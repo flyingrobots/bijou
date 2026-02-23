@@ -1,2 +1,27 @@
 node_modules/
 dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+.idea/
+.vscode/
+*.sublime-workspace
+
+# Env
+.env
+.env.*
+
+# Coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+*.tgz

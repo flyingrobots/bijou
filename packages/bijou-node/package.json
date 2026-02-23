@@ -1,0 +1,31 @@
+{
+  "name": "@flyingrobots/bijou-node",
+  "version": "0.1.0",
+  "description": "Node.js adapter for bijou — chalk styling, readline I/O, process runtime.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "*",
+    "chalk": "^5.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

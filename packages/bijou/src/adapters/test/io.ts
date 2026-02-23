@@ -1,0 +1,58 @@
+import type { IOPort, RawInputHandle, TimerHandle } from '../../ports/io.js';
+import { join } from 'path';
+
+export interface MockIOOptions {
+  answers?: string[];
+  files?: Record<string, string>;
+  dirs?: Record<string, string[]>;
+}
+
+export interface MockIO extends IOPort {
+  written: string[];
+  answerQueue: string[];
+}
+
+export function mockIO(options: MockIOOptions = {}): MockIO {
+  const written: string[] = [];
+  const answerQueue = [...(options.answers ?? [])];
+  const files = options.files ?? {};
+  const dirs = options.dirs ?? {};
+
+  return {
+    written,
+    answerQueue,
+
+    write(data: string): void {
+      written.push(data);
+    },
+
+    question(prompt: string): Promise<string> {
+      written.push(prompt);
+      return Promise.resolve(answerQueue.shift() ?? '');
+    },
+
+    rawInput(onKey: (key: string) => void): RawInputHandle {
+      void onKey;
+      return { dispose() {} };
+    },
+
+    setInterval(callback: () => void, ms: number): TimerHandle {
+      const id = globalThis.setInterval(callback, ms);
+      return { dispose() { clearInterval(id); } };
+    },
+
+    readFile(path: string): string {
+      const content = files[path];
+      if (content === undefined) throw new Error(`Mock: file not found: ${path}`);
+      return content;
+    },
+
+    readDir(path: string): string[] {
+      return dirs[path] ?? [];
+    },
+
+    joinPath(...segments: string[]): string {
+      return join(...segments);
+    },
+  };
+}
