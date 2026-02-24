@@ -77,6 +77,6 @@ describe('createBijou()', () => {
 
   it('defaults to CYAN_MAGENTA when no BIJOU_THEME env var is set', () => {
     const ctx = createBijou(basePorts());
-    expect(ctx.theme.theme.name).toBe(CYAN_MAGENTA.name);
+    expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
   });
 });
