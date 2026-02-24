@@ -28,6 +28,6 @@ describe('default context', () => {
   it('_resetDefaultContextForTesting() clears the singleton', () => {
     setDefaultContext(createTestContext());
     _resetDefaultContextForTesting();
-    expect(() => getDefaultContext()).toThrow();
+    expect(() => getDefaultContext()).toThrow('[bijou] No default context configured');
   });
 });
