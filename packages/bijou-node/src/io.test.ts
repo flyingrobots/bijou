@@ -30,7 +30,8 @@ describe('nodeIO()', () => {
 
   it('readFile() throws for missing file', () => {
     const io = nodeIO();
-    expect(() => io.readFile('/tmp/bijou-nonexistent-file-xyz')).toThrow();
+    const missingFile = join(tmpdir(), `bijou-missing-${Date.now()}.txt`);
+    expect(() => io.readFile(missingFile)).toThrow();
   });
 
   it('readDir() lists real directory contents', () => {
@@ -46,12 +47,13 @@ describe('nodeIO()', () => {
 
   it('readDir() throws for missing directory', () => {
     const io = nodeIO();
-    expect(() => io.readDir('/tmp/bijou-nonexistent-dir-xyz')).toThrow();
+    const missingDir = join(tmpdir(), `bijou-missing-${Date.now()}`);
+    expect(() => io.readDir(missingDir)).toThrow();
   });
 
   it('joinPath() joins segments', () => {
     const io = nodeIO();
-    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe('/foo/bar/baz.txt');
+    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe(join('/foo', 'bar', 'baz.txt'));
   });
 
   it('setInterval() returns a disposable handle', () => {
