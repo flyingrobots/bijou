@@ -2,6 +2,10 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createNodeContext } from './index.js';
 
 describe('createNodeContext()', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('returns BijouContext with all five fields', () => {
     const ctx = createNodeContext();
     expect(ctx.theme).toBeDefined();
@@ -26,9 +30,5 @@ describe('createNodeContext()', () => {
     vi.stubEnv('__BIJOU_TEST_CTX__', 'test-value');
     const ctx = createNodeContext();
     expect(ctx.runtime.env('__BIJOU_TEST_CTX__')).toBe('test-value');
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
   });
 });
