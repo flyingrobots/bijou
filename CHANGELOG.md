@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [0.1.0] - 2026-02-23
 
 ### Added
@@ -32,4 +34,5 @@ All notable changes to this project will be documented in this file.
 - **DTCG edge cases** (8 tests): round-trip for all presets, unresolvable/circular refs, missing groups, modifier preservation
 - **bijou-node adapters** (29 tests): `nodeRuntime()`, `nodeIO()`, `chalkStyle()`, `createBijouNode()` integration
 
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
