@@ -19,6 +19,9 @@ export function createNodeContext(): BijouContext {
 }
 
 let initialized = false;
+export function _resetInitializedForTesting(): void {
+  initialized = false;
+}
 export function initDefaultContext(): BijouContext {
   if (!initialized) {
     const ctx = createNodeContext();

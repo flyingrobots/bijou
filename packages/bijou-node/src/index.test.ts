@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { createNodeContext } from './index.js';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
+import { createNodeContext, initDefaultContext, _resetInitializedForTesting } from './index.js';
+import { getDefaultContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou';
 
 describe('createNodeContext()', () => {
   afterEach(() => {
@@ -30,5 +31,38 @@ describe('createNodeContext()', () => {
     vi.stubEnv('__BIJOU_TEST_CTX__', 'test-value');
     const ctx = createNodeContext();
     expect(ctx.runtime.env('__BIJOU_TEST_CTX__')).toBe('test-value');
+  });
+});
+
+describe('initDefaultContext()', () => {
+  beforeEach(() => {
+    _resetInitializedForTesting();
+    _resetDefaultContextForTesting();
+  });
+
+  afterEach(() => {
+    _resetInitializedForTesting();
+    _resetDefaultContextForTesting();
+  });
+
+  it('first call returns a BijouContext with all five fields', () => {
+    const ctx = initDefaultContext();
+    expect(ctx.theme).toBeDefined();
+    expect(ctx.mode).toBeDefined();
+    expect(ctx.runtime).toBeDefined();
+    expect(ctx.io).toBeDefined();
+    expect(ctx.style).toBeDefined();
+  });
+
+  it('first call sets the default context', () => {
+    const ctx = initDefaultContext();
+    expect(getDefaultContext()).toBe(ctx);
+  });
+
+  it('subsequent call returns a new context without overwriting the default', () => {
+    const first = initDefaultContext();
+    const second = initDefaultContext();
+    expect(second).not.toBe(first);
+    expect(getDefaultContext()).toBe(first);
   });
 });
