@@ -15,8 +15,7 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ff0000' }, 'red')).toContain('red');
     });
 
-    it('styled() applies hex color when chalk supports it', () => {
-      if (!chalkEmitsColor) return; // skip in colorless env
+    it.runIf(chalkEmitsColor)('styled() applies hex color when chalk supports it', () => {
       expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(/\x1b\[/);
     });
 

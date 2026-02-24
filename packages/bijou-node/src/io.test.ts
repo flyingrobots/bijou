@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { nodeIO } from './io.js';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -56,8 +56,7 @@ describe('nodeIO()', () => {
 
   it('setInterval() returns a disposable handle', () => {
     const io = nodeIO();
-    let count = 0;
-    const handle = io.setInterval(() => { count++; }, 10_000);
+    const handle = io.setInterval(() => {}, 10_000);
     expect(handle.dispose).toBeTypeOf('function');
     handle.dispose();
   });
