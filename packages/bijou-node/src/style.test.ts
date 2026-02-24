@@ -16,7 +16,7 @@ describe('chalkStyle()', () => {
     });
 
     it.runIf(chalkEmitsColor)('styled() applies hex color when chalk supports it', () => {
-      expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(/\x1b\[/);
+      expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(new RegExp('\\x1b\\['));
     });
 
     it('styled() applies bold modifier', () => {
