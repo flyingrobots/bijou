@@ -268,8 +268,9 @@ describe('DTCG interop', () => {
         },
       };
 
-      // Should not throw — just returns the ref string as-is since it resolves to another ref
-      expect(() => fromDTCG(doc)).not.toThrow();
+      // Should not throw — resolves one level: {a} → $value of a = '{b}'
+      const theme = fromDTCG(doc);
+      expect(theme.status.success.hex).toBe('{b}');
     });
 
     it('missing optional groups produce default #000000 tokens', () => {
