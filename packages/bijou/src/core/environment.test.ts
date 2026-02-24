@@ -13,15 +13,14 @@ import { CYAN_MAGENTA } from './theme/presets.js';
 // ── NO_COLOR compliance ──────────────────────────────────────────────
 
 describe('NO_COLOR compliance', () => {
-  const ctx = createTestContext({ noColor: true, mode: 'interactive' });
-
   it('theme.ink() returns undefined for all tokens', () => {
+    const ctx = createTestContext({ noColor: true, mode: 'interactive' });
     expect(ctx.theme.ink(ctx.theme.theme.semantic.primary)).toBeUndefined();
     expect(ctx.theme.ink(ctx.theme.theme.status.success)).toBeUndefined();
   });
 
   it('gradientText() returns plain text', () => {
-    const result = gradientText('hello', CYAN_MAGENTA.gradient.primary, {
+    const result = gradientText('hello', CYAN_MAGENTA.gradient.brand, {
       style: plainStyle(),
       noColor: true,
     });
@@ -29,6 +28,7 @@ describe('NO_COLOR compliance', () => {
   });
 
   it('box borders render without ANSI color codes', () => {
+    const ctx = createTestContext({ noColor: true, mode: 'interactive' });
     const result = box('content', { ctx });
     expect(result).not.toMatch(/\x1b\[/);
     expect(result).toContain('content');
@@ -36,12 +36,14 @@ describe('NO_COLOR compliance', () => {
   });
 
   it('progress bar renders without ANSI color codes', () => {
+    const ctx = createTestContext({ noColor: true, mode: 'interactive' });
     const result = progressBar(50, { ctx });
     expect(result).not.toMatch(/\x1b\[/);
     expect(result).toContain('50%');
   });
 
   it('table renders without ANSI color codes', () => {
+    const ctx = createTestContext({ noColor: true, mode: 'interactive' });
     const result = table({
       columns: [{ header: 'Name' }],
       rows: [['Alice']],
@@ -56,24 +58,26 @@ describe('NO_COLOR compliance', () => {
 // ── Piped / non-interactive output ───────────────────────────────────
 
 describe('piped / non-interactive output', () => {
-  const ctx = createTestContext({ mode: 'pipe' });
-
   it('box() returns content only (no border)', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     const result = box('just text', { ctx });
     expect(result).toBe('just text');
   });
 
   it('headerBox() returns label + detail as plain text', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     const result = headerBox('Deploy', { detail: 'v1.0', ctx });
     expect(result).toBe('Deploy  v1.0');
   });
 
   it('headerBox() returns label only when no detail', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     const result = headerBox('Deploy', { ctx });
     expect(result).toBe('Deploy');
   });
 
   it('table() outputs TSV format', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     const result = table({
       columns: [{ header: 'Name' }, { header: 'Age' }],
       rows: [['Alice', '30'], ['Bob', '25']],
@@ -83,10 +87,12 @@ describe('piped / non-interactive output', () => {
   });
 
   it('progressBar() outputs percentage text', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     expect(progressBar(45, { ctx })).toBe('Progress: 45%');
   });
 
   it('spinnerFrame() returns label with ellipsis', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
     expect(spinnerFrame(0, { ctx })).toBe('Loading...');
   });
 });
@@ -132,17 +138,18 @@ describe('BIJOU_ACCESSIBLE', () => {
 // ── Accessible mode ──────────────────────────────────────────────────
 
 describe('accessible mode', () => {
-  const ctx = createTestContext({ mode: 'accessible' });
-
   it('box() returns content only', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
     expect(box('text', { ctx })).toBe('text');
   });
 
   it('headerBox() returns label: detail', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
     expect(headerBox('Status', { detail: 'OK', ctx })).toBe('Status: OK');
   });
 
   it('table() uses row-label format', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
     const result = table({
       columns: [{ header: 'Name' }, { header: 'Role' }],
       rows: [['Alice', 'Admin']],
@@ -152,10 +159,12 @@ describe('accessible mode', () => {
   });
 
   it('spinnerFrame() returns static text indicator', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
     expect(spinnerFrame(0, { ctx })).toBe('Loading. Please wait.');
   });
 
   it('progressBar() returns spoken percentage', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
     expect(progressBar(75, { ctx })).toBe('75 percent complete.');
   });
 });
