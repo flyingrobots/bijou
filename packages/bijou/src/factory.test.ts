@@ -3,7 +3,7 @@ import { createBijou } from './factory.js';
 import { mockRuntime } from './adapters/test/runtime.js';
 import { mockIO } from './adapters/test/io.js';
 import { plainStyle } from './adapters/test/style.js';
-import { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS } from './core/theme/presets.js';
+import { CYAN_MAGENTA, TEAL_ORANGE_PINK } from './core/theme/presets.js';
 
 function basePorts(env: Record<string, string> = {}, tty = true) {
   return {
@@ -65,7 +65,7 @@ describe('createBijou()', () => {
     expect(ctx.theme.noColor).toBe(false);
   });
 
-  it('detects rich mode when stdout is TTY', () => {
+  it('detects interactive mode when stdout is TTY', () => {
     const ctx = createBijou(basePorts({}, true));
     expect(ctx.mode).toBe('interactive');
   });
