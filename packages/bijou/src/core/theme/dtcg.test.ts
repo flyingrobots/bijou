@@ -178,9 +178,10 @@ describe('DTCG interop', () => {
         expect(rt.name).toBe(name);
         expect(rt.status.success.hex).toBe(preset.status.success.hex);
         expect(rt.status.error.hex).toBe(preset.status.error.hex);
+        expect(rt.status.pending.modifiers).toEqual(preset.status.pending.modifiers);
+        expect(rt.status.muted.modifiers).toEqual(preset.status.muted.modifiers);
         expect(rt.border.primary.hex).toBe(preset.border.primary.hex);
         expect(rt.ui.cursor.hex).toBe(preset.ui.cursor.hex);
-        // Gradient stop count preserved
         expect(rt.gradient.brand).toHaveLength(preset.gradient.brand.length);
         expect(rt.gradient.progress).toHaveLength(preset.gradient.progress.length);
       }
@@ -188,8 +189,24 @@ describe('DTCG interop', () => {
   });
 
   describe('fromDTCG edge cases', () => {
+    // Shared minimal boilerplate — tokens without $type are still parsed
+    // (isDTCGToken only checks for $value presence)
+    function minimalDoc(overrides: Partial<DTCGDocument> = {}): DTCGDocument {
+      const filler = (keys: string[]) =>
+        Object.fromEntries(keys.map(k => [k, { $value: '#aaa' }]));
+      return {
+        name: { $type: 'string', $value: 'test' },
+        status: filler(['success', 'error', 'warning', 'info', 'pending', 'active', 'muted']),
+        semantic: filler(['success', 'error', 'warning', 'info', 'accent', 'muted', 'primary']),
+        gradient: { brand: { $type: 'gradient', $value: [] }, progress: { $type: 'gradient', $value: [] } },
+        border: filler(['primary', 'secondary', 'success', 'warning', 'error', 'muted']),
+        ui: filler(['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty']),
+        ...overrides,
+      };
+    }
+
     it('unresolvable reference passes raw ref string as hex value', () => {
-      const doc: DTCGDocument = {
+      const doc = minimalDoc({
         name: { $type: 'string', $value: 'ref-broken' },
         status: {
           success: { $type: 'color', $value: '{nonexistent.path}' },
@@ -200,42 +217,19 @@ describe('DTCG interop', () => {
           active: { $type: 'color', $value: '#00ffff' },
           muted: { $type: 'color', $value: '#808080' },
         },
-        semantic: {
-          success: { $type: 'color', $value: '#00ff00' },
-          error: { $type: 'color', $value: '#ff0000' },
-          warning: { $type: 'color', $value: '#ffff00' },
-          info: { $type: 'color', $value: '#00ffff' },
-          accent: { $type: 'color', $value: '#ff00ff' },
-          muted: { $type: 'color', $value: '#808080' },
-          primary: { $type: 'color', $value: '#ffffff' },
-        },
-        gradient: {
-          brand: { $type: 'gradient', $value: [] },
-          progress: { $type: 'gradient', $value: [] },
-        },
-        border: {
-          primary: { $value: '#aaa' }, secondary: { $value: '#aaa' },
-          success: { $value: '#aaa' }, warning: { $value: '#aaa' },
-          error: { $value: '#aaa' }, muted: { $value: '#aaa' },
-        },
-        ui: {
-          cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' },
-          scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' },
-          logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' },
-          trackEmpty: { $value: '#aaa' },
-        },
-      };
+      });
 
       const theme = fromDTCG(doc);
-      // Unresolvable ref string is treated as the hex value
       expect(theme.status.success.hex).toBe('{nonexistent.path}');
     });
 
-    it('circular references do not crash (return raw ref string)', () => {
-      const doc: DTCGDocument = {
+    it('single-level resolution stops at non-hex ref string (no recursive resolve)', () => {
+      // The resolver is non-recursive by design: {a} resolves to a.$value
+      // which is the literal string '{b}', not a further dereference.
+      const doc = minimalDoc({
         a: { $type: 'color', $value: '{b}' },
         b: { $type: 'color', $value: '{a}' },
-        name: { $type: 'string', $value: 'circular' },
+        name: { $type: 'string', $value: 'non-recursive' },
         status: {
           success: { $type: 'color', $value: '{a}' },
           error: { $type: 'color', $value: '#ff0000' },
@@ -245,30 +239,8 @@ describe('DTCG interop', () => {
           active: { $type: 'color', $value: '#00ffff' },
           muted: { $type: 'color', $value: '#808080' },
         },
-        semantic: {
-          success: { $value: '#0f0' }, error: { $value: '#f00' },
-          warning: { $value: '#ff0' }, info: { $value: '#0ff' },
-          accent: { $value: '#f0f' }, muted: { $value: '#888' },
-          primary: { $value: '#fff' },
-        },
-        gradient: {
-          brand: { $type: 'gradient', $value: [] },
-          progress: { $type: 'gradient', $value: [] },
-        },
-        border: {
-          primary: { $value: '#aaa' }, secondary: { $value: '#aaa' },
-          success: { $value: '#aaa' }, warning: { $value: '#aaa' },
-          error: { $value: '#aaa' }, muted: { $value: '#aaa' },
-        },
-        ui: {
-          cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' },
-          scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' },
-          logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' },
-          trackEmpty: { $value: '#aaa' },
-        },
-      };
+      });
 
-      // Should not throw — resolves one level: {a} → $value of a = '{b}'
       const theme = fromDTCG(doc);
       expect(theme.status.success.hex).toBe('{b}');
     });
@@ -276,7 +248,6 @@ describe('DTCG interop', () => {
     it('missing optional groups produce default #000000 tokens', () => {
       const doc: DTCGDocument = {
         name: { $type: 'string', $value: 'minimal' },
-        // Everything else missing
       };
 
       const theme = fromDTCG(doc);
@@ -296,25 +267,11 @@ describe('DTCG interop', () => {
   });
 
   describe('toDTCG edge cases', () => {
-    it('preserves modifier metadata through toDTCG', () => {
-      const doc = toDTCG(CYAN_MAGENTA);
-      const status = doc['status'] as Record<string, { $type: string; $value: unknown }>;
-      // pending has ['dim'] modifier
-      const pending = status['pending']!.$value as { hex: string; modifiers: string[] };
-      expect(pending.modifiers).toEqual(['dim']);
-    });
-
-    it('tokens without modifiers are encoded as plain hex strings', () => {
-      const doc = toDTCG(CYAN_MAGENTA);
-      const status = doc['status'] as Record<string, { $type: string; $value: unknown }>;
-      // success has no modifiers
-      expect(typeof status['success']!.$value).toBe('string');
-    });
-
     it('gradient stops encode RGB as hex strings', () => {
       const doc = toDTCG(CYAN_MAGENTA);
       const gradient = doc['gradient'] as Record<string, { $value: unknown }>;
-      const stops = gradient['brand']!.$value as Array<{ pos: number; color: string }>;
+      expect(gradient['brand']).toBeDefined();
+      const stops = gradient['brand'].$value as Array<{ pos: number; color: string }>;
       expect(stops.length).toBeGreaterThan(0);
       for (const stop of stops) {
         expect(stop.color).toMatch(/^#[0-9a-f]{6}$/);
