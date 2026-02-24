@@ -1,15 +1,15 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { nodeRuntime } from './runtime.js';
 
 describe('nodeRuntime()', () => {
   const TEMP_KEY = '__BIJOU_TEST_RUNTIME__';
 
   afterEach(() => {
-    delete process.env[TEMP_KEY];
+    vi.unstubAllEnvs();
   });
 
   it('env() reads from process.env', () => {
-    process.env[TEMP_KEY] = 'hello';
+    vi.stubEnv(TEMP_KEY, 'hello');
     const rt = nodeRuntime();
     expect(rt.env(TEMP_KEY)).toBe('hello');
   });
