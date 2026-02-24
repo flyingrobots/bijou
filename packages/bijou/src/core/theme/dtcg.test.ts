@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { fromDTCG, toDTCG, type DTCGDocument } from './dtcg.js';
-import { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS } from './presets.js';
+import { CYAN_MAGENTA, PRESETS } from './presets.js';
 
 describe('DTCG interop', () => {
   describe('toDTCG', () => {
@@ -188,7 +188,7 @@ describe('DTCG interop', () => {
   });
 
   describe('fromDTCG edge cases', () => {
-    it('unresolvable reference falls back to #000000', () => {
+    it('unresolvable reference passes raw ref string as hex value', () => {
       const doc: DTCGDocument = {
         name: { $type: 'string', $value: 'ref-broken' },
         status: {
@@ -209,9 +209,21 @@ describe('DTCG interop', () => {
           muted: { $type: 'color', $value: '#808080' },
           primary: { $type: 'color', $value: '#ffffff' },
         },
-        gradient: { brand: { $type: 'gradient', $value: [] }, progress: { $type: 'gradient', $value: [] } },
-        border: { primary: { $value: '#aaa' }, secondary: { $value: '#aaa' }, success: { $value: '#aaa' }, warning: { $value: '#aaa' }, error: { $value: '#aaa' }, muted: { $value: '#aaa' } },
-        ui: { cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' }, scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' }, logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' }, trackEmpty: { $value: '#aaa' } },
+        gradient: {
+          brand: { $type: 'gradient', $value: [] },
+          progress: { $type: 'gradient', $value: [] },
+        },
+        border: {
+          primary: { $value: '#aaa' }, secondary: { $value: '#aaa' },
+          success: { $value: '#aaa' }, warning: { $value: '#aaa' },
+          error: { $value: '#aaa' }, muted: { $value: '#aaa' },
+        },
+        ui: {
+          cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' },
+          scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' },
+          logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' },
+          trackEmpty: { $value: '#aaa' },
+        },
       };
 
       const theme = fromDTCG(doc);
@@ -233,10 +245,27 @@ describe('DTCG interop', () => {
           active: { $type: 'color', $value: '#00ffff' },
           muted: { $type: 'color', $value: '#808080' },
         },
-        semantic: { success: { $value: '#0f0' }, error: { $value: '#f00' }, warning: { $value: '#ff0' }, info: { $value: '#0ff' }, accent: { $value: '#f0f' }, muted: { $value: '#888' }, primary: { $value: '#fff' } },
-        gradient: { brand: { $type: 'gradient', $value: [] }, progress: { $type: 'gradient', $value: [] } },
-        border: { primary: { $value: '#aaa' }, secondary: { $value: '#aaa' }, success: { $value: '#aaa' }, warning: { $value: '#aaa' }, error: { $value: '#aaa' }, muted: { $value: '#aaa' } },
-        ui: { cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' }, scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' }, logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' }, trackEmpty: { $value: '#aaa' } },
+        semantic: {
+          success: { $value: '#0f0' }, error: { $value: '#f00' },
+          warning: { $value: '#ff0' }, info: { $value: '#0ff' },
+          accent: { $value: '#f0f' }, muted: { $value: '#888' },
+          primary: { $value: '#fff' },
+        },
+        gradient: {
+          brand: { $type: 'gradient', $value: [] },
+          progress: { $type: 'gradient', $value: [] },
+        },
+        border: {
+          primary: { $value: '#aaa' }, secondary: { $value: '#aaa' },
+          success: { $value: '#aaa' }, warning: { $value: '#aaa' },
+          error: { $value: '#aaa' }, muted: { $value: '#aaa' },
+        },
+        ui: {
+          cursor: { $value: '#aaa' }, scrollThumb: { $value: '#aaa' },
+          scrollTrack: { $value: '#aaa' }, sectionHeader: { $value: '#aaa' },
+          logo: { $value: '#aaa' }, tableHeader: { $value: '#aaa' },
+          trackEmpty: { $value: '#aaa' },
+        },
       };
 
       // Should not throw — just returns the ref string as-is since it resolves to another ref
