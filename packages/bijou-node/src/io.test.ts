@@ -5,11 +5,12 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 
 describe('nodeIO()', () => {
-  let tempDir: string;
+  let tempDir: string | undefined;
 
   afterEach(() => {
     if (tempDir) {
       rmSync(tempDir, { recursive: true, force: true });
+      tempDir = undefined;
     }
   });
 
@@ -30,7 +31,7 @@ describe('nodeIO()', () => {
 
   it('readFile() throws for missing file', () => {
     const io = nodeIO();
-    const missingFile = join(tmpdir(), `bijou-missing-${Date.now()}.txt`);
+    const missingFile = join(tmpdir(), `bijou-missing-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`);
     expect(() => io.readFile(missingFile)).toThrow();
   });
 
@@ -47,7 +48,7 @@ describe('nodeIO()', () => {
 
   it('readDir() throws for missing directory', () => {
     const io = nodeIO();
-    const missingDir = join(tmpdir(), `bijou-missing-${Date.now()}`);
+    const missingDir = join(tmpdir(), `bijou-missing-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     expect(() => io.readDir(missingDir)).toThrow();
   });
 
