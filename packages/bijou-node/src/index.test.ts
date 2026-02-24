@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createNodeContext } from './index.js';
 
 describe('createNodeContext()', () => {
@@ -23,7 +23,12 @@ describe('createNodeContext()', () => {
   });
 
   it('runtime reads process.env', () => {
+    vi.stubEnv('__BIJOU_TEST_CTX__', 'test-value');
     const ctx = createNodeContext();
-    expect(ctx.runtime.env('PATH')).toBeDefined();
+    expect(ctx.runtime.env('__BIJOU_TEST_CTX__')).toBe('test-value');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 });
