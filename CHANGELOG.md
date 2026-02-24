@@ -31,3 +31,5 @@ All notable changes to this project will be documented in this file.
 - **Environment integration** (24 tests): NO_COLOR compliance, piped output degradation, CI/TERM=dumb detection, accessible mode, conflicting env vars
 - **DTCG edge cases** (8 tests): round-trip for all presets, unresolvable/circular refs, missing groups, modifier preservation
 - **bijou-node adapters** (29 tests): `nodeRuntime()`, `nodeIO()`, `chalkStyle()`, `createBijouNode()` integration
+
+[0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
