@@ -14,9 +14,8 @@ describe('nodeIO()', () => {
     }
   });
 
-  it('write() calls process.stdout.write', () => {
+  it('write() does not throw', () => {
     const io = nodeIO();
-    // Just verify it doesn't throw — stdout.write in test runner is fine
     expect(() => io.write('')).not.toThrow();
   });
 
