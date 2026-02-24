@@ -29,5 +29,16 @@
   "engines": {
     "node": ">=18"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flyingrobots/bijou.git",
+    "directory": "packages/bijou"
+  },
+  "homepage": "https://github.com/flyingrobots/bijou",
+  "bugs": "https://github.com/flyingrobots/bijou/issues",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }
