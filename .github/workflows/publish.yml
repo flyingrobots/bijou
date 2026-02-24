@@ -71,16 +71,44 @@ jobs:
             echo "npm_dist_tag=latest" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Verify tag == package versions
+      - name: Verify all packages match tag version
         shell: bash
         run: |
           set -euo pipefail
           TAG_VERSION="${{ steps.meta.outputs.tag_version }}"
-          for pkg in packages/bijou packages/bijou-node; do
-            PKG_VERSION=$(node -p "require('./$pkg/package.json').version")
-            echo "$pkg: $PKG_VERSION (tag: $TAG_VERSION)"
-            test "$PKG_VERSION" = "$TAG_VERSION"
+          ERRORS=0
+
+          for pkg in packages/*/package.json; do
+            PKG_NAME=$(node -p "require('./$pkg').name")
+            PKG_VERSION=$(node -p "require('./$pkg').version")
+            echo "$PKG_NAME: $PKG_VERSION (tag: $TAG_VERSION)"
+            if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+              echo "::error::$PKG_NAME version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+              ERRORS=$((ERRORS+1))
+            fi
           done
+
+          # Verify internal cross-deps are pinned to same version
+          for pkg in packages/*/package.json; do
+            PKG_NAME=$(node -p "require('./$pkg').name")
+            node -e "
+              const p = require('./$pkg');
+              for (const depType of ['dependencies','devDependencies','peerDependencies']) {
+                if (!p[depType]) continue;
+                for (const [name, ver] of Object.entries(p[depType])) {
+                  if (name.startsWith('@flyingrobots/bijou') && ver !== '$TAG_VERSION') {
+                    console.log('::error::' + p.name + ' has ' + name + '@' + ver + ', expected $TAG_VERSION');
+                    process.exitCode = 1;
+                  }
+                }
+              }
+            " || ERRORS=$((ERRORS+1))
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::Version mismatch detected. Run: npm run version $TAG_VERSION"
+            exit 1
+          fi
 
       - name: Build
         run: npm run build
