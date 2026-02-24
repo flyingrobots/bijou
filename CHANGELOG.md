@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **initDefaultContext() test coverage**: added `_resetInitializedForTesting()` helper and tests verifying first-call sets default context, subsequent calls don't overwrite it
+- **Consistent env stubbing**: replaced direct `process.env` mutation in `runtime.test.ts` with `vi.stubEnv()`/`vi.unstubAllEnvs()`
+- **Modifier ANSI assertions**: added conditional `it.runIf` tests for bold, dim, strikethrough, and inverse modifiers in `style.test.ts`
+- **TTY coverage documentation**: noted `question()`/`rawInput()` are not unit-testable without a TTY
+
+### Added
+
+- `_resetDefaultContextForTesting` re-exported from `@flyingrobots/bijou` barrel
+
 ## [0.1.0] - 2026-02-23
 
 ### Added

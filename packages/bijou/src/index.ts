@@ -12,6 +12,7 @@ export type {
 export {
   getDefaultContext,
   setDefaultContext,
+  _resetDefaultContextForTesting,
 } from './context.js';
 
 // Factory
