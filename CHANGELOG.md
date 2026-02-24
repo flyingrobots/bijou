@@ -20,3 +20,13 @@ All notable changes to this project will be documented in this file.
 - **CI workflow**: test + typecheck on Node 18/20/22
 - **Release workflow**: tag-based publish with OIDC provenance, tag-on-main guard, version verification, retry with backoff, prerelease dist-tags
 - **Lockstep versioning**: `npm run version <ver>` bumps all packages and cross-deps in one command
+- **README** with install, quick start, architecture, and compatibility notes
+- **ROADMAP** with "Tests ARE the Spec" format: user stories, requirements, acceptance criteria, test plans
+
+### Tested
+
+- **Form functions** (42 tests): `confirm()`, `input()`, `select()`, `multiselect()` across pipe, accessible, and non-interactive modes
+- **Factory + context** (15 tests): `createBijou()` wiring, theme resolution, NO_COLOR, default context singleton
+- **Test adapter self-tests** (31 tests): `mockRuntime()`, `mockIO()`, `plainStyle()`, `createTestContext()`
+- **Environment integration** (24 tests): NO_COLOR compliance, piped output degradation, CI/TERM=dumb detection, accessible mode, conflicting env vars
+- **DTCG edge cases** (8 tests): round-trip for all presets, unresolvable/circular refs, missing groups, modifier preservation
