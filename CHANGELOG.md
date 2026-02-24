@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - **DTCG interop**: `fromDTCG()` / `toDTCG()` for Design Token Community Group JSON
 - **Gradient text**: `lerp3()` interpolation, `gradientText()` with NO_COLOR support
 - **Theme resolver**: `createThemeResolver()` factory with configurable env var, presets, fallback
-- **Output detection**: `detectOutputMode()` → `rich` | `pipe` | `accessible`, respects `NO_COLOR`, `TERM=dumb`, `CI`, `BIJOU_ACCESSIBLE`
+- **Output detection**: `detectOutputMode()` → `interactive` | `static` | `pipe` | `accessible`, respects `NO_COLOR`, `TERM=dumb`, `CI`, `BIJOU_ACCESSIBLE`
 - **Components**: `box()`, `headerBox()`, `table()`, `progressBar()`, `spinnerFrame()`, `createSpinner()`, `loadRandomLogo()`, `selectLogoSize()`
 - **Forms**: `input()`, `select()`, `multiselect()`, `confirm()`, `group()`
 - **Graceful degradation** across all output modes for every component
