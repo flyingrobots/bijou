@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { join } from 'path';
 import { mockIO } from './io.js';
 
 describe('mockIO()', () => {
@@ -47,7 +48,7 @@ describe('mockIO()', () => {
 
   it('joinPath() joins path segments', () => {
     const io = mockIO();
-    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe('/foo/bar/baz.txt');
+    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe(join('/foo', 'bar', 'baz.txt'));
   });
 
   it('rawInput() returns a disposable handle', () => {
