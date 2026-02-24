@@ -37,12 +37,8 @@ jobs:
 
       - name: Publish @flyingrobots/bijou
         working-directory: packages/bijou
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
       - name: Publish @flyingrobots/bijou-node
         working-directory: packages/bijou-node
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
