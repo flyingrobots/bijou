@@ -1,5 +1,4 @@
-import { describe, it, expect } from 'vitest';
-import { join } from 'path';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { mockIO } from './io.js';
 
 describe('mockIO()', () => {
@@ -24,6 +23,7 @@ describe('mockIO()', () => {
     await io.question('1? ');
     const result = await io.question('2? ');
     expect(result).toBe('');
+    expect(io.written).toEqual(['1? ', '2? ']);
   });
 
   it('readFile() returns content from mock filesystem', () => {
@@ -48,7 +48,8 @@ describe('mockIO()', () => {
 
   it('joinPath() joins path segments', () => {
     const io = mockIO();
-    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe(join('/foo', 'bar', 'baz.txt'));
+    // Uses path.join internally; hardcoded POSIX expectation
+    expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe('/foo/bar/baz.txt');
   });
 
   it('rawInput() returns a disposable handle', () => {
@@ -59,9 +60,14 @@ describe('mockIO()', () => {
   });
 
   it('setInterval() returns a disposable handle', () => {
-    const io = mockIO();
-    const handle = io.setInterval(() => {}, 1000);
-    expect(handle.dispose).toBeTypeOf('function');
-    handle.dispose(); // cleans up
+    vi.useFakeTimers();
+    try {
+      const io = mockIO();
+      const handle = io.setInterval(() => {}, 1000);
+      expect(handle.dispose).toBeTypeOf('function');
+      handle.dispose();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

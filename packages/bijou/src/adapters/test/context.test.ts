@@ -4,11 +4,11 @@ import { createTestContext } from './index.js';
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
     const ctx = createTestContext();
-    expect(ctx.theme).toBeDefined();
-    expect(ctx.mode).toBeDefined();
-    expect(ctx.runtime).toBeDefined();
-    expect(ctx.io).toBeDefined();
-    expect(ctx.style).toBeDefined();
+    expect(ctx.runtime.env).toBeTypeOf('function');
+    expect(ctx.io.write).toBeTypeOf('function');
+    expect(ctx.style.bold).toBeTypeOf('function');
+    expect(ctx.theme.noColor).toBeTypeOf('boolean');
+    expect(typeof ctx.mode).toBe('string');
   });
 
   it('defaults to interactive mode', () => {
@@ -32,5 +32,15 @@ describe('createTestContext()', () => {
     const ctx = createTestContext();
     ctx.io.write('test');
     expect(ctx.io.written).toEqual(['test']);
+  });
+
+  it('forwards runtime options', () => {
+    const ctx = createTestContext({ runtime: { columns: 120 } });
+    expect(ctx.runtime.columns).toBe(120);
+  });
+
+  it('forwards io options', async () => {
+    const ctx = createTestContext({ io: { answers: ['yes'] } });
+    expect(await ctx.io.question('? ')).toBe('yes');
   });
 });
