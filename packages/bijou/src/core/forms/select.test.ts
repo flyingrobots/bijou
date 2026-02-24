@@ -9,7 +9,7 @@ const OPTIONS = [
 ];
 
 describe('select()', () => {
-  describe('non-interactive fallback (static mode)', () => {
+  describe('numbered fallback (non-interactive)', () => {
     it('renders numbered list', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1'] } });
       await select({ title: 'Color', options: OPTIONS, ctx });
@@ -39,6 +39,12 @@ describe('select()', () => {
       const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('blue');
     });
+
+    it('valid input overrides defaultValue', async () => {
+      const ctx = createTestContext({ mode: 'static', io: { answers: ['1'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
+      expect(result).toBe('red');
+    });
   });
 
   describe('pipe mode', () => {
@@ -60,7 +66,7 @@ describe('select()', () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: ['1'] } });
       await select({ title: 'Color', options: OPTIONS, ctx });
       const output = ctx.io.written.join('');
-      expect(output).toContain('Enter number');
+      expect(output).toContain('Enter number:');
     });
 
     it('shows option descriptions', async () => {

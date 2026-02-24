@@ -38,14 +38,23 @@ describe('input()', () => {
   describe('validation', () => {
     it('required: true writes error for empty input', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: [''] } });
-      await input({ title: 'Name', required: true, ctx });
+      const result = await input({ title: 'Name', required: true, ctx });
       const allOutput = ctx.io.written.join('');
       expect(allOutput).toContain('required');
+      expect(result).toBe('');
+    });
+
+    it('required: true with non-empty input does not write error', async () => {
+      const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello'] } });
+      const result = await input({ title: 'Name', required: true, ctx });
+      const allOutput = ctx.io.written.join('');
+      expect(allOutput).not.toMatch(/required/i);
+      expect(result).toBe('hello');
     });
 
     it('custom validator error is written', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['ab'] } });
-      await input({
+      const result = await input({
         title: 'Code',
         validate: (v) => v.length < 3
           ? { valid: false, message: 'Too short' }
@@ -54,11 +63,12 @@ describe('input()', () => {
       });
       const allOutput = ctx.io.written.join('');
       expect(allOutput).toContain('Too short');
+      expect(result).toBe('ab');
     });
 
     it('valid input does not write error', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello'] } });
-      await input({
+      const result = await input({
         title: 'Code',
         validate: (v) => v.length >= 3
           ? { valid: true }
@@ -67,14 +77,16 @@ describe('input()', () => {
       });
       const allOutput = ctx.io.written.join('');
       expect(allOutput).not.toContain('Too short');
+      expect(result).toBe('hello');
     });
   });
 
   describe('accessible mode', () => {
     it('prompt says "Enter <title>"', async () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: ['val'] } });
-      await input({ title: 'Username', ctx });
+      const result = await input({ title: 'Username', ctx });
       expect(ctx.io.written[0]).toContain('Enter username');
+      expect(result).toBe('val');
     });
   });
 });

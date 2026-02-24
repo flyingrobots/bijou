@@ -52,13 +52,13 @@ describe('confirm()', () => {
     it('prompt contains Y/n hint', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
       await confirm({ title: 'Continue?', ctx });
-      expect(ctx.io.written[0]).toContain('Y/n');
+      expect(ctx.io.written.join('')).toContain('Y/n');
     });
 
     it('prompt contains y/N hint when default is false', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
       await confirm({ title: 'Continue?', defaultValue: false, ctx });
-      expect(ctx.io.written[0]).toContain('y/N');
+      expect(ctx.io.written.join('')).toContain('y/N');
     });
   });
 
@@ -66,13 +66,13 @@ describe('confirm()', () => {
     it('prompt says "Type yes or no"', async () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: ['yes'] } });
       await confirm({ title: 'Continue?', ctx });
-      expect(ctx.io.written[0]).toContain('Type yes or no');
+      expect(ctx.io.written.join('')).toContain('Type yes or no');
     });
 
     it('indicates default in prompt', async () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: [''] } });
       await confirm({ title: 'Continue?', defaultValue: false, ctx });
-      expect(ctx.io.written[0]).toContain('default: no');
+      expect(ctx.io.written.join('')).toContain('default: no');
     });
   });
 
