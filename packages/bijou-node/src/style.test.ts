@@ -36,6 +36,22 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toContain('inv');
     });
 
+    it.runIf(chalkEmitsColor)('styled() emits ANSI for bold modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits ANSI for dim modifier', () => {
+      expect(style.styled({ hex: '#808080', modifiers: ['dim'] }, 'muted')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits ANSI for strikethrough modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['strikethrough'] }, 'gone')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits ANSI for inverse modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toMatch(new RegExp('\\x1b\\['));
+    });
+
     it('rgb() returns string containing the text', () => {
       expect(style.rgb(255, 0, 0, 'red')).toContain('red');
     });

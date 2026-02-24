@@ -62,4 +62,6 @@ describe('nodeIO()', () => {
     expect(handle.dispose).toBeTypeOf('function');
     handle.dispose();
   });
+
+  // question() and rawInput() require a TTY stdin and are not unit-testable.
 });
