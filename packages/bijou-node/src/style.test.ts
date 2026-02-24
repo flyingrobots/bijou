@@ -60,11 +60,10 @@ describe('chalkStyle()', () => {
       expect(style.hex('#ff0000', 'red')).toBe('red');
     });
 
-    it('styled() does not apply hex color', () => {
+    it('styled() passes text through without modification', () => {
       // In noColor mode, styled uses base chalk (no hex call),
-      // so without modifiers the text should pass through
-      const result = style.styled({ hex: '#ff0000' }, 'plain');
-      expect(result).toContain('plain');
+      // so without modifiers the text should pass through exactly
+      expect(style.styled({ hex: '#ff0000' }, 'plain')).toBe('plain');
     });
 
     it('bold() still applies (chalk.bold is not gated by noColor)', () => {
