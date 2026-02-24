@@ -15,12 +15,13 @@ function basePorts(env: Record<string, string> = {}, tty = true) {
 
 describe('createBijou()', () => {
   it('returns BijouContext with all five fields populated', () => {
-    const ctx = createBijou(basePorts());
-    expect(ctx.theme).toBeDefined();
-    expect(ctx.mode).toBeDefined();
-    expect(ctx.runtime).toBeDefined();
-    expect(ctx.io).toBeDefined();
-    expect(ctx.style).toBeDefined();
+    const ports = basePorts();
+    const ctx = createBijou(ports);
+    expect(ctx.runtime).toBe(ports.runtime);
+    expect(ctx.io).toBe(ports.io);
+    expect(ctx.style).toBe(ports.style);
+    expect(ctx.mode).toBe('interactive');
+    expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
   });
 
   it('reads BIJOU_THEME from runtime.env and resolves matching preset', () => {
@@ -75,8 +76,22 @@ describe('createBijou()', () => {
     expect(ctx.mode).toBe('pipe');
   });
 
-  it('defaults to CYAN_MAGENTA when no BIJOU_THEME env var is set', () => {
-    const ctx = createBijou(basePorts());
-    expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
+  it('detects static mode when CI is set with TTY', () => {
+    const ctx = createBijou(basePorts({ CI: 'true' }, true));
+    expect(ctx.mode).toBe('static');
+  });
+
+  it('detects accessible mode when BIJOU_ACCESSIBLE is set', () => {
+    const ctx = createBijou(basePorts({ BIJOU_ACCESSIBLE: '1' }, true));
+    expect(ctx.mode).toBe('accessible');
+  });
+
+  it('uses custom fallback theme when BIJOU_THEME is unrecognized', () => {
+    const custom = { ...CYAN_MAGENTA, name: 'my-fallback' };
+    const ctx = createBijou({
+      ...basePorts({ BIJOU_THEME: 'nonexistent' }),
+      theme: custom,
+    });
+    expect(ctx.theme.theme).toBe(custom);
   });
 });

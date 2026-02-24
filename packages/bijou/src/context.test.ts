@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getDefaultContext, setDefaultContext, _resetDefaultContextForTesting } from './context.js';
 import { createTestContext } from './adapters/test/index.js';
 
 describe('default context', () => {
   beforeEach(() => {
+    _resetDefaultContextForTesting();
+  });
+
+  afterEach(() => {
     _resetDefaultContextForTesting();
   });
 
