@@ -1,4 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TimerHandle } from '../../ports/io.js';
 import type { GradientStop } from '../theme/tokens.js';
 import { lerp3 } from '../theme/gradient.js';
 import { getDefaultContext } from '../../context.js';
@@ -31,7 +32,7 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
 
   const width = options.width ?? 20;
   const filledChar = options.filled ?? '\u2588';
-  const emptyChar = options.empty ?? '\u2591';
+  const emptyChar = options.empty ?? '\u2810';
   const showPercent = options.showPercent ?? true;
   const filledCount = Math.min(width, Math.max(0, Math.round((pct / 100) * width)));
 
@@ -52,6 +53,144 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
     bar += ctx.style.hex(emptyToken.hex, emptyChar.repeat(width - filledCount));
   }
 
-  const label = showPercent ? ` ${Math.round(pct)}%` : '';
-  return `[${bar}]${label}`;
+  const label = showPercent ? `${Math.round(pct)}%` : '';
+  return label ? `${label.padStart(4)} ${bar}` : bar;
+}
+
+// ---------------------------------------------------------------------------
+// Live progress bar (caller pushes values)
+// ---------------------------------------------------------------------------
+
+export interface ProgressBarController {
+  start(): void;
+  update(pct: number): void;
+  stop(finalMessage?: string): void;
+}
+
+export interface LiveProgressBarOptions extends ProgressBarOptions {
+  // no extra options beyond ProgressBarOptions
+}
+
+export function createProgressBar(options: LiveProgressBarOptions = {}): ProgressBarController {
+  const ctx = resolveCtx(options.ctx);
+  const mode = ctx.mode;
+
+  return {
+    start() {
+      if (mode !== 'interactive') {
+        ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
+        return;
+      }
+      ctx.io.write('\x1b[?25l');
+      ctx.io.write(progressBar(0, { ...options, ctx }));
+    },
+
+    update(pct: number) {
+      if (mode !== 'interactive') {
+        ctx.io.write(progressBar(pct, { ...options, ctx }) + '\n');
+        return;
+      }
+      ctx.io.write(`\r\x1b[K${progressBar(pct, { ...options, ctx })}`);
+    },
+
+    stop(finalMessage?: string) {
+      if (mode !== 'interactive') {
+        if (finalMessage !== undefined) {
+          ctx.io.write(finalMessage + '\n');
+        }
+        return;
+      }
+      ctx.io.write('\r\x1b[K');
+      ctx.io.write('\x1b[?25h');
+      if (finalMessage !== undefined) {
+        ctx.io.write(finalMessage + '\n');
+      }
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Animated progress bar (smooth interpolation between values)
+// ---------------------------------------------------------------------------
+
+export interface AnimatedProgressBarOptions extends ProgressBarOptions {
+  fps?: number;
+  duration?: number;
+}
+
+export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = {}): ProgressBarController {
+  const ctx = resolveCtx(options.ctx);
+  const mode = ctx.mode;
+  const fps = options.fps ?? 30;
+  const duration = options.duration ?? 300;
+
+  let currentPct = 0;
+  let targetPct = 0;
+  let timer: TimerHandle | null = null;
+
+  const frameMs = Math.round(1000 / fps);
+  const stepPerFrame = 100 / (duration / frameMs); // max pct change per frame
+
+  function render(): void {
+    ctx.io.write(`\r\x1b[K${progressBar(currentPct, { ...options, ctx })}`);
+  }
+
+  function startAnimation(): void {
+    if (timer !== null) return;
+    timer = ctx.io.setInterval(() => {
+      if (Math.abs(targetPct - currentPct) < 0.1) {
+        currentPct = targetPct;
+        render();
+        if (timer !== null) {
+          timer.dispose();
+          timer = null;
+        }
+        return;
+      }
+      const direction = targetPct > currentPct ? 1 : -1;
+      currentPct += direction * Math.min(stepPerFrame, Math.abs(targetPct - currentPct));
+      render();
+    }, frameMs);
+  }
+
+  return {
+    start() {
+      if (mode !== 'interactive') {
+        ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
+        return;
+      }
+      ctx.io.write('\x1b[?25l');
+      render();
+    },
+
+    update(pct: number) {
+      targetPct = Math.max(0, Math.min(100, pct));
+      if (mode !== 'interactive') {
+        currentPct = targetPct;
+        ctx.io.write(progressBar(currentPct, { ...options, ctx }) + '\n');
+        return;
+      }
+      startAnimation();
+    },
+
+    stop(finalMessage?: string) {
+      if (timer !== null) {
+        timer.dispose();
+        timer = null;
+      }
+      currentPct = targetPct;
+      if (mode !== 'interactive') {
+        if (finalMessage !== undefined) {
+          ctx.io.write(finalMessage + '\n');
+        }
+        return;
+      }
+      render();
+      ctx.io.write('\r\x1b[K');
+      ctx.io.write('\x1b[?25h');
+      if (finalMessage !== undefined) {
+        ctx.io.write(finalMessage + '\n');
+      }
+    },
+  };
 }
