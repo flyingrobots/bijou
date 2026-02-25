@@ -307,6 +307,32 @@ round-trip
 
 ---
 
+## bijou-tui — TEA runtime for terminal UIs
+
+**Status:** v0.1.0 — initial implementation
+
+`@flyingrobots/bijou-tui` provides a TEA (The Elm Architecture) runtime for building interactive terminal applications. Existing bijou components are view functions; bijou-tui adds the event loop, keyboard input, and screen management needed for stateful TUI apps.
+
+**Architecture:** `init() → [Model, Cmd[]]` / `update(msg, model) → [Model, Cmd[]]` / `view(model) → string`
+
+**Modules:**
+| Module | Purpose |
+|--------|---------|
+| `types.ts` | `App`, `Cmd`, `KeyMsg`, `QUIT`, `RunOptions` |
+| `keys.ts` | `parseKey()` — raw ANSI → structured `KeyMsg` |
+| `screen.ts` | Alt screen, cursor control, clear — pure ANSI strings via `IOPort` |
+| `commands.ts` | `quit()`, `tick()`, `batch()` — built-in command constructors |
+| `runtime.ts` | `run()` — the TEA event loop with keyboard listener, rendering, cleanup |
+| `layout.ts` | `vstack()`, `hstack()` — composition helpers |
+
+**Graceful degradation:** In non-interactive modes (pipe/static/accessible), `run()` renders the initial view once and exits — no alt screen, no keyboard loop.
+
+**What this unblocks:**
+- **bijou core (future):** `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — pure view functions
+- **bijou-tui (future):** `modal()`, `toast()`, `drawer()`, `commandPalette()` — TEA-based overlay patterns
+
+---
+
 ## Future features
 
 ### Component catalog
@@ -316,9 +342,10 @@ Growing toward a full terminal component library:
 | Category | Components |
 |----------|-----------|
 | **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
-| **Data** | `accordion()`, `tree()`, `timeline()` |
-| **Navigation** | `tabs()`, `breadcrumb()`, `paginator()`, `stepper()`, `commandPalette()` |
+| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~ ✅ |
+| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
 | **Overlay** | `modal()`, `toast()`, `drawer()` |
+| **App** | `list()`, `statusBar()`, `splitPane()`, `tooltip()` |
 
 Each new component should follow this template before implementation:
 1. Write user story and requirements
@@ -326,10 +353,83 @@ Each new component should follow this template before implementation:
 3. Write the tests (they will fail)
 4. Implement until tests pass
 
-### Framework adapters
+### `appFrame` — TEA app shell (bijou-tui)
 
-- `@flyingrobots/bijou-ink` — React context, `useTheme()`, scrollable list hook
-- `@flyingrobots/bijou-vue` — if/when vue-termui matures
+Higher-order TEA app that eliminates the boilerplate every TUI app re-implements: tabbed pages, help overlay, scroll, gutters, fullscreen layout.
+
+**Lives in:** `@flyingrobots/bijou-tui` (owns state, not a pure view)
+
+**Core idea:**
+- `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`
+- Each page declares its view, per-page help lines, and per-page key bindings
+- Frame owns: tab switching, `?` help toggle, scroll state, gutter/chrome rendering
+- Delegates content rendering to the active page's `view()`
+
+**Focused scroll:**
+- Each page/view has its own independent scroll position (preserved when switching tabs)
+- Only the "focused" view scrolls — in a multi-pane layout, focus determines which pane receives scroll input
+- Focus can be driven by tab selection or an explicit activation key per pane
+
+**Open questions:**
+- Multi-pane layouts (split views) vs. single content area per tab
+- How page-level state/update composes with frame-level state (nested TEA? slots?)
+- Whether pages can define sub-tabs or if nesting is out of scope
+
+---
+
+---
+
+## Backlog
+
+Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). Prioritized by how many other features they unblock.
+
+### P0 — Foundational (unblocks multiple features)
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **`viewport()`** | bijou-tui | Scrollable content pane. Foundation for `appFrame`, pager, browsable list, navigable table. |
+| **Keybinding manager** | bijou-tui | Declarative key bindings with enable/disable and help text generation. Needed by `appFrame` for per-page key routing. |
+| **Help generator** | bijou-tui | Auto-build help view from registered keybindings (short/full modes). Pairs with keybinding manager. |
+
+### P1 — Core components
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **`textarea()`** | bijou | Multi-line text input with scroll, line numbers, char limit. |
+| **`filter()`** | bijou | Fuzzy type-to-filter from a list. |
+| **`browsableList()`** | bijou-tui | Rich list with keyboard nav, filtering, pagination, status. Beyond `select()`. |
+| **`filePicker()`** | bijou-tui | Directory browser with extension filtering. |
+| **`pager()`** | bijou-tui | Read-only scrollable text viewer. Thin wrapper over viewport. |
+| **Form wizard** | bijou | Multi-page form orchestration — `stepper()` is visual only today, this adds the state machine. |
+| **`navigableTable()`** | bijou-tui | Keyboard-navigable table with row/column selection. Extends `table()`. |
+
+### P2 — Layout & styling primitives
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **`place()`** | bijou | 2D text placement with horizontal + vertical alignment. |
+| **`enumeratedList()`** | bijou | Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet). |
+| **Terminal hyperlinks** | bijou | Clickable OSC 8 links with graceful fallback. |
+| **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
+| **Color downsampling** | bijou | Truecolor → ANSI256 → ANSI graceful fallback chain. |
+| **Color manipulation** | bijou | `darken()`, `lighten()`, `complementary()`, `alpha()` on theme tokens. |
+| **`markdown()`** | bijou | Render markdown with syntax highlighting. |
+| **`log()`** | bijou | Leveled styled log output (debug/info/warn/error/fatal). |
+
+### P3 — Nice to have
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **Timer / Stopwatch** | bijou | Countdown and elapsed-time display components. |
+| **Cursor manager** | bijou-tui | Cursor style/blink management. |
+| **Underline variants** | bijou | Curly, dotted, dashed underlines. |
+| **MaxWidth / MaxHeight** | bijou | Truncation constraints on styled blocks. |
+| **Dynamic forms** | bijou | Fields that change based on previous input values. |
+| **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
+| **Note field** | bijou | Display-only text within a form flow. |
+| **Scrollable select** | bijou | Fixed-height select with overflow scrolling. |
+
+---
 
 ### Xyph migration
 

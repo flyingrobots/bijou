@@ -27,3 +27,24 @@ export type { SkeletonOptions } from './skeleton.js';
 
 export { kbd } from './kbd.js';
 export type { KbdOptions } from './kbd.js';
+
+export { tree } from './tree.js';
+export type { TreeNode, TreeOptions } from './tree.js';
+
+export { accordion } from './accordion.js';
+export type { AccordionSection, AccordionOptions } from './accordion.js';
+
+export { timeline } from './timeline.js';
+export type { TimelineEvent, TimelineOptions } from './timeline.js';
+
+export { tabs } from './tabs.js';
+export type { TabItem, TabsOptions } from './tabs.js';
+
+export { breadcrumb } from './breadcrumb.js';
+export type { BreadcrumbOptions } from './breadcrumb.js';
+
+export { paginator } from './paginator.js';
+export type { PaginatorOptions } from './paginator.js';
+
+export { stepper } from './stepper.js';
+export type { StepperStep, StepperOptions } from './stepper.js';

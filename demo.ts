@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox, progressBar, gradientText, separator, badge, alert, skeleton, kbd } from '@flyingrobots/bijou';
+import { box, headerBox, progressBar, gradientText, separator, badge, alert, skeleton, kbd, tree, accordion, timeline } from '@flyingrobots/bijou';
 
 const ctx = initDefaultContext();
 
@@ -28,3 +28,26 @@ console.log('Loading:');
 console.log(skeleton({ width: 40, lines: 3 }));
 console.log();
 console.log('Press', kbd('Ctrl+C'), 'to exit or', kbd('Enter'), 'to continue');
+console.log();
+console.log(separator({ label: 'Data Components' }));
+console.log();
+console.log(tree([
+  { label: 'src', children: [
+    { label: 'components', children: [{ label: 'tree.ts' }, { label: 'accordion.ts' }, { label: 'timeline.ts' }] },
+    { label: 'index.ts' },
+  ]},
+  { label: 'package.json' },
+]));
+console.log();
+console.log(accordion([
+  { title: 'Getting Started', content: 'npm install @flyingrobots/bijou', expanded: true },
+  { title: 'Configuration', content: 'Set BIJOU_THEME to choose a preset' },
+  { title: 'API Reference', content: 'See the README for full docs' },
+]));
+console.log();
+console.log(timeline([
+  { label: 'Project created', status: 'success' },
+  { label: 'Tests passing', description: '42 tests', status: 'success' },
+  { label: 'Code review', status: 'active' },
+  { label: 'Deploy to production', status: 'pending' },
+]));

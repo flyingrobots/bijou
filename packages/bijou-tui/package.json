@@ -1,0 +1,27 @@
+{
+  "name": "@flyingrobots/bijou-tui",
+  "version": "0.1.0",
+  "description": "TEA runtime for terminal UIs — model/update/view with keyboard input, alt screen, and layout helpers.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

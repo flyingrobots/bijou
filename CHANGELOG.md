@@ -6,12 +6,33 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **`@flyingrobots/bijou-tui`** — new package: TEA (The Elm Architecture) runtime for terminal UIs
+  - `run()` — TEA event loop with keyboard input, alt screen management, and graceful cleanup
+  - `parseKey()` — raw ANSI byte string → structured `KeyMsg` (arrows, ctrl combos, special keys)
+  - `quit()`, `tick()`, `batch()` — built-in command constructors
+  - `vstack()`, `hstack()` — layout composition helpers with ANSI-aware width calculation
+  - `enterScreen()`, `exitScreen()`, `clearAndHome()` — screen control via `IOPort`
+  - Graceful degradation: non-interactive modes render once and exit
+  - Double Ctrl+C force-quit with terminal state restoration
+  - ~43 tests across keys, screen, commands, layout, and runtime modules
+
+- **Data components** (ROADMAP: Component catalog → Data):
+  - `tree()` — hierarchical tree display with box-drawing connectors, accessible item-count annotations
+  - `accordion()` — collapsible sections with ▼/▶ indicators, pipe mode shows all content as markdown
+  - `timeline()` — vertical event timeline with filled/hollow status dots and connector lines
+- **Navigation components** (ROADMAP: Component catalog → Navigation):
+  - `tabs()` — tab bar with active indicator, badge support, custom separators
+  - `breadcrumb()` — path breadcrumb with muted parents and bold current location
+  - `paginator()` — page indicator in dots or text style
+  - `stepper()` — multi-step progress with completed/active/pending markers
 - **Element components** (ROADMAP: Component catalog → Element):
   - `separator()` — horizontal divider with optional label, full-width by default
   - `badge()` — colored label with inverse styling, 5 variants (success/error/warning/info/muted)
   - `alert()` — styled message box with icon, delegates to `box()`, 4 variants
   - `skeleton()` — loading placeholder with configurable width/lines
   - `kbd()` — keyboard key display with styled brackets and bold text
+
+- **ROADMAP**: Added `appFrame` TEA app shell concept, backlog with P0–P3 priorities from Charm ecosystem gap analysis
 
 ### Changed
 
