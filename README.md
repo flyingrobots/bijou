@@ -61,6 +61,39 @@ packages/
 └── bijou-node/      Node.js adapter (chalk, readline, process)
 ```
 
+```mermaid
+graph LR
+  subgraph Core ["@flyingrobots/bijou (zero deps)"]
+    Components[Components\nbox · table · spinner\nprogress · gradient]
+    Theme[Theme Engine\npresets · DTCG]
+    Forms[Forms\ninput · select · confirm]
+    Ports((Ports))
+    Components --- Ports
+    Theme --- Ports
+    Forms --- Ports
+  end
+
+  subgraph Node ["@flyingrobots/bijou-node"]
+    NR[nodeRuntime\nprocess.env · TTY]
+    NI[nodeIO\nreadline · fs]
+    NS[chalkStyle\nchalk colors]
+  end
+
+  subgraph Test [Test Adapters]
+    MR[mockRuntime]
+    MI[mockIO]
+    PS[plainStyle]
+  end
+
+  Ports -- RuntimePort --> NR
+  Ports -- IOPort --> NI
+  Ports -- StylePort --> NS
+
+  Ports -- RuntimePort --> MR
+  Ports -- IOPort --> MI
+  Ports -- StylePort --> PS
+```
+
 All components accept an optional `ctx: BijouContext` parameter. If omitted, they use the global default context set by `initDefaultContext()`.
 
 ### Ports
@@ -82,7 +115,22 @@ bijou detects the output environment and adapts:
 | `pipe` | Piped/redirected, `TERM=dumb`, or `NO_COLOR` | Plain text, no decorations |
 | `accessible` | `BIJOU_ACCESSIBLE=1` | Screen-reader-friendly plain prompts |
 
-Detection order (first match wins): `BIJOU_ACCESSIBLE=1` → accessible, `NO_COLOR` → pipe, `TERM=dumb` → pipe, non-TTY → pipe, `CI` → static, TTY → interactive.
+Detection order (first match wins):
+
+```mermaid
+flowchart TD
+  Start([detectOutputMode]) --> A{BIJOU_ACCESSIBLE\n= 1?}
+  A -- Yes --> Accessible[accessible]
+  A -- No --> B{NO_COLOR\nset?}
+  B -- Yes --> Pipe1[pipe]
+  B -- No --> C{TERM\n= dumb?}
+  C -- Yes --> Pipe2[pipe]
+  C -- No --> D{stdout\nis TTY?}
+  D -- No --> Pipe3[pipe]
+  D -- Yes --> E{CI\nset?}
+  E -- Yes --> Static[static]
+  E -- No --> Interactive[interactive]
+```
 
 ### Environment variables
 
