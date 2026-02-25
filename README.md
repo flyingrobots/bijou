@@ -139,6 +139,128 @@ console.log(
 
 ---
 
+## 🧱 Components
+
+Every component gracefully degrades across all four output modes — full Unicode in interactive, plain text in pipe, screen-reader friendly in accessible.
+
+### Layout
+
+```
+box()                           headerBox()
+┌──────────────────┐            ┌─ Deploy ─────────────┐
+│  Hello, world!   │            │  v2.1.0 → production  │
+└──────────────────┘            └───────────────────────┘
+
+separator()
+──────────── New Section ─────────────
+```
+
+### Elements
+
+```
+badge()                         kbd()
+ SUCCESS   ERROR   WARNING       ⌘   Shift   P
+
+alert()
+┌─ ✓ Success ──────────────────┐
+│  Operation completed.        │
+└──────────────────────────────┘
+
+skeleton()
+░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░
+```
+
+### Data
+
+```
+table()                              tree()
+┌──────────┬──────────┐              src
+│ Name     │ Status   │              ├─ components
+├──────────┼──────────┤              │  ├─ box.ts
+│ api      │ Active   │              │  └─ table.ts
+│ worker   │ Pending  │              └─ index.ts
+└──────────┴──────────┘
+
+accordion()                          timeline()
+▼ Getting Started                    ● Deploy started
+  npm install @flyingrobots/bijou    │
+▶ Configuration                      ● Tests passing
+▶ API Reference                      │
+                                     ○ Awaiting review
+```
+
+### Navigation
+
+```
+tabs()
+ ● Dashboard  │  Settings  │  Users (3)
+
+breadcrumb()
+Home › Settings › Profile
+
+stepper()                            paginator()
+ ✓ Account ── ● Payment ── ○ Confirm  ● ○ ○ ○
+```
+
+### Animation & Progress
+
+```
+spinner()                       progressBar()
+⠋ Loading dependencies...       75%  ████████████░░░░
+```
+
+`createSpinner()` and `createProgressBar()` provide live-updating controllers. `gradientText()` paints any string with a multi-stop color gradient. `loadRandomLogo()` renders ASCII art logos at `small`, `medium`, or `large` sizes.
+
+### Forms
+
+```
+input()                              select()
+? Your name: █                       ? Pick a framework:
+                                       ● Next.js
+confirm()                              ○ Remix
+? Continue? (Y/n): █                   ○ Astro
+
+multiselect()                        group()
+? Select features:                   Chains multiple prompts
+  ☑ TypeScript                       into a single result object.
+  ☐ ESLint
+  ☑ Prettier
+```
+
+All form components support validation, defaults, and degrade to numbered-list selection in pipe/CI modes.
+
+### Demos
+
+Two runnable demos showcase every component:
+
+- **`demo.ts`** — Static CLI showcase: themes, boxes, badges, alerts, trees, timelines, and more
+- **`demo-tui.ts`** — Interactive TUI: 5-tab explorer with live spinners, animated progress bars, and theme cycling (press `t`)
+
+```bash
+npx tsx demo.ts
+npx tsx demo-tui.ts
+```
+
+### Roadmap
+
+These components are planned for future releases:
+
+| Component | Category | Description |
+| :--- | :--- | :--- |
+| `modal()` | Overlay | Centered dialog with backdrop |
+| `toast()` | Overlay | Auto-dismissing notification popup |
+| `drawer()` | Overlay | Slide-in side panel |
+| `commandPalette()` | Navigation | Fuzzy-searchable action picker |
+| `viewport()` | Layout | Scrollable content pane |
+| `place()` | Layout | 2D text placement with alignment |
+| `list()` | Data | Ordered/unordered lists with custom bullets |
+| `markdown()` | Data | Render markdown with syntax highlighting |
+| `textarea()` | Forms | Multi-line input with scroll and line numbers |
+| `appFrame()` | TUI | Full app shell with tabs, help overlay, and scroll state |
+
+---
+
 ## 🏗️ Architecture
 
 `bijou` is split into a runtime-agnostic **Core** and specific **Adapters**.
