@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getDefaultContext, setDefaultContext, _resetDefaultContextForTesting } from './context.js';
 import { createTestContext } from './adapters/test/index.js';
+import { confirm } from './core/forms/confirm.js';
 
 describe('default context', () => {
   beforeEach(() => {
@@ -33,5 +34,13 @@ describe('default context', () => {
     setDefaultContext(createTestContext());
     _resetDefaultContextForTesting();
     expect(() => getDefaultContext()).toThrow('[bijou] No default context configured');
+  });
+
+  it('components use default context when ctx omitted', async () => {
+    const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
+    setDefaultContext(ctx);
+    const result = await confirm({ title: 'OK?' });
+    expect(result).toBe(true);
+    expect(ctx.io.written.length).toBeGreaterThan(0);
   });
 });
