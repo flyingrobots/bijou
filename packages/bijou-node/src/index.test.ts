@@ -32,6 +32,12 @@ describe('createNodeContext()', () => {
     const ctx = createNodeContext();
     expect(ctx.runtime.env('__BIJOU_TEST_CTX__')).toBe('test-value');
   });
+
+  it('respects NO_COLOR env var', () => {
+    vi.stubEnv('NO_COLOR', '1');
+    const ctx = createNodeContext();
+    expect(ctx.theme.noColor).toBe(true);
+  });
 });
 
 describe('initDefaultContext()', () => {
