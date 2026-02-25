@@ -64,6 +64,50 @@ A simple `my-theme.json` looks like this:
 
 ---
 
+## 🧩 Extending Themes
+
+Building a CLI on top of bijou? Use `extendTheme()` to add domain-specific status/ui/gradient keys without cloning entire theme objects, and `styled()`/`styledStatus()` to apply them without reaching through the context.
+
+```typescript
+import {
+  extendTheme, styled, styledStatus, tv,
+  CYAN_MAGENTA, createThemeResolver,
+} from '@flyingrobots/bijou';
+
+// 1. Extend a base theme with your domain keys
+const myTheme = extendTheme(CYAN_MAGENTA, {
+  status: {
+    DEPLOYED:    tv('#34d399'),
+    ROLLING_BACK: tv('#f97316'),
+    CANCELLED:   tv('#6b7280', ['strikethrough']),
+  },
+  ui: {
+    clusterName: tv('#60a5fa', ['bold']),
+  },
+});
+
+// 2. Register it with the theme resolver
+const resolver = createThemeResolver({
+  presets: { 'my-theme': myTheme },
+  fallback: myTheme,
+});
+
+// 3. Use freestanding helpers — no getDefaultContext() boilerplate
+console.log(styledStatus('DEPLOYED', 'All pods healthy'));
+console.log(styled(tv('#ff00ff', ['bold']), 'Highlighted text'));
+```
+
+### Helpers at a glance
+
+| Export | Purpose |
+| :--- | :--- |
+| `extendTheme(base, { status?, ui?, gradient? })` | Shallow-merge new keys onto a base theme |
+| `styled(token, text)` | Apply a `TokenValue` via the default context's `StylePort` |
+| `styledStatus(status, text?)` | Look up `theme.status[key]` (falls back to `muted`) |
+| `tv(hex, modifiers?)` | Shorthand to construct a `TokenValue` |
+
+---
+
 ## 🚀 Quick Start
 
 ```bash
@@ -102,9 +146,9 @@ console.log(
 ```mermaid
 graph LR
   subgraph Core ["@flyingrobots/bijou (zero deps)"]
-    Components[Components\nbox · table · spinner\nprogress · gradient]
-    Theme[Theme Engine\npresets · DTCG]
-    Forms[Forms\ninput · select · confirm]
+    Components["Components<br />box · table · spinner<br />progress · gradient"]
+    Theme["Theme Engine<br />presets · DTCG"]
+    Forms["Forms<br />input · select · confirm"]
     Ports((Ports))
     Components --- Ports
     Theme --- Ports
@@ -112,8 +156,8 @@ graph LR
   end
 
   subgraph Adapters ["Platform Adapters"]
-    Node["@flyingrobots/bijou-node\n(Chalk · Readline · Process)"]
-    Test["Test Adapters\n(MockIO · PlainStyle)"]
+    Node["@flyingrobots/bijou-node<br />(Chalk · Readline · Process)"]
+    Test["Test Adapters<br />(MockIO · PlainStyle)"]
   end
 
   Ports -- RuntimePort --> Node
