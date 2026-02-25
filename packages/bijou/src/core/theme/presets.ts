@@ -1,7 +1,7 @@
 import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
 
 /** Helper to reduce verbosity when defining token values. */
-function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
+export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
   return modifiers !== undefined ? { hex, modifiers } : { hex };
 }
 

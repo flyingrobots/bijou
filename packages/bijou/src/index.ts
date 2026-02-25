@@ -34,6 +34,12 @@ export {
   CYAN_MAGENTA,
   TEAL_ORANGE_PINK,
   PRESETS,
+  tv,
+  // Freestanding styled helpers
+  styled,
+  styledStatus,
+  // Theme extension
+  extendTheme,
   // Gradient
   lerp3,
   gradientText,

@@ -46,6 +46,11 @@ All notable changes to this project will be documented in this file.
   - `kbd()` — keyboard key display with styled brackets and bold text
 
 - **ROADMAP**: Added `appFrame` TEA app shell concept, backlog with P0–P3 priorities from Charm ecosystem gap analysis
+- **Consumer helpers** (zero-wrapper support for downstream CLIs):
+  - `styled(token, text)` — freestanding styled call that delegates to the default context's `StylePort`
+  - `styledStatus(status, text?)` — looks up `theme.status[key]`, falls back to `muted`, uses key as label when text omitted
+  - `extendTheme(base, extensions)` — shallow-merges new status/ui/gradient keys onto a base theme without cloning
+  - `tv(hex, modifiers?)` — exported from presets for concise `TokenValue` construction
 
 ### Changed
 

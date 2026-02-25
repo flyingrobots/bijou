@@ -12,7 +12,13 @@ export type {
 } from './tokens.js';
 
 // Presets
-export { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS } from './presets.js';
+export { CYAN_MAGENTA, TEAL_ORANGE_PINK, PRESETS, tv } from './presets.js';
+
+// Freestanding styled helpers
+export { styled, styledStatus } from './styled.js';
+
+// Theme extension
+export { extendTheme } from './extend.js';
 
 // Gradient
 export { lerp3, gradientText } from './gradient.js';
