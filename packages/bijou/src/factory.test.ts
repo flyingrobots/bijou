@@ -4,6 +4,7 @@ import { mockRuntime } from './adapters/test/runtime.js';
 import { mockIO } from './adapters/test/io.js';
 import { plainStyle } from './adapters/test/style.js';
 import { CYAN_MAGENTA, TEAL_ORANGE_PINK } from './core/theme/presets.js';
+import { toDTCG } from './core/theme/dtcg.js';
 
 function basePorts(env: Record<string, string> = {}, tty = true) {
   return {
@@ -14,6 +15,23 @@ function basePorts(env: Record<string, string> = {}, tty = true) {
 }
 
 describe('createBijou()', () => {
+  it('loads theme from .json path in BIJOU_THEME', () => {
+    const custom = { ...TEAL_ORANGE_PINK, name: 'json-theme' };
+    const ports = basePorts({ BIJOU_THEME: 'theme.json' });
+    const mock = ports.io as ReturnType<typeof mockIO>;
+    mock.files['theme.json'] = JSON.stringify(toDTCG(custom));
+
+    const ctx = createBijou(ports);
+    expect(ctx.theme.theme.name).toBe('json-theme');
+    expect(ctx.theme.theme.status.success.hex).toBe(custom.status.success.hex);
+  });
+
+  it('falls back when .json path load fails', () => {
+    const ports = basePorts({ BIJOU_THEME: 'missing.json' });
+    const ctx = createBijou(ports);
+    expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
+  });
+
   it('returns BijouContext with all five fields populated', () => {
     const ports = basePorts();
     const ctx = createBijou(ports);

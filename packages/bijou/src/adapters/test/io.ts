@@ -11,17 +11,21 @@ export interface MockIOOptions {
 export interface MockIO extends IOPort {
   written: string[];
   answerQueue: string[];
+  files: Record<string, string>;
+  dirs: Record<string, string[]>;
 }
 
 export function mockIO(options: MockIOOptions = {}): MockIO {
   const written: string[] = [];
   const answerQueue = [...(options.answers ?? [])];
-  const files = options.files ?? {};
-  const dirs = options.dirs ?? {};
+  const files = { ...(options.files ?? {}) };
+  const dirs = { ...(options.dirs ?? {}) };
 
   return {
     written,
     answerQueue,
+    files,
+    dirs,
 
     write(data: string): void {
       written.push(data);

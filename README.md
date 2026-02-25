@@ -1,65 +1,103 @@
 # bijou
 
-Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.
+**The hexagonal toolkit for beautiful, bulletproof terminal interfaces.**
 
-## What is this?
+`bijou` is a professional-grade TUI framework for TypeScript. Inspired by the Go-based Charm ecosystem (**Bubble Tea**, **Lip Gloss**), `bijou` brings rigorous software engineering to terminal output through a zero-dependency core, a "Ports and Adapters" architecture, and intelligent graceful degradation.
 
-bijou is a hexagonal-architecture toolkit for building beautiful terminal output. The core package (`@flyingrobots/bijou`) is **zero-dependency** pure TypeScript. Adapter packages like `@flyingrobots/bijou-node` wire it up to real runtimes.
+---
 
-**Key ideas:**
+## 💎 Why bijou?
 
-- Theme engine with DTCG interop and named presets (`BIJOU_THEME=cyan-magenta`)
-- Components: boxes, tables, spinners, progress bars, gradient text, ASCII logos
-- Interactive forms: input, select, multiselect, confirm, group
-- Graceful degradation: four output modes adapt to TTY, CI, piped, and accessible environments
-- Port-based architecture: swap runtime, I/O, and styling without touching core logic
+*   **Hexagonal Architecture:** The core logic is decoupled from the runtime. Swap Node.js for Bun, Deno, or a custom WASM host by providing three simple "Ports" (I/O, Style, Runtime).
+*   **Zero-Dependency Core:** `@flyingrobots/bijou` is pure TypeScript with no external dependencies. Security and stability by design.
+*   **Intelligent Output Modes:** Your CLI automatically adapts its rendering based on the environment (TTY, CI, Piped, or Accessible).
+*   **"Tests ARE the Spec":** Every feature is defined by its tests. Acceptance criteria are written as test descriptions first, ensuring 100% deterministic behavior across modes.
+*   **Theme Engine:** First-class support for RGB/Hex colors, gradients, and **DTCG (Design Tokens Community Group)** interop.
 
-## Install
+---
+
+## 🎨 Design Systems & DTCG
+
+`bijou` isn't just about terminal colors; it's a bridge to your professional design system. By following the **Design Tokens Community Group (DTCG)** specification, `bijou` works natively with the industry's leading tools:
+
+- **[Tokens Studio for Figma](https://tokens.studio/):** Design your CLI theme in Figma and export it directly to `bijou`.
+- **[Style Dictionary](https://styledictionary.com/):** Use Amazon's Style Dictionary to transform your enterprise tokens into `bijou`-ready DTCG JSON.
+
+### Built-in Presets
+`bijou` ships with professional presets that go beyond basic ANSI:
+- `nord`: The arctic, clean Polar Night aesthetic.
+- `catppuccin`: Modern, vibrant, and high-contrast (Mocha variant).
+- `cyan-magenta`: The classic high-energy `bijou` default.
+
+---
+
+## 📂 Custom Themes
+
+Themes in `bijou` are 100% data-driven. You can drop a JSON file into your project and load it instantly without a single line of code change.
+
+### Loading via Environment Variable
+Point `BIJOU_THEME` to a local file path:
+```bash
+BIJOU_THEME=./themes/my-brand.json node my-cli.js
+```
+
+### Theme Schema (DTCG)
+A simple `my-theme.json` looks like this:
+```json
+{
+  "name": { "$value": "my-theme" },
+  "status": {
+    "success": { "$type": "color", "$value": "#00ff00" },
+    "error": { "$type": "color", "$value": "#ff0000" }
+  },
+  "gradient": {
+    "brand": {
+      "$type": "gradient",
+      "$value": [
+        { "pos": 0, "color": "#00ffff" },
+        { "pos": 1, "color": "#ff00ff" }
+      ]
+    }
+  }
+}
+```
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 npm install @flyingrobots/bijou @flyingrobots/bijou-node
 ```
 
-## Quick start
-
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import {
-  box, headerBox, progressBar, gradientText,
-} from '@flyingrobots/bijou';
+import { box, headerBox, gradientText } from '@flyingrobots/bijou';
 
-// Initialize Node.js adapters (call once at startup)
+// 1. Initialize Node.js adapters (auto-detects TTY, CI, NO_COLOR)
 const ctx = initDefaultContext();
 
-// Gradient text (requires stops and a StylePort)
-const stops = [
-  { pos: 0, color: [0, 200, 255] as [number, number, number] },
-  { pos: 1, color: [255, 0, 128] as [number, number, number] },
+// 2. Use high-level components
+console.log(headerBox('Bijou CLI', { detail: 'v1.0.0' }));
+
+// 3. Create stunning visuals with zero effort
+const rainbow = [
+  { pos: 0, color: [0, 200, 255] },
+  { pos: 1, color: [255, 0, 128] },
 ];
-console.log(gradientText('Hello from bijou!', stops, { style: ctx.style }));
 
-// Boxes
-console.log(box('Simple bordered box'));
-console.log(headerBox('Deploy', { detail: 'v1.2.3 → production' }));
-
-// Progress bar (0–100 scale)
-console.log(progressBar(75));
+console.log(
+  box(gradientText('Beautifully degraded terminal output.', rainbow), {
+    padding: { left: 2, right: 2, top: 1, bottom: 1 }
+  })
+);
 ```
 
-## Architecture
+---
 
-```
-packages/
-├── bijou/           Zero-dep core (theme, components, forms, detection)
-│   └── src/
-│       ├── ports/       Port interfaces (RuntimePort, IOPort, StylePort)
-│       ├── adapters/    Test adapters (mockRuntime, mockIO, plainStyle)
-│       ├── core/        Theme engine, components, forms, TTY detection
-│       ├── factory.ts   createBijou() context builder
-│       └── context.ts   Global default context
-│
-└── bijou-node/      Node.js adapter (chalk, readline, process)
-```
+## 🏗️ Architecture
+
+`bijou` is split into a runtime-agnostic **Core** and specific **Adapters**.
 
 ```mermaid
 graph LR
@@ -73,104 +111,69 @@ graph LR
     Forms --- Ports
   end
 
-  subgraph Node ["@flyingrobots/bijou-node"]
-    NR[nodeRuntime\nprocess.env · TTY]
-    NI[nodeIO\nreadline · fs]
-    NS[chalkStyle\nchalk colors]
+  subgraph Adapters ["Platform Adapters"]
+    Node["@flyingrobots/bijou-node\n(Chalk · Readline · Process)"]
+    Test["Test Adapters\n(MockIO · PlainStyle)"]
   end
 
-  subgraph Test [Test Adapters]
-    MR[mockRuntime]
-    MI[mockIO]
-    PS[plainStyle]
-  end
+  Ports -- RuntimePort --> Node
+  Ports -- IOPort --> Node
+  Ports -- StylePort --> Node
 
-  Ports -- RuntimePort --> NR
-  Ports -- IOPort --> NI
-  Ports -- StylePort --> NS
-
-  Ports -- RuntimePort --> MR
-  Ports -- IOPort --> MI
-  Ports -- StylePort --> PS
+  Ports -- RuntimePort --> Test
+  Ports -- IOPort --> Test
+  Ports -- StylePort --> Test
 ```
 
-All components accept an optional `ctx: BijouContext` parameter. If omitted, they use the global default context set by `initDefaultContext()`.
+### Intelligent Output Modes
 
-### Ports
+`bijou` detects the environment and changes behavior to ensure your CLI never breaks.
 
-| Port | Purpose | Node adapter |
-|------|---------|-------------|
-| `RuntimePort` | env vars, TTY flags, columns/rows | `nodeRuntime()` |
-| `IOPort` | write, question, raw input, file I/O | `nodeIO()` |
-| `StylePort` | text styling (bold, rgb, hex, tokens) | `chalkStyle()` |
+| Mode | Trigger | Behavior |
+| :--- | :--- | :--- |
+| **Interactive** | Standard TTY | Full RGB colors, unicode borders, animations. |
+| **Static** | `CI=true` | Single-frame rendering, animations disabled. |
+| **Pipe** | `TERM=dumb` or Piped | Plain text, ASCII fallbacks, no decorations. |
+| **Accessible** | `BIJOU_ACCESSIBLE=1` | Screen-reader friendly prompts and layouts. |
 
-### Output modes
+---
 
-bijou detects the output environment and adapts:
+## 🆚 bijou vs. The World
 
-| Mode | When | Behavior |
-|------|------|----------|
-| `interactive` | stdout is a TTY | Full colors, unicode boxes, animations |
-| `static` | `CI` env var is set | Single-frame rendering, no animations |
-| `pipe` | Piped/redirected, `TERM=dumb`, or `NO_COLOR` | Plain text, no decorations |
-| `accessible` | `BIJOU_ACCESSIBLE=1` | Screen-reader-friendly plain prompts |
+| Feature | **bijou** | **Ink** (React) | **Clack / Enquirer** | **Chalk / Kleur** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Architecture** | **Hexagonal (Ports)** | Component Tree | Imperative | Functional |
+| **Core Dependencies** | **Zero** | 50+ (React/Yoga) | 5-10 | Zero |
+| **Pluggable Runtime** | **Yes** (Node, Bun, WASM) | No (Node only) | No (Node only) | Yes |
+| **Auto-Degradation** | **Built-in** (4 modes) | Manual/Limited | Manual | Manual |
+| **Accessible Mode** | **Native** | No | No | No |
+| **State Pattern** | **TEA** (Elm Architecture) | Hooks (React) | Callbacks | N/A |
+| **Theme System** | **DTCG** (Design Tokens) | Inline Styles | Hardcoded | Manual |
 
-Detection order (first match wins):
+### The "Jenkins Log" Test
+Most TUI libraries output "garbage" ANSI escape codes when piped to a file or a CI log. `bijou` detects the lack of a TTY and automatically switches to `pipe` mode (plain text) or `static` mode. Your logs remain searchable and readable without extra effort.
 
-```mermaid
-flowchart TD
-  Start([detectOutputMode]) --> A{BIJOU_ACCESSIBLE\n= 1?}
-  A -- Yes --> Accessible[accessible]
-  A -- No --> B{NO_COLOR\nset?}
-  B -- Yes --> Pipe1[pipe]
-  B -- No --> C{TERM\n= dumb?}
-  C -- Yes --> Pipe2[pipe]
-  C -- No --> D{stdout\nis TTY?}
-  D -- No --> Pipe3[pipe]
-  D -- Yes --> E{CI\nset?}
-  E -- Yes --> Static[static]
-  E -- No --> Interactive[interactive]
-```
+### Testing without Mocks
+Because `bijou` uses Ports, you don't have to mock `process.stdout` or use complex TTY simulators. You simply pass a `MockIO` port to your component and assert on the string buffer. This makes your UI tests fast, deterministic, and isolated.
 
-### Environment variables
+---
 
-| Variable | Effect |
-|----------|--------|
-| `BIJOU_THEME` | Select a theme preset (e.g. `cyan-magenta`) |
-| `NO_COLOR` | Disable all color output ([no-color.org](https://no-color.org)) |
-| `CI` | Force `static` output mode |
-| `TERM` | Set to `dumb` to force `pipe` output mode |
-| `BIJOU_ACCESSIBLE` | Set to `1` for screen-reader-friendly output |
+## 🛠️ Project Structure
 
-### Context helpers
+*   **`@flyingrobots/bijou`**: The zero-dependency core. Contains the theme engine, pure-view components, and port interfaces.
+*   **`@flyingrobots/bijou-node`**: The official Node.js adapter. Bridges `process`, `readline`, and `chalk` to the core ports.
+*   **`@flyingrobots/bijou-tui`**: An experimental **TEA (The Elm Architecture)** runtime for building complex, stateful terminal applications.
 
-`initDefaultContext()` creates a Node.js context and registers it as the global default (on first call). Components that omit `ctx` will use this default.
+---
 
-`createNodeContext()` creates a fresh Node.js context each time without setting the global default — useful when you need multiple isolated contexts.
+## 📜 Philosophy: Tests as Spec
 
-## Testing
+In `bijou`, we don't just "write tests"—the tests are the formal specification of the library's behavior. We use a "Red -> Green" cycle where every UI component is validated across all four output modes using `mockIO` and `plainStyle` adapters.
 
-```bash
-npm test              # Run all tests
-npm run lint          # Type-check both packages
-```
+This ensures that if a component looks good in your terminal, it is **guaranteed** to be readable in a Jenkins log or a screen reader.
 
-Tests use `createTestContext()` from `@flyingrobots/bijou/adapters/test` with explicit mode and mock ports — no process globals mocked.
+---
 
-```typescript
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+## 📄 License
 
-const ctx = createTestContext({ mode: 'interactive' });
-```
-
-## Compatibility
-
-- **Node.js** >= 18 (with `@flyingrobots/bijou-node`)
-- **Bun** — works via Node compat (same packages)
-- **Deno** — works via `npm:` specifiers
-
-The core `@flyingrobots/bijou` package is runtime-agnostic. Write your own adapter by implementing `RuntimePort`, `IOPort`, and `StylePort`.
-
-## License
-
-MIT — see [LICENSE](./LICENSE).
+MIT © [James Ross](mailto:james@flyingrobots.dev)

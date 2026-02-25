@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **DTCG Theme Engine Enhancements**:
+  - `loadTheme()`, `loadThemesFromDir()` — data-driven theme loading via `IOPort` (ROADMAP #2)
+  - `BIJOU_THEME` now supports direct `.json` file paths (e.g., `BIJOU_THEME=./themes/my-brand.json`)
+  - **New Presets**: `nord` (arctic/clean) and `catppuccin` (modern/vibrant Mocha variant) added to built-in registry
+  - Exported `nord.json` and `catppuccin.json` as reference DTCG documents in `packages/bijou/themes/`
+  - Added Design System integration documentation for **Tokens Studio for Figma** and **Style Dictionary**
+- **Robustness**:
+  - `badge()` component now searches both `status` and `semantic` groups (supporting `accent` and `primary` variants)
+  - `badge()` is now bulletproof with global `try-catch` and deep property guards to prevent theme-lookup crashes
+- **Monorepo DX**:
+  - Root `tsconfig.json` with path mapping to solve the "Dual Package Hazard" during local development
+  - Interactive theme switching added to `demo.ts` and `demo-tui.ts` (press `t` to cycle themes live)
+
 - **`@flyingrobots/bijou-tui`** — new package: TEA (The Elm Architecture) runtime for terminal UIs
   - `run()` — TEA event loop with keyboard input, alt screen management, and graceful cleanup
   - `parseKey()` — raw ANSI byte string → structured `KeyMsg` (arrows, ctrl combos, special keys)

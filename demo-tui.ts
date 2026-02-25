@@ -4,7 +4,7 @@
  * Run: npx tsc -p packages/bijou-tui/tsconfig.json && npx tsx demo-tui.ts
  */
 
-import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { initDefaultContext, createNodeContext } from '@flyingrobots/bijou-node';
 import {
   box,
   headerBox,
@@ -23,6 +23,10 @@ import {
   breadcrumb,
   paginator,
   stepper,
+  PRESETS,
+  setDefaultContext,
+  getDefaultContext,
+  createBijou,
 } from '@flyingrobots/bijou';
 import { run, quit, tick, vstack, hstack, type App, type KeyMsg, type Cmd } from '@flyingrobots/bijou-tui';
 
@@ -35,8 +39,11 @@ initDefaultContext();
 const TABS = ['Elements', 'Data', 'Live', 'Layout', 'Navigation'] as const;
 type Tab = (typeof TABS)[number];
 
+const THEME_NAMES = Object.keys(PRESETS);
+
 interface Model {
   tab: number;
+  themeIndex: number;
   spinnerTick: number;
   progress: number;
   progressDir: 1 | -1;
@@ -55,6 +62,7 @@ const app: App<Model, Msg> = {
     return [
       {
         tab: 0,
+        themeIndex: 0,
         spinnerTick: 0,
         progress: 0,
         progressDir: 1,
@@ -83,6 +91,24 @@ const app: App<Model, Msg> = {
 
     if (key.key === 'q' || (key.key === 'c' && key.ctrl)) {
       return [model, [quit<Msg>()]];
+    }
+
+    // Cycle theme
+    if (key.key === 't') {
+      const nextIndex = (model.themeIndex + 1) % THEME_NAMES.length;
+      const themeName = THEME_NAMES[nextIndex]!;
+      
+      // Reuse existing ports to avoid leaking readline interfaces
+      const current = getDefaultContext();
+      const newCtx = createBijou({
+        runtime: current.runtime,
+        io: current.io,
+        style: current.style,
+        theme: PRESETS[themeName]
+      });
+      
+      setDefaultContext(newCtx);
+      return [{ ...model, themeIndex: nextIndex }, []];
     }
 
     // Tab navigation
@@ -116,48 +142,56 @@ const app: App<Model, Msg> = {
   },
 
   view(model) {
-    const currentTab = TABS[model.tab]!;
+    try {
+      const currentTab = TABS[model.tab]!;
+      const themeName = THEME_NAMES[model.themeIndex];
 
-    // Tab bar
-    const tabBar = TABS.map((t, i) =>
-      i === model.tab ? badge(` ${t} `, { variant: 'info' }) : ` ${t} `,
-    ).join('  ');
+      // Tab bar
+      const tabBar = TABS.map((t, i) =>
+        i === model.tab ? badge(` ${t} `, { variant: 'info' }) : ` ${t} `,
+      ).join('  ');
 
-    // Content
-    let content: string;
-    switch (currentTab) {
-      case 'Elements':
-        content = viewElements();
-        break;
-      case 'Data':
-        content = viewData(model);
-        break;
-      case 'Live':
-        content = viewLive(model);
-        break;
-      case 'Layout':
-        content = viewLayout();
-        break;
-      case 'Navigation':
-        content = viewNavigation();
-        break;
+      // Content
+      let content: string;
+      switch (currentTab) {
+        case 'Elements':
+          content = viewElements();
+          break;
+        case 'Data':
+          content = viewData(model);
+          break;
+        case 'Live':
+          content = viewLive(model);
+          break;
+        case 'Layout':
+          content = viewLayout();
+          break;
+        case 'Navigation':
+          content = viewNavigation();
+          break;
+        default:
+          content = 'Unknown Tab';
+      }
+
+      // Apply scroll
+      const lines = content.split('\n');
+      const scrolled = lines.slice(model.scrollY).join('\n');
+
+      // Help bar
+      const help = separator({ width: 60 }) + '\n' +
+        `  ${kbd('←')} ${kbd('→')} tabs   ${kbd('↑')} ${kbd('↓')} scroll   ` +
+        `${kbd('t')} theme: ${badge(themeName!, { variant: 'accent' })}   ` +
+        `${kbd('q')} quit`;
+
+      return vstack(
+        `  ${tabBar}`,
+        separator({ width: 60 }),
+        scrolled,
+        help,
+      );
+    } catch (err: any) {
+      return alert(`VIEW ERROR: ${err.message}`, { variant: 'error' });
     }
-
-    // Apply scroll
-    const lines = content.split('\n');
-    const scrolled = lines.slice(model.scrollY).join('\n');
-
-    // Help bar
-    const help = separator({ width: 60 }) + '\n' +
-      `  ${kbd('←')} ${kbd('→')} tabs   ${kbd('↑')} ${kbd('↓')} scroll   ` +
-      `${kbd('q')} quit`;
-
-    return vstack(
-      `  ${tabBar}`,
-      separator({ width: 60 }),
-      scrolled,
-      help,
-    );
   },
 };
 

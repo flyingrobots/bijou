@@ -1,0 +1,180 @@
+{
+  "name": {
+    "$type": "string",
+    "$value": "catppuccin"
+  },
+  "status": {
+    "success": {
+      "$type": "color",
+      "$value": "#a6e3a1"
+    },
+    "error": {
+      "$type": "color",
+      "$value": "#f38ba8"
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#f9e2af"
+    },
+    "info": {
+      "$type": "color",
+      "$value": "#89dceb"
+    },
+    "pending": {
+      "$type": "color",
+      "$value": {
+        "hex": "#6c7086",
+        "modifiers": [
+          "dim"
+        ]
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#89b4fa"
+    },
+    "muted": {
+      "$type": "color",
+      "$value": {
+        "hex": "#6c7086",
+        "modifiers": [
+          "dim",
+          "strikethrough"
+        ]
+      }
+    }
+  },
+  "semantic": {
+    "success": {
+      "$type": "color",
+      "$value": "#a6e3a1"
+    },
+    "error": {
+      "$type": "color",
+      "$value": "#f38ba8"
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#f9e2af"
+    },
+    "info": {
+      "$type": "color",
+      "$value": "#89dceb"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "#cba6f7"
+    },
+    "muted": {
+      "$type": "color",
+      "$value": {
+        "hex": "#6c7086",
+        "modifiers": [
+          "dim"
+        ]
+      }
+    },
+    "primary": {
+      "$type": "color",
+      "$value": {
+        "hex": "#cdd6f4",
+        "modifiers": [
+          "bold"
+        ]
+      }
+    }
+  },
+  "border": {
+    "primary": {
+      "$type": "color",
+      "$value": "#89b4fa"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "#cba6f7"
+    },
+    "success": {
+      "$type": "color",
+      "$value": "#a6e3a1"
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "#f9e2af"
+    },
+    "error": {
+      "$type": "color",
+      "$value": "#f38ba8"
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "#6c7086"
+    }
+  },
+  "ui": {
+    "cursor": {
+      "$type": "color",
+      "$value": "#f5e0dc"
+    },
+    "scrollThumb": {
+      "$type": "color",
+      "$value": "#89b4fa"
+    },
+    "scrollTrack": {
+      "$type": "color",
+      "$value": "#313244"
+    },
+    "sectionHeader": {
+      "$type": "color",
+      "$value": {
+        "hex": "#fab387",
+        "modifiers": [
+          "bold"
+        ]
+      }
+    },
+    "logo": {
+      "$type": "color",
+      "$value": "#cba6f7"
+    },
+    "tableHeader": {
+      "$type": "color",
+      "$value": "#cdd6f4"
+    },
+    "trackEmpty": {
+      "$type": "color",
+      "$value": "#181825"
+    }
+  },
+  "gradient": {
+    "brand": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "pos": 0,
+          "color": "#89b4fa"
+        },
+        {
+          "pos": 0.5,
+          "color": "#cba6f7"
+        },
+        {
+          "pos": 1,
+          "color": "#f5c2e7"
+        }
+      ]
+    },
+    "progress": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "pos": 0,
+          "color": "#94e2d5"
+        },
+        {
+          "pos": 1,
+          "color": "#a6e301"
+        }
+      ]
+    }
+  }
+}

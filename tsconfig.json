@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@flyingrobots/bijou": ["packages/bijou/src/index.ts"],
+      "@flyingrobots/bijou-node": ["packages/bijou-node/src/index.ts"],
+      "@flyingrobots/bijou-tui": ["packages/bijou-tui/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*.ts", "demo.ts", "demo-tui.ts"],
+  "exclude": ["node_modules", "**/dist"]
+}

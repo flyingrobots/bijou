@@ -7,6 +7,7 @@ import type { OutputMode } from './core/detect/tty.js';
 import { createResolved, type ResolvedTheme } from './core/theme/resolve.js';
 import { CYAN_MAGENTA } from './core/theme/presets.js';
 import { PRESETS } from './core/theme/presets.js';
+import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
 import { detectOutputMode } from './core/detect/tty.js';
 
 export interface CreateBijouOptions {
@@ -25,8 +26,24 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
   const fallback = options.theme ?? CYAN_MAGENTA;
 
   const noColor = runtime.env('NO_COLOR') !== undefined;
-  const themeName = runtime.env(envVar) ?? fallback.name;
-  const themeObj = presets[themeName] ?? fallback;
+  const themeValue = runtime.env(envVar);
+
+  let themeObj: Theme = fallback;
+
+  if (themeValue) {
+    if (themeValue.endsWith('.json')) {
+      try {
+        const content = io.readFile(themeValue);
+        const doc = JSON.parse(content) as DTCGDocument;
+        themeObj = fromDTCG(doc);
+      } catch (err) {
+        // Fallback if file read/parse fails
+      }
+    } else {
+      themeObj = presets[themeValue] ?? fallback;
+    }
+  }
+
   const theme: ResolvedTheme = createResolved(themeObj, noColor);
   const mode: OutputMode = detectOutputMode(runtime);
 

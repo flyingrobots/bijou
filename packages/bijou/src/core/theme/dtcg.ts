@@ -204,3 +204,32 @@ export function toDTCG(theme: Theme): DTCGDocument {
 
   return doc;
 }
+
+// --- IO Helpers ---
+
+/** Load a single theme from a DTCG JSON file using the provided IOPort. */
+export function loadTheme(io: { readFile(path: string): string }, path: string): Theme {
+  const content = io.readFile(path);
+  const doc = JSON.parse(content) as DTCGDocument;
+  return fromDTCG(doc);
+}
+
+/** Load all .json files from a directory and return them as a theme record. */
+export function loadThemesFromDir(
+  io: { readDir(path: string): string[]; readFile(path: string): string; joinPath(...s: string[]): string },
+  dirPath: string,
+): Record<string, Theme> {
+  const files = io.readDir(dirPath);
+  const themes: Record<string, Theme> = {};
+  for (const file of files) {
+    if (file.endsWith('.json')) {
+      try {
+        const theme = loadTheme(io, io.joinPath(dirPath, file));
+        themes[theme.name] = theme;
+      } catch {
+        // Skip malformed themes
+      }
+    }
+  }
+  return themes;
+}
