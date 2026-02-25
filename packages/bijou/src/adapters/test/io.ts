@@ -3,6 +3,7 @@ import { join } from 'path';
 
 export interface MockIOOptions {
   answers?: string[];
+  keys?: string[];
   files?: Record<string, string>;
   dirs?: Record<string, string[]>;
 }
@@ -32,8 +33,16 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
     },
 
     rawInput(onKey: (key: string) => void): RawInputHandle {
-      void onKey;
-      return { dispose() {} };
+      const keyQueue = [...(options.keys ?? [])];
+      let disposed = false;
+      function deliver() {
+        if (disposed || keyQueue.length === 0) return;
+        const key = keyQueue.shift()!;
+        onKey(key);
+        if (keyQueue.length > 0) queueMicrotask(deliver);
+      }
+      queueMicrotask(deliver);
+      return { dispose() { disposed = true; } };
     },
 
     setInterval(callback: () => void, ms: number): TimerHandle {

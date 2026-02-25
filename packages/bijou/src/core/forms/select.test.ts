@@ -81,6 +81,36 @@ describe('select()', () => {
     });
   });
 
+  describe('interactive mode', () => {
+    it('renders list with cursor on first item', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
+      await select({ title: 'Color', options: OPTIONS, ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('❯');
+      expect(output).toContain('Red');
+      expect(output).toContain('Green');
+      expect(output).toContain('Blue');
+    });
+
+    it('down arrow + Enter selects second option', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      expect(result).toBe('green');
+    });
+
+    it('up arrow wraps to last item', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[A', '\r'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      expect(result).toBe('blue');
+    });
+
+    it('Ctrl+C returns default/first value', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x03'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      expect(result).toBe('red');
+    });
+  });
+
   it('accepts ctx parameter', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['1'] } });
     const result = await select({ title: 'X', options: OPTIONS, ctx });

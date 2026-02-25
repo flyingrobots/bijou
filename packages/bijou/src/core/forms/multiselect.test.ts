@@ -63,6 +63,36 @@ describe('multiselect()', () => {
     });
   });
 
+  describe('interactive mode', () => {
+    it('renders with checkboxes', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
+      await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('○');
+      expect(output).toContain('Red');
+      expect(output).toContain('Green');
+      expect(output).toContain('Blue');
+    });
+
+    it('Space toggles first, Enter confirms', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\r'] } });
+      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      expect(result).toEqual(['red']);
+    });
+
+    it('navigate + toggle multiple items', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\x1b[B', ' ', '\r'] } });
+      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      expect(result).toEqual(['red', 'green']);
+    });
+
+    it('Ctrl+C returns empty array', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x03'] } });
+      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      expect(result).toEqual([]);
+    });
+  });
+
   it('accepts ctx parameter', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['1'] } });
     const result = await multiselect({ title: 'X', options: OPTIONS, ctx });

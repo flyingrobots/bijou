@@ -76,6 +76,41 @@ describe('confirm()', () => {
     });
   });
 
+  describe('rich mode (interactive)', () => {
+    it('prompt contains styled title', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['y'] } });
+      await confirm({ title: 'Continue?', ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('Continue?');
+      expect(output).toContain('[Y/n]');
+    });
+
+    it('y/n parsing works in interactive mode', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['n'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(false);
+    });
+  });
+
+  describe('NO_COLOR', () => {
+    it('prompt uses bracket style without ANSI escapes', async () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['y'] } });
+      await confirm({ title: 'Continue?', ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('[Y/n]');
+      expect(output).not.toMatch(/\x1b\[/);
+    });
+
+    it('"y" returns true under noColor', async () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['y'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('"n" returns false under noColor', async () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['n'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(false);
+    });
+  });
+
   it('accepts ctx parameter and uses it over default', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
     const result = await confirm({ title: 'OK?', ctx });

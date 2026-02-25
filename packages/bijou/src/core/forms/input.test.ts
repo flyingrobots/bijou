@@ -89,4 +89,35 @@ describe('input()', () => {
       expect(result).toBe('val');
     });
   });
+
+  describe('rich mode (interactive)', () => {
+    it('prompt contains title', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['val'] } });
+      await input({ title: 'Username', ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('Username');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('handles 1000+ character input', async () => {
+      const longStr = 'a'.repeat(1500);
+      const ctx = createTestContext({ mode: 'pipe', io: { answers: [longStr] } });
+      const result = await input({ title: 'Data', ctx });
+      expect(result).toBe(longStr);
+      expect(result.length).toBe(1500);
+    });
+
+    it('handles emoji characters', async () => {
+      const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello 🎉🚀'] } });
+      const result = await input({ title: 'Msg', ctx });
+      expect(result).toBe('hello 🎉🚀');
+    });
+
+    it('handles CJK characters', async () => {
+      const ctx = createTestContext({ mode: 'pipe', io: { answers: ['你好世界'] } });
+      const result = await input({ title: 'Text', ctx });
+      expect(result).toBe('你好世界');
+    });
+  });
 });
