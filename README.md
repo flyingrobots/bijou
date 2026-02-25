@@ -8,10 +8,10 @@ bijou is a hexagonal-architecture toolkit for building beautiful terminal output
 
 **Key ideas:**
 
-- Theme engine with DTCG interop and named presets (`BIJOU_THEME=teal-orange-pink`)
+- Theme engine with DTCG interop and named presets (`BIJOU_THEME=cyan-magenta`)
 - Components: boxes, tables, spinners, progress bars, gradient text, ASCII logos
 - Interactive forms: input, select, multiselect, confirm, group
-- Graceful degradation: piped output strips decorations, `NO_COLOR` is respected
+- Graceful degradation: four output modes adapt to TTY, CI, piped, and accessible environments
 - Port-based architecture: swap runtime, I/O, and styling without touching core logic
 
 ## Install
@@ -24,20 +24,26 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox, progressBar, gradientText } from '@flyingrobots/bijou';
+import {
+  box, headerBox, progressBar, gradientText,
+} from '@flyingrobots/bijou';
 
 // Initialize Node.js adapters (call once at startup)
-initDefaultContext();
+const ctx = initDefaultContext();
 
-// Gradient text
-console.log(gradientText('Hello from bijou!'));
+// Gradient text (requires stops and a StylePort)
+const stops = [
+  { pos: 0, color: [0, 200, 255] as [number, number, number] },
+  { pos: 1, color: [255, 0, 128] as [number, number, number] },
+];
+console.log(gradientText('Hello from bijou!', stops, { style: ctx.style }));
 
 // Boxes
 console.log(box('Simple bordered box'));
 console.log(headerBox('Deploy', { detail: 'v1.2.3 → production' }));
 
-// Progress bar
-console.log(progressBar(0.75));
+// Progress bar (0–100 scale)
+console.log(progressBar(75));
 ```
 
 ## Architecture
@@ -61,9 +67,9 @@ All components accept an optional `ctx: BijouContext` parameter. If omitted, the
 
 | Port | Purpose | Node adapter |
 |------|---------|-------------|
-| `RuntimePort` | env vars, exit, columns | `nodeRuntime()` |
-| `IOPort` | stdin/stdout, raw input | `nodeIO()` |
-| `StylePort` | text styling (bold, hex colors) | `chalkStyle()` |
+| `RuntimePort` | env vars, TTY flags, columns/rows | `nodeRuntime()` |
+| `IOPort` | write, question, raw input, file I/O | `nodeIO()` |
+| `StylePort` | text styling (bold, rgb, hex, tokens) | `chalkStyle()` |
 
 ### Output modes
 
@@ -71,11 +77,28 @@ bijou detects the output environment and adapts:
 
 | Mode | When | Behavior |
 |------|------|----------|
-| `rich` | Interactive TTY | Full colors, unicode boxes, animations |
-| `pipe` | Piped / redirected | Plain text, no decorations |
-| `accessible` | `TERM_PROGRAM=accessibility` | Simplified formatting |
+| `interactive` | stdout is a TTY | Full colors, unicode boxes, animations |
+| `static` | `CI` env var is set | Single-frame rendering, no animations |
+| `pipe` | Piped/redirected, `TERM=dumb`, or `NO_COLOR` | Plain text, no decorations |
+| `accessible` | `BIJOU_ACCESSIBLE=1` | Screen-reader-friendly plain prompts |
 
-`NO_COLOR` (per [no-color.org](https://no-color.org)) disables all color output.
+Detection order (first match wins): `BIJOU_ACCESSIBLE=1` → accessible, `NO_COLOR` → pipe, `TERM=dumb` → pipe, non-TTY → pipe, `CI` → static, TTY → interactive.
+
+### Environment variables
+
+| Variable | Effect |
+|----------|--------|
+| `BIJOU_THEME` | Select a theme preset (e.g. `cyan-magenta`) |
+| `NO_COLOR` | Disable all color output ([no-color.org](https://no-color.org)) |
+| `CI` | Force `static` output mode |
+| `TERM` | Set to `dumb` to force `pipe` output mode |
+| `BIJOU_ACCESSIBLE` | Set to `1` for screen-reader-friendly output |
+
+### Context helpers
+
+`initDefaultContext()` creates a Node.js context and registers it as the global default (on first call). Components that omit `ctx` will use this default.
+
+`createNodeContext()` creates a fresh Node.js context each time without setting the global default — useful when you need multiple isolated contexts.
 
 ## Testing
 
@@ -85,6 +108,12 @@ npm run lint          # Type-check both packages
 ```
 
 Tests use `createTestContext()` from `@flyingrobots/bijou/adapters/test` with explicit mode and mock ports — no process globals mocked.
+
+```typescript
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+
+const ctx = createTestContext({ mode: 'interactive' });
+```
 
 ## Compatibility
 

@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- **README accuracy**:
+  - Corrected output mode name (`rich` → `interactive`) and added missing `static` mode
+  - Fixed `gradientText` and `progressBar` API examples to match actual signatures
+  - Fixed accessible mode trigger (`TERM_PROGRAM=accessibility` → `BIJOU_ACCESSIBLE=1`)
+  - Corrected `RuntimePort` port description (removed non-existent `exit()`)
+  - Added environment variables reference table
+  - Documented test adapter subpath export and `createNodeContext` vs `initDefaultContext`
 - **initDefaultContext() test coverage**: added `_resetInitializedForTesting()` helper and tests verifying first-call sets default context, subsequent calls don't overwrite it
 - **Consistent env stubbing**: replaced direct `process.env` mutation in `runtime.test.ts` with `vi.stubEnv()`/`vi.unstubAllEnvs()`
 - **Modifier ANSI assertions**: added conditional `it.runIf` tests for bold, dim, strikethrough, and inverse modifiers in `style.test.ts`
