@@ -49,16 +49,25 @@ function resolveReference(ref: string, doc: DTCGDocument): unknown {
   const path = ref.replace(/^\{|\}$/g, '').split('.');
   let current: unknown = doc;
   for (const segment of path) {
-    if (typeof current !== 'object' || current === null) return ref;
+    if (typeof current !== 'object' || current === null) return undefined;
     current = (current as Record<string, unknown>)[segment];
   }
   if (isDTCGToken(current)) return current.$value;
   return current;
 }
 
-function resolveValue(value: unknown, doc: DTCGDocument): unknown {
+function resolveValue(value: unknown, doc: DTCGDocument, seen?: Set<string>): unknown {
   if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
-    return resolveReference(value, doc);
+    const visitedRefs = seen ?? new Set<string>();
+    if (visitedRefs.has(value)) {
+      throw new Error(`Circular reference detected: ${[...visitedRefs, value].join(' → ')}`);
+    }
+    visitedRefs.add(value);
+    const resolved = resolveReference(value, doc);
+    if (resolved === undefined) {
+      throw new Error(`Unresolvable reference: ${value}`);
+    }
+    return resolveValue(resolved, doc, visitedRefs);
   }
   return value;
 }

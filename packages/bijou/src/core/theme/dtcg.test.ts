@@ -205,7 +205,7 @@ describe('DTCG interop', () => {
       };
     }
 
-    it('unresolvable reference passes raw ref string as hex value', () => {
+    it('throws on unresolvable references', () => {
       const doc = minimalDoc({
         name: { $type: 'string', $value: 'ref-broken' },
         status: {
@@ -219,17 +219,33 @@ describe('DTCG interop', () => {
         },
       });
 
-      const theme = fromDTCG(doc);
-      expect(theme.status.success.hex).toBe('{nonexistent.path}');
+      expect(() => fromDTCG(doc)).toThrow('Unresolvable reference: {nonexistent.path}');
     });
 
-    it('single-level resolution stops at non-hex ref string (no recursive resolve)', () => {
-      // The resolver is non-recursive by design: {a} resolves to a.$value
-      // which is the literal string '{b}', not a further dereference.
+    it('throws on circular references', () => {
       const doc = minimalDoc({
         a: { $type: 'color', $value: '{b}' },
         b: { $type: 'color', $value: '{a}' },
-        name: { $type: 'string', $value: 'non-recursive' },
+        name: { $type: 'string', $value: 'circular' },
+        status: {
+          success: { $type: 'color', $value: '{a}' },
+          error: { $type: 'color', $value: '#ff0000' },
+          warning: { $type: 'color', $value: '#ffff00' },
+          info: { $type: 'color', $value: '#00ffff' },
+          pending: { $type: 'color', $value: '#808080' },
+          active: { $type: 'color', $value: '#00ffff' },
+          muted: { $type: 'color', $value: '#808080' },
+        },
+      });
+
+      expect(() => fromDTCG(doc)).toThrow('Circular reference detected');
+    });
+
+    it('resolves multi-level reference chains', () => {
+      const doc = minimalDoc({
+        a: { $type: 'color', $value: '{b}' },
+        b: { $type: 'color', $value: '#ff0000' },
+        name: { $type: 'string', $value: 'chain' },
         status: {
           success: { $type: 'color', $value: '{a}' },
           error: { $type: 'color', $value: '#ff0000' },
@@ -242,7 +258,7 @@ describe('DTCG interop', () => {
       });
 
       const theme = fromDTCG(doc);
-      expect(theme.status.success.hex).toBe('{b}');
+      expect(theme.status.success.hex).toBe('#ff0000');
     });
 
     it('missing optional groups produce default #000000 tokens', () => {
@@ -277,6 +293,105 @@ describe('DTCG interop', () => {
         expect(stop.color).toMatch(/^#[0-9a-f]{6}$/);
         expect(typeof stop.pos).toBe('number');
       }
+    });
+
+    it('every token has $type and $value, groups are objects, name is string', () => {
+      const doc = toDTCG(CYAN_MAGENTA);
+
+      // name token
+      const name = doc['name'] as { $type: string; $value: unknown };
+      expect(name.$type).toBe('string');
+      expect(typeof name.$value).toBe('string');
+
+      // all group keys
+      for (const groupKey of ['status', 'semantic', 'border', 'ui']) {
+        const group = doc[groupKey] as Record<string, { $type?: string; $value?: unknown }>;
+        expect(typeof group).toBe('object');
+        for (const [, token] of Object.entries(group)) {
+          expect(token.$type).toBe('color');
+          expect(token.$value).toBeDefined();
+        }
+      }
+
+      // gradient group
+      const gradient = doc['gradient'] as Record<string, { $type?: string; $value?: unknown }>;
+      expect(typeof gradient).toBe('object');
+      for (const [, token] of Object.entries(gradient)) {
+        expect(token.$type).toBe('gradient');
+        expect(Array.isArray(token.$value)).toBe(true);
+      }
+    });
+  });
+
+  describe('custom theme round-trip', () => {
+    it('round-trips a theme with all modifier types and multi-stop gradients', () => {
+      const custom: import('./tokens.js').Theme = {
+        name: 'all-modifiers',
+        status: {
+          success: { hex: '#00ff00' },
+          error: { hex: '#ff0000', modifiers: ['bold'] },
+          warning: { hex: '#ffff00', modifiers: ['dim'] },
+          info: { hex: '#00ffff', modifiers: ['strikethrough'] },
+          pending: { hex: '#808080', modifiers: ['inverse'] },
+          active: { hex: '#aabbcc', modifiers: ['bold', 'dim'] },
+          muted: { hex: '#333333', modifiers: ['dim'] },
+        },
+        semantic: {
+          success: { hex: '#11aa11' },
+          error: { hex: '#cc0000' },
+          warning: { hex: '#dddd00' },
+          info: { hex: '#0099cc' },
+          accent: { hex: '#ff00ff', modifiers: ['bold'] },
+          muted: { hex: '#555555' },
+          primary: { hex: '#ffffff' },
+        },
+        border: {
+          primary: { hex: '#aaaaaa' },
+          secondary: { hex: '#bbbbbb' },
+          success: { hex: '#00cc00' },
+          warning: { hex: '#cccc00' },
+          error: { hex: '#cc0000' },
+          muted: { hex: '#444444' },
+        },
+        ui: {
+          cursor: { hex: '#ff00ff' },
+          scrollThumb: { hex: '#cccccc' },
+          scrollTrack: { hex: '#222222' },
+          sectionHeader: { hex: '#0000ff', modifiers: ['bold'] },
+          logo: { hex: '#00ffff' },
+          tableHeader: { hex: '#ffffff', modifiers: ['bold'] },
+          trackEmpty: { hex: '#333333' },
+        },
+        gradient: {
+          brand: [
+            { pos: 0, color: [255, 0, 0] },
+            { pos: 0.33, color: [0, 255, 0] },
+            { pos: 0.66, color: [0, 0, 255] },
+            { pos: 1, color: [255, 255, 0] },
+          ],
+          progress: [
+            { pos: 0, color: [0, 0, 0] },
+            { pos: 0.5, color: [128, 128, 128] },
+            { pos: 1, color: [255, 255, 255] },
+          ],
+        },
+      };
+
+      const rt = fromDTCG(toDTCG(custom));
+
+      expect(rt.name).toBe('all-modifiers');
+      expect(rt.status.error.modifiers).toEqual(['bold']);
+      expect(rt.status.warning.modifiers).toEqual(['dim']);
+      expect(rt.status.info.modifiers).toEqual(['strikethrough']);
+      expect(rt.status.pending.modifiers).toEqual(['inverse']);
+      expect(rt.status.active.modifiers).toEqual(['bold', 'dim']);
+      expect(rt.status.success.modifiers).toBeUndefined();
+      expect(rt.semantic.accent.modifiers).toEqual(['bold']);
+      expect(rt.ui.sectionHeader.modifiers).toEqual(['bold']);
+      expect(rt.gradient.brand).toHaveLength(4);
+      expect(rt.gradient.progress).toHaveLength(3);
+      expect(rt.gradient.brand[1]!.pos).toBe(0.33);
+      expect(rt.gradient.brand[1]!.color).toEqual([0, 255, 0]);
     });
   });
 });

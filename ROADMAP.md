@@ -315,7 +315,7 @@ Growing toward a full terminal component library:
 
 | Category | Components |
 |----------|-----------|
-| **Element** | `alert()`, `badge()`, `separator()`, `skeleton()`, `kbd()` |
+| **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
 | **Data** | `accordion()`, `tree()`, `timeline()` |
 | **Navigation** | `tabs()`, `breadcrumb()`, `paginator()`, `stepper()`, `commandPalette()` |
 | **Overlay** | `modal()`, `toast()`, `drawer()` |

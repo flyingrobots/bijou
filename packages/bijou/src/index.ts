@@ -86,6 +86,18 @@ export {
   type LogoResult,
   type LogoConstraints,
   type LogoOptions,
+  separator,
+  type SeparatorOptions,
+  badge,
+  type BadgeVariant,
+  type BadgeOptions,
+  alert,
+  type AlertVariant,
+  type AlertOptions,
+  skeleton,
+  type SkeletonOptions,
+  kbd,
+  type KbdOptions,
 } from './core/components/index.js';
 
 // Forms

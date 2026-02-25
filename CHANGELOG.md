@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Element components** (ROADMAP: Component catalog → Element):
+  - `separator()` — horizontal divider with optional label, full-width by default
+  - `badge()` — colored label with inverse styling, 5 variants (success/error/warning/info/muted)
+  - `alert()` — styled message box with icon, delegates to `box()`, 4 variants
+  - `skeleton()` — loading placeholder with configurable width/lines
+  - `kbd()` — keyboard key display with styled brackets and bold text
+
+### Changed
+
+- **DTCG edge-case hardening** (ROADMAP #6):
+  - `fromDTCG()` now throws on circular references (`Circular reference detected: ...`)
+  - `fromDTCG()` now throws on unresolvable references (`Unresolvable reference: ...`)
+  - Reference resolution is now recursive — multi-level chains (`{a}` → `{b}` → `#hex`) resolve correctly
+  - Added `toDTCG()` schema validation test (every token has `$type`/`$value`)
+  - Added custom theme round-trip test covering all modifier types and multi-stop gradients
+
 ### Fixed
 
 - **README accuracy**:

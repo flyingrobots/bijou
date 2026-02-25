@@ -12,3 +12,18 @@ export type { BoxOptions, HeaderBoxOptions } from './box.js';
 
 export { selectLogoSize, loadRandomLogo } from './logo.js';
 export type { LogoSize, LogoResult, LogoConstraints, LogoOptions } from './logo.js';
+
+export { separator } from './separator.js';
+export type { SeparatorOptions } from './separator.js';
+
+export { badge } from './badge.js';
+export type { BadgeVariant, BadgeOptions } from './badge.js';
+
+export { alert } from './alert.js';
+export type { AlertVariant, AlertOptions } from './alert.js';
+
+export { skeleton } from './skeleton.js';
+export type { SkeletonOptions } from './skeleton.js';
+
+export { kbd } from './kbd.js';
+export type { KbdOptions } from './kbd.js';
