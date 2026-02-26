@@ -23,5 +23,8 @@ coverage/
 *.log
 npm-debug.log*
 
+# Build
+*.tsbuildinfo
+
 # Misc
 *.tgz

@@ -6,7 +6,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "clean": "rm -rf packages/bijou/dist packages/bijou-node/dist packages/bijou-tui/dist packages/bijou/*.tsbuildinfo packages/bijou-node/*.tsbuildinfo packages/bijou-tui/*.tsbuildinfo",
+    "build": "tsc -b",
+    "build:watch": "tsc -b -w",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "lint": "npm run lint --workspaces",

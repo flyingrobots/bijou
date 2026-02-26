@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -11,12 +14,14 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist",
     "rootDir": "src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"],
+  "references": [{ "path": "../bijou" }]
 }
