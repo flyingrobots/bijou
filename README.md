@@ -1,12 +1,14 @@
 # 💎 Bijou
 
-### Professional TUI engine for TypeScript.
+### Turbo TUI engine for TypeScript.
 **Resilient by design. Physics-powered. Built for scale.**
 
 Stop building brittle CLIs that break in CI or look like garbage on a server. Bijou is a multi-package TUI engine for building everything from simple interactive scripts to complex, high-fidelity terminal applications.
 
 [![npm](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
 [![License](https://img.shields.io/github/license/flyingrobots/bijou)](./LICENSE)
+
+![bijou](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
 ---
 
