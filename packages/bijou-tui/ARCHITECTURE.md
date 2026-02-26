@@ -61,19 +61,22 @@ init() → [Model₀, Cmd[]]
 
 ```
 src/
-├── types.ts      # App, Cmd, KeyMsg, ResizeMsg, QUIT
-├── runtime.ts    # run() — TEA event loop
-├── eventbus.ts   # EventBus — centralized event emitter
-├── keys.ts       # parseKey() — raw bytes → KeyMsg
-├── screen.ts     # ANSI sequences, enterScreen, renderFrame
-├── commands.ts   # quit(), tick(), batch()
-├── spring.ts     # Spring physics + tween engine + easings
-├── animate.ts    # animate(), sequence() — TEA commands
-├── timeline.ts   # GSAP-style timeline orchestrator
-├── viewport.ts   # Scrollable content pane + scroll state
-├── flex.ts       # Flexbox layout engine
-├── layout.ts     # vstack(), hstack()
-└── index.ts      # Public API barrel
+├── types.ts         # App, Cmd, KeyMsg, ResizeMsg, QUIT
+├── runtime.ts       # run() — TEA event loop
+├── eventbus.ts      # EventBus — centralized event emitter
+├── keys.ts          # parseKey() — raw bytes → KeyMsg
+├── screen.ts        # ANSI sequences, enterScreen, renderFrame
+├── commands.ts      # quit(), tick(), batch()
+├── spring.ts        # Spring physics + tween engine + easings
+├── animate.ts       # animate(), sequence() — TEA commands
+├── timeline.ts      # GSAP-style timeline orchestrator
+├── viewport.ts      # Scrollable content pane + scroll state
+├── flex.ts          # Flexbox layout engine
+├── layout.ts        # vstack(), hstack()
+├── keybindings.ts   # KeyMap, parseKeyCombo, formatKeyCombo
+├── help.ts          # helpView, helpShort, helpFor — auto-generated help
+├── inputstack.ts    # InputStack — layered input dispatch
+└── index.ts         # Public API barrel
 ```
 
 ## Animation System
@@ -154,6 +157,64 @@ The bus is a typed publish/subscribe system:
 - **Lifecycle**: `dispose()` disconnects all sources, clears all handlers
 
 The TEA runtime creates an EventBus internally. Apps can also create their own for custom event sources or testing.
+
+## Input System
+
+Three modules compose into a declarative input handling pipeline:
+
+### keybindings.ts — KeyMap
+
+`createKeyMap<A>()` returns a `KeyMap<A>` that maps key descriptors (`"q"`, `"ctrl+c"`, `"shift+tab"`) to action values. Actions are data (messages), not factories — this keeps TEA's data-driven model intact and avoids stale closures.
+
+```
+Key descriptor string
+    │
+    ▼
+parseKeyCombo("ctrl+c")  →  KeyCombo { key: "c", ctrl: true, ... }
+    │
+    ▼
+Stored as Binding<A> { combo, description, group, action, enabled }
+    │
+    ▼
+handle(KeyMsg)  →  first-match scan  →  A | undefined
+```
+
+Key features:
+- **Named groups** — `group('Navigation', g => g.bind(...))` for organized help output
+- **Runtime enable/disable** — by description string, predicate function, or group name
+- **Implements InputHandler** — `KeyMap<A> extends InputHandler<KeyMsg, A>`, plugs directly into InputStack
+
+### help.ts — Help Generator
+
+Three views auto-generated from any `BindingSource` (anything with a `bindings()` method):
+
+- `helpView()` — grouped multi-line with aligned columns
+- `helpShort()` — single-line `"q Quit • j Down • k Up"` format
+- `helpFor()` — filtered by group prefix
+
+Decoupled from `KeyMap` via the `BindingSource` interface — custom implementations can provide their own binding lists.
+
+### inputstack.ts — InputStack
+
+Stack-based dispatch for layered input handling (e.g., modals over global shortcuts):
+
+```
+KeyMsg ──► InputStack.dispatch()
+              │
+              ▼
+          Layer N (top)     ◄── opaque: swallows unhandled events
+              │ not handled
+              ▼
+          Layer N-1          ◄── passthrough: lets events fall through
+              │ not handled
+              ▼
+          Layer 0 (base)
+```
+
+- **Opaque layers** (default) block unhandled events from reaching lower layers — ideal for modals
+- **Passthrough layers** let unmatched events continue — ideal for global shortcuts
+- `InputHandler<Msg, A>` is the only interface a layer needs to implement
+- `KeyMap` satisfies `InputHandler`, so keymaps push directly onto the stack
 
 ## Graceful Degradation
 

@@ -33,31 +33,38 @@ console.log(box('Hello, world!'));
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou  (zero deps)                   │
-│                                                     │
-│  Components   Theme Engine   Forms   Detection      │
-│  box · table  DTCG · presets input   TTY · CI       │
-│  spinner      gradients     select   pipe · a11y    │
-│  progress     styled()      confirm                 │
-│               extendTheme()  group                  │
-│                                                     │
-│  ── Ports ──────────────────────────────────────     │
-│  RuntimePort    IOPort    StylePort                  │
-└───────┬───────────┬───────────┬─────────────────────┘
-        │           │           │
-┌───────▼───────────▼───────────▼─────────────────────┐
-│  @flyingrobots/bijou-node                           │
-│  process · readline · chalk                         │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  @flyingrobots/bijou  (zero deps)                        │
+│                                                          │
+│  Components   Theme Engine   Forms   Detection           │
+│  box · table  DTCG · presets input   TTY · CI            │
+│  spinner      gradients     select   pipe · a11y         │
+│  progress     styled()      confirm                      │
+│               extendTheme()  group                       │
+│                                                          │
+│  ── Ports ─────────────────────────────────────────────  │
+│  RuntimePort       IOPort       StylePort                │
+└──────┬───────────────┬───────────────┬───────────────────┘
+       │               │               │
+┌──────▼───────────────▼───────────────▼───────────────────┐
+│  @flyingrobots/bijou-node                                │
+│  process · readline · chalk · fs                         │
+└──────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou-tui                            │
-│  TEA runtime · key parsing · screen · layout        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  @flyingrobots/bijou-tui                                 │
+│                                                          │
+│  Runtime        Animation       Layout                   │
+│  TEA · EventBus spring · tween  flex · viewport          │
+│  parseKey       animate · timeline   vstack · hstack     │
+│  screen control sequence                                 │
+│                                                          │
+│  Input                                                   │
+│  KeyMap · InputStack · help generator                    │
+└──────────────────────────────────────────────────────────┘
 ```
 
-The core is pure TypeScript. All platform I/O flows through three ports (`RuntimePort`, `IOPort`, `StylePort`), making it testable without mocks and portable to any runtime.
+The core is pure TypeScript. All platform I/O flows through three ports (`RuntimePort`, `IOPort`, `StylePort`), making it testable without mocks and portable to any runtime. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design.
 
 ## Output Modes
 

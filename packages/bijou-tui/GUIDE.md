@@ -300,9 +300,199 @@ bus.emit({ type: 'resize', columns: 120, rows: 40 });
 bus.emit({ type: 'myCustomMsg', value: 42 });
 ```
 
+## Keybinding Manager
+
+### Declaring Bindings
+
+```typescript
+import { createKeyMap } from '@flyingrobots/bijou-tui';
+
+type Msg =
+  | { type: 'quit' }
+  | { type: 'help' }
+  | { type: 'move'; dir: string };
+
+const kb = createKeyMap<Msg>()
+  .bind('q', 'Quit', { type: 'quit' })
+  .bind('?', 'Toggle help', { type: 'help' })
+  .bind('ctrl+c', 'Force quit', { type: 'quit' })
+  .group('Navigation', (g) => g
+    .bind('j', 'Down', { type: 'move', dir: 'down' })
+    .bind('k', 'Up', { type: 'move', dir: 'up' })
+    .bind('shift+tab', 'Previous', { type: 'move', dir: 'prev' })
+  );
+```
+
+Actions are data (messages), not factory functions. This keeps TEA's data-driven model clean.
+
+### Using in TEA Update
+
+```typescript
+update(msg, model) {
+  if (msg.type === 'key') {
+    const action = kb.handle(msg);
+    if (action !== undefined) {
+      switch (action.type) {
+        case 'quit': return [model, [quit()]];
+        case 'help': return [{ ...model, showHelp: !model.showHelp }, []];
+        case 'move': return [{ ...model, cursor: move(model.cursor, action.dir) }, []];
+      }
+    }
+  }
+  return [model, []];
+}
+```
+
+### Runtime Enable/Disable
+
+```typescript
+// Disable by description
+kb.disable('Toggle help');
+
+// Disable by predicate
+kb.disable((b) => b.group === 'Navigation');
+
+// Disable entire group
+kb.disableGroup('Navigation');
+
+// Re-enable
+kb.enableGroup('Navigation');
+kb.enable('Toggle help');
+```
+
+Disabled bindings are skipped during `handle()` and hidden in help output by default.
+
+### Key Descriptors
+
+Supported modifiers: `ctrl`, `alt`, `shift`. Combined with `+`:
+
+```typescript
+'q'              // plain key
+'ctrl+c'         // modifier + key
+'alt+shift+tab'  // multiple modifiers
+'enter'          // named keys
+'space'          // named keys
+'escape'         // named keys
+```
+
+Descriptors are case-insensitive — `'Ctrl+C'` and `'ctrl+c'` are equivalent.
+
+## Help Generation
+
+### Full Help View
+
+```typescript
+import { helpView } from '@flyingrobots/bijou-tui';
+
+const help = helpView(kb);
+// Navigation
+//   j           Down
+//   k           Up
+//   Shift+Tab   Previous
+//
+// General
+//   q       Quit
+//   ?       Toggle help
+//   Ctrl+c  Force quit
+```
+
+### Short Help
+
+```typescript
+import { helpShort } from '@flyingrobots/bijou-tui';
+
+helpShort(kb);
+// "q Quit • ? Toggle help • Ctrl+c Force quit • j Down • k Up • Shift+Tab Previous"
+```
+
+### Filtered Help
+
+```typescript
+import { helpFor } from '@flyingrobots/bijou-tui';
+
+helpFor(kb, 'Nav');  // only Navigation group (prefix match, case-insensitive)
+```
+
+### Options
+
+```typescript
+helpView(kb, {
+  enabledOnly: false,    // show disabled bindings too
+  separator: ' → ',      // custom key-description separator
+  title: 'Keyboard Shortcuts',
+});
+```
+
+Help functions accept any `BindingSource` — not just `KeyMap`. You can implement custom binding sources for dynamic help content.
+
+## Input Stack
+
+### Why a Stack?
+
+Most TUI apps have layers of input handling: global shortcuts, page-specific keys, modal dialogs. The input stack lets you push and pop handlers as context changes:
+
+```typescript
+import { createInputStack, createKeyMap, type KeyMsg } from '@flyingrobots/bijou-tui';
+
+const stack = createInputStack<KeyMsg, Msg>();
+
+// Base layer — global keys, passthrough so unmatched events reach lower layers
+const globalKeys = createKeyMap<Msg>()
+  .bind('ctrl+c', 'Quit', { type: 'quit' })
+  .bind('?', 'Help', { type: 'help' });
+
+stack.push(globalKeys, { passthrough: true });
+```
+
+### Modal Pattern
+
+```typescript
+// When a modal opens — push opaque layer (blocks everything below)
+const modalKeys = createKeyMap<Msg>()
+  .bind('enter', 'Confirm', { type: 'confirm' })
+  .bind('escape', 'Cancel', { type: 'cancel' });
+
+const modalId = stack.push(modalKeys);  // opaque by default
+
+// In update — dispatch through the stack
+const action = stack.dispatch(keyMsg);
+// Only 'enter' and 'escape' will match — everything else is swallowed
+
+// When the modal closes — remove the layer
+stack.remove(modalId);
+// Now global keys work again
+```
+
+### Passthrough vs Opaque
+
+- **Opaque** (default): unhandled events stop here — lower layers never see them. Use for modals and dialogs.
+- **Passthrough**: unhandled events continue to the next layer. Use for global shortcuts that should always work.
+
+```typescript
+// Passthrough — global shortcuts always active
+stack.push(globalKeys, { passthrough: true });
+
+// Opaque — page-specific keys, blocks fallthrough
+stack.push(pageKeys);
+
+// Result: pageKeys handles its bindings, globalKeys handles the rest,
+// anything unmatched by both is swallowed by pageKeys (opaque)
+```
+
+### Named Layers
+
+```typescript
+stack.push(handler, { name: 'search-modal', passthrough: false });
+
+// Inspect the stack
+for (const layer of stack.layers()) {
+  console.log(`${layer.name} (${layer.passthrough ? 'passthrough' : 'opaque'})`);
+}
+```
+
 ## Pure Functions Everywhere
 
-The spring engine, tween engine, timeline, viewport, and scroll state are all pure functions operating on immutable state. This means:
+The spring engine, tween engine, timeline, viewport, scroll state, keybinding matching, and help generation are all pure functions operating on immutable state. This means:
 
 - **Testable**: No timers to mock, no I/O to stub
 - **Composable**: Combine them freely in your update function

@@ -1,6 +1,6 @@
 # @flyingrobots/bijou-tui
 
-TEA runtime for terminal UIs — model/update/view with physics-based animation, flexbox layout, and a centralized event bus.
+TEA runtime for terminal UIs — model/update/view with physics-based animation, flexbox layout, declarative keybindings, and a centralized event bus.
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
@@ -192,6 +192,69 @@ bus.dispose();                   // clean shutdown
 ```
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full event flow and [GUIDE.md](./GUIDE.md) for detailed usage patterns.
+
+## Keybinding Manager
+
+Declarative key binding with modifier support, named groups, and runtime enable/disable:
+
+```typescript
+import { createKeyMap, type KeyMsg } from '@flyingrobots/bijou-tui';
+
+type Msg = { type: 'quit' } | { type: 'help' } | { type: 'move'; dir: string };
+
+const kb = createKeyMap<Msg>()
+  .bind('q', 'Quit', { type: 'quit' })
+  .bind('?', 'Help', { type: 'help' })
+  .bind('ctrl+c', 'Force quit', { type: 'quit' })
+  .group('Navigation', (g) => g
+    .bind('j', 'Down', { type: 'move', dir: 'down' })
+    .bind('k', 'Up', { type: 'move', dir: 'up' })
+  );
+
+// In TEA update:
+const action = kb.handle(keyMsg);
+if (action !== undefined) return [model, [/* ... */]];
+
+// Runtime enable/disable
+kb.disableGroup('Navigation');
+kb.enable('Quit');
+```
+
+### Help Generation
+
+Auto-generate help text from registered bindings:
+
+```typescript
+import { helpView, helpShort, helpFor } from '@flyingrobots/bijou-tui';
+
+helpView(kb);           // full grouped multi-line help
+helpShort(kb);          // "q Quit • ? Help • Ctrl+c Force quit • j Down • k Up"
+helpFor(kb, 'Nav');     // only Navigation group
+```
+
+### Input Stack
+
+Layered input dispatch for modal UIs — push/pop handlers with opaque or passthrough behavior:
+
+```typescript
+import { createInputStack, type KeyMsg } from '@flyingrobots/bijou-tui';
+
+const stack = createInputStack<KeyMsg, Msg>();
+
+// Base layer — global keys, lets unmatched events fall through
+stack.push(appKeys, { passthrough: true });
+
+// Modal opens — captures all input (opaque by default)
+const modalId = stack.push(modalKeys);
+
+// Dispatch returns first matched action, top-down
+const action = stack.dispatch(keyMsg);
+
+// Modal closes
+stack.remove(modalId);
+```
+
+`KeyMap` implements `InputHandler`, so it plugs directly into the input stack.
 
 ## Related Packages
 
