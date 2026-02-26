@@ -6,7 +6,7 @@ describe('commands', () => {
   describe('quit', () => {
     it('returns a function that resolves to QUIT symbol', async () => {
       const cmd = quit();
-      const result = await cmd();
+      const result = await cmd(() => {});
       expect(result).toBe(QUIT);
     });
   });
@@ -16,7 +16,7 @@ describe('commands', () => {
       vi.useFakeTimers();
       const msg = { type: 'tick' as const };
       const cmd = tick(100, msg);
-      const promise = cmd();
+      const promise = cmd(() => {});
       vi.advanceTimersByTime(100);
       const result = await promise;
       expect(result).toBe(msg);
@@ -27,7 +27,9 @@ describe('commands', () => {
       vi.useFakeTimers();
       const cmd = tick(500, 'done');
       let resolved = false;
-      void cmd().then(() => { resolved = true; });
+      void cmd(() => {}).then(() => {
+        resolved = true;
+      });
       vi.advanceTimersByTime(499);
       await vi.advanceTimersByTimeAsync(0);
       expect(resolved).toBe(false);

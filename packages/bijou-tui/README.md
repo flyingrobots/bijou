@@ -6,13 +6,13 @@ Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [G
 
 ## What's New in 0.2.0?
 
-- **Spring animation engine** — physics-based springs with 6 presets, plus tween engine with 12 easing functions
-- **`animate()`** — GSAP-style animation commands for TEA, with `immediate: true` for reduced-motion
-- **Timeline** — orchestrate multiple animations with position-based timing (`'<'`, `'+=N'`, `'-=N'`, labels)
-- **`viewport()`** — scrollable content pane with proportional scrollbar
-- **`flex()`** — flexbox layout with grow/basis/min/max, render functions that reflow on resize
-- **`ResizeMsg`** — terminal resize events auto-dispatched by the runtime
-- **`EventBus`** — centralized typed event emitter unifying keyboard, resize, and commands
+- **Industrial-Grade Renderer** — Flicker-free, scroll-safe rendering loop with `WRAP_DISABLE` and `CLEAR_LINE_TO_END` support.
+- **Spring animation engine** — physics-based springs with 6 presets, plus multi-frame emission for 60fps+ fluidity.
+- **`animate()`** — GSAP-style animation commands for TEA, with `onComplete` signals and `immediate: true` for reduced-motion.
+- **`viewport()`** — scrollable content pane with proportional scrollbar and ANSI-aware clipping.
+- **`flex()`** — flexbox layout with grow/basis/min/max, true horizontal centering, and auto-reflow.
+- **`ResizeMsg`** — terminal resize events auto-dispatched by the runtime.
+- **`EventBus`** — centralized typed event emitter unifying keyboard, resize, and multi-message commands.
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
 

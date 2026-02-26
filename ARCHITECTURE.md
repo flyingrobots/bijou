@@ -121,9 +121,9 @@ interface BijouContext {
 | **Event bus** | `createEventBus()` — typed pub/sub, I/O connection, command runner |
 | **Spring physics** | Damped harmonic oscillator, 6 presets, `springStep()` pure function |
 | **Tween engine** | Duration-based animation, 12 easing functions, `tweenStep()` pure function |
-| **animate/sequence** | GSAP-style TEA commands wrapping spring/tween into `Cmd<M>` |
+| **animate/sequence** | GSAP-style TEA commands wrapping spring/tween into `Cmd<M>` with per-frame emission |
 | **Timeline** | Multi-track orchestration with position syntax, labels, callbacks |
-| **Flexbox** | `flex()` — row/column direction, grow/basis/min/max, render functions |
+| **Flexbox** | `flex()` — row/column direction, grow/basis/min/max, horizontal/vertical alignment, render functions |
 | **Viewport** | `viewport()` — scrollable pane with proportional scrollbar, ANSI-aware clipping |
 | **Keybinding manager** | `createKeyMap()` — declarative binding, modifier combos, named groups, enable/disable |
 | **Help generator** | `helpView()`, `helpShort()`, `helpFor()` — auto-generated from bindings |
@@ -163,7 +163,7 @@ EventBus ──── parseKey() ──── KeyMsg
                           ▼
                     [Model, Cmd[]]
                       │       │
-                      │       └─ bus.runCmd() → emit result → loop
+                      │       └─ bus.runCmd() → emit messages → loop
                       ▼
                     view(model) → string → renderFrame() → stdout
 ```

@@ -1,123 +1,115 @@
-# bijou
+# 💎 Bijou
 
-**The hexagonal toolkit for beautiful, bulletproof terminal interfaces.**
+### Professional TUI engine for TypeScript.
+**Resilient by design. Physics-powered. Built for scale.**
 
-bijou is a professional-grade TUI framework for TypeScript. Zero-dependency core, hexagonal architecture, intelligent graceful degradation across TTY, CI, pipe, and accessible modes.
+Stop building brittle CLIs that break in CI or look like garbage on a server. Bijou is a multi-package TUI engine for building everything from simple interactive scripts to complex, high-fidelity terminal applications.
 
-## Packages
+[![npm](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
+[![License](https://img.shields.io/github/license/flyingrobots/bijou)](./LICENSE)
 
-All packages are versioned in lock-step — every release bumps all three to the same version. Internal cross-dependencies are pinned to the exact release version, so `@flyingrobots/bijou-node@0.3.0` always depends on `@flyingrobots/bijou@0.3.0`.
+---
 
-| Package | Description | npm |
-| :--- | :--- | :--- |
-| [`@flyingrobots/bijou`](./packages/bijou) | Zero-dependency core — components, theme engine, ports | [![npm](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou) |
-| [`@flyingrobots/bijou-node`](./packages/bijou-node) | Node.js adapter — chalk styling, readline I/O, process runtime | [![npm](https://img.shields.io/npm/v/@flyingrobots/bijou-node)](https://www.npmjs.com/package/@flyingrobots/bijou-node) |
-| [`@flyingrobots/bijou-tui`](./packages/bijou-tui) | TEA runtime — model/update/view with keyboard input and layout | [![npm](https://img.shields.io/npm/v/@flyingrobots/bijou-tui)](https://www.npmjs.com/package/@flyingrobots/bijou-tui) |
+## 🚀 Try it in 10 Seconds
 
-## Quick Start
+Experience the full physics-powered TUI engine immediately:
 
 ```bash
-npm install @flyingrobots/bijou @flyingrobots/bijou-node
+git clone https://github.com/flyingrobots/bijou && cd bijou && npm install && npx tsx demo-tui.ts
 ```
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox, gradientText } from '@flyingrobots/bijou';
+---
 
-initDefaultContext();
+## 🦾 Resilience as a Superpower
 
-console.log(headerBox('Bijou CLI', { detail: 'v1.0.0' }));
-console.log(box('Hello, world!'));
-```
-
-## Architecture
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou  (zero deps)                        │
-│                                                          │
-│  Components   Theme Engine   Forms   Detection           │
-│  box · table  DTCG · presets input   TTY · CI            │
-│  spinner      gradients     select   pipe · a11y         │
-│  progress     styled()      confirm                      │
-│               extendTheme()  group                       │
-│                                                          │
-│  ── Ports ─────────────────────────────────────────────  │
-│  RuntimePort       IOPort       StylePort                │
-└──────┬───────────────┬───────────────┬───────────────────┘
-       │               │               │
-┌──────▼───────────────▼───────────────▼───────────────────┐
-│  @flyingrobots/bijou-node                                │
-│  process · readline · chalk · fs                         │
-└──────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou-tui                                 │
-│                                                          │
-│  Runtime        Animation       Layout                   │
-│  TEA · EventBus spring · tween  flex · viewport          │
-│  parseKey       animate · timeline   vstack · hstack     │
-│  screen control sequence                                 │
-│                                                          │
-│  Input                                                   │
-│  KeyMap · InputStack · help generator                    │
-└──────────────────────────────────────────────────────────┘
-```
-
-The core is pure TypeScript. All platform I/O flows through three ports (`RuntimePort`, `IOPort`, `StylePort`), making it testable without mocks and portable to any runtime. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design.
-
-## Output Modes
-
-bijou detects the environment and adapts rendering automatically:
+The core of Bijou is its **Graceful Degradation** engine. It detects your environment and automatically adapts the UI logic—ensuring your tool works as perfectly in a GitHub Action as it does in a local TrueColor terminal.
 
 | Mode | Trigger | Behavior |
 | :--- | :--- | :--- |
-| **Interactive** | TTY | Full RGB, unicode borders, animations |
-| **Static** | `CI=true` | Single-frame, animations disabled |
-| **Pipe** | Piped stdout / `TERM=dumb` | Plain text, ASCII fallbacks |
-| **Accessible** | `BIJOU_ACCESSIBLE=1` | Screen-reader friendly |
+| **Interactive** | Local TTY | Full 24-bit RGB, Unicode borders, 60fps physics animations. |
+| **Static** | `CI=true` | Single-frame rendering, animations disabled, spinners removed. |
+| **Pipe** | Piped `stdout` | Strips all ANSI codes, switches to ASCII fallbacks for UNIX pipes. |
+| **Accessible** | `BIJOU_A11Y=1` | Simplified prompt text and linear flow optimized for screen readers. |
 
-## Components
+---
 
-See the [core package README](./packages/bijou) for the full component catalog:
+## 🛠️ One Engine, Two Runtimes
 
-- **Layout** — `box`, `headerBox`, `separator`
-- **Elements** — `badge`, `alert`, `kbd`, `skeleton`
-- **Data** — `table`, `tree`, `accordion`, `timeline`
-- **Navigation** — `tabs`, `breadcrumb`, `stepper`, `paginator`
-- **Animation** — `spinner`, `progressBar`, `gradientText`
-- **Forms** — `input`, `select`, `multiselect`, `confirm`, `group`
-- **Themes** — DTCG presets (`nord`, `catppuccin`, `cyan-magenta`), `extendTheme()`, `styled()`
+Bijou is split into two layers so you only pay for what you need:
 
-## Development
+### 1. The Resilient Core (`@flyingrobots/bijou`)
+A zero-dependency library of 20+ static components and interactive prompts.
+*   **Hexagonal Architecture:** Decoupled from Node.js. Test your UI logic in pure TS with zero mocks.
+*   **First-class Design Tokens:** (DTCG-compatible) Use your web brand's JSON to drive your terminal's theme.
+*   **Components:** `box`, `table`, `tree`, `accordion`, `timeline`, `input`, `select`, `confirm`, `tabs`, `stepper`.
 
-```bash
-# Install
-npm install
+### 2. The High-Performance TUI (`@flyingrobots/bijou-tui`)
+An interactive runtime inspired by **The Elm Architecture (TEA)** and **GSAP**.
+*   **Physics-Based Motion:** Damped harmonic oscillators (Springs) for 60fps-smooth interfaces.
+*   **Flexbox Layout:** A real `flex()` engine with auto-reflow that understands terminal resizing.
+*   **Animation Timelines:** Orchestrate complex sequences with GSAP-style position syntax (`+=`, `-=`).
 
-# Build all packages
-npm run build
+---
 
-# Run tests
-npm test
+## 📊 Feature Comparison
 
-# Type check
-npm run lint
+| Feature | **Bijou** | **Ink** | **Blessed** | **Clack** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Architecture** | **Hexagonal (Ports)** | Monolithic | Monolithic | Procedural |
+| **Resilience** | **Native (4-mode)** | Manual / Limited | None | Manual |
+| **Animation** | **Physics Springs** | Ad-hoc Tweens | None | CSS-like |
+| **Layout** | **Flexbox + Reflow** | Yoga (Flexbox) | Fixed Widgets | Rows only |
+| **Testing** | **Mock-free Adapters** | Terminal Spawning | Difficult | I/O Mocks |
 
-# Bump all packages to a new version
-npm run version 0.2.0
+---
+
+## Quick Start
+
+### 1. Interactive Prompts (Core)
+Beautiful prompts that automatically degrade to numbered lists in CI environments.
+
+```typescript
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { input, select, group } from '@flyingrobots/bijou';
+
+initDefaultContext();
+
+const setup = await group({
+  project: () => input({ title: 'Project Name', required: true }),
+  type:    () => select({ 
+    title: 'Template', 
+    options: [{ label: 'TypeScript', value: 'ts' }, { label: 'Go', value: 'go' }] 
+  }),
+});
 ```
 
-## Releasing
+### 2. Full-Scale TUI (Runtime)
+Unidirectional state management with physics-based animations. (See [demo-tui.ts](./demo-tui.ts))
 
-All packages release together. The workflow:
+```typescript
+import { run, quit, type App } from '@flyingrobots/bijou-tui';
 
-1. `npm run version X.Y.Z` — bumps all `package.json` files and cross-deps
-2. Commit and tag: `git tag vX.Y.Z && git push --tags`
-3. CI verifies versions match, builds, tests, then publishes all three packages to npm with OIDC provenance
+const app: App<Model> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => {
+    if (msg.key === 'q') return [model, [quit()]];
+    if (msg.key === '+') return [{ count: model.count + 1 }, []];
+    return [model, []];
+  },
+  view: (model) => `Count: ${model.count}\nPress + to increment, q to quit`
+};
 
-Pre-release tags are supported: `v0.2.0-rc.1` publishes to `next`, `v0.2.0-beta.1` to `beta`.
+run(app);
+```
 
-## License
+---
 
-MIT
+## 📦 Packages
+
+*   [`@flyingrobots/bijou`](./packages/bijou) — Zero-dependency core & components.
+*   [`@flyingrobots/bijou-node`](./packages/bijou-node) — Node.js platform adapter (Chalk, Readline).
+*   [`@flyingrobots/bijou-tui`](./packages/bijou-tui) — Interactive TEA runtime & physics.
+
+---
+
+Licensed under [MIT](./LICENSE). Built with 💎 by [Flying Robots](https://flyingrobots.dev).

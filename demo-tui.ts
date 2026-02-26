@@ -1,404 +1,353 @@
 /**
- * bijou component catalog — interactive TUI demo
+ * 💎 Bijou High-Fidelity Showcase
  *
- * Run: npx tsc -p packages/bijou-tui/tsconfig.json && npx tsx demo-tui.ts
+ * Demonstrates the full power of the Bijou TUI engine:
+ * - Responsive Flexbox layout with auto-reflow
+ * - Physics-based spring animations
+ * - GSAP-style timeline orchestration
+ * - Layered input handling (Modals/Overlays)
+ * - Process telemetry & benchmarking
+ *
+ * Run: npx tsx demo-tui.ts
  */
 
-import { initDefaultContext, createNodeContext } from '@flyingrobots/bijou-node';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   box,
   headerBox,
   badge,
   kbd,
   separator,
-  alert,
-  skeleton,
   table,
   tree,
   accordion,
-  timeline,
+  alert,
+  timeline as staticTimeline,
   progressBar,
   spinnerFrame,
-  tabs,
-  breadcrumb,
-  paginator,
-  stepper,
   PRESETS,
   setDefaultContext,
   getDefaultContext,
   createBijou,
 } from '@flyingrobots/bijou';
-import { run, quit, tick, vstack, hstack, type App, type KeyMsg, type Cmd } from '@flyingrobots/bijou-tui';
+import {
+  run,
+  quit,
+  tick,
+  animate,
+  timeline,
+  flex,
+  viewport,
+  vstack,
+  hstack,
+  createScrollState,
+  scrollBy,
+  createKeyMap,
+  createInputStack,
+  type App,
+  type KeyMsg,
+  type ResizeMsg,
+} from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
 // ---------------------------------------------------------------------------
-// Model
+// Types & Constants
 // ---------------------------------------------------------------------------
 
-const TABS = ['Elements', 'Data', 'Live', 'Layout', 'Navigation'] as const;
+const TABS = ['Dashboard', 'Components', 'Animation', 'Patterns', 'Layout'] as const;
 type Tab = (typeof TABS)[number];
 
-const THEME_NAMES = Object.keys(PRESETS);
+type Msg = 
+  | { type: 'quit' }
+  | { type: 'tick' }
+  | { type: 'next-tab' }
+  | { type: 'prev-tab' }
+  | { type: 'cycle-theme' }
+  | { type: 'scroll-up' }
+  | { type: 'scroll-down' }
+  | { type: 'toggle-turbo' }
+  | { type: 'toggle-modal' }
+  | { type: 'toggle-drawer' }
+  | { type: 'animate-spring'; value: number }
+  | { type: 'animate-tween'; value: number }
+  | { type: 'spring-finished' }
+  | { type: 'tween-finished' }
+  | { type: 'animate-pulse'; scale: number }
+  | { type: 'animate-drawer'; x: number; gen: number }
+  | { type: 'reset-animations' };
+
+const showcaseTimeline = timeline()
+  .add('box1', { from: 0, to: 100, spring: 'wobbly' })
+  .add('box2', { from: 0, to: 100, spring: 'gentle' }, '+=200')
+  .add('box3', { type: 'tween', from: 0, to: 100, duration: 1000 })
+  .build();
 
 interface Model {
   tab: number;
+  cols: number;
+  rows: number;
   themeIndex: number;
+  turbo: boolean;
+  
+  // Overlays
+  modalOpen: boolean;
+  drawerOpen: boolean;
+  drawerX: number;
+  drawerGen: number; // Generation ID to prevent animation fighting
+  
+  // Telemetry
+  cpuPercent: number;
+  lastCpuUsage: { user: number; system: number };
+  lastCpuTime: number;
+  fps: number;
+  lastFrameTime: number;
+  memoryMb: number;
+  
+  // Animation state
+  springVal: number;
+  tweenVal: number;
+  pulseScale: number;
   spinnerTick: number;
-  progress: number;
-  progressDir: 1 | -1;
-  accordionOpen: boolean[];
-  scrollY: number;
+  
+  // Direction for looping
+  springDir: 1 | -1;
+  tweenDir: 1 | -1;
+  
+  tlState: ReturnType<typeof showcaseTimeline.init>;
+  scroll: ReturnType<typeof createScrollState>;
 }
 
-type Msg = { type: 'tick' };
+const THEME_NAMES = Object.keys(PRESETS);
 
 // ---------------------------------------------------------------------------
-// App
+// Input Handling
 // ---------------------------------------------------------------------------
 
-const app: App<Model, Msg> = {
-  init() {
-    return [
-      {
-        tab: 0,
-        themeIndex: 0,
-        spinnerTick: 0,
-        progress: 0,
-        progressDir: 1,
-        accordionOpen: [true, false, false],
-        scrollY: 0,
-      },
-      [tick(80, { type: 'tick' })],
-    ];
+const keys = createKeyMap<Msg>()
+  .bind('q', 'Quit', { type: 'quit' })
+  .bind('ctrl+c', 'Force Quit', { type: 'quit' })
+  .bind('tab', 'Next Tab', { type: 'next-tab' })
+  .bind('shift+tab', 'Prev Tab', { type: 'prev-tab' })
+  .bind('t', 'Cycle Theme', { type: 'cycle-theme' })
+  .bind('f', 'Turbo Mode', { type: 'toggle-turbo' })
+  .bind('m', 'Toggle Modal', { type: 'toggle-modal' })
+  .bind('d', 'Toggle Drawer', { type: 'toggle-drawer' })
+  .bind('r', 'Reset', { type: 'reset-animations' })
+  .bind('up', 'Scroll Up', { type: 'scroll-up' })
+  .bind('down', 'Scroll Down', { type: 'scroll-down' });
+
+const modalKeys = createKeyMap<Msg>()
+  .bind('esc', 'Close Modal', { type: 'toggle-modal' })
+  .bind('enter', 'Close Modal', { type: 'toggle-modal' })
+  .bind('q', 'Quit', { type: 'quit' });
+
+const inputStack = createInputStack<KeyMsg, Msg>();
+inputStack.push(keys);
+
+// ---------------------------------------------------------------------------
+// App Logic
+// ---------------------------------------------------------------------------
+
+function startSpring(model: Model): any {
+  const to = model.springDir === 1 ? 100 : 0;
+  const from = 100 - to;
+  return animate({ 
+    from, to, 
+    spring: { stiffness: 40, damping: 8 }, // slow & wobbly
+    fps: model.turbo ? 500 : 60,
+    onFrame: (v) => ({ type: 'animate-spring', value: v }),
+    onComplete: () => ({ type: 'spring-finished' })
+  });
+}
+
+function startTween(model: Model): any {
+  const to = model.tweenDir === 1 ? 100 : 0;
+  const from = 100 - to;
+  return animate({ 
+    type: 'tween', 
+    from, to, 
+    duration: 2000, 
+    onFrame: (v) => ({ type: 'animate-tween', value: v }),
+    onComplete: () => ({ type: 'tween-finished' })
+  });
+}
+
+const app: App<Model, Msg | ResizeMsg> = {
+  init: () => {
+    const ctx = getDefaultContext();
+    const now = Date.now();
+    const initialModel: Model = {
+      tab: 0,
+      cols: ctx.runtime.columns,
+      rows: ctx.runtime.rows,
+      themeIndex: 0,
+      turbo: false,
+      modalOpen: false,
+      drawerOpen: false,
+      drawerX: 0,
+      drawerGen: 0,
+      cpuPercent: 0,
+      lastCpuUsage: process.cpuUsage(),
+      lastCpuTime: now,
+      fps: 0,
+      lastFrameTime: now,
+      memoryMb: 0,
+      springVal: 0,
+      tweenVal: 0,
+      pulseScale: 1,
+      spinnerTick: 0,
+      springDir: 1,
+      tweenDir: 1,
+      tlState: showcaseTimeline.init(),
+      scroll: createScrollState('', 10),
+    };
+    return [initialModel, [tick(16, { type: 'tick' }), startSpring(initialModel), startTween(initialModel)]];
   },
 
-  update(msg, model) {
-    // Tick — advance spinner + progress
+  update: (msg, model) => {
+    if ('type' in msg && msg.type === 'resize') return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
+
     if ('type' in msg && msg.type === 'tick') {
-      let progress = model.progress + model.progressDir * 2;
-      let dir = model.progressDir;
-      if (progress >= 100) { progress = 100; dir = -1; }
-      if (progress <= 0) { progress = 0; dir = 1; }
+      const isAnimTab = TABS[model.tab] === 'Animation' || TABS[model.tab] === 'Dashboard' || model.drawerOpen;
+      const now = Date.now();
+      const nextTl = isAnimTab ? showcaseTimeline.step(model.tlState, 0.016) : model.tlState;
+      
+      const usage = process.cpuUsage();
+      const dtUs = (now - model.lastCpuTime) * 1000;
+      const cpuPercent = dtUs > 0 ? ((usage.user - model.lastCpuUsage.user + usage.system - model.lastCpuUsage.system) / dtUs) * 100 : 0;
+      const fps = now - model.lastFrameTime > 0 ? 1000 / (now - model.lastFrameTime) : 0;
+
       return [
-        { ...model, spinnerTick: model.spinnerTick + 1, progress, progressDir: dir },
-        [tick(80, { type: 'tick' })],
+        { ...model, spinnerTick: isAnimTab ? model.spinnerTick + 1 : model.spinnerTick, tlState: nextTl, cpuPercent, lastCpuUsage: usage, lastCpuTime: now, fps, lastFrameTime: now, memoryMb: process.memoryUsage().rss / 1024 / 1024 },
+        [tick(model.turbo ? 0 : 16, { type: 'tick' })]
       ];
     }
 
-    // Key messages
-    const key = msg as KeyMsg;
-
-    if (key.key === 'q' || (key.key === 'c' && key.ctrl)) {
-      return [model, [quit<Msg>()]];
+    if ('type' in msg && msg.type === 'animate-spring') return [{ ...model, springVal: msg.value }, []];
+    if ('type' in msg && msg.type === 'animate-tween') return [{ ...model, tweenVal: msg.value }, []];
+    if ('type' in msg && msg.type === 'spring-finished') {
+      const nextModel = { ...model, springDir: (model.springDir === 1 ? -1 : 1) as (1 | -1) };
+      return [nextModel, [startSpring(nextModel)]];
+    }
+    if ('type' in msg && msg.type === 'tween-finished') {
+      const nextModel = { ...model, tweenDir: (model.tweenDir === 1 ? -1 : 1) as (1 | -1) };
+      return [nextModel, [startTween(nextModel)]];
     }
 
-    // Cycle theme
-    if (key.key === 't') {
-      const nextIndex = (model.themeIndex + 1) % THEME_NAMES.length;
-      const themeName = THEME_NAMES[nextIndex]!;
-      
-      // Reuse existing ports to avoid leaking readline interfaces
-      const current = getDefaultContext();
-      const newCtx = createBijou({
-        runtime: current.runtime,
-        io: current.io,
-        style: current.style,
-        theme: PRESETS[themeName]
-      });
-      
-      setDefaultContext(newCtx);
-      return [{ ...model, themeIndex: nextIndex }, []];
+    if ('type' in msg && msg.type === 'animate-drawer') {
+      // Guard: Ignore frames from old animation generations
+      if (msg.gen !== model.drawerGen) return [model, []];
+      return [{ ...model, drawerX: msg.x }, []];
     }
+    if ('type' in msg && msg.type === 'animate-pulse') return [{ ...model, pulseScale: msg.scale }, []];
 
-    // Tab navigation
-    if (key.key === 'tab' && !key.shift) {
-      return [{ ...model, tab: (model.tab + 1) % TABS.length, scrollY: 0 }, []];
-    }
-    if ((key.key === 'tab' && key.shift) || key.key === 'left') {
-      return [{ ...model, tab: (model.tab - 1 + TABS.length) % TABS.length, scrollY: 0 }, []];
-    }
-    if (key.key === 'right') {
-      return [{ ...model, tab: (model.tab + 1) % TABS.length, scrollY: 0 }, []];
-    }
+    let action: Msg | undefined;
+    if ('type' in msg && msg.type === 'key') action = inputStack.dispatch(msg as KeyMsg); else action = msg as Msg;
+    if (!action) return [model, []];
 
-    // Scroll
-    if (key.key === 'up') {
-      return [{ ...model, scrollY: Math.max(0, model.scrollY - 1) }, []];
+    switch (action.type) {
+      case 'quit': return [model, [quit()]];
+      case 'toggle-turbo': return [{ ...model, turbo: !model.turbo }, []];
+      case 'toggle-modal':
+        if (!model.modalOpen) inputStack.push(modalKeys); else inputStack.pop();
+        return [{ ...model, modalOpen: !model.modalOpen }, []];
+      case 'toggle-drawer': {
+        const nextDrawer = !model.drawerOpen;
+        const nextGen = model.drawerGen + 1;
+        return [
+          { ...model, drawerOpen: nextDrawer, drawerGen: nextGen }, 
+          [animate({ 
+            from: model.drawerX, 
+            to: nextDrawer ? 30 : 0, 
+            spring: 'gentle', 
+            onFrame: (x) => ({ type: 'animate-drawer', x, gen: nextGen }) 
+          })]
+        ];
+      }
+      case 'reset-animations':
+        return [{ ...model, tlState: showcaseTimeline.init(), springVal: 0, tweenVal: 0, springDir: 1, tweenDir: 1 }, [startSpring(model), startTween(model)]];
+      case 'next-tab':
+      case 'prev-tab': {
+        const nextTab = action.type === 'next-tab' ? (model.tab + 1) % TABS.length : (model.tab - 1 + TABS.length) % TABS.length;
+        return [{ ...model, tab: nextTab }, [animate({ from: 0.8, to: 1, spring: 'wobbly', onFrame: (s) => ({ type: 'animate-pulse', scale: s }) })]];
+      }
+      case 'cycle-theme':
+        const nextIndex = (model.themeIndex + 1) % THEME_NAMES.length;
+        const current = getDefaultContext();
+        setDefaultContext(createBijou({ runtime: current.runtime, io: current.io, style: current.style, theme: PRESETS[THEME_NAMES[nextIndex]!] }));
+        return [{ ...model, themeIndex: nextIndex }, []];
+      case 'scroll-up': return [{ ...model, scroll: scrollBy(model.scroll, -1) }, []];
+      case 'scroll-down': return [{ ...model, scroll: scrollBy(model.scroll, 1) }, []];
     }
-    if (key.key === 'down') {
-      return [{ ...model, scrollY: model.scrollY + 1 }, []];
-    }
-
-    // Toggle accordion (1/2/3 keys)
-    if (key.key === '1' || key.key === '2' || key.key === '3') {
-      const idx = parseInt(key.key) - 1;
-      const open = [...model.accordionOpen];
-      open[idx] = !open[idx];
-      return [{ ...model, accordionOpen: open }, []];
-    }
-
     return [model, []];
   },
 
-  view(model) {
-    try {
-      const currentTab = TABS[model.tab]!;
-      const themeName = THEME_NAMES[model.themeIndex];
-
-      // Tab bar
-      const tabBar = TABS.map((t, i) =>
-        i === model.tab ? badge(` ${t} `, { variant: 'info' }) : ` ${t} `,
-      ).join('  ');
-
-      // Content
-      let content: string;
-      switch (currentTab) {
-        case 'Elements':
-          content = viewElements();
-          break;
-        case 'Data':
-          content = viewData(model);
-          break;
-        case 'Live':
-          content = viewLive(model);
-          break;
-        case 'Layout':
-          content = viewLayout();
-          break;
-        case 'Navigation':
-          content = viewNavigation();
-          break;
-        default:
-          content = 'Unknown Tab';
-      }
-
-      // Apply scroll
-      const lines = content.split('\n');
-      const scrolled = lines.slice(model.scrollY).join('\n');
-
-      // Help bar
-      const help = separator({ width: 60 }) + '\n' +
-        `  ${kbd('←')} ${kbd('→')} tabs   ${kbd('↑')} ${kbd('↓')} scroll   ` +
-        `${kbd('t')} theme: ${badge(themeName!, { variant: 'accent' })}   ` +
-        `${kbd('q')} quit`;
-
-      return vstack(
-        `  ${tabBar}`,
-        separator({ width: 60 }),
-        scrolled,
-        help,
-      );
-    } catch (err: any) {
-      return alert(`VIEW ERROR: ${err.message}`, { variant: 'error' });
-    }
-  },
+  view: (model) => {
+    const main = flex({ direction: 'row', width: model.cols, height: model.rows },
+      { basis: 24, content: (w, h) => renderSidebar(model, w, h) },
+      { basis: 1, content: (_w, h) => '│\n'.repeat(h).trimEnd() },
+      { flex: 1, content: (w, h) => renderMainContent(model, w, h) },
+      { basis: Math.round(model.drawerX), content: (w, h) => w > 0 ? renderDrawer(model, w, h) : '' }
+    );
+    if (model.modalOpen) return flex({ direction: 'column', width: model.cols, height: model.rows }, { flex: 1, align: 'center', content: (w, h) => flex({ direction: 'row', width: w, height: h }, { flex: 1, align: 'center', content: renderModal(model) }) });
+    return main;
+  }
 };
 
-// ---------------------------------------------------------------------------
-// Tab views
-// ---------------------------------------------------------------------------
-
-function viewElements(): string {
-  const badges = '  ' + ['success', 'error', 'warning', 'info', 'muted']
-    .map((v) => badge(v, { variant: v as 'success' | 'error' | 'warning' | 'info' | 'muted' }))
-    .join('  ');
-
-  const kbds = `  ${kbd('⌘')} + ${kbd('Shift')} + ${kbd('P')}  Command Palette`;
-
-  const alerts = vstack(
-    alert('Operation completed successfully!', { variant: 'success' }),
-    alert('Something went wrong.', { variant: 'error' }),
-    alert('Proceed with caution.', { variant: 'warning' }),
-    alert('Here is some useful info.', { variant: 'info' }),
-  );
-
-  const skel = skeleton({ width: 30, lines: 3 });
-
-  return vstack(
-    '',
-    '  BADGES',
-    badges,
-    '',
-    '  KEYBOARD SHORTCUTS',
-    kbds,
-    '',
-    '  ALERTS',
-    alerts,
-    '',
-    '  SKELETON',
-    skel,
-    '',
+function renderSidebar(model: Model, w: number, h: number): string {
+  const nav = TABS.map((t, i) => {
+    const isSelected = i === model.tab;
+    return `${isSelected ? ' ➜ ' : '   '}${isSelected ? badge(t, { variant: 'info' }) : t}`;
+  }).join('\n\n');
+  return flex({ direction: 'column', width: w, height: h },
+    { basis: 3, content: headerBox('BIJOU', { width: w }) },
+    { basis: 1, content: '' },
+    { flex: 1, content: nav },
+    { basis: 12, content: vstack(separator({ width: w }), `  ${badge(THEME_NAMES[model.themeIndex]!, { variant: 'accent' })}`, `  ${model.turbo ? badge(' TURBO ', { variant: 'error' }) : badge(' NORMAL ', { variant: 'success' })}`, '', '  ' + kbd('tab') + ' Cycle', '  ' + kbd('m') + ' Modal', '  ' + kbd('d') + ' Drawer', '  ' + kbd('f') + ' Turbo', '  ' + kbd('q') + ' Quit') }
   );
 }
 
-function viewData(model: Model): string {
-  const tbl = table({
-    columns: [
-      { header: 'Component' },
-      { header: 'Type' },
-      { header: 'Status' },
-    ],
-    rows: [
-      ['box', 'Display', 'Stable'],
-      ['badge', 'Element', 'Stable'],
-      ['tree', 'Data', 'Stable'],
-      ['accordion', 'Data', 'Stable'],
-      ['timeline', 'Data', 'Stable'],
-    ],
-  });
-
-  const tr = tree([
-    {
-      label: 'bijou',
-      children: [
-        { label: 'core', children: [
-          { label: 'components' },
-          { label: 'forms' },
-          { label: 'theme' },
-        ]},
-        { label: 'bijou-node' },
-        { label: 'bijou-tui', children: [
-          { label: 'runtime' },
-          { label: 'keys' },
-          { label: 'layout' },
-        ]},
-      ],
-    },
-  ]);
-
-  const sections = [
-    { title: 'Architecture', content: 'Hexagonal architecture with ports & adapters.\nAll I/O abstracted behind RuntimePort, IOPort, StylePort.', expanded: model.accordionOpen[0] },
-    { title: 'Theme Engine', content: 'Triple-generic Theme<S, U, G> with DTCG interop.\nTwo presets: cyan-magenta, teal-orange-pink.', expanded: model.accordionOpen[1] },
-    { title: 'TEA Runtime', content: 'Model/Update/View cycle with explicit side effects.\nKeyboard input, alt screen, graceful degradation.', expanded: model.accordionOpen[2] },
-  ];
-
-  const tl = timeline([
-    { label: 'Project started', status: 'success' },
-    { label: 'v0.1.0 released', description: 'Hexagonal architecture', status: 'success' },
-    { label: 'Components added', description: 'tree, accordion, timeline, badge, alert...', status: 'success' },
-    { label: 'bijou-tui', description: 'TEA runtime for terminal UIs', status: 'active' },
-    { label: 'Navigation components', description: 'tabs, breadcrumb, paginator', status: 'muted' },
-    { label: 'Overlay patterns', description: 'modal, toast, drawer', status: 'muted' },
-  ]);
-
-  return vstack(
-    '',
-    '  TABLE',
-    tbl,
-    '',
-    '  TREE',
-    tr,
-    '',
-    `  ACCORDION  (press ${kbd('1')} ${kbd('2')} ${kbd('3')} to toggle)`,
-    accordion(sections),
-    '',
-    '  TIMELINE',
-    tl,
-    '',
+function renderDrawer(model: Model, w: number, h: number): string {
+  return flex({ direction: 'row', width: w, height: h },
+    { basis: 1, content: (_w, h) => '│\n'.repeat(h).trimEnd() },
+    { flex: 1, content: vstack(headerBox('DRAWER', { width: w - 1 }), '', '  This side panel', '  is driven by a', '  physics spring.', '', '  Resizes dynamically', '  with the terminal.', '', separator({ width: w - 1 }), '  ' + kbd('d') + ' to close') }
   );
 }
 
-function viewLive(model: Model): string {
-  const spinner = spinnerFrame(model.spinnerTick, { label: 'Loading...' });
-
-  const bar25 = progressBar(25, { width: 30 });
-  const bar50 = progressBar(50, { width: 30 });
-  const bar75 = progressBar(75, { width: 30 });
-  const bar100 = progressBar(100, { width: 30 });
-  const barLive = progressBar(model.progress, { width: 30 });
-
-  return vstack(
-    '',
-    '  SPINNER (animated)',
-    `  ${spinner}`,
-    '',
-    '  PROGRESS BAR (static)',
-    `  25%   ${bar25}`,
-    `  50%   ${bar50}`,
-    `  75%   ${bar75}`,
-    `  100%  ${bar100}`,
-    '',
-    '  PROGRESS BAR (animated)',
-    `  ${barLive}`,
-    '',
-    '  BOX',
-    box('Hello from bijou!\nPure-render terminal components.'),
-    '',
-    '  HEADER BOX',
-    headerBox('bijou-tui', { detail: 'v0.1.0' }),
-    '',
-  );
+function renderModal(model: Model): string {
+  return box(vstack(' 🎭 MODAL OVERLAY ', '', 'This modal captures all input.', 'Global shortcuts are disabled.', '', 'Powered by Layered InputStack.', '', 'Press ' + kbd('Esc') + ' or ' + kbd('Enter') + ' to close.'), { borderToken: PRESETS[THEME_NAMES[model.themeIndex]!]!.semantic.accent });
 }
 
-function viewLayout(): string {
-  const a = box('Block A');
-  const b = box('Block B');
-  const c = box('Block C');
-
-  return vstack(
-    '',
-    '  VSTACK — vertical composition',
-    vstack(a, b),
-    '',
-    '  HSTACK — horizontal composition (gap=2)',
-    hstack(2, a, b, c),
-    '',
-    '  NESTED — hstack inside vstack',
-    vstack(
-      hstack(1, box('Left'), box('Right')),
-      box('Full Width Below'),
-    ),
-    '',
-  );
+function renderMainContent(model: Model, w: number, h: number): string {
+  const tab = TABS[model.tab]!;
+  const tlVals = showcaseTimeline.values(model.tlState);
+  let body = '';
+  switch (tab) {
+    case 'Dashboard':
+      body = vstack(headerBox('Process Telemetry', { detail: model.turbo ? 'UNCAPPED' : '60 FPS', width: w - 4 }), '', hstack(2, box(` CPU: ${model.cpuPercent.toFixed(1).padStart(4, ' ')}% `, { variant: 'success' }), box(` MEM: ${model.memoryMb.toFixed(1).padStart(4, ' ')}MB `, { variant: 'info' }), box(` FPS: ${model.fps.toFixed(0).padStart(3, ' ')} `, { variant: 'accent' })), '', 'Engine Status:', `  ${spinnerFrame(model.spinnerTick, { label: 'Bijou Kernel active...' })}`, '', 'Recent Activity:', staticTimeline([{ label: 'System Boot', status: 'success' }, { label: 'Adapters initialized', status: 'success' }, { label: 'Physics engine ready', status: 'active' }]));
+      break;
+    case 'Components':
+      body = vstack('Rich data components:', '', hstack(4, vstack('TREES', tree([{ label: 'bijou', children: [{ label: 'core' }, { label: 'tui' }] }])), vstack('ACCORDIONS', accordion([{ title: 'Info', content: 'Details here', expanded: true }]))), '', 'Standard UI elements:', hstack(4, vstack('BADGES', badge('success', { variant: 'success' }), badge('error', { variant: 'error' })), vstack('ALERTS', alert('All systems go', { variant: 'info' })), vstack('INPUTS', kbd('Enter'), kbd('Ctrl+C'))), '', table({ columns: [{ header: 'Prop' }, { header: 'Type' }, { header: 'Default' }], rows: [['flex', 'number', '0'], ['basis', 'number', 'auto'], ['min', 'number', '0']] }));
+      break;
+    case 'Animation':
+      body = vstack('Physics-based springs & easing:', '', 'Spring (Slow Wobbly):', progressBar(model.springVal, { width: w - 10 }), '', 'Tween (2s Linear):', progressBar(model.tweenVal, { width: w - 10 }), '', 'GSAP Timeline Orchestration:', ` Track 1: ${progressBar(tlVals.box1!, { width: 20 })}`, ` Track 2: ${progressBar(tlVals.box2!, { width: 20 })}`, ` Track 3: ${progressBar(tlVals.box3!, { width: 20 })}`);
+      break;
+    case 'Patterns':
+      body = vstack('High-level UI patterns:', '', '  ' + kbd('m') + '  Open Modal Overlay', '  ' + kbd('d') + '  Toggle Slide-out Drawer', '', 'These are not "hardcoded" widgets. They are', 'composed using Flexbox, Springs, and the', 'InputStack engine.', '', headerBox('Input Stack State', { width: w - 4 }), `  Layers active: ${inputStack.size}`, '  Top layer: ' + (model.modalOpen ? 'ModalKeys' : 'GlobalKeys'));
+      break;
+    case 'Layout':
+      // Truly full-height layout by making the flex engine the entire body
+      body = flex({ direction: 'column', width: w, height: h, gap: 1 }, 
+        { basis: 1, content: 'The Layout Engine understands constraints:' }, 
+        { basis: 1, content: '' },
+        { basis: 3, content: box('Header (Fixed 3 rows)') }, 
+        { flex: 1, align: 'center', content: box('Body (Flexible - center aligned)') }, 
+        { basis: 3, content: box('Footer (Fixed 3 rows)') }
+      );
+      break;
+  }
+  return viewport({ width: w, height: h, content: body, scrollY: model.scroll.y });
 }
-
-function viewNavigation(): string {
-  const tabBar = tabs(
-    [
-      { label: 'Dashboard' },
-      { label: 'Settings' },
-      { label: 'Users', badge: '3' },
-    ],
-    { active: 0 },
-  );
-
-  const bc = breadcrumb(['Home', 'Settings', 'Profile']);
-
-  const dots = paginator({ current: 1, total: 4 });
-  const textPager = paginator({ current: 1, total: 4, style: 'text' });
-
-  const steps = stepper(
-    [
-      { label: 'Account' },
-      { label: 'Payment' },
-      { label: 'Confirm' },
-    ],
-    { current: 1 },
-  );
-
-  return vstack(
-    '',
-    '  TABS',
-    `  ${tabBar}`,
-    '',
-    '  BREADCRUMB',
-    `  ${bc}`,
-    '',
-    '  PAGINATOR (dots)',
-    `  ${dots}`,
-    '',
-    '  PAGINATOR (text)',
-    `  ${textPager}`,
-    '',
-    '  STEPPER',
-    `  ${steps}`,
-    '',
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Run
-// ---------------------------------------------------------------------------
 
 run(app);

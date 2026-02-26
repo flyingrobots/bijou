@@ -9,6 +9,7 @@ import {
   CLEAR_SCREEN,
   CLEAR_LINE,
   CLEAR_TO_END,
+  CLEAR_LINE_TO_END,
   HOME,
   SHOW_CURSOR,
   EXIT_ALT_SCREEN,
@@ -36,12 +37,7 @@ function counterApp(quitKey = 'q'): App<number, never> {
 /** What renderFrame produces for a given content string. */
 function frame(content: string): string {
   const lines = content.split('\n');
-  let out = HOME;
-  for (const line of lines) {
-    out += CLEAR_LINE + line + '\n';
-  }
-  out += CLEAR_TO_END;
-  return out;
+  return HOME + lines.map((line) => line + CLEAR_LINE_TO_END).join('\n') + CLEAR_TO_END;
 }
 
 describe('run', () => {
@@ -162,7 +158,7 @@ describe('run', () => {
 
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = () => Promise.resolve({ type: 'started' as const });
+          const cmd: Cmd<Msg> = async () => ({ type: 'started' as const });
           return ['loading', [cmd]];
         },
         update(msg, _model) {

@@ -15,9 +15,10 @@ describe('animate', () => {
         },
       });
 
-      const result = await cmd();
-      expect(result).toBe(100);
+      const emitted: number[] = [];
+      await cmd((msg) => emitted.push(msg as number));
       expect(frames).toEqual([100]);
+      expect(emitted).toEqual([100]);
     });
   });
 
@@ -35,9 +36,11 @@ describe('animate', () => {
         },
       });
 
-      const result = await cmd();
+      const emitted: number[] = [];
+      await cmd((msg) => emitted.push(msg as number));
       expect(frames.length).toBeGreaterThan(1);
-      expect(result).toBe(100);
+      expect(emitted.length).toBeGreaterThan(1);
+      expect(emitted).toEqual(frames);
       // Values should start near 0 and end at 100
       expect(frames[0]!).toBeGreaterThan(0);
       expect(frames[0]!).toBeLessThan(50);
@@ -55,7 +58,7 @@ describe('animate', () => {
         },
       });
 
-      await cmd();
+      await cmd(() => {});
       expect(frames.length).toBeGreaterThan(1);
     }, 10_000);
   });
@@ -75,9 +78,8 @@ describe('animate', () => {
         },
       });
 
-      const result = await cmd();
+      await cmd(() => {});
       expect(frames.length).toBeGreaterThan(1);
-      expect(result).toBe(100);
     }, 5_000);
 
     it('respects immediate flag in tween mode too', async () => {
@@ -94,9 +96,10 @@ describe('animate', () => {
         },
       });
 
-      const result = await cmd();
-      expect(result).toBe(50);
+      const emitted: number[] = [];
+      await cmd((msg) => emitted.push(msg as number));
       expect(frames).toEqual([50]);
+      expect(emitted).toEqual([50]);
     });
   });
 });
@@ -106,28 +109,19 @@ describe('sequence', () => {
     const order: string[] = [];
 
     const cmd = sequence(
-      async () => {
+      async (emit) => {
         order.push('first');
-        return 'a';
+        emit('a');
       },
-      async () => {
+      async (emit) => {
         order.push('second');
-        return 'b';
+        emit('b');
       },
     );
 
-    const result = await cmd();
+    const emitted: string[] = [];
+    await cmd((msg) => emitted.push(msg as string));
     expect(order).toEqual(['first', 'second']);
-    expect(result).toBe('b');
-  });
-
-  it('returns last non-undefined result', async () => {
-    const cmd = sequence(
-      async () => 'a',
-      async () => undefined as unknown as string,
-    );
-
-    const result = await cmd();
-    expect(result).toBe('a');
+    expect(emitted).toEqual(['a', 'b']);
   });
 });

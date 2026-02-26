@@ -10,6 +10,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 #### TUI runtime (`@flyingrobots/bijou-tui`)
 
+- **Multi-frame commands** — `Cmd` type updated to receive an `emit` function, enabling long-running effects (like animations) to fire multiple messages per second back to the app.
+- **Animation completion signal** — `animate()` now accepts an `onComplete` callback to signal precisely when physics have settled or a tween has finished.
+- **Flicker-free rendering** — Refactored `renderFrame` to use `join('\n')` and `\x1b[K` (clear-to-end-of-line), preventing unwanted terminal scrolling and top-line clipping.
+- **Scroll-safe initialization** — `enterScreen` now disables auto-wrap (`\x1b[?7l`) to ensure writing to the bottom-right corner doesn't trigger a scroll.
+- **Layout hardening** — `flex()` and `hstack()` are now resilient to zero or negative dimensions (preventing `RangeError: repeat count must be non-negative`).
+- **Enhanced Flex centering** — `flex()` now supports true horizontal alignment for column-based layouts.
+- **Spacers in vstack** — `vstack()` now preserves empty strings, allowing them to function as vertical spacers.
+
+### Fixed
+
+- **Escape key mapping** — Keyboard parser now emits `'esc'` instead of `'escape'` for better compatibility with common TUI keybindings.
+- **Layout height rounding** — `renderColumn` now correctly pads to the full target height, ensuring footers are anchored to the bottom row.
+
+### Showcase
+
+- **High-fidelity demo** — `demo-tui.ts` completely rewritten to demonstrate physics-based springs, GSAP timelines, layered input stacks, real-time process telemetry (CPU/MEM/FPS), and a "Turbo Mode" benchmark.
+
+### Changed
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`Cmd` type signature** — Now `(emit: (msg: M) => void) => Promise<M | QuitSignal | void>`.
 - **Keybinding manager** — `createKeyMap()` for declarative key binding with modifier support (`ctrl+c`, `alt+x`, `shift+tab`), named groups, runtime enable/disable, and `handle(keyMsg)` dispatch.
 - **Help generator** — `helpView()` (grouped multi-line), `helpShort()` (single-line summary), `helpFor()` (filter by group prefix). Auto-generated from registered keybindings.
 - **Input stack** — `createInputStack()` for layered input dispatch. Push/pop handlers (KeyMap or any `InputHandler`), dispatch top-down with opaque (modal) or passthrough (global shortcuts) layers.

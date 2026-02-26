@@ -162,14 +162,26 @@ function renderContent(
  * Clip/pad each content line to exact width. Does NOT pad height —
  * that's handled by alignCross.
  */
-function fitWidth(content: string, width: number): string[] {
+function fitWidth(content: string, width: number, align: 'start' | 'center' | 'end' = 'start'): string[] {
   const lines = content.split('\n');
   return lines.map((line) => {
     const vis = visualWidth(line);
     if (vis > width) {
       return clipToWidth(line, width);
     }
-    return line + ' '.repeat(width - vis);
+    
+    const padding = Math.max(0, width - vis);
+    switch (align) {
+      case 'start':
+        return line + ' '.repeat(padding);
+      case 'end':
+        return ' '.repeat(padding) + line;
+      case 'center': {
+        const before = Math.floor(padding / 2);
+        const after = padding - before;
+        return ' '.repeat(before) + line + ' '.repeat(after);
+      }
+    }
   });
 }
 
@@ -216,7 +228,7 @@ function alignCross(
 ): string[] {
   if (lines.length >= totalCrossSize) return lines.slice(0, totalCrossSize);
 
-  const emptyLine = ' '.repeat(width);
+  const emptyLine = ' '.repeat(Math.max(0, width));
   const padding = totalCrossSize - lines.length;
 
   switch (align) {
@@ -290,13 +302,13 @@ function renderRow(
   for (const item of items) {
     const childWidth = item.allocatedSize;
     const rendered = renderContent(item.child, childWidth, totalHeight);
-    const widthFitted = fitWidth(rendered, childWidth);
+    const widthFitted = fitWidth(rendered, childWidth, item.child.align ?? 'start');
     const aligned = alignCross(widthFitted, totalHeight, item.child.align ?? 'start', childWidth);
     columns.push(aligned);
   }
 
   // Compose columns side-by-side
-  const spacer = ' '.repeat(gap);
+  const spacer = ' '.repeat(Math.max(0, gap));
   const rows: string[] = [];
   for (let r = 0; r < totalHeight; r++) {
     const parts: string[] = [];
@@ -311,22 +323,34 @@ function renderRow(
 function renderColumn(
   items: ResolvedChild[],
   totalWidth: number,
-  _totalHeight: number,
+  totalHeight: number,
   gap: number,
 ): string {
-  const sections: string[] = [];
+  const lines: string[] = [];
 
-  for (const item of items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]!;
     const childHeight = item.allocatedSize;
     const rendered = renderContent(item.child, totalWidth, childHeight);
-    const widthFitted = fitWidth(rendered, totalWidth);
-    const aligned = alignCross(widthFitted, childHeight, item.child.align ?? 'start', totalWidth);
-    sections.push(aligned.join('\n'));
+    const widthFitted = fitWidth(rendered, totalWidth, item.child.align ?? 'start');
+    const aligned = alignCross(widthFitted, childHeight, 'start', totalWidth);
+    
+    lines.push(...aligned);
+
+    // Add gap between items
+    if (i < items.length - 1 && gap > 0) {
+      const spacer = ' '.repeat(Math.max(0, totalWidth));
+      for (let g = 0; g < gap; g++) {
+        lines.push(spacer);
+      }
+    }
   }
 
-  const gapStr = gap > 0
-    ? '\n' + Array.from<string>({ length: gap }).fill(' '.repeat(totalWidth)).join('\n') + '\n'
-    : '\n';
+  // Pad to fill totalHeight if needed
+  const emptyLine = ' '.repeat(Math.max(0, totalWidth));
+  while (lines.length < totalHeight) {
+    lines.push(emptyLine);
+  }
 
-  return sections.join(gapStr);
+  return lines.slice(0, totalHeight).join('\n');
 }

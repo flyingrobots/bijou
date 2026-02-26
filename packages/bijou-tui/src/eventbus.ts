@@ -135,7 +135,7 @@ export function createEventBus<M>(): EventBus<M> {
 
     runCmd(cmd: Cmd<M>): void {
       if (disposed) return;
-      void cmd().then((result) => {
+      void cmd(emit).then((result) => {
         if (disposed) return;
         if (result === QUIT) {
           for (const handler of quitHandlers) {
