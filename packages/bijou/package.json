@@ -3,40 +3,63 @@
   "version": "0.1.0",
   "description": "Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.",
   "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./adapters/test": {
       "types": "./dist/adapters/test/index.d.ts",
-      "import": "./dist/adapters/test/index.js"
-    }
+      "default": "./dist/adapters/test/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
-  "engines": {
-    "node": ">=18"
-  },
+  "keywords": [
+    "cli",
+    "terminal",
+    "tui",
+    "components",
+    "theme",
+    "dtcg",
+    "design-tokens",
+    "graceful-degradation",
+    "hexagonal",
+    "zero-dependency",
+    "spinner",
+    "progress-bar",
+    "box",
+    "table",
+    "forms"
+  ],
+  "author": "James Ross <james@flyingrobots.dev>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/flyingrobots/bijou.git",
+    "url": "git+https://github.com/flyingrobots/bijou.git",
     "directory": "packages/bijou"
   },
   "homepage": "https://github.com/flyingrobots/bijou",
   "bugs": "https://github.com/flyingrobots/bijou/issues",
+  "engines": {
+    "node": ">=18"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true

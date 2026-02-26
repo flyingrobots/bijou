@@ -123,6 +123,7 @@ jobs:
         run: |
           (cd packages/bijou && npm pack --dry-run)
           (cd packages/bijou-node && npm pack --dry-run)
+          (cd packages/bijou-tui && npm pack --dry-run)
 
   publish_npm:
     name: Publish npm (OIDC)
@@ -134,7 +135,7 @@ jobs:
     environment: npm
     strategy:
       matrix:
-        package: [bijou, bijou-node]
+        package: [bijou, bijou-node, bijou-tui]
     steps:
       - uses: actions/checkout@v4
         with:

@@ -1,5 +1,5 @@
 {
-  "name": "bijou-monorepo",
+  "name": "@flyingrobots/bijou-workspace",
   "private": true,
   "type": "module",
   "workspaces": [
