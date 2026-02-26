@@ -1,9 +1,8 @@
 /**
  * Vertical stack — join blocks with newlines.
- * Filters out empty strings.
  */
 export function vstack(...blocks: string[]): string {
-  return blocks.filter((b) => b !== '').join('\n');
+  return blocks.join('\n');
 }
 
 /**
@@ -17,7 +16,7 @@ export function hstack(gap: number, ...blocks: string[]): string {
   const split = blocks.map((b) => b.split('\n'));
   const maxRows = Math.max(...split.map((lines) => lines.length));
   const widths = split.map((lines) => Math.max(...lines.map(visualWidth)));
-  const spacer = ' '.repeat(gap);
+  const spacer = ' '.repeat(Math.max(0, gap));
 
   const rows: string[] = [];
   for (let r = 0; r < maxRows; r++) {
@@ -26,7 +25,7 @@ export function hstack(gap: number, ...blocks: string[]): string {
       const line = split[c]![r] ?? '';
       // Last column doesn't need right-padding
       if (c < split.length - 1) {
-        parts.push(line + ' '.repeat(widths[c]! - visualWidth(line)));
+        parts.push(line + ' '.repeat(Math.max(0, widths[c]! - visualWidth(line))));
       } else {
         parts.push(line);
       }

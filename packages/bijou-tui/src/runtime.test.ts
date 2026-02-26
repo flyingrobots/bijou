@@ -6,8 +6,10 @@ import type { App, KeyMsg, Cmd } from './types.js';
 import {
   ENTER_ALT_SCREEN,
   HIDE_CURSOR,
+  WRAP_DISABLE,
+  WRAP_ENABLE,
   CLEAR_SCREEN,
-  CLEAR_LINE,
+  CLEAR_LINE_TO_END,
   CLEAR_TO_END,
   HOME,
   SHOW_CURSOR,
@@ -36,12 +38,7 @@ function counterApp(quitKey = 'q'): App<number, never> {
 /** What renderFrame produces for a given content string. */
 function frame(content: string): string {
   const lines = content.split('\n');
-  let out = HOME;
-  for (const line of lines) {
-    out += CLEAR_LINE + line + '\n';
-  }
-  out += CLEAR_TO_END;
-  return out;
+  return HOME + lines.map((line) => line + CLEAR_LINE_TO_END).join('\n') + CLEAR_TO_END;
 }
 
 describe('run', () => {
@@ -73,8 +70,8 @@ describe('run', () => {
       await vi.advanceTimersByTimeAsync(50);
       await promise;
 
-      // First write: enterScreen (alt + hide cursor + clear + home)
-      expect(ctx.io.written[0]).toBe(ENTER_ALT_SCREEN + HIDE_CURSOR + CLEAR_SCREEN + HOME);
+      // First write: enterScreen (alt + hide cursor + wrap disable + clear + home)
+      expect(ctx.io.written[0]).toBe(ENTER_ALT_SCREEN + HIDE_CURSOR + WRAP_DISABLE + CLEAR_SCREEN + HOME);
       // Subsequent writes include mouse disable + initial render frame
       const hasInitialRender = ctx.io.written.some((w) => w === frame('count: 0'));
       expect(hasInitialRender).toBe(true);
@@ -88,7 +85,7 @@ describe('run', () => {
       await promise;
 
       const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
-      expect(lastWrite).toBe(SHOW_CURSOR + EXIT_ALT_SCREEN);
+      expect(lastWrite).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
 
     it('updates model on key input', async () => {
@@ -127,7 +124,7 @@ describe('run', () => {
 
       // Should have exited despite app not issuing quit
       const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
-      expect(lastWrite).toBe(SHOW_CURSOR + EXIT_ALT_SCREEN);
+      expect(lastWrite).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
 
     it('sends first Ctrl+C to app as KeyMsg', async () => {
@@ -162,7 +159,7 @@ describe('run', () => {
 
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = () => Promise.resolve({ type: 'started' as const });
+          const cmd: Cmd<Msg> = async (_emit) => ({ type: 'started' as const });
           return ['loading', [cmd]];
         },
         update(msg, _model) {

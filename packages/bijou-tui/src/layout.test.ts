@@ -6,8 +6,8 @@ describe('vstack', () => {
     expect(vstack('hello', 'world')).toBe('hello\nworld');
   });
 
-  it('filters empty strings', () => {
-    expect(vstack('hello', '', 'world')).toBe('hello\nworld');
+  it('preserves empty strings as vertical spacers', () => {
+    expect(vstack('hello', '', 'world')).toBe('hello\n\nworld');
   });
 
   it('returns empty string for no args', () => {

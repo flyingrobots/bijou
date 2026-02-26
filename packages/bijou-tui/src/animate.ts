@@ -44,6 +44,8 @@ interface AnimateBase<M> {
   readonly immediate?: boolean;
   /** Called each frame with the interpolated value. Return a message for TEA. */
   readonly onFrame: (value: number) => M;
+  /** Optional message to emit when the animation is fully complete. */
+  readonly onComplete?: () => M;
 }
 
 export interface SpringAnimateOptions<M> extends AnimateBase<M> {
@@ -73,31 +75,24 @@ export type AnimateOptions<M> = SpringAnimateOptions<M> | TweenAnimateOptions<M>
  * ```ts
  * animate({ from: 0, to: 100, spring: 'wobbly', onFrame: (v) => ({ type: 'scroll', y: v }) })
  * ```
- *
- * Tween mode:
- * ```ts
- * animate({ type: 'tween', from: 0, to: 1, duration: 300, onFrame: (v) => ({ type: 'fade', opacity: v }) })
- * ```
- *
- * No animation:
- * ```ts
- * animate({ from: 0, to: 100, immediate: true, onFrame: (v) => ({ type: 'scroll', y: v }) })
- * ```
  */
 export function animate<M>(options: AnimateOptions<M>): Cmd<M> {
-  const { from, to, fps = 60, immediate = false, onFrame } = options;
+  const { from, to, fps = 60, immediate = false, onFrame, onComplete } = options;
 
   // Immediate mode — single frame, no physics
   if (immediate) {
-    return () => Promise.resolve(onFrame(to));
+    return async (emit) => {
+      emit(onFrame(to));
+      if (onComplete) emit(onComplete());
+    };
   }
 
   if (options.type === 'tween') {
-    return createTweenCmd(from, to, options.duration, options.ease ?? EASINGS.easeOutCubic, fps, onFrame);
+    return createTweenCmd(from, to, options.duration, options.ease ?? EASINGS.easeOutCubic, fps, onFrame, onComplete);
   }
 
   const config = resolveSpringConfig(options.spring);
-  return createSpringCmd(from, to, config, fps, onFrame);
+  return createSpringCmd(from, to, config, fps, onFrame, onComplete);
 }
 
 // ---------------------------------------------------------------------------
@@ -110,20 +105,22 @@ function createSpringCmd<M>(
   config: SpringConfig,
   fps: number,
   onFrame: (value: number) => M,
+  onComplete?: () => M,
 ): Cmd<M> {
-  return () =>
-    new Promise<M>((resolve) => {
+  return (emit) =>
+    new Promise<void>((resolve) => {
       let state = createSpringState(from);
       const dt = 1 / fps;
       const intervalMs = Math.round(1000 / fps);
 
       const id = setInterval(() => {
         state = springStep(state, to, config, dt);
-        const msg = onFrame(state.value);
+        emit(onFrame(state.value));
 
         if (state.done) {
           clearInterval(id);
-          resolve(msg);
+          if (onComplete) emit(onComplete());
+          resolve();
         }
       }, intervalMs);
     });
@@ -140,21 +137,23 @@ function createTweenCmd<M>(
   ease: EasingFn,
   fps: number,
   onFrame: (value: number) => M,
+  onComplete?: () => M,
 ): Cmd<M> {
   const config = resolveTweenConfig({ from, to, duration, ease });
 
-  return () =>
-    new Promise<M>((resolve) => {
+  return (emit) =>
+    new Promise<void>((resolve) => {
       let state = createTweenState(from);
       const intervalMs = Math.round(1000 / fps);
 
       const id = setInterval(() => {
         state = tweenStep(state, config, intervalMs);
-        const msg = onFrame(state.value);
+        emit(onFrame(state.value));
 
         if (state.done) {
           clearInterval(id);
-          resolve(msg);
+          if (onComplete) emit(onComplete());
+          resolve();
         }
       }, intervalMs);
     });
@@ -166,23 +165,11 @@ function createTweenCmd<M>(
 
 /**
  * Run animations in sequence. Each animation completes before the next starts.
- *
- * ```ts
- * sequence(
- *   animate({ from: 0, to: 100, onFrame: (v) => ({ type: 'slideIn', x: v }) }),
- *   animate({ type: 'tween', from: 0, to: 1, duration: 200, onFrame: (v) => ({ type: 'fadeIn', opacity: v }) }),
- * )
- * ```
  */
 export function sequence<M>(...cmds: Cmd<M>[]): Cmd<M> {
-  return async () => {
-    let lastResult: M | undefined;
+  return async (emit) => {
     for (const cmd of cmds) {
-      const result = await cmd();
-      if (result !== undefined) {
-        lastResult = result as M;
-      }
+      await cmd(emit);
     }
-    return lastResult as M;
   };
 }

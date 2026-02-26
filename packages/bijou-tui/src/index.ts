@@ -15,8 +15,11 @@ export {
   EXIT_ALT_SCREEN,
   HIDE_CURSOR,
   SHOW_CURSOR,
+  WRAP_DISABLE,
+  WRAP_ENABLE,
   CLEAR_SCREEN,
   CLEAR_TO_END,
+  CLEAR_LINE_TO_END,
   CLEAR_LINE,
   HOME,
 } from './screen.js';
@@ -95,3 +98,32 @@ export {
   type FlexChild,
   flex,
 } from './flex.js';
+
+// Keybinding manager
+export {
+  type KeyCombo,
+  type BindingInfo,
+  type KeyMap,
+  type KeyMapGroup,
+  createKeyMap,
+  parseKeyCombo,
+  formatKeyCombo,
+} from './keybindings.js';
+
+// Help generation
+export {
+  type BindingSource,
+  type HelpOptions,
+  helpView,
+  helpShort,
+  helpFor,
+} from './help.js';
+
+// Input stack
+export {
+  type InputHandler,
+  type LayerOptions,
+  type LayerInfo,
+  type InputStack,
+  createInputStack,
+} from './inputstack.js';

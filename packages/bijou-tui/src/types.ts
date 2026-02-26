@@ -21,7 +21,11 @@ export interface ResizeMsg {
 export const QUIT: unique symbol = Symbol('QUIT');
 export type QuitSignal = typeof QUIT;
 
-export type Cmd<M> = () => Promise<M | QuitSignal | void>;
+/**
+ * A side effect that can emit messages back to the application.
+ * Returns a promise that resolves when the effect is complete.
+ */
+export type Cmd<M> = (emit: (msg: M) => void) => Promise<M | QuitSignal | void>;
 
 // --- App definition ---
 

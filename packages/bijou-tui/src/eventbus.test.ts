@@ -177,7 +177,7 @@ describe('runCmd', () => {
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
 
-    const cmd: Cmd<TestMsg> = () => Promise.resolve({ type: 'custom' as const, value: 99 });
+    const cmd: Cmd<TestMsg> = async () => ({ type: 'custom' as const, value: 99 });
     bus.runCmd(cmd);
 
     // Wait for promise to resolve
@@ -190,7 +190,7 @@ describe('runCmd', () => {
     const received: BusMsg<TestMsg>[] = [];
     bus.on((msg) => received.push(msg));
 
-    const cmd: Cmd<TestMsg> = () => Promise.resolve(undefined);
+    const cmd: Cmd<TestMsg> = async () => undefined;
     bus.runCmd(cmd);
 
     // Give the promise time to resolve
@@ -203,7 +203,7 @@ describe('runCmd', () => {
     const quitCalled = vi.fn();
     bus.onQuit(quitCalled);
 
-    const cmd: Cmd<TestMsg> = () => Promise.resolve(QUIT);
+    const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
     await vi.waitFor(() => expect(quitCalled).toHaveBeenCalledTimes(1));
@@ -215,7 +215,7 @@ describe('runCmd', () => {
     bus.on((msg) => received.push(msg));
     bus.onQuit(() => {});
 
-    const cmd: Cmd<TestMsg> = () => Promise.resolve(QUIT);
+    const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
     await new Promise((r) => setTimeout(r, 10));
@@ -234,7 +234,7 @@ describe('onQuit', () => {
     const handle = bus.onQuit(quitCalled);
     handle.dispose();
 
-    const cmd: Cmd<TestMsg> = () => Promise.resolve(QUIT);
+    const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
     await new Promise((r) => setTimeout(r, 10));
@@ -270,7 +270,7 @@ describe('dispose', () => {
 
     bus.dispose();
     bus.emit({ type: 'custom', value: 1 });
-    bus.runCmd(() => Promise.resolve(QUIT));
+    bus.runCmd(async () => QUIT);
 
     await new Promise((r) => setTimeout(r, 10));
     expect(received).toHaveLength(0);
