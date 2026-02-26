@@ -13,6 +13,9 @@ Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [G
 - **`flex()`** — flexbox layout with grow/basis/min/max, true horizontal centering, and auto-reflow.
 - **`ResizeMsg`** — terminal resize events auto-dispatched by the runtime.
 - **`EventBus`** — centralized typed event emitter unifying keyboard, resize, and multi-message commands.
+- **Keybinding manager** — `createKeyMap()` for declarative key binding with modifiers, named groups, runtime enable/disable.
+- **Help generator** — `helpView()`, `helpShort()`, `helpFor()` auto-generated from registered keybindings.
+- **Input stack** — `createInputStack()` for layered input dispatch with opaque (modal) and passthrough layers.
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
 
