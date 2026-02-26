@@ -115,3 +115,12 @@ export {
   helpShort,
   helpFor,
 } from './help.js';
+
+// Input stack
+export {
+  type InputHandler,
+  type LayerOptions,
+  type LayerInfo,
+  type InputStack,
+  createInputStack,
+} from './inputstack.js';
