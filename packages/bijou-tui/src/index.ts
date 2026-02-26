@@ -69,3 +69,15 @@ export {
   pageDown,
   pageUp,
 } from './viewport.js';
+
+// Timeline — GSAP-style animation orchestration
+export {
+  type Position,
+  type SpringTrackDef,
+  type TweenTrackDef,
+  type TrackDef,
+  type TimelineState,
+  type TimelineBuilder,
+  type Timeline,
+  timeline,
+} from './timeline.js';
