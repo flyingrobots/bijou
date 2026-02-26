@@ -8,7 +8,7 @@
  * even when they match nothing.
  *
  * ```ts
- * const stack = createInputStack<Msg>();
+ * const stack = createInputStack<KeyMsg, Msg>();
  *
  * // Base layer — global keys, always lets events fall through
  * const baseId = stack.push(appKeys, { passthrough: true });

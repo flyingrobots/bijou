@@ -17,9 +17,7 @@ function keyMsg(key: string, mods?: Partial<KeyMsg>): KeyMsg {
 type TestAction =
   | { type: 'quit' }
   | { type: 'help' }
-  | { type: 'move'; dir: string }
-  | { type: 'select' }
-  | { type: 'delete' };
+  | { type: 'move'; dir: string };
 
 // ---------------------------------------------------------------------------
 // parseKeyCombo
@@ -62,6 +60,14 @@ describe('parseKeyCombo', () => {
     });
   });
 
+  it('throws on unknown modifier', () => {
+    expect(() => parseKeyCombo('meta+x')).toThrow('Unknown modifier "meta"');
+  });
+
+  it('throws on empty key', () => {
+    expect(() => parseKeyCombo('ctrl+')).toThrow('Empty key');
+  });
+
   it('parses named keys', () => {
     expect(parseKeyCombo('enter')).toEqual({
       key: 'enter', ctrl: false, alt: false, shift: false,
@@ -99,6 +105,10 @@ describe('formatKeyCombo', () => {
     expect(formatKeyCombo({ key: 'delete', ctrl: true, alt: true, shift: false }))
       .toBe('Ctrl+Alt+Delete');
   });
+
+  it('round-trips through parse and format', () => {
+    expect(formatKeyCombo(parseKeyCombo('ctrl+shift+tab'))).toBe('Ctrl+Shift+Tab');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -129,14 +139,13 @@ describe('createKeyMap', () => {
     expect(km.handle(keyMsg('c'))).toBeUndefined();
   });
 
-  it('supports function actions', () => {
-    let callCount = 0;
+  it('returns the same action reference each time', () => {
+    const action: TestAction = { type: 'quit' };
     const km = createKeyMap<TestAction>()
-      .bind('q', 'Quit', () => { callCount++; return { type: 'quit' }; });
+      .bind('q', 'Quit', action);
 
-    km.handle(keyMsg('q'));
-    km.handle(keyMsg('q'));
-    expect(callCount).toBe(2);
+    expect(km.handle(keyMsg('q'))).toBe(action);
+    expect(km.handle(keyMsg('q'))).toBe(action);
   });
 
   it('first matching binding wins', () => {

@@ -3,10 +3,10 @@
  *
  * ```ts
  * const kb = createKeyMap<Msg>()
- *   .bind('q', 'Quit', () => quitMsg)
+ *   .bind('q', 'Quit', quitMsg)
  *   .group('Navigation', g => g
- *     .bind('j', 'Down', () => downMsg)
- *     .bind('k', 'Up', () => upMsg)
+ *     .bind('j', 'Down', downMsg)
+ *     .bind('k', 'Up', upMsg)
  *   );
  *
  * helpView(kb)          // full grouped help
@@ -15,8 +15,13 @@
  * ```
  */
 
-import type { KeyMap, BindingInfo } from './keybindings.js';
+import type { BindingInfo } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
+
+/** Anything that can list its bindings (satisfied by KeyMap). */
+export interface BindingSource {
+  bindings(): readonly BindingInfo[];
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,7 +55,7 @@ export interface HelpOptions {
  *   ?  Toggle help
  * ```
  */
-export function helpView<A>(keymap: KeyMap<A>, options?: HelpOptions): string {
+export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   const enabledOnly = options?.enabledOnly ?? true;
   const sep = options?.separator ?? '  ';
   const groupFilter = options?.groupFilter;
@@ -111,7 +116,7 @@ export function helpView<A>(keymap: KeyMap<A>, options?: HelpOptions): string {
  * q Quit • j Down • k Up • ? Help
  * ```
  */
-export function helpShort<A>(keymap: KeyMap<A>, options?: Pick<HelpOptions, 'enabledOnly' | 'groupFilter'>): string {
+export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'enabledOnly' | 'groupFilter'>): string {
   const enabledOnly = options?.enabledOnly ?? true;
   const groupFilter = options?.groupFilter;
 
@@ -131,6 +136,6 @@ export function helpShort<A>(keymap: KeyMap<A>, options?: Pick<HelpOptions, 'ena
 /**
  * Filter help to a specific group (convenience wrapper).
  */
-export function helpFor<A>(keymap: KeyMap<A>, groupPrefix: string, options?: HelpOptions): string {
+export function helpFor(keymap: BindingSource, groupPrefix: string, options?: HelpOptions): string {
   return helpView(keymap, { ...options, groupFilter: groupPrefix });
 }

@@ -99,7 +99,6 @@ export {
 // Keybinding manager
 export {
   type KeyCombo,
-  type Binding,
   type BindingInfo,
   type KeyMap,
   type KeyMapGroup,
@@ -110,6 +109,7 @@ export {
 
 // Help generation
 export {
+  type BindingSource,
   type HelpOptions,
   helpView,
   helpShort,

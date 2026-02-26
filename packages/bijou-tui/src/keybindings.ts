@@ -7,21 +7,22 @@
  *
  * ```ts
  * const kb = createKeyMap<Msg>()
- *   .bind('q', 'Quit', () => ({ type: 'quit' }))
- *   .bind('?', 'Toggle help', () => ({ type: 'toggle-help' }))
- *   .bind('ctrl+c', 'Force quit', () => ({ type: 'force-quit' }))
+ *   .bind('q', 'Quit', { type: 'quit' })
+ *   .bind('?', 'Toggle help', { type: 'toggle-help' })
+ *   .bind('ctrl+c', 'Force quit', { type: 'force-quit' })
  *   .group('Navigation', (g) => g
- *     .bind('j', 'Down', () => ({ type: 'move', dir: 'down' }))
- *     .bind('k', 'Up', () => ({ type: 'move', dir: 'up' }))
+ *     .bind('j', 'Down', { type: 'move', dir: 'down' })
+ *     .bind('k', 'Up', { type: 'move', dir: 'up' })
  *   );
  *
  * // In TEA update:
  * const action = kb.handle(keyMsg);
- * if (action) return [model, action];
+ * if (action !== undefined) return [model, action];
  * ```
  */
 
 import type { KeyMsg } from './types.js';
+import type { InputHandler } from './inputstack.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,7 +41,7 @@ export interface Binding<A> {
   readonly combo: KeyCombo;
   readonly description: string;
   readonly group: string;
-  readonly action: A | (() => A);
+  readonly action: A;
   enabled: boolean;
 }
 
@@ -53,9 +54,9 @@ export interface BindingInfo {
 }
 
 /** The keybinding manager. */
-export interface KeyMap<A> {
+export interface KeyMap<A> extends InputHandler<KeyMsg, A> {
   /** Register a binding. `key` is a descriptor like `"q"`, `"ctrl+c"`, `"shift+tab"`. */
-  bind(key: string, description: string, action: A | (() => A)): KeyMap<A>;
+  bind(key: string, description: string, action: A): KeyMap<A>;
 
   /** Register bindings under a named group. */
   group(name: string, fn: (g: KeyMapGroup<A>) => KeyMapGroup<A>): KeyMap<A>;
@@ -81,7 +82,7 @@ export interface KeyMap<A> {
 
 /** Group builder — same as KeyMap but scoped to a group name. */
 export interface KeyMapGroup<A> {
-  bind(key: string, description: string, action: A | (() => A)): KeyMapGroup<A>;
+  bind(key: string, description: string, action: A): KeyMapGroup<A>;
 }
 
 // ---------------------------------------------------------------------------
@@ -105,9 +106,14 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
     if (mod === 'ctrl') ctrl = true;
     else if (mod === 'alt') alt = true;
     else if (mod === 'shift') shift = true;
+    else throw new Error(`Unknown modifier "${mod}" in key descriptor "${descriptor}"`);
   }
 
   const key = parts[parts.length - 1]!;
+
+  if (key === '') {
+    throw new Error(`Empty key in key descriptor "${descriptor}"`);
+  }
 
   return { key, ctrl, alt, shift };
 }
@@ -115,7 +121,7 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
 /**
  * Format a KeyCombo back into a human-readable string.
  *
- * Examples: `"Ctrl+C"`, `"q"`, `"Shift+Tab"`
+ * Examples: `"Ctrl+c"`, `"q"`, `"Shift+Tab"`
  */
 export function formatKeyCombo(combo: KeyCombo): string {
   const parts: string[] = [];
@@ -196,9 +202,7 @@ export function createKeyMap<A>(): KeyMap<A> {
     handle(msg) {
       for (const binding of allBindings) {
         if (binding.enabled && matches(binding.combo, msg)) {
-          return typeof binding.action === 'function'
-            ? (binding.action as () => A)()
-            : binding.action;
+          return binding.action;
         }
       }
       return undefined;
