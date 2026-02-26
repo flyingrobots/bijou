@@ -95,3 +95,23 @@ export {
   type FlexChild,
   flex,
 } from './flex.js';
+
+// Keybinding manager
+export {
+  type KeyCombo,
+  type Binding,
+  type BindingInfo,
+  type KeyMap,
+  type KeyMapGroup,
+  createKeyMap,
+  parseKeyCombo,
+  formatKeyCombo,
+} from './keybindings.js';
+
+// Help generation
+export {
+  type HelpOptions,
+  helpView,
+  helpShort,
+  helpFor,
+} from './help.js';

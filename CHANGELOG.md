@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`) are versioned in lock-step.
 
+## [Unreleased]
+
+### Added
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **Keybinding manager** — `createKeyMap()` for declarative key binding with modifier support (`ctrl+c`, `alt+x`, `shift+tab`), named groups, runtime enable/disable, and `handle(keyMsg)` dispatch
+- **Help generator** — `helpView()` (grouped multi-line), `helpShort()` (single-line summary), `helpFor()` (filter by group prefix). Auto-generated from registered keybindings.
+
 ## [0.2.0] — 2026-02-26
 
 ### Added
