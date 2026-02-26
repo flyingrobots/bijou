@@ -278,7 +278,10 @@ function alignCross(
  * ```
  */
 export function flex(options: FlexOptions, ...children: FlexChild[]): string {
-  const { direction = 'row', width, height, gap = 0 } = options;
+  const { direction = 'row' } = options;
+  const width = Math.max(0, Math.floor(options.width));
+  const height = Math.max(0, Math.floor(options.height));
+  const gap = Math.max(0, Math.floor(options.gap ?? 0));
   const isRow = direction === 'row';
 
   const mainAxisTotal = isRow ? width : height;

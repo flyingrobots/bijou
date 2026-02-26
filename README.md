@@ -1,6 +1,7 @@
 # 💎 Bijou
 
 ## Turbo TUI engine for TypeScript.
+
 **Resilient by design. Physics-powered. Built for scale.**
 
 Stop building brittle CLIs that break in CI or look like garbage on a server. Bijou is a multi-package TUI engine for building everything from simple interactive scripts to complex, high-fidelity terminal applications.
@@ -74,6 +75,7 @@ While **Ink** is the standard for React-based TUIs, Bijou is built for developer
 Bijou is a growing ecosystem. Transparency is our baseline—here is the current state of the engine:
 
 ### UI Elements (`@flyingrobots/bijou`)
+
 | Component | Status | Description |
 | :--- | :--- | :--- |
 | `box` / `headerBox` | ✅ Stable | The layout foundation with Unicode/ASCII borders. |
@@ -89,6 +91,7 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `filter` | 🗓️ Roadmap | Fuzzy type-to-filter list component. |
 
 ### Interactive Forms (`@flyingrobots/bijou`)
+
 | Component | Status | Description |
 | :--- | :--- | :--- |
 | `input` / `select` | ✅ Stable | Standard prompts with auto-degradation for CI. |
@@ -98,6 +101,7 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `formWizard` | 🗓️ Roadmap | Stateful multi-page form orchestration. |
 
 ### TUI Patterns (`@flyingrobots/bijou-tui`)
+
 | Pattern | Status | Description |
 | :--- | :--- | :--- |
 | `flex` / `vstack` / `hstack`| ✅ Stable | Responsive Flexbox layout engine with auto-reflow. |
@@ -133,13 +137,17 @@ const setup = await group({
 Unidirectional state management with physics-based animations. (See [demo-tui.ts](./demo-tui.ts))
 
 ```typescript
-import { run, quit, type App } from '@flyingrobots/bijou-tui';
+import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
 
-const app: App<Model> = {
+type Model = { count: number };
+
+const app: App<Model, never> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => {
-    if (msg.key === 'q') return [model, [quit()]];
-    if (msg.key === '+') return [{ count: model.count + 1 }, []];
+    if (msg.type === 'key') {
+      if (msg.key === 'q') return [model, [quit()]];
+      if (msg.key === '+') return [{ count: model.count + 1 }, []];
+    }
     return [model, []];
   },
   view: (model) => `Count: ${model.count}\nPress + to increment, q to quit`

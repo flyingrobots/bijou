@@ -196,7 +196,7 @@ const app: App<Model, Msg | ResizeMsg> = {
       drawerX: 0,
       drawerGen: 0,
       cpuPercent: 0,
-      lastCpuUsage: process.cpuUsage(),
+      lastCpuUsage: process.cpuUsage(), // Demo-only: bypasses ports for telemetry
       lastCpuTime: now,
       fps: 0,
       lastFrameTime: now,
@@ -229,6 +229,7 @@ const app: App<Model, Msg | ResizeMsg> = {
 
     // Heartbeat & Telemetry
     if ('type' in msg && msg.type === 'tick') {
+      // Animate on Dashboard/Animation tabs, or while drawer is spring-animating
       const isAnimTab = TABS[model.tab] === 'Animation' || TABS[model.tab] === 'Dashboard' || model.drawerOpen;
       const now = Date.now();
       const nextTl = isAnimTab ? showcaseTimeline.step(model.tlState, 0.016) : model.tlState;
@@ -514,9 +515,9 @@ function renderMainContent(model: Model, w: number, h: number): string {
         progressBar(model.tweenVal, { width: w - 10 }),
         '',
         'GSAP Timeline Orchestration:',
-        ` Track 1: ${progressBar(tlVals.box1!, { width: 20 })}`,
-        ` Track 2: ${progressBar(tlVals.box2!, { width: 20 })}`,
-        ` Track 3: ${progressBar(tlVals.box3!, { width: 20 })}`
+        ` Track 1: ${progressBar(tlVals.box1 ?? 0, { width: 20 })}`,
+        ` Track 2: ${progressBar(tlVals.box2 ?? 0, { width: 20 })}`,
+        ` Track 3: ${progressBar(tlVals.box3 ?? 0, { width: 20 })}`
       );
       break;
 

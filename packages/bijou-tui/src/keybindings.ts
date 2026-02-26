@@ -246,6 +246,7 @@ export function createKeyMap<A>(): KeyMap<A> {
     },
 
     bindings() {
+      // Fresh snapshot each call — intentional to reflect enable/disable mutations.
       return allBindings.map((b) => ({
         combo: b.combo,
         description: b.description,

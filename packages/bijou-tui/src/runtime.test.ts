@@ -159,7 +159,7 @@ describe('run', () => {
 
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = async () => ({ type: 'started' as const });
+          const cmd: Cmd<Msg> = async (_emit) => ({ type: 'started' as const });
           return ['loading', [cmd]];
         },
         update(msg, _model) {

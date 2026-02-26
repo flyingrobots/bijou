@@ -135,6 +135,7 @@ describe('flex column', () => {
     // 2 + 1 gap + 2 = 5 content lines, padded to totalHeight 10
     expect(lines).toHaveLength(10);
     expect(lines[0]).toContain('top');
+    expect(lines[2]!.trim()).toBe(''); // gap row is blank
     expect(lines[3]).toContain('bot');
   });
 
