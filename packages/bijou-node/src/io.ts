@@ -38,6 +38,18 @@ export function nodeIO(): IOPort {
       };
     },
 
+    onResize(callback: (cols: number, rows: number) => void): RawInputHandle {
+      const handler = (): void => {
+        callback(process.stdout.columns ?? 80, process.stdout.rows ?? 24);
+      };
+      process.stdout.on('resize', handler);
+      return {
+        dispose() {
+          process.stdout.removeListener('resize', handler);
+        },
+      };
+    },
+
     setInterval(callback: () => void, ms: number): TimerHandle {
       const id = globalThis.setInterval(callback, ms);
       return {

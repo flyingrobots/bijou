@@ -1,5 +1,5 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
-import type { App, Cmd, KeyMsg, RunOptions } from './types.js';
+import type { App, Cmd, KeyMsg, ResizeMsg, RunOptions } from './types.js';
 import { QUIT } from './types.js';
 import { parseKey } from './keys.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
@@ -16,6 +16,9 @@ const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
  * In non-interactive modes (pipe/static/accessible), renders the initial view
  * once and exits. In interactive mode, enters the alt screen, starts the
  * keyboard event loop, and drives the model/update/view cycle.
+ *
+ * Terminal resize events are automatically dispatched as `ResizeMsg`
+ * messages to the `update` function.
  */
 export async function run<Model, M>(
   app: App<Model, M>,
@@ -59,7 +62,7 @@ export async function run<Model, M>(
   }
 
   // Message handler
-  function handleMsg(msg: KeyMsg | M): void {
+  function handleMsg(msg: KeyMsg | ResizeMsg | M): void {
     if (!running) return;
     const [newModel, cmds] = app.update(msg, model);
     model = newModel;
@@ -110,6 +113,13 @@ export async function run<Model, M>(
     handleMsg(keyMsg);
   });
 
+  // Start resize listener
+  const resizeHandle = ctx.io.onResize((columns, rows) => {
+    if (!running) return;
+    const msg: ResizeMsg = { type: 'resize', columns, rows };
+    handleMsg(msg);
+  });
+
   // Wait for quit signal
   await new Promise<void>((resolve) => {
     resolveQuit = resolve;
@@ -119,6 +129,7 @@ export async function run<Model, M>(
 
   // Cleanup
   inputHandle.dispose();
+  resizeHandle.dispose();
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }

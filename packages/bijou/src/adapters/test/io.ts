@@ -49,6 +49,10 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
       return { dispose() { disposed = true; } };
     },
 
+    onResize(_callback: (cols: number, rows: number) => void): RawInputHandle {
+      return { dispose() {} };
+    },
+
     setInterval(callback: () => void, ms: number): TimerHandle {
       const id = globalThis.setInterval(callback, ms);
       return { dispose() { clearInterval(id); } };

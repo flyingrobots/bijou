@@ -10,6 +10,12 @@ export interface KeyMsg {
   readonly shift: boolean;
 }
 
+export interface ResizeMsg {
+  readonly type: 'resize';
+  readonly columns: number;
+  readonly rows: number;
+}
+
 // --- Commands ---
 
 export const QUIT: unique symbol = Symbol('QUIT');
@@ -21,7 +27,7 @@ export type Cmd<M> = () => Promise<M | QuitSignal | void>;
 
 export interface App<Model, M = never> {
   init(): [Model, Cmd<M>[]];
-  update(msg: KeyMsg | M, model: Model): [Model, Cmd<M>[]];
+  update(msg: KeyMsg | ResizeMsg | M, model: Model): [Model, Cmd<M>[]];
   view(model: Model): string;
 }
 

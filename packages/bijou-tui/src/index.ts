@@ -1,5 +1,5 @@
 // Types
-export type { App, Cmd, KeyMsg, QuitSignal, RunOptions } from './types.js';
+export type { App, Cmd, KeyMsg, ResizeMsg, QuitSignal, RunOptions } from './types.js';
 export { QUIT } from './types.js';
 
 // Key parsing
@@ -81,3 +81,10 @@ export {
   type Timeline,
   timeline,
 } from './timeline.js';
+
+// Flexbox layout
+export {
+  type FlexOptions,
+  type FlexChild,
+  flex,
+} from './flex.js';
