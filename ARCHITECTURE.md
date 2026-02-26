@@ -40,7 +40,7 @@ bijou is a monorepo containing three packages that together provide a complete t
 │  screen control    timeline (GSAP)                           │
 │                                                              │
 │  Input                                                       │
-│  createKeyMap      helpView/Short     createInputStack       │
+│  createKeyMap      helpView/helpShort  createInputStack       │
 │  parseKeyCombo     helpFor            InputHandler           │
 │  formatKeyCombo    BindingSource      layered dispatch       │
 └──────────────────────────────────────────────────────────────┘

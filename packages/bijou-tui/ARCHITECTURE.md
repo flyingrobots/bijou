@@ -166,7 +166,7 @@ Three modules compose into a declarative input handling pipeline:
 
 `createKeyMap<A>()` returns a `KeyMap<A>` that maps key descriptors (`"q"`, `"ctrl+c"`, `"shift+tab"`) to action values. Actions are data (messages), not factories — this keeps TEA's data-driven model intact and avoids stale closures.
 
-```
+```text
 Key descriptor string
     │
     ▼
@@ -198,7 +198,7 @@ Decoupled from `KeyMap` via the `BindingSource` interface — custom implementat
 
 Stack-based dispatch for layered input handling (e.g., modals over global shortcuts):
 
-```
+```text
 KeyMsg ──► InputStack.dispatch()
               │
               ▼

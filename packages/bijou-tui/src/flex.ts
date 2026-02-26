@@ -181,6 +181,10 @@ function fitWidth(content: string, width: number, align: 'start' | 'center' | 'e
         const after = padding - before;
         return ' '.repeat(before) + line + ' '.repeat(after);
       }
+      default: {
+        const _exhaustive: never = align;
+        throw new Error(`Unknown alignment: ${_exhaustive}`);
+      }
     }
   });
 }
@@ -285,14 +289,13 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const resolved = computeSizes(children, mainAxisTotal, crossAxisTotal, gap, isRow);
 
   if (isRow) {
-    return renderRow(resolved, width, height, gap);
+    return renderRow(resolved, height, gap);
   }
   return renderColumn(resolved, width, height, gap);
 }
 
 function renderRow(
   items: ResolvedChild[],
-  _totalWidth: number,
   totalHeight: number,
   gap: number,
 ): string {
@@ -302,7 +305,8 @@ function renderRow(
   for (const item of items) {
     const childWidth = item.allocatedSize;
     const rendered = renderContent(item.child, childWidth, totalHeight);
-    const widthFitted = fitWidth(rendered, childWidth, item.child.align ?? 'start');
+    // In row mode, fitWidth always uses 'start' — align controls cross-axis (vertical) only
+    const widthFitted = fitWidth(rendered, childWidth);
     const aligned = alignCross(widthFitted, totalHeight, item.child.align ?? 'start', childWidth);
     columns.push(aligned);
   }

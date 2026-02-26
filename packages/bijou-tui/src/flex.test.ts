@@ -108,7 +108,8 @@ describe('flex column', () => {
       { basis: 1, content: 'footer' },
     );
     const lines = result.split('\n');
-    expect(lines).toHaveLength(2);
+    // Padded to totalHeight
+    expect(lines).toHaveLength(10);
     expect(lines[0]).toContain('header');
     expect(lines[1]).toContain('footer');
   });
@@ -131,8 +132,10 @@ describe('flex column', () => {
       { basis: 2, content: 'bot\nbot' },
     );
     const lines = result.split('\n');
-    // 2 + 1 gap + 2 = 5 lines
-    expect(lines).toHaveLength(5);
+    // 2 + 1 gap + 2 = 5 content lines, padded to totalHeight 10
+    expect(lines).toHaveLength(10);
+    expect(lines[0]).toContain('top');
+    expect(lines[3]).toContain('bot');
   });
 
   it('renders content with full width', () => {

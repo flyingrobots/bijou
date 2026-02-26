@@ -146,6 +146,9 @@ export function createEventBus<M>(): EventBus<M> {
         if (result !== undefined) {
           emit(result as M);
         }
+      }).catch((err: unknown) => {
+        // Surface command rejections instead of leaving unhandled promise rejections.
+        console.error('[EventBus] Command rejected:', err);
       });
     },
 

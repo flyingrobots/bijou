@@ -28,7 +28,7 @@ export function parseKey(raw: string): KeyMsg {
   if (raw === ' ') return keyMsg('space');
 
   // Escape (alone)
-  if (raw === '\x1b') return keyMsg('esc');
+  if (raw === '\x1b') return keyMsg('escape');
 
   // Ctrl+C
   if (raw === '\x03') return keyMsg('c', true);

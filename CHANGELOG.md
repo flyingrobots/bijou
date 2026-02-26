@@ -20,8 +20,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
-- **Escape key mapping** — Keyboard parser now emits `'esc'` instead of `'escape'` for better compatibility with common TUI keybindings.
 - **Layout height rounding** — `renderColumn` now correctly pads to the full target height, ensuring footers are anchored to the bottom row.
+- **Row cross-axis alignment** — `flex()` row direction no longer conflates inline text alignment with cross-axis (vertical) alignment. `align: 'end'` correctly positions content at the bottom without right-aligning text.
+- **Test expectations** — Updated `screen.test.ts`, `runtime.test.ts`, `flex.test.ts`, `layout.test.ts`, and `keys.test.ts` to match current implementation behavior (WRAP_DISABLE/WRAP_ENABLE sequences, renderFrame format, column height padding).
+- **EventBus unhandled rejections** — `runCmd()` now catches rejected command promises instead of leaving them unhandled.
+- **KeyMap group() safety** — `group()` now uses `try/finally` to restore scope even if the builder callback throws.
+- **Duplicate modifier detection** — `parseKeyCombo()` now throws on duplicate modifiers like `"ctrl+ctrl+c"`.
 
 ### Showcase
 

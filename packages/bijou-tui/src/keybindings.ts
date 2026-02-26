@@ -103,10 +103,18 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
   // All parts except the last are modifiers
   for (let i = 0; i < parts.length - 1; i++) {
     const mod = parts[i];
-    if (mod === 'ctrl') ctrl = true;
-    else if (mod === 'alt') alt = true;
-    else if (mod === 'shift') shift = true;
-    else throw new Error(`Unknown modifier "${mod}" in key descriptor "${descriptor}"`);
+    if (mod === 'ctrl') {
+      if (ctrl) throw new Error(`Duplicate modifier "ctrl" in key descriptor "${descriptor}"`);
+      ctrl = true;
+    } else if (mod === 'alt') {
+      if (alt) throw new Error(`Duplicate modifier "alt" in key descriptor "${descriptor}"`);
+      alt = true;
+    } else if (mod === 'shift') {
+      if (shift) throw new Error(`Duplicate modifier "shift" in key descriptor "${descriptor}"`);
+      shift = true;
+    } else {
+      throw new Error(`Unknown modifier "${mod}" in key descriptor "${descriptor}"`);
+    }
   }
 
   const key = parts[parts.length - 1]!;
@@ -194,8 +202,11 @@ export function createKeyMap<A>(): KeyMap<A> {
         },
       };
 
-      fn(groupBuilder);
-      currentGroup = prevGroup;
+      try {
+        fn(groupBuilder);
+      } finally {
+        currentGroup = prevGroup;
+      }
       return keymap;
     },
 

@@ -45,6 +45,7 @@ import {
   createKeyMap,
   createInputStack,
   type App,
+  type Cmd,
   type KeyMsg,
   type ResizeMsg,
 } from '@flyingrobots/bijou-tui';
@@ -139,7 +140,7 @@ const keys = createKeyMap<Msg>()
   .bind('down', 'Scroll Down', { type: 'scroll-down' });
 
 const modalKeys = createKeyMap<Msg>()
-  .bind('esc', 'Close Modal', { type: 'toggle-modal' })
+  .bind('escape', 'Close Modal', { type: 'toggle-modal' })
   .bind('enter', 'Close Modal', { type: 'toggle-modal' })
   .bind('q', 'Quit', { type: 'quit' });
 
@@ -150,12 +151,12 @@ inputStack.push(keys);
 // Animation Generators
 // ---------------------------------------------------------------------------
 
-function startSpring(model: Model) {
+function startSpring(model: Model): Cmd<Msg> {
   const to = model.springDir === 1 ? 100 : 0;
   const from = 100 - to;
-  return animate({ 
-    from, 
-    to, 
+  return animate({
+    from,
+    to,
     spring: { stiffness: 40, damping: 8 }, // slow & wobbly for visibility
     fps: model.turbo ? 500 : 60,
     onFrame: (v) => ({ type: 'animate-spring', value: v }),
@@ -163,14 +164,14 @@ function startSpring(model: Model) {
   });
 }
 
-function startTween(model: Model) {
+function startTween(model: Model): Cmd<Msg> {
   const to = model.tweenDir === 1 ? 100 : 0;
   const from = 100 - to;
-  return animate({ 
-    type: 'tween', 
-    from, 
-    to, 
-    duration: 2000, 
+  return animate({
+    type: 'tween',
+    from,
+    to,
+    duration: 2000,
     onFrame: (v) => ({ type: 'animate-tween', value: v }),
     onComplete: () => ({ type: 'tween-finished' })
   });
@@ -310,11 +311,10 @@ const app: App<Model, Msg | ResizeMsg> = {
         ];
       }
 
-      case 'reset-animations':
-        return [
-          { ...model, tlState: showcaseTimeline.init(), springVal: 0, tweenVal: 0, springDir: 1, tweenDir: 1 }, 
-          [startSpring(model), startTween(model)]
-        ];
+      case 'reset-animations': {
+        const resetModel: Model = { ...model, tlState: showcaseTimeline.init(), springVal: 0, tweenVal: 0, springDir: 1, tweenDir: 1 };
+        return [resetModel, [startSpring(resetModel), startTween(resetModel)]];
+      }
 
       case 'next-tab':
       case 'prev-tab': {
