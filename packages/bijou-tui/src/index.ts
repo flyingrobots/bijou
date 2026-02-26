@@ -29,3 +29,43 @@ export { run } from './runtime.js';
 
 // Layout
 export { vstack, hstack } from './layout.js';
+
+// Animation — spring physics & tweens
+export {
+  type SpringConfig,
+  type SpringPreset,
+  type SpringState,
+  SPRING_PRESETS,
+  springStep,
+  createSpringState,
+  resolveSpringConfig,
+  type EasingFn,
+  EASINGS,
+  type TweenConfig,
+  type TweenState,
+  tweenStep,
+  createTweenState,
+  resolveTweenConfig,
+} from './spring.js';
+
+export {
+  type SpringAnimateOptions,
+  type TweenAnimateOptions,
+  type AnimateOptions,
+  animate,
+  sequence,
+} from './animate.js';
+
+// Viewport — scrollable content pane
+export {
+  type ViewportOptions,
+  type ScrollState,
+  viewport,
+  createScrollState,
+  scrollBy,
+  scrollTo,
+  scrollToTop,
+  scrollToBottom,
+  pageDown,
+  pageUp,
+} from './viewport.js';
