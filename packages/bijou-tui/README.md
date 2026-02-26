@@ -1,35 +1,47 @@
 # @flyingrobots/bijou-tui
 
-TEA runtime for terminal UIs — model/update/view with keyboard input, alt screen, and layout helpers.
+TEA runtime for terminal UIs — model/update/view with physics-based animation, flexbox layout, and a centralized event bus.
 
-Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go), bijou-tui brings The Elm Architecture to TypeScript terminals.
+Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
+
+## What's New in 0.2.0?
+
+- **Spring animation engine** — physics-based springs with 6 presets, plus tween engine with 12 easing functions
+- **`animate()`** — GSAP-style animation commands for TEA, with `immediate: true` for reduced-motion
+- **Timeline** — orchestrate multiple animations with position-based timing (`'<'`, `'+=N'`, `'-=N'`, labels)
+- **`viewport()`** — scrollable content pane with proportional scrollbar
+- **`flex()`** — flexbox layout with grow/basis/min/max, render functions that reflow on resize
+- **`ResizeMsg`** — terminal resize events auto-dispatched by the runtime
+- **`EventBus`** — centralized typed event emitter unifying keyboard, resize, and commands
+
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
 
 ## Install
 
 ```bash
-npm install @flyingrobots/bijou @flyingrobots/bijou-tui
+npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
 ```
 
 ## Quick Start
 
 ```typescript
+import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { run, quit, tick, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+
+initDefaultContext();
 
 type Model = { count: number };
 
 const app: App<Model> = {
-  init: () => [{ count: 0 }, tick(1000)],
+  init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
     if (msg.type === 'key') {
-      if (msg.key === 'q') return [model, quit()];
-      if (msg.key === '+') return [{ count: model.count + 1 }, null];
-      if (msg.key === '-') return [{ count: model.count - 1 }, null];
+      if (msg.key === 'q') return [model, [quit()]];
+      if (msg.key === '+') return [{ count: model.count + 1 }, []];
+      if (msg.key === '-') return [{ count: model.count - 1 }, []];
     }
-    if (msg.type === 'tick') {
-      return [model, tick(1000)];
-    }
-    return [model, null];
+    return [model, []];
   },
 
   view: (model) => `Count: ${model.count}\n\nPress +/- to change, q to quit`,
@@ -38,35 +50,148 @@ const app: App<Model> = {
 run(app);
 ```
 
-## API
+## Animation
 
-### Core Types
+### Spring Physics
 
-- **`App<M>`** — defines `init`, `update(msg, model)`, and `view(model)` functions
-- **`KeyMsg`** — keyboard input message with `key`, `ctrl`, `shift`, `alt` fields
-- **`Cmd`** — side-effect commands returned from `update`
-- **`QUIT`** — sentinel value to signal app termination
+```typescript
+import { animate, SPRING_PRESETS } from '@flyingrobots/bijou-tui';
 
-### Commands
+// Physics-based (default) — runs until the spring settles
+const cmd = animate({
+  from: 0,
+  to: 100,
+  spring: 'wobbly',  // or 'default', 'gentle', 'stiff', 'slow', 'molasses'
+  onFrame: (v) => ({ type: 'scroll', y: v }),
+});
 
-- **`quit()`** — exit the app
-- **`tick(ms)`** — schedule a tick after `ms` milliseconds
-- **`batch(...cmds)`** — combine multiple commands
+// Duration-based with easing
+const fade = animate({
+  type: 'tween',
+  from: 0,
+  to: 1,
+  duration: 300,
+  ease: EASINGS.easeOutCubic,
+  onFrame: (v) => ({ type: 'fade', opacity: v }),
+});
 
-### Screen Control
+// Skip animation (reduced motion)
+const jump = animate({
+  from: 0, to: 100,
+  immediate: true,
+  onFrame: (v) => ({ type: 'scroll', y: v }),
+});
+```
 
-- **`enterScreen()` / `exitScreen()`** — alt screen buffer management
-- **`clearAndHome()`** — clear screen and move cursor to top-left
-- **`renderFrame(content)`** — efficient frame rendering
+### Timeline
 
-### Layout
+GSAP-style orchestration — pure state machine, no timers:
 
-- **`vstack(...lines)`** — vertical stack (join with newlines)
-- **`hstack(...cols)`** — horizontal stack (side-by-side columns)
+```typescript
+import { timeline } from '@flyingrobots/bijou-tui';
 
-### Key Parsing
+const tl = timeline()
+  .add('slideIn',  { type: 'tween', from: -100, to: 0, duration: 300 })
+  .add('fadeIn',   { type: 'tween', from: 0, to: 1, duration: 200 }, '-=100')
+  .label('settled')
+  .add('bounce',   { from: 0, to: 10, spring: 'wobbly' }, 'settled')
+  .call('onReady', 'settled+=50')
+  .build();
 
-- **`parseKey(data)`** — parse raw stdin bytes into a `KeyMsg`
+// Drive from TEA update:
+let tlState = tl.init();
+// on each frame:
+tlState = tl.step(tlState, 1/60);
+const { slideIn, fadeIn, bounce } = tl.values(tlState);
+const fired = tl.firedCallbacks(prev, tlState); // ['onReady']
+```
+
+Position syntax: `'<'` (parallel), `'+=N'` (gap), `'-=N'` (overlap), `'<+=N'` (offset from previous start), absolute ms, `'label'`, `'label+=N'`.
+
+## Layout
+
+### Flexbox
+
+```typescript
+import { flex } from '@flyingrobots/bijou-tui';
+
+// Sidebar + main content, responsive to terminal width
+flex({ direction: 'row', width: cols, height: rows, gap: 1 },
+  { basis: 20, content: sidebarText },
+  { flex: 1, content: (w, h) => renderMain(w, h) },
+);
+
+// Header + body + footer
+flex({ direction: 'column', width: cols, height: rows },
+  { basis: 1, content: headerLine },
+  { flex: 1, content: (w, h) => renderBody(w, h) },
+  { basis: 1, content: statusLine },
+);
+```
+
+Children can be **render functions** `(width, height) => string` — they receive their allocated space and reflow automatically when the terminal resizes.
+
+### Viewport
+
+```typescript
+import { viewport, createScrollState, scrollBy, pageDown } from '@flyingrobots/bijou-tui';
+
+let scroll = createScrollState(content, viewportHeight);
+
+// Render visible window with scrollbar
+const view = viewport({ width: 60, height: 20, content, scrollY: scroll.y });
+
+// Handle scroll keys
+scroll = scrollBy(scroll, 1);   // down one line
+scroll = pageDown(scroll);       // down one page
+```
+
+### Basic Layout
+
+```typescript
+import { vstack, hstack } from '@flyingrobots/bijou-tui';
+
+vstack(header, content, footer);       // vertical stack
+hstack(2, leftPanel, rightPanel);      // side-by-side with gap
+```
+
+## Resize Handling
+
+Terminal resize events are dispatched automatically as `ResizeMsg`:
+
+```typescript
+update(msg, model) {
+  if (msg.type === 'resize') {
+    return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
+  }
+  // ...
+}
+
+view(model) {
+  return flex(
+    { direction: 'row', width: model.cols, height: model.rows },
+    { basis: 20, content: sidebar },
+    { flex: 1, content: (w, h) => mainContent(w, h) },
+  );
+}
+```
+
+## Event Bus
+
+The runtime uses an `EventBus` internally. You can also create your own for custom event sources:
+
+```typescript
+import { createEventBus } from '@flyingrobots/bijou-tui';
+
+const bus = createEventBus<MyMsg>();
+bus.connectIO(ctx.io);           // keyboard + resize
+bus.on((msg) => { /* ... */ });  // single subscription
+bus.emit(customMsg);             // synthetic events
+bus.runCmd(someCommand);         // command results re-emitted
+bus.dispose();                   // clean shutdown
+```
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full event flow and [GUIDE.md](./GUIDE.md) for detailed usage patterns.
 
 ## Related Packages
 

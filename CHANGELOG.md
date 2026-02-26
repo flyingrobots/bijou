@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`) are versioned in lock-step.
 
+## [0.2.0] — 2026-02-26
+
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`IOPort.onResize()`** — new port method for terminal resize events. Implementors receive `(cols, rows)` callbacks with a disposable handle.
+
+#### Node adapter (`@flyingrobots/bijou-node`)
+
+- **Resize listener** — `nodeIO()` implements `onResize` via `process.stdout.on('resize')`
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **Spring animation engine** — damped harmonic oscillator with 6 presets (`default`, `gentle`, `wobbly`, `stiff`, `slow`, `molasses`) and configurable stiffness/damping/mass
+- **Tween engine** — duration-based animation with 12 easing functions (linear through quartic, in/out/inOut variants)
+- **`animate()`** — GSAP-style TEA command. Spring mode (default, physics-based) or tween mode (duration-based). `immediate: true` for reduced-motion support.
+- **`sequence()`** — chain multiple animation commands
+- **GSAP Timeline** — `timeline()` builder with position-based timing (`'<'`, `'+=N'`, `'-=N'`, labels), pure state machine driven from the TEA update cycle
+- **`viewport()`** — scrollable content pane with proportional scrollbar, ANSI-aware line clipping, scroll state management (`scrollBy`, `scrollTo`, `pageUp`, `pageDown`)
+- **`flex()`** — flexbox-style layout with `direction`, `flex-grow`, `basis`, `minSize`/`maxSize`, `gap`, cross-axis alignment. Children can be render functions `(w, h) => string` that reflow on resize.
+- **`ResizeMsg`** — built-in message type for terminal resize events, auto-dispatched by the TEA runtime
+- **`EventBus`** — centralized event emitter. Unifies keyboard, resize, and command results into a single typed stream. Supports custom events, multiple subscribers, and clean disposal.
+
+### Changed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`IOPort` interface** — added `onResize()` method (breaking for custom port implementations)
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`App.update()`** signature now receives `KeyMsg | ResizeMsg | M` (was `KeyMsg | M`)
+- **TEA runtime** refactored to use `EventBus` internally — single subscription drives the update cycle
+
+### Build
+
+- Switched to `tsc -b` with TypeScript project references for dependency-ordered incremental builds
+- Added `prepack` script to all packages
+- Added `composite: true` to all tsconfig files
+
 ## [0.1.0] — 2026-02-25
 
 First public release.
@@ -37,4 +78,5 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
+[0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0

@@ -4,6 +4,12 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
+## What's New in 0.2.0?
+
+- **`IOPort.onResize()`** — new port method for terminal resize events, enabling TUI apps to reflow layout when the terminal is resized
+
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
+
 ## Install
 
 ```bash
@@ -24,7 +30,7 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 console.log(box('Hello, world!'));
 ```
 
-## What's Inside
+## Components
 
 ### Layout
 `box()`, `headerBox()`, `separator()` — unicode box-drawing with automatic ASCII fallback.
@@ -49,13 +55,13 @@ DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuc
 
 ## Architecture
 
-bijou uses a Ports and Adapters (hexagonal) architecture. The core is pure TypeScript with zero runtime dependencies — all platform concerns flow through three ports:
+bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design.
 
-- **`RuntimePort`** — timers, environment
-- **`IOPort`** — terminal I/O
-- **`StylePort`** — color/formatting
+The core is pure TypeScript with zero runtime dependencies — all platform concerns flow through three ports:
 
-This means your components work identically in Node.js, test harnesses, or any future runtime adapter.
+- **`RuntimePort`** — environment variables, TTY detection, terminal dimensions
+- **`IOPort`** — stdout writes, stdin reads, resize events, file I/O
+- **`StylePort`** — RGB/hex color application, bold/italic/etc.
 
 ### Output Modes
 
@@ -80,6 +86,8 @@ const ctx = createTestContext({ mode: 'interactive' });
 const result = box('hello', { ctx });
 // Assert on the string directly — no process mocking needed
 ```
+
+See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
 
 ## Related Packages
 

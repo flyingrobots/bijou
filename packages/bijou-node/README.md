@@ -2,6 +2,12 @@
 
 Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
 
+## What's New in 0.2.0?
+
+- **`onResize()` support** — `nodeIO()` now listens to `process.stdout` resize events, enabling terminal resize detection in TUI apps
+
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
+
 ## Install
 
 ```bash
@@ -27,8 +33,8 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 
 | Port | Implementation | What it does |
 | :--- | :--- | :--- |
-| `RuntimePort` | `nodeRuntime()` | `process.env`, `setTimeout`, exit handling |
-| `IOPort` | `nodeIO()` | `process.stdout/stdin`, readline |
+| `RuntimePort` | `nodeRuntime()` | `process.env`, TTY detection, terminal dimensions |
+| `IOPort` | `nodeIO()` | `process.stdout/stdin`, readline, resize events |
 | `StylePort` | `chalkStyle()` | RGB/hex color via chalk, respects `NO_COLOR` |
 
 ### API
@@ -46,6 +52,8 @@ const ctx = createNodeContext();
 // initDefaultContext() — creates context AND registers it as the global default
 initDefaultContext();
 ```
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js APIs, and [GUIDE.md](./GUIDE.md) for usage patterns.
 
 ## Related Packages
 
