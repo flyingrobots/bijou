@@ -27,6 +27,13 @@ export { quit, tick, batch } from './commands.js';
 // Runtime
 export { run } from './runtime.js';
 
+// Event bus
+export {
+  type BusMsg,
+  type EventBus,
+  createEventBus,
+} from './eventbus.js';
+
 // Layout
 export { vstack, hstack } from './layout.js';
 

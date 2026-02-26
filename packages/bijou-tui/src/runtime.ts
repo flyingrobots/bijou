@@ -1,8 +1,7 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
 import type { App, Cmd, KeyMsg, ResizeMsg, RunOptions } from './types.js';
-import { QUIT } from './types.js';
-import { parseKey } from './keys.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
+import { createEventBus } from './eventbus.js';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -17,8 +16,8 @@ const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
  * once and exits. In interactive mode, enters the alt screen, starts the
  * keyboard event loop, and drives the model/update/view cycle.
  *
- * Terminal resize events are automatically dispatched as `ResizeMsg`
- * messages to the `update` function.
+ * All input sources (keyboard, resize, commands) are unified through an
+ * internal EventBus — a single subscription drives the update cycle.
  */
 export async function run<Model, M>(
   app: App<Model, M>,
@@ -42,6 +41,8 @@ export async function run<Model, M>(
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
 
+  const bus = createEventBus<M>();
+
   function shutdown(): void {
     if (!running) return;
     running = false;
@@ -52,7 +53,6 @@ export async function run<Model, M>(
   if (useAltScreen || useHideCursor) {
     enterScreen(ctx.io);
   }
-  // Disable mouse reporting to avoid garbage from mouse events
   ctx.io.write(DISABLE_MOUSE);
 
   // Render helper
@@ -61,47 +61,26 @@ export async function run<Model, M>(
     renderFrame(ctx.io, app.view(model));
   }
 
-  // Message handler
-  function handleMsg(msg: KeyMsg | ResizeMsg | M): void {
-    if (!running) return;
-    const [newModel, cmds] = app.update(msg, model);
-    model = newModel;
-    render();
-    executeCommands(cmds);
-  }
-
-  // Execute commands, feeding results back as messages
+  // Execute commands through the bus
   function executeCommands(cmds: Cmd<M>[]): void {
     for (const cmd of cmds) {
-      void cmd().then((result) => {
-        if (result === QUIT) {
-          shutdown();
-          return;
-        }
-        if (result !== undefined) {
-          handleMsg(result as M);
-        }
-      });
+      bus.runCmd(cmd);
     }
   }
 
-  // Initial render
-  render();
+  // Connect I/O sources — keyboard + resize, parsed and unified
+  bus.connectIO(ctx.io);
 
-  // Execute startup commands
-  executeCommands(initCmds);
+  // Handle quit signals from commands
+  bus.onQuit(shutdown);
 
-  // Start keyboard listener
-  const inputHandle = ctx.io.rawInput((raw: string) => {
+  // Single subscription drives the entire update cycle
+  bus.on((msg) => {
     if (!running) return;
 
-    const keyMsg = parseKey(raw);
-
-    // Skip unknown sequences (mouse events, etc.)
-    if (keyMsg.key === 'unknown') return;
-
     // Double Ctrl+C force-quit
-    if (keyMsg.key === 'c' && keyMsg.ctrl) {
+    const keyMsg = msg as KeyMsg;
+    if (keyMsg.type === 'key' && keyMsg.key === 'c' && keyMsg.ctrl) {
       const now = Date.now();
       if (now - lastCtrlC < 1000) {
         shutdown();
@@ -110,26 +89,24 @@ export async function run<Model, M>(
       lastCtrlC = now;
     }
 
-    handleMsg(keyMsg);
+    const [newModel, cmds] = app.update(msg as KeyMsg | ResizeMsg | M, model);
+    model = newModel;
+    render();
+    executeCommands(cmds);
   });
 
-  // Start resize listener
-  const resizeHandle = ctx.io.onResize((columns, rows) => {
-    if (!running) return;
-    const msg: ResizeMsg = { type: 'resize', columns, rows };
-    handleMsg(msg);
-  });
+  // Initial render + startup commands
+  render();
+  executeCommands(initCmds);
 
   // Wait for quit signal
   await new Promise<void>((resolve) => {
     resolveQuit = resolve;
-    // In case shutdown was already called before we got here
     if (!running) resolve();
   });
 
-  // Cleanup
-  inputHandle.dispose();
-  resizeHandle.dispose();
+  // Cleanup — bus disposes all I/O connections
+  bus.dispose();
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }
