@@ -95,6 +95,9 @@ export interface KeyMapGroup<A> {
  * Examples: `"q"`, `"ctrl+c"`, `"alt+shift+tab"`, `"enter"`, `"space"`
  */
 export function parseKeyCombo(descriptor: string): KeyCombo {
+  // Lowercase the entire descriptor for consistency with parseKey(), which always
+  // returns lowercase key names (e.g., 'escape', 'enter', 'c' for Ctrl+C).
+  // Uppercase letter bindings should use 'shift+a' not 'A'.
   const parts = descriptor.toLowerCase().split('+');
   let ctrl = false;
   let alt = false;

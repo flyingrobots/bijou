@@ -27,6 +27,8 @@ describe('screen', () => {
     expect(CLEAR_TO_END).toBe('\x1b[J');
     expect(CLEAR_LINE_TO_END).toBe('\x1b[K');
     expect(HOME).toBe('\x1b[H');
+    expect(WRAP_DISABLE).toBe('\x1b[?7l');
+    expect(WRAP_ENABLE).toBe('\x1b[?7h');
   });
 
   it('enterScreen writes alt screen + hide cursor + wrap disable + clear + home', () => {

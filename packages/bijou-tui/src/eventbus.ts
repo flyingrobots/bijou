@@ -55,10 +55,13 @@ export interface EventBus<M> {
   connectIO(io: IOPort): Disposable;
 
   /**
-   * Run a command. When it resolves:
-   * - QUIT signal → emitted as a special quit event (subscribers can check)
+   * Run a command. The command receives the bus's `emit` function to
+   * dispatch intermediate messages during execution. When it resolves:
+   * - QUIT signal → fires onQuit handlers
    * - Message → emitted to all subscribers
    * - void/undefined → ignored
+   *
+   * Rejected commands are logged to stderr via `console.error`.
    */
   runCmd(cmd: Cmd<M>): void;
 
