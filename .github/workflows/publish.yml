@@ -29,8 +29,8 @@ jobs:
       - name: Verify tag is on main
         run: |
           TAG_COMMIT=$(git rev-list -n 1 "$GITHUB_REF")
-          if ! git branch --contains "$TAG_COMMIT" | grep -q 'main'; then
-            echo "::error::Tag must be on the main branch"
+          if ! git merge-base --is-ancestor "$TAG_COMMIT" origin/main; then
+            echo "::error::Tag must be an ancestor of the main branch"
             exit 1
           fi
 
