@@ -53,3 +53,10 @@ vhs examples/<name>/demo.tape
 | [fullscreen](./fullscreen/) | Alt screen | Alternate screen with centered content |
 | [print-key](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [stopwatch](./stopwatch/) | `tick()` + state | Stopwatch with laps, start/stop/reset |
+| [viewport](./viewport/) | `viewport()` + scroll helpers | Scrollable content pager |
+| [help](./help/) | `createKeyMap()` + `helpView()` | Keybinding manager with help toggle |
+| [modal](./modal/) | `createInputStack()` | Layered modal input dispatch |
+| [progress-download](./progress-download/) | `progressBar()` + `tick()` | Simulated multi-package download |
+| [spring](./spring/) | `animate()` + `SPRING_PRESETS` | Spring physics comparison (4 presets) |
+| [timeline-anim](./timeline-anim/) | `sequence()` + `animate()` | Orchestrated GSAP-style animation |
+| [splash](./splash/) | Spring + tween + `gradientText()` | Animated splash screen |
