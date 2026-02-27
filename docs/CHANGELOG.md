@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+#### Core (`@flyingrobots/bijou`)
+
+- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength, and Ctrl+D submit / Ctrl+C cancel
+- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords, customizable match function, and configurable max visible items
+
 #### TUI runtime (`@flyingrobots/bijou-tui`)
 
 - **`pager()`** — scrollable content viewer building block wrapping `viewport()` with a status line, position tracking, and convenience keymap (`j/k` scroll, `d/u` page, `g/G` top/bottom, `q` quit)

@@ -144,4 +144,9 @@ export {
   multiselect,
   confirm,
   group,
+  textarea,
+  type TextareaOptions,
+  filter,
+  type FilterOption,
+  type FilterOptions,
 } from './core/forms/index.js';

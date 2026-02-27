@@ -1,6 +1,6 @@
 # Examples
 
-> 45 examples · Run any: `npx tsx examples/<name>/main.ts`  
+> 47 examples · Run any: `npx tsx examples/<name>/main.ts`  
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -36,6 +36,8 @@
 | [`select`](./select/) | `select()` | Single-select menu |
 | [`multiselect`](./multiselect/) | `multiselect()` | Checkbox multi-select |
 | [`confirm`](./confirm/) | `confirm()` | Yes/no confirmation prompt |
+| [`textarea`](./textarea/) | `textarea()` | Multi-line text input with cursor navigation |
+| [`filter`](./filter/) | `filter()` | Fuzzy-filter select with real-time search |
 | [`form-group`](./form-group/) | `group()` | Multi-field form wizard |
 
 ## TUI Apps
