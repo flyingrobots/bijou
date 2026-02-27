@@ -107,13 +107,13 @@ Render output and exit. GIFs are short recordings of the final output.
 **Demo:** Render 5 progress bars at 0%, 25%, 50%, 75%, 100% with labels. Show different widths.
 **GIF:** Single frame. ~2s.
 
-### [ ] `dag`
+### [x] `dag`
 
 **Component:** `dag()`
 **Demo:** Render a project dependency DAG (7-8 nodes) with badges showing status (DONE, WIP, BLOCKED). Highlight a critical path in a contrasting color.
 **GIF:** Single frame showing the full graph. ~2s.
 
-### [ ] `dag-fragment`
+### [x] `dag-fragment`
 
 **Component:** `dagSlice()` + `dag()`
 **Demo:** Start with a large DAG (12+ nodes), then render 3 fragments: ancestors of a leaf node, descendants of the root, and a 2-hop neighborhood around a middle node. Show ghost nodes with dashed borders at slice boundaries.
@@ -287,12 +287,12 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 
 | Category | Count |
 |---|---|
-| Static components | 18/20 |
+| Static components | 20/20 |
 | Interactive forms | 5/5 |
 | TUI apps | 18/18 |
-| **Total** | **41/43** |
+| **Total** | **43/43** |
 
-> Remaining: `dag` and `dag-fragment` (blocked on `dag()` component implementation)
+> All examples complete.
 
 ---
 

@@ -1,0 +1,711 @@
+import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
+import { getDefaultContext } from '../../context.js';
+
+// ── Types ──────────────────────────────────────────────────────────
+
+export interface DagNode {
+  id: string;
+  label: string;
+  edges?: string[];
+  badge?: string;
+  token?: TokenValue;
+  /** @internal Used by dagSlice to mark ghost boundary nodes */
+  _ghost?: boolean;
+  _ghostLabel?: string;
+}
+
+export interface DagOptions {
+  nodeToken?: TokenValue;
+  edgeToken?: TokenValue;
+  highlightPath?: string[];
+  highlightToken?: TokenValue;
+  nodeWidth?: number;
+  maxWidth?: number;
+  direction?: 'down' | 'right';
+  ctx?: BijouContext;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+
+function resolveCtx(ctx?: BijouContext): BijouContext {
+  if (ctx) return ctx;
+  return getDefaultContext();
+}
+
+function visibleLength(str: string): number {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/\x1b\[[0-9;]*m/g, '').length;
+}
+
+function truncateLabel(text: string, maxLen: number): string {
+  if (maxLen <= 0) return '';
+  if (visibleLength(text) <= maxLen) return text;
+  return text.slice(0, maxLen - 1) + '\u2026';
+}
+
+// ── Layout: Layer Assignment ───────────────────────────────────────
+
+function assignLayers(nodes: DagNode[]): Map<string, number> {
+  const children = new Map<string, string[]>();
+  const parents = new Map<string, string[]>();
+  const inDegree = new Map<string, number>();
+
+  for (const n of nodes) {
+    children.set(n.id, n.edges ?? []);
+    inDegree.set(n.id, 0);
+    if (!parents.has(n.id)) parents.set(n.id, []);
+  }
+
+  for (const n of nodes) {
+    for (const childId of n.edges ?? []) {
+      if (!parents.has(childId)) parents.set(childId, []);
+      parents.get(childId)!.push(n.id);
+      inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);
+    }
+  }
+
+  // Kahn's topological sort
+  const queue: string[] = [];
+  for (const [id, deg] of inDegree) {
+    if (deg === 0) queue.push(id);
+  }
+
+  const topoOrder: string[] = [];
+  const visited = new Set<string>();
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    if (visited.has(id)) continue;
+    visited.add(id);
+    topoOrder.push(id);
+    for (const childId of children.get(id) ?? []) {
+      const newDeg = (inDegree.get(childId) ?? 1) - 1;
+      inDegree.set(childId, newDeg);
+      if (newDeg === 0) queue.push(childId);
+    }
+  }
+
+  if (topoOrder.length !== nodes.length) {
+    throw new Error('[bijou] dag(): cycle detected in graph');
+  }
+
+  // Longest-path layer assignment
+  const layerMap = new Map<string, number>();
+  for (const id of topoOrder) {
+    const pars = parents.get(id) ?? [];
+    if (pars.length === 0) {
+      layerMap.set(id, 0);
+    } else {
+      let maxParent = 0;
+      for (const p of pars) {
+        maxParent = Math.max(maxParent, layerMap.get(p) ?? 0);
+      }
+      layerMap.set(id, maxParent + 1);
+    }
+  }
+
+  return layerMap;
+}
+
+// ── Layout: Column Ordering ────────────────────────────────────────
+
+function buildLayerArrays(
+  nodes: DagNode[],
+  layerMap: Map<string, number>,
+): string[][] {
+  let maxLayer = 0;
+  for (const v of layerMap.values()) {
+    if (v > maxLayer) maxLayer = v;
+  }
+  const layers: string[][] = Array.from({ length: maxLayer + 1 }, () => []);
+  for (const n of nodes) {
+    const l = layerMap.get(n.id);
+    if (l !== undefined) layers[l]!.push(n.id);
+  }
+  return layers;
+}
+
+function orderColumns(layers: string[][], nodes: DagNode[]): void {
+  const childrenMap = new Map<string, string[]>();
+  const parentsMap = new Map<string, string[]>();
+  for (const n of nodes) {
+    childrenMap.set(n.id, n.edges ?? []);
+    if (!parentsMap.has(n.id)) parentsMap.set(n.id, []);
+  }
+  for (const n of nodes) {
+    for (const c of n.edges ?? []) {
+      if (!parentsMap.has(c)) parentsMap.set(c, []);
+      parentsMap.get(c)!.push(n.id);
+    }
+  }
+
+  // Top-down pass
+  for (let l = 1; l < layers.length; l++) {
+    const prevLayer = layers[l - 1]!;
+    const curLayer = layers[l]!;
+    const prevIndex = new Map<string, number>();
+    for (let i = 0; i < prevLayer.length; i++) {
+      prevIndex.set(prevLayer[i]!, i);
+    }
+
+    const bary = new Map<string, number>();
+    for (const id of curLayer) {
+      const pars = (parentsMap.get(id) ?? []).filter(p => prevIndex.has(p));
+      if (pars.length === 0) {
+        bary.set(id, Infinity);
+      } else {
+        const avg = pars.reduce((s, p) => s + (prevIndex.get(p) ?? 0), 0) / pars.length;
+        bary.set(id, avg);
+      }
+    }
+    curLayer.sort((a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity));
+  }
+
+  // Bottom-up pass
+  for (let l = layers.length - 2; l >= 0; l--) {
+    const nextLayer = layers[l + 1]!;
+    const curLayer = layers[l]!;
+    const nextIndex = new Map<string, number>();
+    for (let i = 0; i < nextLayer.length; i++) {
+      nextIndex.set(nextLayer[i]!, i);
+    }
+
+    const bary = new Map<string, number>();
+    for (const id of curLayer) {
+      const chlds = (childrenMap.get(id) ?? []).filter(c => nextIndex.has(c));
+      if (chlds.length === 0) {
+        bary.set(id, Infinity);
+      } else {
+        const avg = chlds.reduce((s, c) => s + (nextIndex.get(c) ?? 0), 0) / chlds.length;
+        bary.set(id, avg);
+      }
+    }
+    curLayer.sort((a, b) => (bary.get(a) ?? Infinity) - (bary.get(b) ?? Infinity));
+  }
+}
+
+// ── Edge Routing ───────────────────────────────────────────────────
+
+type Dir = 'U' | 'D' | 'L' | 'R';
+
+const JUNCTION: Record<string, string> = {
+  'D': '\u2502', 'U': '\u2502', 'DU': '\u2502',
+  'L': '\u2500', 'R': '\u2500', 'LR': '\u2500',
+  'DR': '\u250c', 'DL': '\u2510', 'RU': '\u2514', 'LU': '\u2518',
+  'DRU': '\u251c', 'DLU': '\u2524', 'DLR': '\u252c', 'LRU': '\u2534',
+  'DLRU': '\u253c',
+};
+
+function junctionChar(dirs: Set<Dir>): string {
+  const key = [...dirs].sort().join('');
+  return JUNCTION[key] ?? '\u253c';
+}
+
+interface GridState {
+  dirs: Set<Dir>[][];
+  arrows: Set<number>;
+  rows: number;
+  cols: number;
+}
+
+function createGrid(rows: number, cols: number): GridState {
+  const dirs: Set<Dir>[][] = [];
+  for (let r = 0; r < rows; r++) {
+    const row: Set<Dir>[] = [];
+    for (let c = 0; c < cols; c++) {
+      row.push(new Set<Dir>());
+    }
+    dirs.push(row);
+  }
+  return { dirs, arrows: new Set<number>(), rows, cols };
+}
+
+function markDir(g: GridState, r: number, c: number, ...ds: Dir[]): void {
+  if (r >= 0 && r < g.rows && c >= 0 && c < g.cols) {
+    const cell = g.dirs[r]![c]!;
+    for (const d of ds) cell.add(d);
+  }
+}
+
+function markEdge(
+  g: GridState,
+  fromCol: number,
+  fromLayer: number,
+  toCol: number,
+  toLayer: number,
+  RS: number,
+  colCenter: (c: number) => number,
+): void {
+  const srcC = colCenter(fromCol);
+  const dstC = colCenter(toCol);
+  const sRow = fromLayer * RS + 3;
+  const dRow = toLayer * RS - 1;   // one row above dest box
+  const mid = sRow + 1;
+
+  if (srcC === dstC) {
+    for (let r = sRow; r < dRow; r++) markDir(g, r, srcC, 'D', 'U');
+  } else {
+    markDir(g, sRow, srcC, 'D', 'U');
+    markDir(g, mid, srcC, srcC < dstC ? 'R' : 'L', 'U');
+
+    const minC = Math.min(srcC, dstC);
+    const maxC = Math.max(srcC, dstC);
+    for (let c = minC + 1; c < maxC; c++) markDir(g, mid, c, 'L', 'R');
+
+    markDir(g, mid, dstC, srcC < dstC ? 'L' : 'R', 'D');
+    for (let r = mid + 1; r < dRow; r++) markDir(g, r, dstC, 'D', 'U');
+  }
+
+  g.arrows.add(dRow * 10000 + dstC);
+}
+
+// ── Node Box Rendering ─────────────────────────────────────────────
+
+function renderNodeBox(
+  label: string,
+  badgeText: string | undefined,
+  width: number,
+  ghost: boolean,
+): string[] {
+  const h = ghost ? '\u254c' : '\u2500';
+  const v = ghost ? '\u254e' : '\u2502';
+
+  const innerW = width - 2;
+  const contentW = innerW - 2;
+
+  let content: string;
+  if (badgeText) {
+    const maxLabelW = contentW - visibleLength(badgeText) - 1;
+    const tLabel = truncateLabel(label, maxLabelW);
+    const gap = Math.max(1, contentW - visibleLength(tLabel) - visibleLength(badgeText));
+    content = tLabel + ' '.repeat(gap) + badgeText;
+  } else {
+    content = truncateLabel(label, contentW);
+  }
+
+  const padRight = Math.max(0, contentW - visibleLength(content));
+  const top = '\u256d' + h.repeat(innerW) + '\u256e';
+  const mid = v + ' ' + content + ' '.repeat(padRight) + ' ' + v;
+  const bot = '\u2570' + h.repeat(innerW) + '\u256f';
+
+  return [top, mid, bot];
+}
+
+// ── Interactive Renderer ───────────────────────────────────────────
+
+function renderInteractive(
+  nodes: DagNode[],
+  options: DagOptions,
+  ctx: BijouContext,
+): string {
+  if (nodes.length === 0) return '';
+
+  const nodeMap = new Map<string, DagNode>();
+  for (const n of nodes) nodeMap.set(n.id, n);
+
+  const layerMap = assignLayers(nodes);
+  const layers = buildLayerArrays(nodes, layerMap);
+  orderColumns(layers, nodes);
+
+  const colIndex = new Map<string, number>();
+  for (const layer of layers) {
+    for (let i = 0; i < layer.length; i++) {
+      colIndex.set(layer[i]!, i);
+    }
+  }
+
+  let maxNodesPerLayer = 1;
+  for (const layer of layers) {
+    if (layer.length > maxNodesPerLayer) maxNodesPerLayer = layer.length;
+  }
+  const maxWidth = options.maxWidth ?? ctx.runtime.columns;
+
+  let nodeWidth = options.nodeWidth ?? Math.max(
+    ...nodes.map(n => visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
+    16,
+  );
+
+  let gap = 4;
+  let colStride = nodeWidth + gap;
+  let totalWidth = maxNodesPerLayer * colStride;
+
+  if (totalWidth > maxWidth && !options.nodeWidth) {
+    gap = 2;
+    colStride = nodeWidth + gap;
+    totalWidth = maxNodesPerLayer * colStride;
+  }
+  if (totalWidth > maxWidth && !options.nodeWidth) {
+    nodeWidth = Math.max(16, Math.floor((maxWidth - gap) / maxNodesPerLayer) - gap);
+    colStride = nodeWidth + gap;
+    totalWidth = maxNodesPerLayer * colStride;
+  }
+
+  const RS = 6;
+  const gridRows = layers.length * RS;
+  const gridCols = totalWidth;
+  const colCenter = (c: number): number => c * colStride + Math.floor(nodeWidth / 2);
+
+  const g = createGrid(gridRows, gridCols);
+
+  // Mark edges
+  for (const n of nodes) {
+    const fLayer = layerMap.get(n.id);
+    const fCol = colIndex.get(n.id);
+    if (fLayer === undefined || fCol === undefined) continue;
+    for (const childId of n.edges ?? []) {
+      const tLayer = layerMap.get(childId);
+      const tCol = colIndex.get(childId);
+      if (tLayer === undefined || tCol === undefined) continue;
+      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter);
+    }
+  }
+
+  // Build output grids
+  const charGrid: string[][] = [];
+  const tokenGrid: (TokenValue | null)[][] = [];
+  for (let r = 0; r < gridRows; r++) {
+    const charRow: string[] = [];
+    const tokenRow: (TokenValue | null)[] = [];
+    for (let c = 0; c < gridCols; c++) {
+      charRow.push(' ');
+      tokenRow.push(null);
+    }
+    charGrid.push(charRow);
+    tokenGrid.push(tokenRow);
+  }
+
+  // Write edge characters
+  const edgeToken = options.edgeToken ?? ctx.theme.theme.border.muted;
+  for (let r = 0; r < gridRows; r++) {
+    for (let c = 0; c < gridCols; c++) {
+      const cell = g.dirs[r]![c]!;
+      if (cell.size > 0) {
+        charGrid[r]![c] = junctionChar(cell);
+        tokenGrid[r]![c] = edgeToken;
+      }
+    }
+  }
+
+  // Write arrowheads
+  for (const encoded of g.arrows) {
+    const r = Math.floor(encoded / 10000);
+    const c = encoded % 10000;
+    if (r >= 0 && r < gridRows && c >= 0 && c < gridCols) {
+      charGrid[r]![c] = '\u25bc';
+      tokenGrid[r]![c] = edgeToken;
+    }
+  }
+
+  // Highlight edges
+  const highlightSet = new Set(options.highlightPath ?? []);
+  if (options.highlightPath && options.highlightToken) {
+    const hlToken = options.highlightToken;
+    const path = options.highlightPath;
+    for (let i = 0; i < path.length - 1; i++) {
+      const fromId = path[i]!;
+      const toId = path[i + 1]!;
+      const fLayer = layerMap.get(fromId);
+      const tLayer = layerMap.get(toId);
+      const fCol = colIndex.get(fromId);
+      const tCol = colIndex.get(toId);
+      if (fLayer === undefined || tLayer === undefined || fCol === undefined || tCol === undefined) continue;
+
+      const srcC = colCenter(fCol);
+      const dstC = colCenter(tCol);
+      const sRow = fLayer * RS + 3;
+      const dRow = tLayer * RS - 1;
+      const midRow = sRow + 1;
+
+      if (srcC === dstC) {
+        for (let r = sRow; r <= dRow && r < gridRows; r++) {
+          if (srcC < gridCols) tokenGrid[r]![srcC] = hlToken;
+        }
+      } else {
+        if (sRow < gridRows && srcC < gridCols) tokenGrid[sRow]![srcC] = hlToken;
+        const minC = Math.min(srcC, dstC);
+        const maxC2 = Math.max(srcC, dstC);
+        if (midRow < gridRows) {
+          for (let c = minC; c <= maxC2 && c < gridCols; c++) {
+            tokenGrid[midRow]![c] = hlToken;
+          }
+        }
+        for (let r = midRow; r <= dRow && r < gridRows; r++) {
+          if (dstC < gridCols) tokenGrid[r]![dstC] = hlToken;
+        }
+      }
+    }
+  }
+
+  // Write node boxes
+  for (const n of nodes) {
+    const layer = layerMap.get(n.id);
+    const col = colIndex.get(n.id);
+    if (layer === undefined || col === undefined) continue;
+    const startCol = col * colStride;
+    const startRow = layer * RS;
+
+    const boxLines = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
+
+    let nToken: TokenValue;
+    if (highlightSet.has(n.id) && options.highlightToken) {
+      nToken = options.highlightToken;
+    } else if (n.token) {
+      nToken = n.token;
+    } else {
+      nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
+    }
+
+    for (let lineIdx = 0; lineIdx < boxLines.length; lineIdx++) {
+      const row = startRow + lineIdx;
+      if (row >= gridRows) continue;
+      const line = boxLines[lineIdx]!;
+      const chars = [...line];
+      for (let ci = 0; ci < chars.length; ci++) {
+        const gc = startCol + ci;
+        if (gc < gridCols) {
+          charGrid[row]![gc] = chars[ci]!;
+          tokenGrid[row]![gc] = nToken;
+        }
+      }
+    }
+  }
+
+  // Serialize
+  const lines: string[] = [];
+  for (let r = 0; r < gridRows; r++) {
+    let line = '';
+    let prevToken: TokenValue | null = null;
+    let run = '';
+
+    for (let c = 0; c < gridCols; c++) {
+      const ch = charGrid[r]![c]!;
+      const tk = tokenGrid[r]![c]!;
+
+      if (tk === prevToken || (tk === null && prevToken === null)) {
+        run += ch;
+      } else {
+        if (run) {
+          line += prevToken ? ctx.style.styled(prevToken, run) : run;
+        }
+        run = ch;
+        prevToken = tk;
+      }
+    }
+    if (run) {
+      line += prevToken ? ctx.style.styled(prevToken, run) : run;
+    }
+    lines.push(line.replace(/\s+$/, ''));
+  }
+
+  while (lines.length > 0 && lines[lines.length - 1]!.trim() === '') {
+    lines.pop();
+  }
+
+  return lines.join('\n');
+}
+
+// ── Pipe Renderer ──────────────────────────────────────────────────
+
+function renderPipe(nodes: DagNode[]): string {
+  if (nodes.length === 0) return '';
+  const lines: string[] = [];
+  for (const n of nodes) {
+    const edges = n.edges ?? [];
+    const badgePart = n.badge ? ` (${n.badge})` : '';
+    if (edges.length > 0) {
+      const targets = edges
+        .map(id => {
+          const target = nodes.find(t => t.id === id);
+          return target ? target.label : id;
+        })
+        .join(', ');
+      lines.push(`${n.label}${badgePart} -> ${targets}`);
+    } else {
+      lines.push(`${n.label}${badgePart}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+// ── Accessible Renderer ────────────────────────────────────────────
+
+function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>): string {
+  if (nodes.length === 0) return 'Graph: 0 nodes, 0 edges';
+
+  const totalEdges = nodes.reduce((s, n) => s + (n.edges?.length ?? 0), 0);
+  const lines: string[] = [`Graph: ${nodes.length} nodes, ${totalEdges} edges`, ''];
+
+  const layers = buildLayerArrays(nodes, layerMap);
+  const nodeMap = new Map<string, DagNode>();
+  for (const n of nodes) nodeMap.set(n.id, n);
+
+  for (let l = 0; l < layers.length; l++) {
+    lines.push(`Layer ${l + 1}:`);
+    for (const id of layers[l]!) {
+      const n = nodeMap.get(id);
+      if (!n) continue;
+      const badgePart = n.badge ? ` (${n.badge})` : '';
+      const edges = (n.edges ?? []).filter(e => nodeMap.has(e));
+      if (edges.length > 0) {
+        const targets = edges.map(e => nodeMap.get(e)?.label ?? e).join(', ');
+        lines.push(`  ${n.label}${badgePart} -> ${targets}`);
+      } else {
+        lines.push(`  ${n.label}${badgePart} (end)`);
+      }
+    }
+    lines.push('');
+  }
+
+  while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop();
+  return lines.join('\n');
+}
+
+// ── dagSlice ───────────────────────────────────────────────────────
+
+export function dagSlice(
+  nodes: DagNode[],
+  focus: string,
+  opts?: {
+    direction?: 'ancestors' | 'descendants' | 'both';
+    depth?: number;
+  },
+): DagNode[] {
+  const direction = opts?.direction ?? 'both';
+  const maxDepth = opts?.depth ?? Infinity;
+
+  const nodeMap = new Map<string, DagNode>();
+  for (const n of nodes) nodeMap.set(n.id, n);
+
+  if (!nodeMap.has(focus)) return [];
+
+  const included = new Set<string>();
+  const ghostIds = new Set<string>();
+
+  // Build parent map
+  const parentsMap = new Map<string, string[]>();
+  for (const n of nodes) {
+    if (!parentsMap.has(n.id)) parentsMap.set(n.id, []);
+    for (const c of n.edges ?? []) {
+      if (!parentsMap.has(c)) parentsMap.set(c, []);
+      parentsMap.get(c)!.push(n.id);
+    }
+  }
+
+  // BFS ancestors
+  if (direction === 'ancestors' || direction === 'both') {
+    const queue: [string, number][] = [[focus, 0]];
+    const visited = new Set<string>();
+    while (queue.length > 0) {
+      const entry = queue.shift()!;
+      const id = entry[0];
+      const depth = entry[1];
+      if (visited.has(id)) continue;
+      visited.add(id);
+      included.add(id);
+      if (depth < maxDepth) {
+        for (const p of parentsMap.get(id) ?? []) {
+          if (!visited.has(p)) queue.push([p, depth + 1]);
+        }
+      } else {
+        const boundaryParents = (parentsMap.get(id) ?? []).filter(p => !visited.has(p));
+        if (boundaryParents.length > 0) {
+          const ghostId = `__ghost_ancestors_${id}`;
+          ghostIds.add(ghostId);
+          included.add(ghostId);
+        }
+      }
+    }
+  }
+
+  // BFS descendants
+  if (direction === 'descendants' || direction === 'both') {
+    const queue: [string, number][] = [[focus, 0]];
+    const visited = new Set<string>();
+    while (queue.length > 0) {
+      const entry = queue.shift()!;
+      const id = entry[0];
+      const depth = entry[1];
+      if (visited.has(id)) continue;
+      visited.add(id);
+      included.add(id);
+      const ch = nodeMap.get(id)?.edges ?? [];
+      if (depth < maxDepth) {
+        for (const c of ch) {
+          if (!visited.has(c) && nodeMap.has(c)) queue.push([c, depth + 1]);
+        }
+      } else {
+        const boundaryChildren = ch.filter(c => !visited.has(c) && nodeMap.has(c));
+        if (boundaryChildren.length > 0) {
+          const ghostId = `__ghost_descendants_${id}`;
+          ghostIds.add(ghostId);
+          included.add(ghostId);
+        }
+      }
+    }
+  }
+
+  // Build result
+  const result: DagNode[] = [];
+
+  for (const gid of ghostIds) {
+    if (gid.startsWith('__ghost_ancestors_')) {
+      const boundaryId = gid.replace('__ghost_ancestors_', '');
+      const allParents = (parentsMap.get(boundaryId) ?? []).filter(p => !included.has(p));
+      const count = allParents.length;
+      result.push({
+        id: gid,
+        label: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
+        edges: [boundaryId],
+        _ghost: true,
+        _ghostLabel: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
+      });
+    }
+  }
+
+  for (const n of nodes) {
+    if (!included.has(n.id)) continue;
+    const filteredEdges = (n.edges ?? []).filter(e => included.has(e));
+    const descGhostId = `__ghost_descendants_${n.id}`;
+    if (ghostIds.has(descGhostId)) {
+      filteredEdges.push(descGhostId);
+    }
+    result.push({ ...n, edges: filteredEdges.length > 0 ? filteredEdges : undefined });
+  }
+
+  for (const gid of ghostIds) {
+    if (gid.startsWith('__ghost_descendants_')) {
+      const boundaryId = gid.replace('__ghost_descendants_', '');
+      const boundaryNode = nodeMap.get(boundaryId);
+      const allChildren = (boundaryNode?.edges ?? []).filter(c => !included.has(c) && nodeMap.has(c));
+      const count = allChildren.length;
+      result.push({
+        id: gid,
+        label: `... ${count} descendant${count !== 1 ? 's' : ''}`,
+        _ghost: true,
+        _ghostLabel: `... ${count} descendant${count !== 1 ? 's' : ''}`,
+      });
+    }
+  }
+
+  return result;
+}
+
+// ── Main Entry Point ───────────────────────────────────────────────
+
+export function dag(nodes: DagNode[], options: DagOptions = {}): string {
+  const ctx = resolveCtx(options.ctx);
+  const mode = ctx.mode;
+
+  if (nodes.length === 0) return '';
+
+  if (mode === 'pipe') {
+    return renderPipe(nodes);
+  }
+
+  if (mode === 'accessible') {
+    const layerMap = assignLayers(nodes);
+    return renderAccessible(nodes, layerMap);
+  }
+
+  return renderInteractive(nodes, options, ctx);
+}

@@ -48,3 +48,6 @@ export type { PaginatorOptions } from './paginator.js';
 
 export { stepper } from './stepper.js';
 export type { StepperStep, StepperOptions } from './stepper.js';
+
+export { dag, dagSlice } from './dag.js';
+export type { DagNode, DagOptions } from './dag.js';
