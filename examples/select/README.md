@@ -38,3 +38,5 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+[← Examples](../README.md)

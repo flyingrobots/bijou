@@ -1,7 +1,7 @@
 # Examples
 
-> 43 examples · Run any: `npx tsx examples/<name>/main.ts`
-> Record all GIFs: `./scripts/record-gifs.sh`
+> 43 examples · Run any: `npx tsx examples/<name>/main.ts`  
+> Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
 
@@ -26,7 +26,7 @@
 | [`dag`](./dag/) | `dag()` | Directed acyclic graph with status badges |
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
-| [`theme`](./theme/) | Theme system, `resolveTheme()`, presets | Same components in all built-in themes |
+| [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
 
 ## Interactive Forms
 
@@ -42,10 +42,10 @@
 
 | Example | Component | Description |
 |---------|-----------|-------------|
-| [`counter`](./counter/) | TEA runtime (`run()`, `App`, `Cmd`) | Minimal counter — hello world of TEA |
-| [`spinner`](./spinner/) | `spinnerFrame()` + TEA `tick()` | Animated spinner with phase transitions |
-| [`progress-animated`](./progress-animated/) | `createAnimatedProgressBar()` or TEA + `progressBar()` | Progress bar filling to completion |
-| [`progress-download`](./progress-download/) | `progressBar()` + TEA `tick()` | Simulated multi-package download |
+| [`counter`](./counter/) | `run()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
+| [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Animated spinner with phase transitions |
+| [`progress-animated`](./progress-animated/) | `createAnimatedProgressBar()`, `progressBar()` | Progress bar filling to completion |
+| [`progress-download`](./progress-download/) | `progressBar()`, `tick()` | Simulated multi-package download |
 | [`viewport`](./viewport/) | `viewport()`, `scrollBy()`, `pageDown()`, etc. | Scrollable content pager |
 | [`flex-layout`](./flex-layout/) | `flex()`, `vstack()`, `hstack()` | Responsive sidebar + main layout |
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
@@ -53,10 +53,10 @@
 | [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
 | [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
-| [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()`, alt screen | Alternate screen with centered content |
-| [`stopwatch`](./stopwatch/) | TEA `tick()` + view rendering | Stopwatch with laps, start/stop/reset |
+| [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |
+| [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
 | [`chat`](./chat/) | `viewport()` + `input()` + `vstack()` + `flex()` | Chat UI with message input |
 | [`split-editors`](./split-editors/) | `flex()` + `hstack()` + `createInputStack()` | Dual-pane editor with focus switching |
-| [`composable`](./composable/) | Multiple components together | Tabbed dashboard combining many components |
-| [`package-manager`](./package-manager/) | Real-world showcase | Simulated `npm install` (resolve → download → link) |
-| [`splash`](./splash/) | Spring animations + `gradientText()` + `timeline()` | Animated splash screen |
+| [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
+| [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
+| [`splash`](./splash/) | `splash` | Animated splash screen |

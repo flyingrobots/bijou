@@ -35,3 +35,5 @@ console.log(kbd('Ctrl', { ctx }), '+', kbd('C', { ctx }), '  Quit');
 console.log(kbd('Ctrl', { ctx }), '+', kbd('S', { ctx }), '  Save');
 console.log(kbd('Cmd', { ctx }), '+', kbd('Shift', { ctx }), '+', kbd('P', { ctx }), '  Command palette');
 ```
+
+[← Examples](../README.md)

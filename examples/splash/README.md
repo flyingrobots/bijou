@@ -1,4 +1,4 @@
-# Spring animations + `gradientText()` + `timeline()`
+# `splash`
 
 Animated splash screen
 
@@ -127,3 +127,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

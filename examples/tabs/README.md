@@ -45,3 +45,5 @@ console.log(tabs([
   { label: 'Draft' },
 ], { active: 1, ctx }));
 ```
+
+[← Examples](../README.md)

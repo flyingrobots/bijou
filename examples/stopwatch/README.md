@@ -1,4 +1,4 @@
-# TEA `tick()` + view rendering
+# `stopwatch`
 
 Stopwatch with laps, start/stop/reset
 
@@ -100,3 +100,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

@@ -1,4 +1,4 @@
-# `enterScreen()`, `exitScreen()`, alt screen
+# `enterScreen()`
 
 Alternate screen with centered content
 
@@ -63,3 +63,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

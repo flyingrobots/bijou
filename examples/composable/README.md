@@ -1,4 +1,4 @@
-# Multiple components together
+# `composable`
 
 Tabbed dashboard combining many components
 
@@ -147,3 +147,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

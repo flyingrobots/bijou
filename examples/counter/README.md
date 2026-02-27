@@ -1,4 +1,4 @@
-# TEA runtime (`run()`, `App`, `Cmd`)
+# `run()`
 
 Minimal counter — hello world of TEA
 
@@ -55,3 +55,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

@@ -37,3 +37,5 @@ console.log(accordion([
   },
 ], { ctx }));
 ```
+
+[← Examples](../README.md)

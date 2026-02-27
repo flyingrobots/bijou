@@ -1,4 +1,4 @@
-# Theme system, `resolveTheme()`, presets
+# `resolveTheme()`
 
 Same components in all built-in themes
 
@@ -64,3 +64,5 @@ for (const name of Object.keys(PRESETS)) {
   renderTheme(name);
 }
 ```
+
+[← Examples](../README.md)

@@ -40,3 +40,5 @@ const banner = [
 
 console.log(gradientText(banner, cyanMagenta, { style: ctx.style }));
 ```
+
+[← Examples](../README.md)

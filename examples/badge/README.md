@@ -52,3 +52,5 @@ console.log(
   badge('TypeScript', { variant: 'info', ctx }),
 );
 ```
+
+[← Examples](../README.md)

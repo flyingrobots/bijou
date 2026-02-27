@@ -1,4 +1,4 @@
-# Real-world showcase
+# `package-manager`
 
 Simulated `npm install` (resolve → download → link)
 
@@ -149,3 +149,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

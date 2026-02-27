@@ -31,3 +31,5 @@ console.log('Short: ', progressBar(60, { width: 20, ctx }));
 console.log('Medium:', progressBar(60, { width: 40, ctx }));
 console.log('Wide:  ', progressBar(60, { width: 60, ctx }));
 ```
+
+[← Examples](../README.md)

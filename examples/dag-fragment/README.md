@@ -56,3 +56,5 @@ const neighborhood = dagSlice(nodes, 'resolver', { direction: 'both', depth: 2 }
 console.log(dag(neighborhood, { ctx }));
 console.log();
 ```
+
+[← Examples](../README.md)

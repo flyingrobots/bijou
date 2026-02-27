@@ -1,4 +1,4 @@
-# `progressBar()` + TEA `tick()`
+# `progressBar()`
 
 Simulated multi-package download
 
@@ -113,3 +113,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

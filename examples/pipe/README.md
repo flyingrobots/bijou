@@ -1,4 +1,4 @@
-# `detectOutputMode()`, all components
+# `detectOutputMode()`
 
 Same components in interactive/pipe/accessible mode
 
@@ -65,3 +65,5 @@ console.log(renderSample('pipe', pipe));
 console.log();
 console.log(renderSample('accessible', accessible));
 ```
+
+[← Examples](../README.md)

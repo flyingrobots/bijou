@@ -56,3 +56,5 @@ console.log(table({
   ctx,
 }));
 ```
+
+[← Examples](../README.md)

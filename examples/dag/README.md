@@ -42,3 +42,5 @@ console.log(dag(nodes, {
 }));
 console.log();
 ```
+
+[← Examples](../README.md)

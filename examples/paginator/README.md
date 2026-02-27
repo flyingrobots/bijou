@@ -31,3 +31,5 @@ for (const page of [0, 4, 9]) {
   console.log(paginator({ current: page, total: 10, style: 'text', ctx }));
 }
 ```
+
+[← Examples](../README.md)

@@ -1,4 +1,4 @@
-# `spinnerFrame()` + TEA `tick()`
+# `spinnerFrame()`
 
 Animated spinner with phase transitions
 
@@ -74,3 +74,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)

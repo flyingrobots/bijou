@@ -33,3 +33,5 @@ console.log();
 
 console.log(breadcrumb(['root', 'usr', 'local', 'bin'], { separator: '/', ctx }));
 ```
+
+[← Examples](../README.md)

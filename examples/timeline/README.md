@@ -29,3 +29,5 @@ console.log(timeline([
   { label: 'v1.0.0', description: 'Stable API, full test coverage', status: 'muted' },
 ], { ctx }));
 ```
+
+[← Examples](../README.md)

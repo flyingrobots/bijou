@@ -24,3 +24,5 @@ console.log(alert('chalk@4 is deprecated. Upgrade to chalk@5 for ESM support.', 
 console.log();
 console.log(alert('A new version of bijou is available: 0.3.0', { variant: 'info', ctx }));
 ```
+
+[← Examples](../README.md)

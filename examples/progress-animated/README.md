@@ -1,4 +1,4 @@
-# `createAnimatedProgressBar()` or TEA + `progressBar()`
+# `createAnimatedProgressBar()`
 
 Progress bar filling to completion
 
@@ -69,3 +69,5 @@ const app: App<Model, Msg> = {
 
 run(app);
 ```
+
+[← Examples](../README.md)
