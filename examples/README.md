@@ -33,6 +33,16 @@ vhs examples/<name>/demo.tape
 | [progress-static](./progress-static/) | `progressBar()` | Static progress bars at various states |
 | [gradient-text](./gradient-text/) | `gradientText()` | Gradient-colored text rendering |
 
+## Interactive Forms
+
+| Example | Component | Description |
+|---------|-----------|-------------|
+| [confirm](./confirm/) | `confirm()` | Yes/no confirmation prompt |
+| [input](./input/) | `input()` | Text input with validation |
+| [select](./select/) | `select()` | Single-select menu |
+| [multiselect](./multiselect/) | `multiselect()` | Checkbox multi-select |
+| [form-group](./form-group/) | `group()` | Multi-field form wizard |
+
 ## TUI Apps
 
 | Example | Component | Description |
