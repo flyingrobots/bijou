@@ -1,6 +1,6 @@
 # Examples
 
-> 43 examples · Run any: `npx tsx examples/<name>/main.ts`  
+> 45 examples · Run any: `npx tsx examples/<name>/main.ts`  
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -57,6 +57,8 @@
 | [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
 | [`chat`](./chat/) | `viewport()` + `input()` + `vstack()` + `flex()` | Chat UI with message input |
 | [`split-editors`](./split-editors/) | `flex()` + `hstack()` + `createInputStack()` | Dual-pane editor with focus switching |
+| [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
+| [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

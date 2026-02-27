@@ -127,3 +127,34 @@ export {
   type InputStack,
   createInputStack,
 } from './inputstack.js';
+
+// Pager — scrollable text viewer
+export {
+  type PagerState,
+  type PagerOptions,
+  type PagerRenderOptions,
+  createPagerState,
+  pager,
+  pagerScrollBy,
+  pagerScrollTo,
+  pagerScrollToTop,
+  pagerScrollToBottom,
+  pagerPageDown,
+  pagerPageUp,
+  pagerSetContent,
+  pagerKeyMap,
+} from './pager.js';
+
+// Interactive accordion
+export {
+  type AccordionState,
+  type InteractiveAccordionOptions,
+  createAccordionState,
+  interactiveAccordion,
+  focusNext,
+  focusPrev,
+  toggleFocused,
+  expandAll,
+  collapseAll,
+  accordionKeyMap,
+} from './accordion.js';
