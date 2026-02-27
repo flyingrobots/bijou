@@ -20,6 +20,8 @@ export interface DagOptions {
   edgeToken?: TokenValue;
   highlightPath?: string[];
   highlightToken?: TokenValue;
+  selectedId?: string;
+  selectedToken?: TokenValue;
   nodeWidth?: number;
   maxWidth?: number;
   direction?: 'down' | 'right';
@@ -449,7 +451,9 @@ function renderInteractive(
     const boxLines = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
 
     let nToken: TokenValue;
-    if (highlightSet.has(n.id) && options.highlightToken) {
+    if (options.selectedId === n.id) {
+      nToken = options.selectedToken ?? ctx.theme.theme.ui.cursor;
+    } else if (highlightSet.has(n.id) && options.highlightToken) {
       nToken = options.highlightToken;
     } else if (n.token) {
       nToken = n.token;

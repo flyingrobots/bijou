@@ -10,6 +10,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 #### Core (`@flyingrobots/bijou`)
 
+- **`dag()` `selectedId`/`selectedToken`** — cursor-style node highlighting with highest priority over highlight path
 - **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength, and Ctrl+D submit / Ctrl+C cancel
 - **`filter()`** — fuzzy-filter select form with real-time search by label and keywords, customizable match function, and configurable max visible items
 

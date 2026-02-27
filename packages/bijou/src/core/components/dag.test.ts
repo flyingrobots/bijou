@@ -317,6 +317,45 @@ describe('dag', () => {
       expect(result).not.toContain('missing');
     });
   });
+
+  // ── selectedId ──────────────────────────────────────────────────
+
+  describe('selectedId', () => {
+    it('renders with selectedId without error', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const result = dag(twoNodes, { selectedId: 'a', ctx });
+      expect(result).toContain('Alpha');
+      expect(result).toContain('Beta');
+    });
+
+    it('selectedId takes precedence over highlightPath', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      // Both highlight and select node 'a' — should not crash
+      const result = dag(diamond, {
+        selectedId: 'a',
+        highlightPath: ['a', 'b', 'd'],
+        highlightToken: { hex: '#ff0000' },
+        ctx,
+      });
+      expect(result).toContain('Start');
+    });
+
+    it('non-selected nodes are unaffected', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const withSelected = dag(twoNodes, { selectedId: 'a', ctx });
+      const without = dag(twoNodes, { ctx });
+      // Both should contain Beta — it is not selected
+      expect(withSelected).toContain('Beta');
+      expect(without).toContain('Beta');
+    });
+
+    it('defaults to ui.cursor token when selectedToken omitted', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      // Should not throw — uses default cursor token
+      const result = dag(twoNodes, { selectedId: 'a', ctx });
+      expect(result).toContain('Alpha');
+    });
+  });
 });
 
 // ── dagSlice Tests ─────────────────────────────────────────────────
