@@ -1,6 +1,6 @@
 Output examples/separator/demo.gif
 Set Shell zsh
-Set FontFamily "Berkeley Mono"
+Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
 Set Width 100
 Set Height 24

@@ -1,6 +1,6 @@
 Output examples/composable/demo.gif
 Set Shell zsh
-Set FontFamily "Berkeley Mono"
+Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
 Set Width 90
 Set Height 30
