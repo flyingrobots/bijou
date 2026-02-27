@@ -104,7 +104,7 @@ export interface SlicedDagSource extends DagSource {
 
 **The flow: Source → Slice → Render**
 
-```
+```text
 DagSource          dagSlice()              dag()
 (your graph,  →  (BFS bounded walk,  →  (Sugiyama on the
  unbounded)       ghost boundaries)       bounded result)
