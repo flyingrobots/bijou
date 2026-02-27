@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-02-27
+
 ### Added
 
 #### Core (`@flyingrobots/bijou`)
@@ -17,6 +19,34 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`DagSliceOptions`** — extracted named type for `dagSlice()` options
 - **`dag()`, `dagSlice()`, `dagLayout()` overloads** — accept `SlicedDagSource` or `DagNode[]`; existing callers are unaffected
 - **`dagSlice()` returns `SlicedDagSource`** when given `DagSource` input, enabling composable slice-of-slice chains; purely traversal-based (no full-graph enumeration)
+
+#### Examples
+
+```typescript
+// Wrap an external graph (database, API, etc.) — no DagNode[] conversion
+const graph: DagSource = {
+  has: (id) => db.exists(id),
+  label: (id) => db.getTitle(id),
+  children: (id) => db.getDependencies(id),
+  parents: (id) => db.getDependents(id),
+  badge: (id) => db.getStatus(id),
+};
+
+// BFS-walk only the ~20 nodes you need — never loads the full graph
+const slice = dagSlice(graph, 'TASK-42', { depth: 2, direction: 'both' });
+
+// Render the bounded slice
+console.log(dag(slice, { ctx }));
+
+// Composable: slice a slice
+const narrower = dagSlice(slice, 'TASK-42', { depth: 1, direction: 'descendants' });
+
+// Existing DagNode[] API is unchanged
+dag([
+  { id: 'a', label: 'Build', edges: ['b'] },
+  { id: 'b', label: 'Test' },
+]);
+```
 
 ## [0.4.0] — 2026-02-27
 

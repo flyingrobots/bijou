@@ -93,7 +93,7 @@ interface BijouContext {
 |----------|----------|
 | **Layout** | `box()`, `headerBox()`, `separator()` |
 | **Elements** | `badge()`, `alert()`, `kbd()`, `skeleton()` |
-| **Data** | `table()`, `tree()`, `accordion()`, `timeline()` |
+| **Data** | `table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()` + `DagSource` adapter |
 | **Navigation** | `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` |
 | **Animation** | `spinner()`, `progressBar()`, `gradientText()` |
 | **Forms** | `input()`, `select()`, `multiselect()`, `confirm()`, `group()` |

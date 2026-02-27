@@ -4,12 +4,11 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
-## What's New in 0.4.0?
+## What's New in 0.5.0?
 
-- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength
-- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords
-- **`dagLayout()`** — returns node position map alongside rendered output, for interactive DAG navigation
-- **`dag()` `selectedId`** — cursor-style node highlighting with highest priority over highlight path
+- **`DagSource` adapter** — bring your own graph representation (database, API, adjacency matrix). DAG rendering no longer requires `DagNode[]`
+- **Traversal-based slicing** — `dagSlice()` BFS-walks via `has()`/`children()`/`parents()`, never enumerates the full graph
+- **Composable slices** — `dagSlice()` returns a `SlicedDagSource` when given `DagSource`, enabling slice-of-slice chains
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
@@ -42,7 +41,7 @@ console.log(box('Hello, world!'));
 `badge()`, `alert()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
 
 ### Data
-`table()`, `tree()`, `accordion()`, `timeline()` — structured data display.
+`table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()` — structured data display and DAG rendering with `DagSource` adapter for external graphs.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.

@@ -86,7 +86,7 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `badge` / `alert` / `kbd` | ✅ Stable | Semantic status and keyboard indicators. |
 | `progress` / `spinner` | ✅ Stable | Visual feedback for long-running tasks. |
 | `timeline` | ✅ Stable | Vertical event visualization. |
-| `dag` / `dagSlice` | ✅ Stable | Directed acyclic graph with auto-layout, edge routing, and subgraph slicing. |
+| `dag` / `dagSlice` | ✅ Stable | Directed acyclic graph with auto-layout, edge routing, subgraph slicing, and `DagSource` adapter for external graphs. |
 | `skeleton` | ✅ Stable | Loading placeholders for data-heavy views. |
 | `textarea` | ✅ Stable | Multi-line, scrollable text entry. |
 | `filter` | ✅ Stable | Fuzzy type-to-filter list component. |
