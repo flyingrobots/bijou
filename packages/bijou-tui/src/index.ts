@@ -159,6 +159,19 @@ export {
   createPanelGroup,
 } from './panels.js';
 
+// Overlay compositing
+export {
+  type Overlay,
+  type CompositeOptions,
+  type ModalOptions,
+  type ToastVariant,
+  type ToastAnchor,
+  type ToastOptions,
+  composite,
+  modal,
+  toast,
+} from './overlay.js';
+
 // Interactive accordion
 export {
   type AccordionState,

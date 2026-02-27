@@ -22,6 +22,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`createPanelGroup()`** — multi-pane focus management with hotkey switching, per-panel KeyMap delegation, InputStack integration, and formatted labels
 - **`pager()`** — scrollable content viewer building block wrapping `viewport()` with a status line, position tracking, and convenience keymap (`j/k` scroll, `d/u` page, `g/G` top/bottom, `q` quit)
 - **`interactiveAccordion()`** — navigable accordion building block wrapping static `accordion()` with focus tracking, expand/collapse transformers, and convenience keymap (`j/k` navigate, `Enter/Space` toggle, `q` quit)
+- **`composite()`** — ANSI-safe overlay compositing with dim background support
+- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
+- **`toast()`** — anchored notification overlay with success/error/info variants
 
 ## [0.3.0] — 2026-02-27
 
