@@ -143,7 +143,7 @@ results.sort((a, b) => a.name.localeCompare(b.name));
 
 const rows = results.map(r => [
   r.name,
-  r.status === 'success' ? '✓' : '✗',
+  r.status === 'success' ? '✅' : '❌',
   `${(r.elapsed / 1000).toFixed(1)}s`,
 ]);
 
