@@ -2,9 +2,9 @@
 
 Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
 
-## What's New in 0.3.0?
+## What's New in 0.4.0?
 
-- Lock-step version bump with `@flyingrobots/bijou` v0.3.0 (DAG renderer)
+- Lock-step version bump with `@flyingrobots/bijou` v0.4.0 (overlay primitives, interactive building blocks, new forms)
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 

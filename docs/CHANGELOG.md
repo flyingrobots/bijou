@@ -6,6 +6,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-02-27
+
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dag()` `selectedId`/`selectedToken`** — cursor-style node highlighting with highest priority over highlight path
+- **`dagLayout()`** — returns node position map (`DagNodePosition`) and grid dimensions alongside rendered output, for interactive DAG navigation
+- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength, and Ctrl+D submit / Ctrl+C cancel
+- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords, customizable match function, and configurable max visible items
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`stripAnsi()`**, **`visibleLength()`**, **`clipToWidth()`** — publicly exported ANSI utility functions from viewport module
+- **viewport `scrollX`** — horizontal scrolling support with `sliceAnsi()`, `scrollByX()`, `scrollToX()`
+- **`createPanelGroup()`** — multi-pane focus management with hotkey switching, per-panel KeyMap delegation, InputStack integration, and formatted labels
+- **`pager()`** — scrollable content viewer building block wrapping `viewport()` with a status line, position tracking, and convenience keymap (`j/k` scroll, `d/u` page, `g/G` top/bottom, `q` quit)
+- **`interactiveAccordion()`** — navigable accordion building block wrapping static `accordion()` with focus tracking, expand/collapse transformers, and convenience keymap (`j/k` navigate, `Enter/Space` toggle, `q` quit)
+- **`composite()`** — ANSI-safe overlay compositing with dim background support
+- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
+- **`toast()`** — anchored notification overlay with success/error/info variants
+
 ### Fixed
 
 #### Core (`@flyingrobots/bijou`)
@@ -33,28 +55,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **pager example** — removed unused `kbd` import; preserve scroll position across terminal resize
 - **accordion example** — removed unused `separator` import
 - **ROADMAP P1.75** — clarified that `dagStats()` is deferred, not shipped with overlay primitives
-
-## [0.4.0] — 2026-02-27
-
-### Added
-
-#### Core (`@flyingrobots/bijou`)
-
-- **`dag()` `selectedId`/`selectedToken`** — cursor-style node highlighting with highest priority over highlight path
-- **`dagLayout()`** — returns node position map (`DagNodePosition`) and grid dimensions alongside rendered output, for interactive DAG navigation
-- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength, and Ctrl+D submit / Ctrl+C cancel
-- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords, customizable match function, and configurable max visible items
-
-#### TUI runtime (`@flyingrobots/bijou-tui`)
-
-- **`stripAnsi()`**, **`visibleLength()`**, **`clipToWidth()`** — publicly exported ANSI utility functions from viewport module
-- **viewport `scrollX`** — horizontal scrolling support with `sliceAnsi()`, `scrollByX()`, `scrollToX()`
-- **`createPanelGroup()`** — multi-pane focus management with hotkey switching, per-panel KeyMap delegation, InputStack integration, and formatted labels
-- **`pager()`** — scrollable content viewer building block wrapping `viewport()` with a status line, position tracking, and convenience keymap (`j/k` scroll, `d/u` page, `g/G` top/bottom, `q` quit)
-- **`interactiveAccordion()`** — navigable accordion building block wrapping static `accordion()` with focus tracking, expand/collapse transformers, and convenience keymap (`j/k` navigate, `Enter/Space` toggle, `q` quit)
-- **`composite()`** — ANSI-safe overlay compositing with dim background support
-- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
-- **`toast()`** — anchored notification overlay with success/error/info variants
 
 ## [0.3.0] — 2026-02-27
 
