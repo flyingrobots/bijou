@@ -1,6 +1,6 @@
 Output examples/dag-fragment/demo.gif
 Set Shell zsh
-Set FontFamily "Berkeley Mono"
+Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
 Set Width 1400
 Set Height 2800
