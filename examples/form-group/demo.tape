@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/form-group/main.ts"
 Enter
-Sleep 1s
+Sleep 3s
 
 # Project name
 Type "my-app"

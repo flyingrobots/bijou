@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/spring/main.ts"
 Enter
-Sleep 3s
+Sleep 5s
 
 Space
 Sleep 3s

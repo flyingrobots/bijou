@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/select/main.ts"
 Enter
-Sleep 1s
+Sleep 3s
 
 Down
 Sleep 300ms

@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/fullscreen/main.ts"
 Enter
-Sleep 2s
+Sleep 4s
 Sleep 2s
 
 Type "q"

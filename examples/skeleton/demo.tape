@@ -9,4 +9,4 @@ Set Padding 20
 
 Type "npx tsx examples/skeleton/main.ts"
 Enter
-Sleep 3s
+Sleep 5s

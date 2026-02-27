@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/viewport/main.ts"
 Enter
-Sleep 1s
+Sleep 3s
 
 # Scroll down
 Type "jjjjj"

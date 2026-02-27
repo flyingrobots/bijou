@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/composable/main.ts"
 Enter
-Sleep 2s
+Sleep 4s
 
 Right
 Sleep 1500ms

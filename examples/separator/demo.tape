@@ -9,4 +9,4 @@ Set Padding 20
 
 Type "npx tsx examples/separator/main.ts"
 Enter
-Sleep 3s
+Sleep 5s

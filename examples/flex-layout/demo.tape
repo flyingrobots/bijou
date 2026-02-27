@@ -9,7 +9,7 @@ Set Padding 20
 
 Type "npx tsx examples/flex-layout/main.ts"
 Enter
-Sleep 3s
+Sleep 5s
 
 Type "q"
 Sleep 500ms
