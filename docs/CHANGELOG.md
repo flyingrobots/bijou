@@ -20,6 +20,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`dag()`, `dagSlice()`, `dagLayout()` overloads** — accept `SlicedDagSource` or `DagNode[]`; existing callers are unaffected
 - **`dagSlice()` returns `SlicedDagSource`** when given `DagSource` input, enabling composable slice-of-slice chains; purely traversal-based (no full-graph enumeration)
 
+### Fixed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`arraySource()` mutable reference leak** — `children()` and `parents()` now return defensive copies instead of exposing internal mutable arrays
+- **`sliceSource()` ghost children leak** — ghost boundary `children()` now returns a copy instead of the internal edges array
+- **`isSlicedDagSource()` incomplete guard** — now checks for `ghostLabel` method in addition to `ids` and `ghost`
+- **`dagSlice()` default direction crash** — silently downgrades `'both'` to `'descendants'` when `parents()` is missing (only throws if `'ancestors'` was explicitly requested)
+- **`dag()`/`dagLayout()` unbounded source guard** — throws a clear error if passed an unbounded `DagSource` directly
+- **Inherited ghost preservation** — slice-of-slice now preserves ghost status from the input slice, preventing ghost nodes from rendering with solid borders
+- **`sliceSource()` parent fallback performance** — replaced O(n×m) scan with precomputed parent map built during BFS
+
 ## [0.4.0] — 2026-02-27
 
 ### Added
