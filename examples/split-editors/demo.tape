@@ -2,8 +2,8 @@ Output examples/split-editors/demo.gif
 Set Shell zsh
 Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
-Set Width 100
-Set Height 28
+Set Width 1200
+Set Height 616
 Set Theme "Catppuccin Mocha"
 Set Padding 20
 

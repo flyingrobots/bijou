@@ -2,8 +2,8 @@ Output examples/spinner/demo.gif
 Set Shell zsh
 Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
-Set Width 60
-Set Height 10
+Set Width 720
+Set Height 220
 Set Theme "Catppuccin Mocha"
 Set Padding 20
 

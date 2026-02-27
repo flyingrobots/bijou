@@ -2,8 +2,8 @@ Output examples/spring/demo.gif
 Set Shell zsh
 Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
-Set Width 70
-Set Height 16
+Set Width 840
+Set Height 352
 Set Theme "Catppuccin Mocha"
 Set Padding 20
 

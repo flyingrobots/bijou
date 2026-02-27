@@ -159,10 +159,19 @@ console.log(table({
 console.log();
 
 if (failures.length > 0) {
-  console.log(alert(
-    `${failures.length} failed: ${failures.map(f => f.name).join(', ')}`,
-    { variant: 'error', ctx },
-  ));
+  const names = failures.map(f => f.name);
+  const lines: string[] = [`${failures.length} failed:`];
+  let line = ' ';
+  for (const name of names) {
+    if (line.length + name.length + 2 > 70) {
+      lines.push(line);
+      line = '  ' + name + ',';
+    } else {
+      line += ' ' + name + ',';
+    }
+  }
+  lines.push(line.replace(/,$/, ''));
+  console.log(alert(lines.join('\n'), { variant: 'error', ctx }));
 } else {
   const totalTime = results.reduce((s, r) => s + r.elapsed, 0);
   console.log(alert(

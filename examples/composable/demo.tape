@@ -2,8 +2,8 @@ Output examples/composable/demo.gif
 Set Shell zsh
 Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
-Set Width 90
-Set Height 30
+Set Width 1080
+Set Height 660
 Set Theme "Catppuccin Mocha"
 Set Padding 20
 

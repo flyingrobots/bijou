@@ -2,8 +2,8 @@ Output examples/print-key/demo.gif
 Set Shell zsh
 Set FontFamily "Monaspace Radon NF"
 Set FontSize 14
-Set Width 80
-Set Height 30
+Set Width 960
+Set Height 660
 Set Theme "Catppuccin Mocha"
 Set Padding 20
 
