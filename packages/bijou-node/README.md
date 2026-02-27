@@ -6,7 +6,7 @@ Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
 
 - **`onResize()` support** — `nodeIO()` now listens to `process.stdout` resize events, enabling terminal resize detection in TUI apps
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
 ## Install
 

@@ -395,6 +395,7 @@ Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). P
 
 | Feature | Package | Notes |
 |---------|---------|-------|
+| **Interactive `accordion()`** | bijou-tui | TEA wrapper around static `accordion()` — `j`/`k` navigate, `Enter`/`Space` toggle fold, `q` quit. |
 | **`textarea()`** | bijou | Multi-line text input with scroll, line numbers, char limit. |
 | **`filter()`** | bijou | Fuzzy type-to-filter from a list. |
 | **`browsableList()`** | bijou-tui | Rich list with keyboard nav, filtering, pagination, status. Beyond `select()`. |
@@ -407,6 +408,7 @@ Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). P
 
 | Feature | Package | Notes |
 |---------|---------|-------|
+| **CLI/stdin component driver** | bijou-tui | Drive component state via CLI flags (`--accordion.open(3)`) or streaming stdin commands. Enables scripted demos, testing, and external control of running TUI apps. |
 | **`place()`** | bijou | 2D text placement with horizontal + vertical alignment. |
 | **`enumeratedList()`** | bijou | Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet). |
 | **Terminal hyperlinks** | bijou | Clickable OSC 8 links with graceful fallback. |

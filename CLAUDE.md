@@ -12,7 +12,7 @@
 
 At the end of every turn that alters files, ALWAYS:
 
-1. Update CHANGELOG.md if necessary
+1. Update docs/CHANGELOG.md if necessary
 2. Bump version if necessary
 3. Update documentation as needed
 4. `git add -A`

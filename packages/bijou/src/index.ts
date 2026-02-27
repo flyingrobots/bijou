@@ -123,6 +123,10 @@ export {
   stepper,
   type StepperStep,
   type StepperOptions,
+  dag,
+  dagSlice,
+  type DagNode,
+  type DagOptions,
 } from './core/components/index.js';
 
 // Forms

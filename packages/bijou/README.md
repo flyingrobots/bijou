@@ -8,7 +8,7 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 - **`IOPort.onResize()`** — new port method for terminal resize events, enabling TUI apps to reflow layout when the terminal is resized
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
 ## Install
 

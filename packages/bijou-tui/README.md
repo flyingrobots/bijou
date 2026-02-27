@@ -17,7 +17,7 @@ Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [G
 - **Help generator** — `helpView()`, `helpShort()`, `helpFor()` auto-generated from registered keybindings.
 - **Input stack** — `createInputStack()` for layered input dispatch with opaque (modal) and passthrough layers.
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/CHANGELOG.md) for the full release history.
+See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
 ## Install
 

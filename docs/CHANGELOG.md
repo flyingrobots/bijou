@@ -6,6 +6,31 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dag()`** — ASCII DAG renderer with auto-layout (Sugiyama-Lite), edge routing, badges, per-node tokens, path highlighting, and graceful degradation (interactive/pipe/accessible modes)
+- **`dagSlice()`** — extract subgraphs (ancestors/descendants/neighborhood) with ghost boundary nodes for rendering fragments of large DAGs
+
+### Fixed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dag()` dangling edges** — edges pointing to node IDs not present in the graph no longer trigger a false "cycle detected" error; they are silently filtered out
+
+### Documentation
+
+- **43 example READMEs** — each example now has its own README with description, run command, GIF demo, and embedded source code
+- **Examples master-of-contents** — `examples/README.md` with categorized table (Static, Forms, TUI Apps) linking all 43 examples
+- **GIF demos** — recorded demo GIFs for all 43 examples via VHS tapes
+- **Docs reorganization** — moved root-level docs (ARCHITECTURE, CHANGELOG, EXAMPLES, ROADMAP) into `docs/` directory
+
+### Build
+
+- Added `tsx` as devDependency to eliminate npx cold-start spinner in examples
+- Added `record-gifs.ts` script with parallel GIF recording and bijou-powered progress UI
+
 ## [0.2.0] — 2026-02-26
 
 ### Added
@@ -103,5 +128,6 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
