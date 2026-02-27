@@ -10,6 +10,7 @@ Thumbs.db
 *.swo
 .idea/
 .vscode/
+.obsidian/
 *.sublime-workspace
 
 # Env
