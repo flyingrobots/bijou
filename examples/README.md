@@ -60,3 +60,15 @@ vhs examples/<name>/demo.tape
 | [spring](./spring/) | `animate()` + `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [timeline-anim](./timeline-anim/) | `sequence()` + `animate()` | Orchestrated GSAP-style animation |
 | [splash](./splash/) | Spring + tween + `gradientText()` | Animated splash screen |
+| [flex-layout](./flex-layout/) | `flex()` | Responsive sidebar + main layout |
+| [chat](./chat/) | `viewport()` + `flex()` | Chat UI with message input |
+| [split-editors](./split-editors/) | `flex()` + `viewport()` | Dual-pane editor with focus switching |
+| [composable](./composable/) | Multiple components | Tabbed dashboard combining many components |
+| [package-manager](./package-manager/) | Real-world showcase | Simulated `npm install` (resolve → download → link) |
+
+## Cross-Cutting
+
+| Example | Component | Description |
+|---------|-----------|-------------|
+| [pipe](./pipe/) | Output modes | Same components in interactive/pipe/accessible mode |
+| [theme](./theme/) | Theme presets | Same components in all 4 built-in themes |
