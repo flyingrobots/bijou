@@ -4,18 +4,9 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.2.0?
+## What's New in 0.3.0?
 
-- **Industrial-Grade Renderer** — Flicker-free, scroll-safe rendering loop with `WRAP_DISABLE` and `CLEAR_LINE_TO_END` support.
-- **Spring animation engine** — physics-based springs with 6 presets, plus multi-frame emission for 60fps+ fluidity.
-- **`animate()`** — GSAP-style animation commands for TEA, with `onComplete` signals and `immediate: true` for reduced-motion.
-- **`viewport()`** — scrollable content pane with proportional scrollbar and ANSI-aware clipping.
-- **`flex()`** — flexbox layout with grow/basis/min/max, true horizontal centering, and auto-reflow.
-- **`ResizeMsg`** — terminal resize events auto-dispatched by the runtime.
-- **`EventBus`** — centralized typed event emitter unifying keyboard, resize, and multi-message commands.
-- **Keybinding manager** — `createKeyMap()` for declarative key binding with modifiers, named groups, runtime enable/disable.
-- **Help generator** — `helpView()`, `helpShort()`, `helpFor()` auto-generated from registered keybindings.
-- **Input stack** — `createInputStack()` for layered input dispatch with opaque (modal) and passthrough layers.
+- Lock-step version bump with `@flyingrobots/bijou` v0.3.0 (DAG renderer)
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 

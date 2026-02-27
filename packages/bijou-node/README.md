@@ -2,9 +2,9 @@
 
 Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
 
-## What's New in 0.2.0?
+## What's New in 0.3.0?
 
-- **`onResize()` support** — `nodeIO()` now listens to `process.stdout` resize events, enabling terminal resize detection in TUI apps
+- Lock-step version bump with `@flyingrobots/bijou` v0.3.0 (DAG renderer)
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 

@@ -4,9 +4,10 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
-## What's New in 0.2.0?
+## What's New in 0.3.0?
 
-- **`IOPort.onResize()`** — new port method for terminal resize events, enabling TUI apps to reflow layout when the terminal is resized
+- **`dag()`** — ASCII DAG renderer with auto-layout (Sugiyama-Lite), edge routing, badges, per-node tokens, path highlighting, and graceful degradation
+- **`dagSlice()`** — extract subgraphs (ancestors/descendants/neighborhood) with ghost boundary nodes
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 

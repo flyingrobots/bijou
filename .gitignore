@@ -11,6 +11,7 @@ Thumbs.db
 .idea/
 .vscode/
 .obsidian/
+.claude/settings.local.json
 *.sublime-workspace
 
 # Env
