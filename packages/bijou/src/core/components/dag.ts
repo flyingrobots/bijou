@@ -50,15 +50,17 @@ function assignLayers(nodes: DagNode[]): Map<string, number> {
   const children = new Map<string, string[]>();
   const parents = new Map<string, string[]>();
   const inDegree = new Map<string, number>();
+  const nodeIds = new Set(nodes.map(n => n.id));
 
   for (const n of nodes) {
-    children.set(n.id, n.edges ?? []);
+    // Filter edges to only include targets that exist in the graph
+    children.set(n.id, (n.edges ?? []).filter(e => nodeIds.has(e)));
     inDegree.set(n.id, 0);
     if (!parents.has(n.id)) parents.set(n.id, []);
   }
 
   for (const n of nodes) {
-    for (const childId of n.edges ?? []) {
+    for (const childId of children.get(n.id) ?? []) {
       if (!parents.has(childId)) parents.set(childId, []);
       parents.get(childId)!.push(n.id);
       inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);

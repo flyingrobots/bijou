@@ -303,6 +303,19 @@ describe('dag', () => {
       ];
       expect(() => dag(selfLoop, { ctx })).toThrow('cycle detected');
     });
+
+    it('ignores dangling edge targets without false cycle error', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const dangling: DagNode[] = [
+        { id: 'a', label: 'A', edges: ['missing'] },
+        { id: 'b', label: 'B' },
+      ];
+      // Should not throw — dangling edges are silently ignored
+      const result = dag(dangling, { ctx });
+      expect(result).toContain('A');
+      expect(result).toContain('B');
+      expect(result).not.toContain('missing');
+    });
   });
 });
 
