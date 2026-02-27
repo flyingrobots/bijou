@@ -78,6 +78,9 @@ export {
   scrollToBottom,
   pageDown,
   pageUp,
+  stripAnsi,
+  visibleLength,
+  clipToWidth,
 } from './viewport.js';
 
 // Timeline — GSAP-style animation orchestration

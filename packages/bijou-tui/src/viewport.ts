@@ -39,11 +39,11 @@ export interface ScrollState {
 
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
 
-function stripAnsi(str: string): string {
+export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
-function visibleLength(str: string): number {
+export function visibleLength(str: string): number {
   return stripAnsi(str).length;
 }
 
@@ -51,7 +51,7 @@ function visibleLength(str: string): number {
  * Clip a string to a maximum visible width, preserving ANSI escapes.
  * Appends a reset sequence if the string was clipped mid-style.
  */
-function clipToWidth(str: string, maxWidth: number): string {
+export function clipToWidth(str: string, maxWidth: number): string {
   let visible = 0;
   let result = '';
   let inEscape = false;
