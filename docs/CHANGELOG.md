@@ -46,6 +46,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`interactiveAccordion()` focusIndex normalization** — normalizes stale/out-of-range focus index before rendering to prevent undefined focus behavior
 - **`interactiveAccordion()` continuation indentation** — continuation-line padding now matches the focus prefix width for custom `focusChar` values
 - **`sliceAnsi()` ANSI leak** — appends reset sequence when the source string ends with an active style, preventing style bleed into subsequent content
+- **viewport tests** — replaced inline ANSI-stripping regexes with the imported `stripAnsi()` utility
+
+### Documentation
+
+- **textarea example** — fixed `box()` call with nonexistent `title` option; replaced with `headerBox()`
+- **textarea example** — use nullish check (`!= null`) instead of truthy check for cancellation detection
+- **pager example** — removed unused `kbd` import; preserve scroll position across terminal resize
+- **accordion example** — removed unused `separator` import
+- **ROADMAP P1.75** — clarified that `dagStats()` is deferred, not shipped with overlay primitives
 
 ## [0.3.0] — 2026-02-27
 
