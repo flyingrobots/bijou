@@ -32,3 +32,14 @@ vhs examples/<name>/demo.tape
 | [tabs](./tabs/) | `tabs()` | Tab bar navigation with badges |
 | [progress-static](./progress-static/) | `progressBar()` | Static progress bars at various states |
 | [gradient-text](./gradient-text/) | `gradientText()` | Gradient-colored text rendering |
+
+## TUI Apps
+
+| Example | Component | Description |
+|---------|-----------|-------------|
+| [counter](./counter/) | TEA runtime | Minimal counter — hello world of TEA |
+| [spinner](./spinner/) | `spinnerFrame()` + `tick()` | Animated spinner with phase transitions |
+| [progress-animated](./progress-animated/) | `progressBar()` + `tick()` | Progress bar filling to completion |
+| [fullscreen](./fullscreen/) | Alt screen | Alternate screen with centered content |
+| [print-key](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
+| [stopwatch](./stopwatch/) | `tick()` + state | Stopwatch with laps, start/stop/reset |
