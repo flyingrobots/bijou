@@ -618,6 +618,11 @@ export function dagLayout(
   input: DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): DagLayout {
+  if (isDagSource(input) && !isSlicedDagSource(input)) {
+    throw new Error(
+      '[bijou] dagLayout(): received an unbounded DagSource. Use dagSlice() to produce a SlicedDagSource first.',
+    );
+  }
   const ctx = resolveCtx(options.ctx);
   const nodes = isSlicedDagSource(input) ? materialize(input) : input;
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
@@ -633,6 +638,11 @@ export function dag(
   input: DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): string {
+  if (isDagSource(input) && !isSlicedDagSource(input)) {
+    throw new Error(
+      '[bijou] dag(): received an unbounded DagSource. Use dagSlice() to produce a SlicedDagSource first.',
+    );
+  }
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
   const nodes = isSlicedDagSource(input) ? materialize(input) : input;

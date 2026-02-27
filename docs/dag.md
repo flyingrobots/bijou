@@ -74,9 +74,9 @@ export interface DagOptions {
   ctx?: BijouContext;
 }
 
-// Accepts DagNode[] (small graphs) or SlicedDagSource (adapter-driven)
-export function dag(nodes: DagNode[], options?: DagOptions): string;
+// Accepts SlicedDagSource (adapter-driven) or DagNode[] (small graphs)
 export function dag(source: SlicedDagSource, options?: DagOptions): string;
+export function dag(nodes: DagNode[], options?: DagOptions): string;
 ```
 
 ### DagSource Adapter (v0.5.0)

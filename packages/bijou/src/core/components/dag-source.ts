@@ -114,7 +114,7 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
 
 // ── materialize ─────────────────────────────────────────────────────
 
-/** Converts a `SlicedDagSource` to `DagNode[]` for internal renderers. */
+/** @internal Converts a `SlicedDagSource` to `DagNode[]` for internal renderers. */
 export function materialize(source: SlicedDagSource): DagNode[] {
   const ids = source.ids();
   const nodes: DagNode[] = [];
@@ -140,17 +140,17 @@ export function materialize(source: SlicedDagSource): DagNode[] {
 
 // ── emptySource ─────────────────────────────────────────────────────
 
-function emptySource(): SlicedDagSource {
-  const empty: readonly string[] = Object.freeze([]);
-  return {
-    ids: () => empty,
-    has: () => false,
-    label: () => '',
-    children: () => empty,
-    ghost: () => false,
-    ghostLabel: () => undefined,
-  };
-}
+const EMPTY_IDS: readonly string[] = Object.freeze([]);
+
+/** @internal Singleton empty source for missing focus nodes. */
+const EMPTY_SOURCE: SlicedDagSource = Object.freeze({
+  ids: () => EMPTY_IDS,
+  has: () => false,
+  label: () => '',
+  children: () => EMPTY_IDS,
+  ghost: () => false,
+  ghostLabel: () => undefined,
+});
 
 // ── sliceSource ─────────────────────────────────────────────────────
 
@@ -167,10 +167,11 @@ export function sliceSource(
   focus: string,
   opts?: DagSliceOptions,
 ): SlicedDagSource {
-  const direction = opts?.direction ?? 'both';
+  const explicitDirection = opts?.direction;
+  const direction = explicitDirection ?? 'both';
   const maxDepth = opts?.depth ?? Infinity;
 
-  if (!source.has(focus)) return emptySource();
+  if (!source.has(focus)) return EMPTY_SOURCE;
 
   const included = new Set<string>();
   const ghostNodes = new Map<string, { label: string; edges: string[] }>();
@@ -178,34 +179,38 @@ export function sliceSource(
   // BFS ancestors
   if (direction === 'ancestors' || direction === 'both') {
     if (!source.parents) {
-      throw new Error(
-        '[bijou] dagSlice(): source.parents() is required for ancestor traversal',
-      );
-    }
-    const getParents = source.parents.bind(source);
-    const queue: [string, number][] = [[focus, 0]];
-    const visited = new Set<string>();
-    while (queue.length > 0) {
-      const [id, depth] = queue.shift()!;
-      if (visited.has(id)) continue;
-      visited.add(id);
-      included.add(id);
-      if (depth < maxDepth) {
-        for (const p of getParents(id)) {
-          if (!visited.has(p) && source.has(p)) queue.push([p, depth + 1]);
-        }
-      } else {
-        const boundaryParents = [...getParents(id)].filter(
-          p => !visited.has(p) && source.has(p),
+      if (explicitDirection === 'ancestors') {
+        throw new Error(
+          '[bijou] dagSlice(): source.parents() is required for ancestor traversal',
         );
-        if (boundaryParents.length > 0) {
-          const ghostId = `__ghost_ancestors_${id}`;
-          included.add(ghostId);
-          const count = boundaryParents.length;
-          ghostNodes.set(ghostId, {
-            label: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
-            edges: [id],
-          });
+      }
+      // direction defaulted to 'both' — silently downgrade to descendants-only
+    } else {
+      const getParents = source.parents.bind(source);
+      const queue: [string, number][] = [[focus, 0]];
+      const visited = new Set<string>();
+      while (queue.length > 0) {
+        const [id, depth] = queue.shift()!;
+        if (visited.has(id)) continue;
+        visited.add(id);
+        included.add(id);
+        if (depth < maxDepth) {
+          for (const p of getParents(id)) {
+            if (!visited.has(p) && source.has(p)) queue.push([p, depth + 1]);
+          }
+        } else {
+          const boundaryParents = [...getParents(id)].filter(
+            p => !visited.has(p) && source.has(p),
+          );
+          if (boundaryParents.length > 0) {
+            const ghostId = `__ghost_ancestors_${id}`;
+            included.add(ghostId);
+            const count = boundaryParents.length;
+            ghostNodes.set(ghostId, {
+              label: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
+              edges: [id],
+            });
+          }
         }
       }
     }
