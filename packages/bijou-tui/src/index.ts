@@ -78,6 +78,12 @@ export {
   scrollToBottom,
   pageDown,
   pageUp,
+  stripAnsi,
+  visibleLength,
+  clipToWidth,
+  sliceAnsi,
+  scrollByX,
+  scrollToX,
 } from './viewport.js';
 
 // Timeline — GSAP-style animation orchestration
@@ -127,3 +133,55 @@ export {
   type InputStack,
   createInputStack,
 } from './inputstack.js';
+
+// Pager — scrollable text viewer
+export {
+  type PagerState,
+  type PagerOptions,
+  type PagerRenderOptions,
+  createPagerState,
+  pager,
+  pagerScrollBy,
+  pagerScrollTo,
+  pagerScrollToTop,
+  pagerScrollToBottom,
+  pagerPageDown,
+  pagerPageUp,
+  pagerSetContent,
+  pagerKeyMap,
+} from './pager.js';
+
+// Panel group — multi-pane focus management
+export {
+  type PanelDef,
+  type PanelGroupOptions,
+  type PanelGroup,
+  createPanelGroup,
+} from './panels.js';
+
+// Overlay compositing
+export {
+  type Overlay,
+  type CompositeOptions,
+  type ModalOptions,
+  type ToastVariant,
+  type ToastAnchor,
+  type ToastOptions,
+  composite,
+  modal,
+  toast,
+} from './overlay.js';
+
+// Interactive accordion
+export {
+  type AccordionState,
+  type InteractiveAccordionOptions,
+  createAccordionState,
+  interactiveAccordion,
+  focusNext,
+  focusPrev,
+  toggleFocused,
+  expandAll,
+  collapseAll,
+  accordionKeyMap,
+} from './accordion.js';

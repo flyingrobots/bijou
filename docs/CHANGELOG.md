@@ -6,6 +6,56 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`filter()` empty-options crash** — guard against empty options array; throws descriptive error or returns `defaultValue` instead of crashing with modulo-by-zero / undefined dereference
+- **`filter()` cursor wrap** — cursor navigation now no-ops when the filtered list is empty, preventing `NaN` cursor index
+- **`textarea()` maxLength on Enter** — Enter key now respects `maxLength`, preventing newlines from exceeding the character limit
+- **`textarea()` width rendering** — the `width` option now clips line content to the specified width instead of being silently ignored
+- **`textarea()` placeholder line** — placeholder now renders on the first line (`lineIdx === 0`) instead of on lines beyond the buffer
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`composite()` dim predicate** — dim check now uses `visibleLength()` instead of raw `.length`, correctly skipping lines that contain only ANSI escape codes
+- **`createPanelGroup()` defaultFocus validation** — throws a descriptive error when `defaultFocus` refers to a non-existent panel ID, preventing silent `InputStack` routing failures
+- **`pager()` scroll clamp** — clamps scroll offset to the active viewport height, fixing overscroll artifact when `showStatus` is toggled off
+- **`interactiveAccordion()` focusIndex normalization** — normalizes stale/out-of-range focus index before rendering to prevent undefined focus behavior
+- **`interactiveAccordion()` continuation indentation** — continuation-line padding now matches the focus prefix width for custom `focusChar` values
+- **`sliceAnsi()` ANSI leak** — appends reset sequence when the source string ends with an active style, preventing style bleed into subsequent content
+- **viewport tests** — replaced inline ANSI-stripping regexes with the imported `stripAnsi()` utility
+
+### Documentation
+
+- **textarea example** — fixed `box()` call with nonexistent `title` option; replaced with `headerBox()`
+- **textarea example** — use nullish check (`!= null`) instead of truthy check for cancellation detection
+- **pager example** — removed unused `kbd` import; preserve scroll position across terminal resize
+- **accordion example** — removed unused `separator` import
+- **ROADMAP P1.75** — clarified that `dagStats()` is deferred, not shipped with overlay primitives
+
+## [0.4.0] — 2026-02-27
+
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dag()` `selectedId`/`selectedToken`** — cursor-style node highlighting with highest priority over highlight path
+- **`dagLayout()`** — returns node position map (`DagNodePosition`) and grid dimensions alongside rendered output, for interactive DAG navigation
+- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength, and Ctrl+D submit / Ctrl+C cancel
+- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords, customizable match function, and configurable max visible items
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`stripAnsi()`**, **`visibleLength()`**, **`clipToWidth()`** — publicly exported ANSI utility functions from viewport module
+- **viewport `scrollX`** — horizontal scrolling support with `sliceAnsi()`, `scrollByX()`, `scrollToX()`
+- **`createPanelGroup()`** — multi-pane focus management with hotkey switching, per-panel KeyMap delegation, InputStack integration, and formatted labels
+- **`pager()`** — scrollable content viewer building block wrapping `viewport()` with a status line, position tracking, and convenience keymap (`j/k` scroll, `d/u` page, `g/G` top/bottom, `q` quit)
+- **`interactiveAccordion()`** — navigable accordion building block wrapping static `accordion()` with focus tracking, expand/collapse transformers, and convenience keymap (`j/k` navigate, `Enter/Space` toggle, `q` quit)
+- **`composite()`** — ANSI-safe overlay compositing with dim background support
+- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
+- **`toast()`** — anchored notification overlay with success/error/info variants
+
 ## [0.3.0] — 2026-02-27
 
 ### Added
@@ -130,7 +180,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/flyingrobots/bijou/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0

@@ -125,8 +125,11 @@ export {
   type StepperOptions,
   dag,
   dagSlice,
+  dagLayout,
   type DagNode,
   type DagOptions,
+  type DagNodePosition,
+  type DagLayout,
 } from './core/components/index.js';
 
 // Forms
@@ -144,4 +147,9 @@ export {
   multiselect,
   confirm,
   group,
+  textarea,
+  type TextareaOptions,
+  filter,
+  type FilterOption,
+  type FilterOptions,
 } from './core/forms/index.js';

@@ -18,6 +18,8 @@ export interface ViewportOptions {
   readonly content: string;
   /** Vertical scroll offset (0-based line index). Default: 0. */
   readonly scrollY?: number;
+  /** Horizontal scroll offset (0-based column index). Default: 0. */
+  readonly scrollX?: number;
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
 }
@@ -27,6 +29,10 @@ export interface ScrollState {
   readonly y: number;
   /** Maximum vertical scroll offset. */
   readonly maxY: number;
+  /** Current horizontal scroll offset. */
+  readonly x: number;
+  /** Maximum horizontal scroll offset. */
+  readonly maxX: number;
   /** Total number of content lines. */
   readonly totalLines: number;
   /** Number of visible lines (viewport height). */
@@ -39,11 +45,11 @@ export interface ScrollState {
 
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
 
-function stripAnsi(str: string): string {
+export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
-function visibleLength(str: string): number {
+export function visibleLength(str: string): number {
   return stripAnsi(str).length;
 }
 
@@ -51,7 +57,7 @@ function visibleLength(str: string): number {
  * Clip a string to a maximum visible width, preserving ANSI escapes.
  * Appends a reset sequence if the string was clipped mid-style.
  */
-function clipToWidth(str: string, maxWidth: number): string {
+export function clipToWidth(str: string, maxWidth: number): string {
   let visible = 0;
   let result = '';
   let inEscape = false;
@@ -80,6 +86,66 @@ function clipToWidth(str: string, maxWidth: number): string {
     result += ch;
     visible++;
   }
+
+  return result;
+}
+
+/**
+ * Extract a visible-column substring from an ANSI-styled string.
+ * Returns characters between visible columns [startCol, endCol).
+ * Preserves any active ANSI styles seen before startCol.
+ */
+export function sliceAnsi(str: string, startCol: number, endCol: number): string {
+  let visible = 0;
+  let inEscape = false;
+  let activeAnsi = '';
+  let result = '';
+  let collecting = false;
+  let hasStyle = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i]!;
+
+    if (ch === '\x1b') {
+      inEscape = true;
+      if (collecting) {
+        result += ch;
+        hasStyle = true;
+      } else {
+        activeAnsi += ch;
+      }
+      continue;
+    }
+
+    if (inEscape) {
+      if (collecting) {
+        result += ch;
+      } else {
+        activeAnsi += ch;
+      }
+      if (ch === 'm') inEscape = false;
+      continue;
+    }
+
+    if (visible >= endCol) {
+      if (hasStyle) result += '\x1b[0m';
+      break;
+    }
+
+    if (visible >= startCol) {
+      if (!collecting) {
+        collecting = true;
+        result = activeAnsi;
+        if (activeAnsi.length > 0) hasStyle = true;
+      }
+      result += ch;
+    }
+
+    visible++;
+  }
+
+  // Append reset if we reached end of string with an active style
+  if (collecting && hasStyle) result += '\x1b[0m';
 
   return result;
 }
@@ -132,6 +198,7 @@ export function viewport(options: ViewportOptions): string {
     height,
     content,
     scrollY = 0,
+    scrollX = 0,
     showScrollbar = true,
   } = options;
 
@@ -154,12 +221,15 @@ export function viewport(options: ViewportOptions): string {
 
   // Clip/pad each line to content width
   const rendered = visibleSlice.map((line) => {
-    const vis = visibleLength(line);
-    if (vis > contentWidth) {
-      return clipToWidth(line, contentWidth);
+    let sliced: string;
+    if (scrollX > 0) {
+      sliced = sliceAnsi(line, scrollX, scrollX + contentWidth);
+    } else {
+      const vis = visibleLength(line);
+      sliced = vis > contentWidth ? clipToWidth(line, contentWidth) : line;
     }
-    // Right-pad with spaces to fill width
-    return line + ' '.repeat(contentWidth - vis);
+    const slicedVis = visibleLength(sliced);
+    return slicedVis < contentWidth ? sliced + ' '.repeat(contentWidth - slicedVis) : sliced;
   });
 
   // Append scrollbar
@@ -181,11 +251,26 @@ export function viewport(options: ViewportOptions): string {
 export function createScrollState(
   content: string,
   viewportHeight: number,
+  viewportWidth?: number,
 ): ScrollState {
-  const totalLines = content.split('\n').length;
+  const lines = content.split('\n');
+  const totalLines = lines.length;
+
+  let maxX = 0;
+  if (viewportWidth !== undefined) {
+    let widest = 0;
+    for (const line of lines) {
+      const w = visibleLength(line);
+      if (w > widest) widest = w;
+    }
+    maxX = Math.max(0, widest - viewportWidth);
+  }
+
   return {
     y: 0,
     maxY: Math.max(0, totalLines - viewportHeight),
+    x: 0,
+    maxX,
     totalLines,
     visibleLines: viewportHeight,
   };
@@ -204,6 +289,20 @@ export function scrollBy(state: ScrollState, dy: number): ScrollState {
  */
 export function scrollTo(state: ScrollState, y: number): ScrollState {
   return { ...state, y: Math.max(0, Math.min(y, state.maxY)) };
+}
+
+/**
+ * Scroll horizontally by a relative amount. Clamps to valid range.
+ */
+export function scrollByX(state: ScrollState, dx: number): ScrollState {
+  return { ...state, x: Math.max(0, Math.min(state.x + dx, state.maxX)) };
+}
+
+/**
+ * Scroll horizontally to an absolute position. Clamps to valid range.
+ */
+export function scrollToX(state: ScrollState, x: number): ScrollState {
+  return { ...state, x: Math.max(0, Math.min(x, state.maxX)) };
 }
 
 /**

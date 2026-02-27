@@ -490,6 +490,76 @@ for (const layer of stack.layers()) {
 }
 ```
 
+## Overlay Compositing
+
+### Modals
+
+Create centered dialog overlays for confirm prompts, info boxes, or text input:
+
+```typescript
+import { composite, modal } from '@flyingrobots/bijou-tui';
+
+// In view:
+let output = renderMainContent(model);
+
+if (model.showConfirm) {
+  const dialog = modal({
+    title: 'Delete Item',
+    body: `Are you sure you want to delete "${model.selectedName}"?`,
+    hint: 'y to confirm, n to cancel',
+    screenWidth: model.cols,
+    screenHeight: model.rows,
+    borderToken: ctx.theme.theme.border.warning,
+    ctx,
+  });
+  output = composite(output, [dialog], { dim: true });
+}
+
+return output;
+```
+
+The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode.
+
+### Toasts
+
+Anchored notification overlays for operation feedback:
+
+```typescript
+import { composite, toast } from '@flyingrobots/bijou-tui';
+
+// In view:
+let output = renderMainContent(model);
+
+if (model.notification) {
+  const t = toast({
+    message: model.notification.text,
+    variant: model.notification.variant,  // 'success' | 'error' | 'info'
+    anchor: 'bottom-right',
+    margin: 2,
+    screenWidth: model.cols,
+    screenHeight: model.rows,
+    ctx,
+  });
+  output = composite(output, [t]);
+}
+
+return output;
+```
+
+### Stacking Overlays
+
+Multiple overlays compose with painter's algorithm — later overlays paint over earlier ones:
+
+```typescript
+const overlays = [];
+
+if (model.toast) overlays.push(toast({ ...model.toast, screenWidth, screenHeight }));
+if (model.modal) overlays.push(modal({ ...model.modal, screenWidth, screenHeight }));
+
+// Modal paints over toast if they overlap
+return composite(background, overlays, { dim: model.modal != null });
+```
+
 ## Pure Functions Everywhere
 
 The spring engine, tween engine, timeline, viewport, scroll state, keybinding matching, and help generation are all pure functions operating on immutable state. This means:

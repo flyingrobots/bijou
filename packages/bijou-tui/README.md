@@ -4,9 +4,14 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.3.0?
+## What's New in 0.4.0?
 
-- Lock-step version bump with `@flyingrobots/bijou` v0.3.0 (DAG renderer)
+- **`composite()`** — ANSI-safe overlay compositing with dim background support
+- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
+- **`toast()`** — anchored notification overlay with success/error/info variants
+- **`pager()`** — scrollable content viewer with status line and convenience keymap
+- **`interactiveAccordion()`** — navigable accordion with focus tracking and expand/collapse
+- **`createPanelGroup()`** — multi-pane focus management with hotkey switching
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
@@ -249,6 +254,37 @@ stack.remove(modalId);
 ```
 
 `KeyMap` implements `InputHandler`, so it plugs directly into the input stack.
+
+## Overlay Compositing
+
+Paint overlays (modals, toasts) on top of existing content:
+
+```typescript
+import { composite, modal, toast } from '@flyingrobots/bijou-tui';
+
+// Create a centered dialog
+const dialog = modal({
+  title: 'Confirm',
+  body: 'Delete this item?',
+  hint: 'y/n',
+  screenWidth: 80,
+  screenHeight: 24,
+});
+
+// Create a toast notification
+const notification = toast({
+  message: 'Saved successfully',
+  variant: 'success',        // 'success' | 'error' | 'info'
+  anchor: 'bottom-right',    // 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left'
+  screenWidth: 80,
+  screenHeight: 24,
+});
+
+// Paint overlays onto background content
+const output = composite(backgroundView, [dialog, notification], { dim: true });
+```
+
+Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
 
 ## Related Packages
 

@@ -76,6 +76,7 @@ src/
 ├── keybindings.ts   # KeyMap, parseKeyCombo, formatKeyCombo
 ├── help.ts          # helpView, helpShort, helpFor — auto-generated help
 ├── inputstack.ts    # InputStack — layered input dispatch
+├── overlay.ts       # composite(), modal(), toast() — overlay compositing
 └── index.ts         # Public API barrel
 ```
 
@@ -215,6 +216,30 @@ KeyMsg ──► InputStack.dispatch()
 - **Passthrough layers** let unmatched events continue — ideal for global shortcuts
 - `InputHandler<Msg, A>` is the only interface a layer needs to implement
 - `KeyMap` satisfies `InputHandler`, so keymaps push directly onto the stack
+
+## Overlay Compositing
+
+The overlay system (`overlay.ts`) provides three primitives for rendering content on top of existing views:
+
+### composite()
+
+ANSI-safe overlay painter:
+
+1. Splits background into lines
+2. Optionally dims background lines (`\x1b[2m`)
+3. Iterates overlays in order (painter's algorithm — last wins)
+4. For each overlay line, `spliceLine()` replaces the target columns in the background line
+5. `spliceLine()` uses `sliceAnsi()` and `visibleLength()` from viewport.ts to handle ANSI escape sequences correctly, inserting `\x1b[0m` resets at splice boundaries to prevent style bleed
+
+### modal()
+
+Builds a bordered box with optional title (bold), body, and hint (muted) sections, then computes centered `(row, col)` position from screen dimensions. Returns an `Overlay` object ready for `composite()`.
+
+### toast()
+
+Builds a bordered single-line box with a variant icon (`✔` success, `✘` error, `ℹ` info), then computes position from anchor corner (`top-right`, `bottom-right`, `bottom-left`, `top-left`) and margin. Returns an `Overlay` object.
+
+**Key design decision:** No dependency on `box()` from bijou core. The `box()` component degrades in pipe/accessible modes (returns raw content, no borders), but overlays are inherently interactive-mode constructs that always need borders. Border rendering uses the same unicode box-drawing characters directly.
 
 ## Graceful Degradation
 
