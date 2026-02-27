@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.2.0** — hexagonal architecture monorepo (`@flyingrobots/bijou` + `@flyingrobots/bijou-node`)
+Current: **v0.3.0** — DAG renderer, 43 examples with GIF demos
 
 ---
 
@@ -307,51 +307,7 @@ round-trip
 
 ---
 
-## bijou-tui — TEA runtime for terminal UIs
-
-**Status:** v0.1.0 — initial implementation
-
-`@flyingrobots/bijou-tui` provides a TEA (The Elm Architecture) runtime for building interactive terminal applications. Existing bijou components are view functions; bijou-tui adds the event loop, keyboard input, and screen management needed for stateful TUI apps.
-
-**Architecture:** `init() → [Model, Cmd[]]` / `update(msg, model) → [Model, Cmd[]]` / `view(model) → string`
-
-**Modules:**
-| Module | Purpose |
-|--------|---------|
-| `types.ts` | `App`, `Cmd`, `KeyMsg`, `QUIT`, `RunOptions` |
-| `keys.ts` | `parseKey()` — raw ANSI → structured `KeyMsg` |
-| `screen.ts` | Alt screen, cursor control, clear — pure ANSI strings via `IOPort` |
-| `commands.ts` | `quit()`, `tick()`, `batch()` — built-in command constructors |
-| `runtime.ts` | `run()` — the TEA event loop with keyboard listener, rendering, cleanup |
-| `layout.ts` | `vstack()`, `hstack()` — composition helpers |
-
-**Graceful degradation:** In non-interactive modes (pipe/static/accessible), `run()` renders the initial view once and exits — no alt screen, no keyboard loop.
-
-**What this unblocks:**
-- **bijou core (future):** `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — pure view functions
-- **bijou-tui (future):** `modal()`, `toast()`, `drawer()`, `commandPalette()` — TEA-based overlay patterns
-
----
-
 ## Future features
-
-### Component catalog
-
-Growing toward a full terminal component library:
-
-| Category | Components |
-|----------|-----------|
-| **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
-| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~ ✅ |
-| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
-| **Overlay** | `modal()`, `toast()`, `drawer()` |
-| **App** | `list()`, `statusBar()`, `splitPane()`, `tooltip()` |
-
-Each new component should follow this template before implementation:
-1. Write user story and requirements
-2. Define acceptance criteria as test descriptions
-3. Write the tests (they will fail)
-4. Implement until tests pass
 
 ### `appFrame` — TEA app shell (bijou-tui)
 
@@ -375,7 +331,23 @@ Higher-order TEA app that eliminates the boilerplate every TUI app re-implements
 - How page-level state/update composes with frame-level state (nested TEA? slots?)
 - Whether pages can define sub-tabs or if nesting is out of scope
 
----
+### Component catalog
+
+Growing toward a full terminal component library:
+
+| Category | Components |
+|----------|-----------|
+| **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
+| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~ ✅ |
+| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
+| **Overlay** | `modal()`, `toast()`, `drawer()` |
+| **App** | `list()`, `statusBar()`, `splitPane()`, `tooltip()` |
+
+Each new component should follow this template before implementation:
+1. Write user story and requirements
+2. Define acceptance criteria as test descriptions
+3. Write the tests (they will fail)
+4. Implement until tests pass
 
 ---
 
@@ -383,13 +355,13 @@ Higher-order TEA app that eliminates the boilerplate every TUI app re-implements
 
 Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). Prioritized by how many other features they unblock.
 
-### P0 — Foundational (unblocks multiple features)
+### ~~P0 — Foundational~~ ✅ Shipped in v0.2.0
 
-| Feature | Package | Notes |
-|---------|---------|-------|
-| **`viewport()`** | bijou-tui | Scrollable content pane. Foundation for `appFrame`, pager, browsable list, navigable table. |
-| **Keybinding manager** | bijou-tui | Declarative key bindings with enable/disable and help text generation. Needed by `appFrame` for per-page key routing. |
-| **Help generator** | bijou-tui | Auto-build help view from registered keybindings (short/full modes). Pairs with keybinding manager. |
+| Feature | Package | Status |
+|---------|---------|--------|
+| ~~**`viewport()`**~~ | bijou-tui | ✅ v0.2.0 |
+| ~~**Keybinding manager**~~ | bijou-tui | ✅ v0.2.0 |
+| ~~**Help generator**~~ | bijou-tui | ✅ v0.2.0 |
 
 ### P1 — Core components
 
