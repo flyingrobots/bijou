@@ -23,8 +23,8 @@ import {
   accordion,
   type AccordionSection,
   type AccordionOptions,
+  type BijouContext,
 } from '@flyingrobots/bijou';
-import type { BijouContext } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 
 // Re-export AccordionSection for convenience

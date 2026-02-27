@@ -398,6 +398,11 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**`composite()` overlay**~~ | bijou-tui | ✅ Painter's algorithm compositing with ANSI-safe splicing, dim background support | ✓ |
 | ~~**`modal()`**~~ | bijou-tui | ✅ Centered dialog overlay with title, body, hint, auto-centering, themed borders | ✓ |
 | ~~**`toast()`**~~ | bijou-tui | ✅ Anchored notification overlay with success/error/info variants, 4-corner anchoring | ✓ |
+
+Remaining from P1.75 (deferred — not an overlay primitive):
+
+| Feature | Package | Notes | Blocks XYPH? |
+|---------|---------|-------|:------------:|
 | **`dagStats()`** | bijou | Pure function: `{nodes, edges, depth, width, roots, leaves}` from node array. For overview dashboard counts. | |
 
 ### P2 — Layout, input & styling primitives

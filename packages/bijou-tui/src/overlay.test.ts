@@ -86,6 +86,10 @@ describe('composite', () => {
     expect(lines[1]!).toContain('\x1b[2m');
     // overlay content should NOT be dimmed
     expect(stripAnsi(lines[0]!)).toBe('AXXA');
+    // verify overlay portion between resets lacks dim code
+    const overlayRegion = lines[0]!.split('\x1b[0m').find(s => s.includes('XX'));
+    expect(overlayRegion).toBeDefined();
+    expect(overlayRegion).not.toContain('\x1b[2m');
   });
 
   it('styled background: non-overlaid regions preserve ANSI', () => {

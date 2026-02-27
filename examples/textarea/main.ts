@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { textarea, box } from '@flyingrobots/bijou';
+import { textarea, headerBox } from '@flyingrobots/bijou';
 
 const ctx = initDefaultContext();
 
@@ -14,7 +14,7 @@ async function main() {
 
   if (message) {
     console.log();
-    console.log(box(message, { title: 'Commit Message', ctx }));
+    console.log(headerBox('Commit Message', { detail: message, ctx }));
   } else {
     console.log('\nCancelled.');
   }

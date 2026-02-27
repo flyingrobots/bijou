@@ -93,7 +93,7 @@ export function composite(
 
   if (options?.dim) {
     for (let i = 0; i < bgLines.length; i++) {
-      if (bgLines[i]!.length > 0) {
+      if (visibleLength(bgLines[i]!) > 0) {
         bgLines[i] = '\x1b[2m' + bgLines[i] + '\x1b[0m';
       }
     }
@@ -190,12 +190,6 @@ const TOAST_ICONS: Record<ToastVariant, string> = {
   info: '\u2139',    // ℹ
 };
 
-const TOAST_SEMANTIC: Record<ToastVariant, 'success' | 'error' | 'info'> = {
-  success: 'success',
-  error: 'error',
-  info: 'info',
-};
-
 const TOAST_BORDER: Record<ToastVariant, 'success' | 'error' | 'primary'> = {
   success: 'success',
   error: 'error',
@@ -216,10 +210,8 @@ export function toast(options: ToastOptions): Overlay {
   const icon = TOAST_ICONS[variant];
   let line = icon + ' ' + message;
 
-  const semanticKey = TOAST_SEMANTIC[variant];
   if (ctx) {
-    const token = ctx.theme.theme.semantic[semanticKey];
-    line = ctx.style.styled(token, line);
+    line = ctx.style.styled(ctx.theme.theme.semantic[variant], line);
   }
 
   const borderKey = TOAST_BORDER[variant];
