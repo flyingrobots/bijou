@@ -151,6 +151,14 @@ export {
   pagerKeyMap,
 } from './pager.js';
 
+// Panel group — multi-pane focus management
+export {
+  type PanelDef,
+  type PanelGroupOptions,
+  type PanelGroup,
+  createPanelGroup,
+} from './panels.js';
+
 // Interactive accordion
 export {
   type AccordionState,
