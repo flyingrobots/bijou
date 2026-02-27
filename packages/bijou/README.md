@@ -4,10 +4,12 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
-## What's New in 0.3.0?
+## What's New in 0.4.0?
 
-- **`dag()`** — ASCII DAG renderer with auto-layout (Sugiyama-Lite), edge routing, badges, per-node tokens, path highlighting, and graceful degradation
-- **`dagSlice()`** — extract subgraphs (ancestors/descendants/neighborhood) with ghost boundary nodes
+- **`textarea()`** — multi-line text input form with cursor navigation, line numbers, placeholder, maxLength
+- **`filter()`** — fuzzy-filter select form with real-time search by label and keywords
+- **`dagLayout()`** — returns node position map alongside rendered output, for interactive DAG navigation
+- **`dag()` `selectedId`** — cursor-style node highlighting with highest priority over highlight path
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 

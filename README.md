@@ -88,8 +88,8 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `timeline` | ✅ Stable | Vertical event visualization. |
 | `dag` / `dagSlice` | ✅ Stable | Directed acyclic graph with auto-layout, edge routing, and subgraph slicing. |
 | `skeleton` | ✅ Stable | Loading placeholders for data-heavy views. |
-| `textarea` | 🗓️ Roadmap | Multi-line, scrollable text entry. |
-| `filter` | 🗓️ Roadmap | Fuzzy type-to-filter list component. |
+| `textarea` | ✅ Stable | Multi-line, scrollable text entry. |
+| `filter` | ✅ Stable | Fuzzy type-to-filter list component. |
 
 ### Interactive Forms (`@flyingrobots/bijou`)
 
@@ -109,7 +109,7 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `viewport` | ✅ Stable | Scrollable content pane with proportional scrollbars. |
 | `animate` / `timeline` | ✅ Stable | Physics-based springs and GSAP-style timelines. |
 | `KeyMap` / `InputStack` | ✅ Stable | Layered, declarative input dispatch for modal UIs. |
-| `modal` / `drawer` | ✅ Showcase | High-level patterns (see `demo-tui.ts`). |
+| `composite` / `modal` / `toast` | ✅ Stable | ANSI-safe overlay compositing, centered dialogs, anchored notifications. |
 | `commandPalette` | 🗓️ Roadmap | Unified global search and action interface. |
 
 ---

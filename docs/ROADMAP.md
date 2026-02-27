@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.3.0** — DAG renderer, 47 examples with GIF demos
+Current: **v0.4.0** — Overlay compositing, interactive building blocks, forms
 
 ---
 
@@ -342,7 +342,7 @@ Growing toward a full terminal component library:
 | **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~ ✅, ~~`textarea()`~~, ~~`filter()`~~ ✅, `wizard()` |
 | **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
 | **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~ ✅, `navigableTable()`, `browsableList()`, `filePicker()` |
-| **Overlay** | `composite()` ← P1.75, `modal()` ← P1.75, `toast()` ← P1.75, `drawer()` |
+| **Overlay** | ~~`composite()`~~, ~~`modal()`~~, ~~`toast()`~~ ✅, `drawer()` |
 | **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~ ✅, mouse events (`IOPort.onMouse()`) |
 | **App** | `statusBar()`, `splitPane()`, `tooltip()` |
 
@@ -391,15 +391,13 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**`dagLayout()`**~~ | bijou | ✅ Returns rendered string + `Map<string, DagNodePosition>` with grid coordinates | |
 | ~~**`createPanelGroup()`**~~ | bijou-tui | ✅ Multi-panel focus with InputStack integration, hotkey switching, `formatLabel()` | |
 
-### P1.75 — XYPH Dashboard blockers
-
-Primitives needed for XYPH's interactive TUI dashboard (confirm dialogs, overlays, write operation flows). Promoted from P2/backlog based on XYPH Phase 1 requirements.
+### ~~P1.75 — XYPH Dashboard blockers~~ ✅ Shipped (overlay primitives)
 
 | Feature | Package | Notes | Blocks XYPH? |
 |---------|---------|-------|:------------:|
-| **`composite()` overlay** | bijou-tui | Painter's algorithm compositing: base render + positioned overlays → final string. ANSI-aware, screen-edge clamping. Core primitive for modals, tooltips, toasts. | ✓ |
-| **`modal()`** | bijou-tui | Centered dialog overlay built on `composite()`. Confirm (y/n), input (text field), and info variants. Returns rendered overlay string. | ✓ |
-| **`toast()`** | bijou-tui | Anchored notification (top-right/bottom-right) built on `composite()`. Success/error/info variants with auto-dismiss timing. | ✓ |
+| ~~**`composite()` overlay**~~ | bijou-tui | ✅ Painter's algorithm compositing with ANSI-safe splicing, dim background support | ✓ |
+| ~~**`modal()`**~~ | bijou-tui | ✅ Centered dialog overlay with title, body, hint, auto-centering, themed borders | ✓ |
+| ~~**`toast()`**~~ | bijou-tui | ✅ Anchored notification overlay with success/error/info variants, 4-corner anchoring | ✓ |
 | **`dagStats()`** | bijou | Pure function: `{nodes, edges, depth, width, roots, leaves}` from node array. For overview dashboard counts. | |
 
 ### P2 — Layout, input & styling primitives
@@ -447,6 +445,6 @@ Once published:
 | XYPH Phase | Bijou dependency | Status |
 |------------|-----------------|--------|
 | Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | ✅ Ready |
-| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | P1.75 — next up |
+| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | ✅ Ready |
 | Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | ✅ Ready |
 | Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | ✅ Ready |
