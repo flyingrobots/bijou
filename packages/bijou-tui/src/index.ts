@@ -81,6 +81,9 @@ export {
   stripAnsi,
   visibleLength,
   clipToWidth,
+  sliceAnsi,
+  scrollByX,
+  scrollToX,
 } from './viewport.js';
 
 // Timeline — GSAP-style animation orchestration

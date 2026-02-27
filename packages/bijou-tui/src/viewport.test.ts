@@ -8,6 +8,11 @@ import {
   scrollToBottom,
   pageDown,
   pageUp,
+  sliceAnsi,
+  scrollByX,
+  scrollToX,
+  stripAnsi,
+  visibleLength,
 } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -225,5 +230,145 @@ describe('pageDown / pageUp', () => {
     const state = createScrollState('a\nb\nc', 3);
     const next = pageDown(state);
     expect(next.y).toBe(0); // content fits, maxY = 0
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sliceAnsi
+// ---------------------------------------------------------------------------
+
+describe('sliceAnsi', () => {
+  it('slices plain text', () => {
+    expect(sliceAnsi('hello world', 3, 8)).toBe('lo wo');
+  });
+
+  it('returns empty for empty string', () => {
+    expect(sliceAnsi('', 0, 5)).toBe('');
+  });
+
+  it('returns empty when startCol beyond length', () => {
+    expect(sliceAnsi('short', 10, 20)).toBe('');
+  });
+
+  it('preserves ANSI style crossing startCol', () => {
+    const styled = '\x1b[31mhello world\x1b[0m';
+    const result = sliceAnsi(styled, 3, 8);
+    // Should include the red style prefix
+    expect(result).toContain('\x1b[31m');
+    const visible = stripAnsi(result);
+    expect(visible).toBe('lo wo');
+  });
+
+  it('appends reset when clipped at endCol mid-style', () => {
+    const styled = '\x1b[31mhello world\x1b[0m';
+    const result = sliceAnsi(styled, 0, 5);
+    expect(result).toContain('\x1b[0m');
+    const visible = stripAnsi(result);
+    expect(visible).toBe('hello');
+  });
+
+  it('startCol=0 equivalence to clipToWidth for plain text', () => {
+    const text = 'abcdefghij';
+    const sliced = sliceAnsi(text, 0, 5);
+    expect(sliced).toBe('abcde');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scrollByX / scrollToX
+// ---------------------------------------------------------------------------
+
+describe('scrollByX', () => {
+  it('scrolls right', () => {
+    const state = createScrollState('a long line here!!!', 1, 5);
+    const next = scrollByX(state, 3);
+    expect(next.x).toBe(3);
+  });
+
+  it('clamps to maxX', () => {
+    const state = createScrollState('1234567890', 1, 5);
+    // maxX = 10 - 5 = 5
+    const next = scrollByX(state, 999);
+    expect(next.x).toBe(5);
+  });
+
+  it('clamps to 0', () => {
+    const state = createScrollState('1234567890', 1, 5);
+    const next = scrollByX(state, -5);
+    expect(next.x).toBe(0);
+  });
+});
+
+describe('scrollToX', () => {
+  it('scrolls to absolute X', () => {
+    const state = createScrollState('1234567890', 1, 5);
+    const next = scrollToX(state, 3);
+    expect(next.x).toBe(3);
+  });
+
+  it('clamps to valid range', () => {
+    const state = createScrollState('1234567890', 1, 5);
+    expect(scrollToX(state, -1).x).toBe(0);
+    expect(scrollToX(state, 999).x).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// createScrollState with viewportWidth
+// ---------------------------------------------------------------------------
+
+describe('createScrollState with viewportWidth', () => {
+  it('computes maxX from widest line', () => {
+    const content = 'short\na much longer line here\nmed';
+    const state = createScrollState(content, 3, 10);
+    expect(state.maxX).toBe(visibleLength('a much longer line here') - 10);
+  });
+
+  it('sets maxX=0 when all lines fit', () => {
+    const state = createScrollState('hi\nbye', 2, 20);
+    expect(state.maxX).toBe(0);
+  });
+
+  it('backward compat without viewportWidth', () => {
+    const state = createScrollState('hello', 1);
+    expect(state.x).toBe(0);
+    expect(state.maxX).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// viewport with scrollX
+// ---------------------------------------------------------------------------
+
+describe('viewport with scrollX', () => {
+  it('shifts content right', () => {
+    const wideContent = 'abcdefghijklmnop';
+    const result = viewport({
+      width: 5,
+      height: 1,
+      content: wideContent,
+      scrollX: 3,
+      showScrollbar: false,
+    });
+    const visible = result.replace(/\x1b\[[0-9;]*m/g, '').trimEnd();
+    expect(visible).toBe('defgh');
+  });
+
+  it('scrollX=0 matches default behavior', () => {
+    const content = 'abcdefghij';
+    const withoutX = viewport({
+      width: 5,
+      height: 1,
+      content,
+      scrollX: 0,
+      showScrollbar: false,
+    });
+    const withDefault = viewport({
+      width: 5,
+      height: 1,
+      content,
+      showScrollbar: false,
+    });
+    expect(withoutX).toBe(withDefault);
   });
 });
