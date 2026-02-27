@@ -8,12 +8,13 @@ import type { DagNode } from './dag.js';
  * from any specific in-memory representation. Implementations can wrap
  * arrays, databases, APIs, or any other graph store.
  *
- * Every render is a bounded slice — `dagSlice()` walks a `DagSource`
- * to produce a new (bounded) `DagSource` that the renderer consumes.
+ * A DagSource may represent an unbounded graph — it has no enumeration
+ * method. Use `dagSlice()` to BFS-walk from a focus node and produce
+ * a bounded `SlicedDagSource` that the renderer can consume.
  */
 export interface DagSource {
-  /** All node IDs in this source (must be finite and enumerable). */
-  ids(): readonly string[];
+  /** Returns true if a node with this ID exists in the graph. */
+  has(id: string): boolean;
 
   /** Human-readable label for a node. */
   label(id: string): string;
@@ -22,9 +23,9 @@ export interface DagSource {
   children(id: string): readonly string[];
 
   /**
-   * Parent node IDs (incoming edges). Optional — enables efficient
-   * ancestor traversal in `dagSlice()`. When omitted, parents are
-   * derived by scanning `children()` of all known IDs.
+   * Parent node IDs (incoming edges). Required for ancestor traversal
+   * in `dagSlice()`. Without this, only `direction: 'descendants'` is
+   * supported.
    */
   parents?(id: string): readonly string[];
 
@@ -33,12 +34,21 @@ export interface DagSource {
 
   /** Optional per-node color/style token. */
   token?(id: string): TokenValue | undefined;
+}
+
+/**
+ * A bounded DagSource produced by `sliceSource()`. Extends DagSource
+ * with `ids()` so the renderer can enumerate the finite node set.
+ */
+export interface SlicedDagSource extends DagSource {
+  /** All node IDs in this bounded slice. */
+  ids(): readonly string[];
 
   /** Whether this node is a ghost (boundary placeholder). */
-  ghost?(id: string): boolean;
+  ghost(id: string): boolean;
 
   /** Ghost label override (e.g., "... 3 ancestors"). */
-  ghostLabel?(id: string): string | undefined;
+  ghostLabel(id: string): string | undefined;
 }
 
 /** Options for `dagSlice()`. */
@@ -55,16 +65,25 @@ export function isDagSource(value: unknown): value is DagSource {
     typeof value === 'object' &&
     value !== null &&
     !Array.isArray(value) &&
-    typeof (value as DagSource).ids === 'function' &&
+    typeof (value as DagSource).has === 'function' &&
     typeof (value as DagSource).label === 'function' &&
     typeof (value as DagSource).children === 'function'
   );
 }
 
+/** Returns true if the value is a `SlicedDagSource` (bounded, with `ids()`). */
+export function isSlicedDagSource(value: unknown): value is SlicedDagSource {
+  return (
+    isDagSource(value) &&
+    typeof (value as SlicedDagSource).ids === 'function' &&
+    typeof (value as SlicedDagSource).ghost === 'function'
+  );
+}
+
 // ── arraySource ─────────────────────────────────────────────────────
 
-/** Wraps a `DagNode[]` as a `DagSource`. Zero-copy read-only view. */
-export function arraySource(nodes: DagNode[]): DagSource {
+/** Wraps a `DagNode[]` as a `SlicedDagSource`. Already bounded. */
+export function arraySource(nodes: DagNode[]): SlicedDagSource {
   const map = new Map<string, DagNode>();
   for (const n of nodes) map.set(n.id, n);
 
@@ -82,6 +101,7 @@ export function arraySource(nodes: DagNode[]): DagSource {
 
   return {
     ids: () => idList,
+    has: (id) => map.has(id),
     label: (id) => map.get(id)?.label ?? id,
     children: (id) => map.get(id)?.edges ?? [],
     parents: (id) => parentMap.get(id) ?? [],
@@ -94,8 +114,8 @@ export function arraySource(nodes: DagNode[]): DagSource {
 
 // ── materialize ─────────────────────────────────────────────────────
 
-/** Converts a `DagSource` to `DagNode[]` for internal renderers. */
-export function materialize(source: DagSource): DagNode[] {
+/** Converts a `SlicedDagSource` to `DagNode[]` for internal renderers. */
+export function materialize(source: SlicedDagSource): DagNode[] {
   const ids = source.ids();
   const nodes: DagNode[] = [];
   for (const id of ids) {
@@ -109,9 +129,9 @@ export function materialize(source: DagSource): DagNode[] {
     if (badge !== undefined) node.badge = badge;
     const token = source.token?.(id);
     if (token !== undefined) node.token = token;
-    if (source.ghost?.(id)) {
+    if (source.ghost(id)) {
       node._ghost = true;
-      node._ghostLabel = source.ghostLabel?.(id);
+      node._ghostLabel = source.ghostLabel(id);
     }
     nodes.push(node);
   }
@@ -120,51 +140,49 @@ export function materialize(source: DagSource): DagNode[] {
 
 // ── emptySource ─────────────────────────────────────────────────────
 
-function emptySource(): DagSource {
+function emptySource(): SlicedDagSource {
   const empty: readonly string[] = Object.freeze([]);
   return {
     ids: () => empty,
+    has: () => false,
     label: () => '',
     children: () => empty,
+    ghost: () => false,
+    ghostLabel: () => undefined,
   };
 }
 
 // ── sliceSource ─────────────────────────────────────────────────────
 
 /**
- * BFS-walks a `DagSource` from a focus node and returns a new bounded
- * `DagSource` containing only the neighborhood. Ghost nodes are
+ * BFS-walks a `DagSource` from a focus node and returns a bounded
+ * `SlicedDagSource` containing only the neighborhood. Ghost nodes are
  * injected at depth boundaries.
+ *
+ * Never calls `ids()` on the source — works purely via traversal.
+ * For ancestor/both directions, `source.parents()` must be provided.
  */
 export function sliceSource(
   source: DagSource,
   focus: string,
   opts?: DagSliceOptions,
-): DagSource {
+): SlicedDagSource {
   const direction = opts?.direction ?? 'both';
   const maxDepth = opts?.depth ?? Infinity;
 
-  const allIds = new Set(source.ids());
-  if (!allIds.has(focus)) return emptySource();
+  if (!source.has(focus)) return emptySource();
 
   const included = new Set<string>();
   const ghostNodes = new Map<string, { label: string; edges: string[] }>();
 
-  // Resolve parents — use source.parents if available, else derive
-  const getParents = source.parents
-    ? (id: string) => source.parents!(id)
-    : (id: string) => {
-        const parents: string[] = [];
-        for (const candidate of allIds) {
-          if (source.children(candidate).includes(id)) {
-            parents.push(candidate);
-          }
-        }
-        return parents;
-      };
-
   // BFS ancestors
   if (direction === 'ancestors' || direction === 'both') {
+    if (!source.parents) {
+      throw new Error(
+        '[bijou] dagSlice(): source.parents() is required for ancestor traversal',
+      );
+    }
+    const getParents = source.parents.bind(source);
     const queue: [string, number][] = [[focus, 0]];
     const visited = new Set<string>();
     while (queue.length > 0) {
@@ -174,11 +192,11 @@ export function sliceSource(
       included.add(id);
       if (depth < maxDepth) {
         for (const p of getParents(id)) {
-          if (!visited.has(p) && allIds.has(p)) queue.push([p, depth + 1]);
+          if (!visited.has(p) && source.has(p)) queue.push([p, depth + 1]);
         }
       } else {
         const boundaryParents = [...getParents(id)].filter(
-          p => !visited.has(p) && allIds.has(p),
+          p => !visited.has(p) && source.has(p),
         );
         if (boundaryParents.length > 0) {
           const ghostId = `__ghost_ancestors_${id}`;
@@ -202,7 +220,7 @@ export function sliceSource(
       if (visited.has(id)) continue;
       visited.add(id);
       included.add(id);
-      const ch = [...source.children(id)].filter(c => allIds.has(c));
+      const ch = [...source.children(id)].filter(c => source.has(c));
       if (depth < maxDepth) {
         for (const c of ch) {
           if (!visited.has(c)) queue.push([c, depth + 1]);
@@ -228,6 +246,8 @@ export function sliceSource(
   return {
     ids: () => slicedIds,
 
+    has: (id) => included.has(id),
+
     label: (id) => {
       const ghost = ghostNodes.get(id);
       if (ghost) return ghost.label;
@@ -246,14 +266,21 @@ export function sliceSource(
 
     parents: (id) => {
       if (ghostNodes.has(id)) {
-        // Ghost ancestor nodes point down — they have no parents in the slice
-        // Ghost descendant nodes also have no parents tracked
         if (id.startsWith('__ghost_ancestors_')) return [];
-        // Descendant ghosts: parent is the boundary node
         const boundaryId = id.replace('__ghost_descendants_', '');
         return included.has(boundaryId) ? [boundaryId] : [];
       }
-      return [...getParents(id)].filter(p => included.has(p));
+      if (source.parents) {
+        return [...source.parents(id)].filter(p => included.has(p));
+      }
+      // Derive parents from children of included nodes
+      const parents: string[] = [];
+      for (const candidate of included) {
+        if (!ghostNodes.has(candidate) && source.children(candidate).includes(id)) {
+          parents.push(candidate);
+        }
+      }
+      return parents;
     },
 
     badge: (id) => ghostNodes.has(id) ? undefined : source.badge?.(id),

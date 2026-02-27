@@ -1,8 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
-import { isDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
-import type { DagSource, DagSliceOptions } from './dag-source.js';
+import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
+import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -591,7 +591,7 @@ export function dagSlice(
   source: DagSource,
   focus: string,
   opts?: DagSliceOptions,
-): DagSource;
+): SlicedDagSource;
 export function dagSlice(
   nodes: DagNode[],
   focus: string,
@@ -601,7 +601,7 @@ export function dagSlice(
   input: DagNode[] | DagSource,
   focus: string,
   opts?: DagSliceOptions,
-): DagNode[] | DagSource {
+): DagNode[] | SlicedDagSource {
   if (isDagSource(input)) {
     return sliceSource(input, focus, opts);
   }
@@ -612,14 +612,14 @@ export function dagSlice(
 
 // ── dagLayout ──────────────────────────────────────────────────────
 
-export function dagLayout(source: DagSource, options?: DagOptions): DagLayout;
+export function dagLayout(source: SlicedDagSource, options?: DagOptions): DagLayout;
 export function dagLayout(nodes: DagNode[], options?: DagOptions): DagLayout;
 export function dagLayout(
-  input: DagNode[] | DagSource,
+  input: DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): DagLayout {
   const ctx = resolveCtx(options.ctx);
-  const nodes = isDagSource(input) ? materialize(input) : input;
+  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
   const result = renderInteractiveLayout(nodes, options, ctx);
   return { output: result.output, nodes: result.nodes, width: result.width, height: result.height };
@@ -627,15 +627,15 @@ export function dagLayout(
 
 // ── Main Entry Point ───────────────────────────────────────────────
 
-export function dag(source: DagSource, options?: DagOptions): string;
+export function dag(source: SlicedDagSource, options?: DagOptions): string;
 export function dag(nodes: DagNode[], options?: DagOptions): string;
 export function dag(
-  input: DagNode[] | DagSource,
+  input: DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
-  const nodes = isDagSource(input) ? materialize(input) : input;
+  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
 
   if (nodes.length === 0) return '';
 

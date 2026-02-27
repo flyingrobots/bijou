@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { dag, dagSlice, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
-import { arraySource, isDagSource, sliceSource } from './dag-source.js';
-import type { DagSource } from './dag-source.js';
+import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
+import type { DagSource, SlicedDagSource } from './dag-source.js';
 import { createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
@@ -511,6 +511,12 @@ describe('DagSource adapter', () => {
       expect(src.ids()).toEqual(['a', 'b', 'c', 'd']);
     });
 
+    it('has() returns true for known nodes', () => {
+      const src = arraySource(diamond);
+      expect(src.has('a')).toBe(true);
+      expect(src.has('missing')).toBe(false);
+    });
+
     it('label() returns node labels', () => {
       const src = arraySource(diamond);
       expect(src.label('a')).toBe('Start');
@@ -550,13 +556,28 @@ describe('DagSource adapter', () => {
 
     it('ghost() returns false for normal nodes', () => {
       const src = arraySource(diamond);
-      expect(src.ghost!('a')).toBe(false);
+      expect(src.ghost('a')).toBe(false);
+    });
+
+    it('is both a DagSource and a SlicedDagSource', () => {
+      const src = arraySource(diamond);
+      expect(isDagSource(src)).toBe(true);
+      expect(isSlicedDagSource(src)).toBe(true);
     });
   });
 
   describe('isDagSource', () => {
     it('returns true for DagSource objects', () => {
       expect(isDagSource(arraySource(diamond))).toBe(true);
+    });
+
+    it('returns true for unbounded DagSource', () => {
+      const custom: DagSource = {
+        has: () => true,
+        label: () => '',
+        children: () => [],
+      };
+      expect(isDagSource(custom)).toBe(true);
     });
 
     it('returns false for DagNode arrays', () => {
@@ -571,12 +592,27 @@ describe('DagSource adapter', () => {
     });
 
     it('returns false for objects missing required methods', () => {
-      expect(isDagSource({ ids: () => [] })).toBe(false);
-      expect(isDagSource({ ids: () => [], label: () => '' })).toBe(false);
+      expect(isDagSource({ has: () => true })).toBe(false);
+      expect(isDagSource({ has: () => true, label: () => '' })).toBe(false);
     });
   });
 
-  describe('dag() with DagSource', () => {
+  describe('isSlicedDagSource', () => {
+    it('returns true for SlicedDagSource', () => {
+      expect(isSlicedDagSource(arraySource(diamond))).toBe(true);
+    });
+
+    it('returns false for unbounded DagSource', () => {
+      const custom: DagSource = {
+        has: () => true,
+        label: () => '',
+        children: () => [],
+      };
+      expect(isSlicedDagSource(custom)).toBe(false);
+    });
+  });
+
+  describe('dag() with SlicedDagSource', () => {
     it('renders same output as DagNode[] for equivalent input', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const fromArray = dag(diamond, { ctx });
@@ -630,10 +666,10 @@ describe('DagSource adapter', () => {
       { id: 'f', label: 'F' },
     ];
 
-    it('returns DagSource (not DagNode[])', () => {
+    it('returns SlicedDagSource (not DagNode[])', () => {
       const src = arraySource(largeGraph);
       const result = dagSlice(src, 'd');
-      expect(isDagSource(result)).toBe(true);
+      expect(isSlicedDagSource(result)).toBe(true);
       expect(Array.isArray(result)).toBe(false);
     });
 
@@ -654,7 +690,7 @@ describe('DagSource adapter', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const src = arraySource(largeGraph);
       const neighborhood = dagSlice(src, 'd', { direction: 'both', depth: 2 });
-      const narrower = dagSlice(neighborhood as DagSource, 'd', { direction: 'descendants', depth: 1 });
+      const narrower = dagSlice(neighborhood, 'd', { direction: 'descendants', depth: 1 });
       const result = dag(narrower, { ctx });
       expect(result).toContain('D');
       expect(result).toContain('F');
@@ -663,15 +699,15 @@ describe('DagSource adapter', () => {
     it('ghost nodes appear at boundaries', () => {
       const src = arraySource(largeGraph);
       const sliced = dagSlice(src, 'd', { direction: 'ancestors', depth: 1 });
-      const ids = (sliced as DagSource).ids();
-      const ghostIds = ids.filter(id => (sliced as DagSource).ghost!(id));
+      const ids = sliced.ids();
+      const ghostIds = ids.filter(id => sliced.ghost(id));
       expect(ghostIds.length).toBeGreaterThan(0);
     });
 
     it('returns empty source for unknown focus', () => {
       const src = arraySource(largeGraph);
       const sliced = dagSlice(src, 'unknown');
-      expect((sliced as DagSource).ids()).toEqual([]);
+      expect(sliced.ids()).toEqual([]);
     });
 
     it('produces equivalent output to array path', () => {
@@ -681,9 +717,36 @@ describe('DagSource adapter', () => {
       const sourceResult = dag(dagSlice(src, 'd', { direction: 'ancestors', depth: 1 }), { ctx });
       expect(sourceResult).toBe(arrayResult);
     });
+
+    it('throws when ancestor traversal requested without parents()', () => {
+      const noParents: DagSource = {
+        has: (id) => ['a', 'b'].includes(id),
+        label: (id) => id,
+        children: (id) => id === 'a' ? ['b'] : [],
+      };
+      expect(() => dagSlice(noParents, 'b', { direction: 'ancestors' })).toThrow(
+        'source.parents() is required',
+      );
+    });
+
+    it('descendants-only works without parents()', () => {
+      const noParents: DagSource = {
+        has: (id) => ['a', 'b', 'c'].includes(id),
+        label: (id) => id,
+        children: (id) => {
+          if (id === 'a') return ['b'];
+          if (id === 'b') return ['c'];
+          return [];
+        },
+      };
+      const sliced = dagSlice(noParents, 'a', { direction: 'descendants' });
+      expect(sliced.ids()).toContain('a');
+      expect(sliced.ids()).toContain('b');
+      expect(sliced.ids()).toContain('c');
+    });
   });
 
-  describe('dagLayout() with DagSource', () => {
+  describe('dagLayout() with SlicedDagSource', () => {
     it('returns same layout as DagNode[] for equivalent input', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const fromArray = dagLayout(diamond, { ctx });
@@ -710,46 +773,38 @@ describe('DagSource adapter', () => {
     });
   });
 
-  describe('custom DagSource (no arraySource)', () => {
-    it('works with a hand-built DagSource', () => {
+  describe('custom DagSource (unbounded → slice → render)', () => {
+    it('slice then render with a hand-built DagSource', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const custom: DagSource = {
-        ids: () => ['x', 'y'],
+        has: (id) => ['x', 'y'].includes(id),
         label: (id) => id === 'x' ? 'Hello' : 'World',
         children: (id) => id === 'x' ? ['y'] : [],
+        parents: (id) => id === 'y' ? ['x'] : [],
       };
-      const result = dag(custom, { ctx });
+      const sliced = dagSlice(custom, 'x', { direction: 'descendants' });
+      const result = dag(sliced, { ctx });
       expect(result).toContain('Hello');
       expect(result).toContain('World');
       expect(result).toContain('▼');
     });
 
-    it('works without optional parents method', () => {
-      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-      const custom: DagSource = {
-        ids: () => ['a', 'b', 'c'],
-        label: (id) => id.toUpperCase(),
-        children: (id) => id === 'a' ? ['b', 'c'] : [],
-      };
-      const result = dag(custom, { ctx });
-      expect(result).toContain('A');
-      expect(result).toContain('B');
-    });
-
     it('works without optional badge/token methods', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const custom: DagSource = {
-        ids: () => ['p', 'q'],
+        has: (id) => ['p', 'q'].includes(id),
         label: (id) => id === 'p' ? 'Parent' : 'Child',
         children: (id) => id === 'p' ? ['q'] : [],
       };
-      const result = dag(custom, { ctx });
+      const sliced = dagSlice(custom, 'p', { direction: 'descendants' });
+      const result = dag(sliced, { ctx });
       expect(result).toBe('Parent -> Child\nChild');
     });
 
-    it('dagSlice works on custom source without parents()', () => {
+    it('never calls ids() on the unbounded source', () => {
+      let idsCalled = false;
       const custom: DagSource = {
-        ids: () => ['a', 'b', 'c'],
+        has: (id) => ['a', 'b', 'c'].includes(id),
         label: (id) => id,
         children: (id) => {
           if (id === 'a') return ['b'];
@@ -757,15 +812,52 @@ describe('DagSource adapter', () => {
           return [];
         },
       };
-      const sliced = dagSlice(custom, 'b', { direction: 'ancestors', depth: 1 });
-      const ids = (sliced as DagSource).ids();
-      expect(ids).toContain('b');
-      expect(ids).toContain('a');
+      // Verify DagSource has no ids method
+      expect((custom as SlicedDagSource).ids).toBeUndefined();
+      // Monkey-patch to detect if anyone tries to call it
+      (custom as Record<string, unknown>).ids = () => { idsCalled = true; return []; };
+      const sliced = dagSlice(custom, 'a', { direction: 'descendants' });
+      dag(sliced, { ctx: createTestContext({ mode: 'pipe' }) });
+      expect(idsCalled).toBe(false);
+    });
+
+    it('works with a simulated large graph via DagSource', () => {
+      // Simulate a graph with 1000 nodes but only render a 3-node slice
+      const custom: DagSource = {
+        has: (id) => id.startsWith('node-') && parseInt(id.split('-')[1]!) < 1000,
+        label: (id) => `Node ${id.split('-')[1]}`,
+        children: (id) => {
+          const n = parseInt(id.split('-')[1]!);
+          // Each node points to the next two
+          const ch: string[] = [];
+          if (n * 2 + 1 < 1000) ch.push(`node-${n * 2 + 1}`);
+          if (n * 2 + 2 < 1000) ch.push(`node-${n * 2 + 2}`);
+          return ch;
+        },
+        parents: (id) => {
+          const n = parseInt(id.split('-')[1]!);
+          if (n === 0) return [];
+          return [`node-${Math.floor((n - 1) / 2)}`];
+        },
+      };
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const sliced = dagSlice(custom, 'node-5', { direction: 'both', depth: 1 });
+      const ids = sliced.ids();
+      // Should contain node-5, its parent (node-2), and its children (node-11, node-12)
+      expect(ids).toContain('node-5');
+      expect(ids).toContain('node-2');
+      expect(ids).toContain('node-11');
+      expect(ids).toContain('node-12');
+      // Should NOT contain the whole graph
+      expect(ids.length).toBeLessThan(10);
+      // Should render
+      const result = dag(sliced, { ctx });
+      expect(result).toContain('Node 5');
     });
   });
 
   describe('sliceSource', () => {
-    it('returns composable DagSource', () => {
+    it('returns composable SlicedDagSource', () => {
       const src = arraySource([
         { id: 'a', label: 'A', edges: ['b'] },
         { id: 'b', label: 'B', edges: ['c'] },
@@ -775,7 +867,7 @@ describe('DagSource adapter', () => {
       expect(s1.ids()).toContain('a');
       expect(s1.ids()).toContain('b');
       // c is depth 2, should be a ghost
-      const ghostIds = s1.ids().filter(id => s1.ghost!(id));
+      const ghostIds = s1.ids().filter(id => s1.ghost(id));
       expect(ghostIds.length).toBe(1);
       expect(ghostIds[0]).toContain('ghost_descendants');
     });

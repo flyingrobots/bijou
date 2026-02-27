@@ -132,7 +132,9 @@ export {
   type DagLayout,
   arraySource,
   isDagSource,
+  isSlicedDagSource,
   type DagSource,
+  type SlicedDagSource,
   type DagSliceOptions,
 } from './core/components/index.js';
 

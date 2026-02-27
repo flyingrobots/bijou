@@ -10,12 +10,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 #### Core (`@flyingrobots/bijou`)
 
-- **`DagSource` adapter interface** — decouple DAG rendering from in-memory `DagNode[]` arrays; bring your own graph representation (database, API, adjacency matrix, etc.)
-- **`arraySource()`** — wraps `DagNode[]` as a `DagSource` for backward compatibility
-- **`isDagSource()`** — type guard for `DagSource` vs `DagNode[]`
+- **`DagSource` adapter interface** — decouple DAG rendering from in-memory `DagNode[]` arrays; bring your own graph representation (database, API, adjacency matrix, etc.). Uses `has()`/`children()`/`parents()` traversal — never enumerates the full graph
+- **`SlicedDagSource`** — bounded subtype of `DagSource` with `ids()` for rendering; produced by `dagSlice()` or `arraySource()`
+- **`arraySource()`** — wraps `DagNode[]` as a `SlicedDagSource` for backward compatibility
+- **`isDagSource()`** / **`isSlicedDagSource()`** — type guards
 - **`DagSliceOptions`** — extracted named type for `dagSlice()` options
-- **`dag()`, `dagSlice()`, `dagLayout()` overloads** — all three functions now accept either `DagSource` or `DagNode[]`; existing `DagNode[]` callers are unaffected
-- **`dagSlice()` returns `DagSource`** when given `DagSource` input, enabling composable slice-of-slice chains
+- **`dag()`, `dagSlice()`, `dagLayout()` overloads** — accept `SlicedDagSource` or `DagNode[]`; existing callers are unaffected
+- **`dagSlice()` returns `SlicedDagSource`** when given `DagSource` input, enabling composable slice-of-slice chains; purely traversal-based (no full-graph enumeration)
 
 ## [0.4.0] — 2026-02-27
 
