@@ -13,6 +13,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`dag()`** — ASCII DAG renderer with auto-layout (Sugiyama-Lite), edge routing, badges, per-node tokens, path highlighting, and graceful degradation (interactive/pipe/accessible modes)
 - **`dagSlice()`** — extract subgraphs (ancestors/descendants/neighborhood) with ghost boundary nodes for rendering fragments of large DAGs
 
+### Documentation
+
+- **43 example READMEs** — each example now has its own README with description, run command, GIF demo, and embedded source code
+- **Examples master-of-contents** — `examples/README.md` with categorized table (Static, Forms, TUI Apps) linking all 43 examples
+- **GIF demos** — recorded demo GIFs for all 43 examples via VHS tapes
+- **Docs reorganization** — moved root-level docs (ARCHITECTURE, CHANGELOG, EXAMPLES, ROADMAP) into `docs/` directory
+
+### Build
+
+- Added `tsx` as devDependency to eliminate npx cold-start spinner in examples
+- Added `record-gifs.ts` script with parallel GIF recording and bijou-powered progress UI
+
 ## [0.2.0] — 2026-02-26
 
 ### Added
