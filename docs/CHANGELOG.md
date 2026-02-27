@@ -13,6 +13,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`dag()`** — ASCII DAG renderer with auto-layout (Sugiyama-Lite), edge routing, badges, per-node tokens, path highlighting, and graceful degradation (interactive/pipe/accessible modes)
 - **`dagSlice()`** — extract subgraphs (ancestors/descendants/neighborhood) with ghost boundary nodes for rendering fragments of large DAGs
 
+### Fixed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dag()` dangling edges** — edges pointing to node IDs not present in the graph no longer trigger a false "cycle detected" error; they are silently filtered out
+
 ### Documentation
 
 - **43 example READMEs** — each example now has its own README with description, run command, GIF demo, and embedded source code
