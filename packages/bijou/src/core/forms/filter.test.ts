@@ -9,6 +9,24 @@ const OPTIONS = [
 ];
 
 describe('filter()', () => {
+  describe('empty options guard', () => {
+    it('throws when options is empty and no defaultValue', async () => {
+      await expect(
+        filter({ title: 'Pick', options: [], ctx: createTestContext({ mode: 'static', io: { answers: [''] } }) }),
+      ).rejects.toThrow('at least one option');
+    });
+
+    it('returns defaultValue when options is empty', async () => {
+      const result = await filter({
+        title: 'Pick',
+        options: [],
+        defaultValue: 'fallback' as string,
+        ctx: createTestContext({ mode: 'static', io: { answers: [''] } }),
+      });
+      expect(result).toBe('fallback');
+    });
+  });
+
   describe('numbered fallback (non-interactive)', () => {
     it('renders numbered list', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1'] } });

@@ -49,6 +49,13 @@ export function createPanelGroup<A>(options: PanelGroupOptions<A>): PanelGroup<A
     hotkeyMap.set(panel.hotkey, panel.id);
   }
 
+  if (!panelMap.has(options.defaultFocus)) {
+    throw new Error(
+      `createPanelGroup: defaultFocus "${options.defaultFocus}" does not match any panel id. ` +
+      `Available: ${[...panelMap.keys()].join(', ')}`,
+    );
+  }
+
   let focusedId = options.defaultFocus;
   const { inputStack } = options;
 

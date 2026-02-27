@@ -14,7 +14,6 @@ npx tsx examples/interactive-accordion/main.ts
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg,
   createAccordionState, interactiveAccordion,

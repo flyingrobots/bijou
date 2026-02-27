@@ -68,6 +68,7 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
   const t = ctx.theme;
   const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
   const height = options.height ?? 6;
+  const renderWidth = options.width ?? 80;
   const showLineNumbers = options.showLineNumbers ?? false;
 
   let lines: string[] = [''];
@@ -93,14 +94,17 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
     ctx.io.write(`\r\x1b[K${label}${hint}\n`);
 
     const vis = visibleLines();
+    const prefixWidth = showLineNumbers ? 6 : 2; // "  1 │ " or "  "
+    const contentWidth = Math.max(1, renderWidth - prefixWidth);
     for (let i = 0; i < height; i++) {
       const lineIdx = scrollY + i;
-      const line = vis[i] ?? '';
+      const rawLine = vis[i] ?? '';
+      const line = rawLine.length > contentWidth ? rawLine.slice(0, contentWidth) : rawLine;
       const prefix = showLineNumbers
         ? styledFn(t.theme.semantic.muted, `${String(lineIdx + 1).padStart(3)} │ `)
         : '  ';
 
-      if (line === '' && lineIdx >= lines.length && options.placeholder && lines.length === 1 && lines[0] === '') {
+      if (lineIdx === 0 && options.placeholder && lines.length === 1 && lines[0] === '') {
         ctx.io.write(`\x1b[K${prefix}${styledFn(t.theme.semantic.muted, options.placeholder)}\n`);
       } else {
         ctx.io.write(`\x1b[K${prefix}${line}\n`);
@@ -160,7 +164,8 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
       }
 
       if (key === '\r' || key === '\n') {
-        // Enter — newline
+        // Enter — newline (counts as 1 character for maxLength)
+        if (options.maxLength && currentLength() >= options.maxLength) return;
         const currentLine = lines[cursorRow]!;
         const before = currentLine.slice(0, cursorCol);
         const after = currentLine.slice(cursorCol);

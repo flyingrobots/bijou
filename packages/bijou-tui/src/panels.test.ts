@@ -39,6 +39,14 @@ function makePanels(): readonly PanelDef<Msg>[] {
 // Focus
 // ---------------------------------------------------------------------------
 
+describe('PanelGroup validation', () => {
+  it('throws when defaultFocus refers to non-existent panel', () => {
+    expect(() =>
+      createPanelGroup({ panels: makePanels(), defaultFocus: 'nonexistent' }),
+    ).toThrow('defaultFocus "nonexistent"');
+  });
+});
+
 describe('PanelGroup focus', () => {
   it('starts with defaultFocus', () => {
     const group = createPanelGroup({ panels: makePanels(), defaultFocus: 'nav' });

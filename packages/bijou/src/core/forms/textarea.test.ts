@@ -185,6 +185,16 @@ describe('textarea()', () => {
       expect(result).toBe('abc');
     });
 
+    it('maxLength prevents Enter newline when at limit', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['a', 'b', 'c', '\r', 'd', '\x04'] },
+      });
+      // maxLength=3: "abc" is 3 chars, Enter would add \n (4th char) — blocked
+      const result = await textarea({ title: 'Msg', maxLength: 3, ctx });
+      expect(result).toBe('abc');
+    });
+
     it('cleanup shows line count for multiline', async () => {
       const ctx = createTestContext({
         mode: 'interactive',

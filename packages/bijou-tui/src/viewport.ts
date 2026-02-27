@@ -144,6 +144,9 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
     visible++;
   }
 
+  // Append reset if we reached end of string with an active style
+  if (collecting && hasStyle) result += '\x1b[0m';
+
   return result;
 }
 

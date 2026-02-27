@@ -27,7 +27,7 @@ async function main() {
     ctx,
   });
 
-  if (message) {
+  if (message != null) {
     console.log();
     console.log(headerBox('Commit Message', { detail: message, ctx }));
   } else {

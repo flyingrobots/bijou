@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { kbd, separator } from '@flyingrobots/bijou';
+import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg,
   createPagerState, pager, pagerScrollBy, pagerPageDown, pagerPageUp,
@@ -54,7 +54,9 @@ const app: App<Model, Msg> = {
     if ('type' in msg && msg.type === 'resize') {
       const r = msg as { columns: number; rows: number };
       const p = createPagerState({ content: CONTENT, width: r.columns, height: r.rows - 2 });
-      return [{ ...model, pager: p, cols: r.columns, rows: r.rows }, []];
+      // Preserve scroll position across resize
+      const clampedY = Math.min(model.pager.scroll.y, p.scroll.maxY);
+      return [{ ...model, pager: { ...p, scroll: { ...p.scroll, y: clampedY } }, cols: r.columns, rows: r.rows }, []];
     }
 
     if ('type' in msg && msg.type === 'key') {

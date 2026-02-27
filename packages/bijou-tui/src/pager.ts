@@ -136,17 +136,22 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
     ? Math.max(1, state.height - 1)
     : state.height;
 
+  // Clamp scroll to the active viewport height (which may differ from
+  // the height used when creating state if showStatus changed).
+  const maxY = Math.max(0, state.scroll.totalLines - viewportHeight);
+  const clampedY = Math.max(0, Math.min(state.scroll.y, maxY));
+
   const body = viewport({
     width: state.width,
     height: viewportHeight,
     content: state.content,
-    scrollY: state.scroll.y,
+    scrollY: clampedY,
     showScrollbar,
   });
 
   if (!showStatus) return body;
 
-  const currentLine = state.scroll.y + 1;
+  const currentLine = clampedY + 1;
   const totalLines = state.scroll.totalLines;
   const status = `  Line ${currentLine}/${totalLines}`;
 

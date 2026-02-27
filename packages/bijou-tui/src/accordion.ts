@@ -123,6 +123,11 @@ export function interactiveAccordion(
   if (state.sections.length === 0) return '';
 
   const focusChar = options?.focusChar ?? '>';
+  // Normalize focusIndex to avoid stale/out-of-range values
+  const focusIndex = ((state.focusIndex % state.sections.length) + state.sections.length) % state.sections.length;
+  // Continuation-line padding must match the focus prefix width
+  const padWidth = focusChar.length + 1; // focusChar + space
+  const continuationPad = ' '.repeat(padWidth);
 
   // Render each section individually so we can prepend the focus indicator
   const renderedSections = state.sections.map((section, i) => {
@@ -132,12 +137,12 @@ export function interactiveAccordion(
       ctx: options?.ctx,
     });
 
-    const prefix = i === state.focusIndex ? `${focusChar} ` : '  ';
+    const prefix = i === focusIndex ? `${focusChar} ` : continuationPad;
 
     // Prepend the focus indicator to each line of the rendered section
     return rendered
       .split('\n')
-      .map((line, lineIdx) => (lineIdx === 0 ? prefix + line : '  ' + line))
+      .map((line, lineIdx) => (lineIdx === 0 ? prefix + line : continuationPad + line))
       .join('\n');
   });
 

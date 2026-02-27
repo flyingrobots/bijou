@@ -14,7 +14,7 @@ npx tsx examples/pager/main.ts
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { kbd, separator } from '@flyingrobots/bijou';
+import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg,
   createPagerState, pager, pagerScrollBy, pagerPageDown, pagerPageUp,

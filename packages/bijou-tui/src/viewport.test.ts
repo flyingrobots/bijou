@@ -90,9 +90,8 @@ describe('viewport', () => {
       showScrollbar: false,
     });
     const line = result.split('\n')[0]!;
-    // After stripping any ANSI reset, visible length should be ≤ 10
-    const visible = line.replace(/\x1b\[[0-9;]*m/g, '');
-    expect(visible.length).toBeLessThanOrEqual(10);
+    // After stripping ANSI, visible length should be ≤ 10
+    expect(stripAnsi(line).length).toBeLessThanOrEqual(10);
   });
 
   it('shows scrollbar when content exceeds viewport', () => {
@@ -105,7 +104,7 @@ describe('viewport', () => {
     const lines = result.split('\n');
     // Each line should include a scrollbar character at the end
     for (const line of lines) {
-      const lastChar = line.replace(/\x1b\[[0-9;]*m/g, '').trimEnd().slice(-1);
+      const lastChar = stripAnsi(line).trimEnd().slice(-1);
       expect(['█', '│']).toContain(lastChar);
     }
   });
@@ -121,7 +120,7 @@ describe('viewport', () => {
     const lines = result.split('\n');
     // No scrollbar chars — content fits entirely
     for (const line of lines) {
-      const stripped = line.replace(/\x1b\[[0-9;]*m/g, '').trimEnd();
+      const stripped = stripAnsi(line).trimEnd();
       expect(stripped).not.toContain('█');
       expect(stripped).not.toContain('│');
     }
@@ -136,7 +135,7 @@ describe('viewport', () => {
     });
     const lines = result.split('\n');
     for (const line of lines) {
-      const stripped = line.replace(/\x1b\[[0-9;]*m/g, '').trimEnd();
+      const stripped = stripAnsi(line).trimEnd();
       expect(stripped).not.toContain('█');
       expect(stripped).not.toContain('│');
     }
@@ -350,7 +349,7 @@ describe('viewport with scrollX', () => {
       scrollX: 3,
       showScrollbar: false,
     });
-    const visible = result.replace(/\x1b\[[0-9;]*m/g, '').trimEnd();
+    const visible = stripAnsi(result).trimEnd();
     expect(visible).toBe('defgh');
   });
 

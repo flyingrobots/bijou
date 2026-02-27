@@ -28,6 +28,11 @@ function defaultMatch<T>(query: string, option: FilterOption<T>): boolean {
 }
 
 export async function filter<T>(options: FilterOptions<T>): Promise<T> {
+  if (options.options.length === 0) {
+    if (options.defaultValue !== undefined) return options.defaultValue;
+    throw new Error('filter() requires at least one option, or a defaultValue');
+  }
+
   const ctx = options.ctx ?? getDefaultContext();
   const mode = ctx.mode;
 
@@ -173,6 +178,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
 
       if (key === '\x1b[A' || key === 'k') {
         // Up
+        if (filtered.length === 0) return;
         cursor = (cursor - 1 + filtered.length) % filtered.length;
         clearRender();
         render();
@@ -190,6 +196,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
           return;
         }
         if (key === '\x1b[B') {
+          if (filtered.length === 0) return;
           cursor = (cursor + 1) % filtered.length;
           clearRender();
           render();
