@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`composite()` dim predicate** — dim check now uses `visibleLength()` instead of raw `.length`, correctly skipping lines that contain only ANSI escape codes
+
+### Documentation
+
+- **textarea example** — fixed `box()` call with nonexistent `title` option; replaced with `headerBox()`
+- **ROADMAP P1.75** — clarified that `dagStats()` is deferred, not shipped with overlay primitives
+
 ## [0.4.0] — 2026-02-27
 
 ### Added
