@@ -338,11 +338,11 @@ Growing toward a full terminal component library:
 | Category | Components |
 |----------|-----------|
 | **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
-| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~ ✅, `dagLayout()`, `dagStats()` |
+| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~, ~~`dagLayout()`~~ ✅, `dagStats()` |
 | **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~ ✅, ~~`textarea()`~~, ~~`filter()`~~ ✅, `wizard()` |
 | **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
-| **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~ ✅, `navigableTable()`, `browsableList()`, `filePicker()`, `createPanelGroup()` |
-| **Overlay** | `composite()`, `modal()`, `toast()`, `drawer()` |
+| **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~ ✅, `navigableTable()`, `browsableList()`, `filePicker()` |
+| **Overlay** | `composite()` ← P1.75, `modal()` ← P1.75, `toast()` ← P1.75, `drawer()` |
 | **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~ ✅, mouse events (`IOPort.onMouse()`) |
 | **App** | `statusBar()`, `splitPane()`, `tooltip()` |
 
@@ -379,28 +379,38 @@ Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). P
 | **Form wizard** | bijou | Multi-page form orchestration — `stepper()` is visual only today, this adds the state machine. |
 | **`navigableTable()`** | bijou-tui | Keyboard-navigable table with row/column selection. Extends `table()`. |
 
-### P1.5 — Interactive DAG primitives (XYPH-driven)
+### ~~P1.5 — Interactive DAG primitives (XYPH-driven)~~ ✅ Shipped
 
 Specs from XYPH for building an interactive roadmap DAG view with 2D panning, node selection, and multi-panel input.
 
 | Feature | Package | Notes | Blocks XYPH? |
 |---------|---------|-------|:------------:|
-| **Export ANSI utilities** | bijou-tui | Export `stripAnsi()`, `visibleLength()`, `clipToWidth()` — already implemented, just not public | ✓ |
-| **`viewport()` scrollX** | bijou-tui | Horizontal scrolling for wide content. `scrollX` option, ANSI-aware left-edge slicing, `scrollByX()`/`scrollToX()` state transformers, `maxX` in `ScrollState` | ✓ |
-| **`dag()` `selectedId`** | bijou | `selectedId`/`selectedToken` options for visual node focus highlight. Selection styling on box border chars, distinct from `highlightPath` | ✓ |
-| **`dagLayout()`** | bijou | Returns rendered string + `Map<string, DagNodePosition>` with grid coordinates per node. Enables auto-scroll-to-selection and future click-to-select | |
-| **`createPanelGroup()`** | bijou-tui | Multi-panel focus management with per-panel keymaps. Integrates with `InputStack` — focus change pushes/pops keymap layers. `formatLabel()` for styled panel headers | |
-| **`dagStats()`** | bijou | Pure function: `{nodes, edges, depth, width, roots, leaves}` from node array | |
+| ~~**Export ANSI utilities**~~ | bijou-tui | ✅ `stripAnsi()`, `visibleLength()`, `clipToWidth()` publicly exported | ✓ |
+| ~~**`viewport()` scrollX**~~ | bijou-tui | ✅ `scrollX` option, `sliceAnsi()`, `scrollByX()`/`scrollToX()`, `maxX` in `ScrollState` | ✓ |
+| ~~**`dag()` `selectedId`**~~ | bijou | ✅ `selectedId`/`selectedToken` with highest priority over highlight path | ✓ |
+| ~~**`dagLayout()`**~~ | bijou | ✅ Returns rendered string + `Map<string, DagNodePosition>` with grid coordinates | |
+| ~~**`createPanelGroup()`**~~ | bijou-tui | ✅ Multi-panel focus with InputStack integration, hotkey switching, `formatLabel()` | |
+
+### P1.75 — XYPH Dashboard blockers
+
+Primitives needed for XYPH's interactive TUI dashboard (confirm dialogs, overlays, write operation flows). Promoted from P2/backlog based on XYPH Phase 1 requirements.
+
+| Feature | Package | Notes | Blocks XYPH? |
+|---------|---------|-------|:------------:|
+| **`composite()` overlay** | bijou-tui | Painter's algorithm compositing: base render + positioned overlays → final string. ANSI-aware, screen-edge clamping. Core primitive for modals, tooltips, toasts. | ✓ |
+| **`modal()`** | bijou-tui | Centered dialog overlay built on `composite()`. Confirm (y/n), input (text field), and info variants. Returns rendered overlay string. | ✓ |
+| **`toast()`** | bijou-tui | Anchored notification (top-right/bottom-right) built on `composite()`. Success/error/info variants with auto-dismiss timing. | ✓ |
+| **`dagStats()`** | bijou | Pure function: `{nodes, edges, depth, width, roots, leaves}` from node array. For overview dashboard counts. | |
 
 ### P2 — Layout, input & styling primitives
 
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **Mouse input** | bijou + bijou-node + bijou-tui | `IOPort.onMouse()` with SGR mouse parsing, `MouseMsg` in TEA runtime. Breaking change (new port method). |
-| **`composite()` overlay** | bijou-tui | Painter's algorithm compositing: base render + positioned overlays → final string. ANSI-aware, screen-edge clamping. Enables tooltips, context menus, detail popups. |
 | **`DagNode` token expansion** | bijou | `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
-| **CLI/stdin component driver** | bijou-tui | Drive component state via CLI flags (`--accordion.open(3)`) or streaming stdin commands. Enables scripted demos, testing, and external control of running TUI apps. |
 | **`place()`** | bijou | 2D text placement with horizontal + vertical alignment. |
+| **`drawer()`** | bijou-tui | Slide-in side panel built on `composite()`. Left/right anchored, configurable width. |
+| **CLI/stdin component driver** | bijou-tui | Drive component state via CLI flags or streaming stdin commands. Enables scripted demos, testing, and external control. |
 | **`enumeratedList()`** | bijou | Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet). |
 | **Terminal hyperlinks** | bijou | Clickable OSC 8 links with graceful fallback. |
 | **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
@@ -431,3 +441,12 @@ Once published:
 2. Create xyph-specific theme preset with custom status keys
 3. Replace inline rendering with bijou components
 4. Domain-specific views stay in xyph
+
+**XYPH TUI Dashboard dependency map:**
+
+| XYPH Phase | Bijou dependency | Status |
+|------------|-----------------|--------|
+| Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | ✅ Ready |
+| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | P1.75 — next up |
+| Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | ✅ Ready |
+| Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | ✅ Ready |
