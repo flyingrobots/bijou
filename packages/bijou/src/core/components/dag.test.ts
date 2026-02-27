@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { dag, dagSlice, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
+import { arraySource, isDagSource, sliceSource } from './dag-source.js';
+import type { DagSource } from './dag-source.js';
 import { createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
@@ -497,5 +499,295 @@ describe('dagLayout', () => {
     const layout = dagLayout(diamond, { selectedId: 'a', ctx });
     expect(layout.output).toContain('Start');
     expect(layout.nodes.has('a')).toBe(true);
+  });
+});
+
+// ── DagSource Adapter Tests ───────────────────────────────────────
+
+describe('DagSource adapter', () => {
+  describe('arraySource', () => {
+    it('ids() returns all node IDs', () => {
+      const src = arraySource(diamond);
+      expect(src.ids()).toEqual(['a', 'b', 'c', 'd']);
+    });
+
+    it('label() returns node labels', () => {
+      const src = arraySource(diamond);
+      expect(src.label('a')).toBe('Start');
+      expect(src.label('d')).toBe('End');
+    });
+
+    it('label() returns id for unknown nodes', () => {
+      const src = arraySource(diamond);
+      expect(src.label('missing')).toBe('missing');
+    });
+
+    it('children() returns edge targets', () => {
+      const src = arraySource(diamond);
+      expect(src.children('a')).toEqual(['b', 'c']);
+      expect(src.children('d')).toEqual([]);
+    });
+
+    it('parents() returns computed parent IDs', () => {
+      const src = arraySource(diamond);
+      expect(src.parents!('d')).toEqual(['b', 'c']);
+      expect(src.parents!('a')).toEqual([]);
+    });
+
+    it('badge() returns badge text', () => {
+      const src = arraySource(withBadges);
+      expect(src.badge!('a')).toBe('DONE');
+      expect(src.badge!('b')).toBe('WIP');
+    });
+
+    it('token() returns per-node token', () => {
+      const tokenNode: DagNode[] = [
+        { id: 'x', label: 'X', token: { hex: '#ff0000' } },
+      ];
+      const src = arraySource(tokenNode);
+      expect(src.token!('x')).toEqual({ hex: '#ff0000' });
+    });
+
+    it('ghost() returns false for normal nodes', () => {
+      const src = arraySource(diamond);
+      expect(src.ghost!('a')).toBe(false);
+    });
+  });
+
+  describe('isDagSource', () => {
+    it('returns true for DagSource objects', () => {
+      expect(isDagSource(arraySource(diamond))).toBe(true);
+    });
+
+    it('returns false for DagNode arrays', () => {
+      expect(isDagSource(diamond)).toBe(false);
+    });
+
+    it('returns false for null/undefined/primitives', () => {
+      expect(isDagSource(null)).toBe(false);
+      expect(isDagSource(undefined)).toBe(false);
+      expect(isDagSource(42)).toBe(false);
+      expect(isDagSource('string')).toBe(false);
+    });
+
+    it('returns false for objects missing required methods', () => {
+      expect(isDagSource({ ids: () => [] })).toBe(false);
+      expect(isDagSource({ ids: () => [], label: () => '' })).toBe(false);
+    });
+  });
+
+  describe('dag() with DagSource', () => {
+    it('renders same output as DagNode[] for equivalent input', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const fromArray = dag(diamond, { ctx });
+      const fromSource = dag(arraySource(diamond), { ctx });
+      expect(fromSource).toBe(fromArray);
+    });
+
+    it('works with pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const fromArray = dag(twoNodes, { ctx });
+      const fromSource = dag(arraySource(twoNodes), { ctx });
+      expect(fromSource).toBe(fromArray);
+    });
+
+    it('works with accessible mode', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const fromArray = dag(diamond, { ctx });
+      const fromSource = dag(arraySource(diamond), { ctx });
+      expect(fromSource).toBe(fromArray);
+    });
+
+    it('handles empty source', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const src = arraySource([]);
+      expect(dag(src, { ctx })).toBe('');
+    });
+
+    it('works with badges', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const fromArray = dag(withBadges, { ctx });
+      const fromSource = dag(arraySource(withBadges), { ctx });
+      expect(fromSource).toBe(fromArray);
+    });
+
+    it('works with fan-out', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200 } });
+      const fromArray = dag(fanOut, { ctx });
+      const fromSource = dag(arraySource(fanOut), { ctx });
+      expect(fromSource).toBe(fromArray);
+    });
+  });
+
+  describe('dagSlice() with DagSource', () => {
+    const largeGraph: DagNode[] = [
+      { id: 'root', label: 'Root', edges: ['a', 'b'] },
+      { id: 'a', label: 'A', edges: ['c', 'd'] },
+      { id: 'b', label: 'B', edges: ['d', 'e'] },
+      { id: 'c', label: 'C', edges: ['f'] },
+      { id: 'd', label: 'D', edges: ['f'] },
+      { id: 'e', label: 'E', edges: ['f'] },
+      { id: 'f', label: 'F' },
+    ];
+
+    it('returns DagSource (not DagNode[])', () => {
+      const src = arraySource(largeGraph);
+      const result = dagSlice(src, 'd');
+      expect(isDagSource(result)).toBe(true);
+      expect(Array.isArray(result)).toBe(false);
+    });
+
+    it('still returns DagNode[] when given DagNode[]', () => {
+      const result = dagSlice(largeGraph, 'd');
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('sliced source is renderable with dag()', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const src = arraySource(largeGraph);
+      const sliced = dagSlice(src, 'd', { direction: 'both', depth: 1 });
+      const result = dag(sliced, { ctx });
+      expect(result).toContain('D');
+    });
+
+    it('composable: slice of a slice works', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const src = arraySource(largeGraph);
+      const neighborhood = dagSlice(src, 'd', { direction: 'both', depth: 2 });
+      const narrower = dagSlice(neighborhood as DagSource, 'd', { direction: 'descendants', depth: 1 });
+      const result = dag(narrower, { ctx });
+      expect(result).toContain('D');
+      expect(result).toContain('F');
+    });
+
+    it('ghost nodes appear at boundaries', () => {
+      const src = arraySource(largeGraph);
+      const sliced = dagSlice(src, 'd', { direction: 'ancestors', depth: 1 });
+      const ids = (sliced as DagSource).ids();
+      const ghostIds = ids.filter(id => (sliced as DagSource).ghost!(id));
+      expect(ghostIds.length).toBeGreaterThan(0);
+    });
+
+    it('returns empty source for unknown focus', () => {
+      const src = arraySource(largeGraph);
+      const sliced = dagSlice(src, 'unknown');
+      expect((sliced as DagSource).ids()).toEqual([]);
+    });
+
+    it('produces equivalent output to array path', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const arrayResult = dag(dagSlice(largeGraph, 'd', { direction: 'ancestors', depth: 1 }), { ctx });
+      const src = arraySource(largeGraph);
+      const sourceResult = dag(dagSlice(src, 'd', { direction: 'ancestors', depth: 1 }), { ctx });
+      expect(sourceResult).toBe(arrayResult);
+    });
+  });
+
+  describe('dagLayout() with DagSource', () => {
+    it('returns same layout as DagNode[] for equivalent input', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const fromArray = dagLayout(diamond, { ctx });
+      const fromSource = dagLayout(arraySource(diamond), { ctx });
+      expect(fromSource.output).toBe(fromArray.output);
+      expect(fromSource.width).toBe(fromArray.width);
+      expect(fromSource.height).toBe(fromArray.height);
+    });
+
+    it('position map contains all source IDs', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const src = arraySource(diamond);
+      const layout = dagLayout(src, { ctx });
+      for (const id of src.ids()) {
+        expect(layout.nodes.has(id)).toBe(true);
+      }
+    });
+
+    it('handles empty source', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const layout = dagLayout(arraySource([]), { ctx });
+      expect(layout.output).toBe('');
+      expect(layout.nodes.size).toBe(0);
+    });
+  });
+
+  describe('custom DagSource (no arraySource)', () => {
+    it('works with a hand-built DagSource', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const custom: DagSource = {
+        ids: () => ['x', 'y'],
+        label: (id) => id === 'x' ? 'Hello' : 'World',
+        children: (id) => id === 'x' ? ['y'] : [],
+      };
+      const result = dag(custom, { ctx });
+      expect(result).toContain('Hello');
+      expect(result).toContain('World');
+      expect(result).toContain('▼');
+    });
+
+    it('works without optional parents method', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const custom: DagSource = {
+        ids: () => ['a', 'b', 'c'],
+        label: (id) => id.toUpperCase(),
+        children: (id) => id === 'a' ? ['b', 'c'] : [],
+      };
+      const result = dag(custom, { ctx });
+      expect(result).toContain('A');
+      expect(result).toContain('B');
+    });
+
+    it('works without optional badge/token methods', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const custom: DagSource = {
+        ids: () => ['p', 'q'],
+        label: (id) => id === 'p' ? 'Parent' : 'Child',
+        children: (id) => id === 'p' ? ['q'] : [],
+      };
+      const result = dag(custom, { ctx });
+      expect(result).toBe('Parent -> Child\nChild');
+    });
+
+    it('dagSlice works on custom source without parents()', () => {
+      const custom: DagSource = {
+        ids: () => ['a', 'b', 'c'],
+        label: (id) => id,
+        children: (id) => {
+          if (id === 'a') return ['b'];
+          if (id === 'b') return ['c'];
+          return [];
+        },
+      };
+      const sliced = dagSlice(custom, 'b', { direction: 'ancestors', depth: 1 });
+      const ids = (sliced as DagSource).ids();
+      expect(ids).toContain('b');
+      expect(ids).toContain('a');
+    });
+  });
+
+  describe('sliceSource', () => {
+    it('returns composable DagSource', () => {
+      const src = arraySource([
+        { id: 'a', label: 'A', edges: ['b'] },
+        { id: 'b', label: 'B', edges: ['c'] },
+        { id: 'c', label: 'C' },
+      ]);
+      const s1 = sliceSource(src, 'a', { direction: 'descendants', depth: 1 });
+      expect(s1.ids()).toContain('a');
+      expect(s1.ids()).toContain('b');
+      // c is depth 2, should be a ghost
+      const ghostIds = s1.ids().filter(id => s1.ghost!(id));
+      expect(ghostIds.length).toBe(1);
+      expect(ghostIds[0]).toContain('ghost_descendants');
+    });
+
+    it('preserves badges and tokens through slicing', () => {
+      const src = arraySource([
+        { id: 'a', label: 'A', edges: ['b'], badge: 'OK', token: { hex: '#00ff00' } },
+        { id: 'b', label: 'B' },
+      ]);
+      const sliced = sliceSource(src, 'a', { direction: 'descendants' });
+      expect(sliced.badge!('a')).toBe('OK');
+      expect(sliced.token!('a')).toEqual({ hex: '#00ff00' });
+    });
   });
 });

@@ -130,6 +130,10 @@ export {
   type DagOptions,
   type DagNodePosition,
   type DagLayout,
+  arraySource,
+  isDagSource,
+  type DagSource,
+  type DagSliceOptions,
 } from './core/components/index.js';
 
 // Forms

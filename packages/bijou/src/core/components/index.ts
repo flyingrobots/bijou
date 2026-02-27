@@ -51,3 +51,6 @@ export type { StepperStep, StepperOptions } from './stepper.js';
 
 export { dag, dagSlice, dagLayout } from './dag.js';
 export type { DagNode, DagOptions, DagNodePosition, DagLayout } from './dag.js';
+
+export { arraySource, isDagSource } from './dag-source.js';
+export type { DagSource, DagSliceOptions } from './dag-source.js';

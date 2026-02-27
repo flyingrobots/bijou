@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`DagSource` adapter interface** — decouple DAG rendering from in-memory `DagNode[]` arrays; bring your own graph representation (database, API, adjacency matrix, etc.)
+- **`arraySource()`** — wraps `DagNode[]` as a `DagSource` for backward compatibility
+- **`isDagSource()`** — type guard for `DagSource` vs `DagNode[]`
+- **`DagSliceOptions`** — extracted named type for `dagSlice()` options
+- **`dag()`, `dagSlice()`, `dagLayout()` overloads** — all three functions now accept either `DagSource` or `DagNode[]`; existing `DagNode[]` callers are unaffected
+- **`dagSlice()` returns `DagSource`** when given `DagSource` input, enabling composable slice-of-slice chains
+
 ## [0.4.0] — 2026-02-27
 
 ### Added
