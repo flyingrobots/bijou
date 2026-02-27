@@ -28,6 +28,20 @@ export interface DagOptions {
   ctx?: BijouContext;
 }
 
+export interface DagNodePosition {
+  readonly row: number;
+  readonly col: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface DagLayout {
+  readonly output: string;
+  readonly nodes: ReadonlyMap<string, DagNodePosition>;
+  readonly width: number;
+  readonly height: number;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────
 
 function resolveCtx(ctx?: BijouContext): BijouContext {
@@ -297,12 +311,12 @@ function renderNodeBox(
 
 // ── Interactive Renderer ───────────────────────────────────────────
 
-function renderInteractive(
+function renderInteractiveLayout(
   nodes: DagNode[],
   options: DagOptions,
   ctx: BijouContext,
-): string {
-  if (nodes.length === 0) return '';
+): { output: string; nodes: Map<string, DagNodePosition>; width: number; height: number } {
+  if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
 
   const nodeMap = new Map<string, DagNode>();
   for (const n of nodes) nodeMap.set(n.id, n);
@@ -441,12 +455,15 @@ function renderInteractive(
   }
 
   // Write node boxes
+  const positions = new Map<string, DagNodePosition>();
   for (const n of nodes) {
     const layer = layerMap.get(n.id);
     const col = colIndex.get(n.id);
     if (layer === undefined || col === undefined) continue;
     const startCol = col * colStride;
     const startRow = layer * RS;
+
+    positions.set(n.id, { row: startRow, col: startCol, width: nodeWidth, height: 3 });
 
     const boxLines = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
 
@@ -507,7 +524,7 @@ function renderInteractive(
     lines.pop();
   }
 
-  return lines.join('\n');
+  return { output: lines.join('\n'), nodes: positions, width: gridCols, height: gridRows };
 }
 
 // ── Pipe Renderer ──────────────────────────────────────────────────
@@ -696,6 +713,15 @@ export function dagSlice(
   return result;
 }
 
+// ── dagLayout ──────────────────────────────────────────────────────
+
+export function dagLayout(nodes: DagNode[], options: DagOptions = {}): DagLayout {
+  const ctx = resolveCtx(options.ctx);
+  if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
+  const result = renderInteractiveLayout(nodes, options, ctx);
+  return { output: result.output, nodes: result.nodes, width: result.width, height: result.height };
+}
+
 // ── Main Entry Point ───────────────────────────────────────────────
 
 export function dag(nodes: DagNode[], options: DagOptions = {}): string {
@@ -713,5 +739,5 @@ export function dag(nodes: DagNode[], options: DagOptions = {}): string {
     return renderAccessible(nodes, layerMap);
   }
 
-  return renderInteractive(nodes, options, ctx);
+  return renderInteractiveLayout(nodes, options, ctx).output;
 }

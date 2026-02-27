@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dag, dagSlice } from './dag.js';
+import { dag, dagSlice, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
 import { createTestContext } from '../../adapters/test/index.js';
 
@@ -443,5 +443,59 @@ describe('dagSlice', () => {
     const sliced = dagSlice(largeGraph, 'd', { direction: 'both', depth: 1 });
     const result = dag(sliced, { ctx });
     expect(result).toContain('D');
+  });
+});
+
+// ── dagLayout Tests ────────────────────────────────────────────────
+
+describe('dagLayout', () => {
+  it('dagLayout().output === dag() for same inputs', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout(diamond, { ctx });
+    const dagStr = dag(diamond, { ctx });
+    expect(layout.output).toBe(dagStr);
+  });
+
+  it('empty nodes return empty layout', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout([], { ctx });
+    expect(layout.output).toBe('');
+    expect(layout.nodes.size).toBe(0);
+    expect(layout.width).toBe(0);
+    expect(layout.height).toBe(0);
+  });
+
+  it('positions map contains all node IDs', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout(diamond, { ctx });
+    for (const n of diamond) {
+      expect(layout.nodes.has(n.id)).toBe(true);
+    }
+  });
+
+  it('positions have valid coordinates', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200 } });
+    const layout = dagLayout(fanOut, { ctx });
+    for (const [, pos] of layout.nodes) {
+      expect(pos.row).toBeGreaterThanOrEqual(0);
+      expect(pos.col).toBeGreaterThanOrEqual(0);
+      expect(pos.row).toBeLessThan(layout.height);
+      expect(pos.col).toBeLessThan(layout.width);
+      expect(pos.height).toBe(3);
+    }
+  });
+
+  it('width/height > 0 for non-empty graphs', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout(twoNodes, { ctx });
+    expect(layout.width).toBeGreaterThan(0);
+    expect(layout.height).toBeGreaterThan(0);
+  });
+
+  it('works with selectedId', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout(diamond, { selectedId: 'a', ctx });
+    expect(layout.output).toContain('Start');
+    expect(layout.nodes.has('a')).toBe(true);
   });
 });
