@@ -76,7 +76,8 @@ export function isSlicedDagSource(value: unknown): value is SlicedDagSource {
   return (
     isDagSource(value) &&
     typeof (value as SlicedDagSource).ids === 'function' &&
-    typeof (value as SlicedDagSource).ghost === 'function'
+    typeof (value as SlicedDagSource).ghost === 'function' &&
+    typeof (value as SlicedDagSource).ghostLabel === 'function'
   );
 }
 
@@ -103,8 +104,8 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
     ids: () => idList,
     has: (id) => map.has(id),
     label: (id) => map.get(id)?.label ?? id,
-    children: (id) => map.get(id)?.edges ?? [],
-    parents: (id) => parentMap.get(id) ?? [],
+    children: (id) => [...(map.get(id)?.edges ?? [])],
+    parents: (id) => [...(parentMap.get(id) ?? [])],
     badge: (id) => map.get(id)?.badge,
     token: (id) => map.get(id)?.token,
     ghost: (id) => map.get(id)?._ghost ?? false,
@@ -152,6 +153,11 @@ const EMPTY_SOURCE: SlicedDagSource = Object.freeze({
   ghostLabel: () => undefined,
 });
 
+// ── Ghost ID Prefixes ───────────────────────────────────────────────
+
+const GHOST_ANCESTORS_PREFIX = '__ghost_ancestors_';
+const GHOST_DESCENDANTS_PREFIX = '__ghost_descendants_';
+
 // ── sliceSource ─────────────────────────────────────────────────────
 
 /**
@@ -175,6 +181,8 @@ export function sliceSource(
 
   const included = new Set<string>();
   const ghostNodes = new Map<string, { label: string; edges: string[] }>();
+  // Precomputed reverse map for when source.parents is absent
+  const derivedParents = new Map<string, string[]>();
 
   // BFS ancestors
   if (direction === 'ancestors' || direction === 'both') {
@@ -203,7 +211,7 @@ export function sliceSource(
             p => !visited.has(p) && source.has(p),
           );
           if (boundaryParents.length > 0) {
-            const ghostId = `__ghost_ancestors_${id}`;
+            const ghostId = `${GHOST_ANCESTORS_PREFIX}${id}`;
             included.add(ghostId);
             const count = boundaryParents.length;
             ghostNodes.set(ghostId, {
@@ -226,6 +234,13 @@ export function sliceSource(
       visited.add(id);
       included.add(id);
       const ch = [...source.children(id)].filter(c => source.has(c));
+      // Track reverse edges for derived parent map
+      if (!source.parents) {
+        for (const c of ch) {
+          if (!derivedParents.has(c)) derivedParents.set(c, []);
+          derivedParents.get(c)!.push(id);
+        }
+      }
       if (depth < maxDepth) {
         for (const c of ch) {
           if (!visited.has(c)) queue.push([c, depth + 1]);
@@ -233,7 +248,7 @@ export function sliceSource(
       } else {
         const boundaryChildren = ch.filter(c => !visited.has(c));
         if (boundaryChildren.length > 0) {
-          const ghostId = `__ghost_descendants_${id}`;
+          const ghostId = `${GHOST_DESCENDANTS_PREFIX}${id}`;
           included.add(ghostId);
           const count = boundaryChildren.length;
           ghostNodes.set(ghostId, {
@@ -247,6 +262,8 @@ export function sliceSource(
 
   // Build the sliced DagSource
   const slicedIds = Object.freeze([...included]);
+  // Inherit ghost status from input when slicing a SlicedDagSource
+  const inheritGhost = isSlicedDagSource(source) ? source : null;
 
   return {
     ids: () => slicedIds,
@@ -261,39 +278,32 @@ export function sliceSource(
 
     children: (id) => {
       const ghost = ghostNodes.get(id);
-      if (ghost) return ghost.edges;
+      if (ghost) return [...ghost.edges];
       // Filter to included IDs, plus any descendant ghost for this node
       const ch = [...source.children(id)].filter(c => included.has(c));
-      const descGhostId = `__ghost_descendants_${id}`;
+      const descGhostId = `${GHOST_DESCENDANTS_PREFIX}${id}`;
       if (ghostNodes.has(descGhostId)) ch.push(descGhostId);
       return ch;
     },
 
     parents: (id) => {
       if (ghostNodes.has(id)) {
-        if (id.startsWith('__ghost_ancestors_')) return [];
-        const boundaryId = id.replace('__ghost_descendants_', '');
+        if (id.startsWith(GHOST_ANCESTORS_PREFIX)) return [];
+        const boundaryId = id.replace(GHOST_DESCENDANTS_PREFIX, '');
         return included.has(boundaryId) ? [boundaryId] : [];
       }
       if (source.parents) {
         return [...source.parents(id)].filter(p => included.has(p));
       }
-      // Derive parents from children of included nodes
-      const parents: string[] = [];
-      for (const candidate of included) {
-        if (!ghostNodes.has(candidate) && source.children(candidate).includes(id)) {
-          parents.push(candidate);
-        }
-      }
-      return parents;
+      return (derivedParents.get(id) ?? []).filter(p => included.has(p));
     },
 
     badge: (id) => ghostNodes.has(id) ? undefined : source.badge?.(id),
 
     token: (id) => ghostNodes.has(id) ? undefined : source.token?.(id),
 
-    ghost: (id) => ghostNodes.has(id),
+    ghost: (id) => ghostNodes.has(id) || (inheritGhost !== null && inheritGhost.ghost(id)),
 
-    ghostLabel: (id) => ghostNodes.get(id)?.label,
+    ghostLabel: (id) => ghostNodes.get(id)?.label ?? inheritGhost?.ghostLabel(id),
   };
 }
