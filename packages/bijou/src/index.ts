@@ -61,6 +61,15 @@ export {
   type DTCGDocument,
   type DTCGToken,
   type DTCGGroup,
+  // Color manipulation
+  hexToRgb,
+  rgbToHex,
+  lighten,
+  darken,
+  mix,
+  complementary,
+  saturate,
+  desaturate,
 } from './core/theme/index.js';
 
 // Detection
