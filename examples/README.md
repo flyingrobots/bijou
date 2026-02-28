@@ -1,6 +1,6 @@
 # Examples
 
-> 59 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 61 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -75,4 +75,6 @@
 | [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
 | [`command-palette`](./command-palette/) | `commandPalette()`, `commandPaletteKeyMap()` | Filterable action list with live search |
 | [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
+| [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
+| [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

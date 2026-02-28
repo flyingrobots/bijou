@@ -84,6 +84,7 @@ export {
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  clipToWidth,
 } from './core/text/index.js';
 
 // Detection

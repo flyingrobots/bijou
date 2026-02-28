@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createEventBus, type BusMsg } from './eventbus.js';
 import type { Cmd } from './types.js';
-import { QUIT, isKeyMsg, isResizeMsg } from './types.js';
+import { QUIT, isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { IOPort, RawInputHandle } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
@@ -126,10 +126,22 @@ describe('connectIO keyboard', () => {
     bus.on((msg) => received.push(msg));
 
     bus.connectIO(io);
-    // Send a mouse event sequence (parsed as unknown)
+    // Send a mouse event sequence (parsed as unknown when mouse disabled)
     simulateKey('\x1b[M !!');
 
     expect(received).toHaveLength(0);
+  });
+
+  it('filters mouse sequences when mouse disabled', () => {
+    const bus = createEventBus<TestMsg>();
+    const { io, simulateKey } = createMockIO();
+    const received: BusMsg<TestMsg>[] = [];
+    bus.on((msg) => received.push(msg));
+
+    bus.connectIO(io); // mouse disabled by default
+    simulateKey('\x1b[<0;10;20M'); // SGR left click
+
+    expect(received).toHaveLength(0); // parsed as unknown key, filtered
   });
 
   it('disconnects on dispose', () => {
@@ -144,6 +156,60 @@ describe('connectIO keyboard', () => {
     simulateKey('b');
 
     expect(received).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// connectIO — mouse
+// ---------------------------------------------------------------------------
+
+describe('connectIO mouse', () => {
+  it('emits MouseMsg when mouse enabled', () => {
+    const bus = createEventBus<TestMsg>();
+    const { io, simulateKey } = createMockIO();
+    const received: BusMsg<TestMsg>[] = [];
+    bus.on((msg) => received.push(msg));
+
+    bus.connectIO(io, { mouse: true });
+    simulateKey('\x1b[<0;10;20M'); // SGR left click
+
+    expect(received).toHaveLength(1);
+    expect(isMouseMsg(received[0])).toBe(true);
+    if (isMouseMsg(received[0])) {
+      expect(received[0].button).toBe('left');
+      expect(received[0].action).toBe('press');
+      expect(received[0].col).toBe(9);
+      expect(received[0].row).toBe(19);
+    }
+  });
+
+  it('still emits KeyMsg for keyboard input when mouse enabled', () => {
+    const bus = createEventBus<TestMsg>();
+    const { io, simulateKey } = createMockIO();
+    const received: BusMsg<TestMsg>[] = [];
+    bus.on((msg) => received.push(msg));
+
+    bus.connectIO(io, { mouse: true });
+    simulateKey('a');
+
+    expect(received).toHaveLength(1);
+    expect(isKeyMsg(received[0])).toBe(true);
+  });
+
+  it('emits scroll events when mouse enabled', () => {
+    const bus = createEventBus<TestMsg>();
+    const { io, simulateKey } = createMockIO();
+    const received: BusMsg<TestMsg>[] = [];
+    bus.on((msg) => received.push(msg));
+
+    bus.connectIO(io, { mouse: true });
+    simulateKey('\x1b[<64;5;5M'); // scroll up
+
+    expect(received).toHaveLength(1);
+    expect(isMouseMsg(received[0])).toBe(true);
+    if (isMouseMsg(received[0])) {
+      expect(received[0].action).toBe('scroll-up');
+    }
   });
 });
 

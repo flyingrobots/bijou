@@ -5,7 +5,7 @@
  * available screen space, with optional scrollbar indicator.
  */
 
-import { graphemeWidth, graphemeClusterWidth, segmentGraphemes } from '@flyingrobots/bijou';
+import { graphemeWidth, graphemeClusterWidth, segmentGraphemes, clipToWidth as coreClipToWidth } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,62 +66,9 @@ export function visibleLength(str: string): number {
  * Grapheme-cluster aware: won't split multi-codepoint sequences.
  * Appends a reset sequence if the string was clipped mid-style.
  *
- * O(n): pre-segments stripped text once, then walks the original string
- * with a grapheme pointer instead of re-segmenting per character.
+ * Re-exported from `@flyingrobots/bijou` core for backward compatibility.
  */
-export function clipToWidth(str: string, maxWidth: number): string {
-  const stripped = stripAnsi(str);
-  const graphemes = segmentGraphemes(stripped);
-
-  let result = '';
-  let visible = 0;
-  let inEscape = false;
-  let escBuf = '';
-  let hasStyle = false;
-  let gi = 0;
-  let i = 0;
-
-  while (i < str.length) {
-    const ch = str[i]!;
-
-    if (ch === '\x1b') {
-      inEscape = true;
-      escBuf = ch;
-      i++;
-      continue;
-    }
-
-    if (inEscape) {
-      escBuf += ch;
-      if (ch === 'm') {
-        inEscape = false;
-        result += escBuf;
-        escBuf = '';
-        hasStyle = true;
-      }
-      i++;
-      continue;
-    }
-
-    // Visible character — consume next pre-segmented grapheme
-    if (gi >= graphemes.length) break;
-
-    const grapheme = graphemes[gi]!;
-    const gWidth = graphemeClusterWidth(grapheme);
-
-    if (visible + gWidth > maxWidth) {
-      if (hasStyle) result += '\x1b[0m';
-      break;
-    }
-
-    result += grapheme;
-    visible += gWidth;
-    gi++;
-    i += grapheme.length;
-  }
-
-  return result;
-}
+export const clipToWidth = coreClipToWidth;
 
 /**
  * Extract a visible-column substring from an ANSI-styled string.

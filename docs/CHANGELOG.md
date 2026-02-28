@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **`canvas()` surrogate corruption** — replace `ch[0]!` with code-point-aware `[...ch][0]` to correctly extract non-BMP characters (emoji) from shader output
+- **Canvas example unsafe cast** — remove `(msg as Msg)` cast; TypeScript narrows through `'type' in msg` already
+- **`parseMouse()` duplicated ternary** — extract `buttonFromBits()` helper to DRY the button-to-name mapping
+- **`parseMouse()` zero coordinate guard** — reject malformed SGR sequences with col/row of 0 (protocol-invalid) instead of producing -1 positions
 - **`clipToWidth()` / `sliceAnsi()` O(n²) perf** — rewrite to pre-segment stripped text once via `segmentGraphemes()`, then walk original string with a grapheme pointer; removes per-character `str.slice(i)` + re-segment pattern
 - **`clipToWidth()` unconditional reset** — only append `\x1b[0m` when the clipped string actually contains ANSI style sequences
 - **`viewport.ts` duplicate segmenter** — remove `getSegmenter()` singleton; import `segmentGraphemes` from `@flyingrobots/bijou` core
@@ -23,13 +27,46 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Mark canvas README snippet as excerpt
+- Add missing `CHARS` definition to canvas README snippet
+- Add `canvas` and `mouse` rows to examples README
+- Add `static` mode comment to `canvas()`
 - Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
+- Fix CHANGELOG test file count (`4 new + 5 expanded` → `2 new + 4 expanded`)
 - Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
 - Merge duplicate README documentation bullets in CHANGELOG
 - Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
 - Fix CHANGELOG v0.6.0 section heading (`Bug Fixes` → `Fixes`)
 - Fix progress-download README unused `vstack` import
 - Remove `(pre-release)` from xyph-title.md
+
+## [0.10.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`clipToWidth()`** — grapheme-aware text clipping promoted from bijou-tui to bijou core. O(n) algorithm preserving ANSI escapes, won't split multi-codepoint grapheme clusters (emoji, CJK, ZWJ sequences). Appends reset only when ANSI present
+- **`box()` width override** — optional `width` on `BoxOptions` locks outer box width (including borders). Content lines are clipped via `clipToWidth()` or right-padded to fill. Padding is clamped when it exceeds available interior space. Pipe/accessible modes ignore width
+- **`box()` grapheme-aware width measurement** — replaced naive `stripAnsi().length` with `graphemeWidth()` for correct CJK/emoji box sizing (pre-existing bug fix)
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`canvas()` shader primitive** — `(cols, rows, shader, options?) → string` character-grid renderer for procedural backgrounds. Shader receives `(x, y, cols, rows, time)` per cell. Returns empty string in pipe/accessible mode. Composes with `composite()` for layered rendering
+- **Mouse input (opt-in)** — SGR mouse protocol support via `RunOptions.mouse?: boolean` (default false). New types: `MouseMsg`, `MouseButton`, `MouseAction`. `parseMouse()` parses SGR sequences (`\x1b[<button;col;rowM/m`). `isMouseMsg()` type guard. EventBus `connectIO()` accepts `{ mouse: true }` option. Runtime sends enable/disable escape sequences on startup/cleanup
+- **`App.update()` signature widened** — now receives `KeyMsg | ResizeMsg | MouseMsg | M` (was `KeyMsg | ResizeMsg | M`). Since `MouseMsg` is never emitted when `mouse: false`, existing apps are unaffected at runtime
+
+### 🔧 Refactors
+
+- **`viewport.ts` `clipToWidth()`** — re-exports from `@flyingrobots/bijou` core instead of maintaining a local copy. Public API unchanged for backward compatibility
+
+### 🧪 Tests
+
+- 51 new tests across 2 new + 4 expanded test files (1403 total)
+
+### 📝 Documentation
+
+- **2 new examples** — `canvas` (animated plasma shader), `mouse` (mouse event inspector)
 
 ## [0.9.0] — 2026-02-28
 
@@ -395,7 +432,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/flyingrobots/bijou/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0

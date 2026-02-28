@@ -1,9 +1,9 @@
 // Types
-export type { App, Cmd, KeyMsg, ResizeMsg, QuitSignal, RunOptions } from './types.js';
-export { QUIT, isKeyMsg, isResizeMsg } from './types.js';
+export type { App, Cmd, KeyMsg, ResizeMsg, MouseMsg, MouseButton, MouseAction, QuitSignal, RunOptions } from './types.js';
+export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 
 // Key parsing
-export { parseKey } from './keys.js';
+export { parseKey, parseMouse } from './keys.js';
 
 // Screen control
 export {
@@ -248,6 +248,13 @@ export {
   type RunScriptResult,
   runScript,
 } from './driver.js';
+
+// Canvas — shader-based character grid
+export {
+  type ShaderFn,
+  type CanvasOptions,
+  canvas,
+} from './canvas.js';
 
 // Command palette
 export {
