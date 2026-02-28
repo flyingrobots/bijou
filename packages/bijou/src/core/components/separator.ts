@@ -1,19 +1,30 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
+/** Configuration for rendering a horizontal separator line. */
 export interface SeparatorOptions {
+  /** Optional centered label text. */
   label?: string;
+  /** Total width in characters (defaults to terminal column count). */
   width?: number;
+  /** Theme token applied to the separator line. */
   borderToken?: TokenValue;
+  /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
-
+/**
+ * Render a horizontal separator line, optionally centered around a label.
+ *
+ * Output adapts to the current output mode:
+ * - `interactive` / `static` — styled horizontal rule using `\u2500`.
+ * - `pipe` — dashes with or without label (`--- label ---`).
+ * - `accessible` — label with dashes, or empty string when no label.
+ *
+ * @param options - Separator configuration.
+ * @returns The rendered separator string.
+ */
 export function separator(options: SeparatorOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;

@@ -10,7 +10,12 @@ import type { RGB, TokenValue } from './tokens.js';
 
 // ── Conversion ─────────────────────────────────────────────────────
 
-/** Parse a hex color string to an RGB tuple. Supports `#RGB` and `#RRGGBB` (with or without `#`). */
+/**
+ * Parse a hex color string to an RGB tuple. Supports `#RGB` and `#RRGGBB` (with or without `#`).
+ * @param hex - Hex color string to parse.
+ * @returns Parsed RGB tuple.
+ * @throws {Error} If the hex string is not a valid 3- or 6-digit hex color.
+ */
 export function hexToRgb(hex: string): RGB {
   let h = hex.startsWith('#') ? hex.slice(1) : hex;
   if (h.length === 3) {
@@ -23,7 +28,11 @@ export function hexToRgb(hex: string): RGB {
   return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
 }
 
-/** Convert an RGB tuple to a `#rrggbb` hex string. */
+/**
+ * Convert an RGB tuple to a `#rrggbb` hex string.
+ * @param rgb - RGB tuple to convert. Values are clamped to [0, 255].
+ * @returns Lowercase hex string with leading `#`.
+ */
 export function rgbToHex(rgb: RGB): string {
   const r = Math.max(0, Math.min(255, Math.round(rgb[0])));
   const g = Math.max(0, Math.min(255, Math.round(rgb[1])));
@@ -33,6 +42,11 @@ export function rgbToHex(rgb: RGB): string {
 
 // ── Internal HSL helpers ───────────────────────────────────────────
 
+/**
+ * Convert an RGB tuple to HSL (hue, saturation, lightness), all in [0, 1].
+ * @param rgb - Input RGB color.
+ * @returns HSL triple with each component normalized to [0, 1].
+ */
 function rgbToHsl(rgb: RGB): [number, number, number] {
   const r = rgb[0] / 255;
   const g = rgb[1] / 255;
@@ -59,6 +73,13 @@ function rgbToHsl(rgb: RGB): [number, number, number] {
   return [h, s, l];
 }
 
+/**
+ * Convert a single HSL hue sector to an RGB channel value.
+ * @param p - Lower bound from lightness calculation.
+ * @param q - Upper bound from lightness calculation.
+ * @param t - Hue offset for this channel.
+ * @returns Channel value in [0, 1].
+ */
 function hue2rgb(p: number, q: number, t: number): number {
   let tt = t;
   if (tt < 0) tt += 1;
@@ -69,6 +90,13 @@ function hue2rgb(p: number, q: number, t: number): number {
   return p;
 }
 
+/**
+ * Convert HSL values to an RGB tuple.
+ * @param h - Hue in [0, 1].
+ * @param s - Saturation in [0, 1].
+ * @param l - Lightness in [0, 1].
+ * @returns RGB tuple with each channel in [0, 255].
+ */
 function hslToRgb(h: number, s: number, l: number): RGB {
   if (s === 0) {
     const v = Math.round(l * 255);
@@ -87,10 +115,21 @@ function hslToRgb(h: number, s: number, l: number): RGB {
 
 // ── Token helpers ──────────────────────────────────────────────────
 
+/**
+ * Clamp a numeric amount to the [0, 1] range.
+ * @param amount - Value to clamp.
+ * @returns Clamped value.
+ */
 function clampAmount(amount: number): number {
   return Math.max(0, Math.min(1, amount));
 }
 
+/**
+ * Create a new TokenValue with the given hex, preserving the original's modifiers.
+ * @param token - Source token whose modifiers are carried over.
+ * @param hex - New hex color string.
+ * @returns New TokenValue with the updated hex.
+ */
 function withHex(token: TokenValue, hex: string): TokenValue {
   return token.modifiers
     ? { hex, modifiers: [...token.modifiers] }
@@ -99,7 +138,12 @@ function withHex(token: TokenValue, hex: string): TokenValue {
 
 // ── Manipulation ───────────────────────────────────────────────────
 
-/** Blend a token's color toward white by `amount` (0 = unchanged, 1 = white). */
+/**
+ * Blend a token's color toward white by `amount` (0 = unchanged, 1 = white).
+ * @param token - Source token to lighten.
+ * @param amount - Blend factor, clamped to [0, 1].
+ * @returns New TokenValue with the lightened hex, preserving modifiers.
+ */
 export function lighten(token: TokenValue, amount: number): TokenValue {
   const t = clampAmount(amount);
   const [r, g, b] = hexToRgb(token.hex);
@@ -110,7 +154,12 @@ export function lighten(token: TokenValue, amount: number): TokenValue {
   ]));
 }
 
-/** Blend a token's color toward black by `amount` (0 = unchanged, 1 = black). */
+/**
+ * Blend a token's color toward black by `amount` (0 = unchanged, 1 = black).
+ * @param token - Source token to darken.
+ * @param amount - Blend factor, clamped to [0, 1].
+ * @returns New TokenValue with the darkened hex, preserving modifiers.
+ */
 export function darken(token: TokenValue, amount: number): TokenValue {
   const t = clampAmount(amount);
   const [r, g, b] = hexToRgb(token.hex);
@@ -121,7 +170,13 @@ export function darken(token: TokenValue, amount: number): TokenValue {
   ]));
 }
 
-/** Blend two token colors by `ratio` (0 = first, 1 = second, default 0.5). Preserves modifiers from the first token. */
+/**
+ * Blend two token colors by `ratio` (0 = first, 1 = second, default 0.5). Preserves modifiers from the first token.
+ * @param a - First token (its modifiers are preserved).
+ * @param b - Second token.
+ * @param ratio - Blend ratio, clamped to [0, 1]. Default is 0.5.
+ * @returns New TokenValue with the blended hex.
+ */
 export function mix(a: TokenValue, b: TokenValue, ratio = 0.5): TokenValue {
   const t = clampAmount(ratio);
   const [ar, ag, ab] = hexToRgb(a.hex);
@@ -133,7 +188,11 @@ export function mix(a: TokenValue, b: TokenValue, ratio = 0.5): TokenValue {
   ]));
 }
 
-/** Rotate hue by 180° to produce the complementary color. */
+/**
+ * Rotate hue by 180 degrees to produce the complementary color.
+ * @param token - Source token.
+ * @returns New TokenValue with the complementary hex, preserving modifiers.
+ */
 export function complementary(token: TokenValue): TokenValue {
   const rgb = hexToRgb(token.hex);
   const [h, s, l] = rgbToHsl(rgb);
@@ -141,7 +200,12 @@ export function complementary(token: TokenValue): TokenValue {
   return withHex(token, rgbToHex(hslToRgb(newH, s, l)));
 }
 
-/** Increase saturation by `amount` (0 = unchanged, 1 = full saturation). */
+/**
+ * Increase saturation by `amount` (0 = unchanged, 1 = full saturation).
+ * @param token - Source token.
+ * @param amount - Saturation increase factor, clamped to [0, 1].
+ * @returns New TokenValue with the saturated hex, preserving modifiers.
+ */
 export function saturate(token: TokenValue, amount: number): TokenValue {
   const t = clampAmount(amount);
   const rgb = hexToRgb(token.hex);
@@ -150,7 +214,12 @@ export function saturate(token: TokenValue, amount: number): TokenValue {
   return withHex(token, rgbToHex(hslToRgb(h, newS, l)));
 }
 
-/** Decrease saturation by `amount` (0 = unchanged, 1 = fully desaturated). */
+/**
+ * Decrease saturation by `amount` (0 = unchanged, 1 = fully desaturated).
+ * @param token - Source token.
+ * @param amount - Desaturation factor, clamped to [0, 1].
+ * @returns New TokenValue with the desaturated hex, preserving modifiers.
+ */
 export function desaturate(token: TokenValue, amount: number): TokenValue {
   const t = clampAmount(amount);
   const rgb = hexToRgb(token.hex);

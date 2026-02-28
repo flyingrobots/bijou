@@ -34,11 +34,15 @@ export type { AccordionSection } from '@flyingrobots/bijou';
 // Types
 // ---------------------------------------------------------------------------
 
+/** Immutable state for the interactive accordion widget. */
 export interface AccordionState {
+  /** All accordion sections with their expand/collapse state. */
   readonly sections: readonly AccordionSection[];
+  /** Index of the currently focused section. */
   readonly focusIndex: number;
 }
 
+/** Options for rendering the interactive accordion view. */
 export interface InteractiveAccordionOptions {
   /** Token for the expand/collapse indicator. */
   readonly indicatorToken?: AccordionOptions['indicatorToken'];
@@ -46,6 +50,7 @@ export interface InteractiveAccordionOptions {
   readonly titleToken?: AccordionOptions['titleToken'];
   /** Character for the focus indicator. Default: '>' */
   readonly focusChar?: string;
+  /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
 }
 
@@ -56,6 +61,9 @@ export interface InteractiveAccordionOptions {
 /**
  * Create initial accordion state from sections.
  * Preserves existing `expanded` flags; focus starts at index 0.
+ *
+ * @param sections - Accordion sections to populate the widget.
+ * @returns Fresh accordion state with focus on the first section.
  */
 export function createAccordionState(sections: AccordionSection[]): AccordionState {
   return {
@@ -68,7 +76,12 @@ export function createAccordionState(sections: AccordionSection[]): AccordionSta
 // State transformers
 // ---------------------------------------------------------------------------
 
-/** Move focus to the next section (wraps around). */
+/**
+ * Move focus to the next section (wraps around).
+ *
+ * @param state - Current accordion state.
+ * @returns Updated accordion state with focus on the next section.
+ */
 export function focusNext(state: AccordionState): AccordionState {
   if (state.sections.length === 0) return state;
   return {
@@ -77,7 +90,12 @@ export function focusNext(state: AccordionState): AccordionState {
   };
 }
 
-/** Move focus to the previous section (wraps around). */
+/**
+ * Move focus to the previous section (wraps around).
+ *
+ * @param state - Current accordion state.
+ * @returns Updated accordion state with focus on the previous section.
+ */
 export function focusPrev(state: AccordionState): AccordionState {
   if (state.sections.length === 0) return state;
   return {
@@ -86,7 +104,12 @@ export function focusPrev(state: AccordionState): AccordionState {
   };
 }
 
-/** Toggle the expanded state of the focused section. */
+/**
+ * Toggle the expanded state of the focused section.
+ *
+ * @param state - Current accordion state.
+ * @returns Updated accordion state with the focused section toggled.
+ */
 export function toggleFocused(state: AccordionState): AccordionState {
   if (state.sections.length === 0) return state;
   const sections = state.sections.map((s, i) =>
@@ -95,12 +118,22 @@ export function toggleFocused(state: AccordionState): AccordionState {
   return { ...state, sections };
 }
 
-/** Expand all sections. */
+/**
+ * Expand all sections.
+ *
+ * @param state - Current accordion state.
+ * @returns Updated accordion state with all sections expanded.
+ */
 export function expandAll(state: AccordionState): AccordionState {
   return { ...state, sections: state.sections.map((s) => ({ ...s, expanded: true })) };
 }
 
-/** Collapse all sections. */
+/**
+ * Collapse all sections.
+ *
+ * @param state - Current accordion state.
+ * @returns Updated accordion state with all sections collapsed.
+ */
 export function collapseAll(state: AccordionState): AccordionState {
   return { ...state, sections: state.sections.map((s) => ({ ...s, expanded: false })) };
 }
@@ -115,6 +148,10 @@ export function collapseAll(state: AccordionState): AccordionState {
  *
  * Delegates to the static `accordion()` for the actual rendering,
  * then prepends a focus indicator to the focused section's line.
+ *
+ * @param state - Current accordion state.
+ * @param options - Rendering options (indicators, focus char, context).
+ * @returns Rendered accordion string with focus indicator on the active section.
  */
 export function interactiveAccordion(
   state: AccordionState,
@@ -155,6 +192,10 @@ export function interactiveAccordion(
 
 /**
  * Create a preconfigured KeyMap for accordion navigation.
+ *
+ * @template Msg - Application message type dispatched by key bindings.
+ * @param actions - Map of navigation and toggle actions to message values.
+ * @returns Preconfigured key map with vim-style accordion bindings.
  */
 export function accordionKeyMap<Msg>(actions: {
   focusNext: Msg;

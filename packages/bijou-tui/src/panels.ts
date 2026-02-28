@@ -15,24 +15,68 @@ import type { BijouContext } from '@flyingrobots/bijou';
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Definition of a single panel within a panel group.
+ *
+ * @template A - Action type produced by the panel's key map.
+ */
 export interface PanelDef<A> {
+  /** Unique identifier for this panel. */
   readonly id: string;
+  /** Single key that focuses this panel when pressed. */
   readonly hotkey: string;
+  /** Human-readable label displayed in the panel tab bar. */
   readonly label: string;
+  /** Key map that handles input when this panel is focused. */
   readonly keyMap: KeyMap<A>;
 }
 
+/**
+ * Configuration for creating a panel group.
+ *
+ * @template A - Action type produced by panel key maps.
+ */
 export interface PanelGroupOptions<A> {
+  /** Panel definitions to include in the group. */
   readonly panels: readonly PanelDef<A>[];
+  /** ID of the panel that is focused initially. Must match an existing panel. */
   readonly defaultFocus: string;
+  /** Optional input stack for automatic layer management on focus changes. */
   readonly inputStack?: InputStack<KeyMsg, A>;
 }
 
+/**
+ * Runtime panel group that tracks focus and routes input.
+ *
+ * @template A - Action type produced by panel key maps.
+ */
 export interface PanelGroup<A> {
+  /** ID of the currently focused panel. */
   readonly focused: string;
+  /**
+   * Switch focus to the panel with the given ID.
+   *
+   * @param id - Target panel ID. No-op if already focused or ID is unknown.
+   */
   focus(id: string): void;
+  /**
+   * Route a key message through hotkey detection and the focused panel's key map.
+   *
+   * @param msg - Incoming key event.
+   * @returns Action from the focused panel's key map, or undefined if unmatched.
+   */
   handle(msg: KeyMsg): A | undefined;
+  /**
+   * Format a panel label for display, applying focus-aware styling.
+   *
+   * @param id - Panel ID whose label to format.
+   * @param ctx - Optional Bijou context for styled output.
+   * @returns Formatted label string (plain if no ctx, styled otherwise).
+   */
   formatLabel(id: string, ctx?: BijouContext): string;
+  /**
+   * Remove all input stack layers owned by this panel group.
+   */
   dispose(): void;
 }
 
@@ -40,6 +84,17 @@ export interface PanelGroup<A> {
 // Implementation
 // ---------------------------------------------------------------------------
 
+/**
+ * Create a panel group that manages focus and input routing across panels.
+ *
+ * Register hotkey and panel layers on the optional input stack. Hotkey presses
+ * switch focus; the focused panel's key map handles all other input.
+ *
+ * @template A - Action type produced by panel key maps.
+ * @param options - Panel group configuration.
+ * @returns Panel group instance with focus management and input routing.
+ * @throws {Error} If `defaultFocus` does not match any panel ID.
+ */
 export function createPanelGroup<A>(options: PanelGroupOptions<A>): PanelGroup<A> {
   const panelMap = new Map<string, PanelDef<A>>();
   const hotkeyMap = new Map<string, string>();

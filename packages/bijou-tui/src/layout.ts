@@ -1,16 +1,32 @@
+/**
+ * Layout primitives for composing terminal UI views.
+ *
+ * Provides `place()` for positioning content within a fixed rectangle,
+ * and `vstack()`/`hstack()` for vertical and horizontal composition.
+ *
+ * @module layout
+ */
+
 import { visibleLength, clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
+/** Horizontal alignment option for {@link place}. */
 export type HAlign = 'left' | 'center' | 'right';
+/** Vertical alignment option for {@link place}. */
 export type VAlign = 'top' | 'middle' | 'bottom';
 
+/** Configuration for the {@link place} layout function. */
 export interface PlaceOptions {
+  /** Width of the bounding rectangle in visible characters. */
   readonly width: number;
+  /** Height of the bounding rectangle in lines. */
   readonly height: number;
+  /** Horizontal alignment within the rectangle. Default: `'left'`. */
   readonly hAlign?: HAlign;
+  /** Vertical alignment within the rectangle. Default: `'top'`. */
   readonly vAlign?: VAlign;
 }
 
@@ -22,6 +38,10 @@ export interface PlaceOptions {
  * Place content within a fixed-size rectangle, aligned horizontally and
  * vertically. Lines are padded/clipped to exactly `width` visible characters
  * and the output is exactly `height` lines tall.
+ *
+ * @param content - The text content to place (may contain newlines).
+ * @param options - Rectangle dimensions and alignment settings.
+ * @returns A string of exactly `height` lines, each exactly `width` visible characters.
  */
 export function place(content: string, options: PlaceOptions): string {
   const { width, height, hAlign = 'left', vAlign = 'top' } = options;
@@ -100,6 +120,9 @@ export function place(content: string, options: PlaceOptions): string {
 
 /**
  * Vertical stack — join blocks with newlines.
+ *
+ * @param blocks - One or more rendered string blocks to stack vertically.
+ * @returns A single string with blocks separated by newlines.
  */
 export function vstack(...blocks: string[]): string {
   return blocks.join('\n');
@@ -108,6 +131,10 @@ export function vstack(...blocks: string[]): string {
 /**
  * Horizontal stack — place blocks side by side with a gap between columns.
  * Pads shorter blocks with empty lines to align rows.
+ *
+ * @param gap    - Number of space characters between adjacent columns.
+ * @param blocks - One or more rendered string blocks to stack horizontally.
+ * @returns A single string with blocks arranged side by side.
  */
 export function hstack(gap: number, ...blocks: string[]): string {
   if (blocks.length === 0) return '';
@@ -135,7 +162,12 @@ export function hstack(gap: number, ...blocks: string[]): string {
   return rows.join('\n');
 }
 
-/** Width of a string with ANSI escapes stripped. */
+/**
+ * Compute the visible width of a string after stripping ANSI escape sequences.
+ *
+ * @param s - The string possibly containing ANSI color/style codes.
+ * @returns The character count excluding escape sequences.
+ */
 function visualWidth(s: string): number {
   // Strip ANSI escape sequences
   // eslint-disable-next-line no-control-regex

@@ -14,40 +14,71 @@ import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Positioned content block that can be composited onto a background.
+ */
 export interface Overlay {
+  /** Rendered content string (newline-delimited lines). */
   readonly content: string;
+  /** Top-left row position (0-based). */
   readonly row: number;
+  /** Top-left column position (0-based). */
   readonly col: number;
 }
 
+/**
+ * Options for the {@link composite} function.
+ */
 export interface CompositeOptions {
   /** Wrap background lines in dim (ANSI 2m). */
   readonly dim?: boolean;
 }
 
+/**
+ * Configuration for the {@link modal} overlay.
+ */
 export interface ModalOptions {
+  /** Optional title displayed at the top of the modal (bolded when ctx provided). */
   readonly title?: string;
+  /** Body content of the modal. */
   readonly body: string;
+  /** Optional hint text displayed below the body (muted when ctx provided). */
   readonly hint?: string;
+  /** Screen width in columns, used for centering. */
   readonly screenWidth: number;
+  /** Screen height in rows, used for centering. */
   readonly screenHeight: number;
-  /** Override box width (default: auto from content). */
+  /** Preferred minimum width — shorter lines are padded but longer lines are not truncated (default: auto from content). */
   readonly width?: number;
+  /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
 
+/** Visual variant controlling the toast icon and border color. */
 export type ToastVariant = 'success' | 'error' | 'info';
+
+/** Screen corner where the toast is anchored. */
 export type ToastAnchor = 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left';
 
+/**
+ * Configuration for the {@link toast} overlay.
+ */
 export interface ToastOptions {
+  /** Message text displayed beside the variant icon. */
   readonly message: string;
+  /** Visual variant controlling icon and border color. Default: 'info'. */
   readonly variant?: ToastVariant;
+  /** Screen corner to anchor the toast. Default: 'bottom-right'. */
   readonly anchor?: ToastAnchor;
+  /** Screen width in columns, used for positioning. */
   readonly screenWidth: number;
+  /** Screen height in rows, used for positioning. */
   readonly screenHeight: number;
   /** Rows/cols from edge. Default: 1. */
   readonly margin?: number;
+  /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
 
@@ -55,6 +86,7 @@ export interface ToastOptions {
 // Border characters (same as core box.ts)
 // ---------------------------------------------------------------------------
 
+/** Unicode box-drawing characters for overlay borders. */
 const BORDER = {
   tl: '\u250c', // ┌
   tr: '\u2510', // ┐
@@ -68,6 +100,17 @@ const BORDER = {
 // spliceLine (internal)
 // ---------------------------------------------------------------------------
 
+/**
+ * Splice an overlay line into a background line at a given column.
+ *
+ * Preserve background content to the left and right of the overlay,
+ * inserting ANSI resets at splice boundaries.
+ *
+ * @param bgLine - Background line (may contain ANSI escapes).
+ * @param overlayLine - Overlay line to paint over the background.
+ * @param col - Starting visible column for the overlay (0-based).
+ * @returns Merged line with the overlay replacing background characters.
+ */
 function spliceLine(bgLine: string, overlayLine: string, col: number): string {
   const overlayVis = visibleLength(overlayLine);
   const bgVis = visibleLength(bgLine);
@@ -85,6 +128,18 @@ function spliceLine(bgLine: string, overlayLine: string, col: number): string {
 // composite()
 // ---------------------------------------------------------------------------
 
+/**
+ * Paint one or more overlays onto a background string.
+ *
+ * Overlay content replaces background characters at the specified position.
+ * Overlays are applied in array order (later overlays paint over earlier ones).
+ * ANSI escape sequences are preserved correctly at splice boundaries.
+ *
+ * @param background - Background content string (newline-delimited).
+ * @param overlays - Positioned overlays to composite onto the background.
+ * @param options - Optional compositing settings (e.g., dim background).
+ * @returns Composited string with all overlays applied.
+ */
 export function composite(
   background: string,
   overlays: readonly Overlay[],
@@ -116,6 +171,16 @@ export function composite(
 // renderBox (shared between modal and toast)
 // ---------------------------------------------------------------------------
 
+/**
+ * Render lines inside a unicode box border.
+ *
+ * Compute inner width from the widest line, then wrap all lines
+ * with vertical borders and pad to uniform width.
+ *
+ * @param lines - Content lines to place inside the box.
+ * @param borderColor - Function to apply border styling (identity for unstyled).
+ * @returns Box string with top/bottom borders and bordered content lines.
+ */
 function renderBox(
   lines: string[],
   borderColor: (s: string) => string,
@@ -134,6 +199,15 @@ function renderBox(
 // modal()
 // ---------------------------------------------------------------------------
 
+/**
+ * Create a centered modal dialog overlay.
+ *
+ * Build a bordered box with optional title, body, and hint text,
+ * then center it on screen.
+ *
+ * @param options - Modal configuration including content and screen dimensions.
+ * @returns Overlay positioned at the center of the screen.
+ */
 export function modal(options: ModalOptions): Overlay {
   const { title, body, hint, screenWidth, screenHeight, ctx } = options;
 
@@ -185,18 +259,29 @@ export function modal(options: ModalOptions): Overlay {
 // toast()
 // ---------------------------------------------------------------------------
 
+/** Unicode icon characters mapped by toast variant. */
 const TOAST_ICONS: Record<ToastVariant, string> = {
   success: '\u2714', // ✔
   error: '\u2718',   // ✘
   info: '\u2139',    // ℹ
 };
 
+/** Semantic border token keys mapped by toast variant. */
 const TOAST_BORDER: Record<ToastVariant, 'success' | 'error' | 'primary'> = {
   success: 'success',
   error: 'error',
   info: 'primary',
 };
 
+/**
+ * Create an anchored toast notification overlay.
+ *
+ * Render a bordered box with a variant icon and message, positioned
+ * at the specified screen corner with configurable margin.
+ *
+ * @param options - Toast configuration including message, variant, and screen dimensions.
+ * @returns Overlay positioned at the specified screen corner.
+ */
 export function toast(options: ToastOptions): Overlay {
   const {
     message,
@@ -257,16 +342,28 @@ export function toast(options: ToastOptions): Overlay {
 // Drawer types
 // ---------------------------------------------------------------------------
 
+/** Side of the screen where the drawer is anchored. */
 export type DrawerAnchor = 'left' | 'right';
 
+/**
+ * Configuration for the {@link drawer} overlay.
+ */
 export interface DrawerOptions {
+  /** Content string to display inside the drawer. */
   readonly content: string;
-  readonly anchor?: DrawerAnchor;       // default: 'right'
+  /** Side of the screen to anchor the drawer. Default: 'right'. */
+  readonly anchor?: DrawerAnchor;
+  /** Total drawer width including borders and padding. */
   readonly width: number;
+  /** Screen width in columns, used for positioning. */
   readonly screenWidth: number;
+  /** Screen height in rows, used for sizing. */
   readonly screenHeight: number;
+  /** Optional title displayed in the top border. */
   readonly title?: string;
+  /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
 
@@ -274,6 +371,15 @@ export interface DrawerOptions {
 // drawer()
 // ---------------------------------------------------------------------------
 
+/**
+ * Create a full-height drawer overlay anchored to a screen edge.
+ *
+ * Render a bordered panel spanning the full screen height with optional
+ * title in the top border, positioned flush against the left or right edge.
+ *
+ * @param options - Drawer configuration including content, anchor, and dimensions.
+ * @returns Overlay positioned at the specified screen edge.
+ */
 export function drawer(options: DrawerOptions): Overlay {
   const {
     content,
@@ -337,19 +443,28 @@ export function drawer(options: DrawerOptions): Overlay {
 // Tooltip types
 // ---------------------------------------------------------------------------
 
+/** Direction to place the tooltip relative to its target element. */
 export type TooltipDirection = 'top' | 'bottom' | 'left' | 'right';
 
+/**
+ * Configuration for the {@link tooltip} overlay.
+ */
 export interface TooltipOptions {
+  /** Content string to display inside the tooltip. */
   readonly content: string;
-  /** Row of the target element. */
+  /** Row of the target element (0-based). */
   readonly row: number;
-  /** Column of the target element. */
+  /** Column of the target element (0-based). */
   readonly col: number;
   /** Direction to place the tooltip relative to the target. Default: 'top'. */
   readonly direction?: TooltipDirection;
+  /** Screen width in columns, used for clamping. */
   readonly screenWidth: number;
+  /** Screen height in rows, used for clamping. */
   readonly screenHeight: number;
+  /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
 
@@ -357,6 +472,15 @@ export interface TooltipOptions {
 // tooltip()
 // ---------------------------------------------------------------------------
 
+/**
+ * Create a tooltip overlay positioned relative to a target element.
+ *
+ * Render a bordered box containing the content, placed in the specified
+ * direction from the target. Clamp to screen bounds to prevent overflow.
+ *
+ * @param options - Tooltip configuration including content, target position, and direction.
+ * @returns Overlay positioned relative to the target, clamped to screen bounds.
+ */
 export function tooltip(options: TooltipOptions): Overlay {
   const {
     content,

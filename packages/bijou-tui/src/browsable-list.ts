@@ -28,26 +28,53 @@ import { createKeyMap, type KeyMap } from './keybindings.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * A single item in a browsable list.
+ *
+ * @template T - Type of the item's value payload.
+ */
 export interface BrowsableListItem<T = string> {
+  /** Display label shown in the list. */
   label: string;
+  /** Value payload returned when this item is selected. */
   value: T;
+  /** Optional description displayed after the label, rendered as `label — description`. */
   description?: string;
 }
 
+/**
+ * Readonly state for the browsable list widget.
+ *
+ * @template T - Type of each item's value payload.
+ */
 export interface BrowsableListState<T = string> {
+  /** All items in the list. */
   readonly items: readonly BrowsableListItem<T>[];
+  /** Index of the currently focused item. */
   readonly focusIndex: number;
+  /** Vertical scroll offset (first visible item index). */
   readonly scrollY: number;
+  /** Maximum number of visible items. */
   readonly height: number;
 }
 
+/**
+ * Options for creating a new browsable list state.
+ *
+ * @template T - Type of each item's value payload.
+ */
 export interface BrowsableListOptions<T = string> {
+  /** Items to populate the list. */
   readonly items: readonly BrowsableListItem<T>[];
+  /** Maximum number of visible items (default: 10). */
   readonly height?: number;
 }
 
+/** Options for rendering the browsable list view. */
 export interface BrowsableListRenderOptions {
+  /** Character(s) shown next to the focused item (default: `"\u25b8"`). */
   readonly focusIndicator?: string;
+  /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
 }
 
@@ -58,6 +85,9 @@ export interface BrowsableListRenderOptions {
 /**
  * Create initial browsable list state from items and optional height.
  * Focus starts at index 0 with scroll at the top.
+ * @template T - Type of each item's value payload.
+ * @param options - Items and optional viewport height.
+ * @returns Fresh browsable list state with focus at the top.
  */
 export function createBrowsableListState<T = string>(
   options: BrowsableListOptions<T>,
@@ -75,28 +105,52 @@ export function createBrowsableListState<T = string>(
 // State transformers
 // ---------------------------------------------------------------------------
 
-/** Move focus to the next item (wraps around). */
+/**
+ * Move focus to the next item (wraps around).
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @returns Updated list state with focus on the next item.
+ */
 export function listFocusNext<T>(state: BrowsableListState<T>): BrowsableListState<T> {
   if (state.items.length === 0) return state;
   const focusIndex = (state.focusIndex + 1) % state.items.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.items.length) };
 }
 
-/** Move focus to the previous item (wraps around). */
+/**
+ * Move focus to the previous item (wraps around).
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @returns Updated list state with focus on the previous item.
+ */
 export function listFocusPrev<T>(state: BrowsableListState<T>): BrowsableListState<T> {
   if (state.items.length === 0) return state;
   const focusIndex = (state.focusIndex - 1 + state.items.length) % state.items.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.items.length) };
 }
 
-/** Move focus down by one page (clamps to last item). */
+/**
+ * Move focus down by one page (clamps to last item).
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @returns Updated list state with focus advanced by one page.
+ */
 export function listPageDown<T>(state: BrowsableListState<T>): BrowsableListState<T> {
   if (state.items.length === 0) return state;
   const focusIndex = Math.min(state.focusIndex + state.height, state.items.length - 1);
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.items.length) };
 }
 
-/** Move focus up by one page (clamps to first item). */
+/**
+ * Move focus up by one page (clamps to first item).
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @returns Updated list state with focus moved back by one page.
+ */
 export function listPageUp<T>(state: BrowsableListState<T>): BrowsableListState<T> {
   if (state.items.length === 0) return state;
   const focusIndex = Math.max(state.focusIndex - state.height, 0);
@@ -107,6 +161,15 @@ export function listPageUp<T>(state: BrowsableListState<T>): BrowsableListState<
 // Scroll helper
 // ---------------------------------------------------------------------------
 
+/**
+ * Clamp scroll position so the focused item stays within the visible window.
+ *
+ * @param focusIndex - Index of the focused item.
+ * @param scrollY - Current scroll offset.
+ * @param height - Viewport height in items.
+ * @param totalItems - Total number of items.
+ * @returns Adjusted scroll offset.
+ */
 function adjustScroll(focusIndex: number, scrollY: number, height: number, totalItems: number): number {
   let newScrollY = scrollY;
   if (focusIndex < newScrollY) {
@@ -127,6 +190,11 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
  * focus indicator on the currently focused item.
  *
  * Items with a `description` field render as `label — description`.
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @param options - Rendering options (focus indicator, context).
+ * @returns Rendered list string with focus indicator on the active item.
  */
 export function browsableList<T>(
   state: BrowsableListState<T>,
@@ -169,6 +237,10 @@ export function browsableList<T>(
  *   quit: { type: 'quit' },
  * });
  * ```
+ *
+ * @template Msg - Application message type dispatched by key bindings.
+ * @param actions - Map of navigation actions to message values.
+ * @returns Preconfigured key map with vim-style list bindings.
  */
 export function browsableListKeyMap<Msg>(actions: {
   focusNext: Msg;

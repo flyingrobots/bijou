@@ -1,22 +1,36 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
+/** Configuration for spinner rendering and behavior. */
 export interface SpinnerOptions {
+  /** Custom animation frames (defaults to braille dot pattern). */
   frames?: string[];
+  /** Text label displayed alongside the spinner. */
   label?: string;
+  /** Milliseconds between frame updates (defaults to 80). */
   interval?: number;
+  /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/** Default braille dot spinner frames. */
 const DOTS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f'];
 
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
-
+/**
+ * Render a single spinner frame as a string.
+ *
+ * Output adapts to the current output mode:
+ * - `interactive` — animated braille frame + label.
+ * - `static` — static ellipsis prefix.
+ * - `pipe` — label followed by ellipsis.
+ * - `accessible` — descriptive "Please wait." suffix.
+ *
+ * @param tick - Zero-based frame counter used to select the current animation frame.
+ * @param options - Spinner configuration.
+ * @returns The rendered spinner frame string.
+ */
 export function spinnerFrame(tick: number, options: SpinnerOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const frames = options.frames ?? DOTS;
@@ -37,12 +51,31 @@ export function spinnerFrame(tick: number, options: SpinnerOptions = {}): string
   }
 }
 
+/** Controller returned by {@link createSpinner} for managing a live spinner. */
 export interface SpinnerController {
+  /** Begin rendering the spinner animation. In non-interactive modes, emit a single line. */
   start(): void;
+  /** Update the spinner label text without restarting the animation.
+   * @param label - New label to display.
+   */
   update(label: string): void;
+  /**
+   * Stop the spinner, clear the line, and optionally print a final message.
+   * @param finalMessage - Text written after stopping (followed by a newline).
+   */
   stop(finalMessage?: string): void;
 }
 
+/**
+ * Create a live spinner that animates in the terminal.
+ *
+ * In interactive mode the spinner uses an interval timer to cycle through
+ * animation frames, hiding the cursor while running. Non-interactive modes
+ * emit a single static line on {@link SpinnerController.start}.
+ *
+ * @param options - Spinner configuration.
+ * @returns A {@link SpinnerController} for starting, updating, and stopping the spinner.
+ */
 export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
   const ctx = resolveCtx(options.ctx);
   const frames = options.frames ?? DOTS;
@@ -53,6 +86,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
 
   const mode: OutputMode = ctx.mode;
 
+  /** Write the current frame to the terminal, overwriting the previous line. */
   function render(): void {
     const line = spinnerFrame(tick, { frames, label, ctx });
     ctx.io.write(`\r\x1b[K${line}`);

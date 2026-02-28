@@ -1,3 +1,10 @@
+/**
+ * Forms module -- interactive CLI prompts (input, select, multiselect,
+ * confirm, textarea, filter) and combinators (group, wizard).
+ *
+ * @module core/forms
+ */
+
 export type {
   ValidationResult,
   Validator,

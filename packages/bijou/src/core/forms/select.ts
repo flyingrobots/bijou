@@ -4,13 +4,34 @@ import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
 import { getDefaultContext } from '../../context.js';
 
+/**
+ * Options for the single-select field.
+ *
+ * @typeParam T - Type of each option's value.
+ */
 export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
+  /** Bijou context for IO, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/**
+ * Prompt the user to choose one item from a list.
+ *
+ * Uses arrow-key navigation in interactive TTY mode, or a numbered list
+ * fallback for pipe and accessible modes.
+ *
+ * @typeParam T - Type of each option's value.
+ * @param options - Select field configuration.
+ * @returns The value of the selected option.
+ * @throws {Error} If `options.options` is empty.
+ */
 export async function select<T = string>(options: SelectOptions<T>): Promise<T> {
   const ctx = options.ctx ?? getDefaultContext();
   const mode = ctx.mode;
+
+  if (options.options.length === 0) {
+    throw new Error('select() requires at least one option');
+  }
 
   if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
     return interactiveSelect(options, ctx);
@@ -19,6 +40,16 @@ export async function select<T = string>(options: SelectOptions<T>): Promise<T> 
   return numberedSelect(options, mode, ctx);
 }
 
+/**
+ * Display options as a numbered list and accept numeric input.
+ *
+ * Used as the fallback for non-interactive or accessible modes.
+ *
+ * @param options - Select field configuration.
+ * @param mode - Current output mode.
+ * @param ctx - Bijou context.
+ * @returns The value of the selected option.
+ */
 async function numberedSelect<T>(options: SelectOptions<T>, mode: OutputMode, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
@@ -46,6 +77,16 @@ async function numberedSelect<T>(options: SelectOptions<T>, mode: OutputMode, ct
   return options.defaultValue ?? options.options[0]!.value;
 }
 
+/**
+ * Display a keyboard-navigable select menu using raw terminal input.
+ *
+ * Supports arrow keys and j/k for navigation, Enter to confirm,
+ * Ctrl+C or Escape to cancel (returns default or first option).
+ *
+ * @param options - Select field configuration.
+ * @param ctx - Bijou context.
+ * @returns The value of the selected option.
+ */
 async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;

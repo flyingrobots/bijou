@@ -1,3 +1,11 @@
+/**
+ * Theme module barrel — re-exports all theme types, presets, utilities,
+ * gradient helpers, resolver, DTCG interop, color downsampling, and
+ * color manipulation functions.
+ *
+ * @module
+ */
+
 // Token types
 export type {
   RGB,

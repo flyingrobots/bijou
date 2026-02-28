@@ -34,19 +34,29 @@ import { createKeyMap, type KeyMap } from './keybindings.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** Immutable state for the pager widget. */
 export interface PagerState {
+  /** Underlying scroll position state. */
   readonly scroll: ScrollState;
+  /** Full text content displayed in the pager. */
   readonly content: string;
+  /** Available width in columns. */
   readonly width: number;
+  /** Total available height in rows (including status line). */
   readonly height: number;
 }
 
+/** Options for creating a new pager state. */
 export interface PagerOptions {
+  /** Full text content to display. */
   readonly content: string;
+  /** Available width in columns. */
   readonly width: number;
+  /** Total available height in rows (one row reserved for status). */
   readonly height: number;
 }
 
+/** Options for rendering the pager view. */
 export interface PagerRenderOptions {
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
@@ -63,6 +73,9 @@ export interface PagerRenderOptions {
  *
  * The viewport height is `height - 1` when status is shown (the default),
  * reserving one line for the status indicator.
+ *
+ * @param options - Content, width, and height for the pager.
+ * @returns Fresh pager state with scroll at the top.
  */
 export function createPagerState(options: PagerOptions): PagerState {
   const { content, width, height } = options;
@@ -79,37 +92,75 @@ export function createPagerState(options: PagerOptions): PagerState {
 // State transformers
 // ---------------------------------------------------------------------------
 
-/** Scroll by a relative number of lines. */
+/**
+ * Scroll by a relative number of lines.
+ *
+ * @param state - Current pager state.
+ * @param dy - Number of lines to scroll (positive = down, negative = up).
+ * @returns Updated pager state with new scroll position.
+ */
 export function pagerScrollBy(state: PagerState, dy: number): PagerState {
   return { ...state, scroll: scrollBy(state.scroll, dy) };
 }
 
-/** Scroll to an absolute line. */
+/**
+ * Scroll to an absolute line.
+ *
+ * @param state - Current pager state.
+ * @param y - Target line number (zero-based).
+ * @returns Updated pager state with new scroll position.
+ */
 export function pagerScrollTo(state: PagerState, y: number): PagerState {
   return { ...state, scroll: scrollTo(state.scroll, y) };
 }
 
-/** Scroll to the first line. */
+/**
+ * Scroll to the first line.
+ *
+ * @param state - Current pager state.
+ * @returns Updated pager state scrolled to the top.
+ */
 export function pagerScrollToTop(state: PagerState): PagerState {
   return { ...state, scroll: scrollToTop(state.scroll) };
 }
 
-/** Scroll to the last line. */
+/**
+ * Scroll to the last line.
+ *
+ * @param state - Current pager state.
+ * @returns Updated pager state scrolled to the bottom.
+ */
 export function pagerScrollToBottom(state: PagerState): PagerState {
   return { ...state, scroll: scrollToBottom(state.scroll) };
 }
 
-/** Page down (one viewport height). */
+/**
+ * Page down (one viewport height).
+ *
+ * @param state - Current pager state.
+ * @returns Updated pager state advanced by one page.
+ */
 export function pagerPageDown(state: PagerState): PagerState {
   return { ...state, scroll: pageDown(state.scroll) };
 }
 
-/** Page up (one viewport height). */
+/**
+ * Page up (one viewport height).
+ *
+ * @param state - Current pager state.
+ * @returns Updated pager state moved back by one page.
+ */
 export function pagerPageUp(state: PagerState): PagerState {
   return { ...state, scroll: pageUp(state.scroll) };
 }
 
-/** Update content while preserving scroll position (clamped). */
+/**
+ * Update content while preserving scroll position (clamped).
+ *
+ * @param state - Current pager state.
+ * @param content - New text content to display.
+ * @returns Updated pager state with new content and clamped scroll position.
+ */
 export function pagerSetContent(state: PagerState, content: string): PagerState {
   const viewportHeight = Math.max(1, state.height - 1);
   const newScroll = createScrollState(content, viewportHeight);
@@ -127,6 +178,10 @@ export function pagerSetContent(state: PagerState, content: string): PagerState 
 
 /**
  * Render the pager — viewport content plus optional status line.
+ *
+ * @param state - Current pager state.
+ * @param options - Rendering options (scrollbar, status line).
+ * @returns Rendered pager string with viewport and optional status.
  */
 export function pager(state: PagerState, options?: PagerRenderOptions): string {
   const showScrollbar = options?.showScrollbar ?? true;
@@ -177,6 +232,10 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
  *   quit: { type: 'quit' },
  * });
  * ```
+ *
+ * @template Msg - Application message type dispatched by key bindings.
+ * @param actions - Map of navigation actions to message values.
+ * @returns Preconfigured key map with vim-style pager bindings.
  */
 export function pagerKeyMap<Msg>(actions: {
   scrollUp: Msg;

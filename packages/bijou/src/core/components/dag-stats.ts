@@ -24,6 +24,8 @@ export interface DagStats {
  * Accepts either a `DagNode[]` array or a `SlicedDagSource`. Ghost nodes
  * (internal boundary markers from `dagSlice()`) are filtered out automatically.
  *
+ * @param input - The graph nodes or sliced source to analyze.
+ * @returns A `DagStats` object with node/edge counts, depth, width, roots, and leaves.
  * @throws If the graph contains a cycle or duplicate node IDs.
  *
  * @example

@@ -1,9 +1,21 @@
 import type { GroupFieldResult } from './types.js';
 
+/**
+ * Async factory that produces a single field value.
+ *
+ * @typeParam T - Type of the value produced.
+ */
 type FieldFn<T> = () => Promise<T>;
 
 /**
  * Chain multiple form fields together, collecting results into an object.
+ *
+ * Fields are executed sequentially in key order. Each field function runs
+ * independently and its return value is stored under the corresponding key.
+ *
+ * @typeParam T - Record type mapping field keys to their value types.
+ * @param fields - Map of field keys to async factory functions.
+ * @returns A {@link GroupFieldResult} containing all collected values.
  *
  * @example
  * ```ts

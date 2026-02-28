@@ -10,15 +10,33 @@ import { PRESETS } from './core/theme/presets.js';
 import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
 import { detectOutputMode } from './core/detect/tty.js';
 
+/** Options for {@link createBijou}. */
 export interface CreateBijouOptions {
+  /** Runtime environment adapter. */
   runtime: RuntimePort;
+  /** I/O adapter (stdin/stdout, filesystem). */
   io: IOPort;
+  /** Style adapter (chalk, plain-text, etc.). */
   style: StylePort;
+  /** Explicit theme object. Defaults to {@link CYAN_MAGENTA}. */
   theme?: Theme;
+  /** Named preset themes, keyed by name. Defaults to built-in {@link PRESETS}. */
   presets?: Record<string, Theme>;
+  /** Environment variable that selects a preset or JSON path. Defaults to `"BIJOU_THEME"`. */
   envVar?: string;
 }
 
+/**
+ * Create a fully-wired {@link BijouContext} from adapter ports.
+ *
+ * Theme resolution order:
+ * 1. If the env-var points to a `.json` file, load and parse it as a DTCG document.
+ * 2. Otherwise look the env-var value up in `presets`.
+ * 3. Fall back to the explicit `theme` option (or the built-in default).
+ *
+ * @param options - Adapter ports and optional theme overrides.
+ * @returns A context object ready to pass to any bijou component.
+ */
 export function createBijou(options: CreateBijouOptions): BijouContext {
   const { runtime, io, style } = options;
   const envVar = options.envVar ?? 'BIJOU_THEME';

@@ -1,3 +1,10 @@
+/**
+ * @module @flyingrobots/bijou
+ *
+ * Themed terminal components for CLIs, loggers, and scripts —
+ * with graceful degradation across output modes.
+ */
+
 // Port interfaces
 export type {
   RuntimePort,
@@ -14,6 +21,9 @@ export {
   setDefaultContext,
   _resetDefaultContextForTesting,
 } from './context.js';
+
+// Context resolution helpers
+export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
 
 // Factory
 export { createBijou, type CreateBijouOptions } from './factory.js';

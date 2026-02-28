@@ -2,26 +2,51 @@ import type { Theme, TokenValue, InkColor } from './tokens.js';
 import type { RuntimePort } from '../../ports/runtime.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
 
-/** Checks the no-color.org spec: NO_COLOR defined (any value) means no color. */
+/**
+ * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
+ * @param runtime - Optional RuntimePort for reading env vars; falls back to `process.env`.
+ * @returns True if the `NO_COLOR` environment variable is set.
+ */
 export function isNoColor(runtime?: RuntimePort): boolean {
   if (runtime) return runtime.env('NO_COLOR') !== undefined;
   return process.env['NO_COLOR'] !== undefined;
 }
 
+/** A theme bundled with its noColor flag and convenience accessor methods. */
 export interface ResolvedTheme {
+  /** The underlying Theme object. */
   theme: Theme;
+  /** Whether color output is disabled (per `NO_COLOR`). */
   noColor: boolean;
 
-  /** Returns hex string for Ink `color=` prop, or undefined when noColor. */
+  /**
+   * Return a hex string for Ink's `color=` prop, or `undefined` when noColor.
+   * @param token - Token to read the color from.
+   * @returns Hex string or `undefined`.
+   */
   ink(token: TokenValue): InkColor;
 
-  /** Returns hex string for a status key, or undefined when noColor. */
+  /**
+   * Return a hex string for a status key, or `undefined` when noColor.
+   * @param status - Status key string to look up.
+   * @returns Hex string or `undefined`.
+   */
   inkStatus(status: string): InkColor;
 
-  /** Returns the raw hex string from a token (for chalk.hex() or boxen borderColor). */
+  /**
+   * Return the raw hex string from a token (for chalk.hex() or boxen borderColor).
+   * @param token - Token to read the color from.
+   * @returns Hex string.
+   */
   hex(token: TokenValue): string;
 }
 
+/**
+ * Create a ResolvedTheme from a Theme and a noColor flag.
+ * @param theme - The theme to wrap.
+ * @param noColor - Whether color output should be suppressed.
+ * @returns ResolvedTheme with convenience accessors.
+ */
 export function createResolved(theme: Theme, noColor: boolean): ResolvedTheme {
   return {
     theme,
@@ -44,26 +69,36 @@ export function createResolved(theme: Theme, noColor: boolean): ResolvedTheme {
   };
 }
 
+/** Configuration options for creating a ThemeResolver. */
 export interface ThemeResolverOptions {
-  /** Environment variable name to read theme from. Default: 'BIJOU_THEME'. */
+  /** Environment variable name to read theme from. Default: `'BIJOU_THEME'`. */
   envVar?: string;
-  /** Preset registry. Default: bijou built-in PRESETS. */
+  /** Preset registry to look up theme names against. Default: bijou built-in PRESETS. */
   presets?: Record<string, Theme>;
   /** Fallback theme when env var / name doesn't match. Default: CYAN_MAGENTA. */
   fallback?: Theme;
-  /** Optional RuntimePort for reading env vars. Falls back to process.env. */
+  /** Optional RuntimePort for reading env vars. Falls back to `process.env`. */
   runtime?: RuntimePort;
 }
 
+/** A stateful theme resolver that caches the resolved theme and reads env vars. */
 export interface ThemeResolver {
-  /** Returns the current resolved theme (cached singleton). */
+  /** Return the current resolved theme (cached singleton). */
   getTheme(): ResolvedTheme;
-  /** Resolves a theme by name — bypasses the singleton cache. */
+  /**
+   * Resolve a theme by name, bypassing the singleton cache.
+   * @param name - Theme name to look up. Falls back to env var, then the default.
+   */
   resolveTheme(name?: string): ResolvedTheme;
-  /** Resets the cached singleton. For tests only. */
+  /** Reset the cached singleton. For tests only. */
   _resetForTesting(): void;
 }
 
+/**
+ * Create a ThemeResolver that reads theme name from an env var and looks it up in a preset registry.
+ * @param options - Resolver configuration (env var name, presets, fallback, runtime port).
+ * @returns ThemeResolver with `getTheme`, `resolveTheme`, and `_resetForTesting` methods.
+ */
 export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeResolver {
   const envVar = options.envVar ?? 'BIJOU_THEME';
   const presets = options.presets ?? PRESETS;
@@ -113,15 +148,22 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
   return { getTheme, resolveTheme, _resetForTesting };
 }
 
-// Default resolver — uses BIJOU_THEME env var and built-in presets.
+/** Default resolver — uses `BIJOU_THEME` env var and built-in presets. */
 const defaultResolver = createThemeResolver();
 
-/** Returns the current resolved theme (singleton) using the default resolver. */
+/**
+ * Return the current resolved theme (singleton) using the default resolver.
+ * @returns Cached ResolvedTheme from the default resolver.
+ */
 export function getTheme(): ResolvedTheme {
   return defaultResolver.getTheme();
 }
 
-/** Resolves a theme by name using the default resolver. */
+/**
+ * Resolve a theme by name using the default resolver (bypasses cache).
+ * @param name - Theme name to look up.
+ * @returns ResolvedTheme for the given name.
+ */
 export function resolveTheme(name?: string): ResolvedTheme {
   return defaultResolver.resolveTheme(name);
 }

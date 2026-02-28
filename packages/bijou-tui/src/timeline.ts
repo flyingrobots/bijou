@@ -56,21 +56,31 @@ export type Position =
 
 /** Spring track configuration. */
 export interface SpringTrackDef {
+  /** Animation type (defaults to `'spring'` when omitted). */
   readonly type?: 'spring';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Spring physics parameters or a named preset. */
   readonly spring?: Partial<SpringConfig> | SpringPreset;
 }
 
 /** Tween track configuration. */
 export interface TweenTrackDef {
+  /** Animation type — must be `'tween'`. */
   readonly type: 'tween';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Duration in milliseconds. */
   readonly duration: number;
+  /** Easing function (defaults to `easeOutCubic`). */
   readonly ease?: EasingFn;
 }
 
+/** Discriminated union of spring and tween track definitions. */
 export type TrackDef = SpringTrackDef | TweenTrackDef;
 
 /** Opaque timeline state — pass between step() calls. */
@@ -81,13 +91,22 @@ export interface TimelineState {
   readonly tracks: Readonly<Record<string, TrackState>>;
 }
 
-/** @internal */
+/**
+ * Per-track animation state stored inside `TimelineState`.
+ * @internal
+ */
 interface TrackState {
+  /** Animation engine type. */
   readonly type: 'spring' | 'tween';
+  /** Whether the track has received its first step. */
   readonly started: boolean;
+  /** Spring-specific simulation state (present when `type === 'spring'`). */
   readonly spring?: SpringState;
+  /** Tween-specific simulation state (present when `type === 'tween'`). */
   readonly tween?: TweenState;
+  /** Current interpolated value. */
   readonly currentValue: number;
+  /** Whether the track has settled at its target. */
   readonly done: boolean;
 }
 
@@ -95,20 +114,39 @@ interface TrackState {
 // Internal: resolved track/callback/label
 // ---------------------------------------------------------------------------
 
+/**
+ * Fully resolved track after position resolution and duration estimation.
+ * @internal
+ */
 interface ResolvedTrack {
+  /** Track identifier. */
   readonly name: string;
+  /** Absolute start time in milliseconds. */
   readonly startMs: number;
+  /** Estimated duration in milliseconds. */
   readonly estimatedDurationMs: number;
+  /** Animation engine type. */
   readonly trackType: 'spring' | 'tween';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Spring physics config (present when `trackType === 'spring'`). */
   readonly springConfig?: SpringConfig;
+  /** Tween duration in ms (present when `trackType === 'tween'`). */
   readonly tweenDuration?: number;
+  /** Tween easing function (present when `trackType === 'tween'`). */
   readonly tweenEase?: EasingFn;
 }
 
+/**
+ * Callback trigger resolved to an absolute time.
+ * @internal
+ */
 interface ResolvedCallback {
+  /** Callback identifier. */
   readonly name: string;
+  /** Absolute trigger time in milliseconds. */
   readonly atMs: number;
 }
 
@@ -116,6 +154,14 @@ interface ResolvedCallback {
 // Spring duration estimation
 // ---------------------------------------------------------------------------
 
+/**
+ * Estimate how long a spring animation takes to settle by simulating it.
+ *
+ * @param from - Starting value.
+ * @param to - Target value.
+ * @param config - Spring physics configuration.
+ * @returns Estimated duration in milliseconds (capped at 30 seconds).
+ */
 function estimateSpringDuration(
   from: number,
   to: number,
@@ -136,12 +182,27 @@ function estimateSpringDuration(
 // Position parsing
 // ---------------------------------------------------------------------------
 
+/**
+ * Tracks the cursor position while resolving timeline entry positions.
+ * @internal
+ */
 interface CursorInfo {
+  /** Start time of the previous track or callback in milliseconds. */
   prevStartMs: number;
+  /** End time of the previous track or callback in milliseconds. */
   prevEndMs: number;
+  /** Map of label names to their resolved times. */
   labels: ReadonlyMap<string, number>;
 }
 
+/**
+ * Resolve a position specifier to an absolute time in milliseconds.
+ *
+ * @param pos - Position specifier (number, relative offset, or label reference).
+ * @param cursor - Current cursor info with previous start/end and known labels.
+ * @returns Absolute time in milliseconds.
+ * @throws Error if the position references an unknown label or has invalid syntax.
+ */
 function resolvePosition(
   pos: Position | undefined,
   cursor: CursorInfo,
@@ -202,11 +263,16 @@ function resolvePosition(
 // Builder
 // ---------------------------------------------------------------------------
 
+/**
+ * Discriminated union of entries accumulated by the timeline builder.
+ * @internal
+ */
 type BuilderEntry =
   | { kind: 'track'; name: string; def: TrackDef; position?: Position }
   | { kind: 'label'; name: string }
   | { kind: 'call'; name: string; position?: Position };
 
+/** Fluent builder for constructing a timeline definition. */
 export interface TimelineBuilder {
   /**
    * Add an animation track.
@@ -215,6 +281,12 @@ export interface TimelineBuilder {
    * .add('x', { from: 0, to: 100, spring: 'wobbly' })
    * .add('opacity', { type: 'tween', from: 0, to: 1, duration: 300 }, '<')
    * ```
+   *
+   * @param name - Unique track identifier used to read values later.
+   * @param def - Spring or tween track definition.
+   * @param position - When the track starts (default: after previous item ends).
+   * @returns The builder for chaining.
+   * @throws Error (at build time) if a duplicate track name is added.
    */
   add(name: string, def: TrackDef, position?: Position): TimelineBuilder;
 
@@ -225,6 +297,9 @@ export interface TimelineBuilder {
    * .label('reveal')
    * .add('scale', { type: 'tween', from: 0, to: 1, duration: 200 }, 'reveal')
    * ```
+   *
+   * @param name - Label identifier, referenced by later position specifiers.
+   * @returns The builder for chaining.
    */
   label(name: string): TimelineBuilder;
 
@@ -234,33 +309,65 @@ export interface TimelineBuilder {
    * ```ts
    * .call('onHalfway', '+=500')
    * ```
+   *
+   * @param name - Callback identifier returned by `firedCallbacks()`.
+   * @param position - When the callback fires (default: after previous item ends).
+   * @returns The builder for chaining.
    */
   call(name: string, position?: Position): TimelineBuilder;
 
-  /** Compile the timeline into an immutable Timeline object. */
+  /**
+   * Compile the timeline into an immutable Timeline object.
+   *
+   * @returns Compiled {@link Timeline} ready for stepping.
+   * @throws Error if a position references an unknown label or has invalid syntax.
+   */
   build(): Timeline;
 }
 
 /** Compiled timeline — step forward, read values, check completion. */
 export interface Timeline {
-  /** Create the initial timeline state. */
+  /**
+   * Create the initial timeline state.
+   *
+   * @returns Fresh timeline state with all tracks at their starting values.
+   */
   init(): TimelineState;
 
   /**
    * Advance the timeline by `dt` seconds.
    * Returns a new state (pure — no mutation).
+   *
+   * @param state - Current timeline state.
+   * @param dt - Time step in seconds (e.g. 1/60 for 60 fps). Must be finite and non-negative.
+   * @returns Updated timeline state with all active tracks advanced.
+   * @throws Error if `dt` is negative, `NaN`, or infinite.
    */
   step(state: TimelineState, dt: number): TimelineState;
 
-  /** Read all current track values as a name→number record. */
+  /**
+   * Read all current track values as a name-to-number record.
+   *
+   * @param state - Current timeline state.
+   * @returns Record mapping each track name to its current value.
+   */
   values(state: TimelineState): Record<string, number>;
 
-  /** True when every track has settled. */
+  /**
+   * True when every track has settled.
+   *
+   * @param state - Current timeline state.
+   * @returns Whether all tracks have reached their target values.
+   */
   done(state: TimelineState): boolean;
 
   /**
    * Return callback names that fired between `prev` and `next` states.
    * A callback fires when the timeline's elapsed time crosses its trigger point.
+   *
+   * @param prev - Timeline state before the step.
+   * @param next - Timeline state after the step.
+   * @returns Array of callback names that fired during the interval.
    */
   firedCallbacks(prev: TimelineState, next: TimelineState): string[];
 
@@ -284,6 +391,8 @@ export interface Timeline {
  *   .add('opacity', { type: 'tween', from: 0, to: 1, duration: 300 }, '<')
  *   .build();
  * ```
+ *
+ * @returns A new {@link TimelineBuilder} for fluent timeline construction.
  */
 export function timeline(): TimelineBuilder {
   const entries: BuilderEntry[] = [];
@@ -313,6 +422,15 @@ export function timeline(): TimelineBuilder {
 // Compilation: resolve positions, estimate durations
 // ---------------------------------------------------------------------------
 
+/**
+ * Compile builder entries into an immutable Timeline object.
+ *
+ * Resolves all positions, estimates durations, and sorts callbacks.
+ *
+ * @param entries - Accumulated builder entries (tracks, labels, callbacks).
+ * @returns Compiled Timeline with init, step, values, done, and firedCallbacks.
+ * @throws Error if a position references an unknown label or has invalid syntax.
+ */
 function compile(entries: BuilderEntry[]): Timeline {
   const tracks: ResolvedTrack[] = [];
   const callbacks: ResolvedCallback[] = [];
@@ -367,6 +485,10 @@ function compile(entries: BuilderEntry[]): Timeline {
           };
         }
 
+        if (tracks.some(t => t.name === entry.name)) {
+          throw new Error(`Timeline: duplicate track name "${entry.name}"`);
+        }
+
         tracks.push(resolved);
         prevStartMs = startMs;
         prevEndMs = startMs + resolved.estimatedDurationMs;
@@ -402,6 +524,9 @@ function compile(entries: BuilderEntry[]): Timeline {
     },
 
     step(state: TimelineState, dt: number): TimelineState {
+      if (!Number.isFinite(dt) || dt < 0) {
+        throw new Error(`Timeline: dt must be a finite non-negative number, got ${dt}`);
+      }
       const dtMs = dt * 1000;
       const elapsedMs = state.elapsedMs + dtMs;
       const nextTracks: Record<string, TrackState> = {};

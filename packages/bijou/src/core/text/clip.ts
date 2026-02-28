@@ -7,16 +7,25 @@
 
 import { segmentGraphemes, graphemeClusterWidth } from './grapheme.js';
 
-// eslint-disable-next-line no-control-regex
-const ANSI_RE = /\x1b\[[0-9;]*m/g;
+/**
+ * Pattern matching ANSI SGR escape sequences (e.g. `\x1b[31m`).
+ *
+ * Used to strip style escapes before measuring visible width.
+ */
+const ANSI_RE = new RegExp('\x1b\\[[0-9;]*m', 'g');
 
 /**
  * Clip a string to a maximum visible width, preserving ANSI escapes.
+ *
  * Grapheme-cluster aware: won't split multi-codepoint sequences.
- * Appends a reset sequence if the string was clipped mid-style.
+ * Appends a reset sequence (`\x1b[0m`) when clipping text that contains ANSI style escapes.
  *
  * O(n): pre-segments stripped text once, then walks the original string
  * with a grapheme pointer instead of re-segmenting per character.
+ *
+ * @param str - Input string, may contain ANSI escape sequences.
+ * @param maxWidth - Maximum visible width in terminal columns.
+ * @returns The clipped string, with ANSI escapes intact and a reset appended if needed.
  */
 export function clipToWidth(str: string, maxWidth: number): string {
   if (maxWidth <= 0) return '';

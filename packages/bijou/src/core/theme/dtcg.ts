@@ -11,22 +11,33 @@ import type {
 
 // --- DTCG Types ---
 
+/** A single Design Token Community Group (DTCG) token with a typed value. */
 export interface DTCGToken {
+  /** Token type descriptor (e.g. 'color', 'gradient', 'string'). */
   $type?: string;
+  /** The token's value, which may be a string, object, array, or a `{reference}`. */
   $value: unknown;
+  /** Optional human-readable description of the token. */
   $description?: string;
 }
 
+/** A named group of DTCG tokens or nested groups. */
 export interface DTCGGroup {
   [key: string]: DTCGToken | DTCGGroup;
 }
 
+/** A top-level DTCG document containing token groups and/or individual tokens. */
 export interface DTCGDocument {
   [key: string]: DTCGToken | DTCGGroup;
 }
 
 // --- Helpers ---
 
+/**
+ * Parse a `#rrggbb` hex string to an RGB tuple.
+ * @param hex - Hex color string (with or without `#`).
+ * @returns RGB tuple.
+ */
 function hexToRgb(hex: string): RGB {
   const h = hex.replace('#', '');
   return [
@@ -36,14 +47,30 @@ function hexToRgb(hex: string): RGB {
   ];
 }
 
+/**
+ * Convert an RGB tuple to a `#rrggbb` hex string.
+ * @param rgb - RGB tuple to convert.
+ * @returns Hex color string with leading `#`.
+ */
 function rgbToHex(rgb: RGB): string {
   return '#' + rgb.map((c) => c.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Type guard that checks whether an object is a DTCGToken (has a `$value` property).
+ * @param obj - Value to test.
+ * @returns True if `obj` conforms to the DTCGToken shape.
+ */
 function isDTCGToken(obj: unknown): obj is DTCGToken {
   return typeof obj === 'object' && obj !== null && '$value' in obj;
 }
 
+/**
+ * Walk a dot-delimited DTCG reference path (e.g. `{color.primary}`) and return its resolved value.
+ * @param ref - DTCG reference string in `{group.key}` format.
+ * @param doc - Root document to resolve against.
+ * @returns The resolved `$value` or raw nested value, or `undefined` if not found.
+ */
 function resolveReference(ref: string, doc: DTCGDocument): unknown {
   // DTCG references look like "{color.primary}"
   const path = ref.replace(/^\{|\}$/g, '').split('.');
@@ -56,6 +83,14 @@ function resolveReference(ref: string, doc: DTCGDocument): unknown {
   return current;
 }
 
+/**
+ * Recursively resolve a DTCG value, following `{reference}` strings until a concrete value is reached.
+ * @param value - Value to resolve (may be a reference string or a concrete value).
+ * @param doc - Root document for reference lookups.
+ * @param seen - Set of already-visited references for circular-reference detection.
+ * @returns The fully-resolved concrete value.
+ * @throws {Error} If a circular reference is detected or a reference cannot be resolved.
+ */
 function resolveValue(value: unknown, doc: DTCGDocument, seen?: Set<string>): unknown {
   if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
     const visitedRefs = seen ?? new Set<string>();
@@ -72,6 +107,12 @@ function resolveValue(value: unknown, doc: DTCGDocument, seen?: Set<string>): un
   return value;
 }
 
+/**
+ * Convert a raw DTCG value (possibly a reference) into a TokenValue.
+ * @param value - Raw value or reference string from a DTCG token.
+ * @param doc - Root document for reference resolution.
+ * @returns Resolved TokenValue (defaults to `{ hex: '#000000' }` on failure).
+ */
 function toTokenValue(value: unknown, doc: DTCGDocument): TokenValue {
   const resolved = resolveValue(value, doc);
   if (typeof resolved === 'string') {
@@ -88,6 +129,12 @@ function toTokenValue(value: unknown, doc: DTCGDocument): TokenValue {
   return { hex: '#000000' };
 }
 
+/**
+ * Convert a raw DTCG value (possibly a reference) into an array of GradientStops.
+ * @param value - Raw value or reference string from a DTCG gradient token.
+ * @param doc - Root document for reference resolution.
+ * @returns Array of gradient stops (empty if the resolved value is not an array).
+ */
 function toGradientStops(value: unknown, doc: DTCGDocument): GradientStop[] {
   const resolved = resolveValue(value, doc);
   if (!Array.isArray(resolved)) return [];
@@ -105,6 +152,14 @@ function toGradientStops(value: unknown, doc: DTCGDocument): GradientStop[] {
 
 // --- fromDTCG ---
 
+/**
+ * Extract a record of TokenValues from a DTCG group for the given keys.
+ * @template K - Union of string keys to extract.
+ * @param group - DTCG group to read tokens from.
+ * @param keys - Keys to extract.
+ * @param doc - Root document for reference resolution.
+ * @returns Record mapping each key to its resolved TokenValue (defaults to `#000000` for missing keys).
+ */
 function extractGroup<K extends string>(
   group: DTCGGroup | undefined,
   keys: readonly K[],
@@ -122,12 +177,22 @@ function extractGroup<K extends string>(
   return result;
 }
 
+/** All built-in status keys used when extracting from a DTCG document. */
 const STATUS_KEYS: readonly BaseStatusKey[] = ['success', 'error', 'warning', 'info', 'pending', 'active', 'muted'];
+/** All built-in semantic keys used when extracting from a DTCG document. */
 const SEMANTIC_KEYS = ['success', 'error', 'warning', 'info', 'accent', 'muted', 'primary'] as const;
+/** All built-in border keys used when extracting from a DTCG document. */
 const BORDER_KEYS = ['primary', 'secondary', 'success', 'warning', 'error', 'muted'] as const;
+/** All built-in UI element keys used when extracting from a DTCG document. */
 const UI_KEYS: readonly BaseUiKey[] = ['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty'];
+/** All built-in gradient keys used when extracting from a DTCG document. */
 const GRADIENT_KEYS: readonly BaseGradientKey[] = ['brand', 'progress'];
 
+/**
+ * Convert a DTCG document into a bijou Theme.
+ * @param doc - DTCG document containing token groups for status, semantic, border, ui, and gradient.
+ * @returns Fully-populated Theme with all built-in keys resolved.
+ */
 export function fromDTCG(doc: DTCGDocument): Theme {
   const name = typeof (doc['name'] as DTCGToken | undefined)?.$value === 'string'
     ? (doc['name'] as DTCGToken).$value as string
@@ -159,6 +224,11 @@ export function fromDTCG(doc: DTCGDocument): Theme {
 
 // --- toDTCG ---
 
+/**
+ * Convert a single TokenValue to a DTCGToken.
+ * @param token - Token to convert.
+ * @returns DTCG token with `$type: 'color'`.
+ */
 function tokenToDTCG(token: TokenValue): DTCGToken {
   if (token.modifiers && token.modifiers.length > 0) {
     return {
@@ -169,6 +239,11 @@ function tokenToDTCG(token: TokenValue): DTCGToken {
   return { $type: 'color', $value: token.hex };
 }
 
+/**
+ * Convert an array of GradientStops to a DTCGToken with `$type: 'gradient'`.
+ * @param stops - Gradient stops to serialize.
+ * @returns DTCG token whose `$value` is an array of `{ pos, color }` objects with hex colors.
+ */
 function gradientToDTCG(stops: GradientStop[]): DTCGToken {
   return {
     $type: 'gradient',
@@ -179,6 +254,12 @@ function gradientToDTCG(stops: GradientStop[]): DTCGToken {
   };
 }
 
+/**
+ * Convert a record of TokenValues into a DTCGGroup.
+ * @template K - String keys of the record.
+ * @param record - Record to convert.
+ * @returns DTCGGroup with each key mapped to a DTCG color token.
+ */
 function recordToDTCGGroup<K extends string>(record: Record<K, TokenValue>): DTCGGroup {
   const group: DTCGGroup = {};
   for (const [key, value] of Object.entries(record) as Array<[string, TokenValue]>) {
@@ -187,6 +268,11 @@ function recordToDTCGGroup<K extends string>(record: Record<K, TokenValue>): DTC
   return group;
 }
 
+/**
+ * Convert a bijou Theme into a DTCG document for interop/export.
+ * @param theme - Theme to serialize.
+ * @returns DTCGDocument with all theme groups as DTCG token groups.
+ */
 export function toDTCG(theme: Theme): DTCGDocument {
   const doc: DTCGDocument = {};
 
@@ -207,14 +293,24 @@ export function toDTCG(theme: Theme): DTCGDocument {
 
 // --- IO Helpers ---
 
-/** Load a single theme from a DTCG JSON file using the provided IOPort. */
+/**
+ * Load a single theme from a DTCG JSON file using the provided IO port.
+ * @param io - IO adapter with a `readFile` method.
+ * @param path - File path to the JSON theme file.
+ * @returns Parsed Theme.
+ */
 export function loadTheme(io: { readFile(path: string): string }, path: string): Theme {
   const content = io.readFile(path);
   const doc = JSON.parse(content) as DTCGDocument;
   return fromDTCG(doc);
 }
 
-/** Load all .json files from a directory and return them as a theme record. */
+/**
+ * Load all `.json` files from a directory and return them as a theme record keyed by theme name.
+ * @param io - IO adapter with `readDir`, `readFile`, and `joinPath` methods.
+ * @param dirPath - Directory path to scan for theme JSON files.
+ * @returns Record mapping theme names to parsed Themes (malformed files are silently skipped).
+ */
 export function loadThemesFromDir(
   io: { readDir(path: string): string[]; readFile(path: string): string; joinPath(...s: string[]): string },
   dirPath: string,

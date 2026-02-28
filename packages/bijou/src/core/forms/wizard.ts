@@ -1,12 +1,27 @@
 import type { GroupFieldResult } from './types.js';
 
+/**
+ * Single step in a multi-step wizard form.
+ *
+ * @typeParam T - Record type of the wizard's accumulated values.
+ * @typeParam K - Key within T that this step populates.
+ */
 export interface WizardStep<T, K extends keyof T = keyof T> {
+  /** Key in the result record where this step's value is stored. */
   key: K;
+  /** Async field function that receives previously collected values and returns this step's value. */
   field: (values: Partial<T>) => Promise<T[K]>;
+  /** Predicate that, when returning `true`, causes this step to be skipped. */
   skip?: (values: Partial<T>) => boolean;
 }
 
+/**
+ * Configuration for a multi-step wizard form.
+ *
+ * @typeParam T - Record type of the wizard's accumulated values.
+ */
 export interface WizardOptions<T extends Record<string, unknown>> {
+  /** Ordered list of wizard steps to execute. */
   steps: WizardStep<T>[];
 }
 
@@ -14,6 +29,10 @@ export interface WizardOptions<T extends Record<string, unknown>> {
  * Multi-step form wizard that runs steps sequentially, passing accumulated
  * values to each step's `field` function. Steps can be conditionally skipped
  * via the `skip` predicate.
+ *
+ * @typeParam T - Record type mapping step keys to their value types.
+ * @param options - Wizard configuration containing the ordered step list.
+ * @returns A {@link GroupFieldResult} containing all collected values.
  *
  * @example
  * ```ts

@@ -4,15 +4,34 @@ import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
 import { getDefaultContext } from '../../context.js';
 
+/**
+ * Options for the multi-line textarea field.
+ */
 export interface TextareaOptions extends FieldOptions<string> {
+  /** Placeholder text shown when the textarea is empty. */
   placeholder?: string;
+  /** Maximum character count (including newlines). */
   maxLength?: number;
+  /** Display line numbers in the gutter. Default: false. */
   showLineNumbers?: boolean;
+  /** Visible editor height in lines. Default: 6. */
   height?: number;
+  /** Render width in columns. Default: 80. */
   width?: number;
+  /** Bijou context for IO, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/**
+ * Prompt the user for multi-line text input.
+ *
+ * In interactive TTY mode, renders a scrollable editor with cursor
+ * navigation, optional line numbers, and a character count status bar.
+ * Falls back to a single-line question for pipe and accessible modes.
+ *
+ * @param options - Textarea field configuration.
+ * @returns The entered text (newline-joined), or the default/empty string on cancel.
+ */
 export async function textarea(options: TextareaOptions): Promise<string> {
   const ctx = options.ctx ?? getDefaultContext();
   const mode = ctx.mode;
@@ -24,6 +43,17 @@ export async function textarea(options: TextareaOptions): Promise<string> {
   return fallbackTextarea(options, mode, ctx);
 }
 
+/**
+ * Non-interactive textarea fallback that reads a single line of input.
+ *
+ * Used when the terminal is not a TTY or the mode is pipe/accessible.
+ * Runs required-field and custom validation checks after input.
+ *
+ * @param options - Textarea field configuration.
+ * @param mode - Current output mode.
+ * @param ctx - Bijou context.
+ * @returns The trimmed input or default value.
+ */
 async function fallbackTextarea(options: TextareaOptions, mode: OutputMode, ctx: BijouContext): Promise<string> {
   const noColor = ctx.theme.noColor;
   const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
@@ -63,6 +93,17 @@ async function fallbackTextarea(options: TextareaOptions, mode: OutputMode, ctx:
   return value;
 }
 
+/**
+ * Render a full interactive textarea editor using raw terminal input.
+ *
+ * Supports arrow-key cursor movement, scrolling, line wrapping,
+ * optional line numbers, placeholder text, and a max-length guard.
+ * Ctrl+D submits; Ctrl+C or Escape cancels.
+ *
+ * @param options - Textarea field configuration.
+ * @param ctx - Bijou context.
+ * @returns The entered text (newline-joined), or the default value on cancel.
+ */
 async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;

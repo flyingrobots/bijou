@@ -1,6 +1,12 @@
 import type { RGB, GradientStop } from './tokens.js';
 import type { StylePort } from '../../ports/style.js';
 
+/**
+ * Linearly interpolate an RGB color from a sorted array of gradient stops.
+ * @param stops - Gradient stops sorted by ascending position.
+ * @param t - Normalized position (0-1) to sample.
+ * @returns Interpolated RGB color at position `t`.
+ */
 export function lerp3(stops: GradientStop[], t: number): RGB {
   if (stops.length === 0) return [0, 0, 0];
   if (stops.length === 1 || t <= stops[0]!.pos) return stops[0]!.color;
@@ -23,11 +29,21 @@ export function lerp3(stops: GradientStop[], t: number): RGB {
   return stops[stops.length - 1]!.color;
 }
 
+/** Options for rendering gradient-colored text. */
 export interface GradientTextOptions {
+  /** Style port used to apply RGB colors to individual characters. */
   style: StylePort;
+  /** When true, return plain text without any color escapes. */
   noColor?: boolean;
 }
 
+/**
+ * Apply a gradient color to each character of a string.
+ * @param text - Text to colorize.
+ * @param stops - Gradient color stops.
+ * @param options - Style port and noColor flag.
+ * @returns The text with per-character RGB coloring applied (or plain text if noColor).
+ */
 export function gradientText(text: string, stops: GradientStop[], options: GradientTextOptions): string {
   if (options.noColor || text.length === 0 || stops.length === 0) return text;
 

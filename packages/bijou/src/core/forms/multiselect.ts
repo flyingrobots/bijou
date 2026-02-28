@@ -4,10 +4,26 @@ import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
 import { getDefaultContext } from '../../context.js';
 
+/**
+ * Options for the multi-select field.
+ *
+ * @typeParam T - Type of each option's value.
+ */
 export interface MultiselectOptions<T = string> extends SelectFieldOptions<T> {
+  /** Bijou context for IO, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/**
+ * Prompt the user to choose zero or more items from a list.
+ *
+ * Uses arrow-key navigation with space-to-toggle in interactive TTY mode,
+ * or a comma-separated numeric input fallback for pipe and accessible modes.
+ *
+ * @typeParam T - Type of each option's value.
+ * @param options - Multiselect field configuration.
+ * @returns Array of selected option values.
+ */
 export async function multiselect<T = string>(options: MultiselectOptions<T>): Promise<T[]> {
   const ctx = options.ctx ?? getDefaultContext();
   const mode = ctx.mode;
@@ -19,6 +35,16 @@ export async function multiselect<T = string>(options: MultiselectOptions<T>): P
   return numberedMultiselect(options, mode, ctx);
 }
 
+/**
+ * Display options as a numbered list and accept comma-separated numeric input.
+ *
+ * Used as the fallback for non-interactive or accessible modes.
+ *
+ * @param options - Multiselect field configuration.
+ * @param mode - Current output mode.
+ * @param ctx - Bijou context.
+ * @returns Array of selected option values.
+ */
 async function numberedMultiselect<T>(options: MultiselectOptions<T>, mode: OutputMode, ctx: BijouContext): Promise<T[]> {
   const noColor = ctx.theme.noColor;
   const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
@@ -46,6 +72,16 @@ async function numberedMultiselect<T>(options: MultiselectOptions<T>, mode: Outp
   return indices.map((i) => options.options[i]!.value);
 }
 
+/**
+ * Display a keyboard-navigable multi-select menu using raw terminal input.
+ *
+ * Supports arrow keys and j/k for navigation, Space to toggle selection,
+ * Enter to confirm, Ctrl+C or Escape to cancel (returns empty array).
+ *
+ * @param options - Multiselect field configuration.
+ * @param ctx - Bijou context.
+ * @returns Array of selected option values in index order.
+ */
 async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: BijouContext): Promise<T[]> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;

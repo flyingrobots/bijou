@@ -1,3 +1,11 @@
+/**
+ * Barrel re-exports for all bijou core UI components.
+ *
+ * Each component adapts its output to the current rendering mode
+ * (interactive, static, pipe, accessible) via the BijouContext.
+ * @module
+ */
+
 export { spinnerFrame, createSpinner } from './spinner.js';
 export type { SpinnerOptions, SpinnerController } from './spinner.js';
 

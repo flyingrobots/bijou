@@ -1,63 +1,125 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
 import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
 import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
+/**
+ * A single node in a directed acyclic graph.
+ *
+ * Each node has a unique `id`, a display `label`, and optional outgoing
+ * `edges` pointing to child node IDs. Nodes may carry per-node style
+ * tokens and an optional badge string.
+ */
 export interface DagNode {
+  /** Unique identifier for this node within the graph. */
   id: string;
+  /** Human-readable display text rendered inside the node box. */
   label: string;
+  /** IDs of child nodes this node has outgoing edges to. */
   edges?: string[];
+  /** Short annotation text displayed alongside the label (e.g., a status or count). */
   badge?: string;
+  /** Color/style token applied to the node box border. */
   token?: TokenValue;
+  /** Color/style token applied to the label text only. */
   labelToken?: TokenValue;
+  /** Color/style token applied to the badge text only. */
   badgeToken?: TokenValue;
-  /** @internal Used by dagSlice to mark ghost boundary nodes */
+  /** @internal Used by dagSlice to mark ghost boundary nodes. */
   _ghost?: boolean;
+  /** @internal Ghost label override text (e.g., "... 3 ancestors"). */
   _ghostLabel?: string;
 }
 
+/**
+ * Rendering options for `dag()` and `dagLayout()`.
+ *
+ * Controls visual styling (tokens), selection highlighting, layout
+ * constraints, and the bijou context to use.
+ */
 export interface DagOptions {
+  /** Default color/style token for all node box borders. */
   nodeToken?: TokenValue;
+  /** Color/style token for edge lines and arrowheads. */
   edgeToken?: TokenValue;
+  /** Ordered list of node IDs forming a path to highlight. */
   highlightPath?: string[];
+  /** Color/style token applied to highlighted path edges and nodes. */
   highlightToken?: TokenValue;
+  /** ID of the currently selected node (e.g., for keyboard navigation). */
   selectedId?: string;
+  /** Color/style token applied to the selected node box. */
   selectedToken?: TokenValue;
+  /** Fixed character width for every node box. Auto-calculated when omitted. */
   nodeWidth?: number;
+  /** Maximum total character width for the rendered graph. Defaults to terminal columns. */
   maxWidth?: number;
+  /** Layout direction. Currently only `'down'` is implemented. */
   direction?: 'down' | 'right';
+  /** Bijou context providing runtime, I/O, style, and theme ports. */
   ctx?: BijouContext;
 }
 
+/**
+ * Grid coordinates and dimensions of a rendered node box.
+ *
+ * Used by `dagLayout()` to report where each node was placed in the
+ * character grid, enabling hit-testing for mouse/keyboard interaction.
+ */
 export interface DagNodePosition {
+  /** Zero-based row of the top-left corner of the node box. */
   readonly row: number;
+  /** Zero-based column of the top-left corner of the node box. */
   readonly col: number;
+  /** Character width of the node box. */
   readonly width: number;
+  /** Character height of the node box (always 3: top border, content, bottom border). */
   readonly height: number;
 }
 
+/**
+ * Full layout result returned by `dagLayout()`.
+ *
+ * Contains the rendered string output, a map of node positions for
+ * hit-testing, and the overall grid dimensions.
+ */
 export interface DagLayout {
+  /** The fully rendered, styled graph string (may contain ANSI escape codes). */
   readonly output: string;
+  /** Map from node ID to its position and dimensions in the character grid. */
   readonly nodes: ReadonlyMap<string, DagNodePosition>;
+  /** Total character width of the rendered grid. */
   readonly width: number;
+  /** Total character height (rows) of the rendered grid. */
   readonly height: number;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
 
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
-
+/**
+ * Compute the visible display width of a string in terminal columns.
+ * Delegates to `graphemeWidth` which handles ANSI escapes and wide characters.
+ *
+ * @param str - The string to measure.
+ * @returns The visible column width.
+ */
 function visibleLength(str: string): number {
   return graphemeWidth(str);
 }
 
+/**
+ * Truncate a label to fit within a maximum visible width.
+ * Strips ANSI escapes before measuring, truncates by grapheme cluster,
+ * and appends an ellipsis character when truncation occurs.
+ *
+ * @param text - The label text to truncate.
+ * @param maxLen - Maximum visible width in terminal columns.
+ * @returns The possibly truncated label string.
+ */
 function truncateLabel(text: string, maxLen: number): string {
   if (maxLen <= 0) return '';
   if (visibleLength(text) <= maxLen) return text;
@@ -77,6 +139,17 @@ function truncateLabel(text: string, maxLen: number): string {
 
 // ── Layout: Layer Assignment ───────────────────────────────────────
 
+/**
+ * Assign each node to a layer using longest-path layer assignment.
+ *
+ * Performs Kahn's topological sort to detect cycles, then assigns each
+ * node to the layer one past its deepest parent. Root nodes (in-degree 0)
+ * are placed on layer 0.
+ *
+ * @param nodes - The graph nodes to lay out.
+ * @returns Map from node ID to its zero-based layer index.
+ * @throws If the graph contains a cycle.
+ */
 function assignLayers(nodes: DagNode[]): Map<string, number> {
   const children = new Map<string, string[]>();
   const parents = new Map<string, string[]>();
@@ -142,6 +215,13 @@ function assignLayers(nodes: DagNode[]): Map<string, number> {
 
 // ── Layout: Column Ordering ────────────────────────────────────────
 
+/**
+ * Group node IDs into layer arrays indexed by layer number.
+ *
+ * @param nodes - All graph nodes.
+ * @param layerMap - Map from node ID to layer index (from `assignLayers`).
+ * @returns Array of layers, where each layer is an array of node IDs.
+ */
 function buildLayerArrays(
   nodes: DagNode[],
   layerMap: Map<string, number>,
@@ -158,6 +238,15 @@ function buildLayerArrays(
   return layers;
 }
 
+/**
+ * Reorder nodes within each layer to minimize edge crossings.
+ *
+ * Uses the barycenter heuristic with one top-down pass followed by
+ * one bottom-up pass. Mutates the `layers` arrays in place.
+ *
+ * @param layers - Layer arrays from `buildLayerArrays`, mutated in place.
+ * @param nodes - All graph nodes (used to build adjacency maps).
+ */
 function orderColumns(layers: string[][], nodes: DagNode[]): void {
   const childrenMap = new Map<string, string[]>();
   const parentsMap = new Map<string, string[]>();
@@ -219,8 +308,13 @@ function orderColumns(layers: string[][], nodes: DagNode[]): void {
 
 // ── Edge Routing ───────────────────────────────────────────────────
 
+/** Cardinal direction for edge routing through grid cells. */
 type Dir = 'U' | 'D' | 'L' | 'R';
 
+/**
+ * Lookup table mapping sorted direction-set keys to Unicode box-drawing characters.
+ * For example, `'DR'` maps to `\u250c` (top-left corner).
+ */
 const JUNCTION: Record<string, string> = {
   'D': '\u2502', 'U': '\u2502', 'DU': '\u2502',
   'L': '\u2500', 'R': '\u2500', 'LR': '\u2500',
@@ -229,18 +323,41 @@ const JUNCTION: Record<string, string> = {
   'DLRU': '\u253c',
 };
 
+/**
+ * Select the Unicode box-drawing character for a cell based on its edge directions.
+ *
+ * @param dirs - Set of cardinal directions passing through this cell.
+ * @returns The appropriate box-drawing character, or `\u253c` (cross) as fallback.
+ */
 function junctionChar(dirs: Set<Dir>): string {
   const key = [...dirs].sort().join('');
   return JUNCTION[key] ?? '\u253c';
 }
 
+/**
+ * Mutable grid state used during edge routing.
+ *
+ * Each cell tracks which cardinal directions edges pass through it,
+ * and `arrows` records the encoded positions of arrowheads.
+ */
 interface GridState {
+  /** 2D array of direction sets, one per grid cell. */
   dirs: Set<Dir>[][];
+  /** Encoded arrowhead positions as `row * 10000 + col` (assumes grid width < 10000). */
   arrows: Set<number>;
+  /** Number of rows in the grid. */
   rows: number;
+  /** Number of columns in the grid. */
   cols: number;
 }
 
+/**
+ * Allocate an empty edge-routing grid.
+ *
+ * @param rows - Number of rows in the grid.
+ * @param cols - Number of columns in the grid.
+ * @returns A fresh `GridState` with empty direction sets for every cell.
+ */
 function createGrid(rows: number, cols: number): GridState {
   const dirs: Set<Dir>[][] = [];
   for (let r = 0; r < rows; r++) {
@@ -253,6 +370,14 @@ function createGrid(rows: number, cols: number): GridState {
   return { dirs, arrows: new Set<number>(), rows, cols };
 }
 
+/**
+ * Add direction markers to a single grid cell. Bounds-checked.
+ *
+ * @param g - The grid state to mutate.
+ * @param r - Row index.
+ * @param c - Column index.
+ * @param ds - One or more directions to mark in this cell.
+ */
 function markDir(g: GridState, r: number, c: number, ...ds: Dir[]): void {
   if (r >= 0 && r < g.rows && c >= 0 && c < g.cols) {
     const cell = g.dirs[r]![c]!;
@@ -260,6 +385,21 @@ function markDir(g: GridState, r: number, c: number, ...ds: Dir[]): void {
   }
 }
 
+/**
+ * Route a single edge through the grid between two node positions.
+ *
+ * Draws a vertical segment from the source, an optional horizontal jog
+ * if the columns differ, then a vertical segment down to the target.
+ * Records an arrowhead position just above the destination node.
+ *
+ * @param g - The grid state to mutate.
+ * @param fromCol - Column index of the source node.
+ * @param fromLayer - Layer index of the source node.
+ * @param toCol - Column index of the destination node.
+ * @param toLayer - Layer index of the destination node.
+ * @param RS - Row stride (number of grid rows per layer).
+ * @param colCenter - Function mapping a column index to its center grid column.
+ */
 function markEdge(
   g: GridState,
   fromCol: number,
@@ -294,13 +434,34 @@ function markEdge(
 
 // ── Node Box Rendering ─────────────────────────────────────────────
 
+/** Classification of a character within a rendered node box, used for per-character styling. */
 type CharType = 'border' | 'label' | 'badge' | 'pad';
 
+/**
+ * Result of rendering a single node box.
+ *
+ * Contains the raw character lines and a parallel array of per-character
+ * type classifications for applying differential style tokens.
+ */
 interface NodeBoxResult {
+  /** The three rendered lines: top border, content, bottom border. */
   lines: string[];
+  /** Per-character type classification for each line, aligned with `lines`. */
   charTypes: CharType[][];
 }
 
+/**
+ * Render a single node as a three-line Unicode box.
+ *
+ * Ghost nodes use dashed borders. The label is truncated to fit and a
+ * badge (if present) is right-aligned within the box.
+ *
+ * @param label - The node label text.
+ * @param badgeText - Optional badge text displayed to the right of the label.
+ * @param width - Total character width of the box (including borders).
+ * @param ghost - Whether to render with dashed (ghost) border characters.
+ * @returns The rendered box lines and per-character type map.
+ */
 function renderNodeBox(
   label: string,
   badgeText: string | undefined,
@@ -356,6 +517,18 @@ function renderNodeBox(
 
 // ── Interactive Renderer ───────────────────────────────────────────
 
+/**
+ * Render the full interactive (styled) DAG layout.
+ *
+ * Performs the complete layout pipeline: layer assignment, column ordering,
+ * edge routing, node box rendering, highlight/selection styling, and ANSI
+ * serialization into a final string.
+ *
+ * @param nodes - The graph nodes to render.
+ * @param options - Rendering options (tokens, selection, sizing).
+ * @param ctx - The resolved bijou context.
+ * @returns The rendered output string, node position map, and grid dimensions.
+ */
 function renderInteractiveLayout(
   nodes: DagNode[],
   options: DagOptions,
@@ -582,6 +755,15 @@ function renderInteractiveLayout(
 
 // ── Pipe Renderer ──────────────────────────────────────────────────
 
+/**
+ * Render the graph as plain text for piped (non-TTY) output.
+ *
+ * Produces one line per node in the format `Label -> Target1, Target2`
+ * with no ANSI styling or box-drawing characters.
+ *
+ * @param nodes - The graph nodes to render.
+ * @returns Plain text representation of the graph.
+ */
 function renderPipe(nodes: DagNode[]): string {
   if (nodes.length === 0) return '';
   const lines: string[] = [];
@@ -605,6 +787,16 @@ function renderPipe(nodes: DagNode[]): string {
 
 // ── Accessible Renderer ────────────────────────────────────────────
 
+/**
+ * Render the graph as structured accessible text.
+ *
+ * Produces a summary header ("Graph: N nodes, M edges") followed by
+ * layer-grouped node listings with edge descriptions.
+ *
+ * @param nodes - The graph nodes to render.
+ * @param layerMap - Map from node ID to layer index.
+ * @returns Accessible text representation of the graph.
+ */
 function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>): string {
   if (nodes.length === 0) return 'Graph: 0 nodes, 0 edges';
 
@@ -638,6 +830,18 @@ function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>): stri
 
 // ── dagSlice ───────────────────────────────────────────────────────
 
+/**
+ * Extract a subgraph centered on a focus node.
+ *
+ * When given a `DagSource`, return a bounded `SlicedDagSource`.
+ * When given a `DagNode[]`, return a filtered `DagNode[]` for backward
+ * compatibility. Ghost boundary nodes are injected at depth limits.
+ *
+ * @param input - The full graph, as either a `DagSource` or `DagNode[]`.
+ * @param focus - ID of the node to center the slice around.
+ * @param opts - Slice direction and depth constraints.
+ * @returns A bounded subgraph of the appropriate type.
+ */
 export function dagSlice(
   source: DagSource,
   focus: string,
@@ -663,6 +867,17 @@ export function dagSlice(
 
 // ── dagLayout ──────────────────────────────────────────────────────
 
+/**
+ * Compute the full DAG layout including node positions and rendered output.
+ *
+ * Unlike `dag()`, this returns a `DagLayout` object with both the rendered
+ * string and a map of node positions for hit-testing and interaction.
+ *
+ * @param input - A `SlicedDagSource` or `DagNode[]` to lay out.
+ * @param options - Rendering options (tokens, selection, sizing).
+ * @returns The layout result with output string, node positions, and dimensions.
+ * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
+ */
 export function dagLayout(source: SlicedDagSource, options?: DagOptions): DagLayout;
 export function dagLayout(nodes: DagNode[], options?: DagOptions): DagLayout;
 export function dagLayout(
@@ -683,6 +898,19 @@ export function dagLayout(
 
 // ── Main Entry Point ───────────────────────────────────────────────
 
+/**
+ * Render a directed acyclic graph as a styled string.
+ *
+ * Adapts output to the current context mode:
+ * - `'interactive'` / `'static'`: Unicode box-drawing with ANSI styling.
+ * - `'pipe'`: Plain text `Label -> Target` lines.
+ * - `'accessible'`: Structured text with layer groupings.
+ *
+ * @param input - A `SlicedDagSource` or `DagNode[]` to render.
+ * @param options - Rendering options (tokens, selection, sizing).
+ * @returns The rendered graph string.
+ * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
+ */
 export function dag(source: SlicedDagSource, options?: DagOptions): string;
 export function dag(nodes: DagNode[], options?: DagOptions): string;
 export function dag(
