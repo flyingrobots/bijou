@@ -62,6 +62,14 @@ describe('dagStats()', () => {
     expect(() => dagStats(nodes)).toThrow('cycle detected');
   });
 
+  it('duplicate node ids throws', () => {
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'A' },
+      { id: 'a', label: 'A2' },
+    ];
+    expect(() => dagStats(nodes)).toThrow('duplicate node id "a"');
+  });
+
   it('self-loop throws', () => {
     const nodes: DagNode[] = [
       { id: 'a', label: 'A', edges: ['a'] },

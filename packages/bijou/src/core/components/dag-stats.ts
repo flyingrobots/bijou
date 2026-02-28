@@ -28,7 +28,13 @@ export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
     return { nodes: 0, edges: 0, depth: 0, width: 0, roots: 0, leaves: 0 };
   }
 
-  const nodeIds = new Set(realNodes.map(n => n.id));
+  const nodeIds = new Set<string>();
+  for (const n of realNodes) {
+    if (nodeIds.has(n.id)) {
+      throw new Error(`[bijou] dagStats(): duplicate node id "${n.id}"`);
+    }
+    nodeIds.add(n.id);
+  }
   const children = new Map<string, string[]>();
   const inDegree = new Map<string, number>();
   const parents = new Map<string, string[]>();
