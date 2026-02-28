@@ -107,6 +107,9 @@ export async function runScript<Model, M>(
     bus.runCmd(cmd);
   }
 
+  // Yield so microtask-based init commands can settle
+  await new Promise<void>((r) => queueMicrotask(r));
+
   // Feed script steps
   for (const step of steps) {
     if (!running) break;
@@ -123,6 +126,9 @@ export async function runScript<Model, M>(
     // Yield to allow async commands to settle
     await new Promise<void>((r) => queueMicrotask(r));
   }
+
+  // Final yield so any trailing commands can settle
+  await new Promise<void>((r) => queueMicrotask(r));
 
   bus.dispose();
 

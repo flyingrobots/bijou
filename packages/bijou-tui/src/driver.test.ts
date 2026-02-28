@@ -107,8 +107,9 @@ describe('runScript', () => {
     };
 
     const result = await runScript(app, []);
-    // Should have processed the init command
-    expect(result.frames.length).toBeGreaterThanOrEqual(1);
+    // Init command should have settled and updated the model
+    expect(result.model.loaded).toBe(true);
+    expect(result.model.data).toBe('hello');
   });
 
   it('handles empty steps array', async () => {

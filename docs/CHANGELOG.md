@@ -15,6 +15,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`markdown()` wordWrap grapheme width** — use `graphemeWidth()` instead of `.length` for correct CJK/emoji word wrapping
 - **`markdown()` inline parse order** — code spans (`` ` ``) now parsed before bold/italic to prevent `*` inside backticks being treated as emphasis
 - **`markdown()` bold regex** — changed from `[^*]+` to `.+?` to allow `*` inside bold spans (e.g. `**a*b**`)
+- **`runScript()` init command settling** — add microtask yield after init commands and before dispose so async init commands settle before step processing begins
+- **`runScript()` init-command test** — strengthen assertion to verify model mutation, not just frame count
 
 ### 📝 Documentation
 
