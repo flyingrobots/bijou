@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.",
   "type": "module",
   "sideEffects": false,

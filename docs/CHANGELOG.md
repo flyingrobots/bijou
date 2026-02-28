@@ -6,6 +6,48 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-02-27
+
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`dagStats()`** — pure graph statistics (nodes, edges, depth, width, roots, leaves) with cycle detection, ghost-node filtering, and `SlicedDagSource` support
+- **`wizard()`** — multi-step form orchestrator that runs steps sequentially, passes accumulated values to each step, and supports conditional skipping via `skip` predicates
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`navigableTable()`** — keyboard-navigable table wrapping core `table()` with focus management, vertical scrolling, and vim-style keybindings (`j`/`k`, `d`/`u`, page up/down)
+- **`createNavigableTableState()`** — factory for navigable table state with configurable viewport height
+- **`navTableFocusNext()` / `navTableFocusPrev()`** — row focus with wrap-around
+- **`navTablePageDown()` / `navTablePageUp()`** — page-sized jumps with clamping
+- **`navTableKeyMap()`** — preconfigured keybinding map for table navigation
+- **`browsableList()`** — navigable list building block with focus tracking, scroll-aware viewport clipping, page navigation, description support, and convenience keymap (`j/k` navigate, `d/u` page, `Enter` select, `q` quit)
+- **`filePicker()`** — directory browser building block with focus navigation, scroll windowing, and extension filtering. Uses `IOPort.readDir()` for synchronous directory listing
+- **`createFilePickerState()`** — initializes picker state from a directory path and IO port
+- **`fpFocusNext()` / `fpFocusPrev()`** — focus navigation with wrap-around and scroll adjustment
+- **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
+- **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
+
+### Fixed
+
+#### Node adapter (`@flyingrobots/bijou-node`)
+
+- **`nodeIO().readDir()` directory classification** — entries are now suffixed with `/` for directories (via `statSync`), matching the `IOPort` contract that `filePicker()` relies on; previously `readdirSync()` returned bare names causing all directories to be misclassified as files
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`filePicker()` unreadable directory crash** — `createFilePickerState()`, `fpEnter()`, and `fpBack()` now gracefully return empty entries instead of throwing when `readDir()` fails on an unreadable directory
+- **`filePicker()` / `browsableList()` / `navigableTable()` viewport height** — `height` is now clamped to a minimum of 1, preventing invalid scroll/paging behavior with zero or negative values
+- **`browsableList()` items mutation safety** — `createBrowsableListState()` now defensively copies items, consistent with navigable-table
+- **`navigableTable()` deep row copy** — `createNavigableTableState()` now deep-copies rows (inner arrays) to prevent external mutation leaking into state
+- **`fpBack()` cross-platform paths** — parent directory resolution now uses `io.joinPath()` instead of hardcoded `/` separator
+
+### Tests
+
+- **Form edge-case hardening** — added confirm/input empty-answer tests in interactive mode, multiselect toggle-on-off and last-item navigation tests
+- **Environment integration matrix** — added form fallback tests for pipe and accessible modes, component × mode matrix, NO_COLOR × component matrix, and CI=true TTY detection variants
+
 ## [0.5.1] — 2026-02-27
 
 ### Fixed
@@ -212,7 +254,9 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/flyingrobots/bijou/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/flyingrobots/bijou/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/flyingrobots/bijou/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/flyingrobots/bijou/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0

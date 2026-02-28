@@ -7,6 +7,9 @@ import { table } from './components/table.js';
 import { progressBar } from './components/progress.js';
 import { spinnerFrame } from './components/spinner.js';
 import { select } from './forms/select.js';
+import { confirm } from './forms/confirm.js';
+import { input } from './forms/input.js';
+import { multiselect } from './forms/multiselect.js';
 import { gradientText } from './theme/gradient.js';
 import { plainStyle } from '../adapters/test/style.js';
 import { CYAN_MAGENTA } from './theme/presets.js';
@@ -211,5 +214,141 @@ describe('environment integration', () => {
       expect(result).not.toMatch(/\x1b\[/);
       expect(result).toContain('test content');
     });
+  });
+});
+
+describe('form fallback in pipe mode', () => {
+  it('confirm() works in pipe mode', async () => {
+    const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
+    const result = await confirm({ title: 'OK?', ctx });
+    expect(result).toBe(true);
+    const output = ctx.io.written.join('');
+    expect(output).not.toMatch(/\x1b\[/);
+  });
+
+  it('input() works in pipe mode', async () => {
+    const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello'] } });
+    const result = await input({ title: 'Name', ctx });
+    expect(result).toBe('hello');
+    const output = ctx.io.written.join('');
+    expect(output).not.toMatch(/\x1b\[/);
+  });
+
+  it('multiselect() works in pipe mode', async () => {
+    const ctx = createTestContext({ mode: 'pipe', io: { answers: ['1,2'] } });
+    const result = await multiselect({
+      title: 'Pick',
+      options: [
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+        { label: 'C', value: 'c' },
+      ],
+      ctx,
+    });
+    expect(result).toEqual(['a', 'b']);
+  });
+});
+
+describe('form fallback in accessible mode', () => {
+  it('confirm() uses text prompt in accessible mode', async () => {
+    const ctx = createTestContext({ mode: 'accessible', io: { answers: ['yes'] } });
+    const result = await confirm({ title: 'OK?', ctx });
+    expect(result).toBe(true);
+    const output = ctx.io.written.join('');
+    expect(output).toContain('Type yes or no');
+  });
+
+  it('input() uses descriptive prompt in accessible mode', async () => {
+    const ctx = createTestContext({ mode: 'accessible', io: { answers: ['val'] } });
+    const result = await input({ title: 'Username', ctx });
+    expect(result).toBe('val');
+    const output = ctx.io.written.join('');
+    expect(output).toContain('Enter username');
+  });
+
+  it('multiselect() uses number prompt in accessible mode', async () => {
+    const ctx = createTestContext({ mode: 'accessible', io: { answers: ['1'] } });
+    const result = await multiselect({
+      title: 'Pick',
+      options: [{ label: 'A', value: 'a' }],
+      ctx,
+    });
+    expect(result).toEqual(['a']);
+    const output = ctx.io.written.join('');
+    expect(output).toContain('Enter numbers separated by commas');
+  });
+});
+
+describe('component × mode matrix', () => {
+  const modes = ['interactive', 'pipe', 'accessible'] as const;
+
+  for (const mode of modes) {
+    describe(`mode: ${mode}`, () => {
+      it('box() renders without error', () => {
+        const ctx = createTestContext({ mode });
+        const result = box('test', { ctx });
+        expect(typeof result).toBe('string');
+        expect(result).toContain('test');
+      });
+
+      it('table() renders without error', () => {
+        const ctx = createTestContext({ mode });
+        const result = table({
+          columns: [{ header: 'Col' }],
+          rows: [['val']],
+          ctx,
+        });
+        expect(typeof result).toBe('string');
+      });
+
+      it('progressBar() renders without error', () => {
+        const ctx = createTestContext({ mode });
+        const result = progressBar(50, { ctx });
+        expect(typeof result).toBe('string');
+      });
+
+      it('spinnerFrame() renders without error', () => {
+        const ctx = createTestContext({ mode });
+        const result = spinnerFrame(0, { ctx });
+        expect(typeof result).toBe('string');
+      });
+    });
+  }
+});
+
+describe('NO_COLOR × component matrix', () => {
+  it('box() with NO_COLOR has no ANSI codes', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = box('test', { ctx });
+    expect(result).not.toMatch(/\x1b\[/);
+  });
+
+  it('headerBox() with NO_COLOR has no ANSI codes', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = headerBox('Title', { detail: 'Info', ctx });
+    expect(result).not.toMatch(/\x1b\[/);
+  });
+
+  it('progressBar() with NO_COLOR has no ANSI codes', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = progressBar(75, { ctx });
+    expect(result).not.toMatch(/\x1b\[/);
+  });
+});
+
+describe('CI=true with TTY detection', () => {
+  it('CI=true + TTY = static mode (not interactive)', () => {
+    const rt = mockRuntime({ env: { CI: 'true' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('static');
+  });
+
+  it('CI=true + no TTY = pipe mode', () => {
+    const rt = mockRuntime({ env: { CI: 'true' }, stdoutIsTTY: false });
+    expect(detectOutputMode(rt)).toBe('pipe');
+  });
+
+  it('CI=1 variant works', () => {
+    const rt = mockRuntime({ env: { CI: '1' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('static');
   });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { nodeIO } from './io.js';
-import { mkdtempSync, writeFileSync, rmSync } from 'fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -43,6 +43,19 @@ describe('nodeIO()', () => {
     const entries = io.readDir(tempDir);
     expect(entries).toContain('a.txt');
     expect(entries).toContain('b.txt');
+  });
+
+  it('readDir() appends trailing / to directories', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
+    mkdirSync(join(tempDir, 'subdir'));
+    writeFileSync(join(tempDir, 'file.txt'), '');
+
+    const io = nodeIO();
+    const entries = io.readDir(tempDir);
+    expect(entries).toContain('subdir/');
+    expect(entries).not.toContain('subdir');
+    expect(entries).toContain('file.txt');
+    expect(entries).not.toContain('file.txt/');
   });
 
   it('readDir() throws for missing directory', () => {

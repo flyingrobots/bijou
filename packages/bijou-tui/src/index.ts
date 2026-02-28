@@ -185,3 +185,47 @@ export {
   collapseAll,
   accordionKeyMap,
 } from './accordion.js';
+
+// Navigable table
+export {
+  type NavigableTableState,
+  type NavigableTableOptions,
+  type NavTableRenderOptions,
+  createNavigableTableState,
+  navigableTable,
+  navTableFocusNext,
+  navTableFocusPrev,
+  navTablePageDown,
+  navTablePageUp,
+  navTableKeyMap,
+} from './navigable-table.js';
+
+// Browsable list
+export {
+  type BrowsableListItem,
+  type BrowsableListState,
+  type BrowsableListOptions,
+  type BrowsableListRenderOptions,
+  createBrowsableListState,
+  browsableList,
+  listFocusNext,
+  listFocusPrev,
+  listPageDown,
+  listPageUp,
+  browsableListKeyMap,
+} from './browsable-list.js';
+
+// File picker
+export {
+  type FileEntry,
+  type FilePickerState,
+  type FilePickerOptions,
+  type FilePickerRenderOptions,
+  createFilePickerState,
+  filePicker,
+  fpFocusNext,
+  fpFocusPrev,
+  fpEnter,
+  fpBack,
+  filePickerKeyMap,
+} from './file-picker.js';

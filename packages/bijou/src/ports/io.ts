@@ -13,6 +13,10 @@ export interface IOPort {
   onResize(callback: (cols: number, rows: number) => void): RawInputHandle;
   setInterval(callback: () => void, ms: number): TimerHandle;
   readFile(path: string): string;
+  /**
+   * List directory contents. Directory names MUST include a trailing `/`
+   * suffix (e.g. `"src/"`) so consumers can distinguish them from files.
+   */
   readDir(path: string): string[];
   joinPath(...segments: string[]): string;
 }

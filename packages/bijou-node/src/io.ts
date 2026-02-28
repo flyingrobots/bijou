@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import type { IOPort, RawInputHandle, TimerHandle } from '@flyingrobots/bijou';
 
@@ -63,8 +63,14 @@ export function nodeIO(): IOPort {
       return readFileSync(path, 'utf8');
     },
 
-    readDir(path: string): string[] {
-      return readdirSync(path);
+    readDir(dirPath: string): string[] {
+      return readdirSync(dirPath).map((name) => {
+        try {
+          return statSync(join(dirPath, name)).isDirectory() ? name + '/' : name;
+        } catch {
+          return name;
+        }
+      });
     },
 
     joinPath(...segments: string[]): string {
