@@ -17,12 +17,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 #### TUI (`@flyingrobots/bijou-tui`)
 
-- **`commandPalette()`** — filterable action list building block with case-insensitive substring matching on label/description/category/id, focus and page navigation with wrap-around, viewport-clipped rendering, and preconfigured keymap
+- **`commandPalette()`** — filterable action list building block with case-insensitive substring matching on label/description/category/id/shortcut, focus and page navigation with wrap-around, viewport-clipped rendering, and preconfigured keymap
 - **`tooltip()`** — positioned overlay relative to a target element with top/bottom/left/right direction and screen-edge clamping. Reuses existing `renderBox()` helper
 
 ### 🧪 Tests
 
-- 87 new tests across 4 new test files (1192 total)
+- 88 new tests across 4 new test files (1193 total)
 
 ### 📝 Documentation
 

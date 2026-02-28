@@ -2,7 +2,7 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator, badge } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
-  vstack, composite, tooltip, type TooltipDirection,
+  composite, tooltip, type TooltipDirection,
 } from '@flyingrobots/bijou-tui';
 
 const ctx = initDefaultContext();

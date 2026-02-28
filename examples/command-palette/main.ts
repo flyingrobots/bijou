@@ -31,8 +31,7 @@ type Msg =
   | { type: 'page-down' }
   | { type: 'page-up' }
   | { type: 'select' }
-  | { type: 'close' }
-  | { type: 'char'; char: string };
+  | { type: 'close' };
 
 const keys = commandPaletteKeyMap<Msg>({
   focusNext: { type: 'next' },

@@ -90,6 +90,13 @@ describe('cpFilter', () => {
     expect(filtered.filteredItems[0]!.id).toBe('split');
   });
 
+  it('matches by shortcut', () => {
+    const state = createCommandPaletteState(items);
+    const filtered = cpFilter(state, 'ctrl+o');
+    expect(filtered.filteredItems).toHaveLength(1);
+    expect(filtered.filteredItems[0]!.id).toBe('open');
+  });
+
   it('is case-insensitive', () => {
     const state = createCommandPaletteState(items);
     const filtered = cpFilter(state, 'SAVE');
@@ -300,13 +307,13 @@ describe('commandPaletteKeyMap', () => {
   };
   const km = commandPaletteKeyMap(actions);
 
-  it('dispatches down/j to focusNext', () => {
-    expect(km.handle({ key: 'j', ctrl: false, alt: false, shift: false })).toBe('next');
+  it('dispatches down/ctrl+n to focusNext', () => {
+    expect(km.handle({ key: 'n', ctrl: true, alt: false, shift: false })).toBe('next');
     expect(km.handle({ key: 'down', ctrl: false, alt: false, shift: false })).toBe('next');
   });
 
-  it('dispatches up/k to focusPrev', () => {
-    expect(km.handle({ key: 'k', ctrl: false, alt: false, shift: false })).toBe('prev');
+  it('dispatches up/ctrl+p to focusPrev', () => {
+    expect(km.handle({ key: 'p', ctrl: true, alt: false, shift: false })).toBe('prev');
     expect(km.handle({ key: 'up', ctrl: false, alt: false, shift: false })).toBe('prev');
   });
 

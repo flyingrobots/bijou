@@ -86,6 +86,7 @@ function matchesQuery(item: CommandPaletteItem, query: string): boolean {
   if (item.description?.toLowerCase().includes(q)) return true;
   if (item.category?.toLowerCase().includes(q)) return true;
   if (item.id.toLowerCase().includes(q)) return true;
+  if (item.shortcut?.toLowerCase().includes(q)) return true;
   return false;
 }
 
@@ -257,13 +258,13 @@ export function commandPaletteKeyMap<Msg>(actions: {
 }): KeyMap<Msg> {
   return createKeyMap<Msg>()
     .group('Navigation', (g) => g
-      .bind('j', 'Next item', actions.focusNext)
+      .bind('ctrl+n', 'Next item', actions.focusNext)
       .bind('down', 'Next item', actions.focusNext)
-      .bind('k', 'Previous item', actions.focusPrev)
+      .bind('ctrl+p', 'Previous item', actions.focusPrev)
       .bind('up', 'Previous item', actions.focusPrev)
-      .bind('d', 'Page down', actions.pageDown)
+      .bind('ctrl+d', 'Page down', actions.pageDown)
       .bind('pagedown', 'Page down', actions.pageDown)
-      .bind('u', 'Page up', actions.pageUp)
+      .bind('ctrl+u', 'Page up', actions.pageUp)
       .bind('pageup', 'Page up', actions.pageUp),
     )
     .bind('enter', 'Select', actions.select)
