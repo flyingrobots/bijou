@@ -22,7 +22,7 @@
 
 import type { BijouContext } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
-import { visibleLength, clipToWidth } from './viewport.js';
+import { clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Types

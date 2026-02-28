@@ -6,6 +6,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`DagNode` `labelToken`/`badgeToken`** — optional per-node label and badge text color tokens for granular styling beyond border color. Propagated through `arraySource()`, `materialize()`, and `sliceSource()`
+- **Color manipulation utilities** — `hexToRgb()`, `rgbToHex()`, `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` for manipulating theme token colors. All functions preserve token modifiers and clamp amounts to [0,1]
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`commandPalette()`** — filterable action list building block with case-insensitive substring matching on label/description/category/id, focus and page navigation with wrap-around, viewport-clipped rendering, and preconfigured keymap
+- **`tooltip()`** — positioned overlay relative to a target element with top/bottom/left/right direction and screen-edge clamping. Reuses existing `renderBox()` helper
+
+### 🧪 Tests
+
+- 87 new tests across 4 new test files (1192 total)
+
+### 📝 Documentation
+
+- **2 new examples** — `command-palette`, `tooltip`
+
 ## [0.7.0] — 2026-02-28
 
 ### 🚀 Features
@@ -282,7 +304,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/flyingrobots/bijou/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/flyingrobots/bijou/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/flyingrobots/bijou/compare/v0.5.0...v0.5.1

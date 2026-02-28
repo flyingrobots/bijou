@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.7.0** — Layout primitives, core components, overlays
+Current: **v0.8.0** — Command palette, tooltip, color utils, DAG token expansion
 
 ---
 
@@ -340,11 +340,11 @@ Growing toward a full terminal component library:
 | **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
 | **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~, ~~`dagLayout()`~~, ~~`dagStats()`~~ ✅ |
 | **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~, ~~`textarea()`~~, ~~`filter()`~~, ~~`wizard()`~~ ✅ |
-| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
+| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~, ~~`commandPalette()`~~ ✅ |
 | **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~, ~~`navigableTable()`~~, ~~`browsableList()`~~, ~~`filePicker()`~~ ✅ |
 | **Overlay** | ~~`composite()`~~, ~~`modal()`~~, ~~`toast()`~~, ~~`drawer()`~~ ✅ |
 | **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~ ✅, mouse events (`IOPort.onMouse()`) |
-| **App** | ~~`statusBar()`~~ ✅, `splitPane()`, `tooltip()` |
+| **App** | ~~`statusBar()`~~, ~~`tooltip()`~~ ✅, `splitPane()` |
 
 Each new component should follow this template before implementation:
 1. Write user story and requirements
@@ -410,7 +410,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **Mouse input** | bijou + bijou-node + bijou-tui | `IOPort.onMouse()` with SGR mouse parsing, `MouseMsg` in TEA runtime. Breaking change (new port method). |
-| **`DagNode` token expansion** | bijou | `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
+| ~~**`DagNode` token expansion**~~ | bijou | ✅ v0.8.0 — `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
 | ~~**`place()`**~~ | bijou-tui | ✅ v0.7.0 — 2D text placement with horizontal + vertical alignment. |
 | ~~**`drawer()`**~~ | bijou-tui | ✅ v0.7.0 — Slide-in side panel built on `composite()`. Left/right anchored, configurable width. |
 | **CLI/stdin component driver** | bijou-tui | Drive component state via CLI flags or streaming stdin commands. Enables scripted demos, testing, and external control. |
@@ -418,7 +418,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
 | **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
 | **Color downsampling** | bijou | Truecolor → ANSI256 → ANSI graceful fallback chain. |
-| **Color manipulation** | bijou | `darken()`, `lighten()`, `complementary()`, `alpha()` on theme tokens. |
+| ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
 | **`markdown()`** | bijou | Render markdown with syntax highlighting. |
 | ~~**`log()`**~~ | bijou | ✅ v0.7.0 — Leveled styled log output (debug/info/warn/error/fatal). |
 
