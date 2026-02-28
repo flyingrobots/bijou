@@ -55,7 +55,11 @@ export function auditStyle(): AuditStylePort {
 
     wasStyled(token: TokenValue, substring: string): boolean {
       return _calls.some(
-        (c) => c.method === 'styled' && c.token === token && c.text.includes(substring),
+        (c) =>
+          c.method === 'styled'
+          && c.token?.hex === token.hex
+          && JSON.stringify(c.token?.modifiers ?? []) === JSON.stringify(token.modifiers ?? [])
+          && c.text.includes(substring),
       );
     },
 
