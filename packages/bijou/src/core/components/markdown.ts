@@ -274,22 +274,20 @@ function renderBlocks(
       }
 
       case 'paragraph': {
-        const inlined = parseInline(block.text, ctx, mode);
-        const wrapped = wordWrap(inlined, width);
-        lines.push(...wrapped);
+        const wrapped = wordWrap(block.text, width);
+        lines.push(...wrapped.map(line => parseInline(line, ctx, mode)));
         lines.push('');
         break;
       }
 
       case 'bullet-list': {
         for (const item of block.items) {
-          const inlined = parseInline(item, ctx, mode);
           const bullet = mode === 'pipe' ? '- ' : '  \u2022 ';
           const indentWidth = width - bullet.length;
-          const wrapped = wordWrap(inlined, indentWidth > 0 ? indentWidth : width);
-          lines.push(bullet + wrapped[0]!);
+          const wrapped = wordWrap(item, indentWidth > 0 ? indentWidth : width);
+          lines.push(bullet + parseInline(wrapped[0]!, ctx, mode));
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(bullet.length) + wrapped[i]!);
+            lines.push(' '.repeat(bullet.length) + parseInline(wrapped[i]!, ctx, mode));
           }
         }
         lines.push('');
@@ -298,13 +296,12 @@ function renderBlocks(
 
       case 'numbered-list': {
         for (let n = 0; n < block.items.length; n++) {
-          const inlined = parseInline(block.items[n]!, ctx, mode);
           const prefix = mode === 'pipe' ? `${n + 1}. ` : `  ${n + 1}. `;
           const indentWidth = width - prefix.length;
-          const wrapped = wordWrap(inlined, indentWidth > 0 ? indentWidth : width);
-          lines.push(prefix + wrapped[0]!);
+          const wrapped = wordWrap(block.items[n]!, indentWidth > 0 ? indentWidth : width);
+          lines.push(prefix + parseInline(wrapped[0]!, ctx, mode));
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(prefix.length) + wrapped[i]!);
+            lines.push(' '.repeat(prefix.length) + parseInline(wrapped[i]!, ctx, mode));
           }
         }
         lines.push('');
