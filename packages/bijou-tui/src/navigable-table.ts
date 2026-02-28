@@ -57,12 +57,13 @@ export interface NavTableRenderOptions {
  * `height` defaults to 10 rows when not provided.
  */
 export function createNavigableTableState(options: NavigableTableOptions): NavigableTableState {
+  const height = Math.max(1, options.height ?? 10);
   return {
     columns: [...options.columns],
-    rows: [...options.rows],
+    rows: options.rows.map((row) => [...row]),
     focusRow: 0,
     scrollY: 0,
-    height: options.height ?? 10,
+    height,
   };
 }
 

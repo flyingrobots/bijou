@@ -33,6 +33,16 @@ describe('navigableTable', () => {
       const state = createNavigableTableState({ columns, rows, height: 3 });
       expect(state.height).toBe(3);
     });
+
+    it('clamps height to 1 when 0 is provided', () => {
+      const state = createNavigableTableState({ columns, rows, height: 0 });
+      expect(state.height).toBe(1);
+    });
+
+    it('clamps negative height to 1', () => {
+      const state = createNavigableTableState({ columns, rows, height: -5 });
+      expect(state.height).toBe(1);
+    });
   });
 
   describe('focus navigation', () => {

@@ -1,8 +1,8 @@
 import type { GroupFieldResult } from './types.js';
 
-export interface WizardStep<T> {
-  key: keyof T;
-  field: (values: Partial<T>) => Promise<unknown>;
+export interface WizardStep<T, K extends keyof T = keyof T> {
+  key: K;
+  field: (values: Partial<T>) => Promise<T[K]>;
   skip?: (values: Partial<T>) => boolean;
 }
 

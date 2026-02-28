@@ -59,6 +59,18 @@ export interface FilePickerRenderOptions {
 // ---------------------------------------------------------------------------
 
 /**
+ * Safely read and parse directory entries. Returns `[]` if the directory
+ * is unreadable (permissions, missing, etc.) instead of throwing.
+ */
+function safeReadEntries(io: IOPort, cwd: string, filter?: string): FileEntry[] {
+  try {
+    return parseEntries(io.readDir(cwd), filter);
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Parse raw directory listing into sorted `FileEntry[]`.
  *
  * @param names  - Names returned by `IOPort.readDir()` (dirs have trailing `/`).
@@ -98,15 +110,15 @@ function parseEntries(names: string[], filter?: string): FileEntry[] {
  * then files, both alphabetically.
  */
 export function createFilePickerState(options: FilePickerOptions): FilePickerState {
-  const names = options.io.readDir(options.cwd);
-  const entries = parseEntries(names, options.filter);
+  const height = Math.max(1, options.height ?? 10);
+  const entries = safeReadEntries(options.io, options.cwd, options.filter);
 
   return {
     cwd: options.cwd,
     entries,
     focusIndex: 0,
     scrollY: 0,
-    height: options.height ?? 10,
+    height,
     filter: options.filter,
   };
 }
@@ -136,8 +148,7 @@ export function fpEnter(state: FilePickerState, io: IOPort): FilePickerState {
   if (!entry || !entry.isDirectory) return state;
 
   const newCwd = io.joinPath(state.cwd, entry.name);
-  const names = io.readDir(newCwd);
-  const entries = parseEntries(names, state.filter);
+  const entries = safeReadEntries(io, newCwd, state.filter);
 
   return {
     ...state,
@@ -153,8 +164,7 @@ export function fpBack(state: FilePickerState, io: IOPort): FilePickerState {
   const newCwd = io.joinPath(state.cwd, '..');
   if (newCwd === state.cwd) return state;
 
-  const names = io.readDir(newCwd);
-  const entries = parseEntries(names, state.filter);
+  const entries = safeReadEntries(io, newCwd, state.filter);
 
   return {
     ...state,

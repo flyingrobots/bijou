@@ -62,11 +62,12 @@ export interface BrowsableListRenderOptions {
 export function createBrowsableListState<T = string>(
   options: BrowsableListOptions<T>,
 ): BrowsableListState<T> {
+  const height = Math.max(1, options.height ?? 10);
   return {
-    items: options.items,
+    items: [...options.items],
     focusIndex: 0,
     scrollY: 0,
-    height: options.height ?? 10,
+    height,
   };
 }
 

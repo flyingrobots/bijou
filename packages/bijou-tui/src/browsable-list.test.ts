@@ -24,12 +24,22 @@ describe('browsableList', () => {
       expect(state.focusIndex).toBe(0);
       expect(state.scrollY).toBe(0);
       expect(state.height).toBe(10);
-      expect(state.items).toBe(items);
+      expect(state.items).toEqual(items);
     });
 
     it('accepts custom height', () => {
       const state = createBrowsableListState({ items, height: 3 });
       expect(state.height).toBe(3);
+    });
+
+    it('clamps height to 1 when 0 is provided', () => {
+      const state = createBrowsableListState({ items, height: 0 });
+      expect(state.height).toBe(1);
+    });
+
+    it('clamps negative height to 1', () => {
+      const state = createBrowsableListState({ items, height: -5 });
+      expect(state.height).toBe(1);
     });
   });
 
