@@ -138,6 +138,9 @@ export {
   type DagSliceOptions,
   dagStats,
   type DagStats,
+  enumeratedList,
+  type BulletStyle,
+  type EnumeratedListOptions,
 } from './core/components/index.js';
 
 // Forms
