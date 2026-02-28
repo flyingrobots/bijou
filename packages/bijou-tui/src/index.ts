@@ -38,7 +38,12 @@ export {
 } from './eventbus.js';
 
 // Layout
-export { vstack, hstack } from './layout.js';
+export { vstack, hstack, place } from './layout.js';
+export type { HAlign, VAlign, PlaceOptions } from './layout.js';
+
+// Status bar
+export { statusBar } from './status-bar.js';
+export type { StatusBarOptions } from './status-bar.js';
 
 // Animation — spring physics & tweens
 export {
