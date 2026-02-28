@@ -8,7 +8,7 @@ Animated plasma effect using the `canvas()` shader primitive.
 npx tsx examples/canvas/main.ts
 ```
 
-## Source
+## Source (excerpt)
 
 ```ts
 const CHARS = ' .:-=+*#%@';
