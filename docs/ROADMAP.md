@@ -422,6 +422,14 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **`markdown()`** | bijou | Render markdown with syntax highlighting. |
 | ~~**`log()`**~~ | bijou | ✅ v0.7.0 — Leveled styled log output (debug/info/warn/error/fatal). |
 
+### P2.5 — Code quality & DX
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **Eliminate `as KeyMsg` casts in examples** | examples | All 20+ examples use `'type' in msg && msg.type === 'key'` with an unsafe `as KeyMsg` cast. Refactor Msg unions to include `KeyMsg` for proper type narrowing. |
+| **`StyleAuditPort` test adapter** | bijou | Current `plainStyle()` is a no-op — can't verify token application in tests. Add an adapter that records styled calls for assertion. |
+| **Grapheme cluster support** | bijou-tui | `[...str]` splits by code points, not grapheme clusters. Multi-codepoint emoji (flags, skin tones) misalign charType mapping in dag renderer and width calculations in viewport/layout. Consider `Intl.Segmenter`. |
+
 ### P3 — Nice to have
 
 | Feature | Package | Notes |
