@@ -2,11 +2,80 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.10.0** — Canvas shader, box width override, mouse input, clipToWidth in core
+Current: **v0.10.1** — JSDoc total coverage
 
 ---
 
-## Test coverage priorities
+## v0.11.0 — Architecture audit remediation
+
+Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
+
+### Phase 1: Port interface cleanup (ISP)
+
+**Problem:** `IOPort` is a fat interface — static components only call `write()` but depend on `question()`, `rawInput()`, `readFile()`, `readDir()`, `joinPath()`. `StylePort` exports `rgb()` and `hex()` methods that no component ever invokes.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Segregate `IOPort`** | bijou | Split into `WritePort`, `QueryPort` (extends Write), `InteractivePort` (extends Query), `FilePort`. `IOPort` becomes their union for backward compat. |
+| **Remove dead `StylePort` methods** | bijou | Audit `rgb()` and `hex()` — if confirmed unused, remove from interface and all adapter implementations. |
+| **Audit `onResize` usage** | bijou | Verify whether any component calls `IOPort.onResize()`. If only used by bijou-tui runtime, move to a TUI-specific port extension. |
+
+### Phase 2: Form abstractions (DRY + SRP)
+
+**Problem:** `select`, `multiselect`, `filter`, and `textarea` duplicate the same interactive/non-interactive branching, render/clearRender/cleanup terminal control, numbered list rendering, title formatting, and validation error display.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Extract `formDispatch()` helper** | bijou | Shared mode-check + TTY-check that routes to interactive vs. fallback handler. Replaces the identical if/else in 4 form files. |
+| **Extract `terminalRenderer()` utility** | bijou | Shared `render()`, `clearRender()`, `cleanup()` using ANSI cursor control. Parameterized by line count. Replaces ~40 lines of duplication per interactive form. |
+| **Extract `renderNumberedOptions()`** | bijou | Shared numbered-list renderer used by `select`, `multiselect`, `filter` fallback modes. |
+| **Extract `formatFormTitle()`** | bijou | Shared `? ${title}` formatting with mode/noColor branching. Used by all 4 interactive forms. |
+| **Extract `writeValidationError()`** | bijou | Shared error display with mode-aware styling. Replaces identical logic in `input` and `textarea`. |
+| **Standardize on `resolveCtx()`** | bijou | Replace all `options.ctx ?? getDefaultContext()` calls in forms with `resolveCtx()`. |
+
+### Phase 3: Large file decomposition (SRP)
+
+**Problem:** Several files exceed 300 lines with multiple distinct responsibilities.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Split `dag.ts` (941 lines)** | bijou | Extract into `dag-layout.ts` (layer assignment, positioning), `dag-edges.ts` (edge routing), `dag-render.ts` (string output + ANSI). Keep `dag.ts` as the public entry that composes them. |
+| **Split `markdown.ts` (468 lines)** | bijou | Extract `markdown-parse.ts` (two-pass block/inline parser) and `markdown-render.ts` (mode-specific output). Keep `markdown.ts` as the public entry. |
+| **Extract textarea editor** | bijou | Move interactive editor state machine (~200 lines) from `textarea.ts` into `textarea-editor.ts`. |
+| **Extract filter interactive UI** | bijou | Move interactive terminal UI (~150 lines) from `filter.ts` into `filter-interactive.ts`. |
+
+### Phase 4: Mode rendering strategy (OCP)
+
+**Problem:** ~22 components repeat `if (mode === 'pipe') ... if (mode === 'accessible') ...` chains. Adding a new output mode requires touching every component.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Design mode renderer pattern** | bijou | Create a `ModeRenderer<Input, Output>` type and `renderByMode()` dispatcher that selects a handler from a mode→renderer map. Components register per-mode renderers instead of using if/else. |
+| **Migrate pilot components** | bijou | Convert `alert`, `badge`, `box` as proof-of-concept. Validate the pattern before wider rollout. |
+| **Migrate remaining components** | bijou | Convert all ~22 mode-branching components to the registry pattern. |
+
+### Phase 5: Test suite hardening
+
+**Problem:** Some tests are brittle (exact ANSI assertions, whitespace-sensitive `toBe`), and some edge cases are missing.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Replace exact ANSI assertions** | bijou | Change `expect(x).toBe('\x1b[?25l')` patterns to `expect(x).toMatch(/\x1b\[/)` or semantic helpers like `expectHiddenCursor(output)`. |
+| **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
+| **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
+| **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
+| **Create output assertion helpers** | bijou | Add `expectContainsAnsi(output)`, `expectNoAnsi(output)`, `expectWritten(ctx, substring)` to reduce coupling to `ctx.io.written` array indexing. |
+
+### Phase 6: Theme access pattern (DIP)
+
+**Problem:** Every component hardcodes deep theme paths like `ctx.theme.theme.semantic.primary` and `ctx.theme.theme.border.primary`, coupling them to the exact theme object shape.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
+| **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
+
+---
 
 ### 1. Form functions: confirm, input, select, multiselect
 
