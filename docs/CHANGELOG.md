@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **`canvas()` surrogate corruption** — replace `ch[0]!` with code-point-aware `[...ch][0]` to correctly extract non-BMP characters (emoji) from shader output
+- **Canvas example unsafe cast** — remove `(msg as Msg)` cast; TypeScript narrows through `'type' in msg` already
+- **`parseMouse()` duplicated ternary** — extract `buttonFromBits()` helper to DRY the button-to-name mapping
 - **`clipToWidth()` / `sliceAnsi()` O(n²) perf** — rewrite to pre-segment stripped text once via `segmentGraphemes()`, then walk original string with a grapheme pointer; removes per-character `str.slice(i)` + re-segment pattern
 - **`clipToWidth()` unconditional reset** — only append `\x1b[0m` when the clipped string actually contains ANSI style sequences
 - **`viewport.ts` duplicate segmenter** — remove `getSegmenter()` singleton; import `segmentGraphemes` from `@flyingrobots/bijou` core
@@ -23,7 +26,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Add missing `CHARS` definition to canvas README snippet
+- Add `canvas` and `mouse` rows to examples README
+- Add `static` mode comment to `canvas()`
 - Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
+- Fix CHANGELOG test file count (`4 new + 5 expanded` → `2 new + 4 expanded`)
 - Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
 - Merge duplicate README documentation bullets in CHANGELOG
 - Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
@@ -53,7 +60,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
-- 51 new tests across 4 new + 5 expanded test files (1403 total)
+- 51 new tests across 2 new + 4 expanded test files (1403 total)
 
 ### 📝 Documentation
 

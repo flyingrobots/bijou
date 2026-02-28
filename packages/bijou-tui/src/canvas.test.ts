@@ -32,6 +32,12 @@ describe('canvas()', () => {
     expect(result).toBe('AAA');
   });
 
+  it('handles non-BMP emoji shader output without surrogate corruption', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = canvas(3, 1, () => '🔥', { ctx });
+    expect(result).toBe('🔥🔥🔥');
+  });
+
   it('substitutes space for empty return', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = canvas(3, 1, () => '', { ctx });

@@ -5,8 +5,7 @@
  * producing a string of exactly `rows` lines, each `cols` characters wide.
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
-import { getDefaultContext } from '@flyingrobots/bijou';
+import { getDefaultContext, type BijouContext } from '@flyingrobots/bijou';
 
 /**
  * Shader function called once per cell.
@@ -50,6 +49,7 @@ export function canvas(
 
   const ctx = options?.ctx ?? getDefaultContext();
   if (ctx.mode === 'pipe' || ctx.mode === 'accessible') return '';
+  // static mode renders normally (same as box/table)
 
   const time = options?.time ?? 0;
   const lines: string[] = [];
@@ -58,8 +58,8 @@ export function canvas(
     let line = '';
     for (let x = 0; x < cols; x++) {
       const ch = shader(x, y, cols, rows, time);
-      // Take first character, or space if empty
-      line += ch.length > 0 ? ch[0]! : ' ';
+      // Take first code point, or space if empty
+      line += ch.length > 0 ? ([...ch][0] ?? ' ') : ' ';
     }
     lines.push(line);
   }

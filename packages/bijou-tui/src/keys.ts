@@ -81,6 +81,8 @@ export function parseMouse(raw: string): MouseMsg | null {
   const isScroll = (buttonByte & 64) !== 0;
 
   const lowBits = buttonByte & 3;
+  const buttonFromBits = (bits: number): MouseButton =>
+    bits === 0 ? 'left' : bits === 1 ? 'middle' : bits === 2 ? 'right' : 'none';
 
   let button: MouseButton;
   let action: MouseAction;
@@ -89,10 +91,10 @@ export function parseMouse(raw: string): MouseMsg | null {
     button = 'none';
     action = lowBits === 0 ? 'scroll-up' : 'scroll-down';
   } else if (isMotion) {
-    button = lowBits === 0 ? 'left' : lowBits === 1 ? 'middle' : lowBits === 2 ? 'right' : 'none';
+    button = buttonFromBits(lowBits);
     action = 'move';
   } else {
-    button = lowBits === 0 ? 'left' : lowBits === 1 ? 'middle' : lowBits === 2 ? 'right' : 'none';
+    button = buttonFromBits(lowBits);
     action = suffix === 'M' ? 'press' : 'release';
   }
 

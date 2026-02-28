@@ -11,6 +11,8 @@ npx tsx examples/canvas/main.ts
 ## Source
 
 ```ts
+const CHARS = ' .:-=+*#%@';
+
 const shader: ShaderFn = (x, y, cols, rows, time) => {
   const cx = cols / 2;
   const cy = rows / 2;

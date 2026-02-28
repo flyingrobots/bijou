@@ -37,7 +37,7 @@ const app: App<Model, Msg> = {
       }
       return [model, []];
     }
-    if ('type' in msg && (msg as Msg).type === 'tick') {
+    if ('type' in msg && msg.type === 'tick') {
       return [{ ...model, time: model.time + 0.016 }, [tick(16)]];
     }
     return [model, []];
