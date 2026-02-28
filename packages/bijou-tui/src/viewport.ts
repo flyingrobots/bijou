@@ -69,6 +69,9 @@ export function stripAnsi(str: string): string {
  *
  * Grapheme-cluster aware: handles emoji, CJK (2 columns), ZWJ sequences,
  * skin tones, flag pairs, and combining marks correctly.
+ *
+ * @param str - Input string (may contain ANSI escapes).
+ * @returns Display width in terminal columns.
  */
 export function visibleLength(str: string): number {
   return graphemeWidth(str);
@@ -80,6 +83,10 @@ export function visibleLength(str: string): number {
  * Appends a reset sequence if the string was clipped mid-style.
  *
  * Re-exported from `@flyingrobots/bijou` core for backward compatibility.
+ *
+ * @param str - Input string (may contain ANSI escapes).
+ * @param maxWidth - Maximum visible width in terminal columns.
+ * @returns Clipped string, at most `maxWidth` columns wide.
  */
 export const clipToWidth = coreClipToWidth;
 

@@ -148,8 +148,7 @@ export function collapseAll(state: AccordionState): AccordionState {
  *
  * Delegates to the static `accordion()` for the actual rendering,
  * then prepends a focus indicator to the focused section's line.
- */
-/**
+ *
  * @param state - Current accordion state.
  * @param options - Rendering options (indicators, focus char, context).
  * @returns Rendered accordion string with focus indicator on the active section.

@@ -257,8 +257,7 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
  *
  * Each entry is prefixed with a focus indicator and a type indicator
  * (directory or file). Directories are suffixed with `/`.
- */
-/**
+ *
  * @param state - Current file picker state.
  * @param options - Rendering options (focus, dir, and file indicators).
  * @returns Rendered file picker string with cwd header and entry list.
@@ -308,8 +307,7 @@ export function filePicker(state: FilePickerState, options?: FilePickerRenderOpt
  *   quit: { type: 'quit' },
  * });
  * ```
- */
-/**
+ *
  * @template Msg - Application message type dispatched by key bindings.
  * @param actions - Map of navigation and action messages.
  * @returns Preconfigured key map with vim-style file picker bindings.

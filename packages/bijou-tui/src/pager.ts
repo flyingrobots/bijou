@@ -232,8 +232,7 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
  *   quit: { type: 'quit' },
  * });
  * ```
- */
-/**
+ *
  * @template Msg - Application message type dispatched by key bindings.
  * @param actions - Map of navigation actions to message values.
  * @returns Preconfigured key map with vim-style pager bindings.

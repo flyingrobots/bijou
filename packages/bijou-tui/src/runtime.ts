@@ -31,6 +31,7 @@ const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
  * @template M     - The message (action) type for the TEA update cycle.
  * @param app     - The TEA application definition (init, update, view).
  * @param options - Optional runtime configuration (context, alt screen, cursor, mouse).
+ * @returns A promise that resolves when the application exits.
  */
 export async function run<Model, M>(
   app: App<Model, M>,

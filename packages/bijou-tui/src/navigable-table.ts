@@ -168,8 +168,7 @@ function adjustScroll(focusRow: number, scrollY: number, height: number, totalRo
  *
  * Slices visible rows based on `scrollY` and `height`, prepends a focus
  * indicator to the first column, then delegates to core `table()`.
- */
-/**
+ *
  * @param state - Current table state.
  * @param options - Rendering options (focus indicator, context).
  * @returns Rendered table string with focus indicator on the active row.
@@ -217,8 +216,7 @@ export function navigableTable(state: NavigableTableState, options?: NavTableRen
  *   quit:      { type: 'quit' },
  * });
  * ```
- */
-/**
+ *
  * @template Msg - Application message type dispatched by key bindings.
  * @param actions - Map of navigation actions to message values.
  * @returns Preconfigured key map with vim-style table row bindings.

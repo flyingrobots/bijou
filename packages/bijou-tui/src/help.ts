@@ -56,8 +56,7 @@ export interface HelpOptions {
  *   q  Quit
  *   ?  Toggle help
  * ```
- */
-/**
+ *
  * @param keymap - Source of key binding information.
  * @param options - Filtering, formatting, and title options.
  * @returns Multi-line help text grouped by binding group.
@@ -122,8 +121,7 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
  * ```
  * q Quit • j Down • k Up • ? Help
  * ```
- */
-/**
+ *
  * @param keymap - Source of key binding information.
  * @param options - Optional filtering by enabled state or group prefix.
  * @returns Single-line help string with keys and descriptions separated by bullets.

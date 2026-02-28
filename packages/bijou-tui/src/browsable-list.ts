@@ -191,8 +191,7 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
  * focus indicator on the currently focused item.
  *
  * Items with a `description` field render as `label — description`.
- */
-/**
+ *
  * @template T - Type of each item's value payload.
  * @param state - Current list state.
  * @param options - Rendering options (focus indicator, context).
@@ -239,8 +238,7 @@ export function browsableList<T>(
  *   quit: { type: 'quit' },
  * });
  * ```
- */
-/**
+ *
  * @template Msg - Application message type dispatched by key bindings.
  * @param actions - Map of navigation actions to message values.
  * @returns Preconfigured key map with vim-style list bindings.

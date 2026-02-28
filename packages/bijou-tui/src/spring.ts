@@ -185,7 +185,7 @@ export interface TweenConfig {
   readonly ease: EasingFn;
 }
 
-/** Mutable snapshot of a running tween animation. */
+/** Immutable snapshot of a running tween animation. */
 export interface TweenState {
   /** Current animated value */
   readonly value: number;

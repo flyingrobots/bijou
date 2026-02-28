@@ -241,8 +241,7 @@ export function cpSelectedItem(state: CommandPaletteState): CommandPaletteItem |
  * - Lines 2+: filtered items in viewport
  * - Each item: `[category] label  description  shortcut`
  * - Focus indicator: `▸` on focused item
- */
-/**
+ *
  * @param state - Current command palette state.
  * @param options - Width, display flags, and context for rendering.
  * @returns Rendered command palette string with search line and item list.
@@ -324,8 +323,7 @@ export function commandPalette(
  *   close: { type: 'cp-close' },
  * });
  * ```
- */
-/**
+ *
  * @template Msg - Application message type dispatched by key bindings.
  * @param actions - Map of navigation and selection actions to message values.
  * @returns Preconfigured key map with Ctrl+N/P, arrow, and page navigation bindings.
