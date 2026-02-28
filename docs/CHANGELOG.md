@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Bug Fixes
+
+- **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
+
 ### 📝 Documentation
 
 - **JSDoc review fixes** — fix 57 issues found during self-review of JSDoc coverage: correct `OutputMode` values in `BijouContext.mode` (critical), add missing `@param`/`@returns`/`@throws` tags across all three packages, merge 12 split JSDoc blocks in bijou-tui, unify `resolveCtx` wording across 16 components, standardize punctuation (en-dashes, em-dashes, `6x6x6`), strip redundant implementation overload docs, and fix inaccurate descriptions (`readDir` sort claim, `NO_COLOR` attribution, "Mutable" snapshot, field check order)

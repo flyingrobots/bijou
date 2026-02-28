@@ -5,7 +5,6 @@
  * On overlap, center is truncated first, then right.
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
 import { visibleLength, clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -24,8 +23,6 @@ export interface StatusBarOptions {
   readonly width: number;
   /** Character used to fill empty space (default: `' '`). */
   readonly fillChar?: string;
-  /** Bijou context for theming and styling. */
-  readonly ctx?: BijouContext;
 }
 
 // ---------------------------------------------------------------------------
@@ -38,7 +35,7 @@ export interface StatusBarOptions {
  * Layout priority: left > right > center. On overlap, center is truncated
  * first, then right. Sections may contain ANSI escape codes.
  *
- * @param options - Bar content, width, fill character, and context.
+ * @param options - Bar content, width, and fill character.
  * @returns Rendered status bar string of exactly `width` visible characters.
  */
 export function statusBar(options: StatusBarOptions): string {

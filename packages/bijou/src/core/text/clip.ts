@@ -12,8 +12,7 @@ import { segmentGraphemes, graphemeClusterWidth } from './grapheme.js';
  *
  * Used to strip style escapes before measuring visible width.
  */
-// eslint-disable-next-line no-control-regex
-const ANSI_RE = /\x1b\[[0-9;]*m/g;
+const ANSI_RE = new RegExp('\x1b\\[[0-9;]*m', 'g');
 
 /**
  * Clip a string to a maximum visible width, preserving ANSI escapes.

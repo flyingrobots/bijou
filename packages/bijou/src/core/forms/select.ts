@@ -23,10 +23,15 @@ export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
  * @typeParam T - Type of each option's value.
  * @param options - Select field configuration.
  * @returns The value of the selected option.
+ * @throws {Error} If `options.options` is empty.
  */
 export async function select<T = string>(options: SelectOptions<T>): Promise<T> {
   const ctx = options.ctx ?? getDefaultContext();
   const mode = ctx.mode;
+
+  if (options.options.length === 0) {
+    throw new Error('select() requires at least one option');
+  }
 
   if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
     return interactiveSelect(options, ctx);

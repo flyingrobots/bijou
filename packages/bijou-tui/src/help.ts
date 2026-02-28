@@ -148,7 +148,7 @@ export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'en
  *
  * @param keymap - Source of key binding information.
  * @param groupPrefix - Group name prefix to filter on (case-insensitive).
- * @param options - Additional formatting options forwarded to `helpView`.
+ * @param options - Additional formatting options forwarded to `helpView` (excluding `groupFilter`, which is set by `groupPrefix`).
  * @returns Filtered multi-line help text.
  */
 export function helpFor(keymap: BindingSource, groupPrefix: string, options?: HelpOptions): string {

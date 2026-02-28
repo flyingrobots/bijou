@@ -56,7 +56,8 @@ export function tree(nodes: TreeNode[], options: TreeOptions = {}): string {
   }
 
   const guideToken = options.guideToken ?? ctx.theme.theme.border.muted;
-  return renderRich(nodes, '', true, guideToken, ctx);
+  const labelToken = options.labelToken;
+  return renderRich(nodes, '', true, guideToken, labelToken, ctx);
 }
 
 /**
@@ -108,6 +109,9 @@ function renderAccessible(nodes: TreeNode[], depth: number): string {
  * @param prefix - Accumulated prefix string for continuation lines.
  * @param isRoot - Whether this is the top-level invocation.
  * @param guideToken - Token used to style connectors and continuation lines.
+ * @param labelToken - Optional token used to style node labels. When provided,
+ *   each label is wrapped with {@link BijouContext.style.styled}; otherwise the
+ *   raw label text is used.
  * @param ctx - Bijou context for styling.
  * @returns Styled tree string.
  */
@@ -116,17 +120,19 @@ function renderRich(
   prefix: string,
   isRoot: boolean,
   guideToken: TokenValue,
+  labelToken: TokenValue | undefined,
   ctx: BijouContext,
 ): string {
   const lines: string[] = [];
   for (const [i, node] of nodes.entries()) {
     const isLast = i === nodes.length - 1;
     const connector = isLast ? '└─ ' : '├─ ';
+    const label = labelToken ? ctx.style.styled(labelToken, node.label) : node.label;
 
     if (isRoot) {
-      lines.push(ctx.style.styled(guideToken, connector) + node.label);
+      lines.push(ctx.style.styled(guideToken, connector) + label);
     } else {
-      lines.push(prefix + ctx.style.styled(guideToken, connector) + node.label);
+      lines.push(prefix + ctx.style.styled(guideToken, connector) + label);
     }
 
     if (node.children && node.children.length > 0) {
@@ -134,7 +140,7 @@ function renderRich(
       const newPrefix = isRoot
         ? ctx.style.styled(guideToken, continuation)
         : prefix + ctx.style.styled(guideToken, continuation);
-      lines.push(renderRich(node.children, newPrefix, false, guideToken, ctx));
+      lines.push(renderRich(node.children, newPrefix, false, guideToken, labelToken, ctx));
     }
   }
   return lines.join('\n');

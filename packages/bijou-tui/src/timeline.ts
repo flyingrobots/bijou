@@ -483,6 +483,10 @@ function compile(entries: BuilderEntry[]): Timeline {
           };
         }
 
+        if (tracks.some(t => t.name === entry.name)) {
+          throw new Error(`Timeline: duplicate track name "${entry.name}"`);
+        }
+
         tracks.push(resolved);
         prevStartMs = startMs;
         prevEndMs = startMs + resolved.estimatedDurationMs;

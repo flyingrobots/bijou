@@ -132,7 +132,7 @@ export function nodeIO(): IOPort {
      *
      * Each entry is either a plain filename or a directory name with a
      * trailing slash (e.g. `"src/"`), matching the {@link IOPort.readDir}
-     * contract. If `statSync` fails for an entry, the bare name is returned.
+     * contract. If `statSync` fails for an entry (e.g. broken symlink), the bare name is returned without a trailing slash.
      *
      * @param dirPath - Path to the directory to list.
      * @returns Entry names with trailing slashes on directories.
