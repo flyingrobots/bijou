@@ -44,7 +44,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`ansi256ToAnsi16()` negative input** — clamp input to 0–255 range
 - **`markdown()` blockquote regex** — handle indented blockquotes (leading whitespace before `>`)
 - **`auditStyle()` mutable reference** — `get calls()` now returns a defensive copy
-- **progress-download example** — add missing `{ type: 'quit' }` handler for auto-exit
+- **progress-download example** — add missing `{ type: 'quit' }` handler for auto-exit; remove unused `vstack` import
 - **help example** — clamp `selected` index to >= 0 when deleting last item
 
 ### 🔧 Refactors
@@ -63,6 +63,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Fix CHANGELOG missing blank line before `## [0.8.0]`
 - Fix ROADMAP `StyleAuditPort` → `AuditStylePort`
 - Add bare-escape limitation comments to select, filter, multiselect, textarea
+- Add `canvas()` shader primitive and `box()` width override to ROADMAP backlog (from XYPH title screen request)
 
 ## [0.8.0] — 2026-02-28
 
