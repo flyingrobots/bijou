@@ -21,7 +21,7 @@ export interface ProgressBarOptions {
 }
 
 /**
- * Resolve the provided context or fall back to the default context.
+ * Resolve the provided context or fall back to the global default.
  *
  * @param ctx - Optional context override.
  * @returns The resolved {@link BijouContext}.
@@ -40,9 +40,9 @@ function resolveCtx(ctx?: BijouContext): BijouContext {
  * - `pipe` — plain text like `Progress: 42%`.
  * - `accessible` — screen-reader-friendly phrase like `42 percent complete.`.
  *
- * The percentage is clamped to the 0 -- 100 range.
+ * The percentage is clamped to the 0–100 range.
  *
- * @param percent - Completion percentage (0 -- 100).
+ * @param percent - Completion percentage (0–100).
  * @param options - Progress bar configuration.
  * @returns The rendered progress bar string.
  */
@@ -95,7 +95,7 @@ export interface ProgressBarController {
   start(): void;
   /**
    * Set the progress bar to a new percentage.
-   * @param pct - New completion percentage (0 -- 100).
+   * @param pct - New completion percentage (0–100).
    */
   update(pct: number): void;
   /**

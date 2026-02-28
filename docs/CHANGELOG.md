@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 📝 Documentation
+
+- **JSDoc fixes** — fix 23 JSDoc issues across `packages/bijou/src/`: correct `OutputMode` values in `BijouContext.mode`, add missing `@param`/`@returns` tags to `markdown()` and `setDefaultContext()`, unify `resolveCtx` wording across all components, standardize range notation in `downsample.ts` and `progress.ts`, expand `@throws` on `sliceSource()`, and various minor doc corrections.
+
 ## [0.10.1] — 2026-02-28
 
 ### 📝 Documentation

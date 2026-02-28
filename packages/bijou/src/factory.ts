@@ -35,7 +35,7 @@ export interface CreateBijouOptions {
  * 3. Fall back to the explicit `theme` option (or the built-in default).
  *
  * @param options - Adapter ports and optional theme overrides.
- * @returns A frozen context ready to pass to any bijou component.
+ * @returns A context object ready to pass to any bijou component.
  */
 export function createBijou(options: CreateBijouOptions): BijouContext {
   const { runtime, io, style } = options;

@@ -21,10 +21,10 @@ export interface TreeOptions {
 }
 
 /**
- * Resolve a BijouContext, falling back to the global default.
+ * Resolve the provided context or fall back to the global default.
  *
- * @param ctx - Optional explicit context.
- * @returns The provided context or the global default.
+ * @param ctx - Optional context override.
+ * @returns The resolved {@link BijouContext}.
  */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;

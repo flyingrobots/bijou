@@ -29,7 +29,7 @@ export interface TestContextOptions {
   runtime?: MockRuntimeOptions;
   /** Overrides for mock I/O (pre-loaded answers, keys, virtual files). */
   io?: MockIOOptions;
-  /** Theme to resolve. Defaults to {@link CYAN_MAGENTA}. */
+  /** Theme to resolve. Defaults to `CYAN_MAGENTA`. */
   theme?: Theme;
   /** Output mode. Defaults to `'interactive'`. */
   mode?: OutputMode;

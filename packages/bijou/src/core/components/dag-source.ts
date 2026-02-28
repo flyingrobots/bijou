@@ -215,7 +215,7 @@ const GHOST_DESCENDANTS_PREFIX = '__ghost_descendants_';
  * `SlicedDagSource` containing only the neighborhood.
  *
  * Ghost nodes are injected at depth boundaries to indicate truncated
- * branches. Never calls `ids()` on the source -- works purely via
+ * branches. Never calls `ids()` on the source — works purely via
  * traversal. For ancestor/both directions, `source.parents()` must
  * be provided.
  *
@@ -224,6 +224,8 @@ const GHOST_DESCENDANTS_PREFIX = '__ghost_descendants_';
  * @param opts - Traversal direction and maximum depth.
  * @returns A bounded `SlicedDagSource` containing the neighborhood.
  * @throws If `direction` is `'ancestors'` and `source.parents` is not provided.
+ *   When `direction` is `'both'` (the default) and `source.parents` is absent,
+ *   silently downgrades to descendants-only traversal instead of throwing.
  */
 export function sliceSource(
   source: DagSource,

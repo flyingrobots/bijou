@@ -19,7 +19,7 @@ export interface SpinnerOptions {
 const DOTS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f'];
 
 /**
- * Resolve the provided context or fall back to the default context.
+ * Resolve the provided context or fall back to the global default.
  *
  * @param ctx - Optional context override.
  * @returns The resolved {@link BijouContext}.

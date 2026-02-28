@@ -13,7 +13,7 @@ export type ColorLevel = 'none' | 'ansi16' | 'ansi256' | 'truecolor';
 // ---------------------------------------------------------------------------
 
 /**
- * Map an RGB color to the nearest ANSI 256 color index (16–255).
+ * Map an RGB color to the nearest ANSI 256 color index (16-255).
  *
  * The ANSI 256 palette has:
  * - Indices 0-15: standard + bright colors (not targeted here)
@@ -33,7 +33,7 @@ export function rgbToAnsi256(r: number, g: number, b: number): number {
     return Math.round((r - 8) / 247 * 24) + 232;
   }
 
-  // Map to 6×6×6 color cube (indices 16–231)
+  // Map to 6x6x6 color cube (indices 16-231)
   const ri = Math.round(r / 255 * 5);
   const gi = Math.round(g / 255 * 5);
   const bi = Math.round(b / 255 * 5);
@@ -122,8 +122,8 @@ function colorDistance(
 // ---------------------------------------------------------------------------
 
 /**
- * The 16 standard ANSI colors in RGB, indexed 0–15.
- * 0–7: standard, 8–15: bright variants.
+ * The 16 standard ANSI colors in RGB, indexed 0-15.
+ * 0-7: standard, 8-15: bright variants.
  */
 const ANSI16_PALETTE: readonly [number, number, number][] = [
   [0, 0, 0],       // 0: black

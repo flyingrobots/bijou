@@ -452,6 +452,10 @@ function renderBlocks(
  * - `interactive`: full styled output with colors and Unicode
  * - `pipe`: plain text with minimal formatting
  * - `accessible`: structured text with explicit labels
+ *
+ * @param source - Raw markdown source text.
+ * @param options - Rendering options (wrap width, context).
+ * @returns The rendered terminal string.
  */
 export function markdown(source: string, options?: MarkdownOptions): string {
   const ctx = options?.ctx ?? getDefaultContext();

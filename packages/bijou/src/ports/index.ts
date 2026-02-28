@@ -1,4 +1,8 @@
-/** @module ports — Hexagonal-architecture port interfaces for bijou. */
+/**
+ * Hexagonal-architecture port interfaces for bijou.
+ *
+ * @module
+ */
 
 export type { RuntimePort } from './runtime.js';
 export type { IOPort, RawInputHandle, TimerHandle } from './io.js';

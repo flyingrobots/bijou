@@ -77,7 +77,7 @@ export interface DagNodePosition {
   readonly col: number;
   /** Character width of the node box. */
   readonly width: number;
-  /** Character height of the node box (typically 3: top border, content, bottom border). */
+  /** Character height of the node box (always 3: top border, content, bottom border). */
   readonly height: number;
 }
 
@@ -101,10 +101,10 @@ export interface DagLayout {
 // ── Helpers ────────────────────────────────────────────────────────
 
 /**
- * Resolve the bijou context, falling back to the global default.
+ * Resolve the provided context or fall back to the global default.
  *
- * @param ctx - Explicit context override, if provided.
- * @returns The provided context or the global default context.
+ * @param ctx - Optional context override.
+ * @returns The resolved {@link BijouContext}.
  */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
@@ -354,7 +354,7 @@ function junctionChar(dirs: Set<Dir>): string {
 interface GridState {
   /** 2D array of direction sets, one per grid cell. */
   dirs: Set<Dir>[][];
-  /** Encoded arrowhead positions as `row * 10000 + col`. */
+  /** Encoded arrowhead positions as `row * 10000 + col` (assumes grid width < 10000). */
   arrows: Set<number>;
   /** Number of rows in the grid. */
   rows: number;
@@ -913,7 +913,7 @@ export function dagLayout(
  * Render a directed acyclic graph as a styled string.
  *
  * Adapts output to the current context mode:
- * - `'interactive'`: Unicode box-drawing with ANSI styling.
+ * - `'interactive'` / `'static'`: Unicode box-drawing with ANSI styling.
  * - `'pipe'`: Plain text `Label -> Target` lines.
  * - `'accessible'`: Structured text with layer groupings.
  *

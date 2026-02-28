@@ -20,10 +20,10 @@ export interface StyledCall {
  *
  * All styling methods return text unchanged (identity pass-through) so that
  * string equality assertions work without stripping escape codes. Use the
- * {@link calls} array or {@link wasStyled} helper to verify styling behavior.
+ * `calls` array or `wasStyled` helper to verify styling behavior.
  */
 export interface AuditStylePort extends StylePort {
-  /** All recorded style calls in order (defensive copy). */
+  /** All recorded style calls in order. */
   readonly calls: readonly StyledCall[];
 
   /**

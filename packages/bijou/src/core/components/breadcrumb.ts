@@ -10,10 +10,10 @@ export interface BreadcrumbOptions {
 }
 
 /**
- * Resolve a BijouContext, falling back to the global default.
+ * Resolve the provided context or fall back to the global default.
  *
- * @param ctx - Optional explicit context.
- * @returns The provided context or the global default.
+ * @param ctx - Optional context override.
+ * @returns The resolved {@link BijouContext}.
  */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
@@ -24,7 +24,7 @@ function resolveCtx(ctx?: BijouContext): BijouContext {
  * Render a breadcrumb navigation trail.
  *
  * Adapts output by mode:
- * - `pipe`: plain segments joined by `>`.
+ * - `pipe`: plain segments joined by `' > '`.
  * - `accessible`: `Breadcrumb: path (current)` format for screen readers.
  * - `interactive`/`static`: muted ancestors with the last segment bold and primary-colored.
  *

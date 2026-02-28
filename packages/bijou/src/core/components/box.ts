@@ -85,7 +85,7 @@ function drawBox(
 }
 
 /**
- * Resolve the provided context or fall back to the default context.
+ * Resolve the provided context or fall back to the global default.
  *
  * @param ctx - Optional context override.
  * @returns The resolved {@link BijouContext}.

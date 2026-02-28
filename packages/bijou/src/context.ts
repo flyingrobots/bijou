@@ -26,6 +26,8 @@ export function getDefaultContext(): BijouContext {
  * Typically called once at startup by an adapter package (e.g. bijou-node).
  * After this call, components that omit the optional `ctx` parameter will
  * use the context provided here.
+ *
+ * @param ctx - The context to set as the global default.
  */
 export function setDefaultContext(ctx: BijouContext): void {
   defaultContext = ctx;

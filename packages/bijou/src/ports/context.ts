@@ -13,7 +13,7 @@ import type { StylePort } from './style.js';
 export interface BijouContext {
   /** Fully-resolved theme with color tokens ready for rendering. */
   readonly theme: ResolvedTheme;
-  /** Current output fidelity: `'full'`, `'basic'`, or `'none'`. */
+  /** Current output fidelity: `'interactive'`, `'static'`, `'pipe'`, or `'accessible'`. */
   readonly mode: OutputMode;
   /** Environment / terminal dimensions adapter. */
   readonly runtime: RuntimePort;
