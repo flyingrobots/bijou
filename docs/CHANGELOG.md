@@ -20,6 +20,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`navTableFocusNext()` / `navTableFocusPrev()`** — row focus with wrap-around
 - **`navTablePageDown()` / `navTablePageUp()`** — page-sized jumps with clamping
 - **`navTableKeyMap()`** — preconfigured keybinding map for table navigation
+- **`browsableList()`** — navigable list building block with focus tracking, scroll-aware viewport clipping, page navigation, description support, and convenience keymap (`j/k` navigate, `d/u` page, `Enter` select, `q` quit)
 
 ## [0.5.1] — 2026-02-27
 
