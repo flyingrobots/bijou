@@ -1,4 +1,4 @@
-import chalk, { type ChalkInstance } from 'chalk';
+import chalk, { Chalk, type ChalkInstance } from 'chalk';
 import type { StylePort, TokenValue } from '@flyingrobots/bijou';
 
 export interface ChalkStyleOptions {
@@ -12,9 +12,9 @@ export function chalkStyle(options?: ChalkStyleOptions): StylePort;
 export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const opts = typeof arg === 'boolean' ? { noColor: arg } : (arg ?? {});
   const isNoColor = opts.noColor ?? false;
-  if (opts.level !== undefined) {
-    chalk.level = opts.level;
-  }
+  const instance: ChalkInstance = opts.level !== undefined
+    ? new Chalk({ level: opts.level })
+    : chalk;
 
   function applyModifiers(c: ChalkInstance, modifiers?: TokenValue['modifiers']): ChalkInstance {
     if (modifiers === undefined) return c;
@@ -36,22 +36,22 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
 
   return {
     styled(token: TokenValue, text: string): string {
-      const base: ChalkInstance = isNoColor ? chalk : chalk.hex(token.hex);
+      const base: ChalkInstance = isNoColor ? instance : instance.hex(token.hex);
       return applyModifiers(base, token.modifiers)(text);
     },
 
     rgb(r: number, g: number, b: number, text: string): string {
       if (isNoColor) return text;
-      return chalk.rgb(r, g, b)(text);
+      return instance.rgb(r, g, b)(text);
     },
 
     hex(color: string, text: string): string {
       if (isNoColor) return text;
-      return chalk.hex(color)(text);
+      return instance.hex(color)(text);
     },
 
     bold(text: string): string {
-      return chalk.bold(text);
+      return instance.bold(text);
     },
   };
 }
