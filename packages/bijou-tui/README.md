@@ -283,6 +283,51 @@ const output = composite(backgroundView, [dialog, notification], { dim: true });
 
 Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
 
+## Building Blocks
+
+Reusable stateful components that follow the TEA state + pure transformers + sync render + convenience keymap pattern:
+
+### Navigable Table
+
+```typescript
+import {
+  createNavigableTableState, navigableTable, navTableFocusNext,
+  navTableKeyMap, helpShort,
+} from '@flyingrobots/bijou-tui';
+
+const state = createNavigableTableState({ columns, rows, height: 10 });
+const output = navigableTable(state, { ctx });
+const next = navTableFocusNext(state);
+```
+
+### Browsable List
+
+```typescript
+import {
+  createBrowsableListState, browsableList, listFocusNext,
+  browsableListKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createBrowsableListState({ items, height: 10 });
+const output = browsableList(state);
+```
+
+### File Picker
+
+```typescript
+import {
+  createFilePickerState, filePicker, fpFocusNext, fpEnter, fpBack,
+  filePickerKeyMap,
+} from '@flyingrobots/bijou-tui';
+import { nodeIO } from '@flyingrobots/bijou-node';
+
+const io = nodeIO();
+const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
+const output = filePicker(state);
+```
+
+All building blocks include `*KeyMap()` factories for preconfigured vim-style keybindings.
+
 ## Related Packages
 
 - [`@flyingrobots/bijou`](https://www.npmjs.com/package/@flyingrobots/bijou) — Zero-dependency core with all components and theme engine
