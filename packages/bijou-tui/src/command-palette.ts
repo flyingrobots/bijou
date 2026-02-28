@@ -191,6 +191,8 @@ export function commandPalette(
 
   const indicator = '\u25b8'; // ▸
   const pad = ' ';
+  const muted = (text: string) =>
+    ctx ? ctx.style.styled(ctx.theme.theme.semantic.muted, text) : text;
 
   for (let i = 0; i < visible.length; i++) {
     const item = visible[i]!;
@@ -200,26 +202,17 @@ export function commandPalette(
     const parts: string[] = [];
 
     if (showCategory && item.category) {
-      const catText = ctx
-        ? ctx.style.styled(ctx.theme.theme.semantic.muted, `[${item.category}]`)
-        : `[${item.category}]`;
-      parts.push(catText);
+      parts.push(muted(`[${item.category}]`));
     }
 
     parts.push(item.label);
 
     if (item.description) {
-      const descText = ctx
-        ? ctx.style.styled(ctx.theme.theme.semantic.muted, item.description)
-        : item.description;
-      parts.push(descText);
+      parts.push(muted(item.description));
     }
 
     if (showShortcut && item.shortcut) {
-      const shortcutText = ctx
-        ? ctx.style.styled(ctx.theme.theme.semantic.muted, item.shortcut)
-        : item.shortcut;
-      parts.push(shortcutText);
+      parts.push(muted(item.shortcut));
     }
 
     const content = parts.join('  ');
