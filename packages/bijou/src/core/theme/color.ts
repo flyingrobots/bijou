@@ -16,7 +16,7 @@ export function hexToRgb(hex: string): RGB {
   if (h.length === 3) {
     h = h[0]! + h[0]! + h[1]! + h[1]! + h[2]! + h[2]!;
   }
-  if (h.length !== 6) {
+  if (h.length !== 6 || !/^[0-9a-f]{6}$/i.test(h)) {
     throw new Error(`Invalid hex color: "${hex}"`);
   }
   const n = parseInt(h, 16);

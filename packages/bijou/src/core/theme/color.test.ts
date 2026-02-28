@@ -44,6 +44,11 @@ describe('hexToRgb', () => {
   it('throws on 4-digit hex', () => {
     expect(() => hexToRgb('#abcd')).toThrow('Invalid hex color');
   });
+
+  it('throws on non-hex characters', () => {
+    expect(() => hexToRgb('xyz')).toThrow('Invalid hex color');
+    expect(() => hexToRgb('#gggggg')).toThrow('Invalid hex color');
+  });
 });
 
 // ── rgbToHex ───────────────────────────────────────────────────────
