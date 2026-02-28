@@ -167,9 +167,12 @@ export {
   type ToastVariant,
   type ToastAnchor,
   type ToastOptions,
+  type DrawerAnchor,
+  type DrawerOptions,
   composite,
   modal,
   toast,
+  drawer,
 } from './overlay.js';
 
 // Interactive accordion

@@ -7,7 +7,7 @@
  */
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
-import { sliceAnsi, visibleLength } from './viewport.js';
+import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -250,4 +250,84 @@ export function toast(options: ToastOptions): Overlay {
   col = Math.max(0, col);
 
   return { content: boxStr, row, col };
+}
+
+// ---------------------------------------------------------------------------
+// Drawer types
+// ---------------------------------------------------------------------------
+
+export type DrawerAnchor = 'left' | 'right';
+
+export interface DrawerOptions {
+  readonly content: string;
+  readonly anchor?: DrawerAnchor;       // default: 'right'
+  readonly width: number;
+  readonly screenWidth: number;
+  readonly screenHeight: number;
+  readonly title?: string;
+  readonly borderToken?: TokenValue;
+  readonly ctx?: BijouContext;
+}
+
+// ---------------------------------------------------------------------------
+// drawer()
+// ---------------------------------------------------------------------------
+
+export function drawer(options: DrawerOptions): Overlay {
+  const {
+    content,
+    anchor = 'right',
+    width,
+    screenWidth,
+    screenHeight,
+    title,
+    ctx,
+  } = options;
+
+  const innerWidth = Math.max(0, width - 4); // border + padding on each side
+
+  const borderColor = ctx && options.borderToken
+    ? (s: string) => ctx.style.styled(options.borderToken!, s)
+    : (s: string) => s;
+
+  // Build top border
+  let topInner: string;
+  if (title) {
+    const titleText = ctx ? ctx.style.bold(title) : title;
+    const titleVis = visibleLength(titleText);
+    const remaining = Math.max(0, innerWidth + 2 - titleVis - 2); // +2 for padding around border, -2 for spaces around title
+    const leftDash = Math.floor(remaining / 2);
+    const rightDash = remaining - leftDash;
+    topInner = BORDER.h.repeat(leftDash) + ' ' + titleText + ' ' + BORDER.h.repeat(rightDash);
+  } else {
+    topInner = BORDER.h.repeat(innerWidth + 2);
+  }
+  const topLine = borderColor(BORDER.tl + topInner + BORDER.tr);
+  const bottomLine = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br);
+
+  // Build content lines
+  const contentLines = content.split('\n');
+  const availableHeight = screenHeight - 2; // minus top + bottom border
+
+  const bodyLines: string[] = [];
+  for (let i = 0; i < availableHeight; i++) {
+    const raw = contentLines[i] ?? '';
+    const vis = visibleLength(raw);
+    let clipped: string;
+    if (vis > innerWidth) {
+      clipped = clipToWidth(raw, innerWidth);
+    } else {
+      clipped = raw + ' '.repeat(innerWidth - vis);
+    }
+    bodyLines.push(borderColor(BORDER.v) + ' ' + clipped + ' ' + borderColor(BORDER.v));
+  }
+
+  const allLines = [topLine, ...bodyLines, bottomLine];
+  const col = anchor === 'right' ? screenWidth - width : 0;
+
+  return {
+    content: allLines.join('\n'),
+    row: 0,
+    col: Math.max(0, col),
+  };
 }
