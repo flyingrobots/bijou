@@ -33,7 +33,7 @@ const app: App<Model, Msg> = {
     if (msg.type === 'key') {
       switch (msg.key) {
         case 'q': return [model, [quit()]];
-        case 'd': return [{ ...model, dirIndex: (model.dirIndex + 1) % 4 }, []];
+        case 'd': return [{ ...model, dirIndex: (model.dirIndex + 1) % directions.length }, []];
         case 'up': return [{ ...model, selectedRow: Math.max(2, model.selectedRow - 1) }, []];
         case 'down': return [{ ...model, selectedRow: Math.min(model.rows - 3, model.selectedRow + 1) }, []];
         case 'left': return [{ ...model, selectedCol: Math.max(2, model.selectedCol - 1) }, []];
@@ -53,7 +53,11 @@ const app: App<Model, Msg> = {
     while (bgLines.length < rows) bgLines.push('');
 
     // Place a marker at the target position
-    bgLines[selectedRow] = bgLines[selectedRow]!.substring(0, selectedCol) + '◆' + bgLines[selectedRow]!.substring(selectedCol + 1);
+    let markerLine = bgLines[selectedRow]!;
+    if (markerLine.length < selectedCol + 1) {
+      markerLine = markerLine.padEnd(selectedCol + 1, ' ');
+    }
+    bgLines[selectedRow] = markerLine.substring(0, selectedCol) + '◆' + markerLine.substring(selectedCol + 1);
     const bg = bgLines.join('\n');
 
     const tip = tooltip({
