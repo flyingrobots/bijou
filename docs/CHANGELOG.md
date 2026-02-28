@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 📝 Documentation
+
+- **JSDoc total coverage** — every exported and internal function, interface, type alias, constant, and class across all three packages (`bijou`, `bijou-node`, `bijou-tui`) now has comprehensive JSDoc with `@param`, `@returns`, `@throws`, and `@template` tags where applicable. 94 source files, ~3,600 lines of documentation added.
+
 ## [0.10.0] — 2026-02-28
 
 ### 🚀 Features

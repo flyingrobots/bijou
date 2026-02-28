@@ -1,3 +1,10 @@
+/**
+ * @module @flyingrobots/bijou
+ *
+ * Themed terminal components for CLIs, loggers, and scripts —
+ * with graceful degradation across output modes.
+ */
+
 // Port interfaces
 export type {
   RuntimePort,
