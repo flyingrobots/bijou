@@ -99,7 +99,7 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `multiselect` | ✅ Stable | Checkbox-style multiple selection. |
 | `confirm` | ✅ Stable | Simple Y/N boolean prompts. |
 | `group` | ✅ Stable | Sequential form chaining. |
-| `formWizard` | 🗓️ Roadmap | Stateful multi-page form orchestration. |
+| `wizard` | ✅ Stable | Multi-step form orchestration with conditional skip logic. |
 
 ### TUI Patterns (`@flyingrobots/bijou-tui`)
 
@@ -110,6 +110,9 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `animate` / `timeline` | ✅ Stable | Physics-based springs and GSAP-style timelines. |
 | `KeyMap` / `InputStack` | ✅ Stable | Layered, declarative input dispatch for modal UIs. |
 | `composite` / `modal` / `toast` | ✅ Stable | ANSI-safe overlay compositing, centered dialogs, anchored notifications. |
+| `navigableTable` | ✅ Stable | Keyboard-navigable data table with focus, scrolling, and vim keybindings. |
+| `browsableList` | ✅ Stable | Scrollable list with focus tracking, descriptions, and page navigation. |
+| `filePicker` | ✅ Stable | Directory browser with IOPort integration and extension filtering. |
 | `commandPalette` | 🗓️ Roadmap | Unified global search and action interface. |
 
 ---

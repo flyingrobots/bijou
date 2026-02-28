@@ -1,6 +1,6 @@
 # Examples
 
-> 51 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 52 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -64,6 +64,7 @@
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |
+| [`file-picker`](./file-picker/) | `filePicker()`, `filePickerKeyMap()` | Directory browser with keyboard navigation |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |

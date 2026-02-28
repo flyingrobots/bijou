@@ -4,14 +4,11 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.4.0?
+## What's New in 0.6.0?
 
-- **`composite()`** — ANSI-safe overlay compositing with dim background support
-- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
-- **`toast()`** — anchored notification overlay with success/error/info variants
-- **`pager()`** — scrollable content viewer with status line and convenience keymap
-- **`interactiveAccordion()`** — navigable accordion with focus tracking and expand/collapse
-- **`createPanelGroup()`** — multi-pane focus management with hotkey switching
+- **`navigableTable()`** — keyboard-navigable table with focus management, vertical scrolling, and vim-style keybindings
+- **`browsableList()`** — navigable list with focus tracking, scroll viewport, descriptions, and convenience keymap
+- **`filePicker()`** — directory browser with focus navigation, extension filtering, and `IOPort` integration
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
