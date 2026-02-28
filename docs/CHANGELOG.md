@@ -13,6 +13,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`dagStats()`** — pure graph statistics (nodes, edges, depth, width, roots, leaves) with cycle detection, ghost-node filtering, and `SlicedDagSource` support
 - **`wizard()`** — multi-step form orchestrator that runs steps sequentially, passes accumulated values to each step, and supports conditional skipping via `skip` predicates
 
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`navigableTable()`** — keyboard-navigable table wrapping core `table()` with focus management, vertical scrolling, and vim-style keybindings (`j`/`k`, `d`/`u`, page up/down)
+- **`createNavigableTableState()`** — factory for navigable table state with configurable viewport height
+- **`navTableFocusNext()` / `navTableFocusPrev()`** — row focus with wrap-around
+- **`navTablePageDown()` / `navTablePageUp()`** — page-sized jumps with clamping
+- **`navTableKeyMap()`** — preconfigured keybinding map for table navigation
+
 ## [0.5.1] — 2026-02-27
 
 ### Fixed

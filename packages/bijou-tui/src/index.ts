@@ -185,3 +185,17 @@ export {
   collapseAll,
   accordionKeyMap,
 } from './accordion.js';
+
+// Navigable table
+export {
+  type NavigableTableState,
+  type NavigableTableOptions,
+  type NavTableRenderOptions,
+  createNavigableTableState,
+  navigableTable,
+  navTableFocusNext,
+  navTableFocusPrev,
+  navTablePageDown,
+  navTablePageUp,
+  navTableKeyMap,
+} from './navigable-table.js';
