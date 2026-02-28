@@ -158,4 +158,7 @@ export {
   filter,
   type FilterOption,
   type FilterOptions,
+  wizard,
+  type WizardStep,
+  type WizardOptions,
 } from './core/forms/index.js';

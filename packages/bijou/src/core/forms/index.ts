@@ -24,3 +24,6 @@ export type { TextareaOptions } from './textarea.js';
 
 export { filter } from './filter.js';
 export type { FilterOption, FilterOptions } from './filter.js';
+
+export { wizard } from './wizard.js';
+export type { WizardStep, WizardOptions } from './wizard.js';
