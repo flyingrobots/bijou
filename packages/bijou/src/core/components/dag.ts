@@ -1,6 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
+import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
+import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -586,137 +588,43 @@ function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>): stri
 // ── dagSlice ───────────────────────────────────────────────────────
 
 export function dagSlice(
+  source: DagSource,
+  focus: string,
+  opts?: DagSliceOptions,
+): SlicedDagSource;
+export function dagSlice(
   nodes: DagNode[],
   focus: string,
-  opts?: {
-    direction?: 'ancestors' | 'descendants' | 'both';
-    depth?: number;
-  },
-): DagNode[] {
-  const direction = opts?.direction ?? 'both';
-  const maxDepth = opts?.depth ?? Infinity;
-
-  const nodeMap = new Map<string, DagNode>();
-  for (const n of nodes) nodeMap.set(n.id, n);
-
-  if (!nodeMap.has(focus)) return [];
-
-  const included = new Set<string>();
-  const ghostIds = new Set<string>();
-
-  // Build parent map
-  const parentsMap = new Map<string, string[]>();
-  for (const n of nodes) {
-    if (!parentsMap.has(n.id)) parentsMap.set(n.id, []);
-    for (const c of n.edges ?? []) {
-      if (!parentsMap.has(c)) parentsMap.set(c, []);
-      parentsMap.get(c)!.push(n.id);
-    }
+  opts?: DagSliceOptions,
+): DagNode[];
+export function dagSlice(
+  input: DagNode[] | DagSource,
+  focus: string,
+  opts?: DagSliceOptions,
+): DagNode[] | SlicedDagSource {
+  if (isDagSource(input)) {
+    return sliceSource(input, focus, opts);
   }
-
-  // BFS ancestors
-  if (direction === 'ancestors' || direction === 'both') {
-    const queue: [string, number][] = [[focus, 0]];
-    const visited = new Set<string>();
-    while (queue.length > 0) {
-      const entry = queue.shift()!;
-      const id = entry[0];
-      const depth = entry[1];
-      if (visited.has(id)) continue;
-      visited.add(id);
-      included.add(id);
-      if (depth < maxDepth) {
-        for (const p of parentsMap.get(id) ?? []) {
-          if (!visited.has(p)) queue.push([p, depth + 1]);
-        }
-      } else {
-        const boundaryParents = (parentsMap.get(id) ?? []).filter(p => !visited.has(p));
-        if (boundaryParents.length > 0) {
-          const ghostId = `__ghost_ancestors_${id}`;
-          ghostIds.add(ghostId);
-          included.add(ghostId);
-        }
-      }
-    }
-  }
-
-  // BFS descendants
-  if (direction === 'descendants' || direction === 'both') {
-    const queue: [string, number][] = [[focus, 0]];
-    const visited = new Set<string>();
-    while (queue.length > 0) {
-      const entry = queue.shift()!;
-      const id = entry[0];
-      const depth = entry[1];
-      if (visited.has(id)) continue;
-      visited.add(id);
-      included.add(id);
-      const ch = nodeMap.get(id)?.edges ?? [];
-      if (depth < maxDepth) {
-        for (const c of ch) {
-          if (!visited.has(c) && nodeMap.has(c)) queue.push([c, depth + 1]);
-        }
-      } else {
-        const boundaryChildren = ch.filter(c => !visited.has(c) && nodeMap.has(c));
-        if (boundaryChildren.length > 0) {
-          const ghostId = `__ghost_descendants_${id}`;
-          ghostIds.add(ghostId);
-          included.add(ghostId);
-        }
-      }
-    }
-  }
-
-  // Build result
-  const result: DagNode[] = [];
-
-  for (const gid of ghostIds) {
-    if (gid.startsWith('__ghost_ancestors_')) {
-      const boundaryId = gid.replace('__ghost_ancestors_', '');
-      const allParents = (parentsMap.get(boundaryId) ?? []).filter(p => !included.has(p));
-      const count = allParents.length;
-      result.push({
-        id: gid,
-        label: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
-        edges: [boundaryId],
-        _ghost: true,
-        _ghostLabel: `... ${count} ancestor${count !== 1 ? 's' : ''}`,
-      });
-    }
-  }
-
-  for (const n of nodes) {
-    if (!included.has(n.id)) continue;
-    const filteredEdges = (n.edges ?? []).filter(e => included.has(e));
-    const descGhostId = `__ghost_descendants_${n.id}`;
-    if (ghostIds.has(descGhostId)) {
-      filteredEdges.push(descGhostId);
-    }
-    result.push({ ...n, edges: filteredEdges.length > 0 ? filteredEdges : undefined });
-  }
-
-  for (const gid of ghostIds) {
-    if (gid.startsWith('__ghost_descendants_')) {
-      const boundaryId = gid.replace('__ghost_descendants_', '');
-      const boundaryNode = nodeMap.get(boundaryId);
-      const allChildren = (boundaryNode?.edges ?? []).filter(c => !included.has(c) && nodeMap.has(c));
-      const count = allChildren.length;
-      result.push({
-        id: gid,
-        label: `... ${count} descendant${count !== 1 ? 's' : ''}`,
-        _ghost: true,
-        _ghostLabel: `... ${count} descendant${count !== 1 ? 's' : ''}`,
-      });
-    }
-  }
-
-  return result;
+  // Array path: wrap, slice, materialize back for backward compat
+  const source = arraySource(input);
+  return materialize(sliceSource(source, focus, opts));
 }
 
 // ── dagLayout ──────────────────────────────────────────────────────
 
-export function dagLayout(nodes: DagNode[], options: DagOptions = {}): DagLayout {
+export function dagLayout(source: SlicedDagSource, options?: DagOptions): DagLayout;
+export function dagLayout(nodes: DagNode[], options?: DagOptions): DagLayout;
+export function dagLayout(
+  input: DagNode[] | SlicedDagSource,
+  options: DagOptions = {},
+): DagLayout {
+  if (isDagSource(input) && !isSlicedDagSource(input)) {
+    throw new Error(
+      '[bijou] dagLayout(): received an unbounded DagSource. Use dagSlice() to produce a SlicedDagSource first.',
+    );
+  }
   const ctx = resolveCtx(options.ctx);
+  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
   const result = renderInteractiveLayout(nodes, options, ctx);
   return { output: result.output, nodes: result.nodes, width: result.width, height: result.height };
@@ -724,9 +632,20 @@ export function dagLayout(nodes: DagNode[], options: DagOptions = {}): DagLayout
 
 // ── Main Entry Point ───────────────────────────────────────────────
 
-export function dag(nodes: DagNode[], options: DagOptions = {}): string {
+export function dag(source: SlicedDagSource, options?: DagOptions): string;
+export function dag(nodes: DagNode[], options?: DagOptions): string;
+export function dag(
+  input: DagNode[] | SlicedDagSource,
+  options: DagOptions = {},
+): string {
+  if (isDagSource(input) && !isSlicedDagSource(input)) {
+    throw new Error(
+      '[bijou] dag(): received an unbounded DagSource. Use dagSlice() to produce a SlicedDagSource first.',
+    );
+  }
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
+  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
 
   if (nodes.length === 0) return '';
 

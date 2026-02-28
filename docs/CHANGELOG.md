@@ -6,6 +6,32 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-02-27
+
+### Added
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`DagSource` adapter interface** — decouple DAG rendering from in-memory `DagNode[]` arrays; bring your own graph representation (database, API, adjacency matrix, etc.). Uses `has()`/`children()`/`parents()` traversal — never enumerates the full graph
+- **`SlicedDagSource`** — bounded subtype of `DagSource` with `ids()` for rendering; produced by `dagSlice()` or `arraySource()`
+- **`arraySource()`** — wraps `DagNode[]` as a `SlicedDagSource` for backward compatibility
+- **`isDagSource()`** / **`isSlicedDagSource()`** — type guards
+- **`DagSliceOptions`** — extracted named type for `dagSlice()` options
+- **`dag()`, `dagSlice()`, `dagLayout()` overloads** — accept `SlicedDagSource` or `DagNode[]`; existing callers are unaffected
+- **`dagSlice()` returns `SlicedDagSource`** when given `DagSource` input, enabling composable slice-of-slice chains; purely traversal-based (no full-graph enumeration)
+
+### Fixed
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`arraySource()` mutable reference leak** — `children()` and `parents()` now return defensive copies instead of exposing internal mutable arrays
+- **`sliceSource()` ghost children leak** — ghost boundary `children()` now returns a copy instead of the internal edges array
+- **`isSlicedDagSource()` incomplete guard** — now checks for `ghostLabel` method in addition to `ids` and `ghost`
+- **`dagSlice()` default direction crash** — silently downgrades `'both'` to `'descendants'` when `parents()` is missing (only throws if `'ancestors'` was explicitly requested)
+- **`dag()`/`dagLayout()` unbounded source guard** — throws a clear error if passed an unbounded `DagSource` directly
+- **Inherited ghost preservation** — slice-of-slice now preserves ghost status from the input slice, preventing ghost nodes from rendering with solid borders
+- **`sliceSource()` parent fallback performance** — replaced O(n×m) scan with precomputed parent map built during BFS
+
 ## [0.4.0] — 2026-02-27
 
 ### Added
@@ -180,7 +206,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/flyingrobots/bijou/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/flyingrobots/bijou/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0

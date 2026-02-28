@@ -66,13 +66,74 @@ export interface DagOptions {
   edgeToken?: TokenValue;     // Edge/connector color
   highlightPath?: string[];   // Node IDs to highlight (e.g., critical path) — renders with a distinct token
   highlightToken?: TokenValue;// Token for highlighted path
+  selectedId?: string;        // Single node drawn with cursor-style highlighting
+  selectedToken?: TokenValue; // Override token for selectedId
   nodeWidth?: number;         // Fixed node box width (default: auto from longest label)
   maxWidth?: number;          // Terminal width constraint (default: ctx.runtime.columns)
   direction?: 'down' | 'right'; // Layout direction (default: 'down')
   ctx?: BijouContext;
 }
 
+// Accepts SlicedDagSource (adapter-driven) or DagNode[] (small graphs)
+export function dag(source: SlicedDagSource, options?: DagOptions): string;
 export function dag(nodes: DagNode[], options?: DagOptions): string;
+```
+
+### DagSource Adapter (v0.5.0)
+
+Decouple DAG rendering from any specific in-memory representation. A `DagSource` represents a potentially unbounded graph — it has no enumeration method. Use `dagSlice()` to BFS-walk from a focus node and produce a bounded `SlicedDagSource` that the renderer can consume.
+
+```typescript
+// Unbounded graph adapter — can wrap a database, API, etc.
+export interface DagSource {
+  has(id: string): boolean;                   // existence check (not enumeration)
+  label(id: string): string;                  // display label
+  children(id: string): readonly string[];    // outgoing edges
+  parents?(id: string): readonly string[];    // incoming edges (required for ancestor traversal)
+  badge?(id: string): string | undefined;     // optional badge text
+  token?(id: string): TokenValue | undefined; // optional per-node color
+}
+
+// Bounded slice — extends DagSource with enumerable IDs
+export interface SlicedDagSource extends DagSource {
+  ids(): readonly string[];                   // all node IDs in the slice
+  ghost(id: string): boolean;                 // is this a boundary placeholder?
+  ghostLabel(id: string): string | undefined; // e.g., "... 3 ancestors"
+}
+```
+
+**The flow: Source → Slice → Render**
+
+```text
+DagSource          dagSlice()              dag()
+(your graph,  →  (BFS bounded walk,  →  (Sugiyama on the
+ unbounded)       ghost boundaries)       bounded result)
+```
+
+```typescript
+// External graph (never fully loaded)
+const graph: DagSource = {
+  has: (id) => db.exists(id),
+  label: (id) => db.getTitle(id),
+  children: (id) => db.getDeps(id),
+  parents: (id) => db.getDependents(id),
+};
+
+// BFS touches ~20 nodes, not the whole graph
+const slice = dagSlice(graph, 'TASK-42', { depth: 2 });
+dag(slice, { ctx });
+
+// Composable: slice a slice
+const narrower = dagSlice(slice, 'TASK-42', { depth: 1, direction: 'descendants' });
+```
+
+**`arraySource()`** wraps `DagNode[]` as a `SlicedDagSource` for backward compatibility:
+
+```typescript
+import { arraySource } from '@flyingrobots/bijou';
+
+const src = arraySource(myNodes);  // SlicedDagSource
+dag(src, { ctx });                 // equivalent to dag(myNodes, { ctx })
 ```
 
 ### Fragment Rendering
@@ -80,21 +141,16 @@ export function dag(nodes: DagNode[], options?: DagOptions): string;
 Render a subgraph instead of the full DAG. This is critical for large graphs — show ancestry of a single node, the critical path, or a neighborhood.
 
 ```typescript
-export interface DagFragmentOptions extends DagOptions {
-  // The full node set is still passed in, but only the fragment is rendered.
-  // Nodes outside the fragment are omitted; edges crossing the boundary
-  // render with a "..." or "→ (N more)" indicator.
+export interface DagSliceOptions {
+  direction?: 'ancestors' | 'descendants' | 'both';  // default: 'both'
+  depth?: number;                                      // max hops from focus (default: Infinity)
 }
 
-// Convenience: extract a subgraph before passing to dag()
-export function dagSlice(
-  nodes: DagNode[],
-  focus: string,                           // Center node ID
-  opts?: {
-    direction?: 'ancestors' | 'descendants' | 'both';  // default: 'both'
-    depth?: number;                        // Max hops from focus (default: Infinity)
-  },
-): DagNode[];
+// DagSource in → SlicedDagSource out (composable)
+export function dagSlice(source: DagSource, focus: string, opts?: DagSliceOptions): SlicedDagSource;
+
+// DagNode[] in → DagNode[] out (backward compatible)
+export function dagSlice(nodes: DagNode[], focus: string, opts?: DagSliceOptions): DagNode[];
 ```
 
 **Usage:**
@@ -380,30 +436,32 @@ Apply colors only when writing content into the grid — never during layout mat
 
 ## XYPH Integration: `status --view deps`
 
-Once `dag()` exists, XYPH's deps view becomes:
+With the `DagSource` adapter, XYPH's quest graph is never duplicated — bijou reads directly from the quest store:
 
 ```typescript
-import { dag, dagSlice } from '@flyingrobots/bijou';
+import { dag, dagSlice, type DagSource } from '@flyingrobots/bijou';
 
-// Full dependency graph
-const nodes = snapshot.quests.map(q => ({
-  id: q.id,
-  label: q.title.slice(0, 20),
-  edges: q.dependsOn ?? [],
-  badge: `${q.hours}h`,
-  token: q.status === 'DONE' ? theme.semantic.success
-       : frontierSet.has(q.id) ? theme.semantic.primary
-       : theme.semantic.muted,
-}));
+// Wrap the quest store as a DagSource — no DagNode[] copy
+const questGraph: DagSource = {
+  has: (id) => snapshot.quests.has(id),
+  label: (id) => snapshot.quests.get(id)!.title.slice(0, 20),
+  children: (id) => snapshot.quests.get(id)!.dependsOn ?? [],
+  parents: (id) => snapshot.quests.get(id)!.dependents ?? [],
+  badge: (id) => `${snapshot.quests.get(id)!.hours}h`,
+  token: (id) => {
+    const q = snapshot.quests.get(id)!;
+    return q.status === 'DONE' ? theme.semantic.success
+         : frontierSet.has(id) ? theme.semantic.primary
+         : theme.semantic.muted;
+  },
+};
 
-// Full graph with critical path highlighted
-console.log(dag(nodes, {
+// Render a 3-hop neighborhood — never loads the full graph
+const slice = dagSlice(questGraph, 'task:BJU-007', { depth: 3, direction: 'ancestors' });
+console.log(dag(slice, {
   highlightPath: criticalResult.path,
   highlightToken: theme.semantic.error,
 }));
-
-// Or: just show what task:BJU-007 is waiting on
-console.log(dag(dagSlice(nodes, 'task:BJU-007', { direction: 'ancestors' })));
 ```
 
 ### Reactive DAG in TUI
