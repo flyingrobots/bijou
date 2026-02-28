@@ -16,6 +16,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`markdown()` inline parse order** — code spans (`` ` ``) now parsed before bold/italic to prevent `*` inside backticks being treated as emphasis
 - **`markdown()` bold regex** — changed from `[^*]+` to `.+?` to allow `*` inside bold spans (e.g. `**a*b**`)
 - **`runScript()` init command settling** — add microtask yield after init commands and before dispose so async init commands settle before step processing begins
+- **`runScript()` exception safety** — wrap lifecycle in `try/finally` so `bus.dispose()` runs even if app throws
+- **`runScript()` unsafe cast** — remove `as KeyMsg | M` cast; `BusMsg<M>` already matches `app.update` signature
 - **`runScript()` init-command test** — strengthen assertion to verify model mutation, not just frame count
 
 ### 📝 Documentation

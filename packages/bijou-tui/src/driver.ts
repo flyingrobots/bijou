@@ -16,7 +16,7 @@
  * ```
  */
 
-import type { App, KeyMsg, RunOptions } from './types.js';
+import type { App, RunOptions } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
 
@@ -87,7 +87,7 @@ export async function runScript<Model, M>(
 
   bus.on((msg) => {
     if (!running) return;
-    const [newModel, cmds] = app.update(msg as KeyMsg | M, model);
+    const [newModel, cmds] = app.update(msg, model);
     model = newModel;
     const frame = app.view(model);
     frames.push(frame);
@@ -97,40 +97,42 @@ export async function runScript<Model, M>(
     }
   });
 
-  // Capture initial frame
-  const initFrame = app.view(model);
-  frames.push(initFrame);
-  options?.onFrame?.(initFrame, 0);
+  try {
+    // Capture initial frame
+    const initFrame = app.view(model);
+    frames.push(initFrame);
+    options?.onFrame?.(initFrame, 0);
 
-  // Run init commands
-  for (const cmd of initCmds) {
-    bus.runCmd(cmd);
-  }
-
-  // Yield so microtask-based init commands can settle
-  await new Promise<void>((r) => queueMicrotask(r));
-
-  // Feed script steps
-  for (const step of steps) {
-    if (!running) break;
-
-    if (step.delay && step.delay > 0) {
-      await new Promise<void>((r) => setTimeout(r, step.delay));
+    // Run init commands
+    for (const cmd of initCmds) {
+      bus.runCmd(cmd);
     }
 
-    if (!running) break;
-
-    const keyMsg = parseKey(step.key);
-    bus.emit(keyMsg);
-
-    // Yield to allow async commands to settle
+    // Yield so microtask-based init commands can settle
     await new Promise<void>((r) => queueMicrotask(r));
+
+    // Feed script steps
+    for (const step of steps) {
+      if (!running) break;
+
+      if (step.delay && step.delay > 0) {
+        await new Promise<void>((r) => setTimeout(r, step.delay));
+      }
+
+      if (!running) break;
+
+      const keyMsg = parseKey(step.key);
+      bus.emit(keyMsg);
+
+      // Yield to allow async commands to settle
+      await new Promise<void>((r) => queueMicrotask(r));
+    }
+
+    // Final yield so any trailing commands can settle
+    await new Promise<void>((r) => queueMicrotask(r));
+  } finally {
+    bus.dispose();
   }
-
-  // Final yield so any trailing commands can settle
-  await new Promise<void>((r) => queueMicrotask(r));
-
-  bus.dispose();
 
   return {
     model,
