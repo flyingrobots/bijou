@@ -58,6 +58,14 @@ export interface FilePickerRenderOptions {
 // Helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse raw directory listing into sorted `FileEntry[]`.
+ *
+ * @param names  - Names returned by `IOPort.readDir()` (dirs have trailing `/`).
+ * @param filter - Optional extension suffix (e.g. `".ts"`) — only files whose
+ *                 name ends with this suffix are included. Directories are
+ *                 always included regardless of the filter.
+ */
 function parseEntries(names: string[], filter?: string): FileEntry[] {
   const dirs: FileEntry[] = [];
   const files: FileEntry[] = [];
@@ -142,11 +150,8 @@ export function fpEnter(state: FilePickerState, io: IOPort): FilePickerState {
 
 /** Navigate to the parent directory. No-op at filesystem root. */
 export function fpBack(state: FilePickerState, io: IOPort): FilePickerState {
-  // Go to parent directory
-  const parts = state.cwd.split('/').filter(Boolean);
-  if (parts.length === 0) return state;
-  parts.pop();
-  const newCwd = '/' + parts.join('/');
+  const newCwd = io.joinPath(state.cwd, '..');
+  if (newCwd === state.cwd) return state;
 
   const names = io.readDir(newCwd);
   const entries = parseEntries(names, state.filter);

@@ -26,7 +26,7 @@ describe('navigableTable', () => {
       expect(state.focusRow).toBe(0);
       expect(state.scrollY).toBe(0);
       expect(state.height).toBe(10);
-      expect(state.rows).toBe(rows);
+      expect(state.rows).toEqual(rows);
     });
 
     it('accepts custom height', () => {

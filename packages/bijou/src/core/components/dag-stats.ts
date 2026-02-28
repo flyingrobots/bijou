@@ -1,7 +1,6 @@
 import type { DagNode } from './dag.js';
 import type { SlicedDagSource } from './dag-source.js';
-import { isSlicedDagSource } from './dag-source.js';
-import { materialize } from './dag-source.js';
+import { isSlicedDagSource, materialize } from './dag-source.js';
 
 /** Statistics computed from a directed acyclic graph. */
 export interface DagStats {

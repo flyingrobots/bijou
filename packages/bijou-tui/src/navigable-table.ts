@@ -59,7 +59,7 @@ export interface NavTableRenderOptions {
 export function createNavigableTableState(options: NavigableTableOptions): NavigableTableState {
   return {
     columns: [...options.columns],
-    rows: options.rows,
+    rows: [...options.rows],
     focusRow: 0,
     scrollY: 0,
     height: options.height ?? 10,
