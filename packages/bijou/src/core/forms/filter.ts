@@ -170,6 +170,9 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
 
       if (key === '\x03' || key === '\x1b') {
         // Ctrl+C or Escape — cancel
+        // Note: bare \x1b may false-trigger on slow connections where escape
+        // sequences arrive as separate bytes. Timer-based disambiguation is a
+        // separate future improvement.
         handle.dispose();
         cleanup();
         resolve(options.defaultValue ?? options.options[0]!.value);

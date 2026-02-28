@@ -427,7 +427,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | Feature | Package | Notes |
 |---------|---------|-------|
 | ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
-| ~~**`StyleAuditPort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
+| ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
 | ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
 
 ### P3 — Nice to have

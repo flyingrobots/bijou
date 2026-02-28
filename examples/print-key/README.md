@@ -15,7 +15,7 @@ npx tsx examples/print-key/main.ts
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator, badge } from '@flyingrobots/bijou';
-import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -38,11 +38,10 @@ const app: App<Model, Msg> = {
   init: () => [{ history: [] }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.ctrl && k.key === 'c') return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.ctrl && msg.key === 'c') return [model, [quit()]];
 
-      const entry: KeyEntry = { key: k.key, ctrl: k.ctrl, alt: k.alt, shift: k.shift };
+      const entry: KeyEntry = { key: msg.key, ctrl: msg.ctrl, alt: msg.alt, shift: msg.shift };
       const history = [...model.history, entry].slice(-MAX_HISTORY);
       return [{ history }, []];
     }

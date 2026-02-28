@@ -157,6 +157,9 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
 
       if (key === '\x03' || key === '\x1b') {
         // Ctrl+C or Escape — cancel
+        // Note: bare \x1b may false-trigger on slow connections where escape
+        // sequences arrive as separate bytes. Timer-based disambiguation is a
+        // separate future improvement.
         handle.dispose();
         cleanup(false);
         resolve(options.defaultValue ?? '');

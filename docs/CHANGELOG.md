@@ -6,6 +6,25 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Fixes
+
+- **`markdown()` word wrap** — wrap plain text before applying inline styles to prevent ANSI escape bytes from causing premature line breaks
+- **`sliceAnsi()` double reset** — prevent emitting `\x1b[0m` twice when loop breaks at the endCol boundary
+- **`chalkStyle()` global mutation** — scope chalk level override to a per-call instance instead of mutating the global chalk, fixing test order-dependence
+- **Hangul syllable range** — correct `isWideChar()` upper bound from `0xD7FF` to `0xD7A3`, excluding narrow Jamo Extended-B characters
+- **`wasStyled()` equality** — use structural comparison (hex + modifiers) instead of reference equality on `TokenValue` objects
+
+### 🔧 Refactors
+
+- **`viewport.ts` grapheme dedup** — remove duplicated `_graphemeClusterWidth()` and `_isWide()`, delegate to `@flyingrobots/bijou` core exports; add lazy singleton `Intl.Segmenter`
+
+### 📝 Documentation
+
+- Fix 4 example READMEs (help, navigable-table, print-key, stopwatch) to use `isKeyMsg()` guard instead of `as KeyMsg` casts
+- Fix CHANGELOG missing blank line before `## [0.8.0]`
+- Fix ROADMAP `StyleAuditPort` → `AuditStylePort`
+- Add bare-escape limitation comments to select, filter, multiselect, textarea
+
 ## [0.9.0] — 2026-02-28
 
 ### 🚀 Features
@@ -47,6 +66,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - Updated 23 example README code snippets to use type guards
+
 ## [0.8.0] — 2026-02-28
 
 ### 🚀 Features

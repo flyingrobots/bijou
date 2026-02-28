@@ -113,6 +113,9 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
         handle.dispose(); cleanup();
         resolve([...selected].sort().map((i) => options.options[i]!.value));
       } else if (key === '\x03' || key === '\x1b') {
+        // Note: bare \x1b may false-trigger on slow connections where escape
+        // sequences arrive as separate bytes. Timer-based disambiguation is a
+        // separate future improvement.
         handle.dispose(); cleanup(); resolve([]);
       }
     });

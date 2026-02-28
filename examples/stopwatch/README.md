@@ -15,7 +15,7 @@ npx tsx examples/stopwatch/main.ts
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator } from '@flyingrobots/bijou';
-import { run, quit, tick, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -40,11 +40,10 @@ const app: App<Model, Msg> = {
   init: () => [{ elapsed: 0, running: false, laps: [] }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
 
-      if (k.key === 'space') {
+      if (msg.key === 'space') {
         // Toggle start/stop
         if (model.running) {
           return [{ ...model, running: false }, []];
@@ -53,11 +52,11 @@ const app: App<Model, Msg> = {
         }
       }
 
-      if (k.key === 'l' && model.running) {
+      if (msg.key === 'l' && model.running) {
         return [{ ...model, laps: [...model.laps, model.elapsed] }, []];
       }
 
-      if (k.key === 'r' && !model.running) {
+      if (msg.key === 'r' && !model.running) {
         return [{ elapsed: 0, running: false, laps: [] }, []];
       }
     }
