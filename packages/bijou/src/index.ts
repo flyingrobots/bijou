@@ -169,6 +169,8 @@ export {
   log,
   type LogLevel,
   type LogOptions,
+  markdown,
+  type MarkdownOptions,
 } from './core/components/index.js';
 
 // Forms
