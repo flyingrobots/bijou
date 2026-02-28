@@ -6,6 +6,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Documentation
+
+- **navigable-table example** — TUI app demonstrating `navigableTable()` with keyboard navigation, scrolling, and `navTableKeyMap()`
+- **browsable-list example** — TUI app demonstrating `browsableList()` with keyboard navigation, page scrolling, and help bar
+
 ## [0.6.0] — 2026-02-27
 
 ### Added
@@ -47,6 +52,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Form edge-case hardening** — added confirm/input empty-answer tests in interactive mode, multiselect toggle-on-off and last-item navigation tests
 - **Environment integration matrix** — added form fallback tests for pipe and accessible modes, component × mode matrix, NO_COLOR × component matrix, and CI=true TTY detection variants
+
+### Documentation
+
+- **5 new examples** — `dag-stats`, `wizard`, `navigable-table`, `browsable-list`, `file-picker` with VHS demo tapes and per-example READMEs
 
 ## [0.5.1] — 2026-02-27
 
