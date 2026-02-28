@@ -34,6 +34,7 @@ const app: App<Model, Msg> = {
       switch (msg.key) {
         case 'q': return [model, [quit()]];
         case 'd': return [{ ...model, dirIndex: (model.dirIndex + 1) % directions.length }, []];
+        // Keep target within screen, leaving margin for tooltip overflow
         case 'up': return [{ ...model, selectedRow: Math.max(2, model.selectedRow - 1) }, []];
         case 'down': return [{ ...model, selectedRow: Math.min(model.rows - 3, model.selectedRow + 1) }, []];
         case 'left': return [{ ...model, selectedCol: Math.max(2, model.selectedCol - 1) }, []];
