@@ -62,6 +62,13 @@ describe('dagStats()', () => {
     expect(() => dagStats(nodes)).toThrow('cycle detected');
   });
 
+  it('self-loop throws', () => {
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'A', edges: ['a'] },
+    ];
+    expect(() => dagStats(nodes)).toThrow('cycle detected');
+  });
+
   it('ghost nodes are filtered out', () => {
     const nodes: DagNode[] = [
       { id: 'a', label: 'A', edges: ['b'] },
@@ -81,6 +88,19 @@ describe('dagStats()', () => {
     const source = arraySource(nodes);
     expect(dagStats(source)).toEqual({
       nodes: 2, edges: 1, depth: 2, width: 1, roots: 1, leaves: 1,
+    });
+  });
+
+  it('disconnected components', () => {
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'A', edges: ['b'] },
+      { id: 'b', label: 'B' },
+      { id: 'c', label: 'C', edges: ['d'] },
+      { id: 'd', label: 'D', edges: ['e'] },
+      { id: 'e', label: 'E' },
+    ];
+    expect(dagStats(nodes)).toEqual({
+      nodes: 5, edges: 3, depth: 3, width: 2, roots: 2, leaves: 2,
     });
   });
 
