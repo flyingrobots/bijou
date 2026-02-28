@@ -240,3 +240,19 @@ export {
   fpBack,
   filePickerKeyMap,
 } from './file-picker.js';
+
+// Command palette
+export {
+  type CommandPaletteItem,
+  type CommandPaletteState,
+  type CommandPaletteOptions,
+  createCommandPaletteState,
+  cpFilter,
+  cpFocusNext,
+  cpFocusPrev,
+  cpPageDown,
+  cpPageUp,
+  cpSelectedItem,
+  commandPalette,
+  commandPaletteKeyMap,
+} from './command-palette.js';
