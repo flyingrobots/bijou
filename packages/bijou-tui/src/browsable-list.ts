@@ -36,14 +36,14 @@ import { createKeyMap, type KeyMap } from './keybindings.js';
 export interface BrowsableListItem<T = string> {
   /** Display label shown in the list. */
   label: string;
-  /** Arbitrary value associated with the item. */
+  /** Value payload returned when this item is selected. */
   value: T;
-  /** Optional description displayed after the label. */
+  /** Optional description displayed after the label, rendered as `label — description`. */
   description?: string;
 }
 
 /**
- * Immutable state for the browsable list widget.
+ * Readonly state for the browsable list widget.
  *
  * @template T - Type of each item's value payload.
  */
@@ -85,7 +85,6 @@ export interface BrowsableListRenderOptions {
 /**
  * Create initial browsable list state from items and optional height.
  * Focus starts at index 0 with scroll at the top.
- *
  * @template T - Type of each item's value payload.
  * @param options - Items and optional viewport height.
  * @returns Fresh browsable list state with focus at the top.

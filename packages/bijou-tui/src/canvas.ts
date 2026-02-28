@@ -15,7 +15,7 @@ import { getDefaultContext, type BijouContext } from '@flyingrobots/bijou';
  * @param cols Total number of columns.
  * @param rows Total number of rows.
  * @param time Animation time value.
- * @returns    A single character (or string — only the first char is used).
+ * @returns    A single character (or string — only the first code point is used).
  */
 export type ShaderFn = (
   x: number,

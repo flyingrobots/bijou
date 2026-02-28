@@ -19,7 +19,7 @@ const ANSI_RE = /\x1b\[[0-9;]*m/g;
  * Clip a string to a maximum visible width, preserving ANSI escapes.
  *
  * Grapheme-cluster aware: won't split multi-codepoint sequences.
- * Appends a reset sequence (`\x1b[0m`) if the string was clipped mid-style.
+ * Appends a reset sequence (`\x1b[0m`) when clipping text that contains ANSI style escapes.
  *
  * O(n): pre-segments stripped text once, then walks the original string
  * with a grapheme pointer instead of re-segmenting per character.

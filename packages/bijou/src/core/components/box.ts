@@ -23,7 +23,8 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * Draw a unicode box around the given content string.
  *
  * Supports both auto-width (measured from content) and fixed-width modes.
- * Content lines wider than the available space are clipped.
+ * Content lines wider than the available space are hard-truncated via
+ * `clipToWidth` (no ellipsis is appended).
  *
  * @param content - Multiline string to place inside the box.
  * @param borderColor - Function that wraps border characters with color styling.
@@ -85,7 +86,7 @@ function drawBox(
 }
 
 /**
- * Resolve the provided context or fall back to the global default.
+ * Resolve the provided context or fall back to the global default via {@link getDefaultContext}.
  *
  * @param ctx - Optional context override.
  * @returns The resolved {@link BijouContext}.
@@ -138,9 +139,9 @@ export interface HeaderBoxOptions extends BoxOptions {
 /**
  * Render a labeled box with an optional detail line.
  *
- * In visual modes the label is styled with the primary semantic token and
- * wrapped in a {@link box}. Pipe mode returns plain text; accessible mode
- * uses a colon separator.
+ * In visual modes the label is styled with `options.labelToken` (defaults to
+ * the primary semantic token) and wrapped in a {@link box}. Pipe mode returns
+ * plain text; accessible mode uses a colon separator.
  *
  * @param label - Primary heading text.
  * @param options - Header box configuration.

@@ -48,7 +48,7 @@ export interface ModalOptions {
   readonly screenWidth: number;
   /** Screen height in rows, used for centering. */
   readonly screenHeight: number;
-  /** Override box width (default: auto from content). */
+  /** Preferred minimum width — shorter lines are padded but longer lines are not truncated (default: auto from content). */
   readonly width?: number;
   /** Design token for the border color. */
   readonly borderToken?: TokenValue;

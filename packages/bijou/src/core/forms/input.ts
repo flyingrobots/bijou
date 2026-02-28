@@ -18,6 +18,9 @@ export interface InputOptions extends FieldOptions<string> {
  * Display adapts to the current output mode (interactive, accessible, pipe).
  * Runs validation and required-field checks after the user responds.
  *
+ * @remarks Validation is non-blocking — errors are written to output but the
+ * entered value is always returned.
+ *
  * @param options - Input field configuration.
  * @returns The trimmed user input, or the default value if none was provided.
  */

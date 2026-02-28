@@ -61,7 +61,7 @@ const ACCESSIBLE_LABELS: Record<LogLevel, string> = {
 };
 
 /**
- * Format the current wall-clock time as `HH:MM:SS`.
+ * Format the current local wall-clock time as `HH:MM:SS`.
  *
  * @returns The formatted timestamp string.
  */
@@ -80,6 +80,8 @@ function formatTimestamp(): string {
  * - `pipe`/no context: `[HH:MM:SS] [LVL] message` brackets format.
  * - `accessible`: `HH:MM:SS LEVEL: message` screen-reader-friendly format.
  * - `interactive`/`static`: styled badge prefix with themed timestamp.
+ *
+ * Timestamp defaults to off; prefix defaults to on but can be disabled.
  *
  * @param level - Severity level of the log entry.
  * @param message - The log message body.

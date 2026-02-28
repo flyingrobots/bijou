@@ -116,7 +116,7 @@ interface Disposable {
 /**
  * Create a new event bus.
  *
- * Return an {@link EventBus} that manages subscribers, I/O connections,
+ * Returns an {@link EventBus} that manages subscribers, I/O connections,
  * command execution, and quit signaling for a TEA runtime.
  *
  * @template M - Application-defined custom message type.

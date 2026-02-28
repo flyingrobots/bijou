@@ -257,7 +257,7 @@ function fitWidth(content: string, width: number, align: 'start' | 'center' | 'e
  * Truncate if content exceeds `totalCrossSize`; pad otherwise.
  *
  * @param lines - Rendered lines to align.
- * @param totalCrossSize - Total cross-axis size (rows for row layout, columns for column).
+ * @param totalCrossSize - Total cross-axis size in lines (height for row layout, character width for column layout).
  * @param align - Cross-axis alignment ('start', 'center', or 'end').
  * @param width - Width of each empty padding line.
  * @returns Array of exactly `totalCrossSize` lines.
