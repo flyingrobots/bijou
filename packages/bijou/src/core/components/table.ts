@@ -1,6 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /** Definition for a single table column. */
 export interface TableColumn {
@@ -55,17 +55,6 @@ function visibleLength(str: string): number {
 function padRight(str: string, width: number): string {
   const visible = visibleLength(str);
   return visible >= width ? str : str + ' '.repeat(width - visible);
-}
-
-/**
- * Resolve the provided context or fall back to the global default.
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
 }
 
 /**

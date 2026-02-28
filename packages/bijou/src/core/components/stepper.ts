@@ -1,5 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /** Represent a single step in a multi-step process. */
 export interface StepperStep {
@@ -13,17 +13,6 @@ export interface StepperOptions {
   current: number;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
-}
-
-/**
- * Resolve the provided context or fall back to the global default.
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
 }
 
 /**

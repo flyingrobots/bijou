@@ -9,12 +9,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🐛 Bug Fixes
 
 - **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
+- **`clip.ts` ANSI regex** — convert `ANSI_RE` from regex literal to `RegExp` constructor to avoid Biome `noControlCharactersInRegex` lint violation
+- **`select()` empty options guard** — throw `Error` when `options.options` is empty instead of allowing undefined dereference
+- **`timeline()` duplicate track guard** — throw `Error` on duplicate track names during `build()` to prevent silent state overwrites
 
 ### 📝 Documentation
 
 - **JSDoc review fixes** — fix 57 issues found during self-review of JSDoc coverage: correct `OutputMode` values in `BijouContext.mode` (critical), add missing `@param`/`@returns`/`@throws` tags across all three packages, merge 12 split JSDoc blocks in bijou-tui, unify `resolveCtx` wording across 16 components, standardize punctuation (en-dashes, em-dashes, `6x6x6`), strip redundant implementation overload docs, and fix inaccurate descriptions (`readDir` sort claim, `NO_COLOR` attribution, "Mutable" snapshot, field check order)
 - **CodeRabbit JSDoc review fixes** — address 16 documentation review comments from PR #25: fix CHANGELOG compare links for v0.10.1, clarify `BrowsableListItem.value`/`description` JSDoc, rename "Immutable" to "Readonly" in `BrowsableListState`, remove blank line before `@template` in `initBrowsableList`, fix verb tense in `createEventBus`, clarify `alignCross` `totalCrossSize` units, fix `ModalOptions.width` to "preferred minimum width", note hard truncation in `box()` `clipToWidth`, document `labelToken` override in `headerBox`, use "local wall-clock time" in `formatTimestamp`, note optional timestamp/prefix in `log()`, fix "mid-style" wording in `clipToWidth`, add non-blocking validation remark to `input()`, use "code point" in `ShaderFn` return, add `getDefaultContext` cross-reference to `resolveCtx`
 - **CodeRabbit code review fixes** — remove unused `ctx?: BijouContext` option from `StatusBarOptions` (dead API surface that was never read by `statusBar()`); clarify `helpFor` JSDoc to note that `groupFilter` in options is overridden by the `groupPrefix` parameter
+- **`readDir` JSDoc** — clarify that `statSync` failures (e.g. broken symlinks) return bare names without trailing slash
 
 ## [0.10.1] — 2026-02-28
 
