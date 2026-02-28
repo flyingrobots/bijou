@@ -21,6 +21,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`navTablePageDown()` / `navTablePageUp()`** — page-sized jumps with clamping
 - **`navTableKeyMap()`** — preconfigured keybinding map for table navigation
 - **`browsableList()`** — navigable list building block with focus tracking, scroll-aware viewport clipping, page navigation, description support, and convenience keymap (`j/k` navigate, `d/u` page, `Enter` select, `q` quit)
+- **`filePicker()`** — directory browser building block with focus navigation, scroll windowing, and extension filtering. Uses `IOPort.readDir()` for synchronous directory listing
+- **`createFilePickerState()`** — initializes picker state from a directory path and IO port
+- **`fpFocusNext()` / `fpFocusPrev()`** — focus navigation with wrap-around and scroll adjustment
+- **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
+- **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
 
 ## [0.5.1] — 2026-02-27
 

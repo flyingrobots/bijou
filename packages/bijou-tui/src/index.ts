@@ -214,3 +214,18 @@ export {
   listPageUp,
   browsableListKeyMap,
 } from './browsable-list.js';
+
+// File picker
+export {
+  type FileEntry,
+  type FilePickerState,
+  type FilePickerOptions,
+  type FilePickerRenderOptions,
+  createFilePickerState,
+  filePicker,
+  fpFocusNext,
+  fpFocusPrev,
+  fpEnter,
+  fpBack,
+  filePickerKeyMap,
+} from './file-picker.js';
