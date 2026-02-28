@@ -29,6 +29,20 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
 - **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
 
+### Fixed
+
+#### Node adapter (`@flyingrobots/bijou-node`)
+
+- **`nodeIO().readDir()` directory classification** — entries are now suffixed with `/` for directories (via `statSync`), matching the `IOPort` contract that `filePicker()` relies on; previously `readdirSync()` returned bare names causing all directories to be misclassified as files
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`filePicker()` unreadable directory crash** — `createFilePickerState()`, `fpEnter()`, and `fpBack()` now gracefully return empty entries instead of throwing when `readDir()` fails on an unreadable directory
+- **`filePicker()` / `browsableList()` / `navigableTable()` viewport height** — `height` is now clamped to a minimum of 1, preventing invalid scroll/paging behavior with zero or negative values
+- **`browsableList()` items mutation safety** — `createBrowsableListState()` now defensively copies items, consistent with navigable-table
+- **`navigableTable()` deep row copy** — `createNavigableTableState()` now deep-copies rows (inner arrays) to prevent external mutation leaking into state
+- **`fpBack()` cross-platform paths** — parent directory resolution now uses `io.joinPath()` instead of hardcoded `/` separator
+
 ### Tests
 
 - **Form edge-case hardening** — added confirm/input empty-answer tests in interactive mode, multiselect toggle-on-off and last-item navigation tests
