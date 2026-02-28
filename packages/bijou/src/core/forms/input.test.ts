@@ -99,6 +99,20 @@ describe('input()', () => {
     });
   });
 
+  describe('empty / Ctrl+C behavior', () => {
+    it('empty input in interactive mode returns empty string', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      const result = await input({ title: 'Name', ctx });
+      expect(result).toBe('');
+    });
+
+    it('empty input in interactive mode returns default when set', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      const result = await input({ title: 'Name', defaultValue: 'fallback', ctx });
+      expect(result).toBe('fallback');
+    });
+  });
+
   describe('edge cases', () => {
     it('handles 1000+ character input', async () => {
       const longStr = 'a'.repeat(1500);

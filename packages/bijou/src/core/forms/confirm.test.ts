@@ -117,4 +117,16 @@ describe('confirm()', () => {
     expect(result).toBe(true);
     expect(ctx.io.written.length).toBeGreaterThan(0);
   });
+
+  describe('Ctrl+C / empty answer in interactive mode', () => {
+    it('empty answer in interactive mode returns default (true)', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('empty answer in interactive mode returns default (false) when defaultValue is false', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      expect(await confirm({ title: 'Continue?', defaultValue: false, ctx })).toBe(false);
+    });
+  });
 });
