@@ -11,6 +11,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 #### Core (`@flyingrobots/bijou`)
 
 - **`dagStats()`** — pure graph statistics (nodes, edges, depth, width, roots, leaves) with cycle detection, ghost-node filtering, and `SlicedDagSource` support
+- **`wizard()`** — multi-step form orchestrator that runs steps sequentially, passes accumulated values to each step, and supports conditional skipping via `skip` predicates
 
 ## [0.5.1] — 2026-02-27
 
