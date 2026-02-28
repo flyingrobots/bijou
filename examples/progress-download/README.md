@@ -55,6 +55,10 @@ const app: App<Model, Msg> = {
       if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
     }
 
+    if ('type' in msg && msg.type === 'quit') {
+      return [model, [quit()]];
+    }
+
     if ('type' in msg && msg.type === 'tick') {
       const downloads = model.downloads.map(d => {
         if (d.done) return d;

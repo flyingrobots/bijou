@@ -1,6 +1,5 @@
 import type { StylePort } from '../../ports/style.js';
-import type { TokenValue } from '../../core/theme/tokens.js';
-import type { RGB } from '../../core/theme/tokens.js';
+import type { TokenValue, RGB } from '../../core/theme/tokens.js';
 
 export interface StyledCall {
   method: 'styled' | 'rgb' | 'hex' | 'bold';
@@ -30,7 +29,7 @@ export function auditStyle(): AuditStylePort {
 
   return {
     get calls(): readonly StyledCall[] {
-      return _calls;
+      return _calls.slice();
     },
 
     styled(token: TokenValue, text: string): string {

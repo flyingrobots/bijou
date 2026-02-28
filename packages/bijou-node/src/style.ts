@@ -36,7 +36,8 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
 
   return {
     styled(token: TokenValue, text: string): string {
-      const base: ChalkInstance = isNoColor ? instance : instance.hex(token.hex);
+      if (isNoColor) return text;
+      const base: ChalkInstance = instance.hex(token.hex);
       return applyModifiers(base, token.modifiers)(text);
     },
 
@@ -51,6 +52,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     },
 
     bold(text: string): string {
+      if (isNoColor) return text;
       return instance.bold(text);
     },
   };

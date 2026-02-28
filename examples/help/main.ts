@@ -60,7 +60,7 @@ const app: App<Model, Msg> = {
         case 'delete': {
           if (model.items.length === 0) return [model, []];
           const items = model.items.filter((_, i) => i !== model.selected);
-          const selected = Math.min(model.selected, items.length - 1);
+          const selected = Math.max(0, Math.min(model.selected, items.length - 1));
           return [{ ...model, items, selected }, []];
         }
       }

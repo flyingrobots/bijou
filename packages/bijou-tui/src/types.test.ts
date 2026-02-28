@@ -61,4 +61,12 @@ describe('isResizeMsg', () => {
   it('returns false for object with wrong type', () => {
     expect(isResizeMsg({ type: 'key' })).toBe(false);
   });
+
+  it('returns false for a plain string', () => {
+    expect(isResizeMsg('some string')).toBe(false);
+  });
+
+  it('returns false for empty object', () => {
+    expect(isResizeMsg({})).toBe(false);
+  });
 });

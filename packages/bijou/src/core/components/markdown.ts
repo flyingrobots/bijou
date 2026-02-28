@@ -87,7 +87,7 @@ function parseBlocks(source: string): BlockType[] {
       const quoteLines: string[] = [];
       while (i < lines.length && (lines[i]!.trimStart().startsWith('>') || (lines[i]!.trim() !== '' && quoteLines.length > 0))) {
         const ql = lines[i]!;
-        quoteLines.push(ql.replace(/^>\s?/, ''));
+        quoteLines.push(ql.replace(/^\s*>\s?/, ''));
         i++;
         if (i < lines.length && lines[i]!.trim() === '') break;
       }

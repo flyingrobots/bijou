@@ -149,9 +149,10 @@ export function rgbToAnsi16(r: number, g: number, b: number): number {
  * Convert an ANSI 256 color index to the nearest ANSI 16 color index.
  */
 export function ansi256ToAnsi16(code: number): number {
+  const clamped = Math.max(0, Math.min(255, Math.round(code)));
   // Standard colors pass through
-  if (code < 16) return code;
+  if (clamped < 16) return clamped;
 
-  const [r, g, b] = ansi256ToRgb(code);
+  const [r, g, b] = ansi256ToRgb(clamped);
   return rgbToAnsi16(r, g, b);
 }
