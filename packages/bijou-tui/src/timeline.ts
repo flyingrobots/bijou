@@ -68,7 +68,7 @@ export interface SpringTrackDef {
 
 /** Tween track configuration. */
 export interface TweenTrackDef {
-  /** Animation type -- must be `'tween'`. */
+  /** Animation type — must be `'tween'`. */
   readonly type: 'tween';
   /** Starting value. */
   readonly from: number;
@@ -281,6 +281,11 @@ export interface TimelineBuilder {
    * .add('x', { from: 0, to: 100, spring: 'wobbly' })
    * .add('opacity', { type: 'tween', from: 0, to: 1, duration: 300 }, '<')
    * ```
+   *
+   * @param name - Unique track identifier used to read values later.
+   * @param def - Spring or tween track definition.
+   * @param position - When the track starts (default: after previous item ends).
+   * @returns The builder for chaining.
    */
   add(name: string, def: TrackDef, position?: Position): TimelineBuilder;
 
@@ -291,6 +296,9 @@ export interface TimelineBuilder {
    * .label('reveal')
    * .add('scale', { type: 'tween', from: 0, to: 1, duration: 200 }, 'reveal')
    * ```
+   *
+   * @param name - Label identifier, referenced by later position specifiers.
+   * @returns The builder for chaining.
    */
   label(name: string): TimelineBuilder;
 
@@ -300,33 +308,64 @@ export interface TimelineBuilder {
    * ```ts
    * .call('onHalfway', '+=500')
    * ```
+   *
+   * @param name - Callback identifier returned by `firedCallbacks()`.
+   * @param position - When the callback fires (default: after previous item ends).
+   * @returns The builder for chaining.
    */
   call(name: string, position?: Position): TimelineBuilder;
 
-  /** Compile the timeline into an immutable Timeline object. */
+  /**
+   * Compile the timeline into an immutable Timeline object.
+   *
+   * @returns Compiled {@link Timeline} ready for stepping.
+   * @throws Error if a position references an unknown label or has invalid syntax.
+   */
   build(): Timeline;
 }
 
 /** Compiled timeline — step forward, read values, check completion. */
 export interface Timeline {
-  /** Create the initial timeline state. */
+  /**
+   * Create the initial timeline state.
+   *
+   * @returns Fresh timeline state with all tracks at their starting values.
+   */
   init(): TimelineState;
 
   /**
    * Advance the timeline by `dt` seconds.
    * Returns a new state (pure — no mutation).
+   *
+   * @param state - Current timeline state.
+   * @param dt - Time step in seconds (e.g. 1/60 for 60 fps).
+   * @returns Updated timeline state with all active tracks advanced.
    */
   step(state: TimelineState, dt: number): TimelineState;
 
-  /** Read all current track values as a name→number record. */
+  /**
+   * Read all current track values as a name-to-number record.
+   *
+   * @param state - Current timeline state.
+   * @returns Record mapping each track name to its current value.
+   */
   values(state: TimelineState): Record<string, number>;
 
-  /** True when every track has settled. */
+  /**
+   * True when every track has settled.
+   *
+   * @param state - Current timeline state.
+   * @returns Whether all tracks have reached their target values.
+   */
   done(state: TimelineState): boolean;
 
   /**
    * Return callback names that fired between `prev` and `next` states.
    * A callback fires when the timeline's elapsed time crosses its trigger point.
+   *
+   * @param prev - Timeline state before the step.
+   * @param next - Timeline state after the step.
+   * @returns Array of callback names that fired during the interval.
    */
   firedCallbacks(prev: TimelineState, next: TimelineState): string[];
 
@@ -350,6 +389,8 @@ export interface Timeline {
  *   .add('opacity', { type: 'tween', from: 0, to: 1, duration: 300 }, '<')
  *   .build();
  * ```
+ *
+ * @returns A new {@link TimelineBuilder} for fluent timeline construction.
  */
 export function timeline(): TimelineBuilder {
   const entries: BuilderEntry[] = [];
@@ -386,6 +427,7 @@ export function timeline(): TimelineBuilder {
  *
  * @param entries - Accumulated builder entries (tracks, labels, callbacks).
  * @returns Compiled Timeline with init, step, values, done, and firedCallbacks.
+ * @throws Error if a position references an unknown label or has invalid syntax.
  */
 function compile(entries: BuilderEntry[]): Timeline {
   const tracks: ResolvedTrack[] = [];

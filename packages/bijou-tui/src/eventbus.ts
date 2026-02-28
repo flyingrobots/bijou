@@ -52,28 +52,40 @@ export interface EventBus<M> {
   /**
    * Subscribe to all events. Returns a dispose function.
    * Multiple subscribers are supported — all receive every event.
+   *
+   * @param handler - Callback invoked for every emitted message.
+   * @returns A disposable that removes this subscription.
    */
   on(handler: (msg: BusMsg<M>) => void): Disposable;
 
-  /** Emit a message to all subscribers. */
+  /**
+   * Emit a message to all subscribers.
+   *
+   * @param msg - The message to broadcast.
+   */
   emit(msg: BusMsg<M>): void;
 
   /**
    * Connect keyboard and resize sources from an IOPort.
    * Raw stdin bytes are parsed into KeyMsg automatically.
    * When `options.mouse` is true, SGR mouse sequences are parsed into MouseMsg.
-   * Returns a dispose function that disconnects both.
+   *
+   * @param io - IO port providing raw input and resize events.
+   * @param options - Optional flags (e.g. `{ mouse: true }` to enable mouse input).
+   * @returns A disposable that disconnects both input and resize listeners.
    */
   connectIO(io: IOPort, options?: { mouse?: boolean }): Disposable;
 
   /**
    * Run a command. The command receives the bus's `emit` function to
    * dispatch intermediate messages during execution. When it resolves:
-   * - QUIT signal → fires onQuit handlers
-   * - Message → emitted to all subscribers
-   * - void/undefined → ignored
+   * - QUIT signal — fires onQuit handlers
+   * - Message — emitted to all subscribers
+   * - void/undefined — ignored
    *
    * Rejected commands are logged to stderr via `console.error`.
+   *
+   * @param cmd - The command to execute.
    */
   runCmd(cmd: Cmd<M>): void;
 
@@ -81,6 +93,9 @@ export interface EventBus<M> {
    * Register a quit handler. Called when a command resolves to QUIT.
    * Separate from `on()` so the runtime can handle shutdown without
    * the app needing to filter for it.
+   *
+   * @param handler - Callback invoked on quit signal.
+   * @returns A disposable that removes this quit handler.
    */
   onQuit(handler: () => void): Disposable;
 

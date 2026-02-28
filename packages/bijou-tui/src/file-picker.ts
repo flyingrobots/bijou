@@ -101,6 +101,7 @@ function safeReadEntries(io: IOPort, cwd: string, filter?: string): FileEntry[] 
  * @param filter - Optional extension suffix (e.g. `".ts"`) — only files whose
  *                 name ends with this suffix are included. Directories are
  *                 always included regardless of the filter.
+ * @returns Sorted array of file entries (directories first, then files).
  */
 function parseEntries(names: string[], filter?: string): FileEntry[] {
   const dirs: FileEntry[] = [];

@@ -217,7 +217,7 @@ function renderContent(
 /**
  * Clip or pad each content line to an exact visible width.
  *
- * Does NOT pad height -- that is handled by {@link alignCross}.
+ * Does NOT pad height — that is handled by {@link alignCross}.
  *
  * @param content - Rendered content string (newline-delimited).
  * @param width - Target visible width in columns.

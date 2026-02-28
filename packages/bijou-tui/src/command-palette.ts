@@ -105,7 +105,7 @@ export function createCommandPaletteState(
 /**
  * Test whether an item matches a search query (case-insensitive substring).
  *
- * Checks id, label, description, category, and shortcut fields.
+ * Checks label, description, category, id, and shortcut fields.
  *
  * @param item - Command palette item to test.
  * @param query - Search query string.

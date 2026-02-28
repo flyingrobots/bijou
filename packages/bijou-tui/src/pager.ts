@@ -177,7 +177,7 @@ export function pagerSetContent(state: PagerState, content: string): PagerState 
 // ---------------------------------------------------------------------------
 
 /**
- * Render the pager -- viewport content plus optional status line.
+ * Render the pager — viewport content plus optional status line.
  *
  * @param state - Current pager state.
  * @param options - Rendering options (scrollbar, status line).
