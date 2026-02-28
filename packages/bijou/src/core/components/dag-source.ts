@@ -34,6 +34,12 @@ export interface DagSource {
 
   /** Optional per-node color/style token. */
   token?(id: string): TokenValue | undefined;
+
+  /** Optional per-node label text color. */
+  labelToken?(id: string): TokenValue | undefined;
+
+  /** Optional per-node badge text color. */
+  badgeToken?(id: string): TokenValue | undefined;
 }
 
 /**
@@ -108,6 +114,8 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
     parents: (id) => [...(parentMap.get(id) ?? [])],
     badge: (id) => map.get(id)?.badge,
     token: (id) => map.get(id)?.token,
+    labelToken: (id) => map.get(id)?.labelToken,
+    badgeToken: (id) => map.get(id)?.badgeToken,
     ghost: (id) => map.get(id)?._ghost ?? false,
     ghostLabel: (id) => map.get(id)?._ghostLabel,
   };
@@ -130,6 +138,10 @@ export function materialize(source: SlicedDagSource): DagNode[] {
     if (badge !== undefined) node.badge = badge;
     const token = source.token?.(id);
     if (token !== undefined) node.token = token;
+    const labelToken = source.labelToken?.(id);
+    if (labelToken !== undefined) node.labelToken = labelToken;
+    const badgeToken = source.badgeToken?.(id);
+    if (badgeToken !== undefined) node.badgeToken = badgeToken;
     if (source.ghost(id)) {
       node._ghost = true;
       node._ghostLabel = source.ghostLabel(id);
@@ -301,6 +313,10 @@ export function sliceSource(
     badge: (id) => ghostNodes.has(id) ? undefined : source.badge?.(id),
 
     token: (id) => ghostNodes.has(id) ? undefined : source.token?.(id),
+
+    labelToken: (id) => ghostNodes.has(id) ? undefined : source.labelToken?.(id),
+
+    badgeToken: (id) => ghostNodes.has(id) ? undefined : source.badgeToken?.(id),
 
     ghost: (id) => ghostNodes.has(id) || (inheritGhost !== null && inheritGhost.ghost(id)),
 
