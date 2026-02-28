@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-02-27
+
 ### Fixed
 
 - **`@flyingrobots/bijou-node` and `@flyingrobots/bijou-tui` dual-package hazard** — moved `@flyingrobots/bijou` from `dependencies` to `peerDependencies` so downstream consumers get a single shared instance, preventing split `setDefaultContext()` state
