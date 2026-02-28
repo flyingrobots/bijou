@@ -168,8 +168,8 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
         return;
       }
 
-      if (key === '\x03') {
-        // Ctrl+C — cancel
+      if (key === '\x03' || key === '\x1b') {
+        // Ctrl+C or Escape — cancel
         handle.dispose();
         cleanup();
         resolve(options.defaultValue ?? options.options[0]!.value);

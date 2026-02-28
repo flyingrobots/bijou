@@ -111,6 +111,13 @@ describe('input()', () => {
       const result = await input({ title: 'Name', defaultValue: 'fallback', ctx });
       expect(result).toBe('fallback');
     });
+
+    it('rejected question() (Ctrl+C) propagates without crashing', async () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      // Override question to reject (simulates readline close via Ctrl+C)
+      ctx.io.question = () => Promise.reject(new Error('readline was closed'));
+      await expect(input({ title: 'Name', ctx })).rejects.toThrow('readline was closed');
+    });
   });
 
   describe('edge cases', () => {

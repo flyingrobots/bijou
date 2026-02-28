@@ -112,7 +112,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       } else if (key === '\r' || key === '\n') {
         handle.dispose(); cleanup();
         resolve([...selected].sort().map((i) => options.options[i]!.value));
-      } else if (key === '\x03') {
+      } else if (key === '\x03' || key === '\x1b') {
         handle.dispose(); cleanup(); resolve([]);
       }
     });

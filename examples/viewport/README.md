@@ -16,7 +16,7 @@ npx tsx examples/viewport/main.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { kbd, separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App,
   viewport, createScrollState, scrollBy, pageDown, pageUp,
   scrollToTop, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
@@ -79,17 +79,16 @@ const app: App<Model, Msg> = {
   init: () => [{ scroll: createScrollState(CONTENT, VIEWPORT_HEIGHT) }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
 
       let scroll = model.scroll;
-      if (k.key === 'j' || k.key === 'down') scroll = scrollBy(scroll, 1);
-      else if (k.key === 'k' || k.key === 'up') scroll = scrollBy(scroll, -1);
-      else if (k.key === 'pagedown' || k.key === 'd') scroll = pageDown(scroll);
-      else if (k.key === 'pageup' || k.key === 'u') scroll = pageUp(scroll);
-      else if (k.key === 'g') scroll = scrollToTop(scroll);
-      else if (k.key === 'G' || (k.shift && k.key === 'g')) scroll = scrollToBottom(scroll);
+      if (msg.key === 'j' || msg.key === 'down') scroll = scrollBy(scroll, 1);
+      else if (msg.key === 'k' || msg.key === 'up') scroll = scrollBy(scroll, -1);
+      else if (msg.key === 'pagedown' || msg.key === 'd') scroll = pageDown(scroll);
+      else if (msg.key === 'pageup' || msg.key === 'u') scroll = pageUp(scroll);
+      else if (msg.key === 'g') scroll = scrollToTop(scroll);
+      else if (msg.key === 'G' || (msg.shift && msg.key === 'g')) scroll = scrollToBottom(scroll);
 
       return [{ scroll }, []];
     }

@@ -155,8 +155,8 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
         return;
       }
 
-      if (key === '\x03') {
-        // Ctrl+C — cancel
+      if (key === '\x03' || key === '\x1b') {
+        // Ctrl+C or Escape — cancel
         handle.dispose();
         cleanup(false);
         resolve(options.defaultValue ?? '');

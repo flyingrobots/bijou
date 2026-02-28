@@ -16,7 +16,7 @@ npx tsx examples/chat/main.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, separator, kbd } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg, type ResizeMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
 
@@ -63,27 +63,25 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
-      const r = msg as ResizeMsg;
-      return [{ ...model, cols: r.columns, rows: r.rows }, []];
+    if (isResizeMsg(msg)) {
+      return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.ctrl && k.key === 'c') return [model, [quit()]];
-      if (k.key === 'q' && model.input === '') return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.ctrl && msg.key === 'c') return [model, [quit()]];
+      if (msg.key === 'q' && model.input === '') return [model, [quit()]];
 
-      if (k.key === 'enter' && model.input.trim()) {
+      if (msg.key === 'enter' && model.input.trim()) {
         const newMsg: Message = { sender: 'you', text: model.input.trim(), variant: 'primary' };
         return [{ ...model, messages: [...model.messages, newMsg], input: '' }, []];
       }
 
-      if (k.key === 'backspace') {
+      if (msg.key === 'backspace') {
         return [{ ...model, input: model.input.slice(0, -1) }, []];
       }
 
       // Printable character
-      if (k.key.length === 1 && !k.ctrl && !k.alt) {
-        return [{ ...model, input: model.input + k.key }, []];
+      if (msg.key.length === 1 && !msg.ctrl && !msg.alt) {
+        return [{ ...model, input: model.input + msg.key }, []];
       }
     }
     return [model, []];

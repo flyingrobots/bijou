@@ -108,6 +108,31 @@ describe('wizard()', () => {
     expect(order).toEqual([1, 2, 3]);
   });
 
+  it('propagates error when a step rejects (cancellation)', async () => {
+    await expect(
+      wizard<{ a: string; b: string }>({
+        steps: [
+          { key: 'a', field: async () => 'first' },
+          { key: 'b', field: async () => { throw new Error('cancelled'); } },
+        ],
+      }),
+    ).rejects.toThrow('cancelled');
+  });
+
+  it('does not run subsequent steps after cancellation', async () => {
+    const order: number[] = [];
+    await expect(
+      wizard<{ a: string; b: string; c: string }>({
+        steps: [
+          { key: 'a', field: async () => { order.push(1); return 'a'; } },
+          { key: 'b', field: async () => { order.push(2); throw new Error('cancelled'); } },
+          { key: 'c', field: async () => { order.push(3); return 'c'; } },
+        ],
+      }),
+    ).rejects.toThrow('cancelled');
+    expect(order).toEqual([1, 2]);
+  });
+
   it('skip predicate can depend on multiple prior values', async () => {
     const result = await wizard<{ x: number; y: number; sum: number }>({
       steps: [
