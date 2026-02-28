@@ -93,6 +93,29 @@ describe('dag', () => {
     });
   });
 
+  describe('non-BMP characters (emoji)', () => {
+    it('renders emoji label without charTypes/chars length mismatch', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: '🚀 Deploy', edges: ['b'] },
+        { id: 'b', label: 'Done' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('🚀 Deploy');
+      expect(result).toContain('Done');
+    });
+
+    it('renders emoji badge without charTypes/chars length mismatch', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'Build', badge: '✅' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('Build');
+      expect(result).toContain('✅');
+    });
+  });
+
   // ── Mode Tests ──────────────────────────────────────────────────
 
   describe('pipe mode', () => {

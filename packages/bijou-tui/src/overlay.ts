@@ -369,7 +369,8 @@ export function tooltip(options: TooltipOptions): Overlay {
     ctx,
   } = options;
 
-  const contentLines = content.split('\n');
+  const maxContentWidth = Math.max(0, screenWidth - 4);
+  const contentLines = content.split('\n').map((l) => clipToWidth(l, maxContentWidth));
 
   const borderColor = ctx && borderToken
     ? (s: string) => ctx.style.styled(borderToken, s)

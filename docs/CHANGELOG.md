@@ -20,9 +20,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`commandPalette()`** — filterable action list building block with case-insensitive substring matching on label/description/category/id/shortcut, focus and page navigation with wrap-around, viewport-clipped rendering, and preconfigured keymap
 - **`tooltip()`** — positioned overlay relative to a target element with top/bottom/left/right direction and screen-edge clamping. Reuses existing `renderBox()` helper
 
+### 🐛 Fixes
+
+- **`dag()`** — fix charTypes/chars length mismatch on non-BMP characters (emoji) by using code-point count instead of UTF-16 `.length`
+- **`cpPageDown()`/`cpPageUp()`** — change to half-page scroll (`floor(height/2)`) to match vim Ctrl+D/Ctrl+U conventions described in JSDoc
+- **`tooltip()`** — clip content lines to screen width before rendering box to prevent overflow
+- **`hexToRgb()`** — throw on invalid hex length (e.g. 2, 4, 5, 7+ digit strings)
+- **command-palette example** — remove unused `cpSelectedItem` import
+
 ### 🧪 Tests
 
-- 93 new tests across 2 new test files (1198 total)
+- 103 new tests across 4 test files (2 new, 2 expanded) (1208 total)
 
 ### 📝 Documentation
 

@@ -169,17 +169,41 @@ describe('focus navigation', () => {
 // Page navigation
 // ---------------------------------------------------------------------------
 
-describe('page navigation', () => {
-  it('pageDown moves by height', () => {
-    const state = createCommandPaletteState(items, 2);
+describe('page navigation (half-page)', () => {
+  it('pageDown moves by half height', () => {
+    const state = createCommandPaletteState(items, 4);
+    const paged = cpPageDown(state);
+    // half = floor(4 / 2) = 2
+    expect(paged.focusIndex).toBe(2);
+  });
+
+  it('pageDown with odd height uses floor(height/2)', () => {
+    // 5 items, height 5 → half = floor(5/2) = 2
+    const state = createCommandPaletteState(items, 5);
     const paged = cpPageDown(state);
     expect(paged.focusIndex).toBe(2);
+  });
+
+  it('pageDown with height 1 moves by 1', () => {
+    const state = createCommandPaletteState(items, 1);
+    const paged = cpPageDown(state);
+    // half = max(1, floor(1/2)) = max(1, 0) = 1
+    expect(paged.focusIndex).toBe(1);
   });
 
   it('pageDown clamps to last item', () => {
     const state = createCommandPaletteState(items, 10);
     const paged = cpPageDown(state);
     expect(paged.focusIndex).toBe(items.length - 1);
+  });
+
+  it('pageUp moves by half height', () => {
+    let state = createCommandPaletteState(items, 4);
+    // Move to index 4 first
+    for (let i = 0; i < 4; i++) state = cpFocusNext(state);
+    const paged = cpPageUp(state);
+    // half = floor(4 / 2) = 2, so 4 - 2 = 2
+    expect(paged.focusIndex).toBe(2);
   });
 
   it('pageUp clamps to first item', () => {

@@ -136,17 +136,19 @@ export function cpFocusPrev(state: CommandPaletteState): CommandPaletteState {
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Move focus down by one page (clamps to last item). */
+/** Move focus down by half a page (vim Ctrl+D convention, clamps to last item). */
 export function cpPageDown(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
-  const focusIndex = Math.min(state.focusIndex + state.height, state.filteredItems.length - 1);
+  const half = Math.max(1, Math.floor(state.height / 2));
+  const focusIndex = Math.min(state.focusIndex + half, state.filteredItems.length - 1);
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Move focus up by one page (clamps to first item). */
+/** Move focus up by half a page (vim Ctrl+U convention, clamps to first item). */
 export function cpPageUp(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
-  const focusIndex = Math.max(state.focusIndex - state.height, 0);
+  const half = Math.max(1, Math.floor(state.height / 2));
+  const focusIndex = Math.max(state.focusIndex - half, 0);
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
@@ -261,10 +263,10 @@ export function commandPaletteKeyMap<Msg>(actions: {
       .bind('down', 'Next item', actions.focusNext)
       .bind('ctrl+p', 'Previous item', actions.focusPrev)
       .bind('up', 'Previous item', actions.focusPrev)
-      .bind('ctrl+d', 'Page down', actions.pageDown)
-      .bind('pagedown', 'Page down', actions.pageDown)
-      .bind('ctrl+u', 'Page up', actions.pageUp)
-      .bind('pageup', 'Page up', actions.pageUp),
+      .bind('ctrl+d', 'Half page down', actions.pageDown)
+      .bind('pagedown', 'Half page down', actions.pageDown)
+      .bind('ctrl+u', 'Half page up', actions.pageUp)
+      .bind('pageup', 'Half page up', actions.pageUp),
     )
     .bind('enter', 'Select', actions.select)
     .bind('escape', 'Close', actions.close);

@@ -544,6 +544,16 @@ describe('tooltip', () => {
     expect(t.col).toBeGreaterThanOrEqual(0);
   });
 
+  it('clips content to screen width', () => {
+    const longContent = 'A'.repeat(100);
+    const t = tooltip({ content: longContent, row: 10, col: 0, screenWidth: 20, screenHeight: 24 });
+    const lines = t.content.split('\n');
+    for (const line of lines) {
+      // Each line should not exceed screenWidth
+      expect(visibleLength(stripAnsi(line))).toBeLessThanOrEqual(20);
+    }
+  });
+
   it('composites with background', () => {
     const bg = Array.from({ length: 24 }, () => '.'.repeat(80)).join('\n');
     const t = tooltip({ ...base, row: 12, col: 40, direction: 'bottom' });

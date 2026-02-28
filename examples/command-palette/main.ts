@@ -3,7 +3,7 @@ import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg,
   createCommandPaletteState, commandPalette,
-  cpFilter, cpFocusNext, cpFocusPrev, cpPageDown, cpPageUp, cpSelectedItem,
+  cpFilter, cpFocusNext, cpFocusPrev, cpPageDown, cpPageUp,
   commandPaletteKeyMap, helpShort, vstack,
   type CommandPaletteItem,
 } from '@flyingrobots/bijou-tui';

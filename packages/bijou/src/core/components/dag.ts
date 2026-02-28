@@ -311,18 +311,21 @@ function renderNodeBox(
     content = tLabel + ' '.repeat(gap) + badgeText;
 
     // Build char-type map for mid line: border + pad + label + gap + badge + pad + border
+    // Use [...str].length (code points) instead of visibleLength (.length / UTF-16 code units)
+    // so that non-BMP characters (emoji) align with the [...line] iteration in the renderer.
     midTypes = ['border']; // v
     midTypes.push('pad');  // space
-    for (let i = 0; i < visibleLength(tLabel); i++) midTypes.push('label');
+    for (let i = 0; i < [...tLabel].length; i++) midTypes.push('label');
     for (let i = 0; i < gap; i++) midTypes.push('pad');
-    for (let i = 0; i < visibleLength(badgeText); i++) midTypes.push('badge');
+    for (let i = 0; i < [...badgeText].length; i++) midTypes.push('badge');
   } else {
     content = truncateLabel(label, contentW);
 
     // Build char-type map for mid line: border + pad + label + pad + border
+    // Use [...str].length (code points) — see comment above.
     midTypes = ['border']; // v
     midTypes.push('pad');  // space
-    for (let i = 0; i < visibleLength(content); i++) midTypes.push('label');
+    for (let i = 0; i < [...content].length; i++) midTypes.push('label');
   }
 
   const padRight = Math.max(0, contentW - visibleLength(content));

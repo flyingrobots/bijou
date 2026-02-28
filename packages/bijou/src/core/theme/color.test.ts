@@ -29,6 +29,21 @@ describe('hexToRgb', () => {
   it('parses 3-digit shorthand without #', () => {
     expect(hexToRgb('0f0')).toEqual([0, 255, 0]);
   });
+  it('throws on invalid length (too short)', () => {
+    expect(() => hexToRgb('#ab')).toThrow('Invalid hex color');
+  });
+
+  it('throws on invalid length (too long)', () => {
+    expect(() => hexToRgb('#1234567')).toThrow('Invalid hex color');
+  });
+
+  it('throws on empty string', () => {
+    expect(() => hexToRgb('')).toThrow('Invalid hex color');
+  });
+
+  it('throws on 4-digit hex', () => {
+    expect(() => hexToRgb('#abcd')).toThrow('Invalid hex color');
+  });
 });
 
 // ── rgbToHex ───────────────────────────────────────────────────────
