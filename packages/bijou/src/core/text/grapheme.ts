@@ -35,8 +35,7 @@ function segmenter(): Intl.Segmenter {
  * - CJK Symbols and Punctuation (U+3000–U+303F)
  * - Enclosed CJK Letters (U+3200–U+33FF)
  * - CJK Compatibility (U+FE30–U+FE4F)
- * - Hangul Syllables (U+AC00–U+D7AF)
- * - Hangul Jamo Extended-B (U+D7B0–U+D7FF)
+ * - Hangul Syllables (U+AC00–U+D7A3)
  * - Emoji (most U+1F000+)
  */
 export function isWideChar(cp: number): boolean {
@@ -56,8 +55,8 @@ export function isWideChar(cp: number): boolean {
   // CJK Unified Ideographs
   if (cp >= 0x4E00 && cp <= 0x9FFF) return true;
 
-  // Hangul Syllables
-  if (cp >= 0xAC00 && cp <= 0xD7FF) return true;
+  // Hangul Syllables (U+AC00–U+D7A3; excludes Jamo Extended-B which are narrow)
+  if (cp >= 0xAC00 && cp <= 0xD7A3) return true;
 
   // CJK Compatibility Ideographs
   if (cp >= 0xF900 && cp <= 0xFAFF) return true;

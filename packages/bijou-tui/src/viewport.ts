@@ -94,7 +94,7 @@ function _isWide(cp: number): boolean {
   if (cp >= 0x3000 && cp <= 0x33FF) return true;
   if (cp >= 0x3400 && cp <= 0x4DBF) return true;
   if (cp >= 0x4E00 && cp <= 0x9FFF) return true;
-  if (cp >= 0xAC00 && cp <= 0xD7FF) return true;
+  if (cp >= 0xAC00 && cp <= 0xD7A3) return true;
   if (cp >= 0xF900 && cp <= 0xFAFF) return true;
   if (cp >= 0xFE30 && cp <= 0xFE4F) return true;
   if (cp >= 0x20000 && cp <= 0x3FFFF) return true;
