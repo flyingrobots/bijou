@@ -31,6 +31,34 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Fix progress-download README unused `vstack` import
 - Remove `(pre-release)` from xyph-title.md
 
+## [0.10.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`clipToWidth()`** — grapheme-aware text clipping promoted from bijou-tui to bijou core. O(n) algorithm preserving ANSI escapes, won't split multi-codepoint grapheme clusters (emoji, CJK, ZWJ sequences). Appends reset only when ANSI present
+- **`box()` width override** — optional `width` on `BoxOptions` locks outer box width (including borders). Content lines are clipped via `clipToWidth()` or right-padded to fill. Padding is clamped when it exceeds available interior space. Pipe/accessible modes ignore width
+- **`box()` grapheme-aware width measurement** — replaced naive `stripAnsi().length` with `graphemeWidth()` for correct CJK/emoji box sizing (pre-existing bug fix)
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`canvas()` shader primitive** — `(cols, rows, shader, options?) → string` character-grid renderer for procedural backgrounds. Shader receives `(x, y, cols, rows, time)` per cell. Returns empty string in pipe/accessible mode. Composes with `composite()` for layered rendering
+- **Mouse input (opt-in)** — SGR mouse protocol support via `RunOptions.mouse?: boolean` (default false). New types: `MouseMsg`, `MouseButton`, `MouseAction`. `parseMouse()` parses SGR sequences (`\x1b[<button;col;rowM/m`). `isMouseMsg()` type guard. EventBus `connectIO()` accepts `{ mouse: true }` option. Runtime sends enable/disable escape sequences on startup/cleanup
+- **`App.update()` signature widened** — now receives `KeyMsg | ResizeMsg | MouseMsg | M` (was `KeyMsg | ResizeMsg | M`). Since `MouseMsg` is never emitted when `mouse: false`, existing apps are unaffected at runtime
+
+### 🔧 Refactors
+
+- **`viewport.ts` `clipToWidth()`** — re-exports from `@flyingrobots/bijou` core instead of maintaining a local copy. Public API unchanged for backward compatibility
+
+### 🧪 Tests
+
+- 51 new tests across 4 new + 5 expanded test files (1403 total)
+
+### 📝 Documentation
+
+- **2 new examples** — `canvas` (animated plasma shader), `mouse` (mouse event inspector)
+
 ## [0.9.0] — 2026-02-28
 
 ### 🚀 Features
@@ -395,7 +423,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/flyingrobots/bijou/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0

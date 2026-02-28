@@ -1,37 +1,55 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
+import { graphemeWidth } from '../text/grapheme.js';
+import { clipToWidth } from '../text/clip.js';
 
 export interface BoxOptions {
   borderToken?: TokenValue;
   padding?: { top?: number; bottom?: number; left?: number; right?: number };
+  /** Lock outer width (including borders). Content is clipped/padded to fit. */
+  width?: number;
   ctx?: BijouContext;
 }
 
 const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2500', v: '\u2502' };
 
-function stripAnsi(str: string): string {
-  // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1b\[[0-9;]*m/g, '');
-}
-
-function visibleLength(str: string): number {
-  return stripAnsi(str).length;
-}
-
 function drawBox(
   content: string,
   borderColor: (s: string) => string,
   padding: { top: number; bottom: number; left: number; right: number },
+  fixedWidth?: number,
 ): string {
   const contentLines = content.split('\n');
-  const maxWidth = contentLines.reduce((max, line) => Math.max(max, visibleLength(line)), 0);
-  const innerWidth = maxWidth + padding.left + padding.right;
+
+  let innerWidth: number;
+  let contentWidth: number;
+
+  if (fixedWidth !== undefined) {
+    // Fixed outer width: outer = border(1) + inner + border(1)
+    innerWidth = Math.max(0, fixedWidth - 2);
+    contentWidth = Math.max(0, innerWidth - padding.left - padding.right);
+  } else {
+    // Auto width: measure content
+    const maxWidth = contentLines.reduce((max, line) => Math.max(max, graphemeWidth(line)), 0);
+    contentWidth = maxWidth;
+    innerWidth = maxWidth + padding.left + padding.right;
+  }
+
+  // When fixed width, padding may exceed innerWidth — clamp to fit
+  const effectiveLeft = fixedWidth !== undefined ? Math.min(padding.left, innerWidth) : padding.left;
+  const effectiveRight = fixedWidth !== undefined ? Math.min(padding.right, Math.max(0, innerWidth - effectiveLeft)) : padding.right;
+
   const pad = (line: string): string => {
-    const visible = visibleLength(line);
-    const leftPad = ' '.repeat(padding.left);
-    const rightPad = ' '.repeat(padding.right + (maxWidth - visible));
-    return leftPad + line + rightPad;
+    const visible = graphemeWidth(line);
+    let processed = line;
+    if (visible > contentWidth) {
+      processed = clipToWidth(line, contentWidth);
+    }
+    const processedVisible = graphemeWidth(processed);
+    const leftPad = ' '.repeat(effectiveLeft);
+    const rightPad = ' '.repeat(effectiveRight + Math.max(0, contentWidth - processedVisible));
+    return leftPad + processed + rightPad;
   };
 
   const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth) + BORDER.tr);
@@ -72,7 +90,7 @@ export function box(content: string, options: BoxOptions = {}): string {
 
   const colorize = (s: string): string => ctx.style.styled(borderToken, s);
 
-  return drawBox(content, colorize, padding);
+  return drawBox(content, colorize, padding, options.width);
 }
 
 export interface HeaderBoxOptions extends BoxOptions {

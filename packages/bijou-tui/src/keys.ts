@@ -1,4 +1,4 @@
-import type { KeyMsg } from './types.js';
+import type { KeyMsg, MouseMsg, MouseButton, MouseAction } from './types.js';
 
 function keyMsg(key: string, ctrl = false, alt = false, shift = false): KeyMsg {
   return { type: 'key', key, ctrl, alt, shift };
@@ -51,4 +51,50 @@ export function parseKey(raw: string): KeyMsg {
   }
 
   return keyMsg('unknown');
+}
+
+// SGR mouse sequence: \x1b[<button;col;row(M|m)
+const SGR_MOUSE_RE = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/;
+
+/**
+ * Parse an SGR extended mouse sequence into a MouseMsg.
+ * Returns null if the string is not a valid SGR mouse sequence.
+ *
+ * SGR format: ESC [ < button ; col ; row M/m
+ * - M = press, m = release
+ * - button byte bits: 0-1 = button, 2 = shift, 3 = alt, 4 = ctrl, 5 = motion, 6-7 = scroll
+ * - col/row are 1-based in the protocol, converted to 0-based here
+ */
+export function parseMouse(raw: string): MouseMsg | null {
+  const match = SGR_MOUSE_RE.exec(raw);
+  if (!match) return null;
+
+  const buttonByte = parseInt(match[1]!, 10);
+  const col = parseInt(match[2]!, 10) - 1; // 1-based → 0-based
+  const row = parseInt(match[3]!, 10) - 1;
+  const suffix = match[4]!;
+
+  const shift = (buttonByte & 4) !== 0;
+  const alt = (buttonByte & 8) !== 0;
+  const ctrl = (buttonByte & 16) !== 0;
+  const isMotion = (buttonByte & 32) !== 0;
+  const isScroll = (buttonByte & 64) !== 0;
+
+  const lowBits = buttonByte & 3;
+
+  let button: MouseButton;
+  let action: MouseAction;
+
+  if (isScroll) {
+    button = 'none';
+    action = lowBits === 0 ? 'scroll-up' : 'scroll-down';
+  } else if (isMotion) {
+    button = lowBits === 0 ? 'left' : lowBits === 1 ? 'middle' : lowBits === 2 ? 'right' : 'none';
+    action = 'move';
+  } else {
+    button = lowBits === 0 ? 'left' : lowBits === 1 ? 'middle' : lowBits === 2 ? 'right' : 'none';
+    action = suffix === 'M' ? 'press' : 'release';
+  }
+
+  return { type: 'mouse', button, action, col, row, shift, alt, ctrl };
 }

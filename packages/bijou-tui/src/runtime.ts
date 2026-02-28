@@ -11,6 +11,13 @@ import { createEventBus } from './eventbus.js';
 const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
 
 /**
+ * Enable SGR mouse reporting.
+ * 1000 = basic press/release, 1002 = button-event tracking (drag),
+ * 1006 = SGR extended format (supports large coordinates, explicit release).
+ */
+const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+
+/**
  * Run a TEA application.
  *
  * In non-interactive modes (pipe/static/accessible), renders the initial view
@@ -27,6 +34,7 @@ export async function run<Model, M>(
   const ctx = options?.ctx ?? getDefaultContext();
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
+  const useMouse = options?.mouse ?? false;
 
   const [initModel, initCmds] = app.init();
 
@@ -54,7 +62,11 @@ export async function run<Model, M>(
   if (useAltScreen || useHideCursor) {
     enterScreen(ctx.io);
   }
-  ctx.io.write(DISABLE_MOUSE);
+  if (useMouse) {
+    ctx.io.write(ENABLE_MOUSE);
+  } else {
+    ctx.io.write(DISABLE_MOUSE);
+  }
 
   // Render helper
   function render(): void {
@@ -69,8 +81,8 @@ export async function run<Model, M>(
     }
   }
 
-  // Connect I/O sources — keyboard + resize, parsed and unified
-  bus.connectIO(ctx.io);
+  // Connect I/O sources — keyboard + resize (+ mouse when enabled), parsed and unified
+  bus.connectIO(ctx.io, { mouse: useMouse });
 
   // Handle quit signals from commands
   bus.onQuit(shutdown);
@@ -107,6 +119,9 @@ export async function run<Model, M>(
 
   // Cleanup — bus disposes all I/O connections
   bus.dispose();
+  if (useMouse) {
+    ctx.io.write(DISABLE_MOUSE);
+  }
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }

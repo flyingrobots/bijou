@@ -26,16 +26,16 @@
  */
 
 import type { IOPort } from '@flyingrobots/bijou';
-import type { Cmd, KeyMsg, ResizeMsg } from './types.js';
+import type { Cmd, KeyMsg, MouseMsg, ResizeMsg } from './types.js';
 import { QUIT } from './types.js';
-import { parseKey } from './keys.js';
+import { parseKey, parseMouse } from './keys.js';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 /** Any message the bus can carry — built-in or app-defined. */
-export type BusMsg<M> = KeyMsg | ResizeMsg | M;
+export type BusMsg<M> = KeyMsg | ResizeMsg | MouseMsg | M;
 
 export interface EventBus<M> {
   /**
@@ -50,9 +50,10 @@ export interface EventBus<M> {
   /**
    * Connect keyboard and resize sources from an IOPort.
    * Raw stdin bytes are parsed into KeyMsg automatically.
+   * When `options.mouse` is true, SGR mouse sequences are parsed into MouseMsg.
    * Returns a dispose function that disconnects both.
    */
-  connectIO(io: IOPort): Disposable;
+  connectIO(io: IOPort, options?: { mouse?: boolean }): Disposable;
 
   /**
    * Run a command. The command receives the bus's `emit` function to
@@ -109,12 +110,24 @@ export function createEventBus<M>(): EventBus<M> {
 
     emit,
 
-    connectIO(io: IOPort): Disposable {
-      // Keyboard input
+    connectIO(io: IOPort, options?: { mouse?: boolean }): Disposable {
+      const mouseEnabled = options?.mouse ?? false;
+
+      // Keyboard (and optionally mouse) input
       const inputHandle = io.rawInput((raw: string) => {
         if (disposed) return;
+
+        // When mouse is enabled, try parsing as mouse first
+        if (mouseEnabled) {
+          const mouseMsg = parseMouse(raw);
+          if (mouseMsg) {
+            emit(mouseMsg);
+            return;
+          }
+        }
+
         const keyMsg = parseKey(raw);
-        // Skip unknown sequences (mouse events, etc.)
+        // Skip unknown sequences (unrecognized escape sequences)
         if (keyMsg.key === 'unknown') return;
         emit(keyMsg);
       });
