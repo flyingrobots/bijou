@@ -185,3 +185,18 @@ export {
   collapseAll,
   accordionKeyMap,
 } from './accordion.js';
+
+// File picker
+export {
+  type FileEntry,
+  type FilePickerState,
+  type FilePickerOptions,
+  type FilePickerRenderOptions,
+  createFilePickerState,
+  filePicker,
+  fpFocusNext,
+  fpFocusPrev,
+  fpEnter,
+  fpBack,
+  filePickerKeyMap,
+} from './file-picker.js';

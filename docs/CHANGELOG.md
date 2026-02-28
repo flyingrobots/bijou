@@ -6,6 +6,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`filePicker()`** — directory browser building block with focus navigation, scroll windowing, and extension filtering. Uses `IOPort.readDir()` for synchronous directory listing
+- **`createFilePickerState()`** — initializes picker state from a directory path and IO port
+- **`fpFocusNext()` / `fpFocusPrev()`** — focus navigation with wrap-around and scroll adjustment
+- **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
+- **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
+
 ## [0.5.0] — 2026-02-27
 
 ### Added
