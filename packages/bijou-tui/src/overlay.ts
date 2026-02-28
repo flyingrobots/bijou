@@ -365,13 +365,14 @@ export function tooltip(options: TooltipOptions): Overlay {
     direction = 'top',
     screenWidth,
     screenHeight,
+    borderToken,
     ctx,
   } = options;
 
   const contentLines = content.split('\n');
 
-  const borderColor = ctx && options.borderToken
-    ? (s: string) => ctx.style.styled(options.borderToken!, s)
+  const borderColor = ctx && borderToken
+    ? (s: string) => ctx.style.styled(borderToken, s)
     : (s: string) => s;
 
   const boxStr = renderBox(contentLines, borderColor);

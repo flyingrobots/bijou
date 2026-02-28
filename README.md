@@ -17,7 +17,7 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 **Command Palette, Tooltip, Color Utils & DAG Tokens** — four high-value non-breaking features:
 
-- **`commandPalette()`** — filterable action list with case-insensitive search, viewport scrolling, and vim-style keymap
+- **`commandPalette()`** — filterable action list with case-insensitive search, viewport scrolling, and keyboard navigation
 - **`tooltip()`** — positioned overlay with top/bottom/left/right direction and screen-edge clamping
 - **Color manipulation** — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens
 - **`DagNode` token expansion** — `labelToken` and `badgeToken` for granular per-node text styling

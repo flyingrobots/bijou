@@ -1003,27 +1003,23 @@ describe('DagNode labelToken / badgeToken', () => {
 
   it('falls back to node token when labelToken/badgeToken omitted', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-    const withTokens: DagNode[] = [
+    const nodes: DagNode[] = [
       {
         id: 'a',
         label: 'Deploy',
         badge: 'OK',
         token: { hex: '#0000ff' },
-        // no labelToken/badgeToken
+        // no labelToken/badgeToken — should use token for all chars
       },
     ];
-    const withoutTokens: DagNode[] = [
-      {
-        id: 'a',
-        label: 'Deploy',
-        badge: 'OK',
-        token: { hex: '#0000ff' },
-      },
-    ];
-    // Both should render identically since neither has labelToken/badgeToken
-    const result1 = dag(withTokens, { ctx });
-    const result2 = dag(withoutTokens, { ctx });
-    expect(result1).toBe(result2);
+    const src = arraySource(nodes);
+    // arraySource should return undefined for missing token overrides
+    expect(src.labelToken!('a')).toBeUndefined();
+    expect(src.badgeToken!('a')).toBeUndefined();
+    // Should still render without error using the base token
+    const result = dag(nodes, { ctx });
+    expect(result).toContain('Deploy');
+    expect(result).toContain('OK');
   });
 
   it('works with selectedId — selectedToken takes precedence for border', () => {

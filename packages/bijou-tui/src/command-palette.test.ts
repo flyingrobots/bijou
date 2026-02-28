@@ -317,6 +317,16 @@ describe('commandPaletteKeyMap', () => {
     expect(km.handle({ key: 'up', ctrl: false, alt: false, shift: false })).toBe('prev');
   });
 
+  it('dispatches pagedown/ctrl+d to pageDown', () => {
+    expect(km.handle({ key: 'd', ctrl: true, alt: false, shift: false })).toBe('pd');
+    expect(km.handle({ key: 'pagedown', ctrl: false, alt: false, shift: false })).toBe('pd');
+  });
+
+  it('dispatches pageup/ctrl+u to pageUp', () => {
+    expect(km.handle({ key: 'u', ctrl: true, alt: false, shift: false })).toBe('pu');
+    expect(km.handle({ key: 'pageup', ctrl: false, alt: false, shift: false })).toBe('pu');
+  });
+
   it('dispatches enter to select', () => {
     expect(km.handle({ key: 'enter', ctrl: false, alt: false, shift: false })).toBe('sel');
   });

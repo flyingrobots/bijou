@@ -11,7 +11,7 @@ import {
 const ctx = initDefaultContext();
 
 const items: CommandPaletteItem[] = [
-  { id: 'box', label: 'box()', description: 'Bordered containers', category: 'Display', shortcut: '' },
+  { id: 'box', label: 'box()', description: 'Bordered containers', category: 'Display' },
   { id: 'table', label: 'table()', description: 'Auto-spacing data grids', category: 'Display' },
   { id: 'dag', label: 'dag()', description: 'Directed acyclic graph', category: 'Display' },
   { id: 'spinner', label: 'spinner()', description: 'Loading indicator', category: 'Feedback' },
@@ -19,7 +19,7 @@ const items: CommandPaletteItem[] = [
   { id: 'select', label: 'select()', description: 'Single-select menu', category: 'Forms' },
   { id: 'input', label: 'input()', description: 'Text input prompt', category: 'Forms' },
   { id: 'confirm', label: 'confirm()', description: 'Yes/no prompt', category: 'Forms' },
-  { id: 'wizard', label: 'wizard()', description: 'Multi-step form', category: 'Forms', shortcut: '' },
+  { id: 'wizard', label: 'wizard()', description: 'Multi-step form', category: 'Forms' },
   { id: 'accordion', label: 'accordion()', description: 'Expandable sections', category: 'Layout' },
   { id: 'tabs', label: 'tabs()', description: 'Tab bar navigation', category: 'Navigation' },
   { id: 'tree', label: 'tree()', description: 'Hierarchical tree', category: 'Display' },
