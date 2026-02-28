@@ -8,7 +8,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
-- **JSDoc fixes** — fix 23 JSDoc issues across `packages/bijou/src/`: correct `OutputMode` values in `BijouContext.mode`, add missing `@param`/`@returns` tags to `markdown()` and `setDefaultContext()`, unify `resolveCtx` wording across all components, standardize range notation in `downsample.ts` and `progress.ts`, expand `@throws` on `sliceSource()`, and various minor doc corrections.
+- **JSDoc fixes (bijou-node)** — fix 10 JSDoc issues across `packages/bijou-node/src/`: correct `readDir` `@returns` wording, replace invalid `{@link ms}` with backtick literal, add JSDoc to all `nodeRuntime` getters, remove stale `NO_COLOR` env-var note from `chalkStyle` implementation, add `@returns` to `env` method, add `@throws {NodeJS.ErrnoException}` to `readFile`/`readDir`, strip redundant implementation overload JSDoc on `chalkStyle`, add `@remarks` about stdin-closed Promise behavior to `question`, and change "keypress" to "stdin data chunk" in `rawInput`.
+- **JSDoc fixes (bijou)** — fix 23 JSDoc issues across `packages/bijou/src/`: correct `OutputMode` values in `BijouContext.mode`, add missing `@param`/`@returns` tags to `markdown()` and `setDefaultContext()`, unify `resolveCtx` wording across all components, standardize range notation in `downsample.ts` and `progress.ts`, expand `@throws` on `sliceSource()`, and various minor doc corrections.
 
 ## [0.10.1] — 2026-02-28
 

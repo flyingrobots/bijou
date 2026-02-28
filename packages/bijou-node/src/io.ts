@@ -30,6 +30,9 @@ export function nodeIO(): IOPort {
      * Opens a new `readline.Interface` for each call and closes it once the
      * user presses Enter.
      *
+     * @remarks The returned Promise will never settle if `process.stdin` is
+     * already closed or ends before the user provides input.
+     *
      * @param prompt - Text shown before the cursor.
      * @returns The user's response (excluding the trailing newline).
      */
@@ -53,7 +56,7 @@ export function nodeIO(): IOPort {
      * for a newline. Call `dispose()` on the returned handle to restore normal
      * input mode and remove the listener.
      *
-     * @param onKey - Callback invoked with the string representation of each keypress.
+     * @param onKey - Callback invoked with the string representation of each stdin data chunk.
      * @returns A {@link RawInputHandle} that restores normal input mode on disposal.
      */
     rawInput(onKey: (key: string) => void): RawInputHandle {
@@ -99,7 +102,7 @@ export function nodeIO(): IOPort {
     /**
      * Start a repeating interval timer via `globalThis.setInterval`.
      *
-     * @param callback - Function invoked every {@link ms} milliseconds.
+     * @param callback - Function invoked every `ms` milliseconds.
      * @param ms - Interval period in milliseconds.
      * @returns A {@link TimerHandle} that cancels the timer on disposal.
      */
@@ -118,7 +121,7 @@ export function nodeIO(): IOPort {
      *
      * @param path - Absolute or relative file path.
      * @returns The file contents as a string.
-     * @throws If the file does not exist or cannot be read.
+     * @throws {NodeJS.ErrnoException} If the file does not exist or cannot be read.
      */
     readFile(path: string): string {
       return readFileSync(path, 'utf8');
@@ -132,7 +135,8 @@ export function nodeIO(): IOPort {
      * contract. If `statSync` fails for an entry, the bare name is returned.
      *
      * @param dirPath - Path to the directory to list.
-     * @returns Sorted entry names with trailing slashes on directories.
+     * @returns Entry names with trailing slashes on directories.
+     * @throws {NodeJS.ErrnoException} If the directory does not exist or cannot be read.
      */
     readDir(dirPath: string): string[] {
       return readdirSync(dirPath).map((name) => {

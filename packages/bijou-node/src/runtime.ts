@@ -12,19 +12,26 @@ import type { RuntimePort } from '@flyingrobots/bijou';
  */
 export function nodeRuntime(): RuntimePort {
   return {
-    /** @param key - Environment variable name. */
+    /**
+     * @param key - Environment variable name.
+     * @returns The value of the environment variable, or `undefined` if not set.
+     */
     env(key: string): string | undefined {
       return process.env[key];
     },
+    /** Whether `process.stdout` is attached to a TTY. Falls back to `false`. */
     get stdoutIsTTY(): boolean {
       return process.stdout.isTTY ?? false;
     },
+    /** Whether `process.stdin` is attached to a TTY. Falls back to `false`. */
     get stdinIsTTY(): boolean {
       return process.stdin.isTTY ?? false;
     },
+    /** Terminal width in columns from `process.stdout`. Falls back to `80`. */
     get columns(): number {
       return process.stdout.columns ?? 80;
     },
+    /** Terminal height in rows from `process.stdout`. Falls back to `24`. */
     get rows(): number {
       return process.stdout.rows ?? 24;
     },

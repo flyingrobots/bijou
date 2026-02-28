@@ -25,21 +25,7 @@ export function chalkStyle(noColor?: boolean): StylePort;
  * @returns A {@link StylePort} implemented via chalk.
  */
 export function chalkStyle(options?: ChalkStyleOptions): StylePort;
-/**
- * Create a {@link StylePort} backed by Chalk.
- *
- * Translates design-token values and raw color specifications into
- * terminal escape sequences using the Chalk library. When `noColor` is
- * `true` (or the `NO_COLOR` env-var is set upstream), every method
- * returns the input text unmodified.
- *
- * When a `level` is provided, a dedicated {@link Chalk} instance is
- * created with that color depth; otherwise the default `chalk` singleton
- * is used so environment auto-detection applies.
- *
- * @param arg - A boolean (`noColor`) or a {@link ChalkStyleOptions} object.
- * @returns A {@link StylePort} implemented via chalk.
- */
+// Implementation
 export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const opts = typeof arg === 'boolean' ? { noColor: arg } : (arg ?? {});
   const isNoColor = opts.noColor ?? false;
