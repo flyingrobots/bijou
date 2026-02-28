@@ -5,6 +5,8 @@
  * available screen space, with optional scrollbar indicator.
  */
 
+import { graphemeWidth, graphemeClusterWidth } from '@flyingrobots/bijou';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -49,6 +51,19 @@ export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
+// ---------------------------------------------------------------------------
+// Lazy singleton segmenter (avoids per-call allocation)
+// ---------------------------------------------------------------------------
+
+let _segmenter: Intl.Segmenter | undefined;
+
+function getSegmenter(): Intl.Segmenter {
+  if (!_segmenter) {
+    _segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  }
+  return _segmenter;
+}
+
 /**
  * Compute the terminal display width of a string.
  *
@@ -56,57 +71,7 @@ export function stripAnsi(str: string): string {
  * skin tones, flag pairs, and combining marks correctly.
  */
 export function visibleLength(str: string): number {
-  const clean = stripAnsi(str);
-  if (clean.length === 0) return 0;
-  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
-  let width = 0;
-  for (const { segment } of seg.segment(clean)) {
-    width += _graphemeClusterWidth(segment);
-  }
-  return width;
-}
-
-/**
- * Returns the display width of a single grapheme cluster.
- * Wide characters (CJK, emoji) are 2 columns; everything else is 1.
- */
-function _graphemeClusterWidth(grapheme: string): number {
-  let maxWidth = 1;
-  for (const ch of grapheme) {
-    const cp = ch.codePointAt(0)!;
-    // Skip zero-width joiners and variation selectors
-    if (cp === 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0xE0100 && cp <= 0xE01EF)) {
-      continue;
-    }
-    if (_isWide(cp)) {
-      maxWidth = 2;
-      break;
-    }
-  }
-  return maxWidth;
-}
-
-/** Returns true if the code point occupies 2 terminal columns. */
-function _isWide(cp: number): boolean {
-  if (cp >= 0xFF01 && cp <= 0xFF60) return true;
-  if (cp >= 0xFFE0 && cp <= 0xFFE6) return true;
-  if (cp >= 0x2E80 && cp <= 0x2FDF) return true;
-  if (cp >= 0x3000 && cp <= 0x33FF) return true;
-  if (cp >= 0x3400 && cp <= 0x4DBF) return true;
-  if (cp >= 0x4E00 && cp <= 0x9FFF) return true;
-  if (cp >= 0xAC00 && cp <= 0xD7A3) return true;
-  if (cp >= 0xF900 && cp <= 0xFAFF) return true;
-  if (cp >= 0xFE30 && cp <= 0xFE4F) return true;
-  if (cp >= 0x20000 && cp <= 0x3FFFF) return true;
-  if (cp >= 0x1F300 && cp <= 0x1F9FF) return true;
-  if (cp >= 0x1FA00 && cp <= 0x1FA6F) return true;
-  if (cp >= 0x1FA70 && cp <= 0x1FAFF) return true;
-  if (cp >= 0x1F600 && cp <= 0x1F64F) return true;
-  if (cp >= 0x1F680 && cp <= 0x1F6FF) return true;
-  if (cp >= 0x2702 && cp <= 0x27B0) return true;
-  if (cp >= 0x1F1E0 && cp <= 0x1F1FF) return true;
-  if (cp >= 0x1F000 && cp <= 0x1F02F) return true;
-  return false;
+  return graphemeWidth(str);
 }
 
 /**
@@ -120,7 +85,7 @@ export function clipToWidth(str: string, maxWidth: number): string {
   let inEscape = false;
   let escBuf = '';
 
-  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  const seg = getSegmenter();
 
   // We need to iterate respecting both ANSI escapes and grapheme clusters.
   // Strategy: scan character-by-character for ANSI escapes, and use the
@@ -155,7 +120,7 @@ export function clipToWidth(str: string, maxWidth: number): string {
     if (firstSeg.done) break;
 
     const grapheme = firstSeg.value.segment;
-    const gWidth = _graphemeClusterWidth(grapheme);
+    const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible + gWidth > maxWidth) {
       result += '\x1b[0m';
@@ -185,7 +150,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
   let hasStyle = false;
   let didBreakAtEnd = false;
 
-  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  const seg = getSegmenter();
 
   let i = 0;
   while (i < str.length) {
@@ -220,7 +185,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
     if (firstSeg.done) break;
 
     const grapheme = firstSeg.value.segment;
-    const gWidth = _graphemeClusterWidth(grapheme);
+    const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible >= endCol) {
       if (hasStyle) result += '\x1b[0m';
