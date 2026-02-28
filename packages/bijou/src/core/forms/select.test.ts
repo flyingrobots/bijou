@@ -109,6 +109,18 @@ describe('select()', () => {
       const result = await select({ title: 'Color', options: OPTIONS, ctx });
       expect(result).toBe('red');
     });
+
+    it('Escape returns default/first value', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      expect(result).toBe('red');
+    });
+
+    it('Escape returns defaultValue when set', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b'] } });
+      const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
+      expect(result).toBe('blue');
+    });
   });
 
   it('accepts ctx parameter', async () => {

@@ -5,6 +5,8 @@
  * available screen space, with optional scrollbar indicator.
  */
 
+import { graphemeWidth, graphemeClusterWidth, segmentGraphemes } from '@flyingrobots/bijou';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -49,42 +51,73 @@ export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
+/**
+ * Compute the terminal display width of a string.
+ *
+ * Grapheme-cluster aware: handles emoji, CJK (2 columns), ZWJ sequences,
+ * skin tones, flag pairs, and combining marks correctly.
+ */
 export function visibleLength(str: string): number {
-  return stripAnsi(str).length;
+  return graphemeWidth(str);
 }
 
 /**
  * Clip a string to a maximum visible width, preserving ANSI escapes.
+ * Grapheme-cluster aware: won't split multi-codepoint sequences.
  * Appends a reset sequence if the string was clipped mid-style.
+ *
+ * O(n): pre-segments stripped text once, then walks the original string
+ * with a grapheme pointer instead of re-segmenting per character.
  */
 export function clipToWidth(str: string, maxWidth: number): string {
-  let visible = 0;
-  let result = '';
-  let inEscape = false;
+  const stripped = stripAnsi(str);
+  const graphemes = segmentGraphemes(stripped);
 
-  for (let i = 0; i < str.length; i++) {
+  let result = '';
+  let visible = 0;
+  let inEscape = false;
+  let escBuf = '';
+  let hasStyle = false;
+  let gi = 0;
+  let i = 0;
+
+  while (i < str.length) {
     const ch = str[i]!;
 
     if (ch === '\x1b') {
       inEscape = true;
-      result += ch;
+      escBuf = ch;
+      i++;
       continue;
     }
 
     if (inEscape) {
-      result += ch;
-      if (ch === 'm') inEscape = false;
+      escBuf += ch;
+      if (ch === 'm') {
+        inEscape = false;
+        result += escBuf;
+        escBuf = '';
+        hasStyle = true;
+      }
+      i++;
       continue;
     }
 
-    if (visible >= maxWidth) {
-      // Append reset in case we clipped inside a styled region
-      result += '\x1b[0m';
+    // Visible character — consume next pre-segmented grapheme
+    if (gi >= graphemes.length) break;
+
+    const grapheme = graphemes[gi]!;
+    const gWidth = graphemeClusterWidth(grapheme);
+
+    if (visible + gWidth > maxWidth) {
+      if (hasStyle) result += '\x1b[0m';
       break;
     }
 
-    result += ch;
-    visible++;
+    result += grapheme;
+    visible += gWidth;
+    gi++;
+    i += grapheme.length;
   }
 
   return result;
@@ -93,59 +126,79 @@ export function clipToWidth(str: string, maxWidth: number): string {
 /**
  * Extract a visible-column substring from an ANSI-styled string.
  * Returns characters between visible columns [startCol, endCol).
- * Preserves any active ANSI styles seen before startCol.
+ * Grapheme-cluster aware. Preserves any active ANSI styles seen before startCol.
+ *
+ * O(n): pre-segments stripped text once, then walks the original string
+ * with a grapheme pointer instead of re-segmenting per character.
  */
 export function sliceAnsi(str: string, startCol: number, endCol: number): string {
+  const stripped = stripAnsi(str);
+  const graphemes = segmentGraphemes(stripped);
+
   let visible = 0;
   let inEscape = false;
+  let escBuf = '';
   let activeAnsi = '';
   let result = '';
   let collecting = false;
   let hasStyle = false;
+  let didBreakAtEnd = false;
+  let gi = 0;
+  let i = 0;
 
-  for (let i = 0; i < str.length; i++) {
+  while (i < str.length) {
     const ch = str[i]!;
 
     if (ch === '\x1b') {
       inEscape = true;
-      if (collecting) {
-        result += ch;
-        hasStyle = true;
-      } else {
-        activeAnsi += ch;
-      }
+      escBuf = ch;
+      i++;
       continue;
     }
 
     if (inEscape) {
-      if (collecting) {
-        result += ch;
-      } else {
-        activeAnsi += ch;
+      escBuf += ch;
+      if (ch === 'm') {
+        inEscape = false;
+        if (collecting) {
+          result += escBuf;
+          hasStyle = true;
+        } else {
+          activeAnsi += escBuf;
+        }
+        escBuf = '';
       }
-      if (ch === 'm') inEscape = false;
+      i++;
       continue;
     }
 
+    // Visible character — consume next pre-segmented grapheme
+    if (gi >= graphemes.length) break;
+
+    const grapheme = graphemes[gi]!;
+    const gWidth = graphemeClusterWidth(grapheme);
+
     if (visible >= endCol) {
       if (hasStyle) result += '\x1b[0m';
+      didBreakAtEnd = true;
       break;
     }
 
-    if (visible >= startCol) {
+    if (visible + gWidth > startCol) {
       if (!collecting) {
         collecting = true;
         result = activeAnsi;
         if (activeAnsi.length > 0) hasStyle = true;
       }
-      result += ch;
+      result += grapheme;
     }
 
-    visible++;
+    visible += gWidth;
+    gi++;
+    i += grapheme.length;
   }
 
-  // Append reset if we reached end of string with an active style
-  if (collecting && hasStyle) result += '\x1b[0m';
+  if (collecting && hasStyle && !didBreakAtEnd) result += '\x1b[0m';
 
   return result;
 }

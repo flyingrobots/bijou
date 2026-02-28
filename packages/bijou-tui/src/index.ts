@@ -1,6 +1,6 @@
 // Types
 export type { App, Cmd, KeyMsg, ResizeMsg, QuitSignal, RunOptions } from './types.js';
-export { QUIT } from './types.js';
+export { QUIT, isKeyMsg, isResizeMsg } from './types.js';
 
 // Key parsing
 export { parseKey } from './keys.js';
@@ -240,6 +240,14 @@ export {
   fpBack,
   filePickerKeyMap,
 } from './file-picker.js';
+
+// Scripted driver
+export {
+  type ScriptStep,
+  type RunScriptOptions,
+  type RunScriptResult,
+  runScript,
+} from './driver.js';
 
 // Command palette
 export {

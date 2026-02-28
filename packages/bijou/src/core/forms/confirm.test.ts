@@ -118,6 +118,14 @@ describe('confirm()', () => {
     expect(ctx.io.written.length).toBeGreaterThan(0);
   });
 
+  describe('Ctrl+C / cancellation', () => {
+    it('rejected question() (Ctrl+C) propagates without crashing', async () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      ctx.io.question = () => Promise.reject(new Error('readline was closed'));
+      await expect(confirm({ title: 'Continue?', ctx })).rejects.toThrow('readline was closed');
+    });
+  });
+
   describe('empty answer in interactive mode', () => {
     it('empty answer in interactive mode returns default (true)', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });

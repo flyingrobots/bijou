@@ -16,7 +16,7 @@ npx tsx examples/timeline-anim/main.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, badge, progressBar, gradientText } from '@flyingrobots/bijou';
 import {
-  run, quit, tick, type App, type KeyMsg,
+  run, quit, tick, isKeyMsg, type App,
   animate, sequence, vstack, EASINGS,
 } from '@flyingrobots/bijou-tui';
 
@@ -78,9 +78,8 @@ const app: App<Model, Msg> = {
   ],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
     }
 
     switch (msg.type) {

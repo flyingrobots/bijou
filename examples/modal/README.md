@@ -16,7 +16,7 @@ npx tsx examples/modal/main.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator, badge } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App, type KeyMsg,
   createKeyMap, createInputStack, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
 
@@ -73,8 +73,8 @@ const app: App<Model, Msg> = {
   },
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const action = stack.dispatch(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = stack.dispatch(msg);
       if (!action) return [model, []];
 
       switch (action.type) {

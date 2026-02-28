@@ -6,6 +6,89 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Fixes
+
+- **`clipToWidth()` / `sliceAnsi()` O(n²) perf** — rewrite to pre-segment stripped text once via `segmentGraphemes()`, then walk original string with a grapheme pointer; removes per-character `str.slice(i)` + re-segment pattern
+- **`clipToWidth()` unconditional reset** — only append `\x1b[0m` when the clipped string actually contains ANSI style sequences
+- **`viewport.ts` duplicate segmenter** — remove `getSegmenter()` singleton; import `segmentGraphemes` from `@flyingrobots/bijou` core
+- **`markdown()` blockquote greedy continuation** — blockquote parser no longer swallows non-`>` continuation lines into the quote block
+- **`markdown()` wordWrap grapheme width** — use `graphemeWidth()` instead of `.length` for correct CJK/emoji word wrapping
+- **`markdown()` inline parse order** — code spans (`` ` ``) now parsed before bold/italic to prevent `*` inside backticks being treated as emphasis
+- **`markdown()` bold regex** — changed from `[^*]+` to `.+?` to allow `*` inside bold spans (e.g. `**a*b**`)
+- **`runScript()` init command settling** — add microtask yield after init commands and before dispose so async init commands settle before step processing begins
+- **`runScript()` exception safety** — wrap lifecycle in `try/finally` so `bus.dispose()` runs even if app throws
+- **`runScript()` unsafe cast** — remove `as KeyMsg | M` cast; `BusMsg<M>` already matches `app.update` signature
+- **`runScript()` init-command test** — strengthen assertion to verify model mutation, not just frame count
+
+### 📝 Documentation
+
+- Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
+- Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
+- Merge duplicate README documentation bullets in CHANGELOG
+- Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
+- Fix CHANGELOG v0.6.0 section heading (`Bug Fixes` → `Fixes`)
+- Fix progress-download README unused `vstack` import
+- Remove `(pre-release)` from xyph-title.md
+
+## [0.9.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **Grapheme cluster support** — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` utilities using `Intl.Segmenter` for correct Unicode text measurement. East Asian Wide characters (CJK = 2 columns), emoji (flags, ZWJ families, skin tones = 2 columns), and combining marks handled correctly
+- **`markdown()`** — terminal markdown renderer supporting headings, bold, italic, code spans, bullet/numbered lists, fenced code blocks, blockquotes, horizontal rules, and links. Two-pass parser with mode degradation (interactive → styled, pipe → plain, accessible → labeled)
+- **Color downsampling** — `rgbToAnsi256()`, `nearestAnsi256()`, `rgbToAnsi16()`, `ansi256ToAnsi16()` pure conversion functions for terminals with limited color support. `ColorLevel` type for color capability detection
+- **`AuditStylePort`** — `auditStyle()` test adapter that records all `styled()`/`rgb()`/`hex()`/`bold()` calls for post-hoc assertion. `wasStyled(token, substring)` convenience method. Returns text unchanged for compatibility with existing string assertions
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`isKeyMsg()` / `isResizeMsg()` type guards** — replace unsafe `as KeyMsg` casts with proper runtime type narrowing
+- **`runScript()`** — scripted CLI/stdin driver for automated testing and demos. Feeds key sequences into a TEA app and captures all rendered frames. Supports delays, `onFrame` callbacks, and returns final model + frame history
+
+#### Node adapter (`@flyingrobots/bijou-node`)
+
+- **`chalkStyle()` level override** — accepts optional `level?: 0|1|2|3` for explicit color level control in tests
+
+### 🐛 Fixes
+
+- **`visibleLength()`** — now grapheme-cluster aware in both `dag.ts` and `viewport.ts`; correctly measures CJK, emoji, and combining marks
+- **`clipToWidth()`** — grapheme-cluster aware clipping; won't split multi-codepoint sequences
+- **`sliceAnsi()`** — grapheme-cluster aware column slicing
+- **`truncateLabel()`** — truncates by grapheme clusters, not UTF-16 code units
+- **`renderNodeBox()` char iteration** — uses grapheme segmenter instead of `[...line]` code-point spread
+- **`flex.ts` duplicate `clipToWidth()`** — removed duplicate; imports from `viewport.ts`
+- **`select()` / `multiselect()` / `textarea()` / `filter()`** — Escape key now cancels (in addition to Ctrl+C)
+- **`markdown()` word wrap** — wrap plain text before applying inline styles to prevent ANSI escape bytes from causing premature line breaks
+- **`sliceAnsi()` double reset** — prevent emitting `\x1b[0m` twice when loop breaks at the endCol boundary
+- **`chalkStyle()` global mutation** — scope chalk level override to a per-call instance instead of mutating the global chalk, fixing test order-dependence
+- **Hangul syllable range** — correct `isWideChar()` upper bound from `0xD7FF` to `0xD7A3`, excluding narrow Jamo Extended-B characters
+- **`wasStyled()` equality** — use structural comparison (hex + modifiers) instead of reference equality on `TokenValue` objects
+- **`chalkStyle()` noColor leaking ANSI** — `styled()` and `bold()` now short-circuit when `noColor` is true, preventing modifier ANSI codes from leaking
+- **`ansi256ToAnsi16()` negative input** — clamp input to 0–255 range
+- **`markdown()` blockquote regex** — handle indented blockquotes (leading whitespace before `>`)
+- **`auditStyle()` mutable reference** — `get calls()` now returns a defensive copy
+- **progress-download example** — add missing `{ type: 'quit' }` handler for auto-exit; remove unused `vstack` import
+- **help example** — clamp `selected` index to >= 0 when deleting last item
+
+### 🔧 Refactors
+
+- Replace `as KeyMsg` / `as ResizeMsg` type casts with `isKeyMsg()` / `isResizeMsg()` type guards across all 23 example `main.ts` files, `demo-tui.ts`, `runtime.ts`, and `eventbus.test.ts`
+- **`viewport.ts` grapheme dedup** — remove duplicated `_graphemeClusterWidth()` and `_isWide()`, delegate to `@flyingrobots/bijou` core exports; add lazy singleton `Intl.Segmenter`
+
+### 🧪 Tests
+
+- 143 new tests across 6 new + 7 expanded test files (1352 total)
+
+### 📝 Documentation
+
+- Updated 23 example README code snippets to use type guards (including help, navigable-table, print-key, stopwatch `isKeyMsg()` guard fixes)
+- Fix CHANGELOG missing blank line before `## [0.8.0]`
+- Fix ROADMAP `StyleAuditPort` → `AuditStylePort`
+- Add bare-escape limitation comments to select, filter, multiselect, textarea
+- Add `canvas()` shader primitive and `box()` width override to ROADMAP backlog (from XYPH title screen request)
+
 ## [0.8.0] — 2026-02-28
 
 ### 🚀 Features
@@ -58,7 +141,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
-- **6 new examples** — `enumerated-list`, `hyperlink`, `log`, `status-bar`, `drawer`
+- **5 new examples** — `enumerated-list`, `hyperlink`, `log`, `status-bar`, `drawer`
 
 ## [0.6.0] — 2026-02-27
 
@@ -83,7 +166,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
 - **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
 
-### 🐛 Bug Fixes
+### 🐛 Fixes
 
 #### Node adapter (`@flyingrobots/bijou-node`)
 
@@ -312,7 +395,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/flyingrobots/bijou/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/flyingrobots/bijou/compare/v0.5.1...v0.6.0

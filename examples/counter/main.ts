@@ -1,6 +1,6 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
-import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -14,12 +14,11 @@ const app: App<Model, Msg> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const key = (msg as KeyMsg).key;
-      if (key === 'k' || key === '+' || key === 'up') return [{ count: model.count + 1 }, []];
-      if (key === 'j' || key === '-' || key === 'down') return [{ count: model.count - 1 }, []];
-      if (key === 'q') return [model, [quit()]];
-      if ((msg as KeyMsg).ctrl && key === 'c') return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'k' || msg.key === '+' || msg.key === 'up') return [{ count: model.count + 1 }, []];
+      if (msg.key === 'j' || msg.key === '-' || msg.key === 'down') return [{ count: model.count - 1 }, []];
+      if (msg.key === 'q') return [model, [quit()]];
+      if (msg.ctrl && msg.key === 'c') return [model, [quit()]];
     }
     return [model, []];
   },

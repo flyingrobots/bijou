@@ -103,7 +103,10 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
         clearRender(); render();
       } else if (key === '\r' || key === '\n') {
         handle.dispose(); cleanup(); resolve(options.options[cursor]!.value);
-      } else if (key === '\x03') {
+      } else if (key === '\x03' || key === '\x1b') {
+        // Note: bare \x1b may false-trigger on slow connections where escape
+        // sequences arrive as separate bytes. Timer-based disambiguation is a
+        // separate future improvement.
         handle.dispose(); cleanup(); resolve(options.defaultValue ?? options.options[0]!.value);
       }
     });

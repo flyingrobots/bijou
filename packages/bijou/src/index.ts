@@ -61,6 +61,12 @@ export {
   type DTCGDocument,
   type DTCGToken,
   type DTCGGroup,
+  // Color downsampling
+  rgbToAnsi256,
+  nearestAnsi256,
+  rgbToAnsi16,
+  ansi256ToAnsi16,
+  type ColorLevel,
   // Color manipulation
   hexToRgb,
   rgbToHex,
@@ -71,6 +77,14 @@ export {
   saturate,
   desaturate,
 } from './core/theme/index.js';
+
+// Text / grapheme utilities
+export {
+  isWideChar,
+  segmentGraphemes,
+  graphemeClusterWidth,
+  graphemeWidth,
+} from './core/text/index.js';
 
 // Detection
 export { detectOutputMode, type OutputMode } from './core/detect/index.js';
@@ -155,6 +169,8 @@ export {
   log,
   type LogLevel,
   type LogOptions,
+  markdown,
+  type MarkdownOptions,
 } from './core/components/index.js';
 
 // Forms

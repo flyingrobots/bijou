@@ -16,7 +16,7 @@ npx tsx examples/help/main.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App,
   createKeyMap, helpView, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
 
@@ -63,8 +63,8 @@ const app: App<Model, Msg> = {
   init: () => [{ showHelp: false, selected: 0, items: [...ITEMS] }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
 
       switch (action.type) {
@@ -75,7 +75,7 @@ const app: App<Model, Msg> = {
         case 'delete': {
           if (model.items.length === 0) return [model, []];
           const items = model.items.filter((_, i) => i !== model.selected);
-          const selected = Math.min(model.selected, items.length - 1);
+          const selected = Math.max(0, Math.min(model.selected, items.length - 1));
           return [{ ...model, items, selected }, []];
         }
       }

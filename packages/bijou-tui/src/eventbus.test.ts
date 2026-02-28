@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createEventBus, type BusMsg } from './eventbus.js';
-import type { KeyMsg, ResizeMsg, Cmd } from './types.js';
-import { QUIT } from './types.js';
+import type { Cmd } from './types.js';
+import { QUIT, isKeyMsg, isResizeMsg } from './types.js';
 import type { IOPort, RawInputHandle } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
@@ -113,8 +113,10 @@ describe('connectIO keyboard', () => {
     simulateKey('a');
 
     expect(received).toHaveLength(1);
-    expect((received[0] as KeyMsg).type).toBe('key');
-    expect((received[0] as KeyMsg).key).toBe('a');
+    expect(isKeyMsg(received[0])).toBe(true);
+    if (isKeyMsg(received[0])) {
+      expect(received[0].key).toBe('a');
+    }
   });
 
   it('filters unknown key sequences', () => {
@@ -160,10 +162,11 @@ describe('connectIO resize', () => {
     simulateResize(120, 40);
 
     expect(received).toHaveLength(1);
-    const msg = received[0] as ResizeMsg;
-    expect(msg.type).toBe('resize');
-    expect(msg.columns).toBe(120);
-    expect(msg.rows).toBe(40);
+    expect(isResizeMsg(received[0])).toBe(true);
+    if (isResizeMsg(received[0])) {
+      expect(received[0].columns).toBe(120);
+      expect(received[0].rows).toBe(40);
+    }
   });
 });
 

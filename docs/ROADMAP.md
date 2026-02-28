@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.8.0** — Command palette, tooltip, color utils, DAG token expansion
+Current: **v0.9.0** — Grapheme clusters, markdown, color downsampling, AuditStylePort, type guards
 
 ---
 
@@ -413,22 +413,24 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**`DagNode` token expansion**~~ | bijou | ✅ v0.8.0 — `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
 | ~~**`place()`**~~ | bijou-tui | ✅ v0.7.0 — 2D text placement with horizontal + vertical alignment. |
 | ~~**`drawer()`**~~ | bijou-tui | ✅ v0.7.0 — Slide-in side panel built on `composite()`. Left/right anchored, configurable width. |
-| **CLI/stdin component driver** | bijou-tui | Drive component state via CLI flags or streaming stdin commands. Enables scripted demos, testing, and external control. |
+| ~~**CLI/stdin component driver**~~ | bijou-tui | ✅ v0.9.0 — `runScript()` feeds key sequences into TEA apps and captures frames. |
 | ~~**`enumeratedList()`**~~ | bijou | ✅ v0.7.0 — Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet, dash, none). |
 | ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
 | **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
-| **Color downsampling** | bijou | Truecolor → ANSI256 → ANSI graceful fallback chain. |
+| ~~**Color downsampling**~~ | bijou | ✅ v0.9.0 — `rgbToAnsi256()`, `rgbToAnsi16()`, `nearestAnsi256()`, `ansi256ToAnsi16()` pure conversion functions. |
 | ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
-| **`markdown()`** | bijou | Render markdown with syntax highlighting. |
+| ~~**`markdown()`**~~ | bijou | ✅ v0.9.0 — Terminal markdown renderer with headings, inline formatting, lists, code blocks, blockquotes, links, and mode degradation. |
 | ~~**`log()`**~~ | bijou | ✅ v0.7.0 — Leveled styled log output (debug/info/warn/error/fatal). |
+| **`canvas()` shader primitive** | bijou-tui | `(cols, rows, shader, time?) → string` character-grid renderer for procedural backgrounds (rain, plasma, spiral, starfield). Composes with `composite()` for layered rendering. |
+| **`box()` width override** | bijou | Optional `width` on `BoxOptions` to lock outer width for visual stability across state changes. Content right-padded or clipped via `clipToWidth()`. |
 
 ### P2.5 — Code quality & DX
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| **Eliminate `as KeyMsg` casts in examples** | examples | All 20+ examples use `'type' in msg && msg.type === 'key'` with an unsafe `as KeyMsg` cast. Refactor Msg unions to include `KeyMsg` for proper type narrowing. |
-| **`StyleAuditPort` test adapter** | bijou | Current `plainStyle()` is a no-op — can't verify token application in tests. Add an adapter that records styled calls for assertion. |
-| **Grapheme cluster support** | bijou-tui | `[...str]` splits by code points, not grapheme clusters. Multi-codepoint emoji (flags, skin tones) misalign charType mapping in dag renderer and width calculations in viewport/layout. Consider `Intl.Segmenter`. |
+| ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
+| ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
+| ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
 
 ### P3 — Nice to have
 
@@ -461,3 +463,4 @@ Once published:
 | Phase 1h (confirm/input overlays) | `composite()`, `modal()` | ✅ Ready |
 | Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | ✅ Ready |
 | Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | ✅ Ready |
+| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | ⏳ Pending `canvas()` + `box()` width |

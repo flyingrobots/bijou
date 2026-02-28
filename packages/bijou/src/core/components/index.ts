@@ -66,3 +66,6 @@ export type { HyperlinkOptions } from './hyperlink.js';
 
 export { log } from './log.js';
 export type { LogLevel, LogOptions } from './log.js';
+
+export { markdown } from './markdown.js';
+export type { MarkdownOptions } from './markdown.js';

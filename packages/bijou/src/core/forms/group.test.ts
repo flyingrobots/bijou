@@ -28,4 +28,25 @@ describe('group', () => {
     });
     expect(result.values.only).toBe('value');
   });
+
+  it('propagates error when a child field rejects (cancellation)', async () => {
+    await expect(
+      group({
+        name: async () => 'Alice',
+        age: async () => { throw new Error('cancelled'); },
+      }),
+    ).rejects.toThrow('cancelled');
+  });
+
+  it('does not run subsequent fields after cancellation', async () => {
+    const order: string[] = [];
+    await expect(
+      group({
+        first: async () => { order.push('first'); return 1; },
+        second: async () => { order.push('second'); throw new Error('cancelled'); },
+        third: async () => { order.push('third'); return 3; },
+      }),
+    ).rejects.toThrow('cancelled');
+    expect(order).toEqual(['first', 'second']);
+  });
 });

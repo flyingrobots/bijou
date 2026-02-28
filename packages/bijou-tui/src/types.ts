@@ -16,6 +16,18 @@ export interface ResizeMsg {
   readonly rows: number;
 }
 
+// --- Type guards ---
+
+/** Narrow an unknown message to KeyMsg. */
+export function isKeyMsg(msg: unknown): msg is KeyMsg {
+  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as KeyMsg).type === 'key';
+}
+
+/** Narrow an unknown message to ResizeMsg. */
+export function isResizeMsg(msg: unknown): msg is ResizeMsg {
+  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as ResizeMsg).type === 'resize';
+}
+
 // --- Commands ---
 
 export const QUIT: unique symbol = Symbol('QUIT');

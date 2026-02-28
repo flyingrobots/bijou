@@ -16,7 +16,7 @@ npx tsx examples/file-picker/main.ts
 import { initDefaultContext, nodeIO } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   createFilePickerState, filePicker,
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
   filePickerKeyMap, helpShort, vstack,
@@ -53,9 +53,14 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isResizeMsg(msg)) {
+      return [{ ...model, cols: msg.columns }, []];
+    }
+
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
+
       switch (action.type) {
         case 'quit': return [model, [quit()]];
         case 'focus-next': return [{ ...model, fp: fpFocusNext(model.fp) }, []];
@@ -68,6 +73,7 @@ const app: App<Model, Msg> = {
         case 'back': return [{ ...model, fp: fpBack(model.fp, io) }, []];
       }
     }
+
     return [model, []];
   },
 

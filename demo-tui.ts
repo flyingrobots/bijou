@@ -44,6 +44,8 @@ import {
   scrollBy,
   createKeyMap,
   createInputStack,
+  isKeyMsg,
+  isResizeMsg,
   type App,
   type Cmd,
   type KeyMsg,
@@ -223,7 +225,7 @@ const app: App<Model, Msg | ResizeMsg> = {
 
   update: (msg, model) => {
     // Resize
-    if ('type' in msg && msg.type === 'resize') {
+    if (isResizeMsg(msg)) {
       return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
 
@@ -281,8 +283,8 @@ const app: App<Model, Msg | ResizeMsg> = {
 
     // Input Dispatch
     let action: Msg | undefined;
-    if ('type' in msg && msg.type === 'key') {
-      action = inputStack.dispatch(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      action = inputStack.dispatch(msg);
     } else {
       action = msg as Msg;
     }
