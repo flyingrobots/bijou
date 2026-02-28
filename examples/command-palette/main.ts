@@ -16,7 +16,7 @@ const items: CommandPaletteItem[] = [
   { id: 'dag', label: 'dag()', description: 'Directed acyclic graph', category: 'Display' },
   { id: 'spinner', label: 'spinner()', description: 'Loading indicator', category: 'Feedback' },
   { id: 'progress', label: 'progressBar()', description: 'Visual progress', category: 'Feedback' },
-  { id: 'select', label: 'select()', description: 'Single-select menu', category: 'Forms' },
+  { id: 'select', label: 'select()', description: 'Single-select menu', category: 'Forms', shortcut: 'ctrl+k' },
   { id: 'input', label: 'input()', description: 'Text input prompt', category: 'Forms' },
   { id: 'confirm', label: 'confirm()', description: 'Yes/no prompt', category: 'Forms' },
   { id: 'wizard', label: 'wizard()', description: 'Multi-step form', category: 'Forms' },
@@ -26,6 +26,7 @@ const items: CommandPaletteItem[] = [
 ];
 
 type Msg =
+  | KeyMsg
   | { type: 'next' }
   | { type: 'prev' }
   | { type: 'page-down' }
@@ -44,25 +45,19 @@ const keys = commandPaletteKeyMap<Msg>({
 
 interface Model {
   cp: ReturnType<typeof createCommandPaletteState>;
-  selected?: string;
 }
 
 const app: App<Model, Msg> = {
   init: () => [{ cp: createCommandPaletteState(items, 8) }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const keyMsg = msg as KeyMsg;
-
+    if (msg.type === 'key') {
       // Let keymap handle navigation keys first
-      const action = keys.handle(keyMsg);
+      const action = keys.handle(msg);
       if (action) {
         switch (action.type) {
           case 'close': return [model, [quit()]];
-          case 'select': {
-            const item = cpSelectedItem(model.cp);
-            return [{ ...model, selected: item?.label }, [quit()]];
-          }
+          case 'select': return [model, [quit()]];
           case 'next': return [{ ...model, cp: cpFocusNext(model.cp) }, []];
           case 'prev': return [{ ...model, cp: cpFocusPrev(model.cp) }, []];
           case 'page-down': return [{ ...model, cp: cpPageDown(model.cp) }, []];
@@ -71,13 +66,13 @@ const app: App<Model, Msg> = {
       }
 
       // Printable character → update filter
-      if (keyMsg.key.length === 1 && !keyMsg.ctrl && !keyMsg.alt) {
-        const newQuery = model.cp.query + keyMsg.key;
+      if (msg.key.length === 1 && !msg.ctrl && !msg.alt) {
+        const newQuery = model.cp.query + msg.key;
         return [{ ...model, cp: cpFilter(model.cp, newQuery) }, []];
       }
 
       // Backspace → remove last char from query
-      if (keyMsg.key === 'backspace') {
+      if (msg.key === 'backspace') {
         const newQuery = model.cp.query.slice(0, -1);
         return [{ ...model, cp: cpFilter(model.cp, newQuery) }, []];
       }
