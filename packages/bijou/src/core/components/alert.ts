@@ -1,6 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
 
 /** Alert severity level. */
@@ -45,17 +45,6 @@ const BORDER_TOKENS: Record<AlertVariant, keyof BijouContext['theme']['theme']['
   warning: 'warning',
   info: 'primary',
 };
-
-/**
- * Resolve the provided context or fall back to the global default.
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
 
 /**
  * Render an alert box with an icon and message.

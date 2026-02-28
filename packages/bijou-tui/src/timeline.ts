@@ -286,6 +286,7 @@ export interface TimelineBuilder {
    * @param def - Spring or tween track definition.
    * @param position - When the track starts (default: after previous item ends).
    * @returns The builder for chaining.
+   * @throws Error (at build time) if a duplicate track name is added.
    */
   add(name: string, def: TrackDef, position?: Position): TimelineBuilder;
 

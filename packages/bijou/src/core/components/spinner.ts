@@ -1,7 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /** Configuration for spinner rendering and behavior. */
 export interface SpinnerOptions {
@@ -17,17 +17,6 @@ export interface SpinnerOptions {
 
 /** Default braille dot spinner frames. */
 const DOTS = ['\u280b', '\u2819', '\u2839', '\u2838', '\u283c', '\u2834', '\u2826', '\u2827', '\u2807', '\u280f'];
-
-/**
- * Resolve the provided context or fall back to the global default.
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
 
 /**
  * Render a single spinner frame as a string.

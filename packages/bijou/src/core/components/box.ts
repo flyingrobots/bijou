@@ -1,6 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
 
