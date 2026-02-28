@@ -57,3 +57,6 @@ export type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.j
 
 export { dagStats } from './dag-stats.js';
 export type { DagStats } from './dag-stats.js';
+
+export { enumeratedList } from './enumerated-list.js';
+export type { BulletStyle, EnumeratedListOptions } from './enumerated-list.js';
