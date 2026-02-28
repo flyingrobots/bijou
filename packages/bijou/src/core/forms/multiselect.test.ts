@@ -91,6 +91,18 @@ describe('multiselect()', () => {
       const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
       expect(result).toEqual([]);
     });
+
+    it('toggle on and off deselects item', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', ' ', '\r'] } });
+      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      expect(result).toEqual([]);
+    });
+
+    it('navigate to last item and select', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\x1b[B', ' ', '\r'] } });
+      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      expect(result).toEqual(['blue']);
+    });
   });
 
   it('accepts ctx parameter', async () => {
