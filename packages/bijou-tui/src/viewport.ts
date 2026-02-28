@@ -5,7 +5,7 @@
  * available screen space, with optional scrollbar indicator.
  */
 
-import { graphemeWidth, graphemeClusterWidth } from '@flyingrobots/bijou';
+import { graphemeWidth, graphemeClusterWidth, segmentGraphemes } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,19 +51,6 @@ export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
-// ---------------------------------------------------------------------------
-// Lazy singleton segmenter (avoids per-call allocation)
-// ---------------------------------------------------------------------------
-
-let _segmenter: Intl.Segmenter | undefined;
-
-function getSegmenter(): Intl.Segmenter {
-  if (!_segmenter) {
-    _segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-  }
-  return _segmenter;
-}
-
 /**
  * Compute the terminal display width of a string.
  *
@@ -78,23 +65,25 @@ export function visibleLength(str: string): number {
  * Clip a string to a maximum visible width, preserving ANSI escapes.
  * Grapheme-cluster aware: won't split multi-codepoint sequences.
  * Appends a reset sequence if the string was clipped mid-style.
+ *
+ * O(n): pre-segments stripped text once, then walks the original string
+ * with a grapheme pointer instead of re-segmenting per character.
  */
 export function clipToWidth(str: string, maxWidth: number): string {
-  let visible = 0;
+  const stripped = stripAnsi(str);
+  const graphemes = segmentGraphemes(stripped);
+
   let result = '';
+  let visible = 0;
   let inEscape = false;
   let escBuf = '';
-
-  const seg = getSegmenter();
-
-  // We need to iterate respecting both ANSI escapes and grapheme clusters.
-  // Strategy: scan character-by-character for ANSI escapes, and use the
-  // segmenter on the stripped content for width tracking.
+  let hasStyle = false;
+  let gi = 0;
   let i = 0;
+
   while (i < str.length) {
     const ch = str[i]!;
 
-    // ANSI escape start
     if (ch === '\x1b') {
       inEscape = true;
       escBuf = ch;
@@ -108,27 +97,26 @@ export function clipToWidth(str: string, maxWidth: number): string {
         inEscape = false;
         result += escBuf;
         escBuf = '';
+        hasStyle = true;
       }
       i++;
       continue;
     }
 
-    // Extract the grapheme cluster starting at position i
-    // Use the segmenter on the remaining string to get the next cluster
-    const remaining = str.slice(i);
-    const firstSeg = seg.segment(remaining)[Symbol.iterator]().next();
-    if (firstSeg.done) break;
+    // Visible character — consume next pre-segmented grapheme
+    if (gi >= graphemes.length) break;
 
-    const grapheme = firstSeg.value.segment;
+    const grapheme = graphemes[gi]!;
     const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible + gWidth > maxWidth) {
-      result += '\x1b[0m';
+      if (hasStyle) result += '\x1b[0m';
       break;
     }
 
     result += grapheme;
     visible += gWidth;
+    gi++;
     i += grapheme.length;
   }
 
@@ -139,8 +127,14 @@ export function clipToWidth(str: string, maxWidth: number): string {
  * Extract a visible-column substring from an ANSI-styled string.
  * Returns characters between visible columns [startCol, endCol).
  * Grapheme-cluster aware. Preserves any active ANSI styles seen before startCol.
+ *
+ * O(n): pre-segments stripped text once, then walks the original string
+ * with a grapheme pointer instead of re-segmenting per character.
  */
 export function sliceAnsi(str: string, startCol: number, endCol: number): string {
+  const stripped = stripAnsi(str);
+  const graphemes = segmentGraphemes(stripped);
+
   let visible = 0;
   let inEscape = false;
   let escBuf = '';
@@ -149,10 +143,9 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
   let collecting = false;
   let hasStyle = false;
   let didBreakAtEnd = false;
-
-  const seg = getSegmenter();
-
+  let gi = 0;
   let i = 0;
+
   while (i < str.length) {
     const ch = str[i]!;
 
@@ -179,12 +172,10 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
       continue;
     }
 
-    // Extract next grapheme cluster
-    const remaining = str.slice(i);
-    const firstSeg = seg.segment(remaining)[Symbol.iterator]().next();
-    if (firstSeg.done) break;
+    // Visible character — consume next pre-segmented grapheme
+    if (gi >= graphemes.length) break;
 
-    const grapheme = firstSeg.value.segment;
+    const grapheme = graphemes[gi]!;
     const gWidth = graphemeClusterWidth(grapheme);
 
     if (visible >= endCol) {
@@ -203,6 +194,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
     }
 
     visible += gWidth;
+    gi++;
     i += grapheme.length;
   }
 

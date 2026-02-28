@@ -2,7 +2,7 @@
 
 **From:** XYPH TUI title screen
 **Date:** 2026-02-28
-**bijou version:** v0.9.0 (pre-release)
+**bijou version:** v0.9.0
 
 ---
 

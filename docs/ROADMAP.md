@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.8.0** — Command palette, tooltip, color utils, DAG token expansion
+Current: **v0.9.0** — Grapheme clusters, markdown, color downsampling, AuditStylePort, type guards
 
 ---
 

@@ -15,7 +15,7 @@ npx tsx examples/progress-download/main.ts
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { progressBar, badge, separator, spinnerFrame } from '@flyingrobots/bijou';
-import { run, quit, tick, isKeyMsg, type App, vstack } from '@flyingrobots/bijou-tui';
+import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 

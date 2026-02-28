@@ -13,6 +13,7 @@ import type { BijouContext } from '../../ports/context.js';
 import { getDefaultContext } from '../../context.js';
 import { separator } from './separator.js';
 import { hyperlink } from './hyperlink.js';
+import { graphemeWidth } from '../text/grapheme.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,7 +86,7 @@ function parseBlocks(source: string): BlockType[] {
     // Blockquote
     if (line.trimStart().startsWith('>')) {
       const quoteLines: string[] = [];
-      while (i < lines.length && (lines[i]!.trimStart().startsWith('>') || (lines[i]!.trim() !== '' && quoteLines.length > 0))) {
+      while (i < lines.length && lines[i]!.trimStart().startsWith('>')) {
         const ql = lines[i]!;
         quoteLines.push(ql.replace(/^\s*>\s?/, ''));
         i++;
@@ -158,19 +159,19 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
     return hyperlink(linkText, url, { ctx });
   });
 
+  // Code spans: `text` (before bold/italic to prevent * inside backticks being parsed)
+  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
+    return ctx.style.styled(ctx.theme.theme.semantic.warning, code);
+  });
+
   // Bold: **text**
-  result = result.replace(/\*\*([^*]+)\*\*/g, (_m, bold: string) => {
+  result = result.replace(/\*\*(.+?)\*\*/g, (_m, bold: string) => {
     return ctx.style.bold(bold);
   });
 
   // Italic: *text* (but not inside **)
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, (_m, italic: string) => {
     return ctx.style.styled(ctx.theme.theme.semantic.muted, italic);
-  });
-
-  // Code spans: `text`
-  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
-    return ctx.style.styled(ctx.theme.theme.semantic.warning, code);
   });
 
   return result;
@@ -182,14 +183,14 @@ function parseInlinePlain(text: string): string {
   // Links: [text](url) → text (url)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)');
 
+  // Code: `text` → text (before bold/italic to prevent * inside backticks being parsed)
+  result = result.replace(/`([^`]+)`/g, '$1');
+
   // Bold: **text** → text
-  result = result.replace(/\*\*([^*]+)\*\*/g, '$1');
+  result = result.replace(/\*\*(.+?)\*\*/g, '$1');
 
   // Italic: *text* → text
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
-
-  // Code: `text` → text
-  result = result.replace(/`([^`]+)`/g, '$1');
 
   return result;
 }
@@ -200,14 +201,14 @@ function parseInlineAccessible(text: string, _ctx: BijouContext): string {
   // Links: [text](url) → Link: text (url)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 'Link: $1 ($2)');
 
+  // Code: `text` → text (before bold/italic to prevent * inside backticks being parsed)
+  result = result.replace(/`([^`]+)`/g, '$1');
+
   // Bold: **text** → text
-  result = result.replace(/\*\*([^*]+)\*\*/g, '$1');
+  result = result.replace(/\*\*(.+?)\*\*/g, '$1');
 
   // Italic: *text* → text
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
-
-  // Code: `text` → text
-  result = result.replace(/`([^`]+)`/g, '$1');
 
   return result;
 }
@@ -221,18 +222,23 @@ function wordWrap(text: string, width: number): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
   let current = '';
+  let currentWidth = 0;
 
   for (const word of words) {
-    if (current.length === 0) {
+    const wordWidth = graphemeWidth(word);
+    if (currentWidth === 0) {
       current = word;
-    } else if (current.length + 1 + word.length <= width) {
+      currentWidth = wordWidth;
+    } else if (currentWidth + 1 + wordWidth <= width) {
       current += ' ' + word;
+      currentWidth += 1 + wordWidth;
     } else {
       lines.push(current);
       current = word;
+      currentWidth = wordWidth;
     }
   }
-  if (current.length > 0) lines.push(current);
+  if (currentWidth > 0) lines.push(current);
   return lines.length > 0 ? lines : [''];
 }
 

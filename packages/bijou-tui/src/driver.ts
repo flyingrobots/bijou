@@ -59,6 +59,12 @@ export interface RunScriptResult<Model> {
  * The app quits when:
  * - A command returns QUIT
  * - All script steps are exhausted (auto-quits)
+ *
+ * **Limitation:** Between steps the driver yields via `queueMicrotask`,
+ * which only settles microtask-based async (e.g. `Promise.resolve()`).
+ * Commands that use `setTimeout`, real I/O, or other macrotask-based async
+ * may not have completed before the next key is dispatched. Use `delay`
+ * on subsequent steps to allow time for macrotask-based commands.
  */
 export async function runScript<Model, M>(
   app: App<Model, M>,

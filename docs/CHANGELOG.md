@@ -6,6 +6,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Fixes
+
+- **`clipToWidth()` / `sliceAnsi()` O(n²) perf** — rewrite to pre-segment stripped text once via `segmentGraphemes()`, then walk original string with a grapheme pointer; removes per-character `str.slice(i)` + re-segment pattern
+- **`clipToWidth()` unconditional reset** — only append `\x1b[0m` when the clipped string actually contains ANSI style sequences
+- **`viewport.ts` duplicate segmenter** — remove `getSegmenter()` singleton; import `segmentGraphemes` from `@flyingrobots/bijou` core
+- **`markdown()` blockquote greedy continuation** — blockquote parser no longer swallows non-`>` continuation lines into the quote block
+- **`markdown()` wordWrap grapheme width** — use `graphemeWidth()` instead of `.length` for correct CJK/emoji word wrapping
+- **`markdown()` inline parse order** — code spans (`` ` ``) now parsed before bold/italic to prevent `*` inside backticks being treated as emphasis
+- **`markdown()` bold regex** — changed from `[^*]+` to `.+?` to allow `*` inside bold spans (e.g. `**a*b**`)
+
+### 📝 Documentation
+
+- Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
+- Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
+- Merge duplicate README documentation bullets in CHANGELOG
+- Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
+- Fix CHANGELOG v0.6.0 section heading (`Bug Fixes` → `Fixes`)
+- Fix progress-download README unused `vstack` import
+- Remove `(pre-release)` from xyph-title.md
+
 ## [0.9.0] — 2026-02-28
 
 ### 🚀 Features
@@ -54,12 +75,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
-- 143 new tests across 8 new + 6 expanded test files (1352 total)
+- 143 new tests across 6 new + 7 expanded test files (1352 total)
 
 ### 📝 Documentation
 
-- Updated 23 example README code snippets to use type guards
-- Fix 4 example READMEs (help, navigable-table, print-key, stopwatch) to use `isKeyMsg()` guard instead of `as KeyMsg` casts
+- Updated 23 example README code snippets to use type guards (including help, navigable-table, print-key, stopwatch `isKeyMsg()` guard fixes)
 - Fix CHANGELOG missing blank line before `## [0.8.0]`
 - Fix ROADMAP `StyleAuditPort` → `AuditStylePort`
 - Add bare-escape limitation comments to select, filter, multiselect, textarea
@@ -117,7 +137,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
-- **6 new examples** — `enumerated-list`, `hyperlink`, `log`, `status-bar`, `drawer`
+- **5 new examples** — `enumerated-list`, `hyperlink`, `log`, `status-bar`, `drawer`
 
 ## [0.6.0] — 2026-02-27
 
@@ -142,7 +162,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
 - **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
 
-### 🐛 Bug Fixes
+### 🐛 Fixes
 
 #### Node adapter (`@flyingrobots/bijou-node`)
 
