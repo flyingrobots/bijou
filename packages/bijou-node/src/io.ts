@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import type { IOPort, RawInputHandle, TimerHandle } from '@flyingrobots/bijou';
 
@@ -130,22 +130,19 @@ export function nodeIO(): IOPort {
     /**
      * List directory contents, appending `'/'` to directory names.
      *
-     * Each entry is either a plain filename or a directory name with a
-     * trailing slash (e.g. `"src/"`), matching the {@link IOPort.readDir}
-     * contract. If `statSync` fails for an entry (e.g. broken symlink), the bare name is returned without a trailing slash.
+     * Uses `withFileTypes` to obtain directory entries directly from the
+     * filesystem, avoiding a separate `statSync` per entry. Each entry is
+     * either a plain filename or a directory name with a trailing slash
+     * (e.g. `"src/"`), matching the {@link IOPort.readDir} contract.
      *
      * @param dirPath - Path to the directory to list.
      * @returns Entry names with trailing slashes on directories.
      * @throws {NodeJS.ErrnoException} If the directory does not exist or cannot be read.
      */
     readDir(dirPath: string): string[] {
-      return readdirSync(dirPath).map((name) => {
-        try {
-          return statSync(join(dirPath, name)).isDirectory() ? name + '/' : name;
-        } catch {
-          return name;
-        }
-      });
+      return readdirSync(dirPath, { withFileTypes: true }).map((entry) =>
+        entry.isDirectory() ? entry.name + '/' : entry.name,
+      );
     },
 
     /**

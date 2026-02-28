@@ -229,7 +229,7 @@ function renderScrollbar(
  * Render a scrollable viewport into content.
  *
  * Return a string with exactly `height` lines, each at most `width`
- * characters wide (plus optional scrollbar).
+ * visible columns wide (including optional scrollbar when enabled).
  *
  * @param options - Viewport configuration including dimensions, content, and scroll offsets.
  * @returns Rendered viewport string with lines joined by newlines.

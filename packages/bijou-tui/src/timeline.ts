@@ -339,8 +339,9 @@ export interface Timeline {
    * Returns a new state (pure — no mutation).
    *
    * @param state - Current timeline state.
-   * @param dt - Time step in seconds (e.g. 1/60 for 60 fps).
+   * @param dt - Time step in seconds (e.g. 1/60 for 60 fps). Must be finite and non-negative.
    * @returns Updated timeline state with all active tracks advanced.
+   * @throws Error if `dt` is negative, `NaN`, or infinite.
    */
   step(state: TimelineState, dt: number): TimelineState;
 
@@ -523,6 +524,9 @@ function compile(entries: BuilderEntry[]): Timeline {
     },
 
     step(state: TimelineState, dt: number): TimelineState {
+      if (!Number.isFinite(dt) || dt < 0) {
+        throw new Error(`Timeline: dt must be a finite non-negative number, got ${dt}`);
+      }
       const dtMs = dt * 1000;
       const elapsedMs = state.elapsedMs + dtMs;
       const nextTracks: Record<string, TrackState> = {};
