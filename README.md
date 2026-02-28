@@ -13,14 +13,14 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v0.8.0
+## What's New in v0.10.0
 
-**Command Palette, Tooltip, Color Utils & DAG Tokens** — four high-value non-breaking features:
+**Canvas Shader, Box Width Override & Mouse Input** — three high-value features plus grapheme-aware text clipping:
 
-- **`commandPalette()`** — filterable action list with case-insensitive search, viewport scrolling, and keyboard navigation
-- **`tooltip()`** — positioned overlay with top/bottom/left/right direction and screen-edge clamping
-- **Color manipulation** — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens
-- **`DagNode` token expansion** — `labelToken` and `badgeToken` for granular per-node text styling
+- **`canvas()` shader primitive** — procedural character-grid renderer: `(cols, rows, shader, options?) → string`. Build plasma effects, starfields, particle systems — all composable with `composite()` for layered rendering
+- **Mouse input (opt-in)** — full SGR mouse protocol support via `RunOptions.mouse?: boolean`. New types: `MouseMsg`, `MouseButton`, `MouseAction`. Parses presses, releases, drags, scroll, and modifier keys
+- **`box()` width override** — lock outer box width with `BoxOptions.width`. Content is grapheme-aware clipped or padded to fill
+- **`clipToWidth()`** — grapheme-aware O(n) text clipping promoted to core. Preserves ANSI escapes, won't split emoji or CJK clusters
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 

@@ -6,6 +6,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`clipToWidth()`** — grapheme-aware text clipping promoted from bijou-tui to bijou core. O(n) algorithm preserving ANSI escapes, won't split multi-codepoint grapheme clusters (emoji, CJK, ZWJ sequences). Appends reset only when ANSI present
+- **`box()` width override** — optional `width` on `BoxOptions` locks outer box width (including borders). Content lines are clipped via `clipToWidth()` or right-padded to fill. Padding is clamped when it exceeds available interior space. Pipe/accessible modes ignore width
+- **`box()` grapheme-aware width measurement** — replaced naive `stripAnsi().length` with `graphemeWidth()` for correct CJK/emoji box sizing (pre-existing bug fix)
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`canvas()` shader primitive** — `(cols, rows, shader, options?) → string` character-grid renderer for procedural backgrounds. Shader receives `(x, y, cols, rows, time)` per cell. Returns empty string in pipe/accessible mode. Composes with `composite()` for layered rendering
+- **Mouse input (opt-in)** — SGR mouse protocol support via `RunOptions.mouse?: boolean` (default false). New types: `MouseMsg`, `MouseButton`, `MouseAction`. `parseMouse()` parses SGR sequences (`\x1b[<button;col;rowM/m`). `isMouseMsg()` type guard. EventBus `connectIO()` accepts `{ mouse: true }` option. Runtime sends enable/disable escape sequences on startup/cleanup
+- **`App.update()` signature widened** — now receives `KeyMsg | ResizeMsg | MouseMsg | M` (was `KeyMsg | ResizeMsg | M`). Since `MouseMsg` is never emitted when `mouse: false`, existing apps are unaffected at runtime
+
 ### 🐛 Fixes
 
 - **`canvas()` surrogate corruption** — replace `ch[0]!` with code-point-aware `[...ch][0]` to correctly extract non-BMP characters (emoji) from shader output
@@ -24,49 +40,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`runScript()` unsafe cast** — remove `as KeyMsg | M` cast; `BusMsg<M>` already matches `app.update` signature
 - **`runScript()` init-command test** — strengthen assertion to verify model mutation, not just frame count
 
-### 📝 Documentation
-
-- Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
-- Mark canvas README snippet as excerpt
-- Add missing `CHARS` definition to canvas README snippet
-- Add `canvas` and `mouse` rows to examples README
-- Add `static` mode comment to `canvas()`
-- Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
-- Fix CHANGELOG test file count (`4 new + 5 expanded` → `2 new + 4 expanded`)
-- Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
-- Merge duplicate README documentation bullets in CHANGELOG
-- Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
-- Fix CHANGELOG v0.6.0 section heading (`Bug Fixes` → `Fixes`)
-- Fix progress-download README unused `vstack` import
-- Remove `(pre-release)` from xyph-title.md
-
-## [0.10.0] — 2026-02-28
-
-### 🚀 Features
-
-#### Core (`@flyingrobots/bijou`)
-
-- **`clipToWidth()`** — grapheme-aware text clipping promoted from bijou-tui to bijou core. O(n) algorithm preserving ANSI escapes, won't split multi-codepoint grapheme clusters (emoji, CJK, ZWJ sequences). Appends reset only when ANSI present
-- **`box()` width override** — optional `width` on `BoxOptions` locks outer box width (including borders). Content lines are clipped via `clipToWidth()` or right-padded to fill. Padding is clamped when it exceeds available interior space. Pipe/accessible modes ignore width
-- **`box()` grapheme-aware width measurement** — replaced naive `stripAnsi().length` with `graphemeWidth()` for correct CJK/emoji box sizing (pre-existing bug fix)
-
-#### TUI (`@flyingrobots/bijou-tui`)
-
-- **`canvas()` shader primitive** — `(cols, rows, shader, options?) → string` character-grid renderer for procedural backgrounds. Shader receives `(x, y, cols, rows, time)` per cell. Returns empty string in pipe/accessible mode. Composes with `composite()` for layered rendering
-- **Mouse input (opt-in)** — SGR mouse protocol support via `RunOptions.mouse?: boolean` (default false). New types: `MouseMsg`, `MouseButton`, `MouseAction`. `parseMouse()` parses SGR sequences (`\x1b[<button;col;rowM/m`). `isMouseMsg()` type guard. EventBus `connectIO()` accepts `{ mouse: true }` option. Runtime sends enable/disable escape sequences on startup/cleanup
-- **`App.update()` signature widened** — now receives `KeyMsg | ResizeMsg | MouseMsg | M` (was `KeyMsg | ResizeMsg | M`). Since `MouseMsg` is never emitted when `mouse: false`, existing apps are unaffected at runtime
-
 ### 🔧 Refactors
 
 - **`viewport.ts` `clipToWidth()`** — re-exports from `@flyingrobots/bijou` core instead of maintaining a local copy. Public API unchanged for backward compatibility
 
 ### 🧪 Tests
 
-- 51 new tests across 2 new + 4 expanded test files (1403 total)
+- 53 new tests across 2 new + 5 expanded test files (1405 total)
 
 ### 📝 Documentation
 
 - **2 new examples** — `canvas` (animated plasma shader), `mouse` (mouse event inspector)
+- Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Mark canvas README snippet as excerpt
+- Add missing `CHARS` definition to canvas README snippet
+- Add `canvas` and `mouse` rows to examples README
+- Add `static` mode comment to `canvas()`
+- Fix ROADMAP version label (`v0.8.0` → `v0.9.0`)
+- Fix CHANGELOG test file count (`8 new + 6 expanded` → `6 new + 7 expanded`)
+- Fix CHANGELOG example count (`6 new examples` → `5 new examples`)
+- Fix CHANGELOG v0.6.0 section heading (`Bug Fixes` → `Fixes`)
+- Fix progress-download README unused `vstack` import
+- Remove `(pre-release)` from xyph-title.md
 
 ## [0.9.0] — 2026-02-28
 
