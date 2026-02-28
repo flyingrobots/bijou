@@ -823,19 +823,23 @@ describe('DagSource adapter', () => {
 
     it('works with a simulated large graph via DagSource', () => {
       // Simulate a graph with 1000 nodes but only render a 3-node slice
+      const nodeIndex = (id: string): number => {
+        const n = parseInt(id.split('-')[1] ?? '', 10);
+        if (Number.isNaN(n)) throw new Error(`Invalid node ID: ${id}`);
+        return n;
+      };
       const custom: DagSource = {
-        has: (id) => id.startsWith('node-') && parseInt(id.split('-')[1]!) < 1000,
-        label: (id) => `Node ${id.split('-')[1]}`,
+        has: (id) => id.startsWith('node-') && nodeIndex(id) < 1000,
+        label: (id) => `Node ${nodeIndex(id)}`,
         children: (id) => {
-          const n = parseInt(id.split('-')[1]!);
-          // Each node points to the next two
+          const n = nodeIndex(id);
           const ch: string[] = [];
           if (n * 2 + 1 < 1000) ch.push(`node-${n * 2 + 1}`);
           if (n * 2 + 2 < 1000) ch.push(`node-${n * 2 + 2}`);
           return ch;
         },
         parents: (id) => {
-          const n = parseInt(id.split('-')[1]!);
+          const n = nodeIndex(id);
           if (n === 0) return [];
           return [`node-${Math.floor((n - 1) / 2)}`];
         },
