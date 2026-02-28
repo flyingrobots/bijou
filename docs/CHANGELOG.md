@@ -6,11 +6,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Documentation
-
-- **navigable-table example** — TUI app demonstrating `navigableTable()` with keyboard navigation, scrolling, and `navTableKeyMap()`
-- **browsable-list example** — TUI app demonstrating `browsableList()` with keyboard navigation, page scrolling, and help bar
-
 ## [0.6.0] — 2026-02-27
 
 ### Added
