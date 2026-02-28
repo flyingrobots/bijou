@@ -22,6 +22,9 @@ export {
   _resetDefaultContextForTesting,
 } from './context.js';
 
+// Context resolution helpers
+export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
+
 // Factory
 export { createBijou, type CreateBijouOptions } from './factory.js';
 

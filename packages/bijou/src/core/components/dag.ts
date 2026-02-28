@@ -1,6 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
 import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
 import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
@@ -99,17 +99,6 @@ export interface DagLayout {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
-
-/**
- * Resolve the provided context or fall back to the global default.
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext {
-  if (ctx) return ctx;
-  return getDefaultContext();
-}
 
 /**
  * Compute the visible display width of a string in terminal columns.

@@ -1,6 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue, BaseStatusKey } from '../theme/tokens.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -11,24 +11,6 @@ export interface BadgeOptions {
   variant?: BadgeVariant;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
-}
-
-/**
- * Resolve the provided context or attempt to obtain the default context.
- *
- * Unlike other components, returns `undefined` when no default context is
- * available (e.g. before bijou-node initialisation).
- *
- * @param ctx - Optional context override.
- * @returns The resolved {@link BijouContext}, or `undefined` if unavailable.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
-  if (ctx) return ctx;
-  try {
-    return getDefaultContext();
-  } catch {
-    return undefined;
-  }
 }
 
 /**

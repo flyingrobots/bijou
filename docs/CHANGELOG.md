@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ♻️ Refactors
+
+- **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.
+
 ### 🐛 Bug Fixes
 
 - **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.

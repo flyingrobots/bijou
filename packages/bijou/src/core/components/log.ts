@@ -1,5 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { badge } from './badge.js';
 
 /** Severity levels for structured log messages. */
@@ -13,24 +13,6 @@ export interface LogOptions {
   readonly prefix?: boolean;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
-}
-
-/**
- * Resolve a BijouContext, falling back to the global default.
- *
- * Returns `undefined` if no context is provided and no default is configured,
- * allowing the component to degrade gracefully.
- *
- * @param ctx - Optional explicit context.
- * @returns The resolved context or `undefined`.
- */
-function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
-  if (ctx) return ctx;
-  try {
-    return getDefaultContext();
-  } catch {
-    return undefined;
-  }
 }
 
 /** Abbreviated 3-letter labels for each log level used in pipe/interactive modes. */
