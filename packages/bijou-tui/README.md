@@ -4,14 +4,11 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.4.0?
+## What's New in 0.6.0?
 
-- **`composite()`** — ANSI-safe overlay compositing with dim background support
-- **`modal()`** — centered dialog overlay with title, body, hint, and auto-centering
-- **`toast()`** — anchored notification overlay with success/error/info variants
-- **`pager()`** — scrollable content viewer with status line and convenience keymap
-- **`interactiveAccordion()`** — navigable accordion with focus tracking and expand/collapse
-- **`createPanelGroup()`** — multi-pane focus management with hotkey switching
+- **`navigableTable()`** — keyboard-navigable table with focus management, vertical scrolling, and vim-style keybindings
+- **`browsableList()`** — navigable list with focus tracking, scroll viewport, descriptions, and convenience keymap
+- **`filePicker()`** — directory browser with focus navigation, extension filtering, and `IOPort` integration
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
@@ -285,6 +282,51 @@ const output = composite(backgroundView, [dialog, notification], { dim: true });
 ```
 
 Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
+
+## Building Blocks
+
+Reusable stateful components that follow the TEA state + pure transformers + sync render + convenience keymap pattern:
+
+### Navigable Table
+
+```typescript
+import {
+  createNavigableTableState, navigableTable, navTableFocusNext,
+  navTableKeyMap, helpShort,
+} from '@flyingrobots/bijou-tui';
+
+const state = createNavigableTableState({ columns, rows, height: 10 });
+const output = navigableTable(state, { ctx });
+const next = navTableFocusNext(state);
+```
+
+### Browsable List
+
+```typescript
+import {
+  createBrowsableListState, browsableList, listFocusNext,
+  browsableListKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createBrowsableListState({ items, height: 10 });
+const output = browsableList(state);
+```
+
+### File Picker
+
+```typescript
+import {
+  createFilePickerState, filePicker, fpFocusNext, fpEnter, fpBack,
+  filePickerKeyMap,
+} from '@flyingrobots/bijou-tui';
+import { nodeIO } from '@flyingrobots/bijou-node';
+
+const io = nodeIO();
+const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
+const output = filePicker(state);
+```
+
+All building blocks include `*KeyMap()` factories for preconfigured vim-style keybindings.
 
 ## Related Packages
 

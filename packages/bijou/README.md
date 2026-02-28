@@ -4,11 +4,11 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
-## What's New in 0.5.0?
+## What's New in 0.6.0?
 
-- **`DagSource` adapter** — bring your own graph representation (database, API, adjacency matrix). DAG rendering no longer requires `DagNode[]`
-- **Traversal-based slicing** — `dagSlice()` BFS-walks via `has()`/`children()`/`parents()`, never enumerates the full graph
-- **Composable slices** — `dagSlice()` returns a `SlicedDagSource` when given `DagSource`, enabling slice-of-slice chains
+- **`dagStats()`** — pure graph statistics (nodes, edges, depth, width, roots, leaves) with cycle detection and ghost-node filtering
+- **`wizard()`** — multi-step form orchestrator with conditional skip logic and accumulated values across steps
+- **`textarea()`** / **`filter()`** — multi-line text input and fuzzy-filter select (shipped in 0.4.0)
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
@@ -41,7 +41,7 @@ console.log(box('Hello, world!'));
 `badge()`, `alert()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
 
 ### Data
-`table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()` — structured data display and DAG rendering with `DagSource` adapter for external graphs.
+`table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
@@ -50,7 +50,7 @@ console.log(box('Hello, world!'));
 `spinner()`, `progressBar()`, `gradientText()` — live-updating output with color gradients.
 
 ### Forms
-`input()`, `select()`, `multiselect()`, `confirm()`, `group()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
+`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
 
 ### Theme Engine
 DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.

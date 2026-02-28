@@ -1,6 +1,6 @@
 # Examples
 
-> 47 examples · Run any: `npx tsx examples/<name>/main.ts`  
+> 52 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -25,6 +25,7 @@
 | [`progress-static`](./progress-static/) | `progressBar()` | Static progress bars at various states |
 | [`dag`](./dag/) | `dag()` | Directed acyclic graph with status badges |
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
+| [`dag-stats`](./dag-stats/) | `dagStats()` | Graph statistics with cycle and duplicate detection |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
 
@@ -39,6 +40,7 @@
 | [`textarea`](./textarea/) | `textarea()` | Multi-line text input with cursor navigation |
 | [`filter`](./filter/) | `filter()` | Fuzzy-filter select with real-time search |
 | [`form-group`](./form-group/) | `group()` | Multi-field form wizard |
+| [`wizard`](./wizard/) | `wizard()` | Multi-step form with conditional skip logic |
 
 ## TUI Apps
 
@@ -60,6 +62,9 @@
 | [`chat`](./chat/) | `viewport()` + `input()` + `vstack()` + `flex()` | Chat UI with message input |
 | [`split-editors`](./split-editors/) | `flex()` + `hstack()` + `createInputStack()` | Dual-pane editor with focus switching |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
+| [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
+| [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |
+| [`file-picker`](./file-picker/) | `filePicker()`, `filePickerKeyMap()` | Directory browser with keyboard navigation |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
