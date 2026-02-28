@@ -193,4 +193,10 @@ describe('parseMouse', () => {
     expect(msg!.col).toBe(0);
     expect(msg!.row).toBe(0);
   });
+
+  it('rejects malformed zero coordinates', () => {
+    expect(parseMouse('\x1b[<0;0;1M')).toBeNull();
+    expect(parseMouse('\x1b[<0;1;0M')).toBeNull();
+    expect(parseMouse('\x1b[<0;0;0M')).toBeNull();
+  });
 });

@@ -70,8 +70,11 @@ export function parseMouse(raw: string): MouseMsg | null {
   if (!match) return null;
 
   const buttonByte = parseInt(match[1]!, 10);
-  const col = parseInt(match[2]!, 10) - 1; // 1-based → 0-based
-  const row = parseInt(match[3]!, 10) - 1;
+  const rawCol = parseInt(match[2]!, 10);
+  const rawRow = parseInt(match[3]!, 10);
+  if (rawCol < 1 || rawRow < 1) return null;
+  const col = rawCol - 1; // 1-based → 0-based
+  const row = rawRow - 1;
   const suffix = match[4]!;
 
   const shift = (buttonByte & 4) !== 0;
