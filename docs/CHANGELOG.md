@@ -11,6 +11,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`canvas()` surrogate corruption** — replace `ch[0]!` with code-point-aware `[...ch][0]` to correctly extract non-BMP characters (emoji) from shader output
 - **Canvas example unsafe cast** — remove `(msg as Msg)` cast; TypeScript narrows through `'type' in msg` already
 - **`parseMouse()` duplicated ternary** — extract `buttonFromBits()` helper to DRY the button-to-name mapping
+- **`parseMouse()` zero coordinate guard** — reject malformed SGR sequences with col/row of 0 (protocol-invalid) instead of producing -1 positions
 - **`clipToWidth()` / `sliceAnsi()` O(n²) perf** — rewrite to pre-segment stripped text once via `segmentGraphemes()`, then walk original string with a grapheme pointer; removes per-character `str.slice(i)` + re-segment pattern
 - **`clipToWidth()` unconditional reset** — only append `\x1b[0m` when the clipped string actually contains ANSI style sequences
 - **`viewport.ts` duplicate segmenter** — remove `getSegmenter()` singleton; import `segmentGraphemes` from `@flyingrobots/bijou` core
@@ -26,6 +27,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - Add `queueMicrotask` limitation JSDoc to `runScript()` in driver.ts
+- Mark canvas README snippet as excerpt
 - Add missing `CHARS` definition to canvas README snippet
 - Add `canvas` and `mouse` rows to examples README
 - Add `static` mode comment to `canvas()`
