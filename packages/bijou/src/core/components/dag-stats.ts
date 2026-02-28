@@ -3,15 +3,41 @@ import type { SlicedDagSource } from './dag-source.js';
 import { isSlicedDagSource } from './dag-source.js';
 import { materialize } from './dag-source.js';
 
+/** Statistics computed from a directed acyclic graph. */
 export interface DagStats {
+  /** Total number of (non-ghost) nodes. */
   nodes: number;
+  /** Total number of edges between non-ghost nodes. */
   edges: number;
-  depth: number;        // number of layers (longest-path assignment)
-  width: number;        // max nodes on any single layer
-  roots: number;        // in-degree 0
-  leaves: number;       // out-degree 0
+  /** Number of layers in the longest-path layer assignment. */
+  depth: number;
+  /** Maximum number of nodes on any single layer. */
+  width: number;
+  /** Number of root nodes (in-degree 0). */
+  roots: number;
+  /** Number of leaf nodes (out-degree 0). */
+  leaves: number;
 }
 
+/**
+ * Compute statistics for a directed acyclic graph.
+ *
+ * Accepts either a `DagNode[]` array or a `SlicedDagSource`. Ghost nodes
+ * (internal boundary markers from `dagSlice()`) are filtered out automatically.
+ *
+ * @throws If the graph contains a cycle or duplicate node IDs.
+ *
+ * @example
+ * ```ts
+ * const stats = dagStats([
+ *   { id: 'a', label: 'A', edges: ['b', 'c'] },
+ *   { id: 'b', label: 'B', edges: ['d'] },
+ *   { id: 'c', label: 'C', edges: ['d'] },
+ *   { id: 'd', label: 'D' },
+ * ]);
+ * // => { nodes: 4, edges: 4, depth: 3, width: 2, roots: 1, leaves: 1 }
+ * ```
+ */
 export function dagStats(nodes: DagNode[]): DagStats;
 export function dagStats(source: SlicedDagSource): DagStats;
 export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
