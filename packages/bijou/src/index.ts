@@ -61,6 +61,12 @@ export {
   type DTCGDocument,
   type DTCGToken,
   type DTCGGroup,
+  // Color downsampling
+  rgbToAnsi256,
+  nearestAnsi256,
+  rgbToAnsi16,
+  ansi256ToAnsi16,
+  type ColorLevel,
   // Color manipulation
   hexToRgb,
   rgbToHex,

@@ -1,8 +1,20 @@
 import chalk, { type ChalkInstance } from 'chalk';
 import type { StylePort, TokenValue } from '@flyingrobots/bijou';
 
-export function chalkStyle(noColor?: boolean): StylePort {
-  const isNoColor = noColor ?? false;
+export interface ChalkStyleOptions {
+  noColor?: boolean;
+  /** Explicit chalk color level override: 0=none, 1=ansi16, 2=ansi256, 3=truecolor */
+  level?: 0 | 1 | 2 | 3;
+}
+
+export function chalkStyle(noColor?: boolean): StylePort;
+export function chalkStyle(options?: ChalkStyleOptions): StylePort;
+export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
+  const opts = typeof arg === 'boolean' ? { noColor: arg } : (arg ?? {});
+  const isNoColor = opts.noColor ?? false;
+  if (opts.level !== undefined) {
+    chalk.level = opts.level;
+  }
 
   function applyModifiers(c: ChalkInstance, modifiers?: TokenValue['modifiers']): ChalkInstance {
     if (modifiers === undefined) return c;

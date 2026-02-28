@@ -6,7 +6,7 @@ import { chalkStyle } from './style.js';
 
 export { nodeRuntime } from './runtime.js';
 export { nodeIO } from './io.js';
-export { chalkStyle } from './style.js';
+export { chalkStyle, type ChalkStyleOptions } from './style.js';
 
 export function createNodeContext(): BijouContext {
   const runtime = nodeRuntime();

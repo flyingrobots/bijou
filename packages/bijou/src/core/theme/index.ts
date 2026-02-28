@@ -42,6 +42,15 @@ export type { GradientTextOptions } from './gradient.js';
 export { fromDTCG, toDTCG } from './dtcg.js';
 export type { DTCGDocument, DTCGToken, DTCGGroup } from './dtcg.js';
 
+// Color downsampling
+export {
+  rgbToAnsi256,
+  nearestAnsi256,
+  rgbToAnsi16,
+  ansi256ToAnsi16,
+  type ColorLevel,
+} from './downsample.js';
+
 // Color manipulation
 export {
   hexToRgb,

@@ -15,7 +15,7 @@ npx tsx examples/spinner/main.ts
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { spinnerFrame, badge } from '@flyingrobots/bijou';
-import { run, quit, tick, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -36,9 +36,8 @@ const app: App<Model, Msg> = {
   ],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const key = (msg as KeyMsg).key;
-      if (key === 'q' || ((msg as KeyMsg).ctrl && key === 'c')) {
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
         return [model, [quit()]];
       }
     }
