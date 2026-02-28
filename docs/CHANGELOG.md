@@ -22,7 +22,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
-- 90 new tests across 2 new test files (1195 total)
+- 91 new tests across 2 new test files (1196 total)
 
 ### 📝 Documentation
 
