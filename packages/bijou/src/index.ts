@@ -136,6 +136,8 @@ export {
   type DagSource,
   type SlicedDagSource,
   type DagSliceOptions,
+  dagStats,
+  type DagStats,
 } from './core/components/index.js';
 
 // Forms
