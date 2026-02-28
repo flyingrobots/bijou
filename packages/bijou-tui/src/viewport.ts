@@ -183,6 +183,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
   let result = '';
   let collecting = false;
   let hasStyle = false;
+  let didBreakAtEnd = false;
 
   const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
 
@@ -223,6 +224,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
 
     if (visible >= endCol) {
       if (hasStyle) result += '\x1b[0m';
+      didBreakAtEnd = true;
       break;
     }
 
@@ -239,7 +241,7 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
     i += grapheme.length;
   }
 
-  if (collecting && hasStyle) result += '\x1b[0m';
+  if (collecting && hasStyle && !didBreakAtEnd) result += '\x1b[0m';
 
   return result;
 }
