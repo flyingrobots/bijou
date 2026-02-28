@@ -49,42 +49,122 @@ export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
 
+/**
+ * Compute the terminal display width of a string.
+ *
+ * Grapheme-cluster aware: handles emoji, CJK (2 columns), ZWJ sequences,
+ * skin tones, flag pairs, and combining marks correctly.
+ */
 export function visibleLength(str: string): number {
-  return stripAnsi(str).length;
+  const clean = stripAnsi(str);
+  if (clean.length === 0) return 0;
+  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+  let width = 0;
+  for (const { segment } of seg.segment(clean)) {
+    width += _graphemeClusterWidth(segment);
+  }
+  return width;
+}
+
+/**
+ * Returns the display width of a single grapheme cluster.
+ * Wide characters (CJK, emoji) are 2 columns; everything else is 1.
+ */
+function _graphemeClusterWidth(grapheme: string): number {
+  let maxWidth = 1;
+  for (const ch of grapheme) {
+    const cp = ch.codePointAt(0)!;
+    // Skip zero-width joiners and variation selectors
+    if (cp === 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0xE0100 && cp <= 0xE01EF)) {
+      continue;
+    }
+    if (_isWide(cp)) {
+      maxWidth = 2;
+      break;
+    }
+  }
+  return maxWidth;
+}
+
+/** Returns true if the code point occupies 2 terminal columns. */
+function _isWide(cp: number): boolean {
+  if (cp >= 0xFF01 && cp <= 0xFF60) return true;
+  if (cp >= 0xFFE0 && cp <= 0xFFE6) return true;
+  if (cp >= 0x2E80 && cp <= 0x2FDF) return true;
+  if (cp >= 0x3000 && cp <= 0x33FF) return true;
+  if (cp >= 0x3400 && cp <= 0x4DBF) return true;
+  if (cp >= 0x4E00 && cp <= 0x9FFF) return true;
+  if (cp >= 0xAC00 && cp <= 0xD7FF) return true;
+  if (cp >= 0xF900 && cp <= 0xFAFF) return true;
+  if (cp >= 0xFE30 && cp <= 0xFE4F) return true;
+  if (cp >= 0x20000 && cp <= 0x3FFFF) return true;
+  if (cp >= 0x1F300 && cp <= 0x1F9FF) return true;
+  if (cp >= 0x1FA00 && cp <= 0x1FA6F) return true;
+  if (cp >= 0x1FA70 && cp <= 0x1FAFF) return true;
+  if (cp >= 0x1F600 && cp <= 0x1F64F) return true;
+  if (cp >= 0x1F680 && cp <= 0x1F6FF) return true;
+  if (cp >= 0x2702 && cp <= 0x27B0) return true;
+  if (cp >= 0x1F1E0 && cp <= 0x1F1FF) return true;
+  if (cp >= 0x1F000 && cp <= 0x1F02F) return true;
+  return false;
 }
 
 /**
  * Clip a string to a maximum visible width, preserving ANSI escapes.
+ * Grapheme-cluster aware: won't split multi-codepoint sequences.
  * Appends a reset sequence if the string was clipped mid-style.
  */
 export function clipToWidth(str: string, maxWidth: number): string {
   let visible = 0;
   let result = '';
   let inEscape = false;
+  let escBuf = '';
 
-  for (let i = 0; i < str.length; i++) {
+  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+
+  // We need to iterate respecting both ANSI escapes and grapheme clusters.
+  // Strategy: scan character-by-character for ANSI escapes, and use the
+  // segmenter on the stripped content for width tracking.
+  let i = 0;
+  while (i < str.length) {
     const ch = str[i]!;
 
+    // ANSI escape start
     if (ch === '\x1b') {
       inEscape = true;
-      result += ch;
+      escBuf = ch;
+      i++;
       continue;
     }
 
     if (inEscape) {
-      result += ch;
-      if (ch === 'm') inEscape = false;
+      escBuf += ch;
+      if (ch === 'm') {
+        inEscape = false;
+        result += escBuf;
+        escBuf = '';
+      }
+      i++;
       continue;
     }
 
-    if (visible >= maxWidth) {
-      // Append reset in case we clipped inside a styled region
+    // Extract the grapheme cluster starting at position i
+    // Use the segmenter on the remaining string to get the next cluster
+    const remaining = str.slice(i);
+    const firstSeg = seg.segment(remaining)[Symbol.iterator]().next();
+    if (firstSeg.done) break;
+
+    const grapheme = firstSeg.value.segment;
+    const gWidth = _graphemeClusterWidth(grapheme);
+
+    if (visible + gWidth > maxWidth) {
       result += '\x1b[0m';
       break;
     }
 
-    result += ch;
-    visible++;
+    result += grapheme;
+    visible += gWidth;
+    i += grapheme.length;
   }
 
   return result;
@@ -93,58 +173,72 @@ export function clipToWidth(str: string, maxWidth: number): string {
 /**
  * Extract a visible-column substring from an ANSI-styled string.
  * Returns characters between visible columns [startCol, endCol).
- * Preserves any active ANSI styles seen before startCol.
+ * Grapheme-cluster aware. Preserves any active ANSI styles seen before startCol.
  */
 export function sliceAnsi(str: string, startCol: number, endCol: number): string {
   let visible = 0;
   let inEscape = false;
+  let escBuf = '';
   let activeAnsi = '';
   let result = '';
   let collecting = false;
   let hasStyle = false;
 
-  for (let i = 0; i < str.length; i++) {
+  const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+
+  let i = 0;
+  while (i < str.length) {
     const ch = str[i]!;
 
     if (ch === '\x1b') {
       inEscape = true;
-      if (collecting) {
-        result += ch;
-        hasStyle = true;
-      } else {
-        activeAnsi += ch;
-      }
+      escBuf = ch;
+      i++;
       continue;
     }
 
     if (inEscape) {
-      if (collecting) {
-        result += ch;
-      } else {
-        activeAnsi += ch;
+      escBuf += ch;
+      if (ch === 'm') {
+        inEscape = false;
+        if (collecting) {
+          result += escBuf;
+          hasStyle = true;
+        } else {
+          activeAnsi += escBuf;
+        }
+        escBuf = '';
       }
-      if (ch === 'm') inEscape = false;
+      i++;
       continue;
     }
+
+    // Extract next grapheme cluster
+    const remaining = str.slice(i);
+    const firstSeg = seg.segment(remaining)[Symbol.iterator]().next();
+    if (firstSeg.done) break;
+
+    const grapheme = firstSeg.value.segment;
+    const gWidth = _graphemeClusterWidth(grapheme);
 
     if (visible >= endCol) {
       if (hasStyle) result += '\x1b[0m';
       break;
     }
 
-    if (visible >= startCol) {
+    if (visible + gWidth > startCol) {
       if (!collecting) {
         collecting = true;
         result = activeAnsi;
         if (activeAnsi.length > 0) hasStyle = true;
       }
-      result += ch;
+      result += grapheme;
     }
 
-    visible++;
+    visible += gWidth;
+    i += grapheme.length;
   }
 
-  // Append reset if we reached end of string with an active style
   if (collecting && hasStyle) result += '\x1b[0m';
 
   return result;

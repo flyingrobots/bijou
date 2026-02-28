@@ -3,6 +3,7 @@ import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
 import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource } from './dag-source.js';
 import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
+import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -54,14 +55,24 @@ function resolveCtx(ctx?: BijouContext): BijouContext {
 }
 
 function visibleLength(str: string): number {
-  // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1b\[[0-9;]*m/g, '').length;
+  return graphemeWidth(str);
 }
 
 function truncateLabel(text: string, maxLen: number): string {
   if (maxLen <= 0) return '';
   if (visibleLength(text) <= maxLen) return text;
-  return text.slice(0, maxLen - 1) + '\u2026';
+  // Truncate by grapheme clusters, not code units
+  const clean = text.replace(/\x1b\[[0-9;]*m/g, '');
+  const graphemes = segmentGraphemes(clean);
+  let width = 0;
+  let result = '';
+  for (const g of graphemes) {
+    const gw = graphemeWidth(g);
+    if (width + gw > maxLen - 1) break;
+    result += g;
+    width += gw;
+  }
+  return result + '\u2026';
 }
 
 // ── Layout: Layer Assignment ───────────────────────────────────────
@@ -311,21 +322,19 @@ function renderNodeBox(
     content = tLabel + ' '.repeat(gap) + badgeText;
 
     // Build char-type map for mid line: border + pad + label + gap + badge + pad + border
-    // Use [...str].length (code points) instead of visibleLength (.length / UTF-16 code units)
-    // so that non-BMP characters (emoji) align with the [...line] iteration in the renderer.
+    // Use segmentGraphemes for correct grapheme cluster counting.
     midTypes = ['border']; // v
     midTypes.push('pad');  // space
-    for (let i = 0; i < [...tLabel].length; i++) midTypes.push('label');
+    for (let i = 0; i < segmentGraphemes(tLabel).length; i++) midTypes.push('label');
     for (let i = 0; i < gap; i++) midTypes.push('pad');
-    for (let i = 0; i < [...badgeText].length; i++) midTypes.push('badge');
+    for (let i = 0; i < segmentGraphemes(badgeText).length; i++) midTypes.push('badge');
   } else {
     content = truncateLabel(label, contentW);
 
     // Build char-type map for mid line: border + pad + label + pad + border
-    // Use [...str].length (code points) — see comment above.
     midTypes = ['border']; // v
     midTypes.push('pad');  // space
-    for (let i = 0; i < [...content].length; i++) midTypes.push('label');
+    for (let i = 0; i < segmentGraphemes(content).length; i++) midTypes.push('label');
   }
 
   const padRight = Math.max(0, contentW - visibleLength(content));
@@ -519,7 +528,7 @@ function renderInteractiveLayout(
       if (row >= gridRows) continue;
       const line = box.lines[lineIdx]!;
       const types = box.charTypes[lineIdx]!;
-      const chars = [...line];
+      const chars = segmentGraphemes(line);
       for (let ci = 0; ci < chars.length; ci++) {
         const gc = startCol + ci;
         if (gc < gridCols) {

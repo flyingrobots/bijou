@@ -72,6 +72,14 @@ export {
   desaturate,
 } from './core/theme/index.js';
 
+// Text / grapheme utilities
+export {
+  isWideChar,
+  segmentGraphemes,
+  graphemeClusterWidth,
+  graphemeWidth,
+} from './core/text/index.js';
+
 // Detection
 export { detectOutputMode, type OutputMode } from './core/detect/index.js';
 

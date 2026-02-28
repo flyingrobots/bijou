@@ -46,14 +46,14 @@ export interface FlexChild {
   readonly align?: 'start' | 'center' | 'end';
 }
 
+import { visibleLength, clipToWidth } from './viewport.js';
+
 // ---------------------------------------------------------------------------
 // ANSI helpers
 // ---------------------------------------------------------------------------
 
-const ANSI_RE = /\x1b\[[0-9;]*m/g;
-
 function visualWidth(s: string): number {
-  return s.replace(ANSI_RE, '').length;
+  return visibleLength(s);
 }
 
 // ---------------------------------------------------------------------------
@@ -187,38 +187,6 @@ function fitWidth(content: string, width: number, align: 'start' | 'center' | 'e
       }
     }
   });
-}
-
-function clipToWidth(str: string, maxWidth: number): string {
-  let visible = 0;
-  let result = '';
-  let inEscape = false;
-
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i]!;
-
-    if (ch === '\x1b') {
-      inEscape = true;
-      result += ch;
-      continue;
-    }
-
-    if (inEscape) {
-      result += ch;
-      if (ch === 'm') inEscape = false;
-      continue;
-    }
-
-    if (visible >= maxWidth) {
-      result += '\x1b[0m';
-      break;
-    }
-
-    result += ch;
-    visible++;
-  }
-
-  return result;
 }
 
 /**
