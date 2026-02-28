@@ -421,6 +421,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
 | ~~**`markdown()`**~~ | bijou | ✅ v0.9.0 — Terminal markdown renderer with headings, inline formatting, lists, code blocks, blockquotes, links, and mode degradation. |
 | ~~**`log()`**~~ | bijou | ✅ v0.7.0 — Leveled styled log output (debug/info/warn/error/fatal). |
+| **`canvas()` shader primitive** | bijou-tui | `(cols, rows, shader, time?) → string` character-grid renderer for procedural backgrounds (rain, plasma, spiral, starfield). Composes with `composite()` for layered rendering. |
+| **`box()` width override** | bijou | Optional `width` on `BoxOptions` to lock outer width for visual stability across state changes. Content right-padded or clipped via `clipToWidth()`. |
 
 ### P2.5 — Code quality & DX
 
@@ -461,3 +463,4 @@ Once published:
 | Phase 1h (confirm/input overlays) | `composite()`, `modal()` | ✅ Ready |
 | Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | ✅ Ready |
 | Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | ✅ Ready |
+| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | ⏳ Pending `canvas()` + `box()` width |
