@@ -23,8 +23,8 @@
     "prepack": "tsc -b",
     "lint": "tsc --noEmit"
   },
-  "dependencies": {
-    "@flyingrobots/bijou": "0.5.0"
+  "peerDependencies": {
+    "@flyingrobots/bijou": "^0.5.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
