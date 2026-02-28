@@ -27,30 +27,49 @@ import { createKeyMap, type KeyMap } from './keybindings.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** A single entry (file or directory) in the file picker listing. */
 export interface FileEntry {
+  /** Name of the file or directory (without trailing `/`). */
   name: string;
+  /** Whether this entry is a directory. */
   isDirectory: boolean;
 }
 
+/** Immutable state for the file picker widget. */
 export interface FilePickerState {
+  /** Current working directory being browsed. */
   readonly cwd: string;
+  /** Sorted entries in the current directory. */
   readonly entries: readonly FileEntry[];
+  /** Index of the currently focused entry. */
   readonly focusIndex: number;
+  /** Vertical scroll offset (first visible entry index). */
   readonly scrollY: number;
+  /** Maximum number of visible entries. */
   readonly height: number;
+  /** Optional file extension filter (e.g. `".ts"`). */
   readonly filter?: string;
 }
 
+/** Options for creating a new file picker state. */
 export interface FilePickerOptions {
+  /** Starting directory path. */
   readonly cwd: string;
+  /** IO port used for directory listing and path joining. */
   readonly io: IOPort;
+  /** Maximum number of visible entries (default: 10). */
   readonly height?: number;
+  /** Optional file extension filter (e.g. `".ts"`). */
   readonly filter?: string;
 }
 
+/** Options for rendering the file picker view. */
 export interface FilePickerRenderOptions {
+  /** Character(s) shown next to the focused entry (default: `"\u25b8"`). */
   readonly focusIndicator?: string;
+  /** Character(s) shown before directory names (default: `"d"`). */
   readonly dirIndicator?: string;
+  /** Character(s) shown before file names (default: `"-"`). */
   readonly fileIndicator?: string;
 }
 
@@ -61,6 +80,11 @@ export interface FilePickerRenderOptions {
 /**
  * Safely read and parse directory entries. Returns `[]` if the directory
  * is unreadable (permissions, missing, etc.) instead of throwing.
+ *
+ * @param io - IO port for filesystem access.
+ * @param cwd - Directory path to read.
+ * @param filter - Optional file extension filter.
+ * @returns Sorted array of file entries, or empty array on error.
  */
 function safeReadEntries(io: IOPort, cwd: string, filter?: string): FileEntry[] {
   try {
@@ -108,6 +132,9 @@ function parseEntries(names: string[], filter?: string): FileEntry[] {
  * Reads directory contents via `io.readDir()` and parses entries into
  * directories (trailing `/`) and files. Directories are sorted first,
  * then files, both alphabetically.
+ *
+ * @param options - Starting directory, IO port, height, and optional filter.
+ * @returns Fresh file picker state with focus on the first entry.
  */
 export function createFilePickerState(options: FilePickerOptions): FilePickerState {
   const height = Math.max(1, options.height ?? 10);
@@ -127,21 +154,37 @@ export function createFilePickerState(options: FilePickerOptions): FilePickerSta
 // State transformers
 // ---------------------------------------------------------------------------
 
-/** Move focus to the next entry (wraps around). */
+/**
+ * Move focus to the next entry (wraps around).
+ *
+ * @param state - Current file picker state.
+ * @returns Updated state with focus on the next entry.
+ */
 export function fpFocusNext(state: FilePickerState): FilePickerState {
   if (state.entries.length === 0) return state;
   const focusIndex = (state.focusIndex + 1) % state.entries.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.entries.length) };
 }
 
-/** Move focus to the previous entry (wraps around). */
+/**
+ * Move focus to the previous entry (wraps around).
+ *
+ * @param state - Current file picker state.
+ * @returns Updated state with focus on the previous entry.
+ */
 export function fpFocusPrev(state: FilePickerState): FilePickerState {
   if (state.entries.length === 0) return state;
   const focusIndex = (state.focusIndex - 1 + state.entries.length) % state.entries.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.entries.length) };
 }
 
-/** Enter the focused directory, refreshing the entry list. No-op on files. */
+/**
+ * Enter the focused directory, refreshing the entry list. No-op on files.
+ *
+ * @param state - Current file picker state.
+ * @param io - IO port for filesystem access.
+ * @returns Updated state browsing the focused directory, or unchanged if focused on a file.
+ */
 export function fpEnter(state: FilePickerState, io: IOPort): FilePickerState {
   if (state.entries.length === 0) return state;
   const entry = state.entries[state.focusIndex];
@@ -159,7 +202,13 @@ export function fpEnter(state: FilePickerState, io: IOPort): FilePickerState {
   };
 }
 
-/** Navigate to the parent directory. No-op at filesystem root. */
+/**
+ * Navigate to the parent directory. No-op at filesystem root.
+ *
+ * @param state - Current file picker state.
+ * @param io - IO port for filesystem access.
+ * @returns Updated state browsing the parent directory, or unchanged at root.
+ */
 export function fpBack(state: FilePickerState, io: IOPort): FilePickerState {
   const newCwd = io.joinPath(state.cwd, '..');
   if (newCwd === state.cwd) return state;
@@ -179,6 +228,15 @@ export function fpBack(state: FilePickerState, io: IOPort): FilePickerState {
 // Scroll helper
 // ---------------------------------------------------------------------------
 
+/**
+ * Clamp scroll position so the focused entry stays within the visible window.
+ *
+ * @param focusIndex - Index of the focused entry.
+ * @param scrollY - Current scroll offset.
+ * @param height - Viewport height in entries.
+ * @param totalItems - Total number of entries.
+ * @returns Adjusted scroll offset.
+ */
 function adjustScroll(focusIndex: number, scrollY: number, height: number, totalItems: number): number {
   let newScrollY = scrollY;
   if (focusIndex < newScrollY) {
@@ -199,6 +257,11 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
  *
  * Each entry is prefixed with a focus indicator and a type indicator
  * (directory or file). Directories are suffixed with `/`.
+ */
+/**
+ * @param state - Current file picker state.
+ * @param options - Rendering options (focus, dir, and file indicators).
+ * @returns Rendered file picker string with cwd header and entry list.
  */
 export function filePicker(state: FilePickerState, options?: FilePickerRenderOptions): string {
   const indicator = options?.focusIndicator ?? '\u25b8';
@@ -245,6 +308,11 @@ export function filePicker(state: FilePickerState, options?: FilePickerRenderOpt
  *   quit: { type: 'quit' },
  * });
  * ```
+ */
+/**
+ * @template Msg - Application message type dispatched by key bindings.
+ * @param actions - Map of navigation and action messages.
+ * @returns Preconfigured key map with vim-style file picker bindings.
  */
 export function filePickerKeyMap<Msg>(actions: {
   focusNext: Msg;

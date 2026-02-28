@@ -24,6 +24,7 @@ import { parseKey } from './keys.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** A single step in a scripted key sequence. */
 export interface ScriptStep {
   /** Key to send (raw terminal key string, e.g., 'a', '\x1b[A', '\x03'). */
   key: string;
@@ -31,11 +32,17 @@ export interface ScriptStep {
   delay?: number;
 }
 
+/** Options for {@link runScript}, extending the base {@link RunOptions}. */
 export interface RunScriptOptions extends RunOptions {
   /** Capture each rendered frame. */
   onFrame?: (frame: string, index: number) => void;
 }
 
+/**
+ * Result returned by {@link runScript} after all steps have been processed.
+ *
+ * @template Model - The application model type.
+ */
 export interface RunScriptResult<Model> {
   /** Final model state after all steps. */
   model: Model;
@@ -65,6 +72,13 @@ export interface RunScriptResult<Model> {
  * Commands that use `setTimeout`, real I/O, or other macrotask-based async
  * may not have completed before the next key is dispatched. Use `delay`
  * on subsequent steps to allow time for macrotask-based commands.
+ *
+ * @template Model - The application model type.
+ * @template M     - The message (action) type for the TEA update cycle.
+ * @param app     - The TEA application definition (init, update, view).
+ * @param steps   - Ordered key events to feed into the app.
+ * @param options - Optional callbacks and runtime configuration.
+ * @returns The final model, all rendered frames, and elapsed time.
  */
 export async function runScript<Model, M>(
   app: App<Model, M>,

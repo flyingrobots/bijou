@@ -56,21 +56,31 @@ export type Position =
 
 /** Spring track configuration. */
 export interface SpringTrackDef {
+  /** Animation type (defaults to `'spring'` when omitted). */
   readonly type?: 'spring';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Spring physics parameters or a named preset. */
   readonly spring?: Partial<SpringConfig> | SpringPreset;
 }
 
 /** Tween track configuration. */
 export interface TweenTrackDef {
+  /** Animation type -- must be `'tween'`. */
   readonly type: 'tween';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Duration in milliseconds. */
   readonly duration: number;
+  /** Easing function (defaults to `easeOutCubic`). */
   readonly ease?: EasingFn;
 }
 
+/** Discriminated union of spring and tween track definitions. */
 export type TrackDef = SpringTrackDef | TweenTrackDef;
 
 /** Opaque timeline state — pass between step() calls. */
@@ -81,13 +91,22 @@ export interface TimelineState {
   readonly tracks: Readonly<Record<string, TrackState>>;
 }
 
-/** @internal */
+/**
+ * Per-track animation state stored inside `TimelineState`.
+ * @internal
+ */
 interface TrackState {
+  /** Animation engine type. */
   readonly type: 'spring' | 'tween';
+  /** Whether the track has received its first step. */
   readonly started: boolean;
+  /** Spring-specific simulation state (present when `type === 'spring'`). */
   readonly spring?: SpringState;
+  /** Tween-specific simulation state (present when `type === 'tween'`). */
   readonly tween?: TweenState;
+  /** Current interpolated value. */
   readonly currentValue: number;
+  /** Whether the track has settled at its target. */
   readonly done: boolean;
 }
 
@@ -95,20 +114,39 @@ interface TrackState {
 // Internal: resolved track/callback/label
 // ---------------------------------------------------------------------------
 
+/**
+ * Fully resolved track after position resolution and duration estimation.
+ * @internal
+ */
 interface ResolvedTrack {
+  /** Track identifier. */
   readonly name: string;
+  /** Absolute start time in milliseconds. */
   readonly startMs: number;
+  /** Estimated duration in milliseconds. */
   readonly estimatedDurationMs: number;
+  /** Animation engine type. */
   readonly trackType: 'spring' | 'tween';
+  /** Starting value. */
   readonly from: number;
+  /** Target value. */
   readonly to: number;
+  /** Spring physics config (present when `trackType === 'spring'`). */
   readonly springConfig?: SpringConfig;
+  /** Tween duration in ms (present when `trackType === 'tween'`). */
   readonly tweenDuration?: number;
+  /** Tween easing function (present when `trackType === 'tween'`). */
   readonly tweenEase?: EasingFn;
 }
 
+/**
+ * Callback trigger resolved to an absolute time.
+ * @internal
+ */
 interface ResolvedCallback {
+  /** Callback identifier. */
   readonly name: string;
+  /** Absolute trigger time in milliseconds. */
   readonly atMs: number;
 }
 
@@ -116,6 +154,14 @@ interface ResolvedCallback {
 // Spring duration estimation
 // ---------------------------------------------------------------------------
 
+/**
+ * Estimate how long a spring animation takes to settle by simulating it.
+ *
+ * @param from - Starting value.
+ * @param to - Target value.
+ * @param config - Spring physics configuration.
+ * @returns Estimated duration in milliseconds (capped at 30 seconds).
+ */
 function estimateSpringDuration(
   from: number,
   to: number,
@@ -136,12 +182,27 @@ function estimateSpringDuration(
 // Position parsing
 // ---------------------------------------------------------------------------
 
+/**
+ * Tracks the cursor position while resolving timeline entry positions.
+ * @internal
+ */
 interface CursorInfo {
+  /** Start time of the previous track or callback in milliseconds. */
   prevStartMs: number;
+  /** End time of the previous track or callback in milliseconds. */
   prevEndMs: number;
+  /** Map of label names to their resolved times. */
   labels: ReadonlyMap<string, number>;
 }
 
+/**
+ * Resolve a position specifier to an absolute time in milliseconds.
+ *
+ * @param pos - Position specifier (number, relative offset, or label reference).
+ * @param cursor - Current cursor info with previous start/end and known labels.
+ * @returns Absolute time in milliseconds.
+ * @throws Error if the position references an unknown label or has invalid syntax.
+ */
 function resolvePosition(
   pos: Position | undefined,
   cursor: CursorInfo,
@@ -202,11 +263,16 @@ function resolvePosition(
 // Builder
 // ---------------------------------------------------------------------------
 
+/**
+ * Discriminated union of entries accumulated by the timeline builder.
+ * @internal
+ */
 type BuilderEntry =
   | { kind: 'track'; name: string; def: TrackDef; position?: Position }
   | { kind: 'label'; name: string }
   | { kind: 'call'; name: string; position?: Position };
 
+/** Fluent builder for constructing a timeline definition. */
 export interface TimelineBuilder {
   /**
    * Add an animation track.
@@ -313,6 +379,14 @@ export function timeline(): TimelineBuilder {
 // Compilation: resolve positions, estimate durations
 // ---------------------------------------------------------------------------
 
+/**
+ * Compile builder entries into an immutable Timeline object.
+ *
+ * Resolves all positions, estimates durations, and sorts callbacks.
+ *
+ * @param entries - Accumulated builder entries (tracks, labels, callbacks).
+ * @returns Compiled Timeline with init, step, values, done, and firedCallbacks.
+ */
 function compile(entries: BuilderEntry[]): Timeline {
   const tracks: ResolvedTrack[] = [];
   const callbacks: ResolvedCallback[] = [];

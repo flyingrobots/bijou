@@ -17,6 +17,9 @@
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Configuration for the flex layout container.
+ */
 export interface FlexOptions {
   /** Layout direction. Default: 'row'. */
   readonly direction?: 'row' | 'column';
@@ -28,6 +31,9 @@ export interface FlexOptions {
   readonly gap?: number;
 }
 
+/**
+ * Descriptor for a single child within a flex layout.
+ */
 export interface FlexChild {
   /**
    * Content to render. Either a static string, or a function that
@@ -52,6 +58,12 @@ import { visibleLength, clipToWidth } from './viewport.js';
 // ANSI helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Compute the terminal display width of a string.
+ *
+ * @param s - Input string possibly containing ANSI escapes.
+ * @returns Number of visible terminal columns.
+ */
 function visualWidth(s: string): number {
   return visibleLength(s);
 }
@@ -60,12 +72,31 @@ function visualWidth(s: string): number {
 // Size computation
 // ---------------------------------------------------------------------------
 
+/**
+ * Internal representation of a child after size allocation.
+ */
 interface ResolvedChild {
+  /** Allocated size along the main axis. */
   allocatedSize: number;
+  /** Available size along the cross axis. */
   crossSize: number;
+  /** Original child descriptor. */
   child: FlexChild;
 }
 
+/**
+ * Distribute available main-axis space among children.
+ *
+ * Fixed-size children (basis or auto-measured) consume space first,
+ * then remaining space is divided proportionally among flex children.
+ *
+ * @param children - Child descriptors to allocate sizes for.
+ * @param mainAxisTotal - Total available size along the main axis.
+ * @param crossAxisTotal - Total available size along the cross axis.
+ * @param gap - Gap size between children on the main axis.
+ * @param isRow - True for row direction (main axis = width), false for column.
+ * @returns Resolved children with allocated sizes.
+ */
 function computeSizes(
   children: FlexChild[],
   mainAxisTotal: number,
@@ -119,6 +150,14 @@ function computeSizes(
   }));
 }
 
+/**
+ * Clamp a size value within optional min/max bounds, flooring at 0.
+ *
+ * @param size - Raw size value.
+ * @param min - Minimum allowed size (inclusive).
+ * @param max - Maximum allowed size (inclusive).
+ * @returns Clamped size, never negative.
+ */
 function clampSize(size: number, min?: number, max?: number): number {
   let result = size;
   if (min !== undefined) result = Math.max(result, min);
@@ -126,6 +165,15 @@ function clampSize(size: number, min?: number, max?: number): number {
   return Math.max(0, result);
 }
 
+/**
+ * Measure the intrinsic size of static content along the main axis.
+ *
+ * Return 0 for render functions (they must use flex or basis).
+ *
+ * @param content - Static string or render function.
+ * @param isRow - True to measure width, false to measure height.
+ * @returns Measured size in the main-axis direction.
+ */
 function measureContent(
   content: string | ((width: number, height: number) => string),
   isRow: boolean,
@@ -147,6 +195,14 @@ function measureContent(
 // Rendering
 // ---------------------------------------------------------------------------
 
+/**
+ * Render a child's content, invoking its render function if applicable.
+ *
+ * @param child - Child descriptor whose content to render.
+ * @param width - Allocated width in columns.
+ * @param height - Allocated height in rows.
+ * @returns Rendered content string.
+ */
 function renderContent(
   child: FlexChild,
   width: number,
@@ -159,8 +215,14 @@ function renderContent(
 }
 
 /**
- * Clip/pad each content line to exact width. Does NOT pad height —
- * that's handled by alignCross.
+ * Clip or pad each content line to an exact visible width.
+ *
+ * Does NOT pad height -- that is handled by {@link alignCross}.
+ *
+ * @param content - Rendered content string (newline-delimited).
+ * @param width - Target visible width in columns.
+ * @param align - Horizontal alignment for lines shorter than width. Default: 'start'.
+ * @returns Array of lines, each exactly `width` visible columns wide.
  */
 function fitWidth(content: string, width: number, align: 'start' | 'center' | 'end' = 'start'): string[] {
   const lines = content.split('\n');
@@ -190,7 +252,15 @@ function fitWidth(content: string, width: number, align: 'start' | 'center' | 'e
 }
 
 /**
- * Align content lines along the cross axis.
+ * Align content lines along the cross axis by padding with empty lines.
+ *
+ * Truncate if content exceeds `totalCrossSize`; pad otherwise.
+ *
+ * @param lines - Rendered lines to align.
+ * @param totalCrossSize - Total cross-axis size (rows for row layout, columns for column).
+ * @param align - Cross-axis alignment ('start', 'center', or 'end').
+ * @param width - Width of each empty padding line.
+ * @returns Array of exactly `totalCrossSize` lines.
  */
 function alignCross(
   lines: string[],
@@ -244,6 +314,10 @@ function alignCross(
  *   { basis: 1, content: statusLine },
  * )
  * ```
+ *
+ * @param options - Layout container configuration (direction, dimensions, gap).
+ * @param children - Child descriptors with content, flex factors, and constraints.
+ * @returns Composed layout string with lines joined by newlines. Empty string if no children.
  */
 export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const { direction = 'row' } = options;
@@ -265,6 +339,14 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   return renderColumn(resolved, width, height, gap);
 }
 
+/**
+ * Compose resolved children side-by-side in a horizontal row layout.
+ *
+ * @param items - Resolved children with allocated widths.
+ * @param totalHeight - Total available height in rows.
+ * @param gap - Horizontal gap between children in columns.
+ * @returns Composed row string with lines joined by newlines.
+ */
 function renderRow(
   items: ResolvedChild[],
   totalHeight: number,
@@ -295,6 +377,15 @@ function renderRow(
   return rows.join('\n');
 }
 
+/**
+ * Stack resolved children vertically in a column layout.
+ *
+ * @param items - Resolved children with allocated heights.
+ * @param totalWidth - Total available width in columns.
+ * @param totalHeight - Total available height in rows.
+ * @param gap - Vertical gap between children in rows.
+ * @returns Composed column string with lines joined by newlines.
+ */
 function renderColumn(
   items: ResolvedChild[],
   totalWidth: number,

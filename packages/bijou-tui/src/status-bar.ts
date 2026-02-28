@@ -12,12 +12,19 @@ import { visibleLength, clipToWidth } from './viewport.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** Options for rendering a status bar. */
 export interface StatusBarOptions {
+  /** Content aligned to the left edge. */
   readonly left?: string;
+  /** Content centered in the bar. */
   readonly center?: string;
+  /** Content aligned to the right edge. */
   readonly right?: string;
+  /** Total width of the bar in columns. */
   readonly width: number;
+  /** Character used to fill empty space (default: `' '`). */
   readonly fillChar?: string;
+  /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
 }
 
@@ -25,6 +32,15 @@ export interface StatusBarOptions {
 // statusBar()
 // ---------------------------------------------------------------------------
 
+/**
+ * Render a single-line status bar with left, center, and right sections.
+ *
+ * Layout priority: left > right > center. On overlap, center is truncated
+ * first, then right. Sections may contain ANSI escape codes.
+ *
+ * @param options - Bar content, width, fill character, and context.
+ * @returns Rendered status bar string of exactly `width` visible characters.
+ */
 export function statusBar(options: StatusBarOptions): string {
   const {
     left = '',

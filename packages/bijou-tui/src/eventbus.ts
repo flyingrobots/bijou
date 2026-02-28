@@ -34,9 +34,20 @@ import { parseKey, parseMouse } from './keys.js';
 // Types
 // ---------------------------------------------------------------------------
 
-/** Any message the bus can carry — built-in or app-defined. */
+/**
+ * Union of all message types the bus can carry — built-in key, resize,
+ * mouse messages plus any app-defined custom message type.
+ *
+ * @template M - Application-defined custom message type.
+ */
 export type BusMsg<M> = KeyMsg | ResizeMsg | MouseMsg | M;
 
+/**
+ * Centralized event bus that unifies all input sources into a single
+ * typed event stream for TEA applications.
+ *
+ * @template M - Application-defined custom message type.
+ */
 export interface EventBus<M> {
   /**
    * Subscribe to all events. Returns a dispose function.
@@ -77,7 +88,9 @@ export interface EventBus<M> {
   dispose(): void;
 }
 
+/** Handle for unsubscribing or disconnecting a resource. */
 interface Disposable {
+  /** Remove the subscription or disconnect the resource. */
   dispose(): void;
 }
 
@@ -85,6 +98,15 @@ interface Disposable {
 // Implementation
 // ---------------------------------------------------------------------------
 
+/**
+ * Create a new event bus.
+ *
+ * Return an {@link EventBus} that manages subscribers, I/O connections,
+ * command execution, and quit signaling for a TEA runtime.
+ *
+ * @template M - Application-defined custom message type.
+ * @returns A new event bus instance.
+ */
 export function createEventBus<M>(): EventBus<M> {
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();

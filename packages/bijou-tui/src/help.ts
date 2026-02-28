@@ -20,6 +20,7 @@ import { formatKeyCombo } from './keybindings.js';
 
 /** Anything that can list its bindings (satisfied by KeyMap). */
 export interface BindingSource {
+  /** Return all registered key bindings. */
   bindings(): readonly BindingInfo[];
 }
 
@@ -27,12 +28,13 @@ export interface BindingSource {
 // Types
 // ---------------------------------------------------------------------------
 
+/** Options for rendering help views. */
 export interface HelpOptions {
   /** Only show enabled bindings (default: true). */
   enabledOnly?: boolean;
   /** Filter to bindings in groups matching this prefix. */
   groupFilter?: string;
-  /** Separator between key and description (default: "  "). */
+  /** Separator between key and description (default: `"  "`). */
   separator?: string;
   /** Title shown at the top (default: none). */
   title?: string;
@@ -54,6 +56,11 @@ export interface HelpOptions {
  *   q  Quit
  *   ?  Toggle help
  * ```
+ */
+/**
+ * @param keymap - Source of key binding information.
+ * @param options - Filtering, formatting, and title options.
+ * @returns Multi-line help text grouped by binding group.
  */
 export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   const enabledOnly = options?.enabledOnly ?? true;
@@ -116,6 +123,11 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
  * q Quit • j Down • k Up • ? Help
  * ```
  */
+/**
+ * @param keymap - Source of key binding information.
+ * @param options - Optional filtering by enabled state or group prefix.
+ * @returns Single-line help string with keys and descriptions separated by bullets.
+ */
 export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'enabledOnly' | 'groupFilter'>): string {
   const enabledOnly = options?.enabledOnly ?? true;
   const groupFilter = options?.groupFilter;
@@ -135,6 +147,11 @@ export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'en
 
 /**
  * Filter help to a specific group (convenience wrapper).
+ *
+ * @param keymap - Source of key binding information.
+ * @param groupPrefix - Group name prefix to filter on (case-insensitive).
+ * @param options - Additional formatting options forwarded to `helpView`.
+ * @returns Filtered multi-line help text.
  */
 export function helpFor(keymap: BindingSource, groupPrefix: string, options?: HelpOptions): string {
   return helpView(keymap, { ...options, groupFilter: groupPrefix });

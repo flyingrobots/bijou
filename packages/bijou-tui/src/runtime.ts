@@ -26,6 +26,11 @@ const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
  *
  * All input sources (keyboard, resize, commands) are unified through an
  * internal EventBus — a single subscription drives the update cycle.
+ *
+ * @template Model - The application model type.
+ * @template M     - The message (action) type for the TEA update cycle.
+ * @param app     - The TEA application definition (init, update, view).
+ * @param options - Optional runtime configuration (context, alt screen, cursor, mouse).
  */
 export async function run<Model, M>(
   app: App<Model, M>,

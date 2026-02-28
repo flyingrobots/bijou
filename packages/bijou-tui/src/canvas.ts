@@ -25,6 +25,9 @@ export type ShaderFn = (
   time: number,
 ) => string;
 
+/**
+ * Options for the {@link canvas} renderer.
+ */
 export interface CanvasOptions {
   /** Animation time value passed to the shader. Default: 0. */
   time?: number;
@@ -34,10 +37,16 @@ export interface CanvasOptions {
 
 /**
  * Render a character grid by calling `shader(x, y, cols, rows, time)` for
- * every cell. Returns a string of exactly `rows` lines, each `cols` chars wide.
+ * every cell. Return a string of exactly `rows` lines, each `cols` chars wide.
  *
- * In pipe or accessible mode, returns empty string (no visual noise).
- * Returns empty string when cols or rows are ≤ 0.
+ * In pipe or accessible mode, return empty string (no visual noise).
+ * Return empty string when cols or rows are <= 0.
+ *
+ * @param cols - Number of columns (grid width).
+ * @param rows - Number of rows (grid height).
+ * @param shader - Function called once per cell to produce a character.
+ * @param options - Optional canvas settings (time, context).
+ * @returns Rendered grid string with lines joined by newlines, or empty string.
  */
 export function canvas(
   cols: number,

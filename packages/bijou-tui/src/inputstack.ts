@@ -31,15 +31,24 @@
 
 /**
  * Anything that can handle an input message and optionally return an action.
- * Return `undefined` to indicate "not handled" (pass through).
  *
- * `KeyMap<A>.handle()` already satisfies this interface.
+ * Return `undefined` to indicate "not handled" (pass through).
+ * {@link KeyMap}.handle() already satisfies this interface.
+ *
+ * @template Msg - Input message type.
+ * @template A - Action type returned on match.
  */
 export interface InputHandler<Msg, A> {
+  /**
+   * Attempt to handle the given message.
+   *
+   * @param msg - Input message to handle.
+   * @returns The matched action, or `undefined` if not handled.
+   */
   handle(msg: Msg): A | undefined;
 }
 
-/** Options when pushing a layer onto the stack. */
+/** Configuration options when pushing a layer onto the stack. */
 export interface LayerOptions {
   /**
    * When true, unhandled events pass through to layers below even
@@ -52,14 +61,22 @@ export interface LayerOptions {
   name?: string;
 }
 
-/** Read-only info about a layer in the stack. */
+/** Read-only snapshot of a layer's metadata. */
 export interface LayerInfo {
+  /** Unique identifier assigned when the layer was pushed. */
   readonly id: number;
+  /** Layer name (empty string if unnamed). */
   readonly name: string;
+  /** Whether unhandled events pass through to layers below. */
   readonly passthrough: boolean;
 }
 
-/** The input stack. */
+/**
+ * Stack-based input dispatcher for layered TUI input handling.
+ *
+ * @template Msg - Input message type dispatched through the stack.
+ * @template A - Action type returned when a handler matches.
+ */
 export interface InputStack<Msg, A> {
   /**
    * Push a handler onto the top of the stack.
@@ -94,13 +111,34 @@ export interface InputStack<Msg, A> {
 // Implementation
 // ---------------------------------------------------------------------------
 
+/**
+ * Internal layer entry stored in the stack.
+ *
+ * @template Msg - Input message type.
+ * @template A - Action type returned on match.
+ */
 interface Layer<Msg, A> {
+  /** Unique identifier assigned at push time. */
   readonly id: number;
+  /** Handler that processes input messages for this layer. */
   readonly handler: InputHandler<Msg, A>;
+  /** Whether unhandled events pass through to layers below. */
   readonly passthrough: boolean;
+  /** Layer name for debugging (empty string if unnamed). */
   readonly name: string;
 }
 
+/**
+ * Create a new empty input stack.
+ *
+ * Return an {@link InputStack} that dispatches input messages top-down
+ * through a stack of handlers. Layers can be opaque (swallowing unmatched
+ * events) or passthrough (letting them fall to lower layers).
+ *
+ * @template Msg - Input message type dispatched through the stack.
+ * @template A - Action type returned when a handler matches.
+ * @returns A new empty input stack.
+ */
 export function createInputStack<Msg, A>(): InputStack<Msg, A> {
   const stack: Layer<Msg, A>[] = [];
   let nextId = 1;

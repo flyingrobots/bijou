@@ -1,3 +1,12 @@
+/**
+ * bijou-tui — TEA-based terminal UI framework.
+ *
+ * Re-export all public types, functions, and constants from the bijou-tui
+ * package. Import from `@flyingrobots/bijou-tui` for the full API.
+ *
+ * @module
+ */
+
 // Types
 export type { App, Cmd, KeyMsg, ResizeMsg, MouseMsg, MouseButton, MouseAction, QuitSignal, RunOptions } from './types.js';
 export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';

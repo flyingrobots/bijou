@@ -30,58 +30,132 @@ import type { InputHandler } from './inputstack.js';
 
 /** A parsed key descriptor: the key name + modifier flags. */
 export interface KeyCombo {
+  /** Key name (e.g. `"q"`, `"enter"`, `"tab"`). */
   readonly key: string;
+  /** Whether the Ctrl modifier is required. */
   readonly ctrl: boolean;
+  /** Whether the Alt modifier is required. */
   readonly alt: boolean;
+  /** Whether the Shift modifier is required. */
   readonly shift: boolean;
 }
 
-/** A single registered binding. */
+/**
+ * A single registered binding associating a key combo with an action.
+ *
+ * @template A - Action type returned when this binding matches.
+ */
 export interface Binding<A> {
+  /** Key combination that triggers this binding. */
   readonly combo: KeyCombo;
+  /** Human-readable description for help text. */
   readonly description: string;
+  /** Group name this binding belongs to (empty string if ungrouped). */
   readonly group: string;
+  /** Action to return when this binding matches. */
   readonly action: A;
+  /** Whether this binding is currently active. */
   enabled: boolean;
 }
 
-/** Read-only view of a binding for help generation. */
+/** Read-only view of a binding for help generation and introspection. */
 export interface BindingInfo {
+  /** Key combination that triggers this binding. */
   readonly combo: KeyCombo;
+  /** Human-readable description for help text. */
   readonly description: string;
+  /** Group name this binding belongs to. */
   readonly group: string;
+  /** Whether this binding is currently active. */
   readonly enabled: boolean;
 }
 
-/** The keybinding manager. */
+/**
+ * The keybinding manager.
+ *
+ * Provide a fluent API for registering key bindings, matching incoming
+ * key events, and managing binding state at runtime.
+ *
+ * @template A - Action type returned when a binding matches.
+ */
 export interface KeyMap<A> extends InputHandler<KeyMsg, A> {
-  /** Register a binding. `key` is a descriptor like `"q"`, `"ctrl+c"`, `"shift+tab"`. */
+  /**
+   * Register a binding. `key` is a descriptor like `"q"`, `"ctrl+c"`, `"shift+tab"`.
+   *
+   * @param key - Key descriptor string.
+   * @param description - Human-readable description for help text.
+   * @param action - Action to return when this binding matches.
+   * @returns This key map for chaining.
+   */
   bind(key: string, description: string, action: A): KeyMap<A>;
 
-  /** Register bindings under a named group. */
+  /**
+   * Register bindings under a named group.
+   *
+   * @param name - Group name for categorizing bindings.
+   * @param fn - Builder callback receiving a scoped group builder.
+   * @returns This key map for chaining.
+   */
   group(name: string, fn: (g: KeyMapGroup<A>) => KeyMapGroup<A>): KeyMap<A>;
 
-  /** Match a KeyMsg and return its action, or undefined if no match. */
+  /**
+   * Match a {@link KeyMsg} and return its action, or `undefined` if no match.
+   *
+   * @param msg - Incoming key message to match against registered bindings.
+   * @returns The matched action, or `undefined` if no enabled binding matches.
+   */
   handle(msg: KeyMsg): A | undefined;
 
-  /** Enable bindings whose description matches the predicate. */
+  /**
+   * Enable bindings whose description matches the predicate.
+   *
+   * @param predicate - Description string for exact match, or a filter function.
+   */
   enable(predicate: string | ((b: BindingInfo) => boolean)): void;
 
-  /** Disable bindings whose description matches the predicate. */
+  /**
+   * Disable bindings whose description matches the predicate.
+   *
+   * @param predicate - Description string for exact match, or a filter function.
+   */
   disable(predicate: string | ((b: BindingInfo) => boolean)): void;
 
-  /** Enable all bindings in a group. */
+  /**
+   * Enable all bindings in a group.
+   *
+   * @param group - Group name to enable.
+   */
   enableGroup(group: string): void;
 
-  /** Disable all bindings in a group. */
+  /**
+   * Disable all bindings in a group.
+   *
+   * @param group - Group name to disable.
+   */
   disableGroup(group: string): void;
 
-  /** Return all bindings (for help generation). */
+  /**
+   * Return a snapshot of all bindings for help generation.
+   *
+   * @returns Read-only array of binding info objects.
+   */
   bindings(): readonly BindingInfo[];
 }
 
-/** Group builder — same as KeyMap but scoped to a group name. */
+/**
+ * Group builder — same as KeyMap but scoped to a group name.
+ *
+ * @template A - Action type returned when a binding matches.
+ */
 export interface KeyMapGroup<A> {
+  /**
+   * Register a binding within this group.
+   *
+   * @param key - Key descriptor string (e.g. `"j"`, `"ctrl+c"`).
+   * @param description - Human-readable description for help text.
+   * @param action - Action to return when this binding matches.
+   * @returns This group builder for chaining.
+   */
   bind(key: string, description: string, action: A): KeyMapGroup<A>;
 }
 
@@ -90,9 +164,13 @@ export interface KeyMapGroup<A> {
 // ---------------------------------------------------------------------------
 
 /**
- * Parse a key descriptor string into a KeyCombo.
+ * Parse a key descriptor string into a {@link KeyCombo}.
  *
  * Examples: `"q"`, `"ctrl+c"`, `"alt+shift+tab"`, `"enter"`, `"space"`
+ *
+ * @param descriptor - Key descriptor string with optional modifier prefixes.
+ * @returns Parsed key combo with key name and modifier flags.
+ * @throws {Error} If a modifier is duplicated, unknown, or the key part is empty.
  */
 export function parseKeyCombo(descriptor: string): KeyCombo {
   // Lowercase the entire descriptor for consistency with parseKey(), which always
@@ -130,9 +208,13 @@ export function parseKeyCombo(descriptor: string): KeyCombo {
 }
 
 /**
- * Format a KeyCombo back into a human-readable string.
+ * Format a {@link KeyCombo} back into a human-readable string.
  *
+ * Capitalize modifier names and multi-character key names.
  * Examples: `"Ctrl+c"`, `"q"`, `"Shift+Tab"`
+ *
+ * @param combo - Key combo to format.
+ * @returns Human-readable key string.
  */
 export function formatKeyCombo(combo: KeyCombo): string {
   const parts: string[] = [];
@@ -153,6 +235,13 @@ export function formatKeyCombo(combo: KeyCombo): string {
 // Matching
 // ---------------------------------------------------------------------------
 
+/**
+ * Test whether a key combo matches a key message exactly.
+ *
+ * @param combo - Registered key combo to match against.
+ * @param msg - Incoming key message from the terminal.
+ * @returns `true` if all key name and modifier flags match.
+ */
 function matches(combo: KeyCombo, msg: KeyMsg): boolean {
   return (
     combo.key === msg.key &&
@@ -166,8 +255,19 @@ function matches(combo: KeyCombo, msg: KeyMsg): boolean {
 // Implementation
 // ---------------------------------------------------------------------------
 
+/** Group name used for bindings registered outside any named group. */
 const DEFAULT_GROUP = '';
 
+/**
+ * Create a new keybinding manager.
+ *
+ * Return a fluent {@link KeyMap} that registers key bindings, matches
+ * incoming {@link KeyMsg} events, and supports runtime enable/disable
+ * of individual bindings or groups.
+ *
+ * @template A - Action type returned when a binding matches.
+ * @returns A new empty key map.
+ */
 export function createKeyMap<A>(): KeyMap<A> {
   const allBindings: Binding<A>[] = [];
   let currentGroup = DEFAULT_GROUP;

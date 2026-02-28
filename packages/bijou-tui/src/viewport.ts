@@ -11,6 +11,9 @@ import { graphemeWidth, graphemeClusterWidth, segmentGraphemes, clipToWidth as c
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Configuration for rendering a scrollable viewport window.
+ */
 export interface ViewportOptions {
   /** Visible width in columns. Content lines longer than this are clipped. */
   readonly width: number;
@@ -26,6 +29,9 @@ export interface ViewportOptions {
   readonly showScrollbar?: boolean;
 }
 
+/**
+ * Immutable snapshot of scroll position and bounds for a viewport.
+ */
 export interface ScrollState {
   /** Current vertical scroll offset. */
   readonly y: number;
@@ -45,8 +51,15 @@ export interface ScrollState {
 // ANSI helpers
 // ---------------------------------------------------------------------------
 
+/** Pattern matching SGR-style ANSI escape sequences. */
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
 
+/**
+ * Strip all SGR ANSI escape sequences from a string.
+ *
+ * @param str - Input string possibly containing ANSI escapes.
+ * @returns Plain text with all ANSI color/style sequences removed.
+ */
 export function stripAnsi(str: string): string {
   return str.replace(ANSI_RE, '');
 }
@@ -72,11 +85,16 @@ export const clipToWidth = coreClipToWidth;
 
 /**
  * Extract a visible-column substring from an ANSI-styled string.
- * Returns characters between visible columns [startCol, endCol).
- * Grapheme-cluster aware. Preserves any active ANSI styles seen before startCol.
+ * Return characters between visible columns [startCol, endCol).
+ * Grapheme-cluster aware. Preserve any active ANSI styles seen before startCol.
  *
- * O(n): pre-segments stripped text once, then walks the original string
+ * O(n): pre-segment stripped text once, then walk the original string
  * with a grapheme pointer instead of re-segmenting per character.
+ *
+ * @param str - ANSI-styled input string.
+ * @param startCol - Start visible column (inclusive, 0-based).
+ * @param endCol - End visible column (exclusive).
+ * @returns Substring spanning the requested visible columns with ANSI styles preserved.
  */
 export function sliceAnsi(str: string, startCol: number, endCol: number): string {
   const stripped = stripAnsi(str);
@@ -154,9 +172,23 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
 // Scrollbar rendering
 // ---------------------------------------------------------------------------
 
+/** Character used for the scrollbar track (unfilled portion). */
 const SCROLLBAR_TRACK = '│';
+
+/** Character used for the scrollbar thumb (filled portion). */
 const SCROLLBAR_THUMB = '█';
 
+/**
+ * Render a vertical scrollbar as an array of single-character strings.
+ *
+ * Thumb size is proportional to the visible fraction of content.
+ * Return an array of spaces when all content fits within the viewport.
+ *
+ * @param viewportHeight - Height of the viewport in rows.
+ * @param totalLines - Total number of content lines.
+ * @param scrollY - Current vertical scroll offset.
+ * @returns Array of length `viewportHeight`, each element a single scrollbar character.
+ */
 function renderScrollbar(
   viewportHeight: number,
   totalLines: number,
@@ -189,8 +221,11 @@ function renderScrollbar(
 /**
  * Render a scrollable viewport into content.
  *
- * Returns a string with exactly `height` lines, each at most `width`
+ * Return a string with exactly `height` lines, each at most `width`
  * characters wide (plus optional scrollbar).
+ *
+ * @param options - Viewport configuration including dimensions, content, and scroll offsets.
+ * @returns Rendered viewport string with lines joined by newlines.
  */
 export function viewport(options: ViewportOptions): string {
   const {
@@ -247,6 +282,11 @@ export function viewport(options: ViewportOptions): string {
 
 /**
  * Create initial scroll state for content within a viewport.
+ *
+ * @param content - Full content string (newline-delimited).
+ * @param viewportHeight - Visible height in rows.
+ * @param viewportWidth - Visible width in columns (used to compute maxX).
+ * @returns Initial scroll state positioned at top-left (y=0, x=0).
  */
 export function createScrollState(
   content: string,
@@ -277,7 +317,11 @@ export function createScrollState(
 }
 
 /**
- * Scroll by a relative amount. Clamps to valid range.
+ * Scroll vertically by a relative amount, clamping to valid range.
+ *
+ * @param state - Current scroll state.
+ * @param dy - Relative vertical offset (positive = down, negative = up).
+ * @returns New scroll state with updated y position.
  */
 export function scrollBy(state: ScrollState, dy: number): ScrollState {
   const y = Math.max(0, Math.min(state.y + dy, state.maxY));
@@ -285,35 +329,53 @@ export function scrollBy(state: ScrollState, dy: number): ScrollState {
 }
 
 /**
- * Scroll to an absolute position. Clamps to valid range.
+ * Scroll vertically to an absolute position, clamping to valid range.
+ *
+ * @param state - Current scroll state.
+ * @param y - Absolute vertical offset (0-based line index).
+ * @returns New scroll state with updated y position.
  */
 export function scrollTo(state: ScrollState, y: number): ScrollState {
   return { ...state, y: Math.max(0, Math.min(y, state.maxY)) };
 }
 
 /**
- * Scroll horizontally by a relative amount. Clamps to valid range.
+ * Scroll horizontally by a relative amount, clamping to valid range.
+ *
+ * @param state - Current scroll state.
+ * @param dx - Relative horizontal offset (positive = right, negative = left).
+ * @returns New scroll state with updated x position.
  */
 export function scrollByX(state: ScrollState, dx: number): ScrollState {
   return { ...state, x: Math.max(0, Math.min(state.x + dx, state.maxX)) };
 }
 
 /**
- * Scroll horizontally to an absolute position. Clamps to valid range.
+ * Scroll horizontally to an absolute position, clamping to valid range.
+ *
+ * @param state - Current scroll state.
+ * @param x - Absolute horizontal offset (0-based column index).
+ * @returns New scroll state with updated x position.
  */
 export function scrollToX(state: ScrollState, x: number): ScrollState {
   return { ...state, x: Math.max(0, Math.min(x, state.maxX)) };
 }
 
 /**
- * Scroll to the top.
+ * Scroll to the top (y = 0).
+ *
+ * @param state - Current scroll state.
+ * @returns New scroll state positioned at the top.
  */
 export function scrollToTop(state: ScrollState): ScrollState {
   return { ...state, y: 0 };
 }
 
 /**
- * Scroll to the bottom.
+ * Scroll to the bottom (y = maxY).
+ *
+ * @param state - Current scroll state.
+ * @returns New scroll state positioned at the bottom.
  */
 export function scrollToBottom(state: ScrollState): ScrollState {
   return { ...state, y: state.maxY };
@@ -321,6 +383,9 @@ export function scrollToBottom(state: ScrollState): ScrollState {
 
 /**
  * Page down (scroll by one viewport height).
+ *
+ * @param state - Current scroll state.
+ * @returns New scroll state scrolled down by `visibleLines` rows.
  */
 export function pageDown(state: ScrollState): ScrollState {
   return scrollBy(state, state.visibleLines);
@@ -328,6 +393,9 @@ export function pageDown(state: ScrollState): ScrollState {
 
 /**
  * Page up (scroll by one viewport height).
+ *
+ * @param state - Current scroll state.
+ * @returns New scroll state scrolled up by `visibleLines` rows.
  */
 export function pageUp(state: ScrollState): ScrollState {
   return scrollBy(state, -state.visibleLines);

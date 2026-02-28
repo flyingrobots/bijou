@@ -28,27 +28,45 @@ import { clipToWidth } from './viewport.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** A single item in the command palette. */
 export interface CommandPaletteItem {
+  /** Unique identifier for the command. */
   readonly id: string;
+  /** Display label shown in the list. */
   readonly label: string;
+  /** Optional description displayed after the label. */
   readonly description?: string;
+  /** Optional category shown in brackets before the label. */
   readonly category?: string;
+  /** Optional keyboard shortcut hint displayed at the end. */
   readonly shortcut?: string;
 }
 
+/** Immutable state for the command palette widget. */
 export interface CommandPaletteState {
+  /** All registered command items (unfiltered). */
   readonly items: readonly CommandPaletteItem[];
+  /** Items matching the current query. */
   readonly filteredItems: readonly CommandPaletteItem[];
+  /** Current filter query string. */
   readonly query: string;
+  /** Index of the focused item within `filteredItems`. */
   readonly focusIndex: number;
+  /** Vertical scroll offset (first visible item index). */
   readonly scrollY: number;
+  /** Maximum number of visible items. */
   readonly height: number;
 }
 
+/** Options for rendering the command palette view. */
 export interface CommandPaletteOptions {
+  /** Total width in columns. */
   readonly width: number;
+  /** Show item categories in brackets (default: true). */
   readonly showCategory?: boolean;
+  /** Show shortcut hints (default: true). */
   readonly showShortcut?: boolean;
+  /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
 }
 
@@ -59,6 +77,10 @@ export interface CommandPaletteOptions {
 /**
  * Create initial command palette state from items and optional height.
  * Focus starts at index 0 with empty query showing all items.
+ *
+ * @param items - Command items to populate the palette.
+ * @param height - Maximum number of visible items (default: 10).
+ * @returns Fresh command palette state with all items visible.
  */
 export function createCommandPaletteState(
   items: readonly CommandPaletteItem[],
@@ -80,6 +102,15 @@ export function createCommandPaletteState(
 // Filtering
 // ---------------------------------------------------------------------------
 
+/**
+ * Test whether an item matches a search query (case-insensitive substring).
+ *
+ * Checks id, label, description, category, and shortcut fields.
+ *
+ * @param item - Command palette item to test.
+ * @param query - Search query string.
+ * @returns True if any field contains the query.
+ */
 function matchesQuery(item: CommandPaletteItem, query: string): boolean {
   const q = query.toLowerCase();
   if (item.label.toLowerCase().includes(q)) return true;
@@ -90,7 +121,13 @@ function matchesQuery(item: CommandPaletteItem, query: string): boolean {
   return false;
 }
 
-/** Filter items by case-insensitive substring match. Resets focus to 0. */
+/**
+ * Filter items by case-insensitive substring match. Resets focus to 0.
+ *
+ * @param state - Current command palette state.
+ * @param query - Search query (empty string shows all items).
+ * @returns Updated state with filtered items and focus reset.
+ */
 export function cpFilter(state: CommandPaletteState, query: string): CommandPaletteState {
   if (query === '') {
     return {
@@ -115,6 +152,15 @@ export function cpFilter(state: CommandPaletteState, query: string): CommandPale
 // Focus navigation
 // ---------------------------------------------------------------------------
 
+/**
+ * Clamp scroll position so the focused item stays within the visible window.
+ *
+ * @param focusIndex - Index of the focused item.
+ * @param scrollY - Current scroll offset.
+ * @param height - Viewport height in items.
+ * @param total - Total number of items.
+ * @returns Adjusted scroll offset.
+ */
 function adjustScroll(focusIndex: number, scrollY: number, height: number, total: number): number {
   let s = scrollY;
   if (focusIndex < s) s = focusIndex;
@@ -122,21 +168,36 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
   return Math.min(s, Math.max(0, total - height));
 }
 
-/** Move focus to the next item (wraps around on filteredItems). */
+/**
+ * Move focus to the next item (wraps around on filteredItems).
+ *
+ * @param state - Current command palette state.
+ * @returns Updated state with focus on the next item.
+ */
 export function cpFocusNext(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
   const focusIndex = (state.focusIndex + 1) % state.filteredItems.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Move focus to the previous item (wraps around on filteredItems). */
+/**
+ * Move focus to the previous item (wraps around on filteredItems).
+ *
+ * @param state - Current command palette state.
+ * @returns Updated state with focus on the previous item.
+ */
 export function cpFocusPrev(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
   const focusIndex = (state.focusIndex - 1 + state.filteredItems.length) % state.filteredItems.length;
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Move focus down by half a page (vim Ctrl+D convention, clamps to last item). */
+/**
+ * Move focus down by half a page (vim Ctrl+D convention, clamps to last item).
+ *
+ * @param state - Current command palette state.
+ * @returns Updated state with focus advanced by half a page.
+ */
 export function cpPageDown(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
   const half = Math.max(1, Math.floor(state.height / 2));
@@ -144,7 +205,12 @@ export function cpPageDown(state: CommandPaletteState): CommandPaletteState {
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Move focus up by half a page (vim Ctrl+U convention, clamps to first item). */
+/**
+ * Move focus up by half a page (vim Ctrl+U convention, clamps to first item).
+ *
+ * @param state - Current command palette state.
+ * @returns Updated state with focus moved back by half a page.
+ */
 export function cpPageUp(state: CommandPaletteState): CommandPaletteState {
   if (state.filteredItems.length === 0) return state;
   const half = Math.max(1, Math.floor(state.height / 2));
@@ -152,7 +218,12 @@ export function cpPageUp(state: CommandPaletteState): CommandPaletteState {
   return { ...state, focusIndex, scrollY: adjustScroll(focusIndex, state.scrollY, state.height, state.filteredItems.length) };
 }
 
-/** Get the currently focused item, or undefined if no items match. */
+/**
+ * Get the currently focused item, or undefined if no items match.
+ *
+ * @param state - Current command palette state.
+ * @returns The focused `CommandPaletteItem`, or `undefined` if empty.
+ */
 export function cpSelectedItem(state: CommandPaletteState): CommandPaletteItem | undefined {
   return state.filteredItems[state.focusIndex];
 }
@@ -170,6 +241,11 @@ export function cpSelectedItem(state: CommandPaletteState): CommandPaletteItem |
  * - Lines 2+: filtered items in viewport
  * - Each item: `[category] label  description  shortcut`
  * - Focus indicator: `▸` on focused item
+ */
+/**
+ * @param state - Current command palette state.
+ * @param options - Width, display flags, and context for rendering.
+ * @returns Rendered command palette string with search line and item list.
  */
 export function commandPalette(
   state: CommandPaletteState,
@@ -248,6 +324,11 @@ export function commandPalette(
  *   close: { type: 'cp-close' },
  * });
  * ```
+ */
+/**
+ * @template Msg - Application message type dispatched by key bindings.
+ * @param actions - Map of navigation and selection actions to message values.
+ * @returns Preconfigured key map with Ctrl+N/P, arrow, and page navigation bindings.
  */
 export function commandPaletteKeyMap<Msg>(actions: {
   focusNext: Msg;

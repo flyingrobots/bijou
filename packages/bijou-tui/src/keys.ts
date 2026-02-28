@@ -1,12 +1,36 @@
+/**
+ * Keyboard and mouse input parsing for raw ANSI/SGR terminal sequences.
+ *
+ * Convert raw byte strings from stdin into structured {@link KeyMsg} and
+ * {@link MouseMsg} objects for use in the TEA update loop.
+ *
+ * @module
+ */
+
 import type { KeyMsg, MouseMsg, MouseButton, MouseAction } from './types.js';
 
+/**
+ * Create a {@link KeyMsg} with the given key name and modifier flags.
+ *
+ * @param key - Key name (e.g. `"a"`, `"enter"`, `"up"`).
+ * @param ctrl - Whether the Ctrl modifier is active.
+ * @param alt - Whether the Alt modifier is active.
+ * @param shift - Whether the Shift modifier is active.
+ * @returns A new `KeyMsg`.
+ */
 function keyMsg(key: string, ctrl = false, alt = false, shift = false): KeyMsg {
   return { type: 'key', key, ctrl, alt, shift };
 }
 
 /**
- * Parse a raw ANSI byte string from rawInput() into a structured KeyMsg.
- * Unrecognized sequences produce { key: 'unknown' }.
+ * Parse a raw ANSI byte string from `rawInput()` into a structured {@link KeyMsg}.
+ *
+ * Handle arrow keys, function keys, enter, tab, backspace, space, escape,
+ * Ctrl+A through Ctrl+Z, and printable ASCII characters. Unrecognized
+ * sequences produce `{ key: 'unknown' }`.
+ *
+ * @param raw - Raw byte string from terminal stdin.
+ * @returns Parsed key message.
  */
 export function parseKey(raw: string): KeyMsg {
   // Arrow keys and other CSI sequences
@@ -53,17 +77,19 @@ export function parseKey(raw: string): KeyMsg {
   return keyMsg('unknown');
 }
 
-// SGR mouse sequence: \x1b[<button;col;row(M|m)
+/** Regular expression matching SGR extended mouse sequences: `ESC [ < button ; col ; row M/m`. */
 const SGR_MOUSE_RE = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/;
 
 /**
- * Parse an SGR extended mouse sequence into a MouseMsg.
- * Returns null if the string is not a valid SGR mouse sequence.
+ * Parse an SGR extended mouse sequence into a {@link MouseMsg}.
  *
- * SGR format: ESC [ < button ; col ; row M/m
- * - M = press, m = release
- * - button byte bits: 0-1 = button, 2 = shift, 3 = alt, 4 = ctrl, 5 = motion, 6-7 = scroll
- * - col/row are 1-based in the protocol, converted to 0-based here
+ * SGR format: `ESC [ < button ; col ; row M/m`
+ * - `M` = press, `m` = release
+ * - Button byte bits: 0-1 = button, 2 = shift, 3 = alt, 4 = ctrl, 5 = motion, 6-7 = scroll
+ * - Column and row are 1-based in the protocol, converted to 0-based here
+ *
+ * @param raw - Raw byte string that may contain an SGR mouse sequence.
+ * @returns Parsed mouse message, or `null` if the string is not a valid SGR mouse sequence.
  */
 export function parseMouse(raw: string): MouseMsg | null {
   const match = SGR_MOUSE_RE.exec(raw);
