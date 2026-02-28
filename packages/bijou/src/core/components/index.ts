@@ -60,3 +60,9 @@ export type { DagStats } from './dag-stats.js';
 
 export { enumeratedList } from './enumerated-list.js';
 export type { BulletStyle, EnumeratedListOptions } from './enumerated-list.js';
+
+export { hyperlink } from './hyperlink.js';
+export type { HyperlinkOptions } from './hyperlink.js';
+
+export { log } from './log.js';
+export type { LogLevel, LogOptions } from './log.js';

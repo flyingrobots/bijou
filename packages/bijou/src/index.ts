@@ -141,6 +141,11 @@ export {
   enumeratedList,
   type BulletStyle,
   type EnumeratedListOptions,
+  hyperlink,
+  type HyperlinkOptions,
+  log,
+  type LogLevel,
+  type LogOptions,
 } from './core/components/index.js';
 
 // Forms
