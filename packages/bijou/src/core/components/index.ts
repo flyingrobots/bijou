@@ -57,3 +57,9 @@ export type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.j
 
 export { dagStats } from './dag-stats.js';
 export type { DagStats } from './dag-stats.js';
+
+export { hyperlink } from './hyperlink.js';
+export type { HyperlinkOptions } from './hyperlink.js';
+
+export { log } from './log.js';
+export type { LogLevel, LogOptions } from './log.js';

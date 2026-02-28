@@ -138,6 +138,11 @@ export {
   type DagSliceOptions,
   dagStats,
   type DagStats,
+  hyperlink,
+  type HyperlinkOptions,
+  log,
+  type LogLevel,
+  type LogOptions,
 } from './core/components/index.js';
 
 // Forms
