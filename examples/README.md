@@ -1,6 +1,6 @@
 # Examples
 
-> 52 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 57 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -26,6 +26,9 @@
 | [`dag`](./dag/) | `dag()` | Directed acyclic graph with status badges |
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
 | [`dag-stats`](./dag-stats/) | `dagStats()` | Graph statistics with cycle and duplicate detection |
+| [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
+| [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
+| [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
 
@@ -68,4 +71,6 @@
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
+| [`status-bar`](./status-bar/) | `statusBar()` | Segmented header/footer with fill characters |
+| [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

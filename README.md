@@ -13,15 +13,16 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v0.6.0
+## What's New in v0.7.0
 
-**Building Blocks** — reusable stateful TUI components that follow the TEA pattern:
+**Layout, Core Components & Overlays** — new primitives for building polished terminal interfaces:
 
-- **`navigableTable()`** — keyboard-navigable data table with focus, scrolling, and vim keybindings
-- **`browsableList()`** — scrollable list with focus tracking, descriptions, and page navigation
-- **`filePicker()`** — directory browser with IOPort integration and extension filtering
-- **`wizard()`** — multi-step form orchestrator with conditional skip logic
-- **`dagStats()`** — pure graph statistics with cycle detection
+- **`place()`** — 2D text alignment with horizontal and vertical positioning
+- **`statusBar()`** — segmented header/footer with left, center, and right sections
+- **`enumeratedList()`** — ordered/unordered lists with 6 bullet styles
+- **`hyperlink()`** — OSC 8 clickable terminal links with graceful fallback
+- **`log()`** — leveled styled output (debug/info/warn/error/fatal)
+- **`drawer()`** — slide-in side panel overlay with `composite()` integration
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 
@@ -98,6 +99,9 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `tabs` / `breadcrumb` | ✅ Stable | Wayfinding and navigation primitives. |
 | `stepper` / `paginator` | ✅ Stable | Multi-step flow and list navigation. |
 | `badge` / `alert` / `kbd` | ✅ Stable | Semantic status and keyboard indicators. |
+| `enumeratedList` | ✅ Stable | Ordered/unordered lists with 6 bullet styles. |
+| `hyperlink` | ✅ Stable | OSC 8 clickable links with graceful fallback. |
+| `log` | ✅ Stable | Leveled styled output (debug through fatal). |
 | `progress` / `spinner` | ✅ Stable | Visual feedback for long-running tasks. |
 | `timeline` | ✅ Stable | Vertical event visualization. |
 | `dag` / `dagSlice` | ✅ Stable | Directed acyclic graph with auto-layout, edge routing, subgraph slicing, and `DagSource` adapter for external graphs. |
@@ -119,11 +123,12 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 
 | Pattern | Status | Description |
 | :--- | :--- | :--- |
-| `flex` / `vstack` / `hstack`| ✅ Stable | Responsive Flexbox layout engine with auto-reflow. |
+| `flex` / `vstack` / `hstack` / `place` | ✅ Stable | Responsive Flexbox layout engine with 2D alignment. |
+| `statusBar` | ✅ Stable | Segmented header/footer bar with fill characters. |
 | `viewport` | ✅ Stable | Scrollable content pane with proportional scrollbars. |
 | `animate` / `timeline` | ✅ Stable | Physics-based springs and GSAP-style timelines. |
 | `KeyMap` / `InputStack` | ✅ Stable | Layered, declarative input dispatch for modal UIs. |
-| `composite` / `modal` / `toast` | ✅ Stable | ANSI-safe overlay compositing, centered dialogs, anchored notifications. |
+| `composite` / `modal` / `toast` / `drawer` | ✅ Stable | ANSI-safe overlay compositing, dialogs, notifications, side panels. |
 | `navigableTable` | ✅ Stable | Keyboard-navigable data table with focus, scrolling, and vim keybindings. |
 | `browsableList` | ✅ Stable | Scrollable list with focus tracking, descriptions, and page navigation. |
 | `filePicker` | ✅ Stable | Directory browser with IOPort integration and extension filtering. |

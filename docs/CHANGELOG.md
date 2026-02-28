@@ -6,6 +6,30 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **`enumeratedList()`** — ordered/unordered list with 6 bullet styles (arabic, alpha, roman, bullet, dash, none), right-aligned numeric prefixes, multi-line item support, and mode degradation (pipe → ASCII fallbacks, accessible → simple numbering)
+- **`hyperlink()`** — OSC 8 clickable terminal links with configurable fallback modes (`'url'`, `'text'`, `'both'`) for pipe and accessible environments
+- **`log()`** — leveled styled output (debug/info/warn/error/fatal) with `badge()` prefixes, optional timestamps, and mode degradation (pipe → `[LEVEL] message`, accessible → `LEVEL: message`)
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`place()`** — 2D text placement with horizontal (`left`/`center`/`right`) and vertical (`top`/`middle`/`bottom`) alignment, ANSI-safe width measurement, and automatic clipping
+- **`statusBar()`** — segmented header/footer bar with left, center, and right sections, configurable fill character, and overlap priority (left > right > center)
+- **`drawer()`** — full-height slide-in side panel overlay with left/right anchoring, optional title, themed borders, and `composite()` integration
+
+### 🧪 Tests
+
+- 84 new tests across 6 new test files (1105 total)
+
+### 📝 Documentation
+
+- **6 new examples** — `enumerated-list`, `hyperlink`, `log`, `status-bar`, `drawer`
+
 ## [0.6.0] — 2026-02-27
 
 ### 🚀 Features
@@ -258,7 +282,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/flyingrobots/bijou/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/flyingrobots/bijou/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/flyingrobots/bijou/compare/v0.4.0...v0.5.0

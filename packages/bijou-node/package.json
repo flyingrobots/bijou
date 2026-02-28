@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-node",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Node.js adapter for bijou — chalk styling, readline I/O, process runtime.",
   "type": "module",
   "sideEffects": false,
@@ -27,7 +27,7 @@
     "chalk": "^5.6.2"
   },
   "peerDependencies": {
-    "@flyingrobots/bijou": "0.6.0"
+    "@flyingrobots/bijou": "0.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
