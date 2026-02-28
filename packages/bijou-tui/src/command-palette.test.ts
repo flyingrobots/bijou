@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { visibleLength, stripAnsi } from './viewport.js';
 import {
   createCommandPaletteState,
   cpFilter,
@@ -273,6 +274,16 @@ describe('commandPalette render', () => {
     state = cpFilter(state, 'zzzzz');
     const output = commandPalette(state, { width: 60 });
     expect(output).toContain('No matches');
+  });
+
+  it('clips "No matches" to width', () => {
+    let state = createCommandPaletteState(items);
+    state = cpFilter(state, 'zzzzz');
+    const output = commandPalette(state, { width: 8 });
+    const lines = output.split('\n');
+    for (const line of lines) {
+      expect(visibleLength(stripAnsi(line))).toBeLessThanOrEqual(8);
+    }
   });
 
   it('respects viewport clipping (only shows items in viewport)', () => {

@@ -182,7 +182,7 @@ export function commandPalette(
   lines.push(clipToWidth(queryLine, width));
 
   if (state.filteredItems.length === 0) {
-    lines.push('  No matches');
+    lines.push(clipToWidth('  No matches', width));
     return lines.join('\n');
   }
 
@@ -236,6 +236,12 @@ export function commandPalette(
 
 /**
  * Create a preconfigured KeyMap for command palette navigation.
+ *
+ * Bindings: Ctrl+N/Down (next), Ctrl+P/Up (prev), Ctrl+D/PageDown (page down),
+ * Ctrl+U/PageUp (page up), Enter (select), Escape (close).
+ *
+ * Ctrl+D and Ctrl+U follow vim half-page scroll conventions. In raw-mode TUIs
+ * these do not conflict with shell behavior (EOF / line-clear).
  *
  * ```ts
  * const keys = commandPaletteKeyMap({
