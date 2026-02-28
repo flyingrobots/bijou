@@ -529,6 +529,21 @@ describe('tooltip', () => {
     expect(stripAnsi(t.content)).toContain('\u250c');
   });
 
+  it('handles multi-line content', () => {
+    const t = tooltip({ ...base, content: 'line1\nline2', row: 10, col: 40 });
+    const lines = t.content.split('\n');
+    // Box wraps 2 content lines: top border + line1 + line2 + bottom border = 4
+    expect(lines).toHaveLength(4);
+    expect(stripAnsi(t.content)).toContain('line1');
+    expect(stripAnsi(t.content)).toContain('line2');
+  });
+
+  it('clamps oversized tooltip to tiny screen', () => {
+    const t = tooltip({ content: 'wide content here', row: 0, col: 0, screenWidth: 5, screenHeight: 3, direction: 'bottom' });
+    expect(t.row).toBeGreaterThanOrEqual(0);
+    expect(t.col).toBeGreaterThanOrEqual(0);
+  });
+
   it('composites with background', () => {
     const bg = Array.from({ length: 24 }, () => '.'.repeat(80)).join('\n');
     const t = tooltip({ ...base, row: 12, col: 40, direction: 'bottom' });
