@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🔧 Refactors
+
+- Replace `as KeyMsg` / `as ResizeMsg` type casts with `isKeyMsg()` / `isResizeMsg()` type guards across all 24 example `main.ts` files, `demo-tui.ts`, and `eventbus.test.ts`
+
 ## [0.8.0] — 2026-02-28
 
 ### 🚀 Features

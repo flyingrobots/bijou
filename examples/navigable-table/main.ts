@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App,
   createNavigableTableState, navigableTable,
   navTableFocusNext, navTableFocusPrev,
   navTablePageDown, navTablePageUp,
@@ -57,8 +57,8 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
 
       switch (action.type) {

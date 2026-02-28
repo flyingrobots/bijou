@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, kbd } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App,
   animate, vstack, SPRING_PRESETS,
 } from '@flyingrobots/bijou-tui';
 
@@ -42,10 +42,9 @@ const app: App<Model, Msg> = {
   },
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
-      if (k.key === 'space' && !model.running) {
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
+      if (msg.key === 'space' && !model.running) {
         // Toggle direction
         const current = model.positions[PRESETS[0]] ?? 0;
         const target = current > WIDTH / 2 ? 0 : WIDTH;

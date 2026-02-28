@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   createPagerState, pager, pagerScrollBy, pagerPageDown, pagerPageUp,
   pagerScrollToTop, pagerScrollToBottom, pagerKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
@@ -51,16 +51,15 @@ const app: App<Model, Msg> = {
   },
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
-      const r = msg as { columns: number; rows: number };
-      const p = createPagerState({ content: CONTENT, width: r.columns, height: r.rows - 2 });
+    if (isResizeMsg(msg)) {
+      const p = createPagerState({ content: CONTENT, width: msg.columns, height: msg.rows - 2 });
       // Preserve scroll position across resize
       const clampedY = Math.min(model.pager.scroll.y, p.scroll.maxY);
-      return [{ ...model, pager: { ...p, scroll: { ...p.scroll, y: clampedY } }, cols: r.columns, rows: r.rows }, []];
+      return [{ ...model, pager: { ...p, scroll: { ...p.scroll, y: clampedY } }, cols: msg.columns, rows: msg.rows }, []];
     }
 
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
 
       switch (action.type) {

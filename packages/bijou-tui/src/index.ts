@@ -1,6 +1,6 @@
 // Types
 export type { App, Cmd, KeyMsg, ResizeMsg, QuitSignal, RunOptions } from './types.js';
-export { QUIT } from './types.js';
+export { QUIT, isKeyMsg, isResizeMsg } from './types.js';
 
 // Key parsing
 export { parseKey } from './keys.js';

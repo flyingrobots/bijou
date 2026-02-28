@@ -1,5 +1,6 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
-import type { App, Cmd, KeyMsg, ResizeMsg, RunOptions } from './types.js';
+import type { App, Cmd, RunOptions } from './types.js';
+import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
 
@@ -79,8 +80,7 @@ export async function run<Model, M>(
     if (!running) return;
 
     // Double Ctrl+C force-quit
-    const keyMsg = msg as KeyMsg;
-    if (keyMsg.type === 'key' && keyMsg.key === 'c' && keyMsg.ctrl) {
+    if (isKeyMsg(msg) && msg.key === 'c' && msg.ctrl) {
       const now = Date.now();
       if (now - lastCtrlC < 1000) {
         shutdown();
@@ -89,7 +89,7 @@ export async function run<Model, M>(
       lastCtrlC = now;
     }
 
-    const [newModel, cmds] = app.update(msg as KeyMsg | ResizeMsg | M, model);
+    const [newModel, cmds] = app.update(msg, model);
     model = newModel;
     render();
     executeCommands(cmds);

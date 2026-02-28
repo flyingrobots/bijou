@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator, badge } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg, type ResizeMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, pageDown, pageUp, vstack,
 } from '@flyingrobots/bijou-tui';
 
@@ -110,25 +110,23 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
-      const r = msg as ResizeMsg;
-      return [{ ...model, cols: r.columns, rows: r.rows }, []];
+    if (isResizeMsg(msg)) {
+      return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
 
-      if (k.key === 'tab') {
+      if (msg.key === 'tab') {
         return [{ ...model, focusLeft: !model.focusLeft }, []];
       }
 
       const scrollKey = model.focusLeft ? 'leftScroll' : 'rightScroll';
       let scroll = model[scrollKey];
 
-      if (k.key === 'j' || k.key === 'down') scroll = scrollBy(scroll, 1);
-      else if (k.key === 'k' || k.key === 'up') scroll = scrollBy(scroll, -1);
-      else if (k.key === 'd') scroll = pageDown(scroll);
-      else if (k.key === 'u') scroll = pageUp(scroll);
+      if (msg.key === 'j' || msg.key === 'down') scroll = scrollBy(scroll, 1);
+      else if (msg.key === 'k' || msg.key === 'up') scroll = scrollBy(scroll, -1);
+      else if (msg.key === 'd') scroll = pageDown(scroll);
+      else if (msg.key === 'u') scroll = pageUp(scroll);
 
       return [{ ...model, [scrollKey]: scroll }, []];
     }

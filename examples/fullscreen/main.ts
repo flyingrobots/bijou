@@ -1,6 +1,6 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
-import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, isKeyMsg, isResizeMsg, type App } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -15,12 +15,11 @@ const app: App<Model, Msg> = {
   init: () => [{ cols: process.stdout.columns ?? 80, rows: process.stdout.rows ?? 24 }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
+    if (isResizeMsg(msg)) {
       return [{ cols: msg.columns, rows: msg.rows }, []];
     }
-    if ('type' in msg && msg.type === 'key') {
-      const key = (msg as KeyMsg).key;
-      if (key === 'q' || key === 'enter' || ((msg as KeyMsg).ctrl && key === 'c')) {
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || msg.key === 'enter' || (msg.ctrl && msg.key === 'c')) {
         return [model, [quit()]];
       }
     }

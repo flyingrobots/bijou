@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { kbd, separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, type App,
   createAccordionState, interactiveAccordion,
   focusNext, focusPrev, toggleFocused, expandAll, collapseAll,
   accordionKeyMap, helpShort, vstack,
@@ -65,8 +65,8 @@ const app: App<Model, Msg> = {
   init: () => [{ accordion: createAccordionState(SECTIONS) }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
 
       switch (action.type) {

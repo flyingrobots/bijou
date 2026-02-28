@@ -1,7 +1,7 @@
 import { initDefaultContext, nodeIO } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   createFilePickerState, filePicker,
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
   filePickerKeyMap, helpShort, vstack,
@@ -38,13 +38,12 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
-      const r = msg as { columns: number };
-      return [{ ...model, cols: r.columns }, []];
+    if (isResizeMsg(msg)) {
+      return [{ ...model, cols: msg.columns }, []];
     }
 
-    if ('type' in msg && msg.type === 'key') {
-      const action = keys.handle(msg as KeyMsg);
+    if (isKeyMsg(msg)) {
+      const action = keys.handle(msg);
       if (!action) return [model, []];
 
       switch (action.type) {

@@ -4,7 +4,7 @@ import {
   tabs, table, tree, progressBar, timeline,
 } from '@flyingrobots/bijou';
 import {
-  run, quit, type App, type KeyMsg, type ResizeMsg,
+  run, quit, isKeyMsg, isResizeMsg, type App,
   flex, vstack,
 } from '@flyingrobots/bijou-tui';
 
@@ -91,18 +91,16 @@ const app: App<Model, Msg> = {
   }, []],
 
   update: (msg, model) => {
-    if ('type' in msg && msg.type === 'resize') {
-      const r = msg as ResizeMsg;
-      return [{ ...model, cols: r.columns, rows: r.rows }, []];
+    if (isResizeMsg(msg)) {
+      return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
-    if ('type' in msg && msg.type === 'key') {
-      const k = msg as KeyMsg;
-      if (k.key === 'q' || (k.ctrl && k.key === 'c')) return [model, [quit()]];
+    if (isKeyMsg(msg)) {
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
 
-      if (k.key === 'left' || k.key === 'h') {
+      if (msg.key === 'left' || msg.key === 'h') {
         return [{ ...model, activeTab: Math.max(0, model.activeTab - 1) }, []];
       }
-      if (k.key === 'right' || k.key === 'l') {
+      if (msg.key === 'right' || msg.key === 'l') {
         return [{ ...model, activeTab: Math.min(TAB_ITEMS.length - 1, model.activeTab + 1) }, []];
       }
     }
