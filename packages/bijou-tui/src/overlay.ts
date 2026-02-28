@@ -4,6 +4,7 @@
  * - `composite()` — paint overlays onto a background string (ANSI-safe)
  * - `modal()` — centered dialog overlay with title, body, hint
  * - `toast()` — anchored notification overlay with variant icons
+ * - `tooltip()` — positioned overlay relative to a target element
  */
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
@@ -330,4 +331,79 @@ export function drawer(options: DrawerOptions): Overlay {
     row: 0,
     col: Math.max(0, col),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Tooltip types
+// ---------------------------------------------------------------------------
+
+export type TooltipDirection = 'top' | 'bottom' | 'left' | 'right';
+
+export interface TooltipOptions {
+  readonly content: string;
+  /** Row of the target element. */
+  readonly row: number;
+  /** Column of the target element. */
+  readonly col: number;
+  /** Direction to place the tooltip relative to the target. Default: 'top'. */
+  readonly direction?: TooltipDirection;
+  readonly screenWidth: number;
+  readonly screenHeight: number;
+  readonly borderToken?: TokenValue;
+  readonly ctx?: BijouContext;
+}
+
+// ---------------------------------------------------------------------------
+// tooltip()
+// ---------------------------------------------------------------------------
+
+export function tooltip(options: TooltipOptions): Overlay {
+  const {
+    content,
+    row: targetRow,
+    col: targetCol,
+    direction = 'top',
+    screenWidth,
+    screenHeight,
+    ctx,
+  } = options;
+
+  const contentLines = content.split('\n');
+
+  const borderColor = ctx && options.borderToken
+    ? (s: string) => ctx.style.styled(options.borderToken!, s)
+    : (s: string) => s;
+
+  const boxStr = renderBox(contentLines, borderColor);
+  const boxLines = boxStr.split('\n');
+  const boxHeight = boxLines.length;
+  const boxWidth = visibleLength(boxLines[0]!);
+
+  let tipRow: number;
+  let tipCol: number;
+
+  switch (direction) {
+    case 'top':
+      tipRow = targetRow - boxHeight;
+      tipCol = targetCol - Math.floor(boxWidth / 2);
+      break;
+    case 'bottom':
+      tipRow = targetRow + 1;
+      tipCol = targetCol - Math.floor(boxWidth / 2);
+      break;
+    case 'left':
+      tipRow = targetRow - Math.floor(boxHeight / 2);
+      tipCol = targetCol - boxWidth;
+      break;
+    case 'right':
+      tipRow = targetRow - Math.floor(boxHeight / 2);
+      tipCol = targetCol + 1;
+      break;
+  }
+
+  // Clamp to screen bounds
+  tipRow = Math.max(0, Math.min(tipRow, screenHeight - boxHeight));
+  tipCol = Math.max(0, Math.min(tipCol, screenWidth - boxWidth));
+
+  return { content: boxStr, row: tipRow, col: tipCol };
 }

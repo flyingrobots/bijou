@@ -174,10 +174,13 @@ export {
   type ToastOptions,
   type DrawerAnchor,
   type DrawerOptions,
+  type TooltipDirection,
+  type TooltipOptions,
   composite,
   modal,
   toast,
   drawer,
+  tooltip,
 } from './overlay.js';
 
 // Interactive accordion
