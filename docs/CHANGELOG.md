@@ -40,6 +40,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`chalkStyle()` global mutation** — scope chalk level override to a per-call instance instead of mutating the global chalk, fixing test order-dependence
 - **Hangul syllable range** — correct `isWideChar()` upper bound from `0xD7FF` to `0xD7A3`, excluding narrow Jamo Extended-B characters
 - **`wasStyled()` equality** — use structural comparison (hex + modifiers) instead of reference equality on `TokenValue` objects
+- **`chalkStyle()` noColor leaking ANSI** — `styled()` and `bold()` now short-circuit when `noColor` is true, preventing modifier ANSI codes from leaking
+- **`ansi256ToAnsi16()` negative input** — clamp input to 0–255 range
+- **`markdown()` blockquote regex** — handle indented blockquotes (leading whitespace before `>`)
+- **`auditStyle()` mutable reference** — `get calls()` now returns a defensive copy
+- **progress-download example** — add missing `{ type: 'quit' }` handler for auto-exit
+- **help example** — clamp `selected` index to >= 0 when deleting last item
 
 ### 🔧 Refactors
 
@@ -48,7 +54,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
-- 141 new tests across 8 new + 6 expanded test files (1350 total)
+- 143 new tests across 8 new + 6 expanded test files (1352 total)
 
 ### 📝 Documentation
 
