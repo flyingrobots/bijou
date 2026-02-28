@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.4.0** — Overlay compositing, interactive building blocks, forms
+Current: **v0.6.0** — Building blocks, form wizard, graph statistics
 
 ---
 
@@ -338,10 +338,10 @@ Growing toward a full terminal component library:
 | Category | Components |
 |----------|-----------|
 | **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
-| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~, ~~`dagLayout()`~~ ✅, `dagStats()` |
-| **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~ ✅, ~~`textarea()`~~, ~~`filter()`~~ ✅, `wizard()` |
+| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~, ~~`dagLayout()`~~, ~~`dagStats()`~~ ✅ |
+| **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~, ~~`textarea()`~~, ~~`filter()`~~, ~~`wizard()`~~ ✅ |
 | **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~ ✅, `commandPalette()` |
-| **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~ ✅, `navigableTable()`, `browsableList()`, `filePicker()` |
+| **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~, ~~`navigableTable()`~~, ~~`browsableList()`~~, ~~`filePicker()`~~ ✅ |
 | **Overlay** | ~~`composite()`~~, ~~`modal()`~~, ~~`toast()`~~ ✅, `drawer()` |
 | **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~ ✅, mouse events (`IOPort.onMouse()`) |
 | **App** | `statusBar()`, `splitPane()`, `tooltip()` |
@@ -374,10 +374,10 @@ Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). P
 | ~~**`pager()`**~~ | bijou-tui | ✅ Building block wrapping `viewport()` with status line |
 | ~~**`textarea()`**~~ | bijou | ✅ Multi-line text input with cursor nav, line numbers, maxLength |
 | ~~**`filter()`**~~ | bijou | ✅ Fuzzy type-to-filter with keyword matching |
-| **`browsableList()`** | bijou-tui | Rich list with keyboard nav, filtering, pagination, status. Beyond `select()`. |
-| **`filePicker()`** | bijou-tui | Directory browser with extension filtering. |
-| **Form wizard** | bijou | Multi-page form orchestration — `stepper()` is visual only today, this adds the state machine. |
-| **`navigableTable()`** | bijou-tui | Keyboard-navigable table with row/column selection. Extends `table()`. |
+| ~~**`browsableList()`**~~ | bijou-tui | ✅ v0.6.0 — Rich list with keyboard nav, scroll viewport, page navigation, descriptions |
+| ~~**`filePicker()`**~~ | bijou-tui | ✅ v0.6.0 — Directory browser with extension filtering, IOPort integration |
+| ~~**Form wizard**~~ | bijou | ✅ v0.6.0 — `wizard()` multi-step form orchestration with conditional skip logic |
+| ~~**`navigableTable()`**~~ | bijou-tui | ✅ v0.6.0 — Keyboard-navigable table with focus, scrolling, vim keybindings |
 
 ### ~~P1.5 — Interactive DAG primitives (XYPH-driven)~~ ✅ Shipped
 
@@ -399,11 +399,11 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**`modal()`**~~ | bijou-tui | ✅ Centered dialog overlay with title, body, hint, auto-centering, themed borders | ✓ |
 | ~~**`toast()`**~~ | bijou-tui | ✅ Anchored notification overlay with success/error/info variants, 4-corner anchoring | ✓ |
 
-Remaining from P1.75 (deferred — not an overlay primitive):
+~~Remaining from P1.75 (deferred — not an overlay primitive):~~ ✅ Shipped in v0.6.0
 
 | Feature | Package | Notes | Blocks XYPH? |
 |---------|---------|-------|:------------:|
-| **`dagStats()`** | bijou | Pure function: `{nodes, edges, depth, width, roots, leaves}` from node array. For overview dashboard counts. | |
+| ~~**`dagStats()`**~~ | bijou | ✅ v0.6.0 — Pure graph statistics with cycle detection, ghost-node filtering, `SlicedDagSource` support | |
 
 ### P2 — Layout, input & styling primitives
 
