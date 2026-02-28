@@ -41,3 +41,15 @@ export type { GradientTextOptions } from './gradient.js';
 // DTCG interop
 export { fromDTCG, toDTCG } from './dtcg.js';
 export type { DTCGDocument, DTCGToken, DTCGGroup } from './dtcg.js';
+
+// Color manipulation
+export {
+  hexToRgb,
+  rgbToHex,
+  lighten,
+  darken,
+  mix,
+  complementary,
+  saturate,
+  desaturate,
+} from './color.js';
