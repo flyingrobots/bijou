@@ -130,7 +130,8 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `navigableTable` | ✅ Stable | Keyboard-navigable data table with focus, scrolling, and vim keybindings. |
 | `browsableList` | ✅ Stable | Scrollable list with focus tracking, descriptions, and page navigation. |
 | `filePicker` | ✅ Stable | Directory browser with IOPort integration and extension filtering. |
-| `commandPalette` | 🗓️ Roadmap | Unified global search and action interface. |
+| `commandPalette` | ✅ Stable | Filterable action list with search and keyboard navigation. |
+| `tooltip` | ✅ Stable | Positioned overlay with directional placement and screen clamping. |
 
 ---
 
