@@ -9,8 +9,14 @@
 // Segmenter (lazy singleton)
 // ---------------------------------------------------------------------------
 
+/** Cached singleton `Intl.Segmenter` instance for grapheme-level segmentation. */
 let _segmenter: Intl.Segmenter | undefined;
 
+/**
+ * Return the lazily-initialized grapheme segmenter singleton.
+ *
+ * @returns The shared `Intl.Segmenter` configured for English grapheme granularity.
+ */
 function segmenter(): Intl.Segmenter {
   if (!_segmenter) {
     _segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
@@ -23,7 +29,7 @@ function segmenter(): Intl.Segmenter {
 // ---------------------------------------------------------------------------
 
 /**
- * Returns true if the given code point occupies 2 terminal columns.
+ * Determine whether a Unicode code point occupies two terminal columns.
  *
  * Covers:
  * - CJK Unified Ideographs (U+4E00–U+9FFF)
@@ -37,6 +43,9 @@ function segmenter(): Intl.Segmenter {
  * - CJK Compatibility (U+FE30–U+FE4F)
  * - Hangul Syllables (U+AC00–U+D7A3)
  * - Emoji (most U+1F000+)
+ *
+ * @param cp - Unicode code point to test.
+ * @returns `true` if the code point renders as two columns wide.
  */
 export function isWideChar(cp: number): boolean {
   // Fullwidth Forms
@@ -97,6 +106,9 @@ export function isWideChar(cp: number): boolean {
  *
  * Each element is a single user-perceived character (handles combining
  * marks, ZWJ sequences, flag pairs, skin tones, etc.).
+ *
+ * @param str - Input string to segment.
+ * @returns Array of grapheme cluster strings.
  */
 export function segmentGraphemes(str: string): string[] {
   const segments = segmenter().segment(str);
@@ -121,6 +133,9 @@ export function segmentGraphemes(str: string): string[] {
  *
  * Zero-width characters (combining marks, ZWJ, variation selectors)
  * don't add width on their own — they're part of the cluster.
+ *
+ * @param grapheme - A single grapheme cluster string.
+ * @returns Display width: 1 for narrow characters, 2 for wide/emoji.
  */
 export function graphemeClusterWidth(grapheme: string): number {
   let maxWidth = 1;
@@ -141,12 +156,15 @@ export function graphemeClusterWidth(grapheme: string): number {
 /**
  * Compute the terminal display width of a string.
  *
- * Strips ANSI escape sequences, segments into grapheme clusters,
- * and sums display widths. Correctly handles:
+ * Strip ANSI escape sequences, segment into grapheme clusters,
+ * and sum display widths. Correctly handles:
  * - Multi-codepoint emoji (flags, ZWJ families, skin tones)
  * - East Asian Wide characters (CJK, fullwidth forms)
  * - Combining marks (accented characters)
  * - ANSI escape sequences (ignored)
+ *
+ * @param str - Input string, may contain ANSI escape sequences.
+ * @returns Total display width in terminal columns.
  */
 export function graphemeWidth(str: string): number {
   // Strip ANSI escapes first

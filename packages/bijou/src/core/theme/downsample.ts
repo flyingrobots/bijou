@@ -5,6 +5,7 @@
  * color levels (ANSI 256, ANSI 16) without external dependencies.
  */
 
+/** Terminal color capability level, from no color support to full 24-bit truecolor. */
 export type ColorLevel = 'none' | 'ansi16' | 'ansi256' | 'truecolor';
 
 // ---------------------------------------------------------------------------
@@ -15,9 +16,14 @@ export type ColorLevel = 'none' | 'ansi16' | 'ansi256' | 'truecolor';
  * Map an RGB color to the nearest ANSI 256 color index (16–255).
  *
  * The ANSI 256 palette has:
- * - Indices 0–15: standard + bright colors (not targeted here)
- * - Indices 16–231: 6×6×6 color cube
- * - Indices 232–255: grayscale ramp (24 shades)
+ * - Indices 0-15: standard + bright colors (not targeted here)
+ * - Indices 16-231: 6x6x6 color cube
+ * - Indices 232-255: grayscale ramp (24 shades)
+ *
+ * @param r - Red channel (0-255).
+ * @param g - Green channel (0-255).
+ * @param b - Blue channel (0-255).
+ * @returns ANSI 256 color index (16-255).
  */
 export function rgbToAnsi256(r: number, g: number, b: number): number {
   // Check if it's close to grayscale first
@@ -37,8 +43,13 @@ export function rgbToAnsi256(r: number, g: number, b: number): number {
 /**
  * Find the nearest ANSI 256 color using Euclidean distance in RGB space.
  *
- * Considers both the 6×6×6 cube and the grayscale ramp, returning
+ * Considers both the 6x6x6 cube and the grayscale ramp, returning
  * whichever is closest to the input color.
+ *
+ * @param r - Red channel (0-255).
+ * @param g - Green channel (0-255).
+ * @param b - Blue channel (0-255).
+ * @returns ANSI 256 color index (16-255) closest to the input.
  */
 export function nearestAnsi256(r: number, g: number, b: number): number {
   const cubeIdx = rgbToAnsi256(r, g, b);
@@ -68,7 +79,11 @@ export function nearestAnsi256(r: number, g: number, b: number): number {
   return grayDist < cubeDist ? grayIdx : cubeIdx;
 }
 
-/** Convert an ANSI 256 index (16–255) back to approximate RGB. */
+/**
+ * Convert an ANSI 256 index (16-255) back to approximate RGB.
+ * @param idx - ANSI 256 color index.
+ * @returns Approximate RGB triple.
+ */
 function ansi256ToRgb(idx: number): [number, number, number] {
   if (idx >= 232) {
     const gray = (idx - 232) * 10 + 8;
@@ -85,6 +100,16 @@ function ansi256ToRgb(idx: number): [number, number, number] {
   ];
 }
 
+/**
+ * Compute squared Euclidean distance between two RGB colors.
+ * @param r1 - Red channel of the first color.
+ * @param g1 - Green channel of the first color.
+ * @param b1 - Blue channel of the first color.
+ * @param r2 - Red channel of the second color.
+ * @param g2 - Green channel of the second color.
+ * @param b2 - Blue channel of the second color.
+ * @returns Squared Euclidean distance (no sqrt for performance).
+ */
 function colorDistance(
   r1: number, g1: number, b1: number,
   r2: number, g2: number, b2: number,
@@ -120,10 +145,15 @@ const ANSI16_PALETTE: readonly [number, number, number][] = [
 ];
 
 /**
- * Map an RGB color to the nearest ANSI 16 color index (0–15).
+ * Map an RGB color to the nearest ANSI 16 color index (0-15).
  *
  * Uses Euclidean distance in RGB space to find the closest match
  * among the 16 standard terminal colors.
+ *
+ * @param r - Red channel (0-255).
+ * @param g - Green channel (0-255).
+ * @param b - Blue channel (0-255).
+ * @returns ANSI 16 color index (0-15).
  */
 export function rgbToAnsi16(r: number, g: number, b: number): number {
   let bestIdx = 0;
@@ -147,6 +177,8 @@ export function rgbToAnsi16(r: number, g: number, b: number): number {
 
 /**
  * Convert an ANSI 256 color index to the nearest ANSI 16 color index.
+ * @param code - ANSI 256 color index (0-255).
+ * @returns ANSI 16 color index (0-15).
  */
 export function ansi256ToAnsi16(code: number): number {
   const clamped = Math.max(0, Math.min(255, Math.round(code)));

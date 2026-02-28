@@ -2,14 +2,28 @@ import type { BijouContext } from '../../ports/context.js';
 import { getDefaultContext } from '../../context.js';
 import { badge } from './badge.js';
 
+/** Severity levels for structured log messages. */
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
+/** Configuration options for the {@link log} component. */
 export interface LogOptions {
-  readonly timestamp?: boolean;     // default: false
-  readonly prefix?: boolean;        // default: true
+  /** Whether to prepend a `HH:MM:SS` timestamp. Defaults to `false`. */
+  readonly timestamp?: boolean;
+  /** Whether to show the level prefix badge/label. Defaults to `true`. */
+  readonly prefix?: boolean;
+  /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }
 
+/**
+ * Resolve a BijouContext, falling back to the global default.
+ *
+ * Returns `undefined` if no context is provided and no default is configured,
+ * allowing the component to degrade gracefully.
+ *
+ * @param ctx - Optional explicit context.
+ * @returns The resolved context or `undefined`.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
   if (ctx) return ctx;
   try {
@@ -19,6 +33,7 @@ function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
   }
 }
 
+/** Abbreviated 3-letter labels for each log level used in pipe/interactive modes. */
 const LABELS: Record<LogLevel, string> = {
   debug: 'DBG',
   info: 'INF',
@@ -27,6 +42,7 @@ const LABELS: Record<LogLevel, string> = {
   fatal: 'FTL',
 };
 
+/** Badge variant mapping for each log level used in interactive/static mode. */
 const BADGE_VARIANTS: Record<LogLevel, string> = {
   debug: 'muted',
   info: 'info',
@@ -35,6 +51,7 @@ const BADGE_VARIANTS: Record<LogLevel, string> = {
   fatal: 'error',
 };
 
+/** Uppercase labels for each log level used in accessible mode. */
 const ACCESSIBLE_LABELS: Record<LogLevel, string> = {
   debug: 'DEBUG',
   info: 'INFO',
@@ -43,6 +60,11 @@ const ACCESSIBLE_LABELS: Record<LogLevel, string> = {
   fatal: 'FATAL',
 };
 
+/**
+ * Format the current wall-clock time as `HH:MM:SS`.
+ *
+ * @returns The formatted timestamp string.
+ */
 function formatTimestamp(): string {
   const d = new Date();
   const hh = String(d.getHours()).padStart(2, '0');
@@ -51,6 +73,19 @@ function formatTimestamp(): string {
   return `${hh}:${mm}:${ss}`;
 }
 
+/**
+ * Render a structured log message with level prefix and optional timestamp.
+ *
+ * Adapts output by mode:
+ * - `pipe`/no context: `[HH:MM:SS] [LVL] message` brackets format.
+ * - `accessible`: `HH:MM:SS LEVEL: message` screen-reader-friendly format.
+ * - `interactive`/`static`: styled badge prefix with themed timestamp.
+ *
+ * @param level - Severity level of the log entry.
+ * @param message - The log message body.
+ * @param options - Rendering options including timestamp, prefix visibility, and context.
+ * @returns The formatted log string.
+ */
 export function log(level: LogLevel, message: string, options?: LogOptions): string {
   const ctx = resolveCtx(options?.ctx);
   const showPrefix = options?.prefix !== false;  // default true

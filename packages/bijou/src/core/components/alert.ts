@@ -3,13 +3,18 @@ import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
 import { box } from './box.js';
 
+/** Alert severity level. */
 export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 
+/** Configuration for rendering an alert box. */
 export interface AlertOptions {
+  /** Severity variant (defaults to `'info'`). */
   variant?: AlertVariant;
+  /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/** Unicode icon characters for each alert variant. */
 const ICONS: Record<AlertVariant, string> = {
   success: '\u2713',
   error: '\u2717',
@@ -17,6 +22,7 @@ const ICONS: Record<AlertVariant, string> = {
   info: '\u2139',
 };
 
+/** Uppercase labels used in pipe mode output. */
 const PIPE_LABELS: Record<AlertVariant, string> = {
   success: 'SUCCESS',
   error: 'ERROR',
@@ -24,6 +30,7 @@ const PIPE_LABELS: Record<AlertVariant, string> = {
   info: 'INFO',
 };
 
+/** Title-cased labels used in accessible mode output. */
 const ACCESSIBLE_LABELS: Record<AlertVariant, string> = {
   success: 'Success',
   error: 'Error',
@@ -31,6 +38,7 @@ const ACCESSIBLE_LABELS: Record<AlertVariant, string> = {
   info: 'Info',
 };
 
+/** Mapping from alert variant to the corresponding border theme token key. */
 const BORDER_TOKENS: Record<AlertVariant, keyof BijouContext['theme']['theme']['border']> = {
   success: 'success',
   error: 'error',
@@ -38,11 +46,29 @@ const BORDER_TOKENS: Record<AlertVariant, keyof BijouContext['theme']['theme']['
   info: 'primary',
 };
 
+/**
+ * Resolve the provided context or fall back to the default context.
+ *
+ * @param ctx - Optional context override.
+ * @returns The resolved {@link BijouContext}.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
   return getDefaultContext();
 }
 
+/**
+ * Render an alert box with an icon and message.
+ *
+ * Output adapts to the current output mode:
+ * - `interactive` / `static` — bordered box with a colored status icon.
+ * - `pipe` — bracketed label like `[ERROR] message`.
+ * - `accessible` — plain label like `Error: message`.
+ *
+ * @param message - Alert body text.
+ * @param options - Alert configuration.
+ * @returns The rendered alert string.
+ */
 export function alert(message: string, options: AlertOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;

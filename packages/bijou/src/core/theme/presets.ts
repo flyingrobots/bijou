@@ -1,6 +1,11 @@
 import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
 
-/** Helper to reduce verbosity when defining token values. */
+/**
+ * Shorthand helper to create a TokenValue with less boilerplate.
+ * @param hex - Hex color string (e.g. `'#00ffff'`).
+ * @param modifiers - Optional text modifiers to attach.
+ * @returns TokenValue with the given hex and optional modifiers.
+ */
 export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
   return modifiers !== undefined ? { hex, modifiers } : { hex };
 }

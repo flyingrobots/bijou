@@ -2,22 +2,47 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { getDefaultContext } from '../../context.js';
 
+/** Represent a single node in a tree hierarchy. */
 export interface TreeNode {
+  /** Display text for this node. */
   label: string;
+  /** Optional child nodes nested beneath this node. */
   children?: TreeNode[];
 }
 
+/** Configuration options for the {@link tree} component. */
 export interface TreeOptions {
+  /** Token used to style the tree guide lines and connectors. */
   guideToken?: TokenValue;
+  /** Token used to style node labels. */
   labelToken?: TokenValue;
+  /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
 
+/**
+ * Resolve a BijouContext, falling back to the global default.
+ *
+ * @param ctx - Optional explicit context.
+ * @returns The provided context or the global default.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
   return getDefaultContext();
 }
 
+/**
+ * Render a tree hierarchy with Unicode box-drawing connectors.
+ *
+ * Adapts output by mode:
+ * - `pipe`: indented plain-text tree.
+ * - `accessible`: indented tree with child-count annotations.
+ * - `interactive`/`static`: styled Unicode connectors with themed guide lines.
+ *
+ * @param nodes - Top-level tree nodes to render.
+ * @param options - Rendering options including guide token and context.
+ * @returns The formatted tree string.
+ */
 export function tree(nodes: TreeNode[], options: TreeOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
@@ -34,6 +59,13 @@ export function tree(nodes: TreeNode[], options: TreeOptions = {}): string {
   return renderRich(nodes, '', true, guideToken, ctx);
 }
 
+/**
+ * Render a tree as indented plain text (pipe mode).
+ *
+ * @param nodes - Nodes at the current depth level.
+ * @param depth - Current nesting depth (controls indentation).
+ * @returns Plain-text tree string.
+ */
 function renderPlain(nodes: TreeNode[], depth: number): string {
   const indent = '  '.repeat(depth);
   const lines: string[] = [];
@@ -46,6 +78,15 @@ function renderPlain(nodes: TreeNode[], depth: number): string {
   return lines.join('\n');
 }
 
+/**
+ * Render a tree with accessibility annotations (accessible mode).
+ *
+ * Parent nodes include a "(contains N items)" suffix for screen readers.
+ *
+ * @param nodes - Nodes at the current depth level.
+ * @param depth - Current nesting depth (controls indentation).
+ * @returns Accessible tree string.
+ */
 function renderAccessible(nodes: TreeNode[], depth: number): string {
   const indent = '  '.repeat(depth);
   const lines: string[] = [];
@@ -60,6 +101,16 @@ function renderAccessible(nodes: TreeNode[], depth: number): string {
   return lines.join('\n');
 }
 
+/**
+ * Render a tree with styled Unicode box-drawing connectors (interactive/static mode).
+ *
+ * @param nodes - Nodes at the current depth level.
+ * @param prefix - Accumulated prefix string for continuation lines.
+ * @param isRoot - Whether this is the top-level invocation.
+ * @param guideToken - Token used to style connectors and continuation lines.
+ * @param ctx - Bijou context for styling.
+ * @returns Styled tree string.
+ */
 function renderRich(
   nodes: TreeNode[],
   prefix: string,

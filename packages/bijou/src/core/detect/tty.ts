@@ -11,8 +11,26 @@
 
 import type { RuntimePort } from '../../ports/runtime.js';
 
+/**
+ * Terminal output mode.
+ *
+ * - `'interactive'` — full TUI experience with cursor movement and animation.
+ * - `'static'` — single-frame rendering (e.g. CI environments).
+ * - `'pipe'` — plain text, no ANSI escapes (piped stdout, `NO_COLOR`, `TERM=dumb`).
+ * - `'accessible'` — screen-reader-friendly plain prompts (`BIJOU_ACCESSIBLE=1`).
+ */
 export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
 
+/**
+ * Detect the appropriate output mode for the current environment.
+ *
+ * Inspects environment variables and TTY status via the optional
+ * {@link RuntimePort} abstraction, falling back to Node.js `process`
+ * globals when no port is provided.
+ *
+ * @param runtime - Optional runtime port for environment access. Falls back to `process`.
+ * @returns The detected {@link OutputMode}.
+ */
 export function detectOutputMode(runtime?: RuntimePort): OutputMode {
   const env = runtime
     ? (key: string) => runtime.env(key)

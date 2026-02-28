@@ -19,12 +19,19 @@ import { graphemeWidth } from '../text/grapheme.js';
 // Types
 // ---------------------------------------------------------------------------
 
+/** Configuration options for the {@link markdown} renderer. */
 export interface MarkdownOptions {
-  /** Wrap width. Defaults to `ctx.runtime.columns`. */
+  /** Wrap width in columns. Defaults to `ctx.runtime.columns`. */
   width?: number;
+  /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
 
+/**
+ * Discriminated union of parsed block-level markdown elements.
+ *
+ * Each variant carries the data needed for rendering that block type.
+ */
 type BlockType =
   | { type: 'heading'; level: number; text: string }
   | { type: 'paragraph'; text: string }
@@ -39,6 +46,15 @@ type BlockType =
 // Block-level parser
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse a markdown source string into an array of block-level elements.
+ *
+ * Recognizes fenced code blocks, horizontal rules, headings, blockquotes,
+ * bullet lists, numbered lists, and paragraphs.
+ *
+ * @param source - Raw markdown source text.
+ * @returns Array of parsed block elements.
+ */
 function parseBlocks(source: string): BlockType[] {
   const lines = source.split('\n');
   const blocks: BlockType[] = [];
@@ -131,6 +147,14 @@ function parseBlocks(source: string): BlockType[] {
   return blocks;
 }
 
+/**
+ * Test whether a line begins a new block-level element.
+ *
+ * Used by the paragraph collector to determine when to stop accumulating lines.
+ *
+ * @param line - The line to test.
+ * @returns `true` if the line starts a code fence, heading, HR, blockquote, or list.
+ */
 function isBlockStart(line: string): boolean {
   if (line.trimStart().startsWith('```')) return true;
   if (/^(#{1,4})\s+/.test(line)) return true;
@@ -145,12 +169,31 @@ function isBlockStart(line: string): boolean {
 // Inline parser
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse and render inline markdown syntax within a text fragment.
+ *
+ * Dispatches to mode-specific handlers for styled, plain, or accessible output.
+ *
+ * @param text - The inline text to parse.
+ * @param ctx - Bijou context for styling.
+ * @param mode - Current rendering mode.
+ * @returns The rendered inline text.
+ */
 function parseInline(text: string, ctx: BijouContext, mode: string): string {
   if (mode === 'accessible') return parseInlineAccessible(text, ctx);
   if (mode === 'pipe') return parseInlinePlain(text);
   return parseInlineStyled(text, ctx);
 }
 
+/**
+ * Render inline markdown with terminal styling (interactive/static mode).
+ *
+ * Processes links, code spans, bold, and italic with theme-based colors.
+ *
+ * @param text - The inline text to parse.
+ * @param ctx - Bijou context for styling.
+ * @returns The styled inline text.
+ */
 function parseInlineStyled(text: string, ctx: BijouContext): string {
   let result = text;
 
@@ -177,6 +220,14 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   return result;
 }
 
+/**
+ * Strip inline markdown syntax to plain text (pipe mode).
+ *
+ * Converts links to `text (url)` format and removes formatting markers.
+ *
+ * @param text - The inline text to parse.
+ * @returns The plain-text inline text.
+ */
 function parseInlinePlain(text: string): string {
   let result = text;
 
@@ -195,6 +246,15 @@ function parseInlinePlain(text: string): string {
   return result;
 }
 
+/**
+ * Parse inline markdown for screen-reader-friendly output (accessible mode).
+ *
+ * Prefixes links with `Link:` and strips formatting markers.
+ *
+ * @param text - The inline text to parse.
+ * @param _ctx - Bijou context (unused, kept for signature consistency).
+ * @returns The accessible inline text.
+ */
 function parseInlineAccessible(text: string, _ctx: BijouContext): string {
   let result = text;
 
@@ -217,6 +277,15 @@ function parseInlineAccessible(text: string, _ctx: BijouContext): string {
 // Word wrapping
 // ---------------------------------------------------------------------------
 
+/**
+ * Wrap text to a maximum column width, breaking on word boundaries.
+ *
+ * Uses grapheme-aware width measurement to handle wide characters correctly.
+ *
+ * @param text - The text to wrap.
+ * @param width - Maximum line width in columns.
+ * @returns Array of wrapped lines.
+ */
 function wordWrap(text: string, width: number): string[] {
   if (width <= 0) return [text];
   const words = text.split(' ');
@@ -246,6 +315,16 @@ function wordWrap(text: string, width: number): string[] {
 // Block renderer
 // ---------------------------------------------------------------------------
 
+/**
+ * Render an array of parsed block elements into a final terminal string.
+ *
+ * Handles mode-specific rendering for each block type and trims trailing blanks.
+ *
+ * @param blocks - Parsed block-level elements.
+ * @param ctx - Bijou context for styling and mode.
+ * @param width - Column width for word wrapping.
+ * @returns The fully rendered markdown string.
+ */
 function renderBlocks(
   blocks: BlockType[],
   ctx: BijouContext,

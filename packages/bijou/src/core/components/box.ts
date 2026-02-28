@@ -4,16 +4,33 @@ import { getDefaultContext } from '../../context.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
 
+/** Configuration for rendering a bordered box. */
 export interface BoxOptions {
+  /** Theme token applied to border characters. */
   borderToken?: TokenValue;
+  /** Inner padding between the border and content (in characters/lines). */
   padding?: { top?: number; bottom?: number; left?: number; right?: number };
   /** Lock outer width (including borders). Content is clipped/padded to fit. */
   width?: number;
+  /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
 
+/** Unicode box-drawing characters for single-line borders. */
 const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2500', v: '\u2502' };
 
+/**
+ * Draw a unicode box around the given content string.
+ *
+ * Supports both auto-width (measured from content) and fixed-width modes.
+ * Content lines wider than the available space are clipped.
+ *
+ * @param content - Multiline string to place inside the box.
+ * @param borderColor - Function that wraps border characters with color styling.
+ * @param padding - Resolved padding values (top, bottom, left, right).
+ * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
+ * @returns The rendered box as a multiline string.
+ */
 function drawBox(
   content: string,
   borderColor: (s: string) => string,
@@ -67,11 +84,28 @@ function drawBox(
   return lines.join('\n');
 }
 
+/**
+ * Resolve the provided context or fall back to the default context.
+ *
+ * @param ctx - Optional context override.
+ * @returns The resolved {@link BijouContext}.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
   return getDefaultContext();
 }
 
+/**
+ * Render content inside a bordered box.
+ *
+ * Output adapts to the current output mode:
+ * - `interactive` / `static` — unicode box with themed border color.
+ * - `pipe` / `accessible` — raw content without borders.
+ *
+ * @param content - Text to display inside the box (may contain newlines).
+ * @param options - Box configuration.
+ * @returns The rendered box string, or plain content in non-visual modes.
+ */
 export function box(content: string, options: BoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
@@ -93,11 +127,25 @@ export function box(content: string, options: BoxOptions = {}): string {
   return drawBox(content, colorize, padding, options.width);
 }
 
+/** Configuration for {@link headerBox}, extending {@link BoxOptions} with label support. */
 export interface HeaderBoxOptions extends BoxOptions {
+  /** Optional detail text displayed after the label in a muted style. */
   detail?: string;
+  /** Theme token applied to the label text. */
   labelToken?: TokenValue;
 }
 
+/**
+ * Render a labeled box with an optional detail line.
+ *
+ * In visual modes the label is styled with the primary semantic token and
+ * wrapped in a {@link box}. Pipe mode returns plain text; accessible mode
+ * uses a colon separator.
+ *
+ * @param label - Primary heading text.
+ * @param options - Header box configuration.
+ * @returns The rendered header box string.
+ */
 export function headerBox(label: string, options: HeaderBoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;

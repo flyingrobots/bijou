@@ -1,18 +1,40 @@
 import type { BijouContext } from '../../ports/context.js';
 import { getDefaultContext } from '../../context.js';
 
+/** Configuration options for the {@link paginator} component. */
 export interface PaginatorOptions {
+  /** Zero-based index of the current page. */
   current: number;
+  /** Total number of pages. */
   total: number;
+  /** Display style: `'dots'` for dot indicators, `'text'` for "Page X of Y". Defaults to `'dots'`. */
   style?: 'dots' | 'text';
+  /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
 
+/**
+ * Resolve a BijouContext, falling back to the global default.
+ *
+ * @param ctx - Optional explicit context.
+ * @returns The provided context or the global default.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
   return getDefaultContext();
 }
 
+/**
+ * Render a page indicator showing the current position within a set of pages.
+ *
+ * Adapts output by mode:
+ * - `pipe`: `[page/total]` format.
+ * - `accessible`: `Page N of M` format.
+ * - `interactive`/`static`: dot indicators (`●`/`○`) or text depending on style option.
+ *
+ * @param options - Paginator configuration including current page, total, and display style.
+ * @returns The formatted paginator string.
+ */
 export function paginator(options: PaginatorOptions): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;

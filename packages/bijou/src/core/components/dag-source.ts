@@ -59,13 +59,23 @@ export interface SlicedDagSource extends DagSource {
 
 /** Options for `dagSlice()`. */
 export interface DagSliceOptions {
+  /** Traversal direction from the focus node. Defaults to `'both'`. */
   direction?: 'ancestors' | 'descendants' | 'both';
+  /** Maximum BFS depth from the focus node. Defaults to `Infinity`. */
   depth?: number;
 }
 
 // ── Type Guard ──────────────────────────────────────────────────────
 
-/** Returns true if the value implements the `DagSource` interface. */
+/**
+ * Return true if the value implements the `DagSource` interface.
+ *
+ * Checks for the presence of `has`, `label`, and `children` methods on
+ * a non-null, non-array object.
+ *
+ * @param value - The value to test.
+ * @returns `true` if `value` conforms to `DagSource`.
+ */
 export function isDagSource(value: unknown): value is DagSource {
   return (
     typeof value === 'object' &&
@@ -77,7 +87,15 @@ export function isDagSource(value: unknown): value is DagSource {
   );
 }
 
-/** Returns true if the value is a `SlicedDagSource` (bounded, with `ids()`). */
+/**
+ * Return true if the value is a `SlicedDagSource` (bounded, with `ids()`).
+ *
+ * Extends `isDagSource` by additionally checking for `ids`, `ghost`, and
+ * `ghostLabel` methods.
+ *
+ * @param value - The value to test.
+ * @returns `true` if `value` conforms to `SlicedDagSource`.
+ */
 export function isSlicedDagSource(value: unknown): value is SlicedDagSource {
   return (
     isDagSource(value) &&
@@ -89,7 +107,15 @@ export function isSlicedDagSource(value: unknown): value is SlicedDagSource {
 
 // ── arraySource ─────────────────────────────────────────────────────
 
-/** Wraps a `DagNode[]` as a `SlicedDagSource`. Already bounded. */
+/**
+ * Wrap a `DagNode[]` as a `SlicedDagSource`.
+ *
+ * Pre-computes a parent map for efficient reverse lookups. The returned
+ * source is already bounded (all node IDs are known).
+ *
+ * @param nodes - The array of DAG nodes to wrap.
+ * @returns A `SlicedDagSource` backed by the provided array.
+ */
 export function arraySource(nodes: DagNode[]): SlicedDagSource {
   const map = new Map<string, DagNode>();
   for (const n of nodes) map.set(n.id, n);
@@ -123,7 +149,15 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
 
 // ── materialize ─────────────────────────────────────────────────────
 
-/** @internal Converts a `SlicedDagSource` to `DagNode[]` for internal renderers. */
+/**
+ * @internal Convert a `SlicedDagSource` back to a `DagNode[]` array.
+ *
+ * Iterates over all IDs in the source and reconstructs `DagNode` objects,
+ * preserving badges, tokens, and ghost metadata.
+ *
+ * @param source - The bounded source to materialize.
+ * @returns Array of `DagNode` objects.
+ */
 export function materialize(source: SlicedDagSource): DagNode[] {
   const ids = source.ids();
   const nodes: DagNode[] = [];
@@ -153,6 +187,7 @@ export function materialize(source: SlicedDagSource): DagNode[] {
 
 // ── emptySource ─────────────────────────────────────────────────────
 
+/** @internal Shared frozen empty array for sources with no nodes. */
 const EMPTY_IDS: readonly string[] = Object.freeze([]);
 
 /** @internal Singleton empty source for missing focus nodes. */
@@ -167,18 +202,28 @@ const EMPTY_SOURCE: SlicedDagSource = Object.freeze({
 
 // ── Ghost ID Prefixes ───────────────────────────────────────────────
 
+/** @internal ID prefix for ghost nodes representing truncated ancestor branches. */
 const GHOST_ANCESTORS_PREFIX = '__ghost_ancestors_';
+
+/** @internal ID prefix for ghost nodes representing truncated descendant branches. */
 const GHOST_DESCENDANTS_PREFIX = '__ghost_descendants_';
 
 // ── sliceSource ─────────────────────────────────────────────────────
 
 /**
- * BFS-walks a `DagSource` from a focus node and returns a bounded
- * `SlicedDagSource` containing only the neighborhood. Ghost nodes are
- * injected at depth boundaries.
+ * BFS-walk a `DagSource` from a focus node and return a bounded
+ * `SlicedDagSource` containing only the neighborhood.
  *
- * Never calls `ids()` on the source — works purely via traversal.
- * For ancestor/both directions, `source.parents()` must be provided.
+ * Ghost nodes are injected at depth boundaries to indicate truncated
+ * branches. Never calls `ids()` on the source -- works purely via
+ * traversal. For ancestor/both directions, `source.parents()` must
+ * be provided.
+ *
+ * @param source - The (possibly unbounded) graph to slice.
+ * @param focus - ID of the node to center the slice around.
+ * @param opts - Traversal direction and maximum depth.
+ * @returns A bounded `SlicedDagSource` containing the neighborhood.
+ * @throws If `direction` is `'ancestors'` and `source.parents` is not provided.
  */
 export function sliceSource(
   source: DagSource,

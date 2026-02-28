@@ -1,16 +1,37 @@
 import type { BijouContext } from '../../ports/context.js';
 import { getDefaultContext } from '../../context.js';
 
+/** Configuration options for the {@link breadcrumb} component. */
 export interface BreadcrumbOptions {
+  /** Custom separator between breadcrumb segments. Defaults to `' > '` (pipe) or `' › '` (rich). */
   separator?: string;
+  /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
 
+/**
+ * Resolve a BijouContext, falling back to the global default.
+ *
+ * @param ctx - Optional explicit context.
+ * @returns The provided context or the global default.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext {
   if (ctx) return ctx;
   return getDefaultContext();
 }
 
+/**
+ * Render a breadcrumb navigation trail.
+ *
+ * Adapts output by mode:
+ * - `pipe`: plain segments joined by `>`.
+ * - `accessible`: `Breadcrumb: path (current)` format for screen readers.
+ * - `interactive`/`static`: muted ancestors with the last segment bold and primary-colored.
+ *
+ * @param items - Ordered breadcrumb segments (first = root, last = current).
+ * @param options - Rendering options including separator and context.
+ * @returns The formatted breadcrumb string.
+ */
 export function breadcrumb(items: string[], options: BreadcrumbOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;

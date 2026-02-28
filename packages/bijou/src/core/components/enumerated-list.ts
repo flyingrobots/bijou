@@ -1,15 +1,39 @@
 import type { BijouContext } from '../../ports/context.js';
 import { getDefaultContext } from '../../context.js';
 
+/**
+ * Enumeration style for list item prefixes.
+ *
+ * - `'arabic'` - Decimal numbering (1., 2., 3.)
+ * - `'alpha'` - Lowercase alphabetic (a., b., c.)
+ * - `'roman'` - Lowercase Roman numerals (i., ii., iii.)
+ * - `'bullet'` - Unicode bullet character
+ * - `'dash'` - En-dash character
+ * - `'none'` - No prefix
+ */
 export type BulletStyle = 'arabic' | 'alpha' | 'roman' | 'bullet' | 'dash' | 'none';
 
+/** Configuration options for the {@link enumeratedList} component. */
 export interface EnumeratedListOptions {
-  readonly style?: BulletStyle;     // default: 'arabic'
-  readonly indent?: number;         // default: 2
-  readonly start?: number;          // default: 1
+  /** Bullet/numbering style. Defaults to `'arabic'`. */
+  readonly style?: BulletStyle;
+  /** Number of leading spaces for indentation. Defaults to `2`. */
+  readonly indent?: number;
+  /** Starting number for ordered styles. Defaults to `1`. */
+  readonly start?: number;
+  /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }
 
+/**
+ * Resolve a BijouContext, falling back to the global default.
+ *
+ * Returns `undefined` if no context is provided and no default is configured,
+ * allowing the component to degrade gracefully.
+ *
+ * @param ctx - Optional explicit context.
+ * @returns The resolved context or `undefined`.
+ */
 function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
   if (ctx) return ctx;
   try {
@@ -19,6 +43,12 @@ function resolveCtx(ctx?: BijouContext): BijouContext | undefined {
   }
 }
 
+/**
+ * Convert a positive integer to a lowercase Roman numeral string.
+ *
+ * @param n - The integer to convert.
+ * @returns The Roman numeral representation.
+ */
 function toRoman(n: number): string {
   const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
   const syms = ['m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i'];
@@ -32,6 +62,12 @@ function toRoman(n: number): string {
   return result;
 }
 
+/**
+ * Convert a positive integer to a lowercase alphabetic label (a, b, ..., z, aa, ab, ...).
+ *
+ * @param n - The 1-based integer to convert.
+ * @returns The alphabetic label string.
+ */
 function toAlpha(n: number): string {
   let result = '';
   while (n > 0) {
@@ -42,6 +78,13 @@ function toAlpha(n: number): string {
   return result;
 }
 
+/**
+ * Generate a Unicode list-item prefix for rich/interactive rendering.
+ *
+ * @param style - The bullet style to use.
+ * @param index - The 1-based item index (used for ordered styles).
+ * @returns The prefix string (e.g. `"3."`, `"b."`, `"•"`).
+ */
 function generatePrefix(style: BulletStyle, index: number): string {
   switch (style) {
     case 'arabic':
@@ -59,6 +102,15 @@ function generatePrefix(style: BulletStyle, index: number): string {
   }
 }
 
+/**
+ * Generate an ASCII list-item prefix for pipe-mode rendering.
+ *
+ * Falls back to `*` for bullets and `-` for dashes instead of Unicode characters.
+ *
+ * @param style - The bullet style to use.
+ * @param index - The 1-based item index (used for ordered styles).
+ * @returns The ASCII prefix string.
+ */
 function generatePipePrefix(style: BulletStyle, index: number): string {
   switch (style) {
     case 'arabic':
@@ -76,10 +128,31 @@ function generatePipePrefix(style: BulletStyle, index: number): string {
   }
 }
 
+/**
+ * Check whether a bullet style produces sequentially numbered prefixes.
+ *
+ * @param style - The bullet style to test.
+ * @returns `true` if the style is `'arabic'`, `'alpha'`, or `'roman'`.
+ */
 function isOrderedStyle(style: BulletStyle): boolean {
   return style === 'arabic' || style === 'alpha' || style === 'roman';
 }
 
+/**
+ * Render a formatted list with configurable numbering or bullet styles.
+ *
+ * Supports multi-line items with continuation-line indentation aligned to the
+ * first content character. Ordered styles right-align prefixes for visual consistency.
+ *
+ * Adapts output by mode:
+ * - `accessible`: simple decimal numbering regardless of style.
+ * - `pipe`: ASCII-safe prefixes (`*`, `-`).
+ * - `interactive`/`static`/no context: Unicode prefixes (`\u2022`, `\u2013`).
+ *
+ * @param items - List item strings to render (may contain newlines).
+ * @param options - Rendering options including style, indent, start, and context.
+ * @returns The formatted list string, or an empty string if `items` is empty.
+ */
 export function enumeratedList(items: readonly string[], options?: EnumeratedListOptions): string {
   if (items.length === 0) return '';
 
