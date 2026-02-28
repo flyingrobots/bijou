@@ -16,8 +16,7 @@
  * ```
  */
 
-import type { App, Cmd, KeyMsg, RunOptions } from './types.js';
-import { QUIT } from './types.js';
+import type { App, KeyMsg, RunOptions } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
 

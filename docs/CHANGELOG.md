@@ -6,10 +6,47 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-02-28
+
+### 🚀 Features
+
+#### Core (`@flyingrobots/bijou`)
+
+- **Grapheme cluster support** — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` utilities using `Intl.Segmenter` for correct Unicode text measurement. East Asian Wide characters (CJK = 2 columns), emoji (flags, ZWJ families, skin tones = 2 columns), and combining marks handled correctly
+- **`markdown()`** — terminal markdown renderer supporting headings, bold, italic, code spans, bullet/numbered lists, fenced code blocks, blockquotes, horizontal rules, and links. Two-pass parser with mode degradation (interactive → styled, pipe → plain, accessible → labeled)
+- **Color downsampling** — `rgbToAnsi256()`, `nearestAnsi256()`, `rgbToAnsi16()`, `ansi256ToAnsi16()` pure conversion functions for terminals with limited color support. `ColorLevel` type for color capability detection
+- **`AuditStylePort`** — `auditStyle()` test adapter that records all `styled()`/`rgb()`/`hex()`/`bold()` calls for post-hoc assertion. `wasStyled(token, substring)` convenience method. Returns text unchanged for compatibility with existing string assertions
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`isKeyMsg()` / `isResizeMsg()` type guards** — replace unsafe `as KeyMsg` casts with proper runtime type narrowing
+- **`runScript()`** — scripted CLI/stdin driver for automated testing and demos. Feeds key sequences into a TEA app and captures all rendered frames. Supports delays, `onFrame` callbacks, and returns final model + frame history
+
+#### Node adapter (`@flyingrobots/bijou-node`)
+
+- **`chalkStyle()` level override** — accepts optional `level?: 0|1|2|3` for explicit color level control in tests
+
+### 🐛 Fixes
+
+- **`visibleLength()`** — now grapheme-cluster aware in both `dag.ts` and `viewport.ts`; correctly measures CJK, emoji, and combining marks
+- **`clipToWidth()`** — grapheme-cluster aware clipping; won't split multi-codepoint sequences
+- **`sliceAnsi()`** — grapheme-cluster aware column slicing
+- **`truncateLabel()`** — truncates by grapheme clusters, not UTF-16 code units
+- **`renderNodeBox()` char iteration** — uses grapheme segmenter instead of `[...line]` code-point spread
+- **`flex.ts` duplicate `clipToWidth()`** — removed duplicate; imports from `viewport.ts`
+- **`select()` / `multiselect()` / `textarea()` / `filter()`** — Escape key now cancels (in addition to Ctrl+C)
+
 ### 🔧 Refactors
 
-- Replace `as KeyMsg` / `as ResizeMsg` type casts with `isKeyMsg()` / `isResizeMsg()` type guards across all 24 example `main.ts` files, `demo-tui.ts`, and `eventbus.test.ts`
+- Replace `as KeyMsg` / `as ResizeMsg` type casts with `isKeyMsg()` / `isResizeMsg()` type guards across all 23 example `main.ts` files, `demo-tui.ts`, `runtime.ts`, and `eventbus.test.ts`
 
+### 🧪 Tests
+
+- 141 new tests across 8 new + 6 expanded test files (1350 total)
+
+### 📝 Documentation
+
+- Updated 23 example README code snippets to use type guards
 ## [0.8.0] — 2026-02-28
 
 ### 🚀 Features
@@ -316,7 +353,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/flyingrobots/bijou/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/flyingrobots/bijou/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/flyingrobots/bijou/compare/v0.5.1...v0.6.0
