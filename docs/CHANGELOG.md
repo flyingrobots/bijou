@@ -8,7 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [0.6.0] — 2026-02-27
 
-### Added
+### 🚀 Features
 
 #### Core (`@flyingrobots/bijou`)
 
@@ -29,7 +29,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`fpEnter()` / `fpBack()`** — directory traversal (enter child / go to parent)
 - **`filePickerKeyMap()`** — preconfigured vim-style keybindings (j/k, arrows, enter, backspace)
 
-### Fixed
+### 🐛 Bug Fixes
 
 #### Node adapter (`@flyingrobots/bijou-node`)
 
@@ -43,12 +43,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`navigableTable()` deep row copy** — `createNavigableTableState()` now deep-copies rows (inner arrays) to prevent external mutation leaking into state
 - **`fpBack()` cross-platform paths** — parent directory resolution now uses `io.joinPath()` instead of hardcoded `/` separator
 
-### Tests
+### 🧪 Tests
 
 - **Form edge-case hardening** — added confirm/input empty-answer tests in interactive mode, multiselect toggle-on-off and last-item navigation tests
 - **Environment integration matrix** — added form fallback tests for pipe and accessible modes, component × mode matrix, NO_COLOR × component matrix, and CI=true TTY detection variants
 
-### Documentation
+### 📝 Documentation
 
 - **5 new examples** — `dag-stats`, `wizard`, `navigable-table`, `browsable-list`, `file-picker` with VHS demo tapes and per-example READMEs
 

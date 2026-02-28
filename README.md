@@ -13,6 +13,20 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
+## What's New in v0.6.0
+
+**Building Blocks** — reusable stateful TUI components that follow the TEA pattern:
+
+- **`navigableTable()`** — keyboard-navigable data table with focus, scrolling, and vim keybindings
+- **`browsableList()`** — scrollable list with focus tracking, descriptions, and page navigation
+- **`filePicker()`** — directory browser with IOPort integration and extension filtering
+- **`wizard()`** — multi-step form orchestrator with conditional skip logic
+- **`dagStats()`** — pure graph statistics with cycle detection
+
+See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
+
+---
+
 ## 🚀 Try it in 10 Seconds
 
 Experience the full physics-powered TUI engine immediately:
