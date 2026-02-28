@@ -6,6 +6,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+#### TUI (`@flyingrobots/bijou-tui`)
+
+- **`navigableTable()`** — keyboard-navigable table wrapping core `table()` with focus management, vertical scrolling, and vim-style keybindings (`j`/`k`, `d`/`u`, page up/down)
+- **`createNavigableTableState()`** — factory for navigable table state with configurable viewport height
+- **`navTableFocusNext()` / `navTableFocusPrev()`** — row focus with wrap-around
+- **`navTablePageDown()` / `navTablePageUp()`** — page-sized jumps with clamping
+- **`navTableKeyMap()`** — preconfigured keybinding map for table navigation
+
 ## [0.5.0] — 2026-02-27
 
 ### Added
