@@ -174,10 +174,13 @@ export {
   type ToastOptions,
   type DrawerAnchor,
   type DrawerOptions,
+  type TooltipDirection,
+  type TooltipOptions,
   composite,
   modal,
   toast,
   drawer,
+  tooltip,
 } from './overlay.js';
 
 // Interactive accordion
@@ -237,3 +240,19 @@ export {
   fpBack,
   filePickerKeyMap,
 } from './file-picker.js';
+
+// Command palette
+export {
+  type CommandPaletteItem,
+  type CommandPaletteState,
+  type CommandPaletteOptions,
+  createCommandPaletteState,
+  cpFilter,
+  cpFocusNext,
+  cpFocusPrev,
+  cpPageDown,
+  cpPageUp,
+  cpSelectedItem,
+  commandPalette,
+  commandPaletteKeyMap,
+} from './command-palette.js';

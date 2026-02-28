@@ -93,6 +93,29 @@ describe('dag', () => {
     });
   });
 
+  describe('non-BMP characters (emoji)', () => {
+    it('renders emoji label without charTypes/chars length mismatch', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: '🚀 Deploy', edges: ['b'] },
+        { id: 'b', label: 'Done' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('🚀 Deploy');
+      expect(result).toContain('Done');
+    });
+
+    it('renders emoji badge without charTypes/chars length mismatch', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'Build', badge: '✅' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('Build');
+      expect(result).toContain('✅');
+    });
+  });
+
   // ── Mode Tests ──────────────────────────────────────────────────
 
   describe('pipe mode', () => {
@@ -959,5 +982,138 @@ describe('DagSource adapter', () => {
         }
       }
     });
+  });
+});
+
+// ── labelToken / badgeToken Tests ──────────────────────────────────
+
+describe('DagNode labelToken / badgeToken', () => {
+  it('labelToken renders node without error', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'Alpha', labelToken: { hex: '#00ff00' } },
+    ];
+    const result = dag(nodes, { ctx });
+    expect(result).toContain('Alpha');
+    expect(result).toContain('╭');
+  });
+
+  it('badgeToken colors badge differently from border', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'Build', badge: 'DONE', badgeToken: { hex: '#ff0000' } },
+    ];
+    const result = dag(nodes, { ctx });
+    expect(result).toContain('Build');
+    expect(result).toContain('DONE');
+  });
+
+  it('both labelToken and badgeToken together', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      {
+        id: 'a',
+        label: 'Deploy',
+        badge: 'WIP',
+        labelToken: { hex: '#00ff00' },
+        badgeToken: { hex: '#ff0000' },
+      },
+    ];
+    const result = dag(nodes, { ctx });
+    expect(result).toContain('Deploy');
+    expect(result).toContain('WIP');
+  });
+
+  it('falls back to node token when labelToken/badgeToken omitted', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      {
+        id: 'a',
+        label: 'Deploy',
+        badge: 'OK',
+        token: { hex: '#0000ff' },
+        // no labelToken/badgeToken — should use token for all chars
+      },
+    ];
+    const src = arraySource(nodes);
+    // arraySource should return undefined for missing token overrides
+    expect(src.labelToken!('a')).toBeUndefined();
+    expect(src.badgeToken!('a')).toBeUndefined();
+    // Should still render without error using the base token
+    const result = dag(nodes, { ctx });
+    expect(result).toContain('Deploy');
+    expect(result).toContain('OK');
+  });
+
+  it('works with selectedId — selectedToken takes precedence for border', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      {
+        id: 'a',
+        label: 'Selected',
+        labelToken: { hex: '#00ff00' },
+        badgeToken: { hex: '#ff0000' },
+        badge: 'TAG',
+      },
+    ];
+    // Should not crash and should render
+    const result = dag(nodes, { selectedId: 'a', ctx });
+    expect(result).toContain('Selected');
+    expect(result).toContain('TAG');
+  });
+
+  it('works through arraySource', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'A', edges: ['b'], labelToken: { hex: '#00ff00' } },
+      { id: 'b', label: 'B', badgeToken: { hex: '#ff0000' }, badge: 'X' },
+    ];
+    const src = arraySource(nodes);
+    expect(src.labelToken!('a')).toEqual({ hex: '#00ff00' });
+    expect(src.badgeToken!('b')).toEqual({ hex: '#ff0000' });
+    expect(src.labelToken!('b')).toBeUndefined();
+    expect(src.badgeToken!('a')).toBeUndefined();
+    // Should render without error
+    const result = dag(src, { ctx });
+    expect(result).toContain('A');
+    expect(result).toContain('B');
+  });
+
+  it('works through dagSlice', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const nodes: DagNode[] = [
+      { id: 'a', label: 'A', edges: ['b'], labelToken: { hex: '#00ff00' } },
+      { id: 'b', label: 'B', edges: ['c'], badgeToken: { hex: '#ff0000' }, badge: 'X' },
+      { id: 'c', label: 'C' },
+    ];
+    const src = arraySource(nodes);
+    const sliced = dagSlice(src, 'b', { direction: 'both', depth: 1 });
+    // labelToken should be preserved for 'a'
+    expect(sliced.labelToken!('a')).toEqual({ hex: '#00ff00' });
+    // badgeToken should be preserved for 'b'
+    expect(sliced.badgeToken!('b')).toEqual({ hex: '#ff0000' });
+    // Should render without error
+    const result = dag(sliced, { ctx });
+    expect(result).toContain('A');
+    expect(result).toContain('B');
+  });
+
+  it('pipe mode ignores tokens (no ANSI output)', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const nodes: DagNode[] = [
+      {
+        id: 'a',
+        label: 'Build',
+        badge: 'OK',
+        labelToken: { hex: '#00ff00' },
+        badgeToken: { hex: '#ff0000' },
+        edges: ['b'],
+      },
+      { id: 'b', label: 'Test' },
+    ];
+    const result = dag(nodes, { ctx });
+    // Pipe mode uses plain text adjacency list — no ANSI
+    expect(result).not.toContain('\x1b[');
+    expect(result).toContain('Build (OK) -> Test');
   });
 });

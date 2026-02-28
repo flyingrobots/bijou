@@ -1,6 +1,6 @@
 # Examples
 
-> 57 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 59 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -73,4 +73,6 @@
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
 | [`status-bar`](./status-bar/) | `statusBar()` | Segmented header/footer with fill characters |
 | [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
+| [`command-palette`](./command-palette/) | `commandPalette()`, `commandPaletteKeyMap()` | Filterable action list with live search |
+| [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

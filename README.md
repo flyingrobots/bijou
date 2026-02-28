@@ -13,16 +13,14 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v0.7.0
+## What's New in v0.8.0
 
-**Layout, Core Components & Overlays** — new primitives for building polished terminal interfaces:
+**Command Palette, Tooltip, Color Utils & DAG Tokens** — four high-value non-breaking features:
 
-- **`place()`** — 2D text alignment with horizontal and vertical positioning
-- **`statusBar()`** — segmented header/footer with left, center, and right sections
-- **`enumeratedList()`** — ordered/unordered lists with 6 bullet styles
-- **`hyperlink()`** — OSC 8 clickable terminal links with graceful fallback
-- **`log()`** — leveled styled output (debug/info/warn/error/fatal)
-- **`drawer()`** — slide-in side panel overlay with `composite()` integration
+- **`commandPalette()`** — filterable action list with case-insensitive search, viewport scrolling, and keyboard navigation
+- **`tooltip()`** — positioned overlay with top/bottom/left/right direction and screen-edge clamping
+- **Color manipulation** — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens
+- **`DagNode` token expansion** — `labelToken` and `badgeToken` for granular per-node text styling
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 
@@ -132,7 +130,8 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `navigableTable` | ✅ Stable | Keyboard-navigable data table with focus, scrolling, and vim keybindings. |
 | `browsableList` | ✅ Stable | Scrollable list with focus tracking, descriptions, and page navigation. |
 | `filePicker` | ✅ Stable | Directory browser with IOPort integration and extension filtering. |
-| `commandPalette` | 🗓️ Roadmap | Unified global search and action interface. |
+| `commandPalette` | ✅ Stable | Filterable action list with search and keyboard navigation. |
+| `tooltip` | ✅ Stable | Positioned overlay with directional placement and screen clamping. |
 
 ---
 

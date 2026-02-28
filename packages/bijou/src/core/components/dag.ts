@@ -12,6 +12,8 @@ export interface DagNode {
   edges?: string[];
   badge?: string;
   token?: TokenValue;
+  labelToken?: TokenValue;
+  badgeToken?: TokenValue;
   /** @internal Used by dagSlice to mark ghost boundary nodes */
   _ghost?: boolean;
   _ghostLabel?: string;
@@ -281,12 +283,19 @@ function markEdge(
 
 // ── Node Box Rendering ─────────────────────────────────────────────
 
+type CharType = 'border' | 'label' | 'badge' | 'pad';
+
+interface NodeBoxResult {
+  lines: string[];
+  charTypes: CharType[][];
+}
+
 function renderNodeBox(
   label: string,
   badgeText: string | undefined,
   width: number,
   ghost: boolean,
-): string[] {
+): NodeBoxResult {
   const h = ghost ? '\u254c' : '\u2500';
   const v = ghost ? '\u254e' : '\u2502';
 
@@ -294,21 +303,46 @@ function renderNodeBox(
   const contentW = innerW - 2;
 
   let content: string;
+  let midTypes: CharType[];
   if (badgeText) {
     const maxLabelW = contentW - visibleLength(badgeText) - 1;
     const tLabel = truncateLabel(label, maxLabelW);
     const gap = Math.max(1, contentW - visibleLength(tLabel) - visibleLength(badgeText));
     content = tLabel + ' '.repeat(gap) + badgeText;
+
+    // Build char-type map for mid line: border + pad + label + gap + badge + pad + border
+    // Use [...str].length (code points) instead of visibleLength (.length / UTF-16 code units)
+    // so that non-BMP characters (emoji) align with the [...line] iteration in the renderer.
+    midTypes = ['border']; // v
+    midTypes.push('pad');  // space
+    for (let i = 0; i < [...tLabel].length; i++) midTypes.push('label');
+    for (let i = 0; i < gap; i++) midTypes.push('pad');
+    for (let i = 0; i < [...badgeText].length; i++) midTypes.push('badge');
   } else {
     content = truncateLabel(label, contentW);
+
+    // Build char-type map for mid line: border + pad + label + pad + border
+    // Use [...str].length (code points) — see comment above.
+    midTypes = ['border']; // v
+    midTypes.push('pad');  // space
+    for (let i = 0; i < [...content].length; i++) midTypes.push('label');
   }
 
   const padRight = Math.max(0, contentW - visibleLength(content));
+  for (let i = 0; i < padRight; i++) midTypes.push('pad');
+  midTypes.push('pad');    // trailing space
+  midTypes.push('border'); // v
+
   const top = '\u256d' + h.repeat(innerW) + '\u256e';
   const mid = v + ' ' + content + ' '.repeat(padRight) + ' ' + v;
   const bot = '\u2570' + h.repeat(innerW) + '\u256f';
 
-  return [top, mid, bot];
+  const borderLine: CharType[] = Array.from({ length: width }, () => 'border');
+
+  return {
+    lines: [top, mid, bot],
+    charTypes: [borderLine, midTypes, borderLine],
+  };
 }
 
 // ── Interactive Renderer ───────────────────────────────────────────
@@ -467,7 +501,7 @@ function renderInteractiveLayout(
 
     positions.set(n.id, { row: startRow, col: startCol, width: nodeWidth, height: 3 });
 
-    const boxLines = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
+    const box = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
 
     let nToken: TokenValue;
     if (options.selectedId === n.id) {
@@ -480,16 +514,24 @@ function renderInteractiveLayout(
       nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
     }
 
-    for (let lineIdx = 0; lineIdx < boxLines.length; lineIdx++) {
+    for (let lineIdx = 0; lineIdx < box.lines.length; lineIdx++) {
       const row = startRow + lineIdx;
       if (row >= gridRows) continue;
-      const line = boxLines[lineIdx]!;
+      const line = box.lines[lineIdx]!;
+      const types = box.charTypes[lineIdx]!;
       const chars = [...line];
       for (let ci = 0; ci < chars.length; ci++) {
         const gc = startCol + ci;
         if (gc < gridCols) {
           charGrid[row]![gc] = chars[ci]!;
-          tokenGrid[row]![gc] = nToken;
+          const charType = types[ci];
+          if (charType === 'label' && n.labelToken) {
+            tokenGrid[row]![gc] = n.labelToken;
+          } else if (charType === 'badge' && n.badgeToken) {
+            tokenGrid[row]![gc] = n.badgeToken;
+          } else {
+            tokenGrid[row]![gc] = nToken;
+          }
         }
       }
     }
