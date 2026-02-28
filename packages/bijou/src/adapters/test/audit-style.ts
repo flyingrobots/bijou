@@ -58,7 +58,7 @@ export function auditStyle(): AuditStylePort {
         (c) =>
           c.method === 'styled'
           && c.token?.hex === token.hex
-          && JSON.stringify(c.token?.modifiers ?? []) === JSON.stringify(token.modifiers ?? [])
+          && JSON.stringify([...(c.token?.modifiers ?? [])].sort()) === JSON.stringify([...(token.modifiers ?? [])].sort())
           && c.text.includes(substring),
       );
     },
