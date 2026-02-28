@@ -241,6 +241,14 @@ export {
   filePickerKeyMap,
 } from './file-picker.js';
 
+// Scripted driver
+export {
+  type ScriptStep,
+  type RunScriptOptions,
+  type RunScriptResult,
+  runScript,
+} from './driver.js';
+
 // Command palette
 export {
   type CommandPaletteItem,
