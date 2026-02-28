@@ -50,21 +50,19 @@ export function dagStats(input: DagNode[] | SlicedDagSource): DagStats {
     }
   }
 
-  // Kahn's topological sort
+  // Kahn's topological sort (index-based dequeue for O(n) total)
   const queue: string[] = [];
+  let head = 0;
   for (const [id, deg] of inDegree) {
     if (deg === 0) queue.push(id);
   }
 
   const topoOrder: string[] = [];
-  const visited = new Set<string>();
-  while (queue.length > 0) {
-    const id = queue.shift()!;
-    if (visited.has(id)) continue;
-    visited.add(id);
+  while (head < queue.length) {
+    const id = queue[head++]!;
     topoOrder.push(id);
     for (const childId of children.get(id) ?? []) {
-      const newDeg = (inDegree.get(childId) ?? 1) - 1;
+      const newDeg = inDegree.get(childId)! - 1;
       inDegree.set(childId, newDeg);
       if (newDeg === 0) queue.push(childId);
     }
