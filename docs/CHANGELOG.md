@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+#### TUI runtime (`@flyingrobots/bijou-tui`)
+
+- **`browsableList()`** — navigable list building block with focus tracking, scroll-aware viewport clipping, page navigation, description support, and convenience keymap (`j/k` navigate, `d/u` page, `Enter` select, `q` quit)
+
 ## [0.5.0] — 2026-02-27
 
 ### Added
