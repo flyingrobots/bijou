@@ -77,7 +77,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Replace exact ANSI assertions** | bijou | Change `expect(x).toBe('\x1b[?25l')` patterns to `expect(x).toMatch(/\x1b\[/)` or semantic helpers like `expectHiddenCursor(output)`. |
+| **Replace exact ANSI assertions** | bijou | Change `expect(x).toBe('\x1b[?25l')` patterns to semantic helpers like `expectHiddenCursor(output)`. Note: tests using `createTestContext()` / `plainStyle()` produce no ANSI — ANSI regex assertions only apply when testing with a styling adapter that emits ANSI (e.g. `chalkStyle()`). |
 | **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
 | **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
 | **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
