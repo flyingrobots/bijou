@@ -56,7 +56,7 @@ export interface FlexChild {
   readonly maxSize?: number;
   /** Cross-axis alignment. Default: 'start'. */
   readonly align?: 'start' | 'center' | 'end';
-  /** Background token for this child's allocated region. Requires `bg` field on the token. */
+  /** Background token for this child's allocated region. Requires `bg` field on the token and `ctx` on `FlexOptions`. */
   readonly bgToken?: TokenValue;
 }
 

@@ -6,7 +6,7 @@ Current: **v1.0.0** — Architecture audit remediation
 
 ---
 
-## v0.11.0 — Architecture audit remediation
+## v1.0.0 — Architecture audit remediation
 
 Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
 
