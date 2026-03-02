@@ -31,3 +31,4 @@ npm-debug.log*
 # Misc
 *.tgz
 .claude/worktrees/
+last-chat.txt
