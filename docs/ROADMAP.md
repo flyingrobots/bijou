@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.10.1** — JSDoc total coverage
+Current: **v1.0.0** — Architecture audit remediation
 
 ---
 

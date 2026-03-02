@@ -6,9 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-03-02
+
+### 💥 BREAKING CHANGES
+
+- **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
+- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — the `bg` property on `FlexOptions` and `FlexChild` changed from `{ bg?: string }` to `TokenValue`. A `ctx` property is also required on `FlexOptions` for bg to take effect.
+- **`TooltipOptions.bgToken` added** — new optional property for API consistency with modal/toast/drawer. Not a breaking change for callers, but implementations of tooltip wrappers that spread options may need updating.
+
 ### ✨ Features
 
-- **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
+- **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
 
 ### ♻️ Changed
 
@@ -22,6 +30,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **`flex()` bg routed through StylePort** — background colors in flex layouts now route through `ctx.style.bgHex()` instead of emitting raw ANSI escape sequences, respecting `noColor`, pipe mode, and accessible mode.
+- **`toDTCG()` surface write unconditional** — remove defensive `if (theme.surface)` guard that could silently drop surface tokens during DTCG export.
 - **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
 - **`clip.ts` ANSI regex** — convert `ANSI_RE` from regex literal to `RegExp` constructor to avoid Biome `noControlCharactersInRegex` lint violation
 - **`select()` empty options guard** — throw `Error` when `options.options` is empty instead of allowing undefined dereference
@@ -463,7 +473,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0
 [0.10.1]: https://github.com/flyingrobots/bijou/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0
