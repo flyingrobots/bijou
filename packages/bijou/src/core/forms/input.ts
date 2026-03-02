@@ -1,6 +1,7 @@
 import type { FieldOptions, ValidationResult } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle, writeValidationError } from './form-utils.js';
 
 /**
  * Options for the text input field.
@@ -34,21 +35,13 @@ export async function input(options: InputOptions): Promise<string> {
   const value = answer.trim() || options.defaultValue || '';
 
   if (options.required && value === '') {
-    if (noColor || mode === 'accessible') {
-      ctx.io.write('This field is required.\n');
-    } else {
-      ctx.io.write(ctx.style.styled(ctx.theme.theme.semantic.error, 'This field is required.') + '\n');
-    }
+    writeValidationError('This field is required.', ctx);
   }
 
   if (options.validate) {
     const result: ValidationResult = options.validate(value);
     if (!result.valid && result.message) {
-      if (noColor) {
-        ctx.io.write(result.message + '\n');
-      } else {
-        ctx.io.write(ctx.style.styled(ctx.theme.theme.semantic.error, result.message) + '\n');
-      }
+      writeValidationError(result.message, ctx);
     }
   }
 
@@ -71,7 +64,7 @@ function buildPrompt(options: InputOptions, mode: string, noColor: boolean, ctx:
   if (mode === 'pipe') return `${options.title}${defaultHint}: `;
   if (noColor) return `${options.title}${defaultHint}: `;
 
-  const label = ctx.style.styled(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(options.title);
+  const label = formatFormTitle(options.title, ctx);
   const hint = options.defaultValue ? ctx.style.styled(ctx.theme.theme.semantic.muted, ` (${options.defaultValue})`) : '';
   return `${label}${hint} `;
 }

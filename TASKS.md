@@ -202,7 +202,7 @@
 
 ### 2A. Migrate all forms to resolveCtx()
 
-- [ ] **Replace `options.ctx ?? getDefaultContext()` with `resolveCtx(options.ctx)` in all 6 form files.**
+- [x] **Replace `options.ctx ?? getDefaultContext()` with `resolveCtx(options.ctx)` in all 6 form files.**
 
   Files to edit (all in `packages/bijou/src/core/forms/`):
   - `confirm.ts` — line 3: remove `import { getDefaultContext }`, add `import { resolveCtx } from '../resolve-ctx.js'`; line 24: `const ctx = resolveCtx(options.ctx)`
@@ -218,7 +218,7 @@
 
 ### 2B. Commit resolveCtx migration
 
-- [ ] **Stage and commit the resolveCtx migration.**
+- [x] **Stage and commit the resolveCtx migration.**
 
   ```
   refactor(forms): standardize on resolveCtx()
@@ -228,7 +228,7 @@
 
 ### 2C. Create form-utils.ts with formatFormTitle()
 
-- [ ] **Create `packages/bijou/src/core/forms/form-utils.ts` and extract `formatFormTitle()`.**
+- [x] **Create `packages/bijou/src/core/forms/form-utils.ts` and extract `formatFormTitle()`.**
 
   This is the `? title` formatting pattern duplicated across all forms. There are two variants:
 
@@ -270,7 +270,7 @@
 
 ### 2D. Extract writeValidationError()
 
-- [ ] **Add `writeValidationError()` to `packages/bijou/src/core/forms/form-utils.ts`.**
+- [x] **Add `writeValidationError()` to `packages/bijou/src/core/forms/form-utils.ts`.**
 
   The duplicated pattern (found in `input.ts` and `textarea.ts`):
   ```typescript
@@ -299,7 +299,7 @@
 
 ### 2E. Extract renderNumberedOptions()
 
-- [ ] **Add `renderNumberedOptions()` to `packages/bijou/src/core/forms/form-utils.ts`.**
+- [x] **Add `renderNumberedOptions()` to `packages/bijou/src/core/forms/form-utils.ts`.**
 
   The duplicated pattern (found in fallback modes of `select.ts`, `multiselect.ts`, `filter.ts`):
   ```typescript
@@ -333,7 +333,7 @@
 
 ### 2F. Extract terminalRenderer()
 
-- [ ] **Add `terminalRenderer()` to `packages/bijou/src/core/forms/form-utils.ts`.**
+- [x] **Add `terminalRenderer()` to `packages/bijou/src/core/forms/form-utils.ts`.**
 
   This is the largest extraction. The ANSI cursor control pattern is duplicated ~40 lines per interactive form across `select.ts`, `multiselect.ts`, `filter.ts`, `textarea.ts`.
 
@@ -379,7 +379,7 @@
 
 ### 2G. Extract formDispatch()
 
-- [ ] **Add `formDispatch()` to `packages/bijou/src/core/forms/form-utils.ts`.**
+- [x] **Add `formDispatch()` to `packages/bijou/src/core/forms/form-utils.ts`.**
 
   The duplicated entry-point pattern (found in `select.ts`, `multiselect.ts`, `filter.ts`, `textarea.ts`):
   ```typescript
@@ -414,7 +414,7 @@
 
 ### 2H. Write tests for form-utils.ts
 
-- [ ] **Create `packages/bijou/src/core/forms/form-utils.test.ts` with unit tests for all extracted utilities.**
+- [x] **Create `packages/bijou/src/core/forms/form-utils.test.ts` with unit tests for all extracted utilities.**
 
   Use `createTestContext()` from `../../adapters/test/index.js` for all tests.
 
@@ -452,13 +452,13 @@
 
 ### 2I. Export form-utils from forms barrel (if needed)
 
-- [ ] **Check whether `formatFormTitle`, `writeValidationError`, `renderNumberedOptions`, `terminalRenderer`, and `formDispatch` need to be exported from `packages/bijou/src/core/forms/index.ts` and `packages/bijou/src/index.ts`.**
+- [x] **Check whether `formatFormTitle`, `writeValidationError`, `renderNumberedOptions`, `terminalRenderer`, and `formDispatch` need to be exported from `packages/bijou/src/core/forms/index.ts` and `packages/bijou/src/index.ts`.**
 
   These are internal helpers for form components, NOT public API. They should be importable within the package (`../form-utils.js`) but do NOT need to be in the public barrel exports. Only add to `index.ts` exports if there's a concrete use case for consumers (e.g. building custom form components). Default: do NOT export publicly.
 
 ### 2J. Verify build and full test suite
 
-- [ ] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json` and `npm test` from repo root. Both must pass with zero errors.**
+- [x] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json` and `npm test` from repo root. Both must pass with zero errors.**
 
   Verify that:
   1. Type checking passes (no import errors, no signature mismatches)
@@ -468,7 +468,7 @@
 
 ### 2K. Update roadmap to mark Phase 2 progress
 
-- [ ] **Update `docs/ROADMAP.md` Phase 2 section.**
+- [x] **Update `docs/ROADMAP.md` Phase 2 section.**
 
   Add ~~strikethrough~~ to each completed task row:
   - ~~Extract `formDispatch()` helper~~
@@ -480,7 +480,7 @@
 
 ### 2L. Commit Phase 2
 
-- [ ] **Stage all Phase 2 changes and commit.**
+- [x] **Stage all Phase 2 changes and commit.**
 
   ```
   refactor(forms): extract shared form utilities (DRY)

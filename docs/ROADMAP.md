@@ -26,12 +26,12 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Extract `formDispatch()` helper** | bijou | Shared mode-check + TTY-check that routes to interactive vs. fallback handler. Replaces the identical if/else in 4 form files. |
-| **Extract `terminalRenderer()` utility** | bijou | Shared `render()`, `clearRender()`, `cleanup()` using ANSI cursor control. Parameterized by line count. Replaces ~40 lines of duplication per interactive form. |
-| **Extract `renderNumberedOptions()`** | bijou | Shared numbered-list renderer used by `select`, `multiselect`, `filter` fallback modes. |
-| **Extract `formatFormTitle()`** | bijou | Shared `? ${title}` formatting with mode/noColor branching. Used by all 4 interactive forms. |
-| **Extract `writeValidationError()`** | bijou | Shared error display with mode-aware styling. Replaces identical logic in `input` and `textarea`. |
-| **Standardize on `resolveCtx()`** | bijou | Replace all `options.ctx ?? getDefaultContext()` calls in forms with `resolveCtx()`. |
+| ~~**Extract `formDispatch()` helper**~~ | bijou | Done — shared mode + TTY routing in `form-utils.ts`. |
+| ~~**Extract `terminalRenderer()` utility**~~ | bijou | Done — ANSI cursor helpers (hideCursor, showCursor, moveUp, clearBlock, writeLine). |
+| ~~**Extract `renderNumberedOptions()`**~~ | bijou | Done — shared numbered-list renderer for fallback modes. |
+| ~~**Extract `formatFormTitle()`**~~ | bijou | Done — styled `? title` formatting with mode/noColor branching. |
+| ~~**Extract `writeValidationError()`**~~ | bijou | Done — mode-aware error display for input and textarea. |
+| ~~**Standardize on `resolveCtx()`**~~ | bijou | Done — all 6 form files migrated from `getDefaultContext()` to `resolveCtx()`. |
 
 ### Phase 3: Background color support (new feature)
 
