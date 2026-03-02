@@ -249,6 +249,19 @@ describe('modal', () => {
     });
     expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
   });
+
+  it('bgToken with noColor is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const noColorResult = modal({
+      body: 'NoBg',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    const plain = modal({ body: 'NoBg', screenWidth: 40, screenHeight: 20 });
+    expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
+  });
 });
 
 // ---------------------------------------------------------------------------
