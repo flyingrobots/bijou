@@ -12,11 +12,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
 - **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — the `bg` property on `FlexOptions` and `FlexChild` changed from `{ bg?: string }` to `TokenValue`. A `ctx` property is also required on `FlexOptions` for bg to take effect.
-- **`TooltipOptions.bgToken` added** — new optional property for API consistency with modal/toast/drawer. Not a breaking change for callers, but implementations of tooltip wrappers that spread options may need updating.
-
 ### ✨ Features
 
 - **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
+- **`TooltipOptions.bgToken`** — new optional property for API consistency with modal/toast/drawer.
 
 ### ♻️ Changed
 
