@@ -70,6 +70,14 @@ export const CYAN_MAGENTA: Theme<BaseStatusKey> = {
     tableHeader:   tv('#ffffff'),
     trackEmpty:    tv('#505050'),
   },
+
+  surface: {
+    primary:   { hex: '#ffffff', bg: '#1a1a2e' },
+    secondary: { hex: '#e0e0e0', bg: '#16213e' },
+    elevated:  { hex: '#ffffff', bg: '#0f3460' },
+    overlay:   { hex: '#ffffff', bg: '#1a1a2e' },
+    muted:     { hex: '#808080', bg: '#0a0a14' },
+  },
 };
 
 /**
@@ -132,6 +140,14 @@ export const TEAL_ORANGE_PINK: Theme<BaseStatusKey> = {
     tableHeader:   tv('#d1d5db'),
     trackEmpty:    tv('#404040'),
   },
+
+  surface: {
+    primary:   { hex: '#d1d5db', bg: '#1f2937' },
+    secondary: { hex: '#d1d5db', bg: '#111827' },
+    elevated:  { hex: '#d1d5db', bg: '#374151' },
+    overlay:   { hex: '#d1d5db', bg: '#1f2937' },
+    muted:     { hex: '#6b7280', bg: '#0f1117' },
+  },
 };
 
 /** Registry of all built-in presets, keyed by theme name. */
@@ -185,6 +201,13 @@ export const PRESETS: Record<string, Theme> = {
       tableHeader:   tv('#D8DEE9'),
       trackEmpty:    tv('#2E3440'),
     },
+    surface: {
+      primary:   { hex: '#D8DEE9', bg: '#2E3440' },
+      secondary: { hex: '#D8DEE9', bg: '#3B4252' },
+      elevated:  { hex: '#ECEFF4', bg: '#434C5E' },
+      overlay:   { hex: '#D8DEE9', bg: '#2E3440' },
+      muted:     { hex: '#4C566A', bg: '#242933' },
+    },
   },
   'catppuccin': {
     name: 'catppuccin',
@@ -233,6 +256,13 @@ export const PRESETS: Record<string, Theme> = {
       logo:          tv('#cba6f7'),
       tableHeader:   tv('#cdd6f4'),
       trackEmpty:    tv('#181825'),
+    },
+    surface: {
+      primary:   { hex: '#cdd6f4', bg: '#1e1e2e' },
+      secondary: { hex: '#cdd6f4', bg: '#181825' },
+      elevated:  { hex: '#cdd6f4', bg: '#313244' },
+      overlay:   { hex: '#cdd6f4', bg: '#1e1e2e' },
+      muted:     { hex: '#6c7086', bg: '#11111b' },
     },
   },
 };

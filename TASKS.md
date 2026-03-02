@@ -509,7 +509,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3A. Add `bg` field to TokenValue
 
-- [ ] **Add an optional `bg?: string` field to `TokenValue` in `packages/bijou/src/core/theme/tokens.ts`.**
+- [x] **Add an optional `bg?: string` field to `TokenValue` in `packages/bijou/src/core/theme/tokens.ts`.**
 
   Current `TokenValue` (line 22-28):
   ```typescript
@@ -535,7 +535,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3B. Add bgRgb() and bgHex() to StylePort
 
-- [ ] **Add two new methods to `StylePort` in `packages/bijou/src/ports/style.ts`.**
+- [x] **Add two new methods to `StylePort` in `packages/bijou/src/ports/style.ts`.**
 
   Add after the existing `hex()` method:
   ```typescript
@@ -549,7 +549,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3C. Update chalk adapter (bijou-node)
 
-- [ ] **Implement `bgRgb()` and `bgHex()` in `packages/bijou-node/src/style.ts`.**
+- [x] **Implement `bgRgb()` and `bgHex()` in `packages/bijou-node/src/style.ts`.**
 
   In the `chalkStyle()` function, add two new methods to the returned object:
 
@@ -578,7 +578,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3D. Update test adapters
 
-- [ ] **Implement `bgRgb()` and `bgHex()` in both test style adapters.**
+- [x] **Implement `bgRgb()` and `bgHex()` in both test style adapters.**
 
   **`packages/bijou/src/adapters/test/plain-style.ts`** — add identity implementations:
   ```typescript
@@ -602,13 +602,13 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3E. Verify build passes with new StylePort methods
 
-- [ ] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json`, `npx tsc --noEmit -p packages/bijou-node/tsconfig.json`, and `npm test`. All must pass.**
+- [x] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json`, `npx tsc --noEmit -p packages/bijou-node/tsconfig.json`, and `npm test`. All must pass.**
 
   At this point every adapter satisfies the extended `StylePort`. No component uses bg yet — this is just the plumbing. Existing tests should still pass with zero changes.
 
 ### 3F. Add surface tokens to Theme
 
-- [ ] **Add a `surface` section to the `Theme` interface in `packages/bijou/src/core/theme/tokens.ts`.**
+- [x] **Add a `surface` section to the `Theme` interface in `packages/bijou/src/core/theme/tokens.ts`.**
 
   Add after the `ui` field:
   ```typescript
@@ -645,7 +645,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3G. Add bgToken support to box()
 
-- [ ] **Add `bgToken` option to `BoxOptions` in `packages/bijou/src/core/components/box.ts`.**
+- [x] **Add `bgToken` option to `BoxOptions` in `packages/bijou/src/core/components/box.ts`.**
 
   Add to the options interface:
   ```typescript
@@ -669,7 +669,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3H. Add bg support to flex()
 
-- [ ] **Add `bg` option to `FlexChild` and `FlexOptions` in `packages/bijou-tui/src/flex.ts`.**
+- [x] **Add `bg` option to `FlexChild` and `FlexOptions` in `packages/bijou-tui/src/flex.ts`.**
 
   On `FlexOptions` (container level):
   ```typescript
@@ -695,7 +695,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3I. Add bg to overlay primitives
 
-- [ ] **Add `bgToken` option to `modal()`, `toast()`, and `drawer()` in `packages/bijou-tui/src/overlay.ts`.**
+- [x] **Add `bgToken` option to `modal()`, `toast()`, and `drawer()` in `packages/bijou-tui/src/overlay.ts`.**
 
   For each overlay function's options interface, add:
   ```typescript
@@ -715,7 +715,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3J. Graceful degradation for background colors
 
-- [ ] **Ensure background colors degrade correctly across all output modes.**
+- [x] **Ensure background colors degrade correctly across all output modes.**
 
   Verify (with tests) that:
   - `noColor: true` → all bg methods return text unchanged (already handled by adapter no-ops)
@@ -727,7 +727,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3K. Write example demonstrating background colors
 
-- [ ] **Create `examples/background-panels/` with a demo showing div-like colored blocks.**
+- [x] **Create `examples/background-panels/` with a demo showing div-like colored blocks.**
 
   The example should demonstrate:
   1. A `box()` with `bgToken` creating a colored panel
@@ -739,7 +739,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3L. Verify full build and test suite
 
-- [ ] **Run type checks for all three packages and full test suite.**
+- [x] **Run type checks for all three packages and full test suite.**
 
   ```
   npx tsc --noEmit -p packages/bijou/tsconfig.json
@@ -755,7 +755,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3M. Update roadmap and changelog
 
-- [ ] **Update `docs/ROADMAP.md` Phase 3 — strike through completed tasks. Update `docs/CHANGELOG.md` unreleased section.**
+- [x] **Update `docs/ROADMAP.md` Phase 3 — strike through completed tasks. Update `docs/CHANGELOG.md` unreleased section.**
 
   CHANGELOG entry under **Features**:
   ```
@@ -764,7 +764,7 @@ Bijou currently has **zero** background color support. `StylePort` is foreground
 
 ### 3N. Commit Phase 3
 
-- [ ] **Stage all Phase 3 changes and commit.**
+- [x] **Stage all Phase 3 changes and commit.**
 
   ```
   feat(theme): add background color support for div-like colored blocks

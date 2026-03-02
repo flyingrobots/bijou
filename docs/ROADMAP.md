@@ -39,16 +39,16 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Add `bg` to `TokenValue`** | bijou | Optional `bg?: string` (hex) field. Backward-compatible — existing tokens without `bg` behave as before (transparent). |
-| **Add `bgRgb()` and `bgHex()` to `StylePort`** | bijou | Two new methods for applying background colors. Mirrors the existing `rgb()` / `hex()` foreground methods. |
-| **Update `styled()` to apply `token.bg`** | bijou + bijou-node | When `TokenValue.bg` is set, `styled()` applies both foreground and background color. chalk adapter uses `chalk.bgHex()`. |
-| **Update test adapters** | bijou | `plainStyle()` and `auditStyle()` implement `bgRgb()` / `bgHex()`. `auditStyle` records bg calls. |
-| **Add `surface` tokens to theme** | bijou | New `surface` section on `Theme`: `{ primary, secondary, elevated, overlay, muted }` — background colors for panels/regions. |
-| **Add `bg` / `bgToken` to `box()`** | bijou | Fill box interior with background color. Spaces inside the box get ANSI bg sequences. Pipe/accessible modes ignore bg. |
-| **Add `bg` to `flex()` children** | bijou-tui | Per-child and container-level background fills. Padding areas filled with bg color. |
-| **Add `bg` to overlay primitives** | bijou-tui | `modal()`, `toast()`, `drawer()` get `bgToken` option for interior fills instead of transparent spaces. |
-| **Graceful degradation** | bijou | `noColor` / pipe / accessible modes strip background sequences. Add `bgRgbToAnsi256()` / `bgRgbToAnsi16()` for limited terminals. |
-| **Tests and examples** | bijou + bijou-tui | Unit tests for all new paths. Example demonstrating div-like colored panels. |
+| ~~**Add `bg` to `TokenValue`**~~ | bijou | Done — optional `bg?: string` (hex) field on `TokenValue`. Backward-compatible. |
+| ~~**Add `bgRgb()` and `bgHex()` to `StylePort`**~~ | bijou | Done — two new methods mirroring `rgb()` / `hex()`. |
+| ~~**Update `styled()` to apply `token.bg`**~~ | bijou + bijou-node | Done — `styled()` applies `bgHex(token.bg)` when present. chalk adapter updated. |
+| ~~**Update test adapters**~~ | bijou | Done — `plainStyle()` (identity) and `auditStyle()` (recording) implement `bgRgb()` / `bgHex()`. |
+| ~~**Add `surface` tokens to theme**~~ | bijou | Done — `surface: { primary, secondary, elevated, overlay, muted }` on all presets. DTCG/extend updated. |
+| ~~**Add `bg` / `bgToken` to `box()`**~~ | bijou | Done — `bgToken` fills interior. Pipe/accessible/noColor modes skip bg. |
+| ~~**Add `bg` to `flex()` children**~~ | bijou-tui | Done — per-child `bg` and container-level `bg` on `FlexOptions`. Gaps and padding filled. |
+| ~~**Add `bg` to overlay primitives**~~ | bijou-tui | Done — `bgToken` on `modal()`, `toast()`, `drawer()` fills interior with background color. |
+| ~~**Graceful degradation**~~ | bijou | Done — `noColor`/pipe/accessible modes skip bg. Adapters return text unchanged when noColor. |
+| ~~**Tests and examples**~~ | bijou + bijou-tui | Done — unit tests for all bg paths. `examples/background-panels/` demonstrates div-like colored blocks. |
 
 ### Phase 4: Large file decomposition (SRP)
 

@@ -21,11 +21,13 @@ export function extendTheme<
   status?: Partial<Record<S, TokenValue>>;
   ui?: Partial<Record<U, TokenValue>>;
   gradient?: Partial<Record<G, GradientStop[]>>;
+  surface?: Partial<Theme['surface']>;
 }): Theme<BaseStatusKey | S, BaseUiKey | U, BaseGradientKey | G> {
   return {
     ...base,
     status: { ...base.status, ...extensions.status } as Record<BaseStatusKey | S, TokenValue>,
     ui: { ...base.ui, ...extensions.ui } as Record<BaseUiKey | U, TokenValue>,
     gradient: { ...base.gradient, ...extensions.gradient } as Record<BaseGradientKey | G, GradientStop[]>,
+    surface: { ...base.surface, ...extensions.surface },
   };
 }

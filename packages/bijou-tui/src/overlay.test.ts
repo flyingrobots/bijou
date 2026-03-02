@@ -209,6 +209,46 @@ describe('modal', () => {
     expect(stripAnsi(content)).toContain('Title');
     expect(stripAnsi(content)).toContain('hint');
   });
+
+  it('bgToken fills interior (plainStyle is identity so content unchanged)', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const token = { hex: '#ffffff', bg: '#003366' };
+    const { content } = modal({
+      body: 'Filled',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: token,
+      ctx,
+    });
+    expect(stripAnsi(content)).toContain('Filled');
+    // borders still present
+    expect(content).toContain('\u250c');
+    expect(content).toContain('\u2514');
+  });
+
+  it('bgToken without bg field is a no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const noBg = modal({
+      body: 'NoBg',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: { hex: '#ffffff' },
+      ctx,
+    });
+    const plain = modal({ body: 'NoBg', screenWidth: 40, screenHeight: 20 });
+    expect(stripAnsi(noBg.content)).toBe(stripAnsi(plain.content));
+  });
+
+  it('bgToken without ctx is ignored', () => {
+    const plain = modal({ body: 'X', screenWidth: 40, screenHeight: 20 });
+    const withToken = modal({
+      body: 'X',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+    });
+    expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -285,6 +325,31 @@ describe('toast', () => {
     const { content } = toast({ message: 'themed', variant: 'success', screenWidth: 80, screenHeight: 24, ctx });
     expect(stripAnsi(content)).toContain('\u2714');
     expect(stripAnsi(content)).toContain('themed');
+  });
+
+  it('bgToken fills toast interior', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const token = { hex: '#ffffff', bg: '#003366' };
+    const { content } = toast({
+      message: 'filled',
+      screenWidth: 80,
+      screenHeight: 24,
+      bgToken: token,
+      ctx,
+    });
+    expect(stripAnsi(content)).toContain('filled');
+    expect(content).toContain('\u250c');
+  });
+
+  it('bgToken without ctx is ignored', () => {
+    const plain = toast({ message: 'X', screenWidth: 80, screenHeight: 24 });
+    const withToken = toast({
+      message: 'X',
+      screenWidth: 80,
+      screenHeight: 24,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+    });
+    expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
   });
 
   it('composites correctly with a background', () => {
@@ -410,6 +475,33 @@ describe('drawer', () => {
     });
     expect(stripAnsi(d.content)).toContain('themed');
     expect(stripAnsi(d.content)).toContain('\u250c');
+  });
+
+  it('bgToken fills drawer interior', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const token = { hex: '#ffffff', bg: '#003366' };
+    const d = drawer({
+      content: 'filled',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: token,
+      ctx,
+    });
+    expect(stripAnsi(d.content)).toContain('filled');
+    expect(d.content).toContain('\u250c');
+  });
+
+  it('bgToken without ctx is ignored', () => {
+    const plain = drawer({ content: 'X', width: 20, screenWidth: 80, screenHeight: 5 });
+    const withToken = drawer({
+      content: 'X',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+    });
+    expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
   });
 
   it('composites correctly with a background', () => {

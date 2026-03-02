@@ -29,6 +29,8 @@ export interface FlexOptions {
   readonly height: number;
   /** Gap between children (in the main axis). Default: 0. */
   readonly gap?: number;
+  /** Background token applied to the entire flex container (gap + padding areas). Requires `bg` field on the token. */
+  readonly bg?: { bg?: string };
 }
 
 /**
@@ -50,9 +52,29 @@ export interface FlexChild {
   readonly maxSize?: number;
   /** Cross-axis alignment. Default: 'start'. */
   readonly align?: 'start' | 'center' | 'end';
+  /** Background token for this child's allocated region. Requires `bg` field on the token. */
+  readonly bg?: { bg?: string };
 }
 
 import { visibleLength, clipToWidth } from './viewport.js';
+
+// ---------------------------------------------------------------------------
+// Background color helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a function that wraps text with ANSI 24-bit background color.
+ * @param hex - Hex color string (e.g. `'#1e1e2e'`).
+ * @returns Wrapper function, or undefined if hex is falsy.
+ */
+function bgFillFn(hex: string | undefined): ((text: string) => string) | undefined {
+  if (!hex) return undefined;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (text: string) => `\x1b[48;2;${r};${g};${b}m${text}\x1b[49m`;
+}
 
 // ---------------------------------------------------------------------------
 // ANSI helpers
@@ -325,6 +347,7 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const height = Math.max(0, Math.floor(options.height));
   const gap = Math.max(0, Math.floor(options.gap ?? 0));
   const isRow = direction === 'row';
+  const containerBg = bgFillFn(options.bg?.bg);
 
   const mainAxisTotal = isRow ? width : height;
   const crossAxisTotal = isRow ? height : width;
@@ -334,9 +357,9 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const resolved = computeSizes(children, mainAxisTotal, crossAxisTotal, gap, isRow);
 
   if (isRow) {
-    return renderRow(resolved, height, gap);
+    return renderRow(resolved, height, gap, containerBg);
   }
-  return renderColumn(resolved, width, height, gap);
+  return renderColumn(resolved, width, height, gap, containerBg);
 }
 
 /**
@@ -351,6 +374,7 @@ function renderRow(
   items: ResolvedChild[],
   totalHeight: number,
   gap: number,
+  containerBg?: (text: string) => string,
 ): string {
   // Render each child into a column of lines
   const columns: string[][] = [];
@@ -361,11 +385,15 @@ function renderRow(
     // In row mode, fitWidth always uses 'start' — align controls cross-axis (vertical) only
     const widthFitted = fitWidth(rendered, childWidth);
     const aligned = alignCross(widthFitted, totalHeight, item.child.align ?? 'start', childWidth);
-    columns.push(aligned);
+    // Apply per-child bg fill (overrides container bg for this region)
+    const childBg = bgFillFn(item.child.bg?.bg) ?? containerBg;
+    const filled = childBg ? aligned.map(childBg) : aligned;
+    columns.push(filled);
   }
 
   // Compose columns side-by-side
-  const spacer = ' '.repeat(Math.max(0, gap));
+  const rawSpacer = ' '.repeat(Math.max(0, gap));
+  const spacer = containerBg && gap > 0 ? containerBg(rawSpacer) : rawSpacer;
   const rows: string[] = [];
   for (let r = 0; r < totalHeight; r++) {
     const parts: string[] = [];
@@ -391,6 +419,7 @@ function renderColumn(
   totalWidth: number,
   totalHeight: number,
   gap: number,
+  containerBg?: (text: string) => string,
 ): string {
   const lines: string[] = [];
 
@@ -400,12 +429,16 @@ function renderColumn(
     const rendered = renderContent(item.child, totalWidth, childHeight);
     const widthFitted = fitWidth(rendered, totalWidth, item.child.align ?? 'start');
     const aligned = alignCross(widthFitted, childHeight, 'start', totalWidth);
-    
-    lines.push(...aligned);
+
+    // Apply per-child bg fill
+    const childBg = bgFillFn(item.child.bg?.bg) ?? containerBg;
+    const filled = childBg ? aligned.map(childBg) : aligned;
+    lines.push(...filled);
 
     // Add gap between items
     if (i < items.length - 1 && gap > 0) {
-      const spacer = ' '.repeat(Math.max(0, totalWidth));
+      const rawSpacer = ' '.repeat(Math.max(0, totalWidth));
+      const spacer = containerBg ? containerBg(rawSpacer) : rawSpacer;
       for (let g = 0; g < gap; g++) {
         lines.push(spacer);
       }
@@ -413,7 +446,8 @@ function renderColumn(
   }
 
   // Pad to fill totalHeight if needed
-  const emptyLine = ' '.repeat(Math.max(0, totalWidth));
+  const rawEmpty = ' '.repeat(Math.max(0, totalWidth));
+  const emptyLine = containerBg ? containerBg(rawEmpty) : rawEmpty;
   while (lines.length < totalHeight) {
     lines.push(emptyLine);
   }

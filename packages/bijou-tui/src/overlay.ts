@@ -52,6 +52,8 @@ export interface ModalOptions {
   readonly width?: number;
   /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Background fill token for the overlay interior. */
+  readonly bgToken?: TokenValue;
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
@@ -78,6 +80,8 @@ export interface ToastOptions {
   readonly screenHeight: number;
   /** Rows/cols from edge. Default: 1. */
   readonly margin?: number;
+  /** Background fill token for the toast interior. */
+  readonly bgToken?: TokenValue;
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
@@ -184,13 +188,15 @@ export function composite(
 function renderBox(
   lines: string[],
   borderColor: (s: string) => string,
+  bgFill?: (s: string) => string,
 ): string {
   const innerWidth = lines.reduce((max, l) => Math.max(max, visibleLength(l)), 0);
   const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth + 2) + BORDER.tr);
   const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br);
+  const fill = bgFill ?? ((s: string) => s);
   const body = lines.map((l) => {
     const pad = innerWidth - visibleLength(l);
-    return borderColor(BORDER.v) + ' ' + l + ' '.repeat(pad) + ' ' + borderColor(BORDER.v);
+    return borderColor(BORDER.v) + fill(' ' + l + ' '.repeat(pad) + ' ') + borderColor(BORDER.v);
   });
   return [top, ...body, bottom].join('\n');
 }
@@ -244,7 +250,11 @@ export function modal(options: ModalOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
-  const boxStr = renderBox(contentLines, borderColor);
+  const bgFill = ctx && options.bgToken?.bg
+    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
+    : undefined;
+
+  const boxStr = renderBox(contentLines, borderColor, bgFill);
   const boxLines = boxStr.split('\n');
   const boxHeight = boxLines.length;
   const boxWidth = visibleLength(boxLines[0]!);
@@ -305,7 +315,11 @@ export function toast(options: ToastOptions): Overlay {
     ? (s: string) => ctx.style.styled(ctx.theme.theme.border[borderKey], s)
     : (s: string) => s;
 
-  const boxStr = renderBox([line], borderColor);
+  const bgFill = ctx && options.bgToken?.bg
+    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
+    : undefined;
+
+  const boxStr = renderBox([line], borderColor, bgFill);
   const boxLines = boxStr.split('\n');
   const boxHeight = boxLines.length;
   const boxWidth = visibleLength(boxLines[0]!);
@@ -363,6 +377,8 @@ export interface DrawerOptions {
   readonly title?: string;
   /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Background fill token for the drawer interior. */
+  readonly bgToken?: TokenValue;
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
@@ -397,6 +413,11 @@ export function drawer(options: DrawerOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
+  const bgFill = ctx && options.bgToken?.bg
+    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
+    : undefined;
+  const fill = bgFill ?? ((s: string) => s);
+
   // Build top border
   let topInner: string;
   if (title) {
@@ -426,7 +447,7 @@ export function drawer(options: DrawerOptions): Overlay {
     } else {
       clipped = raw + ' '.repeat(innerWidth - vis);
     }
-    bodyLines.push(borderColor(BORDER.v) + ' ' + clipped + ' ' + borderColor(BORDER.v));
+    bodyLines.push(borderColor(BORDER.v) + fill(' ' + clipped + ' ') + borderColor(BORDER.v));
   }
 
   const allLines = [topLine, ...bodyLines, bottomLine];

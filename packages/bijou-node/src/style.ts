@@ -72,7 +72,11 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     styled(token: TokenValue, text: string): string {
       if (isNoColor) return text;
       const base: ChalkInstance = instance.hex(token.hex);
-      return applyModifiers(base, token.modifiers)(text);
+      let result = applyModifiers(base, token.modifiers)(text);
+      if (token.bg) {
+        result = instance.bgHex(token.bg)(result);
+      }
+      return result;
     },
 
     /**
@@ -99,6 +103,32 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     hex(color: string, text: string): string {
       if (isNoColor) return text;
       return instance.hex(color)(text);
+    },
+
+    /**
+     * Apply a 24-bit RGB background color to text.
+     *
+     * @param r - Red channel (0-255).
+     * @param g - Green channel (0-255).
+     * @param b - Blue channel (0-255).
+     * @param text - Text to style.
+     * @returns Styled text, or unmodified text when `noColor` is active.
+     */
+    bgRgb(r: number, g: number, b: number, text: string): string {
+      if (isNoColor) return text;
+      return instance.bgRgb(r, g, b)(text);
+    },
+
+    /**
+     * Apply a hex background color to text.
+     *
+     * @param color - CSS-style hex color (e.g. `"#ff00aa"`).
+     * @param text - Text to style.
+     * @returns Styled text, or unmodified text when `noColor` is active.
+     */
+    bgHex(color: string, text: string): string {
+      if (isNoColor) return text;
+      return instance.bgHex(color)(text);
     },
 
     /**

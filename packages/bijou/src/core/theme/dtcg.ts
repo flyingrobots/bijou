@@ -124,7 +124,11 @@ function toTokenValue(value: unknown, doc: DTCGDocument): TokenValue {
     const modifiers = Array.isArray(obj['modifiers'])
       ? (obj['modifiers'] as TextModifier[])
       : undefined;
-    return modifiers ? { hex, modifiers } : { hex };
+    const bg = typeof obj['bg'] === 'string' ? obj['bg'] : undefined;
+    const tv: TokenValue = { hex };
+    if (bg) tv.bg = bg;
+    if (modifiers) tv.modifiers = modifiers;
+    return tv;
   }
   return { hex: '#000000' };
 }
@@ -185,6 +189,8 @@ const SEMANTIC_KEYS = ['success', 'error', 'warning', 'info', 'accent', 'muted',
 const BORDER_KEYS = ['primary', 'secondary', 'success', 'warning', 'error', 'muted'] as const;
 /** All built-in UI element keys used when extracting from a DTCG document. */
 const UI_KEYS: readonly BaseUiKey[] = ['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty'];
+/** All built-in surface keys used when extracting from a DTCG document. */
+const SURFACE_KEYS = ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const;
 /** All built-in gradient keys used when extracting from a DTCG document. */
 const GRADIENT_KEYS: readonly BaseGradientKey[] = ['brand', 'progress'];
 
@@ -202,12 +208,14 @@ export function fromDTCG(doc: DTCGDocument): Theme {
   const semanticGroup = doc['semantic'] as DTCGGroup | undefined;
   const borderGroup = doc['border'] as DTCGGroup | undefined;
   const uiGroup = doc['ui'] as DTCGGroup | undefined;
+  const surfaceGroup = doc['surface'] as DTCGGroup | undefined;
   const gradientGroup = doc['gradient'] as DTCGGroup | undefined;
 
   const status = extractGroup(statusGroup, STATUS_KEYS, doc);
   const semantic = extractGroup(semanticGroup, SEMANTIC_KEYS, doc);
   const border = extractGroup(borderGroup, BORDER_KEYS, doc);
   const ui = extractGroup(uiGroup, UI_KEYS, doc);
+  const surface = extractGroup(surfaceGroup, SURFACE_KEYS, doc);
 
   const gradient = {} as Record<BaseGradientKey, GradientStop[]>;
   for (const key of GRADIENT_KEYS) {
@@ -219,7 +227,7 @@ export function fromDTCG(doc: DTCGDocument): Theme {
     }
   }
 
-  return { name, status, semantic, gradient, border, ui };
+  return { name, status, semantic, gradient, border, ui, surface };
 }
 
 // --- toDTCG ---
@@ -230,11 +238,11 @@ export function fromDTCG(doc: DTCGDocument): Theme {
  * @returns DTCG token with `$type: 'color'`.
  */
 function tokenToDTCG(token: TokenValue): DTCGToken {
-  if (token.modifiers && token.modifiers.length > 0) {
-    return {
-      $type: 'color',
-      $value: { hex: token.hex, modifiers: token.modifiers },
-    };
+  if ((token.modifiers && token.modifiers.length > 0) || token.bg) {
+    const val: Record<string, unknown> = { hex: token.hex };
+    if (token.bg) val['bg'] = token.bg;
+    if (token.modifiers && token.modifiers.length > 0) val['modifiers'] = token.modifiers;
+    return { $type: 'color', $value: val };
   }
   return { $type: 'color', $value: token.hex };
 }
@@ -281,6 +289,9 @@ export function toDTCG(theme: Theme): DTCGDocument {
   doc['semantic'] = recordToDTCGGroup(theme.semantic);
   doc['border'] = recordToDTCGGroup(theme.border);
   doc['ui'] = recordToDTCGGroup(theme.ui);
+  if (theme.surface) {
+    doc['surface'] = recordToDTCGGroup(theme.surface);
+  }
 
   const gradientDoc: DTCGGroup = {};
   for (const [key, stops] of Object.entries(theme.gradient) as Array<[string, GradientStop[]]>) {
