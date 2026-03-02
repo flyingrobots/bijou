@@ -250,7 +250,7 @@ export function modal(options: ModalOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && options.bgToken?.bg
+  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
     ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
     : undefined;
 
@@ -315,7 +315,7 @@ export function toast(options: ToastOptions): Overlay {
     ? (s: string) => ctx.style.styled(ctx.theme.theme.border[borderKey], s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && options.bgToken?.bg
+  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
     ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
     : undefined;
 
@@ -413,7 +413,7 @@ export function drawer(options: DrawerOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && options.bgToken?.bg
+  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
     ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
     : undefined;
   const fill = bgFill ?? ((s: string) => s);
@@ -524,7 +524,7 @@ export function tooltip(options: TooltipOptions): Overlay {
     ? (s: string) => ctx.style.styled(borderToken, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && bgToken?.bg
+  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && bgToken?.bg
     ? (s: string) => ctx.style.bgHex(bgToken.bg!, s)
     : undefined;
 
