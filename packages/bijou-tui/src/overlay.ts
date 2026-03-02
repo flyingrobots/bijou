@@ -485,6 +485,8 @@ export interface TooltipOptions {
   readonly screenHeight: number;
   /** Design token for the border color. */
   readonly borderToken?: TokenValue;
+  /** Background fill token for the tooltip interior. */
+  readonly bgToken?: TokenValue;
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
@@ -511,6 +513,7 @@ export function tooltip(options: TooltipOptions): Overlay {
     screenWidth,
     screenHeight,
     borderToken,
+    bgToken,
     ctx,
   } = options;
 
@@ -521,7 +524,11 @@ export function tooltip(options: TooltipOptions): Overlay {
     ? (s: string) => ctx.style.styled(borderToken, s)
     : (s: string) => s;
 
-  const boxStr = renderBox(contentLines, borderColor);
+  const bgFill = ctx && bgToken?.bg
+    ? (s: string) => ctx.style.bgHex(bgToken.bg!, s)
+    : undefined;
+
+  const boxStr = renderBox(contentLines, borderColor, bgFill);
   const boxLines = boxStr.split('\n');
   const boxHeight = boxLines.length;
   const boxWidth = visibleLength(boxLines[0]!);

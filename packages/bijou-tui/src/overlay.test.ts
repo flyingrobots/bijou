@@ -636,6 +636,28 @@ describe('tooltip', () => {
     expect(t.col).toBeGreaterThanOrEqual(0);
   });
 
+  it('bgToken fills tooltip interior', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const token = { hex: '#ffffff', bg: '#003366' };
+    const t = tooltip({ ...base, row: 10, col: 40, bgToken: token, ctx });
+    expect(stripAnsi(t.content)).toContain('hint');
+    expect(t.content).toContain('\u250c');
+    expect(t.content).toContain('\u2514');
+  });
+
+  it('bgToken without bg field is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const noBg = tooltip({ ...base, row: 10, col: 40, bgToken: { hex: '#ffffff' }, ctx });
+    const plain = tooltip({ ...base, row: 10, col: 40 });
+    expect(stripAnsi(noBg.content)).toBe(stripAnsi(plain.content));
+  });
+
+  it('bgToken without ctx is ignored', () => {
+    const plain = tooltip({ ...base, row: 10, col: 40 });
+    const withToken = tooltip({ ...base, row: 10, col: 40, bgToken: { hex: '#ffffff', bg: '#003366' } });
+    expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
+  });
+
   it('clips content to screen width', () => {
     const longContent = 'A'.repeat(100);
     const t = tooltip({ content: longContent, row: 10, col: 0, screenWidth: 20, screenHeight: 24 });
