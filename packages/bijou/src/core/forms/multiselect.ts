@@ -25,6 +25,8 @@ export interface MultiselectOptions<T = string> extends SelectFieldOptions<T> {
  * @returns Array of selected option values.
  */
 export async function multiselect<T = string>(options: MultiselectOptions<T>): Promise<T[]> {
+  if (options.options.length === 0) return [];
+
   const ctx = resolveCtx(options.ctx);
 
   return formDispatch(
