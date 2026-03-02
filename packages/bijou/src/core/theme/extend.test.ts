@@ -58,6 +58,21 @@ describe('extendTheme', () => {
     expect(extended.status.success).toEqual(override);
   });
 
+  it('merges surface overrides', () => {
+    const extended = extendTheme(CYAN_MAGENTA, {
+      surface: { primary: { hex: '#111111', bg: '#222222' } },
+    });
+    // Override applied
+    expect(extended.surface.primary.hex).toBe('#111111');
+    expect(extended.surface.primary.bg).toBe('#222222');
+    // Base preserved
+    expect(extended.surface.secondary.hex).toBe(CYAN_MAGENTA.surface.secondary.hex);
+    expect(extended.surface.secondary.bg).toBe(CYAN_MAGENTA.surface.secondary.bg);
+    expect(extended.surface.elevated).toEqual(CYAN_MAGENTA.surface.elevated);
+    expect(extended.surface.overlay).toEqual(CYAN_MAGENTA.surface.overlay);
+    expect(extended.surface.muted).toEqual(CYAN_MAGENTA.surface.muted);
+  });
+
   it('extended theme is assignable to Theme (for createThemeResolver)', () => {
     const extended = extendTheme(CYAN_MAGENTA, {
       status: { CUSTOM: { hex: '#aabbcc' } },
