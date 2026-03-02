@@ -2,7 +2,7 @@ import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /**
  * Options for the multi-line textarea field.
@@ -33,7 +33,7 @@ export interface TextareaOptions extends FieldOptions<string> {
  * @returns The entered text (newline-joined), or the default/empty string on cancel.
  */
 export async function textarea(options: TextareaOptions): Promise<string> {
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
 
   if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {

@@ -1,6 +1,6 @@
 import type { FieldOptions, ValidationResult } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /**
  * Options for the text input field.
@@ -25,7 +25,7 @@ export interface InputOptions extends FieldOptions<string> {
  * @returns The trimmed user input, or the default value if none was provided.
  */
 export async function input(options: InputOptions): Promise<string> {
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
   const noColor = ctx.theme.noColor;
 

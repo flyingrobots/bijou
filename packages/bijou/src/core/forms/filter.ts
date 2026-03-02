@@ -2,7 +2,7 @@ import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /**
  * Single option in a filterable select list.
@@ -72,7 +72,7 @@ export async function filter<T>(options: FilterOptions<T>): Promise<T> {
     throw new Error('filter() requires at least one option, or a defaultValue');
   }
 
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
 
   if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {

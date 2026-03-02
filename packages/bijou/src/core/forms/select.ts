@@ -2,7 +2,7 @@ import type { SelectFieldOptions, SelectOption } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /**
  * Options for the single-select field.
@@ -26,7 +26,7 @@ export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
  * @throws {Error} If `options.options` is empty.
  */
 export async function select<T = string>(options: SelectOptions<T>): Promise<T> {
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
 
   if (options.options.length === 0) {

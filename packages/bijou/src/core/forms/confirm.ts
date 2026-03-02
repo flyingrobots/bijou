@@ -1,6 +1,6 @@
 import type { ConfirmFieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 
 /**
  * Options for the yes/no confirmation prompt.
@@ -21,7 +21,7 @@ export interface ConfirmOptions extends ConfirmFieldOptions {
  * @returns `true` for yes, `false` for no.
  */
 export async function confirm(options: ConfirmOptions): Promise<boolean> {
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
   const noColor = ctx.theme.noColor;
   const defaultYes = options.defaultValue !== false;
