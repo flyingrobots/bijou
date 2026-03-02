@@ -33,7 +33,24 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 | **Extract `writeValidationError()`** | bijou | Shared error display with mode-aware styling. Replaces identical logic in `input` and `textarea`. |
 | **Standardize on `resolveCtx()`** | bijou | Replace all `options.ctx ?? getDefaultContext()` calls in forms with `resolveCtx()`. |
 
-### Phase 3: Large file decomposition (SRP)
+### Phase 3: Background color support (new feature)
+
+**Problem:** Bijou has zero background color support. `StylePort` is foreground-only, `TokenValue` has no `bg` field, and every component pads with plain transparent spaces. The only workaround is the `inverse` modifier (used by `badge()` for pills). To create div-like colored blocks — panel backgrounds, highlighted regions, modal fills — we need background colors as a first-class concept across the token system, style port, adapters, and components.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Add `bg` to `TokenValue`** | bijou | Optional `bg?: string` (hex) field. Backward-compatible — existing tokens without `bg` behave as before (transparent). |
+| **Add `bgRgb()` and `bgHex()` to `StylePort`** | bijou | Two new methods for applying background colors. Mirrors the existing `rgb()` / `hex()` foreground methods. |
+| **Update `styled()` to apply `token.bg`** | bijou + bijou-node | When `TokenValue.bg` is set, `styled()` applies both foreground and background color. chalk adapter uses `chalk.bgHex()`. |
+| **Update test adapters** | bijou | `plainStyle()` and `auditStyle()` implement `bgRgb()` / `bgHex()`. `auditStyle` records bg calls. |
+| **Add `surface` tokens to theme** | bijou | New `surface` section on `Theme`: `{ primary, secondary, elevated, overlay, muted }` — background colors for panels/regions. |
+| **Add `bg` / `bgToken` to `box()`** | bijou | Fill box interior with background color. Spaces inside the box get ANSI bg sequences. Pipe/accessible modes ignore bg. |
+| **Add `bg` to `flex()` children** | bijou-tui | Per-child and container-level background fills. Padding areas filled with bg color. |
+| **Add `bg` to overlay primitives** | bijou-tui | `modal()`, `toast()`, `drawer()` get `bgToken` option for interior fills instead of transparent spaces. |
+| **Graceful degradation** | bijou | `noColor` / pipe / accessible modes strip background sequences. Add `bgRgbToAnsi256()` / `bgRgbToAnsi16()` for limited terminals. |
+| **Tests and examples** | bijou + bijou-tui | Unit tests for all new paths. Example demonstrating div-like colored panels. |
+
+### Phase 4: Large file decomposition (SRP)
 
 **Problem:** Several files exceed 300 lines with multiple distinct responsibilities.
 
@@ -44,7 +61,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 | **Extract textarea editor** | bijou | Move interactive editor state machine (~200 lines) from `textarea.ts` into `textarea-editor.ts`. |
 | **Extract filter interactive UI** | bijou | Move interactive terminal UI (~150 lines) from `filter.ts` into `filter-interactive.ts`. |
 
-### Phase 4: Mode rendering strategy (OCP)
+### Phase 5: Mode rendering strategy (OCP)
 
 **Problem:** ~22 components repeat `if (mode === 'pipe') ... if (mode === 'accessible') ...` chains. Adding a new output mode requires touching every component.
 
@@ -54,7 +71,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 | **Migrate pilot components** | bijou | Convert `alert`, `badge`, `box` as proof-of-concept. Validate the pattern before wider rollout. |
 | **Migrate remaining components** | bijou | Convert all ~22 mode-branching components to the registry pattern. |
 
-### Phase 5: Test suite hardening
+### Phase 6: Test suite hardening
 
 **Problem:** Some tests are brittle (exact ANSI assertions, whitespace-sensitive `toBe`), and some edge cases are missing.
 
@@ -66,7 +83,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 | **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
 | **Create output assertion helpers** | bijou | Add `expectContainsAnsi(output)`, `expectNoAnsi(output)`, `expectWritten(ctx, substring)` to reduce coupling to `ctx.io.written` array indexing. |
 
-### Phase 6: Theme access pattern (DIP)
+### Phase 7: Theme access pattern (DIP)
 
 **Problem:** Every component hardcodes deep theme paths like `ctx.theme.theme.semantic.primary` and `ctx.theme.theme.border.primary`, coupling them to the exact theme object shape.
 

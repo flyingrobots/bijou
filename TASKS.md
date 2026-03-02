@@ -1,4 +1,4 @@
-# v0.11.0 Implementation Tasks — Phases 1 & 2
+# v0.11.0 Implementation Tasks — Phases 1, 2 & 3
 
 > **How to use:** Find the first unchecked item (`- [ ]`). Read its description, execute it, then check it off (`- [x]`). Each item is self-contained with enough context to execute without reading prior conversation.
 
@@ -500,3 +500,281 @@
   Update `docs/CHANGELOG.md` unreleased section under **Changed**: `- **forms:** extract shared form utilities (formatFormTitle, writeValidationError, renderNumberedOptions, terminalRenderer, formDispatch) to eliminate cross-form duplication`.
 
   Bump version if appropriate (this is an internal refactor with no public API changes, so a patch bump to the next prerelease or just leaving it unreleased is fine — follow the project's versioning convention).
+
+---
+
+## Phase 3: Background Color Support (new feature)
+
+Bijou currently has **zero** background color support. `StylePort` is foreground-only, `TokenValue` has no `bg` field, and every component pads with plain transparent spaces. The only workaround is the `inverse` modifier (`badge()` uses it for pills). This phase adds background colors as a first-class concept.
+
+### 3A. Add `bg` field to TokenValue
+
+- [ ] **Add an optional `bg?: string` field to `TokenValue` in `packages/bijou/src/core/theme/tokens.ts`.**
+
+  Current `TokenValue` (line 22-28):
+  ```typescript
+  export interface TokenValue {
+    hex: string;
+    modifiers?: TextModifier[];
+  }
+  ```
+
+  Change to:
+  ```typescript
+  export interface TokenValue {
+    /** Foreground color as a `#rrggbb` hex string. */
+    hex: string;
+    /** Optional background color as a `#rrggbb` hex string. */
+    bg?: string;
+    /** Optional text style modifiers to apply alongside the color. */
+    modifiers?: TextModifier[];
+  }
+  ```
+
+  This is backward-compatible — all existing tokens lack `bg` and will behave as before (transparent background). No consumer code changes needed yet.
+
+### 3B. Add bgRgb() and bgHex() to StylePort
+
+- [ ] **Add two new methods to `StylePort` in `packages/bijou/src/ports/style.ts`.**
+
+  Add after the existing `hex()` method:
+  ```typescript
+  /** Apply a 24-bit RGB background color to text. */
+  bgRgb(r: number, g: number, b: number, text: string): string;
+  /** Apply a hex background color (e.g. `"#ff00aa"`) to text. */
+  bgHex(color: string, text: string): string;
+  ```
+
+  This is a **breaking interface change** — all adapters must implement the new methods before the build passes. Steps 3C and 3D add the implementations.
+
+### 3C. Update chalk adapter (bijou-node)
+
+- [ ] **Implement `bgRgb()` and `bgHex()` in `packages/bijou-node/src/style.ts`.**
+
+  In the `chalkStyle()` function, add two new methods to the returned object:
+
+  ```typescript
+  bgRgb(r: number, g: number, b: number, text: string): string {
+    if (noColor) return text;
+    return instance.bgRgb(r, g, b)(text);
+  },
+  bgHex(color: string, text: string): string {
+    if (noColor) return text;
+    return instance.bgHex(color)(text);
+  },
+  ```
+
+  chalk 5.x supports `bgRgb()` and `bgHex()` natively — no extra dependencies.
+
+  Also update `styled()` to apply `token.bg` when present:
+  ```typescript
+  // After applying foreground hex and modifiers, if token.bg exists:
+  if (token.bg && !noColor) {
+    result = instance.bgHex(token.bg)(result);
+  }
+  ```
+
+  Read the existing `styled()` implementation carefully to find the right insertion point. The bg should be applied as the outermost wrap (after fg + modifiers) so ANSI nesting is correct.
+
+### 3D. Update test adapters
+
+- [ ] **Implement `bgRgb()` and `bgHex()` in both test style adapters.**
+
+  **`packages/bijou/src/adapters/test/plain-style.ts`** — add identity implementations:
+  ```typescript
+  bgRgb(_r: number, _g: number, _b: number, text: string): string { return text; },
+  bgHex(_color: string, text: string): string { return text; },
+  ```
+
+  **`packages/bijou/src/adapters/test/audit-style.ts`** — add recording implementations:
+  ```typescript
+  bgRgb(r: number, g: number, b: number, text: string): string {
+    _calls.push({ method: 'bgRgb', text, color: [r, g, b] });
+    return text;
+  },
+  bgHex(color: string, text: string): string {
+    _calls.push({ method: 'bgHex', text, color });
+    return text;
+  },
+  ```
+
+  Update the `StyledCall` type (or equivalent) in audit-style.ts to include the new method names.
+
+### 3E. Verify build passes with new StylePort methods
+
+- [ ] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json`, `npx tsc --noEmit -p packages/bijou-node/tsconfig.json`, and `npm test`. All must pass.**
+
+  At this point every adapter satisfies the extended `StylePort`. No component uses bg yet — this is just the plumbing. Existing tests should still pass with zero changes.
+
+### 3F. Add surface tokens to Theme
+
+- [ ] **Add a `surface` section to the `Theme` interface in `packages/bijou/src/core/theme/tokens.ts`.**
+
+  Add after the `ui` field:
+  ```typescript
+  /** Background surface tokens for panels, regions, and overlays. */
+  surface: {
+    /** Default content background. */
+    primary: TokenValue;
+    /** Secondary/sidebar background. */
+    secondary: TokenValue;
+    /** Elevated surface (cards, dropdowns). */
+    elevated: TokenValue;
+    /** Overlay/scrim background (modals, drawers). */
+    overlay: TokenValue;
+    /** Muted/disabled region background. */
+    muted: TokenValue;
+  };
+  ```
+
+  Surface tokens use `TokenValue` — the `hex` field is the foreground text color for content on that surface, and the new `bg` field is the actual background fill. This way `styled(surface.primary, text)` applies both fg and bg.
+
+  Update all theme presets to include `surface` values:
+  - **CYAN_MAGENTA** (`packages/bijou/src/core/theme/presets.ts` or wherever presets live)
+  - **TEAL_ORANGE_PINK**
+  - **NORD**
+  - **CATPPUCCIN**
+
+  Choose sensible bg colors for each preset. For example, NORD might use its polar night palette (`#2E3440`, `#3B4252`, `#434C5E`, `#4C566A`). CATPPUCCIN would use its base/mantle/crust colors.
+
+  Also update:
+  - `ResolvedTheme` if it needs to expose surface tokens
+  - `fromDTCG()` / `toDTCG()` to handle the new surface section
+  - `extendTheme()` to allow surface overrides
+  - `createResolved()` if it processes theme sections
+
+### 3G. Add bgToken support to box()
+
+- [ ] **Add `bgToken` option to `BoxOptions` in `packages/bijou/src/core/components/box.ts`.**
+
+  Add to the options interface:
+  ```typescript
+  /** Background fill token. Interior spaces are styled with this token's bg color. */
+  bgToken?: TokenValue;
+  ```
+
+  Implementation: when `bgToken` is set and mode is `interactive` or `static`:
+  1. For each interior line, wrap the padding spaces AND the content line in `ctx.style.styled(bgToken, ...)` — or more precisely, apply `ctx.style.bgHex(bgToken.bg, ...)` to the entire interior width (content + padding).
+  2. The border characters themselves should NOT get the background (they have their own `borderToken`).
+  3. In `pipe` / `accessible` / `noColor` modes, ignore `bgToken` entirely (interior stays transparent).
+
+  Key detail: each interior line must be padded to the full interior width so the background color fills edge-to-edge. If `width` is set, this is already handled. If not, pad each line to the width of the longest line.
+
+  Write tests:
+  - `bgToken` fills interior with bg color in interactive mode
+  - `bgToken` ignored in pipe mode
+  - `bgToken` ignored when `noColor: true`
+  - `bgToken` + `width` work together
+  - `bgToken` without `bg` field on token is a no-op (foreground-only token)
+
+### 3H. Add bg support to flex()
+
+- [ ] **Add `bg` option to `FlexChild` and `FlexOptions` in `packages/bijou-tui/src/flex.ts`.**
+
+  On `FlexOptions` (container level):
+  ```typescript
+  /** Background token applied to the entire flex container (gap + padding areas). */
+  bg?: TokenValue;
+  ```
+
+  On `FlexChild` (per-child):
+  ```typescript
+  /** Background token for this child's allocated region (content + child padding). */
+  bg?: TokenValue;
+  ```
+
+  Implementation: when rendering, if a child has `bg`, wrap each line of that child's content (including its padding) with the background color. For container `bg`, fill gap lines and any remaining container padding with the bg color.
+
+  The bg fill must extend to the full allocated width/height of each region so there are no transparent gaps.
+
+  Write tests:
+  - Container bg fills gap areas
+  - Child bg fills child padding
+  - Mixed: child bg overrides container bg in child region
+  - No bg = transparent (existing behavior unchanged)
+
+### 3I. Add bg to overlay primitives
+
+- [ ] **Add `bgToken` option to `modal()`, `toast()`, and `drawer()` in `packages/bijou-tui/src/overlay.ts`.**
+
+  For each overlay function's options interface, add:
+  ```typescript
+  /** Background fill token for the overlay interior. */
+  bgToken?: TokenValue;
+  ```
+
+  Implementation: when rendering the overlay interior (inside the border), fill the background with `bgToken.bg` color. This replaces the current transparent spaces between borders.
+
+  The overlay's `renderBox()` helper (or equivalent) is the right place to inject this — it already renders the interior lines. When `bgToken` is set, wrap each interior line with the bg color escape sequences.
+
+  Write tests:
+  - Modal with bgToken fills interior
+  - Toast with bgToken fills interior
+  - Drawer with bgToken fills interior
+  - Without bgToken, behavior unchanged (transparent)
+
+### 3J. Graceful degradation for background colors
+
+- [ ] **Ensure background colors degrade correctly across all output modes.**
+
+  Verify (with tests) that:
+  - `noColor: true` → all bg methods return text unchanged (already handled by adapter no-ops)
+  - `pipe` mode → components skip bgToken (already handled per-component in 3G–3I)
+  - `accessible` mode → components skip bgToken
+  - Limited color terminals → add `bgRgbToAnsi256()` and `bgRgbToAnsi16()` conversion functions alongside the existing foreground `rgbToAnsi256()` / `rgbToAnsi16()` in `packages/bijou/src/core/theme/downsample.ts`. The ANSI bg codes differ from fg codes (bg256 = `\x1b[48;5;Nm`, bg16 = `\x1b[40-47m` / `\x1b[100-107m`).
+
+  Note: the downsampling functions are pure converters (number → number). The actual ANSI sequence differences are in the adapter layer (chalk handles this automatically). Only add bijou-core downsample functions if there's a concrete consumer that needs them independent of chalk.
+
+### 3K. Write example demonstrating background colors
+
+- [ ] **Create `examples/background-panels/` with a demo showing div-like colored blocks.**
+
+  The example should demonstrate:
+  1. A `box()` with `bgToken` creating a colored panel
+  2. A `flex()` layout with multiple children, each having a different `bg`
+  3. A `modal()` with a filled background over a dimmed main content area
+  4. How the same layout degrades in pipe mode (no colors, no backgrounds)
+
+  Follow the existing example pattern: `index.ts` with a `README.md` containing description, run command, and embedded source.
+
+### 3L. Verify full build and test suite
+
+- [ ] **Run type checks for all three packages and full test suite.**
+
+  ```
+  npx tsc --noEmit -p packages/bijou/tsconfig.json
+  npx tsc --noEmit -p packages/bijou-node/tsconfig.json
+  npx tsc --noEmit -p packages/bijou-tui/tsconfig.json
+  npm test
+  ```
+
+  All must pass. Check specifically that:
+  1. DTCG round-trip tests still pass (fromDTCG/toDTCG with new surface section)
+  2. Theme preset tests account for the new surface field
+  3. All existing component tests are unaffected (no bg = transparent = same as before)
+
+### 3M. Update roadmap and changelog
+
+- [ ] **Update `docs/ROADMAP.md` Phase 3 — strike through completed tasks. Update `docs/CHANGELOG.md` unreleased section.**
+
+  CHANGELOG entry under **Features**:
+  ```
+  - **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
+  ```
+
+### 3N. Commit Phase 3
+
+- [ ] **Stage all Phase 3 changes and commit.**
+
+  ```
+  feat(theme): add background color support for div-like colored blocks
+
+  Add background colors as a first-class concept:
+  - TokenValue.bg optional field for background hex color
+  - StylePort.bgRgb() and bgHex() methods
+  - Theme.surface tokens (primary, secondary, elevated, overlay, muted)
+  - bgToken option on box(), flex(), modal(), toast(), drawer()
+
+  All adapters updated (chalk, plainStyle, auditStyle).
+  Graceful degradation in pipe/accessible/noColor modes.
+  ```
