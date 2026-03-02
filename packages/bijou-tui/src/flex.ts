@@ -17,6 +17,8 @@
 // Types
 // ---------------------------------------------------------------------------
 
+import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+
 /**
  * Configuration for the flex layout container.
  */
@@ -30,7 +32,9 @@ export interface FlexOptions {
   /** Gap between children (in the main axis). Default: 0. */
   readonly gap?: number;
   /** Background token applied to the entire flex container (gap + padding areas). Requires `bg` field on the token. */
-  readonly bg?: { bg?: string };
+  readonly bgToken?: TokenValue;
+  /** Bijou context for styled output (required for bgToken to take effect). */
+  readonly ctx?: BijouContext;
 }
 
 /**
@@ -53,7 +57,7 @@ export interface FlexChild {
   /** Cross-axis alignment. Default: 'start'. */
   readonly align?: 'start' | 'center' | 'end';
   /** Background token for this child's allocated region. Requires `bg` field on the token. */
-  readonly bg?: { bg?: string };
+  readonly bgToken?: TokenValue;
 }
 
 import { visibleLength, clipToWidth } from './viewport.js';
@@ -63,17 +67,19 @@ import { visibleLength, clipToWidth } from './viewport.js';
 // ---------------------------------------------------------------------------
 
 /**
- * Create a function that wraps text with ANSI 24-bit background color.
- * @param hex - Hex color string (e.g. `'#1e1e2e'`).
- * @returns Wrapper function, or undefined if hex is falsy.
+ * Create a bg fill function that routes through StylePort, respecting noColor
+ * and output mode.
+ * @param token - Token with optional `bg` hex color.
+ * @param ctx - Bijou context for styled output.
+ * @returns Wrapper function, or undefined if bg should not be applied.
  */
-function bgFillFn(hex: string | undefined): ((text: string) => string) | undefined {
-  if (!hex) return undefined;
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return (text: string) => `\x1b[48;2;${r};${g};${b}m${text}\x1b[49m`;
+function makeBgFill(
+  token: TokenValue | undefined,
+  ctx: BijouContext | undefined,
+): ((text: string) => string) | undefined {
+  if (!token?.bg || !ctx) return undefined;
+  if (ctx.theme.noColor || ctx.mode === 'pipe' || ctx.mode === 'accessible') return undefined;
+  return (text: string) => ctx.style.bgHex(token.bg!, text);
 }
 
 // ---------------------------------------------------------------------------
@@ -347,7 +353,7 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const height = Math.max(0, Math.floor(options.height));
   const gap = Math.max(0, Math.floor(options.gap ?? 0));
   const isRow = direction === 'row';
-  const containerBg = bgFillFn(options.bg?.bg);
+  const containerBg = makeBgFill(options.bgToken, options.ctx);
 
   const mainAxisTotal = isRow ? width : height;
   const crossAxisTotal = isRow ? height : width;
@@ -357,9 +363,9 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const resolved = computeSizes(children, mainAxisTotal, crossAxisTotal, gap, isRow);
 
   if (isRow) {
-    return renderRow(resolved, height, gap, containerBg);
+    return renderRow(resolved, height, gap, containerBg, options.ctx);
   }
-  return renderColumn(resolved, width, height, gap, containerBg);
+  return renderColumn(resolved, width, height, gap, containerBg, options.ctx);
 }
 
 /**
@@ -375,6 +381,7 @@ function renderRow(
   totalHeight: number,
   gap: number,
   containerBg?: (text: string) => string,
+  ctx?: BijouContext,
 ): string {
   // Render each child into a column of lines
   const columns: string[][] = [];
@@ -386,7 +393,7 @@ function renderRow(
     const widthFitted = fitWidth(rendered, childWidth);
     const aligned = alignCross(widthFitted, totalHeight, item.child.align ?? 'start', childWidth);
     // Apply per-child bg fill (overrides container bg for this region)
-    const childBg = bgFillFn(item.child.bg?.bg) ?? containerBg;
+    const childBg = makeBgFill(item.child.bgToken, ctx) ?? containerBg;
     const filled = childBg ? aligned.map(childBg) : aligned;
     columns.push(filled);
   }
@@ -420,6 +427,7 @@ function renderColumn(
   totalHeight: number,
   gap: number,
   containerBg?: (text: string) => string,
+  ctx?: BijouContext,
 ): string {
   const lines: string[] = [];
 
@@ -431,7 +439,7 @@ function renderColumn(
     const aligned = alignCross(widthFitted, childHeight, 'start', totalWidth);
 
     // Apply per-child bg fill
-    const childBg = bgFillFn(item.child.bg?.bg) ?? containerBg;
+    const childBg = makeBgFill(item.child.bgToken, ctx) ?? containerBg;
     const filled = childBg ? aligned.map(childBg) : aligned;
     lines.push(...filled);
 

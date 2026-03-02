@@ -27,10 +27,10 @@ console.log(box('This box has a background fill.', {
 
 // 2. flex() with per-child bg — multiple colored regions
 console.log(flex(
-  { direction: 'row', width: 60, height: 5, gap: 1, bg: theme.surface.muted },
-  { basis: 20, bg: theme.surface.primary, content: ' Primary' },
-  { basis: 20, bg: theme.surface.secondary, content: ' Secondary' },
-  { flex: 1, bg: theme.surface.elevated, content: ' Elevated' },
+  { direction: 'row', width: 60, height: 5, gap: 1, bgToken: theme.surface.muted, ctx },
+  { basis: 20, bgToken: theme.surface.primary, content: ' Primary' },
+  { basis: 20, bgToken: theme.surface.secondary, content: ' Secondary' },
+  { flex: 1, bgToken: theme.surface.elevated, content: ' Elevated' },
 ));
 
 // 3. modal() with bgToken over dimmed content
