@@ -125,7 +125,7 @@ describe('terminalRenderer', () => {
     term.clearBlock(3);
     const output = allWritten(ctx);
     // Should write 3x clear-to-end + newline, then move up 3
-    const clearCount = (output.match(/\x1b\[K\n/g) ?? []).length;
+    const clearCount = output.split('\x1b[K\n').length - 1;
     expect(clearCount).toBe(3);
     expect(output).toContain('\x1b[3A');
   });
