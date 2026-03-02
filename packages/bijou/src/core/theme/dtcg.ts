@@ -289,9 +289,7 @@ export function toDTCG(theme: Theme): DTCGDocument {
   doc['semantic'] = recordToDTCGGroup(theme.semantic);
   doc['border'] = recordToDTCGGroup(theme.border);
   doc['ui'] = recordToDTCGGroup(theme.ui);
-  if (theme.surface) {
-    doc['surface'] = recordToDTCGGroup(theme.surface);
-  }
+  doc['surface'] = recordToDTCGGroup(theme.surface);
 
   const gradientDoc: DTCGGroup = {};
   for (const [key, stops] of Object.entries(theme.gradient) as Array<[string, GradientStop[]]>) {
