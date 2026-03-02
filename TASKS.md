@@ -8,7 +8,7 @@
 
 ### 1A. Document audit findings for StylePort
 
-- [ ] **Close the "remove dead StylePort methods" task — rgb() and hex() are NOT dead.**
+- [x] **Close the "remove dead StylePort methods" task — rgb() and hex() are NOT dead.**
 
   The roadmap (`docs/ROADMAP.md`, Phase 1) says to audit `rgb()` and `hex()` on `StylePort` and remove if unused. The audit found they ARE used:
   - `packages/bijou/src/core/theme/gradient.ts` calls `style.rgb()` for per-character gradient coloring
@@ -18,7 +18,7 @@
 
 ### 1B. Document audit findings for onResize
 
-- [ ] **Close the "audit onResize usage" task — confirmed TUI-only.**
+- [x] **Close the "audit onResize usage" task — confirmed TUI-only.**
 
   The roadmap says to verify whether any core bijou component calls `IOPort.onResize()`. The audit found:
   - **Only consumer:** `packages/bijou-tui/src/eventbus.ts:173` — the TEA runtime event bus
@@ -28,7 +28,7 @@
 
 ### 1C. Segregate IOPort into sub-port interfaces
 
-- [ ] **Add WritePort, QueryPort, InteractivePort, and FilePort interfaces to `packages/bijou/src/ports/io.ts`.**
+- [x] **Add WritePort, QueryPort, InteractivePort, and FilePort interfaces to `packages/bijou/src/ports/io.ts`.**
 
   Edit the existing `io.ts` file. Add four new interfaces ABOVE the existing `IOPort` interface. Then redefine `IOPort` as their intersection. The file currently defines `RawInputHandle`, `TimerHandle`, and `IOPort`.
 
@@ -126,7 +126,7 @@
 
 ### 1D. Export new sub-port types
 
-- [ ] **Export WritePort, QueryPort, InteractivePort, and FilePort from `packages/bijou/src/ports/index.ts` and `packages/bijou/src/index.ts`.**
+- [x] **Export WritePort, QueryPort, InteractivePort, and FilePort from `packages/bijou/src/ports/index.ts` and `packages/bijou/src/index.ts`.**
 
   In `ports/index.ts`, change the IOPort export line from:
   ```typescript
@@ -166,19 +166,19 @@
 
 ### 1E. Verify build and tests pass
 
-- [ ] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json` and `npm test` from repo root. Both must pass with zero errors.**
+- [x] **Run `npx tsc --noEmit -p packages/bijou/tsconfig.json` and `npm test` from repo root. Both must pass with zero errors.**
 
   The IOPort refactor is purely additive (new super-types extracted, IOPort redefined as their intersection). Structural typing means all existing adapters (`mockIO`, `nodeIO`) satisfy the new interface without any code changes. If anything fails, the sub-port definitions have a signature mismatch — fix the interface, do not change adapter code.
 
 ### 1F. Update roadmap to mark Phase 1 complete
 
-- [ ] **Update `docs/ROADMAP.md` Phase 1 section.**
+- [x] **Update `docs/ROADMAP.md` Phase 1 section.**
 
   Add ~~strikethrough~~ to the "Segregate IOPort" task name. Update its Notes to: `Done — split into WritePort, QueryPort, InteractivePort, FilePort. IOPort = InteractivePort & FilePort & { onResize }.` All three Phase 1 rows should now be struck through.
 
 ### 1G. Commit Phase 1
 
-- [ ] **Stage all changes and commit.**
+- [x] **Stage all changes and commit.**
 
   ```
   refactor(ports): segregate IOPort into sub-port interfaces (ISP)

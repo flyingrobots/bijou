@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ♻️ Changed
+
+- **ports:** segregate IOPort into WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
+
 ### ♻️ Refactors
 
 - **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.

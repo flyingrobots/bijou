@@ -16,9 +16,9 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Segregate `IOPort`** | bijou | Split into `WritePort`, `QueryPort` (extends Write), `InteractivePort` (extends Query), `FilePort`. `IOPort` becomes their union for backward compat. |
-| **Remove dead `StylePort` methods** | bijou | Audit `rgb()` and `hex()` — if confirmed unused, remove from interface and all adapter implementations. |
-| **Audit `onResize` usage** | bijou | Verify whether any component calls `IOPort.onResize()`. If only used by bijou-tui runtime, move to a TUI-specific port extension. |
+| ~~**Segregate `IOPort`**~~ | bijou | Done — split into WritePort, QueryPort, InteractivePort, FilePort. IOPort = InteractivePort & FilePort & { onResize }. |
+| ~~**Remove dead `StylePort` methods**~~ | bijou | Audited — rgb() is used by gradient.ts and progress.ts, hex() by progress.ts. Confirmed not dead; no removal needed. |
+| ~~**Audit `onResize` usage**~~ | bijou | Audited — only called by bijou-tui eventbus.ts. Kept on IOPort (full union) but excluded from core sub-ports (WritePort, QueryPort, InteractivePort). |
 
 ### Phase 2: Form abstractions (DRY + SRP)
 

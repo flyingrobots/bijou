@@ -8,6 +8,10 @@
 // Port interfaces
 export type {
   RuntimePort,
+  WritePort,
+  QueryPort,
+  InteractivePort,
+  FilePort,
   IOPort,
   RawInputHandle,
   TimerHandle,
