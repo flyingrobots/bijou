@@ -1,6 +1,6 @@
 # Completed Milestones
 
-Shipped work, newest first. See `docs/CHANGELOG.md` for detailed release notes.
+Shipped work, newest first. See `CHANGELOG.md` for detailed release notes.
 
 ---
 
