@@ -84,7 +84,10 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       ? `? ${options.title}`
       : formatFormTitle(options.title, ctx);
     term.hideCursor();
-    term.writeLine(`${label}  ${styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)')}`);
+    const hint = noColor
+      ? '(space to toggle, enter to confirm)'
+      : styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)');
+    term.writeLine(`${label}  ${hint}`);
 
     for (let i = 0; i < options.options.length; i++) {
       const opt = options.options[i]!;
@@ -92,7 +95,11 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       const isSelected = selected.has(i);
       const prefix = isCurrent ? '\u276f' : ' ';
       const check = isSelected ? '\u25c9' : '\u25cb';
-      const desc = opt.description ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`) : '';
+      const desc = opt.description
+        ? noColor
+          ? ` \u2014 ${opt.description}`
+          : styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`)
+        : '';
       if (isCurrent && !noColor) {
         ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${styledFn(t.theme.semantic.info, check)} ${ctx.style.bold(opt.label)}${desc}\n`);
       } else if (isSelected && !noColor) {
