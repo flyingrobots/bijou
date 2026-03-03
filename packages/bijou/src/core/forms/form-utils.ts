@@ -157,7 +157,7 @@ export function formDispatch<T>(
   interactive: (ctx: BijouContext) => Promise<T>,
   fallback: (ctx: BijouContext) => Promise<T>,
 ): Promise<T> {
-  if (ctx.mode === 'interactive' && ctx.runtime.stdinIsTTY) {
+  if (ctx.mode === 'interactive' && ctx.runtime.stdinIsTTY && ctx.runtime.stdoutIsTTY) {
     return interactive(ctx);
   }
   return fallback(ctx);
