@@ -77,12 +77,12 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Replace exact ANSI assertions** | bijou | Change `expect(x).toBe('\x1b[?25l')` patterns to semantic helpers like `expectHiddenCursor(output)`. Note: tests using `createTestContext()` / `plainStyle()` produce no ANSI — ANSI regex assertions only apply when testing with a styling adapter that emits ANSI (e.g. `chalkStyle()`). |
+| ~~**Replace exact ANSI assertions**~~ | bijou | ✅ Done — 12 raw ANSI assertions replaced with `expectNoAnsi()`, `expectHiddenCursor()`, `expectShownCursor()` semantic helpers. |
 | **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
 | **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
 | **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
-| **Create output assertion helpers** | bijou | Add `expectContainsAnsi(output)`, `expectNoAnsi(output)`, `expectWritten(ctx, substring)` to reduce coupling to `ctx.io.written` array indexing. |
-| **noColor integration test suite** | bijou | Render each interactive form component in noColor mode and assert zero ANSI escapes in output. Matrix: component x mode x noColor. |
+| ~~**Create output assertion helpers**~~ | bijou | ✅ Done — 6 helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Test-only, not in main barrel. |
+| ~~**noColor integration test suite**~~ | bijou | ✅ Done — 7 tests covering select, multiselect, filter, textarea, input, confirm with `noColor: true`. Interactive forms use `expectNoAnsiSgr()`, question-based use `expectNoAnsi()`. |
 
 ### Phase 7: Theme access pattern (DIP)
 
@@ -503,7 +503,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**CLI/stdin component driver**~~ | bijou-tui | ✅ v0.9.0 — `runScript()` feeds key sequences into TEA apps and captures frames. |
 | ~~**`enumeratedList()`**~~ | bijou | ✅ v0.7.0 — Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet, dash, none). |
 | ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
-| **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
+| ~~**Adaptive colors**~~ | bijou | ✅ Done — `detectColorScheme(runtime?)` reads `COLORFGBG`, `ResolvedTheme.colorScheme`, `createTestContext({ colorScheme })`. Auto color switching deferred to theme consumer. |
 | ~~**Color downsampling**~~ | bijou | ✅ v0.9.0 — `rgbToAnsi256()`, `rgbToAnsi16()`, `nearestAnsi256()`, `ansi256ToAnsi16()` pure conversion functions. |
 | ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
 | ~~**`markdown()`**~~ | bijou | ✅ v0.9.0 — Terminal markdown renderer with headings, inline formatting, lists, code blocks, blockquotes, links, and mode degradation. |
@@ -518,8 +518,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
 | ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
 | ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
-| **`styledFnGuarded()` helper** | bijou | noColor-safe styling helper that returns plain text when `noColor` is true. Eliminates per-callsite `noColor ? text : styledFn(token, text)` guards in form components. |
-| **Lint rule for raw ANSI escapes** | bijou | ESLint/biome rule to flag raw `\x1b[` usage outside of StylePort adapters, preventing unguarded ANSI leaks. |
+| ~~**`styledFnGuarded()` helper**~~ | bijou | ✅ Done — `createStyledFn(ctx)` and `createBoldFn(ctx)` in `form-utils.ts`. All 4 interactive form files refactored. |
+| ~~**Lint rule for raw ANSI escapes**~~ | bijou | ✅ Done — Vitest-based `ansi-lint.test.ts` scans source for raw `\x1b` escapes. 13 allowed files. |
 
 ### P3 — Nice to have
 

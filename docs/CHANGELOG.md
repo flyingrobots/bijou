@@ -6,14 +6,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Adaptive color scheme detection** — `detectColorScheme(runtime?)` reads `COLORFGBG` env var to determine light vs dark terminal background. Wired into `ResolvedTheme.colorScheme` and `createTestContext({ colorScheme })`. Exported from main barrel.
+
 ### 🐛 Fixed
 
 - **docs:** correct `docs/CHANGELOG.md` → `CHANGELOG.md` sibling path in COMPLETED.md
 - **forms:** guard `styledFn()` calls in multiselect interactive renderer when `noColor` is true — hint text and option descriptions no longer leak ANSI in noColor mode
+- **forms:** fix noColor ANSI leaks in filter (5 unguarded calls) and textarea (4 unguarded calls) via `createStyledFn`/`createBoldFn` helpers
 
 ### ♻️ Refactors
 
 - **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).
+- **Extract `createStyledFn()`/`createBoldFn()`** — noColor-safe styling helpers in `form-utils.ts` that return identity functions when `noColor` is true. Refactored select, multiselect, filter, and textarea to use them.
+- **Replace exact ANSI assertions** — 12 raw ANSI string checks replaced with semantic helpers (`expectNoAnsi`, `expectHiddenCursor`, `expectShownCursor`) across form-utils and environment tests.
+
+### 🧪 Tests
+
+- **Output assertion helpers** — 6 new test-only helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Re-exported from `adapters/test` barrel.
+- **noColor integration test suite** — 7 tests exercising all form components with `noColor: true` in interactive mode.
+- **ANSI lint test** — scans source files for raw `\x1b` escapes; fails if found in non-allowed files (13 allowed files for terminal control, key matching, and ANSI parsing).
 
 ## [1.0.0] — 2026-03-02
 
