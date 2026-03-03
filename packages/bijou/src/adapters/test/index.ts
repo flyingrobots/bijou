@@ -20,6 +20,14 @@ export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
 export { plainStyle } from './style.js';
 export { auditStyle, type StyledCall, type AuditStylePort } from './audit-style.js';
+export {
+  expectNoAnsi,
+  expectNoAnsiSgr,
+  expectContainsAnsi,
+  expectHiddenCursor,
+  expectShownCursor,
+  expectWritten,
+} from './assertions.js';
 
 /**
  * Configuration for {@link createTestContext}.
