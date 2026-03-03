@@ -41,7 +41,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 💥 BREAKING CHANGES
 
 - **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
-- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — the `bg` property on `FlexOptions` and `FlexChild` changed from `{ bg?: string }` to `TokenValue`. A `ctx` property is also required on `FlexOptions` for bg to take effect.
+- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — `FlexOptions.bg` and `FlexChild.bg` (formerly `{ bg?: string }`) are now `bgToken?: TokenValue`. A `ctx` property is also required on `FlexOptions` for `bgToken` to take effect.
 
 ### ✨ Features
 

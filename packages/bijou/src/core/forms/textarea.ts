@@ -109,7 +109,7 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
 
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
-    const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C to cancel)');
+    const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
     term.hideCursor();
     term.writeLine(`${label}${hint}`);
 
