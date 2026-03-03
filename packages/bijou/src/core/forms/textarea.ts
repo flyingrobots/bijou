@@ -55,7 +55,7 @@ async function fallbackTextarea(options: TextareaOptions, ctx: BijouContext): Pr
   ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
 
   const prompt = ctx.mode === 'accessible'
-    ? 'Enter text (multi-line, empty line to finish): '
+    ? 'Enter text: '
     : '> ';
   const answer = await ctx.io.question(prompt);
   const value = answer.trim() || options.defaultValue || '';

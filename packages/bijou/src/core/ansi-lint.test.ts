@@ -10,7 +10,12 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-/** Files allowed to contain raw ANSI escapes (relative to packages/bijou/src/). */
+/**
+ * Files allowed to contain raw ANSI escapes (relative to packages/bijou/src/).
+ *
+ * Audit: review when files are added/removed or ANSI usage changes.
+ * Each entry should have a brief justification comment.
+ */
 const ALLOWED = new Set([
   'core/forms/form-utils.ts',       // terminalRenderer cursor control
   'core/forms/select.ts',           // \x1b[K line-clear + key matching
@@ -58,9 +63,16 @@ describe('ANSI lint', () => {
       if (ALLOWED.has(rel)) continue;
 
       const content = readFileSync(file, 'utf-8');
-      // Match the literal 4-char sequence \x1b followed by [ or ]
-      // in source code (string/regex literals)
-      if (content.includes('\\x1b[') || content.includes('\\x1b]')) {
+      // Match common ANSI escape encodings in source:
+      // - hex form:     \x1b[ / \x1b]
+      // - unicode form: \u001b[ / \u001b] / \u{1b}[ / \u{1b}]
+      // - literal ESC byte (U+001B) followed by [ or ]
+      const hasAnsiEscape =
+        content.includes('\\x1b[') || content.includes('\\x1b]')
+        || content.includes('\\u001b[') || content.includes('\\u001b]')
+        || content.includes('\\u{1b}[') || content.includes('\\u{1b}]')
+        || content.includes('\x1b[') || content.includes('\x1b]');
+      if (hasAnsiEscape) {
         violations.push(rel);
       }
     }

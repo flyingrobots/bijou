@@ -116,10 +116,10 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
  * Create a noColor-safe styling function.
  *
  * Returns an identity function `(token, text) => text` when `noColor`
- * is true, or `ctx.style.styled` otherwise. Eliminates per-callsite
- * `noColor ? text : styledFn(token, text)` guards.
+ * is true or mode is `accessible`, or `ctx.style.styled` otherwise.
+ * Eliminates per-callsite `noColor ? text : styledFn(token, text)` guards.
  *
- * @param ctx - Bijou context for noColor detection and style access.
+ * @param ctx - Bijou context for noColor/accessible detection and style access.
  * @returns A function `(token, text) => string`.
  */
 export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: string) => string {
@@ -130,10 +130,10 @@ export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: str
 /**
  * Create a noColor-safe bold function.
  *
- * Returns an identity function when `noColor` is true, or
- * `ctx.style.bold` otherwise.
+ * Returns an identity function when `noColor` is true or mode is
+ * `accessible`, or `ctx.style.bold` otherwise.
  *
- * @param ctx - Bijou context for noColor detection and style access.
+ * @param ctx - Bijou context for noColor/accessible detection and style access.
  * @returns A function `(text) => string`.
  */
 export function createBoldFn(ctx: BijouContext): (text: string) => string {
