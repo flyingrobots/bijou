@@ -354,6 +354,19 @@ describe('toast', () => {
     expect(content).toContain('\u250c');
   });
 
+  it('bgToken without bg field is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const noBg = toast({
+      message: 'NoBg',
+      screenWidth: 80,
+      screenHeight: 24,
+      bgToken: { hex: '#ffffff' },
+      ctx,
+    });
+    const plain = toast({ message: 'NoBg', screenWidth: 80, screenHeight: 24 });
+    expect(stripAnsi(noBg.content)).toBe(stripAnsi(plain.content));
+  });
+
   it('bgToken without ctx is ignored', () => {
     const plain = toast({ message: 'X', screenWidth: 80, screenHeight: 24 });
     const withToken = toast({
@@ -516,6 +529,20 @@ describe('drawer', () => {
     });
     expect(stripAnsi(d.content)).toContain('filled');
     expect(d.content).toContain('\u250c');
+  });
+
+  it('bgToken without bg field is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const noBg = drawer({
+      content: 'NoBg',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: { hex: '#ffffff' },
+      ctx,
+    });
+    const plain = drawer({ content: 'NoBg', width: 20, screenWidth: 80, screenHeight: 5 });
+    expect(stripAnsi(noBg.content)).toBe(stripAnsi(plain.content));
   });
 
   it('bgToken without ctx is ignored', () => {
