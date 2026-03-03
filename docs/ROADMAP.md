@@ -530,6 +530,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
 | **Note field** | bijou | Display-only text within a form flow. |
 | **Scrollable select** | bijou | Fixed-height select with overflow scrolling. |
+| **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
 
 ---
 
