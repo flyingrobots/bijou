@@ -6,6 +6,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **`focusArea()`** (bijou-tui) — new scrollable pane building block with a colored left gutter bar indicating focus state. Wraps `viewport()` with gutter chrome, horizontal overflow support (`overflowX: 'scroll' | 'hidden'`), and a convenience keymap. Degrades gracefully: pipe/accessible modes omit the gutter; static mode renders it unstyled.
+- **`dagPane()`** (bijou-tui) — new interactive DAG viewer building block. Wraps `dagLayout()` in a `focusArea()` with arrow-key node navigation (parent/child/sibling via spatial proximity), auto-highlight-path from root to selected node, and auto-scroll-to-selection. Includes full keymap with vim scroll bindings and arrow-key selection.
+
 ## [1.0.0] — 2026-03-03
 
 ### 💥 BREAKING CHANGES
