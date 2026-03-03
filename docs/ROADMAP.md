@@ -534,6 +534,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Note field** | bijou | Display-only text within a form flow. |
 | **Scrollable select** | bijou | Fixed-height select with overflow scrolling. |
 | **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
+| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+| **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 
 ---
 
