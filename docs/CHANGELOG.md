@@ -15,6 +15,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **docs:** correct `docs/CHANGELOG.md` → `CHANGELOG.md` sibling path in COMPLETED.md
 - **forms:** guard `styledFn()` calls in multiselect interactive renderer when `noColor` is true — hint text and option descriptions no longer leak ANSI in noColor mode
 - **forms:** fix noColor ANSI leaks in filter (5 unguarded calls) and textarea (4 unguarded calls) via `createStyledFn`/`createBoldFn` helpers
+- **forms:** `formatFormTitle` now includes `? ` prefix in noColor/accessible modes for visual parity; remove redundant manual ternaries from all 4 interactive form files
+- **forms:** `createStyledFn`/`createBoldFn` now suppress styling in accessible mode (consistent with `formatFormTitle`)
 
 ### ♻️ Refactors
 
