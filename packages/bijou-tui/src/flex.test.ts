@@ -278,7 +278,7 @@ describe('resize reflow', () => {
 // ---------------------------------------------------------------------------
 
 describe('background token', () => {
-  it('container bgToken fills gap areas', () => {
+  it('container bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const result = flex(
@@ -291,7 +291,7 @@ describe('background token', () => {
     expect(result).toContain('B');
   });
 
-  it('child bgToken fills child region', () => {
+  it('child bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const result = flex(

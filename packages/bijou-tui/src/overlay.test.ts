@@ -210,7 +210,7 @@ describe('modal', () => {
     expect(stripAnsi(content)).toContain('hint');
   });
 
-  it('bgToken fills interior (plainStyle is identity so content unchanged)', () => {
+  it('bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const { content } = modal({
@@ -340,7 +340,7 @@ describe('toast', () => {
     expect(stripAnsi(content)).toContain('themed');
   });
 
-  it('bgToken fills toast interior', () => {
+  it('bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const { content } = toast({
@@ -490,7 +490,7 @@ describe('drawer', () => {
     expect(stripAnsi(d.content)).toContain('\u250c');
   });
 
-  it('bgToken fills drawer interior', () => {
+  it('bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const d = drawer({
@@ -649,7 +649,7 @@ describe('tooltip', () => {
     expect(t.col).toBeGreaterThanOrEqual(0);
   });
 
-  it('bgToken fills tooltip interior', () => {
+  it('bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
     const t = tooltip({ ...base, row: 10, col: 40, bgToken: token, ctx });
