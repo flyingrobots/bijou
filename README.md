@@ -133,6 +133,8 @@ Bijou is a growing ecosystem. Transparency is our baseline—here is the current
 | `filePicker` | ✅ Stable | Directory browser with IOPort integration and extension filtering. |
 | `commandPalette` | ✅ Stable | Filterable action list with search and keyboard navigation. |
 | `tooltip` | ✅ Stable | Positioned overlay with directional placement and screen clamping. |
+| `focusArea` | ✅ Stable | Scrollable pane with colored focus gutter and horizontal overflow. |
+| `dagPane` | ✅ Stable | Interactive DAG viewer with arrow-key navigation and auto-highlight path. |
 
 ---
 

@@ -128,6 +128,8 @@ interface BijouContext {
 | **Keybinding manager** | `createKeyMap()` — declarative binding, modifier combos, named groups, enable/disable |
 | **Help generator** | `helpView()`, `helpShort()`, `helpFor()` — auto-generated from bindings |
 | **Input stack** | `createInputStack()` — layered dispatch with opaque/passthrough modes |
+| **Focus area** | `focusArea()` — scrollable pane with colored focus gutter and horizontal overflow |
+| **DAG pane** | `dagPane()` — interactive DAG viewer with spatial arrow-key navigation and auto-highlight |
 | **Layout** | `vstack()`, `hstack()` |
 
 ## Data Flow

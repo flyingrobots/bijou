@@ -281,6 +281,18 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 **Demo:** Animated splash screen: logo springs in from above, tagline fades in with a tween, gradient sweeps across, then a "Press any key" prompt pulses. Press a key to exit.
 **GIF:** Watch the splash animate in, press a key. ~6s.
 
+### [x] `focus-area`
+
+**Component:** `focusArea()`, `focusAreaScrollBy()`, `focusAreaKeyMap()`
+**Demo:** Scrollable text pane with a colored left gutter bar. Vim-style scroll (j/k/d/u/g/G) plus horizontal scroll (h/l). Press Tab to toggle focus state (accent vs muted gutter).
+**GIF:** Scroll through content → toggle focus → scroll horizontally → quit. ~8s.
+
+### [x] `dag-pane`
+
+**Component:** `dagPane()`, `dagPaneSelectChild()`, `dagPaneKeyMap()`
+**Demo:** Interactive DAG viewer showing a project dependency graph. Arrow keys navigate nodes spatially, auto-highlighting the path from root to selected node. Vim keys scroll the viewport.
+**GIF:** Arrow down through nodes → left/right between siblings → scroll → quit. ~10s.
+
 ---
 
 ## Totals
@@ -289,8 +301,8 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 |---|---|
 | Static components | 20/20 |
 | Interactive forms | 5/5 |
-| TUI apps | 18/18 |
-| **Total** | **43/43** |
+| TUI apps | 20/20 |
+| **Total** | **45/45** |
 
 > All examples complete.
 

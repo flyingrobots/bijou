@@ -77,6 +77,8 @@ src/
 ├── help.ts          # helpView, helpShort, helpFor — auto-generated help
 ├── inputstack.ts    # InputStack — layered input dispatch
 ├── overlay.ts       # composite(), modal(), toast() — overlay compositing
+├── focus-area.ts    # focusArea() — scrollable pane with colored gutter
+├── dag-pane.ts      # dagPane() — interactive DAG viewer with node navigation
 └── index.ts         # Public API barrel
 ```
 
@@ -240,6 +242,67 @@ Builds a bordered box with optional title (bold), body, and hint (muted) section
 Builds a bordered single-line box with a variant icon (`✔` success, `✘` error, `ℹ` info), then computes position from anchor corner (`top-right`, `bottom-right`, `bottom-left`, `top-left`) and margin. Returns an `Overlay` object.
 
 **Key design decision:** No dependency on `box()` from bijou core. The `box()` component degrades in pipe/accessible modes (returns raw content, no borders), but overlays are inherently interactive-mode constructs that always need borders. Border rendering uses the same unicode box-drawing characters directly.
+
+## Focus Area (`focus-area.ts`)
+
+A scrollable pane building block that wraps `viewport()` and prepends a styled gutter character (`▎` U+258E) indicating focus state.
+
+### Composition
+
+```
+focusArea(state, options)
+    │
+    ├── resolveGutter(focused, ctx)  →  styled '▎' character
+    │     └── ctx.style.styled(token, '▎')
+    │
+    └── viewport({ width: state.width - 1, ... })
+          └── standard viewport rendering with scrollbar
+```
+
+### Width Accounting
+
+- Gutter consumes 1 column (always present in interactive/static modes)
+- Viewport gets `width - 1` columns
+- Viewport internally handles scrollbar (another 1 column when `showScrollbar=true`)
+- Pipe/accessible modes: no gutter, full width to content
+
+### Horizontal Overflow
+
+`overflowX: 'scroll'` enables horizontal scrolling — `createScrollState()` receives a `viewportWidth` to compute `maxX`. When `'hidden'`, horizontal scroll functions are no-ops.
+
+## DAG Pane (`dag-pane.ts`)
+
+Interactive DAG viewer composing `dagLayout()` from bijou core with `focusArea()` for viewport management.
+
+### Composition
+
+```
+dagPane(state, options)
+    │
+    └── focusArea(state.focusArea, options)
+          └── viewport with gutter
+
+createDagPaneState / updateSelection
+    │
+    ├── buildAdjacency(source)         →  parent/child maps
+    ├── computeHighlightPath(id, adj)  →  BFS root→selected path
+    ├── renderLayout(source, id, path) →  dagLayout() with highlight/selected
+    ├── focusAreaSetContent(fa, output) →  update viewport content
+    └── scrollToNode(fa, nodePos)      →  ensure selected node visible
+```
+
+### Spatial Navigation
+
+Arrow-key navigation uses `DagNodePosition { row, col, width, height }` from `dagLayout()`:
+
+- **selectChild**: Children from adjacency map → pick by closest column center
+- **selectParent**: Parents from adjacency map → pick by closest column center
+- **selectLeft/Right**: Nodes on same row sorted by column → move to adjacent
+- **No selection**: Auto-select first root node
+
+### Re-rendering on Selection
+
+Each selection change triggers a full `dagLayout()` call because `selectedId` and `highlightPath` affect the rendered output. The layout result replaces the focus area content via `focusAreaSetContent()`.
 
 ## Graceful Degradation
 
