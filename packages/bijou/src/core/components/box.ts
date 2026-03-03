@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { makeBgFill } from '../bg-fill.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
 
@@ -118,9 +119,7 @@ export function box(content: string, options: BoxOptions = {}): string {
 
   const colorize = (s: string): string => ctx.style.styled(borderToken, s);
 
-  const bgFill = options.bgToken?.bg && !ctx.theme.noColor
-    ? (s: string): string => ctx.style.bgHex(options.bgToken!.bg!, s)
-    : undefined;
+  const bgFill = makeBgFill(options.bgToken, ctx);
 
   return drawBox(content, colorize, padding, options.width, bgFill);
 }

@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ♻️ Refactors
+
+- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change for correctly-guarded sites.
+
+### 🐛 Bug Fixes
+
+- **`box()` bgToken missing pipe/accessible guards** — `box()` now skips background fill in pipe and accessible modes, matching the behavior of `flex()`, `modal()`, `toast()`, `drawer()`, and `tooltip()`.
+
 ## [1.0.0] — 2026-03-02
 
 ### 💥 BREAKING CHANGES

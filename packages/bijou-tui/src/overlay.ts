@@ -8,6 +8,7 @@
  */
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import { makeBgFill } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -250,9 +251,7 @@ export function modal(options: ModalOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
-    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
-    : undefined;
+  const bgFill = makeBgFill(options.bgToken, ctx);
 
   const boxStr = renderBox(contentLines, borderColor, bgFill);
   const boxLines = boxStr.split('\n');
@@ -315,9 +314,7 @@ export function toast(options: ToastOptions): Overlay {
     ? (s: string) => ctx.style.styled(ctx.theme.theme.border[borderKey], s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
-    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
-    : undefined;
+  const bgFill = makeBgFill(options.bgToken, ctx);
 
   const boxStr = renderBox([line], borderColor, bgFill);
   const boxLines = boxStr.split('\n');
@@ -413,9 +410,7 @@ export function drawer(options: DrawerOptions): Overlay {
     ? (s: string) => ctx.style.styled(options.borderToken!, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && options.bgToken?.bg
-    ? (s: string) => ctx.style.bgHex(options.bgToken!.bg!, s)
-    : undefined;
+  const bgFill = makeBgFill(options.bgToken, ctx);
   const fill = bgFill ?? ((s: string) => s);
 
   // Build top border
@@ -524,9 +519,7 @@ export function tooltip(options: TooltipOptions): Overlay {
     ? (s: string) => ctx.style.styled(borderToken, s)
     : (s: string) => s;
 
-  const bgFill = ctx && !ctx.theme.noColor && ctx.mode !== 'pipe' && ctx.mode !== 'accessible' && bgToken?.bg
-    ? (s: string) => ctx.style.bgHex(bgToken.bg!, s)
-    : undefined;
+  const bgFill = makeBgFill(bgToken, ctx);
 
   const boxStr = renderBox(contentLines, borderColor, bgFill);
   const boxLines = boxStr.split('\n');

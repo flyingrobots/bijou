@@ -18,6 +18,7 @@
 // ---------------------------------------------------------------------------
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import { makeBgFill } from '@flyingrobots/bijou';
 
 /**
  * Configuration for the flex layout container.
@@ -61,26 +62,6 @@ export interface FlexChild {
 }
 
 import { visibleLength, clipToWidth } from './viewport.js';
-
-// ---------------------------------------------------------------------------
-// Background color helper
-// ---------------------------------------------------------------------------
-
-/**
- * Create a bg fill function that routes through StylePort, respecting noColor
- * and output mode.
- * @param token - Token with optional `bg` hex color.
- * @param ctx - Bijou context for styled output.
- * @returns Wrapper function, or undefined if bg should not be applied.
- */
-function makeBgFill(
-  token: TokenValue | undefined,
-  ctx: BijouContext | undefined,
-): ((text: string) => string) | undefined {
-  if (!token?.bg || !ctx) return undefined;
-  if (ctx.theme.noColor || ctx.mode === 'pipe' || ctx.mode === 'accessible') return undefined;
-  return (text: string) => ctx.style.bgHex(token.bg!, text);
-}
 
 // ---------------------------------------------------------------------------
 // ANSI helpers
