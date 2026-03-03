@@ -324,7 +324,7 @@ describe('background token', () => {
       { basis: 10, content: 'hello' },
     );
     const withoutToken = flex(
-      { direction: 'row', width: 20, height: 2 },
+      { direction: 'row', width: 20, height: 2, ctx },
       { basis: 10, content: 'hello' },
     );
     expect(withToken).toBe(withoutToken);

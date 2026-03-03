@@ -545,6 +545,20 @@ describe('drawer', () => {
     expect(stripAnsi(noBg.content)).toBe(stripAnsi(plain.content));
   });
 
+  it('bgToken with noColor is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const noColorResult = drawer({
+      content: 'NoBg',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    const plain = drawer({ content: 'NoBg', width: 20, screenWidth: 80, screenHeight: 5 });
+    expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
+  });
+
   it('bgToken without ctx is ignored', () => {
     const plain = drawer({ content: 'X', width: 20, screenWidth: 80, screenHeight: 5 });
     const withToken = drawer({

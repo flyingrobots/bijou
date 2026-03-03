@@ -21,7 +21,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **forms:** fix misleading accessible fallback prompt in textarea (said "multi-line" but reads single line)
 - **forms:** `confirm()` noColor prompt now uses `formatFormTitle` to include "? " prefix (visual parity with color mode)
 - **forms:** `moveUp(0)` / `clearBlock(0)` in `terminalRenderer` now early-return instead of emitting empty ANSI sequences
-- **detect:** remove unreachable `undefined` guard in `detectColorScheme` (`split()` always returns >= 1 element)
+- **detect:** remove unreachable `undefined` guard on `parts[parts.length - 1]` in `detectColorScheme` (replaced with `!` assertion — `split()` always returns >= 1 element)
 - **lint:** ANSI lint test now uses case-insensitive regex for all escape form variants (`\x1B`, `\u001B`, `\u{1B}`)
 - **forms:** `formDispatch()` now checks `stdoutIsTTY` in addition to `stdinIsTTY` before routing to interactive handler
 

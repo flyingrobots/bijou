@@ -12,7 +12,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 ### Phase 1: Port interface cleanup (ISP)
 
-**Problem:** `IOPort` is a fat interface — static components only call `write()` but depend on `question()`, `rawInput()`, `readFile()`, `readDir()`, `joinPath()`. `StylePort` exports `rgb()` and `hex()` methods that no component ever invokes.
+**Problem (initial hypothesis):** `IOPort` is a fat interface — static components only call `write()` but depend on `question()`, `rawInput()`, `readFile()`, `readDir()`, `joinPath()`. `StylePort` was suspected to export unused `rgb()` and `hex()` methods (audit found they are used — see resolution below).
 
 | Task | Package | Notes |
 |------|---------|-------|
