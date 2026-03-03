@@ -13,14 +13,15 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v0.10.0
+## What's New in v1.0.0
 
-**Canvas Shader, Box Width Override & Mouse Input** — three high-value features plus grapheme-aware text clipping:
+**First stable release.** Background color support, IOPort segregation, adaptive color detection, and a major forms/overlay hardening pass.
 
-- **`canvas()` shader primitive** — procedural character-grid renderer: `(cols, rows, shader, options?) → string`. Build plasma effects, starfields, particle systems — all composable with `composite()` for layered rendering
-- **Mouse input (opt-in)** — full SGR mouse protocol support via `RunOptions.mouse?: boolean`. New types: `MouseMsg`, `MouseButton`, `MouseAction`. Parses presses, releases, drags, scroll, and modifier keys
-- **`box()` width override** — lock outer box width with `BoxOptions.width`. Content is grapheme-aware clipped or padded to fill
-- **`clipToWidth()`** — grapheme-aware O(n) text clipping promoted to core. Preserves ANSI escapes, won't split emoji or CJK clusters
+- **Background color support** — `bgToken` on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks with graceful degradation
+- **Adaptive color scheme detection** — `detectColorScheme()` reads `COLORFGBG` to determine light vs dark terminal background
+- **IOPort segregation** — WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
+- **Forms hardening** — noColor/accessible ANSI leak fixes across all form components, shared `createStyledFn`/`createBoldFn` helpers, `formDispatch` TTY guards
+- **`Theme.surface` required** — all themes must now include `surface` tokens (`primary`, `secondary`, `elevated`, `overlay`, `muted`)
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 

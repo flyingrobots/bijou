@@ -6,12 +6,42 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-03-03
+
+### 💥 BREAKING CHANGES
+
+- **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
+- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — `FlexOptions.bg` and `FlexChild.bg` (formerly `{ bg?: string }`) are now `bgToken?: TokenValue`. A `ctx` property is also required on `FlexOptions` for `bgToken` to take effect.
+
 ### ✨ Features
 
+- **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
+- **`TooltipOptions.bgToken`** — new optional property for API consistency with modal/toast/drawer.
 - **Adaptive color scheme detection** — `detectColorScheme(runtime?)` reads `COLORFGBG` env var to determine light vs dark terminal background. Wired into `ResolvedTheme.colorScheme` and `createTestContext({ colorScheme })`. Exported from main barrel.
+
+### ♻️ Refactors
+
+- **ports:** segregate IOPort into WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
+- **forms:** extract shared form utilities (formatFormTitle, writeValidationError, renderNumberedOptions, terminalRenderer, formDispatch) to eliminate cross-form duplication
+- **forms:** standardize all form components on shared resolveCtx() helper
+- **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.
+- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).
+- **Extract `createStyledFn()`/`createBoldFn()`** — noColor-safe styling helpers in `form-utils.ts` that return identity functions when `noColor` is true. Refactored select, multiselect, filter, and textarea to use them.
+- **Replace exact ANSI assertions** — 12 raw ANSI string checks replaced with semantic helpers (`expectNoAnsi`, `expectHiddenCursor`, `expectShownCursor`) across form-utils and environment tests.
 
 ### 🐛 Fixed
 
+- **`flex()` bg routed through StylePort** — background colors in flex layouts now route through `ctx.style.bgHex()` instead of emitting raw ANSI escape sequences, respecting `noColor`, pipe mode, and accessible mode.
+- **`toDTCG()` surface write unconditional** — remove defensive `if (theme.surface)` guard that could silently drop surface tokens during DTCG export.
+- **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
+- **`clip.ts` ANSI regex** — convert `ANSI_RE` from regex literal to `RegExp` constructor to avoid Biome `noControlCharactersInRegex` lint violation
+- **`select()` empty options guard** — throw `Error` when `options.options` is empty instead of allowing undefined dereference
+- **`timeline()` duplicate track guard** — throw `Error` on duplicate track names during `build()` to prevent silent state overwrites
+- **`timeline.step()` dt validation** — throw `Error` when `dt` is negative, `NaN`, or infinite to prevent corrupted timeline state
+- **`readDir` uses `withFileTypes`** — replace `statSync` per-entry with `readdirSync({ withFileTypes: true })` to reliably identify directories without a separate stat call
+- **overlay:** add noColor guard to bgFill in modal, toast, drawer, tooltip
+- **overlay:** add pipe/accessible mode guards to bgFill
+- **forms:** guard empty options in multiselect
 - **docs:** fix MD038 code span spacing in CHANGELOG (`` `? ` `` → `"? "`)
 - **docs:** correct `docs/CHANGELOG.md` → `CHANGELOG.md` sibling path in COMPLETED.md
 - **forms:** guard `styledFn()` calls in multiselect interactive renderer when `noColor` is true — hint text and option descriptions no longer leak ANSI in noColor mode
@@ -25,54 +55,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **lint:** ANSI lint test now uses case-insensitive regex for all escape form variants (`\x1B`, `\u001B`, `\u{1B}`)
 - **forms:** `formDispatch()` now checks `stdoutIsTTY` in addition to `stdinIsTTY` before routing to interactive handler
 
-### ♻️ Refactors
-
-- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).
-- **Extract `createStyledFn()`/`createBoldFn()`** — noColor-safe styling helpers in `form-utils.ts` that return identity functions when `noColor` is true. Refactored select, multiselect, filter, and textarea to use them.
-- **Replace exact ANSI assertions** — 12 raw ANSI string checks replaced with semantic helpers (`expectNoAnsi`, `expectHiddenCursor`, `expectShownCursor`) across form-utils and environment tests.
-
-### 🧪 Tests
-
-- **Output assertion helpers** — 6 new test-only helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Re-exported from `adapters/test` barrel.
-- **noColor integration test suite** — 7 tests exercising all form components with `noColor: true` in interactive mode.
-- **ANSI lint test** — scans source files for raw ANSI escapes (hex, unicode, and literal ESC byte forms); fails if found in non-allowed files (13 allowed files for terminal control, key matching, and ANSI parsing).
-
-## [1.0.0] — 2026-03-02
-
-### 💥 BREAKING CHANGES
-
-- **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
-- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — `FlexOptions.bg` and `FlexChild.bg` (formerly `{ bg?: string }`) are now `bgToken?: TokenValue`. A `ctx` property is also required on `FlexOptions` for `bgToken` to take effect.
-
-### ✨ Features
-
-- **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
-- **`TooltipOptions.bgToken`** — new optional property for API consistency with modal/toast/drawer.
-
-### ♻️ Refactors
-
-- **ports:** segregate IOPort into WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
-- **forms:** extract shared form utilities (formatFormTitle, writeValidationError, renderNumberedOptions, terminalRenderer, formDispatch) to eliminate cross-form duplication
-- **forms:** standardize all form components on shared resolveCtx() helper
-- **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.
-
-### 🐛 Fixed
-
-- **`flex()` bg routed through StylePort** — background colors in flex layouts now route through `ctx.style.bgHex()` instead of emitting raw ANSI escape sequences, respecting `noColor`, pipe mode, and accessible mode.
-- **`toDTCG()` surface write unconditional** — remove defensive `if (theme.surface)` guard that could silently drop surface tokens during DTCG export.
-- **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
-- **`clip.ts` ANSI regex** — convert `ANSI_RE` from regex literal to `RegExp` constructor to avoid Biome `noControlCharactersInRegex` lint violation
-- **`select()` empty options guard** — throw `Error` when `options.options` is empty instead of allowing undefined dereference
-- **`timeline()` duplicate track guard** — throw `Error` on duplicate track names during `build()` to prevent silent state overwrites
-- **`timeline.step()` dt validation** — throw `Error` when `dt` is negative, `NaN`, or infinite to prevent corrupted timeline state
-- **`readDir` uses `withFileTypes`** — replace `statSync` per-entry with `readdirSync({ withFileTypes: true })` to reliably identify directories without a separate stat call
-
 ### 📝 Documentation
 
 - **JSDoc review fixes** — fix 57 issues found during self-review of JSDoc coverage: correct `OutputMode` values in `BijouContext.mode` (critical), add missing `@param`/`@returns`/`@throws` tags across all three packages, merge 12 split JSDoc blocks in bijou-tui, unify `resolveCtx` wording across 16 components, standardize punctuation (en-dashes, em-dashes, `6x6x6`), strip redundant implementation overload docs, and fix inaccurate descriptions (`readDir` sort claim, `NO_COLOR` attribution, "Mutable" snapshot, field check order)
 - **CodeRabbit JSDoc review fixes** — address 16 documentation review comments from PR #25: fix CHANGELOG compare links for v0.10.1, clarify `BrowsableListItem.value`/`description` JSDoc, rename "Immutable" to "Readonly" in `BrowsableListState`, remove blank line before `@template` in `initBrowsableList`, fix verb tense in `createEventBus`, clarify `alignCross` `totalCrossSize` units, fix `ModalOptions.width` to "preferred minimum width", note hard truncation in `box()` `clipToWidth`, document `labelToken` override in `headerBox`, use "local wall-clock time" in `formatTimestamp`, note optional timestamp/prefix in `log()`, fix "mid-style" wording in `clipToWidth`, add non-blocking validation remark to `input()`, use "code point" in `ShaderFn` return, add `getDefaultContext` cross-reference to `resolveCtx`
 - **CodeRabbit code review fixes** — remove unused `ctx?: BijouContext` option from `StatusBarOptions` (dead API surface that was never read by `statusBar()`); clarify `helpFor` JSDoc to note that `groupFilter` in options is overridden by the `groupPrefix` parameter
 - **viewport JSDoc** — change "characters wide" to "visible columns wide" to reflect grapheme/ANSI-aware width measurement
+
+### 🧪 Tests
+
+- **Output assertion helpers** — 6 new test-only helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Re-exported from `adapters/test` barrel.
+- **noColor integration test suite** — 7 tests exercising all form components with `noColor: true` in interactive mode.
+- **ANSI lint test** — scans source files for raw ANSI escapes (hex, unicode, and literal ESC byte forms); fails if found in non-allowed files (13 allowed files for terminal control, key matching, and ANSI parsing).
 
 ## [0.10.1] — 2026-02-28
 
