@@ -1,8 +1,7 @@
 import type { SelectFieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch } from './form-utils.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
 
 /**
  * Options for the multi-select field.
@@ -73,7 +72,8 @@ async function numberedMultiselect<T>(options: MultiselectOptions<T>, ctx: Bijou
 async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: BijouContext): Promise<T[]> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
   const term = terminalRenderer(ctx);
 
   let cursor = 0;
@@ -84,9 +84,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       ? `? ${options.title}`
       : formatFormTitle(options.title, ctx);
     term.hideCursor();
-    const hint = noColor
-      ? '(space to toggle, enter to confirm)'
-      : styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)');
+    const hint = styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)');
     term.writeLine(`${label}  ${hint}`);
 
     for (let i = 0; i < options.options.length; i++) {
@@ -96,12 +94,10 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       const prefix = isCurrent ? '\u276f' : ' ';
       const check = isSelected ? '\u25c9' : '\u25cb';
       const desc = opt.description
-        ? noColor
-          ? ` \u2014 ${opt.description}`
-          : styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`)
+        ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`)
         : '';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${styledFn(t.theme.semantic.info, check)} ${ctx.style.bold(opt.label)}${desc}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${styledFn(t.theme.semantic.info, check)} ${boldFn(opt.label)}${desc}\n`);
       } else if (isSelected && !noColor) {
         ctx.io.write(`\x1b[K  ${prefix} ${styledFn(t.theme.semantic.success, check)} ${opt.label}${desc}\n`);
       } else {

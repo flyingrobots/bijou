@@ -1,8 +1,7 @@
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { formatFormTitle, writeValidationError, terminalRenderer, formDispatch } from './form-utils.js';
+import { formatFormTitle, writeValidationError, terminalRenderer, formDispatch, createStyledFn } from './form-utils.js';
 
 /**
  * Options for the multi-line textarea field.
@@ -89,7 +88,7 @@ async function fallbackTextarea(options: TextareaOptions, ctx: BijouContext): Pr
 async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
   const height = options.height ?? 6;
   const renderWidth = options.width ?? 80;
   const showLineNumbers = options.showLineNumbers ?? false;

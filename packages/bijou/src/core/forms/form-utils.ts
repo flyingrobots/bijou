@@ -8,6 +8,7 @@
  */
 
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 /**
  * Format a form title with the `?` prefix and theme-aware styling.
@@ -108,6 +109,35 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
       ctx.io.write(`\x1b[${lineCount}A`);
     },
   };
+}
+
+/**
+ * Create a noColor-safe styling function.
+ *
+ * Returns an identity function `(token, text) => text` when `noColor`
+ * is true, or `ctx.style.styled` otherwise. Eliminates per-callsite
+ * `noColor ? text : styledFn(token, text)` guards.
+ *
+ * @param ctx - Bijou context for noColor detection and style access.
+ * @returns A function `(token, text) => string`.
+ */
+export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: string) => string {
+  if (ctx.theme.noColor) return (_token: TokenValue, text: string) => text;
+  return (token: TokenValue, text: string) => ctx.style.styled(token, text);
+}
+
+/**
+ * Create a noColor-safe bold function.
+ *
+ * Returns an identity function when `noColor` is true, or
+ * `ctx.style.bold` otherwise.
+ *
+ * @param ctx - Bijou context for noColor detection and style access.
+ * @returns A function `(text) => string`.
+ */
+export function createBoldFn(ctx: BijouContext): (text: string) => string {
+  if (ctx.theme.noColor) return (text: string) => text;
+  return (text: string) => ctx.style.bold(text);
 }
 
 /**

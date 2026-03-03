@@ -6,7 +6,10 @@ import {
   renderNumberedOptions,
   terminalRenderer,
   formDispatch,
+  createStyledFn,
+  createBoldFn,
 } from './form-utils.js';
+import { auditStyle } from '../../adapters/test/audit-style.js';
 
 /** Join all writes into a single string for substring assertions. */
 function allWritten(ctx: { io: { written: string[] } }): string {
@@ -180,5 +183,59 @@ describe('formDispatch', () => {
       async () => 'fallback',
     );
     expect(result).toBe('fallback');
+  });
+});
+
+describe('createStyledFn', () => {
+  it('returns identity function when noColor is true', () => {
+    const ctx = createTestContext({ noColor: true });
+    const styledFn = createStyledFn(ctx);
+    const result = styledFn(ctx.theme.theme.semantic.info, 'hello');
+    expect(result).toBe('hello');
+  });
+
+  it('calls ctx.style.styled when noColor is false', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ noColor: false });
+    // Replace style with audit style to track calls
+    const ctxWithAudit = { ...ctx, style };
+    const styledFn = createStyledFn(ctxWithAudit);
+    styledFn(ctx.theme.theme.semantic.info, 'hello');
+    expect(style.wasStyled(ctx.theme.theme.semantic.info, 'hello')).toBe(true);
+  });
+
+  it('does not call styled() when noColor is true', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ noColor: true });
+    const ctxWithAudit = { ...ctx, style };
+    const styledFn = createStyledFn(ctxWithAudit);
+    styledFn(ctx.theme.theme.semantic.info, 'hello');
+    expect(style.calls).toHaveLength(0);
+  });
+});
+
+describe('createBoldFn', () => {
+  it('returns identity function when noColor is true', () => {
+    const ctx = createTestContext({ noColor: true });
+    const boldFn = createBoldFn(ctx);
+    expect(boldFn('hello')).toBe('hello');
+  });
+
+  it('calls ctx.style.bold when noColor is false', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ noColor: false });
+    const ctxWithAudit = { ...ctx, style };
+    const boldFn = createBoldFn(ctxWithAudit);
+    boldFn('hello');
+    expect(style.calls.some((c) => c.method === 'bold' && c.text === 'hello')).toBe(true);
+  });
+
+  it('does not call bold() when noColor is true', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ noColor: true });
+    const ctxWithAudit = { ...ctx, style };
+    const boldFn = createBoldFn(ctxWithAudit);
+    boldFn('hello');
+    expect(style.calls).toHaveLength(0);
   });
 });

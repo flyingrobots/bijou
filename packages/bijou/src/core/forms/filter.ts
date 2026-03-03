@@ -1,8 +1,7 @@
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch } from './form-utils.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
 
 /**
  * Single option in a filterable select list.
@@ -128,7 +127,8 @@ async function fallbackFilter<T>(options: FilterOptions<T>, ctx: BijouContext): 
 async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
   const maxVisible = options.maxVisible ?? 7;
   const term = terminalRenderer(ctx);
@@ -172,7 +172,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
       const isCurrent = i === cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${ctx.style.bold(opt.label)}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}\n`);
       } else {
         ctx.io.write(`\x1b[K  ${prefix} ${opt.label}\n`);
       }
