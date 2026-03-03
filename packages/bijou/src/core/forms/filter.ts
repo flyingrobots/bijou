@@ -1,8 +1,7 @@
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
-import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
 
 /**
  * Single option in a filterable select list.
@@ -72,14 +71,13 @@ export async function filter<T>(options: FilterOptions<T>): Promise<T> {
     throw new Error('filter() requires at least one option, or a defaultValue');
   }
 
-  const ctx = options.ctx ?? getDefaultContext();
-  const mode = ctx.mode;
+  const ctx = resolveCtx(options.ctx);
 
-  if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
-    return interactiveFilter(options, ctx);
-  }
-
-  return fallbackFilter(options, mode, ctx);
+  return formDispatch(
+    ctx,
+    (c) => interactiveFilter(options, c),
+    (c) => fallbackFilter(options, c),
+  );
 }
 
 /**
@@ -89,26 +87,14 @@ export async function filter<T>(options: FilterOptions<T>): Promise<T> {
  * Used as the fallback for non-interactive or accessible modes.
  *
  * @param options - Filter field configuration.
- * @param mode - Current output mode.
  * @param ctx - Bijou context.
  * @returns The value of the matched or selected option.
  */
-async function fallbackFilter<T>(options: FilterOptions<T>, mode: OutputMode, ctx: BijouContext): Promise<T> {
-  const noColor = ctx.theme.noColor;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+async function fallbackFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
+  ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
+  renderNumberedOptions(options.options, ctx);
 
-  if (noColor || mode === 'accessible') {
-    ctx.io.write(`${options.title}\n`);
-  } else {
-    ctx.io.write(styledFn(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(options.title) + '\n');
-  }
-
-  for (let i = 0; i < options.options.length; i++) {
-    const opt = options.options[i]!;
-    ctx.io.write(`  ${i + 1}. ${opt.label}\n`);
-  }
-
-  const prompt = mode === 'accessible' ? 'Enter number or search: ' : '> ';
+  const prompt = ctx.mode === 'accessible' ? 'Enter number or search: ' : '> ';
   const answer = await ctx.io.question(prompt);
   const trimmed = answer.trim();
 
@@ -141,9 +127,11 @@ async function fallbackFilter<T>(options: FilterOptions<T>, mode: OutputMode, ct
 async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
   const maxVisible = options.maxVisible ?? 7;
+  const term = terminalRenderer(ctx);
 
   let query = '';
   let cursor = 0;
@@ -167,11 +155,9 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
   }
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title);
-    ctx.io.write(`\x1b[?25l`);
-    ctx.io.write(`\r\x1b[K${label}\n`);
+    const label = formatFormTitle(options.title, ctx);
+    term.hideCursor();
+    term.writeLine(label);
 
     // Filter input
     const filterDisplay = query || (options.placeholder ? styledFn(t.theme.semantic.muted, options.placeholder) : '');
@@ -184,7 +170,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
       const isCurrent = i === cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${ctx.style.bold(opt.label)}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}\n`);
       } else {
         ctx.io.write(`\x1b[K  ${prefix} ${opt.label}\n`);
       }
@@ -197,23 +183,25 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
 
   function clearRender(): void {
     const total = renderLineCount();
-    ctx.io.write(`\x1b[${total}A`);
+    term.moveUp(total);
+  }
+
+  function clearAndRerender(prevLineCount: number): void {
+    term.moveUp(prevLineCount);
+    term.clearBlock(prevLineCount);
+    render();
   }
 
   function cleanup(): void {
     const total = renderLineCount();
-    // Move up and clear all rendered lines
     clearRender();
-    for (let i = 0; i < total; i++) ctx.io.write(`\x1b[K\n`);
-    ctx.io.write(`\x1b[${total}A`);
+    term.clearBlock(total);
 
     const selected = filtered[cursor];
     const selectedLabel = selected ? selected.label : '(none)';
-    const label = noColor
-      ? `? ${options.title} ${selectedLabel}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
     ctx.io.write(`\x1b[K${label}\n`);
-    ctx.io.write(`\x1b[?25h`);
+    term.showCursor();
   }
 
   render();
@@ -274,11 +262,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
           const prevLineCount = renderLineCount();
           query = query.slice(0, -1);
           applyFilter();
-          // Clear the old render (use the larger count to avoid leftover lines)
-          ctx.io.write(`\x1b[${prevLineCount}A`);
-          for (let i = 0; i < prevLineCount; i++) ctx.io.write(`\x1b[K\n`);
-          ctx.io.write(`\x1b[${prevLineCount}A`);
-          render();
+          clearAndRerender(prevLineCount);
         }
         return;
       }
@@ -288,11 +272,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
         const prevLineCount = renderLineCount();
         query += key;
         applyFilter();
-        // Clear the old render
-        ctx.io.write(`\x1b[${prevLineCount}A`);
-        for (let i = 0; i < prevLineCount; i++) ctx.io.write(`\x1b[K\n`);
-        ctx.io.write(`\x1b[${prevLineCount}A`);
-        render();
+        clearAndRerender(prevLineCount);
       }
     });
   });

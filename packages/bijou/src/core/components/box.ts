@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { makeBgFill } from '../bg-fill.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
 
@@ -8,6 +9,8 @@ import { clipToWidth } from '../text/clip.js';
 export interface BoxOptions {
   /** Theme token applied to border characters. */
   borderToken?: TokenValue;
+  /** Background fill token. Interior spaces are styled with this token's bg color. */
+  bgToken?: TokenValue;
   /** Inner padding between the border and content (in characters/lines). */
   padding?: { top?: number; bottom?: number; left?: number; right?: number };
   /** Lock outer width (including borders). Content is clipped/padded to fit. */
@@ -30,6 +33,7 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * @param borderColor - Function that wraps border characters with color styling.
  * @param padding - Resolved padding values (top, bottom, left, right).
  * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
+ * @param bgFill - Optional function to wrap interior content with background color styling.
  * @returns The rendered box as a multiline string.
  */
 function drawBox(
@@ -37,6 +41,7 @@ function drawBox(
   borderColor: (s: string) => string,
   padding: { top: number; bottom: number; left: number; right: number },
   fixedWidth?: number,
+  bgFill?: (s: string) => string,
 ): string {
   const contentLines = content.split('\n');
 
@@ -70,14 +75,15 @@ function drawBox(
     return leftPad + processed + rightPad;
   };
 
+  const fill = bgFill ?? ((s: string) => s);
   const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth) + BORDER.tr);
   const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth) + BORDER.br);
-  const emptyLine = borderColor(BORDER.v) + ' '.repeat(innerWidth) + borderColor(BORDER.v);
+  const emptyLine = borderColor(BORDER.v) + fill(' '.repeat(innerWidth)) + borderColor(BORDER.v);
 
   const lines: string[] = [top];
   for (let i = 0; i < padding.top; i++) lines.push(emptyLine);
   for (const line of contentLines) {
-    lines.push(borderColor(BORDER.v) + pad(line) + borderColor(BORDER.v));
+    lines.push(borderColor(BORDER.v) + fill(pad(line)) + borderColor(BORDER.v));
   }
   for (let i = 0; i < padding.bottom; i++) lines.push(emptyLine);
   lines.push(bottom);
@@ -114,7 +120,9 @@ export function box(content: string, options: BoxOptions = {}): string {
 
   const colorize = (s: string): string => ctx.style.styled(borderToken, s);
 
-  return drawBox(content, colorize, padding, options.width);
+  const bgFill = makeBgFill(options.bgToken, ctx);
+
+  return drawBox(content, colorize, padding, options.width, bgFill);
 }
 
 /** Configuration for {@link headerBox}, extending {@link BoxOptions} with label support. */

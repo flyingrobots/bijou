@@ -1,8 +1,7 @@
 import type { SelectFieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
-import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
 
 /**
  * Options for the multi-select field.
@@ -25,14 +24,15 @@ export interface MultiselectOptions<T = string> extends SelectFieldOptions<T> {
  * @returns Array of selected option values.
  */
 export async function multiselect<T = string>(options: MultiselectOptions<T>): Promise<T[]> {
-  const ctx = options.ctx ?? getDefaultContext();
-  const mode = ctx.mode;
+  if (options.options.length === 0) return [];
 
-  if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
-    return interactiveMultiselect(options, ctx);
-  }
+  const ctx = resolveCtx(options.ctx);
 
-  return numberedMultiselect(options, mode, ctx);
+  return formDispatch(
+    ctx,
+    (c) => interactiveMultiselect(options, c),
+    (c) => numberedMultiselect(options, c),
+  );
 }
 
 /**
@@ -41,27 +41,14 @@ export async function multiselect<T = string>(options: MultiselectOptions<T>): P
  * Used as the fallback for non-interactive or accessible modes.
  *
  * @param options - Multiselect field configuration.
- * @param mode - Current output mode.
  * @param ctx - Bijou context.
  * @returns Array of selected option values.
  */
-async function numberedMultiselect<T>(options: MultiselectOptions<T>, mode: OutputMode, ctx: BijouContext): Promise<T[]> {
-  const noColor = ctx.theme.noColor;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+async function numberedMultiselect<T>(options: MultiselectOptions<T>, ctx: BijouContext): Promise<T[]> {
+  ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
+  renderNumberedOptions(options.options, ctx);
 
-  if (noColor || mode === 'accessible') {
-    ctx.io.write(`${options.title}\n`);
-  } else {
-    ctx.io.write(styledFn(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(options.title) + '\n');
-  }
-
-  for (let i = 0; i < options.options.length; i++) {
-    const opt = options.options[i]!;
-    const desc = opt.description ? ` \u2014 ${opt.description}` : '';
-    ctx.io.write(`  ${i + 1}. ${opt.label}${desc}\n`);
-  }
-
-  const prompt = mode === 'accessible'
+  const prompt = ctx.mode === 'accessible'
     ? 'Enter numbers separated by commas: '
     : 'Enter numbers (comma-separated): ';
 
@@ -85,17 +72,18 @@ async function numberedMultiselect<T>(options: MultiselectOptions<T>, mode: Outp
 async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: BijouContext): Promise<T[]> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
+  const term = terminalRenderer(ctx);
 
   let cursor = 0;
   const selected = new Set<number>();
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title);
-    ctx.io.write(`\x1b[?25l`);
-    ctx.io.write(`\r\x1b[K${label}  ${styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)')}\n`);
+    const label = formatFormTitle(options.title, ctx);
+    term.hideCursor();
+    const hint = styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)');
+    term.writeLine(`${label}  ${hint}`);
 
     for (let i = 0; i < options.options.length; i++) {
       const opt = options.options[i]!;
@@ -103,9 +91,11 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
       const isSelected = selected.has(i);
       const prefix = isCurrent ? '\u276f' : ' ';
       const check = isSelected ? '\u25c9' : '\u25cb';
-      const desc = opt.description ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`) : '';
+      const desc = opt.description
+        ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`)
+        : '';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${styledFn(t.theme.semantic.info, check)} ${ctx.style.bold(opt.label)}${desc}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${styledFn(t.theme.semantic.info, check)} ${boldFn(opt.label)}${desc}\n`);
       } else if (isSelected && !noColor) {
         ctx.io.write(`\x1b[K  ${prefix} ${styledFn(t.theme.semantic.success, check)} ${opt.label}${desc}\n`);
       } else {
@@ -116,20 +106,17 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
 
   function clearRender(): void {
     const totalLines = options.options.length + 1;
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.moveUp(totalLines);
   }
 
   function cleanup(): void {
     clearRender();
     const totalLines = options.options.length + 1;
-    for (let i = 0; i < totalLines; i++) ctx.io.write(`\x1b[K\n`);
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.clearBlock(totalLines);
     const selectedLabels = [...selected].sort().map((i) => options.options[i]!.label).join(', ');
-    const label = noColor
-      ? `? ${options.title} ${selectedLabels}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title) + ' ' + styledFn(t.theme.semantic.info, selectedLabels);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabels);
     ctx.io.write(`\x1b[K${label}\n`);
-    ctx.io.write(`\x1b[?25h`);
+    term.showCursor();
   }
 
   render();

@@ -6,12 +6,60 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Adaptive color scheme detection** — `detectColorScheme(runtime?)` reads `COLORFGBG` env var to determine light vs dark terminal background. Wired into `ResolvedTheme.colorScheme` and `createTestContext({ colorScheme })`. Exported from main barrel.
+
+### 🐛 Fixed
+
+- **docs:** fix MD038 code span spacing in CHANGELOG (`` `? ` `` → `"? "`)
+- **docs:** correct `docs/CHANGELOG.md` → `CHANGELOG.md` sibling path in COMPLETED.md
+- **forms:** guard `styledFn()` calls in multiselect interactive renderer when `noColor` is true — hint text and option descriptions no longer leak ANSI in noColor mode
+- **forms:** fix noColor ANSI leaks in filter (5 unguarded calls) and textarea (4 unguarded calls) via `createStyledFn`/`createBoldFn` helpers
+- **forms:** `formatFormTitle` now includes "? " prefix in noColor/accessible modes for visual parity; remove redundant manual ternaries from all 4 interactive form files
+- **forms:** `createStyledFn`/`createBoldFn` now suppress styling in accessible mode (consistent with `formatFormTitle`)
+- **forms:** fix misleading accessible fallback prompt in textarea (said "multi-line" but reads single line)
+- **forms:** `confirm()` noColor prompt now uses `formatFormTitle` to include "? " prefix (visual parity with color mode)
+- **forms:** `moveUp(0)` / `clearBlock(0)` in `terminalRenderer` now early-return instead of emitting empty ANSI sequences
+- **detect:** remove unreachable `undefined` guard on `parts[parts.length - 1]` in `detectColorScheme` (replaced with `!` assertion — `split()` always returns >= 1 element)
+- **lint:** ANSI lint test now uses case-insensitive regex for all escape form variants (`\x1B`, `\u001B`, `\u{1B}`)
+- **forms:** `formDispatch()` now checks `stdoutIsTTY` in addition to `stdinIsTTY` before routing to interactive handler
+
 ### ♻️ Refactors
 
+- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).
+- **Extract `createStyledFn()`/`createBoldFn()`** — noColor-safe styling helpers in `form-utils.ts` that return identity functions when `noColor` is true. Refactored select, multiselect, filter, and textarea to use them.
+- **Replace exact ANSI assertions** — 12 raw ANSI string checks replaced with semantic helpers (`expectNoAnsi`, `expectHiddenCursor`, `expectShownCursor`) across form-utils and environment tests.
+
+### 🧪 Tests
+
+- **Output assertion helpers** — 6 new test-only helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Re-exported from `adapters/test` barrel.
+- **noColor integration test suite** — 7 tests exercising all form components with `noColor: true` in interactive mode.
+- **ANSI lint test** — scans source files for raw ANSI escapes (hex, unicode, and literal ESC byte forms); fails if found in non-allowed files (13 allowed files for terminal control, key matching, and ANSI parsing).
+
+## [1.0.0] — 2026-03-02
+
+### 💥 BREAKING CHANGES
+
+- **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
+- **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — `FlexOptions.bg` and `FlexChild.bg` (formerly `{ bg?: string }`) are now `bgToken?: TokenValue`. A `ctx` property is also required on `FlexOptions` for `bgToken` to take effect.
+
+### ✨ Features
+
+- **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
+- **`TooltipOptions.bgToken`** — new optional property for API consistency with modal/toast/drawer.
+
+### ♻️ Refactors
+
+- **ports:** segregate IOPort into WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
+- **forms:** extract shared form utilities (formatFormTitle, writeValidationError, renderNumberedOptions, terminalRenderer, formDispatch) to eliminate cross-form duplication
+- **forms:** standardize all form components on shared resolveCtx() helper
 - **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.
 
-### 🐛 Bug Fixes
+### 🐛 Fixed
 
+- **`flex()` bg routed through StylePort** — background colors in flex layouts now route through `ctx.style.bgHex()` instead of emitting raw ANSI escape sequences, respecting `noColor`, pipe mode, and accessible mode.
+- **`toDTCG()` surface write unconditional** — remove defensive `if (theme.surface)` guard that could silently drop surface tokens during DTCG export.
 - **`tree()` `labelToken` wired up** — the `labelToken` option declared in `TreeOptions` is now passed through to `renderRich` and applied to node labels via `ctx.style.styled()`. Previously the option was accepted but silently ignored.
 - **`clip.ts` ANSI regex** — convert `ANSI_RE` from regex literal to `RegExp` constructor to avoid Biome `noControlCharactersInRegex` lint violation
 - **`select()` empty options guard** — throw `Error` when `options.options` is empty instead of allowing undefined dereference
@@ -453,7 +501,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0
 [0.10.1]: https://github.com/flyingrobots/bijou/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/flyingrobots/bijou/compare/v0.8.0...v0.9.0

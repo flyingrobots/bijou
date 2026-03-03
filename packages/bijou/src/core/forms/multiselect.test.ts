@@ -9,6 +9,11 @@ const OPTIONS = [
 ];
 
 describe('multiselect()', () => {
+  it('returns empty array when options list is empty', async () => {
+    const result = await multiselect({ title: 'Empty', options: [] });
+    expect(result).toEqual([]);
+  });
+
   describe('numbered fallback (non-interactive)', () => {
     it('renders numbered list', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1,2'] } });

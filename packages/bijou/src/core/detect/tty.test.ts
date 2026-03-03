@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { detectOutputMode } from './tty.js';
+import { detectOutputMode, detectColorScheme } from './tty.js';
+import { mockRuntime } from '../../adapters/test/runtime.js';
 
 describe('detectOutputMode', () => {
   const originalEnv = { ...process.env };
@@ -61,5 +62,66 @@ describe('detectOutputMode', () => {
     process.env['CI'] = 'true';
     Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
     expect(detectOutputMode()).toBe('pipe');
+  });
+});
+
+describe('detectColorScheme', () => {
+  const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    delete process.env['COLORFGBG'];
+  });
+
+  afterEach(() => {
+    process.env = { ...originalEnv };
+  });
+
+  it('returns dark when COLORFGBG is not set', () => {
+    expect(detectColorScheme()).toBe('dark');
+  });
+
+  it('returns dark when bg is 0 (COLORFGBG=15;0)', () => {
+    process.env['COLORFGBG'] = '15;0';
+    expect(detectColorScheme()).toBe('dark');
+  });
+
+  it('returns light when bg is 15 (COLORFGBG=0;15)', () => {
+    process.env['COLORFGBG'] = '0;15';
+    expect(detectColorScheme()).toBe('light');
+  });
+
+  it('uses last segment for 3-part format (COLORFGBG=default;0;15)', () => {
+    process.env['COLORFGBG'] = 'default;0;15';
+    expect(detectColorScheme()).toBe('light');
+  });
+
+  it('returns dark for garbage value', () => {
+    process.env['COLORFGBG'] = 'garbage';
+    expect(detectColorScheme()).toBe('dark');
+  });
+
+  it('returns dark for empty string', () => {
+    process.env['COLORFGBG'] = '';
+    expect(detectColorScheme()).toBe('dark');
+  });
+
+  it('returns dark for bg=6 (boundary)', () => {
+    process.env['COLORFGBG'] = '15;6';
+    expect(detectColorScheme()).toBe('dark');
+  });
+
+  it('returns light for bg=7 (boundary)', () => {
+    process.env['COLORFGBG'] = '15;7';
+    expect(detectColorScheme()).toBe('light');
+  });
+
+  it('reads COLORFGBG via RuntimePort', () => {
+    const rt = mockRuntime({ env: { COLORFGBG: '0;15' } });
+    expect(detectColorScheme(rt)).toBe('light');
+  });
+
+  it('returns dark via RuntimePort when COLORFGBG is absent', () => {
+    const rt = mockRuntime({});
+    expect(detectColorScheme(rt)).toBe('dark');
   });
 });

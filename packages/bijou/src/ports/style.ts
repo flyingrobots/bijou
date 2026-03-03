@@ -13,6 +13,10 @@ export interface StylePort {
   rgb(r: number, g: number, b: number, text: string): string;
   /** Apply a hex foreground color (e.g. `"#ff00aa"`) to text. */
   hex(color: string, text: string): string;
+  /** Apply a 24-bit RGB background color to text. */
+  bgRgb(r: number, g: number, b: number, text: string): string;
+  /** Apply a hex background color (e.g. `"#ff00aa"`) to text. */
+  bgHex(color: string, text: string): string;
   /** Apply bold weight to text. */
   bold(text: string): string;
 }

@@ -29,6 +29,17 @@ describe('DTCG interop', () => {
       });
     });
 
+    it('encodes surface tokens', () => {
+      const doc = toDTCG(CYAN_MAGENTA);
+      const surface = doc['surface'] as Record<string, { $type: string; $value: unknown }>;
+      expect(surface).toBeDefined();
+      for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted']) {
+        expect(surface[key], `surface.${key}`).toBeDefined();
+        expect(surface[key]!.$type).toBe('color');
+        expect(surface[key]!.$value).toBeDefined();
+      }
+    });
+
     it('encodes gradient stops', () => {
       const doc = toDTCG(CYAN_MAGENTA);
       const gradient = doc['gradient'] as Record<string, { $type: string; $value: unknown }>;
@@ -81,6 +92,13 @@ describe('DTCG interop', () => {
           tableHeader: { $type: 'color', $value: '#ffffff' },
           trackEmpty: { $type: 'color', $value: '#505050' },
         },
+        surface: {
+          primary: { $type: 'color', $value: { hex: '#ffffff', bg: '#1a1a2e' } },
+          secondary: { $type: 'color', $value: '#e0e0e0' },
+          elevated: { $type: 'color', $value: '#ffffff' },
+          overlay: { $type: 'color', $value: '#ffffff' },
+          muted: { $type: 'color', $value: '#808080' },
+        },
       };
 
       const theme = fromDTCG(doc);
@@ -89,6 +107,8 @@ describe('DTCG interop', () => {
       expect(theme.ui.cursor.hex).toBe('#00ffff');
       expect(theme.gradient.brand).toHaveLength(2);
       expect(theme.gradient.brand[0]!.color).toEqual([0, 255, 255]);
+      expect(theme.surface.primary.hex).toBe('#ffffff');
+      expect(theme.surface.primary.bg).toBe('#1a1a2e');
     });
 
     it('resolves DTCG references', () => {
@@ -184,6 +204,8 @@ describe('DTCG interop', () => {
         expect(rt.ui.cursor.hex).toBe(preset.ui.cursor.hex);
         expect(rt.gradient.brand).toHaveLength(preset.gradient.brand.length);
         expect(rt.gradient.progress).toHaveLength(preset.gradient.progress.length);
+        expect(rt.surface.primary.hex).toBe(preset.surface.primary.hex);
+        expect(rt.surface.primary.bg).toBe(preset.surface.primary.bg);
       }
     });
   });
@@ -201,6 +223,7 @@ describe('DTCG interop', () => {
         gradient: { brand: { $type: 'gradient', $value: [] }, progress: { $type: 'gradient', $value: [] } },
         border: filler(['primary', 'secondary', 'success', 'warning', 'error', 'muted']),
         ui: filler(['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty']),
+        surface: filler(['primary', 'secondary', 'elevated', 'overlay', 'muted']),
         ...overrides,
       };
     }
@@ -304,7 +327,7 @@ describe('DTCG interop', () => {
       expect(typeof name.$value).toBe('string');
 
       // all group keys
-      for (const groupKey of ['status', 'semantic', 'border', 'ui']) {
+      for (const groupKey of ['status', 'semantic', 'border', 'ui', 'surface']) {
         const group = doc[groupKey] as Record<string, { $type?: string; $value?: unknown }>;
         expect(typeof group).toBe('object');
         for (const [, token] of Object.entries(group)) {
@@ -375,6 +398,13 @@ describe('DTCG interop', () => {
             { pos: 1, color: [255, 255, 255] },
           ],
         },
+        surface: {
+          primary:   { hex: '#ffffff', bg: '#1a1a2e' },
+          secondary: { hex: '#e0e0e0', bg: '#16213e' },
+          elevated:  { hex: '#ffffff', bg: '#0f3460' },
+          overlay:   { hex: '#ffffff', bg: '#1a1a2e' },
+          muted:     { hex: '#808080', bg: '#0a0a14' },
+        },
       };
 
       const rt = fromDTCG(toDTCG(custom));
@@ -392,6 +422,80 @@ describe('DTCG interop', () => {
       expect(rt.gradient.progress).toHaveLength(3);
       expect(rt.gradient.brand[1]!.pos).toBe(0.33);
       expect(rt.gradient.brand[1]!.color).toEqual([0, 255, 0]);
+      expect(rt.surface.primary.hex).toBe('#ffffff');
+      expect(rt.surface.primary.bg).toBe('#1a1a2e');
+      expect(rt.surface.muted.bg).toBe('#0a0a14');
+    });
+  });
+
+  describe('bg field round-trip', () => {
+    it('bg field round-trips through DTCG', () => {
+      const theme: import('./tokens.js').Theme = {
+        name: 'bg-test',
+        status: {
+          success: { hex: '#00ff00' },
+          error: { hex: '#ff0000' },
+          warning: { hex: '#ffff00' },
+          info: { hex: '#00ffff' },
+          pending: { hex: '#808080' },
+          active: { hex: '#00ffff' },
+          muted: { hex: '#808080' },
+        },
+        semantic: {
+          success: { hex: '#00ff00' },
+          error: { hex: '#ff0000' },
+          warning: { hex: '#ffff00' },
+          info: { hex: '#00ffff' },
+          accent: { hex: '#ff00ff' },
+          muted: { hex: '#808080' },
+          primary: { hex: '#ffffff' },
+        },
+        border: {
+          primary: { hex: '#00ffff' },
+          secondary: { hex: '#ff00ff' },
+          success: { hex: '#00ff00' },
+          warning: { hex: '#ffff00' },
+          error: { hex: '#ff0000' },
+          muted: { hex: '#808080' },
+        },
+        ui: {
+          cursor: { hex: '#00ffff' },
+          scrollThumb: { hex: '#00ffff' },
+          scrollTrack: { hex: '#808080' },
+          sectionHeader: { hex: '#0000ff' },
+          logo: { hex: '#00ffff' },
+          tableHeader: { hex: '#ffffff' },
+          trackEmpty: { hex: '#505050' },
+        },
+        gradient: {
+          brand: [{ pos: 0, color: [0, 255, 255] }, { pos: 1, color: [255, 0, 255] }],
+          progress: [{ pos: 0, color: [0, 255, 255] }, { pos: 1, color: [255, 0, 255] }],
+        },
+        surface: {
+          primary:   { hex: '#d1d5db', bg: '#1f2937' },
+          secondary: { hex: '#d1d5db', bg: '#111827' },
+          elevated:  { hex: '#d1d5db', bg: '#374151' },
+          overlay:   { hex: '#d1d5db', bg: '#1f2937' },
+          muted:     { hex: '#6b7280', bg: '#0f1117' },
+        },
+      };
+
+      const rt = fromDTCG(toDTCG(theme));
+      expect(rt.surface.primary.bg).toBe('#1f2937');
+      expect(rt.surface.secondary.bg).toBe('#111827');
+      expect(rt.surface.elevated.bg).toBe('#374151');
+      expect(rt.surface.overlay.bg).toBe('#1f2937');
+      expect(rt.surface.muted.bg).toBe('#0f1117');
+    });
+
+    it('surface tokens survive round-trip with bg field', () => {
+      for (const [, preset] of Object.entries(PRESETS)) {
+        const rt = fromDTCG(toDTCG(preset));
+        for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const) {
+          expect(rt.surface[key].hex).toBe(preset.surface[key].hex);
+          expect(rt.surface[key].bg).toBe(preset.surface[key].bg);
+        }
+      }
     });
   });
 });

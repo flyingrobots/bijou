@@ -46,6 +46,54 @@ describe('headerBox', () => {
   });
 });
 
+describe('box() with bgToken', () => {
+  const bgToken = { hex: '#ffffff', bg: '#1e1e2e' };
+
+  it('applies bg fill in interactive mode', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = box('Hello', { bgToken, ctx });
+    // plainStyle is identity, so content is unchanged, but no error thrown
+    expect(result).toContain('Hello');
+    expect(result).toContain('─');
+  });
+
+  it('applies bg fill in static mode', () => {
+    const ctx = createTestContext({ mode: 'static' });
+    const result = box('Hello', { bgToken, ctx });
+    expect(result).toContain('Hello');
+    expect(result).toContain('─');
+  });
+
+  it('skips bg fill in pipe mode', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const result = box('Hello', { bgToken, ctx });
+    // pipe mode returns raw content without borders
+    expect(result).toBe('Hello');
+  });
+
+  it('skips bg fill in accessible mode', () => {
+    const ctx = createTestContext({ mode: 'accessible' });
+    const result = box('Hello', { bgToken, ctx });
+    expect(result).toBe('Hello');
+  });
+
+  it('skips bg fill when noColor is true', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = box('Hello', { bgToken, ctx });
+    // Still renders box, but no bg fill applied
+    expect(result).toContain('Hello');
+    expect(result).toContain('─');
+  });
+
+  it('is a no-op when bgToken has no bg field', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const token = { hex: '#ffffff' };
+    const result = box('Hello', { bgToken: token, ctx });
+    expect(result).toContain('Hello');
+    expect(result).toContain('─');
+  });
+});
+
 describe('box() with width override', () => {
   it('outer width matches specified width exactly', () => {
     const ctx = createTestContext({ mode: 'interactive' });

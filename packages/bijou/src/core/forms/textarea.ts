@@ -1,8 +1,7 @@
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
-import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle, writeValidationError, terminalRenderer, formDispatch, createStyledFn } from './form-utils.js';
 
 /**
  * Options for the multi-line textarea field.
@@ -33,14 +32,13 @@ export interface TextareaOptions extends FieldOptions<string> {
  * @returns The entered text (newline-joined), or the default/empty string on cancel.
  */
 export async function textarea(options: TextareaOptions): Promise<string> {
-  const ctx = options.ctx ?? getDefaultContext();
-  const mode = ctx.mode;
+  const ctx = resolveCtx(options.ctx);
 
-  if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
-    return interactiveTextarea(options, ctx);
-  }
-
-  return fallbackTextarea(options, mode, ctx);
+  return formDispatch(
+    ctx,
+    (c) => interactiveTextarea(options, c),
+    (c) => fallbackTextarea(options, c),
+  );
 }
 
 /**
@@ -50,43 +48,26 @@ export async function textarea(options: TextareaOptions): Promise<string> {
  * Runs required-field and custom validation checks after input.
  *
  * @param options - Textarea field configuration.
- * @param mode - Current output mode.
  * @param ctx - Bijou context.
  * @returns The trimmed input or default value.
  */
-async function fallbackTextarea(options: TextareaOptions, mode: OutputMode, ctx: BijouContext): Promise<string> {
-  const noColor = ctx.theme.noColor;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+async function fallbackTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
+  ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
 
-  if (noColor || mode === 'accessible') {
-    ctx.io.write(`${options.title}\n`);
-  } else {
-    ctx.io.write(styledFn(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(options.title) + '\n');
-  }
-
-  const prompt = mode === 'accessible'
-    ? 'Enter text (multi-line, empty line to finish): '
+  const prompt = ctx.mode === 'accessible'
+    ? 'Enter text: '
     : '> ';
   const answer = await ctx.io.question(prompt);
   const value = answer.trim() || options.defaultValue || '';
 
   if (options.required && value === '') {
-    const msg = 'This field is required.';
-    if (noColor || mode === 'accessible') {
-      ctx.io.write(msg + '\n');
-    } else {
-      ctx.io.write(styledFn(ctx.theme.theme.semantic.error, msg) + '\n');
-    }
+    writeValidationError('This field is required.', ctx);
   }
 
   if (options.validate) {
     const result = options.validate(value);
     if (!result.valid && result.message) {
-      if (noColor) {
-        ctx.io.write(result.message + '\n');
-      } else {
-        ctx.io.write(styledFn(ctx.theme.theme.semantic.error, result.message) + '\n');
-      }
+      writeValidationError(result.message, ctx);
     }
   }
 
@@ -105,12 +86,12 @@ async function fallbackTextarea(options: TextareaOptions, mode: OutputMode, ctx:
  * @returns The entered text (newline-joined), or the default value on cancel.
  */
 async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
-  const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
   const height = options.height ?? 6;
   const renderWidth = options.width ?? 80;
   const showLineNumbers = options.showLineNumbers ?? false;
+  const term = terminalRenderer(ctx);
 
   let lines: string[] = [''];
   let cursorRow = 0;
@@ -127,12 +108,10 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
   }
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title);
-    const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C to cancel)');
-    ctx.io.write(`\x1b[?25l`);
-    ctx.io.write(`\r\x1b[K${label}${hint}\n`);
+    const label = formatFormTitle(options.title, ctx);
+    const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
+    term.hideCursor();
+    term.writeLine(`${label}${hint}`);
 
     const vis = visibleLines();
     const prefixWidth = showLineNumbers ? 6 : 2; // "  1 │ " or "  "
@@ -164,24 +143,21 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
 
   function clearRender(): void {
     const totalLines = height + 2; // header + visible lines + status
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.moveUp(totalLines);
   }
 
   function cleanup(submitted: boolean): void {
     clearRender();
     const totalLines = height + 2;
-    for (let i = 0; i < totalLines; i++) ctx.io.write(`\x1b[K\n`);
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.clearBlock(totalLines);
 
     const value = submitted ? lines.join('\n') : '';
     const summary = value
       ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
       : '(cancelled)';
-    const label = noColor
-      ? `? ${options.title} ${summary}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title) + ' ' + styledFn(t.theme.semantic.info, summary);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, summary);
     ctx.io.write(`\x1b[K${label}\n`);
-    ctx.io.write(`\x1b[?25h`);
+    term.showCursor();
   }
 
   render();

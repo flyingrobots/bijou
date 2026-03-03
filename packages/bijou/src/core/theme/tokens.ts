@@ -21,8 +21,10 @@ export type TextModifier = 'bold' | 'dim' | 'strikethrough' | 'inverse';
 
 /** A theme token value: a hex color with optional text modifiers. */
 export interface TokenValue {
-  /** Color as a `#rrggbb` hex string. */
+  /** Foreground color as a `#rrggbb` hex string. */
   hex: string;
+  /** Optional background color as a `#rrggbb` hex string. */
+  bg?: string;
   /** Optional text style modifiers to apply alongside the color. */
   modifiers?: TextModifier[];
 }
@@ -94,4 +96,18 @@ export interface Theme<
 
   /** UI element tokens (cursors, scroll bars, headers, etc.). */
   ui: Record<U, TokenValue>;
+
+  /** Background surface tokens for panels, regions, and overlays. */
+  surface: {
+    /** Default content background. */
+    primary: TokenValue;
+    /** Secondary/sidebar background. */
+    secondary: TokenValue;
+    /** Elevated surface (cards, dropdowns). */
+    elevated: TokenValue;
+    /** Overlay/scrim background (modals, drawers). */
+    overlay: TokenValue;
+    /** Muted/disabled region background. */
+    muted: TokenValue;
+  };
 }

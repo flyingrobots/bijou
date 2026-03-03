@@ -5,5 +5,5 @@
  * @module
  */
 
-export { detectOutputMode } from './tty.js';
-export type { OutputMode } from './tty.js';
+export { detectOutputMode, detectColorScheme } from './tty.js';
+export type { OutputMode, ColorScheme } from './tty.js';

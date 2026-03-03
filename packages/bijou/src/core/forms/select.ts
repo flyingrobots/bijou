@@ -1,8 +1,7 @@
 import type { SelectFieldOptions, SelectOption } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
-import type { OutputMode } from '../detect/tty.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
 
 /**
  * Options for the single-select field.
@@ -26,18 +25,17 @@ export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
  * @throws {Error} If `options.options` is empty.
  */
 export async function select<T = string>(options: SelectOptions<T>): Promise<T> {
-  const ctx = options.ctx ?? getDefaultContext();
-  const mode = ctx.mode;
+  const ctx = resolveCtx(options.ctx);
 
   if (options.options.length === 0) {
     throw new Error('select() requires at least one option');
   }
 
-  if (mode === 'interactive' && ctx.runtime.stdinIsTTY) {
-    return interactiveSelect(options, ctx);
-  }
-
-  return numberedSelect(options, mode, ctx);
+  return formDispatch(
+    ctx,
+    (c) => interactiveSelect(options, c),
+    (c) => numberedSelect(options, c),
+  );
 }
 
 /**
@@ -46,28 +44,14 @@ export async function select<T = string>(options: SelectOptions<T>): Promise<T> 
  * Used as the fallback for non-interactive or accessible modes.
  *
  * @param options - Select field configuration.
- * @param mode - Current output mode.
  * @param ctx - Bijou context.
  * @returns The value of the selected option.
  */
-async function numberedSelect<T>(options: SelectOptions<T>, mode: OutputMode, ctx: BijouContext): Promise<T> {
-  const noColor = ctx.theme.noColor;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+async function numberedSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
+  ctx.io.write(formatFormTitle(options.title, ctx) + '\n');
+  renderNumberedOptions(options.options, ctx);
 
-  if (noColor || mode === 'accessible') {
-    ctx.io.write(`${options.title}\n`);
-  } else {
-    ctx.io.write(styledFn(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(options.title) + '\n');
-  }
-
-  for (let i = 0; i < options.options.length; i++) {
-    const opt = options.options[i]!;
-    const num = `  ${i + 1}.`;
-    const desc = opt.description ? ` \u2014 ${opt.description}` : '';
-    ctx.io.write(`${num} ${opt.label}${desc}\n`);
-  }
-
-  const prompt = mode === 'accessible' ? 'Enter number: ' : '> ';
+  const prompt = ctx.mode === 'accessible' ? 'Enter number: ' : '> ';
   const answer = await ctx.io.question(prompt);
 
   const idx = parseInt(answer.trim(), 10) - 1;
@@ -90,16 +74,16 @@ async function numberedSelect<T>(options: SelectOptions<T>, mode: OutputMode, ct
 async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
-  const styledFn = (token: TokenValue, text: string) => ctx.style.styled(token, text);
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
+  const term = terminalRenderer(ctx);
 
   let cursor = 0;
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title);
-    ctx.io.write(`\x1b[?25l`);
-    ctx.io.write(`\r\x1b[K${label}\n`);
+    const label = formatFormTitle(options.title, ctx);
+    term.hideCursor();
+    term.writeLine(label);
 
     for (let i = 0; i < options.options.length; i++) {
       const opt = options.options[i]!;
@@ -107,7 +91,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
       const prefix = isCurrent ? '\u276f' : ' ';
       const desc = opt.description ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`) : '';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${ctx.style.bold(opt.label)}${desc}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}${desc}\n`);
       } else {
         ctx.io.write(`\x1b[K  ${prefix} ${opt.label}${desc}\n`);
       }
@@ -116,20 +100,17 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
 
   function clearRender(): void {
     const totalLines = options.options.length + 1;
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.moveUp(totalLines);
   }
 
   function cleanup(): void {
     clearRender();
     const totalLines = options.options.length + 1;
-    for (let i = 0; i < totalLines; i++) ctx.io.write(`\x1b[K\n`);
-    ctx.io.write(`\x1b[${totalLines}A`);
+    term.clearBlock(totalLines);
     const selected = options.options[cursor] as SelectOption<T>;
-    const label = noColor
-      ? `? ${options.title} ${selected.label}`
-      : styledFn(t.theme.semantic.info, '? ') + ctx.style.bold(options.title) + ' ' + styledFn(t.theme.semantic.info, selected.label);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selected.label);
     ctx.io.write(`\x1b[K${label}\n`);
-    ctx.io.write(`\x1b[?25h`);
+    term.showCursor();
   }
 
   render();

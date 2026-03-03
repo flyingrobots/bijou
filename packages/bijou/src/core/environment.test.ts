@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '../adapters/test/index.js';
+import { createTestContext, expectNoAnsi } from '../adapters/test/index.js';
 import { detectOutputMode } from './detect/tty.js';
 import { mockRuntime } from '../adapters/test/runtime.js';
 import { box, headerBox } from './components/box.js';
@@ -33,7 +33,7 @@ describe('environment integration', () => {
     it('box borders render without ANSI color codes', () => {
       const ctx = createTestContext({ noColor: true, mode: 'interactive' });
       const result = box('content', { ctx });
-      expect(result).not.toMatch(/\x1b\[/);
+      expectNoAnsi(result);
       expect(result).toContain('content');
       expect(result).toContain('┌'); // unicode border still present
     });
@@ -41,7 +41,7 @@ describe('environment integration', () => {
     it('progress bar renders without ANSI color codes', () => {
       const ctx = createTestContext({ noColor: true, mode: 'interactive' });
       const result = progressBar(50, { ctx });
-      expect(result).not.toMatch(/\x1b\[/);
+      expectNoAnsi(result);
       expect(result).toContain('50%');
     });
 
@@ -52,7 +52,7 @@ describe('environment integration', () => {
         rows: [['Alice']],
         ctx,
       });
-      expect(result).not.toMatch(/\x1b\[/);
+      expectNoAnsi(result);
       expect(result).toContain('Name');
       expect(result).toContain('Alice');
     });
@@ -60,7 +60,7 @@ describe('environment integration', () => {
     it('spinnerFrame renders without ANSI color codes', () => {
       const ctx = createTestContext({ noColor: true, mode: 'interactive' });
       const result = spinnerFrame(0, { ctx });
-      expect(result).not.toMatch(/\x1b\[/);
+      expectNoAnsi(result);
     });
   });
 
@@ -211,7 +211,7 @@ describe('environment integration', () => {
         runtime: { env: { TERM: 'dumb' } },
       });
       const result = box('test content', { ctx });
-      expect(result).not.toMatch(/\x1b\[/);
+      expectNoAnsi(result);
       expect(result).toContain('test content');
     });
   });
@@ -222,16 +222,14 @@ describe('form fallback in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['y'] } });
     const result = await confirm({ title: 'OK?', ctx });
     expect(result).toBe(true);
-    const output = ctx.io.written.join('');
-    expect(output).not.toMatch(/\x1b\[/);
+    expectNoAnsi(ctx.io.written.join(''));
   });
 
   it('input() works in pipe mode', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello'] } });
     const result = await input({ title: 'Name', ctx });
     expect(result).toBe('hello');
-    const output = ctx.io.written.join('');
-    expect(output).not.toMatch(/\x1b\[/);
+    expectNoAnsi(ctx.io.written.join(''));
   });
 
   it('multiselect() works in pipe mode', async () => {
@@ -320,19 +318,19 @@ describe('NO_COLOR × component matrix', () => {
   it('box() with NO_COLOR has no ANSI codes', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const result = box('test', { ctx });
-    expect(result).not.toMatch(/\x1b\[/);
+    expectNoAnsi(result);
   });
 
   it('headerBox() with NO_COLOR has no ANSI codes', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const result = headerBox('Title', { detail: 'Info', ctx });
-    expect(result).not.toMatch(/\x1b\[/);
+    expectNoAnsi(result);
   });
 
   it('progressBar() with NO_COLOR has no ANSI codes', () => {
     const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const result = progressBar(75, { ctx });
-    expect(result).not.toMatch(/\x1b\[/);
+    expectNoAnsi(result);
   });
 });
 

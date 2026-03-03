@@ -8,6 +8,10 @@
 // Port interfaces
 export type {
   RuntimePort,
+  WritePort,
+  QueryPort,
+  InteractivePort,
+  FilePort,
   IOPort,
   RawInputHandle,
   TimerHandle,
@@ -24,6 +28,9 @@ export {
 
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
+
+// Background fill utilities
+export { shouldApplyBg, makeBgFill } from './core/bg-fill.js';
 
 // Factory
 export { createBijou, type CreateBijouOptions } from './factory.js';
@@ -98,7 +105,12 @@ export {
 } from './core/text/index.js';
 
 // Detection
-export { detectOutputMode, type OutputMode } from './core/detect/index.js';
+export {
+  detectOutputMode,
+  detectColorScheme,
+  type OutputMode,
+  type ColorScheme,
+} from './core/detect/index.js';
 
 // Components
 export {

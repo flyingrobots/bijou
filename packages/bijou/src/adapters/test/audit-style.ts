@@ -6,7 +6,7 @@ import type { TokenValue, RGB } from '../../core/theme/tokens.js';
  */
 export interface StyledCall {
   /** Which styling method was called. */
-  method: 'styled' | 'rgb' | 'hex' | 'bold';
+  method: 'styled' | 'rgb' | 'hex' | 'bgRgb' | 'bgHex' | 'bold';
   /** The text that was styled. */
   text: string;
   /** The design-token value passed to `styled()`, if applicable. */
@@ -88,6 +88,30 @@ export function auditStyle(): AuditStylePort {
      */
     hex(color: string, text: string): string {
       _calls.push({ method: 'hex', text, color });
+      return text;
+    },
+
+    /**
+     * Record a `bgRgb()` call and return the text unchanged.
+     * @param r - Red channel (0-255).
+     * @param g - Green channel (0-255).
+     * @param b - Blue channel (0-255).
+     * @param text - The text to style.
+     * @returns The original text, unmodified.
+     */
+    bgRgb(r: number, g: number, b: number, text: string): string {
+      _calls.push({ method: 'bgRgb', text, color: [r, g, b] });
+      return text;
+    },
+
+    /**
+     * Record a `bgHex()` call and return the text unchanged.
+     * @param color - Hex color string (e.g. `"#ff00aa"`).
+     * @param text - The text to style.
+     * @returns The original text, unmodified.
+     */
+    bgHex(color: string, text: string): string {
+      _calls.push({ method: 'bgHex', text, color });
       return text;
     },
 

@@ -1,6 +1,7 @@
 import type { ConfirmFieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
+import { formatFormTitle } from './form-utils.js';
 
 /**
  * Options for the yes/no confirmation prompt.
@@ -21,7 +22,7 @@ export interface ConfirmOptions extends ConfirmFieldOptions {
  * @returns `true` for yes, `false` for no.
  */
 export async function confirm(options: ConfirmOptions): Promise<boolean> {
-  const ctx = options.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
   const noColor = ctx.theme.noColor;
   const defaultYes = options.defaultValue !== false;
@@ -33,10 +34,9 @@ export async function confirm(options: ConfirmOptions): Promise<boolean> {
   } else if (mode === 'pipe' || noColor) {
     prompt = mode === 'pipe'
       ? `${options.title} ${hint}? `
-      : `${options.title} [${hint}] `;
+      : `${formatFormTitle(options.title, ctx)} [${hint}] `;
   } else {
-    prompt = ctx.style.styled(ctx.theme.theme.semantic.info, '? ')
-      + ctx.style.bold(options.title)
+    prompt = formatFormTitle(options.title, ctx)
       + ctx.style.styled(ctx.theme.theme.semantic.muted, ` [${hint}]`) + ' ';
   }
 

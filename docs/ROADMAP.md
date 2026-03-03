@@ -2,11 +2,98 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v0.10.0** — Canvas shader, box width override, mouse input, clipToWidth in core
+Current: **v1.0.0** — Architecture audit remediation
 
 ---
 
-## Test coverage priorities
+## v1.0.0 — Architecture audit remediation
+
+Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
+
+### Phase 1: Port interface cleanup (ISP)
+
+**Problem (initial hypothesis):** `IOPort` is a fat interface — static components only call `write()` but depend on `question()`, `rawInput()`, `readFile()`, `readDir()`, `joinPath()`. `StylePort` was suspected to export unused `rgb()` and `hex()` methods (audit found they are used — see resolution below).
+
+| Task | Package | Notes |
+|------|---------|-------|
+| ~~**Segregate `IOPort`**~~ | bijou | Done — split into WritePort, QueryPort, InteractivePort, FilePort. IOPort = InteractivePort & FilePort & { onResize }. |
+| ~~**Remove dead `StylePort` methods**~~ | bijou | Audited — rgb() is used by gradient.ts and progress.ts, hex() by progress.ts. Confirmed not dead; no removal needed. |
+| ~~**Audit `onResize` usage**~~ | bijou | Audited — only called by bijou-tui eventbus.ts. Kept on IOPort (full union) but excluded from core sub-ports (WritePort, QueryPort, InteractivePort). |
+
+### Phase 2: Form abstractions (DRY + SRP)
+
+**Problem:** `select`, `multiselect`, `filter`, and `textarea` duplicate the same interactive/non-interactive branching, render/clearRender/cleanup terminal control, numbered list rendering, title formatting, and validation error display.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| ~~**Extract `formDispatch()` helper**~~ | bijou | Done — shared mode + TTY routing in `form-utils.ts`. |
+| ~~**Extract `terminalRenderer()` utility**~~ | bijou | Done — ANSI cursor helpers (hideCursor, showCursor, moveUp, clearBlock, writeLine). |
+| ~~**Extract `renderNumberedOptions()`**~~ | bijou | Done — shared numbered-list renderer for fallback modes. |
+| ~~**Extract `formatFormTitle()`**~~ | bijou | Done — styled `? title` formatting with mode/noColor branching. |
+| ~~**Extract `writeValidationError()`**~~ | bijou | Done — mode-aware error display for input and textarea. |
+| ~~**Standardize on `resolveCtx()`**~~ | bijou | Done — all 6 form files migrated from `getDefaultContext()` to `resolveCtx()`. |
+
+### Phase 3: Background color support (new feature)
+
+**Problem:** Bijou has zero background color support. `StylePort` is foreground-only, `TokenValue` has no `bg` field, and every component pads with plain transparent spaces. The only workaround is the `inverse` modifier (used by `badge()` for pills). To create div-like colored blocks — panel backgrounds, highlighted regions, modal fills — we need background colors as a first-class concept across the token system, style port, adapters, and components.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| ~~**Add `bg` to `TokenValue`**~~ | bijou | Done — optional `bg?: string` (hex) field on `TokenValue`. Backward-compatible. |
+| ~~**Add `bgRgb()` and `bgHex()` to `StylePort`**~~ | bijou | Done — two new methods mirroring `rgb()` / `hex()`. |
+| ~~**Update `styled()` to apply `token.bg`**~~ | bijou + bijou-node | Done — `styled()` applies `bgHex(token.bg)` when present. chalk adapter updated. |
+| ~~**Update test adapters**~~ | bijou | Done — `plainStyle()` (identity) and `auditStyle()` (recording) implement `bgRgb()` / `bgHex()`. |
+| ~~**Add `surface` tokens to theme**~~ | bijou | Done — `surface: { primary, secondary, elevated, overlay, muted }` on all presets. DTCG/extend updated. |
+| ~~**Add `bg` / `bgToken` to `box()`**~~ | bijou | Done — `bgToken` fills interior. Pipe/accessible/noColor modes skip bg. |
+| ~~**Add `bg` to `flex()` children**~~ | bijou-tui | Done — per-child `bg` and container-level `bg` on `FlexOptions`. Gaps and padding filled. |
+| ~~**Add `bg` to overlay primitives**~~ | bijou-tui | Done — `bgToken` on `modal()`, `toast()`, `drawer()` fills interior with background color. |
+| ~~**Graceful degradation**~~ | bijou | Done — `noColor`/pipe/accessible modes skip bg. Adapters return text unchanged when noColor. |
+| ~~**Tests and examples**~~ | bijou + bijou-tui | Done — unit tests for all bg paths. `examples/background-panels/` demonstrates div-like colored blocks. |
+
+### Phase 4: Large file decomposition (SRP)
+
+**Problem:** Several files exceed 300 lines with multiple distinct responsibilities.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Split `dag.ts` (941 lines)** | bijou | Extract into `dag-layout.ts` (layer assignment, positioning), `dag-edges.ts` (edge routing), `dag-render.ts` (string output + ANSI). Keep `dag.ts` as the public entry that composes them. |
+| **Split `markdown.ts` (468 lines)** | bijou | Extract `markdown-parse.ts` (two-pass block/inline parser) and `markdown-render.ts` (mode-specific output). Keep `markdown.ts` as the public entry. |
+| **Extract textarea editor** | bijou | Move interactive editor state machine (~200 lines) from `textarea.ts` into `textarea-editor.ts`. |
+| **Extract filter interactive UI** | bijou | Move interactive terminal UI (~150 lines) from `filter.ts` into `filter-interactive.ts`. |
+
+### Phase 5: Mode rendering strategy (OCP)
+
+**Problem:** ~22 components repeat `if (mode === 'pipe') ... if (mode === 'accessible') ...` chains. Adding a new output mode requires touching every component.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Design mode renderer pattern** | bijou | Create a `ModeRenderer<Input, Output>` type and `renderByMode()` dispatcher that selects a handler from a mode→renderer map. Components register per-mode renderers instead of using if/else. |
+| **Migrate pilot components** | bijou | Convert `alert`, `badge`, `box` as proof-of-concept. Validate the pattern before wider rollout. |
+| **Migrate remaining components** | bijou | Convert all ~22 mode-branching components to the registry pattern. |
+
+### Phase 6: Test suite hardening
+
+**Problem:** Some tests are brittle (exact ANSI assertions, whitespace-sensitive `toBe`), and some edge cases are missing.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| ~~**Replace exact ANSI assertions**~~ | bijou | ✅ Done — 12 raw ANSI assertions replaced with `expectNoAnsi()`, `expectHiddenCursor()`, `expectShownCursor()` semantic helpers. |
+| **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
+| **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
+| **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
+| ~~**Create output assertion helpers**~~ | bijou | ✅ Done — 6 helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Test-only, not in main barrel. |
+| ~~**noColor integration test suite**~~ | bijou | ✅ Done — 7 tests covering select, multiselect, filter, textarea, input, confirm with `noColor: true`. Interactive forms use `expectNoAnsiSgr()`, question-based use `expectNoAnsi()`. |
+
+### Phase 7: Theme access pattern (DIP)
+
+**Problem:** Every component hardcodes deep theme paths like `ctx.theme.theme.semantic.primary` and `ctx.theme.theme.border.primary`, coupling them to the exact theme object shape.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
+| **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
+
+---
 
 ### 1. Form functions: confirm, input, select, multiselect
 
@@ -23,7 +110,7 @@ Current: **v0.10.0** — Canvas shader, box width override, mouse input, clipToW
 
 **Acceptance criteria:**
 
-```
+```text
 confirm()
   rich mode
     ✓ renders yes/no prompt with default highlighted
@@ -114,7 +201,7 @@ all forms
 
 **Acceptance criteria:**
 
-```
+```text
 createBijou()
   ✓ returns BijouContext with all five fields populated
   ✓ reads BIJOU_THEME from runtime.env and resolves matching preset
@@ -151,7 +238,7 @@ default context
 
 **Acceptance criteria:**
 
-```
+```text
 mockRuntime()
   ✓ env() returns values from provided env map
   ✓ env() returns undefined for missing keys
@@ -195,7 +282,7 @@ createTestContext()
 
 **Acceptance criteria:**
 
-```
+```text
 nodeRuntime()
   ✓ env() reads from process.env
   ✓ stdoutIsTTY returns boolean matching process.stdout.isTTY
@@ -240,7 +327,7 @@ initDefaultContext()
 
 **Acceptance criteria:**
 
-```
+```text
 NO_COLOR compliance
   ✓ all components render without ANSI escape codes
   ✓ gradientText() returns plain text
@@ -284,7 +371,7 @@ Already has tests — this is about expanding edge-case coverage.
 
 **Acceptance criteria (additions):**
 
-```
+```text
 fromDTCG()
   ✓ resolves nested references ({group.token} syntax)
   ✓ throws on circular references
@@ -416,7 +503,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**CLI/stdin component driver**~~ | bijou-tui | ✅ v0.9.0 — `runScript()` feeds key sequences into TEA apps and captures frames. |
 | ~~**`enumeratedList()`**~~ | bijou | ✅ v0.7.0 — Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet, dash, none). |
 | ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
-| **Adaptive colors** | bijou | Runtime light/dark background detection, auto color switching. |
+| ~~**Adaptive colors**~~ | bijou | ✅ Done — `detectColorScheme(runtime?)` reads `COLORFGBG`, `ResolvedTheme.colorScheme`, `createTestContext({ colorScheme })`. Auto color switching deferred to theme consumer. |
 | ~~**Color downsampling**~~ | bijou | ✅ v0.9.0 — `rgbToAnsi256()`, `rgbToAnsi16()`, `nearestAnsi256()`, `ansi256ToAnsi16()` pure conversion functions. |
 | ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
 | ~~**`markdown()`**~~ | bijou | ✅ v0.9.0 — Terminal markdown renderer with headings, inline formatting, lists, code blocks, blockquotes, links, and mode degradation. |
@@ -431,6 +518,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
 | ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
 | ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
+| ~~**`styledFnGuarded()` helper**~~ | bijou | ✅ Done — `createStyledFn(ctx)` and `createBoldFn(ctx)` in `form-utils.ts`. All 4 interactive form files refactored. |
+| ~~**Lint rule for raw ANSI escapes**~~ | bijou | ✅ Done — Vitest-based `ansi-lint.test.ts` scans source for raw `\x1b` escapes. 13 allowed files. |
 
 ### P3 — Nice to have
 
@@ -444,6 +533,9 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
 | **Note field** | bijou | Display-only text within a form flow. |
 | **Scrollable select** | bijou | Fixed-height select with overflow scrolling. |
+| **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
+| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+| **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 
 ---
 

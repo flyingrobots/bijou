@@ -53,6 +53,15 @@ function validateTheme(theme: Theme): void {
         expect(stops.length, `gradient.${name}`).toBeGreaterThanOrEqual(1);
       }
     });
+
+    it('has valid surface tokens with hex and bg', () => {
+      for (const key of ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const) {
+        const token = theme.surface[key];
+        expect(token, `missing surface key: ${key}`).toBeDefined();
+        expect(token.hex, `surface.${key} hex`).toMatch(HEX_RE);
+        expect(token.bg, `surface.${key} bg`).toMatch(HEX_RE);
+      }
+    });
   });
 }
 
@@ -60,8 +69,19 @@ describe('presets', () => {
   validateTheme(CYAN_MAGENTA);
   validateTheme(TEAL_ORANGE_PINK);
 
+  for (const [name, preset] of Object.entries(PRESETS)) {
+    if (preset !== CYAN_MAGENTA && preset !== TEAL_ORANGE_PINK) {
+      validateTheme(preset);
+    }
+  }
+
   it('PRESETS registry includes both themes', () => {
     expect(PRESETS['cyan-magenta']).toBe(CYAN_MAGENTA);
     expect(PRESETS['teal-orange-pink']).toBe(TEAL_ORANGE_PINK);
+  });
+
+  it('PRESETS registry includes NORD and CATPPUCCIN', () => {
+    expect(PRESETS['nord']).toBeDefined();
+    expect(PRESETS['catppuccin']).toBeDefined();
   });
 });

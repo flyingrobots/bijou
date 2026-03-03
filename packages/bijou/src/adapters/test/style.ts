@@ -45,6 +45,28 @@ export function plainStyle(): StylePort {
     },
 
     /**
+     * Return text unchanged, ignoring RGB background color.
+     * @param _r - Ignored red channel.
+     * @param _g - Ignored green channel.
+     * @param _b - Ignored blue channel.
+     * @param text - The text to return.
+     * @returns The original text.
+     */
+    bgRgb(_r: number, _g: number, _b: number, text: string): string {
+      return text;
+    },
+
+    /**
+     * Return text unchanged, ignoring the hex background color.
+     * @param _color - Ignored hex color string.
+     * @param text - The text to return.
+     * @returns The original text.
+     */
+    bgHex(_color: string, text: string): string {
+      return text;
+    },
+
+    /**
      * Return text unchanged, ignoring bold decoration.
      * @param text - The text to return.
      * @returns The original text.

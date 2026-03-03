@@ -17,6 +17,9 @@
 // Types
 // ---------------------------------------------------------------------------
 
+import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import { makeBgFill } from '@flyingrobots/bijou';
+
 /**
  * Configuration for the flex layout container.
  */
@@ -29,6 +32,10 @@ export interface FlexOptions {
   readonly height: number;
   /** Gap between children (in the main axis). Default: 0. */
   readonly gap?: number;
+  /** Background token applied to the entire flex container (gap + padding areas). Requires `bg` field on the token. */
+  readonly bgToken?: TokenValue;
+  /** Bijou context for styled output (required for bgToken to take effect). */
+  readonly ctx?: BijouContext;
 }
 
 /**
@@ -50,6 +57,8 @@ export interface FlexChild {
   readonly maxSize?: number;
   /** Cross-axis alignment. Default: 'start'. */
   readonly align?: 'start' | 'center' | 'end';
+  /** Background token for this child's allocated region. Requires `bg` field on the token and `ctx` on `FlexOptions`. */
+  readonly bgToken?: TokenValue;
 }
 
 import { visibleLength, clipToWidth } from './viewport.js';
@@ -325,6 +334,7 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const height = Math.max(0, Math.floor(options.height));
   const gap = Math.max(0, Math.floor(options.gap ?? 0));
   const isRow = direction === 'row';
+  const containerBg = makeBgFill(options.bgToken, options.ctx);
 
   const mainAxisTotal = isRow ? width : height;
   const crossAxisTotal = isRow ? height : width;
@@ -334,9 +344,9 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
   const resolved = computeSizes(children, mainAxisTotal, crossAxisTotal, gap, isRow);
 
   if (isRow) {
-    return renderRow(resolved, height, gap);
+    return renderRow(resolved, height, gap, containerBg, options.ctx);
   }
-  return renderColumn(resolved, width, height, gap);
+  return renderColumn(resolved, width, height, gap, containerBg, options.ctx);
 }
 
 /**
@@ -345,12 +355,16 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
  * @param items - Resolved children with allocated widths.
  * @param totalHeight - Total available height in rows.
  * @param gap - Horizontal gap between children in columns.
+ * @param containerBg - Optional background fill function for container regions (gaps, padding).
+ * @param ctx - Bijou context, used to resolve per-child bgToken fills.
  * @returns Composed row string with lines joined by newlines.
  */
 function renderRow(
   items: ResolvedChild[],
   totalHeight: number,
   gap: number,
+  containerBg?: (text: string) => string,
+  ctx?: BijouContext,
 ): string {
   // Render each child into a column of lines
   const columns: string[][] = [];
@@ -361,11 +375,15 @@ function renderRow(
     // In row mode, fitWidth always uses 'start' — align controls cross-axis (vertical) only
     const widthFitted = fitWidth(rendered, childWidth);
     const aligned = alignCross(widthFitted, totalHeight, item.child.align ?? 'start', childWidth);
-    columns.push(aligned);
+    // Apply per-child bg fill (overrides container bg for this region)
+    const childBg = makeBgFill(item.child.bgToken, ctx) ?? containerBg;
+    const filled = childBg ? aligned.map(childBg) : aligned;
+    columns.push(filled);
   }
 
   // Compose columns side-by-side
-  const spacer = ' '.repeat(Math.max(0, gap));
+  const rawSpacer = ' '.repeat(Math.max(0, gap));
+  const spacer = containerBg && gap > 0 ? containerBg(rawSpacer) : rawSpacer;
   const rows: string[] = [];
   for (let r = 0; r < totalHeight; r++) {
     const parts: string[] = [];
@@ -384,6 +402,8 @@ function renderRow(
  * @param totalWidth - Total available width in columns.
  * @param totalHeight - Total available height in rows.
  * @param gap - Vertical gap between children in rows.
+ * @param containerBg - Optional background fill function for container regions (gaps, padding).
+ * @param ctx - Bijou context, used to resolve per-child bgToken fills.
  * @returns Composed column string with lines joined by newlines.
  */
 function renderColumn(
@@ -391,6 +411,8 @@ function renderColumn(
   totalWidth: number,
   totalHeight: number,
   gap: number,
+  containerBg?: (text: string) => string,
+  ctx?: BijouContext,
 ): string {
   const lines: string[] = [];
 
@@ -400,12 +422,16 @@ function renderColumn(
     const rendered = renderContent(item.child, totalWidth, childHeight);
     const widthFitted = fitWidth(rendered, totalWidth, item.child.align ?? 'start');
     const aligned = alignCross(widthFitted, childHeight, 'start', totalWidth);
-    
-    lines.push(...aligned);
+
+    // Apply per-child bg fill
+    const childBg = makeBgFill(item.child.bgToken, ctx) ?? containerBg;
+    const filled = childBg ? aligned.map(childBg) : aligned;
+    lines.push(...filled);
 
     // Add gap between items
     if (i < items.length - 1 && gap > 0) {
-      const spacer = ' '.repeat(Math.max(0, totalWidth));
+      const rawSpacer = ' '.repeat(Math.max(0, totalWidth));
+      const spacer = containerBg ? containerBg(rawSpacer) : rawSpacer;
       for (let g = 0; g < gap; g++) {
         lines.push(spacer);
       }
@@ -413,7 +439,8 @@ function renderColumn(
   }
 
   // Pad to fill totalHeight if needed
-  const emptyLine = ' '.repeat(Math.max(0, totalWidth));
+  const rawEmpty = ' '.repeat(Math.max(0, totalWidth));
+  const emptyLine = containerBg ? containerBg(rawEmpty) : rawEmpty;
   while (lines.length < totalHeight) {
     lines.push(emptyLine);
   }
