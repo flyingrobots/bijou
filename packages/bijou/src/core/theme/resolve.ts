@@ -1,5 +1,7 @@
 import type { Theme, TokenValue, InkColor } from './tokens.js';
 import type { RuntimePort } from '../../ports/runtime.js';
+import type { ColorScheme } from '../detect/tty.js';
+import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
 
 /**
@@ -18,6 +20,8 @@ export interface ResolvedTheme {
   theme: Theme;
   /** Whether color output is disabled (per `NO_COLOR`). */
   noColor: boolean;
+  /** Detected terminal color scheme (light or dark background). */
+  colorScheme: ColorScheme;
 
   /**
    * Return a hex string for Ink's `color=` prop, or `undefined` when noColor.
@@ -45,12 +49,14 @@ export interface ResolvedTheme {
  * Create a ResolvedTheme from a Theme and a noColor flag.
  * @param theme - The theme to wrap.
  * @param noColor - Whether color output should be suppressed.
+ * @param colorScheme - Terminal color scheme. Defaults to `'dark'`.
  * @returns ResolvedTheme with convenience accessors.
  */
-export function createResolved(theme: Theme, noColor: boolean): ResolvedTheme {
+export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
   return {
     theme,
     noColor,
+    colorScheme,
 
     ink(token: TokenValue): InkColor {
       return noColor ? undefined : token.hex;
@@ -115,14 +121,15 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     if (cached !== null) return cached;
 
     const noColor = isNoColor(runtime);
+    const colorScheme = detectColorScheme(runtime);
     const themeName = readEnv(envVar) ?? fallback.name;
     const theme = presets[themeName];
 
     if (theme === undefined) {
       console.warn(`[bijou] Unknown ${envVar}="${themeName}", falling back to "${fallback.name}".`);
-      cached = createResolved(fallback, noColor);
+      cached = createResolved(fallback, noColor, colorScheme);
     } else {
-      cached = createResolved(theme, noColor);
+      cached = createResolved(theme, noColor, colorScheme);
     }
 
     return cached;
@@ -130,15 +137,16 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
 
   function resolveTheme(name?: string): ResolvedTheme {
     const noColor = isNoColor(runtime);
+    const colorScheme = detectColorScheme(runtime);
     const themeName = name ?? readEnv(envVar) ?? fallback.name;
     const theme = presets[themeName];
 
     if (theme === undefined) {
       console.warn(`[bijou] Unknown theme "${themeName}", falling back to "${fallback.name}".`);
-      return createResolved(fallback, noColor);
+      return createResolved(fallback, noColor, colorScheme);
     }
 
-    return createResolved(theme, noColor);
+    return createResolved(theme, noColor, colorScheme);
   }
 
   function _resetForTesting(): void {

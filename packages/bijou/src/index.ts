@@ -105,7 +105,12 @@ export {
 } from './core/text/index.js';
 
 // Detection
-export { detectOutputMode, type OutputMode } from './core/detect/index.js';
+export {
+  detectOutputMode,
+  detectColorScheme,
+  type OutputMode,
+  type ColorScheme,
+} from './core/detect/index.js';
 
 // Components
 export {
