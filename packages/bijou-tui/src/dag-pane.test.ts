@@ -199,6 +199,12 @@ describe('dagPaneSelectNode', () => {
     const next = dagPaneSelectNode(state, 'UNKNOWN', ctx);
     expect(next.selectedId).toBeUndefined();
   });
+
+  it('preserves existing selection when ID is unknown', () => {
+    const state = createDagPaneState({ source: LINEAR_NODES, width: 60, height: 20, selectedId: 'B', ctx });
+    const next = dagPaneSelectNode(state, 'UNKNOWN', ctx);
+    expect(next.selectedId).toBe('B');
+  });
 });
 
 describe('dagPaneClearSelection', () => {

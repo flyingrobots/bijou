@@ -27,7 +27,6 @@ type Msg =
   | { type: 'page-down' }
   | { type: 'top' }
   | { type: 'bottom' }
-  | { type: 'toggle-focus' }
   | { type: 'quit' };
 
 const keys = focusAreaKeyMap<Msg>({
@@ -88,7 +87,6 @@ const app: App<Model, Msg> = {
       if (!action) return [model, []];
 
       switch (action.type) {
-        case 'quit': return [model, [quit()]];
         case 'scroll': return [{ ...model, fa: focusAreaScrollBy(model.fa, action.dy) }, []];
         case 'page-up': return [{ ...model, fa: focusAreaPageUp(model.fa) }, []];
         case 'page-down': return [{ ...model, fa: focusAreaPageDown(model.fa) }, []];

@@ -20,8 +20,7 @@
  * ```
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
-import type { TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
 import {
   type ScrollState,
   viewport,

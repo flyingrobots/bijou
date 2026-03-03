@@ -21,9 +21,8 @@
  * ```
  */
 
-import type { BijouContext, TokenValue, DagNode, DagNodePosition, DagLayout, DagOptions } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue, DagNode, DagNodePosition, DagLayout, DagOptions, SlicedDagSource } from '@flyingrobots/bijou';
 import { dagLayout, isSlicedDagSource } from '@flyingrobots/bijou';
-import type { SlicedDagSource } from '@flyingrobots/bijou';
 import {
   type FocusAreaState,
   type FocusAreaRenderOptions,
@@ -98,7 +97,7 @@ export interface DagPaneOptions {
 }
 
 /** Options for rendering the DAG pane view. */
-export interface DagPaneRenderOptions extends FocusAreaRenderOptions {}
+export type DagPaneRenderOptions = FocusAreaRenderOptions;
 
 // ---------------------------------------------------------------------------
 // Internal: Adjacency maps
@@ -318,15 +317,17 @@ function renderLayout(
     highlightPath: highlightPath.length > 0 ? [...highlightPath] : undefined,
     ctx,
   };
-  return dagLayout(source as DagNode[], opts);
+  return isSlicedDagSource(source)
+    ? dagLayout(source, opts)
+    : dagLayout(source, opts);
 }
 
 function updateSelection(
   state: DagPaneState,
   newId: string | undefined,
+  adjacency: Adjacency,
   ctx?: BijouContext,
 ): DagPaneState {
-  const adjacency = buildAdjacency(state.source);
   const highlightPath = computeHighlightPath(newId, adjacency);
   const layout = renderLayout(state.source, newId, highlightPath, state.dagOptions, ctx);
   let fa = focusAreaSetContent(state.focusArea, layout.output);
@@ -416,7 +417,7 @@ export function dagPaneSelectChild(state: DagPaneState, ctx?: BijouContext): Dag
 
   if (!state.selectedId) {
     const firstRoot = adjacency.roots[0];
-    return firstRoot ? updateSelection(state, firstRoot, ctx) : state;
+    return firstRoot ? updateSelection(state, firstRoot, adjacency, ctx) : state;
   }
 
   const children = adjacency.children.get(state.selectedId) ?? [];
@@ -425,7 +426,7 @@ export function dagPaneSelectChild(state: DagPaneState, ctx?: BijouContext): Dag
   const currentPos = state.layout.nodes.get(state.selectedId);
   const currentCenter = currentPos ? currentPos.col + currentPos.width / 2 : 0;
   const target = closestByCol(children, currentCenter, state.layout.nodes);
-  return target ? updateSelection(state, target, ctx) : state;
+  return target ? updateSelection(state, target, adjacency, ctx) : state;
 }
 
 /**
@@ -441,7 +442,7 @@ export function dagPaneSelectParent(state: DagPaneState, ctx?: BijouContext): Da
 
   if (!state.selectedId) {
     const firstRoot = adjacency.roots[0];
-    return firstRoot ? updateSelection(state, firstRoot, ctx) : state;
+    return firstRoot ? updateSelection(state, firstRoot, adjacency, ctx) : state;
   }
 
   const parents = adjacency.parents.get(state.selectedId) ?? [];
@@ -450,7 +451,7 @@ export function dagPaneSelectParent(state: DagPaneState, ctx?: BijouContext): Da
   const currentPos = state.layout.nodes.get(state.selectedId);
   const currentCenter = currentPos ? currentPos.col + currentPos.width / 2 : 0;
   const target = closestByCol(parents, currentCenter, state.layout.nodes);
-  return target ? updateSelection(state, target, ctx) : state;
+  return target ? updateSelection(state, target, adjacency, ctx) : state;
 }
 
 /**
@@ -466,7 +467,7 @@ export function dagPaneSelectLeft(state: DagPaneState, ctx?: BijouContext): DagP
 
   if (!state.selectedId) {
     const firstRoot = adjacency.roots[0];
-    return firstRoot ? updateSelection(state, firstRoot, ctx) : state;
+    return firstRoot ? updateSelection(state, firstRoot, adjacency, ctx) : state;
   }
 
   const currentPos = state.layout.nodes.get(state.selectedId);
@@ -476,7 +477,7 @@ export function dagPaneSelectLeft(state: DagPaneState, ctx?: BijouContext): DagP
   const idx = siblings.indexOf(state.selectedId);
   if (idx <= 0) return state; // already leftmost
 
-  return updateSelection(state, siblings[idx - 1]!, ctx);
+  return updateSelection(state, siblings[idx - 1]!, adjacency, ctx);
 }
 
 /**
@@ -492,7 +493,7 @@ export function dagPaneSelectRight(state: DagPaneState, ctx?: BijouContext): Dag
 
   if (!state.selectedId) {
     const firstRoot = adjacency.roots[0];
-    return firstRoot ? updateSelection(state, firstRoot, ctx) : state;
+    return firstRoot ? updateSelection(state, firstRoot, adjacency, ctx) : state;
   }
 
   const currentPos = state.layout.nodes.get(state.selectedId);
@@ -502,7 +503,7 @@ export function dagPaneSelectRight(state: DagPaneState, ctx?: BijouContext): Dag
   const idx = siblings.indexOf(state.selectedId);
   if (idx < 0 || idx >= siblings.length - 1) return state; // already rightmost
 
-  return updateSelection(state, siblings[idx + 1]!, ctx);
+  return updateSelection(state, siblings[idx + 1]!, adjacency, ctx);
 }
 
 /**
@@ -518,7 +519,8 @@ export function dagPaneSelectNode(state: DagPaneState, nodeId: string, ctx?: Bij
   if (!state.layout.nodes.has(nodeId)) {
     return state;
   }
-  return updateSelection(state, nodeId, ctx);
+  const adjacency = buildAdjacency(state.source);
+  return updateSelection(state, nodeId, adjacency, ctx);
 }
 
 /**
@@ -529,7 +531,8 @@ export function dagPaneSelectNode(state: DagPaneState, nodeId: string, ctx?: Bij
  * @returns Updated state with no selection.
  */
 export function dagPaneClearSelection(state: DagPaneState, ctx?: BijouContext): DagPaneState {
-  return updateSelection(state, undefined, ctx);
+  const adjacency = buildAdjacency(state.source);
+  return updateSelection(state, undefined, adjacency, ctx);
 }
 
 // ---------------------------------------------------------------------------

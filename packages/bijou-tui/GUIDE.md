@@ -566,7 +566,7 @@ A scrollable pane with a colored left gutter indicating focus state. Wraps `view
 
 ```typescript
 import {
-  createFocusAreaState, focusArea,
+  createFocusAreaState, focusArea, focusAreaSetContent,
   focusAreaScrollBy, focusAreaPageDown, focusAreaScrollByX,
   focusAreaKeyMap,
 } from '@flyingrobots/bijou-tui';

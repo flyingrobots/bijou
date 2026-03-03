@@ -11,6 +11,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`focusArea()`** (bijou-tui) — new scrollable pane building block with a colored left gutter bar indicating focus state. Wraps `viewport()` with gutter chrome, horizontal overflow support (`overflowX: 'scroll' | 'hidden'`), and a convenience keymap. Degrades gracefully: pipe/accessible modes omit the gutter; static mode renders it unstyled.
 - **`dagPane()`** (bijou-tui) — new interactive DAG viewer building block. Wraps `dagLayout()` in a `focusArea()` with arrow-key node navigation (parent/child/sibling via spatial proximity), auto-highlight-path from root to selected node, and auto-scroll-to-selection. Includes full keymap with vim scroll bindings and arrow-key selection.
 
+### 🐛 Fixed
+
+- **`dagPane` redundant adjacency** — `updateSelection()` no longer rebuilds the adjacency map when all callers already have one; adjacency is now passed through as a parameter
+- **`dagPane` unsafe cast** — replace `source as DagNode[]` with `isSlicedDagSource()` type guard in `renderLayout()`
+- **`dagPaneSelectNode` unknown ID** — preserves existing selection when the requested node ID is not in the layout (previously cleared to `undefined`)
+
+### ♻️ Refactors
+
+- **`DagPaneRenderOptions`** — replace empty interface with type alias
+- **Merge duplicate imports** — consolidate split `import type` lines in `focus-area.ts` and `dag-pane.ts`
+- **Remove dead code** — remove unused `toggle-focus` Msg variant and unreachable `case 'quit'` from focus-area example
+
+### 📝 Documentation
+
+- **GUIDE.md** — add missing `focusAreaSetContent` to Focus Area import example
+
 ## [1.0.0] — 2026-03-03
 
 ### 💥 BREAKING CHANGES
