@@ -6,7 +6,7 @@
  * confirm) are asserted to contain zero ANSI escapes of any kind.
  */
 
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createTestContext, expectNoAnsi, expectNoAnsiSgr } from '../../adapters/test/index.js';
 import { select } from './select.js';
 import { multiselect } from './multiselect.js';
@@ -33,7 +33,7 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { keys: ['\r'] },
       });
-      await select({
+      const result = await select({
         title: 'Pick',
         options: [
           { label: 'A', value: 'a' },
@@ -41,6 +41,7 @@ describe('noColor integration', () => {
         ],
         ctx,
       });
+      expect(result).toBe('a');
       expectNoAnsiSgr(allWritten(ctx));
     });
 
@@ -49,7 +50,7 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { keys: ['\x1b[B', '\r'] },
       });
-      await select({
+      const result = await select({
         title: 'Pick',
         options: [
           { label: 'A', value: 'a' },
@@ -57,6 +58,7 @@ describe('noColor integration', () => {
         ],
         ctx,
       });
+      expect(result).toBe('b');
       expectNoAnsiSgr(allWritten(ctx));
     });
   });
@@ -67,7 +69,7 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { keys: [' ', '\r'] },
       });
-      await multiselect({
+      const result = await multiselect({
         title: 'Pick',
         options: [
           { label: 'A', value: 'a' },
@@ -75,6 +77,7 @@ describe('noColor integration', () => {
         ],
         ctx,
       });
+      expect(result).toEqual(['a']);
       expectNoAnsiSgr(allWritten(ctx));
     });
   });
@@ -85,7 +88,7 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { keys: ['a', '\r'] },
       });
-      await filter({
+      const result = await filter({
         title: 'Search',
         options: [
           { label: 'Apple', value: 'apple' },
@@ -93,6 +96,7 @@ describe('noColor integration', () => {
         ],
         ctx,
       });
+      expect(result).toBe('apple');
       expectNoAnsiSgr(allWritten(ctx));
     });
   });
@@ -103,10 +107,11 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { keys: ['h', 'i', '\x04'] },
       });
-      await textarea({
+      const result = await textarea({
         title: 'Notes',
         ctx,
       });
+      expect(result).toBe('hi');
       expectNoAnsiSgr(allWritten(ctx));
     });
   });
@@ -117,7 +122,8 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { answers: ['test'] },
       });
-      await input({ title: 'Name', ctx });
+      const result = await input({ title: 'Name', ctx });
+      expect(result).toBe('test');
       expectNoAnsi(allWritten(ctx));
     });
   });
@@ -128,7 +134,8 @@ describe('noColor integration', () => {
         ...noColorInteractive,
         io: { answers: ['y'] },
       });
-      await confirm({ title: 'OK?', ctx });
+      const result = await confirm({ title: 'OK?', ctx });
+      expect(result).toBe(true);
       expectNoAnsi(allWritten(ctx));
     });
   });

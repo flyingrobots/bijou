@@ -81,9 +81,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   let cursor = 0;
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : formatFormTitle(options.title, ctx);
+    const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
     term.writeLine(label);
 
@@ -110,9 +108,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     const totalLines = options.options.length + 1;
     term.clearBlock(totalLines);
     const selected = options.options[cursor] as SelectOption<T>;
-    const label = noColor
-      ? `? ${options.title} ${selected.label}`
-      : formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selected.label);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selected.label);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

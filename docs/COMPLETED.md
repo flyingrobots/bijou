@@ -7,8 +7,12 @@ Shipped work, newest first. See `CHANGELOG.md` for detailed release notes.
 ## v1.0.0 — Architecture audit remediation (Phases 1–3)
 
 - **Completed:** 2026-03-02
-- **Summary:** ISP port segregation (WritePort/QueryPort/InteractivePort/FilePort), form DRY extraction (5 shared utilities), background color support (TokenValue.bg, StylePort.bgHex/bgRgb, Theme.surface, bgToken on box/flex/modal/toast/drawer/tooltip). Code review fixes: flex bg routed through StylePort, DTCG surface unconditional, preset surface validation, tooltip bgToken parity.
-- **Ref:** PR #26
+- **Summary:**
+  - ISP port segregation (WritePort/QueryPort/InteractivePort/FilePort)
+  - Form DRY extraction (5 shared utilities)
+  - Background color support (TokenValue.bg, StylePort.bgHex/bgRgb, Theme.surface, bgToken on box/flex/modal/toast/drawer/tooltip)
+  - Code review fixes: flex bg routing, DTCG surface unconditional, preset surface validation, tooltip bgToken parity
+- **Ref:** [PR #26](https://github.com/flyingrobots/bijou/pull/26)
 
 ---
 

@@ -80,9 +80,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   const selected = new Set<number>();
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : formatFormTitle(options.title, ctx);
+    const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
     const hint = styledFn(t.theme.semantic.muted, '(space to toggle, enter to confirm)');
     term.writeLine(`${label}  ${hint}`);
@@ -116,9 +114,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     const totalLines = options.options.length + 1;
     term.clearBlock(totalLines);
     const selectedLabels = [...selected].sort().map((i) => options.options[i]!.label).join(', ');
-    const label = noColor
-      ? `? ${options.title} ${selectedLabels}`
-      : formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabels);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabels);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

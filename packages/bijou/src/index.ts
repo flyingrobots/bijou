@@ -29,7 +29,7 @@ export {
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
 
-// Background fill utility
+// Background fill utilities
 export { shouldApplyBg, makeBgFill } from './core/bg-fill.js';
 
 // Factory

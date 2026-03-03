@@ -13,8 +13,9 @@ import type { TokenValue } from '../theme/tokens.js';
 /**
  * Format a form title with the `?` prefix and theme-aware styling.
  *
- * Returns the styled `? title` string for interactive use, or the
- * plain title for noColor/accessible modes.
+ * Returns `? title` with styling in color mode, or plain `? title`
+ * in noColor/accessible modes. The `?` prefix is always included
+ * for visual parity across modes.
  *
  * @param title - The form prompt text.
  * @param ctx - Bijou context for styling and mode detection.
@@ -22,7 +23,7 @@ import type { TokenValue } from '../theme/tokens.js';
  */
 export function formatFormTitle(title: string, ctx: BijouContext): string {
   if (ctx.theme.noColor || ctx.mode === 'accessible') {
-    return title;
+    return `? ${title}`;
   }
   return ctx.style.styled(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(title);
 }
@@ -122,7 +123,7 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
  * @returns A function `(token, text) => string`.
  */
 export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: string) => string {
-  if (ctx.theme.noColor) return (_token: TokenValue, text: string) => text;
+  if (ctx.theme.noColor || ctx.mode === 'accessible') return (_token: TokenValue, text: string) => text;
   return (token: TokenValue, text: string) => ctx.style.styled(token, text);
 }
 
@@ -136,7 +137,7 @@ export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: str
  * @returns A function `(text) => string`.
  */
 export function createBoldFn(ctx: BijouContext): (text: string) => string {
-  if (ctx.theme.noColor) return (text: string) => text;
+  if (ctx.theme.noColor || ctx.mode === 'accessible') return (text: string) => text;
   return (text: string) => ctx.style.bold(text);
 }
 

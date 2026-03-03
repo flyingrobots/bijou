@@ -17,14 +17,14 @@ function allWritten(ctx: { io: { written: string[] } }): string {
 }
 
 describe('formatFormTitle', () => {
-  it('returns plain title when noColor: true', () => {
+  it('returns ? title when noColor: true', () => {
     const ctx = createTestContext({ noColor: true });
-    expect(formatFormTitle('Name', ctx)).toBe('Name');
+    expect(formatFormTitle('Name', ctx)).toBe('? Name');
   });
 
-  it('returns plain title when mode: accessible', () => {
+  it('returns ? title when mode: accessible', () => {
     const ctx = createTestContext({ mode: 'accessible' });
-    expect(formatFormTitle('Name', ctx)).toBe('Name');
+    expect(formatFormTitle('Name', ctx)).toBe('? Name');
   });
 
   it('returns styled ? title in interactive mode', () => {

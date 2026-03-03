@@ -155,9 +155,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
   }
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : formatFormTitle(options.title, ctx);
+    const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
     term.writeLine(label);
 
@@ -201,9 +199,7 @@ async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext
 
     const selected = filtered[cursor];
     const selectedLabel = selected ? selected.label : '(none)';
-    const label = noColor
-      ? `? ${options.title} ${selectedLabel}`
-      : formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

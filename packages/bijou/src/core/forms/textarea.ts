@@ -86,7 +86,6 @@ async function fallbackTextarea(options: TextareaOptions, ctx: BijouContext): Pr
  * @returns The entered text (newline-joined), or the default value on cancel.
  */
 async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
-  const noColor = ctx.theme.noColor;
   const t = ctx.theme;
   const styledFn = createStyledFn(ctx);
   const height = options.height ?? 6;
@@ -109,9 +108,7 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
   }
 
   function render(): void {
-    const label = noColor
-      ? `? ${options.title}`
-      : formatFormTitle(options.title, ctx);
+    const label = formatFormTitle(options.title, ctx);
     const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C to cancel)');
     term.hideCursor();
     term.writeLine(`${label}${hint}`);
@@ -158,9 +155,7 @@ async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext):
     const summary = value
       ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
       : '(cancelled)';
-    const label = noColor
-      ? `? ${options.title} ${summary}`
-      : formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, summary);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, summary);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

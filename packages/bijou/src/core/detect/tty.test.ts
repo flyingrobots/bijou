@@ -100,6 +100,11 @@ describe('detectColorScheme', () => {
     expect(detectColorScheme()).toBe('dark');
   });
 
+  it('returns dark for empty string', () => {
+    process.env['COLORFGBG'] = '';
+    expect(detectColorScheme()).toBe('dark');
+  });
+
   it('returns dark for bg=6 (boundary)', () => {
     process.env['COLORFGBG'] = '15;6';
     expect(detectColorScheme()).toBe('dark');

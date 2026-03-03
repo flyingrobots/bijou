@@ -53,7 +53,8 @@ describe('ANSI lint', () => {
     const violations: string[] = [];
 
     for (const file of files) {
-      const rel = relative(SRC_ROOT, file);
+      // Normalize to forward slashes for cross-platform allowlist matching
+      const rel = relative(SRC_ROOT, file).replace(/\\/g, '/');
       if (ALLOWED.has(rel)) continue;
 
       const content = readFileSync(file, 'utf-8');
