@@ -8,11 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ♻️ Refactors
 
-- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change for correctly-guarded sites.
-
-### 🐛 Bug Fixes
-
-- **`box()` bgToken missing pipe/accessible guards** — `box()` now skips background fill in pipe and accessible modes, matching the behavior of `flex()`, `modal()`, `toast()`, `drawer()`, and `tooltip()`.
+- **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).
 
 ## [1.0.0] — 2026-03-02
 
@@ -20,6 +16,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`Theme.surface` is now required** — all `Theme` objects must include a `surface` section with `primary`, `secondary`, `elevated`, `overlay`, and `muted` tokens. Custom themes that omit `surface` will fail type checking.
 - **`FlexOptions.bg` renamed to `FlexOptions.bgToken`** — the `bg` property on `FlexOptions` and `FlexChild` changed from `{ bg?: string }` to `TokenValue`. A `ctx` property is also required on `FlexOptions` for bg to take effect.
+
 ### ✨ Features
 
 - **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
