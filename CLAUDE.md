@@ -31,7 +31,7 @@
 
 ### docs/ROADMAP.md (what's next)
 
-- Organized by milestone (e.g. `## v0.11.0 — Architecture audit`).
+- Organized by milestone (e.g. `## vX.Y.Z — Milestone title`).
 - Each milestone has phases/tasks described at planning level (not step-by-step — that's TASKS.md's job).
 - When a milestone becomes the active work, expand its tasks into `TASKS.md` as a detailed checklist.
 - Strike through (`~~task~~`) tasks as they complete; this is a mirror of TASKS.md progress.

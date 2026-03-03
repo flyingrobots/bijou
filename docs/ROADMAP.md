@@ -110,7 +110,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 
 **Acceptance criteria:**
 
-```
+```text
 confirm()
   rich mode
     ✓ renders yes/no prompt with default highlighted
@@ -201,7 +201,7 @@ all forms
 
 **Acceptance criteria:**
 
-```
+```text
 createBijou()
   ✓ returns BijouContext with all five fields populated
   ✓ reads BIJOU_THEME from runtime.env and resolves matching preset
@@ -238,7 +238,7 @@ default context
 
 **Acceptance criteria:**
 
-```
+```text
 mockRuntime()
   ✓ env() returns values from provided env map
   ✓ env() returns undefined for missing keys
@@ -282,7 +282,7 @@ createTestContext()
 
 **Acceptance criteria:**
 
-```
+```text
 nodeRuntime()
   ✓ env() reads from process.env
   ✓ stdoutIsTTY returns boolean matching process.stdout.isTTY
@@ -327,7 +327,7 @@ initDefaultContext()
 
 **Acceptance criteria:**
 
-```
+```text
 NO_COLOR compliance
   ✓ all components render without ANSI escape codes
   ✓ gradientText() returns plain text
@@ -371,7 +371,7 @@ Already has tests — this is about expanding edge-case coverage.
 
 **Acceptance criteria (additions):**
 
-```
+```text
 fromDTCG()
   ✓ resolves nested references ({group.token} syntax)
   ✓ throws on circular references

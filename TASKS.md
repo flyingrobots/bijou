@@ -1,4 +1,4 @@
-# v1.0.0 Implementation Tasks — Phase 4: Large File Decomposition
+# Architecture Audit — Phase 4: Large File Decomposition
 
 > **How to use:** Find the first unchecked item (`- [ ]`). Read its description, execute it, then check it off (`- [x]`). Each item is self-contained with enough context to execute without reading prior conversation.
 
@@ -87,7 +87,7 @@
 
 - [ ] **Run all type checks and tests.**
 
-  ```
+  ```sh
   npx tsc --noEmit -p packages/bijou/tsconfig.json
   npx tsc --noEmit -p packages/bijou-node/tsconfig.json
   npx tsc --noEmit -p packages/bijou-tui/tsconfig.json

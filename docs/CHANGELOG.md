@@ -19,6 +19,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **forms:** `formatFormTitle` now includes "? " prefix in noColor/accessible modes for visual parity; remove redundant manual ternaries from all 4 interactive form files
 - **forms:** `createStyledFn`/`createBoldFn` now suppress styling in accessible mode (consistent with `formatFormTitle`)
 - **forms:** fix misleading accessible fallback prompt in textarea (said "multi-line" but reads single line)
+- **forms:** `confirm()` noColor prompt now uses `formatFormTitle` to include `? ` prefix (visual parity with color mode)
+- **forms:** `moveUp(0)` / `clearBlock(0)` in `terminalRenderer` now early-return instead of emitting empty ANSI sequences
+- **detect:** remove unreachable `undefined` guard in `detectColorScheme` (`split()` always returns >= 1 element)
+- **lint:** ANSI lint test now detects uppercase `\x1B` escape variant
 
 ### ♻️ Refactors
 
@@ -44,17 +48,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Background color support** — new `bg` field on `TokenValue`, `bgRgb()`/`bgHex()` on `StylePort`, `surface` tokens on `Theme`, and `bgToken` option on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks. Degrades gracefully in pipe/accessible/noColor modes.
 - **`TooltipOptions.bgToken`** — new optional property for API consistency with modal/toast/drawer.
 
-### ♻️ Changed
+### ♻️ Refactors
 
 - **ports:** segregate IOPort into WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
 - **forms:** extract shared form utilities (formatFormTitle, writeValidationError, renderNumberedOptions, terminalRenderer, formDispatch) to eliminate cross-form duplication
 - **forms:** standardize all form components on shared resolveCtx() helper
-
-### ♻️ Refactors
-
 - **Extract shared `resolveCtx` / `resolveSafeCtx`** — deduplicate the `resolveCtx` helper that was copy-pasted across 20 component files into a single shared module (`core/resolve-ctx.ts`). Both variants (strict and safe/try-catch) are exported from the bijou barrel. No runtime behavior change.
 
-### 🐛 Bug Fixes
+### 🐛 Fixed
 
 - **`flex()` bg routed through StylePort** — background colors in flex layouts now route through `ctx.style.bgHex()` instead of emitting raw ANSI escape sequences, respecting `noColor`, pipe mode, and accessible mode.
 - **`toDTCG()` surface write unconditional** — remove defensive `if (theme.surface)` guard that could silently drop surface tokens during DTCG export.
