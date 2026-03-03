@@ -355,6 +355,8 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
  * @param items - Resolved children with allocated widths.
  * @param totalHeight - Total available height in rows.
  * @param gap - Horizontal gap between children in columns.
+ * @param containerBg - Optional background fill function for container regions (gaps, padding).
+ * @param ctx - Bijou context, used to resolve per-child bgToken fills.
  * @returns Composed row string with lines joined by newlines.
  */
 function renderRow(
@@ -400,6 +402,8 @@ function renderRow(
  * @param totalWidth - Total available width in columns.
  * @param totalHeight - Total available height in rows.
  * @param gap - Vertical gap between children in rows.
+ * @param containerBg - Optional background fill function for container regions (gaps, padding).
+ * @param ctx - Bijou context, used to resolve per-child bgToken fills.
  * @returns Composed column string with lines joined by newlines.
  */
 function renderColumn(

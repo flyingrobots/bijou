@@ -18,6 +18,8 @@ Shipped work, newest first. See `docs/CHANGELOG.md` for detailed release notes.
 - **Summary:** Every exported and internal symbol across all three packages now has comprehensive JSDoc.
 - **Ref:** [0.10.1](CHANGELOG.md#0101--2026-02-28)
 
+---
+
 ## v0.10.0 — Canvas, mouse input, box width
 
 - **Completed:** 2026-02-28

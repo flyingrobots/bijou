@@ -33,6 +33,7 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * @param borderColor - Function that wraps border characters with color styling.
  * @param padding - Resolved padding values (top, bottom, left, right).
  * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
+ * @param bgFill - Optional function to wrap interior content with background color styling.
  * @returns The rendered box as a multiline string.
  */
 function drawBox(

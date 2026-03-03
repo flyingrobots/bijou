@@ -184,6 +184,7 @@ export function composite(
  *
  * @param lines - Content lines to place inside the box.
  * @param borderColor - Function to apply border styling (identity for unstyled).
+ * @param bgFill - Optional function to wrap interior content with background color styling.
  * @returns Box string with top/bottom borders and bordered content lines.
  */
 function renderBox(
