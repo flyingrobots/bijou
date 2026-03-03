@@ -6,6 +6,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Fixed
+
+- **docs:** correct `docs/CHANGELOG.md` → `CHANGELOG.md` sibling path in COMPLETED.md
+- **forms:** guard `styledFn()` calls in multiselect interactive renderer when `noColor` is true — hint text and option descriptions no longer leak ANSI in noColor mode
+
 ### ♻️ Refactors
 
 - **Extract shared `makeBgFill()` utility** — deduplicate the background-fill guard logic (noColor, pipe, accessible mode checks) that was copy-pasted across 5 call sites into a single shared module (`core/bg-fill.ts`). `shouldApplyBg()` and `makeBgFill()` are exported from the bijou barrel. No runtime behavior change; `box()` gains defense-in-depth guards via the shared utility (its early return already prevented bg in pipe/accessible modes).

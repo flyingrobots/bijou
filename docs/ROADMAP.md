@@ -82,6 +82,7 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 | **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
 | **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
 | **Create output assertion helpers** | bijou | Add `expectContainsAnsi(output)`, `expectNoAnsi(output)`, `expectWritten(ctx, substring)` to reduce coupling to `ctx.io.written` array indexing. |
+| **noColor integration test suite** | bijou | Render each interactive form component in noColor mode and assert zero ANSI escapes in output. Matrix: component x mode x noColor. |
 
 ### Phase 7: Theme access pattern (DIP)
 
@@ -517,6 +518,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
 | ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
 | ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
+| **`styledFnGuarded()` helper** | bijou | noColor-safe styling helper that returns plain text when `noColor` is true. Eliminates per-callsite `noColor ? text : styledFn(token, text)` guards in form components. |
+| **Lint rule for raw ANSI escapes** | bijou | ESLint/biome rule to flag raw `\x1b[` usage outside of StylePort adapters, preventing unguarded ANSI leaks. |
 
 ### P3 — Nice to have
 
