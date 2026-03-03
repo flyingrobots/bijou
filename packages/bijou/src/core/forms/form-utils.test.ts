@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, expectHiddenCursor, expectShownCursor } from '../../adapters/test/index.js';
 import {
   formatFormTitle,
   writeValidationError,
@@ -96,14 +96,14 @@ describe('terminalRenderer', () => {
     const ctx = createTestContext();
     const term = terminalRenderer(ctx);
     term.hideCursor();
-    expect(allWritten(ctx)).toContain('\x1b[?25l');
+    expectHiddenCursor(allWritten(ctx));
   });
 
   it('showCursor writes show sequence', () => {
     const ctx = createTestContext();
     const term = terminalRenderer(ctx);
     term.showCursor();
-    expect(allWritten(ctx)).toContain('\x1b[?25h');
+    expectShownCursor(allWritten(ctx));
   });
 
   it('writeLine writes clear-line + text + newline', () => {
