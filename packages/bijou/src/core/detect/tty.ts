@@ -75,8 +75,8 @@ export function detectColorScheme(runtime?: RuntimePort): ColorScheme {
   if (raw === undefined) return 'dark';
 
   const parts = raw.split(';');
-  const last = parts[parts.length - 1];
-  if (last === undefined) return 'dark';
+  // split() always returns >= 1 element, so last is never undefined
+  const last = parts[parts.length - 1]!;
 
   const bg = parseInt(last, 10);
   if (isNaN(bg)) return 'dark';

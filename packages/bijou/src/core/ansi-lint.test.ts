@@ -69,6 +69,7 @@ describe('ANSI lint', () => {
       // - literal ESC byte (U+001B) followed by [ or ]
       const hasAnsiEscape =
         content.includes('\\x1b[') || content.includes('\\x1b]')
+        || content.includes('\\x1B[') || content.includes('\\x1B]')
         || content.includes('\\u001b[') || content.includes('\\u001b]')
         || content.includes('\\u{1b}[') || content.includes('\\u{1b}]')
         || content.includes('\x1b[') || content.includes('\x1b]');

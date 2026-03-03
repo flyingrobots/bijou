@@ -34,7 +34,7 @@ export async function confirm(options: ConfirmOptions): Promise<boolean> {
   } else if (mode === 'pipe' || noColor) {
     prompt = mode === 'pipe'
       ? `${options.title} ${hint}? `
-      : `${options.title} [${hint}] `;
+      : `${formatFormTitle(options.title, ctx)} [${hint}] `;
   } else {
     prompt = formatFormTitle(options.title, ctx)
       + ctx.style.styled(ctx.theme.theme.semantic.muted, ` [${hint}]`) + ' ';

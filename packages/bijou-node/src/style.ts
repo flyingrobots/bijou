@@ -73,6 +73,9 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
       if (isNoColor) return text;
       const base: ChalkInstance = instance.hex(token.hex);
       let result = applyModifiers(base, token.modifiers)(text);
+      // Note: bg is applied unconditionally when noColor is false.
+      // Callers (e.g. makeBgFill, box, flex) are responsible for
+      // stripping token.bg in pipe/accessible/noColor modes.
       if (token.bg) {
         result = instance.bgHex(token.bg)(result);
       }

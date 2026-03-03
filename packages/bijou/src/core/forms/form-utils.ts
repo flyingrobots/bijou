@@ -103,9 +103,11 @@ export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
       ctx.io.write(`\r\x1b[K${text}\n`);
     },
     moveUp(lines: number) {
+      if (lines <= 0) return;
       ctx.io.write(`\x1b[${lines}A`);
     },
     clearBlock(lineCount: number) {
+      if (lineCount <= 0) return;
       for (let i = 0; i < lineCount; i++) ctx.io.write('\x1b[K\n');
       ctx.io.write(`\x1b[${lineCount}A`);
     },
@@ -147,7 +149,7 @@ export function createBoldFn(ctx: BijouContext): (text: string) => string {
  *
  * @param ctx - Resolved bijou context.
  * @param interactive - Handler for interactive TTY mode.
- * @param fallback - Handler for non-interactive / pipe / accessible modes.
+ * @param fallback - Handler for non-interactive / pipe / static / accessible modes.
  * @returns The result from whichever handler was selected.
  */
 export function formDispatch<T>(
