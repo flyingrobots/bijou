@@ -1,5 +1,11 @@
 /**
- * ANSI lint test — scans source files for raw `\x1b[` / `\x1b]` escapes.
+ * ANSI lint test — scans source files for raw ANSI escape sequences.
+ *
+ * Detected forms (case-insensitive where hex digits are involved):
+ * - Hex: `\x1b[` / `\x1b]` (and uppercase `\x1B`)
+ * - Unicode: `\u001b[` / `\u001b]` (and uppercase `\u001B`)
+ * - Braced: `\u{1b}[` / `\u{1b}]` (and uppercase `\u{1B}`)
+ * - Literal ESC byte (U+001B) followed by `[` or `]`
  *
  * Raw ANSI escapes should only appear in files that legitimately need
  * terminal control, key matching, or ANSI parsing. All other styling
@@ -63,15 +69,13 @@ describe('ANSI lint', () => {
       if (ALLOWED.has(rel)) continue;
 
       const content = readFileSync(file, 'utf-8');
-      // Match common ANSI escape encodings in source:
-      // - hex form:     \x1b[ / \x1b]
-      // - unicode form: \u001b[ / \u001b] / \u{1b}[ / \u{1b}]
-      // - literal ESC byte (U+001B) followed by [ or ]
+      // Case-insensitive match for ANSI escape encodings in source:
+      // - hex:     \x1b[ / \x1B] etc.
+      // - unicode: \u001b[ / \u001B] etc.
+      // - braced:  \u{1b}[ / \u{1B}] etc.
+      // - literal: ESC byte (U+001B) followed by [ or ]
       const hasAnsiEscape =
-        content.includes('\\x1b[') || content.includes('\\x1b]')
-        || content.includes('\\x1B[') || content.includes('\\x1B]')
-        || content.includes('\\u001b[') || content.includes('\\u001b]')
-        || content.includes('\\u{1b}[') || content.includes('\\u{1b}]')
+        /(\\x1b|\\u001b|\\u\{1b\})[\[\]]/i.test(content)
         || content.includes('\x1b[') || content.includes('\x1b]');
       if (hasAnsiEscape) {
         violations.push(rel);

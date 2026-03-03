@@ -365,6 +365,19 @@ describe('toast', () => {
     expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
   });
 
+  it('bgToken with noColor is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const noColorResult = toast({
+      message: 'NoBg',
+      screenWidth: 80,
+      screenHeight: 24,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    const plain = toast({ message: 'NoBg', screenWidth: 80, screenHeight: 24 });
+    expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
+  });
+
   it('composites correctly with a background', () => {
     const bg = Array.from({ length: 24 }, () => '.'.repeat(80)).join('\n');
     const t = toast({ message: 'saved', variant: 'success', screenWidth: 80, screenHeight: 24 });
@@ -669,6 +682,13 @@ describe('tooltip', () => {
     const plain = tooltip({ ...base, row: 10, col: 40 });
     const withToken = tooltip({ ...base, row: 10, col: 40, bgToken: { hex: '#ffffff', bg: '#003366' } });
     expect(stripAnsi(withToken.content)).toBe(stripAnsi(plain.content));
+  });
+
+  it('bgToken with noColor is no-op', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const noColorResult = tooltip({ ...base, row: 10, col: 40, bgToken: { hex: '#ffffff', bg: '#003366' }, ctx });
+    const plain = tooltip({ ...base, row: 10, col: 40 });
+    expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
   });
 
   it('clips content to screen width', () => {
