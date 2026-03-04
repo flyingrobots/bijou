@@ -1,9 +1,11 @@
 /**
- * Interactive filter select UI with real-time search.
+ * Interactive filter select UI with real-time search and vim-style modes.
  *
- * Renders a keyboard-navigable filterable list using raw terminal input.
- * Typing narrows visible options, arrow keys navigate, Enter confirms,
- * Ctrl+C or Escape cancels.
+ * Starts in **normal mode** where `j`/`k` navigate and any printable character
+ * (except `j`/`k`) switches to insert mode and types the character. Press `/`
+ * to enter insert mode without typing. In **insert mode**, all keys are
+ * printable (including `j`/`k`), arrow keys navigate, and Escape returns to
+ * normal mode. Ctrl+C cancels from either mode; Escape in normal mode cancels.
  */
 
 import type { FieldOptions } from './types.js';
@@ -61,10 +63,13 @@ export function defaultMatch<T>(query: string, option: FilterOption<T>): boolean
 }
 
 /**
- * Render a keyboard-navigable filter select using raw terminal input.
+ * Render a keyboard-navigable filter select with vim-style normal/insert modes.
  *
- * Typing narrows the visible options in real time. Arrow keys navigate,
- * Enter confirms, Backspace edits the query, Ctrl+C or Escape cancels.
+ * Starts in normal mode: `j`/`k` navigate, `/` enters insert mode, any other
+ * printable enters insert mode and types the character. In insert mode, all keys
+ * are printable, arrow keys navigate, Escape returns to normal mode. Enter
+ * confirms from either mode, Ctrl+C cancels from either mode, Escape in normal
+ * mode cancels.
  *
  * @param options - Filter field configuration.
  * @param ctx - Bijou context.
@@ -79,6 +84,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   const maxVisible = options.maxVisible ?? 7;
   const term = terminalRenderer(ctx);
 
+  let mode: 'normal' | 'insert' = 'normal';
   let query = '';
   let cursor = 0;
   let filtered = [...options.options];
@@ -105,9 +111,10 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     term.hideCursor();
     term.writeLine(label);
 
-    // Filter input
+    // Filter input with mode indicator (: normal, / insert)
+    const indicator = mode === 'insert' ? '/' : ':';
     const filterDisplay = query || (options.placeholder ? styledFn(t.theme.semantic.muted, options.placeholder) : '');
-    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, '/')} ${filterDisplay}\n`);
+    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, indicator)} ${filterDisplay}\n`);
 
     // Visible items
     const vis = visibleItems();
@@ -151,49 +158,108 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
   render();
 
+  function navigateUp(): void {
+    if (filtered.length === 0) return;
+    const prevLineCount = renderLineCount();
+    cursor = (cursor - 1 + filtered.length) % filtered.length;
+    clearRender(prevLineCount);
+    render();
+  }
+
+  function navigateDown(): void {
+    if (filtered.length === 0) return;
+    const prevLineCount = renderLineCount();
+    cursor = (cursor + 1) % filtered.length;
+    clearRender(prevLineCount);
+    render();
+  }
+
+  function typeChar(ch: string): void {
+    const prevLineCount = renderLineCount();
+    query += ch;
+    applyFilter();
+    clearAndRerender(prevLineCount);
+  }
+
+  function switchMode(newMode: 'normal' | 'insert'): void {
+    mode = newMode;
+    const prevLineCount = renderLineCount();
+    clearRender(prevLineCount);
+    render();
+  }
+
   return new Promise<T>((resolve) => {
     const handle = ctx.io.rawInput((key: string) => {
+      // ── Mode-independent ───────────────────────────────────
       if (key === '\r' || key === '\n') {
-        // Enter — select
         handle.dispose();
         cleanup();
         resolve(filtered[cursor]?.value ?? options.defaultValue ?? options.options[0]!.value);
         return;
       }
 
-      if (key === '\x03' || key === '\x1b') {
-        // Ctrl+C or Escape — cancel
-        // Note: bare \x1b may false-trigger on slow connections where escape
-        // sequences arrive as separate bytes. Timer-based disambiguation is a
-        // separate future improvement.
+      if (key === '\x03') {
+        // Ctrl+C — cancel from either mode
         handle.dispose();
         cleanup();
         resolve(options.defaultValue ?? options.options[0]!.value);
         return;
       }
 
-      if (key === '\x1b[A' || key === 'k') {
-        // Up
-        if (filtered.length === 0) return;
-        const prevLineCount = renderLineCount();
-        cursor = (cursor - 1 + filtered.length) % filtered.length;
-        clearRender(prevLineCount);
-        render();
+      // ── Normal mode ────────────────────────────────────────
+      if (mode === 'normal') {
+        if (key === '\x1b') {
+          // Escape in normal mode — cancel
+          handle.dispose();
+          cleanup();
+          resolve(options.defaultValue ?? options.options[0]!.value);
+          return;
+        }
+
+        if (key === 'j' || key === '\x1b[B') {
+          navigateDown();
+          return;
+        }
+
+        if (key === 'k' || key === '\x1b[A') {
+          navigateUp();
+          return;
+        }
+
+        if (key === '/') {
+          // Enter insert mode without typing
+          switchMode('insert');
+          return;
+        }
+
+        // Any other printable — enter insert mode and type the char
+        if (key.length === 1 && key >= ' ') {
+          mode = 'insert';
+          typeChar(key);
+          return;
+        }
+
+        return;
+      }
+
+      // ── Insert mode ────────────────────────────────────────
+      if (key === '\x1b') {
+        // Escape in insert mode — return to normal
+        switchMode('normal');
+        return;
+      }
+
+      if (key === '\x1b[A') {
+        navigateUp();
         return;
       }
 
       if (key === '\x1b[B') {
-        // Down arrow
-        if (filtered.length === 0) return;
-        const prevLineCount = renderLineCount();
-        cursor = (cursor + 1) % filtered.length;
-        clearRender(prevLineCount);
-        render();
+        navigateDown();
         return;
       }
 
       if (key === '\x7f' || key === '\b') {
-        // Backspace
         if (query.length > 0) {
           const prevLineCount = renderLineCount();
           query = query.slice(0, -1);
@@ -203,12 +269,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
         return;
       }
 
-      // Printable character (filter input)
+      // Printable character (all printable keys including j/k)
       if (key.length === 1 && key >= ' ') {
-        const prevLineCount = renderLineCount();
-        query += key;
-        applyFilter();
-        clearAndRerender(prevLineCount);
+        typeChar(key);
       }
     });
   });
