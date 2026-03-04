@@ -56,6 +56,12 @@ export function renderBlocks(
       }
 
       case 'paragraph': {
+        // Known limitation: wordWrap runs on raw markdown source before
+        // parseInline, so invisible markers like **bold** and [link](url)
+        // consume wrap width. This can cause premature line breaks when
+        // markdown-heavy text is near the wrap boundary. Fixing this
+        // requires strip-for-measurement then wrap-raw then parse-after,
+        // which is complex due to cross-word-boundary formatting spans.
         const wrapped = wordWrap(block.text, width);
         lines.push(...wrapped.map(line => parseInline(line, ctx, mode)));
         lines.push('');
