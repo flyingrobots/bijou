@@ -512,6 +512,7 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 - Arrowhead placement
 
 ### Phase 3: Renderer — Shader-based cellAt (~460 LoC)
+
 - Node box rendering (label + badge + border) into `PlacedNode[]` with pre-segmented graphemes
 - Spatial node index (`Map<row, PlacedNode[]>`) for O(1) amortized node lookup
 - Highlight cell set (`Set<number>` using `encodeArrowPos`) for O(1) edge highlight lookup

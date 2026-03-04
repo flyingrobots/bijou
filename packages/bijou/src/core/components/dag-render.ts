@@ -480,12 +480,13 @@ export function renderPipe(nodes: DagNode[]): string {
 export function renderAccessible(nodes: DagNode[], layerMap: Map<string, number>): string {
   if (nodes.length === 0) return 'Graph: 0 nodes, 0 edges';
 
-  const totalEdges = nodes.reduce((s, n) => s + (n.edges?.length ?? 0), 0);
-  const lines: string[] = [`Graph: ${nodes.length} nodes, ${totalEdges} edges`, ''];
-
   const layers = buildLayerArrays(nodes, layerMap);
   const nodeMap = new Map<string, DagNode>();
   for (const n of nodes) nodeMap.set(n.id, n);
+
+  // Count only edges whose target exists in the graph (matching rendered output)
+  const totalEdges = nodes.reduce((s, n) => s + (n.edges ?? []).filter(e => nodeMap.has(e)).length, 0);
+  const lines: string[] = [`Graph: ${nodes.length} nodes, ${totalEdges} edges`, ''];
 
   for (let l = 0; l < layers.length; l++) {
     lines.push(`Layer ${l + 1}:`);

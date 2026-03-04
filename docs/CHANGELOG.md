@@ -22,6 +22,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **DAG `cellAt()` CJK column mapping** — CJK/wide characters occupy 2 terminal columns but 1 grapheme slot, causing garbled rendering when `cellAt()` indexed directly by column offset. Now builds a column-to-grapheme mapping via `expandToColumns()` during `PlacedNode` construction.
 - **Numbered list continuation indent misalignment** — continuation lines of wrapped numbered list items used per-item prefix width, causing misalignment between items 1–9 and 10+. Now calculates max prefix width across all items and uses it uniformly.
 - **DAG `Math.max(...spread)` overflow** — `Math.max(...nodes.map(...))` in `renderInteractiveLayout()` could throw `RangeError` for arrays > ~65K elements. Replaced with `reduce()` loop.
+- **DAG accessible edge count mismatch** — `renderAccessible()` header counted all declared edges but rendered only edges with existing targets, causing the "Graph: N nodes, M edges" summary to disagree with the body. Now counts only valid edges.
+- **`textarea()` cleanup summary ignores defaultValue** — submitting an empty textarea with Ctrl+D showed "(cancelled)" in the summary line instead of the resolved `defaultValue`. Refactored `cleanup()` to accept the resolved value and cancelled flag.
+- **`textarea()` maxLength=0 ignored** — truthy checks (`options.maxLength && ...`) treated `0` as unset, allowing unlimited input. Changed to nullish checks (`options.maxLength != null`).
 
 ### ♻️ Refactors
 

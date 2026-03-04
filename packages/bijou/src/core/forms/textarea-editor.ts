@@ -88,7 +88,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
     // Status line
     const pos = `Ln ${cursorRow + 1}, Col ${cursorCol + 1}`;
-    const lenInfo = options.maxLength ? ` | ${totalLength}/${options.maxLength}` : '';
+    const lenInfo = options.maxLength != null ? ` | ${totalLength}/${options.maxLength}` : '';
     ctx.io.write(`\x1b[K${styledFn(t.theme.semantic.muted, pos + lenInfo)}\n`);
   }
 
@@ -97,15 +97,16 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     term.moveUp(totalLines);
   }
 
-  function cleanup(submitted: boolean): void {
+  function cleanup(value: string, cancelled: boolean): void {
     clearRender();
     const totalLines = height + 2;
     term.clearBlock(totalLines);
 
-    const value = submitted ? lines.join('\n') : '';
-    const summary = value
-      ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
-      : '(cancelled)';
+    const summary = cancelled
+      ? '(cancelled)'
+      : (value
+        ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
+        : '(empty)');
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, summary);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
@@ -119,9 +120,10 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       if (key === '\x04') {
         // Ctrl+D — submit
         handle.dispose();
-        cleanup(true);
         const text = lines.join('\n');
-        resolve(text || (options.defaultValue ?? ''));
+        const value = text || (options.defaultValue ?? '');
+        cleanup(value, false);
+        resolve(value);
         return;
       }
 
@@ -131,14 +133,15 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.
         handle.dispose();
-        cleanup(false);
-        resolve(options.defaultValue ?? '');
+        const value = options.defaultValue ?? '';
+        cleanup(value, true);
+        resolve(value);
         return;
       }
 
       if (key === '\r' || key === '\n') {
         // Enter — newline (counts as 1 character for maxLength)
-        if (options.maxLength && totalLength >= options.maxLength) return;
+        if (options.maxLength != null && totalLength >= options.maxLength) return;
         const currentLine = lines[cursorRow]!;
         const before = currentLine.slice(0, cursorCol);
         const after = currentLine.slice(cursorCol);
@@ -224,7 +227,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       // Printable character
       if (key.length === 1 && key >= ' ') {
-        if (options.maxLength && totalLength >= options.maxLength) return;
+        if (options.maxLength != null && totalLength >= options.maxLength) return;
         const line = lines[cursorRow]!;
         lines[cursorRow] = line.slice(0, cursorCol) + key + line.slice(cursorCol);
         cursorCol++;

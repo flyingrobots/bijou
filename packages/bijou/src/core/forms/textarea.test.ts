@@ -114,6 +114,9 @@ describe('textarea()', () => {
       });
       const result = await textarea({ title: 'Msg', defaultValue: 'fallback', ctx });
       expect(result).toBe('fallback');
+      const output = ctx.io.written.join('');
+      expect(output).toContain('fallback');
+      expect(output).not.toContain('(cancelled)');
     });
 
     it('Backspace deletes character', async () => {

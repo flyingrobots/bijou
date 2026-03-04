@@ -227,6 +227,18 @@ describe('dag', () => {
       const ctx = createTestContext({ mode: 'accessible' });
       expect(dag([], { ctx })).toBe('');
     });
+
+    it('edge count excludes dangling edges in summary', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'A', edges: ['b', 'ghost'] },
+        { id: 'b', label: 'B' },
+      ];
+      const result = dag(nodes, { ctx });
+      // 'ghost' is not in the graph, so only 1 edge (a→b) should be counted
+      expect(result).toContain('Graph: 2 nodes, 1 edges');
+      expect(result).not.toContain('2 edges');
+    });
   });
 
   // ── Layout Tests ────────────────────────────────────────────────
