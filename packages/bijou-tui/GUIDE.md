@@ -644,7 +644,7 @@ const inspector = drawer({
 - help toggle (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay hook with pane rect introspection
 
-See `examples/app-frame/main.ts` for a complete shell implementation.
+See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.
 
 ## Focus Area
 

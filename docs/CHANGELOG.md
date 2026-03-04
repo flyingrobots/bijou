@@ -25,8 +25,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - Add new examples: `split-pane`, `grid-layout`, and `app-frame`.
+- Add canonical app-shell demo entry points: `demo-tui.ts` and `examples/release-workbench/main.ts`.
 - Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
-- Update examples index to include the new app-shell demos.
+- Update root README and examples index for the canonical release workbench demo.
 
 ## [1.2.0] — 2026-03-04
 

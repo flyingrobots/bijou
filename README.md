@@ -132,14 +132,14 @@ npm install
 # Component showcase
 npx tsx demo.ts
 
-# Full-screen runtime showcase
+# Canonical app-shell showcase
 npx tsx demo-tui.ts
 
 # Run any individual example
 npx tsx examples/<name>/main.ts
 ```
 
-There are 60+ curated examples in [`examples/`](./examples/) with per-example READMEs and demo tapes.
+There are 67 curated examples in [`examples/`](./examples/) with per-example READMEs and demo tapes.
 
 ## Local Development
 
@@ -163,13 +163,13 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## Latest Release Highlights (v1.2.0, March 4, 2026)
+## Current Focus (v1.3.0 in progress, March 4, 2026)
 
-- Vim-style normal/insert mode interaction for `filter()`.
-- Large component refactors (`dag`, `markdown`, `textarea`, `filter`) into smaller focused modules.
-- Broad bug-fix sweep across forms, markdown rendering, and DAG layout/edge handling.
+- App-shell foundations in `@flyingrobots/bijou-tui`: `splitPane()`, `grid()`, `createFramedApp()`, drawer region scoping, and driver script upgrades.
+- New canonical runtime demo: `demo-tui.ts` now runs a multi-view control-room app built on `createFramedApp()` with pane-scoped drawers and command palette.
+- Forms upgrade in `@flyingrobots/bijou`: `select()` now supports `maxVisible` with interactive viewport scrolling.
 
-Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#120--2026-03-04)
+Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#unreleased)
 
 ## License
 

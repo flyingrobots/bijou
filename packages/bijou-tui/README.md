@@ -4,11 +4,13 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.6.0?
+## What's New (v1.3.0 Snapshot)?
 
-- **`navigableTable()`** — keyboard-navigable table with focus management, vertical scrolling, and vim-style keybindings
-- **`browsableList()`** — navigable list with focus tracking, scroll viewport, descriptions, and convenience keymap
-- **`filePicker()`** — directory browser with focus navigation, extension filtering, and `IOPort` integration
+- **`splitPane()`** — ratio-based split layout with pure reducers and deterministic rect introspection.
+- **`grid()`** — fixed + fractional track solver with named areas and stable layout geometry.
+- **`createFramedApp()`** — shell scaffolding for tabs, pane focus/scroll isolation, help, overlays, and command palette.
+- **`drawer()` upgrades** — supports `left`/`right`/`top`/`bottom` anchors and optional panel `region` mounting.
+- **`runScript()` upgrades** — scripted driver now supports key, resize, and custom-message steps for richer integration harnesses.
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
@@ -354,7 +356,7 @@ Each overlay is a `{ content, row, col }` object. `composite()` splices them ont
 - frame help (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay factory with pane rects for panel-scoped drawers/modals
 
-See `examples/app-frame/main.ts` for a working shell demo.
+See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 
 ## Building Blocks
 
