@@ -160,7 +160,7 @@ describe('markdown()', () => {
 
     it('renders hr with asterisks', () => {
       const result = markdown('***', { ctx: ctx() });
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toContain('\u2500');
     });
 
     it('renders hr in pipe mode', () => {
@@ -296,7 +296,7 @@ describe('markdown()', () => {
 
   describe('static mode', () => {
     it('renders styled output same as interactive (not plain like pipe)', () => {
-      const c = createTestContext({ mode: 'static' as 'interactive', runtime: { columns: 80 } });
+      const c = createTestContext({ mode: 'static', runtime: { columns: 80 } });
       const result = markdown('**bold** and *italic*', { ctx: c });
       // Static mode applies styled() calls (same path as interactive)
       expect(result).toContain('bold');

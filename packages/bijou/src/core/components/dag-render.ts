@@ -412,7 +412,7 @@ export function renderInteractiveLayout(
 
       // TokenValue is a plain object — reference equality works here because
       // the same token instance is reused for all cells of the same type.
-      if (tk === prevToken || (tk === null && prevToken === null)) {
+      if (tk === prevToken) {
         run += ch;
       } else {
         if (run) {

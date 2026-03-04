@@ -163,8 +163,7 @@ export function dagLayout(
   const ctx = resolveCtx(options.ctx);
   const nodes = isSlicedDagSource(input) ? materialize(input) : input;
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
-  const result = renderInteractiveLayout(nodes, options, ctx);
-  return { output: result.output, nodes: result.nodes, width: result.width, height: result.height };
+  return renderInteractiveLayout(nodes, options, ctx);
 }
 
 // ── Main Entry Point ───────────────────────────────────────────────

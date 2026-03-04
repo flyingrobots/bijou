@@ -222,12 +222,12 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
  */
 function parseInlineStripped(
   text: string,
-  linkReplacer: string | ((...args: string[]) => string),
+  linkReplacer: string,
 ): string {
   let result = text;
 
   // Links
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, linkReplacer as string);
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, linkReplacer);
 
   // Code: extract and replace with placeholders to isolate from bold/italic
   const codeSpans: string[] = [];

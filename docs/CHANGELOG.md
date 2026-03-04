@@ -27,6 +27,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`textarea()` maxLength=0 ignored** — truthy checks (`options.maxLength && ...`) treated `0` as unset, allowing unlimited input. Changed to nullish checks (`options.maxLength != null`).
 - **DAG duplicate node ID misdiagnosed as cycle** — `assignLayers()` reported "cycle detected" when given duplicate node IDs. Now validates uniqueness before topological sort with a clear "duplicate node id" error message.
 - **`junctionChar()` empty set returned `┼`** — an empty direction set (no edge traffic) now returns `' '` (space) instead of a four-way junction character.
+- **Unnecessary type casts and redundant code** — remove `as 'interactive'` cast in static-mode test, narrow `linkReplacer` param type to `string` (removing `as string` cast), remove redundant null-equality clause in DAG token run-length encoding, return `renderInteractiveLayout()` result directly instead of destructuring into a new object.
+- **`filter()` cursor flicker** — move `hideCursor()` from `render()` (called on every repaint) to one-time setup before the event loop.
+- **Asterisk HR assertion** — strengthen `***` horizontal rule test to assert box-drawing character instead of non-empty output.
 
 ### ♻️ Refactors
 

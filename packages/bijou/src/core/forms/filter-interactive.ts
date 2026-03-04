@@ -122,7 +122,6 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
-    term.hideCursor();
     term.writeLine(label);
 
     // Filter input with mode indicator (: normal, / insert)
@@ -170,6 +169,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     term.showCursor();
   }
 
+  term.hideCursor();
   render();
 
   // navigateUp/navigateDown use clearRender + render instead of clearAndRerender
