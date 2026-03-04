@@ -26,6 +26,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📝 Documentation
 
 - **GUIDE.md** — add missing `focusAreaSetContent` to Focus Area import example
+- **2 new examples** — `focus-area` (scrollable pane with focus gutter), `dag-pane` (interactive DAG viewer with node navigation)
 
 ## [1.0.0] — 2026-03-03
 
