@@ -105,10 +105,16 @@ const GUTTER_CHAR = '▎';
  * @returns Fresh focus area state with scroll at the top-left.
  */
 export function createFocusAreaState(options: FocusAreaOptions): FocusAreaState {
-  const { content, width, height, overflowX = 'hidden' } = options;
-  // Gutter consumes 1 column
+  const { content, overflowX = 'hidden' } = options;
+  // Clamp dimensions to at least 1
+  const width = Math.max(1, options.width);
+  const height = Math.max(1, options.height);
+  // Gutter consumes 1 column; scrollbar consumes 1 more when visible
   const contentWidth = Math.max(1, width - 1);
-  const viewportWidth = overflowX === 'scroll' ? contentWidth : undefined;
+  const totalLines = content.split('\n').length;
+  const hasScrollbar = totalLines > height;
+  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
+  const viewportWidth = overflowX === 'scroll' ? scrollableWidth : undefined;
   return {
     content,
     scroll: createScrollState(content, height, viewportWidth),
@@ -219,7 +225,10 @@ export function focusAreaScrollToX(state: FocusAreaState, x: number): FocusAreaS
  */
 export function focusAreaSetContent(state: FocusAreaState, content: string): FocusAreaState {
   const contentWidth = Math.max(1, state.width - 1);
-  const viewportWidth = state.overflowX === 'scroll' ? contentWidth : undefined;
+  const totalLines = content.split('\n').length;
+  const hasScrollbar = totalLines > state.height;
+  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
+  const viewportWidth = state.overflowX === 'scroll' ? scrollableWidth : undefined;
   const newScroll = createScrollState(content, state.height, viewportWidth);
   const clampedY = Math.min(state.scroll.y, newScroll.maxY);
   const clampedX = Math.min(state.scroll.x, newScroll.maxX);
@@ -257,12 +266,20 @@ export function focusArea(state: FocusAreaState, options?: FocusAreaRenderOption
   const hasGutter = mode !== 'pipe' && mode !== 'accessible';
   const contentWidth = hasGutter ? Math.max(1, state.width - 1) : state.width;
 
+  // Clamp scrollX to render-time content width (may differ from state-time
+  // width when pipe/accessible mode removes the gutter)
+  let scrollX: number | undefined;
+  if (state.overflowX === 'scroll') {
+    const maxRenderX = Math.max(0, state.scroll.maxX + (contentWidth < state.width ? 0 : 1));
+    scrollX = Math.min(state.scroll.x, maxRenderX);
+  }
+
   const body = viewport({
     width: contentWidth,
     height: state.height,
     content: state.content,
     scrollY: state.scroll.y,
-    scrollX: state.overflowX === 'scroll' ? state.scroll.x : undefined,
+    scrollX,
     showScrollbar,
   });
 

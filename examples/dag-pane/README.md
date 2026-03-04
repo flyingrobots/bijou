@@ -87,8 +87,8 @@ const app: App<Model, Msg> = {
     return [{
       pane: createDagPaneState({
         source: nodes,
-        width: cols,
-        height: rows - 3,
+        width: Math.max(1, cols),
+        height: Math.max(1, rows - 3),
         ctx,
       }),
       cols,
@@ -102,8 +102,8 @@ const app: App<Model, Msg> = {
         ...model,
         pane: createDagPaneState({
           source: nodes,
-          width: msg.columns,
-          height: msg.rows - 3,
+          width: Math.max(1, msg.columns),
+          height: Math.max(1, msg.rows - 3),
           selectedId: model.pane.selectedId,
           ctx,
         }),

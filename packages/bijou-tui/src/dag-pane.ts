@@ -317,6 +317,8 @@ function renderLayout(
     highlightPath: highlightPath.length > 0 ? [...highlightPath] : undefined,
     ctx,
   };
+  // Type narrowing required — dagLayout has separate overloads for
+  // DagNode[] and SlicedDagSource; a union won't resolve either overload.
   return isSlicedDagSource(source)
     ? dagLayout(source, opts)
     : dagLayout(source, opts);
@@ -371,8 +373,12 @@ export function createDagPaneState(options: DagPaneOptions): DagPaneState {
   } = options;
 
   const adjacency = buildAdjacency(source);
-  const highlightPath = computeHighlightPath(selectedId, adjacency);
-  const layout = renderLayout(source, selectedId, highlightPath, dagOptions, ctx);
+
+  // Validate selectedId — fall back to no selection if not in the source
+  const validatedId = selectedId !== undefined && adjacency.children.has(selectedId) ? selectedId : undefined;
+
+  const highlightPath = computeHighlightPath(validatedId, adjacency);
+  const layout = renderLayout(source, validatedId, highlightPath, dagOptions, ctx);
 
   const fa = createFocusAreaState({
     content: layout.output,
@@ -383,8 +389,8 @@ export function createDagPaneState(options: DagPaneOptions): DagPaneState {
 
   // Auto-scroll to initial selection
   let finalFa = fa;
-  if (selectedId) {
-    const nodePos = layout.nodes.get(selectedId);
+  if (validatedId) {
+    const nodePos = layout.nodes.get(validatedId);
     if (nodePos) {
       finalFa = scrollToNode(fa, nodePos);
     }
@@ -392,7 +398,7 @@ export function createDagPaneState(options: DagPaneOptions): DagPaneState {
 
   return {
     source,
-    selectedId,
+    selectedId: validatedId,
     layout,
     highlightPath,
     focusArea: finalFa,
@@ -690,7 +696,7 @@ export function dagPaneKeyMap<Msg>(actions: {
       .bind('g', 'Top', actions.top)
       .bind('shift+g', 'Bottom', actions.bottom),
     )
-    .bind('return', 'Confirm', actions.confirm)
+    .bind('enter', 'Confirm', actions.confirm)
     .bind('q', 'Quit', actions.quit)
     .bind('ctrl+c', 'Quit', actions.quit);
 }

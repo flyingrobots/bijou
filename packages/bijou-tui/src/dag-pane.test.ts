@@ -349,12 +349,11 @@ describe('auto-scroll to selection', () => {
     const next = dagPaneSelectNode(state, 'C', ctx);
     // The node C is in the last layer, which starts well below row 0
     const nodePos = next.layout.nodes.get('C');
-    if (nodePos) {
-      // Scroll should have adjusted so the node is within the viewport
-      const scrollY = next.focusArea.scroll.y;
-      expect(scrollY).toBeLessThanOrEqual(nodePos.row);
-      expect(scrollY + next.focusArea.height).toBeGreaterThanOrEqual(nodePos.row);
-    }
+    expect(nodePos).toBeDefined();
+    // Scroll should have adjusted so the node is within the viewport
+    const scrollY = next.focusArea.scroll.y;
+    expect(scrollY).toBeLessThanOrEqual(nodePos!.row);
+    expect(scrollY + next.focusArea.height).toBeGreaterThanOrEqual(nodePos!.row);
   });
 });
 
@@ -408,7 +407,7 @@ describe('dagPaneKeyMap', () => {
   });
 
   it('handles enter for confirm', () => {
-    expect(km.handle(keyMsg('return'))).toEqual({ type: 'ok' });
+    expect(km.handle(keyMsg('enter'))).toEqual({ type: 'ok' });
   });
 
   it('handles quit', () => {

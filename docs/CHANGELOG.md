@@ -21,12 +21,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`DagPaneRenderOptions`** — replace empty interface with type alias
 - **Merge duplicate imports** — consolidate split `import type` lines in `focus-area.ts` and `dag-pane.ts`
-- **Remove dead code** — remove unused `toggle-focus` Msg variant and unreachable `case 'quit'` from focus-area example
+- **Remove dead code** — remove unused `toggle-focus` Msg variant and unreachable `case 'quit'` switch arm from focus-area example
 
 ### 📝 Documentation
 
 - **GUIDE.md** — add missing `focusAreaSetContent` to Focus Area import example
 - **2 new examples** — `focus-area` (scrollable pane with focus gutter), `dag-pane` (interactive DAG viewer with node navigation)
+- **EXAMPLES.md** — add 18 missing example entries (dag-stats, enumerated-list, hyperlink, log, textarea, filter, wizard, pager, navigable-table, browsable-list, file-picker, interactive-accordion, status-bar, drawer, command-palette, tooltip, canvas, mouse) and update totals to 54/63
 
 ## [1.0.0] — 2026-03-03
 

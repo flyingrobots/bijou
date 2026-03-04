@@ -69,8 +69,8 @@ const app: App<Model, Msg> = {
     return [{
       fa: createFocusAreaState({
         content: CONTENT,
-        width: cols,
-        height: rows - 3,
+        width: Math.max(1, cols),
+        height: Math.max(1, rows - 3),
         overflowX: 'scroll',
       }),
       focused: true,
@@ -85,8 +85,8 @@ const app: App<Model, Msg> = {
         ...model,
         fa: createFocusAreaState({
           content: CONTENT,
-          width: msg.columns,
-          height: msg.rows - 3,
+          width: Math.max(1, msg.columns),
+          height: Math.max(1, msg.rows - 3),
           overflowX: 'scroll',
         }),
         cols: msg.columns,
