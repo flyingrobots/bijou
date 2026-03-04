@@ -14,6 +14,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`k` key asymmetry in `filter()`** — `k` always navigated (even when query was non-empty), preventing users from typing `k` as a search character. Now properly handled via normal/insert mode switching.
 - **`clearRender()` consistency in `filter()`** — navigation handlers now capture `renderLineCount()` before mutating state, preventing visual artifacts when the filtered list shrinks.
+- **`filter()` viewport scrolling** — the filter list viewport was locked to `slice(0, maxVisible)`, so the cursor indicator disappeared once the user navigated past the visible window. Now tracks a `scrollOffset` that slides to keep the cursor in view.
+- **Markdown code spans not isolated** — code span content (backtick-delimited) was vulnerable to subsequent bold/italic regex passes. For example, `` `a*b*c` `` in pipe mode became `abc` instead of `a*b*c`. Now uses NUL-delimited placeholders to isolate code span content.
+- **`textarea()` empty submit ignores defaultValue** — submitting an empty textarea with Ctrl+D returned `''` instead of falling back to `defaultValue` when set.
+- **`markdown()` width not validated** — negative or NaN width values flowed unchecked into `String.repeat()` in the separator renderer, causing a `RangeError`. Now clamped to a minimum of 1.
 
 ### ♻️ Refactors
 
