@@ -122,7 +122,8 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         // Ctrl+D — submit
         handle.dispose();
         cleanup(true);
-        resolve(lines.join('\n'));
+        const text = lines.join('\n');
+        resolve(text || (options.defaultValue ?? ''));
         return;
       }
 

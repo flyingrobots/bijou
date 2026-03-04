@@ -104,6 +104,15 @@ describe('textarea()', () => {
       expect(result).toBe('fallback');
     });
 
+    it('empty submit returns defaultValue when set', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x04'] },
+      });
+      const result = await textarea({ title: 'Msg', defaultValue: 'fallback', ctx });
+      expect(result).toBe('fallback');
+    });
+
     it('Backspace deletes character', async () => {
       const ctx = createTestContext({
         mode: 'interactive',
