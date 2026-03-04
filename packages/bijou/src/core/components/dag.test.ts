@@ -39,6 +39,16 @@ const withBadges: DagNode[] = [
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
 ];
 
+const largeGraph: DagNode[] = [
+  { id: 'root', label: 'Root', edges: ['a', 'b'] },
+  { id: 'a', label: 'A', edges: ['c', 'd'] },
+  { id: 'b', label: 'B', edges: ['d', 'e'] },
+  { id: 'c', label: 'C', edges: ['f'] },
+  { id: 'd', label: 'D', edges: ['f'] },
+  { id: 'e', label: 'E', edges: ['f'] },
+  { id: 'f', label: 'F' },
+];
+
 // ── Basic Tests ────────────────────────────────────────────────────
 
 describe('dag', () => {
@@ -116,6 +126,38 @@ describe('dag', () => {
     });
   });
 
+  describe('CJK wide characters', () => {
+    it('renders CJK label without corruption', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: '漢字', edges: ['b'] },
+        { id: 'b', label: 'Done' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('漢字');
+      expect(result).toContain('Done');
+    });
+
+    it('renders mixed ASCII + CJK label', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'hi漢字!' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('hi漢字!');
+    });
+
+    it('renders CJK badge correctly', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'Task', badge: '完了' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('Task');
+      expect(result).toContain('完了');
+    });
+  });
+
   // ── Mode Tests ──────────────────────────────────────────────────
 
   describe('pipe mode', () => {
@@ -184,6 +226,18 @@ describe('dag', () => {
     it('returns node count for empty', () => {
       const ctx = createTestContext({ mode: 'accessible' });
       expect(dag([], { ctx })).toBe('');
+    });
+
+    it('edge count excludes dangling edges in summary', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'A', edges: ['b', 'ghost'] },
+        { id: 'b', label: 'B' },
+      ];
+      const result = dag(nodes, { ctx });
+      // 'ghost' is not in the graph, so only 1 edge (a→b) should be counted
+      expect(result).toContain('Graph: 2 nodes, 1 edges');
+      expect(result).not.toContain('2 edges');
     });
   });
 
@@ -261,7 +315,7 @@ describe('dag', () => {
       expect(boxMatch![0].length).toBe(30);
     });
 
-    it('does not crash with highlightPath', () => {
+    it('renders with highlightPath without error', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const result = dag(diamond, {
         highlightPath: ['a', 'b', 'd'],
@@ -269,6 +323,7 @@ describe('dag', () => {
         ctx,
       });
       expect(result).toContain('Start');
+      expect(result).toContain('Left');
       expect(result).toContain('End');
     });
   });
@@ -299,13 +354,16 @@ describe('dag', () => {
 
     it('truncates labels when maxWidth is small', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30 } });
+      const longLabel = 'A very long label that should be truncated';
       const nodes: DagNode[] = [
-        { id: 'a', label: 'A very long label that should be truncated', edges: ['b'] },
+        { id: 'a', label: longLabel, edges: ['b'] },
         { id: 'b', label: 'Another very long label' },
       ];
       const result = dag(nodes, { maxWidth: 30, ctx });
-      // Should still render without error
-      expect(result).toBeDefined();
+      // Full long label should NOT appear (it was truncated)
+      expect(result).not.toContain(longLabel);
+      // Ellipsis should be present from truncation
+      expect(result).toContain('\u2026');
     });
   });
 
@@ -341,6 +399,16 @@ describe('dag', () => {
       expect(result).toContain('B');
       expect(result).not.toContain('missing');
     });
+
+    it('throws explicit error on duplicate node IDs', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const dupes: DagNode[] = [
+        { id: 'a', label: 'First A', edges: ['b'] },
+        { id: 'a', label: 'Second A', edges: ['b'] },
+        { id: 'b', label: 'B' },
+      ];
+      expect(() => dag(dupes, { ctx })).toThrow('duplicate node id "a"');
+    });
   });
 
   // ── selectedId ──────────────────────────────────────────────────
@@ -367,18 +435,18 @@ describe('dag', () => {
 
     it('non-selected nodes are unaffected', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-      const withSelected = dag(twoNodes, { selectedId: 'a', ctx });
-      const without = dag(twoNodes, { ctx });
-      // Both should contain Beta — it is not selected
-      expect(withSelected).toContain('Beta');
-      expect(without).toContain('Beta');
+      const result = dag(twoNodes, { selectedId: 'a', ctx });
+      // Both nodes should be present in output
+      expect(result).toContain('Alpha');
+      expect(result).toContain('Beta');
     });
 
     it('defaults to ui.cursor token when selectedToken omitted', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       // Should not throw — uses default cursor token
-      const result = dag(twoNodes, { selectedId: 'a', ctx });
-      expect(result).toContain('Alpha');
+      const layout = dagLayout(twoNodes, { selectedId: 'a', ctx });
+      expect(layout.output).toContain('Alpha');
+      expect(layout.nodes.has('a')).toBe(true);
     });
   });
 });
@@ -386,16 +454,6 @@ describe('dag', () => {
 // ── dagSlice Tests ─────────────────────────────────────────────────
 
 describe('dagSlice', () => {
-  const largeGraph: DagNode[] = [
-    { id: 'root', label: 'Root', edges: ['a', 'b'] },
-    { id: 'a', label: 'A', edges: ['c', 'd'] },
-    { id: 'b', label: 'B', edges: ['d', 'e'] },
-    { id: 'c', label: 'C', edges: ['f'] },
-    { id: 'd', label: 'D', edges: ['f'] },
-    { id: 'e', label: 'E', edges: ['f'] },
-    { id: 'f', label: 'F' },
-  ];
-
   it('returns empty for unknown focus', () => {
     expect(dagSlice(largeGraph, 'unknown')).toEqual([]);
   });
@@ -412,12 +470,16 @@ describe('dagSlice', () => {
     expect(ids).toContain('root');
   });
 
-  it('extracts descendants', () => {
+  it('extracts all descendants', () => {
     const result = dagSlice(largeGraph, 'root', { direction: 'descendants' });
     const ids = result.map(n => n.id);
     expect(ids).toContain('root');
     expect(ids).toContain('a');
     expect(ids).toContain('b');
+    expect(ids).toContain('c');
+    expect(ids).toContain('d');
+    expect(ids).toContain('e');
+    expect(ids).toContain('f');
   });
 
   it('extracts both directions', () => {
@@ -679,16 +741,6 @@ describe('DagSource adapter', () => {
   });
 
   describe('dagSlice() with DagSource', () => {
-    const largeGraph: DagNode[] = [
-      { id: 'root', label: 'Root', edges: ['a', 'b'] },
-      { id: 'a', label: 'A', edges: ['c', 'd'] },
-      { id: 'b', label: 'B', edges: ['d', 'e'] },
-      { id: 'c', label: 'C', edges: ['f'] },
-      { id: 'd', label: 'D', edges: ['f'] },
-      { id: 'e', label: 'E', edges: ['f'] },
-      { id: 'f', label: 'F' },
-    ];
-
     it('returns SlicedDagSource (not DagNode[])', () => {
       const src = arraySource(largeGraph);
       const result = dagSlice(src, 'd');
@@ -982,6 +1034,71 @@ describe('DagSource adapter', () => {
         }
       }
     });
+  });
+});
+
+// ── Render Output Stability ───────────────────────────────────────
+
+describe('render output stability', () => {
+  it('two-node linear graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(twoNodes, { ctx });
+    // Capture the exact output to detect regressions during refactoring.
+    // If the rendering algorithm changes, update this snapshot deliberately.
+    expect(output).toMatchSnapshot();
+  });
+
+  it('diamond graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(diamond, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('linear chain snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(linear, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('fan-out graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200 } });
+    const output = dag(fanOut, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('badges graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(withBadges, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('single node snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag([{ id: 'a', label: 'Only' }], { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('highlighted path snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(diamond, {
+      highlightPath: ['a', 'b', 'd'],
+      highlightToken: { hex: '#ff0000' },
+      ctx,
+    });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('selected node snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(twoNodes, { selectedId: 'a', ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('ghost nodes snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const sliced = dagSlice(largeGraph, 'd', { direction: 'ancestors', depth: 1 });
+    const output = dag(sliced, { ctx });
+    expect(output).toMatchSnapshot();
   });
 });
 

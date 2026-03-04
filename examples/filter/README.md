@@ -1,8 +1,26 @@
 # `filter()`
 
-Fuzzy-filter select with real-time search
+Fuzzy-filter select with vim-style normal/insert modes
 
 ![demo](demo.gif)
+
+## Keyboard
+
+| Mode | Key | Action |
+|------|-----|--------|
+| Normal | `j` / `↓` | Navigate down |
+| Normal | `k` / `↑` | Navigate up |
+| Normal | `/` | Enter insert mode |
+| Normal | any other printable | Enter insert mode + type character |
+| Normal | `Escape` | Cancel |
+| Insert | any printable | Type filter character |
+| Insert | `↑` / `↓` | Navigate |
+| Insert | `Backspace` | Delete last character |
+| Insert | `Escape` | Return to normal mode |
+| Either | `Enter` | Select current item |
+| Either | `Ctrl+C` | Cancel |
+
+The mode indicator shows `:` in normal mode and `/` in insert mode.
 
 ## Run
 
@@ -21,7 +39,7 @@ const ctx = initDefaultContext();
 async function main() {
   const language = await filter({
     title: 'Choose a programming language:',
-    placeholder: 'Type to filter...',
+    placeholder: 'j/k navigate, type or / to search',
     options: [
       { label: 'TypeScript', value: 'ts', keywords: ['javascript', 'typed', 'web'] },
       { label: 'Rust', value: 'rust', keywords: ['systems', 'memory', 'safe'] },

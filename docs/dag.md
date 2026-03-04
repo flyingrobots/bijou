@@ -288,7 +288,7 @@ function markEdge(fromCol: number, fromLayer: number, toCol: number, toLayer: nu
 
 **Why this works for junctions:** When a node has both a straight-down edge and a right-elbow edge, the exit cell accumulates `{D, U}` from the straight edge and `{R, U}` from the elbow. The union `{D, R, U}` maps to `├` — the correct junction character. This is emergent behavior, not special-cased.
 
-#### Pass 2: Render Characters
+#### Junction Character Lookup
 
 Convert accumulated direction sets to Unicode box-drawing characters:
 
@@ -307,19 +307,16 @@ function junctionChar(dirs: Set<Dir>): string {
 }
 ```
 
-#### Pass 3: Node Boxes
+#### Shader-based Serialization (cellAt)
 
-Overwrite edge characters with node box content. Each node renders as:
+Instead of pre-allocating 2D character/token grids and writing to them in multiple passes, the renderer uses an on-demand `cellAt(row, col)` function that computes each cell during serialization. Priority order (highest first):
 
-```
-╭──────────────────╮
-│ label       badge│
-╰──────────────────╯
-```
+1. **Node box** — look up spatial index by row, check column bounds, return char + token from pre-rendered `NodeBoxResult`
+2. **Arrowhead** — check `g.arrows.has(encodeArrowPos(row, col))`, return `▼` + token
+3. **Edge** — check `g.dirs[row]?.[col]`, return `junctionChar()` + token
+4. **Empty** — return `' '` + null
 
-#### Pass 4: Arrowheads
-
-Write `▼` (or `v` in ASCII mode) at each edge destination point.
+This avoids allocating O(rows × cols) grid arrays and eliminates separate write passes for edges, arrows, highlights, and nodes.
 
 ---
 
@@ -425,7 +422,7 @@ When `totalWidth > maxWidth`:
 All width calculations use **visible length** (strip ANSI escapes before measuring):
 
 ```typescript
-function visibleLength(str: string): string {
+function visibleLength(str: string): number {
   return str.replace(/\x1b\[[0-9;]*m/g, '').length;
 }
 ```
@@ -514,10 +511,13 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 - Elbow routing (vertical exit → horizontal turn → vertical entry)
 - Arrowhead placement
 
-### Phase 3: Renderer (~80 LoC)
-- Node box rendering (label + badge + border)
-- Grid-to-string serialization
-- ANSI color application (via `StylePort`)
+### Phase 3: Renderer — Shader-based cellAt (~460 LoC)
+
+- Node box rendering (label + badge + border) into `PlacedNode[]` with pre-segmented graphemes
+- Spatial node index (`Map<row, PlacedNode[]>`) for O(1) amortized node lookup
+- Highlight cell set (`Set<number>` using `encodeArrowPos`) for O(1) edge highlight lookup
+- On-demand `cellAt(row, col)` query during serialization (priority: node box > arrowhead > edge > empty)
+- Run-length grouping serializer: consecutive same-token characters grouped into single `styled()` calls
 - Three output mode paths (interactive / pipe / accessible)
 - ASCII fallback junction table
 
@@ -531,7 +531,7 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 - Terminal width overflow → label truncation → gap reduction → vertical fallback
 - `visibleLength()` for ANSI-safe width math
 
-### Total: ~420 LoC + tests
+### Total: ~1014 LoC + tests
 
 Tests follow bijou's `createTestContext()` pattern — one test per output mode, edge cases (empty, single node, diamond, wide fan-out, skip edges spanning multiple layers, cycles rejected with error).
 

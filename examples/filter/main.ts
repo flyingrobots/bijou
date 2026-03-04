@@ -6,7 +6,7 @@ const ctx = initDefaultContext();
 async function main() {
   const language = await filter({
     title: 'Choose a programming language:',
-    placeholder: 'Type to filter...',
+    placeholder: 'j/k navigate, type or / to search',
     options: [
       { label: 'TypeScript', value: 'ts', keywords: ['javascript', 'typed', 'web'] },
       { label: 'Rust', value: 'rust', keywords: ['systems', 'memory', 'safe'] },

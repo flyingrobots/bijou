@@ -6,7 +6,43 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-(No changes yet.)
+### ✨ Features
+
+- **Vim-style mode switching for `filter()`** — interactive filter starts in normal mode where `j`/`k` navigate. Any printable character (except `j`/`k`) enters insert mode and types the character. Press `/` to enter insert mode without typing. `Escape` in insert returns to normal; `Escape` in normal cancels. Mode indicator shows `:` (normal) or `/` (insert).
+
+### 🐛 Fixed
+
+- **`k` key asymmetry in `filter()`** — `k` always navigated (even when query was non-empty), preventing users from typing `k` as a search character. Now properly handled via normal/insert mode switching.
+- **`clearRender()` consistency in `filter()`** — navigation handlers now capture `renderLineCount()` before mutating state, preventing visual artifacts when the filtered list shrinks.
+- **`filter()` viewport scrolling** — the filter list viewport was locked to `slice(0, maxVisible)`, so the cursor indicator disappeared once the user navigated past the visible window. Now tracks a `scrollOffset` that slides to keep the cursor in view.
+- **Markdown code spans not isolated** — code span content (backtick-delimited) was vulnerable to subsequent bold/italic regex passes. For example, `` `a*b*c` `` in pipe mode became `abc` instead of `a*b*c`. Now uses NUL-delimited placeholders to isolate code span content.
+- **`textarea()` empty submit ignores defaultValue** — submitting an empty textarea with Ctrl+D returned `''` instead of falling back to `defaultValue` when set.
+- **`markdown()` width not validated** — negative or NaN width values flowed unchecked into `String.repeat()` in the separator renderer, causing a `RangeError`. Now clamped to a minimum of 1.
+- **`markdown()` HR regex misses spaced variants** — `* * *` and `- - -` are valid CommonMark horizontal rules but were mis-parsed as bullet list items because the bullet regex matched first. HR regex changed from `/^(-{3,}|\*{3,}|_{3,})\s*$/` to `/^([-*_]\s*){3,}$/` on trimmed input.
+- **DAG `cellAt()` CJK column mapping** — CJK/wide characters occupy 2 terminal columns but 1 grapheme slot, causing garbled rendering when `cellAt()` indexed directly by column offset. Now builds a column-to-grapheme mapping via `expandToColumns()` during `PlacedNode` construction.
+- **Numbered list continuation indent misalignment** — continuation lines of wrapped numbered list items used per-item prefix width, causing misalignment between items 1–9 and 10+. Now calculates max prefix width across all items and uses it uniformly.
+- **DAG `Math.max(...spread)` overflow** — `Math.max(...nodes.map(...))` in `renderInteractiveLayout()` could throw `RangeError` for arrays > ~65K elements. Replaced with `reduce()` loop.
+- **DAG accessible edge count mismatch** — `renderAccessible()` header counted all declared edges but rendered only edges with existing targets, causing the "Graph: N nodes, M edges" summary to disagree with the body. Now counts only valid edges.
+- **`textarea()` cleanup summary ignores defaultValue** — submitting an empty textarea with Ctrl+D showed "(cancelled)" in the summary line instead of the resolved `defaultValue`. Refactored `cleanup()` to accept the resolved value and cancelled flag.
+- **`textarea()` maxLength=0 ignored** — truthy checks (`options.maxLength && ...`) treated `0` as unset, allowing unlimited input. Changed to nullish checks (`options.maxLength != null`).
+- **DAG duplicate node ID misdiagnosed as cycle** — `assignLayers()` reported "cycle detected" when given duplicate node IDs. Now validates uniqueness before topological sort with a clear "duplicate node id" error message.
+- **`junctionChar()` empty set returned `┼`** — an empty direction set (no edge traffic) now returns `' '` (space) instead of a four-way junction character.
+- **Unnecessary type casts and redundant code** — remove `as 'interactive'` cast in static-mode test, narrow `linkReplacer` param type to `string` (removing `as string` cast), remove redundant null-equality clause in DAG token run-length encoding, return `renderInteractiveLayout()` result directly instead of destructuring into a new object.
+- **`filter()` cursor flicker** — move `hideCursor()` from `render()` (called on every repaint) to one-time setup before the event loop.
+- **Asterisk HR assertion** — strengthen `***` horizontal rule test to assert box-drawing character instead of non-empty output.
+
+### ♻️ Refactors
+
+- **Split `dag.ts` (941→~200 lines)** — extract edge routing into `dag-edges.ts`, layout algorithms into `dag-layout.ts`, and renderers into `dag-render.ts`. `dag.ts` remains the public facade with types and entry points.
+- **Split `markdown.ts` (468→~50 lines)** — extract block/inline parsers and word wrapping into `markdown-parse.ts`, block renderer into `markdown-render.ts`. `markdown.ts` remains the public facade.
+- **Extract `textarea-editor.ts`** — move the ~192-line interactive editor state machine from `textarea.ts` into a dedicated module. `textarea.ts` remains the public facade.
+- **Extract `filter-interactive.ts`** — move the ~152-line interactive filter UI from `filter.ts` into a dedicated module. `filter.ts` remains the public facade.
+- **`encodeArrowPos()` / `decodeArrowPos()`** — replace `GRID_COL_MULTIPLIER` arithmetic with self-documenting bitwise encoding functions `(row << 16) | col`, supporting up to 65535 rows/cols.
+- **Shader-based DAG edge rendering** — replace pre-allocated `charGrid`/`tokenGrid` arrays in `renderInteractiveLayout()` with on-demand `cellAt()` per-cell computation using a spatial node index and highlight cell set.
+- **Simplify `j` key handling in `filter-interactive`** — in insert mode, `j` falls through to the printable handler instead of being special-cased in the down-arrow condition block.
+- **DRY `parseInlinePlain`/`parseInlineAccessible`** — extract shared `parseInlineStripped()` function; the two variants differed only in link replacement format.
+- **Textarea running counter** — replace O(n) `lines.join('\n').length` recomputation on every keystroke with a maintained `totalLength` counter updated on insert/delete/newline.
+- **Textarea dynamic line-number gutter** — replace hardcoded `prefixWidth = 6` with dynamic calculation based on line count, preventing overflow at 1000+ lines.
 
 ## [1.1.0] — 2026-03-04
 
@@ -527,7 +563,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0
 [0.10.1]: https://github.com/flyingrobots/bijou/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0
