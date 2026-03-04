@@ -127,20 +127,19 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.muted, status)}\n`);
   }
 
-  function clearRender(): void {
-    const total = renderLineCount();
-    term.moveUp(total);
+  function clearRender(lineCount: number): void {
+    term.moveUp(lineCount);
   }
 
   function clearAndRerender(prevLineCount: number): void {
-    term.moveUp(prevLineCount);
+    clearRender(prevLineCount);
     term.clearBlock(prevLineCount);
     render();
   }
 
   function cleanup(): void {
     const total = renderLineCount();
-    clearRender();
+    clearRender(total);
     term.clearBlock(total);
 
     const selected = filtered[cursor];
@@ -176,8 +175,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       if (key === '\x1b[A' || key === 'k') {
         // Up
         if (filtered.length === 0) return;
+        const prevLineCount = renderLineCount();
         cursor = (cursor - 1 + filtered.length) % filtered.length;
-        clearRender();
+        clearRender(prevLineCount);
         render();
         return;
       }
@@ -185,8 +185,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       if (key === '\x1b[B') {
         // Down arrow
         if (filtered.length === 0) return;
+        const prevLineCount = renderLineCount();
         cursor = (cursor + 1) % filtered.length;
-        clearRender();
+        clearRender(prevLineCount);
         render();
         return;
       }
