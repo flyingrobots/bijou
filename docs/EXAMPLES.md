@@ -200,7 +200,7 @@ Prompt the user, collect input, display result. GIFs show the interaction.
 ### [x] `filter`
 
 **Component:** `filter()`
-**Demo:** Fuzzy-filter select from a list of 8 programming languages with keyword metadata. Type to narrow results in real-time, arrow keys to navigate filtered matches, Enter to select. Shows the chosen language as a badge.
+**Demo:** Fuzzy-filter select from a list of 8 programming languages with keyword metadata. Starts in vim-style normal mode (`j`/`k` navigate, `:` indicator). Type any character to enter insert mode (`/` indicator) and filter in real-time. Press `/` to enter insert mode without typing. `Escape` toggles between modes. Arrow keys navigate in both modes, Enter selects, `Ctrl+C` cancels. Shows the chosen language as a badge.
 **GIF:** Type "fun" → see Elixir/Haskell/OCaml → select one → see badge result. ~6s.
 
 ### [x] `wizard`
