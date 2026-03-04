@@ -559,7 +559,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 | ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
-| **Improve docstring coverage to 80%** | bijou | CodeRabbit pre-merge check flagged 60.61% docstring coverage vs. 80% threshold. Audit exported functions in new modules (`dag-layout`, `dag-edges`, `dag-render`, `markdown-parse`, `markdown-render`, `textarea-editor`, `filter-interactive`) and add missing JSDoc. |
+| **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
 | ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) | col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
 ---
