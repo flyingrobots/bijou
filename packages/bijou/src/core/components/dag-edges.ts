@@ -20,7 +20,7 @@ export type Dir = 'U' | 'D' | 'L' | 'R';
 export interface GridState {
   /** 2D array of direction sets, one per grid cell. */
   dirs: Set<Dir>[][];
-  /** Encoded arrowhead positions as `row * GRID_COL_MULTIPLIER + col`. */
+  /** Encoded arrowhead positions. Use `decodeArrowPos()` to extract row/col. */
   arrows: Set<number>;
   /** Number of rows in the grid. */
   rows: number;
@@ -28,10 +28,30 @@ export interface GridState {
   cols: number;
 }
 
-// ── Constants ──────────────────────────────────────────────────────
+// ── Arrow Position Encoding ───────────────────────────────────────
 
-/** Multiplier for encoding arrow positions as `row * GRID_COL_MULTIPLIER + col`. */
-export const GRID_COL_MULTIPLIER = 10000;
+/**
+ * Encode a grid (row, col) pair into a single number for Set membership.
+ *
+ * Uses bitwise encoding `(row << 16) | col`, supporting up to 65535 rows and cols.
+ *
+ * @param row - Grid row index.
+ * @param col - Grid column index.
+ * @returns The encoded position as a single number.
+ */
+export function encodeArrowPos(row: number, col: number): number {
+  return (row << 16) | col;
+}
+
+/**
+ * Decode an encoded arrow position back into row and col.
+ *
+ * @param encoded - Value produced by `encodeArrowPos()`.
+ * @returns Object with `row` and `col` fields.
+ */
+export function decodeArrowPos(encoded: number): { row: number; col: number } {
+  return { row: encoded >>> 16, col: encoded & 0xFFFF };
+}
 
 /**
  * Lookup table mapping sorted direction-set keys to Unicode box-drawing characters.
@@ -136,5 +156,5 @@ export function markEdge(
     for (let r = mid + 1; r < dRow; r++) markDir(g, r, dstC, 'D', 'U');
   }
 
-  g.arrows.add(dRow * GRID_COL_MULTIPLIER + dstC);
+  g.arrows.add(encodeArrowPos(dRow, dstC));
 }

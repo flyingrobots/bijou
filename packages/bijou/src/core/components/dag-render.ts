@@ -12,7 +12,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
-import { createGrid, markEdge, junctionChar, GRID_COL_MULTIPLIER } from './dag-edges.js';
+import { createGrid, markEdge, junctionChar, decodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
 
@@ -247,8 +247,7 @@ export function renderInteractiveLayout(
 
   // Write arrowheads
   for (const encoded of g.arrows) {
-    const r = Math.floor(encoded / GRID_COL_MULTIPLIER);
-    const c = encoded % GRID_COL_MULTIPLIER;
+    const { row: r, col: c } = decodeArrowPos(encoded);
     if (r >= 0 && r < gridRows && c >= 0 && c < gridCols) {
       charGrid[r]![c] = '\u25bc';
       tokenGrid[r]![c] = edgeToken;
