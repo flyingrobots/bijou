@@ -558,9 +558,9 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
-| **Fix `k` key asymmetry in `filter-interactive`** | bijou | `k` always navigates (even when query is non-empty), so users can't type `k` as a search character. Should mirror `j` behavior: treat as printable when query is active. Same issue likely applies to `select-interactive` if it has vim bindings. |
+| ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
 | **Improve docstring coverage to 80%** | bijou | CodeRabbit pre-merge check flagged 60.61% docstring coverage vs. 80% threshold. Audit exported functions in new modules (`dag-layout`, `dag-edges`, `dag-render`, `markdown-parse`, `markdown-render`, `textarea-editor`, `filter-interactive`) and add missing JSDoc. |
-| **Wrap arrow position encoding in functions** | bijou | Replace raw `GRID_COL_MULTIPLIER` arithmetic with explicit `encodeArrowPos(row, col)` / `decodeArrowPos(encoded)` functions in `dag-edges.ts` for self-documenting encode/decode. |
+| ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) | col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
 ---
 
