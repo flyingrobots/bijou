@@ -12,7 +12,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
-import { createGrid, markEdge, junctionChar, decodeArrowPos } from './dag-edges.js';
+import { createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
 
@@ -219,45 +219,66 @@ export function renderInteractiveLayout(
     }
   }
 
-  // Build output grids
-  const charGrid: string[][] = [];
-  const tokenGrid: (TokenValue | null)[][] = [];
-  for (let r = 0; r < gridRows; r++) {
-    const charRow: string[] = [];
-    const tokenRow: (TokenValue | null)[] = [];
-    for (let c = 0; c < gridCols; c++) {
-      charRow.push(' ');
-      tokenRow.push(null);
-    }
-    charGrid.push(charRow);
-    tokenGrid.push(tokenRow);
+  // ── Build placed nodes + spatial index ────────────────────────────
+
+  interface PlacedNode {
+    startRow: number;
+    startCol: number;
+    width: number;
+    box: NodeBoxResult;
+    chars: string[][];    // pre-segmented graphemes per line
+    token: TokenValue;
+    node: DagNode;
   }
 
-  // Write edge characters
-  const edgeToken = options.edgeToken ?? ctx.theme.theme.border.muted;
-  for (let r = 0; r < gridRows; r++) {
-    for (let c = 0; c < gridCols; c++) {
-      const cell = g.dirs[r]![c]!;
-      if (cell.size > 0) {
-        charGrid[r]![c] = junctionChar(cell);
-        tokenGrid[r]![c] = edgeToken;
-      }
-    }
-  }
-
-  // Write arrowheads
-  for (const encoded of g.arrows) {
-    const { row: r, col: c } = decodeArrowPos(encoded);
-    if (r >= 0 && r < gridRows && c >= 0 && c < gridCols) {
-      charGrid[r]![c] = '\u25bc';
-      tokenGrid[r]![c] = edgeToken;
-    }
-  }
-
-  // Highlight edges
   const highlightSet = new Set(options.highlightPath ?? []);
-  if (options.highlightPath && options.highlightToken) {
-    const hlToken = options.highlightToken;
+  const edgeToken = options.edgeToken ?? ctx.theme.theme.border.muted;
+  const hlToken = options.highlightToken;
+
+  const positions = new Map<string, DagNodePosition>();
+  const nodesByRow = new Map<number, PlacedNode[]>();
+
+  for (const n of nodes) {
+    const layer = layerMap.get(n.id);
+    const col = colIndex.get(n.id);
+    if (layer === undefined || col === undefined) continue;
+    const startCol = col * colStride;
+    const startRow = layer * RS;
+
+    positions.set(n.id, { row: startRow, col: startCol, width: nodeWidth, height: 3 });
+
+    const box = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
+
+    let nToken: TokenValue;
+    if (options.selectedId === n.id) {
+      nToken = options.selectedToken ?? ctx.theme.theme.ui.cursor;
+    } else if (highlightSet.has(n.id) && hlToken) {
+      nToken = hlToken;
+    } else if (n.token) {
+      nToken = n.token;
+    } else {
+      nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
+    }
+
+    const placed: PlacedNode = {
+      startRow, startCol, width: nodeWidth, box,
+      chars: box.lines.map(line => segmentGraphemes(line)),
+      token: nToken, node: n,
+    };
+
+    for (let lineIdx = 0; lineIdx < 3; lineIdx++) {
+      const row = startRow + lineIdx;
+      if (row >= gridRows) continue;
+      let list = nodesByRow.get(row);
+      if (!list) { list = []; nodesByRow.set(row, list); }
+      list.push(placed);
+    }
+  }
+
+  // ── Build highlight edge cell set ───────────────────────────────
+
+  const hlCells = new Set<number>();
+  if (options.highlightPath && hlToken) {
     const path = options.highlightPath;
     for (let i = 0; i < path.length - 1; i++) {
       const fromId = path[i]!;
@@ -276,72 +297,69 @@ export function renderInteractiveLayout(
 
       if (srcC === dstC) {
         for (let r = sRow; r <= dRow && r < gridRows; r++) {
-          if (srcC < gridCols) tokenGrid[r]![srcC] = hlToken;
+          if (srcC < gridCols) hlCells.add(encodeArrowPos(r, srcC));
         }
       } else {
-        if (sRow < gridRows && srcC < gridCols) tokenGrid[sRow]![srcC] = hlToken;
+        if (sRow < gridRows && srcC < gridCols) hlCells.add(encodeArrowPos(sRow, srcC));
         const minC = Math.min(srcC, dstC);
         const maxC2 = Math.max(srcC, dstC);
         if (midRow < gridRows) {
           for (let c = minC; c <= maxC2 && c < gridCols; c++) {
-            tokenGrid[midRow]![c] = hlToken;
+            hlCells.add(encodeArrowPos(midRow, c));
           }
         }
         for (let r = midRow; r <= dRow && r < gridRows; r++) {
-          if (dstC < gridCols) tokenGrid[r]![dstC] = hlToken;
+          if (dstC < gridCols) hlCells.add(encodeArrowPos(r, dstC));
         }
       }
     }
   }
 
-  // Write node boxes
-  const positions = new Map<string, DagNodePosition>();
-  for (const n of nodes) {
-    const layer = layerMap.get(n.id);
-    const col = colIndex.get(n.id);
-    if (layer === undefined || col === undefined) continue;
-    const startCol = col * colStride;
-    const startRow = layer * RS;
+  // ── cellAt: on-demand per-cell computation ──────────────────────
 
-    positions.set(n.id, { row: startRow, col: startCol, width: nodeWidth, height: 3 });
-
-    const box = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
-
-    let nToken: TokenValue;
-    if (options.selectedId === n.id) {
-      nToken = options.selectedToken ?? ctx.theme.theme.ui.cursor;
-    } else if (highlightSet.has(n.id) && options.highlightToken) {
-      nToken = options.highlightToken;
-    } else if (n.token) {
-      nToken = n.token;
-    } else {
-      nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
-    }
-
-    for (let lineIdx = 0; lineIdx < box.lines.length; lineIdx++) {
-      const row = startRow + lineIdx;
-      if (row >= gridRows) continue;
-      const line = box.lines[lineIdx]!;
-      const types = box.charTypes[lineIdx]!;
-      const chars = segmentGraphemes(line);
-      for (let ci = 0; ci < chars.length; ci++) {
-        const gc = startCol + ci;
-        if (gc < gridCols) {
-          charGrid[row]![gc] = chars[ci]!;
-          const charType = types[ci];
-          if (charType === 'label' && n.labelToken) {
-            tokenGrid[row]![gc] = n.labelToken;
-          } else if (charType === 'badge' && n.badgeToken) {
-            tokenGrid[row]![gc] = n.badgeToken;
+  function cellAt(row: number, col: number): { ch: string; token: TokenValue | null } {
+    // 1. Node box (highest priority)
+    const nodesOnRow = nodesByRow.get(row);
+    if (nodesOnRow) {
+      for (const p of nodesOnRow) {
+        if (col >= p.startCol && col < p.startCol + p.width) {
+          const lineIdx = row - p.startRow;
+          const ci = col - p.startCol;
+          const ch = p.chars[lineIdx]![ci] ?? ' ';
+          const charType = p.box.charTypes[lineIdx]![ci];
+          let token: TokenValue;
+          if (charType === 'label' && p.node.labelToken) {
+            token = p.node.labelToken;
+          } else if (charType === 'badge' && p.node.badgeToken) {
+            token = p.node.badgeToken;
           } else {
-            tokenGrid[row]![gc] = nToken;
+            token = p.token;
           }
+          return { ch, token };
         }
       }
     }
+
+    // 2. Arrowhead
+    const encoded = encodeArrowPos(row, col);
+    if (g.arrows.has(encoded)) {
+      const token = hlCells.has(encoded) ? hlToken! : edgeToken;
+      return { ch: '\u25bc', token };
+    }
+
+    // 3. Edge
+    const dirs = g.dirs[row]?.[col];
+    if (dirs && dirs.size > 0) {
+      const token = hlCells.has(encoded) ? hlToken! : edgeToken;
+      return { ch: junctionChar(dirs), token };
+    }
+
+    // 4. Empty
+    return { ch: ' ', token: null };
   }
 
-  // Serialize
+  // ── Serialize: run-length grouping with cellAt queries ──────────
+
   const lines: string[] = [];
   for (let r = 0; r < gridRows; r++) {
     let line = '';
@@ -349,8 +367,7 @@ export function renderInteractiveLayout(
     let run = '';
 
     for (let c = 0; c < gridCols; c++) {
-      const ch = charGrid[r]![c]!;
-      const tk = tokenGrid[r]![c]!;
+      const { ch, token: tk } = cellAt(r, c);
 
       if (tk === prevToken || (tk === null && prevToken === null)) {
         run += ch;
