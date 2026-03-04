@@ -985,6 +985,80 @@ describe('DagSource adapter', () => {
   });
 });
 
+// ── Render Output Stability ───────────────────────────────────────
+
+describe('render output stability', () => {
+  it('two-node linear graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(twoNodes, { ctx });
+    // Capture the exact output to detect regressions during refactoring.
+    // If the rendering algorithm changes, update this snapshot deliberately.
+    expect(output).toMatchSnapshot();
+  });
+
+  it('diamond graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(diamond, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('linear chain snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(linear, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('fan-out graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200 } });
+    const output = dag(fanOut, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('badges graph snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(withBadges, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('single node snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag([{ id: 'a', label: 'Only' }], { ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('highlighted path snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(diamond, {
+      highlightPath: ['a', 'b', 'd'],
+      highlightToken: { hex: '#ff0000' },
+      ctx,
+    });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('selected node snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const output = dag(twoNodes, { selectedId: 'a', ctx });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('ghost nodes snapshot', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const largeGraph: DagNode[] = [
+      { id: 'root', label: 'Root', edges: ['a', 'b'] },
+      { id: 'a', label: 'A', edges: ['c', 'd'] },
+      { id: 'b', label: 'B', edges: ['d', 'e'] },
+      { id: 'c', label: 'C', edges: ['f'] },
+      { id: 'd', label: 'D', edges: ['f'] },
+      { id: 'e', label: 'E', edges: ['f'] },
+      { id: 'f', label: 'F' },
+    ];
+    const sliced = dagSlice(largeGraph, 'd', { direction: 'ancestors', depth: 1 });
+    const output = dag(sliced, { ctx });
+    expect(output).toMatchSnapshot();
+  });
+});
+
 // ── labelToken / badgeToken Tests ──────────────────────────────────
 
 describe('DagNode labelToken / badgeToken', () => {
