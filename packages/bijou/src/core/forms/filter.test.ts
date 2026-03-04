@@ -293,4 +293,41 @@ describe('filter()', () => {
       expect(result).toBe('apple');
     });
   });
+
+  describe('viewport scrolling', () => {
+    const MANY_OPTIONS = [
+      { label: 'A1', value: 'a1' },
+      { label: 'A2', value: 'a2' },
+      { label: 'A3', value: 'a3' },
+      { label: 'A4', value: 'a4' },
+      { label: 'A5', value: 'a5' },
+      { label: 'A6', value: 'a6' },
+      { label: 'A7', value: 'a7' },
+      { label: 'A8', value: 'a8' },
+      { label: 'A9', value: 'a9' },
+      { label: 'A10', value: 'a10' },
+    ];
+
+    it('cursor past maxVisible still shows cursor indicator', async () => {
+      // maxVisible=3. Navigate down 8 times → cursor at index 8 = A9.
+      // The viewport must scroll so A9 is visible WITH the cursor indicator.
+      const keys = Array.from({ length: 8 }, () => '\x1b[B').concat(['\r']);
+      const ctx = createTestContext({ mode: 'interactive', io: { keys } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
+      expect(result).toBe('a9');
+      // Strip ANSI codes and verify a line contains both ❯ and A9
+      const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
+      expect(stripped).toMatch(/❯.*A9/);
+    });
+
+    it('cursor wraps up past maxVisible and is visible', async () => {
+      // Navigate up from index 0 wraps to last (A10, index 9).
+      // Viewport must scroll to show A10 with cursor indicator.
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[A', '\r'] } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
+      expect(result).toBe('a10');
+      const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
+      expect(stripped).toMatch(/❯.*A10/);
+    });
+  });
 });

@@ -87,6 +87,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   let mode: 'normal' | 'insert' = 'normal';
   let query = '';
   let cursor = 0;
+  let scrollOffset = 0;
   let filtered = [...options.options];
 
   function applyFilter(): void {
@@ -96,10 +97,20 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       filtered = options.options.filter((opt) => matchFn(query, opt));
     }
     cursor = Math.min(cursor, Math.max(0, filtered.length - 1));
+    clampScroll();
+  }
+
+  function clampScroll(): void {
+    if (cursor < scrollOffset) {
+      scrollOffset = cursor;
+    } else if (cursor >= scrollOffset + maxVisible) {
+      scrollOffset = cursor - maxVisible + 1;
+    }
+    scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, filtered.length - maxVisible)));
   }
 
   function visibleItems(): FilterOption<T>[] {
-    return filtered.slice(0, maxVisible);
+    return filtered.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
   function renderLineCount(): number {
@@ -120,7 +131,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     const vis = visibleItems();
     for (let i = 0; i < vis.length; i++) {
       const opt = vis[i]!;
-      const isCurrent = i === cursor;
+      const isCurrent = scrollOffset + i === cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
         ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}\n`);
@@ -162,6 +173,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     if (filtered.length === 0) return;
     const prevLineCount = renderLineCount();
     cursor = (cursor - 1 + filtered.length) % filtered.length;
+    clampScroll();
     clearRender(prevLineCount);
     render();
   }
@@ -170,6 +182,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     if (filtered.length === 0) return;
     const prevLineCount = renderLineCount();
     cursor = (cursor + 1) % filtered.length;
+    clampScroll();
     clearRender(prevLineCount);
     render();
   }
