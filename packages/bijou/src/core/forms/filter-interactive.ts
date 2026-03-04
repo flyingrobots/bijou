@@ -76,6 +76,9 @@ export function defaultMatch<T>(query: string, option: FilterOption<T>): boolean
  * @returns The value of the selected (or default/first) option.
  */
 export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
+  if (options.options.length === 0) {
+    throw new Error('[bijou] filter(): options array must contain at least one option');
+  }
   const noColor = ctx.theme.noColor;
   const t = ctx.theme;
   const styledFn = createStyledFn(ctx);
@@ -169,6 +172,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
   render();
 
+  // navigateUp/navigateDown use clearRender + render instead of clearAndRerender
+  // because render() uses per-line \x1b[K (clear-to-end-of-line), making a full
+  // clearBlock unnecessary for a simple cursor position change.
   function navigateUp(): void {
     if (filtered.length === 0) return;
     const prevLineCount = renderLineCount();
@@ -194,6 +200,8 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     clearAndRerender(prevLineCount);
   }
 
+  // switchMode uses the same lightweight rerender pattern as navigate functions —
+  // only the mode indicator line changes, and render() clears each line with \x1b[K.
   function switchMode(newMode: 'normal' | 'insert'): void {
     mode = newMode;
     const prevLineCount = renderLineCount();
@@ -223,6 +231,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       if (mode === 'normal') {
         if (key === '\x1b') {
           // Escape in normal mode — cancel
+          // Note: bare \x1b may false-trigger on slow connections where escape
+          // sequences arrive as separate bytes. Timer-based disambiguation is a
+          // separate future improvement.
           handle.dispose();
           cleanup();
           resolve(options.defaultValue ?? options.options[0]!.value);

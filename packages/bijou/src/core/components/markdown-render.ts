@@ -26,6 +26,8 @@ export function renderBlocks(
   width: number,
 ): string {
   const mode = ctx.mode;
+  // `static` mode intentionally falls through to styled rendering (same as
+  // `interactive`). Only `pipe` and `accessible` get special treatment.
   const lines: string[] = [];
 
   for (const block of blocks) {

@@ -74,6 +74,7 @@ const JUNCTION: Record<string, string> = {
  * @returns The appropriate box-drawing character, or `\u253c` (cross) as fallback.
  */
 export function junctionChar(dirs: Set<Dir>): string {
+  // Alphabetical sort of D,L,R,U matches JUNCTION table keys
   const key = [...dirs].sort().join('');
   return JUNCTION[key] ?? '\u253c';
 }

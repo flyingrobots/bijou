@@ -162,6 +162,8 @@ function isBlockStart(line: string): boolean {
 export function parseInline(text: string, ctx: BijouContext, mode: string): string {
   if (mode === 'accessible') return parseInlineAccessible(text, ctx);
   if (mode === 'pipe') return parseInlinePlain(text);
+  // `static` mode intentionally falls through to styled rendering here,
+  // same as `interactive`. Only `pipe` and `accessible` are special-cased.
   return parseInlineStyled(text, ctx);
 }
 
@@ -182,7 +184,8 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
     return hyperlink(linkText, url, { ctx });
   });
 
-  // Code spans: extract and replace with placeholders to isolate from bold/italic
+  // Code spans: extract and replace with placeholders to isolate from bold/italic.
+  // Limitation: does not handle escaped backticks (\`) or double-backtick spans (`` `code` ``).
   const codeSpans: string[] = [];
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
     const idx = codeSpans.length;
@@ -195,7 +198,8 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
     return ctx.style.bold(bold);
   });
 
-  // Italic: *text* (but not inside **)
+  // Italic: *text* — runs after bold removal, so `**bold**` won't false-match.
+  // The negative lookahead/lookbehind prevents matching the `**` delimiter itself.
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, (_m, italic: string) => {
     return ctx.style.styled(ctx.theme.theme.semantic.muted, italic);
   });
@@ -287,6 +291,8 @@ function parseInlineAccessible(text: string, _ctx: BijouContext): string {
  * @returns Array of wrapped lines.
  */
 export function wordWrap(text: string, width: number): string[] {
+  // Non-positive widths return the text unwrapped. This is a deliberate
+  // degradation — callers clamp width upstream, so this is a safety net.
   if (width <= 0) return [text];
   const words = text.split(' ');
   const lines: string[] = [];

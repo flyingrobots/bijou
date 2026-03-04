@@ -12,9 +12,9 @@
 
 - [ ] **Fix word-wrap ordering in `renderBlocks` paragraph case.** In `packages/bijou/src/core/components/markdown-render.ts` line 57, `wordWrap(block.text, width)` is called on raw markdown source *before* `parseInline()`. Markdown markers like `**bold**` consume wrap width but are invisible in the rendered output, causing premature line breaks. Fix: either (a) strip markers before wrapping and re-apply after (complex), or (b) document this as a known limitation with a `// Known limitation:` comment explaining the trade-off. Option (b) is recommended given the complexity of (a).
 
-- [ ] **Document Escape key ambiguity in `filter-interactive.ts` and `textarea-editor.ts`.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 130, bare `\x1b` cancels the editor and discards all typed content. On slow SSH connections, arrow key escape sequences (`\x1b[A`) may arrive byte-by-byte, causing a false cancel and data loss. The same issue exists in `packages/bijou/src/core/forms/filter-interactive.ts` line 224 (normal mode Escape cancels). The textarea already has a comment (lines 132–134) acknowledging this; add a matching comment in `filter-interactive.ts` at line 224 for parity. Timer-based disambiguation is a future improvement.
+- [x] **Document Escape key ambiguity in `filter-interactive.ts` and `textarea-editor.ts`.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 130, bare `\x1b` cancels the editor and discards all typed content. On slow SSH connections, arrow key escape sequences (`\x1b[A`) may arrive byte-by-byte, causing a false cancel and data loss. The same issue exists in `packages/bijou/src/core/forms/filter-interactive.ts` line 224 (normal mode Escape cancels). The textarea already has a comment (lines 132–134) acknowledging this; add a matching comment in `filter-interactive.ts` at line 224 for parity. Timer-based disambiguation is a future improvement.
 
-- [ ] **Document `static` mode fall-through in markdown renderer.** In `packages/bijou/src/core/components/markdown-render.ts` line 28, the `renderBlocks` function checks `mode === 'accessible'` and `mode === 'pipe'` explicitly but lets `'static'` and `'interactive'` fall through to styled rendering. Add a comment at the top of `renderBlocks` explaining that `static` mode intentionally receives styled output (same as `interactive`). Similarly, in `packages/bijou/src/core/components/markdown-parse.ts` line 162, `parseInline` routes non-pipe/non-accessible modes to `parseInlineStyled` — add a comment.
+- [x] **Document `static` mode fall-through in markdown renderer.** In `packages/bijou/src/core/components/markdown-render.ts` line 28, the `renderBlocks` function checks `mode === 'accessible'` and `mode === 'pipe'` explicitly but lets `'static'` and `'interactive'` fall through to styled rendering. Add a comment at the top of `renderBlocks` explaining that `static` mode intentionally receives styled output (same as `interactive`). Similarly, in `packages/bijou/src/core/components/markdown-parse.ts` line 162, `parseInline` routes non-pipe/non-accessible modes to `parseInlineStyled` — add a comment.
 
 ---
 
@@ -50,7 +50,7 @@
 
 - [ ] **DRY up `parseInlinePlain` and `parseInlineAccessible`.** In `packages/bijou/src/core/components/markdown-parse.ts`, lines 217–276 are near-identical — they differ only in the link replacement format (`'$1 ($2)'` vs `'Link: $1 ($2)'`). Extract a shared `parseInlineStripped(text: string, linkFormat: string)` function and have both call it.
 
-- [ ] **Add empty-options guard to `interactiveFilter`.** In `packages/bijou/src/core/forms/filter-interactive.ts` lines 210, 218, 228, `options.options[0]!.value` crashes if called with an empty array. The caller guards against this, but `interactiveFilter` is exported. Add an early `if (options.options.length === 0) throw new Error(...)` or a `@throws` JSDoc tag documenting the precondition.
+- [x] **Add empty-options guard to `interactiveFilter`.** In `packages/bijou/src/core/forms/filter-interactive.ts` lines 210, 218, 228, `options.options[0]!.value` crashes if called with an empty array. The caller guards against this, but `interactiveFilter` is exported. Add an early `if (options.options.length === 0) throw new Error(...)` or a `@throws` JSDoc tag documenting the precondition.
 
 - [ ] **Fix hardcoded line-number gutter width in textarea.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 71, `prefixWidth` is hardcoded to 6, which overflows at 1000+ lines (number formatting uses `padStart(3)`). Calculate dynamically: `const numWidth = String(lines.length).length; const prefixWidth = showLineNumbers ? numWidth + 3 : 2;` and update the `padStart` accordingly.
 
@@ -114,11 +114,11 @@
 
 ## NIT (20)
 
-- [ ] **Add comment explaining `navigateUp`/`navigateDown` skip `clearBlock`.** `filter-interactive.ts` lines 172–188 use a lighter rerender path than `clearAndRerender`. Add a brief comment explaining this is intentional because `render()` uses per-line `\x1b[K`.
+- [x] **Add comment explaining `navigateUp`/`navigateDown` skip `clearBlock`.** `filter-interactive.ts` lines 172–188 use a lighter rerender path than `clearAndRerender`. Add a brief comment explaining this is intentional because `render()` uses per-line `\x1b[K`.
 
-- [ ] **Add comment explaining `switchMode` rerender pattern.** `filter-interactive.ts` line 197 — same pattern divergence as navigate functions. Brief comment for consistency.
+- [x] **Add comment explaining `switchMode` rerender pattern.** `filter-interactive.ts` line 197 — same pattern divergence as navigate functions. Brief comment for consistency.
 
-- [ ] **Add comment on junction char alphabetical sort invariant.** `dag-edges.ts` line 77: `[...dirs].sort().join('')` relies on `D < L < R < U` alphabetically. Add: `// Alphabetical sort of D,L,R,U matches JUNCTION table keys`.
+- [x] **Add comment on junction char alphabetical sort invariant.** `dag-edges.ts` line 77: `[...dirs].sort().join('')` relies on `D < L < R < U` alphabetically. Add: `// Alphabetical sort of D,L,R,U matches JUNCTION table keys`.
 
 - [ ] **Remove redundant `visited` set in Kahn's algorithm.** `dag-layout.ts` line 50: the `visited` set is redundant — in-degree tracking guarantees each node is queued exactly once. Remove or add a defensive-programming comment.
 
@@ -126,15 +126,15 @@
 
 - [ ] **Move empty-source check before context resolution in markdown.** `markdown.ts` line 49: `if (source.trim() === '') return ''` runs after context resolution. Move to line 45 for a micro-optimization.
 
-- [ ] **Add comment on `wordWrap` behavior for `width <= 0`.** `markdown-parse.ts` line 289: `wordWrap` silently degrades for non-positive widths (returns `[text]` unwrapped). Document this design choice.
+- [x] **Add comment on `wordWrap` behavior for `width <= 0`.** `markdown-parse.ts` line 289: `wordWrap` silently degrades for non-positive widths (returns `[text]` unwrapped). Document this design choice.
 
-- [ ] **Document code span regex limitations.** `markdown-parse.ts` line 187: the regex `` /`([^`]+)`/g `` doesn't handle escaped backticks or double-backtick spans (`` `` `code` `` ``). Add a `// Limitation:` comment.
+- [x] **Document code span regex limitations.** `markdown-parse.ts` line 187: the regex `` /`([^`]+)`/g `` doesn't handle escaped backticks or double-backtick spans (`` `` `code` `` ``). Add a `// Limitation:` comment.
 
-- [ ] **Clarify bold/italic interaction comment.** `markdown-parse.ts` line 195: "Italic: `*text*` (but not inside `**`)" is misleading — the negative lookahead only prevents `**text**` from matching as italic, not `*text*` inside a bold span. Clarify that italic runs after bold removal.
+- [x] **Clarify bold/italic interaction comment.** `markdown-parse.ts` line 195: "Italic: `*text*` (but not inside `**`)" is misleading — the negative lookahead only prevents `**text**` from matching as italic, not `*text*` inside a bold span. Clarify that italic runs after bold removal.
 
-- [ ] **Add type-safety fallback for `hlToken`.** `dag-render.ts` lines 346, 353: `hlToken!` non-null assertion is logically safe but hides the invariant from TypeScript. Use `hlToken ?? edgeToken` for type safety.
+- [x] **Add type-safety fallback for `hlToken`.** `dag-render.ts` lines 346, 353: `hlToken!` non-null assertion is logically safe but hides the invariant from TypeScript. Use `hlToken ?? edgeToken` for type safety.
 
-- [ ] **Add comment on run-length token comparison.** `dag-render.ts` line 372: `tk === prevToken` works because `TokenValue` is a string primitive. Add a comment confirming this assumption.
+- [x] **Add comment on run-length token comparison.** `dag-render.ts` line 372: `tk === prevToken` works because `TokenValue` is a string primitive. Add a comment confirming this assumption.
 
 - [x] **Shorten filter demo description in EXAMPLES.md.** `docs/EXAMPLES.md` line 203: the filter demo description is 4+ lines of dense text. Shorten to 1–2 sentences matching other entries' style, deferring keyboard details to the example's README.
 

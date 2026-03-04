@@ -343,14 +343,14 @@ export function renderInteractiveLayout(
     // 2. Arrowhead
     const encoded = encodeArrowPos(row, col);
     if (g.arrows.has(encoded)) {
-      const token = hlCells.has(encoded) ? hlToken! : edgeToken;
+      const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
       return { ch: '\u25bc', token };
     }
 
     // 3. Edge
     const dirs = g.dirs[row]?.[col];
     if (dirs && dirs.size > 0) {
-      const token = hlCells.has(encoded) ? hlToken! : edgeToken;
+      const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
       return { ch: junctionChar(dirs), token };
     }
 
@@ -369,6 +369,8 @@ export function renderInteractiveLayout(
     for (let c = 0; c < gridCols; c++) {
       const { ch, token: tk } = cellAt(r, c);
 
+      // TokenValue is a plain object — reference equality works here because
+      // the same token instance is reused for all cells of the same type.
       if (tk === prevToken || (tk === null && prevToken === null)) {
         run += ch;
       } else {
