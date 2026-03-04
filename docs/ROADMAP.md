@@ -106,7 +106,7 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 | **DX deep dive: app layout patterns** | research | Study real-world TUI layouts. Identify the 3–5 layout patterns that cover 90% of apps. Document findings and propose API surface. |
 | **`splitPane()`** | bijou-tui | Resizable split view (horizontal/vertical) with draggable divider, min/max constraints, and focus delegation. Each pane is a render function `(w, h) => string`. |
 | **`grid()` layout primitive** | bijou-tui | CSS Grid-inspired layout: named areas, row/column track sizing (fixed, fractional, auto), gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
-| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. Fix `filter()` scroll (currently a static slice from index 0, not a real scrolling viewport). Shared `adjustScroll()` logic from `browsable-list`. |
+| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. ~~Fix `filter()` scroll (currently a static slice from index 0, not a real scrolling viewport).~~ ✅ Shared `adjustScroll()` logic from `browsable-list`. |
 
 ### Phase 9: `appFrame()` — TEA app shell
 

@@ -4,6 +4,24 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## PR #28 Review Improvements + PR #29 CodeRabbit Fixes
+
+- **Completed:** 2026-03-03
+- **Summary:**
+  - Vim-style normal/insert mode switching for `filter()`
+  - Bitwise `encodeArrowPos()`/`decodeArrowPos()` replacing `GRID_COL_MULTIPLIER`
+  - Shader-based `cellAt()` DAG edge rendering (replaces `charGrid`/`tokenGrid`)
+  - `clearRender()` consistency fix for filter-interactive
+  - Filter viewport scrolling (cursor stays visible past `maxVisible`)
+  - Markdown code span isolation from bold/italic regex
+  - Textarea empty submit now returns `defaultValue`
+  - Markdown width validation prevents `RangeError` on negative/NaN
+  - DAG `Map.get()` lookup replacing repeated `find()`, duplicate test fixture cleanup
+  - CHANGELOG/ROADMAP tactical detail trimming
+- **Ref:** [PR #29](https://github.com/flyingrobots/bijou/pull/29)
+
+---
+
 ## v1.0.0 — Architecture audit remediation (Phases 1–3)
 
 - **Completed:** 2026-03-02
