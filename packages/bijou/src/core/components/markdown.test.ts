@@ -217,6 +217,24 @@ describe('markdown()', () => {
     });
   });
 
+  describe('width validation', () => {
+    it('negative width does not crash on HR in interactive mode', () => {
+      // separator().repeat(negative) throws RangeError without validation
+      const result = markdown('---', { ctx: ctx(), width: -10 });
+      expect(typeof result).toBe('string');
+    });
+
+    it('width=0 does not crash on HR in interactive mode', () => {
+      const result = markdown('---', { ctx: ctx(), width: 0 });
+      expect(typeof result).toBe('string');
+    });
+
+    it('NaN width does not crash', () => {
+      const result = markdown('Hello world\n\n---', { ctx: ctx(), width: NaN });
+      expect(result).toContain('Hello');
+    });
+  });
+
   describe('edge cases', () => {
     it('returns empty string for empty input', () => {
       expect(markdown('', { ctx: ctx() })).toBe('');

@@ -43,7 +43,8 @@ export interface MarkdownOptions {
  */
 export function markdown(source: string, options?: MarkdownOptions): string {
   const ctx = options?.ctx ?? getDefaultContext();
-  const width = options?.width ?? ctx.runtime.columns;
+  const rawWidth = options?.width ?? ctx.runtime.columns;
+  const width = Math.max(1, Number.isFinite(rawWidth) ? rawWidth : ctx.runtime.columns);
 
   if (source.trim() === '') return '';
 
