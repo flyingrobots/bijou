@@ -182,9 +182,12 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
     return hyperlink(linkText, url, { ctx });
   });
 
-  // Code spans: `text` (before bold/italic to prevent * inside backticks being parsed)
+  // Code spans: extract and replace with placeholders to isolate from bold/italic
+  const codeSpans: string[] = [];
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
-    return ctx.style.styled(ctx.theme.theme.semantic.warning, code);
+    const idx = codeSpans.length;
+    codeSpans.push(ctx.style.styled(ctx.theme.theme.semantic.warning, code));
+    return `\x00CODE${idx}\x00`;
   });
 
   // Bold: **text**
@@ -196,6 +199,9 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, (_m, italic: string) => {
     return ctx.style.styled(ctx.theme.theme.semantic.muted, italic);
   });
+
+  // Restore code spans
+  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
 
   return result;
 }
@@ -214,14 +220,22 @@ function parseInlinePlain(text: string): string {
   // Links: [text](url) → text (url)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)');
 
-  // Code: `text` → text (before bold/italic to prevent * inside backticks being parsed)
-  result = result.replace(/`([^`]+)`/g, '$1');
+  // Code: extract and replace with placeholders to isolate from bold/italic
+  const codeSpans: string[] = [];
+  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
+    const idx = codeSpans.length;
+    codeSpans.push(code);
+    return `\x00CODE${idx}\x00`;
+  });
 
   // Bold: **text** → text
   result = result.replace(/\*\*(.+?)\*\*/g, '$1');
 
   // Italic: *text* → text
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
+
+  // Restore code spans
+  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
 
   return result;
 }
@@ -241,14 +255,22 @@ function parseInlineAccessible(text: string, _ctx: BijouContext): string {
   // Links: [text](url) → Link: text (url)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 'Link: $1 ($2)');
 
-  // Code: `text` → text (before bold/italic to prevent * inside backticks being parsed)
-  result = result.replace(/`([^`]+)`/g, '$1');
+  // Code: extract and replace with placeholders to isolate from bold/italic
+  const codeSpans: string[] = [];
+  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
+    const idx = codeSpans.length;
+    codeSpans.push(code);
+    return `\x00CODE${idx}\x00`;
+  });
 
   // Bold: **text** → text
   result = result.replace(/\*\*(.+?)\*\*/g, '$1');
 
   // Italic: *text* → text
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
+
+  // Restore code spans
+  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
 
   return result;
 }

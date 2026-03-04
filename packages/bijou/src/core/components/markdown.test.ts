@@ -67,6 +67,21 @@ describe('markdown()', () => {
       const result = markdown('Run `cmd`', { ctx: ctx('pipe') });
       expect(result).toBe('Run cmd');
     });
+
+    it('preserves asterisks inside code spans in pipe mode', () => {
+      const result = markdown('Use `a*b*c` here', { ctx: ctx('pipe') });
+      expect(result).toBe('Use a*b*c here');
+    });
+
+    it('preserves double asterisks inside code spans in pipe mode', () => {
+      const result = markdown('Use `**bold**` here', { ctx: ctx('pipe') });
+      expect(result).toBe('Use **bold** here');
+    });
+
+    it('preserves asterisks inside code spans in accessible mode', () => {
+      const result = markdown('Use `a*b*c` here', { ctx: ctx('accessible') });
+      expect(result).toBe('Use a*b*c here');
+    });
   });
 
   describe('bullet lists', () => {
