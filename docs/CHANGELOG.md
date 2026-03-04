@@ -12,6 +12,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Split `markdown.ts` (468→~30 lines)** — extract block/inline parsers and word wrapping into `markdown-parse.ts`, block renderer into `markdown-render.ts`. `markdown.ts` remains the public facade.
 - **Extract `textarea-editor.ts`** — move the ~192-line interactive editor state machine from `textarea.ts` into a dedicated module. `textarea.ts` remains the public facade.
 - **Extract `filter-interactive.ts`** — move the ~152-line interactive filter UI from `filter.ts` into a dedicated module. `filter.ts` remains the public facade.
+- **Extract `GRID_COL_MULTIPLIER` constant** — replace magic number `10000` in dag edge encoding/decoding with a named export shared between `dag-edges.ts` and `dag-render.ts`.
+- **Simplify `j` key handling in filter-interactive** — remove `j` from the down-arrow condition block; `j` is always a printable character, so it now falls through to the printable handler directly.
 
 ## [1.1.0] — 2026-03-04
 

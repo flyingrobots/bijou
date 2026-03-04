@@ -20,7 +20,7 @@ export type Dir = 'U' | 'D' | 'L' | 'R';
 export interface GridState {
   /** 2D array of direction sets, one per grid cell. */
   dirs: Set<Dir>[][];
-  /** Encoded arrowhead positions as `row * 10000 + col` (assumes grid width < 10000). */
+  /** Encoded arrowhead positions as `row * GRID_COL_MULTIPLIER + col`. */
   arrows: Set<number>;
   /** Number of rows in the grid. */
   rows: number;
@@ -29,6 +29,9 @@ export interface GridState {
 }
 
 // ── Constants ──────────────────────────────────────────────────────
+
+/** Multiplier for encoding arrow positions as `row * GRID_COL_MULTIPLIER + col`. */
+export const GRID_COL_MULTIPLIER = 10000;
 
 /**
  * Lookup table mapping sorted direction-set keys to Unicode box-drawing characters.
@@ -133,5 +136,5 @@ export function markEdge(
     for (let r = mid + 1; r < dRow; r++) markDir(g, r, dstC, 'D', 'U');
   }
 
-  g.arrows.add(dRow * 10000 + dstC);
+  g.arrows.add(dRow * GRID_COL_MULTIPLIER + dstC);
 }

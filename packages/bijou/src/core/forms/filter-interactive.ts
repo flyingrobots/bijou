@@ -182,24 +182,13 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
         return;
       }
 
-      if (key === '\x1b[B' || key === 'j') {
-        // Down — but only when query is empty (j is a printable char for filtering)
-        if (key === 'j' && query === '') {
-          // Start filtering with 'j'
-          query += key;
-          applyFilter();
-          clearRender();
-          render();
-          return;
-        }
-        if (key === '\x1b[B') {
-          if (filtered.length === 0) return;
-          cursor = (cursor + 1) % filtered.length;
-          clearRender();
-          render();
-          return;
-        }
-        // j when query is non-empty — fall through to printable handler
+      if (key === '\x1b[B') {
+        // Down arrow
+        if (filtered.length === 0) return;
+        cursor = (cursor + 1) % filtered.length;
+        clearRender();
+        render();
+        return;
       }
 
       if (key === '\x7f' || key === '\b') {
