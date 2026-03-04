@@ -138,6 +138,33 @@ function renderNodeBox(
   };
 }
 
+/**
+ * Expand grapheme arrays so array index equals column offset.
+ *
+ * For each wide grapheme (width 2), insert a `''` placeholder in chars
+ * and duplicate the type in types. After expansion, `chars[col]` and
+ * `types[col]` are column-aligned.
+ */
+function expandToColumns(
+  graphemes: string[],
+  types: CharType[],
+): { chars: string[]; types: CharType[] } {
+  const outChars: string[] = [];
+  const outTypes: CharType[] = [];
+  for (let i = 0; i < graphemes.length; i++) {
+    const g = graphemes[i]!;
+    const t = types[i] ?? 'pad';
+    const w = graphemeWidth(g);
+    outChars.push(g);
+    outTypes.push(t);
+    if (w === 2) {
+      outChars.push('');
+      outTypes.push(t);
+    }
+  }
+  return { chars: outChars, types: outTypes };
+}
+
 // ── Interactive Renderer ───────────────────────────────────────────
 
 /**
@@ -226,7 +253,8 @@ export function renderInteractiveLayout(
     startCol: number;
     width: number;
     box: NodeBoxResult;
-    chars: string[][];    // pre-segmented graphemes per line
+    chars: string[][];    // column-expanded characters per line
+    charTypes: CharType[][];  // column-expanded types per line
     token: TokenValue;
     node: DagNode;
   }
@@ -260,9 +288,22 @@ export function renderInteractiveLayout(
       nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
     }
 
+    // Expand grapheme arrays to column-aligned arrays so cellAt can
+    // index by column offset directly (handles CJK/wide characters).
+    const expandedChars: string[][] = [];
+    const expandedTypes: CharType[][] = [];
+    for (let lineIdx = 0; lineIdx < box.lines.length; lineIdx++) {
+      const graphemes = segmentGraphemes(box.lines[lineIdx]!);
+      const types = box.charTypes[lineIdx]!;
+      const { chars: ec, types: et } = expandToColumns(graphemes, types);
+      expandedChars.push(ec);
+      expandedTypes.push(et);
+    }
+
     const placed: PlacedNode = {
       startRow, startCol, width: nodeWidth, box,
-      chars: box.lines.map(line => segmentGraphemes(line)),
+      chars: expandedChars,
+      charTypes: expandedTypes,
       token: nToken, node: n,
     };
 
@@ -326,7 +367,7 @@ export function renderInteractiveLayout(
           const lineIdx = row - p.startRow;
           const ci = col - p.startCol;
           const ch = p.chars[lineIdx]![ci] ?? ' ';
-          const charType = p.box.charTypes[lineIdx]![ci];
+          const charType = p.charTypes[lineIdx]![ci];
           let token: TokenValue;
           if (charType === 'label' && p.node.labelToken) {
             token = p.node.labelToken;

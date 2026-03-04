@@ -126,6 +126,38 @@ describe('dag', () => {
     });
   });
 
+  describe('CJK wide characters', () => {
+    it('renders CJK label without corruption', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: '漢字', edges: ['b'] },
+        { id: 'b', label: 'Done' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('漢字');
+      expect(result).toContain('Done');
+    });
+
+    it('renders mixed ASCII + CJK label', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'hi漢字!' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('hi漢字!');
+    });
+
+    it('renders CJK badge correctly', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'Task', badge: '完了' },
+      ];
+      const result = dag(nodes, { ctx });
+      expect(result).toContain('Task');
+      expect(result).toContain('完了');
+    });
+  });
+
   // ── Mode Tests ──────────────────────────────────────────────────
 
   describe('pipe mode', () => {
