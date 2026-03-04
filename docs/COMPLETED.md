@@ -6,8 +6,8 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ## PR #28 Review Improvements + PR #29 CodeRabbit Fixes
 
-- **Completed:** 2026-03-03
-- **Summary:** Vim-style filter modes, bitwise arrow encoding, shader-based DAG edges, clearRender/scrolling fixes, markdown code span isolation, textarea defaultValue handling, and various validation hardening.
+- **Completed:** 2026-03-04
+- **Summary:** 77-item self-code-review: vim-style filter modes, bitwise arrow encoding, shader-based DAG edges, clearRender/scrolling fixes, markdown code span isolation, textarea defaultValue handling, CJK DAG rendering, and various validation hardening.
 - **Ref:** [PR #28](https://github.com/flyingrobots/bijou/pull/28), [PR #29](https://github.com/flyingrobots/bijou/pull/29)
 
 ---
