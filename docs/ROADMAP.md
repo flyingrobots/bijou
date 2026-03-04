@@ -103,9 +103,9 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **DX deep dive: app layout patterns** | research | Study real-world TUI layouts. Identify the 3–5 layout patterns that cover 90% of apps. Document findings and propose API surface. |
-| **`splitPane()`** | bijou-tui | Resizable split view (horizontal/vertical) with draggable divider, min/max constraints, and focus delegation. Each pane is a render function `(w, h) => string`. |
-| **`grid()` layout primitive** | bijou-tui | CSS Grid-inspired layout: named areas, row/column track sizing (fixed, fractional, auto), gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
+| ~~**DX deep dive: app layout patterns**~~ | research | ✅ Done — documented in `DX_COMPETITION.md` with matrix comparison and proposed API surface for `splitPane()` / `grid()` / `appFrame()`. |
+| **`splitPane()`** | bijou-tui | **v1.3 core** — resizable split view (horizontal/vertical) with min/max constraints, focus delegation, and pure state reducers. Each pane is a render function `(w, h) => string`. |
+| **`grid()` layout primitive** | bijou-tui | **v1.3 core** — CSS Grid-inspired layout with named areas, fixed + fractional tracks (auto as follow-up), and gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
 | **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. ~~`filter()` scroll~~: ✅ Done. |
 
 ### Phase 9: `appFrame()` — TEA app shell
@@ -114,9 +114,37 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **`appFrame()` higher-order app** | bijou-tui | `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`. Each page declares view + keymap + help. Frame owns tab switching, `?` help toggle, scroll, gutter/chrome. |
-| **Per-page scroll isolation** | bijou-tui | Each page/pane has independent scroll state preserved across tab switches. Focus determines which pane receives scroll input. |
-| **Multi-pane page support** | bijou-tui | Pages can declare `splitPane()` or `grid()` layouts. Frame delegates focus and input routing per pane via `InputStack`. |
+| **`appFrame()` higher-order app** | bijou-tui | **v1.3 core** — `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`. Each page declares view + keymap + help. Frame owns tab switching, `?` help toggle, scroll, gutter/chrome. |
+| **Per-page scroll isolation** | bijou-tui | **v1.3 core** — each page/pane has independent scroll state preserved across tab switches. Focus determines which pane receives scroll input. |
+| **Multi-pane page support** | bijou-tui | **v1.3 core** — pages can declare `splitPane()` or `grid()` layouts. Frame delegates focus and input routing per pane via `InputStack`. |
+| **Panel-scoped overlays/drawers** | bijou-tui | **v1.3 core** — overlays target either full screen or a pane rect from `splitPane()` / `grid()`, enabling local drawers and modal-like panel tools. |
+| **Framed-app interaction harness** | bijou-tui | **v1.3 core** — first-party headless harness for `appFrame` flows: key sequence replay, resize events, and frame snapshot assertions over time. |
+| **Frame-level command palette** | bijou-tui | **v1.3 stretch** — optional action palette (`Ctrl+P`/`:`) for global + page actions, backed by keymap metadata and existing command palette primitives. |
+| **Tab/screen transition animations** | bijou-tui | **v1.4+/experimental** — optional transitions between pages/tabs (`wipe`, `dissolve`, `grid`, `fade`) via full-screen `canvas()` + `composite()`. Must degrade cleanly in `static`/`pipe`/`accessible` modes. |
+
+### Release targeting (current plan)
+
+**v1.3.0 — App Shell Foundations (planned):**
+
+- `splitPane()` v1 (stateful, focus-aware, test-first)
+- `grid()` v1 (fixed + fractional tracks, named areas)
+- `appFrame()` MVP (tabs/help/chrome/global+page keymaps)
+- per-page scroll isolation
+- multi-pane page support
+- panel-scoped overlays + `drawer()` anchor expansion
+- framed-app interaction harness (key replay + resize + frame snapshots)
+
+**v1.3.0 stretch (only if low-risk):**
+
+- scrollable `select()` (`filter()` already done)
+- frame-level command palette (`Ctrl+P`/`:`) for app/page actions
+
+**v1.4.0+ / experimental (after core shell stabilizes):**
+
+- tab/screen transitions (`wipe`/`dissolve`/`grid`/`fade`)
+- dockable panel manager (drag + keyboard move)
+- panel minimize/fold/unfold behaviors
+- layout presets + session restore for pane/dock state
 
 ---
 
@@ -523,6 +551,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | ~~**`DagNode` token expansion**~~ | bijou | ✅ v0.8.0 — `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
 | ~~**`place()`**~~ | bijou-tui | ✅ v0.7.0 — 2D text placement with horizontal + vertical alignment. |
 | ~~**`drawer()`**~~ | bijou-tui | ✅ v0.7.0 — Slide-in side panel built on `composite()`. Left/right anchored, configurable width. |
+| **`drawer()` edge expansion** | bijou-tui | **v1.3 core** — add `top` + `bottom` anchors (in addition to left/right), and support region-scoped drawers so drawers can attach to panels, not only fullscreen. |
 | ~~**CLI/stdin component driver**~~ | bijou-tui | ✅ v0.9.0 — `runScript()` feeds key sequences into TEA apps and captures frames. |
 | ~~**`enumeratedList()`**~~ | bijou | ✅ v0.7.0 — Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet, dash, none). |
 | ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
@@ -556,6 +585,10 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
 | **Note field** | bijou | Display-only text within a form flow. |
 | **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
+| **Dockable panel manager (drag + keyboard move)** | bijou-tui | **v1.4+** — reorder and dock panes in `splitPane()`/`grid()` layouts via mouse drag (when enabled) plus keyboard fallback. Persist layout map in app state. In-process only (no cross-terminal pop-out). |
+| **Panel minimize/fold/unfold** | bijou-tui | **v1.4+** — per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
+| **Panel maximize/restore** | bijou-tui | **v1.4+** — promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
+| **Layout presets + session restore** | bijou-tui | **v1.4+** — serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 | **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |

@@ -6,6 +6,28 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **`splitPane()` layout primitive (bijou-tui)** — new stateful split view with pure reducers (`splitPaneSetRatio`, `splitPaneResizeBy`, `splitPaneFocusNext`, `splitPaneFocusPrev`) and deterministic layout geometry via `splitPaneLayout()`.
+- **`grid()` layout primitive (bijou-tui)** — named-area constraint grid with fixed + fractional tracks (`fr`), gap support, and `gridLayout()` rect solving.
+- **`createFramedApp()` shell (bijou-tui)** — high-level app frame with tabs, pane focus management, per-page/per-pane scroll isolation, help toggle, optional command palette, and pane-rect-aware overlay hook.
+- **Drawer anchor expansion + region scoping (bijou-tui)** — `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped drawers.
+- **Scripted interaction harness upgrades (bijou-tui)** — `runScript()` now accepts key, resize, and custom message steps for richer integration testing.
+- **Scrollable select viewport (bijou core)** — `select()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists.
+
+### 🧪 Tests
+
+- Add dedicated suites for `splitPane`, `grid`, and `appFrame`.
+- Expand `overlay` tests for top/bottom drawer anchors and region-scoped drawer mounting.
+- Expand `driver` tests for resize and custom message script steps.
+- Expand `select` tests for `maxVisible` scrolling behavior.
+
+### 📝 Documentation
+
+- Add new examples: `split-pane`, `grid-layout`, and `app-frame`.
+- Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
+- Update examples index to include the new app-shell demos.
+
 ## [1.2.0] — 2026-03-04
 
 ### ✨ Features

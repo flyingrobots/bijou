@@ -1,6 +1,6 @@
 # Examples
 
-> 63 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 66 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -64,6 +64,9 @@
 | [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
 | [`chat`](./chat/) | `viewport()` + `input()` + `vstack()` + `flex()` | Chat UI with message input |
 | [`split-editors`](./split-editors/) | `flex()` + `hstack()` + `createInputStack()` | Dual-pane editor with focus switching |
+| [`split-pane`](./split-pane/) | `splitPane()`, `splitPaneResizeBy()` | Stateful split layout with focus and divider resizing |
+| [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
+| [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |

@@ -53,6 +53,8 @@ export interface SelectOption<T = string> {
 export interface SelectFieldOptions<T = string> extends FieldOptions<T> {
   /** List of selectable options. */
   options: SelectOption<T>[];
+  /** Maximum number of options visible at once in interactive mode. Default: 7. */
+  maxVisible?: number;
 }
 
 /**

@@ -16,7 +16,7 @@
  * ```
  */
 
-import type { App, RunOptions } from './types.js';
+import type { App, RunOptions, ResizeMsg } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
 
@@ -24,13 +24,26 @@ import { parseKey } from './keys.js';
 // Types
 // ---------------------------------------------------------------------------
 
-/** A single step in a scripted key sequence. */
-export interface ScriptStep {
-  /** Key to send (raw terminal key string, e.g., 'a', '\x1b[A', '\x03'). */
-  key: string;
-  /** Milliseconds to wait before sending this key. Default: 0. */
-  delay?: number;
-}
+/** A single step in a scripted interaction sequence. */
+export type ScriptStep<M = never> =
+  | {
+    /** Key to send (raw terminal key string, e.g., 'a', '\x1b[A', '\x03'). */
+    key: string;
+    /** Milliseconds to wait before sending this step. Default: 0. */
+    delay?: number;
+  }
+  | {
+    /** Resize event to emit. */
+    resize: { columns: number; rows: number };
+    /** Milliseconds to wait before sending this step. Default: 0. */
+    delay?: number;
+  }
+  | {
+    /** Custom message to emit directly onto the bus. */
+    msg: M;
+    /** Milliseconds to wait before sending this step. Default: 0. */
+    delay?: number;
+  };
 
 /** Options for {@link runScript}, extending the base {@link RunOptions}. */
 export interface RunScriptOptions extends RunOptions {
@@ -82,7 +95,7 @@ export interface RunScriptResult<Model> {
  */
 export async function runScript<Model, M>(
   app: App<Model, M>,
-  steps: ScriptStep[],
+  steps: ScriptStep<M>[],
   options?: RunScriptOptions,
 ): Promise<RunScriptResult<Model>> {
   const start = Date.now();
@@ -135,8 +148,19 @@ export async function runScript<Model, M>(
 
       if (!running) break;
 
-      const keyMsg = parseKey(step.key);
-      bus.emit(keyMsg);
+      if ('key' in step) {
+        const keyMsg = parseKey(step.key);
+        bus.emit(keyMsg);
+      } else if ('resize' in step) {
+        const resizeMsg: ResizeMsg = {
+          type: 'resize',
+          columns: step.resize.columns,
+          rows: step.resize.rows,
+        };
+        bus.emit(resizeMsg);
+      } else {
+        bus.emit(step.msg);
+      }
 
       // Yield to allow async commands to settle
       await new Promise<void>((r) => queueMicrotask(r));

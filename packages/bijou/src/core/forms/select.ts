@@ -77,17 +77,38 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const term = terminalRenderer(ctx);
+  const maxVisible = Math.max(1, options.maxVisible ?? 7);
 
   let cursor = 0;
+  let scrollOffset = 0;
+
+  function clampScroll(): void {
+    if (cursor < scrollOffset) {
+      scrollOffset = cursor;
+    } else if (cursor >= scrollOffset + maxVisible) {
+      scrollOffset = cursor - maxVisible + 1;
+    }
+    scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, options.options.length - maxVisible)));
+  }
+
+  function visibleOptions(): SelectOption<T>[] {
+    return options.options.slice(scrollOffset, scrollOffset + maxVisible) as SelectOption<T>[];
+  }
+
+  function renderLineCount(): number {
+    return 1 + Math.min(options.options.length, maxVisible);
+  }
 
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
     term.writeLine(label);
 
-    for (let i = 0; i < options.options.length; i++) {
-      const opt = options.options[i]!;
-      const isCurrent = i === cursor;
+    const visible = visibleOptions();
+    for (let i = 0; i < visible.length; i++) {
+      const globalIndex = scrollOffset + i;
+      const opt = visible[i]!;
+      const isCurrent = globalIndex === cursor;
       const prefix = isCurrent ? '\u276f' : ' ';
       const desc = opt.description ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`) : '';
       if (isCurrent && !noColor) {
@@ -99,13 +120,13 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   }
 
   function clearRender(): void {
-    const totalLines = options.options.length + 1;
+    const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
   function cleanup(): void {
     clearRender();
-    const totalLines = options.options.length + 1;
+    const totalLines = renderLineCount();
     term.clearBlock(totalLines);
     const selected = options.options[cursor] as SelectOption<T>;
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selected.label);
@@ -119,9 +140,11 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     const handle = ctx.io.rawInput((key: string) => {
       if (key === '\x1b[A' || key === 'k') {
         cursor = (cursor - 1 + options.options.length) % options.options.length;
+        clampScroll();
         clearRender(); render();
       } else if (key === '\x1b[B' || key === 'j') {
         cursor = (cursor + 1) % options.options.length;
+        clampScroll();
         clearRender(); render();
       } else if (key === '\r' || key === '\n') {
         handle.dispose(); cleanup(); resolve(options.options[cursor]!.value);

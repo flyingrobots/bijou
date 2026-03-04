@@ -121,6 +121,26 @@ describe('select()', () => {
       const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('blue');
     });
+
+    it('supports maxVisible scrolling for long option lists', async () => {
+      const many = Array.from({ length: 10 }, (_, i) => ({
+        label: `Option ${i + 1}`,
+        value: `v${i + 1}`,
+      }));
+
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\r'] },
+      });
+      const result = await select({
+        title: 'Pick',
+        options: many,
+        maxVisible: 3,
+        ctx,
+      });
+
+      expect(result).toBe('v5');
+    });
   });
 
   it('accepts ctx parameter', async () => {
