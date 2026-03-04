@@ -24,6 +24,28 @@ TypeScript toolkit for building terminal interfaces that remain usable across lo
 
 All packages are versioned in lock-step.
 
+## Features Breakdown
+
+### Core (`@flyingrobots/bijou`)
+
+- **UI primitives**: `box`, `headerBox`, `table`, `tree`, `accordion`, `tabs`, `breadcrumb`, `stepper`, `paginator`, `timeline`, `dag`, `dagSlice`, `dagStats`.
+- **Forms**: `input`, `select`, `multiselect`, `confirm`, `group`, `wizard`, `textarea`, `filter`.
+- **Text and output helpers**: `badge`, `alert`, `kbd`, `log`, `hyperlink`, `enumeratedList`, `progressBar`, `spinnerFrame`, `gradientText`, `markdown`.
+- **Theming**: DTCG-friendly token support with built-in presets (`nord`, `catppuccin`, `cyan-magenta`, `teal-orange-pink`) and custom theme loading via `BIJOU_THEME`.
+
+### Runtime (`@flyingrobots/bijou-tui`)
+
+- **TEA loop**: `run`, `App`, command-driven update/view flow.
+- **Layout**: `flex`, `vstack`, `hstack`, `viewport`, focus-aware panes.
+- **Input and interaction**: keymaps, layered input stack, command palette, file picker, browsable list, navigable table.
+- **Motion**: spring and tween animation, timeline sequencing, high-fidelity terminal transitions.
+
+### Node Adapter (`@flyingrobots/bijou-node`)
+
+- **Runtime port**: TTY/env/dimension detection.
+- **I/O port**: stdin/stdout wiring, keyboard and resize integration.
+- **Style port**: Chalk-backed color and style rendering.
+
 ## Install
 
 Core components + Node runtime adapter:
@@ -152,3 +174,24 @@ Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#120--2026-03-04)
 ## License
 
 MIT ([`LICENSE`](./LICENSE))
+
+---
+
+<p align="center">
+Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
+</p>
+
+```rust
+.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
+;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
+[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
+`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
+ 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
+ "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
+:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
+;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
+ [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
+ $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
+ 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
+ MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
+```
