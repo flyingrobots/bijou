@@ -1,6 +1,6 @@
 # PR #29 Self-Review Fixes
 
-> 77 issues identified by self-code-review of `feat/pr28-improvements` vs `origin/main`. Grouped by severity, then by file. Each item is self-contained.
+> 77 issues identified by self-code-review of `feat/pr28-improvements` vs `origin/main` (PR #28 and PR #29). Grouped by severity, then by file. Each item is self-contained.
 
 ---
 
@@ -38,9 +38,9 @@
 
 ## MAJOR — Docs (2)
 
-- [ ] **Fix `[Unreleased]` compare link in CHANGELOG.** In `docs/CHANGELOG.md` line 551, the link reference points to `v1.0.0...HEAD` but `v1.1.0` has been tagged. Change to `[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.1.0...HEAD`.
+- [x] **Fix `[Unreleased]` compare link in CHANGELOG.** In `docs/CHANGELOG.md` line 551, the link reference points to `v1.0.0...HEAD` but `v1.1.0` has been tagged. Change to `[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.1.0...HEAD`.
 
-- [ ] **Add missing `[1.1.0]` link reference in CHANGELOG.** In `docs/CHANGELOG.md`, the `## [1.1.0]` section (line 32) uses a reference-style link but there is no corresponding definition at the bottom. Add `[1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0` between the `[Unreleased]` and `[1.0.0]` link definitions.
+- [x] **Add missing `[1.1.0]` link reference in CHANGELOG.** In `docs/CHANGELOG.md`, the `## [1.1.0]` section (line 32) uses a reference-style link but there is no corresponding definition at the bottom. Add `[1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0` between the `[Unreleased]` and `[1.0.0]` link definitions.
 
 ---
 
@@ -94,21 +94,21 @@
 
 ## MINOR — Docs (8)
 
-- [ ] **Fix COMPLETED.md entry to reference both PRs and follow naming convention.** In `docs/COMPLETED.md` line 7, the title "PR #28 Review Improvements + PR #29 CodeRabbit Fixes" doesn't follow the version-prefix convention of other entries. Change Ref to include both PRs: `**Ref:** [PR #28](...), [PR #29](...)`.
+- [x] **Fix COMPLETED.md entry to reference both PRs and follow naming convention.** In `docs/COMPLETED.md` line 7, the title "PR #28 Review Improvements + PR #29 CodeRabbit Fixes" doesn't follow the version-prefix convention of other entries. Change Ref to include both PRs: `**Ref:** [PR #28](...), [PR #29](...)`.
 
-- [ ] **Update ROADMAP "Current" line to reflect shipped state.** In `docs/ROADMAP.md` line 5, "Current: **v1.0.0**" is stale — v1.0.0 and v1.1.0 have both shipped. Update to reflect actual state (e.g., remove "Current:" or change to "Latest: **v1.1.0**").
+- [x] **Update ROADMAP "Current" line to reflect shipped state.** In `docs/ROADMAP.md` line 5, "Current: **v1.0.0**" is stale — v1.0.0 and v1.1.0 have both shipped. Update to reflect actual state (e.g., remove "Current:" or change to "Latest: **v1.1.0**").
 
-- [ ] **Fix CHANGELOG markdown.ts line count approximation.** In `docs/CHANGELOG.md` line 25, "468→~30 lines" for markdown.ts is inaccurate (actual: ~53 lines). Change to "468→~50 lines".
+- [x] **Fix CHANGELOG markdown.ts line count approximation.** In `docs/CHANGELOG.md` line 25, "468→~30 lines" for markdown.ts is inaccurate (actual: ~53 lines). Change to "468→~50 lines".
 
-- [ ] **Fix CHANGELOG `j` key simplification entry wording.** In `docs/CHANGELOG.md` line 30, the entry says "remove `j` from the down-arrow condition block" but `j` is still in the down-arrow block in normal mode (`filter-interactive.ts` line 232). Reword to: "in insert mode, `j` falls through to the printable handler instead of being special-cased in the down-arrow condition block."
+- [x] **Fix CHANGELOG `j` key simplification entry wording.** In `docs/CHANGELOG.md` line 30, the entry says "remove `j` from the down-arrow condition block" but `j` is still in the down-arrow block in normal mode (`filter-interactive.ts` line 232). Reword to: "in insert mode, `j` falls through to the printable handler instead of being special-cased in the down-arrow condition block."
 
-- [ ] **Fix TASKS.md to reference both PR #28 and PR #29.** In `TASKS.md` line 3, change "All items from PR #28 Review Improvements" to "All items from PR #28 Review Improvements and PR #29 CodeRabbit Fixes" to match the COMPLETED.md entry.
+- [x] **Fix TASKS.md to reference both PR #28 and PR #29.** In `TASKS.md` line 3, change "All items from PR #28 Review Improvements" to "All items from PR #28 Review Improvements and PR #29 CodeRabbit Fixes" to match the COMPLETED.md entry.
 
-- [ ] **Fix `visibleLength` return type in dag.md.** In `docs/dag.md` line 425, the function signature shows `function visibleLength(str: string): string` — the return type should be `: number`.
+- [x] **Fix `visibleLength` return type in dag.md.** In `docs/dag.md` line 425, the function signature shows `function visibleLength(str: string): string` — the return type should be `: number`.
 
-- [ ] **Update dag.md LoC estimates to reflect actuals.** In `docs/dag.md` lines 514–533, "Phase 3: ~80 LoC" and "Total: ~420 LoC + tests" are vastly wrong. Actual: `dag.ts` (212) + `dag-layout.ts` (176) + `dag-edges.ts` (160) + `dag-render.ts` (466) = ~1014 lines. Update or remove the estimates.
+- [x] **Update dag.md LoC estimates to reflect actuals.** In `docs/dag.md` lines 514–533, "Phase 3: ~80 LoC" and "Total: ~420 LoC + tests" are vastly wrong. Actual: `dag.ts` (212) + `dag-layout.ts` (176) + `dag-edges.ts` (160) + `dag-render.ts` (466) = ~1014 lines. Update or remove the estimates.
 
-- [ ] **Clarify "any printable" in filter README keyboard table.** In `examples/filter/README.md` line 12, the Normal mode row says `any printable | Enter insert mode + type character`. This implicitly excludes `j`, `k`, and `/` which are also printable but have special behavior. Change to `any other printable` or `any printable (except j/k//)`.
+- [x] **Clarify "any printable" in filter README keyboard table.** In `examples/filter/README.md` line 12, the Normal mode row says `any printable | Enter insert mode + type character`. This implicitly excludes `j`, `k`, and `/` which are also printable but have special behavior. Change to `any other printable` or `any printable (except j/k//)`.
 
 ---
 
@@ -136,13 +136,13 @@
 
 - [ ] **Add comment on run-length token comparison.** `dag-render.ts` line 372: `tk === prevToken` works because `TokenValue` is a string primitive. Add a comment confirming this assumption.
 
-- [ ] **Shorten filter demo description in EXAMPLES.md.** `docs/EXAMPLES.md` line 203: the filter demo description is 4+ lines of dense text. Shorten to 1–2 sentences matching other entries' style, deferring keyboard details to the example's README.
+- [x] **Shorten filter demo description in EXAMPLES.md.** `docs/EXAMPLES.md` line 203: the filter demo description is 4+ lines of dense text. Shorten to 1–2 sentences matching other entries' style, deferring keyboard details to the example's README.
 
-- [ ] **Fix ROADMAP Phase 8 table cell formatting.** `docs/ROADMAP.md` line 109: the mixed strikethrough + checkmark in a single cell is visually cluttered. Rewrite the Notes cell to be clearer: "Add `maxVisible` + scroll offset to `select()`. `filter()` scroll: Done."
+- [x] **Fix ROADMAP Phase 8 table cell formatting.** `docs/ROADMAP.md` line 109: the mixed strikethrough + checkmark in a single cell is visually cluttered. Rewrite the Notes cell to be clearer: "Add `maxVisible` + scroll offset to `select()`. `filter()` scroll: Done."
 
-- [ ] **Move struck-through P3 backlog items to end of table.** `docs/ROADMAP.md` lines 561, 563: completed items are interleaved with active backlog. Group them at the end for scanability.
+- [x] **Move struck-through P3 backlog items to end of table.** `docs/ROADMAP.md` lines 561, 563: completed items are interleaved with active backlog. Group them at the end for scanability.
 
-- [ ] **Update dag.md optional chaining note.** `docs/dag.md` line 316: pseudocode says `g.dirs[row][col]` but actual code uses `g.dirs[row]?.[col]`. Minor accuracy fix.
+- [x] **Update dag.md optional chaining note.** `docs/dag.md` line 316: pseudocode says `g.dirs[row][col]` but actual code uses `g.dirs[row]?.[col]`. Minor accuracy fix.
 
 - [ ] **Deduplicate or differentiate filter "typing filters" tests.** `filter.test.ts` lines 132 and 235: both type `c`, `a`, `r`, Enter and assert `carrot`. They're in different describe blocks but exercise the same code path.
 

@@ -22,12 +22,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### ♻️ Refactors
 
 - **Split `dag.ts` (941→~200 lines)** — extract edge routing into `dag-edges.ts`, layout algorithms into `dag-layout.ts`, and renderers into `dag-render.ts`. `dag.ts` remains the public facade with types and entry points.
-- **Split `markdown.ts` (468→~30 lines)** — extract block/inline parsers and word wrapping into `markdown-parse.ts`, block renderer into `markdown-render.ts`. `markdown.ts` remains the public facade.
+- **Split `markdown.ts` (468→~50 lines)** — extract block/inline parsers and word wrapping into `markdown-parse.ts`, block renderer into `markdown-render.ts`. `markdown.ts` remains the public facade.
 - **Extract `textarea-editor.ts`** — move the ~192-line interactive editor state machine from `textarea.ts` into a dedicated module. `textarea.ts` remains the public facade.
 - **Extract `filter-interactive.ts`** — move the ~152-line interactive filter UI from `filter.ts` into a dedicated module. `filter.ts` remains the public facade.
 - **`encodeArrowPos()` / `decodeArrowPos()`** — replace `GRID_COL_MULTIPLIER` arithmetic with self-documenting bitwise encoding functions `(row << 16) | col`, supporting up to 65535 rows/cols.
 - **Shader-based DAG edge rendering** — replace pre-allocated `charGrid`/`tokenGrid` arrays in `renderInteractiveLayout()` with on-demand `cellAt()` per-cell computation using a spatial node index and highlight cell set.
-- **Simplify `j` key handling in `filter-interactive`** — remove `j` from the down-arrow condition block; `j` is always a printable character, so it now falls through to the printable handler directly.
+- **Simplify `j` key handling in `filter-interactive`** — in insert mode, `j` falls through to the printable handler instead of being special-cased in the down-arrow condition block.
 
 ## [1.1.0] — 2026-03-04
 
@@ -548,7 +548,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0
 [0.10.1]: https://github.com/flyingrobots/bijou/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/flyingrobots/bijou/compare/v0.9.0...v0.10.0

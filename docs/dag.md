@@ -313,7 +313,7 @@ Instead of pre-allocating 2D character/token grids and writing to them in multip
 
 1. **Node box** — look up spatial index by row, check column bounds, return char + token from pre-rendered `NodeBoxResult`
 2. **Arrowhead** — check `g.arrows.has(encodeArrowPos(row, col))`, return `▼` + token
-3. **Edge** — check `g.dirs[row][col]`, return `junctionChar()` + token
+3. **Edge** — check `g.dirs[row]?.[col]`, return `junctionChar()` + token
 4. **Empty** — return `' '` + null
 
 This avoids allocating O(rows × cols) grid arrays and eliminates separate write passes for edges, arrows, highlights, and nodes.
@@ -422,7 +422,7 @@ When `totalWidth > maxWidth`:
 All width calculations use **visible length** (strip ANSI escapes before measuring):
 
 ```typescript
-function visibleLength(str: string): string {
+function visibleLength(str: string): number {
   return str.replace(/\x1b\[[0-9;]*m/g, '').length;
 }
 ```
@@ -511,7 +511,7 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 - Elbow routing (vertical exit → horizontal turn → vertical entry)
 - Arrowhead placement
 
-### Phase 3: Renderer — Shader-based cellAt (~80 LoC)
+### Phase 3: Renderer — Shader-based cellAt (~460 LoC)
 - Node box rendering (label + badge + border) into `PlacedNode[]` with pre-segmented graphemes
 - Spatial node index (`Map<row, PlacedNode[]>`) for O(1) amortized node lookup
 - Highlight cell set (`Set<number>` using `encodeArrowPos`) for O(1) edge highlight lookup
@@ -530,7 +530,7 @@ Add a quest in one terminal → the DAG re-renders in the other with the new nod
 - Terminal width overflow → label truncation → gap reduction → vertical fallback
 - `visibleLength()` for ANSI-safe width math
 
-### Total: ~420 LoC + tests
+### Total: ~1014 LoC + tests
 
 Tests follow bijou's `createTestContext()` pattern — one test per output mode, edge cases (empty, single node, diamond, wide fan-out, skip edges spanning multiple layers, cycles rejected with error).
 

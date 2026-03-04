@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v1.0.0** — Architecture audit + app shell
+Latest: **v1.1.0** — Architecture audit + app shell
 
 ---
 
@@ -106,7 +106,7 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 | **DX deep dive: app layout patterns** | research | Study real-world TUI layouts. Identify the 3–5 layout patterns that cover 90% of apps. Document findings and propose API surface. |
 | **`splitPane()`** | bijou-tui | Resizable split view (horizontal/vertical) with draggable divider, min/max constraints, and focus delegation. Each pane is a render function `(w, h) => string`. |
 | **`grid()` layout primitive** | bijou-tui | CSS Grid-inspired layout: named areas, row/column track sizing (fixed, fractional, auto), gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
-| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. ~~Fix `filter()` scroll (currently a static slice from index 0, not a real scrolling viewport).~~ ✅ Shared `adjustScroll()` logic from `browsable-list`. |
+| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. ~~`filter()` scroll~~: ✅ Done. |
 
 ### Phase 9: `appFrame()` — TEA app shell
 
@@ -558,8 +558,8 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
-| ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
 | **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
+| ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
 | ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) | col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
 ---

@@ -18,7 +18,7 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
   - Markdown width validation prevents `RangeError` on negative/NaN
   - DAG `Map.get()` lookup replacing repeated `find()`, duplicate test fixture cleanup
   - CHANGELOG/ROADMAP tactical detail trimming
-- **Ref:** [PR #29](https://github.com/flyingrobots/bijou/pull/29)
+- **Ref:** [PR #28](https://github.com/flyingrobots/bijou/pull/28), [PR #29](https://github.com/flyingrobots/bijou/pull/29)
 
 ---
 

@@ -11,7 +11,7 @@ Fuzzy-filter select with vim-style normal/insert modes
 | Normal | `j` / `↓` | Navigate down |
 | Normal | `k` / `↑` | Navigate up |
 | Normal | `/` | Enter insert mode |
-| Normal | any printable | Enter insert mode + type character |
+| Normal | any other printable | Enter insert mode + type character |
 | Normal | `Escape` | Cancel |
 | Insert | any printable | Type filter character |
 | Insert | `↑` / `↓` | Navigate |
