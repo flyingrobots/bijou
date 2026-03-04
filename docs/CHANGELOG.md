@@ -18,6 +18,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Markdown code spans not isolated** — code span content (backtick-delimited) was vulnerable to subsequent bold/italic regex passes. For example, `` `a*b*c` `` in pipe mode became `abc` instead of `a*b*c`. Now uses NUL-delimited placeholders to isolate code span content.
 - **`textarea()` empty submit ignores defaultValue** — submitting an empty textarea with Ctrl+D returned `''` instead of falling back to `defaultValue` when set.
 - **`markdown()` width not validated** — negative or NaN width values flowed unchecked into `String.repeat()` in the separator renderer, causing a `RangeError`. Now clamped to a minimum of 1.
+- **`markdown()` HR regex misses spaced variants** — `* * *` and `- - -` are valid CommonMark horizontal rules but were mis-parsed as bullet list items because the bullet regex matched first. HR regex changed from `/^(-{3,}|\*{3,}|_{3,})\s*$/` to `/^([-*_]\s*){3,}$/` on trimmed input.
+- **DAG `cellAt()` CJK column mapping** — CJK/wide characters occupy 2 terminal columns but 1 grapheme slot, causing garbled rendering when `cellAt()` indexed directly by column offset. Now builds a column-to-grapheme mapping via `expandToColumns()` during `PlacedNode` construction.
+- **Numbered list continuation indent misalignment** — continuation lines of wrapped numbered list items used per-item prefix width, causing misalignment between items 1–9 and 10+. Now calculates max prefix width across all items and uses it uniformly.
+- **DAG `Math.max(...spread)` overflow** — `Math.max(...nodes.map(...))` in `renderInteractiveLayout()` could throw `RangeError` for arrays > ~65K elements. Replaced with `reduce()` loop.
 
 ### ♻️ Refactors
 
@@ -28,6 +32,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`encodeArrowPos()` / `decodeArrowPos()`** — replace `GRID_COL_MULTIPLIER` arithmetic with self-documenting bitwise encoding functions `(row << 16) | col`, supporting up to 65535 rows/cols.
 - **Shader-based DAG edge rendering** — replace pre-allocated `charGrid`/`tokenGrid` arrays in `renderInteractiveLayout()` with on-demand `cellAt()` per-cell computation using a spatial node index and highlight cell set.
 - **Simplify `j` key handling in `filter-interactive`** — in insert mode, `j` falls through to the printable handler instead of being special-cased in the down-arrow condition block.
+- **DRY `parseInlinePlain`/`parseInlineAccessible`** — extract shared `parseInlineStripped()` function; the two variants differed only in link replacement format.
+- **Textarea running counter** — replace O(n) `lines.join('\n').length` recomputation on every keystroke with a maintained `totalLength` counter updated on insert/delete/newline.
+- **Textarea dynamic line-number gutter** — replace hardcoded `prefixWidth = 6` with dynamic calculation based on line count, preventing overflow at 1000+ lines.
 
 ## [1.1.0] — 2026-03-04
 

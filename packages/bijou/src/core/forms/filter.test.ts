@@ -170,12 +170,11 @@ describe('filter()', () => {
     });
 
     it('filter updates item count', async () => {
-      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['a', '\r'] } });
+      // 'c' matches only Carrot, proving filtering actually occurred
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['c', '\r'] } });
       await filter({ title: 'Food', options: OPTIONS, ctx });
       const output = ctx.io.written.join('');
-      // "a" matches Apple, Banana, Carrot (all contain 'a')
-      // Check that status shows filtered count
-      expect(output).toContain('/3 items');
+      expect(output).toContain('1/3 items');
     });
 
     it('custom match function is used', async () => {
@@ -271,11 +270,11 @@ describe('filter()', () => {
     });
 
     it('mode indicator shows : in normal mode', async () => {
-      // In normal mode, prompt should show ':'
+      // In normal mode, prompt should show the ': ' pattern (indent + colon + space)
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
       await filter({ title: 'Food', options: OPTIONS, ctx });
       const output = ctx.io.written.join('');
-      expect(output).toContain(':');
+      expect(output).toContain('  : ');
     });
 
     it('mode indicator shows / in insert mode', async () => {
@@ -288,9 +287,11 @@ describe('filter()', () => {
 
     it('k is typeable in insert mode', async () => {
       // / enters insert mode; k is typed as query (not navigation)
+      // Add Kiwi option so 'k' matches it, proving k was typed as filter text
+      const optionsWithKiwi = [...OPTIONS, { label: 'Kiwi', value: 'kiwi' }];
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['/', 'k', '\r'] } });
-      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
-      expect(result).toBe('apple');
+      const result = await filter({ title: 'Food', options: optionsWithKiwi, ctx });
+      expect(result).toBe('kiwi');
     });
   });
 
@@ -328,6 +329,81 @@ describe('filter()', () => {
       expect(result).toBe('a10');
       const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
       expect(stripped).toMatch(/❯.*A10/);
+    });
+
+    it('scroll down then back up tracks correctly', async () => {
+      // Navigate down 4 times (past maxVisible=3), then up 2 times, Enter
+      const keys = ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\x1b[A', '\x1b[A', '\r'];
+      const ctx = createTestContext({ mode: 'interactive', io: { keys } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
+      expect(result).toBe('a3');
+    });
+
+    it('filter query resets scroll offset', async () => {
+      // Navigate down 5, then type query that narrows list to 1 match
+      const keys = ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '1', '0', '\r'];
+      const ctx = createTestContext({ mode: 'interactive', io: { keys } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
+      // "10" matches A10
+      expect(result).toBe('a10');
+    });
+
+    it('maxVisible=1 shows single item with cursor', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 1, ctx });
+      expect(result).toBe('a2');
+    });
+
+    it('maxVisible >= option count needs no scrolling', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
+      const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 20, ctx });
+      expect(result).toBe('a2');
+    });
+  });
+
+  describe('no-matches status', () => {
+    it('shows 0/3 items when no options match', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['z', 'z', 'z', '\r'] },
+      });
+      await filter({ title: 'Food', options: OPTIONS, ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('0/3 items');
+    });
+  });
+
+  describe('out-of-range number input (non-interactive)', () => {
+    it('returns first option for number 0', async () => {
+      const ctx = createTestContext({ mode: 'static', io: { answers: ['0'] } });
+      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
+      expect(result).toBe('apple');
+    });
+
+    it('returns first option for negative number', async () => {
+      const ctx = createTestContext({ mode: 'static', io: { answers: ['-1'] } });
+      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
+      expect(result).toBe('apple');
+    });
+
+    it('returns first option for number exceeding option count', async () => {
+      const ctx = createTestContext({ mode: 'static', io: { answers: ['99'] } });
+      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
+      expect(result).toBe('apple');
+    });
+  });
+
+  describe('test deduplication', () => {
+    it('printable char in normal mode enters insert + types char (distinct from insert-mode typing)', async () => {
+      // This test focuses on the mode transition: 'c' should switch from normal to insert
+      // AND type 'c' as filter text. Distinct from typing 'c' when already in insert mode.
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['c', '\r'] } });
+      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
+      // Only Carrot matches 'c'
+      expect(result).toBe('carrot');
+      const output = ctx.io.written.join('');
+      // After typing 'c', mode should show '/' (insert mode indicator)
+      expect(output).toContain('  / ');
     });
   });
 });

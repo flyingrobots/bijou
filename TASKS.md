@@ -20,19 +20,19 @@
 
 ## MAJOR — Tests (7)
 
-- [ ] **Fix filter mode indicator assertion to be non-trivial.** In `packages/bijou/src/core/forms/filter.test.ts` line 278, `expect(output).toContain(':')` passes trivially because `:` appears everywhere in terminal output. Change to `expect(output).toContain('  : ')` to match the actual rendered mode indicator pattern (two-space indent, colon, space), paralleling line 286's `expect(output).toContain('  / ')`.
+- [x] **Fix filter mode indicator assertion to be non-trivial.** In `packages/bijou/src/core/forms/filter.test.ts` line 278, `expect(output).toContain(':')` passes trivially because `:` appears everywhere in terminal output. Change to `expect(output).toContain('  : ')` to match the actual rendered mode indicator pattern (two-space indent, colon, space), paralleling line 286's `expect(output).toContain('  / ')`.
 
-- [ ] **Fix filter count test to prove filtering actually occurred.** In `packages/bijou/src/core/forms/filter.test.ts` line 172, the query character `'a'` matches all 3 options (Apple, Banana, Carrot all contain `a`), so the count stays `3/3 items` — same as unfiltered. Change the query to `'c'` (matches only Carrot) and assert `expect(output).toContain('1/3 items')`.
+- [x] **Fix filter count test to prove filtering actually occurred.** In `packages/bijou/src/core/forms/filter.test.ts` line 172, the query character `'a'` matches all 3 options (Apple, Banana, Carrot all contain `a`), so the count stays `3/3 items` — same as unfiltered. Change the query to `'c'` (matches only Carrot) and assert `expect(output).toContain('1/3 items')`.
 
-- [ ] **Fix `k` typeable assertion to positively prove typing.** In `packages/bijou/src/core/forms/filter.test.ts` line 289, the test types `/` then `k` and expects `apple` (default). This can't distinguish "k was typed as filter text with no match" from "k navigated and something else happened." Fix: add a `{ label: 'Kiwi', value: 'kiwi' }` option to `OPTIONS` (or use a local fixture), so typing `k` matches `Kiwi` and the result proves `k` was treated as filter text. Alternatively, inspect `ctx.io.written` for the filter input line containing the typed `k`.
+- [x] **Fix `k` typeable assertion to positively prove typing.** In `packages/bijou/src/core/forms/filter.test.ts` line 289, the test types `/` then `k` and expects `apple` (default). This can't distinguish "k was typed as filter text with no match" from "k navigated and something else happened." Fix: add a `{ label: 'Kiwi', value: 'kiwi' }` option to `OPTIONS` (or use a local fixture), so typing `k` matches `Kiwi` and the result proves `k` was treated as filter text. Alternatively, inspect `ctx.io.written` for the filter input line containing the typed `k`.
 
-- [ ] **Fix bold/italic interactive-mode tests to verify styling.** In `packages/bijou/src/core/components/markdown.test.ts` lines 38–46, `toContain('bold')` and `toContain('italic')` pass trivially because those words exist in the raw source. Fix: assert the output contains ANSI bold escape `\x1b[1m` (for bold) or use the existing `expectContainsAnsi()` test helper. For italic, verify the muted token was applied by checking for ANSI color codes or using `auditStyle()`.
+- [x] **Fix bold/italic interactive-mode tests to verify styling.** In `packages/bijou/src/core/components/markdown.test.ts` lines 38–46, `toContain('bold')` and `toContain('italic')` pass trivially because those words exist in the raw source. Fix: assert the output contains ANSI bold escape `\x1b[1m` (for bold) or use the existing `expectContainsAnsi()` test helper. For italic, verify the muted token was applied by checking for ANSI color codes or using `auditStyle()`.
 
-- [ ] **Fix code span and HR tests to verify transformation occurred.** In `packages/bijou/src/core/components/markdown.test.ts`: (a) line 61 "renders inline code" — add `expect(result).not.toContain('\`')` to prove backticks were stripped; (b) lines 131–142 "renders hr" — replace `expect(result.length).toBeGreaterThan(0)` with `expect(result).toContain('\u2500')` to verify the box-drawing character was rendered.
+- [x] **Fix code span and HR tests to verify transformation occurred.** In `packages/bijou/src/core/components/markdown.test.ts`: (a) line 61 "renders inline code" — add `expect(result).not.toContain('\`')` to prove backticks were stripped; (b) lines 131–142 "renders hr" — replace `expect(result.length).toBeGreaterThan(0)` with `expect(result).toContain('\u2500')` to verify the box-drawing character was rendered.
 
-- [ ] **Add tests for `junctionChar`, `createGrid`, and `markEdge` in dag-edges.** In `packages/bijou/src/core/components/dag-edges.test.ts`, only `encodeArrowPos`/`decodeArrowPos` are tested. The other three exported functions have zero coverage. Add: (a) `junctionChar`: verify known direction sets produce correct box-drawing chars (e.g., `new Set(['D', 'R'])` → `┌`), test fallback for unknown combos; (b) `createGrid`: verify dimensions and that cells start with empty direction sets; (c) `markEdge`: verify straight and diagonal edges mark correct cells with correct directions and arrowheads.
+- [x] **Add tests for `junctionChar`, `createGrid`, and `markEdge` in dag-edges.** In `packages/bijou/src/core/components/dag-edges.test.ts`, only `encodeArrowPos`/`decodeArrowPos` are tested. The other three exported functions have zero coverage. Add: (a) `junctionChar`: verify known direction sets produce correct box-drawing chars (e.g., `new Set(['D', 'R'])` → `┌`), test fallback for unknown combos; (b) `createGrid`: verify dimensions and that cells start with empty direction sets; (c) `markEdge`: verify straight and diagonal edges mark correct cells with correct directions and arrowheads.
 
-- [ ] **Fix `dagSlice` descendants test to check all expected nodes.** In `packages/bijou/src/core/components/dag.test.ts` line 416, the test "extracts descendants" only checks for `root`, `a`, `b` but the BFS should also return `c`, `d`, `e`, `f`. Add assertions for all descendant nodes: `expect(ids).toContain('c')`, `expect(ids).toContain('d')`, `expect(ids).toContain('e')`, `expect(ids).toContain('f')`.
+- [x] **Fix `dagSlice` descendants test to check all expected nodes.** In `packages/bijou/src/core/components/dag.test.ts` line 416, the test "extracts descendants" only checks for `root`, `a`, `b` but the BFS should also return `c`, `d`, `e`, `f`. Add assertions for all descendant nodes: `expect(ids).toContain('c')`, `expect(ids).toContain('d')`, `expect(ids).toContain('e')`, `expect(ids).toContain('f')`.
 
 ---
 
@@ -64,31 +64,31 @@
 
 ## MINOR — Tests (13)
 
-- [ ] **Add viewport scrolling tests for bidirectional scroll, filter reset, and boundary maxVisible.** In `packages/bijou/src/core/forms/filter.test.ts` lines 297–332, only 2 tests exist. Add: (a) scroll down then back up — verify viewport tracks correctly; (b) type query that narrows list to < maxVisible — verify scroll offset resets; (c) `maxVisible=1` edge case; (d) `maxVisible >= option count` (no scrolling needed).
+- [x] **Add viewport scrolling tests for bidirectional scroll, filter reset, and boundary maxVisible.** In `packages/bijou/src/core/forms/filter.test.ts` lines 297–332, only 2 tests exist. Add: (a) scroll down then back up — verify viewport tracks correctly; (b) type query that narrows list to < maxVisible — verify scroll offset resets; (c) `maxVisible=1` edge case; (d) `maxVisible >= option count` (no scrolling needed).
 
-- [ ] **Add Escape key cancellation test for textarea.** In `packages/bijou/src/core/forms/textarea.test.ts`, no test exercises the Escape key (`\x1b`). Add: `io: { keys: ['h', 'i', '\x1b'] }` and assert result is `''`.
+- [x] **Add Escape key cancellation test for textarea.** In `packages/bijou/src/core/forms/textarea.test.ts`, no test exercises the Escape key (`\x1b`). Add: `io: { keys: ['h', 'i', '\x1b'] }` and assert result is `''`.
 
-- [ ] **Add tests for textarea `showLineNumbers`, `height`, and `placeholder` options.** In `packages/bijou/src/core/forms/textarea.test.ts`: (a) `showLineNumbers: true` — assert output contains `│` and line number; (b) `height: 2` with 5+ lines — verify scrolling occurs (status shows high `Ln` number); (c) `placeholder: 'Type here...'` — verify output contains placeholder text.
+- [x] **Add tests for textarea `showLineNumbers`, `height`, and `placeholder` options.** In `packages/bijou/src/core/forms/textarea.test.ts`: (a) `showLineNumbers: true` — assert output contains `│` and line number; (b) `height: 2` with 5+ lines — verify scrolling occurs (status shows high `Ln` number); (c) `placeholder: 'Type here...'` — verify output contains placeholder text.
 
-- [ ] **Add `static` mode test for markdown.** In `packages/bijou/src/core/components/markdown.test.ts`, add at least one test with `ctx('static')` verifying styled output (ANSI present, same as interactive).
+- [x] **Add `static` mode test for markdown.** In `packages/bijou/src/core/components/markdown.test.ts`, add at least one test with `ctx('static')` verifying styled output (ANSI present, same as interactive).
 
-- [ ] **Strengthen DAG truncation test to verify truncation occurred.** In `packages/bijou/src/core/components/dag.test.ts` line 310, `expect(result).toBeDefined()` is a no-crash guard. Assert the full long label does NOT appear in the output, or assert an ellipsis (`\u2026`) is present.
+- [x] **Strengthen DAG truncation test to verify truncation occurred.** In `packages/bijou/src/core/components/dag.test.ts` line 310, `expect(result).toBeDefined()` is a no-crash guard. Assert the full long label does NOT appear in the output, or assert an ellipsis (`\u2026`) is present.
 
-- [ ] **Strengthen DAG `selectedId` tests to verify styling was applied.** In `packages/bijou/src/core/components/dag.test.ts` lines 358–393, tests only assert label text is present. Use `auditStyle()` or compare styled vs unstyled output to prove selection styling differs.
+- [x] **Strengthen DAG `selectedId` tests to verify styling was applied.** In `packages/bijou/src/core/components/dag.test.ts` lines 358–393, tests only assert label text is present. Use `auditStyle()` or compare styled vs unstyled output to prove selection styling differs.
 
-- [ ] **Strengthen DAG `highlightPath` test to verify highlight styling.** In `packages/bijou/src/core/components/dag.test.ts` line 274, the test only asserts label text. Compare output with vs without `highlightPath` and assert they differ.
+- [x] **Strengthen DAG `highlightPath` test to verify highlight styling.** In `packages/bijou/src/core/components/dag.test.ts` line 274, the test only asserts label text. Compare output with vs without `highlightPath` and assert they differ.
 
-- [ ] **Add "0/3 items" status assertion for no-matches case.** In `packages/bijou/src/core/forms/filter.test.ts` line 195, the test verifies the return value but doesn't check the rendered status. Assert `ctx.io.written.join('').includes('0/3 items')`.
+- [x] **Add "0/3 items" status assertion for no-matches case.** In `packages/bijou/src/core/forms/filter.test.ts` line 195, the test verifies the return value but doesn't check the rendered status. Assert `ctx.io.written.join('').includes('0/3 items')`.
 
-- [ ] **Add out-of-range number tests for filter fallback mode.** In `packages/bijou/src/core/forms/filter.test.ts`, add tests for inputs `'0'`, `'-1'`, and `'99'` in non-interactive mode to verify boundary handling.
+- [x] **Add out-of-range number tests for filter fallback mode.** In `packages/bijou/src/core/forms/filter.test.ts`, add tests for inputs `'0'`, `'-1'`, and `'99'` in non-interactive mode to verify boundary handling.
 
-- [ ] **Add overflow behavior test for `encodeArrowPos`.** In `packages/bijou/src/core/components/dag-edges.test.ts`, add a test documenting that `encodeArrowPos(65536, 0)` silently wraps (same encoding as `(0, 0)`). This documents the limit, not a bug fix.
+- [x] **Add overflow behavior test for `encodeArrowPos`.** In `packages/bijou/src/core/components/dag-edges.test.ts`, add a test documenting that `encodeArrowPos(65536, 0)` silently wraps (same encoding as `(0, 0)`). This documents the limit, not a bug fix.
 
-- [ ] **Strengthen blockquote test to verify pipe character.** In `packages/bijou/src/core/components/markdown.test.ts` line 182, "renders blockquote with pipe character" doesn't assert `\u2502` is present. Add `expect(result).toContain('\u2502')`.
+- [x] **Strengthen blockquote test to verify pipe character.** In `packages/bijou/src/core/components/markdown.test.ts` line 182, "renders blockquote with pipe character" doesn't assert `\u2502` is present. Add `expect(result).toContain('\u2502')`.
 
-- [ ] **Strengthen link test to verify hyperlink rendering.** In `packages/bijou/src/core/components/markdown.test.ts` line 164, "renders link in interactive mode as hyperlink" only checks `toContain('Click')`. Add `expect(result).toContain('\x1b]8;')` to verify OSC 8 hyperlink escape.
+- [x] **Strengthen link test to verify hyperlink rendering.** In `packages/bijou/src/core/components/markdown.test.ts` line 164, "renders link in interactive mode as hyperlink" only checks `toContain('Click')`. Add `expect(result).toContain('\x1b]8;')` to verify OSC 8 hyperlink escape.
 
-- [ ] **Capture return value in textarea validation tests.** In `packages/bijou/src/core/forms/textarea.test.ts` lines 32–50, the `required: true` and custom validator tests assert error messages appear in output but don't assert return values. Capture and assert `expect(result).toBe('')` and `expect(result).toBe('ab')` respectively to document fallback-path behavior.
+- [x] **Capture return value in textarea validation tests.** In `packages/bijou/src/core/forms/textarea.test.ts` lines 32–50, the `required: true` and custom validator tests assert error messages appear in output but don't assert return values. Capture and assert `expect(result).toBe('')` and `expect(result).toBe('ab')` respectively to document fallback-path behavior.
 
 ---
 
@@ -144,12 +144,12 @@
 
 - [x] **Update dag.md optional chaining note.** `docs/dag.md` line 316: pseudocode says `g.dirs[row][col]` but actual code uses `g.dirs[row]?.[col]`. Minor accuracy fix.
 
-- [ ] **Deduplicate or differentiate filter "typing filters" tests.** `filter.test.ts` lines 132 and 235: both type `c`, `a`, `r`, Enter and assert `carrot`. They're in different describe blocks but exercise the same code path.
+- [x] **Deduplicate or differentiate filter "typing filters" tests.** `filter.test.ts` lines 132 and 235: both type `c`, `a`, `r`, Enter and assert `carrot`. They're in different describe blocks but exercise the same code path.
 
-- [ ] **Improve code span test naming.** `markdown.test.ts` lines 71–84: "preserves asterisks inside code spans" could be clearer as "treats asterisks as literal text inside code spans".
+- [x] **Improve code span test naming.** `markdown.test.ts` lines 71–84: "preserves asterisks inside code spans" could be clearer as "treats asterisks as literal text inside code spans".
 
-- [ ] **Add `expect(result).not.toBe('hi')` to textarea Ctrl+C test.** `textarea.test.ts` line 89: the existing assertion `expect(result).toBe('')` is sufficient, but adding a negative assertion makes the intent crystal clear.
+- [x] **Add `expect(result).not.toBe('hi')` to textarea Ctrl+C test.** `textarea.test.ts` line 89: the existing assertion `expect(result).toBe('')` is sufficient, but adding a negative assertion makes the intent crystal clear.
 
-- [ ] **Add more `encodeArrowPos` distinctness pairs.** `dag-edges.test.ts` line 30: only tests `(1,2)` vs `(2,1)`. Add `(0,1)` vs `(1,0)` and `(256,0)` vs `(0,256)`.
+- [x] **Add more `encodeArrowPos` distinctness pairs.** `dag-edges.test.ts` line 30: only tests `(1,2)` vs `(2,1)`. Add `(0,1)` vs `(1,0)` and `(256,0)` vs `(0,256)`.
 
-- [ ] **Add duplicate-node-ID test for DAG.** `dag.test.ts`: no test exercises duplicate `id` values. Add one to document whether it throws or silently uses one.
+- [x] **Add duplicate-node-ID test for DAG.** `dag.test.ts`: no test exercises duplicate `id` values. Add one to document whether it throws or silently uses one.

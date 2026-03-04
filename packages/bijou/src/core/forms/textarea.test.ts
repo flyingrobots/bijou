@@ -31,14 +31,15 @@ describe('textarea()', () => {
 
     it('required: true writes error for empty input', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: [''] } });
-      await textarea({ title: 'Msg', required: true, ctx });
+      const result = await textarea({ title: 'Msg', required: true, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('required');
+      expect(result).toBe('');
     });
 
     it('custom validator error is written', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['ab'] } });
-      await textarea({
+      const result = await textarea({
         title: 'Msg',
         validate: (v) => v.length < 3
           ? { valid: false, message: 'Too short' }
@@ -47,6 +48,7 @@ describe('textarea()', () => {
       });
       const output = ctx.io.written.join('');
       expect(output).toContain('Too short');
+      expect(result).toBe('ab');
     });
   });
 
@@ -93,6 +95,7 @@ describe('textarea()', () => {
       });
       const result = await textarea({ title: 'Msg', ctx });
       expect(result).toBe('');
+      expect(result).not.toBe('hi');
     });
 
     it('Ctrl+C returns defaultValue when set', async () => {
@@ -240,6 +243,46 @@ describe('textarea()', () => {
       });
       const result = await textarea({ title: 'Msg', ctx });
       expect(result).toBe('a');
+    });
+
+    it('Escape cancels and returns empty', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['h', 'i', '\x1b'] },
+      });
+      const result = await textarea({ title: 'Msg', ctx });
+      expect(result).toBe('');
+    });
+
+    it('showLineNumbers renders line numbers with gutter', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['a', '\r', 'b', '\x04'] },
+      });
+      await textarea({ title: 'Msg', showLineNumbers: true, ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('│');
+    });
+
+    it('height option scrolls for many lines', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['a', '\r', 'b', '\r', 'c', '\r', 'd', '\r', 'e', '\x04'] },
+      });
+      await textarea({ title: 'Msg', height: 2, ctx });
+      const output = ctx.io.written.join('');
+      // Status should show a high line number (Ln 5)
+      expect(output).toContain('Ln 5');
+    });
+
+    it('placeholder renders when buffer is empty', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x04'] },
+      });
+      await textarea({ title: 'Msg', placeholder: 'Type here...', ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('Type here...');
     });
   });
 });

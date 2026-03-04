@@ -303,7 +303,7 @@ describe('dag', () => {
       expect(boxMatch![0].length).toBe(30);
     });
 
-    it('does not crash with highlightPath', () => {
+    it('renders with highlightPath without error', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const result = dag(diamond, {
         highlightPath: ['a', 'b', 'd'],
@@ -311,7 +311,10 @@ describe('dag', () => {
         ctx,
       });
       expect(result).toContain('Start');
+      expect(result).toContain('Left');
       expect(result).toContain('End');
+      // All highlight path nodes should be present
+      expect(result).toContain('Start'); // node 'a'
     });
   });
 
@@ -341,13 +344,16 @@ describe('dag', () => {
 
     it('truncates labels when maxWidth is small', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 30 } });
+      const longLabel = 'A very long label that should be truncated';
       const nodes: DagNode[] = [
-        { id: 'a', label: 'A very long label that should be truncated', edges: ['b'] },
+        { id: 'a', label: longLabel, edges: ['b'] },
         { id: 'b', label: 'Another very long label' },
       ];
       const result = dag(nodes, { maxWidth: 30, ctx });
-      // Should still render without error
-      expect(result).toBeDefined();
+      // Full long label should NOT appear (it was truncated)
+      expect(result).not.toContain(longLabel);
+      // Ellipsis should be present from truncation
+      expect(result).toContain('\u2026');
     });
   });
 
@@ -383,6 +389,18 @@ describe('dag', () => {
       expect(result).toContain('B');
       expect(result).not.toContain('missing');
     });
+
+    it('throws cycle error on duplicate node IDs', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const dupes: DagNode[] = [
+        { id: 'a', label: 'First A', edges: ['b'] },
+        { id: 'a', label: 'Second A', edges: ['b'] },
+        { id: 'b', label: 'B' },
+      ];
+      // Duplicate IDs confuse the topo sort (3 nodes in array, but only 2 unique
+      // IDs), resulting in a cycle detection error. This documents the behavior.
+      expect(() => dag(dupes, { ctx })).toThrow('cycle detected');
+    });
   });
 
   // ── selectedId ──────────────────────────────────────────────────
@@ -409,18 +427,18 @@ describe('dag', () => {
 
     it('non-selected nodes are unaffected', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-      const withSelected = dag(twoNodes, { selectedId: 'a', ctx });
-      const without = dag(twoNodes, { ctx });
-      // Both should contain Beta — it is not selected
-      expect(withSelected).toContain('Beta');
-      expect(without).toContain('Beta');
+      const result = dag(twoNodes, { selectedId: 'a', ctx });
+      // Both nodes should be present in output
+      expect(result).toContain('Alpha');
+      expect(result).toContain('Beta');
     });
 
     it('defaults to ui.cursor token when selectedToken omitted', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       // Should not throw — uses default cursor token
-      const result = dag(twoNodes, { selectedId: 'a', ctx });
-      expect(result).toContain('Alpha');
+      const layout = dagLayout(twoNodes, { selectedId: 'a', ctx });
+      expect(layout.output).toContain('Alpha');
+      expect(layout.nodes.has('a')).toBe(true);
     });
   });
 });
@@ -444,12 +462,16 @@ describe('dagSlice', () => {
     expect(ids).toContain('root');
   });
 
-  it('extracts descendants', () => {
+  it('extracts all descendants', () => {
     const result = dagSlice(largeGraph, 'root', { direction: 'descendants' });
     const ids = result.map(n => n.id);
     expect(ids).toContain('root');
     expect(ids).toContain('a');
     expect(ids).toContain('b');
+    expect(ids).toContain('c');
+    expect(ids).toContain('d');
+    expect(ids).toContain('e');
+    expect(ids).toContain('f');
   });
 
   it('extracts both directions', () => {

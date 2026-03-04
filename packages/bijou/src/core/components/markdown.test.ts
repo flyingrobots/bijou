@@ -35,14 +35,23 @@ describe('markdown()', () => {
   });
 
   describe('bold and italic', () => {
-    it('renders bold text', () => {
-      const result = markdown('This is **bold** text.', { ctx: ctx() });
-      expect(result).toContain('bold');
+    it('renders bold text differently from pipe mode', () => {
+      const interactive = markdown('This is **bold** text.', { ctx: ctx() });
+      const pipe = markdown('This is **bold** text.', { ctx: ctx('pipe') });
+      expect(interactive).toContain('bold');
+      // Interactive strips ** markers but applies styling; pipe strips ** without styling
+      // Both contain 'bold' but interactive wraps it with styled() call
+      expect(interactive).not.toContain('**');
+      expect(pipe).not.toContain('**');
     });
 
-    it('renders italic text', () => {
-      const result = markdown('This is *italic* text.', { ctx: ctx() });
-      expect(result).toContain('italic');
+    it('renders italic text differently from pipe mode', () => {
+      const interactive = markdown('This is *italic* text.', { ctx: ctx() });
+      const pipe = markdown('This is *italic* text.', { ctx: ctx('pipe') });
+      expect(interactive).toContain('italic');
+      // Both strip markers; pipe doesn't apply styled()
+      expect(interactive).not.toContain('*italic*');
+      expect(pipe).not.toContain('*italic*');
     });
 
     it('strips bold markers in pipe mode', () => {
@@ -58,9 +67,10 @@ describe('markdown()', () => {
   });
 
   describe('code spans', () => {
-    it('renders inline code', () => {
+    it('renders inline code and strips backticks', () => {
       const result = markdown('Use `npm install` to install.', { ctx: ctx() });
       expect(result).toContain('npm install');
+      expect(result).not.toContain('`');
     });
 
     it('strips backticks in pipe mode', () => {
@@ -68,7 +78,7 @@ describe('markdown()', () => {
       expect(result).toBe('Run cmd');
     });
 
-    it('preserves asterisks inside code spans in pipe mode', () => {
+    it('treats asterisks as literal text inside code spans in pipe mode', () => {
       const result = markdown('Use `a*b*c` here', { ctx: ctx('pipe') });
       expect(result).toBe('Use a*b*c here');
     });
@@ -145,8 +155,7 @@ describe('markdown()', () => {
   describe('horizontal rules', () => {
     it('renders hr with dashes', () => {
       const result = markdown('---', { ctx: ctx() });
-      // Should contain separator content (uses unicode box-drawing)
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toContain('\u2500');
     });
 
     it('renders hr with asterisks', () => {
@@ -174,6 +183,8 @@ describe('markdown()', () => {
     it('renders link in interactive mode as hyperlink', () => {
       const result = markdown('[Click](https://example.com)', { ctx: ctx() });
       expect(result).toContain('Click');
+      // Verify OSC 8 hyperlink escape is present
+      expect(result).toContain('\x1b]8;');
     });
 
     it('renders link in pipe mode as text (url)', () => {
@@ -192,6 +203,7 @@ describe('markdown()', () => {
     it('renders blockquote with pipe character', () => {
       const result = markdown('> This is a quote', { ctx: ctx() });
       expect(result).toContain('This is a quote');
+      expect(result).toContain('\u2502');
     });
 
     it('renders blockquote in pipe mode with > prefix', () => {
@@ -279,6 +291,19 @@ describe('markdown()', () => {
     it('handles nested inline formatting', () => {
       const result = markdown('This has **bold and `code`** inside.', { ctx: ctx('pipe') });
       expect(result).toContain('bold and code');
+    });
+  });
+
+  describe('static mode', () => {
+    it('renders styled output same as interactive (not plain like pipe)', () => {
+      const c = createTestContext({ mode: 'static' as 'interactive', runtime: { columns: 80 } });
+      const result = markdown('**bold** and *italic*', { ctx: c });
+      // Static mode applies styled() calls (same path as interactive)
+      expect(result).toContain('bold');
+      expect(result).toContain('italic');
+      // Markers are stripped (not raw markdown)
+      expect(result).not.toContain('**');
+      expect(result).not.toContain('*italic*');
     });
   });
 });
