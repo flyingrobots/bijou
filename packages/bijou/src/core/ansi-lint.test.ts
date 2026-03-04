@@ -26,7 +26,7 @@ const ALLOWED = new Set([
   'core/forms/form-utils.ts',       // terminalRenderer cursor control
   'core/forms/select.ts',           // \x1b[K line-clear + key matching
   'core/forms/multiselect.ts',      // \x1b[K line-clear + key matching
-  'core/forms/filter.ts',           // \x1b[K line-clear + key matching
+  'core/forms/filter-interactive.ts', // \x1b[K line-clear + key matching
   'core/forms/textarea-editor.ts',  // \x1b[K line-clear + key/arrow matching
   'core/components/progress.ts',    // cursor control
   'core/components/spinner.ts',     // cursor control

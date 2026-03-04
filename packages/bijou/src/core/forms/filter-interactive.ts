@@ -1,0 +1,225 @@
+/**
+ * Interactive filter select UI with real-time search.
+ *
+ * Renders a keyboard-navigable filterable list using raw terminal input.
+ * Typing narrows visible options, arrow keys navigate, Enter confirms,
+ * Ctrl+C or Escape cancels.
+ */
+
+import type { FieldOptions } from './types.js';
+import type { BijouContext } from '../../ports/context.js';
+import { formatFormTitle, terminalRenderer, createStyledFn, createBoldFn } from './form-utils.js';
+
+/**
+ * Single option in a filterable select list.
+ *
+ * @typeParam T - Type of the option's value.
+ */
+export interface FilterOption<T> {
+  /** Display label shown in the option list. */
+  label: string;
+  /** Value returned when this option is selected. */
+  value: T;
+  /** Additional search keywords that match this option during filtering. */
+  keywords?: string[];
+}
+
+/**
+ * Options for the filterable select field.
+ *
+ * @typeParam T - Type of each option's value.
+ */
+export interface FilterOptions<T> extends FieldOptions<T> {
+  /** List of filterable options. */
+  options: FilterOption<T>[];
+  /** Placeholder text shown in the filter input when empty. */
+  placeholder?: string;
+  /** Maximum number of options visible at once. Default: 7. */
+  maxVisible?: number;
+  /** Custom match function for filtering. Defaults to case-insensitive label/keyword substring match. */
+  match?: (query: string, option: FilterOption<T>) => boolean;
+  /** Bijou context for IO, styling, and mode detection. */
+  ctx?: BijouContext;
+}
+
+/**
+ * Default case-insensitive substring matcher for filter options.
+ *
+ * Check the option label first, then fall back to keyword matches.
+ *
+ * @param query - User's search input.
+ * @param option - Option to test against.
+ * @returns `true` if the query matches the label or any keyword.
+ */
+export function defaultMatch<T>(query: string, option: FilterOption<T>): boolean {
+  const q = query.toLowerCase();
+  if (option.label.toLowerCase().includes(q)) return true;
+  if (option.keywords) {
+    return option.keywords.some((kw) => kw.toLowerCase().includes(q));
+  }
+  return false;
+}
+
+/**
+ * Render a keyboard-navigable filter select using raw terminal input.
+ *
+ * Typing narrows the visible options in real time. Arrow keys navigate,
+ * Enter confirms, Backspace edits the query, Ctrl+C or Escape cancels.
+ *
+ * @param options - Filter field configuration.
+ * @param ctx - Bijou context.
+ * @returns The value of the selected (or default/first) option.
+ */
+export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: BijouContext): Promise<T> {
+  const noColor = ctx.theme.noColor;
+  const t = ctx.theme;
+  const styledFn = createStyledFn(ctx);
+  const boldFn = createBoldFn(ctx);
+  const matchFn = options.match ?? defaultMatch;
+  const maxVisible = options.maxVisible ?? 7;
+  const term = terminalRenderer(ctx);
+
+  let query = '';
+  let cursor = 0;
+  let filtered = [...options.options];
+
+  function applyFilter(): void {
+    if (query === '') {
+      filtered = [...options.options];
+    } else {
+      filtered = options.options.filter((opt) => matchFn(query, opt));
+    }
+    cursor = Math.min(cursor, Math.max(0, filtered.length - 1));
+  }
+
+  function visibleItems(): FilterOption<T>[] {
+    return filtered.slice(0, maxVisible);
+  }
+
+  function renderLineCount(): number {
+    return 2 + Math.min(filtered.length, maxVisible) + 1; // header + filter input + items + status
+  }
+
+  function render(): void {
+    const label = formatFormTitle(options.title, ctx);
+    term.hideCursor();
+    term.writeLine(label);
+
+    // Filter input
+    const filterDisplay = query || (options.placeholder ? styledFn(t.theme.semantic.muted, options.placeholder) : '');
+    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, '/')} ${filterDisplay}\n`);
+
+    // Visible items
+    const vis = visibleItems();
+    for (let i = 0; i < vis.length; i++) {
+      const opt = vis[i]!;
+      const isCurrent = i === cursor;
+      const prefix = isCurrent ? '❯' : ' ';
+      if (isCurrent && !noColor) {
+        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}\n`);
+      } else {
+        ctx.io.write(`\x1b[K  ${prefix} ${opt.label}\n`);
+      }
+    }
+
+    // Status
+    const status = `${filtered.length}/${options.options.length} items`;
+    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.muted, status)}\n`);
+  }
+
+  function clearRender(): void {
+    const total = renderLineCount();
+    term.moveUp(total);
+  }
+
+  function clearAndRerender(prevLineCount: number): void {
+    term.moveUp(prevLineCount);
+    term.clearBlock(prevLineCount);
+    render();
+  }
+
+  function cleanup(): void {
+    const total = renderLineCount();
+    clearRender();
+    term.clearBlock(total);
+
+    const selected = filtered[cursor];
+    const selectedLabel = selected ? selected.label : '(none)';
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
+    ctx.io.write(`\x1b[K${label}\n`);
+    term.showCursor();
+  }
+
+  render();
+
+  return new Promise<T>((resolve) => {
+    const handle = ctx.io.rawInput((key: string) => {
+      if (key === '\r' || key === '\n') {
+        // Enter — select
+        handle.dispose();
+        cleanup();
+        resolve(filtered[cursor]?.value ?? options.defaultValue ?? options.options[0]!.value);
+        return;
+      }
+
+      if (key === '\x03' || key === '\x1b') {
+        // Ctrl+C or Escape — cancel
+        // Note: bare \x1b may false-trigger on slow connections where escape
+        // sequences arrive as separate bytes. Timer-based disambiguation is a
+        // separate future improvement.
+        handle.dispose();
+        cleanup();
+        resolve(options.defaultValue ?? options.options[0]!.value);
+        return;
+      }
+
+      if (key === '\x1b[A' || key === 'k') {
+        // Up
+        if (filtered.length === 0) return;
+        cursor = (cursor - 1 + filtered.length) % filtered.length;
+        clearRender();
+        render();
+        return;
+      }
+
+      if (key === '\x1b[B' || key === 'j') {
+        // Down — but only when query is empty (j is a printable char for filtering)
+        if (key === 'j' && query === '') {
+          // Start filtering with 'j'
+          query += key;
+          applyFilter();
+          clearRender();
+          render();
+          return;
+        }
+        if (key === '\x1b[B') {
+          if (filtered.length === 0) return;
+          cursor = (cursor + 1) % filtered.length;
+          clearRender();
+          render();
+          return;
+        }
+        // j when query is non-empty — fall through to printable handler
+      }
+
+      if (key === '\x7f' || key === '\b') {
+        // Backspace
+        if (query.length > 0) {
+          const prevLineCount = renderLineCount();
+          query = query.slice(0, -1);
+          applyFilter();
+          clearAndRerender(prevLineCount);
+        }
+        return;
+      }
+
+      // Printable character (filter input)
+      if (key.length === 1 && key >= ' ') {
+        const prevLineCount = renderLineCount();
+        query += key;
+        applyFilter();
+        clearAndRerender(prevLineCount);
+      }
+    });
+  });
+}
