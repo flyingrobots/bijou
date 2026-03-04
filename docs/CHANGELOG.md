@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+(No changes yet.)
+
+## [1.1.0] — 2026-03-04
+
 ### ✨ Features
 
 - **`focusArea()`** (bijou-tui) — new scrollable pane building block with a colored left gutter bar indicating focus state. Wraps `viewport()` with gutter chrome, horizontal overflow support (`overflowX: 'scroll' | 'hidden'`), and a convenience keymap. Degrades gracefully: pipe/accessible modes omit the gutter; static mode renders it unstyled.

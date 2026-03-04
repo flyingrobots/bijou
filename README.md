@@ -13,15 +13,14 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v1.0.0
+## What's New in v1.1.0
 
-**First stable release.** Background color support, IOPort segregation, adaptive color detection, and a major forms/overlay hardening pass.
+Two new bijou-tui building blocks for composing multi-pane interactive applications:
 
-- **Background color support** — `bgToken` on `box()`, `flex()`, `modal()`, `toast()`, `drawer()`, `tooltip()` for div-like colored blocks with graceful degradation
-- **Adaptive color scheme detection** — `detectColorScheme()` reads `COLORFGBG` to determine light vs dark terminal background
-- **IOPort segregation** — WritePort, QueryPort, InteractivePort, FilePort sub-interfaces (ISP cleanup)
-- **Forms hardening** — noColor/accessible ANSI leak fixes across all form components, shared `createStyledFn`/`createBoldFn` helpers, `formDispatch` TTY guards
-- **`Theme.surface` required** — all themes must now include `surface` tokens (`primary`, `secondary`, `elevated`, `overlay`, `muted`)
+- **`focusArea()`** — scrollable pane with a colored left gutter bar indicating focus state, horizontal overflow support, and graceful degradation
+- **`dagPane()`** — interactive DAG viewer with arrow-key node navigation, auto-highlight-path from root to selected node, and auto-scroll-to-selection
+
+Plus 8 bug fixes hardening dimension clamping, scrollbar-aware bounds, keybinding resolution, and type safety.
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 
