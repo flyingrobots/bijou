@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-03-04
+
 ### ✨ Features
 
 - **Vim-style mode switching for `filter()`** — interactive filter starts in normal mode where `j`/`k` navigate. Any printable character (except `j`/`k`) enters insert mode and types the character. Press `/` to enter insert mode without typing. `Escape` in insert returns to normal; `Escape` in normal cancels. Mode indicator shows `:` (normal) or `/` (insert).
@@ -563,7 +565,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/flyingrobots/bijou/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0
 [0.10.1]: https://github.com/flyingrobots/bijou/compare/v0.10.0...v0.10.1

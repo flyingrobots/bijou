@@ -13,14 +13,11 @@ Stop building brittle CLIs that break in CI or look like garbage on a server. Bi
 
 ---
 
-## What's New in v1.1.0
+## What's New in v1.2.0
 
-Two new bijou-tui building blocks for composing multi-pane interactive applications:
-
-- **`focusArea()`** — scrollable pane with a colored left gutter bar indicating focus state, horizontal overflow support, and graceful degradation
-- **`dagPane()`** — interactive DAG viewer with arrow-key node navigation, auto-highlight-path from root to selected node, and auto-scroll-to-selection
-
-Plus 8 bug fixes hardening dimension clamping, scrollbar-aware bounds, keybinding resolution, and type safety.
+- **Vim-style mode switching for `filter()`** — interactive filter starts in normal mode with `j`/`k` navigation. Any printable key enters insert mode. Press `/` to enter insert mode without typing. `Escape` returns to normal mode.
+- **Major refactors** — `dag.ts`, `markdown.ts`, `textarea.ts`, and `filter.ts` split into focused sub-modules, reducing the largest file from 941 to ~200 lines.
+- **13 bug fixes** across markdown rendering, DAG layout, filter viewport scrolling, textarea handling, and more.
 
 See the [full changelog](./docs/CHANGELOG.md) for the complete technical breakdown.
 
