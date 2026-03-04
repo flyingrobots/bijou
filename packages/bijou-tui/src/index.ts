@@ -280,3 +280,47 @@ export {
   commandPalette,
   commandPaletteKeyMap,
 } from './command-palette.js';
+
+// Focus area — scrollable pane with colored gutter
+export {
+  type OverflowX,
+  type FocusAreaState,
+  type FocusAreaOptions,
+  type FocusAreaRenderOptions,
+  createFocusAreaState,
+  focusArea,
+  focusAreaScrollBy,
+  focusAreaScrollTo,
+  focusAreaScrollToTop,
+  focusAreaScrollToBottom,
+  focusAreaPageDown,
+  focusAreaPageUp,
+  focusAreaScrollByX,
+  focusAreaScrollToX,
+  focusAreaSetContent,
+  focusAreaKeyMap,
+} from './focus-area.js';
+
+// DAG pane — interactive DAG viewer
+export {
+  type DagPaneDagOptions,
+  type DagPaneState,
+  type DagPaneOptions,
+  type DagPaneRenderOptions,
+  createDagPaneState,
+  dagPane,
+  dagPaneSelectChild,
+  dagPaneSelectParent,
+  dagPaneSelectLeft,
+  dagPaneSelectRight,
+  dagPaneSelectNode,
+  dagPaneClearSelection,
+  dagPaneScrollBy,
+  dagPaneScrollToTop,
+  dagPaneScrollToBottom,
+  dagPanePageDown,
+  dagPanePageUp,
+  dagPaneScrollByX,
+  dagPaneSetSource,
+  dagPaneKeyMap,
+} from './dag-pane.js';

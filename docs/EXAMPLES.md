@@ -119,6 +119,30 @@ Render output and exit. GIFs are short recordings of the final output.
 **Demo:** Start with a large DAG (12+ nodes), then render 3 fragments: ancestors of a leaf node, descendants of the root, and a 2-hop neighborhood around a middle node. Show ghost nodes with dashed borders at slice boundaries.
 **GIF:** Single frame showing full DAG then the 3 fragments. ~3s.
 
+### [x] `dag-stats`
+
+**Component:** `dagStats()` + `dag()` + `table()`
+**Demo:** Render a project planning DAG (8 nodes with status badges), then display graph statistics (nodes, edges, depth, width, roots, leaves) in a table. Show a summary box with key metrics.
+**GIF:** Single frame showing the DAG, stats table, and summary box. ~2s.
+
+### [ ] `enumerated-list`
+
+**Component:** `enumeratedList()`
+**Demo:** Render ordered and unordered lists in 5 bullet styles: numeric (default), alpha, roman, bullet, and dash. Each list has 3-4 items showing the style variation.
+**GIF:** Single frame showing all 5 list styles stacked vertically. ~2s.
+
+### [ ] `hyperlink`
+
+**Component:** `hyperlink()`
+**Demo:** Render 3 hyperlinks demonstrating OSC 8 terminal links: a standard link with display text, a link with URL fallback mode, and a link with text-only fallback. Shows clickable terminal links where supported.
+**GIF:** Single frame showing all 3 hyperlink variants. ~2s.
+
+### [ ] `log`
+
+**Component:** `log()`
+**Demo:** Render leveled log output at all 5 levels (debug, info, warn, error, fatal) with colored prefixes. Show a second group with timestamps enabled and a third with prefix disabled.
+**GIF:** Single frame showing all log levels and variants. ~2s.
+
 ### [x] `pipe`
 
 **Component:** `detectOutputMode()`, all components
@@ -166,6 +190,24 @@ Prompt the user, collect input, display result. GIFs show the interaction.
 **Component:** `group()`
 **Demo:** Multi-field form: project name (input), framework (select), features (multiselect), deploy now? (confirm). Show the final collected result object.
 **GIF:** Fill out each field in sequence, show final JSON result. ~12s.
+
+### [x] `textarea`
+
+**Component:** `textarea()`
+**Demo:** Multi-line text input for writing a commit message. Shows line numbers, placeholder text, and cursor navigation. On submit, displays the result in a header box. Cancel shows a cancellation message.
+**GIF:** Type a multi-line message → navigate with arrow keys → submit → see result. ~8s.
+
+### [x] `filter`
+
+**Component:** `filter()`
+**Demo:** Fuzzy-filter select from a list of 8 programming languages with keyword metadata. Type to narrow results in real-time, arrow keys to navigate filtered matches, Enter to select. Shows the chosen language as a badge.
+**GIF:** Type "fun" → see Elixir/Haskell/OCaml → select one → see badge result. ~6s.
+
+### [x] `wizard`
+
+**Component:** `wizard()`
+**Demo:** Multi-step deployment wizard with conditional skip logic: choose a target (cloud/self-hosted/local), then conditionally prompt for cloud provider or server hostname based on the selection, then confirm monitoring. Shows the summary in a box.
+**GIF:** Select "cloud" → enter provider → skip hostname → confirm monitoring → see summary. ~10s.
 
 ---
 
@@ -263,6 +305,36 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 **Demo:** Two side-by-side panes (50/50 flex). Each is a scrollable viewport. Tab to switch focus (highlighted border on active pane). Each pane scrolls independently.
 **GIF:** Scroll left pane → Tab → scroll right pane → Tab → scroll left again. ~8s.
 
+### [x] `pager`
+
+**Component:** `pager()`, `pagerKeyMap()`
+**Demo:** Scrollable text viewer displaying 80 lines of content with section headers. Vim-style navigation (j/k to scroll, d/u for half-page, g/G for top/bottom) with a status line. Handles terminal resize.
+**GIF:** Scroll down with j → page down → jump to bottom → scroll back up. ~8s.
+
+### [x] `navigable-table`
+
+**Component:** `navigableTable()`, `navTableKeyMap()`
+**Demo:** Keyboard-navigable data table showing 12 open-source projects with name, language, stars, and license columns. Arrow keys move the focused row, page up/down for fast scrolling, with a scrollable viewport.
+**GIF:** Navigate rows with j/k → page down → page up → quit. ~8s.
+
+### [x] `browsable-list`
+
+**Component:** `browsableList()`, `browsableListKeyMap()`
+**Demo:** Navigable list of 12 bijou components, each with a label and description. Arrow keys move focus, page up/down for fast scrolling through a viewport. Enter selects the focused item.
+**GIF:** Browse items with j/k → page down → select an item → quit. ~8s.
+
+### [x] `file-picker`
+
+**Component:** `filePicker()`, `filePickerKeyMap()`
+**Demo:** Directory browser starting at the current working directory. Shows files and directories with icons. Arrow keys navigate, Enter opens directories or selects files, Backspace goes up a level. Handles terminal resize.
+**GIF:** Navigate files → enter a directory → go back → select a file → quit. ~8s.
+
+### [x] `interactive-accordion`
+
+**Component:** `interactiveAccordion()`, `accordionKeyMap()`
+**Demo:** Keyboard-navigable accordion with 5 sections about bijou (what it is, components, runtime, themes, getting started). Arrow keys move focus between sections, Enter/Space toggles expand/collapse, `e`/`c` to expand/collapse all.
+**GIF:** Navigate sections → expand → collapse → expand all → collapse all → quit. ~8s.
+
 ### [x] `composable`
 
 **Component:** Multiple components together
@@ -275,11 +347,59 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 **Demo:** Simulate `npm install`. Show a spinner with "Resolving dependencies...", then switch to a multi-progress view as packages "download", then a tree view of what was installed, then a success alert with stats. Fully automated (no user input).
 **GIF:** Watch the full install simulation play out. ~10s.
 
+### [ ] `status-bar`
+
+**Component:** `statusBar()`
+**Demo:** Render 3 status bar variants: a code-editor bar with filename, language, and cursor position; a minimal bar with mode and line count using a fill character; and a recording bar with emoji icons. All with configurable width.
+**GIF:** Single frame showing all 3 status bar variants stacked. ~2s.
+
+### [ ] `drawer`
+
+**Component:** `drawer()`, `composite()`
+**Demo:** Full-screen app with a togglable side panel. Press `d` to slide in a drawer overlay showing a details panel (name, version, status). The background dims when the drawer is open. Press `d` again to close.
+**GIF:** Show main screen → press d → drawer opens → press d → drawer closes. ~6s.
+
+### [ ] `command-palette`
+
+**Component:** `commandPalette()`, `commandPaletteKeyMap()`
+**Demo:** Filterable action list showing 12 bijou components organized by category (Display, Feedback, Forms, Layout, Navigation). Type to filter in real-time, arrow keys to navigate, Enter to select. Shows keyboard shortcuts where available.
+**GIF:** Type "tab" → see filtered results → select one → quit. ~6s.
+
+### [ ] `tooltip`
+
+**Component:** `tooltip()`, `composite()`
+**Demo:** Positioned overlay demo with a movable target marker. Arrow keys reposition the target, `d` cycles through 4 tooltip directions (top, bottom, left, right). The tooltip shows its current direction and coordinates.
+**GIF:** Move target → cycle directions → see tooltip reposition. ~6s.
+
+### [ ] `canvas`
+
+**Component:** `canvas()`, `ShaderFn`
+**Demo:** Animated plasma shader effect rendered as ASCII art. A radial wave pattern emanates from the center of the screen using a 10-character density ramp. Runs at 60fps with smooth time-based animation. Press `q` to quit.
+**GIF:** Watch the plasma animation pulse for a few seconds → quit. ~5s.
+
+### [ ] `mouse`
+
+**Component:** `parseMouse()`, `MouseMsg`
+**Demo:** Mouse event inspector that logs click, scroll, and drag events with modifier badges (CTRL, ALT, SHIFT). Shows the last 10 events in a scrolling log with button type, action, and coordinates. Displays the last click position in a box.
+**GIF:** Click around → scroll → see event log populate → quit. ~6s.
+
 ### [x] `splash`
 
 **Component:** Spring animations + `gradientText()` + `timeline()`
 **Demo:** Animated splash screen: logo springs in from above, tagline fades in with a tween, gradient sweeps across, then a "Press any key" prompt pulses. Press a key to exit.
 **GIF:** Watch the splash animate in, press a key. ~6s.
+
+### [x] `focus-area`
+
+**Component:** `focusArea()`, `focusAreaScrollBy()`, `focusAreaKeyMap()`
+**Demo:** Scrollable text pane with a colored left gutter bar. Vim-style scroll (j/k/d/u/g/G) plus horizontal scroll (h/l). Press Tab to toggle focus state (accent vs muted gutter).
+**GIF:** Scroll through content → toggle focus → scroll horizontally → quit. ~8s.
+
+### [x] `dag-pane`
+
+**Component:** `dagPane()`, `dagPaneSelectChild()`, `dagPaneKeyMap()`
+**Demo:** Interactive DAG viewer showing a project dependency graph. Arrow keys navigate nodes spatially, auto-highlighting the path from root to selected node. Vim keys scroll the viewport.
+**GIF:** Arrow down through nodes → left/right between siblings → scroll → quit. ~10s.
 
 ---
 
@@ -287,12 +407,12 @@ Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
 
 | Category | Count |
 |---|---|
-| Static components | 20/20 |
-| Interactive forms | 5/5 |
-| TUI apps | 18/18 |
-| **Total** | **43/43** |
+| Static components | 24/24 |
+| Interactive forms | 8/8 |
+| TUI apps | 22/31 |
+| **Total** | **54/63** |
 
-> All examples complete.
+> 54 of 63 examples have GIFs recorded. Remaining 9 need demo tapes.
 
 ---
 

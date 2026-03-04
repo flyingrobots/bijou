@@ -326,6 +326,31 @@ const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
 const output = filePicker(state);
 ```
 
+### Focus Area
+
+```typescript
+import {
+  createFocusAreaState, focusArea, focusAreaScrollBy,
+  focusAreaKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createFocusAreaState({ content, width: 60, height: 20, overflowX: 'scroll' });
+const output = focusArea(state, { focused: true, ctx });
+```
+
+### DAG Pane
+
+```typescript
+import {
+  createDagPaneState, dagPane, dagPaneSelectChild,
+  dagPaneSelectParent, dagPaneKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createDagPaneState({ source: nodes, width: 80, height: 24, ctx });
+const output = dagPane(state, { focused: true, ctx });
+const next = dagPaneSelectChild(state, ctx); // arrow-key navigation
+```
+
 All building blocks include `*KeyMap()` factories for preconfigured vim-style keybindings.
 
 ## Related Packages

@@ -6,6 +6,34 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **`focusArea()`** (bijou-tui) — new scrollable pane building block with a colored left gutter bar indicating focus state. Wraps `viewport()` with gutter chrome, horizontal overflow support (`overflowX: 'scroll' | 'hidden'`), and a convenience keymap. Degrades gracefully: pipe/accessible modes omit the gutter; static mode renders it unstyled.
+- **`dagPane()`** (bijou-tui) — new interactive DAG viewer building block. Wraps `dagLayout()` in a `focusArea()` with arrow-key node navigation (parent/child/sibling via spatial proximity), auto-highlight-path from root to selected node, and auto-scroll-to-selection. Includes full keymap with vim scroll bindings and arrow-key selection.
+
+### 🐛 Fixed
+
+- **`dagPane` redundant adjacency** — `updateSelection()` no longer rebuilds the adjacency map when all callers already have one; adjacency is now passed through as a parameter
+- **`dagPane` unsafe cast** — replace `source as DagNode[]` with `isSlicedDagSource()` type guard in `renderLayout()`
+- **`dagPaneSelectNode` unknown ID** — preserves existing selection when the requested node ID is not in the layout (previously cleared to `undefined`)
+- **`dagPaneKeyMap` confirm binding** — fix `'return'` → `'enter'` key descriptor; `parseKey()` emits `'enter'` for Enter keypresses, so the confirm binding was unreachable
+- **`createDagPaneState` invalid `selectedId`** — validate that `selectedId` exists in the source graph; fall back to no selection if the ID is unknown, preventing a stuck invalid selection state
+- **`createFocusAreaState` dimension clamping** — clamp `width` and `height` to a minimum of 1, preventing invalid viewport state on zero or negative dimensions
+- **`focusArea` scrollbar-aware horizontal bounds** — account for the scrollbar column when computing horizontal scroll `maxX`, preventing the rightmost column of content from being hidden behind the scrollbar
+- **`focusArea` render-time scrollX clamping** — clamp `scrollX` against render-time content width to prevent one-column overscroll when pipe/accessible mode removes the gutter
+
+### ♻️ Refactors
+
+- **`DagPaneRenderOptions`** — replace empty interface with type alias
+- **Merge duplicate imports** — consolidate split `import type` lines in `focus-area.ts` and `dag-pane.ts`
+- **Remove dead code** — remove unused `toggle-focus` Msg variant and unreachable `case 'quit'` switch arm from focus-area example
+
+### 📝 Documentation
+
+- **GUIDE.md** — add missing `focusAreaSetContent` to Focus Area import example
+- **2 new examples** — `focus-area` (scrollable pane with focus gutter), `dag-pane` (interactive DAG viewer with node navigation)
+- **EXAMPLES.md** — add 18 missing example entries (dag-stats, enumerated-list, hyperlink, log, textarea, filter, wizard, pager, navigable-table, browsable-list, file-picker, interactive-accordion, status-bar, drawer, command-palette, tooltip, canvas, mouse) and update totals to 54/63
+
 ## [1.0.0] — 2026-03-03
 
 ### 💥 BREAKING CHANGES

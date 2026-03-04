@@ -560,6 +560,119 @@ if (model.modal) overlays.push(modal({ ...model.modal, screenWidth, screenHeight
 return composite(background, overlays, { dim: model.modal != null });
 ```
 
+## Focus Area
+
+A scrollable pane with a colored left gutter indicating focus state. Wraps `viewport()` with gutter chrome and horizontal overflow support.
+
+```typescript
+import {
+  createFocusAreaState, focusArea, focusAreaSetContent,
+  focusAreaScrollBy, focusAreaPageDown, focusAreaScrollByX,
+  focusAreaKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+// Create state with horizontal scrolling enabled
+const fa = createFocusAreaState({
+  content: longContent,
+  width: 60,
+  height: 20,
+  overflowX: 'scroll', // or 'hidden' (default)
+});
+
+// In TEA view — gutter is accent-colored when focused, muted when not
+focusArea(fa, { focused: true, ctx });
+
+// In TEA update — scroll transformers
+focusAreaScrollBy(fa, 1);      // down one line
+focusAreaPageDown(fa);          // one page
+focusAreaScrollByX(fa, 5);     // scroll right (only when overflowX='scroll')
+
+// Update content while preserving scroll position
+focusAreaSetContent(fa, newContent);
+```
+
+The gutter character (`▎`) degrades gracefully:
+- **Interactive/static mode**: colored or unstyled gutter
+- **Pipe/accessible mode**: no gutter (full width to content)
+
+### Keymap
+
+Arrow keys are intentionally excluded — reserved for content-specific navigation (e.g., DAG node selection). Scroll uses vim keys:
+
+| Key | Action |
+|-----|--------|
+| `j` / `k` | Scroll down / up |
+| `d` / `u` | Page down / up |
+| `g` / `G` | Top / bottom |
+| `h` / `l` | Scroll left / right |
+
+## DAG Pane
+
+An interactive DAG viewer that wraps `dagLayout()` in a `focusArea()` with arrow-key node navigation, auto-highlight-path, and auto-scroll-to-selection.
+
+```typescript
+import type { DagNode } from '@flyingrobots/bijou';
+import {
+  createDagPaneState, dagPane,
+  dagPaneSelectChild, dagPaneSelectParent,
+  dagPaneSelectLeft, dagPaneSelectRight,
+  dagPaneKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const nodes: DagNode[] = [
+  { id: 'A', label: 'Root', edges: ['B', 'C'] },
+  { id: 'B', label: 'Left', edges: ['D'] },
+  { id: 'C', label: 'Right', edges: ['D'] },
+  { id: 'D', label: 'Merge' },
+];
+
+// Create state — overflowX defaults to 'scroll' for DAGs
+const pane = createDagPaneState({
+  source: nodes,
+  width: 80,
+  height: 24,
+  ctx,
+});
+
+// In TEA view
+dagPane(pane, { focused: true, ctx });
+
+// In TEA update — arrow keys navigate nodes spatially
+dagPaneSelectChild(pane, ctx);   // down arrow — picks closest child by column
+dagPaneSelectParent(pane, ctx);  // up arrow — picks closest parent by column
+dagPaneSelectLeft(pane, ctx);    // left arrow — sibling in same row
+dagPaneSelectRight(pane, ctx);   // right arrow — sibling in same row
+```
+
+### Navigation Logic
+
+Arrow-key navigation uses the `DagNodePosition` map from `dagLayout()` for spatial selection:
+
+- **Down (child)**: Get children from adjacency map. Pick the child whose column center is closest to the current node's column center.
+- **Up (parent)**: Same logic using the parent adjacency map.
+- **Left/Right (sibling)**: Find all nodes on the same row. Sort by column. Move to the adjacent node. No wrap-around.
+- **No selection + any arrow key**: Auto-select the first root node.
+
+### Auto-Highlight Path
+
+When a node is selected, the pane automatically computes a BFS path from the nearest root to the selected node and passes it as `highlightPath` to `dagLayout()`. This highlights the edges and nodes along the dependency chain.
+
+### Auto-Scroll to Selection
+
+When the selection changes, the viewport automatically scrolls (both vertically and horizontally) to bring the selected node's box into view.
+
+### Keymap
+
+| Key | Action |
+|-----|--------|
+| Arrow keys | Node selection (parent/child/left/right) |
+| `j` / `k` | Scroll down / up |
+| `h` / `l` | Scroll left / right |
+| `d` / `u` | Page down / up |
+| `g` / `G` | Top / bottom |
+| `Enter` | Confirm selection |
+| `q` / `Ctrl+C` | Quit |
+
 ## Pure Functions Everywhere
 
 The spring engine, tween engine, timeline, viewport, scroll state, keybinding matching, and help generation are all pure functions operating on immutable state. This means:

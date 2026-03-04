@@ -1,6 +1,6 @@
 # Examples
 
-> 61 examples · Run any: `npx tsx examples/<name>/main.ts`
+> 63 examples · Run any: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -77,4 +77,6 @@
 | [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
 | [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
+| [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |
+| [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG viewer with node navigation |
 | [`splash`](./splash/) | `splash` | Animated splash screen |
