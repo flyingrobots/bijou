@@ -179,8 +179,8 @@ export function renderInteractiveLayout(
   }
   const maxWidth = options.maxWidth ?? ctx.runtime.columns;
 
-  let nodeWidth = options.nodeWidth ?? Math.max(
-    ...nodes.map(n => visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
+  let nodeWidth = options.nodeWidth ?? nodes.reduce(
+    (max, n) => Math.max(max, visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
     16,
   );
 

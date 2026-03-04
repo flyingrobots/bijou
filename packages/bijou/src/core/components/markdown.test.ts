@@ -158,6 +158,16 @@ describe('markdown()', () => {
       const result = markdown('---', { ctx: ctx('pipe') });
       expect(result).toContain('---');
     });
+
+    it('renders spaced asterisk HR (* * *)', () => {
+      const result = markdown('* * *', { ctx: ctx() });
+      expect(result).toContain('\u2500');
+    });
+
+    it('renders spaced dash HR (- - -)', () => {
+      const result = markdown('- - -', { ctx: ctx() });
+      expect(result).toContain('\u2500');
+    });
   });
 
   describe('links', () => {

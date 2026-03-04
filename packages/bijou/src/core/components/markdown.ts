@@ -42,11 +42,11 @@ export interface MarkdownOptions {
  * @returns The rendered terminal string.
  */
 export function markdown(source: string, options?: MarkdownOptions): string {
+  if (source.trim() === '') return '';
+
   const ctx = options?.ctx ?? getDefaultContext();
   const rawWidth = options?.width ?? ctx.runtime.columns;
   const width = Math.max(1, Number.isFinite(rawWidth) ? rawWidth : ctx.runtime.columns);
-
-  if (source.trim() === '') return '';
 
   const blocks = parseBlocks(source);
   return renderBlocks(blocks, ctx, width);

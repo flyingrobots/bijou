@@ -6,7 +6,7 @@
 
 ## MAJOR — Source Code (5)
 
-- [ ] **Fix HR regex to handle spaced variants (`* * *`, `- - -`).** In `packages/bijou/src/core/components/markdown-parse.ts`, the HR regex at line 70 is `/^(-{3,}|\*{3,}|_{3,})\s*$/` applied to `line.trim()`. This requires three *consecutive* identical characters, but CommonMark allows interspersed spaces: `* * *` and `- - -` are valid HRs. Currently these are mis-parsed as bullet list items because the bullet regex (`/^\s*[-*]\s+/`) matches first. Fix: change the HR regex to `/^([-*_]\s*){3,}$/` on `line.trim()`. Apply the same fix in `isBlockStart()` at line 143. Write a failing test first (`markdown.test.ts`): `markdown('* * *', { ctx: ctx() })` should render an HR, not a bullet list.
+- [x] **Fix HR regex to handle spaced variants (`* * *`, `- - -`).** In `packages/bijou/src/core/components/markdown-parse.ts`, the HR regex at line 70 is `/^(-{3,}|\*{3,}|_{3,})\s*$/` applied to `line.trim()`. This requires three *consecutive* identical characters, but CommonMark allows interspersed spaces: `* * *` and `- - -` are valid HRs. Currently these are mis-parsed as bullet list items because the bullet regex (`/^\s*[-*]\s+/`) matches first. Fix: change the HR regex to `/^([-*_]\s*){3,}$/` on `line.trim()`. Apply the same fix in `isBlockStart()` at line 143. Write a failing test first (`markdown.test.ts`): `markdown('* * *', { ctx: ctx() })` should render an HR, not a bullet list.
 
 - [ ] **Fix CJK/wide-char column-to-grapheme mapping in DAG `cellAt()`.** In `packages/bijou/src/core/components/dag-render.ts`, the `cellAt(row, col)` function (line 327) computes `ci = col - p.startCol` and indexes directly into the `chars` grapheme array. CJK characters occupy 2 terminal columns but 1 grapheme slot, so `col` (a column offset) and `ci` (a grapheme index) diverge when wide characters are present. This causes garbled rendering for CJK node labels. Fix: either expand the grapheme array with empty placeholder entries for the second column of wide characters, or build a column-to-grapheme mapping during `PlacedNode` construction. Write a test with a CJK label (e.g., `{ id: 'a', label: '日本語' }`) and verify the output is well-formed.
 
@@ -46,19 +46,19 @@
 
 ## MINOR — Source Code (7)
 
-- [ ] **Guard against NUL sentinel collision in markdown code span isolation.** In `packages/bijou/src/core/components/markdown-parse.ts` lines 191, 228, 262, the placeholder `\x00CODE{n}\x00` could collide if input contains literal NUL bytes. Use a longer, more unique sentinel (e.g., `\x00\x01BIJOU_CODE${idx}\x01\x00`) or add a brief comment noting the assumption that NUL bytes don't appear in markdown input.
+- [x] **Guard against NUL sentinel collision in markdown code span isolation.** In `packages/bijou/src/core/components/markdown-parse.ts` lines 191, 228, 262, the placeholder `\x00CODE{n}\x00` could collide if input contains literal NUL bytes. Use a longer, more unique sentinel (e.g., `\x00\x01BIJOU_CODE${idx}\x01\x00`) or add a brief comment noting the assumption that NUL bytes don't appear in markdown input.
 
-- [ ] **DRY up `parseInlinePlain` and `parseInlineAccessible`.** In `packages/bijou/src/core/components/markdown-parse.ts`, lines 217–276 are near-identical — they differ only in the link replacement format (`'$1 ($2)'` vs `'Link: $1 ($2)'`). Extract a shared `parseInlineStripped(text: string, linkFormat: string)` function and have both call it.
+- [x] **DRY up `parseInlinePlain` and `parseInlineAccessible`.** In `packages/bijou/src/core/components/markdown-parse.ts`, lines 217–276 are near-identical — they differ only in the link replacement format (`'$1 ($2)'` vs `'Link: $1 ($2)'`). Extract a shared `parseInlineStripped(text: string, linkFormat: string)` function and have both call it.
 
 - [x] **Add empty-options guard to `interactiveFilter`.** In `packages/bijou/src/core/forms/filter-interactive.ts` lines 210, 218, 228, `options.options[0]!.value` crashes if called with an empty array. The caller guards against this, but `interactiveFilter` is exported. Add an early `if (options.options.length === 0) throw new Error(...)` or a `@throws` JSDoc tag documenting the precondition.
 
-- [ ] **Fix hardcoded line-number gutter width in textarea.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 71, `prefixWidth` is hardcoded to 6, which overflows at 1000+ lines (number formatting uses `padStart(3)`). Calculate dynamically: `const numWidth = String(lines.length).length; const prefixWidth = showLineNumbers ? numWidth + 3 : 2;` and update the `padStart` accordingly.
+- [x] **Fix hardcoded line-number gutter width in textarea.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 71, `prefixWidth` is hardcoded to 6, which overflows at 1000+ lines (number formatting uses `padStart(3)`). Calculate dynamically: `const numWidth = String(lines.length).length; const prefixWidth = showLineNumbers ? numWidth + 3 : 2;` and update the `padStart` accordingly.
 
-- [ ] **Replace `currentLength()` with a running counter in textarea.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 94, `lines.join('\n').length` recomputes on every keystroke (O(n) allocation). Maintain a `totalLength` variable updated on insert/delete/newline instead.
+- [x] **Replace `currentLength()` with a running counter in textarea.** In `packages/bijou/src/core/forms/textarea-editor.ts` line 94, `lines.join('\n').length` recomputes on every keystroke (O(n) allocation). Maintain a `totalLength` variable updated on insert/delete/newline instead.
 
-- [ ] **Replace `Math.max(...spread)` with loop in DAG render.** In `packages/bijou/src/core/components/dag-render.ts` line 183, `Math.max(...nodes.map(...))` spreads all elements as arguments. This throws `RangeError` for arrays > ~65K elements. Use `nodes.reduce((max, n) => Math.max(max, ...), 0)` instead.
+- [x] **Replace `Math.max(...spread)` with loop in DAG render.** In `packages/bijou/src/core/components/dag-render.ts` line 183, `Math.max(...nodes.map(...))` spreads all elements as arguments. This throws `RangeError` for arrays > ~65K elements. Use `nodes.reduce((max, n) => Math.max(max, ...), 0)` instead.
 
-- [ ] **Fix numbered list continuation indent misalignment.** In `packages/bijou/src/core/components/markdown-render.ts` lines 77–88, the numbered list prefix width varies per item (`1. ` vs `10. `). Continuation lines of wrapped items inherit their own item's prefix width, causing misalignment between items 1–9 and 10+. Calculate the max prefix width across all items and use it uniformly for all continuation indents.
+- [x] **Fix numbered list continuation indent misalignment.** In `packages/bijou/src/core/components/markdown-render.ts` lines 77–88, the numbered list prefix width varies per item (`1. ` vs `10. `). Continuation lines of wrapped items inherit their own item's prefix width, causing misalignment between items 1–9 and 10+. Calculate the max prefix width across all items and use it uniformly for all continuation indents.
 
 ---
 
@@ -120,11 +120,11 @@
 
 - [x] **Add comment on junction char alphabetical sort invariant.** `dag-edges.ts` line 77: `[...dirs].sort().join('')` relies on `D < L < R < U` alphabetically. Add: `// Alphabetical sort of D,L,R,U matches JUNCTION table keys`.
 
-- [ ] **Remove redundant `visited` set in Kahn's algorithm.** `dag-layout.ts` line 50: the `visited` set is redundant — in-degree tracking guarantees each node is queued exactly once. Remove or add a defensive-programming comment.
+- [x] **Remove redundant `visited` set in Kahn's algorithm.** `dag-layout.ts` line 50: the `visited` set is redundant — in-degree tracking guarantees each node is queued exactly once. Remove or add a defensive-programming comment.
 
-- [ ] **Move `hideCursor()` to initial render only in textarea.** `textarea-editor.ts` line 67: `term.hideCursor()` is called on every `render()` invocation, but the cursor is already hidden. Move to the one-time setup before the event loop.
+- [x] **Move `hideCursor()` to initial render only in textarea.** `textarea-editor.ts` line 67: `term.hideCursor()` is called on every `render()` invocation, but the cursor is already hidden. Move to the one-time setup before the event loop.
 
-- [ ] **Move empty-source check before context resolution in markdown.** `markdown.ts` line 49: `if (source.trim() === '') return ''` runs after context resolution. Move to line 45 for a micro-optimization.
+- [x] **Move empty-source check before context resolution in markdown.** `markdown.ts` line 49: `if (source.trim() === '') return ''` runs after context resolution. Move to line 45 for a micro-optimization.
 
 - [x] **Add comment on `wordWrap` behavior for `width <= 0`.** `markdown-parse.ts` line 289: `wordWrap` silently degrades for non-positive widths (returns `[text]` unwrapped). Document this design choice.
 

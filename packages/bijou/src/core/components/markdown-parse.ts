@@ -66,8 +66,8 @@ export function parseBlocks(source: string): BlockType[] {
       continue;
     }
 
-    // Horizontal rule
-    if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line.trim())) {
+    // Horizontal rule (supports interspersed spaces: * * *, - - -, _ _ _)
+    if (/^([-*_]\s*){3,}$/.test(line.trim())) {
       blocks.push({ type: 'hr' });
       i++;
       continue;
@@ -140,7 +140,7 @@ export function parseBlocks(source: string): BlockType[] {
 function isBlockStart(line: string): boolean {
   if (line.trimStart().startsWith('```')) return true;
   if (/^(#{1,4})\s+/.test(line)) return true;
-  if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line.trim())) return true;
+  if (/^([-*_]\s*){3,}$/.test(line.trim())) return true;
   if (line.trimStart().startsWith('>')) return true;
   if (/^\s*[-*]\s+/.test(line)) return true;
   if (/^\s*\d+\.\s+/.test(line)) return true;
@@ -190,7 +190,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
     const idx = codeSpans.length;
     codeSpans.push(ctx.style.styled(ctx.theme.theme.semantic.warning, code));
-    return `\x00CODE${idx}\x00`;
+    return `\x00\x01BIJOU_CS${idx}\x01\x00`;
   });
 
   // Bold: **text**
@@ -205,7 +205,46 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   });
 
   // Restore code spans
-  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
+  result = result.replace(/\x00\x01BIJOU_CS(\d+)\x01\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
+
+  return result;
+}
+
+/**
+ * Shared implementation for plain/accessible inline markdown stripping.
+ *
+ * Replaces links using the provided replacer, strips bold/italic markers,
+ * and isolates code spans from formatting passes.
+ *
+ * @param text - The inline text to strip.
+ * @param linkReplacer - Replacement pattern or function for markdown links.
+ * @returns The stripped inline text.
+ */
+function parseInlineStripped(
+  text: string,
+  linkReplacer: string | ((...args: string[]) => string),
+): string {
+  let result = text;
+
+  // Links
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, linkReplacer as string);
+
+  // Code: extract and replace with placeholders to isolate from bold/italic
+  const codeSpans: string[] = [];
+  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
+    const idx = codeSpans.length;
+    codeSpans.push(code);
+    return `\x00\x01BIJOU_CS${idx}\x01\x00`;
+  });
+
+  // Bold: **text** → text
+  result = result.replace(/\*\*(.+?)\*\*/g, '$1');
+
+  // Italic: *text* → text
+  result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
+
+  // Restore code spans
+  result = result.replace(/\x00\x01BIJOU_CS(\d+)\x01\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
 
   return result;
 }
@@ -219,29 +258,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
  * @returns The plain-text inline text.
  */
 function parseInlinePlain(text: string): string {
-  let result = text;
-
-  // Links: [text](url) → text (url)
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)');
-
-  // Code: extract and replace with placeholders to isolate from bold/italic
-  const codeSpans: string[] = [];
-  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
-    const idx = codeSpans.length;
-    codeSpans.push(code);
-    return `\x00CODE${idx}\x00`;
-  });
-
-  // Bold: **text** → text
-  result = result.replace(/\*\*(.+?)\*\*/g, '$1');
-
-  // Italic: *text* → text
-  result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
-
-  // Restore code spans
-  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
-
-  return result;
+  return parseInlineStripped(text, '$1 ($2)');
 }
 
 /**
@@ -254,29 +271,7 @@ function parseInlinePlain(text: string): string {
  * @returns The accessible inline text.
  */
 function parseInlineAccessible(text: string, _ctx: BijouContext): string {
-  let result = text;
-
-  // Links: [text](url) → Link: text (url)
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 'Link: $1 ($2)');
-
-  // Code: extract and replace with placeholders to isolate from bold/italic
-  const codeSpans: string[] = [];
-  result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
-    const idx = codeSpans.length;
-    codeSpans.push(code);
-    return `\x00CODE${idx}\x00`;
-  });
-
-  // Bold: **text** → text
-  result = result.replace(/\*\*(.+?)\*\*/g, '$1');
-
-  // Italic: *text* → text
-  result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '$1');
-
-  // Restore code spans
-  result = result.replace(/\x00CODE(\d+)\x00/g, (_m, idx: string) => codeSpans[Number(idx)]!);
-
-  return result;
+  return parseInlineStripped(text, 'Link: $1 ($2)');
 }
 
 // ── Word wrapping ──────────────────────────────────────────────────

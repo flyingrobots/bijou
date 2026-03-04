@@ -51,6 +51,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   let cursorRow = 0;
   let cursorCol = 0;
   let scrollY = 0;
+  let totalLength = 0;  // running counter for lines.join('\n').length
 
   function visibleLines(): string[] {
     return lines.slice(scrollY, scrollY + height);
@@ -64,18 +65,18 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
-    term.hideCursor();
     term.writeLine(`${label}${hint}`);
 
     const vis = visibleLines();
-    const prefixWidth = showLineNumbers ? 6 : 2; // "  1 │ " or "  "
+    const numWidth = showLineNumbers ? String(lines.length).length : 0;
+    const prefixWidth = showLineNumbers ? numWidth + 3 : 2; // " N │ " or "  "
     const contentWidth = Math.max(1, renderWidth - prefixWidth);
     for (let i = 0; i < height; i++) {
       const lineIdx = scrollY + i;
       const rawLine = vis[i] ?? '';
       const line = rawLine.length > contentWidth ? rawLine.slice(0, contentWidth) : rawLine;
       const prefix = showLineNumbers
-        ? styledFn(t.theme.semantic.muted, `${String(lineIdx + 1).padStart(3)} │ `)
+        ? styledFn(t.theme.semantic.muted, `${String(lineIdx + 1).padStart(numWidth)} │ `)
         : '  ';
 
       if (lineIdx === 0 && options.placeholder && lines.length === 1 && lines[0] === '') {
@@ -87,12 +88,8 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
     // Status line
     const pos = `Ln ${cursorRow + 1}, Col ${cursorCol + 1}`;
-    const lenInfo = options.maxLength ? ` | ${currentLength()}/${options.maxLength}` : '';
+    const lenInfo = options.maxLength ? ` | ${totalLength}/${options.maxLength}` : '';
     ctx.io.write(`\x1b[K${styledFn(t.theme.semantic.muted, pos + lenInfo)}\n`);
-  }
-
-  function currentLength(): number {
-    return lines.join('\n').length;
   }
 
   function clearRender(): void {
@@ -114,6 +111,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     term.showCursor();
   }
 
+  term.hideCursor();
   render();
 
   return new Promise<string>((resolve) => {
@@ -140,12 +138,13 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       if (key === '\r' || key === '\n') {
         // Enter — newline (counts as 1 character for maxLength)
-        if (options.maxLength && currentLength() >= options.maxLength) return;
+        if (options.maxLength && totalLength >= options.maxLength) return;
         const currentLine = lines[cursorRow]!;
         const before = currentLine.slice(0, cursorCol);
         const after = currentLine.slice(cursorCol);
         lines[cursorRow] = before;
         lines.splice(cursorRow + 1, 0, after);
+        totalLength++;  // newline character
         cursorRow++;
         cursorCol = 0;
         ensureCursorVisible();
@@ -160,6 +159,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
           const line = lines[cursorRow]!;
           lines[cursorRow] = line.slice(0, cursorCol - 1) + line.slice(cursorCol);
           cursorCol--;
+          totalLength--;  // removed one character
         } else if (cursorRow > 0) {
           // Merge with previous line
           const prevLine = lines[cursorRow - 1]!;
@@ -168,6 +168,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
           lines[cursorRow - 1] = prevLine + currentLine;
           lines.splice(cursorRow, 1);
           cursorRow--;
+          totalLength--;  // removed newline character
           ensureCursorVisible();
         }
         clearRender();
@@ -223,10 +224,11 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       // Printable character
       if (key.length === 1 && key >= ' ') {
-        if (options.maxLength && currentLength() >= options.maxLength) return;
+        if (options.maxLength && totalLength >= options.maxLength) return;
         const line = lines[cursorRow]!;
         lines[cursorRow] = line.slice(0, cursorCol) + key + line.slice(cursorCol);
         cursorCol++;
+        totalLength++;  // added one character
         clearRender();
         render();
       }

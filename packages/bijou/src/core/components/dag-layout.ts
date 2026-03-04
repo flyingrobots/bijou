@@ -46,12 +46,11 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
     if (deg === 0) queue.push(id);
   }
 
+  // Kahn's algorithm: in-degree tracking guarantees each node is queued exactly
+  // once (when its in-degree reaches 0), so no visited set is needed.
   const topoOrder: string[] = [];
-  const visited = new Set<string>();
   while (queue.length > 0) {
     const id = queue.shift()!;
-    if (visited.has(id)) continue;
-    visited.add(id);
     topoOrder.push(id);
     for (const childId of children.get(id) ?? []) {
       const newDeg = (inDegree.get(childId) ?? 1) - 1;

@@ -77,13 +77,18 @@ export function renderBlocks(
       }
 
       case 'numbered-list': {
+        // Pre-compute max prefix width so all continuation lines align
+        const lastNum = block.items.length;
+        const maxPrefix = mode === 'pipe' ? `${lastNum}. ` : `  ${lastNum}. `;
+        const uniformIndent = maxPrefix.length;
         for (let n = 0; n < block.items.length; n++) {
           const prefix = mode === 'pipe' ? `${n + 1}. ` : `  ${n + 1}. `;
-          const indentWidth = width - prefix.length;
+          const paddedPrefix = prefix.padEnd(uniformIndent);
+          const indentWidth = width - uniformIndent;
           const wrapped = wordWrap(block.items[n]!, indentWidth > 0 ? indentWidth : width);
-          lines.push(prefix + parseInline(wrapped[0]!, ctx, mode));
+          lines.push(paddedPrefix + parseInline(wrapped[0]!, ctx, mode));
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(prefix.length) + parseInline(wrapped[i]!, ctx, mode));
+            lines.push(' '.repeat(uniformIndent) + parseInline(wrapped[i]!, ctx, mode));
           }
         }
         lines.push('');
