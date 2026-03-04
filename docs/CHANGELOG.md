@@ -16,6 +16,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`dagPane` redundant adjacency** — `updateSelection()` no longer rebuilds the adjacency map when all callers already have one; adjacency is now passed through as a parameter
 - **`dagPane` unsafe cast** — replace `source as DagNode[]` with `isSlicedDagSource()` type guard in `renderLayout()`
 - **`dagPaneSelectNode` unknown ID** — preserves existing selection when the requested node ID is not in the layout (previously cleared to `undefined`)
+- **`dagPaneKeyMap` confirm binding** — fix `'return'` → `'enter'` key descriptor; `parseKey()` emits `'enter'` for Enter keypresses, so the confirm binding was unreachable
+- **`createDagPaneState` invalid `selectedId`** — validate that `selectedId` exists in the source graph; fall back to no selection if the ID is unknown, preventing a stuck invalid selection state
+- **`createFocusAreaState` dimension clamping** — clamp `width` and `height` to a minimum of 1, preventing invalid viewport state on zero or negative dimensions
+- **`focusArea` scrollbar-aware horizontal bounds** — account for the scrollbar column when computing horizontal scroll `maxX`, preventing the rightmost column of content from being hidden behind the scrollbar
+- **`focusArea` render-time scrollX clamping** — clamp `scrollX` against render-time content width to prevent one-column overscroll when pipe/accessible mode removes the gutter
 
 ### ♻️ Refactors
 
