@@ -23,7 +23,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Extract `filter-interactive.ts`** — move the ~152-line interactive filter UI from `filter.ts` into a dedicated module. `filter.ts` remains the public facade.
 - **`encodeArrowPos()` / `decodeArrowPos()`** — replace `GRID_COL_MULTIPLIER` arithmetic with self-documenting bitwise encoding functions `(row << 16) | col`, supporting up to 65535 rows/cols.
 - **Shader-based DAG edge rendering** — replace pre-allocated `charGrid`/`tokenGrid` arrays in `renderInteractiveLayout()` with on-demand `cellAt()` per-cell computation using a spatial node index and highlight cell set.
-- **Simplify `j` key handling in filter-interactive** — remove `j` from the down-arrow condition block; `j` is always a printable character, so it now falls through to the printable handler directly.
+- **Simplify `j` key handling in `filter-interactive`** — remove `j` from the down-arrow condition block; `j` is always a printable character, so it now falls through to the printable handler directly.
 
 ## [1.1.0] — 2026-03-04
 

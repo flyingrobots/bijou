@@ -279,11 +279,18 @@ describe('filter()', () => {
     });
 
     it('mode indicator shows / in insert mode', async () => {
-      // After entering insert mode, prompt should show '/'
+      // After entering insert mode, prompt should show '/' (not just in x/y status)
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['/', '\r'] } });
       await filter({ title: 'Food', options: OPTIONS, ctx });
       const output = ctx.io.written.join('');
-      expect(output).toContain('/');
+      expect(output).toContain('  / ');
+    });
+
+    it('k is typeable in insert mode', async () => {
+      // / enters insert mode; k is typed as query (not navigation)
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['/', 'k', '\r'] } });
+      const result = await filter({ title: 'Food', options: OPTIONS, ctx });
+      expect(result).toBe('apple');
     });
   });
 });

@@ -405,16 +405,14 @@ export function renderInteractiveLayout(
  */
 export function renderPipe(nodes: DagNode[]): string {
   if (nodes.length === 0) return '';
+  const labelById = new Map(nodes.map(n => [n.id, n.label] as const));
   const lines: string[] = [];
   for (const n of nodes) {
     const edges = n.edges ?? [];
     const badgePart = n.badge ? ` (${n.badge})` : '';
     if (edges.length > 0) {
       const targets = edges
-        .map(id => {
-          const target = nodes.find(t => t.id === id);
-          return target ? target.label : id;
-        })
+        .map(id => labelById.get(id) ?? id)
         .join(', ');
       lines.push(`${n.label}${badgePart} -> ${targets}`);
     } else {

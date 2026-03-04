@@ -39,6 +39,16 @@ const withBadges: DagNode[] = [
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
 ];
 
+const largeGraph: DagNode[] = [
+  { id: 'root', label: 'Root', edges: ['a', 'b'] },
+  { id: 'a', label: 'A', edges: ['c', 'd'] },
+  { id: 'b', label: 'B', edges: ['d', 'e'] },
+  { id: 'c', label: 'C', edges: ['f'] },
+  { id: 'd', label: 'D', edges: ['f'] },
+  { id: 'e', label: 'E', edges: ['f'] },
+  { id: 'f', label: 'F' },
+];
+
 // ── Basic Tests ────────────────────────────────────────────────────
 
 describe('dag', () => {
@@ -386,16 +396,6 @@ describe('dag', () => {
 // ── dagSlice Tests ─────────────────────────────────────────────────
 
 describe('dagSlice', () => {
-  const largeGraph: DagNode[] = [
-    { id: 'root', label: 'Root', edges: ['a', 'b'] },
-    { id: 'a', label: 'A', edges: ['c', 'd'] },
-    { id: 'b', label: 'B', edges: ['d', 'e'] },
-    { id: 'c', label: 'C', edges: ['f'] },
-    { id: 'd', label: 'D', edges: ['f'] },
-    { id: 'e', label: 'E', edges: ['f'] },
-    { id: 'f', label: 'F' },
-  ];
-
   it('returns empty for unknown focus', () => {
     expect(dagSlice(largeGraph, 'unknown')).toEqual([]);
   });
@@ -679,16 +679,6 @@ describe('DagSource adapter', () => {
   });
 
   describe('dagSlice() with DagSource', () => {
-    const largeGraph: DagNode[] = [
-      { id: 'root', label: 'Root', edges: ['a', 'b'] },
-      { id: 'a', label: 'A', edges: ['c', 'd'] },
-      { id: 'b', label: 'B', edges: ['d', 'e'] },
-      { id: 'c', label: 'C', edges: ['f'] },
-      { id: 'd', label: 'D', edges: ['f'] },
-      { id: 'e', label: 'E', edges: ['f'] },
-      { id: 'f', label: 'F' },
-    ];
-
     it('returns SlicedDagSource (not DagNode[])', () => {
       const src = arraySource(largeGraph);
       const result = dagSlice(src, 'd');
@@ -1044,15 +1034,6 @@ describe('render output stability', () => {
 
   it('ghost nodes snapshot', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-    const largeGraph: DagNode[] = [
-      { id: 'root', label: 'Root', edges: ['a', 'b'] },
-      { id: 'a', label: 'A', edges: ['c', 'd'] },
-      { id: 'b', label: 'B', edges: ['d', 'e'] },
-      { id: 'c', label: 'C', edges: ['f'] },
-      { id: 'd', label: 'D', edges: ['f'] },
-      { id: 'e', label: 'E', edges: ['f'] },
-      { id: 'f', label: 'F' },
-    ];
     const sliced = dagSlice(largeGraph, 'd', { direction: 'ancestors', depth: 1 });
     const output = dag(sliced, { ctx });
     expect(output).toMatchSnapshot();
