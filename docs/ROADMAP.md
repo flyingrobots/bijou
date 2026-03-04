@@ -2,13 +2,15 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Current: **v1.0.0** — Architecture audit remediation
+Current: **v1.0.0** — Architecture audit + app shell
 
 ---
 
-## v1.0.0 — Architecture audit remediation
+## v1.0.0 — Architecture audit + app shell
 
-Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
+Phases 1–7: Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
+
+Phases 8–9: App shell primitives — the layout and framing components needed to build full-screen multi-pane TUI applications without boilerplate.
 
 ### Phase 1: Port interface cleanup (ISP)
 
@@ -92,6 +94,29 @@ Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagona
 |------|---------|-------|
 | **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
 | **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
+
+### Phase 8: App shell primitives
+
+**Problem:** Building a multi-pane TUI app requires manually composing `flex()`, `focusArea()`, `createPanelGroup()`, `InputStack`, keymaps, and resize handling. Every non-trivial app re-implements the same shell: tabbed pages, help overlay, scroll, gutters, fullscreen layout. We need higher-level primitives so this is a one-liner.
+
+**DX research needed first:** What are the right abstractions? How do grids, splits, and focus areas compose? Study real apps (lazygit, k9s, btop) and existing TUI frameworks (Charm bubbletea layouts, Ratatui) to identify the minimal primitive set.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **DX deep dive: app layout patterns** | research | Study real-world TUI layouts. Identify the 3–5 layout patterns that cover 90% of apps. Document findings and propose API surface. |
+| **`splitPane()`** | bijou-tui | Resizable split view (horizontal/vertical) with draggable divider, min/max constraints, and focus delegation. Each pane is a render function `(w, h) => string`. |
+| **`grid()` layout primitive** | bijou-tui | CSS Grid-inspired layout: named areas, row/column track sizing (fixed, fractional, auto), gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
+| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. Fix `filter()` scroll (currently a static slice from index 0, not a real scrolling viewport). Shared `adjustScroll()` logic from `browsable-list`. |
+
+### Phase 9: `appFrame()` — TEA app shell
+
+**Problem:** Every TUI app beyond "hello world" re-implements tabbed pages, help overlay, scroll management, gutter chrome, and fullscreen layout. `appFrame()` eliminates this boilerplate.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **`appFrame()` higher-order app** | bijou-tui | `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`. Each page declares view + keymap + help. Frame owns tab switching, `?` help toggle, scroll, gutter/chrome. |
+| **Per-page scroll isolation** | bijou-tui | Each page/pane has independent scroll state preserved across tab switches. Focus determines which pane receives scroll input. |
+| **Multi-pane page support** | bijou-tui | Pages can declare `splitPane()` or `grid()` layouts. Frame delegates focus and input routing per pane via `InputStack`. |
 
 ---
 
@@ -396,11 +421,9 @@ round-trip
 
 ## Future features
 
-### `appFrame` — TEA app shell (bijou-tui)
+### ~~`appFrame` — TEA app shell (bijou-tui)~~ → Scheduled as Phase 9
 
-Higher-order TEA app that eliminates the boilerplate every TUI app re-implements: tabbed pages, help overlay, scroll, gutters, fullscreen layout.
-
-**Lives in:** `@flyingrobots/bijou-tui` (owns state, not a pure view)
+See Phase 9 above. Original design notes preserved here for reference:
 
 **Core idea:**
 - `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`
@@ -431,7 +454,7 @@ Growing toward a full terminal component library:
 | **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~, ~~`navigableTable()`~~, ~~`browsableList()`~~, ~~`filePicker()`~~, ~~`focusArea()`~~, ~~`dagPane()`~~ ✅ |
 | **Overlay** | ~~`composite()`~~, ~~`modal()`~~, ~~`toast()`~~, ~~`drawer()`~~ ✅ |
 | **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~, ~~`parseMouse()`~~ ✅ |
-| **App** | ~~`statusBar()`~~, ~~`tooltip()`~~ ✅, `splitPane()` |
+| **App** | ~~`statusBar()`~~, ~~`tooltip()`~~ ✅, `splitPane()`, `grid()`, `appFrame()` |
 
 Each new component should follow this template before implementation:
 1. Write user story and requirements
@@ -532,7 +555,6 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **Dynamic forms** | bijou | Fields that change based on previous input values. |
 | **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
 | **Note field** | bijou | Display-only text within a form flow. |
-| **Scrollable select** | bijou | Fixed-height select with overflow scrolling. |
 | **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
