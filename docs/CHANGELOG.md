@@ -6,7 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-(No changes yet.)
+### ♻️ Refactors
+
+- **Split `dag.ts` (941→~200 lines)** — extract edge routing into `dag-edges.ts`, layout algorithms into `dag-layout.ts`, and renderers into `dag-render.ts`. `dag.ts` remains the public facade with types and entry points.
+- **Split `markdown.ts` (468→~30 lines)** — extract block/inline parsers and word wrapping into `markdown-parse.ts`, block renderer into `markdown-render.ts`. `markdown.ts` remains the public facade.
+- **Extract `textarea-editor.ts`** — move the ~192-line interactive editor state machine from `textarea.ts` into a dedicated module. `textarea.ts` remains the public facade.
+- **Extract `filter-interactive.ts`** — move the ~152-line interactive filter UI from `filter.ts` into a dedicated module. `filter.ts` remains the public facade.
 
 ## [1.1.0] — 2026-03-04
 

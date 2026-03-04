@@ -58,10 +58,10 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Split `dag.ts` (941 lines)** | bijou | Extract into `dag-layout.ts` (layer assignment, positioning), `dag-edges.ts` (edge routing), `dag-render.ts` (string output + ANSI). Keep `dag.ts` as the public entry that composes them. |
-| **Split `markdown.ts` (468 lines)** | bijou | Extract `markdown-parse.ts` (two-pass block/inline parser) and `markdown-render.ts` (mode-specific output). Keep `markdown.ts` as the public entry. |
-| **Extract textarea editor** | bijou | Move interactive editor state machine (~200 lines) from `textarea.ts` into `textarea-editor.ts`. |
-| **Extract filter interactive UI** | bijou | Move interactive terminal UI (~150 lines) from `filter.ts` into `filter-interactive.ts`. |
+| ~~**Split `dag.ts` (941 lines)**~~ | bijou | Done — `dag-layout.ts` (layer assignment, column ordering), `dag-edges.ts` (edge routing), `dag-render.ts` (interactive/pipe/accessible renderers). `dag.ts` is the public facade. |
+| ~~**Split `markdown.ts` (468 lines)**~~ | bijou | Done — `markdown-parse.ts` (block/inline parser, word wrap), `markdown-render.ts` (mode-specific block renderer). `markdown.ts` is the public facade. |
+| ~~**Extract textarea editor**~~ | bijou | Done — `textarea-editor.ts` owns TextareaOptions and interactiveTextarea(). `textarea.ts` is the public facade. |
+| ~~**Extract filter interactive UI**~~ | bijou | Done — `filter-interactive.ts` owns FilterOption, FilterOptions, defaultMatch, interactiveFilter(). `filter.ts` is the public facade. |
 
 ### Phase 5: Mode rendering strategy (OCP)
 
