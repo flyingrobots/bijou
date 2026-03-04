@@ -74,8 +74,8 @@ describe('junctionChar', () => {
     expect(junctionChar(new Set(['D', 'L', 'R', 'U']))).toBe('┼');
   });
 
-  it('returns ┼ as fallback for unknown direction combo', () => {
-    expect(junctionChar(new Set())).toBe('┼');
+  it('returns space for empty direction set (no edge traffic)', () => {
+    expect(junctionChar(new Set())).toBe(' ');
   });
 });
 

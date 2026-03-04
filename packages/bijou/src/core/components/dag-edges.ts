@@ -71,9 +71,11 @@ const JUNCTION: Record<string, string> = {
  * Select the Unicode box-drawing character for a cell based on its edge directions.
  *
  * @param dirs - Set of cardinal directions passing through this cell.
- * @returns The appropriate box-drawing character, or `\u253c` (cross) as fallback.
+ * @returns The appropriate box-drawing character, or `' '` (space) for an empty
+ *   direction set (no edge traffic through this cell).
  */
 export function junctionChar(dirs: Set<Dir>): string {
+  if (dirs.size === 0) return ' ';
   // Alphabetical sort of D,L,R,U matches JUNCTION table keys
   const key = [...dirs].sort().join('');
   return JUNCTION[key] ?? '\u253c';

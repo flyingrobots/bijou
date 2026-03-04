@@ -231,9 +231,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       if (mode === 'normal') {
         if (key === '\x1b') {
           // Escape in normal mode — cancel
-          // Note: bare \x1b may false-trigger on slow connections where escape
+          // TODO: bare \x1b may false-trigger on slow connections where escape
           // sequences arrive as separate bytes. Timer-based disambiguation is a
-          // separate future improvement.
+          // shared debt with textarea-editor.ts — unify in a future PR.
           handle.dispose();
           cleanup();
           resolve(options.defaultValue ?? options.options[0]!.value);

@@ -325,8 +325,6 @@ describe('dag', () => {
       expect(result).toContain('Start');
       expect(result).toContain('Left');
       expect(result).toContain('End');
-      // All highlight path nodes should be present
-      expect(result).toContain('Start'); // node 'a'
     });
   });
 
@@ -402,16 +400,14 @@ describe('dag', () => {
       expect(result).not.toContain('missing');
     });
 
-    it('throws cycle error on duplicate node IDs', () => {
+    it('throws explicit error on duplicate node IDs', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const dupes: DagNode[] = [
         { id: 'a', label: 'First A', edges: ['b'] },
         { id: 'a', label: 'Second A', edges: ['b'] },
         { id: 'b', label: 'B' },
       ];
-      // Duplicate IDs confuse the topo sort (3 nodes in array, but only 2 unique
-      // IDs), resulting in a cycle detection error. This documents the behavior.
-      expect(() => dag(dupes, { ctx })).toThrow('cycle detected');
+      expect(() => dag(dupes, { ctx })).toThrow('duplicate node id "a"');
     });
   });
 

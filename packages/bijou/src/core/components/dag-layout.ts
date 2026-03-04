@@ -20,10 +20,17 @@ import type { DagNode } from './dag.js';
  * @throws If the graph contains a cycle.
  */
 export function assignLayers(nodes: DagNode[]): Map<string, number> {
+  const nodeIds = new Set<string>();
+  for (const n of nodes) {
+    if (nodeIds.has(n.id)) {
+      throw new Error(`[bijou] dag(): duplicate node id "${n.id}"`);
+    }
+    nodeIds.add(n.id);
+  }
+
   const children = new Map<string, string[]>();
   const parents = new Map<string, string[]>();
   const inDegree = new Map<string, number>();
-  const nodeIds = new Set(nodes.map(n => n.id));
 
   for (const n of nodes) {
     // Filter edges to only include targets that exist in the graph

@@ -129,9 +129,9 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       if (key === '\x03' || key === '\x1b') {
         // Ctrl+C or Escape — cancel
-        // Note: bare \x1b may false-trigger on slow connections where escape
+        // TODO: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
-        // separate future improvement.
+        // shared debt with filter-interactive.ts — unify in a future PR.
         handle.dispose();
         const value = options.defaultValue ?? '';
         cleanup(value, true);

@@ -560,7 +560,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 | **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
 | ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
-| ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) | col` encoding. `GRID_COL_MULTIPLIER` removed. |
+| ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) \| col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
 ---
 

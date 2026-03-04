@@ -25,6 +25,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **DAG accessible edge count mismatch** — `renderAccessible()` header counted all declared edges but rendered only edges with existing targets, causing the "Graph: N nodes, M edges" summary to disagree with the body. Now counts only valid edges.
 - **`textarea()` cleanup summary ignores defaultValue** — submitting an empty textarea with Ctrl+D showed "(cancelled)" in the summary line instead of the resolved `defaultValue`. Refactored `cleanup()` to accept the resolved value and cancelled flag.
 - **`textarea()` maxLength=0 ignored** — truthy checks (`options.maxLength && ...`) treated `0` as unset, allowing unlimited input. Changed to nullish checks (`options.maxLength != null`).
+- **DAG duplicate node ID misdiagnosed as cycle** — `assignLayers()` reported "cycle detected" when given duplicate node IDs. Now validates uniqueness before topological sort with a clear "duplicate node id" error message.
+- **`junctionChar()` empty set returned `┼`** — an empty direction set (no edge traffic) now returns `' '` (space) instead of a four-way junction character.
 
 ### ♻️ Refactors
 
