@@ -32,6 +32,15 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 console.log(box('Hello, world!'));
 ```
 
+## Features Breakdown
+
+- **Resilient rendering**: automatic mode switching for interactive, static, pipe, and accessible output.
+- **Core UI primitives**: `box`, `headerBox`, `table`, `tree`, `accordion`, `tabs`, `breadcrumb`, `stepper`, `timeline`, `paginator`.
+- **Graph tooling**: `dag`, `dagSlice`, and `dagStats` for visualizing and analyzing DAGs.
+- **Interactive forms**: `input`, `select`, `multiselect`, `confirm`, `group`, `wizard`, `textarea`, and `filter`.
+- **Theme system**: preset themes + DTCG-compatible custom token loading via `BIJOU_THEME`.
+- **Test adapters**: deterministic test context and assertion helpers for mock-free component testing.
+
 ## Components
 
 ### Layout
@@ -99,3 +108,24 @@ See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
 ## License
 
 MIT
+
+---
+
+<p align="center">
+Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
+</p>
+
+```rust
+.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
+;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
+[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
+`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
+ 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
+ "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
+:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
+;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
+ [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
+ $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
+ 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
+ MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
+```

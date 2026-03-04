@@ -27,6 +27,14 @@ initDefaultContext();
 console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 ```
 
+## Features Breakdown
+
+- **Port implementation for Node.js**: complete `RuntimePort`, `IOPort`, and `StylePort` adapters for `@flyingrobots/bijou`.
+- **Runtime detection**: environment variables, TTY state, and terminal dimensions sourced from `process`.
+- **Interactive terminal I/O**: stdin/stdout integration with readline and resize-event support.
+- **Styling backend**: Chalk-powered color/style methods wired into bijou styling APIs.
+- **One-line bootstrap**: `initDefaultContext()` creates and registers a production-ready default context.
+
 ## What It Provides
 
 `bijou-node` implements the three ports that `@flyingrobots/bijou` requires:
@@ -63,3 +71,24 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js API
 ## License
 
 MIT
+
+---
+
+<p align="center">
+Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
+</p>
+
+```rust
+.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
+;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
+[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
+`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
+ 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
+ "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
+:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
+;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
+ [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
+ $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
+ 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
+ MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
+```

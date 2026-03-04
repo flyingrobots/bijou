@@ -46,6 +46,15 @@ const app: App<Model> = {
 run(app);
 ```
 
+## Features Breakdown
+
+- **TEA runtime core**: deterministic model/update/view loop with command-driven side effects.
+- **Motion system**: spring physics, tweens, and timeline sequencing for orchestrated terminal animation.
+- **Layout engine**: flexbox helpers, stacks, viewport scrolling, and resize-aware rendering.
+- **Input architecture**: keymaps, grouped bindings, generated help views, and layered input stack for modal flows.
+- **Overlay composition**: modal, toast, drawer, tooltip, and painter-style compositing primitives.
+- **Stateful building blocks**: navigable table, browsable list, file picker, focus area, and DAG pane with vim-friendly keymaps.
+
 ## Animation
 
 ### Spring Physics
@@ -361,3 +370,24 @@ All building blocks include `*KeyMap()` factories for preconfigured vim-style ke
 ## License
 
 MIT
+
+---
+
+<p align="center">
+Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
+</p>
+
+```rust
+.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
+;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
+[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
+`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
+ 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
+ "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
+:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
+;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
+ [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
+ $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
+ 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
+ MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
+```
