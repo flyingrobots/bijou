@@ -14,6 +14,14 @@ Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [G
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
 
+## Documentation Status
+
+This npm README is a quick overview and may lag behind the repository.
+
+- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
+- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
+- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+
 ## Install
 
 ```bash
@@ -47,6 +55,15 @@ const app: App<Model> = {
 
 run(app);
 ```
+
+## Runtime Behavior Note
+
+`run()` behaves differently by output mode:
+
+- `interactive`: full TEA loop (event bus, key/resize/mouse handling, command-driven updates).
+- `pipe` / `static` / `accessible`: render `view(initModel)` once and return immediately.
+
+In non-interactive modes, there is no normal interactive event loop.
 
 ## Features Breakdown
 

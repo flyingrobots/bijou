@@ -28,6 +28,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Add canonical app-shell demo entry points: `demo-tui.ts` and `examples/release-workbench/main.ts`.
 - Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
 - Update root README and examples index for the canonical release workbench demo.
+- Clarify package README caveats: canonical docs/examples live in-repo, `run()` non-interactive single-render behavior, and `initDefaultContext()` first-call registration semantics.
 
 ## [1.2.0] — 2026-03-04
 
