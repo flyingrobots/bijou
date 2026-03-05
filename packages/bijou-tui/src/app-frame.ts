@@ -280,6 +280,10 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isKeyMsg(msg)) {
+        if (model.helpOpen && msg.key === 'escape' && !msg.ctrl && !msg.alt) {
+          return [{ ...model, helpOpen: false }, []];
+        }
+
         if (model.commandPalette != null) {
           return handlePaletteKey(msg, model, paletteKeys, frameKeys, options, pagesById);
         }
@@ -430,6 +434,10 @@ function handlePaletteKey<PageModel, Msg>(
   }
 
   if (msg.ctrl && msg.key === 'c') {
+    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+  }
+
+  if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'q' && cp.query.length === 0) {
     return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
   }
 

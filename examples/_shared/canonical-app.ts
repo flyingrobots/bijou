@@ -193,32 +193,40 @@ function serviceBadge(status: ServiceHealth['status'], ctx: BijouContext): strin
   return badge('degraded', { variant: 'error', ctx });
 }
 
-function renderOpsSummary(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
+function toFixedHeight(lines: readonly string[], maxInnerHeight: number): string[] {
+  if (maxInnerHeight <= 0) return [];
+  const out = [...lines].slice(0, maxInnerHeight);
+  while (out.length < maxInnerHeight) out.push('');
+  return out;
+}
+
+function renderOpsSummary(width: number, height: number, model: WorkbenchPageModel, ctx: BijouContext): string {
   const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
   const trackWidth = Math.max(8, Math.min(34, width - 12));
   const healthVariant = release.readiness >= 75 ? 'success' : release.readiness >= 45 ? 'warning' : 'error';
+  const drawerState = model.drawerOpen ? 'open' : 'closed';
 
   const lines = [
     `Active train ${badge(release.id, { variant: 'primary', ctx })}`,
     `Window: ${release.window}`,
     `ETA: ${release.eta}`,
-    '',
-    `${badge(`${release.readiness}% ready`, { variant: healthVariant, ctx })}`,
+    `${badge(`${release.readiness}% ready`, { variant: healthVariant, ctx })} checks:${release.failedChecks} incidents:${release.incidents}`,
     progressBar(release.readiness, { width: trackWidth, ctx }),
-    '',
-    `Checks failing: ${release.failedChecks}`,
-    `Open incidents: ${release.incidents}`,
-    '',
+    `Inspector drawer: ${drawerState} (${model.drawerAnchor})`,
+    `o toggle drawer, a cycle anchor, y cycle target`,
+    `ctrl+p or : palette, ? help`,
+    `q / esc / ctrl+c quit`,
     statusBar({
       left: 'n/b release',
-      center: 'o drawer  a anchor  y target',
-      right: 'ctrl+p palette',
+      center: 'drawer = panel inspector',
+      right: `target #${model.drawerTargetIndex + 1}`,
       width: Math.max(10, width - 4),
       fillChar: ' ',
     }),
   ];
+  const fixedLines = toFixedHeight(lines, Math.max(0, height - 2));
 
-  return box(lines.join('\n'), {
+  return box(fixedLines.join('\n'), {
     width,
     bgToken: ctx.theme.theme.surface.secondary,
     borderToken: ctx.theme.theme.border.primary,
@@ -477,7 +485,7 @@ export function createCanonicalWorkbenchApp(
         'ops-summary': {
           kind: 'pane',
           paneId: 'ops-summary',
-          render: (width) => renderOpsSummary(width, model, ctx),
+          render: (width, height) => renderOpsSummary(width, height, model, ctx),
         },
         'ops-health': {
           kind: 'pane',
@@ -563,6 +571,8 @@ export function createCanonicalWorkbenchApp(
     globalKeys: createKeyMap<WorkbenchMsg>()
       .group('Global', (group) => group
         .bind('q', 'Quit', { type: 'quit' })
+        .bind('escape', 'Quit', { type: 'quit' })
+        .bind('ctrl+c', 'Quit', { type: 'quit' })
         .bind('o', 'Toggle drawer', { type: 'toggle-drawer' })
         .bind('a', 'Cycle drawer anchor', { type: 'cycle-drawer-anchor' })
         .bind('y', 'Cycle drawer target', { type: 'cycle-drawer-target' })

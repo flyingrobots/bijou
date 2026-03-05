@@ -107,6 +107,15 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(true);
   });
 
+  it('closes help with escape', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const result = await runScript(app, [{ key: '?' }, { key: '\x1b' }]);
+    expect(result.model.helpOpen).toBe(false);
+  });
+
   it('opens command palette and dispatches selected keymap command', async () => {
     const global = createKeyMap<Msg>()
       .bind('z', 'Zap', { type: 'inc' });
@@ -125,6 +134,20 @@ describe('createFramedApp', () => {
     ]);
 
     expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('closes command palette with q when query is empty', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      { key: '\x10' }, // ctrl+p
+      { key: 'q' },
+    ]);
+
     expect(result.model.commandPalette).toBeUndefined();
   });
 
