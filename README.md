@@ -22,6 +22,7 @@ TypeScript toolkit for building terminal interfaces that remain usable across lo
 | `@flyingrobots/bijou-node` | Node.js adapter for runtime, IO, and styling ports | [`packages/bijou-node`](./packages/bijou-node/) |
 | `@flyingrobots/bijou-tui` | Interactive TEA runtime with layout, event bus, and animation | [`packages/bijou-tui`](./packages/bijou-tui/) |
 | `@flyingrobots/bijou-tui-app` | Batteries-included framed app skeleton with tab/header/footer chrome | [`packages/bijou-tui-app`](./packages/bijou-tui-app/) |
+| `create-bijou-tui-app` | `npm create` scaffolder for generating a runnable Bijou TUI app project | [`packages/create-bijou-tui-app`](./packages/create-bijou-tui-app/) |
 
 All packages are versioned in lock-step.
 
@@ -65,6 +66,12 @@ Framed app skeleton package:
 
 ```bash
 npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui @flyingrobots/bijou-tui-app
+```
+
+Scaffold a new runnable app project:
+
+```bash
+npm create bijou-tui-app@latest my-app
 ```
 
 ## Quick Start (Core Components)
