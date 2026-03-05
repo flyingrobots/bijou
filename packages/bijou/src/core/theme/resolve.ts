@@ -124,7 +124,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     : (key: string) => process.env[key];
 
   const warn = (message: string): void => {
-    warningPort?.writeError(`${message}\n`);
+    warningPort?.writeError?.(`${message}\n`);
   };
 
   let cached: ResolvedTheme | null = null;

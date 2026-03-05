@@ -68,7 +68,7 @@ function parseCliArgs(argv: readonly string[]): ReturnType<typeof parseArgs> | n
 }
 
 function quotePath(value: string): string {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+  return `'${value.replace(/'/g, "'\"'\"'")}'`;
 }
 
 function isInstallFailure(message: string): boolean {
@@ -88,11 +88,10 @@ function runDevCommand(pm: PackageManager): string {
 }
 
 if (isEntrypoint()) {
-  const code = runCli(process.argv.slice(2));
-  if (code !== 0) process.exit(code);
+  process.exit(runCli(process.argv.slice(2)));
 }
 
 function isEntrypoint(): boolean {
-  if (process.argv[1] == null) return false;
+  if (process.argv[1] === undefined) return false;
   return import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
 }

@@ -50,7 +50,7 @@
   "homepage": "https://github.com/flyingrobots/bijou",
   "bugs": "https://github.com/flyingrobots/bijou/issues",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public",

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
-## [Unreleased]
+## Unreleased
 
 ### ✨ Features
 
@@ -20,9 +20,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🧪 Tests
 
 - Add dedicated suites for `splitPane`, `grid`, and `appFrame`.
-- Expand `overlay` tests for top/bottom drawer anchors and region-scoped drawer mounting.
-- Expand `driver` tests for resize and custom message script steps.
-- Expand `select` tests for `maxVisible` scrolling behavior.
+- Extend `overlay` coverage for top/bottom drawer anchors and region-scoped mounting.
+- Cover `driver` resize and custom message script steps.
+- Add `select` coverage for `maxVisible` scrolling behavior.
 
 ### ♻️ Refactors
 

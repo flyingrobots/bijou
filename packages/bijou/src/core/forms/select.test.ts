@@ -141,6 +141,26 @@ describe('select()', () => {
 
       expect(result).toBe('v5');
     });
+
+    it('sanitizes non-finite maxVisible values', async () => {
+      const many = Array.from({ length: 10 }, (_, i) => ({
+        label: `Option ${i + 1}`,
+        value: `v${i + 1}`,
+      }));
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[B', '\x1b[B', '\r'] },
+      });
+      const result = await select({
+        title: 'Pick',
+        options: many,
+        maxVisible: Number.NaN,
+        ctx,
+      });
+
+      expect(result).toBe('v3');
+      expect(ctx.io.written.join('')).not.toContain('[NaN');
+    });
   });
 
   it('accepts ctx parameter', async () => {

@@ -31,9 +31,10 @@ describe('create-bijou-tui-app', () => {
   });
 
   it('resolves target dir and package name', () => {
-    const resolved = resolveTarget(undefined, '/tmp/work');
+    const cwd = join(tmpdir(), 'work');
+    const resolved = resolveTarget(undefined, cwd);
     expect(resolved.targetDir).toBe(DEFAULT_TARGET_DIR);
-    expect(resolved.absTargetDir).toBe(resolve('/tmp/work', DEFAULT_TARGET_DIR));
+    expect(resolved.absTargetDir).toBe(resolve(cwd, DEFAULT_TARGET_DIR));
     expect(resolved.packageName).toBe('bijou-tui-app');
   });
 

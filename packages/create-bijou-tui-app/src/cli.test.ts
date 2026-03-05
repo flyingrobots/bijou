@@ -17,16 +17,18 @@ function runCliCaptured(argv: readonly string[]): {
 } {
   let stdout = '';
   let stderr = '';
+
+  const captureChunk = (chunk: string | Uint8Array): string => chunkToString(chunk);
   const stdoutSpy = vi.spyOn(process.stdout, 'write')
-    .mockImplementation(((chunk: unknown) => {
-      stdout += chunkToString(chunk);
+    .mockImplementation((chunk: string | Uint8Array) => {
+      stdout += captureChunk(chunk);
       return true;
-    }) as never);
+    });
   const stderrSpy = vi.spyOn(process.stderr, 'write')
-    .mockImplementation(((chunk: unknown) => {
-      stderr += chunkToString(chunk);
+    .mockImplementation((chunk: string | Uint8Array) => {
+      stderr += captureChunk(chunk);
       return true;
-    }) as never);
+    });
 
   try {
     return { code: runCli(argv), stdout, stderr };
@@ -66,7 +68,22 @@ describe('create-bijou-tui-app cli', () => {
       const targetDir = join(root, 'my app');
       const result = runCliCaptured([targetDir, '--no-install']);
       expect(result.code).toBe(0);
-      expect(result.stdout).toContain(`cd "${targetDir}"`);
+      const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
+      expect(cdLine).toBeDefined();
+      expect(cdLine).toContain(targetDir);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('escapes single quotes in cd instruction paths', () => {
+    const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
+    try {
+      const targetDir = join(root, "my app's workspace");
+      const result = runCliCaptured([targetDir, '--no-install']);
+      expect(result.code).toBe(0);
+      const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
+      expect(cdLine).toContain("'\"'\"'");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

@@ -1,6 +1,6 @@
 # Examples
 
-> 68 examples · Run any: `npx tsx examples/<name>/main.ts`
+> Run any example: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components

@@ -19,7 +19,7 @@ npx tsx examples/release-workbench/main.ts
 
 - `[` / `]`: previous/next tab
 - `tab` / `shift+tab`: next/previous pane
-- `j`/`k` or arrows: scroll focused pane
+- `j`/`k`: scroll focused pane
 - `ctrl+p` or `:`: open command palette
 - `o`: toggle panel drawer
 - `a`: cycle drawer anchor (`right` -> `left` -> `bottom` -> `top`)

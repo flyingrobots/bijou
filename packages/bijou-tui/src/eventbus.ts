@@ -206,6 +206,7 @@ export function createEventBus<M>(options?: CreateEventBusOptions): EventBus<M> 
           emit(result as M);
         }
       }).catch((err: unknown) => {
+        if (disposed) return;
         // Surface command rejections instead of leaving unhandled promise rejections.
         if (options?.onCommandRejected != null) {
           options.onCommandRejected(err);

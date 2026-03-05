@@ -61,7 +61,7 @@ export async function run<Model, M>(
       const message = error instanceof Error
         ? `${error.name}: ${error.message}`
         : String(error);
-      ctx.io.writeError(`[EventBus] Command rejected: ${message}\n`);
+      writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
     },
   });
 
@@ -124,8 +124,8 @@ export async function run<Model, M>(
   // This keeps framed apps sized from ports instead of process globals.
   const initialResize: ResizeMsg = {
     type: 'resize',
-    columns: ctx.runtime.columns,
-    rows: ctx.runtime.rows,
+    columns: sanitizeDimension(ctx.runtime.columns),
+    rows: sanitizeDimension(ctx.runtime.rows),
   };
   const [resizedModel, resizeCmds] = app.update(initialResize, model);
   model = resizedModel;
@@ -149,4 +149,17 @@ export async function run<Model, M>(
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }
+}
+
+function sanitizeDimension(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
+function writeErrorLine(io: { write(data: string): void; writeError?: (data: string) => void }, data: string): void {
+  if (io.writeError != null) {
+    io.writeError(data);
+    return;
+  }
+  io.write(data);
 }

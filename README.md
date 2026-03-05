@@ -153,7 +153,7 @@ npx tsx demo-tui.ts
 npx tsx examples/<name>/main.ts
 ```
 
-There are 68 curated examples in [`examples/`](./examples/), including canonical app-shell demos and advanced component showcases.
+Explore the curated examples in [`examples/`](./examples/) for canonical app-shell demos and advanced component showcases.
 
 Test local `create-bijou-tui-app` scaffolder changes from the monorepo:
 

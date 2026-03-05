@@ -90,6 +90,52 @@ describe('createFramedApp', () => {
     expect(result.model.focusedPaneByPage.home).toBe('left');
   });
 
+  it('throws for duplicate pane ids in a page layout', () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'split',
+          splitId: 'dup',
+          state: createSplitPaneState({ ratio: 0.5 }),
+          paneA: { kind: 'pane', paneId: 'main', render: () => 'left' },
+          paneB: { kind: 'pane', paneId: 'main', render: () => 'right' },
+        }),
+      }],
+    });
+
+    expect(() => app.init()).toThrow(/duplicate paneId "main"/);
+  });
+
+  it('collects pane ids from declared grid areas only', () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'grid',
+          gridId: 'g',
+          columns: ['1fr'],
+          rows: ['1fr'],
+          areas: ['main'],
+          cells: {
+            main: { kind: 'pane', paneId: 'main', render: () => 'main' },
+            ghost: { kind: 'pane', paneId: 'ghost', render: () => 'ghost' },
+          },
+        }),
+      }],
+    });
+
+    const [model] = app.init();
+    expect(model.focusedPaneByPage.home).toBe('main');
+    expect(model.scrollByPage.home?.ghost).toBeUndefined();
+  });
+
   it('dispatches page keymap actions into page update', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],

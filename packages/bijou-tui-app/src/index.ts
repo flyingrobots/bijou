@@ -555,7 +555,11 @@ function bindMapInto<M>(target: KeyMap<M>, source: KeyMap<M>): void {
     if (!binding.enabled) continue;
     const action = source.handle(comboToMsg(binding.combo));
     if (action === undefined) continue;
-    target.bind(formatKeyCombo(binding.combo), binding.description, action);
+    if (binding.group !== '') {
+      target.group(binding.group, (group) => group.bind(formatKeyCombo(binding.combo), binding.description, action));
+    } else {
+      target.bind(formatKeyCombo(binding.combo), binding.description, action);
+    }
   }
 }
 

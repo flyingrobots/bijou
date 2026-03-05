@@ -48,6 +48,37 @@ describe('detectOutputMode', () => {
     });
     expect(detectOutputMode(rt)).toBe('pipe');
   });
+
+  it('falls back to process.stdout.isTTY when runtime is omitted', () => {
+    const originalAccessible = process.env['BIJOU_ACCESSIBLE'];
+    const originalNoColor = process.env['NO_COLOR'];
+    const originalTerm = process.env['TERM'];
+    const originalCi = process.env['CI'];
+    const ttyDescriptor = Object.getOwnPropertyDescriptor(process.stdout, 'isTTY');
+    Object.defineProperty(process.stdout, 'isTTY', { configurable: true, value: true });
+
+    try {
+      delete process.env['BIJOU_ACCESSIBLE'];
+      delete process.env['NO_COLOR'];
+      delete process.env['TERM'];
+      delete process.env['CI'];
+      expect(detectOutputMode()).toBe('interactive');
+    } finally {
+      if (ttyDescriptor == null) {
+        delete (process.stdout as { isTTY?: boolean }).isTTY;
+      } else {
+        Object.defineProperty(process.stdout, 'isTTY', ttyDescriptor);
+      }
+      if (originalAccessible === undefined) delete process.env['BIJOU_ACCESSIBLE'];
+      else process.env['BIJOU_ACCESSIBLE'] = originalAccessible;
+      if (originalNoColor === undefined) delete process.env['NO_COLOR'];
+      else process.env['NO_COLOR'] = originalNoColor;
+      if (originalTerm === undefined) delete process.env['TERM'];
+      else process.env['TERM'] = originalTerm;
+      if (originalCi === undefined) delete process.env['CI'];
+      else process.env['CI'] = originalCi;
+    }
+  });
 });
 
 describe('detectColorScheme', () => {

@@ -738,6 +738,7 @@ function syncPageFrameState<PageModel, Msg>(
 ): InternalFrameModel<PageModel, Msg> {
   const page = pagesById.get(pageId)!;
   const paneIds = collectPaneIds(page.layout(model.pageModels[pageId]!));
+  assertUniquePaneIds(paneIds, `page "${pageId}" layout`);
 
   const prevScroll = model.scrollByPage[pageId] ?? {};
   const nextScroll: Record<string, FramePaneScroll> = {};
@@ -854,10 +855,22 @@ function renderFrameNode<PageModel, Msg>(
   });
 
   let paneRects = new Map<string, LayoutRect>();
+  const seenPaneIds = new Set<string>();
   const paneOrder: string[] = [];
   for (const rendered of renderedByArea.values()) {
-    paneRects = mergeMaps(paneRects, rendered.paneRects);
-    paneOrder.push(...rendered.paneOrder);
+    for (const [paneId, paneRect] of rendered.paneRects.entries()) {
+      if (paneRects.has(paneId)) {
+        throw new Error(`createFramedApp: duplicate paneId "${paneId}" in rendered layout`);
+      }
+      paneRects.set(paneId, paneRect);
+    }
+    for (const paneId of rendered.paneOrder) {
+      if (seenPaneIds.has(paneId)) {
+        throw new Error(`createFramedApp: duplicate paneId "${paneId}" in rendered pane order`);
+      }
+      seenPaneIds.add(paneId);
+      paneOrder.push(paneId);
+    }
   }
 
   return { output, paneRects, paneOrder };
@@ -868,10 +881,32 @@ function collectPaneIds(node: FrameLayoutNode): string[] {
   if (node.kind === 'split') return [...collectPaneIds(node.paneA), ...collectPaneIds(node.paneB)];
 
   const ids: string[] = [];
-  for (const name of Object.keys(node.cells)) {
-    ids.push(...collectPaneIds(node.cells[name]!));
+  for (const areaName of declaredAreaNames(node.areas)) {
+    const child = node.cells[areaName];
+    if (child == null) continue;
+    ids.push(...collectPaneIds(child));
   }
   return ids;
+}
+
+function declaredAreaNames(areas: readonly string[]): string[] {
+  const names = new Set<string>();
+  for (const row of areas) {
+    for (const token of row.trim().split(/\s+/)) {
+      if (token !== '' && token !== '.') names.add(token);
+    }
+  }
+  return [...names];
+}
+
+function assertUniquePaneIds(paneIds: readonly string[], scope: string): void {
+  const seen = new Set<string>();
+  for (const paneId of paneIds) {
+    if (seen.has(paneId)) {
+      throw new Error(`createFramedApp: duplicate paneId "${paneId}" in ${scope}`);
+    }
+    seen.add(paneId);
+  }
 }
 
 function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<FrameLayoutNode, { kind: 'pane' }> | undefined {

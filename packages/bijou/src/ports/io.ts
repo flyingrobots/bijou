@@ -20,7 +20,7 @@ export interface WritePort {
   /** Write a string to the output stream (typically stdout). */
   write(data: string): void;
   /** Write a string to the error stream (typically stderr). */
-  writeError(data: string): void;
+  writeError?: (data: string) => void;
 }
 
 /**

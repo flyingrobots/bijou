@@ -34,7 +34,7 @@ export function detectOutputMode(runtime?: RuntimePort): OutputMode {
   const env = runtime
     ? (key: string) => runtime.env(key)
     : (key: string) => process.env[key];
-  const stdoutIsTTY = runtime?.stdoutIsTTY ?? false;
+  const stdoutIsTTY = runtime?.stdoutIsTTY ?? (process.stdout.isTTY === true);
 
   if (env('BIJOU_ACCESSIBLE') === '1') return 'accessible';
 
