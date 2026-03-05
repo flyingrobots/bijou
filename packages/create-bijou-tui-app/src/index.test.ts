@@ -85,6 +85,21 @@ describe('create-bijou-tui-app', () => {
     }
   });
 
+  it('refuses target paths that already exist as files', () => {
+    const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
+    try {
+      const targetFile = join(root, 'already-a-file');
+      writeFileSync(targetFile, 'occupied', 'utf8');
+
+      expect(() => scaffoldProject({
+        targetDir: targetFile,
+        install: false,
+      })).toThrow(/Target path is not a directory/);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('prints npm create usage', () => {
     const text = usage();
     expect(text).toContain('npm create bijou-tui-app@latest');

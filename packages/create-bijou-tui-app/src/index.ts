@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 
 /** Supported package managers for post-scaffold install instructions. */
@@ -256,6 +256,13 @@ function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   if (!existsSync(absTargetDir)) {
     mkdirSync(absTargetDir, { recursive: true });
     return;
+  }
+
+  if (!lstatSync(absTargetDir).isDirectory()) {
+    throw new Error(
+      `Target path is not a directory: ${absTargetDir}\n` +
+      'Choose a different directory path.',
+    );
   }
 
   const entries = readdirSync(absTargetDir)

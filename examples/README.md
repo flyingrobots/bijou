@@ -31,6 +31,7 @@
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
+| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background surface tokens across layout and overlays |
 
 ## Interactive Forms
 

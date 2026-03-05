@@ -81,7 +81,8 @@ describe('parseKey', () => {
       expect(parseKey('9')).toEqual({ type: 'key', key: '9', ctrl: false, alt: false, shift: false });
     });
     it('parses uppercase letters', () => {
-      expect(parseKey('A')).toEqual({ type: 'key', key: 'A', ctrl: false, alt: false, shift: false });
+      expect(parseKey('A')).toEqual({ type: 'key', key: 'a', ctrl: false, alt: false, shift: true });
+      expect(parseKey('G')).toEqual({ type: 'key', key: 'g', ctrl: false, alt: false, shift: true });
     });
     it('parses punctuation', () => {
       expect(parseKey('/')).toEqual({ type: 'key', key: '/', ctrl: false, alt: false, shift: false });

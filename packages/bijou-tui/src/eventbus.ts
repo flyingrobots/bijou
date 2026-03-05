@@ -207,7 +207,11 @@ export function createEventBus<M>(options?: CreateEventBusOptions): EventBus<M> 
         }
       }).catch((err: unknown) => {
         // Surface command rejections instead of leaving unhandled promise rejections.
-        options?.onCommandRejected?.(err);
+        if (options?.onCommandRejected != null) {
+          options.onCommandRejected(err);
+        } else {
+          console.error('[EventBus] Command rejected:', err);
+        }
       });
     },
 

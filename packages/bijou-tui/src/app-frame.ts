@@ -13,7 +13,7 @@ import {
   type KeyMap,
 } from './keybindings.js';
 import type { App, Cmd, KeyMsg } from './types.js';
-import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
+import { isKeyMsg, isMouseMsg, isResizeMsg, QUIT } from './types.js';
 import type { Overlay } from './overlay.js';
 import { composite, modal } from './overlay.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
@@ -177,6 +177,7 @@ interface PaletteEntry<Msg> {
   readonly id: string;
   readonly item: CommandPaletteItem;
   readonly msgAction?: Msg;
+  readonly targetPageId?: string;
   readonly frameAction?: FrameAction;
 }
 
@@ -216,6 +217,14 @@ type PaletteAction =
   | { type: 'cp-page-up' }
   | { type: 'cp-select' }
   | { type: 'cp-close' };
+
+const PAGE_MSG_TOKEN = Symbol('app-frame-page-msg');
+
+interface PageScopedMsg<Msg> {
+  readonly [PAGE_MSG_TOKEN]: true;
+  readonly pageId: string;
+  readonly msg: Msg;
+}
 
 /**
  * Create a fully framed TEA app shell.
@@ -259,7 +268,7 @@ export function createFramedApp<PageModel, Msg>(
       for (const page of options.pages) {
         const [pageModel, cmds] = page.init();
         pageModels[page.id] = pageModel;
-        initCmds.push(...cmds);
+        initCmds.push(...cmds.map((cmd) => wrapCmdForPage(page.id, cmd)));
       }
 
       let model: InternalFrameModel<PageModel, Msg> = {
@@ -315,7 +324,7 @@ export function createFramedApp<PageModel, Msg>(
         const activePage = pagesById.get(model.activePageId)!;
         const pageAction = activePage.keyMap?.handle(msg);
         if (pageAction !== undefined) {
-          return [model, [emitMsg(pageAction)]];
+          return [model, [emitMsgForPage(model.activePageId, pageAction)]];
         }
 
         return [model, []];
@@ -325,13 +334,18 @@ export function createFramedApp<PageModel, Msg>(
         return [model, []];
       }
 
-      // Custom message path: delegate only to active page.
-      const page = pagesById.get(model.activePageId)!;
-      const pageModel = model.pageModels[model.activePageId]!;
-      const [nextPageModel, cmds] = page.update(msg as Msg, pageModel);
-      const nextModels = { ...model.pageModels, [model.activePageId]: nextPageModel };
-      const synced = syncPageFrameState({ ...model, pageModels: nextModels }, model.activePageId, pagesById);
-      return [synced, cmds];
+      // Custom message path: route to originating page when command messages are scoped.
+      const scoped = isPageScopedMsg<Msg>(msg) ? msg : undefined;
+      const targetPageId = scoped?.pageId ?? model.activePageId;
+      const targetPage = pagesById.get(targetPageId);
+      if (targetPage == null) return [model, []];
+
+      const targetMsg = scoped?.msg ?? (msg as Msg);
+      const pageModel = model.pageModels[targetPageId]!;
+      const [nextPageModel, cmds] = targetPage.update(targetMsg, pageModel);
+      const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
+      const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
+      return [synced, cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd))];
     },
 
     view(model) {
@@ -435,11 +449,14 @@ function handlePaletteKey<PageModel, Msg>(
           return applyFrameAction(entry.frameAction, closed, frameKeys, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {
+          const cmd = entry.targetPageId != null
+            ? emitMsgForPage(entry.targetPageId, entry.msgAction)
+            : emitMsg(entry.msgAction);
           return [{
             ...model,
             commandPalette: undefined,
             commandPaletteEntries: undefined,
-          }, [emitMsg(entry.msgAction)]];
+          }, [cmd]];
         }
         return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
       }
@@ -690,6 +707,7 @@ function buildPaletteEntries<PageModel, Msg>(
           shortcut: formatKeyCombo(b.combo),
         },
         msgAction: action,
+        targetPageId: model.activePageId,
       });
     }
   }
@@ -705,6 +723,7 @@ function buildPaletteEntries<PageModel, Msg>(
           category: item.category ?? page.title,
         },
         msgAction: item.action,
+        targetPageId: model.activePageId,
       });
     }
   }
@@ -995,4 +1014,31 @@ function comboToMsg(binding: BindingInfo): KeyMsg {
 
 function emitMsg<Msg>(msg: Msg): Cmd<Msg> {
   return async () => msg;
+}
+
+function emitMsgForPage<Msg>(pageId: string, msg: Msg): Cmd<Msg> {
+  return async () => wrapPageMsg(pageId, msg);
+}
+
+function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<Msg> {
+  return async (emit) => {
+    const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg) as unknown as Msg));
+    if (result === undefined || result === QUIT) return result;
+    return wrapPageMsg(pageId, result as Msg);
+  };
+}
+
+function wrapPageMsg<Msg>(pageId: string, msg: Msg): Msg {
+  return {
+    [PAGE_MSG_TOKEN]: true,
+    pageId,
+    msg,
+  } as unknown as Msg;
+}
+
+function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
+  return typeof value === 'object'
+    && value !== null
+    && PAGE_MSG_TOKEN in value
+    && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN] === true;
 }

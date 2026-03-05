@@ -70,6 +70,10 @@ export function parseKey(raw: string): KeyMsg {
   if (raw.length === 1) {
     const code = raw.charCodeAt(0);
     if (code >= 0x20 && code <= 0x7e) {
+      // Normalize uppercase letters so bindings like "shift+g" match typed "G".
+      if (code >= 0x41 && code <= 0x5a) {
+        return keyMsg(raw.toLowerCase(), false, false, true);
+      }
       return keyMsg(raw);
     }
   }

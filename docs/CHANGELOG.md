@@ -8,13 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
-- **`splitPane()` layout primitive (bijou-tui)** — new stateful split view with pure reducers (`splitPaneSetRatio`, `splitPaneResizeBy`, `splitPaneFocusNext`, `splitPaneFocusPrev`) and deterministic layout geometry via `splitPaneLayout()`.
+- **`splitPane()` layout primitive (bijou-tui)** — new stateful split view with pure reducers (`splitPaneSetRatio`, `splitPaneResizeBy`, `splitPaneFocusNext`, `splitPaneFocusPrev`). Layout geometry is deterministic via `splitPaneLayout()`.
 - **`grid()` layout primitive (bijou-tui)** — named-area constraint grid with fixed + fractional tracks (`fr`), gap support, and `gridLayout()` rect solving.
-- **`createFramedApp()` shell (bijou-tui)** — high-level app frame with tabs, pane focus management, per-page/per-pane scroll isolation, help toggle, optional command palette, and pane-rect-aware overlay hook.
+- **`createFramedApp()` shell (bijou-tui)** — high-level app frame with tabs, pane focus management, per-page/per-pane scroll isolation, help toggle, optional command palette, and pane-rect-aware overlay hooks.
 - **Drawer anchor expansion + region scoping (bijou-tui)** — `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped drawers.
 - **Scripted interaction harness upgrades (bijou-tui)** — `runScript()` now accepts key, resize, and custom message steps for richer integration testing.
 - **Scrollable select viewport (bijou core)** — `select()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists.
-- **`@flyingrobots/bijou-tui-app` package** — batteries-included app skeleton built on `createFramedApp()` with tokenized tab bar, full-screen shell defaults, animated physics drawer, quit-confirm modal (`q` / `ctrl+c`), `[` / `]` page switching, two-line footer (status + controls), and default two-tab setup (drawer page + 1/3:2/3 split page).
+- **`@flyingrobots/bijou-tui-app` package** — batteries-included app skeleton built on `createFramedApp()`. Includes tokenized tabs, full-screen defaults, animated physics drawer, quit-confirm modal (`q` / `ctrl+c`), `[` / `]` page switching, a two-line footer, and a default two-tab setup (drawer page + 1/3:2/3 split page).
 - **`create-bijou-tui-app` package** — new `npm create bijou-tui-app@latest` scaffolder that generates a runnable TypeScript app using `createTuiAppSkeleton()` with strict config and starter scripts.
 
 ### 🧪 Tests
@@ -37,7 +37,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
 - Update root README and examples index for the canonical release workbench demo.
 - Clarify package README caveats: canonical docs/examples live in-repo, `run()` non-interactive single-render behavior, and `initDefaultContext()` first-call registration semantics.
-- Expand `create-bijou-tui-app` docs with explicit generated-app run instructions (`npm run dev` / `npx tsx src/main.ts`), a local monorepo smoke-test flow, and a root README pointer to discover scaffolder development workflow.
+- Expand `create-bijou-tui-app` docs with explicit generated-app run instructions (`npm run dev` / `npx tsx src/main.ts`) and a local monorepo smoke-test flow.
+- Add a root README pointer for discovering the scaffolder development workflow.
 
 ## [1.2.0] — 2026-03-04
 

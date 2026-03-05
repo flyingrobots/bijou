@@ -3,7 +3,7 @@ import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext } from './app-frame.js';
-import type { MouseMsg } from './types.js';
+import type { Cmd, MouseMsg } from './types.js';
 
 type Msg =
   | { type: 'inc' }
@@ -97,6 +97,95 @@ describe('createFramedApp', () => {
 
     const result = await runScript(app, [{ key: 'x' }]);
     expect(result.model.pageModels.home?.count).toBe(1);
+  });
+
+  it('keeps init command messages scoped to their originating page', async () => {
+    const initInc: Cmd<Msg> = async () => ({ type: 'inc' });
+    const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
+      id,
+      title,
+      init: () => [{ count: 0 }, [initInc]],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => `${id} pane`,
+      }),
+    });
+
+    const app = createFramedApp({
+      pages: [page('home', 'Home'), page('logs', 'Logs')],
+    });
+    const result = await runScript(app, []);
+
+    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.pageModels.logs?.count).toBe(1);
+  });
+
+  it('routes delayed page commands back to the originating page after tab switches', async () => {
+    const home: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => 'home',
+      }),
+    };
+
+    const logs: FramePage<PageModel, Msg> = {
+      id: 'logs',
+      title: 'Logs',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        if (msg.type === 'noop') {
+          const delayed: Cmd<Msg> = async () => {
+            await new Promise<void>((resolve) => setTimeout(resolve, 10));
+            return { type: 'inc' };
+          };
+          return [model, [delayed]];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => 'logs',
+      }),
+      keyMap: createKeyMap<Msg>().bind('x', 'Delayed increment', { type: 'noop' }),
+    };
+
+    const app = createFramedApp({
+      pages: [home, logs],
+    });
+
+    const result = await runScript(app, [
+      { key: ']' },
+      { key: 'x' },
+      { key: '[' },
+      { delay: 25, msg: { type: 'noop' } },
+    ]);
+
+    expect(result.model.pageModels.home?.count).toBe(0);
+    expect(result.model.pageModels.logs?.count).toBe(1);
+  });
+
+  it('supports Shift+G for scroll-to-bottom', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const result = await runScript(app, [{ key: 'G' }]);
+    expect(result.model.scrollByPage.home?.main?.y).toBeGreaterThan(0);
   });
 
   it('ignores mouse messages at the frame boundary', async () => {

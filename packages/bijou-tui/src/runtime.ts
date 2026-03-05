@@ -132,8 +132,8 @@ export async function run<Model, M>(
 
   // Initial render + startup commands
   render();
-  executeCommands(resizeCmds);
   executeCommands(initCmds);
+  executeCommands(resizeCmds);
 
   // Wait for quit signal
   await new Promise<void>((resolve) => {

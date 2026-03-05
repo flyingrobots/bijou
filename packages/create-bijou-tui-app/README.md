@@ -1,13 +1,12 @@
 # `create-bijou-tui-app`
 
-Scaffold a new Bijou TUI app with a batteries-included default shell.
+Scaffold a new Bijou TUI app with batteries-included defaults.
 
 ## Usage
 
 ```sh
 npm create bijou-tui-app@latest my-app
 cd my-app
-npm install
 npm run dev
 ```
 
