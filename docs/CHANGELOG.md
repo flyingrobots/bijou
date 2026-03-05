@@ -37,6 +37,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
 - Update root README and examples index for the canonical release workbench demo.
 - Clarify package README caveats: canonical docs/examples live in-repo, `run()` non-interactive single-render behavior, and `initDefaultContext()` first-call registration semantics.
+- Expand `create-bijou-tui-app` docs with explicit generated-app run instructions (`npm run dev` / `npx tsx src/main.ts`), a local monorepo smoke-test flow, and a root README pointer to discover scaffolder development workflow.
 
 ## [1.2.0] — 2026-03-04
 

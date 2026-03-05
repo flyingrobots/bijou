@@ -155,6 +155,20 @@ npx tsx examples/<name>/main.ts
 
 There are 68 curated examples in [`examples/`](./examples/), including canonical app-shell demos and advanced component showcases.
 
+Test local `create-bijou-tui-app` scaffolder changes from the monorepo:
+
+```bash
+TMP="$(mktemp -d /tmp/bijou-scaffold-XXXXXX)"
+TARGET="$TMP/my-app"
+npx tsx packages/create-bijou-tui-app/src/cli.ts "$TARGET" --no-install
+cd "$TARGET"
+npm install
+npm run dev
+```
+
+For full scaffolder usage, flags, and test flow, see
+[`packages/create-bijou-tui-app/README.md`](./packages/create-bijou-tui-app/README.md).
+
 ## Local Development
 
 ```bash
