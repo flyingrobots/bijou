@@ -139,7 +139,7 @@ npx tsx demo-tui.ts
 npx tsx examples/<name>/main.ts
 ```
 
-There are 67 curated examples in [`examples/`](./examples/) with per-example READMEs and demo tapes.
+There are 68 curated examples in [`examples/`](./examples/), including canonical app-shell demos and advanced component showcases.
 
 ## Local Development
 

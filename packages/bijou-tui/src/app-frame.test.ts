@@ -3,6 +3,7 @@ import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext } from './app-frame.js';
+import type { MouseMsg } from './types.js';
 
 type Msg =
   | { type: 'inc' }
@@ -98,6 +99,47 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(1);
   });
 
+  it('ignores mouse messages at the frame boundary', async () => {
+    type MsgWithMouse = Msg | MouseMsg;
+
+    let sawMouseInPageUpdate = false;
+    const page: FramePage<PageModel, MsgWithMouse> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse') {
+          sawMouseInPageUpdate = true;
+          return [model, []];
+        }
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => 'main',
+      }),
+      keyMap: createKeyMap<MsgWithMouse>().bind('x', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp<PageModel, MsgWithMouse>({ pages: [page] });
+    const mouse: MouseMsg = {
+      type: 'mouse',
+      button: 'left',
+      action: 'press',
+      col: 4,
+      row: 2,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+
+    const result = await runScript(app, [{ msg: mouse }, { key: 'x' }]);
+    expect(sawMouseInPageUpdate).toBe(false);
+    expect(result.model.pageModels.home?.count).toBe(1);
+  });
+
   it('toggles help with ?', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -130,6 +172,43 @@ describe('createFramedApp', () => {
     const result = await runScript(app, [
       { key: '\x10' },
       { key: 'z' },
+      { key: '\r' },
+    ]);
+
+    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('dispatches selected custom commandItems actions', async () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update(msg, model) {
+          if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+          return [model, []];
+        },
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => 'main',
+        }),
+        commandItems: () => [{
+          id: 'boost',
+          label: 'Mega Boost',
+          action: { type: 'inc' },
+        }],
+      }],
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      { key: '\x10' }, // ctrl+p
+      { key: 'm' },
+      { key: 'e' },
+      { key: 'g' },
+      { key: 'a' },
       { key: '\r' },
     ]);
 

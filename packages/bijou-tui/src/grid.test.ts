@@ -24,6 +24,36 @@ describe('gridLayout', () => {
     expect(main!.col).toBeGreaterThan(nav!.col);
   });
 
+  it('clamps fixed columns when they exceed available width', () => {
+    const rects = gridLayout({
+      width: 10,
+      height: 2,
+      columns: [8, 8],
+      rows: [2],
+      areas: ['a b'],
+      gap: 1,
+    });
+
+    expect(rects.get('a')?.width).toBe(8);
+    expect(rects.get('b')?.width).toBe(1);
+    expect(rects.get('b')?.col).toBe(9);
+  });
+
+  it('clamps fixed rows when they exceed available height', () => {
+    const rects = gridLayout({
+      width: 6,
+      height: 7,
+      columns: [6],
+      rows: [5, 5],
+      areas: ['top', 'bottom'],
+      gap: 1,
+    });
+
+    expect(rects.get('top')?.height).toBe(5);
+    expect(rects.get('bottom')?.height).toBe(1);
+    expect(rects.get('bottom')?.row).toBe(6);
+  });
+
   it('throws when area rows mismatch tracks', () => {
     expect(() => gridLayout({
       width: 10,

@@ -164,6 +164,20 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
     }
   }
 
+  // If fixed tracks over-allocate the container, clamp them in declaration order
+  // and leave all fractional tracks at 0. This keeps total size deterministic and bounded.
+  if (fixed > available) {
+    let remainingBudget = available;
+    for (let i = 0; i < tracks.length; i++) {
+      if (typeof tracks[i] !== 'number') continue;
+      const next = Math.min(sizes[i] ?? 0, remainingBudget);
+      sizes[i] = next;
+      remainingBudget -= next;
+      if (remainingBudget <= 0) remainingBudget = 0;
+    }
+    return sizes.map((x) => Math.max(0, x));
+  }
+
   const remaining = Math.max(0, available - fixed);
   if (frTotal > 0) {
     let assigned = 0;

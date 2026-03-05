@@ -78,6 +78,7 @@ export {
 
 // App frame shell
 export {
+  type FrameCommandItem,
   type FramePage,
   type FrameLayoutNode,
   type FrameOverlayContext,

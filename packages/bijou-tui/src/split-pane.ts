@@ -100,10 +100,10 @@ export function splitPaneFocusNext(state: SplitPaneState): SplitPaneState {
 }
 
 /**
- * Focus pane A when on B, otherwise stay on A.
+ * Focus pane A when on B, otherwise focus pane B.
  */
 export function splitPaneFocusPrev(state: SplitPaneState): SplitPaneState {
-  return { ...state, focused: state.focused === 'b' ? 'a' : 'a' };
+  return { ...state, focused: state.focused === 'b' ? 'a' : 'b' };
 }
 
 /**

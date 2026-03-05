@@ -13,7 +13,7 @@ import {
   type KeyMap,
 } from './keybindings.js';
 import type { App, Cmd, KeyMsg } from './types.js';
-import { isKeyMsg, isResizeMsg } from './types.js';
+import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
 import { composite, modal } from './overlay.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
@@ -68,8 +68,14 @@ export interface FramePage<PageModel, Msg> {
   keyMap?: KeyMap<Msg>;
   /** Optional help source override. */
   helpSource?: BindingSource;
-  /** Optional page-scoped command items for command palette listing. */
-  commandItems?: (model: PageModel) => readonly CommandPaletteItem[];
+  /** Optional page-scoped command items for command palette listing/execution. */
+  commandItems?: (model: PageModel) => readonly FrameCommandItem<Msg>[];
+}
+
+/** Custom command-palette item with optional message dispatch action. */
+export interface FrameCommandItem<Msg> extends CommandPaletteItem {
+  /** Message dispatched when this item is selected. */
+  readonly action?: Msg;
 }
 
 /** Declarative frame layout node. */
@@ -304,6 +310,10 @@ export function createFramedApp<PageModel, Msg>(
           return [model, [emitMsg(pageAction)]];
         }
 
+        return [model, []];
+      }
+
+      if (isMouseMsg(msg)) {
         return [model, []];
       }
 
@@ -686,6 +696,7 @@ function buildPaletteEntries<PageModel, Msg>(
           id,
           category: item.category ?? page.title,
         },
+        msgAction: item.action,
       });
     }
   }
