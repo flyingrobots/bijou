@@ -14,10 +14,12 @@ import {
   createKeyMap,
   createSplitPaneState,
   drawer,
+  modal,
   quit,
   statusBar,
   type App,
   type DrawerAnchor,
+  type Overlay,
   type FrameLayoutNode,
   type FrameModel,
   type FramePage,
@@ -139,6 +141,7 @@ interface WorkbenchPageModel {
   readonly drawerOpen: boolean;
   readonly drawerAnchor: DrawerAnchor;
   readonly drawerTargetIndex: number;
+  readonly quitConfirmOpen: boolean;
 }
 
 const INITIAL_PAGE_MODEL: WorkbenchPageModel = {
@@ -147,10 +150,14 @@ const INITIAL_PAGE_MODEL: WorkbenchPageModel = {
   drawerOpen: false,
   drawerAnchor: 'right',
   drawerTargetIndex: 0,
+  quitConfirmOpen: false,
 };
 
 type WorkbenchMsg =
-  | { type: 'quit' }
+  | { type: 'request-quit' }
+  | { type: 'confirm-quit' }
+  | { type: 'escape' }
+  | { type: 'force-quit' }
   | { type: 'toggle-drawer' }
   | { type: 'cycle-drawer-anchor' }
   | { type: 'cycle-drawer-target' }
@@ -215,7 +222,7 @@ function renderOpsSummary(width: number, height: number, model: WorkbenchPageMod
     `Inspector drawer: ${drawerState} (${model.drawerAnchor})`,
     `o toggle drawer, a cycle anchor, y cycle target`,
     `ctrl+p or : palette, ? help`,
-    `q / esc / ctrl+c quit`,
+    `q or esc request quit, enter confirm`,
     statusBar({
       left: 'n/b release',
       center: 'drawer = panel inspector',
@@ -430,9 +437,29 @@ function buildPage(
     title,
     init: () => [INITIAL_PAGE_MODEL, []],
     update(msg, model) {
+      if (msg.type === 'force-quit') {
+        return [model, [quit()]];
+      }
+
+      if (model.quitConfirmOpen) {
+        switch (msg.type) {
+          case 'confirm-quit':
+            return [model, [quit()]];
+          case 'escape':
+            return [{ ...model, quitConfirmOpen: false }, []];
+          case 'request-quit':
+            return [model, []];
+          default:
+            return [model, []];
+        }
+      }
+
       switch (msg.type) {
-        case 'quit':
-          return [model, [quit()]];
+        case 'request-quit':
+        case 'escape':
+          return [{ ...model, quitConfirmOpen: true }, []];
+        case 'confirm-quit':
+          return [model, []];
         case 'toggle-drawer':
           return [{ ...model, drawerOpen: !model.drawerOpen }, []];
         case 'cycle-drawer-anchor':
@@ -570,9 +597,10 @@ export function createCanonicalWorkbenchApp(
     enableCommandPalette: true,
     globalKeys: createKeyMap<WorkbenchMsg>()
       .group('Global', (group) => group
-        .bind('q', 'Quit', { type: 'quit' })
-        .bind('escape', 'Quit', { type: 'quit' })
-        .bind('ctrl+c', 'Quit', { type: 'quit' })
+        .bind('q', 'Quit (confirm)', { type: 'request-quit' })
+        .bind('escape', 'Cancel quit / Quit (confirm)', { type: 'escape' })
+        .bind('enter', 'Confirm quit', { type: 'confirm-quit' })
+        .bind('ctrl+c', 'Force quit', { type: 'force-quit' })
         .bind('o', 'Toggle drawer', { type: 'toggle-drawer' })
         .bind('a', 'Cycle drawer anchor', { type: 'cycle-drawer-anchor' })
         .bind('y', 'Cycle drawer target', { type: 'cycle-drawer-target' })
@@ -581,60 +609,78 @@ export function createCanonicalWorkbenchApp(
       ),
     overlayFactory(frame) {
       const pageModel = frame.pageModel;
-      if (!pageModel.drawerOpen) return [];
+      const overlays: Overlay[] = [];
 
-      const paneIds = PANE_IDS_BY_PAGE[frame.activePageId] ?? [];
-      const targetIndex = pageModel.drawerTargetIndex % (paneIds.length + 1);
-      const targetPaneId = targetIndex < paneIds.length ? paneIds[targetIndex] : undefined;
-      const region = targetPaneId != null ? frame.paneRects.get(targetPaneId) : undefined;
+      if (pageModel.drawerOpen) {
+        const paneIds = PANE_IDS_BY_PAGE[frame.activePageId] ?? [];
+        const targetIndex = pageModel.drawerTargetIndex % (paneIds.length + 1);
+        const targetPaneId = targetIndex < paneIds.length ? paneIds[targetIndex] : undefined;
+        const region = targetPaneId != null ? frame.paneRects.get(targetPaneId) : undefined;
 
-      const targetLabel = targetPaneId == null
-        ? 'screen'
-        : `${frame.activePageId}:${targetPaneId}`;
+        const targetLabel = targetPaneId == null
+          ? 'screen'
+          : `${frame.activePageId}:${targetPaneId}`;
 
-      const content = [
-        `Target: ${targetLabel}`,
-        `Anchor: ${pageModel.drawerAnchor}`,
-        '',
-        `Page: ${frame.activePageId}`,
-        `Release: ${RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)]!.id}`,
-        '',
-        `${kbd('o', { ctx })} toggle`,
-        `${kbd('a', { ctx })} anchor`,
-        `${kbd('y', { ctx })} target`,
-      ].join('\n');
+        const content = [
+          `Target: ${targetLabel}`,
+          `Anchor: ${pageModel.drawerAnchor}`,
+          '',
+          `Page: ${frame.activePageId}`,
+          `Release: ${RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)]!.id}`,
+          '',
+          `${kbd('o', { ctx })} toggle`,
+          `${kbd('a', { ctx })} anchor`,
+          `${kbd('y', { ctx })} target`,
+        ].join('\n');
 
-      const frameWidth = region?.width ?? frame.screenRect.width;
-      const frameHeight = region?.height ?? frame.screenRect.height;
-      const anchor = pageModel.drawerAnchor;
+        const frameWidth = region?.width ?? frame.screenRect.width;
+        const frameHeight = region?.height ?? frame.screenRect.height;
+        const anchor = pageModel.drawerAnchor;
 
-      if (anchor === 'left' || anchor === 'right') {
-        return [drawer({
-          anchor,
-          width: Math.max(24, Math.floor(frameWidth * 0.46)),
-          region,
-          title: 'Panel Inspector',
-          content,
+        if (anchor === 'left' || anchor === 'right') {
+          overlays.push(drawer({
+            anchor,
+            width: Math.max(24, Math.floor(frameWidth * 0.46)),
+            region,
+            title: 'Panel Inspector',
+            content,
+            screenWidth: frame.screenRect.width,
+            screenHeight: frame.screenRect.height,
+            borderToken: ctx.theme.theme.border.primary,
+            bgToken: ctx.theme.theme.surface.elevated,
+            ctx,
+          }));
+        } else {
+          overlays.push(drawer({
+            anchor,
+            height: Math.max(8, Math.floor(frameHeight * 0.4)),
+            region,
+            title: 'Panel Inspector',
+            content,
+            screenWidth: frame.screenRect.width,
+            screenHeight: frame.screenRect.height,
+            borderToken: ctx.theme.theme.border.primary,
+            bgToken: ctx.theme.theme.surface.elevated,
+            ctx,
+          }));
+        }
+      }
+
+      if (pageModel.quitConfirmOpen) {
+        overlays.push(modal({
+          title: 'Quit Session?',
+          body: 'Exit the control room now?\n\nEnter = Yes\nEsc = No',
+          hint: 'q request • enter confirm • esc cancel',
+          width: 44,
           screenWidth: frame.screenRect.width,
           screenHeight: frame.screenRect.height,
           borderToken: ctx.theme.theme.border.primary,
           bgToken: ctx.theme.theme.surface.elevated,
           ctx,
-        })];
+        }));
       }
 
-      return [drawer({
-        anchor,
-        height: Math.max(8, Math.floor(frameHeight * 0.4)),
-        region,
-        title: 'Panel Inspector',
-        content,
-        screenWidth: frame.screenRect.width,
-        screenHeight: frame.screenRect.height,
-        borderToken: ctx.theme.theme.border.primary,
-        bgToken: ctx.theme.theme.surface.elevated,
-        ctx,
-      })];
+      return overlays;
     },
   });
 }

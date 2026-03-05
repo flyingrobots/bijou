@@ -149,6 +149,15 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(true);
   });
 
+  it('closes help with ? when help is open', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const result = await runScript(app, [{ key: '?' }, { key: '?' }]);
+    expect(result.model.helpOpen).toBe(false);
+  });
+
   it('closes help with escape', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -156,6 +165,24 @@ describe('createFramedApp', () => {
 
     const result = await runScript(app, [{ key: '?' }, { key: '\x1b' }]);
     expect(result.model.helpOpen).toBe(false);
+  });
+
+  it('treats help as modal and ignores non-close keys', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      globalKeys: createKeyMap<Msg>().bind('z', 'Increment', { type: 'inc' }),
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      { key: '?' },
+      { key: 'z' },
+      { key: '\x10' }, // ctrl+p should be ignored while help is open
+    ]);
+
+    expect(result.model.helpOpen).toBe(true);
+    expect(result.model.commandPalette).toBeUndefined();
+    expect(result.model.pageModels.home?.count).toBe(0);
   });
 
   it('opens command palette and dispatches selected keymap command', async () => {
@@ -261,5 +288,18 @@ describe('createFramedApp', () => {
     expect(captured!.paneRects.has('right')).toBe(true);
     // Body starts below 2-line chrome
     expect(captured!.paneRects.get('left')!.row).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders mode and focused pane in frame status line', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      title: 'Status Test',
+    });
+
+    const [model] = app.init();
+    const lines = app.view(model).split('\n');
+    expect(lines[1]).toContain('[NORMAL]');
+    expect(lines[1]).toContain('page:home');
+    expect(lines[1]).toContain('pane:main');
   });
 });

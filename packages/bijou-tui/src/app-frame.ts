@@ -286,12 +286,16 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isKeyMsg(msg)) {
-        if (model.helpOpen && msg.key === 'escape' && !msg.ctrl && !msg.alt) {
-          return [{ ...model, helpOpen: false }, []];
-        }
-
         if (model.commandPalette != null) {
           return handlePaletteKey(msg, model, paletteKeys, frameKeys, options, pagesById);
+        }
+
+        // Help acts as a modal layer when open: only close keys are handled.
+        if (model.helpOpen) {
+          if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === '?')) {
+            return [{ ...model, helpOpen: false }, []];
+          }
+          return [model, []];
         }
 
         const frameAction = frameKeys.handle(msg);
@@ -900,13 +904,24 @@ function renderHelpLine<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   activePage: FramePage<PageModel, Msg>,
 ): string {
+  const mode = model.commandPalette != null
+    ? 'PALETTE'
+    : model.helpOpen
+      ? 'HELP'
+      : 'NORMAL';
+  const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
+  const status = `[${mode}] page:${model.activePageId} pane:${focusedPane}`;
+
   const source = mergeBindingSources(
     frameKeys,
     options.globalKeys,
     activePage.helpSource ?? activePage.keyMap,
   );
   const hint = helpShort(source);
-  return fitLine(hint.length > 0 ? ` ${hint}` : '', model.columns);
+  const line = hint.length > 0
+    ? ` ${status}  ${hint}`
+    : ` ${status}`;
+  return fitLine(line, model.columns);
 }
 
 function mergeBindingSources(...sources: Array<BindingSource | undefined>): BindingSource {

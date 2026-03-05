@@ -25,7 +25,10 @@ npx tsx examples/release-workbench/main.ts
 - `a`: cycle drawer anchor (`right` -> `left` -> `bottom` -> `top`)
 - `y`: cycle drawer target (focused panel or full frame)
 - `n` / `b`: next/previous release train
-- `?`: help
-- `q`, `esc`, or `ctrl+c`: quit
+- `?`: help (`?` or `esc` closes help)
+- `q` or `esc`: open quit confirmation dialog (when closed)
+- `enter`: confirm quit when dialog is open
+- `esc`: cancel quit when dialog is open
+- `ctrl+c`: force quit immediately
 
 [← Examples](../README.md)
