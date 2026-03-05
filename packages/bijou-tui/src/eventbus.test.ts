@@ -25,6 +25,7 @@ function createMockIO(): {
 
   const io: IOPort = {
     write: vi.fn(),
+    writeError: vi.fn(),
     question: vi.fn(() => Promise.resolve('')),
     rawInput(onKey) {
       keyHandler = onKey;
@@ -289,6 +290,19 @@ describe('runCmd', () => {
 
     await new Promise((r) => setTimeout(r, 10));
     expect(received).toHaveLength(0);
+  });
+
+  it('surfaces rejected commands through onCommandRejected', async () => {
+    const onCommandRejected = vi.fn();
+    const bus = createEventBus<TestMsg>({ onCommandRejected });
+
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    await vi.waitFor(() => expect(onCommandRejected).toHaveBeenCalledTimes(1));
+    expect(onCommandRejected.mock.calls[0]?.[0]).toBeInstanceOf(Error);
+    expect((onCommandRejected.mock.calls[0]?.[0] as Error).message).toBe('boom');
   });
 });
 

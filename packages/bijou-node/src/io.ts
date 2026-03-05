@@ -25,6 +25,15 @@ export function nodeIO(): IOPort {
     },
 
     /**
+     * Write a string directly to `process.stderr`.
+     *
+     * @param data - Text to write.
+     */
+    writeError(data: string): void {
+      process.stderr.write(data);
+    },
+
+    /**
      * Prompt the user for a single line of input using a readline interface.
      *
      * Opens a new `readline.Interface` for each call and closes it once the

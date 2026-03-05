@@ -36,14 +36,8 @@ describe('resolve', () => {
 
   it('falls back to cyan-magenta for unknown theme name', () => {
     process.env['BIJOU_THEME'] = 'nonexistent-theme';
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-      const t = getTheme();
-      expect(t.theme.name).toBe('cyan-magenta');
-      expect(warnSpy).toHaveBeenCalledOnce();
-    } finally {
-      warnSpy.mockRestore();
-    }
+    const t = getTheme();
+    expect(t.theme.name).toBe('cyan-magenta');
   });
 
   it('caches the theme singleton', () => {
@@ -132,6 +126,34 @@ describe('createThemeResolver', () => {
     });
     const t = resolver.getTheme();
     expect(t.theme.name).toBe('custom');
+  });
+
+  it('writes warnings through warningPort for unknown env theme', () => {
+    process.env['BIJOU_THEME'] = 'missing-theme';
+    const writeError = vi.fn();
+    const resolver = createThemeResolver({
+      warningPort: { writeError },
+    });
+
+    const t = resolver.getTheme();
+    expect(t.theme.name).toBe('cyan-magenta');
+    expect(writeError).toHaveBeenCalledWith(
+      '[bijou] Unknown BIJOU_THEME="missing-theme", falling back to "cyan-magenta".\n',
+    );
+    delete process.env['BIJOU_THEME'];
+  });
+
+  it('writes warnings through warningPort for unknown explicit name', () => {
+    const writeError = vi.fn();
+    const resolver = createThemeResolver({
+      warningPort: { writeError },
+    });
+
+    const t = resolver.resolveTheme('missing-theme');
+    expect(t.theme.name).toBe('cyan-magenta');
+    expect(writeError).toHaveBeenCalledWith(
+      '[bijou] Unknown theme "missing-theme", falling back to "cyan-magenta".\n',
+    );
   });
 
   it('caches per-resolver', () => {

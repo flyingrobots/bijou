@@ -1,5 +1,5 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
-import type { App, Cmd, RunOptions } from './types.js';
+import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
@@ -56,7 +56,14 @@ export async function run<Model, M>(
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
 
-  const bus = createEventBus<M>();
+  const bus = createEventBus<M>({
+    onCommandRejected(error) {
+      const message = error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+      ctx.io.writeError(`[EventBus] Command rejected: ${message}\n`);
+    },
+  });
 
   function shutdown(): void {
     if (!running) return;
@@ -113,8 +120,19 @@ export async function run<Model, M>(
     executeCommands(cmds);
   });
 
+  // Apply an initial runtime-size sync before first render.
+  // This keeps framed apps sized from ports instead of process globals.
+  const initialResize: ResizeMsg = {
+    type: 'resize',
+    columns: ctx.runtime.columns,
+    rows: ctx.runtime.rows,
+  };
+  const [resizedModel, resizeCmds] = app.update(initialResize, model);
+  model = resizedModel;
+
   // Initial render + startup commands
   render();
+  executeCommands(resizeCmds);
   executeCommands(initCmds);
 
   // Wait for quit signal

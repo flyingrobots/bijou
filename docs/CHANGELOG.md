@@ -23,6 +23,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Expand `driver` tests for resize and custom message script steps.
 - Expand `select` tests for `maxVisible` scrolling behavior.
 
+### ♻️ Refactors
+
+- **I/O stderr porting across core/tui** — add `writeError()` to `WritePort`, implement it in `nodeIO()` and test adapters, and route command rejection reporting through injected ports instead of direct `console.error`.
+- **Theme resolver warning output port** — replace direct `console.warn` fallback logs in theme resolution with optional `warningPort.writeError()` wiring.
+- **Runtime/global decoupling cleanup** — remove `process.stdout` dependencies from framed-app initialization and output-mode detection internals; runtime now performs an initial size sync via `ResizeMsg` from `RuntimePort`.
+
 ### 📝 Documentation
 
 - Add new examples: `split-pane`, `grid-layout`, and `app-frame`.

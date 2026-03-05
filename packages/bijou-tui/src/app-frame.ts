@@ -127,6 +127,10 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly defaultPageId?: string;
   /** Optional frame title. */
   readonly title?: string;
+  /** Initial terminal width before runtime resize events. Default: 80. */
+  readonly initialColumns?: number;
+  /** Initial terminal height before runtime resize events. Default: 24. */
+  readonly initialRows?: number;
   /** Optional global keymap layered above page keymap. */
   readonly globalKeys?: KeyMap<Msg>;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
@@ -264,8 +268,8 @@ export function createFramedApp<PageModel, Msg>(
         pageModels,
         focusedPaneByPage: {},
         scrollByPage: {},
-        columns: process.stdout.columns ?? 80,
-        rows: process.stdout.rows ?? 24,
+        columns: Math.max(1, options.initialColumns ?? 80),
+        rows: Math.max(1, options.initialRows ?? 24),
         helpOpen: false,
       };
 

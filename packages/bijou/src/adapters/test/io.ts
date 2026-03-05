@@ -24,6 +24,8 @@ export interface MockIOOptions {
 export interface MockIO extends IOPort {
   /** All strings passed to {@link write} and prompt strings passed to {@link question}. */
   written: string[];
+  /** All strings passed to {@link writeError}. */
+  writtenErr: string[];
   /** Remaining answers that will be consumed by {@link question}. */
   answerQueue: string[];
   /** Mutable virtual filesystem backing {@link readFile}. */
@@ -44,12 +46,14 @@ export interface MockIO extends IOPort {
  */
 export function mockIO(options: MockIOOptions = {}): MockIO {
   const written: string[] = [];
+  const writtenErr: string[] = [];
   const answerQueue = [...(options.answers ?? [])];
   const files = { ...(options.files ?? {}) };
   const dirs = { ...(options.dirs ?? {}) };
 
   return {
     written,
+    writtenErr,
     answerQueue,
     files,
     dirs,
@@ -60,6 +64,14 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
      */
     write(data: string): void {
       written.push(data);
+    },
+
+    /**
+     * Append a string to the `writtenErr` buffer.
+     * @param data - The string to write.
+     */
+    writeError(data: string): void {
+      writtenErr.push(data);
     },
 
     /**
