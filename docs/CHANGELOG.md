@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`) are versioned in lock-step.
+All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`) are versioned in lock-step.
 
 ## [Unreleased]
 
@@ -14,6 +14,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Drawer anchor expansion + region scoping (bijou-tui)** — `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped drawers.
 - **Scripted interaction harness upgrades (bijou-tui)** — `runScript()` now accepts key, resize, and custom message steps for richer integration testing.
 - **Scrollable select viewport (bijou core)** — `select()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists.
+- **`@flyingrobots/bijou-tui-app` package** — new batteries-included app skeleton built on `createFramedApp()` with tokenized tab bar (active/inactive states), header row, full-width `\` separator, footer key gutter, and empty framed body tabs.
 
 ### 🧪 Tests
 
