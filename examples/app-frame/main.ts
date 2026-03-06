@@ -122,8 +122,8 @@ const app = createFramedApp<PageModel, Msg>({
       screenHeight: frame.screenRect.height,
       title: 'Inspector',
       content: `Active page: ${frame.activePageId}\n\nUse ${kbd('tab')} to change focused pane.\nUse ${kbd('ctrl+p')} for palette.`,
-      borderToken: ctx.theme.theme.border.primary,
-      bgToken: ctx.theme.theme.surface.elevated,
+      borderToken: ctx.border('primary'),
+      bgToken: ctx.surface('elevated'),
       ctx,
     })];
   },

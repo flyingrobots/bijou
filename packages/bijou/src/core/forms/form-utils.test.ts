@@ -190,7 +190,7 @@ describe('createStyledFn', () => {
   it('returns identity function when noColor is true', () => {
     const ctx = createTestContext({ noColor: true });
     const styledFn = createStyledFn(ctx);
-    const result = styledFn(ctx.theme.theme.semantic.info, 'hello');
+    const result = styledFn(ctx.semantic('info'), 'hello');
     expect(result).toBe('hello');
   });
 
@@ -200,8 +200,8 @@ describe('createStyledFn', () => {
     // Replace style with audit style to track calls
     const ctxWithAudit = { ...ctx, style };
     const styledFn = createStyledFn(ctxWithAudit);
-    styledFn(ctx.theme.theme.semantic.info, 'hello');
-    expect(style.wasStyled(ctx.theme.theme.semantic.info, 'hello')).toBe(true);
+    styledFn(ctx.semantic('info'), 'hello');
+    expect(style.wasStyled(ctx.semantic('info'), 'hello')).toBe(true);
   });
 
   it('does not call styled() when noColor is true', () => {
@@ -209,7 +209,7 @@ describe('createStyledFn', () => {
     const ctx = createTestContext({ noColor: true });
     const ctxWithAudit = { ...ctx, style };
     const styledFn = createStyledFn(ctxWithAudit);
-    styledFn(ctx.theme.theme.semantic.info, 'hello');
+    styledFn(ctx.semantic('info'), 'hello');
     expect(style.calls).toHaveLength(0);
   });
 });

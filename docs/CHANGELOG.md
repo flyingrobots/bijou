@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
+## [Unreleased]
+
+### ♻️ Refactors
+
+- **Mode rendering strategy (OCP)** — implemented `renderByMode` dispatcher pattern to replace repetitive `if (mode === …)` chains; migrated all core components to use the new registry pattern for cleaner mode-specific rendering.
+- **Decentralized theme access (DIP)** — added `semantic()`, `border()`, `surface()`, `status()`, and `ui()` helpers to `BijouContext`; components now look up tokens via these semantic methods instead of reaching into the deep `ctx.theme.theme` object structure.
+
+### 🧪 Tests
+
+- **Shared test fixtures** — extracted common form data (colors, fruits, large lists) into `adapters/test/fixtures.ts` for reuse across test suites.
+- **Defensive input hardening** — added comprehensive tests and fixes for `null`/`undefined` input handling in `box()`, `headerBox()`, `alert()`, `table()`, and `markdown()`.
+- **Test suite refactoring** — migrated all form tests to use shared fixtures and updated component tests to leverage new `BijouContext` helpers.
+
 ## [1.3.0] - 2026-03-06
 
 ### ✨ Features
