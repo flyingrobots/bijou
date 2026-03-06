@@ -30,27 +30,26 @@ function createPageKeyMap() {
   const km = createKeyMap<Msg>();
   // Bind 1-8 to set transition
   TRANSITIONS.forEach((t, i) => {
-    km.bind((i + 1).toString(), `Use \${t}`, { type: 'set-transition', transition: t });
+    km.bind((i + 1).toString(), `Use ${t}`, { type: 'set-transition', transition: t });
   });
   return km;
 }
 
 function renderContent(pageName: string, model: PageModel, width: number, height: number): string {
   const list = enumeratedList(
-    TRANSITIONS.map(t => t === model.selectedTransition ? `\${t} \${badge('active', { variant: 'success' })}` : t),
+    TRANSITIONS.map(t => t === model.selectedTransition ? `${t} ${badge('active', { variant: 'success' })}` : t),
     { style: 'arabic', indent: 2 }
   );
 
   const content = [
-    `Currently on \${badge(pageName, { variant: 'primary' })}`,
+    `Currently on ${badge(pageName, { variant: 'primary' })}`,
     '',
     'Press 1-8 to select the NEXT transition:',
     '',
     list,
     '',
-    `Press \${kbd('[')} or \${kbd(']')} to switch pages and play the animation.`,
-  ].join('
-');
+    `Press ${kbd('[')} or ${kbd(']')} to switch pages and play the animation.`,
+  ].join('\n');
 
   return box(content, { width: Math.max(40, width - 4), padding: { top: 1, left: 2, right: 2 } });
 }
@@ -64,7 +63,7 @@ function makePage(id: string, title: string): FramePage<PageModel, Msg> {
     keyMap: createPageKeyMap(),
     layout: (model) => ({
       kind: 'pane',
-      paneId: `\${id}-main`,
+      paneId: `${id}-main`,
       render: (w, h) => renderContent(title, model, w, h),
     }),
   };
