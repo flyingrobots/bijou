@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
-## Unreleased
+## [1.3.0] - 2026-03-06
 
 ### ✨ Features
 
@@ -612,7 +612,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/flyingrobots/bijou/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/flyingrobots/bijou/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/flyingrobots/bijou/compare/v0.10.1...v1.0.0

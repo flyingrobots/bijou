@@ -191,13 +191,13 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## Current Focus (v1.3.0 in progress, March 4, 2026)
+## What's New in v1.3.0
 
-- App-shell foundations in `@flyingrobots/bijou-tui`: `splitPane()`, `grid()`, `createFramedApp()`, drawer region scoping, and driver script upgrades.
-- New canonical runtime demo: `demo-tui.ts` now runs a multi-view control-room app built on `createFramedApp()` with pane-scoped drawers and command palette.
-- Forms upgrade in `@flyingrobots/bijou`: `select()` now supports `maxVisible` with interactive viewport scrolling.
+- Added app-shell primitives in `@flyingrobots/bijou-tui`, including `splitPane()`, `grid()`, and `createFramedApp()` with pane-scoped overlays.
+- Added two new packages: `@flyingrobots/bijou-tui-app` (framed app skeleton) and `create-bijou-tui-app` (npm scaffolder).
+- Improved interactive behavior across forms/runtime, including `select({ maxVisible })` scrolling and expanded scripted runtime test coverage.
 
-Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#unreleased)
+See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
 ## License
 
