@@ -643,6 +643,8 @@ const inspector = drawer({
 - pane focus cycling
 - per-page + per-pane scroll isolation
 - help toggle (`?`) and optional command palette (`ctrl+p` / `:`)
+- `Esc` closes help and dismisses the command palette
+- quit behavior is app-defined (examples commonly bind `q` via `globalKeys`)
 - overlay hook with pane rect introspection
 
 See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.

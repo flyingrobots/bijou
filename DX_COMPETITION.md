@@ -3,6 +3,7 @@
 Date: 2026-03-04
 
 ## Goal
+
 This document compares Bijou's current app-shell DX against other mature TUI stacks, specifically to inform:
 
 - Phase 8: `splitPane()` and `grid()`
@@ -11,6 +12,7 @@ This document compares Bijou's current app-shell DX against other mature TUI sta
 Roadmap context: `docs/ROADMAP.md` lines 98-119.
 
 ## Method (What I Actually Did)
+
 I cloned and inspected real upstream repos under `/tmp/bijou-dx-competition` and compared them against Bijou examples and runtime primitives.
 
 Repos inspected:
@@ -41,6 +43,7 @@ Smoke/tinker checks run:
 - Core package has graceful degradation modes (interactive/static/pipe/accessible) and zero-runtime deps.
 
 ### Where app-shell DX still hurts
+
 Using `examples/split-editors/main.ts` as a concrete sample:
 
 - Manual resize tracking in app model (`cols`, `rows`) and explicit handling in `update`.
@@ -277,26 +280,32 @@ The biggest gap is not low-level capability. The gap is shell-level abstraction 
 ## What Other Stacks Do Better Today
 
 1. Built-in "app skeleton" patterns
-- Textual: header/footer, command palette, docked panes, CSS layout all integrated.
-- Bubble Tea ecosystem: strong list/help/key patterns that appear consistent across apps.
 
-2. First-class help/shortcut ergonomics
-- Bubble Tea/Bubbles and Textual both make discoverability (help + bindings) central.
+   - Textual: header/footer, command palette, docked panes, CSS layout all integrated.
+   - Bubble Tea ecosystem: strong list/help/key patterns that appear consistent across apps.
 
-3. Interaction testing harness
-- Textual has the strongest first-party story (`run_test` + `Pilot`).
-- Ink has an established external testing library.
+1. First-class help/shortcut ergonomics
+
+   - Bubble Tea/Bubbles and Textual both make discoverability (help + bindings) central.
+
+1. Interaction testing harness
+
+   - Textual has the strongest first-party story (`run_test` + `Pilot`).
+   - Ink has an established external testing library.
 
 ## What Bijou Already Does Better
 
 1. Graceful degradation is core to design
-- Bijou explicitly targets interactive/static/pipe/accessible from one codebase.
 
-2. Pure-function TEA building blocks
-- Existing primitives (`focusArea`, input stack, panel group) are composable and test-friendly.
+   - Bijou explicitly targets interactive/static/pipe/accessible from one codebase.
 
-3. Package architecture is simple and coherent
-- Core + node adapter + tui runtime are conceptually clear and lock-step versioned.
+1. Pure-function TEA building blocks
+
+   - Existing primitives (`focusArea`, input stack, panel group) are composable and test-friendly.
+
+1. Package architecture is simple and coherent
+
+   - Core + node adapter + tui runtime are conceptually clear and lock-step versioned.
 
 ## Recommendations for Phase 8/9
 
@@ -396,21 +405,26 @@ Guardrails:
 ## Proposed Implementation Sequence (Low-Risk)
 
 1. `splitPane` state + renderer + tests
-- start with keyboard-resizable divider and focus switching
-- no drag/mouse in v1
 
-2. `grid` with fixed + fr tracks
-- add named areas once core solver is stable
+   - start with keyboard-resizable divider and focus switching
+   - no drag/mouse in v1
 
-3. `appFrame` MVP
-- tabs + global/per-page keys + help overlay + scroll isolation
+1. `grid` with fixed + fr tracks
 
-4. `appFrame` advanced
-- multipane page composition via `splitPane` / `grid`
-- optional command palette bridge
+   - add named areas once core solver is stable
 
-5. test harness package/module
-- headless interaction tests for framed apps
+1. `appFrame` MVP
+
+   - tabs + global/per-page keys + help overlay + scroll isolation
+
+1. `appFrame` advanced
+
+   - multipane page composition via `splitPane` / `grid`
+   - optional command palette bridge
+
+1. test harness package/module
+
+   - headless interaction tests for framed apps
 
 ## Concrete "copy this, avoid that" checklist
 
@@ -439,6 +453,7 @@ Avoid from all:
 - requiring app authors to hand-roll focus/scroll/layout glue repeatedly
 
 ## Bottom Line
+
 Bijou does not need new low-level power first. It needs a shell abstraction layer that makes the current power easy to compose.
 
 If Phase 8/9 lands with:

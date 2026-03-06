@@ -20,9 +20,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🐛 Fixed
 
 - **`create-bijou-tui-app` next-step quoting on Windows** — `quotePath()` now emits Windows-safe double-quoted paths on `win32`, so copied `cd` commands with spaces work in `cmd.exe`.
+- **`create-bijou-tui-app` cmd metachar escaping** — Windows `cd` hints now escape `%` and `^` to avoid variable/metachar expansion when users scaffold into unusual directory names.
 - **Event bus rejection surfacing hardening (`bijou-tui`)** — `createEventBus()` now guards `onCommandRejected` callbacks so secondary handler exceptions are logged instead of reintroducing unhandled rejections.
 - **Grid fractional allocation clarity (`bijou-tui`)** — `gridLayout()` now uses largest-remainder distribution for leftover `fr` space and throws on fractional `fr` tokens (e.g. `1.5fr`) to match documented/tested integer semantics.
 - **Framed app render resilience (`bijou-tui`)** — missing grid cell nodes in `createFramedApp()` now render a placeholder with a warning instead of crashing the full app render.
+- **App-frame example split-state persistence** — the `examples/app-frame` editor split state is now initialized once in `PageModel` instead of being recreated on every render.
 
 ### 🧪 Tests
 
