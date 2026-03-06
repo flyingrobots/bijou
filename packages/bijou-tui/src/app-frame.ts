@@ -119,7 +119,7 @@ export interface FrameOverlayContext<PageModel> {
 }
 
 /** Page transition styles. */
-export type PageTransition = 'none' | 'wipe' | 'dissolve' | 'grid' | 'fade';
+export type PageTransition = 'none' | 'wipe' | 'dissolve' | 'grid' | 'fade' | 'melt' | 'matrix' | 'scramble';
 
 /** `createFramedApp()` options. */
 export interface CreateFramedAppOptions<PageModel, Msg> {
@@ -1220,32 +1220,61 @@ function renderTransition(
   const nextGrid = stringToGrid(next, width, height);
 
   return canvas(width, height, (x, y) => {
-    let showNext = false;
+    // Shared stable-ish pseudo-random seed based on coordinates
+    const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+    const rand = seed - Math.floor(seed);
 
     switch (style) {
       case 'wipe':
-        showNext = x / width < progress;
-        break;
-      case 'dissolve': {
-        // Use a stable-ish pseudo-random seed based on coordinates
-        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-        const rand = seed - Math.floor(seed);
-        showNext = rand < progress;
-        break;
-      }
+        return (x / width < progress ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+
+      case 'dissolve':
+        return (rand < progress ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+
       case 'grid': {
         const gx = Math.floor(x / 8);
         const gy = Math.floor(y / 4);
-        showNext = ((gx + gy) % 10) / 10 < progress;
-        break;
+        const showNext = ((gx + gy) % 10) / 10 < progress;
+        return (showNext ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
       }
-      case 'fade':
-        showNext = progress > 0.5;
-        break;
-      default:
-        showNext = progress >= 1;
-    }
 
-    return (showNext ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+      case 'fade':
+        return (progress > 0.5 ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+
+      case 'melt': {
+        // Doom-style melt: columns drop at variable speeds
+        const variability = (Math.sin(x * 0.7) * 0.5 + 0.5) * 0.4;
+        const dropStart = progress * 1.4 - variability;
+        const showNext = y / height < dropStart;
+        return (showNext ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+      }
+
+      case 'matrix': {
+        // Matrix dissolve: leading edge of the flip uses "code" characters
+        const threshold = progress;
+        const edge = 0.1;
+        if (rand < threshold) return nextGrid[y]?.[x] ?? ' ';
+        if (rand < threshold + edge) {
+          const chars = '01$#@%&*';
+          const char = chars[Math.floor(rand * 100) % chars.length]!;
+          return ctx.style.styled(ctx.semantic('success'), char);
+        }
+        return prevGrid[y]?.[x] ?? ' ';
+      }
+
+      case 'scramble': {
+        // Scramble: characters turn to noise then resolve
+        const scrambleAmount = 1 - Math.abs(progress - 0.5) * 2;
+        if (rand < scrambleAmount * 0.8) {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+          const char = chars[Math.floor(rand * 1000) % chars.length]!;
+          return ctx.style.styled(ctx.semantic('muted'), char);
+        }
+        return (progress > 0.5 ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+      }
+
+      default:
+        return (progress >= 1 ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+    }
   }, { ctx });
 }

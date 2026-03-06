@@ -162,6 +162,29 @@ describe('createFramedApp', () => {
     expect(result.frames.length).toBeGreaterThan(1);
   });
 
+  it('renders complex transition styles (melt, matrix, scramble) without error', async () => {
+    const transitions: PageTransition[] = ['melt', 'matrix', 'scramble'];
+    
+    for (const transition of transitions) {
+      const app = createFramedApp({
+        pages: [
+          makePage('p1', 'P1', 'm'),
+          makePage('p2', 'P2', 'm'),
+        ],
+        transition,
+        transitionDuration: 10,
+      });
+
+      const result = await runScript(app, [
+        { key: ']' },
+        { key: 'noop', delay: 50 },
+      ]);
+
+      expect(result.model.activePageId).toBe('p2');
+      expect(result.model.transitionProgress).toBe(1);
+    }
+  });
+
   it('throws for duplicate pane ids in a page layout', () => {
     const app = createFramedApp({
       pages: [{

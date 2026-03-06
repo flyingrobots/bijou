@@ -8,7 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
-- **Tab transition animations (bijou-tui)** — implemented `wipe`, `dissolve`, `grid`, and `fade` transitions in `createFramedApp()`. Transitions are driven by pure TEA state and rendered via high-performance character-grid shaders in `canvas()`.
+- **Tab transition animations (bijou-tui)** — implemented `wipe`, `dissolve`, `grid`, `fade`, `melt` (Doom-style), `matrix` (code-leading edge), and `scramble` (noise resolve) transitions in `createFramedApp()`. Transitions are driven by pure TEA state and rendered via high-performance character-grid shaders in `canvas()`.
 - **Scrollable multiselect viewport (bijou core)** — `multiselect()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists, matching the `select()` and `filter()` components.
 
 ### ♻️ Refactors
