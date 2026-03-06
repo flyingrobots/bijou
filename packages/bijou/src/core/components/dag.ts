@@ -21,7 +21,7 @@ export interface DagNode {
   /** Human-readable display text rendered inside the node box. */
   label: string;
   /** IDs of child nodes this node has outgoing edges to. */
-  edges?: string[];
+  edges?: readonly string[];
   /** Short annotation text displayed alongside the label (e.g., a status or count). */
   badge?: string;
   /** Color/style token applied to the node box border. */

@@ -12,9 +12,16 @@ import {
 } from './split-pane.js';
 
 describe('split-pane state', () => {
+  it('creates default state with ratio 0.5 and focus on pane A', () => {
+    expect(createSplitPaneState()).toEqual({ ratio: 0.5, focused: 'a' });
+  });
+
   it('clamps ratio in state creation', () => {
     expect(createSplitPaneState({ ratio: -1 }).ratio).toBe(0);
     expect(createSplitPaneState({ ratio: 2 }).ratio).toBe(1);
+    expect(createSplitPaneState({ ratio: NaN }).ratio).toBe(0.5);
+    expect(createSplitPaneState({ ratio: Infinity }).ratio).toBe(0.5);
+    expect(createSplitPaneState({ ratio: -Infinity }).ratio).toBe(0.5);
   });
 
   it('setRatio clamps to [0, 1]', () => {
@@ -65,6 +72,20 @@ describe('splitPaneLayout', () => {
     expect(layout.paneA.width).toBeGreaterThanOrEqual(10);
     expect(layout.paneB.width).toBeGreaterThanOrEqual(15);
   });
+
+  it('prioritizes minB when constraints conflict', () => {
+    const state = createSplitPaneState({ ratio: 0.9 });
+    const layout = splitPaneLayout(state, {
+      direction: 'row',
+      width: 21,
+      height: 5,
+      dividerSize: 1,
+      minA: 15,
+      minB: 15,
+    });
+    expect(layout.paneB.width).toBe(15);
+    expect(layout.paneA.width).toBe(5);
+  });
 });
 
 describe('splitPaneResizeBy', () => {
@@ -102,6 +123,24 @@ describe('splitPane render', () => {
     }
     expect(output).toContain('A(');
     expect(output).toContain('B(');
+  });
+
+  it('sanitizes multi-column dividerChar to preserve layout width', () => {
+    const state = createSplitPaneState({ ratio: 0.5 });
+    const output = splitPane(state, {
+      direction: 'row',
+      width: 16,
+      height: 3,
+      dividerChar: '██',
+      paneA: () => 'left',
+      paneB: () => 'right',
+    });
+
+    const lines = output.split('\n');
+    expect(lines).toHaveLength(3);
+    for (const line of lines) {
+      expect(visibleLength(line)).toBe(16);
+    }
   });
 
   it('renders exact width/height in column mode', () => {

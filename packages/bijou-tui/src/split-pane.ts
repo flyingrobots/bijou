@@ -7,6 +7,7 @@
 
 import type { LayoutRect } from './layout-rect.js';
 import { fitBlock } from './layout-utils.js';
+import { graphemeClusterWidth, graphemeWidth, segmentGraphemes } from '@flyingrobots/bijou';
 
 /** Split direction. */
 export type SplitPaneDirection = 'row' | 'column';
@@ -45,7 +46,7 @@ export interface SplitPaneOptions {
   readonly minB?: number;
   /** Divider thickness in the main axis. Default: 1. */
   readonly dividerSize?: number;
-  /** Divider character. Default: `│` or `─` based on direction. */
+  /** Divider character (single terminal column). Default: `│` or `─` based on direction. */
   readonly dividerChar?: string;
   /** Pane A renderer. */
   readonly paneA: (width: number, height: number) => string;
@@ -57,6 +58,10 @@ export interface SplitPaneOptions {
  * Create split-pane state.
  */
 export function createSplitPaneState(options?: { ratio?: number; focused?: SplitPaneFocus }): SplitPaneState {
+  if (options?.ratio != null && !Number.isFinite(options.ratio)) {
+    warnInvalidRatio(options.ratio);
+  }
+
   return {
     ratio: clampRatio(options?.ratio ?? 0.5),
     focused: options?.focused ?? 'a',
@@ -151,14 +156,15 @@ export function splitPaneLayout(
  */
 export function splitPane(state: SplitPaneState, options: SplitPaneOptions): string {
   const direction = options.direction ?? 'row';
-  const dividerChar = options.dividerChar ?? (direction === 'row' ? '│' : '─');
+  const fallbackDividerChar = direction === 'row' ? '│' : '─';
+  const dividerUnit = resolveDividerChar(options.dividerChar, fallbackDividerChar);
   const layout = splitPaneLayout(state, options);
 
   const aLines = fitBlock(options.paneA(layout.paneA.width, layout.paneA.height), layout.paneA.width, layout.paneA.height);
   const bLines = fitBlock(options.paneB(layout.paneB.width, layout.paneB.height), layout.paneB.width, layout.paneB.height);
 
   if (direction === 'row') {
-    const dividerLine = dividerChar.repeat(Math.max(0, layout.divider.width));
+    const dividerLine = repeatToWidth(dividerUnit, Math.max(0, layout.divider.width));
     const lines: string[] = [];
     for (let r = 0; r < layout.paneA.height; r++) {
       lines.push((aLines[r] ?? '') + dividerLine + (bLines[r] ?? ''));
@@ -167,7 +173,7 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
   }
 
   const dividerLines = Array.from({ length: layout.divider.height }, () =>
-    dividerChar.repeat(Math.max(0, layout.divider.width)),
+    repeatToWidth(dividerUnit, Math.max(0, layout.divider.width)),
   );
 
   return [...aLines, ...dividerLines, ...bLines].join('\n');
@@ -199,6 +205,46 @@ function solveSplit(available: number, ratio: number, minA: number, minB: number
 function clampRatio(ratio: number): number {
   if (!Number.isFinite(ratio)) return 0.5;
   return clamp(ratio, 0, 1);
+}
+
+function warnInvalidRatio(ratio: number): void {
+  if (typeof process === 'undefined') return;
+  const nodeEnv = process.env?.['NODE_ENV'];
+  if (nodeEnv === 'production' || nodeEnv === 'test') return;
+  console.warn(
+    `[bijou-tui] createSplitPaneState(): received non-finite ratio "${String(ratio)}"; falling back to 0.5.`,
+  );
+}
+
+function resolveDividerChar(dividerChar: string | undefined, fallback: string): string {
+  if (dividerChar == null || dividerChar.length === 0) return fallback;
+  const graphemes = segmentGraphemes(dividerChar);
+  if (graphemes.length === 0) return fallback;
+  if (graphemes.length === 1 && graphemeClusterWidth(graphemes[0]!) === 1) {
+    return graphemes[0]!;
+  }
+  for (const grapheme of graphemes) {
+    if (graphemeClusterWidth(grapheme) === 1) return grapheme;
+  }
+  return fallback;
+}
+
+function repeatToWidth(unit: string, targetWidth: number): string {
+  const width = Math.max(0, targetWidth);
+  if (width === 0) return '';
+
+  const unitWidth = graphemeWidth(unit);
+  if (unitWidth <= 0) return ' '.repeat(width);
+  if (unitWidth === 1) return unit.repeat(width);
+
+  let out = '';
+  let remaining = width;
+  while (remaining >= unitWidth) {
+    out += unit;
+    remaining -= unitWidth;
+  }
+  if (remaining > 0) out += ' '.repeat(remaining);
+  return out;
 }
 
 function clamp(value: number, min: number, max: number): number {

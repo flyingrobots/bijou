@@ -123,7 +123,7 @@ export function buildLayerArrays(
  * @param nodes - All graph nodes (used to build adjacency maps).
  */
 export function orderColumns(layers: string[][], nodes: DagNode[]): void {
-  const childrenMap = new Map<string, string[]>();
+  const childrenMap = new Map<string, readonly string[]>();
   const parentsMap = new Map<string, string[]>();
   for (const n of nodes) {
     childrenMap.set(n.id, n.edges ?? []);

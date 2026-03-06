@@ -137,7 +137,9 @@ const DEPLOY_GRAPH: readonly DagNode[] = [
 
 interface WorkbenchPageModel {
   readonly releaseIndex: number;
-  readonly selectionIndex: number;
+  readonly incidentIndex: number;
+  readonly backlogIndex: number;
+  readonly graphSelectionIndex: number;
   readonly drawerOpen: boolean;
   readonly drawerAnchor: DrawerAnchor;
   readonly drawerTargetIndex: number;
@@ -146,7 +148,9 @@ interface WorkbenchPageModel {
 
 const INITIAL_PAGE_MODEL: WorkbenchPageModel = {
   releaseIndex: 0,
-  selectionIndex: 0,
+  incidentIndex: 0,
+  backlogIndex: 0,
+  graphSelectionIndex: 0,
   drawerOpen: false,
   drawerAnchor: 'right',
   drawerTargetIndex: 0,
@@ -166,11 +170,14 @@ type WorkbenchMsg =
   | { type: 'next-incident' }
   | { type: 'prev-incident' };
 
+type WorkbenchPageId = 'ops' | 'board' | 'graph';
+
 const OPS_PANES = ['ops-summary', 'ops-health', 'ops-events'] as const;
 const BOARD_PANES = ['board-lanes', 'board-ticket', 'board-runbook'] as const;
 const GRAPH_PANES = ['graph-dag', 'graph-timeline', 'graph-notes'] as const;
+const GRAPH_SELECTION_IDS = ['frame', 'overlays'] as const;
 
-const PANE_IDS_BY_PAGE: Readonly<Record<string, readonly string[]>> = {
+const PANE_IDS_BY_PAGE: Readonly<Record<WorkbenchPageId, readonly string[]>> = {
   ops: OPS_PANES,
   board: BOARD_PANES,
   graph: GRAPH_PANES,
@@ -185,6 +192,38 @@ function clampIndex(index: number, total: number): number {
 function nextAnchor(anchor: DrawerAnchor): DrawerAnchor {
   const idx = DRAWER_ANCHORS.indexOf(anchor);
   return DRAWER_ANCHORS[(idx + 1) % DRAWER_ANCHORS.length]!;
+}
+
+function updateSelectionForPage(
+  pageId: WorkbenchPageId,
+  model: WorkbenchPageModel,
+  delta: number,
+): WorkbenchPageModel {
+  switch (pageId) {
+    case 'ops':
+      return {
+        ...model,
+        incidentIndex: clampIndex(model.incidentIndex + delta, INCIDENT_FEED.length),
+      };
+    case 'board':
+      return {
+        ...model,
+        backlogIndex: clampIndex(model.backlogIndex + delta, BACKLOG.length),
+      };
+    case 'graph':
+      return {
+        ...model,
+        graphSelectionIndex: clampIndex(model.graphSelectionIndex + delta, GRAPH_SELECTION_IDS.length),
+      };
+    default: {
+      const _exhaustive: never = pageId;
+      return model;
+    }
+  }
+}
+
+function paneIdsForPage(pageId: string): readonly string[] {
+  return PANE_IDS_BY_PAGE[pageId as WorkbenchPageId] ?? [];
 }
 
 function statusBadge(status: WorkItem['status'], ctx: BijouContext): string {
@@ -270,7 +309,7 @@ function renderOpsHealth(width: number, ctx: BijouContext): string {
 }
 
 function renderIncidentFeed(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const selected = clampIndex(model.selectionIndex, INCIDENT_FEED.length);
+  const selected = clampIndex(model.incidentIndex, INCIDENT_FEED.length);
   const lines = INCIDENT_FEED.map((line, idx) => {
     if (idx === selected) {
       return `${badge('focus', { variant: 'accent', ctx })} ${line}`;
@@ -327,7 +366,7 @@ function renderBoardLanes(width: number, ctx: BijouContext): string {
 }
 
 function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const selected = BACKLOG[clampIndex(model.selectionIndex, BACKLOG.length)]!;
+  const selected = BACKLOG[clampIndex(model.backlogIndex, BACKLOG.length)]!;
 
   return box([
     separator({ label: `Ticket ${selected.id}`, width: Math.max(8, width - 4), ctx }),
@@ -368,7 +407,7 @@ function renderBoardRunbook(width: number, ctx: BijouContext): string {
 
 function renderGraphDag(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
   const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
-  const selectedId = model.selectionIndex % 2 === 0 ? 'frame' : 'overlays';
+  const selectedId = GRAPH_SELECTION_IDS[clampIndex(model.graphSelectionIndex, GRAPH_SELECTION_IDS.length)]!;
 
   const graph = dag(DEPLOY_GRAPH, {
     selectedId,
@@ -427,7 +466,7 @@ function renderGraphNotes(width: number, model: WorkbenchPageModel, ctx: BijouCo
 }
 
 function buildPage(
-  id: string,
+  id: WorkbenchPageId,
   title: string,
   paneIds: readonly string[],
   layout: (model: WorkbenchPageModel) => FrameLayoutNode,
@@ -480,15 +519,13 @@ function buildPage(
             releaseIndex: clampIndex(model.releaseIndex - 1, RELEASES.length),
           }, []];
         case 'next-incident':
-          return [{
-            ...model,
-            selectionIndex: clampIndex(model.selectionIndex + 1, INCIDENT_FEED.length),
-          }, []];
+          return [updateSelectionForPage(id, model, 1), []];
         case 'prev-incident':
-          return [{
-            ...model,
-            selectionIndex: clampIndex(model.selectionIndex - 1, INCIDENT_FEED.length),
-          }, []];
+          return [updateSelectionForPage(id, model, -1), []];
+        default: {
+          const _exhaustive: never = msg;
+          return [model, []];
+        }
       }
     },
     keyMap: createKeyMap<WorkbenchMsg>()
@@ -618,7 +655,7 @@ export function createCanonicalWorkbenchApp(
       const overlays: Overlay[] = [];
 
       if (pageModel.drawerOpen) {
-        const paneIds = PANE_IDS_BY_PAGE[frame.activePageId] ?? [];
+        const paneIds = paneIdsForPage(frame.activePageId);
         const targetIndex = pageModel.drawerTargetIndex % (paneIds.length + 1);
         const targetPaneId = targetIndex < paneIds.length ? paneIds[targetIndex] : undefined;
         const region = targetPaneId != null ? frame.paneRects.get(targetPaneId) : undefined;
