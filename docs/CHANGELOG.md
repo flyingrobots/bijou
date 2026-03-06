@@ -2,9 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
-All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`) are versioned in lock-step.
+All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
-## [Unreleased]
+## Unreleased
+
+### ✨ Features
+
+- **`splitPane()` layout primitive (bijou-tui)** — new stateful split view with pure reducers (`splitPaneSetRatio`, `splitPaneResizeBy`, `splitPaneFocusNext`, `splitPaneFocusPrev`). Layout geometry is deterministic via `splitPaneLayout()`.
+- **`grid()` layout primitive (bijou-tui)** — named-area constraint grid with fixed + fractional tracks (`fr`), gap support, and `gridLayout()` rect solving.
+- **`createFramedApp()` shell (bijou-tui)** — high-level app frame with tabs, pane focus management, per-page/per-pane scroll isolation, help toggle, optional command palette, and pane-rect-aware overlay hooks.
+- **Drawer anchor expansion + region scoping (bijou-tui)** — `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped drawers.
+- **Scripted interaction harness upgrades (bijou-tui)** — `runScript()` now accepts key, resize, and custom message steps for richer integration testing.
+- **Scrollable select viewport (bijou core)** — `select()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists.
+- **`@flyingrobots/bijou-tui-app` package** — batteries-included app skeleton built on `createFramedApp()`. Includes tokenized tabs, full-screen defaults, animated physics drawer, quit-confirm modal (`q` / `ctrl+c`), `[` / `]` page switching, a two-line footer, and a default two-tab setup (drawer page + 1/3:2/3 split page).
+- **`create-bijou-tui-app` package** — new `npm create bijou-tui-app@latest` scaffolder that generates a runnable TypeScript app using `createTuiAppSkeleton()` with strict config and starter scripts.
+
+### 🐛 Fixed
+
+- **Canonical workbench page-local selection state (`examples`)** — replace shared `selectionIndex` with dedicated `incidentIndex`, `backlogIndex`, and `graphSelectionIndex`; page navigation now clamps against the correct collection per page, and `buildPage()` enforces exhaustive `WorkbenchMsg` handling.
+- **`create-bijou-tui-app` next-step quoting on Windows** — `quotePath()` now emits Windows-safe double-quoted paths on `win32`, so copied `cd` commands with spaces work in `cmd.exe`.
+- **`create-bijou-tui-app` cmd metachar escaping** — Windows `cd` hints now escape `%` and `^` to avoid variable/metachar expansion when users scaffold into unusual directory names.
+- **Split-pane invalid input/render guardrails (`bijou-tui`)** — `createSplitPaneState()` now warns in non-production/non-test environments when given non-finite ratios, and `splitPane()` sanitizes `dividerChar` to a single-column glyph so custom multi-width values cannot break layout width.
+- **Readonly DAG parity (`bijou`)** — `DagNode.edges` is now `readonly string[]`, completing readonly overload support for immutable DAG literals.
+- **Event bus rejection surfacing hardening (`bijou-tui`)** — `createEventBus()` now guards `onCommandRejected` callbacks so secondary handler exceptions are logged instead of reintroducing unhandled rejections.
+- **Grid fractional allocation clarity (`bijou-tui`)** — `gridLayout()` now uses largest-remainder distribution for leftover `fr` space and throws on fractional `fr` tokens (e.g. `1.5fr`) to match documented/tested integer semantics.
+- **Framed app render resilience (`bijou-tui`)** — missing grid cell nodes in `createFramedApp()` now render a placeholder with a warning instead of crashing the full app render.
+- **App-frame example split-state persistence** — the `examples/app-frame` editor split state is now initialized once in `PageModel` instead of being recreated on every render.
+
+### 🧪 Tests
+
+- Add dedicated suites for `splitPane`, `grid`, and `appFrame`.
+- Expand `splitPane` coverage for default state values, non-finite ratio fallback behavior, conflicting min-constraint precedence (`minB`), and multi-width divider sanitization.
+- Extend `overlay` coverage for top/bottom drawer anchors and region-scoped mounting.
+- Cover `driver` resize and custom message script steps.
+- Add `select` coverage for `maxVisible` scrolling behavior.
+
+### ♻️ Refactors
+
+- **I/O stderr porting across core/tui** — add `writeError()` to `WritePort`, implement it in `nodeIO()` and test adapters, and route command rejection reporting through injected ports instead of direct `console.error`.
+- **Theme resolver warning output port** — replace direct `console.warn` fallback logs in theme resolution with optional `warningPort.writeError()` wiring.
+- **Runtime/global decoupling cleanup** — remove `process.stdout` dependencies from framed-app initialization and output-mode detection internals; runtime now performs an initial size sync via `ResizeMsg` from `RuntimePort`.
+
+### 📝 Documentation
+
+- Add new examples: `split-pane`, `grid-layout`, and `app-frame`.
+- Add canonical app-shell demo entry points: `demo-tui.ts` and `examples/release-workbench/main.ts`.
+- Update `@flyingrobots/bijou-tui` README/GUIDE/ARCHITECTURE docs for split/grid/app-frame and drawer region scoping.
+- Update root README and examples index for the canonical release workbench demo.
+- Clarify package README caveats: canonical docs/examples live in-repo, `run()` non-interactive single-render behavior, and `initDefaultContext()` first-call registration semantics.
+- Expand `create-bijou-tui-app` docs with explicit generated-app run instructions (`npm run dev` / `npx tsx src/main.ts`) and a local monorepo smoke-test flow.
+- Add a root README pointer for discovering the scaffolder development workflow.
 
 ## [1.2.0] — 2026-03-04
 

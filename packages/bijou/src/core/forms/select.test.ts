@@ -121,6 +121,51 @@ describe('select()', () => {
       const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('blue');
     });
+
+    it('supports maxVisible scrolling for long option lists', async () => {
+      const many = Array.from({ length: 10 }, (_, i) => ({
+        label: `Option ${i + 1}`,
+        value: `v${i + 1}`,
+      }));
+
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\r'] },
+      });
+      const result = await select({
+        title: 'Pick',
+        options: many,
+        maxVisible: 3,
+        ctx,
+      });
+      const output = ctx.io.written.join('');
+
+      expect(result).toBe('v5');
+      expect(output).toContain('\x1b[4A');
+      expect(output).not.toContain('\x1b[11A');
+      expect(output).toContain('Option 5');
+      expect(output).not.toContain('Option 10');
+    });
+
+    it('sanitizes non-finite maxVisible values', async () => {
+      const many = Array.from({ length: 10 }, (_, i) => ({
+        label: `Option ${i + 1}`,
+        value: `v${i + 1}`,
+      }));
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[B', '\x1b[B', '\r'] },
+      });
+      const result = await select({
+        title: 'Pick',
+        options: many,
+        maxVisible: Number.NaN,
+        ctx,
+      });
+
+      expect(result).toBe('v3');
+      expect(ctx.io.written.join('')).not.toContain('[NaN');
+    });
   });
 
   it('accepts ctx parameter', async () => {

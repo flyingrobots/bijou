@@ -21,6 +21,8 @@ TypeScript toolkit for building terminal interfaces that remain usable across lo
 | `@flyingrobots/bijou` | Core components, forms, themes, and environment detection | [`packages/bijou`](./packages/bijou/) |
 | `@flyingrobots/bijou-node` | Node.js adapter for runtime, IO, and styling ports | [`packages/bijou-node`](./packages/bijou-node/) |
 | `@flyingrobots/bijou-tui` | Interactive TEA runtime with layout, event bus, and animation | [`packages/bijou-tui`](./packages/bijou-tui/) |
+| `@flyingrobots/bijou-tui-app` | Batteries-included framed app skeleton with tab/header/footer chrome | [`packages/bijou-tui-app`](./packages/bijou-tui-app/) |
+| `create-bijou-tui-app` | `npm create` scaffolder for generating a runnable Bijou TUI app project | [`packages/create-bijou-tui-app`](./packages/create-bijou-tui-app/) |
 
 All packages are versioned in lock-step.
 
@@ -58,6 +60,18 @@ Full interactive runtime (includes TEA engine):
 
 ```bash
 npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
+```
+
+Framed app skeleton package:
+
+```bash
+npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui @flyingrobots/bijou-tui-app
+```
+
+Scaffold a new runnable app project:
+
+```bash
+npm create bijou-tui-app@latest my-app
 ```
 
 ## Quick Start (Core Components)
@@ -132,14 +146,28 @@ npm install
 # Component showcase
 npx tsx demo.ts
 
-# Full-screen runtime showcase
+# Canonical app-shell showcase
 npx tsx demo-tui.ts
 
 # Run any individual example
 npx tsx examples/<name>/main.ts
 ```
 
-There are 60+ curated examples in [`examples/`](./examples/) with per-example READMEs and demo tapes.
+Explore the curated examples in [`examples/`](./examples/) for canonical app-shell demos and advanced component showcases.
+
+Test local `create-bijou-tui-app` scaffolder changes from the monorepo:
+
+```bash
+TMP="$(mktemp -d /tmp/bijou-scaffold-XXXXXX)"
+TARGET="$TMP/my-app"
+npx tsx packages/create-bijou-tui-app/src/cli.ts "$TARGET" --no-install
+cd "$TARGET"
+npm install
+npm run dev
+```
+
+For full scaffolder usage, flags, and test flow, see
+[`packages/create-bijou-tui-app/README.md`](./packages/create-bijou-tui-app/README.md).
 
 ## Local Development
 
@@ -163,13 +191,13 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## Latest Release Highlights (v1.2.0, March 4, 2026)
+## Current Focus (v1.3.0 in progress, March 4, 2026)
 
-- Vim-style normal/insert mode interaction for `filter()`.
-- Large component refactors (`dag`, `markdown`, `textarea`, `filter`) into smaller focused modules.
-- Broad bug-fix sweep across forms, markdown rendering, and DAG layout/edge handling.
+- App-shell foundations in `@flyingrobots/bijou-tui`: `splitPane()`, `grid()`, `createFramedApp()`, drawer region scoping, and driver script upgrades.
+- New canonical runtime demo: `demo-tui.ts` now runs a multi-view control-room app built on `createFramedApp()` with pane-scoped drawers and command palette.
+- Forms upgrade in `@flyingrobots/bijou`: `select()` now supports `maxVisible` with interactive viewport scrolling.
 
-Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#120--2026-03-04)
+Full details: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md#unreleased)
 
 ## License
 

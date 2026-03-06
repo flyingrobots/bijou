@@ -2,11 +2,12 @@
 
 Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
 
-## What's New in 0.6.0?
+## Documentation Status
 
-- **`nodeIO().readDir()` directory classification** — entries now include a trailing `/` for directories, enabling `filePicker()` to correctly distinguish directories from files
+This npm README is a quick overview and may lag behind the repository.
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
+- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
+- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
 
 ## Install
 
@@ -33,7 +34,7 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 - **Runtime detection**: environment variables, TTY state, and terminal dimensions sourced from `process`.
 - **Interactive terminal I/O**: stdin/stdout integration with readline and resize-event support.
 - **Styling backend**: Chalk-powered color/style methods wired into bijou styling APIs.
-- **One-line bootstrap**: `initDefaultContext()` creates and registers a production-ready default context.
+- **One-line bootstrap**: `initDefaultContext()` creates a production-ready context and registers it as default on first call.
 
 ## What It Provides
 
@@ -57,9 +58,11 @@ import { createNodeContext, initDefaultContext } from '@flyingrobots/bijou-node'
 // createNodeContext() — returns a BijouContext without setting it as default
 const ctx = createNodeContext();
 
-// initDefaultContext() — creates context AND registers it as the global default
+// initDefaultContext() — first call registers as global default; later calls return fresh unregistered contexts
 initDefaultContext();
 ```
+
+If you need to replace the default context later in-process, call `setDefaultContext(createNodeContext())` from `@flyingrobots/bijou`.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js APIs, and [GUIDE.md](./GUIDE.md) for usage patterns.
 

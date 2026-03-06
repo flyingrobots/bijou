@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "rm -rf packages/bijou/dist packages/bijou-node/dist packages/bijou-tui/dist packages/bijou/*.tsbuildinfo packages/bijou-node/*.tsbuildinfo packages/bijou-tui/*.tsbuildinfo",
+    "clean": "rm -rf packages/bijou/dist packages/bijou-node/dist packages/bijou-tui/dist packages/bijou-tui-app/dist packages/create-bijou-tui-app/dist packages/bijou/*.tsbuildinfo packages/bijou-node/*.tsbuildinfo packages/bijou-tui/*.tsbuildinfo packages/bijou-tui-app/*.tsbuildinfo packages/create-bijou-tui-app/*.tsbuildinfo",
     "build": "tsc -b",
     "build:watch": "tsc -b -w",
     "test": "vitest run --config vitest.config.ts",

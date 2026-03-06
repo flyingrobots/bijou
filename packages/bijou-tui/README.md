@@ -4,13 +4,23 @@ TEA runtime for terminal UIs — model/update/view with physics-based animation,
 
 Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
 
-## What's New in 0.6.0?
+## What's New (v1.3.0 Snapshot)?
 
-- **`navigableTable()`** — keyboard-navigable table with focus management, vertical scrolling, and vim-style keybindings
-- **`browsableList()`** — navigable list with focus tracking, scroll viewport, descriptions, and convenience keymap
-- **`filePicker()`** — directory browser with focus navigation, extension filtering, and `IOPort` integration
+- **`splitPane()`** — ratio-based split layout with pure reducers and deterministic rect introspection.
+- **`grid()`** — fixed + fractional track solver with named areas and stable layout geometry.
+- **`createFramedApp()`** — shell scaffolding for tabs, pane focus/scroll isolation, help, overlays, and command palette.
+- **`drawer()` upgrades** — supports `left`/`right`/`top`/`bottom` anchors and optional panel `region` mounting.
+- **`runScript()` upgrades** — scripted driver now supports key, resize, and custom-message steps for richer integration harnesses.
 
 See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
+
+## Documentation Status
+
+This npm README is a quick overview and may lag behind the repository.
+
+- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
+- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
+- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
 
 ## Install
 
@@ -46,13 +56,23 @@ const app: App<Model> = {
 run(app);
 ```
 
+## Runtime Behavior Note
+
+`run()` behaves differently by output mode:
+
+- `interactive`: full TEA loop (event bus, key/resize/mouse handling, command-driven updates).
+- `pipe` / `static` / `accessible`: render `view(initModel)` once and return immediately.
+
+In non-interactive modes, there is no normal interactive event loop.
+
 ## Features Breakdown
 
 - **TEA runtime core**: deterministic model/update/view loop with command-driven side effects.
 - **Motion system**: spring physics, tweens, and timeline sequencing for orchestrated terminal animation.
-- **Layout engine**: flexbox helpers, stacks, viewport scrolling, and resize-aware rendering.
+- **Layout engine**: flexbox helpers, stacks, split panes, named-area grids, viewport scrolling, and resize-aware rendering.
 - **Input architecture**: keymaps, grouped bindings, generated help views, and layered input stack for modal flows.
-- **Overlay composition**: modal, toast, drawer, tooltip, and painter-style compositing primitives.
+- **Overlay composition**: modal, toast, drawer, tooltip, and painter-style compositing primitives (including panel-scoped drawers).
+- **App shell**: `createFramedApp()` for tabs/help/chrome/pane-focus boilerplate with optional command palette.
 - **Stateful building blocks**: navigable table, browsable list, file picker, focus area, and DAG pane with vim-friendly keymaps.
 
 ## Animation
@@ -158,6 +178,56 @@ import { vstack, hstack } from '@flyingrobots/bijou-tui';
 
 vstack(header, content, footer);       // vertical stack
 hstack(2, leftPanel, rightPanel);      // side-by-side with gap
+```
+
+### Split Pane
+
+```typescript
+import {
+  createSplitPaneState, splitPane, splitPaneResizeBy, splitPaneFocusNext,
+} from '@flyingrobots/bijou-tui';
+
+let state = createSplitPaneState({ ratio: 0.35 });
+
+// in update:
+state = splitPaneResizeBy(state, 2, { total: cols, minA: 16, minB: 16 });
+state = splitPaneFocusNext(state);
+
+// in view:
+const output = splitPane(state, {
+  direction: 'row',
+  width: cols,
+  height: rows,
+  minA: 16,
+  minB: 16,
+  paneA: (w, h) => renderSidebar(w, h),
+  paneB: (w, h) => renderMain(w, h),
+});
+```
+
+### Grid
+
+```typescript
+import { grid } from '@flyingrobots/bijou-tui';
+
+const output = grid({
+  width: cols,
+  height: rows,
+  columns: [24, '1fr'],
+  rows: [3, '1fr', 8],
+  areas: [
+    'header header',
+    'nav main',
+    'logs main',
+  ],
+  gap: 1,
+  cells: {
+    header: (w, h) => renderHeader(w, h),
+    nav: (w, h) => renderNav(w, h),
+    logs: (w, h) => renderLogs(w, h),
+    main: (w, h) => renderMain(w, h),
+  },
+});
 ```
 
 ## Resize Handling
@@ -291,6 +361,19 @@ const output = composite(backgroundView, [dialog, notification], { dim: true });
 ```
 
 Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
+
+`drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
+
+## App Frame
+
+`createFramedApp()` wraps page-level TEA logic in a shared shell:
+
+- tabs + page switching
+- pane focus and per-pane scroll isolation
+- frame help (`?`) and optional command palette (`ctrl+p` / `:`)
+- overlay factory with pane rects for panel-scoped drawers/modals
+
+See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 
 ## Building Blocks
 

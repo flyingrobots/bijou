@@ -1,5 +1,5 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
-import type { App, Cmd, RunOptions } from './types.js';
+import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
@@ -56,7 +56,14 @@ export async function run<Model, M>(
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
 
-  const bus = createEventBus<M>();
+  const bus = createEventBus<M>({
+    onCommandRejected(error) {
+      const message = error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+      writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
+    },
+  });
 
   function shutdown(): void {
     if (!running) return;
@@ -113,9 +120,20 @@ export async function run<Model, M>(
     executeCommands(cmds);
   });
 
+  // Apply an initial runtime-size sync before first render.
+  // This keeps framed apps sized from ports instead of process globals.
+  const initialResize: ResizeMsg = {
+    type: 'resize',
+    columns: sanitizeDimension(ctx.runtime.columns),
+    rows: sanitizeDimension(ctx.runtime.rows),
+  };
+  const [resizedModel, resizeCmds] = app.update(initialResize, model);
+  model = resizedModel;
+
   // Initial render + startup commands
   render();
   executeCommands(initCmds);
+  executeCommands(resizeCmds);
 
   // Wait for quit signal
   await new Promise<void>((resolve) => {
@@ -131,4 +149,17 @@ export async function run<Model, M>(
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }
+}
+
+function sanitizeDimension(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
+function writeErrorLine(io: { write(data: string): void; writeError?: (data: string) => void }, data: string): void {
+  if (io.writeError != null) {
+    io.writeError(data);
+    return;
+  }
+  io.write(data);
 }

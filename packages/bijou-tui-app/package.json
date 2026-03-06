@@ -1,0 +1,59 @@
+{
+  "name": "@flyingrobots/bijou-tui-app",
+  "version": "1.2.0",
+  "description": "Batteries-included TUI app skeleton built on bijou-tui createFramedApp().",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "tsc -b",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "1.2.0",
+    "@flyingrobots/bijou-tui": "1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "keywords": [
+    "cli",
+    "terminal",
+    "tui",
+    "bijou",
+    "app-shell",
+    "skeleton"
+  ],
+  "author": "James Ross <james@flyingrobots.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyingrobots/bijou.git",
+    "directory": "packages/bijou-tui-app"
+  },
+  "homepage": "https://github.com/flyingrobots/bijou",
+  "bugs": "https://github.com/flyingrobots/bijou/issues",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

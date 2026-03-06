@@ -49,6 +49,44 @@ export {
 // Layout
 export { vstack, hstack, place } from './layout.js';
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
+export type { LayoutRect } from './layout-rect.js';
+
+// Split pane layout
+export {
+  type SplitPaneDirection,
+  type SplitPaneFocus,
+  type SplitPaneState,
+  type SplitPaneLayout,
+  type SplitPaneOptions,
+  createSplitPaneState,
+  splitPaneSetRatio,
+  splitPaneResizeBy,
+  splitPaneFocusNext,
+  splitPaneFocusPrev,
+  splitPaneLayout,
+  splitPane,
+} from './split-pane.js';
+
+// Constraint grid layout
+export {
+  type GridTrack,
+  type GridOptions,
+  type GridLayoutResult,
+  gridLayout,
+  grid,
+} from './grid.js';
+
+// App frame shell
+export {
+  type FrameCommandItem,
+  type FramePage,
+  type FrameLayoutNode,
+  type FrameOverlayContext,
+  type CreateFramedAppOptions,
+  type FramePaneScroll,
+  type FrameModel,
+  createFramedApp,
+} from './app-frame.js';
 
 // Status bar
 export { statusBar } from './status-bar.js';

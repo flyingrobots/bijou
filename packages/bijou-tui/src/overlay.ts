@@ -10,6 +10,7 @@
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
 import { makeBgFill } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
+import type { LayoutRect } from './layout-rect.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -354,23 +355,21 @@ export function toast(options: ToastOptions): Overlay {
 // Drawer types
 // ---------------------------------------------------------------------------
 
-/** Side of the screen where the drawer is anchored. */
-export type DrawerAnchor = 'left' | 'right';
+/** Side of the screen (or region) where the drawer is anchored. */
+export type DrawerAnchor = 'left' | 'right' | 'top' | 'bottom';
 
 /**
  * Configuration for the {@link drawer} overlay.
  */
-export interface DrawerOptions {
+interface DrawerBaseOptions {
   /** Content string to display inside the drawer. */
   readonly content: string;
-  /** Side of the screen to anchor the drawer. Default: 'right'. */
-  readonly anchor?: DrawerAnchor;
-  /** Total drawer width including borders and padding. */
-  readonly width: number;
   /** Screen width in columns, used for positioning. */
   readonly screenWidth: number;
   /** Screen height in rows, used for sizing. */
   readonly screenHeight: number;
+  /** Optional region rectangle to attach inside, instead of full screen. */
+  readonly region?: LayoutRect;
   /** Optional title displayed in the top border. */
   readonly title?: string;
   /** Design token for the border color. */
@@ -380,6 +379,32 @@ export interface DrawerOptions {
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
+
+interface DrawerDefaultOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. Default: 'right'. */
+  readonly anchor?: undefined;
+  /** Total drawer width including borders and padding. */
+  readonly width: number;
+  readonly height?: never;
+}
+
+interface DrawerHorizontalOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. */
+  readonly anchor: 'left' | 'right';
+  /** Total drawer width including borders and padding. */
+  readonly width: number;
+  readonly height?: never;
+}
+
+interface DrawerVerticalOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. */
+  readonly anchor: 'top' | 'bottom';
+  /** Total drawer height including borders and padding. */
+  readonly height: number;
+  readonly width?: never;
+}
+
+export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | DrawerVerticalOptions;
 
 // ---------------------------------------------------------------------------
 // drawer()
@@ -397,14 +422,15 @@ export interface DrawerOptions {
 export function drawer(options: DrawerOptions): Overlay {
   const {
     content,
-    anchor = 'right',
-    width,
     screenWidth,
     screenHeight,
     title,
     ctx,
   } = options;
 
+  const region = clampRegion(options.region, screenWidth, screenHeight);
+  const dims = resolveDrawerDimensions(options, region);
+  const { width, height, row, col } = dims;
   const innerWidth = Math.max(0, width - 4); // border + padding on each side
 
   const borderColor = ctx && options.borderToken
@@ -426,12 +452,12 @@ export function drawer(options: DrawerOptions): Overlay {
   } else {
     topInner = BORDER.h.repeat(innerWidth + 2);
   }
-  const topLine = borderColor(BORDER.tl + topInner + BORDER.tr);
-  const bottomLine = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br);
+  const topLine = fitLineExact(borderColor(BORDER.tl + topInner + BORDER.tr), width);
+  const bottomLine = fitLineExact(borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br), width);
 
   // Build content lines
   const contentLines = content.split('\n');
-  const availableHeight = screenHeight - 2; // minus top + bottom border
+  const availableHeight = Math.max(0, height - 2); // minus top + bottom border
 
   const bodyLines: string[] = [];
   for (let i = 0; i < availableHeight; i++) {
@@ -443,17 +469,96 @@ export function drawer(options: DrawerOptions): Overlay {
     } else {
       clipped = raw + ' '.repeat(innerWidth - vis);
     }
-    bodyLines.push(borderColor(BORDER.v) + fill(' ' + clipped + ' ') + borderColor(BORDER.v));
+    bodyLines.push(fitLineExact(borderColor(BORDER.v) + fill(' ' + clipped + ' ') + borderColor(BORDER.v), width));
   }
 
-  const allLines = [topLine, ...bodyLines, bottomLine];
-  const col = anchor === 'right' ? screenWidth - width : 0;
+  const allLines: string[] = [];
+  if (height === 1) {
+    allLines.push(topLine);
+  } else if (height >= 2) {
+    allLines.push(topLine, ...bodyLines, bottomLine);
+  }
 
   return {
     content: allLines.join('\n'),
-    row: 0,
-    col: Math.max(0, col),
+    row,
+    col,
   };
+}
+
+function resolveDrawerDimensions(
+  options: DrawerOptions,
+  region: LayoutRect,
+): { width: number; height: number; row: number; col: number } {
+  if (options.anchor === 'top' || options.anchor === 'bottom') {
+    const anchor = options.anchor;
+    const heightRaw = options.height;
+    if (heightRaw == null || !Number.isFinite(heightRaw)) {
+      throw new Error(`drawer(): "height" is required for anchor "${anchor}"`);
+    }
+    const height = clamp(Math.floor(heightRaw), 0, region.height);
+    const width = region.width;
+    const col = region.col;
+    const row = anchor === 'top'
+      ? region.row
+      : region.row + region.height - height;
+    return { width, height, row: Math.max(region.row, row), col };
+  }
+
+  const anchor = options.anchor ?? 'right';
+  if (anchor === 'left' || anchor === 'right') {
+    const widthRaw = options.width;
+    if (widthRaw == null || !Number.isFinite(widthRaw)) {
+      throw new Error(`drawer(): "width" is required for anchor "${anchor}"`);
+    }
+    const width = clamp(Math.floor(widthRaw), 0, region.width);
+    const height = region.height;
+    const row = region.row;
+    const col = anchor === 'left'
+      ? region.col
+      : region.col + region.width - width;
+    return { width, height, row, col: Math.max(region.col, col) };
+  }
+
+  return assertNever(anchor);
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unexpected drawer anchor: ${String(value)}`);
+}
+
+function clampRegion(region: LayoutRect | undefined, screenWidth: number, screenHeight: number): LayoutRect {
+  if (region == null) {
+    return {
+      row: 0,
+      col: 0,
+      width: Math.max(0, screenWidth),
+      height: Math.max(0, screenHeight),
+    };
+  }
+
+  const row = clamp(region.row, 0, Math.max(0, screenHeight));
+  const col = clamp(region.col, 0, Math.max(0, screenWidth));
+  const maxWidth = Math.max(0, screenWidth - col);
+  const maxHeight = Math.max(0, screenHeight - row);
+
+  return {
+    row,
+    col,
+    width: clamp(region.width, 0, maxWidth),
+    height: clamp(region.height, 0, maxHeight),
+  };
+}
+
+function fitLineExact(line: string, width: number): string {
+  const target = Math.max(0, width);
+  const clipped = clipToWidth(line, target);
+  const vis = visibleLength(clipped);
+  return clipped + ' '.repeat(Math.max(0, target - vis));
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 // ---------------------------------------------------------------------------

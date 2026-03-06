@@ -3,65 +3,81 @@ import { detectOutputMode, detectColorScheme } from './tty.js';
 import { mockRuntime } from '../../adapters/test/runtime.js';
 
 describe('detectOutputMode', () => {
-  const originalEnv = { ...process.env };
-  const originalIsTTY = process.stdout.isTTY;
-
-  beforeEach(() => {
-    delete process.env['BIJOU_ACCESSIBLE'];
-    delete process.env['NO_COLOR'];
-    delete process.env['CI'];
-    delete process.env['TERM'];
-  });
-
-  afterEach(() => {
-    process.env = { ...originalEnv };
-    Object.defineProperty(process.stdout, 'isTTY', { value: originalIsTTY, writable: true });
-  });
-
   it('returns accessible when BIJOU_ACCESSIBLE=1', () => {
-    process.env['BIJOU_ACCESSIBLE'] = '1';
-    expect(detectOutputMode()).toBe('accessible');
+    const rt = mockRuntime({ env: { BIJOU_ACCESSIBLE: '1' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('accessible');
   });
 
   it('returns pipe when NO_COLOR is set', () => {
-    process.env['NO_COLOR'] = '1';
-    Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
-    expect(detectOutputMode()).toBe('pipe');
+    const rt = mockRuntime({ env: { NO_COLOR: '1' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('pipe');
   });
 
   it('returns pipe when TERM=dumb', () => {
-    process.env['TERM'] = 'dumb';
-    Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
-    expect(detectOutputMode()).toBe('pipe');
+    const rt = mockRuntime({ env: { TERM: 'dumb' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('pipe');
   });
 
   it('returns pipe when stdout is not a TTY', () => {
-    Object.defineProperty(process.stdout, 'isTTY', { value: false, writable: true });
-    expect(detectOutputMode()).toBe('pipe');
+    const rt = mockRuntime({ stdoutIsTTY: false });
+    expect(detectOutputMode(rt)).toBe('pipe');
   });
 
   it('returns static when CI is set', () => {
-    process.env['CI'] = 'true';
-    Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
-    expect(detectOutputMode()).toBe('static');
+    const rt = mockRuntime({ env: { CI: 'true' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('static');
   });
 
   it('returns interactive when stdout is TTY and no overrides', () => {
-    Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
-    expect(detectOutputMode()).toBe('interactive');
+    const rt = mockRuntime({ stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('interactive');
   });
 
   it('BIJOU_ACCESSIBLE takes priority over NO_COLOR', () => {
-    process.env['BIJOU_ACCESSIBLE'] = '1';
-    process.env['NO_COLOR'] = '1';
-    expect(detectOutputMode()).toBe('accessible');
+    const rt = mockRuntime({
+      env: { BIJOU_ACCESSIBLE: '1', NO_COLOR: '1' },
+      stdoutIsTTY: true,
+    });
+    expect(detectOutputMode(rt)).toBe('accessible');
   });
 
   it('NO_COLOR takes priority over CI', () => {
-    process.env['NO_COLOR'] = '1';
-    process.env['CI'] = 'true';
-    Object.defineProperty(process.stdout, 'isTTY', { value: true, writable: true });
-    expect(detectOutputMode()).toBe('pipe');
+    const rt = mockRuntime({
+      env: { NO_COLOR: '1', CI: 'true' },
+      stdoutIsTTY: true,
+    });
+    expect(detectOutputMode(rt)).toBe('pipe');
+  });
+
+  it('falls back to process.stdout.isTTY when runtime is omitted', () => {
+    const originalAccessible = process.env['BIJOU_ACCESSIBLE'];
+    const originalNoColor = process.env['NO_COLOR'];
+    const originalTerm = process.env['TERM'];
+    const originalCi = process.env['CI'];
+    const ttyDescriptor = Object.getOwnPropertyDescriptor(process.stdout, 'isTTY');
+    Object.defineProperty(process.stdout, 'isTTY', { configurable: true, value: true });
+
+    try {
+      delete process.env['BIJOU_ACCESSIBLE'];
+      delete process.env['NO_COLOR'];
+      delete process.env['TERM'];
+      delete process.env['CI'];
+      expect(detectOutputMode()).toBe('interactive');
+    } finally {
+      if (ttyDescriptor == null) {
+        delete (process.stdout as { isTTY?: boolean }).isTTY;
+      } else {
+        Object.defineProperty(process.stdout, 'isTTY', ttyDescriptor);
+      }
+      if (originalAccessible === undefined) delete process.env['BIJOU_ACCESSIBLE'];
+      else process.env['BIJOU_ACCESSIBLE'] = originalAccessible;
+      if (originalNoColor === undefined) delete process.env['NO_COLOR'];
+      else process.env['NO_COLOR'] = originalNoColor;
+      if (originalTerm === undefined) delete process.env['TERM'];
+      else process.env['TERM'] = originalTerm;
+      if (originalCi === undefined) delete process.env['CI'];
+      else process.env['CI'] = originalCi;
+    }
   });
 });
 

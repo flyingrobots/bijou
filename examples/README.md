@@ -1,6 +1,6 @@
 # Examples
 
-> 63 examples · Run any: `npx tsx examples/<name>/main.ts`
+> Run any example: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
 ## Static Components
@@ -31,6 +31,7 @@
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
+| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background surface tokens across layout and overlays |
 
 ## Interactive Forms
 
@@ -64,6 +65,10 @@
 | [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
 | [`chat`](./chat/) | `viewport()` + `input()` + `vstack()` + `flex()` | Chat UI with message input |
 | [`split-editors`](./split-editors/) | `flex()` + `hstack()` + `createInputStack()` | Dual-pane editor with focus switching |
+| [`split-pane`](./split-pane/) | `splitPane()`, `splitPaneResizeBy()` | Stateful split layout with focus and divider resizing |
+| [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
+| [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
+| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |

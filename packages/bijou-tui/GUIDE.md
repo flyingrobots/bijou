@@ -104,6 +104,63 @@ When a child's `content` is a function, it receives the allocated `(width, heigh
 { flex: 1, content: (w, h) => viewport({ width: w, height: h, content, scrollY }) }
 ```
 
+## Split Pane Layout
+
+Use `splitPane()` for two-pane shells with a stateful ratio and focus.
+
+```typescript
+import {
+  createSplitPaneState,
+  splitPane,
+  splitPaneResizeBy,
+  splitPaneFocusNext,
+} from '@flyingrobots/bijou-tui';
+
+let split = createSplitPaneState({ ratio: 0.4, focused: 'a' });
+
+// In update:
+split = splitPaneResizeBy(split, 2, { total: cols, minA: 16, minB: 16 });
+split = splitPaneFocusNext(split);
+
+// In view:
+const output = splitPane(split, {
+  direction: 'row',
+  width: cols,
+  height: rows,
+  minA: 16,
+  minB: 16,
+  paneA: (w, h) => renderNav(w, h),
+  paneB: (w, h) => renderMain(w, h),
+});
+```
+
+## Grid Layout
+
+Use `grid()` for named-area page composition with fixed and fractional tracks.
+
+```typescript
+import { grid } from '@flyingrobots/bijou-tui';
+
+const output = grid({
+  width: cols,
+  height: rows,
+  columns: [24, '1fr'],
+  rows: [3, '1fr', 8],
+  areas: [
+    'header header',
+    'nav main',
+    'logs main',
+  ],
+  gap: 1,
+  cells: {
+    header: (w, h) => renderHeader(w, h),
+    nav: (w, h) => renderNav(w, h),
+    logs: (w, h) => renderLogs(w, h),
+    main: (w, h) => renderMain(w, h),
+  },
+});
+```
+
 ## Scrollable Viewport
 
 ```typescript
@@ -559,6 +616,38 @@ if (model.modal) overlays.push(modal({ ...model.modal, screenWidth, screenHeight
 // Modal paints over toast if they overlap
 return composite(background, overlays, { dim: model.modal != null });
 ```
+
+### Drawer Anchors and Panel Scoping
+
+`drawer()` supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
+For dimensions: `left`/`right` require `width`, while `top`/`bottom` require `height`.
+
+```typescript
+import { drawer } from '@flyingrobots/bijou-tui';
+
+const inspector = drawer({
+  anchor: 'right',
+  width: 30,
+  region: { row: 3, col: 20, width: 60, height: 18 }, // pane rect
+  content: 'Inspector content',
+  screenWidth: cols,
+  screenHeight: rows,
+});
+```
+
+## App Frame
+
+`createFramedApp()` wraps page-level TEA logic in a shared shell:
+
+- tab/page switching
+- pane focus cycling
+- per-page + per-pane scroll isolation
+- help toggle (`?`) and optional command palette (`ctrl+p` / `:`)
+- `Esc` closes help and dismisses the command palette
+- quit behavior is app-defined (examples commonly bind `q` via `globalKeys`)
+- overlay hook with pane rect introspection
+
+See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.
 
 ## Focus Area
 

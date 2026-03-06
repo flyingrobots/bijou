@@ -21,7 +21,7 @@ export interface DagNode {
   /** Human-readable display text rendered inside the node box. */
   label: string;
   /** IDs of child nodes this node has outgoing edges to. */
-  edges?: string[];
+  edges?: readonly string[];
   /** Short annotation text displayed alongside the label (e.g., a status or count). */
   badge?: string;
   /** Color/style token applied to the node box border. */
@@ -119,12 +119,12 @@ export function dagSlice(
   opts?: DagSliceOptions,
 ): SlicedDagSource;
 export function dagSlice(
-  nodes: DagNode[],
+  nodes: readonly DagNode[],
   focus: string,
   opts?: DagSliceOptions,
 ): DagNode[];
 export function dagSlice(
-  input: DagNode[] | DagSource,
+  input: readonly DagNode[] | DagSource,
   focus: string,
   opts?: DagSliceOptions,
 ): DagNode[] | SlicedDagSource {
@@ -132,7 +132,7 @@ export function dagSlice(
     return sliceSource(input, focus, opts);
   }
   // Array path: wrap, slice, materialize back for backward compat
-  const source = arraySource(input);
+  const source = arraySource([...input]);
   return materialize(sliceSource(source, focus, opts));
 }
 
@@ -150,9 +150,9 @@ export function dagSlice(
  * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
  */
 export function dagLayout(source: SlicedDagSource, options?: DagOptions): DagLayout;
-export function dagLayout(nodes: DagNode[], options?: DagOptions): DagLayout;
+export function dagLayout(nodes: readonly DagNode[], options?: DagOptions): DagLayout;
 export function dagLayout(
-  input: DagNode[] | SlicedDagSource,
+  input: readonly DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): DagLayout {
   if (isDagSource(input) && !isSlicedDagSource(input)) {
@@ -161,7 +161,7 @@ export function dagLayout(
     );
   }
   const ctx = resolveCtx(options.ctx);
-  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
+  const nodes = isSlicedDagSource(input) ? materialize(input) : [...input];
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
   return renderInteractiveLayout(nodes, options, ctx);
 }
@@ -182,9 +182,9 @@ export function dagLayout(
  * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
  */
 export function dag(source: SlicedDagSource, options?: DagOptions): string;
-export function dag(nodes: DagNode[], options?: DagOptions): string;
+export function dag(nodes: readonly DagNode[], options?: DagOptions): string;
 export function dag(
-  input: DagNode[] | SlicedDagSource,
+  input: readonly DagNode[] | SlicedDagSource,
   options: DagOptions = {},
 ): string {
   if (isDagSource(input) && !isSlicedDagSource(input)) {
@@ -194,7 +194,7 @@ export function dag(
   }
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
-  const nodes = isSlicedDagSource(input) ? materialize(input) : input;
+  const nodes = isSlicedDagSource(input) ? materialize(input) : [...input];
 
   if (nodes.length === 0) return '';
 

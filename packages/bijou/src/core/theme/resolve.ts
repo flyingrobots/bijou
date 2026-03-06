@@ -1,5 +1,6 @@
 import type { Theme, TokenValue, InkColor } from './tokens.js';
 import type { RuntimePort } from '../../ports/runtime.js';
+import type { WritePort } from '../../ports/io.js';
 import type { ColorScheme } from '../detect/tty.js';
 import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
@@ -85,6 +86,12 @@ export interface ThemeResolverOptions {
   fallback?: Theme;
   /** Optional RuntimePort for reading env vars. Falls back to `process.env`. */
   runtime?: RuntimePort;
+  /**
+   * Optional output port for resolver warnings (unknown env/configured theme names).
+   *
+   * When omitted, resolver fallbacks remain silent.
+   */
+  warningPort?: Pick<WritePort, 'writeError'>;
 }
 
 /** A stateful theme resolver that caches the resolved theme and reads env vars. */
@@ -110,10 +117,15 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
   const presets = options.presets ?? PRESETS;
   const fallback = options.fallback ?? CYAN_MAGENTA;
   const runtime = options.runtime;
+  const warningPort = options.warningPort;
 
   const readEnv = runtime
     ? (key: string) => runtime.env(key)
     : (key: string) => process.env[key];
+
+  const warn = (message: string): void => {
+    warningPort?.writeError?.(`${message}\n`);
+  };
 
   let cached: ResolvedTheme | null = null;
 
@@ -126,7 +138,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     const theme = presets[themeName];
 
     if (theme === undefined) {
-      console.warn(`[bijou] Unknown ${envVar}="${themeName}", falling back to "${fallback.name}".`);
+      warn(`[bijou] Unknown ${envVar}="${themeName}", falling back to "${fallback.name}".`);
       cached = createResolved(fallback, noColor, colorScheme);
     } else {
       cached = createResolved(theme, noColor, colorScheme);
@@ -142,7 +154,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     const theme = presets[themeName];
 
     if (theme === undefined) {
-      console.warn(`[bijou] Unknown theme "${themeName}", falling back to "${fallback.name}".`);
+      warn(`[bijou] Unknown theme "${themeName}", falling back to "${fallback.name}".`);
       return createResolved(fallback, noColor, colorScheme);
     }
 

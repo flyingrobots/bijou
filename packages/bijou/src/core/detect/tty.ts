@@ -25,17 +25,16 @@ export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
  * Detect the appropriate output mode for the current environment.
  *
  * Inspects environment variables and TTY status via the optional
- * {@link RuntimePort} abstraction, falling back to Node.js `process`
- * globals when no port is provided.
+ * {@link RuntimePort} abstraction.
  *
- * @param runtime - Optional runtime port for environment access. Falls back to `process`.
+ * @param runtime - Optional runtime port for environment access.
  * @returns The detected {@link OutputMode}.
  */
 export function detectOutputMode(runtime?: RuntimePort): OutputMode {
   const env = runtime
     ? (key: string) => runtime.env(key)
     : (key: string) => process.env[key];
-  const stdoutIsTTY = runtime ? runtime.stdoutIsTTY : (process.stdout.isTTY ?? false);
+  const stdoutIsTTY = runtime?.stdoutIsTTY ?? (process.stdout.isTTY === true);
 
   if (env('BIJOU_ACCESSIBLE') === '1') return 'accessible';
 

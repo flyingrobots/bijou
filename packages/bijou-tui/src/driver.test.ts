@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { runScript } from './driver.js';
 import type { App, Cmd, KeyMsg } from './types.js';
 import { quit } from './commands.js';
-import { isKeyMsg } from './types.js';
+import { isKeyMsg, isResizeMsg } from './types.js';
 
 // ---------------------------------------------------------------------------
 // Test app: counter that increments on 'up', decrements on 'down', quits on 'q'
@@ -117,5 +117,44 @@ describe('runScript', () => {
     expect(result.frames).toHaveLength(1);
     expect(result.model.count).toBe(0);
     expect(result.elapsed).toBeGreaterThanOrEqual(0);
+  });
+
+  it('emits resize steps', async () => {
+    interface Model { cols: number; rows: number }
+    const app: App<Model> = {
+      init: () => [{ cols: 80, rows: 24 }, []],
+      update(msg, model) {
+        if (isResizeMsg(msg)) {
+          return [{ cols: msg.columns, rows: msg.rows }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return `${model.cols}x${model.rows}`;
+      },
+    };
+
+    const result = await runScript(app, [{ resize: { columns: 120, rows: 40 } }]);
+    expect(result.model.cols).toBe(120);
+    expect(result.model.rows).toBe(40);
+    expect(result.frames[result.frames.length - 1]).toBe('120x40');
+  });
+
+  it('emits custom msg steps', async () => {
+    type Msg = { type: 'inc' };
+    interface Model { count: number }
+    const app: App<Model, Msg> = {
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if ((msg as Msg).type === 'inc') return [{ count: model.count + 1 }, []];
+        return [model, []];
+      },
+      view(model) {
+        return `Count: ${model.count}`;
+      },
+    };
+
+    const result = await runScript(app, [{ msg: { type: 'inc' } }, { msg: { type: 'inc' } }]);
+    expect(result.model.count).toBe(2);
   });
 });

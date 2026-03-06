@@ -73,10 +73,13 @@ src/
 ├── viewport.ts      # Scrollable content pane + scroll state
 ├── flex.ts          # Flexbox layout engine
 ├── layout.ts        # vstack(), hstack()
+├── split-pane.ts    # splitPane() + state reducers + layout solver
+├── grid.ts          # constraint grid solver + named-area renderer
 ├── keybindings.ts   # KeyMap, parseKeyCombo, formatKeyCombo
 ├── help.ts          # helpView, helpShort, helpFor — auto-generated help
 ├── inputstack.ts    # InputStack — layered input dispatch
-├── overlay.ts       # composite(), modal(), toast() — overlay compositing
+├── overlay.ts       # composite(), modal(), toast(), drawer(), tooltip()
+├── app-frame.ts     # createFramedApp() — tabs/help/pane focus shell
 ├── focus-area.ts    # focusArea() — scrollable pane with colored gutter
 ├── dag-pane.ts      # dagPane() — interactive DAG viewer with node navigation
 └── index.ts         # Public API barrel
@@ -221,7 +224,7 @@ KeyMsg ──► InputStack.dispatch()
 
 ## Overlay Compositing
 
-The overlay system (`overlay.ts`) provides three primitives for rendering content on top of existing views:
+The overlay system (`overlay.ts`) provides compositing primitives for rendering content on top of existing views:
 
 ### composite()
 
@@ -241,7 +244,24 @@ Builds a bordered box with optional title (bold), body, and hint (muted) section
 
 Builds a bordered single-line box with a variant icon (`✔` success, `✘` error, `ℹ` info), then computes position from anchor corner (`top-right`, `bottom-right`, `bottom-left`, `top-left`) and margin. Returns an `Overlay` object.
 
+### drawer() / tooltip()
+
+`drawer()` supports side and edge anchors (`left`, `right`, `top`, `bottom`) and can be mounted either screen-wide or inside a region rect (for panel-scoped tools). `tooltip()` positions a small bordered hint box around a target point with directional placement and bounds clamping.
+
 **Key design decision:** No dependency on `box()` from bijou core. The `box()` component degrades in pipe/accessible modes (returns raw content, no borders), but overlays are inherently interactive-mode constructs that always need borders. Border rendering uses the same unicode box-drawing characters directly.
+
+## App Shell (`app-frame.ts`)
+
+`createFramedApp()` is a higher-order shell that composes existing primitives into a batteries-included frame:
+
+- tab/page switching
+- pane focus cycling
+- per-page/per-pane scroll isolation
+- built-in help line + help modal (`?`)
+- optional command palette (`ctrl+p` / `:`)
+- overlay factory with pane rect introspection for panel-scoped drawers/modals
+
+Internally, pane layout is resolved from `splitPane`/`grid`/`pane` nodes, then each pane is rendered through `focusArea()` with persisted scroll coordinates.
 
 ## Focus Area (`focus-area.ts`)
 

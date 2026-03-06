@@ -1,0 +1,51 @@
+{
+  "name": "create-bijou-tui-app",
+  "version": "1.2.0",
+  "description": "Scaffold a new Bijou TUI app with batteries-included defaults.",
+  "type": "module",
+  "bin": {
+    "create-bijou-tui-app": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "tsc -b",
+    "lint": "tsc --noEmit",
+    "test": "vitest run --config ../../vitest.config.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "keywords": [
+    "create",
+    "scaffold",
+    "cli",
+    "terminal",
+    "tui",
+    "bijou"
+  ],
+  "author": "James Ross <james@flyingrobots.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyingrobots/bijou.git",
+    "directory": "packages/create-bijou-tui-app"
+  },
+  "homepage": "https://github.com/flyingrobots/bijou",
+  "bugs": "https://github.com/flyingrobots/bijou/issues",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

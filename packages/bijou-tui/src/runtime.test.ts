@@ -178,6 +178,37 @@ describe('run', () => {
       expect(hasReady).toBe(true);
     });
 
+    it('runs init commands before startup resize commands', async () => {
+      vi.useFakeTimers();
+      type Msg = { type: 'init-cmd' } | { type: 'resize-cmd' };
+      const order: string[] = [];
+
+      const orderingApp: App<null, Msg> = {
+        init() {
+          const initCmd: Cmd<Msg> = async () => ({ type: 'init-cmd' });
+          return [null, [initCmd]];
+        },
+        update(msg, model) {
+          if (msg.type === 'resize') {
+            const resizeCmd: Cmd<Msg> = async () => ({ type: 'resize-cmd' });
+            return [model, [resizeCmd]];
+          }
+          if (msg.type === 'init-cmd') order.push('init');
+          if (msg.type === 'resize-cmd') order.push('resize');
+          if (order.length >= 2) return [model, [quit<Msg>()]];
+          return [model, []];
+        },
+        view: () => 'ordering',
+      };
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const promise = run(orderingApp, { ctx });
+      await vi.advanceTimersByTimeAsync(50);
+      await promise;
+
+      expect(order).toEqual(['init', 'resize']);
+    });
+
     it('skips alt screen when altScreen is false', async () => {
       vi.useFakeTimers();
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['q'] } });

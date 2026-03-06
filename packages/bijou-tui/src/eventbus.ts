@@ -83,7 +83,7 @@ export interface EventBus<M> {
    * - Message — emitted to all subscribers
    * - void/undefined — ignored
    *
-   * Rejected commands are logged to stderr via `console.error`.
+   * Rejected commands are surfaced via `onCommandRejected` when provided.
    *
    * @param cmd - The command to execute.
    */
@@ -101,6 +101,12 @@ export interface EventBus<M> {
 
   /** Disconnect all sources and remove all subscribers. */
   dispose(): void;
+}
+
+/** Optional callbacks for {@link createEventBus}. */
+export interface CreateEventBusOptions {
+  /** Called when a command promise rejects. */
+  onCommandRejected?: (error: unknown) => void;
 }
 
 /** Handle for unsubscribing or disconnecting a resource. */
@@ -122,7 +128,7 @@ interface Disposable {
  * @template M - Application-defined custom message type.
  * @returns A new event bus instance.
  */
-export function createEventBus<M>(): EventBus<M> {
+export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<M> {
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
   const disposables: Disposable[] = [];
@@ -147,8 +153,8 @@ export function createEventBus<M>(): EventBus<M> {
 
     emit,
 
-    connectIO(io: IOPort, options?: { mouse?: boolean }): Disposable {
-      const mouseEnabled = options?.mouse ?? false;
+    connectIO(io: IOPort, ioOptions?: { mouse?: boolean }): Disposable {
+      const mouseEnabled = ioOptions?.mouse ?? false;
 
       // Keyboard (and optionally mouse) input
       const inputHandle = io.rawInput((raw: string) => {
@@ -200,8 +206,18 @@ export function createEventBus<M>(): EventBus<M> {
           emit(result as M);
         }
       }).catch((err: unknown) => {
+        if (disposed) return;
         // Surface command rejections instead of leaving unhandled promise rejections.
-        console.error('[EventBus] Command rejected:', err);
+        try {
+          if (busOptions?.onCommandRejected != null) {
+            busOptions.onCommandRejected(err);
+          } else {
+            console.error('[EventBus] Command rejected:', err);
+          }
+        } catch (reportErr: unknown) {
+          console.error('[EventBus] onCommandRejected handler threw:', reportErr);
+          console.error('[EventBus] Original command rejection:', err);
+        }
       });
     },
 

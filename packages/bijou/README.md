@@ -4,13 +4,13 @@ Themed terminal components for CLIs, loggers, and scripts — graceful degradati
 
 **Zero dependencies. Hexagonal architecture. Works everywhere.**
 
-## What's New in 0.6.0?
+## Documentation Status
 
-- **`dagStats()`** — pure graph statistics (nodes, edges, depth, width, roots, leaves) with cycle detection and ghost-node filtering
-- **`wizard()`** — multi-step form orchestrator with conditional skip logic and accumulated values across steps
-- **`textarea()`** / **`filter()`** — multi-line text input and fuzzy-filter select (shipped in 0.4.0)
+This npm README is a quick overview and may lag behind the repository.
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
+- Canonical API details and usage live in [`GUIDE.md`](./GUIDE.md)
+- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
+- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
 
 ## Install
 

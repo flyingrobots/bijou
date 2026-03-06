@@ -5,7 +5,7 @@ Demonstrates background color support on `box()`, `flex()`, `modal()`, and `toas
 ## Run
 
 ```sh
-npx tsx examples/background-panels/index.ts
+npx tsx examples/background-panels/main.ts
 ```
 
 ## Code
