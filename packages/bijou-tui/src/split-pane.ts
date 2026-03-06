@@ -95,15 +95,22 @@ export function splitPaneResizeBy(
 /**
  * Toggle focus between pane A and pane B.
  */
-export function splitPaneFocusNext(state: SplitPaneState): SplitPaneState {
+export function splitPaneToggleFocus(state: SplitPaneState): SplitPaneState {
   return { ...state, focused: state.focused === 'a' ? 'b' : 'a' };
 }
 
 /**
- * Toggle focus between pane B and pane A.
+ * Focus the next pane (equivalent to toggle for a 2-pane split).
+ */
+export function splitPaneFocusNext(state: SplitPaneState): SplitPaneState {
+  return splitPaneToggleFocus(state);
+}
+
+/**
+ * Focus the previous pane (equivalent to toggle for a 2-pane split).
  */
 export function splitPaneFocusPrev(state: SplitPaneState): SplitPaneState {
-  return { ...state, focused: state.focused === 'b' ? 'a' : 'b' };
+  return splitPaneToggleFocus(state);
 }
 
 /**

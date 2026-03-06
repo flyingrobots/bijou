@@ -95,7 +95,7 @@ function runDevCommand(pm: PackageManager): string {
 }
 
 if (isEntrypoint()) {
-  process.exit(runCli(process.argv.slice(2)));
+  process.exitCode = runCli(process.argv.slice(2));
 }
 
 function isEntrypoint(): boolean {

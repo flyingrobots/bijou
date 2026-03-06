@@ -370,7 +370,7 @@ function renderGraphDag(width: number, model: WorkbenchPageModel, ctx: BijouCont
   const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
   const selectedId = model.selectionIndex % 2 === 0 ? 'frame' : 'overlays';
 
-  const graph = dag(DEPLOY_GRAPH as DagNode[], {
+  const graph = dag(DEPLOY_GRAPH, {
     selectedId,
     highlightPath: ['plan', 'split', 'frame', 'overlays', 'release'],
     maxWidth: Math.max(50, width * 2),

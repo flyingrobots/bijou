@@ -4,6 +4,7 @@ import {
   createSplitPaneState,
   splitPaneSetRatio,
   splitPaneResizeBy,
+  splitPaneToggleFocus,
   splitPaneFocusNext,
   splitPaneFocusPrev,
   splitPaneLayout,
@@ -24,9 +25,11 @@ describe('split-pane state', () => {
 
   it('focus reducers toggle panes', () => {
     const a = createSplitPaneState({ focused: 'a' });
+    expect(splitPaneToggleFocus(a).focused).toBe('b');
     expect(splitPaneFocusNext(a).focused).toBe('b');
     expect(splitPaneFocusPrev(a).focused).toBe('b');
     const b = createSplitPaneState({ focused: 'b' });
+    expect(splitPaneToggleFocus(b).focused).toBe('a');
     expect(splitPaneFocusNext(b).focused).toBe('a');
     expect(splitPaneFocusPrev(b).focused).toBe('a');
   });

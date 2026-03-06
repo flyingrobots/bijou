@@ -79,6 +79,7 @@ describe('create-bijou-tui-app cli', () => {
       const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
       expect(cdLine).toBeDefined();
       expect(cdLine).toContain(targetDir);
+      expect(cdLine).toMatch(/^\s*cd\s+(['"]).*\1$/);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
