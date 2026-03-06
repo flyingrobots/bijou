@@ -46,7 +46,7 @@ import {
 } from './focus-area.js';
 import { splitPane, splitPaneLayout, type SplitPaneDirection, type SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
-import { clipToWidth, sliceAnsi, visibleLength } from './viewport.js';
+import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
 import { animate } from './animate.js';
 import { EASINGS } from './spring.js';
 
@@ -1206,19 +1206,10 @@ function renderPageContent<PageModel, Msg>(
 function stringToGrid(str: string, width: number, height: number): string[][] {
   const lines = str.split('\n');
   const grid: string[][] = [];
+
   for (let y = 0; y < height; y++) {
     const line = lines[y] ?? '';
-    const row: string[] = [];
-    const lineVis = visibleLength(line);
-
-    for (let x = 0; x < width; x++) {
-      if (x >= lineVis) {
-        row.push(' ');
-      } else {
-        row.push(sliceAnsi(line, x, x + 1));
-      }
-    }
-    grid.push(row);
+    grid.push(tokenizeAnsi(line, width));
   }
   return grid;
 }

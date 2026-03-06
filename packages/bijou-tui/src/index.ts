@@ -83,6 +83,7 @@ export {
   type FrameLayoutNode,
   type FrameOverlayContext,
   type CreateFramedAppOptions,
+  type PageTransition,
   type FramePaneScroll,
   type FrameModel,
   createFramedApp,
