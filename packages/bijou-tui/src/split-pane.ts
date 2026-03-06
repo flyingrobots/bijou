@@ -5,8 +5,8 @@
  * solving for horizontal (`row`) and vertical (`column`) splits.
  */
 
-import { clipToWidth, visibleLength } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
+import { fitBlock } from './layout-utils.js';
 
 /** Split direction. */
 export type SplitPaneDirection = 'row' | 'column';
@@ -187,22 +187,6 @@ function solveSplit(available: number, ratio: number, minA: number, minB: number
   const a = clamp(desiredA, 0, available);
   const b = Math.max(0, available - a);
   return [a, b];
-}
-
-function fitBlock(content: string, width: number, height: number): string[] {
-  if (width <= 0 || height <= 0) return Array.from({ length: Math.max(0, height) }, () => '');
-
-  const src = content.split('\n');
-  const out: string[] = [];
-
-  for (let i = 0; i < height; i++) {
-    const line = src[i] ?? '';
-    const clipped = clipToWidth(line, width);
-    const vis = visibleLength(clipped);
-    out.push(clipped + ' '.repeat(Math.max(0, width - vis)));
-  }
-
-  return out;
 }
 
 function clampRatio(ratio: number): number {

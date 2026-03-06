@@ -18,9 +18,16 @@ type Msg =
 interface PageModel {
   count: number;
   inspector: boolean;
+  editorSplit: ReturnType<typeof createSplitPaneState>;
 }
 
-const INITIAL_PAGE_MODEL: PageModel = { count: 0, inspector: false };
+function createInitialPageModel(): PageModel {
+  return {
+    count: 0,
+    inspector: false,
+    editorSplit: createSplitPaneState({ ratio: 0.38 }),
+  };
+}
 
 function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
   if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
@@ -40,7 +47,7 @@ function createPage(
   return {
     id,
     title,
-    init: () => [{ ...INITIAL_PAGE_MODEL }, []],
+    init: () => [createInitialPageModel(), []],
     update: updatePageModel,
     keyMap: createPageKeyMap(),
     layout,
@@ -50,7 +57,7 @@ function createPage(
 const editorPage = createPage('editor', 'Editor', (model) => ({
   kind: 'split',
   splitId: 'editor-shell',
-  state: createSplitPaneState({ ratio: 0.38 }),
+  state: model.editorSplit,
   paneA: {
     kind: 'pane',
     paneId: 'files',

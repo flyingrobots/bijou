@@ -351,10 +351,10 @@ function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouC
 }
 
 function renderBoardRunbook(width: number, ctx: BijouContext): string {
-  const events = RUNBOOK.map((step, idx) => ({
+  const events: Array<{ label: string; status: 'success' | 'active' | 'muted' }> = RUNBOOK.map((step, idx) => ({
     label: step,
     status: idx < 2 ? 'success' : idx === 2 ? 'active' : 'muted',
-  })) as Array<{ label: string; status: 'success' | 'active' | 'muted' }>;
+  }));
 
   return box([
     separator({ label: 'Release Runbook', width: Math.max(8, width - 4), ctx }),

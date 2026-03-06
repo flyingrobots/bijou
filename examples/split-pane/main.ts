@@ -38,6 +38,7 @@ const app: App<Model, Msg> = {
     if (isKeyMsg(msg)) {
       if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
       if (msg.key === 'tab') return [{ ...model, split: splitPaneFocusNext(model.split) }, []];
+      // Divider-centric semantics: h moves divider left, l moves divider right.
       if (msg.key === 'h') {
         return [{
           ...model,

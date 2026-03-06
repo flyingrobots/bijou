@@ -18,15 +18,14 @@ function runCliCaptured(argv: readonly string[]): {
   let stdout = '';
   let stderr = '';
 
-  const captureChunk = (chunk: string | Uint8Array): string => chunkToString(chunk);
   const stdoutSpy = vi.spyOn(process.stdout, 'write')
     .mockImplementation((chunk: string | Uint8Array) => {
-      stdout += captureChunk(chunk);
+      stdout += chunkToString(chunk);
       return true;
     });
   const stderrSpy = vi.spyOn(process.stderr, 'write')
     .mockImplementation((chunk: string | Uint8Array) => {
-      stderr += captureChunk(chunk);
+      stderr += chunkToString(chunk);
       return true;
     });
 
@@ -108,6 +107,20 @@ describe('create-bijou-tui-app cli', () => {
       expect(cdLine).toBeDefined();
       expect(cdLine).toContain(`cd "${targetDir}"`);
       expect(cdLine).not.toContain(`cd '${targetDir}'`);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('escapes cmd.exe metacharacters in Windows cd instructions', () => {
+    const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
+    try {
+      const targetDir = join(root, 'my %APPDATA%^ app');
+      const result = withPlatform('win32', () => runCliCaptured([targetDir, '--no-install']));
+      expect(result.code).toBe(0);
+      const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
+      expect(cdLine).toBeDefined();
+      expect(cdLine).toContain('%%APPDATA%%^^');
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

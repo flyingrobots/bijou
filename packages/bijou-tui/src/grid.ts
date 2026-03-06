@@ -7,7 +7,7 @@
 
 import { composite, type Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
-import { clipToWidth, visibleLength } from './viewport.js';
+import { fitBlock } from './layout-utils.js';
 
 /** Grid track definition. */
 export type GridTrack = number | `${number}fr`;
@@ -228,20 +228,6 @@ function trackStarts(sizes: readonly number[], gap: number): number[] {
     cursor += sizes[i]! + (i < sizes.length - 1 ? gap : 0);
   }
   return starts;
-}
-
-function fitBlock(content: string, width: number, height: number): string[] {
-  if (width <= 0 || height <= 0) return Array.from({ length: Math.max(0, height) }, () => '');
-
-  const src = content.split('\n');
-  const out: string[] = [];
-  for (let i = 0; i < height; i++) {
-    const line = src[i] ?? '';
-    const clipped = clipToWidth(line, width);
-    const vis = visibleLength(clipped);
-    out.push(clipped + ' '.repeat(Math.max(0, width - vis)));
-  }
-  return out;
 }
 
 function sum(values: readonly number[]): number {
