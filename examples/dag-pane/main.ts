@@ -1,4 +1,5 @@
-import { initDefaultContext, getDefaultContext } from '@flyingrobots/bijou-node';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { getDefaultContext } from '@flyingrobots/bijou';
 import { separator } from '@flyingrobots/bijou';
 import type { DagNode } from '@flyingrobots/bijou';
 import {

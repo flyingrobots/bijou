@@ -27,6 +27,9 @@
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
 | [`dag-stats`](./dag-stats/) | `dagStats()` | Graph statistics with cycle and duplicate detection |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
+| [`markdown`](./markdown/) | `markdown()` | Terminal markdown with mode degradation |
+| [`logo`](./logo/) | `loadRandomLogo()` | Random ASCII brand logos in 3 sizes |
+| [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
 | [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
@@ -59,6 +62,7 @@
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
 | [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
+| [`toast`](./toast/) | `toast()`, `composite()` | Anchored notification overlay variants |
 | [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |
