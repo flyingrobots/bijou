@@ -25,7 +25,7 @@ export function formatFormTitle(title: string, ctx: BijouContext): string {
   if (ctx.theme.noColor || ctx.mode === 'accessible') {
     return `? ${title}`;
   }
-  return ctx.style.styled(ctx.theme.theme.semantic.info, '? ') + ctx.style.bold(title);
+  return ctx.style.styled(ctx.semantic('info'), '? ') + ctx.style.bold(title);
 }
 
 /**
@@ -41,7 +41,7 @@ export function writeValidationError(message: string, ctx: BijouContext): void {
   if (ctx.theme.noColor || ctx.mode === 'accessible') {
     ctx.io.write(message + '\n');
   } else {
-    ctx.io.write(ctx.style.styled(ctx.theme.theme.semantic.error, message) + '\n');
+    ctx.io.write(ctx.style.styled(ctx.semantic('error'), message) + '\n');
   }
 }
 

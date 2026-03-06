@@ -2,6 +2,7 @@ import type { FieldOptions, ValidationResult } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { formatFormTitle, writeValidationError } from './form-utils.js';
+import { renderByMode } from '../mode-render.js';
 
 /**
  * Options for the text input field.
@@ -27,10 +28,9 @@ export interface InputOptions extends FieldOptions<string> {
  */
 export async function input(options: InputOptions): Promise<string> {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const noColor = ctx.theme.noColor;
 
-  const prompt = buildPrompt(options, mode, noColor, ctx);
+  const prompt = buildPrompt(options, noColor, ctx);
   const answer = await ctx.io.question(prompt);
   const value = answer.trim() || options.defaultValue || '';
 
@@ -57,14 +57,17 @@ export async function input(options: InputOptions): Promise<string> {
  * @param ctx - Bijou context for styling.
  * @returns Formatted prompt string.
  */
-function buildPrompt(options: InputOptions, mode: string, noColor: boolean, ctx: BijouContext): string {
+function buildPrompt(options: InputOptions, noColor: boolean, ctx: BijouContext): string {
   const defaultHint = options.defaultValue ? ` (${options.defaultValue})` : '';
 
-  if (mode === 'accessible') return `Enter ${options.title.toLowerCase()}${defaultHint}: `;
-  if (mode === 'pipe') return `${options.title}${defaultHint}: `;
-  if (noColor) return `${options.title}${defaultHint}: `;
-
-  const label = formatFormTitle(options.title, ctx);
-  const hint = options.defaultValue ? ctx.style.styled(ctx.theme.theme.semantic.muted, ` (${options.defaultValue})`) : '';
-  return `${label}${hint} `;
+  return renderByMode(ctx.mode, {
+    accessible: () => `Enter ${options.title.toLowerCase()}${defaultHint}: `,
+    pipe: () => `${options.title}${defaultHint}: `,
+    interactive: () => {
+      if (noColor) return `${options.title}${defaultHint}: `;
+      const label = formatFormTitle(options.title, ctx);
+      const hint = options.defaultValue ? ctx.style.styled(ctx.semantic('muted'), ` (${options.defaultValue})`) : '';
+      return `${label}${hint} `;
+    },
+  }, options);
 }

@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration options for the {@link paginator} component. */
 export interface PaginatorOptions {
@@ -26,26 +27,28 @@ export interface PaginatorOptions {
  */
 export function paginator(options: PaginatorOptions): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const page = options.current + 1; // convert 0-indexed to 1-indexed for display
   const total = options.total;
 
-  if (mode === 'pipe') return `[${page}/${total}]`;
-  if (mode === 'accessible') return `Page ${page} of ${total}`;
+  return renderByMode(ctx.mode, {
+    pipe: () => `[${page}/${total}]`,
+    accessible: () => `Page ${page} of ${total}`,
+    interactive: () => {
+      // interactive + static
+      const style = options.style ?? 'dots';
 
-  // interactive + static
-  const style = options.style ?? 'dots';
+      if (style === 'text') return `Page ${page} of ${total}`;
 
-  if (style === 'text') return `Page ${page} of ${total}`;
-
-  // dots style
-  const dots: string[] = [];
-  for (let i = 0; i < total; i++) {
-    if (i === options.current) {
-      dots.push(ctx.style.styled(ctx.theme.theme.semantic.primary, '●'));
-    } else {
-      dots.push(ctx.style.styled(ctx.theme.theme.semantic.muted, '○'));
-    }
-  }
-  return dots.join(' ');
+      // dots style
+      const dots: string[] = [];
+      for (let i = 0; i < total; i++) {
+        if (i === options.current) {
+          dots.push(ctx.style.styled(ctx.semantic('primary'), '●'));
+        } else {
+          dots.push(ctx.style.styled(ctx.semantic('muted'), '○'));
+        }
+      }
+      return dots.join(' ');
+    },
+  }, options);
 }

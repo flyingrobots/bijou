@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /**
  * Enumeration style for list item prefixes.
@@ -142,28 +143,11 @@ export function enumeratedList(items: readonly string[], options?: EnumeratedLis
   const indent = options?.indent ?? 2;
   const start = options?.start ?? 1;
   const ctx = resolveCtx(options?.ctx);
-  const mode = ctx?.mode;
 
   const indentStr = ' '.repeat(indent);
 
-  // Accessible mode: simple numbering regardless of style
-  if (mode === 'accessible') {
-    return items
-      .map((item, i) => {
-        const num = start + i;
-        const prefix = `${num}.`;
-        const lines = item.split('\n');
-        const firstLine = `${indentStr}${prefix} ${lines[0]}`;
-        if (lines.length === 1) return firstLine;
-        const contIndent = ' '.repeat(indent + prefix.length + 1);
-        return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-      })
-      .join('\n');
-  }
-
-  // Pipe mode: ASCII fallbacks
-  if (mode === 'pipe') {
-    const prefixes = items.map((_, i) => generatePipePrefix(style, start + i));
+  if (!ctx) {
+    const prefixes = items.map((_, i) => generatePrefix(style, start + i));
     const maxPrefixLen = isOrderedStyle(style)
       ? Math.max(...prefixes.map(p => p.length))
       : 0;
@@ -191,31 +175,75 @@ export function enumeratedList(items: readonly string[], options?: EnumeratedLis
       .join('\n');
   }
 
-  // Interactive / static mode (or no context): full rendering
-  const prefixes = items.map((_, i) => generatePrefix(style, start + i));
-  const maxPrefixLen = isOrderedStyle(style)
-    ? Math.max(...prefixes.map(p => p.length))
-    : 0;
+  return renderByMode(ctx.mode, {
+    accessible: () => {
+      return items
+        .map((item, i) => {
+          const num = start + i;
+          const prefix = `${num}.`;
+          const lines = item.split('\n');
+          const firstLine = `${indentStr}${prefix} ${lines[0]}`;
+          if (lines.length === 1) return firstLine;
+          const contIndent = ' '.repeat(indent + prefix.length + 1);
+          return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
+        })
+        .join('\n');
+    },
+    pipe: () => {
+      const prefixes = items.map((_, i) => generatePipePrefix(style, start + i));
+      const maxPrefixLen = isOrderedStyle(style)
+        ? Math.max(...prefixes.map(p => p.length))
+        : 0;
 
-  return items
-    .map((item, i) => {
-      const prefix = prefixes[i]!;
-      const lines = item.split('\n');
+      return items
+        .map((item, i) => {
+          const prefix = prefixes[i]!;
+          const lines = item.split('\n');
 
-      if (style === 'none') {
-        const firstLine = `${indentStr}${lines[0]}`;
-        if (lines.length === 1) return firstLine;
-        const contIndent = indentStr;
-        return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-      }
+          if (style === 'none') {
+            const firstLine = `${indentStr}${lines[0]}`;
+            if (lines.length === 1) return firstLine;
+            const contIndent = indentStr;
+            return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
+          }
 
-      const paddedPrefix = isOrderedStyle(style)
-        ? prefix.padStart(maxPrefixLen)
-        : prefix;
-      const firstLine = `${indentStr}${paddedPrefix} ${lines[0]}`;
-      if (lines.length === 1) return firstLine;
-      const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
-      return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-    })
-    .join('\n');
+          const paddedPrefix = isOrderedStyle(style)
+            ? prefix.padStart(maxPrefixLen)
+            : prefix;
+          const firstLine = `${indentStr}${paddedPrefix} ${lines[0]}`;
+          if (lines.length === 1) return firstLine;
+          const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
+          return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
+        })
+        .join('\n');
+    },
+    interactive: () => {
+      const prefixes = items.map((_, i) => generatePrefix(style, start + i));
+      const maxPrefixLen = isOrderedStyle(style)
+        ? Math.max(...prefixes.map(p => p.length))
+        : 0;
+
+      return items
+        .map((item, i) => {
+          const prefix = prefixes[i]!;
+          const lines = item.split('\n');
+
+          if (style === 'none') {
+            const firstLine = `${indentStr}${lines[0]}`;
+            if (lines.length === 1) return firstLine;
+            const contIndent = indentStr;
+            return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
+          }
+
+          const paddedPrefix = isOrderedStyle(style)
+            ? prefix.padStart(maxPrefixLen)
+            : prefix;
+          const firstLine = `${indentStr}${paddedPrefix} ${lines[0]}`;
+          if (lines.length === 1) return firstLine;
+          const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
+          return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
+        })
+        .join('\n');
+    },
+  }, options ?? {});
 }

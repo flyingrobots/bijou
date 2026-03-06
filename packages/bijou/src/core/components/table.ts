@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Definition for a single table column. */
 export interface TableColumn {
@@ -70,60 +71,63 @@ function padRight(str: string, width: number): string {
  */
 export function table(options: TableOptions): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
+  const columns = options.columns ?? [];
+  const rows = (options.rows ?? []).map(row => (row ?? []).map(cell => cell ?? ''));
 
-  if (mode === 'pipe') {
-    const headerLine = options.columns.map((c) => c.header).join('\t');
-    const dataLines = options.rows.map((row) => row.join('\t'));
-    return [headerLine, ...dataLines].join('\n');
-  }
+  return renderByMode(ctx.mode, {
+    pipe: () => {
+      const headerLine = columns.map((c) => c.header ?? '').join('\t');
+      const dataLines = rows.map((row) => row.join('\t'));
+      return [headerLine, ...dataLines].join('\n');
+    },
+    accessible: () => {
+      const lines: string[] = [];
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i]!;
+        const pairs = columns.map((col, j) => `${col.header ?? ''}=${row[j] ?? ''}`);
+        lines.push(`Row ${i + 1}: ${pairs.join(', ')}`);
+      }
+      return lines.join('\n');
+    },
+    interactive: () => {
+      const headerToken = options.headerToken ?? ctx.ui('tableHeader');
+      const borderToken = options.borderToken ?? ctx.border('muted');
+      const bc = (s: string): string => ctx.style.styled(borderToken, s);
 
-  if (mode === 'accessible') {
-    const lines: string[] = [];
-    for (let i = 0; i < options.rows.length; i++) {
-      const row = options.rows[i]!;
-      const pairs = options.columns.map((col, j) => `${col.header}=${row[j] ?? ''}`);
-      lines.push(`Row ${i + 1}: ${pairs.join(', ')}`);
-    }
-    return lines.join('\n');
-  }
+      const colWidths = columns.map((col, i) => {
+        if (col.width !== undefined) return col.width;
+        let max = (col.header ?? '').length;
+        for (const row of rows) {
+          const cell = row[i] ?? '';
+          max = Math.max(max, cell.length);
+        }
+        return max;
+      });
 
-  const headerToken = options.headerToken ?? ctx.theme.theme.ui.tableHeader;
-  const borderToken = options.borderToken ?? ctx.theme.theme.border.muted;
-  const bc = (s: string): string => ctx.style.styled(borderToken, s);
+      const h = '\u2500';
+      const v = '\u2502';
 
-  const colWidths = options.columns.map((col, i) => {
-    if (col.width !== undefined) return col.width;
-    let max = col.header.length;
-    for (const row of options.rows) {
-      const cell = row[i] ?? '';
-      max = Math.max(max, cell.length);
-    }
-    return max;
-  });
+      const hLine = (left: string, mid: string, right: string): string => {
+        const segments = colWidths.map((w) => h.repeat(w + 2));
+        return bc(left + segments.join(mid) + right);
+      };
 
-  const h = '\u2500';
-  const v = '\u2502';
+      const top    = hLine('\u250c', '\u252c', '\u2510');
+      const midSep = hLine('\u251c', '\u253c', '\u2524');
+      const bottom = hLine('\u2514', '\u2534', '\u2518');
 
-  const hLine = (left: string, mid: string, right: string): string => {
-    const segments = colWidths.map((w) => h.repeat(w + 2));
-    return bc(left + segments.join(mid) + right);
-  };
+      const headerCells = columns.map((col, i) =>
+        ' ' + padRight(ctx.style.styled(headerToken, col.header ?? ''), colWidths[i]!) + ' ',
+      );
+      const headerRow = bc(v) + headerCells.join(bc(v)) + bc(v);
 
-  const top    = hLine('\u250c', '\u252c', '\u2510');
-  const midSep = hLine('\u251c', '\u253c', '\u2524');
-  const bottom = hLine('\u2514', '\u2534', '\u2518');
+      const dataRows = rows.map((row) => {
+        const cells = colWidths.map((w, i) => ' ' + padRight(row[i] ?? '', w) + ' ');
+        return bc(v) + cells.join(bc(v)) + bc(v);
+      });
 
-  const headerCells = options.columns.map((col, i) =>
-    ' ' + padRight(ctx.style.styled(headerToken, col.header), colWidths[i]!) + ' ',
-  );
-  const headerRow = bc(v) + headerCells.join(bc(v)) + bc(v);
-
-  const dataRows = options.rows.map((row) => {
-    const cells = colWidths.map((w, i) => ' ' + padRight(row[i] ?? '', w) + ' ');
-    return bc(v) + cells.join(bc(v)) + bc(v);
-  });
-
-  const lines = [top, headerRow, midSep, ...dataRows, bottom];
-  return lines.join('\n');
+      const lines = [top, headerRow, midSep, ...dataRows, bottom];
+      return lines.join('\n');
+    },
+  }, options);
 }

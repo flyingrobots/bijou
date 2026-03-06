@@ -1,7 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Alert severity level. */
 export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
@@ -60,20 +60,23 @@ const BORDER_TOKENS: Record<AlertVariant, keyof BijouContext['theme']['theme']['
  */
 export function alert(message: string, options: AlertOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const variant = options.variant ?? 'info';
+  const safeMessage = message ?? '';
 
-  if (mode === 'pipe') return `[${PIPE_LABELS[variant]}] ${message}`;
-  if (mode === 'accessible') return `${ACCESSIBLE_LABELS[variant]}: ${message}`;
+  return renderByMode(ctx.mode, {
+    pipe: () => `[${PIPE_LABELS[variant]}] ${safeMessage}`,
+    accessible: () => `${ACCESSIBLE_LABELS[variant]}: ${safeMessage}`,
+    interactive: () => {
+      const icon = ICONS[variant];
+      const semanticToken = ctx.semantic(variant === 'info' ? 'info' : variant);
+      const borderToken = ctx.border(BORDER_TOKENS[variant]);
+      const coloredIcon = ctx.style.styled(semanticToken, icon);
 
-  const icon = ICONS[variant];
-  const semanticToken: TokenValue = ctx.theme.theme.semantic[variant === 'info' ? 'info' : variant];
-  const borderToken = ctx.theme.theme.border[BORDER_TOKENS[variant]];
-  const coloredIcon = ctx.style.styled(semanticToken, icon);
-
-  return box(coloredIcon + ' ' + message, {
-    borderToken,
-    padding: { left: 1, right: 1 },
-    ctx,
-  });
+      return box(coloredIcon + ' ' + safeMessage, {
+        borderToken,
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    },
+  }, options);
 }

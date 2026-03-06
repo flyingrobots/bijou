@@ -232,7 +232,7 @@ export function modal(options: ModalOptions): Overlay {
   if (hint != null) {
     contentLines.push('');
     const hintText = ctx
-      ? ctx.style.styled(ctx.theme.theme.semantic.muted, hint)
+      ? ctx.style.styled(ctx.semantic('muted'), hint)
       : hint;
     contentLines.push(hintText);
   }
@@ -308,12 +308,12 @@ export function toast(options: ToastOptions): Overlay {
   let line = icon + ' ' + message;
 
   if (ctx) {
-    line = ctx.style.styled(ctx.theme.theme.semantic[variant], line);
+    line = ctx.style.styled(ctx.semantic(variant), line);
   }
 
   const borderKey = TOAST_BORDER[variant];
   const borderColor = ctx
-    ? (s: string) => ctx.style.styled(ctx.theme.theme.border[borderKey], s)
+    ? (s: string) => ctx.style.styled(ctx.border(borderKey), s)
     : (s: string) => s;
 
   const bgFill = makeBgFill(options.bgToken, ctx);

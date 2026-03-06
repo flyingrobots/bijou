@@ -1,18 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { select } from './select.js';
-import { createTestContext } from '../../adapters/test/index.js';
-
-const OPTIONS = [
-  { label: 'Red', value: 'red' },
-  { label: 'Green', value: 'green' },
-  { label: 'Blue', value: 'blue' },
-];
+import { createTestContext, COLOR_OPTIONS, MANY_OPTIONS } from '../../adapters/test/index.js';
 
 describe('select()', () => {
   describe('numbered fallback (non-interactive)', () => {
     it('renders numbered list', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1'] } });
-      await select({ title: 'Color', options: OPTIONS, ctx });
+      await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('1.');
       expect(output).toContain('Red');
@@ -24,25 +18,25 @@ describe('select()', () => {
 
     it('accepts number and returns corresponding value', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['2'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('green');
     });
 
     it('invalid number returns default or first option', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['99'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('red'); // falls back to first
     });
 
     it('returns defaultValue when invalid input and default is set', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: [''] } });
-      const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('blue');
     });
 
     it('valid input overrides defaultValue', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('red');
     });
   });
@@ -50,13 +44,13 @@ describe('select()', () => {
   describe('pipe mode', () => {
     it('accepts number from stdin', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['3'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('blue');
     });
 
     it('returns first option when stdin is empty', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: [''] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('red');
     });
   });
@@ -64,7 +58,7 @@ describe('select()', () => {
   describe('accessible mode', () => {
     it('prompt says "Enter number:"', async () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: ['1'] } });
-      await select({ title: 'Color', options: OPTIONS, ctx });
+      await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('Enter number:');
     });
@@ -84,7 +78,7 @@ describe('select()', () => {
   describe('interactive mode', () => {
     it('renders list with cursor on first item', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
-      await select({ title: 'Color', options: OPTIONS, ctx });
+      await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('❯');
       expect(output).toContain('Red');
@@ -94,47 +88,42 @@ describe('select()', () => {
 
     it('down arrow + Enter selects second option', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('green');
     });
 
     it('up arrow wraps to last item', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[A', '\r'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('blue');
     });
 
     it('Ctrl+C returns default/first value', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x03'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('red');
     });
 
     it('Escape returns default/first value', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, ctx });
       expect(result).toBe('red');
     });
 
     it('Escape returns defaultValue when set', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b'] } });
-      const result = await select({ title: 'Color', options: OPTIONS, defaultValue: 'blue', ctx });
+      const result = await select({ title: 'Color', options: COLOR_OPTIONS, defaultValue: 'blue', ctx });
       expect(result).toBe('blue');
     });
 
     it('supports maxVisible scrolling for long option lists', async () => {
-      const many = Array.from({ length: 10 }, (_, i) => ({
-        label: `Option ${i + 1}`,
-        value: `v${i + 1}`,
-      }));
-
       const ctx = createTestContext({
         mode: 'interactive',
         io: { keys: ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\r'] },
       });
       const result = await select({
         title: 'Pick',
-        options: many,
+        options: MANY_OPTIONS,
         maxVisible: 3,
         ctx,
       });
@@ -148,17 +137,13 @@ describe('select()', () => {
     });
 
     it('sanitizes non-finite maxVisible values', async () => {
-      const many = Array.from({ length: 10 }, (_, i) => ({
-        label: `Option ${i + 1}`,
-        value: `v${i + 1}`,
-      }));
       const ctx = createTestContext({
         mode: 'interactive',
         io: { keys: ['\x1b[B', '\x1b[B', '\r'] },
       });
       const result = await select({
         title: 'Pick',
-        options: many,
+        options: MANY_OPTIONS,
         maxVisible: Number.NaN,
         ctx,
       });
@@ -170,7 +155,7 @@ describe('select()', () => {
 
   it('accepts ctx parameter', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['1'] } });
-    const result = await select({ title: 'X', options: OPTIONS, ctx });
+    const result = await select({ title: 'X', options: COLOR_OPTIONS, ctx });
     expect(result).toBe('red');
     expect(ctx.io.written.length).toBeGreaterThan(0);
   });

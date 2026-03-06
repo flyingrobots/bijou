@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Represent a single event on a vertical timeline. */
 export interface TimelineEvent {
@@ -48,43 +49,40 @@ function statusLabel(status: BaseStatusKey): string {
  */
 export function timeline(events: TimelineEvent[], options: TimelineOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
 
-  if (mode === 'pipe') {
-    return events
+  return renderByMode(ctx.mode, {
+    pipe: () => events
       .map((e) => {
         const status = (e.status ?? 'muted').toUpperCase();
         const desc = e.description ? ` - ${e.description}` : '';
         return `[${status}] ${e.label}${desc}`;
       })
-      .join('\n');
-  }
-
-  if (mode === 'accessible') {
-    return events
+      .join('\n'),
+    accessible: () => events
       .map((e) => {
         const label = statusLabel(e.status ?? 'muted');
         const desc = e.description ? `. ${e.description}` : '';
         return `${label}: ${e.label}${desc}`;
       })
-      .join('\n');
-  }
+      .join('\n'),
+    interactive: () => {
+      const lineToken = options.lineToken ?? ctx.border('muted');
 
-  const lineToken = options.lineToken ?? ctx.theme.theme.border.muted;
+      const lines: string[] = [];
+      for (const [i, event] of events.entries()) {
+        const status = event.status ?? 'muted';
+        const dotChar = FILLED_STATUSES.has(status) ? '●' : '○';
+        const statusToken = ctx.status(status);
 
-  const lines: string[] = [];
-  for (const [i, event] of events.entries()) {
-    const status = event.status ?? 'muted';
-    const dotChar = FILLED_STATUSES.has(status) ? '●' : '○';
-    const statusToken = ctx.theme.theme.status[status];
+        const dot = ctx.style.styled(statusToken, dotChar);
+        const desc = event.description ? ` ${event.description}` : '';
+        lines.push(`${dot} ${event.label}${desc}`);
 
-    const dot = ctx.style.styled(statusToken, dotChar);
-    const desc = event.description ? ` ${event.description}` : '';
-    lines.push(`${dot} ${event.label}${desc}`);
-
-    if (i < events.length - 1) {
-      lines.push(ctx.style.styled(lineToken, '│'));
-    }
-  }
-  return lines.join('\n');
+        if (i < events.length - 1) {
+          lines.push(ctx.style.styled(lineToken, '│'));
+        }
+      }
+      return lines.join('\n');
+    },
+  }, options);
 }

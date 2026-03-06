@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration for rendering a keyboard shortcut indicator. */
 export interface KbdOptions {
@@ -21,13 +22,15 @@ export interface KbdOptions {
  */
 export function kbd(key: string, options: KbdOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
 
-  if (mode === 'pipe') return `<${key}>`;
-  if (mode === 'accessible') return key;
+  return renderByMode(ctx.mode, {
+    pipe: () => `<${key}>`,
+    accessible: () => key,
+    interactive: () => {
+      const borderToken = ctx.border('muted');
+      const boldKey = ctx.style.bold(key);
 
-  const borderToken = ctx.theme.theme.border.muted;
-  const boldKey = ctx.style.bold(key);
-
-  return ctx.style.styled(borderToken, '[') + ' ' + boldKey + ' ' + ctx.style.styled(borderToken, ']');
+      return ctx.style.styled(borderToken, '[') + ' ' + boldKey + ' ' + ctx.style.styled(borderToken, ']');
+    },
+  }, options);
 }

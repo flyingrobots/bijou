@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration for rendering a skeleton placeholder. */
 export interface SkeletonOptions {
@@ -24,15 +25,17 @@ export interface SkeletonOptions {
  */
 export function skeleton(options: SkeletonOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
 
-  if (mode === 'pipe') return '';
-  if (mode === 'accessible') return 'Loading...';
+  return renderByMode(ctx.mode, {
+    pipe: () => '',
+    accessible: () => 'Loading...',
+    interactive: () => {
+      const width = options.width ?? 20;
+      const lines = options.lines ?? 1;
+      const token = ctx.semantic('muted');
+      const line = ctx.style.styled(token, '\u2591'.repeat(width));
 
-  const width = options.width ?? 20;
-  const lines = options.lines ?? 1;
-  const token = ctx.theme.theme.semantic.muted;
-  const line = ctx.style.styled(token, '\u2591'.repeat(width));
-
-  return Array.from({ length: lines }, () => line).join('\n');
+      return Array.from({ length: lines }, () => line).join('\n');
+    },
+  }, options);
 }

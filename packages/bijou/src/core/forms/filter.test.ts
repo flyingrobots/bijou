@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { filter } from './filter.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, MANY_OPTIONS } from '../../adapters/test/index.js';
 
 const OPTIONS = [
   { label: 'Apple', value: 'apple', keywords: ['fruit', 'red'] },
@@ -296,39 +296,26 @@ describe('filter()', () => {
   });
 
   describe('viewport scrolling', () => {
-    const MANY_OPTIONS = [
-      { label: 'A1', value: 'a1' },
-      { label: 'A2', value: 'a2' },
-      { label: 'A3', value: 'a3' },
-      { label: 'A4', value: 'a4' },
-      { label: 'A5', value: 'a5' },
-      { label: 'A6', value: 'a6' },
-      { label: 'A7', value: 'a7' },
-      { label: 'A8', value: 'a8' },
-      { label: 'A9', value: 'a9' },
-      { label: 'A10', value: 'a10' },
-    ];
-
     it('cursor past maxVisible still shows cursor indicator', async () => {
       // maxVisible=3. Navigate down 8 times → cursor at index 8 = A9.
       // The viewport must scroll so A9 is visible WITH the cursor indicator.
       const keys = Array.from({ length: 8 }, () => '\x1b[B').concat(['\r']);
       const ctx = createTestContext({ mode: 'interactive', io: { keys } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
-      expect(result).toBe('a9');
-      // Strip ANSI codes and verify a line contains both ❯ and A9
+      expect(result).toBe('v9');
+      // Strip ANSI codes and verify a line contains both ❯ and Option 9
       const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
-      expect(stripped).toMatch(/❯.*A9/);
+      expect(stripped).toMatch(/❯.*Option 9/);
     });
 
     it('cursor wraps up past maxVisible and is visible', async () => {
-      // Navigate up from index 0 wraps to last (A10, index 9).
-      // Viewport must scroll to show A10 with cursor indicator.
+      // Navigate up from index 0 wraps to last (Option 20, index 19).
+      // Viewport must scroll to show Option 20 with cursor indicator.
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[A', '\r'] } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
-      expect(result).toBe('a10');
+      expect(result).toBe('v20');
       const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
-      expect(stripped).toMatch(/❯.*A10/);
+      expect(stripped).toMatch(/❯.*Option 20/);
     });
 
     it('scroll down then back up tracks correctly', async () => {
@@ -336,7 +323,7 @@ describe('filter()', () => {
       const keys = ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\x1b[A', '\x1b[A', '\r'];
       const ctx = createTestContext({ mode: 'interactive', io: { keys } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
-      expect(result).toBe('a3');
+      expect(result).toBe('v3');
     });
 
     it('filter query resets scroll offset', async () => {
@@ -344,20 +331,20 @@ describe('filter()', () => {
       const keys = ['\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '\x1b[B', '1', '0', '\r'];
       const ctx = createTestContext({ mode: 'interactive', io: { keys } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
-      // "10" matches A10
-      expect(result).toBe('a10');
+      // "10" matches Option 10
+      expect(result).toBe('v10');
     });
 
     it('maxVisible=1 shows single item with cursor', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 1, ctx });
-      expect(result).toBe('a2');
+      expect(result).toBe('v2');
     });
 
     it('maxVisible >= option count needs no scrolling', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\r'] } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 20, ctx });
-      expect(result).toBe('a2');
+      expect(result).toBe('v2');
     });
   });
 

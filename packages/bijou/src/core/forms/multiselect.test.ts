@@ -1,12 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { multiselect } from './multiselect.js';
-import { createTestContext } from '../../adapters/test/index.js';
-
-const OPTIONS = [
-  { label: 'Red', value: 'red' },
-  { label: 'Green', value: 'green' },
-  { label: 'Blue', value: 'blue' },
-];
+import { createTestContext, COLOR_OPTIONS } from '../../adapters/test/index.js';
 
 describe('multiselect()', () => {
   it('returns empty array when options list is empty', async () => {
@@ -17,7 +11,7 @@ describe('multiselect()', () => {
   describe('numbered fallback (non-interactive)', () => {
     it('renders numbered list', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1,2'] } });
-      await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('1.');
       expect(output).toContain('Red');
@@ -27,19 +21,19 @@ describe('multiselect()', () => {
 
     it('accepts comma-separated numbers', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1,3'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['red', 'blue']);
     });
 
     it('filters out invalid numbers', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: ['1,99,2'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['red', 'green']);
     });
 
     it('returns empty array when input is empty', async () => {
       const ctx = createTestContext({ mode: 'static', io: { answers: [''] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual([]);
     });
   });
@@ -47,13 +41,13 @@ describe('multiselect()', () => {
   describe('pipe mode', () => {
     it('accepts comma-separated numbers from stdin', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: ['2, 3'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['green', 'blue']);
     });
 
     it('returns empty array when stdin is empty', async () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: [''] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual([]);
     });
   });
@@ -61,7 +55,7 @@ describe('multiselect()', () => {
   describe('accessible mode', () => {
     it('prompt says "Enter numbers separated by commas"', async () => {
       const ctx = createTestContext({ mode: 'accessible', io: { answers: ['1'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('Enter numbers separated by commas');
       expect(result).toEqual(['red']);
@@ -71,7 +65,7 @@ describe('multiselect()', () => {
   describe('interactive mode', () => {
     it('renders with checkboxes', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
-      await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       const output = ctx.io.written.join('');
       expect(output).toContain('○');
       expect(output).toContain('Red');
@@ -81,57 +75,57 @@ describe('multiselect()', () => {
 
     it('Space toggles first, Enter confirms', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\r'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['red']);
     });
 
     it('navigate + toggle multiple items', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\x1b[B', ' ', '\r'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['red', 'green']);
     });
 
     it('Ctrl+C returns empty array', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x03'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual([]);
     });
 
     it('Escape returns empty array', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual([]);
     });
 
     it('toggle on and off deselects item', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', ' ', '\r'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual([]);
     });
 
     it('navigate to last item and select', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\x1b[B', ' ', '\r'] } });
-      const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+      const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['blue']);
     });
   });
 
   it('accepts ctx parameter', async () => {
     const ctx = createTestContext({ mode: 'pipe', io: { answers: ['1'] } });
-    const result = await multiselect({ title: 'X', options: OPTIONS, ctx });
+    const result = await multiselect({ title: 'X', options: COLOR_OPTIONS, ctx });
     expect(result).toEqual(['red']);
     expect(ctx.io.written.length).toBeGreaterThan(0);
   });
 
   it('single selection works', async () => {
     const ctx = createTestContext({ mode: 'static', io: { answers: ['2'] } });
-    const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+    const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
     expect(result).toEqual(['green']);
   });
 
   it('all selections work', async () => {
     const ctx = createTestContext({ mode: 'static', io: { answers: ['1,2,3'] } });
-    const result = await multiselect({ title: 'Colors', options: OPTIONS, ctx });
+    const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
     expect(result).toEqual(['red', 'green', 'blue']);
   });
 });

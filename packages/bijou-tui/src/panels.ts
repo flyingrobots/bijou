@@ -191,12 +191,11 @@ export function createPanelGroup<A>(options: PanelGroupOptions<A>): PanelGroup<A
       }
 
       const style = ctx.style;
-      const semantic = ctx.theme.theme.semantic;
 
       if (id === focusedId) {
-        return style.bold(style.styled(semantic.primary, panel.label));
+        return style.bold(style.styled(ctx.semantic('primary'), panel.label));
       }
-      return style.styled(semantic.muted, panel.label);
+      return style.styled(ctx.semantic('muted'), panel.label);
     },
 
     dispose(): void {

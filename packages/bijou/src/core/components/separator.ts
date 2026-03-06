@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration for rendering a horizontal separator line. */
 export interface SeparatorOptions {
@@ -27,29 +28,30 @@ export interface SeparatorOptions {
  */
 export function separator(options: SeparatorOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const label = options.label;
   const width = options.width ?? ctx.runtime.columns;
 
-  if (mode === 'pipe') {
-    if (label) return `--- ${label} ---`;
-    return '---';
-  }
+  return renderByMode(ctx.mode, {
+    pipe: () => {
+      if (label) return `--- ${label} ---`;
+      return '---';
+    },
+    accessible: () => {
+      if (label) return `--- ${label} ---`;
+      return '';
+    },
+    interactive: () => {
+      const token = options.borderToken ?? ctx.border('muted');
 
-  if (mode === 'accessible') {
-    if (label) return `--- ${label} ---`;
-    return '';
-  }
+      if (label) {
+        const labelWithSpaces = ` ${label} `;
+        const remaining = Math.max(0, width - labelWithSpaces.length);
+        const left = Math.floor(remaining / 2);
+        const right = remaining - left;
+        return ctx.style.styled(token, '\u2500'.repeat(left)) + labelWithSpaces + ctx.style.styled(token, '\u2500'.repeat(right));
+      }
 
-  const token = options.borderToken ?? ctx.theme.theme.border.muted;
-
-  if (label) {
-    const labelWithSpaces = ` ${label} `;
-    const remaining = Math.max(0, width - labelWithSpaces.length);
-    const left = Math.floor(remaining / 2);
-    const right = remaining - left;
-    return ctx.style.styled(token, '\u2500'.repeat(left)) + labelWithSpaces + ctx.style.styled(token, '\u2500'.repeat(right));
-  }
-
-  return ctx.style.styled(token, '\u2500'.repeat(width));
+      return ctx.style.styled(token, '\u2500'.repeat(width));
+    },
+  }, options);
 }

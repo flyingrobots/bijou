@@ -21,6 +21,7 @@
  */
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import { renderByMode } from '@flyingrobots/bijou';
 import {
   type ScrollState,
   viewport,
@@ -303,14 +304,16 @@ function resolveGutter(
 ): string {
   if (!ctx) return GUTTER_CHAR;
 
-  const mode = ctx.mode;
-  if (mode === 'static') return GUTTER_CHAR;
+  return renderByMode(ctx.mode, {
+    static: () => GUTTER_CHAR,
+    interactive: () => {
+      const token = focused
+        ? (options?.focusedGutterToken ?? ctx.semantic('accent'))
+        : (options?.unfocusedGutterToken ?? ctx.semantic('muted'));
 
-  const token = focused
-    ? (options?.focusedGutterToken ?? ctx.theme.theme.semantic.accent)
-    : (options?.unfocusedGutterToken ?? ctx.theme.theme.semantic.muted);
-
-  return ctx.style.styled(token, GUTTER_CHAR);
+      return ctx.style.styled(token, GUTTER_CHAR);
+    },
+  }, options);
 }
 
 // ---------------------------------------------------------------------------

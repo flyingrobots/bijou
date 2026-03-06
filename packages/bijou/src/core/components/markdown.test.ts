@@ -292,6 +292,11 @@ describe('markdown()', () => {
       const result = markdown('This has **bold and `code`** inside.', { ctx: ctx('pipe') });
       expect(result).toContain('bold and code');
     });
+
+    it('handles null/undefined input gracefully', () => {
+      expect(markdown(null as any, { ctx: ctx() })).toBe('');
+      expect(markdown(undefined as any, { ctx: ctx() })).toBe('');
+    });
   });
 
   describe('static mode', () => {

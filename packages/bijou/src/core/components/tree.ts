@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Represent a single node in a tree hierarchy. */
 export interface TreeNode {
@@ -34,19 +35,16 @@ export interface TreeOptions {
  */
 export function tree(nodes: TreeNode[], options: TreeOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
 
-  if (mode === 'pipe') {
-    return renderPlain(nodes, 0);
-  }
-
-  if (mode === 'accessible') {
-    return renderAccessible(nodes, 0);
-  }
-
-  const guideToken = options.guideToken ?? ctx.theme.theme.border.muted;
-  const labelToken = options.labelToken;
-  return renderRich(nodes, '', true, guideToken, labelToken, ctx);
+  return renderByMode(ctx.mode, {
+    pipe: () => renderPlain(nodes, 0),
+    accessible: () => renderAccessible(nodes, 0),
+    interactive: () => {
+      const guideToken = options.guideToken ?? ctx.border('muted');
+      const labelToken = options.labelToken;
+      return renderRich(nodes, '', true, guideToken, labelToken, ctx);
+    },
+  }, options);
 }
 
 /**

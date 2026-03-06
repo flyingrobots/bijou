@@ -5,6 +5,7 @@ import { isDagSource, isSlicedDagSource, arraySource, materialize, sliceSource }
 import type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';
 import { assignLayers } from './dag-layout.js';
 import { renderInteractiveLayout, renderPipe, renderAccessible } from './dag-render.js';
+import { renderByMode } from '../mode-render.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -193,19 +194,16 @@ export function dag(
     );
   }
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const nodes = isSlicedDagSource(input) ? materialize(input) : [...input];
 
   if (nodes.length === 0) return '';
 
-  if (mode === 'pipe') {
-    return renderPipe(nodes);
-  }
-
-  if (mode === 'accessible') {
-    const layerMap = assignLayers(nodes);
-    return renderAccessible(nodes, layerMap);
-  }
-
-  return renderInteractiveLayout(nodes, options, ctx).output;
+  return renderByMode(ctx.mode, {
+    pipe: () => renderPipe(nodes),
+    accessible: () => {
+      const layerMap = assignLayers(nodes);
+      return renderAccessible(nodes, layerMap);
+    },
+    interactive: () => renderInteractiveLayout(nodes, options, ctx).output,
+  }, options);
 }
