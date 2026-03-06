@@ -332,8 +332,8 @@ function splitPane(
 And provide pure reducers:
 
 - `splitPaneFocusNext(state)`
-- `splitPaneResizeBy(state, delta)`
-- `splitPaneHandleKey(state, msg, keyMap?)`
+- `splitPaneResizeBy(state, delta, limits)`
+- `splitPaneFocusPrev(state)`
 
 Why: this mirrors the successful pattern already used by `focusArea` and keeps TEA purity.
 

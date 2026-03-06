@@ -158,8 +158,11 @@ export async function runScript<Model, M>(
           rows: step.resize.rows,
         };
         bus.emit(resizeMsg);
-      } else {
+      } else if ('msg' in step) {
         bus.emit(step.msg);
+      } else {
+        const _exhaustive: never = step;
+        throw new Error(`runScript: unhandled script step variant: ${JSON.stringify(_exhaustive)}`);
       }
 
       // Yield to allow async commands to settle

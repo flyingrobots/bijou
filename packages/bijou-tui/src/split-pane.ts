@@ -93,14 +93,14 @@ export function splitPaneResizeBy(
 }
 
 /**
- * Focus pane B when on A, otherwise stay on B.
+ * Toggle focus between pane A and pane B.
  */
 export function splitPaneFocusNext(state: SplitPaneState): SplitPaneState {
   return { ...state, focused: state.focused === 'a' ? 'b' : 'a' };
 }
 
 /**
- * Focus pane A when on B, otherwise focus pane B.
+ * Toggle focus between pane B and pane A.
  */
 export function splitPaneFocusPrev(state: SplitPaneState): SplitPaneState {
   return { ...state, focused: state.focused === 'b' ? 'a' : 'b' };
@@ -169,12 +169,16 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
 function solveSplit(available: number, ratio: number, minA: number, minB: number): [number, number] {
   if (available <= 0) return [0, 0];
 
+  // Priority: minB > minA when they conflict (B keeps its minimum first).
   const maxAFromMinB = Math.max(0, available - Math.min(minB, available));
+  // A's minimum cannot exceed the maximum that still satisfies B's minimum.
   const clampedMinA = Math.min(minA, maxAFromMinB);
 
+  // Ratio target is clamped to feasible bounds after applying constraints.
   let desiredA = Math.round(clampRatio(ratio) * available);
   desiredA = clamp(desiredA, clampedMinA, maxAFromMinB);
 
+  // Guardrail: if rounding drift undercuts B's minimum, pull A back into range.
   const desiredB = available - desiredA;
   if (desiredB < Math.min(minB, available)) {
     desiredA = Math.max(clampedMinA, available - Math.min(minB, available));

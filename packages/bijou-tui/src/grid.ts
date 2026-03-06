@@ -95,7 +95,9 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
     for (let r = minR; r <= maxR; r++) {
       for (let c = minC; c <= maxC; c++) {
         if (matrix[r]![c] !== name) {
-          throw new Error(`gridLayout: area "${name}" must form a contiguous rectangle`);
+          throw new Error(
+            `gridLayout: area "${name}" must form a contiguous rectangle; gap at row ${r}, column ${c}`,
+          );
         }
       }
     }
@@ -181,20 +183,26 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   const remaining = Math.max(0, available - fixed);
   if (frTotal > 0) {
     let assigned = 0;
-    const frIndices: number[] = [];
+    const frAllocations: Array<{ index: number; remainder: number }> = [];
     for (let i = 0; i < tracks.length; i++) {
       const t = tracks[i]!;
       if (typeof t !== 'number') {
-        frIndices.push(i);
         const fr = parseFr(t);
-        const sz = Math.floor((remaining * fr) / frTotal);
+        const rawShare = (remaining * fr) / frTotal;
+        const sz = Math.floor(rawShare);
         sizes[i] = sz;
         assigned += sz;
+        frAllocations.push({ index: i, remainder: rawShare - sz });
       }
     }
     let leftover = remaining - assigned;
-    for (const idx of frIndices) {
-      if (leftover <= 0) break;
+    // Prefer largest fractional remainders first to reduce declaration-order bias.
+    frAllocations.sort((a, b) => {
+      if (b.remainder !== a.remainder) return b.remainder - a.remainder;
+      return a.index - b.index;
+    });
+    for (let i = 0; i < frAllocations.length && leftover > 0; i++) {
+      const idx = frAllocations[i]!.index;
       sizes[idx] = (sizes[idx] ?? 0) + 1;
       leftover -= 1;
     }
@@ -206,7 +214,7 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
 function parseFr(track: `${number}fr`): number {
   const raw = track.slice(0, -2);
   const n = Number(raw);
-  if (!Number.isFinite(n) || n <= 0) {
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
     throw new Error(`gridLayout: invalid fr track "${track}"`);
   }
   return n;

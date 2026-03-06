@@ -68,6 +68,9 @@ function parseCliArgs(argv: readonly string[]): ReturnType<typeof parseArgs> | n
 }
 
 function quotePath(value: string): string {
+  if (process.platform === 'win32') {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
   return `'${value.replace(/'/g, "'\"'\"'")}'`;
 }
 

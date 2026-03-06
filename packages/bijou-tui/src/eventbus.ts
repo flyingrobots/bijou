@@ -128,7 +128,7 @@ interface Disposable {
  * @template M - Application-defined custom message type.
  * @returns A new event bus instance.
  */
-export function createEventBus<M>(options?: CreateEventBusOptions): EventBus<M> {
+export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<M> {
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
   const disposables: Disposable[] = [];
@@ -153,8 +153,8 @@ export function createEventBus<M>(options?: CreateEventBusOptions): EventBus<M> 
 
     emit,
 
-    connectIO(io: IOPort, options?: { mouse?: boolean }): Disposable {
-      const mouseEnabled = options?.mouse ?? false;
+    connectIO(io: IOPort, ioOptions?: { mouse?: boolean }): Disposable {
+      const mouseEnabled = ioOptions?.mouse ?? false;
 
       // Keyboard (and optionally mouse) input
       const inputHandle = io.rawInput((raw: string) => {
@@ -208,10 +208,15 @@ export function createEventBus<M>(options?: CreateEventBusOptions): EventBus<M> 
       }).catch((err: unknown) => {
         if (disposed) return;
         // Surface command rejections instead of leaving unhandled promise rejections.
-        if (options?.onCommandRejected != null) {
-          options.onCommandRejected(err);
-        } else {
-          console.error('[EventBus] Command rejected:', err);
+        try {
+          if (busOptions?.onCommandRejected != null) {
+            busOptions.onCommandRejected(err);
+          } else {
+            console.error('[EventBus] Command rejected:', err);
+          }
+        } catch (reportErr: unknown) {
+          console.error('[EventBus] onCommandRejected handler threw:', reportErr);
+          console.error('[EventBus] Original command rejection:', err);
         }
       });
     },

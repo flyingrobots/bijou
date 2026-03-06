@@ -361,15 +361,9 @@ export type DrawerAnchor = 'left' | 'right' | 'top' | 'bottom';
 /**
  * Configuration for the {@link drawer} overlay.
  */
-export interface DrawerOptions {
+interface DrawerBaseOptions {
   /** Content string to display inside the drawer. */
   readonly content: string;
-  /** Side of the screen/region to anchor the drawer. Default: 'right'. */
-  readonly anchor?: DrawerAnchor;
-  /** Total drawer width including borders and padding (required for left/right). */
-  readonly width?: number;
-  /** Total drawer height including borders and padding (required for top/bottom). */
-  readonly height?: number;
   /** Screen width in columns, used for positioning. */
   readonly screenWidth: number;
   /** Screen height in rows, used for sizing. */
@@ -385,6 +379,32 @@ export interface DrawerOptions {
   /** Bijou context for styled output. */
   readonly ctx?: BijouContext;
 }
+
+interface DrawerDefaultOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. Default: 'right'. */
+  readonly anchor?: undefined;
+  /** Total drawer width including borders and padding. */
+  readonly width: number;
+  readonly height?: never;
+}
+
+interface DrawerHorizontalOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. */
+  readonly anchor: 'left' | 'right';
+  /** Total drawer width including borders and padding. */
+  readonly width: number;
+  readonly height?: never;
+}
+
+interface DrawerVerticalOptions extends DrawerBaseOptions {
+  /** Side of the screen/region to anchor the drawer. */
+  readonly anchor: 'top' | 'bottom';
+  /** Total drawer height including borders and padding. */
+  readonly height: number;
+  readonly width?: never;
+}
+
+export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | DrawerVerticalOptions;
 
 // ---------------------------------------------------------------------------
 // drawer()
@@ -402,7 +422,6 @@ export interface DrawerOptions {
 export function drawer(options: DrawerOptions): Overlay {
   const {
     content,
-    anchor = 'right',
     screenWidth,
     screenHeight,
     title,
@@ -410,7 +429,7 @@ export function drawer(options: DrawerOptions): Overlay {
   } = options;
 
   const region = clampRegion(options.region, screenWidth, screenHeight);
-  const dims = resolveDrawerDimensions(anchor, options, region);
+  const dims = resolveDrawerDimensions(options, region);
   const { width, height, row, col } = dims;
   const innerWidth = Math.max(0, width - 4); // border + padding on each side
 
@@ -468,15 +487,31 @@ export function drawer(options: DrawerOptions): Overlay {
 }
 
 function resolveDrawerDimensions(
-  anchor: DrawerAnchor,
   options: DrawerOptions,
   region: LayoutRect,
 ): { width: number; height: number; row: number; col: number } {
+  if (options.anchor === 'top' || options.anchor === 'bottom') {
+    const anchor = options.anchor;
+    const heightRaw = options.height;
+    if (heightRaw == null || !Number.isFinite(heightRaw)) {
+      throw new Error(`drawer(): "height" is required for anchor "${anchor}"`);
+    }
+    const height = clamp(Math.floor(heightRaw), 0, region.height);
+    const width = region.width;
+    const col = region.col;
+    const row = anchor === 'top'
+      ? region.row
+      : region.row + region.height - height;
+    return { width, height, row: Math.max(region.row, row), col };
+  }
+
+  const anchor = options.anchor ?? 'right';
   if (anchor === 'left' || anchor === 'right') {
-    if (options.width == null) {
+    const widthRaw = options.width;
+    if (widthRaw == null || !Number.isFinite(widthRaw)) {
       throw new Error(`drawer(): "width" is required for anchor "${anchor}"`);
     }
-    const width = clamp(Math.floor(options.width), 0, region.width);
+    const width = clamp(Math.floor(widthRaw), 0, region.width);
     const height = region.height;
     const row = region.row;
     const col = anchor === 'left'
@@ -485,17 +520,11 @@ function resolveDrawerDimensions(
     return { width, height, row, col: Math.max(region.col, col) };
   }
 
-  if (options.height == null) {
-    throw new Error(`drawer(): "height" is required for anchor "${anchor}"`);
-  }
+  return assertNever(anchor);
+}
 
-  const height = clamp(Math.floor(options.height), 0, region.height);
-  const width = region.width;
-  const col = region.col;
-  const row = anchor === 'top'
-    ? region.row
-    : region.row + region.height - height;
-  return { width, height, row: Math.max(region.row, row), col };
+function assertNever(value: never): never {
+  throw new Error(`Unexpected drawer anchor: ${String(value)}`);
 }
 
 function clampRegion(region: LayoutRect | undefined, screenWidth: number, screenHeight: number): LayoutRect {

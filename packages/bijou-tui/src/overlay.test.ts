@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { composite, modal, toast, drawer, tooltip } from './overlay.js';
-import type { Overlay } from './overlay.js';
+import type { Overlay, DrawerOptions } from './overlay.js';
 import { visibleLength, stripAnsi } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -445,7 +445,7 @@ describe('drawer', () => {
       anchor: 'left',
       screenWidth: 80,
       screenHeight: 10,
-    })).toThrow(/width/);
+    } as unknown as DrawerOptions)).toThrow(/width/);
   });
 
   it('throws when top/bottom anchor is missing height', () => {
@@ -454,7 +454,7 @@ describe('drawer', () => {
       anchor: 'top',
       screenWidth: 80,
       screenHeight: 10,
-    })).toThrow(/height/);
+    } as unknown as DrawerOptions)).toThrow(/height/);
   });
 
   it('content fills exact screenHeight lines', () => {

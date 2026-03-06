@@ -137,7 +137,7 @@ const DEPLOY_GRAPH: readonly DagNode[] = [
 
 interface WorkbenchPageModel {
   readonly releaseIndex: number;
-  readonly incidentIndex: number;
+  readonly selectionIndex: number;
   readonly drawerOpen: boolean;
   readonly drawerAnchor: DrawerAnchor;
   readonly drawerTargetIndex: number;
@@ -146,7 +146,7 @@ interface WorkbenchPageModel {
 
 const INITIAL_PAGE_MODEL: WorkbenchPageModel = {
   releaseIndex: 0,
-  incidentIndex: 0,
+  selectionIndex: 0,
   drawerOpen: false,
   drawerAnchor: 'right',
   drawerTargetIndex: 0,
@@ -270,7 +270,7 @@ function renderOpsHealth(width: number, ctx: BijouContext): string {
 }
 
 function renderIncidentFeed(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const selected = clampIndex(model.incidentIndex, INCIDENT_FEED.length);
+  const selected = clampIndex(model.selectionIndex, INCIDENT_FEED.length);
   const lines = INCIDENT_FEED.map((line, idx) => {
     if (idx === selected) {
       return `${badge('focus', { variant: 'accent', ctx })} ${line}`;
@@ -327,7 +327,7 @@ function renderBoardLanes(width: number, ctx: BijouContext): string {
 }
 
 function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
-  const selected = BACKLOG[clampIndex(model.incidentIndex, BACKLOG.length)]!;
+  const selected = BACKLOG[clampIndex(model.selectionIndex, BACKLOG.length)]!;
 
   return box([
     separator({ label: `Ticket ${selected.id}`, width: Math.max(8, width - 4), ctx }),
@@ -368,7 +368,7 @@ function renderBoardRunbook(width: number, ctx: BijouContext): string {
 
 function renderGraphDag(width: number, model: WorkbenchPageModel, ctx: BijouContext): string {
   const release = RELEASES[clampIndex(model.releaseIndex, RELEASES.length)]!;
-  const selectedId = model.incidentIndex % 2 === 0 ? 'frame' : 'overlays';
+  const selectedId = model.selectionIndex % 2 === 0 ? 'frame' : 'overlays';
 
   const graph = dag(DEPLOY_GRAPH as DagNode[], {
     selectedId,
@@ -480,9 +480,15 @@ function buildPage(
             releaseIndex: clampIndex(model.releaseIndex - 1, RELEASES.length),
           }, []];
         case 'next-incident':
-          return [{ ...model, incidentIndex: model.incidentIndex + 1 }, []];
+          return [{
+            ...model,
+            selectionIndex: clampIndex(model.selectionIndex + 1, INCIDENT_FEED.length),
+          }, []];
         case 'prev-incident':
-          return [{ ...model, incidentIndex: model.incidentIndex - 1 }, []];
+          return [{
+            ...model,
+            selectionIndex: clampIndex(model.selectionIndex - 1, INCIDENT_FEED.length),
+          }, []];
       }
     },
     keyMap: createKeyMap<WorkbenchMsg>()
@@ -636,11 +642,8 @@ export function createCanonicalWorkbenchApp(
         const frameWidth = region?.width ?? frame.screenRect.width;
         const frameHeight = region?.height ?? frame.screenRect.height;
         const anchor = pageModel.drawerAnchor;
-
-        if (anchor === 'left' || anchor === 'right') {
-          overlays.push(drawer({
-            anchor,
-            width: Math.max(24, Math.floor(frameWidth * 0.46)),
+        const createInspectorDrawer = (): Overlay => {
+          const base = {
             region,
             title: 'Panel Inspector',
             content,
@@ -649,21 +652,21 @@ export function createCanonicalWorkbenchApp(
             borderToken: ctx.theme.theme.border.primary,
             bgToken: ctx.theme.theme.surface.elevated,
             ctx,
-          }));
-        } else {
-          overlays.push(drawer({
+          };
+          if (anchor === 'left' || anchor === 'right') {
+            return drawer({
+              ...base,
+              anchor,
+              width: Math.max(24, Math.floor(frameWidth * 0.46)),
+            });
+          }
+          return drawer({
+            ...base,
             anchor,
             height: Math.max(8, Math.floor(frameHeight * 0.4)),
-            region,
-            title: 'Panel Inspector',
-            content,
-            screenWidth: frame.screenRect.width,
-            screenHeight: frame.screenRect.height,
-            borderToken: ctx.theme.theme.border.primary,
-            bgToken: ctx.theme.theme.surface.elevated,
-            ctx,
-          }));
-        }
+          });
+        };
+        overlays.push(createInspectorDrawer());
       }
 
       if (pageModel.quitConfirmOpen) {

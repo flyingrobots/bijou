@@ -137,6 +137,7 @@ describe('createThemeResolver', () => {
 
     const t = resolver.getTheme();
     expect(t.theme.name).toBe('cyan-magenta');
+    expect(writeError).toHaveBeenCalledTimes(1);
     expect(writeError).toHaveBeenCalledWith(
       '[bijou] Unknown BIJOU_THEME="missing-theme", falling back to "cyan-magenta".\n',
     );
@@ -151,6 +152,7 @@ describe('createThemeResolver', () => {
 
     const t = resolver.resolveTheme('missing-theme');
     expect(t.theme.name).toBe('cyan-magenta');
+    expect(writeError).toHaveBeenCalledTimes(1);
     expect(writeError).toHaveBeenCalledWith(
       '[bijou] Unknown theme "missing-theme", falling back to "cyan-magenta".\n',
     );

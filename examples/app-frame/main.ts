@@ -20,79 +20,78 @@ interface PageModel {
   inspector: boolean;
 }
 
-const editorPage: FramePage<PageModel, Msg> = {
-  id: 'editor',
-  title: 'Editor',
-  init: () => [{ count: 0, inspector: false }, []],
-  update(msg, model) {
-    if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
-    if (msg.type === 'toggle-inspector') return [{ ...model, inspector: !model.inspector }, []];
-    return [model, []];
-  },
-  keyMap: createKeyMap<Msg>()
-    .bind('x', 'Increment counter', { type: 'inc' }),
-  layout(model) {
-    return {
-      kind: 'split',
-      splitId: 'editor-shell',
-      state: createSplitPaneState({ ratio: 0.38 }),
-      paneA: {
-        kind: 'pane',
-        paneId: 'files',
-        render: (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w }),
-      },
-      paneB: {
-        kind: 'pane',
-        paneId: 'content',
-        overflowX: 'scroll',
-        render: (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }),
-      },
-    };
-  },
-};
+const INITIAL_PAGE_MODEL: PageModel = { count: 0, inspector: false };
 
-const dashboardPage: FramePage<PageModel, Msg> = {
-  id: 'dashboard',
-  title: 'Dashboard',
-  init: () => [{ count: 0, inspector: false }, []],
-  update(msg, model) {
-    if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
-    if (msg.type === 'toggle-inspector') return [{ ...model, inspector: !model.inspector }, []];
-    return [model, []];
+function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
+  if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+  if (msg.type === 'toggle-inspector') return [{ ...model, inspector: !model.inspector }, []];
+  return [model, []];
+}
+
+function createPageKeyMap() {
+  return createKeyMap<Msg>().bind('x', 'Increment counter', { type: 'inc' });
+}
+
+function createPage(
+  id: string,
+  title: string,
+  layout: FramePage<PageModel, Msg>['layout'],
+): FramePage<PageModel, Msg> {
+  return {
+    id,
+    title,
+    init: () => [{ ...INITIAL_PAGE_MODEL }, []],
+    update: updatePageModel,
+    keyMap: createPageKeyMap(),
+    layout,
+  };
+}
+
+const editorPage = createPage('editor', 'Editor', (model) => ({
+  kind: 'split',
+  splitId: 'editor-shell',
+  state: createSplitPaneState({ ratio: 0.38 }),
+  paneA: {
+    kind: 'pane',
+    paneId: 'files',
+    render: (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w }),
   },
-  keyMap: createKeyMap<Msg>()
-    .bind('x', 'Increment counter', { type: 'inc' }),
-  layout(model) {
-    return {
-      kind: 'grid',
-      gridId: 'dash-grid',
-      columns: ['1fr', '1fr'],
-      rows: [3, '1fr'],
-      areas: [
-        'stats stats',
-        'left right',
-      ],
-      gap: 1,
-      cells: {
-        stats: {
-          kind: 'pane',
-          paneId: 'stats',
-          render: (w) => box(`Stats: counter=${model.count}`, { width: w }),
-        },
-        left: {
-          kind: 'pane',
-          paneId: 'left',
-          render: (w) => box('Queues\n\n- build\n- test\n- release', { width: w }),
-        },
-        right: {
-          kind: 'pane',
-          paneId: 'right',
-          render: (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w }),
-        },
-      },
-    };
+  paneB: {
+    kind: 'pane',
+    paneId: 'content',
+    overflowX: 'scroll',
+    render: (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }),
   },
-};
+}));
+
+const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
+  kind: 'grid',
+  gridId: 'dash-grid',
+  columns: ['1fr', '1fr'],
+  rows: [3, '1fr'],
+  areas: [
+    'stats stats',
+    'left right',
+  ],
+  gap: 1,
+  cells: {
+    stats: {
+      kind: 'pane',
+      paneId: 'stats',
+      render: (w) => box(`Stats: counter=${model.count}`, { width: w }),
+    },
+    left: {
+      kind: 'pane',
+      paneId: 'left',
+      render: (w) => box('Queues\n\n- build\n- test\n- release', { width: w }),
+    },
+    right: {
+      kind: 'pane',
+      paneId: 'right',
+      render: (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w }),
+    },
+  },
+}));
 
 const globalKeys = createKeyMap<Msg>()
   .bind('o', 'Toggle inspector drawer', { type: 'toggle-inspector' });

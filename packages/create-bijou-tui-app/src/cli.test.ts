@@ -38,6 +38,15 @@ function runCliCaptured(argv: readonly string[]): {
   }
 }
 
+function withPlatform<T>(platform: NodeJS.Platform, run: () => T): T {
+  const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue(platform);
+  try {
+    return run();
+  } finally {
+    platformSpy.mockRestore();
+  }
+}
+
 describe('create-bijou-tui-app cli', () => {
   it('prints usage for argument parsing errors', () => {
     const result = runCliCaptured(['--definitely-not-a-real-flag']);
@@ -80,10 +89,25 @@ describe('create-bijou-tui-app cli', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
     try {
       const targetDir = join(root, "my app's workspace");
-      const result = runCliCaptured([targetDir, '--no-install']);
+      const result = withPlatform('darwin', () => runCliCaptured([targetDir, '--no-install']));
       expect(result.code).toBe(0);
       const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
       expect(cdLine).toContain("'\"'\"'");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('uses Windows-safe cd quoting when process platform is win32', () => {
+    const root = mkdtempSync(join(tmpdir(), 'create-bijou-test-'));
+    try {
+      const targetDir = join(root, 'my app');
+      const result = withPlatform('win32', () => runCliCaptured([targetDir, '--no-install']));
+      expect(result.code).toBe(0);
+      const cdLine = result.stdout.split('\n').find((line) => line.trimStart().startsWith('cd '));
+      expect(cdLine).toBeDefined();
+      expect(cdLine).toContain(`cd "${targetDir}"`);
+      expect(cdLine).not.toContain(`cd '${targetDir}'`);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

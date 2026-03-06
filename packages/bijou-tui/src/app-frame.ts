@@ -566,8 +566,9 @@ function scrollFocusedPane<PageModel, Msg>(
   if (focusedPaneId == null) return model;
 
   const page = pagesById.get(pageId)!;
+  const layoutTree = page.layout(model.pageModels[pageId]!);
   const bodyRect = frameBodyRect(model.columns, model.rows);
-  const resolved = renderFrameNode(page.layout(model.pageModels[pageId]!), bodyRect, {
+  const resolved = renderFrameNode(layoutTree, bodyRect, {
     model,
     pageId,
     focusedPaneId,
@@ -576,7 +577,7 @@ function scrollFocusedPane<PageModel, Msg>(
   const paneRect = resolved.paneRects.get(focusedPaneId);
   if (paneRect == null || paneRect.width <= 0 || paneRect.height <= 0) return model;
 
-  const paneNode = findPaneNode(page.layout(model.pageModels[pageId]!), focusedPaneId);
+  const paneNode = findPaneNode(layoutTree, focusedPaneId);
   if (paneNode == null) return model;
 
   const content = paneNode.render(paneRect.width, paneRect.height);
@@ -837,11 +838,16 @@ function renderFrameNode<PageModel, Msg>(
 
   const renderedByArea = new Map<string, RenderResult>();
   for (const [areaName, areaRect] of relRects) {
+    const absoluteAreaRect = offsetRect(areaRect, rect.row, rect.col);
     const child = node.cells[areaName];
     if (child == null) {
-      throw new Error(`createFramedApp: grid cell "${areaName}" missing in layout node`);
+      console.warn(
+        `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder`,
+      );
+      renderedByArea.set(areaName, renderMissingGridCell(areaName, absoluteAreaRect));
+      continue;
     }
-    renderedByArea.set(areaName, renderFrameNode(child, offsetRect(areaRect, rect.row, rect.col), ctx));
+    renderedByArea.set(areaName, renderFrameNode(child, absoluteAreaRect, ctx));
   }
 
   const output = grid({
@@ -874,6 +880,14 @@ function renderFrameNode<PageModel, Msg>(
   }
 
   return { output, paneRects, paneOrder };
+}
+
+function renderMissingGridCell(areaName: string, rect: LayoutRect): RenderResult {
+  return {
+    output: fitBlock(`[missing grid cell: ${areaName}]`, rect.width, rect.height).join('\n'),
+    paneRects: new Map(),
+    paneOrder: [],
+  };
 }
 
 function collectPaneIds(node: FrameLayoutNode): string[] {
@@ -1048,7 +1062,7 @@ function comboToMsg(binding: BindingInfo): KeyMsg {
 }
 
 function emitMsg<Msg>(msg: Msg): Cmd<Msg> {
-  return async () => msg;
+  return () => Promise.resolve(msg);
 }
 
 function emitMsgForPage<Msg>(pageId: string, msg: Msg): Cmd<Msg> {

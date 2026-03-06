@@ -17,6 +17,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`@flyingrobots/bijou-tui-app` package** — batteries-included app skeleton built on `createFramedApp()`. Includes tokenized tabs, full-screen defaults, animated physics drawer, quit-confirm modal (`q` / `ctrl+c`), `[` / `]` page switching, a two-line footer, and a default two-tab setup (drawer page + 1/3:2/3 split page).
 - **`create-bijou-tui-app` package** — new `npm create bijou-tui-app@latest` scaffolder that generates a runnable TypeScript app using `createTuiAppSkeleton()` with strict config and starter scripts.
 
+### 🐛 Fixed
+
+- **`create-bijou-tui-app` next-step quoting on Windows** — `quotePath()` now emits Windows-safe double-quoted paths on `win32`, so copied `cd` commands with spaces work in `cmd.exe`.
+- **Event bus rejection surfacing hardening (`bijou-tui`)** — `createEventBus()` now guards `onCommandRejected` callbacks so secondary handler exceptions are logged instead of reintroducing unhandled rejections.
+- **Grid fractional allocation clarity (`bijou-tui`)** — `gridLayout()` now uses largest-remainder distribution for leftover `fr` space and throws on fractional `fr` tokens (e.g. `1.5fr`) to match documented/tested integer semantics.
+- **Framed app render resilience (`bijou-tui`)** — missing grid cell nodes in `createFramedApp()` now render a placeholder with a warning instead of crashing the full app render.
+
 ### 🧪 Tests
 
 - Add dedicated suites for `splitPane`, `grid`, and `appFrame`.

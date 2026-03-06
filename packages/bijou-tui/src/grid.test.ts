@@ -21,7 +21,22 @@ describe('gridLayout', () => {
     expect(main).toBeDefined();
     expect(body).toBeDefined();
     expect(nav!.width).toBe(10);
-    expect(main!.col).toBeGreaterThan(nav!.col);
+    expect(nav!.row).toBe(0);
+    expect(nav!.col).toBe(0);
+    expect(nav!.height).toBe(10);
+
+    expect(main!.row).toBe(0);
+    expect(main!.col).toBe(11);
+    expect(main!.width).toBe(29);
+    expect(main!.height).toBe(2);
+
+    expect(body!.row).toBe(3);
+    expect(body!.col).toBe(11);
+    expect(body!.width).toBe(29);
+    expect(body!.height).toBe(7);
+
+    expect(nav!.width + 1 + main!.width).toBe(40);
+    expect(main!.height + 1 + body!.height).toBe(10);
   });
 
   it('clamps fixed columns when they exceed available width', () => {
@@ -72,6 +87,16 @@ describe('gridLayout', () => {
       rows: ['1fr', '1fr'],
       areas: ['a a b', 'a b b'],
     })).toThrow(/contiguous rectangle/);
+  });
+
+  it('rejects fractional fr tracks', () => {
+    expect(() => gridLayout({
+      width: 20,
+      height: 6,
+      columns: ['1.5fr', '1fr'],
+      rows: ['1fr'],
+      areas: ['a b'],
+    })).toThrow(/invalid fr track/);
   });
 });
 

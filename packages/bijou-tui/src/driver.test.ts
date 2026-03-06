@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { runScript } from './driver.js';
 import type { App, Cmd, KeyMsg } from './types.js';
 import { quit } from './commands.js';
-import { isKeyMsg } from './types.js';
+import { isKeyMsg, isResizeMsg } from './types.js';
 
 // ---------------------------------------------------------------------------
 // Test app: counter that increments on 'up', decrements on 'down', quits on 'q'
@@ -124,7 +124,7 @@ describe('runScript', () => {
     const app: App<Model> = {
       init: () => [{ cols: 80, rows: 24 }, []],
       update(msg, model) {
-        if (msg.type === 'resize') {
+        if (isResizeMsg(msg)) {
           return [{ cols: msg.columns, rows: msg.rows }, []];
         }
         return [model, []];

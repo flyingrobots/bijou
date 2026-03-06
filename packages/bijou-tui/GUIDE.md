@@ -620,6 +620,7 @@ return composite(background, overlays, { dim: model.modal != null });
 ### Drawer Anchors and Panel Scoping
 
 `drawer()` supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
+For dimensions: `left`/`right` require `width`, while `top`/`bottom` require `height`.
 
 ```typescript
 import { drawer } from '@flyingrobots/bijou-tui';

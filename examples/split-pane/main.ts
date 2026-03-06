@@ -21,6 +21,7 @@ interface Model {
 }
 
 type Msg = never;
+const MIN_PANE_SIZE = 16;
 
 const app: App<Model, Msg> = {
   init: () => [{
@@ -40,13 +41,21 @@ const app: App<Model, Msg> = {
       if (msg.key === 'h') {
         return [{
           ...model,
-          split: splitPaneResizeBy(model.split, -2, { total: model.cols, minA: 16, minB: 16 }),
+          split: splitPaneResizeBy(model.split, -2, {
+            total: model.cols,
+            minA: MIN_PANE_SIZE,
+            minB: MIN_PANE_SIZE,
+          }),
         }, []];
       }
       if (msg.key === 'l') {
         return [{
           ...model,
-          split: splitPaneResizeBy(model.split, 2, { total: model.cols, minA: 16, minB: 16 }),
+          split: splitPaneResizeBy(model.split, 2, {
+            total: model.cols,
+            minA: MIN_PANE_SIZE,
+            minB: MIN_PANE_SIZE,
+          }),
         }, []];
       }
     }
@@ -62,8 +71,8 @@ const app: App<Model, Msg> = {
       direction: 'row',
       width: model.cols,
       height: bodyHeight,
-      minA: 16,
-      minB: 16,
+      minA: MIN_PANE_SIZE,
+      minB: MIN_PANE_SIZE,
       paneA: (w, h) => box(`\n Project Tree\n\n ${leftFocused ? '●' : '○'} src\n ${leftFocused ? '●' : '○'} test\n\n ${w}x${h}`, {
         width: w,
       }),

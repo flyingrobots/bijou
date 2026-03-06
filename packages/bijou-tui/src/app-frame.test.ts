@@ -13,6 +13,12 @@ interface PageModel {
   count: number;
 }
 
+const KEY_TAB = '\t';
+const KEY_SHIFT_TAB = '\x1b[Z';
+const KEY_ESCAPE = '\x1b';
+const KEY_CTRL_P = '\x10';
+const KEY_ENTER = '\r';
+
 function makeLongContent(label: string, lines = 40): string {
   return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
 }
@@ -86,7 +92,7 @@ describe('createFramedApp', () => {
     };
 
     const app = createFramedApp({ pages: [splitPage] });
-    const result = await runScript(app, [{ key: '\t' }, { key: '\x1b[Z' }]);
+    const result = await runScript(app, [{ key: KEY_TAB }, { key: KEY_SHIFT_TAB }]);
     expect(result.model.focusedPaneByPage.home).toBe('left');
   });
 
@@ -298,7 +304,7 @@ describe('createFramedApp', () => {
       pages: [makePage('home', 'Home', 'main')],
     });
 
-    const result = await runScript(app, [{ key: '?' }, { key: '\x1b' }]);
+    const result = await runScript(app, [{ key: '?' }, { key: KEY_ESCAPE }]);
     expect(result.model.helpOpen).toBe(false);
   });
 
@@ -312,7 +318,7 @@ describe('createFramedApp', () => {
     const result = await runScript(app, [
       { key: '?' },
       { key: 'z' },
-      { key: '\x10' }, // ctrl+p should be ignored while help is open
+      { key: KEY_CTRL_P }, // ctrl+p should be ignored while help is open
     ]);
 
     expect(result.model.helpOpen).toBe(true);
@@ -332,9 +338,9 @@ describe('createFramedApp', () => {
 
     // Ctrl+P opens palette. Type "z" to filter to Zap, then Enter.
     const result = await runScript(app, [
-      { key: '\x10' },
+      { key: KEY_CTRL_P },
       { key: 'z' },
-      { key: '\r' },
+      { key: KEY_ENTER },
     ]);
 
     expect(result.model.pageModels.home?.count).toBe(1);
@@ -366,12 +372,12 @@ describe('createFramedApp', () => {
     });
 
     const result = await runScript(app, [
-      { key: '\x10' }, // ctrl+p
+      { key: KEY_CTRL_P }, // ctrl+p
       { key: 'm' },
       { key: 'e' },
       { key: 'g' },
       { key: 'a' },
-      { key: '\r' },
+      { key: KEY_ENTER },
     ]);
 
     expect(result.model.pageModels.home?.count).toBe(1);
@@ -385,7 +391,7 @@ describe('createFramedApp', () => {
     });
 
     const result = await runScript(app, [
-      { key: '\x10' }, // ctrl+p
+      { key: KEY_CTRL_P }, // ctrl+p
       { key: 'q' },
     ]);
 

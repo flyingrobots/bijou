@@ -305,6 +305,26 @@ describe('runCmd', () => {
     expect((onCommandRejected.mock.calls[0]?.[0] as Error).message).toBe('boom');
   });
 
+  it('logs both errors if onCommandRejected throws', async () => {
+    const onCommandRejected = vi.fn(() => {
+      throw new Error('report failed');
+    });
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const bus = createEventBus<TestMsg>({ onCommandRejected });
+      bus.runCmd(async () => {
+        throw new Error('boom');
+      });
+
+      await vi.waitFor(() => expect(consoleError).toHaveBeenCalledTimes(2));
+      expect(onCommandRejected).toHaveBeenCalledTimes(1);
+      expect(String(consoleError.mock.calls[0]?.[0])).toContain('[EventBus] onCommandRejected handler threw:');
+      expect(String(consoleError.mock.calls[1]?.[0])).toContain('[EventBus] Original command rejection:');
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it('logs rejected commands when no rejection handler is configured', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {

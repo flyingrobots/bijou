@@ -27,6 +27,7 @@ describe('split-pane state', () => {
     expect(splitPaneFocusNext(a).focused).toBe('b');
     expect(splitPaneFocusPrev(a).focused).toBe('b');
     const b = createSplitPaneState({ focused: 'b' });
+    expect(splitPaneFocusNext(b).focused).toBe('a');
     expect(splitPaneFocusPrev(b).focused).toBe('a');
   });
 });

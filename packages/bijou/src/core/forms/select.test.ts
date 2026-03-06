@@ -138,8 +138,13 @@ describe('select()', () => {
         maxVisible: 3,
         ctx,
       });
+      const output = ctx.io.written.join('');
 
       expect(result).toBe('v5');
+      expect(output).toContain('\x1b[4A');
+      expect(output).not.toContain('\x1b[11A');
+      expect(output).toContain('Option 5');
+      expect(output).not.toContain('Option 10');
     });
 
     it('sanitizes non-finite maxVisible values', async () => {
