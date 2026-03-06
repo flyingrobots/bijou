@@ -80,7 +80,6 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     throw new Error('[bijou] filter(): options array must contain at least one option');
   }
   const noColor = ctx.theme.noColor;
-  const t = ctx.theme;
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
@@ -126,8 +125,8 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
     // Filter input with mode indicator (: normal, / insert)
     const indicator = mode === 'insert' ? '/' : ':';
-    const filterDisplay = query || (options.placeholder ? styledFn(t.theme.semantic.muted, options.placeholder) : '');
-    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, indicator)} ${filterDisplay}\n`);
+    const filterDisplay = query || (options.placeholder ? styledFn(ctx.semantic('muted'), options.placeholder) : '');
+    ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), indicator)} ${filterDisplay}\n`);
 
     // Visible items
     const vis = visibleItems();
@@ -136,7 +135,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       const isCurrent = scrollOffset + i === cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), prefix)} ${boldFn(opt.label)}\n`);
       } else {
         ctx.io.write(`\x1b[K  ${prefix} ${opt.label}\n`);
       }
@@ -144,7 +143,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
     // Status
     const status = `${filtered.length}/${options.options.length} items`;
-    ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.muted, status)}\n`);
+    ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('muted'), status)}\n`);
   }
 
   function clearRender(lineCount: number): void {
@@ -164,7 +163,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
     const selected = filtered[cursor];
     const selectedLabel = selected ? selected.label : '(none)';
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selectedLabel);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selectedLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

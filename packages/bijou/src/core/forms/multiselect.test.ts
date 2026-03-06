@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { multiselect } from './multiselect.js';
-import { createTestContext, COLOR_OPTIONS } from '../../adapters/test/index.js';
+import { createTestContext, COLOR_OPTIONS, MANY_OPTIONS } from '../../adapters/test/index.js';
 
 describe('multiselect()', () => {
   it('returns empty array when options list is empty', async () => {
@@ -107,6 +107,41 @@ describe('multiselect()', () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[B', '\x1b[B', ' ', '\r'] } });
       const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });
       expect(result).toEqual(['blue']);
+    });
+
+    it('supports maxVisible scrolling for long option lists', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[B', '\x1b[B', '\x1b[B', ' ', '\r'] },
+      });
+      const result = await multiselect({
+        title: 'Pick',
+        options: MANY_OPTIONS,
+        maxVisible: 3,
+        ctx,
+      });
+      const output = ctx.io.written.join('');
+
+      expect(result).toEqual(['v4']);
+      expect(output).toContain('\x1b[4A');
+      expect(output).toContain('Option 4');
+      expect(output).not.toContain('Option 10');
+    });
+
+    it('sanitizes non-finite maxVisible values', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: [' ', '\r'] },
+      });
+      const result = await multiselect({
+        title: 'Pick',
+        options: MANY_OPTIONS,
+        maxVisible: Number.NaN,
+        ctx,
+      });
+
+      expect(result).toEqual(['v1']);
+      expect(ctx.io.written.join('')).not.toContain('[NaN');
     });
   });
 

@@ -5,6 +5,7 @@
  * panel-scoped overlay context, and optional frame-level command palette.
  */
 
+import { resolveSafeCtx, type BijouContext } from '@flyingrobots/bijou';
 import { helpShort, helpView, type BindingSource } from './help.js';
 import {
   createKeyMap,
@@ -43,14 +44,12 @@ import {
   focusAreaScrollToX,
   type OverflowX,
 } from './focus-area.js';
-import {
-  splitPane,
-  splitPaneLayout,
-  type SplitPaneDirection,
-  type SplitPaneState,
-} from './split-pane.js';
+import { splitPane, splitPaneLayout, type SplitPaneDirection, type SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
-import { clipToWidth, visibleLength } from './viewport.js';
+import { clipToWidth, sliceAnsi, visibleLength } from './viewport.js';
+import { animate } from './animate.js';
+import { EASINGS } from './spring.js';
+import { canvas } from './canvas.js';
 
 /** Page declaration consumed by {@link createFramedApp}. */
 export interface FramePage<PageModel, Msg> {
@@ -119,6 +118,9 @@ export interface FrameOverlayContext<PageModel> {
   readonly screenRect: LayoutRect;
 }
 
+/** Page transition styles. */
+export type PageTransition = 'none' | 'wipe' | 'dissolve' | 'grid' | 'fade';
+
 /** `createFramedApp()` options. */
 export interface CreateFramedAppOptions<PageModel, Msg> {
   /** Registered pages. */
@@ -137,6 +139,10 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly enableCommandPalette?: boolean;
   /** Optional overlay provider (receives pane rects for panel scoping). */
   readonly overlayFactory?: (ctx: FrameOverlayContext<PageModel>) => readonly Overlay[];
+  /** Optional page transition style. Default: 'none'. */
+  readonly transition?: PageTransition;
+  /** Transition duration in milliseconds. Default: 300. */
+  readonly transitionDuration?: number;
 }
 
 /** Stored pane scroll coordinates. */
@@ -167,6 +173,10 @@ export interface FrameModel<PageModel> {
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
   readonly commandPalette?: CommandPaletteState;
+  /** ID of the page we are transitioning away from. */
+  readonly previousPageId?: string;
+  /** Transition progress (0 to 1). */
+  readonly transitionProgress: number;
 }
 
 interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
@@ -208,7 +218,9 @@ type FrameAction =
   | { type: 'bottom' }
   | { type: 'scroll-left' }
   | { type: 'scroll-right' }
-  | { type: 'open-palette' };
+  | { type: 'open-palette' }
+  | { type: 'transition'; progress: number }
+  | { type: 'transition-complete' };
 
 type PaletteAction =
   | { type: 'cp-next' }
@@ -219,11 +231,17 @@ type PaletteAction =
   | { type: 'cp-close' };
 
 const PAGE_MSG_TOKEN = Symbol('app-frame-page-msg');
+const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 
 interface PageScopedMsg<Msg> {
   readonly [PAGE_MSG_TOKEN]: true;
   readonly pageId: string;
   readonly msg: Msg;
+}
+
+interface FrameScopedMsg {
+  readonly [FRAME_MSG_TOKEN]: true;
+  readonly action: FrameAction;
 }
 
 /**
@@ -280,6 +298,7 @@ export function createFramedApp<PageModel, Msg>(
         columns: Math.max(1, options.initialColumns ?? 80),
         rows: Math.max(1, options.initialRows ?? 24),
         helpOpen: false,
+        transitionProgress: 1,
       };
 
       for (const pageId of pageOrder) {
@@ -290,6 +309,17 @@ export function createFramedApp<PageModel, Msg>(
     },
 
     update(msg, model) {
+      if (isFrameScopedMsg(msg)) {
+        const action = msg.action;
+        if (action.type === 'transition') {
+          return [{ ...model, transitionProgress: action.progress }, []];
+        }
+        if (action.type === 'transition-complete') {
+          return [{ ...model, transitionProgress: 1, previousPageId: undefined }, []];
+        }
+        return applyFrameAction(action, model, frameKeys, options, pagesById);
+      }
+
       if (isResizeMsg(msg)) {
         return [{
           ...model,
@@ -350,21 +380,30 @@ export function createFramedApp<PageModel, Msg>(
 
     view(model) {
       const activePage = pagesById.get(model.activePageId)!;
-      const activePageModel = model.pageModels[model.activePageId]!;
-
       const header = renderHeaderLine(model, options, pagesById);
       const helpLine = renderHelpLine(model, frameKeys, options, activePage);
       const bodyRect = frameBodyRect(model.columns, model.rows);
 
-      const renderCtx: RenderContext<PageModel, Msg> = {
-        model,
-        pageId: model.activePageId,
-        focusedPaneId: model.focusedPaneByPage[model.activePageId],
-        scrollByPane: model.scrollByPage[model.activePageId] ?? {},
-      };
+      const activeResult = renderPageContent(model.activePageId, model, bodyRect, pagesById);
+      let bodyOutput = activeResult.output;
 
-      const rendered = renderFrameNode(activePage.layout(activePageModel), bodyRect, renderCtx);
-      const bodyLines = fitBlock(rendered.output, bodyRect.width, bodyRect.height);
+      if (model.previousPageId != null && model.transitionProgress < 1 && options.transition && options.transition !== 'none') {
+        const ctx = resolveSafeCtx();
+        if (ctx) {
+          const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
+          bodyOutput = renderTransition(
+            prevResult.output,
+            activeResult.output,
+            options.transition,
+            model.transitionProgress,
+            bodyRect.width,
+            bodyRect.height,
+            ctx,
+          );
+        }
+      }
+
+      const bodyLines = fitBlock(bodyOutput, bodyRect.width, bodyRect.height);
       const rows: string[] = [header, helpLine, ...bodyLines];
       while (rows.length < model.rows) rows.push(' '.repeat(Math.max(0, model.columns)));
 
@@ -374,8 +413,8 @@ export function createFramedApp<PageModel, Msg>(
       if (options.overlayFactory != null) {
         overlays.push(...options.overlayFactory({
           activePageId: model.activePageId,
-          pageModel: activePageModel,
-          paneRects: rendered.paneRects,
+          pageModel: model.pageModels[model.activePageId]!,
+          paneRects: activeResult.paneRects,
           screenRect: { row: 0, col: 0, width: model.columns, height: model.rows },
         }));
       }
@@ -495,9 +534,9 @@ function applyFrameAction<PageModel, Msg>(
     case 'toggle-help':
       return [{ ...model, helpOpen: !model.helpOpen }, []];
     case 'prev-tab':
-      return [switchTab(model, -1, pagesById), []];
+      return switchTab(model, -1, pagesById, options);
     case 'next-tab':
-      return [switchTab(model, 1, pagesById), []];
+      return switchTab(model, 1, pagesById, options);
     case 'next-pane':
       return [cyclePane(model, 1, pagesById), []];
     case 'prev-pane':
@@ -514,6 +553,9 @@ function applyFrameAction<PageModel, Msg>(
     case 'scroll-left':
     case 'scroll-right':
       return [scrollFocusedPane(model, action, pagesById), []];
+    case 'transition':
+    case 'transition-complete':
+      return [model, []];
   }
 }
 
@@ -521,12 +563,36 @@ function switchTab<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
-): InternalFrameModel<PageModel, Msg> {
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
   const idx = model.pageOrder.indexOf(model.activePageId);
-  if (idx < 0) return model;
+  if (idx < 0) return [model, []];
   const nextIdx = (idx + delta + model.pageOrder.length) % model.pageOrder.length;
   const nextId = model.pageOrder[nextIdx]!;
-  return syncPageFrameState({ ...model, activePageId: nextId }, nextId, pagesById);
+
+  if (nextId === model.activePageId) return [model, []];
+
+  const nextModel = syncPageFrameState({
+    ...model,
+    activePageId: nextId,
+    previousPageId: model.activePageId,
+    transitionProgress: options.transition && options.transition !== 'none' ? 0 : 1,
+  }, nextId, pagesById);
+
+  if (options.transition && options.transition !== 'none') {
+    const cmd: Cmd<Msg> = animate({
+      type: 'tween',
+      from: 0,
+      to: 1,
+      duration: options.transitionDuration ?? 300,
+      ease: EASINGS.easeInOutCubic,
+      onFrame: (v) => wrapFrameMsg({ type: 'transition', progress: v } as FrameAction) as unknown as Msg,
+      onComplete: () => wrapFrameMsg({ type: 'transition-complete' } as FrameAction) as unknown as Msg,
+    });
+    return [nextModel, [cmd]];
+  }
+
+  return [nextModel, []];
 }
 
 function cyclePane<PageModel, Msg>(
@@ -1061,6 +1127,20 @@ function comboToMsg(binding: BindingInfo): KeyMsg {
   };
 }
 
+function isFrameScopedMsg(value: unknown): value is FrameScopedMsg {
+  return typeof value === 'object'
+    && value !== null
+    && FRAME_MSG_TOKEN in value
+    && (value as FrameScopedMsg)[FRAME_MSG_TOKEN] === true;
+}
+
+function wrapFrameMsg(action: FrameAction): FrameScopedMsg {
+  return {
+    [FRAME_MSG_TOKEN]: true,
+    action,
+  };
+}
+
 function emitMsg<Msg>(msg: Msg): Cmd<Msg> {
   return () => Promise.resolve(msg);
 }
@@ -1090,4 +1170,82 @@ function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
     && value !== null
     && PAGE_MSG_TOKEN in value
     && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN] === true;
+}
+
+function renderPageContent<PageModel, Msg>(
+  pageId: string,
+  model: InternalFrameModel<PageModel, Msg>,
+  bodyRect: LayoutRect,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): RenderResult {
+  const page = pagesById.get(pageId)!;
+  const pageModel = model.pageModels[pageId]!;
+  const renderCtx: RenderContext<PageModel, Msg> = {
+    model,
+    pageId,
+    focusedPaneId: model.focusedPaneByPage[pageId],
+    scrollByPane: model.scrollByPage[pageId] ?? {},
+  };
+  return renderFrameNode(page.layout(pageModel), bodyRect, renderCtx);
+}
+
+/**
+ * Split a styled multiline string into a 2D grid of single-column characters.
+ * Each cell is a fully-styled string (including resets).
+ */
+function stringToGrid(str: string, width: number, height: number): string[][] {
+  const lines = str.split('\n');
+  const grid: string[][] = [];
+  for (let y = 0; y < height; y++) {
+    const line = lines[y] ?? '';
+    const row: string[] = [];
+    for (let x = 0; x < width; x++) {
+      row.push(sliceAnsi(line, x, x + 1));
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+function renderTransition(
+  prev: string,
+  next: string,
+  style: PageTransition,
+  progress: number,
+  width: number,
+  height: number,
+  ctx: BijouContext,
+): string {
+  const prevGrid = stringToGrid(prev, width, height);
+  const nextGrid = stringToGrid(next, width, height);
+
+  return canvas(width, height, (x, y) => {
+    let showNext = false;
+
+    switch (style) {
+      case 'wipe':
+        showNext = x / width < progress;
+        break;
+      case 'dissolve': {
+        // Use a stable-ish pseudo-random seed based on coordinates
+        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        const rand = seed - Math.floor(seed);
+        showNext = rand < progress;
+        break;
+      }
+      case 'grid': {
+        const gx = Math.floor(x / 8);
+        const gy = Math.floor(y / 4);
+        showNext = ((gx + gy) % 10) / 10 < progress;
+        break;
+      }
+      case 'fade':
+        showNext = progress > 0.5;
+        break;
+      default:
+        showNext = progress >= 1;
+    }
+
+    return (showNext ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
+  }, { ctx });
 }

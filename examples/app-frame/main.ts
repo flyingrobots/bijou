@@ -108,6 +108,8 @@ const app = createFramedApp<PageModel, Msg>({
   pages: [editorPage, dashboardPage],
   globalKeys,
   enableCommandPalette: true,
+  transition: 'dissolve',
+  transitionDuration: 400,
   overlayFactory(frame) {
     if (!frame.pageModel.inspector) return [];
 

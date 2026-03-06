@@ -6,13 +6,21 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Tab transition animations (bijou-tui)** — implemented `wipe`, `dissolve`, `grid`, and `fade` transitions in `createFramedApp()`. Transitions are driven by pure TEA state and rendered via high-performance character-grid shaders in `canvas()`.
+- **Scrollable multiselect viewport (bijou core)** — `multiselect()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists, matching the `select()` and `filter()` components.
+
 ### ♻️ Refactors
 
 - **Mode rendering strategy (OCP)** — implemented `renderByMode` dispatcher pattern to replace repetitive `if (mode === …)` chains; migrated all core components to use the new registry pattern for cleaner mode-specific rendering.
 - **Decentralized theme access (DIP)** — added `semantic()`, `border()`, `surface()`, `status()`, and `ui()` helpers to `BijouContext`; components now look up tokens via these semantic methods instead of reaching into the deep `ctx.theme.theme` object structure.
+- **Form components consistency** — refactored `select()`, `multiselect()`, and `filter()` to use new semantic context helpers and the `renderByMode` dispatcher.
 
 ### 🧪 Tests
 
+- **Tab transition coverage** — added manual and scripted interaction tests for tab transitions in `app-frame.test.ts`.
+- **Multiselect scrolling coverage** — added `maxVisible` scrolling test cases to `multiselect.test.ts`.
 - **Shared test fixtures** — extracted common form data (colors, fruits, large lists) into `adapters/test/fixtures.ts` for reuse across test suites.
 - **Defensive input hardening** — added comprehensive tests and fixes for `null`/`undefined` input handling in `box()`, `headerBox()`, `alert()`, `table()`, and `markdown()`.
 - **Test suite refactoring** — migrated all form tests to use shared fixtures and updated component tests to leverage new `BijouContext` helpers.
