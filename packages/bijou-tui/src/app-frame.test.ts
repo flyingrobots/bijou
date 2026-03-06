@@ -185,6 +185,25 @@ describe('createFramedApp', () => {
     }
   });
 
+  it('respects transitionOverride to select animation dynamically', async () => {
+    const app = createFramedApp({
+      pages: [
+        makePage('p1', 'P1', 'm'),
+        makePage('p2', 'P2', 'm'),
+      ],
+      transition: 'none',
+      transitionOverride: () => 'wipe',
+      transitionDuration: 10,
+    });
+
+    const [initModel] = app.init();
+    const [switchedModel] = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, initModel);
+    
+    // Even though transition: 'none' was set, override should win
+    expect(switchedModel.activeTransition).toBe('wipe');
+    expect(switchedModel.transitionProgress).toBe(0);
+  });
+
   it('throws for duplicate pane ids in a page layout', () => {
     const app = createFramedApp({
       pages: [{

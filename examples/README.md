@@ -72,6 +72,7 @@
 | [`split-pane`](./split-pane/) | `splitPane()`, `splitPaneResizeBy()` | Stateful split layout with focus and divider resizing |
 | [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
 | [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
+| [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
 | [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |

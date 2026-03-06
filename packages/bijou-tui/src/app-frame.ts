@@ -143,6 +143,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly transition?: PageTransition;
   /** Transition duration in milliseconds. Default: 300. */
   readonly transitionDuration?: number;
+  /** Optional function to determine the transition style dynamically. */
+  readonly transitionOverride?: (model: PageModel) => PageTransition;
 }
 
 /** Stored pane scroll coordinates. */
@@ -177,6 +179,8 @@ export interface FrameModel<PageModel> {
   readonly previousPageId?: string;
   /** Transition progress (0 to 1). */
   readonly transitionProgress: number;
+  /** Currently active transition style. */
+  readonly activeTransition?: PageTransition;
 }
 
 interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
@@ -315,7 +319,7 @@ export function createFramedApp<PageModel, Msg>(
           return [{ ...model, transitionProgress: action.progress }, []];
         }
         if (action.type === 'transition-complete') {
-          return [{ ...model, transitionProgress: 1, previousPageId: undefined }, []];
+          return [{ ...model, transitionProgress: 1, previousPageId: undefined, activeTransition: undefined }, []];
         }
         return applyFrameAction(action, model, frameKeys, options, pagesById);
       }
@@ -387,14 +391,15 @@ export function createFramedApp<PageModel, Msg>(
       const activeResult = renderPageContent(model.activePageId, model, bodyRect, pagesById);
       let bodyOutput = activeResult.output;
 
-      if (model.previousPageId != null && model.transitionProgress < 1 && options.transition && options.transition !== 'none') {
+      const activeTransition = model.activeTransition ?? options.transition;
+      if (model.previousPageId != null && model.transitionProgress < 1 && activeTransition && activeTransition !== 'none') {
         const ctx = resolveSafeCtx();
         if (ctx) {
           const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
           bodyOutput = renderTransition(
             prevResult.output,
             activeResult.output,
-            options.transition,
+            activeTransition,
             model.transitionProgress,
             bodyRect.width,
             bodyRect.height,
@@ -572,14 +577,20 @@ function switchTab<PageModel, Msg>(
 
   if (nextId === model.activePageId) return [model, []];
 
+  const activePageModel = model.pageModels[model.activePageId]!;
+  const activeTransition = options.transitionOverride
+    ? options.transitionOverride(activePageModel)
+    : options.transition;
+
   const nextModel = syncPageFrameState({
     ...model,
     activePageId: nextId,
     previousPageId: model.activePageId,
-    transitionProgress: options.transition && options.transition !== 'none' ? 0 : 1,
+    activeTransition,
+    transitionProgress: activeTransition && activeTransition !== 'none' ? 0 : 1,
   }, nextId, pagesById);
 
-  if (options.transition && options.transition !== 'none') {
+  if (activeTransition && activeTransition !== 'none') {
     const cmd: Cmd<Msg> = animate({
       type: 'tween',
       from: 0,
