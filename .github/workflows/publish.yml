@@ -116,6 +116,8 @@ jobs:
           (cd packages/bijou && npm pack --dry-run)
           (cd packages/bijou-node && npm pack --dry-run)
           (cd packages/bijou-tui && npm pack --dry-run)
+          (cd packages/bijou-tui-app && npm pack --dry-run)
+          (cd packages/create-bijou-tui-app && npm pack --dry-run)
 
   publish_npm:
     name: Publish npm (OIDC)
@@ -127,7 +129,7 @@ jobs:
     environment: npm
     strategy:
       matrix:
-        package: [bijou, bijou-node, bijou-tui]
+        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -145,7 +147,7 @@ jobs:
       - name: Upgrade npm CLI (>=11.5.1 for trusted publishing)
         run: npm i -g npm@latest
 
-      - name: Publish @flyingrobots/${{ matrix.package }}
+      - name: Publish packages/${{ matrix.package }}
         uses: ./.github/actions/retry
         with:
           attempts: "3"
