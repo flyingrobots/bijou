@@ -1,5 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue } from '../theme/tokens.js';
+import type { Theme, TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
 import { renderByMode } from '../mode-render.js';
@@ -42,7 +42,7 @@ const ACCESSIBLE_LABELS: Record<AlertVariant, string> = {
 };
 
 /** Mapping from alert variant to the corresponding border theme token key. */
-const BORDER_TOKENS: Record<AlertVariant, keyof BijouContext['theme']['theme']['border']> = {
+const BORDER_TOKENS: Record<AlertVariant, keyof Theme['border']> = {
   success: 'success',
   error: 'error',
   warning: 'warning',
