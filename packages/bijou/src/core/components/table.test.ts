@@ -45,6 +45,35 @@ describe('table', () => {
     expect(result).toBe('Name\tStatus\tScore');
   });
 
+  describe('background fill', () => {
+    it('applies headerBgToken in interactive mode', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Name');
+      expect(result).toContain('Alice');
+      expect(result).toContain('─');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = table({ columns, rows, ctx });
+      expect(result).toContain('Name');
+      expect(result).toContain('─');
+    });
+
+    it('skips headerBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Name\tStatus\tScore');
+    });
+
+    it('skips headerBgToken when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Name');
+    });
+  });
+
   describe('defensive input handling', () => {
     it('handles empty columns gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });

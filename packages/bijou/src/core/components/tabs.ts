@@ -1,6 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Represent a single tab in a tab bar. */
 export interface TabItem {
@@ -16,6 +18,8 @@ export interface TabsOptions {
   active: number;
   /** Custom separator string between tabs. Defaults to `' | '` (pipe) or `' │ '` (rich). */
   separator?: string;
+  /** Background fill token for the active tab. Defaults to `surface.muted`. */
+  activeBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
@@ -69,13 +73,15 @@ export function tabs(items: TabItem[], options: TabsOptions): string {
     interactive: () => {
       // interactive + static
       const sep = options.separator ?? ' │ ';
+      const bgFill = makeBgFill(options.activeBgToken ?? ctx.surface('muted'), ctx);
       return items
         .map((item, i) => {
           const label = formatLabel(item);
           if (i === active) {
             const token = ctx.semantic('primary');
             const boldToken = { hex: token.hex, modifiers: [...(token.modifiers ?? []), 'bold' as const] };
-            return `${ctx.style.styled(boldToken, '●')} ${ctx.style.styled(boldToken, label)}`;
+            const text = `${ctx.style.styled(boldToken, '●')} ${ctx.style.styled(boldToken, label)}`;
+            return bgFill ? bgFill(` ${text} `) : text;
           }
           return `  ${ctx.style.styled(ctx.semantic('muted'), label)}`;
         })

@@ -56,4 +56,31 @@ describe('stepper', () => {
     expect(result).toContain('● Done');
     expect(result).not.toContain('──');
   });
+
+  describe('background fill', () => {
+    it('applies activeBgToken on current step', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Payment');
+      expect(result).toContain('●');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = stepper(steps, { current: 1, ctx });
+      expect(result).toContain('Payment');
+    });
+
+    it('skips activeBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toBe('[x] Account -- [*] Payment -- [ ] Confirm');
+    });
+
+    it('skips activeBgToken when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Payment');
+    });
+  });
 });

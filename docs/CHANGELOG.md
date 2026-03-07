@@ -9,6 +9,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### ✨ Features
 
 - **`gradient()` theme accessor** — `ctx.gradient(key)` returns `GradientStop[]` for any named gradient, completing the theme accessor API (`semantic`, `border`, `surface`, `status`, `ui`, `gradient`).
+- **Background color support for 7 components** — Style pass adding `bgToken` / background fill support:
+  - `alert()` — `surface.elevated` bg on interior box (default, overridable via `bgToken`)
+  - `kbd()` — `surface.muted` bg for key-cap effect (default, overridable via `bgToken`)
+  - `tabs()` — `surface.muted` bg on active tab with padding (default, overridable via `activeBgToken`)
+  - `accordion()` — opt-in `headerBgToken` for expanded/collapsed section headers
+  - `table()` — opt-in `headerBgToken` for header row background
+  - `stepper()` — opt-in `activeBgToken` for active step indicator
+  - `breadcrumb()` — opt-in `currentBgToken` for current segment highlight
+  - All bg fills gracefully degrade in pipe/accessible/noColor modes via `shouldApplyBg()`
 
 ### 🧪 Tests
 

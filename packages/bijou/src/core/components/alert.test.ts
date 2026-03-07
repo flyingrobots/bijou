@@ -40,6 +40,40 @@ describe('alert', () => {
     expect(result).toContain('msg');
   });
 
+  describe('background fill', () => {
+    it('applies default bg (surface.elevated) in interactive mode', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = alert('bg test', { ctx });
+      expect(result).toContain('bg test');
+      expect(result).toContain('─');
+    });
+
+    it('accepts custom bgToken', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = alert('custom', { bgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('custom');
+    });
+
+    it('skips bg in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = alert('piped', { ctx });
+      expect(result).toBe('[INFO] piped');
+    });
+
+    it('skips bg in accessible mode', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const result = alert('a11y', { ctx });
+      expect(result).toBe('Info: a11y');
+    });
+
+    it('skips bg when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = alert('nocolor', { ctx });
+      expect(result).toContain('nocolor');
+      expect(result).toContain('─');
+    });
+  });
+
   describe('defensive input handling', () => {
     it('handles null/undefined message gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });

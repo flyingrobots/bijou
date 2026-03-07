@@ -1,4 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
 import { renderByMode } from '../mode-render.js';
@@ -10,6 +11,8 @@ export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 export interface AlertOptions {
   /** Severity variant (defaults to `'info'`). */
   variant?: AlertVariant;
+  /** Background fill token for the alert box interior. Defaults to `surface.elevated`. */
+  bgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -74,6 +77,7 @@ export function alert(message: string, options: AlertOptions = {}): string {
 
       return box(coloredIcon + ' ' + safeMessage, {
         borderToken,
+        bgToken: options.bgToken ?? ctx.surface('elevated'),
         padding: { left: 1, right: 1 },
         ctx,
       });

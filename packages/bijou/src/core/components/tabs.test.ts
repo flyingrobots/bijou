@@ -56,4 +56,37 @@ describe('tabs', () => {
     const result = tabs([{ label: 'Mail', badge: '12' }], { active: 0, ctx });
     expect(result).toContain('Mail (12)');
   });
+
+  describe('background fill', () => {
+    it('applies default bg (surface.muted) on active tab in interactive mode', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = tabs(items, { active: 0, ctx });
+      expect(result).toContain('Dashboard');
+      expect(result).toContain('●');
+    });
+
+    it('accepts custom activeBgToken', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = tabs(items, { active: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Settings');
+    });
+
+    it('skips bg in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = tabs(items, { active: 0, ctx });
+      expect(result).toBe('[Dashboard] | Settings | Users (3)');
+    });
+
+    it('skips bg in accessible mode', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const result = tabs(items, { active: 0, ctx });
+      expect(result).toContain('Tab 1 of 3: Dashboard (active)');
+    });
+
+    it('skips bg when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = tabs(items, { active: 0, ctx });
+      expect(result).toContain('Dashboard');
+    });
+  });
 });

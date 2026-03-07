@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Definition for a single table column. */
 export interface TableColumn {
@@ -21,6 +22,8 @@ export interface TableOptions {
   headerToken?: TokenValue;
   /** Theme token applied to border characters. */
   borderToken?: TokenValue;
+  /** Background fill token for the header row. No default — opt-in only. */
+  headerBgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -116,10 +119,12 @@ export function table(options: TableOptions): string {
       const midSep = hLine('\u251c', '\u253c', '\u2524');
       const bottom = hLine('\u2514', '\u2534', '\u2518');
 
+      const hdrBgFill = makeBgFill(options.headerBgToken, ctx);
       const headerCells = columns.map((col, i) =>
         ' ' + padRight(ctx.style.styled(headerToken, col.header ?? ''), colWidths[i]!) + ' ',
       );
-      const headerRow = bc(v) + headerCells.join(bc(v)) + bc(v);
+      const rawHeaderRow = bc(v) + headerCells.join(bc(v)) + bc(v);
+      const headerRow = hdrBgFill ? hdrBgFill(rawHeaderRow) : rawHeaderRow;
 
       const dataRows = rows.map((row) => {
         const cells = colWidths.map((w, i) => ' ' + padRight(row[i] ?? '', w) + ' ');

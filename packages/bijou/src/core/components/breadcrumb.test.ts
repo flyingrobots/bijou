@@ -50,4 +50,31 @@ describe('breadcrumb', () => {
     const result = breadcrumb(['Home', 'About'], { ctx });
     expect(result).toBe('Home > About');
   });
+
+  describe('background fill', () => {
+    it('applies currentBgToken on last segment', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = breadcrumb(items, { currentBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Profile');
+      expect(result).toContain('›');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = breadcrumb(items, { ctx });
+      expect(result).toContain('Profile');
+    });
+
+    it('skips currentBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = breadcrumb(items, { currentBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toBe('Home > Settings > Profile');
+    });
+
+    it('skips currentBgToken when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = breadcrumb(items, { currentBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Profile');
+    });
+  });
 });

@@ -1,6 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Represent a single step in a multi-step process. */
 export interface StepperStep {
@@ -12,6 +14,8 @@ export interface StepperStep {
 export interface StepperOptions {
   /** Zero-based index of the current (active) step. */
   current: number;
+  /** Background fill token for the active step indicator. No default — opt-in only. */
+  activeBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
@@ -53,6 +57,7 @@ export function stepper(steps: StepperStep[], options: StepperOptions): string {
     interactive: () => {
       // interactive + static
       const connector = ctx.style.styled(ctx.semantic('muted'), '──');
+      const bgFill = makeBgFill(options.activeBgToken, ctx);
       return steps
         .map((step, i) => {
           if (i < current) {
@@ -62,7 +67,8 @@ export function stepper(steps: StepperStep[], options: StepperOptions): string {
           if (i === current) {
             const token = ctx.semantic('primary');
             const boldToken = { hex: token.hex, modifiers: [...(token.modifiers ?? []), 'bold' as const] };
-            return `${ctx.style.styled(token, '●')} ${ctx.style.styled(boldToken, step.label)}`;
+            const text = `${ctx.style.styled(token, '●')} ${ctx.style.styled(boldToken, step.label)}`;
+            return bgFill ? bgFill(` ${text} `) : text;
           }
           const token = ctx.semantic('muted');
           return `${ctx.style.styled(token, '○')} ${ctx.style.styled(token, step.label)}`;

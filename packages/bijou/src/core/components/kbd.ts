@@ -1,9 +1,13 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Configuration for rendering a keyboard shortcut indicator. */
 export interface KbdOptions {
+  /** Background fill token for the key cap. Defaults to `surface.muted`. */
+  bgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -29,8 +33,10 @@ export function kbd(key: string, options: KbdOptions = {}): string {
     interactive: () => {
       const borderToken = ctx.border('muted');
       const boldKey = ctx.style.bold(key);
+      const bgFill = makeBgFill(options.bgToken ?? ctx.surface('muted'), ctx);
 
-      return ctx.style.styled(borderToken, '[') + ' ' + boldKey + ' ' + ctx.style.styled(borderToken, ']');
+      const inner = ctx.style.styled(borderToken, '[') + ' ' + boldKey + ' ' + ctx.style.styled(borderToken, ']');
+      return bgFill ? bgFill(inner) : inner;
     },
   }, options);
 }

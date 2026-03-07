@@ -1,11 +1,15 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Configuration options for the {@link breadcrumb} component. */
 export interface BreadcrumbOptions {
   /** Custom separator between breadcrumb segments. Defaults to `' > '` (pipe) or `' › '` (rich). */
   separator?: string;
+  /** Background fill token for the current (last) breadcrumb segment. No default — opt-in only. */
+  currentBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
@@ -37,12 +41,14 @@ export function breadcrumb(items: string[], options: BreadcrumbOptions = {}): st
     interactive: () => {
       const sep = options.separator ?? ' › ';
       const last = items.length - 1;
+      const bgFill = makeBgFill(options.currentBgToken, ctx);
       return items
         .map((item, i) => {
           if (i === last) {
             const token = ctx.semantic('primary');
             const boldToken = { hex: token.hex, modifiers: [...(token.modifiers ?? []), 'bold' as const] };
-            return ctx.style.styled(boldToken, item);
+            const text = ctx.style.styled(boldToken, item);
+            return bgFill ? bgFill(` ${text} `) : text;
           }
           return ctx.style.styled(ctx.semantic('muted'), item);
         })

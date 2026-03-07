@@ -65,4 +65,32 @@ describe('accordion', () => {
     const result = accordion(multi, { ctx });
     expect(result).toContain('  line1\n  line2');
   });
+
+  describe('background fill', () => {
+    it('applies headerBgToken when provided', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Section A');
+      expect(result).toContain('▼');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = accordion(sections, { ctx });
+      expect(result).toContain('Section A');
+      expect(result).toContain('▼');
+    });
+
+    it('skips headerBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('# Section A');
+    });
+
+    it('skips headerBgToken when noColor is true', () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true });
+      const result = accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('Section A');
+    });
+  });
 });
