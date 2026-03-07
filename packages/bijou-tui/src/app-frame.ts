@@ -17,6 +17,8 @@ import type { App, Cmd, KeyMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg, QUIT } from './types.js';
 import type { Overlay } from './overlay.js';
 import { composite, modal } from './overlay.js';
+import type { TransitionShaderFn } from './transition-shaders.js';
+import { type BuiltinTransition, TRANSITION_SHADERS } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import {
   commandPalette,
@@ -47,8 +49,7 @@ import {
 import { splitPane, splitPaneLayout, type SplitPaneDirection, type SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
 import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
-import { animate } from './animate.js';
-import { EASINGS, type EasingFn } from './spring.js';
+import { EASINGS } from './spring.js';
 import { timeline, type Timeline, type TimelineState } from './timeline.js';
 
 /** Page declaration consumed by {@link createFramedApp}. */
@@ -118,8 +119,8 @@ export interface FrameOverlayContext<PageModel> {
   readonly screenRect: LayoutRect;
 }
 
-/** Page transition styles. */
-export type PageTransition = 'none' | 'wipe' | 'dissolve' | 'grid' | 'fade' | 'melt' | 'matrix' | 'scramble';
+/** Page transition styles — a built-in name or a custom shader function. */
+export type PageTransition = BuiltinTransition | TransitionShaderFn;
 
 /** `createFramedApp()` options. */
 export interface CreateFramedAppOptions<PageModel, Msg> {
@@ -353,7 +354,7 @@ export function createFramedApp<PageModel, Msg>(
             // Step from init to current elapsed time (tweens are deterministic)
             const state = model.transitionTimeline.step(model.transitionTimeline.init(), elapsedSec);
             const vals = model.transitionTimeline.values(state);
-            const progress = Math.min(1, Math.max(0, vals.progress ?? action.progress));
+            const progress = Math.min(1, Math.max(0, vals['progress'] ?? action.progress));
 
             if (model.transitionTimeline.done(state) || progress >= 1) {
               return [{
@@ -1333,6 +1334,9 @@ function renderTransition(
   height: number,
   ctx: BijouContext,
 ): string {
+  const shader = typeof style === 'function' ? style : TRANSITION_SHADERS[style];
+  if (!shader) return next;
+
   const prevGrid = stringToGrid(prev, width, height);
   const nextGrid = stringToGrid(next, width, height);
   const lines: string[] = [];
@@ -1344,66 +1348,9 @@ function renderTransition(
       const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
       const rand = seed - Math.floor(seed);
 
-      let showNext = false;
-      let charOverride: string | undefined;
-
-      switch (style) {
-        case 'wipe':
-          showNext = x / width < progress;
-          break;
-
-        case 'dissolve':
-          showNext = rand < progress;
-          break;
-
-        case 'grid': {
-          const gx = Math.floor(x / 8);
-          const gy = Math.floor(y / 4);
-          showNext = ((gx + gy) % 10) / 10 < progress;
-          break;
-        }
-
-        case 'fade':
-          showNext = progress > 0.5;
-          break;
-
-        case 'melt': {
-          const variability = (Math.sin(x * 0.7) * 0.5 + 0.5) * 0.4;
-          const dropStart = progress * 1.4 - variability;
-          showNext = y / height < dropStart;
-          break;
-        }
-
-        case 'matrix': {
-          const threshold = progress;
-          const edge = 0.1;
-          if (rand < threshold) {
-            showNext = true;
-          } else if (rand < threshold + edge) {
-            const chars = '01$#@%&*';
-            const char = chars[Math.floor(rand * 100) % chars.length]!;
-            charOverride = ctx.style.styled(ctx.status('success'), char);
-          } else {
-            showNext = false;
-          }
-          break;
-        }
-
-        case 'scramble': {
-          const scrambleAmount = 1 - Math.abs(progress - 0.5) * 2;
-          if (rand < scrambleAmount * 0.8) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-            const char = chars[Math.floor(rand * 1000) % chars.length]!;
-            charOverride = ctx.style.styled(ctx.semantic('muted'), char);
-          } else {
-            showNext = progress > 0.5;
-          }
-          break;
-        }
-
-        default:
-          showNext = progress >= 1;
-      }
+      const result = shader({ x, y, width, height, progress, rand, ctx });
+      const showNext = result.showNext;
+      const charOverride = result.char;
 
       if (charOverride !== undefined) {
         line += charOverride;

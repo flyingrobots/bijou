@@ -89,6 +89,22 @@ export {
   createFramedApp,
 } from './app-frame.js';
 
+// Transition shaders
+export {
+  type TransitionCell,
+  type TransitionResult,
+  type TransitionShaderFn,
+  type BuiltinTransition,
+  wipeShader,
+  dissolveShader,
+  gridShader,
+  fadeShader,
+  meltShader,
+  matrixShader,
+  scrambleShader,
+  TRANSITION_SHADERS,
+} from './transition-shaders.js';
+
 // Status bar
 export { statusBar } from './status-bar.js';
 export type { StatusBarOptions } from './status-bar.js';

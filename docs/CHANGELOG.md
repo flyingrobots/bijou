@@ -15,6 +15,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ♻️ Refactors
 
+- **Transition shader system (bijou-tui)** — extracted 7 hardcoded transition effects from `renderTransition()` into composable pure functions (`TransitionShaderFn`). `PageTransition` now accepts custom shader functions alongside built-in names, enabling user-authored spatial blend algorithms.
 - **Mode rendering strategy (OCP)** — implemented `renderByMode` dispatcher pattern to replace repetitive `if (mode === …)` chains; migrated all core components to use the new registry pattern for cleaner mode-specific rendering.
 - **Decentralized theme access (DIP)** — added `semantic()`, `border()`, `surface()`, `status()`, and `ui()` helpers to `BijouContext`; components now look up tokens via these semantic methods instead of reaching into the deep `ctx.theme.theme` object structure.
 - **Form components consistency** — refactored `select()`, `multiselect()`, and `filter()` to use new semantic context helpers and the `renderByMode` dispatcher.
