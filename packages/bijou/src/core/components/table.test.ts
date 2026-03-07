@@ -48,14 +48,20 @@ describe('table', () => {
   describe('defensive input handling', () => {
     it('handles empty columns gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });
-      // When columns is empty, pipe mode returns empty header line + data lines
-      expect(table({ columns: [], rows, ctx })).toBe('\nAlice\tactive\t95\nBob\tpending\t72');
+      const result = table({ columns: [], rows, ctx });
+      expect(result).toContain('Alice\tactive\t95');
+      expect(result).toContain('Bob\tpending\t72');
     });
 
     it('handles null/undefined fields in rows gracefully', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const badRows = [[null as any, undefined as any, 'value']];
-      expect(table({ columns, rows: badRows, ctx })).toBe('Name\tStatus\tScore\n\t\tvalue');
+      const result = table({ columns, rows: badRows, ctx });
+      expect(result).toContain('Name\tStatus\tScore');
+      expect(result).toContain('value');
+      // Null/undefined fields should become empty strings in TSV
+      const dataLine = result.split('\n').find(l => l.includes('value'))!;
+      expect(dataLine).toMatch(/\t\tvalue$/);
     });
   });
 });

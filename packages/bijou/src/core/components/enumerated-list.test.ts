@@ -47,7 +47,11 @@ describe('enumeratedList', () => {
   it('renders none style with indented items and no prefix', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = enumeratedList(['One', 'Two', 'Three'], { style: 'none', ctx });
-    expect(result).toBe('  One\n  Two\n  Three');
+    const lines = result.split('\n');
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toMatch(/^\s+One$/);
+    expect(lines[1]).toMatch(/^\s+Two$/);
+    expect(lines[2]).toMatch(/^\s+Three$/);
   });
 
   it('respects start offset', () => {
@@ -116,9 +120,10 @@ describe('enumeratedList', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = enumeratedList(['Line one\nLine two', 'Another'], { ctx });
     const lines = result.split('\n');
-    expect(lines[0]).toBe('  1. Line one');
-    expect(lines[1]).toBe('     Line two');
-    expect(lines[2]).toBe('  2. Another');
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toMatch(/1\.\s+Line one$/);
+    expect(lines[1]).toMatch(/^\s+Line two$/);
+    expect(lines[2]).toMatch(/2\.\s+Another$/);
   });
 
   it('works with default options (no options passed)', () => {

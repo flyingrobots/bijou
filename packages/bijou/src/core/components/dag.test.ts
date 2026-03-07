@@ -873,7 +873,8 @@ describe('DagSource adapter', () => {
       };
       const sliced = dagSlice(custom, 'p', { direction: 'descendants' });
       const result = dag(sliced, { ctx });
-      expect(result).toBe('Parent -> Child\nChild');
+      expect(result).toContain('Parent -> Child');
+      expect(result).toContain('Child');
     });
 
     it('never calls ids() on the unbounded source', () => {

@@ -10,6 +10,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`gradient()` theme accessor** — `ctx.gradient(key)` returns `GradientStop[]` for any named gradient, completing the theme accessor API (`semantic`, `border`, `surface`, `status`, `ui`, `gradient`).
 
+### 🧪 Tests
+
+- **Relaxed brittle multiline assertions** — Replaced exact multiline `toBe()` assertions with `toMatch()`/`toContain()` + per-line checks in `table.test.ts`, `enumerated-list.test.ts`, `tree.test.ts`, and `dag.test.ts`. Tests now verify content and structure without breaking on whitespace changes.
+
 ### ♻️ Refactors
 
 - **Migrated remaining direct theme accesses** — `textarea-editor.ts`, `progress.ts`, and `overlay.test.ts` now use `ctx.semantic()`, `ctx.gradient()`, and `ctx.border()` accessors instead of reaching into `ctx.theme.theme.*` directly. All source-level direct theme access is eliminated.
