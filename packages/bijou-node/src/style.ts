@@ -43,6 +43,15 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
    * @param modifiers - Optional array of modifier names from a {@link TokenValue}.
    * @returns The chalk instance with all modifiers applied.
    */
+  /** SGR codes for underline variants (not supported by chalk natively). */
+  const UNDERLINE_VARIANT_SGR: Record<string, string> = {
+    'curly-underline': '\x1b[4:3m',
+    'dotted-underline': '\x1b[4:4m',
+    'dashed-underline': '\x1b[4:5m',
+  };
+  /** SGR 24 resets underline. */
+  const UNDERLINE_RESET = '\x1b[24m';
+
   function applyModifiers(c: ChalkInstance, modifiers?: TokenValue['modifiers']): ChalkInstance {
     if (modifiers === undefined) return c;
     let result = c;
@@ -52,10 +61,31 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
         case 'dim':           result = result.dim; break;
         case 'strikethrough': result = result.strikethrough; break;
         case 'inverse':       result = result.inverse; break;
+        case 'underline':     result = result.underline; break;
+        // Underline variants are handled after chalk styling via raw SGR wrapping
+        case 'curly-underline':
+        case 'dotted-underline':
+        case 'dashed-underline': break;
         default: {
           const _exhaustive: never = mod;
           void _exhaustive;
         }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Wrap text with raw SGR sequences for underline variants that chalk
+   * doesn't support natively. Called after chalk styling is applied.
+   */
+  function applyUnderlineVariants(text: string, modifiers?: TokenValue['modifiers']): string {
+    if (modifiers === undefined) return text;
+    let result = text;
+    for (const mod of modifiers) {
+      const sgr = UNDERLINE_VARIANT_SGR[mod];
+      if (sgr) {
+        result = sgr + result + UNDERLINE_RESET;
       }
     }
     return result;
@@ -73,6 +103,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
       if (isNoColor) return text;
       const base: ChalkInstance = instance.hex(token.hex);
       let result = applyModifiers(base, token.modifiers)(text);
+      result = applyUnderlineVariants(result, token.modifiers);
       // Note: bg is applied unconditionally when noColor is false.
       // Callers (e.g. makeBgFill, box, flex) are responsible for
       // stripping token.bg in pipe/accessible/noColor modes.

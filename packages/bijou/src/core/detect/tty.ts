@@ -12,6 +12,16 @@
 import type { RuntimePort } from '../../ports/runtime.js';
 
 /**
+ * Build an environment variable accessor from a runtime port.
+ * Falls back to `process.env` when no runtime is provided.
+ */
+function envAccessor(runtime?: RuntimePort): (key: string) => string | undefined {
+  return runtime
+    ? (key: string) => runtime.env(key)
+    : (key: string) => process.env[key];
+}
+
+/**
  * Terminal output mode.
  *
  * - `'interactive'` — full TUI experience with cursor movement and animation.
@@ -31,9 +41,7 @@ export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
  * @returns The detected {@link OutputMode}.
  */
 export function detectOutputMode(runtime?: RuntimePort): OutputMode {
-  const env = runtime
-    ? (key: string) => runtime.env(key)
-    : (key: string) => process.env[key];
+  const env = envAccessor(runtime);
   const stdoutIsTTY = runtime?.stdoutIsTTY ?? (process.stdout.isTTY === true);
 
   if (env('BIJOU_ACCESSIBLE') === '1') return 'accessible';
@@ -67,9 +75,8 @@ export type ColorScheme = 'light' | 'dark';
  * @returns The detected {@link ColorScheme}. Defaults to `'dark'`.
  */
 export function detectColorScheme(runtime?: RuntimePort): ColorScheme {
-  const raw = runtime
-    ? runtime.env('COLORFGBG')
-    : process.env['COLORFGBG'];
+  const env = envAccessor(runtime);
+  const raw = env('COLORFGBG');
 
   if (raw === undefined) return 'dark';
 

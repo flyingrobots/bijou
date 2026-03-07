@@ -44,6 +44,36 @@ export function parseKey(raw: string): KeyMsg {
   if (raw === '\x1b[5~') return keyMsg('pageup');
   if (raw === '\x1b[6~') return keyMsg('pagedown');
 
+  // F-keys: CSI ~ encoding (F1–F12)
+  const csiTilde = CSI_TILDE_RE.exec(raw);
+  if (csiTilde) {
+    const code = csiTilde[1]!;
+    const modifier = csiTilde[2] ? parseInt(csiTilde[2], 10) : 0;
+    const fkey = CSI_FKEY_MAP[code];
+    if (fkey) {
+      const [shift, alt, ctrl] = decodeModifier(modifier);
+      return keyMsg(fkey, ctrl, alt, shift);
+    }
+  }
+
+  // F-keys: SS3 encoding (F1–F4)
+  const ss3 = SS3_FKEY_RE.exec(raw);
+  if (ss3) {
+    const fkey = SS3_FKEY_MAP[ss3[1]!];
+    if (fkey) return keyMsg(fkey);
+  }
+
+  // F-keys: CSI 1;modifier P/Q/R/S encoding (modified F1–F4)
+  const csiMod = CSI_MOD_FKEY_RE.exec(raw);
+  if (csiMod) {
+    const modifier = parseInt(csiMod[1]!, 10);
+    const fkey = SS3_FKEY_MAP[csiMod[2]!];
+    if (fkey) {
+      const [shift, alt, ctrl] = decodeModifier(modifier);
+      return keyMsg(fkey, ctrl, alt, shift);
+    }
+  }
+
   // Enter, tab, backspace, space, escape
   if (raw === '\r' || raw === '\n') return keyMsg('enter');
   if (raw === '\t') return keyMsg('tab');
@@ -79,6 +109,41 @@ export function parseKey(raw: string): KeyMsg {
   }
 
   return keyMsg('unknown');
+}
+
+// ── F-key lookup tables ─────────────────────────────────────────────
+
+/** CSI `code~` and `code;modifier~` pattern. Groups: code, optional modifier. */
+const CSI_TILDE_RE = /^\x1b\[(\d+)(?:;(\d+))?~$/;
+
+/** CSI `1;modifier[PQRS]` pattern for modified F1–F4. Groups: modifier, letter. */
+const CSI_MOD_FKEY_RE = /^\x1b\[1;(\d+)([PQRS])$/;
+
+/** SS3 `\x1bO[PQRS]` pattern for unmodified F1–F4. Group: letter. */
+const SS3_FKEY_RE = /^\x1bO([PQRS])$/;
+
+/** Map CSI tilde code → F-key name. */
+const CSI_FKEY_MAP: Record<string, string> = {
+  '11': 'f1', '12': 'f2', '13': 'f3', '14': 'f4',
+  '15': 'f5', '17': 'f6', '18': 'f7', '19': 'f8',
+  '20': 'f9', '21': 'f10', '23': 'f11', '24': 'f12',
+};
+
+/** Map SS3 / CSI letter → F-key name. */
+const SS3_FKEY_MAP: Record<string, string> = {
+  'P': 'f1', 'Q': 'f2', 'R': 'f3', 'S': 'f4',
+};
+
+/**
+ * Decode xterm modifier parameter to `[shift, alt, ctrl]`.
+ *
+ * Modifier encoding: value = 1 + (shift ? 1 : 0) + (alt ? 2 : 0) + (ctrl ? 4 : 0).
+ * A value of 0 means no modifier parameter was present.
+ */
+function decodeModifier(modifier: number): [boolean, boolean, boolean] {
+  if (modifier <= 1) return [false, false, false];
+  const bits = modifier - 1;
+  return [(bits & 1) !== 0, (bits & 2) !== 0, (bits & 4) !== 0];
 }
 
 /** Regular expression matching SGR extended mouse sequences: `ESC [ < button ; col ; row M/m`. */

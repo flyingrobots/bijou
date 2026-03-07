@@ -17,7 +17,8 @@ export interface GradientStop {
 }
 
 /** Supported text style modifiers that can be applied alongside a color. */
-export type TextModifier = 'bold' | 'dim' | 'strikethrough' | 'inverse';
+export type TextModifier = 'bold' | 'dim' | 'strikethrough' | 'inverse'
+  | 'underline' | 'curly-underline' | 'dotted-underline' | 'dashed-underline';
 
 /** A theme token value: a hex color with optional text modifiers. */
 export interface TokenValue {
