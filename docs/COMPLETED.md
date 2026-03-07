@@ -4,6 +4,14 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.6.0 — Terminal Whisperer + Test Audit
+
+- **Completed:** 2026-03-07
+- **Summary:** F-key parsing (F1–F12, CSI + SS3 encodings, modifier combos), cursor manager (DECSCUSR block/underline/bar with blink), underline text variants (standard, curly, dotted, dashed via SGR 4:x), `detectColorScheme` env accessor refactor. Test audit: 24 new tests filling coverage gaps across forms, test adapters, DTCG, and chalk adapter.
+- **Ref:** v1.6.0, branch `feat/v1.6.0-app-shell-primitives`
+
+---
+
 ## v1.5.0 — Polish & Patterns
 
 - **Completed:** 2026-03-07

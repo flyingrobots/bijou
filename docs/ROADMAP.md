@@ -2,14 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.5.0** — Polish & Patterns
-
-**In progress: v1.6.0 — Terminal Whisperer + Test Audit**
-- Parse F-keys (F1–F12) in `parseKey()`
-- Cursor manager (shape/style control)
-- Underline variants (standard, curly, dotted, dashed)
-- `detectColorScheme` env accessor refactor
-- Test hardening pass against acceptance criteria (sections 1–6 below)
+Latest: **v1.6.0** — Terminal Whisperer + Test Audit
 
 ---
 
@@ -19,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
 | v1.5.0 | Polish & Patterns | Mode rendering (OCP), test hardening, theme accessors (DIP), style pass (bg support for 7 components) |
 | v1.4.0 | Transitions & Showcase | Tab transition animations (7 shaders), interactive showcase app, scrollable multiselect |
 | v1.3.0 | App Shell Foundations | `splitPane()`, `grid()`, `createFramedApp()`, drawer expansion, scrollable `select()`, `bijou-tui-app`, `create-bijou-tui-app` |
@@ -56,19 +50,15 @@ Each new component should follow this template before implementation:
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **Timer / Stopwatch** | bijou | Countdown and elapsed-time display components. |
-| **Cursor manager** | bijou-tui | Cursor style/blink management. |
-| **Underline variants** | bijou | Curly, dotted, dashed underlines. |
 | **MaxWidth / MaxHeight** | bijou | Truncation constraints on styled blocks. |
 | **Dynamic forms** | bijou | Fields that change based on previous input values. |
 | **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
 | **Note field** | bijou | Display-only text within a form flow. |
-| **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
 | **Dockable panel manager (drag + keyboard move)** | bijou-tui | Reorder and dock panes in `splitPane()`/`grid()` layouts via mouse drag (when enabled) plus keyboard fallback. Persist layout map in app state. In-process only (no cross-terminal pop-out). |
 | **Panel minimize/fold/unfold** | bijou-tui | Per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
 | **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
 | **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
-| **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 
 ---
 

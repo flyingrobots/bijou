@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
+## [1.6.0] - 2026-03-07
+
+### ✨ Features
+
+- **F-key parsing (bijou-tui)** — `parseKey()` now recognizes F1–F12 via CSI `~` encoding (`\x1b[11~`–`\x1b[24~`) and SS3 encoding (`\x1bOP`–`\x1bOS`). Supports Shift/Ctrl/Alt modifier combinations via `\x1b[1;{mod}P` and `\x1b[{code};{mod}~` sequences.
+- **Cursor manager (bijou-tui)** — `setCursorStyle(io, shape, { blink })` and `resetCursorStyle(io)` for DECSCUSR cursor shape control. Three shapes (`'block'`, `'underline'`, `'bar'`) with optional blink. Constants: `CURSOR_BLOCK`, `CURSOR_UNDERLINE`, `CURSOR_BAR`, `CURSOR_RESET`.
+- **Underline text variants (bijou core + bijou-node)** — `TextModifier` expanded with `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'`. Chalk adapter applies standard underline via chalk and variants via raw SGR 4:3/4:4/4:5 sequences. Graceful degradation in unsupporting terminals.
+
+### ♻️ Refactors
+
+- **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.
+
+### 🧪 Tests
+
+- **Test audit** — 24 new tests filling coverage gaps identified against acceptance criteria specs:
+  - Form functions: confirm rich mode (y/Y/yes/n/N/no, invalid input, accessible mode), input (trimming, required, validator, noColor, ctx)
+  - Test adapters: plainStyle `bgRgb()`/`bgHex()`, createTestContext theme accessor verification
+  - DTCG: surface group defaults, partial group token fill
+  - Chalk adapter: underline and variant modifier coverage
+
+### 📝 Documentation
+
+- **Roadmap cleanup** — moved shipped Phases 1–9 and P0–P2.5 backlog to `docs/COMPLETED.md`. Roadmap now contains only P3 backlog, test coverage specs, and Xyph migration plan.
+
 ## [1.5.0] - 2026-03-07
 
 ### ✨ Features
