@@ -151,11 +151,13 @@ function createCategoryPage(
 
     init() {
       const listState = createBrowsableListState({ items, height: 40 });
+      const gen = 1;
       const model: ShowcasePageModel = {
         listState,
         quitConfirmOpen: false,
         drawerOpen: isFirstPage,
         drawerProgress: 0,
+        drawerAnimGen: gen,
       };
       const cmds: ReturnType<typeof animate<ShowcaseMsg>>[] = [];
       if (isFirstPage) {
@@ -163,7 +165,7 @@ function createCategoryPage(
           from: 0,
           to: 1,
           spring: 'default',
-          onFrame: (value) => ({ type: 'drawer-progress', value }),
+          onFrame: (value) => ({ type: 'drawer-progress', value, gen }),
         }));
       }
       return [model, cmds];
@@ -199,22 +201,37 @@ function createCategoryPage(
         case 'request-quit':
           return [{ ...model, quitConfirmOpen: true }, []];
         case 'cancel-quit':
+          // Close drawer if open, otherwise no-op
+          if (model.drawerOpen) {
+            const nextGen = model.drawerAnimGen + 1;
+            return [{ ...model, drawerOpen: false, drawerAnimGen: nextGen }, [
+              animate<ShowcaseMsg>({
+                from: model.drawerProgress,
+                to: 0,
+                spring: 'default',
+                onFrame: (value) => ({ type: 'drawer-progress', value, gen: nextGen }),
+              }),
+            ]];
+          }
           return [model, []];
         case 'confirm-quit':
           return [model, []];
         case 'toggle-drawer': {
           const drawerOpen = !model.drawerOpen;
           const target = drawerOpen ? 1 : 0;
-          return [{ ...model, drawerOpen }, [
+          const nextGen = model.drawerAnimGen + 1;
+          return [{ ...model, drawerOpen, drawerAnimGen: nextGen }, [
             animate<ShowcaseMsg>({
               from: model.drawerProgress,
               to: target,
               spring: 'default',
-              onFrame: (value) => ({ type: 'drawer-progress', value }),
+              onFrame: (value) => ({ type: 'drawer-progress', value, gen: nextGen }),
             }),
           ]];
         }
         case 'drawer-progress':
+          // Ignore stale frames from superseded animations
+          if (msg.gen !== model.drawerAnimGen) return [model, []];
           return [{ ...model, drawerProgress: clamp01(msg.value) }, []];
         case 'force-quit':
           return [model, [quit()]];
@@ -275,7 +292,7 @@ export function createShowcaseApp(
       .group('App', (g) => g
         .bind('q', 'Quit (confirm)', { type: 'request-quit' })
         .bind('ctrl+c', 'Force quit', { type: 'force-quit' })
-        .bind('escape', 'Cancel / Quit', { type: 'request-quit' })
+        .bind('escape', 'Cancel / Close', { type: 'cancel-quit' })
         .bind('enter', 'Confirm quit', { type: 'confirm-quit' })
         .bind('o', 'Toggle welcome drawer', { type: 'toggle-drawer' }),
       ),

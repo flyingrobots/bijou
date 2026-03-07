@@ -25,6 +25,8 @@ export interface ShowcasePageModel {
   readonly quitConfirmOpen: boolean;
   readonly drawerOpen: boolean;
   readonly drawerProgress: number;
+  /** Monotonic counter — only accept drawer-progress msgs matching the latest gen. */
+  readonly drawerAnimGen: number;
 }
 
 /** Messages dispatched by the showcase app. */
@@ -38,4 +40,4 @@ export type ShowcaseMsg =
   | { type: 'cancel-quit' }
   | { type: 'force-quit' }
   | { type: 'toggle-drawer' }
-  | { type: 'drawer-progress'; value: number };
+  | { type: 'drawer-progress'; value: number; gen: number };
