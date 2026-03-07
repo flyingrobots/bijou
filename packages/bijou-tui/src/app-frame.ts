@@ -48,7 +48,8 @@ import { splitPane, splitPaneLayout, type SplitPaneDirection, type SplitPaneStat
 import type { LayoutRect } from './layout-rect.js';
 import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
 import { animate } from './animate.js';
-import { EASINGS } from './spring.js';
+import { EASINGS, type EasingFn } from './spring.js';
+import { timeline, type Timeline, type TimelineState } from './timeline.js';
 
 /** Page declaration consumed by {@link createFramedApp}. */
 export interface FramePage<PageModel, Msg> {
@@ -180,6 +181,12 @@ export interface FrameModel<PageModel> {
   readonly transitionProgress: number;
   /** Currently active transition style. */
   readonly activeTransition?: PageTransition;
+  /** Wall-clock start time of the active transition (ms since epoch). */
+  readonly transitionStartMs?: number;
+  /** Compiled timeline driving the active transition. */
+  readonly transitionTimeline?: Timeline;
+  /** Timeline state for the active transition. */
+  readonly transitionTimelineState?: TimelineState;
 }
 
 interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
@@ -315,10 +322,46 @@ export function createFramedApp<PageModel, Msg>(
       if (isFrameScopedMsg(msg)) {
         const action = msg.action;
         if (action.type === 'transition') {
+          // Advance timeline using wall-clock elapsed time
+          if (model.transitionTimeline && model.transitionTimelineState && model.transitionStartMs != null) {
+            const elapsedMs = Date.now() - model.transitionStartMs;
+            const elapsedSec = Math.max(0, elapsedMs / 1000);
+            // Step from init to current elapsed time (tweens are deterministic)
+            const state = model.transitionTimeline.step(model.transitionTimeline.init(), elapsedSec);
+            const vals = model.transitionTimeline.values(state);
+            const progress = Math.min(1, Math.max(0, vals.progress ?? action.progress));
+
+            if (model.transitionTimeline.done(state) || progress >= 1) {
+              return [{
+                ...model,
+                transitionProgress: 1,
+                previousPageId: undefined,
+                activeTransition: undefined,
+                transitionStartMs: undefined,
+                transitionTimeline: undefined,
+                transitionTimelineState: undefined,
+              }, []];
+            }
+
+            return [{
+              ...model,
+              transitionProgress: progress,
+              transitionTimelineState: state,
+            }, []];
+          }
+          // Fallback for non-timeline transitions (backward compat)
           return [{ ...model, transitionProgress: action.progress }, []];
         }
         if (action.type === 'transition-complete') {
-          return [{ ...model, transitionProgress: 1, previousPageId: undefined, activeTransition: undefined }, []];
+          return [{
+            ...model,
+            transitionProgress: 1,
+            previousPageId: undefined,
+            activeTransition: undefined,
+            transitionStartMs: undefined,
+            transitionTimeline: undefined,
+            transitionTimelineState: undefined,
+          }, []];
         }
         return applyFrameAction(action, model, frameKeys, options, pagesById);
       }
@@ -581,24 +624,37 @@ function switchTab<PageModel, Msg>(
     ? options.transitionOverride(activePageModel)
     : options.transition;
 
+  const durationMs = options.transitionDuration ?? 300;
+  const hasTransition = activeTransition != null && activeTransition !== 'none';
+
+  // Build a timeline to drive the transition — time-based, not tick-based.
+  const tl = hasTransition
+    ? timeline()
+      .add('progress', {
+        type: 'tween',
+        from: 0,
+        to: 1,
+        duration: durationMs,
+        ease: EASINGS.easeInOutCubic,
+      })
+      .build()
+    : undefined;
+
   const nextModel = syncPageFrameState({
     ...model,
     activePageId: nextId,
     previousPageId: model.activePageId,
     activeTransition,
-    transitionProgress: activeTransition && activeTransition !== 'none' ? 0 : 1,
+    transitionProgress: hasTransition ? 0 : 1,
+    transitionStartMs: hasTransition ? Date.now() : undefined,
+    transitionTimeline: tl,
+    transitionTimelineState: tl?.init(),
   }, nextId, pagesById);
 
-  if (activeTransition && activeTransition !== 'none') {
-    const cmd: Cmd<Msg> = animate({
-      type: 'tween',
-      from: 0,
-      to: 1,
-      duration: options.transitionDuration ?? 300,
-      ease: EASINGS.easeInOutCubic,
-      onFrame: (v) => wrapFrameMsg({ type: 'transition', progress: v } as FrameAction) as unknown as Msg,
-      onComplete: () => wrapFrameMsg({ type: 'transition-complete' } as FrameAction) as unknown as Msg,
-    });
+  if (hasTransition) {
+    // Schedule render ticks at ~60fps for the duration of the transition.
+    // Each tick advances the timeline using wall-clock elapsed time.
+    const cmd: Cmd<Msg> = createTransitionTickCmd(durationMs);
     return [nextModel, [cmd]];
   }
 
@@ -1180,6 +1236,34 @@ function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
     && value !== null
     && PAGE_MSG_TOKEN in value
     && (value as PageScopedMsg<Msg>)[PAGE_MSG_TOKEN] === true;
+}
+
+/**
+ * Create a TEA command that drives transition re-renders via `setInterval`.
+ *
+ * Each tick emits a frame-scoped 'transition' message. The actual progress
+ * is computed from wall-clock time in the update handler, not from the
+ * interval count. The interval just schedules re-renders.
+ */
+function createTransitionTickCmd<Msg>(durationMs: number): Cmd<Msg> {
+  return (emit) =>
+    new Promise<void>((resolve) => {
+      const startMs = Date.now();
+      const intervalMs = Math.round(1000 / 60);
+
+      const id = setInterval(() => {
+        const elapsed = Date.now() - startMs;
+        const rawProgress = Math.min(1, elapsed / durationMs);
+
+        emit(wrapFrameMsg({ type: 'transition', progress: rawProgress } as FrameAction) as unknown as Msg);
+
+        if (rawProgress >= 1) {
+          clearInterval(id);
+          emit(wrapFrameMsg({ type: 'transition-complete' } as FrameAction) as unknown as Msg);
+          resolve();
+        }
+      }, intervalMs);
+    });
 }
 
 function renderPageContent<PageModel, Msg>(

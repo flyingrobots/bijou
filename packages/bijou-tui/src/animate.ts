@@ -148,10 +148,14 @@ function createSpringCmd<M>(
   return (emit) =>
     new Promise<void>((resolve) => {
       let state = createSpringState(from);
-      const dt = 1 / fps;
       const intervalMs = Math.round(1000 / fps);
+      let lastMs = Date.now();
 
       const id = setInterval(() => {
+        const nowMs = Date.now();
+        const dt = Math.max(0, (nowMs - lastMs) / 1000);
+        lastMs = nowMs;
+
         state = springStep(state, to, config, dt);
         emit(onFrame(state.value));
 
@@ -170,6 +174,10 @@ function createSpringCmd<M>(
 
 /**
  * Build a TEA command that runs a tween animation via `setInterval`.
+ *
+ * Uses wall-clock time (`Date.now()`) to compute actual elapsed time
+ * per frame, so animations run at the correct speed regardless of
+ * timer jitter or system load.
  *
  * @template M - The message type emitted into the TEA update cycle.
  * @param from       - Starting value.
@@ -196,9 +204,14 @@ function createTweenCmd<M>(
     new Promise<void>((resolve) => {
       let state = createTweenState(from);
       const intervalMs = Math.round(1000 / fps);
+      let lastMs = Date.now();
 
       const id = setInterval(() => {
-        state = tweenStep(state, config, intervalMs);
+        const nowMs = Date.now();
+        const dtMs = Math.max(0, nowMs - lastMs);
+        lastMs = nowMs;
+
+        state = tweenStep(state, config, dtMs);
         emit(onFrame(state.value));
 
         if (state.done) {
