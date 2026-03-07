@@ -40,7 +40,7 @@ All packages are versioned in lock-step.
 - **TEA loop**: `run`, `App`, command-driven update/view flow.
 - **Layout**: `flex`, `vstack`, `hstack`, `viewport`, focus-aware panes.
 - **Input and interaction**: keymaps, layered input stack, command palette, file picker, browsable list, navigable table.
-- **Motion**: spring and tween animation, timeline sequencing, high-fidelity terminal transitions (wipe, dissolve, grid, fade).
+- **Motion**: spring and tween animation, timeline sequencing, composable transition shaders (wipe, dissolve, grid, fade, melt, matrix, scramble + custom).
 
 ### Node Adapter (`@flyingrobots/bijou-node`)
 
@@ -191,11 +191,13 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v1.3.0
+## What's New in v1.4.0
 
-- Added app-shell primitives in `@flyingrobots/bijou-tui`, including `splitPane()`, `grid()`, and `createFramedApp()` with pane-scoped overlays.
-- Added two new packages: `@flyingrobots/bijou-tui-app` (framed app skeleton) and `create-bijou-tui-app` (npm scaffolder).
-- Improved interactive behavior across forms/runtime, including `select({ maxVisible })` scrolling and expanded scripted runtime test coverage.
+- **Transition shader system** — page transitions are now composable pure functions (`TransitionShaderFn`). Pass custom shaders or use 7 built-ins: `wipe`, `dissolve`, `grid`, `fade`, `melt`, `matrix`, `scramble`.
+- **Timeline-driven transitions** — `createFramedApp()` accepts a `transitionTimeline` option for spring/tween-based transition control.
+- **Architecture patterns** — `renderByMode` dispatcher (OCP) and `ctx.semantic()`/`ctx.border()` helpers (DIP) simplify component authoring.
+- **Component showcase** — interactive explorer app with 45 components across 4 categories.
+- **Scrollable multiselect** — `multiselect()` now supports `maxVisible` with viewport scrolling.
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
