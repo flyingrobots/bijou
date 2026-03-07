@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
+## [Unreleased]
+
+### ✨ Features
+
+- **`gradient()` theme accessor** — `ctx.gradient(key)` returns `GradientStop[]` for any named gradient, completing the theme accessor API (`semantic`, `border`, `surface`, `status`, `ui`, `gradient`).
+
+### ♻️ Refactors
+
+- **Migrated remaining direct theme accesses** — `textarea-editor.ts`, `progress.ts`, and `overlay.test.ts` now use `ctx.semantic()`, `ctx.gradient()`, and `ctx.border()` accessors instead of reaching into `ctx.theme.theme.*` directly. All source-level direct theme access is eliminated.
+
 ## [1.4.0] - 2026-03-07
 
 ### ✨ Features
