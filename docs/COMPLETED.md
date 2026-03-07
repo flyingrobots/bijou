@@ -12,6 +12,22 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.4.0 — Transitions, Showcase & Architecture
+
+- **Completed:** 2026-03-07
+- **Summary:** Tab transition animations (wipe, dissolve, grid, fade, melt, matrix, scramble) with composable shader system. Interactive component showcase app. Scrollable multiselect viewport. Mode rendering strategy (OCP) and decentralized theme access (DIP) architecture refactors. Transition generation guards for rapid tab switching.
+- **Ref:** v1.4.0, branch `feat/phase-5-7-refactor`
+
+---
+
+## v1.3.0 — App Shell Foundations
+
+- **Completed:** 2026-03-06
+- **Summary:** Phase 8 and 9 complete. `splitPane()` layout primitive with pure state reducers. `grid()` CSS Grid-inspired layout with fixed/fr tracks and named areas. `createFramedApp()` TEA app shell with tabs, pane focus, scroll isolation, help toggle, command palette, and panel-scoped overlays. `drawer()` expanded with top/bottom anchors and region-scoped mounting. Scrollable `select()` with `maxVisible`. `@flyingrobots/bijou-tui-app` batteries-included skeleton and `create-bijou-tui-app` scaffolder.
+- **Ref:** v1.3.0, [PR #31](https://github.com/flyingrobots/bijou/pull/31)
+
+---
+
 ## PR #28 Review Improvements + PR #29 CodeRabbit Fixes
 
 - **Completed:** 2026-03-04

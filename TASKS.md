@@ -1,12 +1,7 @@
-# v1.5.0 — Polish & Patterns
+# Roadmap & Doc Cleanup
 
-All tasks complete. Summary moved to `docs/COMPLETED.md`.
-
-- [x] Add `gradient()` accessor to `BijouContext`
-- [x] Migrate remaining direct theme accesses (textarea-editor, progress, overlay.test)
-- [x] Relax brittle whitespace-sensitive test assertions
-- [x] Style pass: add bg support to alert, kbd, tabs, accordion, table, stepper, breadcrumb
-- [x] Write bg tests for all 7 components (31 new tests)
-- [x] Update ROADMAP — mark Phases 5, 6, 7, 7b complete
-- [x] Version bump to 1.5.0
-- [x] Update CHANGELOG
+- [x] Add v1.3.0 and v1.4.0 entries to `docs/COMPLETED.md`
+- [x] Strip shipped milestones from `docs/ROADMAP.md` (Phases 1–9, P0–P2.5 backlog)
+- [x] Update component catalog to reflect all shipped components
+- [x] Keep P3 backlog, test coverage specs, and Xyph migration in ROADMAP
+- [ ] Commit cleanup
