@@ -592,6 +592,7 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 | **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
+| **Style pass** | bijou | Visual polish sweep across all components. Audit each component for opportunities to use background colors (via `surface` tokens and `bgToken`/`bgHex`), improve default spacing, padding, and border treatments. Goal: every component should look intentionally designed out of the box, not just functional. Leverage the bg infrastructure from Phase 3 (v1.0.0) that most components don't yet use. |
 | ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
 | ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) \| col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
