@@ -145,6 +145,30 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly transitionDuration?: number;
   /** Optional function to determine the transition style dynamically. */
   readonly transitionOverride?: (model: PageModel) => PageTransition;
+  /**
+   * Optional compiled timeline that drives the transition animation.
+   *
+   * Must contain a `'progress'` track that tweens from 0 to 1.
+   * When provided, replaces the default ease/duration with whatever
+   * the timeline defines — springs, multi-track orchestration, etc.
+   *
+   * ```ts
+   * import { timeline, EASINGS } from '@flyingrobots/bijou-tui';
+   *
+   * createFramedApp({
+   *   transition: 'melt',
+   *   transitionTimeline: timeline()
+   *     .add('progress', {
+   *       type: 'tween',
+   *       from: 0, to: 1,
+   *       duration: 600,
+   *       ease: EASINGS.easeInOutCubic,
+   *     })
+   *     .build(),
+   * });
+   * ```
+   */
+  readonly transitionTimeline?: Timeline;
 }
 
 /** Stored pane scroll coordinates. */
@@ -624,21 +648,23 @@ function switchTab<PageModel, Msg>(
     ? options.transitionOverride(activePageModel)
     : options.transition;
 
-  const durationMs = options.transitionDuration ?? 300;
   const hasTransition = activeTransition != null && activeTransition !== 'none';
 
-  // Build a timeline to drive the transition — time-based, not tick-based.
+  // Use the user-supplied timeline if provided, otherwise build a default.
+  // The timeline MUST contain a 'progress' track (0 → 1).
   const tl = hasTransition
-    ? timeline()
+    ? (options.transitionTimeline ?? timeline()
       .add('progress', {
         type: 'tween',
         from: 0,
         to: 1,
-        duration: durationMs,
+        duration: options.transitionDuration ?? 300,
         ease: EASINGS.easeInOutCubic,
       })
-      .build()
+      .build())
     : undefined;
+
+  const durationMs = tl?.estimatedDurationMs ?? options.transitionDuration ?? 300;
 
   const nextModel = syncPageFrameState({
     ...model,

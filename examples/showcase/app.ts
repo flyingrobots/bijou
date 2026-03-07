@@ -7,12 +7,14 @@ import {
   createKeyMap,
   createSplitPaneState,
   drawer,
+  EASINGS,
   listFocusNext,
   listFocusPrev,
   listPageDown,
   listPageUp,
   modal,
   quit,
+  timeline,
   type App,
   type FrameLayoutNode,
   type FrameModel,
@@ -286,8 +288,16 @@ export function createShowcaseApp(
     pages,
     defaultPageId: 'display',
     enableCommandPalette: true,
-    transition: 'fade',
-    transitionDuration: 250,
+    transition: 'dissolve',
+    transitionTimeline: timeline()
+      .add('progress', {
+        type: 'tween',
+        from: 0,
+        to: 1,
+        duration: 400,
+        ease: EASINGS.easeInOutCubic,
+      })
+      .build(),
     globalKeys: createKeyMap<ShowcaseMsg>()
       .group('App', (g) => g
         .bind('q', 'Quit (confirm)', { type: 'request-quit' })

@@ -9,6 +9,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### ✨ Features
 
 - **Component showcase app** — full-screen interactive explorer (`examples/showcase/`) with 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Each component shows rendered output in rich, pipe, and accessible modes side-by-side. Features animated welcome drawer, tab transitions, command palette, and full keyboard navigation.
+- **Timeline-driven transitions (bijou-tui)** — `createFramedApp()` now accepts a `transitionTimeline` option: a compiled `timeline()` with a `'progress'` track that drives the transition animation. Users can share custom transition definitions with springs, tweens, and easing curves. Transitions are time-based (wall-clock `Date.now()`), not tick-based.
 - **Tab transition animations (bijou-tui)** — implemented `wipe`, `dissolve`, `grid`, `fade`, `melt` (Doom-style), `matrix` (code-leading edge), and `scramble` (noise resolve) transitions in `createFramedApp()`. Transitions are driven by pure TEA state and rendered via high-performance character-grid shaders in `canvas()`.
 - **Scrollable multiselect viewport (bijou core)** — `multiselect()` now supports `maxVisible` in interactive mode with scrolling behavior for long option lists, matching the `select()` and `filter()` components.
 
