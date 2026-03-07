@@ -4,6 +4,14 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.5.0 — Polish & Patterns
+
+- **Completed:** 2026-03-07
+- **Summary:** Completed Phases 5 (mode rendering), 6 (test hardening), 7 (theme accessors), and 7b (style pass). Added `gradient()` accessor to BijouContext, migrated all remaining direct theme accesses to typed accessors, relaxed brittle test assertions, and added background color support to 7 components (alert, kbd, tabs, accordion, table, stepper, breadcrumb).
+- **Ref:** v1.5.0, branch `feat/v1.5.0-polish-and-patterns`
+
+---
+
 ## PR #28 Review Improvements + PR #29 CodeRabbit Fixes
 
 - **Completed:** 2026-03-04

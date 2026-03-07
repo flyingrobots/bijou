@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.1.0** — Architecture audit + app shell
+Latest: **v1.5.0** — Polish & Patterns
 
 ---
 
@@ -63,49 +63,49 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 | ~~**Extract textarea editor**~~ | bijou | Done — `textarea-editor.ts` owns TextareaOptions and interactiveTextarea(). `textarea.ts` is the public facade. |
 | ~~**Extract filter interactive UI**~~ | bijou | Done — `filter-interactive.ts` owns FilterOption, FilterOptions, defaultMatch, interactiveFilter(). `filter.ts` is the public facade. |
 
-### Phase 5: Mode rendering strategy (OCP)
+### Phase 5: Mode rendering strategy (OCP) ✅
 
 **Problem:** ~22 components repeat `if (mode === 'pipe') ... if (mode === 'accessible') ...` chains. Adding a new output mode requires touching every component.
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Design mode renderer pattern** | bijou | Create a `ModeRenderer<Input, Output>` type and `renderByMode()` dispatcher that selects a handler from a mode→renderer map. Components register per-mode renderers instead of using if/else. |
-| **Migrate pilot components** | bijou | Convert `alert`, `badge`, `box` as proof-of-concept. Validate the pattern before wider rollout. |
-| **Migrate remaining components** | bijou | Convert all ~22 mode-branching components to the registry pattern. |
+| ~~**Design mode renderer pattern**~~ | bijou | ✅ Done — `renderByMode()` dispatcher in `core/mode-render.ts`. |
+| ~~**Migrate pilot components**~~ | bijou | ✅ Done — `alert`, `badge`, `box` converted. |
+| ~~**Migrate remaining components**~~ | bijou | ✅ Done — ~27 of 38 files use `renderByMode()`. Remaining ~11 are boolean guards (`shouldApplyBg`, `canvas` empty return, `formDispatch` TTY routing) that don't benefit from the dispatcher. |
 
-### Phase 6: Test suite hardening
+### Phase 6: Test suite hardening ✅
 
 **Problem:** Some tests are brittle (exact ANSI assertions, whitespace-sensitive `toBe`), and some edge cases are missing.
 
 | Task | Package | Notes |
 |------|---------|-------|
 | ~~**Replace exact ANSI assertions**~~ | bijou | ✅ Done — 12 raw ANSI assertions replaced with `expectNoAnsi()`, `expectHiddenCursor()`, `expectShownCursor()` semantic helpers. |
-| **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
-| **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
-| **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
+| ~~**Relax whitespace-sensitive assertions**~~ | bijou | ✅ Done — Replaced multiline `toBe()` with `toMatch()`/`toContain()` + per-line checks in table, enumerated-list, tree, and dag tests. Pipe/accessible exact-format tests retained `toBe()`. |
+| ~~**Add null/undefined input tests**~~ | bijou | ✅ Done — Defensive tests for `box(null)`, `table({ columns: [], rows: [] })`, `alert(null)`, etc. already existed. |
+| ~~**Extract shared test fixtures**~~ | bijou | ✅ Done — `fixtures.ts` with `COLOR_OPTIONS`, `FRUIT_OPTIONS`, `MANY_OPTIONS` already existed. |
 | ~~**Create output assertion helpers**~~ | bijou | ✅ Done — 6 helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Test-only, not in main barrel. |
 | ~~**noColor integration test suite**~~ | bijou | ✅ Done — 7 tests covering select, multiselect, filter, textarea, input, confirm with `noColor: true`. Interactive forms use `expectNoAnsiSgr()`, question-based use `expectNoAnsi()`. |
 
-### Phase 7: Theme access pattern (DIP)
+### Phase 7: Theme access pattern (DIP) ✅
 
 **Problem:** Every component hardcodes deep theme paths like `ctx.theme.theme.semantic.primary` and `ctx.theme.theme.border.primary`, coupling them to the exact theme object shape.
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
-| **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
+| ~~**Add theme query helpers**~~ | bijou | ✅ Done — `ctx.semantic(key)`, `ctx.border(key)`, `ctx.surface(key)`, `ctx.status(key)`, `ctx.ui(key)`, `ctx.gradient(key)` accessors on BijouContext. |
+| ~~**Migrate components**~~ | bijou | ✅ Done — All source-level `ctx.theme.theme.*` access replaced with typed accessors. Only test files asserting raw theme shape retain direct access. |
 
-### Phase 7b: Style pass
+### Phase 7b: Style pass ✅
 
 **Problem:** Most components were built function-first and never received a visual design pass. The bg infrastructure from Phase 3 (`surface` tokens, `bgToken`, `bgHex`) exists but only `box()`, `flex()`, `modal()`, `toast()`, and `drawer()` use it. Components like `alert()`, `table()`, `accordion()`, `timeline()`, `stepper()`, and others render with minimal styling — no background fills, inconsistent padding, and bare borders.
 
 | Task | Package | Notes |
 |------|---------|-------|
-| **Audit all components for bg opportunities** | bijou + bijou-tui | Catalog every component, note which ones would benefit from `surface` token backgrounds (e.g., `alert()` with `surface.elevated`, `table()` header rows with `surface.muted`). |
-| **Apply background fills** | bijou + bijou-tui | Add `bgToken` / `bg` support to components identified in audit. Ensure graceful degradation in pipe/accessible/noColor modes. |
-| **Improve spacing and padding** | bijou | Review default padding in `box()`, `alert()`, `headerBox()`, `accordion()`, etc. Ensure consistent internal margins. |
-| **Border treatment polish** | bijou | Audit border styles across components — ensure themed `border.*` tokens are applied consistently and defaults look cohesive. |
-| **Update examples and showcase** | examples | Refresh `examples/showcase/` and other demo scripts to reflect the improved visuals. |
+| ~~**Audit all components for bg opportunities**~~ | bijou + bijou-tui | ✅ Done — Categorized 17 components into high-value (alert, kbd, tabs), medium-value (accordion, table, stepper, breadcrumb), and no-bg (badge, separator, skeleton, tree, dag, etc.). |
+| ~~**Apply background fills**~~ | bijou + bijou-tui | ✅ Done — 7 components gained bg support: alert (surface.elevated), kbd (surface.muted), tabs (surface.muted), accordion/table/stepper/breadcrumb (opt-in). All degrade gracefully. |
+| ~~**Improve spacing and padding**~~ | bijou | ✅ Done — tabs() active tab padded with spaces around bg fill. Existing padding on alert/box already adequate. |
+| ~~**Border treatment polish**~~ | bijou | ✅ Done — All bordered components already use `ctx.border()` helpers consistently. |
+| ~~**Update examples and showcase**~~ | examples | ✅ No changes needed — showcase already uses all 7 components and picks up bg improvements automatically via default tokens. |
 
 ### Phase 8: App shell primitives
 
@@ -136,17 +136,12 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 
 ### Release targeting (current plan)
 
-**v1.5.0 — Polish & Patterns:**
+**v1.5.0 — Polish & Patterns: ✅ SHIPPED**
 
-- Phase 5: Mode rendering strategy (`ModeRenderer` dispatcher, migrate all ~22 components)
-- Phase 6: Test suite hardening (relax whitespace assertions, null/undefined tests, shared fixtures)
-- Phase 7: Theme access pattern (`ctx.semantic(key)` / `ctx.border(key)` helpers)
-- Style pass: visual polish sweep across all components — background colors, spacing, padding, border treatments
-
-**v1.5.0 stretch (only if low-risk):**
-
-- `drawer()` top/bottom anchors + region-scoped drawers
-- Improve docstring coverage to 80%
+- ~~Phase 5: Mode rendering strategy~~ ✅
+- ~~Phase 6: Test suite hardening~~ ✅
+- ~~Phase 7: Theme access pattern~~ ✅
+- ~~Phase 7b: Style pass~~ ✅
 
 ---
 
