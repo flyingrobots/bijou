@@ -19,4 +19,12 @@ describe('plainStyle()', () => {
   it('hex() returns text unchanged', () => {
     expect(style.hex('#00ff00', 'green')).toBe('green');
   });
+
+  it('bgRgb() returns text unchanged', () => {
+    expect(style.bgRgb(0, 0, 255, 'blue bg')).toBe('blue bg');
+  });
+
+  it('bgHex() returns text unchanged', () => {
+    expect(style.bgHex('#0000ff', 'blue bg')).toBe('blue bg');
+  });
 });

@@ -43,4 +43,27 @@ describe('createTestContext()', () => {
     const ctx = createTestContext({ io: { answers: ['yes'] } });
     expect(await ctx.io.question('? ')).toBe('yes');
   });
+
+  it('theme accessor functions are resolved and functional', () => {
+    const ctx = createTestContext();
+    expect(ctx.semantic('primary').hex).toBeTypeOf('string');
+    expect(ctx.status('success').hex).toBeTypeOf('string');
+    expect(ctx.border('primary').hex).toBeTypeOf('string');
+    expect(ctx.surface('primary').hex).toBeTypeOf('string');
+    expect(ctx.ui('cursor').hex).toBeTypeOf('string');
+    expect(Array.isArray(ctx.gradient('brand'))).toBe(true);
+  });
+
+  it('status() falls back to muted for unknown keys', () => {
+    const ctx = createTestContext();
+    const muted = ctx.status('muted');
+    const unknown = ctx.status('nonexistent');
+    expect(unknown.hex).toBe(muted.hex);
+  });
+
+  it('gradient() returns empty array for unknown keys', () => {
+    const ctx = createTestContext();
+    expect(ctx.gradient('nonexistent')).toEqual([]);
+  });
+
 });

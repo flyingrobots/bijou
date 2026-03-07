@@ -74,6 +74,14 @@ describe('confirm()', () => {
       await confirm({ title: 'Continue?', defaultValue: false, ctx });
       expect(ctx.io.written.join('')).toContain('default: no');
     });
+
+    it('renders plain text without box-drawing characters', async () => {
+      const ctx = createTestContext({ mode: 'accessible', io: { answers: ['yes'] } });
+      await confirm({ title: 'Continue?', ctx });
+      const output = ctx.io.written.join('');
+      // No box-drawing unicode characters
+      expect(output).not.toMatch(/[─│┌┐└┘┬┴├┤┼╔╗╚╝║═]/);
+    });
   });
 
   describe('rich mode (interactive)', () => {
@@ -85,9 +93,51 @@ describe('confirm()', () => {
       expect(output).toContain('[Y/n]');
     });
 
-    it('y/n parsing works in interactive mode', async () => {
+    it('renders [y/N] when defaultValue is false', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['y'] } });
+      await confirm({ title: 'Continue?', defaultValue: false, ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('[y/N]');
+    });
+
+    it('accepts "y" and returns true', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['y'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('accepts "Y" and returns true', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['Y'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('accepts "yes" and returns true', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['yes'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('accepts "n" and returns false', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { answers: ['n'] } });
       expect(await confirm({ title: 'Continue?', ctx })).toBe(false);
+    });
+
+    it('accepts "N" and returns false', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['N'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(false);
+    });
+
+    it('accepts "no" and returns false', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['no'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(false);
+    });
+
+    it('invalid input returns default value', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['maybe'] } });
+      expect(await confirm({ title: 'Continue?', ctx })).toBe(true);
+    });
+
+    it('invalid input returns false when defaultValue is false', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['maybe'] } });
+      expect(await confirm({ title: 'Continue?', defaultValue: false, ctx })).toBe(false);
     });
   });
 
