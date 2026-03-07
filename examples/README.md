@@ -3,6 +3,16 @@
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
+## Showcase
+
+Full-screen interactive component explorer with live previews across all output modes:
+
+```sh
+npx tsx examples/showcase/main.ts
+```
+
+Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Each component shows rendered output in rich, pipe, and accessible modes side-by-side.
+
 ## Static Components
 
 | Example | Component | Description |
