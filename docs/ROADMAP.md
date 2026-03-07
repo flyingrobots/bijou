@@ -95,6 +95,18 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 | **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
 | **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
 
+### Phase 7b: Style pass
+
+**Problem:** Most components were built function-first and never received a visual design pass. The bg infrastructure from Phase 3 (`surface` tokens, `bgToken`, `bgHex`) exists but only `box()`, `flex()`, `modal()`, `toast()`, and `drawer()` use it. Components like `alert()`, `table()`, `accordion()`, `timeline()`, `stepper()`, and others render with minimal styling — no background fills, inconsistent padding, and bare borders.
+
+| Task | Package | Notes |
+|------|---------|-------|
+| **Audit all components for bg opportunities** | bijou + bijou-tui | Catalog every component, note which ones would benefit from `surface` token backgrounds (e.g., `alert()` with `surface.elevated`, `table()` header rows with `surface.muted`). |
+| **Apply background fills** | bijou + bijou-tui | Add `bgToken` / `bg` support to components identified in audit. Ensure graceful degradation in pipe/accessible/noColor modes. |
+| **Improve spacing and padding** | bijou | Review default padding in `box()`, `alert()`, `headerBox()`, `accordion()`, etc. Ensure consistent internal margins. |
+| **Border treatment polish** | bijou | Audit border styles across components — ensure themed `border.*` tokens are applied consistently and defaults look cohesive. |
+| **Update examples and showcase** | examples | Refresh `examples/showcase/` and other demo scripts to reflect the improved visuals. |
+
 ### Phase 8: App shell primitives
 
 **Problem:** Building a multi-pane TUI app requires manually composing `flex()`, `focusArea()`, `createPanelGroup()`, `InputStack`, keymaps, and resize handling. Every non-trivial app re-implements the same shell: tabbed pages, help overlay, scroll, gutters, fullscreen layout. We need higher-level primitives so this is a one-liner.
@@ -124,27 +136,17 @@ Phases 8–9: App shell primitives — the layout and framing components needed 
 
 ### Release targeting (current plan)
 
-**v1.3.0 — App Shell Foundations (planned):**
+**v1.5.0 — Polish & Patterns:**
 
-- `splitPane()` v1 (stateful, focus-aware, test-first)
-- `grid()` v1 (fixed + fractional tracks, named areas)
-- `appFrame()` MVP (tabs/help/chrome/global+page keymaps)
-- per-page scroll isolation
-- multi-pane page support
-- panel-scoped overlays + `drawer()` anchor expansion
-- framed-app interaction harness (key replay + resize + frame snapshots)
+- Phase 5: Mode rendering strategy (`ModeRenderer` dispatcher, migrate all ~22 components)
+- Phase 6: Test suite hardening (relax whitespace assertions, null/undefined tests, shared fixtures)
+- Phase 7: Theme access pattern (`ctx.semantic(key)` / `ctx.border(key)` helpers)
+- Style pass: visual polish sweep across all components — background colors, spacing, padding, border treatments
 
-**v1.3.0 stretch (only if low-risk):**
+**v1.5.0 stretch (only if low-risk):**
 
-- scrollable `select()` (`filter()` already done)
-- frame-level command palette (`Ctrl+P`/`:`) for app/page actions
-
-**v1.4.0+ / experimental (after core shell stabilizes):**
-
-- tab/screen transitions (`wipe`/`dissolve`/`grid`/`fade`)
-- dockable panel manager (drag + keyboard move)
-- panel minimize/fold/unfold behaviors
-- layout presets + session restore for pane/dock state
+- `drawer()` top/bottom anchors + region-scoped drawers
+- Improve docstring coverage to 80%
 
 ---
 
@@ -592,7 +594,6 @@ Specs from XYPH for building an interactive roadmap DAG view with 2D panning, no
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
 | **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
 | **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
-| **Style pass** | bijou | Visual polish sweep across all components. Audit each component for opportunities to use background colors (via `surface` tokens and `bgToken`/`bgHex`), improve default spacing, padding, and border treatments. Goal: every component should look intentionally designed out of the box, not just functional. Leverage the bg infrastructure from Phase 3 (v1.0.0) that most components don't yet use. |
 | ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
 | ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) \| col` encoding. `GRID_COL_MULTIPLIER` removed. |
 
