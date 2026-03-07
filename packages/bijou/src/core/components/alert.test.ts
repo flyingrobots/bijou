@@ -47,8 +47,7 @@ describe('alert', () => {
       expect(alert(undefined as any, { ctx })).toBe('[INFO] ');
     });
 
-    it('handles missing options gracefully', () => {
-      // should not throw, uses default context (or fails if not set, but here we check it doesn't crash on options access)
+    it('renders with explicit context in pipe mode', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       expect(alert('test', { ctx })).toBe('[INFO] test');
     });

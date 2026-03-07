@@ -28,16 +28,17 @@ console.log(separator({ label: 'interactive mode', ctx }));
 console.log(box(spark('Deploy', 'v1.3.0', { ctx }), { padding: { left: 2, right: 2 }, ctx }));
 console.log();
 
+function withMode(base: BijouContext, mode: BijouContext['mode']): BijouContext {
+  return { ...base, mode };
+}
+
 // 2. Simulated pipe mode
-const pipeCtx = createNodeContext();
-// Manually override mode for demonstration
-(pipeCtx as any).mode = 'pipe';
+const pipeCtx = withMode(createNodeContext(), 'pipe');
 console.log(separator({ label: 'pipe mode fallback', ctx: pipeCtx }));
 console.log(spark('Deploy', 'v1.3.0', { ctx: pipeCtx }));
 console.log();
 
 // 3. Simulated accessible mode
-const accCtx = createNodeContext();
-(accCtx as any).mode = 'accessible';
+const accCtx = withMode(createNodeContext(), 'accessible');
 console.log(separator({ label: 'accessible mode fallback', ctx: accCtx }));
 console.log(spark('Deploy', 'v1.3.0', { ctx: accCtx }));

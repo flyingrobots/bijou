@@ -96,10 +96,10 @@ export function table(options: TableOptions): string {
 
       const colWidths = columns.map((col, i) => {
         if (col.width !== undefined) return col.width;
-        let max = (col.header ?? '').length;
+        let max = visibleLength(col.header ?? '');
         for (const row of rows) {
           const cell = row[i] ?? '';
-          max = Math.max(max, cell.length);
+          max = Math.max(max, visibleLength(cell));
         }
         return max;
       });

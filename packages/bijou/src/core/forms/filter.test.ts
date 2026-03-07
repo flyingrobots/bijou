@@ -303,9 +303,8 @@ describe('filter()', () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
       expect(result).toBe('v9');
-      // Strip ANSI codes and verify a line contains both ❯ and Option 9
-      const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
-      expect(stripped).toMatch(/❯.*Option 9/);
+      const output = ctx.io.written.join('');
+      expect(output).toMatch(/❯.*Option 9/);
     });
 
     it('cursor wraps up past maxVisible and is visible', async () => {
@@ -314,8 +313,8 @@ describe('filter()', () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x1b[A', '\r'] } });
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 3, ctx });
       expect(result).toBe('v20');
-      const stripped = ctx.io.written.join('').replace(/\x1b\[[0-9;]*m/g, '');
-      expect(stripped).toMatch(/❯.*Option 20/);
+      const output = ctx.io.written.join('');
+      expect(output).toMatch(/❯.*Option 20/);
     });
 
     it('scroll down then back up tracks correctly', async () => {

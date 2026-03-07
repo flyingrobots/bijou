@@ -93,7 +93,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   }
 
   function visibleOptions(): SelectOption<T>[] {
-    return options.options.slice(scrollOffset, scrollOffset + maxVisible) as SelectOption<T>[];
+    return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
   function renderLineCount(): number {

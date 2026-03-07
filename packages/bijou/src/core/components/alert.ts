@@ -68,7 +68,7 @@ export function alert(message: string, options: AlertOptions = {}): string {
     accessible: () => `${ACCESSIBLE_LABELS[variant]}: ${safeMessage}`,
     interactive: () => {
       const icon = ICONS[variant];
-      const semanticToken = ctx.semantic(variant === 'info' ? 'info' : variant);
+      const semanticToken = ctx.semantic(variant);
       const borderToken = ctx.border(BORDER_TOKENS[variant]);
       const coloredIcon = ctx.style.styled(semanticToken, icon);
 

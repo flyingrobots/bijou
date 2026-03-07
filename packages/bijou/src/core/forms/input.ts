@@ -51,10 +51,11 @@ export async function input(options: InputOptions): Promise<string> {
 /**
  * Build a mode-appropriate prompt string for the input field.
  *
+ * Mode is derived from `ctx`.
+ *
  * @param options - Input field configuration.
- * @param mode - Current output mode (interactive, accessible, pipe).
  * @param noColor - Whether color output is disabled.
- * @param ctx - Bijou context for styling.
+ * @param ctx - Bijou context for styling and mode.
  * @returns Formatted prompt string.
  */
 function buildPrompt(options: InputOptions, noColor: boolean, ctx: BijouContext): string {

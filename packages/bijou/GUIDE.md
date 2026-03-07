@@ -144,9 +144,13 @@ const doc = toDTCG(theme);
 Build your own mode-aware components using the `renderByMode` dispatcher:
 
 ```typescript
+import type { BijouContext } from '@flyingrobots/bijou';
 import { renderByMode, resolveCtx } from '@flyingrobots/bijou';
 
-export function myComponent(text: string, options = {}) {
+export function myComponent(
+  text: string,
+  options: { ctx?: BijouContext } = {},
+) {
   const ctx = resolveCtx(options.ctx);
 
   return renderByMode(ctx.mode, {

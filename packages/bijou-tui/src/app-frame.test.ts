@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext } from '@flyingrobots/bijou';
+import { setDefaultContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
@@ -47,7 +47,8 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
 describe('createFramedApp', () => {
   // Ensure a context is available for components that resolve it from the singleton
   const testCtx = createTestContext();
-  setDefaultContext(testCtx);
+  beforeAll(() => setDefaultContext(testCtx));
+  afterAll(() => _resetDefaultContextForTesting());
 
   it('switches tabs with [ and ]', async () => {
     const app = createFramedApp({
@@ -149,10 +150,10 @@ describe('createFramedApp', () => {
       transitionDuration: 20,
     });
 
-    // We add a second step with a delay to allow the macrotask (setInterval) to complete.
+    // Delay must exceed transitionDuration (20ms) with headroom for CI load.
     const result = await runScript(app, [
       { key: ']' },
-      { key: 'noop', delay: 100 },
+      { key: 'noop', delay: 200 },
     ]);
 
     expect(result.model.activePageId).toBe('p2');

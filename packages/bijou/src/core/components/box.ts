@@ -152,13 +152,17 @@ export function headerBox(label: string, options: HeaderBoxOptions = {}): string
   const safeLabel = label ?? '';
 
   return renderByMode(ctx.mode, {
-    pipe: () => (detail ? `${safeLabel}  ${detail}` : safeLabel),
-    accessible: () => (detail ? `${safeLabel}: ${detail}` : safeLabel),
+    pipe: () => (safeLabel && detail ? `${safeLabel}  ${detail}` : safeLabel || detail),
+    accessible: () => (safeLabel && detail ? `${safeLabel}: ${detail}` : safeLabel || detail),
     interactive: () => {
       const labelToken = options.labelToken ?? ctx.semantic('primary');
-      const content = detail
+      const content = safeLabel && detail
         ? ctx.style.styled(labelToken, safeLabel) + ctx.style.styled(ctx.semantic('muted'), `  ${detail}`)
-        : ctx.style.styled(labelToken, safeLabel);
+        : safeLabel
+          ? ctx.style.styled(labelToken, safeLabel)
+          : detail
+            ? ctx.style.styled(ctx.semantic('muted'), detail)
+            : '';
 
       return box(content, options);
     },

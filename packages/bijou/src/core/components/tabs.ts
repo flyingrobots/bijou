@@ -75,7 +75,7 @@ export function tabs(items: TabItem[], options: TabsOptions): string {
           if (i === active) {
             const token = ctx.semantic('primary');
             const boldToken = { hex: token.hex, modifiers: [...(token.modifiers ?? []), 'bold' as const] };
-            return `● ${ctx.style.styled(boldToken, label)}`;
+            return `${ctx.style.styled(boldToken, '●')} ${ctx.style.styled(boldToken, label)}`;
           }
           return `  ${ctx.style.styled(ctx.semantic('muted'), label)}`;
         })

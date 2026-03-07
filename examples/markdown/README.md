@@ -1,6 +1,11 @@
 # `markdown()`
 
-Terminal markdown with mode degradation
+Renders a subset of CommonMark that adapts to the terminal's output mode — styled in interactive mode, plain in pipe mode, and screen-reader-friendly in accessible mode.
+
+## Prerequisites
+
+- Node.js 18+
+- `pnpm install` from the repo root
 
 ## Run
 
@@ -8,7 +13,15 @@ Terminal markdown with mode degradation
 npx tsx examples/markdown/main.ts
 ```
 
+Pipe mode output (no ANSI styling):
+
+```sh
+npx tsx examples/markdown/main.ts | cat
+```
+
 ## Code
+
+The example initializes a `BijouContext` via `initDefaultContext()` — this detects the terminal's capabilities (TTY, color support, screen reader) and configures the styling engine accordingly. All bijou components accept `ctx` to render mode-appropriate output.
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
@@ -23,14 +36,14 @@ const SOURCE = `
 
 ## Features
 
-- **Inline formatting**: **bold**, *italic*, and `code spans`
+- **Inline formatting**: **bold**, *italic*, and \`code spans\`
 - **Lists**: bulleted and numbered
 - **Links**: [GitHub](https://github.com/flyingrobots/bijou)
 - **Blocks**:
   > Blockquotes for highlights
-  ```ts
+  \`\`\`ts
   console.log("Fenced code blocks");
-  ```
+  \`\`\`
 
 ---
 

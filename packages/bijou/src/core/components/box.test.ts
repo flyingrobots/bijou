@@ -172,17 +172,18 @@ describe('box() with width override', () => {
     }
   });
 
-  describe('defensive input handling', () => {
-    it('handles null/undefined content gracefully', () => {
-      const ctx = createTestContext({ mode: 'pipe' });
-      expect(box(null as any, { ctx })).toBe('');
-      expect(box(undefined as any, { ctx })).toBe('');
-    });
+});
 
-    it('handles null/undefined label in headerBox gracefully', () => {
-      const ctx = createTestContext({ mode: 'pipe' });
-      expect(headerBox(null as any, { ctx })).toBe('');
-      expect(headerBox(undefined as any, { ctx })).toBe('');
-    });
+describe('defensive input handling', () => {
+  it('handles null/undefined content gracefully', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    expect(box(null as any, { ctx })).toBe('');
+    expect(box(undefined as any, { ctx })).toBe('');
+  });
+
+  it('handles null/undefined label in headerBox gracefully', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    expect(headerBox(null as any, { ctx })).toBe('');
+    expect(headerBox(undefined as any, { ctx })).toBe('');
   });
 });

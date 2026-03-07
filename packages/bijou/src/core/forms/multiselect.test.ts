@@ -122,10 +122,27 @@ describe('multiselect()', () => {
       });
       const output = ctx.io.written.join('');
 
-      expect(result).toEqual(['v4']);
+      expect(result).toEqual([MANY_OPTIONS[3]!.value]);
       expect(output).toContain('\x1b[4A');
-      expect(output).toContain('Option 4');
-      expect(output).not.toContain('Option 10');
+      expect(output).toContain(MANY_OPTIONS[3]!.label);
+      expect(output).not.toContain(MANY_OPTIONS[9]!.label);
+    });
+
+    it('wrap-around scrolling from first to last item', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['\x1b[A', ' ', '\r'] },
+      });
+      const result = await multiselect({
+        title: 'Pick',
+        options: MANY_OPTIONS,
+        maxVisible: 3,
+        ctx,
+      });
+      const output = ctx.io.written.join('');
+
+      expect(result).toEqual([MANY_OPTIONS[MANY_OPTIONS.length - 1]!.value]);
+      expect(output).toContain(MANY_OPTIONS[MANY_OPTIONS.length - 1]!.label);
     });
 
     it('sanitizes non-finite maxVisible values', async () => {

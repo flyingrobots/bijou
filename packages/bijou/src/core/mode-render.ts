@@ -21,9 +21,12 @@ export type ModeMap<I, O> = {
 /**
  * Dispatch rendering to a mode-specific handler.
  *
- * If no handler is defined for the requested mode, it falls back to
- * `'pipe'`, then to `'accessible'`, then to `'static'`, and finally
- * to the first available handler in the map.
+ * If no handler is defined for the requested mode, it falls back to a
+ * sibling in the same visual group first: visual modes (`interactive`,
+ * `static`) fall back to each other, then to `pipe` → `accessible`;
+ * non-visual modes (`pipe`, `accessible`) fall back to each other, then
+ * to `interactive` → `static`. Finally falls back to the first available
+ * handler in the map.
  *
  * @template I - Input options type.
  * @template O - Output type.
