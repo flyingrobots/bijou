@@ -39,4 +39,17 @@ describe('alert', () => {
     expect(result).toContain('\u2717');
     expect(result).toContain('msg');
   });
+
+  describe('defensive input handling', () => {
+    it('handles null/undefined message gracefully', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      expect(alert(null as any, { ctx })).toBe('[INFO] ');
+      expect(alert(undefined as any, { ctx })).toBe('[INFO] ');
+    });
+
+    it('renders with explicit context in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      expect(alert('test', { ctx })).toBe('[INFO] test');
+    });
+  });
 });

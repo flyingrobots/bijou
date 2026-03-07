@@ -260,7 +260,7 @@ export function renderInteractiveLayout(
   }
 
   const highlightSet = new Set(options.highlightPath ?? []);
-  const edgeToken = options.edgeToken ?? ctx.theme.theme.border.muted;
+  const edgeToken = options.edgeToken ?? ctx.border('muted');
   const hlToken = options.highlightToken;
 
   const positions = new Map<string, DagNodePosition>();
@@ -279,13 +279,13 @@ export function renderInteractiveLayout(
 
     let nToken: TokenValue;
     if (options.selectedId === n.id) {
-      nToken = options.selectedToken ?? ctx.theme.theme.ui.cursor;
+      nToken = options.selectedToken ?? ctx.ui('cursor');
     } else if (highlightSet.has(n.id) && hlToken) {
       nToken = hlToken;
     } else if (n.token) {
       nToken = n.token;
     } else {
-      nToken = options.nodeToken ?? ctx.theme.theme.border.primary;
+      nToken = options.nodeToken ?? ctx.border('primary');
     }
 
     // Expand grapheme arrays to column-aligned arrays so cellAt can

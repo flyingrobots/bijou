@@ -2,6 +2,7 @@ import type { ConfirmFieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { formatFormTitle } from './form-utils.js';
+import { renderByMode } from '../mode-render.js';
 
 /**
  * Options for the yes/no confirmation prompt.
@@ -23,22 +24,21 @@ export interface ConfirmOptions extends ConfirmFieldOptions {
  */
 export async function confirm(options: ConfirmOptions): Promise<boolean> {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const noColor = ctx.theme.noColor;
   const defaultYes = options.defaultValue !== false;
   const hint = defaultYes ? 'Y/n' : 'y/N';
 
-  let prompt: string;
-  if (mode === 'accessible') {
-    prompt = `${options.title} Type yes or no (default: ${defaultYes ? 'yes' : 'no'}): `;
-  } else if (mode === 'pipe' || noColor) {
-    prompt = mode === 'pipe'
-      ? `${options.title} ${hint}? `
-      : `${formatFormTitle(options.title, ctx)} [${hint}] `;
-  } else {
-    prompt = formatFormTitle(options.title, ctx)
-      + ctx.style.styled(ctx.theme.theme.semantic.muted, ` [${hint}]`) + ' ';
-  }
+  const prompt = renderByMode(ctx.mode, {
+    accessible: () => `${options.title} Type yes or no (default: ${defaultYes ? 'yes' : 'no'}): `,
+    pipe: () => `${options.title} ${hint}? `,
+    interactive: () => {
+      if (noColor) {
+        return `${formatFormTitle(options.title, ctx)} [${hint}] `;
+      }
+      return formatFormTitle(options.title, ctx)
+        + ctx.style.styled(ctx.semantic('muted'), ` [${hint}]`) + ' ';
+    },
+  }, options);
 
   const answer = await ctx.io.question(prompt);
   const trimmed = answer.trim().toLowerCase();

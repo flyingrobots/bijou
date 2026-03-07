@@ -64,7 +64,7 @@ const app: App<Model, Msg> = {
       screenWidth: cols,
       screenHeight: rows,
       title: 'Info',
-      borderToken: ctx.theme.theme.border.primary,
+      borderToken: ctx.border('primary'),
       ctx,
     });
 

@@ -40,7 +40,7 @@ All packages are versioned in lock-step.
 - **TEA loop**: `run`, `App`, command-driven update/view flow.
 - **Layout**: `flex`, `vstack`, `hstack`, `viewport`, focus-aware panes.
 - **Input and interaction**: keymaps, layered input stack, command palette, file picker, browsable list, navigable table.
-- **Motion**: spring and tween animation, timeline sequencing, high-fidelity terminal transitions.
+- **Motion**: spring and tween animation, timeline sequencing, high-fidelity terminal transitions (wipe, dissolve, grid, fade).
 
 ### Node Adapter (`@flyingrobots/bijou-node`)
 

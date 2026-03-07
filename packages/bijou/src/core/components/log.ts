@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { badge } from './badge.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Severity levels for structured log messages. */
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
@@ -85,34 +86,34 @@ export function log(level: LogLevel, message: string, options?: LogOptions): str
     return parts.join(' ');
   }
 
-  const mode = ctx.mode;
-
-  if (mode === 'pipe') {
-    const parts: string[] = [];
-    if (ts) parts.push(`[${ts}]`);
-    if (showPrefix) parts.push(`[${LABELS[level]}]`);
-    parts.push(message);
-    return parts.join(' ');
-  }
-
-  if (mode === 'accessible') {
-    const parts: string[] = [];
-    if (ts) parts.push(ts);
-    if (showPrefix) parts.push(`${ACCESSIBLE_LABELS[level]}:`);
-    parts.push(message);
-    return parts.join(' ');
-  }
-
-  // Interactive/static: use badge + styled message
-  const parts: string[] = [];
-  if (ts) {
-    const tsStyled = ctx.style.styled(ctx.theme.theme.semantic.muted, ts);
-    parts.push(tsStyled);
-  }
-  if (showPrefix) {
-    const variant = BADGE_VARIANTS[level] as any;
-    parts.push(badge(LABELS[level], { variant, ctx }));
-  }
-  parts.push(message);
-  return parts.join(' ');
+  return renderByMode(ctx.mode, {
+    pipe: () => {
+      const parts: string[] = [];
+      if (ts) parts.push(`[${ts}]`);
+      if (showPrefix) parts.push(`[${LABELS[level]}]`);
+      parts.push(message);
+      return parts.join(' ');
+    },
+    accessible: () => {
+      const parts: string[] = [];
+      if (ts) parts.push(ts);
+      if (showPrefix) parts.push(`${ACCESSIBLE_LABELS[level]}:`);
+      parts.push(message);
+      return parts.join(' ');
+    },
+    interactive: () => {
+      // Interactive/static: use badge + styled message
+      const parts: string[] = [];
+      if (ts) {
+        const tsStyled = ctx.style.styled(ctx.semantic('muted'), ts);
+        parts.push(tsStyled);
+      }
+      if (showPrefix) {
+        const variant = BADGE_VARIANTS[level] as any;
+        parts.push(badge(LABELS[level], { variant, ctx }));
+      }
+      parts.push(message);
+      return parts.join(' ');
+    },
+  }, options ?? {});
 }

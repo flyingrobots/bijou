@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import type { OutputMode } from '../detect/tty.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration for spinner rendering and behavior. */
 export interface SpinnerOptions {
@@ -35,20 +36,16 @@ export function spinnerFrame(tick: number, options: SpinnerOptions = {}): string
   const ctx = resolveCtx(options.ctx);
   const frames = options.frames ?? DOTS;
   const label = options.label ?? 'Loading';
-  const mode: OutputMode = ctx.mode;
 
-  switch (mode) {
-    case 'interactive': {
+  return renderByMode(ctx.mode, {
+    interactive: () => {
       const frame = frames[tick % frames.length] ?? frames[0] ?? '\u280b';
       return `${frame} ${label}`;
-    }
-    case 'static':
-      return `... ${label}`;
-    case 'pipe':
-      return `${label}...`;
-    case 'accessible':
-      return `${label}. Please wait.`;
-  }
+    },
+    static: () => `... ${label}`,
+    pipe: () => `${label}...`,
+    accessible: () => `${label}. Please wait.`,
+  }, options);
 }
 
 /** Controller returned by {@link createSpinner} for managing a live spinner. */

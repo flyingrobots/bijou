@@ -18,8 +18,8 @@ describe('environment integration', () => {
   describe('NO_COLOR compliance', () => {
     it('theme.ink() returns undefined for all tokens', () => {
       const ctx = createTestContext({ noColor: true, mode: 'interactive' });
-      expect(ctx.theme.ink(ctx.theme.theme.semantic.primary)).toBeUndefined();
-      expect(ctx.theme.ink(ctx.theme.theme.status.success)).toBeUndefined();
+      expect(ctx.theme.ink(ctx.semantic('primary'))).toBeUndefined();
+      expect(ctx.theme.ink(ctx.status('success'))).toBeUndefined();
     });
 
     it('gradientText() returns plain text', () => {

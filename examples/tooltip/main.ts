@@ -68,7 +68,7 @@ const app: App<Model, Msg> = {
       direction: dir,
       screenWidth: cols,
       screenHeight: rows,
-      borderToken: ctx.theme.theme.border.primary,
+      borderToken: ctx.border('primary'),
       ctx,
     });
 

@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Represent a single collapsible section within an accordion. */
 export interface AccordionSection {
@@ -36,42 +37,39 @@ export interface AccordionOptions {
  */
 export function accordion(sections: AccordionSection[], options: AccordionOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
 
-  if (mode === 'pipe') {
-    return sections
+  return renderByMode(ctx.mode, {
+    pipe: () => sections
       .map((s) => `# ${s.title}\n${s.content}`)
-      .join('\n\n');
-  }
-
-  if (mode === 'accessible') {
-    return sections
+      .join('\n\n'),
+    accessible: () => sections
       .map((s) => {
         if (s.expanded) {
           return `[expanded] ${s.title}: ${s.content}`;
         }
         return `[collapsed] ${s.title}`;
       })
-      .join('\n');
-  }
+      .join('\n'),
+    interactive: () => {
+      const indicatorToken = options.indicatorToken ?? ctx.semantic('accent');
+      const titleToken = options.titleToken ?? ctx.semantic('primary');
 
-  const indicatorToken = options.indicatorToken ?? ctx.theme.theme.semantic.accent;
-  const titleToken = options.titleToken ?? ctx.theme.theme.semantic.primary;
-
-  return sections
-    .map((s) => {
-      if (s.expanded) {
-        const indicator = ctx.style.styled(indicatorToken, '▼');
-        const title = ctx.style.styled(titleToken, s.title);
-        const indented = s.content
-          .split('\n')
-          .map((line) => `  ${line}`)
-          .join('\n');
-        return `${indicator} ${title}\n${indented}`;
-      }
-      const indicator = ctx.style.styled(indicatorToken, '▶');
-      const title = ctx.style.styled(titleToken, s.title);
-      return `${indicator} ${title}`;
-    })
-    .join('\n\n');
+      return sections
+        .map((s) => {
+          if (s.expanded) {
+            const indicator = ctx.style.styled(indicatorToken, '▼');
+            const title = ctx.style.styled(titleToken, s.title);
+            const indented = s.content
+              .split('\n')
+              .map((line) => `  ${line}`)
+              .join('\n');
+            return `${indicator} ${title}\n${indented}`;
+          }
+          const indicator = ctx.style.styled(indicatorToken, '▶');
+          const title = ctx.style.styled(titleToken, s.title);
+          return `${indicator} ${title}`;
+        })
+        .join('\n\n');
+    },
+  }, options);
 }

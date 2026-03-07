@@ -175,6 +175,72 @@ export function sliceAnsi(str: string, startCol: number, endCol: number): string
   return result;
 }
 
+/**
+ * Extract all individual visible character cells from an ANSI-styled string.
+ * Each cell is returned as a fully-styled string (including resets).
+ *
+ * @param str - ANSI-styled input string.
+ * @param width - Number of cells to extract (pads with spaces if shorter).
+ * @returns Array of exactly `width` strings, each a single-column styled character.
+ */
+export function tokenizeAnsi(str: string, width: number): string[] {
+  const stripped = stripAnsi(str);
+  const graphemes = segmentGraphemes(stripped);
+  const result: string[] = [];
+
+  let inEscape = false;
+  let escBuf = '';
+  let activeAnsi = '';
+  let gi = 0;
+  let i = 0;
+  let visibleCount = 0;
+
+  while (i < str.length && visibleCount < width) {
+    const ch = str[i]!;
+
+    if (ch === '\x1b') {
+      inEscape = true;
+      escBuf = ch;
+      i++;
+      continue;
+    }
+
+    if (inEscape) {
+      escBuf += ch;
+      if (ch === 'm') {
+        inEscape = false;
+        activeAnsi += escBuf;
+        escBuf = '';
+      }
+      i++;
+      continue;
+    }
+
+    if (gi >= graphemes.length) break;
+
+    const grapheme = graphemes[gi]!;
+    const gWidth = graphemeClusterWidth(grapheme);
+
+    // If adding this grapheme exceeds width, stop
+    if (visibleCount + gWidth > width) break;
+
+    const styledGrapheme = activeAnsi + grapheme + '\x1b[0m';
+    result.push(styledGrapheme);
+    if (gWidth === 2) result.push(''); // placeholder for wide char
+
+    visibleCount += gWidth;
+    gi++;
+    i += grapheme.length;
+  }
+
+  // Pad with spaces
+  while (result.length < width) {
+    result.push(' ');
+  }
+
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // Scrollbar rendering
 // ---------------------------------------------------------------------------

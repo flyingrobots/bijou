@@ -8,6 +8,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { hyperlink } from './hyperlink.js';
 import { graphemeWidth } from '../text/grapheme.js';
+import { renderByMode } from '../mode-render.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -156,15 +157,14 @@ function isBlockStart(line: string): boolean {
  *
  * @param text - The inline text to parse.
  * @param ctx - Bijou context for styling.
- * @param mode - Current rendering mode.
  * @returns The rendered inline text.
  */
-export function parseInline(text: string, ctx: BijouContext, mode: string): string {
-  if (mode === 'accessible') return parseInlineAccessible(text, ctx);
-  if (mode === 'pipe') return parseInlinePlain(text);
-  // `static` mode intentionally falls through to styled rendering here,
-  // same as `interactive`. Only `pipe` and `accessible` are special-cased.
-  return parseInlineStyled(text, ctx);
+export function parseInline(text: string, ctx: BijouContext): string {
+  return renderByMode(ctx.mode, {
+    accessible: () => parseInlineAccessible(text, ctx),
+    pipe: () => parseInlinePlain(text),
+    interactive: () => parseInlineStyled(text, ctx),
+  }, text);
 }
 
 /**
@@ -189,7 +189,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   const codeSpans: string[] = [];
   result = result.replace(/`([^`]+)`/g, (_m, code: string) => {
     const idx = codeSpans.length;
-    codeSpans.push(ctx.style.styled(ctx.theme.theme.semantic.warning, code));
+    codeSpans.push(ctx.style.styled(ctx.semantic('warning'), code));
     return `\x00\x01BIJOU_CS${idx}\x01\x00`;
   });
 
@@ -201,7 +201,7 @@ function parseInlineStyled(text: string, ctx: BijouContext): string {
   // Italic: *text* — runs after bold removal, so `**bold**` won't false-match.
   // The negative lookahead/lookbehind prevents matching the `**` delimiter itself.
   result = result.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, (_m, italic: string) => {
-    return ctx.style.styled(ctx.theme.theme.semantic.muted, italic);
+    return ctx.style.styled(ctx.semantic('muted'), italic);
   });
 
   // Restore code spans

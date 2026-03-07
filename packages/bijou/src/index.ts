@@ -29,6 +29,13 @@ export {
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
 
+// Mode rendering strategy
+export {
+  renderByMode,
+  type ModeHandler,
+  type ModeMap,
+} from './core/mode-render.js';
+
 // Background fill utilities
 export { shouldApplyBg, makeBgFill } from './core/bg-fill.js';
 

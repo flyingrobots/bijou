@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration options for the {@link hyperlink} component. */
 export interface HyperlinkOptions {
@@ -29,20 +30,11 @@ export function hyperlink(text: string, url: string, options?: HyperlinkOptions)
   // No context → use fallback format
   if (!ctx) return formatFallback(text, url, fallback);
 
-  const mode = ctx.mode;
-
-  // Interactive/static: OSC 8 clickable link
-  if (mode === 'interactive' || mode === 'static') {
-    return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
-  }
-
-  // Pipe: use fallback format
-  if (mode === 'pipe') return formatFallback(text, url, fallback);
-
-  // Accessible: always text (url) for screen readers
-  if (mode === 'accessible') return `${text} (${url})`;
-
-  return formatFallback(text, url, fallback);
+  return renderByMode(ctx.mode, {
+    interactive: () => `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`,
+    pipe: () => formatFallback(text, url, fallback),
+    accessible: () => `${text} (${url})`,
+  }, options ?? {});
 }
 
 /**

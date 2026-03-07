@@ -102,7 +102,7 @@ BIJOU_THEME=./themes/my-brand.json node my-cli.js
 ### Extending Themes in Code
 
 ```typescript
-import { extendTheme, styled, styledStatus, tv, CYAN_MAGENTA } from '@flyingrobots/bijou';
+import { extendTheme, tv, CYAN_MAGENTA } from '@flyingrobots/bijou';
 
 const myTheme = extendTheme(CYAN_MAGENTA, {
   status: {
@@ -113,6 +113,18 @@ const myTheme = extendTheme(CYAN_MAGENTA, {
     clusterName: tv('#60a5fa', ['bold']),
   },
 });
+```
+
+### Looking Up Tokens
+
+Use semantic helpers on the context to look up tokens without coupling to theme object structure:
+
+```typescript
+const primary = ctx.semantic('primary');
+const border = ctx.border('muted');
+const bg = ctx.surface('secondary');
+const status = ctx.status('success'); // falls back to 'muted' if missing
+const icon = ctx.ui('cursor');
 ```
 
 ### DTCG Interop
@@ -126,6 +138,33 @@ const theme = fromDTCG(jsonDocument);
 // Export back to DTCG format
 const doc = toDTCG(theme);
 ```
+
+## Custom Components
+
+Build your own mode-aware components using the `renderByMode` dispatcher:
+
+```typescript
+import type { BijouContext } from '@flyingrobots/bijou';
+import { renderByMode, resolveCtx } from '@flyingrobots/bijou';
+
+export function myComponent(
+  text: string,
+  options: { ctx?: BijouContext } = {},
+) {
+  const ctx = resolveCtx(options.ctx);
+
+  return renderByMode(ctx.mode, {
+    pipe: () => `[${text}]`,
+    accessible: () => `Component: ${text}`,
+    interactive: () => {
+      const token = ctx.semantic('accent');
+      return ctx.style.styled(token, `\u2728 ${text}`);
+    }
+  }, options);
+}
+```
+
+The dispatcher automatically handles mode selection and fallback logic (e.g. `static` falls back to `interactive` by default).
 
 ## Testing
 

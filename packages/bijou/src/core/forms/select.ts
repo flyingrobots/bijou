@@ -73,7 +73,6 @@ async function numberedSelect<T>(options: SelectOptions<T>, ctx: BijouContext): 
  */
 async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext): Promise<T> {
   const noColor = ctx.theme.noColor;
-  const t = ctx.theme;
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const term = terminalRenderer(ctx);
@@ -113,9 +112,9 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
       const opt = visible[i]!;
       const isCurrent = globalIndex === cursor;
       const prefix = isCurrent ? '\u276f' : ' ';
-      const desc = opt.description ? styledFn(t.theme.semantic.muted, ` \u2014 ${opt.description}`) : '';
+      const desc = opt.description ? styledFn(ctx.semantic('muted'), ` \u2014 ${opt.description}`) : '';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(t.theme.semantic.info, prefix)} ${boldFn(opt.label)}${desc}\n`);
+        ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), prefix)} ${boldFn(opt.label)}${desc}\n`);
       } else {
         ctx.io.write(`\x1b[K  ${prefix} ${opt.label}${desc}\n`);
       }
@@ -132,7 +131,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
     const selected = options.options[cursor] as SelectOption<T>;
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, selected.label);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selected.label);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

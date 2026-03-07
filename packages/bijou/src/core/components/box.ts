@@ -4,6 +4,7 @@ import { resolveCtx } from '../resolve-ctx.js';
 import { makeBgFill } from '../bg-fill.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions {
@@ -104,25 +105,26 @@ function drawBox(
  */
 export function box(content: string, options: BoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
+  const safeContent = content ?? '';
 
-  if (mode === 'pipe' || mode === 'accessible') {
-    return content;
-  }
+  return renderByMode(ctx.mode, {
+    pipe: () => safeContent,
+    accessible: () => safeContent,
+    interactive: () => {
+      const borderToken = options.borderToken ?? ctx.border('primary');
+      const padding = {
+        top: options.padding?.top ?? 0,
+        bottom: options.padding?.bottom ?? 0,
+        left: options.padding?.left ?? 1,
+        right: options.padding?.right ?? 1,
+      };
 
-  const borderToken = options.borderToken ?? ctx.theme.theme.border.primary;
-  const padding = {
-    top: options.padding?.top ?? 0,
-    bottom: options.padding?.bottom ?? 0,
-    left: options.padding?.left ?? 1,
-    right: options.padding?.right ?? 1,
-  };
+      const colorize = (s: string): string => ctx.style.styled(borderToken, s);
+      const bgFill = makeBgFill(options.bgToken, ctx);
 
-  const colorize = (s: string): string => ctx.style.styled(borderToken, s);
-
-  const bgFill = makeBgFill(options.bgToken, ctx);
-
-  return drawBox(content, colorize, padding, options.width, bgFill);
+      return drawBox(safeContent, colorize, padding, options.width, bgFill);
+    },
+  }, options);
 }
 
 /** Configuration for {@link headerBox}, extending {@link BoxOptions} with label support. */
@@ -146,20 +148,23 @@ export interface HeaderBoxOptions extends BoxOptions {
  */
 export function headerBox(label: string, options: HeaderBoxOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const detail = options.detail ?? '';
+  const safeLabel = label ?? '';
 
-  if (mode === 'pipe') {
-    return detail ? `${label}  ${detail}` : label;
-  }
-  if (mode === 'accessible') {
-    return detail ? `${label}: ${detail}` : label;
-  }
+  return renderByMode(ctx.mode, {
+    pipe: () => (safeLabel && detail ? `${safeLabel}  ${detail}` : safeLabel || detail),
+    accessible: () => (safeLabel && detail ? `${safeLabel}: ${detail}` : safeLabel || detail),
+    interactive: () => {
+      const labelToken = options.labelToken ?? ctx.semantic('primary');
+      const content = safeLabel && detail
+        ? ctx.style.styled(labelToken, safeLabel) + ctx.style.styled(ctx.semantic('muted'), `  ${detail}`)
+        : safeLabel
+          ? ctx.style.styled(labelToken, safeLabel)
+          : detail
+            ? ctx.style.styled(ctx.semantic('muted'), detail)
+            : '';
 
-  const labelToken = options.labelToken ?? ctx.theme.theme.semantic.primary;
-  const content = detail
-    ? ctx.style.styled(labelToken, label) + ctx.style.styled(ctx.theme.theme.semantic.muted, `  ${detail}`)
-    : ctx.style.styled(labelToken, label);
-
-  return box(content, options);
+      return box(content, options);
+    },
+  }, options);
 }

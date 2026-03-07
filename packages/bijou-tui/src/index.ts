@@ -83,10 +83,27 @@ export {
   type FrameLayoutNode,
   type FrameOverlayContext,
   type CreateFramedAppOptions,
+  type PageTransition,
   type FramePaneScroll,
   type FrameModel,
   createFramedApp,
 } from './app-frame.js';
+
+// Transition shaders
+export {
+  type TransitionCell,
+  type TransitionResult,
+  type TransitionShaderFn,
+  type BuiltinTransition,
+  wipeShader,
+  dissolveShader,
+  gridShader,
+  fadeShader,
+  meltShader,
+  matrixShader,
+  scrambleShader,
+  TRANSITION_SHADERS,
+} from './transition-shaders.js';
 
 // Status bar
 export { statusBar } from './status-bar.js';

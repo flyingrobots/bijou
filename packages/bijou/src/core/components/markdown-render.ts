@@ -9,6 +9,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { BlockType } from './markdown-parse.js';
 import { parseInline, wordWrap } from './markdown-parse.js';
 import { separator } from './separator.js';
+import { renderByMode } from '../mode-render.js';
 
 /**
  * Render an array of parsed block elements into a final terminal string.
@@ -37,21 +38,18 @@ export function renderBlocks(
         break;
 
       case 'heading': {
-        const text = parseInline(block.text, ctx, mode);
-        if (mode === 'accessible') {
-          lines.push(`Heading level ${block.level}: ${text}`);
-        } else if (mode === 'pipe') {
-          lines.push('#'.repeat(block.level) + ' ' + text);
-        } else {
-          // Interactive: bold, h1 uses primary color
-          const styled = ctx.style.bold(text);
-          if (block.level === 1) {
-            lines.push(ctx.style.styled(ctx.theme.theme.border.primary, styled));
-          } else {
-            lines.push(styled);
-          }
-        }
-        lines.push('');
+        const text = parseInline(block.text, ctx);
+        const headingLine = renderByMode(ctx.mode, {
+          accessible: () => `Heading level ${block.level}: ${text}`,
+          pipe: () => '#'.repeat(block.level) + ' ' + text,
+          interactive: () => {
+            const styled = ctx.style.bold(text);
+            return block.level === 1
+              ? ctx.style.styled(ctx.border('primary'), styled)
+              : styled;
+          },
+        }, block);
+        lines.push(headingLine, '');
         break;
       }
 
@@ -63,7 +61,7 @@ export function renderBlocks(
         // requires strip-for-measurement then wrap-raw then parse-after,
         // which is complex due to cross-word-boundary formatting spans.
         const wrapped = wordWrap(block.text, width);
-        lines.push(...wrapped.map(line => parseInline(line, ctx, mode)));
+        lines.push(...wrapped.map(line => parseInline(line, ctx)));
         lines.push('');
         break;
       }
@@ -73,9 +71,9 @@ export function renderBlocks(
           const bullet = mode === 'pipe' ? '- ' : '  \u2022 ';
           const indentWidth = width - bullet.length;
           const wrapped = wordWrap(item, indentWidth > 0 ? indentWidth : width);
-          lines.push(bullet + parseInline(wrapped[0]!, ctx, mode));
+          lines.push(bullet + parseInline(wrapped[0]!, ctx));
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(bullet.length) + parseInline(wrapped[i]!, ctx, mode));
+            lines.push(' '.repeat(bullet.length) + parseInline(wrapped[i]!, ctx));
           }
         }
         lines.push('');
@@ -92,9 +90,9 @@ export function renderBlocks(
           const paddedPrefix = prefix.padEnd(uniformIndent);
           const indentWidth = width - uniformIndent;
           const wrapped = wordWrap(block.items[n]!, indentWidth > 0 ? indentWidth : width);
-          lines.push(paddedPrefix + parseInline(wrapped[0]!, ctx, mode));
+          lines.push(paddedPrefix + parseInline(wrapped[0]!, ctx));
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(uniformIndent) + parseInline(wrapped[i]!, ctx, mode));
+            lines.push(' '.repeat(uniformIndent) + parseInline(wrapped[i]!, ctx));
           }
         }
         lines.push('');
@@ -102,29 +100,27 @@ export function renderBlocks(
       }
 
       case 'code-block': {
-        if (mode === 'pipe' || mode === 'accessible') {
-          lines.push('```' + block.lang);
-          lines.push(...block.lines);
-          lines.push('```');
-        } else {
-          // Interactive: dim styling
-          for (const codeLine of block.lines) {
-            lines.push(ctx.style.styled(ctx.theme.theme.semantic.muted, '  ' + codeLine));
-          }
-        }
-        lines.push('');
+        const cbLines = renderByMode(ctx.mode, {
+          pipe: () => ['```' + block.lang, ...block.lines, '```'],
+          accessible: () => ['```' + block.lang, ...block.lines, '```'],
+          interactive: () => block.lines.map(cl => ctx.style.styled(ctx.semantic('muted'), '  ' + cl)),
+        }, block);
+        lines.push(...cbLines, '');
         break;
       }
 
       case 'blockquote': {
         for (const ql of block.lines) {
-          const inlined = parseInline(ql, ctx, mode);
-          if (mode === 'pipe' || mode === 'accessible') {
-            lines.push('> ' + inlined);
-          } else {
-            const prefix = ctx.style.styled(ctx.theme.theme.border.muted, '\u2502 ');
-            lines.push(prefix + ctx.style.styled(ctx.theme.theme.semantic.muted, inlined));
-          }
+          const inlined = parseInline(ql, ctx);
+          const bqLine = renderByMode(ctx.mode, {
+            pipe: () => '> ' + inlined,
+            accessible: () => '> ' + inlined,
+            interactive: () => {
+              const prefix = ctx.style.styled(ctx.border('muted'), '\u2502 ');
+              return prefix + ctx.style.styled(ctx.semantic('muted'), inlined);
+            },
+          }, block);
+          lines.push(bqLine);
         }
         lines.push('');
         break;

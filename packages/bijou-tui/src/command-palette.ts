@@ -269,7 +269,7 @@ export function commandPalette(
   const indicator = '\u25b8'; // ▸
   const pad = ' ';
   const muted = (text: string) =>
-    ctx ? ctx.style.styled(ctx.theme.theme.semantic.muted, text) : text;
+    ctx ? ctx.style.styled(ctx.semantic('muted'), text) : text;
 
   for (let i = 0; i < visible.length; i++) {
     const item = visible[i]!;

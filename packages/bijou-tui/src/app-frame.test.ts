@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { setDefaultContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
-import { createFramedApp, type FramePage, type FrameOverlayContext } from './app-frame.js';
+import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import type { Cmd, MouseMsg } from './types.js';
 
 type Msg =
@@ -43,6 +45,11 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
 }
 
 describe('createFramedApp', () => {
+  // Ensure a context is available for components that resolve it from the singleton
+  const testCtx = createTestContext();
+  beforeAll(() => setDefaultContext(testCtx));
+  afterAll(() => _resetDefaultContextForTesting());
+
   it('switches tabs with [ and ]', async () => {
     const app = createFramedApp({
       title: 'Test',
@@ -94,6 +101,108 @@ describe('createFramedApp', () => {
     const app = createFramedApp({ pages: [splitPage] });
     const result = await runScript(app, [{ key: KEY_TAB }, { key: KEY_SHIFT_TAB }]);
     expect(result.model.focusedPaneByPage.home).toBe('left');
+  });
+
+  it('triggers transition animation when switching tabs', async () => {
+    const app = createFramedApp({
+      pages: [
+        makePage('p1', 'P1', 'm'),
+        makePage('p2', 'P2', 'm'),
+      ],
+      transition: 'wipe',
+      transitionDuration: 10,
+    });
+
+    const [initModel, initCmds] = app.init();
+    expect(initModel.activePageId).toBe('p1');
+
+    // Trigger tab switch
+    const [switchedModel, switchCmds] = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, initModel);
+    expect(switchedModel.activePageId).toBe('p2');
+    expect(switchedModel.previousPageId).toBe('p1');
+    expect(switchedModel.transitionProgress).toBe(0);
+    expect(switchCmds.length).toBe(1);
+
+    // Manually drive the animation command
+    const messages: any[] = [];
+    await switchCmds[0]!((m) => messages.push(m));
+
+    expect(messages.length).toBeGreaterThan(0);
+    
+    let model = switchedModel;
+    for (const m of messages) {
+      const [nextModel] = app.update(m, model);
+      model = nextModel;
+    }
+
+    expect(model.activePageId).toBe('p2');
+    expect(model.previousPageId).toBeUndefined();
+    expect(model.transitionProgress).toBe(1);
+  });
+
+  it('runs transition animation through runScript', async () => {
+    const app = createFramedApp({
+      pages: [
+        makePage('p1', 'P1', 'm'),
+        makePage('p2', 'P2', 'm'),
+      ],
+      transition: 'fade',
+      transitionDuration: 20,
+    });
+
+    // Delay must exceed transitionDuration (20ms) with headroom for CI load.
+    const result = await runScript(app, [
+      { key: ']' },
+      { key: 'noop', delay: 200 },
+    ]);
+
+    expect(result.model.activePageId).toBe('p2');
+    expect(result.model.previousPageId).toBeUndefined();
+    expect(result.model.transitionProgress).toBe(1);
+    // Transition emits frames, so we expect more than just the keypress frame
+    expect(result.frames.length).toBeGreaterThan(1);
+  });
+
+  it('renders complex transition styles (melt, matrix, scramble) without error', async () => {
+    const transitions: PageTransition[] = ['melt', 'matrix', 'scramble'];
+    
+    for (const transition of transitions) {
+      const app = createFramedApp({
+        pages: [
+          makePage('p1', 'P1', 'm'),
+          makePage('p2', 'P2', 'm'),
+        ],
+        transition,
+        transitionDuration: 10,
+      });
+
+      const result = await runScript(app, [
+        { key: ']' },
+        { key: 'noop', delay: 50 },
+      ]);
+
+      expect(result.model.activePageId).toBe('p2');
+      expect(result.model.transitionProgress).toBe(1);
+    }
+  });
+
+  it('respects transitionOverride to select animation dynamically', async () => {
+    const app = createFramedApp({
+      pages: [
+        makePage('p1', 'P1', 'm'),
+        makePage('p2', 'P2', 'm'),
+      ],
+      transition: 'none',
+      transitionOverride: () => 'wipe',
+      transitionDuration: 10,
+    });
+
+    const [initModel] = app.init();
+    const [switchedModel] = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, initModel);
+    
+    // Even though transition: 'none' was set, override should win
+    expect(switchedModel.activeTransition).toBe('wipe');
+    expect(switchedModel.transitionProgress).toBe(0);
   });
 
   it('throws for duplicate pane ids in a page layout', () => {

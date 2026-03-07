@@ -15,11 +15,9 @@ import { ctx } from '../_shared/setup.js';
 import { box, separator } from '@flyingrobots/bijou';
 import { flex, modal, toast, composite } from '@flyingrobots/bijou-tui';
 
-const { theme } = ctx.theme;
-
 // 1. box() with bgToken — a colored panel
 console.log(box('This box has a background fill.', {
-  bgToken: theme.surface.primary,
+  bgToken: ctx.surface('primary'),
   padding: { top: 1, bottom: 1, left: 2, right: 2 },
   width: 44,
   ctx,
@@ -27,10 +25,10 @@ console.log(box('This box has a background fill.', {
 
 // 2. flex() with per-child bg — multiple colored regions
 console.log(flex(
-  { direction: 'row', width: 60, height: 5, gap: 1, bgToken: theme.surface.muted, ctx },
-  { basis: 20, bgToken: theme.surface.primary, content: ' Primary' },
-  { basis: 20, bgToken: theme.surface.secondary, content: ' Secondary' },
-  { flex: 1, bgToken: theme.surface.elevated, content: ' Elevated' },
+  { direction: 'row', width: 60, height: 5, gap: 1, bgToken: ctx.surface('muted'), ctx },
+  { basis: 20, bgToken: ctx.surface('primary'), content: ' Primary' },
+  { basis: 20, bgToken: ctx.surface('secondary'), content: ' Secondary' },
+  { flex: 1, bgToken: ctx.surface('elevated'), content: ' Elevated' },
 ));
 
 // 3. modal() with bgToken over dimmed content
@@ -41,8 +39,8 @@ const m = modal({
   hint: 'y/n',
   screenWidth: 64,
   screenHeight: 12,
-  bgToken: theme.surface.overlay,
-  borderToken: theme.border.primary,
+  bgToken: ctx.surface('overlay'),
+  borderToken: ctx.border('primary'),
   ctx,
 });
 console.log(composite(bg, [m], { dim: true }));
@@ -54,7 +52,7 @@ const t = toast({
   variant: 'success',
   screenWidth: 64,
   screenHeight: 6,
-  bgToken: theme.surface.elevated,
+  bgToken: ctx.surface('elevated'),
   ctx,
 });
 console.log(composite(toastBg, [t]));

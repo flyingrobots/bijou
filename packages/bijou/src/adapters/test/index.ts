@@ -14,7 +14,7 @@ import { mockIO, type MockIOOptions, type MockIO } from './io.js';
 import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
 import { CYAN_MAGENTA } from '../../core/theme/presets.js';
-import type { Theme } from '../../core/theme/tokens.js';
+import type { Theme, TokenValue } from '../../core/theme/tokens.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
@@ -28,6 +28,7 @@ export {
   expectShownCursor,
   expectWritten,
 } from './assertions.js';
+export { COLOR_OPTIONS, FRUIT_OPTIONS, MANY_OPTIONS } from './fixtures.js';
 
 /**
  * Configuration for {@link createTestContext}.
@@ -73,5 +74,16 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
   const theme = createResolved(options.theme ?? CYAN_MAGENTA, options.noColor ?? false, options.colorScheme ?? 'dark');
   const mode: OutputMode = options.mode ?? 'interactive';
 
-  return { theme, mode, runtime, io, style };
+  return {
+    theme,
+    mode,
+    runtime,
+    io,
+    style,
+    semantic: (key) => theme.theme.semantic[key],
+    border: (key) => theme.theme.border[key],
+    surface: (key) => theme.theme.surface[key],
+    status: (key) => (theme.theme.status as Record<string, TokenValue>)[key] ?? (theme.theme.status as Record<string, TokenValue>)['muted']!,
+    ui: (key) => (theme.theme.ui as Record<string, TokenValue>)[key] ?? theme.theme.semantic.primary,
+  };
 }

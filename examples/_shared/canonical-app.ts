@@ -274,8 +274,8 @@ function renderOpsSummary(width: number, height: number, model: WorkbenchPageMod
 
   return box(fixedLines.join('\n'), {
     width,
-    bgToken: ctx.theme.theme.surface.secondary,
-    borderToken: ctx.theme.theme.border.primary,
+    bgToken: ctx.surface('secondary'),
+    borderToken: ctx.border('primary'),
     ctx,
   });
 }
@@ -331,7 +331,7 @@ function renderIncidentFeed(width: number, model: WorkbenchPageModel, ctx: Bijou
     legend,
   ].join('\n'), {
     width,
-    borderToken: ctx.theme.theme.border.muted,
+    borderToken: ctx.border('muted'),
     ctx,
   });
 }
@@ -384,7 +384,7 @@ function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouC
     `Hints: ${kbd('tab', { ctx })} pane focus • ${kbd('h/l', { ctx })} horizontal scroll`,
   ].join('\n'), {
     width,
-    borderToken: ctx.theme.theme.border.primary,
+    borderToken: ctx.border('primary'),
     ctx,
   });
 }
@@ -400,7 +400,7 @@ function renderBoardRunbook(width: number, ctx: BijouContext): string {
     timeline(events, { ctx }),
   ].join('\n'), {
     width,
-    bgToken: ctx.theme.theme.surface.secondary,
+    bgToken: ctx.surface('secondary'),
     ctx,
   });
 }
@@ -460,7 +460,7 @@ function renderGraphNotes(width: number, model: WorkbenchPageModel, ctx: BijouCo
     '- per-pane scroll isolation and horizontal overflow',
   ].join('\n'), {
     width,
-    bgToken: ctx.theme.theme.surface.muted,
+    bgToken: ctx.surface('muted'),
     ctx,
   });
 }
@@ -686,8 +686,8 @@ export function createCanonicalWorkbenchApp(
             content,
             screenWidth: frame.screenRect.width,
             screenHeight: frame.screenRect.height,
-            borderToken: ctx.theme.theme.border.primary,
-            bgToken: ctx.theme.theme.surface.elevated,
+            borderToken: ctx.border('primary'),
+            bgToken: ctx.surface('elevated'),
             ctx,
           };
           if (anchor === 'left' || anchor === 'right') {
@@ -714,8 +714,8 @@ export function createCanonicalWorkbenchApp(
           width: 44,
           screenWidth: frame.screenRect.width,
           screenHeight: frame.screenRect.height,
-          borderToken: ctx.theme.theme.border.primary,
-          bgToken: ctx.theme.theme.surface.elevated,
+          borderToken: ctx.border('primary'),
+          bgToken: ctx.surface('elevated'),
           ctx,
         }));
       }

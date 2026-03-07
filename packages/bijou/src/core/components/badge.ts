@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue, BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { renderByMode } from '../mode-render.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -31,27 +32,22 @@ export function badge(text: string, options: BadgeOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   if (!ctx) return ` ${text} `;
 
-  const mode = ctx.mode;
-  if (mode === 'pipe') return `[${text}]`;
-  if (mode === 'accessible') return text;
-
-  const t = ctx.theme?.theme;
-  if (!t) return ` ${text} `;
-
   const variant = options.variant ?? 'info';
-  const status = (t.status || {}) as any;
-  const semantic = (t.semantic || {}) as any;
-  
-  let baseToken = status[variant] || semantic[variant] || status.info;
 
-  if (!baseToken || typeof baseToken.hex !== 'string') {
-    baseToken = { hex: '#808080' };
-  }
+  return renderByMode(ctx.mode, {
+    pipe: () => `[${text}]`,
+    accessible: () => text,
+    interactive: () => {
+      const baseToken = (variant === 'accent' || variant === 'primary')
+        ? ctx.semantic(variant)
+        : ctx.status(variant);
 
-  const inverseToken: TokenValue = {
-    hex: baseToken.hex,
-    modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
-  };
+      const inverseToken: TokenValue = {
+        hex: baseToken.hex,
+        modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+      };
 
-  return ctx.style.styled(inverseToken, ` ${text} `);
+      return ctx.style.styled(inverseToken, ` ${text} `);
+    },
+  }, options);
 }

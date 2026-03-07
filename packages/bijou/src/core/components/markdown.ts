@@ -10,7 +10,7 @@
  */
 
 import type { BijouContext } from '../../ports/context.js';
-import { getDefaultContext } from '../../context.js';
+import { resolveCtx } from '../resolve-ctx.js';
 import { parseBlocks } from './markdown-parse.js';
 import { renderBlocks } from './markdown-render.js';
 
@@ -42,12 +42,13 @@ export interface MarkdownOptions {
  * @returns The rendered terminal string.
  */
 export function markdown(source: string, options?: MarkdownOptions): string {
-  if (source.trim() === '') return '';
+  const safeSource = source ?? '';
+  if (safeSource.trim() === '') return '';
 
-  const ctx = options?.ctx ?? getDefaultContext();
+  const ctx = resolveCtx(options?.ctx);
   const rawWidth = options?.width ?? ctx.runtime.columns;
   const width = Math.max(1, Number.isFinite(rawWidth) ? rawWidth : ctx.runtime.columns);
 
-  const blocks = parseBlocks(source);
+  const blocks = parseBlocks(safeSource);
   return renderBlocks(blocks, ctx, width);
 }
