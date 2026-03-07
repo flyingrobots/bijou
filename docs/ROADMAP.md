@@ -4,6 +4,13 @@
 
 Latest: **v1.5.0** — Polish & Patterns
 
+**In progress: v1.6.0 — Terminal Whisperer + Test Audit**
+- Parse F-keys (F1–F12) in `parseKey()`
+- Cursor manager (shape/style control)
+- Underline variants (standard, curly, dotted, dashed)
+- `detectColorScheme` env accessor refactor
+- Test hardening pass against acceptance criteria (sections 1–6 below)
+
 ---
 
 ## Shipped milestones
