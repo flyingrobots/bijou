@@ -20,13 +20,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Decentralized theme access (DIP)** — added `semantic()`, `border()`, `surface()`, `status()`, and `ui()` helpers to `BijouContext`; components now look up tokens via these semantic methods instead of reaching into the deep `ctx.theme.theme` object structure.
 - **Form components consistency** — refactored `select()`, `multiselect()`, and `filter()` to use new semantic context helpers and the `renderByMode` dispatcher.
 
+### 🐛 Fixes
+
+- **Transition generation guard (bijou-tui)** — rapid tab switches no longer let stale tween ticks overwrite a newer transition's progress. Each transition carries a monotonic generation counter; mismatched ticks are discarded.
+- **Table column width (bijou core)** — `table()` now uses `visibleLength()` instead of `.length` for auto-calculated column widths, preventing oversized columns when cells contain ANSI styling.
+- **`headerBox()` nullish label handling** — nullish labels with non-empty `detail` no longer leak separators or empty styled spans.
+- **Active tab bullet styling** — the `●` bullet in `tabs()` is now styled with the primary token, matching the active label.
+- **Custom component example** — replaced `as any` mode mutation with immutable context spread pattern.
+
 ### 🧪 Tests
 
 - **Tab transition coverage** — added manual and scripted interaction tests for tab transitions in `app-frame.test.ts`.
-- **Multiselect scrolling coverage** — added `maxVisible` scrolling test cases to `multiselect.test.ts`.
+- **Multiselect scrolling coverage** — added `maxVisible` scrolling test cases to `multiselect.test.ts`, including wrap-around scrolling.
 - **Shared test fixtures** — extracted common form data (colors, fruits, large lists) into `adapters/test/fixtures.ts` for reuse across test suites.
 - **Defensive input hardening** — added comprehensive tests and fixes for `null`/`undefined` input handling in `box()`, `headerBox()`, `alert()`, `table()`, and `markdown()`.
 - **Test suite refactoring** — migrated all form tests to use shared fixtures and updated component tests to leverage new `BijouContext` helpers.
+- **Test isolation** — `app-frame.test.ts` now properly scopes `setDefaultContext()` with `beforeAll`/`afterAll` to prevent singleton leaks.
 
 ## [1.3.0] - 2026-03-06
 
