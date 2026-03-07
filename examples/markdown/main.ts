@@ -10,14 +10,14 @@ const SOURCE = `
 
 ## Features
 
-- **Inline formatting**: **bold**, *italic*, and `code spans`
+- **Inline formatting**: **bold**, *italic*, and \`code spans\`
 - **Lists**: bulleted and numbered
 - **Links**: [GitHub](https://github.com/flyingrobots/bijou)
 - **Blocks**:
   > Blockquotes for highlights
-  ```ts
+  \`\`\`ts
   console.log("Fenced code blocks");
-  ```
+  \`\`\`
 
 ---
 

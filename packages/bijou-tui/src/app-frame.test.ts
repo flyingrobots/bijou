@@ -4,7 +4,7 @@ import { setDefaultContext } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
-import { createFramedApp, type FramePage, type FrameOverlayContext } from './app-frame.js';
+import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import type { Cmd, MouseMsg } from './types.js';
 
 type Msg =
