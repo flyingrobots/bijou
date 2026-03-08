@@ -54,6 +54,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
 | **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
 | **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+| **Git hooks (pre-commit + pre-push)** | repo config | `scripts/hooks/pre-commit`: lint + lockfile consistency (`npm ls --all`). `scripts/hooks/pre-push`: full test suite. Wire via `core.hooksPath`. Catches lockfile drift before CI. |
 
 ---
 
