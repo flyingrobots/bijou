@@ -1,18 +1,25 @@
 import type { Theme, TokenValue, InkColor } from './tokens.js';
 import type { RuntimePort } from '../../ports/runtime.js';
 import type { WritePort } from '../../ports/io.js';
+import { createEnvAccessor } from '../../ports/env.js';
 import type { ColorScheme } from '../detect/tty.js';
 import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
 
 /**
  * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
+ *
+ * @deprecated The zero-argument form (`isNoColor()`) falls back to
+ *   `process.env`, bypassing hexagonal ports. Prefer `isNoColor(runtime)`
+ *   with an explicit {@link RuntimePort}, or use `createBijou()` /
+ *   `createThemeResolver({ runtime })` which handle detection internally.
+ *
  * @param runtime - Optional RuntimePort for reading env vars; falls back to `process.env`.
  * @returns True if the `NO_COLOR` environment variable is set.
  */
 export function isNoColor(runtime?: RuntimePort): boolean {
-  if (runtime) return runtime.env('NO_COLOR') !== undefined;
-  return process.env['NO_COLOR'] !== undefined;
+  const env = createEnvAccessor(runtime);
+  return env('NO_COLOR') !== undefined;
 }
 
 /** A theme bundled with its noColor flag and convenience accessor methods. */
@@ -119,9 +126,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
   const runtime = options.runtime;
   const warningPort = options.warningPort;
 
-  const readEnv = runtime
-    ? (key: string) => runtime.env(key)
-    : (key: string) => process.env[key];
+  const readEnv = createEnvAccessor(runtime);
 
   const warn = (message: string): void => {
     warningPort?.writeError(`${message}\n`);
@@ -176,6 +181,11 @@ const defaultResolver = createThemeResolver();
 
 /**
  * Return the current resolved theme (singleton) using the default resolver.
+ *
+ * @deprecated Use `createBijou()` or `createThemeResolver({ runtime })` to
+ *   obtain a theme without relying on the global default resolver that falls
+ *   back to `process.env`.
+ *
  * @returns Cached ResolvedTheme from the default resolver.
  */
 export function getTheme(): ResolvedTheme {
@@ -184,6 +194,11 @@ export function getTheme(): ResolvedTheme {
 
 /**
  * Resolve a theme by name using the default resolver (bypasses cache).
+ *
+ * @deprecated Use `createBijou()` or `createThemeResolver({ runtime })` to
+ *   resolve themes without relying on the global default resolver that falls
+ *   back to `process.env`.
+ *
  * @param name - Theme name to look up.
  * @returns ResolvedTheme for the given name.
  */

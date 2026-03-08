@@ -10,16 +10,7 @@
  */
 
 import type { RuntimePort } from '../../ports/runtime.js';
-
-/**
- * Build an environment variable accessor from a runtime port.
- * Falls back to `process.env` when no runtime is provided.
- */
-function envAccessor(runtime?: RuntimePort): (key: string) => string | undefined {
-  return runtime
-    ? (key: string) => runtime.env(key)
-    : (key: string) => process.env[key];
-}
+import { createEnvAccessor, createTTYAccessor } from '../../ports/env.js';
 
 /**
  * Terminal output mode.
@@ -37,12 +28,17 @@ export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
  * Inspects environment variables and TTY status via the optional
  * {@link RuntimePort} abstraction.
  *
+ * @deprecated The zero-argument form (`detectOutputMode()`) falls back to
+ *   `process.env` / `process.stdout`, bypassing hexagonal ports. Prefer
+ *   `detectOutputMode(runtime)` with an explicit {@link RuntimePort}, or
+ *   use `createBijou()` which handles detection internally.
+ *
  * @param runtime - Optional runtime port for environment access.
  * @returns The detected {@link OutputMode}.
  */
 export function detectOutputMode(runtime?: RuntimePort): OutputMode {
-  const env = envAccessor(runtime);
-  const stdoutIsTTY = runtime?.stdoutIsTTY ?? (process.stdout.isTTY === true);
+  const env = createEnvAccessor(runtime);
+  const stdoutIsTTY = createTTYAccessor(runtime);
 
   if (env('BIJOU_ACCESSIBLE') === '1') return 'accessible';
 
@@ -71,11 +67,16 @@ export type ColorScheme = 'light' | 'dark';
  * `"default;fg;bg"`). The last segment is treated as the background
  * color index: 0–6 → dark, 7+ → light.
  *
+ * @deprecated The zero-argument form (`detectColorScheme()`) falls back to
+ *   `process.env`, bypassing hexagonal ports. Prefer
+ *   `detectColorScheme(runtime)` with an explicit {@link RuntimePort}, or
+ *   use `createBijou()` which handles detection internally.
+ *
  * @param runtime - Optional runtime port for environment access. Falls back to `process`.
  * @returns The detected {@link ColorScheme}. Defaults to `'dark'`.
  */
 export function detectColorScheme(runtime?: RuntimePort): ColorScheme {
-  const env = envAccessor(runtime);
+  const env = createEnvAccessor(runtime);
   const raw = env('COLORFGBG');
 
   if (raw === undefined) return 'dark';
