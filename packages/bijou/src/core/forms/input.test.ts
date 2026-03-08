@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { input } from './input.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 describe('input()', () => {
   describe('pipe mode', () => {
@@ -32,6 +32,19 @@ describe('input()', () => {
       const ctx = createTestContext({ mode: 'pipe', io: { answers: [''] } });
       await input({ title: 'Name', defaultValue: 'bob', ctx });
       expect(ctx.io.written[0]).toContain('bob');
+    });
+
+    it('applies validation to piped input', async () => {
+      const ctx = createTestContext({ mode: 'pipe', io: { answers: ['ab'] } });
+      const result = await input({
+        title: 'Code',
+        validate: (v) => v.length < 3
+          ? { valid: false, message: 'Too short' }
+          : { valid: true },
+        ctx,
+      });
+      expect(ctx.io.written.join('')).toContain('Too short');
+      expect(result).toBe('ab');
     });
   });
 
@@ -97,6 +110,52 @@ describe('input()', () => {
       const output = ctx.io.written.join('');
       expect(output).toContain('Username');
     });
+
+    it('captures typed input and returns trimmed string', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['  alice  '] } });
+      const result = await input({ title: 'Name', ctx });
+      expect(result).toBe('alice');
+    });
+
+    it('renders default value hint in prompt', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      await input({ title: 'Name', defaultValue: 'bob', ctx });
+      const output = ctx.io.written.join('');
+      expect(output).toContain('bob');
+    });
+
+    it('required: true writes error for empty input', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: [''] } });
+      await input({ title: 'Name', required: true, ctx });
+      const allOutput = ctx.io.written.join('');
+      expect(allOutput).toMatch(/required/i);
+    });
+
+    it('custom validator error is written', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['ab'] } });
+      await input({
+        title: 'Code',
+        validate: (v) => v.length < 3
+          ? { valid: false, message: 'Too short' }
+          : { valid: true },
+        ctx,
+      });
+      const allOutput = ctx.io.written.join('');
+      expect(allOutput).toContain('Too short');
+    });
+
+    it('valid input does not write validation error', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { answers: ['hello'] } });
+      await input({
+        title: 'Code',
+        validate: (v) => v.length >= 3
+          ? { valid: true }
+          : { valid: false, message: 'Too short' },
+        ctx,
+      });
+      const allOutput = ctx.io.written.join('');
+      expect(allOutput).not.toContain('Too short');
+    });
   });
 
   describe('empty / Ctrl+C behavior', () => {
@@ -118,6 +177,29 @@ describe('input()', () => {
       ctx.io.question = () => Promise.reject(new Error('readline was closed'));
       await expect(input({ title: 'Name', ctx })).rejects.toThrow('readline was closed');
     });
+  });
+
+  describe('NO_COLOR', () => {
+    it('prompt renders without ANSI escape codes', async () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['test'] }, style });
+      await input({ title: 'Name', ctx });
+      const colorCalls = style.calls.filter((c) => c.method === 'hex' || c.method === 'bgHex');
+      expect(colorCalls.length).toBe(0);
+    });
+
+    it('functionality identical: captures and trims input', async () => {
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['  alice  '] } });
+      const result = await input({ title: 'Name', ctx });
+      expect(result).toBe('alice');
+    });
+  });
+
+  it('accepts ctx parameter and uses it over default', async () => {
+    const ctx = createTestContext({ mode: 'pipe', io: { answers: ['hello'] } });
+    const result = await input({ title: 'Name', ctx });
+    expect(result).toBe('hello');
+    expect(ctx.io.written.length).toBeGreaterThan(0);
   });
 
   describe('edge cases', () => {

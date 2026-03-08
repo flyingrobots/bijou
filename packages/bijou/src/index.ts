@@ -91,6 +91,9 @@ export {
   rgbToAnsi16,
   ansi256ToAnsi16,
   type ColorLevel,
+  // Theme accessors
+  createThemeAccessors,
+  type ThemeAccessors,
   // Color manipulation
   hexToRgb,
   rgbToHex,

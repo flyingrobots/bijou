@@ -2,151 +2,63 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.1.0** — Architecture audit + app shell
+Latest: **v1.6.0** — Terminal Whisperer + Test Audit
 
 ---
 
-## v1.0.0 — Architecture audit + app shell
+## Shipped milestones
 
-Phases 1–7: Findings from a full-codebase audit of SOLID, DRY, and test quality. No hexagonal architecture violations were found — the port system is clean. These items address structural debt discovered in component internals and test patterns.
+See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
-Phases 8–9: App shell primitives — the layout and framing components needed to build full-screen multi-pane TUI applications without boilerplate.
+| Version | Milestone | Key deliverables |
+|---------|-----------|-----------------|
+| v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
+| v1.5.0 | Polish & Patterns | Mode rendering (OCP), test hardening, theme accessors (DIP), style pass (bg support for 7 components) |
+| v1.4.0 | Transitions & Showcase | Tab transition animations (7 shaders), interactive showcase app, scrollable multiselect |
+| v1.3.0 | App Shell Foundations | `splitPane()`, `grid()`, `createFramedApp()`, drawer expansion, scrollable `select()`, `bijou-tui-app`, `create-bijou-tui-app` |
+| v1.0.0 | Architecture Audit | ISP port segregation, form DRY extraction, background color support |
+| v0.10.x | Canvas, Mouse, Box Width | `canvas()` shader, SGR mouse, `box({ width })`, JSDoc total coverage |
+| v0.6.0–v0.9.0 | Component Library | All forms, navigation, data, overlay, TUI building blocks, color manipulation, markdown, hyperlinks, grapheme support |
+| v0.2.0 | Hexagonal Architecture | Port system, viewport, keybindings, help generator |
 
-### Phase 1: Port interface cleanup (ISP)
+### Component catalog (complete)
 
-**Problem (initial hypothesis):** `IOPort` is a fat interface — static components only call `write()` but depend on `question()`, `rawInput()`, `readFile()`, `readDir()`, `joinPath()`. `StylePort` was suspected to export unused `rgb()` and `hex()` methods (audit found they are used — see resolution below).
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**Segregate `IOPort`**~~ | bijou | Done — split into WritePort, QueryPort, InteractivePort, FilePort. IOPort = InteractivePort & FilePort & { onResize }. |
-| ~~**Remove dead `StylePort` methods**~~ | bijou | Audited — rgb() is used by gradient.ts and progress.ts, hex() by progress.ts. Confirmed not dead; no removal needed. |
-| ~~**Audit `onResize` usage**~~ | bijou | Audited — only called by bijou-tui eventbus.ts. Kept on IOPort (full union) but excluded from core sub-ports (WritePort, QueryPort, InteractivePort). |
-
-### Phase 2: Form abstractions (DRY + SRP)
-
-**Problem:** `select`, `multiselect`, `filter`, and `textarea` duplicate the same interactive/non-interactive branching, render/clearRender/cleanup terminal control, numbered list rendering, title formatting, and validation error display.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**Extract `formDispatch()` helper**~~ | bijou | Done — shared mode + TTY routing in `form-utils.ts`. |
-| ~~**Extract `terminalRenderer()` utility**~~ | bijou | Done — ANSI cursor helpers (hideCursor, showCursor, moveUp, clearBlock, writeLine). |
-| ~~**Extract `renderNumberedOptions()`**~~ | bijou | Done — shared numbered-list renderer for fallback modes. |
-| ~~**Extract `formatFormTitle()`**~~ | bijou | Done — styled `? title` formatting with mode/noColor branching. |
-| ~~**Extract `writeValidationError()`**~~ | bijou | Done — mode-aware error display for input and textarea. |
-| ~~**Standardize on `resolveCtx()`**~~ | bijou | Done — all 6 form files migrated from `getDefaultContext()` to `resolveCtx()`. |
-
-### Phase 3: Background color support (new feature)
-
-**Problem:** Bijou has zero background color support. `StylePort` is foreground-only, `TokenValue` has no `bg` field, and every component pads with plain transparent spaces. The only workaround is the `inverse` modifier (used by `badge()` for pills). To create div-like colored blocks — panel backgrounds, highlighted regions, modal fills — we need background colors as a first-class concept across the token system, style port, adapters, and components.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**Add `bg` to `TokenValue`**~~ | bijou | Done — optional `bg?: string` (hex) field on `TokenValue`. Backward-compatible. |
-| ~~**Add `bgRgb()` and `bgHex()` to `StylePort`**~~ | bijou | Done — two new methods mirroring `rgb()` / `hex()`. |
-| ~~**Update `styled()` to apply `token.bg`**~~ | bijou + bijou-node | Done — `styled()` applies `bgHex(token.bg)` when present. chalk adapter updated. |
-| ~~**Update test adapters**~~ | bijou | Done — `plainStyle()` (identity) and `auditStyle()` (recording) implement `bgRgb()` / `bgHex()`. |
-| ~~**Add `surface` tokens to theme**~~ | bijou | Done — `surface: { primary, secondary, elevated, overlay, muted }` on all presets. DTCG/extend updated. |
-| ~~**Add `bg` / `bgToken` to `box()`**~~ | bijou | Done — `bgToken` fills interior. Pipe/accessible/noColor modes skip bg. |
-| ~~**Add `bg` to `flex()` children**~~ | bijou-tui | Done — per-child `bg` and container-level `bg` on `FlexOptions`. Gaps and padding filled. |
-| ~~**Add `bg` to overlay primitives**~~ | bijou-tui | Done — `bgToken` on `modal()`, `toast()`, `drawer()` fills interior with background color. |
-| ~~**Graceful degradation**~~ | bijou | Done — `noColor`/pipe/accessible modes skip bg. Adapters return text unchanged when noColor. |
-| ~~**Tests and examples**~~ | bijou + bijou-tui | Done — unit tests for all bg paths. `examples/background-panels/` demonstrates div-like colored blocks. |
-
-### Phase 4: Large file decomposition (SRP)
-
-**Problem:** Several files exceed 300 lines with multiple distinct responsibilities.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**Split `dag.ts` (941 lines)**~~ | bijou | Done — `dag-layout.ts` (layer assignment, column ordering), `dag-edges.ts` (edge routing), `dag-render.ts` (interactive/pipe/accessible renderers). `dag.ts` is the public facade. |
-| ~~**Split `markdown.ts` (468 lines)**~~ | bijou | Done — `markdown-parse.ts` (block/inline parser, word wrap), `markdown-render.ts` (mode-specific block renderer). `markdown.ts` is the public facade. |
-| ~~**Extract textarea editor**~~ | bijou | Done — `textarea-editor.ts` owns TextareaOptions and interactiveTextarea(). `textarea.ts` is the public facade. |
-| ~~**Extract filter interactive UI**~~ | bijou | Done — `filter-interactive.ts` owns FilterOption, FilterOptions, defaultMatch, interactiveFilter(). `filter.ts` is the public facade. |
-
-### Phase 5: Mode rendering strategy (OCP)
-
-**Problem:** ~22 components repeat `if (mode === 'pipe') ... if (mode === 'accessible') ...` chains. Adding a new output mode requires touching every component.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| **Design mode renderer pattern** | bijou | Create a `ModeRenderer<Input, Output>` type and `renderByMode()` dispatcher that selects a handler from a mode→renderer map. Components register per-mode renderers instead of using if/else. |
-| **Migrate pilot components** | bijou | Convert `alert`, `badge`, `box` as proof-of-concept. Validate the pattern before wider rollout. |
-| **Migrate remaining components** | bijou | Convert all ~22 mode-branching components to the registry pattern. |
-
-### Phase 6: Test suite hardening
-
-**Problem:** Some tests are brittle (exact ANSI assertions, whitespace-sensitive `toBe`), and some edge cases are missing.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**Replace exact ANSI assertions**~~ | bijou | ✅ Done — 12 raw ANSI assertions replaced with `expectNoAnsi()`, `expectHiddenCursor()`, `expectShownCursor()` semantic helpers. |
-| **Relax whitespace-sensitive assertions** | bijou | Audit `toBe` assertions on multi-line component output. Replace with `toContain` / `toMatch` where the test intent is "contains content" not "exact formatting". |
-| **Add null/undefined input tests** | bijou | Add defensive tests for all public component APIs: `box(null as any)`, `table({ columns: [], rows: [] })`, etc. |
-| **Extract shared test fixtures** | bijou | Create `test/fixtures.ts` with shared option arrays (`COLOR_OPTIONS`, `FRUIT_OPTIONS`) and context builders used across form tests. |
-| ~~**Create output assertion helpers**~~ | bijou | ✅ Done — 6 helpers: `expectNoAnsi()`, `expectNoAnsiSgr()`, `expectContainsAnsi()`, `expectHiddenCursor()`, `expectShownCursor()`, `expectWritten()`. Test-only, not in main barrel. |
-| ~~**noColor integration test suite**~~ | bijou | ✅ Done — 7 tests covering select, multiselect, filter, textarea, input, confirm with `noColor: true`. Interactive forms use `expectNoAnsiSgr()`, question-based use `expectNoAnsi()`. |
-
-### Phase 7: Theme access pattern (DIP)
-
-**Problem:** Every component hardcodes deep theme paths like `ctx.theme.theme.semantic.primary` and `ctx.theme.theme.border.primary`, coupling them to the exact theme object shape.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| **Add theme query helpers** | bijou | `ctx.semantic(key)`, `ctx.border(key)` convenience accessors that encapsulate the path traversal. |
-| **Migrate components** | bijou | Replace `ctx.theme.theme.semantic.*` with `ctx.semantic()` calls across all components. |
-
-### Phase 8: App shell primitives
-
-**Problem:** Building a multi-pane TUI app requires manually composing `flex()`, `focusArea()`, `createPanelGroup()`, `InputStack`, keymaps, and resize handling. Every non-trivial app re-implements the same shell: tabbed pages, help overlay, scroll, gutters, fullscreen layout. We need higher-level primitives so this is a one-liner.
-
-**DX research needed first:** What are the right abstractions? How do grids, splits, and focus areas compose? Study real apps (lazygit, k9s, btop) and existing TUI frameworks (Charm bubbletea layouts, Ratatui) to identify the minimal primitive set.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| ~~**DX deep dive: app layout patterns**~~ | research | ✅ Done — documented in `DX_COMPETITION.md` with matrix comparison and proposed API surface for `splitPane()` / `grid()` / `appFrame()`. |
-| **`splitPane()`** | bijou-tui | **v1.3 core** — resizable split view (horizontal/vertical) with min/max constraints, focus delegation, and pure state reducers. Each pane is a render function `(w, h) => string`. |
-| **`grid()` layout primitive** | bijou-tui | **v1.3 core** — CSS Grid-inspired layout with named areas, fixed + fractional tracks (auto as follow-up), and gap. Each cell receives allocated `(w, h)`. Composes with `focusArea()` for per-cell scroll. |
-| **Scrollable `select()` / `filter()`** | bijou | Add `maxVisible` + scroll offset to `select()`. ~~`filter()` scroll~~: ✅ Done. |
-
-### Phase 9: `appFrame()` — TEA app shell
-
-**Problem:** Every TUI app beyond "hello world" re-implements tabbed pages, help overlay, scroll management, gutter chrome, and fullscreen layout. `appFrame()` eliminates this boilerplate.
-
-| Task | Package | Notes |
-|------|---------|-------|
-| **`appFrame()` higher-order app** | bijou-tui | **v1.3 core** — `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`. Each page declares view + keymap + help. Frame owns tab switching, `?` help toggle, scroll, gutter/chrome. |
-| **Per-page scroll isolation** | bijou-tui | **v1.3 core** — each page/pane has independent scroll state preserved across tab switches. Focus determines which pane receives scroll input. |
-| **Multi-pane page support** | bijou-tui | **v1.3 core** — pages can declare `splitPane()` or `grid()` layouts. Frame delegates focus and input routing per pane via `InputStack`. |
-| **Panel-scoped overlays/drawers** | bijou-tui | **v1.3 core** — overlays target either full screen or a pane rect from `splitPane()` / `grid()`, enabling local drawers and modal-like panel tools. |
-| **Framed-app interaction harness** | bijou-tui | **v1.3 core** — first-party headless harness for `appFrame` flows: key sequence replay, resize events, and frame snapshot assertions over time. |
-| **Frame-level command palette** | bijou-tui | **v1.3 stretch** — optional action palette (`Ctrl+P`/`:`) for global + page actions, backed by keymap metadata and existing command palette primitives. |
-| **Tab/screen transition animations** | bijou-tui | **v1.4+/experimental** — optional transitions between pages/tabs (`wipe`, `dissolve`, `grid`, `fade`) via full-screen `canvas()` + `composite()`. Must degrade cleanly in `static`/`pipe`/`accessible` modes. |
-
-### Release targeting (current plan)
-
-**v1.3.0 — App Shell Foundations (planned):**
-
-- `splitPane()` v1 (stateful, focus-aware, test-first)
-- `grid()` v1 (fixed + fractional tracks, named areas)
-- `appFrame()` MVP (tabs/help/chrome/global+page keymaps)
-- per-page scroll isolation
-- multi-pane page support
-- panel-scoped overlays + `drawer()` anchor expansion
-- framed-app interaction harness (key replay + resize + frame snapshots)
-
-**v1.3.0 stretch (only if low-risk):**
-
-- scrollable `select()` (`filter()` already done)
-- frame-level command palette (`Ctrl+P`/`:`) for app/page actions
-
-**v1.4.0+ / experimental (after core shell stabilizes):**
-
-- tab/screen transitions (`wipe`/`dissolve`/`grid`/`fade`)
-- dockable panel manager (drag + keyboard move)
-- panel minimize/fold/unfold behaviors
-- layout presets + session restore for pane/dock state
+| Category | Components |
+|----------|-----------|
+| **Element** | `alert()`, `badge()`, `separator()`, `skeleton()`, `kbd()` |
+| **Data** | `accordion()`, `tree()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` |
+| **Forms** | `input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `textarea()`, `filter()`, `wizard()` |
+| **Navigation** | `tabs()`, `breadcrumb()`, `paginator()`, `stepper()`, `commandPalette()` |
+| **TUI Building Blocks** | `viewport()`, `pager()`, `interactiveAccordion()`, `createPanelGroup()`, `navigableTable()`, `browsableList()`, `filePicker()`, `focusArea()`, `dagPane()` |
+| **Overlay** | `composite()`, `modal()`, `toast()`, `drawer()`, `tooltip()` |
+| **Input** | `parseKey()`, `createKeyMap()`, `createInputStack()`, `parseMouse()` |
+| **Layout** | `splitPane()`, `grid()`, `flex()`, `place()`, `vstack()`, `hstack()` |
+| **App** | `statusBar()`, `createFramedApp()`, `canvas()` |
 
 ---
+
+## Backlog
+
+### P3 — Nice to have
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **Timer / Stopwatch** | bijou | Countdown and elapsed-time display components. |
+| **MaxWidth / MaxHeight** | bijou | Truncation constraints on styled blocks. |
+| **Dynamic forms** | bijou | Fields that change based on previous input values. |
+| **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
+| **Note field** | bijou | Display-only text within a form flow. |
+| **Dockable panel manager (drag + keyboard move)** | bijou-tui | Reorder and dock panes in `splitPane()`/`grid()` layouts via mouse drag (when enabled) plus keyboard fallback. Persist layout map in app state. In-process only (no cross-terminal pop-out). |
+| **Panel minimize/fold/unfold** | bijou-tui | Per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
+| **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
+| **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
+| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+
+---
+
+## Test coverage spec (future hardening milestone)
+
+Detailed acceptance criteria for existing features. Not all of these are currently covered by tests — this section defines the target coverage.
 
 ### 1. Form functions: confirm, input, select, multiselect
 
@@ -410,7 +322,7 @@ accessible mode
 ```
 
 **Test plan:**
-- **Golden path:** one test per component per environment config (matrix: component × mode × NO_COLOR)
+- **Golden path:** one test per component per environment config (matrix: component x mode x NO_COLOR)
 - **Failure modes:** conflicting env vars (e.g., `NO_COLOR` + TTY), unknown `TERM` values
 - **Fuzz/stress:** randomized env var combinations to check for crashes
 
@@ -447,157 +359,7 @@ round-trip
 
 ---
 
-## Future features
-
-### ~~`appFrame` — TEA app shell (bijou-tui)~~ → Scheduled as Phase 9
-
-See Phase 9 above. Original design notes preserved here for reference:
-
-**Core idea:**
-- `createFramedApp({ pages, globalKeys })` → `App<FrameModel, FrameMsg>`
-- Each page declares its view, per-page help lines, and per-page key bindings
-- Frame owns: tab switching, `?` help toggle, scroll state, gutter/chrome rendering
-- Delegates content rendering to the active page's `view()`
-
-**Focused scroll:**
-- Each page/view has its own independent scroll position (preserved when switching tabs)
-- Only the "focused" view scrolls — in a multi-pane layout, focus determines which pane receives scroll input
-- Focus can be driven by tab selection or an explicit activation key per pane
-
-**Open questions:**
-- Multi-pane layouts (split views) vs. single content area per tab
-- How page-level state/update composes with frame-level state (nested TEA? slots?)
-- Whether pages can define sub-tabs or if nesting is out of scope
-
-### Component catalog
-
-Growing toward a full terminal component library:
-
-| Category | Components |
-|----------|-----------|
-| **Element** | ~~`alert()`~~, ~~`badge()`~~, ~~`separator()`~~, ~~`skeleton()`~~, ~~`kbd()`~~ ✅ |
-| **Data** | ~~`accordion()`~~, ~~`tree()`~~, ~~`timeline()`~~, ~~`dag()`~~, ~~`dagSlice()`~~, ~~`dagLayout()`~~, ~~`dagStats()`~~ ✅ |
-| **Forms** | ~~`input()`~~, ~~`select()`~~, ~~`multiselect()`~~, ~~`confirm()`~~, ~~`group()`~~, ~~`textarea()`~~, ~~`filter()`~~, ~~`wizard()`~~ ✅ |
-| **Navigation** | ~~`tabs()`~~, ~~`breadcrumb()`~~, ~~`paginator()`~~, ~~`stepper()`~~, ~~`commandPalette()`~~ ✅ |
-| **TUI Building Blocks** | ~~`viewport()`~~, ~~`pager()`~~, ~~`interactiveAccordion()`~~, ~~`createPanelGroup()`~~, ~~`navigableTable()`~~, ~~`browsableList()`~~, ~~`filePicker()`~~, ~~`focusArea()`~~, ~~`dagPane()`~~ ✅ |
-| **Overlay** | ~~`composite()`~~, ~~`modal()`~~, ~~`toast()`~~, ~~`drawer()`~~ ✅ |
-| **Input** | ~~`parseKey()`~~, ~~`createKeyMap()`~~, ~~`createInputStack()`~~, ~~`parseMouse()`~~ ✅ |
-| **App** | ~~`statusBar()`~~, ~~`tooltip()`~~ ✅, `splitPane()`, `grid()`, `appFrame()` |
-
-Each new component should follow this template before implementation:
-1. Write user story and requirements
-2. Define acceptance criteria as test descriptions
-3. Write the tests (they will fail)
-4. Implement until tests pass
-
----
-
-## Backlog
-
-Gaps identified from Charm ecosystem comparison (gum, bubbles, lipgloss, huh). Prioritized by how many other features they unblock.
-
-### ~~P0 — Foundational~~ ✅ Shipped in v0.2.0
-
-| Feature | Package | Status |
-|---------|---------|--------|
-| ~~**`viewport()`**~~ | bijou-tui | ✅ v0.2.0 |
-| ~~**Keybinding manager**~~ | bijou-tui | ✅ v0.2.0 |
-| ~~**Help generator**~~ | bijou-tui | ✅ v0.2.0 |
-
-### P1 — Core components
-
-| Feature | Package | Status |
-|---------|---------|--------|
-| ~~**Interactive `accordion()`**~~ | bijou-tui | ✅ Building block: `interactiveAccordion()`, `accordionKeyMap()`, state transformers |
-| ~~**`pager()`**~~ | bijou-tui | ✅ Building block wrapping `viewport()` with status line |
-| ~~**`textarea()`**~~ | bijou | ✅ Multi-line text input with cursor nav, line numbers, maxLength |
-| ~~**`filter()`**~~ | bijou | ✅ Fuzzy type-to-filter with keyword matching |
-| ~~**`browsableList()`**~~ | bijou-tui | ✅ v0.6.0 — Rich list with keyboard nav, scroll viewport, page navigation, descriptions |
-| ~~**`filePicker()`**~~ | bijou-tui | ✅ v0.6.0 — Directory browser with extension filtering, IOPort integration |
-| ~~**Form wizard**~~ | bijou | ✅ v0.6.0 — `wizard()` multi-step form orchestration with conditional skip logic |
-| ~~**`navigableTable()`**~~ | bijou-tui | ✅ v0.6.0 — Keyboard-navigable table with focus, scrolling, vim keybindings |
-
-### ~~P1.5 — Interactive DAG primitives (XYPH-driven)~~ ✅ Shipped
-
-Specs from XYPH for building an interactive roadmap DAG view with 2D panning, node selection, and multi-panel input.
-
-| Feature | Package | Notes | Blocks XYPH? |
-|---------|---------|-------|:------------:|
-| ~~**Export ANSI utilities**~~ | bijou-tui | ✅ `stripAnsi()`, `visibleLength()`, `clipToWidth()` publicly exported | ✓ |
-| ~~**`viewport()` scrollX**~~ | bijou-tui | ✅ `scrollX` option, `sliceAnsi()`, `scrollByX()`/`scrollToX()`, `maxX` in `ScrollState` | ✓ |
-| ~~**`dag()` `selectedId`**~~ | bijou | ✅ `selectedId`/`selectedToken` with highest priority over highlight path | ✓ |
-| ~~**`dagLayout()`**~~ | bijou | ✅ Returns rendered string + `Map<string, DagNodePosition>` with grid coordinates | |
-| ~~**`createPanelGroup()`**~~ | bijou-tui | ✅ Multi-panel focus with InputStack integration, hotkey switching, `formatLabel()` | |
-
-### ~~P1.75 — XYPH Dashboard blockers~~ ✅ Shipped (overlay primitives)
-
-| Feature | Package | Notes | Blocks XYPH? |
-|---------|---------|-------|:------------:|
-| ~~**`composite()` overlay**~~ | bijou-tui | ✅ Painter's algorithm compositing with ANSI-safe splicing, dim background support | ✓ |
-| ~~**`modal()`**~~ | bijou-tui | ✅ Centered dialog overlay with title, body, hint, auto-centering, themed borders | ✓ |
-| ~~**`toast()`**~~ | bijou-tui | ✅ Anchored notification overlay with success/error/info variants, 4-corner anchoring | ✓ |
-
-~~Remaining from P1.75 (deferred — not an overlay primitive):~~ ✅ Shipped in v0.6.0
-
-| Feature | Package | Notes | Blocks XYPH? |
-|---------|---------|-------|:------------:|
-| ~~**`dagStats()`**~~ | bijou | ✅ v0.6.0 — Pure graph statistics with cycle detection, ghost-node filtering, `SlicedDagSource` support | |
-
-### P2 — Layout, input & styling primitives
-
-| Feature | Package | Notes |
-|---------|---------|-------|
-| ~~**Mouse input**~~ | bijou-tui | ✅ v0.10.0 — Opt-in SGR mouse protocol via `RunOptions.mouse`. `MouseMsg`, `parseMouse()`, `isMouseMsg()`. No port change needed — reuses `rawInput()`. |
-| ~~**`DagNode` token expansion**~~ | bijou | ✅ v0.8.0 — `labelToken` and `badgeToken` on `DagNode` for granular per-node styling beyond border color. |
-| ~~**`place()`**~~ | bijou-tui | ✅ v0.7.0 — 2D text placement with horizontal + vertical alignment. |
-| ~~**`drawer()`**~~ | bijou-tui | ✅ v0.7.0 — Slide-in side panel built on `composite()`. Left/right anchored, configurable width. |
-| **`drawer()` edge expansion** | bijou-tui | **v1.3 core** — add `top` + `bottom` anchors (in addition to left/right), and support region-scoped drawers so drawers can attach to panels, not only fullscreen. |
-| ~~**CLI/stdin component driver**~~ | bijou-tui | ✅ v0.9.0 — `runScript()` feeds key sequences into TEA apps and captures frames. |
-| ~~**`enumeratedList()`**~~ | bijou | ✅ v0.7.0 — Ordered/unordered lists with bullet styles (arabic, alpha, roman, bullet, dash, none). |
-| ~~**Terminal hyperlinks**~~ | bijou | ✅ v0.7.0 — Clickable OSC 8 links with graceful fallback. |
-| ~~**Adaptive colors**~~ | bijou | ✅ Done — `detectColorScheme(runtime?)` reads `COLORFGBG`, `ResolvedTheme.colorScheme`, `createTestContext({ colorScheme })`. Auto color switching deferred to theme consumer. |
-| ~~**Color downsampling**~~ | bijou | ✅ v0.9.0 — `rgbToAnsi256()`, `rgbToAnsi16()`, `nearestAnsi256()`, `ansi256ToAnsi16()` pure conversion functions. |
-| ~~**Color manipulation**~~ | bijou | ✅ v0.8.0 — `lighten()`, `darken()`, `mix()`, `complementary()`, `saturate()`, `desaturate()` on theme tokens. |
-| ~~**`markdown()`**~~ | bijou | ✅ v0.9.0 — Terminal markdown renderer with headings, inline formatting, lists, code blocks, blockquotes, links, and mode degradation. |
-| ~~**`log()`**~~ | bijou | ✅ v0.7.0 — Leveled styled log output (debug/info/warn/error/fatal). |
-| ~~**`canvas()` shader primitive**~~ | bijou-tui | ✅ v0.10.0 — `(cols, rows, shader, options?) → string` character-grid renderer. Shader per cell, pipe/accessible → empty. |
-| ~~**`box()` width override**~~ | bijou | ✅ v0.10.0 — Optional `width` on `BoxOptions` locks outer width. Content clipped via `clipToWidth()` or right-padded. |
-
-### P2.5 — Code quality & DX
-
-| Feature | Package | Notes |
-|---------|---------|-------|
-| ~~**Eliminate `as KeyMsg` casts in examples**~~ | examples | ✅ v0.9.0 — Replaced with `isKeyMsg()` / `isResizeMsg()` type guards across all examples, runtime, and tests. |
-| ~~**`AuditStylePort` test adapter**~~ | bijou | ✅ v0.9.0 — `auditStyle()` records styled calls for assertion with `wasStyled()` convenience method. |
-| ~~**Grapheme cluster support**~~ | bijou + bijou-tui | ✅ v0.9.0 — `segmentGraphemes()`, `graphemeWidth()`, `isWideChar()` using `Intl.Segmenter`. Fixed `visibleLength()`, `clipToWidth()`, `sliceAnsi()`, `truncateLabel()`, and `renderNodeBox()`. |
-| ~~**`styledFnGuarded()` helper**~~ | bijou | ✅ Done — `createStyledFn(ctx)` and `createBoldFn(ctx)` in `form-utils.ts`. All 4 interactive form files refactored. |
-| ~~**Lint rule for raw ANSI escapes**~~ | bijou | ✅ Done — Vitest-based `ansi-lint.test.ts` scans source for raw `\x1b` escapes. 13 allowed files. |
-
-### P3 — Nice to have
-
-| Feature | Package | Notes |
-|---------|---------|-------|
-| **Timer / Stopwatch** | bijou | Countdown and elapsed-time display components. |
-| **Cursor manager** | bijou-tui | Cursor style/blink management. |
-| **Underline variants** | bijou | Curly, dotted, dashed underlines. |
-| **MaxWidth / MaxHeight** | bijou | Truncation constraints on styled blocks. |
-| **Dynamic forms** | bijou | Fields that change based on previous input values. |
-| **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
-| **Note field** | bijou | Display-only text within a form flow. |
-| **Parse F-keys** | bijou-tui | Recognize F1–F12 escape sequences in `parseKey()` and surface as `KeyMsg`. |
-| **Dockable panel manager (drag + keyboard move)** | bijou-tui | **v1.4+** — reorder and dock panes in `splitPane()`/`grid()` layouts via mouse drag (when enabled) plus keyboard fallback. Persist layout map in app state. In-process only (no cross-terminal pop-out). |
-| **Panel minimize/fold/unfold** | bijou-tui | **v1.4+** — per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
-| **Panel maximize/restore** | bijou-tui | **v1.4+** — promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
-| **Layout presets + session restore** | bijou-tui | **v1.4+** — serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
-| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
-| **`detectColorScheme` env accessor** | bijou | Refactor inline `runtime ? runtime.env(key) : process.env[key]` to use shared `env()` closure, matching `detectOutputMode` pattern in the same file (`core/detect/tty.ts`). |
-| **Improve docstring coverage to 80%** | bijou | Audit exported functions across all packages and add missing JSDoc to reach the 80% threshold. |
-| ~~**Fix `k` key asymmetry in `filter-interactive`**~~ | bijou | ✅ Done — resolved via vim-style normal/insert mode switching. `k` navigates in normal mode, is typeable in insert mode. |
-| ~~**Wrap arrow position encoding in functions**~~ | bijou | ✅ Done — `encodeArrowPos()`/`decodeArrowPos()` using bitwise `(row << 16) \| col` encoding. `GRID_COL_MULTIPLIER` removed. |
-
----
-
-### Xyph migration
+## Xyph migration
 
 Once published:
 1. `npm install @flyingrobots/bijou @flyingrobots/bijou-node`
@@ -609,8 +371,8 @@ Once published:
 
 | XYPH Phase | Bijou dependency | Status |
 |------------|-----------------|--------|
-| Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | ✅ Ready |
-| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | ✅ Ready |
-| Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | ✅ Ready |
-| Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | ✅ Ready |
-| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | ✅ Ready |
+| Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | Ready |
+| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | Ready |
+| Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | Ready |
+| Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | Ready |
+| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | Ready |

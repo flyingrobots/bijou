@@ -32,12 +32,20 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const instance: ChalkInstance = opts.level !== undefined
     ? new Chalk({ level: opts.level })
     : chalk;
+  /** Whether ANSI styling is active (respects both noColor flag and chalk level). */
+  const ansiEnabled = !isNoColor && instance.level > 0;
+
+  /** SGR codes for underline variants (not supported by chalk natively). */
+  const UNDERLINE_VARIANT_SGR: Record<string, string> = {
+    'curly-underline': '\x1b[4:3m',
+    'dotted-underline': '\x1b[4:4m',
+    'dashed-underline': '\x1b[4:5m',
+  };
+  /** SGR 24 resets underline. */
+  const UNDERLINE_RESET = '\x1b[24m';
 
   /**
    * Chain text-decoration modifiers onto a chalk instance.
-   *
-   * Applies each modifier (`bold`, `dim`, `strikethrough`, `inverse`)
-   * in order, returning the fully-decorated chalk instance.
    *
    * @param c - Base chalk instance (already color-configured).
    * @param modifiers - Optional array of modifier names from a {@link TokenValue}.
@@ -52,10 +60,31 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
         case 'dim':           result = result.dim; break;
         case 'strikethrough': result = result.strikethrough; break;
         case 'inverse':       result = result.inverse; break;
+        case 'underline':     result = result.underline; break;
+        // Underline variants are handled after chalk styling via raw SGR wrapping
+        case 'curly-underline':
+        case 'dotted-underline':
+        case 'dashed-underline': break;
         default: {
           const _exhaustive: never = mod;
           void _exhaustive;
         }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Wrap text with raw SGR sequences for underline variants that chalk
+   * doesn't support natively. Called after chalk styling is applied.
+   */
+  function applyUnderlineVariants(text: string, modifiers?: TokenValue['modifiers']): string {
+    if (!ansiEnabled || modifiers === undefined) return text;
+    let result = text;
+    for (const mod of modifiers) {
+      const sgr = UNDERLINE_VARIANT_SGR[mod];
+      if (sgr) {
+        result = sgr + result + UNDERLINE_RESET;
       }
     }
     return result;
@@ -67,12 +96,13 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      *
      * @param token - Resolved token value containing `hex` and optional `modifiers`.
      * @param text - Text to style.
-     * @returns Styled text, or unmodified text when `noColor` is active.
+     * @returns Styled text, or unmodified text when ANSI output is disabled via `noColor` or `level: 0`.
      */
     styled(token: TokenValue, text: string): string {
-      if (isNoColor) return text;
+      if (!ansiEnabled) return text;
       const base: ChalkInstance = instance.hex(token.hex);
       let result = applyModifiers(base, token.modifiers)(text);
+      result = applyUnderlineVariants(result, token.modifiers);
       // Note: bg is applied unconditionally when noColor is false.
       // Callers (e.g. makeBgFill, box, flex) are responsible for
       // stripping token.bg in pipe/accessible/noColor modes.

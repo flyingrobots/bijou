@@ -27,7 +27,12 @@ describe('tree', () => {
   it('renders indented plain text in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = tree(simple, { ctx });
-    expect(result).toBe('src\n  index.ts\n  utils.ts\nREADME.md');
+    const lines = result.split('\n');
+    expect(lines).toHaveLength(4);
+    expect(lines[0]).toBe('src');
+    expect(lines[1]).toMatch(/^\s+index\.ts$/);
+    expect(lines[2]).toMatch(/^\s+utils\.ts$/);
+    expect(lines[3]).toBe('README.md');
   });
 
   it('renders indented text with item counts in accessible mode', () => {

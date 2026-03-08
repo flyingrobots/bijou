@@ -51,7 +51,7 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
       const filledCount = Math.min(width, Math.max(0, Math.round((pct / 100) * width)));
 
       const noColor = ctx.theme.noColor;
-      const stops = options.gradient ?? ctx.theme.theme.gradient.progress ?? [];
+      const stops = options.gradient ?? ctx.gradient('progress');
 
       let bar = '';
       if (noColor || stops.length === 0) {

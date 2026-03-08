@@ -19,6 +19,9 @@ export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
  * Uses arrow-key navigation in interactive TTY mode, or a numbered list
  * fallback for pipe and accessible modes.
  *
+ * If `defaultValue` does not match any option (via {@link Object.is}), the
+ * first option is used as the cancellation fallback.
+ *
  * @typeParam T - Type of each option's value.
  * @param options - Select field configuration.
  * @returns The value of the selected option.
@@ -84,6 +87,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   let cursor = 0;
   let scrollOffset = 0;
 
+  /** Keep the scroll offset so the cursor stays within the visible window. */
   function clampScroll(): void {
     if (cursor < scrollOffset) {
       scrollOffset = cursor;
@@ -93,14 +97,17 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, options.options.length - maxVisible)));
   }
 
+  /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
-    return options.options.slice(scrollOffset, scrollOffset + maxVisible) as SelectOption<T>[];
+    return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
+  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
+  /** Write the select UI (title, option list) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
@@ -121,17 +128,19 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     }
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
-  function cleanup(): void {
+  /** Erase the full UI and print the final selection summary line. */
+  function cleanup(selectedLabel?: string): void {
     clearRender();
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
-    const selected = options.options[cursor] as SelectOption<T>;
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selected.label);
+    const displayLabel = selectedLabel ?? (options.options[cursor] as SelectOption<T>).label;
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), displayLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }
@@ -154,7 +163,11 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
         // Note: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.
-        handle.dispose(); cleanup(); resolve(options.defaultValue ?? options.options[0]!.value);
+        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        // Object.is uses reference equality — object-typed values must be the
+        // exact same reference to match, not merely structurally equivalent.
+        const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
+        handle.dispose(); cleanup(fallbackOption?.label); resolve(fallbackValue);
       }
     });
   });

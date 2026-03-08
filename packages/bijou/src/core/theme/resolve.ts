@@ -129,6 +129,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
 
   let cached: ResolvedTheme | null = null;
 
+  /** Return the lazily-cached resolved theme for the current environment. */
   function getTheme(): ResolvedTheme {
     if (cached !== null) return cached;
 
@@ -147,6 +148,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     return cached;
   }
 
+  /** Resolve a theme by name (or env/fallback), bypassing the cache. */
   function resolveTheme(name?: string): ResolvedTheme {
     const noColor = isNoColor(runtime);
     const colorScheme = detectColorScheme(runtime);
@@ -161,6 +163,7 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
     return createResolved(theme, noColor, colorScheme);
   }
 
+  /** Clear the cached theme so the next `getTheme()` re-resolves. */
   function _resetForTesting(): void {
     cached = null;
   }

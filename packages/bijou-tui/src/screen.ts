@@ -32,6 +32,54 @@ export const HOME = '\x1b[H';
 /** ANSI escape: clear entire current line (EL 2). */
 export const CLEAR_LINE = '\x1b[2K';
 
+// ── Cursor shape (DECSCUSR) ──────────────────────────────────────────
+
+/** Cursor shape type for {@link setCursorStyle}. */
+export type CursorShape = 'block' | 'underline' | 'bar';
+
+/** ANSI escape: steady block cursor (DECSCUSR 2). */
+export const CURSOR_BLOCK = '\x1b[2 q';
+/** ANSI escape: steady underline cursor (DECSCUSR 4). */
+export const CURSOR_UNDERLINE = '\x1b[4 q';
+/** ANSI escape: steady bar cursor (DECSCUSR 6). */
+export const CURSOR_BAR = '\x1b[6 q';
+/** ANSI escape: request the terminal's configured default cursor style (DECSCUSR 0). */
+export const CURSOR_RESET = '\x1b[0 q';
+
+/** DECSCUSR code for each shape: steady value (blinking = steady - 1). */
+const CURSOR_SHAPE_CODE: Record<CursorShape, number> = {
+  block: 2,
+  underline: 4,
+  bar: 6,
+};
+
+/**
+ * Set cursor shape and optional blink state via DECSCUSR.
+ *
+ * This function produces Ps values 1–6. To reset the cursor to the
+ * terminal's configured default (Ps=0), use {@link resetCursorStyle} instead.
+ *
+ * @param io - The I/O port to write the escape sequence to.
+ * @param shape - Cursor shape: `'block'`, `'underline'`, or `'bar'`.
+ * @param options - Optional blink configuration.
+ */
+export function setCursorStyle(io: IOPort, shape: CursorShape, options?: { blink?: boolean }): void {
+  const code = options?.blink ? CURSOR_SHAPE_CODE[shape] - 1 : CURSOR_SHAPE_CODE[shape];
+  io.write(`\x1b[${code} q`);
+}
+
+/**
+ * Request the terminal's configured default cursor style (DECSCUSR 0).
+ *
+ * Note: this does not restore a previously saved cursor style — it asks
+ * the terminal to use whatever default it has configured.
+ *
+ * @param io - The I/O port to write the escape sequence to.
+ */
+export function resetCursorStyle(io: IOPort): void {
+  io.write(CURSOR_RESET);
+}
+
 /**
  * Enter alt screen buffer, hide cursor, disable wrap, and clear screen.
  *

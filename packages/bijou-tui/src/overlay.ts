@@ -380,6 +380,7 @@ interface DrawerBaseOptions {
   readonly ctx?: BijouContext;
 }
 
+/** Drawer options with default (right) anchor and required width. */
 interface DrawerDefaultOptions extends DrawerBaseOptions {
   /** Side of the screen/region to anchor the drawer. Default: 'right'. */
   readonly anchor?: undefined;
@@ -388,6 +389,7 @@ interface DrawerDefaultOptions extends DrawerBaseOptions {
   readonly height?: never;
 }
 
+/** Drawer options for left/right anchor with required width. */
 interface DrawerHorizontalOptions extends DrawerBaseOptions {
   /** Side of the screen/region to anchor the drawer. */
   readonly anchor: 'left' | 'right';
@@ -396,6 +398,7 @@ interface DrawerHorizontalOptions extends DrawerBaseOptions {
   readonly height?: never;
 }
 
+/** Drawer options for top/bottom anchor with required height. */
 interface DrawerVerticalOptions extends DrawerBaseOptions {
   /** Side of the screen/region to anchor the drawer. */
   readonly anchor: 'top' | 'bottom';
@@ -404,6 +407,7 @@ interface DrawerVerticalOptions extends DrawerBaseOptions {
   readonly width?: never;
 }
 
+/** Union of all drawer anchor variants (default/right, left/right, top/bottom). */
 export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | DrawerVerticalOptions;
 
 // ---------------------------------------------------------------------------
@@ -411,10 +415,15 @@ export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | Dra
 // ---------------------------------------------------------------------------
 
 /**
- * Create a full-height drawer overlay anchored to a screen edge.
+ * Create a drawer overlay anchored to a screen edge.
  *
- * Render a bordered panel spanning the full screen height with optional
- * title in the top border, positioned flush against the left or right edge.
+ * Supports horizontal anchors (`left`/`right`) that span the full screen height,
+ * and vertical anchors (`top`/`bottom`) that span the full screen width.
+ * Defaults to the right edge when no anchor is specified.
+ * Renders a bordered panel with optional title in the top border.
+ *
+ * When an optional `region` is provided, the drawer is constrained to that
+ * sub-region rectangle instead of spanning the full screen dimensions.
  *
  * @param options - Drawer configuration including content, anchor, and dimensions.
  * @returns Overlay positioned at the specified screen edge.
@@ -486,6 +495,7 @@ export function drawer(options: DrawerOptions): Overlay {
   };
 }
 
+/** Compute the final width, height, row, and col for a drawer given its anchor. */
 function resolveDrawerDimensions(
   options: DrawerOptions,
   region: LayoutRect,
@@ -523,33 +533,39 @@ function resolveDrawerDimensions(
   return assertNever(anchor);
 }
 
+/** Exhaustive check — always throws. */
 function assertNever(value: never): never {
   throw new Error(`Unexpected drawer anchor: ${String(value)}`);
 }
 
+/** Normalize an optional region into a clamped LayoutRect within screen bounds. */
 function clampRegion(region: LayoutRect | undefined, screenWidth: number, screenHeight: number): LayoutRect {
+  const sw = Math.floor(screenWidth);
+  const sh = Math.floor(screenHeight);
+
   if (region == null) {
     return {
       row: 0,
       col: 0,
-      width: Math.max(0, screenWidth),
-      height: Math.max(0, screenHeight),
+      width: Math.floor(Math.max(0, sw)),
+      height: Math.floor(Math.max(0, sh)),
     };
   }
 
-  const row = clamp(region.row, 0, Math.max(0, screenHeight));
-  const col = clamp(region.col, 0, Math.max(0, screenWidth));
-  const maxWidth = Math.max(0, screenWidth - col);
-  const maxHeight = Math.max(0, screenHeight - row);
+  const row = Math.floor(clamp(region.row, 0, Math.max(0, sh)));
+  const col = Math.floor(clamp(region.col, 0, Math.max(0, sw)));
+  const maxWidth = Math.max(0, sw - col);
+  const maxHeight = Math.max(0, sh - row);
 
   return {
     row,
     col,
-    width: clamp(region.width, 0, maxWidth),
-    height: clamp(region.height, 0, maxHeight),
+    width: Math.floor(clamp(region.width, 0, maxWidth)),
+    height: Math.floor(clamp(region.height, 0, maxHeight)),
   };
 }
 
+/** Clip or pad a single line to exactly `width` visible columns. */
 function fitLineExact(line: string, width: number): string {
   const target = Math.max(0, width);
   const clipped = clipToWidth(line, target);
@@ -557,6 +573,7 @@ function fitLineExact(line: string, width: number): string {
   return clipped + ' '.repeat(Math.max(0, target - vis));
 }
 
+/** Clamp a number between min and max. */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }

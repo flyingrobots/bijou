@@ -83,7 +83,10 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
-  const maxVisible = options.maxVisible ?? 7;
+  const rawMaxVisible = options.maxVisible ?? 7;
+  const maxVisible = Number.isFinite(rawMaxVisible)
+    ? Math.max(1, Math.floor(rawMaxVisible))
+    : 7;
   const term = terminalRenderer(ctx);
 
   let mode: 'normal' | 'insert' = 'normal';
@@ -92,6 +95,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   let scrollOffset = 0;
   let filtered = [...options.options];
 
+  /** Re-run the match function against all options and clamp the cursor. */
   function applyFilter(): void {
     if (query === '') {
       filtered = [...options.options];
@@ -102,6 +106,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     clampScroll();
   }
 
+  /** Keep the scroll offset so the cursor stays within the visible window. */
   function clampScroll(): void {
     if (cursor < scrollOffset) {
       scrollOffset = cursor;
@@ -111,14 +116,17 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, filtered.length - maxVisible)));
   }
 
+  /** Return the slice of filtered options currently visible on screen. */
   function visibleItems(): FilterOption<T>[] {
     return filtered.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
+  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 2 + Math.min(filtered.length, maxVisible) + 1; // header + filter input + items + status
   }
 
+  /** Write the filter UI (title, input, option list, status) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.writeLine(label);
@@ -146,23 +154,24 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('muted'), status)}\n`);
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(lineCount: number): void {
     term.moveUp(lineCount);
   }
 
+  /** Erase the previous render block and draw fresh output. */
   function clearAndRerender(prevLineCount: number): void {
     clearRender(prevLineCount);
     term.clearBlock(prevLineCount);
     render();
   }
 
-  function cleanup(): void {
+  /** Erase the full UI and print the final selection summary line. */
+  function cleanup(selectedLabel: string): void {
     const total = renderLineCount();
     clearRender(total);
     term.clearBlock(total);
 
-    const selected = filtered[cursor];
-    const selectedLabel = selected ? selected.label : '(none)';
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selectedLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
@@ -174,6 +183,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   // navigateUp/navigateDown use clearRender + render instead of clearAndRerender
   // because render() uses per-line \x1b[K (clear-to-end-of-line), making a full
   // clearBlock unnecessary for a simple cursor position change.
+  /** Move the cursor up one item, wrapping around at the top. */
   function navigateUp(): void {
     if (filtered.length === 0) return;
     const prevLineCount = renderLineCount();
@@ -183,6 +193,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     render();
   }
 
+  /** Move the cursor down one item, wrapping around at the bottom. */
   function navigateDown(): void {
     if (filtered.length === 0) return;
     const prevLineCount = renderLineCount();
@@ -192,6 +203,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
     render();
   }
 
+  /** Append a character to the query, re-filter, and re-render. */
   function typeChar(ch: string): void {
     const prevLineCount = renderLineCount();
     query += ch;
@@ -201,6 +213,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
   // switchMode uses the same lightweight rerender pattern as navigate functions —
   // only the mode indicator line changes, and render() clears each line with \x1b[K.
+  /** Toggle between normal and insert input modes and re-render. */
   function switchMode(newMode: 'normal' | 'insert'): void {
     mode = newMode;
     const prevLineCount = renderLineCount();
@@ -213,16 +226,20 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       // ── Mode-independent ───────────────────────────────────
       if (key === '\r' || key === '\n') {
         handle.dispose();
-        cleanup();
+        const selected = filtered[cursor];
+        const resolvedLabel = selected ? selected.label : '(none)';
+        cleanup(resolvedLabel);
         resolve(filtered[cursor]?.value ?? options.defaultValue ?? options.options[0]!.value);
         return;
       }
 
       if (key === '\x03') {
         // Ctrl+C — cancel from either mode
+        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
         handle.dispose();
-        cleanup();
-        resolve(options.defaultValue ?? options.options[0]!.value);
+        cleanup(fallbackOption?.label ?? '(none)');
+        resolve(fallbackValue);
         return;
       }
 
@@ -233,9 +250,11 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
           // TODO: bare \x1b may false-trigger on slow connections where escape
           // sequences arrive as separate bytes. Timer-based disambiguation is a
           // shared debt with textarea-editor.ts — unify in a future PR.
+          const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+          const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
           handle.dispose();
-          cleanup();
-          resolve(options.defaultValue ?? options.options[0]!.value);
+          cleanup(fallbackOption?.label ?? '(none)');
+          resolve(fallbackValue);
           return;
         }
 

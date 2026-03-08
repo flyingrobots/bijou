@@ -252,6 +252,12 @@ export function usage(): string {
   ].join('\n');
 }
 
+/**
+ * Ensure the target directory exists, is a directory, and is empty unless forced.
+ *
+ * When checking emptiness, `.git` and `.DS_Store` entries are filtered out so
+ * that a directory containing only those entries is treated as empty.
+ */
 function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   if (!existsSync(absTargetDir)) {
     mkdirSync(absTargetDir, { recursive: true });
@@ -275,7 +281,12 @@ function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   }
 }
 
+/** Spawn the package manager's install command synchronously. */
 function runInstall(packageManager: PackageManager, cwd: string): void {
+  const VALID_MANAGERS = new Set(['npm', 'pnpm', 'yarn', 'bun']);
+  if (!VALID_MANAGERS.has(packageManager)) {
+    throw new Error(`Unsupported package manager: ${packageManager}`);
+  }
   const args = packageManager === 'yarn' ? [] : ['install'];
   const result = spawnSync(packageManager, args, {
     cwd,

@@ -179,6 +179,7 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
   return [...aLines, ...dividerLines, ...bLines].join('\n');
 }
 
+/** Divide available space between two panes, respecting ratio and minimum constraints. */
 function solveSplit(available: number, ratio: number, minA: number, minB: number): [number, number] {
   if (available <= 0) return [0, 0];
 
@@ -202,11 +203,13 @@ function solveSplit(available: number, ratio: number, minA: number, minB: number
   return [a, b];
 }
 
+/** Normalize a ratio to the 0–1 range, defaulting non-finite values to 0.5. */
 function clampRatio(ratio: number): number {
   if (!Number.isFinite(ratio)) return 0.5;
   return clamp(ratio, 0, 1);
 }
 
+/** Log a dev-mode warning when a non-finite ratio is supplied. */
 function warnInvalidRatio(ratio: number): void {
   if (typeof process === 'undefined') return;
   const nodeEnv = process.env?.['NODE_ENV'];
@@ -216,6 +219,7 @@ function warnInvalidRatio(ratio: number): void {
   );
 }
 
+/** Pick a single-width grapheme from the divider string, falling back to a default. */
 function resolveDividerChar(dividerChar: string | undefined, fallback: string): string {
   if (dividerChar == null || dividerChar.length === 0) return fallback;
   const graphemes = segmentGraphemes(dividerChar);
@@ -229,6 +233,7 @@ function resolveDividerChar(dividerChar: string | undefined, fallback: string): 
   return fallback;
 }
 
+/** Repeat a grapheme unit to fill exactly `targetWidth` columns, padding with spaces if needed. */
 function repeatToWidth(unit: string, targetWidth: number): string {
   const width = Math.max(0, targetWidth);
   if (width === 0) return '';
@@ -247,6 +252,7 @@ function repeatToWidth(unit: string, targetWidth: number): string {
   return out;
 }
 
+/** Clamp a number between min and max. */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }

@@ -56,6 +56,7 @@ export function runCli(argv: readonly string[]): number {
   }
 }
 
+/** Parse CLI arguments, returning the parsed result or an exit code on failure. */
 function parseCliArgs(argv: readonly string[]): ReturnType<typeof parseArgs> | number {
   try {
     return parseArgs(argv);
@@ -67,6 +68,7 @@ function parseCliArgs(argv: readonly string[]): ReturnType<typeof parseArgs> | n
   }
 }
 
+/** Quote a file path for safe display in shell commands (platform-aware). */
 function quotePath(value: string): string {
   if (process.platform === 'win32') {
     const escaped = value
@@ -78,16 +80,19 @@ function quotePath(value: string): string {
   return `'${value.replace(/'/g, "'\"'\"'")}'`;
 }
 
+/** Check if an error message indicates a package install failure. */
 function isInstallFailure(message: string): boolean {
   return message.includes(' install failed');
 }
 
+/** Return the install command string for a given package manager. */
 function installCommand(pm: PackageManager): string {
   if (pm === 'yarn') return 'yarn';
   if (pm === 'bun') return 'bun install';
   return `${pm} install`;
 }
 
+/** Return the dev server command string for a given package manager. */
 function runDevCommand(pm: PackageManager): string {
   if (pm === 'yarn') return 'yarn dev';
   if (pm === 'bun') return 'bun run dev';
@@ -98,6 +103,7 @@ if (isEntrypoint()) {
   process.exitCode = runCli(process.argv.slice(2));
 }
 
+/** Check if this module is being run as the CLI entrypoint. */
 function isEntrypoint(): boolean {
   if (process.argv[1] === undefined) return false;
   return import.meta.url === pathToFileURL(resolve(process.argv[1])).href;

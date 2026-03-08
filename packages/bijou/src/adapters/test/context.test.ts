@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from './index.js';
+import { createTestContext, auditStyle } from './index.js';
 
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
@@ -43,4 +43,46 @@ describe('createTestContext()', () => {
     const ctx = createTestContext({ io: { answers: ['yes'] } });
     expect(await ctx.io.question('? ')).toBe('yes');
   });
+
+  it('theme accessor functions are resolved and functional', () => {
+    const ctx = createTestContext();
+    expect(ctx.semantic('primary').hex).toBeTypeOf('string');
+    expect(ctx.status('success').hex).toBeTypeOf('string');
+    expect(ctx.border('primary').hex).toBeTypeOf('string');
+    expect(ctx.surface('primary').hex).toBeTypeOf('string');
+    expect(ctx.ui('cursor').hex).toBeTypeOf('string');
+    const brandGradient = ctx.gradient('brand');
+    expect(Array.isArray(brandGradient)).toBe(true);
+    expect(brandGradient.length).toBeGreaterThan(0);
+    expect(brandGradient[0]).toHaveProperty('pos');
+    expect(brandGradient[0]).toHaveProperty('color');
+    expect(brandGradient[0]!.pos).toBeTypeOf('number');
+    expect(Array.isArray(brandGradient[0]!.color)).toBe(true);
+    expect(brandGradient).toEqual(ctx.theme.theme.gradient['brand']);
+  });
+
+  it('status() falls back to muted for unknown keys', () => {
+    const ctx = createTestContext();
+    const muted = ctx.status('muted');
+    expect(muted).toBeDefined();
+    expect(muted.hex).toBeTypeOf('string');
+    expect(muted.hex).toMatch(/^#[0-9a-fA-F]{6}$/);
+    const unknown = ctx.status('nonexistent');
+    expect(unknown.hex).toBe(muted.hex);
+  });
+
+  it('gradient() returns empty array for unknown keys', () => {
+    const ctx = createTestContext();
+    expect(ctx.gradient('nonexistent')).toEqual([]);
+  });
+
+  it('uses custom style option when provided', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    expect(ctx.style).toBe(style);
+    ctx.style.bold('hello');
+    expect(style.calls).toHaveLength(1);
+    expect(style.calls[0]!.method).toBe('bold');
+  });
+
 });

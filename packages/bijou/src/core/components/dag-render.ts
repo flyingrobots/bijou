@@ -144,6 +144,10 @@ function renderNodeBox(
  * For each wide grapheme (width 2), insert a `''` placeholder in chars
  * and duplicate the type in types. After expansion, `chars[col]` and
  * `types[col]` are column-aligned.
+ *
+ * @param graphemes - Array of grapheme cluster strings to expand.
+ * @param types - Parallel array of per-grapheme character type classifications.
+ * @returns Column-aligned character and type arrays with wide-character placeholders inserted.
  */
 function expandToColumns(
   graphemes: string[],
@@ -248,14 +252,23 @@ export function renderInteractiveLayout(
 
   // ── Build placed nodes + spatial index ────────────────────────────
 
+  /** A node that has been positioned on the character grid. */
   interface PlacedNode {
+    /** The starting row (0-indexed) of this node on the character grid. */
     startRow: number;
+    /** The starting column (0-indexed) of this node on the character grid. */
     startCol: number;
+    /** The width of the rendered node box in columns. */
     width: number;
+    /** The raw rendered box lines and per-character type classifications. */
     box: NodeBoxResult;
-    chars: string[][];    // column-expanded characters per line
-    charTypes: CharType[][];  // column-expanded types per line
+    /** Column-expanded characters per line. */
+    chars: string[][];
+    /** Column-expanded type classifications per line. */
+    charTypes: CharType[][];
+    /** The resolved style token for this node. */
     token: TokenValue;
+    /** Reference to the original DagNode. */
     node: DagNode;
   }
 
@@ -358,6 +371,13 @@ export function renderInteractiveLayout(
 
   // ── cellAt: on-demand per-cell computation ──────────────────────
 
+  /**
+   * Resolve the character and optional style token at a grid coordinate.
+   *
+   * @param row - The grid row index.
+   * @param col - The grid column index.
+   * @returns The character at the coordinate and its associated style token (or null for unstyled).
+   */
   function cellAt(row: number, col: number): { ch: string; token: TokenValue | null } {
     // 1. Node box (highest priority)
     const nodesOnRow = nodesByRow.get(row);

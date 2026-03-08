@@ -11,10 +11,12 @@ import type { BijouContext } from '../../ports/context.js';
 import type { OutputMode, ColorScheme } from '../../core/detect/tty.js';
 import { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 import { mockIO, type MockIOOptions, type MockIO } from './io.js';
+import type { StylePort } from '../../ports/style.js';
 import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
 import { CYAN_MAGENTA } from '../../core/theme/presets.js';
-import type { Theme, TokenValue } from '../../core/theme/tokens.js';
+import { createThemeAccessors } from '../../core/theme/accessors.js';
+import type { Theme } from '../../core/theme/tokens.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
@@ -46,6 +48,8 @@ export interface TestContextOptions {
   noColor?: boolean;
   /** Terminal color scheme for the resolved theme. Defaults to `'dark'`. */
   colorScheme?: ColorScheme;
+  /** Style adapter override. Defaults to {@link plainStyle}. */
+  style?: StylePort;
 }
 
 /**
@@ -70,7 +74,7 @@ export interface TestContext extends BijouContext {
 export function createTestContext(options: TestContextOptions = {}): TestContext {
   const runtime = mockRuntime(options.runtime);
   const io = mockIO(options.io);
-  const style = plainStyle();
+  const style = options.style ?? plainStyle();
   const theme = createResolved(options.theme ?? CYAN_MAGENTA, options.noColor ?? false, options.colorScheme ?? 'dark');
   const mode: OutputMode = options.mode ?? 'interactive';
 
@@ -80,10 +84,6 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
     runtime,
     io,
     style,
-    semantic: (key) => theme.theme.semantic[key],
-    border: (key) => theme.theme.border[key],
-    surface: (key) => theme.theme.surface[key],
-    status: (key) => (theme.theme.status as Record<string, TokenValue>)[key] ?? (theme.theme.status as Record<string, TokenValue>)['muted']!,
-    ui: (key) => (theme.theme.ui as Record<string, TokenValue>)[key] ?? theme.theme.semantic.primary,
+    ...createThemeAccessors(theme),
   };
 }

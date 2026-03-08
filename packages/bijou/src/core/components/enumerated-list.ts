@@ -121,6 +121,17 @@ function isOrderedStyle(style: BulletStyle): boolean {
   return style === 'arabic' || style === 'alpha' || style === 'roman';
 }
 
+/**
+ * Render list items with bullet or numbered prefixes and continuation indentation.
+ *
+ * @param items - The text items to render.
+ * @param style - Bullet or numbering style.
+ * @param start - Starting index for ordered styles.
+ * @param indent - Number of leading spaces for indentation.
+ * @param indentStr - Whitespace prefix for the current depth.
+ * @param prefixFn - Produces the bullet/number prefix for a given style and index.
+ * @returns The formatted list as a single string.
+ */
 function renderItems(
   items: readonly string[],
   style: BulletStyle,
@@ -183,32 +194,7 @@ export function enumeratedList(items: readonly string[], options?: EnumeratedLis
   const indentStr = ' '.repeat(indent);
 
   if (!ctx) {
-    const prefixes = items.map((_, i) => generatePrefix(style, start + i));
-    const maxPrefixLen = isOrderedStyle(style)
-      ? Math.max(...prefixes.map(p => p.length))
-      : 0;
-
-    return items
-      .map((item, i) => {
-        const prefix = prefixes[i]!;
-        const lines = item.split('\n');
-
-        if (style === 'none') {
-          const firstLine = `${indentStr}${lines[0]}`;
-          if (lines.length === 1) return firstLine;
-          const contIndent = indentStr;
-          return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-        }
-
-        const paddedPrefix = isOrderedStyle(style)
-          ? prefix.padStart(maxPrefixLen)
-          : prefix;
-        const firstLine = `${indentStr}${paddedPrefix} ${lines[0]}`;
-        if (lines.length === 1) return firstLine;
-        const contIndent = ' '.repeat(indent + paddedPrefix.length + 1);
-        return [firstLine, ...lines.slice(1).map(l => `${contIndent}${l}`)].join('\n');
-      })
-      .join('\n');
+    return renderItems(items, style, start, indent, indentStr, generatePrefix);
   }
 
   return renderByMode(ctx.mode, {

@@ -83,6 +83,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   let scrollOffset = 0;
   const selected = new Set<number>();
 
+  /** Keep the scroll offset so the cursor stays within the visible window (cursor-relative then absolute bounds). */
   function clampScroll(): void {
     if (cursor < scrollOffset) {
       scrollOffset = cursor;
@@ -92,14 +93,17 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, options.options.length - maxVisible)));
   }
 
+  /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
     return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
+  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
+  /** Write the multiselect UI (title, hint, option list) to the terminal. Hides the cursor as a side effect. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
@@ -127,11 +131,13 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     }
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
+  /** Erase the full UI, print the final selection summary line, and restore cursor visibility. */
   function cleanup(): void {
     clearRender();
     const totalLines = renderLineCount();

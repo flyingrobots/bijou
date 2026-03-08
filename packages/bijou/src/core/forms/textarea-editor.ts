@@ -40,7 +40,6 @@ export interface TextareaOptions extends FieldOptions<string> {
  * @returns The entered text (newline-joined), or the default value on cancel.
  */
 export async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
-  const t = ctx.theme;
   const styledFn = createStyledFn(ctx);
   const height = options.height ?? 6;
   const renderWidth = options.width ?? 80;
@@ -53,18 +52,21 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   let scrollY = 0;
   let totalLength = 0;  // running counter for lines.join('\n').length
 
+  /** Return the slice of lines currently visible in the editor viewport. */
   function visibleLines(): string[] {
     return lines.slice(scrollY, scrollY + height);
   }
 
+  /** Adjust the vertical scroll so the cursor row is within the viewport. */
   function ensureCursorVisible(): void {
     if (cursorRow < scrollY) scrollY = cursorRow;
     if (cursorRow >= scrollY + height) scrollY = cursorRow - height + 1;
   }
 
+  /** Write the editor UI (title, visible lines, status bar) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
-    const hint = styledFn(t.theme.semantic.muted, ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
+    const hint = styledFn(ctx.semantic('muted'), ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
     term.writeLine(`${label}${hint}`);
 
     const vis = visibleLines();
@@ -76,11 +78,11 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       const rawLine = vis[i] ?? '';
       const line = rawLine.length > contentWidth ? rawLine.slice(0, contentWidth) : rawLine;
       const prefix = showLineNumbers
-        ? styledFn(t.theme.semantic.muted, `${String(lineIdx + 1).padStart(numWidth)} │ `)
+        ? styledFn(ctx.semantic('muted'), `${String(lineIdx + 1).padStart(numWidth)} │ `)
         : '  ';
 
       if (lineIdx === 0 && options.placeholder && lines.length === 1 && lines[0] === '') {
-        ctx.io.write(`\x1b[K${prefix}${styledFn(t.theme.semantic.muted, options.placeholder)}\n`);
+        ctx.io.write(`\x1b[K${prefix}${styledFn(ctx.semantic('muted'), options.placeholder)}\n`);
       } else {
         ctx.io.write(`\x1b[K${prefix}${line}\n`);
       }
@@ -89,14 +91,16 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     // Status line
     const pos = `Ln ${cursorRow + 1}, Col ${cursorCol + 1}`;
     const lenInfo = options.maxLength != null ? ` | ${totalLength}/${options.maxLength}` : '';
-    ctx.io.write(`\x1b[K${styledFn(t.theme.semantic.muted, pos + lenInfo)}\n`);
+    ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = height + 2; // header + visible lines + status
     term.moveUp(totalLines);
   }
 
+  /** Erase the editor UI and print a one-line summary of the result. */
   function cleanup(value: string, cancelled: boolean): void {
     clearRender();
     const totalLines = height + 2;
@@ -107,7 +111,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       : (value
         ? (value.includes('\n') ? `${value.split('\n').length} lines` : value)
         : '(empty)');
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(t.theme.semantic.info, summary);
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), summary);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }

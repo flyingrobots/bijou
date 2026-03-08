@@ -272,6 +272,12 @@ export function createKeyMap<A>(): KeyMap<A> {
   const allBindings: Binding<A>[] = [];
   let currentGroup = DEFAULT_GROUP;
 
+  /**
+   * Normalize a description string or predicate function into a binding filter.
+   *
+   * @param input - Description string for exact match, or a filter function.
+   * @returns A predicate function that tests bindings.
+   */
   function makePredicate(
     input: string | ((b: BindingInfo) => boolean),
   ): (b: Binding<A>) => boolean {

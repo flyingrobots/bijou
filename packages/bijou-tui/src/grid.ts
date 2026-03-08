@@ -39,12 +39,23 @@ export interface GridLayoutResult {
 }
 
 /**
+ * Floor a numeric dimension and clamp NaN / Infinity to 0.
+ *
+ * @param value - Raw numeric dimension.
+ * @returns Sanitised non-negative integer.
+ */
+function sanitiseDimension(value: number): number {
+  const floored = Math.floor(value);
+  return Number.isFinite(floored) ? Math.max(0, floored) : 0;
+}
+
+/**
  * Compute area rectangles from grid constraints and area template.
  */
 export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<string, LayoutRect> {
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
-  const gap = Math.max(0, options.gap ?? 0);
+  const width = sanitiseDimension(options.width);
+  const height = sanitiseDimension(options.height);
+  const gap = sanitiseDimension(options.gap ?? 0);
 
   if (options.columns.length === 0 || options.rows.length === 0) {
     throw new Error('gridLayout: columns and rows must be non-empty');
@@ -104,8 +115,8 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
 
     const colSpan = maxC - minC + 1;
     const rowSpan = maxR - minR + 1;
-    const rectWidth = sum(colSizes.slice(minC, maxC + 1)) + gap * Math.max(0, colSpan - 1);
-    const rectHeight = sum(rowSizes.slice(minR, maxR + 1)) + gap * Math.max(0, rowSpan - 1);
+    const rectWidth = Math.min(width, sum(colSizes.slice(minC, maxC + 1)) + gap * Math.max(0, colSpan - 1));
+    const rectHeight = Math.min(height, sum(rowSizes.slice(minR, maxR + 1)) + gap * Math.max(0, rowSpan - 1));
 
     rects.set(name, {
       row: rowStarts[minR] ?? 0,
@@ -122,9 +133,14 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
  * Render a named-area grid.
  */
 export function grid(options: GridOptions): string {
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
+  // gridLayout() already floors and clamps width/height/gap (NaN/Infinity → 0),
+  // so we delegate all input validation to it and only derive canvas dimensions
+  // from its sanitised output.
   const rects = gridLayout(options);
+
+  // Mirror gridLayout()'s sanitisation for the canvas (same expression).
+  const width = sanitiseDimension(options.width);
+  const height = sanitiseDimension(options.height);
 
   if (width <= 0 || height <= 0) return '';
 
@@ -147,6 +163,7 @@ export function grid(options: GridOptions): string {
   return composite(background, overlays);
 }
 
+/** Distribute space among fixed-pixel and fractional tracks, respecting gaps. */
 function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): number[] {
   const available = Math.max(0, total - gap * Math.max(0, tracks.length - 1));
   const sizes = new Array<number>(tracks.length).fill(0);
@@ -211,6 +228,7 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   return sizes.map((x) => Math.max(0, x));
 }
 
+/** Parse a CSS-grid-style `fr` unit string into a positive integer. */
 function parseFr(track: `${number}fr`): number {
   const raw = track.slice(0, -2);
   const n = Number(raw);
@@ -220,6 +238,7 @@ function parseFr(track: `${number}fr`): number {
   return n;
 }
 
+/** Compute cumulative start positions from solved track sizes and gap. */
 function trackStarts(sizes: readonly number[], gap: number): number[] {
   const starts: number[] = [];
   let cursor = 0;
@@ -230,6 +249,7 @@ function trackStarts(sizes: readonly number[], gap: number): number[] {
   return starts;
 }
 
+/** Sum an array of numbers. */
 function sum(values: readonly number[]): number {
   let acc = 0;
   for (const n of values) acc += n;

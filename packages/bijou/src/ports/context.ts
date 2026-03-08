@@ -1,5 +1,5 @@
 import type { ResolvedTheme } from '../core/theme/resolve.js';
-import type { Theme, TokenValue } from '../core/theme/tokens.js';
+import type { Theme, TokenValue, GradientStop } from '../core/theme/tokens.js';
 import type { OutputMode } from '../core/detect/tty.js';
 import type { RuntimePort } from './runtime.js';
 import type { IOPort } from './io.js';
@@ -33,4 +33,6 @@ export interface BijouContext {
   status(key: string): TokenValue;
   /** Look up a UI element color token. */
   ui(key: string): TokenValue;
+  /** Look up a gradient by key, returning its color stops. */
+  gradient(key: string): GradientStop[];
 }

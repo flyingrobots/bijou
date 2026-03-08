@@ -59,6 +59,9 @@ export {
   type ColorLevel,
 } from './downsample.js';
 
+// Theme accessors
+export { createThemeAccessors, type ThemeAccessors } from './accessors.js';
+
 // Color manipulation
 export {
   hexToRgb,

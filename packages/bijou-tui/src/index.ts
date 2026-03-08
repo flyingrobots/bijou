@@ -20,6 +20,9 @@ export {
   exitScreen,
   clearAndHome,
   renderFrame,
+  setCursorStyle,
+  resetCursorStyle,
+  type CursorShape,
   ENTER_ALT_SCREEN,
   EXIT_ALT_SCREEN,
   HIDE_CURSOR,
@@ -31,6 +34,10 @@ export {
   CLEAR_LINE_TO_END,
   CLEAR_LINE,
   HOME,
+  CURSOR_BLOCK,
+  CURSOR_UNDERLINE,
+  CURSOR_BAR,
+  CURSOR_RESET,
 } from './screen.js';
 
 // Commands

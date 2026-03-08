@@ -106,6 +106,7 @@ export async function runScript<Model, M>(
   let model = initModel;
   let running = true;
 
+  /** Stop the scripted driver event loop. */
   function shutdown(): void {
     running = false;
   }

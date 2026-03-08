@@ -296,6 +296,38 @@ describe('DTCG interop', () => {
       expect(theme.border.primary.hex).toBe('#000000');
       expect(theme.ui.cursor.hex).toBe('#000000');
       expect(theme.gradient.brand).toEqual([]);
+      expect(theme.surface.primary.hex).toBe('#000000');
+      expect(theme.surface.muted.hex).toBe('#000000');
+    });
+
+    it('partial group fills missing tokens with #000000', () => {
+      const doc: DTCGDocument = {
+        name: { $type: 'string', $value: 'partial' },
+        status: {
+          success: { $type: 'color', $value: '#11ff11' },
+          // all other status keys omitted
+        },
+        semantic: {
+          primary: { $type: 'color', $value: '#ffffff' },
+        },
+        border: {},
+        ui: {},
+        gradient: {},
+        surface: {
+          primary: { $type: 'color', $value: '#eeeeee' },
+        },
+      };
+
+      const theme = fromDTCG(doc);
+      expect(theme.status.success.hex).toBe('#11ff11');
+      expect(theme.status.error.hex).toBe('#000000');
+      expect(theme.semantic.primary.hex).toBe('#ffffff');
+      expect(theme.semantic.accent.hex).toBe('#000000');
+      expect(theme.border.primary.hex).toBe('#000000');
+      expect(theme.ui.cursor.hex).toBe('#000000');
+      expect(theme.gradient.brand).toEqual([]);
+      expect(theme.surface.primary.hex).toBe('#eeeeee');
+      expect(theme.surface.secondary.hex).toBe('#000000');
     });
 
     it('missing name defaults to "imported"', () => {

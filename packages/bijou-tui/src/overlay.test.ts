@@ -202,7 +202,7 @@ describe('modal', () => {
       hint: 'hint',
       screenWidth: 40,
       screenHeight: 20,
-      borderToken: ctx.theme.theme.border.primary,
+      borderToken: ctx.border('primary'),
       ctx,
     });
     expect(stripAnsi(content)).toContain('Themed');
@@ -575,7 +575,7 @@ describe('drawer', () => {
       width: 20,
       screenWidth: 80,
       screenHeight: 5,
-      borderToken: ctx.theme.theme.border.primary,
+      borderToken: ctx.border('primary'),
       ctx,
     });
     expect(stripAnsi(d.content)).toContain('themed');
@@ -747,7 +747,7 @@ describe('tooltip', () => {
       ...base,
       row: 10,
       col: 40,
-      borderToken: ctx.theme.theme.border.primary,
+      borderToken: ctx.border('primary'),
       ctx,
     });
     expect(stripAnsi(t.content)).toContain('hint');

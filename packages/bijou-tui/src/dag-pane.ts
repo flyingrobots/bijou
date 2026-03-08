@@ -103,6 +103,7 @@ export type DagPaneRenderOptions = FocusAreaRenderOptions;
 // Internal: Adjacency maps
 // ---------------------------------------------------------------------------
 
+/** Pre-computed parent/child relationships and root nodes for a DAG. */
 interface Adjacency {
   /** Map from node ID to its child IDs. */
   children: ReadonlyMap<string, readonly string[]>;
@@ -112,6 +113,7 @@ interface Adjacency {
   roots: readonly string[];
 }
 
+/** Build parent/child adjacency maps from either a DagNode array or SlicedDagSource. */
 function buildAdjacency(source: DagNode[] | SlicedDagSource): Adjacency {
   const childMap = new Map<string, string[]>();
   const parentMap = new Map<string, string[]>();
@@ -169,6 +171,7 @@ function buildAdjacency(source: DagNode[] | SlicedDagSource): Adjacency {
 // Internal: Highlight path computation
 // ---------------------------------------------------------------------------
 
+/** BFS upward from the selected node to a root, returning the path for highlighting. */
 function computeHighlightPath(
   selectedId: string | undefined,
   adjacency: Adjacency,
@@ -225,6 +228,7 @@ function computeHighlightPath(
 // Internal: Spatial navigation helpers
 // ---------------------------------------------------------------------------
 
+/** Pick the candidate node whose horizontal center is closest to the given column. */
 function closestByCol(
   candidates: readonly string[],
   currentCenter: number,
@@ -245,6 +249,7 @@ function closestByCol(
   return best;
 }
 
+/** Return all node IDs positioned on the given grid row, sorted by column. */
 function nodesOnSameRow(
   row: number,
   positions: ReadonlyMap<string, DagNodePosition>,
@@ -264,6 +269,7 @@ function nodesOnSameRow(
 // Internal: Auto-scroll to node
 // ---------------------------------------------------------------------------
 
+/** Adjust scroll offsets so the given node is visible within the focus area viewport. */
 function scrollToNode(
   faState: FocusAreaState,
   nodePos: DagNodePosition,
@@ -304,6 +310,7 @@ function scrollToNode(
 // Internal: Selection update
 // ---------------------------------------------------------------------------
 
+/** Re-render the DAG layout with the current selection and highlight path. */
 function renderLayout(
   source: DagNode[] | SlicedDagSource,
   selectedId: string | undefined,
@@ -324,6 +331,7 @@ function renderLayout(
     : dagLayout(source, opts);
 }
 
+/** Update the selected node, recompute highlights and layout, and auto-scroll. */
 function updateSelection(
   state: DagPaneState,
   newId: string | undefined,

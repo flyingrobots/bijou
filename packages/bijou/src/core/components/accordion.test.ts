@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { accordion } from './accordion.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 const sections: Parameters<typeof accordion>[0] = [
   { title: 'Section A', content: 'Content A', expanded: true },
@@ -64,5 +64,38 @@ describe('accordion', () => {
     const multi = [{ title: 'Multi', content: 'line1\nline2', expanded: true }];
     const result = accordion(multi, { ctx });
     expect(result).toContain('  line1\n  line2');
+  });
+
+  describe('background fill', () => {
+    it('applies headerBgToken when provided', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', style });
+      accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBeGreaterThan(0);
+      expect(bgCalls[0]!.color).toBe('#001122');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', style });
+      accordion(sections, { ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
+    });
+
+    it('skips headerBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toContain('# Section A');
+    });
+
+    it('skips headerBgToken when noColor is true', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, style });
+      accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
+    });
   });
 });

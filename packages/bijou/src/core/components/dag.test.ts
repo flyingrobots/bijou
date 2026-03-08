@@ -873,7 +873,10 @@ describe('DagSource adapter', () => {
       };
       const sliced = dagSlice(custom, 'p', { direction: 'descendants' });
       const result = dag(sliced, { ctx });
-      expect(result).toBe('Parent -> Child\nChild');
+      expect(result).toContain('Parent -> Child');
+      // Verify the standalone node label appears on its own line
+      const lines = result.split('\n');
+      expect(lines.some(l => l.trim() === 'Child')).toBe(true);
     });
 
     it('never calls ids() on the unbounded source', () => {

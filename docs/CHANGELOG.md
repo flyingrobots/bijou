@@ -4,6 +4,70 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
 
+## [1.6.0] - 2026-03-07
+
+### ✨ Features
+
+- **F-key parsing (bijou-tui)** — `parseKey()` now recognizes F1–F12 via CSI `~` encoding (`\x1b[11~`–`\x1b[24~`) and SS3 encoding (`\x1bOP`–`\x1bOS`). Supports Shift/Ctrl/Alt modifier combinations via `\x1b[1;{mod}P` and `\x1b[{code};{mod}~` sequences.
+- **Cursor manager (bijou-tui)** — `setCursorStyle(io, shape, { blink })` and `resetCursorStyle(io)` for DECSCUSR cursor shape control. Three shapes (`'block'`, `'underline'`, `'bar'`) with optional blink. Constants: `CURSOR_BLOCK`, `CURSOR_UNDERLINE`, `CURSOR_BAR`, `CURSOR_RESET`.
+- **Underline text variants (bijou core + bijou-node)** — `TextModifier` expanded with `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'`. Chalk adapter applies standard underline via chalk and variants via raw SGR 4:3/4:4/4:5 sequences. Graceful degradation in unsupporting terminals.
+
+### 🐛 Bug Fixes
+
+- **Select cancel label mismatch (bijou core)** — `cleanup()` in `select()` always displayed the label at the cursor position, even on cancel (Ctrl+C/Escape) where the resolved value is the default/first option. Now accepts an optional `selectedLabel` parameter so the cancel path displays the correct fallback label.
+- **Filter interactive cleanup label (bijou core)** — `cleanup()` in `interactiveFilter` now receives the resolved label from each call site instead of computing it from `filtered[cursor]`. Previously, cancel paths (Ctrl+C, Escape) and empty-list Enter always displayed the wrong label because `cleanup()` read `filtered[cursor]` which didn't reflect the actual fallback value.
+- **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
+- **Tabs validation (bijou-tui-app)** — `createTuiAppSkeleton()` now throws on duplicate `tab.id` values and falls back to first tab when `defaultTabId` is not found in tabs.
+- **Transition tick zero-duration guard (bijou-tui)** — `createTransitionTickCmd()` now emits `transition-complete` immediately when `durationMs <= 0`, avoiding unnecessary interval timers.
+- **F-key non-null assertions (bijou-tui)** — `keys.ts` capture group accesses replaced with `?? ''` fallbacks; `decodeModifier()` guards against NaN inputs.
+
+### ♻️ Refactors
+
+- **DRY grid dimension sanitisation (bijou-tui)** — extracted `sanitiseDimension()` helper shared by `gridLayout()` and `grid()`, eliminating duplicate floor/NaN/Infinity clamping.
+- **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a local copy.
+- **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
+- **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.
+- **Extract `createThemeAccessors` (bijou core)** — Six duplicated accessor lambdas in `factory.ts` and `test/index.ts` consolidated into a single `createThemeAccessors()` function in `core/theme/accessors.ts`.
+- **`createTestContext` style option (bijou core)** — `createTestContext()` now accepts an optional `style` override, eliminating 12 double-cast `(ctx as unknown as …).style = style` patterns across 5 test files.
+
+- **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.
+
+### 🧪 Tests
+
+- **table.test.ts auditStyle** — `table()` background fill tests now use `auditStyle()` to verify `bgHex` calls instead of checking rendered string content.
+- **Test audit** — 24 new tests filling coverage gaps identified against acceptance criteria specs:
+  - Form functions: confirm rich mode (y/Y/yes/n/N/no, invalid input, accessible mode), input (trimming, required, validator, noColor, ctx)
+  - Test adapters: plainStyle `bgRgb()`/`bgHex()`, createTestContext theme accessor verification
+  - DTCG: surface group defaults, partial group token fill
+  - Chalk adapter: underline and variant modifier coverage
+
+### 📝 Documentation
+
+- **Roadmap cleanup** — moved shipped Phases 1–9 and P0–P2.5 backlog to `docs/COMPLETED.md`. Roadmap now contains only P3 backlog, test coverage specs, and Xyph migration plan.
+
+## [1.5.0] - 2026-03-07
+
+### ✨ Features
+
+- **`gradient()` theme accessor** — `ctx.gradient(key)` returns `GradientStop[]` for any named gradient, completing the theme accessor API (`semantic`, `border`, `surface`, `status`, `ui`, `gradient`).
+- **Background color support for 7 components** — Style pass adding `bgToken` / background fill support:
+  - `alert()` — `surface.elevated` bg on interior box (default, overridable via `bgToken`)
+  - `kbd()` — `surface.muted` bg for key-cap effect (default, overridable via `bgToken`)
+  - `tabs()` — `surface.muted` bg on active tab with padding (default, overridable via `activeBgToken`)
+  - `accordion()` — opt-in `headerBgToken` for expanded/collapsed section headers
+  - `table()` — opt-in `headerBgToken` for header row background
+  - `stepper()` — opt-in `activeBgToken` for active step indicator
+  - `breadcrumb()` — opt-in `currentBgToken` for current segment highlight
+  - All bg fills gracefully degrade in pipe/accessible/noColor modes via `shouldApplyBg()`
+
+### 🧪 Tests
+
+- **Relaxed brittle multiline assertions** — Replaced exact multiline `toBe()` assertions with `toMatch()`/`toContain()` + per-line checks in `table.test.ts`, `enumerated-list.test.ts`, `tree.test.ts`, and `dag.test.ts`. Tests now verify content and structure without breaking on whitespace changes.
+
+### ♻️ Refactors
+
+- **Migrated remaining direct theme accesses** — `textarea-editor.ts`, `progress.ts`, and `overlay.test.ts` now use `ctx.semantic()`, `ctx.gradient()`, and `ctx.border()` accessors instead of reaching into `ctx.theme.theme.*` directly. All source-level direct theme access is eliminated.
+
 ## [1.4.0] - 2026-03-07
 
 ### ✨ Features
@@ -645,7 +709,10 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/flyingrobots/bijou/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/flyingrobots/bijou/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/flyingrobots/bijou/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/flyingrobots/bijou/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/flyingrobots/bijou/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/flyingrobots/bijou/compare/v1.0.0...v1.1.0

@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { makeBgFill } from '../bg-fill.js';
 
 /** Represent a single collapsible section within an accordion. */
 export interface AccordionSection {
@@ -19,6 +20,8 @@ export interface AccordionOptions {
   indicatorToken?: TokenValue;
   /** Token used to style section titles. */
   titleToken?: TokenValue;
+  /** Background fill token for section headers (expanded and collapsed). No default — opt-in only. */
+  headerBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }
@@ -53,21 +56,24 @@ export function accordion(sections: AccordionSection[], options: AccordionOption
     interactive: () => {
       const indicatorToken = options.indicatorToken ?? ctx.semantic('accent');
       const titleToken = options.titleToken ?? ctx.semantic('primary');
+      const bgFill = makeBgFill(options.headerBgToken, ctx);
 
       return sections
         .map((s) => {
           if (s.expanded) {
             const indicator = ctx.style.styled(indicatorToken, '▼');
             const title = ctx.style.styled(titleToken, s.title);
+            const header = `${indicator} ${title}`;
             const indented = s.content
               .split('\n')
               .map((line) => `  ${line}`)
               .join('\n');
-            return `${indicator} ${title}\n${indented}`;
+            return `${bgFill ? bgFill(header) : header}\n${indented}`;
           }
           const indicator = ctx.style.styled(indicatorToken, '▶');
           const title = ctx.style.styled(titleToken, s.title);
-          return `${indicator} ${title}`;
+          const header = `${indicator} ${title}`;
+          return bgFill ? bgFill(header) : header;
         })
         .join('\n\n');
     },

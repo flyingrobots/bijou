@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { stepper } from './stepper.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 const steps = [
   { label: 'Account' },
@@ -55,5 +55,38 @@ describe('stepper', () => {
     const result = stepper([{ label: 'Done' }], { current: 0, ctx });
     expect(result).toContain('● Done');
     expect(result).not.toContain('──');
+  });
+
+  describe('background fill', () => {
+    it('applies activeBgToken on current step', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', style });
+      stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBeGreaterThan(0);
+      expect(bgCalls[0]!.color).toBe('#001122');
+    });
+
+    it('no default bg (opt-in only)', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', style });
+      stepper(steps, { current: 1, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
+    });
+
+    it('skips activeBgToken in pipe mode', () => {
+      const ctx = createTestContext({ mode: 'pipe' });
+      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      expect(result).toBe('[x] Account -- [*] Payment -- [ ] Confirm');
+    });
+
+    it('skips activeBgToken when noColor is true', () => {
+      const style = auditStyle();
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, style });
+      stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
+    });
   });
 });

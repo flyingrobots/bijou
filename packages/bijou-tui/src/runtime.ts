@@ -1,4 +1,5 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
+import type { WritePort } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
@@ -65,6 +66,7 @@ export async function run<Model, M>(
     },
   });
 
+  /** Tear down the run loop and signal the quit promise. */
   function shutdown(): void {
     if (!running) return;
     running = false;
@@ -82,12 +84,14 @@ export async function run<Model, M>(
   }
 
   // Render helper
+  /** Render the current model's view to the terminal. */
   function render(): void {
     if (!running) return;
     renderFrame(ctx.io, app.view(model));
   }
 
   // Execute commands through the bus
+  /** Submit TEA commands to the event bus for async execution. */
   function executeCommands(cmds: Cmd<M>[]): void {
     for (const cmd of cmds) {
       bus.runCmd(cmd);
@@ -151,12 +155,14 @@ export async function run<Model, M>(
   }
 }
 
+/** Clamp a terminal dimension to a non-negative integer. */
 function sanitizeDimension(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.floor(value));
 }
 
-function writeErrorLine(io: { write(data: string): void; writeError?: (data: string) => void }, data: string): void {
+/** Write an error message to stderr if available, otherwise stdout. */
+function writeErrorLine(io: WritePort, data: string): void {
   if (io.writeError != null) {
     io.writeError(data);
     return;

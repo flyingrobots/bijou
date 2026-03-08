@@ -36,6 +36,35 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toContain('inv');
     });
 
+    it('styled() applies underline modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toContain('uline');
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits ANSI for underline modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it('styled() applies curly-underline via raw SGR 4:3', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'curly');
+      expect(result).toContain('curly');
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits SGR 4:3 for curly-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'curly');
+      expect(result).toContain('\x1b[4:3m');
+      expect(result).toContain('\x1b[24m');
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits SGR 4:4 for dotted-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['dotted-underline'] }, 'dotted');
+      expect(result).toContain('\x1b[4:4m');
+    });
+
+    it.runIf(chalkEmitsColor)('styled() emits SGR 4:5 for dashed-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['dashed-underline'] }, 'dashed');
+      expect(result).toContain('\x1b[4:5m');
+    });
+
     it.runIf(chalkEmitsColor)('styled() emits ANSI for bold modifier', () => {
       expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toMatch(new RegExp('\\x1b\\['));
     });
@@ -84,6 +113,27 @@ describe('chalkStyle()', () => {
 
     it('bold() still applies (chalk.bold is not gated by noColor)', () => {
       expect(style.bold('text')).toContain('text');
+    });
+
+    it('styled() returns plain text for underline variants in noColor mode', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'u')).toBe('u');
+      expect(style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'c')).toBe('c');
+      expect(style.styled({ hex: '#ffffff', modifiers: ['dotted-underline'] }, 'd')).toBe('d');
+      expect(style.styled({ hex: '#ffffff', modifiers: ['dashed-underline'] }, 'x')).toBe('x');
+    });
+  });
+
+  describe('level: 0 mode', () => {
+    const style = chalkStyle({ level: 0 });
+
+    it('styled() returns plain text when chalk level is 0', () => {
+      expect(style.styled({ hex: '#ff0000' }, 'plain')).toBe('plain');
+    });
+
+    it('styled() does not emit raw SGR for underline variants at level 0', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'text');
+      expect(result).toBe('text');
+      expect(result).not.toContain('\x1b[');
     });
   });
 });

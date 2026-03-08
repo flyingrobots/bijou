@@ -1,5 +1,6 @@
 import { clipToWidth, visibleLength } from './viewport.js';
 
+/** Clip/pad a multiline string into an array of exactly `height` lines, each `width` columns. */
 export function fitBlock(content: string, width: number, height: number): string[] {
   if (width <= 0 || height <= 0) return Array.from({ length: Math.max(0, height) }, () => '');
 
