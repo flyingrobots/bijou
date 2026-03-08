@@ -6,6 +6,31 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-03-08
+
+### ✨ Features
+
+- **Custom fill characters (bijou)** — `box()` and `headerBox()` accept `fillChar` option for custom padding/fill characters. Validates single-width graphemes; wide characters fall back to space.
+- **`constrain()` component (bijou)** — New `constrain(content, { maxWidth?, maxHeight?, ellipsis? })` for content truncation with configurable ellipsis. Passthrough in pipe/accessible modes.
+- **Note field (bijou)** — New `note({ message, title? })` display-only form field. Interactive: info icon + bold title + muted message with left accent line. Compatible with `group()`/`wizard()`.
+- **Timer / Stopwatch (bijou)** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` elapsed-time controllers with start/pause/resume/stop.
+- **Dynamic wizard forms (bijou)** — `WizardStep` gains `transform` (replace field function dynamically) and `branch` (splice in additional steps after value collection) options.
+- **Panel minimize/fold/unfold (bijou-tui)** — Per-pane collapsed state with `ctrl+m` toggle. Minimized panes collapse to title bar; sibling gets remaining space. Cannot minimize last visible pane.
+- **Panel maximize/restore (bijou-tui)** — `ctrl+f` promotes focused pane to full-area view. Per-page state. Maximizing a minimized pane restores it first.
+- **Dockable panel manager (bijou-tui)** — `ctrl+shift+arrow` reorders panes within split/grid containers. Pure state reducers with `movePaneInContainer` and `resolveChildOrder`.
+- **Layout presets + session restore (bijou-tui)** — `serializeLayoutState()` / `restoreLayoutState()` for JSON-friendly workspace persistence. Preset helpers: `presetSideBySide`, `presetStacked`, `presetFocused`. `initialLayout` option on `createFramedApp`.
+
+### 🔧 Infrastructure
+
+- **Commit pacing hook** — `pre-push` warns when pushing >10 commits (configurable via `BIJOU_PUSH_COMMIT_LIMIT`).
+- **PR reply script** — `scripts/reply-to-reviews.sh` for replying to CodeRabbit review threads (interactive + batch modes).
+- **Code smell journal** — Populated `.claude/bad_code.md` with 7 findings (process.env bypasses, duplicated envAccessor, _reset exports, app-frame.ts size, engine version inconsistency).
+- **Dependency audit** — 0 CVEs, all MIT, all maintained.
+
+### 🧪 Tests
+
+- 84 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (19), dynamic wizard (6), panel-state (11), panel-dock (14), layout-preset (7).
+
 ## [1.7.0] - 2026-03-08
 
 ### ✨ Features

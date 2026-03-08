@@ -31,7 +31,7 @@ All 13 items across 5 phases: housekeeping, core small wins, core medium feature
 
 ## Phase 5: Ship
 
-- [ ] **Version bump** — All 5 packages → 1.8.0.
-- [ ] **Documentation** — `docs/CHANGELOG.md` `[1.8.0]` section, `docs/ROADMAP.md` strike completed items, `docs/COMPLETED.md` add entry, package READMEs if needed.
-- [ ] **Final validation** — `npm run build` clean, `npm run lint` zero errors/warnings, `npm test` all passing.
-- [ ] **PR** — PR to main from merge branch combining all phase branches.
+- [x] **Version bump** — All 5 packages → 1.8.0.
+- [x] **Documentation** — `docs/CHANGELOG.md` `[1.8.0]` section, `docs/ROADMAP.md` strike completed items, `docs/COMPLETED.md` add entry, package READMEs if needed.
+- [x] **Final validation** — `npm run build` clean, `npm run lint` zero errors/warnings, `npm test` 1985 passed, 12 skipped, 0 failures.
+- [ ] **PR** — PR to main from release/v1.8.0 branch.

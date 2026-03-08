@@ -4,6 +4,14 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.8.0 — The Big One
+
+- **Completed:** 2026-03-08
+- **Summary:** 13 items across 5 phases. Core bijou: custom fill chars for box(), constrain() maxWidth/maxHeight, note() form field, timer/stopwatch components (static + live controllers), dynamic wizard forms (transform/branch). TUI: panel minimize/fold/unfold, maximize/restore, dockable panel manager (keyboard reorder), layout presets + session restore with serialization. Housekeeping: commit pacing hook, PR reply script, code smell journal, dependency audit. 84 new tests.
+- **Ref:** v1.8.0, branch `release/v1.8.0`
+
+---
+
 ## v1.7.0 — Test Fortress
 
 - **Completed:** 2026-03-08

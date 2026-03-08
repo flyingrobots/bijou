@@ -30,6 +30,7 @@ const ALLOWED = new Set([
   'core/forms/textarea-editor.ts',  // \x1b[K line-clear + key/arrow matching
   'core/components/progress.ts',    // cursor control
   'core/components/spinner.ts',     // cursor control
+  'core/components/timer.ts',       // cursor control
   'core/components/hyperlink.ts',   // OSC 8 sequences
   'core/components/table.ts',       // ANSI strip regex
   'core/components/dag-render.ts',  // ANSI strip regex
