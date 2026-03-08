@@ -1146,8 +1146,8 @@ function renderFrameNode<PageModel, Msg>(
     const absoluteAreaRect = offsetRect(areaRect, rect.row, rect.col);
     const child = node.cells[areaName];
     if (child == null) {
-      console.warn(
-        `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder`,
+      resolveSafeCtx()?.io.writeError(
+        `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
       renderedByArea.set(areaName, renderMissingGridCell(areaName, absoluteAreaRect));
       continue;

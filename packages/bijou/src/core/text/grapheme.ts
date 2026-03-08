@@ -120,6 +120,29 @@ export function segmentGraphemes(str: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// ANSI stripping
+// ---------------------------------------------------------------------------
+
+/**
+ * Pattern matching ANSI SGR escape sequences (e.g. `\x1b[31m`).
+ *
+ * Exported for reuse by text utilities that need to strip terminal
+ * style escapes before measuring or clipping visible content.
+ */
+// eslint-disable-next-line no-control-regex
+export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/g;
+
+/**
+ * Strip all ANSI SGR escape sequences from a string.
+ *
+ * @param str - Input string potentially containing ANSI codes.
+ * @returns The string with all ANSI SGR sequences removed.
+ */
+export function stripAnsi(str: string): string {
+  return str.replace(ANSI_SGR_RE, '');
+}
+
+// ---------------------------------------------------------------------------
 // Display width
 // ---------------------------------------------------------------------------
 
@@ -168,7 +191,7 @@ export function graphemeClusterWidth(grapheme: string): number {
  */
 export function graphemeWidth(str: string): number {
   // Strip ANSI escapes first
-  const clean = str.replace(/\x1b\[[0-9;]*m/g, '');
+  const clean = stripAnsi(str);
   if (clean.length === 0) return 0;
 
   let width = 0;

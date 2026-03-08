@@ -112,6 +112,8 @@ export {
   graphemeClusterWidth,
   graphemeWidth,
   clipToWidth,
+  ANSI_SGR_RE,
+  stripAnsi,
 } from './core/text/index.js';
 
 // Detection

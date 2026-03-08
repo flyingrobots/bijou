@@ -24,8 +24,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou": "1.7.0",
-    "@flyingrobots/bijou-tui": "1.7.0"
+    "@flyingrobots/bijou": "1.8.0",
+    "@flyingrobots/bijou-tui": "1.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -50,7 +50,7 @@
   "homepage": "https://github.com/flyingrobots/bijou",
   "bugs": "https://github.com/flyingrobots/bijou/issues",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "publishConfig": {
     "access": "public",

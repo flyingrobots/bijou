@@ -5,6 +5,7 @@ import { lerp3 } from '../theme/gradient.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
+import { CLEAR_LINE_RETURN } from '../ansi.js';
 
 /** Configuration for rendering a progress bar. */
 export interface ProgressBarOptions {
@@ -128,7 +129,7 @@ export function createProgressBar(options: LiveProgressBarOptions = {}): Progres
         ctx.io.write(progressBar(pct, { ...options, ctx }) + '\n');
         return;
       }
-      ctx.io.write(`\r\x1b[K${progressBar(pct, { ...options, ctx })}`);
+      ctx.io.write(`${CLEAR_LINE_RETURN}${progressBar(pct, { ...options, ctx })}`);
     },
 
     stop(finalMessage?: string) {
@@ -138,7 +139,7 @@ export function createProgressBar(options: LiveProgressBarOptions = {}): Progres
         }
         return;
       }
-      ctx.io.write('\r\x1b[K');
+      ctx.io.write(CLEAR_LINE_RETURN);
       if (cursorHandle !== null) {
         cursorHandle.dispose();
         cursorHandle = null;
@@ -188,7 +189,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
 
   /** Write the current percentage bar to the terminal, overwriting the current line. */
   function render(): void {
-    ctx.io.write(`\r\x1b[K${progressBar(currentPct, { ...options, ctx })}`);
+    ctx.io.write(`${CLEAR_LINE_RETURN}${progressBar(currentPct, { ...options, ctx })}`);
   }
 
   /** Start the interpolation timer if it is not already running. */
@@ -244,7 +245,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
         return;
       }
       render();
-      ctx.io.write('\r\x1b[K');
+      ctx.io.write(CLEAR_LINE_RETURN);
       if (cursorHandle !== null) {
         cursorHandle.dispose();
         cursorHandle = null;

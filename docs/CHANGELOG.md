@@ -23,6 +23,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
 - **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
 - **`serializeLayoutState` reads model defaults** — Now falls back to `model.minimizedByPage` / `maximizedPaneByPage` / `dockStateByPage` / `splitRatioOverrides` when `perPage` is omitted, so callers don't need to pass redundant state.
+- **DRY: shared ANSI constants** — Extracted `ANSI_SGR_RE`, `stripAnsi()`, `CLEAR_LINE_RETURN`, `HIDE_CURSOR`, `SHOW_CURSOR` into shared modules (`core/text/grapheme.ts`, `core/ansi.ts`). Replaced 4 inline ANSI strip regexes and ~12 raw `'\r\x1b[K'` sequences across spinner, progress, timer, and form components.
+- **DRY: form scroll/navigation** — Extracted `clampScroll()` and `handleVerticalNav()` into `form-utils.ts`, deduplicating identical implementations in `select.ts` and `multiselect.ts`.
+- **`WritePort.writeError` now required** — Removed optional `?` from `WritePort.writeError`. All adapters already provided it; this eliminates nil-checks at callsites.
+- **`console.warn` removed from bijou-tui** — `app-frame.ts` grid-cell warning now routes through `writeError()`. `split-pane.ts` `warnInvalidRatio` accepts an optional `WritePort` instead of sniffing `process.env`.
+
+### 📦 Maintenance
+
+- **bijou-tui-app dependency alignment** — Updated `@flyingrobots/bijou` and `@flyingrobots/bijou-tui` deps from `1.7.0` to `1.8.0`; engine constraint from `>=20` to `>=18` for consistency.
 
 ## [1.8.0] - 2026-03-08
 

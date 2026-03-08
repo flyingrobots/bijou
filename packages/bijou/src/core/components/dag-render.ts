@@ -14,7 +14,7 @@ import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
 import { createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
-import { graphemeWidth, segmentGraphemes } from '../text/grapheme.js';
+import { graphemeWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ function truncateLabel(text: string, maxLen: number): string {
   if (maxLen <= 0) return '';
   if (visibleLength(text) <= maxLen) return text;
   // Truncate by grapheme clusters, not code units
-  const clean = text.replace(/\x1b\[[0-9;]*m/g, '');
+  const clean = stripAnsi(text);
   const graphemes = segmentGraphemes(clean);
   let width = 0;
   let result = '';

@@ -9,9 +9,7 @@
  */
 
 import type { WritePort } from '../../ports/io.js';
-
-const HIDE_CURSOR = '\x1b[?25l';
-const SHOW_CURSOR = '\x1b[?25h';
+import { HIDE_CURSOR, SHOW_CURSOR } from '../ansi.js';
 
 /** Disposable handle returned by {@link CursorGuard.hide}. */
 export interface CursorHideHandle {

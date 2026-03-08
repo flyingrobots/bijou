@@ -3,6 +3,7 @@ import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { makeBgFill } from '../bg-fill.js';
+import { stripAnsi } from '../text/grapheme.js';
 
 /** Definition for a single table column. */
 export interface TableColumn {
@@ -26,17 +27,6 @@ export interface TableOptions {
   headerBgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
-}
-
-/**
- * Strip ANSI escape sequences from a string.
- *
- * @param str - Input string potentially containing ANSI codes.
- * @returns The string with all ANSI SGR sequences removed.
- */
-function stripAnsi(str: string): string {
-  // eslint-disable-next-line no-control-regex
-  return str.replace(/\x1b\[[0-9;]*m/g, '');
 }
 
 /**

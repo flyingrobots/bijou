@@ -3,6 +3,7 @@ import type { TimerHandle } from '../../ports/io.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
+import { CLEAR_LINE_RETURN } from '../ansi.js';
 
 /** Configuration for timer rendering. */
 export interface TimerOptions {
@@ -116,7 +117,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
 
   function render(): void {
     const line = timer(displayMs(elapsedMs), { ...timerOpts, ctx });
-    ctx.io.write(`\r\x1b[K${line}`);
+    ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
   }
 
   function tick(): void {
@@ -167,7 +168,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     stop(finalMessage?: string) {
       stopInternal();
       if (mode === 'interactive') {
-        ctx.io.write('\r\x1b[K');
+        ctx.io.write(CLEAR_LINE_RETURN);
         if (cursorHandle !== null) {
           cursorHandle.dispose();
           cursorHandle = null;
@@ -188,7 +189,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
  * Create a live countdown timer.
  *
  * Follows the same controller pattern as `createSpinner` and `createProgressBar`.
- * In interactive mode, uses `setInterval` for ticking with `\r\x1b[K` for line overwrite.
+ * In interactive mode, uses `setInterval` for ticking with `CLEAR_LINE_RETURN` for line overwrite.
  * Non-interactive modes emit a single line on start and final line on stop.
  *
  * @param options - Timer configuration including duration and optional onComplete callback.
@@ -209,7 +210,7 @@ export function createTimer(options: CreateTimerOptions): TimerController {
       if (elapsed >= duration) {
         // Render final frame before completing
         const line = timer(0, { ...options, ctx });
-        ctx.io.write(`\r\x1b[K${line}`);
+        ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
         onComplete?.();
         return true;
       }

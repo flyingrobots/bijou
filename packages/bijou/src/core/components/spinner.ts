@@ -4,6 +4,7 @@ import type { OutputMode } from '../detect/tty.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
+import { CLEAR_LINE_RETURN } from '../ansi.js';
 
 /** Configuration for spinner rendering and behavior. */
 export interface SpinnerOptions {
@@ -88,7 +89,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
   /** Write the current frame to the terminal, overwriting the previous line. */
   function render(): void {
     const line = spinnerFrame(tick, { frames, label, ctx });
-    ctx.io.write(`\r\x1b[K${line}`);
+    ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
     tick++;
   }
 
@@ -114,7 +115,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
         timer = null;
       }
       if (mode === 'interactive') {
-        ctx.io.write('\r\x1b[K');
+        ctx.io.write(CLEAR_LINE_RETURN);
         if (cursorHandle !== null) {
           cursorHandle.dispose();
           cursorHandle = null;
