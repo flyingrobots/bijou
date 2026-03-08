@@ -18,6 +18,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Filter interactive cleanup label (bijou core)** — `cleanup()` in `interactiveFilter` now receives the resolved label from each call site instead of computing it from `filtered[cursor]`. Previously, cancel paths (Ctrl+C, Escape) and empty-list Enter always displayed the wrong label because `cleanup()` read `filtered[cursor]` which didn't reflect the actual fallback value.
 - **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
 - **Tabs validation (bijou-tui-app)** — `createTuiAppSkeleton()` now throws on duplicate `tab.id` values and falls back to first tab when `defaultTabId` is not found in tabs.
+- **Transition tick zero-duration guard (bijou-tui)** — `createTransitionTickCmd()` now emits `transition-complete` immediately when `durationMs <= 0`, avoiding unnecessary interval timers.
 
 ### ♻️ Refactors
 

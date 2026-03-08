@@ -1311,6 +1311,12 @@ function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
 function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<Msg> {
   return (emit) =>
     new Promise<void>((resolve) => {
+      if (durationMs <= 0) {
+        emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction) as unknown as Msg);
+        resolve();
+        return;
+      }
+
       const startMs = Date.now();
       const intervalMs = Math.round(1000 / 60);
 

@@ -16,4 +16,5 @@ Address reviewer feedback and finalize JSDoc coverage overhaul for merge.
   - [x] accordion/stepper tests: use auditStyle to verify bg fill path
   - [x] input.test.ts: use \u001b instead of \x1b in regex
 - [x] Push fixes and request re-review
+- [x] Address 35 new CodeRabbit review comments (JSDoc completeness, behavioral fixes, test improvements)
 - [ ] Merge PR #34 into main
