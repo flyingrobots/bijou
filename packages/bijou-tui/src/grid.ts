@@ -147,6 +147,7 @@ export function grid(options: GridOptions): string {
   return composite(background, overlays);
 }
 
+/** Distribute space among fixed-pixel and fractional tracks, respecting gaps. */
 function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): number[] {
   const available = Math.max(0, total - gap * Math.max(0, tracks.length - 1));
   const sizes = new Array<number>(tracks.length).fill(0);
@@ -211,6 +212,7 @@ function solveTracks(total: number, tracks: readonly GridTrack[], gap: number): 
   return sizes.map((x) => Math.max(0, x));
 }
 
+/** Parse a CSS-grid-style `fr` unit string into a positive integer. */
 function parseFr(track: `${number}fr`): number {
   const raw = track.slice(0, -2);
   const n = Number(raw);
@@ -220,6 +222,7 @@ function parseFr(track: `${number}fr`): number {
   return n;
 }
 
+/** Compute cumulative start positions from solved track sizes and gap. */
 function trackStarts(sizes: readonly number[], gap: number): number[] {
   const starts: number[] = [];
   let cursor = 0;
@@ -230,6 +233,7 @@ function trackStarts(sizes: readonly number[], gap: number): number[] {
   return starts;
 }
 
+/** Sum an array of numbers. */
 function sum(values: readonly number[]): number {
   let acc = 0;
   for (const n of values) acc += n;

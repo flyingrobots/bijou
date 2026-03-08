@@ -216,10 +216,12 @@ export interface FrameModel<PageModel> {
   readonly transitionTimelineState?: TimelineState;
 }
 
+/** Internal model extending the public FrameModel with palette state. */
 interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
   readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[];
 }
 
+/** A command palette entry linking a UI item to an action or message. */
 interface PaletteEntry<Msg> {
   readonly id: string;
   readonly item: CommandPaletteItem;
@@ -228,6 +230,7 @@ interface PaletteEntry<Msg> {
   readonly frameAction?: FrameAction;
 }
 
+/** Thread-local state passed to the recursive layout renderer. */
 interface RenderContext<PageModel, Msg> {
   readonly model: InternalFrameModel<PageModel, Msg>;
   readonly pageId: string;
@@ -235,12 +238,14 @@ interface RenderContext<PageModel, Msg> {
   readonly scrollByPane: Readonly<Record<string, FramePaneScroll>>;
 }
 
+/** Output of a layout node render pass. */
 interface RenderResult {
   readonly output: string;
   readonly paneRects: ReadonlyMap<string, LayoutRect>;
   readonly paneOrder: readonly string[];
 }
 
+/** Discriminated union of all frame-level actions (tabs, panes, scroll, palette, transitions). */
 type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'prev-tab' }
@@ -259,6 +264,7 @@ type FrameAction =
   | { type: 'transition'; progress: number; generation: number }
   | { type: 'transition-complete'; generation: number };
 
+/** Discriminated union of command palette navigation/selection actions. */
 type PaletteAction =
   | { type: 'cp-next' }
   | { type: 'cp-prev' }
@@ -270,12 +276,14 @@ type PaletteAction =
 const PAGE_MSG_TOKEN = Symbol('app-frame-page-msg');
 const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 
+/** Wrapper that tags a user message with its originating page ID. */
 interface PageScopedMsg<Msg> {
   readonly [PAGE_MSG_TOKEN]: true;
   readonly pageId: string;
   readonly msg: Msg;
 }
 
+/** Wrapper that tags a frame-internal action for the update loop. */
 interface FrameScopedMsg {
   readonly [FRAME_MSG_TOKEN]: true;
   readonly action: FrameAction;
@@ -532,6 +540,7 @@ export function createFramedApp<PageModel, Msg>(
   return app;
 }
 
+/** Route a key press through the command palette, returning updated model and commands. */
 function handlePaletteKey<PageModel, Msg>(
   msg: KeyMsg,
   model: InternalFrameModel<PageModel, Msg>,
@@ -601,6 +610,7 @@ function handlePaletteKey<PageModel, Msg>(
   return [model, []];
 }
 
+/** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette). */
 function applyFrameAction<PageModel, Msg>(
   action: FrameAction,
   model: InternalFrameModel<PageModel, Msg>,
@@ -637,6 +647,7 @@ function applyFrameAction<PageModel, Msg>(
   }
 }
 
+/** Cycle the active tab by `delta` positions, optionally starting a transition. */
 function switchTab<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
@@ -696,6 +707,7 @@ function switchTab<PageModel, Msg>(
   return [nextModel, []];
 }
 
+/** Move focus to the next or previous pane in the active page's layout. */
 function cyclePane<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   delta: number,
@@ -720,6 +732,7 @@ function cyclePane<PageModel, Msg>(
   };
 }
 
+/** Apply a scroll action to the currently focused pane. */
 function scrollFocusedPane<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   action: Extract<
@@ -798,6 +811,7 @@ function scrollFocusedPane<PageModel, Msg>(
   };
 }
 
+/** Initialize the command palette with entries from frame, global, and page key maps. */
 function openCommandPalette<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -813,6 +827,7 @@ function openCommandPalette<PageModel, Msg>(
   };
 }
 
+/** Collect all available commands from frame, global, page, and custom sources. */
 function buildPaletteEntries<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -899,6 +914,7 @@ function buildPaletteEntries<PageModel, Msg>(
   return entries;
 }
 
+/** Reconcile pane IDs, scroll offsets, and focus for a page after a tab switch. */
 function syncPageFrameState<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   pageId: string,
@@ -932,6 +948,7 @@ function syncPageFrameState<PageModel, Msg>(
   };
 }
 
+/** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 function renderFrameNode<PageModel, Msg>(
   node: FrameLayoutNode,
   rect: LayoutRect,
@@ -1049,6 +1066,7 @@ function renderFrameNode<PageModel, Msg>(
   return { output, paneRects, paneOrder };
 }
 
+/** Render a placeholder for a grid area that has no matching cell definition. */
 function renderMissingGridCell(areaName: string, rect: LayoutRect): RenderResult {
   return {
     output: fitBlock(`[missing grid cell: ${areaName}]`, rect.width, rect.height).join('\n'),
@@ -1057,6 +1075,7 @@ function renderMissingGridCell(areaName: string, rect: LayoutRect): RenderResult
   };
 }
 
+/** Recursively collect all pane IDs from a layout tree in declaration order. */
 function collectPaneIds(node: FrameLayoutNode): string[] {
   if (node.kind === 'pane') return [node.paneId];
   if (node.kind === 'split') return [...collectPaneIds(node.paneA), ...collectPaneIds(node.paneB)];
@@ -1070,6 +1089,7 @@ function collectPaneIds(node: FrameLayoutNode): string[] {
   return ids;
 }
 
+/** Extract unique area names from CSS-grid-style template strings. */
 function declaredAreaNames(areas: readonly string[]): string[] {
   const names = new Set<string>();
   for (const row of areas) {
@@ -1080,6 +1100,7 @@ function declaredAreaNames(areas: readonly string[]): string[] {
   return [...names];
 }
 
+/** Throw if any pane ID appears more than once in the given list. */
 function assertUniquePaneIds(paneIds: readonly string[], scope: string): void {
   const seen = new Set<string>();
   for (const paneId of paneIds) {
@@ -1090,6 +1111,7 @@ function assertUniquePaneIds(paneIds: readonly string[], scope: string): void {
   }
 }
 
+/** Walk the layout tree to find the pane node with the given ID. */
 function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<FrameLayoutNode, { kind: 'pane' }> | undefined {
   if (node.kind === 'pane') return node.paneId === paneId ? node : undefined;
   if (node.kind === 'split') return findPaneNode(node.paneA, paneId) ?? findPaneNode(node.paneB, paneId);
@@ -1100,6 +1122,7 @@ function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<FrameLayou
   return undefined;
 }
 
+/** Build the default key map for frame-level actions (tabs, panes, scroll). */
 function createFrameKeyMap(): KeyMap<FrameAction> {
   return createKeyMap<FrameAction>()
     .group('Frame', (g) => g
@@ -1123,6 +1146,7 @@ function createFrameKeyMap(): KeyMap<FrameAction> {
     );
 }
 
+/** Render the top header line showing the app title and tab bar. */
 function renderHeaderLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -1137,6 +1161,7 @@ function renderHeaderLine<PageModel, Msg>(
   return fitLine(`${title}  ${tabs}`, model.columns);
 }
 
+/** Render the bottom status line showing mode, focused pane, and key hints. */
 function renderHelpLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -1163,6 +1188,7 @@ function renderHelpLine<PageModel, Msg>(
   return fitLine(line, model.columns);
 }
 
+/** Combine multiple binding sources into a single source for help display. */
 function mergeBindingSources(...sources: Array<BindingSource | undefined>): BindingSource {
   return {
     bindings(): readonly BindingInfo[] {
@@ -1176,6 +1202,7 @@ function mergeBindingSources(...sources: Array<BindingSource | undefined>): Bind
   };
 }
 
+/** Compute the available rect for page content (screen minus header and footer). */
 function frameBodyRect(columns: number, rows: number): LayoutRect {
   return {
     row: Math.min(2, Math.max(0, rows)),
@@ -1185,6 +1212,7 @@ function frameBodyRect(columns: number, rows: number): LayoutRect {
   };
 }
 
+/** Clip/pad a multiline string into an array of exactly `height` lines, each `width` columns. */
 function fitBlock(content: string, width: number, height: number): string[] {
   if (width <= 0 || height <= 0) return Array.from({ length: Math.max(0, height) }, () => '');
   const src = content.split('\n');
@@ -1197,11 +1225,13 @@ function fitBlock(content: string, width: number, height: number): string[] {
   return out;
 }
 
+/** Clip or pad a single line to exactly `width` visible columns. */
 function fitLine(line: string, width: number): string {
   const clipped = clipToWidth(line, Math.max(0, width));
   return clipped + ' '.repeat(Math.max(0, width - visibleLength(clipped)));
 }
 
+/** Merge two read-only maps into a new mutable map. */
 function mergeMaps<K, V>(a: ReadonlyMap<K, V>, b: ReadonlyMap<K, V>): Map<K, V> {
   const out = new Map<K, V>();
   for (const [k, v] of a) out.set(k, v);
@@ -1209,6 +1239,7 @@ function mergeMaps<K, V>(a: ReadonlyMap<K, V>, b: ReadonlyMap<K, V>): Map<K, V> 
   return out;
 }
 
+/** Translate a layout rect by the given row and column offsets. */
 function offsetRect(rect: LayoutRect, rowOffset: number, colOffset: number): LayoutRect {
   return {
     row: rowOffset + rect.row,
@@ -1218,6 +1249,7 @@ function offsetRect(rect: LayoutRect, rowOffset: number, colOffset: number): Lay
   };
 }
 
+/** Convert a binding's key combo into a synthetic KeyMsg for dispatch. */
 function comboToMsg(binding: BindingInfo): KeyMsg {
   return {
     type: 'key',
@@ -1228,6 +1260,7 @@ function comboToMsg(binding: BindingInfo): KeyMsg {
   };
 }
 
+/** Type guard: is this message a frame-internal action wrapper? */
 function isFrameScopedMsg(value: unknown): value is FrameScopedMsg {
   return typeof value === 'object'
     && value !== null
@@ -1235,6 +1268,7 @@ function isFrameScopedMsg(value: unknown): value is FrameScopedMsg {
     && (value as FrameScopedMsg)[FRAME_MSG_TOKEN] === true;
 }
 
+/** Wrap a frame action into a FrameScopedMsg for the update loop. */
 function wrapFrameMsg(action: FrameAction): FrameScopedMsg {
   return {
     [FRAME_MSG_TOKEN]: true,
@@ -1242,14 +1276,17 @@ function wrapFrameMsg(action: FrameAction): FrameScopedMsg {
   };
 }
 
+/** Create a command that immediately resolves with the given message. */
 function emitMsg<Msg>(msg: Msg): Cmd<Msg> {
   return () => Promise.resolve(msg);
 }
 
+/** Create a command that emits a page-scoped message. */
 function emitMsgForPage<Msg>(pageId: string, msg: Msg): Cmd<Msg> {
   return async () => wrapPageMsg(pageId, msg);
 }
 
+/** Wrap a page-level command so its emitted messages are tagged with the page ID. */
 function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<Msg> {
   return async (emit) => {
     const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg) as unknown as Msg));
@@ -1258,6 +1295,7 @@ function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<Msg> {
   };
 }
 
+/** Tag a user message with its originating page ID. */
 function wrapPageMsg<Msg>(pageId: string, msg: Msg): Msg {
   return {
     [PAGE_MSG_TOKEN]: true,
@@ -1266,6 +1304,7 @@ function wrapPageMsg<Msg>(pageId: string, msg: Msg): Msg {
   } as unknown as Msg;
 }
 
+/** Type guard: is this message a page-scoped wrapper? */
 function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
   return typeof value === 'object'
     && value !== null
@@ -1301,6 +1340,7 @@ function createTransitionTickCmd<Msg>(durationMs: number, generation: number): C
     });
 }
 
+/** Render a page's layout tree within the frame body rect. */
 function renderPageContent<PageModel, Msg>(
   pageId: string,
   model: InternalFrameModel<PageModel, Msg>,

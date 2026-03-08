@@ -134,6 +134,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   const disposables: Disposable[] = [];
   let disposed = false;
 
+  /** Broadcast a message to all current subscribers. */
   function emit(msg: BusMsg<M>): void {
     if (disposed) return;
     for (const handler of subscribers) {
