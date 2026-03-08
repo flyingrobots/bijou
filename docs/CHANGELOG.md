@@ -6,16 +6,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### 🐛 Bug Fixes
-
-- **Timer `onComplete` fires before cursor restore** — `onComplete` callback now runs after interval disposal and cursor restoration, so user code in the callback sees a clean terminal state.
-
-### 🔧 Internal
-
-- **Timer state machine refactor (bijou)** — Replaced 6 loose mutable variables in `createLiveController` with a discriminated union (`TimerState`), making invalid states unrepresentable. Zero API or behavioral changes; all 29 timer tests pass unmodified.
-- **pre-push hook pipefail safety** — `git rev-list` failures in the commit pacing check now fall back to `count=0` instead of aborting the hook under `set -euo pipefail`.
-- **reply-to-reviews.sh uses GraphQL for thread resolution** — Replaced REST-based heuristic ("has human reply = resolved") with GraphQL `reviewThreads.isResolved` for accurate unresolved thread detection.
-
 ## [1.8.0] - 2026-03-08
 
 ### ✨ Features
@@ -44,6 +34,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer `stop()` after `pause()` loses paused elapsed** — `stop()` now snapshots `pausedElapsed` into `elapsedMs` when stopped while paused.
 - **`constrain()` height ellipsis ignores width constraint** — Height-truncation ellipsis now respects `maxWidth` when both constraints are active.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
+- **Timer `onComplete` fires before cursor restore** — `onComplete` callback now runs after interval disposal and cursor restoration, so user code in the callback sees a clean terminal state.
 
 ### ⚠️ Deprecations
 
@@ -67,6 +58,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`ANSI_SGR_RE` shared regex safety** — Removed `/g` flag from the exported constant to prevent `lastIndex` bugs. Callsites create fresh regex instances for replacement.
 - **`constrain()` explicit `maxWidth=0` guard** — Returns empty string immediately instead of relying on `clipToWidth` coincidence.
 - **Wizard max iteration guard** — `wizard()` throws after 1000 steps to prevent infinite `branch` recursion loops.
+- **Timer state machine refactor** — Replaced 6 loose mutable variables in `createLiveController` with a `TimerState` discriminated union (`idle | running | paused | stopped`), making invalid states unrepresentable.
 
 ### 📦 Maintenance
 
@@ -79,10 +71,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Code smell journal** — Populated `.claude/bad_code.md` with 7 findings (process.env bypasses, duplicated envAccessor, _reset exports, app-frame.ts size, engine version inconsistency).
 - **Dependency audit** — 0 CVEs, all MIT, all maintained.
 - **pre-push hook** — Removed squashing suggestion from commit pacing warning (repo forbids squashing).
+- **pre-push hook pipefail safety** — `git rev-list` failures in the commit pacing check now fall back to `count=0` instead of aborting under `set -euo pipefail`.
+- **reply-to-reviews.sh GraphQL thread resolution** — Replaced REST-based heuristic with GraphQL `reviewThreads.isResolved` for accurate unresolved thread detection.
 
 ### 🧪 Tests
 
-- 109 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (23), dynamic wizard (16), panel-state (11), panel-dock (14), layout-preset (7), env accessors (5), cursor-guard (3), form-utils (1), ANSI regex (2).
+- 110 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (24), dynamic wizard (16), panel-state (11), panel-dock (14), layout-preset (7), env accessors (5), cursor-guard (3), form-utils (1), ANSI regex (2).
 
 ## [1.7.0] - 2026-03-08
 

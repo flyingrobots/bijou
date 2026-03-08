@@ -191,12 +191,13 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v1.7.0
+## What's New in v1.8.0
 
-- **Multiselect `defaultValues`** — Pre-select items when `multiselect()` first renders in interactive mode. Togglable with Space, cleared on cancel.
-- **Property-based fuzz testing** — fast-check suites for forms (arbitrary strings, control chars, numeric edge cases), environment detection (500+ env×TTY combos), and DTCG theme round-trip.
-- **Expanded adapter tests** — `nodeIO()` write/readFile/setInterval and `chalkStyle()` bgRgb/bgHex/noColor coverage.
-- **Git hooks** — Pre-commit lint + lockfile check, pre-push test suite.
+- **Timer / Stopwatch** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` with start/pause/resume/stop.
+- **`constrain()` component** — Content truncation with configurable `maxWidth`, `maxHeight`, and `ellipsis`. Passthrough in pipe/accessible modes.
+- **`cursorGuard()` + `withHiddenCursor()`** — Reference-counted cursor visibility guard so nested live components (spinner inside progress bar) don't clobber each other.
+- **Dynamic wizard forms** — `WizardStep` gains `transform` and `branch` for runtime field replacement and conditional step injection.
+- **Panel minimize/maximize/dock (bijou-tui)** — `ctrl+m` fold/unfold, `ctrl+f` maximize/restore, `ctrl+shift+arrow` reorder panes. Layout presets and JSON session restore.
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
