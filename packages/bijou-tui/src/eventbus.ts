@@ -107,6 +107,8 @@ export interface EventBus<M> {
 export interface CreateEventBusOptions {
   /** Called when a command promise rejects. */
   onCommandRejected?: (error: unknown) => void;
+  /** Called to surface error messages (replaces direct `console.error` usage). */
+  onError?: (message: string, error: unknown) => void;
 }
 
 /** Handle for unsubscribing or disconnecting a resource. */
@@ -213,11 +215,11 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
           if (busOptions?.onCommandRejected != null) {
             busOptions.onCommandRejected(err);
           } else {
-            console.error('[EventBus] Command rejected:', err);
+            busOptions?.onError?.('[EventBus] Command rejected:', err);
           }
         } catch (reportErr: unknown) {
-          console.error('[EventBus] onCommandRejected handler threw:', reportErr);
-          console.error('[EventBus] Original command rejection:', err);
+          busOptions?.onError?.('[EventBus] onCommandRejected handler threw:', reportErr);
+          busOptions?.onError?.('[EventBus] Original command rejection:', err);
         }
       });
     },
