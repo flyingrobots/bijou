@@ -140,7 +140,7 @@ multiselect()
     ✓ returns empty array when stdin is empty
 
 all forms
-  ✓ Ctrl+C throws or returns cancellation sentinel
+  ✓ Ctrl+C cancels gracefully — confirm/input reject with error, select returns default/first value, multiselect returns empty array
   ✓ each form accepts ctx parameter and uses it over default
   ✓ each form works with createTestContext() and mock IO
 ```
@@ -213,7 +213,7 @@ mockRuntime()
 mockIO()
   ✓ write() captures output to retrievable buffer
   ✓ readLine() returns queued answers in order
-  ✓ readLine() throws when queue exhausted
+  ✓ readLine() returns empty string when queue exhausted
   ✓ readFile() / readDir() use mock filesystem
 
 plainStyle()
@@ -308,7 +308,7 @@ piped / non-interactive output
   ✓ forms fall back to numbered/line-buffered mode
 
 CI detection
-  ✓ CI=true with TTY still detects as rich mode
+  ✓ CI=true with TTY detects as static mode
   ✓ CI=true without TTY detects as pipe mode
 
 TERM=dumb

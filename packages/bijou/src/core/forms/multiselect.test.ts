@@ -97,6 +97,32 @@ describe('multiselect()', () => {
       expect(result).toEqual([]);
     });
 
+    it('pre-selected defaultValues render as checked on initial render', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\r'] } });
+      const result = await multiselect({
+        title: 'Colors',
+        options: COLOR_OPTIONS,
+        defaultValues: ['red', 'blue'],
+        ctx,
+      });
+      const output = ctx.io.written.join('');
+      // ◉ = filled circle = selected; should appear for red and blue
+      expect(output).toContain('◉');
+      expect(result).toEqual(['red', 'blue']);
+    });
+
+    it('defaultValues can be toggled off', async () => {
+      // Space on first item (red, pre-selected) toggles it off, then Enter
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\r'] } });
+      const result = await multiselect({
+        title: 'Colors',
+        options: COLOR_OPTIONS,
+        defaultValues: ['red', 'blue'],
+        ctx,
+      });
+      expect(result).toEqual(['blue']);
+    });
+
     it('toggle on and off deselects item', async () => {
       const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', ' ', '\r'] } });
       const result = await multiselect({ title: 'Colors', options: COLOR_OPTIONS, ctx });

@@ -11,6 +11,8 @@ import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch,
 export interface MultiselectOptions<T = string> extends SelectFieldOptions<T> {
   /** Bijou context for IO, styling, and mode detection. */
   ctx?: BijouContext;
+  /** Values to pre-select when the multiselect first renders in interactive mode. */
+  defaultValues?: T[];
 }
 
 /**
@@ -82,6 +84,15 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   let cursor = 0;
   let scrollOffset = 0;
   const selected = new Set<number>();
+
+  // Pre-select items matching defaultValues (if provided)
+  if (options.defaultValues !== undefined) {
+    for (let i = 0; i < options.options.length; i++) {
+      if (options.defaultValues.some((dv) => Object.is(dv, options.options[i]!.value))) {
+        selected.add(i);
+      }
+    }
+  }
 
   /** Keep the scroll offset so the cursor stays within the visible window (cursor-relative then absolute bounds). */
   function clampScroll(): void {

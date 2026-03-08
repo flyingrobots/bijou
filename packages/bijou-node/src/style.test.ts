@@ -92,6 +92,28 @@ describe('chalkStyle()', () => {
     it('bold() returns string containing the text', () => {
       expect(style.bold('strong')).toContain('strong');
     });
+
+    it('bgRgb() returns string containing the text', () => {
+      expect(style.bgRgb(0, 0, 255, 'blue')).toContain('blue');
+    });
+
+    it.runIf(chalkEmitsColor)('bgRgb() emits ANSI for background color', () => {
+      expect(style.bgRgb(0, 0, 255, 'blue')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it('bgHex() returns string containing the text', () => {
+      expect(style.bgHex('#0000ff', 'blue')).toContain('blue');
+    });
+
+    it.runIf(chalkEmitsColor)('bgHex() emits ANSI for background color', () => {
+      expect(style.bgHex('#0000ff', 'blue')).toMatch(new RegExp('\\x1b\\['));
+    });
+
+    it.runIf(chalkEmitsColor)('styled() applies bg field from token', () => {
+      const result = style.styled({ hex: '#ffffff', bg: '#0000ff' }, 'bg-test');
+      expect(result).toMatch(new RegExp('\\x1b\\['));
+      expect(result).toContain('bg-test');
+    });
   });
 
   describe('noColor mode', () => {
@@ -111,8 +133,16 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ff0000' }, 'plain')).toBe('plain');
     });
 
-    it('bold() still applies (chalk.bold is not gated by noColor)', () => {
-      expect(style.bold('text')).toContain('text');
+    it('bold() returns plain text in noColor mode', () => {
+      expect(style.bold('text')).toBe('text');
+    });
+
+    it('bgRgb() returns plain text', () => {
+      expect(style.bgRgb(0, 0, 255, 'blue')).toBe('blue');
+    });
+
+    it('bgHex() returns plain text', () => {
+      expect(style.bgHex('#0000ff', 'blue')).toBe('blue');
     });
 
     it('styled() returns plain text for underline variants in noColor mode', () => {
