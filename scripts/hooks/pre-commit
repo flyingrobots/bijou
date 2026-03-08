@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "pre-commit: lint"
+npm run lint
+
+echo "pre-commit: lockfile consistency"
+npm ls --all > /dev/null 2>&1

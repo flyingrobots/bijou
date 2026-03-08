@@ -19,6 +19,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Multiselect defaultValues tests** — Pre-selected items render checked, can be toggled off.
 - **Property-based fuzz suites (fast-check)** — Forms: arbitrary strings, control characters, long input, numeric edge cases, malformed comma lists, rapid repeated calls. Environment detection: 500+ random env×TTY combos, BIJOU_ACCESSIBLE priority invariant, NO_COLOR invariant. DTCG: random theme round-trip, hex preservation, modifier subset preservation, deeply nested reference chains, edge-case hex values.
 
+### 🔧 Infrastructure
+
+- **Git hooks (repo)** — `scripts/hooks/pre-commit` runs lint + lockfile consistency check (`npm ls --all`). `scripts/hooks/pre-push` runs the full test suite. Wired via `core.hooksPath scripts/hooks`. Catches lockfile drift before it reaches CI.
+
 ### 📝 Documentation
 
 - **ROADMAP** — Test coverage spec sections corrected. Xyph migration moved to COMPLETED.
