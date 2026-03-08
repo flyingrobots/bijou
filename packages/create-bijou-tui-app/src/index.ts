@@ -252,6 +252,7 @@ export function usage(): string {
   ].join('\n');
 }
 
+/** Ensure the target directory exists and is writable, creating it if needed. */
 function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   if (!existsSync(absTargetDir)) {
     mkdirSync(absTargetDir, { recursive: true });
@@ -275,6 +276,7 @@ function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   }
 }
 
+/** Spawn the package manager's install command synchronously. */
 function runInstall(packageManager: PackageManager, cwd: string): void {
   const args = packageManager === 'yarn' ? [] : ['install'];
   const result = spawnSync(packageManager, args, {

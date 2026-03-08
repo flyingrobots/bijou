@@ -102,11 +102,13 @@ interface SkeletonPageModel {
   readonly quitConfirmOpen: boolean;
 }
 
+/** Per-page configuration derived from the page spec (drawer vs. split vs. empty). */
 interface SkeletonPageConfig {
   readonly hasDrawer: boolean;
   readonly drawerPaneId?: string;
 }
 
+/** Describes a page's tab and layout kind before rendering. */
 interface SkeletonPageSpec {
   readonly tab: SkeletonTab;
   readonly kind: 'drawer' | 'split' | 'empty';
@@ -203,6 +205,7 @@ export function createTuiAppSkeleton(
   });
 }
 
+/** Everything needed to build the skeleton app's overlay stack. */
 interface OverlayBuildOptions {
   readonly frame: FrameOverlayContext<SkeletonPageModel>;
   readonly tabsById: ReadonlyMap<string, SkeletonTab>;
@@ -215,6 +218,7 @@ interface OverlayBuildOptions {
   readonly ctx: BijouContext;
 }
 
+/** Assemble the full overlay stack (tab bar, header, drawer, footer, quit modal). */
 function buildSkeletonOverlays(options: OverlayBuildOptions): readonly Overlay[] {
   const width = Math.max(0, options.frame.screenRect.width);
   const height = Math.max(0, options.frame.screenRect.height);
@@ -291,6 +295,7 @@ function buildSkeletonOverlays(options: OverlayBuildOptions): readonly Overlay[]
   return overlays;
 }
 
+/** Render the top tab bar with active/inactive styling and separators. */
 function renderTabRow(
   width: number,
   tabs: readonly SkeletonTab[],
@@ -310,6 +315,7 @@ function renderTabRow(
   return fillToWidth(tabsRaw, width, headerBg, ctx);
 }
 
+/** Render the header row with app title and active tab name. */
 function renderHeaderRow(
   width: number,
   title: string,
@@ -326,6 +332,7 @@ function renderHeaderRow(
   return style(line, headerBg, ctx);
 }
 
+/** Render a full-width diagonal separator line above the footer. */
 function renderSeparatorRow(
   width: number,
   tokens: SkeletonThemeTokens | undefined,
@@ -335,6 +342,7 @@ function renderSeparatorRow(
   return style('\\'.repeat(width), separatorToken, ctx);
 }
 
+/** Render the footer status bar with status message and tab name. */
 function renderFooterStatusRow(
   width: number,
   status: string,
@@ -351,6 +359,7 @@ function renderFooterStatusRow(
   return style(line, footerToken, ctx);
 }
 
+/** Render the bottom footer line showing the key legend. */
 function renderFooterControlsRow(
   width: number,
   keyLegend: string,
@@ -366,6 +375,7 @@ function renderFooterControlsRow(
   return style(line, controlsToken, ctx);
 }
 
+/** Build the drawer overlay if the page supports it and the animation progress is visible. */
 function maybeRenderDrawerOverlay(
   frame: FrameOverlayContext<SkeletonPageModel>,
   pageConfig: SkeletonPageConfig,
@@ -404,6 +414,7 @@ function maybeRenderDrawerOverlay(
   });
 }
 
+/** Produce the static content shown inside the drawer panel. */
 function renderDrawerContent(model: SkeletonPageModel): string {
   const pct = Math.round(clamp01(model.drawerProgress) * 100);
   return [
@@ -418,6 +429,7 @@ function renderDrawerContent(model: SkeletonPageModel): string {
   ].join('\n');
 }
 
+/** Map each tab to a page spec with a layout kind (drawer, split, or empty). */
 function buildPageSpecs(tabs: readonly SkeletonTab[]): readonly SkeletonPageSpec[] {
   return tabs.map((tab, index) => ({
     tab,
@@ -425,6 +437,7 @@ function buildPageSpecs(tabs: readonly SkeletonTab[]): readonly SkeletonPageSpec
   }));
 }
 
+/** Derive per-page configuration (drawer pane ID, etc.) from a page spec. */
 function pageConfigFor(spec: SkeletonPageSpec): SkeletonPageConfig {
   if (spec.kind === 'drawer') {
     return {
@@ -435,6 +448,7 @@ function pageConfigFor(spec: SkeletonPageSpec): SkeletonPageConfig {
   return { hasDrawer: false };
 }
 
+/** Create the initial model for a skeleton page based on its config. */
 function createInitialPageModel(config: SkeletonPageConfig): SkeletonPageModel {
   return {
     ready: true,
@@ -444,6 +458,7 @@ function createInitialPageModel(config: SkeletonPageConfig): SkeletonPageModel {
   };
 }
 
+/** TEA update handler for skeleton page messages (quit, drawer toggle, etc.). */
 function updateSkeletonPage(
   msg: SkeletonMsg,
   model: SkeletonPageModel,
@@ -482,6 +497,7 @@ function updateSkeletonPage(
   }
 }
 
+/** Build the layout tree for a skeleton page (single pane, split, or empty). */
 function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
   switch (spec.kind) {
     case 'drawer':
@@ -518,6 +534,7 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
   }
 }
 
+/** Render a centered label inside a split pane for the skeleton demo. */
 function renderSplitPaneLabel(label: string, width: number, height: number): string {
   if (width <= 0 || height <= 0) return '';
   const first = clipToWidth(` ${label}`, width);
@@ -526,10 +543,12 @@ function renderSplitPaneLabel(label: string, width: number, height: number): str
   return lines.join('\n');
 }
 
+/** Derive the drawer pane ID from a tab ID. */
 function drawerPaneId(tabId: string): string {
   return `${tabId}-main`;
 }
 
+/** Pad styled content with token-styled spaces to fill exactly `width` columns. */
 function fillToWidth(content: string, width: number, token: TokenValue, ctx: BijouContext): string {
   const clipped = clipToWidth(content, width);
   const visible = visibleLength(clipped);
@@ -537,11 +556,13 @@ function fillToWidth(content: string, width: number, token: TokenValue, ctx: Bij
   return clipped + style(' '.repeat(width - visible), token, ctx);
 }
 
+/** Apply a design token's style to text, returning unstyled for empty strings. */
 function style(text: string, token: TokenValue, ctx: BijouContext): string {
   if (text.length === 0) return '';
   return ctx.style.styled(token, text);
 }
 
+/** Combine a base and optional extra key map into a new merged key map. */
 function mergeKeyMaps<M>(base: KeyMap<M>, extra: KeyMap<M> | undefined): KeyMap<M> {
   if (extra == null) return base;
   const merged = createKeyMap<M>();
@@ -550,6 +571,7 @@ function mergeKeyMaps<M>(base: KeyMap<M>, extra: KeyMap<M> | undefined): KeyMap<
   return merged;
 }
 
+/** Copy all enabled bindings from a source key map into a target key map. */
 function bindMapInto<M>(target: KeyMap<M>, source: KeyMap<M>): void {
   for (const binding of source.bindings()) {
     if (!binding.enabled) continue;
@@ -563,6 +585,7 @@ function bindMapInto<M>(target: KeyMap<M>, source: KeyMap<M>): void {
   }
 }
 
+/** Convert a key combo into a synthetic KeyMsg for dispatch. */
 function comboToMsg(combo: KeyCombo): KeyMsg {
   return {
     type: 'key',
@@ -573,6 +596,7 @@ function comboToMsg(combo: KeyCombo): KeyMsg {
   };
 }
 
+/** Clamp a number to the 0–1 range, treating non-finite as 0. */
 function clamp01(value: number): number {
   if (!Number.isFinite(value)) return 0;
   if (value < 0) return 0;
@@ -580,6 +604,7 @@ function clamp01(value: number): number {
   return value;
 }
 
+/** Floor and clamp a number between min and max. */
 function clampInt(value: number, min: number, max: number): number {
   const floored = Math.floor(value);
   return Math.max(min, Math.min(max, floored));
