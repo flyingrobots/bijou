@@ -14,6 +14,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Select cancel label mismatch (bijou core)** — `cleanup()` in `select()` always displayed the label at the cursor position, even on cancel (Ctrl+C/Escape) where the resolved value is the default/first option. Now accepts an optional `selectedLabel` parameter so the cancel path displays the correct fallback label.
 - **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
 
 ### ♻️ Refactors
