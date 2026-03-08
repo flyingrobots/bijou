@@ -81,6 +81,95 @@ export function timer(ms: number, options: TimerOptions = {}): string {
   }, options);
 }
 
+/** Internal config for the shared live controller. */
+interface LiveControllerConfig {
+  readonly ctx: BijouContext;
+  readonly interval: number;
+  readonly timerOpts: TimerOptions;
+  /** Return the display ms for the current tick. Called after updating elapsed. */
+  readonly displayMs: (elapsedMs: number) => number;
+  /** Initial display value for non-interactive fallback. */
+  readonly initialDisplayMs: number;
+  /** Optional tick guard — return true to signal completion. */
+  readonly onTick?: (elapsedMs: number) => boolean;
+}
+
+/** Shared controller logic for createTimer and createStopwatch. */
+function createLiveController(config: LiveControllerConfig): TimerController {
+  const { ctx, interval, timerOpts, displayMs, initialDisplayMs, onTick } = config;
+  const mode = ctx.mode;
+
+  let elapsedMs = 0;
+  let timerHandle: TimerHandle | null = null;
+  let startTime = 0;
+  let pausedElapsed = 0;
+  let paused = false;
+
+  function stopInternal(): void {
+    if (timerHandle !== null) {
+      timerHandle.dispose();
+      timerHandle = null;
+    }
+  }
+
+  function render(): void {
+    const line = timer(displayMs(elapsedMs), { ...timerOpts, ctx });
+    ctx.io.write(`\r\x1b[K${line}`);
+  }
+
+  function tick(): void {
+    if (paused) return;
+    elapsedMs = pausedElapsed + (Date.now() - startTime);
+    if (onTick?.(elapsedMs)) {
+      stopInternal();
+      return;
+    }
+    render();
+  }
+
+  return {
+    start() {
+      if (mode !== 'interactive') {
+        ctx.io.write(timer(initialDisplayMs, { ...timerOpts, ctx }) + '\n');
+        return;
+      }
+      startTime = Date.now();
+      pausedElapsed = 0;
+      elapsedMs = 0;
+      ctx.io.write('\x1b[?25l');
+      render();
+      timerHandle = ctx.io.setInterval(tick, interval);
+    },
+
+    pause() {
+      if (paused || timerHandle === null) return;
+      paused = true;
+      pausedElapsed = elapsedMs;
+    },
+
+    resume() {
+      if (!paused) return;
+      paused = false;
+      startTime = Date.now();
+    },
+
+    stop(finalMessage?: string) {
+      stopInternal();
+      if (mode === 'interactive') {
+        ctx.io.write('\r\x1b[K');
+        ctx.io.write('\x1b[?25h');
+      }
+      if (finalMessage !== undefined) {
+        ctx.io.write(finalMessage + '\n');
+      }
+    },
+
+    elapsed() {
+      return elapsedMs;
+    },
+  };
+}
+
 /**
  * Create a live countdown timer.
  *
@@ -93,84 +182,26 @@ export function timer(ms: number, options: TimerOptions = {}): string {
  */
 export function createTimer(options: CreateTimerOptions): TimerController {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
   const duration = Math.max(0, options.duration);
-  const interval = options.interval ?? (options.showMs ? 100 : 1000);
   const onComplete = options.onComplete;
 
-  let elapsedMs = 0;
-  let timerHandle: TimerHandle | null = null;
-  let startTime = 0;
-  let pausedElapsed = 0;
-  let paused = false;
-
-  function render(): void {
-    const remaining = Math.max(0, duration - elapsedMs);
-    const line = timer(remaining, { ...options, ctx });
-    ctx.io.write(`\r\x1b[K${line}`);
-  }
-
-  function tick(): void {
-    if (paused) return;
-    elapsedMs = pausedElapsed + (Date.now() - startTime);
-    if (elapsedMs >= duration) {
-      elapsedMs = duration;
-      render();
-      stopInternal();
-      onComplete?.();
-      return;
-    }
-    render();
-  }
-
-  function stopInternal(): void {
-    if (timerHandle !== null) {
-      timerHandle.dispose();
-      timerHandle = null;
-    }
-  }
-
-  return {
-    start() {
-      if (mode !== 'interactive') {
-        ctx.io.write(timer(duration, { ...options, ctx }) + '\n');
-        return;
+  return createLiveController({
+    ctx,
+    interval: options.interval ?? (options.showMs ? 100 : 1000),
+    timerOpts: options,
+    displayMs: (elapsed) => Math.max(0, duration - elapsed),
+    initialDisplayMs: duration,
+    onTick: (elapsed) => {
+      if (elapsed >= duration) {
+        // Render final frame before completing
+        const line = timer(0, { ...options, ctx });
+        ctx.io.write(`\r\x1b[K${line}`);
+        onComplete?.();
+        return true;
       }
-      startTime = Date.now();
-      pausedElapsed = 0;
-      elapsedMs = 0;
-      ctx.io.write('\x1b[?25l');
-      render();
-      timerHandle = ctx.io.setInterval(tick, interval);
+      return false;
     },
-
-    pause() {
-      if (paused || timerHandle === null) return;
-      paused = true;
-      pausedElapsed = elapsedMs;
-    },
-
-    resume() {
-      if (!paused) return;
-      paused = false;
-      startTime = Date.now();
-    },
-
-    stop(finalMessage?: string) {
-      stopInternal();
-      if (mode === 'interactive') {
-        ctx.io.write('\r\x1b[K');
-        ctx.io.write('\x1b[?25h');
-      }
-      if (finalMessage !== undefined) {
-        ctx.io.write(finalMessage + '\n');
-      }
-    },
-
-    elapsed() {
-      return elapsedMs;
-    },
-  };
+  });
 }
 
 /**
@@ -181,70 +212,14 @@ export function createTimer(options: CreateTimerOptions): TimerController {
  */
 export function createStopwatch(options: CreateStopwatchOptions = {}): TimerController {
   const ctx = resolveCtx(options.ctx);
-  const mode = ctx.mode;
-  const interval = options.interval ?? (options.showMs ? 100 : 1000);
 
-  let elapsedMs = 0;
-  let timerHandle: TimerHandle | null = null;
-  let startTime = 0;
-  let pausedElapsed = 0;
-  let paused = false;
-
-  function render(): void {
-    const line = timer(elapsedMs, { ...options, ctx });
-    ctx.io.write(`\r\x1b[K${line}`);
-  }
-
-  function tick(): void {
-    if (paused) return;
-    elapsedMs = pausedElapsed + (Date.now() - startTime);
-    render();
-  }
-
-  return {
-    start() {
-      if (mode !== 'interactive') {
-        ctx.io.write(timer(0, { ...options, ctx }) + '\n');
-        return;
-      }
-      startTime = Date.now();
-      pausedElapsed = 0;
-      elapsedMs = 0;
-      ctx.io.write('\x1b[?25l');
-      render();
-      timerHandle = ctx.io.setInterval(tick, interval);
-    },
-
-    pause() {
-      if (paused || timerHandle === null) return;
-      paused = true;
-      pausedElapsed = elapsedMs;
-    },
-
-    resume() {
-      if (!paused) return;
-      paused = false;
-      startTime = Date.now();
-    },
-
-    stop(finalMessage?: string) {
-      if (timerHandle !== null) {
-        timerHandle.dispose();
-        timerHandle = null;
-      }
-      if (mode === 'interactive') {
-        ctx.io.write('\r\x1b[K');
-        ctx.io.write('\x1b[?25h');
-      }
-      if (finalMessage !== undefined) {
-        ctx.io.write(finalMessage + '\n');
-      }
-    },
-
-    elapsed() {
-      return elapsedMs;
-    },
-  };
+  return createLiveController({
+    ctx,
+    interval: options.interval ?? (options.showMs ? 100 : 1000),
+    timerOpts: options,
+    displayMs: (elapsed) => elapsed,
+    initialDisplayMs: 0,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -253,11 +228,12 @@ export function createStopwatch(options: CreateStopwatchOptions = {}): TimerCont
 
 /** Format milliseconds as `MM:SS`, `HH:MM:SS`, or `MM:SS.mmm`. */
 function formatTime(ms: number, options: TimerOptions): string {
-  const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
+  const safeMs = Math.max(0, ms);
+  const totalSeconds = Math.floor(safeMs / 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  const millis = Math.floor(ms % 1000);
+  const millis = Math.floor(safeMs % 1000);
 
   const mm = String(minutes).padStart(2, '0');
   const ss = String(seconds).padStart(2, '0');

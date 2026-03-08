@@ -117,6 +117,7 @@ export {
   movePaneInContainer,
   resolveChildOrder,
   findPaneContainer,
+  getNodeId,
 } from './panel-dock.js';
 
 // Layout presets + session restore

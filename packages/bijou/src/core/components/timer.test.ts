@@ -52,6 +52,11 @@ describe('timer (static)', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     expect(timer(-1000, { ctx })).toBe('00:00');
   });
+
+  it('handles negative ms with showMs', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    expect(timer(-500, { showMs: true, ctx })).toBe('00:00.000');
+  });
 });
 
 describe('createTimer', () => {

@@ -6,6 +6,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Bug Fixes
+
+- **`timer()` negative ms with `showMs`** — `formatTime()` now clamps the entire input to `>= 0` before extracting millis, fixing invalid output like `00:00.-500`.
+- **`constrain()` ANSI-safe truncation detection** — Width comparison now uses `graphemeWidth()` instead of raw string length, preventing false-positive ellipsis on ANSI-styled input.
+
+### ♻️ Refactors
+
+- **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
+- **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
+
 ## [1.8.0] - 2026-03-08
 
 ### ✨ Features

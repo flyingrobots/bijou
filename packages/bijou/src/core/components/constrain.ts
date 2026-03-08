@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { clipToWidth } from '../text/clip.js';
+import { graphemeWidth } from '../text/grapheme.js';
 
 /** Configuration for content constraint rendering. */
 export interface ConstrainOptions {
@@ -50,9 +51,9 @@ function applyConstraints(content: string, options: ConstrainOptions): string {
     const maxW = options.maxWidth;
     lines = lines.map((line) => {
       const clipped = clipToWidth(line, maxW);
-      if (clipped.length < line.length) {
+      if (graphemeWidth(clipped) < graphemeWidth(line)) {
         // Re-clip to make room for ellipsis
-        const ellipsisWidth = ellipsis.length;
+        const ellipsisWidth = graphemeWidth(ellipsis);
         if (maxW > ellipsisWidth) {
           return clipToWidth(line, maxW - ellipsisWidth) + ellipsis;
         }

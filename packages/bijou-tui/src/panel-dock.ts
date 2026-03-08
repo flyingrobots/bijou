@@ -135,7 +135,7 @@ export function findPaneContainer(
 }
 
 /** Get the identifying ID of a layout node (paneId, splitId, or gridId). */
-function getNodeId(node: FrameLayoutNode): string {
+export function getNodeId(node: FrameLayoutNode): string {
   switch (node.kind) {
     case 'pane': return node.paneId;
     case 'split': return node.splitId;

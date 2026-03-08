@@ -64,6 +64,7 @@ import {
   movePaneInContainer,
   resolveChildOrder,
   findPaneContainer,
+  getNodeId,
   type PanelDockState,
   type DockDirection,
 } from './panel-dock.js';
@@ -1070,7 +1071,7 @@ function renderFrameNode<PageModel, Msg>(
     const direction = node.direction ?? 'row';
 
     // Consult dock state for child order
-    const defaultChildIds = [getLayoutNodeId(node.paneA), getLayoutNodeId(node.paneB)];
+    const defaultChildIds = [getNodeId(node.paneA), getNodeId(node.paneB)];
     const resolvedOrder = resolveChildOrder(ctx.dockState, node.splitId, defaultChildIds);
     const swapped = resolvedOrder[0] !== defaultChildIds[0];
     const effectiveA = swapped ? node.paneB : node.paneA;
@@ -1461,14 +1462,6 @@ function fitLine(line: string, width: number): string {
   return clipped + ' '.repeat(Math.max(0, width - visibleLength(clipped)));
 }
 
-/** Get the identifying ID of a layout node. */
-function getLayoutNodeId(node: FrameLayoutNode): string {
-  switch (node.kind) {
-    case 'pane': return node.paneId;
-    case 'split': return node.splitId;
-    case 'grid': return node.gridId;
-  }
-}
 
 /** Check if a layout node (or its first descendant pane) is minimized. */
 function isPaneMinimized(node: FrameLayoutNode, visibility: PanelVisibilityState): boolean {
