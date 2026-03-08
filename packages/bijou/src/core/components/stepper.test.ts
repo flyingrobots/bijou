@@ -69,9 +69,12 @@ describe('stepper', () => {
     });
 
     it('no default bg (opt-in only)', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive' });
-      const result = stepper(steps, { current: 1, ctx });
-      expect(result).toContain('Payment');
+      (ctx as unknown as { style: typeof style }).style = style;
+      stepper(steps, { current: 1, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
     });
 
     it('skips activeBgToken in pipe mode', () => {
