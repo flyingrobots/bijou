@@ -32,6 +32,31 @@ describe('serializeLayoutState', () => {
     expect(result.pages['page1']!.maximizedPane).toBeUndefined();
   });
 
+  it('reads panel state from model when perPage is omitted', () => {
+    const model: FrameModel<unknown> = {
+      activePageId: 'page1',
+      pageOrder: ['page1'],
+      pageModels: { page1: {} },
+      focusedPaneByPage: { page1: 'a' },
+      scrollByPage: {},
+      columns: 80,
+      rows: 24,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      minimizedByPage: { page1: { minimized: new Set(['b']) } },
+      maximizedPaneByPage: { page1: { maximizedPaneId: 'a' } },
+      dockStateByPage: { page1: { orderByContainer: { 'split-1': ['b', 'a'] } } },
+      splitRatioOverrides: { page1: { 'split-1': 0.3 } },
+    };
+
+    const result = serializeLayoutState(model, ['page1']);
+    expect(result.pages['page1']!.minimized).toEqual(['b']);
+    expect(result.pages['page1']!.maximizedPane).toBe('a');
+    expect(result.pages['page1']!.dockOrder).toEqual({ 'split-1': ['b', 'a'] });
+    expect(result.pages['page1']!.splitRatios).toEqual({ 'split-1': 0.3 });
+  });
+
   it('serializes with per-page state', () => {
     const model: FrameModel<unknown> = {
       activePageId: 'page1',

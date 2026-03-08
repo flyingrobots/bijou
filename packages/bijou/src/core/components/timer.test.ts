@@ -90,6 +90,22 @@ describe('createTimer', () => {
     expect(output).toContain('\x1b[?25h');
   });
 
+  it('restores cursor on natural completion in interactive mode', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      let completed = false;
+      const t = createTimer({ duration: 1000, interval: 100, ctx, onComplete: () => { completed = true; } });
+      t.start();
+      vi.advanceTimersByTime(1100);
+      const output = ctx.io.written.join('');
+      expect(completed).toBe(true);
+      expect(output).toContain('\x1b[?25h');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('writes final message on stop', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const t = createTimer({ duration: 60_000, ctx });

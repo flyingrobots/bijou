@@ -68,10 +68,14 @@ export function serializeLayoutState<PageModel>(
   const serializedPages: Record<string, SerializedPageLayout> = {};
 
   for (const pageId of pages) {
-    const visibility = perPage.minimizedByPage?.[pageId];
-    const maximize = perPage.maximizedPaneByPage?.[pageId];
-    const dock = perPage.dockStateByPage?.[pageId];
-    const ratios = perPage.splitRatiosByPage?.[pageId];
+    const visibility = perPage.minimizedByPage?.[pageId]
+      ?? model.minimizedByPage?.[pageId];
+    const maximize = perPage.maximizedPaneByPage?.[pageId]
+      ?? model.maximizedPaneByPage?.[pageId];
+    const dock = perPage.dockStateByPage?.[pageId]
+      ?? model.dockStateByPage?.[pageId];
+    const ratios = perPage.splitRatiosByPage?.[pageId]
+      ?? model.splitRatioOverrides?.[pageId];
 
     serializedPages[pageId] = {
       splitRatios: ratios ? { ...ratios } : {},

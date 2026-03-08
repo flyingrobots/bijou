@@ -122,6 +122,11 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     elapsedMs = pausedElapsed + (Date.now() - startTime);
     if (onTick?.(elapsedMs)) {
       stopInternal();
+      // Restore cursor after natural completion
+      if (mode === 'interactive') {
+        ctx.io.write('\n');
+        ctx.io.write('\x1b[?25h');
+      }
       return;
     }
     render();

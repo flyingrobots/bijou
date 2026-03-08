@@ -115,12 +115,12 @@ export function findPaneContainer(
     return findPaneContainer(node.paneA, paneId) ?? findPaneContainer(node.paneB, paneId);
   }
 
-  // Grid
+  // Grid — derive childIds from node IDs, not area names
   const areaNames = Object.keys(node.cells);
-  for (const areaName of areaNames) {
-    const child = node.cells[areaName]!;
-    if (getNodeId(child) === paneId) {
-      return { containerId: node.gridId, childIds: areaNames };
+  const gridChildIds = areaNames.map((name) => getNodeId(node.cells[name]!));
+  for (let i = 0; i < areaNames.length; i++) {
+    if (gridChildIds[i] === paneId) {
+      return { containerId: node.gridId, childIds: gridChildIds };
     }
   }
 

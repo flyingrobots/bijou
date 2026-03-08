@@ -101,6 +101,20 @@ describe('findPaneContainer', () => {
     expect(result).toEqual({ containerId: 'inner', childIds: ['a', 'b'] });
   });
 
+  it('returns pane IDs (not area names) for grid containers', () => {
+    const tree: FrameLayoutNode = {
+      kind: 'grid',
+      gridId: 'grid-1',
+      template: { columns: '1fr 1fr', rows: '1fr', areas: [['left', 'right']] },
+      cells: {
+        left: { kind: 'pane', paneId: 'editor', render: () => '' },
+        right: { kind: 'pane', paneId: 'preview', render: () => '' },
+      },
+    };
+    const result = findPaneContainer(tree, 'editor');
+    expect(result).toEqual({ containerId: 'grid-1', childIds: ['editor', 'preview'] });
+  });
+
   it('returns undefined for root pane', () => {
     const result = findPaneContainer(paneA, 'a');
     expect(result).toBeUndefined();

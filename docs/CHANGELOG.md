@@ -10,11 +10,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **`timer()` negative ms with `showMs`** — `formatTime()` now clamps the entire input to `>= 0` before extracting millis, fixing invalid output like `00:00.-500`.
 - **`constrain()` ANSI-safe truncation detection** — Width comparison now uses `graphemeWidth()` instead of raw string length, preventing false-positive ellipsis on ANSI-styled input.
+- **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
+- **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 
 ### ♻️ Refactors
 
 - **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
 - **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
+- **`serializeLayoutState` reads model defaults** — Now falls back to `model.minimizedByPage` / `maximizedPaneByPage` / `dockStateByPage` / `splitRatioOverrides` when `perPage` is omitted, so callers don't need to pass redundant state.
 
 ## [1.8.0] - 2026-03-08
 
