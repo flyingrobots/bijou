@@ -181,6 +181,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
         // Note: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.
+        selected.clear();
         handle.dispose(); cleanup(); resolve([]);
       }
     });

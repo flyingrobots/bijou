@@ -111,6 +111,20 @@ describe('multiselect()', () => {
       expect(result).toEqual(['red', 'blue']);
     });
 
+    it('cancel with defaultValues does not render preselected labels', async () => {
+      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['\x03'] } });
+      const result = await multiselect({
+        title: 'Colors',
+        options: COLOR_OPTIONS,
+        defaultValues: ['red', 'blue'],
+        ctx,
+      });
+      expect(result).toEqual([]);
+      // The cleanup line should NOT contain the preselected labels
+      const lastWrites = ctx.io.written.slice(-3).join('');
+      expect(lastWrites).not.toContain('Red, Blue');
+    });
+
     it('defaultValues can be toggled off', async () => {
       // Space on first item (red, pre-selected) toggles it off, then Enter
       const ctx = createTestContext({ mode: 'interactive', io: { keys: [' ', '\r'] } });
