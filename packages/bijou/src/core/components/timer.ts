@@ -143,6 +143,8 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       stopInternal();
       if (mode !== 'interactive') {
         ctx.io.write(timer(initialDisplayMs, { ...timerOpts, ctx }) + '\n');
+        // Fire onTick for non-interactive countdown completion (e.g. duration=0)
+        if (onTick?.(0)) { /* onComplete fired */ }
         return;
       }
       startTime = Date.now();
@@ -151,6 +153,14 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       paused = false;
       cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
+      // Check for immediate completion (e.g. duration=0 countdown)
+      if (onTick?.(0)) {
+        if (cursorHandle !== null) {
+          cursorHandle.dispose();
+          cursorHandle = null;
+        }
+        return;
+      }
       render();
       timerHandle = ctx.io.setInterval(tick, interval);
     },

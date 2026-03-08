@@ -801,7 +801,9 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/flyingrobots/bijou/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/flyingrobots/bijou/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/flyingrobots/bijou/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/flyingrobots/bijou/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/flyingrobots/bijou/compare/v1.3.0...v1.4.0

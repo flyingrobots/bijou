@@ -106,6 +106,22 @@ describe('createTimer', () => {
     }
   });
 
+  it('fires onComplete in non-interactive mode for zero-duration timer', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    let completed = false;
+    const t = createTimer({ duration: 0, ctx, onComplete: () => { completed = true; } });
+    t.start();
+    expect(completed).toBe(true);
+  });
+
+  it('completes immediately in interactive mode when duration is 0', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    let completed = false;
+    const t = createTimer({ duration: 0, ctx, onComplete: () => { completed = true; } });
+    t.start();
+    expect(completed).toBe(true);
+  });
+
   it('writes final message on stop', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const t = createTimer({ duration: 60_000, ctx });

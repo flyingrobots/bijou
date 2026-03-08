@@ -14,7 +14,6 @@ set -euo pipefail
 # Requires: gh (GitHub CLI), jq
 # ---------------------------------------------------------------------------
 
-REPO="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner -q '.nameWithOwner')}"
 BOT_LOGIN="coderabbitai[bot]"
 
 usage() {
@@ -43,6 +42,8 @@ for cmd in gh jq; do
     exit 1
   fi
 done
+
+REPO="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner -q '.nameWithOwner')}"
 
 # --- Fetch review comments ---------------------------------------------------
 echo "Fetching review comments for PR #${PR_NUMBER}..."
@@ -90,8 +91,7 @@ for i in $(seq 0 $((THREAD_COUNT - 1))); do
     gh api "repos/${REPO}/pulls/${PR_NUMBER}/comments" \
       -f body="$BATCH_MESSAGE" \
       -F in_reply_to="$THREAD_ID" \
-      --silent 2>/dev/null
-    REPLIED=$((REPLIED + 1))
+      --silent     REPLIED=$((REPLIED + 1))
   else
     echo ""
     echo "--- Thread $((i + 1))/$THREAD_COUNT ---"
@@ -108,8 +108,7 @@ for i in $(seq 0 $((THREAD_COUNT - 1))); do
           gh api "repos/${REPO}/pulls/${PR_NUMBER}/comments" \
             -f body="$reply_text" \
             -F in_reply_to="$THREAD_ID" \
-            --silent 2>/dev/null
-          REPLIED=$((REPLIED + 1))
+            --silent           REPLIED=$((REPLIED + 1))
           echo "  ✓ Reply posted."
         else
           echo "  Empty reply — skipped."

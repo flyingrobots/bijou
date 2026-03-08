@@ -218,6 +218,13 @@ describe('box() with fillChar', () => {
     expect(box('Hello', { fillChar: '.', ctx })).toBe('Hello');
   });
 
+  it('renders fill character in static mode', () => {
+    const ctx = createTestContext({ mode: 'static' });
+    const result = box('Hi', { fillChar: '.', padding: { left: 2, right: 2 }, ctx });
+    const lines = result.split('\n');
+    expect(lines[1]!).toContain('..Hi..');
+  });
+
   it('headerBox inherits fillChar', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = headerBox('Title', { fillChar: '.', padding: { left: 2, right: 2 }, ctx });

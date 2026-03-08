@@ -48,7 +48,7 @@ function applyConstraints(content: string, options: ConstrainOptions): string {
 
   // Apply width constraint
   if (options.maxWidth != null && options.maxWidth >= 0) {
-    const maxW = options.maxWidth;
+    const maxW = Math.floor(options.maxWidth);
     if (maxW === 0) return '';
     lines = lines.map((line) => {
       const clipped = clipToWidth(line, maxW);
@@ -66,7 +66,7 @@ function applyConstraints(content: string, options: ConstrainOptions): string {
 
   // Apply height constraint
   if (options.maxHeight != null && options.maxHeight >= 0 && lines.length > options.maxHeight) {
-    const maxH = options.maxHeight;
+    const maxH = Math.floor(options.maxHeight);
     if (maxH === 0) return '';
     lines = lines.slice(0, maxH);
     // Respect width constraint on the ellipsis line

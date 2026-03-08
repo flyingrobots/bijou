@@ -99,5 +99,19 @@ describe('constrain', () => {
       const result = constrain('Hello World', { maxWidth: 8, ctx });
       expect(result).toBe('Hello W…');
     });
+
+    it('floors fractional maxHeight to integer', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = constrain('A\nB\nC\nD', { maxHeight: 2.7, ctx });
+      // 2.7 floors to 2 — two lines, last replaced with ellipsis
+      expect(result).toBe('A\n…');
+    });
+
+    it('floors fractional maxWidth to integer', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const result = constrain('Hello World', { maxWidth: 5.9, ctx });
+      // 5.9 floors to 5 — clips to 5 columns
+      expect(result).toBe('Hell…');
+    });
   });
 });

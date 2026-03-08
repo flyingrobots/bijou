@@ -257,6 +257,29 @@ describe('wizard()', () => {
     expect(result.values).toEqual({ a: 'transformed', b: 'branched', c: 'final' });
   });
 
+  it('nested branching executes in correct order', async () => {
+    const order: string[] = [];
+    await wizard<{ a: string; b: string; c: string; d: string }>({
+      steps: [
+        {
+          key: 'a',
+          field: async () => { order.push('a'); return 'a'; },
+          branch: () => [
+            {
+              key: 'b' as const,
+              field: async () => { order.push('b'); return 'b'; },
+              branch: () => [
+                { key: 'c' as const, field: async () => { order.push('c'); return 'c'; } },
+              ],
+            },
+          ],
+        },
+        { key: 'd', field: async () => { order.push('d'); return 'd'; } },
+      ],
+    });
+    expect(order).toEqual(['a', 'b', 'c', 'd']);
+  });
+
   it('throws when exceeding max iteration guard', async () => {
     // Each step branches a copy of itself, creating unbounded growth
     const selfBranchingStep: WizardStep<{ n: number }> = {
