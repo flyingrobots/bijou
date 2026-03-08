@@ -77,3 +77,6 @@ export type { LogLevel, LogOptions } from './log.js';
 
 export { markdown } from './markdown.js';
 export type { MarkdownOptions } from './markdown.js';
+
+export { constrain } from './constrain.js';
+export type { ConstrainOptions } from './constrain.js';

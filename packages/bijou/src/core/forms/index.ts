@@ -34,3 +34,6 @@ export type { FilterOption, FilterOptions } from './filter.js';
 
 export { wizard } from './wizard.js';
 export type { WizardStep, WizardOptions } from './wizard.js';
+
+export { note } from './note.js';
+export type { NoteOptions } from './note.js';

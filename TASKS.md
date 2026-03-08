@@ -13,9 +13,9 @@ All 13 items across 5 phases: housekeeping, core small wins, core medium feature
 
 ## Phase 2: Core Small Wins (branch: `feat/v1.8.0-core-small-wins`)
 
-- [ ] **2A. Custom Fill Chars** — Add `fillChar?: string` to `BoxOptions` in `packages/bijou/src/core/components/box.ts`. Replace hardcoded spaces in padding areas with `fillChar`. Validate single-width via `graphemeWidth()`. Tests: fillChar renders in padding, wide-char fallback, pipe/accessible passthrough.
-- [ ] **2B. MaxWidth / MaxHeight (`constrain()`)** — Create `packages/bijou/src/core/components/constrain.ts` + test. `constrain(content, { maxWidth?, maxHeight?, ellipsis?, ctx? })` → string. Uses `clipToWidth()` per line for width, truncates line array for height. Pipe/accessible: passthrough. Interactive/static: apply constraints. Ellipsis appended when clipped. Update barrel exports.
-- [ ] **2C. Note Field** — Create `packages/bijou/src/core/forms/note.ts` + test. `note({ message, title?, ctx? }): Promise<void>`. Interactive: info icon + bold title + muted message, left accent line. Fallback: plain text `"Note: {message}"`. Compatible with `group()`/`wizard()`. Update barrel exports.
+- [x] **2A. Custom Fill Chars** — Add `fillChar?: string` to `BoxOptions` in `packages/bijou/src/core/components/box.ts`. Replace hardcoded spaces in padding areas with `fillChar`. Validate single-width via `graphemeWidth()`. Tests: fillChar renders in padding, wide-char fallback, pipe/accessible passthrough.
+- [x] **2B. MaxWidth / MaxHeight (`constrain()`)** — Create `packages/bijou/src/core/components/constrain.ts` + test. `constrain(content, { maxWidth?, maxHeight?, ellipsis?, ctx? })` → string. Uses `clipToWidth()` per line for width, truncates line array for height. Pipe/accessible: passthrough. Interactive/static: apply constraints. Ellipsis appended when clipped. Update barrel exports.
+- [x] **2C. Note Field** — Create `packages/bijou/src/core/forms/note.ts` + test. `note({ message, title?, ctx? }): Promise<void>`. Interactive: info icon + bold title + muted message, left accent line. Fallback: plain text `"Note: {message}"`. Compatible with `group()`/`wizard()`. Update barrel exports.
 
 ## Phase 3: Core Medium Features (branch: `feat/v1.8.0-core-medium`)
 

@@ -204,6 +204,8 @@ export {
   type LogOptions,
   markdown,
   type MarkdownOptions,
+  constrain,
+  type ConstrainOptions,
 } from './core/components/index.js';
 
 // Forms
@@ -229,4 +231,6 @@ export {
   wizard,
   type WizardStep,
   type WizardOptions,
+  note,
+  type NoteOptions,
 } from './core/forms/index.js';
