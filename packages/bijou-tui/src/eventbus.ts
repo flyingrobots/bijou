@@ -107,6 +107,8 @@ export interface EventBus<M> {
 export interface CreateEventBusOptions {
   /** Called when a command promise rejects. */
   onCommandRejected?: (error: unknown) => void;
+  /** Called to surface error messages (replaces direct `console.error` usage). */
+  onError?: (message: string, error: unknown) => void;
 }
 
 /** Handle for unsubscribing or disconnecting a resource. */
@@ -125,6 +127,9 @@ interface Disposable {
  * Returns an {@link EventBus} that manages subscribers, I/O connections,
  * command execution, and quit signaling for a TEA runtime.
  *
+ * **Note:** Command rejections are silent by default. Provide `onCommandRejected`
+ * or `onError` in options to surface them.
+ *
  * @template M - Application-defined custom message type.
  * @returns A new event bus instance.
  */
@@ -133,6 +138,15 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   const quitHandlers = new Set<() => void>();
   const disposables: Disposable[] = [];
   let disposed = false;
+
+  /** Report an error without risking an unhandled rejection. */
+  function safeReport(message: string, error: unknown): void {
+    try {
+      busOptions?.onError?.(message, error);
+    } catch {
+      // Never let error reporting recreate an unhandled rejection.
+    }
+  }
 
   /** Broadcast a message to all current subscribers. */
   function emit(msg: BusMsg<M>): void {
@@ -213,11 +227,16 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
           if (busOptions?.onCommandRejected != null) {
             busOptions.onCommandRejected(err);
           } else {
-            console.error('[EventBus] Command rejected:', err);
+            safeReport('[EventBus] Command rejected:', err);
           }
         } catch (reportErr: unknown) {
-          console.error('[EventBus] onCommandRejected handler threw:', reportErr);
-          console.error('[EventBus] Original command rejection:', err);
+          safeReport(
+            busOptions?.onCommandRejected != null
+              ? '[EventBus] onCommandRejected handler threw:'
+              : '[EventBus] onError handler threw while reporting a command rejection:',
+            reportErr,
+          );
+          safeReport('[EventBus] Original command rejection:', err);
         }
       });
     },

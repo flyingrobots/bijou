@@ -9,15 +9,10 @@ import { PRESETS, CYAN_MAGENTA } from './presets.js';
 /**
  * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
  *
- * @deprecated The zero-argument form (`isNoColor()`) falls back to
- *   `process.env`, bypassing hexagonal ports. Prefer `isNoColor(runtime)`
- *   with an explicit {@link RuntimePort}, or use `createBijou()` /
- *   `createThemeResolver({ runtime })` which handle detection internally.
- *
- * @param runtime - Optional RuntimePort for reading env vars; falls back to `process.env`.
+ * @param runtime - RuntimePort for reading env vars.
  * @returns True if the `NO_COLOR` environment variable is set.
  */
-export function isNoColor(runtime?: RuntimePort): boolean {
+export function isNoColor(runtime: RuntimePort): boolean {
   const env = createEnvAccessor(runtime);
   return env('NO_COLOR') !== undefined;
 }
@@ -91,8 +86,8 @@ export interface ThemeResolverOptions {
   presets?: Record<string, Theme>;
   /** Fallback theme when env var / name doesn't match. Default: CYAN_MAGENTA. */
   fallback?: Theme;
-  /** Optional RuntimePort for reading env vars. Falls back to `process.env`. */
-  runtime?: RuntimePort;
+  /** RuntimePort for reading env vars. */
+  runtime: RuntimePort;
   /**
    * Optional output port for resolver warnings (unknown env/configured theme names).
    *
@@ -119,11 +114,11 @@ export interface ThemeResolver {
  * @param options - Resolver configuration (env var name, presets, fallback, runtime port).
  * @returns ThemeResolver with `getTheme`, `resolveTheme`, and `_resetForTesting` methods.
  */
-export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeResolver {
+export function createThemeResolver(options: ThemeResolverOptions): ThemeResolver {
   const envVar = options.envVar ?? 'BIJOU_THEME';
   const presets = options.presets ?? PRESETS;
   const fallback = options.fallback ?? CYAN_MAGENTA;
-  const runtime = options.runtime;
+  const { runtime } = options;
   const warningPort = options.warningPort;
 
   const readEnv = createEnvAccessor(runtime);
@@ -174,39 +169,4 @@ export function createThemeResolver(options: ThemeResolverOptions = {}): ThemeRe
   }
 
   return { getTheme, resolveTheme, _resetForTesting };
-}
-
-/** Default resolver — uses `BIJOU_THEME` env var and built-in presets. */
-const defaultResolver = createThemeResolver();
-
-/**
- * Return the current resolved theme (singleton) using the default resolver.
- *
- * @deprecated Use `createBijou()` or `createThemeResolver({ runtime })` to
- *   obtain a theme without relying on the global default resolver that falls
- *   back to `process.env`.
- *
- * @returns Cached ResolvedTheme from the default resolver.
- */
-export function getTheme(): ResolvedTheme {
-  return defaultResolver.getTheme();
-}
-
-/**
- * Resolve a theme by name using the default resolver (bypasses cache).
- *
- * @deprecated Use `createBijou()` or `createThemeResolver({ runtime })` to
- *   resolve themes without relying on the global default resolver that falls
- *   back to `process.env`.
- *
- * @param name - Theme name to look up.
- * @returns ResolvedTheme for the given name.
- */
-export function resolveTheme(name?: string): ResolvedTheme {
-  return defaultResolver.resolveTheme(name);
-}
-
-/** Resets the default resolver's cached singleton. For tests only. */
-export function _resetThemeForTesting(): void {
-  defaultResolver._resetForTesting();
 }

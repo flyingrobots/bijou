@@ -42,8 +42,8 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
 | [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
-| [`pipe`](./pipe/) | `detectOutputMode()`, all components | Same components in interactive/pipe/accessible mode |
-| [`theme`](./theme/) | `resolveTheme()`, theme presets | Same components in all built-in themes |
+| [`pipe`](./pipe/) | Output modes, all components | Same components in interactive/pipe/accessible mode |
+| [`theme`](./theme/) | `createBijou()`, theme presets | Same components in all built-in themes |
 | [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background surface tokens across layout and overlays |
 
 ## Interactive Forms

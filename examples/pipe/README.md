@@ -1,4 +1,4 @@
-# `detectOutputMode()`
+# Output Modes
 
 Same components in interactive/pipe/accessible mode
 

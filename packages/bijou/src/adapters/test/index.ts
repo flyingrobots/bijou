@@ -32,7 +32,6 @@ export {
 } from './assertions.js';
 export { COLOR_OPTIONS, FRUIT_OPTIONS, MANY_OPTIONS } from './fixtures.js';
 export { _resetDefaultContextForTesting } from '../../context.js';
-export { _resetThemeForTesting } from '../../core/theme/resolve.js';
 
 /**
  * Configuration for {@link createTestContext}.

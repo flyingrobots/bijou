@@ -137,7 +137,10 @@ export {
   type TransitionCell,
   type TransitionResult,
   type TransitionShaderFn,
+  type CharRole,
+  type WipeDirection,
   type BuiltinTransition,
+  // Original shader instances
   wipeShader,
   dissolveShader,
   gridShader,
@@ -145,6 +148,32 @@ export {
   meltShader,
   matrixShader,
   scrambleShader,
+  // New shader instances
+  radialShader,
+  diamondShader,
+  spiralShader,
+  blindsShader,
+  curtainShader,
+  pixelateShader,
+  typewriterShader,
+  glitchShader,
+  staticShader,
+  // Shader factories (parameterized)
+  wipe,
+  radial,
+  diamond,
+  spiral,
+  blinds,
+  curtain,
+  pixelate,
+  typewriter,
+  glitch,
+  tvStatic,
+  // Combinators
+  reverse,
+  chain,
+  overlay,
+  // Registry
   TRANSITION_SHADERS,
 } from './transition-shaders.js';
 

@@ -22,6 +22,7 @@ describe('serializeLayoutState', () => {
       helpOpen: false,
       transitionProgress: 1,
       transitionGeneration: 0,
+      transitionFrame: 0,
     };
 
     const result = serializeLayoutState(model, ['page1']);
@@ -44,6 +45,7 @@ describe('serializeLayoutState', () => {
       helpOpen: false,
       transitionProgress: 1,
       transitionGeneration: 0,
+      transitionFrame: 0,
       minimizedByPage: { page1: { minimized: new Set(['b']) } },
       maximizedPaneByPage: { page1: { maximizedPaneId: 'a' } },
       dockStateByPage: { page1: { orderByContainer: { 'split-1': ['b', 'a'] } } },
@@ -69,6 +71,7 @@ describe('serializeLayoutState', () => {
       helpOpen: false,
       transitionProgress: 1,
       transitionGeneration: 0,
+      transitionFrame: 0,
     };
 
     const result = serializeLayoutState(model, ['page1'], {

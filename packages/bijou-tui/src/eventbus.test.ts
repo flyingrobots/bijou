@@ -305,27 +305,71 @@ describe('runCmd', () => {
     expect((onCommandRejected.mock.calls[0]?.[0] as Error).message).toBe('boom');
   });
 
-  it('logs both errors if onCommandRejected throws', async () => {
+  it('routes both errors through onError if onCommandRejected throws', async () => {
     const onCommandRejected = vi.fn(() => {
       throw new Error('report failed');
     });
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const bus = createEventBus<TestMsg>({ onCommandRejected });
-      bus.runCmd(async () => {
-        throw new Error('boom');
-      });
+    const onError = vi.fn();
+    const bus = createEventBus<TestMsg>({ onCommandRejected, onError });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
 
-      await vi.waitFor(() => expect(consoleError).toHaveBeenCalledTimes(2));
-      expect(onCommandRejected).toHaveBeenCalledTimes(1);
-      expect(String(consoleError.mock.calls[0]?.[0])).toContain('[EventBus] onCommandRejected handler threw:');
-      expect(String(consoleError.mock.calls[1]?.[0])).toContain('[EventBus] Original command rejection:');
-    } finally {
-      consoleError.mockRestore();
-    }
+    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(2));
+    expect(onCommandRejected).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0]?.[0]).toContain('[EventBus] onCommandRejected handler threw:');
+    expect(onError.mock.calls[1]?.[0]).toContain('[EventBus] Original command rejection:');
   });
 
-  it('logs rejected commands when no rejection handler is configured', async () => {
+  it('routes rejected commands through onError when no rejection handler is configured', async () => {
+    const onError = vi.fn();
+    const bus = createEventBus<TestMsg>({ onError });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
+    expect(onError.mock.calls[0]?.[0]).toContain('[EventBus] Command rejected:');
+    expect(onError.mock.calls[0]?.[1]).toBeInstanceOf(Error);
+  });
+
+  it('does not throw unhandled rejection when onError itself throws', async () => {
+    const throwingOnError = vi.fn(() => {
+      throw new Error('onError blew up');
+    });
+    const bus = createEventBus<TestMsg>({ onError: throwingOnError });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    // If safeReport is working, the promise settles without unhandled rejection.
+    await new Promise((r) => setTimeout(r, 10));
+    // onError was called but its throw was swallowed
+    expect(throwingOnError).toHaveBeenCalled();
+  });
+
+  it('does not throw unhandled rejection when onCommandRejected and onError both throw', async () => {
+    const throwingRejected = vi.fn(() => {
+      throw new Error('rejected handler blew up');
+    });
+    const throwingOnError = vi.fn(() => {
+      throw new Error('onError blew up');
+    });
+    const bus = createEventBus<TestMsg>({
+      onCommandRejected: throwingRejected,
+      onError: throwingOnError,
+    });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    await new Promise((r) => setTimeout(r, 10));
+    expect(throwingRejected).toHaveBeenCalledTimes(1);
+    // safeReport swallowed the throw from onError
+    expect(throwingOnError).toHaveBeenCalled();
+  });
+
+  it('silently drops rejected commands when no handlers are configured', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const bus = createEventBus<TestMsg>();
@@ -333,8 +377,9 @@ describe('runCmd', () => {
         throw new Error('boom');
       });
 
-      await vi.waitFor(() => expect(consoleError).toHaveBeenCalledTimes(1));
-      expect(String(consoleError.mock.calls[0]?.[0])).toContain('[EventBus] Command rejected:');
+      // Give the promise time to resolve
+      await new Promise((r) => setTimeout(r, 10));
+      expect(consoleError).not.toHaveBeenCalled();
     } finally {
       consoleError.mockRestore();
     }

@@ -6,6 +6,32 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Transition shader system expansion (bijou-tui)** — Added 9 new built-in transition shaders: `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static`. Added shader factories for parameterized variants (`wipe(direction)`, `radial(originX, originY)`, `blinds(count, direction)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`). Added `frame` counter to `TransitionCell` for temporal effects (glitch, static). Added `charRole` (`'decoration'` | `'marker'`) to `TransitionResult` so combinators can distinguish ambient noise from positional indicators. All 16 named transitions available via the `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
+
+### 🐛 Fixes
+
+- **Zero-dimension guard in `renderTransition`** — Early-returns when `width <= 0` or `height <= 0`, preventing `NaN`/`Infinity` from division-by-zero in shaders called with degenerate dimensions.
+- **Removed unused `_frameKeys` parameter from `applyFrameAction`** — Dead parameter left after palette logic was extracted; removed from signature and all call sites.
+- **Explicit `charRole: 'decoration'` on char-emitting shaders** — `matrixShader`, `scrambleShader`, `pixelate()`, `glitch()`, and `tvStatic()` now explicitly declare their char overrides as decorations for self-documenting combinator behavior.
+- **`overlay()` combinator JSDoc** — Documented OR semantics of `showNext` (composite reveals if either shader reveals).
+- **`createEventBus` JSDoc** — Documented that command rejections are silent by default.
+- **Fixed branch name in `COMPLETED.md`** — v2.0.0 entry now correctly references `feat/tui-shader-transitions`.
+
+## [2.0.0] - 2026-03-08
+
+### BREAKING CHANGES
+
+- **Removed deprecated public exports (bijou)** — `getTheme()`, `resolveTheme()`, and `_resetThemeForTesting()` have been removed from `@flyingrobots/bijou`. Use `createBijou()` or `createThemeResolver({ runtime })` instead.
+- **`RuntimePort` now required (bijou)** — `createEnvAccessor()`, `createTTYAccessor()`, `detectOutputMode()`, `detectColorScheme()`, `isNoColor()`, and `createThemeResolver()` no longer accept optional `RuntimePort` — it is now a required parameter. This eliminates all `process.env` / `process.stdout` fallbacks from the core package, enforcing the hexagonal port boundary.
+
+### Refactors
+
+- **Eliminated `process.env` fallbacks from hexagonal boundary (bijou)** — `ports/env.ts` no longer references `process.env` or `process.stdout.isTTY`. All environment and TTY access flows through `RuntimePort`.
+- **Routed eventbus errors through `onError` port (bijou-tui)** — `createEventBus()` accepts an `onError` callback in options, replacing direct `console.error` calls. When no error handler is configured, rejected commands are silently dropped.
+- **Decomposed `app-frame.ts` (bijou-tui)** — Split the 1662-line monolith into 6 focused modules: types (179), utilities (151), rendering (357), actions (410), palette (200), and factory (526). No public API changes.
+
 ## [1.8.0] - 2026-03-08
 
 ### ✨ Features
@@ -805,7 +831,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/flyingrobots/bijou/compare/v1.8.0...v2.0.0
 [1.8.0]: https://github.com/flyingrobots/bijou/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/flyingrobots/bijou/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/flyingrobots/bijou/compare/v1.5.0...v1.6.0

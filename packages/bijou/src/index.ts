@@ -70,8 +70,6 @@ export {
   type GradientTextOptions,
   // Resolver
   isNoColor,
-  getTheme,
-  resolveTheme,
   createThemeResolver,
   createResolved,
   type ResolvedTheme,
