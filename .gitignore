@@ -28,6 +28,10 @@ npm-debug.log*
 # Build
 *.tsbuildinfo
 
+# Lockfiles (repo uses npm workspaces with root package-lock.json)
+pnpm-lock.yaml
+yarn.lock
+
 # Misc
 *.tgz
 last-chat.txt
