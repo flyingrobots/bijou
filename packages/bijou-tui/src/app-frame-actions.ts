@@ -145,6 +145,7 @@ export function switchTab<PageModel, Msg>(
     activeTransition,
     transitionProgress: hasTransition ? 0 : 1,
     transitionGeneration: nextGeneration,
+    transitionFrame: 0,
     transitionStartMs: hasTransition ? Date.now() : undefined,
     transitionTimeline: tl,
     transitionTimelineState: tl?.init(),

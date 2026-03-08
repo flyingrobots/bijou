@@ -325,6 +325,7 @@ export function renderTransition(
   width: number,
   height: number,
   ctx: BijouContext,
+  frame = 0,
 ): string {
   const shader = typeof style === 'function' ? style : TRANSITION_SHADERS[style];
   if (!shader) return next;
@@ -340,7 +341,7 @@ export function renderTransition(
       const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
       const rand = seed - Math.floor(seed);
 
-      const result = shader({ x, y, width, height, progress, rand, ctx });
+      const result = shader({ x, y, width, height, progress, rand, frame, ctx });
       const showNext = result.showNext;
       const charOverride = result.char;
 

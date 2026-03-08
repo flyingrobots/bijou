@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Transition shader system expansion (bijou-tui)** — Added 9 new built-in transition shaders: `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static`. Added shader factories for parameterized variants (`wipe(direction)`, `radial(originX, originY)`, `blinds(count, direction)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`). Added `frame` counter to `TransitionCell` for temporal effects (glitch, static). All 16 named transitions available via the `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
+
 ## [2.0.0] - 2026-03-08
 
 ### BREAKING CHANGES

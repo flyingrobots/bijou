@@ -232,6 +232,8 @@ export interface FrameModel<PageModel> {
   readonly transitionTimeline?: Timeline;
   /** Timeline state for the active transition. */
   readonly transitionTimelineState?: TimelineState;
+  /** Monotonic frame counter for the active transition (for temporal shader effects). */
+  readonly transitionFrame: number;
   /** Per-page panel visibility (minimize/fold) state. */
   readonly minimizedByPage: Readonly<Record<string, PanelVisibilityState>>;
   /** Per-page maximized pane state. */
@@ -302,6 +304,7 @@ export function createFramedApp<PageModel, Msg>(
         helpOpen: false,
         transitionProgress: 1,
         transitionGeneration: 0,
+        transitionFrame: 0,
         minimizedByPage: {},
         maximizedPaneByPage: {},
         dockStateByPage: {},
@@ -348,6 +351,7 @@ export function createFramedApp<PageModel, Msg>(
               return [{
                 ...model,
                 transitionProgress: 1,
+                transitionFrame: 0,
                 previousPageId: undefined,
                 activeTransition: undefined,
                 transitionStartMs: undefined,
@@ -359,17 +363,23 @@ export function createFramedApp<PageModel, Msg>(
             return [{
               ...model,
               transitionProgress: progress,
+              transitionFrame: model.transitionFrame + 1,
               transitionTimelineState: state,
             }, []];
           }
           // Fallback for non-timeline transitions (backward compat)
-          return [{ ...model, transitionProgress: action.progress }, []];
+          return [{
+            ...model,
+            transitionProgress: action.progress,
+            transitionFrame: model.transitionFrame + 1,
+          }, []];
         }
         if (action.type === 'transition-complete') {
           if (action.generation !== model.transitionGeneration) return [model, []];
           return [{
             ...model,
             transitionProgress: 1,
+            transitionFrame: 0,
             previousPageId: undefined,
             activeTransition: undefined,
             transitionStartMs: undefined,
@@ -470,6 +480,7 @@ export function createFramedApp<PageModel, Msg>(
             bodyRect.width,
             bodyRect.height,
             ctx,
+            model.transitionFrame,
           );
         }
       }
