@@ -27,6 +27,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a local copy.
 - **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
 - **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.
+- **Extract `createThemeAccessors` (bijou core)** — Six duplicated accessor lambdas in `factory.ts` and `test/index.ts` consolidated into a single `createThemeAccessors()` function in `core/theme/accessors.ts`.
 
 - **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.
 

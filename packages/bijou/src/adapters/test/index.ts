@@ -14,7 +14,8 @@ import { mockIO, type MockIOOptions, type MockIO } from './io.js';
 import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
 import { CYAN_MAGENTA } from '../../core/theme/presets.js';
-import type { Theme, TokenValue, GradientStop } from '../../core/theme/tokens.js';
+import { createThemeAccessors } from '../../core/theme/accessors.js';
+import type { Theme } from '../../core/theme/tokens.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
@@ -80,11 +81,6 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
     runtime,
     io,
     style,
-    semantic: (key) => theme.theme.semantic[key],
-    border: (key) => theme.theme.border[key],
-    surface: (key) => theme.theme.surface[key],
-    status: (key) => (theme.theme.status as Record<string, TokenValue>)[key] ?? (theme.theme.status as Record<string, TokenValue>)['muted']!,
-    ui: (key) => (theme.theme.ui as Record<string, TokenValue>)[key] ?? theme.theme.semantic.primary,
-    gradient: (key) => (theme.theme.gradient as Record<string, GradientStop[]>)[key] ?? [],
+    ...createThemeAccessors(theme),
   };
 }
