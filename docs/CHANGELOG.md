@@ -17,8 +17,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 
+### ⚠️ Deprecations
+
+- **`detectOutputMode()`, `detectColorScheme()`, `isNoColor()` no-arg forms** — These fall back to `process.env` / `process.stdout`, bypassing hexagonal ports. Pass an explicit `RuntimePort` or use `createBijou()`.
+- **`getTheme()`, `resolveTheme()` freestanding functions** — Rely on the global default resolver that falls back to `process.env`. Use `createBijou()` or `createThemeResolver({ runtime })`.
+- **`styled()`, `styledStatus()` freestanding functions** — Reach for the global default context singleton, violating dependency inversion. Use `ctx.style.styled(token, text)` and `ctx.semantic(status)` instead.
+
 ### ♻️ Refactors
 
+- **Deduplicate cursor constants (bijou-tui)** — `HIDE_CURSOR` and `SHOW_CURSOR` in `screen.ts` now re-export from `@flyingrobots/bijou` instead of defining local copies.
+- **Test-only exports moved to `@flyingrobots/bijou/adapters/test`** — `_resetDefaultContextForTesting` and `_resetThemeForTesting` removed from the main barrel; available via the dedicated test entry point.
+- **Shared env/TTY accessors** — Extracted `createEnvAccessor()` and `createTTYAccessor()` into `ports/env.ts`, replacing duplicated `envAccessor()` / `process.env` fallback logic in `tty.ts` and `resolve.ts`.
 - **Cursor lifecycle via `CursorGuard`** — Spinner, progress bar, timer, and form `terminalRenderer` now use `cursorGuard()` instead of raw ANSI writes, eliminating duplicated `\x1b[?25l`/`\x1b[?25h` sequences and fixing nesting correctness.
 - **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
 - **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
