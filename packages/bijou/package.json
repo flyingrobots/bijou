@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.",
   "type": "module",
   "sideEffects": false,
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "fast-check": "^4.5.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

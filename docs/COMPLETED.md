@@ -4,6 +4,21 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.7.0 — Test Fortress
+
+- **Completed:** 2026-03-08
+- **Summary:** Deep audit of ROADMAP test coverage spec vs actual assertions. Resolved 3 spec-vs-impl mismatches. Added `defaultValues` option to multiselect (bug fix + feature). Filled nodeIO and chalkStyle adapter test gaps. Added 3 property-based fuzz suites via fast-check (forms, environment detection, DTCG). 1900 tests total, all passing.
+- **Ref:** v1.7.0, branch `feat/v1.7.0-test-fortress`
+
+---
+
+## Xyph Migration
+
+- **Completed:** 2026-03-08
+- **Summary:** Xyph TUI dashboard fully migrated to bijou. All five phases (views/selection/writes, confirm/input overlays, review actions/detail panel, full DAG interactivity, animated title screen) integrated using bijou components, layout primitives, and theme presets.
+
+---
+
 ## PR #34 — JSDoc Coverage Overhaul
 
 - **Completed:** 2026-03-08

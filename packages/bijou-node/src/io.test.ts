@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { nodeIO } from './io.js';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
@@ -14,9 +14,20 @@ describe('nodeIO()', () => {
     }
   });
 
-  it('write() does not throw', () => {
+  it('write() calls process.stdout.write', () => {
+    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
     const io = nodeIO();
-    expect(() => io.write('')).not.toThrow();
+    io.write('hello');
+    expect(spy).toHaveBeenCalledWith('hello');
+    spy.mockRestore();
+  });
+
+  it('writeError() calls process.stderr.write', () => {
+    const spy = vi.spyOn(process.stderr, 'write').mockReturnValue(true);
+    const io = nodeIO();
+    io.writeError('err');
+    expect(spy).toHaveBeenCalledWith('err');
+    spy.mockRestore();
   });
 
   it('readFile() reads a real file', () => {
@@ -69,11 +80,20 @@ describe('nodeIO()', () => {
     expect(io.joinPath('/foo', 'bar', 'baz.txt')).toBe(join('/foo', 'bar', 'baz.txt'));
   });
 
-  it('setInterval() returns a disposable handle', () => {
-    const io = nodeIO();
-    const handle = io.setInterval(() => {}, 10_000);
-    expect(handle.dispose).toBeTypeOf('function');
-    handle.dispose();
+  it('setInterval() fires periodically and stops on dispose', () => {
+    vi.useFakeTimers();
+    try {
+      const spy = vi.fn();
+      const io = nodeIO();
+      const handle = io.setInterval(spy, 50);
+      vi.advanceTimersByTime(150);
+      expect(spy).toHaveBeenCalledTimes(3);
+      handle.dispose();
+      vi.advanceTimersByTime(100);
+      expect(spy).toHaveBeenCalledTimes(3); // no more calls after dispose
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   // question() and rawInput() require a TTY stdin and are not unit-testable.

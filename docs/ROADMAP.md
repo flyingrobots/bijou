@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.6.0** — Terminal Whisperer + Test Audit
+Latest: **v1.7.0** — Test Fortress
 
 ---
 
@@ -12,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v1.7.0 | Test Fortress | Deep audit, multiselect defaultValues, nodeIO/chalkStyle tests, fast-check fuzz suites |
 | v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
 | v1.5.0 | Polish & Patterns | Mode rendering (OCP), test hardening, theme accessors (DIP), style pass (bg support for 7 components) |
 | v1.4.0 | Transitions & Showcase | Tab transition animations (7 shaders), interactive showcase app, scrollable multiselect |
@@ -52,13 +53,14 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Panel minimize/fold/unfold** | bijou-tui | Per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
 | **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
 | **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
-| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+| ~~**CodeRabbit review exclusions**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
+| ~~**Git hooks (pre-commit + pre-push)**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
 
 ---
 
-## Test coverage spec (future hardening milestone)
+## ~~Test coverage spec~~ (shipped in v1.7.0)
 
-Detailed acceptance criteria for existing features. Not all of these are currently covered by tests — this section defines the target coverage.
+~~Detailed acceptance criteria for existing features.~~ All sections audited, gaps filled, fuzz suites added. See COMPLETED.md.
 
 ### 1. Form functions: confirm, input, select, multiselect
 
@@ -140,7 +142,7 @@ multiselect()
     ✓ returns empty array when stdin is empty
 
 all forms
-  ✓ Ctrl+C throws or returns cancellation sentinel
+  ✓ Ctrl+C cancels gracefully — confirm/input reject with error, select returns default/first value, multiselect returns empty array
   ✓ each form accepts ctx parameter and uses it over default
   ✓ each form works with createTestContext() and mock IO
 ```
@@ -213,7 +215,7 @@ mockRuntime()
 mockIO()
   ✓ write() captures output to retrievable buffer
   ✓ readLine() returns queued answers in order
-  ✓ readLine() throws when queue exhausted
+  ✓ readLine() returns empty string when queue exhausted
   ✓ readFile() / readDir() use mock filesystem
 
 plainStyle()
@@ -308,7 +310,7 @@ piped / non-interactive output
   ✓ forms fall back to numbered/line-buffered mode
 
 CI detection
-  ✓ CI=true with TTY still detects as rich mode
+  ✓ CI=true with TTY detects as static mode
   ✓ CI=true without TTY detects as pipe mode
 
 TERM=dumb
@@ -359,20 +361,3 @@ round-trip
 
 ---
 
-## Xyph migration
-
-Once published:
-1. `npm install @flyingrobots/bijou @flyingrobots/bijou-node`
-2. Create xyph-specific theme preset with custom status keys
-3. Replace inline rendering with bijou components
-4. Domain-specific views stay in xyph
-
-**XYPH TUI Dashboard dependency map:**
-
-| XYPH Phase | Bijou dependency | Status |
-|------------|-----------------|--------|
-| Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | Ready |
-| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | Ready |
-| Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | Ready |
-| Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | Ready |
-| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | Ready |
