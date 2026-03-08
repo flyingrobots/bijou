@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { table } from './table.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 describe('table', () => {
   const columns = [
@@ -46,20 +46,23 @@ describe('table', () => {
   });
 
   describe('background fill', () => {
-    // plainStyle() strips styling — this verifies headerBgToken is accepted without errors
-    it('accepts headerBgToken without throwing', () => {
+    it('applies headerBgToken', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive' });
-      const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-      expect(result).toContain('Name');
-      expect(result).toContain('Alice');
-      expect(result).toContain('─');
+      (ctx as unknown as { style: typeof style }).style = style;
+      table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBeGreaterThan(0);
+      expect(bgCalls[0]!.color).toBe('#001122');
     });
 
     it('no default bg (opt-in only)', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive' });
-      const result = table({ columns, rows, ctx });
-      expect(result).toContain('Name');
-      expect(result).toContain('─');
+      (ctx as unknown as { style: typeof style }).style = style;
+      table({ columns, rows, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
     });
 
     it('skips headerBgToken in pipe mode', () => {

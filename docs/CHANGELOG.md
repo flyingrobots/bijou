@@ -31,6 +31,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
+- **table.test.ts auditStyle** — `table()` background fill tests now use `auditStyle()` to verify `bgHex` calls instead of checking rendered string content.
 - **Test audit** — 24 new tests filling coverage gaps identified against acceptance criteria specs:
   - Form functions: confirm rich mode (y/Y/yes/n/N/no, invalid input, accessible mode), input (trimming, required, validator, noColor, ctx)
   - Test adapters: plainStyle `bgRgb()`/`bgHex()`, createTestContext theme accessor verification
