@@ -56,6 +56,9 @@ const CURSOR_SHAPE_CODE: Record<CursorShape, number> = {
 /**
  * Set cursor shape and optional blink state via DECSCUSR.
  *
+ * This function produces Ps values 1–6. To reset the cursor to the
+ * terminal's configured default (Ps=0), use {@link resetCursorStyle} instead.
+ *
  * @param io - The I/O port to write the escape sequence to.
  * @param shape - Cursor shape: `'block'`, `'underline'`, or `'bar'`.
  * @param options - Optional blink configuration.

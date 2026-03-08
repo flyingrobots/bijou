@@ -144,6 +144,10 @@ function renderNodeBox(
  * For each wide grapheme (width 2), insert a `''` placeholder in chars
  * and duplicate the type in types. After expansion, `chars[col]` and
  * `types[col]` are column-aligned.
+ *
+ * @param graphemes - Array of grapheme cluster strings to expand.
+ * @param types - Parallel array of per-grapheme character type classifications.
+ * @returns Column-aligned character and type arrays with wide-character placeholders inserted.
  */
 function expandToColumns(
   graphemes: string[],

@@ -125,13 +125,13 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
  * Render a named-area grid.
  */
 export function grid(options: GridOptions): string {
-  const rawGridWidth = Math.floor(options.width);
-  const rawGridHeight = Math.floor(options.height);
-  const width = Number.isFinite(rawGridWidth) ? Math.max(0, rawGridWidth) : 0;
-  const height = Number.isFinite(rawGridHeight) ? Math.max(0, rawGridHeight) : 0;
+  // gridLayout() already sanitizes width/height (floor, NaN/Infinity → 0),
+  // so we defer to its normalised values via the solved rects.
+  const width = Math.floor(options.width);
+  const height = Math.floor(options.height);
   const rects = gridLayout(options);
 
-  if (width <= 0 || height <= 0) return '';
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return '';
 
   const background = Array.from({ length: height }, () => ' '.repeat(width)).join('\n');
   const overlays: Overlay[] = [];
