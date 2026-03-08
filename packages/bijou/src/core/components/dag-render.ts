@@ -250,13 +250,21 @@ export function renderInteractiveLayout(
 
   /** A node that has been positioned on the character grid. */
   interface PlacedNode {
+    /** The starting row (0-indexed) of this node on the character grid. */
     startRow: number;
+    /** The starting column (0-indexed) of this node on the character grid. */
     startCol: number;
+    /** The width of the rendered node box in columns. */
     width: number;
+    /** The raw rendered box lines and per-character type classifications. */
     box: NodeBoxResult;
-    chars: string[][];    // column-expanded characters per line
-    charTypes: CharType[][];  // column-expanded types per line
+    /** Column-expanded characters per line. */
+    chars: string[][];
+    /** Column-expanded type classifications per line. */
+    charTypes: CharType[][];
+    /** The resolved style token for this node. */
     token: TokenValue;
+    /** Reference to the original DagNode. */
     node: DagNode;
   }
 

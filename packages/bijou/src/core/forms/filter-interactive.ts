@@ -83,7 +83,10 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
-  const maxVisible = options.maxVisible ?? 7;
+  const rawMaxVisible = options.maxVisible ?? 7;
+  const maxVisible = Number.isFinite(rawMaxVisible)
+    ? Math.max(1, Math.floor(rawMaxVisible))
+    : 7;
   const term = terminalRenderer(ctx);
 
   let mode: 'normal' | 'insert' = 'normal';

@@ -60,6 +60,9 @@ describe('createTestContext()', () => {
   it('status() falls back to muted for unknown keys', () => {
     const ctx = createTestContext();
     const muted = ctx.status('muted');
+    expect(muted).toBeDefined();
+    expect(muted.hex).toBeTypeOf('string');
+    expect(muted.hex).toMatch(/^#[0-9a-fA-F]{6}$/);
     const unknown = ctx.status('nonexistent');
     expect(unknown.hex).toBe(muted.hex);
   });

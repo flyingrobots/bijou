@@ -83,7 +83,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
   let scrollOffset = 0;
   const selected = new Set<number>();
 
-  /** Keep the scroll offset so the cursor stays within the visible window. */
+  /** Keep the scroll offset so the cursor stays within the visible window (cursor-relative then absolute bounds). */
   function clampScroll(): void {
     if (cursor < scrollOffset) {
       scrollOffset = cursor;
@@ -103,7 +103,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
-  /** Write the multiselect UI (title, hint, option list) to the terminal. */
+  /** Write the multiselect UI (title, hint, option list) to the terminal. Hides the cursor as a side effect. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();

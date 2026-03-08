@@ -278,6 +278,10 @@ function ensureTargetWritable(absTargetDir: string, force: boolean): void {
 
 /** Spawn the package manager's install command synchronously. */
 function runInstall(packageManager: PackageManager, cwd: string): void {
+  const VALID_MANAGERS = new Set(['npm', 'pnpm', 'yarn', 'bun']);
+  if (!VALID_MANAGERS.has(packageManager)) {
+    throw new Error(`Unsupported package manager: ${packageManager}`);
+  }
   const args = packageManager === 'yarn' ? [] : ['install'];
   const result = spawnSync(packageManager, args, {
     cwd,

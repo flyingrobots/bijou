@@ -537,25 +537,28 @@ function assertNever(value: never): never {
 
 /** Normalize an optional region into a clamped LayoutRect within screen bounds. */
 function clampRegion(region: LayoutRect | undefined, screenWidth: number, screenHeight: number): LayoutRect {
+  const sw = Math.floor(screenWidth);
+  const sh = Math.floor(screenHeight);
+
   if (region == null) {
     return {
       row: 0,
       col: 0,
-      width: Math.max(0, screenWidth),
-      height: Math.max(0, screenHeight),
+      width: Math.floor(Math.max(0, sw)),
+      height: Math.floor(Math.max(0, sh)),
     };
   }
 
-  const row = clamp(region.row, 0, Math.max(0, screenHeight));
-  const col = clamp(region.col, 0, Math.max(0, screenWidth));
-  const maxWidth = Math.max(0, screenWidth - col);
-  const maxHeight = Math.max(0, screenHeight - row);
+  const row = Math.floor(clamp(region.row, 0, Math.max(0, sh)));
+  const col = Math.floor(clamp(region.col, 0, Math.max(0, sw)));
+  const maxWidth = Math.max(0, sw - col);
+  const maxHeight = Math.max(0, sh - row);
 
   return {
     row,
     col,
-    width: clamp(region.width, 0, maxWidth),
-    height: clamp(region.height, 0, maxHeight),
+    width: Math.floor(clamp(region.width, 0, maxWidth)),
+    height: Math.floor(clamp(region.height, 0, maxHeight)),
   };
 }
 

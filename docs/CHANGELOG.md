@@ -21,7 +21,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ♻️ Refactors
 
-- **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a duplicate copy.
+- **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a local copy.
 - **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
 - **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.
 

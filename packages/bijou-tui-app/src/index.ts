@@ -129,7 +129,7 @@ const DEFAULT_TABS: readonly SkeletonTab[] = [
 
 const DEFAULT_KEY_LEGEND = '[ ] pages | o drawer | tab panes | ctrl+p commands | q quit';
 
-const DEFAULT_SPLIT_STATE = createSplitPaneState({ ratio: 1 / 3 });
+const DEFAULT_SPLIT_RATIO = 1 / 3;
 
 /**
  * Create a full-screen framed app skeleton with:
@@ -293,7 +293,7 @@ function buildSkeletonOverlays(options: OverlayBuildOptions): readonly Overlay[]
       title: 'Quit App?',
       body: 'Exit this TUI session now?',
       hint: 'Y / Enter confirm  •  N / Esc cancel',
-      width: Math.min(56, Math.max(34, width - 4)),
+      width: Math.min(56, width - 2, Math.max(20, width - 4)),
       screenWidth: width,
       screenHeight: height,
       borderToken: options.tokens?.modalBorderToken ?? options.ctx.theme.theme.border.warning,
@@ -522,7 +522,7 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
         kind: 'split',
         splitId: `${spec.tab.id}-split`,
         direction: 'row',
-        state: DEFAULT_SPLIT_STATE,
+        state: createSplitPaneState({ ratio: DEFAULT_SPLIT_RATIO }),
         paneA: {
           kind: 'pane',
           paneId: `${spec.tab.id}-left`,

@@ -78,10 +78,12 @@ describe('accordion', () => {
     });
 
     it('no default bg (opt-in only)', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive' });
-      const result = accordion(sections, { ctx });
-      expect(result).toContain('Section A');
-      expect(result).toContain('▼');
+      (ctx as unknown as { style: typeof style }).style = style;
+      accordion(sections, { ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
     });
 
     it('skips headerBgToken in pipe mode', () => {
@@ -91,9 +93,12 @@ describe('accordion', () => {
     });
 
     it('skips headerBgToken when noColor is true', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive', noColor: true });
-      const result = accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-      expect(result).toContain('Section A');
+      (ctx as unknown as { style: typeof style }).style = style;
+      accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
     });
   });
 });

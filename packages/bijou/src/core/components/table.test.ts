@@ -73,7 +73,7 @@ describe('table', () => {
       const ctx = createTestContext({ mode: 'interactive', noColor: true });
       const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       expect(result).toContain('Name');
-      expect(result).not.toMatch(/\x1b\[/);
+      expect(result).not.toMatch(/\u001b\[/);
     });
   });
 

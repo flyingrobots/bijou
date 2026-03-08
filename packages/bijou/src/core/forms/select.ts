@@ -96,7 +96,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
 
   /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
-    return options.options.slice(scrollOffset, scrollOffset + maxVisible) as SelectOption<T>[];
+    return options.options.slice(scrollOffset, scrollOffset + maxVisible);
   }
 
   /** Calculate the total terminal lines occupied by the current render. */

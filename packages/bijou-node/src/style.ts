@@ -96,7 +96,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      *
      * @param token - Resolved token value containing `hex` and optional `modifiers`.
      * @param text - Text to style.
-     * @returns Styled text, or unmodified text when `noColor` is active.
+     * @returns Styled text, or unmodified text when ANSI output is disabled via `noColor` or `level: 0`.
      */
     styled(token: TokenValue, text: string): string {
       if (!ansiEnabled) return text;

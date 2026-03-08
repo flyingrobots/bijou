@@ -217,7 +217,7 @@ export interface FrameModel<PageModel> {
   readonly transitionTimelineState?: TimelineState;
 }
 
-/** Internal model extending the public FrameModel with palette state. */
+/** Internal model extending the public FrameModel with palette entries. */
 interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
   readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[];
 }
@@ -246,7 +246,7 @@ interface RenderResult {
   readonly paneOrder: readonly string[];
 }
 
-/** Discriminated union of all frame-level actions (tabs, panes, scroll, palette, transitions). */
+/** Discriminated union of all frame-level actions (tabs, panes, scroll, palette, help, transitions). */
 type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'prev-tab' }
@@ -611,7 +611,7 @@ function handlePaletteKey<PageModel, Msg>(
   return [model, []];
 }
 
-/** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette). */
+/** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette, help toggle, transitions). */
 function applyFrameAction<PageModel, Msg>(
   action: FrameAction,
   model: InternalFrameModel<PageModel, Msg>,
@@ -812,7 +812,7 @@ function scrollFocusedPane<PageModel, Msg>(
   };
 }
 
-/** Initialize the command palette with entries from frame, global, and page key maps. */
+/** Initialize the command palette with entries from frame, global, page key maps, and custom page command items. */
 function openCommandPalette<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -915,7 +915,7 @@ function buildPaletteEntries<PageModel, Msg>(
   return entries;
 }
 
-/** Reconcile pane IDs, scroll offsets, and focus for a page after a tab switch. */
+/** Reconcile pane IDs, scroll offsets, and focus for a page after init, tab switches, or window resizes. */
 function syncPageFrameState<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   pageId: string,
@@ -1123,7 +1123,7 @@ function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<FrameLayou
   return undefined;
 }
 
-/** Build the default key map for frame-level actions (tabs, panes, scroll). */
+/** Build the default key map for frame-level actions (tabs, panes, scroll, help '?', command palette 'ctrl+p'/':'). */
 function createFrameKeyMap(): KeyMap<FrameAction> {
   return createKeyMap<FrameAction>()
     .group('Frame', (g) => g

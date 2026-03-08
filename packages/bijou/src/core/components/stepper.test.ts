@@ -81,9 +81,12 @@ describe('stepper', () => {
     });
 
     it('skips activeBgToken when noColor is true', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive', noColor: true });
-      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-      expect(result).toContain('Payment');
+      (ctx as unknown as { style: typeof style }).style = style;
+      stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBe(0);
     });
   });
 });

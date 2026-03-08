@@ -42,9 +42,12 @@ export interface GridLayoutResult {
  * Compute area rectangles from grid constraints and area template.
  */
 export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<string, LayoutRect> {
-  const width = Math.max(0, Math.floor(options.width));
-  const height = Math.max(0, Math.floor(options.height));
-  const gap = Math.max(0, Math.floor(options.gap ?? 0));
+  const rawWidth = Math.floor(options.width);
+  const rawHeight = Math.floor(options.height);
+  const width = Number.isFinite(rawWidth) ? Math.max(0, rawWidth) : 0;
+  const height = Number.isFinite(rawHeight) ? Math.max(0, rawHeight) : 0;
+  const rawGap = Math.floor(options.gap ?? 0);
+  const gap = Number.isFinite(rawGap) ? Math.max(0, rawGap) : 0;
 
   if (options.columns.length === 0 || options.rows.length === 0) {
     throw new Error('gridLayout: columns and rows must be non-empty');
@@ -104,8 +107,8 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
 
     const colSpan = maxC - minC + 1;
     const rowSpan = maxR - minR + 1;
-    const rectWidth = sum(colSizes.slice(minC, maxC + 1)) + gap * Math.max(0, colSpan - 1);
-    const rectHeight = sum(rowSizes.slice(minR, maxR + 1)) + gap * Math.max(0, rowSpan - 1);
+    const rectWidth = Math.min(width, sum(colSizes.slice(minC, maxC + 1)) + gap * Math.max(0, colSpan - 1));
+    const rectHeight = Math.min(height, sum(rowSizes.slice(minR, maxR + 1)) + gap * Math.max(0, rowSpan - 1));
 
     rects.set(name, {
       row: rowStarts[minR] ?? 0,
@@ -122,8 +125,10 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
  * Render a named-area grid.
  */
 export function grid(options: GridOptions): string {
-  const width = Math.max(0, Math.floor(options.width));
-  const height = Math.max(0, Math.floor(options.height));
+  const rawGridWidth = Math.floor(options.width);
+  const rawGridHeight = Math.floor(options.height);
+  const width = Number.isFinite(rawGridWidth) ? Math.max(0, rawGridWidth) : 0;
+  const height = Number.isFinite(rawGridHeight) ? Math.max(0, rawGridHeight) : 0;
   const rects = gridLayout(options);
 
   if (width <= 0 || height <= 0) return '';
