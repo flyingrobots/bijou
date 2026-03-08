@@ -17,4 +17,7 @@ Address reviewer feedback and finalize JSDoc coverage overhaul for merge.
   - [x] input.test.ts: use \u001b instead of \x1b in regex
 - [x] Push fixes and request re-review
 - [x] Address 35 new CodeRabbit review comments (JSDoc completeness, behavioral fixes, test improvements)
-- [ ] Merge PR #34 into main
+- [x] Address round 4 CodeRabbit feedback (table/stepper auditStyle, grid DRY, dag-render JSDoc, screen DECSCUSR)
+- [x] Post comprehensive reply declining 12 false positives with evidence — CodeRabbit acknowledged and recorded learnings
+- [ ] Wait for CodeRabbit rate limit to clear, trigger final review (`@coderabbitai review`). If no new actionable comments: merge.
+- [ ] Merge PR #34 into main (requires: CI green, CodeRabbit resolved or approved, no unresolved comments)
