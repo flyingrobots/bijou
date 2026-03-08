@@ -1373,6 +1373,7 @@ function stringToGrid(str: string, width: number, height: number): string[][] {
   return grid;
 }
 
+/** Apply a transition shader to blend between the previous and next page views. */
 function renderTransition(
   prev: string,
   next: string,
