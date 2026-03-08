@@ -53,7 +53,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Panel minimize/fold/unfold** | bijou-tui | Per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
 | **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
 | **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
-| **CodeRabbit review exclusions** | repo config | Add `CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md` to `.coderabbit.yaml` path filters to reduce false positives on project instructions and planning artifacts. |
+| ~~**CodeRabbit review exclusions**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
 | ~~**Git hooks (pre-commit + pre-push)**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
 
 ---

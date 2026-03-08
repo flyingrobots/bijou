@@ -22,6 +22,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🔧 Infrastructure
 
 - **Git hooks (repo)** — `scripts/hooks/pre-commit` runs lint + lockfile consistency check (`npm ls --all`). `scripts/hooks/pre-push` runs the full test suite. Wired via `core.hooksPath scripts/hooks`. Catches lockfile drift before it reaches CI.
+- **CodeRabbit path exclusions (repo)** — `.coderabbit.yaml` excludes planning/task files (`CLAUDE.md`, `TASKS.md`, `docs/ROADMAP.md`, `docs/COMPLETED.md`, `docs/GRAVEYARD.md`) from review to reduce false positives.
 
 ### 📝 Documentation
 

@@ -1,0 +1,7 @@
+reviews:
+  path_filters:
+    - "!CLAUDE.md"
+    - "!TASKS.md"
+    - "!docs/ROADMAP.md"
+    - "!docs/COMPLETED.md"
+    - "!docs/GRAVEYARD.md"
