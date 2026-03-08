@@ -31,6 +31,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer `pause()` snapshots stale elapsed** — `pause()` now uses `Date.now() - startTime` instead of the tick-updated `elapsedMs`.
 - **Timer `stop()` loses sub-tick elapsed time** — `stop()` now snapshots `elapsedMs` before disposing the interval, so `elapsed()` returns an accurate value after stopping.
 - **Timer `start()` while paused stays frozen** — `start()` now resets the `paused` flag, preventing a re-started timer from remaining frozen.
+- **Timer `stop()` after `pause()` loses paused elapsed** — `stop()` now snapshots `pausedElapsed` into `elapsedMs` when stopped while paused.
 - **`constrain()` height ellipsis ignores width constraint** — Height-truncation ellipsis now respects `maxWidth` when both constraints are active.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 

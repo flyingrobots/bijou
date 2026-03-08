@@ -168,8 +168,10 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     },
 
     stop(finalMessage?: string) {
-      if (timerHandle !== null && !paused) {
-        elapsedMs = pausedElapsed + (Date.now() - startTime);
+      if (timerHandle !== null) {
+        elapsedMs = paused
+          ? pausedElapsed
+          : pausedElapsed + (Date.now() - startTime);
       }
       stopInternal();
       if (mode === 'interactive') {

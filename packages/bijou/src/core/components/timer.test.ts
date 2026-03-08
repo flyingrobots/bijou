@@ -259,4 +259,22 @@ describe('createStopwatch', () => {
       vi.useRealTimers();
     }
   });
+
+  it('stop() after pause() preserves paused elapsed value', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 100, ctx });
+      sw.start();
+      vi.advanceTimersByTime(400);
+      sw.pause();
+      const atPause = sw.elapsed();
+      expect(atPause).toBeGreaterThanOrEqual(400);
+      // Stop while paused — elapsed should reflect time at pause
+      sw.stop();
+      expect(sw.elapsed()).toBe(atPause);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
