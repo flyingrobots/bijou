@@ -206,6 +206,13 @@ export {
   type MarkdownOptions,
   constrain,
   type ConstrainOptions,
+  timer,
+  createTimer,
+  createStopwatch,
+  type TimerOptions,
+  type TimerController,
+  type CreateTimerOptions,
+  type CreateStopwatchOptions,
 } from './core/components/index.js';
 
 // Forms

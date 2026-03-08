@@ -80,3 +80,6 @@ export type { MarkdownOptions } from './markdown.js';
 
 export { constrain } from './constrain.js';
 export type { ConstrainOptions } from './constrain.js';
+
+export { timer, createTimer, createStopwatch } from './timer.js';
+export type { TimerOptions, TimerController, CreateTimerOptions, CreateStopwatchOptions } from './timer.js';

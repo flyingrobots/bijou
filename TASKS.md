@@ -19,8 +19,8 @@ All 13 items across 5 phases: housekeeping, core small wins, core medium feature
 
 ## Phase 3: Core Medium Features (branch: `feat/v1.8.0-core-medium`)
 
-- [ ] **3A. Timer / Stopwatch** — Create `packages/bijou/src/core/components/timer.ts` + test. Static `timer(ms, opts)` renders `MM:SS` / `HH:MM:SS` / `MM:SS.mmm`. Live `createTimer({ duration, onComplete?, interval? })` and `createStopwatch({ interval? })` with `start/pause/resume/stop/elapsed`. Follow spinner/progressBar controller pattern. Update barrel exports.
-- [ ] **3B. Dynamic Forms** — Modify `packages/bijou/src/core/forms/wizard.ts` + test. Add `transform?` and `branch?` to `WizardStep<T, K>`. `transform`: called before `field()`, returns replacement field function or void. `branch`: called after value, returns steps to splice in. Convert to index-based iteration over mutable copy.
+- [x] **3A. Timer / Stopwatch** — Create `packages/bijou/src/core/components/timer.ts` + test. Static `timer(ms, opts)` renders `MM:SS` / `HH:MM:SS` / `MM:SS.mmm`. Live `createTimer({ duration, onComplete?, interval? })` and `createStopwatch({ interval? })` with `start/pause/resume/stop/elapsed`. Follow spinner/progressBar controller pattern. Update barrel exports.
+- [x] **3B. Dynamic Forms** — Modify `packages/bijou/src/core/forms/wizard.ts` + test. Add `transform?` and `branch?` to `WizardStep<T, K>`. `transform`: called before `field()`, returns replacement field function or void. `branch`: called after value, returns steps to splice in. Convert to index-based iteration over mutable copy.
 
 ## Phase 4: TUI Panel Features (branch: `feat/v1.8.0-panel-management`)
 
