@@ -32,10 +32,23 @@ export interface TransitionCell {
   readonly ctx: BijouContext;
 }
 
+/**
+ * Semantic role of a character override.
+ *
+ * - `'decoration'` — ambient visual noise (glitch blocks, static, scramble).
+ *   Survives progress remapping in combinators like `reverse()` and `chain()`.
+ * - `'marker'` — positional indicator tied to the shader's progress direction
+ *   (e.g., typewriter cursor). Dropped by combinators that remap progress,
+ *   since the marker's position becomes meaningless in the new space.
+ */
+export type CharRole = 'decoration' | 'marker';
+
 /** Output from a transition shader for a single cell. */
 export interface TransitionResult {
   readonly showNext: boolean;
   readonly char?: string;
+  /** Semantic role of the char override. Defaults to `'decoration'` if omitted. */
+  readonly charRole?: CharRole;
 }
 
 /** A pure function that determines how each cell transitions between pages. */
@@ -260,7 +273,7 @@ export function typewriter(cursor = '▌'): TransitionShaderFn {
     const cellIndex = y * width + x;
     if (cellIndex < revealed) return { showNext: true };
     if (cellIndex === revealed) {
-      return { showNext: false, char: ctx.style.styled(ctx.status('info'), cursor) };
+      return { showNext: false, char: ctx.style.styled(ctx.status('info'), cursor), charRole: 'marker' };
     }
     return { showNext: false };
   };
@@ -368,10 +381,13 @@ export const staticShader: TransitionShaderFn = tvStatic();
 export function reverse(shader: TransitionShaderFn): TransitionShaderFn {
   return (cell) => {
     const result = shader({ ...cell, progress: 1 - cell.progress });
-    // Drop char overrides — they belong to the original progress direction
-    // and would produce stale artifacts (e.g., cursor glyphs on a fully
-    // revealed frame when reversing typewriter).
-    return { showNext: !result.showNext };
+    // Marker chars (e.g., typewriter cursor) are positional — they become
+    // stale when progress is remapped. Decoration chars (glitch noise,
+    // static blocks) are ambient and survive the reversal.
+    const keepChar = result.char !== undefined && result.charRole !== 'marker';
+    return keepChar
+      ? { showNext: !result.showNext, char: result.char, charRole: result.charRole }
+      : { showNext: !result.showNext };
   };
 }
 
@@ -406,6 +422,7 @@ export function overlay(base: TransitionShaderFn, top: TransitionShaderFn): Tran
     return {
       showNext: topResult.showNext || baseResult.showNext,
       char: baseResult.char,
+      charRole: baseResult.charRole,
     };
   };
 }

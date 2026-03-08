@@ -137,6 +137,7 @@ export {
   type TransitionCell,
   type TransitionResult,
   type TransitionShaderFn,
+  type CharRole,
   type WipeDirection,
   type BuiltinTransition,
   // Original shader instances

@@ -32,6 +32,7 @@ import {
   overlay,
   TRANSITION_SHADERS,
   type TransitionCell,
+  type TransitionShaderFn,
   type BuiltinTransition,
 } from './transition-shaders.js';
 
@@ -460,14 +461,38 @@ describe('reverse()', () => {
     expect(reversed(cell({ x: 79, width: 80, progress: 1 })).showNext).toBe(true);
   });
 
-  it('drops char overrides from the base shader', () => {
+  it('drops marker char overrides from the base shader', () => {
     // reverse(typewriter) at progress=1 evaluates typewriter at progress=0,
-    // which emits a cursor char for cell (0,0). The reversed result should
-    // NOT carry that char, since it belongs to the wrong progress direction.
+    // which emits a cursor char (charRole='marker') for cell (0,0).
+    // Marker chars are positional and must be dropped on reversal.
     const reversed = reverse(typewriter());
     const result = reversed(cell({ x: 0, y: 0, width: 80, height: 24, progress: 1 }));
     expect(result.showNext).toBe(true);
     expect(result.char).toBeUndefined();
+  });
+
+  it('preserves decoration char overrides from the base shader', () => {
+    // Decoration chars (glitch noise, static blocks) are ambient and should
+    // survive progress remapping.
+    const decorationShader: TransitionShaderFn = () => ({
+      showNext: true,
+      char: '█',
+      charRole: 'decoration',
+    });
+    const reversed = reverse(decorationShader);
+    const result = reversed(cell({ progress: 0.5 }));
+    expect(result.char).toBe('█');
+    expect(result.charRole).toBe('decoration');
+  });
+
+  it('treats chars without charRole as decoration (preserves them)', () => {
+    const legacyShader: TransitionShaderFn = () => ({
+      showNext: true,
+      char: 'X',
+    });
+    const reversed = reverse(legacyShader);
+    const result = reversed(cell({ progress: 0.5 }));
+    expect(result.char).toBe('X');
   });
 });
 
