@@ -184,7 +184,7 @@ describe('input()', () => {
       const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['test'] } });
       await input({ title: 'Name', ctx });
       const output = ctx.io.written.join('');
-      expect(output).not.toMatch(/\x1b\[/);
+      expect(output).not.toMatch(/\u001b\[/);
     });
 
     it('functionality identical: captures and trims input', async () => {

@@ -18,6 +18,7 @@ import { isKeyMsg, isMouseMsg, isResizeMsg, QUIT } from './types.js';
 import type { Overlay } from './overlay.js';
 import { composite, modal } from './overlay.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
+import { fitBlock } from './layout-utils.js';
 import { type BuiltinTransition, TRANSITION_SHADERS } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import {
@@ -1212,18 +1213,6 @@ function frameBodyRect(columns: number, rows: number): LayoutRect {
   };
 }
 
-/** Clip/pad a multiline string into an array of exactly `height` lines, each `width` columns. */
-function fitBlock(content: string, width: number, height: number): string[] {
-  if (width <= 0 || height <= 0) return Array.from({ length: Math.max(0, height) }, () => '');
-  const src = content.split('\n');
-  const out: string[] = [];
-  for (let i = 0; i < height; i++) {
-    const line = src[i] ?? '';
-    const clipped = clipToWidth(line, width);
-    out.push(clipped + ' '.repeat(Math.max(0, width - visibleLength(clipped))));
-  }
-  return out;
-}
 
 /** Clip or pad a single line to exactly `width` visible columns. */
 function fitLine(line: string, width: number): string {

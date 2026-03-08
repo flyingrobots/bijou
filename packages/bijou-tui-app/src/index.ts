@@ -150,6 +150,14 @@ export function createTuiAppSkeleton(
     throw new Error('createTuiAppSkeleton: "tabs" must contain at least one tab');
   }
 
+  const seenTabIds = new Set<string>();
+  for (const tab of tabs) {
+    if (seenTabIds.has(tab.id)) {
+      throw new Error(`createTuiAppSkeleton: duplicate tab id "${tab.id}"`);
+    }
+    seenTabIds.add(tab.id);
+  }
+
   const tabsById = new Map(tabs.map((tab) => [tab.id, tab] as const));
   const pageSpecs = buildPageSpecs(tabs);
   const pageConfigs = new Map(pageSpecs.map((spec) => [spec.tab.id, pageConfigFor(spec)] as const));
@@ -187,7 +195,9 @@ export function createTuiAppSkeleton(
   return createFramedApp<SkeletonPageModel, SkeletonMsg>({
     title: options.title ?? 'App',
     pages,
-    defaultPageId: options.defaultTabId ?? tabs[0]!.id,
+    defaultPageId: options.defaultTabId != null && tabsById.has(options.defaultTabId)
+      ? options.defaultTabId
+      : tabs[0]!.id,
     globalKeys: mergedGlobalKeys,
     enableCommandPalette: true,
     overlayFactory: (frame) =>

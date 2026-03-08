@@ -1,4 +1,5 @@
 import { getDefaultContext } from '@flyingrobots/bijou';
+import type { WritePort } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderFrame } from './screen.js';
@@ -161,7 +162,7 @@ function sanitizeDimension(value: number): number {
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */
-function writeErrorLine(io: { write(data: string): void; writeError?: (data: string) => void }, data: string): void {
+function writeErrorLine(io: WritePort, data: string): void {
   if (io.writeError != null) {
     io.writeError(data);
     return;

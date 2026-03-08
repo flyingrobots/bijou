@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { stepper } from './stepper.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 const steps = [
   { label: 'Account' },
@@ -59,10 +59,13 @@ describe('stepper', () => {
 
   describe('background fill', () => {
     it('applies activeBgToken on current step', () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive' });
-      const result = stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-      expect(result).toContain('Payment');
-      expect(result).toContain('●');
+      (ctx as unknown as { style: typeof style }).style = style;
+      stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
+      const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
+      expect(bgCalls.length).toBeGreaterThan(0);
+      expect(bgCalls[0]!.color).toBe('#001122');
     });
 
     it('no default bg (opt-in only)', () => {

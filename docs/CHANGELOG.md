@@ -17,8 +17,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Select cancel label mismatch (bijou core)** — `cleanup()` in `select()` always displayed the label at the cursor position, even on cancel (Ctrl+C/Escape) where the resolved value is the default/first option. Now accepts an optional `selectedLabel` parameter so the cancel path displays the correct fallback label.
 - **Filter interactive cleanup label (bijou core)** — `cleanup()` in `interactiveFilter` now receives the resolved label from each call site instead of computing it from `filtered[cursor]`. Previously, cancel paths (Ctrl+C, Escape) and empty-list Enter always displayed the wrong label because `cleanup()` read `filtered[cursor]` which didn't reflect the actual fallback value.
 - **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
+- **Tabs validation (bijou-tui-app)** — `createTuiAppSkeleton()` now throws on duplicate `tab.id` values and falls back to first tab when `defaultTabId` is not found in tabs.
 
 ### ♻️ Refactors
+
+- **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a duplicate copy.
+- **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
+- **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.
 
 - **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.
 
