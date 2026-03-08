@@ -9,6 +9,7 @@
 
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
+import { cursorGuard, type CursorHideHandle } from '../components/cursor-guard.js';
 
 /**
  * Format a form title with the `?` prefix and theme-aware styling.
@@ -92,12 +93,18 @@ export interface TerminalRenderer {
  * @returns A renderer with cursor control methods.
  */
 export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
+  let cursorHandle: CursorHideHandle | null = null;
   return {
     hideCursor() {
-      ctx.io.write('\x1b[?25l');
+      if (cursorHandle === null) {
+        cursorHandle = cursorGuard(ctx.io).hide();
+      }
     },
     showCursor() {
-      ctx.io.write('\x1b[?25h');
+      if (cursorHandle !== null) {
+        cursorHandle.dispose();
+        cursorHandle = null;
+      }
     },
     writeLine(text: string) {
       ctx.io.write(`\r\x1b[K${text}\n`);

@@ -13,8 +13,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 
+### ✨ Features
+
+- **`cursorGuard()` + `withHiddenCursor()` (bijou)** — Reference-counted cursor visibility guard. Multiple components (spinner, progress, timer, forms) sharing the same IOPort now coordinate hide/show automatically — nesting a spinner inside a progress bar no longer prematurely restores the cursor. `withHiddenCursor(io, fn)` provides try/finally sugar for one-shot use cases.
+
 ### ♻️ Refactors
 
+- **Cursor lifecycle via `CursorGuard`** — Spinner, progress bar, timer, and form `terminalRenderer` now use `cursorGuard()` instead of raw ANSI writes, eliminating duplicated `\x1b[?25l`/`\x1b[?25h` sequences and fixing nesting correctness.
 - **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
 - **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
 - **`serializeLayoutState` reads model defaults** — Now falls back to `model.minimizedByPage` / `maximizedPaneByPage` / `dockStateByPage` / `splitRatioOverrides` when `perPage` is omitted, so callers don't need to pass redundant state.

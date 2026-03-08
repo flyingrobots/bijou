@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
 
 /** Configuration for timer rendering. */
 export interface TimerOptions {
@@ -101,6 +102,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
 
   let elapsedMs = 0;
   let timerHandle: TimerHandle | null = null;
+  let cursorHandle: CursorHideHandle | null = null;
   let startTime = 0;
   let pausedElapsed = 0;
   let paused = false;
@@ -125,7 +127,10 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       // Restore cursor after natural completion
       if (mode === 'interactive') {
         ctx.io.write('\n');
-        ctx.io.write('\x1b[?25h');
+        if (cursorHandle !== null) {
+          cursorHandle.dispose();
+          cursorHandle = null;
+        }
       }
       return;
     }
@@ -141,7 +146,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       startTime = Date.now();
       pausedElapsed = 0;
       elapsedMs = 0;
-      ctx.io.write('\x1b[?25l');
+      cursorHandle = cursorGuard(ctx.io).hide();
       render();
       timerHandle = ctx.io.setInterval(tick, interval);
     },
@@ -162,7 +167,10 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       stopInternal();
       if (mode === 'interactive') {
         ctx.io.write('\r\x1b[K');
-        ctx.io.write('\x1b[?25h');
+        if (cursorHandle !== null) {
+          cursorHandle.dispose();
+          cursorHandle = null;
+        }
       }
       if (finalMessage !== undefined) {
         ctx.io.write(finalMessage + '\n');

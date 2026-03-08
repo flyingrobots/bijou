@@ -4,6 +4,7 @@ import type { GradientStop } from '../theme/tokens.js';
 import { lerp3 } from '../theme/gradient.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
 
 /** Configuration for rendering a progress bar. */
 export interface ProgressBarOptions {
@@ -109,6 +110,7 @@ export interface LiveProgressBarOptions extends ProgressBarOptions {
 export function createProgressBar(options: LiveProgressBarOptions = {}): ProgressBarController {
   const ctx = resolveCtx(options.ctx);
   const mode = ctx.mode;
+  let cursorHandle: CursorHideHandle | null = null;
 
   return {
     start() {
@@ -116,7 +118,7 @@ export function createProgressBar(options: LiveProgressBarOptions = {}): Progres
         ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
         return;
       }
-      ctx.io.write('\x1b[?25l');
+      cursorHandle = cursorGuard(ctx.io).hide();
       ctx.io.write(progressBar(0, { ...options, ctx }));
     },
 
@@ -136,7 +138,10 @@ export function createProgressBar(options: LiveProgressBarOptions = {}): Progres
         return;
       }
       ctx.io.write('\r\x1b[K');
-      ctx.io.write('\x1b[?25h');
+      if (cursorHandle !== null) {
+        cursorHandle.dispose();
+        cursorHandle = null;
+      }
       if (finalMessage !== undefined) {
         ctx.io.write(finalMessage + '\n');
       }
@@ -175,6 +180,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
   let currentPct = 0;
   let targetPct = 0;
   let timer: TimerHandle | null = null;
+  let cursorHandle: CursorHideHandle | null = null;
 
   const frameMs = Math.round(1000 / fps);
   const stepPerFrame = 100 / (duration / frameMs); // max pct change per frame
@@ -209,7 +215,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
         ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
         return;
       }
-      ctx.io.write('\x1b[?25l');
+      cursorHandle = cursorGuard(ctx.io).hide();
       render();
     },
 
@@ -237,7 +243,10 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
       }
       render();
       ctx.io.write('\r\x1b[K');
-      ctx.io.write('\x1b[?25h');
+      if (cursorHandle !== null) {
+        cursorHandle.dispose();
+        cursorHandle = null;
+      }
       if (finalMessage !== undefined) {
         ctx.io.write(finalMessage + '\n');
       }

@@ -213,6 +213,10 @@ export {
   type TimerController,
   type CreateTimerOptions,
   type CreateStopwatchOptions,
+  cursorGuard,
+  withHiddenCursor,
+  type CursorGuard,
+  type CursorHideHandle,
 } from './core/components/index.js';
 
 // Forms

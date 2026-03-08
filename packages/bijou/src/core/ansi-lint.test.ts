@@ -28,6 +28,7 @@ const ALLOWED = new Set([
   'core/forms/multiselect.ts',      // \x1b[K line-clear + key matching
   'core/forms/filter-interactive.ts', // \x1b[K line-clear + key matching
   'core/forms/textarea-editor.ts',  // \x1b[K line-clear + key/arrow matching
+  'core/components/cursor-guard.ts', // cursor hide/show escape sequences
   'core/components/progress.ts',    // cursor control
   'core/components/spinner.ts',     // cursor control
   'core/components/timer.ts',       // cursor control
