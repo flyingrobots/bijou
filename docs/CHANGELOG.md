@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🔧 Internal
+
+- **Timer state machine refactor (bijou)** — Replaced 6 loose mutable variables in `createLiveController` with a discriminated union (`TimerState`), making invalid states unrepresentable. Zero API or behavioral changes; all 29 timer tests pass unmodified.
+
 ## [1.8.0] - 2026-03-08
 
 ### ✨ Features

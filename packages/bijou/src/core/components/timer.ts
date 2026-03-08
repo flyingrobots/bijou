@@ -96,111 +96,114 @@ interface LiveControllerConfig {
   readonly onTick?: (elapsedMs: number) => boolean;
 }
 
+/**
+ * Discriminated union for timer state machine.
+ * Makes invalid states unrepresentable and transitions explicit.
+ */
+type TimerState =
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'running'; readonly startTime: number; readonly pausedElapsed: number;
+      readonly handle: TimerHandle; readonly cursor: CursorHideHandle | null }
+  | { readonly kind: 'paused'; readonly pausedElapsed: number;
+      readonly handle: TimerHandle; readonly cursor: CursorHideHandle | null }
+  | { readonly kind: 'stopped'; readonly elapsedMs: number };
+
+function computeElapsed(s: TimerState): number {
+  switch (s.kind) {
+    case 'idle':    return 0;
+    case 'running': return s.pausedElapsed + (Date.now() - s.startTime);
+    case 'paused':  return s.pausedElapsed;
+    case 'stopped': return s.elapsedMs;
+  }
+}
+
 /** Shared controller logic for createTimer and createStopwatch. */
 function createLiveController(config: LiveControllerConfig): TimerController {
   const { ctx, interval, timerOpts, displayMs, initialDisplayMs, onTick } = config;
   const mode = ctx.mode;
 
-  let elapsedMs = 0;
-  let timerHandle: TimerHandle | null = null;
-  let cursorHandle: CursorHideHandle | null = null;
-  let startTime = 0;
-  let pausedElapsed = 0;
-  let paused = false;
-
-  function stopInternal(): void {
-    if (timerHandle !== null) {
-      timerHandle.dispose();
-      timerHandle = null;
-    }
-  }
-
-  function render(): void {
-    const line = timer(displayMs(elapsedMs), { ...timerOpts, ctx });
-    ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
-  }
+  let state: TimerState = { kind: 'idle' };
 
   function tick(): void {
-    if (paused) return;
-    elapsedMs = pausedElapsed + (Date.now() - startTime);
-    if (onTick?.(elapsedMs)) {
-      stopInternal();
-      // Restore cursor after natural completion
+    if (state.kind !== 'running') return;
+    const elapsed = state.pausedElapsed + (Date.now() - state.startTime);
+    if (onTick?.(elapsed)) {
+      state.handle.dispose();
       if (mode === 'interactive') {
         ctx.io.write('\n');
-        if (cursorHandle !== null) {
-          cursorHandle.dispose();
-          cursorHandle = null;
+        if (state.cursor !== null) {
+          state.cursor.dispose();
         }
       }
+      state = { kind: 'stopped', elapsedMs: elapsed };
       return;
     }
-    render();
+    const line = timer(displayMs(elapsed), { ...timerOpts, ctx });
+    ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
   }
 
   return {
     start() {
-      stopInternal();
+      if (state.kind === 'running' || state.kind === 'paused') {
+        state.handle.dispose();
+        if (state.cursor !== null) {
+          state.cursor.dispose();
+        }
+      }
+
       if (mode !== 'interactive') {
         ctx.io.write(timer(initialDisplayMs, { ...timerOpts, ctx }) + '\n');
-        // Fire onTick for non-interactive countdown completion (e.g. duration=0)
         if (onTick?.(0)) { /* onComplete fired */ }
+        state = { kind: 'idle' };
         return;
       }
-      startTime = Date.now();
-      pausedElapsed = 0;
-      elapsedMs = 0;
-      paused = false;
-      cursorHandle?.dispose();
-      cursorHandle = cursorGuard(ctx.io).hide();
-      // Check for immediate completion (e.g. duration=0 countdown)
+
+      const cursor = cursorGuard(ctx.io).hide();
+
       if (onTick?.(0)) {
-        if (cursorHandle !== null) {
-          cursorHandle.dispose();
-          cursorHandle = null;
-        }
+        cursor.dispose();
+        state = { kind: 'stopped', elapsedMs: 0 };
         return;
       }
-      render();
-      timerHandle = ctx.io.setInterval(tick, interval);
+
+      const now = Date.now();
+      const line = timer(displayMs(0), { ...timerOpts, ctx });
+      ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
+      const handle = ctx.io.setInterval(tick, interval);
+      state = { kind: 'running', startTime: now, pausedElapsed: 0, handle, cursor };
     },
 
     pause() {
-      if (paused || timerHandle === null) return;
-      paused = true;
-      pausedElapsed += Date.now() - startTime;
+      if (state.kind !== 'running') return;
+      const elapsed = state.pausedElapsed + (Date.now() - state.startTime);
+      state = { kind: 'paused', pausedElapsed: elapsed, handle: state.handle, cursor: state.cursor };
     },
 
     resume() {
-      if (!paused) return;
-      paused = false;
-      startTime = Date.now();
+      if (state.kind !== 'paused') return;
+      state = { kind: 'running', startTime: Date.now(), pausedElapsed: state.pausedElapsed,
+        handle: state.handle, cursor: state.cursor };
     },
 
     stop(finalMessage?: string) {
-      if (timerHandle !== null) {
-        elapsedMs = paused
-          ? pausedElapsed
-          : pausedElapsed + (Date.now() - startTime);
-      }
-      stopInternal();
-      if (mode === 'interactive') {
-        ctx.io.write(CLEAR_LINE_RETURN);
-        if (cursorHandle !== null) {
-          cursorHandle.dispose();
-          cursorHandle = null;
+      const elapsed = computeElapsed(state);
+      if (state.kind === 'running' || state.kind === 'paused') {
+        state.handle.dispose();
+        if (mode === 'interactive') {
+          ctx.io.write(CLEAR_LINE_RETURN);
+          if (state.cursor !== null) {
+            state.cursor.dispose();
+          }
         }
       }
+      state = { kind: 'stopped', elapsedMs: elapsed };
       if (finalMessage !== undefined) {
         ctx.io.write(finalMessage + '\n');
       }
     },
 
     elapsed() {
-      if (timerHandle !== null && !paused) {
-        return pausedElapsed + (Date.now() - startTime);
-      }
-      return elapsedMs;
+      return computeElapsed(state);
     },
   };
 }
