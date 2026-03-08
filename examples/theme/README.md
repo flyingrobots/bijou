@@ -1,4 +1,4 @@
-# `resolveTheme()`
+# `createBijou()` — Theme Presets
 
 Same components in all built-in themes
 

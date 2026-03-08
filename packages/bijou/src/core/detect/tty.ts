@@ -25,18 +25,13 @@ export type OutputMode = 'interactive' | 'static' | 'pipe' | 'accessible';
 /**
  * Detect the appropriate output mode for the current environment.
  *
- * Inspects environment variables and TTY status via the optional
+ * Inspects environment variables and TTY status via the
  * {@link RuntimePort} abstraction.
  *
- * @deprecated The zero-argument form (`detectOutputMode()`) falls back to
- *   `process.env` / `process.stdout`, bypassing hexagonal ports. Prefer
- *   `detectOutputMode(runtime)` with an explicit {@link RuntimePort}, or
- *   use `createBijou()` which handles detection internally.
- *
- * @param runtime - Optional runtime port for environment access.
+ * @param runtime - Runtime port for environment access.
  * @returns The detected {@link OutputMode}.
  */
-export function detectOutputMode(runtime?: RuntimePort): OutputMode {
+export function detectOutputMode(runtime: RuntimePort): OutputMode {
   const env = createEnvAccessor(runtime);
   const stdoutIsTTY = createTTYAccessor(runtime);
 
@@ -67,15 +62,10 @@ export type ColorScheme = 'light' | 'dark';
  * `"default;fg;bg"`). The last segment is treated as the background
  * color index: 0–6 → dark, 7+ → light.
  *
- * @deprecated The zero-argument form (`detectColorScheme()`) falls back to
- *   `process.env`, bypassing hexagonal ports. Prefer
- *   `detectColorScheme(runtime)` with an explicit {@link RuntimePort}, or
- *   use `createBijou()` which handles detection internally.
- *
- * @param runtime - Optional runtime port for environment access. Falls back to `process`.
+ * @param runtime - Runtime port for environment access.
  * @returns The detected {@link ColorScheme}. Defaults to `'dark'`.
  */
-export function detectColorScheme(runtime?: RuntimePort): ColorScheme {
+export function detectColorScheme(runtime: RuntimePort): ColorScheme {
   const env = createEnvAccessor(runtime);
   const raw = env('COLORFGBG');
 

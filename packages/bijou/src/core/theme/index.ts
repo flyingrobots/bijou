@@ -34,9 +34,6 @@ export { lerp3, gradientText } from './gradient.js';
 // Resolver
 export {
   isNoColor,
-  getTheme,
-  resolveTheme,
-  _resetThemeForTesting,
   createThemeResolver,
   createResolved,
 } from './resolve.js';
