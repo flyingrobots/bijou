@@ -191,12 +191,12 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v1.6.0
+## What's New in v1.7.0
 
-- **F-key parsing** — `parseKey()` recognizes F1–F12 (CSI and SS3 encodings) with Shift/Ctrl/Alt modifier support.
-- **Cursor manager** — `setCursorStyle(io, 'bar', { blink: true })` for DECSCUSR cursor shape control (block, underline, bar).
-- **Underline variants** — `TextModifier` now supports `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'` with graceful degradation.
-- **Test audit** — 24 new tests filling coverage gaps across forms, adapters, and DTCG interop.
+- **Multiselect `defaultValues`** — Pre-select items when `multiselect()` first renders in interactive mode. Togglable with Space, cleared on cancel.
+- **Property-based fuzz testing** — fast-check suites for forms (arbitrary strings, control chars, numeric edge cases), environment detection (500+ env×TTY combos), and DTCG theme round-trip.
+- **Expanded adapter tests** — `nodeIO()` write/readFile/setInterval and `chalkStyle()` bgRgb/bgHex/noColor coverage.
+- **Git hooks** — Pre-commit lint + lockfile check, pre-push test suite.
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
