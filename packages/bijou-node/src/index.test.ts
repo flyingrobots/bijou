@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { createNodeContext, initDefaultContext, _resetInitializedForTesting } from './index.js';
-import { getDefaultContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou';
+import { getDefaultContext } from '@flyingrobots/bijou';
+import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 
 describe('createNodeContext()', () => {
   afterEach(() => {

@@ -23,7 +23,6 @@ export type {
 export {
   getDefaultContext,
   setDefaultContext,
-  _resetDefaultContextForTesting,
 } from './context.js';
 
 // Context resolution helpers
@@ -73,7 +72,6 @@ export {
   isNoColor,
   getTheme,
   resolveTheme,
-  _resetThemeForTesting,
   createThemeResolver,
   createResolved,
   type ResolvedTheme,
