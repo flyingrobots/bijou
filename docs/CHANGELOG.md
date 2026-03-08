@@ -23,6 +23,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ♻️ Refactors
 
+- **DRY grid dimension sanitisation (bijou-tui)** — extracted `sanitiseDimension()` helper shared by `gridLayout()` and `grid()`, eliminating duplicate floor/NaN/Infinity clamping.
 - **Remove duplicate `fitBlock` (bijou-tui)** — `app-frame.ts` now imports `fitBlock` from `layout-utils.ts` instead of maintaining a local copy.
 - **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
 - **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.

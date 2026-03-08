@@ -39,15 +39,23 @@ export interface GridLayoutResult {
 }
 
 /**
+ * Floor a numeric dimension and clamp NaN / Infinity to 0.
+ *
+ * @param value - Raw numeric dimension.
+ * @returns Sanitised non-negative integer.
+ */
+function sanitiseDimension(value: number): number {
+  const floored = Math.floor(value);
+  return Number.isFinite(floored) ? Math.max(0, floored) : 0;
+}
+
+/**
  * Compute area rectangles from grid constraints and area template.
  */
 export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<string, LayoutRect> {
-  const rawWidth = Math.floor(options.width);
-  const rawHeight = Math.floor(options.height);
-  const width = Number.isFinite(rawWidth) ? Math.max(0, rawWidth) : 0;
-  const height = Number.isFinite(rawHeight) ? Math.max(0, rawHeight) : 0;
-  const rawGap = Math.floor(options.gap ?? 0);
-  const gap = Number.isFinite(rawGap) ? Math.max(0, rawGap) : 0;
+  const width = sanitiseDimension(options.width);
+  const height = sanitiseDimension(options.height);
+  const gap = sanitiseDimension(options.gap ?? 0);
 
   if (options.columns.length === 0 || options.rows.length === 0) {
     throw new Error('gridLayout: columns and rows must be non-empty');
@@ -125,13 +133,16 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
  * Render a named-area grid.
  */
 export function grid(options: GridOptions): string {
-  // gridLayout() already sanitizes width/height (floor, NaN/Infinity → 0),
-  // so we defer to its normalised values via the solved rects.
-  const width = Math.floor(options.width);
-  const height = Math.floor(options.height);
+  // gridLayout() already floors and clamps width/height/gap (NaN/Infinity → 0),
+  // so we delegate all input validation to it and only derive canvas dimensions
+  // from its sanitised output.
   const rects = gridLayout(options);
 
-  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return '';
+  // Mirror gridLayout()'s sanitisation for the canvas (same expression).
+  const width = sanitiseDimension(options.width);
+  const height = sanitiseDimension(options.height);
+
+  if (width <= 0 || height <= 0) return '';
 
   const background = Array.from({ length: height }, () => ' '.repeat(width)).join('\n');
   const overlays: Overlay[] = [];
