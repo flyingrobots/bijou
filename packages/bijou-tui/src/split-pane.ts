@@ -7,7 +7,7 @@
 
 import type { LayoutRect } from './layout-rect.js';
 import { fitBlock } from './layout-utils.js';
-import { graphemeClusterWidth, graphemeWidth, segmentGraphemes } from '@flyingrobots/bijou';
+import { graphemeClusterWidth, graphemeWidth, segmentGraphemes, type WritePort } from '@flyingrobots/bijou';
 
 /** Split direction. */
 export type SplitPaneDirection = 'row' | 'column';
@@ -56,10 +56,13 @@ export interface SplitPaneOptions {
 
 /**
  * Create split-pane state.
+ *
+ * @param options - Optional initial ratio, focus, and warning output.
+ * @param options.io - Optional `WritePort` for developer warnings. When omitted, warnings are silently skipped.
  */
-export function createSplitPaneState(options?: { ratio?: number; focused?: SplitPaneFocus }): SplitPaneState {
+export function createSplitPaneState(options?: { ratio?: number; focused?: SplitPaneFocus; io?: WritePort }): SplitPaneState {
   if (options?.ratio != null && !Number.isFinite(options.ratio)) {
-    warnInvalidRatio(options.ratio);
+    warnInvalidRatio(options.ratio, options.io);
   }
 
   return {
@@ -210,12 +213,9 @@ function clampRatio(ratio: number): number {
 }
 
 /** Log a dev-mode warning when a non-finite ratio is supplied. */
-function warnInvalidRatio(ratio: number): void {
-  if (typeof process === 'undefined') return;
-  const nodeEnv = process.env?.['NODE_ENV'];
-  if (nodeEnv === 'production' || nodeEnv === 'test') return;
-  console.warn(
-    `[bijou-tui] createSplitPaneState(): received non-finite ratio "${String(ratio)}"; falling back to 0.5.`,
+function warnInvalidRatio(ratio: number, io?: WritePort): void {
+  io?.writeError(
+    `[bijou-tui] createSplitPaneState(): received non-finite ratio "${String(ratio)}"; falling back to 0.5.\n`,
   );
 }
 

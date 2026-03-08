@@ -3,6 +3,8 @@ import type { TimerHandle } from '../../ports/io.js';
 import type { OutputMode } from '../detect/tty.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
+import { CLEAR_LINE_RETURN } from '../ansi.js';
 
 /** Configuration for spinner rendering and behavior. */
 export interface SpinnerOptions {
@@ -79,6 +81,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
   const interval = options.interval ?? 80;
   let label = options.label ?? 'Loading';
   let timer: TimerHandle | null = null;
+  let cursorHandle: CursorHideHandle | null = null;
   let tick = 0;
 
   const mode: OutputMode = ctx.mode;
@@ -86,7 +89,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
   /** Write the current frame to the terminal, overwriting the previous line. */
   function render(): void {
     const line = spinnerFrame(tick, { frames, label, ctx });
-    ctx.io.write(`\r\x1b[K${line}`);
+    ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
     tick++;
   }
 
@@ -96,7 +99,8 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
         ctx.io.write(spinnerFrame(0, { frames, label, ctx }) + '\n');
         return;
       }
-      ctx.io.write('\x1b[?25l');
+      cursorHandle?.dispose();
+      cursorHandle = cursorGuard(ctx.io).hide();
       render();
       timer = ctx.io.setInterval(render, interval);
     },
@@ -111,8 +115,11 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
         timer = null;
       }
       if (mode === 'interactive') {
-        ctx.io.write('\r\x1b[K');
-        ctx.io.write('\x1b[?25h');
+        ctx.io.write(CLEAR_LINE_RETURN);
+        if (cursorHandle !== null) {
+          cursorHandle.dispose();
+          cursorHandle = null;
+        }
       }
       if (finalMessage !== undefined) {
         ctx.io.write(finalMessage + '\n');

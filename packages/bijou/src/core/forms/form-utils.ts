@@ -9,6 +9,8 @@
 
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
+import { cursorGuard, type CursorHideHandle } from '../components/cursor-guard.js';
+import { CLEAR_LINE_RETURN } from '../ansi.js';
 
 /**
  * Format a form title with the `?` prefix and theme-aware styling.
@@ -92,15 +94,21 @@ export interface TerminalRenderer {
  * @returns A renderer with cursor control methods.
  */
 export function terminalRenderer(ctx: BijouContext): TerminalRenderer {
+  let cursorHandle: CursorHideHandle | null = null;
   return {
     hideCursor() {
-      ctx.io.write('\x1b[?25l');
+      if (cursorHandle === null) {
+        cursorHandle = cursorGuard(ctx.io).hide();
+      }
     },
     showCursor() {
-      ctx.io.write('\x1b[?25h');
+      if (cursorHandle !== null) {
+        cursorHandle.dispose();
+        cursorHandle = null;
+      }
     },
     writeLine(text: string) {
-      ctx.io.write(`\r\x1b[K${text}\n`);
+      ctx.io.write(`${CLEAR_LINE_RETURN}${text}\n`);
     },
     moveUp(lines: number) {
       if (lines <= 0) return;
@@ -141,6 +149,46 @@ export function createStyledFn(ctx: BijouContext): (token: TokenValue, text: str
 export function createBoldFn(ctx: BijouContext): (text: string) => string {
   if (ctx.theme.noColor || ctx.mode === 'accessible') return (text: string) => text;
   return (text: string) => ctx.style.bold(text);
+}
+
+/**
+ * Keep a scroll offset so the cursor stays within a visible window.
+ *
+ * First adjusts the offset relative to the cursor position, then
+ * clamps to the absolute bounds `[0, max(0, itemCount - maxVisible)]`.
+ *
+ * @param cursor - Current cursor index.
+ * @param scrollOffset - Current scroll offset.
+ * @param maxVisible - Maximum number of items visible at once.
+ * @param itemCount - Total number of items.
+ * @returns The updated scroll offset.
+ */
+export function clampScroll(cursor: number, scrollOffset: number, maxVisible: number, itemCount: number): number {
+  let offset = scrollOffset;
+  if (cursor < offset) {
+    offset = cursor;
+  } else if (cursor >= offset + maxVisible) {
+    offset = cursor - maxVisible + 1;
+  }
+  return Math.max(0, Math.min(offset, Math.max(0, itemCount - maxVisible)));
+}
+
+/**
+ * Handle up/down (arrow key or j/k) navigation in a wrapping list.
+ *
+ * @param key - The keypress string.
+ * @param cursor - Current cursor index.
+ * @param length - Total number of items.
+ * @returns The new cursor index, or `null` if the key was not a vertical nav key.
+ */
+export function handleVerticalNav(key: string, cursor: number, length: number): number | null {
+  if (key === '\x1b[A' || key === 'k') {
+    return (cursor - 1 + length) % length;
+  }
+  if (key === '\x1b[B' || key === 'j') {
+    return (cursor + 1) % length;
+  }
+  return null;
 }
 
 /**

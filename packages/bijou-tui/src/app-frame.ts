@@ -49,6 +49,29 @@ import {
 } from './focus-area.js';
 import { splitPane, splitPaneLayout, type SplitPaneDirection, type SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
+import {
+  createPanelVisibilityState,
+  createPanelMaximizeState,
+  toggleMinimized,
+  restorePane,
+  isMinimized,
+  toggleMaximize,
+  type PanelVisibilityState,
+  type PanelMaximizeState,
+} from './panel-state.js';
+import {
+  createPanelDockState,
+  movePaneInContainer,
+  resolveChildOrder,
+  findPaneContainer,
+  getNodeId,
+  type PanelDockState,
+  type DockDirection,
+} from './panel-dock.js';
+import {
+  restoreLayoutState,
+  type SerializedLayoutState,
+} from './layout-preset.js';
 import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
 import { EASINGS } from './spring.js';
 import { timeline, type Timeline, type TimelineState } from './timeline.js';
@@ -171,6 +194,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
    * ```
    */
   readonly transitionTimeline?: Timeline;
+  /** Optional initial layout state to restore on startup. */
+  readonly initialLayout?: SerializedLayoutState;
 }
 
 /** Stored pane scroll coordinates. */
@@ -215,6 +240,14 @@ export interface FrameModel<PageModel> {
   readonly transitionTimeline?: Timeline;
   /** Timeline state for the active transition. */
   readonly transitionTimelineState?: TimelineState;
+  /** Per-page panel visibility (minimize/fold) state. */
+  readonly minimizedByPage: Readonly<Record<string, PanelVisibilityState>>;
+  /** Per-page maximized pane state. */
+  readonly maximizedPaneByPage: Readonly<Record<string, PanelMaximizeState>>;
+  /** Per-page dock order state. */
+  readonly dockStateByPage: Readonly<Record<string, PanelDockState>>;
+  /** Per-page split ratio overrides (from layout presets/session restore). */
+  readonly splitRatioOverrides: Readonly<Record<string, Readonly<Record<string, number>>>>;
 }
 
 /** Internal model extending the public FrameModel with palette entries. */
@@ -237,6 +270,8 @@ interface RenderContext<PageModel, Msg> {
   readonly pageId: string;
   readonly focusedPaneId: string | undefined;
   readonly scrollByPane: Readonly<Record<string, FramePaneScroll>>;
+  readonly visibility: PanelVisibilityState;
+  readonly dockState: PanelDockState;
 }
 
 /** Output of a layout node render pass. */
@@ -262,6 +297,12 @@ type FrameAction =
   | { type: 'scroll-left' }
   | { type: 'scroll-right' }
   | { type: 'open-palette' }
+  | { type: 'toggle-minimize' }
+  | { type: 'toggle-maximize' }
+  | { type: 'dock-up' }
+  | { type: 'dock-down' }
+  | { type: 'dock-left' }
+  | { type: 'dock-right' }
   | { type: 'transition'; progress: number; generation: number }
   | { type: 'transition-complete'; generation: number };
 
@@ -346,10 +387,28 @@ export function createFramedApp<PageModel, Msg>(
         helpOpen: false,
         transitionProgress: 1,
         transitionGeneration: 0,
+        minimizedByPage: {},
+        maximizedPaneByPage: {},
+        dockStateByPage: {},
+        splitRatioOverrides: {},
       };
 
       for (const pageId of pageOrder) {
         model = syncPageFrameState(model, pageId, pagesById);
+      }
+
+      // Apply initial layout if provided
+      if (options.initialLayout) {
+        const restored = restoreLayoutState(options.initialLayout);
+        model = {
+          ...model,
+          activePageId: pagesById.has(restored.activePageId) ? restored.activePageId : model.activePageId,
+          focusedPaneByPage: { ...model.focusedPaneByPage, ...restored.focusedPaneByPage },
+          minimizedByPage: restored.minimizedByPage,
+          maximizedPaneByPage: restored.maximizedPaneByPage,
+          dockStateByPage: restored.dockStateByPage,
+          splitRatioOverrides: restored.splitRatiosByPage,
+        };
       }
 
       return [model, initCmds];
@@ -470,7 +529,13 @@ export function createFramedApp<PageModel, Msg>(
       const helpLine = renderHelpLine(model, frameKeys, options, activePage);
       const bodyRect = frameBodyRect(model.columns, model.rows);
 
-      const activeResult = renderPageContent(model.activePageId, model, bodyRect, pagesById);
+      // Check for maximized pane — if set, render only that pane at full body rect
+      const maxState = model.maximizedPaneByPage[model.activePageId];
+      const maximizedPaneId = maxState?.maximizedPaneId;
+
+      const activeResult = maximizedPaneId
+        ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+        : renderPageContent(model.activePageId, model, bodyRect, pagesById);
       let bodyOutput = activeResult.output;
 
       const activeTransition = model.activeTransition ?? options.transition;
@@ -633,6 +698,17 @@ function applyFrameAction<PageModel, Msg>(
     case 'open-palette':
       if (!options.enableCommandPalette) return [model, []];
       return [openCommandPalette(model, frameKeys, options, pagesById), []];
+    case 'toggle-minimize':
+      return [applyToggleMinimize(model, pagesById), []];
+    case 'toggle-maximize':
+      return [applyToggleMaximize(model, pagesById), []];
+    case 'dock-up':
+    case 'dock-down':
+    case 'dock-left':
+    case 'dock-right': {
+      const dir = action.type.replace('dock-', '') as DockDirection;
+      return [applyDockMove(model, dir, pagesById), []];
+    }
     case 'scroll-up':
     case 'scroll-down':
     case 'page-up':
@@ -754,6 +830,8 @@ function scrollFocusedPane<PageModel, Msg>(
     pageId,
     focusedPaneId,
     scrollByPane: model.scrollByPage[pageId] ?? {},
+    visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
+    dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
   });
   const paneRect = resolved.paneRects.get(focusedPaneId);
   if (paneRect == null || paneRect.width <= 0 || paneRect.height <= 0) return model;
@@ -960,6 +1038,17 @@ function renderFrameNode<PageModel, Msg>(
   }
 
   if (node.kind === 'pane') {
+    // Minimized pane: render as collapsed title bar
+    if (isMinimized(ctx.visibility, node.paneId)) {
+      const titleBar = `[${node.paneId}] \u25b8`; // ▸
+      const output = fitBlock(titleBar, rect.width, rect.height).join('\n');
+      return {
+        output,
+        paneRects: new Map([[node.paneId, rect]]),
+        paneOrder: [node.paneId],
+      };
+    }
+
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
     const content = node.render(rect.width, rect.height);
     let state = createFocusAreaState({
@@ -980,7 +1069,38 @@ function renderFrameNode<PageModel, Msg>(
 
   if (node.kind === 'split') {
     const direction = node.direction ?? 'row';
-    const layout = splitPaneLayout(node.state, {
+
+    // Consult dock state for child order
+    const defaultChildIds = [getNodeId(node.paneA), getNodeId(node.paneB)];
+    const resolvedOrder = resolveChildOrder(ctx.dockState, node.splitId, defaultChildIds);
+    const swapped = resolvedOrder[0] !== defaultChildIds[0];
+    const effectiveA = swapped ? node.paneB : node.paneA;
+    const effectiveB = swapped ? node.paneA : node.paneB;
+
+    // Check for minimized panes — give minimized pane 1 row, sibling gets rest
+    const aMinimized = isPaneMinimized(effectiveA, ctx.visibility);
+    const bMinimized = isPaneMinimized(effectiveB, ctx.visibility);
+
+    let splitState = node.state;
+    // Apply split ratio overrides from layout presets
+    const ratioOverride = ctx.model.splitRatioOverrides[ctx.pageId]?.[node.splitId];
+    if (ratioOverride !== undefined) {
+      splitState = { ...splitState, ratio: ratioOverride };
+    }
+
+    if (aMinimized && !bMinimized) {
+      // A is minimized: give it minimal space
+      const mainAxisTotal = direction === 'row' ? rect.width : rect.height;
+      const minimizedSize = Math.min(1, mainAxisTotal);
+      splitState = { ...splitState, ratio: minimizedSize / Math.max(1, mainAxisTotal) };
+    } else if (bMinimized && !aMinimized) {
+      // B is minimized: give A most of the space
+      const mainAxisTotal = direction === 'row' ? rect.width : rect.height;
+      const minimizedSize = Math.min(1, mainAxisTotal);
+      splitState = { ...splitState, ratio: 1 - minimizedSize / Math.max(1, mainAxisTotal) };
+    }
+
+    const layout = splitPaneLayout(splitState, {
       direction,
       width: rect.width,
       height: rect.height,
@@ -991,10 +1111,10 @@ function renderFrameNode<PageModel, Msg>(
     const aRect = offsetRect(layout.paneA, rect.row, rect.col);
     const bRect = offsetRect(layout.paneB, rect.row, rect.col);
 
-    const a = renderFrameNode(node.paneA, aRect, ctx);
-    const b = renderFrameNode(node.paneB, bRect, ctx);
+    const a = renderFrameNode(effectiveA, aRect, ctx);
+    const b = renderFrameNode(effectiveB, bRect, ctx);
 
-    const output = splitPane(node.state, {
+    const output = splitPane(splitState, {
       direction,
       width: rect.width,
       height: rect.height,
@@ -1026,8 +1146,8 @@ function renderFrameNode<PageModel, Msg>(
     const absoluteAreaRect = offsetRect(areaRect, rect.row, rect.col);
     const child = node.cells[areaName];
     if (child == null) {
-      console.warn(
-        `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder`,
+      resolveSafeCtx()?.io.writeError(
+        `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
       renderedByArea.set(areaName, renderMissingGridCell(areaName, absoluteAreaRect));
       continue;
@@ -1112,6 +1232,120 @@ function assertUniquePaneIds(paneIds: readonly string[], scope: string): void {
   }
 }
 
+/** Toggle minimize on the focused pane of the active page. */
+function applyToggleMinimize<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): InternalFrameModel<PageModel, Msg> {
+  const pageId = model.activePageId;
+  const focusedPaneId = model.focusedPaneByPage[pageId];
+  if (focusedPaneId == null) return model;
+
+  const page = pagesById.get(pageId)!;
+  const allPaneIds = collectPaneIds(page.layout(model.pageModels[pageId]!));
+  const current = model.minimizedByPage[pageId] ?? createPanelVisibilityState();
+  const next = toggleMinimized(current, focusedPaneId, allPaneIds);
+
+  // If we just minimized the focused pane, move focus to a non-minimized sibling
+  let newFocused = focusedPaneId;
+  if (isMinimized(next, focusedPaneId)) {
+    const visible = allPaneIds.filter((id) => !isMinimized(next, id));
+    newFocused = visible[0] ?? focusedPaneId;
+  }
+
+  return {
+    ...model,
+    minimizedByPage: { ...model.minimizedByPage, [pageId]: next },
+    focusedPaneByPage: { ...model.focusedPaneByPage, [pageId]: newFocused },
+  };
+}
+
+/** Toggle maximize on the focused pane of the active page. */
+function applyToggleMaximize<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  _pagesById: Map<string, FramePage<PageModel, Msg>>,
+): InternalFrameModel<PageModel, Msg> {
+  const pageId = model.activePageId;
+  const focusedPaneId = model.focusedPaneByPage[pageId];
+  if (focusedPaneId == null) return model;
+
+  const current = model.maximizedPaneByPage[pageId] ?? createPanelMaximizeState();
+  const next = toggleMaximize(current, focusedPaneId);
+
+  // If maximizing a minimized pane, restore it first
+  let visibility = model.minimizedByPage[pageId] ?? createPanelVisibilityState();
+  if (next.maximizedPaneId && isMinimized(visibility, next.maximizedPaneId)) {
+    visibility = restorePane(visibility, next.maximizedPaneId);
+  }
+
+  return {
+    ...model,
+    maximizedPaneByPage: { ...model.maximizedPaneByPage, [pageId]: next },
+    minimizedByPage: { ...model.minimizedByPage, [pageId]: visibility },
+  };
+}
+
+/** Move the focused pane within its container in the given direction. */
+function applyDockMove<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  direction: DockDirection,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): InternalFrameModel<PageModel, Msg> {
+  const pageId = model.activePageId;
+  const focusedPaneId = model.focusedPaneByPage[pageId];
+  if (focusedPaneId == null) return model;
+
+  const page = pagesById.get(pageId)!;
+  const layoutTree = page.layout(model.pageModels[pageId]!);
+  const container = findPaneContainer(layoutTree, focusedPaneId);
+  if (container == null) return model;
+
+  const dockState = model.dockStateByPage[pageId] ?? createPanelDockState();
+  const currentOrder = resolveChildOrder(dockState, container.containerId, container.childIds);
+  const next = movePaneInContainer(dockState, container.containerId, focusedPaneId, direction, currentOrder);
+
+  return {
+    ...model,
+    dockStateByPage: { ...model.dockStateByPage, [pageId]: next },
+  };
+}
+
+/** Render only the maximized pane at the full body rect. */
+function renderMaximizedPane<PageModel, Msg>(
+  pageId: string,
+  model: InternalFrameModel<PageModel, Msg>,
+  bodyRect: LayoutRect,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+  maximizedPaneId: string,
+): RenderResult {
+  const page = pagesById.get(pageId)!;
+  const pageModel = model.pageModels[pageId]!;
+  const layoutTree = page.layout(pageModel);
+  const paneNode = findPaneNode(layoutTree, maximizedPaneId);
+  if (paneNode == null) {
+    // Pane not found, fall back to normal rendering
+    return renderPageContent(pageId, model, bodyRect, pagesById);
+  }
+
+  const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
+  const content = paneNode.render(bodyRect.width, bodyRect.height);
+  let state = createFocusAreaState({
+    content,
+    width: bodyRect.width,
+    height: bodyRect.height,
+    overflowX: paneNode.overflowX ?? 'hidden',
+  });
+  state = focusAreaScrollTo(state, prior.y);
+  state = focusAreaScrollToX(state, prior.x);
+  const output = focusArea(state, { focused: true });
+
+  return {
+    output,
+    paneRects: new Map([[maximizedPaneId, bodyRect]]),
+    paneOrder: [maximizedPaneId],
+  };
+}
+
 /** Walk the layout tree to find the pane node with the given ID. */
 function findPaneNode(node: FrameLayoutNode, paneId: string): Extract<FrameLayoutNode, { kind: 'pane' }> | undefined {
   if (node.kind === 'pane') return node.paneId === paneId ? node : undefined;
@@ -1133,7 +1367,15 @@ function createFrameKeyMap(): KeyMap<FrameAction> {
       .bind('tab', 'Next pane', { type: 'next-pane' })
       .bind('shift+tab', 'Previous pane', { type: 'prev-pane' })
       .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
-      .bind(':', 'Open command palette', { type: 'open-palette' }),
+      .bind(':', 'Open command palette', { type: 'open-palette' })
+      .bind('ctrl+m', 'Fold/unfold pane', { type: 'toggle-minimize' })
+      .bind('ctrl+f', 'Full-screen pane', { type: 'toggle-maximize' }),
+    )
+    .group('Dock', (g) => g
+      .bind('ctrl+shift+up', 'Move pane up', { type: 'dock-up' })
+      .bind('ctrl+shift+down', 'Move pane down', { type: 'dock-down' })
+      .bind('ctrl+shift+left', 'Move pane left', { type: 'dock-left' })
+      .bind('ctrl+shift+right', 'Move pane right', { type: 'dock-right' }),
     )
     .group('Scroll', (g) => g
       .bind('j', 'Scroll down', { type: 'scroll-down' })
@@ -1218,6 +1460,15 @@ function frameBodyRect(columns: number, rows: number): LayoutRect {
 function fitLine(line: string, width: number): string {
   const clipped = clipToWidth(line, Math.max(0, width));
   return clipped + ' '.repeat(Math.max(0, width - visibleLength(clipped)));
+}
+
+
+/** Check if a layout node (or its first descendant pane) is minimized. */
+function isPaneMinimized(node: FrameLayoutNode, visibility: PanelVisibilityState): boolean {
+  if (node.kind === 'pane') return isMinimized(visibility, node.paneId);
+  // For containers, check if all descendant panes are minimized
+  const paneIds = collectPaneIds(node);
+  return paneIds.length > 0 && paneIds.every((id) => isMinimized(visibility, id));
 }
 
 /** Merge two read-only maps into a new mutable map. */
@@ -1349,6 +1600,8 @@ function renderPageContent<PageModel, Msg>(
     pageId,
     focusedPaneId: model.focusedPaneByPage[pageId],
     scrollByPane: model.scrollByPage[pageId] ?? {},
+    visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
+    dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
   };
   return renderFrameNode(page.layout(pageModel), bodyRect, renderCtx);
 }

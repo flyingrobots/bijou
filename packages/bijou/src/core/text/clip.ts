@@ -5,14 +5,7 @@
  * Won't split multi-codepoint grapheme clusters (emoji, CJK, ZWJ sequences).
  */
 
-import { segmentGraphemes, graphemeClusterWidth } from './grapheme.js';
-
-/**
- * Pattern matching ANSI SGR escape sequences (e.g. `\x1b[31m`).
- *
- * Used to strip style escapes before measuring visible width.
- */
-const ANSI_RE = new RegExp('\x1b\\[[0-9;]*m', 'g');
+import { segmentGraphemes, graphemeClusterWidth, ANSI_SGR_RE } from './grapheme.js';
 
 /**
  * Clip a string to a maximum visible width, preserving ANSI escapes.
@@ -30,7 +23,7 @@ const ANSI_RE = new RegExp('\x1b\\[[0-9;]*m', 'g');
 export function clipToWidth(str: string, maxWidth: number): string {
   if (maxWidth <= 0) return '';
 
-  const stripped = str.replace(ANSI_RE, '');
+  const stripped = str.replace(new RegExp(ANSI_SGR_RE, 'g'), '');
   const graphemes = segmentGraphemes(stripped);
 
   let result = '';

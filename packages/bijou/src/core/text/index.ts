@@ -11,6 +11,8 @@ export {
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  ANSI_SGR_RE,
+  stripAnsi,
 } from './grapheme.js';
 
 export { clipToWidth } from './clip.js';

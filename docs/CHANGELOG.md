@@ -6,6 +6,84 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Bug Fixes
+
+- **Timer `onComplete` fires before cursor restore** — `onComplete` callback now runs after interval disposal and cursor restoration, so user code in the callback sees a clean terminal state.
+
+### 🔧 Internal
+
+- **Timer state machine refactor (bijou)** — Replaced 6 loose mutable variables in `createLiveController` with a discriminated union (`TimerState`), making invalid states unrepresentable. Zero API or behavioral changes; all 29 timer tests pass unmodified.
+- **pre-push hook pipefail safety** — `git rev-list` failures in the commit pacing check now fall back to `count=0` instead of aborting the hook under `set -euo pipefail`.
+- **reply-to-reviews.sh uses GraphQL for thread resolution** — Replaced REST-based heuristic ("has human reply = resolved") with GraphQL `reviewThreads.isResolved` for accurate unresolved thread detection.
+
+## [1.8.0] - 2026-03-08
+
+### ✨ Features
+
+- **Custom fill characters (bijou)** — `box()` and `headerBox()` accept `fillChar` option for custom padding/fill characters. Validates single-width graphemes; wide characters fall back to space.
+- **`constrain()` component (bijou)** — New `constrain(content, { maxWidth?, maxHeight?, ellipsis? })` for content truncation with configurable ellipsis. Passthrough in pipe/accessible modes.
+- **Note field (bijou)** — New `note({ message, title? })` display-only form field. Interactive: info icon + bold title + muted message with left accent line. Compatible with `group()`/`wizard()`.
+- **Timer / Stopwatch (bijou)** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` elapsed-time controllers with start/pause/resume/stop.
+- **Dynamic wizard forms (bijou)** — `WizardStep` gains `transform` (replace field function dynamically) and `branch` (splice in additional steps after value collection) options.
+- **`cursorGuard()` + `withHiddenCursor()` (bijou)** — Reference-counted cursor visibility guard. Multiple components (spinner, progress, timer, forms) sharing the same IOPort now coordinate hide/show automatically — nesting a spinner inside a progress bar no longer prematurely restores the cursor. `withHiddenCursor(io, fn)` provides try/finally sugar for one-shot use cases.
+- **Panel minimize/fold/unfold (bijou-tui)** — Per-pane collapsed state with `ctrl+m` toggle. Minimized panes collapse to title bar; sibling gets remaining space. Cannot minimize last visible pane.
+- **Panel maximize/restore (bijou-tui)** — `ctrl+f` promotes focused pane to full-area view. Per-page state. Maximizing a minimized pane restores it first.
+- **Dockable panel manager (bijou-tui)** — `ctrl+shift+arrow` reorders panes within split/grid containers. Pure state reducers with `movePaneInContainer` and `resolveChildOrder`.
+- **Layout presets + session restore (bijou-tui)** — `serializeLayoutState()` / `restoreLayoutState()` for JSON-friendly workspace persistence. Preset helpers: `presetSideBySide`, `presetStacked`, `presetFocused`. `initialLayout` option on `createFramedApp`.
+
+### 🐛 Bug Fixes
+
+- **`timer()` negative ms with `showMs`** — `formatTime()` now clamps the entire input to `>= 0` before extracting millis, fixing invalid output like `00:00.-500`.
+- **`constrain()` ANSI-safe truncation detection** — Width comparison now uses `graphemeWidth()` instead of raw string length, preventing false-positive ellipsis on ANSI-styled input.
+- **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
+- **Timer double-start leaks interval handle** — `start()` now disposes any existing timer before creating a new one.
+- **Timer `elapsed()` returns stale value** — `elapsed()` now computes on the fly when the timer is running, instead of returning a value only updated on tick.
+- **Timer `pause()` snapshots stale elapsed** — `pause()` now uses `Date.now() - startTime` instead of the tick-updated `elapsedMs`.
+- **Timer `stop()` loses sub-tick elapsed time** — `stop()` now snapshots `elapsedMs` before disposing the interval, so `elapsed()` returns an accurate value after stopping.
+- **Timer `start()` while paused stays frozen** — `start()` now resets the `paused` flag, preventing a re-started timer from remaining frozen.
+- **Timer `stop()` after `pause()` loses paused elapsed** — `stop()` now snapshots `pausedElapsed` into `elapsedMs` when stopped while paused.
+- **`constrain()` height ellipsis ignores width constraint** — Height-truncation ellipsis now respects `maxWidth` when both constraints are active.
+- **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
+
+### ⚠️ Deprecations
+
+- **`detectOutputMode()`, `detectColorScheme()`, `isNoColor()` no-arg forms** — These fall back to `process.env` / `process.stdout`, bypassing hexagonal ports. Pass an explicit `RuntimePort` or use `createBijou()`.
+- **`getTheme()`, `resolveTheme()` freestanding functions** — Rely on the global default resolver that falls back to `process.env`. Use `createBijou()` or `createThemeResolver({ runtime })`.
+- **`styled()`, `styledStatus()` freestanding functions** — Reach for the global default context singleton, violating dependency inversion. Use `ctx.style.styled(token, text)` and `ctx.semantic(status)` instead.
+
+### ♻️ Refactors
+
+- **Deduplicate cursor constants (bijou-tui)** — `HIDE_CURSOR` and `SHOW_CURSOR` in `screen.ts` now re-export from `@flyingrobots/bijou` instead of defining local copies.
+- **Test-only exports moved to `@flyingrobots/bijou/adapters/test`** — `_resetDefaultContextForTesting` and `_resetThemeForTesting` removed from the main barrel; available via the dedicated test entry point.
+- **Shared env/TTY accessors** — Extracted `createEnvAccessor()` and `createTTYAccessor()` into `ports/env.ts`, replacing duplicated `envAccessor()` / `process.env` fallback logic in `tty.ts` and `resolve.ts`.
+- **Cursor lifecycle via `CursorGuard`** — Spinner, progress bar, timer, and form `terminalRenderer` now use `cursorGuard()` instead of raw ANSI writes, eliminating duplicated `\x1b[?25l`/`\x1b[?25h` sequences and fixing nesting correctness.
+- **Timer/stopwatch shared controller** — Extracted `createLiveController()` to deduplicate ~60 lines of identical start/pause/resume/stop logic between `createTimer()` and `createStopwatch()`.
+- **`getNodeId()` deduplication (bijou-tui)** — Exported `getNodeId()` from `panel-dock.ts` and removed the duplicate `getLayoutNodeId()` from `app-frame.ts`.
+- **`serializeLayoutState` reads model defaults** — Now falls back to `model.minimizedByPage` / `maximizedPaneByPage` / `dockStateByPage` / `splitRatioOverrides` when `perPage` is omitted, so callers don't need to pass redundant state.
+- **DRY: shared ANSI constants** — Extracted `ANSI_SGR_RE`, `stripAnsi()`, `CLEAR_LINE_RETURN`, `HIDE_CURSOR`, `SHOW_CURSOR` into shared modules (`core/text/grapheme.ts`, `core/ansi.ts`). Replaced 4 inline ANSI strip regexes and ~12 raw `'\r\x1b[K'` sequences across spinner, progress, timer, and form components.
+- **DRY: form scroll/navigation** — Extracted `clampScroll()` and `handleVerticalNav()` into `form-utils.ts`, deduplicating identical implementations in `select.ts` and `multiselect.ts`.
+- **`WritePort.writeError` now required** — Removed optional `?` from `WritePort.writeError`. All adapters already provided it; this eliminates nil-checks at callsites.
+- **`console.warn` removed from bijou-tui** — `app-frame.ts` grid-cell warning now routes through `writeError()`. `split-pane.ts` `warnInvalidRatio` accepts an optional `WritePort` instead of sniffing `process.env`.
+- **`ANSI_SGR_RE` shared regex safety** — Removed `/g` flag from the exported constant to prevent `lastIndex` bugs. Callsites create fresh regex instances for replacement.
+- **`constrain()` explicit `maxWidth=0` guard** — Returns empty string immediately instead of relying on `clipToWidth` coincidence.
+- **Wizard max iteration guard** — `wizard()` throws after 1000 steps to prevent infinite `branch` recursion loops.
+
+### 📦 Maintenance
+
+- **bijou-tui-app dependency alignment** — Updated `@flyingrobots/bijou` and `@flyingrobots/bijou-tui` deps from `1.7.0` to `1.8.0`; engine constraint from `>=20` to `>=18` for consistency.
+
+### 🔧 Infrastructure
+
+- **Commit pacing hook** — `pre-push` warns when pushing >10 commits (configurable via `BIJOU_PUSH_COMMIT_LIMIT`).
+- **PR reply script** — `scripts/reply-to-reviews.sh` for replying to CodeRabbit review threads (interactive + batch modes).
+- **Code smell journal** — Populated `.claude/bad_code.md` with 7 findings (process.env bypasses, duplicated envAccessor, _reset exports, app-frame.ts size, engine version inconsistency).
+- **Dependency audit** — 0 CVEs, all MIT, all maintained.
+- **pre-push hook** — Removed squashing suggestion from commit pacing warning (repo forbids squashing).
+
+### 🧪 Tests
+
+- 109 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (23), dynamic wizard (16), panel-state (11), panel-dock (14), layout-preset (7), env accessors (5), cursor-guard (3), form-utils (1), ANSI regex (2).
+
 ## [1.7.0] - 2026-03-08
 
 ### ✨ Features
@@ -733,7 +811,9 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/flyingrobots/bijou/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/flyingrobots/bijou/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/flyingrobots/bijou/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/flyingrobots/bijou/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/flyingrobots/bijou/compare/v1.3.0...v1.4.0

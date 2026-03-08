@@ -102,6 +102,7 @@ describe('terminalRenderer', () => {
   it('showCursor writes show sequence', () => {
     const ctx = createTestContext();
     const term = terminalRenderer(ctx);
+    term.hideCursor();
     term.showCursor();
     expectShownCursor(allWritten(ctx));
   });

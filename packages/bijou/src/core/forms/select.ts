@@ -1,7 +1,7 @@
 import type { SelectFieldOptions, SelectOption } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn } from './form-utils.js';
+import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn, clampScroll, handleVerticalNav } from './form-utils.js';
 
 /**
  * Options for the single-select field.
@@ -87,16 +87,6 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   let cursor = 0;
   let scrollOffset = 0;
 
-  /** Keep the scroll offset so the cursor stays within the visible window. */
-  function clampScroll(): void {
-    if (cursor < scrollOffset) {
-      scrollOffset = cursor;
-    } else if (cursor >= scrollOffset + maxVisible) {
-      scrollOffset = cursor - maxVisible + 1;
-    }
-    scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, options.options.length - maxVisible)));
-  }
-
   /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
     return options.options.slice(scrollOffset, scrollOffset + maxVisible);
@@ -149,13 +139,10 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
 
   return new Promise<T>((resolve) => {
     const handle = ctx.io.rawInput((key: string) => {
-      if (key === '\x1b[A' || key === 'k') {
-        cursor = (cursor - 1 + options.options.length) % options.options.length;
-        clampScroll();
-        clearRender(); render();
-      } else if (key === '\x1b[B' || key === 'j') {
-        cursor = (cursor + 1) % options.options.length;
-        clampScroll();
+      const next = handleVerticalNav(key, cursor, options.options.length);
+      if (next !== null) {
+        cursor = next;
+        scrollOffset = clampScroll(cursor, scrollOffset, maxVisible, options.options.length);
         clearRender(); render();
       } else if (key === '\r' || key === '\n') {
         handle.dispose(); cleanup(); resolve(options.options[cursor]!.value);

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou';
+import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { setDefaultContext } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';

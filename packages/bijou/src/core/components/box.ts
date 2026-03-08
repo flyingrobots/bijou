@@ -16,6 +16,12 @@ export interface BoxOptions {
   padding?: { top?: number; bottom?: number; left?: number; right?: number };
   /** Lock outer width (including borders). Content is clipped/padded to fit. */
   width?: number;
+  /**
+   * Custom character used for padding/fill areas instead of spaces.
+   * Must be a single-width grapheme cluster. Wide characters (e.g. CJK)
+   * are rejected and fall back to space.
+   */
+  fillChar?: string;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -35,6 +41,7 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * @param padding - Resolved padding values (top, bottom, left, right).
  * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
  * @param bgFill - Optional function to wrap interior content with background color styling.
+ * @param fillChar - Single-width character for padding areas (defaults to space).
  * @returns The rendered box as a multiline string.
  */
 function drawBox(
@@ -43,6 +50,7 @@ function drawBox(
   padding: { top: number; bottom: number; left: number; right: number },
   fixedWidth?: number,
   bgFill?: (s: string) => string,
+  fillChar: string = ' ',
 ): string {
   const contentLines = content.split('\n');
 
@@ -71,15 +79,15 @@ function drawBox(
       processed = clipToWidth(line, contentWidth);
     }
     const processedVisible = graphemeWidth(processed);
-    const leftPad = ' '.repeat(effectiveLeft);
-    const rightPad = ' '.repeat(effectiveRight + Math.max(0, contentWidth - processedVisible));
+    const leftPad = fillChar.repeat(effectiveLeft);
+    const rightPad = fillChar.repeat(effectiveRight + Math.max(0, contentWidth - processedVisible));
     return leftPad + processed + rightPad;
   };
 
   const fill = bgFill ?? ((s: string) => s);
   const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth) + BORDER.tr);
   const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth) + BORDER.br);
-  const emptyLine = borderColor(BORDER.v) + fill(' '.repeat(innerWidth)) + borderColor(BORDER.v);
+  const emptyLine = borderColor(BORDER.v) + fill(fillChar.repeat(innerWidth)) + borderColor(BORDER.v);
 
   const lines: string[] = [top];
   for (let i = 0; i < padding.top; i++) lines.push(emptyLine);
@@ -121,8 +129,9 @@ export function box(content: string, options: BoxOptions = {}): string {
 
       const colorize = (s: string): string => ctx.style.styled(borderToken, s);
       const bgFill = makeBgFill(options.bgToken, ctx);
+      const resolvedFill = resolveFillChar(options.fillChar);
 
-      return drawBox(safeContent, colorize, padding, options.width, bgFill);
+      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill);
     },
   }, options);
 }
@@ -167,4 +176,16 @@ export function headerBox(label: string, options: HeaderBoxOptions = {}): string
       return box(content, options);
     },
   }, options);
+}
+
+/**
+ * Validate and resolve a fill character option.
+ *
+ * Returns the character if it is a single-width grapheme cluster,
+ * otherwise falls back to a space.
+ */
+function resolveFillChar(fillChar: string | undefined): string {
+  if (fillChar == null || fillChar.length === 0) return ' ';
+  if (graphemeWidth(fillChar) !== 1) return ' ';
+  return fillChar;
 }

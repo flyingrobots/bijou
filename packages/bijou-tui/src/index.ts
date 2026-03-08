@@ -96,6 +96,42 @@ export {
   createFramedApp,
 } from './app-frame.js';
 
+// Panel state (minimize/maximize)
+export {
+  type PanelVisibilityState,
+  type PanelMaximizeState,
+  createPanelVisibilityState,
+  createPanelMaximizeState,
+  toggleMinimized,
+  minimizePane,
+  restorePane,
+  isMinimized,
+  toggleMaximize,
+} from './panel-state.js';
+
+// Panel dock (reorder panes)
+export {
+  type DockDirection,
+  type PanelDockState,
+  createPanelDockState,
+  movePaneInContainer,
+  resolveChildOrder,
+  findPaneContainer,
+  getNodeId,
+} from './panel-dock.js';
+
+// Layout presets + session restore
+export {
+  type SerializedPageLayout,
+  type SerializedLayoutState,
+  type LayoutPreset,
+  serializeLayoutState,
+  restoreLayoutState,
+  presetSideBySide,
+  presetStacked,
+  presetFocused,
+} from './layout-preset.js';
+
 // Transition shaders
 export {
   type TransitionCell,

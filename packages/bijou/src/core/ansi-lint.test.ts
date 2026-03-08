@@ -23,16 +23,13 @@ import { join, relative } from 'node:path';
  * Each entry should have a brief justification comment.
  */
 const ALLOWED = new Set([
+  'core/ansi.ts',                    // shared ANSI constants (CLEAR_LINE_RETURN, HIDE/SHOW_CURSOR)
   'core/forms/form-utils.ts',       // terminalRenderer cursor control
   'core/forms/select.ts',           // \x1b[K line-clear + key matching
   'core/forms/multiselect.ts',      // \x1b[K line-clear + key matching
   'core/forms/filter-interactive.ts', // \x1b[K line-clear + key matching
   'core/forms/textarea-editor.ts',  // \x1b[K line-clear + key/arrow matching
-  'core/components/progress.ts',    // cursor control
-  'core/components/spinner.ts',     // cursor control
   'core/components/hyperlink.ts',   // OSC 8 sequences
-  'core/components/table.ts',       // ANSI strip regex
-  'core/components/dag-render.ts',  // ANSI strip regex
   'core/text/clip.ts',              // ANSI-aware text clipping
   'core/text/grapheme.ts',          // ANSI strip for width measurement
   'adapters/test/assertions.ts',    // assertion helpers reference ANSI patterns

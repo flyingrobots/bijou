@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.7.0** — Test Fortress
+Latest: **v1.8.0** — The Big One
 
 ---
 
@@ -12,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v1.8.0 | The Big One | Custom fill chars, constrain, note, timer, dynamic forms, panel minimize/maximize/dock, layout presets |
 | v1.7.0 | Test Fortress | Deep audit, multiselect defaultValues, nodeIO/chalkStyle tests, fast-check fuzz suites |
 | v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
 | v1.5.0 | Polish & Patterns | Mode rendering (OCP), test hardening, theme accessors (DIP), style pass (bg support for 7 components) |
@@ -44,15 +45,15 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| **Timer / Stopwatch** | bijou | Countdown and elapsed-time display components. |
-| **MaxWidth / MaxHeight** | bijou | Truncation constraints on styled blocks. |
-| **Dynamic forms** | bijou | Fields that change based on previous input values. |
-| **Custom fill chars** | bijou | Custom characters for padding/margin areas. |
-| **Note field** | bijou | Display-only text within a form flow. |
-| **Dockable panel manager (drag + keyboard move)** | bijou-tui | Reorder and dock panes in `splitPane()`/`grid()` layouts via mouse drag (when enabled) plus keyboard fallback. Persist layout map in app state. In-process only (no cross-terminal pop-out). |
-| **Panel minimize/fold/unfold** | bijou-tui | Per-pane collapsed state for `splitPane()`/`grid()` layouts with restore shortcuts and optional animated collapse/expand in interactive mode. |
-| **Panel maximize/restore** | bijou-tui | Promote active pane to temporary full-area view, then restore prior split/grid layout in one action. |
-| **Layout presets + session restore** | bijou-tui | Serialize split/grid/dock/minimize state to JSON for workspace presets and startup restore. |
+| ~~**Timer / Stopwatch**~~ | ~~bijou~~ | ~~Shipped in v1.8.0.~~ |
+| ~~**MaxWidth / MaxHeight**~~ | ~~bijou~~ | ~~Shipped in v1.8.0 as `constrain()`.~~ |
+| ~~**Dynamic forms**~~ | ~~bijou~~ | ~~Shipped in v1.8.0 (wizard transform/branch).~~ |
+| ~~**Custom fill chars**~~ | ~~bijou~~ | ~~Shipped in v1.8.0.~~ |
+| ~~**Note field**~~ | ~~bijou~~ | ~~Shipped in v1.8.0.~~ |
+| ~~**Dockable panel manager (drag + keyboard move)**~~ | ~~bijou-tui~~ | ~~Shipped in v1.8.0 (keyboard move; mouse drag deferred).~~ |
+| ~~**Panel minimize/fold/unfold**~~ | ~~bijou-tui~~ | ~~Shipped in v1.8.0.~~ |
+| ~~**Panel maximize/restore**~~ | ~~bijou-tui~~ | ~~Shipped in v1.8.0.~~ |
+| ~~**Layout presets + session restore**~~ | ~~bijou-tui~~ | ~~Shipped in v1.8.0.~~ |
 | ~~**CodeRabbit review exclusions**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
 | ~~**Git hooks (pre-commit + pre-push)**~~ | ~~repo config~~ | ~~Shipped in v1.7.0.~~ |
 

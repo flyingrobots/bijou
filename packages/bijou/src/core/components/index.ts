@@ -77,3 +77,12 @@ export type { LogLevel, LogOptions } from './log.js';
 
 export { markdown } from './markdown.js';
 export type { MarkdownOptions } from './markdown.js';
+
+export { constrain } from './constrain.js';
+export type { ConstrainOptions } from './constrain.js';
+
+export { timer, createTimer, createStopwatch } from './timer.js';
+export type { TimerOptions, TimerController, CreateTimerOptions, CreateStopwatchOptions } from './timer.js';
+
+export { cursorGuard, withHiddenCursor } from './cursor-guard.js';
+export type { CursorGuard, CursorHideHandle } from './cursor-guard.js';

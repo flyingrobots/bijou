@@ -23,7 +23,6 @@ export type {
 export {
   getDefaultContext,
   setDefaultContext,
-  _resetDefaultContextForTesting,
 } from './context.js';
 
 // Context resolution helpers
@@ -73,7 +72,6 @@ export {
   isNoColor,
   getTheme,
   resolveTheme,
-  _resetThemeForTesting,
   createThemeResolver,
   createResolved,
   type ResolvedTheme,
@@ -112,6 +110,8 @@ export {
   graphemeClusterWidth,
   graphemeWidth,
   clipToWidth,
+  ANSI_SGR_RE,
+  stripAnsi,
 } from './core/text/index.js';
 
 // Detection
@@ -204,7 +204,23 @@ export {
   type LogOptions,
   markdown,
   type MarkdownOptions,
+  constrain,
+  type ConstrainOptions,
+  timer,
+  createTimer,
+  createStopwatch,
+  type TimerOptions,
+  type TimerController,
+  type CreateTimerOptions,
+  type CreateStopwatchOptions,
+  cursorGuard,
+  withHiddenCursor,
+  type CursorGuard,
+  type CursorHideHandle,
 } from './core/components/index.js';
+
+// Shared ANSI escape constants
+export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
 
 // Forms
 export {
@@ -229,4 +245,6 @@ export {
   wizard,
   type WizardStep,
   type WizardOptions,
+  note,
+  type NoteOptions,
 } from './core/forms/index.js';
