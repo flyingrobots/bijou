@@ -221,6 +221,9 @@ export {
   type CursorHideHandle,
 } from './core/components/index.js';
 
+// Shared ANSI escape constants
+export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
+
 // Forms
 export {
   type ValidationResult,

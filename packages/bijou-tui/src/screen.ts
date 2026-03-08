@@ -7,16 +7,14 @@
  * @module screen
  */
 
-import type { IOPort } from '@flyingrobots/bijou';
+import { HIDE_CURSOR, SHOW_CURSOR, type IOPort } from '@flyingrobots/bijou';
 
 /** ANSI escape: enter alternate screen buffer (DEC Private Mode 1049). */
 export const ENTER_ALT_SCREEN = '\x1b[?1049h';
 /** ANSI escape: exit alternate screen buffer (DEC Private Mode 1049). */
 export const EXIT_ALT_SCREEN = '\x1b[?1049l';
-/** ANSI escape: hide the text cursor (DEC Private Mode 25). */
-export const HIDE_CURSOR = '\x1b[?25l';
-/** ANSI escape: show the text cursor (DEC Private Mode 25). */
-export const SHOW_CURSOR = '\x1b[?25h';
+
+export { HIDE_CURSOR, SHOW_CURSOR };
 /** ANSI escape: disable line wrapping (DEC Private Mode 7). */
 export const WRAP_DISABLE = '\x1b[?7l';
 /** ANSI escape: enable line wrapping (DEC Private Mode 7). */
