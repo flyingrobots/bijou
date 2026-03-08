@@ -88,6 +88,37 @@ function noise(x: number, y: number, seed: number): number {
   return v - Math.floor(v);
 }
 
+/** Shared origin-relative normalization for radial/diamond/spiral shaders. */
+interface OriginMetrics {
+  readonly nx: number;
+  readonly ny: number;
+  readonly aspect: number;
+  readonly dx: number;
+  readonly dy: number;
+  readonly dist: number;
+  readonly maxDist: number;
+  readonly normDist: number;
+}
+
+/** Compute normalized coordinates, aspect-corrected deltas, and distance metrics. */
+function computeOriginMetrics(
+  x: number, y: number, width: number, height: number,
+  originX: number, originY: number,
+): OriginMetrics {
+  const nx = x / width;
+  const ny = y / height;
+  const aspect = width / Math.max(1, height) * 0.5; // chars are ~2:1 tall
+  const dx = (nx - originX) * aspect;
+  const dy = ny - originY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const maxDist = Math.sqrt(
+    Math.max(originX, 1 - originX) ** 2 * aspect * aspect
+    + Math.max(originY, 1 - originY) ** 2,
+  );
+  const normDist = maxDist > 0 ? dist / maxDist : 0;
+  return { nx, ny, aspect, dx, dy, dist, maxDist, normDist };
+}
+
 // ---------------------------------------------------------------------------
 // Original shaders (backward-compatible instances)
 // ---------------------------------------------------------------------------
@@ -165,54 +196,31 @@ export function wipe(direction: WipeDirection = 'right'): TransitionShaderFn {
 /** Circle expanding from an origin point. Default: center. */
 export function radial(originX = 0.5, originY = 0.5): TransitionShaderFn {
   return ({ x, y, width, height, progress }) => {
-    // Normalize to [0, 1] space, accounting for 2:1 character aspect ratio
-    const nx = x / width;
-    const ny = y / height;
-    const aspect = width / Math.max(1, height) * 0.5; // chars are ~2:1 tall
-    const dx = (nx - originX) * aspect;
-    const dy = ny - originY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    // Max possible distance (corner to origin) for normalization
-    const maxDist = Math.sqrt(
-      Math.max(originX, 1 - originX) ** 2 * aspect * aspect
-      + Math.max(originY, 1 - originY) ** 2,
-    );
-    return { showNext: progress >= 1 || dist / maxDist < progress };
+    const m = computeOriginMetrics(x, y, width, height, originX, originY);
+    return { showNext: progress >= 1 || m.normDist < progress };
   };
 }
 
 /** Diamond/rhombus shape expanding from center. */
 export function diamond(originX = 0.5, originY = 0.5): TransitionShaderFn {
   return ({ x, y, width, height, progress }) => {
-    const nx = x / width;
-    const ny = y / height;
-    const aspect = width / Math.max(1, height) * 0.5;
-    const dx = Math.abs(nx - originX) * aspect;
-    const dy = Math.abs(ny - originY);
-    const dist = dx + dy; // Manhattan distance
-    const maxDist = Math.max(originX, 1 - originX) * aspect
+    const m = computeOriginMetrics(x, y, width, height, originX, originY);
+    // Manhattan distance uses absolute deltas
+    const dist = Math.abs(m.dx) + Math.abs(m.dy);
+    const maxDist = Math.max(originX, 1 - originX) * m.aspect
       + Math.max(originY, 1 - originY);
-    return { showNext: progress >= 1 || dist / maxDist < progress };
+    const normDist = maxDist > 0 ? dist / maxDist : 0;
+    return { showNext: progress >= 1 || normDist < progress };
   };
 }
 
 /** Angular sweep that spirals outward from center. */
 export function spiral(turns = 3, originX = 0.5, originY = 0.5): TransitionShaderFn {
   return ({ x, y, width, height, progress }) => {
-    const nx = x / width;
-    const ny = y / height;
-    const aspect = width / Math.max(1, height) * 0.5;
-    const dx = (nx - originX) * aspect;
-    const dy = ny - originY;
-    const angle = (Math.atan2(dy, dx) / (2 * Math.PI) + 0.5) % 1; // [0, 1]
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const maxDist = Math.sqrt(
-      Math.max(originX, 1 - originX) ** 2 * aspect * aspect
-      + Math.max(originY, 1 - originY) ** 2,
-    );
-    const normDist = dist / maxDist;
+    const m = computeOriginMetrics(x, y, width, height, originX, originY);
+    const angle = (Math.atan2(m.dy, m.dx) / (2 * Math.PI) + 0.5) % 1; // [0, 1]
     // Combine angle + distance into a spiral threshold
-    const spiralT = (angle + normDist * turns) % 1;
+    const spiralT = (angle + m.normDist * turns) % 1;
     return { showNext: spiralT < progress };
   };
 }

@@ -146,8 +146,8 @@ Render output and exit. GIFs are short recordings of the final output.
 ### [x] `pipe`
 
 **Component:** Output modes, all components
-**Demo:** Render the same content (a box with a table inside, a badge, an alert) in all 4 output modes side-by-side: interactive, static, pipe, accessible. Use `createTestContext()` with explicit modes.
-**GIF:** Single frame showing the 4-column comparison. ~3s.
+**Demo:** Render the same content (a box with a table inside, a badge, an alert) in 3 output modes side-by-side: interactive, pipe, accessible. Use `createTestContext()` with explicit modes.
+**GIF:** Single frame showing the 3-column comparison. ~3s.
 
 ### [x] `theme`
 

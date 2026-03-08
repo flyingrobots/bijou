@@ -139,6 +139,15 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   const disposables: Disposable[] = [];
   let disposed = false;
 
+  /** Report an error without risking an unhandled rejection. */
+  function safeReport(message: string, error: unknown): void {
+    try {
+      busOptions?.onError?.(message, error);
+    } catch {
+      // Never let error reporting recreate an unhandled rejection.
+    }
+  }
+
   /** Broadcast a message to all current subscribers. */
   function emit(msg: BusMsg<M>): void {
     if (disposed) return;
@@ -218,11 +227,16 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
           if (busOptions?.onCommandRejected != null) {
             busOptions.onCommandRejected(err);
           } else {
-            busOptions?.onError?.('[EventBus] Command rejected:', err);
+            safeReport('[EventBus] Command rejected:', err);
           }
         } catch (reportErr: unknown) {
-          busOptions?.onError?.('[EventBus] onCommandRejected handler threw:', reportErr);
-          busOptions?.onError?.('[EventBus] Original command rejection:', err);
+          safeReport(
+            busOptions?.onCommandRejected != null
+              ? '[EventBus] onCommandRejected handler threw:'
+              : '[EventBus] onError handler threw while reporting a command rejection:',
+            reportErr,
+          );
+          safeReport('[EventBus] Original command rejection:', err);
         }
       });
     },

@@ -333,6 +333,42 @@ describe('runCmd', () => {
     expect(onError.mock.calls[0]?.[1]).toBeInstanceOf(Error);
   });
 
+  it('does not throw unhandled rejection when onError itself throws', async () => {
+    const throwingOnError = vi.fn(() => {
+      throw new Error('onError blew up');
+    });
+    const bus = createEventBus<TestMsg>({ onError: throwingOnError });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    // If safeReport is working, the promise settles without unhandled rejection.
+    await new Promise((r) => setTimeout(r, 10));
+    // onError was called but its throw was swallowed
+    expect(throwingOnError).toHaveBeenCalled();
+  });
+
+  it('does not throw unhandled rejection when onCommandRejected and onError both throw', async () => {
+    const throwingRejected = vi.fn(() => {
+      throw new Error('rejected handler blew up');
+    });
+    const throwingOnError = vi.fn(() => {
+      throw new Error('onError blew up');
+    });
+    const bus = createEventBus<TestMsg>({
+      onCommandRejected: throwingRejected,
+      onError: throwingOnError,
+    });
+    bus.runCmd(async () => {
+      throw new Error('boom');
+    });
+
+    await new Promise((r) => setTimeout(r, 10));
+    expect(throwingRejected).toHaveBeenCalledTimes(1);
+    // safeReport swallowed the throw from onError
+    expect(throwingOnError).toHaveBeenCalled();
+  });
+
   it('silently drops rejected commands when no handlers are configured', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
