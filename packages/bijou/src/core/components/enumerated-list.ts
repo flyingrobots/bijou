@@ -121,6 +121,17 @@ function isOrderedStyle(style: BulletStyle): boolean {
   return style === 'arabic' || style === 'alpha' || style === 'roman';
 }
 
+/**
+ * Render list items with bullet or numbered prefixes and continuation indentation.
+ *
+ * @param items - The text items to render.
+ * @param style - Bullet or numbering style.
+ * @param start - Starting index for ordered styles.
+ * @param indent - Current nesting depth.
+ * @param indentStr - Whitespace prefix for the current depth.
+ * @param prefixFn - Produces the bullet/number prefix for a given style and index.
+ * @returns The formatted list as a single string.
+ */
 function renderItems(
   items: readonly string[],
   style: BulletStyle,

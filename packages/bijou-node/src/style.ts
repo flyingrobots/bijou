@@ -33,16 +33,6 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     ? new Chalk({ level: opts.level })
     : chalk;
 
-  /**
-   * Chain text-decoration modifiers onto a chalk instance.
-   *
-   * Applies each modifier (`bold`, `dim`, `strikethrough`, `inverse`)
-   * in order, returning the fully-decorated chalk instance.
-   *
-   * @param c - Base chalk instance (already color-configured).
-   * @param modifiers - Optional array of modifier names from a {@link TokenValue}.
-   * @returns The chalk instance with all modifiers applied.
-   */
   /** SGR codes for underline variants (not supported by chalk natively). */
   const UNDERLINE_VARIANT_SGR: Record<string, string> = {
     'curly-underline': '\x1b[4:3m',
@@ -52,6 +42,13 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   /** SGR 24 resets underline. */
   const UNDERLINE_RESET = '\x1b[24m';
 
+  /**
+   * Chain text-decoration modifiers onto a chalk instance.
+   *
+   * @param c - Base chalk instance (already color-configured).
+   * @param modifiers - Optional array of modifier names from a {@link TokenValue}.
+   * @returns The chalk instance with all modifiers applied.
+   */
   function applyModifiers(c: ChalkInstance, modifiers?: TokenValue['modifiers']): ChalkInstance {
     if (modifiers === undefined) return c;
     let result = c;

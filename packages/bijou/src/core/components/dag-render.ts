@@ -248,6 +248,7 @@ export function renderInteractiveLayout(
 
   // ── Build placed nodes + spatial index ────────────────────────────
 
+  /** A node that has been positioned on the character grid. */
   interface PlacedNode {
     startRow: number;
     startCol: number;
@@ -358,6 +359,7 @@ export function renderInteractiveLayout(
 
   // ── cellAt: on-demand per-cell computation ──────────────────────
 
+  /** Resolve the character and optional style token at a grid coordinate. */
   function cellAt(row: number, col: number): { ch: string; token: TokenValue | null } {
     // 1. Node box (highest priority)
     const nodesOnRow = nodesByRow.get(row);

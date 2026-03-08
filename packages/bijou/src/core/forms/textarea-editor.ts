@@ -52,15 +52,18 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   let scrollY = 0;
   let totalLength = 0;  // running counter for lines.join('\n').length
 
+  /** Return the slice of lines currently visible in the editor viewport. */
   function visibleLines(): string[] {
     return lines.slice(scrollY, scrollY + height);
   }
 
+  /** Adjust the vertical scroll so the cursor row is within the viewport. */
   function ensureCursorVisible(): void {
     if (cursorRow < scrollY) scrollY = cursorRow;
     if (cursorRow >= scrollY + height) scrollY = cursorRow - height + 1;
   }
 
+  /** Write the editor UI (title, visible lines, status bar) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     const hint = styledFn(ctx.semantic('muted'), ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
@@ -91,11 +94,13 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = height + 2; // header + visible lines + status
     term.moveUp(totalLines);
   }
 
+  /** Erase the editor UI and print a one-line summary of the result. */
   function cleanup(value: string, cancelled: boolean): void {
     clearRender();
     const totalLines = height + 2;

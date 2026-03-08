@@ -84,6 +84,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   let cursor = 0;
   let scrollOffset = 0;
 
+  /** Keep the scroll offset so the cursor stays within the visible window. */
   function clampScroll(): void {
     if (cursor < scrollOffset) {
       scrollOffset = cursor;
@@ -93,14 +94,17 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, options.options.length - maxVisible)));
   }
 
+  /** Return the slice of options currently visible on screen. */
   function visibleOptions(): SelectOption<T>[] {
     return options.options.slice(scrollOffset, scrollOffset + maxVisible) as SelectOption<T>[];
   }
 
+  /** Calculate the total terminal lines occupied by the current render. */
   function renderLineCount(): number {
     return 1 + Math.min(options.options.length, maxVisible);
   }
 
+  /** Write the select UI (title, option list) to the terminal. */
   function render(): void {
     const label = formatFormTitle(options.title, ctx);
     term.hideCursor();
@@ -121,11 +125,13 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
     }
   }
 
+  /** Move the cursor up to overwrite the previous render. */
   function clearRender(): void {
     const totalLines = renderLineCount();
     term.moveUp(totalLines);
   }
 
+  /** Erase the full UI and print the final selection summary line. */
   function cleanup(): void {
     clearRender();
     const totalLines = renderLineCount();
