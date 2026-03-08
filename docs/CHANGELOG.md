@@ -10,6 +10,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Transition shader system expansion (bijou-tui)** — Added 9 new built-in transition shaders: `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static`. Added shader factories for parameterized variants (`wipe(direction)`, `radial(originX, originY)`, `blinds(count, direction)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`). Added `frame` counter to `TransitionCell` for temporal effects (glitch, static). Added `charRole` (`'decoration'` | `'marker'`) to `TransitionResult` so combinators can distinguish ambient noise from positional indicators. All 16 named transitions available via the `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
 
+### 🐛 Fixes
+
+- **Zero-dimension guard in `renderTransition`** — Early-returns when `width <= 0` or `height <= 0`, preventing `NaN`/`Infinity` from division-by-zero in shaders called with degenerate dimensions.
+- **Removed unused `_frameKeys` parameter from `applyFrameAction`** — Dead parameter left after palette logic was extracted; removed from signature and all call sites.
+- **Explicit `charRole: 'decoration'` on char-emitting shaders** — `matrixShader`, `scrambleShader`, `pixelate()`, `glitch()`, and `tvStatic()` now explicitly declare their char overrides as decorations for self-documenting combinator behavior.
+- **`overlay()` combinator JSDoc** — Documented OR semantics of `showNext` (composite reveals if either shader reveals).
+- **`createEventBus` JSDoc** — Documented that command rejections are silent by default.
+- **Fixed branch name in `COMPLETED.md`** — v2.0.0 entry now correctly references `feat/tui-shader-transitions`.
+
 ## [2.0.0] - 2026-03-08
 
 ### BREAKING CHANGES

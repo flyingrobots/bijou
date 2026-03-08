@@ -6,13 +6,12 @@
  */
 
 import type { CommandPaletteItem } from './command-palette.js';
-import type { KeyMsg } from './types.js';
+import type { KeyMsg, Cmd } from './types.js';
 import { QUIT } from './types.js';
 import type { BindingInfo } from './keybindings.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PanelDockState } from './panel-dock.js';
 import type { FrameModel } from './app-frame.js';
-import type { Cmd } from './types.js';
 
 // ---------------------------------------------------------------------------
 // Symbols

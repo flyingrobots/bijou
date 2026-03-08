@@ -334,6 +334,7 @@ export function renderTransition(
 ): string {
   const shader = typeof style === 'function' ? style : TRANSITION_SHADERS[style];
   if (!shader) return next;
+  if (width <= 0 || height <= 0) return next;
 
   const prevGrid = stringToGrid(prev, width, height);
   const nextGrid = stringToGrid(next, width, height);

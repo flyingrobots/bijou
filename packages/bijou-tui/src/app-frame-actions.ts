@@ -12,7 +12,6 @@ import type {
 } from './app-frame-types.js';
 import { wrapFrameMsg } from './app-frame-types.js';
 import type { Cmd } from './types.js';
-import type { KeyMap } from './keybindings.js';
 import type { DockDirection } from './panel-dock.js';
 import {
   createPanelVisibilityState,
@@ -53,7 +52,6 @@ import { renderFrameNode } from './app-frame-render.js';
 export function applyFrameAction<PageModel, Msg>(
   action: FrameAction,
   model: InternalFrameModel<PageModel, Msg>,
-  _frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {

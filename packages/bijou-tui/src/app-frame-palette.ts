@@ -31,7 +31,6 @@ export function handlePaletteKey<PageModel, Msg>(
   msg: KeyMsg,
   model: InternalFrameModel<PageModel, Msg>,
   paletteKeys: KeyMap<PaletteAction>,
-  frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
@@ -58,7 +57,7 @@ export function handlePaletteKey<PageModel, Msg>(
         const entry = model.commandPaletteEntries?.find((x) => x.id === selected.id);
         if (entry?.frameAction != null) {
           const closed = { ...model, commandPalette: undefined, commandPaletteEntries: undefined };
-          return applyFrameAction(entry.frameAction, closed, frameKeys, options, pagesById);
+          return applyFrameAction(entry.frameAction, closed, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {
           const cmd = entry.targetPageId != null

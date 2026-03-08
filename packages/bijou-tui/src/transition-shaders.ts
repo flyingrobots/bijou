@@ -131,7 +131,7 @@ export const matrixShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   if (rand < threshold + edge) {
     const chars = '01$#@%&*';
     const char = chars[Math.min(Math.floor(rand * 100) % chars.length, chars.length - 1)]!;
-    return { showNext: false, char: ctx.style.styled(ctx.status('success'), char) };
+    return { showNext: false, char: ctx.style.styled(ctx.status('success'), char), charRole: 'decoration' as const };
   }
   return { showNext: false };
 };
@@ -142,7 +142,7 @@ export const scrambleShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   if (rand < scrambleAmount * 0.8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
     const char = chars[Math.min(Math.floor(rand * 1000) % chars.length, chars.length - 1)]!;
-    return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char) };
+    return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char), charRole: 'decoration' as const };
   }
   return { showNext: progress > 0.5 };
 };
@@ -256,7 +256,7 @@ export function pixelate(maxBlockSize = 16): TransitionShaderFn {
     if (scramble) {
       const chars = '░▒▓█';
       const char = chars[Math.min(Math.floor(rand * chars.length), chars.length - 1)]!;
-      return { showNext: false, char };
+      return { showNext: false, char, charRole: 'decoration' as const };
     }
     return { showNext };
   };
@@ -294,7 +294,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
       const glitchChars = '▓░▒█▄▀';
       const n = noise(x, y, frame);
       const char = glitchChars[Math.min(Math.floor(n * glitchChars.length), glitchChars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.status('error'), char) };
+      return { showNext: false, char: ctx.style.styled(ctx.status('error'), char), charRole: 'decoration' as const };
     }
 
     // Scattered cells get individual scramble
@@ -302,7 +302,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
     if (cellNoise < glitchAmount * 0.3) {
       const glitchChars = '▓░▒█▄▀╪╫╬';
       const char = glitchChars[Math.min(Math.floor(cellNoise * 100) % glitchChars.length, glitchChars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.status('warning'), char) };
+      return { showNext: false, char: ctx.style.styled(ctx.status('warning'), char), charRole: 'decoration' as const };
     }
 
     return { showNext: progress > 0.5 };
@@ -330,7 +330,7 @@ export function tvStatic(density = 0.7): TransitionShaderFn {
       const intensity = noise(x + 1, y + 1, frame);
       const chars = ' ░▒▓█';
       const char = chars[Math.min(Math.floor(intensity * chars.length), chars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char) };
+      return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char), charRole: 'decoration' as const };
     }
 
     return { showNext: progress > 0.5 };
@@ -413,6 +413,10 @@ export function chain(a: TransitionShaderFn, b: TransitionShaderFn): TransitionS
 /**
  * Overlay two shaders: `top` shader's char override wins when present,
  * otherwise falls through to `base` shader's result.
+ *
+ * `showNext` uses OR semantics — the composite reveals a cell if *either*
+ * shader reveals it. This means the composite always reveals at least as
+ * much as either shader alone.
  */
 export function overlay(base: TransitionShaderFn, top: TransitionShaderFn): TransitionShaderFn {
   return (cell) => {

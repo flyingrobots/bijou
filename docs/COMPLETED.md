@@ -8,7 +8,7 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 - **Completed:** 2026-03-08
 - **Summary:** Resolved all items from code smell journal. Eliminated `process.env`/`process.stdout` fallbacks from bijou core (enforcing hexagonal port boundary), removed deprecated public exports (`getTheme`, `resolveTheme`, `_resetThemeForTesting`), routed eventbus `console.error` through `onError` port, and decomposed 1662-line `app-frame.ts` into 6 focused modules. BREAKING: `RuntimePort` now required in detection/resolver APIs.
-- **Ref:** v2.0.0, branch `feat/tech-debt-cleanup`
+- **Ref:** v2.0.0, branch `feat/tui-shader-transitions`
 
 ---
 

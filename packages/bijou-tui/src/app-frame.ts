@@ -387,7 +387,7 @@ export function createFramedApp<PageModel, Msg>(
             transitionTimelineState: undefined,
           }, []];
         }
-        return applyFrameAction(action, model, frameKeys, options, pagesById);
+        return applyFrameAction(action, model, options, pagesById);
       }
 
       if (isResizeMsg(msg)) {
@@ -400,7 +400,7 @@ export function createFramedApp<PageModel, Msg>(
 
       if (isKeyMsg(msg)) {
         if (model.commandPalette != null) {
-          return handlePaletteKey(msg, model, paletteKeys, frameKeys, options, pagesById);
+          return handlePaletteKey(msg, model, paletteKeys, options, pagesById);
         }
 
         // Help acts as a modal layer when open: only close keys are handled.
@@ -417,7 +417,7 @@ export function createFramedApp<PageModel, Msg>(
           if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
             return [openCommandPalette(model, frameKeys, options, pagesById), []];
           }
-          return applyFrameAction(frameAction, model, frameKeys, options, pagesById);
+          return applyFrameAction(frameAction, model, options, pagesById);
         }
 
         const globalAction = options.globalKeys?.handle(msg);

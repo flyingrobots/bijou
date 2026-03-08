@@ -127,6 +127,9 @@ interface Disposable {
  * Returns an {@link EventBus} that manages subscribers, I/O connections,
  * command execution, and quit signaling for a TEA runtime.
  *
+ * **Note:** Command rejections are silent by default. Provide `onCommandRejected`
+ * or `onError` in options to surface them.
+ *
  * @template M - Application-defined custom message type.
  * @returns A new event bus instance.
  */
