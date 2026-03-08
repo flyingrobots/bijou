@@ -69,7 +69,12 @@ function applyConstraints(content: string, options: ConstrainOptions): string {
     const maxH = options.maxHeight;
     if (maxH === 0) return '';
     lines = lines.slice(0, maxH);
-    lines[maxH - 1] = ellipsis;
+    // Respect width constraint on the ellipsis line
+    if (options.maxWidth != null && options.maxWidth > 0 && graphemeWidth(ellipsis) > options.maxWidth) {
+      lines[maxH - 1] = clipToWidth(ellipsis, options.maxWidth);
+    } else {
+      lines[maxH - 1] = ellipsis;
+    }
   }
 
   return lines.join('\n');

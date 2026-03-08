@@ -56,8 +56,8 @@ describe('createTTYAccessor()', () => {
   });
 
   it('falls back to process.stdout.isTTY when no runtime is provided', () => {
-    // In test environments, process.stdout.isTTY is typically undefined (falsy)
+    // In Vitest, process.stdout.isTTY is undefined (falsy), so result is false
     const result = createTTYAccessor();
-    expect(typeof result).toBe('boolean');
+    expect(result).toBe(!!process.stdout.isTTY);
   });
 });

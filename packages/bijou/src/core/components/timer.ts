@@ -148,6 +148,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       startTime = Date.now();
       pausedElapsed = 0;
       elapsedMs = 0;
+      paused = false;
       cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       render();
@@ -167,6 +168,9 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     },
 
     stop(finalMessage?: string) {
+      if (timerHandle !== null && !paused) {
+        elapsedMs = pausedElapsed + (Date.now() - startTime);
+      }
       stopInternal();
       if (mode === 'interactive') {
         ctx.io.write(CLEAR_LINE_RETURN);

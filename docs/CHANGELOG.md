@@ -29,6 +29,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Timer double-start leaks interval handle** — `start()` now disposes any existing timer before creating a new one.
 - **Timer `elapsed()` returns stale value** — `elapsed()` now computes on the fly when the timer is running, instead of returning a value only updated on tick.
 - **Timer `pause()` snapshots stale elapsed** — `pause()` now uses `Date.now() - startTime` instead of the tick-updated `elapsedMs`.
+- **Timer `stop()` loses sub-tick elapsed time** — `stop()` now snapshots `elapsedMs` before disposing the interval, so `elapsed()` returns an accurate value after stopping.
+- **Timer `start()` while paused stays frozen** — `start()` now resets the `paused` flag, preventing a re-started timer from remaining frozen.
+- **`constrain()` height ellipsis ignores width constraint** — Height-truncation ellipsis now respects `maxWidth` when both constraints are active.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 
 ### ⚠️ Deprecations

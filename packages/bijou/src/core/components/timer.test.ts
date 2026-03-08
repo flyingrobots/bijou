@@ -120,6 +120,22 @@ describe('createTimer', () => {
     const t = createTimer({ duration: 60_000, ctx });
     expect(t.elapsed()).toBe(0);
   });
+
+  it('displays countdown value that decreases over time', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const t = createTimer({ duration: 60_000, interval: 1000, ctx });
+      t.start();
+      vi.advanceTimersByTime(30_000);
+      const output = ctx.io.written.join('');
+      // Should contain a value showing ~30s remaining
+      expect(output).toContain('00:30');
+      t.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe('createStopwatch', () => {
@@ -156,19 +172,18 @@ describe('createStopwatch', () => {
       const ctx = createTestContext({ mode: 'interactive' });
       const sw = createStopwatch({ interval: 100, ctx });
       sw.start();
-      const writesAfterFirstStart = ctx.io.written.length;
 
       // Start again — should cancel the first interval
       sw.start();
       vi.advanceTimersByTime(500);
       sw.stop();
 
-      // If the old interval leaked, we'd see double the expected tick writes.
       // Count tick writes (those containing CLEAR_LINE_RETURN = \r\x1b[K)
       const tickWrites = ctx.io.written.filter((s: string) => s.includes('\r\x1b[K'));
-      // 500ms / 100ms interval = 5 ticks from the second start, plus initial renders
-      // With a leak we'd see ~10+ extra ticks from both intervals running
-      expect(tickWrites.length).toBeLessThanOrEqual(10);
+      // 2 initial renders (one per start) + 5 ticks (500ms / 100ms) = 7
+      // With a leak we'd see ~12+ from both intervals running
+      expect(tickWrites.length).toBeGreaterThanOrEqual(5);
+      expect(tickWrites.length).toBeLessThanOrEqual(8);
     } finally {
       vi.useRealTimers();
     }
@@ -190,15 +205,58 @@ describe('createStopwatch', () => {
   });
 
   it('pause and resume preserve elapsed', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const sw = createStopwatch({ ctx });
-    sw.start();
-    // Simulate some passage of time
-    sw.pause();
-    const elapsed = sw.elapsed();
-    sw.resume();
-    // After resume, elapsed should be >= the paused value
-    expect(sw.elapsed()).toBeGreaterThanOrEqual(elapsed);
-    sw.stop();
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 100, ctx });
+      sw.start();
+      vi.advanceTimersByTime(300);
+      sw.pause();
+      const atPause = sw.elapsed();
+      expect(atPause).toBeGreaterThanOrEqual(300);
+      // Time passes while paused — elapsed should NOT advance
+      vi.advanceTimersByTime(500);
+      expect(sw.elapsed()).toBe(atPause);
+      // Resume and verify elapsed advances again
+      sw.resume();
+      vi.advanceTimersByTime(200);
+      expect(sw.elapsed()).toBeGreaterThanOrEqual(atPause + 200);
+      sw.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('start() while paused resets paused state', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 100, ctx });
+      sw.start();
+      vi.advanceTimersByTime(200);
+      sw.pause();
+      // Restart while paused — should not remain frozen
+      sw.start();
+      vi.advanceTimersByTime(300);
+      expect(sw.elapsed()).toBeGreaterThanOrEqual(300);
+      sw.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stop() snapshots accurate elapsed value', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 1000, ctx });
+      sw.start();
+      vi.advanceTimersByTime(550);
+      sw.stop();
+      // elapsed() after stop should reflect time at stop, not last tick
+      expect(sw.elapsed()).toBeGreaterThanOrEqual(550);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

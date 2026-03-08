@@ -169,25 +169,27 @@ describe('wizard()', () => {
     expect(result.values.greeting).toBe('hi');
   });
 
-  it('branch splices in additional steps', async () => {
+  it('branch splices in additional steps before subsequent steps', async () => {
+    const order: string[] = [];
     const result = await wizard<{ type: string; subA: string; subB: string; final: string }>({
       steps: [
         {
           key: 'type',
-          field: async () => 'advanced',
+          field: async () => { order.push('type'); return 'advanced'; },
           branch: (vals) => {
             if (vals.type === 'advanced') {
               return [
-                { key: 'subA' as const, field: async () => 'sub-value-A' },
-                { key: 'subB' as const, field: async () => 'sub-value-B' },
+                { key: 'subA' as const, field: async () => { order.push('subA'); return 'sub-value-A'; } },
+                { key: 'subB' as const, field: async () => { order.push('subB'); return 'sub-value-B'; } },
               ];
             }
             return [];
           },
         },
-        { key: 'final', field: async () => 'done' },
+        { key: 'final', field: async () => { order.push('final'); return 'done'; } },
       ],
     });
+    expect(order).toEqual(['type', 'subA', 'subB', 'final']);
     expect(result.values.type).toBe('advanced');
     expect(result.values.subA).toBe('sub-value-A');
     expect(result.values.subB).toBe('sub-value-B');

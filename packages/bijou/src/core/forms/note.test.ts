@@ -42,6 +42,16 @@ describe('note', () => {
     expect(output).toContain('Note: Info here');
   });
 
+  it('renders in static mode with accent line', async () => {
+    const ctx = createTestContext({ mode: 'static' });
+    await note({ message: 'Static note', title: 'Info', ctx });
+    const output = ctx.io.written.join('');
+    expect(output).toContain('Static note');
+    expect(output).toContain('Info');
+    expect(output).toContain('│');
+    expect(output).toContain('ℹ');
+  });
+
   it('resolves to undefined (compatible with wizard)', async () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = await note({ message: 'Test', ctx });
