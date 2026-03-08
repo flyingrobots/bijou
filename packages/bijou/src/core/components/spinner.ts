@@ -98,6 +98,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
         ctx.io.write(spinnerFrame(0, { frames, label, ctx }) + '\n');
         return;
       }
+      cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       render();
       timer = ctx.io.setInterval(render, interval);

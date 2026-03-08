@@ -118,6 +118,7 @@ export function createProgressBar(options: LiveProgressBarOptions = {}): Progres
         ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
         return;
       }
+      cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       ctx.io.write(progressBar(0, { ...options, ctx }));
     },
@@ -215,6 +216,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
         ctx.io.write(progressBar(0, { ...options, ctx }) + '\n');
         return;
       }
+      cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       render();
     },

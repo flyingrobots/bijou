@@ -146,6 +146,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       startTime = Date.now();
       pausedElapsed = 0;
       elapsedMs = 0;
+      cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       render();
       timerHandle = ctx.io.setInterval(tick, interval);

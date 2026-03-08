@@ -6,16 +6,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **`cursorGuard()` + `withHiddenCursor()` (bijou)** — Reference-counted cursor visibility guard. Multiple components (spinner, progress, timer, forms) sharing the same IOPort now coordinate hide/show automatically — nesting a spinner inside a progress bar no longer prematurely restores the cursor. `withHiddenCursor(io, fn)` provides try/finally sugar for one-shot use cases.
+
 ### 🐛 Bug Fixes
 
 - **`timer()` negative ms with `showMs`** — `formatTime()` now clamps the entire input to `>= 0` before extracting millis, fixing invalid output like `00:00.-500`.
 - **`constrain()` ANSI-safe truncation detection** — Width comparison now uses `graphemeWidth()` instead of raw string length, preventing false-positive ellipsis on ANSI-styled input.
 - **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
-
-### ✨ Features
-
-- **`cursorGuard()` + `withHiddenCursor()` (bijou)** — Reference-counted cursor visibility guard. Multiple components (spinner, progress, timer, forms) sharing the same IOPort now coordinate hide/show automatically — nesting a spinner inside a progress bar no longer prematurely restores the cursor. `withHiddenCursor(io, fn)` provides try/finally sugar for one-shot use cases.
 
 ### ♻️ Refactors
 
