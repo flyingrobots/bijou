@@ -191,13 +191,12 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v1.4.0
+## What's New in v1.6.0
 
-- **Transition shader system** — page transitions are now composable pure functions (`TransitionShaderFn`). Pass custom shaders or use 7 built-ins: `wipe`, `dissolve`, `grid`, `fade`, `melt`, `matrix`, `scramble`.
-- **Timeline-driven transitions** — `createFramedApp()` accepts a `transitionTimeline` option for spring/tween-based transition control.
-- **Architecture patterns** — `renderByMode` dispatcher (OCP) and `ctx.semantic()`/`ctx.border()` helpers (DIP) simplify component authoring.
-- **Component showcase** — interactive explorer app with 45 components across 4 categories.
-- **Scrollable multiselect** — `multiselect()` now supports `maxVisible` with viewport scrolling.
+- **F-key parsing** — `parseKey()` recognizes F1–F12 (CSI and SS3 encodings) with Shift/Ctrl/Alt modifier support.
+- **Cursor manager** — `setCursorStyle(io, 'bar', { blink: true })` for DECSCUSR cursor shape control (block, underline, bar).
+- **Underline variants** — `TextModifier` now supports `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'` with graceful degradation.
+- **Test audit** — 24 new tests filling coverage gaps across forms, adapters, and DTCG interop.
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 

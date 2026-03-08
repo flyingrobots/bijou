@@ -25,9 +25,16 @@ function keyMsg(key: string, ctrl = false, alt = false, shift = false): KeyMsg {
 /**
  * Parse a raw ANSI byte string from `rawInput()` into a structured {@link KeyMsg}.
  *
- * Handle arrow keys, function keys, enter, tab, backspace, space, escape,
- * Ctrl+A through Ctrl+Z, and printable ASCII characters. Unrecognized
- * sequences produce `{ key: 'unknown' }`.
+ * Handles:
+ * - Arrow keys (`up`, `down`, `left`, `right`)
+ * - Navigation (`home`, `end`, `delete`, `pageup`, `pagedown`)
+ * - F-keys (`f1`–`f12`) via CSI `~` encoding and SS3 encoding
+ * - F-key modifiers: Shift/Ctrl/Alt combos (e.g. `\x1b[1;2P` → Shift+F1)
+ * - Special keys: `enter`, `tab`, `backspace`, `space`, `escape`
+ * - Ctrl+A through Ctrl+Z
+ * - Printable ASCII characters (uppercase → `shift: true`)
+ *
+ * Unrecognized sequences produce `{ key: 'unknown' }`.
  *
  * @param raw - Raw byte string from terminal stdin.
  * @returns Parsed key message.

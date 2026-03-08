@@ -16,7 +16,21 @@ export interface GradientStop {
   color: RGB;
 }
 
-/** Supported text style modifiers that can be applied alongside a color. */
+/**
+ * Supported text style modifiers that can be applied alongside a color.
+ *
+ * - `'bold'` — bold/bright weight
+ * - `'dim'` — faint/reduced intensity
+ * - `'strikethrough'` — horizontal line through text
+ * - `'inverse'` — swap foreground and background colors
+ * - `'underline'` — standard single underline (SGR 4)
+ * - `'curly-underline'` — wavy/curly underline (SGR 4:3, kitty/iTerm2/WezTerm/Windows Terminal)
+ * - `'dotted-underline'` — dotted underline (SGR 4:4)
+ * - `'dashed-underline'` — dashed underline (SGR 4:5)
+ *
+ * Underline variants gracefully degrade to standard underline in terminals
+ * that don't support SGR sub-parameters.
+ */
 export type TextModifier = 'bold' | 'dim' | 'strikethrough' | 'inverse'
   | 'underline' | 'curly-underline' | 'dotted-underline' | 'dashed-underline';
 

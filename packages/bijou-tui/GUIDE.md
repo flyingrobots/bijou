@@ -37,6 +37,27 @@ const app: App<Model, Msg> = {
 run(app);
 ```
 
+## Cursor Control
+
+Change cursor shape and blink state via DECSCUSR:
+
+```typescript
+import { setCursorStyle, resetCursorStyle, CURSOR_BLOCK } from '@flyingrobots/bijou-tui';
+
+// Set cursor to blinking bar (good for text input)
+setCursorStyle(io, 'bar', { blink: true });
+
+// Set cursor to steady block (good for normal mode)
+setCursorStyle(io, 'block');
+
+// Reset to terminal default
+resetCursorStyle(io);
+```
+
+Three shapes: `'block'`, `'underline'`, `'bar'`. Each supports `{ blink: true }`.
+
+Constants `CURSOR_BLOCK`, `CURSOR_UNDERLINE`, `CURSOR_BAR`, and `CURSOR_RESET` are available for direct use with `io.write()`.
+
 ## Handling Resize
 
 The runtime dispatches `ResizeMsg` automatically when the terminal resizes:
@@ -430,9 +451,13 @@ Supported modifiers: `ctrl`, `alt`, `shift`. Combined with `+`:
 'enter'          // named keys
 'space'          // named keys
 'escape'         // named keys
+'f1'             // function keys (f1–f12)
+'shift+f1'       // modified function keys
 ```
 
 Descriptors are case-insensitive — `'Ctrl+C'` and `'ctrl+c'` are equivalent.
+
+`parseKey()` recognizes F1–F12 via both CSI `~` encoding (e.g. `\x1b[11~`) and SS3 encoding (`\x1bOP`–`\x1bOS`), including Shift/Ctrl/Alt modifier combinations.
 
 ## Help Generation
 

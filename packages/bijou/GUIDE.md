@@ -115,6 +115,19 @@ const myTheme = extendTheme(CYAN_MAGENTA, {
 });
 ```
 
+### Text Modifiers
+
+Token values accept an array of modifiers: `'bold'`, `'dim'`, `'strikethrough'`, `'inverse'`, `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'`.
+
+```typescript
+tv('#ff0000', ['bold'])                    // bold red
+tv('#808080', ['dim', 'strikethrough'])    // dimmed strikethrough
+tv('#00aaff', ['underline'])               // standard underline
+tv('#ff6600', ['curly-underline'])         // wavy underline (kitty, iTerm2, WezTerm, Windows Terminal)
+tv('#00ff00', ['dotted-underline'])        // dotted underline
+tv('#ffaa00', ['dashed-underline'])        // dashed underline
+```
+
 ### Looking Up Tokens
 
 Use semantic helpers on the context to look up tokens without coupling to theme object structure:
