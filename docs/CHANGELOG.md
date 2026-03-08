@@ -6,15 +6,29 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-03-08
+
 ### ✨ Features
 
+- **Custom fill characters (bijou)** — `box()` and `headerBox()` accept `fillChar` option for custom padding/fill characters. Validates single-width graphemes; wide characters fall back to space.
+- **`constrain()` component (bijou)** — New `constrain(content, { maxWidth?, maxHeight?, ellipsis? })` for content truncation with configurable ellipsis. Passthrough in pipe/accessible modes.
+- **Note field (bijou)** — New `note({ message, title? })` display-only form field. Interactive: info icon + bold title + muted message with left accent line. Compatible with `group()`/`wizard()`.
+- **Timer / Stopwatch (bijou)** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` elapsed-time controllers with start/pause/resume/stop.
+- **Dynamic wizard forms (bijou)** — `WizardStep` gains `transform` (replace field function dynamically) and `branch` (splice in additional steps after value collection) options.
 - **`cursorGuard()` + `withHiddenCursor()` (bijou)** — Reference-counted cursor visibility guard. Multiple components (spinner, progress, timer, forms) sharing the same IOPort now coordinate hide/show automatically — nesting a spinner inside a progress bar no longer prematurely restores the cursor. `withHiddenCursor(io, fn)` provides try/finally sugar for one-shot use cases.
+- **Panel minimize/fold/unfold (bijou-tui)** — Per-pane collapsed state with `ctrl+m` toggle. Minimized panes collapse to title bar; sibling gets remaining space. Cannot minimize last visible pane.
+- **Panel maximize/restore (bijou-tui)** — `ctrl+f` promotes focused pane to full-area view. Per-page state. Maximizing a minimized pane restores it first.
+- **Dockable panel manager (bijou-tui)** — `ctrl+shift+arrow` reorders panes within split/grid containers. Pure state reducers with `movePaneInContainer` and `resolveChildOrder`.
+- **Layout presets + session restore (bijou-tui)** — `serializeLayoutState()` / `restoreLayoutState()` for JSON-friendly workspace persistence. Preset helpers: `presetSideBySide`, `presetStacked`, `presetFocused`. `initialLayout` option on `createFramedApp`.
 
 ### 🐛 Bug Fixes
 
 - **`timer()` negative ms with `showMs`** — `formatTime()` now clamps the entire input to `>= 0` before extracting millis, fixing invalid output like `00:00.-500`.
 - **`constrain()` ANSI-safe truncation detection** — Width comparison now uses `graphemeWidth()` instead of raw string length, preventing false-positive ellipsis on ANSI-styled input.
 - **Timer cursor not restored on natural completion** — `createTimer()` now emits `\x1b[?25h` when countdown finishes naturally, not just on explicit `stop()`.
+- **Timer double-start leaks interval handle** — `start()` now disposes any existing timer before creating a new one.
+- **Timer `elapsed()` returns stale value** — `elapsed()` now computes on the fly when the timer is running, instead of returning a value only updated on tick.
+- **Timer `pause()` snapshots stale elapsed** — `pause()` now uses `Date.now() - startTime` instead of the tick-updated `elapsedMs`.
 - **Grid dock operations were no-ops** — `findPaneContainer()` now returns pane IDs (not area names) for grid containers, fixing `ctrl+shift+arrow` in grid layouts.
 
 ### ⚠️ Deprecations
@@ -36,24 +50,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **DRY: form scroll/navigation** — Extracted `clampScroll()` and `handleVerticalNav()` into `form-utils.ts`, deduplicating identical implementations in `select.ts` and `multiselect.ts`.
 - **`WritePort.writeError` now required** — Removed optional `?` from `WritePort.writeError`. All adapters already provided it; this eliminates nil-checks at callsites.
 - **`console.warn` removed from bijou-tui** — `app-frame.ts` grid-cell warning now routes through `writeError()`. `split-pane.ts` `warnInvalidRatio` accepts an optional `WritePort` instead of sniffing `process.env`.
+- **`ANSI_SGR_RE` shared regex safety** — Removed `/g` flag from the exported constant to prevent `lastIndex` bugs. Callsites create fresh regex instances for replacement.
+- **`constrain()` explicit `maxWidth=0` guard** — Returns empty string immediately instead of relying on `clipToWidth` coincidence.
+- **Wizard max iteration guard** — `wizard()` throws after 1000 steps to prevent infinite `branch` recursion loops.
 
 ### 📦 Maintenance
 
 - **bijou-tui-app dependency alignment** — Updated `@flyingrobots/bijou` and `@flyingrobots/bijou-tui` deps from `1.7.0` to `1.8.0`; engine constraint from `>=20` to `>=18` for consistency.
-
-## [1.8.0] - 2026-03-08
-
-### ✨ Features
-
-- **Custom fill characters (bijou)** — `box()` and `headerBox()` accept `fillChar` option for custom padding/fill characters. Validates single-width graphemes; wide characters fall back to space.
-- **`constrain()` component (bijou)** — New `constrain(content, { maxWidth?, maxHeight?, ellipsis? })` for content truncation with configurable ellipsis. Passthrough in pipe/accessible modes.
-- **Note field (bijou)** — New `note({ message, title? })` display-only form field. Interactive: info icon + bold title + muted message with left accent line. Compatible with `group()`/`wizard()`.
-- **Timer / Stopwatch (bijou)** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` elapsed-time controllers with start/pause/resume/stop.
-- **Dynamic wizard forms (bijou)** — `WizardStep` gains `transform` (replace field function dynamically) and `branch` (splice in additional steps after value collection) options.
-- **Panel minimize/fold/unfold (bijou-tui)** — Per-pane collapsed state with `ctrl+m` toggle. Minimized panes collapse to title bar; sibling gets remaining space. Cannot minimize last visible pane.
-- **Panel maximize/restore (bijou-tui)** — `ctrl+f` promotes focused pane to full-area view. Per-page state. Maximizing a minimized pane restores it first.
-- **Dockable panel manager (bijou-tui)** — `ctrl+shift+arrow` reorders panes within split/grid containers. Pure state reducers with `movePaneInContainer` and `resolveChildOrder`.
-- **Layout presets + session restore (bijou-tui)** — `serializeLayoutState()` / `restoreLayoutState()` for JSON-friendly workspace persistence. Preset helpers: `presetSideBySide`, `presetStacked`, `presetFocused`. `initialLayout` option on `createFramedApp`.
 
 ### 🔧 Infrastructure
 
@@ -61,10 +64,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **PR reply script** — `scripts/reply-to-reviews.sh` for replying to CodeRabbit review threads (interactive + batch modes).
 - **Code smell journal** — Populated `.claude/bad_code.md` with 7 findings (process.env bypasses, duplicated envAccessor, _reset exports, app-frame.ts size, engine version inconsistency).
 - **Dependency audit** — 0 CVEs, all MIT, all maintained.
+- **pre-push hook** — Removed squashing suggestion from commit pacing warning (repo forbids squashing).
 
 ### 🧪 Tests
 
-- 84 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (19), dynamic wizard (6), panel-state (11), panel-dock (14), layout-preset (7).
+- 109 new tests across all features: box fillChar (7), constrain (13), note (7), timer/stopwatch (23), dynamic wizard (16), panel-state (11), panel-dock (14), layout-preset (7), env accessors (5), cursor-guard (3), form-utils (1), ANSI regex (2).
 
 ## [1.7.0] - 2026-03-08
 

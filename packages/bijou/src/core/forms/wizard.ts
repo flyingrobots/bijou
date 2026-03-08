@@ -1,5 +1,8 @@
 import type { GroupFieldResult } from './types.js';
 
+/** Maximum number of wizard steps before throwing to prevent infinite loops. */
+const MAX_WIZARD_STEPS = 1000;
+
 /**
  * Single step in a multi-step wizard form.
  *
@@ -66,7 +69,11 @@ export async function wizard<T extends Record<string, unknown>>(
   const steps = [...options.steps];
 
   let i = 0;
+  let iterations = 0;
   while (i < steps.length) {
+    if (++iterations > MAX_WIZARD_STEPS) {
+      throw new Error(`Wizard exceeded ${MAX_WIZARD_STEPS} steps — possible infinite loop`);
+    }
     const step = steps[i]!;
 
     // Skip check

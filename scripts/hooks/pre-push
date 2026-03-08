@@ -22,7 +22,7 @@ while read -r local_ref local_oid remote_ref remote_oid; do
 
   if [ "$count" -gt "$COMMIT_LIMIT" ]; then
     echo "pre-push: ⚠ pushing $count commits on ${local_ref} (limit: $COMMIT_LIMIT)"
-    echo "          Consider squashing or splitting into smaller pushes."
+    echo "          Consider splitting into smaller pushes."
   fi
 done
 

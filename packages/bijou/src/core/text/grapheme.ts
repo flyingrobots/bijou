@@ -130,7 +130,7 @@ export function segmentGraphemes(str: string): string[] {
  * style escapes before measuring or clipping visible content.
  */
 // eslint-disable-next-line no-control-regex
-export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/g;
+export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/;
 
 /**
  * Strip all ANSI SGR escape sequences from a string.
@@ -139,7 +139,7 @@ export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/g;
  * @returns The string with all ANSI SGR sequences removed.
  */
 export function stripAnsi(str: string): string {
-  return str.replace(ANSI_SGR_RE, '');
+  return str.replace(new RegExp(ANSI_SGR_RE, 'g'), '');
 }
 
 // ---------------------------------------------------------------------------

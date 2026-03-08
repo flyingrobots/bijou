@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { wizard } from './wizard.js';
+import { wizard, type WizardStep } from './wizard.js';
 
 describe('wizard()', () => {
   it('runs all steps and collects values', async () => {
@@ -253,6 +253,19 @@ describe('wizard()', () => {
     });
     expect(order).toEqual(['transformed-a', 'branched-b', 'c']);
     expect(result.values).toEqual({ a: 'transformed', b: 'branched', c: 'final' });
+  });
+
+  it('throws when exceeding max iteration guard', async () => {
+    // Each step branches a copy of itself, creating unbounded growth
+    const selfBranchingStep: WizardStep<{ n: number }> = {
+      key: 'n',
+      field: async () => 1,
+      branch: () => [selfBranchingStep],
+    };
+
+    await expect(
+      wizard<{ n: number }>({ steps: [selfBranchingStep] }),
+    ).rejects.toThrow('exceeded 1000 steps');
   });
 
   it('skip predicate can depend on multiple prior values', async () => {

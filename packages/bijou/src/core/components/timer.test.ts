@@ -150,6 +150,45 @@ describe('createStopwatch', () => {
     expect(sw.elapsed()).toBe(0);
   });
 
+  it('calling start() twice does not leak interval handles', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 100, ctx });
+      sw.start();
+      const writesAfterFirstStart = ctx.io.written.length;
+
+      // Start again — should cancel the first interval
+      sw.start();
+      vi.advanceTimersByTime(500);
+      sw.stop();
+
+      // If the old interval leaked, we'd see double the expected tick writes.
+      // Count tick writes (those containing CLEAR_LINE_RETURN = \r\x1b[K)
+      const tickWrites = ctx.io.written.filter((s: string) => s.includes('\r\x1b[K'));
+      // 500ms / 100ms interval = 5 ticks from the second start, plus initial renders
+      // With a leak we'd see ~10+ extra ticks from both intervals running
+      expect(tickWrites.length).toBeLessThanOrEqual(10);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('elapsed() returns a live value while running', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const sw = createStopwatch({ interval: 1000, ctx });
+      sw.start();
+      vi.advanceTimersByTime(500);
+      // Between ticks, elapsed() should still reflect real time
+      expect(sw.elapsed()).toBeGreaterThanOrEqual(500);
+      sw.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('pause and resume preserve elapsed', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const sw = createStopwatch({ ctx });

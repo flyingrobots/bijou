@@ -140,6 +140,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
 
   return {
     start() {
+      stopInternal();
       if (mode !== 'interactive') {
         ctx.io.write(timer(initialDisplayMs, { ...timerOpts, ctx }) + '\n');
         return;
@@ -156,7 +157,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     pause() {
       if (paused || timerHandle === null) return;
       paused = true;
-      pausedElapsed = elapsedMs;
+      pausedElapsed += Date.now() - startTime;
     },
 
     resume() {
@@ -180,6 +181,9 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     },
 
     elapsed() {
+      if (timerHandle !== null && !paused) {
+        return pausedElapsed + (Date.now() - startTime);
+      }
       return elapsedMs;
     },
   };

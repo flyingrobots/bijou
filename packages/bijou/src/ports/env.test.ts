@@ -11,7 +11,9 @@ describe('createEnvAccessor()', () => {
     const runtime: RuntimePort = {
       env: (key: string) => (key === 'FOO' ? 'bar' : undefined),
       stdoutIsTTY: true,
+      stdinIsTTY: true,
       columns: 80,
+      rows: 24,
     };
 
     const env = createEnvAccessor(runtime);
@@ -33,7 +35,9 @@ describe('createTTYAccessor()', () => {
     const runtime: RuntimePort = {
       env: () => undefined,
       stdoutIsTTY: false,
+      stdinIsTTY: false,
       columns: 80,
+      rows: 24,
     };
 
     expect(createTTYAccessor(runtime)).toBe(false);
@@ -43,7 +47,9 @@ describe('createTTYAccessor()', () => {
     const runtime: RuntimePort = {
       env: () => undefined,
       stdoutIsTTY: true,
+      stdinIsTTY: true,
       columns: 120,
+      rows: 24,
     };
 
     expect(createTTYAccessor(runtime)).toBe(true);

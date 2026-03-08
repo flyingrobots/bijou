@@ -23,7 +23,7 @@ import { segmentGraphemes, graphemeClusterWidth, ANSI_SGR_RE } from './grapheme.
 export function clipToWidth(str: string, maxWidth: number): string {
   if (maxWidth <= 0) return '';
 
-  const stripped = str.replace(ANSI_SGR_RE, '');
+  const stripped = str.replace(new RegExp(ANSI_SGR_RE, 'g'), '');
   const graphemes = segmentGraphemes(stripped);
 
   let result = '';

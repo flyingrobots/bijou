@@ -8,7 +8,7 @@ import { graphemeWidth } from '../text/grapheme.js';
 export interface ConstrainOptions {
   /** Maximum visible width in terminal columns. Lines exceeding this are clipped. */
   maxWidth?: number;
-  /** Maximum number of visible lines. Excess lines are truncated. */
+  /** Maximum number of visible lines. When truncating, the last visible line is replaced with the ellipsis indicator. */
   maxHeight?: number;
   /** Ellipsis string appended when content is clipped. Defaults to `"…"`. */
   ellipsis?: string;
@@ -49,6 +49,7 @@ function applyConstraints(content: string, options: ConstrainOptions): string {
   // Apply width constraint
   if (options.maxWidth != null && options.maxWidth >= 0) {
     const maxW = options.maxWidth;
+    if (maxW === 0) return '';
     lines = lines.map((line) => {
       const clipped = clipToWidth(line, maxW);
       if (graphemeWidth(clipped) < graphemeWidth(line)) {
