@@ -24,8 +24,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou": "1.5.0",
-    "@flyingrobots/bijou-tui": "1.5.0"
+    "@flyingrobots/bijou": "1.6.0",
+    "@flyingrobots/bijou-tui": "1.6.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
