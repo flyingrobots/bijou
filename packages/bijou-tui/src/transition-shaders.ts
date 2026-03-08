@@ -70,7 +70,8 @@ export type BuiltinTransition =
 
 /** Hash-based pseudo-random that incorporates spatial + temporal seeds. */
 function noise(x: number, y: number, seed: number): number {
-  const v = Math.sin(x * 12.9898 + y * 78.233 + seed * 43.7585) * 43758.5453;
+  // Constant offset (7.31) breaks the degenerate fixed point at (0, 0, 0).
+  const v = Math.sin(x * 12.9898 + y * 78.233 + seed * 43.7585 + 7.31) * 43758.5453;
   return v - Math.floor(v);
 }
 
@@ -116,7 +117,7 @@ export const matrixShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   }
   if (rand < threshold + edge) {
     const chars = '01$#@%&*';
-    const char = chars[Math.floor(rand * 100) % chars.length]!;
+    const char = chars[Math.min(Math.floor(rand * 100) % chars.length, chars.length - 1)]!;
     return { showNext: false, char: ctx.style.styled(ctx.status('success'), char) };
   }
   return { showNext: false };
@@ -127,7 +128,7 @@ export const scrambleShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   const scrambleAmount = 1 - Math.abs(progress - 0.5) * 2;
   if (rand < scrambleAmount * 0.8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
-    const char = chars[Math.floor(rand * 1000) % chars.length]!;
+    const char = chars[Math.min(Math.floor(rand * 1000) % chars.length, chars.length - 1)]!;
     return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char) };
   }
   return { showNext: progress > 0.5 };
@@ -241,7 +242,7 @@ export function pixelate(maxBlockSize = 16): TransitionShaderFn {
     const scramble = phase > 0.3 && blockRand < phase * 0.6;
     if (scramble) {
       const chars = '░▒▓█';
-      const char = chars[Math.floor(rand * chars.length)]!;
+      const char = chars[Math.min(Math.floor(rand * chars.length), chars.length - 1)]!;
       return { showNext: false, char };
     }
     return { showNext };
@@ -270,27 +271,24 @@ export function typewriter(cursor = '▌'): TransitionShaderFn {
  * Uses the frame counter for temporal variation.
  */
 export function glitch(intensity = 0.5): TransitionShaderFn {
-  return ({ x, y, width, progress, frame, ctx }) => {
+  return ({ x, y, progress, frame, ctx }) => {
     // Glitch peaks at midpoint, ramps up then down
     const glitchAmount = (1 - Math.abs(progress - 0.5) * 2) * intensity;
     const rowNoise = noise(0, y, frame * 0.3);
 
-    // Some rows get horizontally displaced
+    // Selected rows show block-char corruption across all their cells
     if (rowNoise < glitchAmount * 0.6) {
-      const displacement = Math.floor((rowNoise - 0.3) * 20);
-      const srcX = x + displacement;
-      if (srcX < 0 || srcX >= width) {
-        const glitchChars = '▓░▒█▄▀';
-        const char = glitchChars[Math.floor(noise(x, y, frame) * glitchChars.length)]!;
-        return { showNext: false, char: ctx.style.styled(ctx.status('error'), char) };
-      }
+      const glitchChars = '▓░▒█▄▀';
+      const n = noise(x, y, frame);
+      const char = glitchChars[Math.min(Math.floor(n * glitchChars.length), glitchChars.length - 1)]!;
+      return { showNext: false, char: ctx.style.styled(ctx.status('error'), char) };
     }
 
-    // Some cells get scrambled
+    // Scattered cells get individual scramble
     const cellNoise = noise(x, y, frame * 0.5);
     if (cellNoise < glitchAmount * 0.3) {
       const glitchChars = '▓░▒█▄▀╪╫╬';
-      const char = glitchChars[Math.floor(cellNoise * 100) % glitchChars.length]!;
+      const char = glitchChars[Math.min(Math.floor(cellNoise * 100) % glitchChars.length, glitchChars.length - 1)]!;
       return { showNext: false, char: ctx.style.styled(ctx.status('warning'), char) };
     }
 
@@ -318,7 +316,7 @@ export function tvStatic(density = 0.7): TransitionShaderFn {
     if (cellNoise < staticAmount * density) {
       const intensity = noise(x + 1, y + 1, frame);
       const chars = ' ░▒▓█';
-      const char = chars[Math.floor(intensity * chars.length)]!;
+      const char = chars[Math.min(Math.floor(intensity * chars.length), chars.length - 1)]!;
       return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char) };
     }
 
@@ -375,8 +373,14 @@ export function reverse(shader: TransitionShaderFn): TransitionShaderFn {
 }
 
 /**
- * Chain two shaders: `a` runs during progress [0, 0.5], `b` runs during [0.5, 1].
- * Each sub-shader receives a normalized 0→1 progress for its half.
+ * Chain two shaders sequentially: `a` runs during progress [0, 0.5],
+ * `b` runs during (0.5, 1]. Each sub-shader receives a normalized 0→1
+ * progress for its half.
+ *
+ * **Note:** There is a hard cut at the midpoint — shader `a` completes
+ * (all cells revealed) then shader `b` starts from scratch (no cells
+ * revealed). This is intentional for effects like "dissolve out → wipe in"
+ * but will flash if both shaders reveal in the same direction.
  */
 export function chain(a: TransitionShaderFn, b: TransitionShaderFn): TransitionShaderFn {
   return (cell) => {

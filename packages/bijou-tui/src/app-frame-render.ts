@@ -316,7 +316,12 @@ export function stringToGrid(str: string, width: number, height: number): string
   return grid;
 }
 
-/** Apply a transition shader to blend between the previous and next page views. */
+/**
+ * Apply a transition shader to blend between the previous and next page views.
+ *
+ * @param frame - Monotonic frame counter passed to shaders for temporal effects
+ *   (glitch flickering, static noise). Defaults to 0 for stateless shaders.
+ */
 export function renderTransition(
   prev: string,
   next: string,
