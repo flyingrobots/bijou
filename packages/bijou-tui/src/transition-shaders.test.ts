@@ -459,6 +459,16 @@ describe('reverse()', () => {
     expect(reversed(cell({ x: 0, width: 80, progress: 1 })).showNext).toBe(true);
     expect(reversed(cell({ x: 79, width: 80, progress: 1 })).showNext).toBe(true);
   });
+
+  it('drops char overrides from the base shader', () => {
+    // reverse(typewriter) at progress=1 evaluates typewriter at progress=0,
+    // which emits a cursor char for cell (0,0). The reversed result should
+    // NOT carry that char, since it belongs to the wrong progress direction.
+    const reversed = reverse(typewriter());
+    const result = reversed(cell({ x: 0, y: 0, width: 80, height: 24, progress: 1 }));
+    expect(result.showNext).toBe(true);
+    expect(result.char).toBeUndefined();
+  });
 });
 
 describe('chain()', () => {

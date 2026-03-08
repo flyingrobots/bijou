@@ -368,7 +368,10 @@ export const staticShader: TransitionShaderFn = tvStatic();
 export function reverse(shader: TransitionShaderFn): TransitionShaderFn {
   return (cell) => {
     const result = shader({ ...cell, progress: 1 - cell.progress });
-    return { showNext: !result.showNext, char: result.char };
+    // Drop char overrides — they belong to the original progress direction
+    // and would produce stale artifacts (e.g., cursor glyphs on a fully
+    // revealed frame when reversing typewriter).
+    return { showNext: !result.showNext };
   };
 }
 
