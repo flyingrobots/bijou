@@ -6,6 +6,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-08
+
+### BREAKING CHANGES
+
+- **Removed deprecated public exports (bijou)** — `getTheme()`, `resolveTheme()`, and `_resetThemeForTesting()` have been removed from `@flyingrobots/bijou`. Use `createBijou()` or `createThemeResolver({ runtime })` instead.
+- **`RuntimePort` now required (bijou)** — `createEnvAccessor()`, `createTTYAccessor()`, `detectOutputMode()`, `detectColorScheme()`, `isNoColor()`, and `createThemeResolver()` no longer accept optional `RuntimePort` — it is now a required parameter. This eliminates all `process.env` / `process.stdout` fallbacks from the core package, enforcing the hexagonal port boundary.
+
+### Refactors
+
+- **Eliminated `process.env` fallbacks from hexagonal boundary (bijou)** — `ports/env.ts` no longer references `process.env` or `process.stdout.isTTY`. All environment and TTY access flows through `RuntimePort`.
+- **Routed eventbus errors through `onError` port (bijou-tui)** — `createEventBus()` accepts an `onError` callback in options, replacing direct `console.error` calls. When no error handler is configured, rejected commands are silently dropped.
+- **Decomposed `app-frame.ts` (bijou-tui)** — Split the 1662-line monolith into 6 focused modules: types (179), utilities (151), rendering (357), actions (410), palette (200), and factory (526). No public API changes.
+
 ## [1.8.0] - 2026-03-08
 
 ### ✨ Features

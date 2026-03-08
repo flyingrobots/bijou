@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.8.0** — The Big One
+Latest: **v2.0.0** — Tech Debt Cleanup
 
 ---
 
@@ -12,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v2.0.0 | Tech Debt Cleanup | Remove process.env fallbacks, eventbus error port, app-frame decomposition |
 | v1.8.0 | The Big One | Custom fill chars, constrain, note, timer, dynamic forms, panel minimize/maximize/dock, layout presets |
 | v1.7.0 | Test Fortress | Deep audit, multiselect defaultValues, nodeIO/chalkStyle tests, fast-check fuzz suites |
 | v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
