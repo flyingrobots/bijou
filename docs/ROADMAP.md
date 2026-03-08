@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.7.0** — Test Fortress (in progress)
+Latest: **v1.7.0** — Test Fortress
 
 ---
 
@@ -12,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v1.7.0 | Test Fortress | Deep audit, multiselect defaultValues, nodeIO/chalkStyle tests, fast-check fuzz suites |
 | v1.6.0 | Terminal Whisperer + Test Audit | F-key parsing, cursor manager, underline variants, env accessor refactor, 24-test audit pass |
 | v1.5.0 | Polish & Patterns | Mode rendering (OCP), test hardening, theme accessors (DIP), style pass (bg support for 7 components) |
 | v1.4.0 | Transitions & Showcase | Tab transition animations (7 shaders), interactive showcase app, scrollable multiselect |
@@ -56,9 +57,9 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 ---
 
-## Test coverage spec (future hardening milestone)
+## ~~Test coverage spec~~ (shipped in v1.7.0)
 
-Detailed acceptance criteria for existing features. Not all of these are currently covered by tests — this section defines the target coverage.
+~~Detailed acceptance criteria for existing features.~~ All sections audited, gaps filled, fuzz suites added. See COMPLETED.md.
 
 ### 1. Form functions: confirm, input, select, multiselect
 

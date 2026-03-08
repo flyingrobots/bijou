@@ -6,6 +6,23 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-03-08
+
+### ✨ Features
+
+- **Multiselect `defaultValues` (bijou)** — New `defaultValues` option on `multiselect()` pre-selects items when the form first renders in interactive mode. Items render with filled checkboxes (`◉`) and can be toggled off with Space.
+
+### 🧪 Tests
+
+- **Spec-vs-impl corrections** — Resolved 3 mismatches between ROADMAP acceptance criteria and actual implementation: `mockIO().question()` exhaustion returns `''` (not throws), CI+TTY detects as `'static'` (not `'rich'`), Ctrl+C semantics documented per-form.
+- **Node.js adapter tests (bijou-node)** — `nodeIO()`: write, writeError, readFile, readDir (with trailing `/` on dirs), joinPath, setInterval firing/dispose. `chalkStyle()`: bgRgb, bgHex, styled bg field, noColor mode for bg methods.
+- **Multiselect defaultValues tests** — Pre-selected items render checked, can be toggled off.
+- **Property-based fuzz suites (fast-check)** — Forms: arbitrary strings, control characters, long input, numeric edge cases, malformed comma lists, rapid repeated calls. Environment detection: 500+ random env×TTY combos, BIJOU_ACCESSIBLE priority invariant, NO_COLOR invariant. DTCG: random theme round-trip, hex preservation, modifier subset preservation, deeply nested reference chains, edge-case hex values.
+
+### 📝 Documentation
+
+- **ROADMAP** — Test coverage spec sections corrected. Xyph migration moved to COMPLETED.
+
 ## [1.6.0] - 2026-03-07
 
 ### ✨ Features

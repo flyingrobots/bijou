@@ -4,6 +4,14 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## v1.7.0 — Test Fortress
+
+- **Completed:** 2026-03-08
+- **Summary:** Deep audit of ROADMAP test coverage spec vs actual assertions. Resolved 3 spec-vs-impl mismatches. Added `defaultValues` option to multiselect (bug fix + feature). Filled nodeIO and chalkStyle adapter test gaps. Added 3 property-based fuzz suites via fast-check (forms, environment detection, DTCG). 1900 tests total, all passing.
+- **Ref:** v1.7.0, branch `feat/v1.7.0-test-fortress`
+
+---
+
 ## Xyph Migration
 
 - **Completed:** 2026-03-08
