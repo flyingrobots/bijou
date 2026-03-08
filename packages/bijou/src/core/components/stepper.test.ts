@@ -60,8 +60,7 @@ describe('stepper', () => {
   describe('background fill', () => {
     it('applies activeBgToken on current step', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
@@ -70,8 +69,7 @@ describe('stepper', () => {
 
     it('no default bg (opt-in only)', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       stepper(steps, { current: 1, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);
@@ -85,8 +83,7 @@ describe('stepper', () => {
 
     it('skips activeBgToken when noColor is true', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive', noColor: true });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, style });
       stepper(steps, { current: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);

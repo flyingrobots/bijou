@@ -182,8 +182,7 @@ describe('input()', () => {
   describe('NO_COLOR', () => {
     it('prompt renders without ANSI escape codes', async () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['test'] } });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['test'] }, style });
       await input({ title: 'Name', ctx });
       const colorCalls = style.calls.filter((c) => c.method === 'hex' || c.method === 'bgHex');
       expect(colorCalls.length).toBe(0);

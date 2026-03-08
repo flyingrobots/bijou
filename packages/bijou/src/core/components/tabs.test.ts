@@ -60,8 +60,7 @@ describe('tabs', () => {
   describe('background fill', () => {
     it('applies default bg (surface.muted) on active tab in interactive mode', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       tabs(items, { active: 0, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
@@ -69,8 +68,7 @@ describe('tabs', () => {
 
     it('accepts custom activeBgToken', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       tabs(items, { active: 1, activeBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
@@ -91,8 +89,7 @@ describe('tabs', () => {
 
     it('skips bg when noColor is true', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive', noColor: true });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, style });
       tabs(items, { active: 0, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);

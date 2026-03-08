@@ -48,8 +48,7 @@ describe('table', () => {
   describe('background fill', () => {
     it('applies headerBgToken', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
@@ -58,8 +57,7 @@ describe('table', () => {
 
     it('no default bg (opt-in only)', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       table({ columns, rows, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);

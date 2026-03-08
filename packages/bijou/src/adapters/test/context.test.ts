@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from './index.js';
+import { createTestContext, auditStyle } from './index.js';
 
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
@@ -74,6 +74,15 @@ describe('createTestContext()', () => {
   it('gradient() returns empty array for unknown keys', () => {
     const ctx = createTestContext();
     expect(ctx.gradient('nonexistent')).toEqual([]);
+  });
+
+  it('uses custom style option when provided', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    expect(ctx.style).toBe(style);
+    ctx.style.bold('hello');
+    expect(style.calls).toHaveLength(1);
+    expect(style.calls[0]!.method).toBe('bold');
   });
 
 });

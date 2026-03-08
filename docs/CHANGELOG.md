@@ -28,6 +28,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Import `WritePort` type (bijou-tui)** — `runtime.ts` now imports `WritePort` from `@flyingrobots/bijou` instead of inlining the type.
 - **DRY enumerated list (bijou core)** — `enumeratedList()` no-context path now calls the existing `renderItems()` helper instead of duplicating its logic.
 - **Extract `createThemeAccessors` (bijou core)** — Six duplicated accessor lambdas in `factory.ts` and `test/index.ts` consolidated into a single `createThemeAccessors()` function in `core/theme/accessors.ts`.
+- **`createTestContext` style option (bijou core)** — `createTestContext()` now accepts an optional `style` override, eliminating 12 double-cast `(ctx as unknown as …).style = style` patterns across 5 test files.
 
 - **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.
 

@@ -69,8 +69,7 @@ describe('accordion', () => {
   describe('background fill', () => {
     it('applies headerBgToken when provided', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBeGreaterThan(0);
@@ -79,8 +78,7 @@ describe('accordion', () => {
 
     it('no default bg (opt-in only)', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive' });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', style });
       accordion(sections, { ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);
@@ -94,8 +92,7 @@ describe('accordion', () => {
 
     it('skips headerBgToken when noColor is true', () => {
       const style = auditStyle();
-      const ctx = createTestContext({ mode: 'interactive', noColor: true });
-      (ctx as unknown as { style: typeof style }).style = style;
+      const ctx = createTestContext({ mode: 'interactive', noColor: true, style });
       accordion(sections, { headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       const bgCalls = style.calls.filter((c) => c.method === 'bgHex');
       expect(bgCalls.length).toBe(0);
