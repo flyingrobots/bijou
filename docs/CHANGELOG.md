@@ -6,9 +6,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### 🐛 Bug Fixes
+
+- **Timer `onComplete` fires before cursor restore** — `onComplete` callback now runs after interval disposal and cursor restoration, so user code in the callback sees a clean terminal state.
+
 ### 🔧 Internal
 
 - **Timer state machine refactor (bijou)** — Replaced 6 loose mutable variables in `createLiveController` with a discriminated union (`TimerState`), making invalid states unrepresentable. Zero API or behavioral changes; all 29 timer tests pass unmodified.
+- **pre-push hook pipefail safety** — `git rev-list` failures in the commit pacing check now fall back to `count=0` instead of aborting the hook under `set -euo pipefail`.
+- **reply-to-reviews.sh uses GraphQL for thread resolution** — Replaced REST-based heuristic ("has human reply = resolved") with GraphQL `reviewThreads.isResolved` for accurate unresolved thread detection.
 
 ## [1.8.0] - 2026-03-08
 

@@ -106,6 +106,27 @@ describe('createTimer', () => {
     }
   });
 
+  it('fires onComplete after cursor is restored on natural completion', () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = createTestContext({ mode: 'interactive' });
+      let cursorRestoredBeforeCallback = false;
+      const t = createTimer({
+        duration: 1000, interval: 100, ctx,
+        onComplete: () => {
+          // At the time onComplete fires, cursor should already be restored
+          const output = ctx.io.written.join('');
+          cursorRestoredBeforeCallback = output.endsWith('\x1b[?25h');
+        },
+      });
+      t.start();
+      vi.advanceTimersByTime(1100);
+      expect(cursorRestoredBeforeCallback).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('fires onComplete in non-interactive mode for zero-duration timer', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     let completed = false;

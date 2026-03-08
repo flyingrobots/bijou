@@ -94,6 +94,8 @@ interface LiveControllerConfig {
   readonly initialDisplayMs: number;
   /** Optional tick guard — return true to signal completion. */
   readonly onTick?: (elapsedMs: number) => boolean;
+  /** Called after cleanup when onTick signals completion. */
+  readonly onComplete?: () => void;
 }
 
 /**
@@ -119,7 +121,7 @@ function computeElapsed(s: TimerState): number {
 
 /** Shared controller logic for createTimer and createStopwatch. */
 function createLiveController(config: LiveControllerConfig): TimerController {
-  const { ctx, interval, timerOpts, displayMs, initialDisplayMs, onTick } = config;
+  const { ctx, interval, timerOpts, displayMs, initialDisplayMs, onTick, onComplete } = config;
   const mode = ctx.mode;
 
   let state: TimerState = { kind: 'idle' };
@@ -136,6 +138,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
         }
       }
       state = { kind: 'stopped', elapsedMs: elapsed };
+      onComplete?.();
       return;
     }
     const line = timer(displayMs(elapsed), { ...timerOpts, ctx });
@@ -153,7 +156,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
 
       if (mode !== 'interactive') {
         ctx.io.write(timer(initialDisplayMs, { ...timerOpts, ctx }) + '\n');
-        if (onTick?.(0)) { /* onComplete fired */ }
+        if (onTick?.(0)) { onComplete?.(); }
         state = { kind: 'idle' };
         return;
       }
@@ -163,6 +166,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
       if (onTick?.(0)) {
         cursor.dispose();
         state = { kind: 'stopped', elapsedMs: 0 };
+        onComplete?.();
         return;
       }
 
@@ -234,11 +238,11 @@ export function createTimer(options: CreateTimerOptions): TimerController {
         // Render final frame before completing
         const line = timer(0, { ...options, ctx });
         ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
-        onComplete?.();
         return true;
       }
       return false;
     },
+    onComplete,
   });
 }
 
