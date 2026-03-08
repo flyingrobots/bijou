@@ -132,12 +132,12 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   }
 
   /** Erase the full UI and print the final selection summary line. */
-  function cleanup(): void {
+  function cleanup(selectedLabel?: string): void {
     clearRender();
     const totalLines = renderLineCount();
     term.clearBlock(totalLines);
-    const selected = options.options[cursor] as SelectOption<T>;
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selected.label);
+    const displayLabel = selectedLabel ?? (options.options[cursor] as SelectOption<T>).label;
+    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), displayLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
   }
@@ -160,7 +160,9 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
         // Note: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.
-        handle.dispose(); cleanup(); resolve(options.defaultValue ?? options.options[0]!.value);
+        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
+        handle.dispose(); cleanup(fallbackOption?.label); resolve(fallbackValue);
       }
     });
   });

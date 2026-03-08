@@ -12,6 +12,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Cursor manager (bijou-tui)** — `setCursorStyle(io, shape, { blink })` and `resetCursorStyle(io)` for DECSCUSR cursor shape control. Three shapes (`'block'`, `'underline'`, `'bar'`) with optional blink. Constants: `CURSOR_BLOCK`, `CURSOR_UNDERLINE`, `CURSOR_BAR`, `CURSOR_RESET`.
 - **Underline text variants (bijou core + bijou-node)** — `TextModifier` expanded with `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'`. Chalk adapter applies standard underline via chalk and variants via raw SGR 4:3/4:4/4:5 sequences. Graceful degradation in unsupporting terminals.
 
+### 🐛 Bug Fixes
+
+- **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
+
 ### ♻️ Refactors
 
 - **`detectColorScheme` env accessor (bijou core)** — extracted shared `envAccessor()` helper in `tty.ts`, eliminating inline `process.env` fallback coupling. Both `detectOutputMode` and `detectColorScheme` now use the same accessor pattern.

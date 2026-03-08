@@ -42,9 +42,9 @@ export interface GridLayoutResult {
  * Compute area rectangles from grid constraints and area template.
  */
 export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<string, LayoutRect> {
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
-  const gap = Math.max(0, options.gap ?? 0);
+  const width = Math.max(0, Math.floor(options.width));
+  const height = Math.max(0, Math.floor(options.height));
+  const gap = Math.max(0, Math.floor(options.gap ?? 0));
 
   if (options.columns.length === 0 || options.rows.length === 0) {
     throw new Error('gridLayout: columns and rows must be non-empty');
@@ -122,8 +122,8 @@ export function gridLayout(options: Omit<GridOptions, 'cells'>): ReadonlyMap<str
  * Render a named-area grid.
  */
 export function grid(options: GridOptions): string {
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
+  const width = Math.max(0, Math.floor(options.width));
+  const height = Math.max(0, Math.floor(options.height));
   const rects = gridLayout(options);
 
   if (width <= 0 || height <= 0) return '';

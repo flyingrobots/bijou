@@ -164,13 +164,11 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   }
 
   /** Erase the full UI and print the final selection summary line. */
-  function cleanup(): void {
+  function cleanup(selectedLabel: string): void {
     const total = renderLineCount();
     clearRender(total);
     term.clearBlock(total);
 
-    const selected = filtered[cursor];
-    const selectedLabel = selected ? selected.label : '(none)';
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selectedLabel);
     ctx.io.write(`\x1b[K${label}\n`);
     term.showCursor();
@@ -225,16 +223,20 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       // ── Mode-independent ───────────────────────────────────
       if (key === '\r' || key === '\n') {
         handle.dispose();
-        cleanup();
+        const selected = filtered[cursor];
+        const resolvedLabel = selected ? selected.label : '(none)';
+        cleanup(resolvedLabel);
         resolve(filtered[cursor]?.value ?? options.defaultValue ?? options.options[0]!.value);
         return;
       }
 
       if (key === '\x03') {
         // Ctrl+C — cancel from either mode
+        const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
         handle.dispose();
-        cleanup();
-        resolve(options.defaultValue ?? options.options[0]!.value);
+        cleanup(fallbackOption?.label ?? '(none)');
+        resolve(fallbackValue);
         return;
       }
 
@@ -245,9 +247,11 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
           // TODO: bare \x1b may false-trigger on slow connections where escape
           // sequences arrive as separate bytes. Timer-based disambiguation is a
           // shared debt with textarea-editor.ts — unify in a future PR.
+          const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+          const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
           handle.dispose();
-          cleanup();
-          resolve(options.defaultValue ?? options.options[0]!.value);
+          cleanup(fallbackOption?.label ?? '(none)');
+          resolve(fallbackValue);
           return;
         }
 
