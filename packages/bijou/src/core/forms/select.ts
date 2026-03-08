@@ -19,6 +19,9 @@ export interface SelectOptions<T = string> extends SelectFieldOptions<T> {
  * Uses arrow-key navigation in interactive TTY mode, or a numbered list
  * fallback for pipe and accessible modes.
  *
+ * If `defaultValue` does not match any option (via {@link Object.is}), the
+ * first option is used as the cancellation fallback.
+ *
  * @typeParam T - Type of each option's value.
  * @param options - Select field configuration.
  * @returns The value of the selected option.
@@ -161,6 +164,8 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.
         const fallbackValue = options.defaultValue ?? options.options[0]!.value;
+        // Object.is uses reference equality — object-typed values must be the
+        // exact same reference to match, not merely structurally equivalent.
         const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
         handle.dispose(); cleanup(fallbackOption?.label); resolve(fallbackValue);
       }

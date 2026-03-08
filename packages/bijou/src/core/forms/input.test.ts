@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { input } from './input.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, auditStyle } from '../../adapters/test/index.js';
 
 describe('input()', () => {
   describe('pipe mode', () => {
@@ -181,10 +181,12 @@ describe('input()', () => {
 
   describe('NO_COLOR', () => {
     it('prompt renders without ANSI escape codes', async () => {
+      const style = auditStyle();
       const ctx = createTestContext({ mode: 'interactive', noColor: true, io: { answers: ['test'] } });
+      (ctx as unknown as { style: typeof style }).style = style;
       await input({ title: 'Name', ctx });
-      const output = ctx.io.written.join('');
-      expect(output).not.toMatch(/\u001b\[/);
+      const colorCalls = style.calls.filter((c) => c.method === 'hex' || c.method === 'bgHex');
+      expect(colorCalls.length).toBe(0);
     });
 
     it('functionality identical: captures and trims input', async () => {

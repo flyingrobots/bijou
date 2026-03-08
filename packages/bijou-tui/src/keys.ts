@@ -54,7 +54,7 @@ export function parseKey(raw: string): KeyMsg {
   // F-keys: CSI ~ encoding (F1–F12)
   const csiTilde = CSI_TILDE_RE.exec(raw);
   if (csiTilde) {
-    const code = csiTilde[1]!;
+    const code = csiTilde[1] ?? '';
     const modifier = csiTilde[2] ? parseInt(csiTilde[2], 10) : 0;
     const fkey = CSI_FKEY_MAP[code];
     if (fkey) {
@@ -66,15 +66,15 @@ export function parseKey(raw: string): KeyMsg {
   // F-keys: SS3 encoding (F1–F4)
   const ss3 = SS3_FKEY_RE.exec(raw);
   if (ss3) {
-    const fkey = SS3_FKEY_MAP[ss3[1]!];
+    const fkey = SS3_FKEY_MAP[ss3[1] ?? ''];
     if (fkey) return keyMsg(fkey);
   }
 
   // F-keys: CSI 1;modifier P/Q/R/S encoding (modified F1–F4)
   const csiMod = CSI_MOD_FKEY_RE.exec(raw);
   if (csiMod) {
-    const modifier = parseInt(csiMod[1]!, 10);
-    const fkey = SS3_FKEY_MAP[csiMod[2]!];
+    const modifier = parseInt(csiMod[1] ?? '', 10);
+    const fkey = SS3_FKEY_MAP[csiMod[2] ?? ''];
     if (fkey) {
       const [shift, alt, ctrl] = decodeModifier(modifier);
       return keyMsg(fkey, ctrl, alt, shift);
@@ -148,7 +148,7 @@ const SS3_FKEY_MAP: Record<string, string> = {
  * A value of 0 means no modifier parameter was present.
  */
 function decodeModifier(modifier: number): [boolean, boolean, boolean] {
-  if (modifier <= 1) return [false, false, false];
+  if (Number.isNaN(modifier) || modifier <= 1) return [false, false, false];
   const bits = modifier - 1;
   return [(bits & 1) !== 0, (bits & 2) !== 0, (bits & 4) !== 0];
 }

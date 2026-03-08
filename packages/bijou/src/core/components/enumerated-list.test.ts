@@ -57,9 +57,11 @@ describe('enumeratedList', () => {
   it('respects start offset', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = enumeratedList(['Five', 'Six', 'Seven'], { style: 'arabic', start: 5, ctx });
-    expect(result).toContain('5. Five');
-    expect(result).toContain('6. Six');
-    expect(result).toContain('7. Seven');
+    const lines = result.split('\n');
+    expect(lines).toHaveLength(3);
+    expect(lines[0]).toMatch(/^\s*5\. Five$/);
+    expect(lines[1]).toMatch(/^\s*6\. Six$/);
+    expect(lines[2]).toMatch(/^\s*7\. Seven$/);
   });
 
   it('controls leading spaces with indent', () => {

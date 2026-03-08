@@ -422,6 +422,9 @@ export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | Dra
  * Defaults to the right edge when no anchor is specified.
  * Renders a bordered panel with optional title in the top border.
  *
+ * When an optional `region` is provided, the drawer is constrained to that
+ * sub-region rectangle instead of spanning the full screen dimensions.
+ *
  * @param options - Drawer configuration including content, anchor, and dimensions.
  * @returns Overlay positioned at the specified screen edge.
  */

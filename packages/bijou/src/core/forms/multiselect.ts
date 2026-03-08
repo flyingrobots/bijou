@@ -137,7 +137,7 @@ async function interactiveMultiselect<T>(options: MultiselectOptions<T>, ctx: Bi
     term.moveUp(totalLines);
   }
 
-  /** Erase the full UI and print the final selection summary line. */
+  /** Erase the full UI, print the final selection summary line, and restore cursor visibility. */
   function cleanup(): void {
     clearRender();
     const totalLines = renderLineCount();

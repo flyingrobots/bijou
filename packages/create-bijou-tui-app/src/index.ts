@@ -252,7 +252,12 @@ export function usage(): string {
   ].join('\n');
 }
 
-/** Ensure the target directory exists, is a directory, and is empty unless forced. */
+/**
+ * Ensure the target directory exists, is a directory, and is empty unless forced.
+ *
+ * When checking emptiness, `.git` and `.DS_Store` entries are filtered out so
+ * that a directory containing only those entries is treated as empty.
+ */
 function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   if (!existsSync(absTargetDir)) {
     mkdirSync(absTargetDir, { recursive: true });
