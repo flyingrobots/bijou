@@ -4,6 +4,14 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## PR #34 — JSDoc Coverage Overhaul
+
+- **Completed:** 2026-03-08
+- **Summary:** Comprehensive JSDoc coverage across all packages. Fixed 6 pre-existing behavioral bugs (select/filter cancel labels, grid fractional inputs, tab validation, fitBlock dedup, WritePort type dedup, enumerated-list DRY). Extracted `createThemeAccessors` to deduplicate accessor wiring. Added `style` option to `createTestContext`, eliminating 12 double-cast patterns. 5 rounds of CodeRabbit review — 18 items fixed, 12 declined with evidence.
+- **Ref:** [PR #34](https://github.com/flyingrobots/bijou/pull/34)
+
+---
+
 ## v1.6.0 — Terminal Whisperer + Test Audit
 
 - **Completed:** 2026-03-07
