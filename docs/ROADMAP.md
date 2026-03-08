@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v1.6.0** — Terminal Whisperer + Test Audit
+Latest: **v1.7.0** — Test Fortress (in progress)
 
 ---
 
@@ -359,20 +359,3 @@ round-trip
 
 ---
 
-## Xyph migration
-
-Once published:
-1. `npm install @flyingrobots/bijou @flyingrobots/bijou-node`
-2. Create xyph-specific theme preset with custom status keys
-3. Replace inline rendering with bijou components
-4. Domain-specific views stay in xyph
-
-**XYPH TUI Dashboard dependency map:**
-
-| XYPH Phase | Bijou dependency | Status |
-|------------|-----------------|--------|
-| Phase 1 (views, selection, writes) | `selectedId`, ANSI utils, `InputStack` | Ready |
-| Phase 1h (confirm/input overlays) | `composite()`, `modal()` | Ready |
-| Phase 2 (review actions, detail panel) | `selectedId`, ANSI utils | Ready |
-| Phase 3 (full DAG interactivity) | `scrollX`, `dagLayout()`, `createPanelGroup()` | Ready |
-| Title screen (animated splash) | `canvas()`, `box({ width })`, `composite()` | Ready |

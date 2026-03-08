@@ -4,6 +4,13 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 ---
 
+## Xyph Migration
+
+- **Completed:** 2026-03-08
+- **Summary:** Xyph TUI dashboard fully migrated to bijou. All five phases (views/selection/writes, confirm/input overlays, review actions/detail panel, full DAG interactivity, animated title screen) integrated using bijou components, layout primitives, and theme presets.
+
+---
+
 ## PR #34 — JSDoc Coverage Overhaul
 
 - **Completed:** 2026-03-08
