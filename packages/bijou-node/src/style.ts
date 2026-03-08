@@ -32,6 +32,8 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
   const instance: ChalkInstance = opts.level !== undefined
     ? new Chalk({ level: opts.level })
     : chalk;
+  /** Whether ANSI styling is active (respects both noColor flag and chalk level). */
+  const ansiEnabled = !isNoColor && instance.level > 0;
 
   /** SGR codes for underline variants (not supported by chalk natively). */
   const UNDERLINE_VARIANT_SGR: Record<string, string> = {
@@ -77,7 +79,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
    * doesn't support natively. Called after chalk styling is applied.
    */
   function applyUnderlineVariants(text: string, modifiers?: TokenValue['modifiers']): string {
-    if (modifiers === undefined) return text;
+    if (!ansiEnabled || modifiers === undefined) return text;
     let result = text;
     for (const mod of modifiers) {
       const sgr = UNDERLINE_VARIANT_SGR[mod];
@@ -97,7 +99,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      * @returns Styled text, or unmodified text when `noColor` is active.
      */
     styled(token: TokenValue, text: string): string {
-      if (isNoColor) return text;
+      if (!ansiEnabled) return text;
       const base: ChalkInstance = instance.hex(token.hex);
       let result = applyModifiers(base, token.modifiers)(text);
       result = applyUnderlineVariants(result, token.modifiers);

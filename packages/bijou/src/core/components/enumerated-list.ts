@@ -127,7 +127,7 @@ function isOrderedStyle(style: BulletStyle): boolean {
  * @param items - The text items to render.
  * @param style - Bullet or numbering style.
  * @param start - Starting index for ordered styles.
- * @param indent - Current nesting depth.
+ * @param indent - Number of leading spaces for indentation.
  * @param indentStr - Whitespace prefix for the current depth.
  * @param prefixFn - Produces the bullet/number prefix for a given style and index.
  * @returns The formatted list as a single string.

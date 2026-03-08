@@ -51,7 +51,10 @@ describe('createTestContext()', () => {
     expect(ctx.border('primary').hex).toBeTypeOf('string');
     expect(ctx.surface('primary').hex).toBeTypeOf('string');
     expect(ctx.ui('cursor').hex).toBeTypeOf('string');
-    expect(Array.isArray(ctx.gradient('brand'))).toBe(true);
+    const brandGradient = ctx.gradient('brand');
+    expect(Array.isArray(brandGradient)).toBe(true);
+    expect(brandGradient.length).toBeGreaterThan(0);
+    expect(brandGradient).toEqual(ctx.theme.theme.gradient['brand']);
   });
 
   it('status() falls back to muted for unknown keys', () => {

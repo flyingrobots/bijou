@@ -35,12 +35,6 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Layout** | `splitPane()`, `grid()`, `flex()`, `place()`, `vstack()`, `hstack()` |
 | **App** | `statusBar()`, `createFramedApp()`, `canvas()` |
 
-Each new component should follow this template before implementation:
-1. Write user story and requirements
-2. Define acceptance criteria as test descriptions
-3. Write the tests (they will fail)
-4. Implement until tests pass
-
 ---
 
 ## Backlog

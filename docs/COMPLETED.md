@@ -8,7 +8,7 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 - **Completed:** 2026-03-07
 - **Summary:** F-key parsing (F1–F12, CSI + SS3 encodings, modifier combos), cursor manager (DECSCUSR block/underline/bar with blink), underline text variants (standard, curly, dotted, dashed via SGR 4:x), `detectColorScheme` env accessor refactor. Test audit: 24 new tests filling coverage gaps across forms, test adapters, DTCG, and chalk adapter.
-- **Ref:** v1.6.0, branch `feat/v1.6.0-app-shell-primitives`
+- **Ref:** [`9340854`](https://github.com/flyingrobots/bijou/commit/9340854) (release commit on `feat/v1.6.0-app-shell-primitives`)
 
 ---
 
@@ -16,7 +16,7 @@ Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed releas
 
 - **Completed:** 2026-03-07
 - **Summary:** Completed Phases 5 (mode rendering), 6 (test hardening), 7 (theme accessors), and 7b (style pass). Added `gradient()` accessor to BijouContext, migrated all remaining direct theme accesses to typed accessors, relaxed brittle test assertions, and added background color support to 7 components (alert, kbd, tabs, accordion, table, stepper, breadcrumb).
-- **Ref:** v1.5.0, branch `feat/v1.5.0-polish-and-patterns`
+- **Ref:** [`5071dca`](https://github.com/flyingrobots/bijou/commit/5071dca) (release commit on `feat/v1.5.0-polish-and-patterns`)
 
 ---
 

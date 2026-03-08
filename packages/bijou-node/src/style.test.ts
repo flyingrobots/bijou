@@ -122,4 +122,18 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ffffff', modifiers: ['dashed-underline'] }, 'x')).toBe('x');
     });
   });
+
+  describe('level: 0 mode', () => {
+    const style = chalkStyle({ level: 0 });
+
+    it('styled() returns plain text when chalk level is 0', () => {
+      expect(style.styled({ hex: '#ff0000' }, 'plain')).toBe('plain');
+    });
+
+    it('styled() does not emit raw SGR for underline variants at level 0', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'text');
+      expect(result).toBe('text');
+      expect(result).not.toContain('\x1b[');
+    });
+  });
 });

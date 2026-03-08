@@ -43,7 +43,7 @@ export const CURSOR_BLOCK = '\x1b[2 q';
 export const CURSOR_UNDERLINE = '\x1b[4 q';
 /** ANSI escape: steady bar cursor (DECSCUSR 6). */
 export const CURSOR_BAR = '\x1b[6 q';
-/** ANSI escape: reset cursor to terminal default (DECSCUSR 0). */
+/** ANSI escape: request the terminal's configured default cursor style (DECSCUSR 0). */
 export const CURSOR_RESET = '\x1b[0 q';
 
 /** DECSCUSR code for each shape: steady value (blinking = steady - 1). */
@@ -66,7 +66,10 @@ export function setCursorStyle(io: IOPort, shape: CursorShape, options?: { blink
 }
 
 /**
- * Reset cursor to the terminal's default style (DECSCUSR 0).
+ * Request the terminal's configured default cursor style (DECSCUSR 0).
+ *
+ * Note: this does not restore a previously saved cursor style — it asks
+ * the terminal to use whatever default it has configured.
  *
  * @param io - The I/O port to write the escape sequence to.
  */

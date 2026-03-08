@@ -534,7 +534,7 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
   }
 }
 
-/** Render a centered label inside a split pane for the skeleton demo. */
+/** Render a label on the first line of a split pane for the skeleton demo. */
 function renderSplitPaneLabel(label: string, width: number, height: number): string {
   if (width <= 0 || height <= 0) return '';
   const first = clipToWidth(` ${label}`, width);

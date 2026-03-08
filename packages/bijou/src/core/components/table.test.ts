@@ -46,7 +46,8 @@ describe('table', () => {
   });
 
   describe('background fill', () => {
-    it('applies headerBgToken in interactive mode', () => {
+    // plainStyle() strips styling — this verifies headerBgToken is accepted without errors
+    it('accepts headerBgToken without throwing', () => {
       const ctx = createTestContext({ mode: 'interactive' });
       const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       expect(result).toContain('Name');
@@ -64,13 +65,15 @@ describe('table', () => {
     it('skips headerBgToken in pipe mode', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-      expect(result).toContain('Name\tStatus\tScore');
+      const lines = result.split('\n');
+      expect(lines[0]).toBe('Name\tStatus\tScore');
     });
 
     it('skips headerBgToken when noColor is true', () => {
       const ctx = createTestContext({ mode: 'interactive', noColor: true });
       const result = table({ columns, rows, headerBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
       expect(result).toContain('Name');
+      expect(result).not.toMatch(/\x1b\[/);
     });
   });
 

@@ -230,7 +230,7 @@ interface PaletteEntry<Msg> {
   readonly frameAction?: FrameAction;
 }
 
-/** Thread-local state passed to the recursive layout renderer. */
+/** Per-call context passed through the recursive layout renderer. */
 interface RenderContext<PageModel, Msg> {
   readonly model: InternalFrameModel<PageModel, Msg>;
   readonly pageId: string;

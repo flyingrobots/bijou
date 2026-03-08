@@ -121,9 +121,9 @@ describe('enumeratedList', () => {
     const result = enumeratedList(['Line one\nLine two', 'Another'], { ctx });
     const lines = result.split('\n');
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toMatch(/1\.\s+Line one$/);
+    expect(lines[0]).toMatch(/^\s*1\.\s+Line one$/);
     expect(lines[1]).toMatch(/^\s+Line two$/);
-    expect(lines[2]).toMatch(/2\.\s+Another$/);
+    expect(lines[2]).toMatch(/^\s*2\.\s+Another$/);
   });
 
   it('works with default options (no options passed)', () => {

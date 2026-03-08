@@ -20,7 +20,7 @@ export interface AccordionOptions {
   indicatorToken?: TokenValue;
   /** Token used to style section titles. */
   titleToken?: TokenValue;
-  /** Background fill token for expanded section headers. No default — opt-in only. */
+  /** Background fill token for section headers (expanded and collapsed). No default — opt-in only. */
   headerBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;

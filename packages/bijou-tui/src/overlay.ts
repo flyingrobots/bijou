@@ -415,10 +415,12 @@ export type DrawerOptions = DrawerDefaultOptions | DrawerHorizontalOptions | Dra
 // ---------------------------------------------------------------------------
 
 /**
- * Create a full-height drawer overlay anchored to a screen edge.
+ * Create a drawer overlay anchored to a screen edge.
  *
- * Render a bordered panel spanning the full screen height with optional
- * title in the top border, positioned flush against the left or right edge.
+ * Supports horizontal anchors (`left`/`right`) that span the full screen height,
+ * and vertical anchors (`top`/`bottom`) that span the full screen width.
+ * Defaults to the right edge when no anchor is specified.
+ * Renders a bordered panel with optional title in the top border.
  *
  * @param options - Drawer configuration including content, anchor, and dimensions.
  * @returns Overlay positioned at the specified screen edge.

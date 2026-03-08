@@ -252,7 +252,7 @@ export function usage(): string {
   ].join('\n');
 }
 
-/** Ensure the target directory exists and is writable, creating it if needed. */
+/** Ensure the target directory exists, is a directory, and is empty unless forced. */
 function ensureTargetWritable(absTargetDir: string, force: boolean): void {
   if (!existsSync(absTargetDir)) {
     mkdirSync(absTargetDir, { recursive: true });

@@ -359,7 +359,13 @@ export function renderInteractiveLayout(
 
   // ── cellAt: on-demand per-cell computation ──────────────────────
 
-  /** Resolve the character and optional style token at a grid coordinate. */
+  /**
+   * Resolve the character and optional style token at a grid coordinate.
+   *
+   * @param row - The grid row index.
+   * @param col - The grid column index.
+   * @returns The character at the coordinate and its associated style token (or null for unstyled).
+   */
   function cellAt(row: number, col: number): { ch: string; token: TokenValue | null } {
     // 1. Node box (highest priority)
     const nodesOnRow = nodesByRow.get(row);
