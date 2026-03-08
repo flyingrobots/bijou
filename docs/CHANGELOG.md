@@ -19,6 +19,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Grid fractional inputs (bijou-tui)** — `gridLayout()` and `grid()` now floor `width`, `height`, and `gap` at the API boundary. Previously, fractional values passed through to `solveTracks()`, causing leftover fractions to be wrongly promoted to full cells.
 - **Tabs validation (bijou-tui-app)** — `createTuiAppSkeleton()` now throws on duplicate `tab.id` values and falls back to first tab when `defaultTabId` is not found in tabs.
 - **Transition tick zero-duration guard (bijou-tui)** — `createTransitionTickCmd()` now emits `transition-complete` immediately when `durationMs <= 0`, avoiding unnecessary interval timers.
+- **F-key non-null assertions (bijou-tui)** — `keys.ts` capture group accesses replaced with `?? ''` fallbacks; `decodeModifier()` guards against NaN inputs.
 
 ### ♻️ Refactors
 

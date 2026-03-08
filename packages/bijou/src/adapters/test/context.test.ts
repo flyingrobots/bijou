@@ -54,8 +54,10 @@ describe('createTestContext()', () => {
     const brandGradient = ctx.gradient('brand');
     expect(Array.isArray(brandGradient)).toBe(true);
     expect(brandGradient.length).toBeGreaterThan(0);
-    expect(brandGradient[0]).toHaveProperty('hex');
-    expect(brandGradient[0]!.hex).toMatch(/^#[0-9a-fA-F]{6}$/);
+    expect(brandGradient[0]).toHaveProperty('pos');
+    expect(brandGradient[0]).toHaveProperty('color');
+    expect(brandGradient[0]!.pos).toBeTypeOf('number');
+    expect(Array.isArray(brandGradient[0]!.color)).toBe(true);
     expect(brandGradient).toEqual(ctx.theme.theme.gradient['brand']);
   });
 
