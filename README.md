@@ -191,13 +191,11 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v1.8.0
+## What's New in v2.1.0
 
-- **Timer / Stopwatch** — Static `timer(ms)` renders MM:SS / HH:MM:SS / MM:SS.mmm with accessible spoken output. Live `createTimer()` countdown and `createStopwatch()` with start/pause/resume/stop.
-- **`constrain()` component** — Content truncation with configurable `maxWidth`, `maxHeight`, and `ellipsis`. Passthrough in pipe/accessible modes.
-- **`cursorGuard()` + `withHiddenCursor()`** — Reference-counted cursor visibility guard so nested live components (spinner inside progress bar) don't clobber each other.
-- **Dynamic wizard forms** — `WizardStep` gains `transform` and `branch` for runtime field replacement and conditional step injection.
-- **Panel minimize/maximize/dock (bijou-tui)** — `ctrl+m` fold/unfold, `ctrl+f` maximize/restore, `ctrl+shift+arrow` reorder panes. Layout presets and JSON session restore.
+- **9 new transition shaders** — `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static` join the existing 7. All 16 available via `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
+- **Shader factories & combinators** — Parameterized factories (`wipe(direction)`, `radial(originX, originY)`, `blinds(count)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`) for custom transition effects.
+- **`charRole` on `TransitionResult`** — `'decoration'` vs `'marker'` semantic lets combinators distinguish ambient noise from positional indicators (e.g., typewriter cursor).
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 

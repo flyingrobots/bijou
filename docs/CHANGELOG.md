@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-09
+
 ### ✨ Features
 
 - **Transition shader system expansion (bijou-tui)** — Added 9 new built-in transition shaders: `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static`. Added shader factories for parameterized variants (`wipe(direction)`, `radial(originX, originY)`, `blinds(count, direction)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`). Added `frame` counter to `TransitionCell` for temporal effects (glitch, static). Added `charRole` (`'decoration'` | `'marker'`) to `TransitionResult` so combinators can distinguish ambient noise from positional indicators. All 16 named transitions available via the `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
@@ -831,7 +833,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/flyingrobots/bijou/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/flyingrobots/bijou/compare/v1.8.0...v2.0.0
 [1.8.0]: https://github.com/flyingrobots/bijou/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/flyingrobots/bijou/compare/v1.6.0...v1.7.0
