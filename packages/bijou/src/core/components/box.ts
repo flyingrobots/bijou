@@ -1,13 +1,13 @@
-import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { makeBgFill } from '../bg-fill.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
 import { renderByMode } from '../mode-render.js';
+import type { BijouNodeOptions } from './types.js';
 
 /** Configuration for rendering a bordered box. */
-export interface BoxOptions {
+export interface BoxOptions extends BijouNodeOptions {
   /** Theme token applied to border characters. */
   borderToken?: TokenValue;
   /** Background fill token. Interior spaces are styled with this token's bg color. */
@@ -22,8 +22,6 @@ export interface BoxOptions {
    * are rejected and fall back to space.
    */
   fillChar?: string;
-  /** Bijou context for I/O, styling, and mode detection. */
-  ctx?: BijouContext;
 }
 
 /** Unicode box-drawing characters for single-line borders. */

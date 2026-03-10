@@ -1,20 +1,18 @@
-import type { BijouContext } from '../../ports/context.js';
 import type { Theme, TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
 import { renderByMode } from '../mode-render.js';
+import type { BijouNodeOptions } from './types.js';
 
 /** Alert severity level. */
 export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 
 /** Configuration for rendering an alert box. */
-export interface AlertOptions {
+export interface AlertOptions extends BijouNodeOptions {
   /** Severity variant (defaults to `'info'`). */
   variant?: AlertVariant;
   /** Background fill token for the alert box interior. Defaults to `surface.elevated`. */
   bgToken?: TokenValue;
-  /** Bijou context for I/O, styling, and mode detection. */
-  ctx?: BijouContext;
 }
 
 /** Unicode icon characters for each alert variant. */
