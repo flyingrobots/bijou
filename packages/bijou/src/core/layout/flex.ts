@@ -1,4 +1,4 @@
-import type { LayoutNode, LayoutRect } from './types.js';
+import type { LayoutNode, LayoutRect } from '../../ports/surface.js';
 
 /**
  * Common alignment values.

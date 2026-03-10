@@ -1,8 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { runScript } from './driver.js';
-import type { App, Cmd, KeyMsg } from './types.js';
+import type { App, Cmd } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
+import { surfaceToString } from '@flyingrobots/bijou';
+import { plainStyle } from '@flyingrobots/bijou/adapters/test';
+
+const style = plainStyle();
 
 // ---------------------------------------------------------------------------
 // Test app: counter that increments on 'up', decrements on 'down', quits on 'q'
@@ -37,7 +41,7 @@ describe('runScript', () => {
   it('captures initial frame', async () => {
     const result = await runScript(counterApp, []);
     expect(result.frames).toHaveLength(1);
-    expect(result.frames[0]).toBe('Count: 0');
+    expect(surfaceToString(result.frames[0]!, style)).toContain('Count: 0');
     expect(result.model.count).toBe(0);
   });
 
@@ -50,9 +54,9 @@ describe('runScript', () => {
     // Initial frame + 3 update frames
     expect(result.frames).toHaveLength(4);
     expect(result.model.count).toBe(1);
-    expect(result.frames[1]).toBe('Count: 1');
-    expect(result.frames[2]).toBe('Count: 2');
-    expect(result.frames[3]).toBe('Count: 1');
+    expect(surfaceToString(result.frames[1]!, style)).toContain('Count: 1');
+    expect(surfaceToString(result.frames[2]!, style)).toContain('Count: 2');
+    expect(surfaceToString(result.frames[3]!, style)).toContain('Count: 1');
   });
 
   it('stops on quit signal', async () => {
@@ -68,7 +72,7 @@ describe('runScript', () => {
     const captured: Array<{ frame: string; index: number }> = [];
     await runScript(counterApp, [{ key: '\x1b[A' }], {
       onFrame(frame, index) {
-        captured.push({ frame, index });
+        captured.push({ frame: surfaceToString(frame, style), index });
       },
     });
     expect(captured).toHaveLength(2); // initial + 1 update
@@ -137,7 +141,7 @@ describe('runScript', () => {
     const result = await runScript(app, [{ resize: { columns: 120, rows: 40 } }]);
     expect(result.model.cols).toBe(120);
     expect(result.model.rows).toBe(40);
-    expect(result.frames[result.frames.length - 1]).toBe('120x40');
+    expect(surfaceToString(result.frames[result.frames.length - 1]!, style)).toContain('120x40');
   });
 
   it('emits custom msg steps', async () => {

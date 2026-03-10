@@ -1,11 +1,13 @@
 import { getDefaultContext, createSurface, surfaceToString, stringToSurface } from '@flyingrobots/bijou';
-import type { WritePort, Surface } from '@flyingrobots/bijou';
+import type { WritePort, Surface, LayoutNode } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
-import { isKeyMsg } from './types.js';
+import { isKeyMsg, isPulseMsg } from './types.js';
 import { enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
 import { createPipeline, type RenderState } from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
+import { motionMiddleware } from './pipeline/middleware/motion.js';
+import { paintMiddleware } from './pipeline/middleware/paint.js';
 import { parseBCSS } from './css/parser.js';
 import { resolveStyles } from './css/resolver.js';
 import type { ThemeMode } from '@flyingrobots/bijou';
@@ -53,9 +55,19 @@ export async function run<Model, M>(
   // Non-interactive: render once and return
   if (ctx.mode !== 'interactive') {
     const viewOutput = app.view(initModel);
-    const output = typeof viewOutput === 'string' 
-      ? viewOutput 
-      : surfaceToString(viewOutput, ctx.style);
+    let output: string;
+    if (typeof viewOutput === 'string') {
+      output = viewOutput;
+    } else if ((viewOutput as any).cells) {
+      output = surfaceToString(viewOutput as Surface, ctx.style);
+    } else {
+      // LayoutNode: paint to a temporary surface then to string
+      const s = createSurface(sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows));
+      const paintStage = paintMiddleware();
+      const state: any = { targetSurface: s, layoutRoot: viewOutput };
+      paintStage(state, () => {});
+      output = surfaceToString(s, ctx.style);
+    }
     ctx.io.write(output);
     return;
   }
@@ -65,6 +77,7 @@ export async function run<Model, M>(
   let running = true;
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
+  let currentDt = 0.016; // Default to 60fps for first frame
 
   // Double Buffering: track what is currently on screen
   let currentSurface: Surface = createSurface(
@@ -84,31 +97,52 @@ export async function run<Model, M>(
   // Setup Programmable Rendering Pipeline
   const pipeline = createPipeline();
 
+  // 1. Layout Logic Stage
+  pipeline.use('Layout', (state, next) => {
+    const viewOutput = app.view(state.model);
+    if (typeof viewOutput === 'string') {
+      (state as any).layoutRoot = {
+        rect: { x: 0, y: 0, width: sanitizeDimension(ctx.runtime.columns), height: sanitizeDimension(ctx.runtime.rows) },
+        children: [],
+        surface: stringToSurface(viewOutput, sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows))
+      };
+    } else if ((viewOutput as any).cells) {
+      (state as any).layoutRoot = {
+        rect: { x: 0, y: 0, width: (viewOutput as Surface).width, height: (viewOutput as Surface).height },
+        children: [],
+        surface: viewOutput as Surface
+      };
+    } else {
+      (state as any).layoutRoot = viewOutput as LayoutNode;
+    }
+    next();
+  });
+
+  // 2. Motion Interpolation Stage
+  pipeline.use('Layout', motionMiddleware());
+
   // Register BCSS middleware if provided
   if (options?.css) {
     const sheet = parseBCSS(options.css);
     pipeline.use('Layout', bcssMiddleware(options.css));
 
     // Determine theme mode
-    const mode: ThemeMode = (ctx.runtime.env('COLORFGBG')?.split(';').pop() === '15' || ctx.runtime.env('TERM_PROGRAM') === 'Apple_Terminal') ? 'light' : 'dark';
+    const themeMode: ThemeMode = (ctx.runtime.env('COLORFGBG')?.split(';').pop() === '15' || ctx.runtime.env('TERM_PROGRAM') === 'Apple_Terminal') ? 'light' : 'dark';
 
     // Bridge: inject real CSS resolver into the context
     (ctx as any).resolveBCSS = (identity: any) => {
       return resolveStyles(identity, sheet, {
         width: ctx.runtime.columns,
         height: ctx.runtime.rows,
-      }, ctx.tokenGraph, mode);
+      }, ctx.tokenGraph, themeMode);
     };
   }
 
+  // 3. Paint Stage
+  pipeline.use('Paint', paintMiddleware());
+
   // Add default Diff stage (double-buffering)
   pipeline.use('Diff', (state, next) => {
-    // If we're not in interactive mode, we don't diff, we just output
-    if (state.ctx.mode !== 'interactive') {
-      next();
-      return;
-    }
-    
     renderSurfaceFrame(
       state.ctx.io,
       state.currentSurface,
@@ -120,20 +154,15 @@ export async function run<Model, M>(
 
   // Add default Output stage (sync current surface)
   pipeline.use('Output', (state, next) => {
-    // We can't re-assign `currentSurface` here because it's a readonly ref in state,
-    // so we copy the target into the current surface.
-    // If surfaces are different sizes (e.g. after resize), re-initialize.
     if (state.currentSurface.width !== state.targetSurface.width || state.currentSurface.height !== state.targetSurface.height) {
       currentSurface = state.targetSurface.clone();
-      // Need to re-bind it to state since we created a new reference
-      // In a real app we'd probably have currentSurface wrapped in a holder
     } else {
       state.currentSurface.blit(state.targetSurface, 0, 0);
     }
     next();
   });
 
-  // Register middleware
+  // Register user middleware
   if (options?.middlewares) {
     for (const mw of options.middlewares) {
       bus.use(mw);
@@ -167,16 +196,12 @@ export async function run<Model, M>(
     setTimeout(() => {
       renderRequested = false;
 
-      const viewOutput = app.view(model);
-      
-      // Support both Surface and legacy string output during migration
-      const targetSurface = typeof viewOutput === 'string' 
-        ? stringToSurface(viewOutput, sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows))
-        : viewOutput;
+      const targetSurface = createSurface(sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows));
 
       const renderState: RenderState = {
         model,
         ctx,
+        dt: currentDt,
         currentSurface,
         targetSurface,
         layoutMap: new Map(),
@@ -207,6 +232,11 @@ export async function run<Model, M>(
   // Single subscription drives the entire update cycle
   bus.on((msg) => {
     if (!running) return;
+
+    // Track time delta from pulse
+    if (isPulseMsg(msg)) {
+      currentDt = msg.dt;
+    }
 
     // Double Ctrl+C force-quit
     if (isKeyMsg(msg) && msg.key === 'c' && msg.ctrl) {

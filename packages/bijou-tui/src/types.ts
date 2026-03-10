@@ -7,7 +7,7 @@
  * @module
  */
 
-import type { BijouContext, Surface } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, LayoutNode } from '@flyingrobots/bijou';
 import type { Middleware } from './eventbus.js';
 
 // --- Messages ---
@@ -170,12 +170,12 @@ export interface App<Model, M = never> {
   update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];
 
   /**
-   * Render the current model as a Surface for terminal display.
+   * Render the current model as a Surface or LayoutNode for terminal display.
    *
    * @param model - Current application state.
-   * @returns Rendered Surface.
+   * @returns Rendered Surface or Layout tree.
    */
-  view(model: Model): Surface;
+  view(model: Model): Surface | LayoutNode;
 }
 
 // --- Runtime options ---

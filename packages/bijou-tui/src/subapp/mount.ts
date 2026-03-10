@@ -1,5 +1,5 @@
 import type { App, Cmd, QuitSignal } from '../types.js';
-import type { Surface } from '@flyingrobots/bijou';
+import type { Surface, LayoutNode } from '@flyingrobots/bijou';
 
 /**
  * Options for mounting a sub-app.
@@ -27,8 +27,8 @@ export interface MountOptions<SubModel, SubMsg, ParentMsg> {
  * and blitted onto the parent's surface.
  */
 export interface MountedApp<SubMsg> {
-  /** The rendered surface of the sub-app. */
-  surface: Surface;
+  /** The rendered surface or layout tree of the sub-app. */
+  surfaceOrNode: Surface | LayoutNode;
   /**
    * Any TEA commands the sub-app needs to execute.
    * These should be dispatched by the parent during its update cycle.
@@ -45,28 +45,17 @@ export interface MountedApp<SubMsg> {
  *
  * @param app - The TEA application to mount.
  * @param options - Configuration for the mounted instance.
- * @returns A tuple of `[Surface, mapped Cmds]`.
+ * @returns A tuple of `[Surface | LayoutNode, mapped Cmds]`.
  */
 export function mount<SubModel, SubMsg, ParentMsg>(
   app: App<SubModel, SubMsg>,
   options: MountOptions<SubModel, SubMsg, ParentMsg>,
-): [Surface, Cmd<ParentMsg>[]] {
+): [Surface | LayoutNode, Cmd<ParentMsg>[]] {
   const { model } = options;
 
-  const rawSurface = app.view(model);
+  const surfaceOrNode = app.view(model);
   
-  // Handle migration wrapper if the sub-app still returns a string
-  if (typeof rawSurface === 'string') {
-    throw new Error('Sub-apps must return a Surface from view() in v3');
-  }
-  const surface = rawSurface;
-
-  // We don't have commands from the view phase in standard TEA, 
-  // but if we extend `mount` to handle `update` lifecycle forwarding,
-  // this is where command mapping happens.
-  // For now, `mount` is primarily a view-layer composition tool.
-
-  return [surface, []];
+  return [surfaceOrNode, []];
 }
 
 /**

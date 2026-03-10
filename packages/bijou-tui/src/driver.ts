@@ -19,7 +19,7 @@
 import type { App, RunOptions, ResizeMsg } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
-import type { Surface } from '@flyingrobots/bijou';
+import { type Surface, paintLayoutNode, createSurface, stringToSurface } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -127,7 +127,17 @@ export async function runScript<Model, M>(
     if (!running) return;
     const [newModel, cmds] = app.update(msg, model);
     model = newModel;
-    const frame = app.view(model);
+    const viewOutput = app.view(model);
+    
+    let frame: Surface;
+    if (typeof viewOutput === 'string') {
+      frame = stringToSurface(viewOutput, 80, 24);
+    } else if ((viewOutput as any).cells) {
+      frame = viewOutput as Surface;
+    } else {
+      frame = paintToSurface(viewOutput as any);
+    }
+
     frames.push(frame);
     options?.onFrame?.(frame, frames.length - 1);
     for (const cmd of cmds) {
@@ -137,7 +147,16 @@ export async function runScript<Model, M>(
 
   try {
     // Capture initial frame
-    const initFrame = app.view(model);
+    const viewOutput = app.view(model);
+    let initFrame: Surface;
+    if (typeof viewOutput === 'string') {
+      initFrame = stringToSurface(viewOutput, 80, 24);
+    } else if ((viewOutput as any).cells) {
+      initFrame = viewOutput as Surface;
+    } else {
+      initFrame = paintToSurface(viewOutput as any);
+    }
+
     frames.push(initFrame);
     options?.onFrame?.(initFrame, 0);
 
@@ -194,4 +213,11 @@ export async function runScript<Model, M>(
     frames,
     elapsed: Date.now() - start,
   };
+}
+
+/** Helper to paint a layout tree into a surface for the driver. */
+function paintToSurface(node: any): Surface {
+  const surface = createSurface(node.rect.width, node.rect.height);
+  paintLayoutNode(surface, node);
+  return surface;
 }

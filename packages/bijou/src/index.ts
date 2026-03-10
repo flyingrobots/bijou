@@ -240,10 +240,10 @@ export {
 export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
 
 // Rendering
-export { renderDiff, isSameCell, stringToSurface, surfaceToString } from './core/render/differ.js';
+export { renderDiff, isSameCell, stringToSurface, surfaceToString, paintLayoutNode } from './core/render/differ.js';
 
 // Layout
-export type { LayoutRect, LayoutNode, LayoutEngine } from './core/layout/types.js';
+export type { LayoutRect, LayoutNode, LayoutEngine } from './ports/surface.js';
 export { calculateFlex, type FlexOptions, type FlexChildProps } from './core/layout/flex.js';
 
 // Forms

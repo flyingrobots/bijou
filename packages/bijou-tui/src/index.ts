@@ -62,6 +62,11 @@ export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
 export type { MountOptions, MountedApp } from './subapp/mount.js';
 export { mount, mapCmds } from './subapp/mount.js';
 
+// Motion API
+export { motion } from './motion/motion.js';
+export { motionMiddleware } from './pipeline/middleware/motion.js';
+export type { MotionOptions } from './motion/types.js';
+
 // Layout
 export { vstack, hstack, place } from './layout.js';
 export { vstackV3, hstackV3 } from './layout-v3.js';

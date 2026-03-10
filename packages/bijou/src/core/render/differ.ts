@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
+import { createSurface, type Surface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { stripAnsi } from '../text/index.js';
@@ -54,6 +54,22 @@ export function surfaceToString(surface: Surface, style: StylePort): string {
     lines.push(line);
   }
   return lines.join('\n');
+}
+
+/**
+ * Paint a LayoutNode tree onto a Surface.
+ * 
+ * @param target - The surface to paint onto.
+ * @param node - The root layout node to paint.
+ */
+export function paintLayoutNode(target: Surface, node: LayoutNode): void {
+  if (node.surface) {
+    target.blit(node.surface, node.rect.x, node.rect.y);
+  }
+
+  for (const child of node.children) {
+    paintLayoutNode(target, child);
+  }
 }
 
 /**
@@ -133,10 +149,6 @@ export function renderDiff(
         const c = target.get(batchX, y);
         const curr = current.get(batchX, y);
         
-        // Stop if style changes OR cell is already correct
-        // Note: we could be more aggressive and include "already correct" cells 
-        // in the batch if they have the same style, to avoid a cursor jump later.
-        // For now, we only batch cells that NEED update and share style.
         if (batchX > x && !isSameStyle(c, targetCell)) break;
         if (isSameCell(c, curr)) break;
 

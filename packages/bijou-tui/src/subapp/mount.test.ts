@@ -20,21 +20,6 @@ describe('mount', () => {
 
     expect(surface).toBe(mockSurface);
   });
-
-  it('throws an error if the sub-app returns a string', () => {
-    const mockApp: App<number, any> = {
-      init: () => [0, []],
-      update: (m) => [0, []],
-      view: () => 'legacy string',
-    };
-
-    expect(() => {
-      mount(mockApp as any, {
-        model: 42,
-        onMsg: (m) => m,
-      });
-    }).toThrow(/Sub-apps must return a Surface/);
-  });
 });
 
 describe('mapCmds', () => {

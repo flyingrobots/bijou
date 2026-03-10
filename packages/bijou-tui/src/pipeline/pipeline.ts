@@ -8,6 +8,8 @@ export interface RenderState {
   model: any;
   /** The Bijou context (ports, theme, mode). */
   ctx: BijouContext;
+  /** Time delta in seconds since the last frame. */
+  dt: number;
   /**
    * The surface currently visible on the terminal.
    * This should NOT be modified by pipeline stages.
