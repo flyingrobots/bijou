@@ -273,10 +273,9 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         onPulse: (h: (dt: number) => void) => this.onPulse(h),
       };
 
-      void cmd(emit, caps).then((result) => {
+      Promise.resolve(cmd(emit, caps)).then((result) => {
         if (disposed) return;
-        if (result === QUIT) {
-          for (const handler of quitHandlers) {
+        if (result === QUIT) {          for (const handler of quitHandlers) {
             handler();
           }
           return;

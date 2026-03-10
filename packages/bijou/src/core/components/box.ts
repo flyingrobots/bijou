@@ -8,6 +8,8 @@ import type { BijouNodeOptions } from './types.js';
 
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions extends BijouNodeOptions {
+  /** Optional title displayed in the top border. */
+  title?: string;
   /** Theme token applied to border characters. */
   borderToken?: TokenValue;
   /** Background fill token. Interior spaces are styled with this token's bg color. */

@@ -38,10 +38,12 @@ export { isBijouWorker, runInWorker, startWorkerApp, type RunWorkerOptions } fro
 export function createNodeContext(): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
+  // Force level 3 (truecolor) if NO_COLOR is not set, 
+  // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
     io: nodeIO(),
-    style: chalkStyle(noColor),
+    style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
   });
 }
 

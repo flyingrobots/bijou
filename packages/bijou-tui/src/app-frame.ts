@@ -5,7 +5,7 @@
  * panel-scoped overlay context, and optional frame-level command palette.
  */
 
-import { resolveSafeCtx, stringToSurface } from '@flyingrobots/bijou';
+import { resolveSafeCtx, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import type { App, Cmd } from './types.js';
@@ -99,7 +99,7 @@ export type FrameLayoutNode =
   | {
     readonly kind: 'pane';
     readonly paneId: string;
-    readonly render: (width: number, height: number) => string;
+    readonly render: (width: number, height: number) => string | Surface;
     readonly overflowX?: OverflowX;
   }
   | {
@@ -500,8 +500,12 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       const bodyLines = fitBlock(bodyOutput, bodyRect.width, bodyRect.height);
-      const rows: string[] = [header, helpLine, ...bodyLines];
-      while (rows.length < model.rows) rows.push(' '.repeat(Math.max(0, model.columns)));
+      const rows: string[] = [header, ...bodyLines];
+      
+      // Pad to leave room for footer help line
+      while (rows.length < model.rows - 1) rows.push(' '.repeat(Math.max(0, model.columns)));
+      
+      rows.push(helpLine);
 
       let output = rows.slice(0, model.rows).join('\n');
 

@@ -272,3 +272,5 @@ export {
   note,
   type NoteOptions,
 } from './core/forms/index.js';
+export { boxV3 } from './core/components/box-v3.js';
+export { parseAnsiToSurface } from './core/render/differ.js';

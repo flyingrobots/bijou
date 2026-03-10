@@ -46,6 +46,7 @@ import {
   findPaneNode,
   frameBodyRect,
 } from './app-frame-utils.js';
+import { resolveSafeCtx, surfaceToString, stripAnsi } from '@flyingrobots/bijou';
 import { renderFrameNode } from './app-frame-render.js';
 
 /** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette, help toggle, transitions). */
@@ -214,14 +215,21 @@ export function scrollFocusedPane<PageModel, Msg>(
   const paneNode = findPaneNode(layoutTree, focusedPaneId);
   if (paneNode == null) return model;
 
-  const content = paneNode.render(paneRect.width, paneRect.height);
+  const rawContent = paneNode.render(paneRect.width, paneRect.height);
+  let content: string;
+  if (typeof rawContent === 'string') {
+    content = rawContent;
+  } else {
+    const bctx = resolveSafeCtx();
+    content = bctx ? surfaceToString(rawContent, bctx.style) : stripAnsi(surfaceToString(rawContent, { styled: (_: any, s: string) => s } as any));
+  }
+
   let state = createFocusAreaState({
     content,
     width: paneRect.width,
     height: paneRect.height,
     overflowX: paneNode.overflowX ?? 'hidden',
-  });
-  const prior = model.scrollByPage[pageId]?.[focusedPaneId] ?? { x: 0, y: 0 };
+  });  const prior = model.scrollByPage[pageId]?.[focusedPaneId] ?? { x: 0, y: 0 };
   state = focusAreaScrollTo(state, prior.y);
   state = focusAreaScrollToX(state, prior.x);
 

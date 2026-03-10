@@ -92,4 +92,11 @@ export interface IOPort extends InteractivePort, FilePort {
    * @returns A handle whose `dispose()` removes the listener.
    */
   onResize(callback: (cols: number, rows: number) => void): RawInputHandle;
+
+  /**
+   * Register a callback invoked when arbitrary data is received from the host.
+   * Useful for IPC in background workers.
+   * @returns A handle whose `dispose()` removes the listener.
+   */
+  onData?(callback: (payload: any) => void): RawInputHandle;
 }

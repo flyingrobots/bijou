@@ -5,7 +5,7 @@
  * transition shader, and string-to-grid tokenization.
  */
 
-import { resolveSafeCtx, type BijouContext } from '@flyingrobots/bijou';
+import { resolveSafeCtx, type BijouContext, surfaceToString, stripAnsi } from '@flyingrobots/bijou';
 import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type { InternalFrameModel, RenderContext, RenderResult, FrameAction } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -57,7 +57,16 @@ export function renderFrameNode<PageModel, Msg>(
     }
 
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
-    const content = node.render(rect.width, rect.height);
+    const rawContent = node.render(rect.width, rect.height);
+    
+    let content: string;
+    if (typeof rawContent === 'string') {
+      content = rawContent;
+    } else {
+      const bctx = resolveSafeCtx();
+      content = bctx ? surfaceToString(rawContent, bctx.style) : stripAnsi(surfaceToString(rawContent, { styled: (_: any, s: string) => s } as any));
+    }
+
     let state = createFocusAreaState({
       content,
       width: rect.width,
@@ -241,7 +250,16 @@ export function renderMaximizedPane<PageModel, Msg>(
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
-  const content = paneNode.render(bodyRect.width, bodyRect.height);
+  const rawContent = paneNode.render(bodyRect.width, bodyRect.height);
+  
+  let content: string;
+  if (typeof rawContent === 'string') {
+    content = rawContent;
+  } else {
+    const bctx = resolveSafeCtx();
+    content = bctx ? surfaceToString(rawContent, bctx.style) : stripAnsi(surfaceToString(rawContent, { styled: (_: any, s: string) => s } as any));
+  }
+
   let state = createFocusAreaState({
     content,
     width: bodyRect.width,
@@ -294,9 +312,19 @@ export function renderHelpLine<PageModel, Msg>(
     options.globalKeys,
     activePage.helpSource ?? activePage.keyMap,
   );
+  
   const hint = helpShort(source);
-  const line = hint.length > 0
-    ? ` ${status}  ${hint}`
+  const statusPrefix = ` ${status}  `;
+  const availableWidth = model.columns - statusPrefix.length - 4;
+  
+  let finalHint = hint;
+  if (hint.length > availableWidth) {
+    // Basic prioritization or just truncation with indicator
+    finalHint = hint.slice(0, availableWidth) + '... (press ? for more)';
+  }
+
+  const line = finalHint.length > 0
+    ? `${statusPrefix}${finalHint}`
     : ` ${status}`;
   return fitLine(line, model.columns);
 }

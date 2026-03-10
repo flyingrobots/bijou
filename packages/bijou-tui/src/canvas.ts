@@ -26,7 +26,7 @@ export interface ShaderParams {
  * 
  * Returns a Cell defining the character and style. 
  * In high-res modes (Braille/Quad), the character is treated as a boolean 
- * (non-space = on) and styling is taken from the top-left sub-pixel of each cell.
+ * (non-space = on) and styling is taken from the first non-space sub-pixel.
  */
 export type ShaderFn = (params: ShaderParams) => Cell | string;
 
@@ -104,8 +104,6 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
   const subW = width * 2;
   const subH = height * 2;
 
-  // Quad character mapping (2x2 bits)
-  // Top-left: 1, Top-right: 2, Bottom-left: 4, Bottom-right: 8
   const QUAD_CHARS: Record<number, string> = {
     0: ' ', 1: '▘', 2: '▝', 3: '▀',
     4: '▖', 5: '▌', 6: '▞', 7: '▛',
@@ -116,7 +114,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       let mask = 0;
-      let firstCell: Cell | null = null;
+      let firstStyledCell: Cell | null = null;
 
       for (let sy = 0; sy < 2; sy++) {
         for (let sx = 0; sx < 2; sx++) {
@@ -129,16 +127,16 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
             uniforms
           });
           const cell = typeof result === 'string' ? { char: result } : result;
-          if (sy === 0 && sx === 0) firstCell = cell;
-
+          
           if (cell.char !== ' ') {
             mask |= (1 << (sy * 2 + sx));
+            if (!firstStyledCell) firstStyledCell = cell;
           }
         }
       }
 
       surface.set(x, y, {
-        ...(firstCell || { char: ' ' }),
+        ...(firstStyledCell || { char: ' ' }),
         char: QUAD_CHARS[mask] || ' '
       });
     }
@@ -150,11 +148,6 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
   const subW = width * 2;
   const subH = height * 4;
 
-  // Braille dot mapping (2x4 bits)
-  // 1 4
-  // 2 5
-  // 3 6
-  // 7 8
   const DOT_MAP = [
     [0x01, 0x08],
     [0x02, 0x10],
@@ -165,7 +158,7 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       let code = 0;
-      let firstCell: Cell | null = null;
+      let firstStyledCell: Cell | null = null;
 
       for (let sy = 0; sy < 4; sy++) {
         for (let sx = 0; sx < 2; sx++) {
@@ -178,16 +171,16 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
             uniforms
           });
           const cell = typeof result === 'string' ? { char: result } : result;
-          if (sy === 0 && sx === 0) firstCell = cell;
-
+          
           if (cell.char !== ' ') {
             code |= DOT_MAP[sy]![sx]!;
+            if (!firstStyledCell) firstStyledCell = cell;
           }
         }
       }
 
       surface.set(x, y, {
-        ...(firstCell || { char: ' ' }),
+        ...(firstStyledCell || { char: ' ' }),
         char: String.fromCharCode(0x2800 + code)
       });
     }

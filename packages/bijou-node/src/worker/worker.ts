@@ -11,11 +11,13 @@ import { createNodeContext } from '../index.js';
 export type WorkerMessage =
   | { type: 'io:data'; data: string }
   | { type: 'io:resize'; columns: number; rows: number }
+  | { type: 'data'; payload: any }
   | { type: 'quit' };
 
 export type MainMessage =
   | { type: 'render:frame'; output: string }
   | { type: 'error'; message: string }
+  | { type: 'data'; payload: any }
   | { type: 'quit' };
 
 // ---------------------------------------------------------------------------
@@ -30,11 +32,25 @@ export function isBijouWorker(): boolean {
 }
 
 /**
+ * Sends a custom data message from the worker to the main thread.
+ * This will be received via the `onMessage` callback in `runInWorker`.
+ */
+export function sendToMain(payload: any): void {
+  if (parentPort) {
+    parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
+  }
+}
+
+/**
  * Options for starting an app in a background worker.
  */
 export interface RunWorkerOptions extends RunOptions<any> {
   /** The absolute path to the file containing the worker entry point. */
   entry: string;
+  /** Optional callback for custom data messages sent from the worker via `sendToMain`. */
+  onMessage?: (payload: any) => void;
+  /** Optional arguments passed to the Node.js worker process (e.g. ['--import', 'tsx']). */
+  execArgv?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -42,14 +58,26 @@ export interface RunWorkerOptions extends RunOptions<any> {
 // ---------------------------------------------------------------------------
 
 /**
+ * Handle for a running background worker.
+ */
+export interface WorkerHandle {
+  /** Sends a custom data message to the worker thread. */
+  send(payload: any): void;
+  /** Forcefully terminates the worker thread. */
+  terminate(): Promise<void>;
+  /** A promise that resolves when the worker exits cleanly. */
+  onExit: Promise<void>;
+}
+
+/**
  * Spawns a background worker thread to run the TEA application.
  * The main thread delegates all logic to the worker, only handling raw I/O
  * and frame rendering (to keep the TTY responsive).
  * 
  * @param options - Configuration including the path to the worker entry file.
- * @returns A promise that resolves when the worker exits.
+ * @returns A handle to the running worker.
  */
-export async function runInWorker(options: RunWorkerOptions): Promise<void> {
+export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   if (!isMainThread) {
     throw new Error('runInWorker must be called from the main thread.');
   }
@@ -68,22 +96,22 @@ export async function runInWorker(options: RunWorkerOptions): Promise<void> {
     ctx.io.write('\x1b[?1000h\x1b[?1002h\x1b[?1006h'); // ENABLE_MOUSE
   }
 
-  return new Promise<void>((resolve, reject) => {
-    // Spawn the worker
-    const worker = new Worker(resolvePath(options.entry), {
-      workerData: { isBijouWorker: true, options },
-      // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
-    });
+  const worker = new Worker(resolvePath(options.entry), {
+    workerData: { isBijouWorker: true, options: { ...options, onMessage: undefined } },
+    execArgv: options.execArgv,
+    // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
+  });
 
-    // 1. Pipe Main Stdin -> Worker IPC
-    const inputHandle = ctx.io.rawInput((data: string) => {
-      worker.postMessage({ type: 'io:data', data } satisfies WorkerMessage);
-    });
+  // 1. Pipe Main Stdin -> Worker IPC
+  const inputHandle = ctx.io.rawInput((data: string) => {
+    worker.postMessage({ type: 'io:data', data } satisfies WorkerMessage);
+  });
 
-    const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
-      worker.postMessage({ type: 'io:resize', columns, rows } satisfies WorkerMessage);
-    });
+  const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
+    worker.postMessage({ type: 'io:resize', columns, rows } satisfies WorkerMessage);
+  });
 
+  const onExit = new Promise<void>((resolve, reject) => {
     // 2. Pipe Worker IPC -> Main Stdout
     worker.on('message', (msg: MainMessage) => {
       if (msg.type === 'render:frame') {
@@ -91,6 +119,8 @@ export async function runInWorker(options: RunWorkerOptions): Promise<void> {
       } else if (msg.type === 'error') {
         if (ctx.io.writeError) ctx.io.writeError(msg.message);
         else ctx.io.write(msg.message);
+      } else if (msg.type === 'data') {
+        if (options.onMessage) options.onMessage(msg.payload);
       } else if (msg.type === 'quit') {
         worker.terminate();
       }
@@ -120,6 +150,12 @@ export async function runInWorker(options: RunWorkerOptions): Promise<void> {
       }
     }
   });
+
+  return {
+    send: (payload: any) => worker.postMessage({ type: 'data', payload } satisfies WorkerMessage),
+    terminate: async () => { await worker.terminate(); },
+    onExit
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -141,6 +177,8 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
 
   // Create a proxy Context that speaks IPC instead of true I/O
   const proxyCtx = createNodeContext();
+  const { setDefaultContext } = await import('@flyingrobots/bijou');
+  setDefaultContext(proxyCtx);
   
   // Hijack the WritePort to send frames back to main thread
   proxyCtx.io.write = (data: string) => {
@@ -174,6 +212,16 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
   proxyCtx.io.onResize = (handler) => {
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:resize') handler(msg.columns, msg.rows);
+    };
+    parentPort!.on('message', listener);
+    return {
+      dispose: () => parentPort!.off('message', listener)
+    };
+  };
+
+  proxyCtx.io.onData = (handler) => {
+    const listener = (msg: WorkerMessage) => {
+      if (msg.type === 'data') handler(msg.payload);
     };
     parentPort!.on('message', listener);
     return {
