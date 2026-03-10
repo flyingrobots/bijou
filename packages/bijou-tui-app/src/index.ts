@@ -168,7 +168,7 @@ export function createTuiAppSkeleton(
       id: spec.tab.id,
       title: spec.tab.title,
       init: () => [createInitialPageModel(config), []],
-      update(msg, model) {
+      update(msg: SkeletonMsg, model: SkeletonPageModel) {
         return updateSkeletonPage(msg, model, config);
       },
       layout: () => layoutFor(spec),
@@ -200,7 +200,7 @@ export function createTuiAppSkeleton(
       : tabs[0]!.id,
     globalKeys: mergedGlobalKeys,
     enableCommandPalette: true,
-    overlayFactory: (frame) =>
+    overlayFactory: (frame: FrameOverlayContext<SkeletonPageModel>) =>
       buildSkeletonOverlays({
         frame,
         tabsById,
@@ -496,7 +496,7 @@ function updateSkeletonPage(
           from: model.drawerProgress,
           to: target,
           spring: 'default',
-          onFrame: (value) => ({ type: 'drawer-progress', value }),
+          onFrame: (value: number) => ({ type: 'drawer-progress', value }),
         }),
       ]];
     }
@@ -526,12 +526,12 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
         paneA: {
           kind: 'pane',
           paneId: `${spec.tab.id}-left`,
-          render: (width, height) => renderSplitPaneLabel('Left pane (1/3)', width, height),
+          render: (width: number, height: number) => renderSplitPaneLabel('Left pane (1/3)', width, height),
         },
         paneB: {
           kind: 'pane',
           paneId: `${spec.tab.id}-right`,
-          render: (width, height) => renderSplitPaneLabel('Right pane (2/3)', width, height),
+          render: (width: number, height: number) => renderSplitPaneLabel('Right pane (2/3)', width, height),
         },
       };
 

@@ -76,11 +76,11 @@ export async function runInWorker(options: RunWorkerOptions): Promise<void> {
     });
 
     // 1. Pipe Main Stdin -> Worker IPC
-    const inputHandle = ctx.io.rawInput((data) => {
+    const inputHandle = ctx.io.rawInput((data: string) => {
       worker.postMessage({ type: 'io:data', data } satisfies WorkerMessage);
     });
 
-    const resizeHandle = ctx.io.onResize((columns, rows) => {
+    const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
       worker.postMessage({ type: 'io:resize', columns, rows } satisfies WorkerMessage);
     });
 
