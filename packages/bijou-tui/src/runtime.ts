@@ -5,6 +5,10 @@ import { isKeyMsg } from './types.js';
 import { enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
 import { createPipeline, type RenderState } from './pipeline/pipeline.js';
+import { bcssMiddleware } from './pipeline/middleware/css.js';
+import { parseBCSS } from './css/parser.js';
+import { resolveStyles } from './css/resolver.js';
+import type { ThemeMode } from '@flyingrobots/bijou';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -79,6 +83,23 @@ export async function run<Model, M>(
 
   // Setup Programmable Rendering Pipeline
   const pipeline = createPipeline();
+
+  // Register BCSS middleware if provided
+  if (options?.css) {
+    const sheet = parseBCSS(options.css);
+    pipeline.use('Layout', bcssMiddleware(options.css));
+
+    // Determine theme mode
+    const mode: ThemeMode = (ctx.runtime.env('COLORFGBG')?.split(';').pop() === '15' || ctx.runtime.env('TERM_PROGRAM') === 'Apple_Terminal') ? 'light' : 'dark';
+
+    // Bridge: inject real CSS resolver into the context
+    (ctx as any).resolveBCSS = (identity: any) => {
+      return resolveStyles(identity, sheet, {
+        width: ctx.runtime.columns,
+        height: ctx.runtime.rows,
+      }, ctx.tokenGraph, mode);
+    };
+  }
 
   // Add default Diff stage (double-buffering)
   pipeline.use('Diff', (state, next) => {

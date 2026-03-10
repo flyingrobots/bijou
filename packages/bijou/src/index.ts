@@ -110,6 +110,14 @@ export {
   complementary,
   saturate,
   desaturate,
+  // Reactive Token Graph
+  createTokenGraph,
+  type TokenGraph,
+  type ThemeMode,
+  type ColorDefinition,
+  type TokenDefinition,
+  type TokenDefinitions,
+  type ColorTransform,
 } from './core/theme/index.js';
 
 // Text / grapheme utilities

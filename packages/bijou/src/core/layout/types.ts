@@ -20,8 +20,12 @@ export interface LayoutRect {
  * A node in the layout tree.
  */
 export interface LayoutNode {
-  /** Unique identifier for this layout node. */
+  /** Unique identifier for this layout node. Matches CSS #id. */
   id?: string;
+  /** Component type name. Matches CSS type selectors (e.g. 'Badge'). */
+  type?: string;
+  /** List of CSS class names. Matches CSS .class selectors. */
+  classes?: string[];
   /** The calculated rectangle for this node. */
   rect: LayoutRect;
   /** Child layout nodes. */

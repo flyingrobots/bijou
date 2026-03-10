@@ -77,6 +77,7 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     io,
     style,
     tokenGraph,
+    resolveBCSS: () => ({}),
     ...createThemeAccessors(theme),
   };
 }

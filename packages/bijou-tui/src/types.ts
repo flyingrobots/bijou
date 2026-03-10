@@ -196,4 +196,6 @@ export interface RunOptions<M = any> {
   ctx?: BijouContext;
   /** Optional middleware to intercept or modify messages. */
   middlewares?: Middleware<M>[];
+  /** Optional BCSS stylesheet string. */
+  css?: string;
 }

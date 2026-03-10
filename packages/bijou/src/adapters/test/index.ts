@@ -88,6 +88,7 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
     io,
     style,
     tokenGraph,
+    resolveBCSS: () => ({}),
     ...createThemeAccessors(theme),
   };
 }

@@ -22,6 +22,9 @@ export { nodeIO } from './io.js';
 /** Re-export the Chalk-based {@link StylePort} factory and its options type. */
 export { chalkStyle, type ChalkStyleOptions } from './style.js';
 
+/** Re-export Worker utilities for multi-threaded applications. */
+export { isBijouWorker, runInWorker, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
+
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
  *
