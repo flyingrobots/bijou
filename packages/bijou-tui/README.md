@@ -1,28 +1,54 @@
-# @flyingrobots/bijou-tui
+# `@flyingrobots/bijou-tui`
 
-TEA runtime for terminal UIs — model/update/view with physics-based animation, flexbox layout, declarative keybindings, and a centralized event bus.
+The high-performance TEA runtime and graphics engine for Bijou.
 
-Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
+`bijou-tui` provides the application loop, layout primitives, and advanced orchestration required to build complex, 60fps terminal applications.
 
-## What's New (v1.3.0 Snapshot)?
+## V3.0.0 Evolution
 
-- **`splitPane()`** — ratio-based split layout with pure reducers and deterministic rect introspection.
-- **`grid()`** — fixed + fractional track solver with named areas and stable layout geometry.
-- **`createFramedApp()`** — shell scaffolding for tabs, pane focus/scroll isolation, help, overlays, and command palette.
-- **`drawer()` upgrades** — supports `left`/`right`/`top`/`bottom` anchors and optional panel `region` mounting.
-- **`runScript()` upgrades** — scripted driver now supports key, resize, and custom-message steps for richer integration harnesses.
+The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
+### 🌟 What's New
+- **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
+- **Fractal TEA (Sub-Apps):** Use `mount()` and `mapCmds()` to nest fully independent Bijou apps inside a parent app. Say goodbye to monolithic, unmaintainable update functions.
+- **Bijou CSS (BCSS):** Style your terminal with a zero-dependency CSS engine. Supports classes, IDs, the `var()` token graph, and terminal-aware media queries (`@media (width < 80)`).
+- **Declarative Motion:** Wrap any component in `motion({ key: 'id' }, ...)` and watch it smoothly interpolate layout changes (move, resize) using physics-based springs.
+- **Unified Heartbeat:** All animations and physics calculations are now synchronized to a single `PulseMsg`, eliminating timer jitter and saving CPU.
 
-## Documentation Status
+## Installation
 
-This npm README is a quick overview and may lag behind the repository.
+```bash
+npm install @flyingrobots/bijou-tui
+```
 
-- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
-- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+## Quick Start (V3 Sub-App Composition)
 
-## Install
+```typescript
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { run, mount, mapCmds, type App } from '@flyingrobots/bijou-tui';
+import { createSurface } from '@flyingrobots/bijou';
+
+initDefaultContext();
+
+// Parent App mounting two independent Sub-Apps
+const app: App<any, any> = {
+  init: () => [{}, []],
+  update: (msg, model) => [model, []],
+  view: (model) => {
+    // Render the children (they return Surfaces!)
+    const [leftSurface] = mount(childAppA, { model: model.left, onMsg: m => m });
+    const [rightSurface] = mount(childAppB, { model: model.right, onMsg: m => m });
+    
+    // Composite them onto the main screen
+    const screen = createSurface(process.stdout.columns, process.stdout.rows);
+    screen.blit(leftSurface, 0, 0);
+    screen.blit(rightSurface, 40, 0);
+    return screen;
+  }
+};
+
+run(app);
+```
 
 ```bash
 npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui

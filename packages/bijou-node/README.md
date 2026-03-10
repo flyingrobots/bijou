@@ -1,13 +1,15 @@
 # @flyingrobots/bijou-node
 
-Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
+Node.js adapters for the Bijou terminal graphics engine.
 
-## Documentation Status
+This package bridges the pure, platform-agnostic `@flyingrobots/bijou` core with the Node.js runtime, handling TTY capabilities, raw I/O, chalk-based styling, and multi-threading.
 
-This npm README is a quick overview and may lag behind the repository.
+## V3.0.0 Evolution
 
-- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+### 🌟 What's New
+- **Background Worker Runtime:** The new `runInWorker()` and `startWorkerApp()` APIs allow you to run the TEA update loop in a Node.js `Worker` thread. This keeps the main thread 100% responsive for rendering and I/O, even during heavy synchronous workloads (like parsing large files or ASTs).
+- **Environment Refresh Rate:** Automatically detects the environment's target refresh rate (or falls back to 60fps) to synchronize the TUI's unified animation heartbeat perfectly. Supports `BIJOU_FPS` override.
+- **V3 Native I/O:** fully optimized for the new Double-Buffered differential rendering engine.
 
 ## Install
 

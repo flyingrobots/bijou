@@ -1,16 +1,18 @@
 # @flyingrobots/bijou
 
-Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.
+The pure core of the Bijou terminal graphics engine.
 
-**Zero dependencies. Hexagonal architecture. Works everywhere.**
+This package contains the **zero-dependency** foundation of Bijou, focusing entirely on data structures, component logic, and the "what" of terminal rendering. It delegates the "how" (actual TTY writing, styling) to abstract Hexagonal Ports.
 
-## Documentation Status
+## V3.0.0 Evolution
 
-This npm README is a quick overview and may lag behind the repository.
+As of v3.0.0, `@flyingrobots/bijou` has evolved from a string-based library into a high-performance **2D Cell-Buffered Graphics Engine**.
 
-- Canonical API details and usage live in [`GUIDE.md`](./GUIDE.md)
-- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+### Core Pillars
+- **Buffered Surfaces:** Components no longer return strings; they paint into a 2D `Surface` grid of `Cell` objects. Supports masking, affine transforms (rotate/scale), and layer composition (`blit`).
+- **Reactive Token Graph:** A DAG-based theming engine supporting aliases (`ref: 'semantic.primary'`), functional color math (`darken`, `mix`), and adaptive mode buckets (`light`/`dark`).
+- **Differential Rendering:** Contains `renderDiff`, the mathematical engine that computes the minimal set of ANSI escape codes (CUP/SGR) needed to transition from `Frame A` to `Frame B`.
+- **Pure Components:** Contains the robust library of layout algorithms (`Flex`), atomic elements (`badge`, `box`), and form primitives (`input`, `select`)—all rewritten to paint natively to `Surface` buffers.
 
 ## Install
 
