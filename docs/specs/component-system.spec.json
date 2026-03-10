@@ -15,7 +15,7 @@
     "A standard Component<Model, Msg> interface is established",
     "TEA-native form fields (TextField, Checkbox, Slider) are implemented",
     "Focus management (Tab/Shift+Tab) works globally across nested components",
-    "Field-to-Model binding is declarative (e.g. { bind: 'user.name' })",
+    "Field-to-Model binding is declarative (accepts string path or typed (model)=>value binder)",
     "Real-time validation is supported per-field with error propagation to the UI"
   ],
   "backwardCompatibility": "Legacy 'Prompt-style' forms will be maintained for simple scripts, but the new system will be the recommended path for full TUI applications.",

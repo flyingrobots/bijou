@@ -1,4 +1,4 @@
-import type { TextModifier } from './tokens.js';
+import type { TokenValue, TextModifier } from './tokens.js';
 
 /**
  * Color transformation operations supported by the token graph.
@@ -34,8 +34,13 @@ export interface TokenDefinition {
 }
 
 /**
+ * Union of possible input values for a token path.
+ */
+export type TokenInput = ColorDefinition | TokenDefinition | TokenValue;
+
+/**
  * A flat or nested map of token definitions.
  */
 export interface TokenDefinitions {
-  [key: string]: ColorDefinition | TokenDefinition | TokenDefinitions;
+  [key: string]: TokenInput | TokenDefinitions;
 }

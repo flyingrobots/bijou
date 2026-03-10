@@ -14,7 +14,7 @@
     "Tokens can be defined as References to other tokens (Aliases)",
     "Tokens can be derived using functional math (darken, lighten, mix, invert)",
     "Tokens can have conditional buckets for 'light' and 'dark' terminal backgrounds",
-    "A reactive stream/observable exists to signal when any part of the graph changes"
+    "A reactive stream/observable exists to signal when any part of the graph changes, returning a Disposable for clean teardown"
   ],
   "backwardCompatibility": "Current hex-based TokenValue definitions will be the 'leaf nodes' of the graph, ensuring all existing themes continue to work unchanged.",
   "scope": {

@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { grayscaleFilter } from './grayscale.js';
 import { createSurface } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 
 describe('grayscaleFilter', () => {
   it('converts colors to grayscale luminance', () => {

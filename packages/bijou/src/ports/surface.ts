@@ -191,13 +191,15 @@ function applyMask(target: Cell, source: Cell, mask: CellMask): Cell {
  * @returns A new Surface instance.
  */
 export function createSurface(width: number, height: number, fill?: Cell): Surface {
-  const size = Math.max(0, width) * Math.max(0, height);
+  const w = Math.max(0, Math.floor(width));
+  const h = Math.max(0, Math.floor(height));
+  const size = w * h;
   const defaultCell: Cell = fill ?? { char: ' ', empty: true };
   const cells: Cell[] = Array.from({ length: size }, () => ({ ...defaultCell }));
 
   const surface: Surface = {
-    width,
-    height,
+    width: w,
+    height: h,
     cells,
 
     clear() {
@@ -207,26 +209,26 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
     },
 
     get(x, y, mask = FULL_MASK) {
-      if (x < 0 || x >= width || y < 0 || y >= height) {
+      if (x < 0 || x >= w || y < 0 || y >= h) {
         return { char: ' ', empty: true };
       }
-      return maskCell(cells[y * width + x]!, mask);
+      return maskCell(cells[y * w + x]!, mask);
     },
     set(x, y, cell, mask = FULL_MASK) {
-      if (x < 0 || x >= width || y < 0 || y >= height) return;
-      const idx = y * width + x;
+      if (x < 0 || x >= w || y < 0 || y >= h) return;
+      const idx = y * w + x;
       cells[idx] = applyMask(cells[idx]!, cell, mask);
     },
 
-    fill(cell, fx = 0, fy = 0, fw = width, fh = height, mask = FULL_MASK) {
+    fill(cell, fx = 0, fy = 0, fw = w, fh = h, mask = FULL_MASK) {
       const xStart = Math.max(0, fx);
       const yStart = Math.max(0, fy);
-      const xEnd = Math.min(width, xStart + fw);
-      const yEnd = Math.min(height, yStart + fh);
+      const xEnd = Math.min(w, xStart + fw);
+      const yEnd = Math.min(h, yStart + fh);
 
       for (let y = yStart; y < yEnd; y++) {
         for (let x = xStart; x < xEnd; x++) {
-          const idx = y * width + x;
+          const idx = y * w + x;
           cells[idx] = applyMask(cells[idx]!, cell, mask);
         }
       }
@@ -238,18 +240,18 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       const srcXStart = sx + (xStart - dx);
       const srcYStart = sy + (yStart - dy);
 
-      const w = Math.min(width - xStart, sw - (srcXStart - sx));
-      const h = Math.min(height - yStart, sh - (srcYStart - sy));
+      const blitW = Math.min(w - xStart, sw - (srcXStart - sx));
+      const blitH = Math.min(h - yStart, sh - (srcYStart - sy));
 
-      if (w <= 0 || h <= 0) return;
+      if (blitW <= 0 || blitH <= 0) return;
 
-      for (let i = 0; i < h; i++) {
+      for (let i = 0; i < blitH; i++) {
         const targetY = yStart + i;
         const sourceY = srcYStart + i;
-        for (let j = 0; j < w; j++) {
+        for (let j = 0; j < blitW; j++) {
           const targetX = xStart + j;
           const sourceX = srcXStart + j;
-          const tIdx = targetY * width + targetX;
+          const tIdx = targetY * w + targetX;
           const sIdx = sourceY * source.width + sourceX;
           cells[tIdx] = applyMask(cells[tIdx]!, source.cells[sIdx]!, mask);
         }
@@ -262,8 +264,8 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       const det = a * d - b * c;
       if (Math.abs(det) < 0.0001) return;
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
           const srcX = Math.round((d * (x - tx) - b * (y - ty)) / det);
           const srcY = Math.round((a * (y - ty) - c * (x - tx)) / det);
 
@@ -276,35 +278,35 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
               transformedCell.char = charMap[transformedCell.char]!;
             }
             
-            const idx = y * width + x;
+            const idx = y * w + x;
             cells[idx] = applyMask(cells[idx]!, transformedCell, mask);
           }
         }
       }
     },
 
-    getRow(y, rx = 0, rw = width - rx, mask = FULL_MASK) {
-      if (y < 0 || y >= height) return [];
+    getRow(y, rx = 0, rw = w - rx, mask = FULL_MASK) {
+      if (y < 0 || y >= h) return [];
       const xStart = Math.max(0, rx);
-      const count = Math.min(width - xStart, rw);
+      const count = Math.min(w - xStart, rw);
       if (count <= 0) return [];
       return cells
-        .slice(y * width + xStart, y * width + xStart + count)
+        .slice(y * w + xStart, y * w + xStart + count)
         .map((c) => maskCell(c!, mask));
     },
 
     setRow(y, rowCells, sx = 0, mask = FULL_MASK) {
-      if (y < 0 || y >= height) return;
+      if (y < 0 || y >= h) return;
       const xStart = Math.max(0, sx);
-      const count = Math.min(width - xStart, rowCells.length);
+      const count = Math.min(w - xStart, rowCells.length);
       for (let i = 0; i < count; i++) {
-        const idx = y * width + xStart + i;
+        const idx = y * w + xStart + i;
         cells[idx] = applyMask(cells[idx]!, rowCells[i]!, mask);
       }
     },
 
     clone() {
-      const s = createSurface(width, height);
+      const s = createSurface(w, h);
       for (let i = 0; i < cells.length; i++) {
         s.cells[i] = { ...cells[i]! };
       }

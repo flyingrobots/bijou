@@ -13,7 +13,8 @@ import type {
   ColorDefinition, 
   TokenDefinition, 
   TokenDefinitions, 
-  ColorTransform 
+  ColorTransform,
+  TokenInput
 } from './graph-types.js';
 
 export type ThemeMode = 'light' | 'dark';
@@ -27,11 +28,13 @@ export interface TokenGraph {
   /** Resolve a raw color definition to a hex string. */
   getColor(def: ColorDefinition, mode?: ThemeMode): string;
   /** Update a definition in the graph and notify subscribers. */
-  set(path: string, definition: ColorDefinition | TokenDefinition): void;
+  set(path: string, definition: TokenInput): void;
   /** Register a listener for graph changes. */
   on(handler: (path: string) => void): { dispose(): void };
   /** Import a standard Theme object or a nested definitions object. */
   import(defs: TokenDefinitions): void;
+  /** Clear all definitions and subscribers from the graph. */
+  dispose(): void;
 }
 
 function isTokenValue(obj: any): obj is TokenValue {
@@ -186,6 +189,11 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
       for (const handler of subscribers) {
         handler('*'); // Notify full re-import
       }
+    },
+
+    dispose() {
+      definitions.clear();
+      subscribers.clear();
     },
   };
 
