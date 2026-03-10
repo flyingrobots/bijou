@@ -54,11 +54,15 @@ describe('animate', () => {
       const emitted: number[] = [];
       const caps = createMockCaps();
       
-      const promise = cmd((msg) => emitted.push(msg as number), caps);
+      let settled = false;
+      const promise = cmd((msg) => emitted.push(msg as number), caps).then(() => {
+        settled = true;
+      });
       
-      // Manually pulse until done
-      for (let i = 0; i < 100 && frames[frames.length - 1] !== 100; i++) {
+      // Manually pulse until done (or safety limit)
+      for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
+        await new Promise((r) => queueMicrotask(r));
       }
       
       await promise;
@@ -83,11 +87,13 @@ describe('animate', () => {
       });
 
       const caps = createMockCaps();
-      const promise = cmd(() => {}, caps);
+      let settled = false;
+      const promise = cmd(() => {}, caps).then(() => { settled = true; });
       
       // Pulse
-      for (let i = 0; i < 100 && frames[frames.length - 1] !== 10; i++) {
+      for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
+        await new Promise((r) => queueMicrotask(r));
       }
       
       await promise;

@@ -39,7 +39,7 @@
     ],
     "fuzzStress": "Run a complex Braille shader at 4k resolution (simulated) and measure the time per frame.",
     "failureCases": [
-      "Floating point drift in UV coordinates (DIND requirement)"
+      "Floating point drift in UV coordinates affecting reproducible/deterministic output (DIND requirement)"
     ]
   },
   "priority": "P1",

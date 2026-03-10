@@ -29,10 +29,15 @@ export function grayscaleFilter(): RenderMiddleware {
 function hexToGrayscale(hex: string): string {
   if (hex.length !== 7 || hex[0] !== '#') return hex;
   
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
+  const digits = hex.slice(1);
+  if (!/^[0-9A-Fa-f]{6}$/.test(digits)) return hex;
+
+  const r = parseInt(digits.slice(0, 2), 16);
+  const g = parseInt(digits.slice(2, 4), 16);
+  const b = parseInt(digits.slice(4, 6), 16);
   
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return hex;
+
   // Standard luminance formula
   const lum = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
   

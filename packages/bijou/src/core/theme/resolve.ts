@@ -6,6 +6,7 @@ import type { ColorScheme } from '../detect/tty.js';
 import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
 import { createTokenGraph, type TokenGraph } from './graph.js';
+import type { TokenDefinitions } from './graph-types.js';
 
 /**
  * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
@@ -59,7 +60,7 @@ export interface ResolvedTheme {
  * @returns ResolvedTheme with convenience accessors.
  */
 export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
-  const tokenGraph = createTokenGraph(theme as any);
+  const tokenGraph = createTokenGraph(theme as unknown as TokenDefinitions);
 
   return {
     theme,

@@ -14,6 +14,8 @@ export interface MockRuntimeOptions {
   columns?: number;
   /** Terminal height in rows. Defaults to `24`. */
   rows?: number;
+  /** Refresh rate in FPS. Defaults to `60`. */
+  refreshRate?: number;
 }
 
 /**
@@ -40,6 +42,6 @@ export function mockRuntime(options: MockRuntimeOptions = {}): RuntimePort {
     stdinIsTTY: options.stdinIsTTY ?? true,
     columns: options.columns ?? 80,
     rows: options.rows ?? 24,
-    refreshRate: 60,
+    refreshRate: options.refreshRate ?? 60,
   };
 }

@@ -7,13 +7,13 @@ describe('badge', () => {
   it('renders padded text in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = surfaceToString(badge('OK', { ctx }), ctx.style);
-    expect(result).toContain('OK');
+    expect(result).toBe(' OK ');
   });
 
   it('renders with variant in static mode', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = surfaceToString(badge('Error', { variant: 'error', ctx }), ctx.style);
-    expect(result).toContain('Error');
+    expect(result).toBe(' Error ');
   });
 
   it('returns bracketed text in pipe mode', () => {
@@ -25,12 +25,12 @@ describe('badge', () => {
   it('returns plain text in accessible mode', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     const result = surfaceToString(badge('Info', { ctx }), ctx.style);
-    expect(result).toContain('Info');
+    expect(result).toBe(' Info ');
   });
 
   it('defaults to info variant', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = surfaceToString(badge('Note', { ctx }), ctx.style);
-    expect(result).toContain('Note');
+    expect(result).toBe(' Note ');
   });
 });
