@@ -1,7 +1,8 @@
+import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue, BaseStatusKey } from '../theme/tokens.js';
+import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { renderByMode } from '../mode-render.js';
+import { segmentGraphemes } from '../text/grapheme.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -16,38 +17,45 @@ export interface BadgeOptions {
 
 /**
  * Render an inline badge (pill-shaped label) for the given text.
- *
- * Output adapts to the current output mode:
- * - `interactive` / `static` — inverse-colored pill using the variant token.
- * - `pipe` — bracketed text like `[OK]`.
- * - `accessible` — plain text.
- *
- * Falls back to a plain space-padded string when no context or theme is available.
+ * 
+ * Returns a Surface containing the styled badge.
  *
  * @param text - Label to display inside the badge.
  * @param options - Badge configuration.
- * @returns The rendered badge string.
+ * @returns The rendered badge Surface.
  */
-export function badge(text: string, options: BadgeOptions = {}): string {
+export function badge(text: string, options: BadgeOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  if (!ctx) return ` ${text} `;
-
   const variant = options.variant ?? 'info';
+  
+  const paddedText = ` ${text} `;
+  const graphemes = segmentGraphemes(paddedText);
+  const width = graphemes.length;
+  const surface = createSurface(width, 1);
 
-  return renderByMode(ctx.mode, {
-    pipe: () => `[${text}]`,
-    accessible: () => text,
-    interactive: () => {
-      const baseToken = (variant === 'accent' || variant === 'primary')
-        ? ctx.semantic(variant)
-        : ctx.status(variant);
+  if (!ctx || ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    // Basic text output for non-rich modes
+    const char = ctx?.mode === 'pipe' ? `[${text}]` : paddedText;
+    return stringToSurface(char, char.length, 1);
+  }
 
-      const inverseToken: TokenValue = {
-        hex: baseToken.hex,
-        modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
-      };
+  const baseToken = (variant === 'accent' || variant === 'primary')
+    ? ctx.semantic(variant)
+    : ctx.status(variant);
 
-      return ctx.style.styled(inverseToken, ` ${text} `);
-    },
-  }, options);
+  const cell: Cell = {
+    char: ' ',
+    fg: baseToken.hex,
+    modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+    empty: false
+  };
+
+  for (let i = 0; i < width; i++) {
+    surface.set(i, 0, { ...cell, char: graphemes[i]! });
+  }
+
+  return surface;
 }
+
+// Helper needed for the fallback
+import { stringToSurface } from '../render/differ.js';

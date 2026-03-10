@@ -7,7 +7,7 @@
  * @module screen
  */
 
-import { HIDE_CURSOR, SHOW_CURSOR, type IOPort } from '@flyingrobots/bijou';
+import { HIDE_CURSOR, SHOW_CURSOR, renderDiff, type IOPort, type Surface, type StylePort } from '@flyingrobots/bijou';
 
 /** ANSI escape: enter alternate screen buffer (DEC Private Mode 1049). */
 export const ENTER_ALT_SCREEN = '\x1b[?1049h';
@@ -104,9 +104,27 @@ export function exitScreen(io: IOPort): void {
 export function clearAndHome(io: IOPort): void {
   io.write(CLEAR_SCREEN + HOME);
 }
+/**
+ * Optimized double-buffered render: diff two surfaces and write the minimal
+ * set of CUP/SGR escape codes to the terminal.
+ *
+ * @param io      - The I/O port to write the composed frame to.
+ * @param current - The surface currently on screen.
+ * @param target  - The new surface to render.
+ * @param style   - Style port for color resolution.
+ */
+export function renderSurfaceFrame(
+  io: IOPort,
+  current: Surface,
+  target: Surface,
+  style: StylePort,
+): void {
+  renderDiff(current, target, io, style);
+}
 
 /**
  * Flicker-free render: move cursor home, write content line-by-line,
+...
  * clearing from the end of each line to the terminal edge.
  *
  * Disabling wrap in enterScreen() ensures the terminal won't scroll

@@ -16,7 +16,7 @@ import { nodeIO } from './io.js';
 import { chalkStyle } from './style.js';
 
 /** Re-export the Node.js {@link RuntimePort} factory. */
-export { nodeRuntime } from './runtime.js';
+export { nodeRuntime, detectRefreshRate } from './runtime.js';
 /** Re-export the Node.js {@link IOPort} factory. */
 export { nodeIO } from './io.js';
 /** Re-export the Chalk-based {@link StylePort} factory and its options type. */

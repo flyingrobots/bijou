@@ -1,0 +1,50 @@
+{
+  "name": "Sub-App Composition",
+  "designPattern": "Fractal TEA / Composite",
+  "requirements": [
+    "TEA update/view cycle",
+    "Buffered Surfaces (for sub-app isolation)"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to nest Bijou applications inside each other",
+    "soThat": "I can build massive, complex interfaces by composing small, independent, and testable sub-apps."
+  },
+  "acceptanceCriteria": [
+    "A mount() helper allows an App to be placed inside another App's view",
+    "Sub-apps maintain their own isolated Model and Msg types",
+    "Parent apps can intercept and transform Sub-app messages",
+    "The EventBus correctly routes messages to the appropriate sub-app handler",
+    "Sub-apps render to their own isolated Surfaces before being blitted by the parent"
+  ],
+  "backwardCompatibility": "Legacy 'Single-Model' apps are just the root of a potentially deeper fractal tree. Zero breaking changes for existing apps.",
+  "scope": {
+    "inScope": [
+      "Fractal mount() primitive",
+      "Message routing and namespacing",
+      "Isolated Surface management for sub-apps",
+      "Type helpers for Model/Msg nesting"
+    ],
+    "outScope": [
+      "Shared global state (state should be passed down or managed via Effects)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Create a 'Counter' app. Mount two instances of 'Counter' inside a 'Dashboard' app. Verify that clicking '+' on one counter only increments that specific sub-app's model.",
+    "edgeCases": [
+      "Deeply nested sub-apps (5+ levels)",
+      "Sibling sub-apps sharing the same Msg type (should be namespaced)",
+      "Parent app overriding a sub-app's update logic"
+    ],
+    "fuzzStress": "Mount 100 identical sub-apps and verify that message routing latency remains O(log N).",
+    "failureCases": [
+      "Message 'collisions' where a parent accidentally swallows a sub-app message"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~350 lines",
+    "timeComplexity": "O(D) where D is tree depth",
+    "workEstimate": "Medium"
+  }
+}

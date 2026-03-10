@@ -16,7 +16,7 @@ import { QUIT, type Cmd, type QuitSignal } from './types.js';
  * @returns A command that resolves to the {@link QUIT} sentinel.
  */
 export function quit<M>(): Cmd<M> {
-  return async (_emit) => QUIT as QuitSignal;
+  return async (_emit, _caps) => QUIT as QuitSignal;
 }
 
 /**
@@ -28,7 +28,7 @@ export function quit<M>(): Cmd<M> {
  * @returns A one-shot timer command.
  */
 export function tick<M>(ms: number, msg: M): Cmd<M> {
-  return (_emit) =>
+  return (_emit, _caps) =>
     new Promise<M>((resolve) => {
       setTimeout(() => resolve(msg), ms);
     });

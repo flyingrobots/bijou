@@ -19,6 +19,17 @@ export type {
   BijouContext,
 } from './ports/index.js';
 
+export {
+  type Cell,
+  type Surface,
+  type CellMask,
+  type Matrix3x3,
+  type TransformOptions,
+  createSurface,
+  FULL_MASK,
+  ROTATION_CHAR_MAP,
+} from './ports/surface.js';
+
 // Context
 export {
   getDefaultContext,
@@ -219,6 +230,13 @@ export {
 
 // Shared ANSI escape constants
 export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
+
+// Rendering
+export { renderDiff, isSameCell, stringToSurface, surfaceToString } from './core/render/differ.js';
+
+// Layout
+export type { LayoutRect, LayoutNode, LayoutEngine } from './core/layout/types.js';
+export { calculateFlex, type FlexOptions, type FlexChildProps } from './core/layout/flex.js';
 
 // Forms
 export {

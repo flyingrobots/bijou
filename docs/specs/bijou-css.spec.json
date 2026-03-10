@@ -1,0 +1,59 @@
+{
+  "name": "Bijou CSS (BCSS) & Live Styles",
+  "requirements": [
+    "Reactive & Semantic Token Graph spec",
+    "CSSTree or similar parser",
+    "Surface/Cell primitives"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to style my application using familiar CSS selectors and separate stylesheets",
+    "soThat": "my UI structure remains clean and I can hot-reload styles instantly."
+  },
+  "acceptanceCriteria": [
+    "CSS Parser correctly maps a subset of CSS properties to Bijou component props",
+    "Selectors support classes (.sidebar), IDs (#header), and widget types (Badge)",
+    "Pseudo-classes like :hover and :focus are supported via EventBus integration",
+    "Media queries (@media) handle responsive layout based on terminal rows/cols",
+    "Live hot-reloading works when CSS files are modified on disk"
+  ],
+  "scope": {
+    "inScope": [
+      "BCSS subset of CSS (Box Model, Flex/Grid, Typography)",
+      "Selector matching engine",
+      "Style cascade and inheritance",
+      "Media query evaluation",
+      "File-watch bridge for hot-reloading"
+    ],
+    "outScope": [
+      "Full CSS compatibility (no floating, no absolute positioning outside grid)",
+      "Web browser CSS (this is for terminal primitives only)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Apply a .tcss file with .header { color: #ff0000; } to a component. Assert the component's resolved color is #ff0000.",
+    "edgeCases": [
+      "Specificity wars between ID, class, and type selectors",
+      "Invalid CSS syntax handling (fail gracefully, log error)",
+      "Rapidly changing media query conditions (resizing terminal fast)"
+    ],
+    "fuzzStress": "Apply a stylesheet with 10,000 rules and measure the time it takes to resolve a single widget's final style.",
+    "failureCases": [
+      "Circular dependency in token references through CSS",
+      "Style resolution leaking between isolated sub-apps"
+    ]
+  },
+  "blocking": [],
+  "blockedBy": [
+    "Reactive & Semantic Token Graph"
+  ],
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~1,200 lines (including parser bridge)",
+    "timeComplexity": "O(N * M) where N is selectors and M is widget tree depth",
+    "memoryFootprint": "Style rule registry storage"
+  },
+  "workEstimate": {
+    "size": "Large"
+  }
+}

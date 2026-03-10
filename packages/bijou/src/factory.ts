@@ -6,6 +6,7 @@ import type { Theme } from './core/theme/tokens.js';
 import type { OutputMode } from './core/detect/tty.js';
 import { createResolved, type ResolvedTheme } from './core/theme/resolve.js';
 import { createThemeAccessors } from './core/theme/accessors.js';
+import { createTokenGraph } from './core/theme/graph.js';
 import { CYAN_MAGENTA } from './core/theme/presets.js';
 import { PRESETS } from './core/theme/presets.js';
 import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
@@ -66,12 +67,16 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
   const theme: ResolvedTheme = createResolved(themeObj, noColor);
   const mode: OutputMode = detectOutputMode(runtime);
 
+  // Initialize Reactive Token Graph
+  const tokenGraph = createTokenGraph(themeObj as any);
+
   return {
     theme,
     mode,
     runtime,
     io,
     style,
+    tokenGraph,
     ...createThemeAccessors(theme),
   };
 }

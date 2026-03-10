@@ -16,6 +16,7 @@ import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
 import { CYAN_MAGENTA } from '../../core/theme/presets.js';
 import { createThemeAccessors } from '../../core/theme/accessors.js';
+import { createTokenGraph } from '../../core/theme/graph.js';
 import type { Theme } from '../../core/theme/tokens.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
@@ -77,6 +78,7 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
   const io = mockIO(options.io);
   const style = options.style ?? plainStyle();
   const theme = createResolved(options.theme ?? CYAN_MAGENTA, options.noColor ?? false, options.colorScheme ?? 'dark');
+  const tokenGraph = createTokenGraph((options.theme ?? CYAN_MAGENTA) as any);
   const mode: OutputMode = options.mode ?? 'interactive';
 
   return {
@@ -85,6 +87,7 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
     runtime,
     io,
     style,
+    tokenGraph,
     ...createThemeAccessors(theme),
   };
 }

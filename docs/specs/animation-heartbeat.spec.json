@@ -1,0 +1,48 @@
+{
+  "name": "Unified Animation Heartbeat",
+  "designPattern": "Ticker / Observer",
+  "requirements": [
+    "EventBus spec (to host the pulse)",
+    "TEA update cycle (to consume the pulse)"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "all animations to be driven by a single system clock",
+    "soThat": "multiple simultaneous animations (springs, tweens) stay perfectly in sync and don't overwhelm the event loop."
+  },
+  "acceptanceCriteria": [
+    "A single global interval/pulse is managed by the EventBus",
+    "Components subscribe to the pulse via a specialized Msg type",
+    "All spring/tween physics calculations are batched into one update cycle per frame",
+    "The pulse frequency (FPS) is configurable at the runtime level"
+  ],
+  "backwardCompatibility": "Legacy components using individual setIntervals will still function, but will be deprecated in favor of the pulse-aware animate() helper.",
+  "scope": {
+    "inScope": [
+      "Centralized Ticker implementation in EventBus",
+      "PulseMsg type definition",
+      "Batching logic for simultaneous Cmds"
+    ],
+    "outScope": [
+      "Individual component logic (they just consume the pulse)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Spawn 50 'wobbly' springs at once. Assert that only one setInterval is active and all 50 values update in the same event loop turn.",
+    "edgeCases": [
+      "Slow systems where the pulse can't maintain the target FPS",
+      "Pausing/Resuming the heartbeat (e.g. when terminal is minimized)",
+      "Varying FPS targets between components"
+    ],
+    "fuzzStress": "Run 500 animations at 120fps for 10 minutes and measure CPU spikes and frame drop counts.",
+    "failureCases": [
+      "Pulse feedback loop (update cycle triggering another pulse instantly)"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~250 lines",
+    "timeComplexity": "O(N) where N is active animations",
+    "workEstimate": "Small"
+  }
+}

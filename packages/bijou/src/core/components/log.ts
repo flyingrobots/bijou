@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { badge } from './badge.js';
 import { renderByMode } from '../mode-render.js';
+import { surfaceToString } from '../render/differ.js';
 
 /** Severity levels for structured log messages. */
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
@@ -110,7 +111,7 @@ export function log(level: LogLevel, message: string, options?: LogOptions): str
       }
       if (showPrefix) {
         const variant = BADGE_VARIANTS[level] as any;
-        parts.push(badge(LABELS[level], { variant, ctx }));
+        parts.push(surfaceToString(badge(LABELS[level], { variant, ctx }), ctx.style));
       }
       parts.push(message);
       return parts.join(' ');

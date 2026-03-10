@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext } from '@flyingrobots/bijou';
+import { setDefaultContext, surfaceToString } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
@@ -547,7 +547,8 @@ describe('createFramedApp', () => {
     });
 
     const [model] = app.init();
-    const lines = app.view(model).split('\n');
+    const ctx = createTestContext();
+    const lines = surfaceToString(app.view(model), ctx.style).split('\n');
     expect(lines[1]).toContain('[NORMAL]');
     expect(lines[1]).toContain('page:home');
     expect(lines[1]).toContain('pane:main');

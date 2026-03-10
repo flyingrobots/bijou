@@ -42,6 +42,37 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 ## Backlog
 
+### P1 — Architecture & Performance
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| ~~**Programmable Rendering Pipeline**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Multi-stage pipeline (Layout -> Paint -> Post-Process -> Diff -> Output).~~ |
+| ~~**Buffered Surfaces & Post-Processing**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Render to 2D `Surface` objects. Supported `blit()` transfers, masking, and affine transforms.~~ |
+| ~~**Cell-Diffing Render Engine**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Only sends changed cells and cursor movements to the TTY.~~ |
+| ~~**Unified Animation Heartbeat**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Centralized `PulseMsg` in the EventBus, synchronized to environment refresh rate.~~ |
+| ~~**Decoupled Layout Pass**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. `calculateFlex()` returns pure geometry (`LayoutNode`/`LayoutRect`).~~ |
+| ~~**EventBus Middleware**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. `bus.use()` interceptor chain added.~~ |
+| ~~**Sub-App Composition**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Fractal TEA support via `mount()` and `mapCmds()`.~~ |
+| ~~**Reactive & Semantic Token Graph**~~ | ~~bijou~~ | ~~Shipped in v3.0.0. Reactive graph backend for theming (`createTokenGraph`).~~ |
+| **Standardized `BijouNode` Protocol** | bijou | Unified node type and `children` prop across all components for true composability. |
+| **Standard Interactive Component & Form System** | bijou-tui | Unified interface for stateful components (Sub-Apps), global focus management, and TEA-native form binding. |
+| **Background Worker Runtime** | bijou-node | Run `update` and `view` cycles in a Worker Thread to keep the TUI 60fps during heavy I/O. |
+| **Pluggable "Effect" Handlers** | bijou | Formalize `HttpPort`, `SqlPort`, and `GitPort` to keep all side effects mockable and testable. |
+| **bijou-web** | adapters | Implement `WebRuntime` and `WebIO` adapters to run Bijou TUIs in the browser (Wasm/Xterm.js). |
+| **Deterministic Snapshot Harness** | bijou-tui | Built-in "Tape" recording/replay for TUI sessions to assert UI inevitability and regression safety. |
+| **Rich Canvas / Shader v2** | bijou-tui | Upgrade `canvas()` to support rich cell output (`{ char, color, bg }`), normalized UV mapping, and high-res Braille/Quad sub-grid scaling. |
+| **Bijou CSS (BCSS) & Live Styles** | bijou-tui | CSS-based styling engine for TUIs. Supports selectors (classes, IDs, widgets), responsive @media queries for terminal size, and hot-reloading styles. |
+
+### P2 — Advanced Components & DX
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| **Data Visualization Suite** | bijou | High-density `sparkline()`, `barChart()`, and Braille-based `scatterPlot()` for real-time monitoring. |
+| **Bijou DevTools Inspector** | bijou-tui | Toggleable overlay (`F12`) to inspect the live TEA model, message log, and design tokens. |
+| **Syntax-Aware `textarea`** | bijou | Light-weight syntax highlighting for JSON, YAML, and Markdown within the editor. |
+| **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
+| **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
+
 ### P3 — Nice to have
 
 | Feature | Package | Notes |

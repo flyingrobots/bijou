@@ -1,6 +1,26 @@
 import type { RuntimePort } from '@flyingrobots/bijou';
 
 /**
+ * Attempt to detect the system's refresh rate in Hz.
+ * 
+ * Currently defaults to 60, but provides an anchor for future
+ * platform-specific detection (e.g. via native calls or shell commands).
+ * 
+ * @returns Detected refresh rate or 60.
+ */
+export function detectRefreshRate(): number {
+  const envFps = process.env['BIJOU_FPS'];
+  if (envFps) {
+    const parsed = parseInt(envFps, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  
+  // Future: add platform-specific detection logic here
+  
+  return 60;
+}
+
+/**
  * Create a {@link RuntimePort} backed by Node.js `process` globals.
  *
  * Delegates environment variable lookups to `process.env` and terminal
@@ -34,6 +54,10 @@ export function nodeRuntime(): RuntimePort {
     /** Terminal height in rows from `process.stdout`. Falls back to `24`. */
     get rows(): number {
       return process.stdout.rows ?? 24;
+    },
+    /** Refresh rate in FPS. Defaults to 60, or BIJOU_FPS if set. */
+    get refreshRate(): number {
+      return detectRefreshRate();
     },
   };
 }

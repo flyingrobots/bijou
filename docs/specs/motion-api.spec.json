@@ -1,0 +1,50 @@
+{
+  "name": "Motion API",
+  "designPattern": "Declarative Animation / Reconciler",
+  "requirements": [
+    "Buffered Surfaces (for snapshotting A and B)",
+    "Decoupled Layout Pass (for transition geometry)",
+    "Unified Animation Heartbeat"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to declaratively animate layout changes",
+    "soThat": "components slide, fade, and scale into place automatically when the model changes."
+  },
+  "acceptanceCriteria": [
+    "A motion() wrapper exists for any component",
+    "The engine detects 'Exit', 'Enter', and 'Move' transitions",
+    "Layout transitions are smooth (60fps) and driven by the Heartbeat",
+    "Supports 'Keyed' children for stable tracking during list re-ordering"
+  ],
+  "backwardCompatibility": "Zero changes to existing components; motion() is a purely additive wrapper.",
+  "scope": {
+    "inScope": [
+      "Motion reconciler (Diffing before/after layout)",
+      "Interpolation engine for Rects and Opacity",
+      "Staggered animation support",
+      "Spring/Tween integration"
+    ],
+    "outScope": [
+      "Non-layout animations (e.g. animating character contents — use Shader v2 for that)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Wrap a list of items in a motion() group. Re-order the list in the model. Verify that the items slide to their new positions over 300ms.",
+    "edgeCases": [
+      "Rapidly interrupting an animation with a new model change",
+      "Animating items that are also being resized",
+      "Handling hundreds of moving elements simultaneously"
+    ],
+    "fuzzStress": "Randomly shuffle a 100-item list every 500ms for 5 minutes and verify that no items 'leak' or drift off-screen.",
+    "failureCases": [
+      "Memory leaks from orphaned Surface snapshots"
+    ]
+  },
+  "priority": "P2",
+  "estimatedComplexity": {
+    "linesOfCode": "~800 lines",
+    "timeComplexity": "O(N) where N is animated elements",
+    "workEstimate": "Large"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "Syntax-Aware textarea",
+  "designPattern": "Decorator / Parser",
+  "requirements": [
+    "textarea component",
+    "StylePort for coloring"
+  ],
+  "userStory": {
+    "asA": "TUI user",
+    "iWant": "syntax highlighting while I edit code or config files",
+    "soThat": "the editor feels professional and I can spot syntax errors instantly."
+  },
+  "acceptanceCriteria": [
+    "Light-weight highlighter for JSON, YAML, and Markdown",
+    "Customizable color themes via the Token Graph",
+    "Asynchronous highlighting (no typing lag)",
+    "Correct handling of multi-byte characters and line wraps"
+  ],
+  "backwardCompatibility": "The base textarea component remains identical; syntax highlighting is an optional opt-in prop.",
+  "scope": {
+    "inScope": [
+      "Regex-based or Tree-sitter-based highlighting engine",
+      "Language-specific grammars (JSON, YAML, MD)",
+      "Incremental update logic (only re-highlight visible lines)",
+      "Integration with the existing textarea cursor/wrap logic"
+    ],
+    "outScope": [
+      "Full IDE features (Auto-complete, LSP support — deferred to P3)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Open a JSON file in the textarea. Verify that keys, strings, and numbers are colored according to the current theme.",
+    "edgeCases": [
+      "Malformed syntax (should not crash the highlighter)",
+      "Extremely large files (10k+ lines)",
+      "Nested languages (e.g. code blocks in Markdown)"
+    ],
+    "fuzzStress": "Paste a 1MB JSON blob and measure the time to the first highlighted frame.",
+    "failureCases": [
+      "Highlighter falling behind the user's typing speed (input lag)"
+    ]
+  },
+  "priority": "P2",
+  "estimatedComplexity": {
+    "linesOfCode": "~600 lines",
+    "timeComplexity": "O(L) where L is visible lines",
+    "workEstimate": "Medium"
+  }
+}

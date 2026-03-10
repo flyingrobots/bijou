@@ -53,8 +53,18 @@ export {
   createEventBus,
 } from './eventbus.js';
 
+// Pipeline
+export type { RenderState, RenderMiddleware, RenderStage, RenderPipeline } from './pipeline/pipeline.js';
+export { createPipeline } from './pipeline/pipeline.js';
+export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
+
+// Sub-App Composition
+export type { MountOptions, MountedApp } from './subapp/mount.js';
+export { mount, mapCmds } from './subapp/mount.js';
+
 // Layout
 export { vstack, hstack, place } from './layout.js';
+export { vstackV3, hstackV3 } from './layout-v3.js';
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
 export type { LayoutRect } from './layout-rect.js';
 

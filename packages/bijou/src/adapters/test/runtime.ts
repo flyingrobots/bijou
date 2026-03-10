@@ -40,5 +40,6 @@ export function mockRuntime(options: MockRuntimeOptions = {}): RuntimePort {
     stdinIsTTY: options.stdinIsTTY ?? true,
     columns: options.columns ?? 80,
     rows: options.rows ?? 24,
+    refreshRate: 60,
   };
 }

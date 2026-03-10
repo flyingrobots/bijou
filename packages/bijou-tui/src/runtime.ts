@@ -1,9 +1,10 @@
-import { getDefaultContext } from '@flyingrobots/bijou';
-import type { WritePort } from '@flyingrobots/bijou';
+import { getDefaultContext, createSurface, surfaceToString, stringToSurface } from '@flyingrobots/bijou';
+import type { WritePort, Surface } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg } from './types.js';
-import { enterScreen, exitScreen, renderFrame } from './screen.js';
+import { enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
+import { createPipeline, type RenderState } from './pipeline/pipeline.js';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -36,7 +37,7 @@ const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
  */
 export async function run<Model, M>(
   app: App<Model, M>,
-  options?: RunOptions,
+  options?: RunOptions<M>,
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
   const useAltScreen = options?.altScreen ?? true;
@@ -47,7 +48,11 @@ export async function run<Model, M>(
 
   // Non-interactive: render once and return
   if (ctx.mode !== 'interactive') {
-    ctx.io.write(app.view(initModel));
+    const viewOutput = app.view(initModel);
+    const output = typeof viewOutput === 'string' 
+      ? viewOutput 
+      : surfaceToString(viewOutput, ctx.style);
+    ctx.io.write(output);
     return;
   }
 
@@ -57,6 +62,12 @@ export async function run<Model, M>(
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
 
+  // Double Buffering: track what is currently on screen
+  let currentSurface: Surface = createSurface(
+    sanitizeDimension(ctx.runtime.columns),
+    sanitizeDimension(ctx.runtime.rows),
+  );
+
   const bus = createEventBus<M>({
     onCommandRejected(error) {
       const message = error instanceof Error
@@ -65,6 +76,48 @@ export async function run<Model, M>(
       writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
     },
   });
+
+  // Setup Programmable Rendering Pipeline
+  const pipeline = createPipeline();
+
+  // Add default Diff stage (double-buffering)
+  pipeline.use('Diff', (state, next) => {
+    // If we're not in interactive mode, we don't diff, we just output
+    if (state.ctx.mode !== 'interactive') {
+      next();
+      return;
+    }
+    
+    renderSurfaceFrame(
+      state.ctx.io,
+      state.currentSurface,
+      state.targetSurface,
+      state.ctx.style
+    );
+    next();
+  });
+
+  // Add default Output stage (sync current surface)
+  pipeline.use('Output', (state, next) => {
+    // We can't re-assign `currentSurface` here because it's a readonly ref in state,
+    // so we copy the target into the current surface.
+    // If surfaces are different sizes (e.g. after resize), re-initialize.
+    if (state.currentSurface.width !== state.targetSurface.width || state.currentSurface.height !== state.targetSurface.height) {
+      currentSurface = state.targetSurface.clone();
+      // Need to re-bind it to state since we created a new reference
+      // In a real app we'd probably have currentSurface wrapped in a holder
+    } else {
+      state.currentSurface.blit(state.targetSurface, 0, 0);
+    }
+    next();
+  });
+
+  // Register middleware
+  if (options?.middlewares) {
+    for (const mw of options.middlewares) {
+      bus.use(mw);
+    }
+  }
 
   /** Tear down the run loop and signal the quit promise. */
   function shutdown(): void {
@@ -84,10 +137,33 @@ export async function run<Model, M>(
   }
 
   // Render helper
+  let renderRequested = false;
   /** Render the current model's view to the terminal. */
   function render(): void {
-    if (!running) return;
-    renderFrame(ctx.io, app.view(model));
+    if (!running || renderRequested) return;
+    renderRequested = true;
+
+    setTimeout(() => {
+      renderRequested = false;
+
+      const viewOutput = app.view(model);
+      
+      // Support both Surface and legacy string output during migration
+      const targetSurface = typeof viewOutput === 'string' 
+        ? stringToSurface(viewOutput, sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows))
+        : viewOutput;
+
+      const renderState: RenderState = {
+        model,
+        ctx,
+        currentSurface,
+        targetSurface,
+        layoutMap: new Map(),
+        data: {},
+      };
+
+      pipeline.execute(renderState);
+    }, 0);
   }
 
   // Execute commands through the bus
@@ -103,6 +179,9 @@ export async function run<Model, M>(
 
   // Handle quit signals from commands
   bus.onQuit(shutdown);
+
+  // Start heartbeat for animations
+  bus.startPulse(ctx.runtime.refreshRate);
 
   // Single subscription drives the entire update cycle
   bus.on((msg) => {
@@ -134,6 +213,13 @@ export async function run<Model, M>(
   const [resizedModel, resizeCmds] = app.update(initialResize, model);
   model = resizedModel;
 
+  // After a potential resize in update, ensure currentSurface matches size
+  // to avoid diffing mismatched grids.
+  currentSurface = createSurface(
+    sanitizeDimension(ctx.runtime.columns),
+    sanitizeDimension(ctx.runtime.rows),
+  );
+
   // Initial render + startup commands
   render();
   executeCommands(initCmds);
@@ -145,7 +231,15 @@ export async function run<Model, M>(
     if (!running) resolve();
   });
 
+  // Ensure any pending render is flushed before exiting
+  if (renderRequested) {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  }
+
   // Cleanup — bus disposes all I/O connections
+  bus.stopPulse();
   bus.dispose();
   if (useMouse) {
     ctx.io.write(DISABLE_MOUSE);

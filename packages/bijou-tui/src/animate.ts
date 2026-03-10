@@ -43,8 +43,6 @@ interface AnimateBase<M> {
   readonly from: number;
   /** Target value. */
   readonly to: number;
-  /** Frames per second. Default: 60. */
-  readonly fps?: number;
   /** Skip animation — jump to target in one frame. Default: false. */
   readonly immediate?: boolean;
   /** Called each frame with the interpolated value. Return a message for TEA. */
@@ -103,7 +101,7 @@ export type AnimateOptions<M> = SpringAnimateOptions<M> | TweenAnimateOptions<M>
  * @returns A TEA command that emits `onFrame` messages as the animation progresses.
  */
 export function animate<M>(options: AnimateOptions<M>): Cmd<M> {
-  const { from, to, fps = 60, immediate = false, onFrame, onComplete } = options;
+  const { from, to, immediate = false, onFrame, onComplete } = options;
 
   // Immediate mode — single frame, no physics
   if (immediate) {
@@ -114,11 +112,11 @@ export function animate<M>(options: AnimateOptions<M>): Cmd<M> {
   }
 
   if (options.type === 'tween') {
-    return createTweenCmd(from, to, options.duration, options.ease ?? EASINGS.easeOutCubic, fps, onFrame, onComplete);
+    return createTweenCmd(from, to, options.duration, options.ease ?? EASINGS.easeOutCubic, onFrame, onComplete);
   }
 
   const config = resolveSpringConfig(options.spring);
-  return createSpringCmd(from, to, config, fps, onFrame, onComplete);
+  return createSpringCmd(from, to, config, onFrame, onComplete);
 }
 
 // ---------------------------------------------------------------------------
@@ -141,30 +139,23 @@ function createSpringCmd<M>(
   from: number,
   to: number,
   config: SpringConfig,
-  fps: number,
   onFrame: (value: number) => M,
   onComplete?: () => M,
 ): Cmd<M> {
-  return (emit) =>
+  return (emit, caps) =>
     new Promise<void>((resolve) => {
       let state = createSpringState(from);
-      const intervalMs = Math.round(1000 / fps);
-      let lastMs = Date.now();
 
-      const id = setInterval(() => {
-        const nowMs = Date.now();
-        const dt = Math.max(0, (nowMs - lastMs) / 1000);
-        lastMs = nowMs;
-
+      const handle = caps.onPulse((dt) => {
         state = springStep(state, to, config, dt);
         emit(onFrame(state.value));
 
         if (state.done) {
-          clearInterval(id);
+          handle.dispose();
           if (onComplete) emit(onComplete());
           resolve();
         }
-      }, intervalMs);
+      });
     });
 }
 
@@ -194,32 +185,26 @@ function createTweenCmd<M>(
   to: number,
   duration: number,
   ease: EasingFn,
-  fps: number,
   onFrame: (value: number) => M,
   onComplete?: () => M,
 ): Cmd<M> {
   const config = resolveTweenConfig({ from, to, duration, ease });
 
-  return (emit) =>
+  return (emit, caps) =>
     new Promise<void>((resolve) => {
       let state = createTweenState(from);
-      const intervalMs = Math.round(1000 / fps);
-      let lastMs = Date.now();
 
-      const id = setInterval(() => {
-        const nowMs = Date.now();
-        const dtMs = Math.max(0, nowMs - lastMs);
-        lastMs = nowMs;
-
-        state = tweenStep(state, config, dtMs);
+      const handle = caps.onPulse((dt) => {
+        // TweenStep expects milliseconds for delta
+        state = tweenStep(state, config, dt * 1000);
         emit(onFrame(state.value));
 
         if (state.done) {
-          clearInterval(id);
+          handle.dispose();
           if (onComplete) emit(onComplete());
           resolve();
         }
-      }, intervalMs);
+      });
     });
 }
 
@@ -235,9 +220,9 @@ function createTweenCmd<M>(
  * @returns A single TEA command that runs all commands serially.
  */
 export function sequence<M>(...cmds: Cmd<M>[]): Cmd<M> {
-  return async (emit) => {
+  return async (emit, caps) => {
     for (const cmd of cmds) {
-      await cmd(emit);
+      await cmd(emit, caps);
     }
   };
 }

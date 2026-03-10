@@ -4,6 +4,7 @@ import type { OutputMode } from '../core/detect/tty.js';
 import type { RuntimePort } from './runtime.js';
 import type { IOPort } from './io.js';
 import type { StylePort } from './style.js';
+import type { TokenGraph } from '../core/theme/graph.js';
 
 /**
  * Top-level dependency-injection context threaded through every bijou component.
@@ -22,6 +23,8 @@ export interface BijouContext {
   readonly io: IOPort;
   /** Color / text-decoration adapter. */
   readonly style: StylePort;
+  /** Reactive and Semantic Token Graph for advanced theming. */
+  readonly tokenGraph: TokenGraph;
 
   /** Look up a semantic color token. */
   semantic(key: keyof Theme['semantic']): TokenValue;

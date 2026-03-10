@@ -5,6 +5,7 @@ import { createEnvAccessor } from '../../ports/env.js';
 import type { ColorScheme } from '../detect/tty.js';
 import { detectColorScheme } from '../detect/tty.js';
 import { PRESETS, CYAN_MAGENTA } from './presets.js';
+import { createTokenGraph, type TokenGraph } from './graph.js';
 
 /**
  * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
@@ -25,6 +26,8 @@ export interface ResolvedTheme {
   noColor: boolean;
   /** Detected terminal color scheme (light or dark background). */
   colorScheme: ColorScheme;
+  /** Reactive and Semantic Token Graph for advanced theming. */
+  tokenGraph: TokenGraph;
 
   /**
    * Return a hex string for Ink's `color=` prop, or `undefined` when noColor.
@@ -56,10 +59,13 @@ export interface ResolvedTheme {
  * @returns ResolvedTheme with convenience accessors.
  */
 export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
+  const tokenGraph = createTokenGraph(theme as any);
+
   return {
     theme,
     noColor,
     colorScheme,
+    tokenGraph,
 
     ink(token: TokenValue): InkColor {
       return noColor ? undefined : token.hex;

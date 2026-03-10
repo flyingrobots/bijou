@@ -73,7 +73,7 @@ describe('run', () => {
       // First write: enterScreen (alt + hide cursor + wrap disable + clear + home)
       expect(ctx.io.written[0]).toBe(ENTER_ALT_SCREEN + HIDE_CURSOR + WRAP_DISABLE + CLEAR_SCREEN + HOME);
       // Subsequent writes include mouse disable + initial render frame
-      const hasInitialRender = ctx.io.written.some((w) => w === frame('count: 0'));
+      const hasInitialRender = ctx.io.written.some((w) => w.includes('count: 0'));
       expect(hasInitialRender).toBe(true);
     });
 
@@ -159,7 +159,7 @@ describe('run', () => {
 
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = async (_emit) => ({ type: 'started' as const });
+          const cmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'started' as const });
           return ['loading', [cmd]];
         },
         update(msg, _model) {
@@ -185,12 +185,12 @@ describe('run', () => {
 
       const orderingApp: App<null, Msg> = {
         init() {
-          const initCmd: Cmd<Msg> = async () => ({ type: 'init-cmd' });
+          const initCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'init-cmd' });
           return [null, [initCmd]];
         },
         update(msg, model) {
           if (msg.type === 'resize') {
-            const resizeCmd: Cmd<Msg> = async () => ({ type: 'resize-cmd' });
+            const resizeCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'resize-cmd' });
             return [model, [resizeCmd]];
           }
           if (msg.type === 'init-cmd') order.push('init');

@@ -26,7 +26,7 @@
  */
 
 import type { IOPort } from '@flyingrobots/bijou';
-import type { Cmd, KeyMsg, MouseMsg, ResizeMsg } from './types.js';
+import type { Cmd, KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from './types.js';
 import { QUIT } from './types.js';
 import { parseKey, parseMouse } from './keys.js';
 
@@ -36,11 +36,21 @@ import { parseKey, parseMouse } from './keys.js';
 
 /**
  * Union of all message types the bus can carry — built-in key, resize,
- * mouse messages plus any app-defined custom message type.
+ * mouse, and pulse messages plus any app-defined custom message type.
  *
  * @template M - Application-defined custom message type.
  */
-export type BusMsg<M> = KeyMsg | ResizeMsg | MouseMsg | M;
+export type BusMsg<M> = KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M;
+
+/**
+ * Middleware function for intercepting and modifying messages.
+ * 
+ * Call `next(msg)` to continue the message chain. Omitting the call 
+ * halts message propagation.
+ * 
+ * @template M - Application-defined custom message type.
+ */
+export type Middleware<M> = (msg: BusMsg<M>, next: (msg: BusMsg<M>) => void) => void;
 
 /**
  * Centralized event bus that unifies all input sources into a single
@@ -99,6 +109,35 @@ export interface EventBus<M> {
    */
   onQuit(handler: () => void): Disposable;
 
+  /**
+   * Start the system animation heartbeat at the specified frequency.
+   * Emits `PulseMsg` to all subscribers.
+   * 
+   * @param fps - Frames per second. Default: 60.
+   */
+  startPulse(fps?: number): void;
+
+  /** Stop the system animation heartbeat. */
+  stopPulse(): void;
+
+  /**
+   * Register a listener for the system heartbeat pulse.
+   * 
+   * @param handler - Callback invoked every pulse with the time delta.
+   * @returns A disposable that removes this pulse listener.
+   */
+  onPulse(handler: (dt: number) => void): Disposable;
+
+  /**
+   * Register a middleware function to intercept or modify messages.
+   * 
+   * Middleware are executed in the order they are registered.
+   * 
+   * @param middleware - The middleware function.
+   * @returns A disposable that removes this middleware.
+   */
+  use(middleware: Middleware<M>): Disposable;
+
   /** Disconnect all sources and remove all subscribers. */
   dispose(): void;
 }
@@ -136,8 +175,11 @@ interface Disposable {
 export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<M> {
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
+  const pulseHandlers = new Set<(dt: number) => void>();
+  const middlewares: Middleware<M>[] = [];
   const disposables: Disposable[] = [];
   let disposed = false;
+  let pulseTimer: any = null;
 
   /** Report an error without risking an unhandled rejection. */
   function safeReport(message: string, error: unknown): void {
@@ -151,9 +193,26 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   /** Broadcast a message to all current subscribers. */
   function emit(msg: BusMsg<M>): void {
     if (disposed) return;
-    for (const handler of subscribers) {
-      handler(msg);
-    }
+
+    let index = 0;
+    const dispatch = (currentMsg: BusMsg<M>) => {
+      if (index < middlewares.length) {
+        const mw = middlewares[index++]!;
+        try {
+          mw(currentMsg, dispatch);
+        } catch (err) {
+          safeReport('[EventBus] Middleware threw:', err);
+          // Continue with original message if middleware fails
+          dispatch(currentMsg);
+        }
+      } else {
+        for (const handler of subscribers) {
+          handler(currentMsg);
+        }
+      }
+    };
+
+    dispatch(msg);
   }
 
   return {
@@ -209,7 +268,12 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
     runCmd(cmd: Cmd<M>): void {
       if (disposed) return;
-      void cmd(emit).then((result) => {
+
+      const caps = {
+        onPulse: (h: (dt: number) => void) => this.onPulse(h),
+      };
+
+      void cmd(emit, caps).then((result) => {
         if (disposed) return;
         if (result === QUIT) {
           for (const handler of quitHandlers) {
@@ -250,14 +314,71 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       };
     },
 
+    startPulse(fps = 60) {
+      if (disposed || pulseTimer) return;
+
+      const intervalMs = Math.round(1000 / fps);
+      let lastMs = Date.now();
+
+      pulseTimer = setInterval(() => {
+        if (disposed) {
+          clearInterval(pulseTimer);
+          pulseTimer = null;
+          return;
+        }
+        const nowMs = Date.now();
+        const dt = Math.max(0, (nowMs - lastMs) / 1000);
+        lastMs = nowMs;
+
+        // Notify pulse listeners first (for batching local state updates)
+        for (const handler of pulseHandlers) {
+          handler(dt);
+        }
+        // Emit message to application subscribers
+        emit({ type: 'pulse', dt });
+      }, intervalMs);
+    },
+
+    stopPulse() {
+      if (pulseTimer) {
+        clearInterval(pulseTimer);
+        pulseTimer = null;
+      }
+    },
+
+    onPulse(handler) {
+      pulseHandlers.add(handler);
+      return {
+        dispose() {
+          pulseHandlers.delete(handler);
+        },
+      };
+    },
+
+    use(middleware) {
+      middlewares.push(middleware);
+      return {
+        dispose() {
+          const i = middlewares.indexOf(middleware);
+          if (i !== -1) middlewares.splice(i, 1);
+        },
+      };
+    },
+
     dispose(): void {
       disposed = true;
+      if (pulseTimer) {
+        clearInterval(pulseTimer);
+        pulseTimer = null;
+      }
       for (const d of disposables) {
         d.dispose();
       }
       disposables.length = 0;
       subscribers.clear();
       quitHandlers.clear();
+      pulseHandlers.clear();
+      middlewares.length = 0;
     },
   };
 }

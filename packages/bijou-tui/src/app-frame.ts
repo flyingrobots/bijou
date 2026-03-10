@@ -5,7 +5,7 @@
  * panel-scoped overlay context, and optional frame-level command palette.
  */
 
-import { resolveSafeCtx } from '@flyingrobots/bijou';
+import { resolveSafeCtx, stringToSurface } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import type { App, Cmd } from './types.js';
@@ -446,10 +446,24 @@ export function createFramedApp<PageModel, Msg>(
 
       const targetMsg = scoped?.msg ?? (msg as Msg);
       const pageModel = model.pageModels[targetPageId]!;
-      const [nextPageModel, cmds] = targetPage.update(targetMsg, pageModel);
+      
+      const updateResult = targetPage.update(targetMsg, pageModel);
+      let nextPageModel: PageModel = pageModel; // Default to current
+      let cmds: Cmd<Msg>[] = [];
+
+      if (updateResult !== undefined && updateResult !== null) {
+        if (Array.isArray(updateResult)) {
+          nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
+          cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
+        } else {
+          nextPageModel = updateResult as PageModel;
+        }
+      }
+      
       const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
       const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
-      return [synced, cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd))];
+      const wrappedCmds = Array.isArray(cmds) ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd)) : [];
+      return [synced, wrappedCmds];
     },
 
     view(model) {
@@ -529,7 +543,7 @@ export function createFramedApp<PageModel, Msg>(
         output = composite(output, overlays, { dim: true });
       }
 
-      return output;
+      return stringToSurface(output, model.columns, model.rows);
     },
   };
 

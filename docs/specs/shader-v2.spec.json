@@ -1,0 +1,51 @@
+{
+  "name": "Rich Canvas / Shader v2",
+  "designPattern": "Fragment Shader Pipeline",
+  "requirements": [
+    "Buffered Surfaces & Post-Processing",
+    "Token Graph (for color uniforms)"
+  ],
+  "userStory": {
+    "asA": "TUI artist",
+    "iWant": "a high-resolution, color-aware shader engine",
+    "soThat": "I can create beautiful, fluid, and reactive character-art and data visualizations."
+  },
+  "acceptanceCriteria": [
+    "ShaderFn returns a Cell object (char, color, bg) instead of a string",
+    "ShaderFn receives normalized UV coordinates (0.0 to 1.0)",
+    "Supports 'Braille' and 'Quad' sub-grid scaling for high-resolution plotting",
+    "Uniforms registry allows passing external state (time, mouse, theme) into the shader",
+    "Braille-scaling automatically maps 2x4 bitmasks to Unicode Braille characters"
+  ],
+  "backwardCompatibility": "The legacy canvas() API (string-based) will be preserved as a wrapper around the new engine for simple ASCII art.",
+  "scope": {
+    "inScope": [
+      "New ShaderFn signature",
+      "UV normalization logic",
+      "Braille/Quad pixel mapping",
+      "Uniforms system",
+      "Performance-optimized cell iterator"
+    ],
+    "outScope": [
+      "WebGPU/GL integration (must remain CPU-deterministic)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write a shader that renders a red circle at (0.5, 0.5) using Braille pixels. Assert that the resulting surface contains the expected Braille characters with correct red foreground colors.",
+    "edgeCases": [
+      "Shaders that return non-character data (invalid cells)",
+      "Resolution mismatch between shader and surface",
+      "High-frequency uniform updates (120fps)"
+    ],
+    "fuzzStress": "Run a complex Braille shader at 4k resolution (simulated) and measure the time per frame.",
+    "failureCases": [
+      "Floating point drift in UV coordinates (DIND requirement)"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~450 lines",
+    "timeComplexity": "O(W * H * S) where S is sub-grid scale",
+    "workEstimate": "Medium"
+  }
+}
