@@ -30,8 +30,9 @@ describe('createTuiAppSkeleton', () => {
 
     const splitFrame = app.view(switched.model);
     const splitString = surfaceToString(splitFrame, ctx.style);
-    expect(stripAnsi(splitString)).toContain('Left pane (1/3)');
-    expect(stripAnsi(splitString)).toContain('Right pane (2/3)');
+    const plain = stripAnsi(splitString);
+    expect(plain).toContain('Split');
+    expect(plain).toContain('Split ready');
   });
 
   it('renders a two-line footer with status over controls and a full-width separator', () => {

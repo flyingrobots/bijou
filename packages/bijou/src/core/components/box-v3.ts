@@ -21,7 +21,7 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
 
   let contentSurf: Surface;
   if (typeof content === 'string') {
-    const lines = content.split('\n');
+    const lines = content.split(/\r?\n/);
     const h = lines.length;
     const w = Math.max(...lines.map(l => segmentGraphemes(l).length), 0);
     contentSurf = createSurface(w, h);
