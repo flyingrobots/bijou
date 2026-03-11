@@ -13,13 +13,11 @@ npx tsx examples/canvas/main.ts
 ```ts
 const CHARS = ' .:-=+*#%@';
 
-const shader: ShaderFn = (x, y, cols, rows, time) => {
-  const cx = cols / 2;
-  const cy = rows / 2;
-  const dx = x - cx;
-  const dy = (y - cy) * 2;
+const shader: ShaderFn = ({ u, v, time }) => {
+  const dx = u - 0.5;
+  const dy = (v - 0.5) * 2; // aspect ratio correction
   const dist = Math.sqrt(dx * dx + dy * dy);
-  const wave = Math.sin(dist * 0.5 - time * 3) * 0.5 + 0.5;
+  const wave = Math.sin(dist * 10 - time * 3) * 0.5 + 0.5;
   const idx = Math.floor(wave * (CHARS.length - 1));
   return CHARS[idx]!;
 };

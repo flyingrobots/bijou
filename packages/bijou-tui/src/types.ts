@@ -7,8 +7,10 @@
  * @module
  */
 
-import type { BijouContext, Surface, LayoutNode } from '@flyingrobots/bijou';
+import type { BijouContext } from '@flyingrobots/bijou';
 import type { Middleware } from './eventbus.js';
+import type { RenderPipeline } from './pipeline/pipeline.js';
+import type { ViewOutput } from './view-output.js';
 
 // --- Messages ---
 
@@ -170,12 +172,12 @@ export interface App<Model, M = never> {
   update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];
 
   /**
-   * Render the current model as a Surface or LayoutNode for terminal display.
+   * Render the current model as a Surface, LayoutNode, or legacy string view.
    *
    * @param model - Current application state.
-   * @returns Rendered Surface or Layout tree.
+   * @returns Rendered Surface, Layout tree, or legacy string output.
    */
-  view(model: Model): Surface | LayoutNode;
+  view(model: Model): ViewOutput;
 }
 
 // --- Runtime options ---
@@ -196,6 +198,8 @@ export interface RunOptions<M = any> {
   ctx?: BijouContext;
   /** Optional middleware to intercept or modify messages. */
   middlewares?: Middleware<M>[];
+  /** Optional hook to extend the render pipeline with custom middleware. */
+  configurePipeline?: (pipeline: RenderPipeline) => void;
   /** Optional BCSS stylesheet string. */
   css?: string;
 }

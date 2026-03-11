@@ -1,16 +1,18 @@
+import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, createSurface, type Surface } from '@flyingrobots/bijou';
-import { run, quit, isKeyMsg, type App, vstackV3, hstackV3 } from '@flyingrobots/bijou-tui';
+import { badge, boxV3 } from '@flyingrobots/bijou';
+import { hstackV3, isKeyMsg, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/v3.ts';
 
-initDefaultContext();
+export const ctx = initDefaultContext();
 
 interface Model {
   count: number;
 }
 
-type Msg = { type: 'inc' } | { type: 'quit' };
+type Msg = never;
 
-const app: App<Model, Msg> = {
+export const app: App<Model, Msg> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
@@ -22,27 +24,33 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = badge('BIJOU V3', { variant: 'primary' });
-    const counter = badge(`Count: ${model.count}`, { variant: 'accent' });
-    const instruction = stringToSurface('Press SPACE to increment, Q to quit', 40, 1);
-
-    const content = vstackV3(
-      header,
-      createSurface(1, 1), // Spacer
-      counter,
-      createSurface(1, 1), // Spacer
-      instruction
+    const hero = badge('BIJOU V3', { variant: 'primary' });
+    const metrics = hstackV3(
+      2,
+      badge(`Count ${model.count}`, { variant: 'accent' }),
+      badge(`${ctx.runtime.columns}x${ctx.runtime.rows}`, { variant: 'info' }),
+      badge(ctx.mode, { variant: 'success' }),
     );
 
-    // Center the content on a full-screen surface
-    const full = createSurface(process.stdout.columns, process.stdout.rows);
-    full.blit(content, Math.floor((full.width - content.width) / 2), Math.floor((full.height - content.height) / 2));
-    
-    return full;
+    const body = vstackV3(
+      hero,
+      spacer(1, 1),
+      boxV3(
+        vstackV3(
+          line('Surface-first runtime, buffered rendering, and honest legacy compatibility.'),
+          spacer(1, 1),
+          metrics,
+          spacer(1, 1),
+          line('Press SPACE to increment. Press Q to quit.'),
+        ),
+        { title: 'Starter App', padding: { top: 1, bottom: 1, left: 2, right: 2 } },
+      ),
+    );
+
+    return centerSurface(ctx, body);
   },
 };
 
-// stringToSurface is needed for the instruction
-import { stringToSurface } from '@flyingrobots/bijou';
-
-run(app);
+if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run(app);
+}

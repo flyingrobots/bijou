@@ -8,6 +8,7 @@ describe('createPipeline', () => {
     return {
       model: {},
       ctx: createTestContext(),
+      dt: 0,
       currentSurface: createSurface(10, 10),
       targetSurface: createSurface(10, 10),
       layoutMap: new Map(),

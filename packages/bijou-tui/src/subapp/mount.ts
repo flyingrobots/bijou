@@ -1,5 +1,5 @@
 import type { App, Cmd, QuitSignal } from '../types.js';
-import type { Surface, LayoutNode } from '@flyingrobots/bijou';
+import type { ViewOutput } from '../view-output.js';
 
 /**
  * Options for mounting a sub-app.
@@ -28,7 +28,7 @@ export interface MountOptions<SubModel, SubMsg, ParentMsg> {
  */
 export interface MountedApp<SubMsg> {
   /** The rendered surface or layout tree of the sub-app. */
-  surfaceOrNode: Surface | LayoutNode;
+  surfaceOrNode: ViewOutput;
   /**
    * Any TEA commands the sub-app needs to execute.
    * These should be dispatched by the parent during its update cycle.
@@ -50,12 +50,40 @@ export interface MountedApp<SubMsg> {
 export function mount<SubModel, SubMsg, ParentMsg>(
   app: App<SubModel, SubMsg>,
   options: MountOptions<SubModel, SubMsg, ParentMsg>,
-): [Surface | LayoutNode, Cmd<ParentMsg>[]] {
+): [ViewOutput, Cmd<ParentMsg>[]] {
   const { model } = options;
 
   const surfaceOrNode = app.view(model);
-  
+
   return [surfaceOrNode, []];
+}
+
+export interface SubAppOptions<SubMsg, ParentMsg> {
+  /** Function to map a sub-app message into a parent message. */
+  onMsg: (msg: SubMsg) => ParentMsg;
+  /**
+   * Optional function to intercept and handle `Cmd`s emitted by the sub-app.
+   * If not provided, commands are automatically mapped using `onMsg`.
+   */
+  mapCmd?: (cmd: Cmd<SubMsg>) => Cmd<ParentMsg>;
+}
+
+export function initSubApp<SubModel, SubMsg, ParentMsg>(
+  app: App<SubModel, SubMsg>,
+  options: SubAppOptions<SubMsg, ParentMsg>,
+): [SubModel, Cmd<ParentMsg>[]] {
+  const [model, cmds] = app.init();
+  return [model, mapSubAppCmds(cmds, options)];
+}
+
+export function updateSubApp<SubModel, SubMsg, ParentMsg>(
+  app: App<SubModel, SubMsg>,
+  msg: SubMsg,
+  model: SubModel,
+  options: SubAppOptions<SubMsg, ParentMsg>,
+): [SubModel, Cmd<ParentMsg>[]] {
+  const [nextModel, cmds] = app.update(msg, model);
+  return [nextModel, mapSubAppCmds(cmds, options)];
 }
 
 /**
@@ -70,6 +98,16 @@ export function mapCmds<SubMsg, ParentMsg>(
   mapper: (msg: SubMsg) => ParentMsg,
 ): Cmd<ParentMsg>[] {
   return cmds.map((cmd) => mapSingleCmd(cmd, mapper));
+}
+
+function mapSubAppCmds<SubMsg, ParentMsg>(
+  cmds: Cmd<SubMsg>[],
+  options: SubAppOptions<SubMsg, ParentMsg>,
+): Cmd<ParentMsg>[] {
+  if (options.mapCmd != null) {
+    return cmds.map((cmd) => options.mapCmd!(cmd));
+  }
+  return mapCmds(cmds, options.onMsg);
 }
 
 /**

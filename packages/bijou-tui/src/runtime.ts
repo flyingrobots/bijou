@@ -1,5 +1,5 @@
-import { getDefaultContext, createSurface, surfaceToString, stringToSurface } from '@flyingrobots/bijou';
-import type { WritePort, Surface, LayoutNode } from '@flyingrobots/bijou';
+import { getDefaultContext, createSurface, surfaceToString } from '@flyingrobots/bijou';
+import type { WritePort, Surface } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg } from './types.js';
 import { enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
@@ -8,9 +8,8 @@ import { createPipeline, type RenderState } from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
 import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
-import { parseBCSS } from './css/parser.js';
-import { resolveStyles } from './css/resolver.js';
-import type { ThemeMode } from '@flyingrobots/bijou';
+import { installBCSSResolver } from './css/install.js';
+import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -49,6 +48,7 @@ export async function run<Model, M>(
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
   const useMouse = options?.mouse ?? false;
+  installBCSSResolver(ctx, options?.css);
 
   const [initModel, initCmds] = app.init();
 
@@ -58,15 +58,12 @@ export async function run<Model, M>(
     let output: string;
     if (typeof viewOutput === 'string') {
       output = viewOutput;
-    } else if ((viewOutput as any).cells) {
-      output = surfaceToString(viewOutput as Surface, ctx.style);
     } else {
-      // LayoutNode: paint to a temporary surface then to string
-      const s = createSurface(sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows));
-      const paintStage = paintMiddleware();
-      const state: any = { targetSurface: s, layoutRoot: viewOutput };
-      paintStage(state, () => {});
-      output = surfaceToString(s, ctx.style);
+      const normalized = normalizeViewOutput(viewOutput, {
+        width: sanitizeDimension(ctx.runtime.columns),
+        height: sanitizeDimension(ctx.runtime.rows),
+      });
+      output = surfaceToString(normalized.surface, ctx.style);
     }
     ctx.io.write(output);
     return;
@@ -100,42 +97,18 @@ export async function run<Model, M>(
   // 1. Layout Logic Stage
   pipeline.use('Layout', (state, next) => {
     const viewOutput = app.view(state.model);
-    if (typeof viewOutput === 'string') {
-      (state as any).layoutRoot = {
-        rect: { x: 0, y: 0, width: sanitizeDimension(ctx.runtime.columns), height: sanitizeDimension(ctx.runtime.rows) },
-        children: [],
-        surface: stringToSurface(viewOutput, sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows))
-      };
-    } else if ((viewOutput as any).cells) {
-      (state as any).layoutRoot = {
-        rect: { x: 0, y: 0, width: (viewOutput as Surface).width, height: (viewOutput as Surface).height },
-        children: [],
-        surface: viewOutput as Surface
-      };
-    } else {
-      (state as any).layoutRoot = viewOutput as LayoutNode;
-    }
+    (state as any).layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
+      width: sanitizeDimension(ctx.runtime.columns),
+      height: sanitizeDimension(ctx.runtime.rows),
+    });
     next();
   });
 
   // 2. Motion Interpolation Stage
   pipeline.use('Layout', motionMiddleware());
 
-  // Register BCSS middleware if provided
   if (options?.css) {
-    const sheet = parseBCSS(options.css);
     pipeline.use('Layout', bcssMiddleware(options.css));
-
-    // Determine theme mode
-    const themeMode: ThemeMode = (ctx.runtime.env('COLORFGBG')?.split(';').pop() === '15' || ctx.runtime.env('TERM_PROGRAM') === 'Apple_Terminal') ? 'light' : 'dark';
-
-    // Bridge: inject real CSS resolver into the context
-    (ctx as any).resolveBCSS = (identity: any) => {
-      return resolveStyles(identity, sheet, {
-        width: ctx.runtime.columns,
-        height: ctx.runtime.rows,
-      }, ctx.tokenGraph, themeMode);
-    };
   }
 
   // 3. Paint Stage
@@ -161,6 +134,8 @@ export async function run<Model, M>(
     }
     next();
   });
+
+  options?.configurePipeline?.(pipeline);
 
   // Register user middleware
   if (options?.middlewares) {

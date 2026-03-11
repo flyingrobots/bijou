@@ -69,6 +69,13 @@ describe('theme/tokens types', () => {
         error: { hex: '#ff0000' },
         muted: { hex: '#808080' },
       },
+      surface: {
+        primary: { hex: '#101010' },
+        secondary: { hex: '#1a1a1a' },
+        elevated: { hex: '#202020' },
+        overlay: { hex: '#181818' },
+        muted: { hex: '#141414' },
+      },
       ui: {
         cursor: { hex: '#00ffff' },
         scrollThumb: { hex: '#00ffff' },

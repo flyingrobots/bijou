@@ -100,7 +100,10 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      */
     styled(token: TokenValue, text: string): string {
       if (!ansiEnabled) return text;
-      const base: ChalkInstance = instance.hex(token.hex);
+      let base: ChalkInstance = instance;
+      if (token.hex) {
+        base = instance.hex(token.hex);
+      }
       let result = applyModifiers(base, token.modifiers)(text);
       result = applyUnderlineVariants(result, token.modifiers);
       // Note: bg is applied unconditionally when noColor is false.
@@ -111,7 +114,6 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
       }
       return result;
     },
-
     /**
      * Apply a 24-bit RGB foreground color to text.
      *

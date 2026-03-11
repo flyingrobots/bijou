@@ -1,6 +1,8 @@
 import type { LayoutNode, Surface } from '@flyingrobots/bijou';
 import type { MotionOptions } from './types.js';
 
+type MotionNode = LayoutNode & { motion?: MotionOptions };
+
 /**
  * A declarative wrapper that enables automatic layout transitions for a component.
  * 
@@ -20,15 +22,19 @@ export function motion(
   if (isSurface(content)) {
     return {
       id: options.key,
+      type: 'Motion',
+      classes: ['motion'],
       rect: { x: 0, y: 0, width: content.width, height: content.height },
       children: [],
-      surface: content
-    };
+      surface: content,
+      motion: options,
+    } as MotionNode;
   }
 
   // If already a layout node, just ensure it has the correct ID
   return {
     ...content,
-    id: options.key
-  };
+    id: options.key,
+    motion: options,
+  } as MotionNode;
 }

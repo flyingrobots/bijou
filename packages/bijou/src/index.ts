@@ -240,7 +240,7 @@ export {
 export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
 
 // Rendering
-export { renderDiff, isSameCell, stringToSurface, surfaceToString, paintLayoutNode } from './core/render/differ.js';
+export { renderDiff, isSameCell, stringToSurface, parseAnsiToSurface, surfaceToString, paintLayoutNode } from './core/render/differ.js';
 
 // Layout
 export type { LayoutRect, LayoutNode, LayoutEngine } from './ports/surface.js';
@@ -273,4 +273,3 @@ export {
   type NoteOptions,
 } from './core/forms/index.js';
 export { boxV3 } from './core/components/box-v3.js';
-export { parseAnsiToSurface } from './core/render/differ.js';

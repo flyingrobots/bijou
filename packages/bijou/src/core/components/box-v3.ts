@@ -13,6 +13,7 @@ const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' 
 export function boxV3(content: Surface | string, options: BoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
+  const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
   
   const pt = padding.top ?? 0;
   const pb = padding.bottom ?? 0;
@@ -27,7 +28,9 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
     contentSurf = createSurface(w, h);
     lines.forEach((line, y) => {
       const gs = segmentGraphemes(line);
-      gs.forEach((char, x) => contentSurf.set(x, y, { char }));
+      gs.forEach((char, x) => {
+        contentSurf.set(x, y, { char });
+      });
     });
   } else {
     contentSurf = content;
@@ -40,14 +43,19 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
   const outerH = innerH + 2;
   
   const surface = createSurface(outerW, outerH);
-  surface.fill({ char: options.fillChar || ' ' });
+  surface.fill({
+    char: options.fillChar || ' ',
+    bg: bcss['background'],
+    fg: bcss['color'],
+    empty: false,
+  });
 
   const borderToken = options.borderToken || ctx?.border('primary');
   const borderCell: Cell = { 
     char: ' ', 
-    fg: borderToken?.hex ?? '#ffffff', 
-    bg: borderToken?.bg, 
-    modifiers: borderToken?.modifiers as any 
+    fg: bcss['color'] ?? borderToken?.hex ?? '#ffffff',
+    bg: bcss['background'] ?? borderToken?.bg,
+    modifiers: borderToken?.modifiers as any,
   };
 
   // Draw borders
@@ -65,10 +73,12 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
   surface.set(outerW - 1, outerH - 1, { ...borderCell, char: BORDER.br });
 
   // Draw title
-  if (title) {
-    const titleText = ' ' + title + ' ';
+  if (title && outerW >= 4) {
+    const titleText = ` ${title} `;
     const titleGs = segmentGraphemes(titleText);
-    for (let i = 0; i < Math.min(titleGs.length, outerW - 4); i++) {
+    const available = outerW - 4;
+    const titleLen = Math.min(titleGs.length, available);
+    for (let i = 0; i < titleLen; i++) {
       surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
     }
   }

@@ -95,12 +95,19 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   if (useMouse) {
     ctx.io.write('\x1b[?1000h\x1b[?1002h\x1b[?1006h'); // ENABLE_MOUSE
   }
+// Spawn the worker
+const serializableOptions = {
+  altScreen: options.altScreen,
+  hideCursor: options.hideCursor,
+  mouse: options.mouse,
+  css: options.css,
+};
 
-  const worker = new Worker(resolvePath(options.entry), {
-    workerData: { isBijouWorker: true, options: { ...options, onMessage: undefined } },
-    execArgv: options.execArgv,
-    // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
-  });
+const worker = new Worker(resolvePath(options.entry), {
+  workerData: { isBijouWorker: true, options: serializableOptions },
+  execArgv: options.execArgv,
+  // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
+});
 
   // 1. Pipe Main Stdin -> Worker IPC
   const inputHandle = ctx.io.rawInput((data: string) => {
@@ -112,6 +119,9 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   });
 
   const onExit = new Promise<void>((resolve, reject) => {
+    let requestedQuit = false;
+    let forcedTerminate = false;
+
     // 2. Pipe Worker IPC -> Main Stdout
     worker.on('message', (msg: MainMessage) => {
       if (msg.type === 'render:frame') {
@@ -122,7 +132,13 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
       } else if (msg.type === 'data') {
         if (options.onMessage) options.onMessage(msg.payload);
       } else if (msg.type === 'quit') {
-        worker.terminate();
+        requestedQuit = true;
+        setTimeout(() => {
+          if (requestedQuit) {
+            forcedTerminate = true;
+            void worker.terminate();
+          }
+        }, 50);
       }
     });
 
@@ -133,6 +149,10 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
 
     worker.on('exit', (code) => {
       cleanup();
+      if (requestedQuit && (code === 0 || forcedTerminate)) {
+        resolve();
+        return;
+      }
       if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
       else resolve();
     });

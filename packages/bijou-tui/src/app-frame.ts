@@ -5,13 +5,13 @@
  * panel-scoped overlay context, and optional frame-level command palette.
  */
 
-import { resolveSafeCtx, stringToSurface } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, resolveSafeCtx, type Surface } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import type { App, Cmd } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
-import { composite, modal } from './overlay.js';
+import { modal } from './overlay.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
 import { fitBlock } from './layout-utils.js';
 import { type BuiltinTransition } from './transition-shaders.js';
@@ -63,6 +63,7 @@ import {
   handlePaletteKey,
   openCommandPalette,
 } from './app-frame-palette.js';
+import { visibleLength } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -499,11 +500,7 @@ export function createFramedApp<PageModel, Msg>(
         }
       }
 
-      const bodyLines = fitBlock(bodyOutput, bodyRect.width, bodyRect.height);
-      const rows: string[] = [header, helpLine, ...bodyLines];
-      while (rows.length < model.rows) rows.push(' '.repeat(Math.max(0, model.columns)));
-
-      let output = rows.slice(0, model.rows).join('\n');
+      bodyOutput = fitBlock(bodyOutput, bodyRect.width, bodyRect.height).join('\n');
 
       const overlays: Overlay[] = [];
       if (options.overlayFactory != null) {
@@ -539,13 +536,76 @@ export function createFramedApp<PageModel, Msg>(
         }));
       }
 
-      if (overlays.length > 0) {
-        output = composite(output, overlays, { dim: true });
-      }
-
-      return stringToSurface(output, model.columns, model.rows);
+      return composeFrameSurface({
+        width: model.columns,
+        height: model.rows,
+        header,
+        helpLine,
+        bodyOutput,
+        bodyRect,
+        overlays,
+        dimBackground: overlays.length > 0,
+      });
     },
   };
 
   return app;
+}
+
+interface FrameSurfaceOptions {
+  width: number;
+  height: number;
+  header: string;
+  helpLine: string;
+  bodyOutput: string;
+  bodyRect: LayoutRect;
+  overlays: readonly Overlay[];
+  dimBackground: boolean;
+}
+
+function composeFrameSurface(options: FrameSurfaceOptions): Surface {
+  const frame = createSurface(options.width, options.height);
+
+  frame.blit(parseAnsiToSurface(options.header, options.width, 1), 0, 0);
+  if (options.height > 1) {
+    frame.blit(parseAnsiToSurface(options.helpLine, options.width, 1), 0, 1);
+  }
+  if (options.bodyRect.width > 0 && options.bodyRect.height > 0) {
+    frame.blit(
+      parseAnsiToSurface(options.bodyOutput, options.bodyRect.width, options.bodyRect.height),
+      options.bodyRect.col,
+      options.bodyRect.row,
+    );
+  }
+
+  if (options.dimBackground) {
+    dimSurface(frame);
+  }
+
+  for (const overlay of options.overlays) {
+    const overlaySurface = parseAnsiToSurface(
+      overlay.content,
+      maxVisibleWidth(overlay.content),
+      overlay.content.split('\n').length,
+    );
+    frame.blit(overlaySurface, overlay.col, overlay.row);
+  }
+
+  return frame;
+}
+
+function dimSurface(surface: Surface): void {
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      const cell = surface.get(x, y);
+      if (cell.empty || cell.char === ' ') continue;
+      const modifiers = new Set(cell.modifiers ?? []);
+      modifiers.add('dim');
+      surface.set(x, y, { ...cell, modifiers: Array.from(modifiers) });
+    }
+  }
+}
+
+function maxVisibleWidth(text: string): number {
+  return text.split('\n').reduce((max, line) => Math.max(max, visibleLength(line)), 0);
 }

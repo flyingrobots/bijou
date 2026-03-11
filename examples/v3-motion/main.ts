@@ -1,63 +1,71 @@
+import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, isKeyMsg, type App, motion } from '@flyingrobots/bijou-tui';
-import { badge, createSurface, stringToSurface, type LayoutNode } from '@flyingrobots/bijou';
+import { badge, boxV3, type LayoutNode } from '@flyingrobots/bijou';
+import { isKeyMsg, motion, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
+import { line } from '../_shared/v3.ts';
 
-initDefaultContext();
+export const ctx = initDefaultContext();
 
 interface Model {
   x: number;
   y: number;
-  targetX: number;
-  targetY: number;
 }
 
-const app: App<Model, any> = {
-  init: () => [{ x: 5, y: 5, targetX: 5, targetY: 5 }, []],
-  
+export const app: App<Model> = {
+  init: () => [{ x: 6, y: 6 }, []],
+
   update: (msg, model) => {
     if (isKeyMsg(msg)) {
       if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
-      
-      // Move target instantly on keypress
-      if (msg.key === 'right') return [{ ...model, targetX: model.targetX + 10 }, []];
-      if (msg.key === 'left')  return [{ ...model, targetX: model.targetX - 10 }, []];
-      if (msg.key === 'down')  return [{ ...model, targetY: model.targetY + 5 }, []];
-      if (msg.key === 'up')    return [{ ...model, targetY: model.targetY - 5 }, []];
+      if (msg.key === 'right') return [{ ...model, x: Math.min(model.x + 6, ctx.runtime.columns - 32) }, []];
+      if (msg.key === 'left') return [{ ...model, x: Math.max(2, model.x - 6) }, []];
+      if (msg.key === 'down') return [{ ...model, y: Math.min(model.y + 3, ctx.runtime.rows - 10) }, []];
+      if (msg.key === 'up') return [{ ...model, y: Math.max(4, model.y - 3) }, []];
     }
     return [model, []];
   },
 
   view: (model) => {
-    // The target layout state: where the badge WANTS to be.
-    // The Motion API will interpolate the 'moving-badge' node automatically.
-    
-    const movingBadge: LayoutNode = motion(
-      { key: 'moving-badge' },
-      badge('SMOOTH MOTION')
+    const springCard = motion(
+      { key: 'spring-card', transition: { type: 'spring', spring: 'wobbly' } },
+      boxV3(
+        vstackV3(
+          badge('Spring', { variant: 'success' }),
+          line('Follows the target with a spring preset.'),
+        ),
+        { title: 'Wobbly', padding: { top: 1, bottom: 1, left: 2, right: 2 } },
+      ),
     );
-    
-    // Position the badge at target coordinates in the layout tree
-    movingBadge.rect.x = model.targetX;
-    movingBadge.rect.y = model.targetY;
+    springCard.rect = { ...springCard.rect, x: model.x, y: model.y };
 
-    // Return a layout tree
-    return {
-      rect: { x: 0, y: 0, width: process.stdout.columns, height: process.stdout.rows },
-      children: [
-        movingBadge,
-        {
-          rect: { x: 5, y: 2, width: 60, height: 1 },
-          children: [],
-          surface: stringToSurface('Use ARROW KEYS to move the badge. Notice the smooth spring physics!', 60, 1)
-        },
-        {
-          rect: { x: 5, y: 20, width: 20, height: 1 },
-          children: [],
-          surface: stringToSurface('Press Q to quit', 20, 1)
-        }
-      ]
+    const tweenCard = motion(
+      { key: 'tween-card', transition: { type: 'tween', duration: 240 }, initial: { x: -18 } },
+      boxV3(
+        vstackV3(
+          badge('Tween', { variant: 'accent' }),
+          line('Moves on a fixed duration curve.'),
+        ),
+        { title: 'Timed', padding: { top: 1, bottom: 1, left: 2, right: 2 } },
+      ),
+    );
+    tweenCard.rect = { ...tweenCard.rect, x: model.x + 22, y: model.y + 4 };
+
+    const info: LayoutNode = {
+      rect: { x: 3, y: 1, width: 70, height: 2 },
+      children: [],
+      surface: vstackV3(
+        line('Arrow keys move both cards. The green card uses a spring; the amber card uses a tween.'),
+        line('Press Q to quit.'),
+      ),
     };
-  }
+
+    return {
+      rect: { x: 0, y: 0, width: ctx.runtime.columns, height: ctx.runtime.rows },
+      children: [info, springCard, tweenCard],
+    };
+  },
 };
 
-run(app);
+if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run(app);
+}

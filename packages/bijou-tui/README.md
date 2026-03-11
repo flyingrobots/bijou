@@ -18,7 +18,7 @@ The TUI package has been completely overhauled in v3.0.0 to operate as a true gr
 ## Installation
 
 ```bash
-npm install @flyingrobots/bijou-tui
+npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
 ```
 
 ## Quick Start (V3 Sub-App Composition)
@@ -26,21 +26,37 @@ npm install @flyingrobots/bijou-tui
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { run, mount, mapCmds, type App } from '@flyingrobots/bijou-tui';
-import { createSurface } from '@flyingrobots/bijou';
+import { createSurface, type Surface } from '@flyingrobots/bijou';
 
 initDefaultContext();
 
+// Minimal child apps
+const childApp: App<{ count: number }, any> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => [model, []],
+  view: (model) => {
+    const s = createSurface(20, 5);
+    s.fill({ char: '.' });
+    return s;
+  }
+};
+
+interface Model { 
+  left: { count: number }; 
+  right: { count: number }; 
+}
+
 // Parent App mounting two independent Sub-Apps
-const app: App<any, any> = {
-  init: () => [{}, []],
+const app: App<Model, any> = {
+  init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
     // Render the children (they return Surfaces!)
-    const [leftSurface] = mount(childAppA, { model: model.left, onMsg: m => m });
-    const [rightSurface] = mount(childAppB, { model: model.right, onMsg: m => m });
+    const [leftSurface] = mount(childApp, { model: model.left, onMsg: m => m });
+    const [rightSurface] = mount(childApp, { model: model.right, onMsg: m => m });
     
     // Composite them onto the main screen
-    const screen = createSurface(process.stdout.columns, process.stdout.rows);
+    const screen = createSurface(80, 24);
     screen.blit(leftSurface, 0, 0);
     screen.blit(rightSurface, 40, 0);
     return screen;
@@ -50,15 +66,11 @@ const app: App<any, any> = {
 run(app);
 ```
 
-```bash
-npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
-```
-
-## Quick Start
+## Quick Start (Basic)
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, tick, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, quit, type App, isKeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -68,7 +80,7 @@ const app: App<Model> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
-    if (msg.type === 'key') {
+    if (isKeyMsg(msg)) {
       if (msg.key === 'q') return [model, [quit()]];
       if (msg.key === '+') return [{ count: model.count + 1 }, []];
       if (msg.key === '-') return [{ count: model.count - 1 }, []];

@@ -155,6 +155,15 @@ npx tsx examples/<name>/main.ts
 
 Explore the curated examples in [`examples/`](./examples/) for canonical app-shell demos and advanced component showcases.
 
+Flagship V3 examples:
+
+- [`examples/v3-demo`](./examples/v3-demo/) — minimal surface-first starter app
+- [`examples/v3-css`](./examples/v3-css/) — BCSS selectors, token vars, and media queries
+- [`examples/v3-motion`](./examples/v3-motion/) — keyed motion with springs and tweens
+- [`examples/v3-subapp`](./examples/v3-subapp/) — Fractal TEA lifecycle helpers
+- [`examples/v3-worker`](./examples/v3-worker/) — worker runtime plus data channel
+- [`examples/v3-pipeline`](./examples/v3-pipeline/) — programmable render-pipeline extension
+
 Test local `create-bijou-tui-app` scaffolder changes from the monorepo:
 
 ```bash
@@ -191,7 +200,7 @@ Node.js version: `>=18`.
   - [`packages/bijou-node/GUIDE.md`](./packages/bijou-node/GUIDE.md)
   - [`packages/bijou-tui/GUIDE.md`](./packages/bijou-tui/GUIDE.md)
 
-## What's New in v2.1.0
+## What's New in v3.0.0
 
 - **9 new transition shaders** — `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static` join the existing 7. All 16 available via `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
 - **Shader factories & combinators** — Parameterized factories (`wipe(direction)`, `radial(originX, originY)`, `blinds(count)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`) for custom transition effects.

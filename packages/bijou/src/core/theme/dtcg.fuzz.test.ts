@@ -124,12 +124,12 @@ describe('DTCG fuzz (property-based)', () => {
     const depth = 7;
     const doc: DTCGDocument = {
       name: { $type: 'string', $value: 'chain-test' },
-      status: {} as Record<string, unknown>,
-      semantic: {} as Record<string, unknown>,
+      status: {} as any,
+      semantic: {} as any,
       gradient: { brand: { $type: 'gradient', $value: [{ pos: 0, color: [0, 0, 0] }, { pos: 1, color: [255, 255, 255] }] } },
-      border: {} as Record<string, unknown>,
-      ui: {} as Record<string, unknown>,
-      surface: {} as Record<string, unknown>,
+      border: {} as any,
+      ui: {} as any,
+      surface: {} as any,
     };
 
     // Create chain tokens in status: chain_0 → chain_1 → ... → chain_N (concrete)

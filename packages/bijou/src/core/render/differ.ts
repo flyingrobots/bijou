@@ -1,6 +1,5 @@
 import { createSurface, type Surface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
-import type { TokenValue } from '../theme/tokens.js';
 import { stripAnsi, segmentGraphemes } from '../text/index.js';
 
 /**
@@ -8,11 +7,6 @@ import { stripAnsi, segmentGraphemes } from '../text/index.js';
  * 
  * Note: This is a legacy migration helper. It currently strips ANSI
  * and treats all characters as the default style.
- * 
- * @param text - The string to convert.
- * @param width - Desired width.
- * @param height - Desired height.
- * @returns A new Surface populated with characters from the string.
  */
 export function stringToSurface(text: string, width: number, height: number): Surface {
   const surface = createSurface(width, height);
@@ -45,7 +39,7 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
     
     let currentFg: string | undefined;
     let currentBg: string | undefined;
-    let currentMods: string[] = [];
+    let currentMods = new Set<string>();
 
     const matches = Array.from(line.matchAll(ANSI_RE));
     let lastIndex = 0;
@@ -56,31 +50,48 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
       const gs = segmentGraphemes(part);
       for (const char of gs) {
         if (x < width) {
-          surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: currentMods });
+          surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: Array.from(currentMods) });
           x++;
         }
       }
 
-      const code = match[1]!;
-      if (code === '0' || code === '') {
+      const codeStr = match[1]!;
+      if (codeStr === '0' || codeStr === '') {
         currentFg = undefined;
         currentBg = undefined;
-        currentMods = [];
-      } else if (code.startsWith('38;2;')) {
-        const parts = code.split(';');
-        if (parts.length >= 5) {
-          const r = parseInt(parts[2]!, 10).toString(16).padStart(2, '0');
-          const g = parseInt(parts[3]!, 10).toString(16).padStart(2, '0');
-          const b = parseInt(parts[4]!, 10).toString(16).padStart(2, '0');
-          currentFg = '#' + r + g + b;
-        }
-      } else if (code.startsWith('48;2;')) {
-        const parts = code.split(';');
-        if (parts.length >= 5) {
-          const r = parseInt(parts[2]!, 10).toString(16).padStart(2, '0');
-          const g = parseInt(parts[3]!, 10).toString(16).padStart(2, '0');
-          const b = parseInt(parts[4]!, 10).toString(16).padStart(2, '0');
-          currentBg = '#' + r + g + b;
+        currentMods.clear();
+      } else {
+        const parts = codeStr.split(';');
+        let i = 0;
+        while (i < parts.length) {
+          const code = parts[i]!;
+          if (code === '1') currentMods.add('bold');
+          else if (code === '2') currentMods.add('dim');
+          else if (code === '3') currentMods.add('italic');
+          else if (code === '4') currentMods.add('underline');
+          else if (code === '7') currentMods.add('inverse');
+          else if (code === '9') currentMods.add('strike');
+          else if (code === '22') { currentMods.delete('bold'); currentMods.delete('dim'); }
+          else if (code === '23') currentMods.delete('italic');
+          else if (code === '24') currentMods.delete('underline');
+          else if (code === '27') currentMods.delete('inverse');
+          else if (code === '29') currentMods.delete('strike');
+          else if (code === '38' && parts[i+1] === '2') {
+            // Truecolor FG: 38;2;R;G;B
+            const r = parseInt(parts[i+2]!, 10).toString(16).padStart(2, '0');
+            const g = parseInt(parts[i+3]!, 10).toString(16).padStart(2, '0');
+            const b = parseInt(parts[i+4]!, 10).toString(16).padStart(2, '0');
+            currentFg = '#' + r + g + b;
+            i += 4;
+          } else if (code === '48' && parts[i+1] === '2') {
+            // Truecolor BG: 48;2;R;G;B
+            const r = parseInt(parts[i+2]!, 10).toString(16).padStart(2, '0');
+            const g = parseInt(parts[i+3]!, 10).toString(16).padStart(2, '0');
+            const b = parseInt(parts[i+4]!, 10).toString(16).padStart(2, '0');
+            currentBg = '#' + r + g + b;
+            i += 4;
+          }
+          i++;
         }
       }
       
@@ -91,7 +102,7 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
     const gs = segmentGraphemes(remaining);
     for (const char of gs) {
       if (x < width) {
-        surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: currentMods });
+        surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: Array.from(currentMods) });
         x++;
       }
     }
@@ -114,12 +125,12 @@ export function surfaceToString(surface: Surface, style: StylePort): string {
     let line = '';
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
-      const token: TokenValue = {
-        hex: cell.fg ?? '#ffffff',
+      const token = {
+        hex: cell.fg,
         bg: cell.bg,
         modifiers: cell.modifiers as any,
       };
-      line += style.styled(token, cell.char);
+      line += style.styled(token as any, cell.char);
     }
     lines.push(line);
   }
@@ -227,13 +238,13 @@ export function renderDiff(
       }
 
       // Render the batch
-      const token: TokenValue = {
-        hex: targetCell.fg ?? '#ffffff',
+      const token = {
+        hex: targetCell.fg,
         bg: targetCell.bg,
         modifiers: targetCell.modifiers as any,
       };
 
-      output += style.styled(token, batchText);
+      output += style.styled(token as any, batchText);
 
       // Advance our internal cursor tracking
       const batchWidth = batchX - x;

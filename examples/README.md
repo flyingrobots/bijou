@@ -3,6 +3,19 @@
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record all GIFs: `../scripts/record-gifs.sh`
 
+## V3 Features
+
+Start here if you want the canonical V3 story:
+
+| Example | What it proves |
+|---------|-----------------|
+| [`v3-demo`](./v3-demo/) | Minimal surface-first starter app using the honest V3 runtime contract |
+| [`v3-css`](./v3-css/) | BCSS type/class/id selectors, token vars, and media-query styling |
+| [`v3-motion`](./v3-motion/) | Keyed motion with spring, tween, and initial offsets |
+| [`v3-subapp`](./v3-subapp/) | Fractal TEA composition via `initSubApp()`, `updateSubApp()`, and `mount()` |
+| [`v3-worker`](./v3-worker/) | Worker runtime plus main-thread/worker data channel |
+| [`v3-pipeline`](./v3-pipeline/) | Custom post-process middleware via `configurePipeline()` |
+
 ## Showcase
 
 Full-screen interactive component explorer with live previews across all output modes:

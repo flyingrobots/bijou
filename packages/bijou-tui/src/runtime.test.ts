@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { createSurface } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
 import { quit } from './commands.js';
@@ -218,6 +219,36 @@ describe('run', () => {
 
       const hasAltScreen = ctx.io.written.some((w) => w.includes(ENTER_ALT_SCREEN));
       expect(hasAltScreen).toBe(false);
+    });
+
+    it('allows callers to extend the render pipeline', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app: App<null, never> = {
+        init: () => [null, [quit()]],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      const promise = run(app, {
+        ctx,
+        configurePipeline(pipeline) {
+          pipeline.use('PostProcess', (state, next) => {
+            state.targetSurface.set(0, 0, { char: 'X', empty: false });
+            next();
+          });
+        },
+      });
+
+      await vi.advanceTimersByTimeAsync(50);
+      await promise;
+
+      expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
     });
   });
 });

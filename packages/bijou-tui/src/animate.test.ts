@@ -62,7 +62,7 @@ describe('animate', () => {
       // Manually pulse until done (or safety limit)
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
-        await new Promise((r) => queueMicrotask(r));
+        await new Promise<void>((resolve) => queueMicrotask(resolve));
       }
       
       await promise;
@@ -93,7 +93,7 @@ describe('animate', () => {
       // Pulse
       for (let i = 0; i < 1000 && !settled; i++) {
         caps.pulse(0.016);
-        await new Promise((r) => queueMicrotask(r));
+        await new Promise<void>((resolve) => queueMicrotask(resolve));
       }
       
       await promise;

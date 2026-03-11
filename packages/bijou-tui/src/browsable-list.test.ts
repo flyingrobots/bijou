@@ -163,10 +163,10 @@ describe('browsableList', () => {
         quit: 'q',
       };
       const km = browsableListKeyMap(actions);
-      expect(km.handle({ key: 'j', ctrl: false, alt: false, shift: false })).toBe('next');
-      expect(km.handle({ key: 'k', ctrl: false, alt: false, shift: false })).toBe('prev');
-      expect(km.handle({ key: 'enter', ctrl: false, alt: false, shift: false })).toBe('sel');
-      expect(km.handle({ key: 'q', ctrl: false, alt: false, shift: false })).toBe('q');
+      expect(km.handle({ type: 'key', key: 'j', ctrl: false, alt: false, shift: false })).toBe('next');
+      expect(km.handle({ type: 'key', key: 'k', ctrl: false, alt: false, shift: false })).toBe('prev');
+      expect(km.handle({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false })).toBe('sel');
+      expect(km.handle({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false })).toBe('q');
     });
   });
 });

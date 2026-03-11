@@ -36,7 +36,7 @@ describe('renderDiff', () => {
   it('writes nothing if surfaces are identical', () => {
     const current = createSurface(10, 10, { char: 'a' });
     const target = createSurface(10, 10, { char: 'a' });
-    const mockIo: WritePort = { write: vi.fn() };
+    const mockIo: WritePort = { write: vi.fn(), writeError: vi.fn() };
 
     renderDiff(current, target, mockIo, mockStyle);
     expect(mockIo.write).not.toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe('renderDiff', () => {
     target.set(2, 2, { char: 'b', fg: '#ff0000' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
 
     renderDiff(current, target, mockIo, mockStyle);
     
@@ -65,7 +65,7 @@ describe('renderDiff', () => {
     target.set(1, 0, { char: 'B' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
 
     renderDiff(current, target, mockIo, mockStyle);
     
@@ -84,7 +84,7 @@ describe('renderDiff', () => {
     target.set(5, 0, { char: 'B' });
     
     let output = '';
-    const mockIo: WritePort = { write: (s) => output += s };
+    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
 
     renderDiff(current, target, mockIo, mockStyle);
     

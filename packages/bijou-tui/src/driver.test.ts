@@ -3,8 +3,8 @@ import { runScript } from './driver.js';
 import type { App, Cmd } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
-import { surfaceToString } from '@flyingrobots/bijou';
-import { plainStyle } from '@flyingrobots/bijou/adapters/test';
+import { badge, surfaceToString } from '@flyingrobots/bijou';
+import { createTestContext, plainStyle } from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
 
@@ -144,6 +144,16 @@ describe('runScript', () => {
     expect(surfaceToString(result.frames[result.frames.length - 1]!, style)).toContain('120x40');
   });
 
+  it('uses the latest scripted dimensions when normalizing legacy string views', async () => {
+    const result = await runScript(counterApp, [
+      { resize: { columns: 18, rows: 3 } },
+    ]);
+
+    const lastFrame = result.frames[result.frames.length - 1]!;
+    expect(lastFrame.width).toBe(18);
+    expect(lastFrame.height).toBe(3);
+  });
+
   it('emits custom msg steps', async () => {
     type Msg = { type: 'inc' };
     interface Model { count: number }
@@ -160,5 +170,31 @@ describe('runScript', () => {
 
     const result = await runScript(app, [{ msg: { type: 'inc' } }, { msg: { type: 'inc' } }]);
     expect(result.model.count).toBe(2);
+  });
+
+  it('installs the BCSS resolver when css is provided', async () => {
+    const ctx = createTestContext({
+      runtime: { columns: 40, rows: 8 },
+    });
+
+    const app: App<null> = {
+      init: () => [null, []],
+      update: (_msg, model) => [model, []],
+      view: () => badge('Styled', { class: 'active', ctx }),
+    };
+
+    const result = await runScript(app, [], {
+      ctx,
+      css: `
+        .active {
+          color: #001122;
+          background: #33aa44;
+        }
+      `,
+    });
+
+    const badgeCell = result.frames[0]!.get(1, 0);
+    expect(badgeCell.fg).toBe('#001122');
+    expect(badgeCell.bg).toBe('#33aa44');
   });
 });

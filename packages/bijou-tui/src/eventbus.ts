@@ -198,12 +198,18 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
     const dispatch = (currentMsg: BusMsg<M>) => {
       if (index < middlewares.length) {
         const mw = middlewares[index++]!;
+        let nextCalled = false;
         try {
-          mw(currentMsg, dispatch);
+          mw(currentMsg, (nextMsg) => {
+            nextCalled = true;
+            dispatch(nextMsg);
+          });
         } catch (err) {
           safeReport('[EventBus] Middleware threw:', err);
-          // Continue with original message if middleware fails
-          dispatch(currentMsg);
+          // Continue with original message if middleware fails and next() was not yet called
+          if (!nextCalled) {
+            dispatch(currentMsg);
+          }
         }
       } else {
         for (const handler of subscribers) {
@@ -214,7 +220,6 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
     dispatch(msg);
   }
-
   return {
     on(handler) {
       subscribers.add(handler);
@@ -256,10 +261,16 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         emit(msg);
       });
 
+      const dataHandle = io.onData?.((payload) => {
+        if (disposed) return;
+        emit(payload as M);
+      });
+
       const handle: Disposable = {
         dispose() {
           inputHandle.dispose();
           resizeHandle.dispose();
+          dataHandle?.dispose();
         },
       };
       disposables.push(handle);

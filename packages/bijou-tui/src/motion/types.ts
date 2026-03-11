@@ -20,10 +20,10 @@ export interface MotionOptions {
     duration?: number;
   };
   /**
-   * Initial layout or properties when the component first appears.
-   * e.g. { opacity: 0, x: -10 }
+   * Initial layout offsets or size overrides when the component first appears.
+   * e.g. { x: -10, y: 2, width: 0 }
    */
-  initial?: Partial<LayoutRect & { opacity: number }>;
+  initial?: Partial<LayoutRect>;
 }
 
 /**
@@ -37,6 +37,12 @@ export interface TrackedMotion {
   currentRect: LayoutRect;
   /** Velocity for spring physics. */
   velocity: { x: number; y: number; w: number; h: number };
+  /** Resolved motion mode for the current transition. */
+  mode: 'spring' | 'tween';
+  /** Elapsed time for tween transitions. */
+  tweenElapsedMs: number;
+  /** Starting rect for the active tween. */
+  tweenFromRect: LayoutRect;
   /** Whether the motion has settled. */
   done: boolean;
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createEventBus, type BusMsg } from './eventbus.js';
-import type { Cmd } from './types.js';
+import type { Cmd, KeyMsg } from './types.js';
 import { QUIT, isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { IOPort, RawInputHandle } from '@flyingrobots/bijou';
 

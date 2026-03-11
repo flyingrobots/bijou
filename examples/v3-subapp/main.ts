@@ -1,121 +1,126 @@
+import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, isKeyMsg, type App, mount, mapCmds } from '@flyingrobots/bijou-tui';
-import { badge, createSurface, stringToSurface } from '@flyingrobots/bijou';
+import { badge, boxV3, createSurface, type Surface } from '@flyingrobots/bijou';
+import {
+  initSubApp,
+  isKeyMsg,
+  mount,
+  quit,
+  run,
+  type App,
+  type Cmd,
+  vstackV3,
+  updateSubApp,
+} from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/v3.ts';
 
-initDefaultContext();
-
-// --- Counter Sub-App ---
+export const ctx = initDefaultContext();
 
 interface CounterModel {
   count: number;
 }
-type CounterMsg = { type: 'inc' } | { type: 'dec' };
 
-const counterApp: App<CounterModel, CounterMsg> = {
+type CounterMsg =
+  | { type: 'inc' }
+  | { type: 'dec' };
+
+export const counterApp: App<CounterModel, CounterMsg> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => {
-    if ('type' in msg) {
-      if (msg.type === 'inc') return [{ count: model.count + 1 }, []];
-      if (msg.type === 'dec') return [{ count: model.count - 1 }, []];
-    }
+    if (msg.type === 'inc') return [{ count: model.count + 1 }, []];
+    if (msg.type === 'dec') return [{ count: model.count - 1 }, []];
     return [model, []];
   },
-  view: (model) => {
-    // Return a Surface
-    return badge(`Counter: ${model.count}`, { variant: model.count > 0 ? 'success' : 'error' });
-  }
+  view: (model) => badge(`Count ${model.count}`, { variant: model.count >= 0 ? 'success' : 'error' }),
 };
 
-// --- Parent App ---
-
-interface MainModel {
-  leftCounter: CounterModel;
-  rightCounter: CounterModel;
-  lastAction: string;
+interface Model {
+  left: CounterModel;
+  right: CounterModel;
+  status: string;
 }
 
-type MainMsg =
-  | { type: 'leftMsg'; msg: CounterMsg }
-  | { type: 'rightMsg'; msg: CounterMsg }
-  | { type: 'quit' };
+type Msg =
+  | { type: 'left'; msg: CounterMsg }
+  | { type: 'right'; msg: CounterMsg };
 
-const parentApp: App<MainModel, MainMsg> = {
-  init: () => {
-    const [leftModel, leftCmds] = counterApp.init();
-    const [rightModel, rightCmds] = counterApp.init();
-    
-    // Map init cmds to parent space
-    const cmds = [
-      ...mapCmds(leftCmds, (msg) => ({ type: 'leftMsg', msg })),
-      ...mapCmds(rightCmds, (msg) => ({ type: 'rightMsg', msg })),
+function mapLeft(msg: CounterMsg): Msg {
+  return { type: 'left', msg };
+}
+
+function mapRight(msg: CounterMsg): Msg {
+  return { type: 'right', msg };
+}
+
+export const app: App<Model, Msg> = {
+  init() {
+    const [left, leftCmds] = initSubApp(counterApp, { onMsg: mapLeft });
+    const [right, rightCmds] = initSubApp(counterApp, { onMsg: mapRight });
+    return [
+      { left, right, status: 'Ready' },
+      [...leftCmds, ...rightCmds],
     ];
-
-    return [{ leftCounter: leftModel, rightCounter: rightModel, lastAction: 'None' }, cmds];
   },
-  
-  update: (msg, model) => {
-    // Intercept keyboard commands at the top level
+
+  update(msg, model) {
     if (isKeyMsg(msg)) {
       if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
-      
-      // Route inputs to the correct sub-app
-      if (msg.key === 'a') return [{ ...model, lastAction: 'Left ++' }, [() => Promise.resolve({ type: 'leftMsg', msg: { type: 'inc' } })]];
-      if (msg.key === 'z') return [{ ...model, lastAction: 'Left --' }, [() => Promise.resolve({ type: 'leftMsg', msg: { type: 'dec' } })]];
-      if (msg.key === 'k') return [{ ...model, lastAction: 'Right ++' }, [() => Promise.resolve({ type: 'rightMsg', msg: { type: 'inc' } })]];
-      if (msg.key === 'm') return [{ ...model, lastAction: 'Right --' }, [() => Promise.resolve({ type: 'rightMsg', msg: { type: 'dec' } })]];
+      if (msg.key === 'a') return updateLeft(model, { type: 'inc' }, 'Left +1');
+      if (msg.key === 'z') return updateLeft(model, { type: 'dec' }, 'Left -1');
+      if (msg.key === 'k') return updateRight(model, { type: 'inc' }, 'Right +1');
+      if (msg.key === 'm') return updateRight(model, { type: 'dec' }, 'Right -1');
+      return [model, []];
     }
 
-    // Handle routed sub-app messages
-    if ('type' in msg) {
-      if (msg.type === 'leftMsg') {
-        const [nextLeft, leftCmds] = counterApp.update(msg.msg, model.leftCounter);
-        return [
-          { ...model, leftCounter: nextLeft }, 
-          mapCmds(leftCmds, m => ({ type: 'leftMsg', msg: m }))
-        ];
-      }
-      
-      if (msg.type === 'rightMsg') {
-        const [nextRight, rightCmds] = counterApp.update(msg.msg, model.rightCounter);
-        return [
-          { ...model, rightCounter: nextRight }, 
-          mapCmds(rightCmds, m => ({ type: 'rightMsg', msg: m }))
-        ];
-      }
-    }
-    
+    if (msg.type === 'left') return updateLeft(model, msg.msg, 'Left child command');
+    if (msg.type === 'right') return updateRight(model, msg.msg, 'Right child command');
     return [model, []];
   },
 
   view: (model) => {
-    // Mount the sub-apps!
-    const [leftSurface] = mount(counterApp, {
-      model: model.leftCounter,
-      onMsg: m => ({ type: 'leftMsg', msg: m })
-    });
-    
-    const [rightSurface] = mount(counterApp, {
-      model: model.rightCounter,
-      onMsg: m => ({ type: 'rightMsg', msg: m })
-    });
+    const [leftView] = mount(counterApp, { model: model.left, onMsg: mapLeft });
+    const [rightView] = mount(counterApp, { model: model.right, onMsg: mapRight });
 
-    // Create a container surface
-    const w = process.stdout.columns;
-    const h = process.stdout.rows;
-    const full = createSurface(w, h);
-    
-    // Blit the sub-app surfaces onto the parent!
-    full.blit(leftSurface, 10, 5);
-    full.blit(rightSurface, 40, 5);
-    
-    const controls = stringToSurface('Controls: [a/z] Left | [k/m] Right | [q] Quit', 60, 1);
-    const status = stringToSurface(`Last action: ${model.lastAction}`, 40, 1);
-    
-    full.blit(controls, 10, 8);
-    full.blit(status, 10, 10);
+    const dashboard = boxV3(
+      vstackV3(
+        row('Left Counter', ensureSurface(leftView)),
+        spacer(1, 1),
+        row('Right Counter', ensureSurface(rightView)),
+        spacer(1, 1),
+        line('Controls: [a/z] left  [k/m] right  [q] quit'),
+        line(`Status: ${model.status}`),
+      ),
+      { title: 'Fractal TEA', padding: { top: 1, bottom: 1, left: 2, right: 2 } },
+    );
 
-    return full;
-  }
+    return centerSurface(ctx, dashboard);
+  },
 };
 
-run(parentApp);
+function updateLeft(model: Model, msg: CounterMsg, status: string): [Model, Cmd<Msg>[]] {
+  const [left, cmds] = updateSubApp(counterApp, msg, model.left, { onMsg: mapLeft });
+  return [{ ...model, left, status }, cmds];
+}
+
+function updateRight(model: Model, msg: CounterMsg, status: string): [Model, Cmd<Msg>[]] {
+  const [right, cmds] = updateSubApp(counterApp, msg, model.right, { onMsg: mapRight });
+  return [{ ...model, right, status }, cmds];
+}
+
+function row(label: string, content: Surface): Surface {
+  const surface = createSurface(Math.max(36, content.width + 16), Math.max(3, content.height + 2));
+  surface.blit(line(label), 0, 0);
+  surface.blit(content, 0, 2);
+  return surface;
+}
+
+function ensureSurface(view: Surface | string | { cells?: unknown }): Surface {
+  if (typeof view === 'string' || !('cells' in view)) {
+    throw new Error('v3-subapp expects child views to be surface-native');
+  }
+  return view;
+}
+
+if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run(app);
+}

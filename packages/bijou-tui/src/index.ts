@@ -53,6 +53,9 @@ export {
   createEventBus,
 } from './eventbus.js';
 
+// View output compatibility
+export type { ViewOutput } from './view-output.js';
+
 // Pipeline
 export type { RenderState, RenderMiddleware, RenderStage, RenderPipeline } from './pipeline/pipeline.js';
 export { createPipeline } from './pipeline/pipeline.js';
@@ -60,7 +63,7 @@ export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
 
 // Sub-App Composition
 export type { MountOptions, MountedApp } from './subapp/mount.js';
-export { mount, mapCmds } from './subapp/mount.js';
+export { mount, mapCmds, initSubApp, updateSubApp } from './subapp/mount.js';
 
 // Motion API
 export { motion } from './motion/motion.js';

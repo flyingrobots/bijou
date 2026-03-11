@@ -42,6 +42,7 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * @param fixedWidth - If provided, lock the outer width and clip/pad content to fit.
  * @param bgFill - Optional function to wrap interior content with background color styling.
  * @param fillChar - Single-width character for padding areas (defaults to space).
+ * @param title - Optional title displayed in the top border.
  * @returns The rendered box as a multiline string.
  */
 function drawBox(
@@ -51,6 +52,7 @@ function drawBox(
   fixedWidth?: number,
   bgFill?: (s: string) => string,
   fillChar: string = ' ',
+  title?: string,
 ): string {
   const contentLines = content.split('\n');
 
@@ -63,9 +65,10 @@ function drawBox(
     contentWidth = Math.max(0, innerWidth - padding.left - padding.right);
   } else {
     // Auto width: measure content
+    const titleWidth = title ? graphemeWidth(title) + 2 : 0;
     const maxWidth = contentLines.reduce((max, line) => Math.max(max, graphemeWidth(line)), 0);
     contentWidth = maxWidth;
-    innerWidth = maxWidth + padding.left + padding.right;
+    innerWidth = Math.max(titleWidth, maxWidth + padding.left + padding.right);
   }
 
   // When fixed width, padding may exceed innerWidth — clamp to fit
@@ -85,7 +88,28 @@ function drawBox(
   };
 
   const fill = bgFill ?? ((s: string) => s);
-  const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth) + BORDER.tr);
+  
+  // Render top border with optional title
+  let topBorder = BORDER.h.repeat(innerWidth);
+  if (title && innerWidth >= 4) {
+    const label = ` ${title} `;
+    const labelWidth = graphemeWidth(label);
+    if (labelWidth <= innerWidth - 2) {
+      const start = 1;
+      const before = BORDER.h.repeat(start);
+      const after = BORDER.h.repeat(innerWidth - start - labelWidth);
+      topBorder = before + label + after;
+    } else {
+      // Title too long, clip it
+      const clippedLabel = clipToWidth(label, innerWidth - 2);
+      const start = 1;
+      const before = BORDER.h.repeat(start);
+      const after = BORDER.h.repeat(innerWidth - start - graphemeWidth(clippedLabel));
+      topBorder = before + clippedLabel + after;
+    }
+  }
+  
+  const top = borderColor(BORDER.tl + topBorder + BORDER.tr);
   const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth) + BORDER.br);
   const emptyLine = borderColor(BORDER.v) + fill(fillChar.repeat(innerWidth)) + borderColor(BORDER.v);
 
@@ -131,7 +155,7 @@ export function box(content: string, options: BoxOptions = {}): string {
       const bgFill = makeBgFill(options.bgToken, ctx);
       const resolvedFill = resolveFillChar(options.fillChar);
 
-      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill);
+      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill, options.title);
     },
   }, options);
 }

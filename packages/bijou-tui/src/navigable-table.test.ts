@@ -149,9 +149,9 @@ describe('navigableTable', () => {
         quit: 'q',
       };
       const km = navTableKeyMap(actions);
-      expect(km.handle({ key: 'j', ctrl: false, alt: false, shift: false })).toBe('next');
-      expect(km.handle({ key: 'k', ctrl: false, alt: false, shift: false })).toBe('prev');
-      expect(km.handle({ key: 'q', ctrl: false, alt: false, shift: false })).toBe('q');
+      expect(km.handle({ type: 'key', key: 'j', ctrl: false, alt: false, shift: false })).toBe('next');
+      expect(km.handle({ type: 'key', key: 'k', ctrl: false, alt: false, shift: false })).toBe('prev');
+      expect(km.handle({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false })).toBe('q');
     });
   });
 });

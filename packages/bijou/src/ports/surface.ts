@@ -275,29 +275,44 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
     },
 
     blit(source, dx, dy, sx = 0, sy = 0, sw = source.width, sh = source.height, mask = FULL_MASK) {
-      const xStart = Math.max(0, dx);
-      const yStart = Math.max(0, dy);
-      const srcXStart = sx + (xStart - dx);
-      const srcYStart = sy + (yStart - dy);
+      // 1. Clamp source rectangle to source surface bounds
+      const sX = Math.max(0, sx);
+      const sY = Math.max(0, sy);
+      const sW = Math.min(sw - (sX - sx), source.width - sX);
+      const sH = Math.min(sh - (sY - sy), source.height - sY);
 
-      const blitW = Math.min(w - xStart, sw - (srcXStart - sx));
-      const blitH = Math.min(h - yStart, sh - (srcYStart - sy));
+      if (sW <= 0 || sH <= 0) return;
+
+      // 2. Map to destination and clamp to target surface bounds
+      const dX = dx + (sX - sx);
+      const dY = dy + (sY - sy);
+
+      const xStart = Math.max(0, dX);
+      const yStart = Math.max(0, dY);
+
+      const srcXStart = sX + (xStart - dX);
+      const srcYStart = sY + (yStart - dY);
+
+      const blitW = Math.min(w - xStart, sW - (srcXStart - sX));
+      const blitH = Math.min(h - yStart, sH - (srcYStart - sY));
 
       if (blitW <= 0 || blitH <= 0) return;
 
       for (let i = 0; i < blitH; i++) {
         const targetY = yStart + i;
         const sourceY = srcYStart + i;
+        const tRowOffset = targetY * w;
+        const sRowOffset = sourceY * source.width;
+
         for (let j = 0; j < blitW; j++) {
           const targetX = xStart + j;
           const sourceX = srcXStart + j;
-          const tIdx = targetY * w + targetX;
-          const sIdx = sourceY * source.width + sourceX;
+          const tIdx = tRowOffset + targetX;
+          const sIdx = sRowOffset + sourceX;
           cells[tIdx] = applyMask(cells[tIdx]!, source.cells[sIdx]!, mask);
         }
       }
     },
-
     transform(source, matrix, options = {}) {
       const { charMap = {}, mask = FULL_MASK } = options;
       const [a, b, c, d, tx, ty] = matrix;

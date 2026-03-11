@@ -125,7 +125,7 @@ describe('createFramedApp', () => {
 
     // Manually drive the animation command
     const messages: any[] = [];
-    await switchCmds[0]!((m) => messages.push(m));
+    await switchCmds[0]!((m) => messages.push(m), { onPulse: () => ({ dispose() {} }) });
 
     expect(messages.length).toBeGreaterThan(0);
     
@@ -548,7 +548,9 @@ describe('createFramedApp', () => {
 
     const [model] = app.init();
     const ctx = createTestContext();
-    const lines = surfaceToString(app.view(model), ctx.style).split('\n');
+    const frame = app.view(model);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const lines = surfaceToString(frame, ctx.style).split('\n');
     expect(lines[1]).toContain('[NORMAL]');
     expect(lines[1]).toContain('page:home');
     expect(lines[1]).toContain('pane:main');

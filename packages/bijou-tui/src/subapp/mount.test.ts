@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { mount, mapCmds } from './mount.js';
+import { initSubApp, mount, mapCmds, updateSubApp } from './mount.js';
 import type { App, Cmd, QuitSignal } from '../types.js';
 import { QUIT } from '../types.js';
 import { createSurface } from '@flyingrobots/bijou';
@@ -32,7 +32,7 @@ describe('mapCmds', () => {
       return { sub: true, val: 2 };
     };
 
-    const mapped = mapCmds([cmd], (msg) => ({ parent: true, val: msg.val }));
+    const mapped = mapCmds([cmd], (msg) => ({ parent: true as const, val: msg.val }));
     expect(mapped).toHaveLength(1);
 
     const emitted: ParentMsg[] = [];
@@ -52,5 +52,67 @@ describe('mapCmds', () => {
 
     const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(QUIT);
+  });
+});
+
+describe('initSubApp', () => {
+  it('returns the child model and mapped init commands', async () => {
+    type SubMsg = { type: 'ready'; value: number };
+    type ParentMsg = { type: 'child'; value: number };
+
+    const child: App<number, SubMsg> = {
+      init: () => [7, [async () => ({ type: 'ready', value: 7 })]],
+      update: (_msg, model) => [model, []],
+      view: () => createSurface(1, 1),
+    };
+
+    const [model, cmds] = initSubApp(child, {
+      onMsg: (msg) => ({ type: 'child', value: msg.value }),
+    });
+
+    expect(model).toBe(7);
+    expect(cmds).toHaveLength(1);
+    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({ type: 'child', value: 7 });
+  });
+});
+
+describe('updateSubApp', () => {
+  it('maps returned commands into the parent message space', async () => {
+    type SubMsg = { type: 'inc' };
+    type ParentMsg = { type: 'left'; inner: SubMsg };
+
+    const child: App<number, SubMsg> = {
+      init: () => [0, []],
+      update: (_msg, model) => [model + 1, [async () => ({ type: 'inc' })]],
+      view: () => createSurface(1, 1),
+    };
+
+    const [nextModel, cmds] = updateSubApp(child, { type: 'inc' }, 1, {
+      onMsg: (msg) => ({ type: 'left', inner: msg }),
+    });
+
+    expect(nextModel).toBe(2);
+    expect(cmds).toHaveLength(1);
+    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toEqual({
+      type: 'left',
+      inner: { type: 'inc' },
+    });
+  });
+
+  it('passes QUIT through when mapping child commands', async () => {
+    type SubMsg = { type: 'noop' };
+    type ParentMsg = { type: 'parent-noop' };
+
+    const child: App<number, SubMsg> = {
+      init: () => [0, []],
+      update: (_msg, model) => [model, [async () => QUIT as QuitSignal]],
+      view: () => createSurface(1, 1),
+    };
+
+    const [, cmds] = updateSubApp(child, { type: 'noop' }, 0, {
+      onMsg: () => ({ type: 'parent-noop' }),
+    });
+
+    await expect(cmds[0]!(vi.fn(), { onPulse: vi.fn() })).resolves.toBe(QUIT);
   });
 });

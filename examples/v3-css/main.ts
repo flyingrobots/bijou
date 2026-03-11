@@ -1,75 +1,80 @@
+import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, isKeyMsg, type App, vstackV3 } from '@flyingrobots/bijou-tui';
-import { badge, createSurface, stringToSurface } from '@flyingrobots/bijou';
+import { badge, boxV3 } from '@flyingrobots/bijou';
+import { hstackV3, isKeyMsg, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/v3.ts';
 
-initDefaultContext();
+export const ctx = initDefaultContext();
 
-// Global CSS Stylesheet
-const css = `
+export const css = `
   Badge {
     color: var(semantic.primary);
   }
 
+  Box {
+    background: var(surface.overlay);
+    color: var(border.primary);
+  }
+
   .active {
     background: var(status.success);
-    color: var(semantic.primary);
+    color: #04110a;
   }
 
   .warning {
     background: var(status.warning);
-    color: #000000;
+    color: #1c1300;
   }
 
-  #header-badge {
-    background: var(semantic.accent);
-    color: var(semantic.primary);
+  #hero-box {
+    background: var(surface.elevated);
+    color: var(semantic.accent);
   }
 
-  @media (width < 50) {
-    Badge {
-      background: var(status.error); /* Responsive override! */
+  @media (width < 80) {
+    Box {
+      background: var(status.error);
+      color: #fff5f5;
     }
   }
 `;
 
-interface Model {
-  count: number;
-}
-
-const app: App<Model, any> = {
-  init: () => [{ count: 0 }, []],
+export const app: App<null> = {
+  init: () => [null, []],
   update: (msg, model) => {
     if (isKeyMsg(msg) && (msg.key === 'q' || (msg.ctrl && msg.key === 'c'))) {
       return [model, [quit()]];
     }
     return [model, []];
   },
-  view: (model) => {
-    const normal = badge('Normal Badge');
-    const active = badge('Active Class', { class: 'active' });
-    const warning = badge('Warning Class', { class: 'warning' });
-    const idBadge = badge('ID Badge', { id: 'header-badge' });
-    
-    const content = vstackV3(
-      badge('BCSS ENGINE DEMO', { variant: 'primary' }),
-      createSurface(1, 1),
-      normal,
-      createSurface(1, 1),
-      active,
-      createSurface(1, 1),
-      warning,
-      createSurface(1, 1),
-      idBadge,
-      createSurface(1, 1),
-      stringToSurface('(Resize the terminal to see Media Queries in action!)', 60, 1),
-      createSurface(1, 1),
-      stringToSurface('Press Q to quit', 20, 1)
+  view: () => {
+    const chips = hstackV3(
+      2,
+      badge('Type selector'),
+      badge('Class selector', { class: 'active' }),
+      badge('Warning', { class: 'warning' }),
     );
 
-    const full = createSurface(process.stdout.columns, process.stdout.rows);
-    full.blit(content, 5, 2);
-    return full;
-  }
+    const hero = boxV3(
+      vstackV3(
+        line('BCSS resolves type, class, id, var(), and media queries in the runtime path.'),
+        spacer(1, 1),
+        chips,
+        spacer(1, 1),
+        line(`Resize below 80 columns to flip the container theme. Current width: ${ctx.runtime.columns}`),
+        line('Press Q to quit.'),
+      ),
+      {
+        id: 'hero-box',
+        padding: { top: 1, bottom: 1, left: 2, right: 2 },
+        title: 'BCSS Workbench',
+      },
+    );
+
+    return centerSurface(ctx, hero);
+  },
 };
 
-run(app, { css });
+if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run(app, { ctx, css });
+}

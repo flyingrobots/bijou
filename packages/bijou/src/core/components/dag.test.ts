@@ -893,7 +893,7 @@ describe('DagSource adapter', () => {
       // Verify DagSource has no ids method
       expect((custom as SlicedDagSource).ids).toBeUndefined();
       // Monkey-patch to detect if anyone tries to call it
-      (custom as Record<string, unknown>).ids = () => { idsCalled = true; return []; };
+      (custom as unknown as Record<string, unknown>).ids = () => { idsCalled = true; return []; };
       const sliced = dagSlice(custom, 'a', { direction: 'descendants' });
       dag(sliced, { ctx: createTestContext({ mode: 'pipe' }) });
       expect(idsCalled).toBe(false);

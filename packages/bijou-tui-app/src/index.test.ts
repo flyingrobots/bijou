@@ -4,6 +4,13 @@ import { runScript, stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { createTuiAppSkeleton } from './index.js';
 
+function expectSurface(value: ReturnType<ReturnType<typeof createTuiAppSkeleton>['view']>) {
+  if (typeof value === 'string' || !('cells' in value)) {
+    throw new Error('expected a surface-native framed app view');
+  }
+  return value;
+}
+
 describe('createTuiAppSkeleton', () => {
   it('throws when tabs are explicitly empty', () => {
     const ctx = createTestContext({ mode: 'interactive' });
@@ -18,18 +25,18 @@ describe('createTuiAppSkeleton', () => {
     expect(model.pageOrder).toHaveLength(2);
 
     const firstFrame = app.view(model);
-    const firstString = surfaceToString(firstFrame, ctx.style);
+    const firstString = surfaceToString(expectSurface(firstFrame), ctx.style);
     const firstLines = firstString.split('\n');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Home');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('|');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Split');
     expect(stripAnsi(firstString)).toContain('Drawer');
 
-    const switched = await runScript(app, [{ key: ']' }]);
+    const switched = await runScript(app, [{ key: ']' }], { ctx });
     expect(switched.model.activePageId).toBe('split');
 
     const splitFrame = app.view(switched.model);
-    const splitString = surfaceToString(splitFrame, ctx.style);
+    const splitString = surfaceToString(expectSurface(splitFrame), ctx.style);
     const plain = stripAnsi(splitString);
     expect(plain).toContain('Split');
     expect(plain).toContain('Split ready');
@@ -45,7 +52,7 @@ describe('createTuiAppSkeleton', () => {
 
     const [model] = app.init();
     const output = app.view(model);
-    const lines = surfaceToString(output, ctx.style).split('\n');
+    const lines = surfaceToString(expectSurface(output), ctx.style).split('\n');
 
     const statusRow = lines[model.rows - 2] ?? '';
     const controlsRow = lines[model.rows - 1] ?? '';
@@ -63,13 +70,13 @@ describe('createTuiAppSkeleton', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const app = createTuiAppSkeleton({ ctx });
 
-    const qOpen = await runScript(app, [{ key: 'q' }]);
+    const qOpen = await runScript(app, [{ key: 'q' }], { ctx });
     expect(stripAnsi(surfaceToString(qOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
 
-    const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }]);
-    expect(stripAnsi(surfaceToString(app.view(qCancel.model), ctx.style))).not.toContain('Quit App?');
+    const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }], { ctx });
+    expect(stripAnsi(surfaceToString(expectSurface(app.view(qCancel.model)), ctx.style))).not.toContain('Quit App?');
 
-    const ctrlCOpen = await runScript(app, [{ key: '\x03' }]);
+    const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
     expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
   });
 
@@ -80,7 +87,7 @@ describe('createTuiAppSkeleton', () => {
     const result = await runScript(app, [
       { key: 'o' },
       { key: 'o', delay: 120 },
-    ]);
+    ], { ctx });
 
     // Initial frame + key frame + animation frames + second toggle.
     expect(result.frames.length).toBeGreaterThan(3);

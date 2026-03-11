@@ -23,7 +23,15 @@ export { nodeIO } from './io.js';
 export { chalkStyle, type ChalkStyleOptions } from './style.js';
 
 /** Re-export Worker utilities for multi-threaded applications. */
-export { isBijouWorker, runInWorker, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
+export { isBijouWorker, runInWorker, sendToMain, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
+export {
+  recordDemoGif,
+  rasterizeSurface,
+  writeSurfaceGif,
+  type NativeDemoSpec,
+  type RecorderResult,
+  type SurfaceGifOptions,
+} from './recorder.js';
 
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
