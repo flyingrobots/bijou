@@ -2,7 +2,7 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest: **v2.0.0** — Tech Debt Cleanup
+Latest: **v3.0.0** — Truthful V3 Release
 
 ---
 
@@ -12,6 +12,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v3.0.0 | Truthful V3 Release | Surface-native runtime path, framed `ViewOutput`, BCSS scope, worker runtime, native recorder, release demos |
 | v2.0.0 | Tech Debt Cleanup | Remove process.env fallbacks, eventbus error port, app-frame decomposition |
 | v1.8.0 | The Big One | Custom fill chars, constrain, note, timer, dynamic forms, panel minimize/maximize/dock, layout presets |
 | v1.7.0 | Test Fortress | Deep audit, multiselect defaultValues, nodeIO/chalkStyle tests, fast-check fuzz suites |
@@ -54,14 +55,15 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | ~~**EventBus Middleware**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. `bus.use()` interceptor chain added.~~ |
 | ~~**Sub-App Composition**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Fractal TEA support via `mount()` and `mapCmds()`.~~ |
 | ~~**Reactive & Semantic Token Graph**~~ | ~~bijou~~ | ~~Shipped in v3.0.0. Reactive graph backend for theming (`createTokenGraph`).~~ |
+| **Shared Runtime Viewport Overlay** | bijou-tui + bijou-node | Extract the mutable runtime-size overlay used by the main runtime and worker runtime into one shared helper so resize-state logic stays consistent across contexts. |
 | **Standardized `BijouNode` Protocol** | bijou | Unified node type and `children` prop across all components for true composability. |
 | **Standard Interactive Component & Form System** | bijou-tui | Unified interface for stateful components (Sub-Apps), global focus management, and TEA-native form binding. |
-| **Background Worker Runtime** | bijou-node | Run `update` and `view` cycles in a Worker Thread to keep the TUI 60fps during heavy I/O. |
+| **Worker Runtime Hardening & Performance** | bijou-node | `runInWorker()` / `startWorkerApp()` shipped in v3.0.0. Backlog now covers heavier-load scheduling, profiling, and follow-up cleanup beyond the first release. |
 | **Pluggable "Effect" Handlers** | bijou | Formalize `HttpPort`, `SqlPort`, and `GitPort` to keep all side effects mockable and testable. |
 | **bijou-web** | adapters | Implement `WebRuntime` and `WebIO` adapters to run Bijou TUIs in the browser (Wasm/Xterm.js). |
-| **Deterministic Snapshot Harness** | bijou-tui | Built-in "Tape" recording/replay for TUI sessions to assert UI inevitability and regression safety. |
+| **Deterministic Snapshot Replay & Assertions** | bijou-tui | The native Surface-to-GIF recorder shipped in v3.0.0. Backlog now covers replay/assert APIs for deterministic UI tests, not just demo capture. |
 | **Rich Canvas / Shader v2** | bijou-tui | Upgrade `canvas()` to support rich cell output (`{ char, color, bg }`), normalized UV mapping, and high-res Braille/Quad sub-grid scaling. |
-| **Bijou CSS (BCSS) & Live Styles** | bijou-tui | CSS-based styling engine for TUIs. Supports selectors (classes, IDs, widgets), responsive @media queries for terminal size, and hot-reloading styles. |
+| **BCSS Global Cascade & Live Styles** | bijou-tui | v3.0.0 ships scoped BCSS for supported V3 surface components and frame shell regions. Backlog covers a broader layout-node cascade and live style reload tooling. |
 
 ### P2 — Advanced Components & DX
 
@@ -72,6 +74,9 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Syntax-Aware `textarea`** | bijou | Light-weight syntax highlighting for JSON, YAML, and Markdown within the editor. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
+| **PR Review Tooling** | repo tooling | Add local scripts to summarize unresolved threads, checks, and bot status, plus batch reply/resolve addressed review threads. |
+| **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
+| **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
 
 ### P3 — Nice to have
 
@@ -393,4 +398,3 @@ round-trip
 - **Fuzz/stress:** randomly generated DTCG documents with valid structure but edge-case values
 
 ---
-

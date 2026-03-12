@@ -19,3 +19,5 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Build `scripts/pr-review-status.sh` to print: PR number, unresolved thread count, open high-severity findings, check status, and CodeRabbit cooldown (if any).
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
+- Build `scripts/pr-review-reply.ts` to apply structured reply templates and resolve addressed threads in one pass.
+- Add unit coverage for `scripts/smoke-all-examples.ts` path/root resolution and launcher selection so portability fixes are locked in before full smoke runs.

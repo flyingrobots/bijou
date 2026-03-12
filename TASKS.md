@@ -1,5 +1,7 @@
 # v2.0.0 — Tech Debt Cleanup
 
+> Historical note: this checklist is complete. Post-v3 follow-up backlog items now live in `docs/ROADMAP.md` and `docs/CODERABBIT_REVIEW_NOTES.md`.
+
 Clean up all items from `.claude/bad_code.md`. Items 3, 4, 5, and 7 were already resolved in prior work. Remaining: items 1-2 (process.env fallbacks), item 6 (app-frame decomposition), plus a new finding (console.error in eventbus.ts).
 
 BREAKING CHANGE: Removes deprecated public exports (`getTheme`, `resolveTheme`, `isNoColor` standalone, `_resetThemeForTesting`).
