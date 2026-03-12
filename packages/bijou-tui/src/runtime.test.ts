@@ -36,6 +36,14 @@ function counterApp(quitKey = 'q'): App<number, never> {
   };
 }
 
+function singleCellSurface(char?: string) {
+  const surface = createSurface(1, 1);
+  if (char) {
+    surface.set(0, 0, { char, empty: false });
+  }
+  return surface;
+}
+
 /** What renderFrame produces for a given content string. */
 function frame(content: string): string {
   const lines = content.split('\n');
@@ -269,6 +277,43 @@ describe('run', () => {
       await promise;
 
       expect(ctx.io.written.some((chunk) => chunk === CLEAR_SCREEN + HOME)).toBe(true);
+    });
+
+    it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
+      vi.useFakeTimers();
+
+      const app: App<boolean, never> = {
+        init: () => [true, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            if (msg.key === 'x') return [false, []];
+            if (msg.key === 'q') return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: (model) => (model ? singleCellSurface('X') : singleCellSurface()),
+      };
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      ctx.io.rawInput = (onKey) => {
+        const ids = [
+          globalThis.setTimeout(() => onKey('x'), 10),
+          globalThis.setTimeout(() => onKey('x'), 20),
+          globalThis.setTimeout(() => onKey('q'), 30),
+        ];
+        return {
+          dispose() {
+            ids.forEach(clearTimeout);
+          },
+        };
+      };
+
+      const promise = run(app, { ctx });
+      await vi.advanceTimersByTimeAsync(50);
+      await promise;
+
+      const clearWrites = ctx.io.written.filter((chunk) => chunk === '\x1b[1;1H ');
+      expect(clearWrites).toHaveLength(1);
     });
   });
 });

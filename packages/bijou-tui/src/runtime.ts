@@ -15,7 +15,7 @@ import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.j
  * Disable mouse reporting sequences that terminals may send.
  * Some terminals auto-enable mouse tracking in alt screen mode.
  */
-const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
+const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
 
 /**
  * Enable SGR mouse reporting.
@@ -127,11 +127,7 @@ export async function run<Model, M>(
 
   // Add default Output stage (sync current surface)
   pipeline.use('Output', (state, next) => {
-    if (state.currentSurface.width !== state.targetSurface.width || state.currentSurface.height !== state.targetSurface.height) {
-      currentSurface = state.targetSurface.clone();
-    } else {
-      state.currentSurface.blit(state.targetSurface, 0, 0);
-    }
+    currentSurface = state.targetSurface.clone();
     next();
   });
 
