@@ -21,3 +21,6 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
 - Build `scripts/pr-review-reply.ts` to apply structured reply templates and resolve addressed threads in one pass.
 - Add unit coverage for `scripts/smoke-all-examples.ts` path/root resolution and launcher selection so portability fixes are locked in before full smoke runs.
+- Add a scaffold canary CI script that generates a fresh `create-bijou-tui-app` project, installs deps, builds it, and smoke-runs it once.
+- Add a release dry-run workflow or helper script that exercises the publish matrix and release-note generation without publishing to registries.
+- Add a small benchmark harness for diff rendering, layout solves, recorder throughput, and worker round-trips so perf regressions have a repeatable signal.

@@ -59,9 +59,12 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Standardized `BijouNode` Protocol** | bijou | Unified node type and `children` prop across all components for true composability. |
 | **Standard Interactive Component & Form System** | bijou-tui | Unified interface for stateful components (Sub-Apps), global focus management, and TEA-native form binding. |
 | **Worker Runtime Hardening & Performance** | bijou-node | `runInWorker()` / `startWorkerApp()` shipped in v3.0.0. Backlog now covers heavier-load scheduling, profiling, and follow-up cleanup beyond the first release. |
+| **Render, Layout, and Worker Benchmarks** | repo tooling + bijou-tui + bijou-node | Add a small benchmark suite for diff rendering, layout solves, recorder throughput, and worker round-trips so performance regressions are measured instead of guessed. |
 | **Pluggable "Effect" Handlers** | bijou | Formalize `HttpPort`, `SqlPort`, and `GitPort` to keep all side effects mockable and testable. |
 | **bijou-web** | adapters | Implement `WebRuntime` and `WebIO` adapters to run Bijou TUIs in the browser (Wasm/Xterm.js). |
 | **Deterministic Snapshot Replay & Assertions** | bijou-tui | The native Surface-to-GIF recorder shipped in v3.0.0. Backlog now covers replay/assert APIs for deterministic UI tests, not just demo capture. |
+| **Deterministic Visual Regression Suite** | bijou-tui + bijou-node | Build frame-level golden tests on top of `Surface[]` capture so visual regressions can be detected without screenshot diff flake. |
+| **Surface-First Primitive Migration** | bijou + bijou-tui | Replace the remaining high-friction string-era display helpers with surface-native equivalents so downstream apps stop tripping over `Surface`/string compatibility seams. |
 | **Rich Canvas / Shader v2** | bijou-tui | Upgrade `canvas()` to support rich cell output (`{ char, color, bg }`), normalized UV mapping, and high-res Braille/Quad sub-grid scaling. |
 | **BCSS Global Cascade & Live Styles** | bijou-tui | v3.0.0 ships scoped BCSS for supported V3 surface components and frame shell regions. Backlog covers a broader layout-node cascade and live style reload tooling. |
 
@@ -70,18 +73,24 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **Data Visualization Suite** | bijou | High-density `sparkline()`, `barChart()`, and Braille-based `scatterPlot()` for real-time monitoring. |
-| **Bijou DevTools Inspector** | bijou-tui | Toggleable overlay (`F12`) to inspect the live TEA model, message log, and design tokens. |
+| **Bijou DevTools Inspector** | bijou-tui | Expand the toggleable overlay (`F12`) into a real inspector for focused node ids/classes, layout rects, BCSS matches, token resolution, message flow, and runtime state. |
 | **Syntax-Aware `textarea`** | bijou | Light-weight syntax highlighting for JSON, YAML, and Markdown within the editor. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
+| **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Generate a fresh app in CI, install dependencies, build it, and smoke-run it once so the scaffolder is validated as a first-class published artifact. |
 | **PR Review Tooling** | repo tooling | Add local scripts to summarize unresolved threads, checks, and bot status, plus batch reply/resolve addressed review threads. |
+| **Release Dry-Run Workflow** | repo tooling | Add a workflow-dispatch release rehearsal that exercises the publish matrix and release notes flow without touching registries. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
+| **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
 | **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
 
 ### P3 — Nice to have
 
 | Feature | Package | Notes |
 |---------|---------|-------|
+| **Token Graph / Theme Explorer** | examples + docs | Add an interactive explorer that visualizes semantic token resolution, references, fallbacks, and live preset swaps so the theme graph becomes easier to understand and debug. |
+| **Layout Debugger Overlay** | bijou-tui | Add an opt-in debugging layer that renders gutters, split ratios, viewport bounds, and flex remainder allocation to make shell/layout tuning faster. |
+| **Component Lab Mode** | examples + bijou-tui-app | Build a knob-driven playground for components and scripted scenarios so examples can share one interactive “lab” instead of each demo hand-rolling controls. |
 | ~~**Timer / Stopwatch**~~ | ~~bijou~~ | ~~Shipped in v1.8.0.~~ |
 | ~~**MaxWidth / MaxHeight**~~ | ~~bijou~~ | ~~Shipped in v1.8.0 as `constrain()`.~~ |
 | ~~**Dynamic forms**~~ | ~~bijou~~ | ~~Shipped in v1.8.0 (wizard transform/branch).~~ |
