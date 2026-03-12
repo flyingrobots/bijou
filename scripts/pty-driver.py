@@ -12,6 +12,8 @@ import fcntl
 import struct
 import termios
 
+sys.dont_write_bytecode = True
+
 MARKER_PREFIX = "__BIJOU_STEP__:"
 
 

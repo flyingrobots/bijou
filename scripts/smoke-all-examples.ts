@@ -233,6 +233,7 @@ function createInteractiveTtyChild(absPath: string, steps: readonly PtyStep[]): 
       env: {
         ...process.env,
         BIJOU_PTY_SPEC: JSON.stringify(spec),
+        PYTHONDONTWRITEBYTECODE: '1',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     },
