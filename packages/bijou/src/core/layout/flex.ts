@@ -103,13 +103,25 @@ export function calculateFlex(
 
     if (!spaceDistributed) {
       // Final pass: distribute the last remaining bits without constraints (they are already satisfied)
+      const fractionalShares: Array<{ index: number; remainder: number }> = [];
+      let assigned = 0;
       for (let i = 0; i < children.length; i++) {
         if (!isConstrained[i] && (children[i]!.flex ?? 0) > 0) {
           const flexGrow = children[i]!.flex!;
           const share = (flexGrow / activeFlex) * remaining;
-          sizes[i]! += Math.floor(share);
+          const whole = Math.floor(share);
+          sizes[i]! += whole;
+          assigned += whole;
+          fractionalShares.push({ index: i, remainder: share - whole });
         }
       }
+
+      let leftover = remaining - assigned;
+      fractionalShares.sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+      for (let i = 0; i < fractionalShares.length && leftover > 0; i++, leftover--) {
+        sizes[fractionalShares[i]!.index]! += 1;
+      }
+
       remaining = 0; // All done
     }
   }

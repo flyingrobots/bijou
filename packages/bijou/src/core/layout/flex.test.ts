@@ -45,4 +45,21 @@ describe('calculateFlex', () => {
     expect(root.children[0]!.rect.width).toBe(30);
     expect(root.children[1]!.rect.width).toBe(70);
   });
+
+  it('allocates leftover units after integer rounding', () => {
+    const root = calculateFlex(
+      { direction: 'row' },
+      [
+        { flex: 1 },
+        { flex: 1 },
+      ],
+      { x: 0, y: 0, width: 3, height: 1 }
+    );
+
+    const total = root.children.reduce((sum, child) => sum + child.rect.width, 0);
+    const last = root.children[root.children.length - 1]!;
+
+    expect(total).toBe(3);
+    expect(last.rect.x + last.rect.width).toBe(3);
+  });
 });
