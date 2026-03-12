@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createRequire } from 'node:module';
-import type { BijouContext, Surface } from '@flyingrobots/bijou';
+import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { runScript, type App, type ScriptStep } from '@flyingrobots/bijou-tui';
 
 const require = createRequire(import.meta.url);
@@ -75,6 +75,10 @@ export async function recordDemoGif<Model, M = never>(
 }
 
 export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
+  if (options.frames.length === 0) {
+    throw new Error('writeSurfaceGif() requires at least one frame');
+  }
+
   const rasterOptions: RasterizeOptions = {
     cellWidth: options.cellWidth ?? 8,
     cellHeight: options.cellHeight ?? 10,
@@ -82,9 +86,11 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
     background: options.background ?? DEFAULT_BACKGROUND,
   };
 
-  const frames = options.frames.map((frame) => rasterizeSurface(frame, rasterOptions));
-  const width = options.frames[0]?.width ?? 0;
-  const height = options.frames[0]?.height ?? 0;
+  const width = Math.max(...options.frames.map((frame) => frame.width));
+  const height = Math.max(...options.frames.map((frame) => frame.height));
+  const frames = options.frames
+    .map((frame) => normalizeSurfaceFrame(frame, width, height))
+    .map((frame) => rasterizeSurface(frame, rasterOptions));
   const palette = quantize(joinFrames(frames), 256, { format: 'rgb565' });
   const gif = GIFEncoder();
   const delay = Math.max(2, Math.round((options.frameDelayMs ?? 90) / 10));
@@ -285,6 +291,16 @@ function joinFrames(frames: Uint8Array[]): Uint8Array {
     offset += frame.length;
   }
   return joined;
+}
+
+function normalizeSurfaceFrame(surface: Surface, width: number, height: number): Surface {
+  if (surface.width === width && surface.height === height) {
+    return surface;
+  }
+
+  const normalized = createSurface(width, height);
+  normalized.blit(surface, 0, 0);
+  return normalized;
 }
 
 interface Rgb {

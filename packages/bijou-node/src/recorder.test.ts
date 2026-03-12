@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { createSurface } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { App } from '@flyingrobots/bijou-tui';
-import { recordDemoGif, rasterizeSurface } from './recorder.js';
+import { recordDemoGif, rasterizeSurface, writeSurfaceGif } from './recorder.js';
 
 describe('recorder', () => {
   it('rasterizes cell foreground and background colors', () => {
@@ -60,5 +60,31 @@ describe('recorder', () => {
     const bytes = readFileSync(outputPath);
     expect(bytes.subarray(0, 6).toString('ascii')).toBe('GIF89a');
     expect(result.frames).toBe(2);
+  });
+
+  it('normalizes resized frames to a stable GIF canvas', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'bijou-recorder-'));
+    const outputPath = join(dir, 'resized.gif');
+    const first = createSurface(2, 1);
+    first.set(0, 0, { char: 'A', fg: '#ffffff', bg: '#000000', empty: false });
+    const second = createSurface(4, 2);
+    second.set(3, 1, { char: 'B', fg: '#00ff00', bg: '#000000', empty: false });
+
+    const result = writeSurfaceGif({
+      outputPath,
+      frames: [first, second],
+      cellWidth: 8,
+      cellHeight: 10,
+      frameDelayMs: 80,
+    });
+
+    const bytes = readFileSync(outputPath);
+    const gifWidth = bytes.readUInt16LE(6);
+    const gifHeight = bytes.readUInt16LE(8);
+
+    expect(result.width).toBe(32);
+    expect(result.height).toBe(20);
+    expect(gifWidth).toBe(32);
+    expect(gifHeight).toBe(20);
   });
 });
