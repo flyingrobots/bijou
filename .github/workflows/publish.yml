@@ -20,6 +20,7 @@ jobs:
       tag_version: ${{ steps.meta.outputs.tag_version }}
       is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
       npm_dist_tag: ${{ steps.meta.outputs.npm_dist_tag }}
+      release_sha: ${{ steps.release_sha.outputs.release_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,6 +103,13 @@ jobs:
             exit 1
           fi
 
+      - name: Capture verified release commit
+        id: release_sha
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: npm run build
 
@@ -139,7 +147,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.verify.outputs.tag }}
+          ref: ${{ needs.verify.outputs.release_sha }}
 
       - uses: actions/setup-node@v4
         with:
