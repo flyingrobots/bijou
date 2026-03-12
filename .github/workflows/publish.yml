@@ -176,9 +176,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Build release summary
+      - name: Build release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
+          set -euo pipefail
+          TAG="${{ needs.verify.outputs.tag }}"
+          TARGET_SHA="${{ needs.verify.outputs.release_sha }}"
+
           cat > RELEASE_SUMMARY.md << 'EOF'
           ## Registry publish summary
 
@@ -190,14 +197,52 @@ jobs:
           If npm failed, re-run only that job from Actions.
           EOF
 
+          gh api \
+            -X POST \
+            "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="$TAG" \
+            -f target_commitish="$TARGET_SHA" \
+            > GENERATED_RELEASE.json
+
+          node --input-type=module <<'EOF'
+          import { readFileSync, writeFileSync } from 'node:fs';
+
+          const payload = JSON.parse(readFileSync('GENERATED_RELEASE.json', 'utf8'));
+          const releaseName = String(payload.name ?? '').trim();
+          const generatedBody = String(payload.body ?? '').trim();
+          const summary = readFileSync('RELEASE_SUMMARY.md', 'utf8').trim();
+          const body = [generatedBody, summary].filter(Boolean).join('\n\n') + '\n';
+
+          writeFileSync('RELEASE_BODY.md', body);
+          writeFileSync('RELEASE_NAME.txt', `${releaseName}\n`);
+          EOF
+
+          echo "release_name=$(cat RELEASE_NAME.txt)" >> "$GITHUB_OUTPUT"
+
       - name: Create / update release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.verify.outputs.tag }}
-          prerelease: ${{ needs.verify.outputs.is_prerelease == 'true' }}
-          generate_release_notes: true
-          append_body: true
-          body_path: RELEASE_SUMMARY.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ needs.verify.outputs.tag }}"
+          RELEASE_NAME="${{ steps.notes.outputs.release_name }}"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" \
+              --title "$RELEASE_NAME" \
+              --notes-file RELEASE_BODY.md
+          else
+            PRERELEASE_ARGS=()
+            if [[ "${{ needs.verify.outputs.is_prerelease }}" == "true" ]]; then
+              PRERELEASE_ARGS+=(--prerelease)
+            fi
+
+            gh release create "$TAG" \
+              --title "$RELEASE_NAME" \
+              --notes-file RELEASE_BODY.md \
+              "${PRERELEASE_ARGS[@]}"
+          fi
 
       - name: Fail if npm publish failed
         if: ${{ needs.publish_npm.result != 'success' }}
