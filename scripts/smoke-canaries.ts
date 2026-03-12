@@ -1,13 +1,14 @@
 #!/usr/bin/env npx tsx
 
 import { spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   detectGarbage,
   inputStep,
+  PTY_MARKER_PREFIX,
   resizeStep,
   rewritePackageManifestToTarballs,
   stripAnsi,
@@ -17,6 +18,7 @@ import {
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURE_ROOT = resolve(ROOT, 'scripts/canary-fixtures/core-static');
 const KEEP_TEMP = process.env['BIJOU_KEEP_CANARY_TMP'] === '1';
+const SKIP_BUILD = process.argv.includes('--skip-build');
 
 interface PublishableUnit {
   readonly name: string;
@@ -35,23 +37,27 @@ interface CommandOptions {
 }
 
 const TUI_CANARY_STEPS: readonly PtyStep[] = [
-  inputStep(']', 500),
-  inputStep('[', 350),
-  inputStep('o', 350),
-  inputStep('o', 550),
-  resizeStep(120, 36, 700),
-  resizeStep(92, 24, 700),
-  inputStep('q', 400),
-  inputStep('n', 250),
-  inputStep('q', 350),
+  inputStep('', 600, 'initial', 150),
+  inputStep(']', 200, 'split', 650),
+  inputStep('[', 200, 'home-return', 500),
+  inputStep('o', 200, 'drawer-closed', 1200),
+  resizeStep(120, 36, 200, 'resize-large', 700),
+  resizeStep(92, 24, 200, 'resize-small', 700),
+  inputStep('q', 200, 'quit-open', 450),
+  inputStep('n', 200, 'quit-cancel', 450),
+  inputStep('q', 200, 'quit-reopen', 450),
   inputStep('y', 250),
 ];
 
 function main(): void {
   try {
-    process.stdout.write('smoke-canaries: building workspace artifacts ... ');
-    runCommand('workspace build', 'npm', ['run', 'build'], { cwd: ROOT }, { quietSuccess: true });
-    process.stdout.write('ok\n');
+    if (SKIP_BUILD) {
+      process.stdout.write('smoke-canaries: skipping workspace build (--skip-build)\n');
+    } else {
+      process.stdout.write('smoke-canaries: building workspace artifacts ... ');
+      runCommand('workspace build', 'npm', ['run', 'build'], { cwd: ROOT }, { quietSuccess: true });
+      process.stdout.write('ok\n');
+    }
 
     const tempRoot = mkdtempSync(join(tmpdir(), 'bijou-canaries-'));
 
@@ -113,11 +119,26 @@ function packPublishableUnits(tempRoot: string): Readonly<Record<string, string>
 
 function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, string>>): void {
   const targetDir = resolve(tempRoot, 'generated-tui');
+  const cliTarball = tarballSpecs['create-bijou-tui-app'];
+  if (cliTarball == null) {
+    throw new Error('missing packed create-bijou-tui-app tarball');
+  }
+  const cliRunnerDir = resolve(tempRoot, 'cli-runner');
+  mkdirSync(cliRunnerDir, { recursive: true });
+  runSimpleNpmLifecycle(
+    'install packed scaffold CLI',
+    ROOT,
+    ['install', '--prefix', cliRunnerDir, '--no-package-lock', '--no-save', cliTarball],
+  );
+  const cliBin = resolve(cliRunnerDir, 'node_modules/.bin/create-bijou-tui-app');
+  if (!existsSync(cliBin)) {
+    throw new Error(`installed create-bijou-tui-app tarball did not produce a bin shim at ${cliBin}`);
+  }
   process.stdout.write('generate TUI canary ... ');
   runCommand(
     'generate TUI canary',
-    process.execPath,
-    ['--import', 'tsx', resolve(ROOT, 'packages/create-bijou-tui-app/src/cli.ts'), targetDir, '--no-install'],
+    cliBin,
+    [targetDir, '--no-install'],
     { cwd: ROOT },
     { quietSuccess: true },
   );
@@ -130,21 +151,44 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
 
   process.stdout.write('run TUI canary ... ');
   const output = runPtyScenario(targetDir, TUI_CANARY_STEPS);
-  assertOutput(
-    'TUI canary',
-    output,
-    [
-      'My Bijou App',
-      'Home',
-      'Split',
-      'Home ready',
-      'Split ready',
-      'Panel drawer',
-      '1/3',
-      'Right pane',
-      'Quit App?',
-    ],
-  );
+  assertOutputFreeOfGarbage('TUI canary', output);
+  const checkpoints = parseCheckpointSegments(output);
+  assertCheckpointContains(checkpoints, 'initial', [
+    'My Bijou App',
+    'Home',
+    'Split',
+    'Home ready',
+    'Panel drawer',
+  ]);
+  assertCheckpointContains(checkpoints, 'split', [
+    'Split ready',
+    '1/3',
+    'Right pane',
+  ]);
+  assertCheckpointContains(checkpoints, 'home-return', [
+    'Home ready',
+    'Panel drawer',
+  ]);
+  assertCheckpointContains(checkpoints, 'drawer-closed', [
+    'Open: no',
+  ]);
+  assertCheckpointContains(checkpoints, 'resize-large', [
+    'Home ready',
+    'Home',
+  ]);
+  assertCheckpointContains(checkpoints, 'resize-small', [
+    'Home ready',
+    'Home',
+  ]);
+  assertCheckpointContains(checkpoints, 'quit-open', [
+    'Quit App?',
+  ]);
+  assertCheckpointAbsent(checkpoints, 'quit-cancel', [
+    'Quit App?',
+  ]);
+  assertCheckpointContains(checkpoints, 'quit-reopen', [
+    'Quit App?',
+  ]);
   process.stdout.write('ok\n');
 }
 
@@ -172,7 +216,8 @@ function runCoreStaticCanary(tempRoot: string, tarballSpecs: Readonly<Record<str
     { quietSuccess: true, timeoutMs: 10000 },
   );
   const output = `${result.stdout}${result.stderr}`;
-  assertOutput(
+  assertOutputFreeOfGarbage('core/static canary', output);
+  assertOutputContains(
     'core/static canary',
     output,
     [
@@ -247,16 +292,70 @@ function parsePackResult(stdout: string, packageName: string): { filename: strin
   return { filename };
 }
 
-function assertOutput(label: string, output: string, expected: readonly string[]): void {
+function assertOutputFreeOfGarbage(label: string, output: string): void {
   const clean = stripAnsi(output);
   const garbage = detectGarbage(clean);
   if (garbage != null) {
     throw new Error(`${label} produced garbage output: ${garbage}\n${tail(clean)}`);
   }
+}
 
+function assertOutputContains(label: string, output: string, expected: readonly string[]): void {
+  const clean = stripAnsi(output);
   const missing = expected.filter((needle) => !clean.includes(needle));
   if (missing.length > 0) {
     throw new Error(`${label} output missing expected text: ${missing.join(', ')}\n${tail(clean)}`);
+  }
+}
+
+function parseCheckpointSegments(output: string): ReadonlyMap<string, string> {
+  const clean = stripAnsi(output);
+  const lines = clean.split('\n');
+  const checkpoints = new Map<string, string>();
+  const buffer: string[] = [];
+
+  for (const line of lines) {
+    if (line.startsWith(PTY_MARKER_PREFIX)) {
+      const label = line.slice(PTY_MARKER_PREFIX.length).trim();
+      checkpoints.set(label, buffer.join('\n'));
+      buffer.length = 0;
+      continue;
+    }
+    buffer.push(line);
+  }
+
+  return checkpoints;
+}
+
+function assertCheckpointContains(
+  checkpoints: ReadonlyMap<string, string>,
+  label: string,
+  expected: readonly string[],
+): void {
+  const segment = checkpoints.get(label);
+  if (segment == null) {
+    throw new Error(`missing PTY checkpoint "${label}"`);
+  }
+
+  const missing = expected.filter((needle) => !segment.includes(needle));
+  if (missing.length > 0) {
+    throw new Error(`checkpoint "${label}" missing expected text: ${missing.join(', ')}\n${tail(segment)}`);
+  }
+}
+
+function assertCheckpointAbsent(
+  checkpoints: ReadonlyMap<string, string>,
+  label: string,
+  forbidden: readonly string[],
+): void {
+  const segment = checkpoints.get(label);
+  if (segment == null) {
+    throw new Error(`missing PTY checkpoint "${label}"`);
+  }
+
+  const present = forbidden.filter((needle) => segment.includes(needle));
+  if (present.length > 0) {
+    throw new Error(`checkpoint "${label}" unexpectedly contained: ${present.join(', ')}\n${tail(segment)}`);
   }
 }
 

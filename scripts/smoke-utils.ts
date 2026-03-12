@@ -1,17 +1,22 @@
-export interface InputStep {
-  readonly type: 'input';
-  readonly input: string;
+interface PtyStepBase {
   readonly delayMs?: number;
+  readonly label?: string;
+  readonly captureMs?: number;
 }
 
-export interface ResizeStep {
+export interface InputStep extends PtyStepBase {
+  readonly type: 'input';
+  readonly input: string;
+}
+
+export interface ResizeStep extends PtyStepBase {
   readonly type: 'resize';
   readonly cols: number;
   readonly rows: number;
-  readonly delayMs?: number;
 }
 
 export type PtyStep = InputStep | ResizeStep;
+export const PTY_MARKER_PREFIX = '__BIJOU_STEP__:';
 
 interface PackageManifest {
   readonly name?: string;
@@ -45,12 +50,23 @@ const ERROR_PATTERNS = [
   /\bUnhandled\b/i,
 ];
 
-export function inputStep(input: string, delayMs?: number): InputStep {
-  return { type: 'input', input, delayMs };
+export function inputStep(
+  input: string,
+  delayMs?: number,
+  label?: string,
+  captureMs?: number,
+): InputStep {
+  return { type: 'input', input, delayMs, label, captureMs };
 }
 
-export function resizeStep(cols: number, rows: number, delayMs?: number): ResizeStep {
-  return { type: 'resize', cols, rows, delayMs };
+export function resizeStep(
+  cols: number,
+  rows: number,
+  delayMs?: number,
+  label?: string,
+  captureMs?: number,
+): ResizeStep {
+  return { type: 'resize', cols, rows, delayMs, label, captureMs };
 }
 
 export function stripAnsi(text: string): string {
