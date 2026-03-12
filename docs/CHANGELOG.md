@@ -6,13 +6,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Fixed
-
-- Corrected runtime back-buffer syncing so cleared surface cells converge cleanly across successive renders.
-- Preserved leftover flex units after integer rounding to avoid layout gaps in narrow containers.
-- Tightened worker IPC typing, removed an unused canvas option, and aligned mouse disable sequences with the modes Bijou actually enables.
-- Normalized resized recorder frames before GIF encoding and aligned the bundled `gifenc` type declarations with the runtime API surface.
-
 ## [3.0.0] - 2026-03-12
 
 ### BREAKING CHANGES
@@ -34,6 +27,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Back-buffer convergence** — cleared surface cells now converge cleanly across successive renders instead of getting stuck behind stale diff state.
+- **Flex remainder allocation** — leftover units after integer rounding are preserved so narrow flex layouts do not develop visible gaps.
+- **Runtime viewport sync** — interactive resize now updates the runtime viewport source of truth used by layout, BCSS, and rendering.
+- **Worker viewport propagation** — worker apps now inherit host dimensions on first render, stay in sync on resize, and expose only worker-safe run options.
+- **Flex API cleanup** — removed the unused `align` field from `FlexChildProps` instead of documenting a behavior the layout engine never implemented.
+- **Worker IPC / recorder correctness** — removed an unused canvas option, aligned mouse disable sequences with the modes Bijou actually enables, and normalized resized recorder frames before GIF encoding while matching the bundled `gifenc` types to the runtime API.
 - **Resize redraw invalidation** — interactive resize now forces a clean redraw so shell chrome does not disappear after repeated terminal resizes.
 - **Framed shell compatibility** — shell panes no longer crash when downstream apps return `Surface` or `LayoutNode` output.
 - **Example compatibility sweep** — legacy examples that mixed string APIs with V3 `Surface` values were updated to render cleanly.
