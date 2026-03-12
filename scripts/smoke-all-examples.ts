@@ -4,6 +4,7 @@ import { execSync, spawn, type ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { detectGarbage, inputStep, stripAnsi, type PtyStep } from './smoke-utils.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -21,11 +22,6 @@ const EXAMPLES = execSync('find examples -maxdepth 2 -name main.ts | sort', {
   .filter(Boolean);
 
 const TARGETS = [...TOP_LEVEL, ...EXAMPLES];
-
-interface ScriptStep {
-  input: string;
-  delayMs?: number;
-}
 
 const PLAIN_INPUTS: Readonly<Record<string, string>> = {
   'demo.ts': '2\n',
@@ -49,71 +45,55 @@ const DEFAULT_INPUT = [
   '',
 ].join('\n').repeat(8);
 
-const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, readonly ScriptStep[]>> = {
+const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, readonly PtyStep[]>> = {
   'demo.ts': [
-    { input: '\x1b[B', delayMs: 250 },
-    { input: '\r', delayMs: 120 },
+    inputStep('\x1b[B', 250),
+    inputStep('\r', 120),
   ],
   'examples/select/main.ts': [
-    { input: '\x1b[B', delayMs: 250 },
-    { input: '\r', delayMs: 120 },
+    inputStep('\x1b[B', 250),
+    inputStep('\r', 120),
   ],
   'examples/multiselect/main.ts': [
-    { input: ' ', delayMs: 250 },
-    { input: '\x1b[B', delayMs: 120 },
-    { input: ' ', delayMs: 120 },
-    { input: '\r', delayMs: 120 },
+    inputStep(' ', 250),
+    inputStep('\x1b[B', 120),
+    inputStep(' ', 120),
+    inputStep('\r', 120),
   ],
   'examples/filter/main.ts': [
-    { input: '/', delayMs: 250 },
-    { input: 'r', delayMs: 80 },
-    { input: 'u', delayMs: 60 },
-    { input: 's', delayMs: 60 },
-    { input: 't', delayMs: 60 },
-    { input: '\r', delayMs: 120 },
+    inputStep('/', 250),
+    inputStep('r', 80),
+    inputStep('u', 60),
+    inputStep('s', 60),
+    inputStep('t', 60),
+    inputStep('\r', 120),
   ],
   'examples/input/main.ts': [
-    { input: 'my-app\n', delayMs: 250 },
-    { input: 'A short description\n', delayMs: 250 },
+    inputStep('my-app\n', 250),
+    inputStep('A short description\n', 250),
   ],
   'examples/textarea/main.ts': [
-    { input: 'feat: smoke test', delayMs: 250 },
-    { input: '\x04', delayMs: 120 },
+    inputStep('feat: smoke test', 250),
+    inputStep('\x04', 120),
   ],
   'examples/confirm/main.ts': [
-    { input: 'y\n', delayMs: 250 },
+    inputStep('y\n', 250),
   ],
   'examples/form-group/main.ts': [
-    { input: 'my-app\n', delayMs: 250 },
-    { input: '\r', delayMs: 250 },
-    { input: ' ', delayMs: 250 },
-    { input: '\x1b[B', delayMs: 120 },
-    { input: ' ', delayMs: 120 },
-    { input: '\r', delayMs: 120 },
-    { input: 'y\n', delayMs: 250 },
+    inputStep('my-app\n', 250),
+    inputStep('\r', 250),
+    inputStep(' ', 250),
+    inputStep('\x1b[B', 120),
+    inputStep(' ', 120),
+    inputStep('\r', 120),
+    inputStep('y\n', 250),
   ],
   'examples/wizard/main.ts': [
-    { input: '\r', delayMs: 250 },
-    { input: 'aws\n', delayMs: 250 },
-    { input: 'y\n', delayMs: 250 },
+    inputStep('\r', 250),
+    inputStep('aws\n', 250),
+    inputStep('y\n', 250),
   ],
 };
-
-const RAW_SURFACE_PATTERNS = [
-  /cells:\s*\[/,
-  /clear:\s*\[Function:/,
-  /transform:\s*\[Function:/,
-  /width:\s*\d+,\s*\n\s*height:\s*\d+/,
-  /\[object Object\]/,
-];
-
-const ERROR_PATTERNS = [
-  /\[Pipeline Error\]/,
-  /\bTypeError:/,
-  /\bReferenceError:/,
-  /\bSyntaxError:/,
-  /\bUnhandled\b/i,
-];
 
 interface Result {
   path: string;
@@ -126,34 +106,13 @@ interface Result {
 interface Scenario {
   path: string;
   mode: Result['mode'];
-  steps?: readonly ScriptStep[];
+  steps?: readonly PtyStep[];
 }
 
 function isTuiTarget(relativePath: string): boolean {
   if (relativePath === 'demo-tui.ts') return true;
   const source = readFileSync(resolve(ROOT, relativePath), 'utf8');
   return source.includes('@flyingrobots/bijou-tui');
-}
-
-function stripAnsi(text: string): string {
-  // eslint-disable-next-line no-control-regex
-  return text.replace(/\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, '');
-}
-
-function detectGarbage(cleanOutput: string): string | null {
-  for (const pattern of RAW_SURFACE_PATTERNS) {
-    if (pattern.test(cleanOutput)) {
-      return `raw Surface dump matched ${pattern}`;
-    }
-  }
-
-  for (const pattern of ERROR_PATTERNS) {
-    if (pattern.test(cleanOutput)) {
-      return `error output matched ${pattern}`;
-    }
-  }
-
-  return null;
 }
 
 async function runScenarioWithTimeout(scenario: Scenario): Promise<Result> {
@@ -253,7 +212,7 @@ function createStaticTtyChild(absPath: string): ChildProcess {
   );
 }
 
-function createInteractiveTtyChild(absPath: string, steps: readonly ScriptStep[]): ChildProcess {
+function createInteractiveTtyChild(absPath: string, steps: readonly PtyStep[]): ChildProcess {
   const spec = {
     argv: [process.execPath, '--import', 'tsx', absPath],
     cwd: ROOT,

@@ -3,9 +3,38 @@
 import json
 import os
 import selectors
+import signal
 import subprocess
 import sys
 import time
+import fcntl
+import struct
+import termios
+
+
+def set_window_size(fd: int, rows: int, cols: int) -> None:
+    packed = struct.pack("HHHH", rows, cols, 0, 0)
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, packed)
+
+
+def apply_step(master_fd: int, proc: subprocess.Popen[bytes], step: dict) -> None:
+    step_type = step.get("type", "input")
+
+    if step_type == "input":
+        payload = step["input"].encode("utf-8", "surrogatepass")
+        os.write(master_fd, payload)
+        return
+
+    if step_type == "resize":
+        rows = int(step["rows"])
+        cols = int(step["cols"])
+        if rows <= 0 or cols <= 0:
+            raise RuntimeError("resize step requires positive rows and cols")
+        set_window_size(master_fd, rows, cols)
+        os.kill(proc.pid, signal.SIGWINCH)
+        return
+
+    raise RuntimeError(f"Unsupported PTY step type: {step_type}")
 
 
 def main() -> int:
@@ -17,16 +46,20 @@ def main() -> int:
     argv = spec["argv"]
     cwd = spec["cwd"]
     steps = spec.get("steps", [])
+    proc = None
 
     env = os.environ.copy()
     for key, value in spec.get("env", {}).items():
-      if value is None:
-        env.pop(key, None)
-      else:
-        env[key] = str(value)
+        if value is None:
+            env.pop(key, None)
+        else:
+            env[key] = str(value)
 
     master_fd, slave_fd = os.openpty()
     try:
+        rows = int(spec.get("rows", 24))
+        cols = int(spec.get("cols", 80))
+        set_window_size(master_fd, rows, cols)
         proc = subprocess.Popen(
             argv,
             cwd=cwd,
@@ -51,8 +84,7 @@ def main() -> int:
         while True:
             now = time.monotonic()
             while next_step_index < len(steps) and now >= next_deadline:
-                payload = steps[next_step_index]["input"].encode("utf-8", "surrogatepass")
-                os.write(master_fd, payload)
+                apply_step(master_fd, proc, steps[next_step_index])
                 next_step_index += 1
                 if next_step_index < len(steps):
                     next_deadline = now + (steps[next_step_index].get("delayMs", 0) / 1000)
@@ -83,6 +115,8 @@ def main() -> int:
             sys.stdout.buffer.write(chunk)
             sys.stdout.buffer.flush()
     finally:
+        if proc is not None and proc.poll() is None:
+            proc.kill()
         selector.close()
         os.close(master_fd)
 

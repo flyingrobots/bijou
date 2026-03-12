@@ -1,0 +1,17 @@
+{
+  "name": "bijou-core-static-canary",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "latest",
+    "@flyingrobots/bijou-node": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  }
+}

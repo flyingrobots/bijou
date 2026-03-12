@@ -125,6 +125,9 @@ jobs:
       - name: Smoke all examples
         run: npm run smoke:examples:all
 
+      - name: Smoke canary apps
+        run: npm run smoke:canaries
+
       - name: Verify published files
         run: |
           (cd packages/bijou && npm pack --dry-run)
