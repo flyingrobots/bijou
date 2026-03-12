@@ -1,0 +1,130 @@
+name: Release Dry Run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify release candidate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      notes_tag: ${{ steps.meta.outputs.notes_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compute dry-run metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./packages/bijou/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "notes_tag=dry-run-v${VERSION}-${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: npm run build
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Type check tests
+        run: npm run typecheck:test
+
+      - name: Test
+        run: npm test
+
+      - name: Smoke all examples
+        run: npm run smoke:examples:all
+
+      - name: Smoke canary apps
+        run: npm run smoke:canaries -- --skip-build
+
+      - name: Verify packed files
+        run: |
+          (cd packages/bijou && npm pack --dry-run)
+          (cd packages/bijou-node && npm pack --dry-run)
+          (cd packages/bijou-tui && npm pack --dry-run)
+          (cd packages/bijou-tui-app && npm pack --dry-run)
+          (cd packages/create-bijou-tui-app && npm pack --dry-run)
+
+  npm_publish_dry_run:
+    name: npm publish dry-run
+    runs-on: ubuntu-latest
+    needs: verify
+    strategy:
+      matrix:
+        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: npm publish dry-run packages/${{ matrix.package }}
+        run: cd packages/${{ matrix.package }} && npm publish --dry-run --access public --tag dry-run
+
+  release_notes_preview:
+    name: Release notes preview
+    runs-on: ubuntu-latest
+    needs: verify
+    permissions:
+      contents: read
+    steps:
+      - name: Generate notes preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            -X POST \
+            "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="${{ needs.verify.outputs.notes_tag }}" \
+            -f target_commitish="${{ github.sha }}" \
+            > GENERATED_RELEASE.json
+
+          node --input-type=module <<'EOF'
+          import { readFileSync, writeFileSync } from 'node:fs';
+
+          const payload = JSON.parse(readFileSync('GENERATED_RELEASE.json', 'utf8'));
+          const body = String(payload.body ?? '').trim();
+          const version = '${{ needs.verify.outputs.version }}';
+          const tag = '${{ needs.verify.outputs.notes_tag }}';
+
+          writeFileSync(
+            'RELEASE_NOTES_PREVIEW.md',
+            [
+              `# Release Dry Run Notes`,
+              ``,
+              `Version: \`${version}\``,
+              `Preview tag: \`${tag}\``,
+              ``,
+              body,
+              ``,
+            ].join('\n'),
+          );
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-notes-preview
+          path: RELEASE_NOTES_PREVIEW.md
