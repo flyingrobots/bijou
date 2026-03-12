@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import errno
 import json
 import os
 import selectors
@@ -20,11 +21,18 @@ def set_window_size(fd: int, rows: int, cols: int) -> None:
 
 
 def apply_step(master_fd: int, proc: subprocess.Popen[bytes], step: dict) -> None:
+    if proc.poll() is not None:
+        return
+
     step_type = step.get("type", "input")
 
     if step_type == "input":
         payload = step["input"].encode("utf-8", "surrogatepass")
-        os.write(master_fd, payload)
+        try:
+            os.write(master_fd, payload)
+        except OSError as exc:
+            if exc.errno not in (errno.EPIPE, errno.EIO):
+                raise
         return
 
     if step_type == "resize":
@@ -33,7 +41,11 @@ def apply_step(master_fd: int, proc: subprocess.Popen[bytes], step: dict) -> Non
         if rows <= 0 or cols <= 0:
             raise RuntimeError("resize step requires positive rows and cols")
         set_window_size(master_fd, rows, cols)
-        os.kill(proc.pid, signal.SIGWINCH)
+        try:
+            os.kill(proc.pid, signal.SIGWINCH)
+        except OSError as exc:
+            if exc.errno != errno.ESRCH:
+                raise
         return
 
     raise RuntimeError(f"Unsupported PTY step type: {step_type}")
