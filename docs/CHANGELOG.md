@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Corrected runtime back-buffer syncing so cleared surface cells converge cleanly across successive renders.
+- Preserved leftover flex units after integer rounding to avoid layout gaps in narrow containers.
+- Tightened worker IPC typing, removed an unused canvas option, and aligned mouse disable sequences with the modes Bijou actually enables.
+
 ## [3.0.0] - 2026-03-12
 
 ### BREAKING CHANGES
