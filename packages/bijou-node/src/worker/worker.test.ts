@@ -9,12 +9,11 @@ describe('worker runtime', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const received: unknown[] = [];
     const here = dirname(fileURLToPath(import.meta.url));
-    const entry = resolve(here, 'fixtures/echo-worker.ts');
+    const entry = resolve(here, 'fixtures/echo-worker.mjs');
 
     const handle = runInWorker({
       ctx,
       entry,
-      execArgv: ['--import', 'tsx'],
       onMessage(payload) {
         received.push(payload);
       },
@@ -30,13 +29,12 @@ describe('worker runtime', () => {
   it('disables only the mouse modes it enables', async () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const here = dirname(fileURLToPath(import.meta.url));
-    const entry = resolve(here, 'fixtures/echo-worker.ts');
+    const entry = resolve(here, 'fixtures/echo-worker.mjs');
 
     const handle = runInWorker({
       ctx,
       entry,
       mouse: true,
-      execArgv: ['--import', 'tsx'],
       onMessage() {},
     });
 
