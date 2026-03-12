@@ -80,7 +80,9 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Generate a fresh app in CI, install dependencies, build it, and smoke-run it once so the scaffolder is validated as a first-class published artifact. |
 | **PR Review Tooling** | repo tooling | Add local scripts to summarize unresolved threads, checks, and bot status, plus batch reply/resolve addressed review threads. |
 | **Release Dry-Run Workflow** | repo tooling | Add a workflow-dispatch release rehearsal that exercises the publish matrix and release notes flow without touching registries. |
+| **Python Script Artifact Hygiene** | repo tooling | Suppress or ignore generated Python bytecode artifacts so PTY/script tests do not leave `__pycache__` noise in the worktree. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
+| **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
 | **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
 | **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
 
