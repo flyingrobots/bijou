@@ -1,8 +1,12 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { runCli } from './cli.js';
+
+const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function chunkToString(chunk: unknown): string {
   if (typeof chunk === 'string') return chunk;
@@ -126,4 +130,53 @@ describe('create-bijou-tui-app cli', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('runs correctly through the packed npm bin shim', () => {
+    const root = mkdtempSync(join(tmpdir(), 'create-bijou-pack-cli-'));
+    const packDir = join(root, 'pack');
+    const runnerDir = join(root, 'runner');
+    const targetDir = join(root, 'generated-app');
+    mkdirSync(packDir, { recursive: true });
+    mkdirSync(runnerDir, { recursive: true });
+
+    try {
+      const packed = spawnSync('npm', ['pack', '--json', '--pack-destination', packDir], {
+        cwd: PACKAGE_ROOT,
+        encoding: 'utf8',
+        maxBuffer: 8 * 1024 * 1024,
+      });
+      expect(packed.status).toBe(0);
+      const arrayStart = packed.stdout.indexOf('[');
+      const arrayEnd = packed.stdout.lastIndexOf(']');
+      expect(arrayStart).toBeGreaterThanOrEqual(0);
+      expect(arrayEnd).toBeGreaterThan(arrayStart);
+      const packOutput = JSON.parse(packed.stdout.slice(arrayStart, arrayEnd + 1)) as Array<{ filename?: string }>;
+      const tarball = resolve(packDir, packOutput[0]!.filename!);
+
+      const installed = spawnSync(
+        'npm',
+        ['install', '--prefix', runnerDir, '--no-package-lock', '--no-save', `file:${tarball}`],
+        {
+          cwd: PACKAGE_ROOT,
+          encoding: 'utf8',
+          maxBuffer: 8 * 1024 * 1024,
+        },
+      );
+      expect(installed.status).toBe(0);
+
+      const binPath = join(runnerDir, 'node_modules', '.bin', 'create-bijou-tui-app');
+      expect(existsSync(binPath)).toBe(true);
+
+      const result = spawnSync(binPath, [targetDir, '--no-install'], {
+        cwd: root,
+        encoding: 'utf8',
+        maxBuffer: 8 * 1024 * 1024,
+      });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('Created project in');
+      expect(existsSync(join(targetDir, 'package.json'))).toBe(true);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }, 60000);
 });

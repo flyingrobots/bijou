@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
+import { realpathSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   type PackageManager,
   parseArgs,
@@ -106,5 +107,9 @@ if (isEntrypoint()) {
 /** Check if this module is being run as the CLI entrypoint. */
 function isEntrypoint(): boolean {
   if (process.argv[1] === undefined) return false;
-  return import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+  try {
+    return realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+  }
 }

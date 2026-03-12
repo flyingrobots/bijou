@@ -186,9 +186,12 @@ npm run build:watch  # Incremental watch mode
 npm test             # Vitest suite
 npm run typecheck:test
 npm run smoke:examples:all
+npm run smoke:canaries
 npm run lint         # Typecheck each workspace package
 npm run clean        # Remove build outputs
 ```
+
+`npm run smoke:canaries` packs the current workspace packages, generates a stock `create-bijou-tui-app` app from the local CLI, installs both that TUI app and an internal core/static fixture from local tarballs, then smoke-runs both downstream canaries.
 
 Node.js version: `>=18`.
 

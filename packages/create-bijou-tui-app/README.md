@@ -48,6 +48,9 @@ From the repository root:
 # Run scaffolder unit tests
 npx vitest run --config vitest.config.ts packages/create-bijou-tui-app/src/index.test.ts
 
+# Validate the stock generated scaffold end-to-end from packed local tarballs
+npm run smoke:canaries
+
 # Smoke-test generated files without installing dependencies
 TMP="$(mktemp -d /tmp/bijou-scaffold-XXXXXX)"
 TARGET="$TMP/my-app"
@@ -59,5 +62,7 @@ cd "$TARGET"
 npm install
 npm run dev
 ```
+
+The canary smoke run is the strongest downstream check: it generates the stock scaffold, rewrites only the Bijou dependency specs to local tarballs, builds the app, and drives the shipped shell through tab switches, drawer toggles, resizes, and quit-confirm flows under a PTY.
 
 For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md) and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).
