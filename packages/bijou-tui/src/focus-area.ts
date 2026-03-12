@@ -22,6 +22,7 @@
 
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
 import { renderByMode } from '@flyingrobots/bijou';
+import { resolveBCSSTextToken } from './css/text-style.js';
 import {
   type ScrollState,
   viewport,
@@ -80,6 +81,10 @@ export interface FocusAreaRenderOptions {
   readonly unfocusedGutterToken?: TokenValue;
   /** Show a scrollbar track on the right edge. Default: `true`. */
   readonly showScrollbar?: boolean;
+  /** Optional BCSS id for the focus area. */
+  readonly id?: string;
+  /** Optional BCSS classes for the focus area. */
+  readonly classes?: readonly string[];
   /** Bijou context for styling and mode detection. */
   readonly ctx?: BijouContext;
 }
@@ -307,11 +312,24 @@ function resolveGutter(
   return renderByMode(ctx.mode, {
     static: () => GUTTER_CHAR,
     interactive: () => {
-      const token = focused
+      const baseToken = focused
         ? (options?.focusedGutterToken ?? ctx.semantic('accent'))
         : (options?.unfocusedGutterToken ?? ctx.semantic('muted'));
+      const token = resolveBCSSTextToken(
+        ctx,
+        {
+          type: 'FocusArea',
+          id: options?.id,
+          classes: [...(options?.classes ?? []), focused ? 'focused' : 'unfocused'],
+        },
+        {
+          hex: baseToken.hex,
+          bg: baseToken.bg,
+          modifiers: baseToken.modifiers as string[] | undefined,
+        },
+      );
 
-      return ctx.style.styled(token, GUTTER_CHAR);
+      return ctx.style.styled(token as any, GUTTER_CHAR);
     },
   }, options);
 }

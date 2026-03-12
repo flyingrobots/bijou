@@ -1,8 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge } from '@flyingrobots/bijou';
+import { progressBar, badge, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   percent: number;
@@ -41,7 +43,7 @@ const app: App<Model, Msg> = {
     if (model.done) {
       lines.push(`  ${progressBar(100, { width: 50, showPercent: true })}`);
       lines.push('');
-      lines.push(`  ${badge('COMPLETE', { variant: 'success' })}  Build finished.`);
+      lines.push(`  ${badgeText('COMPLETE', 'success')}  Build finished.`);
     } else {
       lines.push(`  ${progressBar(model.percent, { width: 50, showPercent: true })}`);
     }

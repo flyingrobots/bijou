@@ -1,0 +1,53 @@
+{
+  "name": "Decoupled Layout Pass",
+  "designPattern": "Two-Pass Layout / Visitor",
+  "requirements": [
+    "Buffered Surfaces spec (to paint into calculated Rects)",
+    "Flex/Grid components (as layout engines)"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to calculate the geometry of my app before I render its content",
+    "soThat": "I can implement floating menus, relative tooltips, and complex z-indexing."
+  },
+  "acceptanceCriteria": [
+    "The layout function returns a tree of Rect objects (x, y, w, h)",
+    "A separate paint() function accepts a Rect and a Surface",
+    "Layout information is persistent across frames for optimized invalidation",
+    "Portal/Overlay components can request a Rect from a 'target' ID"
+  ],
+  "backwardCompatibility": "Current layout functions will be refactored to internalize this two-pass logic, maintaining the same string-based output for legacy consumers while exposing the new Rect-based API.",
+  "scope": {
+    "inScope": [
+      "Geometry calculation (Flex/Grid algorithm logic)",
+      "LayoutRect and LayoutNode types",
+      "Visitor pattern for tree traversal",
+      "Coordinate-to-Widget hit detection"
+    ],
+    "outScope": [
+      "Individual component rendering (stays in paint pass)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Pass a 3-cell Flex container to the layout engine and assert that the resulting Rects (A, B, C) sum exactly to the container dimensions and do not overlap.",
+    "edgeCases": [
+      "Zero-width/height parent containers",
+      "Negative margins or overflowing children",
+      "Dynamic resizing resulting in invalid geometry"
+    ],
+    "fuzzStress": "Generate 1000 deeply-nested layout nodes (10 levels deep) and measure the time to resolve all Rects.",
+    "failureCases": [
+      "Infinite loops during layout resolution (e.g. mutually dependent widths)"
+    ]
+  },
+  "blocking": [
+    "Motion API",
+    "Bijou DevTools Inspector"
+  ],
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~800 lines",
+    "timeComplexity": "O(N) for linear layouts",
+    "workEstimate": "Medium"
+  }
+}

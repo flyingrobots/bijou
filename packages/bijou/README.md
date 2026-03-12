@@ -1,16 +1,15 @@
 # @flyingrobots/bijou
 
-Themed terminal components for CLIs, loggers, and scripts — graceful degradation included.
+The pure, zero-dependency core of Bijou.
 
-**Zero dependencies. Hexagonal architecture. Works everywhere.**
+`@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the V3 runtime builds on.
 
-## Documentation Status
+## What's New in v3.0.0
 
-This npm README is a quick overview and may lag behind the repository.
-
-- Canonical API details and usage live in [`GUIDE.md`](./GUIDE.md)
-- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+- **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
+- **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
+- **Explicit compatibility boundaries** — when you mix surface-native helpers with legacy string APIs, you cross that seam explicitly with `surfaceToString(surface, ctx.style)`.
+- **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
 ## Install
 
@@ -59,14 +58,14 @@ console.log(box('Hello, world!'));
 `spinner()`, `progressBar()`, `gradientText()` — live-updating output with color gradients.
 
 ### Forms
-`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
+`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
 
 ### Theme Engine
-DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.
+DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`, `teal-orange-pink`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.
 
 ## Architecture
 
-bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design.
+bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the package-level design and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) for the monorepo-wide architecture.
 
 The core is pure TypeScript with zero runtime dependencies — all platform concerns flow through three ports:
 
@@ -99,6 +98,7 @@ const result = box('hello', { ctx });
 ```
 
 See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
+For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
 
 ## Related Packages
 

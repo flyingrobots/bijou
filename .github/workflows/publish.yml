@@ -108,8 +108,14 @@ jobs:
       - name: Type check
         run: npm run lint
 
+      - name: Type check tests
+        run: npm run typecheck:test
+
       - name: Test
         run: npm test
+
+      - name: Smoke all examples
+        run: npm run smoke:examples:all
 
       - name: Verify published files
         run: |

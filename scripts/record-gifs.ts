@@ -9,8 +9,9 @@
  */
 
 import { execSync, spawn } from 'node:child_process';
-import { readdirSync, existsSync, statSync } from 'node:fs';
+import { readdirSync, existsSync } from 'node:fs';
 import { resolve, basename, dirname } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   headerBox,
@@ -24,37 +25,42 @@ import {
 const ctx = initDefaultContext();
 const JOBS = parseInt(process.env['JOBS'] ?? '8', 10);
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..');
+type JobKind = 'native' | 'vhs';
+
+interface RecordJob {
+  example: string;
+  kind: JobKind;
+  path: string;
+}
 
 // ── Collect tapes ──────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-let tapes: string[];
+let jobs: RecordJob[];
 
 if (args.length > 0) {
-  tapes = args
-    .map(name => resolve(ROOT, 'examples', name, 'demo.tape'))
-    .filter(tape => {
-      if (!existsSync(tape)) {
-        console.log(alert(`${basename(dirname(tape))}: demo.tape not found, skipping`, { variant: 'warning', ctx }));
-        return false;
-      }
+  jobs = args
+    .map(buildJob)
+    .filter((job): job is RecordJob => {
+      if (job == null) return false;
       return true;
     });
 } else {
-  tapes = readdirSync(resolve(ROOT, 'examples'))
-    .filter(d => existsSync(resolve(ROOT, 'examples', d, 'demo.tape')))
-    .map(d => resolve(ROOT, 'examples', d, 'demo.tape'))
-    .sort();
+  jobs = readdirSync(resolve(ROOT, 'examples'))
+    .map(buildJob)
+    .filter((job): job is RecordJob => job != null)
+    .sort((a, b) => a.example.localeCompare(b.example));
 }
 
-if (tapes.length === 0) {
-  console.log(alert('No tapes found.', { variant: 'error', ctx }));
+if (jobs.length === 0) {
+  console.log(alert('No recordable examples found.', { variant: 'error', ctx }));
   process.exit(1);
 }
 
 // ── Build ──────────────────────────────────────────────────────────
 
-console.log(headerBox('record-gifs', { detail: `${tapes.length} tapes · ${JOBS} parallel jobs`, ctx }));
+const nativeCount = jobs.filter((job) => job.kind === 'native').length;
+console.log(headerBox('record-gifs', { detail: `${jobs.length} jobs · ${nativeCount} native · ${JOBS} parallel`, ctx }));
 console.log();
 
 process.stdout.write(`  Building packages...`);
@@ -74,39 +80,44 @@ const results: Result[] = [];
 let completed = 0;
 
 function renderProgress(): void {
-  const pct = tapes.length > 0 ? (completed / tapes.length) * 100 : 100;
+  const pct = jobs.length > 0 ? (completed / jobs.length) * 100 : 100;
   const bar = progressBar(pct, { width: 40, ctx });
-  process.stdout.write(`\r\x1b[K  ${bar}  ${completed}/${tapes.length}`);
+  process.stdout.write(`\r\x1b[K  ${bar}  ${completed}/${jobs.length}`);
 }
 
-function recordOne(tape: string): Promise<Result> {
-  const name = basename(dirname(tape));
+function recordOne(job: RecordJob): Promise<Result> {
+  const name = job.example;
   const start = Date.now();
 
   return new Promise<Result>((resolve) => {
-    const proc = spawn('vhs', [tape], {
+    if (job.kind === 'native') {
+      recordNative(job.path)
+        .then(() => finish('success'))
+        .catch(() => finish('error'));
+      return;
+    }
+
+    const proc = spawn('vhs', [job.path], {
       cwd: ROOT,
       stdio: ['ignore', 'ignore', 'ignore'],
     });
 
     proc.on('close', (code) => {
+      finish(code === 0 ? 'success' : 'error');
+    });
+
+    proc.on('error', () => {
+      finish('error');
+    });
+
+    function finish(status: Result['status']) {
       const elapsed = Date.now() - start;
-      const status = code === 0 ? 'success' : 'error';
       const result: Result = { name, status, elapsed };
       results.push(result);
       completed++;
       renderProgress();
       resolve(result);
-    });
-
-    proc.on('error', () => {
-      const elapsed = Date.now() - start;
-      const result: Result = { name, status: 'error', elapsed };
-      results.push(result);
-      completed++;
-      renderProgress();
-      resolve(result);
-    });
+    }
   });
 }
 
@@ -114,22 +125,48 @@ function recordOne(tape: string): Promise<Result> {
 async function runAll(): Promise<void> {
   renderProgress();
 
-  const queue = [...tapes];
+  const queue = [...jobs];
   const running: Promise<void>[] = [];
 
   async function next(): Promise<void> {
     while (queue.length > 0) {
-      const tape = queue.shift()!;
-      await recordOne(tape);
+      const job = queue.shift()!;
+      await recordOne(job);
     }
   }
 
-  for (let i = 0; i < Math.min(JOBS, tapes.length); i++) {
+  for (let i = 0; i < Math.min(JOBS, jobs.length); i++) {
     running.push(next());
   }
 
   await Promise.all(running);
   process.stdout.write('\n\n');
+}
+
+function buildJob(name: string): RecordJob | null {
+  const nativePath = resolve(ROOT, 'examples', name, 'record.ts');
+  if (existsSync(nativePath)) {
+    return { example: name, kind: 'native', path: nativePath };
+  }
+
+  const tapePath = resolve(ROOT, 'examples', name, 'demo.tape');
+  if (existsSync(tapePath)) {
+    return { example: name, kind: 'vhs', path: tapePath };
+  }
+
+  if (args.length > 0) {
+    console.log(alert(`${name}: no record.ts or demo.tape found, skipping`, { variant: 'warning', ctx }));
+  }
+
+  return null;
+}
+
+async function recordNative(entryPath: string): Promise<void> {
+  const module = await import(pathToFileURL(entryPath).href);
+  if (typeof module.default !== 'function') {
+    throw new Error(`${entryPath} does not export a default recorder function`);
+  }
+  await module.default();
 }
 
 await runAll();

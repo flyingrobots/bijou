@@ -1,5 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { run, quit, tick, isKeyMsg, canvas, type App, type ShaderFn } from '@flyingrobots/bijou-tui';
+import { stringToSurface } from '@flyingrobots/bijou';
+import { vstackV3 } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -13,13 +15,11 @@ type Msg = { type: 'tick' } | { type: 'quit' };
 
 const CHARS = ' .:-=+*#%@';
 
-const shader: ShaderFn = (x, y, cols, rows, time) => {
-  const cx = cols / 2;
-  const cy = rows / 2;
-  const dx = x - cx;
-  const dy = (y - cy) * 2; // aspect ratio correction
+const shader: ShaderFn = ({ u, v, time }) => {
+  const dx = u - 0.5;
+  const dy = (v - 0.5) * 2; // aspect ratio correction
   const dist = Math.sqrt(dx * dx + dy * dy);
-  const wave = Math.sin(dist * 0.5 - time * 3) * 0.5 + 0.5;
+  const wave = Math.sin(dist * 10 - time * 3) * 0.5 + 0.5;
   const idx = Math.floor(wave * (CHARS.length - 1));
   return CHARS[idx]!;
 };
@@ -37,7 +37,7 @@ const app: App<Model, Msg> = {
       }
       return [model, []];
     }
-    if ('type' in msg && msg.type === 'tick') {
+    if (msg && typeof msg === 'object' && 'type' in msg && msg.type === 'tick') {
       return [{ ...model, time: model.time + 0.016 }, [tick(16)]];
     }
     return [model, []];
@@ -45,7 +45,8 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     const art = canvas(model.cols, model.rows, shader, { time: model.time });
-    return `\n  Plasma Shader  (q to quit)\n\n${art}\n`;
+    const title = stringToSurface('  Plasma Shader  (q to quit)', model.cols, 3);
+    return vstackV3(title, art);
   },
 };
 

@@ -17,8 +17,12 @@
  */
 
 import type { App, RunOptions, ResizeMsg } from './types.js';
+import { isResizeMsg } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
+import { type Surface } from '@flyingrobots/bijou';
+import { installBCSSResolver } from './css/install.js';
+import { normalizeViewOutput } from './view-output.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,6 +43,12 @@ export type ScriptStep<M = never> =
     delay?: number;
   }
   | {
+    /** Pulse event to emit. */
+    pulse: { dt: number };
+    /** Milliseconds to wait before sending this step. Default: 0. */
+    delay?: number;
+  }
+  | {
     /** Custom message to emit directly onto the bus. */
     msg: M;
     /** Milliseconds to wait before sending this step. Default: 0. */
@@ -48,7 +58,7 @@ export type ScriptStep<M = never> =
 /** Options for {@link runScript}, extending the base {@link RunOptions}. */
 export interface RunScriptOptions extends RunOptions {
   /** Capture each rendered frame. */
-  onFrame?: (frame: string, index: number) => void;
+  onFrame?: (frame: Surface, index: number) => void;
 }
 
 /**
@@ -60,7 +70,7 @@ export interface RunScriptResult<Model> {
   /** Final model state after all steps. */
   model: Model;
   /** All rendered frames in order. */
-  frames: string[];
+  frames: Surface[];
   /** Total elapsed time in milliseconds. */
   elapsed: number;
 }
@@ -99,12 +109,23 @@ export async function runScript<Model, M>(
   options?: RunScriptOptions,
 ): Promise<RunScriptResult<Model>> {
   const start = Date.now();
-  const frames: string[] = [];
+  const frames: Surface[] = [];
   const bus = createEventBus<M>();
+  const ctx = options?.ctx;
+  if (ctx != null) {
+    installBCSSResolver(ctx, options?.css);
+  }
 
   const [initModel, initCmds] = app.init();
   let model = initModel;
   let running = true;
+  let currentSize = {
+    width: Math.max(0, Math.floor(ctx?.runtime.columns || 80)),
+    height: Math.max(0, Math.floor(ctx?.runtime.rows || 24)),
+  };
+
+  // Start heartbeat for animations
+  bus.startPulse();
 
   /** Stop the scripted driver event loop. */
   function shutdown(): void {
@@ -117,7 +138,15 @@ export async function runScript<Model, M>(
     if (!running) return;
     const [newModel, cmds] = app.update(msg, model);
     model = newModel;
-    const frame = app.view(model);
+    if (isResizeMsg(msg)) {
+      currentSize = {
+        width: Math.max(0, msg.columns),
+        height: Math.max(0, msg.rows),
+      };
+    }
+
+    const frame = normalizeViewOutput(app.view(model), currentSize).surface;
+
     frames.push(frame);
     options?.onFrame?.(frame, frames.length - 1);
     for (const cmd of cmds) {
@@ -127,7 +156,8 @@ export async function runScript<Model, M>(
 
   try {
     // Capture initial frame
-    const initFrame = app.view(model);
+    const initFrame = normalizeViewOutput(app.view(model), currentSize).surface;
+
     frames.push(initFrame);
     options?.onFrame?.(initFrame, 0);
 
@@ -152,6 +182,8 @@ export async function runScript<Model, M>(
       if ('key' in step) {
         const keyMsg = parseKey(step.key);
         bus.emit(keyMsg);
+      } else if ('pulse' in step) {
+        bus.emit({ type: 'pulse', dt: step.pulse.dt });
       } else if ('resize' in step) {
         const resizeMsg: ResizeMsg = {
           type: 'resize',
@@ -173,6 +205,7 @@ export async function runScript<Model, M>(
     // Final yield so any trailing commands can settle
     await new Promise<void>((r) => queueMicrotask(r));
   } finally {
+    bus.stopPulse();
     bus.dispose();
   }
 

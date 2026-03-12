@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator } from '@flyingrobots/bijou';
+import { badge, separator, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   composite, toast, type ToastVariant, type ToastAnchor,
 } from '@flyingrobots/bijou-tui';
 
 const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Msg = 
   | KeyMsg 
@@ -21,17 +23,17 @@ interface Model {
 
 const app: App<Model, Msg> = {
   init: () => [
-    { 
-      cols: ctx.runtime.columns(), 
-      rows: ctx.runtime.rows(), 
-      anchor: 'bottom-right' 
-    }, 
+    {
+      cols: ctx.runtime.columns,
+      rows: ctx.runtime.rows,
+      anchor: 'bottom-right',
+    },
     [],
   ],
 
   update: (msg, model) => {
     if (msg.type === 'resize') {
-      return [{ ...model, cols: msg.cols, rows: msg.rows }, []];
+      return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
     if (msg.type === 'key') {
       if (msg.key === 'q') return [model, [quit()]];
@@ -57,25 +59,23 @@ const app: App<Model, Msg> = {
     const header = separator({ label: 'toast demo', width: cols, ctx });
     const help = [
       '  Keys:',
-      `    ${badge('s', { ctx })} success toast`,
-      `    ${badge('e', { ctx })} error toast`,
-      `    ${badge('i', { ctx })} info toast`,
-      `    ${badge('a', { ctx })} cycle anchor (${model.anchor})`,
-      `    ${badge('q', { ctx })} quit`,
-    ].join('
-');
+      `    ${badgeText('s')} success toast`,
+      `    ${badgeText('e')} error toast`,
+      `    ${badgeText('i')} info toast`,
+      `    ${badgeText('a')} cycle anchor (${model.anchor})`,
+      `    ${badgeText('q')} quit`,
+    ].join('\n');
 
     const bgLines = [header, '', help];
     while (bgLines.length < rows) bgLines.push('');
-    const bg = bgLines.join('
-');
+    const bg = bgLines.join('\n');
 
     if (!model.lastToast || Date.now() - model.lastToast.timestamp > 3000) {
       return bg;
     }
 
     const t = toast({
-      message: `Operation \${model.lastToast.variant}!`,
+      message: `Operation ${model.lastToast.variant}!`,
       variant: model.lastToast.variant,
       anchor: model.anchor,
       screenWidth: cols,

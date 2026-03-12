@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { createSurface } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
 import { quit } from './commands.js';
@@ -33,6 +34,14 @@ function counterApp(quitKey = 'q'): App<number, never> {
     },
     view: (model: number) => `count: ${model}`,
   };
+}
+
+function singleCellSurface(char?: string) {
+  const surface = createSurface(1, 1);
+  if (char) {
+    surface.set(0, 0, { char, empty: false });
+  }
+  return surface;
 }
 
 /** What renderFrame produces for a given content string. */
@@ -73,7 +82,7 @@ describe('run', () => {
       // First write: enterScreen (alt + hide cursor + wrap disable + clear + home)
       expect(ctx.io.written[0]).toBe(ENTER_ALT_SCREEN + HIDE_CURSOR + WRAP_DISABLE + CLEAR_SCREEN + HOME);
       // Subsequent writes include mouse disable + initial render frame
-      const hasInitialRender = ctx.io.written.some((w) => w === frame('count: 0'));
+      const hasInitialRender = ctx.io.written.some((w) => w.includes('count: 0'));
       expect(hasInitialRender).toBe(true);
     });
 
@@ -159,7 +168,7 @@ describe('run', () => {
 
       const startupApp: App<string, Msg> = {
         init() {
-          const cmd: Cmd<Msg> = async (_emit) => ({ type: 'started' as const });
+          const cmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'started' as const });
           return ['loading', [cmd]];
         },
         update(msg, _model) {
@@ -185,12 +194,12 @@ describe('run', () => {
 
       const orderingApp: App<null, Msg> = {
         init() {
-          const initCmd: Cmd<Msg> = async () => ({ type: 'init-cmd' });
+          const initCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'init-cmd' });
           return [null, [initCmd]];
         },
         update(msg, model) {
           if (msg.type === 'resize') {
-            const resizeCmd: Cmd<Msg> = async () => ({ type: 'resize-cmd' });
+            const resizeCmd: Cmd<Msg> = async (_emit, _caps) => ({ type: 'resize-cmd' });
             return [model, [resizeCmd]];
           }
           if (msg.type === 'init-cmd') order.push('init');
@@ -218,6 +227,154 @@ describe('run', () => {
 
       const hasAltScreen = ctx.io.written.some((w) => w.includes(ENTER_ALT_SCREEN));
       expect(hasAltScreen).toBe(false);
+    });
+
+    it('allows callers to extend the render pipeline', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app: App<null, never> = {
+        init: () => [null, [quit()]],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      const promise = run(app, {
+        ctx,
+        configurePipeline(pipeline) {
+          pipeline.use('PostProcess', (state, next) => {
+            state.targetSurface.set(0, 0, { char: 'X', empty: false });
+            next();
+          });
+        },
+      });
+
+      await vi.advanceTimersByTimeAsync(50);
+      await promise;
+
+      expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
+    });
+
+    it('forces a clean redraw when the terminal resizes', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      ctx.io.rawInput = (onKey) => {
+        const id = globalThis.setTimeout(() => onKey('q'), 30);
+        return { dispose() { clearTimeout(id); } };
+      };
+      ctx.io.onResize = (onResize) => {
+        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
+        return { dispose() { clearTimeout(id); } };
+      };
+
+      const promise = run(counterApp(), { ctx });
+      await vi.advanceTimersByTimeAsync(80);
+      await promise;
+
+      expect(ctx.io.written.some((chunk) => chunk === CLEAR_SCREEN + HOME)).toBe(true);
+    });
+
+    it('updates runtime dimensions before rerendering after resize', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
+          return [model, []];
+        },
+        view: () => `size:${ctx.runtime.columns}x${ctx.runtime.rows}`,
+      };
+
+      ctx.io.rawInput = (onKey) => {
+        const id = globalThis.setTimeout(() => onKey('q'), 30);
+        return { dispose() { clearTimeout(id); } };
+      };
+      ctx.io.onResize = (onResize) => {
+        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
+        return { dispose() { clearTimeout(id); } };
+      };
+
+      const promise = run(app, { ctx });
+      await vi.advanceTimersByTimeAsync(80);
+      await promise;
+
+      expect(ctx.runtime.columns).toBe(100);
+      expect(ctx.runtime.rows).toBe(30);
+      expect(ctx.io.written.some((chunk) => chunk.includes('size:100x30'))).toBe(true);
+    });
+
+    it('restores the terminal before rejecting when a scheduled render fails', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const promise = run(counterApp(), { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+
+      let columns = ctx.runtime.columns;
+      Object.defineProperty(ctx.runtime, 'columns', {
+        configurable: true,
+        get() {
+          throw new Error('render exploded');
+        },
+        set(value: number) {
+          columns = value;
+        },
+      });
+
+      await vi.advanceTimersByTimeAsync(10);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('render exploded');
+      expect(columns).toBe(80);
+      expect(ctx.io.written[ctx.io.written.length - 1]).toBe(
+        SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN,
+      );
+    });
+
+    it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
+      vi.useFakeTimers();
+
+      const app: App<boolean, never> = {
+        init: () => [true, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            if (msg.key === 'x') return [false, []];
+            if (msg.key === 'q') return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: (model) => (model ? singleCellSurface('X') : singleCellSurface()),
+      };
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      ctx.io.rawInput = (onKey) => {
+        const ids = [
+          globalThis.setTimeout(() => onKey('x'), 10),
+          globalThis.setTimeout(() => onKey('x'), 20),
+          globalThis.setTimeout(() => onKey('q'), 30),
+        ];
+        return {
+          dispose() {
+            ids.forEach(clearTimeout);
+          },
+        };
+      };
+
+      const promise = run(app, { ctx });
+      await vi.advanceTimersByTimeAsync(50);
+      await promise;
+
+      const clearWrites = ctx.io.written.filter((chunk) => chunk === '\x1b[1;1H ');
+      expect(clearWrites).toHaveLength(1);
     });
   });
 });

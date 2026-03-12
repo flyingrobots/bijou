@@ -1,9 +1,22 @@
 # Examples Catalog
 
-> One app per component. Each example gets a `main.ts` + `demo.tape` (VHS) that records a GIF.
+> One app per component. Flagship V3 examples get `main.ts` + `README.md` and use the native Surface recorder; legacy examples can keep `demo.tape` (VHS).
 >
 > Run any example: `npx tsx examples/<name>/main.ts`
-> Record any GIF: `vhs examples/<name>/demo.tape`
+> Record flagship V3 GIFs: `npx tsx scripts/record-gifs.ts`
+
+---
+
+## V3 Features
+
+These are the canonical release-facing V3 demos:
+
+- `examples/v3-demo` — smallest correct surface-native starter app.
+- `examples/v3-css` — BCSS selector/value/media-query workbench.
+- `examples/v3-motion` — keyed layout motion with springs and tweens.
+- `examples/v3-subapp` — Fractal TEA composition helpers.
+- `examples/v3-worker` — worker runtime plus data-channel story.
+- `examples/v3-pipeline` — programmable render-pipeline extension.
 
 ---
 

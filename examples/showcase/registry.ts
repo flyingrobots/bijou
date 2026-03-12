@@ -23,8 +23,13 @@ import {
   dag,
   enumeratedList,
   markdown,
+  surfaceToString,
 } from '@flyingrobots/bijou';
 import type { ComponentEntry } from './types.js';
+
+function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
+  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+}
 
 // ---------------------------------------------------------------------------
 // Sample data
@@ -126,18 +131,18 @@ const DISPLAY: ComponentEntry[] = [
     ].join('\n'),
     render: (_w, ctx) => [
       [
-        badge('SUCCESS', { variant: 'success', ctx }),
-        badge('ERROR', { variant: 'error', ctx }),
-        badge('WARNING', { variant: 'warning', ctx }),
+        badgeText('SUCCESS', 'success', ctx),
+        badgeText('ERROR', 'error', ctx),
+        badgeText('WARNING', 'warning', ctx),
       ].join('  '),
       [
-        badge('INFO', { variant: 'info', ctx }),
-        badge('MUTED', { variant: 'muted', ctx }),
-        badge('ACCENT', { variant: 'accent', ctx }),
-        badge('PRIMARY', { variant: 'primary', ctx }),
+        badgeText('INFO', 'info', ctx),
+        badgeText('MUTED', 'muted', ctx),
+        badgeText('ACCENT', 'accent', ctx),
+        badgeText('PRIMARY', 'primary', ctx),
       ].join('  '),
       '',
-      `Server is ${badge('RUNNING', { variant: 'success', ctx })} on port ${badge('3000', { variant: 'primary', ctx })}`,
+      `Server is ${badgeText('RUNNING', 'success', ctx)} on port ${badgeText('3000', 'primary', ctx)}`,
     ].join('\n'),
   },
   {
@@ -332,9 +337,9 @@ const DATA: ComponentEntry[] = [
         { header: 'Status', width: Math.min(10, Math.floor(w / 4)) },
       ],
       rows: [
-        ['Alice', 'Engineer', badge('active', { variant: 'success', ctx })],
-        ['Bob', 'Designer', badge('away', { variant: 'warning', ctx })],
-        ['Carol', 'PM', badge('offline', { variant: 'muted', ctx })],
+        ['Alice', 'Engineer', badgeText('active', 'success', ctx)],
+        ['Bob', 'Designer', badgeText('away', 'warning', ctx)],
+        ['Carol', 'PM', badgeText('offline', 'muted', ctx)],
       ],
       ctx,
     }),

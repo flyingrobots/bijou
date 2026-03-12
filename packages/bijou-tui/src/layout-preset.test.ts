@@ -23,6 +23,10 @@ describe('serializeLayoutState', () => {
       transitionProgress: 1,
       transitionGeneration: 0,
       transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
     };
 
     const result = serializeLayoutState(model, ['page1']);
@@ -72,6 +76,10 @@ describe('serializeLayoutState', () => {
       transitionProgress: 1,
       transitionGeneration: 0,
       transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
     };
 
     const result = serializeLayoutState(model, ['page1'], {

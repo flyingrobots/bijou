@@ -1,53 +1,72 @@
-import type { BijouContext } from '../../ports/context.js';
-import type { TokenValue, BaseStatusKey } from '../theme/tokens.js';
+import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
+import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { renderByMode } from '../mode-render.js';
+import { segmentGraphemes } from '../text/grapheme.js';
+import type { BijouNodeOptions } from './types.js';
+import { applyBCSSCellTextStyles } from './bcss-style.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
 
 /** Configuration for rendering a badge. */
-export interface BadgeOptions {
+export interface BadgeOptions extends BijouNodeOptions {
   /** Color variant (defaults to `'info'`). */
   variant?: BadgeVariant;
-  /** Bijou context for I/O, styling, and mode detection. */
-  ctx?: BijouContext;
 }
 
 /**
  * Render an inline badge (pill-shaped label) for the given text.
- *
- * Output adapts to the current output mode:
- * - `interactive` / `static` — inverse-colored pill using the variant token.
- * - `pipe` — bracketed text like `[OK]`.
- * - `accessible` — plain text.
- *
- * Falls back to a plain space-padded string when no context or theme is available.
+ * 
+ * Returns a Surface containing the styled badge.
  *
  * @param text - Label to display inside the badge.
  * @param options - Badge configuration.
- * @returns The rendered badge string.
+ * @returns The rendered badge Surface.
  */
-export function badge(text: string, options: BadgeOptions = {}): string {
+export function badge(text: string, options: BadgeOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  if (!ctx) return ` ${text} `;
-
   const variant = options.variant ?? 'info';
+  
+  const paddedText = ` ${text} `;
+  const graphemes = segmentGraphemes(paddedText);
+  const width = graphemes.length;
+  const surface = createSurface(width, 1);
 
-  return renderByMode(ctx.mode, {
-    pipe: () => `[${text}]`,
-    accessible: () => text,
-    interactive: () => {
-      const baseToken = (variant === 'accent' || variant === 'primary')
-        ? ctx.semantic(variant)
-        : ctx.status(variant);
+  if (!ctx || ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    // Basic text output for non-rich modes
+    const char = ctx?.mode === 'pipe' ? `[${text}]` : paddedText;
+    return stringToSurface(char, char.length, 1);
+  }
 
-      const inverseToken: TokenValue = {
-        hex: baseToken.hex,
-        modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
-      };
+  // Resolve global CSS styles
+  const bcss = ctx.resolveBCSS({ type: 'Badge', id: options.id, classes: options.class?.split(' ') });
 
-      return ctx.style.styled(inverseToken, ` ${text} `);
-    },
-  }, options);
+  const baseToken = (variant === 'accent' || variant === 'primary')
+    ? ctx.semantic(variant)
+    : ctx.status(variant);
+
+  const cell: Cell = {
+    char: ' ',
+    ...applyBCSSCellTextStyles({
+      fg: baseToken.hex,
+      bg: undefined,
+      modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+    }, bcss),
+    empty: false
+  };
+
+  // If CSS background is set, we might want to disable 'inverse' modifier 
+  // since the user is being explicit about the BG color.
+  if (bcss['background']) {
+    cell.modifiers = cell.modifiers?.filter(m => m !== 'inverse');
+  }
+
+  for (let i = 0; i < width; i++) {
+    surface.set(i, 0, { ...cell, char: graphemes[i]! });
+  }
+
+  return surface;
 }
+
+// Helper needed for the fallback
+import { stringToSurface } from '../render/differ.js';

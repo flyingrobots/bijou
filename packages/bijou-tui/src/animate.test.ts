@@ -1,5 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { animate, sequence } from './animate.js';
+import type { CmdCapabilities } from './types.js';
+
+/** Create mock capabilities that can be manually pulsed. */
+function createMockCaps(): CmdCapabilities & { pulse(dt: number): void } {
+  const handlers = new Set<(dt: number) => void>();
+  return {
+    onPulse: (h) => {
+      handlers.add(h);
+      return { dispose: () => handlers.delete(h) };
+    },
+    pulse: (dt) => {
+      for (const h of handlers) h(dt);
+    },
+  };
+}
 
 describe('animate', () => {
   describe('immediate mode', () => {
@@ -16,7 +31,8 @@ describe('animate', () => {
       });
 
       const emitted: number[] = [];
-      await cmd((msg) => emitted.push(msg as number));
+      const caps = createMockCaps();
+      await cmd((msg) => emitted.push(msg as number), caps);
       expect(frames).toEqual([100]);
       expect(emitted).toEqual([100]);
     });
@@ -28,7 +44,6 @@ describe('animate', () => {
       const cmd = animate({
         from: 0,
         to: 100,
-        fps: 60,
         spring: 'stiff',
         onFrame: (v) => {
           frames.push(v);
@@ -37,30 +52,53 @@ describe('animate', () => {
       });
 
       const emitted: number[] = [];
-      await cmd((msg) => emitted.push(msg as number));
+      const caps = createMockCaps();
+      
+      let settled = false;
+      const promise = cmd((msg) => emitted.push(msg as number), caps).then(() => {
+        settled = true;
+      });
+      
+      // Manually pulse until done (or safety limit)
+      for (let i = 0; i < 1000 && !settled; i++) {
+        caps.pulse(0.016);
+        await new Promise<void>((resolve) => queueMicrotask(resolve));
+      }
+      
+      await promise;
+
       expect(frames.length).toBeGreaterThan(1);
       expect(emitted.length).toBeGreaterThan(1);
       expect(emitted).toEqual(frames);
       // Values should start near 0 and end at 100
       expect(frames[0]!).toBeGreaterThan(0);
       expect(frames[0]!).toBeLessThan(50);
-    }, 10_000);
+    });
 
     it('defaults to spring type', async () => {
       const frames: number[] = [];
       const cmd = animate({
         from: 0,
         to: 10,
-        fps: 60,
         onFrame: (v) => {
           frames.push(v);
           return v;
         },
       });
 
-      await cmd(() => {});
+      const caps = createMockCaps();
+      let settled = false;
+      const promise = cmd(() => {}, caps).then(() => { settled = true; });
+      
+      // Pulse
+      for (let i = 0; i < 1000 && !settled; i++) {
+        caps.pulse(0.016);
+        await new Promise<void>((resolve) => queueMicrotask(resolve));
+      }
+      
+      await promise;
       expect(frames.length).toBeGreaterThan(1);
-    }, 10_000);
+    });
   });
 
   describe('tween mode', () => {
@@ -71,16 +109,23 @@ describe('animate', () => {
         from: 0,
         to: 100,
         duration: 200,
-        fps: 30,
         onFrame: (v) => {
           frames.push(v);
           return v;
         },
       });
 
-      await cmd(() => {});
+      const caps = createMockCaps();
+      const promise = cmd(() => {}, caps);
+      
+      // Pulse 10 times (10 * 20ms = 200ms)
+      for (let i = 0; i < 11; i++) {
+        caps.pulse(0.02);
+      }
+
+      await promise;
       expect(frames.length).toBeGreaterThan(1);
-    }, 5_000);
+    });
 
     it('respects immediate flag in tween mode too', async () => {
       const frames: number[] = [];
@@ -97,7 +142,8 @@ describe('animate', () => {
       });
 
       const emitted: number[] = [];
-      await cmd((msg) => emitted.push(msg as number));
+      const caps = createMockCaps();
+      await cmd((msg) => emitted.push(msg as number), caps);
       expect(frames).toEqual([50]);
       expect(emitted).toEqual([50]);
     });
@@ -107,6 +153,7 @@ describe('animate', () => {
 describe('sequence', () => {
   it('runs commands in order', async () => {
     const order: string[] = [];
+    const caps = createMockCaps();
 
     const cmd = sequence(
       async (emit) => {
@@ -120,7 +167,7 @@ describe('sequence', () => {
     );
 
     const emitted: string[] = [];
-    await cmd((msg) => emitted.push(msg as string));
+    await cmd((msg) => emitted.push(msg as string), caps);
     expect(order).toEqual(['first', 'second']);
     expect(emitted).toEqual(['a', 'b']);
   });

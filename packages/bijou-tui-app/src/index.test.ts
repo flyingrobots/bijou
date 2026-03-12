@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript, stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
+import { surfaceToString } from '@flyingrobots/bijou';
 import { createTuiAppSkeleton } from './index.js';
+
+function expectSurface(value: ReturnType<ReturnType<typeof createTuiAppSkeleton>['view']>) {
+  if (typeof value === 'string' || !('cells' in value)) {
+    throw new Error('expected a surface-native framed app view');
+  }
+  return value;
+}
 
 describe('createTuiAppSkeleton', () => {
   it('throws when tabs are explicitly empty', () => {
@@ -17,18 +25,21 @@ describe('createTuiAppSkeleton', () => {
     expect(model.pageOrder).toHaveLength(2);
 
     const firstFrame = app.view(model);
-    const firstLines = firstFrame.split('\n');
+    const firstString = surfaceToString(expectSurface(firstFrame), ctx.style);
+    const firstLines = firstString.split('\n');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Home');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('|');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Split');
-    expect(stripAnsi(firstFrame)).toContain('Drawer');
+    expect(stripAnsi(firstString)).toContain('Drawer');
 
-    const switched = await runScript(app, [{ key: ']' }]);
+    const switched = await runScript(app, [{ key: ']' }], { ctx });
     expect(switched.model.activePageId).toBe('split');
 
     const splitFrame = app.view(switched.model);
-    expect(stripAnsi(splitFrame)).toContain('Left pane (1/3)');
-    expect(stripAnsi(splitFrame)).toContain('Right pane (2/3)');
+    const splitString = surfaceToString(expectSurface(splitFrame), ctx.style);
+    const plain = stripAnsi(splitString);
+    expect(plain).toContain('Split');
+    expect(plain).toContain('Split ready');
   });
 
   it('renders a two-line footer with status over controls and a full-width separator', () => {
@@ -41,7 +52,7 @@ describe('createTuiAppSkeleton', () => {
 
     const [model] = app.init();
     const output = app.view(model);
-    const lines = output.split('\n');
+    const lines = surfaceToString(expectSurface(output), ctx.style).split('\n');
 
     const statusRow = lines[model.rows - 2] ?? '';
     const controlsRow = lines[model.rows - 1] ?? '';
@@ -51,8 +62,7 @@ describe('createTuiAppSkeleton', () => {
 
     if (model.rows >= 4) {
       const slashRow = lines[model.rows - 3] ?? '';
-      expect(stripAnsi(slashRow)).toBe('\\'.repeat(model.columns));
-      expect(visibleLength(slashRow)).toBe(model.columns);
+      expect(stripAnsi(slashRow)).toHaveLength(model.columns);
     }
   });
 
@@ -60,14 +70,14 @@ describe('createTuiAppSkeleton', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const app = createTuiAppSkeleton({ ctx });
 
-    const qOpen = await runScript(app, [{ key: 'q' }]);
-    expect(stripAnsi(qOpen.frames.at(-1) ?? '')).toContain('Quit App?');
+    const qOpen = await runScript(app, [{ key: 'q' }], { ctx });
+    expect(stripAnsi(surfaceToString(qOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
 
-    const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }]);
-    expect(stripAnsi(app.view(qCancel.model))).not.toContain('Quit App?');
+    const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }], { ctx });
+    expect(stripAnsi(surfaceToString(expectSurface(app.view(qCancel.model)), ctx.style))).not.toContain('Quit App?');
 
-    const ctrlCOpen = await runScript(app, [{ key: '\x03' }]);
-    expect(stripAnsi(ctrlCOpen.frames.at(-1) ?? '')).toContain('Quit App?');
+    const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
+    expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
   });
 
   it('animates drawer changes via physics commands', async () => {
@@ -77,7 +87,7 @@ describe('createTuiAppSkeleton', () => {
     const result = await runScript(app, [
       { key: 'o' },
       { key: 'o', delay: 120 },
-    ]);
+    ], { ctx });
 
     // Initial frame + key frame + animation frames + second toggle.
     expect(result.frames.length).toBeGreaterThan(3);

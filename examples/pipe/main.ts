@@ -2,11 +2,15 @@ import { createNodeContext } from '@flyingrobots/bijou-node';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import {
   box, headerBox, badge, alert, table, progressBar, separator,
-  setDefaultContext,
+  setDefaultContext, surfaceToString,
 } from '@flyingrobots/bijou';
 import type { BijouContext } from '@flyingrobots/bijou';
 
 // Render the same components in each output mode for comparison.
+
+function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
+  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+}
 
 function renderSample(label: string, ctx: BijouContext): string {
   const lines: string[] = [];
@@ -18,8 +22,8 @@ function renderSample(label: string, ctx: BijouContext): string {
   lines.push(headerBox('Deploy', { detail: 'v1.2.3', ctx }));
   lines.push('');
   lines.push([
-    badge('OK', { variant: 'success', ctx }),
-    badge('FAIL', { variant: 'error', ctx }),
+    badgeText('OK', 'success', ctx),
+    badgeText('FAIL', 'error', ctx),
   ].join(' '));
   lines.push('');
   lines.push(alert('Build passed.', { variant: 'success', ctx }));

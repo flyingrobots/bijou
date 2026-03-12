@@ -1,0 +1,49 @@
+{
+  "name": "Continuum Bridge",
+  "designPattern": "Observer / Bridge",
+  "requirements": [
+    "Pluggable Effect Handlers (for ContinuumPort)",
+    "Buffered Surfaces (for live-syncing logic)"
+  ],
+  "userStory": {
+    "asA": "Continuum developer",
+    "iWant": "to bind Bijou components directly to causal data sources",
+    "soThat": "my UI automatically reflects the state of the WARP graph and Shiplog without manual synchronization."
+  },
+  "acceptanceCriteria": [
+    "A ContinuumPort exists for subscribing to graph node changes",
+    "The bridge can emit TEA messages when causal events occur",
+    "Components can 'bind' their model fields to specific WARP hashes",
+    "Supports 'Time-Travel' viewing of the graph directly in the TUI"
+  ],
+  "backwardCompatibility": "Zero impact on standard Bijou apps; this is a specialized adapter package (@flyingrobots/bijou-continuum).",
+  "scope": {
+    "inScope": [
+      "ContinuumPort implementation",
+      "WARP graph subscription bridge",
+      "Shiplog event stream integration",
+      "Causal-aware TUI components"
+    ],
+    "outScope": [
+      "The Continuum kernel itself (Bijou is just the shell)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Bind a Table to a WARP node representing a list of tasks. Update the node in the Continuum kernel. Assert that the Bijou table automatically renders the new task row.",
+    "edgeCases": [
+      "Massive graph synchronization (thousands of nodes)",
+      "Conflict resolution in the UI (handling causal forks)",
+      "Syncing during network partitioning"
+    ],
+    "fuzzStress": "Stream 10,000 causal events per second and measure the TUI's update/view latency.",
+    "failureCases": [
+      "Inconsistent causal state in the UI (breaking determinism)"
+    ]
+  },
+  "priority": "P2",
+  "estimatedComplexity": {
+    "linesOfCode": "~500 lines",
+    "timeComplexity": "O(E) where E is causal events",
+    "workEstimate": "Large"
+  }
+}

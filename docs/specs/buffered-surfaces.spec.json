@@ -1,0 +1,60 @@
+{
+  "name": "Buffered Surfaces & Post-Processing",
+  "requirements": [
+    "StylePort for color resolution",
+    "TokenValue types for cell styling"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to render components to offscreen surfaces",
+    "soThat": "I can layer them with z-index, cache expensive renders, and apply post-processing effects."
+  },
+  "acceptanceCriteria": [
+    "Surface type represents a 2D grid of Cell objects",
+    "Cell object contains char, hex, bg, and modifiers",
+    "offscreen() captures a render function's output into a Surface",
+    "blt() performs a block transfer of one surface onto another with clipping",
+    "opacity() correctly blends a source cell's color with a target cell's background",
+    "filter() applies a fragment shader function (Cell -> Cell) to every cell in a surface"
+  ],
+  "scope": {
+    "inScope": [
+      "Memory-backed Surface management",
+      "Layered composition (Painter's Algorithm)",
+      "Basic blending (opacity)",
+      "Clipping logic for blt()"
+    ],
+    "outScope": [
+      "TTY diffing (handled in separate spec)",
+      "GPU acceleration (keep CPU-bound for portability)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Render a complex component (Table) to a surface, blit it to a main surface at (10,5), and assert the cell contents at specific coordinates match the original output.",
+    "edgeCases": [
+      "Surfaces with 0 width or height",
+      "Blitting a source surface entirely outside the target bounds",
+      "Partial clipping on all four edges"
+    ],
+    "fuzzStress": "Allocate 1000x1000 surfaces and perform 100 sequential blit operations to monitor memory footprint and latency.",
+    "failureCases": [
+      "Incompatible cell dimensions during blend operations",
+      "OOM errors on massive buffer allocations"
+    ]
+  },
+  "blocking": [
+    "Cell-Diffing Render Engine",
+    "Rich Canvas / Shader v2",
+    "Decoupled Layout Pass"
+  ],
+  "blockedBy": [],
+  "priority": "P0",
+  "estimatedComplexity": {
+    "linesOfCode": "~600 lines",
+    "timeComplexity": "O(W * H) for rendering and composition",
+    "memoryFootprint": "Width * Height * sizeof(Cell) bytes per surface"
+  },
+  "workEstimate": {
+    "size": "Medium"
+  }
+}

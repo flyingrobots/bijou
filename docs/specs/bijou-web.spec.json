@@ -1,0 +1,49 @@
+{
+  "name": "bijou-web",
+  "designPattern": "Adapter Pattern",
+  "requirements": [
+    "Hexagonal Port architecture (Ports/Adapters)",
+    "Xterm.js or raw DOM grid for display"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to run my Bijou TUI in a web browser",
+    "soThat": "I can share interactive demos, build cloud shells, and unify my CLI and Web tools."
+  },
+  "acceptanceCriteria": [
+    "A WebRuntime adapter implements the RuntimePort for browsers",
+    "A WebIO adapter implements the IOPort using Xterm.js (or DOM)",
+    "A WebStyle adapter implements the StylePort using CSS/Canvas",
+    "The exact same App code runs in both Node.js and the Browser"
+  ],
+  "backwardCompatibility": "Zero changes required to core bijou or bijou-tui packages.",
+  "scope": {
+    "inScope": [
+      "Web-compatible Port implementations",
+      "Terminal emulator integration (Xterm.js)",
+      "Keyboard/Resize event mapping for browsers",
+      "Wasm-friendly build configuration"
+    ],
+    "outScope": [
+      "Full Node.js polyfills (no 'fs' or 'child_process' in the browser runtime)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Compile the 'Release Workbench' example using Vite and the Web adapters. Verify that the TUI renders correctly in Chrome and responds to keyboard input.",
+    "edgeCases": [
+      "Handling browser-specific keys (Alt, Cmd, Ctrl+W)",
+      "Responsive resizing in a variable-width browser tab",
+      "Displaying TrueColor/Hex values correctly across different browser engines"
+    ],
+    "fuzzStress": "Simulate 1000 resize events per second and measure the browser's paint performance.",
+    "failureCases": [
+      "Missing browser APIs in older environments (Graceful degradation)"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~400 lines",
+    "timeComplexity": "O(1) relative to Node adapters",
+    "workEstimate": "Medium"
+  }
+}

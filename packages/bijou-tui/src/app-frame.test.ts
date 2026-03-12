@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext } from '@flyingrobots/bijou';
+import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
@@ -61,6 +61,49 @@ describe('createFramedApp', () => {
 
     const result = await runScript(app, [{ key: ']' }]);
     expect(result.model.activePageId).toBe('logs');
+  });
+
+  it('supports pane renderers that return a Surface', async () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => stringToSurface('surface-pane', 12, 1),
+        }),
+      }],
+    });
+
+    const result = await runScript(app, []);
+    expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('surface-pane');
+  });
+
+  it('supports pane renderers that return a LayoutNode', async () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => ({
+            type: 'PaneNode',
+            rect: { x: 0, y: 0, width: 11, height: 1 },
+            children: [],
+            surface: stringToSurface('layout-pane', 11, 1),
+          }),
+        }),
+      }],
+    });
+
+    const result = await runScript(app, []);
+    expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('layout-pane');
   });
 
   it('preserves scroll per page across tab switches', async () => {
@@ -125,7 +168,7 @@ describe('createFramedApp', () => {
 
     // Manually drive the animation command
     const messages: any[] = [];
-    await switchCmds[0]!((m) => messages.push(m));
+    await switchCmds[0]!((m) => messages.push(m), { onPulse: () => ({ dispose() {} }) });
 
     expect(messages.length).toBeGreaterThan(0);
     
@@ -547,7 +590,10 @@ describe('createFramedApp', () => {
     });
 
     const [model] = app.init();
-    const lines = app.view(model).split('\n');
+    const ctx = createTestContext();
+    const frame = app.view(model);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const lines = surfaceToString(frame, ctx.style).split('\n');
     expect(lines[1]).toContain('[NORMAL]');
     expect(lines[1]).toContain('page:home');
     expect(lines[1]).toContain('pane:main');

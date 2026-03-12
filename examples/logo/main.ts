@@ -9,8 +9,8 @@ console.log();
 const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large'];
 
 for (const size of sizes) {
-  const logo = loadRandomLogo({ size });
-  console.log(headerBox(`Size: \${size}`, { ctx }));
-  console.log(box(logo.ascii, { padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx }));
+  const logo = loadRandomLogo('logos', 'bijou', size, undefined, { ctx });
+  console.log(headerBox(`Size: ${size}`, { ctx }));
+  console.log(box(logo.text, { padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx }));
   console.log();
 }

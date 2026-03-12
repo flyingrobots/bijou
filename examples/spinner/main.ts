@@ -1,8 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { spinnerFrame, badge } from '@flyingrobots/bijou';
+import { spinnerFrame, badge, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   frame: number;
@@ -45,7 +47,7 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     if (model.phase === 'done') {
-      return `\n  ${badge('DONE', { variant: 'success' })}  All tasks complete.\n`;
+      return `\n  ${badgeText('DONE', 'success')}  All tasks complete.\n`;
     }
 
     const label = model.phase === 'loading'

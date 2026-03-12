@@ -8,6 +8,9 @@
  */
 
 import type { BijouContext } from '@flyingrobots/bijou';
+import type { Middleware } from './eventbus.js';
+import type { RenderPipeline } from './pipeline/pipeline.js';
+import type { ViewOutput } from './view-output.js';
 
 // --- Messages ---
 
@@ -33,6 +36,14 @@ export interface ResizeMsg {
   readonly columns: number;
   /** New terminal height in rows. */
   readonly rows: number;
+}
+
+/** Represent a system animation pulse event. */
+export interface PulseMsg {
+  /** Discriminant tag identifying this as a pulse message. */
+  readonly type: 'pulse';
+  /** Time delta in seconds since the last pulse. */
+  readonly dt: number;
 }
 
 // --- Mouse messages ---
@@ -86,6 +97,16 @@ export function isResizeMsg(msg: unknown): msg is ResizeMsg {
 }
 
 /**
+ * Narrow an unknown message to {@link PulseMsg}.
+ *
+ * @param msg - Value to test.
+ * @returns `true` if `msg` is a `PulseMsg`.
+ */
+export function isPulseMsg(msg: unknown): msg is PulseMsg {
+  return typeof msg === 'object' && msg !== null && 'type' in msg && (msg as PulseMsg).type === 'pulse';
+}
+
+/**
  * Narrow an unknown message to {@link MouseMsg}.
  *
  * @param msg - Value to test.
@@ -111,7 +132,16 @@ export type QuitSignal = typeof QUIT;
  *
  * @template M - Application message type.
  */
-export type Cmd<M> = (emit: (msg: M) => void) => Promise<M | QuitSignal | void>;
+export type Cmd<M> = (emit: (msg: M) => void, capabilities: CmdCapabilities) => Promise<M | QuitSignal | void>;
+
+/** Capabilities provided to commands by the runtime. */
+export interface CmdCapabilities {
+  /** 
+   * Subscribe to the system animation pulse. 
+   * Returns a dispose function.
+   */
+  onPulse(handler: (dt: number) => void): { dispose(): void };
+}
 
 // --- App definition ---
 
@@ -135,25 +165,29 @@ export interface App<Model, M = never> {
   /**
    * Handle a message and return the updated model with commands.
    *
-   * @param msg - Incoming message (key, resize, mouse, or custom).
+   * @param msg - Incoming message (key, resize, mouse, pulse, or custom).
    * @param model - Current application state.
    * @returns A tuple of `[updatedModel, commands]`.
    */
-  update(msg: KeyMsg | ResizeMsg | MouseMsg | M, model: Model): [Model, Cmd<M>[]];
+  update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];
 
   /**
-   * Render the current model as a string for terminal display.
+   * Render the current model as a Surface, LayoutNode, or legacy string view.
    *
    * @param model - Current application state.
-   * @returns Rendered string output.
+   * @returns Rendered Surface, Layout tree, or legacy string output.
    */
-  view(model: Model): string;
+  view(model: Model): ViewOutput;
 }
 
 // --- Runtime options ---
 
-/** Configuration options for the TEA runtime. */
-export interface RunOptions {
+/**
+ * Configuration options for the TEA runtime.
+ * 
+ * @template M - Custom application message type.
+ */
+export interface RunOptions<M = any> {
   /** Enter the alternate screen buffer on startup. */
   altScreen?: boolean;
   /** Hide the cursor on startup. */
@@ -162,4 +196,10 @@ export interface RunOptions {
   mouse?: boolean;
   /** Bijou context providing I/O and runtime ports. */
   ctx?: BijouContext;
+  /** Optional middleware to intercept or modify messages. */
+  middlewares?: Middleware<M>[];
+  /** Optional hook to extend the render pipeline with custom middleware. */
+  configurePipeline?: (pipeline: RenderPipeline) => void;
+  /** Optional BCSS stylesheet string. */
+  css?: string;
 }

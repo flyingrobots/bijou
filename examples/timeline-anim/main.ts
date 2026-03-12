@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, progressBar, gradientText } from '@flyingrobots/bijou';
+import { box, badge, progressBar, gradientText, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, tick, isKeyMsg, type App,
   animate, sequence, vstack, EASINGS,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   titleX: number;
@@ -97,7 +99,7 @@ const app: App<Model, Msg> = {
 
     for (const card of cards) {
       if (card.opacity > 0.5) {
-        lines.push(`    ${badge(card.label, { variant: card.variant })}`);
+        lines.push(`    ${badgeText(card.label, card.variant)}`);
       } else {
         lines.push('');
       }
@@ -111,7 +113,7 @@ const app: App<Model, Msg> = {
 
     if (model.phase === 'done') {
       lines.push('');
-      lines.push(`    ${badge('COMPLETE', { variant: 'success' })}  Sequence finished.`);
+      lines.push(`    ${badgeText('COMPLETE', 'success')}  Sequence finished.`);
     }
 
     lines.push('');

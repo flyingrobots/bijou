@@ -16,11 +16,22 @@ import { nodeIO } from './io.js';
 import { chalkStyle } from './style.js';
 
 /** Re-export the Node.js {@link RuntimePort} factory. */
-export { nodeRuntime } from './runtime.js';
+export { nodeRuntime, detectRefreshRate } from './runtime.js';
 /** Re-export the Node.js {@link IOPort} factory. */
 export { nodeIO } from './io.js';
 /** Re-export the Chalk-based {@link StylePort} factory and its options type. */
 export { chalkStyle, type ChalkStyleOptions } from './style.js';
+
+/** Re-export Worker utilities for multi-threaded applications. */
+export { isBijouWorker, runInWorker, sendToMain, startWorkerApp, type RunWorkerOptions } from './worker/worker.js';
+export {
+  recordDemoGif,
+  rasterizeSurface,
+  writeSurfaceGif,
+  type NativeDemoSpec,
+  type RecorderResult,
+  type SurfaceGifOptions,
+} from './recorder.js';
 
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
@@ -35,10 +46,12 @@ export { chalkStyle, type ChalkStyleOptions } from './style.js';
 export function createNodeContext(): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
+  // Force level 3 (truecolor) if NO_COLOR is not set, 
+  // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
     io: nodeIO(),
-    style: chalkStyle(noColor),
+    style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
   });
 }
 

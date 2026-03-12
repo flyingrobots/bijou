@@ -149,18 +149,18 @@ export function wrapPageMsg<Msg>(pageId: string, msg: Msg): Msg {
 
 /** Create a command that immediately resolves with the given message. */
 export function emitMsg<Msg>(msg: Msg): Cmd<Msg> {
-  return () => Promise.resolve(msg);
+  return async (_emit, _caps) => msg;
 }
 
 /** Create a command that emits a page-scoped message. */
 export function emitMsgForPage<Msg>(pageId: string, msg: Msg): Cmd<Msg> {
-  return async () => wrapPageMsg(pageId, msg);
+  return async (_emit, _caps) => wrapPageMsg(pageId, msg);
 }
 
 /** Wrap a page-level command so its emitted messages are tagged with the page ID. */
 export function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<Msg> {
-  return async (emit) => {
-    const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg) as unknown as Msg));
+  return async (emit, caps) => {
+    const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg) as unknown as Msg), caps);
     if (result === undefined || result === QUIT) return result;
     return wrapPageMsg(pageId, result as Msg);
   };

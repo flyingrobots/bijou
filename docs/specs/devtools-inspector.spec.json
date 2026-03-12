@@ -1,0 +1,51 @@
+{
+  "name": "Bijou DevTools Inspector",
+  "designPattern": "Overlay / Debugger",
+  "requirements": [
+    "EventBus Middleware (for message logging)",
+    "Decoupled Layout Pass (for layout inspection)",
+    "Sub-App Composition (to run the inspector as a sub-app)"
+  ],
+  "userStory": {
+    "asA": "Bijou developer",
+    "iWant": "an in-app inspector for my TUI",
+    "soThat": "I can see the live state, message history, and layout boxes without leaving the terminal."
+  },
+  "acceptanceCriteria": [
+    "Toggleable overlay (F12) that doesn't disrupt the main app",
+    "Live tree-view of the current TEA Model",
+    "Searchable and filterable history of all BusMsgs",
+    "Layout inspector that highlights component boxes on hover",
+    "Color picker/inspector for design tokens"
+  ],
+  "backwardCompatibility": "Optional dev-only dependency; zero impact on production builds.",
+  "scope": {
+    "inScope": [
+      "DevTools UI (using Bijou components)",
+      "Model-to-Tree serialization",
+      "Layout boundary visualizer",
+      "Message playback control"
+    ],
+    "outScope": [
+      "External browser-based devtools (TUI-native only for now)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Open the inspector in a running app. Trigger a message. Verify that the message appears in the devtools log instantly.",
+    "edgeCases": [
+      "Inspecting extremely large models (performance)",
+      "Inspector layout interfering with the main app layout",
+      "DevTools throwing an error (should not crash the main app)"
+    ],
+    "fuzzStress": "Spam 10,000 messages and verify that the message log remains responsive with virtualization.",
+    "failureCases": [
+      "Infinite recursion during model serialization"
+    ]
+  },
+  "priority": "P2",
+  "estimatedComplexity": {
+    "linesOfCode": "~1,000 lines",
+    "timeComplexity": "O(N) where N is model size",
+    "workEstimate": "Large"
+  }
+}

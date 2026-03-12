@@ -1,198 +1,220 @@
-# Architecture — bijou
+# Architecture — Bijou
 
 ## Overview
 
-bijou is a monorepo containing three packages that together provide a complete toolkit for building terminal interfaces in TypeScript. The architecture follows Ports and Adapters (hexagonal) — the core is pure TypeScript with zero dependencies, all platform I/O flows through typed port interfaces, and adapters plug in at the edges.
+Bijou is a five-package monorepo for building terminal interfaces in TypeScript.
 
-## Package Dependency Graph
+The important design decision in `3.0.0` is the product split:
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou  (zero deps)                            │
-│                                                              │
-│  Components       Theme Engine       Forms       Detection   │
-│  box · table      DTCG · presets     input       TTY · CI    │
-│  spinner · tree   gradients          select      pipe · a11y │
-│  progress · kbd   styled()           confirm                 │
-│  badge · alert    extendTheme()      multiselect             │
-│  accordion        tv()               group                   │
-│  tabs · stepper                                              │
-│  breadcrumb                                                  │
-│  paginator                                                   │
-│                                                              │
-│  ── Ports ─────────────────────────────────────────────────  │
-│  RuntimePort       IOPort       StylePort                    │
-└──────┬───────────────┬───────────────┬───────────────────────┘
-       │               │               │
-┌──────▼───────────────▼───────────────▼───────────────────────┐
-│  @flyingrobots/bijou-node                                    │
-│  nodeRuntime()  ·  nodeIO()  ·  chalkStyle()                 │
-│  process.env · stdout/stdin · readline · chalk · fs          │
-└──────────────────────────────────────────────────────────────┘
+- `@flyingrobots/bijou` is the pure, degradation-first terminal toolkit.
+- `@flyingrobots/bijou-tui` is the high-fidelity interactive runtime.
+- `@flyingrobots/bijou-node` is the Node adapter layer plus Node-specific runtime utilities.
+- `@flyingrobots/bijou-tui-app` is the batteries-included framed shell.
+- `create-bijou-tui-app` scaffolds new apps using that stack.
 
-┌──────────────────────────────────────────────────────────────┐
-│  @flyingrobots/bijou-tui                                     │
-│                                                              │
-│  Runtime           Animation          Layout                 │
-│  TEA (run)         spring physics     flex (flexbox)         │
-│  EventBus          tween engine       viewport (scroll)      │
-│  parseKey          animate/sequence   vstack/hstack          │
-│  screen control    timeline (GSAP)                           │
-│                                                              │
-│  Input                                                       │
-│  createKeyMap      helpView/helpShort  createInputStack       │
-│  parseKeyCombo     helpFor            InputHandler           │
-│  formatKeyCombo    BindingSource      layered dispatch       │
-└──────────────────────────────────────────────────────────────┘
+The repo still follows Ports and Adapters (hexagonal) at the core. The V3 work did not replace that architecture; it tightened the runtime/rendering story around it.
+
+## Package Graph
+
+```text
+create-bijou-tui-app
+        │
+        │ scaffolds apps that use
+        ▼
+@flyingrobots/bijou
+├── @flyingrobots/bijou-tui
+│   └── @flyingrobots/bijou-node
+└── @flyingrobots/bijou-tui-app
+    └── depends on @flyingrobots/bijou-tui
 ```
 
-`bijou-tui` and `bijou-node` are siblings — neither depends on the other. Both depend on `bijou` core for port interfaces. A typical app imports all three.
+Key facts:
 
-## Hexagonal Architecture
+- `@flyingrobots/bijou` has zero runtime dependencies.
+- `@flyingrobots/bijou-tui` depends on the core package.
+- `@flyingrobots/bijou-node` now depends on `@flyingrobots/bijou-tui` because it owns the worker runtime and native recorder APIs in addition to the port adapters.
+- `@flyingrobots/bijou-tui-app` depends on both the core and runtime packages.
 
-### Ports
+## Package Responsibilities
 
-Three interfaces define the boundary between pure logic and platform I/O:
+### `@flyingrobots/bijou`
 
-| Port | Responsibility | Methods |
-|------|---------------|---------|
-| **RuntimePort** | Environment state (read-only) | `env()`, `stdoutIsTTY`, `stdinIsTTY`, `columns`, `rows` |
-| **IOPort** | All I/O operations | `write()`, `question()`, `rawInput()`, `onResize()`, `setInterval()`, `readFile()`, `readDir()`, `joinPath()` |
-| **StylePort** | Color and text formatting | `styled()`, `rgb()`, `hex()`, `bold()` |
+This is the stable, pure foundation:
 
-### Adapters
+- components, prompts, layout helpers, and themes
+- output-mode detection and graceful degradation
+- the `RuntimePort`, `IOPort`, and `StylePort` interfaces
+- test adapters and deterministic test contexts
+- the `Surface` and `LayoutNode` primitives used by the V3 runtime
 
-| Adapter | Package | What it wraps |
-|---------|---------|---------------|
-| `nodeRuntime()` | bijou-node | `process.env`, `process.stdout` |
-| `nodeIO()` | bijou-node | `process.stdout/stdin`, `readline`, `fs` |
-| `chalkStyle()` | bijou-node | chalk RGB/hex/modifiers |
-| `mockRuntime()` | bijou (test) | Configurable stub |
-| `mockIO()` | bijou (test) | Captured writes, canned answers |
-| `plainStyle()` | bijou (test) | Identity (no ANSI) |
+This package intentionally supports both string-oriented and surface-oriented APIs. `3.0.0` does not require every component to be surface-native.
 
-### BijouContext
+### `@flyingrobots/bijou-tui`
 
-Bundles ports + resolved state into a single object passed through the system:
+This is the V3 runtime layer:
 
-```typescript
-interface BijouContext {
-  readonly theme: ResolvedTheme;
-  readonly mode: OutputMode;  // 'interactive' | 'static' | 'pipe' | 'accessible'
-  readonly runtime: RuntimePort;
-  readonly io: IOPort;
-  readonly style: StylePort;
-}
+- TEA `App`/`Cmd` loop
+- input, resize, mouse, and animation pulse handling
+- layout and overlay primitives
+- motion, transition shaders, and render pipeline middleware
+- framed shell composition helpers and sub-app lifecycle helpers
+
+The public runtime contract is now `ViewOutput`:
+
+```ts
+type ViewOutput = string | Surface | LayoutNode;
 ```
 
-## Feature Catalog
+Strings remain supported as a legacy compatibility path. Surfaces and layout trees are the preferred V3-native render values.
 
-### Core (`@flyingrobots/bijou`)
+### `@flyingrobots/bijou-node`
 
-| Category | Features |
-|----------|----------|
-| **Layout** | `box()`, `headerBox()`, `separator()` |
-| **Elements** | `badge()`, `alert()`, `kbd()`, `skeleton()` |
-| **Data** | `table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()` + `DagSource` adapter |
-| **Navigation** | `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` |
-| **Animation** | `spinner()`, `progressBar()`, `gradientText()` |
-| **Forms** | `input()`, `select()`, `multiselect()`, `confirm()`, `group()` |
-| **Theme engine** | DTCG interop, 3 presets (`cyan-magenta`, `nord`, `catppuccin`), `extendTheme()`, `styled()`, `tv()` |
-| **Detection** | Output mode auto-detection (TTY, CI, pipe, accessible) |
-| **Test adapters** | `createTestContext()`, `mockRuntime()`, `mockIO()`, `plainStyle()` |
+This package owns the Node boundary:
 
-### Node adapter (`@flyingrobots/bijou-node`)
+- `nodeRuntime()`, `nodeIO()`, and `chalkStyle()`
+- `createNodeContext()` / `initDefaultContext()`
+- worker runtime helpers: `runInWorker()` and `startWorkerApp()`
+- native demo recorder helpers such as `recordDemoGif()`
 
-| Feature | Description |
-|---------|-------------|
-| `nodeRuntime()` | `process.env`, TTY detection, terminal dimensions |
-| `nodeIO()` | stdout/stdin, readline, raw input, resize events, file I/O |
-| `chalkStyle()` | RGB/hex color via chalk, respects `NO_COLOR` |
-| `initDefaultContext()` | One-line setup with auto-detection |
+### `@flyingrobots/bijou-tui-app`
 
-### TUI runtime (`@flyingrobots/bijou-tui`)
+This package provides the opinionated framed shell:
 
-| Category | Features |
-|----------|----------|
-| **TEA runtime** | `run()` — The Elm Architecture event loop with `App<M>` type |
-| **Commands** | `quit()`, `tick()`, `batch()` |
-| **Key parsing** | `parseKey()` — raw stdin bytes to `KeyMsg` |
-| **Screen** | `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`, ANSI constants |
-| **Event bus** | `createEventBus()` — typed pub/sub, I/O connection, command runner |
-| **Spring physics** | Damped harmonic oscillator, 6 presets, `springStep()` pure function |
-| **Tween engine** | Duration-based animation, 12 easing functions, `tweenStep()` pure function |
-| **animate/sequence** | GSAP-style TEA commands wrapping spring/tween into `Cmd<M>` with per-frame emission |
-| **Timeline** | Multi-track orchestration with position syntax, labels, callbacks |
-| **Flexbox** | `flex()` — row/column direction, grow/basis/min/max, horizontal/vertical alignment, render functions |
-| **Viewport** | `viewport()` — scrollable pane with proportional scrollbar, ANSI-aware clipping |
-| **Keybinding manager** | `createKeyMap()` — declarative binding, modifier combos, named groups, enable/disable |
-| **Help generator** | `helpView()`, `helpShort()`, `helpFor()` — auto-generated from bindings |
-| **Input stack** | `createInputStack()` — layered dispatch with opaque/passthrough modes |
-| **Focus area** | `focusArea()` — scrollable pane with colored focus gutter and horizontal overflow |
-| **DAG pane** | `dagPane()` — interactive DAG viewer with spatial arrow-key navigation and auto-highlight |
-| **Layout** | `vstack()`, `hstack()` |
+- tab/header/footer chrome
+- help and command-palette plumbing
+- drawer and modal flows
+- a ready-to-run TUI app skeleton
 
-## Data Flow
+The shell now accepts `ViewOutput` at pane boundaries, not just strings.
 
-### Static components (bijou core)
+### `create-bijou-tui-app`
 
-```
-Data + Options → Component Function → String
-                      │
-                      ├─ resolves BijouContext
-                      ├─ branches on ctx.mode for degradation
-                      └─ uses ctx.style for colors
-```
+This is the scaffolder:
 
-### TEA apps (bijou-tui)
+- generates a runnable TypeScript app
+- uses only public package APIs
+- targets the framed-shell V3 path by default
 
-```
-IOPort (stdin, resize)
-    │
-    ▼
-EventBus ──── parseKey() ──── KeyMsg
-    │                          │
-    │                          ▼
-    │                    InputStack (optional)
-    │                     │  dispatch top-down
-    │                     │  opaque vs passthrough
-    │                     ▼
-    │                    KeyMap (optional)
-    │                     │  match combo → action
-    │                     ▼
-    └──────────────── update(msg, model)
-                          │
-                          ▼
-                    [Model, Cmd[]]
-                      │       │
-                      │       └─ bus.runCmd() → emit messages → loop
-                      ▼
-                    view(model) → string → renderFrame() → stdout
+## Hexagonal Core
+
+Three ports define the pure/platform boundary:
+
+| Port | Responsibility | Representative methods |
+|------|----------------|------------------------|
+| `RuntimePort` | environment and terminal facts | `env()`, `stdoutIsTTY`, `stdinIsTTY`, `columns`, `rows` |
+| `IOPort` | input/output and timers | `write()`, `question()`, `rawInput()`, `onResize()`, `setInterval()`, `readFile()` |
+| `StylePort` | text styling | `styled()`, `rgb()`, `hex()`, `bold()` |
+
+Adapters live outside the core:
+
+| Adapter | Package | Wraps |
+|---------|---------|-------|
+| `nodeRuntime()` | `@flyingrobots/bijou-node` | `process.env`, `process.stdout` |
+| `nodeIO()` | `@flyingrobots/bijou-node` | stdin/stdout, readline, fs |
+| `chalkStyle()` | `@flyingrobots/bijou-node` | Chalk |
+| `mockRuntime()` | `@flyingrobots/bijou/adapters/test` | deterministic runtime stub |
+| `mockIO()` | `@flyingrobots/bijou/adapters/test` | captured writes, canned answers |
+| `plainStyle()` | `@flyingrobots/bijou/adapters/test` | no-op styling |
+
+## Rendering Model
+
+### Core Toolkit Path
+
+For CLI-first flows, the model is still straightforward:
+
+```text
+data + options
+  -> core component
+  -> output-mode-aware rendering
+  -> string or surface result
+  -> stdout / tests / pipe / accessibility flow
 ```
 
-### Input system (keybindings + input stack)
+That path is intentionally simple and degradation-first.
 
+### V3 Runtime Path
+
+The interactive runtime uses a stricter pipeline:
+
+```text
+stdin / resize / mouse / pulse
+  -> event bus
+  -> update(msg, model)
+  -> [model, cmds]
+  -> view(model): ViewOutput
+  -> normalize ViewOutput
+  -> Surface
+  -> render pipeline middleware
+  -> diff renderer
+  -> terminal output
 ```
-KeyMsg ─── InputStack.dispatch() ──► top layer
-               │                        │
-               │          ┌─────────────┤
-               │          │ handled?    │ not handled
-               │          ▼             ▼
-               │       return action    passthrough? ─── yes ──► next layer
-               │                            │
-               │                           no
-               │                            │
-               │                        swallowed
-               │                       (return undefined)
-               │
-               └── Each layer is an InputHandler
-                   (KeyMap satisfies InputHandler)
-```
+
+Important release-truth points for `3.0.0`:
+
+- `App.view` accepts `string | Surface | LayoutNode`.
+- framed pane renderers accept the same `ViewOutput` contract.
+- the flagship runtime and app-shell path is surface/layout-native at the frame boundary.
+- legacy strings are preserved for compatibility, but are no longer the only real render path.
+
+## BCSS And Styling Scope
+
+`run(app, { css })` installs BCSS resolution into the runtime context.
+
+Guaranteed in `3.0.0`:
+
+- `Type`, `.class`, and `#id` selectors
+- `var(token.path)` lookups
+- terminal width/height media queries
+- documented text-style support on V3 surface primitives and frame shell regions
+
+Not guaranteed in `3.0.0`:
+
+- a global CSS cascade over arbitrary layout nodes
+- blanket styling of every component in the repo
+
+That scope is deliberate and reflected in the public docs.
+
+## Sub-Apps And Composition
+
+Nested TEA composition is supported through:
+
+- `mount()` for rendering child views
+- `initSubApp()` for child initialization
+- `updateSubApp()` for child update + command mapping
+- `mapCmds()` for explicit command translation
+
+`mount()` alone is not the whole lifecycle story.
+
+## Output Modes
+
+The core toolkit and Node adapter continue to auto-detect output modes:
+
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| `interactive` | TTY stdout | full color, motion, input loop |
+| `static` | CI with TTY stdout | single-frame render, no interactive loop |
+| `pipe` | non-TTY stdout, `NO_COLOR`, or `TERM=dumb` | plain-text-safe output |
+| `accessible` | `BIJOU_ACCESSIBLE=1` | linearized, screen-reader-friendly output |
+
+That degradation-first behavior is still part of Bijou's identity in `3.0.0`.
+
+## Test And Release Gates
+
+The repo's release-ready gates for `3.0.0` are:
+
+- `npm run build`
+- `npm run lint`
+- `npm test`
+- `npm run typecheck:test`
+- `npm run smoke:examples:all`
+- `npm pack --dry-run --workspaces`
+
+The examples suite is part of the release contract now, not a side project.
 
 ## Design Principles
 
-1. **Pure functions over objects** — springs, tweens, timelines, viewport, scroll state are all `(state, input) → state`. No internal timers or side effects.
-2. **Data over factories** — keybinding actions are values (messages), not factory functions. This prevents stale closures and keeps TEA's data-driven model intact.
-3. **Ports over imports** — no `process`, `chalk`, `readline`, or `fs` imports in core. Platform I/O only through port interfaces.
-4. **Graceful degradation** — every component adapts to the detected output mode. Interactive → static → pipe → accessible, automatically.
-5. **Composition over inheritance** — `KeyMap` satisfies `InputHandler`, `BindingSource`. Stack layers compose handlers. Timeline composes tracks. Flex composes children.
+1. Ports over platform imports.
+2. Graceful degradation first for the core toolkit.
+3. Honest public contracts for the runtime and shell.
+4. Pure state transitions for animation, layout, and TEA updates.
+5. Compatibility boundaries are explicit when V3 surface output meets legacy string APIs.

@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { separator, badge } from '@flyingrobots/bijou';
+import { separator, badge, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   vstack, composite, drawer,
 } from '@flyingrobots/bijou-tui';
 
 const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Msg = KeyMsg | ResizeMsg;
 
@@ -17,14 +19,14 @@ interface Model {
 
 const app: App<Model, Msg> = {
   init: () => {
-    const cols = ctx.runtime.columns();
-    const rows = ctx.runtime.rows();
+    const cols = ctx.runtime.columns;
+    const rows = ctx.runtime.rows;
     return [{ showDrawer: false, cols, rows }, []];
   },
 
   update: (msg, model) => {
     if (msg.type === 'resize') {
-      return [{ ...model, cols: msg.cols, rows: msg.rows }, []];
+      return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
     }
     if (msg.type === 'key') {
       if (msg.key === 'q') return [model, [quit()]];
@@ -38,7 +40,7 @@ const app: App<Model, Msg> = {
 
     // Build background
     const header = separator({ label: 'drawer demo', width: cols, ctx });
-    const help = `  Press ${badge('d', { ctx })} to toggle drawer · ${badge('q', { ctx })} to quit`;
+    const help = `  Press ${badgeText('d')} to toggle drawer · ${badgeText('q')} to quit`;
     const bgLines = [header, '', help];
     // Fill to full screen
     while (bgLines.length < rows) bgLines.push('');

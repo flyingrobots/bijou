@@ -105,7 +105,9 @@ describe('findPaneContainer', () => {
     const tree: FrameLayoutNode = {
       kind: 'grid',
       gridId: 'grid-1',
-      template: { columns: '1fr 1fr', rows: '1fr', areas: [['left', 'right']] },
+      columns: ['1fr', '1fr'],
+      rows: ['1fr'],
+      areas: ['left right'],
       cells: {
         left: { kind: 'pane', paneId: 'editor', render: () => '' },
         right: { kind: 'pane', paneId: 'preview', render: () => '' },

@@ -19,6 +19,17 @@ export type {
   BijouContext,
 } from './ports/index.js';
 
+export {
+  type Cell,
+  type Surface,
+  type CellMask,
+  type Matrix3x3,
+  type TransformOptions,
+  createSurface,
+  FULL_MASK,
+  ROTATION_CHAR_MAP,
+} from './ports/surface.js';
+
 // Context
 export {
   getDefaultContext,
@@ -99,6 +110,14 @@ export {
   complementary,
   saturate,
   desaturate,
+  // Reactive Token Graph
+  createTokenGraph,
+  type TokenGraph,
+  type ThemeMode,
+  type ColorDefinition,
+  type TokenDefinition,
+  type TokenDefinitions,
+  type ColorTransform,
 } from './core/theme/index.js';
 
 // Text / grapheme utilities
@@ -220,6 +239,13 @@ export {
 // Shared ANSI escape constants
 export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';
 
+// Rendering
+export { renderDiff, isSameCell, stringToSurface, parseAnsiToSurface, surfaceToString, paintLayoutNode } from './core/render/differ.js';
+
+// Layout
+export type { LayoutRect, LayoutNode, LayoutEngine } from './ports/surface.js';
+export { calculateFlex, type FlexOptions, type FlexChildProps } from './core/layout/flex.js';
+
 // Forms
 export {
   type ValidationResult,
@@ -246,3 +272,4 @@ export {
   note,
   type NoteOptions,
 } from './core/forms/index.js';
+export { boxV3 } from './core/components/box-v3.js';

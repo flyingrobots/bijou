@@ -1,8 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { spinnerFrame, progressBar, badge, alert, tree, separator } from '@flyingrobots/bijou';
+import { spinnerFrame, progressBar, badge, alert, tree, separator, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App, vstack } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Phase = 'resolving' | 'downloading' | 'linking' | 'done';
 
@@ -91,7 +93,7 @@ const app: App<Model, Msg> = {
       for (const p of model.packages) {
         const name = `${p.name}@${p.version}`.padEnd(28);
         if (p.done) {
-          lines.push(`  ${badge('OK', { variant: 'success' })} ${name}`);
+          lines.push(`  ${badgeText('OK', 'success')} ${name}`);
         } else {
           lines.push(`  ${spinnerFrame(model.frame, { label: '' })} ${name}`);
           lines.push(`    ${progressBar(Math.round(p.progress), { width: 36, showPercent: true })}`);
@@ -124,7 +126,7 @@ const app: App<Model, Msg> = {
       ]},
     ]));
     lines.push('');
-    lines.push(`  Added ${badge('5', { variant: 'primary' })} packages in 3.2s`);
+    lines.push(`  Added ${badgeText('5', 'primary')} packages in 3.2s`);
     lines.push('');
 
     return lines.join('\n');

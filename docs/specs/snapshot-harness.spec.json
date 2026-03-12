@@ -1,0 +1,51 @@
+{
+  "name": "Deterministic Snapshot Harness",
+  "designPattern": "Recorder / Replay / Oracle",
+  "requirements": [
+    "EventBus for recording Msg streams",
+    "Cell-Diffing engine (to compare TTY output)",
+    "Tests as Spec philosophy"
+  ],
+  "userStory": {
+    "asA": "TUI maintainer",
+    "iWant": "to record interactive sessions and verify they produce identical results in the future",
+    "soThat": "I can catch visual regressions and breaking logic changes with absolute certainty (DIND)."
+  },
+  "acceptanceCriteria": [
+    "A Recorder middleware captures all BusMsg and TTY frame hashes",
+    "Sessions can be saved to a .tape (JSON/Binary) file",
+    "The Replay engine can drive an App using the recorded messages",
+    "The Replay engine asserts that the resulting Surface/TTY hashes match the recorded 'goldens'",
+    "Supports 'Hostile Input' replays to ensure stability"
+  ],
+  "backwardCompatibility": "Purely additive; no impact on runtime performance unless recording is active.",
+  "scope": {
+    "inScope": [
+      ".tape format specification",
+      "Message playback engine",
+      "Surface hashing for verification",
+      "Vitest/Jest integration for CI"
+    ],
+    "outScope": [
+      "Video recording (only recording terminal state/messages)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Record a session of the 'Accordion' example. Modify the accordion logic. Replay the tape and verify that the test fails if a single pixel changed.",
+    "edgeCases": [
+      "Time-dependent apps (should mock the Heartbeat during replay)",
+      "Varying terminal sizes during recording",
+      "Async command timing (should wait for Cmd resolution during replay)"
+    ],
+    "fuzzStress": "Generate 1000 randomized 'Monkey Tapes' and assert that the application never panics or reaches an inconsistent state.",
+    "failureCases": [
+      "Non-deterministic logic (e.g. Math.random) breaking the replay chain"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~500 lines",
+    "timeComplexity": "O(N) where N is tape length",
+    "workEstimate": "Medium"
+  }
+}

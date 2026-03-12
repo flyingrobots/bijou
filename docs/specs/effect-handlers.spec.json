@@ -1,0 +1,48 @@
+{
+  "name": "Pluggable 'Effect' Handlers",
+  "designPattern": "Command Pattern / Dependency Injection",
+  "requirements": [
+    "TEA Cmd type",
+    "BijouContext for Port registration"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to register custom side-effect handlers for network, database, or git operations",
+    "soThat": "my application logic remains pure and 100% testable via mock ports."
+  },
+  "acceptanceCriteria": [
+    "The BijouContext supports a dynamic 'Ports' registry",
+    "Users can define custom Ports (e.g. HttpPort, GitPort)",
+    "A Cmd can request a specific Port from the context during execution",
+    "Standardized mock implementations exist for all built-in 'Effect' ports"
+  ],
+  "backwardCompatibility": "Current Cmds that use direct imports or global fetch will continue to work, but will be discouraged in documentation in favor of port-based effects.",
+  "scope": {
+    "inScope": [
+      "Effect Port registry in BijouContext",
+      "Cmd execution bridge for dynamic ports",
+      "Built-in prototypes for HttpPort and FilePort"
+    ],
+    "outScope": [
+      "Implementing the actual heavy logic for every possible third-party API (just providing the interface/adapter pattern)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Define an App that uses an HttpPort to fetch data. In tests, provide a MockHttpPort that returns a static string. Assert that the App correctly updates with the mocked data without making a real network call.",
+    "edgeCases": [
+      "Requesting a Port that hasn't been registered in the context",
+      "Port implementations that return incorrect types",
+      "Concurrent port access from multiple Cmds"
+    ],
+    "fuzzStress": "Register 1000 unique mock ports and verify that the context resolution remains O(1).",
+    "failureCases": [
+      "Port registration collision (two handlers for the same interface)"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~200 lines",
+    "timeComplexity": "O(1) lookup",
+    "workEstimate": "Small"
+  }
+}

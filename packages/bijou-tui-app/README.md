@@ -2,6 +2,12 @@
 
 Batteries-included TUI app skeleton built on `createFramedApp()`.
 
+## What's New in v3.0.0
+
+- **ViewOutput-aware shell panes** — framed panes can now return legacy strings, `Surface`, or `LayoutNode`, which makes the shell compatible with V3-native panes instead of forcing everything through string rendering.
+- **Truthful shell role** — this package is the opinionated shell layer in the Bijou stack, not the whole runtime. Use it when you want tabs, footer/help chrome, overlays, and a ready-to-run app frame.
+- **Canonical release starter** — the scaffolder and V3 examples now treat this package as the default way to stand up a polished full-screen Bijou app.
+
 It ships a ready-to-run shell with sane defaults:
 - full-screen framed app shell
 - top tab bar (`|` separators, active/inactive tab backgrounds)
@@ -60,3 +66,5 @@ await run(
 
 - Frame keys: `[` / `]` tab switch, `tab` pane next, `shift+tab` pane prev, `ctrl+p` command palette, `?` help
 - Skeleton keys: `o` drawer toggle, `q`/`ctrl+c` quit confirm, `y`/`enter` confirm quit, `n`/`escape` cancel quit
+
+For upgrading an existing shell-based app, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).

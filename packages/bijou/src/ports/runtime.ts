@@ -15,4 +15,9 @@ export interface RuntimePort {
   columns: number;
   /** Current terminal height in rows. */
   rows: number;
+  /** 
+   * Expected refresh rate in frames per second (FPS). 
+   * Defaults to 60 if the adapter cannot detect it.
+   */
+  refreshRate: number;
 }

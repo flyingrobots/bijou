@@ -1,38 +1,79 @@
-# @flyingrobots/bijou-tui
+# `@flyingrobots/bijou-tui`
 
-TEA runtime for terminal UIs — model/update/view with physics-based animation, flexbox layout, declarative keybindings, and a centralized event bus.
+The high-fidelity TEA runtime for Bijou.
 
-Inspired by [Bubble Tea](https://github.com/charmbracelet/bubbletea) (Go) and [GSAP](https://gsap.com/) animation.
+`bijou-tui` provides the application loop, layout primitives, motion, and orchestration needed to build complex interactive terminal apps on top of the Bijou core.
 
-## What's New (v1.3.0 Snapshot)?
+## V3.0.0 Evolution
 
-- **`splitPane()`** — ratio-based split layout with pure reducers and deterministic rect introspection.
-- **`grid()`** — fixed + fractional track solver with named areas and stable layout geometry.
-- **`createFramedApp()`** — shell scaffolding for tabs, pane focus/scroll isolation, help, overlays, and command palette.
-- **`drawer()` upgrades** — supports `left`/`right`/`top`/`bottom` anchors and optional panel `region` mounting.
-- **`runScript()` upgrades** — scripted driver now supports key, resize, and custom-message steps for richer integration harnesses.
+The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
 
-See the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md) for the full release history.
+### 🌟 What's New
+- **Honest view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`string | Surface | LayoutNode`). Strings still work, but they are the legacy compatibility path.
+- **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
+- **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
+- **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
+- **Declarative Motion:** Wrap any component in `motion({ key: 'id' }, ...)` and watch it smoothly interpolate layout changes (move, resize) using physics-based springs.
+- **Unified Heartbeat:** All animations and physics calculations are now synchronized to a single `PulseMsg`, eliminating timer jitter and saving CPU.
 
-## Documentation Status
-
-This npm README is a quick overview and may lag behind the repository.
-
-- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
-- End-to-end examples live in [`/examples`](https://github.com/flyingrobots/bijou/tree/main/examples)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
-
-## Install
+## Installation
 
 ```bash
-npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
+npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
 ```
 
-## Quick Start
+If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
+
+## Quick Start (V3 Sub-App Composition)
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, tick, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
+import { run, mount, mapCmds, type App } from '@flyingrobots/bijou-tui';
+import { createSurface, type Surface } from '@flyingrobots/bijou';
+
+initDefaultContext();
+
+// Minimal child apps
+const childApp: App<{ count: number }, any> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => [model, []],
+  view: (model) => {
+    const s = createSurface(20, 5);
+    s.fill({ char: '.' });
+    return s;
+  }
+};
+
+interface Model { 
+  left: { count: number }; 
+  right: { count: number }; 
+}
+
+// Parent App mounting two independent Sub-Apps
+const app: App<Model, any> = {
+  init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
+  update: (msg, model) => [model, []],
+  view: (model) => {
+    // Render the children (they return Surfaces!)
+    const [leftSurface] = mount(childApp, { model: model.left, onMsg: m => m });
+    const [rightSurface] = mount(childApp, { model: model.right, onMsg: m => m });
+    
+    // Composite them onto the main screen
+    const screen = createSurface(80, 24);
+    screen.blit(leftSurface, 0, 0);
+    screen.blit(rightSurface, 40, 0);
+    return screen;
+  }
+};
+
+run(app);
+```
+
+## Quick Start (Basic)
+
+```typescript
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { run, quit, type App, isKeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -42,7 +83,7 @@ const app: App<Model> = {
   init: () => [{ count: 0 }, []],
 
   update: (msg, model) => {
-    if (msg.type === 'key') {
+    if (isKeyMsg(msg)) {
       if (msg.key === 'q') return [model, [quit()]];
       if (msg.key === '+') return [{ count: model.count + 1 }, []];
       if (msg.key === '-') return [{ count: model.count - 1 }, []];
@@ -372,6 +413,8 @@ Each overlay is a `{ content, row, col }` object. `composite()` splices them ont
 - pane focus and per-pane scroll isolation
 - frame help (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay factory with pane rects for panel-scoped drawers/modals
+
+Pane renderers may return a legacy string, a `Surface`, or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 

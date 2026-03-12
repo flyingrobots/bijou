@@ -1,13 +1,14 @@
 # @flyingrobots/bijou-node
 
-Node.js adapter for bijou — chalk styling, readline I/O, process runtime.
+Node.js adapters and runtime utilities for Bijou.
 
-## Documentation Status
+This package bridges the pure `@flyingrobots/bijou` core and the `@flyingrobots/bijou-tui` runtime to the Node.js environment. It owns runtime detection, terminal I/O, Chalk-backed styling, worker-thread helpers, and the native V3 demo recorder.
 
-This npm README is a quick overview and may lag behind the repository.
+## What's New in v3.0.0
 
-- Canonical API details and behavior notes live in [`GUIDE.md`](./GUIDE.md)
-- Release-level changes live in the [CHANGELOG](https://github.com/flyingrobots/bijou/blob/main/docs/CHANGELOG.md)
+- **Worker runtime support** — `runInWorker()` and `startWorkerApp()` let TEA apps move heavy update work off the main thread while keeping input and rendering responsive.
+- **Native demo recorder** — V3 flagship demos can now be recorded directly from captured `Surface[]` frames with `recordDemoGif()`.
+- **Node boundary stays explicit** — runtime facts, I/O, and styling remain behind the port interfaces instead of leaking `process`, `readline`, or Chalk into the pure packages.
 
 ## Install
 
@@ -35,6 +36,8 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 - **Interactive terminal I/O**: stdin/stdout integration with readline and resize-event support.
 - **Styling backend**: Chalk-powered color/style methods wired into bijou styling APIs.
 - **One-line bootstrap**: `initDefaultContext()` creates a production-ready context and registers it as default on first call.
+- **Worker helpers**: `runInWorker()` and `startWorkerApp()` for moving app logic into a worker thread.
+- **Native recorder**: `recordDemoGif()` and related helpers for scripted V3 demo capture.
 
 ## What It Provides
 
@@ -65,6 +68,7 @@ initDefaultContext();
 If you need to replace the default context later in-process, call `setDefaultContext(createNodeContext())` from `@flyingrobots/bijou`.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js APIs, and [GUIDE.md](./GUIDE.md) for usage patterns.
+For upgrading existing apps, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
 
 ## Related Packages
 

@@ -1,0 +1,54 @@
+{
+  "name": "Reactive & Semantic Token Graph",
+  "designPattern": "Directed Acyclic Graph (DAG) / Observer",
+  "requirements": [
+    "StylePort spec",
+    "ResolvedTheme types"
+  ],
+  "userStory": {
+    "asA": "TUI developer",
+    "iWant": "to define my theme using a graph of related colors",
+    "soThat": "changing one brand color automatically cascades through my entire UI and adapts to light/dark terminal backgrounds."
+  },
+  "acceptanceCriteria": [
+    "Tokens can be defined as References to other tokens (Aliases)",
+    "Tokens can be derived using functional math (darken, lighten, mix, invert)",
+    "Tokens can have conditional buckets for 'light' and 'dark' terminal backgrounds",
+    "A reactive stream/observable exists to signal when any part of the graph changes, returning a Disposable for clean teardown"
+  ],
+  "backwardCompatibility": "Current hex-based TokenValue definitions will be the 'leaf nodes' of the graph, ensuring all existing themes continue to work unchanged.",
+  "scope": {
+    "inScope": [
+      "Token Graph resolution engine",
+      "Support for cycle detection in references",
+      "Functional color manipulation (darken/lighten)",
+      "Light/Dark mode bucket resolution",
+      "Hot-reload bridge for the graph"
+    ],
+    "outScope": [
+      "Individual component logic (they just resolve the token from the graph)"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Define a 'primary' color. Define 'border' as a 20% darkened 'primary'. Change 'primary' and assert that 'border' resolves to the new correct darkened color.",
+    "edgeCases": [
+      "Deep reference chains (e.g. A -> B -> C -> D)",
+      "Conflicting light/dark mode definitions",
+      "Unresolvable/Missing references"
+    ],
+    "fuzzStress": "Build a graph with 10,000 nodes and 50,000 edges and measure the time to re-resolve the entire graph after a root change.",
+    "failureCases": [
+      "Infinite recursion during reference resolution (circular dependencies)"
+    ]
+  },
+  "blocking": [
+    "Bijou CSS (BCSS) & Live Styles",
+    "Bijou DevTools Inspector"
+  ],
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~500 lines",
+    "timeComplexity": "O(V + E) where V is tokens and E is references",
+    "workEstimate": "Medium"
+  }
+}

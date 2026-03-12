@@ -5,7 +5,7 @@
  * transition shader, and string-to-grid tokenization.
  */
 
-import { resolveSafeCtx, type BijouContext } from '@flyingrobots/bijou';
+import { resolveSafeCtx, surfaceToString, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type { InternalFrameModel, RenderContext, RenderResult, FrameAction } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -33,6 +33,8 @@ import {
   fitLine,
   mergeBindingSources,
 } from './app-frame-utils.js';
+import { normalizeViewOutput, type ViewOutput } from './view-output.js';
+import { styleTextWithBCSS } from './css/text-style.js';
 
 /** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 export function renderFrameNode<PageModel, Msg>(
@@ -57,7 +59,7 @@ export function renderFrameNode<PageModel, Msg>(
     }
 
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
-    const content = node.render(rect.width, rect.height);
+    const content = framePaneOutputToString(node.render(rect.width, rect.height), rect.width, rect.height);
     let state = createFocusAreaState({
       content,
       width: rect.width,
@@ -66,7 +68,12 @@ export function renderFrameNode<PageModel, Msg>(
     });
     state = focusAreaScrollTo(state, prior.y);
     state = focusAreaScrollToX(state, prior.x);
-    const output = focusArea(state, { focused: node.paneId === ctx.focusedPaneId });
+    const output = focusArea(state, {
+      focused: node.paneId === ctx.focusedPaneId,
+      ctx: resolveSafeCtx(),
+      id: node.paneId,
+      classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
+    });
     return {
       output,
       paneRects: new Map([[node.paneId, rect]]),
@@ -241,7 +248,7 @@ export function renderMaximizedPane<PageModel, Msg>(
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
-  const content = paneNode.render(bodyRect.width, bodyRect.height);
+  const content = framePaneOutputToString(paneNode.render(bodyRect.width, bodyRect.height), bodyRect.width, bodyRect.height);
   let state = createFocusAreaState({
     content,
     width: bodyRect.width,
@@ -250,7 +257,12 @@ export function renderMaximizedPane<PageModel, Msg>(
   });
   state = focusAreaScrollTo(state, prior.y);
   state = focusAreaScrollToX(state, prior.x);
-  const output = focusArea(state, { focused: true });
+  const output = focusArea(state, {
+    focused: true,
+    ctx: resolveSafeCtx(),
+    id: maximizedPaneId,
+    classes: ['focused', 'maximized'],
+  });
 
   return {
     output,
@@ -271,7 +283,12 @@ export function renderHeaderLine<PageModel, Msg>(
     return id === model.activePageId ? `[${page.title}]` : ` ${page.title} `;
   }).join(' ');
 
-  return fitLine(`${title}  ${tabs}`, model.columns);
+  const line = fitLine(`${title}  ${tabs}`, model.columns);
+  return styleTextWithBCSS(line, resolveSafeCtx(), {
+    type: 'FrameHeader',
+    id: 'frame-header',
+    classes: [`page-${model.activePageId}`],
+  });
 }
 
 /** Render the bottom status line showing mode, focused pane, and key hints. */
@@ -298,7 +315,11 @@ export function renderHelpLine<PageModel, Msg>(
   const line = hint.length > 0
     ? ` ${status}  ${hint}`
     : ` ${status}`;
-  return fitLine(line, model.columns);
+  return styleTextWithBCSS(fitLine(line, model.columns), resolveSafeCtx(), {
+    type: 'FrameHelp',
+    id: 'frame-help',
+    classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
+  });
 }
 
 /**
@@ -360,5 +381,29 @@ export function renderTransition(
     lines.push(line);
   }
 
+  return lines.join('\n');
+}
+
+export function framePaneOutputToString(output: ViewOutput, width: number, height: number): string {
+  if (typeof output === 'string') return output;
+
+  const surface = normalizeViewOutput(output, { width, height }).surface;
+  const ctx = resolveSafeCtx();
+  if (ctx?.style) {
+    return surfaceToString(surface, ctx.style);
+  }
+
+  return surfaceToPlainText(surface);
+}
+
+function surfaceToPlainText(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
   return lines.join('\n');
 }

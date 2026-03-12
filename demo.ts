@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   box, headerBox, progressBar, gradientText, separator, badge, alert,
-  skeleton, kbd, tree, accordion, timeline, select, PRESETS
+  skeleton, kbd, tree, accordion, timeline, select, PRESETS, surfaceToString
 } from '@flyingrobots/bijou';
 
 async function runDemo() {
@@ -30,11 +30,11 @@ async function runDemo() {
   console.log(separator({ label: 'New Components', ctx: themedCtx }));
   console.log();
   console.log(
-    badge('SUCCESS', { variant: 'success', ctx: themedCtx }),
-    badge('ERROR', { variant: 'error', ctx: themedCtx }),
-    badge('WARNING', { variant: 'warning', ctx: themedCtx }),
-    badge('INFO', { ctx: themedCtx }),
-    badge('MUTED', { variant: 'muted', ctx: themedCtx })
+    surfaceToString(badge('SUCCESS', { variant: 'success', ctx: themedCtx }), themedCtx.style),
+    surfaceToString(badge('ERROR', { variant: 'error', ctx: themedCtx }), themedCtx.style),
+    surfaceToString(badge('WARNING', { variant: 'warning', ctx: themedCtx }), themedCtx.style),
+    surfaceToString(badge('INFO', { ctx: themedCtx }), themedCtx.style),
+    surfaceToString(badge('MUTED', { variant: 'muted', ctx: themedCtx }), themedCtx.style),
   );
   console.log();
   console.log(alert('Deployment completed successfully!', { variant: 'success', ctx: themedCtx }));

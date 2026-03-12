@@ -1,20 +1,24 @@
 import { ctx } from '../_shared/setup.js';
-import { badge, separator } from '@flyingrobots/bijou';
+import { badge, separator, surfaceToString } from '@flyingrobots/bijou';
+
+function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant']): string {
+  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+}
 
 console.log(separator({ label: 'badge variants', ctx }));
 console.log();
 
 console.log(
-  badge('SUCCESS', { variant: 'success', ctx }),
-  badge('ERROR', { variant: 'error', ctx }),
-  badge('WARNING', { variant: 'warning', ctx }),
-  badge('INFO', { variant: 'info', ctx }),
-  badge('MUTED', { variant: 'muted', ctx }),
+  badgeText('SUCCESS', 'success'),
+  badgeText('ERROR', 'error'),
+  badgeText('WARNING', 'warning'),
+  badgeText('INFO', 'info'),
+  badgeText('MUTED', 'muted'),
 );
 console.log();
 console.log(
-  badge('ACCENT', { variant: 'accent', ctx }),
-  badge('PRIMARY', { variant: 'primary', ctx }),
+  badgeText('ACCENT', 'accent'),
+  badgeText('PRIMARY', 'primary'),
 );
 console.log();
 
@@ -22,17 +26,17 @@ console.log(separator({ label: 'inline usage', ctx }));
 console.log();
 
 console.log(
-  'Server is', badge('RUNNING', { variant: 'success', ctx }),
-  'on port', badge('3000', { variant: 'primary', ctx }),
+  'Server is', badgeText('RUNNING', 'success'),
+  'on port', badgeText('3000', 'primary'),
 );
 console.log();
 console.log(
-  'Build', badge('FAILED', { variant: 'error', ctx }),
+  'Build', badgeText('FAILED', 'error'),
   '— 3 errors, 1 warning',
 );
 console.log();
 console.log(
-  badge('v0.2.0', { variant: 'accent', ctx }),
-  badge('MIT', { variant: 'muted', ctx }),
-  badge('TypeScript', { variant: 'info', ctx }),
+  badgeText('v0.2.0', 'accent'),
+  badgeText('MIT', 'muted'),
+  badgeText('TypeScript', 'info'),
 );

@@ -1,18 +1,16 @@
-import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import type { BijouNodeOptions } from './types.js';
 
 /** Configuration for rendering a horizontal separator line. */
-export interface SeparatorOptions {
+export interface SeparatorOptions extends BijouNodeOptions {
   /** Optional centered label text. */
   label?: string;
   /** Total width in characters (defaults to terminal column count). */
   width?: number;
   /** Theme token applied to the separator line. */
   borderToken?: TokenValue;
-  /** Bijou context for I/O, styling, and mode detection. */
-  ctx?: BijouContext;
 }
 
 /**

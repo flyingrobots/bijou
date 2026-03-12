@@ -1,29 +1,39 @@
 /**
- * Shader-based canvas primitive for procedural character art.
- *
- * Calls a user-provided shader function for every cell in a grid,
- * producing a string of exactly `rows` lines, each `cols` characters wide.
+ * Rich shader-based canvas primitive for procedural character art.
+ * 
+ * Supports high-resolution plotting via Braille and Quad characters,
+ * with normalized UV mapping and full color/styling support.
  */
 
-import { getDefaultContext, type BijouContext } from '@flyingrobots/bijou';
+import { createSurface, type Surface, type Cell } from '@flyingrobots/bijou';
 
 /**
- * Shader function called once per cell.
- *
- * @param x    Column index (0-based).
- * @param y    Row index (0-based).
- * @param cols Total number of columns.
- * @param rows Total number of rows.
- * @param time Animation time value.
- * @returns    A single character (or string — only the first code point is used).
+ * Parameters passed to the shader function.
  */
-export type ShaderFn = (
-  x: number,
-  y: number,
-  cols: number,
-  rows: number,
-  time: number,
-) => string;
+export interface ShaderParams {
+  /** Normalized horizontal coordinate (0.0 to 1.0). */
+  u: number;
+  /** Normalized vertical coordinate (0.0 to 1.0). */
+  v: number;
+  /** Animation time value in seconds. */
+  time: number;
+  /** Custom data bag passed to the shader. */
+  uniforms: Record<string, any>;
+}
+
+/**
+ * Shader function called per "pixel" (cell or sub-pixel).
+ * 
+ * Returns a Cell defining the character and style. 
+ * In high-res modes (Braille/Quad), the character is treated as a boolean 
+ * (non-space = on) and styling is taken from the first non-space sub-pixel.
+ */
+export type ShaderFn = (params: ShaderParams) => Cell | string;
+
+/**
+ * Resolution modes for the canvas.
+ */
+export type CanvasResolution = 'cell' | 'quad' | 'braille';
 
 /**
  * Options for the {@link canvas} renderer.
@@ -31,47 +41,146 @@ export type ShaderFn = (
 export interface CanvasOptions {
   /** Animation time value passed to the shader. Default: 0. */
   time?: number;
-  /** Bijou context for mode detection. */
-  ctx?: BijouContext;
+  /** Plotting resolution. Default: 'cell'. */
+  resolution?: CanvasResolution;
+  /** Custom data passed to the shader. */
+  uniforms?: Record<string, any>;
 }
 
 /**
- * Render a character grid by calling `shader(x, y, cols, rows, time)` for
- * every cell. Return a string of exactly `rows` lines, each `cols` chars wide.
- *
- * In pipe or accessible mode, return empty string (no visual noise).
- * Return empty string when cols or rows are <= 0.
- *
- * @param cols - Number of columns (grid width).
- * @param rows - Number of rows (grid height).
- * @param shader - Function called once per cell to produce a character.
- * @param options - Optional canvas settings (time, context).
- * @returns Rendered grid string with lines joined by newlines, or empty string.
+ * Render procedural art using a fragment shader.
+ * 
+ * @param cols - Grid width in columns.
+ * @param rows - Grid height in rows.
+ * @param shader - Function called for every pixel/sub-pixel.
+ * @param options - Canvas configuration.
+ * @returns A Surface containing the rendered art.
  */
 export function canvas(
   cols: number,
   rows: number,
   shader: ShaderFn,
-  options?: CanvasOptions,
-): string {
-  if (cols <= 0 || rows <= 0) return '';
+  options: CanvasOptions = {}
+): Surface {
+  const { resolution = 'cell', time = 0, uniforms = {} } = options;
+  const surface = createSurface(cols, rows);
 
-  const ctx = options?.ctx ?? getDefaultContext();
-  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') return '';
-  // static mode renders normally (same as box/table)
+  if (cols <= 0 || rows <= 0) return surface;
 
-  const time = options?.time ?? 0;
-  const lines: string[] = [];
-
-  for (let y = 0; y < rows; y++) {
-    let line = '';
-    for (let x = 0; x < cols; x++) {
-      const ch = shader(x, y, cols, rows, time);
-      // Take first code point, or space if empty
-      line += ch.length > 0 ? ([...ch][0] ?? ' ') : ' ';
-    }
-    lines.push(line);
+  switch (resolution) {
+    case 'cell':
+      renderCellResolution(surface, shader, time, uniforms);
+      break;
+    case 'quad':
+      renderQuadResolution(surface, shader, time, uniforms);
+      break;
+    case 'braille':
+      renderBrailleResolution(surface, shader, time, uniforms);
+      break;
   }
 
-  return lines.join('\n');
+  return surface;
+}
+
+function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+  const { width, height } = surface;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const cell = shader({
+        u: x / (width - 1 || 1),
+        v: y / (height - 1 || 1),
+        time,
+        uniforms
+      });
+      surface.set(x, y, typeof cell === 'string' ? { char: cell } : cell);
+    }
+  }
+}
+
+function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+  const { width, height } = surface;
+  const subW = width * 2;
+  const subH = height * 2;
+
+  const QUAD_CHARS: Record<number, string> = {
+    0: ' ', 1: '▘', 2: '▝', 3: '▀',
+    4: '▖', 5: '▌', 6: '▞', 7: '▛',
+    8: '▗', 9: '▚', 10: '▐', 11: '▜',
+    12: '▄', 13: '▙', 14: '▟', 15: '█'
+  };
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let mask = 0;
+      let firstStyledCell: Cell | null = null;
+
+      for (let sy = 0; sy < 2; sy++) {
+        for (let sx = 0; sx < 2; sx++) {
+          const px = x * 2 + sx;
+          const py = y * 2 + sy;
+          const result = shader({
+            u: px / (subW - 1 || 1),
+            v: py / (subH - 1 || 1),
+            time,
+            uniforms
+          });
+          const cell = typeof result === 'string' ? { char: result } : result;
+          
+          if (cell.char !== ' ') {
+            mask |= (1 << (sy * 2 + sx));
+            if (!firstStyledCell) firstStyledCell = cell;
+          }
+        }
+      }
+
+      surface.set(x, y, {
+        ...(firstStyledCell || { char: ' ' }),
+        char: QUAD_CHARS[mask] || ' '
+      });
+    }
+  }
+}
+
+function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
+  const { width, height } = surface;
+  const subW = width * 2;
+  const subH = height * 4;
+
+  const DOT_MAP = [
+    [0x01, 0x08],
+    [0x02, 0x10],
+    [0x04, 0x20],
+    [0x40, 0x80]
+  ];
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let code = 0;
+      let firstStyledCell: Cell | null = null;
+
+      for (let sy = 0; sy < 4; sy++) {
+        for (let sx = 0; sx < 2; sx++) {
+          const px = x * 2 + sx;
+          const py = y * 4 + sy;
+          const result = shader({
+            u: px / (subW - 1 || 1),
+            v: py / (subH - 1 || 1),
+            time,
+            uniforms
+          });
+          const cell = typeof result === 'string' ? { char: result } : result;
+          
+          if (cell.char !== ' ') {
+            code |= DOT_MAP[sy]![sx]!;
+            if (!firstStyledCell) firstStyledCell = cell;
+          }
+        }
+      }
+
+      surface.set(x, y, {
+        ...(firstStyledCell || { char: ' ' }),
+        char: String.fromCharCode(0x2800 + code)
+      });
+    }
+  }
 }

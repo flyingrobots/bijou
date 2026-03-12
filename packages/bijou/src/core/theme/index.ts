@@ -55,9 +55,18 @@ export {
   ansi256ToAnsi16,
   type ColorLevel,
 } from './downsample.js';
-
 // Theme accessors
 export { createThemeAccessors, type ThemeAccessors } from './accessors.js';
+
+// Reactive Token Graph
+export { createTokenGraph } from './graph.js';
+export type { TokenGraph, ThemeMode } from './graph.js';
+export type {
+  ColorDefinition,
+  TokenDefinition,
+  TokenDefinitions,
+  ColorTransform,
+} from './graph-types.js';
 
 // Color manipulation
 export {
