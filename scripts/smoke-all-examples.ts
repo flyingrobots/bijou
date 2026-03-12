@@ -236,15 +236,14 @@ function createStaticTtyChild(absPath: string): ChildProcess {
   const env = { ...process.env, CI: '1', TERM: 'xterm-256color' };
   delete env['NO_COLOR'];
   delete env['BIJOU_ACCESSIBLE'];
+  const command = `${process.execPath} --import tsx ${shellQuote(absPath)}`;
+  const args = process.platform === 'darwin'
+    ? ['-q', '/dev/null', 'zsh', '-lc', command]
+    : ['-q', '-e', '-c', command, '/dev/null'];
+
   return spawn(
     '/usr/bin/script',
-    [
-      '-q',
-      '/dev/null',
-      'zsh',
-      '-lc',
-      `${process.execPath} --import tsx ${shellQuote(absPath)}`,
-    ],
+    args,
     {
       cwd: ROOT,
       env,
