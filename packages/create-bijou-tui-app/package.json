@@ -4,7 +4,7 @@
   "description": "Scaffold a new Bijou TUI app with batteries-included defaults.",
   "type": "module",
   "bin": {
-    "create-bijou-tui-app": "./dist/cli.js"
+    "create-bijou-tui-app": "dist/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
