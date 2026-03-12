@@ -98,5 +98,5 @@ export interface IOPort extends InteractivePort, FilePort {
    * Useful for IPC in background workers.
    * @returns A handle whose `dispose()` removes the listener.
    */
-  onData?(callback: (payload: any) => void): RawInputHandle;
+  onData?(callback: (payload: unknown) => void): RawInputHandle;
 }

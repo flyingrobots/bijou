@@ -11,13 +11,13 @@ import { createNodeContext } from '../index.js';
 export type WorkerMessage =
   | { type: 'io:data'; data: string }
   | { type: 'io:resize'; columns: number; rows: number }
-  | { type: 'data'; payload: any }
+  | { type: 'data'; payload: unknown }
   | { type: 'quit' };
 
 export type MainMessage =
   | { type: 'render:frame'; output: string }
   | { type: 'error'; message: string }
-  | { type: 'data'; payload: any }
+  | { type: 'data'; payload: unknown }
   | { type: 'quit' };
 
 // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ export function isBijouWorker(): boolean {
  * Sends a custom data message from the worker to the main thread.
  * This will be received via the `onMessage` callback in `runInWorker`.
  */
-export function sendToMain(payload: any): void {
+export function sendToMain(payload: unknown): void {
   if (parentPort) {
     parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
   }
@@ -48,7 +48,7 @@ export interface RunWorkerOptions extends RunOptions<any> {
   /** The absolute path to the file containing the worker entry point. */
   entry: string;
   /** Optional callback for custom data messages sent from the worker via `sendToMain`. */
-  onMessage?: (payload: any) => void;
+  onMessage?: (payload: unknown) => void;
   /** Optional arguments passed to the Node.js worker process (e.g. ['--import', 'tsx']). */
   execArgv?: string[];
 }
@@ -62,7 +62,7 @@ export interface RunWorkerOptions extends RunOptions<any> {
  */
 export interface WorkerHandle {
   /** Sends a custom data message to the worker thread. */
-  send(payload: any): void;
+  send(payload: unknown): void;
   /** Forcefully terminates the worker thread. */
   terminate(): Promise<void>;
   /** A promise that resolves when the worker exits cleanly. */
@@ -95,19 +95,20 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   if (useMouse) {
     ctx.io.write('\x1b[?1000h\x1b[?1002h\x1b[?1006h'); // ENABLE_MOUSE
   }
-// Spawn the worker
-const serializableOptions = {
-  altScreen: options.altScreen,
-  hideCursor: options.hideCursor,
-  mouse: options.mouse,
-  css: options.css,
-};
 
-const worker = new Worker(resolvePath(options.entry), {
-  workerData: { isBijouWorker: true, options: serializableOptions },
-  execArgv: options.execArgv,
-  // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
-});
+  // Spawn the worker with structured-clone-safe options only.
+  const serializableOptions = {
+    altScreen: options.altScreen,
+    hideCursor: options.hideCursor,
+    mouse: options.mouse,
+    css: options.css,
+  };
+
+  const worker = new Worker(resolvePath(options.entry), {
+    workerData: { isBijouWorker: true, options: serializableOptions },
+    execArgv: options.execArgv,
+    // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
+  });
 
   // 1. Pipe Main Stdin -> Worker IPC
   const inputHandle = ctx.io.rawInput((data: string) => {
@@ -162,7 +163,7 @@ const worker = new Worker(resolvePath(options.entry), {
       resizeHandle.dispose();
 
       if (useMouse) {
-        ctx.io.write('\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l'); // DISABLE_MOUSE
+        ctx.io.write('\x1b[?1000l\x1b[?1002l\x1b[?1006l'); // DISABLE_MOUSE
       }
       if (useAltScreen || useHideCursor) {
         ctx.io.write('\x1b[?1049l'); // EXIT_ALT_SCREEN
@@ -172,7 +173,7 @@ const worker = new Worker(resolvePath(options.entry), {
   });
 
   return {
-    send: (payload: any) => worker.postMessage({ type: 'data', payload } satisfies WorkerMessage),
+    send: (payload: unknown) => worker.postMessage({ type: 'data', payload } satisfies WorkerMessage),
     terminate: async () => { await worker.terminate(); },
     onExit
   };

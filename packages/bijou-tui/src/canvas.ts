@@ -5,7 +5,7 @@
  * with normalized UV mapping and full color/styling support.
  */
 
-import { createSurface, type Surface, type Cell, type BijouContext } from '@flyingrobots/bijou';
+import { createSurface, type Surface, type Cell } from '@flyingrobots/bijou';
 
 /**
  * Parameters passed to the shader function.
@@ -45,8 +45,6 @@ export interface CanvasOptions {
   resolution?: CanvasResolution;
   /** Custom data passed to the shader. */
   uniforms?: Record<string, any>;
-  /** Bijou context for mode detection. */
-  ctx?: BijouContext;
 }
 
 /**
