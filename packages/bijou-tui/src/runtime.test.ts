@@ -279,6 +279,67 @@ describe('run', () => {
       expect(ctx.io.written.some((chunk) => chunk === CLEAR_SCREEN + HOME)).toBe(true);
     });
 
+    it('updates runtime dimensions before rerendering after resize', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
+          return [model, []];
+        },
+        view: () => `size:${ctx.runtime.columns}x${ctx.runtime.rows}`,
+      };
+
+      ctx.io.rawInput = (onKey) => {
+        const id = globalThis.setTimeout(() => onKey('q'), 30);
+        return { dispose() { clearTimeout(id); } };
+      };
+      ctx.io.onResize = (onResize) => {
+        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
+        return { dispose() { clearTimeout(id); } };
+      };
+
+      const promise = run(app, { ctx });
+      await vi.advanceTimersByTimeAsync(80);
+      await promise;
+
+      expect(ctx.runtime.columns).toBe(100);
+      expect(ctx.runtime.rows).toBe(30);
+      expect(ctx.io.written.some((chunk) => chunk.includes('size:100x30'))).toBe(true);
+    });
+
+    it('restores the terminal before rejecting when a scheduled render fails', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      const promise = run(counterApp(), { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+
+      let columns = ctx.runtime.columns;
+      Object.defineProperty(ctx.runtime, 'columns', {
+        configurable: true,
+        get() {
+          throw new Error('render exploded');
+        },
+        set(value: number) {
+          columns = value;
+        },
+      });
+
+      await vi.advanceTimersByTimeAsync(10);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('render exploded');
+      expect(columns).toBe(80);
+      expect(ctx.io.written[ctx.io.written.length - 1]).toBe(
+        SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN,
+      );
+    });
+
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
       vi.useFakeTimers();
 

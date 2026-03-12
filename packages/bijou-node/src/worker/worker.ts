@@ -1,5 +1,6 @@
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { resolve as resolvePath } from 'node:path';
+import type { BijouContext, RuntimePort } from '@flyingrobots/bijou';
 import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
 import { createNodeContext } from '../index.js';
@@ -44,13 +45,39 @@ export function sendToMain(payload: unknown): void {
 /**
  * Options for starting an app in a background worker.
  */
-export interface RunWorkerOptions extends RunOptions<any> {
+export interface RunWorkerOptions {
   /** The absolute path to the file containing the worker entry point. */
   entry: string;
+  /** Optional Bijou context for the host thread. */
+  ctx?: BijouContext;
+  /** Enter the alternate screen buffer on startup. */
+  altScreen?: boolean;
+  /** Hide the cursor on startup. */
+  hideCursor?: boolean;
+  /** Enable mouse input (SGR mode). */
+  mouse?: boolean;
+  /** Optional BCSS stylesheet string. */
+  css?: string;
   /** Optional callback for custom data messages sent from the worker via `sendToMain`. */
   onMessage?: (payload: unknown) => void;
   /** Optional arguments passed to the Node.js worker process (e.g. ['--import', 'tsx']). */
   execArgv?: string[];
+}
+
+interface WorkerSerializableOptions {
+  altScreen?: boolean;
+  hideCursor?: boolean;
+  mouse?: boolean;
+  css?: string;
+}
+
+interface BijouWorkerData {
+  isBijouWorker: true;
+  options: WorkerSerializableOptions;
+  runtime: {
+    columns: number;
+    rows: number;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -83,6 +110,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   }
 
   const ctx = options.ctx ?? createNodeContext();
+  installRuntimeOverlay(ctx);
   const useAltScreen = options.altScreen ?? true;
   const useHideCursor = options.hideCursor ?? true;
   const useMouse = options.mouse ?? false;
@@ -97,7 +125,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   }
 
   // Spawn the worker with structured-clone-safe options only.
-  const serializableOptions = {
+  const serializableOptions: WorkerSerializableOptions = {
     altScreen: options.altScreen,
     hideCursor: options.hideCursor,
     mouse: options.mouse,
@@ -105,7 +133,14 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   };
 
   const worker = new Worker(resolvePath(options.entry), {
-    workerData: { isBijouWorker: true, options: serializableOptions },
+    workerData: {
+      isBijouWorker: true,
+      options: serializableOptions,
+      runtime: {
+        columns: sanitizeDimension(ctx.runtime.columns),
+        rows: sanitizeDimension(ctx.runtime.rows),
+      },
+    } satisfies BijouWorkerData,
     execArgv: options.execArgv,
     // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
   });
@@ -116,7 +151,11 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   });
 
   const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
-    worker.postMessage({ type: 'io:resize', columns, rows } satisfies WorkerMessage);
+    const nextColumns = sanitizeDimension(columns);
+    const nextRows = sanitizeDimension(rows);
+    ctx.runtime.columns = nextColumns;
+    ctx.runtime.rows = nextRows;
+    worker.postMessage({ type: 'io:resize', columns: nextColumns, rows: nextRows } satisfies WorkerMessage);
   });
 
   const onExit = new Promise<void>((resolve, reject) => {
@@ -196,10 +235,15 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
     throw new Error('startWorkerApp must be called from within a worker thread.');
   }
 
+  const initData = workerData as BijouWorkerData;
+
   // Create a proxy Context that speaks IPC instead of true I/O
   const proxyCtx = createNodeContext();
+  installRuntimeOverlay(proxyCtx);
   const { setDefaultContext } = await import('@flyingrobots/bijou');
   setDefaultContext(proxyCtx);
+  proxyCtx.runtime.columns = sanitizeDimension(initData.runtime?.columns ?? proxyCtx.runtime.columns);
+  proxyCtx.runtime.rows = sanitizeDimension(initData.runtime?.rows ?? proxyCtx.runtime.rows);
   
   // Hijack the WritePort to send frames back to main thread
   proxyCtx.io.write = (data: string) => {
@@ -212,7 +256,7 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
   // We need to bypass the standard run() setup since the main thread 
   // already handled alt screen and mouse modes. We tell run() to do nothing.
   const proxyOptions: RunOptions<M> = {
-    ...workerData.options,
+    ...initData.options,
     ctx: proxyCtx,
     altScreen: false,
     hideCursor: false,
@@ -232,7 +276,11 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
 
   proxyCtx.io.onResize = (handler) => {
     const listener = (msg: WorkerMessage) => {
-      if (msg.type === 'io:resize') handler(msg.columns, msg.rows);
+      if (msg.type === 'io:resize') {
+        proxyCtx.runtime.columns = sanitizeDimension(msg.columns);
+        proxyCtx.runtime.rows = sanitizeDimension(msg.rows);
+        handler(proxyCtx.runtime.columns, proxyCtx.runtime.rows);
+      }
     };
     parentPort!.on('message', listener);
     return {
@@ -255,4 +303,46 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
 
   // Signal main thread to shut down
   parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
+}
+
+function sanitizeDimension(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
+function installRuntimeOverlay(ctx: BijouContext): RuntimePort {
+  const baseRuntime = ctx.runtime;
+  const state = {
+    columns: sanitizeDimension(baseRuntime.columns),
+    rows: sanitizeDimension(baseRuntime.rows),
+  };
+  const runtime: RuntimePort = {
+    env(key: string): string | undefined {
+      return baseRuntime.env(key);
+    },
+    get stdoutIsTTY(): boolean {
+      return baseRuntime.stdoutIsTTY;
+    },
+    get stdinIsTTY(): boolean {
+      return baseRuntime.stdinIsTTY;
+    },
+    get columns(): number {
+      return state.columns;
+    },
+    set columns(value: number) {
+      state.columns = sanitizeDimension(value);
+    },
+    get rows(): number {
+      return state.rows;
+    },
+    set rows(value: number) {
+      state.rows = sanitizeDimension(value);
+    },
+    get refreshRate(): number {
+      return baseRuntime.refreshRate;
+    },
+  };
+
+  (ctx as { runtime: RuntimePort }).runtime = runtime;
+  return runtime;
 }

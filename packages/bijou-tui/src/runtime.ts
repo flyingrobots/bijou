@@ -1,5 +1,5 @@
 import { getDefaultContext, createSurface, surfaceToString } from '@flyingrobots/bijou';
-import type { WritePort, Surface } from '@flyingrobots/bijou';
+import type { RuntimePort, WritePort, Surface } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
@@ -45,6 +45,7 @@ export async function run<Model, M>(
   options?: RunOptions<M>,
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
+  installRuntimeOverlay(ctx);
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
   const useMouse = options?.mouse ?? false;
@@ -75,6 +76,7 @@ export async function run<Model, M>(
   let lastCtrlC = 0;
   let resolveQuit: (() => void) | null = null;
   let currentDt = 0.016; // Default to 60fps for first frame
+  let fatalError: unknown = null;
 
   // Double Buffering: track what is currently on screen
   let currentSurface: Surface = createSurface(
@@ -141,7 +143,10 @@ export async function run<Model, M>(
   }
 
   /** Tear down the run loop and signal the quit promise. */
-  function shutdown(): void {
+  function shutdown(error?: unknown): void {
+    if (error !== undefined && fatalError === null) {
+      fatalError = error;
+    }
     if (!running) return;
     running = false;
     if (resolveQuit) resolveQuit();
@@ -165,21 +170,32 @@ export async function run<Model, M>(
     renderRequested = true;
 
     setTimeout(() => {
-      renderRequested = false;
+      try {
+        const targetSurface = createSurface(
+          sanitizeDimension(ctx.runtime.columns),
+          sanitizeDimension(ctx.runtime.rows),
+        );
 
-      const targetSurface = createSurface(sanitizeDimension(ctx.runtime.columns), sanitizeDimension(ctx.runtime.rows));
+        const renderState: RenderState = {
+          model,
+          ctx,
+          dt: currentDt,
+          currentSurface,
+          targetSurface,
+          layoutMap: new Map(),
+          data: {},
+        };
 
-      const renderState: RenderState = {
-        model,
-        ctx,
-        dt: currentDt,
-        currentSurface,
-        targetSurface,
-        layoutMap: new Map(),
-        data: {},
-      };
-
-      pipeline.execute(renderState);
+        pipeline.execute(renderState);
+      } catch (error) {
+        writeErrorLine(
+          ctx.io,
+          `[Runtime Error] ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
+        );
+        shutdown(error);
+      } finally {
+        renderRequested = false;
+      }
     }, 0);
   }
 
@@ -210,9 +226,11 @@ export async function run<Model, M>(
     }
 
     if (isResizeMsg(msg)) {
+      ctx.runtime.columns = sanitizeDimension(msg.columns);
+      ctx.runtime.rows = sanitizeDimension(msg.rows);
       currentSurface = createSurface(
-        sanitizeDimension(msg.columns),
-        sanitizeDimension(msg.rows),
+        ctx.runtime.columns,
+        ctx.runtime.rows,
       );
       clearAndHome(ctx.io);
     }
@@ -277,12 +295,53 @@ export async function run<Model, M>(
   if (useAltScreen || useHideCursor) {
     exitScreen(ctx.io);
   }
+
+  if (fatalError != null) {
+    throw fatalError instanceof Error ? fatalError : new Error(String(fatalError));
+  }
 }
 
 /** Clamp a terminal dimension to a non-negative integer. */
 function sanitizeDimension(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.floor(value));
+}
+
+function installRuntimeOverlay(ctx: { runtime: RuntimePort }): RuntimePort {
+  const baseRuntime = ctx.runtime;
+  const state = {
+    columns: sanitizeDimension(baseRuntime.columns),
+    rows: sanitizeDimension(baseRuntime.rows),
+  };
+  const runtime: RuntimePort = {
+    env(key: string): string | undefined {
+      return baseRuntime.env(key);
+    },
+    get stdoutIsTTY(): boolean {
+      return baseRuntime.stdoutIsTTY;
+    },
+    get stdinIsTTY(): boolean {
+      return baseRuntime.stdinIsTTY;
+    },
+    get columns(): number {
+      return state.columns;
+    },
+    set columns(value: number) {
+      state.columns = sanitizeDimension(value);
+    },
+    get rows(): number {
+      return state.rows;
+    },
+    set rows(value: number) {
+      state.rows = sanitizeDimension(value);
+    },
+    get refreshRate(): number {
+      return baseRuntime.refreshRate;
+    },
+  };
+
+  (ctx as { runtime: RuntimePort }).runtime = runtime;
+  return runtime;
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */

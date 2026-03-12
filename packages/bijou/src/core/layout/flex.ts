@@ -1,11 +1,6 @@
 import type { LayoutNode, LayoutRect } from '../../ports/surface.js';
 
 /**
- * Common alignment values.
- */
-export type Align = 'start' | 'center' | 'end';
-
-/**
  * Options for the flex layout engine.
  */
 export interface FlexOptions {
@@ -22,7 +17,6 @@ export interface FlexChildProps {
   basis?: number;
   minSize?: number;
   maxSize?: number;
-  align?: Align;
 }
 
 /**

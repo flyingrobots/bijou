@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateFlex } from './flex.js';
+import type { FlexChildProps } from './flex.js';
 
 describe('calculateFlex', () => {
   it('splits space between fixed and flex children in row mode', () => {
@@ -61,5 +62,14 @@ describe('calculateFlex', () => {
 
     expect(total).toBe(3);
     expect(last.rect.x + last.rect.width).toBe(3);
+  });
+
+  it('does not expose a non-functional align prop on flex children', () => {
+    const child: FlexChildProps = { flex: 1 };
+    expect(child.flex).toBe(1);
+
+    // @ts-expect-error Cross-axis alignment is not part of the current flex child contract.
+    const aligned: FlexChildProps = { align: 'center' };
+    expect(aligned).toBeDefined();
   });
 });
