@@ -1,14 +1,15 @@
 # `@flyingrobots/bijou-tui`
 
-The high-performance TEA runtime and graphics engine for Bijou.
+The high-fidelity TEA runtime for Bijou.
 
-`bijou-tui` provides the application loop, layout primitives, and advanced orchestration required to build complex, 60fps terminal applications.
+`bijou-tui` provides the application loop, layout primitives, motion, and orchestration needed to build complex interactive terminal apps on top of the Bijou core.
 
 ## V3.0.0 Evolution
 
 The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
 
 ### 🌟 What's New
+- **Honest view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`string | Surface | LayoutNode`). Strings still work, but they are the legacy compatibility path.
 - **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
 - **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
 - **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
@@ -20,6 +21,8 @@ The TUI package has been completely overhauled in v3.0.0 to operate as a true gr
 ```bash
 npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
 ```
+
+If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
 
 ## Quick Start (V3 Sub-App Composition)
 

@@ -184,6 +184,8 @@ For full scaffolder usage, flags, and test flow, see
 npm run build        # TypeScript project references build
 npm run build:watch  # Incremental watch mode
 npm test             # Vitest suite
+npm run typecheck:test
+npm run smoke:examples:all
 npm run lint         # Typecheck each workspace package
 npm run clean        # Remove build outputs
 ```
@@ -194,6 +196,7 @@ Node.js version: `>=18`.
 
 - Project architecture: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 - Changelog: [`docs/CHANGELOG.md`](./docs/CHANGELOG.md)
+- Migration guide: [`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md)
 - Example catalog: [`docs/EXAMPLES.md`](./docs/EXAMPLES.md)
 - Package guides:
   - [`packages/bijou/GUIDE.md`](./packages/bijou/GUIDE.md)
@@ -202,9 +205,14 @@ Node.js version: `>=18`.
 
 ## What's New in v3.0.0
 
-- **9 new transition shaders** — `radial`, `diamond`, `spiral`, `blinds`, `curtain`, `pixelate`, `typewriter`, `glitch`, and `static` join the existing 7. All 16 available via `BuiltinTransition` union and `TRANSITION_SHADERS` registry.
-- **Shader factories & combinators** — Parameterized factories (`wipe(direction)`, `radial(originX, originY)`, `blinds(count)`, etc.) and composable combinators (`reverse()`, `chain()`, `overlay()`) for custom transition effects.
-- **`charRole` on `TransitionResult`** — `'decoration'` vs `'marker'` semantic lets combinators distinguish ambient noise from positional indicators (e.g., typewriter cursor).
+- **Truthful package split** — `@flyingrobots/bijou` stays the degradation-first terminal toolkit, `@flyingrobots/bijou-tui` is the high-fidelity runtime, `@flyingrobots/bijou-tui-app` is the shell, and `@flyingrobots/bijou-node` owns Node adapters plus worker/recording utilities.
+- **Honest V3 view contract** — `App.view` and framed panes now work with `ViewOutput` (`string | Surface | LayoutNode`). Legacy strings still work, but they are explicitly the compatibility path rather than the whole story.
+- **Surface-native flagship path** — the runtime, scripted driver, framed shell boundary, and canonical V3 demos now run through the V3 surface/layout pipeline instead of relying on lossy full-frame ANSI round-tripping.
+- **BCSS, motion, and Fractal TEA** — `run(app, { css })`, keyed motion, and `initSubApp()` / `updateSubApp()` / `mount()` / `mapCmds()` are now the documented V3 composition story. BCSS is intentionally scoped to supported V3 surface primitives and frame shell regions.
+- **Worker runtime and native demo recorder** — `runInWorker()` / `startWorkerApp()` and the internal Surface-to-GIF recorder ship as part of the Node package, alongside canonical V3 demos and smoke coverage.
+
+If you are upgrading an existing app, start with the dedicated migration guide:
+[`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md)
 
 See the full release notes in [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 

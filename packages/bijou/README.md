@@ -1,18 +1,15 @@
 # @flyingrobots/bijou
 
-The pure core of the Bijou terminal graphics engine.
+The pure, zero-dependency core of Bijou.
 
-This package contains the **zero-dependency** foundation of Bijou, focusing entirely on data structures, component logic, and the "what" of terminal rendering. It delegates the "how" (actual TTY writing, styling) to abstract Hexagonal Ports.
+`@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the V3 runtime builds on.
 
-## V3.0.0 Evolution
+## What's New in v3.0.0
 
-As of v3.0.0, `@flyingrobots/bijou` has evolved from a string-based library into a high-performance **2D Cell-Buffered Graphics Engine**.
-
-### Core Pillars
-- **Buffered Surfaces:** Components no longer return strings; they paint into a 2D `Surface` grid of `Cell` objects. Supports masking, affine transforms (rotate/scale), and layer composition (`blit`).
-- **Reactive Token Graph:** A DAG-based theming engine supporting aliases (`ref: 'semantic.primary'`), functional color math (`darken`, `mix`), and adaptive mode buckets (`light`/`dark`).
-- **Differential Rendering:** Contains `renderDiff`, the mathematical engine that computes the minimal set of ANSI escape codes (CUP/SGR) needed to transition from `Frame A` to `Frame B`.
-- **Pure Components:** Contains the robust library of layout algorithms (`Flex`), atomic elements (`badge`, `box`), and form primitives (`input`, `select`)—all rewritten to paint natively to `Surface` buffers.
+- **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
+- **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
+- **Explicit compatibility boundaries** — when you mix surface-native helpers with legacy string APIs, you cross that seam explicitly with `surfaceToString(surface, ctx.style)`.
+- **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
 ## Install
 
@@ -61,14 +58,14 @@ console.log(box('Hello, world!'));
 `spinner()`, `progressBar()`, `gradientText()` — live-updating output with color gradients.
 
 ### Forms
-`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
+`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
 
 ### Theme Engine
-DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.
+DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`, `teal-orange-pink`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.
 
 ## Architecture
 
-bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full design.
+bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the package-level design and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) for the monorepo-wide architecture.
 
 The core is pure TypeScript with zero runtime dependencies — all platform concerns flow through three ports:
 
@@ -101,6 +98,7 @@ const result = box('hello', { ctx });
 ```
 
 See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
+For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
 
 ## Related Packages
 

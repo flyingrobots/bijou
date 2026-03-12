@@ -2,6 +2,12 @@
 
 Scaffold a new Bijou TUI app with batteries-included defaults.
 
+## What's New in v3.0.0
+
+- **Canonical V3 starter** — generated apps target the current `@flyingrobots/bijou-tui` + `@flyingrobots/bijou-tui-app` path instead of an older string-only shell story.
+- **Public API only** — the scaffolded app uses public package APIs so it can serve as a downstream canary for real-world upgrades.
+- **Release-aligned defaults** — the generated project matches the same shell/runtime split described in the root docs and migration guide.
+
 ## Usage
 
 ```sh
@@ -53,3 +59,5 @@ cd "$TARGET"
 npm install
 npm run dev
 ```
+
+For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md) and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).

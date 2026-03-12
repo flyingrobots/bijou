@@ -233,7 +233,7 @@ describe('focusArea', () => {
   it('applies BCSS text styles to the gutter', () => {
     const style = auditStyle();
     const ctx = createTestContext({ style });
-    ctx.resolveBCSS = (identity) => {
+    ctx.resolveBCSS = (identity): Record<string, string> => {
       if (identity.type === 'FocusArea' && identity.id === 'main') {
         return {
           color: '#ff00ff',

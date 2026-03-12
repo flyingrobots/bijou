@@ -1,7 +1,7 @@
 # Examples
 
 > Run any example: `npx tsx examples/<name>/main.ts`
-> Record all GIFs: `../scripts/record-gifs.sh`
+> Record release-facing GIFs: `npx tsx scripts/record-gifs.ts`
 
 ## V3 Features
 

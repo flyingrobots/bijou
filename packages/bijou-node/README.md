@@ -1,15 +1,14 @@
 # @flyingrobots/bijou-node
 
-Node.js adapters for the Bijou terminal graphics engine.
+Node.js adapters and runtime utilities for Bijou.
 
-This package bridges the pure, platform-agnostic `@flyingrobots/bijou` core with the Node.js runtime, handling TTY capabilities, raw I/O, chalk-based styling, and multi-threading.
+This package bridges the pure `@flyingrobots/bijou` core and the `@flyingrobots/bijou-tui` runtime to the Node.js environment. It owns runtime detection, terminal I/O, Chalk-backed styling, worker-thread helpers, and the native V3 demo recorder.
 
-## V3.0.0 Evolution
+## What's New in v3.0.0
 
-### 🌟 What's New
-- **Background Worker Runtime:** The new `runInWorker()` and `startWorkerApp()` APIs allow you to run the TEA update loop in a Node.js `Worker` thread. This keeps the main thread 100% responsive for rendering and I/O, even during heavy synchronous workloads (like parsing large files or ASTs).
-- **Environment Refresh Rate:** Automatically detects the environment's target refresh rate (or falls back to 60fps) to synchronize the TUI's unified animation heartbeat perfectly. Supports `BIJOU_FPS` override.
-- **V3 Native I/O:** fully optimized for the new Double-Buffered differential rendering engine.
+- **Worker runtime support** — `runInWorker()` and `startWorkerApp()` let TEA apps move heavy update work off the main thread while keeping input and rendering responsive.
+- **Native demo recorder** — V3 flagship demos can now be recorded directly from captured `Surface[]` frames with `recordDemoGif()`.
+- **Node boundary stays explicit** — runtime facts, I/O, and styling remain behind the port interfaces instead of leaking `process`, `readline`, or Chalk into the pure packages.
 
 ## Install
 
@@ -37,6 +36,8 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 - **Interactive terminal I/O**: stdin/stdout integration with readline and resize-event support.
 - **Styling backend**: Chalk-powered color/style methods wired into bijou styling APIs.
 - **One-line bootstrap**: `initDefaultContext()` creates a production-ready context and registers it as default on first call.
+- **Worker helpers**: `runInWorker()` and `startWorkerApp()` for moving app logic into a worker thread.
+- **Native recorder**: `recordDemoGif()` and related helpers for scripted V3 demo capture.
 
 ## What It Provides
 
@@ -67,6 +68,7 @@ initDefaultContext();
 If you need to replace the default context later in-process, call `setDefaultContext(createNodeContext())` from `@flyingrobots/bijou`.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js APIs, and [GUIDE.md](./GUIDE.md) for usage patterns.
+For upgrading existing apps, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
 
 ## Related Packages
 

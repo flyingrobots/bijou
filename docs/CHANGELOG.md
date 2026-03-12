@@ -6,6 +6,44 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-03-12
+
+### BREAKING CHANGES
+
+- **Truthful V3 runtime contract** — `App.view` and framed pane renderers now document the real `ViewOutput` contract: `string | Surface | LayoutNode`. Legacy string views remain supported, but they are explicitly the compatibility path.
+- **Surface/string seams are explicit** — surface-native helpers such as `badge()` must be converted with `surfaceToString(surface, ctx.style)` when passed into legacy string-only APIs.
+- **`surfaceToString()` requires a style port** — callers must pass `ctx.style`.
+
+### ✨ Features
+
+- **Surface-native flagship runtime path** — the runtime, scripted driver, and framed shell boundary now normalize V3 output consistently instead of relying on lossy full-frame ANSI round-tripping.
+- **Framed shell `ViewOutput` support** — framed panes can return `string`, `Surface`, or `LayoutNode`, which makes shell-based apps compatible with surface-native V3 panes.
+- **BCSS release scope** — `run(app, { css })` now ships with documented selector, token, media-query, and supported-region behavior for `3.0.0`.
+- **Fractal TEA lifecycle helpers** — `initSubApp()` and `updateSubApp()` join `mount()` and `mapCmds()` as the supported nested-app composition path.
+- **Motion contract tightened** — keyed motion supports spring/tween interpolation and initial rect offsets through the documented V3 path.
+- **Worker runtime and native recorder** — `runInWorker()`, `startWorkerApp()`, and the internal Surface-to-GIF recorder ship in `@flyingrobots/bijou-node`.
+- **Canonical V3 demos** — `v3-demo`, `v3-css`, `v3-motion`, `v3-subapp`, `v3-worker`, and `v3-pipeline` now anchor the release story.
+- **Hybrid example recording pipeline** — flagship V3 examples use native Surface recording while legacy examples can continue using VHS.
+
+### 🐛 Fixes
+
+- **Resize redraw invalidation** — interactive resize now forces a clean redraw so shell chrome does not disappear after repeated terminal resizes.
+- **Framed shell compatibility** — shell panes no longer crash when downstream apps return `Surface` or `LayoutNode` output.
+- **Example compatibility sweep** — legacy examples that mixed string APIs with V3 `Surface` values were updated to render cleanly.
+- **Interactive example smoke coverage** — prompt and form examples now run through PTY-driven scripted coverage instead of only static entrypoint checks.
+
+### 🧪 Tests
+
+- Added `typecheck:test` as a release gate.
+- Added full-repo example smoke coverage via `smoke:examples:all`.
+- Added regressions for framed pane `ViewOutput`, BCSS shell styling, runtime resize invalidation, worker runtime, and the native recorder.
+
+### 📝 Documentation
+
+- Rewrote the root architecture doc to reflect the five-package monorepo and actual package graph.
+- Added a dedicated migration guide for upgrading apps to `3.0.0`.
+- Updated the root and package READMEs with a truthful V3 story and release-facing examples.
+
 ## [2.1.0] - 2026-03-09
 
 ### ✨ Features
@@ -833,7 +871,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/flyingrobots/bijou/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/flyingrobots/bijou/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/flyingrobots/bijou/compare/v1.8.0...v2.0.0
 [1.8.0]: https://github.com/flyingrobots/bijou/compare/v1.7.0...v1.8.0
