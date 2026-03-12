@@ -2,7 +2,7 @@
 
 import { execSync, spawn, type ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..');
 
@@ -20,6 +20,11 @@ const EXAMPLES = execSync('find examples -maxdepth 2 -name main.ts | sort', {
   .filter(Boolean);
 
 const TARGETS = [...TOP_LEVEL, ...EXAMPLES];
+
+interface ScriptStep {
+  input: string;
+  delayMs?: number;
+}
 
 const PLAIN_INPUTS: Readonly<Record<string, string>> = {
   'demo.ts': '2\n',
@@ -43,6 +48,56 @@ const DEFAULT_INPUT = [
   '',
 ].join('\n').repeat(8);
 
+const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, readonly ScriptStep[]>> = {
+  'demo.ts': [
+    { input: '\x1b[B', delayMs: 250 },
+    { input: '\r', delayMs: 120 },
+  ],
+  'examples/select/main.ts': [
+    { input: '\x1b[B', delayMs: 250 },
+    { input: '\r', delayMs: 120 },
+  ],
+  'examples/multiselect/main.ts': [
+    { input: ' ', delayMs: 250 },
+    { input: '\x1b[B', delayMs: 120 },
+    { input: ' ', delayMs: 120 },
+    { input: '\r', delayMs: 120 },
+  ],
+  'examples/filter/main.ts': [
+    { input: '/', delayMs: 250 },
+    { input: 'r', delayMs: 80 },
+    { input: 'u', delayMs: 60 },
+    { input: 's', delayMs: 60 },
+    { input: 't', delayMs: 60 },
+    { input: '\r', delayMs: 120 },
+  ],
+  'examples/input/main.ts': [
+    { input: 'my-app\n', delayMs: 250 },
+    { input: 'A short description\n', delayMs: 250 },
+  ],
+  'examples/textarea/main.ts': [
+    { input: 'feat: smoke test', delayMs: 250 },
+    { input: '\x04', delayMs: 120 },
+  ],
+  'examples/confirm/main.ts': [
+    { input: 'y\n', delayMs: 250 },
+  ],
+  'examples/form-group/main.ts': [
+    { input: 'my-app\n', delayMs: 250 },
+    { input: '\r', delayMs: 250 },
+    { input: ' ', delayMs: 250 },
+    { input: '\x1b[B', delayMs: 120 },
+    { input: ' ', delayMs: 120 },
+    { input: '\r', delayMs: 120 },
+    { input: 'y\n', delayMs: 250 },
+  ],
+  'examples/wizard/main.ts': [
+    { input: '\r', delayMs: 250 },
+    { input: 'aws\n', delayMs: 250 },
+    { input: 'y\n', delayMs: 250 },
+  ],
+};
+
 const RAW_SURFACE_PATTERNS = [
   /cells:\s*\[/,
   /clear:\s*\[Function:/,
@@ -61,10 +116,16 @@ const ERROR_PATTERNS = [
 
 interface Result {
   path: string;
-  mode: 'pipe' | 'static-tty';
+  mode: 'pipe' | 'static-tty' | 'interactive-tty';
   status: 'ok' | 'error';
   reason?: string;
   output?: string;
+}
+
+interface Scenario {
+  path: string;
+  mode: Result['mode'];
+  steps?: readonly ScriptStep[];
 }
 
 function isTuiTarget(relativePath: string): boolean {
@@ -94,15 +155,18 @@ function detectGarbage(cleanOutput: string): string | null {
   return null;
 }
 
-async function runWithTimeout(relativePath: string, mode: Result['mode']): Promise<Result> {
+async function runScenarioWithTimeout(scenario: Scenario): Promise<Result> {
+  const { path: relativePath, mode } = scenario;
   const absPath = resolve(ROOT, relativePath);
   const command = mode === 'static-tty'
     ? createStaticTtyChild(absPath)
-    : createPipeChild(absPath, PLAIN_INPUTS[relativePath] ?? DEFAULT_INPUT);
+    : mode === 'interactive-tty'
+      ? createInteractiveTtyChild(absPath, scenario.steps ?? [])
+      : createPipeChild(absPath, PLAIN_INPUTS[relativePath] ?? DEFAULT_INPUT);
 
   return new Promise<Result>((resolveResult) => {
     const chunks: Buffer[] = [];
-    const timeoutMs = mode === 'static-tty' ? 8000 : 5000;
+    const timeoutMs = mode === 'static-tty' ? 8000 : mode === 'interactive-tty' ? 12000 : 5000;
     let settled = false;
 
     const finish = (status: Result['status'], reason?: string) => {
@@ -169,6 +233,9 @@ function createPipeChild(absPath: string, input: string): ChildProcess {
 }
 
 function createStaticTtyChild(absPath: string): ChildProcess {
+  const env = { ...process.env, CI: '1', TERM: 'xterm-256color' };
+  delete env['NO_COLOR'];
+  delete env['BIJOU_ACCESSIBLE'];
   return spawn(
     '/usr/bin/script',
     [
@@ -176,11 +243,38 @@ function createStaticTtyChild(absPath: string): ChildProcess {
       '/dev/null',
       'zsh',
       '-lc',
-      `CI=1 TERM=xterm-256color ${process.execPath} --import tsx ${shellQuote(absPath)}`,
+      `${process.execPath} --import tsx ${shellQuote(absPath)}`,
     ],
     {
       cwd: ROOT,
-      env: process.env,
+      env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  );
+}
+
+function createInteractiveTtyChild(absPath: string, steps: readonly ScriptStep[]): ChildProcess {
+  const spec = {
+    argv: [process.execPath, '--import', 'tsx', absPath],
+    cwd: ROOT,
+    env: {
+      TERM: 'xterm-256color',
+      CI: null,
+      NO_COLOR: null,
+      BIJOU_ACCESSIBLE: null,
+    },
+    steps,
+  };
+
+  return spawn(
+    'python3',
+    [resolve(ROOT, 'scripts/pty-driver.py')],
+    {
+      cwd: ROOT,
+      env: {
+        ...process.env,
+        BIJOU_PTY_SPEC: JSON.stringify(spec),
+      },
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
@@ -192,11 +286,22 @@ function shellQuote(value: string): string {
 
 execSync('npx tsc -b', { cwd: ROOT, stdio: 'ignore' });
 
+const scenarios: Scenario[] = [
+  ...TARGETS.map((path) => ({
+    path,
+    mode: isTuiTarget(path) ? 'static-tty' as const : 'pipe' as const,
+  })),
+  ...Object.entries(INTERACTIVE_FORM_SCRIPTS).map(([path, steps]) => ({
+    path,
+    mode: 'interactive-tty' as const,
+    steps,
+  })),
+];
+
 const failures: Result[] = [];
-for (const relativePath of TARGETS) {
-  const mode = isTuiTarget(relativePath) ? 'static-tty' : 'pipe';
-  process.stdout.write(`smoke ${relativePath} (${mode}) ... `);
-  const result = await runWithTimeout(relativePath, mode);
+for (const scenario of scenarios) {
+  process.stdout.write(`smoke ${scenario.path} (${scenario.mode}) ... `);
+  const result = await runScenarioWithTimeout(scenario);
   if (result.status === 'ok') {
     process.stdout.write('ok\n');
     continue;
