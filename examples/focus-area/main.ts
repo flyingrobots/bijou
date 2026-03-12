@@ -1,4 +1,4 @@
-import { initDefaultContext, getDefaultContext } from '@flyingrobots/bijou-node';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
@@ -9,8 +9,7 @@ import {
   focusAreaKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
-const ctx = getDefaultContext();
+const ctx = initDefaultContext();
 
 // Generate some content to scroll through
 const CONTENT = Array.from({ length: 60 }, (_, i) => {

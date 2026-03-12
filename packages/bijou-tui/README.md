@@ -10,8 +10,8 @@ The TUI package has been completely overhauled in v3.0.0 to operate as a true gr
 
 ### 🌟 What's New
 - **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
-- **Fractal TEA (Sub-Apps):** Use `mount()` and `mapCmds()` to nest fully independent Bijou apps inside a parent app. Say goodbye to monolithic, unmaintainable update functions.
-- **Bijou CSS (BCSS):** Style your terminal with a zero-dependency CSS engine. Supports classes, IDs, the `var()` token graph, and terminal-aware media queries (`@media (width < 80)`).
+- **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
+- **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
 - **Declarative Motion:** Wrap any component in `motion({ key: 'id' }, ...)` and watch it smoothly interpolate layout changes (move, resize) using physics-based springs.
 - **Unified Heartbeat:** All animations and physics calculations are now synchronized to a single `PulseMsg`, eliminating timer jitter and saving CPU.
 
@@ -410,6 +410,8 @@ Each overlay is a `{ content, row, col }` object. `composite()` splices them ont
 - pane focus and per-pane scroll isolation
 - frame help (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay factory with pane rects for panel-scoped drawers/modals
+
+Pane renderers may return a legacy string, a `Surface`, or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 

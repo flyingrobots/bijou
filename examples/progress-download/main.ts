@@ -1,8 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge, separator, spinnerFrame } from '@flyingrobots/bijou';
+import { progressBar, badge, separator, spinnerFrame, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Download {
   name: string;
@@ -74,7 +76,7 @@ const app: App<Model, Msg> = {
       const size = d.size.padStart(8);
 
       if (d.done) {
-        lines.push(`  ${badge('DONE', { variant: 'success' })} ${name} ${size}`);
+        lines.push(`  ${badgeText('DONE', 'success')} ${name} ${size}`);
       } else {
         const spinner = spinnerFrame(model.frame, { label: '' });
         lines.push(`  ${spinner} ${name} ${size}`);
@@ -91,7 +93,7 @@ const app: App<Model, Msg> = {
 
     if (allDone) {
       lines.push('');
-      lines.push(`  ${badge('SUCCESS', { variant: 'success' })} All packages installed.`);
+      lines.push(`  ${badgeText('SUCCESS', 'success')} All packages installed.`);
     }
 
     lines.push('');

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { auditStyle, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { KeyMsg } from './types.js';
 import {
   createFocusAreaState,
@@ -228,6 +228,32 @@ describe('focusArea', () => {
     // the styled() call was made — we verify the gutter is present)
     expect(focused).toContain('▎');
     expect(unfocused).toContain('▎');
+  });
+
+  it('applies BCSS text styles to the gutter', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    ctx.resolveBCSS = (identity) => {
+      if (identity.type === 'FocusArea' && identity.id === 'main') {
+        return {
+          color: '#ff00ff',
+          background: '#101010',
+          'font-weight': 'bold',
+          'text-decoration': 'underline',
+        };
+      }
+      return {};
+    };
+
+    const state = createFocusAreaState({ content: SHORT_CONTENT, width: 40, height: 5 });
+    focusArea(state, { focused: true, ctx, id: 'main' });
+
+    const styledGutter = style.calls.find((call) => call.method === 'styled' && call.text === '▎');
+    expect(styledGutter?.token).toMatchObject({
+      hex: '#ff00ff',
+      bg: '#101010',
+      modifiers: expect.arrayContaining(['bold', 'underline']),
+    });
   });
 
   it('defaults to focused=true', () => {

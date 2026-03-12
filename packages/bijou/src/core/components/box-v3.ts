@@ -2,6 +2,7 @@ import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
 import { type BoxOptions } from './box.js';
+import { applyBCSSCellTextStyles } from './bcss-style.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
@@ -43,19 +44,30 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
   const outerH = innerH + 2;
   
   const surface = createSurface(outerW, outerH);
+  const fillStyle = applyBCSSCellTextStyles({
+    fg: undefined,
+    bg: undefined,
+    modifiers: undefined,
+  }, bcss);
   surface.fill({
     char: options.fillChar || ' ',
-    bg: bcss['background'],
-    fg: bcss['color'],
+    bg: fillStyle.bg,
+    fg: fillStyle.fg,
+    modifiers: fillStyle.modifiers,
     empty: false,
   });
 
   const borderToken = options.borderToken || ctx?.border('primary');
+  const borderStyle = applyBCSSCellTextStyles({
+    fg: borderToken?.hex ?? '#ffffff',
+    bg: borderToken?.bg,
+    modifiers: borderToken?.modifiers as any,
+  }, bcss);
   const borderCell: Cell = { 
     char: ' ', 
-    fg: bcss['color'] ?? borderToken?.hex ?? '#ffffff',
-    bg: bcss['background'] ?? borderToken?.bg,
-    modifiers: borderToken?.modifiers as any,
+    fg: borderStyle.fg,
+    bg: borderStyle.bg,
+    modifiers: borderStyle.modifiers,
   };
 
   // Draw borders

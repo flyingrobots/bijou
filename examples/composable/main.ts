@@ -1,14 +1,16 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   box, headerBox, badge, alert, separator, kbd,
-  tabs, table, tree, progressBar, timeline,
+  tabs, table, tree, progressBar, timeline, surfaceToString,
 } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const TAB_ITEMS = [
   { label: 'Overview' },
@@ -29,9 +31,9 @@ function overviewTab(): string {
     headerBox('bijou', { detail: 'v0.2.0 — physics-powered TUI engine' }),
     '',
     '  ' + [
-      badge('TypeScript', { variant: 'info' }),
-      badge('MIT', { variant: 'muted' }),
-      badge('Zero Deps', { variant: 'success' }),
+      badgeText('TypeScript', 'info'),
+      badgeText('MIT', 'muted'),
+      badgeText('Zero Deps', 'success'),
     ].join(' '),
     '',
     alert('All tests passing — 42 tests in 3 suites', { variant: 'success' }),

@@ -1,8 +1,8 @@
 import { getDefaultContext, createSurface, surfaceToString } from '@flyingrobots/bijou';
 import type { WritePort, Surface } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
-import { isKeyMsg, isPulseMsg } from './types.js';
-import { enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
+import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
+import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
 import { createPipeline, type RenderState } from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
@@ -211,6 +211,14 @@ export async function run<Model, M>(
     // Track time delta from pulse
     if (isPulseMsg(msg)) {
       currentDt = msg.dt;
+    }
+
+    if (isResizeMsg(msg)) {
+      currentSurface = createSurface(
+        sanitizeDimension(msg.columns),
+        sanitizeDimension(msg.rows),
+      );
+      clearAndHome(ctx.io);
     }
 
     // Double Ctrl+C force-quit

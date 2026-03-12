@@ -3,6 +3,7 @@ import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
 import type { BijouNodeOptions } from './types.js';
+import { applyBCSSCellTextStyles } from './bcss-style.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -46,9 +47,11 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
 
   const cell: Cell = {
     char: ' ',
-    fg: bcss['color'] ?? baseToken.hex,
-    bg: bcss['background'] ?? undefined,
-    modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+    ...applyBCSSCellTextStyles({
+      fg: baseToken.hex,
+      bg: undefined,
+      modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+    }, bcss),
     empty: false
   };
 

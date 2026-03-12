@@ -250,5 +250,25 @@ describe('run', () => {
 
       expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
     });
+
+    it('forces a clean redraw when the terminal resizes', async () => {
+      vi.useFakeTimers();
+
+      const ctx = createTestContext({ mode: 'interactive' });
+      ctx.io.rawInput = (onKey) => {
+        const id = globalThis.setTimeout(() => onKey('q'), 30);
+        return { dispose() { clearTimeout(id); } };
+      };
+      ctx.io.onResize = (onResize) => {
+        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
+        return { dispose() { clearTimeout(id); } };
+      };
+
+      const promise = run(counterApp(), { ctx });
+      await vi.advanceTimersByTimeAsync(80);
+      await promise;
+
+      expect(ctx.io.written.some((chunk) => chunk === CLEAR_SCREEN + HOME)).toBe(true);
+    });
   });
 });

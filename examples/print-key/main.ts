@@ -1,8 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge } from '@flyingrobots/bijou';
+import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface KeyEntry {
   key: string;
@@ -47,9 +49,9 @@ const app: App<Model, Msg> = {
     } else {
       for (const entry of model.history) {
         const mods: string[] = [];
-        if (entry.ctrl) mods.push(badge('CTRL', { variant: 'warning' }));
-        if (entry.alt) mods.push(badge('ALT', { variant: 'info' }));
-        if (entry.shift) mods.push(badge('SHIFT', { variant: 'accent' }));
+        if (entry.ctrl) mods.push(badgeText('CTRL', 'warning'));
+        if (entry.alt) mods.push(badgeText('ALT', 'info'));
+        if (entry.shift) mods.push(badgeText('SHIFT', 'accent'));
 
         const modStr = mods.length > 0 ? mods.join(' ') + ' ' : '';
         lines.push(`  ${modStr}${kbd(entry.key)}`);

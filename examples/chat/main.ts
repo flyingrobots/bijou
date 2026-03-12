@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator, kbd } from '@flyingrobots/bijou';
+import { badge, separator, kbd, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Message {
   sender: string;
@@ -33,8 +35,9 @@ const INITIAL_MESSAGES: Message[] = [
 ];
 
 function renderMessages(messages: Message[], width: number): string {
+  void width;
   return messages.map(m => {
-    const tag = badge(m.sender, { variant: m.variant });
+    const tag = badgeText(m.sender, m.variant);
     return `${tag} ${m.text}`;
   }).join('\n\n');
 }

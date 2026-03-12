@@ -1,7 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { filter, badge } from '@flyingrobots/bijou';
+import { filter, badge, surfaceToString } from '@flyingrobots/bijou';
 
 const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 async function main() {
   const language = await filter({
@@ -21,7 +23,7 @@ async function main() {
   });
 
   console.log();
-  console.log('Selected:', badge(language.toUpperCase(), { variant: 'primary', ctx }));
+  console.log('Selected:', badgeText(language.toUpperCase(), 'primary'));
 }
 
 main().catch(console.error);

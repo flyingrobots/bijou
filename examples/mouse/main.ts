@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, kbd } from '@flyingrobots/bijou';
+import { box, badge, kbd, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isMouseMsg,
   type App, type MouseMsg,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   events: MouseMsg[];
@@ -46,9 +48,9 @@ const app: App<Model, Msg> = {
     } else {
       for (const e of model.events) {
         const mods: string[] = [];
-        if (e.ctrl) mods.push(badge('CTRL', { variant: 'warning' }));
-        if (e.alt) mods.push(badge('ALT', { variant: 'info' }));
-        if (e.shift) mods.push(badge('SHIFT', { variant: 'accent' }));
+        if (e.ctrl) mods.push(badgeText('CTRL', 'warning'));
+        if (e.alt) mods.push(badgeText('ALT', 'info'));
+        if (e.shift) mods.push(badgeText('SHIFT', 'accent'));
         const modStr = mods.length > 0 ? mods.join(' ') + ' ' : '';
         lines.push(`  ${modStr}${e.action} ${e.button} (${e.col}, ${e.row})`);
       }

@@ -1,5 +1,5 @@
 import type { BijouContext } from '@flyingrobots/bijou';
-import { badge, box, kbd, markdown } from '@flyingrobots/bijou';
+import { badge, box, kbd, markdown, surfaceToString } from '@flyingrobots/bijou';
 import {
   animate,
   createBrowsableListState,
@@ -29,6 +29,10 @@ import { triModePreview } from './tri-mode.js';
 // Detail pane rendering
 // ---------------------------------------------------------------------------
 
+function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
+  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+}
+
 function renderDetail(
   componentId: string | undefined,
   width: number,
@@ -52,11 +56,11 @@ function renderDetail(
 
   // Tier + package badge
   const tierBadge = entry.tier === 1
-    ? badge('static', { variant: 'success', ctx })
+    ? badgeText('static', 'success', ctx)
     : entry.tier === 2
-      ? badge('embeddable', { variant: 'info', ctx })
-      : badge('standalone', { variant: 'warning', ctx });
-  sections.push(`  ${tierBadge} ${badge(entry.pkg, { variant: 'muted', ctx })}`);
+      ? badgeText('embeddable', 'info', ctx)
+      : badgeText('standalone', 'warning', ctx);
+  sections.push(`  ${tierBadge} ${badgeText(entry.pkg, 'muted', ctx)}`);
   sections.push('');
 
   // Tri-mode preview

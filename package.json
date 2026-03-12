@@ -13,6 +13,7 @@
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
     "smoke:examples": "tsx scripts/smoke-v3-examples.ts",
+    "smoke:examples:all": "tsx scripts/smoke-all-examples.ts",
     "lint": "npm run lint --workspaces",
     "version": "bash scripts/version.sh"
   },

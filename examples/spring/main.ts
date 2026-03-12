@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, kbd } from '@flyingrobots/bijou';
+import { badge, kbd, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
   animate, vstack, SPRING_PRESETS,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const PRESETS = ['gentle', 'default', 'wobbly', 'stiff'] as const;
 const WIDTH = 50;
@@ -70,7 +72,7 @@ const app: App<Model, Msg> = {
       const pos = Math.round(model.positions[preset] ?? 0);
       const bar = ' '.repeat(Math.max(0, pos)) + '\u2588';
       const label = preset.padEnd(9);
-      lines.push(`  ${badge(label, { variant: 'primary' })} ${bar}`);
+      lines.push(`  ${badgeText(label, 'primary')} ${bar}`);
     }
 
     lines.push('');

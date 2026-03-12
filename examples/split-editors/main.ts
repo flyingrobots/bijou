@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge } from '@flyingrobots/bijou';
+import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, pageDown, pageUp, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const LEFT_CONTENT = `// app.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
@@ -137,8 +139,8 @@ const app: App<Model, Msg> = {
     const paneWidth = Math.floor((model.cols - 3) / 2);
     const vpHeight = model.rows - 4;
 
-    const leftLabel = model.focusLeft ? badge('app.ts', { variant: 'primary' }) : 'app.ts';
-    const rightLabel = !model.focusLeft ? badge('app.test.ts', { variant: 'primary' }) : 'app.test.ts';
+    const leftLabel = model.focusLeft ? badgeText('app.ts', 'primary') : 'app.ts';
+    const rightLabel = !model.focusLeft ? badgeText('app.test.ts', 'primary') : 'app.test.ts';
 
     return flex(
       { direction: 'column', width: model.cols, height: model.rows },

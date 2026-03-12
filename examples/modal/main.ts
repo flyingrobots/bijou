@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge } from '@flyingrobots/bijou';
+import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App, type KeyMsg,
   createKeyMap, createInputStack, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   items: string[];
@@ -121,7 +123,7 @@ const app: App<Model, Msg> = {
     if (model.modal === 'confirm') {
       const item = model.items[model.deleteTarget] ?? '';
       const confirmContent = [
-        `Delete ${badge(item, { variant: 'warning' })}?`,
+        `Delete ${badgeText(item, 'warning')}?`,
         '',
         `${kbd('y')} yes  ${kbd('n')} no`,
       ].join('\n');

@@ -46,7 +46,7 @@ import {
   findPaneNode,
   frameBodyRect,
 } from './app-frame-utils.js';
-import { renderFrameNode } from './app-frame-render.js';
+import { framePaneOutputToString, renderFrameNode } from './app-frame-render.js';
 
 /** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette, help toggle, transitions). */
 export function applyFrameAction<PageModel, Msg>(
@@ -214,7 +214,11 @@ export function scrollFocusedPane<PageModel, Msg>(
   const paneNode = findPaneNode(layoutTree, focusedPaneId);
   if (paneNode == null) return model;
 
-  const content = paneNode.render(paneRect.width, paneRect.height);
+  const content = framePaneOutputToString(
+    paneNode.render(paneRect.width, paneRect.height),
+    paneRect.width,
+    paneRect.height,
+  );
   let state = createFocusAreaState({
     content,
     width: paneRect.width,

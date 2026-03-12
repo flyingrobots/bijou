@@ -30,6 +30,7 @@ import type { SerializedLayoutState } from './layout-preset.js';
 import { restoreLayoutState } from './layout-preset.js';
 import type { OverflowX } from './focus-area.js';
 import type { Timeline, TimelineState } from './timeline.js';
+import type { ViewOutput } from './view-output.js';
 
 // Internal modules
 import type {
@@ -100,7 +101,8 @@ export type FrameLayoutNode =
   | {
     readonly kind: 'pane';
     readonly paneId: string;
-    readonly render: (width: number, height: number) => string;
+    /** Pane content may be a legacy string, a Surface, or a LayoutNode. */
+    readonly render: (width: number, height: number) => ViewOutput;
     readonly overflowX?: OverflowX;
   }
   | {

@@ -1,11 +1,13 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, separator, kbd, tree } from '@flyingrobots/bijou';
+import { box, badge, separator, kbd, tree, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, vstack,
 } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const ctx = initDefaultContext();
+const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
+  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   cols: number;
@@ -42,7 +44,7 @@ const app: App<Model, Msg> = {
       { direction: 'column', width: model.cols, height: model.rows },
       // Header
       { basis: 3, content: (w) => {
-        const header = `  ${badge('bijou', { variant: 'primary' })}  Dashboard  ${badge(`${model.cols}×${model.rows}`, { variant: 'muted' })}`;
+        const header = `  ${badgeText('bijou', 'primary')}  Dashboard  ${badgeText(`${model.cols}×${model.rows}`, 'muted')}`;
         return vstack(separator({ width: w }), header, separator({ width: w }));
       }},
       // Body: sidebar + main
