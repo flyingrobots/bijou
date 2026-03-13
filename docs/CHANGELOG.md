@@ -13,6 +13,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Release dry-run peer pin validation** — the dry-run metadata gate now checks internal `peerDependencies` as well, so it matches the lock-step validation performed by the real publish workflow.
 - **Packed scaffold bin test stability** — the packed `create-bijou-tui-app` bin-shim test now disables npm audit/fund/script overhead and uses explicit subprocess timeouts so it stays reliable under full-suite load.
 - **Shared release validation script** — publish and dry-run workflows now use one repo script for tag parsing, lock-step package version checks, and internal dependency pin validation, with a matching local `npm run release:preflight` command.
+- **Release preflight metadata and semver validation** — local `npm run release:preflight` now emits the derived `version` / `notes_tag` metadata, and the shared release parser rejects leading-zero semver identifiers before npm can reject them later.
+- **Packed scaffolder CLI execution path** — packaged `create-bijou-tui-app` verification now asserts the installed npm bin shim exists while invoking the packed CLI entry through `node`, which avoids macOS shebang hangs without dropping tarball-level coverage.
 
 ## [3.0.0] - 2026-03-12
 
