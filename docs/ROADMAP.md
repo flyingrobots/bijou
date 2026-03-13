@@ -78,13 +78,16 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Generate a fresh app in CI, install dependencies, build it, and smoke-run it once so the scaffolder is validated as a first-class published artifact. |
-| **PR Review Tooling** | repo tooling | Add local scripts to summarize unresolved threads, checks, and bot status, plus batch reply/resolve addressed review threads. |
-| **Release Dry-Run Workflow** | repo tooling | Add a workflow-dispatch release rehearsal that exercises the publish matrix and release notes flow without touching registries. |
-| **Python Script Artifact Hygiene** | repo tooling | Suppress or ignore generated Python bytecode artifacts so PTY/script tests do not leave `__pycache__` noise in the worktree. |
+| **PR Review Tooling** | repo tooling | `pr:review-status` shipped. Backlog now covers shared GitHub adapter helpers plus batch reply/resolve workflows for addressed threads. |
+| **Release Dry-Run Workflow** | repo tooling | `workflow_dispatch` dry-run shipped. Backlog now covers sharing release validation logic with the real publish workflow and adding a local shell-block preflight path. |
+| **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Backlog now covers keeping the PTY helper self-contained and low-noise. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
 | **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
 | **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
 | **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
+| **Shared Release Validation Script** | repo tooling | Extract workspace version and internal dependency validation into a reusable repo script so `publish.yml` and `release-dry-run.yml` cannot drift. |
+| **Workflow Shell Preflight** | repo tooling | Add a lightweight local command that validates workflow shell blocks and release-policy snippets outside GitHub Actions. |
+| **Packed Scaffold CLI Test Optimization** | create-bijou-tui-app | Keep the packed bin-shim integration test truthful, but continue reducing install/pack overhead so it stays cheap in the full suite. |
 
 ### P3 — Nice to have
 

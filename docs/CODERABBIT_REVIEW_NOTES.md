@@ -26,3 +26,6 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Add a scaffold canary CI script that generates a fresh `create-bijou-tui-app` project, installs deps, builds it, and smoke-runs it once.
 - Add a release dry-run workflow or helper script that exercises the publish matrix and release-note generation without publishing to registries.
 - Add a small benchmark harness for diff rendering, layout solves, recorder throughput, and worker round-trips so perf regressions have a repeatable signal.
+- Extract shared release version/dependency validation into one repo script so dry-run and publish workflows enforce the same lock-step policy.
+- Add a local preflight command for workflow shell blocks so release-policy bash logic can be validated without waiting on GitHub Actions.
+- Keep optimizing the packed `create-bijou-tui-app` bin-shim integration test so published-artifact coverage stays fast enough for the full suite.
