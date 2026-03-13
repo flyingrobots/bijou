@@ -46,7 +46,7 @@ jobs:
           for pkg in packages/*/package.json; do
             node -e "
               const p = require('./$pkg');
-              for (const depType of ['dependencies', 'devDependencies']) {
+              for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
                 if (!p[depType]) continue;
                 for (const [name, ver] of Object.entries(p[depType])) {
                   if (name.startsWith('@flyingrobots/bijou') && ver !== '$VERSION') {
