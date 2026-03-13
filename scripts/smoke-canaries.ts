@@ -128,21 +128,17 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
   runSimpleNpmLifecycle(
     'install packed scaffold CLI',
     ROOT,
-    ['install', '--prefix', cliRunnerDir, '--no-package-lock', '--no-save', cliTarball],
+    ['install', '--prefix', cliRunnerDir, '--no-package-lock', '--no-save', '--no-audit', '--fund=false', cliTarball],
   );
   const cliBin = resolve(cliRunnerDir, 'node_modules/.bin/create-bijou-tui-app');
   if (!existsSync(cliBin)) {
     throw new Error(`installed create-bijou-tui-app tarball did not produce a bin shim at ${cliBin}`);
   }
-  const cliEntryPath = resolve(cliRunnerDir, 'node_modules/create-bijou-tui-app/dist/cli.js');
-  if (!existsSync(cliEntryPath)) {
-    throw new Error(`installed create-bijou-tui-app tarball did not include a CLI entry at ${cliEntryPath}`);
-  }
   process.stdout.write('generate TUI canary ... ');
   runCommand(
     'generate TUI canary',
-    process.execPath,
-    [cliEntryPath, targetDir, '--no-install'],
+    'npm',
+    ['exec', '--prefix', cliRunnerDir, '--', 'create-bijou-tui-app', targetDir, '--no-install'],
     { cwd: ROOT },
     { quietSuccess: true },
   );
@@ -153,7 +149,7 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
   runSimpleNpmLifecycle(
     'install TUI canary',
     targetDir,
-    ['install', '--no-fund', '--no-audit', '--ignore-scripts'],
+    ['install', '--no-fund', '--no-audit'],
     300000,
   );
   runSimpleNpmLifecycle('build TUI canary', targetDir, ['run', 'build']);
@@ -209,7 +205,7 @@ function runCoreStaticCanary(tempRoot: string, tarballSpecs: Readonly<Record<str
   runSimpleNpmLifecycle(
     'install core/static canary',
     targetDir,
-    ['install', '--no-fund', '--no-audit', '--ignore-scripts'],
+    ['install', '--no-fund', '--no-audit'],
     300000,
   );
   runSimpleNpmLifecycle('build core/static canary', targetDir, ['run', 'build']);
