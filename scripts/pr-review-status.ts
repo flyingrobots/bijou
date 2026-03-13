@@ -23,7 +23,7 @@ interface CheckEntry {
 }
 
 interface ReviewThreadComment {
-  readonly author: { readonly login: string };
+  readonly author?: { readonly login: string } | null;
   readonly body: string;
   readonly path?: string | null;
   readonly url: string;
@@ -50,6 +50,7 @@ export interface CheckSummary {
   readonly counts: Readonly<Record<string, number>>;
   readonly failing: readonly CheckEntry[];
   readonly pending: readonly CheckEntry[];
+  readonly canceled: readonly CheckEntry[];
   readonly codeRabbit: CheckEntry | null;
 }
 
@@ -82,6 +83,7 @@ export function summarizeChecks(checks: readonly CheckEntry[]): CheckSummary {
     counts,
     failing: checks.filter((check) => check.bucket === 'fail'),
     pending: checks.filter((check) => check.bucket === 'pending'),
+    canceled: checks.filter((check) => check.bucket === 'cancel'),
     codeRabbit: checks.find((check) => check.name === 'CodeRabbit') ?? null,
   };
 }
@@ -92,7 +94,7 @@ export function extractUnresolvedFindings(threads: readonly ReviewThreadNode[]):
     .map((thread) => thread.comments.nodes[0])
     .filter((comment): comment is ReviewThreadComment => comment != null)
     .map((comment) => ({
-      author: comment.author.login,
+      author: comment.author?.login ?? '(unknown)',
       path: comment.path ?? '(no file)',
       url: comment.url,
       summary: summarizeComment(comment.body),
@@ -100,7 +102,7 @@ export function extractUnresolvedFindings(threads: readonly ReviewThreadNode[]):
 }
 
 export function computeExitCode(summary: CheckSummary, unresolvedCount: number): number {
-  if (summary.failing.length > 0 || unresolvedCount > 0) {
+  if (summary.failing.length > 0 || summary.canceled.length > 0 || unresolvedCount > 0) {
     return 1;
   }
 
@@ -145,6 +147,13 @@ function main(): void {
   if (summary.failing.length > 0) {
     process.stdout.write('\nFailing checks:\n');
     for (const check of summary.failing) {
+      process.stdout.write(`- ${check.name} (${check.state})${check.link ? ` ${check.link}` : ''}\n`);
+    }
+  }
+
+  if (summary.canceled.length > 0) {
+    process.stdout.write('\nCanceled checks:\n');
+    for (const check of summary.canceled) {
       process.stdout.write(`- ${check.name} (${check.state})${check.link ? ` ${check.link}` : ''}\n`);
     }
   }
