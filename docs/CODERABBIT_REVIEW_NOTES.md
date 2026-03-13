@@ -16,16 +16,14 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
   Proposed improvement: keep the policy of fixing all severities, but auto-group by subsystem to batch test runs efficiently.
 
 ## Backlog Candidates
-- Build `scripts/pr-review-status.sh` to print: PR number, unresolved thread count, open high-severity findings, check status, and CodeRabbit cooldown (if any).
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
 - Build `scripts/pr-review-reply.ts` to apply structured reply templates and resolve addressed threads in one pass.
-- Suppress or ignore generated Python bytecode artifacts for `scripts/pty-driver.py` so PTY test runs do not dirty the worktree with `scripts/__pycache__/`.
 - Add unit coverage for `scripts/smoke-all-examples.ts` path/root resolution and launcher selection so portability fixes are locked in before full smoke runs.
 - Add one more PTY lifecycle regression focused on resize/exit ordering and other late-step shutdown races.
-- Add a scaffold canary CI script that generates a fresh `create-bijou-tui-app` project, installs deps, builds it, and smoke-runs it once.
-- Add a release dry-run workflow or helper script that exercises the publish matrix and release-note generation without publishing to registries.
 - Add a small benchmark harness for diff rendering, layout solves, recorder throughput, and worker round-trips so perf regressions have a repeatable signal.
-- Extract shared release version/dependency validation into one repo script so dry-run and publish workflows enforce the same lock-step policy.
 - Add a local preflight command for workflow shell blocks so release-policy bash logic can be validated without waiting on GitHub Actions.
 - Keep optimizing the packed `create-bijou-tui-app` bin-shim integration test so published-artifact coverage stays fast enough for the full suite.
+- Teach `scripts/pr-review-status.ts` to down-rank stale historical CodeRabbit rate-limit comments when a newer `CodeRabbit` check is green.
+- Add a merge-readiness summary command that combines checks, unresolved threads, review-count gating, and latest bot status in one output.
+- Consider extracting a small shared GitHub API adapter/helper layer so repo tooling scripts stop duplicating GraphQL/REST shapes and nullability handling.

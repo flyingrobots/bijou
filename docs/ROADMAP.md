@@ -77,17 +77,18 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Syntax-Aware `textarea`** | bijou | Light-weight syntax highlighting for JSON, YAML, and Markdown within the editor. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
-| **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Generate a fresh app in CI, install dependencies, build it, and smoke-run it once so the scaffolder is validated as a first-class published artifact. |
-| **PR Review Tooling** | repo tooling | `pr:review-status` shipped. Backlog now covers shared GitHub adapter helpers plus batch reply/resolve workflows for addressed threads. |
-| **Release Dry-Run Workflow** | repo tooling | `workflow_dispatch` dry-run shipped. Backlog now covers sharing release validation logic with the real publish workflow and adding a local shell-block preflight path. |
+| **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | The generated TUI canary and internal core/static canary shipped. Backlog now covers keeping the scenario coverage broad and the install/build path efficient without weakening published-artifact fidelity. |
+| **PR Review Tooling** | repo tooling | `pr:review-status` shipped. Backlog now covers stale-CodeRabbit filtering, merge-readiness summaries, shared GitHub adapter helpers, and batch reply/resolve workflows for addressed threads. |
+| **Release Dry-Run Workflow** | repo tooling | `workflow_dispatch` dry-run and shared release validation shipped. Backlog now covers a local shell-block preflight path plus any remaining release-policy helper cleanup. |
 | **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Backlog now covers keeping the PTY helper self-contained and low-noise. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
 | **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
 | **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
 | **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
-| **Shared Release Validation Script** | repo tooling | Extract workspace version and internal dependency validation into a reusable repo script so `publish.yml` and `release-dry-run.yml` cannot drift. |
+| ~~**Shared Release Validation Script**~~ | ~~repo tooling~~ | ~~Shipped post-v3. `scripts/release-metadata.ts` now validates workspace versions and internal dependency pins for both `publish.yml` and `release-dry-run.yml`.~~ |
 | **Workflow Shell Preflight** | repo tooling | Add a lightweight local command that validates workflow shell blocks and release-policy snippets outside GitHub Actions. |
 | **Packed Scaffold CLI Test Optimization** | create-bijou-tui-app | Keep the packed bin-shim integration test truthful, but continue reducing install/pack overhead so it stays cheap in the full suite. |
+| **Merge-Readiness Summary** | repo tooling | Add one command that combines checks, unresolved threads, review-count gating, and latest bot status so PR triage stops depending on manual cross-checks. |
 
 ### P3 — Nice to have
 
