@@ -9,6 +9,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🐛 Fixes
 
 - **Scaffold canary PTY shutdown race** — the PTY driver now treats queued late input/resize steps as no-ops once the child exits, preventing traceback noise from masking the actual canary failure.
+- **PR status helper edge cases** — canceled checks now fail the review-status exit code, nullable review authors fall back safely, and the release dry-run workflow labels its lint step accurately.
 
 ## [3.0.0] - 2026-03-12
 
