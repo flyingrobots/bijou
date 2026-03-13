@@ -260,6 +260,7 @@ function runPtyScenario(cwd: string, steps: readonly PtyStep[]): string {
       cwd: ROOT,
       env: {
         BIJOU_PTY_SPEC: JSON.stringify(spec),
+        PYTHONDONTWRITEBYTECODE: '1',
       },
       timeoutMs: 20000,
     },

@@ -144,7 +144,9 @@ describe('create-bijou-tui-app cli', () => {
         cwd: PACKAGE_ROOT,
         encoding: 'utf8',
         maxBuffer: 8 * 1024 * 1024,
+        timeout: 90_000,
       });
+      expect(packed.error).toBeUndefined();
       expect(packed.status).toBe(0);
       const arrayStart = packed.stdout.indexOf('[');
       const arrayEnd = packed.stdout.lastIndexOf(']');
@@ -155,13 +157,24 @@ describe('create-bijou-tui-app cli', () => {
 
       const installed = spawnSync(
         'npm',
-        ['install', '--prefix', runnerDir, '--no-package-lock', '--no-save', `file:${tarball}`],
+        [
+          'install',
+          '--prefix', runnerDir,
+          '--no-package-lock',
+          '--no-save',
+          '--no-audit',
+          '--fund=false',
+          '--ignore-scripts',
+          `file:${tarball}`,
+        ],
         {
           cwd: PACKAGE_ROOT,
           encoding: 'utf8',
           maxBuffer: 8 * 1024 * 1024,
+          timeout: 90_000,
         },
       );
+      expect(installed.error).toBeUndefined();
       expect(installed.status).toBe(0);
 
       const binPath = join(runnerDir, 'node_modules', '.bin', 'create-bijou-tui-app');
@@ -171,12 +184,14 @@ describe('create-bijou-tui-app cli', () => {
         cwd: root,
         encoding: 'utf8',
         maxBuffer: 8 * 1024 * 1024,
+        timeout: 30_000,
       });
+      expect(result.error).toBeUndefined();
       expect(result.status).toBe(0);
       expect(result.stdout).toContain('Created project in');
       expect(existsSync(join(targetDir, 'package.json'))).toBe(true);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
-  }, 60000);
+  }, 180000);
 });
