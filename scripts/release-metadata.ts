@@ -57,8 +57,6 @@ const TAG_PATTERN = new RegExp(
   `^v(?<version>${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT})(?:-(?<channel>rc|beta|alpha)\\.(?<serial>${SEMVER_INT}))?$`,
 );
 const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies'];
-const PACKAGE_ROOT_RELATIVE = 'packages/bijou/package.json';
-
 function readJsonFile<T>(filepath: string): T {
   return JSON.parse(readFileSync(filepath, 'utf8')) as T;
 }
@@ -127,8 +125,13 @@ export function readWorkspacePackages(root: string): readonly WorkspacePackage[]
 }
 
 export function readCurrentWorkspaceVersion(root: string): string {
-  const manifestPath = join(root, PACKAGE_ROOT_RELATIVE);
-  return readJsonFile<PackageManifest>(manifestPath).version;
+  const packages = readWorkspacePackages(root);
+  const firstPackage = packages[0];
+  if (firstPackage == null) {
+    throw new Error('Workspace configuration did not resolve any package.json files');
+  }
+
+  return validateReleaseVersion(firstPackage.manifest.version);
 }
 
 export function parseReleaseTag(tag: string): ReleaseMetadata {

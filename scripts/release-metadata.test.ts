@@ -277,6 +277,37 @@ describe('runReleaseMetadata', () => {
     expect(stdout.join('')).toContain('notes_tag=dry-run-v3.0.0-local');
   });
 
+  it('derives --current-version from discovered workspace packages instead of packages/bijou', () => {
+    const root = makeWorkspace(
+      [
+        { dir: 'core', name: '@flyingrobots/bijou', version: '3.0.0' },
+        {
+          dir: 'node',
+          name: '@flyingrobots/bijou-node',
+          version: '3.0.0',
+          dependencies: { '@flyingrobots/bijou': '3.0.0' },
+        },
+      ],
+      {
+        workspaceRoot: 'fixtures',
+        workspacePatterns: ['fixtures/*'],
+      },
+    );
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+
+    const code = runReleaseMetadata(['--current-version'], {
+      cwd: root,
+      stdout: (text) => stdout.push(text),
+      stderr: (text) => stderr.push(text),
+    });
+
+    expect(code).toBe(0);
+    expect(stderr).toEqual([]);
+    expect(stdout.join('')).toContain('@flyingrobots/bijou: 3.0.0 (release: 3.0.0)');
+    expect(stdout.join('')).toContain('version=3.0.0');
+  });
+
   it('fails on workspace mismatches', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
