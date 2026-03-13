@@ -3,8 +3,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  formatReleaseOutputs,
   parseReleaseTag,
   runReleaseMetadata,
+  validateReleaseVersion,
   validateWorkspaceVersion,
   writeGithubOutput,
 } from './release-metadata.js';
@@ -91,6 +93,23 @@ describe('parseReleaseTag', () => {
 
   it('rejects invalid tags', () => {
     expect(() => parseReleaseTag('release-3.0.0')).toThrow('Invalid tag format');
+  });
+
+  it('rejects tags with leading-zero numeric identifiers', () => {
+    expect(() => parseReleaseTag('v01.2.3')).toThrow('Invalid tag format');
+    expect(() => parseReleaseTag('v3.1.0-rc.01')).toThrow('Invalid tag format');
+  });
+});
+
+describe('validateReleaseVersion', () => {
+  it('accepts valid release versions', () => {
+    expect(validateReleaseVersion('3.0.0')).toBe('3.0.0');
+    expect(validateReleaseVersion('3.1.0-beta.2')).toBe('3.1.0-beta.2');
+  });
+
+  it('rejects leading-zero numeric identifiers', () => {
+    expect(() => validateReleaseVersion('01.2.3')).toThrow('Invalid release version');
+    expect(() => validateReleaseVersion('3.1.0-rc.01')).toThrow('Invalid release version');
   });
 });
 
@@ -232,6 +251,32 @@ describe('runReleaseMetadata', () => {
     expect(readFileSync(outputPath, 'utf8')).toContain('npm_dist_tag=next');
   });
 
+  it('prints derived outputs locally when no GitHub output file is provided', () => {
+    const root = makeWorkspace([
+      { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
+      {
+        dir: 'bijou-tui',
+        name: '@flyingrobots/bijou-tui',
+        version: '3.0.0',
+        dependencies: { '@flyingrobots/bijou': '3.0.0' },
+      },
+    ]);
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+
+    const code = runReleaseMetadata(['--current-version', '--notes-tag-run-id', 'local'], {
+      cwd: root,
+      stdout: (text) => stdout.push(text),
+      stderr: (text) => stderr.push(text),
+    });
+
+    expect(code).toBe(0);
+    expect(stderr).toEqual([]);
+    expect(stdout.join('')).toContain('@flyingrobots/bijou: 3.0.0 (release: 3.0.0)');
+    expect(stdout.join('')).toContain('version=3.0.0');
+    expect(stdout.join('')).toContain('notes_tag=dry-run-v3.0.0-local');
+  });
+
   it('fails on workspace mismatches', () => {
     const root = makeWorkspace([
       { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
@@ -254,6 +299,12 @@ describe('runReleaseMetadata', () => {
 });
 
 describe('writeGithubOutput', () => {
+  it('formats key value pairs as environment-file lines', () => {
+    expect(formatReleaseOutputs({ version: '3.0.0', notes_tag: 'dry-run-v3.0.0-local' })).toBe(
+      'version=3.0.0\nnotes_tag=dry-run-v3.0.0-local\n',
+    );
+  });
+
   it('appends key value pairs as environment-file lines', () => {
     const root = makeWorkspace([{ dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' }]);
     const outputPath = join(root, 'github-output.txt');

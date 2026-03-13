@@ -49,8 +49,13 @@ interface RootWorkspaceManifest {
   readonly workspaces?: readonly string[] | { readonly packages?: readonly string[] };
 }
 
-const VERSION_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)\.[0-9]+)?$/;
-const TAG_PATTERN = /^v(?<version>[0-9]+\.[0-9]+\.[0-9]+)(?:-(?<channel>rc|beta|alpha)\.(?<serial>[0-9]+))?$/;
+const SEMVER_INT = '(?:0|[1-9][0-9]*)';
+const VERSION_PATTERN = new RegExp(
+  `^${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT}(?:-(rc|beta|alpha)\\.${SEMVER_INT})?$`,
+);
+const TAG_PATTERN = new RegExp(
+  `^v(?<version>${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT})(?:-(?<channel>rc|beta|alpha)\\.(?<serial>${SEMVER_INT}))?$`,
+);
 const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies'];
 const PACKAGE_ROOT_RELATIVE = 'packages/bijou/package.json';
 
@@ -203,6 +208,12 @@ export function writeGithubOutput(filepath: string, outputs: ReleaseCommandOutpu
   appendFileSync(filepath, `${lines.join('\n')}\n`, 'utf8');
 }
 
+export function formatReleaseOutputs(outputs: ReleaseCommandOutputs): string {
+  return `${Object.entries(outputs)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')}\n`;
+}
+
 function printPackageSummary(
   packages: readonly WorkspacePackage[],
   expectedVersion: string,
@@ -287,6 +298,8 @@ export function runReleaseMetadata(argv: readonly string[], io: ReleaseCommandIO
 
     if (githubOutput) {
       writeGithubOutput(githubOutput, outputs);
+    } else {
+      stdout(formatReleaseOutputs(outputs));
     }
 
     return 0;
