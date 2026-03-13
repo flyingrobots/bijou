@@ -11,6 +11,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Scaffold canary PTY shutdown race** — the PTY driver now treats queued late input/resize steps as no-ops once the child exits, preventing traceback noise from masking the actual canary failure.
 - **PR status helper edge cases** — canceled checks now fail the review-status exit code, nullable review authors fall back safely, and the release dry-run workflow labels its lint step accurately.
 - **Release dry-run peer pin validation** — the dry-run metadata gate now checks internal `peerDependencies` as well, so it matches the lock-step validation performed by the real publish workflow.
+- **Packed scaffold bin test stability** — the packed `create-bijou-tui-app` bin-shim test now disables npm audit/fund/script overhead and uses explicit subprocess timeouts so it stays reliable under full-suite load.
 
 ## [3.0.0] - 2026-03-12
 
