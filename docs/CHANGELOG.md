@@ -12,6 +12,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **PR status helper edge cases** — canceled checks now fail the review-status exit code, nullable review authors fall back safely, and the release dry-run workflow labels its lint step accurately.
 - **Release dry-run peer pin validation** — the dry-run metadata gate now checks internal `peerDependencies` as well, so it matches the lock-step validation performed by the real publish workflow.
 - **Packed scaffold bin test stability** — the packed `create-bijou-tui-app` bin-shim test now disables npm audit/fund/script overhead and uses explicit subprocess timeouts so it stays reliable under full-suite load.
+- **Shared release validation script** — publish and dry-run workflows now use one repo script for tag parsing, lock-step package version checks, and internal dependency pin validation, with a matching local `npm run release:preflight` command.
 
 ## [3.0.0] - 2026-03-12
 
