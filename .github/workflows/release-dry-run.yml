@@ -31,6 +31,38 @@ jobs:
         run: |
           set -euo pipefail
           VERSION=$(node -p "require('./packages/bijou/package.json').version")
+          ERRORS=0
+
+          for pkg in packages/*/package.json; do
+            PKG_NAME=$(node -p "require('./$pkg').name")
+            PKG_VERSION=$(node -p "require('./$pkg').version")
+            echo "$PKG_NAME: $PKG_VERSION (dry-run: $VERSION)"
+            if [ "$PKG_VERSION" != "$VERSION" ]; then
+              echo "::error::$PKG_NAME version ($PKG_VERSION) does not match dry-run version ($VERSION)"
+              ERRORS=$((ERRORS+1))
+            fi
+          done
+
+          for pkg in packages/*/package.json; do
+            node -e "
+              const p = require('./$pkg');
+              for (const depType of ['dependencies', 'devDependencies']) {
+                if (!p[depType]) continue;
+                for (const [name, ver] of Object.entries(p[depType])) {
+                  if (name.startsWith('@flyingrobots/bijou') && ver !== '$VERSION') {
+                    console.log('::error::' + p.name + ' has ' + name + '@' + ver + ' in ' + depType + ', expected $VERSION');
+                    process.exitCode = 1;
+                  }
+                }
+              }
+            " || ERRORS=$((ERRORS+1))
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::Workspace version mismatch detected. Run: npm run version $VERSION"
+            exit 1
+          fi
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "notes_tag=dry-run-v${VERSION}-${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
 
