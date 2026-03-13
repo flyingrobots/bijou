@@ -131,7 +131,7 @@ describe('create-bijou-tui-app cli', () => {
     }
   });
 
-  it('runs correctly through the packed npm bin shim', () => {
+  it('runs correctly from the packed CLI entry and installs the npm bin shim', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-pack-cli-'));
     const packDir = join(root, 'pack');
     const runnerDir = join(root, 'runner');
@@ -179,8 +179,10 @@ describe('create-bijou-tui-app cli', () => {
 
       const binPath = join(runnerDir, 'node_modules', '.bin', 'create-bijou-tui-app');
       expect(existsSync(binPath)).toBe(true);
+      const cliEntryPath = join(runnerDir, 'node_modules', 'create-bijou-tui-app', 'dist', 'cli.js');
+      expect(existsSync(cliEntryPath)).toBe(true);
 
-      const result = spawnSync(binPath, [targetDir, '--no-install'], {
+      const result = spawnSync(process.execPath, [cliEntryPath, targetDir, '--no-install'], {
         cwd: root,
         encoding: 'utf8',
         maxBuffer: 8 * 1024 * 1024,

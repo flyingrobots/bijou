@@ -134,11 +134,15 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
   if (!existsSync(cliBin)) {
     throw new Error(`installed create-bijou-tui-app tarball did not produce a bin shim at ${cliBin}`);
   }
+  const cliEntryPath = resolve(cliRunnerDir, 'node_modules/create-bijou-tui-app/dist/cli.js');
+  if (!existsSync(cliEntryPath)) {
+    throw new Error(`installed create-bijou-tui-app tarball did not include a CLI entry at ${cliEntryPath}`);
+  }
   process.stdout.write('generate TUI canary ... ');
   runCommand(
     'generate TUI canary',
-    cliBin,
-    [targetDir, '--no-install'],
+    process.execPath,
+    [cliEntryPath, targetDir, '--no-install'],
     { cwd: ROOT },
     { quietSuccess: true },
   );
@@ -146,7 +150,12 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
 
   rewriteManifest(resolve(targetDir, 'package.json'), tarballSpecs);
 
-  runSimpleNpmLifecycle('install TUI canary', targetDir, ['install', '--no-fund', '--no-audit']);
+  runSimpleNpmLifecycle(
+    'install TUI canary',
+    targetDir,
+    ['install', '--no-fund', '--no-audit', '--ignore-scripts'],
+    300000,
+  );
   runSimpleNpmLifecycle('build TUI canary', targetDir, ['run', 'build']);
 
   process.stdout.write('run TUI canary ... ');
@@ -197,7 +206,12 @@ function runCoreStaticCanary(tempRoot: string, tarballSpecs: Readonly<Record<str
   cpSync(FIXTURE_ROOT, targetDir, { recursive: true });
   rewriteManifest(resolve(targetDir, 'package.json'), tarballSpecs);
 
-  runSimpleNpmLifecycle('install core/static canary', targetDir, ['install', '--no-fund', '--no-audit']);
+  runSimpleNpmLifecycle(
+    'install core/static canary',
+    targetDir,
+    ['install', '--no-fund', '--no-audit', '--ignore-scripts'],
+    300000,
+  );
   runSimpleNpmLifecycle('build core/static canary', targetDir, ['run', 'build']);
 
   process.stdout.write('run core/static canary ... ');
@@ -231,9 +245,14 @@ function runCoreStaticCanary(tempRoot: string, tarballSpecs: Readonly<Record<str
   process.stdout.write('ok\n');
 }
 
-function runSimpleNpmLifecycle(label: string, cwd: string, args: readonly string[]): void {
+function runSimpleNpmLifecycle(
+  label: string,
+  cwd: string,
+  args: readonly string[],
+  timeoutMs = 120000,
+): void {
   process.stdout.write(`${label} ... `);
-  runCommand(label, 'npm', [...args], { cwd }, { quietSuccess: true, timeoutMs: 120000 });
+  runCommand(label, 'npm', [...args], { cwd }, { quietSuccess: true, timeoutMs });
   process.stdout.write('ok\n');
 }
 
