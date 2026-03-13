@@ -34,74 +34,12 @@ jobs:
 
       - run: npm ci
 
-      - name: Validate tag format and compute metadata
+      - name: Validate release metadata
         id: meta
-        shell: bash
         run: |
-          set -euo pipefail
-          TAG="${{ github.ref_name }}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)\.[0-9]+)?$ ]]; then
-            echo "Invalid tag format: $TAG"
-            exit 1
-          fi
-
-          TAG_VERSION="${TAG#v}"
-          echo "tag_version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
-
-          if [[ "$TAG_VERSION" =~ -(rc|beta|alpha)\. ]]; then
-            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
-            if [[ "$TAG_VERSION" =~ -rc\. ]]; then
-              echo "npm_dist_tag=next" >> "$GITHUB_OUTPUT"
-            elif [[ "$TAG_VERSION" =~ -beta\. ]]; then
-              echo "npm_dist_tag=beta" >> "$GITHUB_OUTPUT"
-            else
-              echo "npm_dist_tag=alpha" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
-            echo "npm_dist_tag=latest" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Verify all packages match tag version
-        shell: bash
-        run: |
-          set -euo pipefail
-          TAG_VERSION="${{ steps.meta.outputs.tag_version }}"
-          ERRORS=0
-
-          for pkg in packages/*/package.json; do
-            PKG_NAME=$(node -p "require('./$pkg').name")
-            PKG_VERSION=$(node -p "require('./$pkg').version")
-            echo "$PKG_NAME: $PKG_VERSION (tag: $TAG_VERSION)"
-            if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-              echo "::error::$PKG_NAME version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
-              ERRORS=$((ERRORS+1))
-            fi
-          done
-
-          # Verify internal cross-deps are pinned to same version
-          for pkg in packages/*/package.json; do
-            PKG_NAME=$(node -p "require('./$pkg').name")
-            node -e "
-              const p = require('./$pkg');
-              for (const depType of ['dependencies','devDependencies','peerDependencies']) {
-                if (!p[depType]) continue;
-                for (const [name, ver] of Object.entries(p[depType])) {
-                  if (name.startsWith('@flyingrobots/bijou') && ver !== '$TAG_VERSION') {
-                    console.log('::error::' + p.name + ' has ' + name + '@' + ver + ', expected $TAG_VERSION');
-                    process.exitCode = 1;
-                  }
-                }
-              }
-            " || ERRORS=$((ERRORS+1))
-          done
-
-          if [ "$ERRORS" -gt 0 ]; then
-            echo "::error::Version mismatch detected. Run: npm run version $TAG_VERSION"
-            exit 1
-          fi
+          npx tsx scripts/release-metadata.ts \
+            --tag "${{ github.ref_name }}" \
+            --github-output "$GITHUB_OUTPUT"
 
       - name: Capture verified release commit
         id: release_sha
@@ -113,7 +51,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Type check
+      - name: Lint
         run: npm run lint
 
       - name: Type check tests

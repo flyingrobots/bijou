@@ -12,6 +12,7 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
+    "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "smoke:examples": "tsx scripts/smoke-v3-examples.ts",
     "smoke:examples:all": "tsx scripts/smoke-all-examples.ts",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
