@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { computeExitCode, extractUnresolvedFindings, summarizeChecks } from './pr-review-status.js';
+import {
+  computeExitCode,
+  computeMergeReadiness,
+  computeMergeReadinessExitCode,
+  extractUnresolvedFindings,
+  summarizeChecks,
+  summarizeCodeRabbitStatus,
+  summarizeReviews,
+} from './pr-review-status.js';
 
 describe('summarizeChecks', () => {
   it('counts passing, pending, failing, canceled, and CodeRabbit checks', () => {
@@ -92,5 +100,135 @@ describe('computeExitCode', () => {
     expect(computeExitCode(passing, 1)).toBe(1);
     expect(computeExitCode(failing, 0)).toBe(1);
     expect(computeExitCode(canceled, 0)).toBe(1);
+  });
+});
+
+describe('summarizeReviews', () => {
+  it('counts review states for merge-readiness gating', () => {
+    const summary = summarizeReviews([
+      { author: { login: 'alice' }, body: 'looks good', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+      { author: { login: 'bob' }, body: 'needs work', submittedAt: '2026-03-13T11:00:00Z', state: 'CHANGES_REQUESTED' },
+      { author: { login: 'coderabbitai' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
+    ]);
+
+    expect(summary).toEqual({
+      total: 3,
+      approvals: 1,
+      changesRequested: 1,
+      comments: 1,
+      byState: {
+        APPROVED: 1,
+        CHANGES_REQUESTED: 1,
+        COMMENTED: 1,
+      },
+    });
+  });
+});
+
+describe('summarizeCodeRabbitStatus', () => {
+  it('down-ranks stale rate-limit comments when a newer pass signal exists', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'Rate limit exceeded. Please wait 30m.',
+        createdAt: '2026-03-13T10:00:00Z',
+      }, {
+        author: { login: 'coderabbitai' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T11:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('pass');
+    expect(status.staleRateLimitCount).toBe(1);
+    expect(status.activeRateLimitCount).toBe(0);
+    expect(status.detail).toContain('stale rate-limit comment');
+  });
+
+  it('treats the latest active rate-limit signal as pending review work', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pending', state: 'PENDING' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'Rate limit exceeded. Please wait 30m.',
+        createdAt: '2026-03-13T12:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('rate_limited');
+    expect(status.staleRateLimitCount).toBe(0);
+    expect(status.activeRateLimitCount).toBe(1);
+    expect(status.detail).toBe('rate-limited');
+  });
+});
+
+describe('computeMergeReadiness', () => {
+  it('blocks when the review gate is not met even if checks are green', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([{ author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' }]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('blocked');
+    expect(readiness.reasons).toContain('needs at least 2 reviews (found 1)');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(1);
+  });
+
+  it('returns pending when checks are still running after all blocking gates are satisfied', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false },
+      checks: summarizeChecks([
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        { name: 'test (22)', bucket: 'pending', state: 'PENDING' },
+      ]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('pending');
+    expect(readiness.reasons).toContain('1 pending check');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(8);
+  });
+
+  it('returns ready once checks, reviews, and bot state are all clear', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('ready');
+    expect(readiness.reasons).toEqual([]);
+    expect(computeMergeReadinessExitCode(readiness)).toBe(0);
   });
 });
