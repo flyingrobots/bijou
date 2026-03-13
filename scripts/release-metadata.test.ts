@@ -18,13 +18,31 @@ function makeWorkspace(packages: Array<{
   readonly dependencies?: Record<string, string>;
   readonly devDependencies?: Record<string, string>;
   readonly peerDependencies?: Record<string, string>;
-}>): string {
+}>, options?: {
+  readonly workspaceRoot?: string;
+  readonly workspacePatterns?: readonly string[];
+}): string {
   const root = mkdtempSync(join(tmpdir(), 'bijou-release-meta-'));
   tempRoots.push(root);
-  mkdirSync(join(root, 'packages'), { recursive: true });
+  const workspaceRoot = options?.workspaceRoot ?? 'packages';
+  const workspacePatterns = options?.workspacePatterns ?? [`${workspaceRoot}/*`];
+  mkdirSync(join(root, workspaceRoot), { recursive: true });
+  writeFileSync(
+    join(root, 'package.json'),
+    JSON.stringify(
+      {
+        name: 'bijou-release-meta-test',
+        private: true,
+        workspaces: workspacePatterns,
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
 
   for (const pkg of packages) {
-    const pkgDir = join(root, 'packages', pkg.dir);
+    const pkgDir = join(root, workspaceRoot, pkg.dir);
     mkdirSync(pkgDir, { recursive: true });
     writeFileSync(
       join(pkgDir, 'package.json'),
@@ -112,6 +130,42 @@ describe('validateWorkspaceVersion', () => {
     expect(validateWorkspaceVersion(root, '3.0.0').errors).toEqual([
       '@flyingrobots/bijou-node has @flyingrobots/bijou@^3.0.0 in peerDependencies, expected 3.0.0',
     ]);
+  });
+
+  it('fails on unknown Bijou-scoped dependencies', () => {
+    const root = makeWorkspace([
+      { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
+      {
+        dir: 'bijou-node',
+        name: '@flyingrobots/bijou-node',
+        version: '3.0.0',
+        dependencies: { '@flyingrobots/bijou-legacy': '3.0.0' },
+      },
+    ]);
+
+    expect(validateWorkspaceVersion(root, '3.0.0').errors).toEqual([
+      '@flyingrobots/bijou-node references unknown internal package @flyingrobots/bijou-legacy in dependencies',
+    ]);
+  });
+
+  it('discovers packages from the root workspace config instead of assuming packages/*', () => {
+    const root = makeWorkspace(
+      [
+        { dir: 'bijou', name: '@flyingrobots/bijou', version: '3.0.0' },
+        {
+          dir: 'bijou-node',
+          name: '@flyingrobots/bijou-node',
+          version: '3.0.0',
+          dependencies: { '@flyingrobots/bijou': '3.0.0' },
+        },
+      ],
+      {
+        workspaceRoot: 'fixtures',
+        workspacePatterns: ['fixtures/*'],
+      },
+    );
+
+    expect(validateWorkspaceVersion(root, '3.0.0').errors).toEqual([]);
   });
 });
 

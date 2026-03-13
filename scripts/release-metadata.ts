@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 type DependencyMap = Record<string, string>;
 type DependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies';
+const INTERNAL_PACKAGE_PREFIX = '@flyingrobots/bijou';
 
 export interface PackageManifest {
   readonly name: string;
@@ -44,6 +45,10 @@ export interface ReleaseCommandOutputs {
   readonly [key: string]: string;
 }
 
+interface RootWorkspaceManifest {
+  readonly workspaces?: readonly string[] | { readonly packages?: readonly string[] };
+}
+
 const VERSION_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)\.[0-9]+)?$/;
 const TAG_PATTERN = /^v(?<version>[0-9]+\.[0-9]+\.[0-9]+)(?:-(?<channel>rc|beta|alpha)\.(?<serial>[0-9]+))?$/;
 const DEPENDENCY_TYPES: readonly DependencyType[] = ['dependencies', 'devDependencies', 'peerDependencies'];
@@ -54,11 +59,61 @@ function readJsonFile<T>(filepath: string): T {
 }
 
 export function readWorkspacePackages(root: string): readonly WorkspacePackage[] {
-  const packagesDir = join(root, 'packages');
-  return readdirSync(packagesDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => join(packagesDir, entry.name, 'package.json'))
-    .filter((manifestPath) => existsSync(manifestPath))
+  const rootManifest = readJsonFile<RootWorkspaceManifest>(join(root, 'package.json'));
+  const workspaces = rootManifest.workspaces;
+  let workspacePatterns: readonly string[] | undefined;
+
+  if (Array.isArray(workspaces)) {
+    workspacePatterns = workspaces;
+  } else if (workspaces && 'packages' in workspaces) {
+    workspacePatterns = workspaces.packages;
+  }
+
+  if (!workspacePatterns || workspacePatterns.length === 0) {
+    throw new Error('Root package.json is missing workspaces configuration');
+  }
+
+  const manifestPaths = new Set<string>();
+
+  for (const pattern of workspacePatterns) {
+    if (pattern.endsWith('/*')) {
+      const basePattern = pattern.slice(0, -2);
+      if (basePattern.includes('*')) {
+        throw new Error(`Unsupported workspace pattern: ${pattern}`);
+      }
+
+      const baseDir = join(root, basePattern);
+      if (!existsSync(baseDir)) {
+        throw new Error(`Workspace directory does not exist: ${pattern}`);
+      }
+
+      for (const entry of readdirSync(baseDir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const manifestPath = join(baseDir, entry.name, 'package.json');
+        if (!existsSync(manifestPath)) {
+          throw new Error(`Workspace package is missing package.json: ${join(pattern.slice(0, -1), entry.name)}`);
+        }
+        manifestPaths.add(manifestPath);
+      }
+      continue;
+    }
+
+    if (pattern.includes('*')) {
+      throw new Error(`Unsupported workspace pattern: ${pattern}`);
+    }
+
+    const manifestPath = join(root, pattern, 'package.json');
+    if (!existsSync(manifestPath)) {
+      throw new Error(`Workspace package is missing package.json: ${pattern}`);
+    }
+    manifestPaths.add(manifestPath);
+  }
+
+  if (manifestPaths.size === 0) {
+    throw new Error('Workspace configuration did not resolve any package.json files');
+  }
+
+  return [...manifestPaths]
     .map((manifestPath) => ({
       manifestPath,
       manifest: readJsonFile<PackageManifest>(manifestPath),
@@ -125,7 +180,14 @@ export function validateWorkspaceVersion(
       const deps = entry.manifest[dependencyType];
       if (!deps) continue;
       for (const [name, version] of Object.entries(deps)) {
-        if (!internalPackageNames.has(name)) continue;
+        const isKnownWorkspacePackage = internalPackageNames.has(name);
+        const isBijouScopedDependency = name.startsWith(INTERNAL_PACKAGE_PREFIX);
+
+        if (!isKnownWorkspacePackage && !isBijouScopedDependency) continue;
+        if (isBijouScopedDependency && !isKnownWorkspacePackage) {
+          errors.push(`${entry.manifest.name} references unknown internal package ${name} in ${dependencyType}`);
+          continue;
+        }
         if (version !== expectedVersion) {
           errors.push(`${entry.manifest.name} has ${name}@${version} in ${dependencyType}, expected ${expectedVersion}`);
         }
