@@ -17,7 +17,8 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 
 ### 2026-03-13
 - **Historical bot chatter still competes with live bot state**: older CodeRabbit comments can remain prominent even when a newer check is green or a new review is actively in progress.
-  Proposed improvement: teach repo tooling to distinguish stale historical comments from the current bot lifecycle (`pending`, `pass`, `rate-limited`, `no actionable comments`) so humans do not have to infer that state manually.
+  Progress: `pr:review-status` already down-ranks stale historical `rate-limited` comments when a newer green CodeRabbit signal exists.
+  Proposed improvement: extend that logic across the full bot lifecycle (`pending`, `pass`, `rate-limited`, `no actionable comments`) so humans do not have to infer the current state manually from mixed historical comments.
 
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.

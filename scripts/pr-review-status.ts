@@ -27,13 +27,13 @@ interface CheckEntry {
 }
 
 interface PullRequestComment {
-  readonly author?: { readonly login: string } | null;
+  readonly author?: { readonly login: string; readonly __typename?: string } | null;
   readonly body: string;
   readonly createdAt: string;
 }
 
 interface PullRequestReview {
-  readonly author?: { readonly login: string } | null;
+  readonly author?: { readonly login: string; readonly __typename?: string } | null;
   readonly body: string;
   readonly submittedAt: string;
   readonly state: string;
@@ -59,6 +59,19 @@ interface ReviewThreadsResponse {
           readonly nodes: readonly ReviewThreadNode[];
         };
       };
+    };
+  };
+}
+
+interface PullRequestGraphqlNode extends Omit<PullRequestView, 'comments' | 'reviews'> {
+  readonly comments: { readonly nodes: readonly PullRequestComment[] };
+  readonly reviews: { readonly nodes: readonly PullRequestReview[] };
+}
+
+interface PullRequestGraphqlResponse {
+  readonly data: {
+    readonly repository: {
+      readonly pullRequest: PullRequestGraphqlNode | null;
     };
   };
 }
@@ -148,7 +161,7 @@ export function summarizeReviews(reviews: readonly PullRequestReview[]): ReviewS
 
   for (const review of reviews) {
     const reviewer = review.author?.login ?? '(unknown)';
-    if (isAutomatedReviewer(reviewer)) {
+    if (isAutomatedReviewer(review.author)) {
       continue;
     }
 
@@ -308,7 +321,7 @@ export function computeMergeReadiness(input: {
     reasons.push('review decision is changes_requested');
   }
 
-  if (input.pr.mergeStateStatus != null && input.pr.mergeStateStatus !== '' && !isMergeableState(input.pr.mergeStateStatus)) {
+  if (input.pr.mergeStateStatus != null && input.pr.mergeStateStatus !== '' && isBlockingMergeState(input.pr.mergeStateStatus)) {
     reasons.push(`merge state is ${input.pr.mergeStateStatus.toLowerCase()}`);
   }
 
@@ -337,6 +350,10 @@ export function computeMergeReadiness(input: {
   }
 
   const pendingReasons: string[] = [];
+
+  if (input.pr.mergeStateStatus === 'UNKNOWN') {
+    pendingReasons.push('mergeability is still being computed');
+  }
 
   if (input.checks.pending.length > 0) {
     pendingReasons.push(`${input.checks.pending.length} pending check${input.checks.pending.length === 1 ? '' : 's'}`);
@@ -380,13 +397,7 @@ export function computeMergeReadinessExitCode(readiness: MergeReadiness): number
 
 function main(): void {
   const options = parseArgs(process.argv.slice(2));
-  const pr = ghJson<PullRequestView>([
-    'pr',
-    'view',
-    ...maybeArg(options.prArg),
-    '--json',
-    'number,title,state,baseRefName,headRefName,isDraft,url,reviewDecision,mergeStateStatus,comments,reviews',
-  ]);
+  const pr = fetchPullRequest(options.prArg);
   const checks = ghJson<CheckEntry[]>([
     'pr',
     'checks',
@@ -514,13 +525,13 @@ function collectCodeRabbitEvents(
   reviews: readonly PullRequestReview[],
 ): readonly { readonly at: string; readonly kind: CodeRabbitEventKind }[] {
   const commentEvents = comments
-    .filter((comment) => comment.author?.login === 'coderabbitai')
+    .filter((comment) => isCodeRabbitAuthor(comment.author?.login))
     .map((comment) => ({
       at: comment.createdAt,
       kind: classifyCodeRabbitBody(comment.body),
     }));
   const reviewEvents = reviews
-    .filter((review) => review.author?.login === 'coderabbitai')
+    .filter((review) => isCodeRabbitAuthor(review.author?.login))
     .map((review) => ({
       at: review.submittedAt,
       kind: classifyCodeRabbitBody(review.body),
@@ -551,12 +562,80 @@ function classifyCodeRabbitBody(body: string): CodeRabbitEventKind {
   return 'other';
 }
 
-function isAutomatedReviewer(login: string): boolean {
-  return login === 'coderabbitai' || login === 'chatgpt-codex-connector' || login.endsWith('[bot]');
+function isAutomatedReviewer(author: PullRequestReview['author'] | PullRequestComment['author']): boolean {
+  if (author?.__typename != null) {
+    return author.__typename !== 'User';
+  }
+
+  const login = author?.login;
+  return login != null && (isCodeRabbitAuthor(login) || login.endsWith('[bot]'));
 }
 
-function isMergeableState(state: string): boolean {
-  return state === 'CLEAN' || state === 'HAS_HOOKS' || state === 'UNSTABLE';
+function isBlockingMergeState(state: string): boolean {
+  return state !== 'CLEAN' && state !== 'HAS_HOOKS' && state !== 'UNSTABLE' && state !== 'UNKNOWN';
+}
+
+function isCodeRabbitAuthor(login: string | undefined): boolean {
+  if (login == null) {
+    return false;
+  }
+
+  return /^coderabbitai(?:\[bot\])?$/i.test(login);
+}
+
+function fetchPullRequest(prArg: string | undefined): PullRequestView {
+  const selector = prArg == null || prArg === '' ? undefined : prArg;
+  const prNumber = ghJson<{ readonly number: number }>([
+    'pr',
+    'view',
+    ...maybeArg(selector),
+    '--json',
+    'number',
+  ]).number;
+
+  const query = `
+query($prNumber: Int!) {
+  repository(owner: "flyingrobots", name: "bijou") {
+    pullRequest(number: $prNumber) {
+      number
+      title
+      state
+      baseRefName
+      headRefName
+      isDraft
+      url
+      reviewDecision
+      mergeStateStatus
+      comments(first: 100) {
+        nodes {
+          body
+          createdAt
+          author { login __typename }
+        }
+      }
+      reviews(first: 100) {
+        nodes {
+          body
+          submittedAt
+          state
+          author { login __typename }
+        }
+      }
+    }
+  }
+}
+`;
+  const payload = ghGraphql<PullRequestGraphqlResponse>(query, { prNumber: String(prNumber) });
+  const pullRequest = payload.data.repository.pullRequest;
+  if (pullRequest == null) {
+    throw new Error(`no pull request found for ${selector ?? 'current branch'}`);
+  }
+
+  return {
+    ...pullRequest,
+    comments: pullRequest.comments.nodes,
+    reviews: pullRequest.reviews.nodes,
+  };
 }
 
 function ghJson<T>(args: readonly string[]): T {

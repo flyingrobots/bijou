@@ -109,8 +109,8 @@ describe('summarizeReviews', () => {
       { author: { login: 'alice' }, body: 'needs work', submittedAt: '2026-03-13T09:00:00Z', state: 'CHANGES_REQUESTED' },
       { author: { login: 'alice' }, body: 'looks good', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
       { author: { login: 'bob' }, body: 'needs work', submittedAt: '2026-03-13T11:00:00Z', state: 'CHANGES_REQUESTED' },
-      { author: { login: 'coderabbitai' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
-      { author: { login: 'chatgpt-codex-connector' }, body: 'notes', submittedAt: '2026-03-13T12:30:00Z', state: 'COMMENTED' },
+      { author: { login: 'coderabbitai', __typename: 'Bot' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
+      { author: { login: 'review-buddy', __typename: 'Bot' }, body: 'LGTM', submittedAt: '2026-03-13T12:30:00Z', state: 'APPROVED' },
     ]);
 
     expect(summary).toEqual({
@@ -127,6 +127,21 @@ describe('summarizeReviews', () => {
 });
 
 describe('summarizeCodeRabbitStatus', () => {
+  it('accepts CodeRabbit bot login variants when collecting events', () => {
+    const status = summarizeCodeRabbitStatus(
+      null,
+      [{
+        author: { login: 'coderabbitai[bot]', __typename: 'Bot' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T12:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('clean');
+    expect(status.latestKind).toBe('clean');
+  });
+
   it('down-ranks stale rate-limit comments when a newer pass signal exists', () => {
     const status = summarizeCodeRabbitStatus(
       { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
@@ -208,6 +223,28 @@ describe('computeMergeReadiness', () => {
 
     expect(readiness.status).toBe('pending');
     expect(readiness.reasons).toContain('1 pending check');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(8);
+  });
+
+  it('treats unknown merge state as pending while GitHub computes mergeability', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'UNKNOWN' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('pending');
+    expect(readiness.reasons).toContain('mergeability is still being computed');
     expect(computeMergeReadinessExitCode(readiness)).toBe(8);
   });
 
