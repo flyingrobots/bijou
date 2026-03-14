@@ -9,13 +9,24 @@ export interface TableSurfaceOptions extends Omit<TableOptions, 'rows'> {
   readonly rows: TableSurfaceCell[][];
 }
 
+function resolveColumns(
+  columns: NonNullable<TableOptions['columns']>,
+  rows: readonly TableSurfaceCell[][],
+): NonNullable<TableOptions['columns']> {
+  if (columns.length > 0) return [...columns];
+
+  const inferredCount = rows.reduce((max, row) => Math.max(max, row.length), 0);
+  return Array.from({ length: inferredCount }, () => ({ header: '' }));
+}
+
 /**
  * Render a bordered data table as a Surface for V3-native composition.
  */
 export function tableSurface(options: TableSurfaceOptions): Surface {
   const ctx = resolveCtx(options.ctx);
-  const columns = options.columns ?? [];
-  const rows = (options.rows ?? []).map((row) => (row ?? []).map((cell) => cell ?? ''));
+  const rawRows = (options.rows ?? []).map((row) => (row ?? []).map((cell) => cell ?? ''));
+  const columns = resolveColumns(options.columns ?? [], rawRows);
+  const rows = rawRows;
   const headerToken = options.headerToken ?? ctx?.ui('tableHeader');
   const headerStyle = tokenToCellStyle(headerToken);
   const borderStyle = tokenToCellStyle(options.borderToken ?? ctx?.border('muted'));
@@ -33,7 +44,11 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
     }
     return maxWidth;
   });
-  const rowHeights = cellSurfaces.map((row) => row.reduce((max, cell) => Math.max(max, cell.height), 1));
+  const rowHeights = cellSurfaces.map((row) => row.reduce((max, cell, index) => {
+    const cellWidth = colWidths[index] ?? 0;
+    if (cellWidth <= 0) return max;
+    return Math.max(max, cell.height);
+  }, 1));
   const totalWidth = columns.length === 0
     ? 2
     : colWidths.reduce((sum, width) => sum + width + 2, 0) + columns.length + 1;
@@ -84,7 +99,7 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
     const headerSurface = headerSurfaces[i]!;
     for (let x = headerX; x < headerX + cellWidth + 2; x++) setSpace(x, 1);
     setBorder(headerX - 1, 1, '\u2502', headerBg?.bg);
-    surface.blit(headerSurface, headerX + 1, 1);
+    surface.blit(headerSurface, headerX + 1, 1, 0, 0, cellWidth, 1);
     headerX += cellWidth + 3;
   }
   setBorder(totalWidth - 1, 1, '\u2502', headerBg?.bg);
@@ -99,15 +114,20 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
       let x = 1;
       for (let colIndex = 0; colIndex < columns.length; colIndex++) {
         const cellWidth = colWidths[colIndex]!;
-        const cellSurface = row[colIndex] ?? createTextSurface('');
         setBorder(x - 1, y + line, '\u2502');
         for (let fillX = x; fillX < x + cellWidth + 2; fillX++) {
           surface.set(fillX, y + line, { char: ' ', empty: false });
         }
-        surface.blit(cellSurface, x + 1, y + line);
         x += cellWidth + 3;
       }
       setBorder(totalWidth - 1, y + line, '\u2502');
+    }
+    let x = 1;
+    for (let colIndex = 0; colIndex < columns.length; colIndex++) {
+      const cellWidth = colWidths[colIndex]!;
+      const cellSurface = row[colIndex] ?? createTextSurface('');
+      surface.blit(cellSurface, x + 1, y, 0, 0, cellWidth, rowHeight);
+      x += cellWidth + 3;
     }
     y += rowHeight;
   }

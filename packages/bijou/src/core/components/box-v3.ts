@@ -1,11 +1,27 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
+import { shouldApplyBg } from '../bg-fill.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
-import { type BoxOptions, type HeaderBoxOptions } from './box.js';
+import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createSegmentSurface, createTextSurface, tokenToCellStyle } from './surface-text.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
+
+function withInheritedBackground(surface: Surface, background: string | undefined): Surface {
+  if (background == null) return surface;
+
+  const next = surface.clone();
+  for (let y = 0; y < next.height; y++) {
+    for (let x = 0; x < next.width; x++) {
+      const cell = next.get(x, y);
+      if (cell.empty || cell.bg != null) continue;
+      next.set(x, y, { ...cell, bg: background });
+    }
+  }
+
+  return next;
+}
 
 /**
  * Render a bordered box around a Surface.
@@ -36,13 +52,14 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const outerH = innerH + 2;
   
   const surface = createSurface(outerW, outerH);
+  const resolvedFillChar = resolveFillChar(options.fillChar);
   const fillStyle = applyBCSSCellTextStyles({
     fg: undefined,
-    bg: undefined,
+    bg: shouldApplyBg(ctx) ? options.bgToken?.bg : undefined,
     modifiers: undefined,
   }, bcss);
   surface.fill({
-    char: options.fillChar || ' ',
+    char: resolvedFillChar,
     bg: fillStyle.bg,
     fg: fillStyle.fg,
     modifiers: fillStyle.modifiers,
@@ -88,7 +105,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   }
 
   // Blit content
-  surface.blit(contentSurf, pl + 1, pt + 1);
+  surface.blit(withInheritedBackground(contentSurf, fillStyle.bg), pl + 1, pt + 1);
 
   return surface;
 }
