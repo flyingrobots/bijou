@@ -22,6 +22,7 @@ import {
   type KeyMsg,
   type Overlay,
 } from '@flyingrobots/bijou-tui';
+import { renderSplitPaneLabelSurface } from './split-pane-surface.js';
 
 /** Single top-level tab in the app skeleton. */
 export interface SkeletonTab {
@@ -171,7 +172,7 @@ export function createTuiAppSkeleton(
       update(msg: SkeletonMsg, model: SkeletonPageModel) {
         return updateSkeletonPage(msg, model, config);
       },
-      layout: () => layoutFor(spec),
+      layout: () => layoutFor(spec, options.ctx),
       keyMap: config.hasDrawer
         ? createKeyMap<SkeletonMsg>().group('Page', (group) => group
           .bind('o', 'Toggle drawer', { type: 'toggle-drawer' }),
@@ -508,7 +509,7 @@ function updateSkeletonPage(
 }
 
 /** Build the layout tree for a skeleton page (single pane, split, or empty). */
-function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
+function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
   switch (spec.kind) {
     case 'drawer':
       return {
@@ -526,12 +527,12 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
         paneA: {
           kind: 'pane',
           paneId: `${spec.tab.id}-left`,
-          render: (width: number, height: number) => renderSplitPaneLabel('Left pane (1/3)', width, height),
+          render: (width: number, height: number) => renderSplitPaneLabelSurface('Left pane (1/3)', width, height, ctx),
         },
         paneB: {
           kind: 'pane',
           paneId: `${spec.tab.id}-right`,
-          render: (width: number, height: number) => renderSplitPaneLabel('Right pane (2/3)', width, height),
+          render: (width: number, height: number) => renderSplitPaneLabelSurface('Right pane (2/3)', width, height, ctx),
         },
       };
 
@@ -542,15 +543,6 @@ function layoutFor(spec: SkeletonPageSpec): FrameLayoutNode {
         render: () => '',
       };
   }
-}
-
-/** Render a label on the first line of a split pane for the skeleton demo. */
-function renderSplitPaneLabel(label: string, width: number, height: number): string {
-  if (width <= 0 || height <= 0) return '';
-  const first = clipToWidth(` ${label}`, width);
-  const lines: string[] = [first];
-  while (lines.length < height) lines.push('');
-  return lines.join('\n');
 }
 
 /** Derive the drawer pane ID from a tab ID. */

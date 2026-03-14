@@ -11,6 +11,8 @@ export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 export interface AlertOptions extends BijouNodeOptions {
   /** Severity variant (defaults to `'info'`). */
   variant?: AlertVariant;
+  /** Theme token applied to alert borders. Defaults to a variant-specific border token. */
+  borderToken?: TokenValue;
   /** Background fill token for the alert box interior. Defaults to `surface.elevated`. */
   bgToken?: TokenValue;
 }
@@ -70,7 +72,7 @@ export function alert(message: string, options: AlertOptions = {}): string {
     interactive: () => {
       const icon = ICONS[variant];
       const semanticToken = ctx.semantic(variant);
-      const borderToken = ctx.border(BORDER_TOKENS[variant]);
+      const borderToken = options.borderToken ?? ctx.border(BORDER_TOKENS[variant]);
       const coloredIcon = ctx.style.styled(semanticToken, icon);
 
       return box(coloredIcon + ' ' + safeMessage, {

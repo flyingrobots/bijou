@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, boxV3 } from '@flyingrobots/bijou';
+import { badge, boxSurface, separatorSurface } from '@flyingrobots/bijou';
 import { hstackV3, isKeyMsg, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
 import { centerSurface, line, spacer } from '../_shared/v3.ts';
 
@@ -31,13 +31,20 @@ export const app: App<Model, Msg> = {
       badge(`${ctx.runtime.columns}x${ctx.runtime.rows}`, { variant: 'info' }),
       badge(ctx.mode, { variant: 'success' }),
     );
+    const metricsDivider = separatorSurface({
+      label: 'Live Metrics',
+      width: Math.max(metrics.width, 22),
+      ctx,
+    });
 
     const body = vstackV3(
       hero,
       spacer(1, 1),
-      boxV3(
+      boxSurface(
         vstackV3(
           line('Surface-first runtime, buffered rendering, and honest legacy compatibility.'),
+          spacer(1, 1),
+          metricsDivider,
           spacer(1, 1),
           metrics,
           spacer(1, 1),

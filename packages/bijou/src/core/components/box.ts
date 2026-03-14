@@ -208,7 +208,7 @@ export function headerBox(label: string, options: HeaderBoxOptions = {}): string
  * Returns the character if it is a single-width grapheme cluster,
  * otherwise falls back to a space.
  */
-function resolveFillChar(fillChar: string | undefined): string {
+export function resolveFillChar(fillChar: string | undefined): string {
   if (fillChar == null || fillChar.length === 0) return ' ';
   if (graphemeWidth(fillChar) !== 1) return ' ';
   return fillChar;

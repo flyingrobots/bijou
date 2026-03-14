@@ -39,6 +39,7 @@ You get:
 
 - forms: `input`, `select`, `multiselect`, `confirm`, `textarea`, `filter`, `wizard`, `group`
 - structural UI: `box`, `headerBox`, `separator`, `tabs`, `breadcrumb`, `stepper`, `paginator`
+- surface-first companions: `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, `tableSurface`
 - data views: `table`, `tree`, `accordion`, `timeline`, `dag`, `dagSlice`, `dagStats`
 - output helpers: `badge`, `alert`, `kbd`, `log`, `progressBar`, `hyperlink`, `markdown`
 - themes and tokens: built-in presets plus custom token graphs and DTCG-friendly theme loading
@@ -61,6 +62,8 @@ It gives you:
 - a programmable render pipeline
 
 This is the part of Bijou that feels like building an app, not decorating a string.
+
+The practical payoff in the current release line is simple: you do not need to cross back through `surfaceToString(...)` for common layout chrome anymore. Core helpers like `boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, and `tableSurface()` are now available when you want to stay on the V3-native path.
 
 ### 3. A Batteries-Included Shell
 
@@ -194,6 +197,30 @@ const app: App<Model> = {
 };
 
 await run(app);
+```
+
+## Quick Start: Surface-First Core Composition
+
+```ts
+import { badge, boxSurface, separatorSurface, tableSurface } from '@flyingrobots/bijou';
+import { hstackV3, vstackV3 } from '@flyingrobots/bijou-tui';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+
+const ctx = initDefaultContext();
+
+const stats = tableSurface({
+  columns: [{ header: 'Service' }, { header: 'Status' }],
+  rows: [['api', badge('LIVE', { variant: 'success', ctx })]],
+  ctx,
+});
+
+const card = boxSurface(
+  vstackV3(
+    separatorSurface({ label: 'Deploy Status', width: stats.width, ctx }),
+    stats,
+  ),
+  { title: 'Runtime', padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx },
+);
 ```
 
 ## Output Modes, Automatically

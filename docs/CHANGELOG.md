@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Surface-first companion primitives** — added `boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, and `tableSurface()` so V3 apps can keep common layout/status composition on the `Surface` path instead of dropping back through explicit string bridges.
+
 ### 🐛 Fixes
 
 - **Scaffold canary PTY shutdown race** — the PTY driver now treats queued late input/resize steps as no-ops once the child exits, preventing traceback noise from masking the actual canary failure.
@@ -16,6 +20,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Release preflight metadata and semver validation** — local `npm run release:preflight` now emits the derived `version` / `notes_tag` metadata, derives `--current-version` from discovered workspace manifests instead of assuming `packages/bijou`, and rejects leading-zero semver identifiers before npm can reject them later.
 - **Packed scaffolder CLI execution path** — packaged `create-bijou-tui-app` verification now asserts the installed npm bin shim exists while invoking the packed CLI entry through `node`, which avoids macOS shebang hangs without dropping tarball-level coverage.
 - **PR merge-readiness tooling** — `pr:review-status` now collapses to the latest non-automated review per reviewer, ignores draft/pending reviews without `submittedAt`, prefers GitHub author metadata for bot detection, treats `mergeStateStatus=UNKNOWN` as pending while GitHub computes mergeability, honors GitHub `reviewDecision` / `mergeStateStatus`, fails fast if PR comment/review/thread metadata would be truncated, and down-ranks stale historical CodeRabbit rate-limit comments when a newer green or live pending bot signal exists; `pr:merge-readiness` adds a one-command merge gate summary on top of those signals and labels pending states separately from hard blockers.
+- **Surface alert option parity** — `AlertOptions` now includes `borderToken`, and both `alert()` and `alertSurface()` honor custom border overrides while the surface path drops a redundant string nullish-coalescing fallback.
 
 ## [3.0.0] - 2026-03-12
 
