@@ -35,7 +35,7 @@ interface PullRequestComment {
 interface PullRequestReview {
   readonly author?: { readonly login: string; readonly __typename?: string } | null;
   readonly body: string;
-  readonly submittedAt: string;
+  readonly submittedAt: string | null;
   readonly state: string;
 }
 
@@ -55,9 +55,7 @@ interface ReviewThreadsResponse {
   readonly data: {
     readonly repository: {
       readonly pullRequest: {
-        readonly reviewThreads: {
-          readonly nodes: readonly ReviewThreadNode[];
-        };
+        readonly reviewThreads: PullRequestConnection<ReviewThreadNode>;
       };
     };
   };
@@ -111,6 +109,7 @@ export interface ReviewSummary {
 }
 
 type CodeRabbitEventKind = 'rate_limit' | 'clean' | 'actionable' | 'other';
+type SubmittedReview = PullRequestReview & { readonly submittedAt: string };
 
 export interface CodeRabbitStatus {
   readonly state: 'missing' | 'pass' | 'pending' | 'failing' | 'rate_limited' | 'actionable' | 'clean' | 'commented';
@@ -130,17 +129,22 @@ export function mergeReadinessHeading(readiness: MergeReadiness): string {
 }
 
 export function assertUntruncatedPullRequestData(input: {
-  readonly comments: Pick<PullRequestConnection<PullRequestComment>, 'pageInfo' | 'totalCount'>;
-  readonly reviews: Pick<PullRequestConnection<PullRequestReview>, 'pageInfo' | 'totalCount'>;
+  readonly comments?: Pick<PullRequestConnection<PullRequestComment>, 'pageInfo' | 'totalCount'>;
+  readonly reviews?: Pick<PullRequestConnection<PullRequestReview>, 'pageInfo' | 'totalCount'>;
+  readonly reviewThreads?: Pick<PullRequestConnection<ReviewThreadNode>, 'pageInfo' | 'totalCount'>;
 }): void {
   const truncated: string[] = [];
 
-  if (input.comments.pageInfo.hasNextPage) {
+  if (input.comments?.pageInfo.hasNextPage) {
     truncated.push(`comments=${input.comments.totalCount}`);
   }
 
-  if (input.reviews.pageInfo.hasNextPage) {
+  if (input.reviews?.pageInfo.hasNextPage) {
     truncated.push(`reviews=${input.reviews.totalCount}`);
+  }
+
+  if (input.reviewThreads?.pageInfo.hasNextPage) {
+    truncated.push(`reviewThreads=${input.reviewThreads.totalCount}`);
   }
 
   if (truncated.length > 0) {
@@ -189,11 +193,15 @@ export function extractUnresolvedFindings(threads: readonly ReviewThreadNode[]):
 }
 
 export function summarizeReviews(reviews: readonly PullRequestReview[]): ReviewSummary {
-  const latestByReviewer = new Map<string, PullRequestReview>();
+  const latestByReviewer = new Map<string, SubmittedReview>();
 
   const byState: Record<string, number> = {};
 
   for (const review of reviews) {
+    if (!isSubmittedReview(review)) {
+      continue;
+    }
+
     const reviewer = review.author?.login ?? '(unknown)';
     if (isAutomatedReviewer(review.author)) {
       continue;
@@ -524,6 +532,11 @@ query($prNumber: Int!) {
   repository(owner: "flyingrobots", name: "bijou") {
     pullRequest(number: $prNumber) {
       reviewThreads(first: 100) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
         nodes {
           isResolved
           comments(first: 20) {
@@ -542,7 +555,9 @@ query($prNumber: Int!) {
 `;
 
   const payload = ghGraphql<ReviewThreadsResponse>(query, { prNumber: String(prNumber) });
-  return payload.data.repository.pullRequest.reviewThreads.nodes;
+  const reviewThreads = payload.data.repository.pullRequest.reviewThreads;
+  assertUntruncatedPullRequestData({ reviewThreads });
+  return reviewThreads.nodes;
 }
 
 function summarizeComment(body: string): string {
@@ -565,6 +580,7 @@ function collectCodeRabbitEvents(
       kind: classifyCodeRabbitBody(comment.body),
     }));
   const reviewEvents = reviews
+    .filter(isSubmittedReview)
     .filter((review) => isCodeRabbitAuthor(review.author?.login))
     .map((review) => ({
       at: review.submittedAt,
@@ -603,6 +619,10 @@ function isAutomatedReviewer(author: PullRequestReview['author'] | PullRequestCo
 
   const login = author?.login;
   return login != null && (isCodeRabbitAuthor(login) || login.endsWith('[bot]'));
+}
+
+function isSubmittedReview(review: PullRequestReview): review is SubmittedReview {
+  return review.submittedAt != null && review.state !== 'PENDING';
 }
 
 function isBlockingMergeState(state: string): boolean {

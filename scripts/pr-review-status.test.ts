@@ -111,6 +111,7 @@ describe('summarizeReviews', () => {
       { author: { login: 'alice' }, body: 'needs work', submittedAt: '2026-03-13T09:00:00Z', state: 'CHANGES_REQUESTED' },
       { author: { login: 'alice' }, body: 'looks good', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
       { author: { login: 'bob' }, body: 'needs work', submittedAt: '2026-03-13T11:00:00Z', state: 'CHANGES_REQUESTED' },
+      { author: { login: 'carol' }, body: 'draft review', submittedAt: null, state: 'PENDING' },
       { author: { login: 'coderabbitai', __typename: 'Bot' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
       { author: { login: 'review-buddy', __typename: 'Bot' }, body: 'LGTM', submittedAt: '2026-03-13T12:30:00Z', state: 'APPROVED' },
     ]);
@@ -159,6 +160,22 @@ describe('summarizeCodeRabbitStatus', () => {
     expect(status.detail).toBe('pending');
     expect(status.staleRateLimitCount).toBe(0);
     expect(status.activeRateLimitCount).toBe(0);
+  });
+
+  it('ignores pending draft reviews without submitted timestamps', () => {
+    const status = summarizeCodeRabbitStatus(
+      null,
+      [],
+      [{
+        author: { login: 'coderabbitai', __typename: 'Bot' },
+        body: 'draft review',
+        submittedAt: null,
+        state: 'PENDING',
+      }],
+    );
+
+    expect(status.state).toBe('missing');
+    expect(status.latestKind).toBe('none');
   });
 
   it('down-ranks stale rate-limit comments when a newer pass signal exists', () => {
@@ -220,6 +237,12 @@ describe('assertUntruncatedPullRequestData', () => {
       comments: { totalCount: 101, pageInfo: { hasNextPage: true } },
       reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
     })).toThrow('pull request metadata truncated; pagination required for comments=101');
+  });
+
+  it('fails fast when review thread metadata is truncated', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      reviewThreads: { totalCount: 101, pageInfo: { hasNextPage: true } },
+    })).toThrow('pull request metadata truncated; pagination required for reviewThreads=101');
   });
 });
 
