@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  assertUntruncatedPullRequestData,
   computeExitCode,
   computeMergeReadiness,
   computeMergeReadinessExitCode,
   extractUnresolvedFindings,
+  mergeReadinessHeading,
   summarizeChecks,
   summarizeCodeRabbitStatus,
   summarizeReviews,
@@ -142,6 +144,23 @@ describe('summarizeCodeRabbitStatus', () => {
     expect(status.latestKind).toBe('clean');
   });
 
+  it('prefers a live pending check over older clean history', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pending', state: 'PENDING' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T10:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('pending');
+    expect(status.detail).toBe('pending');
+    expect(status.staleRateLimitCount).toBe(0);
+    expect(status.activeRateLimitCount).toBe(0);
+  });
+
   it('down-ranks stale rate-limit comments when a newer pass signal exists', () => {
     const status = summarizeCodeRabbitStatus(
       { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
@@ -178,6 +197,29 @@ describe('summarizeCodeRabbitStatus', () => {
     expect(status.staleRateLimitCount).toBe(0);
     expect(status.activeRateLimitCount).toBe(1);
     expect(status.detail).toBe('rate-limited');
+  });
+});
+
+describe('mergeReadinessHeading', () => {
+  it('uses a pending-specific heading for pending-only states', () => {
+    expect(mergeReadinessHeading({ status: 'pending', reasons: ['1 pending check'] })).toBe('Pending merge signals');
+    expect(mergeReadinessHeading({ status: 'blocked', reasons: ['1 failing check'] })).toBe('Merge blockers');
+  });
+});
+
+describe('assertUntruncatedPullRequestData', () => {
+  it('passes when comment and review metadata fit in a single page', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      comments: { totalCount: 12, pageInfo: { hasNextPage: false } },
+      reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
+    })).not.toThrow();
+  });
+
+  it('fails fast when GitHub reports truncated comment or review metadata', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      comments: { totalCount: 101, pageInfo: { hasNextPage: true } },
+      reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
+    })).toThrow('pull request metadata truncated; pagination required for comments=101');
   });
 });
 

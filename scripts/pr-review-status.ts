@@ -63,9 +63,20 @@ interface ReviewThreadsResponse {
   };
 }
 
+interface PageInfo {
+  readonly hasNextPage: boolean;
+  readonly endCursor?: string | null;
+}
+
+interface PullRequestConnection<TNode> {
+  readonly nodes: readonly TNode[];
+  readonly totalCount: number;
+  readonly pageInfo: PageInfo;
+}
+
 interface PullRequestGraphqlNode extends Omit<PullRequestView, 'comments' | 'reviews'> {
-  readonly comments: { readonly nodes: readonly PullRequestComment[] };
-  readonly reviews: { readonly nodes: readonly PullRequestReview[] };
+  readonly comments: PullRequestConnection<PullRequestComment>;
+  readonly reviews: PullRequestConnection<PullRequestReview>;
 }
 
 interface PullRequestGraphqlResponse {
@@ -112,6 +123,29 @@ export interface CodeRabbitStatus {
 export interface MergeReadiness {
   readonly status: 'ready' | 'pending' | 'blocked';
   readonly reasons: readonly string[];
+}
+
+export function mergeReadinessHeading(readiness: MergeReadiness): string {
+  return readiness.status === 'blocked' ? 'Merge blockers' : 'Pending merge signals';
+}
+
+export function assertUntruncatedPullRequestData(input: {
+  readonly comments: Pick<PullRequestConnection<PullRequestComment>, 'pageInfo' | 'totalCount'>;
+  readonly reviews: Pick<PullRequestConnection<PullRequestReview>, 'pageInfo' | 'totalCount'>;
+}): void {
+  const truncated: string[] = [];
+
+  if (input.comments.pageInfo.hasNextPage) {
+    truncated.push(`comments=${input.comments.totalCount}`);
+  }
+
+  if (input.reviews.pageInfo.hasNextPage) {
+    truncated.push(`reviews=${input.reviews.totalCount}`);
+  }
+
+  if (truncated.length > 0) {
+    throw new Error(`pull request metadata truncated; pagination required for ${truncated.join(', ')}`);
+  }
 }
 
 export function summarizeChecks(checks: readonly CheckEntry[]): CheckSummary {
@@ -473,7 +507,7 @@ function main(): void {
   }
 
   if (options.mergeReady && mergeReadiness.reasons.length > 0) {
-    process.stdout.write(`\nMerge blockers:\n`);
+    process.stdout.write(`\n${mergeReadinessHeading(mergeReadiness)}:\n`);
     for (const reason of mergeReadiness.reasons) {
       process.stdout.write(`- ${reason}\n`);
     }
@@ -607,6 +641,11 @@ query($prNumber: Int!) {
       reviewDecision
       mergeStateStatus
       comments(first: 100) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
         nodes {
           body
           createdAt
@@ -614,6 +653,11 @@ query($prNumber: Int!) {
         }
       }
       reviews(first: 100) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
         nodes {
           body
           submittedAt
@@ -630,6 +674,8 @@ query($prNumber: Int!) {
   if (pullRequest == null) {
     throw new Error(`no pull request found for ${selector ?? 'current branch'}`);
   }
+
+  assertUntruncatedPullRequestData(pullRequest);
 
   return {
     ...pullRequest,
