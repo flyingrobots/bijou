@@ -17,6 +17,7 @@
     "smoke:examples:all": "tsx scripts/smoke-all-examples.ts",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
     "pr:review-status": "tsx scripts/pr-review-status.ts",
+    "pr:merge-readiness": "tsx scripts/pr-review-status.ts --merge-ready",
     "lint": "npm run lint --workspaces",
     "version": "bash scripts/version.sh"
   },

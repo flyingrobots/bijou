@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { computeExitCode, extractUnresolvedFindings, summarizeChecks } from './pr-review-status.js';
+import {
+  assertUntruncatedPullRequestData,
+  computeExitCode,
+  computeMergeReadiness,
+  computeMergeReadinessExitCode,
+  extractUnresolvedFindings,
+  mergeReadinessHeading,
+  summarizeChecks,
+  summarizeCodeRabbitStatus,
+  summarizeReviews,
+} from './pr-review-status.js';
 
 describe('summarizeChecks', () => {
   it('counts passing, pending, failing, canceled, and CodeRabbit checks', () => {
@@ -92,5 +102,258 @@ describe('computeExitCode', () => {
     expect(computeExitCode(passing, 1)).toBe(1);
     expect(computeExitCode(failing, 0)).toBe(1);
     expect(computeExitCode(canceled, 0)).toBe(1);
+  });
+});
+
+describe('summarizeReviews', () => {
+  it('collapses to the latest non-automated review per reviewer for merge gating', () => {
+    const summary = summarizeReviews([
+      { author: { login: 'alice' }, body: 'needs work', submittedAt: '2026-03-13T09:00:00Z', state: 'CHANGES_REQUESTED' },
+      { author: { login: 'alice' }, body: 'looks good', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+      { author: { login: 'bob' }, body: 'needs work', submittedAt: '2026-03-13T11:00:00Z', state: 'CHANGES_REQUESTED' },
+      { author: { login: 'carol' }, body: 'draft review', submittedAt: null, state: 'PENDING' },
+      { author: { login: 'coderabbitai', __typename: 'Bot' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
+      { author: { login: 'review-buddy', __typename: 'Bot' }, body: 'LGTM', submittedAt: '2026-03-13T12:30:00Z', state: 'APPROVED' },
+    ]);
+
+    expect(summary).toEqual({
+      total: 2,
+      approvals: 1,
+      changesRequested: 1,
+      comments: 0,
+      byState: {
+        APPROVED: 1,
+        CHANGES_REQUESTED: 1,
+      },
+    });
+  });
+});
+
+describe('summarizeCodeRabbitStatus', () => {
+  it('accepts CodeRabbit bot login variants when collecting events', () => {
+    const status = summarizeCodeRabbitStatus(
+      null,
+      [{
+        author: { login: 'coderabbitai[bot]', __typename: 'Bot' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T12:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('clean');
+    expect(status.latestKind).toBe('clean');
+  });
+
+  it('prefers a live pending check over older clean history', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pending', state: 'PENDING' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T10:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('pending');
+    expect(status.detail).toBe('pending');
+    expect(status.staleRateLimitCount).toBe(0);
+    expect(status.activeRateLimitCount).toBe(0);
+  });
+
+  it('ignores pending draft reviews without submitted timestamps', () => {
+    const status = summarizeCodeRabbitStatus(
+      null,
+      [],
+      [{
+        author: { login: 'coderabbitai', __typename: 'Bot' },
+        body: 'draft review',
+        submittedAt: null,
+        state: 'PENDING',
+      }],
+    );
+
+    expect(status.state).toBe('missing');
+    expect(status.latestKind).toBe('none');
+  });
+
+  it('down-ranks stale rate-limit comments when a newer pass signal exists', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'Rate limit exceeded. Please wait 30m.',
+        createdAt: '2026-03-13T10:00:00Z',
+      }, {
+        author: { login: 'coderabbitai' },
+        body: 'No actionable comments were generated in the recent review. 🎉',
+        createdAt: '2026-03-13T11:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('pass');
+    expect(status.staleRateLimitCount).toBe(1);
+    expect(status.activeRateLimitCount).toBe(0);
+    expect(status.detail).toContain('stale rate-limit comment');
+  });
+
+  it('treats the latest active rate-limit signal as pending review work', () => {
+    const status = summarizeCodeRabbitStatus(
+      { name: 'CodeRabbit', bucket: 'pending', state: 'PENDING' },
+      [{
+        author: { login: 'coderabbitai' },
+        body: 'Rate limit exceeded. Please wait 30m.',
+        createdAt: '2026-03-13T12:00:00Z',
+      }],
+      [],
+    );
+
+    expect(status.state).toBe('rate_limited');
+    expect(status.staleRateLimitCount).toBe(0);
+    expect(status.activeRateLimitCount).toBe(1);
+    expect(status.detail).toBe('rate-limited');
+  });
+});
+
+describe('mergeReadinessHeading', () => {
+  it('uses a pending-specific heading for pending-only states', () => {
+    expect(mergeReadinessHeading({ status: 'pending', reasons: ['1 pending check'] })).toBe('Pending merge signals');
+    expect(mergeReadinessHeading({ status: 'blocked', reasons: ['1 failing check'] })).toBe('Merge blockers');
+  });
+});
+
+describe('assertUntruncatedPullRequestData', () => {
+  it('passes when comment and review metadata fit in a single page', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      comments: { totalCount: 12, pageInfo: { hasNextPage: false } },
+      reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
+    })).not.toThrow();
+  });
+
+  it('fails fast when GitHub reports truncated comment or review metadata', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      comments: { totalCount: 101, pageInfo: { hasNextPage: true } },
+      reviews: { totalCount: 4, pageInfo: { hasNextPage: false } },
+    })).toThrow('pull request metadata truncated; pagination required for comments=101');
+  });
+
+  it('fails fast when review thread metadata is truncated', () => {
+    expect(() => assertUntruncatedPullRequestData({
+      reviewThreads: { totalCount: 101, pageInfo: { hasNextPage: true } },
+    })).toThrow('pull request metadata truncated; pagination required for reviewThreads=101');
+  });
+});
+
+describe('computeMergeReadiness', () => {
+  it('blocks when the review gate is not met even if checks are green', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: null, mergeStateStatus: 'CLEAN' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([{ author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' }]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('blocked');
+    expect(readiness.reasons).toContain('needs at least 2 reviews (found 1)');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(1);
+  });
+
+  it('returns pending when checks are still running after all blocking gates are satisfied', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
+      checks: summarizeChecks([
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        { name: 'test (22)', bucket: 'pending', state: 'PENDING' },
+      ]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('pending');
+    expect(readiness.reasons).toContain('1 pending check');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(8);
+  });
+
+  it('treats unknown merge state as pending while GitHub computes mergeability', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'UNKNOWN' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('pending');
+    expect(readiness.reasons).toContain('mergeability is still being computed');
+    expect(computeMergeReadinessExitCode(readiness)).toBe(8);
+  });
+
+  it('returns ready once checks, reviews, and bot state are all clear', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('ready');
+    expect(readiness.reasons).toEqual([]);
+    expect(computeMergeReadinessExitCode(readiness)).toBe(0);
+  });
+
+  it('blocks when GitHub still requires review or reports a non-mergeable state', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'REVIEW_REQUIRED', mergeStateStatus: 'BLOCKED' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('blocked');
+    expect(readiness.reasons).toContain('review decision is review_required');
+    expect(readiness.reasons).toContain('merge state is blocked');
   });
 });

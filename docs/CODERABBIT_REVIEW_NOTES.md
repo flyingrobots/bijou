@@ -15,6 +15,11 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - **Nits can hide real regressions**: trivial findings occasionally surface useful edge cases (e.g., split-pane multi-width divider).
   Proposed improvement: keep the policy of fixing all severities, but auto-group by subsystem to batch test runs efficiently.
 
+### 2026-03-13
+- **Historical bot chatter still competes with live bot state**: older CodeRabbit comments can remain prominent even when a newer check is green or a new review is actively in progress.
+  Progress: `pr:review-status` already prefers live pending/pass CodeRabbit signals over older clean history and down-ranks stale historical `rate-limited` comments when a newer green signal exists.
+  Remaining gap: make stale-history handling equally explicit for older clean/actionable bot chatter, so mixed historical comment streams need less human interpretation.
+
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
@@ -24,6 +29,5 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Add a small benchmark harness for diff rendering, layout solves, recorder throughput, and worker round-trips so perf regressions have a repeatable signal.
 - Add a local preflight command for workflow shell blocks so release-policy bash logic can be validated without waiting on GitHub Actions.
 - Keep optimizing the packed `create-bijou-tui-app` bin-shim integration test so published-artifact coverage stays fast enough for the full suite.
-- Teach `scripts/pr-review-status.ts` to down-rank stale historical CodeRabbit rate-limit comments when a newer `CodeRabbit` check is green.
-- Add a merge-readiness summary command that combines checks, unresolved threads, review-count gating, and latest bot status in one output.
 - Consider extracting a small shared GitHub API adapter/helper layer so repo tooling scripts stop duplicating GraphQL/REST shapes and nullability handling.
+- Generalize stale CodeRabbit history handling beyond `rate-limited` comments so older clean/actionable bot chatter is down-ranked as explicitly as rate-limit noise.
