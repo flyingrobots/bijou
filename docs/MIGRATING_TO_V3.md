@@ -14,7 +14,7 @@ The short version:
 1. Upgrade all Bijou packages together to `3.0.0`.
 2. Decide whether each part of your app is a core string-first flow or a V3 runtime flow.
 3. Treat `Surface`-returning helpers as real render values, not implicit strings.
-4. Cross string boundaries explicitly with `surfaceToString(..., ctx.style)` when you feed V3 output into legacy string-only helpers.
+4. Prefer the new `*Surface` companion helpers for common V3 layout chrome, and cross string boundaries explicitly with `surfaceToString(..., ctx.style)` only when you truly need a string.
 5. If you use framed apps, update pane renderers to the new `ViewOutput` contract.
 6. If you use nested TEA apps, prefer `initSubApp()` and `updateSubApp()` for lifecycle wiring, with `mount()` for rendering.
 7. If you adopt BCSS, stay within the documented supported scope for `3.0.0`.
@@ -92,6 +92,26 @@ The same rule applies when you feed badge or other V3 surface output into:
 - template strings
 - `Array.join(...)`
 - legacy string-only helpers like `table()` cells
+
+For common V3 app-shell composition, prefer the surface-native companions instead of converting back to strings:
+
+```ts
+import { badge, separatorSurface, tableSurface } from '@flyingrobots/bijou';
+
+const table = tableSurface({
+  columns: [{ header: 'Service' }, { header: 'Status' }],
+  rows: [['api', badge('LIVE', { variant: 'success', ctx })]],
+  ctx,
+});
+```
+
+The preferred V3-native companions are:
+
+- `boxSurface()`
+- `headerBoxSurface()`
+- `separatorSurface()`
+- `alertSurface()`
+- `tableSurface()`
 
 ## `surfaceToString()` Now Needs A Style Port
 

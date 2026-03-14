@@ -35,5 +35,5 @@ yarn.lock
 # Misc
 *.tgz
 last-chat.txt
-bijou-tui-app/
+/bijou-tui-app/
 scripts/__pycache__/

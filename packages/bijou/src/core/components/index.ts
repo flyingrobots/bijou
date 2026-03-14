@@ -14,21 +14,26 @@ export type { ProgressBarOptions, LiveProgressBarOptions, AnimatedProgressBarOpt
 
 export { table } from './table.js';
 export type { TableColumn, TableOptions } from './table.js';
+export { tableSurface } from './table-v3.js';
+export type { TableSurfaceCell, TableSurfaceOptions } from './table-v3.js';
 
 export { box, headerBox } from './box.js';
 export type { BoxOptions, HeaderBoxOptions } from './box.js';
+export { boxSurface, boxV3, headerBoxSurface } from './box-v3.js';
 
 export { selectLogoSize, loadRandomLogo } from './logo.js';
 export type { LogoSize, LogoResult, LogoConstraints, LogoOptions } from './logo.js';
 
 export { separator } from './separator.js';
 export type { SeparatorOptions } from './separator.js';
+export { separatorSurface } from './separator-v3.js';
 
 export { badge } from './badge.js';
 export type { BadgeVariant, BadgeOptions } from './badge.js';
 
 export { alert } from './alert.js';
 export type { AlertVariant, AlertOptions } from './alert.js';
+export { alertSurface } from './alert-v3.js';
 
 export { skeleton } from './skeleton.js';
 export type { SkeletonOptions } from './skeleton.js';

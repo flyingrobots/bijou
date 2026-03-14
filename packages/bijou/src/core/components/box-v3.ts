@@ -1,8 +1,9 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
-import { type BoxOptions } from './box.js';
+import { type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
+import { createSegmentSurface, createTextSurface, tokenToCellStyle } from './surface-text.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
@@ -11,7 +12,7 @@ const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' 
  * 
  * Returns a new Surface containing the box and the nested content.
  */
-export function boxV3(content: Surface | string, options: BoxOptions = {}): Surface {
+export function boxSurface(content: Surface | string, options: BoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
@@ -23,16 +24,7 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
 
   let contentSurf: Surface;
   if (typeof content === 'string') {
-    const lines = content.split(/\r?\n/);
-    const h = lines.length;
-    const w = Math.max(...lines.map(l => segmentGraphemes(l).length), 0);
-    contentSurf = createSurface(w, h);
-    lines.forEach((line, y) => {
-      const gs = segmentGraphemes(line);
-      gs.forEach((char, x) => {
-        contentSurf.set(x, y, { char });
-      });
-    });
+    contentSurf = createTextSurface(content);
   } else {
     contentSurf = content;
   }
@@ -99,4 +91,33 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
   surface.blit(contentSurf, pl + 1, pt + 1);
 
   return surface;
+}
+
+export const boxV3 = boxSurface;
+
+/**
+ * Render a header box as a Surface for V3-native composition.
+ *
+ * Unlike {@link headerBox}, this always returns a Surface and is intended
+ * for use inside framed apps or other surface-first render paths.
+ */
+export function headerBoxSurface(label: string, options: HeaderBoxOptions = {}): Surface {
+  const ctx = resolveCtx(options.ctx);
+  const safeLabel = label ?? '';
+  const detail = options.detail ?? '';
+  const labelToken = options.labelToken ?? ctx?.semantic('primary');
+  const mutedToken = ctx?.semantic('muted');
+
+  const segments = [];
+  if (safeLabel.length > 0) {
+    segments.push({ text: safeLabel, style: tokenToCellStyle(labelToken) });
+  }
+  if (detail.length > 0) {
+    segments.push({
+      text: safeLabel.length > 0 ? `  ${detail}` : detail,
+      style: tokenToCellStyle(mutedToken),
+    });
+  }
+
+  return boxSurface(createSegmentSurface(segments), options);
 }

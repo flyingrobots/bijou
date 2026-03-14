@@ -8,6 +8,7 @@ The pure, zero-dependency core of Bijou.
 
 - **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
 - **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
+- **Surface-first companions for common V3 chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for the most common layout and status primitives.
 - **Explicit compatibility boundaries** — when you mix surface-native helpers with legacy string APIs, you cross that seam explicitly with `surfaceToString(surface, ctx.style)`.
 - **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
@@ -21,14 +22,21 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox, gradientText, table } from '@flyingrobots/bijou';
+import { badge, boxSurface, tableSurface } from '@flyingrobots/bijou';
 
 // Initialize Node.js adapters (auto-detects TTY, CI, NO_COLOR)
-initDefaultContext();
+const ctx = initDefaultContext();
 
-// Use components
-console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
-console.log(box('Hello, world!'));
+const panel = boxSurface(
+  tableSurface({
+    columns: [{ header: 'Service' }, { header: 'Status' }],
+    rows: [['api', badge('LIVE', { variant: 'success', ctx })]],
+    ctx,
+  }),
+  { title: 'Runtime', padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx },
+);
+
+// Return `panel` from a V3 `view()` function or framed pane renderer.
 ```
 
 ## Features Breakdown
@@ -43,13 +51,13 @@ console.log(box('Hello, world!'));
 ## Components
 
 ### Layout
-`box()`, `headerBox()`, `separator()` — unicode box-drawing with automatic ASCII fallback.
+`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — legacy string helpers and V3-native surface companions for layout chrome.
 
 ### Elements
-`badge()`, `alert()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
+`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
 
 ### Data
-`table()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
+`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
