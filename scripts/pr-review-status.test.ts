@@ -104,22 +104,23 @@ describe('computeExitCode', () => {
 });
 
 describe('summarizeReviews', () => {
-  it('counts review states for merge-readiness gating', () => {
+  it('collapses to the latest non-automated review per reviewer for merge gating', () => {
     const summary = summarizeReviews([
+      { author: { login: 'alice' }, body: 'needs work', submittedAt: '2026-03-13T09:00:00Z', state: 'CHANGES_REQUESTED' },
       { author: { login: 'alice' }, body: 'looks good', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
       { author: { login: 'bob' }, body: 'needs work', submittedAt: '2026-03-13T11:00:00Z', state: 'CHANGES_REQUESTED' },
       { author: { login: 'coderabbitai' }, body: 'notes', submittedAt: '2026-03-13T12:00:00Z', state: 'COMMENTED' },
+      { author: { login: 'chatgpt-codex-connector' }, body: 'notes', submittedAt: '2026-03-13T12:30:00Z', state: 'COMMENTED' },
     ]);
 
     expect(summary).toEqual({
-      total: 3,
+      total: 2,
       approvals: 1,
       changesRequested: 1,
-      comments: 1,
+      comments: 0,
       byState: {
         APPROVED: 1,
         CHANGES_REQUESTED: 1,
-        COMMENTED: 1,
       },
     });
   });
@@ -168,7 +169,7 @@ describe('summarizeCodeRabbitStatus', () => {
 describe('computeMergeReadiness', () => {
   it('blocks when the review gate is not met even if checks are green', () => {
     const readiness = computeMergeReadiness({
-      pr: { state: 'OPEN', isDraft: false },
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: null, mergeStateStatus: 'CLEAN' },
       checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
       unresolvedCount: 0,
       reviews: summarizeReviews([{ author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' }]),
@@ -187,7 +188,7 @@ describe('computeMergeReadiness', () => {
 
   it('returns pending when checks are still running after all blocking gates are satisfied', () => {
     const readiness = computeMergeReadiness({
-      pr: { state: 'OPEN', isDraft: false },
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
       checks: summarizeChecks([
         { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
         { name: 'test (22)', bucket: 'pending', state: 'PENDING' },
@@ -212,7 +213,7 @@ describe('computeMergeReadiness', () => {
 
   it('returns ready once checks, reviews, and bot state are all clear', () => {
     const readiness = computeMergeReadiness({
-      pr: { state: 'OPEN', isDraft: false },
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'APPROVED', mergeStateStatus: 'CLEAN' },
       checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
       unresolvedCount: 0,
       reviews: summarizeReviews([
@@ -230,5 +231,27 @@ describe('computeMergeReadiness', () => {
     expect(readiness.status).toBe('ready');
     expect(readiness.reasons).toEqual([]);
     expect(computeMergeReadinessExitCode(readiness)).toBe(0);
+  });
+
+  it('blocks when GitHub still requires review or reports a non-mergeable state', () => {
+    const readiness = computeMergeReadiness({
+      pr: { state: 'OPEN', isDraft: false, reviewDecision: 'REVIEW_REQUIRED', mergeStateStatus: 'BLOCKED' },
+      checks: summarizeChecks([{ name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' }]),
+      unresolvedCount: 0,
+      reviews: summarizeReviews([
+        { author: { login: 'alice' }, body: 'ok', submittedAt: '2026-03-13T10:00:00Z', state: 'APPROVED' },
+        { author: { login: 'bob' }, body: 'ok', submittedAt: '2026-03-13T11:00:00Z', state: 'APPROVED' },
+      ]),
+      codeRabbit: summarizeCodeRabbitStatus(
+        { name: 'CodeRabbit', bucket: 'pass', state: 'SUCCESS' },
+        [],
+        [],
+      ),
+      minReviews: 2,
+    });
+
+    expect(readiness.status).toBe('blocked');
+    expect(readiness.reasons).toContain('review decision is review_required');
+    expect(readiness.reasons).toContain('merge state is blocked');
   });
 });

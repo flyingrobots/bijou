@@ -142,14 +142,28 @@ export function extractUnresolvedFindings(threads: readonly ReviewThreadNode[]):
 }
 
 export function summarizeReviews(reviews: readonly PullRequestReview[]): ReviewSummary {
+  const latestByReviewer = new Map<string, PullRequestReview>();
+
   const byState: Record<string, number> = {};
 
   for (const review of reviews) {
+    const reviewer = review.author?.login ?? '(unknown)';
+    if (isAutomatedReviewer(reviewer)) {
+      continue;
+    }
+
+    const previous = latestByReviewer.get(reviewer);
+    if (previous == null || previous.submittedAt < review.submittedAt) {
+      latestByReviewer.set(reviewer, review);
+    }
+  }
+
+  for (const review of latestByReviewer.values()) {
     byState[review.state] = (byState[review.state] ?? 0) + 1;
   }
 
   return {
-    total: reviews.length,
+    total: latestByReviewer.size,
     approvals: byState.APPROVED ?? 0,
     changesRequested: byState.CHANGES_REQUESTED ?? 0,
     comments: byState.COMMENTED ?? 0,
@@ -269,7 +283,7 @@ export function summarizeCodeRabbitStatus(
 }
 
 export function computeMergeReadiness(input: {
-  readonly pr: Pick<PullRequestView, 'state' | 'isDraft'>;
+  readonly pr: Pick<PullRequestView, 'state' | 'isDraft' | 'reviewDecision' | 'mergeStateStatus'>;
   readonly checks: CheckSummary;
   readonly unresolvedCount: number;
   readonly reviews: ReviewSummary;
@@ -284,6 +298,18 @@ export function computeMergeReadiness(input: {
 
   if (input.pr.isDraft) {
     reasons.push('pull request is still a draft');
+  }
+
+  if (input.pr.reviewDecision === 'REVIEW_REQUIRED') {
+    reasons.push('review decision is review_required');
+  }
+
+  if (input.pr.reviewDecision === 'CHANGES_REQUESTED') {
+    reasons.push('review decision is changes_requested');
+  }
+
+  if (input.pr.mergeStateStatus != null && input.pr.mergeStateStatus !== '' && !isMergeableState(input.pr.mergeStateStatus)) {
+    reasons.push(`merge state is ${input.pr.mergeStateStatus.toLowerCase()}`);
   }
 
   if (input.checks.failing.length > 0) {
@@ -523,6 +549,14 @@ function classifyCodeRabbitBody(body: string): CodeRabbitEventKind {
   }
 
   return 'other';
+}
+
+function isAutomatedReviewer(login: string): boolean {
+  return login === 'coderabbitai' || login === 'chatgpt-codex-connector' || login.endsWith('[bot]');
+}
+
+function isMergeableState(state: string): boolean {
+  return state === 'CLEAN' || state === 'HAS_HOOKS' || state === 'UNSTABLE';
 }
 
 function ghJson<T>(args: readonly string[]): T {
