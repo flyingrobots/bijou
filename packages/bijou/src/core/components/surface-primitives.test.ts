@@ -94,6 +94,15 @@ describe('surface-first primitives', () => {
     expect(surface.get(1, 1).char).toBe(' ');
   });
 
+  it('boxSurface clips constrained content and preserves the right border', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = boxSurface('ABCDE', { width: 6, ctx });
+
+    expect(surface.get(1, 1).char).toBe('A');
+    expect(surface.get(4, 1).char).toBe('D');
+    expect(surface.get(5, 1).char).toBe('│');
+  });
+
   it('tableSurface accepts Surface cells without explicit surfaceToString bridging', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const rendered = stripAnsi(surfaceToString(tableSurface({
@@ -182,5 +191,21 @@ describe('surface-first primitives', () => {
     expect(rendered).toContain('Alice');
     expect(rendered).toContain('95');
     expect(rendered).toContain('┌');
+  });
+
+  it('createTextSurface rejects wide graphemes until surface wide-cell support exists', () => {
+    expect(() => createTextSurface('漢')).toThrow(/does not yet support wide graphemes/);
+  });
+
+  it('separatorSurface rejects wide labels until surface wide-cell support exists', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+
+    expect(() => separatorSurface({ label: '漢', width: 8, ctx })).toThrow(/does not yet support wide graphemes/);
+  });
+
+  it('boxSurface rejects wide text until surface wide-cell support exists', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+
+    expect(() => boxSurface('漢', { ctx })).toThrow(/does not yet support wide graphemes/);
   });
 });

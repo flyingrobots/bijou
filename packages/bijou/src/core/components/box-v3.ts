@@ -1,10 +1,10 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { shouldApplyBg } from '../bg-fill.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { segmentGraphemes } from '../text/grapheme.js';
+import { clipToWidth } from '../text/clip.js';
 import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
-import { createSegmentSurface, createTextSurface, tokenToCellStyle } from './surface-text.js';
+import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
@@ -50,6 +50,10 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   
   const outerW = fixedWidth ?? (innerW + 2);
   const outerH = innerH + 2;
+  const boundedInnerW = Math.max(0, outerW - 2);
+  const effectiveLeft = fixedWidth !== undefined ? Math.min(pl, boundedInnerW) : pl;
+  const effectiveRight = fixedWidth !== undefined ? Math.min(pr, Math.max(0, boundedInnerW - effectiveLeft)) : pr;
+  const contentBoxWidth = Math.max(0, boundedInnerW - effectiveLeft - effectiveRight);
   
   const surface = createSurface(outerW, outerH);
   const resolvedFillChar = resolveFillChar(options.fillChar);
@@ -95,9 +99,9 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
 
   // Draw title
   if (title && outerW >= 4) {
-    const titleText = ` ${title} `;
-    const titleGs = segmentGraphemes(titleText);
-    const available = outerW - 4;
+    const available = Math.max(0, outerW - 4);
+    const titleText = clipToWidth(` ${title} `, available);
+    const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
     const titleLen = Math.min(titleGs.length, available);
     for (let i = 0; i < titleLen; i++) {
       surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
@@ -105,7 +109,15 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   }
 
   // Blit content
-  surface.blit(withInheritedBackground(contentSurf, fillStyle.bg), pl + 1, pt + 1);
+  surface.blit(
+    withInheritedBackground(contentSurf, fillStyle.bg),
+    effectiveLeft + 1,
+    pt + 1,
+    0,
+    0,
+    contentBoxWidth,
+    contentSurf.height,
+  );
 
   return surface;
 }

@@ -1,8 +1,7 @@
 import { createSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { segmentGraphemes } from '../text/grapheme.js';
 import type { SeparatorOptions } from './separator.js';
-import { tokenToCellStyle } from './surface-text.js';
+import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 
 /**
  * Render a horizontal separator as a Surface for V3-native composition.
@@ -12,7 +11,8 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const label = options.label ?? '';
   const token = options.borderToken ?? ctx?.border('muted');
   const borderStyle = tokenToCellStyle(token);
-  const fallbackWidth = label.length > 0 ? segmentGraphemes(` ${label} `).length : 3;
+  const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `, 'separatorSurface label') : [];
+  const fallbackWidth = labelGraphemes.length > 0 ? labelGraphemes.length : 3;
   const width = Math.max(0, Math.floor(options.width ?? ctx?.runtime.columns ?? fallbackWidth));
   const surface = createSurface(width, 1);
 
@@ -30,7 +30,6 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
     return surface;
   }
 
-  const labelGraphemes = segmentGraphemes(` ${label} `);
   if (labelGraphemes.length >= width) {
     for (let x = 0; x < width; x++) {
       setPlain(x, labelGraphemes[x] ?? ' ');
