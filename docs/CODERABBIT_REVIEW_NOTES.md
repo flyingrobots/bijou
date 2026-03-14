@@ -17,8 +17,8 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 
 ### 2026-03-13
 - **Historical bot chatter still competes with live bot state**: older CodeRabbit comments can remain prominent even when a newer check is green or a new review is actively in progress.
-  Progress: `pr:review-status` already down-ranks stale historical `rate-limited` comments when a newer green CodeRabbit signal exists.
-  Proposed improvement: extend that logic across the full bot lifecycle (`pending`, `pass`, `rate-limited`, `no actionable comments`) so humans do not have to infer the current state manually from mixed historical comments.
+  Progress: `pr:review-status` already prefers live pending/pass CodeRabbit signals over older clean history and down-ranks stale historical `rate-limited` comments when a newer green signal exists.
+  Remaining gap: make stale-history handling equally explicit for older clean/actionable bot chatter, so mixed historical comment streams need less human interpretation.
 
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
@@ -30,4 +30,4 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Add a local preflight command for workflow shell blocks so release-policy bash logic can be validated without waiting on GitHub Actions.
 - Keep optimizing the packed `create-bijou-tui-app` bin-shim integration test so published-artifact coverage stays fast enough for the full suite.
 - Consider extracting a small shared GitHub API adapter/helper layer so repo tooling scripts stop duplicating GraphQL/REST shapes and nullability handling.
-- Teach `scripts/pr-review-status.ts` to distinguish active CodeRabbit review-in-progress state from stale historical comments when the latest bot run is still pending.
+- Generalize stale CodeRabbit history handling beyond `rate-limited` comments so older clean/actionable bot chatter is down-ranked as explicitly as rate-limit noise.
