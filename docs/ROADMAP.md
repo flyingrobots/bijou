@@ -78,7 +78,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | The generated TUI canary and internal core/static canary shipped. Backlog now covers keeping the scenario coverage broad and the install/build path efficient without weakening published-artifact fidelity. |
-| **PR Review Tooling** | repo tooling | `pr:review-status` shipped. Backlog now covers stale-CodeRabbit filtering, merge-readiness summaries, shared GitHub adapter helpers, and batch reply/resolve workflows for addressed threads. |
+| **PR Review Tooling** | repo tooling | `pr:review-status` and `pr:merge-readiness` shipped. Backlog now covers differentiating active bot-review progress from stale historical chatter, shared GitHub adapter helpers, and batch reply/resolve workflows for addressed threads. |
 | **Release Dry-Run Workflow** | repo tooling | `workflow_dispatch` dry-run and shared release validation shipped. Backlog now covers a local shell-block preflight path plus any remaining release-policy helper cleanup. |
 | **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Backlog now covers keeping the PTY helper self-contained and low-noise. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
@@ -88,7 +88,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | ~~**Shared Release Validation Script**~~ | ~~repo tooling~~ | ~~Shipped post-v3. `scripts/release-metadata.ts` now validates workspace versions and internal dependency pins for both `publish.yml` and `release-dry-run.yml`.~~ |
 | **Workflow Shell Preflight** | repo tooling | Add a lightweight local command that validates workflow shell blocks and release-policy snippets outside GitHub Actions. |
 | **Packed Scaffold CLI Test Optimization** | create-bijou-tui-app | Keep the packed bin-shim integration test truthful, but continue reducing install/pack overhead so it stays cheap in the full suite. |
-| **Merge-Readiness Summary** | repo tooling | Add one command that combines checks, unresolved threads, review-count gating, and latest bot status so PR triage stops depending on manual cross-checks. |
+| ~~**Merge-Readiness Summary**~~ | ~~repo tooling~~ | ~~Shipped post-v3. `pr:merge-readiness` now combines checks, unresolved threads, review-count gating, and latest bot status in one CLI summary.~~ |
 
 ### P3 — Nice to have
 
