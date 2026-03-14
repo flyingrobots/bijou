@@ -26,7 +26,7 @@ export function alertSurface(message: string | Surface, options: AlertOptions = 
   const ctx = resolveCtx(options.ctx);
   const variant = options.variant ?? 'info';
   const iconSurface = createTextSurface(ICONS[variant], tokenToCellStyle(ctx?.semantic(variant)));
-  const messageSurface = typeof message === 'string' ? createTextSurface(message ?? '') : message;
+  const messageSurface = typeof message === 'string' ? createTextSurface(message) : message;
   const width = iconSurface.width + 1 + messageSurface.width;
   const height = Math.max(iconSurface.height, messageSurface.height, 1);
   const content = createSurface(width, height, { char: ' ', empty: false });
@@ -37,7 +37,7 @@ export function alertSurface(message: string | Surface, options: AlertOptions = 
 
   return boxSurface(content, {
     ...options,
-    borderToken: ctx?.border(BORDER_TOKENS[variant]),
+    borderToken: options.borderToken ?? ctx?.border(BORDER_TOKENS[variant]),
     bgToken: options.bgToken ?? ctx?.surface('elevated'),
   });
 }

@@ -72,6 +72,17 @@ describe('surface-first primitives', () => {
     expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated')?.bg);
   });
 
+  it('alertSurface accepts a custom borderToken override', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = alertSurface('Watch this border', {
+      borderToken: { hex: '#112233' },
+      ctx,
+    });
+
+    expect(surface.get(0, 0).fg).toBe('#112233');
+    expect(surface.get(surface.width - 1, surface.height - 1).fg).toBe('#112233');
+  });
+
   it('boxSurface falls back to a safe fill character for wide graphemes', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const surface = boxSurface('A', {
