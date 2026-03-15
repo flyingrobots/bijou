@@ -8,6 +8,12 @@ import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCel
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
+function normalizeFixedWidth(width: number | undefined): number | undefined {
+  if (width == null) return undefined;
+  if (!Number.isFinite(width)) return undefined;
+  return Math.max(2, Math.floor(width));
+}
+
 function withInheritedBackground(surface: Surface, background: string | undefined): Surface {
   if (background == null) return surface;
 
@@ -32,6 +38,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
+  const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
   
   const pt = padding.top ?? 0;
   const pb = padding.bottom ?? 0;
@@ -48,11 +55,11 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const innerW = contentSurf.width + pl + pr;
   const innerH = contentSurf.height + pt + pb;
   
-  const outerW = fixedWidth ?? (innerW + 2);
+  const outerW = normalizedFixedWidth ?? (innerW + 2);
   const outerH = innerH + 2;
   const boundedInnerW = Math.max(0, outerW - 2);
-  const effectiveLeft = fixedWidth !== undefined ? Math.min(pl, boundedInnerW) : pl;
-  const effectiveRight = fixedWidth !== undefined ? Math.min(pr, Math.max(0, boundedInnerW - effectiveLeft)) : pr;
+  const effectiveLeft = normalizedFixedWidth !== undefined ? Math.min(pl, boundedInnerW) : pl;
+  const effectiveRight = normalizedFixedWidth !== undefined ? Math.min(pr, Math.max(0, boundedInnerW - effectiveLeft)) : pr;
   const contentBoxWidth = Math.max(0, boundedInnerW - effectiveLeft - effectiveRight);
   
   const surface = createSurface(outerW, outerH);

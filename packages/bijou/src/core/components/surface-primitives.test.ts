@@ -103,6 +103,26 @@ describe('surface-first primitives', () => {
     expect(surface.get(5, 1).char).toBe('│');
   });
 
+  it('boxSurface normalizes fractional fixed widths before blitting content', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = boxSurface('ABCDE', { width: 3.9, ctx });
+
+    expect(surface.width).toBe(3);
+    expect(surface.get(1, 1).char).toBe('A');
+    expect(surface.get(2, 1).char).toBe('│');
+  });
+
+  it('boxSurface clamps negative fixed widths to a minimal border shell', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = boxSurface('ABCDE', { width: -4, ctx });
+
+    expect(surface.width).toBe(2);
+    expect(surface.get(0, 0).char).toBe('┌');
+    expect(surface.get(1, 0).char).toBe('┐');
+    expect(surface.get(0, 1).char).toBe('│');
+    expect(surface.get(1, 1).char).toBe('│');
+  });
+
   it('tableSurface accepts Surface cells without explicit surfaceToString bridging', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const rendered = stripAnsi(surfaceToString(tableSurface({
