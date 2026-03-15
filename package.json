@@ -10,6 +10,7 @@
     "build": "tsc -b",
     "build:watch": "tsc -b -w",
     "test": "vitest run --config vitest.config.ts",
+    "test:frames": "vitest run --config vitest.config.ts scripts/frame-assertions.test.ts scripts/frame-regressions.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",

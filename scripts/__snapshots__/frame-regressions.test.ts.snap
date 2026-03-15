@@ -1,0 +1,147 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`frame regressions > captures stable scaffold home and split frames > scaffold-home 1`] = `
+" Home  |  Split                                                                 
+ App                                                                        Home
+▎                                                 ┌────────── Drawer ──────────┐
+▎                                                 │ Panel drawer               │
+▎                                                 │                            │
+▎                                                 │ Open: yes                  │
+▎                                                 │ Width: 100%                │
+▎                                                 │                            │
+▎                                                 │ o        toggle drawer     │
+▎                                                 │ [ / ]    switch pages      │
+▎                                                 │ q        quit (confirm)    │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+▎                                                 │                            │
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ Home ready                                                                 Home
+ [ ] pages | o drawer | tab panes | ctrl+p commands | q quit                    "
+`;
+
+exports[`frame regressions > captures stable scaffold home and split frames > scaffold-split 1`] = `
+" Home  |  Split                                                                 
+ App                                                                       Split
+▎──── Left pane (1/3) ────│▎───────────────── Right pane (2/3) ─────────────────
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+▎                         │▎                                                    
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ Split ready                                                               Split
+ [ ] pages | o drawer | tab panes | ctrl+p commands | q quit                    "
+`;
+
+exports[`frame regressions > locks the BCSS demo frames across responsive width changes > v3-css-narrow 1`] = `
+"┌─ BCSS Workbench ──────────────────────────────────────────────────────
+│                                                                       
+│  BCSS resolves type, class, id, var(), and media queries in the runtim
+│                                                                       
+│   Type selector    Class selector    Warning                          
+│                                                                       
+│  Resize below 80 columns to flip the container theme. Current width: 7
+│  Press Q to quit.                                                     
+│                                                                       
+└───────────────────────────────────────────────────────────────────────"
+`;
+
+exports[`frame regressions > locks the BCSS demo frames across responsive width changes > v3-css-wide 1`] = `
+"┌─ BCSS Workbench ───────────────────────────────────────────────────────────────┐
+│                                                                                │
+│  BCSS resolves type, class, id, var(), and media queries in the runtime path.  │
+│                                                                                │
+│   Type selector    Class selector    Warning                                   │
+│                                                                                │
+│  Resize below 80 columns to flip the container theme. Current width: 96        │
+│  Press Q to quit.                                                              │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘"
+`;
+
+exports[`frame regressions > locks the fractal sub-app demo frames after child updates > v3-subapp-initial 1`] = `
+"┌─ Fractal TEA ─────────────────────────────────┐
+│                                               │
+│  Left Counter                                 │
+│                                               │
+│   Count 0                                     │
+│                                               │
+│  Right Counter                                │
+│                                               │
+│   Count 0                                     │
+│                                               │
+│  Controls: [a/z] left  [k/m] right  [q] quit  │
+│  Status: Ready                                │
+│                                               │
+└───────────────────────────────────────────────┘"
+`;
+
+exports[`frame regressions > locks the fractal sub-app demo frames after child updates > v3-subapp-updated 1`] = `
+"┌─ Fractal TEA ─────────────────────────────────┐
+│                                               │
+│  Left Counter                                 │
+│                                               │
+│   Count 1                                     │
+│                                               │
+│  Right Counter                                │
+│                                               │
+│   Count 0                                     │
+│                                               │
+│  Controls: [a/z] left  [k/m] right  [q] quit  │
+│  Status: Right -1                             │
+│                                               │
+└───────────────────────────────────────────────┘"
+`;
+
+exports[`frame regressions > locks the starter V3 demo frames > v3-demo-after-space 1`] = `
+" BIJOU V3                                                               
+                                                                        
+┌─ Starter App ─────────────────────────────────────────────────────────
+│                                                                       
+│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│                                                                       
+│  ───────── Live Metrics ──────────                                    
+│                                                                       
+│   Count 1    72x20    interactive                                     
+│                                                                       
+│  Press SPACE to increment. Press Q to quit.                           
+│                                                                       
+└───────────────────────────────────────────────────────────────────────"
+`;
+
+exports[`frame regressions > locks the starter V3 demo frames > v3-demo-initial 1`] = `
+" BIJOU V3                                                               
+                                                                        
+┌─ Starter App ─────────────────────────────────────────────────────────
+│                                                                       
+│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│                                                                       
+│  ───────── Live Metrics ──────────                                    
+│                                                                       
+│   Count 0    72x20    interactive                                     
+│                                                                       
+│  Press SPACE to increment. Press Q to quit.                           
+│                                                                       
+└───────────────────────────────────────────────────────────────────────"
+`;
