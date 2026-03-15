@@ -26,6 +26,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface title and table width parity** — `boxSurface()` now widens auto-sized boxes to account for long titles like `box()`, and `tableSurface()` now normalizes explicit column widths before layout math so fractional widths cannot corrupt the underlying `Surface` grid.
 - **Surface background metadata parity** — `boxSurface()` now preserves interior background cells even when `ctx` is `noColor`, so the returned `Surface` model stays consistent and render policy decides whether color is emitted.
 
+### 🧪 Tests
+
+- **Deterministic frame regressions** — added repo-level frame assertion helpers plus scripted frame snapshots for the scaffold shell and flagship V3 examples, with explicit resize assertions on the shell path and responsive narrow/wide frame coverage for the BCSS demo.
+
 ## [3.0.0] - 2026-03-12
 
 ### BREAKING CHANGES
