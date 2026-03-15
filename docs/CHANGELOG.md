@@ -24,6 +24,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface primitive clipping and Unicode guardrails** — `boxSurface()` now clips constrained content inside the inner box instead of letting it overwrite borders, and the new text-based surface helpers now fail loudly on wide graphemes until the `Surface` model grows true wide-cell support.
 - **Surface fixed-width normalization** — `boxSurface()` now normalizes fractional or negative fixed widths before border and blit math runs, so constrained boxes preserve their borders instead of drifting past the actual allocated surface width.
 - **Surface title and table width parity** — `boxSurface()` now widens auto-sized boxes to account for long titles like `box()`, and `tableSurface()` now normalizes explicit column widths before layout math so fractional widths cannot corrupt the underlying `Surface` grid.
+- **Surface background metadata parity** — `boxSurface()` now preserves interior background cells even when `ctx` is `noColor`, so the returned `Surface` model stays consistent and render policy decides whether color is emitted.
 
 ## [3.0.0] - 2026-03-12
 
