@@ -1,20 +1,43 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { segmentGraphemes } from '../text/grapheme.js';
-import { type BoxOptions } from './box.js';
+import { clipToWidth } from '../text/clip.js';
+import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
+import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
+
+function normalizeFixedWidth(width: number | undefined): number | undefined {
+  if (width == null) return undefined;
+  if (!Number.isFinite(width)) return undefined;
+  return Math.max(2, Math.floor(width));
+}
+
+function withInheritedBackground(surface: Surface, background: string | undefined): Surface {
+  if (background == null) return surface;
+
+  const next = surface.clone();
+  for (let y = 0; y < next.height; y++) {
+    for (let x = 0; x < next.width; x++) {
+      const cell = next.get(x, y);
+      if (cell.empty || cell.bg != null) continue;
+      next.set(x, y, { ...cell, bg: background });
+    }
+  }
+
+  return next;
+}
 
 /**
  * Render a bordered box around a Surface.
  * 
  * Returns a new Surface containing the box and the nested content.
  */
-export function boxV3(content: Surface | string, options: BoxOptions = {}): Surface {
+export function boxSurface(content: Surface | string, options: BoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
+  const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
   
   const pt = padding.top ?? 0;
   const pb = padding.bottom ?? 0;
@@ -23,34 +46,35 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
 
   let contentSurf: Surface;
   if (typeof content === 'string') {
-    const lines = content.split(/\r?\n/);
-    const h = lines.length;
-    const w = Math.max(...lines.map(l => segmentGraphemes(l).length), 0);
-    contentSurf = createSurface(w, h);
-    lines.forEach((line, y) => {
-      const gs = segmentGraphemes(line);
-      gs.forEach((char, x) => {
-        contentSurf.set(x, y, { char });
-      });
-    });
+    contentSurf = createTextSurface(content);
   } else {
     contentSurf = content;
   }
 
-  const innerW = contentSurf.width + pl + pr;
+  const autoTitleWidth = normalizedFixedWidth === undefined && title
+    ? segmentSurfaceText(` ${title} `, 'boxSurface title').length
+    : 0;
+  const innerW = normalizedFixedWidth === undefined
+    ? Math.max(contentSurf.width + pl + pr, autoTitleWidth)
+    : contentSurf.width + pl + pr;
   const innerH = contentSurf.height + pt + pb;
   
-  const outerW = fixedWidth ?? (innerW + 2);
+  const outerW = normalizedFixedWidth ?? (innerW + 2);
   const outerH = innerH + 2;
+  const boundedInnerW = Math.max(0, outerW - 2);
+  const effectiveLeft = normalizedFixedWidth !== undefined ? Math.min(pl, boundedInnerW) : pl;
+  const effectiveRight = normalizedFixedWidth !== undefined ? Math.min(pr, Math.max(0, boundedInnerW - effectiveLeft)) : pr;
+  const contentBoxWidth = Math.max(0, boundedInnerW - effectiveLeft - effectiveRight);
   
   const surface = createSurface(outerW, outerH);
+  const resolvedFillChar = resolveFillChar(options.fillChar);
   const fillStyle = applyBCSSCellTextStyles({
     fg: undefined,
-    bg: undefined,
+    bg: options.bgToken?.bg,
     modifiers: undefined,
   }, bcss);
   surface.fill({
-    char: options.fillChar || ' ',
+    char: resolvedFillChar,
     bg: fillStyle.bg,
     fg: fillStyle.fg,
     modifiers: fillStyle.modifiers,
@@ -86,9 +110,9 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
 
   // Draw title
   if (title && outerW >= 4) {
-    const titleText = ` ${title} `;
-    const titleGs = segmentGraphemes(titleText);
-    const available = outerW - 4;
+    const available = Math.max(0, outerW - 4);
+    const titleText = clipToWidth(` ${title} `, available);
+    const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
     const titleLen = Math.min(titleGs.length, available);
     for (let i = 0; i < titleLen; i++) {
       surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
@@ -96,7 +120,44 @@ export function boxV3(content: Surface | string, options: BoxOptions = {}): Surf
   }
 
   // Blit content
-  surface.blit(contentSurf, pl + 1, pt + 1);
+  surface.blit(
+    withInheritedBackground(contentSurf, fillStyle.bg),
+    effectiveLeft + 1,
+    pt + 1,
+    0,
+    0,
+    contentBoxWidth,
+    contentSurf.height,
+  );
 
   return surface;
+}
+
+export const boxV3 = boxSurface;
+
+/**
+ * Render a header box as a Surface for V3-native composition.
+ *
+ * Unlike {@link headerBox}, this always returns a Surface and is intended
+ * for use inside framed apps or other surface-first render paths.
+ */
+export function headerBoxSurface(label: string, options: HeaderBoxOptions = {}): Surface {
+  const ctx = resolveCtx(options.ctx);
+  const safeLabel = label ?? '';
+  const detail = options.detail ?? '';
+  const labelToken = options.labelToken ?? ctx?.semantic('primary');
+  const mutedToken = ctx?.semantic('muted');
+
+  const segments = [];
+  if (safeLabel.length > 0) {
+    segments.push({ text: safeLabel, style: tokenToCellStyle(labelToken) });
+  }
+  if (detail.length > 0) {
+    segments.push({
+      text: safeLabel.length > 0 ? `  ${detail}` : detail,
+      style: tokenToCellStyle(mutedToken),
+    });
+  }
+
+  return boxSurface(createSegmentSurface(segments), options);
 }

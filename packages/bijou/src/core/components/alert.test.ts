@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { alert } from './alert.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { auditStyle, createTestContext } from '../../adapters/test/index.js';
 
 describe('alert', () => {
   it('renders box with icon in interactive mode', () => {
@@ -16,6 +16,18 @@ describe('alert', () => {
     const result = alert('Done!', { variant: 'success', ctx });
     expect(result).toContain('\u2713');
     expect(result).toContain('Done!');
+  });
+
+  it('accepts a custom borderToken override in interactive mode', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ mode: 'interactive', style });
+    const borderToken = { hex: '#123456' };
+
+    alert('Border me', { borderToken, ctx });
+
+    expect(style.calls.some(
+      (call) => call.method === 'styled' && call.token?.hex === borderToken.hex && call.text.includes('─'),
+    )).toBe(true);
   });
 
   it('returns pipe format [VARIANT] message', () => {

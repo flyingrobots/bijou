@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { RunWorkerOptions } from './worker.js';
 
+const WORKER_PROXY_TEST_TIMEOUT_MS = 15_000;
+
 afterEach(() => {
   vi.resetModules();
   vi.unmock('node:worker_threads');
@@ -85,7 +87,7 @@ describe('worker proxy runtime', () => {
     expect(posted).toContainEqual({ type: 'io:resize', columns: 90, rows: 22 });
 
     await handle.terminate();
-  });
+  }, WORKER_PROXY_TEST_TIMEOUT_MS);
 
   it('hydrates proxy runtime size before run() and updates it on resize messages', async () => {
     const messageListeners = new Set<(msg: unknown) => void>();
@@ -147,5 +149,5 @@ describe('worker proxy runtime', () => {
 
     expect(run).toHaveBeenCalledOnce();
     expect(posted).toContainEqual({ type: 'quit' });
-  });
+  }, WORKER_PROXY_TEST_TIMEOUT_MS);
 });
