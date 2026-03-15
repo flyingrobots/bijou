@@ -32,6 +32,18 @@ describe('surface-first primitives', () => {
     expect(rendered).toContain('┌');
   });
 
+  it('boxSurface widens auto-width boxes to preserve long titles', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const rendered = stripAnsi(surfaceToString(
+      boxSurface('Hi', { title: 'Long title', ctx }),
+      ctx.style,
+    ));
+
+    expect(rendered).toContain('Long');
+    expect(rendered).toContain('Hi');
+    expect(rendered.split('\n')[0]).not.toBe('┌──┐');
+  });
+
   it('separatorSurface returns a width-locked separator surface', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const rendered = stripAnsi(surfaceToString(separatorSurface({ label: 'Section', width: 24, ctx }), ctx.style));
@@ -195,6 +207,25 @@ describe('surface-first primitives', () => {
     expect(surface.get(2, 3).char).toBe('L');
     expect(surface.get(3, 3).char).toBe('O');
     expect(surface.get(4, 3).char).toBe('N');
+    expect(surface.get(6, 3).char).toBe('│');
+    expect(surface.get(8, 3).char).toBe('o');
+    expect(surface.get(9, 3).char).toBe('k');
+  });
+
+  it('tableSurface normalizes fractional explicit column widths before layout math', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = tableSurface({
+      columns: [
+        { header: 'Key', width: 3.9 },
+        { header: 'Val', width: 3.2 },
+      ],
+      rows: [
+        ['LONG', 'ok'],
+      ],
+      ctx,
+    });
+
+    expect(Object.keys(surface.cells).some((key) => key.includes('.'))).toBe(false);
     expect(surface.get(6, 3).char).toBe('│');
     expect(surface.get(8, 3).char).toBe('o');
     expect(surface.get(9, 3).char).toBe('k');

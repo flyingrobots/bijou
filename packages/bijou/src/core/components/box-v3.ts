@@ -52,7 +52,12 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     contentSurf = content;
   }
 
-  const innerW = contentSurf.width + pl + pr;
+  const autoTitleWidth = normalizedFixedWidth === undefined && title
+    ? segmentSurfaceText(` ${title} `, 'boxSurface title').length
+    : 0;
+  const innerW = normalizedFixedWidth === undefined
+    ? Math.max(contentSurf.width + pl + pr, autoTitleWidth)
+    : contentSurf.width + pl + pr;
   const innerH = contentSurf.height + pt + pb;
   
   const outerW = normalizedFixedWidth ?? (innerW + 2);

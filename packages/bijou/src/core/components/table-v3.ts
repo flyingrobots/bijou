@@ -9,6 +9,12 @@ export interface TableSurfaceOptions extends Omit<TableOptions, 'rows'> {
   readonly rows: TableSurfaceCell[][];
 }
 
+function normalizeColumnWidth(width: number | undefined): number | undefined {
+  if (width == null) return undefined;
+  if (!Number.isFinite(width)) return 0;
+  return Math.max(0, Math.floor(width));
+}
+
 function resolveColumns(
   columns: NonNullable<TableOptions['columns']>,
   rows: readonly TableSurfaceCell[][],
@@ -37,7 +43,8 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   }));
   const cellSurfaces = rows.map((row) => row.map((cell) => typeof cell === 'string' ? createTextSurface(cell) : cell));
   const colWidths = columns.map((column, index) => {
-    if (column.width !== undefined) return column.width;
+    const normalizedWidth = normalizeColumnWidth(column.width);
+    if (normalizedWidth !== undefined) return normalizedWidth;
     let maxWidth = headerSurfaces[index]?.width ?? 0;
     for (const row of cellSurfaces) {
       maxWidth = Math.max(maxWidth, row[index]?.width ?? 0);
