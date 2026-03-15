@@ -22,6 +22,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **PR merge-readiness tooling** — `pr:review-status` now collapses to the latest non-automated review per reviewer, ignores draft/pending reviews without `submittedAt`, prefers GitHub author metadata for bot detection, treats `mergeStateStatus=UNKNOWN` as pending while GitHub computes mergeability, honors GitHub `reviewDecision` / `mergeStateStatus`, fails fast if PR comment/review/thread metadata would be truncated, and down-ranks stale historical CodeRabbit rate-limit comments when a newer green or live pending bot signal exists; `pr:merge-readiness` adds a one-command merge gate summary on top of those signals and labels pending states separately from hard blockers.
 - **Surface alert option parity** — `AlertOptions` now includes `borderToken`, and both `alert()` and `alertSurface()` honor custom border overrides while the surface path drops a redundant string nullish-coalescing fallback.
 - **Surface primitive clipping and Unicode guardrails** — `boxSurface()` now clips constrained content inside the inner box instead of letting it overwrite borders, and the new text-based surface helpers now fail loudly on wide graphemes until the `Surface` model grows true wide-cell support.
+- **Surface fixed-width normalization** — `boxSurface()` now normalizes fractional or negative fixed widths before border and blit math runs, so constrained boxes preserve their borders instead of drifting past the actual allocated surface width.
 
 ## [3.0.0] - 2026-03-12
 
