@@ -1,5 +1,4 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
-import { shouldApplyBg } from '../bg-fill.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { clipToWidth } from '../text/clip.js';
 import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
@@ -71,7 +70,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const resolvedFillChar = resolveFillChar(options.fillChar);
   const fillStyle = applyBCSSCellTextStyles({
     fg: undefined,
-    bg: shouldApplyBg(ctx) ? options.bgToken?.bg : undefined,
+    bg: options.bgToken?.bg,
     modifiers: undefined,
   }, bcss);
   surface.fill({

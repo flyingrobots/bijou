@@ -76,8 +76,29 @@ describe('surface-first primitives', () => {
     expect(surface.get(2, 1).bg).toBe('#112233');
   });
 
+  it('boxSurface preserves background metadata in noColor contexts', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const surface = boxSurface('Hi', {
+      bgToken: { hex: '#ffffff', bg: '#112233' },
+      ctx,
+    });
+
+    expect(surface.get(1, 1).char).toBe('H');
+    expect(surface.get(1, 1).bg).toBe('#112233');
+    expect(surface.get(2, 1).char).toBe('i');
+    expect(surface.get(2, 1).bg).toBe('#112233');
+  });
+
   it('alertSurface carries the default elevated background into interior cells', () => {
     const ctx = createTestContext({ mode: 'interactive' });
+    const surface = alertSurface('Watch this space', { ctx });
+
+    expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated')?.bg);
+    expect(surface.get(3, 1).bg).toBe(ctx.surface('elevated')?.bg);
+  });
+
+  it('alertSurface preserves elevated background metadata in noColor contexts', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
     const surface = alertSurface('Watch this space', { ctx });
 
     expect(surface.get(1, 1).bg).toBe(ctx.surface('elevated')?.bg);
