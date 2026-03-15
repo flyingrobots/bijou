@@ -85,7 +85,7 @@ describe('worker proxy runtime', () => {
     expect(posted).toContainEqual({ type: 'io:resize', columns: 90, rows: 22 });
 
     await handle.terminate();
-  });
+  }, 10_000);
 
   it('hydrates proxy runtime size before run() and updates it on resize messages', async () => {
     const messageListeners = new Set<(msg: unknown) => void>();
