@@ -63,8 +63,8 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Pluggable "Effect" Handlers** | bijou | Formalize `HttpPort`, `SqlPort`, and `GitPort` to keep all side effects mockable and testable. |
 | **bijou-web** | adapters | Implement `WebRuntime` and `WebIO` adapters to run Bijou TUIs in the browser (Wasm/Xterm.js). |
 | **Deterministic Snapshot Replay & Assertions** | bijou-tui | The native Surface-to-GIF recorder shipped in v3.0.0. Backlog now covers replay/assert APIs for deterministic UI tests, not just demo capture. |
-| **Deterministic Visual Regression Suite** | bijou-tui + bijou-node | Build frame-level golden tests on top of `Surface[]` capture so visual regressions can be detected without screenshot diff flake. |
-| **Surface-First Primitive Migration** | bijou + bijou-tui | Replace the remaining high-friction string-era display helpers with surface-native equivalents so downstream apps stop tripping over `Surface`/string compatibility seams. |
+| **Deterministic Visual Regression Suite** | bijou-tui + bijou-node | Build frame-level golden tests on top of `Surface[]` capture so visual regressions can be detected without screenshot diff flake. This is the next planned v3.1 slice after the shipped surface-first primitive pass. |
+| **Surface-First Primitive Migration** | bijou + bijou-tui | Core surface-native companions (`boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, `tableSurface()`) shipped post-v3. Backlog now covers the remaining string-era helpers plus continued removal of explicit `surfaceToString()` bridges in downstream apps/examples. |
 | **Rich Canvas / Shader v2** | bijou-tui | Upgrade `canvas()` to support rich cell output (`{ char, color, bg }`), normalized UV mapping, and high-res Braille/Quad sub-grid scaling. |
 | **BCSS Global Cascade & Live Styles** | bijou-tui | v3.0.0 ships scoped BCSS for supported V3 surface components and frame shell regions. Backlog covers a broader layout-node cascade and live style reload tooling. |
 
@@ -84,7 +84,8 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
 | **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
 | **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
-| **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0, but reduce the runtime cost of the worker proxy regression tests. |
+| **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0. Latest stabilization raised an explicit test-local timeout budget; backlog now covers trimming dynamic import/mock overhead so the test can get cheaper again. |
+| **String/Surface Parity Regression Harness** | bijou + repo tooling | Add a reusable regression pattern for paired string/surface component APIs so option parity, width normalization, and render-policy/model separation are locked in consistently across future V3 companion helpers. |
 | ~~**Shared Release Validation Script**~~ | ~~repo tooling~~ | ~~Shipped post-v3. `scripts/release-metadata.ts` now validates workspace versions and internal dependency pins for both `publish.yml` and `release-dry-run.yml`.~~ |
 | **Workflow Shell Preflight** | repo tooling | Add a lightweight local command that validates workflow shell blocks and release-policy snippets outside GitHub Actions. |
 | **Packed Scaffold CLI Test Optimization** | create-bijou-tui-app | Keep the packed bin-shim integration test truthful, but continue reducing install/pack overhead so it stays cheap in the full suite. |

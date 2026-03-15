@@ -20,6 +20,14 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
   Progress: `pr:review-status` already prefers live pending/pass CodeRabbit signals over older clean history and down-ranks stale historical `rate-limited` comments when a newer green signal exists.
   Remaining gap: make stale-history handling equally explicit for older clean/actionable bot chatter, so mixed historical comment streams need less human interpretation.
 
+### 2026-03-15
+- **Surface-first parity edges attract high-signal review feedback**: width normalization, title sizing, background metadata, and render-policy versus surface-model separation all surfaced as real issues during the `boxSurface()` / `alertSurface()` rollout.
+  Progress: PR #45 shipped the core surface-first primitives and added targeted regressions for fixed-width clipping, title width, background preservation, and no-color model consistency.
+  Remaining gap: codify a reusable parity-test pattern for paired string/surface APIs so future companion helpers inherit the same edge-case contract faster.
+- **Worker proxy tests are still heavier than the rest of the suite**: the full pre-push run re-exposed timeout pressure in `packages/bijou-node/src/worker/worker.proxy.test.ts` even after the first local timeout bump.
+  Progress: the file now uses an explicit `15_000ms` budget for the two async proxy-runtime tests, which stabilized the full-suite push.
+  Remaining gap: reduce dynamic-import and mock overhead so those tests can move back toward the default timeout budget.
+
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
@@ -31,3 +39,5 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Keep optimizing the packed `create-bijou-tui-app` bin-shim integration test so published-artifact coverage stays fast enough for the full suite.
 - Consider extracting a small shared GitHub API adapter/helper layer so repo tooling scripts stop duplicating GraphQL/REST shapes and nullability handling.
 - Generalize stale CodeRabbit history handling beyond `rate-limited` comments so older clean/actionable bot chatter is down-ranked as explicitly as rate-limit noise.
+- Add a reusable parity-test helper or pattern for paired string/surface primitives so option-contract regressions are easier to lock down.
+- Reduce the runtime cost of `packages/bijou-node/src/worker/worker.proxy.test.ts` so explicit elevated timeout budgets are no longer needed.
