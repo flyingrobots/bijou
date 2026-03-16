@@ -56,6 +56,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | ~~**Sub-App Composition**~~ | ~~bijou-tui~~ | ~~Shipped in v3.0.0. Fractal TEA support via `mount()` and `mapCmds()`.~~ |
 | ~~**Reactive & Semantic Token Graph**~~ | ~~bijou~~ | ~~Shipped in v3.0.0. Reactive graph backend for theming (`createTokenGraph`).~~ |
 | **Shared Runtime Viewport Overlay** | bijou-tui + bijou-node | Extract the mutable runtime-size overlay used by the main runtime and worker runtime into one shared helper so resize-state logic stays consistent across contexts. |
+| **Deterministic Time & Idle Semantics** | bijou + bijou-tui | The first v3.1 hardening slice adds a shared `clock` port, `mockClock()`, event-bus `drain()`, and pulse-driven timing. Backlog now covers the remaining global-timer holdouts, shared runtime overlay cleanup, and more defensive interval/microtask/sentinel regressions. |
 | **Standardized `BijouNode` Protocol** | bijou | Unified node type and `children` prop across all components for true composability. |
 | **Standard Interactive Component & Form System** | bijou-tui | Unified interface for stateful components (Sub-Apps), global focus management, and TEA-native form binding. |
 | **Worker Runtime Hardening & Performance** | bijou-node | `runInWorker()` / `startWorkerApp()` shipped in v3.0.0. Backlog now covers heavier-load scheduling, profiling, and follow-up cleanup beyond the first release. |

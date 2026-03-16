@@ -28,6 +28,11 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
   Progress: the file now uses an explicit `15_000ms` budget for the two async proxy-runtime tests, which stabilized the full-suite push.
   Remaining gap: reduce dynamic-import and mock overhead so those tests can move back toward the default timeout budget.
 
+### 2026-03-16
+- **Deterministic clocks are flushing out real runtime edge cases**: once time became injectable, CodeRabbit and local regressions surfaced several legitimate bugs that wall-clock testing had masked: event-bus sync throws could strand `drain()`, `mockClock.runAll()` could spin forever on active intervals, runtime timeout handles were not always disposed after firing, and the interactive Ctrl+C guard treated time `0` as "already pressed once."
+  Progress: PR #47 adds the shared `clock` port/test adapter, event-bus idle tracking, pulse-driven timing, timeout-handle cleanup, and targeted regressions for those failure modes.
+  Remaining gap: finish pushing the remaining time-dependent logic behind explicit seams, share the runtime viewport overlay across main/worker runtimes, and add more fake-time coverage around intervals, microtasks, and startup-time sentinel values.
+
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
 - Build `scripts/pr-review-resolve.ts` to resolve confirmed-addressed thread IDs in bulk.
@@ -41,3 +46,6 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 - Generalize stale CodeRabbit history handling beyond `rate-limited` comments so older clean/actionable bot chatter is down-ranked as explicitly as rate-limit noise.
 - Add a reusable parity-test helper or pattern for paired string/surface primitives so option-contract regressions are easier to lock down.
 - Reduce the runtime cost of `packages/bijou-node/src/worker/worker.proxy.test.ts` so explicit elevated timeout budgets are no longer needed.
+- Add more defensive fake-time regressions around intervals, microtasks, idle-drain sequencing, and startup-time sentinel values.
+- Finish sharing the runtime viewport overlay/helper across main and worker runtimes so resize bookkeeping and deterministic timing stay aligned.
+- Keep removing remaining direct wall-clock/global-timer uses in runtime and component logic in favor of the shared clock/pulse seams.
