@@ -30,7 +30,12 @@ export interface MockClock extends ClockPort {
   advanceByAsync(ms: number): Promise<void>;
   /** Run all queued microtasks without advancing wall-clock time. */
   flushMicrotasks(): void;
-  /** Run all currently scheduled timers to completion. */
+  /**
+   * Run all currently scheduled non-recurring timers to completion.
+   *
+   * Throws when an interval remains active after being given a chance to run,
+   * because recurring timers cannot be drained to completion automatically.
+   */
   runAll(): void;
 }
 
@@ -168,6 +173,13 @@ export function mockClock(options: MockClockOptions = {}): MockClock {
         const next = tasks.find((task) => !task.disposed);
         if (next === undefined) break;
         this.advanceBy(Math.max(0, next.at - nowMs));
+        sortTasks();
+        const remaining = tasks.filter((task) => !task.disposed);
+        if (remaining.length > 0 && remaining.every((task) => task.intervalMs !== null)) {
+          throw new Error(
+            'mockClock.runAll() cannot drain active interval timers; dispose them or advance time manually.',
+          );
+        }
       }
     },
   };
