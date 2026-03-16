@@ -306,7 +306,14 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         now: () => clock.now(),
       };
 
-      Promise.resolve(cmd(emit, caps)).then((result) => {
+      let commandPromise: Promise<M | typeof QUIT | void>;
+      try {
+        commandPromise = Promise.resolve(cmd(emit, caps));
+      } catch (err: unknown) {
+        commandPromise = Promise.reject(err);
+      }
+
+      commandPromise.then((result) => {
         if (disposed) return;
         if (result === QUIT) {
           for (const handler of quitHandlers) {

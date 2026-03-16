@@ -335,6 +335,20 @@ describe('runCmd', () => {
     expect(onError.mock.calls[0]?.[1]).toBeInstanceOf(Error);
   });
 
+  it('settles drain when a command throws synchronously', async () => {
+    const onError = vi.fn();
+    const bus = createEventBus<TestMsg>({ onError });
+
+    bus.runCmd(() => {
+      throw new Error('sync boom');
+    });
+
+    await bus.drain();
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls[0]?.[0]).toContain('[EventBus] Command rejected:');
+    expect(onError.mock.calls[0]?.[1]).toBeInstanceOf(Error);
+  });
+
   it('does not throw unhandled rejection when onError itself throws', async () => {
     const throwingOnError = vi.fn(() => {
       throw new Error('onError blew up');
