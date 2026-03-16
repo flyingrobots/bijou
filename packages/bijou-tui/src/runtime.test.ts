@@ -191,6 +191,43 @@ describe('run', () => {
       expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
     });
 
+    it('does not treat the first Ctrl+C at clock time zero as a double-press', async () => {
+      const clock = mockClock({ nowMs: 0 });
+      const received: KeyMsg[] = [];
+
+      const spyApp: App<null, never> = {
+        init: () => [null, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            received.push(msg);
+            if (msg.key === 'q') return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: () => 'spy',
+      };
+
+      const ctx = createTestContext({ mode: 'interactive', clock });
+      ctx.io.rawInput = (onKey) => {
+        const handles = [
+          clock.setTimeout(() => onKey('\x03'), 0),
+          clock.setTimeout(() => onKey('q'), 10),
+        ];
+        return {
+          dispose() {
+            handles.forEach((handle) => handle.dispose());
+          },
+        };
+      };
+
+      const promise = run(spyApp, { ctx });
+      await clock.advanceByAsync(20);
+      await promise;
+
+      expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
+      expect(received.some((msg) => msg.key === 'q')).toBe(true);
+    });
+
     it('executes startup commands from init', async () => {
       vi.useFakeTimers();
       type Msg = { type: 'started' };

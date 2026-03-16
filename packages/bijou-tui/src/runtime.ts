@@ -74,7 +74,7 @@ export async function run<Model, M>(
   // Interactive mode
   let model = initModel;
   let running = true;
-  let lastCtrlC = 0;
+  let lastCtrlC: number | null = null;
   let resolveQuit: (() => void) | null = null;
   let currentDt = 0.016; // Default to 60fps for first frame
   let fatalError: unknown = null;
@@ -247,7 +247,7 @@ export async function run<Model, M>(
     // Double Ctrl+C force-quit
     if (isKeyMsg(msg) && msg.key === 'c' && msg.ctrl) {
       const now = clock.now();
-      if (now - lastCtrlC < 1000) {
+      if (lastCtrlC !== null && now - lastCtrlC < 1000) {
         shutdown();
         return;
       }
