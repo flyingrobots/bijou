@@ -29,6 +29,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface background metadata parity** — `boxSurface()` now preserves interior background cells even when `ctx` is `noColor`, so the returned `Surface` model stays consistent and render policy decides whether color is emitted.
 - **Pulse-driven TUI timing** — `tick()`, framed-page transitions, runtime render scheduling, and live timer/log/spinner/progress helpers now route through the shared clock/pulse seams instead of mixing raw `Date.now()`, `setTimeout(...)`, and `setInterval(...)` into component logic.
 - **Deterministic test cleanup** — high-signal TUI tests now use `mockClock()`, explicit event-bus idleness, and deterministic temporary paths instead of wall-clock sleeps and random missing-file names.
+- **Deterministic command and timer drains** — event-bus `drain()` now settles even when commands throw synchronously, and `mockClock.runAll()` now fails loudly instead of spinning forever when live intervals remain active.
 
 ## [3.0.0] - 2026-03-12
 
