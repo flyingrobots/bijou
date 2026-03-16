@@ -2,6 +2,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import type { GradientStop } from '../theme/tokens.js';
 import { lerp3 } from '../theme/gradient.js';
+import { resolveClock } from '../clock.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
@@ -175,6 +176,7 @@ export interface AnimatedProgressBarOptions extends ProgressBarOptions {
  */
 export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = {}): ProgressBarController {
   const ctx = resolveCtx(options.ctx);
+  const clock = resolveClock(ctx);
   const mode = ctx.mode;
   const fps = options.fps ?? 30;
   const duration = options.duration ?? 300;
@@ -195,7 +197,7 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
   /** Start the interpolation timer if it is not already running. */
   function startAnimation(): void {
     if (timer !== null) return;
-    timer = ctx.io.setInterval(() => {
+    timer = clock.setInterval(() => {
       if (Math.abs(targetPct - currentPct) < 0.1) {
         currentPct = targetPct;
         render();

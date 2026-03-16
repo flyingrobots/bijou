@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { log } from './log.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, mockClock } from '../../adapters/test/index.js';
 
 describe('log', () => {
   it('debug level uses DBG label', () => {
@@ -69,15 +69,21 @@ describe('log', () => {
   });
 
   it('timestamp: true adds HH:MM:SS timestamp in pipe mode', () => {
-    const ctx = createTestContext({ mode: 'pipe' });
+    const ctx = createTestContext({
+      mode: 'pipe',
+      clock: mockClock({ nowMs: new Date(2024, 0, 1, 12, 34, 56).getTime() }),
+    });
     const result = log('info', 'request', { timestamp: true, ctx });
-    expect(result).toMatch(/^\[\d{2}:\d{2}:\d{2}\] \[INF\] request$/);
+    expect(result).toBe('[12:34:56] [INF] request');
   });
 
   it('timestamp: true adds timestamp in interactive mode', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
+    const ctx = createTestContext({
+      mode: 'interactive',
+      clock: mockClock({ nowMs: new Date(2024, 0, 1, 12, 34, 56).getTime() }),
+    });
     const result = log('info', 'request', { timestamp: true, ctx });
-    expect(result).toMatch(/\d{2}:\d{2}:\d{2}/);
+    expect(result).toContain('12:34:56');
     expect(result).toContain('request');
   });
 

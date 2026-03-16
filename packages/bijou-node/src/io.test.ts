@@ -40,8 +40,9 @@ describe('nodeIO()', () => {
   });
 
   it('readFile() throws for missing file', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
     const io = nodeIO();
-    const missingFile = join(tmpdir(), `bijou-missing-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`);
+    const missingFile = join(tempDir, 'missing.txt');
     expect(() => io.readFile(missingFile)).toThrow();
   });
 
@@ -70,8 +71,9 @@ describe('nodeIO()', () => {
   });
 
   it('readDir() throws for missing directory', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-test-'));
     const io = nodeIO();
-    const missingDir = join(tmpdir(), `bijou-missing-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const missingDir = join(tempDir, 'missing-dir');
     expect(() => io.readDir(missingDir)).toThrow();
   });
 

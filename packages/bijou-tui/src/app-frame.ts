@@ -341,12 +341,12 @@ export function createFramedApp<PageModel, Msg>(
         if (action.type === 'transition') {
           // Ignore stale transition ticks from a previous generation
           if (action.generation !== model.transitionGeneration) return [model, []];
-          // Advance timeline using wall-clock elapsed time
-          if (model.transitionTimeline && model.transitionTimelineState && model.transitionStartMs != null) {
-            const elapsedMs = Date.now() - model.transitionStartMs;
-            const elapsedSec = Math.max(0, elapsedMs / 1000);
-            // Step from init to current elapsed time (tweens are deterministic)
-            const state = model.transitionTimeline.step(model.transitionTimeline.init(), elapsedSec);
+          // Advance timeline from deterministic pulse deltas.
+          if (model.transitionTimeline && model.transitionTimelineState) {
+            const state = model.transitionTimeline.step(
+              model.transitionTimelineState,
+              Math.max(0, action.dt),
+            );
             const vals = model.transitionTimeline.values(state);
             const progress = Math.min(1, Math.max(0, vals['progress'] ?? action.progress));
 

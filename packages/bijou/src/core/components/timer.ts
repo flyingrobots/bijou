@@ -1,5 +1,6 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
+import { resolveClock } from '../clock.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
@@ -110,10 +111,10 @@ type TimerState =
       readonly handle: TimerHandle; readonly cursor: CursorHideHandle | null }
   | { readonly kind: 'stopped'; readonly elapsedMs: number };
 
-function computeElapsed(s: TimerState): number {
+function computeElapsed(s: TimerState, nowMs: number): number {
   switch (s.kind) {
     case 'idle':    return 0;
-    case 'running': return s.pausedElapsed + (Date.now() - s.startTime);
+    case 'running': return s.pausedElapsed + (nowMs - s.startTime);
     case 'paused':  return s.pausedElapsed;
     case 'stopped': return s.elapsedMs;
   }
@@ -122,13 +123,14 @@ function computeElapsed(s: TimerState): number {
 /** Shared controller logic for createTimer and createStopwatch. */
 function createLiveController(config: LiveControllerConfig): TimerController {
   const { ctx, interval, timerOpts, displayMs, initialDisplayMs, onTick, onComplete } = config;
+  const clock = resolveClock(ctx);
   const mode = ctx.mode;
 
   let state: TimerState = { kind: 'idle' };
 
   function tick(): void {
     if (state.kind !== 'running') return;
-    const elapsed = state.pausedElapsed + (Date.now() - state.startTime);
+    const elapsed = state.pausedElapsed + (clock.now() - state.startTime);
     if (onTick?.(elapsed)) {
       state.handle.dispose();
       if (mode === 'interactive') {
@@ -170,27 +172,27 @@ function createLiveController(config: LiveControllerConfig): TimerController {
         return;
       }
 
-      const now = Date.now();
+      const now = clock.now();
       const line = timer(displayMs(0), { ...timerOpts, ctx });
       ctx.io.write(`${CLEAR_LINE_RETURN}${line}`);
-      const handle = ctx.io.setInterval(tick, interval);
+      const handle = clock.setInterval(tick, interval);
       state = { kind: 'running', startTime: now, pausedElapsed: 0, handle, cursor };
     },
 
     pause() {
       if (state.kind !== 'running') return;
-      const elapsed = state.pausedElapsed + (Date.now() - state.startTime);
+      const elapsed = state.pausedElapsed + (clock.now() - state.startTime);
       state = { kind: 'paused', pausedElapsed: elapsed, handle: state.handle, cursor: state.cursor };
     },
 
     resume() {
       if (state.kind !== 'paused') return;
-      state = { kind: 'running', startTime: Date.now(), pausedElapsed: state.pausedElapsed,
+      state = { kind: 'running', startTime: clock.now(), pausedElapsed: state.pausedElapsed,
         handle: state.handle, cursor: state.cursor };
     },
 
     stop(finalMessage?: string) {
-      const elapsed = computeElapsed(state);
+      const elapsed = computeElapsed(state, clock.now());
       if (state.kind === 'running' || state.kind === 'paused') {
         state.handle.dispose();
         if (mode === 'interactive') {
@@ -207,7 +209,7 @@ function createLiveController(config: LiveControllerConfig): TimerController {
     },
 
     elapsed() {
-      return computeElapsed(state);
+      return computeElapsed(state, clock.now());
     },
   };
 }

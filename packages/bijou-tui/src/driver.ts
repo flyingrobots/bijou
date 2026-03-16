@@ -20,7 +20,7 @@ import type { App, RunOptions, ResizeMsg } from './types.js';
 import { isResizeMsg } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
-import { type Surface } from '@flyingrobots/bijou';
+import { type Surface, resolveClock, sleep } from '@flyingrobots/bijou';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput } from './view-output.js';
 
@@ -59,6 +59,8 @@ export type ScriptStep<M = never> =
 export interface RunScriptOptions extends RunOptions {
   /** Capture each rendered frame. */
   onFrame?: (frame: Surface, index: number) => void;
+  /** Pulse frequency used to drive animation commands. Set to `false` to disable. */
+  pulseFps?: number | false;
 }
 
 /**
@@ -90,11 +92,8 @@ export interface RunScriptResult<Model> {
  * - A command returns QUIT
  * - All script steps are exhausted (auto-quits)
  *
- * **Limitation:** Between steps the driver yields via `queueMicrotask`,
- * which only settles microtask-based async (e.g. `Promise.resolve()`).
- * Commands that use `setTimeout`, real I/O, or other macrotask-based async
- * may not have completed before the next key is dispatched. Use `delay`
- * on subsequent steps to allow time for macrotask-based commands.
+ * Between steps the driver waits for the event bus to go idle, so command
+ * chains settle deterministically without relying on microtask-only yields.
  *
  * @template Model - The application model type.
  * @template M     - The message (action) type for the TEA update cycle.
@@ -108,9 +107,10 @@ export async function runScript<Model, M>(
   steps: ScriptStep<M>[],
   options?: RunScriptOptions,
 ): Promise<RunScriptResult<Model>> {
-  const start = Date.now();
+  const clock = resolveClock(options?.ctx);
+  const start = clock.now();
   const frames: Surface[] = [];
-  const bus = createEventBus<M>();
+  const bus = createEventBus<M>({ clock });
   const ctx = options?.ctx;
   if (ctx != null) {
     installBCSSResolver(ctx, options?.css);
@@ -124,8 +124,10 @@ export async function runScript<Model, M>(
     height: Math.max(0, Math.floor(ctx?.runtime.rows || 24)),
   };
 
-  // Start heartbeat for animations
-  bus.startPulse();
+  // Start heartbeat for animations when enabled.
+  if (options?.pulseFps !== false) {
+    bus.startPulse(options?.pulseFps ?? ctx?.runtime.refreshRate ?? 60);
+  }
 
   /** Stop the scripted driver event loop. */
   function shutdown(): void {
@@ -166,15 +168,14 @@ export async function runScript<Model, M>(
       bus.runCmd(cmd);
     }
 
-    // Yield so microtask-based init commands can settle
-    await new Promise<void>((r) => queueMicrotask(r));
+    await bus.drain();
 
     // Feed script steps
     for (const step of steps) {
       if (!running) break;
 
       if (step.delay && step.delay > 0) {
-        await new Promise<void>((r) => setTimeout(r, step.delay));
+        await sleep(clock, step.delay);
       }
 
       if (!running) break;
@@ -198,12 +199,10 @@ export async function runScript<Model, M>(
         throw new Error(`runScript: unhandled script step variant: ${JSON.stringify(_exhaustive)}`);
       }
 
-      // Yield to allow async commands to settle
-      await new Promise<void>((r) => queueMicrotask(r));
+      await bus.drain();
     }
 
-    // Final yield so any trailing commands can settle
-    await new Promise<void>((r) => queueMicrotask(r));
+    await bus.drain();
   } finally {
     bus.stopPulse();
     bus.dispose();
@@ -212,6 +211,6 @@ export async function runScript<Model, M>(
   return {
     model,
     frames,
-    elapsed: Date.now() - start,
+    elapsed: clock.now() - start,
   };
 }

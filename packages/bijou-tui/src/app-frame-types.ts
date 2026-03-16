@@ -81,7 +81,7 @@ export type FrameAction =
   | { type: 'dock-down' }
   | { type: 'dock-left' }
   | { type: 'dock-right' }
-  | { type: 'transition'; progress: number; generation: number }
+  | { type: 'transition'; progress: number; generation: number; dt: number; elapsedMs: number }
   | { type: 'transition-complete'; generation: number };
 
 /** Discriminated union of command palette navigation/selection actions. */

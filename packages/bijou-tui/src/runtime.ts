@@ -1,4 +1,4 @@
-import { getDefaultContext, createSurface, surfaceToString } from '@flyingrobots/bijou';
+import { getDefaultContext, createSurface, surfaceToString, resolveClock } from '@flyingrobots/bijou';
 import type { RuntimePort, WritePort, Surface } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
@@ -45,6 +45,7 @@ export async function run<Model, M>(
   options?: RunOptions<M>,
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
+  const clock = resolveClock(ctx);
   installRuntimeOverlay(ctx);
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
@@ -85,6 +86,7 @@ export async function run<Model, M>(
   );
 
   const bus = createEventBus<M>({
+    clock,
     onCommandRejected(error) {
       const message = error instanceof Error
         ? `${error.name}: ${error.message}`
@@ -169,7 +171,7 @@ export async function run<Model, M>(
     if (!running || renderRequested) return;
     renderRequested = true;
 
-    setTimeout(() => {
+    clock.setTimeout(() => {
       try {
         const targetSurface = createSurface(
           sanitizeDimension(ctx.runtime.columns),
@@ -237,7 +239,7 @@ export async function run<Model, M>(
 
     // Double Ctrl+C force-quit
     if (isKeyMsg(msg) && msg.key === 'c' && msg.ctrl) {
-      const now = Date.now();
+      const now = clock.now();
       if (now - lastCtrlC < 1000) {
         shutdown();
         return;
@@ -282,7 +284,7 @@ export async function run<Model, M>(
   // Ensure any pending render is flushed before exiting
   if (renderRequested) {
     await new Promise<void>((resolve) => {
-      setTimeout(resolve, 0);
+      clock.setTimeout(resolve, 0);
     });
   }
 

@@ -250,8 +250,7 @@ describe('runCmd', () => {
     const cmd: Cmd<TestMsg> = async () => ({ type: 'custom' as const, value: 99 });
     bus.runCmd(cmd);
 
-    // Wait for promise to resolve
-    await vi.waitFor(() => expect(received).toHaveLength(1));
+    await bus.drain();
     expect(received[0]).toEqual({ type: 'custom', value: 99 });
   });
 
@@ -263,8 +262,7 @@ describe('runCmd', () => {
     const cmd: Cmd<TestMsg> = async () => undefined;
     bus.runCmd(cmd);
 
-    // Give the promise time to resolve
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     expect(received).toHaveLength(0);
   });
 
@@ -276,7 +274,8 @@ describe('runCmd', () => {
     const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
-    await vi.waitFor(() => expect(quitCalled).toHaveBeenCalledTimes(1));
+    await bus.drain();
+    expect(quitCalled).toHaveBeenCalledTimes(1);
   });
 
   it('does not emit QUIT as a regular message', async () => {
@@ -288,7 +287,7 @@ describe('runCmd', () => {
     const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     expect(received).toHaveLength(0);
   });
 
@@ -300,7 +299,8 @@ describe('runCmd', () => {
       throw new Error('boom');
     });
 
-    await vi.waitFor(() => expect(onCommandRejected).toHaveBeenCalledTimes(1));
+    await bus.drain();
+    expect(onCommandRejected).toHaveBeenCalledTimes(1);
     expect(onCommandRejected.mock.calls[0]?.[0]).toBeInstanceOf(Error);
     expect((onCommandRejected.mock.calls[0]?.[0] as Error).message).toBe('boom');
   });
@@ -315,7 +315,8 @@ describe('runCmd', () => {
       throw new Error('boom');
     });
 
-    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(2));
+    await bus.drain();
+    expect(onError).toHaveBeenCalledTimes(2);
     expect(onCommandRejected).toHaveBeenCalledTimes(1);
     expect(onError.mock.calls[0]?.[0]).toContain('[EventBus] onCommandRejected handler threw:');
     expect(onError.mock.calls[1]?.[0]).toContain('[EventBus] Original command rejection:');
@@ -328,7 +329,8 @@ describe('runCmd', () => {
       throw new Error('boom');
     });
 
-    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
+    await bus.drain();
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(onError.mock.calls[0]?.[0]).toContain('[EventBus] Command rejected:');
     expect(onError.mock.calls[0]?.[1]).toBeInstanceOf(Error);
   });
@@ -342,8 +344,7 @@ describe('runCmd', () => {
       throw new Error('boom');
     });
 
-    // If safeReport is working, the promise settles without unhandled rejection.
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     // onError was called but its throw was swallowed
     expect(throwingOnError).toHaveBeenCalled();
   });
@@ -363,7 +364,7 @@ describe('runCmd', () => {
       throw new Error('boom');
     });
 
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     expect(throwingRejected).toHaveBeenCalledTimes(1);
     // safeReport swallowed the throw from onError
     expect(throwingOnError).toHaveBeenCalled();
@@ -377,8 +378,7 @@ describe('runCmd', () => {
         throw new Error('boom');
       });
 
-      // Give the promise time to resolve
-      await new Promise((r) => setTimeout(r, 10));
+      await bus.drain();
       expect(consoleError).not.toHaveBeenCalled();
     } finally {
       consoleError.mockRestore();
@@ -400,7 +400,7 @@ describe('onQuit', () => {
     const cmd: Cmd<TestMsg> = async () => QUIT;
     bus.runCmd(cmd);
 
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     expect(quitCalled).not.toHaveBeenCalled();
   });
 });
@@ -532,7 +532,7 @@ describe('dispose', () => {
     bus.emit({ type: 'custom', value: 1 });
     bus.runCmd(async () => QUIT);
 
-    await new Promise((r) => setTimeout(r, 10));
+    await bus.drain();
     expect(received).toHaveLength(0);
     expect(quitCalled).not.toHaveBeenCalled();
   });

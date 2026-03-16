@@ -4,7 +4,7 @@ import type { App, Cmd } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
 import { badge, surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext, plainStyle } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock, plainStyle } from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
 
@@ -81,12 +81,17 @@ describe('runScript', () => {
   });
 
   it('supports delays between steps', async () => {
-    const start = Date.now();
-    const result = await runScript(counterApp, [
+    const clock = mockClock({ nowMs: 1_000 });
+    const ctx = createTestContext({ clock });
+    const promise = runScript(counterApp, [
       { key: '\x1b[A', delay: 50 },
       { key: '\x1b[A', delay: 50 },
-    ]);
-    expect(result.elapsed).toBeGreaterThanOrEqual(80); // some margin
+    ], { ctx, pulseFps: false });
+    for (let i = 0; i < 4; i++) {
+      await clock.advanceByAsync(25);
+    }
+    const result = await promise;
+    expect(result.elapsed).toBe(100);
     expect(result.model.count).toBe(2);
   });
 

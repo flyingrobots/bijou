@@ -3,6 +3,7 @@ import type { Theme, TokenValue, GradientStop } from '../core/theme/tokens.js';
 import type { OutputMode } from '../core/detect/tty.js';
 import type { RuntimePort } from './runtime.js';
 import type { IOPort } from './io.js';
+import type { ClockPort } from './clock.js';
 import type { StylePort } from './style.js';
 import type { TokenGraph } from '../core/theme/graph.js';
 
@@ -21,6 +22,8 @@ export interface BijouContext {
   readonly runtime: RuntimePort;
   /** I/O adapter (stdin/stdout, filesystem). */
   readonly io: IOPort;
+  /** Clock/scheduler adapter for deterministic time and timers. */
+  readonly clock?: ClockPort;
   /** Color / text-decoration adapter. */
   readonly style: StylePort;
   /** Reactive and Semantic Token Graph for advanced theming. */

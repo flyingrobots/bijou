@@ -26,6 +26,7 @@
  */
 
 import type { IOPort } from '@flyingrobots/bijou';
+import { defer, resolveClock, sleep, type ClockPort } from '@flyingrobots/bijou';
 import type { Cmd, KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from './types.js';
 import { QUIT } from './types.js';
 import { parseKey, parseMouse } from './keys.js';
@@ -138,6 +139,9 @@ export interface EventBus<M> {
    */
   use(middleware: Middleware<M>): Disposable;
 
+  /** Resolve once all in-flight commands have settled. */
+  drain(): Promise<void>;
+
   /** Disconnect all sources and remove all subscribers. */
   dispose(): void;
 }
@@ -148,6 +152,8 @@ export interface CreateEventBusOptions {
   onCommandRejected?: (error: unknown) => void;
   /** Called to surface error messages (replaces direct `console.error` usage). */
   onError?: (message: string, error: unknown) => void;
+  /** Clock/scheduler override for deterministic command and pulse timing. */
+  clock?: ClockPort;
 }
 
 /** Handle for unsubscribing or disconnecting a resource. */
@@ -173,13 +179,16 @@ interface Disposable {
  * @returns A new event bus instance.
  */
 export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<M> {
+  const clock = resolveClock(busOptions?.clock);
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
   const pulseHandlers = new Set<(dt: number) => void>();
   const middlewares: Middleware<M>[] = [];
   const disposables: Disposable[] = [];
   let disposed = false;
-  let pulseTimer: any = null;
+  let pulseTimer: { dispose(): void } | null = null;
+  let pendingCommands = 0;
+  const idleResolvers = new Set<() => void>();
 
   /** Report an error without risking an unhandled rejection. */
   function safeReport(message: string, error: unknown): void {
@@ -220,6 +229,15 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
     dispatch(msg);
   }
+
+  function resolveIdleIfNeeded(): void {
+    if (!disposed && pendingCommands !== 0) return;
+    for (const resolve of idleResolvers) {
+      resolve();
+    }
+    idleResolvers.clear();
+  }
+
   return {
     on(handler) {
       subscribers.add(handler);
@@ -279,14 +297,19 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
     runCmd(cmd: Cmd<M>): void {
       if (disposed) return;
+      pendingCommands++;
 
       const caps = {
         onPulse: (h: (dt: number) => void) => this.onPulse(h),
+        sleep: (ms: number) => sleep(clock, ms),
+        defer: () => defer(clock),
+        now: () => clock.now(),
       };
 
       Promise.resolve(cmd(emit, caps)).then((result) => {
         if (disposed) return;
-        if (result === QUIT) {          for (const handler of quitHandlers) {
+        if (result === QUIT) {
+          for (const handler of quitHandlers) {
             handler();
           }
           return;
@@ -312,6 +335,11 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
           );
           safeReport('[EventBus] Original command rejection:', err);
         }
+      }).finally(() => {
+        pendingCommands = Math.max(0, pendingCommands - 1);
+        if (!disposed) {
+          resolveIdleIfNeeded();
+        }
       });
     },
 
@@ -328,15 +356,15 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       if (disposed || pulseTimer) return;
 
       const intervalMs = Math.round(1000 / fps);
-      let lastMs = Date.now();
+      let lastMs = clock.now();
 
-      pulseTimer = setInterval(() => {
+      pulseTimer = clock.setInterval(() => {
         if (disposed) {
-          clearInterval(pulseTimer);
+          pulseTimer?.dispose();
           pulseTimer = null;
           return;
         }
-        const nowMs = Date.now();
+        const nowMs = clock.now();
         const dt = Math.max(0, (nowMs - lastMs) / 1000);
         lastMs = nowMs;
 
@@ -351,7 +379,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
 
     stopPulse() {
       if (pulseTimer) {
-        clearInterval(pulseTimer);
+        pulseTimer.dispose();
         pulseTimer = null;
       }
     },
@@ -375,12 +403,22 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       };
     },
 
+    drain(): Promise<void> {
+      if (disposed || pendingCommands === 0) {
+        return Promise.resolve();
+      }
+      return new Promise<void>((resolve) => {
+        idleResolvers.add(resolve);
+      });
+    },
+
     dispose(): void {
       disposed = true;
       if (pulseTimer) {
-        clearInterval(pulseTimer);
+        pulseTimer.dispose();
         pulseTimer = null;
       }
+      resolveIdleIfNeeded();
       for (const d of disposables) {
         d.dispose();
       }
