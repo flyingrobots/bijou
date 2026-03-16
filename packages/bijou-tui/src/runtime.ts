@@ -1,5 +1,5 @@
 import { getDefaultContext, createSurface, surfaceToString, resolveClock } from '@flyingrobots/bijou';
-import type { RuntimePort, WritePort, Surface } from '@flyingrobots/bijou';
+import type { RuntimePort, WritePort, Surface, TimerHandle } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
@@ -166,12 +166,14 @@ export async function run<Model, M>(
 
   // Render helper
   let renderRequested = false;
+  let renderHandle: TimerHandle | null = null;
   /** Render the current model's view to the terminal. */
   function render(): void {
     if (!running || renderRequested) return;
     renderRequested = true;
 
-    clock.setTimeout(() => {
+    let scheduledHandle: TimerHandle | null = null;
+    scheduledHandle = clock.setTimeout(() => {
       try {
         const targetSurface = createSurface(
           sanitizeDimension(ctx.runtime.columns),
@@ -197,8 +199,13 @@ export async function run<Model, M>(
         shutdown(error);
       } finally {
         renderRequested = false;
+        scheduledHandle?.dispose();
+        if (renderHandle === scheduledHandle) {
+          renderHandle = null;
+        }
       }
     }, 0);
+    renderHandle = scheduledHandle;
   }
 
   // Execute commands through the bus
@@ -284,11 +291,18 @@ export async function run<Model, M>(
   // Ensure any pending render is flushed before exiting
   if (renderRequested) {
     await new Promise<void>((resolve) => {
-      clock.setTimeout(resolve, 0);
+      let flushHandle: TimerHandle | null = null;
+      flushHandle = clock.setTimeout(() => {
+        flushHandle?.dispose();
+        flushHandle = null;
+        resolve();
+      }, 0);
     });
   }
 
   // Cleanup — bus disposes all I/O connections
+  disposeTimerHandle(renderHandle);
+  renderHandle = null;
   bus.stopPulse();
   bus.dispose();
   if (useMouse) {
@@ -301,6 +315,10 @@ export async function run<Model, M>(
   if (fatalError != null) {
     throw fatalError instanceof Error ? fatalError : new Error(String(fatalError));
   }
+}
+
+function disposeTimerHandle(handle: TimerHandle | null): void {
+  handle?.dispose();
 }
 
 /** Clamp a terminal dimension to a non-negative integer. */
