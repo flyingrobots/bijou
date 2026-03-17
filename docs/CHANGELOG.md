@@ -32,6 +32,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Deterministic command and timer drains** — event-bus `drain()` now settles even when commands throw synchronously, and `mockClock.runAll()` now fails loudly instead of spinning forever when live intervals remain active.
 - **Runtime timer-handle cleanup** — interactive runtime renders and shutdown flushes now dispose their scheduled timeout handles after firing, so deterministic clocks do not retain stale timeout bookkeeping after the app exits.
 - **Deterministic Ctrl+C quit guard** — interactive runtime now treats “no prior Ctrl+C” distinctly from “Ctrl+C at time zero,” so injected clocks that start at `0` still forward the first Ctrl+C to the app instead of force-quitting immediately.
+- **Deterministic runtime test lint compliance** — the Ctrl+C-at-time-zero regression test now disposes its timeout handles with a block-bodied loop so it satisfies the repo’s iterable-callback-return lint rule without changing behavior.
 
 ## [3.0.0] - 2026-03-12
 
