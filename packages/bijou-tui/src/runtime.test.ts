@@ -215,7 +215,9 @@ describe('run', () => {
         ];
         return {
           dispose() {
-            handles.forEach((handle) => handle.dispose());
+            handles.forEach((handle) => {
+              handle.dispose();
+            });
           },
         };
       };
