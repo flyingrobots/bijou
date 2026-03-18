@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd } from '@flyingrobots/bijou';
+import { box, clipToWidth, graphemeWidth, kbd } from '@flyingrobots/bijou';
 import {
   activateFocusedNotification,
   createFramedApp,
@@ -56,6 +56,7 @@ type Msg =
   | { type: 'cycle-placement' }
   | { type: 'cycle-duration' }
   | { type: 'toggle-action' }
+  | { type: 'toggle-wrap' }
   | { type: 'focus-next' }
   | { type: 'focus-prev' }
   | { type: 'activate-focused' }
@@ -72,6 +73,7 @@ interface PageModel {
   readonly placementIndex: number;
   readonly durationIndex: number;
   readonly actionEnabled: boolean;
+  readonly wrapText: boolean;
   readonly nextOrdinal: number;
   readonly log: readonly string[];
 }
@@ -85,6 +87,7 @@ function createInitialPageModel(): PageModel {
     placementIndex: 3,
     durationIndex: 0,
     actionEnabled: true,
+    wrapText: true,
     nextOrdinal: 1,
     log: [
       'Notification lab ready.',
@@ -158,6 +161,59 @@ function appendLog(model: PageModel, message: string): PageModel {
     ...model,
     log: [message, ...model.log].slice(0, 12),
   };
+}
+
+function wrapLine(text: string, width: number): readonly string[] {
+  if (width <= 0) return [''];
+  const safeText = text ?? '';
+  if (safeText.length === 0) return [''];
+  if (graphemeWidth(safeText) <= width) return [safeText];
+
+  const words = safeText.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [''];
+
+  const lines: string[] = [];
+  let current = '';
+
+  for (const word of words) {
+    if (graphemeWidth(word) > width) {
+      if (current.length > 0) {
+        lines.push(current);
+        current = '';
+      }
+
+      let remainder = word;
+      while (graphemeWidth(remainder) > width) {
+        const chunk = clipToWidth(remainder, width);
+        lines.push(chunk);
+        remainder = remainder.slice(chunk.length);
+      }
+      current = remainder;
+      continue;
+    }
+
+    const next = current.length === 0 ? word : `${current} ${word}`;
+    if (graphemeWidth(next) <= width) {
+      current = next;
+      continue;
+    }
+
+    lines.push(current);
+    current = word;
+  }
+
+  if (current.length > 0) {
+    lines.push(current);
+  }
+
+  return lines.length > 0 ? lines : [''];
+}
+
+function wrapBlock(lines: readonly string[], width: number, enabled: boolean): string {
+  if (!enabled) return lines.join('\n');
+  return lines
+    .flatMap((line) => (line.length === 0 ? [''] : wrapLine(line, width)))
+    .join('\n');
 }
 
 function applyNotificationState(
@@ -300,8 +356,7 @@ function renderControlsPane(model: PageModel, width: number): string {
   const focused = model.notifications.focusedId == null
     ? 'none'
     : `#${model.notifications.focusedId}`;
-
-  return box([
+  const lines = [
     'Notification Lab',
     '',
     `Variant : ${activeVariant}`,
@@ -309,6 +364,7 @@ function renderControlsPane(model: PageModel, width: number): string {
     `Place   : ${activePlacement}`,
     `Stay    : ${activeDuration.label}`,
     `Action  : ${model.actionEnabled ? 'enabled' : 'disabled'}`,
+    `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
     `Stack   : ${model.notifications.items.length}`,
     `Focus   : ${focused}`,
     '',
@@ -318,6 +374,7 @@ function renderControlsPane(model: PageModel, width: number): string {
     `${kbd('l')} cycle placement`,
     `${kbd('d')} cycle duration`,
     `${kbd('a')} toggle action`,
+    `${kbd('w')} toggle wrap`,
     `${kbd('j')} / ${kbd('k')} focus action`,
     `${kbd('enter')} run action`,
     `${kbd('x')} dismiss focused/latest`,
@@ -325,7 +382,9 @@ function renderControlsPane(model: PageModel, width: number): string {
     '',
     'Try stacking a few in the same corner, then',
     'flip placements to compare the anchor behavior.',
-  ].join('\n'), {
+  ];
+
+  return box(wrapBlock(lines, Math.max(1, width - 4), model.wrapText), {
     width,
     title: 'Controls',
     ctx,
@@ -339,7 +398,7 @@ function renderLogPane(model: PageModel, width: number): string {
     ...model.log,
   ];
 
-  return box(lines.join('\n'), {
+  return box(wrapBlock(lines, Math.max(1, width - 4), model.wrapText), {
     width,
     title: 'Activity',
     ctx,
@@ -385,6 +444,11 @@ const page: FramePage<PageModel, Msg> = {
         return [{
           ...model,
           actionEnabled: !model.actionEnabled,
+        }, []];
+      case 'toggle-wrap':
+        return [{
+          ...model,
+          wrapText: !model.wrapText,
         }, []];
       case 'focus-next':
         return [{
@@ -433,6 +497,7 @@ const page: FramePage<PageModel, Msg> = {
     .bind('l', 'Cycle placement', { type: 'cycle-placement' })
     .bind('d', 'Cycle duration', { type: 'cycle-duration' })
     .bind('a', 'Toggle action button', { type: 'toggle-action' })
+    .bind('w', 'Toggle text wrap', { type: 'toggle-wrap' })
     .bind('j', 'Focus next actionable notification', { type: 'focus-next' })
     .bind('k', 'Focus previous actionable notification', { type: 'focus-prev' })
     .bind('enter', 'Run focused notification action', { type: 'activate-focused' })
