@@ -15,7 +15,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
-- **Notification stack rendering and routing** — notification overlays now preserve full-card background fill, relocate existing notifications when placement changes, archive and auto-evict the oldest active notifications when the visible stack exceeds the available viewport, and framed apps can auto-route runtime warnings/errors into toast notifications while still writing to stderr.
+- **Notification stack rendering and routing** — notification overlays now preserve full-card background fill, dismissed notifications animate through a visible exit phase, placement changes relocate and re-enter the active stack instead of leaving it visually stuck, the stack archives and auto-evicts the oldest active notifications when the visible viewport is full, and framed apps can auto-route runtime warnings/errors into toast notifications while still writing to stderr.
 - **Scaffold canary PTY shutdown race** — the PTY driver now treats queued late input/resize steps as no-ops once the child exits, preventing traceback noise from masking the actual canary failure.
 - **PR status helper edge cases** — canceled checks now fail the review-status exit code, nullable review authors fall back safely, and the release dry-run workflow labels its lint step accurately.
 - **Release dry-run peer pin validation** — the dry-run metadata gate now checks internal `peerDependencies` as well, so it matches the lock-step validation performed by the real publish workflow.
