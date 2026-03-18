@@ -1,6 +1,11 @@
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { resolve as resolvePath } from 'node:path';
-import type { BijouContext, RuntimePort } from '@flyingrobots/bijou';
+import {
+  installRuntimeViewportOverlay,
+  readRuntimeViewport,
+  updateRuntimeViewport,
+  type BijouContext,
+} from '@flyingrobots/bijou';
 import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
 import { createNodeContext } from '../index.js';
@@ -110,7 +115,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   }
 
   const ctx = options.ctx ?? createNodeContext();
-  installRuntimeOverlay(ctx);
+  installRuntimeViewportOverlay(ctx);
   const useAltScreen = options.altScreen ?? true;
   const useHideCursor = options.hideCursor ?? true;
   const useMouse = options.mouse ?? false;
@@ -136,10 +141,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
     workerData: {
       isBijouWorker: true,
       options: serializableOptions,
-      runtime: {
-        columns: sanitizeDimension(ctx.runtime.columns),
-        rows: sanitizeDimension(ctx.runtime.rows),
-      },
+      runtime: readRuntimeViewport(ctx.runtime),
     } satisfies BijouWorkerData,
     execArgv: options.execArgv,
     // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
@@ -151,11 +153,8 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   });
 
   const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
-    const nextColumns = sanitizeDimension(columns);
-    const nextRows = sanitizeDimension(rows);
-    ctx.runtime.columns = nextColumns;
-    ctx.runtime.rows = nextRows;
-    worker.postMessage({ type: 'io:resize', columns: nextColumns, rows: nextRows } satisfies WorkerMessage);
+    const nextViewport = updateRuntimeViewport(ctx.runtime, columns, rows);
+    worker.postMessage({ type: 'io:resize', ...nextViewport } satisfies WorkerMessage);
   });
 
   const onExit = new Promise<void>((resolve, reject) => {
@@ -239,11 +238,14 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
 
   // Create a proxy Context that speaks IPC instead of true I/O
   const proxyCtx = createNodeContext();
-  installRuntimeOverlay(proxyCtx);
+  installRuntimeViewportOverlay(proxyCtx);
   const { setDefaultContext } = await import('@flyingrobots/bijou');
   setDefaultContext(proxyCtx);
-  proxyCtx.runtime.columns = sanitizeDimension(initData.runtime?.columns ?? proxyCtx.runtime.columns);
-  proxyCtx.runtime.rows = sanitizeDimension(initData.runtime?.rows ?? proxyCtx.runtime.rows);
+  updateRuntimeViewport(
+    proxyCtx.runtime,
+    initData.runtime?.columns ?? proxyCtx.runtime.columns,
+    initData.runtime?.rows ?? proxyCtx.runtime.rows,
+  );
   
   // Hijack the WritePort to send frames back to main thread
   proxyCtx.io.write = (data: string) => {
@@ -277,9 +279,8 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
   proxyCtx.io.onResize = (handler) => {
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:resize') {
-        proxyCtx.runtime.columns = sanitizeDimension(msg.columns);
-        proxyCtx.runtime.rows = sanitizeDimension(msg.rows);
-        handler(proxyCtx.runtime.columns, proxyCtx.runtime.rows);
+        const nextViewport = updateRuntimeViewport(proxyCtx.runtime, msg.columns, msg.rows);
+        handler(nextViewport.columns, nextViewport.rows);
       }
     };
     parentPort!.on('message', listener);
@@ -303,46 +304,4 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
 
   // Signal main thread to shut down
   parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
-}
-
-function sanitizeDimension(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.floor(value));
-}
-
-function installRuntimeOverlay(ctx: BijouContext): RuntimePort {
-  const baseRuntime = ctx.runtime;
-  const state = {
-    columns: sanitizeDimension(baseRuntime.columns),
-    rows: sanitizeDimension(baseRuntime.rows),
-  };
-  const runtime: RuntimePort = {
-    env(key: string): string | undefined {
-      return baseRuntime.env(key);
-    },
-    get stdoutIsTTY(): boolean {
-      return baseRuntime.stdoutIsTTY;
-    },
-    get stdinIsTTY(): boolean {
-      return baseRuntime.stdinIsTTY;
-    },
-    get columns(): number {
-      return state.columns;
-    },
-    set columns(value: number) {
-      state.columns = sanitizeDimension(value);
-    },
-    get rows(): number {
-      return state.rows;
-    },
-    set rows(value: number) {
-      state.rows = sanitizeDimension(value);
-    },
-    get refreshRate(): number {
-      return baseRuntime.refreshRate;
-    },
-  };
-
-  (ctx as { runtime: RuntimePort }).runtime = runtime;
-  return runtime;
 }

@@ -40,6 +40,13 @@ export {
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
 export { systemClock, resolveClock, sleep, defer } from './core/clock.js';
+export {
+  type RuntimeViewport,
+  sanitizeRuntimeDimension,
+  readRuntimeViewport,
+  installRuntimeViewportOverlay,
+  updateRuntimeViewport,
+} from './core/runtime-viewport.js';
 
 // Mode rendering strategy
 export {
