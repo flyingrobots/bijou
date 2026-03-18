@@ -1,4 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
+import { resolveClock } from '../clock.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { badge } from './badge.js';
 import { renderByMode } from '../mode-render.js';
@@ -49,8 +50,8 @@ const ACCESSIBLE_LABELS: Record<LogLevel, string> = {
  *
  * @returns The formatted timestamp string.
  */
-function formatTimestamp(): string {
-  const d = new Date();
+function formatTimestamp(ctx?: BijouContext): string {
+  const d = resolveClock(ctx).date();
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
   const ss = String(d.getSeconds()).padStart(2, '0');
@@ -77,7 +78,7 @@ export function log(level: LogLevel, message: string, options?: LogOptions): str
   const showPrefix = options?.prefix !== false;  // default true
   const showTimestamp = options?.timestamp === true;  // default false
 
-  const ts = showTimestamp ? formatTimestamp() : '';
+  const ts = showTimestamp ? formatTimestamp(ctx) : '';
 
   if (!ctx) {
     const parts: string[] = [];

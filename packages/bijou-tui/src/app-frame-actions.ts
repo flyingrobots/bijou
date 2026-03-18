@@ -144,7 +144,7 @@ export function switchTab<PageModel, Msg>(
     transitionProgress: hasTransition ? 0 : 1,
     transitionGeneration: nextGeneration,
     transitionFrame: 0,
-    transitionStartMs: hasTransition ? Date.now() : undefined,
+    transitionStartMs: undefined,
     transitionTimeline: tl,
     transitionTimelineState: tl?.init(),
   }, nextId, pagesById);
@@ -382,14 +382,10 @@ export function syncPageFrameState<PageModel, Msg>(
 }
 
 /**
- * Create a TEA command that drives transition re-renders via `setInterval`.
- *
- * Each tick emits a frame-scoped 'transition' message. The actual progress
- * is computed from wall-clock time in the update handler, not from the
- * interval count. The interval just schedules re-renders.
+ * Create a TEA command that drives transition re-renders from the shared pulse.
  */
 export function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<Msg> {
-  return (emit) =>
+  return (emit, caps) =>
     new Promise<void>((resolve) => {
       if (durationMs <= 0) {
         emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction) as unknown as Msg);
@@ -397,20 +393,24 @@ export function createTransitionTickCmd<Msg>(durationMs: number, generation: num
         return;
       }
 
-      const startMs = Date.now();
-      const intervalMs = Math.round(1000 / 60);
+      let elapsedMs = 0;
+      const pulse = caps.onPulse((dt) => {
+        elapsedMs = Math.min(durationMs, elapsedMs + Math.max(0, dt * 1000));
+        const rawProgress = Math.min(1, elapsedMs / durationMs);
 
-      const id = setInterval(() => {
-        const elapsed = Date.now() - startMs;
-        const rawProgress = Math.min(1, elapsed / durationMs);
-
-        emit(wrapFrameMsg({ type: 'transition', progress: rawProgress, generation } as FrameAction) as unknown as Msg);
+        emit(wrapFrameMsg({
+          type: 'transition',
+          progress: rawProgress,
+          generation,
+          dt,
+          elapsedMs,
+        } as FrameAction) as unknown as Msg);
 
         if (rawProgress >= 1) {
-          clearInterval(id);
+          pulse.dispose();
           emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction) as unknown as Msg);
           resolve();
         }
-      }, intervalMs);
+      });
     });
 }

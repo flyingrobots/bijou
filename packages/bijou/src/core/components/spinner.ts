@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
 import type { OutputMode } from '../detect/tty.js';
+import { resolveClock } from '../clock.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
@@ -77,6 +78,7 @@ export interface SpinnerController {
  */
 export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
   const ctx = resolveCtx(options.ctx);
+  const clock = resolveClock(ctx);
   const frames = options.frames ?? DOTS;
   const interval = options.interval ?? 80;
   let label = options.label ?? 'Loading';
@@ -102,7 +104,7 @@ export function createSpinner(options: SpinnerOptions = {}): SpinnerController {
       cursorHandle?.dispose();
       cursorHandle = cursorGuard(ctx.io).hide();
       render();
-      timer = ctx.io.setInterval(render, interval);
+      timer = clock.setInterval(render, interval);
     },
 
     update(newLabel: string) {

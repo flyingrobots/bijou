@@ -28,10 +28,16 @@ export function quit<M>(): Cmd<M> {
  * @returns A one-shot timer command.
  */
 export function tick<M>(ms: number, msg: M): Cmd<M> {
-  return (_emit, _caps) =>
-    new Promise<M>((resolve) => {
-      setTimeout(() => resolve(msg), ms);
-    });
+  return async (_emit, caps) => {
+    if (caps.sleep) {
+      await caps.sleep(ms);
+    } else {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+      });
+    }
+    return msg;
+  };
 }
 
 /**

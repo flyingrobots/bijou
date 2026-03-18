@@ -12,6 +12,8 @@ import { CYAN_MAGENTA } from './core/theme/presets.js';
 import { PRESETS } from './core/theme/presets.js';
 import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
 import { detectOutputMode } from './core/detect/tty.js';
+import { systemClock } from './core/clock.js';
+import type { ClockPort } from './ports/clock.js';
 
 /** Options for {@link createBijou}. */
 export interface CreateBijouOptions {
@@ -19,6 +21,8 @@ export interface CreateBijouOptions {
   runtime: RuntimePort;
   /** I/O adapter (stdin/stdout, filesystem). */
   io: IOPort;
+  /** Clock/scheduler adapter. Defaults to the system clock. */
+  clock?: ClockPort;
   /** Style adapter (chalk, plain-text, etc.). */
   style: StylePort;
   /** Explicit theme object. Defaults to {@link CYAN_MAGENTA}. */
@@ -42,6 +46,7 @@ export interface CreateBijouOptions {
  */
 export function createBijou(options: CreateBijouOptions): BijouContext {
   const { runtime, io, style } = options;
+  const clock = options.clock ?? systemClock();
   const envVar = options.envVar ?? 'BIJOU_THEME';
   const presets = options.presets ?? PRESETS;
   const fallback = options.theme ?? CYAN_MAGENTA;
@@ -76,6 +81,7 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     mode,
     runtime,
     io,
+    clock,
     style,
     tokenGraph,
     resolveBCSS: () => ({}),
