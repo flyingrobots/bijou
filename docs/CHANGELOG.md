@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Stacked notification overlays** — `@flyingrobots/bijou-tui` now ships a reusable notification stack with actionable, inline, and toast variants; configurable placement/duration/action payloads; stacked screen-edge rendering; and animated enter/exit transitions, plus a new framed `examples/notifications` lab for interactive evaluation.
 - **Surface-first companion primitives** — added `boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, and `tableSurface()` so V3 apps can keep common layout/status composition on the `Surface` path instead of dropping back through explicit string bridges.
 - **Deterministic clock port and test adapter** — `BijouContext` now supports a shared `clock` port, and the test adapters now ship `mockClock()` so runtime code and component tests can fake wall-clock time without reaching for Node globals.
 - **Idle-aware scripted driver controls** — `runScript()` now supports configurable pulse frequency, and the TUI event bus exposes explicit command-idle tracking so deterministic tests can wait for real command completion instead of sprinkling `setTimeout(...)` heuristics.

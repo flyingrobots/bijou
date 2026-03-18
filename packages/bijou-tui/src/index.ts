@@ -337,6 +337,29 @@ export {
   tooltip,
 } from './overlay.js';
 
+// Notification stack overlays
+export {
+  type NotificationVariant,
+  type NotificationTone,
+  type NotificationPlacement,
+  type NotificationAction,
+  type NotificationSpec,
+  type NotificationPhase,
+  type NotificationRecord,
+  type NotificationState,
+  type RenderNotificationStackOptions,
+  createNotificationState,
+  pushNotification,
+  dismissNotification,
+  dismissFocusedNotification,
+  cycleNotificationFocus,
+  activateFocusedNotification,
+  tickNotifications,
+  hasNotifications,
+  notificationsNeedTick,
+  renderNotificationStack,
+} from './notification.js';
+
 // Interactive accordion
 export {
   type AccordionState,
