@@ -61,8 +61,8 @@ export const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, readonly PtyStep[
     inputStep('A short description\n', 250),
   ],
   'examples/textarea/main.ts': [
-    inputStep('feat: smoke test', 250),
-    inputStep('\x04', 120),
+    inputStep('feat: smoke test', 600),
+    inputStep('\x04', 200),
   ],
   'examples/confirm/main.ts': [
     inputStep('y\n', 250),
