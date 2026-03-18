@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createSurface, type TimerHandle } from '@flyingrobots/bijou';
 import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
@@ -16,10 +16,6 @@ import {
   SHOW_CURSOR,
   EXIT_ALT_SCREEN,
 } from './screen.js';
-
-afterEach(() => {
-  vi.useRealTimers();
-});
 
 function counterApp(quitKey = 'q'): App<number, never> {
   return {
@@ -77,6 +73,48 @@ function frame(content: string): string {
   return HOME + lines.map((line) => line + CLEAR_LINE_TO_END).join('\n') + CLEAR_TO_END;
 }
 
+function createInteractiveContext(options: Parameters<typeof createTestContext>[0] = {}) {
+  const clock = mockClock();
+  const ctx = createTestContext({ ...options, mode: 'interactive', clock });
+  return { clock, ctx };
+}
+
+function scheduleKeys(
+  ctx: ReturnType<typeof createTestContext>,
+  clock: ReturnType<typeof mockClock>,
+  events: Array<{ at: number; key: string }>,
+): void {
+  ctx.io.rawInput = (onKey) => {
+    const handles = events.map(({ at, key }) => clock.setTimeout(() => onKey(key), at));
+    return {
+      dispose() {
+        handles.forEach((handle) => {
+          handle.dispose();
+        });
+      },
+    };
+  };
+}
+
+function scheduleResizes(
+  ctx: ReturnType<typeof createTestContext>,
+  clock: ReturnType<typeof mockClock>,
+  events: Array<{ at: number; columns: number; rows: number }>,
+): void {
+  ctx.io.onResize = (onResize) => {
+    const handles = events.map(({ at, columns, rows }) =>
+      clock.setTimeout(() => onResize(columns, rows), at)
+    );
+    return {
+      dispose() {
+        handles.forEach((handle) => {
+          handle.dispose();
+        });
+      },
+    };
+  };
+}
+
 describe('run', () => {
   describe('non-interactive mode', () => {
     it('renders once in pipe mode and returns', async () => {
@@ -100,10 +138,9 @@ describe('run', () => {
 
   describe('interactive mode', () => {
     it('enters alt screen and renders initial view', async () => {
-      vi.useFakeTimers();
-      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['q'] } });
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
       const promise = run(counterApp(), { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       // First write: enterScreen (alt + hide cursor + wrap disable + clear + home)
@@ -114,10 +151,9 @@ describe('run', () => {
     });
 
     it('exits alt screen on quit', async () => {
-      vi.useFakeTimers();
-      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['q'] } });
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
       const promise = run(counterApp(), { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
@@ -125,23 +161,37 @@ describe('run', () => {
     });
 
     it('updates model on key input', async () => {
-      vi.useFakeTimers();
-      const ctx = createTestContext({
-        mode: 'interactive',
-        io: { keys: ['\x1b[A', '\x1b[A', 'q'] }, // up, up, quit
-      });
-      const promise = run(counterApp(), { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      const seen: number[] = [];
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            if (msg.key === 'q') return [model, [quit()]];
+            if (msg.key === 'up') {
+              const next = model + 1;
+              seen.push(next);
+              return [next, []];
+            }
+          }
+          return [model, []];
+        },
+        view: (model) => `count: ${model}`,
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [
+        { at: 5, key: '\x1b[A' },
+        { at: 10, key: '\x1b[A' },
+        { at: 20, key: 'q' },
+      ]);
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(50);
       await promise;
 
-      // After two 'up' presses, the rendered frame should contain 'count: 2'
-      const hasCount2 = ctx.io.written.some((w) => w.includes('count: 2'));
-      expect(hasCount2).toBe(true);
+      expect(seen).toEqual([1, 2]);
     });
 
     it('handles double Ctrl+C force-quit', async () => {
-      vi.useFakeTimers();
-
       // App that ignores Ctrl+C (doesn't quit on it)
       const stubbornApp: App<string, never> = {
         init: () => ['running', []],
@@ -150,12 +200,11 @@ describe('run', () => {
       };
 
       // Two Ctrl+C in rapid succession
-      const ctx = createTestContext({
-        mode: 'interactive',
+      const { clock, ctx } = createInteractiveContext({
         io: { keys: ['\x03', '\x03'] },
       });
       const promise = run(stubbornApp, { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       // Should have exited despite app not issuing quit
@@ -164,7 +213,6 @@ describe('run', () => {
     });
 
     it('sends first Ctrl+C to app as KeyMsg', async () => {
-      vi.useFakeTimers();
       const received: KeyMsg[] = [];
 
       const spyApp: App<null, never> = {
@@ -178,12 +226,11 @@ describe('run', () => {
       };
 
       // Ctrl+C then q to quit normally
-      const ctx = createTestContext({
-        mode: 'interactive',
+      const { clock, ctx } = createInteractiveContext({
         io: { keys: ['\x03', 'q'] },
       });
       const promise = run(spyApp, { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
@@ -229,7 +276,6 @@ describe('run', () => {
     });
 
     it('executes startup commands from init', async () => {
-      vi.useFakeTimers();
       type Msg = { type: 'started' };
 
       const startupApp: App<string, Msg> = {
@@ -244,9 +290,9 @@ describe('run', () => {
         view: (model) => model,
       };
 
-      const ctx = createTestContext({ mode: 'interactive' });
+      const { clock, ctx } = createInteractiveContext();
       const promise = run(startupApp, { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       const hasReady = ctx.io.written.some((w) => w.includes('ready'));
@@ -254,7 +300,6 @@ describe('run', () => {
     });
 
     it('runs init commands before startup resize commands', async () => {
-      vi.useFakeTimers();
       type Msg = { type: 'init-cmd' } | { type: 'resize-cmd' };
       const order: string[] = [];
 
@@ -276,19 +321,18 @@ describe('run', () => {
         view: () => 'ordering',
       };
 
-      const ctx = createTestContext({ mode: 'interactive' });
+      const { clock, ctx } = createInteractiveContext();
       const promise = run(orderingApp, { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       expect(order).toEqual(['init', 'resize']);
     });
 
     it('skips alt screen when altScreen is false', async () => {
-      vi.useFakeTimers();
-      const ctx = createTestContext({ mode: 'interactive', io: { keys: ['q'] } });
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
       const promise = run(counterApp(), { ctx, altScreen: false, hideCursor: false });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       const hasAltScreen = ctx.io.written.some((w) => w.includes(ENTER_ALT_SCREEN));
@@ -296,9 +340,7 @@ describe('run', () => {
     });
 
     it('allows callers to extend the render pipeline', async () => {
-      vi.useFakeTimers();
-
-      const ctx = createTestContext({ mode: 'interactive' });
+      const { clock, ctx } = createInteractiveContext();
       const app: App<null, never> = {
         init: () => [null, [quit()]],
         update: (_msg, model) => [model, []],
@@ -319,36 +361,26 @@ describe('run', () => {
         },
       });
 
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
     });
 
     it('forces a clean redraw when the terminal resizes', async () => {
-      vi.useFakeTimers();
-
-      const ctx = createTestContext({ mode: 'interactive' });
-      ctx.io.rawInput = (onKey) => {
-        const id = globalThis.setTimeout(() => onKey('q'), 30);
-        return { dispose() { clearTimeout(id); } };
-      };
-      ctx.io.onResize = (onResize) => {
-        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
-        return { dispose() { clearTimeout(id); } };
-      };
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
+      scheduleResizes(ctx, clock, [{ at: 10, columns: 100, rows: 30 }]);
 
       const promise = run(counterApp(), { ctx });
-      await vi.advanceTimersByTimeAsync(80);
+      await clock.advanceByAsync(80);
       await promise;
 
       expect(ctx.io.written.some((chunk) => chunk === CLEAR_SCREEN + HOME)).toBe(true);
     });
 
     it('updates runtime dimensions before rerendering after resize', async () => {
-      vi.useFakeTimers();
-
-      const ctx = createTestContext({ mode: 'interactive' });
+      const { clock, ctx } = createInteractiveContext();
       const app: App<number, never> = {
         init: () => [0, []],
         update(msg, model) {
@@ -358,17 +390,11 @@ describe('run', () => {
         view: () => `size:${ctx.runtime.columns}x${ctx.runtime.rows}`,
       };
 
-      ctx.io.rawInput = (onKey) => {
-        const id = globalThis.setTimeout(() => onKey('q'), 30);
-        return { dispose() { clearTimeout(id); } };
-      };
-      ctx.io.onResize = (onResize) => {
-        const id = globalThis.setTimeout(() => onResize(100, 30), 10);
-        return { dispose() { clearTimeout(id); } };
-      };
+      scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
+      scheduleResizes(ctx, clock, [{ at: 10, columns: 100, rows: 30 }]);
 
       const promise = run(app, { ctx });
-      await vi.advanceTimersByTimeAsync(80);
+      await clock.advanceByAsync(80);
       await promise;
 
       expect(ctx.runtime.columns).toBe(100);
@@ -377,9 +403,7 @@ describe('run', () => {
     });
 
     it('restores the terminal before rejecting when a scheduled render fails', async () => {
-      vi.useFakeTimers();
-
-      const ctx = createTestContext({ mode: 'interactive' });
+      const { clock, ctx } = createInteractiveContext();
       const promise = run(counterApp(), { ctx });
       const rejection = promise.then(
         () => null,
@@ -397,7 +421,7 @@ describe('run', () => {
         },
       });
 
-      await vi.advanceTimersByTimeAsync(10);
+      await clock.advanceByAsync(10);
       await expect(rejection).resolves.toBeInstanceOf(Error);
       await expect(promise).rejects.toThrow('render exploded');
       expect(columns).toBe(80);
@@ -423,8 +447,6 @@ describe('run', () => {
     });
 
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
-      vi.useFakeTimers();
-
       const app: App<boolean, never> = {
         init: () => [true, []],
         update(msg, model) {
@@ -437,22 +459,15 @@ describe('run', () => {
         view: (model) => (model ? singleCellSurface('X') : singleCellSurface()),
       };
 
-      const ctx = createTestContext({ mode: 'interactive' });
-      ctx.io.rawInput = (onKey) => {
-        const ids = [
-          globalThis.setTimeout(() => onKey('x'), 10),
-          globalThis.setTimeout(() => onKey('x'), 20),
-          globalThis.setTimeout(() => onKey('q'), 30),
-        ];
-        return {
-          dispose() {
-            ids.forEach(clearTimeout);
-          },
-        };
-      };
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [
+        { at: 10, key: 'x' },
+        { at: 20, key: 'x' },
+        { at: 30, key: 'q' },
+      ]);
 
       const promise = run(app, { ctx });
-      await vi.advanceTimersByTimeAsync(50);
+      await clock.advanceByAsync(50);
       await promise;
 
       const clearWrites = ctx.io.written.filter((chunk) => chunk === '\x1b[1;1H ');

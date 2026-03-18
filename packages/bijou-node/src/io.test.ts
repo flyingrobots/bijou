@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { mockClock } from '@flyingrobots/bijou/adapters/test';
 import { nodeIO } from './io.js';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
@@ -83,19 +84,17 @@ describe('nodeIO()', () => {
   });
 
   it('setInterval() fires periodically and stops on dispose', () => {
-    vi.useFakeTimers();
-    try {
-      const spy = vi.fn();
-      const io = nodeIO();
-      const handle = io.setInterval(spy, 50);
-      vi.advanceTimersByTime(150);
-      expect(spy).toHaveBeenCalledTimes(3);
-      handle.dispose();
-      vi.advanceTimersByTime(100);
-      expect(spy).toHaveBeenCalledTimes(3); // no more calls after dispose
-    } finally {
-      vi.useRealTimers();
-    }
+    const clock = mockClock();
+    const spy = vi.fn();
+    const io = nodeIO({ clock });
+    const handle = io.setInterval(spy, 50);
+
+    clock.advanceBy(150);
+    expect(spy).toHaveBeenCalledTimes(3);
+
+    handle.dispose();
+    clock.advanceBy(100);
+    expect(spy).toHaveBeenCalledTimes(3); // no more calls after dispose
   });
 
   // question() and rawInput() require a TTY stdin and are not unit-testable.

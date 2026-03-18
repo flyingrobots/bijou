@@ -52,6 +52,20 @@ describe('createTestContext()', () => {
     expect(ctx.clock?.now()).toBe(1234);
   });
 
+  it('shares the provided clock with mock I/O scheduling', () => {
+    const clock = mockClock();
+    const ctx = createTestContext({ clock });
+    const calls: number[] = [];
+    const handle = ctx.io.setInterval(() => {
+      calls.push(clock.now());
+    }, 10);
+
+    clock.advanceBy(25);
+    handle.dispose();
+
+    expect(calls).toEqual([10, 20]);
+  });
+
   it('theme accessor functions are resolved and functional', () => {
     const ctx = createTestContext();
     expect(ctx.semantic('primary').hex).toBeTypeOf('string');

@@ -1,6 +1,22 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { mockClock } from '@flyingrobots/bijou/adapters/test';
 import { quit, tick, batch } from './commands.js';
 import { QUIT } from './types.js';
+
+function createClockCapabilities() {
+  const clock = mockClock();
+  return {
+    clock,
+    caps: {
+      onPulse: () => ({ dispose() {} }),
+      sleep(ms: number) {
+        return new Promise<void>((resolve) => {
+          clock.setTimeout(resolve, ms);
+        });
+      },
+    },
+  };
+}
 
 describe('commands', () => {
   describe('quit', () => {
@@ -13,30 +29,26 @@ describe('commands', () => {
 
   describe('tick', () => {
     it('resolves with the message after the delay', async () => {
-      vi.useFakeTimers();
+      const { clock, caps } = createClockCapabilities();
       const msg = { type: 'tick' as const };
       const cmd = tick(100, msg);
-      const promise = cmd(() => {}, { onPulse: () => ({ dispose() {} }) });
-      vi.advanceTimersByTime(100);
+      const promise = cmd(() => {}, caps);
+      await clock.advanceByAsync(100);
       const result = await promise;
       expect(result).toBe(msg);
-      vi.useRealTimers();
     });
 
     it('does not resolve before the delay', async () => {
-      vi.useFakeTimers();
+      const { clock, caps } = createClockCapabilities();
       const cmd = tick(500, 'done');
       let resolved = false;
-      void cmd(() => {}, { onPulse: () => ({ dispose() {} }) }).then(() => {
+      void cmd(() => {}, caps).then(() => {
         resolved = true;
       });
-      vi.advanceTimersByTime(499);
-      await vi.advanceTimersByTimeAsync(0);
+      await clock.advanceByAsync(499);
       expect(resolved).toBe(false);
-      vi.advanceTimersByTime(1);
-      await vi.advanceTimersByTimeAsync(0);
+      await clock.advanceByAsync(1);
       expect(resolved).toBe(true);
-      vi.useRealTimers();
     });
   });
 

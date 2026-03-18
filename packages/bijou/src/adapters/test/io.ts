@@ -1,4 +1,6 @@
+import type { ClockPort } from '../../ports/clock.js';
 import type { IOPort, RawInputHandle, TimerHandle } from '../../ports/io.js';
+import { resolveClock } from '../../core/clock.js';
 import { join } from 'path';
 
 /**
@@ -9,6 +11,8 @@ export interface MockIOOptions {
   answers?: string[];
   /** Pre-loaded keypress strings delivered by {@link MockIO.rawInput} via microtasks. */
   keys?: string[];
+  /** Clock override for deterministic timer and microtask scheduling in tests. */
+  clock?: ClockPort;
   /** Virtual filesystem entries (path to content) for {@link MockIO.readFile}. */
   files?: Record<string, string>;
   /** Virtual directory listings (path to entries) for {@link MockIO.readDir}. */
@@ -50,6 +54,7 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
   const answerQueue = [...(options.answers ?? [])];
   const files = { ...(options.files ?? {}) };
   const dirs = { ...(options.dirs ?? {}) };
+  const clock = resolveClock(options.clock);
 
   return {
     written,
@@ -101,9 +106,9 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
         if (disposed || keyQueue.length === 0) return;
         const key = keyQueue.shift()!;
         onKey(key);
-        if (keyQueue.length > 0) queueMicrotask(deliver);
+        if (keyQueue.length > 0) clock.queueMicrotask(deliver);
       }
-      queueMicrotask(deliver);
+      clock.queueMicrotask(deliver);
       return { dispose() { disposed = true; } };
     },
 
@@ -123,8 +128,7 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
      * @returns A handle whose `dispose()` cancels the timer.
      */
     setInterval(callback: () => void, ms: number): TimerHandle {
-      const id = globalThis.setInterval(callback, ms);
-      return { dispose() { clearInterval(id); } };
+      return clock.setInterval(callback, ms);
     },
 
     /**

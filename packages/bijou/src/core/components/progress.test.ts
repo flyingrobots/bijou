@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { progressBar, createProgressBar, createAnimatedProgressBar } from './progress.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { createTestContext, mockClock } from '../../adapters/test/index.js';
 
 describe('progressBar', () => {
   it('renders progress bar at 0% in static mode', () => {
@@ -126,8 +126,8 @@ describe('createAnimatedProgressBar', () => {
   });
 
   it('update() triggers interpolation frames', async () => {
-    vi.useFakeTimers();
-    const ctx = createTestContext({ mode: 'interactive' });
+    const clock = mockClock();
+    const ctx = createTestContext({ mode: 'interactive', clock });
     const bar = createAnimatedProgressBar({ width: 10, fps: 30, duration: 300, ctx });
     bar.start();
     const writesBeforeUpdate = ctx.io.written.length;
@@ -135,7 +135,7 @@ describe('createAnimatedProgressBar', () => {
     bar.update(100);
 
     // Advance several frames
-    vi.advanceTimersByTime(200);
+    clock.advanceBy(200);
     expect(ctx.io.written.length).toBeGreaterThan(writesBeforeUpdate);
 
     // Some intermediate frames should have values between 0 and 100
@@ -143,16 +143,15 @@ describe('createAnimatedProgressBar', () => {
     expect(intermediateWrites.length).toBeGreaterThan(1);
 
     bar.stop();
-    vi.useRealTimers();
   });
 
   it('stop() clears interval and restores cursor', () => {
-    vi.useFakeTimers();
-    const ctx = createTestContext({ mode: 'interactive' });
+    const clock = mockClock();
+    const ctx = createTestContext({ mode: 'interactive', clock });
     const bar = createAnimatedProgressBar({ width: 10, ctx });
     bar.start();
     bar.update(50);
-    vi.advanceTimersByTime(100);
+    clock.advanceBy(100);
 
     bar.stop('All done');
     const writes = ctx.io.written;
@@ -161,10 +160,8 @@ describe('createAnimatedProgressBar', () => {
 
     // No more writes after stop
     const countAfterStop = writes.length;
-    vi.advanceTimersByTime(200);
+    clock.advanceBy(200);
     expect(writes.length).toBe(countAfterStop);
-
-    vi.useRealTimers();
   });
 
   it('non-interactive mode produces static output', () => {
@@ -185,19 +182,18 @@ describe('createAnimatedProgressBar', () => {
   });
 
   it('animation converges to target value', () => {
-    vi.useFakeTimers();
-    const ctx = createTestContext({ mode: 'interactive' });
+    const clock = mockClock();
+    const ctx = createTestContext({ mode: 'interactive', clock });
     const bar = createAnimatedProgressBar({ width: 10, fps: 30, duration: 300, ctx });
     bar.start();
     bar.update(100);
 
     // Advance enough time for animation to complete
-    vi.advanceTimersByTime(500);
+    clock.advanceBy(500);
 
     const lastRenderWrite = ctx.io.written.filter(w => w.includes('%')).at(-1);
     expect(lastRenderWrite).toContain('100%');
 
     bar.stop();
-    vi.useRealTimers();
   });
 });

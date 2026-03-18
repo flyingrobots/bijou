@@ -35,6 +35,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Deterministic runtime test lint compliance** — the Ctrl+C-at-time-zero regression test now disposes its timeout handles with a block-bodied loop so it satisfies the repo’s iterable-callback-return lint rule without changing behavior.
 - **Deterministic runtime test helper cleanup** — the tracking clock helper in `runtime.test.ts` now passes timeout callbacks directly to the base clock instead of wrapping them in a no-op forwarding closure.
 - **Shared runtime viewport overlay** — the main TUI runtime and the worker host/proxy now share one viewport overlay helper, so dimension sanitization and mutable resize state stay consistent across scripted runs, interactive resizes, and worker handoff.
+- **Clock-driven test scheduling** — the remaining timer-sensitive runtime, command, component, and I/O adapter tests now use injected `mockClock()` instances instead of Vitest fake timers, and the Node/test I/O adapters accept clock injection so those tests never have to touch wall-clock scheduling.
 
 ### 🧪 Tests
 

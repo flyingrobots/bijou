@@ -12,6 +12,7 @@ import type { OutputMode, ColorScheme } from '../../core/detect/tty.js';
 import { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 import { mockIO, type MockIOOptions, type MockIO } from './io.js';
 import { mockClock, type MockClockOptions, type MockClock } from './clock.js';
+import type { ClockPort } from '../../ports/clock.js';
 import type { StylePort } from '../../ports/style.js';
 import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
@@ -49,7 +50,7 @@ export interface TestContextOptions {
   /** Theme to resolve. Defaults to `CYAN_MAGENTA`. */
   theme?: Theme;
   /** Clock override for deterministic time/scheduling. */
-  clock?: MockClockOptions | MockClock;
+  clock?: MockClockOptions | MockClock | ClockPort;
   /** Output mode. Defaults to `'interactive'`. */
   mode?: OutputMode;
   /** Whether to strip color from the resolved theme. Defaults to `false`. */
@@ -60,7 +61,7 @@ export interface TestContextOptions {
   style?: StylePort;
 }
 
-function isMockClock(value: MockClockOptions | MockClock | undefined): value is MockClock {
+function isClockPort(value: MockClockOptions | MockClock | ClockPort | undefined): value is ClockPort {
   return typeof value === 'object'
     && value !== null
     && 'now' in value
@@ -81,17 +82,22 @@ export interface TestContext extends BijouContext {
  *
  * Assemble a {@link mockRuntime}, {@link mockIO}, and {@link plainStyle}
  * together with a resolved theme so tests can exercise bijou components
- * without touching real terminals or filesystems.
+ * without touching real terminals or filesystems. When a clock override is
+ * provided, the same scheduler is threaded through the mock I/O adapter so
+ * interactive runtime tests can stay fully deterministic.
  *
  * @param options - Optional overrides for runtime, I/O, theme, mode, and color.
  * @returns A {@link TestContext} ready for use in tests.
  */
 export function createTestContext(options: TestContextOptions = {}): TestContext {
   const runtime = mockRuntime(options.runtime);
-  const io = mockIO(options.io);
-  const clock = options.clock === undefined
+  const requestedClock = options.clock ?? options.io?.clock;
+  const clock = requestedClock === undefined
     ? systemClock()
-    : (isMockClock(options.clock) ? options.clock : mockClock(options.clock));
+    : (isClockPort(requestedClock) ? requestedClock : mockClock(requestedClock));
+  const io = mockIO(options.io?.clock === undefined
+    ? { ...(options.io ?? {}), clock }
+    : options.io);
   const style = options.style ?? plainStyle();
   const theme = createResolved(options.theme ?? CYAN_MAGENTA, options.noColor ?? false, options.colorScheme ?? 'dark');
   const tokenGraph = createTokenGraph((options.theme ?? CYAN_MAGENTA) as unknown as TokenDefinitions);
