@@ -15,3 +15,6 @@ export const HIDE_CURSOR = '\x1b[?25l';
 
 /** ANSI escape: show the text cursor (DEC Private Mode 25). */
 export const SHOW_CURSOR = '\x1b[?25h';
+
+/** ANSI escape: reset SGR style state. */
+export const RESET_SGR = '\x1b[0m';

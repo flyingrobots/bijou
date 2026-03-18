@@ -129,11 +129,21 @@ describe('surface-first primitives', () => {
 
   it('boxSurface clips constrained content and preserves the right border', () => {
     const ctx = createTestContext({ mode: 'interactive' });
-    const surface = boxSurface('ABCDE', { width: 6, ctx });
+    const surface = boxSurface('ABCDE', { width: 6, overflow: 'truncate', ctx });
 
     expect(surface.get(1, 1).char).toBe('A');
     expect(surface.get(4, 1).char).toBe('D');
     expect(surface.get(5, 1).char).toBe('│');
+  });
+
+  it('boxSurface wraps constrained string content by default', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = boxSurface('ABCDEFGHI', { width: 7, ctx });
+
+    expect(surface.height).toBeGreaterThan(3);
+    expect(surface.get(1, 1).char).toBe('A');
+    expect(surface.get(5, 1).char).toBe('E');
+    expect(surface.get(1, 2).char).toBe('F');
   });
 
   it('boxSurface normalizes fractional fixed widths before blitting content', () => {
@@ -193,8 +203,8 @@ describe('surface-first primitives', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const surface = tableSurface({
       columns: [
-        { header: 'State', width: 4 },
-        { header: 'Next', width: 4 },
+        { header: 'S', width: 4 },
+        { header: 'N', width: 4 },
       ],
       rows: [
         [createTextSurface('UP\nDN'), 'ok'],
@@ -222,6 +232,7 @@ describe('surface-first primitives', () => {
       rows: [
         [createTextSurface('LONGER'), 'ok'],
       ],
+      overflow: 'truncate',
       ctx,
     });
 
@@ -231,6 +242,27 @@ describe('surface-first primitives', () => {
     expect(surface.get(6, 3).char).toBe('│');
     expect(surface.get(8, 3).char).toBe('o');
     expect(surface.get(9, 3).char).toBe('k');
+  });
+
+  it('tableSurface wraps explicit-width cells by default', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = tableSurface({
+      columns: [
+        { header: 'Key', width: 3 },
+        { header: 'Val', width: 3 },
+      ],
+      rows: [
+        [createTextSurface('LONGER'), 'ok'],
+      ],
+      ctx,
+    });
+
+    expect(surface.get(2, 3).char).toBe('L');
+    expect(surface.get(3, 3).char).toBe('O');
+    expect(surface.get(4, 3).char).toBe('N');
+    expect(surface.get(2, 4).char).toBe('G');
+    expect(surface.get(3, 4).char).toBe('E');
+    expect(surface.get(4, 4).char).toBe('R');
   });
 
   it('tableSurface normalizes fractional explicit column widths before layout math', () => {

@@ -1,9 +1,13 @@
+import { graphemeWidth } from '../text/grapheme.js';
+import { clipToWidth } from '../text/clip.js';
+import { wrapToWidth } from '../text/wrap.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { makeBgFill } from '../bg-fill.js';
-import { stripAnsi } from '../text/grapheme.js';
+import { resolveOverflowBehavior } from './overflow.js';
+import type { BijouNodeOptions } from './types.js';
 
 /** Definition for a single table column. */
 export interface TableColumn {
@@ -14,7 +18,7 @@ export interface TableColumn {
 }
 
 /** Configuration for rendering a table. */
-export interface TableOptions {
+export interface TableOptions extends BijouNodeOptions {
   /** Column definitions (headers and optional widths). */
   columns: TableColumn[];
   /** Two-dimensional array of cell strings, one inner array per row. */
@@ -36,7 +40,7 @@ export interface TableOptions {
  * @returns The number of visible characters.
  */
 function visibleLength(str: string): number {
-  return stripAnsi(str).length;
+  return graphemeWidth(str);
 }
 
 /**
@@ -49,6 +53,26 @@ function visibleLength(str: string): number {
 function padRight(str: string, width: number): string {
   const visible = visibleLength(str);
   return visible >= width ? str : str + ' '.repeat(width - visible);
+}
+
+function normalizeColumnWidth(width: number | undefined): number | undefined {
+  if (width == null) return undefined;
+  if (!Number.isFinite(width)) return 0;
+  return Math.max(0, Math.floor(width));
+}
+
+function formatCellLines(
+  value: string,
+  width: number,
+  overflow: 'wrap' | 'truncate',
+  fixedWidth: boolean,
+): string[] {
+  const safeValue = value ?? '';
+  if (!fixedWidth) return safeValue.split('\n');
+  if (overflow === 'truncate') {
+    return safeValue.split('\n').map((line) => clipToWidth(line, width));
+  }
+  return safeValue.split('\n').flatMap((line) => wrapToWidth(line, width));
 }
 
 /**
@@ -85,10 +109,15 @@ export function table(options: TableOptions): string {
     interactive: () => {
       const headerToken = options.headerToken ?? ctx.ui('tableHeader');
       const borderToken = options.borderToken ?? ctx.border('muted');
+      const overflow = resolveOverflowBehavior(
+        options.overflow,
+        ctx.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }),
+      );
       const bc = (s: string): string => ctx.style.styled(borderToken, s);
 
       const colWidths = columns.map((col, i) => {
-        if (col.width !== undefined) return col.width;
+        const normalizedWidth = normalizeColumnWidth(col.width);
+        if (normalizedWidth !== undefined) return normalizedWidth;
         let max = visibleLength(col.header ?? '');
         for (const row of rows) {
           const cell = row[i] ?? '';
@@ -110,18 +139,36 @@ export function table(options: TableOptions): string {
       const bottom = hLine('\u2514', '\u2534', '\u2518');
 
       const hdrBgFill = makeBgFill(options.headerBgToken, ctx);
-      const headerCells = columns.map((col, i) =>
-        ' ' + padRight(ctx.style.styled(headerToken, col.header ?? ''), colWidths[i]!) + ' ',
-      );
-      const rawHeaderRow = bc(v) + headerCells.join(bc(v)) + bc(v);
-      const headerRow = hdrBgFill ? hdrBgFill(rawHeaderRow) : rawHeaderRow;
-
-      const dataRows = rows.map((row) => {
-        const cells = colWidths.map((w, i) => ' ' + padRight(row[i] ?? '', w) + ' ');
-        return bc(v) + cells.join(bc(v)) + bc(v);
+      const headerLinesByColumn = columns.map((col, i) => formatCellLines(
+        ctx.style.styled(headerToken, col.header ?? ''),
+        colWidths[i]!,
+        overflow,
+        col.width !== undefined,
+      ));
+      const headerHeight = headerLinesByColumn.reduce((max, lines) => Math.max(max, lines.length), 1);
+      const headerRows = Array.from({ length: headerHeight }, (_row, rowIndex) => {
+        const headerCells = columns.map((_col, i) =>
+          ' ' + padRight(headerLinesByColumn[i]![rowIndex] ?? '', colWidths[i]!) + ' ',
+        );
+        const rawHeaderRow = bc(v) + headerCells.join(bc(v)) + bc(v);
+        return hdrBgFill ? hdrBgFill(rawHeaderRow) : rawHeaderRow;
       });
 
-      const lines = [top, headerRow, midSep, ...dataRows, bottom];
+      const dataRows = rows.flatMap((row) => {
+        const cellLines = colWidths.map((w, i) => formatCellLines(
+          row[i] ?? '',
+          w,
+          overflow,
+          columns[i]?.width !== undefined,
+        ));
+        const rowHeight = cellLines.reduce((max, lines) => Math.max(max, lines.length), 1);
+        return Array.from({ length: rowHeight }, (_line, lineIndex) => {
+          const cells = colWidths.map((w, i) => ' ' + padRight(cellLines[i]![lineIndex] ?? '', w) + ' ');
+          return bc(v) + cells.join(bc(v)) + bc(v);
+        });
+      });
+
+      const lines = [top, ...headerRows, midSep, ...dataRows, bottom];
       return lines.join('\n');
     },
   }, options);

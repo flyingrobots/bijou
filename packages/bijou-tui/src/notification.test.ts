@@ -152,6 +152,44 @@ describe('renderNotificationStack', () => {
     expect(lines[0]!).toContain('Rendered as one row');
   });
 
+  it('wraps long notification copy by default instead of truncating it', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Deploy pipeline for western region exceeded retry budget',
+      message: 'This toast should wrap instead of clipping away the trailing diagnostic text.',
+      variant: 'TOAST',
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 48,
+      screenHeight: 20,
+    });
+    const lines = stripAnsi(overlay!.content).split('\n');
+
+    expect(lines.length).toBeGreaterThan(3);
+    expect(lines.join('\n')).toContain('diagnostic text.');
+  });
+
+  it('supports per-notification truncate overflow overrides', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Deploy pipeline for western region exceeded retry budget',
+      message: 'This toast should clip when truncate overflow is requested.',
+      variant: 'TOAST',
+      overflow: 'truncate',
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 48,
+      screenHeight: 20,
+    });
+    const lines = stripAnsi(overlay!.content).split('\n');
+
+    expect(lines.join('\n')).not.toContain('requested.');
+  });
+
   it('anchors stacks inside an explicit render region', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {

@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, clipToWidth, graphemeWidth, kbd } from '@flyingrobots/bijou';
+import { box, kbd } from '@flyingrobots/bijou';
 import {
   activateFocusedNotification,
   createFramedApp,
@@ -163,59 +163,6 @@ function appendLog(model: PageModel, message: string): PageModel {
   };
 }
 
-function wrapLine(text: string, width: number): readonly string[] {
-  if (width <= 0) return [''];
-  const safeText = text ?? '';
-  if (safeText.length === 0) return [''];
-  if (graphemeWidth(safeText) <= width) return [safeText];
-
-  const words = safeText.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return [''];
-
-  const lines: string[] = [];
-  let current = '';
-
-  for (const word of words) {
-    if (graphemeWidth(word) > width) {
-      if (current.length > 0) {
-        lines.push(current);
-        current = '';
-      }
-
-      let remainder = word;
-      while (graphemeWidth(remainder) > width) {
-        const chunk = clipToWidth(remainder, width);
-        lines.push(chunk);
-        remainder = remainder.slice(chunk.length);
-      }
-      current = remainder;
-      continue;
-    }
-
-    const next = current.length === 0 ? word : `${current} ${word}`;
-    if (graphemeWidth(next) <= width) {
-      current = next;
-      continue;
-    }
-
-    lines.push(current);
-    current = word;
-  }
-
-  if (current.length > 0) {
-    lines.push(current);
-  }
-
-  return lines.length > 0 ? lines : [''];
-}
-
-function wrapBlock(lines: readonly string[], width: number, enabled: boolean): string {
-  if (!enabled) return lines.join('\n');
-  return lines
-    .flatMap((line) => (line.length === 0 ? [''] : wrapLine(line, width)))
-    .join('\n');
-}
-
 function applyNotificationState(
   model: PageModel,
   notifications: NotificationState<Msg>,
@@ -258,6 +205,7 @@ function spawnConfiguredNotification(model: PageModel): [PageModel, Cmd<Msg>[]] 
         payload: { type: 'notification-action', ordinal },
       }
       : undefined,
+    overflow: model.wrapText ? 'wrap' : 'truncate',
   };
 
   const notifications = pushNotification(model.notifications, spec, ctx.clock.now());
@@ -334,6 +282,7 @@ function seedDemoNotifications(model: PageModel): PageModel {
           label: entry.actionLabel,
           payload: { type: 'notification-action', ordinal },
         },
+      overflow: next.wrapText ? 'wrap' : 'truncate',
     }, nowMs);
 
     next = appendLog({
@@ -384,9 +333,10 @@ function renderControlsPane(model: PageModel, width: number): string {
     'flip placements to compare the anchor behavior.',
   ];
 
-  return box(wrapBlock(lines, Math.max(1, width - 4), model.wrapText), {
+  return box(lines.join('\n'), {
     width,
     title: 'Controls',
+    overflow: model.wrapText ? 'wrap' : 'truncate',
     ctx,
   });
 }
@@ -398,9 +348,10 @@ function renderLogPane(model: PageModel, width: number): string {
     ...model.log,
   ];
 
-  return box(wrapBlock(lines, Math.max(1, width - 4), model.wrapText), {
+  return box(lines.join('\n'), {
     width,
     title: 'Activity',
+    overflow: model.wrapText ? 'wrap' : 'truncate',
     ctx,
   });
 }

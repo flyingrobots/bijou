@@ -1,5 +1,5 @@
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
-import { makeBgFill } from '@flyingrobots/bijou';
+import type { BijouContext, OverflowBehavior, TokenValue } from '@flyingrobots/bijou';
+import { makeBgFill, wrapToWidth } from '@flyingrobots/bijou';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { clipToWidth, visibleLength } from './viewport.js';
@@ -30,6 +30,7 @@ export interface NotificationSpec<Msg> {
   readonly action?: NotificationAction<Msg>;
   readonly bgToken?: TokenValue;
   readonly accentToken?: TokenValue;
+  readonly overflow?: OverflowBehavior;
 }
 
 export type NotificationPhase = 'entering' | 'visible' | 'exiting';
@@ -45,6 +46,7 @@ export interface NotificationRecord<Msg> {
   readonly action?: NotificationAction<Msg>;
   readonly bgToken?: TokenValue;
   readonly accentToken?: TokenValue;
+  readonly overflow: OverflowBehavior;
   readonly createdAtMs: number;
   readonly updatedAtMs: number;
   readonly enteredAtMs?: number;
@@ -138,6 +140,7 @@ export function pushNotification<Msg>(
     action: spec.action,
     bgToken: spec.bgToken,
     accentToken: spec.accentToken,
+    overflow: spec.overflow ?? 'wrap',
     createdAtMs: nowMs,
     updatedAtMs: nowMs,
     phase: 'entering',
@@ -352,14 +355,42 @@ function composeColumns(left: string, right: string, width: number): string {
   return safeLeft + ' '.repeat(gap) + safeRight;
 }
 
+function fitOverflowLines(line: string, width: number, overflow: OverflowBehavior): string[] {
+  if (overflow === 'truncate') return [padLine(line, width)];
+  return wrapToWidth(line, width).map((fragment) => padLine(fragment, width));
+}
+
+function composeOverflowColumns(
+  left: string,
+  right: string,
+  width: number,
+  overflow: OverflowBehavior,
+): string[] {
+  if (overflow === 'truncate') return [composeColumns(left, right, width)];
+
+  const safeRight = clipToWidth(right, width);
+  const rightWidth = visibleLength(safeRight);
+  const leftWidth = Math.max(1, width - rightWidth - (rightWidth > 0 ? 1 : 0));
+  const wrappedLeft = wrapToWidth(left, leftWidth);
+
+  if (wrappedLeft.length === 0) return [composeColumns('', safeRight, width)];
+
+  return [
+    composeColumns(wrappedLeft[0]!, safeRight, width),
+    ...wrappedLeft.slice(1).map((fragment) => padLine(fragment, width)),
+  ];
+}
+
 function wrapPanelLines(
   accent: string,
   bodyLines: readonly string[],
   textWidth: number,
   fill: (text: string) => string,
+  overflow: OverflowBehavior,
 ): string {
   return bodyLines
-    .map((line) => accent + fill(` ${padLine(line, textWidth)} `))
+    .flatMap((line) => fitOverflowLines(line, textWidth, overflow))
+    .map((line) => accent + fill(` ${line} `))
     .join('\n');
 }
 
@@ -394,14 +425,15 @@ function renderNotificationContent<Msg>(
   const textWidth = measureTextWidth(item, options.region?.width ?? options.screenWidth);
   const subtitle = styleMuted(item.message, ctx);
   const title = styleTitle(item.title, ctx);
+  const overflow = item.overflow;
 
   if (item.variant === 'INLINE') {
     const left = `${icon} ${title}${item.message ? ` ${subtitle}` : ''}`;
-    return wrapPanelLines(accent, [composeColumns(left, closeMark, textWidth)], textWidth, fill);
+    return wrapPanelLines(accent, composeOverflowColumns(left, closeMark, textWidth, overflow), textWidth, fill, 'truncate');
   }
 
   const lines: string[] = [
-    composeColumns(`${icon} ${title}`, closeMark, textWidth),
+    ...composeOverflowColumns(`${icon} ${title}`, closeMark, textWidth, overflow),
   ];
 
   if (item.message.length > 0) {
@@ -422,7 +454,7 @@ function renderNotificationContent<Msg>(
     lines.push(styleMuted(formatTimeLabel(item.createdAtMs), ctx));
   }
 
-  return wrapPanelLines(accent, lines, textWidth, fill);
+  return wrapPanelLines(accent, lines, textWidth, fill, overflow);
 }
 
 function sortForPlacement<Msg>(

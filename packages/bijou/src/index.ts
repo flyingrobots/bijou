@@ -136,6 +136,7 @@ export {
   graphemeClusterWidth,
   graphemeWidth,
   clipToWidth,
+  wrapToWidth,
   ANSI_SGR_RE,
   stripAnsi,
 } from './core/text/index.js';
@@ -154,6 +155,7 @@ export {
   createSpinner,
   type SpinnerOptions,
   type SpinnerController,
+  type OverflowBehavior,
   progressBar,
   createProgressBar,
   createAnimatedProgressBar,
