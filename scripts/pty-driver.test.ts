@@ -162,4 +162,84 @@ print(result)
     expect(result.stdout.trim().endsWith('0')).toBe(true);
     expect(result.stderr).toBe('');
   });
+
+  it('preserves ordered late step markers after exit without replaying resize side effects', () => {
+    const result = runPython(`
+import importlib.util
+import json
+import pathlib
+import sys
+
+driver_path = pathlib.Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("pty_driver", driver_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+class DeadProc:
+    pid = 123
+
+    def poll(self):
+        return 0
+
+    def wait(self):
+        return 0
+
+    def kill(self):
+        raise AssertionError("kill should not be called")
+
+class FakeSelector:
+    def register(self, *_args, **_kwargs):
+        return None
+
+    def select(self, _timeout):
+        return []
+
+    def close(self):
+        return None
+
+module.os.environ["BIJOU_PTY_SPEC"] = json.dumps({
+    "argv": ["python3", "-c", "print('ignored')"],
+    "cwd": ".",
+    "steps": [
+        {
+            "type": "input",
+            "input": "x",
+            "delayMs": 0,
+            "label": "input-after-exit",
+        },
+        {
+            "type": "resize",
+            "rows": 30,
+            "cols": 100,
+            "delayMs": 0,
+            "label": "resize-after-exit",
+        },
+    ],
+})
+
+module.os.openpty = lambda: (10, 11)
+module.os.close = lambda _fd: None
+module.os.kill = lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("os.kill should not run"))
+module.os.read = lambda *_args, **_kwargs: b""
+module.subprocess.Popen = lambda *_args, **_kwargs: DeadProc()
+module.selectors.DefaultSelector = lambda: FakeSelector()
+resize_calls = []
+module.set_window_size = lambda fd, rows, cols: resize_calls.append((fd, rows, cols))
+module.capture_until = lambda *_args, **_kwargs: None
+module.flush_ready_output = lambda *_args, **_kwargs: None
+module.time.monotonic = lambda: 0.0
+
+result = module.main()
+assert resize_calls == [(10, 24, 80)], resize_calls
+print(result)
+`);
+
+    expect(result.status).toBe(0);
+    const inputMarker = result.stdout.indexOf('__BIJOU_STEP__:input-after-exit');
+    const resizeMarker = result.stdout.indexOf('__BIJOU_STEP__:resize-after-exit');
+    expect(inputMarker).toBeGreaterThanOrEqual(0);
+    expect(resizeMarker).toBeGreaterThan(inputMarker);
+    expect(result.stdout.trim().endsWith('0')).toBe(true);
+    expect(result.stderr).toBe('');
+  });
 });

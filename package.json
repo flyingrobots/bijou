@@ -14,6 +14,7 @@
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
+    "workflow:shell:preflight": "tsx scripts/workflow-shell-preflight.ts",
     "smoke:examples": "tsx scripts/smoke-v3-examples.ts",
     "smoke:examples:all": "tsx scripts/smoke-all-examples.ts",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
