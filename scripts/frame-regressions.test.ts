@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapters/test';
+import { chalkStyle } from '@flyingrobots/bijou-node';
 import type { App, KeyMsg } from '@flyingrobots/bijou-tui';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createTuiAppSkeleton } from '../packages/bijou-tui-app/src/index.js';
@@ -22,12 +23,14 @@ afterEach(() => {
 async function loadExample<Model, M = never>(
   modulePath: string,
   runtime: { columns: number; rows: number },
+  options: { style?: TestContext['style'] } = {},
 ): Promise<{ module: ExampleModule<Model, M>; ctx: TestContext }> {
   vi.resetModules();
   vi.doUnmock('@flyingrobots/bijou-node');
   const ctx = createTestContext({
     mode: 'interactive',
     runtime,
+    style: options.style,
   });
 
   vi.doMock('@flyingrobots/bijou-node', async () => {
@@ -84,12 +87,13 @@ describe('frame regressions', () => {
   });
 
   it('locks the BCSS demo frames across responsive width changes', async () => {
-    const narrow = await loadExample('../examples/v3-css/main.ts', { columns: 72, rows: 18 });
+    const style = chalkStyle({ level: 3 });
+    const narrow = await loadExample('../examples/v3-css/main.ts', { columns: 72, rows: 18 }, { style });
     const narrowResult = await runScript(narrow.module.app, [], {
       ctx: narrow.ctx,
       css: narrow.module.css,
     });
-    const wide = await loadExample('../examples/v3-css/main.ts', { columns: 96, rows: 18 });
+    const wide = await loadExample('../examples/v3-css/main.ts', { columns: 96, rows: 18 }, { style });
     const wideResult = await runScript(wide.module.app, [], {
       ctx: wide.ctx,
       css: wide.module.css,
@@ -97,8 +101,8 @@ describe('frame regressions', () => {
 
     const narrowText = renderFrameText(narrowResult.frames[0]!, narrow.ctx.style);
     const wideText = renderFrameText(wideResult.frames[0]!, wide.ctx.style);
-    expect(renderFrameText(narrowResult.frames[0]!, narrow.ctx.style, { crop: true })).toMatchSnapshot('v3-css-narrow');
-    expect(renderFrameText(wideResult.frames[0]!, wide.ctx.style, { crop: true })).toMatchSnapshot('v3-css-wide');
+    expect(renderFrameText(narrowResult.frames[0]!, narrow.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-narrow');
+    expect(renderFrameText(wideResult.frames[0]!, wide.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-wide');
     expect(narrowText).toContain('Current width: 7');
     expect(narrowText).not.toContain('Current width: 96');
     expect(wideText).toContain('Current width: 96');

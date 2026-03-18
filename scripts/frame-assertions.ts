@@ -5,6 +5,7 @@ import { stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
 export interface FrameRenderOptions {
   readonly crop?: boolean;
   readonly padding?: number;
+  readonly preserveAnsi?: boolean;
 }
 
 export function cropSurfaceFrame(frame: Surface, padding = 0): Surface {
@@ -42,7 +43,8 @@ export function renderFrameText(
   options: FrameRenderOptions = {},
 ): string {
   const target = options.crop ? cropSurfaceFrame(frame, options.padding) : frame;
-  return stripAnsi(surfaceToString(target, style));
+  const rendered = surfaceToString(target, style);
+  return options.preserveAnsi ? rendered : stripAnsi(rendered);
 }
 
 export function renderFrameTexts(
