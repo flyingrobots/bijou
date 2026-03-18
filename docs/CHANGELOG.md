@@ -38,6 +38,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Clock-driven test scheduling** — the remaining timer-sensitive runtime, command, component, and I/O adapter tests now use injected `mockClock()` instances instead of Vitest fake timers, and the Node/test I/O adapters accept clock injection so those tests never have to touch wall-clock scheduling.
 - **Worker proxy test seams** — `runInWorker()` and `startWorkerApp()` now accept explicit worker-thread bindings, so the proxy-runtime tests can assert host/worker IPC behavior without module-reset mock churn.
 - **Workflow and smoke harness hardening** — `smoke-all-examples` now exposes testable launcher/path helpers with focused unit coverage, the repo ships a local `workflow:shell:preflight` command for validating workflow shell blocks before CI is first to see them, and the PTY driver has extra shutdown-ordering coverage for late labeled steps after child exit.
+- **Release readiness gate** — the repo now ships `npm run release:readiness`, a single local command that runs the build, test, frame-regression, smoke, workflow-shell, and release-preflight bars in release order instead of relying on tribal knowledge.
 
 ### 🧪 Tests
 
