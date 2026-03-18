@@ -34,6 +34,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Deterministic Ctrl+C quit guard** — interactive runtime now treats “no prior Ctrl+C” distinctly from “Ctrl+C at time zero,” so injected clocks that start at `0` still forward the first Ctrl+C to the app instead of force-quitting immediately.
 - **Deterministic runtime test lint compliance** — the Ctrl+C-at-time-zero regression test now disposes its timeout handles with a block-bodied loop so it satisfies the repo’s iterable-callback-return lint rule without changing behavior.
 - **Deterministic runtime test helper cleanup** — the tracking clock helper in `runtime.test.ts` now passes timeout callbacks directly to the base clock instead of wrapping them in a no-op forwarding closure.
+- **Shared runtime viewport overlay** — the main TUI runtime and the worker host/proxy now share one viewport overlay helper, so dimension sanitization and mutable resize state stay consistent across scripted runs, interactive resizes, and worker handoff.
 
 ### 🧪 Tests
 
