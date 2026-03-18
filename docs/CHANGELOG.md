@@ -37,7 +37,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🧪 Tests
 
-- **Deterministic frame regressions** — added repo-level frame assertion helpers plus scripted frame snapshots for the scaffold shell and flagship V3 examples, with explicit resize assertions on the shell path and responsive narrow/wide frame coverage for the BCSS demo.
+- **Deterministic frame regressions** — added repo-level frame assertion helpers plus scripted frame snapshots for the scaffold shell and flagship V3 examples, with explicit resize assertions on the shell path, responsive narrow/wide frame coverage for the BCSS demo, and ANSI-preserving BCSS snapshots so style-only media-query regressions are locked as well as text/layout changes.
 
 ## [3.0.0] - 2026-03-12
 
