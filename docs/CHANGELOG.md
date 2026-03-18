@@ -941,3 +941,4 @@ First public release.
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
+- defaulted core box/table component overflow to wrap instead of truncate, with per-instance `overflow: 'truncate'` overrides and matching surface support
