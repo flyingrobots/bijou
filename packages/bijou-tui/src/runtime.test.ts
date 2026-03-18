@@ -60,9 +60,7 @@ function createTrackingClock() {
           },
         };
 
-        baseHandle = base.setTimeout(() => {
-          callback();
-        }, ms);
+        baseHandle = base.setTimeout(callback, ms);
         activeTimeouts.add(wrapper);
         return wrapper;
       },
