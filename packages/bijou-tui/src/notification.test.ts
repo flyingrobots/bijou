@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { stripAnsi } from './viewport.js';
 import {
   activateFocusedNotification,
   createNotificationState,
   cycleNotificationFocus,
+  relocateNotifications,
   notificationsNeedTick,
   pushNotification,
   renderNotificationStack,
+  trimNotificationsToViewport,
   tickNotifications,
 } from './notification.js';
 
@@ -47,6 +50,8 @@ describe('notification state', () => {
 
     state = tickNotifications(state, 4_500);
     expect(state.items).toHaveLength(0);
+    expect(state.history).toHaveLength(1);
+    expect(state.history[0]?.title).toBe('Build complete');
   });
 
   it('cycles actionable focus and activates the focused action payload', () => {
@@ -70,6 +75,47 @@ describe('notification state', () => {
     const result = activateFocusedNotification(state, 100);
     expect(result.payload).toEqual({ type: 'retry', id: 1 });
     expect(result.state.items.find((item) => item.id === 1)?.phase).toBe('exiting');
+  });
+
+  it('can relocate the active stack to a new placement', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'First',
+      placement: 'LOWER_RIGHT',
+    }, 0);
+    state = pushNotification(state, {
+      title: 'Second',
+      placement: 'LOWER_RIGHT',
+    }, 10);
+
+    state = relocateNotifications(state, 'TOP_CENTER');
+
+    expect(state.items.every((item) => item.placement === 'TOP_CENTER')).toBe(true);
+  });
+
+  it('trims the oldest active notifications when the viewport runs out of room', () => {
+    let state = createNotificationState<Msg>();
+    for (let index = 0; index < 5; index++) {
+      state = pushNotification(state, {
+        title: `Notice ${index + 1}`,
+        message: 'Stack trimming keeps the newest notifications visible.',
+        variant: 'TOAST',
+        placement: 'LOWER_RIGHT',
+        durationMs: null,
+      }, index * 10);
+    }
+
+    state = tickNotifications(state, 500);
+    state = trimNotificationsToViewport(state, {
+      screenWidth: 48,
+      screenHeight: 12,
+      margin: 1,
+      gap: 1,
+    });
+
+    expect(state.items.length).toBeLessThan(5);
+    expect(state.items.some((item) => item.title === 'Notice 5')).toBe(true);
+    expect(state.history.some((item) => item.title === 'Notice 1')).toBe(true);
   });
 });
 
@@ -210,5 +256,59 @@ describe('renderNotificationStack', () => {
     expect(overlay!.row).toBeGreaterThanOrEqual(6);
     expect(overlay!.col).toBeGreaterThanOrEqual(12);
     expect(overlay!.col).toBeLessThan(60);
+  });
+
+  it('moves existing overlays when the stack placement changes', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Movable',
+      variant: 'TOAST',
+      placement: 'LOWER_RIGHT',
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [before] = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    const moved = relocateNotifications(state, 'UPPER_LEFT');
+    const [after] = renderNotificationStack(moved, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    expect(after!.row).toBeLessThan(before!.row);
+    expect(after!.col).toBeLessThan(before!.col);
+  });
+
+  it('keeps the card background applied across the full notification surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Deploy failed',
+      message: 'Worker boot retries are exhausted.',
+      variant: 'ACTIONABLE',
+      tone: 'ERROR',
+      action: { label: 'Retry deploy', payload: { type: 'retry', id: 7 } },
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 80,
+      screenHeight: 24,
+      ctx,
+    });
+
+    expect(overlay?.surface).toBeDefined();
+    const surface = overlay!.surface!;
+    const expectedBg = surface.get(1, 0).bg;
+
+    expect(expectedBg).toBeDefined();
+    for (let y = 0; y < surface.height; y++) {
+      expect(surface.get(1, y).bg).toBe(expectedBg);
+      expect(surface.get(surface.width - 1, y).bg).toBe(expectedBg);
+      expect(surface.get(Math.max(2, surface.width - 2), y).bg).toBe(expectedBg);
+    }
   });
 });

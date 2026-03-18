@@ -149,6 +149,26 @@ export interface CmdCapabilities {
   now?(): number;
 }
 
+/** Severity of a runtime issue surfaced by the framework itself. */
+export type RuntimeIssueLevel = 'warning' | 'error';
+
+/** Origin of a runtime issue surfaced by the framework itself. */
+export type RuntimeIssueSource = 'command' | 'eventbus' | 'runtime';
+
+/** Framework-level issue routed alongside normal app messages when supported. */
+export interface RuntimeIssue {
+  /** Warning or error severity. */
+  readonly level: RuntimeIssueLevel;
+  /** Subsystem that surfaced the issue. */
+  readonly source: RuntimeIssueSource;
+  /** Human-readable issue text. */
+  readonly message: string;
+  /** Runtime clock timestamp for deterministic routing. */
+  readonly atMs: number;
+  /** Original thrown value when available. */
+  readonly error?: unknown;
+}
+
 // --- App definition ---
 
 /**
@@ -184,6 +204,14 @@ export interface App<Model, M = never> {
    * @returns Rendered Surface, Layout tree, or legacy string output.
    */
   view(model: Model): ViewOutput;
+
+  /**
+   * Optionally translate framework warnings/errors into application messages.
+   *
+   * This lets higher-level shells surface runtime issues through their own UI
+   * while the framework still writes them to stderr as usual.
+   */
+  routeRuntimeIssue?(issue: RuntimeIssue): M | undefined;
 }
 
 // --- Runtime options ---

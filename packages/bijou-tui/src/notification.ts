@@ -1,8 +1,17 @@
-import type { BijouContext, OverflowBehavior, TokenValue } from '@flyingrobots/bijou';
-import { makeBgFill, wrapToWidth } from '@flyingrobots/bijou';
+import type {
+  BijouContext,
+  OverflowBehavior,
+  Surface,
+  TokenValue,
+} from '@flyingrobots/bijou';
+import {
+  createSurface,
+  segmentGraphemes,
+  surfaceToString,
+} from '@flyingrobots/bijou';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
-import { clipToWidth, visibleLength } from './viewport.js';
+import { visibleLength } from './viewport.js';
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
 export type NotificationTone = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
@@ -57,6 +66,7 @@ export interface NotificationRecord<Msg> {
 
 export interface NotificationState<Msg> {
   readonly items: readonly NotificationRecord<Msg>[];
+  readonly history: readonly NotificationRecord<Msg>[];
   readonly nextId: number;
   readonly focusedId?: number;
 }
@@ -70,10 +80,22 @@ export interface RenderNotificationStackOptions {
   readonly gap?: number;
 }
 
+interface CellTextStyle {
+  readonly fg?: string;
+  readonly bg?: string;
+  readonly modifiers?: readonly string[];
+}
+
+interface NotificationRenderEntry<Msg> {
+  readonly item: NotificationRecord<Msg>;
+  readonly surface: Surface;
+}
+
 const ENTER_DURATION_MS = 180;
 const EXIT_DURATION_MS = 140;
 const DEFAULT_MARGIN = 1;
 const DEFAULT_GAP = 1;
+const HISTORY_LIMIT = 250;
 
 const TONE_ICONS: Record<NotificationTone, string> = {
   INFO: '\u2139',
@@ -92,6 +114,7 @@ const TONE_BORDER_KEYS: Record<NotificationTone, 'primary' | 'success' | 'warnin
 export function createNotificationState<Msg>(): NotificationState<Msg> {
   return {
     items: [],
+    history: [],
     nextId: 1,
   };
 }
@@ -123,6 +146,17 @@ function normalizeFocusedId<Msg>(
   return focusable[focusable.length - 1];
 }
 
+function archiveNotifications<Msg>(
+  history: readonly NotificationRecord<Msg>[],
+  items: readonly NotificationRecord<Msg>[],
+): readonly NotificationRecord<Msg>[] {
+  if (items.length === 0) return history;
+  const archived = [...items].sort(
+    (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
+  );
+  return [...archived, ...history].slice(0, HISTORY_LIMIT);
+}
+
 export function pushNotification<Msg>(
   state: NotificationState<Msg>,
   spec: NotificationSpec<Msg>,
@@ -149,6 +183,7 @@ export function pushNotification<Msg>(
 
   const items = [...state.items, next];
   return {
+    ...state,
     items,
     nextId: state.nextId + 1,
     focusedId: normalizeFocusedId(items, next.action != null ? next.id : state.focusedId),
@@ -183,6 +218,17 @@ export function dismissFocusedNotification<Msg>(
 ): NotificationState<Msg> {
   if (state.focusedId == null) return state;
   return dismissNotification(state, state.focusedId, nowMs);
+}
+
+export function relocateNotifications<Msg>(
+  state: NotificationState<Msg>,
+  placement: NotificationPlacement,
+): NotificationState<Msg> {
+  if (state.items.every((item) => item.placement === placement)) return state;
+  return {
+    ...state,
+    items: state.items.map((item) => ({ ...item, placement })),
+  };
 }
 
 export function cycleNotificationFocus<Msg>(
@@ -221,6 +267,7 @@ export function tickNotifications<Msg>(
   nowMs: number,
 ): NotificationState<Msg> {
   const nextItems: NotificationRecord<Msg>[] = [];
+  const archived: NotificationRecord<Msg>[] = [];
 
   for (const item of state.items) {
     const deltaMs = Math.max(0, nowMs - item.updatedAtMs);
@@ -268,12 +315,20 @@ export function tickNotifications<Msg>(
         progress,
         updatedAtMs: nowMs,
       });
+      continue;
     }
+
+    archived.push({
+      ...item,
+      progress: 0,
+      updatedAtMs: nowMs,
+    });
   }
 
   return {
     ...state,
     items: nextItems,
+    history: archiveNotifications(state.history, archived),
     focusedId: normalizeFocusedId(nextItems, state.focusedId),
   };
 }
@@ -311,87 +366,144 @@ function formatTimeLabel(ms: number): string {
   });
 }
 
-function styleAccent(
-  text: string,
-  item: NotificationRecord<unknown>,
-  ctx: BijouContext | undefined,
-): string {
-  if (!ctx) return text;
-  return ctx.style.styled(item.accentToken ?? ctx.border(TONE_BORDER_KEYS[item.tone]), text);
+function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
+  if (token == null) return {};
+  return {
+    fg: token.hex,
+    bg: token.bg,
+    modifiers: token.modifiers,
+  };
 }
 
-function styleIcon(
-  item: NotificationRecord<unknown>,
-  ctx: BijouContext | undefined,
-): string {
-  const icon = TONE_ICONS[item.tone];
-  if (!ctx) return icon;
-  return ctx.style.styled(ctx.semantic(toneSemanticKey(item.tone)), icon);
+function withModifiers(style: CellTextStyle, modifiers: readonly string[]): CellTextStyle {
+  const next = new Set(style.modifiers ?? []);
+  for (const modifier of modifiers) {
+    next.add(modifier);
+  }
+  return {
+    ...style,
+    modifiers: next.size === 0 ? undefined : Array.from(next),
+  };
 }
 
-function styleTitle(text: string, ctx: BijouContext | undefined): string {
-  return ctx ? ctx.style.bold(text) : text;
+function createSegmentSurface(segments: readonly { readonly text: string; readonly style?: CellTextStyle }[]): Surface {
+  const graphemeSegments = segments.map((segment) => ({
+    graphemes: segmentGraphemes(segment.text ?? ''),
+    style: segment.style,
+  }));
+  const width = graphemeSegments.reduce((sum, segment) => sum + segment.graphemes.length, 0);
+  const surface = createSurface(width, 1);
+  let x = 0;
+
+  for (const segment of graphemeSegments) {
+    for (const char of segment.graphemes) {
+      surface.set(x, 0, {
+        char,
+        fg: segment.style?.fg,
+        bg: segment.style?.bg,
+        modifiers: segment.style?.modifiers ? [...segment.style.modifiers] : undefined,
+        empty: false,
+      });
+      x++;
+    }
+  }
+
+  return surface;
 }
 
-function styleMuted(text: string, ctx: BijouContext | undefined): string {
-  return ctx ? ctx.style.styled(ctx.semantic('muted'), text) : text;
+function createBlankLineSurface(width: number): Surface {
+  return createSurface(Math.max(0, width), 1);
 }
 
-function styleButton(text: string, focused: boolean, ctx: BijouContext | undefined): string {
-  const raw = focused ? `[ ${text} ]` : `  ${text}  `;
-  return focused && ctx ? ctx.style.bold(raw) : raw;
+function fitLineSurface(surface: Surface, width: number): Surface {
+  const safeWidth = Math.max(0, width);
+  const line = createSurface(safeWidth, 1);
+  if (safeWidth > 0) {
+    line.blit(surface, 0, 0, 0, 0, safeWidth, 1);
+  }
+  return line;
 }
 
-function padLine(line: string, width: number): string {
-  const clipped = clipToWidth(line, width);
-  return clipped + ' '.repeat(Math.max(0, width - visibleLength(clipped)));
+function wrapLineSurface(surface: Surface, width: number): readonly Surface[] {
+  const safeWidth = Math.max(1, width);
+  if (surface.width === 0) return [createBlankLineSurface(safeWidth)];
+
+  const rows: Surface[] = [];
+  for (let offset = 0; offset < surface.width; offset += safeWidth) {
+    const row = createSurface(safeWidth, 1);
+    row.blit(surface, 0, 0, offset, 0, safeWidth, 1);
+    rows.push(row);
+  }
+  return rows;
 }
 
-function composeColumns(left: string, right: string, width: number): string {
-  const safeRight = clipToWidth(right, width);
-  const rightWidth = visibleLength(safeRight);
-  const safeLeft = clipToWidth(left, Math.max(0, width - rightWidth));
-  const gap = Math.max(0, width - visibleLength(safeLeft) - rightWidth);
-  return safeLeft + ' '.repeat(gap) + safeRight;
+function renderPlainSurface(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
+  return lines.join('\n');
 }
 
-function fitOverflowLines(line: string, width: number, overflow: OverflowBehavior): string[] {
-  if (overflow === 'truncate') return [padLine(line, width)];
-  return wrapToWidth(line, width).map((fragment) => padLine(fragment, width));
-}
-
-function composeOverflowColumns(
-  left: string,
-  right: string,
+function standaloneRows(
+  lineSurface: Surface,
   width: number,
   overflow: OverflowBehavior,
-): string[] {
-  if (overflow === 'truncate') return [composeColumns(left, right, width)];
-
-  const safeRight = clipToWidth(right, width);
-  const rightWidth = visibleLength(safeRight);
-  const leftWidth = Math.max(1, width - rightWidth - (rightWidth > 0 ? 1 : 0));
-  const wrappedLeft = wrapToWidth(left, leftWidth);
-
-  if (wrappedLeft.length === 0) return [composeColumns('', safeRight, width)];
-
-  return [
-    composeColumns(wrappedLeft[0]!, safeRight, width),
-    ...wrappedLeft.slice(1).map((fragment) => padLine(fragment, width)),
-  ];
+): readonly Surface[] {
+  if (overflow === 'truncate') return [fitLineSurface(lineSurface, width)];
+  return wrapLineSurface(lineSurface, width);
 }
 
-function wrapPanelLines(
-  accent: string,
-  bodyLines: readonly string[],
-  textWidth: number,
-  fill: (text: string) => string,
+function composeColumnRows(
+  left: Surface,
+  right: Surface,
+  width: number,
   overflow: OverflowBehavior,
-): string {
-  return bodyLines
-    .flatMap((line) => fitOverflowLines(line, textWidth, overflow))
-    .map((line) => accent + fill(` ${line} `))
-    .join('\n');
+): readonly Surface[] {
+  const safeWidth = Math.max(1, width);
+  const rightWidth = Math.min(right.width, safeWidth);
+
+  if (overflow === 'truncate') {
+    const row = createSurface(safeWidth, 1);
+    const leftWidth = Math.max(0, safeWidth - rightWidth);
+    if (leftWidth > 0) {
+      row.blit(left, 0, 0, 0, 0, leftWidth, 1);
+    }
+    if (rightWidth > 0) {
+      row.blit(right, safeWidth - rightWidth, 0, Math.max(0, right.width - rightWidth), 0, rightWidth, 1);
+    }
+    return [row];
+  }
+
+  const gap = rightWidth > 0 ? 1 : 0;
+  const leftWidth = Math.max(1, safeWidth - rightWidth - gap);
+  const wrappedLeft = wrapLineSurface(left, leftWidth);
+  return wrappedLeft.map((rowSurface, index) => {
+    const row = createSurface(safeWidth, 1);
+    row.blit(rowSurface, 0, 0);
+    if (index === 0 && rightWidth > 0) {
+      row.blit(right, safeWidth - rightWidth, 0, Math.max(0, right.width - rightWidth), 0, rightWidth, 1);
+    }
+    return row;
+  });
+}
+
+function resolveRegion(options: RenderNotificationStackOptions): LayoutRect {
+  const screenWidth = Math.max(0, options.screenWidth);
+  const screenHeight = Math.max(0, options.screenHeight);
+  if (options.region == null) {
+    return { row: 0, col: 0, width: screenWidth, height: screenHeight };
+  }
+  return {
+    row: Math.max(0, options.region.row),
+    col: Math.max(0, options.region.col),
+    width: Math.max(0, options.region.width),
+    height: Math.max(0, options.region.height),
+  };
 }
 
 function measureTextWidth<Msg>(
@@ -412,56 +524,111 @@ function measureTextWidth<Msg>(
   return Math.min(available, Math.max(26, Math.min(52, base + 6)));
 }
 
-function renderNotificationContent<Msg>(
+function renderNotificationSurface<Msg>(
   item: NotificationRecord<Msg>,
   options: RenderNotificationStackOptions,
   focused: boolean,
-): string {
+): Surface {
   const ctx = options.ctx;
-  const accent = styleAccent('\u258e', item, ctx);
-  const fill = makeBgFill(item.bgToken ?? defaultBgToken(ctx), ctx) ?? ((text: string) => text);
-  const icon = styleIcon(item, ctx);
-  const closeMark = styleMuted('\u2715', ctx);
-  const textWidth = measureTextWidth(item, options.region?.width ?? options.screenWidth);
-  const subtitle = styleMuted(item.message, ctx);
-  const title = styleTitle(item.title, ctx);
+  const textWidth = measureTextWidth(item, resolveRegion(options).width);
+  const mutedStyle = tokenToCellStyle(ctx?.semantic('muted'));
+  const titleStyle = withModifiers({}, ['bold']);
+  const iconStyle = tokenToCellStyle(ctx?.semantic(toneSemanticKey(item.tone)));
+  const accentStyle = tokenToCellStyle(item.accentToken ?? ctx?.border(TONE_BORDER_KEYS[item.tone]));
+  const backgroundStyle = tokenToCellStyle(item.bgToken ?? defaultBgToken(ctx));
+  const closeSurface = createSegmentSurface([{ text: '\u2715', style: mutedStyle }]);
+  const icon = TONE_ICONS[item.tone];
   const overflow = item.overflow;
 
+  const rows: Surface[] = [];
+
   if (item.variant === 'INLINE') {
-    const left = `${icon} ${title}${item.message ? ` ${subtitle}` : ''}`;
-    return wrapPanelLines(accent, composeOverflowColumns(left, closeMark, textWidth, overflow), textWidth, fill, 'truncate');
-  }
+    const left = createSegmentSurface([
+      { text: icon, style: iconStyle },
+      { text: ' ' },
+      { text: item.title, style: titleStyle },
+      ...(item.message.length > 0
+        ? [
+          { text: ' ' },
+          { text: item.message, style: mutedStyle },
+        ]
+        : []),
+    ]);
+    rows.push(...composeColumnRows(left, closeSurface, textWidth, overflow));
+  } else {
+    const titleLeft = createSegmentSurface([
+      { text: icon, style: iconStyle },
+      { text: ' ' },
+      { text: item.title, style: titleStyle },
+    ]);
+    rows.push(...composeColumnRows(titleLeft, closeSurface, textWidth, overflow));
 
-  const lines: string[] = [
-    ...composeOverflowColumns(`${icon} ${title}`, closeMark, textWidth, overflow),
-  ];
+    if (item.message.length > 0) {
+      const messageSurface = createSegmentSurface([{ text: item.message, style: mutedStyle }]);
+      rows.push(...standaloneRows(messageSurface, textWidth, overflow));
+    }
 
-  if (item.message.length > 0) {
-    lines.push(subtitle);
-  }
+    if (item.variant === 'ACTIONABLE') {
+      rows.push(createBlankLineSurface(textWidth));
+      const actionLabel = item.action == null
+        ? 'Dismiss'
+        : (focused ? `[ ${item.action.label} ]` : `  ${item.action.label}  `);
+      const actionStyle = focused ? withModifiers({}, ['bold']) : {};
+      rows.push(...standaloneRows(createSegmentSurface([{ text: actionLabel, style: actionStyle }]), textWidth, overflow));
+    }
 
-  if (item.variant === 'ACTIONABLE') {
-    lines.push('');
-    if (item.action != null) {
-      lines.push(styleButton(item.action.label, focused, ctx));
-    } else {
-      lines.push(styleMuted('Dismiss', ctx));
+    if (item.variant === 'TOAST') {
+      rows.push(createBlankLineSurface(textWidth));
+      const timestampSurface = createSegmentSurface([{ text: formatTimeLabel(item.createdAtMs), style: mutedStyle }]);
+      rows.push(...standaloneRows(timestampSurface, textWidth, overflow));
     }
   }
 
-  if (item.variant === 'TOAST') {
-    lines.push('');
-    lines.push(styleMuted(formatTimeLabel(item.createdAtMs), ctx));
+  const contentRows = rows.length === 0 ? [createBlankLineSurface(textWidth)] : rows;
+  const cardWidth = textWidth + 3;
+  const cardHeight = contentRows.length;
+  const card = createSurface(cardWidth, cardHeight, {
+    char: ' ',
+    fg: backgroundStyle.fg,
+    bg: backgroundStyle.bg,
+    modifiers: backgroundStyle.modifiers ? [...backgroundStyle.modifiers] : undefined,
+    empty: false,
+  });
+
+  for (let y = 0; y < contentRows.length; y++) {
+    card.set(0, y, {
+      char: '\u258e',
+      fg: accentStyle.fg,
+      bg: backgroundStyle.bg,
+      modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
+      empty: false,
+    });
+    card.blit(
+      contentRows[y]!,
+      2,
+      y,
+      0,
+      0,
+      contentRows[y]!.width,
+      1,
+      {
+        char: true,
+        fg: true,
+        bg: false,
+        modifiers: true,
+        alpha: true,
+      },
+    );
   }
 
-  return wrapPanelLines(accent, lines, textWidth, fill, overflow);
+  return card;
 }
 
 function sortForPlacement<Msg>(
   items: readonly NotificationRecord<Msg>[],
   placement: NotificationPlacement,
 ): readonly NotificationRecord<Msg>[] {
-  const ordered = [...items].sort((left, right) => right.createdAtMs - left.createdAtMs);
+  const ordered = [...items].sort((left, right) => right.createdAtMs - left.createdAtMs || right.id - left.id);
   return placementSortSign(placement) === 'bottom' ? ordered.reverse() : ordered;
 }
 
@@ -521,26 +688,25 @@ function applyAnimationOffset(
   }
 }
 
-export function renderNotificationStack<Msg>(
+function createRenderEntry<Msg>(
+  item: NotificationRecord<Msg>,
+  options: RenderNotificationStackOptions,
+  focusedId: number | undefined,
+): NotificationRenderEntry<Msg> {
+  return {
+    item,
+    surface: renderNotificationSurface(item, options, focusedId === item.id),
+  };
+}
+
+function selectVisibleNotificationIds<Msg>(
   state: NotificationState<Msg>,
   options: RenderNotificationStackOptions,
-): readonly Overlay[] {
-  const screenWidth = Math.max(0, options.screenWidth);
-  const screenHeight = Math.max(0, options.screenHeight);
-  if (screenWidth <= 0 || screenHeight <= 0) return [];
-
-  const region = options.region == null
-    ? { row: 0, col: 0, width: screenWidth, height: screenHeight }
-    : {
-      row: Math.max(0, options.region.row),
-      col: Math.max(0, options.region.col),
-      width: Math.max(0, options.region.width),
-      height: Math.max(0, options.region.height),
-    };
-  if (region.width <= 0 || region.height <= 0) return [];
-
+): ReadonlySet<number> {
+  const region = resolveRegion(options);
   const margin = options.margin ?? DEFAULT_MARGIN;
   const gap = options.gap ?? DEFAULT_GAP;
+  const availableHeight = Math.max(1, region.height - (margin * 2));
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
 
   for (const item of state.items) {
@@ -549,21 +715,80 @@ export function renderNotificationStack<Msg>(
     grouped.set(item.placement, placementItems);
   }
 
+  const visibleIds = new Set<number>();
+
+  for (const items of grouped.values()) {
+    const newestFirst = [...items].sort((left, right) => right.createdAtMs - left.createdAtMs || right.id - left.id);
+    let usedHeight = 0;
+    let keptCount = 0;
+
+    for (const item of newestFirst) {
+      const entry = createRenderEntry(item, options, state.focusedId);
+      const required = entry.surface.height + (keptCount > 0 ? gap : 0);
+      if (keptCount === 0 || usedHeight + required <= availableHeight) {
+        visibleIds.add(item.id);
+        usedHeight += required;
+        keptCount++;
+      }
+    }
+  }
+
+  return visibleIds;
+}
+
+export function trimNotificationsToViewport<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationStackOptions,
+): NotificationState<Msg> {
+  const visibleIds = selectVisibleNotificationIds(state, options);
+  const keptItems = state.items.filter((item) => visibleIds.has(item.id));
+
+  if (keptItems.length === state.items.length) {
+    const focusedId = normalizeFocusedId(keptItems, state.focusedId);
+    return focusedId === state.focusedId ? state : { ...state, focusedId };
+  }
+
+  const evictedItems = state.items.filter((item) => !visibleIds.has(item.id));
+  return {
+    ...state,
+    items: keptItems,
+    history: archiveNotifications(state.history, evictedItems),
+    focusedId: normalizeFocusedId(keptItems, state.focusedId),
+  };
+}
+
+export function renderNotificationStack<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationStackOptions,
+): readonly Overlay[] {
+  const screenWidth = Math.max(0, options.screenWidth);
+  const screenHeight = Math.max(0, options.screenHeight);
+  if (screenWidth <= 0 || screenHeight <= 0) return [];
+
+  const region = resolveRegion(options);
+  if (region.width <= 0 || region.height <= 0) return [];
+
+  const margin = options.margin ?? DEFAULT_MARGIN;
+  const gap = options.gap ?? DEFAULT_GAP;
+  const visibleIds = selectVisibleNotificationIds(state, options);
+  const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
+
+  for (const item of state.items) {
+    if (!visibleIds.has(item.id)) continue;
+    const placementItems = grouped.get(item.placement) ?? [];
+    placementItems.push(item);
+    grouped.set(item.placement, placementItems);
+  }
+
   const overlays: Overlay[] = [];
 
   for (const [placement, items] of grouped) {
-    const rendered = sortForPlacement(items, placement).map((item) => {
-      const content = renderNotificationContent(item, options, state.focusedId === item.id);
-      const lines = content.split('\n');
-      return {
-        item,
-        content,
-        width: visibleLength(lines[0] ?? ''),
-        height: lines.length,
-      };
-    });
+    const rendered = sortForPlacement(items, placement).map((item) =>
+      createRenderEntry(item, options, state.focusedId)
+    );
 
-    const totalHeight = rendered.reduce((sum, entry) => sum + entry.height, 0) + Math.max(0, rendered.length - 1) * gap;
+    const totalHeight = rendered.reduce((sum, entry) => sum + entry.surface.height, 0)
+      + Math.max(0, rendered.length - 1) * gap;
     const mode = placementSortSign(placement);
     let cursor = mode === 'top'
       ? margin
@@ -573,14 +798,22 @@ export function renderNotificationStack<Msg>(
 
     for (const entry of rendered) {
       const baseRow = cursor;
-      const baseCol = anchoredCol(placement, entry.width, region.width, margin);
-      const offset = applyAnimationOffset(placement, entry.width, entry.height, entry.item.progress);
+      const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
+      const offset = applyAnimationOffset(
+        placement,
+        entry.surface.width,
+        entry.surface.height,
+        entry.item.progress,
+      );
       overlays.push({
         row: Math.max(0, region.row + baseRow + offset.rowDelta),
         col: Math.max(0, region.col + baseCol + offset.colDelta),
-        content: entry.content,
+        surface: entry.surface,
+        content: options.ctx != null
+          ? surfaceToString(entry.surface, options.ctx.style)
+          : renderPlainSurface(entry.surface),
       });
-      cursor += entry.height + gap;
+      cursor += entry.surface.height + gap;
     }
   }
 

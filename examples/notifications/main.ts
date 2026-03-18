@@ -10,11 +10,13 @@ import {
   dismissNotification,
   notificationsNeedTick,
   pushNotification,
+  relocateNotifications,
   quit,
   renderNotificationStack,
   run,
   tick,
   tickNotifications,
+  trimNotificationsToViewport,
   type Cmd,
   type FramePage,
   type NotificationPlacement,
@@ -169,10 +171,17 @@ function applyNotificationState(
   commands: readonly Cmd<Msg>[] = [],
   forceTick = false,
 ): [PageModel, Cmd<Msg>[]] {
-  const needsTick = notificationsNeedTick(notifications);
+  const trimmed = trimNotificationsToViewport(notifications, {
+    screenWidth: ctx.runtime.columns,
+    screenHeight: Math.max(0, ctx.runtime.rows - 2),
+    margin: 2,
+    gap: 1,
+    ctx,
+  });
+  const needsTick = notificationsNeedTick(trimmed);
   const nextModel: PageModel = {
     ...model,
-    notifications,
+    notifications: trimmed,
     notificationLoopActive: needsTick,
   };
   const shouldScheduleTick = needsTick && (forceTick || !model.notificationLoopActive);
@@ -315,6 +324,7 @@ function renderControlsPane(model: PageModel, width: number): string {
     `Action  : ${model.actionEnabled ? 'enabled' : 'disabled'}`,
     `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
     `Stack   : ${model.notifications.items.length}`,
+    `History : ${model.notifications.history.length}`,
     `Focus   : ${focused}`,
     '',
     `${kbd('n')} spawn`,
@@ -382,10 +392,14 @@ const page: FramePage<PageModel, Msg> = {
           toneIndex: (model.toneIndex + 1) % TONES.length,
         }, []];
       case 'cycle-placement':
-        return [{
+        return [appendLog({
           ...model,
           placementIndex: (model.placementIndex + 1) % PLACEMENTS.length,
-        }, []];
+          notifications: relocateNotifications(
+            model.notifications,
+            PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!,
+          ),
+        }, `Moved active notifications to ${PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!}.`), []];
       case 'cycle-duration':
         return [{
           ...model,

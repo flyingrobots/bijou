@@ -7,7 +7,7 @@
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
 import { makeBgFill } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -22,6 +22,8 @@ import type { LayoutRect } from './layout-rect.js';
 export interface Overlay {
   /** Rendered content string (newline-delimited lines). */
   readonly content: string;
+  /** Optional cell-accurate overlay surface used by surface-first render paths. */
+  readonly surface?: Surface;
   /** Top-left row position (0-based). */
   readonly row: number;
   /** Top-left column position (0-based). */

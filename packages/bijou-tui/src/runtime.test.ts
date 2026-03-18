@@ -299,6 +299,43 @@ describe('run', () => {
       expect(hasReady).toBe(true);
     });
 
+    it('routes rejected commands through the app runtime issue hook', async () => {
+      type Msg = { type: 'issue'; text: string };
+      const seenIssues: string[] = [];
+
+      const rejectingApp: App<string, Msg> = {
+        init() {
+          const rejectCmd: Cmd<Msg> = async () => {
+            throw new Error('boom');
+          };
+          return ['idle', [rejectCmd]];
+        },
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') {
+            return [model, [quit<Msg>()]];
+          }
+          if ('type' in msg && msg.type === 'issue') {
+            seenIssues.push(msg.text);
+            return [`issue:${msg.text}`, []];
+          }
+          return ['idle', []];
+        },
+        view: (model) => model,
+        routeRuntimeIssue(issue) {
+          return { type: 'issue', text: `${issue.source}:${issue.message}` };
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
+      const promise = run(rejectingApp, { ctx });
+      await clock.advanceByAsync(100);
+      await promise;
+
+      expect(ctx.io.writtenErr.some((chunk) => chunk.includes('[EventBus] Command rejected: Error: boom'))).toBe(true);
+      expect(seenIssues).toContain('command:Error: boom');
+    });
+
     it('runs init commands before startup resize commands', async () => {
       type Msg = { type: 'init-cmd' } | { type: 'resize-cmd' };
       const order: string[] = [];

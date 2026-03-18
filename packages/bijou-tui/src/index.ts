@@ -8,7 +8,20 @@
  */
 
 // Types
-export type { App, Cmd, KeyMsg, ResizeMsg, MouseMsg, MouseButton, MouseAction, QuitSignal, RunOptions } from './types.js';
+export type {
+  App,
+  Cmd,
+  KeyMsg,
+  ResizeMsg,
+  MouseMsg,
+  MouseButton,
+  MouseAction,
+  QuitSignal,
+  RunOptions,
+  RuntimeIssue,
+  RuntimeIssueLevel,
+  RuntimeIssueSource,
+} from './types.js';
 export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 
 // Key parsing
@@ -107,6 +120,7 @@ export {
   type FramePage,
   type FrameLayoutNode,
   type FrameOverlayContext,
+  type FrameRuntimeNotificationOptions,
   type CreateFramedAppOptions,
   type PageTransition,
   type FramePaneScroll,
@@ -352,8 +366,10 @@ export {
   pushNotification,
   dismissNotification,
   dismissFocusedNotification,
+  relocateNotifications,
   cycleNotificationFocus,
   activateFocusedNotification,
+  trimNotificationsToViewport,
   tickNotifications,
   hasNotifications,
   notificationsNeedTick,

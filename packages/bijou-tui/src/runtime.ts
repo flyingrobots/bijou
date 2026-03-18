@@ -18,6 +18,7 @@ import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
+import type { RuntimeIssue } from './types.js';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -93,6 +94,13 @@ export async function run<Model, M>(
   const initialViewport = runtimeViewport();
   let currentSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
 
+  function routeRuntimeIssue(issue: RuntimeIssue): void {
+    const routed = app.routeRuntimeIssue?.(issue);
+    if (routed !== undefined) {
+      bus.emit(routed);
+    }
+  }
+
   const bus = createEventBus<M>({
     clock,
     onCommandRejected(error) {
@@ -100,6 +108,26 @@ export async function run<Model, M>(
         ? `${error.name}: ${error.message}`
         : String(error);
       writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
+      routeRuntimeIssue({
+        level: 'error',
+        source: 'command',
+        message,
+        atMs: clock.now(),
+        error,
+      });
+    },
+    onError(message, error) {
+      const detail = error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+      writeErrorLine(ctx.io, `${message} ${detail}\n`);
+      routeRuntimeIssue({
+        level: 'warning',
+        source: 'eventbus',
+        message: `${message} ${detail}`,
+        atMs: clock.now(),
+        error,
+      });
     },
   });
 
@@ -202,6 +230,13 @@ export async function run<Model, M>(
 
         pipeline.execute(renderState);
       } catch (error) {
+        routeRuntimeIssue({
+          level: 'error',
+          source: 'runtime',
+          message: error instanceof Error ? error.message : String(error),
+          atMs: clock.now(),
+          error,
+        });
         writeErrorLine(
           ctx.io,
           `[Runtime Error] ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,

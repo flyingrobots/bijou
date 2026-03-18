@@ -658,4 +658,29 @@ describe('createFramedApp', () => {
     expect(lines[1]).toContain('page:home');
     expect(lines[1]).toContain('pane:main');
   });
+
+  it('renders routed runtime issues through frame-managed notifications', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const [model] = app.init();
+    const runtimeMsg = app.routeRuntimeIssue?.({
+      level: 'error',
+      source: 'command',
+      message: 'Command rejected: worker crashed during boot',
+      atMs: 0,
+    });
+
+    expect(runtimeMsg).toBeDefined();
+
+    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const frame = app.view(nextModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+
+    const rendered = surfaceToString(frame, testCtx.style);
+    expect(nextModel.runtimeNotifications.items).toHaveLength(1);
+    expect(rendered).toContain('Command rejected: worker crashed during boot');
+    expect(cmds).toHaveLength(1);
+  });
 });
