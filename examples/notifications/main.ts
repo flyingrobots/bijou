@@ -177,7 +177,7 @@ function applyNotificationState(
     margin: 2,
     gap: 1,
     ctx,
-  });
+  }, ctx.clock.now());
   const needsTick = notificationsNeedTick(trimmed);
   const nextModel: PageModel = {
     ...model,

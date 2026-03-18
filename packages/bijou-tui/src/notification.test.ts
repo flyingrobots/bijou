@@ -49,7 +49,7 @@ describe('notification state', () => {
     state = tickNotifications(state, 4_300);
     expect(state.items[0]?.phase).toBe('exiting');
 
-    state = tickNotifications(state, 4_600);
+    state = tickNotifications(state, 4_700);
     expect(state.items).toHaveLength(0);
     expect(state.history).toHaveLength(1);
     expect(state.history[0]?.title).toBe('Build complete');
@@ -112,10 +112,13 @@ describe('notification state', () => {
       screenHeight: 12,
       margin: 1,
       gap: 1,
-    });
+    }, 500);
 
     expect(state.items.length).toBeLessThan(5);
     expect(state.items.some((item) => item.title === 'Notice 5')).toBe(true);
+    expect(state.overflowExits.some((item) => item.title === 'Notice 1')).toBe(true);
+
+    state = tickNotifications(state, 900);
     expect(state.history.some((item) => item.title === 'Notice 1')).toBe(true);
   });
 });
@@ -315,12 +318,43 @@ describe('renderNotificationStack', () => {
     expect(animating).toBeDefined();
     expect(animating!.col).toBeGreaterThanOrEqual(visible!.col);
 
-    state = tickNotifications(state, 650);
+    state = tickNotifications(state, 700);
     const overlays = renderNotificationStack(state, {
       screenWidth: 90,
       screenHeight: 30,
     });
     expect(overlays).toHaveLength(0);
+  });
+
+  it('renders overflowed notifications through an exit lane before archiving them', () => {
+    let state = createNotificationState<Msg>();
+    for (let index = 0; index < 5; index++) {
+      state = pushNotification(state, {
+        title: `Overflow ${index + 1}`,
+        message: 'Older notices should animate out when newer ones force them away.',
+        variant: 'TOAST',
+        placement: 'LOWER_RIGHT',
+        durationMs: null,
+      }, index * 10);
+    }
+    state = tickNotifications(state, 500);
+    state = trimNotificationsToViewport(state, {
+      screenWidth: 48,
+      screenHeight: 12,
+      margin: 1,
+      gap: 1,
+    }, 500);
+
+    const overlays = renderNotificationStack(state, {
+      screenWidth: 48,
+      screenHeight: 12,
+    });
+
+    expect(state.overflowExits.length).toBeGreaterThan(0);
+    expect(overlays.some((overlay) => stripAnsi(overlay.content).includes('Overflow 1'))).toBe(true);
+
+    state = tickNotifications(state, 900);
+    expect(state.history.some((item) => item.title === 'Overflow 1')).toBe(true);
   });
 
   it('keeps the card background applied across the full notification surface', () => {

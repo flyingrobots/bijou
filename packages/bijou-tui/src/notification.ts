@@ -66,6 +66,7 @@ export interface NotificationRecord<Msg> {
 
 export interface NotificationState<Msg> {
   readonly items: readonly NotificationRecord<Msg>[];
+  readonly overflowExits: readonly NotificationRecord<Msg>[];
   readonly history: readonly NotificationRecord<Msg>[];
   readonly nextId: number;
   readonly focusedId?: number;
@@ -92,7 +93,7 @@ interface NotificationRenderEntry<Msg> {
 }
 
 const ENTER_DURATION_MS = 180;
-const EXIT_DURATION_MS = 220;
+const EXIT_DURATION_MS = 320;
 const DEFAULT_MARGIN = 1;
 const DEFAULT_GAP = 1;
 const HISTORY_LIMIT = 250;
@@ -114,6 +115,7 @@ const TONE_BORDER_KEYS: Record<NotificationTone, 'primary' | 'success' | 'warnin
 export function createNotificationState<Msg>(): NotificationState<Msg> {
   return {
     items: [],
+    overflowExits: [],
     history: [],
     nextId: 1,
   };
@@ -155,6 +157,32 @@ function archiveNotifications<Msg>(
     (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
   );
   return [...archived, ...history].slice(0, HISTORY_LIMIT);
+}
+
+function advanceExitRecord<Msg>(
+  item: NotificationRecord<Msg>,
+  nowMs: number,
+): { readonly active?: NotificationRecord<Msg>; readonly archived?: NotificationRecord<Msg> } {
+  const deltaMs = Math.max(0, nowMs - item.updatedAtMs);
+  const progress = Math.max(0, item.progress - (deltaMs / EXIT_DURATION_MS));
+
+  if (progress > 0) {
+    return {
+      active: {
+        ...item,
+        progress,
+        updatedAtMs: nowMs,
+      },
+    };
+  }
+
+  return {
+    archived: {
+      ...item,
+      progress: 0,
+      updatedAtMs: nowMs,
+    },
+  };
 }
 
 export function pushNotification<Msg>(
@@ -283,6 +311,8 @@ export function tickNotifications<Msg>(
 ): NotificationState<Msg> {
   const nextItems: NotificationRecord<Msg>[] = [];
   const archived: NotificationRecord<Msg>[] = [];
+  const nextOverflowExits: NotificationRecord<Msg>[] = [];
+  const archivedOverflowExits: NotificationRecord<Msg>[] = [];
 
   for (const item of state.items) {
     const deltaMs = Math.max(0, nowMs - item.updatedAtMs);
@@ -323,27 +353,34 @@ export function tickNotifications<Msg>(
       continue;
     }
 
-    const progress = Math.max(0, item.progress - (deltaMs / EXIT_DURATION_MS));
-    if (progress > 0) {
-      nextItems.push({
-        ...item,
-        progress,
-        updatedAtMs: nowMs,
-      });
+    const result = advanceExitRecord(item, nowMs);
+    if (result.active != null) {
+      nextItems.push(result.active);
       continue;
     }
 
-    archived.push({
-      ...item,
-      progress: 0,
-      updatedAtMs: nowMs,
-    });
+    if (result.archived != null) {
+      archived.push(result.archived);
+    }
+  }
+
+  for (const item of state.overflowExits) {
+    const result = advanceExitRecord(item, nowMs);
+    if (result.active != null) {
+      nextOverflowExits.push(result.active);
+      continue;
+    }
+
+    if (result.archived != null) {
+      archivedOverflowExits.push(result.archived);
+    }
   }
 
   return {
     ...state,
     items: nextItems,
-    history: archiveNotifications(state.history, archived),
+    overflowExits: nextOverflowExits,
+    history: archiveNotifications(state.history, [...archived, ...archivedOverflowExits]),
     focusedId: normalizeFocusedId(nextItems, state.focusedId),
   };
 }
@@ -353,7 +390,8 @@ export function hasNotifications<Msg>(state: NotificationState<Msg>): boolean {
 }
 
 export function notificationsNeedTick<Msg>(state: NotificationState<Msg>): boolean {
-  return state.items.some((item) => item.phase !== 'visible' || item.durationMs != null);
+  return state.overflowExits.length > 0
+    || state.items.some((item) => item.phase !== 'visible' || item.durationMs != null);
 }
 
 function toneSemanticKey(tone: NotificationTone): 'info' | 'success' | 'warning' | 'error' {
@@ -754,6 +792,7 @@ function selectVisibleNotificationIds<Msg>(
 export function trimNotificationsToViewport<Msg>(
   state: NotificationState<Msg>,
   options: RenderNotificationStackOptions,
+  nowMs?: number,
 ): NotificationState<Msg> {
   const visibleIds = selectVisibleNotificationIds(state, options);
   const keptItems = state.items.filter((item) => visibleIds.has(item.id));
@@ -764,12 +803,95 @@ export function trimNotificationsToViewport<Msg>(
   }
 
   const evictedItems = state.items.filter((item) => !visibleIds.has(item.id));
+  const exitStartedAtMs = nowMs ?? evictedItems.reduce(
+    (max, item) => Math.max(max, item.updatedAtMs, item.createdAtMs),
+    0,
+  );
+  const overflowExits = [
+    ...state.overflowExits,
+    ...evictedItems.map((item) => ({
+      ...item,
+      phase: 'exiting' as const,
+      progress: 1,
+      updatedAtMs: exitStartedAtMs,
+      exitStartedAtMs,
+    })),
+  ].sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id);
+
   return {
     ...state,
     items: keptItems,
-    history: archiveNotifications(state.history, evictedItems),
+    overflowExits,
     focusedId: normalizeFocusedId(keptItems, state.focusedId),
   };
+}
+
+function renderOverflowExits<Msg>(
+  exits: readonly NotificationRecord<Msg>[],
+  placement: NotificationPlacement,
+  activeTotalHeight: number,
+  region: LayoutRect,
+  margin: number,
+  gap: number,
+  options: RenderNotificationStackOptions,
+  focusedId: number | undefined,
+): readonly Overlay[] {
+  if (exits.length === 0) return [];
+
+  const rendered = [...exits]
+    .sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id)
+    .map((item) => createRenderEntry(item, options, focusedId));
+  const overlays: Overlay[] = [];
+  const mode = placementSortSign(placement);
+
+  if (mode === 'bottom') {
+    let cursor = Math.max(margin, region.height - activeTotalHeight - margin) - gap;
+    for (const entry of rendered) {
+      cursor -= entry.surface.height;
+      const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
+      const offset = applyAnimationOffset(
+        placement,
+        entry.surface.width,
+        entry.surface.height,
+        entry.item.progress,
+      );
+      overlays.push({
+        row: Math.max(0, region.row + cursor + offset.rowDelta),
+        col: Math.max(0, region.col + baseCol + offset.colDelta),
+        surface: entry.surface,
+        content: options.ctx != null
+          ? surfaceToString(entry.surface, options.ctx.style)
+          : renderPlainSurface(entry.surface),
+      });
+      cursor -= gap;
+    }
+    return overlays;
+  }
+
+  let cursor = mode === 'top'
+    ? margin + activeTotalHeight + (activeTotalHeight > 0 ? gap : 0)
+    : Math.max(0, Math.floor((region.height + activeTotalHeight) / 2) + gap);
+
+  for (const entry of rendered) {
+    const baseCol = anchoredCol(placement, entry.surface.width, region.width, margin);
+    const offset = applyAnimationOffset(
+      placement,
+      entry.surface.width,
+      entry.surface.height,
+      entry.item.progress,
+    );
+    overlays.push({
+      row: Math.max(0, region.row + cursor + offset.rowDelta),
+      col: Math.max(0, region.col + baseCol + offset.colDelta),
+      surface: entry.surface,
+      content: options.ctx != null
+        ? surfaceToString(entry.surface, options.ctx.style)
+        : renderPlainSurface(entry.surface),
+    });
+    cursor += entry.surface.height + gap;
+  }
+
+  return overlays;
 }
 
 export function renderNotificationStack<Msg>(
@@ -787,6 +909,7 @@ export function renderNotificationStack<Msg>(
   const gap = options.gap ?? DEFAULT_GAP;
   const visibleIds = selectVisibleNotificationIds(state, options);
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
+  const overflowGrouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
 
   for (const item of state.items) {
     if (!visibleIds.has(item.id)) continue;
@@ -795,9 +918,20 @@ export function renderNotificationStack<Msg>(
     grouped.set(item.placement, placementItems);
   }
 
-  const overlays: Overlay[] = [];
+  for (const item of state.overflowExits) {
+    const placementItems = overflowGrouped.get(item.placement) ?? [];
+    placementItems.push(item);
+    overflowGrouped.set(item.placement, placementItems);
+  }
 
-  for (const [placement, items] of grouped) {
+  const overlays: Overlay[] = [];
+  const placements = new Set<NotificationPlacement>([
+    ...grouped.keys(),
+    ...overflowGrouped.keys(),
+  ]);
+
+  for (const placement of placements) {
+    const items = grouped.get(placement) ?? [];
     const rendered = sortForPlacement(items, placement).map((item) =>
       createRenderEntry(item, options, state.focusedId)
     );
@@ -830,6 +964,17 @@ export function renderNotificationStack<Msg>(
       });
       cursor += entry.surface.height + gap;
     }
+
+    overlays.push(...renderOverflowExits(
+      overflowGrouped.get(placement) ?? [],
+      placement,
+      totalHeight,
+      region,
+      margin,
+      gap,
+      options,
+      state.focusedId,
+    ));
   }
 
   return overlays;

@@ -384,6 +384,7 @@ export function createFramedApp<PageModel, Msg>(
   function applyFrameNotificationState(
     model: InternalFrameModel<PageModel, Msg>,
     notifications: NotificationState<never>,
+    nowMs: number,
     forceTick = false,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
     const trimmed = trimNotificationsToViewport(notifications, {
@@ -391,7 +392,7 @@ export function createFramedApp<PageModel, Msg>(
       screenHeight: model.rows,
       margin: frameNotificationOptions.margin,
       gap: frameNotificationOptions.gap,
-    });
+    }, nowMs);
     const needsTick = notificationsNeedTick(trimmed);
     const nextModel: InternalFrameModel<PageModel, Msg> = {
       ...model,
@@ -471,11 +472,11 @@ export function createFramedApp<PageModel, Msg>(
             durationMs: frameNotificationOptions.durationMs,
             overflow: frameNotificationOptions.overflow,
           }, action.issue.atMs);
-          return applyFrameNotificationState(model, notifications);
+          return applyFrameNotificationState(model, notifications, action.issue.atMs);
         }
         if (action.type === 'notification-tick') {
           const notifications = tickNotifications(model.runtimeNotifications, action.atMs);
-          return applyFrameNotificationState(model, notifications, true);
+          return applyFrameNotificationState(model, notifications, action.atMs, true);
         }
         if (action.type === 'transition') {
           // Ignore stale transition ticks from a previous generation
