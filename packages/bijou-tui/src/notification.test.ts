@@ -5,6 +5,7 @@ import {
   activateFocusedNotification,
   createNotificationState,
   cycleNotificationFocus,
+  dismissNotification,
   relocateNotifications,
   notificationsNeedTick,
   pushNotification,
@@ -48,7 +49,7 @@ describe('notification state', () => {
     state = tickNotifications(state, 4_300);
     expect(state.items[0]?.phase).toBe('exiting');
 
-    state = tickNotifications(state, 4_500);
+    state = tickNotifications(state, 4_600);
     expect(state.items).toHaveLength(0);
     expect(state.history).toHaveLength(1);
     expect(state.history[0]?.title).toBe('Build complete');
@@ -272,7 +273,7 @@ describe('renderNotificationStack', () => {
       screenHeight: 30,
     });
 
-    const moved = relocateNotifications(state, 'UPPER_LEFT');
+    const moved = relocateNotifications(state, 'UPPER_LEFT', 300);
     const [after] = renderNotificationStack(moved, {
       screenWidth: 90,
       screenHeight: 30,
@@ -280,6 +281,46 @@ describe('renderNotificationStack', () => {
 
     expect(after!.row).toBeLessThan(before!.row);
     expect(after!.col).toBeLessThan(before!.col);
+    expect(moved.items[0]?.phase).toBe('entering');
+  });
+
+  it('keeps a dismissed notification on-screen long enough to animate out', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Animated exit',
+      message: 'This notice should slide out instead of disappearing immediately.',
+      variant: 'TOAST',
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [visible] = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    const [dismissed] = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+    expect(dismissed).toBeDefined();
+
+    state = tickNotifications(state, 360);
+    const [animating] = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+    expect(animating).toBeDefined();
+    expect(animating!.col).toBeGreaterThanOrEqual(visible!.col);
+
+    state = tickNotifications(state, 650);
+    const overlays = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+    expect(overlays).toHaveLength(0);
   });
 
   it('keeps the card background applied across the full notification surface', () => {

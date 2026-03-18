@@ -92,7 +92,7 @@ interface NotificationRenderEntry<Msg> {
 }
 
 const ENTER_DURATION_MS = 180;
-const EXIT_DURATION_MS = 140;
+const EXIT_DURATION_MS = 220;
 const DEFAULT_MARGIN = 1;
 const DEFAULT_GAP = 1;
 const HISTORY_LIMIT = 250;
@@ -223,11 +223,26 @@ export function dismissFocusedNotification<Msg>(
 export function relocateNotifications<Msg>(
   state: NotificationState<Msg>,
   placement: NotificationPlacement,
+  nowMs?: number,
 ): NotificationState<Msg> {
   if (state.items.every((item) => item.placement === placement)) return state;
   return {
     ...state,
-    items: state.items.map((item) => ({ ...item, placement })),
+    items: state.items.map((item) => {
+      if (nowMs == null || item.phase === 'exiting') {
+        return { ...item, placement };
+      }
+
+      return {
+        ...item,
+        placement,
+        phase: 'entering' as const,
+        progress: 0,
+        updatedAtMs: nowMs,
+        enteredAtMs: undefined,
+        exitStartedAtMs: undefined,
+      };
+    }),
   };
 }
 

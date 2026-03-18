@@ -392,14 +392,21 @@ const page: FramePage<PageModel, Msg> = {
           toneIndex: (model.toneIndex + 1) % TONES.length,
         }, []];
       case 'cycle-placement':
-        return [appendLog({
+      {
+        const nextPlacementIndex = (model.placementIndex + 1) % PLACEMENTS.length;
+        const nextPlacement = PLACEMENTS[nextPlacementIndex]!;
+        const notifications = relocateNotifications(
+          model.notifications,
+          nextPlacement,
+          ctx.clock.now(),
+        );
+        const nextModel = appendLog({
           ...model,
-          placementIndex: (model.placementIndex + 1) % PLACEMENTS.length,
-          notifications: relocateNotifications(
-            model.notifications,
-            PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!,
-          ),
-        }, `Moved active notifications to ${PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!}.`), []];
+          placementIndex: nextPlacementIndex,
+          notifications,
+        }, `Moved active notifications to ${nextPlacement}.`);
+        return applyNotificationState(nextModel, notifications);
+      }
       case 'cycle-duration':
         return [{
           ...model,
