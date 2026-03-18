@@ -1,14 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import type { RunWorkerOptions } from './worker.js';
-
-const WORKER_PROXY_TEST_TIMEOUT_MS = 15_000;
-
-afterEach(() => {
-  vi.resetModules();
-  vi.unmock('node:worker_threads');
-  vi.unmock('@flyingrobots/bijou-tui');
-});
+import type { RunOptions } from '@flyingrobots/bijou-tui';
+import { runInWorker, startWorkerApp, type RunWorkerOptions } from './worker.js';
 
 describe('worker proxy runtime', () => {
   it('only accepts worker-safe run options at type level', () => {
@@ -48,15 +41,6 @@ describe('worker proxy runtime', () => {
         return Promise.resolve(0);
       }
     }
-
-    vi.doMock('node:worker_threads', () => ({
-      Worker: FakeWorker,
-      isMainThread: true,
-      parentPort: null,
-      workerData: null,
-    }));
-
-    const { runInWorker } = await import('./worker.js');
     const ctx = createTestContext({
       mode: 'interactive',
       runtime: { columns: 120, rows: 40 },
@@ -73,7 +57,24 @@ describe('worker proxy runtime', () => {
       };
     };
 
-    const handle = runInWorker({ ctx, entry: '/tmp/worker.mjs' });
+    const handle = runInWorker(
+      { ctx, entry: '/tmp/worker.mjs' },
+      {
+        isMainThread: true,
+        parentPort: null,
+        workerData: null,
+        createWorker(entry, options) {
+          return new FakeWorker(entry, options);
+        },
+        createNodeContext() {
+          return createTestContext({ mode: 'interactive' });
+        },
+        runApp: async () => {},
+        scheduleTimeout(callback, ms) {
+          return setTimeout(callback, ms);
+        },
+      },
+    );
 
     expect(ctorCalls).toHaveLength(1);
     expect(ctorCalls[0]!.options.workerData).toMatchObject({
@@ -87,20 +88,23 @@ describe('worker proxy runtime', () => {
     expect(posted).toContainEqual({ type: 'io:resize', columns: 90, rows: 22 });
 
     await handle.terminate();
-  }, WORKER_PROXY_TEST_TIMEOUT_MS);
+  });
 
   it('hydrates proxy runtime size before run() and updates it on resize messages', async () => {
     const messageListeners = new Set<(msg: unknown) => void>();
     const posted: unknown[] = [];
-    const run = vi.fn(async (_app, options: { ctx: { runtime: { columns: number; rows: number }; io: { onResize: (handler: (columns: number, rows: number) => void) => { dispose(): void } } } }) => {
-      expect(options.ctx.runtime.columns).toBe(120);
-      expect(options.ctx.runtime.rows).toBe(40);
+    let runCalls = 0;
+    const run = async <M>(_app: unknown, options: RunOptions<M>) => {
+      runCalls += 1;
+      const ctx = options.ctx!;
+      expect(ctx.runtime.columns).toBe(120);
+      expect(ctx.runtime.rows).toBe(40);
 
       const seenResizes: Array<{ columns: number; rows: number }> = [];
-      const handle = options.ctx.io.onResize((columns, rows) => {
+      const handle = ctx.io.onResize((columns, rows) => {
         seenResizes.push({ columns, rows });
-        expect(options.ctx.runtime.columns).toBe(columns);
-        expect(options.ctx.runtime.rows).toBe(rows);
+        expect(ctx.runtime.columns).toBe(columns);
+        expect(ctx.runtime.rows).toBe(rows);
       });
 
       for (const listener of messageListeners) {
@@ -109,10 +113,12 @@ describe('worker proxy runtime', () => {
 
       expect(seenResizes).toEqual([{ columns: 90, rows: 22 }]);
       handle.dispose();
-    });
-
-    vi.doMock('node:worker_threads', () => ({
-      Worker: class {},
+    };
+    await startWorkerApp({
+      init: () => [null, []],
+      update: (msg, model) => [model, []],
+      view: () => 'worker',
+    }, {
       isMainThread: false,
       parentPort: {
         on(_event: string, listener: (msg: unknown) => void) {
@@ -130,24 +136,19 @@ describe('worker proxy runtime', () => {
         options: {},
         runtime: { columns: 120, rows: 40 },
       },
-    }));
-
-    vi.doMock('@flyingrobots/bijou-tui', async () => {
-      const actual = await vi.importActual<typeof import('@flyingrobots/bijou-tui')>('@flyingrobots/bijou-tui');
-      return {
-        ...actual,
-        run,
-      };
+      createWorker() {
+        throw new Error('createWorker should not be used inside startWorkerApp tests');
+      },
+      createNodeContext() {
+        return createTestContext({ mode: 'interactive' });
+      },
+      runApp: run,
+      scheduleTimeout(callback, ms) {
+        return setTimeout(callback, ms);
+      },
     });
 
-    const { startWorkerApp } = await import('./worker.js');
-    await startWorkerApp({
-      init: () => [null, []],
-      update: (msg, model) => [model, []],
-      view: () => 'worker',
-    });
-
-    expect(run).toHaveBeenCalledOnce();
+    expect(runCalls).toBe(1);
     expect(posted).toContainEqual({ type: 'quit' });
-  }, WORKER_PROXY_TEST_TIMEOUT_MS);
+  });
 });

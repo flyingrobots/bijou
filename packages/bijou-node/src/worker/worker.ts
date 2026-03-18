@@ -10,6 +10,44 @@ import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
 import { createNodeContext } from '../index.js';
 
+interface WorkerInstance {
+  postMessage(message: unknown): void;
+  on(event: string, handler: (value: any) => void): void;
+  terminate(): Promise<number>;
+}
+
+interface WorkerParentPort {
+  on(event: string, listener: (msg: any) => void): void;
+  off(event: string, listener: (msg: any) => void): void;
+  postMessage(message: unknown): void;
+}
+
+interface WorkerThreadBindings {
+  isMainThread: boolean;
+  parentPort: WorkerParentPort | null;
+  workerData: unknown;
+  createWorker(entry: string, options: Record<string, unknown>): WorkerInstance;
+  createNodeContext(): BijouContext;
+  runApp<Model, M>(app: App<Model, M>, options: RunOptions<M>): Promise<void>;
+  scheduleTimeout(callback: () => void, ms: number): ReturnType<typeof setTimeout>;
+}
+
+function defaultWorkerThreadBindings(): WorkerThreadBindings {
+  return {
+    isMainThread,
+    parentPort,
+    workerData,
+    createWorker(entry, options) {
+      return new Worker(entry, options);
+    },
+    createNodeContext,
+    runApp: run,
+    scheduleTimeout(callback, ms) {
+      return setTimeout(callback, ms);
+    },
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Types & Messages
 // ---------------------------------------------------------------------------
@@ -34,7 +72,8 @@ export type MainMessage =
  * Checks if the current environment is running inside a Bijou Worker.
  */
 export function isBijouWorker(): boolean {
-  return !isMainThread && workerData?.isBijouWorker === true;
+  const bindings = defaultWorkerThreadBindings();
+  return !bindings.isMainThread && (bindings.workerData as { isBijouWorker?: boolean } | null)?.isBijouWorker === true;
 }
 
 /**
@@ -42,8 +81,9 @@ export function isBijouWorker(): boolean {
  * This will be received via the `onMessage` callback in `runInWorker`.
  */
 export function sendToMain(payload: unknown): void {
-  if (parentPort) {
-    parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
+  const bindings = defaultWorkerThreadBindings();
+  if (bindings.parentPort) {
+    bindings.parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
   }
 }
 
@@ -109,12 +149,15 @@ export interface WorkerHandle {
  * @param options - Configuration including the path to the worker entry file.
  * @returns A handle to the running worker.
  */
-export function runInWorker(options: RunWorkerOptions): WorkerHandle {
-  if (!isMainThread) {
+export function runInWorker(
+  options: RunWorkerOptions,
+  bindings: WorkerThreadBindings = defaultWorkerThreadBindings(),
+): WorkerHandle {
+  if (!bindings.isMainThread) {
     throw new Error('runInWorker must be called from the main thread.');
   }
 
-  const ctx = options.ctx ?? createNodeContext();
+  const ctx = options.ctx ?? bindings.createNodeContext();
   installRuntimeViewportOverlay(ctx);
   const useAltScreen = options.altScreen ?? true;
   const useHideCursor = options.hideCursor ?? true;
@@ -137,7 +180,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
     css: options.css,
   };
 
-  const worker = new Worker(resolvePath(options.entry), {
+  const worker = bindings.createWorker(resolvePath(options.entry), {
     workerData: {
       isBijouWorker: true,
       options: serializableOptions,
@@ -172,7 +215,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
         if (options.onMessage) options.onMessage(msg.payload);
       } else if (msg.type === 'quit') {
         requestedQuit = true;
-        setTimeout(() => {
+        bindings.scheduleTimeout(() => {
           if (requestedQuit) {
             forcedTerminate = true;
             void worker.terminate();
@@ -229,15 +272,18 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
  * 
  * @param app - The TEA app to run.
  */
-export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void> {
-  if (isMainThread || !parentPort) {
+export async function startWorkerApp<Model, M>(
+  app: App<Model, M>,
+  bindings: WorkerThreadBindings = defaultWorkerThreadBindings(),
+): Promise<void> {
+  if (bindings.isMainThread || !bindings.parentPort) {
     throw new Error('startWorkerApp must be called from within a worker thread.');
   }
 
-  const initData = workerData as BijouWorkerData;
+  const initData = bindings.workerData as BijouWorkerData;
 
   // Create a proxy Context that speaks IPC instead of true I/O
-  const proxyCtx = createNodeContext();
+  const proxyCtx = bindings.createNodeContext();
   installRuntimeViewportOverlay(proxyCtx);
   const { setDefaultContext } = await import('@flyingrobots/bijou');
   setDefaultContext(proxyCtx);
@@ -249,10 +295,10 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
   
   // Hijack the WritePort to send frames back to main thread
   proxyCtx.io.write = (data: string) => {
-    parentPort!.postMessage({ type: 'render:frame', output: data } satisfies MainMessage);
+    bindings.parentPort!.postMessage({ type: 'render:frame', output: data } satisfies MainMessage);
   };
   proxyCtx.io.writeError = (data: string) => {
-    parentPort!.postMessage({ type: 'error', message: data } satisfies MainMessage);
+    bindings.parentPort!.postMessage({ type: 'error', message: data } satisfies MainMessage);
   };
 
   // We need to bypass the standard run() setup since the main thread 
@@ -270,9 +316,9 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:data') handler(msg.data);
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
@@ -283,9 +329,9 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
         handler(nextViewport.columns, nextViewport.rows);
       }
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
@@ -293,15 +339,15 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'data') handler(msg.payload);
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
   // Run the app using the proxy context
-  await run(app, proxyOptions);
+  await bindings.runApp(app, proxyOptions);
 
   // Signal main thread to shut down
-  parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
+  bindings.parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
 }
