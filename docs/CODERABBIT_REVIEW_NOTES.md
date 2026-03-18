@@ -30,8 +30,8 @@ Track recurring friction in the PR feedback loop and concrete fixes (scripts/pro
 
 ### 2026-03-16
 - **Deterministic clocks are flushing out real runtime edge cases**: once time became injectable, CodeRabbit and local regressions surfaced several legitimate bugs that wall-clock testing had masked: event-bus sync throws could strand `drain()`, `mockClock.runAll()` could spin forever on active intervals, runtime timeout handles were not always disposed after firing, and the interactive Ctrl+C guard treated time `0` as "already pressed once."
-  Progress: PR #47 adds the shared `clock` port/test adapter, event-bus idle tracking, pulse-driven timing, timeout-handle cleanup, and targeted regressions for those failure modes.
-  Remaining gap: finish pushing the remaining time-dependent logic behind explicit seams, share the runtime viewport overlay across main/worker runtimes, and add more fake-time coverage around intervals, microtasks, and startup-time sentinel values.
+  Progress: PR #47 shipped the shared `clock` port/test adapter, event-bus idle tracking, pulse-driven timing, timeout-handle cleanup, and targeted regressions for those failure modes.
+  Remaining gap: finish pushing the remaining time-dependent logic behind explicit seams, share the runtime viewport overlay across main/worker runtimes, add more fake-time coverage around intervals, microtasks, and startup-time sentinel values, and cash the new deterministic seam into the frame-assertion / visual-regression slice.
 
 ## Backlog Candidates
 - Build `scripts/pr-review-threads.ts` to export unresolved threads as JSON/Markdown with severity bucketing and dedupe.
