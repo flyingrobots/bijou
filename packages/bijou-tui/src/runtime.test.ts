@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { createSurface } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createSurface, type TimerHandle } from '@flyingrobots/bijou';
+import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
 import { quit } from './commands.js';
 import type { App, KeyMsg, Cmd } from './types.js';
@@ -42,6 +42,33 @@ function singleCellSurface(char?: string) {
     surface.set(0, 0, { char, empty: false });
   }
   return surface;
+}
+
+function createTrackingClock() {
+  const base = mockClock();
+  const activeTimeouts = new Set<TimerHandle>();
+
+  return {
+    clock: {
+      ...base,
+      setTimeout(callback: () => void, ms: number): TimerHandle {
+        let baseHandle: TimerHandle | null = null;
+        const wrapper: TimerHandle = {
+          dispose() {
+            if (!activeTimeouts.delete(wrapper)) return;
+            baseHandle?.dispose();
+          },
+        };
+
+        baseHandle = base.setTimeout(callback, ms);
+        activeTimeouts.add(wrapper);
+        return wrapper;
+      },
+    },
+    activeTimeoutCount(): number {
+      return activeTimeouts.size;
+    },
+  };
 }
 
 /** What renderFrame produces for a given content string. */
@@ -160,6 +187,45 @@ describe('run', () => {
       await promise;
 
       expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
+    });
+
+    it('does not treat the first Ctrl+C at clock time zero as a double-press', async () => {
+      const clock = mockClock({ nowMs: 0 });
+      const received: KeyMsg[] = [];
+
+      const spyApp: App<null, never> = {
+        init: () => [null, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            received.push(msg);
+            if (msg.key === 'q') return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: () => 'spy',
+      };
+
+      const ctx = createTestContext({ mode: 'interactive', clock });
+      ctx.io.rawInput = (onKey) => {
+        const handles = [
+          clock.setTimeout(() => onKey('\x03'), 0),
+          clock.setTimeout(() => onKey('q'), 10),
+        ];
+        return {
+          dispose() {
+            handles.forEach((handle) => {
+              handle.dispose();
+            });
+          },
+        };
+      };
+
+      const promise = run(spyApp, { ctx });
+      await clock.advanceByAsync(20);
+      await promise;
+
+      expect(received[0]).toMatchObject({ key: 'c', ctrl: true });
+      expect(received.some((msg) => msg.key === 'q')).toBe(true);
     });
 
     it('executes startup commands from init', async () => {
@@ -338,6 +404,22 @@ describe('run', () => {
       expect(ctx.io.written[ctx.io.written.length - 1]).toBe(
         SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN,
       );
+    });
+
+    it('does not leave runtime timeout handles active after shutdown', async () => {
+      const { clock, activeTimeoutCount } = createTrackingClock();
+      const ctx = createTestContext({ mode: 'interactive', clock });
+      const app: App<string, never> = {
+        init: () => ['bye', [quit()]],
+        update: (_msg, model) => [model, []],
+        view: (model) => model,
+      };
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(5);
+      await promise;
+
+      expect(activeTimeoutCount()).toBe(0);
     });
 
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {

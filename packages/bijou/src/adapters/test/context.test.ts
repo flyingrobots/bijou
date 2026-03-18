@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { createTestContext, auditStyle } from './index.js';
+import { createTestContext, auditStyle, mockClock } from './index.js';
 
 describe('createTestContext()', () => {
   it('returns BijouContext with all fields', () => {
     const ctx = createTestContext();
     expect(ctx.runtime.env).toBeTypeOf('function');
     expect(ctx.io.write).toBeTypeOf('function');
+    expect(ctx.clock?.now).toBeTypeOf('function');
     expect(ctx.style.bold).toBeTypeOf('function');
     expect(ctx.theme.noColor).toBeTypeOf('boolean');
     expect(typeof ctx.mode).toBe('string');
@@ -42,6 +43,13 @@ describe('createTestContext()', () => {
   it('forwards io options', async () => {
     const ctx = createTestContext({ io: { answers: ['yes'] } });
     expect(await ctx.io.question('? ')).toBe('yes');
+  });
+
+  it('forwards custom clock options', () => {
+    const clock = mockClock({ nowMs: 1234 });
+    const ctx = createTestContext({ clock });
+    expect(ctx.clock).toBe(clock);
+    expect(ctx.clock?.now()).toBe(1234);
   });
 
   it('theme accessor functions are resolved and functional', () => {

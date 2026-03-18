@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { runScript, stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { createTuiAppSkeleton } from './index.js';
@@ -81,13 +81,18 @@ describe('createTuiAppSkeleton', () => {
   });
 
   it('animates drawer changes via physics commands', async () => {
-    const ctx = createTestContext({ mode: 'interactive' });
+    const clock = mockClock();
+    const ctx = createTestContext({ mode: 'interactive', clock });
     const app = createTuiAppSkeleton({ ctx });
 
-    const result = await runScript(app, [
+    const promise = runScript(app, [
       { key: 'o' },
       { key: 'o', delay: 120 },
     ], { ctx });
+    for (let i = 0; i < 80; i++) {
+      await clock.advanceByAsync(25);
+    }
+    const result = await promise;
 
     // Initial frame + key frame + animation frames + second toggle.
     expect(result.frames.length).toBeGreaterThan(3);

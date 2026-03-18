@@ -13,6 +13,7 @@ export type {
   InteractivePort,
   FilePort,
   IOPort,
+  ClockPort,
   RawInputHandle,
   TimerHandle,
   StylePort,
@@ -38,6 +39,7 @@ export {
 
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
+export { systemClock, resolveClock, sleep, defer } from './core/clock.js';
 
 // Mode rendering strategy
 export {

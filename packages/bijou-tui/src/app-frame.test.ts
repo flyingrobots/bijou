@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
-import type { Cmd, MouseMsg } from './types.js';
+import { QUIT, type Cmd, type MouseMsg } from './types.js';
+import { tick } from './commands.js';
 
 type Msg =
   | { type: 'inc' }
@@ -168,7 +169,29 @@ describe('createFramedApp', () => {
 
     // Manually drive the animation command
     const messages: any[] = [];
-    await switchCmds[0]!((m) => messages.push(m), { onPulse: () => ({ dispose() {} }) });
+    const pulseHandlers = new Set<(dt: number) => void>();
+    let settled = false;
+    const promise = switchCmds[0]!((m) => messages.push(m), {
+      onPulse(handler) {
+        pulseHandlers.add(handler);
+        return {
+          dispose() {
+            pulseHandlers.delete(handler);
+          },
+        };
+      },
+    }).then(() => {
+      settled = true;
+    });
+
+    for (let i = 0; i < 10 && !settled; i++) {
+      for (const handler of [...pulseHandlers]) {
+        handler(0.002);
+      }
+      await Promise.resolve();
+    }
+
+    await promise;
 
     expect(messages.length).toBeGreaterThan(0);
     
@@ -184,6 +207,8 @@ describe('createFramedApp', () => {
   });
 
   it('runs transition animation through runScript', async () => {
+    const clock = mockClock();
+    const ctx = createTestContext({ clock });
     const app = createFramedApp({
       pages: [
         makePage('p1', 'P1', 'm'),
@@ -193,11 +218,11 @@ describe('createFramedApp', () => {
       transitionDuration: 20,
     });
 
-    // Delay must exceed transitionDuration (20ms) with headroom for CI load.
-    const result = await runScript(app, [
+    const promise = runScript(app, [
       { key: ']' },
-      { key: 'noop', delay: 200 },
-    ]);
+    ], { ctx });
+    await clock.advanceByAsync(200);
+    const result = await promise;
 
     expect(result.model.activePageId).toBe('p2');
     expect(result.model.previousPageId).toBeUndefined();
@@ -210,6 +235,8 @@ describe('createFramedApp', () => {
     const transitions: PageTransition[] = ['melt', 'matrix', 'scramble'];
     
     for (const transition of transitions) {
+      const clock = mockClock();
+      const ctx = createTestContext({ clock });
       const app = createFramedApp({
         pages: [
           makePage('p1', 'P1', 'm'),
@@ -219,10 +246,11 @@ describe('createFramedApp', () => {
         transitionDuration: 10,
       });
 
-      const result = await runScript(app, [
+      const promise = runScript(app, [
         { key: ']' },
-        { key: 'noop', delay: 50 },
-      ]);
+      ], { ctx });
+      await clock.advanceByAsync(100);
+      const result = await promise;
 
       expect(result.model.activePageId).toBe('p2');
       expect(result.model.transitionProgress).toBe(1);
@@ -352,11 +380,7 @@ describe('createFramedApp', () => {
       update(msg, model) {
         if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
         if (msg.type === 'noop') {
-          const delayed: Cmd<Msg> = async () => {
-            await new Promise<void>((resolve) => setTimeout(resolve, 10));
-            return { type: 'inc' };
-          };
-          return [model, [delayed]];
+          return [model, [tick(10, { type: 'inc' })]];
         }
         return [model, []];
       },
@@ -372,15 +396,51 @@ describe('createFramedApp', () => {
       pages: [home, logs],
     });
 
-    const result = await runScript(app, [
-      { key: ']' },
-      { key: 'x' },
-      { key: '[' },
-      { delay: 25, msg: { type: 'noop' } },
-    ]);
+    let [model, initCmds] = app.init();
+    expect(initCmds).toHaveLength(0);
 
-    expect(result.model.pageModels.home?.count).toBe(0);
-    expect(result.model.pageModels.logs?.count).toBe(1);
+    let update = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('logs');
+
+    update = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    const noopCmd = update[1][0];
+    expect(noopCmd).toBeDefined();
+
+    const noopResult = await noopCmd!(() => {}, {
+      onPulse: () => ({ dispose() {} }),
+    });
+    expect(noopResult).toBeDefined();
+    expect(noopResult).not.toBe(QUIT);
+
+    update = app.update(noopResult as Msg, model);
+    model = update[0];
+    const delayedCmd = update[1][0];
+    expect(delayedCmd).toBeDefined();
+
+    const emitted: Msg[] = [];
+    const delayedPromise = delayedCmd!((msg) => emitted.push(msg), {
+      onPulse: () => ({ dispose() {} }),
+      sleep: () => Promise.resolve(),
+    });
+
+    update = app.update({ type: 'key', key: '[', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('home');
+
+    const returned = await delayedPromise;
+    for (const msg of emitted) {
+      update = app.update(msg, model);
+      model = update[0];
+    }
+    if (returned !== undefined && returned !== QUIT) {
+      update = app.update(returned, model);
+      model = update[0];
+    }
+
+    expect(model.pageModels.home?.count).toBe(0);
+    expect(model.pageModels.logs?.count).toBe(1);
   });
 
   it('supports Shift+G for scroll-to-bottom', async () => {

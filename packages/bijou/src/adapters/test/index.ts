@@ -11,6 +11,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { OutputMode, ColorScheme } from '../../core/detect/tty.js';
 import { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 import { mockIO, type MockIOOptions, type MockIO } from './io.js';
+import { mockClock, type MockClockOptions, type MockClock } from './clock.js';
 import type { StylePort } from '../../ports/style.js';
 import { plainStyle } from './style.js';
 import { createResolved } from '../../core/theme/resolve.js';
@@ -19,9 +20,11 @@ import { createThemeAccessors } from '../../core/theme/accessors.js';
 import { createTokenGraph } from '../../core/theme/graph.js';
 import type { TokenDefinitions } from '../../core/theme/graph-types.js';
 import type { Theme } from '../../core/theme/tokens.js';
+import { systemClock } from '../../core/clock.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
+export { mockClock, type MockClockOptions, type MockClock } from './clock.js';
 export { plainStyle } from './style.js';
 export { auditStyle, type StyledCall, type AuditStylePort } from './audit-style.js';
 export {
@@ -45,6 +48,8 @@ export interface TestContextOptions {
   io?: MockIOOptions;
   /** Theme to resolve. Defaults to `CYAN_MAGENTA`. */
   theme?: Theme;
+  /** Clock override for deterministic time/scheduling. */
+  clock?: MockClockOptions | MockClock;
   /** Output mode. Defaults to `'interactive'`. */
   mode?: OutputMode;
   /** Whether to strip color from the resolved theme. Defaults to `false`. */
@@ -53,6 +58,13 @@ export interface TestContextOptions {
   colorScheme?: ColorScheme;
   /** Style adapter override. Defaults to {@link plainStyle}. */
   style?: StylePort;
+}
+
+function isMockClock(value: MockClockOptions | MockClock | undefined): value is MockClock {
+  return typeof value === 'object'
+    && value !== null
+    && 'now' in value
+    && typeof value.now === 'function';
 }
 
 /**
@@ -77,6 +89,9 @@ export interface TestContext extends BijouContext {
 export function createTestContext(options: TestContextOptions = {}): TestContext {
   const runtime = mockRuntime(options.runtime);
   const io = mockIO(options.io);
+  const clock = options.clock === undefined
+    ? systemClock()
+    : (isMockClock(options.clock) ? options.clock : mockClock(options.clock));
   const style = options.style ?? plainStyle();
   const theme = createResolved(options.theme ?? CYAN_MAGENTA, options.noColor ?? false, options.colorScheme ?? 'dark');
   const tokenGraph = createTokenGraph((options.theme ?? CYAN_MAGENTA) as unknown as TokenDefinitions);
@@ -87,6 +102,7 @@ export function createTestContext(options: TestContextOptions = {}): TestContext
     mode,
     runtime,
     io,
+    clock,
     style,
     tokenGraph,
     resolveBCSS: () => ({}),

@@ -141,6 +141,12 @@ export interface CmdCapabilities {
    * Returns a dispose function.
    */
   onPulse(handler: (dt: number) => void): { dispose(): void };
+  /** Sleep for a bounded amount of time using the runtime clock. */
+  sleep?(ms: number): Promise<void>;
+  /** Yield to the next microtask using the runtime clock. */
+  defer?(): Promise<void>;
+  /** Read the current wall-clock time from the runtime clock. */
+  now?(): number;
 }
 
 // --- App definition ---

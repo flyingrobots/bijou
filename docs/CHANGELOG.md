@@ -9,6 +9,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### ✨ Features
 
 - **Surface-first companion primitives** — added `boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, and `tableSurface()` so V3 apps can keep common layout/status composition on the `Surface` path instead of dropping back through explicit string bridges.
+- **Deterministic clock port and test adapter** — `BijouContext` now supports a shared `clock` port, and the test adapters now ship `mockClock()` so runtime code and component tests can fake wall-clock time without reaching for Node globals.
+- **Idle-aware scripted driver controls** — `runScript()` now supports configurable pulse frequency, and the TUI event bus exposes explicit command-idle tracking so deterministic tests can wait for real command completion instead of sprinkling `setTimeout(...)` heuristics.
 
 ### 🐛 Fixes
 
@@ -25,6 +27,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface fixed-width normalization** — `boxSurface()` now normalizes fractional or negative fixed widths before border and blit math runs, so constrained boxes preserve their borders instead of drifting past the actual allocated surface width.
 - **Surface title and table width parity** — `boxSurface()` now widens auto-sized boxes to account for long titles like `box()`, and `tableSurface()` now normalizes explicit column widths before layout math so fractional widths cannot corrupt the underlying `Surface` grid.
 - **Surface background metadata parity** — `boxSurface()` now preserves interior background cells even when `ctx` is `noColor`, so the returned `Surface` model stays consistent and render policy decides whether color is emitted.
+- **Pulse-driven TUI timing** — `tick()`, framed-page transitions, runtime render scheduling, and live timer/log/spinner/progress helpers now route through the shared clock/pulse seams instead of mixing raw `Date.now()`, `setTimeout(...)`, and `setInterval(...)` into component logic.
+- **Deterministic test cleanup** — high-signal TUI tests now use `mockClock()`, explicit event-bus idleness, and deterministic temporary paths instead of wall-clock sleeps and random missing-file names.
+- **Deterministic command and timer drains** — event-bus `drain()` now settles even when commands throw synchronously, and `mockClock.runAll()` now fails loudly instead of spinning forever when live intervals remain active.
+- **Runtime timer-handle cleanup** — interactive runtime renders and shutdown flushes now dispose their scheduled timeout handles after firing, so deterministic clocks do not retain stale timeout bookkeeping after the app exits.
+- **Deterministic Ctrl+C quit guard** — interactive runtime now treats “no prior Ctrl+C” distinctly from “Ctrl+C at time zero,” so injected clocks that start at `0` still forward the first Ctrl+C to the app instead of force-quitting immediately.
+- **Deterministic runtime test lint compliance** — the Ctrl+C-at-time-zero regression test now disposes its timeout handles with a block-bodied loop so it satisfies the repo’s iterable-callback-return lint rule without changing behavior.
+- **Deterministic runtime test helper cleanup** — the tracking clock helper in `runtime.test.ts` now passes timeout callbacks directly to the base clock instead of wrapping them in a no-op forwarding closure.
 
 ### 🧪 Tests
 
