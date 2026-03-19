@@ -358,6 +358,40 @@ describe('createFramedApp', () => {
     expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
   });
 
+  it('can override the short help strip with page bindings only', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => 'home',
+      }),
+      keyMap: createKeyMap<Msg>()
+        .bind('l', 'Cycle placement', { type: 'inc' })
+        .bind('q', 'Quit demo', { type: 'noop' }),
+    };
+
+    const app = createFramedApp({
+      title: 'Test',
+      pages: [page],
+      helpLineSource: ({ activePage }) => activePage.keyMap,
+    });
+
+    const result = await runScript(app, []);
+    const frame = surfaceToString(result.frames.at(-1)!, testCtx.style);
+
+    expect(frame).toContain('l Cycle placement');
+    expect(frame).toContain('q Quit demo');
+    expect(frame).not.toContain('[ Previous tab');
+    expect(frame).not.toContain('Tab Next pane');
+  });
+
   it('keeps init command messages scoped to their originating page', async () => {
     const initInc: Cmd<Msg> = async () => ({ type: 'inc' });
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({

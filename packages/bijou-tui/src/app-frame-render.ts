@@ -306,7 +306,12 @@ export function renderHelpLine<PageModel, Msg>(
   const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
   const status = `[${mode}] page:${model.activePageId} pane:${focusedPane}`;
 
-  const source = mergeBindingSources(
+  const source = options.helpLineSource?.({
+    model,
+    activePage,
+    frameKeys,
+    globalKeys: options.globalKeys,
+  }) ?? mergeBindingSources(
     frameKeys,
     options.globalKeys,
     activePage.helpSource ?? activePage.keyMap,

@@ -14,7 +14,7 @@ import {
 } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
-import type { App, Cmd } from './types.js';
+import type { App, Cmd, KeyMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
 import { modal } from './overlay.js';
@@ -51,6 +51,7 @@ import {
 // Internal modules
 import type {
   InternalFrameModel,
+  FrameAction,
   PaletteAction,
 } from './app-frame-types.js';
 import {
@@ -190,6 +191,18 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly globalKeys?: KeyMap<Msg>;
   /** Resolve key conflicts in favor of the frame shell or the active page. Default: 'frame-first'. */
   readonly keyPriority?: 'frame-first' | 'page-first';
+  /** Optional override for the short help strip source shown beneath the frame header. */
+  readonly helpLineSource?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly frameKeys: KeyMap<FrameAction>;
+    readonly globalKeys?: KeyMap<Msg>;
+  }) => BindingSource | undefined;
+  /** Optional observer that receives every key plus the route that handled it. Returned messages are scoped to the active page. */
+  readonly observeKey?: (
+    msg: KeyMsg,
+    route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
+  ) => Msg | undefined;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
   /** Optional overlay provider (receives pane rects for panel scoping). */
@@ -383,6 +396,17 @@ export function createFramedApp<PageModel, Msg>(
     close: { type: 'cp-close' },
   });
 
+  function withObservedKey(
+    model: InternalFrameModel<PageModel, Msg>,
+    cmds: readonly Cmd<Msg>[],
+    msg: KeyMsg,
+    route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
+  ): Cmd<Msg>[] {
+    const observed = options.observeKey?.(msg, route);
+    if (observed === undefined) return [...cmds];
+    return [emitMsgForPage(model.activePageId, observed), ...cmds];
+  }
+
   function applyFrameNotificationState(
     model: InternalFrameModel<PageModel, Msg>,
     notifications: NotificationState<never>,
@@ -545,15 +569,16 @@ export function createFramedApp<PageModel, Msg>(
 
       if (isKeyMsg(msg)) {
         if (model.commandPalette != null) {
-          return handlePaletteKey(msg, model, paletteKeys, options, pagesById);
+          const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
+          return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
 
         // Help acts as a modal layer when open: only close keys are handled.
         if (model.helpOpen) {
           if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === '?')) {
-            return [{ ...model, helpOpen: false }, []];
+            return [{ ...model, helpOpen: false }, withObservedKey(model, [], msg, 'help')];
           }
-          return [model, []];
+          return [model, withObservedKey(model, [], msg, 'help')];
         }
 
         const activePage = pagesById.get(model.activePageId)!;
@@ -564,37 +589,39 @@ export function createFramedApp<PageModel, Msg>(
 
         if (keyPriority === 'page-first') {
           if (pageAction !== undefined) {
-            return [model, [emitMsgForPage(model.activePageId, pageAction)]];
+            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
           }
           if (globalAction !== undefined) {
-            return [model, [emitMsg(globalAction)]];
+            return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
           }
           if (frameAction !== undefined) {
             if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
-              return [openCommandPalette(model, frameKeys, options, pagesById), []];
+              return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
             }
-            return applyFrameAction(frameAction, model, options, pagesById);
+            const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
+            return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
           }
-          return [model, []];
+          return [model, withObservedKey(model, [], msg, 'unhandled')];
         }
 
         if (frameAction !== undefined) {
           // Handle palette opening here since applyFrameAction doesn't have access to palette deps
           if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
-            return [openCommandPalette(model, frameKeys, options, pagesById), []];
+            return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
           }
-          return applyFrameAction(frameAction, model, options, pagesById);
+          const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
+          return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
         }
 
         if (globalAction !== undefined) {
-          return [model, [emitMsg(globalAction)]];
+          return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
         }
 
         if (pageAction !== undefined) {
-          return [model, [emitMsgForPage(model.activePageId, pageAction)]];
+          return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
         }
 
-        return [model, []];
+        return [model, withObservedKey(model, [], msg, 'unhandled')];
       }
 
       if (isMouseMsg(msg)) {

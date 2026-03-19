@@ -64,6 +64,7 @@ type Msg =
   | { type: 'activate-focused' }
   | { type: 'dismiss-notification' }
   | { type: 'notification-tick' }
+  | { type: 'key-observed'; key: string; route: string }
   | { type: 'quit-app' }
   | { type: 'notification-action'; ordinal: number };
 
@@ -470,6 +471,11 @@ const page: FramePage<PageModel, Msg> = {
           notifications,
         }, notifications, [], true);
       }
+      case 'key-observed':
+        return [appendLog({
+          ...model,
+          lastHandledInput: `${msg.key}:${msg.route}`,
+        }, `[key ${msg.key}] route=${msg.route}`), []];
       case 'quit-app':
         return [model, [quit()]];
       default:
@@ -517,6 +523,12 @@ const app = createFramedApp<PageModel, Msg>({
   title: 'Bijou Notification Lab',
   pages: [page],
   keyPriority: 'page-first',
+  helpLineSource: ({ activePage }) => activePage.helpSource ?? activePage.keyMap,
+  observeKey: (msg, route) => ({
+    type: 'key-observed',
+    key: `${msg.ctrl ? 'ctrl+' : ''}${msg.alt ? 'alt+' : ''}${msg.shift ? 'shift+' : ''}${msg.key}`,
+    route,
+  }),
   enableCommandPalette: true,
   overlayFactory(frame) {
     const paneRects = [...frame.paneRects.values()];
