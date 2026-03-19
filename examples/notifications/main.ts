@@ -2,15 +2,18 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
 import {
   activateFocusedNotification,
+  countNotificationHistory,
   createFramedApp,
   createKeyMap,
   createNotificationState,
   cycleNotificationFocus,
   dismissFocusedNotification,
   dismissNotification,
+  modal,
   notificationsNeedTick,
   pushNotification,
   relocateNotifications,
+  renderNotificationHistory,
   quit,
   renderNotificationStack,
   run,
@@ -19,6 +22,7 @@ import {
   trimNotificationsToViewport,
   type Cmd,
   type FramePage,
+  type NotificationHistoryFilter,
   type NotificationPlacement,
   type NotificationSpec,
   type NotificationState,
@@ -43,6 +47,15 @@ const PLACEMENTS: readonly NotificationPlacement[] = [
   'CENTER',
 ];
 
+const HISTORY_FILTERS: readonly NotificationHistoryFilter[] = [
+  'ALL',
+  'ACTIONABLE',
+  'ERROR',
+  'WARNING',
+  'SUCCESS',
+  'INFO',
+];
+
 const DURATION_OPTIONS = [
   { label: 'default', value: undefined },
   { label: 'persistent', value: null },
@@ -59,6 +72,13 @@ type Msg =
   | { type: 'cycle-duration' }
   | { type: 'toggle-action' }
   | { type: 'toggle-wrap' }
+  | { type: 'open-history' }
+  | { type: 'close-history' }
+  | { type: 'history-next' }
+  | { type: 'history-prev' }
+  | { type: 'history-page-down' }
+  | { type: 'history-page-up' }
+  | { type: 'cycle-history-filter' }
   | { type: 'focus-next' }
   | { type: 'focus-prev' }
   | { type: 'activate-focused' }
@@ -77,6 +97,9 @@ interface PageModel {
   readonly durationIndex: number;
   readonly actionEnabled: boolean;
   readonly wrapText: boolean;
+  readonly historyOpen: boolean;
+  readonly historyScroll: number;
+  readonly historyFilterIndex: number;
   readonly nextOrdinal: number;
   readonly lastHandledInput: string;
   readonly log: readonly string[];
@@ -92,6 +115,9 @@ function createInitialPageModel(): PageModel {
     durationIndex: 0,
     actionEnabled: true,
     wrapText: true,
+    historyOpen: false,
+    historyScroll: 0,
+    historyFilterIndex: 0,
     nextOrdinal: 1,
     lastHandledInput: 'none',
     log: [
@@ -115,6 +141,18 @@ function currentPlacement(model: PageModel): NotificationPlacement {
 
 function currentDuration(model: PageModel) {
   return DURATION_OPTIONS[model.durationIndex]!;
+}
+
+function currentHistoryFilter(model: PageModel): NotificationHistoryFilter {
+  return HISTORY_FILTERS[model.historyFilterIndex]!;
+}
+
+function maxHistoryScroll(model: PageModel): number {
+  return Math.max(0, countNotificationHistory(model.notifications, currentHistoryFilter(model)) - 1);
+}
+
+function clampHistoryScroll(model: PageModel, nextScroll: number): number {
+  return Math.max(0, Math.min(nextScroll, maxHistoryScroll(model)));
 }
 
 function toneCopy(tone: NotificationTone): { readonly title: string; readonly message: string } {
@@ -173,6 +211,14 @@ function recordInput(model: PageModel, key: string, message: string): PageModel 
     ...model,
     lastHandledInput: key,
   }, `[${key}] ${message}`);
+}
+
+function openHistory(model: PageModel, key: string): PageModel {
+  return recordInput({
+    ...model,
+    historyOpen: true,
+    historyScroll: clampHistoryScroll(model, model.historyScroll),
+  }, key, `Opened notification history (${countNotificationHistory(model.notifications, currentHistoryFilter(model))} items).`);
 }
 
 function applyNotificationState(
@@ -323,6 +369,7 @@ function renderControlsPane(model: PageModel, width: number): string {
   const activePlacement = currentPlacement(model);
   const nextPlacement = PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!;
   const activeDuration = currentDuration(model);
+  const historyFilter = currentHistoryFilter(model);
   const focused = model.notifications.focusedId == null
     ? 'none'
     : `#${model.notifications.focusedId}`;
@@ -338,6 +385,7 @@ function renderControlsPane(model: PageModel, width: number): string {
     `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
     `Stack   : ${model.notifications.items.length}`,
     `History : ${model.notifications.history.length}`,
+    `Center  : ${model.historyOpen ? 'open' : 'closed'} (${historyFilter})`,
     `Focus   : ${focused}`,
     `Last key: ${model.lastHandledInput}`,
     '',
@@ -348,6 +396,7 @@ function renderControlsPane(model: PageModel, width: number): string {
     `${kbd('d')} cycle duration`,
     `${kbd('a')} toggle action`,
     `${kbd('w')} toggle wrap`,
+    `${kbd('shift+h')} open history center`,
     `${kbd('j')} / ${kbd('k')} focus action`,
     `${kbd('enter')} run action`,
     `${kbd('x')} dismiss focused/latest`,
@@ -376,6 +425,29 @@ function renderLogPane(model: PageModel, width: number): string {
     width,
     title: 'Activity',
     overflow: model.wrapText ? 'wrap' : 'truncate',
+    ctx,
+  });
+}
+
+function renderHistoryModal(model: PageModel, screenWidth: number, screenHeight: number) {
+  const modalWidth = Math.max(48, Math.min(96, screenWidth - 6));
+  const bodyWidth = Math.max(20, modalWidth - 4);
+  const bodyHeight = Math.max(8, Math.min(screenHeight - 8, 20));
+  const filter = currentHistoryFilter(model);
+
+  return modal({
+    title: `Notification History (${filter})`,
+    body: renderNotificationHistory(model.notifications, {
+      width: bodyWidth,
+      height: bodyHeight,
+      scroll: model.historyScroll,
+      filter,
+      ctx,
+    }),
+    hint: 'Up/Down scroll • PageUp/PageDown jump • f filter • Esc close',
+    width: modalWidth,
+    screenWidth,
+    screenHeight,
     ctx,
   });
 }
@@ -437,12 +509,63 @@ const page: FramePage<PageModel, Msg> = {
           ...model,
           wrapText: !model.wrapText,
         }, 'w', `Wrap ${!model.wrapText ? 'enabled' : 'disabled'}.`), []];
+      case 'open-history':
+        return [openHistory(model, 'shift+h'), []];
+      case 'close-history':
+        if (!model.historyOpen) return [model, []];
+        return [recordInput({
+          ...model,
+          historyOpen: false,
+        }, 'escape', 'Closed notification history.'), []];
+      case 'history-next':
+        if (!model.historyOpen) return [model, []];
+        return [{
+          ...model,
+          historyScroll: clampHistoryScroll(model, model.historyScroll + 1),
+        }, []];
+      case 'history-prev':
+        if (!model.historyOpen) return [model, []];
+        return [{
+          ...model,
+          historyScroll: clampHistoryScroll(model, model.historyScroll - 1),
+        }, []];
+      case 'history-page-down':
+        if (!model.historyOpen) return [model, []];
+        return [{
+          ...model,
+          historyScroll: clampHistoryScroll(model, model.historyScroll + 5),
+        }, []];
+      case 'history-page-up':
+        if (!model.historyOpen) return [model, []];
+        return [{
+          ...model,
+          historyScroll: clampHistoryScroll(model, model.historyScroll - 5),
+        }, []];
+      case 'cycle-history-filter':
+        if (!model.historyOpen) return [model, []];
+        return [recordInput({
+          ...model,
+          historyFilterIndex: (model.historyFilterIndex + 1) % HISTORY_FILTERS.length,
+          historyScroll: 0,
+        }, 'f', `History filter -> ${HISTORY_FILTERS[(model.historyFilterIndex + 1) % HISTORY_FILTERS.length]!}.`), []];
       case 'focus-next':
+        if (model.historyOpen) {
+          return [{
+            ...model,
+            historyScroll: clampHistoryScroll(model, model.historyScroll + 1),
+          }, []];
+        }
         return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, 1),
         }, 'j', 'Focused next actionable notification.'), []];
       case 'focus-prev':
+        if (model.historyOpen) {
+          return [{
+            ...model,
+            historyScroll: clampHistoryScroll(model, model.historyScroll - 1),
+          }, []];
+        }
         return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, -1),
@@ -477,6 +600,12 @@ const page: FramePage<PageModel, Msg> = {
           lastHandledInput: `${msg.key}:${msg.route}`,
         }, `[key ${msg.key}] route=${msg.route}`), []];
       case 'quit-app':
+        if (model.historyOpen) {
+          return [recordInput({
+            ...model,
+            historyOpen: false,
+          }, 'q', 'Closed notification history.'), []];
+        }
         return [model, [quit()]];
       default:
         return [model, []];
@@ -490,11 +619,27 @@ const page: FramePage<PageModel, Msg> = {
     .bind('d', 'Cycle duration', { type: 'cycle-duration' })
     .bind('a', 'Toggle action button', { type: 'toggle-action' })
     .bind('w', 'Toggle text wrap', { type: 'toggle-wrap' })
+    .bind('shift+h', 'Open notification history', { type: 'open-history' })
+    .bind('escape', 'Close history modal', { type: 'close-history' })
+    .bind('up', 'Scroll history up', { type: 'history-prev' })
+    .bind('down', 'Scroll history down', { type: 'history-next' })
+    .bind('pageup', 'History page up', { type: 'history-page-up' })
+    .bind('pagedown', 'History page down', { type: 'history-page-down' })
+    .bind('f', 'Cycle history filter', { type: 'cycle-history-filter' })
     .bind('j', 'Focus next actionable notification', { type: 'focus-next' })
     .bind('k', 'Focus previous actionable notification', { type: 'focus-prev' })
     .bind('enter', 'Run focused notification action', { type: 'activate-focused' })
     .bind('x', 'Dismiss focused/latest notification', { type: 'dismiss-notification' })
-    .bind('q', 'Quit demo', { type: 'quit-app' }),
+    .bind('q', 'Quit demo / Close history', { type: 'quit-app' }),
+  commandItems(model) {
+    return [{
+      id: 'view-history',
+      label: 'View notifications history',
+      description: `${countNotificationHistory(model.notifications, currentHistoryFilter(model))} archived notifications`,
+      category: 'Notifications',
+      action: { type: 'open-history' },
+    }];
+  },
   layout(model) {
     return {
       kind: 'grid',
@@ -541,7 +686,7 @@ const app = createFramedApp<PageModel, Msg>({
         height: Math.max(...paneRects.map((rect) => rect.row + rect.height)) - Math.min(...paneRects.map((rect) => rect.row)),
       };
 
-    return renderNotificationStack(frame.pageModel.notifications, {
+    const overlays = renderNotificationStack(frame.pageModel.notifications, {
       screenWidth: frame.screenRect.width,
       screenHeight: frame.screenRect.height,
       region,
@@ -549,6 +694,12 @@ const app = createFramedApp<PageModel, Msg>({
       gap: 1,
       ctx,
     });
+
+    if (frame.pageModel.historyOpen) {
+      overlays.push(renderHistoryModal(frame.pageModel, frame.screenRect.width, frame.screenRect.height));
+    }
+
+    return overlays;
   },
 });
 
