@@ -719,11 +719,12 @@ function applyAnimationOffset(
   placement: NotificationPlacement,
   width: number,
   height: number,
+  margin: number,
   progress: number,
 ): { readonly rowDelta: number; readonly colDelta: number } {
   const remaining = 1 - progress;
-  const slideX = Math.round(remaining * Math.max(2, Math.min(8, Math.floor(width / 4))));
-  const slideY = Math.round(remaining * Math.max(1, Math.min(3, Math.floor(height / 2))));
+  const slideX = Math.round(remaining * (width + margin));
+  const slideY = Math.round(remaining * (height + margin));
 
   switch (placement) {
     case 'UPPER_LEFT':
@@ -853,11 +854,12 @@ function renderOverflowExits<Msg>(
         placement,
         entry.surface.width,
         entry.surface.height,
+        margin,
         entry.item.progress,
       );
       overlays.push({
-        row: Math.max(0, region.row + cursor + offset.rowDelta),
-        col: Math.max(0, region.col + baseCol + offset.colDelta),
+        row: region.row + cursor + offset.rowDelta,
+        col: region.col + baseCol + offset.colDelta,
         surface: entry.surface,
         content: options.ctx != null
           ? surfaceToString(entry.surface, options.ctx.style)
@@ -878,11 +880,12 @@ function renderOverflowExits<Msg>(
       placement,
       entry.surface.width,
       entry.surface.height,
+      margin,
       entry.item.progress,
     );
     overlays.push({
-      row: Math.max(0, region.row + cursor + offset.rowDelta),
-      col: Math.max(0, region.col + baseCol + offset.colDelta),
+      row: region.row + cursor + offset.rowDelta,
+      col: region.col + baseCol + offset.colDelta,
       surface: entry.surface,
       content: options.ctx != null
         ? surfaceToString(entry.surface, options.ctx.style)
@@ -952,11 +955,12 @@ export function renderNotificationStack<Msg>(
         placement,
         entry.surface.width,
         entry.surface.height,
+        margin,
         entry.item.progress,
       );
       overlays.push({
-        row: Math.max(0, region.row + baseRow + offset.rowDelta),
-        col: Math.max(0, region.col + baseCol + offset.colDelta),
+        row: region.row + baseRow + offset.rowDelta,
+        col: region.col + baseCol + offset.colDelta,
         surface: entry.surface,
         content: options.ctx != null
           ? surfaceToString(entry.surface, options.ctx.style)

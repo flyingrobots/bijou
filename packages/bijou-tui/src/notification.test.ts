@@ -287,6 +287,41 @@ describe('renderNotificationStack', () => {
     expect(moved.items[0]?.phase).toBe('entering');
   });
 
+  it('starts entry animations fully off-screen for edge-anchored placements', () => {
+    let leftState = createNotificationState<Msg>();
+    leftState = pushNotification(leftState, {
+      title: 'Off-screen left',
+      variant: 'TOAST',
+      placement: 'UPPER_LEFT',
+      durationMs: null,
+    }, 0);
+
+    const [leftOverlay] = renderNotificationStack(leftState, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    expect(leftOverlay).toBeDefined();
+    expect(leftOverlay!.surface).toBeDefined();
+    expect(leftOverlay!.col + leftOverlay!.surface!.width).toBeLessThanOrEqual(0);
+
+    let rightState = createNotificationState<Msg>();
+    rightState = pushNotification(rightState, {
+      title: 'Off-screen right',
+      variant: 'TOAST',
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+
+    const [rightOverlay] = renderNotificationStack(rightState, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    expect(rightOverlay).toBeDefined();
+    expect(rightOverlay!.col).toBeGreaterThanOrEqual(90);
+  });
+
   it('keeps a dismissed notification on-screen long enough to animate out', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
@@ -324,6 +359,30 @@ describe('renderNotificationStack', () => {
       screenHeight: 30,
     });
     expect(overlays).toHaveLength(0);
+  });
+
+  it('slides dismissed notifications fully off-screen before archiving them', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Exit to the right',
+      message: 'This should travel all the way off-screen before removal.',
+      variant: 'TOAST',
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = tickNotifications(state, 619);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 90,
+      screenHeight: 30,
+    });
+
+    expect(overlay).toBeDefined();
+    expect(overlay!.col).toBeGreaterThanOrEqual(90);
+    expect(state.items[0]?.phase).toBe('exiting');
   });
 
   it('renders overflowed notifications through an exit lane before archiving them', () => {
