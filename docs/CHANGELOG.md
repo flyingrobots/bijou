@@ -6,6 +6,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-03-18
+
 ### ✨ Features
 
 - **Stacked notification overlays** — `@flyingrobots/bijou-tui` now ships a reusable notification stack with actionable, inline, and toast variants; configurable placement/duration/action payloads; stacked screen-edge rendering; and animated enter/exit transitions, plus a new framed `examples/notifications` lab for interactive evaluation.
@@ -917,7 +919,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/flyingrobots/bijou/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/flyingrobots/bijou/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/flyingrobots/bijou/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/flyingrobots/bijou/compare/v1.8.0...v2.0.0
