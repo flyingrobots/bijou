@@ -140,7 +140,7 @@ function matchesHistoryFilter<Msg>(
   filter: NotificationHistoryFilter,
 ): boolean {
   if (filter === 'ALL') return true;
-  if (filter === 'ACTIONABLE') return item.action != null;
+  if (filter === 'ACTIONABLE') return item.variant === 'ACTIONABLE';
   return item.tone === filter;
 }
 
@@ -148,7 +148,11 @@ export function countNotificationHistory<Msg>(
   state: NotificationState<Msg>,
   filter: NotificationHistoryFilter = 'ALL',
 ): number {
-  return state.history.filter((item) => matchesHistoryFilter(item, filter)).length;
+  let count = 0;
+  for (const item of state.history) {
+    if (matchesHistoryFilter(item, filter)) count++;
+  }
+  return count;
 }
 
 function filterLabel(filter: NotificationHistoryFilter): string {
@@ -160,7 +164,7 @@ function renderHistoryEntry<Msg>(
   width: number,
   ctx: BijouContext | undefined,
 ): readonly string[] {
-  const safeWidth = Math.max(12, width);
+  const safeWidth = Math.max(1, width);
   const toneLabel = `[${item.tone}]`;
   const title = ctx == null
     ? `${toneLabel} ${item.title}`
@@ -190,8 +194,8 @@ export function renderNotificationHistory<Msg>(
   state: NotificationState<Msg>,
   options: RenderNotificationHistoryOptions,
 ): string {
-  const safeWidth = Math.max(20, options.width);
-  const safeHeight = Math.max(4, options.height);
+  const safeWidth = Math.max(1, options.width);
+  const safeHeight = Math.max(3, options.height);
   const filter = options.filter ?? 'ALL';
   const filtered = state.history.filter((item) => matchesHistoryFilter(item, filter));
   const maxBodyLines = Math.max(1, safeHeight - 2);

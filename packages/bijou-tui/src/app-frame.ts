@@ -102,6 +102,8 @@ export interface FramePage<PageModel, Msg> {
   layout(model: PageModel): FrameLayoutNode;
   /** Optional page keymap. */
   keyMap?: KeyMap<Msg>;
+  /** Optional modal keymap. When present, it captures all keys until dismissed. */
+  modalKeyMap?: (model: PageModel) => KeyMap<Msg> | undefined;
   /** Optional help source override. */
   helpSource?: BindingSource;
   /** Optional page-scoped command items for command palette listing/execution. */
@@ -582,6 +584,16 @@ export function createFramedApp<PageModel, Msg>(
         }
 
         const activePage = pagesById.get(model.activePageId)!;
+        const activePageModel = model.pageModels[model.activePageId]!;
+        const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
+        if (modalKeyMap != null) {
+          const modalAction = modalKeyMap.handle(msg);
+          if (modalAction !== undefined) {
+            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, modalAction)], msg, 'page')];
+          }
+          return [model, withObservedKey(model, [], msg, 'page')];
+        }
+
         const pageAction = activePage.keyMap?.handle(msg);
         const globalAction = options.globalKeys?.handle(msg);
         const frameAction = frameKeys.handle(msg);

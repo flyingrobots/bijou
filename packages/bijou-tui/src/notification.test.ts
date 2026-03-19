@@ -163,6 +163,31 @@ describe('notification state', () => {
     expect(stripAnsi(body)).not.toContain('Archived info');
   });
 
+  it('treats actionable history as the variant, not action presence', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Dismiss-only actionable',
+      message: 'Archived without a custom action payload.',
+      variant: 'ACTIONABLE',
+      tone: 'WARNING',
+      durationMs: null,
+    }, 0);
+
+    state = tickNotifications(state, 250);
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = tickNotifications(state, 900);
+
+    expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
+
+    const body = renderNotificationHistory(state, {
+      width: 28,
+      height: 8,
+      filter: 'ACTIONABLE',
+    });
+
+    expect(stripAnsi(body)).toMatch(/Dismiss-only actio\s*nable/);
+  });
+
   it('supports scrolling through archived notification history', () => {
     let state = createNotificationState<Msg>();
     for (let index = 0; index < 3; index++) {
