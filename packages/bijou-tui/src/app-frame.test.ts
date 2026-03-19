@@ -331,6 +331,67 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(1);
   });
 
+  it('can prefer page key bindings over frame scroll bindings', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => makeLongContent('home:main'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('l', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+      keyPriority: 'page-first',
+    });
+
+    const result = await runScript(app, [{ key: 'l' }]);
+    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
+  });
+
+  it('can override the short help strip with page bindings only', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => 'home',
+      }),
+      keyMap: createKeyMap<Msg>()
+        .bind('l', 'Cycle placement', { type: 'inc' })
+        .bind('q', 'Quit demo', { type: 'noop' }),
+    };
+
+    const app = createFramedApp({
+      title: 'Test',
+      pages: [page],
+      helpLineSource: ({ activePage }) => activePage.keyMap,
+    });
+
+    const result = await runScript(app, []);
+    const frame = surfaceToString(result.frames.at(-1)!, testCtx.style);
+
+    expect(frame).toContain('l Cycle placement');
+    expect(frame).toContain('q Quit demo');
+    expect(frame).not.toContain('[ Previous tab');
+    expect(frame).not.toContain('Tab Next pane');
+  });
+
   it('keeps init command messages scoped to their originating page', async () => {
     const initInc: Cmd<Msg> = async () => ({ type: 'inc' });
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
@@ -657,5 +718,38 @@ describe('createFramedApp', () => {
     expect(lines[1]).toContain('[NORMAL]');
     expect(lines[1]).toContain('page:home');
     expect(lines[1]).toContain('pane:main');
+  });
+
+  it('renders routed runtime issues through frame-managed notifications', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const [model] = app.init();
+    const runtimeMsg = app.routeRuntimeIssue?.({
+      level: 'error',
+      source: 'command',
+      message: 'Command rejected: worker crashed during boot',
+      atMs: 0,
+    });
+
+    expect(runtimeMsg).toBeDefined();
+
+    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
+
+    expect(nextModel.runtimeNotifications.items).toHaveLength(1);
+    expect(tickMsg).toBeDefined();
+
+    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+    const frame = app.view(visibleModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const rendered = surfaceToString(frame, testCtx.style);
+    expect(rendered).toContain('Command rejected: worker crashed during boot');
+    expect(cmds).toHaveLength(1);
   });
 });

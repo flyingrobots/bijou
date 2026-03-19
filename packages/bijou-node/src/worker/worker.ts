@@ -1,9 +1,52 @@
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { resolve as resolvePath } from 'node:path';
-import type { BijouContext, RuntimePort } from '@flyingrobots/bijou';
+import {
+  installRuntimeViewportOverlay,
+  readRuntimeViewport,
+  updateRuntimeViewport,
+  type BijouContext,
+} from '@flyingrobots/bijou';
 import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
 import { createNodeContext } from '../index.js';
+
+interface WorkerInstance {
+  postMessage(message: unknown): void;
+  on(event: string, handler: (value: any) => void): void;
+  terminate(): Promise<number>;
+}
+
+interface WorkerParentPort {
+  on(event: string, listener: (msg: any) => void): void;
+  off(event: string, listener: (msg: any) => void): void;
+  postMessage(message: unknown): void;
+}
+
+interface WorkerThreadBindings {
+  isMainThread: boolean;
+  parentPort: WorkerParentPort | null;
+  workerData: unknown;
+  createWorker(entry: string, options: Record<string, unknown>): WorkerInstance;
+  createNodeContext(): BijouContext;
+  runApp<Model, M>(app: App<Model, M>, options: RunOptions<M>): Promise<void>;
+  scheduleTimeout(callback: () => void, ms: number): ReturnType<typeof setTimeout>;
+}
+
+function defaultWorkerThreadBindings(): WorkerThreadBindings {
+  return {
+    isMainThread,
+    parentPort,
+    workerData,
+    createWorker(entry, options) {
+      return new Worker(entry, options);
+    },
+    createNodeContext,
+    runApp: run,
+    scheduleTimeout(callback, ms) {
+      return setTimeout(callback, ms);
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Types & Messages
@@ -29,7 +72,8 @@ export type MainMessage =
  * Checks if the current environment is running inside a Bijou Worker.
  */
 export function isBijouWorker(): boolean {
-  return !isMainThread && workerData?.isBijouWorker === true;
+  const bindings = defaultWorkerThreadBindings();
+  return !bindings.isMainThread && (bindings.workerData as { isBijouWorker?: boolean } | null)?.isBijouWorker === true;
 }
 
 /**
@@ -37,8 +81,9 @@ export function isBijouWorker(): boolean {
  * This will be received via the `onMessage` callback in `runInWorker`.
  */
 export function sendToMain(payload: unknown): void {
-  if (parentPort) {
-    parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
+  const bindings = defaultWorkerThreadBindings();
+  if (bindings.parentPort) {
+    bindings.parentPort.postMessage({ type: 'data', payload } satisfies MainMessage);
   }
 }
 
@@ -104,13 +149,16 @@ export interface WorkerHandle {
  * @param options - Configuration including the path to the worker entry file.
  * @returns A handle to the running worker.
  */
-export function runInWorker(options: RunWorkerOptions): WorkerHandle {
-  if (!isMainThread) {
+export function runInWorker(
+  options: RunWorkerOptions,
+  bindings: WorkerThreadBindings = defaultWorkerThreadBindings(),
+): WorkerHandle {
+  if (!bindings.isMainThread) {
     throw new Error('runInWorker must be called from the main thread.');
   }
 
-  const ctx = options.ctx ?? createNodeContext();
-  installRuntimeOverlay(ctx);
+  const ctx = options.ctx ?? bindings.createNodeContext();
+  installRuntimeViewportOverlay(ctx);
   const useAltScreen = options.altScreen ?? true;
   const useHideCursor = options.hideCursor ?? true;
   const useMouse = options.mouse ?? false;
@@ -132,14 +180,11 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
     css: options.css,
   };
 
-  const worker = new Worker(resolvePath(options.entry), {
+  const worker = bindings.createWorker(resolvePath(options.entry), {
     workerData: {
       isBijouWorker: true,
       options: serializableOptions,
-      runtime: {
-        columns: sanitizeDimension(ctx.runtime.columns),
-        rows: sanitizeDimension(ctx.runtime.rows),
-      },
+      runtime: readRuntimeViewport(ctx.runtime),
     } satisfies BijouWorkerData,
     execArgv: options.execArgv,
     // Pipe stdout/stderr so we can capture logs if needed, but primarily use IPC
@@ -151,11 +196,8 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
   });
 
   const resizeHandle = ctx.io.onResize((columns: number, rows: number) => {
-    const nextColumns = sanitizeDimension(columns);
-    const nextRows = sanitizeDimension(rows);
-    ctx.runtime.columns = nextColumns;
-    ctx.runtime.rows = nextRows;
-    worker.postMessage({ type: 'io:resize', columns: nextColumns, rows: nextRows } satisfies WorkerMessage);
+    const nextViewport = updateRuntimeViewport(ctx.runtime, columns, rows);
+    worker.postMessage({ type: 'io:resize', ...nextViewport } satisfies WorkerMessage);
   });
 
   const onExit = new Promise<void>((resolve, reject) => {
@@ -173,7 +215,7 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
         if (options.onMessage) options.onMessage(msg.payload);
       } else if (msg.type === 'quit') {
         requestedQuit = true;
-        setTimeout(() => {
+        bindings.scheduleTimeout(() => {
           if (requestedQuit) {
             forcedTerminate = true;
             void worker.terminate();
@@ -230,27 +272,33 @@ export function runInWorker(options: RunWorkerOptions): WorkerHandle {
  * 
  * @param app - The TEA app to run.
  */
-export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void> {
-  if (isMainThread || !parentPort) {
+export async function startWorkerApp<Model, M>(
+  app: App<Model, M>,
+  bindings: WorkerThreadBindings = defaultWorkerThreadBindings(),
+): Promise<void> {
+  if (bindings.isMainThread || !bindings.parentPort) {
     throw new Error('startWorkerApp must be called from within a worker thread.');
   }
 
-  const initData = workerData as BijouWorkerData;
+  const initData = bindings.workerData as BijouWorkerData;
 
   // Create a proxy Context that speaks IPC instead of true I/O
-  const proxyCtx = createNodeContext();
-  installRuntimeOverlay(proxyCtx);
+  const proxyCtx = bindings.createNodeContext();
+  installRuntimeViewportOverlay(proxyCtx);
   const { setDefaultContext } = await import('@flyingrobots/bijou');
   setDefaultContext(proxyCtx);
-  proxyCtx.runtime.columns = sanitizeDimension(initData.runtime?.columns ?? proxyCtx.runtime.columns);
-  proxyCtx.runtime.rows = sanitizeDimension(initData.runtime?.rows ?? proxyCtx.runtime.rows);
+  updateRuntimeViewport(
+    proxyCtx.runtime,
+    initData.runtime?.columns ?? proxyCtx.runtime.columns,
+    initData.runtime?.rows ?? proxyCtx.runtime.rows,
+  );
   
   // Hijack the WritePort to send frames back to main thread
   proxyCtx.io.write = (data: string) => {
-    parentPort!.postMessage({ type: 'render:frame', output: data } satisfies MainMessage);
+    bindings.parentPort!.postMessage({ type: 'render:frame', output: data } satisfies MainMessage);
   };
   proxyCtx.io.writeError = (data: string) => {
-    parentPort!.postMessage({ type: 'error', message: data } satisfies MainMessage);
+    bindings.parentPort!.postMessage({ type: 'error', message: data } satisfies MainMessage);
   };
 
   // We need to bypass the standard run() setup since the main thread 
@@ -268,23 +316,22 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:data') handler(msg.data);
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
   proxyCtx.io.onResize = (handler) => {
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'io:resize') {
-        proxyCtx.runtime.columns = sanitizeDimension(msg.columns);
-        proxyCtx.runtime.rows = sanitizeDimension(msg.rows);
-        handler(proxyCtx.runtime.columns, proxyCtx.runtime.rows);
+        const nextViewport = updateRuntimeViewport(proxyCtx.runtime, msg.columns, msg.rows);
+        handler(nextViewport.columns, nextViewport.rows);
       }
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
@@ -292,57 +339,15 @@ export async function startWorkerApp<Model, M>(app: App<Model, M>): Promise<void
     const listener = (msg: WorkerMessage) => {
       if (msg.type === 'data') handler(msg.payload);
     };
-    parentPort!.on('message', listener);
+    bindings.parentPort!.on('message', listener);
     return {
-      dispose: () => parentPort!.off('message', listener)
+      dispose: () => bindings.parentPort!.off('message', listener)
     };
   };
 
   // Run the app using the proxy context
-  await run(app, proxyOptions);
+  await bindings.runApp(app, proxyOptions);
 
   // Signal main thread to shut down
-  parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
-}
-
-function sanitizeDimension(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.floor(value));
-}
-
-function installRuntimeOverlay(ctx: BijouContext): RuntimePort {
-  const baseRuntime = ctx.runtime;
-  const state = {
-    columns: sanitizeDimension(baseRuntime.columns),
-    rows: sanitizeDimension(baseRuntime.rows),
-  };
-  const runtime: RuntimePort = {
-    env(key: string): string | undefined {
-      return baseRuntime.env(key);
-    },
-    get stdoutIsTTY(): boolean {
-      return baseRuntime.stdoutIsTTY;
-    },
-    get stdinIsTTY(): boolean {
-      return baseRuntime.stdinIsTTY;
-    },
-    get columns(): number {
-      return state.columns;
-    },
-    set columns(value: number) {
-      state.columns = sanitizeDimension(value);
-    },
-    get rows(): number {
-      return state.rows;
-    },
-    set rows(value: number) {
-      state.rows = sanitizeDimension(value);
-    },
-    get refreshRate(): number {
-      return baseRuntime.refreshRate;
-    },
-  };
-
-  (ctx as { runtime: RuntimePort }).runtime = runtime;
-  return runtime;
+  bindings.parentPort.postMessage({ type: 'quit' } satisfies MainMessage);
 }

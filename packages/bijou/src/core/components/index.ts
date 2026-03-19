@@ -8,6 +8,7 @@
 
 export { spinnerFrame, createSpinner } from './spinner.js';
 export type { SpinnerOptions, SpinnerController } from './spinner.js';
+export type { OverflowBehavior } from './types.js';
 
 export { progressBar, createProgressBar, createAnimatedProgressBar } from './progress.js';
 export type { ProgressBarOptions, LiveProgressBarOptions, AnimatedProgressBarOptions, ProgressBarController } from './progress.js';

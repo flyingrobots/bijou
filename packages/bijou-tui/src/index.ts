@@ -8,7 +8,20 @@
  */
 
 // Types
-export type { App, Cmd, KeyMsg, ResizeMsg, MouseMsg, MouseButton, MouseAction, QuitSignal, RunOptions } from './types.js';
+export type {
+  App,
+  Cmd,
+  KeyMsg,
+  ResizeMsg,
+  MouseMsg,
+  MouseButton,
+  MouseAction,
+  QuitSignal,
+  RunOptions,
+  RuntimeIssue,
+  RuntimeIssueLevel,
+  RuntimeIssueSource,
+} from './types.js';
 export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 
 // Key parsing
@@ -107,6 +120,7 @@ export {
   type FramePage,
   type FrameLayoutNode,
   type FrameOverlayContext,
+  type FrameRuntimeNotificationOptions,
   type CreateFramedAppOptions,
   type PageTransition,
   type FramePaneScroll,
@@ -336,6 +350,31 @@ export {
   drawer,
   tooltip,
 } from './overlay.js';
+
+// Notification stack overlays
+export {
+  type NotificationVariant,
+  type NotificationTone,
+  type NotificationPlacement,
+  type NotificationAction,
+  type NotificationSpec,
+  type NotificationPhase,
+  type NotificationRecord,
+  type NotificationState,
+  type RenderNotificationStackOptions,
+  createNotificationState,
+  pushNotification,
+  dismissNotification,
+  dismissFocusedNotification,
+  relocateNotifications,
+  cycleNotificationFocus,
+  activateFocusedNotification,
+  trimNotificationsToViewport,
+  tickNotifications,
+  hasNotifications,
+  notificationsNeedTick,
+  renderNotificationStack,
+} from './notification.js';
 
 // Interactive accordion
 export {

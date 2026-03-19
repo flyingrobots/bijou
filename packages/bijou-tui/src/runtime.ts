@@ -1,5 +1,13 @@
-import { getDefaultContext, createSurface, surfaceToString, resolveClock } from '@flyingrobots/bijou';
-import type { RuntimePort, WritePort, Surface, TimerHandle } from '@flyingrobots/bijou';
+import {
+  getDefaultContext,
+  createSurface,
+  surfaceToString,
+  resolveClock,
+  installRuntimeViewportOverlay,
+  readRuntimeViewport,
+  updateRuntimeViewport,
+} from '@flyingrobots/bijou';
+import type { WritePort, Surface, TimerHandle } from '@flyingrobots/bijou';
 import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
@@ -10,6 +18,7 @@ import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
+import type { RuntimeIssue } from './types.js';
 
 /**
  * Disable mouse reporting sequences that terminals may send.
@@ -46,11 +55,12 @@ export async function run<Model, M>(
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
   const clock = resolveClock(ctx);
-  installRuntimeOverlay(ctx);
+  installRuntimeViewportOverlay(ctx);
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
   const useMouse = options?.mouse ?? false;
   installBCSSResolver(ctx, options?.css);
+  const runtimeViewport = () => readRuntimeViewport(ctx.runtime);
 
   const [initModel, initCmds] = app.init();
 
@@ -61,9 +71,10 @@ export async function run<Model, M>(
     if (typeof viewOutput === 'string') {
       output = viewOutput;
     } else {
+      const viewport = runtimeViewport();
       const normalized = normalizeViewOutput(viewOutput, {
-        width: sanitizeDimension(ctx.runtime.columns),
-        height: sanitizeDimension(ctx.runtime.rows),
+        width: viewport.columns,
+        height: viewport.rows,
       });
       output = surfaceToString(normalized.surface, ctx.style);
     }
@@ -80,10 +91,15 @@ export async function run<Model, M>(
   let fatalError: unknown = null;
 
   // Double Buffering: track what is currently on screen
-  let currentSurface: Surface = createSurface(
-    sanitizeDimension(ctx.runtime.columns),
-    sanitizeDimension(ctx.runtime.rows),
-  );
+  const initialViewport = runtimeViewport();
+  let currentSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
+
+  function routeRuntimeIssue(issue: RuntimeIssue): void {
+    const routed = app.routeRuntimeIssue?.(issue);
+    if (routed !== undefined) {
+      bus.emit(routed);
+    }
+  }
 
   const bus = createEventBus<M>({
     clock,
@@ -92,6 +108,26 @@ export async function run<Model, M>(
         ? `${error.name}: ${error.message}`
         : String(error);
       writeErrorLine(ctx.io, `[EventBus] Command rejected: ${message}\n`);
+      routeRuntimeIssue({
+        level: 'error',
+        source: 'command',
+        message,
+        atMs: clock.now(),
+        error,
+      });
+    },
+    onError(message, error) {
+      const detail = error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+      writeErrorLine(ctx.io, `${message} ${detail}\n`);
+      routeRuntimeIssue({
+        level: 'warning',
+        source: 'eventbus',
+        message: `${message} ${detail}`,
+        atMs: clock.now(),
+        error,
+      });
     },
   });
 
@@ -101,9 +137,10 @@ export async function run<Model, M>(
   // 1. Layout Logic Stage
   pipeline.use('Layout', (state, next) => {
     const viewOutput = app.view(state.model);
+    const viewport = runtimeViewport();
     (state as any).layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
-      width: sanitizeDimension(ctx.runtime.columns),
-      height: sanitizeDimension(ctx.runtime.rows),
+      width: viewport.columns,
+      height: viewport.rows,
     });
     next();
   });
@@ -175,9 +212,10 @@ export async function run<Model, M>(
     let scheduledHandle: TimerHandle | null = null;
     scheduledHandle = clock.setTimeout(() => {
       try {
+        const viewport = runtimeViewport();
         const targetSurface = createSurface(
-          sanitizeDimension(ctx.runtime.columns),
-          sanitizeDimension(ctx.runtime.rows),
+          viewport.columns,
+          viewport.rows,
         );
 
         const renderState: RenderState = {
@@ -192,6 +230,13 @@ export async function run<Model, M>(
 
         pipeline.execute(renderState);
       } catch (error) {
+        routeRuntimeIssue({
+          level: 'error',
+          source: 'runtime',
+          message: error instanceof Error ? error.message : String(error),
+          atMs: clock.now(),
+          error,
+        });
         writeErrorLine(
           ctx.io,
           `[Runtime Error] ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
@@ -235,11 +280,10 @@ export async function run<Model, M>(
     }
 
     if (isResizeMsg(msg)) {
-      ctx.runtime.columns = sanitizeDimension(msg.columns);
-      ctx.runtime.rows = sanitizeDimension(msg.rows);
+      const viewport = updateRuntimeViewport(ctx.runtime, msg.columns, msg.rows);
       currentSurface = createSurface(
-        ctx.runtime.columns,
-        ctx.runtime.rows,
+        viewport.columns,
+        viewport.rows,
       );
       clearAndHome(ctx.io);
     }
@@ -262,20 +306,19 @@ export async function run<Model, M>(
 
   // Apply an initial runtime-size sync before first render.
   // This keeps framed apps sized from ports instead of process globals.
+  const syncedViewport = runtimeViewport();
   const initialResize: ResizeMsg = {
     type: 'resize',
-    columns: sanitizeDimension(ctx.runtime.columns),
-    rows: sanitizeDimension(ctx.runtime.rows),
+    columns: syncedViewport.columns,
+    rows: syncedViewport.rows,
   };
   const [resizedModel, resizeCmds] = app.update(initialResize, model);
   model = resizedModel;
 
   // After a potential resize in update, ensure currentSurface matches size
   // to avoid diffing mismatched grids.
-  currentSurface = createSurface(
-    sanitizeDimension(ctx.runtime.columns),
-    sanitizeDimension(ctx.runtime.rows),
-  );
+  const postResizeViewport = runtimeViewport();
+  currentSurface = createSurface(postResizeViewport.columns, postResizeViewport.rows);
 
   // Initial render + startup commands
   render();
@@ -319,49 +362,6 @@ export async function run<Model, M>(
 
 function disposeTimerHandle(handle: TimerHandle | null): void {
   handle?.dispose();
-}
-
-/** Clamp a terminal dimension to a non-negative integer. */
-function sanitizeDimension(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.floor(value));
-}
-
-function installRuntimeOverlay(ctx: { runtime: RuntimePort }): RuntimePort {
-  const baseRuntime = ctx.runtime;
-  const state = {
-    columns: sanitizeDimension(baseRuntime.columns),
-    rows: sanitizeDimension(baseRuntime.rows),
-  };
-  const runtime: RuntimePort = {
-    env(key: string): string | undefined {
-      return baseRuntime.env(key);
-    },
-    get stdoutIsTTY(): boolean {
-      return baseRuntime.stdoutIsTTY;
-    },
-    get stdinIsTTY(): boolean {
-      return baseRuntime.stdinIsTTY;
-    },
-    get columns(): number {
-      return state.columns;
-    },
-    set columns(value: number) {
-      state.columns = sanitizeDimension(value);
-    },
-    get rows(): number {
-      return state.rows;
-    },
-    set rows(value: number) {
-      state.rows = sanitizeDimension(value);
-    },
-    get refreshRate(): number {
-      return baseRuntime.refreshRate;
-    },
-  };
-
-  (ctx as { runtime: RuntimePort }).runtime = runtime;
-  return runtime;
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */

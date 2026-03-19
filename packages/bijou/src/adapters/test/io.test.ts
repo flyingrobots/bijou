@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mockIO } from './io.js';
+import { mockClock } from './clock.js';
 
 describe('mockIO()', () => {
   it('write() captures output to written buffer', () => {
@@ -60,14 +61,18 @@ describe('mockIO()', () => {
   });
 
   it('setInterval() returns a disposable handle', () => {
-    vi.useFakeTimers();
-    try {
-      const io = mockIO();
-      const handle = io.setInterval(() => {}, 1000);
-      expect(handle.dispose).toBeTypeOf('function');
-      handle.dispose();
-    } finally {
-      vi.useRealTimers();
-    }
+    const clock = mockClock();
+    const calls: number[] = [];
+    const io = mockIO({ clock });
+    const handle = io.setInterval(() => {
+      calls.push(clock.now());
+    }, 1000);
+
+    clock.advanceBy(3_000);
+    expect(calls).toEqual([1_000, 2_000, 3_000]);
+
+    handle.dispose();
+    clock.advanceBy(2_000);
+    expect(calls).toEqual([1_000, 2_000, 3_000]);
   });
 });

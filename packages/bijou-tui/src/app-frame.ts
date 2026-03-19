@@ -5,10 +5,16 @@
  * panel-scoped overlay context, and optional frame-level command palette.
  */
 
-import { createSurface, parseAnsiToSurface, resolveSafeCtx, type Surface } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  parseAnsiToSurface,
+  resolveSafeCtx,
+  type OverflowBehavior,
+  type Surface,
+} from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
-import type { App, Cmd } from './types.js';
+import type { App, Cmd, KeyMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
 import { modal } from './overlay.js';
@@ -31,10 +37,21 @@ import { restoreLayoutState } from './layout-preset.js';
 import type { OverflowX } from './focus-area.js';
 import type { Timeline, TimelineState } from './timeline.js';
 import type { ViewOutput } from './view-output.js';
+import {
+  createNotificationState,
+  notificationsNeedTick,
+  pushNotification,
+  renderNotificationStack,
+  tickNotifications,
+  trimNotificationsToViewport,
+  type NotificationPlacement,
+  type NotificationState,
+} from './notification.js';
 
 // Internal modules
 import type {
   InternalFrameModel,
+  FrameAction,
   PaletteAction,
 } from './app-frame-types.js';
 import {
@@ -43,6 +60,7 @@ import {
   wrapCmdForPage,
   emitMsg,
   emitMsgForPage,
+  wrapFrameMsg,
 } from './app-frame-types.js';
 import {
   createFrameKeyMap,
@@ -138,6 +156,22 @@ export interface FrameOverlayContext<PageModel> {
   readonly screenRect: LayoutRect;
 }
 
+/** Configuration for frame-managed runtime notifications. */
+export interface FrameRuntimeNotificationOptions {
+  /** Enable routing framework warnings/errors through notifications. Default: true. */
+  readonly enabled?: boolean;
+  /** Stack placement. Default: 'LOWER_RIGHT'. */
+  readonly placement?: NotificationPlacement;
+  /** Auto-dismiss delay. Default: 6000ms. */
+  readonly durationMs?: number | null;
+  /** Render margin from the viewport edge. Default: 1. */
+  readonly margin?: number;
+  /** Gap between stacked notifications. Default: 1. */
+  readonly gap?: number;
+  /** Text overflow behavior. Default: 'wrap'. */
+  readonly overflow?: OverflowBehavior;
+}
+
 /** Page transition styles — a built-in name or a custom shader function. */
 export type PageTransition = BuiltinTransition | TransitionShaderFn;
 
@@ -155,10 +189,26 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly initialRows?: number;
   /** Optional global keymap layered above page keymap. */
   readonly globalKeys?: KeyMap<Msg>;
+  /** Resolve key conflicts in favor of the frame shell or the active page. Default: 'frame-first'. */
+  readonly keyPriority?: 'frame-first' | 'page-first';
+  /** Optional override for the short help strip source shown beneath the frame header. */
+  readonly helpLineSource?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly frameKeys: KeyMap<FrameAction>;
+    readonly globalKeys?: KeyMap<Msg>;
+  }) => BindingSource | undefined;
+  /** Optional observer that receives every key plus the route that handled it. Returned messages are scoped to the active page. */
+  readonly observeKey?: (
+    msg: KeyMsg,
+    route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
+  ) => Msg | undefined;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
   /** Optional overlay provider (receives pane rects for panel scoping). */
   readonly overlayFactory?: (ctx: FrameOverlayContext<PageModel>) => readonly Overlay[];
+  /** Optional runtime warning/error notifications managed by the frame shell. */
+  readonly runtimeNotifications?: boolean | FrameRuntimeNotificationOptions;
   /** Optional page transition style. Default: 'none'. */
   readonly transition?: PageTransition;
   /** Transition duration in milliseconds. Default: 300. */
@@ -245,9 +295,69 @@ export interface FrameModel<PageModel> {
   readonly dockStateByPage: Readonly<Record<string, PanelDockState>>;
   /** Per-page split ratio overrides (from layout presets/session restore). */
   readonly splitRatioOverrides: Readonly<Record<string, Readonly<Record<string, number>>>>;
+  /** Frame-managed runtime notifications. */
+  readonly runtimeNotifications: NotificationState<never>;
+  /** Whether the runtime notification tick loop is active. */
+  readonly runtimeNotificationLoopActive: boolean;
 }
 
 // ---------------------------------------------------------------------------
+// Frame Notification Helpers
+// ---------------------------------------------------------------------------
+
+const FRAME_NOTIFICATION_TICK_MS = 40;
+const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
+
+interface ResolvedFrameNotificationOptions {
+  readonly enabled: boolean;
+  readonly placement: NotificationPlacement;
+  readonly durationMs: number | null;
+  readonly margin: number;
+  readonly gap: number;
+  readonly overflow: OverflowBehavior;
+}
+
+function resolveFrameNotificationOptions<PageModel, Msg>(
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): ResolvedFrameNotificationOptions {
+  if (options.runtimeNotifications === false) {
+    return {
+      enabled: false,
+      placement: 'LOWER_RIGHT',
+      durationMs: DEFAULT_FRAME_NOTIFICATION_DURATION_MS,
+      margin: 1,
+      gap: 1,
+      overflow: 'wrap',
+    };
+  }
+
+  const configured = options.runtimeNotifications === true || options.runtimeNotifications == null
+    ? {}
+    : options.runtimeNotifications;
+
+  return {
+    enabled: configured.enabled ?? true,
+    placement: configured.placement ?? 'LOWER_RIGHT',
+    durationMs: configured.durationMs ?? DEFAULT_FRAME_NOTIFICATION_DURATION_MS,
+    margin: configured.margin ?? 1,
+    gap: configured.gap ?? 1,
+    overflow: configured.overflow ?? 'wrap',
+  };
+}
+
+function createFrameNotificationTickCmd<Msg>(): Cmd<Msg> {
+  return async (_emit, caps) => {
+    if (!caps.sleep) {
+      throw new Error('createFrameNotificationTickCmd requires sleep capability');
+    }
+    await caps.sleep(FRAME_NOTIFICATION_TICK_MS);
+    return wrapFrameMsg({
+      type: 'notification-tick',
+      atMs: caps.now?.() ?? 0,
+    }) as unknown as Msg;
+  };
+}
+
 // Factory
 // ---------------------------------------------------------------------------
 
@@ -276,6 +386,7 @@ export function createFramedApp<PageModel, Msg>(
   }
 
   const frameKeys = createFrameKeyMap();
+  const frameNotificationOptions = resolveFrameNotificationOptions(options);
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -284,6 +395,42 @@ export function createFramedApp<PageModel, Msg>(
     select: { type: 'cp-select' },
     close: { type: 'cp-close' },
   });
+
+  function withObservedKey(
+    model: InternalFrameModel<PageModel, Msg>,
+    cmds: readonly Cmd<Msg>[],
+    msg: KeyMsg,
+    route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
+  ): Cmd<Msg>[] {
+    const observed = options.observeKey?.(msg, route);
+    if (observed === undefined) return [...cmds];
+    return [emitMsgForPage(model.activePageId, observed), ...cmds];
+  }
+
+  function applyFrameNotificationState(
+    model: InternalFrameModel<PageModel, Msg>,
+    notifications: NotificationState<never>,
+    nowMs: number,
+    forceTick = false,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+    const trimmed = trimNotificationsToViewport(notifications, {
+      screenWidth: model.columns,
+      screenHeight: model.rows,
+      margin: frameNotificationOptions.margin,
+      gap: frameNotificationOptions.gap,
+    }, nowMs);
+    const needsTick = notificationsNeedTick(trimmed);
+    const nextModel: InternalFrameModel<PageModel, Msg> = {
+      ...model,
+      runtimeNotifications: trimmed,
+      runtimeNotificationLoopActive: needsTick,
+    };
+
+    if (needsTick && (forceTick || !model.runtimeNotificationLoopActive)) {
+      return [nextModel, [createFrameNotificationTickCmd<Msg>()]];
+    }
+    return [nextModel, []];
+  }
 
   const app: App<InternalFrameModel<PageModel, Msg>, Msg> = {
     init() {
@@ -312,6 +459,8 @@ export function createFramedApp<PageModel, Msg>(
         maximizedPaneByPage: {},
         dockStateByPage: {},
         splitRatioOverrides: {},
+        runtimeNotifications: createNotificationState(),
+        runtimeNotificationLoopActive: false,
       };
 
       for (const pageId of pageOrder) {
@@ -338,6 +487,23 @@ export function createFramedApp<PageModel, Msg>(
     update(msg, model) {
       if (isFrameScopedMsg(msg)) {
         const action = msg.action;
+        if (action.type === 'runtime-issue') {
+          if (!frameNotificationOptions.enabled) return [model, []];
+          const notifications = pushNotification(model.runtimeNotifications, {
+            title: action.issue.level === 'warning' ? 'Framework warning' : 'Runtime error',
+            message: action.issue.message,
+            variant: 'TOAST',
+            tone: action.issue.level === 'warning' ? 'WARNING' : 'ERROR',
+            placement: frameNotificationOptions.placement,
+            durationMs: frameNotificationOptions.durationMs,
+            overflow: frameNotificationOptions.overflow,
+          }, action.issue.atMs);
+          return applyFrameNotificationState(model, notifications, action.issue.atMs);
+        }
+        if (action.type === 'notification-tick') {
+          const notifications = tickNotifications(model.runtimeNotifications, action.atMs);
+          return applyFrameNotificationState(model, notifications, action.atMs, true);
+        }
         if (action.type === 'transition') {
           // Ignore stale transition ticks from a previous generation
           if (action.generation !== model.transitionGeneration) return [model, []];
@@ -403,38 +569,59 @@ export function createFramedApp<PageModel, Msg>(
 
       if (isKeyMsg(msg)) {
         if (model.commandPalette != null) {
-          return handlePaletteKey(msg, model, paletteKeys, options, pagesById);
+          const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
+          return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
 
         // Help acts as a modal layer when open: only close keys are handled.
         if (model.helpOpen) {
           if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === '?')) {
-            return [{ ...model, helpOpen: false }, []];
+            return [{ ...model, helpOpen: false }, withObservedKey(model, [], msg, 'help')];
           }
-          return [model, []];
-        }
-
-        const frameAction = frameKeys.handle(msg);
-        if (frameAction !== undefined) {
-          // Handle palette opening here since applyFrameAction doesn't have access to palette deps
-          if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
-            return [openCommandPalette(model, frameKeys, options, pagesById), []];
-          }
-          return applyFrameAction(frameAction, model, options, pagesById);
-        }
-
-        const globalAction = options.globalKeys?.handle(msg);
-        if (globalAction !== undefined) {
-          return [model, [emitMsg(globalAction)]];
+          return [model, withObservedKey(model, [], msg, 'help')];
         }
 
         const activePage = pagesById.get(model.activePageId)!;
         const pageAction = activePage.keyMap?.handle(msg);
-        if (pageAction !== undefined) {
-          return [model, [emitMsgForPage(model.activePageId, pageAction)]];
+        const globalAction = options.globalKeys?.handle(msg);
+        const frameAction = frameKeys.handle(msg);
+        const keyPriority = options.keyPriority ?? 'frame-first';
+
+        if (keyPriority === 'page-first') {
+          if (pageAction !== undefined) {
+            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
+          }
+          if (globalAction !== undefined) {
+            return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
+          }
+          if (frameAction !== undefined) {
+            if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
+              return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
+            return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
+          }
+          return [model, withObservedKey(model, [], msg, 'unhandled')];
         }
 
-        return [model, []];
+        if (frameAction !== undefined) {
+          // Handle palette opening here since applyFrameAction doesn't have access to palette deps
+          if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
+            return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+          }
+          const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
+          return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
+        }
+
+        if (globalAction !== undefined) {
+          return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
+        }
+
+        if (pageAction !== undefined) {
+          return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
+        }
+
+        return [model, withObservedKey(model, [], msg, 'unhandled')];
       }
 
       if (isMouseMsg(msg)) {
@@ -514,6 +701,17 @@ export function createFramedApp<PageModel, Msg>(
         }));
       }
 
+      if (frameNotificationOptions.enabled) {
+        const ctx = resolveSafeCtx();
+        overlays.push(...renderNotificationStack(model.runtimeNotifications, {
+          screenWidth: model.columns,
+          screenHeight: model.rows,
+          margin: frameNotificationOptions.margin,
+          gap: frameNotificationOptions.gap,
+          ctx: ctx ?? undefined,
+        }));
+      }
+
       if (model.helpOpen) {
         const full = helpView(mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap));
         overlays.push(modal({
@@ -548,6 +746,11 @@ export function createFramedApp<PageModel, Msg>(
         overlays,
         dimBackground: overlays.length > 0,
       });
+    },
+
+    routeRuntimeIssue(issue) {
+      if (!frameNotificationOptions.enabled) return undefined;
+      return wrapFrameMsg({ type: 'runtime-issue', issue }) as unknown as Msg;
     },
   };
 
@@ -585,7 +788,7 @@ function composeFrameSurface(options: FrameSurfaceOptions): Surface {
   }
 
   for (const overlay of options.overlays) {
-    const overlaySurface = parseAnsiToSurface(
+    const overlaySurface = overlay.surface ?? parseAnsiToSurface(
       overlay.content,
       maxVisibleWidth(overlay.content),
       overlay.content.split('\n').length,

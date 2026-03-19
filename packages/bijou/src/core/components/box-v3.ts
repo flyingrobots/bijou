@@ -1,9 +1,11 @@
 import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { clipToWidth } from '../text/clip.js';
+import { wrapToWidth } from '../text/wrap.js';
 import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
-import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
+import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
+import { resolveOverflowBehavior } from './overflow.js';
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
@@ -37,6 +39,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
+  const overflow = resolveOverflowBehavior(options.overflow, bcss);
   const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
   
   const pt = padding.top ?? 0;
@@ -46,9 +49,14 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
 
   let contentSurf: Surface;
   if (typeof content === 'string') {
-    contentSurf = createTextSurface(content);
+    const wrapped = normalizedFixedWidth !== undefined && overflow === 'wrap'
+      ? wrapToWidth(content, Math.max(0, normalizedFixedWidth - 2 - pl - pr)).join('\n')
+      : content;
+    contentSurf = createTextSurface(wrapped);
   } else {
-    contentSurf = content;
+    contentSurf = normalizedFixedWidth !== undefined && overflow === 'wrap'
+      ? wrapSurfaceToWidth(content, Math.max(0, normalizedFixedWidth - 2 - pl - pr))
+      : content;
   }
 
   const autoTitleWidth = normalizedFixedWidth === undefined && title

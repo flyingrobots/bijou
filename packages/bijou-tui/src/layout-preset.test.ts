@@ -8,6 +8,7 @@ import {
   type SerializedLayoutState,
 } from './layout-preset.js';
 import type { FrameModel } from './app-frame.js';
+import { createNotificationState } from './notification.js';
 
 describe('serializeLayoutState', () => {
   it('serializes empty state', () => {
@@ -27,6 +28,8 @@ describe('serializeLayoutState', () => {
       maximizedPaneByPage: {},
       dockStateByPage: {},
       splitRatioOverrides: {},
+      runtimeNotifications: createNotificationState(),
+      runtimeNotificationLoopActive: false,
     };
 
     const result = serializeLayoutState(model, ['page1']);
@@ -54,6 +57,8 @@ describe('serializeLayoutState', () => {
       maximizedPaneByPage: { page1: { maximizedPaneId: 'a' } },
       dockStateByPage: { page1: { orderByContainer: { 'split-1': ['b', 'a'] } } },
       splitRatioOverrides: { page1: { 'split-1': 0.3 } },
+      runtimeNotifications: createNotificationState(),
+      runtimeNotificationLoopActive: false,
     };
 
     const result = serializeLayoutState(model, ['page1']);
@@ -80,6 +85,8 @@ describe('serializeLayoutState', () => {
       maximizedPaneByPage: {},
       dockStateByPage: {},
       splitRatioOverrides: {},
+      runtimeNotifications: createNotificationState(),
+      runtimeNotificationLoopActive: false,
     };
 
     const result = serializeLayoutState(model, ['page1'], {

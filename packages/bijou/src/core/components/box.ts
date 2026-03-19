@@ -3,8 +3,11 @@ import { resolveCtx } from '../resolve-ctx.js';
 import { makeBgFill } from '../bg-fill.js';
 import { graphemeWidth } from '../text/grapheme.js';
 import { clipToWidth } from '../text/clip.js';
+import { wrapToWidth } from '../text/wrap.js';
 import { renderByMode } from '../mode-render.js';
 import type { BijouNodeOptions } from './types.js';
+import { resolveOverflowBehavior } from './overflow.js';
+import type { OverflowBehavior } from './types.js';
 
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions extends BijouNodeOptions {
@@ -33,8 +36,8 @@ const BORDER = { tl: '\u250c', tr: '\u2510', bl: '\u2514', br: '\u2518', h: '\u2
  * Draw a unicode box around the given content string.
  *
  * Supports both auto-width (measured from content) and fixed-width modes.
- * Content lines wider than the available space are hard-truncated via
- * `clipToWidth` (no ellipsis is appended).
+ * Content lines wider than the available space wrap by default. Set
+ * `overflow: 'truncate'` to preserve the previous hard-clipping behavior.
  *
  * @param content - Multiline string to place inside the box.
  * @param borderColor - Function that wraps border characters with color styling.
@@ -53,8 +56,9 @@ function drawBox(
   bgFill?: (s: string) => string,
   fillChar: string = ' ',
   title?: string,
+  overflow: OverflowBehavior = 'wrap',
 ): string {
-  const contentLines = content.split('\n');
+  const rawContentLines = content.split('\n');
 
   let innerWidth: number;
   let contentWidth: number;
@@ -66,7 +70,7 @@ function drawBox(
   } else {
     // Auto width: measure content
     const titleWidth = title ? graphemeWidth(title) + 2 : 0;
-    const maxWidth = contentLines.reduce((max, line) => Math.max(max, graphemeWidth(line)), 0);
+    const maxWidth = rawContentLines.reduce((max, line) => Math.max(max, graphemeWidth(line)), 0);
     contentWidth = maxWidth;
     innerWidth = Math.max(titleWidth, maxWidth + padding.left + padding.right);
   }
@@ -74,6 +78,9 @@ function drawBox(
   // When fixed width, padding may exceed innerWidth — clamp to fit
   const effectiveLeft = fixedWidth !== undefined ? Math.min(padding.left, innerWidth) : padding.left;
   const effectiveRight = fixedWidth !== undefined ? Math.min(padding.right, Math.max(0, innerWidth - effectiveLeft)) : padding.right;
+  const contentLines = fixedWidth !== undefined && overflow === 'wrap'
+    ? rawContentLines.flatMap((line) => wrapToWidth(line, contentWidth))
+    : rawContentLines;
 
   const pad = (line: string): string => {
     const visible = graphemeWidth(line);
@@ -154,8 +161,12 @@ export function box(content: string, options: BoxOptions = {}): string {
       const colorize = (s: string): string => ctx.style.styled(borderToken, s);
       const bgFill = makeBgFill(options.bgToken, ctx);
       const resolvedFill = resolveFillChar(options.fillChar);
+      const overflow = resolveOverflowBehavior(
+        options.overflow,
+        ctx.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }),
+      );
 
-      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill, options.title);
+      return drawBox(safeContent, colorize, padding, options.width, bgFill, resolvedFill, options.title, overflow);
     },
   }, options);
 }

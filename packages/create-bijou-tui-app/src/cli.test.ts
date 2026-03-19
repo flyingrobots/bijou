@@ -50,6 +50,13 @@ function withPlatform<T>(platform: NodeJS.Platform, run: () => T): T {
   }
 }
 
+function resolveInstalledCliCommand(runnerDir: string): string {
+  const binDir = join(runnerDir, 'node_modules', '.bin');
+  return process.platform === 'win32'
+    ? join(binDir, 'create-bijou-tui-app.cmd')
+    : join(binDir, 'create-bijou-tui-app');
+}
+
 describe('create-bijou-tui-app cli', () => {
   it('prints usage for argument parsing errors', () => {
     const result = runCliCaptured(['--definitely-not-a-real-flag']);
@@ -176,16 +183,17 @@ describe('create-bijou-tui-app cli', () => {
       expect(installed.error).toBeUndefined();
       expect(installed.status).toBe(0);
 
-      const binPath = join(runnerDir, 'node_modules', '.bin', 'create-bijou-tui-app');
+      const binPath = resolveInstalledCliCommand(runnerDir);
       expect(existsSync(binPath)).toBe(true);
       const result = spawnSync(
-        'npm',
-        ['exec', '--prefix', runnerDir, '--', 'create-bijou-tui-app', targetDir, '--no-install'],
+        binPath,
+        [targetDir, '--no-install'],
         {
-        cwd: root,
-        encoding: 'utf8',
-        maxBuffer: 8 * 1024 * 1024,
-        timeout: 30_000,
+          cwd: root,
+          encoding: 'utf8',
+          maxBuffer: 8 * 1024 * 1024,
+          timeout: 30_000,
+          shell: process.platform === 'win32',
         },
       );
       expect(result.error).toBeUndefined();

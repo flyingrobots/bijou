@@ -6,21 +6,25 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-03-18
+
 ### ✨ Features
 
+- **Stacked notification overlays** — `@flyingrobots/bijou-tui` now ships a reusable notification stack with actionable, inline, and toast variants; configurable placement/duration/action payloads; stacked screen-edge rendering; and animated enter/exit transitions, plus a new framed `examples/notifications` lab for interactive evaluation.
 - **Surface-first companion primitives** — added `boxSurface()`, `headerBoxSurface()`, `separatorSurface()`, `alertSurface()`, and `tableSurface()` so V3 apps can keep common layout/status composition on the `Surface` path instead of dropping back through explicit string bridges.
 - **Deterministic clock port and test adapter** — `BijouContext` now supports a shared `clock` port, and the test adapters now ship `mockClock()` so runtime code and component tests can fake wall-clock time without reaching for Node globals.
 - **Idle-aware scripted driver controls** — `runScript()` now supports configurable pulse frequency, and the TUI event bus exposes explicit command-idle tracking so deterministic tests can wait for real command completion instead of sprinkling `setTimeout(...)` heuristics.
 
 ### 🐛 Fixes
 
+- **Notification stack rendering and routing** — notification overlays now preserve full-card background fill, dismissed notifications use a longer visible exit phase, placement changes relocate and re-enter the active stack instead of leaving it visually stuck, overflowed notifications animate through a dedicated exit lane before they are archived, and framed apps can auto-route runtime warnings/errors into toast notifications while still writing to stderr.
 - **Scaffold canary PTY shutdown race** — the PTY driver now treats queued late input/resize steps as no-ops once the child exits, preventing traceback noise from masking the actual canary failure.
 - **PR status helper edge cases** — canceled checks now fail the review-status exit code, nullable review authors fall back safely, and the release dry-run workflow labels its lint step accurately.
 - **Release dry-run peer pin validation** — the dry-run metadata gate now checks internal `peerDependencies` as well, so it matches the lock-step validation performed by the real publish workflow.
 - **Packed scaffold bin test stability** — the packed `create-bijou-tui-app` bin-shim test now disables npm audit/fund/script overhead and uses explicit subprocess timeouts so it stays reliable under full-suite load.
 - **Shared release validation script** — publish and dry-run workflows now use one repo script for tag parsing, lock-step package version checks, and internal dependency pin validation, with a matching local `npm run release:preflight` command.
 - **Release preflight metadata and semver validation** — local `npm run release:preflight` now emits the derived `version` / `notes_tag` metadata, derives `--current-version` from discovered workspace manifests instead of assuming `packages/bijou`, and rejects leading-zero semver identifiers before npm can reject them later.
-- **Packed scaffolder CLI execution path** — packaged `create-bijou-tui-app` verification now asserts the installed npm bin shim exists while invoking the packed CLI entry through `node`, which avoids macOS shebang hangs without dropping tarball-level coverage.
+- **Packed scaffolder CLI execution path** — packaged `create-bijou-tui-app` verification now asserts the installed npm bin shim exists and invokes that installed shim directly after tarball install, keeping the packaged-path guarantee without paying for an extra `npm exec` hop.
 - **PR merge-readiness tooling** — `pr:review-status` now collapses to the latest non-automated review per reviewer, ignores draft/pending reviews without `submittedAt`, prefers GitHub author metadata for bot detection, treats `mergeStateStatus=UNKNOWN` as pending while GitHub computes mergeability, honors GitHub `reviewDecision` / `mergeStateStatus`, fails fast if PR comment/review/thread metadata would be truncated, and down-ranks stale historical CodeRabbit rate-limit comments when a newer green or live pending bot signal exists; `pr:merge-readiness` adds a one-command merge gate summary on top of those signals and labels pending states separately from hard blockers.
 - **Surface alert option parity** — `AlertOptions` now includes `borderToken`, and both `alert()` and `alertSurface()` honor custom border overrides while the surface path drops a redundant string nullish-coalescing fallback.
 - **Surface primitive clipping and Unicode guardrails** — `boxSurface()` now clips constrained content inside the inner box instead of letting it overwrite borders, and the new text-based surface helpers now fail loudly on wide graphemes until the `Surface` model grows true wide-cell support.
@@ -34,6 +38,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Deterministic Ctrl+C quit guard** — interactive runtime now treats “no prior Ctrl+C” distinctly from “Ctrl+C at time zero,” so injected clocks that start at `0` still forward the first Ctrl+C to the app instead of force-quitting immediately.
 - **Deterministic runtime test lint compliance** — the Ctrl+C-at-time-zero regression test now disposes its timeout handles with a block-bodied loop so it satisfies the repo’s iterable-callback-return lint rule without changing behavior.
 - **Deterministic runtime test helper cleanup** — the tracking clock helper in `runtime.test.ts` now passes timeout callbacks directly to the base clock instead of wrapping them in a no-op forwarding closure.
+- **Shared runtime viewport overlay** — the main TUI runtime and the worker host/proxy now share one viewport overlay helper, so dimension sanitization and mutable resize state stay consistent across scripted runs, interactive resizes, and worker handoff.
+- **Clock-driven test scheduling** — the remaining timer-sensitive runtime, command, component, and I/O adapter tests now use injected `mockClock()` instances instead of Vitest fake timers, and the Node/test I/O adapters accept clock injection so those tests never have to touch wall-clock scheduling.
+- **Worker proxy test seams** — `runInWorker()` and `startWorkerApp()` now accept explicit worker-thread bindings, so the proxy-runtime tests can assert host/worker IPC behavior without module-reset mock churn.
+- **Workflow and smoke harness hardening** — `smoke-all-examples` now exposes testable launcher/path helpers with focused unit coverage, the repo ships a local `workflow:shell:preflight` command for validating workflow shell blocks before CI is first to see them, and the PTY driver has extra shutdown-ordering coverage for late labeled steps after child exit.
+- **Release readiness gate** — the repo now ships `npm run release:readiness`, a single local command that runs the build, test, frame-regression, smoke, workflow-shell, and release-preflight bars in release order instead of relying on tribal knowledge.
+
+### 🧪 Tests
+
+- **Deterministic frame regressions** — added repo-level frame assertion helpers plus scripted frame snapshots for the scaffold shell and flagship V3 examples, with explicit resize assertions on the shell path, responsive narrow/wide frame coverage for the BCSS demo, and ANSI-preserving BCSS snapshots so style-only media-query regressions are locked as well as text/layout changes.
 
 ## [3.0.0] - 2026-03-12
 
@@ -906,7 +919,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/flyingrobots/bijou/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/flyingrobots/bijou/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/flyingrobots/bijou/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/flyingrobots/bijou/compare/v1.8.0...v2.0.0
@@ -931,3 +945,4 @@ First public release.
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
+- defaulted core box/table component overflow to wrap instead of truncate, with per-instance `overflow: 'truncate'` overrides and matching surface support

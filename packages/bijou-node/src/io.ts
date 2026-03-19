@@ -1,7 +1,13 @@
 import * as readline from 'readline';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import type { IOPort, RawInputHandle, TimerHandle } from '@flyingrobots/bijou';
+import { resolveClock, type ClockPort, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
+
+/** Optional overrides for {@link nodeIO}. */
+export interface NodeIOOptions {
+  /** Clock override for deterministic timer scheduling in tests. */
+  clock?: ClockPort;
+}
 
 /**
  * Create an {@link IOPort} backed by Node.js I/O primitives.
@@ -11,9 +17,11 @@ import type { IOPort, RawInputHandle, TimerHandle } from '@flyingrobots/bijou';
  * `rawInput`, `onResize`, and `setInterval` clean up their underlying
  * resources when `dispose()` is called.
  *
+ * @param options - Optional runtime overrides such as a deterministic clock for tests.
  * @returns An {@link IOPort} bound to the current Node.js process.
  */
-export function nodeIO(): IOPort {
+export function nodeIO(options: NodeIOOptions = {}): IOPort {
+  const clock = resolveClock(options.clock);
   return {
     /**
      * Write a string directly to `process.stdout`.
@@ -116,13 +124,7 @@ export function nodeIO(): IOPort {
      * @returns A {@link TimerHandle} that cancels the timer on disposal.
      */
     setInterval(callback: () => void, ms: number): TimerHandle {
-      const id = globalThis.setInterval(callback, ms);
-      return {
-        /** Cancel the repeating timer. */
-        dispose() {
-          clearInterval(id);
-        },
-      };
+      return clock.setInterval(callback, ms);
     },
 
     /**

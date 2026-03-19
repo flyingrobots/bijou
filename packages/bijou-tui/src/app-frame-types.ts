@@ -81,6 +81,8 @@ export type FrameAction =
   | { type: 'dock-down' }
   | { type: 'dock-left' }
   | { type: 'dock-right' }
+  | { type: 'runtime-issue'; issue: RuntimeIssue }
+  | { type: 'notification-tick'; atMs: number }
   | { type: 'transition'; progress: number; generation: number; dt: number; elapsedMs: number }
   | { type: 'transition-complete'; generation: number };
 
@@ -176,3 +178,4 @@ export function comboToMsg(binding: BindingInfo): KeyMsg {
     shift: binding.combo.shift,
   };
 }
+import type { RuntimeIssue } from './types.js';

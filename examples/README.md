@@ -86,6 +86,7 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
 | [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
 | [`toast`](./toast/) | `toast()`, `composite()` | Anchored notification overlay variants |
+| [`notifications`](./notifications/) | `renderNotificationStack()`, `pushNotification()`, `tickNotifications()` | Stacked actionable/inline/toast notifications inside `createFramedApp()` |
 | [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |

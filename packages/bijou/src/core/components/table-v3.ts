@@ -1,7 +1,8 @@
 import { createSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import type { TableOptions } from './table.js';
-import { createTextSurface, tokenToCellStyle } from './surface-text.js';
+import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
+import { resolveOverflowBehavior } from './overflow.js';
 
 export type TableSurfaceCell = string | Surface;
 
@@ -30,6 +31,10 @@ function resolveColumns(
  */
 export function tableSurface(options: TableSurfaceOptions): Surface {
   const ctx = resolveCtx(options.ctx);
+  const overflow = resolveOverflowBehavior(
+    options.overflow,
+    ctx?.resolveBCSS({ type: 'Table', id: options.id, classes: options.class?.split(' ') }) ?? {},
+  );
   const rawRows = (options.rows ?? []).map((row) => (row ?? []).map((cell) => cell ?? ''));
   const columns = resolveColumns(options.columns ?? [], rawRows);
   const rows = rawRows;
@@ -51,7 +56,18 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
     }
     return maxWidth;
   });
-  const rowHeights = cellSurfaces.map((row) => row.reduce((max, cell, index) => {
+  const fittedHeaderSurfaces = headerSurfaces.map((cell, index) => {
+    const cellWidth = colWidths[index] ?? 0;
+    if (columns[index]?.width === undefined || overflow === 'truncate') return cell;
+    return wrapSurfaceToWidth(cell, cellWidth);
+  });
+  const headerHeight = fittedHeaderSurfaces.reduce((max, cell) => Math.max(max, cell.height), 1);
+  const fittedCellSurfaces = cellSurfaces.map((row) => row.map((cell, index) => {
+    const cellWidth = colWidths[index] ?? 0;
+    if (columns[index]?.width === undefined || overflow === 'truncate') return cell;
+    return wrapSurfaceToWidth(cell, cellWidth);
+  }));
+  const rowHeights = fittedCellSurfaces.map((row) => row.reduce((max, cell, index) => {
     const cellWidth = colWidths[index] ?? 0;
     if (cellWidth <= 0) return max;
     return Math.max(max, cell.height);
@@ -59,7 +75,7 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   const totalWidth = columns.length === 0
     ? 2
     : colWidths.reduce((sum, width) => sum + width + 2, 0) + columns.length + 1;
-  const totalHeight = 1 + 1 + 1 + rowHeights.reduce((sum, height) => sum + height, 0) + 1;
+  const totalHeight = 1 + headerHeight + 1 + rowHeights.reduce((sum, height) => sum + height, 0) + 1;
   const surface = createSurface(totalWidth, totalHeight, { char: ' ', empty: false });
 
   const setBorder = (x: number, y: number, char: string, bg?: string): void => {
@@ -93,29 +109,33 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   drawBorderRow(0, '\u250c', '\u252c', '\u2510');
 
   if (columns.length === 0) {
-    setBorder(0, 1, '\u2502', headerBg?.bg);
-    setBorder(1, 1, '\u2502', headerBg?.bg);
-    drawBorderRow(2, '\u251c', '\u253c', '\u2524');
+    for (let headerY = 0; headerY < headerHeight; headerY++) {
+      setBorder(0, 1 + headerY, '\u2502', headerBg?.bg);
+      setBorder(1, 1 + headerY, '\u2502', headerBg?.bg);
+    }
+    drawBorderRow(1 + headerHeight, '\u251c', '\u253c', '\u2524');
     drawBorderRow(totalHeight - 1, '\u2514', '\u2534', '\u2518');
     return surface;
   }
 
-  let headerX = 1;
-  for (let i = 0; i < columns.length; i++) {
-    const cellWidth = colWidths[i]!;
-    const headerSurface = headerSurfaces[i]!;
-    for (let x = headerX; x < headerX + cellWidth + 2; x++) setSpace(x, 1);
-    setBorder(headerX - 1, 1, '\u2502', headerBg?.bg);
-    surface.blit(headerSurface, headerX + 1, 1, 0, 0, cellWidth, 1);
-    headerX += cellWidth + 3;
+  for (let headerLine = 0; headerLine < headerHeight; headerLine++) {
+    let headerX = 1;
+    for (let i = 0; i < columns.length; i++) {
+      const cellWidth = colWidths[i]!;
+      const headerSurface = fittedHeaderSurfaces[i]!;
+      for (let x = headerX; x < headerX + cellWidth + 2; x++) setSpace(x, 1 + headerLine);
+      setBorder(headerX - 1, 1 + headerLine, '\u2502', headerBg?.bg);
+      surface.blit(headerSurface, headerX + 1, 1 + headerLine, 0, headerLine, cellWidth, 1);
+      headerX += cellWidth + 3;
+    }
+    setBorder(totalWidth - 1, 1 + headerLine, '\u2502', headerBg?.bg);
   }
-  setBorder(totalWidth - 1, 1, '\u2502', headerBg?.bg);
 
-  drawBorderRow(2, '\u251c', '\u253c', '\u2524');
+  drawBorderRow(1 + headerHeight, '\u251c', '\u253c', '\u2524');
 
-  let y = 3;
-  for (let rowIndex = 0; rowIndex < cellSurfaces.length; rowIndex++) {
-    const row = cellSurfaces[rowIndex]!;
+  let y = 2 + headerHeight;
+  for (let rowIndex = 0; rowIndex < fittedCellSurfaces.length; rowIndex++) {
+    const row = fittedCellSurfaces[rowIndex]!;
     const rowHeight = rowHeights[rowIndex]!;
     for (let line = 0; line < rowHeight; line++) {
       let x = 1;

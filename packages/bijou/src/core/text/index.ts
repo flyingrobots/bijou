@@ -16,3 +16,4 @@ export {
 } from './grapheme.js';
 
 export { clipToWidth } from './clip.js';
+export { wrapToWidth } from './wrap.js';

@@ -92,6 +92,9 @@ export function applyFrameAction<PageModel, Msg>(
     case 'scroll-left':
     case 'scroll-right':
       return [scrollFocusedPane(model, action, pagesById), []];
+    case 'runtime-issue':
+    case 'notification-tick':
+      return [model, []];
     case 'transition':
     case 'transition-complete':
       return [model, []];

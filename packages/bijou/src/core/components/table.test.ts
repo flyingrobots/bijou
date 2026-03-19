@@ -23,6 +23,31 @@ describe('table', () => {
     expect(result).toContain('─'); // table border chars
   });
 
+  it('wraps fixed-width cell content by default', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = table({
+      columns: [{ header: 'Status', width: 4 }],
+      rows: [['degraded']],
+      ctx,
+    });
+
+    expect(result).toContain('degr');
+    expect(result).toContain('aded');
+  });
+
+  it('supports per-instance truncate overflow overrides', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = table({
+      columns: [{ header: 'Status', width: 4 }],
+      rows: [['degraded']],
+      overflow: 'truncate',
+      ctx,
+    });
+
+    expect(result).toContain('degr');
+    expect(result).not.toContain('aded');
+  });
+
   it('renders TSV in pipe mode', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = table({ columns, rows, ctx });
