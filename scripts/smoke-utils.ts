@@ -26,6 +26,7 @@ interface PackageManifest {
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
+  overrides?: Record<string, string>;
 }
 
 type DependencySection =
@@ -112,6 +113,13 @@ export function rewritePackageManifestToTarballs(
         deps[name] = tarballSpec;
       }
     }
+  }
+
+  if (Object.keys(tarballSpecs).length > 0) {
+    manifest.overrides = {
+      ...(manifest.overrides ?? {}),
+      ...tarballSpecs,
+    };
   }
 
   return `${JSON.stringify(manifest, null, 2)}\n`;

@@ -30,6 +30,8 @@ describe('rewritePackageManifestToTarballs', () => {
     expect(rewritten.dependencies?.['chalk']).toBe('^5.0.0');
     expect(rewritten.devDependencies?.['@flyingrobots/bijou-tui']).toBe('file:/tmp/bijou-tui.tgz');
     expect(rewritten.peerDependencies?.['@flyingrobots/bijou-tui-app']).toBe('file:/tmp/bijou-tui-app.tgz');
+    expect(rewritten.overrides?.['@flyingrobots/bijou']).toBe('file:/tmp/bijou.tgz');
+    expect(rewritten.overrides?.['@flyingrobots/bijou-tui']).toBe('file:/tmp/bijou-tui.tgz');
   });
 
   it('leaves unrelated manifests unchanged when no tarball exists', () => {
@@ -47,6 +49,26 @@ describe('rewritePackageManifestToTarballs', () => {
 
     expect(rewritten.dependencies?.['@flyingrobots/bijou']).toBe('latest');
     expect(rewritten.dependencies?.['picocolors']).toBe('^1.1.0');
+  });
+
+  it('adds tarball overrides for transitive workspace dependencies', () => {
+    const source = JSON.stringify({
+      name: 'core-canary',
+      dependencies: {
+        '@flyingrobots/bijou': 'latest',
+        '@flyingrobots/bijou-node': 'latest',
+      },
+    });
+
+    const rewritten = JSON.parse(rewritePackageManifestToTarballs(source, {
+      '@flyingrobots/bijou': 'file:/tmp/bijou.tgz',
+      '@flyingrobots/bijou-node': 'file:/tmp/bijou-node.tgz',
+      '@flyingrobots/bijou-tui': 'file:/tmp/bijou-tui.tgz',
+    })) as Record<string, Record<string, string>>;
+
+    expect(rewritten.dependencies?.['@flyingrobots/bijou']).toBe('file:/tmp/bijou.tgz');
+    expect(rewritten.dependencies?.['@flyingrobots/bijou-node']).toBe('file:/tmp/bijou-node.tgz');
+    expect(rewritten.overrides?.['@flyingrobots/bijou-tui']).toBe('file:/tmp/bijou-tui.tgz');
   });
 });
 
