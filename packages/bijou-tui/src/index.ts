@@ -353,6 +353,7 @@ export {
 
 // Notification stack overlays
 export {
+  type NotificationHistoryFilter,
   type NotificationVariant,
   type NotificationTone,
   type NotificationPlacement,
@@ -361,7 +362,9 @@ export {
   type NotificationPhase,
   type NotificationRecord,
   type NotificationState,
+  type RenderNotificationHistoryOptions,
   type RenderNotificationStackOptions,
+  countNotificationHistory,
   createNotificationState,
   pushNotification,
   dismissNotification,
@@ -373,6 +376,7 @@ export {
   tickNotifications,
   hasNotifications,
   notificationsNeedTick,
+  renderNotificationHistory,
   renderNotificationStack,
 } from './notification.js';
 

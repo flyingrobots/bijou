@@ -8,6 +8,7 @@ import {
   createSurface,
   segmentGraphemes,
   surfaceToString,
+  wrapToWidth,
 } from '@flyingrobots/bijou';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -23,6 +24,11 @@ export type NotificationPlacement =
   | 'TOP_CENTER'
   | 'BOTTOM_CENTER'
   | 'CENTER';
+
+export type NotificationHistoryFilter =
+  | 'ALL'
+  | 'ACTIONABLE'
+  | NotificationTone;
 
 export interface NotificationAction<Msg> {
   readonly label: string;
@@ -81,6 +87,14 @@ export interface RenderNotificationStackOptions {
   readonly gap?: number;
 }
 
+export interface RenderNotificationHistoryOptions {
+  readonly width: number;
+  readonly height: number;
+  readonly scroll?: number;
+  readonly filter?: NotificationHistoryFilter;
+  readonly ctx?: BijouContext;
+}
+
 interface CellTextStyle {
   readonly fg?: string;
   readonly bg?: string;
@@ -119,6 +133,116 @@ export function createNotificationState<Msg>(): NotificationState<Msg> {
     history: [],
     nextId: 1,
   };
+}
+
+function matchesHistoryFilter<Msg>(
+  item: NotificationRecord<Msg>,
+  filter: NotificationHistoryFilter,
+): boolean {
+  if (filter === 'ALL') return true;
+  if (filter === 'ACTIONABLE') return item.variant === 'ACTIONABLE';
+  return item.tone === filter;
+}
+
+export function countNotificationHistory<Msg>(
+  state: NotificationState<Msg>,
+  filter: NotificationHistoryFilter = 'ALL',
+): number {
+  let count = 0;
+  for (const item of state.history) {
+    if (matchesHistoryFilter(item, filter)) count++;
+  }
+  return count;
+}
+
+function filterLabel(filter: NotificationHistoryFilter): string {
+  return filter === 'ALL' ? 'All' : filter === 'ACTIONABLE' ? 'Actionable' : filter;
+}
+
+function renderHistoryEntry<Msg>(
+  item: NotificationRecord<Msg>,
+  width: number,
+  ctx: BijouContext | undefined,
+): readonly string[] {
+  const safeWidth = Math.max(1, width);
+  const toneLabel = `[${item.tone}]`;
+  const title = ctx == null
+    ? `${toneLabel} ${item.title}`
+    : `${ctx.style.styled(ctx.semantic(toneSemanticKey(item.tone)), toneLabel)} ${ctx.style.bold(item.title)}`;
+  const meta = `${formatTimeLabel(item.createdAtMs)} • ${item.variant} • ${item.placement}`;
+  const metaLine = ctx == null ? meta : ctx.style.styled(ctx.semantic('muted'), meta);
+  const actionLine = item.action == null
+    ? undefined
+    : (ctx == null
+      ? `Action: ${item.action.label}`
+      : ctx.style.styled(ctx.semantic('muted'), `Action: ${item.action.label}`));
+  const messageLine = item.message.length === 0
+    ? undefined
+    : (ctx == null ? item.message : ctx.style.styled(ctx.semantic('muted'), item.message));
+
+  const lines = [
+    ...wrapToWidth(title, safeWidth),
+    ...wrapToWidth(metaLine, safeWidth),
+    ...(messageLine == null ? [] : wrapToWidth(messageLine, safeWidth)),
+    ...(actionLine == null ? [] : wrapToWidth(actionLine, safeWidth)),
+  ];
+
+  return lines.length === 0 ? [''] : lines;
+}
+
+export function renderNotificationHistory<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationHistoryOptions,
+): string {
+  const safeWidth = Math.max(1, options.width);
+  const safeHeight = Math.max(3, options.height);
+  const filter = options.filter ?? 'ALL';
+  const filtered = state.history.filter((item) => matchesHistoryFilter(item, filter));
+  const maxBodyLines = Math.max(1, safeHeight - 2);
+  const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
+
+  if (filtered.length === 0) {
+    const empty = wrapToWidth(
+      options.ctx == null
+        ? `No archived notifications for ${filterLabel(filter)} yet.`
+        : options.ctx.style.styled(
+          options.ctx.semantic('muted'),
+          `No archived notifications for ${filterLabel(filter)} yet.`,
+        ),
+      safeWidth,
+    ).slice(0, maxBodyLines);
+    return [
+      `History • ${filterLabel(filter)} • 0 items`,
+      '',
+      ...empty,
+    ].join('\n');
+  }
+
+  const bodyLines: string[] = [];
+  let renderedCount = 0;
+
+  for (const item of filtered.slice(start)) {
+    const entryLines = renderHistoryEntry(item, safeWidth, options.ctx);
+    const remaining = maxBodyLines - bodyLines.length;
+    if (remaining <= 0) break;
+
+    if (bodyLines.length > 0) {
+      if (remaining <= 1) break;
+      bodyLines.push('');
+    }
+
+    bodyLines.push(...entryLines.slice(0, maxBodyLines - bodyLines.length));
+    renderedCount++;
+
+    if (bodyLines.length >= maxBodyLines) break;
+  }
+
+  const end = Math.min(filtered.length, start + Math.max(1, renderedCount));
+  return [
+    `History • ${filterLabel(filter)} • ${start + 1}-${end} of ${filtered.length}`,
+    '',
+    ...bodyLines,
+  ].join('\n');
 }
 
 function defaultDurationMs(variant: NotificationVariant): number | null {

@@ -752,4 +752,40 @@ describe('createFramedApp', () => {
     expect(rendered).toContain('Command rejected: worker crashed during boot');
     expect(cmds).toHaveLength(1);
   });
+
+  it('treats modal keymaps as exclusive while a page modal is open', async () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0, modalOpen: true }, []],
+        update(msg, model) {
+          if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+          if (msg.type === 'noop') return [model, []];
+          return [model, []];
+        },
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => 'modal page',
+        }),
+        keyMap: createKeyMap<Msg>()
+          .bind('x', 'Increment', { type: 'inc' }),
+        modalKeyMap(model) {
+          if (!model.modalOpen) return undefined;
+          return createKeyMap<Msg>()
+            .bind('escape', 'Close modal', { type: 'noop' });
+        },
+      }],
+    });
+
+    const result = await runScript(app, [
+      { key: 'x' },
+      { key: ']' },
+      { key: KEY_ESCAPE },
+    ]);
+
+    expect(result.model.activePageId).toBe('home');
+    expect(result.model.pageModels.home?.count).toBe(0);
+  });
 });

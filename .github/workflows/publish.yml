@@ -22,12 +22,12 @@ jobs:
       npm_dist_tag: ${{ steps.meta.outputs.npm_dist_tag }}
       release_sha: ${{ steps.release_sha.outputs.release_sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -86,11 +86,11 @@ jobs:
       matrix:
         package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.verify.outputs.release_sha }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm

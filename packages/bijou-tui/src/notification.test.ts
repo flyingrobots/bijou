@@ -3,12 +3,14 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { stripAnsi } from './viewport.js';
 import {
   activateFocusedNotification,
+  countNotificationHistory,
   createNotificationState,
   cycleNotificationFocus,
   dismissNotification,
   relocateNotifications,
   notificationsNeedTick,
   pushNotification,
+  renderNotificationHistory,
   renderNotificationStack,
   trimNotificationsToViewport,
   tickNotifications,
@@ -120,6 +122,98 @@ describe('notification state', () => {
 
     state = tickNotifications(state, 900);
     expect(state.history.some((item) => item.title === 'Notice 1')).toBe(true);
+  });
+
+  it('counts and renders archived notification history with filters', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Archived info',
+      message: 'Informational trail entry.',
+      variant: 'TOAST',
+      tone: 'INFO',
+      durationMs: null,
+    }, 0);
+    state = pushNotification(state, {
+      title: 'Archived action',
+      message: 'Needs follow-up.',
+      variant: 'ACTIONABLE',
+      tone: 'ERROR',
+      durationMs: null,
+      action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
+    }, 10);
+
+    state = tickNotifications(state, 250);
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = dismissNotification(state, state.items[1]!.id, 310);
+    state = tickNotifications(state, 900);
+
+    expect(countNotificationHistory(state)).toBe(2);
+    expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
+    expect(countNotificationHistory(state, 'ERROR')).toBe(1);
+
+    const body = renderNotificationHistory(state, {
+      width: 34,
+      height: 8,
+      filter: 'ACTIONABLE',
+    });
+
+    expect(stripAnsi(body)).toContain('History • Actionable • 1-1 of 1');
+    expect(stripAnsi(body)).toContain('Archived action');
+    expect(stripAnsi(body)).toContain('Retry deploy');
+    expect(stripAnsi(body)).not.toContain('Archived info');
+  });
+
+  it('treats actionable history as the variant, not action presence', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Dismiss-only actionable',
+      message: 'Archived without a custom action payload.',
+      variant: 'ACTIONABLE',
+      tone: 'WARNING',
+      durationMs: null,
+    }, 0);
+
+    state = tickNotifications(state, 250);
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = tickNotifications(state, 900);
+
+    expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
+
+    const body = renderNotificationHistory(state, {
+      width: 28,
+      height: 8,
+      filter: 'ACTIONABLE',
+    });
+
+    expect(stripAnsi(body)).toMatch(/Dismiss-only actio\s*nable/);
+  });
+
+  it('supports scrolling through archived notification history', () => {
+    let state = createNotificationState<Msg>();
+    for (let index = 0; index < 3; index++) {
+      state = pushNotification(state, {
+        title: `Archived ${index + 1}`,
+        message: 'Scrollable history entry.',
+        variant: 'TOAST',
+        durationMs: null,
+      }, index * 10);
+    }
+
+    state = tickNotifications(state, 250);
+    for (const item of state.items) {
+      state = dismissNotification(state, item.id, 300 + item.id);
+    }
+    state = tickNotifications(state, 900);
+
+    const body = renderNotificationHistory(state, {
+      width: 28,
+      height: 7,
+      scroll: 1,
+    });
+
+    expect(stripAnsi(body)).toContain('History • All • 2-2 of 3');
+    expect(stripAnsi(body)).toContain('Archived 2');
+    expect(stripAnsi(body)).not.toContain('Archived 3');
   });
 });
 

@@ -14,11 +14,11 @@ jobs:
       version: ${{ steps.meta.outputs.version }}
       notes_tag: ${{ steps.meta.outputs.notes_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -67,9 +67,9 @@ jobs:
       matrix:
         package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -123,7 +123,7 @@ jobs:
           );
           EOF
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-notes-preview
           path: RELEASE_NOTES_PREVIEW.md
