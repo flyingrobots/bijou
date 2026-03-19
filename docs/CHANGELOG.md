@@ -13,6 +13,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 🐛 Fixes
 
 - **GitHub Actions runtime compatibility** — CI, publish, and release dry-run workflows now use `actions/checkout@v6` and `actions/setup-node@v6`, clearing the Node 20 action-runtime deprecation warning path before GitHub flips the default to Node 24.
+- **Notification history filtering and modal safety** — actionable archived notifications are now filtered by variant instead of custom action payload presence, the notification history center blocks background notification shortcuts while open, and the demo initializes framed shell dimensions from the injected runtime so the compact-terminal history modal clamps and wraps correctly.
+- **Release dry-run artifact action compatibility** — the release dry-run workflow now uses `actions/upload-artifact@v7`, matching the current Node 24-compatible action runtime.
 
 ## [3.1.0] - 2026-03-18
 
