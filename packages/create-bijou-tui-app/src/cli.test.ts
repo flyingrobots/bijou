@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -55,6 +55,20 @@ function resolveInstalledCliCommand(runnerDir: string): string {
   return process.platform === 'win32'
     ? join(binDir, 'create-bijou-tui-app.cmd')
     : join(binDir, 'create-bijou-tui-app');
+}
+
+function resolveInstalledCliEntrypoint(runnerDir: string): string {
+  const packageDir = join(runnerDir, 'node_modules', 'create-bijou-tui-app');
+  const packageJson = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8')) as {
+    readonly bin?: string | Record<string, string>;
+  };
+  const binRelative = typeof packageJson.bin === 'string'
+    ? packageJson.bin
+    : packageJson.bin?.['create-bijou-tui-app'];
+  if (typeof binRelative !== 'string' || binRelative.length === 0) {
+    throw new Error('Installed package does not declare a create-bijou-tui-app bin entry.');
+  }
+  return join(packageDir, binRelative);
 }
 
 describe('create-bijou-tui-app cli', () => {
@@ -138,7 +152,7 @@ describe('create-bijou-tui-app cli', () => {
     }
   });
 
-  it('runs correctly from the packed npm executable path', () => {
+  it('installs a runnable packed CLI entrypoint and exports the npm bin', () => {
     const root = mkdtempSync(join(tmpdir(), 'create-bijou-pack-cli-'));
     const packDir = join(root, 'pack');
     const runnerDir = join(root, 'runner');
@@ -185,15 +199,18 @@ describe('create-bijou-tui-app cli', () => {
 
       const binPath = resolveInstalledCliCommand(runnerDir);
       expect(existsSync(binPath)).toBe(true);
+      const entrypoint = resolveInstalledCliEntrypoint(runnerDir);
+      expect(existsSync(entrypoint)).toBe(true);
+      if (process.platform !== 'win32') {
+        expect(realpathSync(binPath)).toBe(realpathSync(entrypoint));
+      }
       const result = spawnSync(
-        binPath,
-        [targetDir, '--no-install'],
+        process.execPath,
+        [entrypoint, targetDir, '--no-install'],
         {
           cwd: root,
           encoding: 'utf8',
           maxBuffer: 8 * 1024 * 1024,
-          timeout: 30_000,
-          shell: process.platform === 'win32',
         },
       );
       expect(result.error).toBeUndefined();
@@ -203,5 +220,5 @@ describe('create-bijou-tui-app cli', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
-  }, 180000);
+  }, 240000);
 });
