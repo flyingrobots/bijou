@@ -188,6 +188,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly initialRows?: number;
   /** Optional global keymap layered above page keymap. */
   readonly globalKeys?: KeyMap<Msg>;
+  /** Resolve key conflicts in favor of the frame shell or the active page. Default: 'frame-first'. */
+  readonly keyPriority?: 'frame-first' | 'page-first';
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
   /** Optional overlay provider (receives pane rects for panel scoping). */
@@ -554,7 +556,28 @@ export function createFramedApp<PageModel, Msg>(
           return [model, []];
         }
 
+        const activePage = pagesById.get(model.activePageId)!;
+        const pageAction = activePage.keyMap?.handle(msg);
+        const globalAction = options.globalKeys?.handle(msg);
         const frameAction = frameKeys.handle(msg);
+        const keyPriority = options.keyPriority ?? 'frame-first';
+
+        if (keyPriority === 'page-first') {
+          if (pageAction !== undefined) {
+            return [model, [emitMsgForPage(model.activePageId, pageAction)]];
+          }
+          if (globalAction !== undefined) {
+            return [model, [emitMsg(globalAction)]];
+          }
+          if (frameAction !== undefined) {
+            if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
+              return [openCommandPalette(model, frameKeys, options, pagesById), []];
+            }
+            return applyFrameAction(frameAction, model, options, pagesById);
+          }
+          return [model, []];
+        }
+
         if (frameAction !== undefined) {
           // Handle palette opening here since applyFrameAction doesn't have access to palette deps
           if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
@@ -563,13 +586,10 @@ export function createFramedApp<PageModel, Msg>(
           return applyFrameAction(frameAction, model, options, pagesById);
         }
 
-        const globalAction = options.globalKeys?.handle(msg);
         if (globalAction !== undefined) {
           return [model, [emitMsg(globalAction)]];
         }
 
-        const activePage = pagesById.get(model.activePageId)!;
-        const pageAction = activePage.keyMap?.handle(msg);
         if (pageAction !== undefined) {
           return [model, [emitMsgForPage(model.activePageId, pageAction)]];
         }

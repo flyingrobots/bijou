@@ -331,6 +331,33 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(1);
   });
 
+  it('can prefer page key bindings over frame scroll bindings', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => makeLongContent('home:main'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('l', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+      keyPriority: 'page-first',
+    });
+
+    const result = await runScript(app, [{ key: 'l' }]);
+    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
+  });
+
   it('keeps init command messages scoped to their originating page', async () => {
     const initInc: Cmd<Msg> = async () => ({ type: 'inc' });
     const page = (id: string, title: string): FramePage<PageModel, Msg> => ({

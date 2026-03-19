@@ -77,6 +77,7 @@ interface PageModel {
   readonly actionEnabled: boolean;
   readonly wrapText: boolean;
   readonly nextOrdinal: number;
+  readonly lastHandledInput: string;
   readonly log: readonly string[];
 }
 
@@ -91,6 +92,7 @@ function createInitialPageModel(): PageModel {
     actionEnabled: true,
     wrapText: true,
     nextOrdinal: 1,
+    lastHandledInput: 'none',
     log: [
       'Notification lab ready.',
       'Press n to spawn a new notification.',
@@ -165,6 +167,13 @@ function appendLog(model: PageModel, message: string): PageModel {
   };
 }
 
+function recordInput(model: PageModel, key: string, message: string): PageModel {
+  return appendLog({
+    ...model,
+    lastHandledInput: key,
+  }, `[${key}] ${message}`);
+}
+
 function applyNotificationState(
   model: PageModel,
   notifications: NotificationState<Msg>,
@@ -220,9 +229,10 @@ function spawnConfiguredNotification(model: PageModel): [PageModel, Cmd<Msg>[]] 
   const notifications = pushNotification(model.notifications, spec, ctx.clock.now());
   const nextModel = appendLog({
     ...model,
+    lastHandledInput: 'n',
     notifications,
     nextOrdinal: ordinal + 1,
-  }, `Spawned ${variant} #${ordinal} at ${placement} (${formatDurationLabel(duration.value)})`);
+  }, `[n] Spawned ${variant} #${ordinal} at ${placement} (${formatDurationLabel(duration.value)}).`);
 
   return applyNotificationState(nextModel, notifications);
 }
@@ -236,10 +246,10 @@ function dismissCurrentNotification(model: PageModel): [PageModel, Cmd<Msg>[]] {
 
   if (notifications === model.notifications) return [model, []];
 
-  const nextModel = appendLog({
+  const nextModel = recordInput({
     ...model,
     notifications,
-  }, 'Dismissed a notification.');
+  }, 'x', 'Dismissed a notification.');
 
   return applyNotificationState(nextModel, notifications);
 }
@@ -310,6 +320,7 @@ function renderControlsPane(model: PageModel, width: number): string {
   const activeVariant = currentVariant(model);
   const activeTone = currentTone(model);
   const activePlacement = currentPlacement(model);
+  const nextPlacement = PLACEMENTS[(model.placementIndex + 1) % PLACEMENTS.length]!;
   const activeDuration = currentDuration(model);
   const focused = model.notifications.focusedId == null
     ? 'none'
@@ -319,13 +330,15 @@ function renderControlsPane(model: PageModel, width: number): string {
     '',
     `Variant : ${activeVariant}`,
     `Tone    : ${activeTone}`,
-    `Place   : ${activePlacement}`,
+    `Next at : ${activePlacement}`,
+    `Cycle   : ${nextPlacement}`,
     `Stay    : ${activeDuration.label}`,
     `Action  : ${model.actionEnabled ? 'enabled' : 'disabled'}`,
     `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
     `Stack   : ${model.notifications.items.length}`,
     `History : ${model.notifications.history.length}`,
     `Focus   : ${focused}`,
+    `Last key: ${model.lastHandledInput}`,
     '',
     `${kbd('n')} spawn`,
     `${kbd('v')} cycle variant`,
@@ -382,15 +395,15 @@ const page: FramePage<PageModel, Msg> = {
       case 'spawn-notification':
         return spawnConfiguredNotification(model);
       case 'cycle-variant':
-        return [{
+        return [recordInput({
           ...model,
           variantIndex: (model.variantIndex + 1) % VARIANTS.length,
-        }, []];
+        }, 'v', `Variant -> ${VARIANTS[(model.variantIndex + 1) % VARIANTS.length]!}.`), []];
       case 'cycle-tone':
-        return [{
+        return [recordInput({
           ...model,
           toneIndex: (model.toneIndex + 1) % TONES.length,
-        }, []];
+        }, 't', `Tone -> ${TONES[(model.toneIndex + 1) % TONES.length]!}.`), []];
       case 'cycle-placement':
       {
         const nextPlacementIndex = (model.placementIndex + 1) % PLACEMENTS.length;
@@ -402,36 +415,37 @@ const page: FramePage<PageModel, Msg> = {
         );
         const nextModel = appendLog({
           ...model,
+          lastHandledInput: 'l',
           placementIndex: nextPlacementIndex,
           notifications,
-        }, `Moved active notifications to ${nextPlacement}.`);
+        }, `[l] Placement -> ${nextPlacement}; active notifications relocated.`);
         return applyNotificationState(nextModel, notifications);
       }
       case 'cycle-duration':
-        return [{
+        return [recordInput({
           ...model,
           durationIndex: (model.durationIndex + 1) % DURATION_OPTIONS.length,
-        }, []];
+        }, 'd', `Duration -> ${DURATION_OPTIONS[(model.durationIndex + 1) % DURATION_OPTIONS.length]!.label}.`), []];
       case 'toggle-action':
-        return [{
+        return [recordInput({
           ...model,
           actionEnabled: !model.actionEnabled,
-        }, []];
+        }, 'a', `Action button ${!model.actionEnabled ? 'enabled' : 'disabled'}.`), []];
       case 'toggle-wrap':
-        return [{
+        return [recordInput({
           ...model,
           wrapText: !model.wrapText,
-        }, []];
+        }, 'w', `Wrap ${!model.wrapText ? 'enabled' : 'disabled'}.`), []];
       case 'focus-next':
-        return [{
+        return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, 1),
-        }, []];
+        }, 'j', 'Focused next actionable notification.'), []];
       case 'focus-prev':
-        return [{
+        return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, -1),
-        }, []];
+        }, 'k', 'Focused previous actionable notification.'), []];
       case 'dismiss-notification':
         return dismissCurrentNotification(model);
       case 'activate-focused': {
@@ -442,7 +456,7 @@ const page: FramePage<PageModel, Msg> = {
         };
 
         if (result.payload?.type === 'notification-action') {
-          nextModel = appendLog(nextModel, `Action fired from notification #${result.payload.ordinal}.`);
+          nextModel = recordInput(nextModel, 'enter', `Action fired from notification #${result.payload.ordinal}.`);
         }
 
         return applyNotificationState(nextModel, nextModel.notifications);
@@ -502,6 +516,7 @@ const page: FramePage<PageModel, Msg> = {
 const app = createFramedApp<PageModel, Msg>({
   title: 'Bijou Notification Lab',
   pages: [page],
+  keyPriority: 'page-first',
   enableCommandPalette: true,
   overlayFactory(frame) {
     const paneRects = [...frame.paneRects.values()];
