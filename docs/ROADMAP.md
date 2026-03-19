@@ -78,10 +78,12 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log. Summary:
 | **Bijou DevTools Inspector** | bijou-tui | Expand the toggleable overlay (`F12`) into a real inspector for focused node ids/classes, layout rects, BCSS matches, token resolution, message flow, and runtime state. |
 | **Syntax-Aware `textarea`** | bijou | Light-weight syntax highlighting for JSON, YAML, and Markdown within the editor. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
+| **Notification Center / History View** | bijou-tui | Build on the shipped notification stack with a reusable history/archive view, command-palette entry points, scroll/filter controls, and richer review/reopen flows for archived notices. |
 | **Continuum Bridge** | bijou | Specialized `ContinuumPort` for live-syncing components with WARP graphs and Shiplog events. |
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | The generated TUI canary and internal core/static canary shipped. Backlog now covers keeping the scenario coverage broad and the install/build path efficient without weakening published-artifact fidelity. |
 | **PR Review Tooling** | repo tooling | `pr:review-status` and `pr:merge-readiness` shipped. Backlog now covers differentiating active bot-review progress from stale historical chatter, shared GitHub adapter helpers, and batch reply/resolve workflows for addressed threads. |
 | **Release Dry-Run Workflow** | repo tooling | `workflow_dispatch` dry-run and shared release validation shipped. Backlog now covers a local shell-block preflight path plus any remaining release-policy helper cleanup. |
+| **GitHub Actions Runtime Compatibility** | repo tooling | Keep workflow action majors current so CI/publish/dry-run paths stay ahead of runner runtime deprecations like the Node 20 to Node 24 action-runtime switch. |
 | **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Backlog now covers keeping the PTY helper self-contained and low-noise. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
 | **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
