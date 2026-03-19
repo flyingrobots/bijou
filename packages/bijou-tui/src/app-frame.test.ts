@@ -720,7 +720,7 @@ describe('createFramedApp', () => {
     expect(lines[1]).toContain('pane:main');
   });
 
-  it('renders routed runtime issues through frame-managed notifications', () => {
+  it('renders routed runtime issues through frame-managed notifications', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
@@ -736,11 +736,19 @@ describe('createFramedApp', () => {
     expect(runtimeMsg).toBeDefined();
 
     const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
-    const frame = app.view(nextModel);
-    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
 
-    const rendered = surfaceToString(frame, testCtx.style);
     expect(nextModel.runtimeNotifications.items).toHaveLength(1);
+    expect(tickMsg).toBeDefined();
+
+    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+    const frame = app.view(visibleModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const rendered = surfaceToString(frame, testCtx.style);
     expect(rendered).toContain('Command rejected: worker crashed during boot');
     expect(cmds).toHaveLength(1);
   });
