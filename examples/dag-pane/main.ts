@@ -12,6 +12,7 @@ import {
   dagPanePageDown, dagPanePageUp,
   dagPaneKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
 initDefaultContext();
 const ctx = getDefaultContext();
@@ -131,4 +132,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

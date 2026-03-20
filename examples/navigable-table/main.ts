@@ -7,8 +7,9 @@ import {
   navTablePageDown, navTablePageUp,
   navTableKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const columns = [
   { header: 'Name', width: 20 },
@@ -80,4 +81,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

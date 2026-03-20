@@ -6,8 +6,9 @@ import {
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
   filePickerKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const io = nodeIO();
 
@@ -70,4 +71,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

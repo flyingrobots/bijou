@@ -4,6 +4,7 @@ import {
   run, quit, isKeyMsg, type App, type KeyMsg,
   createKeyMap, createInputStack, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -134,4 +135,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

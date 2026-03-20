@@ -6,8 +6,9 @@ import {
   focusNext, focusPrev, toggleFocused, expandAll, collapseAll,
   accordionKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const SECTIONS = [
   {
@@ -90,4 +91,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

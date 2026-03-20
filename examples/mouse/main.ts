@@ -4,6 +4,7 @@ import {
   run, quit, isKeyMsg, isMouseMsg,
   type App, type MouseMsg,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -69,4 +70,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app, { mouse: true });
+run(legacyApp(ctx, app), { mouse: true });

@@ -1,8 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 interface Model {
   count: number;
@@ -37,4 +38,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

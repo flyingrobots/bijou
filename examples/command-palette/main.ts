@@ -7,6 +7,7 @@ import {
   commandPaletteKeyMap, helpShort, vstack,
   type CommandPaletteItem,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -89,4 +90,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

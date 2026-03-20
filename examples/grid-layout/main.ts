@@ -8,8 +8,9 @@ import {
   type App,
   grid,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 interface Model {
   cols: number;
@@ -61,4 +62,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));

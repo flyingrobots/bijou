@@ -7,8 +7,9 @@ import {
   browsableListKeyMap, helpShort, vstack,
   type BrowsableListItem,
 } from '@flyingrobots/bijou-tui';
+import { legacyApp } from '../_shared/v3.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const items: BrowsableListItem[] = [
   { label: 'box()', value: 'box', description: 'Bordered containers with Unicode/ASCII fallback' },
@@ -75,4 +76,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app);
+run(legacyApp(ctx, app));
