@@ -11,6 +11,7 @@ import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
 import { makeBgFill } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
+import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -54,6 +55,8 @@ export interface ModalOptions {
   readonly screenHeight: number;
   /** Preferred minimum width — shorter lines are padded but longer lines are not truncated (default: auto from content). */
   readonly width?: number;
+  /** Preferred edge inset from the viewport when the dialog is centered. */
+  readonly margin?: number;
   /** Design token for the border color. */
   readonly borderToken?: TokenValue;
   /** Background fill token for the overlay interior. */
@@ -261,9 +264,10 @@ export function modal(options: ModalOptions): Overlay {
   const boxLines = boxStr.split('\n');
   const boxHeight = boxLines.length;
   const boxWidth = visibleLength(boxLines[0]!);
+  const margin = resolveOverlayMargin(screenWidth, screenHeight, options.margin);
 
-  const row = Math.max(0, Math.floor((screenHeight - boxHeight) / 2));
-  const col = Math.max(0, Math.floor((screenWidth - boxWidth) / 2));
+  const row = clampCenteredPosition(screenHeight, boxHeight, margin);
+  const col = clampCenteredPosition(screenWidth, boxWidth, margin);
 
   return { content: boxStr, row, col };
 }
@@ -302,9 +306,10 @@ export function toast(options: ToastOptions): Overlay {
     anchor = 'bottom-right',
     screenWidth,
     screenHeight,
-    margin = 1,
+    margin,
     ctx,
   } = options;
+  const resolvedMargin = resolveOverlayMargin(screenWidth, screenHeight, margin);
 
   const icon = TOAST_ICONS[variant];
   let line = icon + ' ' + message;
@@ -330,20 +335,20 @@ export function toast(options: ToastOptions): Overlay {
 
   switch (anchor) {
     case 'top-right':
-      row = margin;
-      col = screenWidth - boxWidth - margin;
+      row = resolvedMargin;
+      col = screenWidth - boxWidth - resolvedMargin;
       break;
     case 'bottom-right':
-      row = screenHeight - boxHeight - margin;
-      col = screenWidth - boxWidth - margin;
+      row = screenHeight - boxHeight - resolvedMargin;
+      col = screenWidth - boxWidth - resolvedMargin;
       break;
     case 'bottom-left':
-      row = screenHeight - boxHeight - margin;
-      col = margin;
+      row = screenHeight - boxHeight - resolvedMargin;
+      col = resolvedMargin;
       break;
     case 'top-left':
-      row = margin;
-      col = margin;
+      row = resolvedMargin;
+      col = resolvedMargin;
       break;
   }
 

@@ -9,6 +9,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### ✨ Features
 
 - **Notification history center** — `@flyingrobots/bijou-tui` now exposes `renderNotificationHistory()` / `countNotificationHistory()`, and the framed notification lab can open a scrollable history modal from the command palette or `Shift+H`, with filter cycling and archived actionable/error review.
+- **Shared TUI design-language defaults** — `@flyingrobots/bijou-tui` now centralizes compact-viewport detection plus overlay/notification inset defaults, so modals, toasts, and the notification lab share one cell-based spacing policy instead of drifting on local magic numbers.
 
 ### 📝 Documentation
 

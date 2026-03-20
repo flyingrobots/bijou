@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { composite, modal, toast, drawer, tooltip } from './overlay.js';
 import type { Overlay, DrawerOptions } from './overlay.js';
+import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { visibleLength, stripAnsi } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -168,8 +169,9 @@ describe('modal', () => {
     const boxLines = content.split('\n');
     const boxH = boxLines.length;
     const boxW = visibleLength(boxLines[0]!);
-    expect(row).toBe(Math.floor((24 - boxH) / 2));
-    expect(col).toBe(Math.floor((80 - boxW) / 2));
+    const margin = resolveOverlayMargin(80, 24);
+    expect(row).toBe(clampCenteredPosition(24, boxH, margin));
+    expect(col).toBe(clampCenteredPosition(80, boxW, margin));
   });
 
   it('clamps to (0,0) when modal exceeds screen', () => {
@@ -317,8 +319,18 @@ describe('toast', () => {
     const { row, col, content } = toast({ message: 'x', screenWidth: 80, screenHeight: 24 });
     const boxH = content.split('\n').length;
     const boxW = visibleLength(content.split('\n')[0]!);
-    expect(row).toBe(24 - boxH - 1);
-    expect(col).toBe(80 - boxW - 1);
+    const margin = resolveOverlayMargin(80, 24);
+    expect(row).toBe(24 - boxH - margin);
+    expect(col).toBe(80 - boxW - margin);
+  });
+
+  it('uses a preferred roomy margin by default and a compact margin on tight screens', () => {
+    const roomy = toast({ message: 'roomy', screenWidth: 80, screenHeight: 24 });
+    const compact = toast({ message: 'compact', screenWidth: 40, screenHeight: 12 });
+    const roomyHeight = roomy.content.split('\n').length;
+    const compactHeight = compact.content.split('\n').length;
+    expect(roomy.row).toBe(24 - roomyHeight - 2);
+    expect(compact.row).toBe(12 - compactHeight - 1);
   });
 
   it('margin is respected', () => {

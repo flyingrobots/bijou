@@ -13,6 +13,7 @@ import {
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
+import { resolveNotificationGap, resolveOverlayMargin } from './design-language.js';
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
 export type NotificationTone = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
@@ -108,8 +109,6 @@ interface NotificationRenderEntry<Msg> {
 
 const ENTER_DURATION_MS = 180;
 const EXIT_DURATION_MS = 320;
-const DEFAULT_MARGIN = 1;
-const DEFAULT_GAP = 1;
 const HISTORY_LIMIT = 250;
 
 const TONE_ICONS: Record<NotificationTone, string> = {
@@ -882,8 +881,8 @@ function selectVisibleNotificationIds<Msg>(
   options: RenderNotificationStackOptions,
 ): ReadonlySet<number> {
   const region = resolveRegion(options);
-  const margin = options.margin ?? DEFAULT_MARGIN;
-  const gap = options.gap ?? DEFAULT_GAP;
+  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
+  const gap = resolveNotificationGap(options.gap);
   const availableHeight = Math.max(1, region.height - (margin * 2));
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
 
@@ -1032,8 +1031,8 @@ export function renderNotificationStack<Msg>(
   const region = resolveRegion(options);
   if (region.width <= 0 || region.height <= 0) return [];
 
-  const margin = options.margin ?? DEFAULT_MARGIN;
-  const gap = options.gap ?? DEFAULT_GAP;
+  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
+  const gap = resolveNotificationGap(options.gap);
   const visibleIds = selectVisibleNotificationIds(state, options);
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
   const overflowGrouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();

@@ -64,6 +64,22 @@ const DURATION_OPTIONS = [
   { label: '9.0s', value: 9_000 },
 ] as const;
 
+const COMPACT_DEMO_WIDTH = 52;
+const COMPACT_DEMO_HEIGHT = 16;
+const COMPACT_OVERLAY_MARGIN = 1;
+const DEFAULT_OVERLAY_MARGIN = 2;
+const DEMO_NOTIFICATION_GAP = 1;
+
+function isCompactDemoViewport(width: number, height: number): boolean {
+  return width < COMPACT_DEMO_WIDTH || height < COMPACT_DEMO_HEIGHT;
+}
+
+function demoOverlayMargin(width: number, height: number): number {
+  return isCompactDemoViewport(width, height)
+    ? COMPACT_OVERLAY_MARGIN
+    : DEFAULT_OVERLAY_MARGIN;
+}
+
 type Msg =
   | { type: 'spawn-notification' }
   | { type: 'cycle-variant' }
@@ -337,7 +353,8 @@ function renderHistoryModal(
   notificationCtx = ctx,
 ) {
   const filter = currentHistoryFilter(model);
-  const compact = screenWidth < 52;
+  const compact = isCompactDemoViewport(screenWidth, screenHeight);
+  const edgeMargin = demoOverlayMargin(screenWidth, screenHeight);
   const title = compact ? 'History' : `Notification History (${filter})`;
   const hint = compact
     ? 'Up/Down • PgUp/PgDn • f • Esc'
@@ -345,7 +362,7 @@ function renderHistoryModal(
   const headerRows = 2;
   const hintRows = 2;
   const borderRows = 2;
-  const modalWidth = Math.max(12, Math.min(96, Math.max(12, screenWidth - 2)));
+  const modalWidth = Math.max(12, Math.min(96, Math.max(12, screenWidth - (edgeMargin * 2))));
   const bodyWidth = Math.max(1, modalWidth - 4);
   const bodyHeight = Math.max(
     1,
@@ -380,8 +397,11 @@ function applyNotificationState(
   const trimmed = trimNotificationsToViewport(notifications, {
     screenWidth: notificationCtx.runtime.columns,
     screenHeight: Math.max(0, notificationCtx.runtime.rows - 2),
-    margin: 2,
-    gap: 1,
+    margin: demoOverlayMargin(
+      notificationCtx.runtime.columns,
+      Math.max(0, notificationCtx.runtime.rows - 2),
+    ),
+    gap: DEMO_NOTIFICATION_GAP,
     ctx: notificationCtx,
   }, clock.now());
   const needsTick = notificationsNeedTick(trimmed);

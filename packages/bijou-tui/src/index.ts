@@ -239,6 +239,16 @@ export {
   sequence,
 } from './animate.js';
 
+// Design language defaults
+export {
+  TUI_SPACING,
+  COMPACT_VIEWPORT_WIDTH,
+  COMPACT_VIEWPORT_HEIGHT,
+  isCompactViewport,
+  resolveOverlayMargin,
+  resolveNotificationGap,
+} from './design-language.js';
+
 // Viewport — scrollable content pane
 export {
   type ViewportOptions,
