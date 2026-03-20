@@ -10,6 +10,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Notification history center** — `@flyingrobots/bijou-tui` now exposes `renderNotificationHistory()` / `countNotificationHistory()`, and the framed notification lab can open a scrollable history modal from the command palette or `Shift+H`, with filter cycling and archived actionable/error review.
 
+### 📝 Documentation
+
+- **Design-system docs foundation** — added a new `docs/design-system/` section covering foundations, interaction/pattern policy, component families, and data-visualization guidance, plus linked that guidance from the root and package README entry points.
+
 ### 🐛 Fixes
 
 - **GitHub Actions runtime compatibility** — CI, publish, and release dry-run workflows now use `actions/checkout@v6` and `actions/setup-node@v6`, clearing the Node 20 action-runtime deprecation warning path before GitHub flips the default to Node 24.

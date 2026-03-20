@@ -126,6 +126,20 @@ This repo is opinionated about one thing: if the examples, scaffolded apps, and 
 
 All packages are versioned in lock-step.
 
+## Design System
+
+Bijou now ships a design-system documentation track in addition to API docs.
+
+Start here:
+
+- [Design System Overview](./docs/design-system/README.md)
+- [Foundations](./docs/design-system/foundations.md)
+- [Patterns](./docs/design-system/patterns.md)
+- [Component Families](./docs/design-system/component-families.md)
+- [Data Visualization Policy](./docs/design-system/data-visualization.md)
+
+If you want the blunt version: these docs answer not just "what exports exist?" but "what is this component for, when should I use it, when should I avoid it, and what is the TUI-versus-core boundary?"
+
 ## Quick Start
 
 ### Install The Core Toolkit

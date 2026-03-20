@@ -48,6 +48,22 @@ const panel = boxSurface(
 - **Theme system**: preset themes + DTCG-compatible custom token loading via `BIJOU_THEME`.
 - **Test adapters**: deterministic test context and assertion helpers for mock-free component testing.
 
+## Design guidance
+
+For the system-level guidance behind the component catalog, see:
+
+- [`../../docs/design-system/README.md`](../../docs/design-system/README.md)
+- [`../../docs/design-system/foundations.md`](../../docs/design-system/foundations.md)
+- [`../../docs/design-system/patterns.md`](../../docs/design-system/patterns.md)
+- [`../../docs/design-system/component-families.md`](../../docs/design-system/component-families.md)
+
+Those docs answer the questions the API reference cannot:
+
+- when to use a family
+- when not to use it
+- which variation is semantic versus render-path versus interaction-layer
+- what belongs in core Bijou versus `@flyingrobots/bijou-tui`
+
 ## Components
 
 ### Layout
