@@ -9,7 +9,7 @@ The high-fidelity TEA runtime for Bijou.
 The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
 
 ### 🌟 What's New
-- **Honest view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`string | Surface | LayoutNode`). Strings still work, but they are the legacy compatibility path.
+- **Pure view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`Surface | LayoutNode`).
 - **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
 - **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
 - **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
@@ -22,7 +22,7 @@ The TUI package has been completely overhauled in v3.0.0 to operate as a true gr
 npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
 ```
 
-If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
+If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
 
 ## Quick Start (V3 Sub-App Composition)
 
@@ -73,6 +73,7 @@ run(app);
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
 import { run, quit, type App, isKeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
@@ -91,7 +92,11 @@ const app: App<Model> = {
     return [model, []];
   },
 
-  view: (model) => `Count: ${model.count}\n\nPress +/- to change, q to quit`,
+  view: (model) => {
+    const text = `Count: ${model.count}\n\nPress +/- to change, q to quit`;
+    const lines = text.split('\n');
+    return stringToSurface(text, Math.max(1, ...lines.map((line) => line.length)), lines.length);
+  },
 };
 
 run(app);
@@ -431,7 +436,7 @@ Reach for `toast()` when the app is composing a one-off overlay directly. Reach 
 - frame help (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay factory with pane rects for panel-scoped drawers/modals
 
-Pane renderers may return a legacy string, a `Surface`, or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
+Pane renderers return a `Surface` or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 

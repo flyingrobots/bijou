@@ -1,6 +1,6 @@
 # Examples Catalog
 
-> One app per component. Flagship V3 examples get `main.ts` + `README.md` and use the native Surface recorder; legacy examples can keep `demo.tape` (VHS).
+> One app per component. Flagship V3 examples get `main.ts` + `README.md` and use the native Surface recorder; tape-backed examples can keep `demo.tape` (VHS).
 >
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record flagship V3 GIFs: `npx tsx scripts/record-gifs.ts`

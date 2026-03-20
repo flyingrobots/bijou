@@ -4,9 +4,9 @@ import { stripAnsi, segmentGraphemes } from '../text/index.js';
 
 /**
  * Convert a multi-line string into a Surface.
- * 
- * Note: This is a legacy migration helper. It currently strips ANSI
- * and treats all characters as the default style.
+ *
+ * This is a plain-text bridge. It strips ANSI and treats all characters
+ * as the default style.
  */
 export function stringToSurface(text: string, width: number, height: number): Surface {
   const surface = createSurface(width, height);
@@ -112,9 +112,9 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
 
 /**
  * Convert a Surface into a multi-line string with ANSI escape codes.
- * 
- * Note: This is a legacy migration helper.
- * 
+ *
+ * This is an explicit bridge for string-first APIs and terminal writes.
+ *
  * @param surface - The surface to convert.
  * @param style - The style port to use for color resolution.
  * @returns A string representation of the surface.

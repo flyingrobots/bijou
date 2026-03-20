@@ -53,7 +53,7 @@ This is not just a string-template library. It understands output modes and make
 It gives you:
 
 - a TEA-style runtime with `init`, `update`, `view`, and command flow
-- `ViewOutput` as the public render contract: `string | Surface | LayoutNode`
+- `ViewOutput` as the public render contract: `Surface | LayoutNode`
 - buffered `Surface` rendering instead of blind full-frame repainting
 - diff-based terminal output
 - layout primitives like `flex`, `vstack`, `hstack`, `grid`, and `viewport`
@@ -285,13 +285,13 @@ For the full example index, see [`examples/README.md`](./examples/README.md) and
 - `@flyingrobots/bijou-tui` is the high-fidelity runtime
 - `@flyingrobots/bijou-tui-app` is the shell layer
 - `@flyingrobots/bijou-node` owns the Node boundary, worker runtime, and recorder helpers
-- `App.view` and framed panes now honestly support `string | Surface | LayoutNode`
+- `App.view` and framed panes now stay on the pure runtime path: `Surface | LayoutNode`
 - the flagship runtime path is surface/layout-native at the frame boundary
 - BCSS, motion, Fractal TEA helpers, worker runtime, and native demo recording all ship as real documented features
 
 If you are upgrading an existing app, read the migration guide first:
 
-- [`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md)
+- [`docs/MIGRATING_TO_V4.md`](./docs/MIGRATING_TO_V4.md)
 
 And for the full release notes:
 
@@ -328,7 +328,7 @@ That gives the repo a downstream contract check, not just an internal unit check
 ## Documentation Map
 
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — package graph, ports, runtime model
-- [`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md) — upgrade guide for existing apps
+- [`docs/MIGRATING_TO_V4.md`](./docs/MIGRATING_TO_V4.md) — upgrade guide for existing apps
 - [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) — release notes
 - [`docs/EXAMPLES.md`](./docs/EXAMPLES.md) — curated example map
 - [`packages/bijou/GUIDE.md`](./packages/bijou/GUIDE.md) — core package guide

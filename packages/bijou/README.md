@@ -9,7 +9,7 @@ The pure, zero-dependency core of Bijou.
 - **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
 - **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
 - **Surface-first companions for common V3 chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for the most common layout and status primitives.
-- **Explicit compatibility boundaries** — when you mix surface-native helpers with legacy string APIs, you cross that seam explicitly with `surfaceToString(surface, ctx.style)`.
+- **Explicit core/runtime boundaries** — when you move `Surface` output back into string-first core APIs, you do it explicitly with `surfaceToString(surface, ctx.style)`.
 - **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
 ## Install
@@ -82,7 +82,7 @@ Those docs answer the questions the API reference cannot:
 ## Components
 
 ### Layout
-`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — legacy string helpers and V3-native surface companions for layout chrome.
+`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — string-first helpers and surface-native companions for layout chrome.
 
 ### Elements
 `badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — inline status, in-flow status blocks, and UI primitives.
@@ -137,7 +137,7 @@ const result = box('hello', { ctx });
 ```
 
 See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
-For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
+For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
 
 ## Related Packages
 

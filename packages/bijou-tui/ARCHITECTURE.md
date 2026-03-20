@@ -28,8 +28,8 @@ bijou-tui implements The Elm Architecture (TEA) for terminal UIs. It provides a 
 ┌─────────────────────────────────────────────────┐
 │  TEA Runtime                                    │
 │  ├─ update(msg, model) → [model, cmds]          │
-│  ├─ view(model) → string                        │
-│  ├─ renderFrame(string) → stdout                │
+│  ├─ view(model) → Surface | LayoutNode          │
+│  ├─ renderSurfaceFrame(surface diff) → stdout   │
 │  └─ cmds → bus.runCmd() → loop                  │
 └─────────────────────────────────────────────────┘
 ```
@@ -43,10 +43,10 @@ init() → [Model₀, Cmd[]]
         ┌─── render ◄──────────────────┐
         │     │                        │
         │     ▼                        │
-        │   view(model) → string       │
+        │   view(model) → Surface | LayoutNode │
         │     │                        │
         │     ▼                        │
-        │   renderFrame(io, string)    │
+        │   renderSurfaceFrame(io, diff)│
         │                              │
         │   msg arrives (key/resize/M) │
         │     │                        │
@@ -65,7 +65,7 @@ src/
 ├── runtime.ts       # run() — TEA event loop
 ├── eventbus.ts      # EventBus — centralized event emitter
 ├── keys.ts          # parseKey() — raw bytes → KeyMsg
-├── screen.ts        # ANSI sequences, enterScreen, renderFrame
+├── screen.ts        # ANSI sequences, enterScreen, renderSurfaceFrame
 ├── commands.ts      # quit(), tick(), batch()
 ├── spring.ts        # Spring physics + tween engine + easings
 ├── animate.ts       # animate(), sequence() — TEA commands

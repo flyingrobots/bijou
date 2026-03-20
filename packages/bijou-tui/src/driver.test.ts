@@ -155,14 +155,34 @@ describe('runScript', () => {
     expect(surfaceToString(result.frames[result.frames.length - 1]!, style)).toContain('120x40');
   });
 
-  it('uses the latest scripted dimensions when normalizing legacy string views', async () => {
-    const result = await runScript(counterApp, [
+  it('uses the latest scripted dimensions when normalizing layout views', async () => {
+    interface Model { cols: number; rows: number }
+    const app: App<Model> = {
+      init: () => [{ cols: 8, rows: 1 }, []],
+      update(msg, model) {
+        if (isResizeMsg(msg)) {
+          return [{ cols: msg.columns, rows: msg.rows }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return {
+          type: 'TestLayoutNode',
+          rect: { x: 0, y: 0, width: 8, height: 1 },
+          children: [],
+          surface: stringToSurface(`${model.cols}x${model.rows}`, 8, 1),
+        };
+      },
+    };
+
+    const result = await runScript(app, [
       { resize: { columns: 18, rows: 3 } },
     ]);
 
     const lastFrame = result.frames[result.frames.length - 1]!;
     expect(lastFrame.width).toBe(18);
     expect(lastFrame.height).toBe(3);
+    expect(surfaceToString(lastFrame, style)).toContain('18x3');
   });
 
   it('emits custom msg steps', async () => {
