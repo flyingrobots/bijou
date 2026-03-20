@@ -17,7 +17,7 @@
     "Uniforms registry allows passing external state (time, mouse, theme) into the shader",
     "Braille-scaling automatically maps 2x4 bitmasks to Unicode Braille characters"
   ],
-  "backwardCompatibility": "The legacy canvas() API (string-based) will be preserved as a wrapper around the new engine for simple ASCII art.",
+  "backwardCompatibility": "The current string-based canvas() API will be preserved as a wrapper around the new engine for simple ASCII art.",
   "scope": {
     "inScope": [
       "New ShaderFn signature",

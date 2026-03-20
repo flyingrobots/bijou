@@ -486,11 +486,11 @@ describe('reverse()', () => {
   });
 
   it('treats chars without charRole as decoration (preserves them)', () => {
-    const legacyShader: TransitionShaderFn = () => ({
+    const plainCharShader: TransitionShaderFn = () => ({
       showNext: true,
       char: 'X',
     });
-    const reversed = reverse(legacyShader);
+    const reversed = reverse(plainCharShader);
     const result = reversed(cell({ progress: 0.5 }));
     expect(result.char).toBe('X');
   });

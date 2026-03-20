@@ -69,8 +69,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### BREAKING CHANGES
 
-- **Truthful V3 runtime contract** — `App.view` and framed pane renderers now document the real `ViewOutput` contract: `string | Surface | LayoutNode`. Legacy string views remain supported, but they are explicitly the compatibility path.
-- **Surface/string seams are explicit** — surface-native helpers such as `badge()` must be converted with `surfaceToString(surface, ctx.style)` when passed into legacy string-only APIs.
+- **Truthful V3 runtime contract** — `App.view` and framed pane renderers were formalized under the transition-era `ViewOutput` contract while the runtime moved toward surface/layout-native rendering.
+- **Surface/string seams are explicit** — surface-native helpers such as `badge()` must be converted with `surfaceToString(surface, ctx.style)` when passed into string-first APIs.
 - **`surfaceToString()` requires a style port** — callers must pass `ctx.style`.
 
 ### ✨ Features
@@ -82,7 +82,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Motion contract tightened** — keyed motion supports spring/tween interpolation and initial rect offsets through the documented V3 path.
 - **Worker runtime and native recorder** — `runInWorker()`, `startWorkerApp()`, and the internal Surface-to-GIF recorder ship in `@flyingrobots/bijou-node`.
 - **Canonical V3 demos** — `v3-demo`, `v3-css`, `v3-motion`, `v3-subapp`, `v3-worker`, and `v3-pipeline` now anchor the release story.
-- **Hybrid example recording pipeline** — flagship V3 examples use native Surface recording while legacy examples can continue using VHS.
+- **Hybrid example recording pipeline** — flagship V3 examples use native Surface recording while tape-backed examples can continue using VHS.
 
 ### 🐛 Fixes
 
@@ -94,7 +94,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Worker IPC / recorder correctness** — removed an unused canvas option, aligned mouse disable sequences with the modes Bijou actually enables, and normalized resized recorder frames before GIF encoding while matching the bundled `gifenc` types to the runtime API.
 - **Resize redraw invalidation** — interactive resize now forces a clean redraw so shell chrome does not disappear after repeated terminal resizes.
 - **Framed shell compatibility** — shell panes no longer crash when downstream apps return `Surface` or `LayoutNode` output.
-- **Example compatibility sweep** — legacy examples that mixed string APIs with V3 `Surface` values were updated to render cleanly.
+- **Example migration sweep** — examples that mixed string APIs with V3 `Surface` values were updated to render cleanly.
 - **Interactive example smoke coverage** — prompt and form examples now run through PTY-driven scripted coverage instead of only static entrypoint checks.
 
 ### 🧪 Tests

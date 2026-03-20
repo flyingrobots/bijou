@@ -119,7 +119,7 @@ exports[`frame regressions > locks the starter V3 demo frames > v3-demo-after-sp
                                                                         
 ┌─ Starter App ─────────────────────────────────────────────────────────
 │                                                                       
-│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│  Surface-first runtime, buffered rendering, and explicit string bounda
 │                                                                       
 │  ───────── Live Metrics ──────────                                    
 │                                                                       
@@ -135,7 +135,7 @@ exports[`frame regressions > locks the starter V3 demo frames > v3-demo-initial 
                                                                         
 ┌─ Starter App ─────────────────────────────────────────────────────────
 │                                                                       
-│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│  Surface-first runtime, buffered rendering, and explicit string bounda
 │                                                                       
 │  ───────── Live Metrics ──────────                                    
 │                                                                       

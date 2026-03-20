@@ -13,9 +13,9 @@ describe('surface-first primitives', () => {
   it('boxSurface preserves the existing boxV3 behavior', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const next = stripAnsi(surfaceToString(boxSurface('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
-    const legacy = stripAnsi(surfaceToString(boxV3('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
+    const prior = stripAnsi(surfaceToString(boxV3('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
 
-    expect(next).toBe(legacy);
+    expect(next).toBe(prior);
     expect(next).toContain('Hello');
     expect(next).toContain('Card');
   });

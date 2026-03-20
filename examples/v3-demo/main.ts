@@ -42,7 +42,7 @@ export const app: App<Model, Msg> = {
       spacer(1, 1),
       boxSurface(
         vstackV3(
-          line('Surface-first runtime, buffered rendering, and honest legacy compatibility.'),
+          line('Surface-first runtime, buffered rendering, and explicit string boundaries.'),
           spacer(1, 1),
           metricsDivider,
           spacer(1, 1),

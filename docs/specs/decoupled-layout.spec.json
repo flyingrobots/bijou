@@ -16,7 +16,7 @@
     "Layout information is persistent across frames for optimized invalidation",
     "Portal/Overlay components can request a Rect from a 'target' ID"
   ],
-  "backwardCompatibility": "Current layout functions will be refactored to internalize this two-pass logic, maintaining the same string-based output for legacy consumers while exposing the new Rect-based API.",
+  "backwardCompatibility": "Current layout functions will be refactored to internalize this two-pass logic, maintaining the same string-based output for existing consumers while exposing the new Rect-based API.",
   "scope": {
     "inScope": [
       "Geometry calculation (Flex/Grid algorithm logic)",

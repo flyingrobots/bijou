@@ -158,12 +158,12 @@ describe('validateWorkspaceVersion', () => {
         dir: 'bijou-node',
         name: '@flyingrobots/bijou-node',
         version: '3.0.0',
-        dependencies: { '@flyingrobots/bijou-legacy': '3.0.0' },
+        dependencies: { '@flyingrobots/bijou-ghost': '3.0.0' },
       },
     ]);
 
     expect(validateWorkspaceVersion(root, '3.0.0').errors).toEqual([
-      '@flyingrobots/bijou-node references unknown internal package @flyingrobots/bijou-legacy in dependencies',
+      '@flyingrobots/bijou-node references unknown internal package @flyingrobots/bijou-ghost in dependencies',
     ]);
   });
 
