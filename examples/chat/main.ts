@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -81,7 +81,7 @@ const app: App<Model, Msg> = {
     const vpHeight = model.rows - 4;
     const scroll = scrollToBottom(createScrollState(content, vpHeight));
 
-    return flex(
+    return ansiSurface(flex(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: separator({ label: 'chat', width: model.cols }) },
       { flex: 1, content: (w, h) =>
@@ -89,8 +89,8 @@ const app: App<Model, Msg> = {
       },
       { basis: 1, content: separator({ width: model.cols }) },
       { basis: 1, content: `  > ${model.input}\u2588  ${kbd('Enter')} send  ${kbd('q')} quit` },
-    );
+    ), model.cols, model.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

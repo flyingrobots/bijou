@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, type App, type KeyMsg,
   createKeyMap, createInputStack, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -118,7 +118,7 @@ const app: App<Model, Msg> = {
         '',
         `Press ${kbd('Esc')} to close`,
       ].join('\n');
-      return vstack(main, box(helpContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), '');
+      return ansiSurface(vstack(main, box(helpContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), ''), ctx.runtime.columns, ctx.runtime.rows);
     }
 
     if (model.modal === 'confirm') {
@@ -128,11 +128,11 @@ const app: App<Model, Msg> = {
         '',
         `${kbd('y')} yes  ${kbd('n')} no`,
       ].join('\n');
-      return vstack(main, box(confirmContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), '');
+      return ansiSurface(vstack(main, box(confirmContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), ''), ctx.runtime.columns, ctx.runtime.rows);
     }
 
-    return main;
+    return ansiSurface(main, ctx.runtime.columns, ctx.runtime.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

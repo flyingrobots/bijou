@@ -4,7 +4,7 @@ import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   vstack, composite, drawer,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
@@ -47,7 +47,7 @@ const app: App<Model, Msg> = {
     while (bgLines.length < rows) bgLines.push('');
     const bg = bgLines.join('\n');
 
-    if (!model.showDrawer) return bg;
+    if (!model.showDrawer) return ansiSurface(bg, cols, rows);
 
     // Overlay the drawer
     const drawerWidth = Math.min(40, Math.floor(cols / 3));
@@ -71,8 +71,8 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return composite(bg, [d], { dim: true });
+    return ansiSurface(composite(bg, [d], { dim: true }), cols, rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

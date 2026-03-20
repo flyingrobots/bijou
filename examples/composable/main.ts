@@ -7,7 +7,7 @@ import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -121,14 +121,14 @@ const app: App<Model, Msg> = {
       default: content = '';
     }
 
-    return flex(
+    return ansiSurface(flex(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: `  ${tabBar}` },
       { basis: 1, content: separator({ width: model.cols }) },
       { flex: 1, content: () => content },
       { basis: 1, content: `  ${kbd('←')}${kbd('→')} tabs  ${kbd('q')} quit` },
-    );
+    ), model.cols, model.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

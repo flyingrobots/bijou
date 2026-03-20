@@ -8,7 +8,7 @@ import {
   type App,
   grid,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -58,8 +58,8 @@ const app: App<Model, Msg> = {
       },
     });
 
-    return `${layout}\n ${kbd('q')} quit`;
+    return ansiSurface(`${layout}\n ${kbd('q')} quit`, model.cols, model.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

@@ -7,7 +7,7 @@ import {
   commandPaletteKeyMap, helpShort, vstack,
   type CommandPaletteItem,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -86,8 +86,8 @@ const app: App<Model, Msg> = {
     const header = separator({ label: 'command palette', ctx });
     const body = commandPalette(model.cp, { width: 60, ctx });
     const help = `  ${helpShort(keys)}`;
-    return vstack('', header, '', body, '', help, '');
+    return ansiSurface(vstack('', header, '', body, '', help, ''), ctx.runtime.columns, ctx.runtime.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

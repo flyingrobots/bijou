@@ -6,7 +6,7 @@ import {
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
   filePickerKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -67,8 +67,8 @@ const app: App<Model, Msg> = {
     const header = separator({ label: 'file picker', width: model.cols });
     const body = filePicker(model.fp);
     const help = `  ${helpShort(keys)}`;
-    return vstack(header, body, help);
+    return ansiSurface(vstack(header, body, help), model.cols, ctx.runtime.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

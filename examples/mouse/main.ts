@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, isMouseMsg,
   type App, type MouseMsg,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -66,8 +66,8 @@ const app: App<Model, Msg> = {
     lines.push(`  ${kbd('q')} to quit`);
     lines.push('');
 
-    return lines.join('\n');
+    return ansiSurface(lines.join('\n'), ctx.runtime.columns, ctx.runtime.rows);
   },
 };
 
-run(legacyApp(ctx, app), { mouse: true });
+run(app, { mouse: true });

@@ -8,7 +8,7 @@ import {
   focusAreaScrollByX,
   focusAreaKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -105,8 +105,8 @@ const app: App<Model, Msg> = {
     const focusLabel = model.focused ? 'focused' : 'unfocused';
     const body = focusArea(model.fa, { focused: model.focused, ctx });
     const help = `  ${helpShort(keys)}  Tab: toggle focus (${focusLabel})  q: quit`;
-    return vstack(header, body, help);
+    return ansiSurface(vstack(header, body, help), model.cols, model.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, type App,
   createKeyMap, helpView, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -91,8 +91,8 @@ const app: App<Model, Msg> = {
     }
 
     lines.push('');
-    return lines.join('\n');
+    return ansiSurface(lines.join('\n'), ctx.runtime.columns, ctx.runtime.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);

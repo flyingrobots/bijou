@@ -3,10 +3,9 @@ import {
   parseAnsiToSurface,
   stringToSurface,
   type BijouContext,
-  type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
-import type { App, FrameLayoutNode, OverflowX, ViewOutput } from '@flyingrobots/bijou-tui';
+import type { FrameLayoutNode, OverflowX, ViewOutput } from '@flyingrobots/bijou-tui';
 
 export function line(text: string, width = visibleWidth(text)): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), 1);
@@ -30,20 +29,8 @@ export function textSurface(text: string, width: number, height: number): Surfac
   return stringToSurface(text, Math.max(1, width), Math.max(1, height));
 }
 
-export function legacyApp<Model, Msg>(
-  ctx: BijouContext,
-  app: Omit<App<Model, Msg>, 'view'> & { view(model: Model): string | ViewOutput },
-): App<Model, Msg> {
-  return {
-    ...app,
-    view(model: Model): ViewOutput {
-      const output = app.view(model) as string | Surface | LayoutNode;
-      if (typeof output === 'string') {
-        return textSurface(output, ctx.runtime.columns, ctx.runtime.rows);
-      }
-      return output;
-    },
-  };
+export function ansiSurface(text: string, width: number, height: number): Surface {
+  return parseAnsiToSurface(text, Math.max(1, width), Math.max(1, height));
 }
 
 export function legacyPane(

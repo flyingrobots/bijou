@@ -12,7 +12,7 @@ import {
   dagPanePageDown, dagPanePageUp,
   dagPaneKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { legacyApp } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/v3.ts';
 
 initDefaultContext();
 const ctx = getDefaultContext();
@@ -128,8 +128,8 @@ const app: App<Model, Msg> = {
     const header = separator({ label: `dag pane — selected: ${selected}`, width: model.cols, ctx });
     const body = dagPane(model.pane, { focused: true, ctx });
     const help = `  ${helpShort(keys)}`;
-    return vstack(header, body, help);
+    return ansiSurface(vstack(header, body, help), model.cols, model.rows);
   },
 };
 
-run(legacyApp(ctx, app));
+run(app);
