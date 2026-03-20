@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, boxV3, type LayoutNode } from '@flyingrobots/bijou';
-import { isKeyMsg, motion, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
+import { badge, boxSurface, type LayoutNode } from '@flyingrobots/bijou';
+import { isKeyMsg, motion, quit, run, type App, vstackSurface } from '@flyingrobots/bijou-tui';
 import { line } from '../_shared/v3.ts';
 
 export const ctx = initDefaultContext();
@@ -28,8 +28,8 @@ export const app: App<Model> = {
   view: (model) => {
     const springCard = motion(
       { key: 'spring-card', transition: { type: 'spring', spring: 'wobbly' } },
-      boxV3(
-        vstackV3(
+      boxSurface(
+        vstackSurface(
           badge('Spring', { variant: 'success' }),
           line('Follows the target with a spring preset.'),
         ),
@@ -40,8 +40,8 @@ export const app: App<Model> = {
 
     const tweenCard = motion(
       { key: 'tween-card', transition: { type: 'tween', duration: 240 }, initial: { x: -18 } },
-      boxV3(
-        vstackV3(
+      boxSurface(
+        vstackSurface(
           badge('Tween', { variant: 'accent' }),
           line('Moves on a fixed duration curve.'),
         ),
@@ -53,7 +53,7 @@ export const app: App<Model> = {
     const info: LayoutNode = {
       rect: { x: 3, y: 1, width: 70, height: 2 },
       children: [],
-      surface: vstackV3(
+      surface: vstackSurface(
         line('Arrow keys move both cards. The green card uses a spring; the amber card uses a tween.'),
         line('Press Q to quit.'),
       ),

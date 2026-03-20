@@ -112,6 +112,14 @@ The preferred surface-native companions are:
 - `separatorSurface()`
 - `alertSurface()`
 - `tableSurface()`
+- `vstackSurface()`
+- `hstackSurface()`
+
+Transition-era aliases were removed from the runtime-facing API surface:
+
+- use `boxSurface()`, not `boxV3()`
+- use `vstackSurface()`, not `vstackV3()`
+- use `hstackSurface()`, not `hstackV3()`
 
 ## `surfaceToString()` Now Needs A Style Port
 

@@ -4,20 +4,20 @@ import { stripAnsi } from '../text/grapheme.js';
 import { surfaceToString } from '../render/differ.js';
 import { alertSurface } from './alert-v3.js';
 import { badge } from './badge.js';
-import { boxSurface, boxV3, headerBoxSurface } from './box-v3.js';
+import { boxSurface, headerBoxSurface } from './box-v3.js';
 import { separatorSurface } from './separator-v3.js';
 import { createTextSurface } from './surface-text.js';
 import { tableSurface } from './table-v3.js';
 
 describe('surface-first primitives', () => {
-  it('boxSurface preserves the existing boxV3 behavior', () => {
+  it('boxSurface renders bordered content with titles', () => {
     const ctx = createTestContext({ mode: 'interactive' });
-    const next = stripAnsi(surfaceToString(boxSurface('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
-    const prior = stripAnsi(surfaceToString(boxV3('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
+    const rendered = stripAnsi(surfaceToString(boxSurface('Hello', { title: 'Card', width: 14, ctx }), ctx.style));
 
-    expect(next).toBe(prior);
-    expect(next).toContain('Hello');
-    expect(next).toContain('Card');
+    expect(rendered).toContain('Hello');
+    expect(rendered).toContain('Card');
+    expect(rendered).toContain('┌');
+    expect(rendered).toContain('┘');
   });
 
   it('headerBoxSurface returns a boxed surface with styled detail text', () => {

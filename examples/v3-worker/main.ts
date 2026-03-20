@@ -6,8 +6,8 @@ import {
   startWorkerApp,
 } from '@flyingrobots/bijou-node';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { badge, boxV3, getDefaultContext, setDefaultContext } from '@flyingrobots/bijou';
-import { isKeyMsg, quit, type App, vstackV3 } from '@flyingrobots/bijou-tui';
+import { badge, boxSurface, getDefaultContext, setDefaultContext } from '@flyingrobots/bijou';
+import { isKeyMsg, quit, type App, vstackSurface } from '@flyingrobots/bijou-tui';
 import { centerSurface, line, spacer } from '../_shared/v3.ts';
 
 interface Model {
@@ -53,8 +53,8 @@ export const app: App<Model, WorkerMsg> = {
   },
 
   view: (model) => {
-    const card = boxV3(
-      vstackV3(
+    const card = boxSurface(
+      vstackSurface(
         badge('Worker Runtime', { variant: 'primary' }),
         spacer(1, 1),
         badge(`Jobs ${model.completedJobs}`, { variant: 'accent' }),

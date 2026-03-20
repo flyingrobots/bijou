@@ -217,7 +217,7 @@ await run(app);
 
 ```ts
 import { badge, boxSurface, separatorSurface, tableSurface } from '@flyingrobots/bijou';
-import { hstackV3, vstackV3 } from '@flyingrobots/bijou-tui';
+import { vstackSurface } from '@flyingrobots/bijou-tui';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 
 const ctx = initDefaultContext();
@@ -229,7 +229,7 @@ const stats = tableSurface({
 });
 
 const card = boxSurface(
-  vstackV3(
+  vstackSurface(
     separatorSurface({ label: 'Deploy Status', width: stats.width, ctx }),
     stats,
   ),

@@ -1,7 +1,6 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, quit, tick, isKeyMsg, canvas, type App, type ShaderFn } from '@flyingrobots/bijou-tui';
+import { run, quit, tick, isKeyMsg, canvas, type App, type ShaderFn, vstackSurface } from '@flyingrobots/bijou-tui';
 import { stringToSurface } from '@flyingrobots/bijou';
-import { vstackV3 } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
 
@@ -46,7 +45,7 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const art = canvas(model.cols, model.rows, shader, { time: model.time });
     const title = stringToSurface('  Plasma Shader  (q to quit)', model.cols, 3);
-    return vstackV3(title, art);
+    return vstackSurface(title, art);
   },
 };
 
