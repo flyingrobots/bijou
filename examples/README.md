@@ -26,17 +26,25 @@ npx tsx examples/showcase/main.ts
 
 Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Each component shows rendered output in rich, pipe, and accessible modes side-by-side.
 
+## Choosing Between Similar Examples
+
+- Use [`alert`](./alert/) for in-flow status that should remain part of the page.
+- Use [`toast`](./toast/) for a single low-level transient overlay you are composing directly.
+- Use [`notifications`](./notifications/) when the app needs stacking, actions, placement control, routing, or history.
+- Use [`table`](./table/) for passive row/column comparison.
+- Use [`navigable-table`](./navigable-table/) when the table itself becomes a keyboard-owned inspection surface.
+
 ## Static Components
 
 | Example | Component | Description |
 |---------|-----------|-------------|
 | [`box`](./box/) | `box()`, `headerBox()` | Bordered containers and header boxes |
-| [`table`](./table/) | `table()` | Data tables with columns and alignment |
+| [`table`](./table/) | `table()` | Passive row/column comparison grid |
 | [`tree`](./tree/) | `tree()` | Hierarchical tree views |
 | [`accordion`](./accordion/) | `accordion()` | Expandable content sections |
 | [`tabs`](./tabs/) | `tabs()` | Tab bar navigation with badges |
 | [`badge`](./badge/) | `badge()` | Inline status badges in 7 variants |
-| [`alert`](./alert/) | `alert()` | Boxed alerts with icons |
+| [`alert`](./alert/) | `alert()` | In-flow status block that persists in page content |
 | [`separator`](./separator/) | `separator()` | Horizontal dividers with labels |
 | [`skeleton`](./skeleton/) | `skeleton()` | Loading placeholders |
 | [`kbd`](./kbd/) | `kbd()` | Keyboard shortcut display |
@@ -85,8 +93,8 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
 | [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
-| [`toast`](./toast/) | `toast()`, `composite()` | Anchored notification overlay variants |
-| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | Stacked actionable/inline/toast notifications inside `createFramedApp()`, plus a command-palette history center for archived notices |
+| [`toast`](./toast/) | `toast()`, `composite()` | Low-level transient overlay primitive with explicit anchoring |
+| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and history center |
 | [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |
@@ -99,7 +107,7 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
 | [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
-| [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
+| [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-owned table inspection with focus and scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |
 | [`file-picker`](./file-picker/) | `filePicker()`, `filePickerKeyMap()` | Directory browser with keyboard navigation |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |

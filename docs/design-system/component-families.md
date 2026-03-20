@@ -42,6 +42,23 @@ The goal is to stop thinking in terms of "every export is its own component."
 - Carbon analogue:
   - inline notification
 
+### Low-level transient overlay
+
+- Family: `toast()`
+- Variants:
+  - status variants
+  - anchor/placement
+- Use when:
+  - the app needs a one-off transient overlay and is composing overlays directly
+  - placement matters, but lifecycle/history does not
+- Avoid when:
+  - stacking, routing, actions, or recall matter
+  - the content should remain in page flow
+- Ownership:
+  - TUI
+- Carbon analogue:
+  - toast notification primitive
+
 ### Transient app notifications
 
 - Family: notification system
@@ -56,6 +73,7 @@ The goal is to stop thinking in terms of "every export is its own component."
   - the app owns transient messaging and may need stacking, routing, actions, or recall
 - Avoid when:
   - the content is primary page content
+  - one local overlay is enough and app-wide lifecycle is unnecessary
 - Ownership:
   - TUI
 - Carbon analogue:
@@ -246,13 +264,14 @@ The goal is to stop thinking in terms of "every export is its own component."
   - `tableSurface()`
   - `navigableTable()`
 - Variants:
-  - passive comparison
-  - surface-native render path
-  - keyboard inspection layer
+  - `table()` for passive comparison in core string output
+  - `tableSurface()` for passive comparison in V3 surface-first output
+  - `navigableTable()` for keyboard-owned inspection in the TUI layer
 - Use when:
   - row/column comparison is the main task
 - Avoid when:
   - hierarchy or dependency structure dominates
+  - items are primarily one-dimensional and should read as a list instead
 - Ownership:
   - core plus TUI interaction layer
 - Carbon analogue:

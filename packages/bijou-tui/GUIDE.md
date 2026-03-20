@@ -574,6 +574,13 @@ for (const layer of stack.layers()) {
 
 ## Overlay Compositing
 
+### Choosing overlay families
+
+- Use `toast()` when you are composing a single transient overlay directly.
+- Use the notification system when the app needs stacking, actions, routing, placement changes, or history.
+- Use `drawer()` for supplemental side work that should not fully block the main surface.
+- Use `modal()` when the user must stop and decide and background interactions should be blocked.
+
 ### Modals
 
 Create centered dialog overlays for confirm prompts, info boxes, or text input:
@@ -599,6 +606,8 @@ if (model.showConfirm) {
 
 return output;
 ```
+
+Reach for this low-level `toast()` primitive when explicit anchoring matters, but app-wide notification lifecycle does not. If you need stacking, actionable buttons, archive/history, or framed-app routing, move up to the notification system shown in `examples/notifications`.
 
 The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode.
 

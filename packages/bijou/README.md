@@ -64,16 +64,31 @@ Those docs answer the questions the API reference cannot:
 - which variation is semantic versus render-path versus interaction-layer
 - what belongs in core Bijou versus `@flyingrobots/bijou-tui`
 
+## Choosing Component Families
+
+### Status and feedback
+
+- Use `badge()` when status is compact and belongs inline with another object.
+- Use `note()` when the user needs explanation without urgency.
+- Use `alert()` when the message should persist inside the page or document flow.
+- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
+
+### Tables and inspection
+
+- Use `table()` when row/column comparison is the main job and string output is still the right endpoint.
+- Use `tableSurface()` when the job is still passive comparison, but your V3 app is already composing `Surface` output.
+- Use `navigableTable()` from `@flyingrobots/bijou-tui` when the user needs keyboard-owned row or cell inspection instead of passive reading.
+
 ## Components
 
 ### Layout
 `box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — legacy string helpers and V3-native surface companions for layout chrome.
 
 ### Elements
-`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
+`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — inline status, in-flow status blocks, and UI primitives.
 
 ### Data
-`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
+`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — passive comparison and structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.

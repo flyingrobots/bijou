@@ -1,6 +1,6 @@
 # `navigableTable()`
 
-Keyboard-navigable data table with scrolling
+Keyboard-owned table inspection with focus and scrolling
 
 ![demo](demo.gif)
 
@@ -9,6 +9,16 @@ Keyboard-navigable data table with scrolling
 ```sh
 npx tsx examples/navigable-table/main.ts
 ```
+
+## Use this when
+
+- the user should actively traverse rows or cells
+- keyboard focus and scrolling are part of the interaction model
+
+## Choose something else when
+
+- choose core `table()` or `tableSurface()` for passive comparison
+- choose `browsableList()` when the content is one-dimensional and description-led
 
 ## Code
 

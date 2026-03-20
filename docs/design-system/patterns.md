@@ -53,18 +53,32 @@ Avoid when:
 - it belongs in an activity stream
 - the app should manage stack/history/lifecycle
 
-#### `toast()` / notifications
+#### `toast()`
 
 Use when:
 
 - the event is transient
-- the user does not need to stop what they are doing
-- stacking, placement, actions, or history matter
+- the app is composing a one-off overlay directly
+- custom placement matters, but full notification lifecycle does not
 
 Avoid when:
 
 - the message must remain in the page content
-- the user must review before proceeding
+- the app needs stacking, history, routing, or recall
+
+#### notifications
+
+Use when:
+
+- the app owns transient messaging as a system
+- stacking, placement, actions, routing, or history matter
+- the user may need to reopen or review prior notices
+
+Avoid when:
+
+- the message should remain in page content
+- a single local overlay would do
+- the user must stop and decide before continuing
 
 #### `modal()`
 
@@ -130,12 +144,30 @@ Avoid when:
 - hierarchy is the main point
 - the user needs focused keyboard inspection rather than passive comparison
 
+### `tableSurface()`
+
+Use when:
+
+- the user needs the same passive comparison semantics as `table()`
+- the surrounding V3 runtime is already composing `Surface` output
+- cells may contain surface-native labels or badges
+
+Avoid when:
+
+- direct string output is the final destination
+- the app needs keyboard-owned row/cell focus semantics
+
 ### `navigableTable()`
 
 Use when:
 
 - table data must be actively traversed
 - the app wants row/cell focus semantics
+
+Avoid when:
+
+- passive comparison is enough
+- the output must remain portable through core-only string rendering
 
 ### `browsableList()`
 

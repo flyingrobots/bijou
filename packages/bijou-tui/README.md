@@ -116,6 +116,21 @@ In non-interactive modes, there is no normal interactive event loop.
 - **App shell**: `createFramedApp()` for tabs/help/chrome/pane-focus boilerplate with optional command palette.
 - **Stateful building blocks**: navigable table, browsable list, file picker, focus area, and DAG pane with vim-friendly keymaps.
 
+## Choosing Component Families
+
+### Overlays and interruption
+
+- Use `toast()` when you are composing a single transient overlay directly.
+- Use the notification system when the app needs stacking, placement, actions, routing, or history.
+- Use `drawer()` when the user should keep the main surface visible while working in supplemental detail.
+- Use `modal()` when background shortcuts and pointer actions should be blocked.
+
+### Collection interaction
+
+- Use core `table()` or `tableSurface()` for passive comparison.
+- Use `navigableTable()` when row/cell focus and keyboard traversal are the real job.
+- Use `browsableList()` when the content is one-dimensional and description-led rather than grid-oriented.
+
 ## Animation
 
 ### Spring Physics
@@ -403,6 +418,8 @@ const output = composite(backgroundView, [dialog, notification], { dim: true });
 
 Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
 
+Reach for `toast()` when the app is composing a one-off overlay directly. Reach for the notification system when stacking, actions, routing, or history matter. The notification lab in `examples/notifications` is the canonical higher-level example.
+
 `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
 
 ## App Frame
@@ -434,6 +451,8 @@ const state = createNavigableTableState({ columns, rows, height: 10 });
 const output = navigableTable(state, { ctx });
 const next = navTableFocusNext(state);
 ```
+
+Use `navigableTable()` when the user should actively traverse a table. If the job is still passive comparison, prefer core `table()` or `tableSurface()` and keep the interaction layer simpler.
 
 ### Browsable List
 

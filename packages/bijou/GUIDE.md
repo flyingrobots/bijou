@@ -19,6 +19,13 @@ initDefaultContext();
 
 Every component returns a string. Print it however you like — `console.log`, `process.stdout.write`, or pass it to another component.
 
+### Choosing feedback surfaces
+
+- Use `badge()` for compact inline status.
+- Use `note()` for explanatory, non-urgent supporting text.
+- Use `alert()` when the message should stay in document flow.
+- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
+
 ### Layout
 
 ```typescript
@@ -47,6 +54,8 @@ console.log(table(data, {
   ],
 }));
 ```
+
+Use `table()` when passive row/column comparison is the job. If your V3 app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
 
 ### Progress & Spinners
 

@@ -1,6 +1,6 @@
 # `alert()`
 
-Boxed alerts with icons
+In-flow status block that stays with the surrounding content
 
 ![demo](demo.gif)
 
@@ -9,6 +9,17 @@ Boxed alerts with icons
 ```sh
 npx tsx examples/alert/main.ts
 ```
+
+## Use this when
+
+- the message should remain part of the page or document flow
+- the user should still see the status while reading or editing nearby content
+
+## Choose something else when
+
+- choose `badge()` for compact inline status
+- choose `toast()` for a single transient overlay
+- choose `notifications` for stacking, actions, routing, or history
 
 ## Code
 

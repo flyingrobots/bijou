@@ -1,12 +1,23 @@
 # `toast()`, `composite()`
 
-Anchored notification overlay variants
+Low-level transient overlay primitive
 
 ## Run
 
 ```sh
 npx tsx examples/toast/main.ts
 ```
+
+## Use this when
+
+- you are composing a single transient overlay directly
+- explicit anchoring matters
+- you do not need stack/history management
+
+## Choose something else when
+
+- choose `alert()` when the message should remain in page flow
+- choose `notifications` when the app needs stacking, actions, routing, or history
 
 ## Code
 
