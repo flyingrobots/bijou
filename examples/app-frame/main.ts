@@ -8,6 +8,7 @@ import {
   drawer,
   type FramePage,
 } from '@flyingrobots/bijou-tui';
+import { legacyPane } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -58,17 +59,8 @@ const editorPage = createPage('editor', 'Editor', (model) => ({
   kind: 'split',
   splitId: 'editor-shell',
   state: model.editorSplit,
-  paneA: {
-    kind: 'pane',
-    paneId: 'files',
-    render: (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w }),
-  },
-  paneB: {
-    kind: 'pane',
-    paneId: 'content',
-    overflowX: 'scroll',
-    render: (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }),
-  },
+  paneA: legacyPane('files', (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w })),
+  paneB: legacyPane('content', (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }), { overflowX: 'scroll' }),
 }));
 
 const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
@@ -83,19 +75,13 @@ const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
   gap: 1,
   cells: {
     stats: {
-      kind: 'pane',
-      paneId: 'stats',
-      render: (w) => box(`Stats: counter=${model.count}`, { width: w }),
+      ...legacyPane('stats', (w) => box(`Stats: counter=${model.count}`, { width: w })),
     },
     left: {
-      kind: 'pane',
-      paneId: 'left',
-      render: (w) => box('Queues\n\n- build\n- test\n- release', { width: w }),
+      ...legacyPane('left', (w) => box('Queues\n\n- build\n- test\n- release', { width: w })),
     },
     right: {
-      kind: 'pane',
-      paneId: 'right',
-      render: (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w }),
+      ...legacyPane('right', (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w })),
     },
   },
 }));
