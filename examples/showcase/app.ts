@@ -24,6 +24,7 @@ import {
 import type { ShowcaseMsg, ShowcasePageModel } from './types.js';
 import { CATEGORIES, findEntry, type Category } from './registry.js';
 import { triModePreview } from './tri-mode.js';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 // ---------------------------------------------------------------------------
 // Detail pane rendering
@@ -265,13 +266,13 @@ function createCategoryPage(
         paneA: {
           kind: 'pane',
           paneId: `${category.id}-sidebar`,
-          render: (w, h) => renderSidebar(model, w, h, category, ctx),
+          render: (w, h) => ansiContentSurface(renderSidebar(model, w, h, category, ctx)),
         },
         paneB: {
           kind: 'pane',
           paneId: `${category.id}-detail`,
           overflowX: 'scroll',
-          render: (w, h) => renderDetail(selectedId, w, h, ctx),
+          render: (w, h) => ansiContentSurface(renderDetail(selectedId, w, h, ctx)),
         },
       } satisfies FrameLayoutNode;
     },

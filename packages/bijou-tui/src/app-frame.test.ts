@@ -113,6 +113,25 @@ describe('createFramedApp', () => {
     expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('layout-pane');
   });
 
+  it('rejects raw string pane renderers with an explicit migration error', () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => 'string panes are no longer valid' as unknown as any,
+        }),
+      }],
+    });
+
+    const [model] = app.init();
+    expect(() => app.view(model)).toThrow(/Raw strings are no longer supported/);
+  });
+
   it('preserves scroll per page across tab switches', async () => {
     const app = createFramedApp({
       pages: [

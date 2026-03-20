@@ -21,6 +21,10 @@ export function isSurfaceView(value: unknown): value is Surface {
   return typeof value === 'object' && value !== null && 'cells' in value;
 }
 
+export function isLayoutNodeView(value: unknown): value is LayoutNode {
+  return typeof value === 'object' && value !== null && 'rect' in value && 'children' in value;
+}
+
 export function normalizeViewOutput(
   output: ViewOutput,
   size: ViewportSize,
@@ -30,6 +34,12 @@ export function normalizeViewOutput(
       kind: 'surface',
       surface: output,
     };
+  }
+
+  if (!isLayoutNodeView(output)) {
+    throw new Error(
+      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them explicitly with parseAnsiToSurface(...) or stringToSurface(...).',
+    );
   }
 
   return {
@@ -49,6 +59,12 @@ export function wrapViewOutputAsLayoutRoot(
       children: [],
       surface: output,
     };
+  }
+
+  if (!isLayoutNodeView(output)) {
+    throw new Error(
+      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them explicitly with parseAnsiToSurface(...) or stringToSurface(...).',
+    );
   }
 
   return output;
