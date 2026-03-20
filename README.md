@@ -250,6 +250,45 @@ Bijou is designed to do the right thing without making you micromanage output st
 
 This is not an afterthought. It is the core product idea.
 
+### A Real Degradation Example
+
+The same component call lowers itself differently depending on the output profile.
+
+```ts
+import { alert } from '@flyingrobots/bijou';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+
+const ctx = initDefaultContext();
+
+console.log(
+  alert('Connection refused on port 5432.', {
+    variant: 'error',
+    ctx,
+  }),
+);
+```
+
+With no color applied so the shape is easier to see, that exact call renders like this:
+
+```text
+interactive / static
+┌─────────────────────────────────────┐
+│ ✗ Connection refused on port 5432. │
+└─────────────────────────────────────┘
+
+pipe
+[ERROR] Connection refused on port 5432.
+
+accessible
+Error: Connection refused on port 5432.
+```
+
+That is the core Bijou promise in one example:
+
+- rich terminals get real chrome
+- pipes get plain-text-safe output
+- accessible runs get the same meaning, rewritten for reading instead of decoration
+
 ## The Feature Tour In Repo Form
 
 Clone the repo and run the canonical entrypoints:
