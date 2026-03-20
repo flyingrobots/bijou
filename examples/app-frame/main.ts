@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd } from '@flyingrobots/bijou';
+import { boxSurface, kbd } from '@flyingrobots/bijou';
 import {
   run,
   createKeyMap,
@@ -8,7 +8,6 @@ import {
   drawer,
   type FramePage,
 } from '@flyingrobots/bijou-tui';
-import { legacyPane } from '../_shared/v3.ts';
 
 const ctx = initDefaultContext();
 
@@ -59,8 +58,23 @@ const editorPage = createPage('editor', 'Editor', (model) => ({
   kind: 'split',
   splitId: 'editor-shell',
   state: model.editorSplit,
-  paneA: legacyPane('files', (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w })),
-  paneB: legacyPane('content', (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }), { overflowX: 'scroll' }),
+  paneA: {
+    kind: 'pane',
+    paneId: 'files',
+    render: (width) => boxSurface(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${width} cols`, {
+      width,
+      ctx,
+    }),
+  },
+  paneB: {
+    kind: 'pane',
+    paneId: 'content',
+    overflowX: 'scroll',
+    render: (width, height) => boxSurface(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${width}x${height}`, {
+      width,
+      ctx,
+    }),
+  },
 }));
 
 const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
@@ -75,13 +89,19 @@ const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
   gap: 1,
   cells: {
     stats: {
-      ...legacyPane('stats', (w) => box(`Stats: counter=${model.count}`, { width: w })),
+      kind: 'pane',
+      paneId: 'stats',
+      render: (width) => boxSurface(`Stats: counter=${model.count}`, { width, ctx }),
     },
     left: {
-      ...legacyPane('left', (w) => box('Queues\n\n- build\n- test\n- release', { width: w })),
+      kind: 'pane',
+      paneId: 'left',
+      render: (width) => boxSurface('Queues\n\n- build\n- test\n- release', { width, ctx }),
     },
     right: {
-      ...legacyPane('right', (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w })),
+      kind: 'pane',
+      paneId: 'right',
+      render: (width) => boxSurface('Signals\n\n- latency\n- errors\n- throughput', { width, ctx }),
     },
   },
 }));

@@ -5,7 +5,6 @@ import {
   type BijouContext,
   type Surface,
 } from '@flyingrobots/bijou';
-import type { FrameLayoutNode, OverflowX, ViewOutput } from '@flyingrobots/bijou-tui';
 
 export function line(text: string, width = visibleWidth(text)): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), 1);
@@ -31,21 +30,6 @@ export function textSurface(text: string, width: number, height: number): Surfac
 
 export function ansiSurface(text: string, width: number, height: number): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), Math.max(1, height));
-}
-
-export function legacyPane(
-  paneId: string,
-  render: (width: number, height: number) => string,
-  options: { overflowX?: OverflowX } = {},
-): FrameLayoutNode {
-  return {
-    kind: 'pane',
-    paneId,
-    overflowX: options.overflowX,
-    render(width: number, height: number): ViewOutput {
-      return textSurface(render(width, height), width, height);
-    },
-  };
 }
 
 function visibleWidth(text: string): number {
