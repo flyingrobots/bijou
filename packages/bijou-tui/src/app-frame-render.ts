@@ -15,8 +15,8 @@ import { fitBlock } from './layout-utils.js';
 import { splitPane, splitPaneLayout } from './split-pane.js';
 import { grid, gridLayout } from './grid.js';
 import {
-  createFocusAreaState,
-  focusArea,
+  createFocusAreaStateForSurface,
+  focusAreaSurface,
   focusAreaScrollTo,
   focusAreaScrollToX,
 } from './focus-area.js';
@@ -70,21 +70,20 @@ export function renderFrameNode<PageModel, Msg>(
     }
 
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
-    const content = framePaneOutputToString(node.render(rect.width, rect.height), rect.width, rect.height);
-    let state = createFocusAreaState({
-      content,
+    const contentSurface = framePaneOutputToSurface(node.render(rect.width, rect.height), rect.width, rect.height);
+    let state = createFocusAreaStateForSurface(contentSurface, {
       width: rect.width,
       height: rect.height,
       overflowX: node.overflowX ?? 'hidden',
     });
     state = focusAreaScrollTo(state, prior.y);
     state = focusAreaScrollToX(state, prior.x);
-    const output = focusArea(state, {
+    const output = framePaneSurfaceToString(focusAreaSurface(contentSurface, state, {
       focused: node.paneId === ctx.focusedPaneId,
       ctx: resolveSafeCtx(),
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
-    });
+    }));
     return {
       output,
       paneRects: new Map([[node.paneId, rect]]),
@@ -259,21 +258,24 @@ export function renderMaximizedPane<PageModel, Msg>(
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
-  const content = framePaneOutputToString(paneNode.render(bodyRect.width, bodyRect.height), bodyRect.width, bodyRect.height);
-  let state = createFocusAreaState({
-    content,
+  const contentSurface = framePaneOutputToSurface(
+    paneNode.render(bodyRect.width, bodyRect.height),
+    bodyRect.width,
+    bodyRect.height,
+  );
+  let state = createFocusAreaStateForSurface(contentSurface, {
     width: bodyRect.width,
     height: bodyRect.height,
     overflowX: paneNode.overflowX ?? 'hidden',
   });
   state = focusAreaScrollTo(state, prior.y);
   state = focusAreaScrollToX(state, prior.x);
-  const output = focusArea(state, {
+  const output = framePaneSurfaceToString(focusAreaSurface(contentSurface, state, {
     focused: true,
     ctx: resolveSafeCtx(),
     id: maximizedPaneId,
     classes: ['focused', 'maximized'],
-  });
+  }));
 
   return {
     output,
@@ -429,8 +431,11 @@ export function renderTransition(
   return lines.join('\n');
 }
 
-export function framePaneOutputToString(output: ViewOutput, width: number, height: number): string {
-  const surface = normalizeViewOutput(output, { width, height }).surface;
+export function framePaneOutputToSurface(output: ViewOutput, width: number, height: number): Surface {
+  return normalizeViewOutput(output, { width, height }).surface;
+}
+
+export function framePaneSurfaceToString(surface: Surface): string {
   const ctx = resolveSafeCtx();
   if (ctx?.style) {
     return surfaceToString(surface, ctx.style);

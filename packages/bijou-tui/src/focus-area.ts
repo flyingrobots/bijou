@@ -20,8 +20,8 @@
  * ```
  */
 
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
-import { renderByMode } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
   type ScrollState,
@@ -115,15 +115,44 @@ export function createFocusAreaState(options: FocusAreaOptions): FocusAreaState 
   // Clamp dimensions to at least 1
   const width = Math.max(1, options.width);
   const height = Math.max(1, options.height);
-  // Gutter consumes 1 column; scrollbar consumes 1 more when visible
-  const contentWidth = Math.max(1, width - 1);
-  const totalLines = content.split('\n').length;
-  const hasScrollbar = totalLines > height;
-  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
-  const viewportWidth = overflowX === 'scroll' ? scrollableWidth : undefined;
   return {
     content,
-    scroll: createScrollState(content, height, viewportWidth),
+    scroll: createScrollState(
+      content,
+      height,
+      resolveFocusAreaViewportWidth(content.split('\n').length, width, height, overflowX),
+    ),
+    width,
+    height,
+    overflowX,
+  };
+}
+
+/**
+ * Create focus area state for already-rendered surface content.
+ *
+ * Uses the surface dimensions directly to compute scroll bounds so callers can
+ * keep pane rendering surface-native without string round-tripping.
+ */
+export function createFocusAreaStateForSurface(
+  surface: Surface,
+  options: Omit<FocusAreaOptions, 'content'>,
+): FocusAreaState {
+  const { overflowX = 'hidden' } = options;
+  const width = Math.max(1, options.width);
+  const height = Math.max(1, options.height);
+  const viewportWidth = resolveFocusAreaViewportWidth(surface.height, width, height, overflowX);
+  const maxX = viewportWidth === undefined ? 0 : Math.max(0, surface.width - viewportWidth);
+  return {
+    content: '',
+    scroll: {
+      y: 0,
+      maxY: Math.max(0, surface.height - height),
+      x: 0,
+      maxX,
+      totalLines: surface.height,
+      visibleLines: height,
+    },
     width,
     height,
     overflowX,
@@ -230,11 +259,8 @@ export function focusAreaScrollToX(state: FocusAreaState, x: number): FocusAreaS
  * @returns Updated state with new content and clamped scroll position.
  */
 export function focusAreaSetContent(state: FocusAreaState, content: string): FocusAreaState {
-  const contentWidth = Math.max(1, state.width - 1);
   const totalLines = content.split('\n').length;
-  const hasScrollbar = totalLines > state.height;
-  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
-  const viewportWidth = state.overflowX === 'scroll' ? scrollableWidth : undefined;
+  const viewportWidth = resolveFocusAreaViewportWidth(totalLines, state.width, state.height, state.overflowX);
   const newScroll = createScrollState(content, state.height, viewportWidth);
   const clampedY = Math.min(state.scroll.y, newScroll.maxY);
   const clampedX = Math.min(state.scroll.x, newScroll.maxX);
@@ -300,6 +326,51 @@ export function focusArea(state: FocusAreaState, options?: FocusAreaRenderOption
 }
 
 /**
+ * Render the focus area into a surface without converting the pane body back
+ * into a string first.
+ */
+export function focusAreaSurface(
+  content: Surface,
+  state: FocusAreaState,
+  options?: FocusAreaRenderOptions,
+): Surface {
+  const focused = options?.focused ?? true;
+  const showScrollbar = options?.showScrollbar ?? true;
+  const ctx = options?.ctx;
+  const mode = ctx?.mode ?? 'interactive';
+  const hasGutter = mode !== 'pipe' && mode !== 'accessible' && state.width > 1;
+  const gutterWidth = hasGutter ? 1 : 0;
+  const bodyWidth = Math.max(0, state.width - gutterWidth);
+  const needsScrollbar = showScrollbar && content.height > state.height && bodyWidth > 0;
+  const contentWidth = needsScrollbar ? Math.max(0, bodyWidth - 1) : bodyWidth;
+  const scrollY = Math.max(0, Math.min(state.scroll.y, Math.max(0, content.height - state.height)));
+  const scrollX = state.overflowX === 'scroll'
+    ? Math.max(0, Math.min(state.scroll.x, Math.max(0, content.width - contentWidth)))
+    : 0;
+
+  const surface = createSurface(state.width, state.height, { char: ' ', empty: false });
+  if (contentWidth > 0 && state.height > 0) {
+    surface.blit(content, gutterWidth, 0, scrollX, scrollY, contentWidth, state.height);
+  }
+
+  if (needsScrollbar) {
+    const scrollCol = gutterWidth + contentWidth;
+    for (const [y, cell] of renderScrollbarCells(state.height, content.height, scrollY).entries()) {
+      surface.set(scrollCol, y, cell);
+    }
+  }
+
+  if (hasGutter) {
+    const gutterCell = resolveGutterCell(focused, ctx, options);
+    for (let y = 0; y < state.height; y++) {
+      surface.set(0, y, gutterCell);
+    }
+  }
+
+  return surface;
+}
+
+/**
  * Resolve the styled gutter string based on focus state and context.
  */
 function resolveGutter(
@@ -332,6 +403,47 @@ function resolveGutter(
       return ctx.style.styled(token as any, GUTTER_CHAR);
     },
   }, options);
+}
+
+function resolveGutterCell(
+  focused: boolean,
+  ctx: BijouContext | undefined,
+  options: FocusAreaRenderOptions | undefined,
+) {
+  return parseAnsiToSurface(resolveGutter(focused, ctx, options), 1, 1).get(0, 0);
+}
+
+function renderScrollbarCells(
+  viewportHeight: number,
+  totalLines: number,
+  scrollY: number,
+) {
+  if (totalLines <= viewportHeight) {
+    return Array.from({ length: viewportHeight }, () => ({ char: ' ', empty: false }));
+  }
+
+  const thumbSize = Math.max(1, Math.round((viewportHeight / totalLines) * viewportHeight));
+  const maxScroll = totalLines - viewportHeight;
+  const scrollFraction = maxScroll > 0 ? scrollY / maxScroll : 0;
+  const thumbStart = Math.round(scrollFraction * (viewportHeight - thumbSize));
+
+  return Array.from({ length: viewportHeight }, (_, index) => ({
+    char: index >= thumbStart && index < thumbStart + thumbSize ? '█' : '│',
+    empty: false,
+  }));
+}
+
+function resolveFocusAreaViewportWidth(
+  totalLines: number,
+  width: number,
+  height: number,
+  overflowX: OverflowX,
+): number | undefined {
+  const gutterWidth = width > 1 ? 1 : 0;
+  const contentWidth = Math.max(1, width - gutterWidth);
+  const hasScrollbar = totalLines > height && contentWidth > 1;
+  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
+  return overflowX === 'scroll' ? scrollableWidth : undefined;
 }
 
 // ---------------------------------------------------------------------------

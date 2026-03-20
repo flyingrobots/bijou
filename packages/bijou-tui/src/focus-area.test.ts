@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { auditStyle, createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { stringToSurface } from '@flyingrobots/bijou';
 import type { KeyMsg } from './types.js';
 import {
   createFocusAreaState,
+  createFocusAreaStateForSurface,
   focusArea,
+  focusAreaSurface,
   focusAreaScrollBy,
   focusAreaScrollTo,
   focusAreaScrollToTop,
@@ -67,6 +70,21 @@ describe('createFocusAreaState', () => {
   it('handles content shorter than viewport', () => {
     const state = createFocusAreaState({ content: SHORT_CONTENT, width: 40, height: 10 });
     expect(state.scroll.maxY).toBe(0);
+    expect(state.scroll.totalLines).toBe(3);
+  });
+});
+
+describe('createFocusAreaStateForSurface', () => {
+  it('computes scroll bounds from rendered surface dimensions', () => {
+    const surface = stringToSurface('abcdef\nghijkl\nmnopqr', 6, 3);
+    const state = createFocusAreaStateForSurface(surface, {
+      width: 5,
+      height: 2,
+      overflowX: 'scroll',
+    });
+
+    expect(state.scroll.maxY).toBe(1);
+    expect(state.scroll.maxX).toBe(3);
     expect(state.scroll.totalLines).toBe(3);
   });
 });
@@ -305,6 +323,43 @@ describe('focusArea', () => {
     const output = focusArea(state, { showScrollbar: false });
     expect(output).not.toContain('│');
     expect(output).not.toContain('█');
+  });
+});
+
+describe('focusAreaSurface', () => {
+  it('renders a scrolled surface with gutter and scrollbar', () => {
+    const content = stringToSurface('abcdef\nghijkl\nmnopqr', 6, 3);
+    let state = createFocusAreaStateForSurface(content, {
+      width: 5,
+      height: 2,
+      overflowX: 'scroll',
+    });
+    state = focusAreaScrollTo(focusAreaScrollToX(state, 2), 1);
+
+    const output = focusAreaSurface(content, state);
+
+    expect(output.width).toBe(5);
+    expect(output.height).toBe(2);
+    expect(output.get(0, 0).char).toBe('▎');
+    expect(output.get(1, 0).char).toBe('i');
+    expect(output.get(2, 0).char).toBe('j');
+    expect(output.get(3, 0).char).toBe('k');
+    expect(output.get(4, 0).char).toMatch(/[█│]/);
+  });
+
+  it('omits the gutter in pipe mode', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const content = stringToSurface('abcdef\nghijkl', 6, 2);
+    const state = createFocusAreaStateForSurface(content, {
+      width: 4,
+      height: 2,
+      overflowX: 'hidden',
+    });
+
+    const output = focusAreaSurface(content, state, { ctx });
+
+    expect(output.get(0, 0).char).toBe('a');
+    expect(output.get(1, 0).char).toBe('b');
   });
 });
 
