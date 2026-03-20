@@ -5,6 +5,7 @@ import {
   createPagerState, pager, pagerScrollBy, pagerPageDown, pagerPageUp,
   pagerScrollToTop, pagerScrollToBottom, pagerKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 initDefaultContext();
 
@@ -79,7 +80,7 @@ const app: App<Model, Msg> = {
     const header = separator({ label: 'pager', width: model.cols });
     const body = pager(model.pager);
     const help = `  ${helpShort(keys)}`;
-    return vstack(header, body, help);
+    return ansiContentSurface(vstack(header, body, help));
   },
 };
 

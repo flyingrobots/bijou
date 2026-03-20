@@ -11,6 +11,7 @@ import {
   splitPaneFocusNext,
   splitPaneResizeBy,
 } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 initDefaultContext();
 
@@ -83,7 +84,7 @@ const app: App<Model, Msg> = {
     });
 
     const help = ` ${kbd('tab')} focus  ${kbd('h')}/${kbd('l')} resize  ${kbd('q')} quit`;
-    return `${body}\n${help}`;
+    return ansiContentSurface(`${body}\n${help}`);
   },
 };
 

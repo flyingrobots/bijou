@@ -1,6 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -62,7 +63,7 @@ const app: App<Model, Msg> = {
     lines.push(`  ${kbd('Ctrl')}+${kbd('C')} to quit`);
     lines.push('');
 
-    return lines.join('\n');
+    return ansiContentSurface(lines.join('\n'));
   },
 };
 

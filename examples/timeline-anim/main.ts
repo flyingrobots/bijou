@@ -1,9 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, progressBar, gradientText, surfaceToString } from '@flyingrobots/bijou';
+import { badge, progressBar, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, tick, isKeyMsg, type App,
-  animate, sequence, vstack, EASINGS,
+  animate, sequence, EASINGS,
 } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -117,7 +118,7 @@ const app: App<Model, Msg> = {
     }
 
     lines.push('');
-    return lines.join('\n');
+    return ansiContentSurface(lines.join('\n'));
   },
 };
 

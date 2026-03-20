@@ -1,6 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { spinnerFrame, progressBar, badge, alert, tree, separator, surfaceToString } from '@flyingrobots/bijou';
-import { run, quit, tick, isKeyMsg, type App, vstack } from '@flyingrobots/bijou-tui';
+import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -84,7 +85,7 @@ const app: App<Model, Msg> = {
     if (model.phase === 'resolving') {
       lines.push(`  ${spinnerFrame(model.frame)} Resolving dependencies...`);
       lines.push('');
-      return lines.join('\n');
+      return ansiContentSurface(lines.join('\n'));
     }
 
     if (model.phase === 'downloading') {
@@ -104,13 +105,13 @@ const app: App<Model, Msg> = {
       lines.push(separator({ label: 'total', width: 50 }));
       lines.push(`  ${progressBar(Math.round(total), { width: 42, showPercent: true })}`);
       lines.push('');
-      return lines.join('\n');
+      return ansiContentSurface(lines.join('\n'));
     }
 
     if (model.phase === 'linking') {
       lines.push(`  ${spinnerFrame(model.frame)} Linking dependencies...`);
       lines.push('');
-      return lines.join('\n');
+      return ansiContentSurface(lines.join('\n'));
     }
 
     // Done
@@ -129,7 +130,7 @@ const app: App<Model, Msg> = {
     lines.push(`  Added ${badgeText('5', 'primary')} packages in 3.2s`);
     lines.push('');
 
-    return lines.join('\n');
+    return ansiContentSurface(lines.join('\n'));
   },
 };
 

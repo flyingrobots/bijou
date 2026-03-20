@@ -1,9 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { kbd, badge, surfaceToString } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, viewport, createScrollState, scrollBy, pageDown, pageUp, vstack,
+  flex, viewport, createScrollState, scrollBy, pageDown, pageUp,
 } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -142,7 +143,7 @@ const app: App<Model, Msg> = {
     const leftLabel = model.focusLeft ? badgeText('app.ts', 'primary') : 'app.ts';
     const rightLabel = !model.focusLeft ? badgeText('app.test.ts', 'primary') : 'app.test.ts';
 
-    return flex(
+    return ansiContentSurface(flex(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: `  ${leftLabel}${''.padEnd(paneWidth - 10)}${rightLabel}` },
       { flex: 1, content: (w, h) =>
@@ -158,7 +159,7 @@ const app: App<Model, Msg> = {
         )
       },
       { basis: 1, content: `  ${kbd('Tab')} switch pane  ${kbd('j')}${kbd('k')} scroll  ${kbd('q')} quit` },
-    );
+    ));
   },
 };
 

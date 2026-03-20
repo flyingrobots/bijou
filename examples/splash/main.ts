@@ -1,9 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { gradientText, separator } from '@flyingrobots/bijou';
+import { gradientText } from '@flyingrobots/bijou';
 import {
   run, quit, tick, isKeyMsg, type App,
   animate, sequence, EASINGS,
 } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 
@@ -105,7 +106,7 @@ const app: App<Model, Msg> = {
     }
 
     lines.push('');
-    return lines.join('\n');
+    return ansiContentSurface(lines.join('\n'));
   },
 };
 

@@ -1,6 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { spinnerFrame, badge, surfaceToString } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { ansiContentSurface } from '../_shared/surface-bridge.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -47,14 +48,14 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     if (model.phase === 'done') {
-      return `\n  ${badgeText('DONE', 'success')}  All tasks complete.\n`;
+      return ansiContentSurface(`\n  ${badgeText('DONE', 'success')}  All tasks complete.\n`);
     }
 
     const label = model.phase === 'loading'
       ? 'Fetching dependencies...'
       : 'Processing modules...';
 
-    return `\n  ${spinnerFrame(model.frame, { label })}\n`;
+    return ansiContentSurface(`\n  ${spinnerFrame(model.frame, { label })}\n`);
   },
 };
 
