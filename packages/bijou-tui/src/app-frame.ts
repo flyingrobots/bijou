@@ -8,13 +8,14 @@
 import {
   createSurface,
   parseAnsiToSurface,
+  resolveClock,
   resolveSafeCtx,
   type OverflowBehavior,
   type Surface,
 } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
-import type { App, Cmd, KeyMsg } from './types.js';
+import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
 import { modal } from './overlay.js';
@@ -39,6 +40,8 @@ import type { Timeline, TimelineState } from './timeline.js';
 import type { ViewOutput } from './view-output.js';
 import {
   createNotificationState,
+  dismissNotification,
+  hitTestNotificationStack,
   notificationsNeedTick,
   pushNotification,
   renderNotificationStack,
@@ -68,7 +71,7 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import {
-  renderHeaderLine,
+  resolveHeaderLine,
   renderHelpLine,
   renderPageContent,
   renderMaximizedPane,
@@ -76,6 +79,7 @@ import {
 } from './app-frame-render.js';
 import {
   applyFrameAction,
+  switchTab,
   syncPageFrameState,
 } from './app-frame-actions.js';
 import {
@@ -409,6 +413,84 @@ export function createFramedApp<PageModel, Msg>(
     return [emitMsgForPage(model.activePageId, observed), ...cmds];
   }
 
+  function updateTargetPage(
+    model: InternalFrameModel<PageModel, Msg>,
+    targetPageId: string,
+    targetMsg: Msg,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+    const targetPage = pagesById.get(targetPageId);
+    if (targetPage == null) return [model, []];
+
+    const pageModel = model.pageModels[targetPageId]!;
+    const updateResult = targetPage.update(targetMsg, pageModel);
+    let nextPageModel: PageModel = pageModel;
+    let cmds: Cmd<Msg>[] = [];
+
+    if (updateResult !== undefined && updateResult !== null) {
+      if (Array.isArray(updateResult)) {
+        nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
+        cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
+      } else {
+        nextPageModel = updateResult as PageModel;
+      }
+    }
+
+    const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
+    const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
+    const wrappedCmds = Array.isArray(cmds)
+      ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd))
+      : [];
+    return [synced, wrappedCmds];
+  }
+
+  function handleFrameMouse(
+    msg: MouseMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
+    if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+    if (model.helpOpen || model.commandPalette != null) return [model, []];
+
+    if (frameNotificationOptions.enabled) {
+      const nowMs = resolveClock(resolveSafeCtx()).now();
+      const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
+        screenWidth: model.columns,
+        screenHeight: model.rows,
+        margin: frameNotificationOptions.margin,
+        gap: frameNotificationOptions.gap,
+        ctx: resolveSafeCtx() ?? undefined,
+      }, msg.col, msg.row);
+
+      if (notificationTarget?.kind === 'dismiss' || notificationTarget?.kind === 'action') {
+        return applyFrameNotificationState(
+          model,
+          dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),
+          nowMs,
+        );
+      }
+      if (notificationTarget != null) {
+        return [model, []];
+      }
+    }
+
+    if (msg.row === 0) {
+      const header = resolveHeaderLine(model, options, pagesById);
+      const tab = header.tabTargets.find((target) =>
+        msg.col >= target.startCol && msg.col <= target.endCol,
+      );
+      if (tab != null) {
+        const currentIndex = model.pageOrder.indexOf(model.activePageId);
+        const nextIndex = model.pageOrder.indexOf(tab.pageId);
+        if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
+          return switchTab(model, nextIndex - currentIndex, pagesById, options);
+        }
+        return [model, []];
+      }
+      return [model, []];
+    }
+
+    return undefined;
+  }
+
   function applyFrameNotificationState(
     model: InternalFrameModel<PageModel, Msg>,
     notifications: NotificationState<never>,
@@ -637,40 +719,21 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isMouseMsg(msg)) {
-        return [model, []];
+        const frameResult = handleFrameMouse(msg, model);
+        if (frameResult != null) return frameResult;
+        return updateTargetPage(model, model.activePageId, msg as unknown as Msg);
       }
 
       // Custom message path: route to originating page when command messages are scoped.
       const scoped = isPageScopedMsg<Msg>(msg) ? msg : undefined;
       const targetPageId = scoped?.pageId ?? model.activePageId;
-      const targetPage = pagesById.get(targetPageId);
-      if (targetPage == null) return [model, []];
-
       const targetMsg = scoped?.msg ?? (msg as Msg);
-      const pageModel = model.pageModels[targetPageId]!;
-      
-      const updateResult = targetPage.update(targetMsg, pageModel);
-      let nextPageModel: PageModel = pageModel; // Default to current
-      let cmds: Cmd<Msg>[] = [];
-
-      if (updateResult !== undefined && updateResult !== null) {
-        if (Array.isArray(updateResult)) {
-          nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
-          cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
-        } else {
-          nextPageModel = updateResult as PageModel;
-        }
-      }
-      
-      const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
-      const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
-      const wrappedCmds = Array.isArray(cmds) ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd)) : [];
-      return [synced, wrappedCmds];
+      return updateTargetPage(model, targetPageId, targetMsg);
     },
 
     view(model) {
       const activePage = pagesById.get(model.activePageId)!;
-      const header = renderHeaderLine(model, options, pagesById);
+      const header = resolveHeaderLine(model, options, pagesById).line;
       const helpLine = renderHelpLine(model, frameKeys, options, activePage);
       const bodyRect = frameBodyRect(model.columns, model.rows);
 

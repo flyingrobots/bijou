@@ -22,7 +22,7 @@ import {
 } from './focus-area.js';
 import { isMinimized, createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState, resolveChildOrder, getNodeId } from './panel-dock.js';
-import { tokenizeAnsi } from './viewport.js';
+import { tokenizeAnsi, visibleLength } from './viewport.js';
 import { helpShort } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import {
@@ -35,6 +35,17 @@ import {
 } from './app-frame-utils.js';
 import { normalizeViewOutput, type ViewOutput } from './view-output.js';
 import { styleTextWithBCSS } from './css/text-style.js';
+
+export interface FrameHeaderTabTarget {
+  readonly pageId: string;
+  readonly startCol: number;
+  readonly endCol: number;
+}
+
+export interface FrameHeaderRenderResult {
+  readonly line: string;
+  readonly tabTargets: readonly FrameHeaderTabTarget[];
+}
 
 /** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 export function renderFrameNode<PageModel, Msg>(
@@ -271,24 +282,53 @@ export function renderMaximizedPane<PageModel, Msg>(
   };
 }
 
+/** Resolve the top header line plus clickable tab target geometry. */
+export function resolveHeaderLine<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): FrameHeaderRenderResult {
+  const title = options.title ?? 'App';
+  let cursor = visibleLength(title) + 2;
+  const tabTargets: FrameHeaderTabTarget[] = [];
+  const tabs = model.pageOrder.map((id, index) => {
+    const page = pagesById.get(id)!;
+    const label = id === model.activePageId ? `[${page.title}]` : ` ${page.title} `;
+    const width = visibleLength(label);
+    const startCol = cursor;
+    const endCol = cursor + width - 1;
+    if (endCol >= 0 && startCol < model.columns) {
+      tabTargets.push({
+        pageId: id,
+        startCol: Math.max(0, startCol),
+        endCol: Math.min(Math.max(0, model.columns - 1), endCol),
+      });
+    }
+    cursor += width;
+    if (index < model.pageOrder.length - 1) {
+      cursor += 1;
+    }
+    return label;
+  }).join(' ');
+
+  const line = fitLine(`${title}  ${tabs}`, model.columns);
+  return {
+    line: styleTextWithBCSS(line, resolveSafeCtx(), {
+      type: 'FrameHeader',
+      id: 'frame-header',
+      classes: [`page-${model.activePageId}`],
+    }),
+    tabTargets,
+  };
+}
+
 /** Render the top header line showing the app title and tab bar. */
 export function renderHeaderLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): string {
-  const title = options.title ?? 'App';
-  const tabs = model.pageOrder.map((id) => {
-    const page = pagesById.get(id)!;
-    return id === model.activePageId ? `[${page.title}]` : ` ${page.title} `;
-  }).join(' ');
-
-  const line = fitLine(`${title}  ${tabs}`, model.columns);
-  return styleTextWithBCSS(line, resolveSafeCtx(), {
-    type: 'FrameHeader',
-    id: 'frame-header',
-    classes: [`page-${model.activePageId}`],
-  });
+  return resolveHeaderLine(model, options, pagesById).line;
 }
 
 /** Render the bottom status line showing mode, focused pane, and key hints. */

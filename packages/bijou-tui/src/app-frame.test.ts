@@ -513,7 +513,7 @@ describe('createFramedApp', () => {
     expect(result.model.scrollByPage.home?.main?.y).toBeGreaterThan(0);
   });
 
-  it('ignores mouse messages at the frame boundary', async () => {
+  it('forwards unhandled mouse messages to the active page', async () => {
     type MsgWithMouse = Msg | MouseMsg;
 
     let sawMouseInPageUpdate = false;
@@ -549,9 +549,34 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
 
-    const result = await runScript(app, [{ msg: mouse }, { key: 'x' }]);
-    expect(sawMouseInPageUpdate).toBe(false);
+    const result = await runScript(app, [{ mouse }, { key: 'x' }]);
+    expect(sawMouseInPageUpdate).toBe(true);
     expect(result.model.pageModels.home?.count).toBe(1);
+  });
+
+  it('switches tabs when the user clicks a header tab', async () => {
+    const app = createFramedApp({
+      title: 'Test',
+      pages: [
+        makePage('home', 'Home', 'main'),
+        makePage('logs', 'Logs', 'main'),
+      ],
+    });
+
+    const result = await runScript(app, [{
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'press',
+        col: 15,
+        row: 0,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    }]);
+
+    expect(result.model.activePageId).toBe('logs');
   });
 
   it('toggles help with ?', async () => {

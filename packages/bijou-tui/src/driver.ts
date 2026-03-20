@@ -16,7 +16,7 @@
  * ```
  */
 
-import type { App, RunOptions, ResizeMsg } from './types.js';
+import type { App, RunOptions, ResizeMsg, MouseMsg } from './types.js';
 import { isResizeMsg } from './types.js';
 import { createEventBus } from './eventbus.js';
 import { parseKey } from './keys.js';
@@ -45,6 +45,12 @@ export type ScriptStep<M = never> =
   | {
     /** Pulse event to emit. */
     pulse: { dt: number };
+    /** Milliseconds to wait before sending this step. Default: 0. */
+    delay?: number;
+  }
+  | {
+    /** Mouse event to emit. */
+    mouse: MouseMsg;
     /** Milliseconds to wait before sending this step. Default: 0. */
     delay?: number;
   }
@@ -192,6 +198,8 @@ export async function runScript<Model, M>(
           rows: step.resize.rows,
         };
         bus.emit(resizeMsg);
+      } else if ('mouse' in step) {
+        bus.emit(step.mouse as unknown as M);
       } else if ('msg' in step) {
         bus.emit(step.msg);
       } else {

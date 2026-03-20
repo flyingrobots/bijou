@@ -10,6 +10,7 @@ import {
   cycleNotificationFocus,
   dismissFocusedNotification,
   dismissNotification,
+  isMouseMsg,
   modal,
   notificationsNeedTick,
   pushNotification,
@@ -21,8 +22,10 @@ import {
   tick,
   tickNotifications,
   trimNotificationsToViewport,
+  stripAnsi,
   type Cmd,
   type FramePage,
+  type MouseMsg,
   type NotificationHistoryFilter,
   type NotificationPlacement,
   type NotificationSpec,
@@ -81,6 +84,7 @@ function demoOverlayMargin(width: number, height: number): number {
 }
 
 type Msg =
+  | MouseMsg
   | { type: 'spawn-notification' }
   | { type: 'cycle-variant' }
   | { type: 'cycle-tone' }
@@ -482,6 +486,105 @@ function dismissCurrentNotification(
   return applyNotificationState(nextModel, notifications, notificationCtx);
 }
 
+function notificationRegion(notificationCtx = ctx) {
+  return {
+    row: 2,
+    col: 0,
+    width: notificationCtx.runtime.columns,
+    height: Math.max(0, notificationCtx.runtime.rows - 2),
+  };
+}
+
+function resolveDemoNotificationMouseTarget(
+  model: PageModel,
+  msg: MouseMsg,
+  notificationCtx = ctx,
+) {
+  const overlays = renderNotificationStack(model.notifications, {
+    screenWidth: notificationCtx.runtime.columns,
+    screenHeight: notificationCtx.runtime.rows,
+    region: notificationRegion(notificationCtx),
+    margin: 2,
+    gap: 1,
+    ctx: notificationCtx,
+  });
+
+  for (let index = overlays.length - 1; index >= 0; index--) {
+    const overlay = overlays[index]!;
+    const surface = overlay.surface;
+    if (
+      surface == null
+      || msg.col < overlay.col
+      || msg.col >= overlay.col + surface.width
+      || msg.row < overlay.row
+      || msg.row >= overlay.row + surface.height
+    ) {
+      continue;
+    }
+
+    const item = model.notifications.items.find((candidate) =>
+      stripAnsi(overlay.content).includes(candidate.title)
+    );
+    if (item == null) continue;
+
+    const localCol = msg.col - overlay.col;
+    const localRow = msg.row - overlay.row;
+    if (localRow === 0 && localCol === surface.width - 2) {
+      return { item, kind: 'dismiss' as const };
+    }
+    if (item.variant === 'ACTIONABLE' && localRow === surface.height - 1 && localCol >= 2) {
+      return { item, kind: 'action' as const };
+    }
+    return { item, kind: 'body' as const };
+  }
+
+  return undefined;
+}
+
+function handleNotificationMouse(
+  model: PageModel,
+  msg: MouseMsg,
+  notificationCtx = ctx,
+): [PageModel, Cmd<Msg>[]] {
+  if (msg.action !== 'press' || msg.button !== 'left') return [model, []];
+
+  const target = resolveDemoNotificationMouseTarget(model, msg, notificationCtx);
+
+  if (target == null) return [model, []];
+
+  if (target.kind === 'dismiss') {
+    const nowMs = resolveClock(notificationCtx).now();
+    const notifications = dismissNotification(model.notifications, target.item.id, nowMs);
+    const nextModel = appendLog({
+      ...model,
+      notifications,
+      lastHandledInput: `mouse:${msg.col},${msg.row}`,
+    }, `[mouse] Dismissed notification #${target.item.id}.`);
+    return applyNotificationState(nextModel, notifications, notificationCtx);
+  }
+
+  if (target.kind === 'action') {
+    const nowMs = resolveClock(notificationCtx).now();
+    const notifications = dismissNotification(model.notifications, target.item.id, nowMs);
+    const nextModel = appendLog({
+      ...model,
+      notifications,
+      lastHandledInput: `mouse:${msg.col},${msg.row}`,
+    }, target.item.action == null
+      ? `[mouse] Dismissed notification #${target.item.id}.`
+      : `[mouse] Activated notification #${target.item.id}.`);
+
+    if (target.item.action == null) {
+      return applyNotificationState(nextModel, notifications, notificationCtx);
+    }
+
+    const actionCmd: Cmd<Msg> = async () => target.item.action!.payload;
+    return applyNotificationState(nextModel, notifications, notificationCtx, [actionCmd]);
+  }
+
+  return [model, []];
+}
+
 function seedDemoNotifications(model: PageModel, notificationCtx = ctx): PageModel {
   const entries = [
     {
@@ -566,6 +669,11 @@ export function createNotificationDemoApp(
       ];
     },
     update(msg, model) {
+      if (isMouseMsg(msg)) {
+        if (model.historyOpen) return [model, []];
+        return handleNotificationMouse(model, msg, notificationCtx);
+      }
+
       if (model.historyOpen && blocksBehindHistory(msg)) {
         return [model, []];
       }
@@ -805,5 +913,5 @@ export function createNotificationDemoApp(
 export const app = createNotificationDemoApp();
 
 if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run(app);
+  run(app, { mouse: true });
 }

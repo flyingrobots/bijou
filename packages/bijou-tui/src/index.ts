@@ -372,6 +372,8 @@ export {
   type NotificationPhase,
   type NotificationRecord,
   type NotificationState,
+  type NotificationMouseTargetKind,
+  type NotificationMouseTarget,
   type RenderNotificationHistoryOptions,
   type RenderNotificationStackOptions,
   countNotificationHistory,
@@ -386,6 +388,7 @@ export {
   tickNotifications,
   hasNotifications,
   notificationsNeedTick,
+  hitTestNotificationStack,
   renderNotificationHistory,
   renderNotificationStack,
 } from './notification.js';

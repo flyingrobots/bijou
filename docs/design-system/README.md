@@ -27,8 +27,9 @@ Use these docs when you need to answer:
 
 1. [Foundations](./foundations.md)
 2. [Patterns](./patterns.md)
-3. [Component Families](./component-families.md)
-4. [Data Visualization Policy](./data-visualization.md)
+3. [Pointer and Mouse Policy](./pointer.md)
+4. [Component Families](./component-families.md)
+5. [Data Visualization Policy](./data-visualization.md)
 
 For the raw inventory and taxonomy work behind these docs, see [../COMPONENT_SYSTEM_AUDIT.md](../COMPONENT_SYSTEM_AUDIT.md).
 

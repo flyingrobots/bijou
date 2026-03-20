@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runScript } from './driver.js';
-import type { App, Cmd } from './types.js';
+import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
 import { badge, surfaceToString } from '@flyingrobots/bijou';
@@ -175,6 +175,38 @@ describe('runScript', () => {
 
     const result = await runScript(app, [{ msg: { type: 'inc' } }, { msg: { type: 'inc' } }]);
     expect(result.model.count).toBe(2);
+  });
+
+  it('emits mouse steps', async () => {
+    interface Model { clicked: number }
+    type Msg = MouseMsg;
+    const app: App<Model, Msg> = {
+      init: () => [{ clicked: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse' && msg.action === 'press' && msg.button === 'left') {
+          return [{ clicked: model.clicked + 1 }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return `Clicked: ${model.clicked}`;
+      },
+    };
+
+    const result = await runScript(app, [{
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'press',
+        col: 4,
+        row: 2,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    }]);
+
+    expect(result.model.clicked).toBe(1);
   });
 
   it('installs the BCSS resolver when css is provided', async () => {
