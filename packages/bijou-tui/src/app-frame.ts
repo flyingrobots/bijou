@@ -125,7 +125,7 @@ export type FrameLayoutNode =
   | {
     readonly kind: 'pane';
     readonly paneId: string;
-    /** Pane content may be a legacy string, a Surface, or a LayoutNode. */
+    /** Pane content must be a Surface or LayoutNode. */
     readonly render: (width: number, height: number) => ViewOutput;
     readonly overflowX?: OverflowX;
   }

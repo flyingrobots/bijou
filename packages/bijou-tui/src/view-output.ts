@@ -1,12 +1,11 @@
 import {
   createSurface,
   paintLayoutNode,
-  parseAnsiToSurface,
   type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
 
-export type ViewOutput = Surface | LayoutNode | string;
+export type ViewOutput = Surface | LayoutNode;
 
 export interface ViewportSize {
   width: number;
@@ -14,8 +13,7 @@ export interface ViewportSize {
 }
 
 export interface NormalizedViewOutput {
-  kind: 'surface' | 'layout' | 'string';
-  legacyString: boolean;
+  kind: 'surface' | 'layout';
   surface: Surface;
 }
 
@@ -27,43 +25,23 @@ export function normalizeViewOutput(
   output: ViewOutput,
   size: ViewportSize,
 ): NormalizedViewOutput {
-  if (typeof output === 'string') {
-    return {
-      kind: 'string',
-      legacyString: true,
-      surface: parseAnsiToSurface(output, size.width, size.height),
-    };
-  }
-
   if (isSurfaceView(output)) {
     return {
       kind: 'surface',
-      legacyString: false,
       surface: output,
     };
   }
 
   return {
     kind: 'layout',
-    legacyString: false,
     surface: paintViewLayout(output, size),
   };
 }
 
 export function wrapViewOutputAsLayoutRoot(
   output: ViewOutput,
-  size: ViewportSize,
+  _size: ViewportSize,
 ): LayoutNode {
-  if (typeof output === 'string') {
-    return {
-      type: 'LegacyTextView',
-      classes: ['legacy-view'],
-      rect: { x: 0, y: 0, width: size.width, height: size.height },
-      children: [],
-      surface: parseAnsiToSurface(output, size.width, size.height),
-    };
-  }
-
   if (isSurfaceView(output)) {
     return {
       type: 'SurfaceView',

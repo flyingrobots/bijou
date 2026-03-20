@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, resolveClock } from '@flyingrobots/bijou';
+import { box, kbd, resolveClock, stringToSurface } from '@flyingrobots/bijou';
 import {
   activateFocusedNotification,
   countNotificationHistory,
@@ -847,12 +847,12 @@ export function createNotificationDemoApp(
           controls: {
             kind: 'pane',
             paneId: 'controls',
-            render: (width) => renderControlsPane(model, width, notificationCtx),
+            render: (width, height) => stringToSurface(renderControlsPane(model, width, notificationCtx), width, height),
           },
           activity: {
             kind: 'pane',
             paneId: 'activity',
-            render: (width) => renderLogPane(model, width, notificationCtx),
+            render: (width, height) => stringToSurface(renderLogPane(model, width, notificationCtx), width, height),
           },
         },
       };

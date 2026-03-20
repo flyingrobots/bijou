@@ -26,6 +26,12 @@ function makeLongContent(label: string, lines = 40): string {
   return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
 }
 
+function textView(text: string) {
+  const lines = text.split('\n');
+  const width = Math.max(1, ...lines.map((line) => line.length));
+  return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
 function makePage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
   return {
     id,
@@ -38,7 +44,7 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
     layout: () => ({
       kind: 'pane',
       paneId,
-      render: () => makeLongContent(`${id}:${paneId}`),
+      render: () => textView(makeLongContent(`${id}:${paneId}`)),
     }),
     keyMap: createKeyMap<Msg>()
       .bind('x', 'Increment', { type: 'inc' }),
@@ -137,8 +143,8 @@ describe('createFramedApp', () => {
         kind: 'split',
         splitId: 's1',
         state: createSplitPaneState({ ratio: 0.5 }),
-        paneA: { kind: 'pane', paneId: 'left', render: () => 'left' },
-        paneB: { kind: 'pane', paneId: 'right', render: () => 'right' },
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
       }),
     };
 
@@ -287,8 +293,8 @@ describe('createFramedApp', () => {
           kind: 'split',
           splitId: 'dup',
           state: createSplitPaneState({ ratio: 0.5 }),
-          paneA: { kind: 'pane', paneId: 'main', render: () => 'left' },
-          paneB: { kind: 'pane', paneId: 'main', render: () => 'right' },
+          paneA: { kind: 'pane', paneId: 'main', render: () => textView('left') },
+          paneB: { kind: 'pane', paneId: 'main', render: () => textView('right') },
         }),
       }],
     });
@@ -310,8 +316,8 @@ describe('createFramedApp', () => {
           rows: ['1fr'],
           areas: ['main'],
           cells: {
-            main: { kind: 'pane', paneId: 'main', render: () => 'main' },
-            ghost: { kind: 'pane', paneId: 'ghost', render: () => 'ghost' },
+            main: { kind: 'pane', paneId: 'main', render: () => textView('main') },
+            ghost: { kind: 'pane', paneId: 'ghost', render: () => textView('ghost') },
           },
         }),
       }],
@@ -343,7 +349,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => makeLongContent('home:main'),
+        render: () => textView(makeLongContent('home:main')),
       }),
       keyMap: createKeyMap<Msg>().bind('l', 'Increment', { type: 'inc' }),
     };
@@ -370,7 +376,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'home',
+        render: () => textView('home'),
       }),
       keyMap: createKeyMap<Msg>()
         .bind('l', 'Cycle placement', { type: 'inc' })
@@ -405,7 +411,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => `${id} pane`,
+        render: () => textView(`${id} pane`),
       }),
     });
 
@@ -430,7 +436,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'home',
+        render: () => textView('home'),
       }),
     };
 
@@ -448,7 +454,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'logs',
+        render: () => textView('logs'),
       }),
       keyMap: createKeyMap<Msg>().bind('x', 'Delayed increment', { type: 'noop' }),
     };
@@ -532,7 +538,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'main',
+        render: () => textView('main'),
       }),
       keyMap: createKeyMap<MsgWithMouse>().bind('x', 'Increment', { type: 'inc' }),
     };
@@ -658,7 +664,7 @@ describe('createFramedApp', () => {
         layout: () => ({
           kind: 'pane',
           paneId: 'main',
-          render: () => 'main',
+          render: () => textView('main'),
         }),
         commandItems: () => [{
           id: 'boost',
@@ -709,8 +715,8 @@ describe('createFramedApp', () => {
           kind: 'split',
           splitId: 'shell',
           state: createSplitPaneState({ ratio: 0.5 }),
-          paneA: { kind: 'pane', paneId: 'left', render: () => 'left' },
-          paneB: { kind: 'pane', paneId: 'right', render: () => 'right' },
+          paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+          paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
         }),
       }],
       overlayFactory(ctx) {
@@ -792,7 +798,7 @@ describe('createFramedApp', () => {
         layout: () => ({
           kind: 'pane',
           paneId: 'main',
-          render: () => 'modal page',
+          render: () => textView('modal page'),
         }),
         keyMap: createKeyMap<Msg>()
           .bind('x', 'Increment', { type: 'inc' }),

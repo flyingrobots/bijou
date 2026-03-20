@@ -25,6 +25,7 @@ npx tsx src/main.ts
 ## What it generates
 
 - TypeScript Node app entrypoint using `createTuiAppSkeleton()`
+- mouse-enabled runtime startup (`run(..., { mouse: true })`)
 - Dependencies:
   - `@flyingrobots/bijou`
   - `@flyingrobots/bijou-node`
@@ -32,6 +33,7 @@ npx tsx src/main.ts
   - `@flyingrobots/bijou-tui-app`
 - Starter scripts: `dev`, `build`, `start`
 - Strict `tsconfig.json`
+- A README that explains the shell patterns the starter is modeling
 
 ## Flags
 
@@ -64,5 +66,15 @@ npm run dev
 ```
 
 The canary smoke run is the strongest downstream check: it generates the stock scaffold, rewrites only the Bijou dependency specs to local tarballs, builds the app, and drives the shipped shell through tab switches, drawer toggles, resizes, and quit-confirm flows under a PTY.
+
+## Design-System Role
+
+The generated app is intentionally opinionated:
+- tabs model peer destinations
+- the drawer models supplemental side work
+- the split page models comparison and inspection
+- the modal models blocking confirmation
+
+Use this scaffolder when you want a real shell starter, not just an empty `run(app)` bootstrap.
 
 For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md) and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).

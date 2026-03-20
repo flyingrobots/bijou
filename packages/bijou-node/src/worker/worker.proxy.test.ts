@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { stringToSurface } from '@flyingrobots/bijou';
 import type { RunOptions } from '@flyingrobots/bijou-tui';
 import { runInWorker, startWorkerApp, type RunWorkerOptions } from './worker.js';
 
@@ -117,7 +118,7 @@ describe('worker proxy runtime', () => {
     await startWorkerApp({
       init: () => [null, []],
       update: (msg, model) => [model, []],
-      view: () => 'worker',
+      view: () => stringToSurface('worker', 6, 1),
     }, {
       isMainThread: false,
       parentPort: {

@@ -430,8 +430,6 @@ export function renderTransition(
 }
 
 export function framePaneOutputToString(output: ViewOutput, width: number, height: number): string {
-  if (typeof output === 'string') return output;
-
   const surface = normalizeViewOutput(output, { width, height }).surface;
   const ctx = resolveSafeCtx();
   if (ctx?.style) {

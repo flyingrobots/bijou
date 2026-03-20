@@ -43,6 +43,9 @@ describe('create-bijou-tui-app', () => {
     expect(files['package.json']).toContain('"name": "my-app"');
     expect(files['src/main.ts']).toContain('createTuiAppSkeleton');
     expect(files['src/main.ts']).toContain("title: 'My Bijou App'");
+    expect(files['src/main.ts']).toContain('{ mouse: true }');
+    expect(files['README.md']).toContain('supplemental side work in a drawer');
+    expect(files['README.md']).toContain('Avoid this starter for one-shot CLI');
   });
 
   it('scaffolds files to target directory when install is disabled', () => {
@@ -64,7 +67,9 @@ describe('create-bijou-tui-app', () => {
       expect(files).toContain('src');
 
       const main = readFileSync(join(target, 'src/main.ts'), 'utf8');
-      expect(main).toContain('await run(createTuiAppSkeleton');
+      expect(main).toContain('await run(');
+      expect(main).toContain('createTuiAppSkeleton');
+      expect(main).toContain('{ mouse: true }');
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

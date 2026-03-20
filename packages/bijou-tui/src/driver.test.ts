@@ -3,10 +3,16 @@ import { runScript } from './driver.js';
 import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
-import { badge, surfaceToString } from '@flyingrobots/bijou';
+import { badge, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext, mockClock, plainStyle } from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
+
+function textView(text: string) {
+  const lines = text.split('\n');
+  const width = Math.max(1, ...lines.map((line) => line.length));
+  return stringToSurface(text, width, Math.max(1, lines.length));
+}
 
 // ---------------------------------------------------------------------------
 // Test app: counter that increments on 'up', decrements on 'down', quits on 'q'
@@ -29,7 +35,7 @@ const counterApp: App<CounterModel> = {
     return [model, []];
   },
   view(model) {
-    return `Count: ${model.count}`;
+    return textView(`Count: ${model.count}`);
   },
 };
 
@@ -111,7 +117,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return model.loaded ? `Data: ${model.data}` : 'Loading...';
+        return textView(model.loaded ? `Data: ${model.data}` : 'Loading...');
       },
     };
 
@@ -139,7 +145,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return `${model.cols}x${model.rows}`;
+        return textView(`${model.cols}x${model.rows}`);
       },
     };
 
@@ -169,7 +175,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return `Count: ${model.count}`;
+        return textView(`Count: ${model.count}`);
       },
     };
 
@@ -189,7 +195,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return `Clicked: ${model.clicked}`;
+        return textView(`Clicked: ${model.clicked}`);
       },
     };
 

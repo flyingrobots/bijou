@@ -1,4 +1,4 @@
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import { createSurface, type BijouContext, type TokenValue } from '@flyingrobots/bijou';
 import {
   animate,
   clipToWidth,
@@ -64,7 +64,15 @@ export interface SkeletonThemeTokens {
   readonly modalBgToken?: TokenValue;
 }
 
-/** Options for creating a batteries-included app skeleton. */
+/**
+ * Options for creating a batteries-included design-system shell starter.
+ *
+ * The scaffold is intentionally opinionated:
+ * - tabs model peer destinations
+ * - the drawer models supplemental side work
+ * - the quit modal models blocking confirmation
+ * - the footer rows model shell status and shortcut chrome
+ */
 export interface CreateTuiAppSkeletonOptions {
   /** Bijou context for theme + style rendering. */
   readonly ctx: BijouContext;
@@ -136,12 +144,16 @@ const DEFAULT_SPLIT_RATIO = 1 / 3;
  * Create a full-screen framed app skeleton with:
  * - tabbed top bar (`|` separators, active/inactive surface tokens)
  * - header line
- * - animated physics drawer on tab 1 (`o` to toggle)
+ * - animated supplemental drawer on tab 1 (`o` to toggle)
  * - tab switching with `[` and `]` (frame defaults)
  * - quit confirmation modal (`q` / `ctrl+c`)
  * - two-line footer (status line + controls line)
  * - full-width `\\` separator row above footer
  * - default 2-tab setup (drawer page + 1/3:2/3 split page)
+ *
+ * Use this starter when you want an opinionated shell for multi-view apps.
+ * Avoid it for one-shot prompts or simple document-style flows that do not
+ * need tabbed navigation, shell chrome, or overlay orchestration.
  */
 export function createTuiAppSkeleton(
   options: CreateTuiAppSkeletonOptions,
@@ -429,7 +441,10 @@ function maybeRenderDrawerOverlay(
 function renderDrawerContent(model: SkeletonPageModel): string {
   const pct = Math.round(clamp01(model.drawerProgress) * 100);
   return [
-    'Panel drawer',
+    'Supplemental drawer',
+    '',
+    'Use for side work.',
+    'Keep the main pane active.',
     '',
     `Open: ${model.drawerOpen ? 'yes' : 'no'}`,
     `Width: ${pct}%`,
@@ -515,7 +530,7 @@ function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
       return {
         kind: 'pane',
         paneId: drawerPaneId(spec.tab.id),
-        render: () => '',
+        render: () => createSurface(0, 0),
       };
 
     case 'split':
@@ -527,12 +542,12 @@ function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
         paneA: {
           kind: 'pane',
           paneId: `${spec.tab.id}-left`,
-          render: (width: number, height: number) => renderSplitPaneLabelSurface('Left pane (1/3)', width, height, ctx),
+          render: (width: number, height: number) => renderSplitPaneLabelSurface('Primary workspace (1/3)', width, height, ctx),
         },
         paneB: {
           kind: 'pane',
           paneId: `${spec.tab.id}-right`,
-          render: (width: number, height: number) => renderSplitPaneLabelSurface('Right pane (2/3)', width, height, ctx),
+          render: (width: number, height: number) => renderSplitPaneLabelSurface('Secondary context (2/3)', width, height, ctx),
         },
       };
 
@@ -540,7 +555,7 @@ function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
       return {
         kind: 'pane',
         paneId: `${spec.tab.id}-main`,
-        render: () => '',
+        render: () => createSurface(0, 0),
       };
   }
 }

@@ -9,8 +9,8 @@ export function renderSplitPaneLabelSurface(
   width: number,
   height: number,
   ctx: BijouContext,
-): Surface | string {
-  if (width <= 0 || height <= 0) return '';
+): Surface {
+  if (width <= 0 || height <= 0) return createSurface(0, 0);
 
   const surface = createSurface(width, height);
   surface.blit(separatorSurface({

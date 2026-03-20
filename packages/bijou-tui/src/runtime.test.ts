@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createSurface, type TimerHandle } from '@flyingrobots/bijou';
+import { createSurface, stringToSurface, type TimerHandle } from '@flyingrobots/bijou';
 import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
 import { quit } from './commands.js';
@@ -28,7 +28,7 @@ function counterApp(quitKey = 'q'): App<number, never> {
       }
       return [model, []];
     },
-    view: (model: number) => `count: ${model}`,
+    view: (model: number) => textView(`count: ${model}`),
   };
 }
 
@@ -38,6 +38,12 @@ function singleCellSurface(char?: string) {
     surface.set(0, 0, { char, empty: false });
   }
   return surface;
+}
+
+function textView(text: string) {
+  const lines = text.split('\n');
+  const width = Math.max(1, ...lines.map((line) => line.length));
+  return stringToSurface(text, width, Math.max(1, lines.length));
 }
 
 function createTrackingClock() {
@@ -175,7 +181,7 @@ describe('run', () => {
           }
           return [model, []];
         },
-        view: (model) => `count: ${model}`,
+        view: (model) => textView(`count: ${model}`),
       };
 
       const { clock, ctx } = createInteractiveContext();
@@ -196,7 +202,7 @@ describe('run', () => {
       const stubbornApp: App<string, never> = {
         init: () => ['running', []],
         update(_msg, model) { return [model, []]; },
-        view: (model) => model,
+        view: (model) => textView(model),
       };
 
       // Two Ctrl+C in rapid succession
@@ -222,7 +228,7 @@ describe('run', () => {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
           return [model, []];
         },
-        view: () => 'spy',
+        view: () => textView('spy'),
       };
 
       // Ctrl+C then q to quit normally
@@ -249,7 +255,7 @@ describe('run', () => {
           }
           return [model, []];
         },
-        view: () => 'spy',
+        view: () => textView('spy'),
       };
 
       const ctx = createTestContext({ mode: 'interactive', clock });
@@ -287,7 +293,7 @@ describe('run', () => {
           if ('type' in msg && msg.type === 'started') return ['ready', [quit<Msg>()]];
           return ['loading', []];
         },
-        view: (model) => model,
+        view: (model) => textView(model),
       };
 
       const { clock, ctx } = createInteractiveContext();
@@ -320,7 +326,7 @@ describe('run', () => {
           }
           return ['idle', []];
         },
-        view: (model) => model,
+        view: (model) => textView(model),
         routeRuntimeIssue(issue) {
           return { type: 'issue', text: `${issue.source}:${issue.message}` };
         },
@@ -355,7 +361,7 @@ describe('run', () => {
           if (order.length >= 2) return [model, [quit<Msg>()]];
           return [model, []];
         },
-        view: () => 'ordering',
+        view: () => textView('ordering'),
       };
 
       const { clock, ctx } = createInteractiveContext();
@@ -424,7 +430,7 @@ describe('run', () => {
           if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
           return [model, []];
         },
-        view: () => `size:${ctx.runtime.columns}x${ctx.runtime.rows}`,
+        view: () => textView(`size:${ctx.runtime.columns}x${ctx.runtime.rows}`),
       };
 
       scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
@@ -473,7 +479,7 @@ describe('run', () => {
       const app: App<string, never> = {
         init: () => ['bye', [quit()]],
         update: (_msg, model) => [model, []],
-        view: (model) => model,
+        view: (model) => textView(model),
       };
 
       const promise = run(app, { ctx });
