@@ -19,6 +19,7 @@ npx tsx examples/notifications/main.ts
 - choose `alert()` when the message should remain in page flow
 - choose `toast()` when you only need a single low-level transient overlay
 - choose `modal()` when the user must stop and decide before continuing
+- choose `drawer()` when the user needs supplemental context while keeping the main task visible
 
 ## What this example proves
 

@@ -580,13 +580,20 @@ for (const layer of stack.layers()) {
 - Use the notification system when the app needs stacking, actions, routing, placement changes, or history.
 - Use `drawer()` for supplemental side work that should not fully block the main surface.
 - Use `modal()` when the user must stop and decide and background interactions should be blocked.
+- Use `tooltip()` only for tiny local explanation. If the content needs commands, scrolling, or recall, pick something else.
+
+Additional guidance:
+
+- If users may need to review prior events, the notification system is the right family, not a pile of ad hoc toasts.
+- If the content belongs in the reading flow, move it back into the page as an `alert()` or normal region instead of forcing it into an overlay.
+- If interruption is not justified, prefer a drawer over a modal.
 
 ### Modals
 
 Create centered dialog overlays for confirm prompts, info boxes, or text input:
 
 ```typescript
-import { composite, modal } from '@flyingrobots/bijou-tui';
+import { compositeSurface, modal } from '@flyingrobots/bijou-tui';
 
 // In view:
 let output = renderMainContent(model);
@@ -601,7 +608,7 @@ if (model.showConfirm) {
     borderToken: ctx.theme.theme.border.warning,
     ctx,
   });
-  output = composite(output, [dialog], { dim: true });
+  output = compositeSurface(output, [dialog], { dim: true });
 }
 
 return output;
@@ -616,7 +623,7 @@ The `width` option overrides auto-sizing. Without `ctx`, borders render as plain
 Anchored notification overlays for operation feedback:
 
 ```typescript
-import { composite, toast } from '@flyingrobots/bijou-tui';
+import { compositeSurface, toast } from '@flyingrobots/bijou-tui';
 
 // In view:
 let output = renderMainContent(model);
@@ -631,7 +638,7 @@ if (model.notification) {
     screenHeight: model.rows,
     ctx,
   });
-  output = composite(output, [t]);
+  output = compositeSurface(output, [t]);
 }
 
 return output;
@@ -648,8 +655,10 @@ if (model.toast) overlays.push(toast({ ...model.toast, screenWidth, screenHeight
 if (model.modal) overlays.push(modal({ ...model.modal, screenWidth, screenHeight }));
 
 // Modal paints over toast if they overlap
-return composite(background, overlays, { dim: model.modal != null });
+return compositeSurface(background, overlays, { dim: model.modal != null });
 ```
+
+Every overlay still exposes `content` for explicit lowering paths, but surface-native composition is the preferred default in V4-era TUI apps.
 
 ### Drawer Anchors and Panel Scoping
 

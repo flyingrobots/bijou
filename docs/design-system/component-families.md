@@ -27,7 +27,7 @@ The stated design-system standard requires each mature family doc to include:
 - related families
 - closest Carbon analogue
 
-This slice closes the biggest gap: every family below now calls out graceful lowering and related families explicitly. The remaining incompleteness is mostly depth, not structure. Some families still need richer content guidance, stronger examples, and sharper edge-case policy, but the page now satisfies the baseline design-system template instead of merely describing intent.
+This slice closes two large structural gaps: every family below now calls out graceful lowering and related families explicitly, and the overlay families now carry real content guidance. The remaining incompleteness is still important, though. Many non-overlay families still need richer content guidance, stronger examples, and sharper edge-case policy before this page can be treated as fully mature doctrine.
 
 ## Status and feedback families
 
@@ -542,6 +542,11 @@ This slice closes the biggest gap: every family below now calls out graceful low
   - the content should just live in the document or shell
 - Ownership:
   - TUI
+- Content guidance:
+  - `tooltip()` content should be short, local, and explanatory, not actionable or scrollable
+  - `drawer()` content should support supplemental work, inspection, or side-by-side context without stealing the whole task
+  - `modal()` content should justify blocking the user and should end in a clear decision, confirmation, or review step
+  - `toast()` content should be short-lived and self-contained, not a surrogate notification center
 - Graceful lowering:
   - rich: layered overlay surfaces with blocking or non-blocking behavior depending on variant
   - static: lower to visible in-flow or shell-level snapshots rather than hidden z-order
@@ -568,6 +573,10 @@ This slice closes the biggest gap: every family below now calls out graceful low
   - the app is really one screen or one prompt
 - Ownership:
   - TUI
+- Content guidance:
+  - the shell should frame destinations and workspace state, not become a dumping ground for unrelated metadata
+  - status lines should carry concise global context, not replace in-page guidance
+  - command palette entries should prefer actions and navigation targets over field-style data entry
 - Graceful lowering:
   - rich: full shell chrome with tabs, palette, overlays, notifications, and workspace regions
   - static: retain the active page and essential shell context without pretending background interactivity exists
@@ -617,7 +626,6 @@ These are shipped, but the guidance is still thinner than it should be:
 - `alert()` versus notifications versus `toast()`
 - `tree()` versus future interactive tree behavior
 - `timeline()` density and audit-trail guidance
-- overlay family specialization beyond primitive API docs
 - `statusBar()` as a shell pattern
 - `commandPalette()` modes beyond simple action search
 - mouse-first interaction policy for shell and overlay families

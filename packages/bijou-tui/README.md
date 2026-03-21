@@ -129,6 +129,7 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use the notification system when the app needs stacking, placement, actions, routing, or history.
 - Use `drawer()` when the user should keep the main surface visible while working in supplemental detail.
 - Use `modal()` when background shortcuts and pointer actions should be blocked.
+- Use `tooltip()` only for tiny local explanation, not for decisions or scrollable content.
 
 ### Collection interaction
 
@@ -397,7 +398,7 @@ stack.remove(modalId);
 Paint overlays (modals, toasts) on top of existing content:
 
 ```typescript
-import { composite, modal, toast } from '@flyingrobots/bijou-tui';
+import { compositeSurface, modal, toast } from '@flyingrobots/bijou-tui';
 
 // Create a centered dialog
 const dialog = modal({
@@ -418,10 +419,10 @@ const notification = toast({
 });
 
 // Paint overlays onto background content
-const output = composite(backgroundView, [dialog, notification], { dim: true });
+const output = compositeSurface(backgroundSurface, [dialog, notification], { dim: true });
 ```
 
-Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
+Each overlay now exposes both `surface` and `content` forms. Prefer `compositeSurface()` when your app is already on the surface-native path. Keep the string-oriented `composite()` path for explicit lowering boundaries, not as the default mental model. The `dim` option fades the background with ANSI dim.
 
 Reach for `toast()` when the app is composing a one-off overlay directly. Reach for the notification system when stacking, actions, routing, or history matter. The notification lab in `examples/notifications` is the canonical higher-level example.
 

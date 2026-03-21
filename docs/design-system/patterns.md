@@ -65,6 +65,13 @@ Avoid when:
 
 - the message must remain in the page content
 - the app needs stacking, history, routing, or recall
+- the user needs to review a set of related events later
+
+Content guidance:
+
+- keep the message short and self-contained
+- do not hide follow-up obligations in a toast body
+- prefer one clear state statement over mixed status plus instructions plus history
 
 #### notifications
 
@@ -80,6 +87,13 @@ Avoid when:
 - a single local overlay would do
 - the user must stop and decide before continuing
 
+Content guidance:
+
+- use notifications for events, not for durable documents
+- route warnings and errors here when the app owns runtime messaging as a system
+- actionable notifications should expose one obvious next step, not a mini workflow
+- if users may need recall, the history/archive surface is part of the feature, not an optional afterthought
+
 #### `modal()`
 
 Use when:
@@ -91,6 +105,13 @@ Use when:
 Avoid when:
 
 - a lighter inline or overlay treatment would do
+
+Content guidance:
+
+- the title should state the decision or review task clearly
+- the body should explain the consequence, not repeat generic warning copy
+- the modal should end in a clear next action or dismissal path
+- avoid turning a modal into a drawer with extra blocking chrome
 
 ## 2. Selection versus action
 
@@ -230,25 +251,42 @@ Avoid when:
 
 Choose overlays by how much they should interrupt and how much context they should retain.
 
+### Governing rules
+
+- Overlays are for interruption, review, or supplemental context. They are not substitutes for normal page structure.
+- Pick the least interruptive overlay that still preserves the meaning and action path.
+- If users need history, stacking, routing, or recall, move up from `toast()` to the notification system.
+- If background input must stop, use `modal()` rather than trying to make a toast or drawer behave like one.
+- If the content is long-lived and belongs in the reading flow, use `alert()` or a normal page region instead of any overlay.
+
 ### `tooltip()`
 
 - for tiny local explanation
 - not for decisions
+- not for content that needs scrolling, recall, or commands
 
 ### `drawer()`
 
 - for supplemental context, inspectors, side work
 - keep the main surface visible
+- prefer when the user needs reference material while still working in the main task
 
 ### `modal()`
 
 - for blocking review, choice, or confirmation
 - background shortcuts and pointer actions should be blocked
+- use sparingly; interruption must be justified
+
+### `toast()`
+
+- for one transient overlay the app is composing directly
+- not for stack/history/routing problems
 
 ### notifications
 
 - for events, not documents
 - use history/archive when recall matters
+- prefer over repeated ad hoc toasts once app-level messaging becomes systemic
 
 ## 6. Forms and progression
 
