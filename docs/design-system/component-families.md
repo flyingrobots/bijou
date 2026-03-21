@@ -27,7 +27,7 @@ The stated design-system standard requires each mature family doc to include:
 - related families
 - closest Carbon analogue
 
-Many entries below already cover purpose, variants, ownership, and analogue, but they do not yet consistently document graceful lowering or related-family guidance explicitly. Until that is corrected, this page should be treated as incomplete doctrine rather than finished usage guidance.
+This slice closes the biggest gap: every family below now calls out graceful lowering and related families explicitly. The remaining incompleteness is mostly depth, not structure. Some families still need richer content guidance, stronger examples, and sharper edge-case policy, but the page now satisfies the baseline design-system template instead of merely describing intent.
 
 ## Status and feedback families
 
@@ -42,6 +42,14 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - message must stand alone or explain itself
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: keep compact label styling inline with nearby content
+  - pipe: lower to plain inline text label without relying on color
+  - accessible: speak the status in plain words next to the owning object
+- Related families:
+  - `alert()`
+  - `note()`
+  - notification system
 - Carbon analogue:
   - tag
 
@@ -57,6 +65,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - lifecycle/history/stacking is required
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: remain a boxed or otherwise clearly separated in-flow message
+  - pipe: lower to emphasized plain text that stays in document order
+  - accessible: keep message text and severity explicit, with no dependence on borders or color
+- Related families:
+  - `badge()`
+  - `note()`
+  - `toast()`
+  - notification system
 - Carbon analogue:
   - inline notification
 
@@ -74,6 +91,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the content should remain in page flow
 - Ownership:
   - TUI
+- Graceful lowering:
+  - rich: anchored transient overlay with placement and timing
+  - static: lower to visible in-flow status or last-frame summary rather than hidden motion
+  - pipe: lower to one plain event line or app-owned log entry
+  - accessible: prefer explicit announcement text over spatial anchoring
+- Related families:
+  - `alert()`
+  - `modal()`
+  - notification system
 - Carbon analogue:
   - toast notification primitive
 
@@ -94,6 +120,16 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - one local overlay is enough and app-wide lifecycle is unnecessary
 - Ownership:
   - TUI
+- Graceful lowering:
+  - rich: stacked overlays with placement, action buttons, animation, and archive/history
+  - static: visible notices plus accessible history review surface
+  - pipe: lower to ordered event lines and routed warnings/errors
+  - accessible: simplify to explicit chronological reviewable notices with actions described in text
+- Related families:
+  - `toast()`
+  - `alert()`
+  - `log()`
+  - `modal()`
 - Carbon analogue:
   - toast notification, actionable notification, notification panel/center
 
@@ -108,6 +144,14 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the message should interrupt instead of accumulate
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: retain ordered styled lines with level cues
+  - pipe: already natural plain sequential output
+  - accessible: keep timestamps/levels explicit and avoid decorative formatting
+- Related families:
+  - notification system
+  - `alert()`
+  - `badge()`
 - Carbon analogue:
   - activity log / event stream pattern
 
@@ -125,6 +169,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - urgency or interruption is the primary job
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: keep bordered or titled containment when space allows
+  - pipe: lower to plain grouped text with spacing and optional title
+  - accessible: preserve title and content order without decorative framing
+- Related families:
+  - `separator()`
+  - `alert()`
+  - `grid()`
+  - `splitPane()`
 - Carbon analogue:
   - tile / contained section
 
@@ -140,6 +193,14 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the content needs its own grouped region
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: render as visual divider or labeled rule
+  - pipe: lower to simple text divider or heading-like label
+  - accessible: preserve section naming without decorative characters being the only cue
+- Related families:
+  - `box()`
+  - `tabs()`
+  - `breadcrumb()`
 - Carbon analogue:
   - divider
 
@@ -158,6 +219,16 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - choices are already known and enumerable
 - Ownership:
   - core
+- Graceful lowering:
+  - rich: interactive field/editor treatment with validation feedback
+  - static: render current value or prompt snapshot honestly
+  - pipe: fall back to line-buffered prompt/input flow
+  - accessible: keep prompt, validation, and submitted value explicit in text
+- Related families:
+  - `select()`
+  - `filter()`
+  - `group()`
+  - `wizard()`
 - Carbon analogue:
   - text input / text area
 
@@ -175,6 +246,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - selecting should trigger an app command rather than persist a value
 - Ownership:
   - core
+- Graceful lowering:
+  - rich: keyboard choice list with focus and optional search narrowing
+  - static: show current selection or available options snapshot
+  - pipe: lower to numbered or searchable textual selection flow
+  - accessible: keep option labels, current selection, and prompt semantics explicit
+- Related families:
+  - `multiselect()`
+  - `commandPalette()`
+  - `input()`
 - Carbon analogue:
   - dropdown / combo box
 
@@ -189,6 +269,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the choice is singular or immediate action-oriented
 - Ownership:
   - core
+- Graceful lowering:
+  - rich: checkbox-style set selection with keyboard toggling
+  - static: show selected values snapshot honestly
+  - pipe: lower to comma-separated or numbered textual selection flow
+  - accessible: describe the current set in plain text rather than relying on checkmarks alone
+- Related families:
+  - `select()`
+  - `filter()`
+  - `group()`
 - Carbon analogue:
   - multi-select / checkbox group
 
@@ -203,6 +292,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - nuance, comparison, or explanation is needed
 - Ownership:
   - core
+- Graceful lowering:
+  - rich: yes/no confirmation prompt or focused confirm surface
+  - static: show the confirmation question and current default honestly
+  - pipe: lower naturally to textual yes/no input
+  - accessible: preserve the binary choice and default state explicitly
+- Related families:
+  - `modal()`
+  - `alert()`
+  - `wizard()`
 - Carbon analogue:
   - confirmation dialog pattern
 
@@ -220,6 +318,16 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the fields are unrelated or the result is a command
 - Ownership:
   - core
+- Graceful lowering:
+  - rich: grouped or staged prompts with progress and validation
+  - static: show the current step/group snapshot honestly
+  - pipe: lower to sequential prompts while preserving branching meaning
+  - accessible: keep step names, requirements, and progress explicit in text
+- Related families:
+  - `input()`
+  - `select()`
+  - `confirm()`
+  - `stepper()`
 - Carbon analogue:
   - form group / multi-step flow
 
@@ -236,6 +344,14 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - order or hierarchy is the main idea
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: keep one active peer view visibly selected
+  - pipe: lower to labeled current section plus sibling list if needed
+  - accessible: preserve peer destinations and active state explicitly in text
+- Related families:
+  - `stepper()`
+  - `breadcrumb()`
+  - `createFramedApp()`
 - Carbon analogue:
   - tabs
 
@@ -253,6 +369,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - sections are peers that deserve first-class navigation
 - Ownership:
   - core plus TUI interaction layer
+- Graceful lowering:
+  - rich: collapsible sections with optional keyboard-owned inspection
+  - static: show expanded/collapsed state honestly without requiring motion
+  - pipe: lower to section headings with visible disclosed content
+  - accessible: keep section labels and disclosure state explicit in text
+- Related families:
+  - `tabs()`
+  - `box()`
+  - `interactiveAccordion()`
 - Carbon analogue:
   - accordion
 
@@ -270,6 +395,14 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - tabs or lists express the job more clearly
 - Ownership:
   - core
+- Graceful lowering:
+  - rich/static: retain location, step, or page state with simple styling
+  - pipe: lower to plain path/progress/page summaries
+  - accessible: preserve order and active/current state explicitly
+- Related families:
+  - `tabs()`
+  - `wizard()`
+  - `statusBar()`
 - Carbon analogue:
   - breadcrumb / progress indicator / pagination
 
@@ -292,6 +425,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - items are primarily one-dimensional and should read as a list instead
 - Ownership:
   - core plus TUI interaction layer
+- Graceful lowering:
+  - rich: passive table or focused navigable inspection depending on variant
+  - static: retain tabular comparison when width allows, otherwise favor honest wrapped rows
+  - pipe: lower to textual row/column output without hidden clipping
+  - accessible: preserve headers, row labels, and comparison semantics explicitly
+- Related families:
+  - `browsableList()`
+  - `tree()`
+  - `navigableTable()`
 - Carbon analogue:
   - data table
 
@@ -309,6 +451,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - multiple parents or graph dependencies matter
 - Ownership:
   - core plus TUI interaction layer
+- Graceful lowering:
+  - rich: render hierarchy with optional interactive file/navigation layer
+  - static: keep visible nesting and path structure honestly
+  - pipe: lower naturally to textual indented hierarchy/path lists
+  - accessible: preserve parent/child relationships in linear text
+- Related families:
+  - `browsableList()`
+  - `dag()`
+  - `filePicker()`
 - Carbon analogue:
   - tree view / file browser pattern
 
@@ -326,6 +477,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - columns or hierarchy carry the meaning
 - Ownership:
   - core plus TUI interaction layer
+- Graceful lowering:
+  - rich: passive or keyboard-browsable list with optional descriptions
+  - static: keep readable ordered list snapshot
+  - pipe: lower naturally to plain item list text
+  - accessible: preserve item ordering, active selection, and descriptions explicitly
+- Related families:
+  - `table()`
+  - `tree()`
+  - `commandPalette()`
 - Carbon analogue:
   - ordered/unordered list / selectable list
 
@@ -349,6 +509,16 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - a plain table or tree is enough
 - Ownership:
   - core plus TUI interaction layer
+- Graceful lowering:
+  - rich: preserve chronology or graph shape with optional focused inspection
+  - static: keep time/dependency order honestly even if the spatial rendering simplifies
+  - pipe: lower to ordered event lists or textual dependency traces
+  - accessible: linearize the structure while preserving temporal/dependency meaning explicitly
+- Related families:
+  - `table()`
+  - `tree()`
+  - `log()`
+  - `dagPane()`
 - Carbon analogue:
   - timeline has a close analogue; DAG does not and should be treated as a specialized Bijou family
 
@@ -372,6 +542,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the content should just live in the document or shell
 - Ownership:
   - TUI
+- Graceful lowering:
+  - rich: layered overlay surfaces with blocking or non-blocking behavior depending on variant
+  - static: lower to visible in-flow or shell-level snapshots rather than hidden z-order
+  - pipe: lower to plain text event or prompt surfaces appropriate to interruption level
+  - accessible: linearize overlay content with explicit relationship to the blocked or supplemented context
+- Related families:
+  - notification system
+  - `alert()`
+  - `createFramedApp()`
 - Carbon analogue:
   - tooltip / side panel / modal / toast notification
 
@@ -389,6 +568,16 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - the app is really one screen or one prompt
 - Ownership:
   - TUI
+- Graceful lowering:
+  - rich: full shell chrome with tabs, palette, overlays, notifications, and workspace regions
+  - static: retain the active page and essential shell context without pretending background interactivity exists
+  - pipe: lower to current page content plus minimal status/context framing
+  - accessible: linearize active shell state, navigation context, and current overlays into one readable flow
+- Related families:
+  - `statusBar()`
+  - `tabs()`
+  - `commandPalette()`
+  - notification system
 - Carbon analogue:
   - shell, header/footer, command palette
 
@@ -409,6 +598,15 @@ Many entries below already cover purpose, variants, ownership, and analogue, but
   - a sequential flow would be simpler and more legible
 - Ownership:
   - TUI
+- Graceful lowering:
+  - rich: keep spatial relationships and resizable or placed regions where they materially help
+  - static: retain simplified spatial grouping when possible without fake interactivity
+  - pipe: lower to sensible sequential content order
+  - accessible: linearize regions in a predictable reading order with section labels
+- Related families:
+  - `box()`
+  - `createFramedApp()`
+  - `focusArea()`
 - Carbon analogue:
   - layout grid / split layout / stack primitives
 
