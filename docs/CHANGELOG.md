@@ -13,6 +13,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Pointer policy + shell mouse routing** — `@flyingrobots/bijou-tui` now documents keyboard-first mouse policy, lets framed apps route click interactions through shell tabs and notification stacks, exposes notification hit-testing helpers, and enables the notification demo to run in real mouse mode.
 - **Surface-native flex and viewport APIs** — `@flyingrobots/bijou-tui` now ships `flexSurface()` and `viewportSurface()`, so apps can keep layout and scrolling on the structured `Surface` path instead of flattening rich content into multiline strings at the composition boundary.
 - **Structured overlay content** — `@flyingrobots/bijou-tui` now lets `modal()`, `drawer()`, and `tooltip()` accept either plain strings or structured `Surface` content, so rich overlay rows and embedded component surfaces can stay structured through the overlay renderer instead of being flattened first.
+- **Surface-native stack and placement APIs** — `@flyingrobots/bijou-tui` now ships `placeSurface()` alongside `vstackSurface()` / `hstackSurface()`, giving the layout family a complete structured composition path for rich TUI views instead of forcing callers back through string-first stack/placement helpers.
 
 ### 📝 Documentation
 
@@ -44,6 +45,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Release dry-run artifact action compatibility** — the release dry-run workflow now uses `actions/upload-artifact@v7`, matching the current Node 24-compatible action runtime.
 - **Surface-native layout example migration** — the `chat`, `composable`, `split-editors`, and `flex-layout` demos now use `flexSurface()` / `viewportSurface()` instead of string-first layout boundaries, and the shared example surface helpers now call the stack helpers with their actual surface-native signatures.
 - **Structured overlay example migration** — the `modal`, `drawer`, and `tooltip` demos now pass structured `Surface` content into the overlay family, and the public overlay docs now document structured content as the preferred path when rich TUI layout matters inside an interruption layer.
+- **Workspace layout doctrine update** — the layout-family docs and public TUI guides now explicitly treat `vstackSurface()` / `hstackSurface()` / `placeSurface()` as the canonical rich-TUI composition path and frame `vstack()` / `hstack()` / `place()` as explicit text-composition or lowering tools.
 
 ## [3.1.0] - 2026-03-18
 

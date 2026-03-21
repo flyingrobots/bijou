@@ -243,11 +243,30 @@ scroll = pageDown(scroll);       // down one page
 ### Basic Layout
 
 ```typescript
-import { vstack, hstack } from '@flyingrobots/bijou-tui';
+import {
+  hstack,
+  hstackSurface,
+  place,
+  placeSurface,
+  vstack,
+  vstackSurface,
+} from '@flyingrobots/bijou-tui';
 
-vstack(header, content, footer);       // vertical stack
-hstack(2, leftPanel, rightPanel);      // side-by-side with gap
+vstack(header, content, footer);                   // explicit text-lowering path
+hstack(2, leftPanel, rightPanel);                  // explicit text-lowering path
+place('Title', { width: 20, height: 3 });          // text placement
+
+vstackSurface(headerSurface, bodySurface);         // structured surface stack
+hstackSurface(2, navSurface, mainSurface);         // structured horizontal stack
+placeSurface(dialogSurface, {                      // structured placement/alignment
+  width: cols,
+  height: rows,
+  hAlign: 'center',
+  vAlign: 'middle',
+});
 ```
+
+Prefer `vstackSurface()` / `hstackSurface()` / `placeSurface()` when the view is already composed from `Surface` values. Keep `vstack()` / `hstack()` / `place()` for explicit text composition or lowering paths.
 
 ### Split Pane
 

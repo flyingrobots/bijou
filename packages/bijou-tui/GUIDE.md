@@ -182,6 +182,29 @@ const output = grid({
 });
 ```
 
+## Surface-Native Stack and Placement
+
+Use `vstackSurface()` / `hstackSurface()` / `placeSurface()` when the page is already composed from structured `Surface` values and should stay on that path.
+
+```typescript
+import {
+  hstackSurface,
+  placeSurface,
+  vstackSurface,
+} from '@flyingrobots/bijou-tui';
+
+const body = vstackSurface(headerSurface, contentSurface, footerSurface);
+const split = hstackSurface(2, navSurface, mainSurface);
+const centered = placeSurface(dialogSurface, {
+  width: cols,
+  height: rows,
+  hAlign: 'center',
+  vAlign: 'middle',
+});
+```
+
+Keep `vstack()` / `hstack()` / `place()` for explicit text composition or deliberate lowering to string-first helpers.
+
 ## Scrollable Viewport
 
 ```typescript

@@ -683,7 +683,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - use `splitPane()` when the user benefits from explicit primary-versus-secondary context
   - use `grid()` when multiple stable regions deserve simultaneous visibility
-  - use `flex()` / `vstack()` / `hstack()` / `place()` to support a semantic layout, not to create arbitrary ornament
+  - use `flex()` / `vstackSurface()` / `hstackSurface()` / `placeSurface()` to keep rich TUI composition structured; keep `vstack()` / `hstack()` / `place()` for explicit text composition or lowering
   - region titles and borders should explain job and hierarchy, not merely expose geometry
 - Graceful lowering:
   - rich: keep spatial relationships and resizable or placed regions where they materially help

@@ -85,7 +85,7 @@ export type { MotionOptions } from './motion/types.js';
 
 // Layout
 export { vstack, hstack, place } from './layout.js';
-export { vstackSurface, hstackSurface } from './surface-layout.js';
+export { vstackSurface, hstackSurface, placeSurface } from './surface-layout.js';
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
 export type { LayoutRect } from './layout-rect.js';
 
