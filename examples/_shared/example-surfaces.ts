@@ -1,11 +1,14 @@
 import {
+  badge,
   createSurface,
   parseAnsiToSurface,
   stringToSurface,
   stripAnsi,
+  type BadgeVariant,
   type BijouContext,
   type Surface,
 } from '@flyingrobots/bijou';
+import { hstackSurface, vstackSurface } from '@flyingrobots/bijou-tui';
 
 export function line(text: string, width = visibleWidth(text)): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), 1);
@@ -38,6 +41,18 @@ export function contentSurface(text: string): Surface {
   const width = Math.max(1, ...lines.map((line) => stripAnsi(line).length));
   const height = Math.max(1, lines.length);
   return parseAnsiToSurface(text, width, height);
+}
+
+export function badgeSurface(label: string, variant: BadgeVariant, ctx: BijouContext): Surface {
+  return badge(label, { variant, ctx });
+}
+
+export function row(parts: readonly (string | Surface)[]): Surface {
+  return hstackSurface(parts.map((part) => typeof part === 'string' ? line(part) : part));
+}
+
+export function column(rows: readonly (string | Surface)[]): Surface {
+  return vstackSurface(rows.map((entry) => typeof entry === 'string' ? contentSurface(entry) : entry));
 }
 
 function visibleWidth(text: string): number {

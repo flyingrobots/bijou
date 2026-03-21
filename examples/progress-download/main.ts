@@ -1,11 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge, separator, spinnerFrame, surfaceToString } from '@flyingrobots/bijou';
+import { progressBar, separator, spinnerFrame, type Surface } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Download {
   name: string;
@@ -70,35 +68,35 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const allDone = model.downloads.every(d => d.done);
 
-    const lines: string[] = ['', '  Installing packages...', ''];
+    const rows = [spacer(), line('  Installing packages...'), spacer()] as Surface[];
 
     for (const d of model.downloads) {
       const name = d.name.padEnd(16);
       const size = d.size.padStart(8);
 
       if (d.done) {
-        lines.push(`  ${badgeText('DONE', 'success')} ${name} ${size}`);
+        rows.push(row(['  ', badgeSurface('DONE', 'success', ctx), ` ${name} ${size}`]));
       } else {
         const spinner = spinnerFrame(model.frame, { label: '' });
-        lines.push(`  ${spinner} ${name} ${size}`);
-        lines.push(`    ${progressBar(Math.round(d.progress), { width: 40, showPercent: true })}`);
+        rows.push(line(`  ${spinner} ${name} ${size}`));
+        rows.push(line(`    ${progressBar(Math.round(d.progress), { width: 40, showPercent: true })}`));
       }
     }
 
-    lines.push('');
+    rows.push(spacer());
 
     // Overall progress
     const totalProgress = model.downloads.reduce((sum, d) => sum + d.progress, 0) / model.downloads.length;
-    lines.push(separator({ label: 'total', width: 58 }));
-    lines.push(`  ${progressBar(Math.round(totalProgress), { width: 50, showPercent: true })}`);
+    rows.push(contentSurface(separator({ label: 'total', width: 58 })));
+    rows.push(line(`  ${progressBar(Math.round(totalProgress), { width: 50, showPercent: true })}`));
 
     if (allDone) {
-      lines.push('');
-      lines.push(`  ${badgeText('SUCCESS', 'success')} All packages installed.`);
+      rows.push(spacer());
+      rows.push(row(['  ', badgeSurface('SUCCESS', 'success', ctx), ' All packages installed.']));
     }
 
-    lines.push('');
-    return contentSurface(lines.join('\n'));
+    rows.push(spacer());
+    return column(rows);
   },
 };
 

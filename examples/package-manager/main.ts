@@ -1,11 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { spinnerFrame, progressBar, badge, alert, tree, separator, surfaceToString } from '@flyingrobots/bijou';
+import { spinnerFrame, progressBar, alert, tree, separator, type Surface } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Phase = 'resolving' | 'downloading' | 'linking' | 'done';
 
@@ -80,44 +78,44 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = [''];
+    const rows = [spacer()] as Surface[];
 
     if (model.phase === 'resolving') {
-      lines.push(`  ${spinnerFrame(model.frame)} Resolving dependencies...`);
-      lines.push('');
-      return contentSurface(lines.join('\n'));
+      rows.push(line(`  ${spinnerFrame(model.frame)} Resolving dependencies...`));
+      rows.push(spacer());
+      return column(rows);
     }
 
     if (model.phase === 'downloading') {
-      lines.push('  Downloading packages...');
-      lines.push('');
+      rows.push(line('  Downloading packages...'));
+      rows.push(spacer());
       for (const p of model.packages) {
         const name = `${p.name}@${p.version}`.padEnd(28);
         if (p.done) {
-          lines.push(`  ${badgeText('OK', 'success')} ${name}`);
+          rows.push(row(['  ', badgeSurface('OK', 'success', ctx), ` ${name}`]));
         } else {
-          lines.push(`  ${spinnerFrame(model.frame, { label: '' })} ${name}`);
-          lines.push(`    ${progressBar(Math.round(p.progress), { width: 36, showPercent: true })}`);
+          rows.push(line(`  ${spinnerFrame(model.frame, { label: '' })} ${name}`));
+          rows.push(line(`    ${progressBar(Math.round(p.progress), { width: 36, showPercent: true })}`));
         }
       }
-      lines.push('');
+      rows.push(spacer());
       const total = model.packages.reduce((s, p) => s + p.progress, 0) / model.packages.length;
-      lines.push(separator({ label: 'total', width: 50 }));
-      lines.push(`  ${progressBar(Math.round(total), { width: 42, showPercent: true })}`);
-      lines.push('');
-      return contentSurface(lines.join('\n'));
+      rows.push(contentSurface(separator({ label: 'total', width: 50 })));
+      rows.push(line(`  ${progressBar(Math.round(total), { width: 42, showPercent: true })}`));
+      rows.push(spacer());
+      return column(rows);
     }
 
     if (model.phase === 'linking') {
-      lines.push(`  ${spinnerFrame(model.frame)} Linking dependencies...`);
-      lines.push('');
-      return contentSurface(lines.join('\n'));
+      rows.push(line(`  ${spinnerFrame(model.frame)} Linking dependencies...`));
+      rows.push(spacer());
+      return column(rows);
     }
 
     // Done
-    lines.push(alert('Packages installed successfully!', { variant: 'success' }));
-    lines.push('');
-    lines.push(tree([
+    rows.push(contentSurface(alert('Packages installed successfully!', { variant: 'success' })));
+    rows.push(spacer());
+    rows.push(contentSurface(tree([
       { label: 'node_modules', children: [
         { label: 'typescript@5.9.3' },
         { label: 'vitest@4.0.18' },
@@ -125,12 +123,12 @@ const app: App<Model, Msg> = {
         { label: 'chalk@5.6.2' },
         { label: 'tsx@4.19.0' },
       ]},
-    ]));
-    lines.push('');
-    lines.push(`  Added ${badgeText('5', 'primary')} packages in 3.2s`);
-    lines.push('');
+    ])));
+    rows.push(spacer());
+    rows.push(row(['  Added ', badgeSurface('5', 'primary', ctx), ' packages in 3.2s']));
+    rows.push(spacer());
 
-    return contentSurface(lines.join('\n'));
+    return column(rows);
   },
 };
 

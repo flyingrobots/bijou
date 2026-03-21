@@ -1,14 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, progressBar, surfaceToString } from '@flyingrobots/bijou';
+import { progressBar, type Surface } from '@flyingrobots/bijou';
 import {
   run, quit, tick, isKeyMsg, type App,
   animate, sequence, EASINGS,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   titleX: number;
@@ -83,13 +81,13 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = [];
+    const rows: Surface[] = [];
 
     // Title with spring offset
     const indent = Math.max(0, Math.round(model.titleX + 4));
-    lines.push('');
-    lines.push(' '.repeat(indent) + '  Timeline Animation');
-    lines.push('');
+    rows.push(spacer());
+    rows.push(line(' '.repeat(indent) + '  Timeline Animation'));
+    rows.push(spacer());
 
     // Cards fade in (use opacity to show/hide)
     const cards = [
@@ -100,25 +98,25 @@ const app: App<Model, Msg> = {
 
     for (const card of cards) {
       if (card.opacity > 0.5) {
-        lines.push(`    ${badgeText(card.label, card.variant)}`);
+        rows.push(row(['    ', badgeSurface(card.label, card.variant, ctx)]));
       } else {
-        lines.push('');
+        rows.push(spacer());
       }
     }
 
     // Progress bar
-    lines.push('');
+    rows.push(spacer());
     if (model.barPercent > 0) {
-      lines.push(`    ${progressBar(Math.round(model.barPercent), { width: 40, showPercent: true })}`);
+      rows.push(line(`    ${progressBar(Math.round(model.barPercent), { width: 40, showPercent: true })}`));
     }
 
     if (model.phase === 'done') {
-      lines.push('');
-      lines.push(`    ${badgeText('COMPLETE', 'success')}  Sequence finished.`);
+      rows.push(spacer());
+      rows.push(row(['    ', badgeSurface('COMPLETE', 'success', ctx), '  Sequence finished.']));
     }
 
-    lines.push('');
-    return contentSurface(lines.join('\n'));
+    rows.push(spacer());
+    return column(rows);
   },
 };
 

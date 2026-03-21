@@ -1,14 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, kbd, surfaceToString } from '@flyingrobots/bijou';
+import { kbd, type Surface } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
   animate, SPRING_PRESETS,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const PRESETS = ['gentle', 'default', 'wobbly', 'stiff'] as const;
 const WIDTH = 50;
@@ -67,24 +65,24 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = ['', '  Spring Physics Comparison', ''];
+    const rows = [spacer(), line('  Spring Physics Comparison'), spacer()] as Surface[];
 
     for (const preset of PRESETS) {
       const pos = Math.round(model.positions[preset] ?? 0);
       const bar = ' '.repeat(Math.max(0, pos)) + '\u2588';
       const label = preset.padEnd(9);
-      lines.push(`  ${badgeText(label, 'primary')} ${bar}`);
+      rows.push(row(['  ', badgeSurface(label, 'primary', ctx), ` ${bar}`]));
     }
 
-    lines.push('');
+    rows.push(spacer());
     if (model.running) {
-      lines.push('  animating...');
+      rows.push(line('  animating...'));
     } else {
-      lines.push(`  ${kbd('Space')} bounce  ${kbd('q')} quit`);
+      rows.push(line(`  ${kbd('Space')} bounce  ${kbd('q')} quit`));
     }
-    lines.push('');
+    rows.push(spacer());
 
-    return contentSurface(lines.join('\n'));
+    return column(rows);
   },
 };
 
