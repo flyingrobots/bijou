@@ -12,7 +12,7 @@ import {
   vstackSurface,
   updateSubApp,
 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 

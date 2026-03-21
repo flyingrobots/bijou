@@ -12,7 +12,7 @@ import {
   dagPanePageDown, dagPanePageUp,
   dagPaneKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 const ctx = getDefaultContext();

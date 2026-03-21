@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>

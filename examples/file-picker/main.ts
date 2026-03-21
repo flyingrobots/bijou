@@ -6,7 +6,7 @@ import {
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
   filePickerKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 

@@ -8,7 +8,7 @@ import {
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { badge, boxSurface, getDefaultContext, setDefaultContext } from '@flyingrobots/bijou';
 import { isKeyMsg, quit, type App, vstackSurface } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 interface Model {
   completedJobs: number;

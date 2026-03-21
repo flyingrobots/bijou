@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, boxSurface } from '@flyingrobots/bijou';
 import { isKeyMsg, quit, run, type App, type RenderPipeline, vstackSurface } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 

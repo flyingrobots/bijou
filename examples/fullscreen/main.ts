@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, isResizeMsg, type App } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/v3.ts';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
