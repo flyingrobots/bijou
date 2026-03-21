@@ -1,9 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { select, badge, surfaceToString } from '@flyingrobots/bijou';
+import { select } from '@flyingrobots/bijou';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 async function main() {
   const manager = await select({
@@ -20,7 +18,7 @@ async function main() {
   });
 
   console.log();
-  console.log('Selected:', badgeText(manager.toUpperCase(), 'primary'));
+  console.log(`Selected package manager: ${manager.toUpperCase()}`);
 }
 
 main().catch(console.error);

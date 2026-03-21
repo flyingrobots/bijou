@@ -1,9 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { input, badge, surfaceToString } from '@flyingrobots/bijou';
+import { input } from '@flyingrobots/bijou';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 async function main() {
   const name = await input({
@@ -27,7 +25,7 @@ async function main() {
   });
 
   console.log();
-  console.log(badgeText('CREATED', 'success'), ` ${name} — ${description || '(no description)'}`);
+  console.log(`Created project: ${name} — ${description || '(no description)'}`);
 }
 
 main().catch(console.error);
