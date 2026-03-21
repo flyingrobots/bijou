@@ -1,9 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { composite, modal, toast, drawer, tooltip } from './overlay.js';
+import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
+import { composite, compositeSurface, modal, toast, drawer, tooltip } from './overlay.js';
 import type { Overlay, DrawerOptions } from './overlay.js';
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { visibleLength, stripAnsi } from './viewport.js';
+
+function expectSurfaceTextMatch(actualSurfaceText: string, expectedContent: string) {
+  expect(
+    stripAnsi(actualSurfaceText).split('\n').map((line) => line.trimEnd()),
+  ).toEqual(
+    stripAnsi(expectedContent).split('\n').map((line) => line.trimEnd()),
+  );
+}
 
 // ---------------------------------------------------------------------------
 // composite()
@@ -113,6 +122,39 @@ describe('composite', () => {
     expect(stripAnsi(lines[0]!)).toBe('AXXA');
     // Second line untouched
     expect(stripAnsi(lines[1]!)).toBe('BBBB');
+  });
+});
+
+describe('compositeSurface', () => {
+  it('paints overlay surfaces onto a background surface', () => {
+    const bg = stringToSurface('AAAA\nBBBB\nCCCC', 4, 3);
+    const ov: Overlay = {
+      content: 'unused',
+      surface: stringToSurface('XX\nYY', 2, 2),
+      row: 1,
+      col: 1,
+    };
+
+    const result = compositeSurface(bg, [ov]);
+
+    expect(surfaceToString(result, createTestContext().style)).toBe('AAAA\nBXXB\nCYYC');
+  });
+
+  it('dims background cells without dimming overlay cells', () => {
+    const ctx = createTestContext();
+    const bg = stringToSurface('AAAA', 4, 1);
+    const ov: Overlay = {
+      content: 'unused',
+      surface: stringToSurface('XX', 2, 1),
+      row: 0,
+      col: 1,
+    };
+
+    const result = compositeSurface(bg, [ov], { dim: true });
+
+    expect(result.get(0, 0).modifiers).toContain('dim');
+    expect(result.get(1, 0).modifiers ?? []).not.toContain('dim');
+    expect(surfaceToString(result, ctx.style)).toBe('AXXA');
   });
 });
 
@@ -264,6 +306,13 @@ describe('modal', () => {
     const plain = modal({ body: 'NoBg', screenWidth: 40, screenHeight: 20 });
     expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
   });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = modal({ title: 'Title', body: 'Body', hint: 'Hint', screenWidth: 40, screenHeight: 20, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -411,6 +460,13 @@ describe('toast', () => {
     expect(lines).toHaveLength(24);
     // Toast should appear near bottom-right
     expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+  });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = toast({ message: 'saved', variant: 'success', screenWidth: 80, screenHeight: 24, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
   });
 });
 
@@ -680,6 +736,13 @@ describe('drawer', () => {
     // Top border: ┌  ┐ (2 spaces for padding)
     expect(visibleLength(stripAnsi(lines4[0]!))).toBe(4);
   });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = drawer({ content: 'panel', width: 20, screenWidth: 80, screenHeight: 5, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -827,5 +890,12 @@ describe('tooltip', () => {
     const lines = result.split('\n');
     expect(lines).toHaveLength(24);
     expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+  });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = tooltip({ ...base, row: 10, col: 40, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
   });
 });

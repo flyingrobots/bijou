@@ -2,13 +2,14 @@
  * Overlay compositing primitives for TUI apps.
  *
  * - `composite()` — paint overlays onto a background string (ANSI-safe)
+ * - `compositeSurface()` — paint overlays onto a background surface
  * - `modal()` — centered dialog overlay with title, body, hint
  * - `toast()` — anchored notification overlay with variant icons
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
 import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
-import { makeBgFill } from '@flyingrobots/bijou';
+import { makeBgFill, parseAnsiToSurface } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
@@ -178,6 +179,39 @@ export function composite(
   return bgLines.join('\n');
 }
 
+/**
+ * Paint one or more overlays onto a background surface.
+ *
+ * Overlays are applied in array order, with later overlays painting over
+ * earlier ones. String-only overlays are normalized through an explicit
+ * ANSI-to-surface bridge at the composition edge.
+ */
+export function compositeSurface(
+  background: Surface,
+  overlays: readonly Overlay[],
+  options?: CompositeOptions,
+): Surface {
+  const result = background.clone();
+
+  if (options?.dim) {
+    for (let y = 0; y < result.height; y++) {
+      for (let x = 0; x < result.width; x++) {
+        const cell = result.get(x, y);
+        if (cell.empty || cell.char === ' ') continue;
+        const modifiers = new Set(cell.modifiers ?? []);
+        modifiers.add('dim');
+        result.set(x, y, { ...cell, modifiers: Array.from(modifiers), empty: false });
+      }
+    }
+  }
+
+  for (const overlay of overlays) {
+    result.blit(overlay.surface ?? surfaceFromContent(overlay.content), overlay.col, overlay.row);
+  }
+
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // renderBox (shared between modal and toast)
 // ---------------------------------------------------------------------------
@@ -269,7 +303,7 @@ export function modal(options: ModalOptions): Overlay {
   const row = clampCenteredPosition(screenHeight, boxHeight, margin);
   const col = clampCenteredPosition(screenWidth, boxWidth, margin);
 
-  return { content: boxStr, row, col };
+  return { content: boxStr, surface: surfaceFromContent(boxStr), row, col };
 }
 
 // ---------------------------------------------------------------------------
@@ -355,7 +389,7 @@ export function toast(options: ToastOptions): Overlay {
   row = Math.max(0, row);
   col = Math.max(0, col);
 
-  return { content: boxStr, row, col };
+  return { content: boxStr, surface: surfaceFromContent(boxStr), row, col };
 }
 
 // ---------------------------------------------------------------------------
@@ -497,6 +531,7 @@ export function drawer(options: DrawerOptions): Overlay {
 
   return {
     content: allLines.join('\n'),
+    surface: surfaceFromContent(allLines.join('\n')),
     row,
     col,
   };
@@ -682,5 +717,12 @@ export function tooltip(options: TooltipOptions): Overlay {
   tipRow = Math.max(0, Math.min(tipRow, screenHeight - boxHeight));
   tipCol = Math.max(0, Math.min(tipCol, screenWidth - boxWidth));
 
-  return { content: boxStr, row: tipRow, col: tipCol };
+  return { content: boxStr, surface: surfaceFromContent(boxStr), row: tipRow, col: tipCol };
+}
+
+function surfaceFromContent(content: string): Surface {
+  const lines = content.split('\n');
+  const width = Math.max(1, ...lines.map((line) => visibleLength(line)));
+  const height = Math.max(1, lines.length);
+  return parseAnsiToSurface(content, width, height);
 }

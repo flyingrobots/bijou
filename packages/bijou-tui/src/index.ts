@@ -355,6 +355,7 @@ export {
   type TooltipDirection,
   type TooltipOptions,
   composite,
+  compositeSurface,
   modal,
   toast,
   drawer,
