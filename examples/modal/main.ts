@@ -1,14 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App, type KeyMsg,
-  createKeyMap, createInputStack, helpShort, vstack,
+  compositeSurface, createKeyMap, createInputStack, helpShort, modal,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { column, line, screenSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   items: string[];
@@ -95,43 +93,59 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    // Main list
-    const listLines: string[] = ['', '  Task List', ''];
+    const rows = [spacer(), line('  Task List'), spacer()];
     for (let i = 0; i < model.items.length; i++) {
       const cursor = i === model.selected ? '>' : ' ';
-      listLines.push(`  ${cursor} ${model.items[i]}`);
+      rows.push(line(`  ${cursor} ${model.items[i]}`));
     }
-    if (model.items.length === 0) listLines.push('  (empty)');
-    listLines.push('');
-    listLines.push(`  ${helpShort(appKeys)}`);
-    listLines.push('');
+    if (model.items.length === 0) rows.push(line('  (empty)'));
+    rows.push(spacer());
+    rows.push(line(`  ${helpShort(appKeys)}`));
+    rows.push(spacer());
 
-    const main = listLines.join('\n');
+    const background = screenSurface(
+      ctx.runtime.columns,
+      ctx.runtime.rows,
+      column(rows),
+    );
 
-    // Modal overlay
     if (model.modal === 'help') {
-      const helpContent = [
-        `${kbd('j')} ${kbd('k')}  Navigate`,
-        `${kbd('d')}      Delete item`,
-        `${kbd('?')}      Toggle help`,
-        `${kbd('q')}      Quit`,
-        '',
-        `Press ${kbd('Esc')} to close`,
-      ].join('\n');
-      return ansiSurface(vstack(main, box(helpContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), ''), ctx.runtime.columns, ctx.runtime.rows);
+      const dialog = modal({
+        title: 'Help',
+        body: [
+          `${kbd('j')} ${kbd('k')}  Navigate`,
+          `${kbd('d')}      Delete item`,
+          `${kbd('?')}      Toggle help`,
+          `${kbd('q')}      Quit`,
+        ].join('\n'),
+        hint: 'Press Esc to close',
+        screenWidth: ctx.runtime.columns,
+        screenHeight: ctx.runtime.rows,
+        borderToken: ctx.border('primary'),
+        ctx,
+      });
+      return compositeSurface(background, [dialog], { dim: true });
     }
 
     if (model.modal === 'confirm') {
       const item = model.items[model.deleteTarget] ?? '';
-      const confirmContent = [
-        `Delete ${badgeText(item, 'warning')}?`,
-        '',
-        `${kbd('y')} yes  ${kbd('n')} no`,
-      ].join('\n');
-      return ansiSurface(vstack(main, box(confirmContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 } }), ''), ctx.runtime.columns, ctx.runtime.rows);
+      const dialog = modal({
+        title: 'Confirm delete',
+        body: [
+          `Delete "${item}"?`,
+          '',
+          'This action cannot be undone.',
+        ].join('\n'),
+        hint: 'y yes • n no • Esc cancel',
+        screenWidth: ctx.runtime.columns,
+        screenHeight: ctx.runtime.rows,
+        borderToken: ctx.border('primary'),
+        ctx,
+      });
+      return compositeSurface(background, [dialog], { dim: true });
     }
 
-    return ansiSurface(main, ctx.runtime.columns, ctx.runtime.rows);
+    return background;
   },
 };
 

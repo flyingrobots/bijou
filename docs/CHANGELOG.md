@@ -21,6 +21,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Component-family decision guidance** — public package READMEs and example docs now explain when to choose `alert()` versus `toast()` versus the notification system, and when to choose `table()` / `tableSurface()` versus `navigableTable()`, instead of presenting those families as unrelated exports.
 - **Pure-V4 migration naming guidance** — the V4 migration guide now calls out the canonical surface stack/composition names (`boxSurface()`, `vstackSurface()`, `hstackSurface()`) and explicitly drops the old transition-era `*V3` aliases.
 - **Example helper naming cleanup** — the shared example surface helpers now live in `examples/_shared/example-surfaces.ts`, replacing both the transition-era `examples/_shared/v3.ts` path and the separate `surface-bridge.ts` helper so the example fleet stops teaching V3-branded or one-off bridge module names while the repo moves toward V4-only guidance.
+- **Overlay example surface-first migration** — the `toast`, `modal`, `drawer`, and `tooltip` demos now build background/help content as `Surface` values and compose overlays with `compositeSurface(...)`, so the examples finally teach the same surface-native overlay path the TUI docs now recommend.
 
 ### 🐛 Fixes
 

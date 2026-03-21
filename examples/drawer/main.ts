@@ -1,14 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
-  vstack, composite, drawer,
+  compositeSurface, drawer, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Msg = KeyMsg | ResizeMsg;
 
@@ -39,17 +37,15 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const { cols, rows } = model;
 
-    // Build background
     const header = separator({ label: 'drawer demo', width: cols, ctx });
-    const help = `  Press ${badgeText('d')} to toggle drawer · ${badgeText('q')} to quit`;
-    const bgLines = [header, '', help];
-    // Fill to full screen
-    while (bgLines.length < rows) bgLines.push('');
-    const bg = bgLines.join('\n');
+    const background = screenSurface(cols, rows, column([
+      contentSurface(header),
+      spacer(),
+      row(['  Press ', badgeSurface('d', 'info', ctx), ' to toggle drawer · ', badgeSurface('q', 'warning', ctx), ' to quit']),
+    ]));
 
-    if (!model.showDrawer) return ansiSurface(bg, cols, rows);
+    if (!model.showDrawer) return background;
 
-    // Overlay the drawer
     const drawerWidth = Math.min(40, Math.floor(cols / 3));
     const drawerContent = vstack(
       'Details Panel',
@@ -71,7 +67,7 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return ansiSurface(composite(bg, [d], { dim: true }), cols, rows);
+    return compositeSurface(background, [d], { dim: true });
   },
 };
 

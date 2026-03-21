@@ -28,6 +28,12 @@ export function centerSurface(ctx: BijouContext, content: Surface, topOffset = 0
   return full;
 }
 
+export function screenSurface(width: number, height: number, content: Surface, row = 0, col = 0): Surface {
+  const full = createSurface(Math.max(1, width), Math.max(1, height));
+  full.blit(content, col, row);
+  return full;
+}
+
 export function textSurface(text: string, width: number, height: number): Surface {
   return stringToSurface(text, Math.max(1, width), Math.max(1, height));
 }
