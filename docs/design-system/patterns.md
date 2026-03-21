@@ -317,6 +317,13 @@ Avoid when:
 
 ## 7. App shell composition
 
+### Governing rules
+
+- The shell exists to frame destinations, workspace state, and global actions. It should not compete with page content for narrative space.
+- Use shell chrome for orientation, status, and cross-cutting actions. Put explanation and task detail back into the page.
+- Prefer the simplest workspace that preserves the mental model. Do not use split panes or grids just because the runtime can.
+- If a region is not meaningfully inspectable, comparable, or supplemental, it probably should not be its own pane.
+
 ### `createFramedApp()`
 
 Use when:
@@ -328,6 +335,12 @@ Avoid when:
 
 - the app is really just one screen or one prompt loop
 
+Content guidance:
+
+- tabs should represent peer destinations, not unrelated commands
+- shell notifications and overlays should remain subordinate to the active page task
+- help text should clarify shell behavior, not restate page content
+
 ### `statusBar()`
 
 Use when:
@@ -338,6 +351,12 @@ Avoid when:
 
 - the content is explanatory or multi-line
 
+Content guidance:
+
+- keep status text short, global, and low-drama
+- reserve strong emphasis for mode changes, faults, or focus-critical state
+- do not turn the status bar into a secondary page body
+
 ### `splitPane()` and `grid()`
 
 Use when:
@@ -347,6 +366,12 @@ Use when:
 Avoid when:
 
 - the layout would be simpler and more legible as a sequential flow
+
+Content guidance:
+
+- use split panes for comparison, side-by-side reference, or inspector-style secondary context
+- use grids when the user is reading across stable regions, not when one long column would be clearer
+- label regions by job, not by visual position alone
 
 ## 8. Mouse and multimodal interaction
 

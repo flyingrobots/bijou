@@ -137,6 +137,13 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use `navigableTable()` when row/cell focus and keyboard traversal are the real job.
 - Use `browsableList()` when the content is one-dimensional and description-led rather than grid-oriented.
 
+### Shell and workspace layout
+
+- Use `createFramedApp()` when the app has multiple destinations, overlays, and workspace state that should be standardized.
+- Use `splitPane()` when the user benefits from primary-versus-secondary context or side-by-side comparison.
+- Use `grid()` when multiple stable regions deserve simultaneous visibility.
+- Keep `statusBar()` concise and global; explanatory text belongs in the page, not in shell chrome.
+
 ## Animation
 
 ### Spring Physics

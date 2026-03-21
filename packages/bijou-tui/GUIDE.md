@@ -692,6 +692,13 @@ const inspector = drawer({
 
 See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.
 
+Shell doctrine:
+
+- tabs are for peer destinations, not command buttons
+- status rails are for concise global context, not page prose
+- split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
+- if a second region does not materially help the task, keep the app in a simpler single-surface flow
+
 ## Focus Area
 
 A scrollable pane with a colored left gutter indicating focus state. Wraps `viewport()` with gutter chrome and horizontal overflow support.

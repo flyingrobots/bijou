@@ -577,6 +577,7 @@ This slice closes two large structural gaps: every family below now calls out gr
   - the shell should frame destinations and workspace state, not become a dumping ground for unrelated metadata
   - status lines should carry concise global context, not replace in-page guidance
   - command palette entries should prefer actions and navigation targets over field-style data entry
+  - tabs should represent peer destinations or work areas, not disguised command buttons
 - Graceful lowering:
   - rich: full shell chrome with tabs, palette, overlays, notifications, and workspace regions
   - static: retain the active page and essential shell context without pretending background interactivity exists
@@ -607,6 +608,11 @@ This slice closes two large structural gaps: every family below now calls out gr
   - a sequential flow would be simpler and more legible
 - Ownership:
   - TUI
+- Content guidance:
+  - use `splitPane()` when the user benefits from explicit primary-versus-secondary context
+  - use `grid()` when multiple stable regions deserve simultaneous visibility
+  - use `flex()` / `vstack()` / `hstack()` / `place()` to support a semantic layout, not to create arbitrary ornament
+  - region titles and borders should explain job and hierarchy, not merely expose geometry
 - Graceful lowering:
   - rich: keep spatial relationships and resizable or placed regions where they materially help
   - static: retain simplified spatial grouping when possible without fake interactivity
