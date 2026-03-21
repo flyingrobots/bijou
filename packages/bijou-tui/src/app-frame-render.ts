@@ -2,18 +2,25 @@
  * Layout rendering for `app-frame.ts`.
  *
  * Recursive tree renderer, page content, maximized pane, header/help lines,
- * transition shader, and string-to-grid tokenization.
+ * transition shader, and surface/string bridge helpers.
  */
 
-import { resolveSafeCtx, surfaceToString, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  parseAnsiToSurface,
+  resolveSafeCtx,
+  surfaceToString,
+  type BijouContext,
+  type Surface,
+} from '@flyingrobots/bijou';
 import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type { InternalFrameModel, RenderContext, RenderResult, FrameAction } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
 import type { PageTransition } from './app-frame.js';
 import { TRANSITION_SHADERS } from './transition-shaders.js';
 import { fitBlock } from './layout-utils.js';
-import { splitPane, splitPaneLayout } from './split-pane.js';
-import { grid, gridLayout } from './grid.js';
+import { splitPaneLayout } from './split-pane.js';
+import { gridLayout } from './grid.js';
 import {
   createFocusAreaStateForSurface,
   focusAreaSurface,
@@ -54,16 +61,15 @@ export function renderFrameNode<PageModel, Msg>(
   ctx: RenderContext<PageModel, Msg>,
 ): RenderResult {
   if (rect.width <= 0 || rect.height <= 0) {
-    return { output: '', paneRects: new Map(), paneOrder: [] };
+    return { surface: createSurface(rect.width, rect.height), paneRects: new Map(), paneOrder: [] };
   }
 
   if (node.kind === 'pane') {
     // Minimized pane: render as collapsed title bar
     if (isMinimized(ctx.visibility, node.paneId)) {
       const titleBar = `[${node.paneId}] \u25b8`; // ▸
-      const output = fitBlock(titleBar, rect.width, rect.height).join('\n');
       return {
-        output,
+        surface: blockSurface(titleBar, rect.width, rect.height),
         paneRects: new Map([[node.paneId, rect]]),
         paneOrder: [node.paneId],
       };
@@ -78,14 +84,14 @@ export function renderFrameNode<PageModel, Msg>(
     });
     state = focusAreaScrollTo(state, prior.y);
     state = focusAreaScrollToX(state, prior.x);
-    const output = framePaneSurfaceToString(focusAreaSurface(contentSurface, state, {
+    const surface = focusAreaSurface(contentSurface, state, {
       focused: node.paneId === ctx.focusedPaneId,
       ctx: resolveSafeCtx(),
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
-    }));
+    });
     return {
-      output,
+      surface,
       paneRects: new Map([[node.paneId, rect]]),
       paneOrder: [node.paneId],
     };
@@ -138,19 +144,13 @@ export function renderFrameNode<PageModel, Msg>(
     const a = renderFrameNode(effectiveA, aRect, ctx);
     const b = renderFrameNode(effectiveB, bRect, ctx);
 
-    const output = splitPane(splitState, {
-      direction,
-      width: rect.width,
-      height: rect.height,
-      minA: node.minA,
-      minB: node.minB,
-      dividerChar: node.dividerChar,
-      paneA: () => a.output,
-      paneB: () => b.output,
-    });
+    const surface = createSurface(rect.width, rect.height);
+    surface.blit(a.surface, layout.paneA.col, layout.paneA.row);
+    surface.blit(b.surface, layout.paneB.col, layout.paneB.row);
+    paintDivider(surface, layout.divider, node.dividerChar, direction);
 
     return {
-      output,
+      surface,
       paneRects: mergeMaps(a.paneRects, b.paneRects),
       paneOrder: [...a.paneOrder, ...b.paneOrder],
     };
@@ -179,15 +179,11 @@ export function renderFrameNode<PageModel, Msg>(
     renderedByArea.set(areaName, renderFrameNode(child, absoluteAreaRect, ctx));
   }
 
-  const output = grid({
-    width: rect.width,
-    height: rect.height,
-    columns: node.columns,
-    rows: node.rows,
-    areas: node.areas,
-    gap: node.gap,
-    cells: Object.fromEntries([...renderedByArea.entries()].map(([name, rendered]) => [name, () => rendered.output])),
-  });
+  const surface = createSurface(rect.width, rect.height);
+  for (const [areaName, areaRect] of relRects) {
+    const rendered = renderedByArea.get(areaName)!;
+    surface.blit(rendered.surface, areaRect.col, areaRect.row);
+  }
 
   let paneRects = new Map<string, LayoutRect>();
   const seenPaneIds = new Set<string>();
@@ -208,13 +204,13 @@ export function renderFrameNode<PageModel, Msg>(
     }
   }
 
-  return { output, paneRects, paneOrder };
+  return { surface, paneRects, paneOrder };
 }
 
 /** Render a placeholder for a grid area that has no matching cell definition. */
 export function renderMissingGridCell(areaName: string, rect: LayoutRect): RenderResult {
   return {
-    output: fitBlock(`[missing grid cell: ${areaName}]`, rect.width, rect.height).join('\n'),
+    surface: blockSurface(`[missing grid cell: ${areaName}]`, rect.width, rect.height),
     paneRects: new Map(),
     paneOrder: [],
   };
@@ -270,15 +266,15 @@ export function renderMaximizedPane<PageModel, Msg>(
   });
   state = focusAreaScrollTo(state, prior.y);
   state = focusAreaScrollToX(state, prior.x);
-  const output = framePaneSurfaceToString(focusAreaSurface(contentSurface, state, {
+  const surface = focusAreaSurface(contentSurface, state, {
     focused: true,
     ctx: resolveSafeCtx(),
     id: maximizedPaneId,
     classes: ['focused', 'maximized'],
-  }));
+  });
 
   return {
-    output,
+    surface,
     paneRects: new Map([[maximizedPaneId, bodyRect]]),
     paneOrder: [maximizedPaneId],
   };
@@ -444,6 +440,14 @@ export function framePaneSurfaceToString(surface: Surface): string {
   return surfaceToPlainText(surface);
 }
 
+export function lineToSurface(line: string, width: number): Surface {
+  return parseAnsiToSurface(line, width, 1);
+}
+
+export function blockSurface(content: string, width: number, height: number): Surface {
+  return parseAnsiToSurface(fitBlock(content, width, height).join('\n'), width, height);
+}
+
 function surfaceToPlainText(surface: Surface): string {
   const lines: string[] = [];
   for (let y = 0; y < surface.height; y++) {
@@ -454,4 +458,23 @@ function surfaceToPlainText(surface: Surface): string {
     lines.push(line);
   }
   return lines.join('\n');
+}
+
+function paintDivider(
+  target: Surface,
+  rect: LayoutRect,
+  dividerChar: string | undefined,
+  direction: 'row' | 'column',
+): void {
+  const unit = resolveDividerUnit(dividerChar, direction === 'row' ? '│' : '─');
+  for (let y = 0; y < rect.height; y++) {
+    for (let x = 0; x < rect.width; x++) {
+      target.set(rect.col + x, rect.row + y, { char: unit, empty: false });
+    }
+  }
+}
+
+function resolveDividerUnit(dividerChar: string | undefined, fallback: string): string {
+  if (dividerChar == null || dividerChar.length === 0) return fallback;
+  return dividerChar[0] ?? fallback;
 }
