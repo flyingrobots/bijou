@@ -156,6 +156,7 @@ describe('matrixShader', () => {
     const result = matrixShader(cell({ rand: 0.55, progress: 0.5 }));
     expect(result.showNext).toBe(false);
     expect(result.char).toBeDefined();
+    expect(result.cell?.char).toBe(result.char);
   });
 
   it('shows next when rand < threshold', () => {
@@ -180,6 +181,7 @@ describe('scrambleShader', () => {
     // At progress=0.5, scrambleAmount=1, so rand 0.5 < 0.8 → char override
     const result = scrambleShader(cell({ rand: 0.5, progress: 0.5 }));
     expect(result.char).toBeDefined();
+    expect(result.cell?.char).toBe(result.char);
   });
 
   it('resolves to next page past midpoint with high rand', () => {
@@ -305,6 +307,7 @@ describe('typewriterShader', () => {
     // progress=0 → revealed=0, cellIndex=0 → cursor
     const result = typewriterShader(cell({ x: 0, y: 0, width: 80, height: 24, progress: 0 }));
     expect(result.char).toBeDefined();
+    expect(result.cell?.char).toBe(result.char);
     expect(result.showNext).toBe(false);
   });
 
@@ -332,6 +335,8 @@ describe('glitchShader', () => {
     // At minimum, the shader should not crash
     expect(typeof a.showNext).toBe('boolean');
     expect(typeof b.showNext).toBe('boolean');
+    if (a.char !== undefined) expect(a.cell?.char).toBe(a.char);
+    if (b.char !== undefined) expect(b.cell?.char).toBe(b.char);
   });
 });
 
@@ -353,6 +358,7 @@ describe('staticShader', () => {
     const result = staticShader(cell({ x: 3, y: 3, progress: 0.5, frame: 1 }));
     // Should either show char override or fall through — no crash
     expect(typeof result.showNext).toBe('boolean');
+    if (result.char !== undefined) expect(result.cell?.char).toBe(result.char);
   });
 });
 

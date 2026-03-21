@@ -12,7 +12,7 @@
  * - **Combinators** (`reverse()`, `chain()`, `overlay()`) — transform or compose shaders.
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext, Cell, TokenValue } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Core types
@@ -47,6 +47,8 @@ export type CharRole = 'decoration' | 'marker';
 export interface TransitionResult {
   readonly showNext: boolean;
   readonly char?: string;
+  /** Surface-native override cell. Merged on top of the selected base cell. */
+  readonly cell?: Cell;
   /** Semantic role of the char override. Defaults to `'decoration'` if omitted. */
   readonly charRole?: CharRole;
 }
@@ -76,6 +78,16 @@ export type BuiltinTransition =
   | 'typewriter'
   | 'glitch'
   | 'static';
+
+function tokenCell(char: string, token: TokenValue): Cell {
+  return {
+    char,
+    fg: token.hex,
+    bg: token.bg,
+    modifiers: token.modifiers ? [...token.modifiers] : [],
+    empty: false,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Pseudo-random helpers
@@ -162,7 +174,7 @@ export const matrixShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   if (rand < threshold + edge) {
     const chars = '01$#@%&*';
     const char = chars[Math.min(Math.floor(rand * 100) % chars.length, chars.length - 1)]!;
-    return { showNext: false, char: ctx.style.styled(ctx.status('success'), char), charRole: 'decoration' as const };
+    return { showNext: false, char, cell: tokenCell(char, ctx.status('success')), charRole: 'decoration' as const };
   }
   return { showNext: false };
 };
@@ -173,7 +185,7 @@ export const scrambleShader: TransitionShaderFn = ({ rand, progress, ctx }) => {
   if (rand < scrambleAmount * 0.8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
     const char = chars[Math.min(Math.floor(rand * 1000) % chars.length, chars.length - 1)]!;
-    return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char), charRole: 'decoration' as const };
+    return { showNext: false, char, cell: tokenCell(char, ctx.semantic('muted')), charRole: 'decoration' as const };
   }
   return { showNext: progress > 0.5 };
 };
@@ -281,7 +293,7 @@ export function typewriter(cursor = '▌'): TransitionShaderFn {
     const cellIndex = y * width + x;
     if (cellIndex < revealed) return { showNext: true };
     if (cellIndex === revealed) {
-      return { showNext: false, char: ctx.style.styled(ctx.status('info'), cursor), charRole: 'marker' };
+      return { showNext: false, char: cursor, cell: tokenCell(cursor, ctx.status('info')), charRole: 'marker' };
     }
     return { showNext: false };
   };
@@ -302,7 +314,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
       const glitchChars = '▓░▒█▄▀';
       const n = noise(x, y, frame);
       const char = glitchChars[Math.min(Math.floor(n * glitchChars.length), glitchChars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.status('error'), char), charRole: 'decoration' as const };
+      return { showNext: false, char, cell: tokenCell(char, ctx.status('error')), charRole: 'decoration' as const };
     }
 
     // Scattered cells get individual scramble
@@ -310,7 +322,7 @@ export function glitch(intensity = 0.5): TransitionShaderFn {
     if (cellNoise < glitchAmount * 0.3) {
       const glitchChars = '▓░▒█▄▀╪╫╬';
       const char = glitchChars[Math.min(Math.floor(cellNoise * 100) % glitchChars.length, glitchChars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.status('warning'), char), charRole: 'decoration' as const };
+      return { showNext: false, char, cell: tokenCell(char, ctx.status('warning')), charRole: 'decoration' as const };
     }
 
     return { showNext: progress > 0.5 };
@@ -338,7 +350,7 @@ export function tvStatic(density = 0.7): TransitionShaderFn {
       const intensity = noise(x + 1, y + 1, frame);
       const chars = ' ░▒▓█';
       const char = chars[Math.min(Math.floor(intensity * chars.length), chars.length - 1)]!;
-      return { showNext: false, char: ctx.style.styled(ctx.semantic('muted'), char), charRole: 'decoration' as const };
+      return { showNext: false, char, cell: tokenCell(char, ctx.semantic('muted')), charRole: 'decoration' as const };
     }
 
     return { showNext: progress > 0.5 };
@@ -392,9 +404,9 @@ export function reverse(shader: TransitionShaderFn): TransitionShaderFn {
     // Marker chars (e.g., typewriter cursor) are positional — they become
     // stale when progress is remapped. Decoration chars (glitch noise,
     // static blocks) are ambient and survive the reversal.
-    const keepChar = result.char !== undefined && result.charRole !== 'marker';
-    return keepChar
-      ? { showNext: !result.showNext, char: result.char, charRole: result.charRole }
+    const keepOverride = (result.char !== undefined || result.cell !== undefined) && result.charRole !== 'marker';
+    return keepOverride
+      ? { showNext: !result.showNext, char: result.char, cell: result.cell, charRole: result.charRole }
       : { showNext: !result.showNext };
   };
 }
@@ -429,11 +441,12 @@ export function chain(a: TransitionShaderFn, b: TransitionShaderFn): TransitionS
 export function overlay(base: TransitionShaderFn, top: TransitionShaderFn): TransitionShaderFn {
   return (cell) => {
     const topResult = top(cell);
-    if (topResult.char !== undefined) return topResult;
+    if (topResult.char !== undefined || topResult.cell !== undefined) return topResult;
     const baseResult = base(cell);
     return {
       showNext: topResult.showNext || baseResult.showNext,
       char: baseResult.char,
+      cell: baseResult.cell,
       charRole: baseResult.charRole,
     };
   };

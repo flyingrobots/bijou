@@ -8,6 +8,7 @@
 import {
   createSurface,
   parseAnsiToSurface,
+  type Cell,
   resolveSafeCtx,
   surfaceToString,
   type BijouContext,
@@ -17,7 +18,7 @@ import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-f
 import type { InternalFrameModel, RenderContext, RenderResult, FrameAction } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
 import type { PageTransition } from './app-frame.js';
-import { TRANSITION_SHADERS } from './transition-shaders.js';
+import { TRANSITION_SHADERS, type TransitionResult } from './transition-shaders.js';
 import { fitBlock } from './layout-utils.js';
 import { splitPaneLayout } from './split-pane.js';
 import { gridLayout } from './grid.js';
@@ -29,7 +30,7 @@ import {
 } from './focus-area.js';
 import { isMinimized, createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState, resolveChildOrder, getNodeId } from './panel-dock.js';
-import { tokenizeAnsi, visibleLength } from './viewport.js';
+import { visibleLength } from './viewport.js';
 import { helpShort } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import {
@@ -366,20 +367,6 @@ export function renderHelpLine<PageModel, Msg>(
 }
 
 /**
- * Split a styled multiline string into a 2D grid of single-column characters.
- * Each cell is a fully-styled string (including resets).
- */
-export function stringToGrid(str: string, width: number, height: number): string[][] {
-  const lines = str.split('\n');
-  const grid: string[][] = [];
-
-  for (let y = 0; y < height; y++) {
-    const line = lines[y] ?? '';
-    grid.push(tokenizeAnsi(line, width));
-  }
-  return grid;
-}
-
 /**
  * Apply a transition shader to blend between the previous and next page views.
  *
@@ -387,44 +374,31 @@ export function stringToGrid(str: string, width: number, height: number): string
  *   (glitch flickering, static noise). Defaults to 0 for stateless shaders.
  */
 export function renderTransition(
-  prev: string,
-  next: string,
+  prev: Surface,
+  next: Surface,
   style: PageTransition,
   progress: number,
   width: number,
   height: number,
   ctx: BijouContext,
   frame = 0,
-): string {
+): Surface {
   const shader = typeof style === 'function' ? style : TRANSITION_SHADERS[style];
-  if (!shader) return next;
-  if (width <= 0 || height <= 0) return next;
+  if (!shader || width <= 0 || height <= 0) return next;
 
-  const prevGrid = stringToGrid(prev, width, height);
-  const nextGrid = stringToGrid(next, width, height);
-  const lines: string[] = [];
+  const surface = createSurface(width, height);
 
   for (let y = 0; y < height; y++) {
-    let line = '';
     for (let x = 0; x < width; x++) {
-      // Shared stable-ish pseudo-random seed based on coordinates
       const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
       const rand = seed - Math.floor(seed);
-
       const result = shader({ x, y, width, height, progress, rand, frame, ctx });
-      const showNext = result.showNext;
-      const charOverride = result.char;
-
-      if (charOverride !== undefined) {
-        line += charOverride;
-      } else {
-        line += (showNext ? nextGrid[y]?.[x] : prevGrid[y]?.[x]) ?? ' ';
-      }
+      const baseCell = result.showNext ? next.get(x, y) : prev.get(x, y);
+      surface.set(x, y, applyTransitionCell(baseCell, result));
     }
-    lines.push(line);
   }
 
-  return lines.join('\n');
+  return surface;
 }
 
 export function framePaneOutputToSurface(output: ViewOutput, width: number, height: number): Surface {
@@ -477,4 +451,29 @@ function paintDivider(
 function resolveDividerUnit(dividerChar: string | undefined, fallback: string): string {
   if (dividerChar == null || dividerChar.length === 0) return fallback;
   return dividerChar[0] ?? fallback;
+}
+
+function applyTransitionCell(
+  baseCell: Cell,
+  result: TransitionResult,
+): Cell {
+  if (result.cell != null) {
+    return {
+      ...baseCell,
+      ...result.cell,
+      char: result.cell.char,
+      empty: false,
+    };
+  }
+  if (result.char !== undefined) {
+    return {
+      ...baseCell,
+      char: result.char,
+      empty: false,
+    };
+  }
+  return {
+    ...baseCell,
+    empty: false,
+  };
 }

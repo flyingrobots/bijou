@@ -7,7 +7,6 @@
 
 import {
   createSurface,
-  parseAnsiToSurface,
   resolveClock,
   resolveSafeCtx,
   type OverflowBehavior,
@@ -70,7 +69,6 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import {
-  framePaneSurfaceToString,
   lineToSurface,
   resolveHeaderLine,
   renderHelpLine,
@@ -751,9 +749,9 @@ export function createFramedApp<PageModel, Msg>(
         const ctx = resolveSafeCtx();
         if (ctx) {
           const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
-          const bodyOutput = renderTransition(
-            framePaneSurfaceToString(prevResult.surface),
-            framePaneSurfaceToString(activeResult.surface),
+          bodySurface = renderTransition(
+            prevResult.surface,
+            activeResult.surface,
             activeTransition,
             model.transitionProgress,
             bodyRect.width,
@@ -761,7 +759,6 @@ export function createFramedApp<PageModel, Msg>(
             ctx,
             model.transitionFrame,
           );
-          bodySurface = parseAnsiToSurface(bodyOutput, bodyRect.width, bodyRect.height);
         }
       }
 
