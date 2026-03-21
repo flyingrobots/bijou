@@ -8,8 +8,15 @@
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
-import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
-import { makeBgFill, parseAnsiToSurface } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  parseAnsiToSurface,
+  segmentGraphemes,
+  shouldApplyBg,
+  stripAnsi,
+  surfaceToString,
+} from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
@@ -213,34 +220,116 @@ export function compositeSurface(
 }
 
 // ---------------------------------------------------------------------------
-// renderBox (shared between modal and toast)
+// surface helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Render lines inside a unicode box border.
- *
- * Compute inner width from the widest line, then wrap all lines
- * with vertical borders and pad to uniform width.
- *
- * @param lines - Content lines to place inside the box.
- * @param borderColor - Function to apply border styling (identity for unstyled).
- * @param bgFill - Optional function to wrap interior content with background color styling.
- * @returns Box string with top/bottom borders and bordered content lines.
- */
-function renderBox(
-  lines: string[],
-  borderColor: (s: string) => string,
-  bgFill?: (s: string) => string,
-): string {
-  const innerWidth = lines.reduce((max, l) => Math.max(max, visibleLength(l)), 0);
-  const top = borderColor(BORDER.tl + BORDER.h.repeat(innerWidth + 2) + BORDER.tr);
-  const bottom = borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br);
-  const fill = bgFill ?? ((s: string) => s);
-  const body = lines.map((l) => {
-    const pad = innerWidth - visibleLength(l);
-    return borderColor(BORDER.v) + fill(' ' + l + ' '.repeat(pad) + ' ') + borderColor(BORDER.v);
-  });
-  return [top, ...body, bottom].join('\n');
+type CellStyle = Pick<Cell, 'fg' | 'bg' | 'modifiers'>;
+
+function styleFromToken(token: TokenValue | undefined, ctx: BijouContext | undefined): CellStyle {
+  if (!ctx || token == null) return {};
+  return {
+    fg: token.hex,
+    bg: token.bg,
+    modifiers: token.modifiers ? [...token.modifiers] : undefined,
+  };
+}
+
+function backgroundStyleFromToken(token: TokenValue | undefined, ctx: BijouContext | undefined): CellStyle {
+  if (!ctx || !shouldApplyBg(ctx) || !token?.bg) return {};
+  return { bg: token.bg };
+}
+
+function mergeStyles(base: CellStyle, extra: CellStyle): CellStyle {
+  const modifiers = [...(base.modifiers ?? []), ...(extra.modifiers ?? [])];
+  return {
+    fg: extra.fg ?? base.fg,
+    bg: extra.bg ?? base.bg,
+    modifiers: modifiers.length > 0 ? Array.from(new Set(modifiers)) : undefined,
+  };
+}
+
+function plainSurfaceToString(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
+
+function overlayContentFromSurface(surface: Surface, ctx: BijouContext | undefined): string {
+  return ctx ? surfaceToString(surface, ctx.style) : plainSurfaceToString(surface);
+}
+
+function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle): void {
+  surface.set(x, y, { char, ...style, empty: false });
+}
+
+function lineSurface(text: string, style: CellStyle = {}): Surface {
+  if (text.length === 0) return createSurface(0, 1);
+
+  const plain = stripAnsi(text);
+  const width = Math.max(0, visibleLength(text));
+
+  if (width === 0) return createSurface(0, 1);
+  if (plain !== text && style.fg == null && style.bg == null && style.modifiers == null) {
+    return parseAnsiToSurface(text, width, 1);
+  }
+
+  const graphemes = segmentGraphemes(plain);
+  const surface = createSurface(graphemes.length, 1);
+  for (let x = 0; x < graphemes.length; x++) {
+    setStyledCell(surface, x, 0, graphemes[x]!, style);
+  }
+  return surface;
+}
+
+function lineWithInheritedBackground(line: Surface, bg: string | undefined): Surface {
+  if (bg == null || line.width === 0) return line;
+  const result = line.clone();
+  for (let x = 0; x < result.width; x++) {
+    const cell = result.get(x, 0);
+    if (cell.empty) continue;
+    result.set(x, 0, { ...cell, bg: cell.bg ?? bg, empty: false });
+  }
+  return result;
+}
+
+function renderBoxSurface(
+  lines: readonly Surface[],
+  borderStyle: CellStyle,
+  fillStyle: CellStyle,
+  innerWidthOverride?: number,
+): Surface {
+  const innerWidth = innerWidthOverride ?? lines.reduce((max, line) => Math.max(max, line.width), 0);
+  const width = innerWidth + 4;
+  const height = lines.length + 2;
+  const surface = createSurface(width, height);
+
+  setStyledCell(surface, 0, 0, BORDER.tl, borderStyle);
+  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, 0, BORDER.h, borderStyle);
+  setStyledCell(surface, width - 1, 0, BORDER.tr, borderStyle);
+
+  setStyledCell(surface, 0, height - 1, BORDER.bl, borderStyle);
+  for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, height - 1, BORDER.h, borderStyle);
+  setStyledCell(surface, width - 1, height - 1, BORDER.br, borderStyle);
+
+  for (let i = 0; i < lines.length; i++) {
+    const y = i + 1;
+    setStyledCell(surface, 0, y, BORDER.v, borderStyle);
+    for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, y, ' ', fillStyle);
+    setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
+
+    const line = lineWithInheritedBackground(lines[i]!, fillStyle.bg);
+    if (line.width > 0 && innerWidth > 0) {
+      surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
+    }
+  }
+
+  return surface;
 }
 
 // ---------------------------------------------------------------------------
@@ -259,51 +348,30 @@ function renderBox(
 export function modal(options: ModalOptions): Overlay {
   const { title, body, hint, screenWidth, screenHeight, ctx } = options;
 
-  const contentLines: string[] = [];
+  const contentLines: Surface[] = [];
 
   if (title != null) {
-    const titleText = ctx ? ctx.style.bold(title) : title;
-    contentLines.push(titleText, '');
+    contentLines.push(lineSurface(title, ctx ? { modifiers: ['bold'] } : {}), createSurface(0, 1));
   }
 
-  contentLines.push(...body.split('\n'));
+  contentLines.push(...body.split('\n').map((line) => lineSurface(line)));
 
   if (hint != null) {
-    contentLines.push('');
-    const hintText = ctx
-      ? ctx.style.styled(ctx.semantic('muted'), hint)
-      : hint;
-    contentLines.push(hintText);
+    contentLines.push(createSurface(0, 1));
+    contentLines.push(lineSurface(hint, styleFromToken(ctx?.semantic('muted'), ctx)));
   }
 
-  // If width override, constrain inner width
-  if (options.width != null) {
-    const targetInner = options.width - 4; // border + padding
-    // Pad short lines, but don't truncate (user controls width)
-    for (let i = 0; i < contentLines.length; i++) {
-      const vis = visibleLength(contentLines[i]!);
-      if (vis < targetInner) {
-        contentLines[i] = contentLines[i]! + ' '.repeat(targetInner - vis);
-      }
-    }
-  }
-
-  const borderColor = ctx && options.borderToken
-    ? (s: string) => ctx.style.styled(options.borderToken!, s)
-    : (s: string) => s;
-
-  const bgFill = makeBgFill(options.bgToken, ctx);
-
-  const boxStr = renderBox(contentLines, borderColor, bgFill);
-  const boxLines = boxStr.split('\n');
-  const boxHeight = boxLines.length;
-  const boxWidth = visibleLength(boxLines[0]!);
+  const surface = renderBoxSurface(
+    contentLines,
+    styleFromToken(options.borderToken, ctx),
+    backgroundStyleFromToken(options.bgToken, ctx),
+    options.width != null ? Math.max(0, options.width - 4) : undefined,
+  );
   const margin = resolveOverlayMargin(screenWidth, screenHeight, options.margin);
+  const row = clampCenteredPosition(screenHeight, surface.height, margin);
+  const col = clampCenteredPosition(screenWidth, surface.width, margin);
 
-  const row = clampCenteredPosition(screenHeight, boxHeight, margin);
-  const col = clampCenteredPosition(screenWidth, boxWidth, margin);
-
-  return { content: boxStr, surface: surfaceFromContent(boxStr), row, col };
+  return { content: overlayContentFromSurface(surface, ctx), surface, row, col };
 }
 
 // ---------------------------------------------------------------------------
@@ -346,23 +414,12 @@ export function toast(options: ToastOptions): Overlay {
   const resolvedMargin = resolveOverlayMargin(screenWidth, screenHeight, margin);
 
   const icon = TOAST_ICONS[variant];
-  let line = icon + ' ' + message;
-
-  if (ctx) {
-    line = ctx.style.styled(ctx.semantic(variant), line);
-  }
-
-  const borderKey = TOAST_BORDER[variant];
-  const borderColor = ctx
-    ? (s: string) => ctx.style.styled(ctx.border(borderKey), s)
-    : (s: string) => s;
-
-  const bgFill = makeBgFill(options.bgToken, ctx);
-
-  const boxStr = renderBox([line], borderColor, bgFill);
-  const boxLines = boxStr.split('\n');
-  const boxHeight = boxLines.length;
-  const boxWidth = visibleLength(boxLines[0]!);
+  const line = lineSurface(`${icon} ${message}`, styleFromToken(ctx?.semantic(variant), ctx));
+  const surface = renderBoxSurface(
+    [line],
+    styleFromToken(ctx?.border(TOAST_BORDER[variant]), ctx),
+    backgroundStyleFromToken(options.bgToken, ctx),
+  );
 
   let row: number;
   let col: number;
@@ -370,14 +427,14 @@ export function toast(options: ToastOptions): Overlay {
   switch (anchor) {
     case 'top-right':
       row = resolvedMargin;
-      col = screenWidth - boxWidth - resolvedMargin;
+      col = screenWidth - surface.width - resolvedMargin;
       break;
     case 'bottom-right':
-      row = screenHeight - boxHeight - resolvedMargin;
-      col = screenWidth - boxWidth - resolvedMargin;
+      row = screenHeight - surface.height - resolvedMargin;
+      col = screenWidth - surface.width - resolvedMargin;
       break;
     case 'bottom-left':
-      row = screenHeight - boxHeight - resolvedMargin;
+      row = screenHeight - surface.height - resolvedMargin;
       col = resolvedMargin;
       break;
     case 'top-left':
@@ -389,7 +446,7 @@ export function toast(options: ToastOptions): Overlay {
   row = Math.max(0, row);
   col = Math.max(0, col);
 
-  return { content: boxStr, surface: surfaceFromContent(boxStr), row, col };
+  return { content: overlayContentFromSurface(surface, ctx), surface, row, col };
 }
 
 // ---------------------------------------------------------------------------
@@ -483,55 +540,58 @@ export function drawer(options: DrawerOptions): Overlay {
   const { width, height, row, col } = dims;
   const innerWidth = Math.max(0, width - 4); // border + padding on each side
 
-  const borderColor = ctx && options.borderToken
-    ? (s: string) => ctx.style.styled(options.borderToken!, s)
-    : (s: string) => s;
+  const borderStyle = styleFromToken(options.borderToken, ctx);
+  const fillStyle = backgroundStyleFromToken(options.bgToken, ctx);
+  const titleStyle = ctx ? { modifiers: ['bold'] as string[] } : {};
+  const surface = createSurface(width, height);
 
-  const bgFill = makeBgFill(options.bgToken, ctx);
-  const fill = bgFill ?? ((s: string) => s);
-
-  // Build top border
-  let topInner: string;
-  if (title) {
-    const titleText = ctx ? ctx.style.bold(title) : title;
-    const titleVis = visibleLength(titleText);
-    const remaining = Math.max(0, innerWidth + 2 - titleVis - 2); // +2 for padding around border, -2 for spaces around title
-    const leftDash = Math.floor(remaining / 2);
-    const rightDash = remaining - leftDash;
-    topInner = BORDER.h.repeat(leftDash) + ' ' + titleText + ' ' + BORDER.h.repeat(rightDash);
-  } else {
-    topInner = BORDER.h.repeat(innerWidth + 2);
+  if (width === 0 || height === 0) {
+    return { content: overlayContentFromSurface(surface, ctx), surface, row, col };
   }
-  const topLine = fitLineExact(borderColor(BORDER.tl + topInner + BORDER.tr), width);
-  const bottomLine = fitLineExact(borderColor(BORDER.bl + BORDER.h.repeat(innerWidth + 2) + BORDER.br), width);
 
-  // Build content lines
-  const contentLines = content.split('\n');
-  const availableHeight = Math.max(0, height - 2); // minus top + bottom border
-
-  const bodyLines: string[] = [];
-  for (let i = 0; i < availableHeight; i++) {
-    const raw = contentLines[i] ?? '';
-    const vis = visibleLength(raw);
-    let clipped: string;
-    if (vis > innerWidth) {
-      clipped = clipToWidth(raw, innerWidth);
-    } else {
-      clipped = raw + ' '.repeat(innerWidth - vis);
+  for (let x = 0; x < width; x++) {
+    const topChar = x === 0 ? BORDER.tl : x === width - 1 ? BORDER.tr : BORDER.h;
+    setStyledCell(surface, x, 0, topChar, borderStyle);
+    if (height > 1) {
+      const bottomChar = x === 0 ? BORDER.bl : x === width - 1 ? BORDER.br : BORDER.h;
+      setStyledCell(surface, x, height - 1, bottomChar, borderStyle);
     }
-    bodyLines.push(fitLineExact(borderColor(BORDER.v) + fill(' ' + clipped + ' ') + borderColor(BORDER.v), width));
   }
 
-  const allLines: string[] = [];
-  if (height === 1) {
-    allLines.push(topLine);
-  } else if (height >= 2) {
-    allLines.push(topLine, ...bodyLines, bottomLine);
+  if (title != null && width > 2) {
+    const titleLine = lineSurface(title, titleStyle);
+    const spanWidth = Math.min(width - 2, titleLine.width + 2);
+    const startX = 1 + Math.max(0, Math.floor(((width - 2) - spanWidth) / 2));
+    setStyledCell(surface, startX, 0, ' ', borderStyle);
+    const mergedTitleStyle = mergeStyles(borderStyle, titleStyle);
+    for (let x = 0; x < Math.min(titleLine.width, Math.max(0, spanWidth - 2)); x++) {
+      setStyledCell(surface, startX + 1 + x, 0, titleLine.get(x, 0).char, mergedTitleStyle);
+    }
+    if (spanWidth >= 2) {
+      setStyledCell(surface, startX + spanWidth - 1, 0, ' ', borderStyle);
+    }
+  }
+
+  const contentLines = content.split('\n').map((line) => lineSurface(clipToWidth(line, innerWidth)));
+  const availableHeight = Math.max(0, height - 2);
+
+  for (let i = 0; i < availableHeight; i++) {
+    const y = i + 1;
+    if (width >= 1) setStyledCell(surface, 0, y, BORDER.v, borderStyle);
+    for (let x = 1; x < Math.max(1, width - 1); x++) {
+      if (x < width - 1) setStyledCell(surface, x, y, ' ', fillStyle);
+    }
+    if (width >= 2) setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
+
+    const line = lineWithInheritedBackground(contentLines[i] ?? createSurface(0, 1), fillStyle.bg);
+    if (line.width > 0 && innerWidth > 0 && width >= 4) {
+      surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
+    }
   }
 
   return {
-    content: allLines.join('\n'),
-    surface: surfaceFromContent(allLines.join('\n')),
+    content: overlayContentFromSurface(surface, ctx),
+    surface,
     row,
     col,
   };
@@ -607,14 +667,6 @@ function clampRegion(region: LayoutRect | undefined, screenWidth: number, screen
   };
 }
 
-/** Clip or pad a single line to exactly `width` visible columns. */
-function fitLineExact(line: string, width: number): string {
-  const target = Math.max(0, width);
-  const clipped = clipToWidth(line, target);
-  const vis = visibleLength(clipped);
-  return clipped + ' '.repeat(Math.max(0, target - vis));
-}
-
 /** Clamp a number between min and max. */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -678,46 +730,40 @@ export function tooltip(options: TooltipOptions): Overlay {
   } = options;
 
   const maxContentWidth = Math.max(0, screenWidth - 4);
-  const contentLines = content.split('\n').map((l) => clipToWidth(l, maxContentWidth));
-
-  const borderColor = ctx && borderToken
-    ? (s: string) => ctx.style.styled(borderToken, s)
-    : (s: string) => s;
-
-  const bgFill = makeBgFill(bgToken, ctx);
-
-  const boxStr = renderBox(contentLines, borderColor, bgFill);
-  const boxLines = boxStr.split('\n');
-  const boxHeight = boxLines.length;
-  const boxWidth = visibleLength(boxLines[0]!);
+  const contentLines = content.split('\n').map((line) => lineSurface(clipToWidth(line, maxContentWidth)));
+  const surface = renderBoxSurface(
+    contentLines,
+    styleFromToken(borderToken, ctx),
+    backgroundStyleFromToken(bgToken, ctx),
+  );
 
   let tipRow: number;
   let tipCol: number;
 
   switch (direction) {
     case 'top':
-      tipRow = targetRow - boxHeight;
-      tipCol = targetCol - Math.floor(boxWidth / 2);
+      tipRow = targetRow - surface.height;
+      tipCol = targetCol - Math.floor(surface.width / 2);
       break;
     case 'bottom':
       tipRow = targetRow + 1;
-      tipCol = targetCol - Math.floor(boxWidth / 2);
+      tipCol = targetCol - Math.floor(surface.width / 2);
       break;
     case 'left':
-      tipRow = targetRow - Math.floor(boxHeight / 2);
-      tipCol = targetCol - boxWidth;
+      tipRow = targetRow - Math.floor(surface.height / 2);
+      tipCol = targetCol - surface.width;
       break;
     case 'right':
-      tipRow = targetRow - Math.floor(boxHeight / 2);
+      tipRow = targetRow - Math.floor(surface.height / 2);
       tipCol = targetCol + 1;
       break;
   }
 
   // Clamp to screen bounds
-  tipRow = Math.max(0, Math.min(tipRow, screenHeight - boxHeight));
-  tipCol = Math.max(0, Math.min(tipCol, screenWidth - boxWidth));
+  tipRow = Math.max(0, Math.min(tipRow, screenHeight - surface.height));
+  tipCol = Math.max(0, Math.min(tipCol, screenWidth - surface.width));
 
-  return { content: boxStr, surface: surfaceFromContent(boxStr), row: tipRow, col: tipCol };
+  return { content: overlayContentFromSurface(surface, ctx), surface, row: tipRow, col: tipCol };
 }
 
 function surfaceFromContent(content: string): Surface {

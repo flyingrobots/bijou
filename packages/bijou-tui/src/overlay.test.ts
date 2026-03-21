@@ -313,6 +313,20 @@ describe('modal', () => {
     expect(result.surface).toBeDefined();
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
   });
+
+  it('keeps background fill on modal text cells in the returned surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = modal({
+      body: 'Filled',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).char).toBe('F');
+    expect(result.surface!.get(2, 1).bg).toBe('#003366');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -467,6 +481,19 @@ describe('toast', () => {
     const result = toast({ message: 'saved', variant: 'success', screenWidth: 80, screenHeight: 24, ctx });
     expect(result.surface).toBeDefined();
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('applies semantic styling directly to toast text cells', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = toast({
+      message: 'Boom',
+      variant: 'error',
+      screenWidth: 80,
+      screenHeight: 24,
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).fg).toBe(ctx.semantic('error').hex);
   });
 });
 
@@ -742,6 +769,21 @@ describe('drawer', () => {
     const result = drawer({ content: 'panel', width: 20, screenWidth: 80, screenHeight: 5, ctx });
     expect(result.surface).toBeDefined();
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('keeps background fill on drawer text cells in the returned surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = drawer({
+      content: 'panel',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).char).toBe('p');
+    expect(result.surface!.get(2, 1).bg).toBe('#003366');
   });
 });
 
