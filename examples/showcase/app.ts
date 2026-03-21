@@ -1,5 +1,5 @@
 import type { BijouContext } from '@flyingrobots/bijou';
-import { badge, box, kbd, markdown, surfaceToString } from '@flyingrobots/bijou';
+import { box, kbd, markdown } from '@flyingrobots/bijou';
 import {
   animate,
   createBrowsableListState,
@@ -30,8 +30,10 @@ import { contentSurface } from '../_shared/example-surfaces.ts';
 // Detail pane rendering
 // ---------------------------------------------------------------------------
 
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+function tierLabel(tier: number): string {
+  if (tier === 1) return 'static';
+  if (tier === 2) return 'embeddable';
+  return 'standalone';
 }
 
 function renderDetail(
@@ -56,12 +58,7 @@ function renderDetail(
   sections.push('');
 
   // Tier + package badge
-  const tierBadge = entry.tier === 1
-    ? badgeText('static', 'success', ctx)
-    : entry.tier === 2
-      ? badgeText('embeddable', 'info', ctx)
-      : badgeText('standalone', 'warning', ctx);
-  sections.push(`  ${tierBadge} ${badgeText(entry.pkg, 'muted', ctx)}`);
+  sections.push(`  Tier: ${tierLabel(entry.tier)} · Package: ${entry.pkg}`);
   sections.push('');
 
   // Tri-mode preview

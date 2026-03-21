@@ -24,6 +24,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Overlay example surface-first migration** — the `toast`, `modal`, `drawer`, and `tooltip` demos now build background/help content as `Surface` values and compose overlays with `compositeSurface(...)`, so the examples finally teach the same surface-native overlay path the TUI docs now recommend.
 - **Prompt example output cleanup** — the `select`, `input`, `confirm`, `filter`, and `multiselect` demos now report their result state in plain text instead of decorating prompt outcomes with badge bridges, keeping those examples focused on prompt patterns rather than unrelated component styling.
 - **Runtime helper example cleanup** — the `chat`, `mouse`, `print-key`, and `composable` demos no longer teach badge-string bridges in their runtime views; event inspectors now compose modifier pills as surfaces, while string-first layout demos use plain semantic labels instead of reparsing badge output.
+- **Shared showcase and canary bridge cleanup** — the canonical workbench, showcase detail views, transitions demo, and core static canary now avoid badge-string bridge residue where the badge component was not the thing being demonstrated, leaving the remaining bridges concentrated in actual badge-focused previews and a few string-first layout demos.
 
 ### 🐛 Fixes
 

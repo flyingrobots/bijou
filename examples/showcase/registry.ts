@@ -337,9 +337,9 @@ const DATA: ComponentEntry[] = [
         { header: 'Status', width: Math.min(10, Math.floor(w / 4)) },
       ],
       rows: [
-        ['Alice', 'Engineer', badgeText('active', 'success', ctx)],
-        ['Bob', 'Designer', badgeText('away', 'warning', ctx)],
-        ['Carol', 'PM', badgeText('offline', 'muted', ctx)],
+        ['Alice', 'Engineer', 'active'],
+        ['Bob', 'Designer', 'away'],
+        ['Carol', 'PM', 'offline'],
       ],
       ctx,
     }),
