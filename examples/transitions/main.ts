@@ -7,7 +7,7 @@ import {
   type FramePage,
   type PageTransition,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -68,7 +68,7 @@ function makePage(id: string, title: string): FramePage<PageModel, Msg> {
     layout: (model) => ({
       kind: 'pane',
       paneId: `${id}-main`,
-      render: (w, h) => ansiContentSurface(renderContent(title, model, w, h)),
+      render: (w, h) => contentSurface(renderContent(title, model, w, h)),
     }),
   };
 }

@@ -25,7 +25,7 @@ import {
   type FrameModel,
   type FramePage,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from './surface-bridge.ts';
+import { contentSurface } from './example-surfaces.ts';
 
 const DRAWER_ANCHORS: readonly DrawerAnchor[] = ['right', 'left', 'bottom', 'top'];
 
@@ -561,18 +561,18 @@ export function createCanonicalWorkbenchApp(
         'ops-summary': {
           kind: 'pane',
           paneId: 'ops-summary',
-          render: (width, height) => ansiContentSurface(renderOpsSummary(width, height, model, ctx)),
+          render: (width, height) => contentSurface(renderOpsSummary(width, height, model, ctx)),
         },
         'ops-health': {
           kind: 'pane',
           paneId: 'ops-health',
-          render: (width) => ansiContentSurface(renderOpsHealth(width, ctx)),
+          render: (width) => contentSurface(renderOpsHealth(width, ctx)),
         },
         'ops-events': {
           kind: 'pane',
           paneId: 'ops-events',
           overflowX: 'scroll',
-          render: (width) => ansiContentSurface(renderIncidentFeed(width, model, ctx)),
+          render: (width) => contentSurface(renderIncidentFeed(width, model, ctx)),
         },
       },
     })),
@@ -586,7 +586,7 @@ export function createCanonicalWorkbenchApp(
       paneA: {
         kind: 'pane',
         paneId: 'board-lanes',
-        render: (width) => ansiContentSurface(renderBoardLanes(width, ctx)),
+        render: (width) => contentSurface(renderBoardLanes(width, ctx)),
       },
       paneB: {
         kind: 'split',
@@ -599,12 +599,12 @@ export function createCanonicalWorkbenchApp(
           kind: 'pane',
           paneId: 'board-ticket',
           overflowX: 'scroll',
-          render: (width) => ansiContentSurface(renderBoardTicket(width, model, ctx)),
+          render: (width) => contentSurface(renderBoardTicket(width, model, ctx)),
         },
         paneB: {
           kind: 'pane',
           paneId: 'board-runbook',
-          render: (width) => ansiContentSurface(renderBoardRunbook(width, ctx)),
+          render: (width) => contentSurface(renderBoardRunbook(width, ctx)),
         },
       },
     })),
@@ -623,17 +623,17 @@ export function createCanonicalWorkbenchApp(
           kind: 'pane',
           paneId: 'graph-dag',
           overflowX: 'scroll',
-          render: (width) => ansiContentSurface(renderGraphDag(width, model, ctx)),
+          render: (width) => contentSurface(renderGraphDag(width, model, ctx)),
         },
         'graph-timeline': {
           kind: 'pane',
           paneId: 'graph-timeline',
-          render: (width) => ansiContentSurface(renderGraphTimeline(width, model, ctx)),
+          render: (width) => contentSurface(renderGraphTimeline(width, model, ctx)),
         },
         'graph-notes': {
           kind: 'pane',
           paneId: 'graph-notes',
-          render: (width) => ansiContentSurface(renderGraphNotes(width, model, ctx)),
+          render: (width) => contentSurface(renderGraphNotes(width, model, ctx)),
         },
       },
     })),

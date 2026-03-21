@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, type App,
   animate, SPRING_PRESETS,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -84,7 +84,7 @@ const app: App<Model, Msg> = {
     }
     lines.push('');
 
-    return ansiContentSurface(lines.join('\n'));
+    return contentSurface(lines.join('\n'));
   },
 };
 

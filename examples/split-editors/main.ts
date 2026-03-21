@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, isResizeMsg, type App,
   flex, viewport, createScrollState, scrollBy, pageDown, pageUp,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
@@ -143,7 +143,7 @@ const app: App<Model, Msg> = {
     const leftLabel = model.focusLeft ? badgeText('app.ts', 'primary') : 'app.ts';
     const rightLabel = !model.focusLeft ? badgeText('app.test.ts', 'primary') : 'app.test.ts';
 
-    return ansiContentSurface(flex(
+    return contentSurface(flex(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: `  ${leftLabel}${''.padEnd(paneWidth - 10)}${rightLabel}` },
       { flex: 1, content: (w, h) =>

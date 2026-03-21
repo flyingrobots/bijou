@@ -2,6 +2,7 @@ import {
   createSurface,
   parseAnsiToSurface,
   stringToSurface,
+  stripAnsi,
   type BijouContext,
   type Surface,
 } from '@flyingrobots/bijou';
@@ -30,6 +31,13 @@ export function textSurface(text: string, width: number, height: number): Surfac
 
 export function ansiSurface(text: string, width: number, height: number): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), Math.max(1, height));
+}
+
+export function contentSurface(text: string): Surface {
+  const lines = text.split(/\r?\n/);
+  const width = Math.max(1, ...lines.map((line) => stripAnsi(line).length));
+  const height = Math.max(1, lines.length);
+  return parseAnsiToSurface(text, width, height);
 }
 
 function visibleWidth(text: string): number {

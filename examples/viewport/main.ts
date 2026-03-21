@@ -5,7 +5,7 @@ import {
   viewport, createScrollState, scrollBy, pageDown, pageUp,
   scrollToTop, scrollToBottom, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -93,7 +93,7 @@ const app: App<Model, Msg> = {
     const status = `  Line ${model.scroll.y + 1}/${model.scroll.totalLines}`;
     const help = `  ${kbd('j')}${kbd('k')} scroll  ${kbd('d')}${kbd('u')} page  ${kbd('g')}${kbd('G')} top/bottom  ${kbd('q')} quit`;
 
-    return ansiContentSurface(vstack('', header, body, status, help, ''));
+    return contentSurface(vstack('', header, body, status, help, ''));
   },
 };
 

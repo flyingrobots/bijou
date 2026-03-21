@@ -4,7 +4,7 @@ import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   composite, toast, type ToastVariant, type ToastAnchor,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
@@ -72,7 +72,7 @@ const app: App<Model, Msg> = {
     const bg = bgLines.join('\n');
 
     if (!model.lastToast || Date.now() - model.lastToast.timestamp > 3000) {
-      return ansiContentSurface(bg);
+      return contentSurface(bg);
     }
 
     const t = toast({
@@ -84,7 +84,7 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return ansiContentSurface(composite(bg, [t]));
+    return contentSurface(composite(bg, [t]));
   },
 };
 

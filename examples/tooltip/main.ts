@@ -4,7 +4,7 @@ import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   composite, tooltip, type TooltipDirection,
 } from '@flyingrobots/bijou-tui';
-import { ansiContentSurface } from '../_shared/surface-bridge.ts';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
@@ -77,7 +77,7 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return ansiContentSurface(composite(bg, [tip]));
+    return contentSurface(composite(bg, [tip]));
   },
 };
 
