@@ -2,9 +2,8 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator, kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, viewport, createScrollState, scrollToBottom,
+  flexSurface, viewportSurface, createScrollState, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -76,15 +75,17 @@ const app: App<Model, Msg> = {
     const vpHeight = model.rows - 4;
     const scroll = scrollToBottom(createScrollState(content, vpHeight));
 
-    return ansiSurface(flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: separator({ label: 'chat', width: model.cols }) },
-      { flex: 1, content: (w, h) =>
-        viewport({ width: w, height: h, content, scrollY: scroll.y, showScrollbar: true })
+      {
+        flex: 1,
+        content: (w, h) =>
+          viewportSurface({ width: w, height: h, content, scrollY: scroll.y, showScrollbar: true }),
       },
       { basis: 1, content: separator({ width: model.cols }) },
       { basis: 1, content: `  > ${model.input}\u2588  ${kbd('Enter')} send  ${kbd('q')} quit` },
-    ), model.cols, model.rows);
+    );
   },
 };
 

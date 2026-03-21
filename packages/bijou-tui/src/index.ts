@@ -252,8 +252,10 @@ export {
 // Viewport — scrollable content pane
 export {
   type ViewportOptions,
+  type ViewportSurfaceOptions,
   type ScrollState,
   viewport,
+  viewportSurface,
   createScrollState,
   scrollBy,
   scrollTo,
@@ -285,7 +287,9 @@ export {
 export {
   type FlexOptions,
   type FlexChild,
+  type SurfaceFlexChild,
   flex,
+  flexSurface,
 } from './flex.js';
 
 // Keybinding manager

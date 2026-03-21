@@ -54,11 +54,11 @@ export function badgeSurface(label: string, variant: BadgeVariant, ctx: BijouCon
 }
 
 export function row(parts: readonly (string | Surface)[]): Surface {
-  return hstackSurface(parts.map((part) => typeof part === 'string' ? line(part) : part));
+  return hstackSurface(0, ...parts.map((part) => typeof part === 'string' ? line(part) : part));
 }
 
 export function column(rows: readonly (string | Surface)[]): Surface {
-  return vstackSurface(rows.map((entry) => typeof entry === 'string' ? contentSurface(entry) : entry));
+  return vstackSurface(...rows.map((entry) => typeof entry === 'string' ? contentSurface(entry) : entry));
 }
 
 function visibleWidth(text: string): number {

@@ -5,9 +5,8 @@ import {
 } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, vstack,
+  flexSurface, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -115,13 +114,13 @@ const app: App<Model, Msg> = {
       default: content = '';
     }
 
-    return ansiSurface(flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: `  ${tabBar}` },
       { basis: 1, content: separator({ width: model.cols }) },
       { flex: 1, content: () => content },
       { basis: 1, content: `  ${kbd('←')}${kbd('→')} tabs  ${kbd('q')} quit` },
-    ), model.cols, model.rows);
+    );
   },
 };
 

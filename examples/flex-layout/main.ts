@@ -1,14 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, separator, kbd, tree, surfaceToString } from '@flyingrobots/bijou';
+import { box, separator, kbd, tree } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, vstack,
+  flexSurface, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
-
-const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
+initDefaultContext();
 
 interface Model {
   cols: number;
@@ -41,16 +37,16 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    return ansiSurface(flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       // Header
       { basis: 3, content: (w) => {
-        const header = `  ${badgeText('bijou', 'primary')}  Dashboard  ${badgeText(`${model.cols}×${model.rows}`, 'muted')}`;
+        const header = `  [bijou]  Dashboard  [${model.cols}×${model.rows}]`;
         return vstack(separator({ width: w }), header, separator({ width: w }));
       }},
       // Body: sidebar + main
       { flex: 1, content: (w, h) =>
-        flex(
+        flexSurface(
           { direction: 'row', width: w, height: h, gap: 1 },
           // Sidebar
           { basis: 24, content: () => {
@@ -74,7 +70,7 @@ const app: App<Model, Msg> = {
       { basis: 1, content: (w) => {
         return `  ${kbd('q')} quit  ${'─'.repeat(Math.max(0, w - 12))}`;
       }},
-    ), model.cols, model.rows);
+    );
   },
 };
 

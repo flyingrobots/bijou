@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
+import { createSurface } from '@flyingrobots/bijou';
 import {
   viewport,
+  viewportSurface,
   createScrollState,
   scrollBy,
   scrollTo,
@@ -14,6 +16,18 @@ import {
   stripAnsi,
   visibleLength,
 } from './viewport.js';
+
+function surfaceLines(surface: { width: number; height: number; get(x: number, y: number): { char: string } }): string[] {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
+  return lines;
+}
 
 // ---------------------------------------------------------------------------
 // viewport()
@@ -139,6 +153,40 @@ describe('viewport', () => {
       expect(stripped).not.toContain('█');
       expect(stripped).not.toContain('│');
     }
+  });
+});
+
+describe('viewportSurface', () => {
+  it('renders string content into a surface with the same viewport clipping', () => {
+    const result = viewportSurface({
+      width: 6,
+      height: 2,
+      content: 'alpha\nbeta\ngamma',
+      scrollY: 1,
+      showScrollbar: false,
+    });
+
+    expect(surfaceLines(result)).toEqual(['beta  ', 'gamma ']);
+  });
+
+  it('clips and scrolls existing surfaces without flattening them', () => {
+    const content = createSurface(4, 3);
+    content.set(0, 0, { char: 'A', fg: '#ff0000', empty: false });
+    content.set(1, 0, { char: 'B', empty: false });
+    content.set(2, 1, { char: 'C', fg: '#00ff00', empty: false });
+    content.set(3, 2, { char: 'D', fg: '#0000ff', empty: false });
+
+    const result = viewportSurface({
+      width: 2,
+      height: 2,
+      content,
+      scrollX: 1,
+      scrollY: 1,
+      showScrollbar: false,
+    });
+
+    expect(surfaceLines(result)).toEqual([' C', '  ']);
+    expect(result.get(1, 0)).toMatchObject({ char: 'C', fg: '#00ff00' });
   });
 });
 

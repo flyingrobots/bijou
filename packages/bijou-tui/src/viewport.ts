@@ -5,7 +5,15 @@
  * available screen space, with optional scrollbar indicator.
  */
 
-import { graphemeWidth, graphemeClusterWidth, segmentGraphemes, clipToWidth as coreClipToWidth } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  graphemeWidth,
+  graphemeClusterWidth,
+  parseAnsiToSurface,
+  segmentGraphemes,
+  clipToWidth as coreClipToWidth,
+  type Surface,
+} from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -27,6 +35,14 @@ export interface ViewportOptions {
   readonly scrollX?: number;
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
+}
+
+/**
+ * Configuration for rendering a viewport directly into a Surface.
+ */
+export interface ViewportSurfaceOptions extends Omit<ViewportOptions, 'content'> {
+  /** Full content payload, either plain/ANSI text or a pre-rendered surface. */
+  readonly content: string | Surface;
 }
 
 /**
@@ -347,6 +363,67 @@ export function viewport(options: ViewportOptions): string {
   }
 
   return rendered.join('\n');
+}
+
+/**
+ * Render a scrollable viewport directly into a Surface.
+ *
+ * When the content is already a `Surface`, the viewport clips/blits it
+ * directly without flattening through a string bridge. String content still
+ * routes through {@link viewport} so the legacy text helper stays consistent.
+ *
+ * @param options - Viewport configuration including dimensions, content, and scroll offsets.
+ * @returns Surface sized exactly to the requested viewport rectangle.
+ */
+export function viewportSurface(options: ViewportSurfaceOptions): Surface {
+  const {
+    width,
+    height,
+    content,
+    scrollY = 0,
+    scrollX = 0,
+    showScrollbar = true,
+  } = options;
+
+  const safeWidth = Math.max(0, Math.floor(width));
+  const safeHeight = Math.max(0, Math.floor(height));
+
+  if (typeof content === 'string') {
+    return parseAnsiToSurface(
+      viewport({
+        width: safeWidth,
+        height: safeHeight,
+        content,
+        scrollY,
+        scrollX,
+        showScrollbar,
+      }),
+      safeWidth,
+      safeHeight,
+    );
+  }
+
+  const result = createSurface(safeWidth, safeHeight, { char: ' ', empty: false });
+  const totalLines = content.height;
+  const maxScroll = Math.max(0, totalLines - safeHeight);
+  const clampedY = Math.max(0, Math.min(scrollY, maxScroll));
+
+  const needsScrollbar = showScrollbar && totalLines > safeHeight;
+  const contentWidth = Math.max(0, needsScrollbar ? safeWidth - 1 : safeWidth);
+
+  if (contentWidth > 0 && safeHeight > 0) {
+    result.blit(content, 0, 0, Math.max(0, scrollX), clampedY, contentWidth, safeHeight);
+  }
+
+  if (needsScrollbar && safeWidth > 0) {
+    const bar = renderScrollbar(safeHeight, totalLines, clampedY);
+    const scrollbarX = safeWidth - 1;
+    for (let y = 0; y < safeHeight; y++) {
+      result.set(scrollbarX, y, { char: bar[y]!, empty: false });
+    }
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
