@@ -11,6 +11,24 @@ The goal is to stop thinking in terms of "every export is its own component."
 - **Core** means it belongs in `@flyingrobots/bijou`.
 - **TUI** means it belongs in `@flyingrobots/bijou-tui`.
 
+## Documentation completeness status
+
+This page is still a working semantic map, not a finished component-family reference.
+
+The stated design-system standard requires each mature family doc to include:
+
+- what it is
+- variations
+- when to use
+- when not to use
+- content guidance
+- interaction ownership
+- graceful lowering across `rich`, `static`, `pipe`, and `accessible`
+- related families
+- closest Carbon analogue
+
+Many entries below already cover purpose, variants, ownership, and analogue, but they do not yet consistently document graceful lowering or related-family guidance explicitly. Until that is corrected, this page should be treated as incomplete doctrine rather than finished usage guidance.
+
 ## Status and feedback families
 
 ### Inline status

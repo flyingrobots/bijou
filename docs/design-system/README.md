@@ -97,12 +97,15 @@ Every mature component-family page in Bijou should eventually include:
 - Related families
 - Closest Carbon analogue
 
+This standard is not fully met yet. Some family pages still describe semantic purpose and ownership without explicitly documenting graceful lowering across `rich`, `static`, `pipe`, and `accessible` contexts. Until those sections are present, those pages should be treated as incomplete design-system docs, not finished guidance.
+
 ## Current gaps this section is meant to close
 
 Bijou is already strong on breadth and runtime architecture. The weaker parts are:
 
 - explicit usage guidance
 - family-level documentation
+- documentation completeness against the standard defined above
 - pattern-level decision support
 - data-visualization doctrine
 - mouse and multi-input policy
