@@ -69,7 +69,6 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import {
-  lineToSurface,
   resolveHeaderLine,
   renderHelpLine,
   renderPageContent,
@@ -731,7 +730,7 @@ export function createFramedApp<PageModel, Msg>(
 
     view(model) {
       const activePage = pagesById.get(model.activePageId)!;
-      const header = resolveHeaderLine(model, options, pagesById).line;
+      const header = resolveHeaderLine(model, options, pagesById).surface;
       const helpLine = renderHelpLine(model, frameKeys, options, activePage);
       const bodyRect = frameBodyRect(model.columns, model.rows);
 
@@ -810,8 +809,8 @@ export function createFramedApp<PageModel, Msg>(
       return composeFrameSurface({
         width: model.columns,
         height: model.rows,
-        header,
-        helpLine,
+        headerSurface: header,
+        helpLineSurface: helpLine,
         bodySurface,
         bodyRect,
         overlays,
@@ -831,8 +830,8 @@ export function createFramedApp<PageModel, Msg>(
 interface FrameSurfaceOptions {
   width: number;
   height: number;
-  header: string;
-  helpLine: string;
+  headerSurface: Surface;
+  helpLineSurface: Surface;
   bodySurface: Surface;
   bodyRect: LayoutRect;
   overlays: readonly Overlay[];
@@ -842,9 +841,9 @@ interface FrameSurfaceOptions {
 function composeFrameSurface(options: FrameSurfaceOptions): Surface {
   const frame = createSurface(options.width, options.height);
 
-  frame.blit(lineToSurface(options.header, options.width), 0, 0);
+  frame.blit(options.headerSurface, 0, 0);
   if (options.height > 1) {
-    frame.blit(lineToSurface(options.helpLine, options.width), 0, 1);
+    frame.blit(options.helpLineSurface, 0, 1);
   }
   if (options.bodyRect.width > 0 && options.bodyRect.height > 0) {
     frame.blit(options.bodySurface, options.bodyRect.col, options.bodyRect.row);

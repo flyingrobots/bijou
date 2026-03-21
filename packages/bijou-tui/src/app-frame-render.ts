@@ -10,7 +10,6 @@ import {
   parseAnsiToSurface,
   type Cell,
   resolveSafeCtx,
-  surfaceToString,
   type BijouContext,
   type Surface,
 } from '@flyingrobots/bijou';
@@ -42,7 +41,7 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import { normalizeViewOutput, type ViewOutput } from './view-output.js';
-import { styleTextWithBCSS } from './css/text-style.js';
+import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
 
 export interface FrameHeaderTabTarget {
   readonly pageId: string;
@@ -51,7 +50,7 @@ export interface FrameHeaderTabTarget {
 }
 
 export interface FrameHeaderRenderResult {
-  readonly line: string;
+  readonly surface: Surface;
   readonly tabTargets: readonly FrameHeaderTabTarget[];
 }
 
@@ -312,7 +311,7 @@ export function resolveHeaderLine<PageModel, Msg>(
 
   const line = fitLine(`${title}  ${tabs}`, model.columns);
   return {
-    line: styleTextWithBCSS(line, resolveSafeCtx(), {
+    surface: createStyledTextSurfaceWithBCSS(line, model.columns, resolveSafeCtx(), {
       type: 'FrameHeader',
       id: 'frame-header',
       classes: [`page-${model.activePageId}`],
@@ -321,22 +320,13 @@ export function resolveHeaderLine<PageModel, Msg>(
   };
 }
 
-/** Render the top header line showing the app title and tab bar. */
-export function renderHeaderLine<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): string {
-  return resolveHeaderLine(model, options, pagesById).line;
-}
-
 /** Render the bottom status line showing mode, focused pane, and key hints. */
 export function renderHelpLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   activePage: FramePage<PageModel, Msg>,
-): string {
+): Surface {
   const mode = model.commandPalette != null
     ? 'PALETTE'
     : model.helpOpen
@@ -359,7 +349,7 @@ export function renderHelpLine<PageModel, Msg>(
   const line = hint.length > 0
     ? ` ${status}  ${hint}`
     : ` ${status}`;
-  return styleTextWithBCSS(fitLine(line, model.columns), resolveSafeCtx(), {
+  return createStyledTextSurfaceWithBCSS(fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
@@ -405,33 +395,8 @@ export function framePaneOutputToSurface(output: ViewOutput, width: number, heig
   return normalizeViewOutput(output, { width, height }).surface;
 }
 
-export function framePaneSurfaceToString(surface: Surface): string {
-  const ctx = resolveSafeCtx();
-  if (ctx?.style) {
-    return surfaceToString(surface, ctx.style);
-  }
-
-  return surfaceToPlainText(surface);
-}
-
-export function lineToSurface(line: string, width: number): Surface {
-  return parseAnsiToSurface(line, width, 1);
-}
-
 export function blockSurface(content: string, width: number, height: number): Surface {
   return parseAnsiToSurface(fitBlock(content, width, height).join('\n'), width, height);
-}
-
-function surfaceToPlainText(surface: Surface): string {
-  const lines: string[] = [];
-  for (let y = 0; y < surface.height; y++) {
-    let line = '';
-    for (let x = 0; x < surface.width; x++) {
-      line += surface.get(x, y).char;
-    }
-    lines.push(line);
-  }
-  return lines.join('\n');
 }
 
 function paintDivider(
