@@ -1,14 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator, kbd, surfaceToString } from '@flyingrobots/bijou';
+import { separator, kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
+  flex, viewport, createScrollState, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
 import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Message {
   sender: string;
@@ -37,10 +35,7 @@ const INITIAL_MESSAGES: Message[] = [
 
 function renderMessages(messages: Message[], width: number): string {
   void width;
-  return messages.map(m => {
-    const tag = badgeText(m.sender, m.variant);
-    return `${tag} ${m.text}`;
-  }).join('\n\n');
+  return messages.map((m) => `${m.sender.toUpperCase()}: ${m.text}`).join('\n\n');
 }
 
 const app: App<Model, Msg> = {

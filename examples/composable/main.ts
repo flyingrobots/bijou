@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
-  box, headerBox, badge, alert, separator, kbd,
-  tabs, table, tree, progressBar, timeline, surfaceToString,
+  headerBox, alert, separator, kbd,
+  tabs, table, tree, progressBar, timeline,
 } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
@@ -10,8 +10,6 @@ import {
 import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const TAB_ITEMS = [
   { label: 'Overview' },
@@ -31,11 +29,7 @@ function overviewTab(): string {
   return vstack(
     headerBox('bijou', { detail: 'v0.2.0 — physics-powered TUI engine' }),
     '',
-    '  ' + [
-      badgeText('TypeScript', 'info'),
-      badgeText('MIT', 'muted'),
-      badgeText('Zero Deps', 'success'),
-    ].join(' '),
+    '  TypeScript · MIT · Zero Deps',
     '',
     alert('All tests passing — 42 tests in 3 suites', { variant: 'success' }),
     '',
