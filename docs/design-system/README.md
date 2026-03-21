@@ -99,6 +99,22 @@ Every mature component-family page in Bijou should eventually include:
 
 This standard is not fully met yet. Some family pages still describe semantic purpose and ownership without explicitly documenting graceful lowering across `rich`, `static`, `pipe`, and `accessible` contexts. Until those sections are present, those pages should be treated as incomplete design-system docs, not finished guidance.
 
+## Component-change gate
+
+From the v4 pure-surface cleanup onward, any component-family change should be evaluated against the docs in the same slice.
+
+For every component or component family touched, verify:
+
+- documentation exists
+- documented variants are current
+- `When to use` guidance is present and still accurate
+- `When not to use` guidance is present and still accurate
+- core-versus-TUI ownership is explicit
+- graceful lowering is documented across `rich`, `static`, `pipe`, and `accessible` when applicable
+- related families are listed
+
+If any of those are missing or materially wrong, the docs are incomplete and that gap should be fixed in the same slice or explicitly logged as backlog debt before the work is considered done.
+
 ## Current gaps this section is meant to close
 
 Bijou is already strong on breadth and runtime architecture. The weaker parts are:

@@ -29,6 +29,20 @@ The stated design-system standard requires each mature family doc to include:
 
 This slice closes two large structural gaps: every family below now calls out graceful lowering and related families explicitly, and the overlay families now carry real content guidance. The remaining incompleteness is still important, though. Many non-overlay families still need richer content guidance, stronger examples, and sharper edge-case policy before this page can be treated as fully mature doctrine.
 
+## Component slice checklist
+
+When a component family is changed in code, the matching family docs should be checked in the same slice.
+
+Minimum verification:
+
+- the family is present in this guide
+- the listed variants still match reality
+- `Use when` and `Avoid when` still match the implementation and examples
+- graceful lowering still matches the runtime behavior
+- related families still make sense after the code change
+
+If those checks fail, the component work is not doctrinally complete yet.
+
 ## Status and feedback families
 
 ### Inline status
