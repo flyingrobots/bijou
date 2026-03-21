@@ -110,15 +110,16 @@ const app: App<Model, Msg> = {
     );
 
     if (model.modal === 'help') {
+      const body = column([
+        line(`${kbd('j')} ${kbd('k')}  Navigate`),
+        line(`${kbd('d')}      Delete item`),
+        line(`${kbd('?')}      Toggle help`),
+        line(`${kbd('q')}      Quit`),
+      ]);
       const dialog = modal({
         title: 'Help',
-        body: [
-          `${kbd('j')} ${kbd('k')}  Navigate`,
-          `${kbd('d')}      Delete item`,
-          `${kbd('?')}      Toggle help`,
-          `${kbd('q')}      Quit`,
-        ].join('\n'),
-        hint: 'Press Esc to close',
+        body,
+        hint: line('Press Esc to close'),
         screenWidth: ctx.runtime.columns,
         screenHeight: ctx.runtime.rows,
         borderToken: ctx.border('primary'),
@@ -129,14 +130,15 @@ const app: App<Model, Msg> = {
 
     if (model.modal === 'confirm') {
       const item = model.items[model.deleteTarget] ?? '';
+      const body = column([
+        line(`Delete "${item}"?`),
+        spacer(),
+        line('This action cannot be undone.'),
+      ]);
       const dialog = modal({
         title: 'Confirm delete',
-        body: [
-          `Delete "${item}"?`,
-          '',
-          'This action cannot be undone.',
-        ].join('\n'),
-        hint: 'y yes • n no • Esc cancel',
+        body,
+        hint: line('y yes • n no • Esc cancel'),
         screenWidth: ctx.runtime.columns,
         screenHeight: ctx.runtime.rows,
         borderToken: ctx.border('primary'),

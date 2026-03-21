@@ -431,6 +431,8 @@ const output = compositeSurface(backgroundSurface, [dialog, notification], { dim
 
 Each overlay now exposes both `surface` and `content` forms. Prefer `compositeSurface()` when your app is already on the surface-native path. Keep the string-oriented `composite()` path for explicit lowering boundaries, not as the default mental model. The `dim` option fades the background with ANSI dim.
 
+`modal().body`, `modal().hint`, `drawer().content`, and `tooltip().content` accept either plain strings or structured `Surface` content. Use surfaces when the overlay needs real rows, embedded component surfaces, or richer composition inside the interrupting layer.
+
 Reach for `toast()` when the app is composing a one-off overlay directly. Reach for the notification system when stacking, actions, routing, or history matter. The notification lab in `examples/notifications` is the canonical higher-level example.
 
 `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.

@@ -314,6 +314,22 @@ describe('modal', () => {
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
   });
 
+  it('accepts structured surface body and hint content', () => {
+    const ctx = createTestContext();
+    const result = modal({
+      title: 'Title',
+      body: stringToSurface('line1\nline2', 5, 2),
+      hint: stringToSurface('Press q', 7, 1),
+      screenWidth: 40,
+      screenHeight: 20,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('line1');
+    expect(stripAnsi(result.content)).toContain('line2');
+    expect(stripAnsi(result.content)).toContain('Press q');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
   it('keeps background fill on modal text cells in the returned surface', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = modal({
@@ -771,6 +787,31 @@ describe('drawer', () => {
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
   });
 
+  it('accepts structured surface content', () => {
+    const ctx = createTestContext();
+    const result = drawer({
+      content: stringToSurface('first\nsecond', 6, 2),
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 6,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('first');
+    expect(stripAnsi(result.content)).toContain('second');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('clips structured surface content to the drawer inner width', () => {
+    const result = drawer({
+      content: stringToSurface('ABCDEFG', 7, 1),
+      width: 8,
+      screenWidth: 80,
+      screenHeight: 5,
+    });
+    expect(stripAnsi(result.content)).toContain('ABCD');
+    expect(stripAnsi(result.content)).not.toContain('EFG');
+  });
+
   it('keeps background fill on drawer text cells in the returned surface', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = drawer({
@@ -939,5 +980,36 @@ describe('tooltip', () => {
     const result = tooltip({ ...base, row: 10, col: 40, ctx });
     expect(result.surface).toBeDefined();
     expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('accepts structured surface content', () => {
+    const ctx = createTestContext();
+    const result = tooltip({
+      content: stringToSurface('line1\nline2', 5, 2),
+      row: 10,
+      col: 40,
+      screenWidth: 80,
+      screenHeight: 24,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('line1');
+    expect(stripAnsi(result.content)).toContain('line2');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('clips structured surface content to screen width', () => {
+    const result = tooltip({
+      content: stringToSurface('ABCDEFG', 7, 1),
+      row: 10,
+      col: 0,
+      screenWidth: 6,
+      screenHeight: 24,
+      direction: 'right',
+    });
+    for (const line of result.content.split('\n')) {
+      expect(visibleLength(stripAnsi(line))).toBeLessThanOrEqual(6);
+    }
+    expect(stripAnsi(result.content)).toContain('AB');
+    expect(stripAnsi(result.content)).not.toContain('CDEFG');
   });
 });

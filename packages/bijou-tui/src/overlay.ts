@@ -47,16 +47,19 @@ export interface CompositeOptions {
   readonly dim?: boolean;
 }
 
+/** Structured overlay content accepted by the surface-native overlay family. */
+export type OverlayContent = string | Surface;
+
 /**
  * Configuration for the {@link modal} overlay.
  */
 export interface ModalOptions {
   /** Optional title displayed at the top of the modal (bolded when ctx provided). */
   readonly title?: string;
-  /** Body content of the modal. */
-  readonly body: string;
-  /** Optional hint text displayed below the body (muted when ctx provided). */
-  readonly hint?: string;
+  /** Body content of the modal. Accepts plain text or a structured surface. */
+  readonly body: OverlayContent;
+  /** Optional hint content displayed below the body (muted when ctx provided). */
+  readonly hint?: OverlayContent;
   /** Screen width in columns, used for centering. */
   readonly screenWidth: number;
   /** Screen height in rows, used for centering. */
@@ -298,6 +301,27 @@ function lineWithInheritedBackground(line: Surface, bg: string | undefined): Sur
   return result;
 }
 
+function surfaceRows(surface: Surface, maxWidth?: number): Surface[] {
+  const width = maxWidth != null ? Math.max(0, Math.min(surface.width, maxWidth)) : surface.width;
+  if (surface.height <= 0) return [createSurface(width, 1)];
+
+  const rows: Surface[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    const row = createSurface(width, 1);
+    if (width > 0) row.blit(surface, 0, 0, 0, y, width, 1);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function contentLines(content: OverlayContent, maxWidth?: number): Surface[] {
+  if (typeof content === 'string') {
+    return content.split('\n').map((line) => lineSurface(maxWidth != null ? clipToWidth(line, maxWidth) : line));
+  }
+
+  return surfaceRows(content, maxWidth);
+}
+
 function renderBoxSurface(
   lines: readonly Surface[],
   borderStyle: CellStyle,
@@ -348,21 +372,25 @@ function renderBoxSurface(
 export function modal(options: ModalOptions): Overlay {
   const { title, body, hint, screenWidth, screenHeight, ctx } = options;
 
-  const contentLines: Surface[] = [];
+  const lines: Surface[] = [];
 
   if (title != null) {
-    contentLines.push(lineSurface(title, ctx ? { modifiers: ['bold'] } : {}), createSurface(0, 1));
+    lines.push(lineSurface(title, ctx ? { modifiers: ['bold'] } : {}), createSurface(0, 1));
   }
 
-  contentLines.push(...body.split('\n').map((line) => lineSurface(line)));
+  lines.push(...contentLines(body));
 
   if (hint != null) {
-    contentLines.push(createSurface(0, 1));
-    contentLines.push(lineSurface(hint, styleFromToken(ctx?.semantic('muted'), ctx)));
+    lines.push(createSurface(0, 1));
+    if (typeof hint === 'string') {
+      lines.push(lineSurface(hint, styleFromToken(ctx?.semantic('muted'), ctx)));
+    } else {
+      lines.push(...surfaceRows(hint));
+    }
   }
 
   const surface = renderBoxSurface(
-    contentLines,
+    lines,
     styleFromToken(options.borderToken, ctx),
     backgroundStyleFromToken(options.bgToken, ctx),
     options.width != null ? Math.max(0, options.width - 4) : undefined,
@@ -460,8 +488,8 @@ export type DrawerAnchor = 'left' | 'right' | 'top' | 'bottom';
  * Configuration for the {@link drawer} overlay.
  */
 interface DrawerBaseOptions {
-  /** Content string to display inside the drawer. */
-  readonly content: string;
+  /** Content to display inside the drawer. Accepts plain text or a structured surface. */
+  readonly content: OverlayContent;
   /** Screen width in columns, used for positioning. */
   readonly screenWidth: number;
   /** Screen height in rows, used for sizing. */
@@ -572,7 +600,7 @@ export function drawer(options: DrawerOptions): Overlay {
     }
   }
 
-  const contentLines = content.split('\n').map((line) => lineSurface(clipToWidth(line, innerWidth)));
+  const rows = contentLines(content, innerWidth);
   const availableHeight = Math.max(0, height - 2);
 
   for (let i = 0; i < availableHeight; i++) {
@@ -583,7 +611,7 @@ export function drawer(options: DrawerOptions): Overlay {
     }
     if (width >= 2) setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
 
-    const line = lineWithInheritedBackground(contentLines[i] ?? createSurface(0, 1), fillStyle.bg);
+    const line = lineWithInheritedBackground(rows[i] ?? createSurface(0, 1), fillStyle.bg);
     if (line.width > 0 && innerWidth > 0 && width >= 4) {
       surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
     }
@@ -683,8 +711,8 @@ export type TooltipDirection = 'top' | 'bottom' | 'left' | 'right';
  * Configuration for the {@link tooltip} overlay.
  */
 export interface TooltipOptions {
-  /** Content string to display inside the tooltip. */
-  readonly content: string;
+  /** Content to display inside the tooltip. Accepts plain text or a structured surface. */
+  readonly content: OverlayContent;
   /** Row of the target element (0-based). */
   readonly row: number;
   /** Column of the target element (0-based). */
@@ -730,9 +758,9 @@ export function tooltip(options: TooltipOptions): Overlay {
   } = options;
 
   const maxContentWidth = Math.max(0, screenWidth - 4);
-  const contentLines = content.split('\n').map((line) => lineSurface(clipToWidth(line, maxContentWidth)));
+  const lines = contentLines(content, maxContentWidth);
   const surface = renderBoxSurface(
-    contentLines,
+    lines,
     styleFromToken(borderToken, ctx),
     backgroundStyleFromToken(bgToken, ctx),
   );

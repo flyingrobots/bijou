@@ -2,9 +2,9 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
-  compositeSurface, drawer, vstack,
+  compositeSurface, drawer,
 } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, contentSurface, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -47,15 +47,15 @@ const app: App<Model, Msg> = {
     if (!model.showDrawer) return background;
 
     const drawerWidth = Math.min(40, Math.floor(cols / 3));
-    const drawerContent = vstack(
-      'Details Panel',
-      '',
-      'Name:    bijou',
-      'Version: 0.7.0',
-      'Status:  active',
-      '',
-      'Press d to close',
-    );
+    const drawerContent = column([
+      line('Details Panel'),
+      spacer(),
+      line('Name:    bijou'),
+      line('Version: 4.0.0'),
+      line('Status:  active'),
+      spacer(),
+      line('Press d to close'),
+    ]);
 
     const d = drawer({
       content: drawerContent,

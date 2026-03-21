@@ -618,6 +618,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `drawer()` content should support supplemental work, inspection, or side-by-side context without stealing the whole task
   - `modal()` content should justify blocking the user and should end in a clear decision, confirmation, or review step
   - `toast()` content should be short-lived and self-contained, not a surrogate notification center
+  - when rich TUI structure matters, overlays should accept or compose structured `Surface` content instead of flattening component content into strings first
 - Graceful lowering:
   - rich: layered overlay surfaces with blocking or non-blocking behavior depending on variant
   - static: lower to visible in-flow or shell-level snapshots rather than hidden z-order

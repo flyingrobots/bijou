@@ -616,7 +616,7 @@ return output;
 
 Reach for this low-level `toast()` primitive when explicit anchoring matters, but app-wide notification lifecycle does not. If you need stacking, actionable buttons, archive/history, or framed-app routing, move up to the notification system shown in `examples/notifications`.
 
-The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode.
+The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode. `body`, `hint`, `drawer().content`, and `tooltip().content` can all be either plain strings or structured `Surface` values; use structured content when the overlay needs real rows or embedded component surfaces.
 
 ### Toasts
 

@@ -67,7 +67,10 @@ const app: App<Model, Msg> = {
     background.blit(line('◆'), clampedCol, clampedRow);
 
     const tip = tooltip({
-      content: `Direction: ${dir}\nRow: ${selectedRow} Col: ${selectedCol}`,
+      content: column([
+        line(`Direction: ${dir}`),
+        line(`Row: ${selectedRow} Col: ${selectedCol}`),
+      ]),
       row: selectedRow,
       col: selectedCol,
       direction: dir,
