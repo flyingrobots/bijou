@@ -14,6 +14,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface-native flex and viewport APIs** — `@flyingrobots/bijou-tui` now ships `flexSurface()` and `viewportSurface()`, so apps can keep layout and scrolling on the structured `Surface` path instead of flattening rich content into multiline strings at the composition boundary.
 - **Structured overlay content** — `@flyingrobots/bijou-tui` now lets `modal()`, `drawer()`, and `tooltip()` accept either plain strings or structured `Surface` content, so rich overlay rows and embedded component surfaces can stay structured through the overlay renderer instead of being flattened first.
 - **Surface-native stack and placement APIs** — `@flyingrobots/bijou-tui` now ships `placeSurface()` alongside `vstackSurface()` / `hstackSurface()`, giving the layout family a complete structured composition path for rich TUI views instead of forcing callers back through string-first stack/placement helpers.
+- **Surface-native pager and focus-area panes** — `@flyingrobots/bijou-tui` now ships `pagerSurface()` and `createPagerStateForSurface()`, rounding out the existing `focusAreaSurface()` path so scrollable panes with status or focus chrome can stay on the `Surface` path instead of dropping through text-first viewport helpers.
 
 ### 📝 Documentation
 
@@ -46,6 +47,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Surface-native layout example migration** — the `chat`, `composable`, `split-editors`, and `flex-layout` demos now use `flexSurface()` / `viewportSurface()` instead of string-first layout boundaries, and the shared example surface helpers now call the stack helpers with their actual surface-native signatures.
 - **Structured overlay example migration** — the `modal`, `drawer`, and `tooltip` demos now pass structured `Surface` content into the overlay family, and the public overlay docs now document structured content as the preferred path when rich TUI layout matters inside an interruption layer.
 - **Workspace layout doctrine update** — the layout-family docs and public TUI guides now explicitly treat `vstackSurface()` / `hstackSurface()` / `placeSurface()` as the canonical rich-TUI composition path and frame `vstack()` / `hstack()` / `place()` as explicit text-composition or lowering tools.
+- **Scrollable pane doctrine update** — the design-system family guide now has a dedicated `pager()` / `focusArea()` family, and the package/example docs now teach `pagerSurface()` and `focusAreaSurface()` as the canonical rich-TUI path while leaving the string renderers as explicit lowering helpers.
 
 ## [3.1.0] - 2026-03-18
 

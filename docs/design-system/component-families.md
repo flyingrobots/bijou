@@ -593,6 +593,42 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - timeline has a close analogue; DAG does not and should be treated as a specialized Bijou family
 
+### Scrollable inspection panes
+
+- Family:
+  - `pager()`
+  - `pagerSurface()`
+  - `focusArea()`
+  - `focusAreaSurface()`
+- Variants:
+  - linear pager
+  - focused pane with gutter
+  - text-lowering path
+  - surface-native path
+- Use when:
+  - a bounded pane is for reading, reviewing, or scrolling through content rather than navigating a richer table, tree, or graph structure
+- Avoid when:
+  - the content needs row/column comparison, hierarchy, or domain-specific navigation semantics
+- Ownership:
+  - TUI
+- Content guidance:
+  - use `pager()` / `pagerSurface()` for long linear text where the status line and current line position matter
+  - use `focusArea()` / `focusAreaSurface()` when the pane participates in a larger workspace and needs explicit focus ownership
+  - prefer the surface-native path when the pane body is already composed from `Surface` content; keep the string path as explicit lowering, not the default teaching path
+  - gutter chrome should communicate focus and workspace ownership, not carry primary content meaning
+- Graceful lowering:
+  - rich: scrollable pane with honest status/focus chrome and bounded viewport behavior
+  - static: visible excerpt or current window with enough status context to explain where the user is
+  - pipe: lower to sequential text without pretending the hidden region is still interactively present
+  - accessible: linearize the pane content while preserving scroll position or focus context explicitly
+- Related families:
+  - `viewport()`
+  - `dagPane()`
+  - `createFramedApp()`
+  - `browsableList()`
+- Carbon analogue:
+  - closest to a scrollable content region or code viewer; not a direct Carbon family
+
 ## Overlay and shell families
 
 ### Overlay primitives

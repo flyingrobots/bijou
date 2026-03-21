@@ -17,9 +17,11 @@
  * ```
  */
 
+import { createSurface, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import {
   type ScrollState,
   viewport,
+  viewportSurface,
   createScrollState,
   scrollBy,
   scrollTo,
@@ -83,6 +85,33 @@ export function createPagerState(options: PagerOptions): PagerState {
   return {
     scroll: createScrollState(content, viewportHeight),
     content,
+    width,
+    height,
+  };
+}
+
+/**
+ * Create pager state for already-rendered surface content.
+ *
+ * Uses the surface height directly for scroll bounds so callers can keep
+ * pager composition on the `Surface` path without flattening content first.
+ */
+export function createPagerStateForSurface(
+  content: Surface,
+  options: Omit<PagerOptions, 'content'>,
+): PagerState {
+  const { width, height } = options;
+  const viewportHeight = Math.max(1, height - 1);
+  return {
+    scroll: {
+      y: 0,
+      maxY: Math.max(0, content.height - viewportHeight),
+      x: 0,
+      maxX: 0,
+      totalLines: content.height,
+      visibleLines: viewportHeight,
+    },
+    content: '',
     width,
     height,
   };
@@ -211,6 +240,50 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
   const status = `  Line ${currentLine}/${totalLines}`;
 
   return body + '\n' + status;
+}
+
+/**
+ * Render the pager directly into a surface.
+ *
+ * Pairs with {@link createPagerStateForSurface} so already-rendered pane
+ * content can stay on the structured surface path instead of dropping back
+ * through the string viewport helper.
+ */
+export function pagerSurface(
+  content: Surface,
+  state: PagerState,
+  options?: PagerRenderOptions,
+): Surface {
+  const showScrollbar = options?.showScrollbar ?? true;
+  const showStatus = options?.showStatus ?? true;
+  const safeWidth = Math.max(0, Math.floor(state.width));
+  const safeHeight = Math.max(0, Math.floor(state.height));
+
+  if (safeWidth === 0 || safeHeight === 0) return createSurface(0, 0);
+
+  const viewportHeight = showStatus
+    ? Math.max(1, safeHeight - 1)
+    : safeHeight;
+
+  const maxY = Math.max(0, content.height - viewportHeight);
+  const clampedY = Math.max(0, Math.min(state.scroll.y, maxY));
+  const body = viewportSurface({
+    width: safeWidth,
+    height: viewportHeight,
+    content,
+    scrollY: clampedY,
+    showScrollbar,
+  });
+
+  if (!showStatus) return body;
+
+  const currentLine = clampedY + 1;
+  const totalLines = content.height;
+  const status = stringToSurface(`  Line ${currentLine}/${totalLines}`, safeWidth, 1);
+  const result = createSurface(safeWidth, safeHeight, { char: ' ', empty: false });
+  result.blit(body, 0, 0);
+  result.blit(status, 0, safeHeight - 1);
+  return result;
 }
 
 // ---------------------------------------------------------------------------

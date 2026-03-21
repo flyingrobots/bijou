@@ -2,12 +2,13 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  createPagerState, pager, pagerScrollBy, pagerPageDown, pagerPageUp,
-  pagerScrollToTop, pagerScrollToBottom, pagerKeyMap, helpShort, vstack,
+  createPagerStateForSurface, pagerScrollBy, pagerPageDown, pagerPageUp,
+  pagerSurface,
+  pagerScrollToTop, pagerScrollToBottom, pagerKeyMap, helpShort, type PagerState,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { column, contentSurface, line } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 // Generate some content to page through
 const CONTENT = Array.from({ length: 80 }, (_, i) => {
@@ -15,6 +16,7 @@ const CONTENT = Array.from({ length: 80 }, (_, i) => {
   if (i % 10 === 0) return `  ── Section ${i / 10} ──`;
   return `  Line ${i}: ${'Lorem ipsum dolor sit amet'.repeat(Math.ceil(Math.random() * 2))}`;
 }).join('\n');
+const CONTENT_SURFACE = contentSurface(CONTENT);
 
 type Msg =
   | { type: 'scroll'; dy: number }
@@ -35,17 +37,17 @@ const keys = pagerKeyMap<Msg>({
 });
 
 interface Model {
-  pager: ReturnType<typeof createPagerState>;
+  pager: PagerState;
   cols: number;
   rows: number;
 }
 
 const app: App<Model, Msg> = {
   init: () => {
-    const cols = process.stdout.columns ?? 80;
-    const rows = process.stdout.rows ?? 24;
+    const cols = ctx.runtime.columns;
+    const rows = ctx.runtime.rows;
     return [{
-      pager: createPagerState({ content: CONTENT, width: cols, height: rows - 2 }),
+      pager: createPagerStateForSurface(CONTENT_SURFACE, { width: cols, height: rows - 2 }),
       cols,
       rows,
     }, []];
@@ -53,7 +55,7 @@ const app: App<Model, Msg> = {
 
   update: (msg, model) => {
     if (isResizeMsg(msg)) {
-      const p = createPagerState({ content: CONTENT, width: msg.columns, height: msg.rows - 2 });
+      const p = createPagerStateForSurface(CONTENT_SURFACE, { width: msg.columns, height: msg.rows - 2 });
       // Preserve scroll position across resize
       const clampedY = Math.min(model.pager.scroll.y, p.scroll.maxY);
       return [{ ...model, pager: { ...p, scroll: { ...p.scroll, y: clampedY } }, cols: msg.columns, rows: msg.rows }, []];
@@ -78,9 +80,13 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     const header = separator({ label: 'pager', width: model.cols });
-    const body = pager(model.pager);
+    const body = pagerSurface(CONTENT_SURFACE, model.pager);
     const help = `  ${helpShort(keys)}`;
-    return contentSurface(vstack(header, body, help));
+    return column([
+      contentSurface(header),
+      body,
+      line(help, model.cols),
+    ]);
   },
 };
 

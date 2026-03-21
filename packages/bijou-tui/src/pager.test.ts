@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
+import { stringToSurface, type Surface } from '@flyingrobots/bijou';
 import {
   createPagerState,
+  createPagerStateForSurface,
   pager,
+  pagerSurface,
   pagerScrollBy,
   pagerScrollTo,
   pagerScrollToTop,
@@ -17,6 +20,18 @@ import type { KeyMsg } from './types.js';
 
 const SHORT_CONTENT = 'line 1\nline 2\nline 3';
 const LONG_CONTENT = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`).join('\n');
+
+function plainSurface(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
 
 function keyMsg(key: string, mods?: Partial<KeyMsg>): KeyMsg {
   return { type: 'key', key, ctrl: false, alt: false, shift: false, ...mods };
@@ -48,6 +63,17 @@ describe('createPagerState', () => {
   it('handles height of 1 (minimum viewport of 1 line)', () => {
     const state = createPagerState({ content: LONG_CONTENT, width: 40, height: 1 });
     expect(state.scroll.visibleLines).toBe(1);
+  });
+});
+
+describe('createPagerStateForSurface', () => {
+  it('computes scroll bounds from surface height', () => {
+    const surface = stringToSurface('line1\nline2\nline3\nline4', 5, 4);
+    const state = createPagerStateForSurface(surface, { width: 20, height: 3 });
+
+    expect(state.scroll.visibleLines).toBe(2);
+    expect(state.scroll.totalLines).toBe(4);
+    expect(state.scroll.maxY).toBe(2);
   });
 });
 
@@ -176,6 +202,37 @@ describe('pager', () => {
     const output = pager(state);
     const lines = output.split('\n');
     expect(lines[0]).toContain('line 4');
+  });
+});
+
+describe('pagerSurface', () => {
+  it('renders surface content with a status line', () => {
+    const content = stringToSurface(LONG_CONTENT, 20, 50);
+    const state = createPagerStateForSurface(content, { width: 20, height: 5 });
+    const output = pagerSurface(content, state);
+    const lines = plainSurface(output).split('\n');
+
+    expect(lines).toHaveLength(5);
+    expect(lines[4]).toContain('Line 1/50');
+  });
+
+  it('status line updates with scroll position', () => {
+    const content = stringToSurface(LONG_CONTENT, 20, 50);
+    const state = pagerScrollBy(
+      createPagerStateForSurface(content, { width: 20, height: 5 }),
+      10,
+    );
+    const lines = plainSurface(pagerSurface(content, state)).split('\n');
+    expect(lines[4]).toContain('Line 11/50');
+  });
+
+  it('renders without status line when showStatus is false', () => {
+    const content = stringToSurface(LONG_CONTENT, 20, 50);
+    const state = createPagerStateForSurface(content, { width: 20, height: 5 });
+    const lines = plainSurface(pagerSurface(content, state, { showStatus: false })).split('\n');
+
+    expect(lines).toHaveLength(5);
+    expect(plainSurface(pagerSurface(content, state, { showStatus: false }))).not.toContain('Line');
   });
 });
 

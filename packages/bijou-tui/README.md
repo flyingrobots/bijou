@@ -514,17 +514,36 @@ const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
 const output = filePicker(state);
 ```
 
+### Pager
+
+```typescript
+import {
+  createPagerStateForSurface,
+  pagerSurface,
+  pagerScrollBy,
+} from '@flyingrobots/bijou-tui';
+
+const state = createPagerStateForSurface(contentSurface, { width: 60, height: 20 });
+const output = pagerSurface(contentSurface, state);
+```
+
 ### Focus Area
 
 ```typescript
 import {
-  createFocusAreaState, focusArea, focusAreaScrollBy,
+  createFocusAreaStateForSurface, focusAreaScrollBy, focusAreaSurface,
   focusAreaKeyMap,
 } from '@flyingrobots/bijou-tui';
 
-const state = createFocusAreaState({ content, width: 60, height: 20, overflowX: 'scroll' });
-const output = focusArea(state, { focused: true, ctx });
+const state = createFocusAreaStateForSurface(contentSurface, {
+  width: 60,
+  height: 20,
+  overflowX: 'scroll',
+});
+const output = focusAreaSurface(contentSurface, state, { focused: true, ctx });
 ```
+
+If the pane is still intentionally text-composed, `createFocusAreaState()` + `focusArea()` remain the explicit lowering path.
 
 ### DAG Pane
 

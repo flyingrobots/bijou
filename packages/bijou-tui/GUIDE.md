@@ -722,40 +722,62 @@ Shell doctrine:
 - split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
 - if a second region does not materially help the task, keep the app in a simpler single-surface flow
 
+## Pager
+
+Use `pagerSurface()` for long linear text that should stay on the structured `Surface` path while still showing pager status and scroll position.
+
+```typescript
+import {
+  createPagerStateForSurface,
+  pagerSurface,
+  pagerScrollBy,
+  pagerPageDown,
+} from '@flyingrobots/bijou-tui';
+
+const pagerState = createPagerStateForSurface(contentSurface, {
+  width: 80,
+  height: 24,
+});
+
+pagerSurface(contentSurface, pagerState);
+pagerScrollBy(pagerState, 1);
+pagerPageDown(pagerState);
+```
+
+If the content is intentionally text-first, `createPagerState()` + `pager()` remain the explicit lowering path.
+
 ## Focus Area
 
 A scrollable pane with a colored left gutter indicating focus state. Wraps `viewport()` with gutter chrome and horizontal overflow support.
 
 ```typescript
 import {
-  createFocusAreaState, focusArea, focusAreaSetContent,
+  createFocusAreaStateForSurface, focusAreaSurface,
   focusAreaScrollBy, focusAreaPageDown, focusAreaScrollByX,
   focusAreaKeyMap,
 } from '@flyingrobots/bijou-tui';
 
 // Create state with horizontal scrolling enabled
-const fa = createFocusAreaState({
-  content: longContent,
+const fa = createFocusAreaStateForSurface(contentSurface, {
   width: 60,
   height: 20,
   overflowX: 'scroll', // or 'hidden' (default)
 });
 
 // In TEA view — gutter is accent-colored when focused, muted when not
-focusArea(fa, { focused: true, ctx });
+focusAreaSurface(contentSurface, fa, { focused: true, ctx });
 
 // In TEA update — scroll transformers
 focusAreaScrollBy(fa, 1);      // down one line
 focusAreaPageDown(fa);          // one page
 focusAreaScrollByX(fa, 5);     // scroll right (only when overflowX='scroll')
-
-// Update content while preserving scroll position
-focusAreaSetContent(fa, newContent);
 ```
 
 The gutter character (`▎`) degrades gracefully:
 - **Interactive/static mode**: colored or unstyled gutter
 - **Pipe/accessible mode**: no gutter (full width to content)
+
+If your pane is still string-composed, `createFocusAreaState()` + `focusArea()` remain available as the explicit text-lowering path.
 
 ### Keymap
 
