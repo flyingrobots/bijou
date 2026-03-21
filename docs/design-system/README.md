@@ -85,7 +85,7 @@ If a component cannot answer that question, it probably belongs in `@flyingrobot
 
 ## Carbon-style documentation standard
 
-Every mature component-family page in Bijou should eventually include:
+Every mature component-family page in Bijou should include:
 
 - What it is
 - Variations
@@ -97,7 +97,7 @@ Every mature component-family page in Bijou should eventually include:
 - Related families
 - Closest Carbon analogue
 
-This standard is not fully met yet. Some family pages still describe semantic purpose and ownership without explicitly documenting graceful lowering across `rich`, `static`, `pipe`, and `accessible` contexts. Until those sections are present, those pages should be treated as incomplete design-system docs, not finished guidance.
+The component-family guide now meets this structural baseline and is checked by a repo preflight script. The content can still deepen over time, but missing required sections should now be treated as a documentation failure, not a normal state.
 
 ## Component-change gate
 

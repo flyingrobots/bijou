@@ -13,7 +13,7 @@ The goal is to stop thinking in terms of "every export is its own component."
 
 ## Documentation completeness status
 
-This page is still a working semantic map, not a finished component-family reference.
+This page is a living component-family reference.
 
 The stated design-system standard requires each mature family doc to include:
 
@@ -27,7 +27,7 @@ The stated design-system standard requires each mature family doc to include:
 - related families
 - closest Carbon analogue
 
-This slice closes two large structural gaps: every family below now calls out graceful lowering and related families explicitly, and the overlay families now carry real content guidance. The remaining incompleteness is still important, though. Many non-overlay families still need richer content guidance, stronger examples, and sharper edge-case policy before this page can be treated as fully mature doctrine.
+This page now meets the structural documentation standard for shipped families: every family below includes variants, usage guidance, content guidance, ownership, graceful lowering, related families, and a Carbon analogue. The remaining work is about depth and sharper examples, not missing required sections.
 
 ## Component slice checklist
 
@@ -54,6 +54,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - status is compact and local to another object
 - Avoid when:
   - message must stand alone or explain itself
+- Content guidance:
+  - keep badge labels terse, stable, and noun-like or state-like
+  - avoid embedding full sentences or multi-step guidance in badges
 - Ownership:
   - core
 - Graceful lowering:
@@ -77,6 +80,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - status should remain part of the page/document
 - Avoid when:
   - lifecycle/history/stacking is required
+- Content guidance:
+  - include the state, cause, and next useful action in the body when possible
+  - keep the headline short and let supporting text carry detail
 - Ownership:
   - core
 - Graceful lowering:
@@ -103,6 +109,9 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Avoid when:
   - stacking, routing, actions, or recall matter
   - the content should remain in page flow
+- Content guidance:
+  - keep the message short enough to scan without stopping the task
+  - avoid multiline operational detail that really belongs in notifications or a drawer
 - Ownership:
   - TUI
 - Graceful lowering:
@@ -132,6 +141,9 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Avoid when:
   - the content is primary page content
   - one local overlay is enough and app-wide lifecycle is unnecessary
+- Content guidance:
+  - titles should summarize the event, while body text should explain consequence or next step
+  - actionable notifications should expose one clear primary action instead of a menu of choices
 - Ownership:
   - TUI
 - Graceful lowering:
@@ -156,6 +168,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - order and accumulation matter
 - Avoid when:
   - the message should interrupt instead of accumulate
+- Content guidance:
+  - log lines should remain chronological, specific, and attributable
+  - avoid decorative phrasing that makes scanning and filtering harder
 - Ownership:
   - core
 - Graceful lowering:
@@ -181,6 +196,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - grouping and containment matter
 - Avoid when:
   - urgency or interruption is the primary job
+- Content guidance:
+  - titles should describe the region’s job, not restate surrounding context
+  - keep dense prose out of narrow boxes unless wrapping materially helps comprehension
 - Ownership:
   - core
 - Graceful lowering:
@@ -205,6 +223,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - a section boundary is needed without full containment
 - Avoid when:
   - the content needs its own grouped region
+- Content guidance:
+  - labels should name the next section or state, not repeat a page title
+  - use dividers sparingly so they mark real boundaries rather than visual noise
 - Ownership:
   - core
 - Graceful lowering:
@@ -231,6 +252,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the user is providing text rather than choosing from a fixed set
 - Avoid when:
   - choices are already known and enumerable
+- Content guidance:
+  - prompts should describe the expected input shape and any critical constraints
+  - placeholders and defaults should clarify intent, not substitute for the label
 - Ownership:
   - core
 - Graceful lowering:
@@ -258,6 +282,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the result is stored value state
 - Avoid when:
   - selecting should trigger an app command rather than persist a value
+- Content guidance:
+  - option labels should be distinct, parallel, and easy to scan
+  - searchable choice should use concise matching text, not long descriptive paragraphs
 - Ownership:
   - core
 - Graceful lowering:
@@ -281,6 +308,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the user is building a set
 - Avoid when:
   - the choice is singular or immediate action-oriented
+- Content guidance:
+  - options should read like members of one set, not unrelated commands
+  - summary text should make selection state obvious without requiring visual checkboxes
 - Ownership:
   - core
 - Graceful lowering:
@@ -304,6 +334,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the decision is genuinely binary
 - Avoid when:
   - nuance, comparison, or explanation is needed
+- Content guidance:
+  - questions should be explicit about the consequence of yes versus no
+  - destructive confirmations should name the thing being changed or removed
 - Ownership:
   - core
 - Graceful lowering:
@@ -330,6 +363,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the user is progressing through related inputs
 - Avoid when:
   - the fields are unrelated or the result is a command
+- Content guidance:
+  - each step or group should have a clear goal and avoid mixing unrelated concepts
+  - summaries and progress text should orient the user without duplicating every field label
 - Ownership:
   - core
 - Graceful lowering:
@@ -356,6 +392,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - views are peers and only one is active
 - Avoid when:
   - order or hierarchy is the main idea
+- Content guidance:
+  - tab labels should be short destination names, not action phrases
+  - unread counts or compact status belong in secondary adornments, not the core label
 - Ownership:
   - core
 - Graceful lowering:
@@ -381,6 +420,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - detail is secondary to summary
 - Avoid when:
   - sections are peers that deserve first-class navigation
+- Content guidance:
+  - section headers should summarize the concealed content well enough to support scanning
+  - disclosed content should stay tightly related to its summary row
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -407,6 +449,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the UI needs wayfinding or progress communication
 - Avoid when:
   - tabs or lists express the job more clearly
+- Content guidance:
+  - path and progress labels should emphasize where the user is, not every possible destination
+  - step titles should be stable and action-oriented enough to support review and recovery
 - Ownership:
   - core
 - Graceful lowering:
@@ -437,6 +482,9 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Avoid when:
   - hierarchy or dependency structure dominates
   - items are primarily one-dimensional and should read as a list instead
+- Content guidance:
+  - column headers should describe comparable attributes, not narrative explanations
+  - cell text should stay compact enough that wrapping does not obscure the comparison task
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -463,6 +511,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - parent/child nesting is the mental model
 - Avoid when:
   - multiple parents or graph dependencies matter
+- Content guidance:
+  - labels should make nesting meaningful even when indentation is flattened or linearized
+  - path context should be explicit when many siblings have similar names
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -489,6 +540,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - one-dimensional items are being scanned or explored
 - Avoid when:
   - columns or hierarchy carry the meaning
+- Content guidance:
+  - list rows should begin with the most distinguishing label or identifier
+  - descriptions should help the scan task, not turn each row into a paragraph
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -521,6 +575,9 @@ If those checks fail, the component work is not doctrinally complete yet.
   - time or dependency is the actual structure
 - Avoid when:
   - a plain table or tree is enough
+- Content guidance:
+  - events and nodes should expose the causal or temporal relationship, not just labels
+  - annotations should stay lightweight enough that the structure remains legible
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:

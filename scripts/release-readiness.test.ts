@@ -7,6 +7,7 @@ describe('release-readiness', () => {
     expect(plan.map((step) => step.label)).toEqual([
       'build',
       'typecheck:test',
+      'docs:design-system:preflight',
       'workflow:shell:preflight',
       'release:preflight',
       'test:frames',
@@ -43,6 +44,7 @@ describe('release-readiness', () => {
     expect(executed).toEqual([
       '/tmp/bijou:build',
       '/tmp/bijou:typecheck:test',
+      '/tmp/bijou:docs:design-system:preflight',
       '/tmp/bijou:workflow:shell:preflight',
       '/tmp/bijou:release:preflight',
       '/tmp/bijou:test:frames',
