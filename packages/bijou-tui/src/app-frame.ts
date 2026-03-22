@@ -444,8 +444,8 @@ export function createFramedApp<PageModel, Msg>(
     msg: MouseMsg,
     model: InternalFrameModel<PageModel, Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
-    if (msg.action !== 'press' || msg.button !== 'left') return undefined;
     if (model.helpOpen || model.commandPalette != null) return [model, []];
+    if (msg.action !== 'press' || msg.button !== 'left') return undefined;
 
     if (frameNotificationOptions.enabled) {
       const nowMs = resolveClock(resolveSafeCtx()).now();
