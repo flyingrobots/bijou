@@ -522,11 +522,14 @@ If those checks fail, the component work is not doctrinally complete yet.
   - parent/child nesting is the mental model
 - Avoid when:
   - multiple parents or graph dependencies matter
+  - the interaction is really filesystem traversal, where `filePicker()` / `filePickerSurface()` are more honest
+  - dense comparison matters more than nesting
 - Content guidance:
   - labels should make nesting meaningful even when indentation is flattened or linearized
   - path context should be explicit when many siblings have similar names
   - use `filePickerSurface()` when the picker lives inside a rich TUI pane and should inherit shared viewport masking semantics; keep `filePicker()` as the explicit text-lowering path
   - directories should remain visually distinct from files, and moving to a parent or child path should be explicit rather than hidden behind overloaded actions
+  - `tree()` should stay focused on passive hierarchy display; if arbitrary hierarchy needs keyboard-owned non-filesystem inspection later, that should become an explicit interactive tree family instead of overloading `tree()` itself
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -594,6 +597,10 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - events and nodes should expose the causal or temporal relationship, not just labels
   - annotations should stay lightweight enough that the structure remains legible
+  - use `timeline()` when chronology is the actual reading path, not as a decorative status list
+  - if timeline rows become so dense that the user is comparing attributes instead of following sequence, collapse to summary milestones plus drill-down or move to a table/log view
+  - use `dag()` / `dagPane()` when causality, dependency, or multi-parent structure matters more than order
+  - audit-trail timelines should preserve event ordering and consequence clearly, but avoid stuffing each row with enough metadata that the temporal story disappears
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -854,8 +861,6 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 These are shipped, but the guidance is still thinner than it should be:
 
-- `alert()` versus notifications versus `toast()`
-- `tree()` versus future interactive tree behavior
-- `timeline()` density and audit-trail guidance
-- `commandPalette()` modes beyond simple action search
-- mouse-first interaction policy for shell and overlay families
+- `note()` public example coverage and cross-linking with the status-escalation ladder
+- `breadcrumb()` / `paginator()` / `stepper()` scenario guidance beyond catalog usage
+- `canvas()` and shader-family guidance for when decorative motion is justified versus distracting

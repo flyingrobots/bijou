@@ -289,6 +289,13 @@ Avoid when:
 Use when:
 
 - the primary relationship is parent/child
+- the user needs to understand nesting or containment
+
+Avoid when:
+
+- multiple parents or dependency edges matter
+- the user is really traversing filesystem paths, where `filePickerSurface()` is more honest
+- dense row/column comparison would communicate the content more clearly than nesting
 
 ### `dag()`
 
@@ -296,6 +303,19 @@ Use when:
 
 - the primary relationship is dependency or flow
 - multiple parents or graph edges matter
+
+### `timeline()`
+
+Use when:
+
+- chronology is the main structure
+- events should read as a sequence, milestone trail, or audit-oriented progression
+
+Avoid when:
+
+- dependency or causality matters more than ordering
+- the content is so dense that a table, log, or summary-plus-detail drill-down would be more readable
+- the user is really comparing attributes across many events rather than following a temporal story
 
 ## 4. Disclosure and progressive complexity
 

@@ -784,6 +784,7 @@ Shell doctrine:
 - status rails are for concise global context, not page prose
 - split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
 - if a second region does not materially help the task, keep the app in a simpler single-surface flow
+- mouse is enhancement: overlays should consume pointer input before shell/background content, and click targets should mirror existing keyboard behavior
 
 If palette entries start looking like stored field values, move that interaction back to core `select()` / `filter()` / `multiselect()` instead of overloading the shell palette.
 

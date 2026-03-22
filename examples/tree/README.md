@@ -1,6 +1,6 @@
 # `tree()`
 
-Hierarchical tree views
+Passive hierarchical view for parent/child nesting.
 
 ![demo](demo.gif)
 
@@ -10,59 +10,22 @@ Hierarchical tree views
 npx tsx examples/tree/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { tree, separator } from '@flyingrobots/bijou';
+- parent/child nesting is the mental model
+- the user should read hierarchy, not operate a full browser-like workspace
+- indentation and containment communicate the meaning better than columns
 
-console.log(separator({ label: 'project structure', ctx }));
-console.log();
+## Choose something else when
 
-console.log(tree([
-  { label: 'src', children: [
-    { label: 'components', children: [
-      { label: 'box.ts' },
-      { label: 'table.ts' },
-      { label: 'tree.ts' },
-    ]},
-    { label: 'forms', children: [
-      { label: 'input.ts' },
-      { label: 'select.ts' },
-    ]},
-    { label: 'theme', children: [
-      { label: 'tokens.ts' },
-      { label: 'presets.ts' },
-      { label: 'gradient.ts' },
-    ]},
-    { label: 'index.ts' },
-  ]},
-  { label: 'tests', children: [
-    { label: 'components.test.ts' },
-    { label: 'theme.test.ts' },
-  ]},
-  { label: 'package.json' },
-  { label: 'tsconfig.json' },
-], { ctx }));
+- choose `filePickerSurface()` when the interaction is really filesystem traversal
+- choose `dag()` when multiple parents or dependency flow matter
+- choose `table()` when comparison across attributes matters more than nesting
 
-console.log();
-console.log(separator({ label: 'dependency tree', ctx }));
-console.log();
+## What this example proves
 
-console.log(tree([
-  { label: '@flyingrobots/bijou-node', children: [
-    { label: '@flyingrobots/bijou', children: [
-      { label: '(zero dependencies)' },
-    ]},
-    { label: 'chalk@5.6.2', children: [
-      { label: '#ansi-styles@6.2.1' },
-      { label: '#supports-color@9.4.0' },
-    ]},
-  ]},
-  { label: '@flyingrobots/bijou-tui', children: [
-    { label: '@flyingrobots/bijou' },
-  ]},
-], { ctx }));
-```
+- `tree()` as a passive hierarchy renderer
+- readable nesting that still makes sense when flattened into textual output
+- the distinction between general hierarchy display and richer interactive browsing families
 
 [← Examples](../README.md)

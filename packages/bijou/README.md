@@ -87,6 +87,12 @@ Those docs answer the questions the API reference cannot:
 - Use `tableSurface()` when the job is still passive comparison, but your V3 app is already composing `Surface` output.
 - Use `navigableTable()` from `@flyingrobots/bijou-tui` when the user needs keyboard-owned row or cell inspection instead of passive reading.
 
+### Hierarchy and chronology
+
+- Use `tree()` when parent/child nesting is the main thing the reader needs to understand.
+- Use `timeline()` when chronology is the actual reading path.
+- Move to `dag()` when dependency or causal flow matters more than simple order or nesting.
+
 ## Components
 
 ### Layout

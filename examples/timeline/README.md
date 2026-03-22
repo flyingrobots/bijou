@@ -1,6 +1,6 @@
 # `timeline()`
 
-Event timelines with status
+Chronological event view for milestone trails, release history, and audit-style sequences.
 
 ![demo](demo.gif)
 
@@ -10,24 +10,22 @@ Event timelines with status
 npx tsx examples/timeline/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { timeline, separator } from '@flyingrobots/bijou';
+- chronology is the main structure
+- the reader should follow a sequence of events or milestones
+- a temporal story is more important than attribute comparison
 
-console.log(separator({ label: 'release history', ctx }));
-console.log();
+## Choose something else when
 
-console.log(timeline([
-  { label: 'Project created', description: 'Initial commit', status: 'success' },
-  { label: 'v0.1.0 released', description: 'Core components, forms, theme engine', status: 'success' },
-  { label: 'Hexagonal refactor', description: 'Ports & adapters, zero-dep core', status: 'success' },
-  { label: 'v0.2.0 released', description: 'TEA runtime, animations, layouts, keybindings', status: 'success' },
-  { label: 'Examples catalog', description: '43 demos with VHS recordings', status: 'info' },
-  { label: 'v0.3.0', description: 'DAG renderer, browsable list, textarea', status: 'warning' },
-  { label: 'v1.0.0', description: 'Stable API, full test coverage', status: 'muted' },
-], { ctx }));
-```
+- choose `log()` when accumulation and raw chronology matter more than milestone presentation
+- choose `table()` when users are really comparing attributes across many events
+- choose `dag()` when causal or dependency structure matters more than simple order
+
+## What this example proves
+
+- `timeline()` as a chronological status view
+- milestone rows that stay readable without turning into dense data tables
+- a temporal reading path that still degrades cleanly into text output
 
 [← Examples](../README.md)

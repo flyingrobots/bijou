@@ -150,6 +150,7 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use `commandPaletteSurface()` for action discovery and navigation inside the shell, not as a substitute value picker.
 - Use notifications for events and follow-up, not as a replacement for the status rail.
 - Keep status rails concise and global; explanatory text belongs in the page, not in shell chrome.
+- Mouse is enhancement, not baseline. Overlay layers should consume pointer input before shell chrome or page content, and every click target should mirror an existing keyboard path.
 
 ## Animation
 

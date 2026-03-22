@@ -31,6 +31,12 @@ Pointer events should resolve from most interruptive layer to least:
 
 Background content should not keep receiving pointer actions while a true modal surface is open.
 
+For shell and overlay families specifically:
+
+- `modal()` should consume pointer input ahead of everything behind it
+- notifications and ad hoc overlays should consume clicks before shell chrome or page content
+- shell tabs, palette rows, and pane-scoped overlay controls should behave like pointer shortcuts for already-available keyboard actions, not as pointer-exclusive product paths
+
 ## Click policy
 
 Clicks should usually mirror an existing keyboard action:
@@ -64,6 +70,8 @@ The current first-class mouse baseline in `@flyingrobots/bijou-tui` should be:
 - shell tabs are clickable
 - notification cards support click-to-dismiss and click-to-activate
 - mouse requires explicit runtime opt-in with `run(app, { mouse: true })`
+- modal-style overlays block background pointer interaction
+- shell/pane pointer routing should remain subordinate to overlay routing when interruptive surfaces are open
 
 Further component adoption should follow the same rule:
 

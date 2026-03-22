@@ -47,6 +47,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Shared showcase and canary bridge cleanup** — the canonical workbench, showcase detail views, transitions demo, and core static canary now avoid badge-string bridge residue where the badge component was not the thing being demonstrated, leaving the remaining bridges concentrated in actual badge-focused previews and a few string-first layout demos.
 - **Overlay and shell docs pass** — the design-system guides, `@flyingrobots/bijou-tui` docs, examples index, and overlay/shell example READMEs now agree on the overlay escalation ladder, shell role split, and current surface-native APIs, and the missing `drawer`, `tooltip`, and `app-frame` example docs are now first-class pages instead of gaps.
 - **Selection and status docs pass** — the design-system patterns, component-family docs, core/package guides, and the `select`, `filter`, `multiselect`, `confirm`, `command-palette`, `alert`, and `notifications` example docs now more clearly distinguish value-picking prompts from action discovery and sharpen the status-escalation ladder around `note()`, `alert()`, `toast()`, and notifications.
+- **Hierarchy, timeline, and pointer docs pass** — the design-system and package docs now draw sharper lines between hierarchy, chronology, and dependency views, and the `tree`, `timeline`, and `mouse` example docs now explicitly teach passive hierarchy, temporal/audit usage, and keyboard-first mouse enhancement instead of acting like raw catalog stubs.
 
 ### 🐛 Fixes
 

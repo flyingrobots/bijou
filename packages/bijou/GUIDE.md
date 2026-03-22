@@ -65,6 +65,10 @@ console.log(table(data, {
 
 Use `table()` when passive row/column comparison is the job. If your V3 app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
 
+### Hierarchy & chronology
+
+Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`.
+
 ### Progress & Spinners
 
 ```typescript

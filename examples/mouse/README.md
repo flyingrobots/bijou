@@ -1,6 +1,6 @@
-# mouse
+# `parseMouse()`, `MouseMsg`
 
-Mouse event inspector showing clicks, releases, scrolls, and drags with modifier keys.
+Mouse event inspector for the keyboard-first pointer layer in `@flyingrobots/bijou-tui`.
 
 ## Run
 
@@ -8,16 +8,21 @@ Mouse event inspector showing clicks, releases, scrolls, and drags with modifier
 npx tsx examples/mouse/main.ts
 ```
 
-## Source
+## Use this when
 
-```ts
-run(app, { mouse: true });
+- you are validating terminal mouse parsing and routing
+- you need to inspect clicks, releases, scrolls, drags, and modifiers
+- you are designing mouse enhancement for an existing keyboard-first interaction
 
-// In update:
-if (isMouseMsg(msg)) {
-  // msg.button: 'left' | 'middle' | 'right' | 'none'
-  // msg.action: 'press' | 'release' | 'move' | 'scroll-up' | 'scroll-down'
-  // msg.col, msg.row: 0-based terminal coordinates
-  // msg.ctrl, msg.alt, msg.shift: modifier keys
-}
-```
+## Choose something else when
+
+- choose normal component examples when you are evaluating the product pattern itself rather than raw pointer events
+- do not treat this as a license to invent pointer-only flows with no keyboard parity
+
+## What this example proves
+
+- `run(app, { mouse: true })` runtime opt-in
+- `MouseMsg` shape for buttons, actions, coordinates, and modifiers
+- the raw input layer that shell tabs, notifications, and future spatial controls build on
+
+[← Examples](../README.md)
