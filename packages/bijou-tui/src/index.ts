@@ -214,7 +214,7 @@ export {
 } from './transition-shaders.js';
 
 // Status bar
-export { statusBar } from './status-bar.js';
+export { statusBar, statusBarSurface } from './status-bar.js';
 export type { StatusBarOptions } from './status-bar.js';
 
 // Animation — spring physics & tweens
@@ -313,9 +313,13 @@ export {
 export {
   type BindingSource,
   type HelpOptions,
+  type HelpSurfaceOptions,
   helpView,
+  helpViewSurface,
   helpShort,
+  helpShortSurface,
   helpFor,
+  helpForSurface,
 } from './help.js';
 
 // Input stack

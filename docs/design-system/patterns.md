@@ -374,7 +374,7 @@ Content guidance:
 - shell notifications and overlays should remain subordinate to the active page task
 - help text should clarify shell behavior, not restate page content
 
-### `statusBar()`
+### `statusBar()` and `statusBarSurface()`
 
 Use when:
 
@@ -387,8 +387,27 @@ Avoid when:
 Content guidance:
 
 - keep status text short, global, and low-drama
+- use `statusBarSurface()` when shell chrome is already being composed as a `Surface`
+- keep `statusBar()` for explicit text output or lowering
 - reserve strong emphasis for mode changes, faults, or focus-critical state
 - do not turn the status bar into a secondary page body
+
+### `helpShort()` / `helpView()` and surface companions
+
+Use when:
+
+- keyboard ownership is real and shortcut discovery needs a concise hint or grouped reference
+
+Avoid when:
+
+- the text would only restate visible controls without clarifying behavior or scope
+
+Content guidance:
+
+- use `helpShortSurface()` for shell hints that stay on the structured `Surface` path
+- use `helpViewSurface()` for grouped shortcut references embedded inside a rich TUI surface or modal
+- keep the plain string helpers for explicit lowering, pipe output, or textual docs/examples
+- group by user intent (`Navigation`, `Actions`, `Selection`) rather than by key shape
 
 ### `splitPane()` and `grid()`
 

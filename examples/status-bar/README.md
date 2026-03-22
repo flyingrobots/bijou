@@ -1,3 +1,16 @@
+# `statusBar()`, `statusBarSurface()`
+
+Segmented shell status rails
+
+## Run
+
+```sh
+npx tsx examples/status-bar/main.ts
+```
+
+## Code
+
+```typescript
 import { ctx } from '../_shared/setup.js';
 import { separatorSurface } from '@flyingrobots/bijou';
 import { statusBarSurface } from '@flyingrobots/bijou-tui';
@@ -15,3 +28,8 @@ const surface = column([
 ]);
 
 console.log(renderSurface(surface, ctx));
+```
+
+Use `statusBarSurface()` when shell chrome is already part of a structured `Surface` composition path. Keep `statusBar()` for explicit text output, logs, or other lowering boundaries where a plain string is still the right artifact.
+
+[← Examples](../README.md)

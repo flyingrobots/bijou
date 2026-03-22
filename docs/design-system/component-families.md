@@ -679,9 +679,10 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Family:
   - `createFramedApp()`
   - `statusBar()`
+  - `statusBarSurface()`
   - `commandPalette()`
 - Variants:
-  - shell, status rail, action discovery
+  - shell container, status rail, action discovery
 - Use when:
   - the app has multiple views, overlays, navigation, and shell chrome
 - Avoid when:
@@ -690,6 +691,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - TUI
 - Content guidance:
   - the shell should frame destinations and workspace state, not become a dumping ground for unrelated metadata
+  - use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output or lowering
   - status lines should carry concise global context, not replace in-page guidance
   - command palette entries should prefer actions and navigation targets over field-style data entry
   - tabs should represent peer destinations or work areas, not disguised command buttons
@@ -700,11 +702,47 @@ If those checks fail, the component work is not doctrinally complete yet.
   - accessible: linearize active shell state, navigation context, and current overlays into one readable flow
 - Related families:
   - `statusBar()`
+  - `helpShortSurface()`
   - `tabs()`
   - `commandPalette()`
   - notification system
 - Carbon analogue:
   - shell, header/footer, command palette
+
+### Keybinding help and shell hints
+
+- Family:
+  - `createKeyMap()`
+  - `helpView()`
+  - `helpViewSurface()`
+  - `helpShort()`
+  - `helpShortSurface()`
+  - `helpFor()`
+  - `helpForSurface()`
+- Variants:
+  - grouped reference, single-line hint, filtered subset, explicit text output, structured-surface output
+- Use when:
+  - the app is keyboard-owned and the user needs discoverable shortcuts or a grouped command reference
+- Avoid when:
+  - the controls are already obvious from context and the help text would just restate visible labels
+- Ownership:
+  - TUI
+- Content guidance:
+  - use `helpShortSurface()` for shell hints that should stay on the structured `Surface` path; keep `helpShort()` for explicit text output or lowering
+  - use `helpViewSurface()` when the full keybinding reference is embedded inside a rich TUI surface; keep `helpView()` for plain text and pipe-oriented help
+  - group names should describe jobs (`Navigation`, `Actions`, `Selection`) rather than raw input mechanics
+  - help text should clarify behavior and scope, not repeat page prose or become a substitute command palette
+- Graceful lowering:
+  - rich: concise shell hints plus an optional grouped help view or modal
+  - static: retain the active hint and the relevant grouped reference without pretending background input is live
+  - pipe: lower to plain text shortcut summaries and grouped help blocks
+  - accessible: linearize help content into readable sections with explicit scope and action labels
+- Related families:
+  - `createFramedApp()`
+  - `statusBarSurface()`
+  - `commandPalette()`
+- Carbon analogue:
+  - keyboard shortcuts help, command reference, hotkey cheat sheet
 
 ### Workspace layout
 
@@ -749,6 +787,5 @@ These are shipped, but the guidance is still thinner than it should be:
 - `alert()` versus notifications versus `toast()`
 - `tree()` versus future interactive tree behavior
 - `timeline()` density and audit-trail guidance
-- `statusBar()` as a shell pattern
 - `commandPalette()` modes beyond simple action search
 - mouse-first interaction policy for shell and overlay families

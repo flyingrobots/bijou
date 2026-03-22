@@ -58,7 +58,6 @@ Release intent:
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| **Surface-Native Shell Utilities** | bijou-tui | `statusBar()` and the help renderers still expose text-first shell-chrome APIs even though the frame shell itself now composes structured surfaces. Add surface-native companions so shell chrome stops teaching the old seam. |
 | **Viewport Scroll Unification** | bijou-tui | Treat `viewportSurface()` as the canonical scroll-mask primitive and converge bespoke scroll-window components on it. Current ad hoc candidates are `browsableList()`, `navigableTable()`, `filePicker()`, and `commandPalette()`. `pagerSurface()`, `focusAreaSurface()`, and `dagPane()` already sit on the right layering path. |
 | **Design-System Documentation Completeness** | docs | The component-family guide now has a structural completeness gate in CI (`docs:design-system:preflight`). Remaining work is deeper content guidance, stronger examples, and sharper edge-case policy. |
 | **Component Guidance & Carbon-Style Usage Docs** | docs + examples + package READMEs | Keep expanding the “what this is / variants / use / avoid / graceful lowering / related families” doctrine until the public docs actually support the design system they claim to describe. |

@@ -23,6 +23,7 @@ import {
   enumeratedList,
   markdown,
 } from '@flyingrobots/bijou';
+import { statusBarSurface } from '@flyingrobots/bijou-tui';
 import type { ComponentEntry } from './types.js';
 import { badgeSurface, column, row, spacer } from '../_shared/example-surfaces.ts';
 
@@ -1058,17 +1059,15 @@ const TUI: ComponentEntry[] = [
     description: [
       '# statusBar()',
       '',
-      'Single-line status bar with left, center, and right segments.',
-      'Fill character customizable.',
+      'Single-line status rail with left, center, and right segments.',
+      'Use `statusBarSurface()` when shell chrome stays on the structured surface path.',
     ].join('\n'),
-    render: (_w, _ctx) => {
-      // statusBar is imported from bijou-tui; use a simple mock render
-      const w2 = 40;
-      const left = ' NORMAL';
-      const right = 'Ln 42, Col 8 ';
-      const gap = w2 - left.length - right.length;
-      return left + ' '.repeat(Math.max(1, gap)) + right;
-    },
+    render: () => statusBarSurface({
+      left: ' NORMAL',
+      center: 'TypeScript',
+      right: 'Ln 42, Col 8 ',
+      width: 40,
+    }),
   },
 ];
 

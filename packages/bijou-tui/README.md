@@ -142,7 +142,8 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use `createFramedApp()` when the app has multiple destinations, overlays, and workspace state that should be standardized.
 - Use `splitPane()` when the user benefits from primary-versus-secondary context or side-by-side comparison.
 - Use `grid()` when multiple stable regions deserve simultaneous visibility.
-- Keep `statusBar()` concise and global; explanatory text belongs in the page, not in shell chrome.
+- Use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output.
+- Keep status rails concise and global; explanatory text belongs in the page, not in shell chrome.
 
 ## Animation
 
@@ -413,11 +414,21 @@ kb.enable('Quit');
 Auto-generate help text from registered bindings:
 
 ```typescript
-import { helpView, helpShort, helpFor } from '@flyingrobots/bijou-tui';
+import {
+  helpView,
+  helpViewSurface,
+  helpShort,
+  helpShortSurface,
+  helpFor,
+  helpForSurface,
+} from '@flyingrobots/bijou-tui';
 
-helpView(kb);           // full grouped multi-line help
-helpShort(kb);          // "q Quit • ? Help • Ctrl+c Force quit • j Down • k Up"
-helpFor(kb, 'Nav');     // only Navigation group
+helpView(kb);                       // full grouped multi-line help
+helpShort(kb);                      // "q Quit • ? Help • Ctrl+c Force quit • j Down • k Up"
+helpFor(kb, 'Nav');                 // only Navigation group
+helpShortSurface(kb, { width: 48 }); // shell hint that stays on the Surface path
+helpViewSurface(kb, { width: 48 });  // grouped help as a Surface
+helpForSurface(kb, 'Nav', { width: 48 });
 ```
 
 ### Input Stack

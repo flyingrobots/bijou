@@ -1,10 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator } from '@flyingrobots/bijou';
+import { separatorSurface } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createKeyMap, helpView, helpShort, vstack,
+  createKeyMap, helpViewSurface, helpShortSurface,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { column, line, row } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -70,28 +70,31 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = ['', '  Task List', ''];
+    const rows: Array<string | ReturnType<typeof helpViewSurface>> = ['', '  Task List', ''];
 
     for (let i = 0; i < model.items.length; i++) {
       const cursor = i === model.selected ? '>' : ' ';
-      lines.push(`  ${cursor} ${model.items[i]}`);
+      rows.push(`  ${cursor} ${model.items[i]}`);
     }
 
     if (model.items.length === 0) {
-      lines.push('  (empty)');
+      rows.push('  (empty)');
     }
 
-    lines.push('');
+    rows.push('');
 
     if (model.showHelp) {
-      lines.push(separator({ label: 'help', width: 50 }));
-      lines.push(helpView(keys, { title: 'Keybindings' }));
+      rows.push(separatorSurface({ label: 'help', width: 50, ctx }));
+      rows.push(helpViewSurface(keys, { title: 'Keybindings', width: 50 }));
     } else {
-      lines.push(`  ${helpShort(keys)}`);
+      rows.push(row([
+        '  ',
+        helpShortSurface(keys, { width: Math.max(1, ctx.runtime.columns - 2) }),
+      ]));
     }
 
-    lines.push('');
-    return ansiSurface(lines.join('\n'), ctx.runtime.columns, ctx.runtime.rows);
+    rows.push('');
+    return column(rows);
   },
 };
 

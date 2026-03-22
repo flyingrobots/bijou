@@ -539,7 +539,7 @@ Descriptors are case-insensitive — `'Ctrl+C'` and `'ctrl+c'` are equivalent.
 ### Full Help View
 
 ```typescript
-import { helpView } from '@flyingrobots/bijou-tui';
+import { helpView, helpViewSurface } from '@flyingrobots/bijou-tui';
 
 const help = helpView(kb);
 // Navigation
@@ -551,23 +551,28 @@ const help = helpView(kb);
 //   q       Quit
 //   ?       Toggle help
 //   Ctrl+c  Force quit
+
+const helpSurface = helpViewSurface(kb, { width: 48 });
 ```
 
 ### Short Help
 
 ```typescript
-import { helpShort } from '@flyingrobots/bijou-tui';
+import { helpShort, helpShortSurface } from '@flyingrobots/bijou-tui';
 
 helpShort(kb);
 // "q Quit • ? Toggle help • Ctrl+c Force quit • j Down • k Up • Shift+Tab Previous"
+
+helpShortSurface(kb, { width: 48 });
 ```
 
 ### Filtered Help
 
 ```typescript
-import { helpFor } from '@flyingrobots/bijou-tui';
+import { helpFor, helpForSurface } from '@flyingrobots/bijou-tui';
 
 helpFor(kb, 'Nav');  // only Navigation group (prefix match, case-insensitive)
+helpForSurface(kb, 'Nav', { width: 48 });
 ```
 
 ### Options
@@ -581,6 +586,7 @@ helpView(kb, {
 ```
 
 Help functions accept any `BindingSource` — not just `KeyMap`. You can implement custom binding sources for dynamic help content.
+Use the `*Surface()` companions when the hint or help panel should stay on the structured `Surface` path, and keep the string helpers for explicit lowering or plain-text output.
 
 ## Input Stack
 
@@ -770,6 +776,7 @@ See `examples/release-workbench/main.ts` for a full canonical shell implementati
 Shell doctrine:
 
 - tabs are for peer destinations, not command buttons
+- use `statusBarSurface()` when status rails stay on the structured shell path; keep `statusBar()` for explicit text output
 - status rails are for concise global context, not page prose
 - split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
 - if a second region does not materially help the task, keep the app in a simpler single-surface flow

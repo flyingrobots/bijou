@@ -97,7 +97,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
 | [`toast`](./toast/) | `toast()`, `composite()` | Low-level transient overlay primitive with explicit anchoring |
 | [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and history center |
-| [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
+| [`help`](./help/) | `createKeyMap()`, `helpViewSurface()`, `helpShortSurface()` | Keybinding manager with surface-native help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |
 | [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
@@ -115,7 +115,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
-| [`status-bar`](./status-bar/) | `statusBar()` | Segmented header/footer with fill characters |
+| [`status-bar`](./status-bar/) | `statusBar()`, `statusBarSurface()` | Segmented header/footer with explicit text and surface paths |
 | [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
 | [`command-palette`](./command-palette/) | `commandPalette()`, `commandPaletteKeyMap()` | Filterable action list with live search |
 | [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
