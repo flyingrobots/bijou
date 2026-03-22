@@ -128,12 +128,12 @@ When a child's `content` is a function, it receives the allocated `(width, heigh
 
 ## Split Pane Layout
 
-Use `splitPane()` for two-pane shells with a stateful ratio and focus.
+Use `splitPaneSurface()` for two-pane shells when the pane bodies are already structured `Surface` values. Keep `splitPane()` for explicit text-lowering paths.
 
 ```typescript
 import {
   createSplitPaneState,
-  splitPane,
+  splitPaneSurface,
   splitPaneResizeBy,
   splitPaneFocusNext,
 } from '@flyingrobots/bijou-tui';
@@ -145,7 +145,7 @@ split = splitPaneResizeBy(split, 2, { total: cols, minA: 16, minB: 16 });
 split = splitPaneFocusNext(split);
 
 // In view:
-const output = splitPane(split, {
+const output = splitPaneSurface(split, {
   direction: 'row',
   width: cols,
   height: rows,
@@ -158,12 +158,12 @@ const output = splitPane(split, {
 
 ## Grid Layout
 
-Use `grid()` for named-area page composition with fixed and fractional tracks.
+Use `gridSurface()` for named-area page composition when the regions are already structured `Surface` values. Keep `grid()` for explicit text-lowering paths.
 
 ```typescript
-import { grid } from '@flyingrobots/bijou-tui';
+import { gridSurface } from '@flyingrobots/bijou-tui';
 
-const output = grid({
+const output = gridSurface({
   width: cols,
   height: rows,
   columns: [24, '1fr'],

@@ -289,7 +289,7 @@ Prefer `vstackSurface()` / `hstackSurface()` / `placeSurface()` when the view is
 
 ```typescript
 import {
-  createSplitPaneState, splitPane, splitPaneResizeBy, splitPaneFocusNext,
+  createSplitPaneState, splitPaneSurface, splitPaneResizeBy, splitPaneFocusNext,
 } from '@flyingrobots/bijou-tui';
 
 let state = createSplitPaneState({ ratio: 0.35 });
@@ -299,7 +299,7 @@ state = splitPaneResizeBy(state, 2, { total: cols, minA: 16, minB: 16 });
 state = splitPaneFocusNext(state);
 
 // in view:
-const output = splitPane(state, {
+const output = splitPaneSurface(state, {
   direction: 'row',
   width: cols,
   height: rows,
@@ -310,12 +310,14 @@ const output = splitPane(state, {
 });
 ```
 
+Prefer `splitPaneSurface()` when the panes are already structured `Surface` views. Keep `splitPane()` for explicit text composition or lowering paths.
+
 ### Grid
 
 ```typescript
-import { grid } from '@flyingrobots/bijou-tui';
+import { gridSurface } from '@flyingrobots/bijou-tui';
 
-const output = grid({
+const output = gridSurface({
   width: cols,
   height: rows,
   columns: [24, '1fr'],
@@ -334,6 +336,8 @@ const output = grid({
   },
 });
 ```
+
+Prefer `gridSurface()` when the regions are already structured `Surface` views. Keep `grid()` for explicit text composition or lowering paths.
 
 ## Resize Handling
 

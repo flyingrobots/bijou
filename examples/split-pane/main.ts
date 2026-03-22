@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd } from '@flyingrobots/bijou';
+import { boxSurface, kbd } from '@flyingrobots/bijou';
 import {
   run,
   quit,
@@ -7,11 +7,11 @@ import {
   isResizeMsg,
   type App,
   createSplitPaneState,
-  splitPane,
+  splitPaneSurface,
   splitPaneFocusNext,
   splitPaneResizeBy,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { column, row } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -69,22 +69,22 @@ const app: App<Model, Msg> = {
     const bodyHeight = Math.max(0, model.rows - 1);
     const leftFocused = model.split.focused === 'a';
 
-    const body = splitPane(model.split, {
+    const body = splitPaneSurface(model.split, {
       direction: 'row',
       width: model.cols,
       height: bodyHeight,
       minA: MIN_PANE_SIZE,
       minB: MIN_PANE_SIZE,
-      paneA: (w, h) => box(`\n Project Tree\n\n ${leftFocused ? '●' : '○'} src\n ${leftFocused ? '●' : '○'} test\n\n ${w}x${h}`, {
+      paneA: (w, h) => boxSurface(`\n Project Tree\n\n ${leftFocused ? '●' : '○'} src\n ${leftFocused ? '●' : '○'} test\n\n ${w}x${h}`, {
         width: w,
       }),
-      paneB: (w, h) => box(`\n Editor\n\n function hello() {\n   return 'bijou';\n }\n\n ${w}x${h}`, {
+      paneB: (w, h) => boxSurface(`\n Editor\n\n function hello() {\n   return 'bijou';\n }\n\n ${w}x${h}`, {
         width: w,
       }),
     });
 
-    const help = ` ${kbd('tab')} focus  ${kbd('h')}/${kbd('l')} resize  ${kbd('q')} quit`;
-    return contentSurface(`${body}\n${help}`);
+    const help = row([' ', kbd('tab'), ' focus  ', kbd('h'), '/', kbd('l'), ' resize  ', kbd('q'), ' quit']);
+    return column([body, help]);
   },
 };
 

@@ -96,6 +96,7 @@ export {
   type SplitPaneState,
   type SplitPaneLayout,
   type SplitPaneOptions,
+  type SplitPaneSurfaceOptions,
   createSplitPaneState,
   splitPaneSetRatio,
   splitPaneResizeBy,
@@ -103,15 +104,18 @@ export {
   splitPaneFocusPrev,
   splitPaneLayout,
   splitPane,
+  splitPaneSurface,
 } from './split-pane.js';
 
 // Constraint grid layout
 export {
   type GridTrack,
   type GridOptions,
+  type GridSurfaceOptions,
   type GridLayoutResult,
   gridLayout,
   grid,
+  gridSurface,
 } from './grid.js';
 
 // App frame shell

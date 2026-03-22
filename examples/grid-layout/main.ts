@@ -1,16 +1,16 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd } from '@flyingrobots/bijou';
+import { boxSurface, kbd } from '@flyingrobots/bijou';
 import {
   run,
   quit,
   isKeyMsg,
   isResizeMsg,
   type App,
-  grid,
+  gridSurface,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { column, row } from '../_shared/example-surfaces.ts';
 
-const ctx = initDefaultContext();
+initDefaultContext();
 
 interface Model {
   cols: number;
@@ -39,7 +39,7 @@ const app: App<Model, Msg> = {
 
   view(model) {
     const bodyHeight = Math.max(0, model.rows - 1);
-    const layout = grid({
+    const layout = gridSurface({
       width: model.cols,
       height: bodyHeight,
       columns: [22, '1fr'],
@@ -51,14 +51,14 @@ const app: App<Model, Msg> = {
       ],
       gap: 1,
       cells: {
-        header: (w) => box('Grid layout primitive (fixed + fr tracks)', { width: w }),
-        nav: (w, h) => box(`Navigation\n\n- Inbox\n- Build\n- Deploy\n\n${w}x${h}`, { width: w }),
-        logs: (w, h) => box(`Logs\n\n[ok] build passed\n[ok] tests passed\n\n${w}x${h}`, { width: w }),
-        main: (w, h) => box(`Main View\n\nUse this as a page body in appFrame()\n\n${w}x${h}`, { width: w }),
+        header: (w) => boxSurface('Grid layout primitive (fixed + fr tracks)', { width: w }),
+        nav: (w, h) => boxSurface(`Navigation\n\n- Inbox\n- Build\n- Deploy\n\n${w}x${h}`, { width: w }),
+        logs: (w, h) => boxSurface(`Logs\n\n[ok] build passed\n[ok] tests passed\n\n${w}x${h}`, { width: w }),
+        main: (w, h) => boxSurface(`Main View\n\nUse this as a page body in appFrame()\n\n${w}x${h}`, { width: w }),
       },
     });
 
-    return ansiSurface(`${layout}\n ${kbd('q')} quit`, model.cols, model.rows);
+    return column([layout, row([' ', kbd('q'), ' quit'])]);
   },
 };
 

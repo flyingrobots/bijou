@@ -703,13 +703,15 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 - Family:
   - `splitPane()`
+  - `splitPaneSurface()`
   - `grid()`
+  - `gridSurface()`
   - `flex()`
   - `vstack()`
   - `hstack()`
   - `place()`
 - Variants:
-  - user-resizable, named-area, compositional layout primitives
+  - user-resizable, named-area, compositional layout primitives with structured-surface and explicit text-lowering paths
 - Use when:
   - spatial arrangement materially helps the task
 - Avoid when:
@@ -717,8 +719,8 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Ownership:
   - TUI
 - Content guidance:
-  - use `splitPane()` when the user benefits from explicit primary-versus-secondary context
-  - use `grid()` when multiple stable regions deserve simultaneous visibility
+  - use `splitPaneSurface()` when the user benefits from explicit primary-versus-secondary context and the panes are already rich TUI surfaces; keep `splitPane()` for explicit text composition or lowering
+  - use `gridSurface()` when multiple stable regions deserve simultaneous visibility and the regions are already rich TUI surfaces; keep `grid()` for explicit text composition or lowering
   - use `flex()` / `vstackSurface()` / `hstackSurface()` / `placeSurface()` to keep rich TUI composition structured; keep `vstack()` / `hstack()` / `place()` for explicit text composition or lowering
   - region titles and borders should explain job and hierarchy, not merely expose geometry
 - Graceful lowering:
