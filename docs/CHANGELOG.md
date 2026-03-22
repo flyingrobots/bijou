@@ -65,6 +65,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Scrollable pane doctrine update** — the design-system family guide now has a dedicated `pager()` / `focusArea()` family, and the package/example docs now teach `pagerSurface()` and `focusAreaSurface()` as the canonical rich-TUI path while leaving the string renderers as explicit lowering helpers.
 - **Viewport-backed collection docs** — the design-system guide, package docs, example index, and the browsable-list/file-picker/command-palette example docs now teach the surface-native collection path explicitly and narrow viewport-scroll unification to the remaining row-aware `navigableTable()` case.
 - **Navigable table doctrine update** — the design-system family docs, package README/GUIDE, and navigable-table example docs now teach `navigableTableSurface()` as the structured path and explicitly call out why table inspection keeps row-aware scrolling instead of pretending generic viewport masking is always the right abstraction.
+- **Data and browsing docs depth pass** — the design-system patterns and component-family guides now give sharper “choose this over that” guidance for tables, browsable lists, file pickers, command palettes, and viewport masking, including the explicit rule that row-aware table inspection is not the same thing as generic line-clipped scrolling.
 
 ## [3.1.0] - 2026-03-18
 

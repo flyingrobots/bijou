@@ -139,17 +139,18 @@ Use when:
 - the user is choosing one value from a larger set
 - search/narrowing is the main task
 
-### `commandPalette()`
+### `commandPalette()` / `commandPaletteSurface()`
 
 Use when:
 
 - the result is an action, navigation, or command
 - the app wants one global action-discovery surface
 
-Avoid `commandPalette()` when:
+Avoid `commandPalette()` / `commandPaletteSurface()` when:
 
 - the user is filling out a field value
 - the result should behave like stored form data
+- the content is really a browseable record list rather than an action list
 
 ## 3. Comparison versus browsing versus inspection
 
@@ -164,6 +165,7 @@ Avoid when:
 
 - hierarchy is the main point
 - the user needs focused keyboard inspection rather than passive comparison
+- the item set is effectively one-dimensional and would read more honestly as a list
 
 ### `tableSurface()`
 
@@ -178,25 +180,45 @@ Avoid when:
 - direct string output is the final destination
 - the app needs keyboard-owned row/cell focus semantics
 
-### `navigableTable()`
+### `navigableTable()` / `navigableTableSurface()`
 
 Use when:
 
 - table data must be actively traversed
 - the app wants row/cell focus semantics
+- comparison across stable columns is still the job even while navigating
 
 Avoid when:
 
 - passive comparison is enough
 - the output must remain portable through core-only string rendering
+- the user is really selecting among one-dimensional records instead of comparing attributes
 
-### `browsableList()`
+### `browsableList()` / `browsableListSurface()`
 
 Use when:
 
 - items are one-dimensional
 - descriptions matter
 - the user is exploring or choosing among records
+
+Avoid when:
+
+- actions/commands are the result rather than records
+- column comparison is the point
+- hierarchy/path structure is the point
+
+### `filePicker()` / `filePickerSurface()`
+
+Use when:
+
+- the user is traversing filesystem hierarchy
+- the current path and directory transitions are part of the job
+
+Avoid when:
+
+- the content is generic hierarchy rather than actual file/path navigation
+- actions/commands are the result rather than a selected file or directory
 
 ## 3.5 Viewport masking and scroll ownership
 
@@ -206,6 +228,7 @@ Use when:
 - `viewport()` is the explicit text-lowering path when the content is intentionally string-first.
 - `pagerSurface()` and `focusAreaSurface()` are specialization layers on top of the viewport primitive, not separate scroll systems.
 - If a component only needs a clipped window plus scroll state, it should wrap viewport semantics rather than invent a bespoke `scrollY` slicer.
+- `navigableTableSurface()` is the important exception: wrapped comparison rows keep row-aware scroll semantics, so generic line clipping is the wrong abstraction there.
 
 ### `viewportSurface()`
 
@@ -230,6 +253,14 @@ Use when:
 Avoid when:
 
 - a plain masked region is enough and extra chrome would distract from the task
+
+### Choosing among browseable structures
+
+- Choose `browsableListSurface()` when rows are essentially labels plus brief descriptions.
+- Choose `commandPaletteSurface()` when the outcome is an action or navigation command.
+- Choose `filePickerSurface()` when path traversal is the mental model.
+- Choose `navigableTableSurface()` when comparison across columns remains the job even while navigating.
+- Choose `viewportSurface()` directly when the content already exists as a region and just needs bounded overflow masking.
 
 ### `tree()`
 

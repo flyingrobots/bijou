@@ -489,6 +489,8 @@ If those checks fail, the component work is not doctrinally complete yet.
   - cell text should stay compact enough that wrapping does not obscure the comparison task
   - use `navigableTableSurface()` when the table lives inside a rich TUI surface and the row-aware inspection model should remain structured
   - unlike list/picker/palette families, navigable tables should keep row-aware scrolling semantics rather than generic line clipping whenever wrapped rows materially affect comparison
+  - if rows wrap so heavily that column comparison is no longer readable, the table should usually collapse to a summary row plus a focused drill-down region instead of pretending dense comparison still works
+  - choose `navigableTable()` / `navigableTableSurface()` only when keyboard traversal is actually part of the job; otherwise keep the table passive
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -520,6 +522,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - labels should make nesting meaningful even when indentation is flattened or linearized
   - path context should be explicit when many siblings have similar names
   - use `filePickerSurface()` when the picker lives inside a rich TUI pane and should inherit shared viewport masking semantics; keep `filePicker()` as the explicit text-lowering path
+  - directories should remain visually distinct from files, and moving to a parent or child path should be explicit rather than hidden behind overloaded actions
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -551,6 +554,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - list rows should begin with the most distinguishing label or identifier
   - descriptions should help the scan task, not turn each row into a paragraph
   - use `browsableListSurface()` when the list belongs inside a rich TUI region and should share viewport masking semantics with pagers and focus panes; keep `browsableList()` as the explicit text-lowering path
+  - if the next user action is “run a command” rather than “inspect a record,” move up to `commandPalette()` instead of making the list pretend to be an action launcher
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -630,6 +634,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - prefer the surface-native path when the pane body is already composed from `Surface` content; keep the string path as explicit lowering, not the default teaching path
   - gutter chrome should communicate focus and workspace ownership, not carry primary content meaning
   - `browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now converge on viewport semantics; `navigableTable()` remains the row-aware holdout because wrapped-row comparison still needs a more specialized scroll model
+  - viewport masking is the wrong abstraction when the user thinks in semantic rows rather than rendered lines; in that case keep row-aware scroll ownership local to the domain-specific component
 - Graceful lowering:
   - rich: scrollable pane with honest status/focus chrome and bounded viewport behavior
   - static: visible excerpt or current window with enough status context to explain where the user is
