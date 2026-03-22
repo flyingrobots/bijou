@@ -194,7 +194,7 @@ For upgrading existing apps, see the monorepo migration guide at [`../../docs/MI
 
 ## License
 
-MIT
+Apache-2.0
 
 ---
 

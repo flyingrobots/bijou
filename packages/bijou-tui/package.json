@@ -41,7 +41,7 @@
     "interactive"
   ],
   "author": "James Ross <james@flyingrobots.dev>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/flyingrobots/bijou.git",

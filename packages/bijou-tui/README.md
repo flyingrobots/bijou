@@ -644,7 +644,7 @@ All building blocks include `*KeyMap()` factories for preconfigured vim-style ke
 
 ## License
 
-MIT
+Apache-2.0
 
 ---
 

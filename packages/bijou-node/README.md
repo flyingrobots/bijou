@@ -77,7 +77,7 @@ For upgrading existing apps, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MI
 
 ## License
 
-MIT
+Apache-2.0
 
 ---
 
