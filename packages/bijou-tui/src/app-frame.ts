@@ -457,7 +457,7 @@ export function createFramedApp<PageModel, Msg>(
         ctx: resolveSafeCtx() ?? undefined,
       }, msg.col, msg.row);
 
-      if (notificationTarget?.kind === 'dismiss' || notificationTarget?.kind === 'action') {
+      if (notificationTarget?.kind === 'dismiss') {
         return applyFrameNotificationState(
           model,
           dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),

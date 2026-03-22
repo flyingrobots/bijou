@@ -4,6 +4,7 @@ import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobo
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
+import { hitTestNotificationStack } from './notification.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import { QUIT, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
@@ -801,6 +802,64 @@ describe('createFramedApp', () => {
     const rendered = surfaceToString(frame, testCtx.style);
     expect(rendered).toContain('Command rejected: worker crashed during boot');
     expect(cmds).toHaveLength(1);
+  });
+
+  it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const [model] = app.init();
+    const runtimeMsg = app.routeRuntimeIssue?.({
+      level: 'warning',
+      source: 'runtime',
+      message: 'Framework warning',
+      atMs: 0,
+    });
+    if (runtimeMsg == null) throw new Error('expected runtime issue message');
+
+    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
+    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+
+    let dismissMouse: MouseMsg | undefined;
+    let sawActionTarget = false;
+    for (let row = 0; row < visibleModel.rows; row++) {
+      for (let col = 0; col < visibleModel.columns; col++) {
+        const target = hitTestNotificationStack(visibleModel.runtimeNotifications, {
+          screenWidth: visibleModel.columns,
+          screenHeight: visibleModel.rows,
+          margin: 1,
+          gap: 1,
+          ctx: testCtx,
+        }, col, row);
+        if (target?.kind === 'action') sawActionTarget = true;
+        if (target?.kind === 'dismiss' && dismissMouse == null) {
+          dismissMouse = {
+            type: 'mouse',
+            action: 'press',
+            button: 'left',
+            col,
+            row,
+            shift: false,
+            alt: false,
+            ctrl: false,
+          };
+        }
+      }
+    }
+
+    expect(sawActionTarget).toBe(false);
+    expect(dismissMouse).toBeDefined();
+
+    const [dismissedModel] = app.update(dismissMouse!, visibleModel);
+    expect(dismissedModel.runtimeNotifications.items).toHaveLength(1);
+    expect(dismissedModel.runtimeNotifications.items[0]?.phase).toBe('exiting');
+    expect(dismissedModel.runtimeNotificationLoopActive).toBe(true);
   });
 
   it('treats modal keymaps as exclusive while a page modal is open', async () => {

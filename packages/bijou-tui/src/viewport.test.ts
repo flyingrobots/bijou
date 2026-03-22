@@ -210,6 +210,27 @@ describe('viewportSurface', () => {
     expect(surfaceLines(result)).toEqual(['...', '..Z']);
     expect(result.get(2, 1)).toMatchObject({ char: 'Z', fg: '#ff00ff' });
   });
+
+  it('re-roots non-zero-origin layout-node content before masking', () => {
+    const nodeSurface = createSurface(3, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    nodeSurface.set(2, 0, { char: 'C', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+
+    const result = viewportSurface({
+      width: 3,
+      height: 1,
+      content: layout,
+      showScrollbar: false,
+    });
+
+    expect(surfaceLines(result)).toEqual(['ABC']);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -259,6 +280,20 @@ describe('createScrollStateForContent', () => {
     expect(state.maxY).toBe(3);
     expect(state.maxX).toBe(2);
     expect(state.totalLines).toBe(5);
+  });
+
+  it('ignores absolute root offsets when deriving layout-node bounds', () => {
+    const surface = createSurface(3, 1, { char: 'x', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface,
+    };
+
+    const state = createScrollStateForContent(layout, 1, 3);
+    expect(state.maxY).toBe(0);
+    expect(state.maxX).toBe(0);
+    expect(state.totalLines).toBe(1);
   });
 });
 

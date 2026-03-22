@@ -97,7 +97,7 @@ Every mature component-family page in Bijou should include:
 - Related families
 - Closest Carbon analogue
 
-The component-family guide now meets this structural baseline and is checked by a repo preflight script. The content can still deepen over time, but missing required sections should now be treated as a documentation failure, not a normal state.
+The component-family guide now meets this structural baseline and its structure is checked by a repo preflight script. That preflight is intentionally structural: it verifies required family sections and graceful-lowering mode coverage inside the family guide. Semantic accuracy, package/example doc drift, and touched-component doc completeness are still review responsibilities, not something the current script can prove automatically.
 
 ## Component-change gate
 
@@ -113,7 +113,7 @@ For every component or component family touched, verify:
 - graceful lowering is documented across `rich`, `static`, `pipe`, and `accessible` when applicable
 - related families are listed
 
-If any of those are missing or materially wrong, the docs are incomplete and that gap should be fixed in the same slice or explicitly logged as backlog debt before the work is considered done.
+The CI preflight enforces the structural minimum for the family guide. If any of the broader checks below are missing or materially wrong, the docs are still incomplete and that gap should be fixed in the same slice or explicitly logged as backlog debt before the work is considered done.
 
 ## Current gaps this section is meant to close
 
