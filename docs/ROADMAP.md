@@ -74,7 +74,7 @@ Release intent:
 | **Deterministic Time & Idle Semantics** | bijou + bijou-tui | The first v3.1 hardening slice shipped a shared `clock` port, `mockClock()`, event-bus `drain()`, and pulse-driven timing. Remaining work is the last global-timer holdouts plus more defensive interval/microtask/sentinel regressions. |
 | **Worker Runtime Hardening & Performance** | bijou-node | `runInWorker()` / `startWorkerApp()` shipped in v3.0.0. Remaining work is heavier-load scheduling, profiling, and cleanup beyond the first release. |
 | **Render, Layout, and Worker Benchmarks** | repo tooling + bijou-tui + bijou-node | Add a small benchmark suite for diff rendering, layout solves, recorder throughput, and worker round-trips so performance regressions are measured instead of guessed. |
-| **Deterministic Snapshot Replay & Assertions** | bijou-tui | The native Surface-to-GIF recorder shipped in v3.0.0. Remaining work is replay/assert APIs for deterministic UI tests, not just demo capture. |
+| **Deterministic Snapshot Replay & Assertions** | bijou-tui | The native Surface-to-GIF recorder shipped in v3.0.0. Remaining work is replay/assert APIs for deterministic UI tests, not just demo capture, plus a stable replay-artifact format that can bundle captured surfaces, input scripts, timing, and build metadata for later inspection or CI triage. |
 | **Deterministic Visual Regression Suite** | bijou-tui + bijou-node | Build frame-level golden tests on top of `Surface[]` capture so visual regressions can be detected without screenshot diff flake. |
 | **Worker Proxy Test Optimization** | bijou-node | Keep the host-to-worker viewport coverage added in v3.0.0. Remaining work is trimming dynamic import/mock overhead so the test can get cheaper again. |
 | **String/Surface Parity Regression Harness** | bijou + repo tooling | Add a reusable regression pattern for paired string/surface component APIs so option parity, width normalization, and render-policy separation stay locked in. |
@@ -92,7 +92,7 @@ Release intent:
 | **Data Visualization Suite** | bijou | High-density `sparkline()`, `barChart()`, and Braille-based `scatterPlot()` for real-time monitoring. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |
 | **Syntax-Aware `textarea`** | bijou | Lightweight syntax highlighting for JSON, YAML, and Markdown within the editor. |
-| **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions so demos and bugs can be inspected interactively instead of only exported as GIFs. |
+| **Surface Replay Viewer** | repo tooling + docs | Build a frame scrubber for recorded `Surface[]` sessions and replay artifacts so demos and bugs can be inspected interactively instead of only exported as GIFs. |
 | **Bijou DevTools Inspector** | bijou-tui | Expand the toggleable overlay into a real inspector for focused node ids/classes, layout rects, BCSS matches, token resolution, message flow, and runtime state. |
 
 ### Milestone 4 — Tooling, ecosystem, and long-range bets
@@ -100,7 +100,8 @@ Release intent:
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **PR Review Tooling** | repo tooling | `pr:review-status` and `pr:merge-readiness` shipped. Remaining work is differentiating active bot-review progress from stale historical chatter, shared GitHub adapter helpers, and batch reply/resolve workflows for addressed threads. |
-| **Surface Scenario Test Harness** | repo tooling + bijou-tui | Build a Playwright-like test/runtime harness for Bijou surfaces with semantic selectors, scripted input driving, frame assertions, and deterministic interaction flows so docs demos, scenario tests, and regressions can all share one DX layer. |
+| **Surface Scenario Test Harness** | repo tooling + bijou-tui | Build a Playwright-like test/runtime harness for Bijou surfaces with semantic selectors, scripted input driving, frame assertions, and deterministic interaction flows so docs demos, scenario tests, and regressions can all share one DX layer. If the API stabilizes, this likely graduates into its own package rather than staying as repo-local tooling. |
+| **Replay Artifact Pipeline** | repo tooling + bijou-tui + git tooling | Capture deterministic run artifacts that bundle surface frames, scripted input, timing, runtime metadata, and git/worktree provenance so failures can be replayed later. Explore using a dedicated git-backed scratch repo plus git-warp-style time travel/reconstruction to package and replay these runs as portable zipped artifacts. |
 | **Smoke Harness Unit Coverage** | repo tooling | Add focused tests for `scripts/smoke-all-examples.ts`, especially path/root resolution and launcher selection, so portability regressions fail before CI smoke runs. |
 | **PTY Lifecycle Race Coverage** | repo tooling + scripts | Add regression coverage for resize/exit ordering and other late-step shutdown races so the PTY harness keeps its lifecycle guarantees explicit. |
 | **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Remaining work is keeping the PTY helper self-contained and low-noise. |
