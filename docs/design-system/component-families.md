@@ -184,6 +184,35 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - activity log / event stream pattern
 
+### Loading placeholders
+
+- Family: `skeleton()`
+- Variants:
+  - single-line, multiline, and region-shaped placeholders
+- Use when:
+  - the expected content shape is known but the content is not available yet
+  - a short-lived loading interval would otherwise cause distracting layout pop
+- Avoid when:
+  - honest partial content can already be shown
+  - the delay is long enough that a clearer loading state, progress indicator, or retry path is needed
+  - the placeholder would outlive the user’s trust and start to look like fake content
+- Content guidance:
+  - skeletons should roughly match the final information density instead of becoming ornamental gray bars everywhere
+  - use them for short-lived uncertainty, then yield to partial or explicit loading states as soon as real content exists
+  - keep labels or surrounding context explicit so the user knows what is loading
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve the placeholder shape while loading is genuinely transient
+  - pipe: lower to explicit loading text or field labels instead of decorative placeholder bars
+  - accessible: announce loading state and the affected region explicitly rather than relying on visual shimmer or shape
+- Related families:
+  - `spinner()`
+  - `progressBar()`
+  - `note()`
+- Carbon analogue:
+  - skeleton state
+
 ## Structural families
 
 ### Framed grouping
@@ -251,6 +280,36 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `helpView()`
 - Carbon analogue:
   - structured text / markdown content block
+
+### Linked destinations
+
+- Family: `hyperlink()`
+- Variants:
+  - OSC 8 clickable link
+  - explicit fallback text or URL modes
+- Use when:
+  - the destination matters and should remain part of the rendered output
+  - terminals with hyperlink support should get a direct clickable affordance without hiding the actual destination semantics
+- Avoid when:
+  - the destination is untrusted, ambiguous, or should not be activated casually
+  - link text is the only place where critical meaning or safety context appears
+  - the user needs an app-owned action rather than an external destination
+- Content guidance:
+  - link labels should describe the destination or resource, not generic phrases like “click here”
+  - when trust matters, keep the host or destination obvious in the surrounding text or fallback behavior
+  - use fallback modes intentionally so non-supporting terminals still preserve the destination honestly
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: use OSC 8 when supported while keeping meaningful visible link text
+  - pipe: lower to explicit text plus destination URL when needed
+  - accessible: preserve label and destination clearly in reading order without assuming clickability
+- Related families:
+  - `markdown()`
+  - `note()`
+  - `helpView()`
+- Carbon analogue:
+  - link
 
 ### Dividers
 
@@ -548,6 +607,38 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `timeline()`
 - Carbon analogue:
   - no exact analogue; closest to expressive motion and illustration guidance rather than one component family
+
+### Expressive branding and decorative emphasis
+
+- Family:
+  - `loadRandomLogo()`
+  - `gradientText()`
+- Variants:
+  - ASCII logo sizes
+  - single-line or multiline gradient emphasis
+- Use when:
+  - the interface needs a deliberate branded or celebratory moment
+  - splash surfaces, docs, demos, and launch moments benefit from expressive treatment
+- Avoid when:
+  - routine application chrome or task-critical labels need to stay plain and scannable
+  - color, decoration, or branding would compete with the actual work
+  - the same text must remain equally legible in constrained or no-color environments
+- Content guidance:
+  - treat logos and gradients as rare emphasis, not the default voice of the interface
+  - never make critical state, instructions, or navigation depend on gradient color alone
+  - use expressive branding to open, celebrate, or orient, then get out of the user’s way
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve expressive branding where it adds real atmosphere without obscuring content
+  - pipe: lower to plain ASCII/text without pretending the gradient or brand treatment still carries meaning
+  - accessible: keep the textual content explicit and avoid decorative output that adds noise to the reading order
+- Related families:
+  - `canvas()`
+  - `box()`
+  - `markdown()`
+- Carbon analogue:
+  - closest to illustration, expressive color, and brand guidance rather than one component family
 
 ## Data and browsing families
 
@@ -948,6 +1039,6 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 These are shipped, but the guidance is still thinner than it should be:
 
-- `skeleton()` loading-state policy and when placeholders should yield to honest partial content
-- `hyperlink()` trust and external-destination guidance for terminal output
-- `logo()` / `gradientText()` expressive-brand boundaries versus routine application chrome
+- `kbd()` rules for when shortcut chips belong inline versus in shell-level help
+- `progressBar()` / `spinner()` guidance for choosing determinate versus indeterminate progress surfaces
+- `custom-component` / `renderByMode()` examples and doctrine for authoring app-specific primitives

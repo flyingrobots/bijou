@@ -77,6 +77,10 @@ Use `breadcrumb()` when path context explains where the user is. Use `paginator(
 
 Use `box()` when a region needs visible containment. Use `headerBox()` when the same region also needs a compact title plus detail line. Use `markdown()` for bounded help, reference, and release-note prose that should degrade honestly across rich, pipe, and accessible modes. Avoid using boxes as default decoration or markdown as a substitute layout engine for application chrome.
 
+### Loading, links, & expressive output
+
+Use `skeleton()` only for short-lived loading states where the content shape is already known. Use `hyperlink()` when the destination should stay explicit and trustworthy in terminal output. Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
 ### Progress & Spinners
 
 ```typescript

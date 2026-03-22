@@ -32,10 +32,12 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 
 - Use [`note`](./note/) for explanatory, non-urgent support inside a flow.
 - Use [`alert`](./alert/) for in-flow status that should remain part of the page.
+- Use [`skeleton`](./skeleton/) only for short-lived known-shape loading states; prefer honest partial content once it exists.
 - Use [`toast`](./toast/) for a single low-level transient overlay you are composing directly.
 - Use [`notifications`](./notifications/) when the app needs stacking, actions, placement control, routing, or history.
 - Use [`table`](./table/) for passive row/column comparison.
 - Use [`navigable-table`](./navigable-table/) when the table itself becomes a keyboard-owned inspection surface.
+- Use [`gradient-text`](./gradient-text/) and [`logo`](./logo/) for deliberate expressive moments, not routine application chrome.
 
 ## Static Components
 
@@ -50,22 +52,22 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`note`](./note/) | `note()` | Explanatory, non-urgent supporting text for form flows |
 | [`alert`](./alert/) | `alert()` | In-flow status block that persists in page content |
 | [`separator`](./separator/) | `separator()` | Horizontal dividers with labels |
-| [`skeleton`](./skeleton/) | `skeleton()` | Loading placeholders |
+| [`skeleton`](./skeleton/) | `skeleton()` | Short-lived known-shape loading placeholders |
 | [`kbd`](./kbd/) | `kbd()` | Keyboard shortcut display |
 | [`breadcrumb`](./breadcrumb/) | `breadcrumb()` | Navigation breadcrumb trails |
 | [`stepper`](./stepper/) | `stepper()` | Step progress indicators |
 | [`timeline`](./timeline/) | `timeline()` | Event timelines with status |
 | [`paginator`](./paginator/) | `paginator()` | Page indicators (dots and text) |
-| [`gradient-text`](./gradient-text/) | `gradientText()` | Gradient-colored text rendering |
+| [`gradient-text`](./gradient-text/) | `gradientText()` | Expressive gradient emphasis for splash and docs |
 | [`progress-static`](./progress-static/) | `progressBar()` | Static progress bars at various states |
 | [`dag`](./dag/) | `dag()` | Passive dependency and causal-flow graph |
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | Focused DAG slices for local dependency review |
 | [`dag-stats`](./dag-stats/) | `dagStats()` | Graph health and structural metrics |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
 | [`markdown`](./markdown/) | `markdown()` | Bounded structured prose with mode-aware lowering |
-| [`logo`](./logo/) | `loadRandomLogo()` | Random ASCII brand logos in 3 sizes |
+| [`logo`](./logo/) | `loadRandomLogo()` | ASCII brand treatment for splash and docs moments |
 | [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
-| [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
+| [`hyperlink`](./hyperlink/) | `hyperlink()` | Trusted terminal links with explicit fallback behavior |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | Output modes, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `createBijou()`, theme presets | Same components in all built-in themes |

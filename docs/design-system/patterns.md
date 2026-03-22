@@ -113,6 +113,19 @@ Content guidance:
 - the modal should end in a clear next action or dismissal path
 - avoid turning a modal into a drawer with extra blocking chrome
 
+#### `skeleton()`
+
+Use when:
+
+- the content shape is known but a short-lived loading gap would otherwise cause layout pop
+- the user benefits from seeing where content will land
+
+Avoid when:
+
+- honest partial content is already available
+- the loading state is long-lived enough that explicit progress or retry messaging would be more honest
+- the placeholder would imply certainty the app does not actually have yet
+
 ## 2. Selection versus action
 
 This is one of the easiest places for a component library to become fuzzy.
@@ -296,6 +309,19 @@ Avoid when:
 - the app is really laying out UI regions or controls and is trying to use markdown as a layout engine
 - dense comparison, forms, or command discovery are the real jobs
 
+### `hyperlink()`
+
+Use when:
+
+- the destination itself should remain part of the rendered output
+- terminals with link support can benefit from clickability without hiding where the link goes
+
+Avoid when:
+
+- the label is vague or generic
+- trust depends on seeing the actual destination, but the surrounding content hides it
+- the interaction is really an app-owned action instead of an external destination
+
 ### `pagerSurface()` / `focusAreaSurface()`
 
 Use when:
@@ -354,6 +380,21 @@ Avoid when:
 - dependency or causality matters more than ordering
 - the content is so dense that a table, log, or summary-plus-detail drill-down would be more readable
 - the user is really comparing attributes across many events rather than following a temporal story
+
+## 3.7 Expressive branding and decorative emphasis
+
+### `loadRandomLogo()` / `gradientText()`
+
+Use when:
+
+- the product needs a deliberate branded or celebratory moment
+- splash surfaces, docs, or demos benefit from a little atmosphere
+
+Avoid when:
+
+- ordinary workspace chrome, navigation, status, or instructions need to stay neutral and legible
+- the emphasis would compete with the actual task
+- the color treatment is being asked to carry meaning that should live in text
 
 ## 4. Disclosure and progressive complexity
 

@@ -108,13 +108,19 @@ Those docs answer the questions the API reference cannot:
 - Use `markdown()` for bounded help, reference, and release-note prose that should lower honestly across rich, pipe, and accessible output.
 - Avoid turning every subsection into a box or using markdown as a substitute layout engine for full application chrome.
 
+### Loading, links, and expressive moments
+
+- Use `skeleton()` for short-lived placeholders when the final content shape is known.
+- Use `hyperlink()` when the destination itself should remain explicit and trustworthy in terminal output.
+- Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
 ## Components
 
 ### Layout
 `box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — string-first helpers and surface-native companions for layout chrome.
 
 ### Elements
-`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — inline status, in-flow status blocks, and UI primitives.
+`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()`, `hyperlink()` — inline status, in-flow status blocks, loading placeholders, trusted links, and UI primitives.
 
 ### Data
 `table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — passive comparison and structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
@@ -126,7 +132,7 @@ Those docs answer the questions the API reference cannot:
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
 
 ### Animation & Progress
-`spinner()`, `progressBar()`, `gradientText()` — live-updating output with color gradients.
+`spinner()`, `progressBar()`, `gradientText()`, `loadRandomLogo()` — live-updating output, expressive gradients, and branded ASCII moments.
 
 ### Forms
 `input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.

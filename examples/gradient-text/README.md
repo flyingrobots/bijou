@@ -1,6 +1,6 @@
 # `gradientText()`
 
-Gradient-colored text rendering
+Expressive gradient emphasis for splash, docs, and celebratory text.
 
 ![demo](demo.gif)
 
@@ -10,35 +10,22 @@ Gradient-colored text rendering
 npx tsx examples/gradient-text/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { gradientText, separator } from '@flyingrobots/bijou';
+- a branded or celebratory moment deserves extra atmosphere
+- a short hero line or banner benefits from expressive emphasis
+- the text is optional flourish rather than core task-bearing content
 
-const cyanMagenta = ctx.theme.theme.gradient.brand;
+## Choose something else when
 
-console.log(separator({ label: 'gradient text', ctx }));
-console.log();
+- avoid using gradients for routine workspace labels, instructions, or navigation
+- avoid relying on color treatment to carry meaning that should be in the text itself
+- if a simpler heading or `logo()` would communicate the moment more honestly, prefer that
 
-console.log(gradientText('bijou — physics-powered TUI engine', cyanMagenta, { style: ctx.style }));
-console.log();
+## What this example proves
 
-console.log(gradientText('The quick brown fox jumps over the lazy dog.', cyanMagenta, { style: ctx.style }));
-console.log();
-
-console.log(separator({ label: 'multiline', ctx }));
-console.log();
-
-const banner = [
-  '╔══════════════════════════════════╗',
-  '║                                  ║',
-  '║     Welcome to bijou v0.2.0      ║',
-  '║                                  ║',
-  '╚══════════════════════════════════╝',
-].join('\n');
-
-console.log(gradientText(banner, cyanMagenta, { style: ctx.style }));
-```
+- single-line and multiline gradient rendering
+- using theme gradient tokens for consistent expressive color
+- `gradientText()` as rare emphasis instead of the default tone of the application
 
 [← Examples](../README.md)
