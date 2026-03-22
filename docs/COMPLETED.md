@@ -4,11 +4,11 @@ Shipped work and completed branch milestones, newest first. See [CHANGELOG.md](C
 
 ---
 
-## v4.0.0 branch progress — Pure Surface Runtime & Design-System Conformance
+## v4.0.0 — Pure Surface Release
 
-- **Completed:** 2026-03-21
-- **Summary:** Completed the major v4 pure-surface cuts on branch `feat/v4-pure-v3-release`: raw string `App.view` removal, surface-native frame shell/body/chrome/transitions, structured overlay content, surface-native layout and scrolling primitives (`flexSurface`, `viewportSurface`, `placeSurface`, `pagerSurface`, `splitPaneSurface`, `gridSurface`), surface-native shell utilities (`statusBarSurface()`, `helpViewSurface()`, `helpShortSurface()`, `helpForSurface()`), transition shader API normalization, viewport masking doctrine, example/canary bridge burn-down, and CI/documentation gates for component-family completeness.
-- **Ref:** branch `feat/v4-pure-v3-release` (pending v4.0.0 release)
+- **Completed:** 2026-03-22
+- **Summary:** Shipped the major pure-surface runtime and design-system conformance work from branch `feat/v4-pure-v3-release`: raw string `App.view` removal, surface-native frame shell/body/chrome/transitions, structured overlay content, surface-native layout and scrolling primitives (`flexSurface`, `viewportSurface`, `placeSurface`, `pagerSurface`, `splitPaneSurface`, `gridSurface`), surface-native shell utilities (`statusBarSurface()`, `helpViewSurface()`, `helpShortSurface()`, `helpForSurface()`), transition shader API normalization, viewport masking doctrine, example/canary bridge burn-down, CI/documentation gates for component-family completeness, release-facing README cleanup, and the Apache-2.0 licensing switch for published packages.
+- **Ref:** [`v4.0.0`](https://github.com/flyingrobots/bijou/releases/tag/v4.0.0), branch `feat/v4-pure-v3-release`
 
 ---
 

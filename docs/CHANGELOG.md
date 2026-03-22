@@ -28,6 +28,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **Post-v4 roadmap triage** — the roadmap now reflects `v4.0.0` as a shipped release, moves the pure-surface release work into the completed archive, and reorganizes active backlog into post-v4 priorities: story-first docs, replay/debug tooling, platform hardening, runtime/design-system expansion, and long-range ecosystem bets.
 - **Design-system docs foundation** — added a new `docs/design-system/` section covering foundations, interaction/pattern policy, component families, and data-visualization guidance, plus linked that guidance from the root and package README entry points.
 - **Component-family graceful lowering coverage** — the component-family design-system guide now documents graceful lowering and related-family guidance across the shipped semantic families, so the docs more honestly match the Carbon-style standard they claim to enforce.
 - **Overlay doctrine and surface-native examples** — the design-system pattern docs, family docs, package README, and TUI guide now give sharper overlay/interruption guidance and lead with `compositeSurface(...)` for modal/toast composition instead of teaching the string-first overlay path as the default.
