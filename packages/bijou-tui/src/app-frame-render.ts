@@ -422,18 +422,18 @@ function applyTransitionCell(
   baseCell: Cell,
   result: TransitionResult,
 ): Cell {
-  if (result.cell != null) {
+  if (result.overrideCell != null) {
     return {
       ...baseCell,
-      ...result.cell,
-      char: result.cell.char,
+      ...result.overrideCell,
+      char: result.overrideCell.char,
       empty: false,
     };
   }
-  if (result.char !== undefined) {
+  if (result.overrideChar !== undefined) {
     return {
       ...baseCell,
-      char: result.char,
+      char: result.overrideChar,
       empty: false,
     };
   }

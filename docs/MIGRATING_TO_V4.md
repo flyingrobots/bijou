@@ -18,6 +18,7 @@ The short version:
 5. Prefer the `*Surface` companion helpers for common runtime chrome, and cross string boundaries explicitly with `surfaceToString(..., ctx.style)` only when you truly need a string endpoint.
 6. If you use nested TEA apps, prefer `initSubApp()` and `updateSubApp()` for lifecycle wiring, with `mount()` for rendering.
 7. If you adopt BCSS, stay within the documented supported scope for the current release line.
+8. If you author custom transition shaders, use the v4 override names: `overrideChar`, `overrideCell`, and `overrideRole`.
 
 ## Package Roles In v4
 

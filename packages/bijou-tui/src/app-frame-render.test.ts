@@ -19,8 +19,8 @@ describe('renderTransition', () => {
       ({ x }) => (x === 0
         ? {
           showNext: false,
-          char: 'X',
-          cell: { char: 'X', fg: '#ff0000', bg: '#000000', modifiers: ['bold'], empty: false },
+          overrideChar: 'X',
+          overrideCell: { char: 'X', fg: '#ff0000', bg: '#000000', modifiers: ['bold'], empty: false },
         }
         : { showNext: true }),
       0.5,
@@ -45,14 +45,14 @@ describe('renderTransition', () => {
     });
   });
 
-  it('keeps the selected base cell styling for plain char overrides', () => {
+  it('keeps the selected base cell styling for plain character overrides', () => {
     const prev = createSurface(1, 1, { char: 'p', fg: '#123456', bg: '#654321', modifiers: ['underline'], empty: false });
     const next = createSurface(1, 1, { char: 'n', fg: '#abcdef', bg: '#fedcba', empty: false });
 
     const result = renderTransition(
       prev,
       next,
-      () => ({ showNext: false, char: '░' }),
+      () => ({ showNext: false, overrideChar: '░' }),
       0.5,
       1,
       1,

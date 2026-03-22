@@ -8,7 +8,7 @@ Every bijou-tui app defines three functions:
 interface App<Model, M> {
   init(): [Model, Cmd<M>[]];                            // initial state + startup commands
   update(msg: KeyMsg | ResizeMsg | M, model: Model): [Model, Cmd<M>[]];  // state transition
-  view(model: Model): string;                            // render to string
+  view(model: Model): Surface | LayoutNode;             // render to structured output
 }
 ```
 
@@ -18,6 +18,7 @@ The runtime calls `init()` once, then loops: render → wait for event → `upda
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
 import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
@@ -31,7 +32,7 @@ const app: App<Model, Msg> = {
     if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
     return [model, []];
   },
-  view: (model) => model.text,
+  view: (model) => stringToSurface(model.text, model.text.length, 1),
 };
 
 run(app);
@@ -357,6 +358,54 @@ case 'frame': {
 | `1000` | Absolute time (ms) |
 | `'label'` | At the label's position |
 | `'label+=200'` | 200ms after label |
+
+## Transition Shaders
+
+Use transition shaders to customize page-to-page movement in `createFramedApp()`.
+
+```typescript
+import { createFramedApp, type TransitionShaderFn } from '@flyingrobots/bijou-tui';
+
+const cursorTrail: TransitionShaderFn = ({ progress, x, width, ctx }) => {
+  const edge = Math.floor(progress * width);
+  if (x < edge) return { showNext: true };
+  if (x === edge) {
+    return {
+      showNext: false,
+      overrideChar: '▌',
+      overrideCell: {
+        char: '▌',
+        fg: ctx.status('info').hex,
+        bg: ctx.status('info').bg,
+        empty: false,
+      },
+      overrideRole: 'marker',
+    };
+  }
+  return { showNext: false };
+};
+
+createFramedApp({
+  title: 'Transitions',
+  pages,
+  transitionOverride: () => cursorTrail,
+});
+```
+
+Use the shader result fields like this:
+
+| Field | Meaning |
+|-------|---------|
+| `showNext` | Whether this cell reveals the next page |
+| `overrideChar` | Optional single-character override that keeps the chosen base cell styling |
+| `overrideCell` | Optional full cell override when the shader needs to control fg/bg/modifiers too |
+| `overrideRole` | Semantic hint for combinators; use `'marker'` for positional indicators like cursors and `'decoration'` for ambient noise |
+
+Guidance:
+- Prefer `overrideCell` when the shader wants true visual styling, not just a replacement glyph.
+- Treat `overrideChar` as a light-weight convenience for inheriting the selected base cell styling.
+- Use `'marker'` only for progress-tied indicators that should be dropped by `reverse()` and similar remapping combinators.
+- Use `'decoration'` for ambient effects like glitch blocks, static, and scramble noise that can survive progress remapping.
 
 ## Event Bus
 

@@ -202,6 +202,23 @@ const fired = tl.firedCallbacks(prev, tlState); // ['onReady']
 
 Position syntax: `'<'` (parallel), `'+=N'` (gap), `'-=N'` (overlap), `'<+=N'` (offset from previous start), absolute ms, `'label'`, `'label+=N'`.
 
+## Transition Shaders
+
+Custom page transitions are surface-native in v4. Shader functions decide whether each cell shows the previous page or next page, and may optionally provide override data for that cell.
+
+```typescript
+import { type TransitionShaderFn } from '@flyingrobots/bijou-tui';
+
+const shimmer: TransitionShaderFn = ({ progress, x, width }) => {
+  const edge = Math.floor(progress * width);
+  if (x < edge) return { showNext: true };
+  if (x === edge) return { showNext: false, overrideChar: '░', overrideRole: 'marker' };
+  return { showNext: false };
+};
+```
+
+Use `overrideChar` when the base cell styling should stay intact, `overrideCell` when the shader needs full fg/bg/modifier control, and `overrideRole` to tell combinators whether an override is ambient (`'decoration'`) or positional (`'marker'`).
+
 ## Layout
 
 ### Flexbox
