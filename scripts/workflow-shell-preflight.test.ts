@@ -1,4 +1,5 @@
 import { dirname, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
@@ -72,5 +73,16 @@ describe('runWorkflowShellPreflight', () => {
     expect(status).toBe(0);
     expect(output.join('')).toContain('workflow shell .github/workflows/publish.yml');
     expect(output.join('')).toContain('workflow shell .github/workflows/release-dry-run.yml');
+  });
+
+  it('anchors GitHub release commands to an explicit repository context', () => {
+    const publishWorkflow = readFileSync(resolve(ROOT, '.github/workflows/publish.yml'), 'utf8');
+
+    expect(publishWorkflow).toContain('github_release:');
+    expect(publishWorkflow).toContain('ref: ${{ needs.verify.outputs.release_sha }}');
+    expect(publishWorkflow).toContain('gh release view "$TAG" --repo "$REPO"');
+    expect(publishWorkflow).toContain('gh release edit "$TAG" \\');
+    expect(publishWorkflow).toContain('--repo "$REPO" \\');
+    expect(publishWorkflow).toContain('gh release create "$TAG" \\');
   });
 });
