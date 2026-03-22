@@ -1,12 +1,25 @@
 import { createNodeContext } from '@flyingrobots/bijou-node';
 import {
-  box, headerBox, badge, alert, progressBar, separator,
-  gradientText, PRESETS, setDefaultContext, surfaceToString,
+  box,
+  alert,
+  progressBar,
+  separatorSurface,
+  gradientText,
+  PRESETS,
+  setDefaultContext,
 } from '@flyingrobots/bijou';
 import { createBijou } from '@flyingrobots/bijou';
 import { nodeRuntime } from '@flyingrobots/bijou-node';
 import { nodeIO } from '@flyingrobots/bijou-node';
 import { chalkStyle } from '@flyingrobots/bijou-node';
+import {
+  badgeSurface,
+  column,
+  contentSurface,
+  renderSurface,
+  row,
+  spacer,
+} from '../_shared/example-surfaces.ts';
 
 // Show the same components rendered in each built-in theme.
 
@@ -20,27 +33,32 @@ function renderTheme(themeName: string): void {
   });
 
   const stops = ctx.theme.theme.gradient.brand;
-  const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-    surfaceToString(badge(label, { variant, ctx }), ctx.style);
+  const output = column([
+    separatorSurface({ label: themeName, ctx }),
+    spacer(1, 1),
+    contentSurface(gradientText(`  Theme: ${themeName}`, stops, { style: ctx.style })),
+    spacer(1, 1),
+    contentSurface(box('Hello, bijou!', { ctx })),
+    spacer(1, 1),
+    row([
+      badgeSurface('SUCCESS', 'success', ctx),
+      ' ',
+      badgeSurface('ERROR', 'error', ctx),
+      ' ',
+      badgeSurface('WARNING', 'warning', ctx),
+      ' ',
+      badgeSurface('INFO', 'info', ctx),
+      ' ',
+      badgeSurface('MUTED', 'muted', ctx),
+    ]),
+    spacer(1, 1),
+    contentSurface(alert('All systems operational.', { variant: 'success', ctx })),
+    spacer(1, 1),
+    contentSurface(progressBar(75, { width: 40, showPercent: true, ctx })),
+    spacer(1, 1),
+  ]);
 
-  console.log(separator({ label: themeName, ctx }));
-  console.log();
-  console.log(gradientText(`  Theme: ${themeName}`, stops, { style: ctx.style }));
-  console.log();
-  console.log(box('Hello, bijou!', { ctx }));
-  console.log();
-  console.log([
-    badgeText('SUCCESS', 'success'),
-    badgeText('ERROR', 'error'),
-    badgeText('WARNING', 'warning'),
-    badgeText('INFO', 'info'),
-    badgeText('MUTED', 'muted'),
-  ].join(' '));
-  console.log();
-  console.log(alert('All systems operational.', { variant: 'success', ctx }));
-  console.log();
-  console.log(progressBar(75, { width: 40, showPercent: true, ctx }));
-  console.log();
+  console.log(renderSurface(output, ctx));
 }
 
 // Initialize a default context first

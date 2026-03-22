@@ -14,43 +14,35 @@ npx tsx examples/badge/main.ts
 
 ```typescript
 import { ctx } from '../_shared/setup.js';
-import { badge, separator } from '@flyingrobots/bijou';
+import { separatorSurface } from '@flyingrobots/bijou';
+import {
+  badgeSurface,
+  column,
+  renderSurface,
+  row,
+  spacer,
+} from '../_shared/example-surfaces.ts';
 
-console.log(separator({ label: 'badge variants', ctx }));
-console.log();
+const output = column([
+  separatorSurface({ label: 'badge variants', ctx }),
+  spacer(1, 1),
+  row([
+    badgeSurface('SUCCESS', 'success', ctx),
+    ' ',
+    badgeSurface('ERROR', 'error', ctx),
+    ' ',
+    badgeSurface('WARNING', 'warning', ctx),
+  ]),
+  spacer(1, 1),
+  row([
+    'Server is ',
+    badgeSurface('RUNNING', 'success', ctx),
+    ' on port ',
+    badgeSurface('3000', 'primary', ctx),
+  ]),
+]);
 
-console.log(
-  badge('SUCCESS', { variant: 'success', ctx }),
-  badge('ERROR', { variant: 'error', ctx }),
-  badge('WARNING', { variant: 'warning', ctx }),
-  badge('INFO', { variant: 'info', ctx }),
-  badge('MUTED', { variant: 'muted', ctx }),
-);
-console.log();
-console.log(
-  badge('ACCENT', { variant: 'accent', ctx }),
-  badge('PRIMARY', { variant: 'primary', ctx }),
-);
-console.log();
-
-console.log(separator({ label: 'inline usage', ctx }));
-console.log();
-
-console.log(
-  'Server is', badge('RUNNING', { variant: 'success', ctx }),
-  'on port', badge('3000', { variant: 'primary', ctx }),
-);
-console.log();
-console.log(
-  'Build', badge('FAILED', { variant: 'error', ctx }),
-  '— 3 errors, 1 warning',
-);
-console.log();
-console.log(
-  badge('v0.2.0', { variant: 'accent', ctx }),
-  badge('MIT', { variant: 'muted', ctx }),
-  badge('TypeScript', { variant: 'info', ctx }),
-);
+console.log(renderSurface(output, ctx));
 ```
 
 [← Examples](../README.md)

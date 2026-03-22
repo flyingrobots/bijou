@@ -4,6 +4,7 @@ import {
   parseAnsiToSurface,
   stringToSurface,
   stripAnsi,
+  surfaceToString,
   type BadgeVariant,
   type BijouContext,
   type Surface,
@@ -59,6 +60,10 @@ export function row(parts: readonly (string | Surface)[]): Surface {
 
 export function column(rows: readonly (string | Surface)[]): Surface {
   return vstackSurface(...rows.map((entry) => typeof entry === 'string' ? contentSurface(entry) : entry));
+}
+
+export function renderSurface(surface: Surface, ctx: BijouContext): string {
+  return surfaceToString(surface, ctx.style);
 }
 
 function visibleWidth(text: string): number {
