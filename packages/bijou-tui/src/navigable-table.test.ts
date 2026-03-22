@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { surfaceToString } from '@flyingrobots/bijou';
 import {
   createNavigableTableState,
   navTableFocusNext,
@@ -6,6 +7,7 @@ import {
   navTablePageDown,
   navTablePageUp,
   navigableTable,
+  navigableTableSurface,
   navTableKeyMap,
 } from './navigable-table.js';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
@@ -136,6 +138,33 @@ describe('navigableTable', () => {
       const ctx = createTestContext({ mode: 'interactive' });
       const output = navigableTable(state, { ctx });
       expect(output).toContain('Name');
+    });
+
+    it('renders a surface-native table with the same focused row semantics', () => {
+      const state = createNavigableTableState({ columns, rows, height: 3 });
+      const ctx = createTestContext({ mode: 'interactive' });
+      const surface = navigableTableSurface(state, { ctx });
+      const rendered = surfaceToString(surface, ctx.style);
+
+      expect(surface.height).toBeGreaterThan(0);
+      expect(rendered).toContain('\u25b8');
+      expect(rendered).toContain('Alice');
+    });
+
+    it('surface path keeps row-aware scrolling when rows wrap', () => {
+      const wrapColumns = [{ header: 'Name', width: 10 }, { header: 'Notes', width: 12 }];
+      const wrapRows = [
+        ['Alpha', 'first row wraps across multiple rendered lines'],
+        ['Beta', 'second row also wraps and should be the only visible data row'],
+      ];
+      let state = createNavigableTableState({ columns: wrapColumns, rows: wrapRows, height: 1 });
+      state = navTableFocusNext(state);
+      const ctx = createTestContext({ mode: 'interactive' });
+
+      const rendered = surfaceToString(navigableTableSurface(state, { ctx }), ctx.style);
+
+      expect(rendered).toContain('Beta');
+      expect(rendered).not.toContain('Alpha');
     });
   });
 

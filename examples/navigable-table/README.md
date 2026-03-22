@@ -1,4 +1,4 @@
-# `navigableTable()`
+# `navigableTableSurface()`
 
 Keyboard-owned table inspection with focus and scrolling
 
@@ -27,11 +27,12 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createNavigableTableState, navigableTable,
+  createNavigableTableState, navigableTableSurface,
   navTableFocusNext, navTableFocusPrev,
   navTablePageDown, navTablePageUp,
-  navTableKeyMap, helpShort, vstack,
+  navTableKeyMap, helpShortSurface, vstackSurface,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -96,8 +97,13 @@ const app: App<Model, Msg> = {
     return [model, []];
   },
 
-  view: (model) => vstack(
-    '', navigableTable(model.table), '', `  ${helpShort(keys)}`, '',
+  view: (model) => vstackSurface(
+    spacer(62, 1),
+    contentSurface(separator({ label: 'navigable table', width: 62 })),
+    navigableTableSurface(model.table),
+    spacer(62, 1),
+    helpShortSurface(keys, { width: 62 }),
+    spacer(62, 1),
   ),
 };
 

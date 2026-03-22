@@ -2,12 +2,12 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createNavigableTableState, navigableTable,
+  createNavigableTableState, navigableTableSurface,
   navTableFocusNext, navTableFocusPrev,
   navTablePageDown, navTablePageUp,
-  navTableKeyMap, helpShort, vstack,
+  navTableKeyMap, helpShortSurface, vstackSurface,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -74,10 +74,19 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = separator({ label: 'navigable table', width: 62 });
-    const body = navigableTable(model.table);
-    const help = `  ${helpShort(keys)}`;
-    return ansiSurface(vstack('', header, body, help, ''), ctx.runtime.columns, ctx.runtime.rows);
+    const width = Math.max(62, Math.min(ctx.runtime.columns, 80));
+    const header = contentSurface(separator({ label: 'navigable table', width }));
+    const body = navigableTableSurface(model.table);
+    const help = helpShortSurface(keys, { width });
+
+    return vstackSurface(
+      spacer(width, 1),
+      header,
+      body,
+      spacer(width, 1),
+      help,
+      spacer(width, 1),
+    );
   },
 };
 

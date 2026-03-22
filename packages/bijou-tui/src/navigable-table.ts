@@ -19,8 +19,10 @@
 
 import {
   table,
+  tableSurface,
   type TableColumn,
   type BijouContext,
+  type Surface,
 } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 
@@ -59,6 +61,9 @@ export interface NavTableRenderOptions {
   /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
 }
+
+/** Options for rendering the navigable table into a `Surface`. */
+export type NavTableSurfaceOptions = NavTableRenderOptions;
 
 // ---------------------------------------------------------------------------
 // State creation
@@ -193,6 +198,44 @@ export function navigableTable(state: NavigableTableState, options?: NavTableRen
   });
 
   return table({
+    columns: state.columns,
+    rows: decoratedRows,
+    ctx: options?.ctx,
+  });
+}
+
+/**
+ * Render the navigable table directly into a `Surface`.
+ *
+ * This keeps the table on the structured render path while preserving the
+ * existing row-aware scroll model. Unlike generic `viewportSurface()` masking,
+ * the scroll window is still defined in rows, not rendered lines, so wrapped
+ * rows stay honest to the table-inspection job.
+ *
+ * @param state - Current table state.
+ * @param options - Rendering options (focus indicator, context).
+ * @returns Rendered table surface with focus indicator on the active row.
+ */
+export function navigableTableSurface(
+  state: NavigableTableState,
+  options?: NavTableSurfaceOptions,
+): Surface {
+  if (state.rows.length === 0) {
+    return tableSurface({ columns: state.columns, rows: [], ctx: options?.ctx });
+  }
+
+  const indicator = options?.focusIndicator ?? '\u25b8';
+  const pad = ' '.repeat(indicator.length);
+  const visibleRows = state.rows.slice(state.scrollY, state.scrollY + state.height);
+
+  const decoratedRows = visibleRows.map((row, i) => {
+    const globalIndex = state.scrollY + i;
+    const prefix = globalIndex === state.focusRow ? indicator : pad;
+    const firstCol = `${prefix} ${row[0] ?? ''}`;
+    return [firstCol, ...row.slice(1)];
+  });
+
+  return tableSurface({
     columns: state.columns,
     rows: decoratedRows,
     ctx: options?.ctx,

@@ -50,7 +50,7 @@ Branch: `feat/v4-pure-v3-release`
 
 Release intent:
 - finish the last string-era teaching seams in `bijou-tui`
-- unify scroll ownership around `viewportSurface()`
+- finish the remaining surface-native collection and pane paths, using `viewportSurface()` where it fits and row-aware scrolling where it does not
 - make the design-system docs good enough to be a real standard, not just a shape check
 - keep scaffold, smoke, and release workflows truthful enough to publish without hand-waving
 
@@ -58,7 +58,6 @@ Release intent:
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| **Viewport Scroll Unification** | bijou-tui | `browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now sit on the shared `viewportSurface()` masking model. Remaining work is `navigableTable()`, whose wrapped-row comparison semantics still need a row-aware viewport model instead of simple line clipping. |
 | **Design-System Documentation Completeness** | docs | The component-family guide now has a structural completeness gate in CI (`docs:design-system:preflight`). Remaining work is deeper content guidance, stronger examples, and sharper edge-case policy. |
 | **Component Guidance & Carbon-Style Usage Docs** | docs + examples + package READMEs | Keep expanding the “what this is / variants / use / avoid / graceful lowering / related families” doctrine until the public docs actually support the design system they claim to describe. |
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Keep the generated TUI canary and published-artifact path healthy on every release candidate. |
@@ -88,6 +87,7 @@ Release intent:
 | **BCSS Global Cascade & Live Styles** | bijou-tui | v3.0.0 ships scoped BCSS for supported V3 surface components and frame shell regions. Remaining work is a broader layout-node cascade and live style reload tooling. |
 | **Standardized `BijouNode` Protocol** | bijou | Unified node type and `children` prop across all components for true composability. |
 | **Standard Interactive Component & Form System** | bijou-tui | Unified interface for stateful components, global focus management, and TEA-native form binding. |
+| **Row-Aware Table Viewport Model** | bijou-tui | `navigableTableSurface()` now keeps keyboard-owned table inspection on the structured surface path. Remaining work is deciding whether wrapped-row comparison deserves a reusable row-aware masked-table primitive beyond the local navigable-table implementation. |
 | **Notification Center / History View** | bijou-tui | Build on the shipped notification stack with a reusable archive view, command-palette entry points, filters, and richer review/reopen flows. |
 | **Data Visualization Suite** | bijou | High-density `sparkline()`, `barChart()`, and Braille-based `scatterPlot()` for real-time monitoring. |
 | **Motion API** | bijou-tui | Declarative entry/exit animations (Framer Motion style) for components in the `view` function. |

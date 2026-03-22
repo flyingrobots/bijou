@@ -513,16 +513,17 @@ Reusable stateful components that follow the TEA state + pure transformers + syn
 
 ```typescript
 import {
-  createNavigableTableState, navigableTable, navTableFocusNext,
+  createNavigableTableState, navigableTable, navigableTableSurface, navTableFocusNext,
   navTableKeyMap, helpShort,
 } from '@flyingrobots/bijou-tui';
 
 const state = createNavigableTableState({ columns, rows, height: 10 });
-const output = navigableTable(state, { ctx });
+const textOutput = navigableTable(state, { ctx });
+const surfaceOutput = navigableTableSurface(state, { ctx });
 const next = navTableFocusNext(state);
 ```
 
-Use `navigableTable()` when the user should actively traverse a table. If the job is still passive comparison, prefer core `table()` or `tableSurface()` and keep the interaction layer simpler.
+Use `navigableTableSurface()` when the user should actively traverse a table inside a rich TUI surface. Keep `navigableTable()` for explicit text lowering. If the job is still passive comparison, prefer core `table()` or `tableSurface()` and keep the interaction layer simpler.
 
 ### Browsable List
 

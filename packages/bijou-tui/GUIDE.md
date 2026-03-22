@@ -861,6 +861,8 @@ const palette = commandPaletteSurface(createCommandPaletteState(commands, 8), { 
 
 Keep `browsableList()`, `filePicker()`, and `commandPalette()` for explicit text-lowering paths, snapshots, or pipe-oriented output.
 
+`navigableTableSurface()` is the related table-inspection variant. It stays surface-native too, but keeps a row-aware scroll model instead of generic line masking so wrapped comparison rows remain honest.
+
 ### Keymap
 
 Arrow keys are intentionally excluded — reserved for content-specific navigation (e.g., DAG node selection). Scroll uses vim keys:

@@ -473,10 +473,12 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `table()`
   - `tableSurface()`
   - `navigableTable()`
+  - `navigableTableSurface()`
 - Variants:
   - `table()` for passive comparison in core string output
   - `tableSurface()` for passive comparison in V3 surface-first output
   - `navigableTable()` for keyboard-owned inspection in the TUI layer
+  - `navigableTableSurface()` for keyboard-owned inspection on the structured surface path
 - Use when:
   - row/column comparison is the main task
 - Avoid when:
@@ -485,6 +487,8 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - column headers should describe comparable attributes, not narrative explanations
   - cell text should stay compact enough that wrapping does not obscure the comparison task
+  - use `navigableTableSurface()` when the table lives inside a rich TUI surface and the row-aware inspection model should remain structured
+  - unlike list/picker/palette families, navigable tables should keep row-aware scrolling semantics rather than generic line clipping whenever wrapped rows materially affect comparison
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:

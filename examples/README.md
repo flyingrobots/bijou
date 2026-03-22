@@ -109,7 +109,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
 | [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
-| [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-owned table inspection with focus and scrolling |
+| [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |
 | [`file-picker`](./file-picker/) | `filePickerSurface()`, `filePickerKeyMap()` | Directory browser with fixed header and viewport-backed entry list |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
