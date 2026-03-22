@@ -92,12 +92,21 @@ Those docs answer the questions the API reference cannot:
 - Use `tree()` when parent/child nesting is the main thing the reader needs to understand.
 - Use `timeline()` when chronology is the actual reading path.
 - Move to `dag()` when dependency or causal flow matters more than simple order or nesting.
+- Use `dagSlice()` when a local neighborhood or ancestor/descendant chain is the honest scope.
+- Use `dagStats()` when graph health or structural summary matters more than visual shape.
 
 ### Wayfinding and progress
 
 - Use `breadcrumb()` when path context helps explain the current location.
 - Use `paginator()` when compact position-in-sequence feedback is enough.
 - Use `stepper()` when the user is progressing through ordered stages rather than switching among peers.
+
+### Containment and formatted content
+
+- Use `box()` when a region needs visible containment or comparison against sibling panels.
+- Use `headerBox()` when that same region also needs a compact title and detail line.
+- Use `markdown()` for bounded help, reference, and release-note prose that should lower honestly across rich, pipe, and accessible output.
+- Avoid turning every subsection into a box or using markdown as a substitute layout engine for full application chrome.
 
 ## Components
 
@@ -109,6 +118,9 @@ Those docs answer the questions the API reference cannot:
 
 ### Data
 `table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — passive comparison and structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
+
+### Documents
+`markdown()` — structured terminal prose for help, readmes, and reference content with mode-aware lowering.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.

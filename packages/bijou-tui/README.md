@@ -622,6 +622,8 @@ If the pane is still intentionally text-composed, `createFocusAreaState()` + `fo
 
 ### DAG Pane
 
+Use `dagPane()` when graph inspection is an active task and the user needs keyboard-owned selection, path highlighting, and scroll control. Keep plain `dag()` in `@flyingrobots/bijou` for passive graph explanation, and move to `dagSlice()` or `dagStats()` when a focused fragment or structural summary would be more honest than a full interactive graph.
+
 ```typescript
 import {
   createDagPaneState, dagPane, dagPaneSelectChild,

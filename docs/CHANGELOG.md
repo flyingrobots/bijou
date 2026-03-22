@@ -70,6 +70,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Navigable table doctrine update** — the design-system family docs, package README/GUIDE, and navigable-table example docs now teach `navigableTableSurface()` as the structured path and explicitly call out why table inspection keeps row-aware scrolling instead of pretending generic viewport masking is always the right abstraction.
 - **Data and browsing docs depth pass** — the design-system patterns and component-family guides now give sharper “choose this over that” guidance for tables, browsable lists, file pickers, command palettes, and viewport masking, including the explicit rule that row-aware table inspection is not the same thing as generic line-clipped scrolling.
 - **Wayfinding, note, and shader docs depth pass** — the design-system guides, package docs, examples index, and example READMEs now add first-class `note()` coverage, sharper `breadcrumb()` / `paginator()` / `stepper()` scenario guidance, and clearer doctrine for `canvas()`, shader effects, and animated timeline usage.
+- **Containment, markdown, and DAG docs depth pass** — the design-system guides, package docs, and example pages now add a first-class `markdown()` family entry, deeper `box()` / `headerBox()` scenario guidance, and sharper rules for when to use passive DAGs, sliced DAGs, DAG metrics, or `dagPane()` inspection.
 
 ## [3.1.0] - 2026-03-18
 

@@ -1,11 +1,6 @@
 # `markdown()`
 
-Renders a subset of CommonMark that adapts to the terminal's output mode — styled in interactive mode, plain in pipe mode, and screen-reader-friendly in accessible mode.
-
-## Prerequisites
-
-- Node.js 18+
-- `pnpm install` from the repo root
+Renders bounded markdown prose that lowers honestly across rich, pipe, and accessible output modes.
 
 ## Run
 
@@ -19,40 +14,22 @@ Pipe mode output (no ANSI styling):
 npx tsx examples/markdown/main.ts | cat
 ```
 
-## Code
+## Use this when
 
-The example initializes a `BijouContext` via `initDefaultContext()` — this detects the terminal's capabilities (TTY, color support, screen reader) and configures the styling engine accordingly. All bijou components accept `ctx` to render mode-appropriate output.
+- the content is help, reference, release notes, or bounded prose
+- headings, lists, links, and code fences materially help comprehension
+- the same text should remain readable in rich terminals, pipes, and accessible output
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { markdown, box } from '@flyingrobots/bijou';
+## Choose something else when
 
-const ctx = initDefaultContext();
+- the content needs deep document navigation instead of one rendered block
+- the app is really composing UI layout, forms, or command surfaces
+- browser-grade markdown fidelity or arbitrary rich user-authored documents are expected
 
-const SOURCE = `
-# Bijou Markdown
+## What this example proves
 
-**Bijou** supports a subset of CommonMark that degrades gracefully across terminal modes.
-
-## Features
-
-- **Inline formatting**: **bold**, *italic*, and \`code spans\`
-- **Lists**: bulleted and numbered
-- **Links**: [GitHub](https://github.com/flyingrobots/bijou)
-- **Blocks**:
-  > Blockquotes for highlights
-  \`\`\`ts
-  console.log("Fenced code blocks");
-  \`\`\`
-
----
-
-### Why use it?
-
-It allows you to ship documentation or help text that looks great in a TTY but remains readable when piped to a file or a screen reader.
-`;
-
-console.log(box(markdown(SOURCE, { ctx }), { padding: { top: 1, bottom: 1, left: 2, right: 2 } }));
-```
+- supported markdown structure rendered in a terminal-friendly way
+- graceful lowering from styled terminal prose to plain pipe output
+- pairing `markdown()` with `box()` to frame a bounded document region honestly
 
 [← Examples](../README.md)

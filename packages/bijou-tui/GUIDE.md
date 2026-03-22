@@ -921,6 +921,8 @@ dagPaneSelectLeft(pane, ctx);    // left arrow — sibling in same row
 dagPaneSelectRight(pane, ctx);   // right arrow — sibling in same row
 ```
 
+Use `dagPane()` when the graph itself is the inspection surface. If the graph can remain passive, prefer `dag()`. If the real need is a local neighborhood or a health summary rather than full navigation, prefer `dagSlice()` or `dagStats()` instead of forcing everything into one interactive pane.
+
 ### Navigation Logic
 
 Arrow-key navigation uses the `DagNodePosition` map from `dagLayout()` for spatial selection:

@@ -41,7 +41,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 
 | Example | Component | Description |
 |---------|-----------|-------------|
-| [`box`](./box/) | `box()`, `headerBox()` | Bordered containers and header boxes |
+| [`box`](./box/) | `box()`, `headerBox()` | Contained sections and titled panels |
 | [`table`](./table/) | `table()` | Passive row/column comparison grid |
 | [`tree`](./tree/) | `tree()` | Hierarchical tree views |
 | [`accordion`](./accordion/) | `accordion()` | Expandable content sections |
@@ -58,18 +58,18 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`paginator`](./paginator/) | `paginator()` | Page indicators (dots and text) |
 | [`gradient-text`](./gradient-text/) | `gradientText()` | Gradient-colored text rendering |
 | [`progress-static`](./progress-static/) | `progressBar()` | Static progress bars at various states |
-| [`dag`](./dag/) | `dag()` | Directed acyclic graph with status badges |
-| [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
-| [`dag-stats`](./dag-stats/) | `dagStats()` | Graph statistics with cycle and duplicate detection |
+| [`dag`](./dag/) | `dag()` | Passive dependency and causal-flow graph |
+| [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | Focused DAG slices for local dependency review |
+| [`dag-stats`](./dag-stats/) | `dagStats()` | Graph health and structural metrics |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
-| [`markdown`](./markdown/) | `markdown()` | Terminal markdown with mode degradation |
+| [`markdown`](./markdown/) | `markdown()` | Bounded structured prose with mode-aware lowering |
 | [`logo`](./logo/) | `loadRandomLogo()` | Random ASCII brand logos in 3 sizes |
 | [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
 | [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | Output modes, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `createBijou()`, theme presets | Same components in all built-in themes |
-| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background surface tokens across layout and overlays |
+| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background token treatment across containment and overlays |
 
 ## Interactive Forms
 
@@ -124,5 +124,5 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Deliberate shader-driven visual surface |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |
-| [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG viewer with node navigation |
+| [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG inspection pane with viewport and focus |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

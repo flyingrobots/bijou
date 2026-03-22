@@ -67,11 +67,15 @@ Use `table()` when passive row/column comparison is the job. If your V3 app is a
 
 ### Hierarchy & chronology
 
-Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`.
+Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`. Use `dagSlice()` when a local neighborhood is the honest scope, and `dagStats()` when graph health matters more than visual shape.
 
 ### Wayfinding & progress
 
 Use `breadcrumb()` when path context explains where the user is. Use `paginator()` when compact position-in-sequence feedback is enough. Use `stepper()` when the user is moving through ordered stages rather than switching among peer destinations.
+
+### Containment & formatted content
+
+Use `box()` when a region needs visible containment. Use `headerBox()` when the same region also needs a compact title plus detail line. Use `markdown()` for bounded help, reference, and release-note prose that should degrade honestly across rich, pipe, and accessible modes. Avoid using boxes as default decoration or markdown as a substitute layout engine for application chrome.
 
 ### Progress & Spinners
 

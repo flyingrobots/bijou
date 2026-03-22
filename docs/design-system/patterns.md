@@ -265,6 +265,37 @@ Avoid when:
 - the content is intentionally string-first and the text-lowering path is the actual destination
 - the component needs domain-specific focus chrome or status semantics that belong in a higher-level wrapper
 
+## 3.6 Containment and formatted documents
+
+### `box()` / `headerBox()`
+
+Use when:
+
+- a region needs visible containment or a local title
+- peer panels need to feel like separate working areas
+- compact metadata belongs in a header rather than in the surrounding prose
+
+Avoid when:
+
+- every subsection would get a border just for visual decoration
+- the real job is status escalation, not containment
+- a divider, heading, or simple whitespace would communicate structure more honestly
+
+### `markdown()`
+
+Use when:
+
+- the content is help, reference, release notes, or bounded prose
+- lightweight structure such as headings, lists, quotes, links, and code fences materially helps comprehension
+- the same content should lower honestly across rich, pipe, and accessible modes
+
+Avoid when:
+
+- the content is so large that it really needs document navigation instead of one rendered block
+- the prose is user-authored rich content that expects full browser-grade markdown semantics
+- the app is really laying out UI regions or controls and is trying to use markdown as a layout engine
+- dense comparison, forms, or command discovery are the real jobs
+
 ### `pagerSurface()` / `focusAreaSurface()`
 
 Use when:
@@ -297,12 +328,19 @@ Avoid when:
 - the user is really traversing filesystem paths, where `filePickerSurface()` is more honest
 - dense row/column comparison would communicate the content more clearly than nesting
 
-### `dag()`
+### `dag()` / `dagPane()`
 
 Use when:
 
 - the primary relationship is dependency or flow
 - multiple parents or graph edges matter
+- the user needs to answer questions like “what does this depend on?” or “what does this unblock?”
+
+Avoid when:
+
+- a tree, timeline, or table would answer the question more directly
+- the graph would mostly act as architecture wallpaper instead of supporting a concrete task
+- the user really needs a metrics summary or focused fragment instead of the whole graph
 
 ### `timeline()`
 

@@ -1,6 +1,6 @@
 # `box()`, `headerBox()`
 
-Bordered containers and header boxes
+Contained regions and titled panels for grouping related content.
 
 ![demo](demo.gif)
 
@@ -10,39 +10,24 @@ Bordered containers and header boxes
 npx tsx examples/box/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { box, headerBox, separator } from '@flyingrobots/bijou';
+- a region needs visible containment
+- sibling panels should read as separate working areas
+- `headerBox()` can explain a panel with a short title plus compact detail metadata
 
-console.log(separator({ label: 'box', ctx }));
-console.log();
+## Choose something else when
 
-console.log(box('A simple bordered box.', { ctx }));
-console.log();
+- choose `separator()` when a boundary is enough and full containment would add noise
+- choose `alert()` when the message is really status escalation rather than grouping
+- avoid stacking boxes everywhere just to manufacture visual weight
 
-console.log(box('Custom padding adds breathing room.', {
-  padding: { top: 1, bottom: 1, left: 3, right: 3 },
-  ctx,
-}));
-console.log();
+## What this example proves
 
-console.log(separator({ label: 'headerBox', ctx }));
-console.log();
+- `box()` for simple containment and padded breathing room
+- `headerBox()` for titled panels with terse secondary detail
+- nested boxes only when they explain real structure, not as default decoration
 
-console.log(headerBox('Deploy', { detail: 'v1.2.3 → production', ctx }));
-console.log();
-
-console.log(headerBox('Database', { detail: 'postgresql://localhost:5432', ctx }));
-console.log();
-
-console.log(separator({ label: 'nested boxes', ctx }));
-console.log();
-
-const inner1 = box('Port: 3000', { ctx });
-const inner2 = box('Port: 5432', { ctx });
-console.log(box(inner1 + '\n' + inner2, { ctx }));
-```
+For background-filled panel treatment, see [`background-panels`](../background-panels/).
 
 [← Examples](../README.md)

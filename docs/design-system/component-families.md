@@ -193,11 +193,18 @@ If those checks fail, the component work is not doctrinally complete yet.
   - titled via `headerBox()`
   - render-path companions via `boxSurface()` and `headerBoxSurface()`
 - Use when:
-  - grouping and containment matter
+  - grouping, containment, or local region identity matter
+  - peer panels need to read as separate working areas
+  - a compact title plus detail helps orient a panel without consuming a full heading block
 - Avoid when:
   - urgency or interruption is the primary job
+  - every subsection would get its own border purely for decoration
+  - a separator, heading, or whitespace would communicate structure more honestly
 - Content guidance:
+  - use `box()` for grouped content and `headerBox()` when the region needs a clear title plus compact secondary detail
   - titles should describe the region’s job, not restate surrounding context
+  - `headerBox()` detail text should carry terse metadata such as environment, path, version, or scope rather than a second sentence
+  - nested boxes should be rare and should explain real hierarchy or comparison, not just add more chrome
   - keep dense prose out of narrow boxes unless wrapping materially helps comprehension
 - Ownership:
   - core
@@ -212,6 +219,38 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `splitPane()`
 - Carbon analogue:
   - tile / contained section
+
+### Formatted documents and prose
+
+- Family: `markdown()`
+- Variants:
+  - headings, emphasis, lists, blockquotes, links, code fences, and other supported markdown structures with mode-aware lowering
+- Use when:
+  - help, reference, release notes, readme-like content, or bounded prose needs lightweight structure
+  - the same content should remain honest across rich, pipe, and accessible output modes
+- Avoid when:
+  - the content needs deep document navigation rather than one rendered block
+  - the app is really composing interface layout, forms, or command surfaces rather than prose
+  - browser-grade markdown fidelity or arbitrary user-authored rich documents are expected
+- Content guidance:
+  - headings should break the content into scannable chunks instead of reproducing the entire document hierarchy from another medium
+  - keep fenced code blocks and quotes short enough that the surrounding task still matters more than ornamental formatting
+  - links should remain explicit and self-describing, since terminals vary in clickable-link support
+  - use markdown for documents and reference prose, not as a substitute layout engine for application chrome
+  - when markdown appears in overlays or panes, keep the scope intentionally bounded and move to pager or navigation patterns if the content becomes a document-reading task
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve supported markdown structure and emphasis honestly within terminal constraints
+  - pipe: lower to plain text with heading/list/code semantics still understandable without styling
+  - accessible: linearize headings, lists, links, and code cues explicitly in reading order
+- Related families:
+  - `note()`
+  - `box()`
+  - `pager()`
+  - `helpView()`
+- Carbon analogue:
+  - structured text / markdown content block
 
 ### Dividers
 
@@ -633,14 +672,21 @@ If those checks fail, the component work is not doctrinally complete yet.
   - interactive graph inspection
 - Use when:
   - time or dependency is the actual structure
+  - readers need to answer “what happened next?” or “what depends on this?”
 - Avoid when:
   - a plain table or tree is enough
+  - the graph is mostly decorative architecture wallpaper
+  - a summary metric or local fragment would answer the question more honestly than the whole structure
 - Content guidance:
   - events and nodes should expose the causal or temporal relationship, not just labels
   - annotations should stay lightweight enough that the structure remains legible
   - use `timeline()` when chronology is the actual reading path, not as a decorative status list
   - if timeline rows become so dense that the user is comparing attributes instead of following sequence, collapse to summary milestones plus drill-down or move to a table/log view
   - use `dag()` / `dagPane()` when causality, dependency, or multi-parent structure matters more than order
+  - use `dagPane()` when graph inspection is an active task and keyboard-owned navigation, focus, and scrolling are part of the job; keep plain `dag()` for passive explanation
+  - use `dagSlice()` when the honest scope is a neighborhood, ancestor chain, or descendant chain and the full graph would exceed the reader’s cognitive budget
+  - use `dagStats()` when graph health, breadth, depth, or duplication risk matters more than visual shape
+  - if most nodes have only one parent and the reader still consumes them in sequence, `timeline()` or `tree()` is usually clearer than a DAG
   - audit-trail timelines should preserve event ordering and consequence clearly, but avoid stuffing each row with enough metadata that the temporal story disappears
 - Ownership:
   - core plus TUI interaction layer
@@ -902,6 +948,6 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 These are shipped, but the guidance is still thinner than it should be:
 
-- `box()` / `headerBox()` scenario guidance beyond simple containment
-- `markdown()` content policy and when not to render rich markdown in terminal output
-- `dag()` / `dagPane()` scenario guidance for when graph shape is worth the cognitive cost
+- `skeleton()` loading-state policy and when placeholders should yield to honest partial content
+- `hyperlink()` trust and external-destination guidance for terminal output
+- `logo()` / `gradientText()` expressive-brand boundaries versus routine application chrome

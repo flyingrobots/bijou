@@ -1,6 +1,6 @@
 # `dagStats()`
 
-Graph statistics with cycle and duplicate detection
+Graph health and structural metrics for DAG data.
 
 ![demo](demo.gif)
 
@@ -10,43 +10,22 @@ Graph statistics with cycle and duplicate detection
 npx tsx examples/dag-stats/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { dagStats, dag, separator, table, box } from '@flyingrobots/bijou';
-import type { DagNode } from '@flyingrobots/bijou';
+- the reader needs graph health, breadth, depth, or duplication signals
+- summary metrics matter more than visual shape
+- you want to validate or compare DAG structures before rendering the whole graph
 
-const nodes: DagNode[] = [
-  { id: 'bridge', label: 'Theme bridge', edges: ['static', 'tea'] },
-  { id: 'static', label: 'Static renderers', edges: ['roadmap', 'lineage'] },
-  { id: 'tea', label: 'TEA app shell', edges: ['roadmap', 'lineage', 'input', 'watch'] },
-  { id: 'roadmap', label: 'RoadmapView', edges: ['cleanup'] },
-  { id: 'lineage', label: 'LineageView', edges: ['cleanup'] },
-  { id: 'input', label: 'Input system', edges: ['cleanup'] },
-  { id: 'watch', label: 'graph.watch()', edges: ['cleanup'] },
-  { id: 'cleanup', label: 'Cleanup' },
-];
+## Choose something else when
 
-console.log(dag(nodes, { ctx }));
+- choose `dag()` when dependency shape itself is the product
+- choose `dagSlice()` when only one local neighborhood matters
+- choose `dagPane()` when the user should actively inspect and navigate nodes
 
-const stats = dagStats(nodes);
+## What this example proves
 
-console.log(table({
-  columns: [
-    { header: 'Metric', width: 12 },
-    { header: 'Value', width: 10 },
-  ],
-  rows: [
-    ['Nodes', String(stats.nodes)],
-    ['Edges', String(stats.edges)],
-    ['Depth', String(stats.depth)],
-    ['Width', String(stats.width)],
-    ['Roots', String(stats.roots)],
-    ['Leaves', String(stats.leaves)],
-  ],
-  ctx,
-}));
-```
+- structural metrics such as nodes, edges, depth, width, roots, and leaves
+- pairing DAG metrics with a passive graph render
+- using summary and validation signals before escalating to a richer graph viewer
 
 [← Examples](../README.md)
