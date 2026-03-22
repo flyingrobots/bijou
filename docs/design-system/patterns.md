@@ -322,35 +322,43 @@ Choose overlays by how much they should interrupt and how much context they shou
 - If users need history, stacking, routing, or recall, move up from `toast()` to the notification system.
 - If background input must stop, use `modal()` rather than trying to make a toast or drawer behave like one.
 - If the content is long-lived and belongs in the reading flow, use `alert()` or a normal page region instead of any overlay.
+- Use structured `Surface` content inside overlays when the interrupting layer needs real rows, embedded components, or richer layout. Flatten to plain text only at explicit lowering boundaries.
 
 ### `tooltip()`
 
-- for tiny local explanation
+- for tiny local explanation attached to nearby content
+- prefer one or two short lines that clarify a control, label, or state
 - not for decisions
-- not for content that needs scrolling, recall, or commands
+- not for content that needs scrolling, recall, commands, or workflow ownership
 
 ### `drawer()`
 
 - for supplemental context, inspectors, side work
 - keep the main surface visible
 - prefer when the user needs reference material while still working in the main task
+- use panel-scoped drawers when the supplemental context belongs to one workspace region instead of the whole frame
+- do not turn a drawer into a modal by stuffing it with blocking confirmation copy
 
 ### `modal()`
 
 - for blocking review, choice, or confirmation
 - background shortcuts and pointer actions should be blocked
 - use sparingly; interruption must be justified
+- prefer short review-and-decide tasks over deep browsing or long-lived side work
 
 ### `toast()`
 
 - for one transient overlay the app is composing directly
 - not for stack/history/routing problems
+- if the same class of event happens repeatedly, stop composing ad hoc toasts and move up to notifications
 
 ### notifications
 
 - for events, not documents
 - use history/archive when recall matters
 - prefer over repeated ad hoc toasts once app-level messaging becomes systemic
+- route app-owned warnings and errors here when users may need to revisit them after the initial interruption
+- keep actions singular and obvious; do not hide multi-step workflows inside notification cards
 
 ## 6. Forms and progression
 
@@ -387,6 +395,12 @@ Avoid when:
 - Use shell chrome for orientation, status, and cross-cutting actions. Put explanation and task detail back into the page.
 - Prefer the simplest workspace that preserves the mental model. Do not use split panes or grids just because the runtime can.
 - If a region is not meaningfully inspectable, comparable, or supplemental, it probably should not be its own pane.
+- Keep shell roles distinct:
+  - status rails communicate concise global state
+  - help hints teach shortcuts and scope
+  - command palette surfaces action discovery
+  - notifications surface events and follow-up
+- If one shell element starts doing another shell element's job, the design is drifting.
 
 ### `createFramedApp()`
 
@@ -404,6 +418,8 @@ Content guidance:
 - tabs should represent peer destinations, not unrelated commands
 - shell notifications and overlays should remain subordinate to the active page task
 - help text should clarify shell behavior, not restate page content
+- command palette entries should prefer actions and navigation targets, not field-style data entry or explanatory prose
+- use drawers for supplemental workspace context and notifications for event messaging; do not overload the status rail with either
 
 ### `statusBar()` and `statusBarSurface()`
 
@@ -422,6 +438,7 @@ Content guidance:
 - keep `statusBar()` for explicit text output or lowering
 - reserve strong emphasis for mode changes, faults, or focus-critical state
 - do not turn the status bar into a secondary page body
+- do not route transient warnings or task-specific explanation here when notifications or in-page content would be more honest
 
 ### `helpShort()` / `helpView()` and surface companions
 
@@ -439,6 +456,7 @@ Content guidance:
 - use `helpViewSurface()` for grouped shortcut references embedded inside a rich TUI surface or modal
 - keep the plain string helpers for explicit lowering, pipe output, or textual docs/examples
 - group by user intent (`Navigation`, `Actions`, `Selection`) rather than by key shape
+- help is for shortcut discovery and scope clarification, not for executing commands or replacing a command palette
 
 ### `splitPane()` and `grid()`
 

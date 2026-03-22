@@ -130,6 +130,7 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use `drawer()` when the user should keep the main surface visible while working in supplemental detail.
 - Use `modal()` when background shortcuts and pointer actions should be blocked.
 - Use `tooltip()` only for tiny local explanation, not for decisions or scrollable content.
+- If the overlay needs embedded component surfaces or multiple real rows, keep it on the structured `Surface` path with `compositeSurface()`.
 
 ### Collection interaction
 
@@ -143,6 +144,9 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use `splitPane()` when the user benefits from primary-versus-secondary context or side-by-side comparison.
 - Use `grid()` when multiple stable regions deserve simultaneous visibility.
 - Use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output.
+- Use `helpShortSurface()` or `helpViewSurface()` when shortcut guidance stays inside the rich shell; keep `helpShort()` / `helpView()` for explicit text output.
+- Use `commandPaletteSurface()` for action discovery and navigation inside the shell, not as a substitute value picker.
+- Use notifications for events and follow-up, not as a replacement for the status rail.
 - Keep status rails concise and global; explanatory text belongs in the page, not in shell chrome.
 
 ## Animation
@@ -491,6 +495,7 @@ Each overlay now exposes both `surface` and `content` forms. Prefer `compositeSu
 Reach for `toast()` when the app is composing a one-off overlay directly. Reach for the notification system when stacking, actions, routing, or history matter. The notification lab in `examples/notifications` is the canonical higher-level example.
 
 `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
+Use `drawer()` when the user should keep the main task visible while consulting or editing supplemental context. Use `modal()` when the user must stop and decide. Use `tooltip()` only for tiny local explanation, not for commands or scrollable content.
 
 ## App Frame
 
@@ -504,6 +509,13 @@ Reach for `toast()` when the app is composing a one-off overlay directly. Reach 
 Pane renderers return a `Surface` or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
+
+Shell role split matters:
+
+- `statusBarSurface()` communicates concise global state
+- `helpShortSurface()` / `helpViewSurface()` teach shortcuts and scope
+- `commandPaletteSurface()` handles action discovery and navigation
+- notifications surface events and follow-up
 
 ## Building Blocks
 

@@ -94,8 +94,8 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`flex-layout`](./flex-layout/) | `flex()`, `vstack()`, `hstack()` | Responsive sidebar + main layout |
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
-| [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
-| [`toast`](./toast/) | `toast()`, `composite()` | Low-level transient overlay primitive with explicit anchoring |
+| [`modal`](./modal/) | `modal()`, `compositeSurface()`, `createInputStack()` | Blocking decision overlay with layered input ownership |
+| [`toast`](./toast/) | `toast()`, `compositeSurface()` | Low-level transient overlay primitive with explicit anchoring |
 | [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and history center |
 | [`help`](./help/) | `createKeyMap()`, `helpViewSurface()`, `helpShortSurface()` | Keybinding manager with surface-native help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
@@ -107,7 +107,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
 | [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
-| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
+| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `drawer()`, command palette | Canonical multi-view control room with pane-scoped drawers and shell-level action discovery |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |
@@ -116,9 +116,9 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
 | [`status-bar`](./status-bar/) | `statusBar()`, `statusBarSurface()` | Segmented header/footer with explicit text and surface paths |
-| [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
+| [`drawer`](./drawer/) | `drawer()`, `compositeSurface()` | Togglable slide-in side panel overlay |
 | [`command-palette`](./command-palette/) | `commandPaletteSurface()`, `commandPaletteKeyMap()` | Filterable action list with fixed search row and viewport-backed results |
-| [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
+| [`tooltip`](./tooltip/) | `tooltip()`, `compositeSurface()` | Positioned overlay with directional placement |
 | [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |

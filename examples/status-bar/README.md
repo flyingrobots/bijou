@@ -8,6 +8,17 @@ Segmented shell status rails
 npx tsx examples/status-bar/main.ts
 ```
 
+## Use this when
+
+- shell chrome needs concise global state, mode, or position cues
+- the app already composes shell output as a structured `Surface`
+- the information belongs at the shell edge rather than in page content
+
+## Choose something else when
+
+- choose notifications for transient events, warnings, and follow-up
+- choose page content or `alert()` when the text is explanatory or durable
+
 ## Code
 
 ```typescript

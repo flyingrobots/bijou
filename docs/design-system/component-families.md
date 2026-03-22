@@ -674,6 +674,8 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `drawer()` content should support supplemental work, inspection, or side-by-side context without stealing the whole task
   - `modal()` content should justify blocking the user and should end in a clear decision, confirmation, or review step
   - `toast()` content should be short-lived and self-contained, not a surrogate notification center
+  - if the user may need recall, stacking, or routing, stop composing ad hoc `toast()` overlays and move up to the notification system
+  - if the user still needs the main task visible and interactive, prefer `drawer()` over `modal()`
   - when rich TUI structure matters, overlays should accept or compose structured `Surface` content instead of flattening component content into strings first
 - Graceful lowering:
   - rich: layered overlay surfaces with blocking or non-blocking behavior depending on variant
@@ -686,6 +688,51 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `createFramedApp()`
 - Carbon analogue:
   - tooltip / side panel / modal / toast notification
+
+### Notification system
+
+- Family:
+  - `renderNotificationStack()`
+  - `renderNotificationHistory()`
+  - `pushNotification()`
+  - `dismissNotification()`
+  - `tickNotifications()`
+  - framed runtime notification routing
+- Variants:
+  - `ACTIONABLE`
+  - `INLINE`
+  - `TOAST`
+  - info, success, warning, error tone variants
+  - per-notification placement and duration
+- Use when:
+  - the app owns transient messaging as a system instead of rendering one ad hoc overlay at a time
+  - stacking, placement, routing, or history matter
+  - warnings and errors should be reviewable after the moment they first appear
+- Avoid when:
+  - the message should remain in normal page flow as part of the document
+  - a single local transient overlay is enough
+  - the user must stop and decide before continuing
+- Ownership:
+  - TUI
+- Content guidance:
+  - use notifications for events and follow-up prompts, not durable documents or long-form explanation
+  - actionable notifications should expose one obvious next step, not a miniature workflow or form
+  - if users may need to revisit prior notices, the archive/history surface is part of the feature, not an optional add-on
+  - route app-owned warnings and errors here when recall matters, while still keeping stderr/log output honest where appropriate
+  - use placement and duration to control interruption level, not to smuggle unrelated importance into every message
+- Graceful lowering:
+  - rich: stacked notifications with actions, placement, history, and explicit dismissal
+  - static: visible current notifications or a truthful archived summary without pretending transient timing still exists
+  - pipe: lower to sequential event text or explicit warning/error records
+  - accessible: linearize current and archived notices with tone, action, and dismissal state made explicit
+- Related families:
+  - `toast()`
+  - `alert()`
+  - `modal()`
+  - `drawer()`
+  - `createFramedApp()`
+- Carbon analogue:
+  - notification / toast notification center pattern
 
 ### App shell
 
@@ -710,6 +757,8 @@ If those checks fail, the component work is not doctrinally complete yet.
   - status lines should carry concise global context, not replace in-page guidance
   - command palette entries should prefer actions and navigation targets over field-style data entry
   - tabs should represent peer destinations or work areas, not disguised command buttons
+  - use notifications for events and follow-up, not the status rail
+  - use help hints for shortcut discovery and shell scope, not for action execution or event messaging
 - Graceful lowering:
   - rich: full shell chrome with tabs, palette, overlays, notifications, and workspace regions
   - static: retain the active page and essential shell context without pretending background interactivity exists
@@ -747,6 +796,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - use `helpViewSurface()` when the full keybinding reference is embedded inside a rich TUI surface; keep `helpView()` for plain text and pipe-oriented help
   - group names should describe jobs (`Navigation`, `Actions`, `Selection`) rather than raw input mechanics
   - help text should clarify behavior and scope, not repeat page prose or become a substitute command palette
+  - use the command palette for discoverable actions and navigation, and keep help focused on shortcut explanation
 - Graceful lowering:
   - rich: concise shell hints plus an optional grouped help view or modal
   - static: retain the active hint and the relevant grouped reference without pretending background input is live

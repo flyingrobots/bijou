@@ -668,6 +668,7 @@ Additional guidance:
 - If users may need to review prior events, the notification system is the right family, not a pile of ad hoc toasts.
 - If the content belongs in the reading flow, move it back into the page as an `alert()` or normal region instead of forcing it into an overlay.
 - If interruption is not justified, prefer a drawer over a modal.
+- If the overlay needs embedded component surfaces or multiple real rows, keep it on the structured `Surface` path and compose with `compositeSurface()`.
 
 ### Modals
 
@@ -777,6 +778,9 @@ Shell doctrine:
 
 - tabs are for peer destinations, not command buttons
 - use `statusBarSurface()` when status rails stay on the structured shell path; keep `statusBar()` for explicit text output
+- use `helpShortSurface()` / `helpViewSurface()` for shortcut guidance and scope, not for action execution
+- use `commandPaletteSurface()` for action discovery and navigation, not as a value picker
+- use notifications for events and follow-up, not as a replacement for the status rail
 - status rails are for concise global context, not page prose
 - split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
 - if a second region does not materially help the task, keep the app in a simpler single-surface flow

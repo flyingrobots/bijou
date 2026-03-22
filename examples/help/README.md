@@ -10,6 +10,17 @@ Keybinding manager with help toggle
 npx tsx examples/help/main.ts
 ```
 
+## Use this when
+
+- the app is keyboard-owned and users need shortcut discovery
+- shell hints should stay on the structured `Surface` path
+- grouped shortcut reference should reflect behavior and scope, not just raw key names
+
+## Choose something else when
+
+- choose `commandPaletteSurface()` when the real task is action discovery or navigation
+- choose visible inline labels when the controls are already self-evident and help text would only restate them
+
 ## Code
 
 ```typescript

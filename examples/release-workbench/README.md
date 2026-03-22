@@ -2,18 +2,30 @@
 
 Canonical multi-view app-shell demo built on `createFramedApp()`.
 
-Demonstrates:
-- Tabs and shared frame chrome
-- Multi-pane layouts with `grid()` and `splitPane()`
-- Pane focus + per-pane scroll isolation
-- Pane-scoped `drawer()` overlays
-- Frame-level command palette
-
 ## Run
 
 ```sh
 npx tsx examples/release-workbench/main.ts
 ```
+
+## Use this when
+
+- you want the canonical shell example instead of a minimal framed-app starter
+- the product has multiple destinations, pane-focused workspace state, overlays, and global action discovery
+- you need a concrete example of shell roles staying distinct: status/help/palette/notifications/overlays
+
+## Choose something else when
+
+- choose `app-frame` when you want a smaller focused shell example
+- choose a single-page example when the product is really one surface or one prompt loop
+
+## What this example proves
+
+- tabs and shared frame chrome
+- multi-pane layouts with split and grid page composition
+- pane focus plus per-pane scroll isolation
+- pane-scoped `drawer()` overlays
+- shell-level command palette and confirmation flow
 
 ## Controls
 
