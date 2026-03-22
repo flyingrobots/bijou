@@ -2,11 +2,12 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg,
-  createCommandPaletteState, commandPalette,
+  createCommandPaletteState, commandPaletteSurface,
   cpFilter, cpFocusNext, cpFocusPrev, cpPageDown, cpPageUp,
-  commandPaletteKeyMap, helpShort, vstack,
+  commandPaletteKeyMap, helpShortSurface, vstackSurface,
   type CommandPaletteItem,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -82,10 +83,19 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = separator({ label: 'command palette', ctx });
-    const body = commandPalette(model.cp, { width: 60, ctx });
-    const help = `  ${helpShort(keys)}`;
-    return vstack('', header, '', body, '', help, '');
+    const width = Math.min(60, Math.max(24, ctx.runtime.columns));
+    const header = contentSurface(separator({ label: 'command palette', width, ctx }));
+    const body = commandPaletteSurface(model.cp, { width, ctx });
+    const help = helpShortSurface(keys, { width });
+
+    return vstackSurface(
+      spacer(width, 1),
+      header,
+      spacer(width, 1),
+      body,
+      spacer(width, 1),
+      help,
+    );
   },
 };
 

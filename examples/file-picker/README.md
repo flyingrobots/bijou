@@ -1,6 +1,6 @@
-# `filePicker()`
+# `filePickerSurface()`
 
-Directory browser with keyboard navigation
+Directory browser with a fixed header and viewport-backed entry list
 
 ![demo](demo.gif)
 
@@ -17,10 +17,11 @@ import { initDefaultContext, nodeIO } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  createFilePickerState, filePicker,
+  createFilePickerState, filePickerSurface,
   fpFocusNext, fpFocusPrev, fpEnter, fpBack,
-  filePickerKeyMap, helpShort, vstack,
+  filePickerKeyMap, helpShortSurface, vstackSurface,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -78,10 +79,18 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = separator({ label: 'file picker', width: model.cols });
-    const body = filePicker(model.fp);
-    const help = `  ${helpShort(keys)}`;
-    return vstack(header, body, help);
+    const width = Math.max(24, model.cols);
+    const header = contentSurface(separator({ label: 'file picker', width }));
+    const body = filePickerSurface(model.fp, { width });
+    const help = helpShortSurface(keys, { width });
+
+    return vstackSurface(
+      header,
+      spacer(width, 1),
+      body,
+      spacer(width, 1),
+      help,
+    );
   },
 };
 

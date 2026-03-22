@@ -7,7 +7,15 @@
 
 import type { LayoutRect } from './layout-rect.js';
 import { fitBlock } from './layout-utils.js';
-import { graphemeClusterWidth, graphemeWidth, segmentGraphemes, type WritePort } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  graphemeClusterWidth,
+  graphemeWidth,
+  segmentGraphemes,
+  type Surface,
+  type WritePort,
+} from '@flyingrobots/bijou';
+import { placeSurface } from './surface-layout.js';
 
 /** Split direction. */
 export type SplitPaneDirection = 'row' | 'column';
@@ -52,6 +60,14 @@ export interface SplitPaneOptions {
   readonly paneA: (width: number, height: number) => string;
   /** Pane B renderer. */
   readonly paneB: (width: number, height: number) => string;
+}
+
+/** Options for rendering split panes from structured surfaces. */
+export interface SplitPaneSurfaceOptions extends Omit<SplitPaneOptions, 'paneA' | 'paneB'> {
+  /** Pane A renderer. */
+  readonly paneA: (width: number, height: number) => Surface;
+  /** Pane B renderer. */
+  readonly paneB: (width: number, height: number) => Surface;
 }
 
 /**
@@ -180,6 +196,40 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
   );
 
   return [...aLines, ...dividerLines, ...bLines].join('\n');
+}
+
+/**
+ * Render a split-pane surface.
+ */
+export function splitPaneSurface(state: SplitPaneState, options: SplitPaneSurfaceOptions): Surface {
+  const width = Math.max(0, Math.floor(options.width));
+  const height = Math.max(0, Math.floor(options.height));
+  if (width === 0 || height === 0) return createSurface(0, 0);
+
+  const direction = options.direction ?? 'row';
+  const fallbackDividerChar = direction === 'row' ? '│' : '─';
+  const dividerUnit = resolveDividerChar(options.dividerChar, fallbackDividerChar);
+  const layout = splitPaneLayout(state, options);
+  const result = createSurface(width, height);
+
+  const paneA = placeSurface(options.paneA(layout.paneA.width, layout.paneA.height), {
+    width: layout.paneA.width,
+    height: layout.paneA.height,
+  });
+  const paneB = placeSurface(options.paneB(layout.paneB.width, layout.paneB.height), {
+    width: layout.paneB.width,
+    height: layout.paneB.height,
+  });
+
+  result.blit(paneA, layout.paneA.col, layout.paneA.row, 0, 0, layout.paneA.width, layout.paneA.height);
+  result.blit(paneB, layout.paneB.col, layout.paneB.row, 0, 0, layout.paneB.width, layout.paneB.height);
+
+  if (layout.divider.width > 0 && layout.divider.height > 0) {
+    const divider = createSurface(layout.divider.width, layout.divider.height, { char: dividerUnit, empty: false });
+    result.blit(divider, layout.divider.col, layout.divider.row, 0, 0, layout.divider.width, layout.divider.height);
+  }
+
+  return result;
 }
 
 /** Divide available space between two panes, respecting ratio and minimum constraints. */

@@ -1,10 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { spinnerFrame, badge, surfaceToString } from '@flyingrobots/bijou';
+import { spinnerFrame } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   frame: number;
@@ -47,14 +46,14 @@ const app: App<Model, Msg> = {
 
   view: (model) => {
     if (model.phase === 'done') {
-      return `\n  ${badgeText('DONE', 'success')}  All tasks complete.\n`;
+      return column([spacer(), row(['  ', badgeSurface('DONE', 'success', ctx), '  All tasks complete.']), spacer()]);
     }
 
     const label = model.phase === 'loading'
       ? 'Fetching dependencies...'
       : 'Processing modules...';
 
-    return `\n  ${spinnerFrame(model.frame, { label })}\n`;
+    return column([spacer(), line(`  ${spinnerFrame(model.frame, { label })}`), spacer()]);
   },
 };
 

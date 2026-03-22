@@ -1,6 +1,6 @@
 # `dagSlice()` + `dag()`
 
-DAG slicing with ghost nodes at boundaries
+Focused DAG slices for local dependency review.
 
 ![demo](demo.gif)
 
@@ -10,51 +10,22 @@ DAG slicing with ghost nodes at boundaries
 npx tsx examples/dag-fragment/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { dag, dagSlice, separator } from '@flyingrobots/bijou';
-import type { DagNode } from '@flyingrobots/bijou';
+- the full graph is too large to be the honest scope
+- the question is local, such as ancestors, descendants, or a neighborhood
+- you want to preserve graph semantics without making the reader pay for the entire network
 
-const nodes: DagNode[] = [
-  { id: 'init', label: 'Project init', edges: ['core', 'cli'] },
-  { id: 'core', label: 'Core engine', edges: ['parser', 'resolver', 'cache'] },
-  { id: 'cli', label: 'CLI scaffold', edges: ['commands', 'config'] },
-  { id: 'parser', label: 'Parser', edges: ['transform'] },
-  { id: 'resolver', label: 'Resolver', edges: ['transform', 'graph'] },
-  { id: 'cache', label: 'Cache layer', edges: ['graph'] },
-  { id: 'commands', label: 'Commands', edges: ['output'] },
-  { id: 'config', label: 'Config loader', edges: ['commands'] },
-  { id: 'transform', label: 'Transform', edges: ['output'] },
-  { id: 'graph', label: 'Dep graph', edges: ['output'] },
-  { id: 'output', label: 'Output engine', edges: ['release'] },
-  { id: 'release', label: 'Release', edges: ['docs'] },
-  { id: 'docs', label: 'Docs' },
-];
+## Choose something else when
 
-console.log(separator({ label: 'Full DAG (13 nodes)', ctx }));
-console.log();
-console.log(dag(nodes, { ctx }));
-console.log();
+- choose plain `dag()` when the full dependency shape is still readable and relevant
+- choose `dagStats()` when the reader needs structural summary more than local topology
+- choose `dagPane()` when the user should actively inspect and navigate the graph
 
-console.log(separator({ label: 'dagSlice — ancestors of "output"', ctx }));
-console.log();
-const ancestors = dagSlice(nodes, 'output', { direction: 'ancestors' });
-console.log(dag(ancestors, { ctx }));
-console.log();
+## What this example proves
 
-console.log(separator({ label: 'dagSlice — descendants of "core"', ctx }));
-console.log();
-const descendants = dagSlice(nodes, 'core', { direction: 'descendants' });
-console.log(dag(descendants, { ctx }));
-console.log();
-
-console.log(separator({ label: 'dagSlice — 2-hop neighborhood of "resolver"', ctx }));
-console.log();
-const neighborhood = dagSlice(nodes, 'resolver', { direction: 'both', depth: 2 });
-console.log(dag(neighborhood, { ctx }));
-console.log();
-```
+- ancestor, descendant, and neighborhood slices
+- ghost-node boundaries that keep the slice honest about omitted context
+- a better alternative than forcing oversized full-graph renderings into the terminal
 
 [← Examples](../README.md)

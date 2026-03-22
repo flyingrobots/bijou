@@ -53,7 +53,7 @@ This is not just a string-template library. It understands output modes and make
 It gives you:
 
 - a TEA-style runtime with `init`, `update`, `view`, and command flow
-- `ViewOutput` as the public render contract: `string | Surface | LayoutNode`
+- `ViewOutput` as the public render contract: `Surface | LayoutNode`
 - buffered `Surface` rendering instead of blind full-frame repainting
 - diff-based terminal output
 - layout primitives like `flex`, `vstack`, `hstack`, `grid`, and `viewport`
@@ -125,6 +125,20 @@ This repo is opinionated about one thing: if the examples, scaffolded apps, and 
 | [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) | `npm create` scaffolder for a runnable Bijou app |
 
 All packages are versioned in lock-step.
+
+## Design System
+
+Bijou now ships a design-system documentation track in addition to API docs.
+
+Start here:
+
+- [Design System Overview](./docs/design-system/README.md)
+- [Foundations](./docs/design-system/foundations.md)
+- [Patterns](./docs/design-system/patterns.md)
+- [Component Families](./docs/design-system/component-families.md)
+- [Data Visualization Policy](./docs/design-system/data-visualization.md)
+
+If you want the blunt version: these docs answer not just "what exports exist?" but "what is this component for, when should I use it, when should I avoid it, and what is the TUI-versus-core boundary?"
 
 ## Quick Start
 
@@ -203,7 +217,7 @@ await run(app);
 
 ```ts
 import { badge, boxSurface, separatorSurface, tableSurface } from '@flyingrobots/bijou';
-import { hstackV3, vstackV3 } from '@flyingrobots/bijou-tui';
+import { vstackSurface } from '@flyingrobots/bijou-tui';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 
 const ctx = initDefaultContext();
@@ -215,7 +229,7 @@ const stats = tableSurface({
 });
 
 const card = boxSurface(
-  vstackV3(
+  vstackSurface(
     separatorSurface({ label: 'Deploy Status', width: stats.width, ctx }),
     stats,
   ),
@@ -235,6 +249,45 @@ Bijou is designed to do the right thing without making you micromanage output st
 | `accessible` | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader-friendly flow |
 
 This is not an afterthought. It is the core product idea.
+
+### A Real Degradation Example
+
+The same component call lowers itself differently depending on the output profile.
+
+```ts
+import { alert } from '@flyingrobots/bijou';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+
+const ctx = initDefaultContext();
+
+console.log(
+  alert('Connection refused on port 5432.', {
+    variant: 'error',
+    ctx,
+  }),
+);
+```
+
+With no color applied so the shape is easier to see, that exact call renders like this:
+
+```text
+interactive / static
+┌─────────────────────────────────────┐
+│ ✗ Connection refused on port 5432. │
+└─────────────────────────────────────┘
+
+pipe
+[ERROR] Connection refused on port 5432.
+
+accessible
+Error: Connection refused on port 5432.
+```
+
+That is the core Bijou promise in one example:
+
+- rich terminals get real chrome
+- pipes get plain-text-safe output
+- accessible runs get the same meaning, rewritten for reading instead of decoration
 
 ## The Feature Tour In Repo Form
 
@@ -271,13 +324,13 @@ For the full example index, see [`examples/README.md`](./examples/README.md) and
 - `@flyingrobots/bijou-tui` is the high-fidelity runtime
 - `@flyingrobots/bijou-tui-app` is the shell layer
 - `@flyingrobots/bijou-node` owns the Node boundary, worker runtime, and recorder helpers
-- `App.view` and framed panes now honestly support `string | Surface | LayoutNode`
+- `App.view` and framed panes now stay on the pure runtime path: `Surface | LayoutNode`
 - the flagship runtime path is surface/layout-native at the frame boundary
 - BCSS, motion, Fractal TEA helpers, worker runtime, and native demo recording all ship as real documented features
 
 If you are upgrading an existing app, read the migration guide first:
 
-- [`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md)
+- [`docs/MIGRATING_TO_V4.md`](./docs/MIGRATING_TO_V4.md)
 
 And for the full release notes:
 
@@ -314,7 +367,7 @@ That gives the repo a downstream contract check, not just an internal unit check
 ## Documentation Map
 
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — package graph, ports, runtime model
-- [`docs/MIGRATING_TO_V3.md`](./docs/MIGRATING_TO_V3.md) — upgrade guide for existing apps
+- [`docs/MIGRATING_TO_V4.md`](./docs/MIGRATING_TO_V4.md) — upgrade guide for existing apps
 - [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) — release notes
 - [`docs/EXAMPLES.md`](./docs/EXAMPLES.md) — curated example map
 - [`packages/bijou/GUIDE.md`](./packages/bijou/GUIDE.md) — core package guide

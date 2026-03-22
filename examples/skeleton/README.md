@@ -1,6 +1,6 @@
 # `skeleton()`
 
-Loading placeholders
+Short-lived placeholders for known-shape loading states.
 
 ![demo](demo.gif)
 
@@ -10,36 +10,22 @@ Loading placeholders
 npx tsx examples/skeleton/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { skeleton, separator, box } from '@flyingrobots/bijou';
+- the final content shape is already known
+- a brief loading gap would otherwise cause distracting layout pop
+- the user benefits from seeing where content will appear
 
-console.log(separator({ label: 'loading states', ctx }));
-console.log();
+## Choose something else when
 
-// Single line skeleton
-console.log('Title:');
-console.log(skeleton({ width: 30, ctx }));
-console.log();
+- choose partial real content once any trustworthy content is available
+- choose `spinner()` or `progressBar()` when duration or progress matters more than shape
+- avoid long-lived skeletons that start to look like fake content instead of honest loading state
 
-// Multi-line skeleton (paragraph placeholder)
-console.log('Body:');
-console.log(skeleton({ width: 50, lines: 3, ctx }));
-console.log();
+## What this example proves
 
-// Card skeleton
-console.log(separator({ label: 'card skeleton', ctx }));
-console.log();
-const cardContent = [
-  skeleton({ width: 20, ctx }),
-  '',
-  skeleton({ width: 40, lines: 2, ctx }),
-  '',
-  skeleton({ width: 12, ctx }),
-].join('\n');
-console.log(box(cardContent, { padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx }));
-```
+- single-line and multiline placeholders
+- a card-shaped skeleton region inside real containment
+- `skeleton()` as a temporary loading affordance, not a permanent blank state
 
 [← Examples](../README.md)

@@ -67,17 +67,12 @@ export async function run<Model, M>(
   // Non-interactive: render once and return
   if (ctx.mode !== 'interactive') {
     const viewOutput = app.view(initModel);
-    let output: string;
-    if (typeof viewOutput === 'string') {
-      output = viewOutput;
-    } else {
-      const viewport = runtimeViewport();
-      const normalized = normalizeViewOutput(viewOutput, {
-        width: viewport.columns,
-        height: viewport.rows,
-      });
-      output = surfaceToString(normalized.surface, ctx.style);
-    }
+    const viewport = runtimeViewport();
+    const normalized = normalizeViewOutput(viewOutput, {
+      width: viewport.columns,
+      height: viewport.rows,
+    });
+    const output = surfaceToString(normalized.surface, ctx.style);
     ctx.io.write(output);
     return;
   }

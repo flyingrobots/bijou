@@ -4,7 +4,10 @@ exports[`frame regressions > captures stable scaffold home and split frames > sc
 " Home  |  Split                                                                 
  App                                                                        Home
 ▎                                                 ┌────────── Drawer ──────────┐
-▎                                                 │ Panel drawer               │
+▎                                                 │ Supplemental drawer        │
+▎                                                 │                            │
+▎                                                 │ Use for side work.         │
+▎                                                 │ Keep the main pane active. │
 ▎                                                 │                            │
 ▎                                                 │ Open: yes                  │
 ▎                                                 │ Width: 100%                │
@@ -12,9 +15,6 @@ exports[`frame regressions > captures stable scaffold home and split frames > sc
 ▎                                                 │ o        toggle drawer     │
 ▎                                                 │ [ / ]    switch pages      │
 ▎                                                 │ q        quit (confirm)    │
-▎                                                 │                            │
-▎                                                 │                            │
-▎                                                 │                            │
 ▎                                                 │                            │
 ▎                                                 │                            │
 ▎                                                 │                            │
@@ -30,7 +30,7 @@ exports[`frame regressions > captures stable scaffold home and split frames > sc
 exports[`frame regressions > captures stable scaffold home and split frames > scaffold-split 1`] = `
 " Home  |  Split                                                                 
  App                                                                       Split
-▎──── Left pane (1/3) ────│▎───────────────── Right pane (2/3) ─────────────────
+▎ Primary workspace (1/3) │▎────────────── Secondary context (2/3) ─────────────
 ▎                         │▎                                                    
 ▎                         │▎                                                    
 ▎                         │▎                                                    
@@ -119,7 +119,7 @@ exports[`frame regressions > locks the starter V3 demo frames > v3-demo-after-sp
                                                                         
 ┌─ Starter App ─────────────────────────────────────────────────────────
 │                                                                       
-│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│  Surface-first runtime, buffered rendering, and explicit string bounda
 │                                                                       
 │  ───────── Live Metrics ──────────                                    
 │                                                                       
@@ -135,7 +135,7 @@ exports[`frame regressions > locks the starter V3 demo frames > v3-demo-initial 
                                                                         
 ┌─ Starter App ─────────────────────────────────────────────────────────
 │                                                                       
-│  Surface-first runtime, buffered rendering, and honest legacy compatib
+│  Surface-first runtime, buffered rendering, and explicit string bounda
 │                                                                       
 │  ───────── Live Metrics ──────────                                    
 │                                                                       

@@ -1,13 +1,11 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator, kbd, surfaceToString } from '@flyingrobots/bijou';
+import { separator, kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, viewport, createScrollState, scrollBy, scrollToBottom, vstack,
+  flexSurface, viewportSurface, createScrollState, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Message {
   sender: string;
@@ -36,10 +34,7 @@ const INITIAL_MESSAGES: Message[] = [
 
 function renderMessages(messages: Message[], width: number): string {
   void width;
-  return messages.map(m => {
-    const tag = badgeText(m.sender, m.variant);
-    return `${tag} ${m.text}`;
-  }).join('\n\n');
+  return messages.map((m) => `${m.sender.toUpperCase()}: ${m.text}`).join('\n\n');
 }
 
 const app: App<Model, Msg> = {
@@ -80,11 +75,13 @@ const app: App<Model, Msg> = {
     const vpHeight = model.rows - 4;
     const scroll = scrollToBottom(createScrollState(content, vpHeight));
 
-    return flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: separator({ label: 'chat', width: model.cols }) },
-      { flex: 1, content: (w, h) =>
-        viewport({ width: w, height: h, content, scrollY: scroll.y, showScrollbar: true })
+      {
+        flex: 1,
+        content: (w, h) =>
+          viewportSurface({ width: w, height: h, content, scrollY: scroll.y, showScrollbar: true }),
       },
       { basis: 1, content: separator({ width: model.cols }) },
       { basis: 1, content: `  > ${model.input}\u2588  ${kbd('Enter')} send  ${kbd('q')} quit` },

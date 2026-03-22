@@ -19,6 +19,21 @@ initDefaultContext();
 
 Every component returns a string. Print it however you like — `console.log`, `process.stdout.write`, or pass it to another component.
 
+### Choosing feedback surfaces
+
+- Use `badge()` for compact inline status.
+- Use `note()` for explanatory, non-urgent supporting text.
+- Use `alert()` when the message should stay in document flow.
+- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
+
+### Choosing prompts versus commands
+
+- Use `select()` for one stored value from a short, stable list.
+- Use `filter()` when one stored value is still the result, but search is the main task.
+- Use `multiselect()` when the user is building a lasting set.
+- Use `confirm()` only when the real question is yes/no.
+- If the outcome is “run this command” or “go to this destination,” move up to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` instead of making a prompt pretend to be an action launcher.
+
 ### Layout
 
 ```typescript
@@ -48,7 +63,27 @@ console.log(table(data, {
 }));
 ```
 
+Use `table()` when passive row/column comparison is the job. If your V3 app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
+
+### Hierarchy & chronology
+
+Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`. Use `dagSlice()` when a local neighborhood is the honest scope, and `dagStats()` when graph health matters more than visual shape.
+
+### Wayfinding & progress
+
+Use `breadcrumb()` when path context explains where the user is. Use `paginator()` when compact position-in-sequence feedback is enough. Use `stepper()` when the user is moving through ordered stages rather than switching among peer destinations.
+
+### Containment & formatted content
+
+Use `box()` when a region needs visible containment. Use `headerBox()` when the same region also needs a compact title plus detail line. Use `markdown()` for bounded help, reference, and release-note prose that should degrade honestly across rich, pipe, and accessible modes. Avoid using boxes as default decoration or markdown as a substitute layout engine for application chrome.
+
+### Loading, links, & expressive output
+
+Use `skeleton()` only for short-lived loading states where the content shape is already known. Use `hyperlink()` when the destination should stay explicit and trustworthy in terminal output. Use `kbd()` for inline shortcut cues, not full shell keybinding references. Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
 ### Progress & Spinners
+
+Use `progressBar()` when percent-complete is actually known. Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
 
 ```typescript
 // Static progress bar frame
@@ -67,6 +102,10 @@ bar.update(50);
 bar.update(100);
 bar.stop('Complete!');
 ```
+
+### App-authored primitives
+
+Use `renderByMode()` when you need an app-specific primitive that should preserve the same meaning across rich, pipe, and accessible modes.
 
 ### Forms
 

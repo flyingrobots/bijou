@@ -3,13 +3,13 @@
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record release-facing GIFs: `npx tsx scripts/record-gifs.ts`
 
-## V3 Features
+## Runtime Feature References
 
-Start here if you want the canonical V3 story:
+These directories keep their historical `v3-*` names, but they are the canonical runtime references for the `4.0.0` line:
 
 | Example | What it proves |
 |---------|-----------------|
-| [`v3-demo`](./v3-demo/) | Minimal surface-first starter app using the honest V3 runtime contract |
+| [`v3-demo`](./v3-demo/) | Minimal surface-first starter app using the current runtime contract |
 | [`v3-css`](./v3-css/) | BCSS type/class/id selectors, token vars, and media-query styling |
 | [`v3-motion`](./v3-motion/) | Keyed motion with spring, tween, and initial offsets |
 | [`v3-subapp`](./v3-subapp/) | Fractal TEA composition via `initSubApp()`, `updateSubApp()`, and `mount()` |
@@ -26,38 +26,54 @@ npx tsx examples/showcase/main.ts
 
 Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Each component shows rendered output in rich, pipe, and accessible modes side-by-side.
 
+See [showcase](./showcase/) for the structured preview contract and usage notes.
+
+## Choosing Between Similar Examples
+
+- Use [`note`](./note/) for explanatory, non-urgent support inside a flow.
+- Use [`alert`](./alert/) for in-flow status that should remain part of the page.
+- Use [`skeleton`](./skeleton/) only for short-lived known-shape loading states; prefer honest partial content once it exists.
+- Use [`kbd`](./kbd/) for local inline shortcut cues; use shell help examples when the user needs a broader keybinding reference.
+- Use [`toast`](./toast/) for a single low-level transient overlay you are composing directly.
+- Use [`notifications`](./notifications/) when the app needs stacking, actions, placement control, routing, or history.
+- Use [`progress-static`](./progress-static/) when completion is determinate; use [`spinner`](./spinner/) when activity is real but percent-complete is not.
+- Use [`table`](./table/) for passive row/column comparison.
+- Use [`navigable-table`](./navigable-table/) when the table itself becomes a keyboard-owned inspection surface.
+- Use [`gradient-text`](./gradient-text/) and [`logo`](./logo/) for deliberate expressive moments, not routine application chrome.
+
 ## Static Components
 
 | Example | Component | Description |
 |---------|-----------|-------------|
-| [`box`](./box/) | `box()`, `headerBox()` | Bordered containers and header boxes |
-| [`table`](./table/) | `table()` | Data tables with columns and alignment |
+| [`box`](./box/) | `box()`, `headerBox()` | Contained sections and titled panels |
+| [`table`](./table/) | `table()` | Passive row/column comparison grid |
 | [`tree`](./tree/) | `tree()` | Hierarchical tree views |
 | [`accordion`](./accordion/) | `accordion()` | Expandable content sections |
 | [`tabs`](./tabs/) | `tabs()` | Tab bar navigation with badges |
 | [`badge`](./badge/) | `badge()` | Inline status badges in 7 variants |
-| [`alert`](./alert/) | `alert()` | Boxed alerts with icons |
+| [`note`](./note/) | `note()` | Explanatory, non-urgent supporting text for form flows |
+| [`alert`](./alert/) | `alert()` | In-flow status block that persists in page content |
 | [`separator`](./separator/) | `separator()` | Horizontal dividers with labels |
-| [`skeleton`](./skeleton/) | `skeleton()` | Loading placeholders |
-| [`kbd`](./kbd/) | `kbd()` | Keyboard shortcut display |
+| [`skeleton`](./skeleton/) | `skeleton()` | Short-lived known-shape loading placeholders |
+| [`kbd`](./kbd/) | `kbd()` | Local inline shortcut cues |
 | [`breadcrumb`](./breadcrumb/) | `breadcrumb()` | Navigation breadcrumb trails |
 | [`stepper`](./stepper/) | `stepper()` | Step progress indicators |
 | [`timeline`](./timeline/) | `timeline()` | Event timelines with status |
 | [`paginator`](./paginator/) | `paginator()` | Page indicators (dots and text) |
-| [`gradient-text`](./gradient-text/) | `gradientText()` | Gradient-colored text rendering |
-| [`progress-static`](./progress-static/) | `progressBar()` | Static progress bars at various states |
-| [`dag`](./dag/) | `dag()` | Directed acyclic graph with status badges |
-| [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | DAG slicing with ghost nodes at boundaries |
-| [`dag-stats`](./dag-stats/) | `dagStats()` | Graph statistics with cycle and duplicate detection |
+| [`gradient-text`](./gradient-text/) | `gradientText()` | Expressive gradient emphasis for splash and docs |
+| [`progress-static`](./progress-static/) | `progressBar()` | Determinate progress bars at fixed states |
+| [`dag`](./dag/) | `dag()` | Passive dependency and causal-flow graph |
+| [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | Focused DAG slices for local dependency review |
+| [`dag-stats`](./dag-stats/) | `dagStats()` | Graph health and structural metrics |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
-| [`markdown`](./markdown/) | `markdown()` | Terminal markdown with mode degradation |
-| [`logo`](./logo/) | `loadRandomLogo()` | Random ASCII brand logos in 3 sizes |
-| [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
-| [`hyperlink`](./hyperlink/) | `hyperlink()` | OSC 8 clickable terminal links with fallback |
+| [`markdown`](./markdown/) | `markdown()` | Bounded structured prose with mode-aware lowering |
+| [`logo`](./logo/) | `loadRandomLogo()` | ASCII brand treatment for splash and docs moments |
+| [`custom-component`](./custom-component/) | `renderByMode()` | App-authored mode-aware primitive example |
+| [`hyperlink`](./hyperlink/) | `hyperlink()` | Trusted terminal links with explicit fallback behavior |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | Output modes, all components | Same components in interactive/pipe/accessible mode |
 | [`theme`](./theme/) | `createBijou()`, theme presets | Same components in all built-in themes |
-| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background surface tokens across layout and overlays |
+| [`background-panels`](./background-panels/) | `box()`, `flex()`, `modal()`, `toast()` | Background token treatment across containment and overlays |
 
 ## Interactive Forms
 
@@ -77,17 +93,17 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | Example | Component | Description |
 |---------|-----------|-------------|
 | [`counter`](./counter/) | `run()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
-| [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Animated spinner with phase transitions |
-| [`progress-animated`](./progress-animated/) | `createAnimatedProgressBar()`, `progressBar()` | Progress bar filling to completion |
-| [`progress-download`](./progress-download/) | `progressBar()`, `tick()` | Simulated multi-package download |
-| [`viewport`](./viewport/) | `viewport()`, `scrollBy()`, `pageDown()`, etc. | Scrollable content pager |
+| [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Indeterminate activity with phase transitions |
+| [`progress-animated`](./progress-animated/) | `progressBar()`, `tick()` | TEA-driven animated determinate progress |
+| [`progress-download`](./progress-download/) | `progressBar()`, `spinnerFrame()`, `tick()` | Mixed determinate and indeterminate download feedback |
+| [`viewport`](./viewport/) | `viewportSurface()`, `createScrollStateForContent()`, `scrollBy()`, etc. | Masking viewport for overflow scrolling |
 | [`flex-layout`](./flex-layout/) | `flex()`, `vstack()`, `hstack()` | Responsive sidebar + main layout |
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
-| [`modal`](./modal/) | `createInputStack()`, `viewport()` | Layered modal input dispatch |
-| [`toast`](./toast/) | `toast()`, `composite()` | Anchored notification overlay variants |
-| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | Stacked actionable/inline/toast notifications inside `createFramedApp()`, plus a command-palette history center for archived notices |
-| [`help`](./help/) | `createKeyMap()`, `helpView()`, `helpShort()` | Keybinding manager with help toggle |
+| [`modal`](./modal/) | `modal()`, `compositeSurface()`, `createInputStack()` | Blocking decision overlay with layered input ownership |
+| [`toast`](./toast/) | `toast()`, `compositeSurface()` | Low-level transient overlay primitive with explicit anchoring |
+| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and history center |
+| [`help`](./help/) | `createKeyMap()`, `helpViewSurface()`, `helpShortSurface()` | Keybinding manager with surface-native help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |
 | [`stopwatch`](./stopwatch/) | `tick()`, view rendering | Stopwatch with laps, start/stop/reset |
@@ -97,20 +113,20 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 | [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
 | [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
-| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
+| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `drawer()`, command palette | Canonical multi-view control room with pane-scoped drawers and shell-level action discovery |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
-| [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-navigable data table with scrolling |
-| [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |
-| [`file-picker`](./file-picker/) | `filePicker()`, `filePickerKeyMap()` | Directory browser with keyboard navigation |
+| [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
+| [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |
+| [`file-picker`](./file-picker/) | `filePickerSurface()`, `filePickerKeyMap()` | Directory browser with fixed header and viewport-backed entry list |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
-| [`status-bar`](./status-bar/) | `statusBar()` | Segmented header/footer with fill characters |
-| [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
-| [`command-palette`](./command-palette/) | `commandPalette()`, `commandPaletteKeyMap()` | Filterable action list with live search |
-| [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
-| [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
+| [`status-bar`](./status-bar/) | `statusBar()`, `statusBarSurface()` | Segmented header/footer with explicit text and surface paths |
+| [`drawer`](./drawer/) | `drawer()`, `compositeSurface()` | Togglable slide-in side panel overlay |
+| [`command-palette`](./command-palette/) | `commandPaletteSurface()`, `commandPaletteKeyMap()` | Filterable action list with fixed search row and viewport-backed results |
+| [`tooltip`](./tooltip/) | `tooltip()`, `compositeSurface()` | Positioned overlay with directional placement |
+| [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Deliberate shader-driven visual surface |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |
-| [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG viewer with node navigation |
+| [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG inspection pane with viewport and focus |
 | [`splash`](./splash/) | `splash` | Animated splash screen |

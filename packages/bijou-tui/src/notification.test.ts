@@ -7,6 +7,7 @@ import {
   createNotificationState,
   cycleNotificationFocus,
   dismissNotification,
+  hitTestNotificationStack,
   relocateNotifications,
   notificationsNeedTick,
   pushNotification,
@@ -260,6 +261,37 @@ describe('renderNotificationStack', () => {
     });
 
     expect(stripAnsi(overlay!.content)).toContain('[ Retry deploy ]');
+  });
+
+  it('hit-tests dismiss and action targets inside the rendered stack', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Deploy failed',
+      message: 'The worker crashed before boot.',
+      variant: 'ACTIONABLE',
+      action: { label: 'Retry deploy', payload: { type: 'retry', id: 7 } },
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 80,
+      screenHeight: 24,
+    });
+
+    const dismiss = hitTestNotificationStack(state, {
+      screenWidth: 80,
+      screenHeight: 24,
+    }, overlay!.col + overlay!.surface!.width - 2, overlay!.row);
+    expect(dismiss?.kind).toBe('dismiss');
+
+    const action = hitTestNotificationStack(state, {
+      screenWidth: 80,
+      screenHeight: 24,
+    }, overlay!.col + 3, overlay!.row + overlay!.surface!.height - 1);
+    expect(action?.kind).toBe('action');
+    expect(action?.item.title).toBe('Deploy failed');
   });
 
   it('renders toast timestamps and inline notifications in their distinct layouts', () => {

@@ -2,6 +2,8 @@
 
 Scrollable pane with colored focus gutter and horizontal overflow
 
+This example now uses the surface-native focus-area path: `createFocusAreaStateForSurface()` + `focusAreaSurface()`.
+
 ![demo](demo.gif)
 
 ## Run
@@ -13,19 +15,19 @@ npx tsx examples/focus-area/main.ts
 ## Code
 
 ```typescript
-import { initDefaultContext, getDefaultContext } from '@flyingrobots/bijou-node';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  createFocusAreaState, focusArea,
+  createFocusAreaStateForSurface, focusAreaSurface,
   focusAreaScrollBy, focusAreaPageDown, focusAreaPageUp,
   focusAreaScrollToTop, focusAreaScrollToBottom,
   focusAreaScrollByX,
-  focusAreaKeyMap, helpShort, vstack,
+  focusAreaKeyMap, helpShort, type FocusAreaState,
 } from '@flyingrobots/bijou-tui';
+import { column, contentSurface, line } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
-const ctx = getDefaultContext();
+const ctx = initDefaultContext();
 
 // Generate some content to scroll through
 const CONTENT = Array.from({ length: 60 }, (_, i) => {
@@ -33,6 +35,7 @@ const CONTENT = Array.from({ length: 60 }, (_, i) => {
   if (i % 10 === 0) return `── Section ${i / 10} ${'─'.repeat(60)}`;
   return `Line ${String(i).padStart(2, ' ')}: ${('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ').repeat(Math.ceil(Math.random() * 2))}`;
 }).join('\n');
+const CONTENT_SURFACE = contentSurface(CONTENT);
 
 type Msg =
   | { type: 'scroll'; dy: number }
@@ -56,7 +59,7 @@ const keys = focusAreaKeyMap<Msg>({
 });
 
 interface Model {
-  fa: ReturnType<typeof createFocusAreaState>;
+  fa: FocusAreaState;
   focused: boolean;
   cols: number;
   rows: number;
@@ -64,11 +67,10 @@ interface Model {
 
 const app: App<Model, Msg> = {
   init: () => {
-    const cols = process.stdout.columns ?? 80;
-    const rows = process.stdout.rows ?? 24;
+    const cols = ctx.runtime.columns;
+    const rows = ctx.runtime.rows;
     return [{
-      fa: createFocusAreaState({
-        content: CONTENT,
+      fa: createFocusAreaStateForSurface(CONTENT_SURFACE, {
         width: Math.max(1, cols),
         height: Math.max(1, rows - 3),
         overflowX: 'scroll',
@@ -83,8 +85,7 @@ const app: App<Model, Msg> = {
     if (isResizeMsg(msg)) {
       return [{
         ...model,
-        fa: createFocusAreaState({
-          content: CONTENT,
+        fa: createFocusAreaStateForSurface(CONTENT_SURFACE, {
           width: Math.max(1, msg.columns),
           height: Math.max(1, msg.rows - 3),
           overflowX: 'scroll',
@@ -118,9 +119,9 @@ const app: App<Model, Msg> = {
   view: (model) => {
     const header = separator({ label: 'focus area', width: model.cols, ctx });
     const focusLabel = model.focused ? 'focused' : 'unfocused';
-    const body = focusArea(model.fa, { focused: model.focused, ctx });
+    const body = focusAreaSurface(CONTENT_SURFACE, model.fa, { focused: model.focused, ctx });
     const help = `  ${helpShort(keys)}  Tab: toggle focus (${focusLabel})  q: quit`;
-    return vstack(header, body, help);
+    return column([contentSurface(header), body, line(help, model.cols)]);
   },
 };
 

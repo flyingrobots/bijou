@@ -1,6 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, separator } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -78,7 +79,7 @@ const app: App<Model, Msg> = {
     lines.push(`  ${kbd('Space')} start/stop  ${kbd('l')} lap  ${kbd('r')} reset  ${kbd('q')} quit`);
     lines.push('');
 
-    return lines.join('\n');
+    return contentSurface(lines.join('\n'));
   },
 };
 

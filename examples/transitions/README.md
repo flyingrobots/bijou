@@ -2,6 +2,13 @@
 
 Demonstrates dynamic tab transition animations.
 
+Custom shaders in this example family should return surface-native override data:
+
+- `showNext` to choose the base page cell
+- `overrideChar` for a simple glyph override that keeps the base cell styling
+- `overrideCell` for a fully styled replacement cell
+- `overrideRole` as `'marker'` or `'decoration'` so combinators can preserve or discard the override correctly
+
 ## Run
 
 ```sh

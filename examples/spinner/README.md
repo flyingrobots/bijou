@@ -1,6 +1,6 @@
 # `spinnerFrame()`
 
-Animated spinner with phase transitions
+Indeterminate activity feedback when work is real but percent-complete is unknown.
 
 ![demo](demo.gif)
 
@@ -10,68 +10,22 @@ Animated spinner with phase transitions
 npx tsx examples/spinner/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { spinnerFrame, badge } from '@flyingrobots/bijou';
-import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+- the task is active but indeterminate
+- the user needs reassurance that work is still happening
+- phase changes matter more than exact completion percentage
 
-initDefaultContext();
+## Choose something else when
 
-interface Model {
-  frame: number;
-  phase: 'loading' | 'processing' | 'done';
-  elapsed: number;
-}
+- choose `progressBar()` when completion can be estimated honestly
+- avoid perpetual spinners when a retry, failure, or durable status message is the more honest next state
+- avoid using animation where a static snapshot or final result would communicate better
 
-type Msg = { type: 'tick' } | { type: 'quit' };
+## What this example proves
 
-const PHASE_DURATION = { loading: 30, processing: 20 };
-
-const app: App<Model, Msg> = {
-  init: () => [
-    { frame: 0, phase: 'loading', elapsed: 0 },
-    [tick(80, { type: 'tick' })],
-  ],
-
-  update: (msg, model) => {
-    if (isKeyMsg(msg)) {
-      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
-        return [model, [quit()]];
-      }
-    }
-
-    if ('type' in msg && msg.type === 'tick') {
-      const elapsed = model.elapsed + 1;
-
-      if (model.phase === 'loading' && elapsed >= PHASE_DURATION.loading) {
-        return [{ frame: model.frame + 1, phase: 'processing', elapsed: 0 }, [tick(80, { type: 'tick' })]];
-      }
-      if (model.phase === 'processing' && elapsed >= PHASE_DURATION.processing) {
-        return [{ frame: model.frame + 1, phase: 'done', elapsed: 0 }, [tick(1000, { type: 'quit' })]];
-      }
-
-      return [{ frame: model.frame + 1, phase: model.phase, elapsed }, [tick(80, { type: 'tick' })]];
-    }
-
-    return [model, []];
-  },
-
-  view: (model) => {
-    if (model.phase === 'done') {
-      return `\n  ${badge('DONE', { variant: 'success' })}  All tasks complete.\n`;
-    }
-
-    const label = model.phase === 'loading'
-      ? 'Fetching dependencies...'
-      : 'Processing modules...';
-
-    return `\n  ${spinnerFrame(model.frame, { label })}\n`;
-  },
-};
-
-run(app);
-```
+- animated spinner frames inside a TUI loop
+- phase-based messaging that changes from loading to processing to done
+- `spinnerFrame()` as the right primitive when activity is real but determinate progress is not
 
 [← Examples](../README.md)

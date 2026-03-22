@@ -1,15 +1,15 @@
 # Examples Catalog
 
-> One app per component. Flagship V3 examples get `main.ts` + `README.md` and use the native Surface recorder; legacy examples can keep `demo.tape` (VHS).
+> One app per component. Flagship runtime examples get `main.ts` + `README.md` and use the native Surface recorder; tape-backed examples can keep `demo.tape` (VHS).
 >
 > Run any example: `npx tsx examples/<name>/main.ts`
-> Record flagship V3 GIFs: `npx tsx scripts/record-gifs.ts`
+> Record flagship runtime GIFs: `npx tsx scripts/record-gifs.ts`
 
 ---
 
-## V3 Features
+## Runtime Features
 
-These are the canonical release-facing V3 demos:
+These directories keep their historical `v3-*` names, but they are the canonical runtime demos for the `4.0.0` line:
 
 - `examples/v3-demo` — smallest correct surface-native starter app.
 - `examples/v3-css` — BCSS selector/value/media-query workbench.

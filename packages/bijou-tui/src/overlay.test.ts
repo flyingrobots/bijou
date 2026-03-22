@@ -1,8 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { composite, modal, toast, drawer, tooltip } from './overlay.js';
+import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
+import { composite, compositeSurface, modal, toast, drawer, tooltip } from './overlay.js';
 import type { Overlay, DrawerOptions } from './overlay.js';
+import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { visibleLength, stripAnsi } from './viewport.js';
+
+function expectSurfaceTextMatch(actualSurfaceText: string, expectedContent: string) {
+  expect(
+    stripAnsi(actualSurfaceText).split('\n').map((line) => line.trimEnd()),
+  ).toEqual(
+    stripAnsi(expectedContent).split('\n').map((line) => line.trimEnd()),
+  );
+}
 
 // ---------------------------------------------------------------------------
 // composite()
@@ -115,6 +125,39 @@ describe('composite', () => {
   });
 });
 
+describe('compositeSurface', () => {
+  it('paints overlay surfaces onto a background surface', () => {
+    const bg = stringToSurface('AAAA\nBBBB\nCCCC', 4, 3);
+    const ov: Overlay = {
+      content: 'unused',
+      surface: stringToSurface('XX\nYY', 2, 2),
+      row: 1,
+      col: 1,
+    };
+
+    const result = compositeSurface(bg, [ov]);
+
+    expect(surfaceToString(result, createTestContext().style)).toBe('AAAA\nBXXB\nCYYC');
+  });
+
+  it('dims background cells without dimming overlay cells', () => {
+    const ctx = createTestContext();
+    const bg = stringToSurface('AAAA', 4, 1);
+    const ov: Overlay = {
+      content: 'unused',
+      surface: stringToSurface('XX', 2, 1),
+      row: 0,
+      col: 1,
+    };
+
+    const result = compositeSurface(bg, [ov], { dim: true });
+
+    expect(result.get(0, 0).modifiers).toContain('dim');
+    expect(result.get(1, 0).modifiers ?? []).not.toContain('dim');
+    expect(surfaceToString(result, ctx.style)).toBe('AXXA');
+  });
+});
+
 // ---------------------------------------------------------------------------
 // modal()
 // ---------------------------------------------------------------------------
@@ -168,8 +211,9 @@ describe('modal', () => {
     const boxLines = content.split('\n');
     const boxH = boxLines.length;
     const boxW = visibleLength(boxLines[0]!);
-    expect(row).toBe(Math.floor((24 - boxH) / 2));
-    expect(col).toBe(Math.floor((80 - boxW) / 2));
+    const margin = resolveOverlayMargin(80, 24);
+    expect(row).toBe(clampCenteredPosition(24, boxH, margin));
+    expect(col).toBe(clampCenteredPosition(80, boxW, margin));
   });
 
   it('clamps to (0,0) when modal exceeds screen', () => {
@@ -208,6 +252,24 @@ describe('modal', () => {
     expect(stripAnsi(content)).toContain('Themed');
     expect(stripAnsi(content)).toContain('Title');
     expect(stripAnsi(content)).toContain('hint');
+  });
+
+  it('sizes plain wide glyph content by display width', () => {
+    const result = modal({ body: '漢', screenWidth: 20, screenHeight: 10 });
+    const boxWidth = visibleLength(result.content.split('\n')[0]!);
+    const margin = resolveOverlayMargin(20, 10);
+
+    expect(boxWidth).toBe(6);
+    expect(result.col).toBe(clampCenteredPosition(20, boxWidth, margin));
+  });
+
+  it('sizes ANSI wide glyph content by display width', () => {
+    const result = modal({ body: '\x1b[31m漢\x1b[0m', screenWidth: 20, screenHeight: 10 });
+    const boxWidth = visibleLength(result.content.split('\n')[0]!);
+    const margin = resolveOverlayMargin(20, 10);
+
+    expect(boxWidth).toBe(6);
+    expect(result.col).toBe(clampCenteredPosition(20, boxWidth, margin));
   });
 
   it('bgToken does not crash with plainStyle ctx', () => {
@@ -261,6 +323,43 @@ describe('modal', () => {
     });
     const plain = modal({ body: 'NoBg', screenWidth: 40, screenHeight: 20 });
     expect(stripAnsi(noColorResult.content)).toBe(stripAnsi(plain.content));
+  });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = modal({ title: 'Title', body: 'Body', hint: 'Hint', screenWidth: 40, screenHeight: 20, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('accepts structured surface body and hint content', () => {
+    const ctx = createTestContext();
+    const result = modal({
+      title: 'Title',
+      body: stringToSurface('line1\nline2', 5, 2),
+      hint: stringToSurface('Press q', 7, 1),
+      screenWidth: 40,
+      screenHeight: 20,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('line1');
+    expect(stripAnsi(result.content)).toContain('line2');
+    expect(stripAnsi(result.content)).toContain('Press q');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('keeps background fill on modal text cells in the returned surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = modal({
+      body: 'Filled',
+      screenWidth: 40,
+      screenHeight: 20,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).char).toBe('F');
+    expect(result.surface!.get(2, 1).bg).toBe('#003366');
   });
 });
 
@@ -317,8 +416,18 @@ describe('toast', () => {
     const { row, col, content } = toast({ message: 'x', screenWidth: 80, screenHeight: 24 });
     const boxH = content.split('\n').length;
     const boxW = visibleLength(content.split('\n')[0]!);
-    expect(row).toBe(24 - boxH - 1);
-    expect(col).toBe(80 - boxW - 1);
+    const margin = resolveOverlayMargin(80, 24);
+    expect(row).toBe(24 - boxH - margin);
+    expect(col).toBe(80 - boxW - margin);
+  });
+
+  it('uses a preferred roomy margin by default and a compact margin on tight screens', () => {
+    const roomy = toast({ message: 'roomy', screenWidth: 80, screenHeight: 24 });
+    const compact = toast({ message: 'compact', screenWidth: 40, screenHeight: 12 });
+    const roomyHeight = roomy.content.split('\n').length;
+    const compactHeight = compact.content.split('\n').length;
+    expect(roomy.row).toBe(24 - roomyHeight - 2);
+    expect(compact.row).toBe(12 - compactHeight - 1);
   });
 
   it('margin is respected', () => {
@@ -399,6 +508,26 @@ describe('toast', () => {
     expect(lines).toHaveLength(24);
     // Toast should appear near bottom-right
     expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+  });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = toast({ message: 'saved', variant: 'success', screenWidth: 80, screenHeight: 24, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('applies semantic styling directly to toast text cells', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = toast({
+      message: 'Boom',
+      variant: 'error',
+      screenWidth: 80,
+      screenHeight: 24,
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).fg).toBe(ctx.semantic('error').hex);
   });
 });
 
@@ -668,6 +797,53 @@ describe('drawer', () => {
     // Top border: ┌  ┐ (2 spaces for padding)
     expect(visibleLength(stripAnsi(lines4[0]!))).toBe(4);
   });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = drawer({ content: 'panel', width: 20, screenWidth: 80, screenHeight: 5, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('accepts structured surface content', () => {
+    const ctx = createTestContext();
+    const result = drawer({
+      content: stringToSurface('first\nsecond', 6, 2),
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 6,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('first');
+    expect(stripAnsi(result.content)).toContain('second');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('clips structured surface content to the drawer inner width', () => {
+    const result = drawer({
+      content: stringToSurface('ABCDEFG', 7, 1),
+      width: 8,
+      screenWidth: 80,
+      screenHeight: 5,
+    });
+    expect(stripAnsi(result.content)).toContain('ABCD');
+    expect(stripAnsi(result.content)).not.toContain('EFG');
+  });
+
+  it('keeps background fill on drawer text cells in the returned surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = drawer({
+      content: 'panel',
+      width: 20,
+      screenWidth: 80,
+      screenHeight: 5,
+      bgToken: { hex: '#ffffff', bg: '#003366' },
+      ctx,
+    });
+    expect(result.surface).toBeDefined();
+    expect(result.surface!.get(2, 1).char).toBe('p');
+    expect(result.surface!.get(2, 1).bg).toBe('#003366');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -815,5 +991,43 @@ describe('tooltip', () => {
     const lines = result.split('\n');
     expect(lines).toHaveLength(24);
     expect(stripAnsi(lines[t.row]!)).toContain('\u250c');
+  });
+
+  it('provides a surface that matches its rendered content', () => {
+    const ctx = createTestContext();
+    const result = tooltip({ ...base, row: 10, col: 40, ctx });
+    expect(result.surface).toBeDefined();
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('accepts structured surface content', () => {
+    const ctx = createTestContext();
+    const result = tooltip({
+      content: stringToSurface('line1\nline2', 5, 2),
+      row: 10,
+      col: 40,
+      screenWidth: 80,
+      screenHeight: 24,
+      ctx,
+    });
+    expect(stripAnsi(result.content)).toContain('line1');
+    expect(stripAnsi(result.content)).toContain('line2');
+    expectSurfaceTextMatch(surfaceToString(result.surface!, ctx.style), result.content);
+  });
+
+  it('clips structured surface content to screen width', () => {
+    const result = tooltip({
+      content: stringToSurface('ABCDEFG', 7, 1),
+      row: 10,
+      col: 0,
+      screenWidth: 6,
+      screenHeight: 24,
+      direction: 'right',
+    });
+    for (const line of result.content.split('\n')) {
+      expect(visibleLength(stripAnsi(line))).toBeLessThanOrEqual(6);
+    }
+    expect(stripAnsi(result.content)).toContain('AB');
+    expect(stripAnsi(result.content)).not.toContain('CDEFG');
   });
 });

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { stringToSurface } from '@flyingrobots/bijou';
 import {
   createPanelDockState,
   movePaneInContainer,
@@ -6,6 +7,10 @@ import {
   findPaneContainer,
 } from './panel-dock.js';
 import type { FrameLayoutNode } from './app-frame.js';
+
+function emptyView() {
+  return stringToSurface('', 1, 1);
+}
 
 describe('PanelDockState', () => {
   it('starts with empty order overrides', () => {
@@ -67,8 +72,8 @@ describe('resolveChildOrder', () => {
 });
 
 describe('findPaneContainer', () => {
-  const paneA: FrameLayoutNode = { kind: 'pane', paneId: 'a', render: () => '' };
-  const paneB: FrameLayoutNode = { kind: 'pane', paneId: 'b', render: () => '' };
+  const paneA: FrameLayoutNode = { kind: 'pane', paneId: 'a', render: () => emptyView() };
+  const paneB: FrameLayoutNode = { kind: 'pane', paneId: 'b', render: () => emptyView() };
 
   it('finds pane in split container', () => {
     const tree: FrameLayoutNode = {
@@ -95,7 +100,7 @@ describe('findPaneContainer', () => {
       splitId: 'outer',
       state: { ratio: 0.5, focused: 'a' },
       paneA: inner,
-      paneB: { kind: 'pane', paneId: 'c', render: () => '' },
+      paneB: { kind: 'pane', paneId: 'c', render: () => emptyView() },
     };
     const result = findPaneContainer(outer, 'b');
     expect(result).toEqual({ containerId: 'inner', childIds: ['a', 'b'] });
@@ -109,8 +114,8 @@ describe('findPaneContainer', () => {
       rows: ['1fr'],
       areas: ['left right'],
       cells: {
-        left: { kind: 'pane', paneId: 'editor', render: () => '' },
-        right: { kind: 'pane', paneId: 'preview', render: () => '' },
+        left: { kind: 'pane', paneId: 'editor', render: () => emptyView() },
+        right: { kind: 'pane', paneId: 'preview', render: () => emptyView() },
       },
     };
     const result = findPaneContainer(tree, 'editor');

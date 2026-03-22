@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { statusBar } from './status-bar.js';
+import { surfaceToString } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { statusBar, statusBarSurface } from './status-bar.js';
 import { visibleLength } from './viewport.js';
 
 describe('statusBar', () => {
@@ -74,5 +76,32 @@ describe('statusBar', () => {
   it('single char width', () => {
     const result = statusBar({ left: 'ABC', width: 1 });
     expect(visibleLength(result)).toBe(1);
+  });
+});
+
+describe('statusBarSurface', () => {
+  const ctx = createTestContext();
+
+  it('matches the lowered string output', () => {
+    const options = { left: 'main.ts', center: 'TypeScript', right: 'Ln 42', width: 24 };
+    const surface = statusBarSurface(options);
+    const rendered = surfaceToString(surface, ctx.style);
+
+    expect(rendered).toBe(statusBar(options));
+  });
+
+  it('preserves fill characters on the surface path', () => {
+    const rendered = surfaceToString(
+      statusBarSurface({ left: 'A', right: 'B', width: 5, fillChar: '─' }),
+      ctx.style,
+    );
+
+    expect(rendered).toBe('A───B');
+  });
+
+  it('returns an empty surface for zero width', () => {
+    const surface = statusBarSurface({ left: 'x', width: 0 });
+    expect(surface.width).toBe(0);
+    expect(surface.height).toBe(0);
   });
 });

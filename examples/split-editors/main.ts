@@ -1,13 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, viewport, createScrollState, scrollBy, pageDown, pageUp, vstack,
+  flexSurface, viewportSurface, createScrollState, scrollBy, pageDown, pageUp,
 } from '@flyingrobots/bijou-tui';
-
-const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
+initDefaultContext();
 
 const LEFT_CONTENT = `// app.ts
 import { initDefaultContext } from '@flyingrobots/bijou-node';
@@ -136,26 +133,38 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const paneWidth = Math.floor((model.cols - 3) / 2);
-    const vpHeight = model.rows - 4;
+    const leftLabel = model.focusLeft ? '[app.ts]' : 'app.ts';
+    const rightLabel = !model.focusLeft ? '[app.test.ts]' : 'app.test.ts';
 
-    const leftLabel = model.focusLeft ? badgeText('app.ts', 'primary') : 'app.ts';
-    const rightLabel = !model.focusLeft ? badgeText('app.test.ts', 'primary') : 'app.test.ts';
-
-    return flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
-      { basis: 1, content: `  ${leftLabel}${''.padEnd(paneWidth - 10)}${rightLabel}` },
-      { flex: 1, content: (w, h) =>
-        flex(
+      {
+        basis: 1,
+        content: (w) =>
+          flexSurface(
+            { direction: 'row', width: w, height: 1, gap: 1 },
+            { flex: 1, content: `  ${leftLabel}` },
+            { basis: 1, content: '│' },
+            { flex: 1, content: `  ${rightLabel}` },
+          ),
+      },
+      {
+        flex: 1,
+        content: (w, h) =>
+          flexSurface(
           { direction: 'row', width: w, height: h, gap: 1 },
-          { flex: 1, content: (pw, ph) =>
-            viewport({ width: pw, height: ph, content: LEFT_CONTENT, scrollY: model.leftScroll.y, showScrollbar: true })
+          {
+            flex: 1,
+            content: (pw, ph) =>
+              viewportSurface({ width: pw, height: ph, content: LEFT_CONTENT, scrollY: model.leftScroll.y, showScrollbar: true }),
           },
           { basis: 1, content: (_, ph) => '\u2502\n'.repeat(ph).trimEnd() },
-          { flex: 1, content: (pw, ph) =>
-            viewport({ width: pw, height: ph, content: RIGHT_CONTENT, scrollY: model.rightScroll.y, showScrollbar: true })
+          {
+            flex: 1,
+            content: (pw, ph) =>
+              viewportSurface({ width: pw, height: ph, content: RIGHT_CONTENT, scrollY: model.rightScroll.y, showScrollbar: true }),
           },
-        )
+          ),
       },
       { basis: 1, content: `  ${kbd('Tab')} switch pane  ${kbd('j')}${kbd('k')} scroll  ${kbd('q')} quit` },
     );

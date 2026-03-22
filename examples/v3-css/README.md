@@ -11,7 +11,7 @@ It proves:
 
 Current scope:
 - BCSS is guaranteed on the supported V3 surface primitives used here and on framed shell regions like `FrameHeader`, `FrameHelp`, and `FocusArea`.
-- It is not yet a global cascade for arbitrary layout nodes or every legacy string component.
+- It is not yet a global cascade for arbitrary layout nodes or every string-first core component.
 
 Run it with:
 

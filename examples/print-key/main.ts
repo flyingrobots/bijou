@@ -1,10 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { kbd, separator } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface KeyEntry {
   key: string;
@@ -36,33 +35,32 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = [
-      '',
-      '  Key Event Inspector',
-      '',
-      `  ${separator({ label: 'press any key', width: 50 })}`,
-      '',
+    const rows = [
+      spacer(),
+      line('  Key Event Inspector'),
+      spacer(),
+      contentSurface(`  ${separator({ label: 'press any key', width: 50 })}`),
+      spacer(),
     ];
 
     if (model.history.length === 0) {
-      lines.push('  Waiting for input...');
+      rows.push(line('  Waiting for input...'));
     } else {
       for (const entry of model.history) {
-        const mods: string[] = [];
-        if (entry.ctrl) mods.push(badgeText('CTRL', 'warning'));
-        if (entry.alt) mods.push(badgeText('ALT', 'info'));
-        if (entry.shift) mods.push(badgeText('SHIFT', 'accent'));
-
-        const modStr = mods.length > 0 ? mods.join(' ') + ' ' : '';
-        lines.push(`  ${modStr}${kbd(entry.key)}`);
+        const parts: (string | ReturnType<typeof badgeSurface>)[] = ['  '];
+        if (entry.ctrl) parts.push(badgeSurface('CTRL', 'warning', ctx), ' ');
+        if (entry.alt) parts.push(badgeSurface('ALT', 'info', ctx), ' ');
+        if (entry.shift) parts.push(badgeSurface('SHIFT', 'accent', ctx), ' ');
+        parts.push(kbd(entry.key));
+        rows.push(row(parts));
       }
     }
 
-    lines.push('');
-    lines.push(`  ${kbd('Ctrl')}+${kbd('C')} to quit`);
-    lines.push('');
+    rows.push(spacer());
+    rows.push(line(`  ${kbd('Ctrl')}+${kbd('C')} to quit`));
+    rows.push(spacer());
 
-    return lines.join('\n');
+    return column(rows);
   },
 };
 

@@ -1,6 +1,6 @@
-# Migrating To Bijou v3.0.0
+# Migrating To Bijou v4.0.0
 
-This guide is for existing Bijou apps moving onto the `3.0.0` release line.
+This guide is for existing Bijou apps moving onto the `4.0.0` release line.
 
 The short version:
 
@@ -11,15 +11,16 @@ The short version:
 
 ## Upgrade Checklist
 
-1. Upgrade all Bijou packages together to `3.0.0`.
-2. Decide whether each part of your app is a core string-first flow or a V3 runtime flow.
+1. Upgrade all Bijou packages together to `4.0.0`.
+2. Decide whether each part of your app is a core string-first flow or a V4 runtime flow.
 3. Treat `Surface`-returning helpers as real render values, not implicit strings.
-4. Prefer the new `*Surface` companion helpers for common V3 layout chrome, and cross string boundaries explicitly with `surfaceToString(..., ctx.style)` only when you truly need a string.
-5. If you use framed apps, update pane renderers to the new `ViewOutput` contract.
+4. Keep the fullscreen runtime pure: `App.view` and framed pane renderers return `Surface` or `LayoutNode`, never raw strings.
+5. Prefer the `*Surface` companion helpers for common runtime chrome, and cross string boundaries explicitly with `surfaceToString(..., ctx.style)` only when you truly need a string endpoint.
 6. If you use nested TEA apps, prefer `initSubApp()` and `updateSubApp()` for lifecycle wiring, with `mount()` for rendering.
-7. If you adopt BCSS, stay within the documented supported scope for `3.0.0`.
+7. If you adopt BCSS, stay within the documented supported scope for the current release line.
+8. If you author custom transition shaders, use the v4 override names: `overrideChar`, `overrideCell`, and `overrideRole`.
 
-## Package Roles In v3
+## Package Roles In v4
 
 ### `@flyingrobots/bijou`
 
@@ -30,7 +31,7 @@ Use this for:
 - boxes, tables, trees, badges, alerts, progress bars
 - themes, output-mode detection, and test adapters
 
-`@flyingrobots/bijou` remains the stable, pure, degradation-first package. It contains both string-oriented and surface-oriented primitives. `3.0.0` does not require every core helper to return `Surface`.
+`@flyingrobots/bijou` remains the stable, pure, degradation-first package. It contains both string-oriented and surface-oriented primitives. `4.0.0` does not require every core helper to return `Surface`.
 
 ### `@flyingrobots/bijou-tui`
 
@@ -44,7 +45,7 @@ Use this for:
 The runtime now treats `ViewOutput` as the public render contract.
 
 ```ts
-type ViewOutput = string | Surface | LayoutNode;
+type ViewOutput = Surface | LayoutNode;
 ```
 
 ### `@flyingrobots/bijou-tui-app`
@@ -55,7 +56,7 @@ Use this when you want:
 - tabs, footer/help chrome, overlays, drawer/modal flows
 - a batteries-included app skeleton
 
-The shell accepts pane renderers that return `ViewOutput`, not just strings.
+The shell accepts pane renderers that return `ViewOutput`, not just string blocks.
 
 ### `@flyingrobots/bijou-node`
 
@@ -66,9 +67,9 @@ Use this for:
 - `runInWorker()` / `startWorkerApp()`
 - `recordDemoGif()` and related native recorder helpers
 
-## The Biggest Behavioral Change: Surface/String Boundaries
+## The Biggest Behavioral Change: Pure Runtime Boundaries
 
-Some V3-first helpers now return `Surface`. The most visible example is `badge()`.
+Some runtime-first helpers now return `Surface`. The most visible example is `badge()`.
 
 That means this old pattern is no longer safe everywhere:
 
@@ -86,14 +87,14 @@ const text = surfaceToString(badge('OK', { ctx }), ctx.style);
 console.log(text);
 ```
 
-The same rule applies when you feed badge or other V3 surface output into:
+The same rule applies when you feed `badge()` or other surface output into:
 
 - `console.log(...)`
 - template strings
 - `Array.join(...)`
-- legacy string-only helpers like `table()` cells
+- string-first helpers like `table()` cells
 
-For common V3 app-shell composition, prefer the surface-native companions instead of converting back to strings:
+For common app-shell composition, prefer the surface-native companions instead of converting back to strings:
 
 ```ts
 import { badge, separatorSurface, tableSurface } from '@flyingrobots/bijou';
@@ -105,17 +106,25 @@ const table = tableSurface({
 });
 ```
 
-The preferred V3-native companions are:
+The preferred surface-native companions are:
 
 - `boxSurface()`
 - `headerBoxSurface()`
 - `separatorSurface()`
 - `alertSurface()`
 - `tableSurface()`
+- `vstackSurface()`
+- `hstackSurface()`
+
+Transition-era aliases were removed from the runtime-facing API surface:
+
+- use `boxSurface()`, not `boxV3()`
+- use `vstackSurface()`, not `vstackV3()`
+- use `hstackSurface()`, not `hstackV3()`
 
 ## `surfaceToString()` Now Needs A Style Port
 
-In `3.0.0`, `surfaceToString()` requires a `StylePort`.
+In `4.0.0`, `surfaceToString()` requires a `StylePort`.
 
 ```ts
 surfaceToString(surface, ctx.style);
@@ -129,17 +138,16 @@ The runtime now documents the truth:
 
 ```ts
 interface App<Model, Msg> {
-  view(model: Model): string | Surface | LayoutNode;
+  view(model: Model): Surface | LayoutNode;
 }
 ```
 
-Framed pane renderers follow the same rule. You can return:
+Framed pane renderers follow the same rule. Return:
 
-- `string` for legacy compatibility
-- `Surface` for direct V3 rendering
+- `Surface` for direct rendering
 - `LayoutNode` for layout-tree composition
 
-If you keep returning strings, that still works. It is simply the legacy compatibility path now.
+If you still have string-returning runtime views, convert them explicitly before they cross the runtime boundary.
 
 ## Sub-Apps: Prefer Lifecycle Helpers
 
@@ -152,9 +160,9 @@ For nested TEA apps, the release-ready pattern is:
 
 `mount()` alone is not the full lifecycle story.
 
-## BCSS Scope In `3.0.0`
+## BCSS Scope In `4.0.0`
 
-BCSS is real in `3.0.0`, but intentionally scoped.
+BCSS is real in `4.0.0`, but intentionally scoped.
 
 Supported:
 
@@ -164,7 +172,7 @@ Supported:
 - supported text-style properties on documented V3 surface components
 - frame shell regions that expose BCSS identity
 
-Not promised in `3.0.0`:
+Not promised in `4.0.0`:
 
 - a global CSS cascade across arbitrary layout nodes
 - blanket styling of every component in the repository
@@ -176,13 +184,13 @@ If you need a good template, start from [`examples/v3-css`](../examples/v3-css/)
 ### 1. Upgrade dependencies together
 
 ```bash
-npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0
+npm install @flyingrobots/bijou@4.0.0 @flyingrobots/bijou-node@4.0.0
 ```
 
 Add the runtime packages if the app uses them:
 
 ```bash
-npm install @flyingrobots/bijou-tui@3.0.0 @flyingrobots/bijou-tui-app@3.0.0
+npm install @flyingrobots/bijou-tui@4.0.0 @flyingrobots/bijou-tui-app@4.0.0
 ```
 
 ### 2. Fix string/surface seams first
@@ -196,7 +204,7 @@ Look for:
 
 ### 3. Update framed panes to `ViewOutput`
 
-If your app uses `createFramedApp()`, return `Surface` or `LayoutNode` directly where that makes sense. Keep strings only where the pane is intentionally string-based.
+If your app uses `createFramedApp()`, return `Surface` or `LayoutNode` directly. Remove any string-returning pane shims.
 
 ### 4. Update nested app wiring
 
@@ -213,7 +221,9 @@ npm run typecheck:test
 npm run smoke:examples:all
 ```
 
-## Canonical v3 References
+## Canonical Runtime References
+
+These directories keep their historical `v3-*` names, but they are still the canonical runtime references for the `4.0.0` line on this branch.
 
 - Runtime starter: [`examples/v3-demo`](../examples/v3-demo/)
 - BCSS: [`examples/v3-css`](../examples/v3-css/)

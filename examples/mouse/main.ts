@@ -1,13 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, kbd, surfaceToString } from '@flyingrobots/bijou';
+import { box, kbd } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isMouseMsg,
   type App, type MouseMsg,
 } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   events: MouseMsg[];
@@ -37,35 +36,35 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = [
-      '',
-      '  Mouse Event Inspector',
-      '',
+    const rows = [
+      spacer(),
+      line('  Mouse Event Inspector'),
+      spacer(),
     ];
 
     if (model.events.length === 0) {
-      lines.push('  Click or scroll anywhere...');
+      rows.push(line('  Click or scroll anywhere...'));
     } else {
       for (const e of model.events) {
-        const mods: string[] = [];
-        if (e.ctrl) mods.push(badgeText('CTRL', 'warning'));
-        if (e.alt) mods.push(badgeText('ALT', 'info'));
-        if (e.shift) mods.push(badgeText('SHIFT', 'accent'));
-        const modStr = mods.length > 0 ? mods.join(' ') + ' ' : '';
-        lines.push(`  ${modStr}${e.action} ${e.button} (${e.col}, ${e.row})`);
+        const parts: (string | ReturnType<typeof badgeSurface>)[] = ['  '];
+        if (e.ctrl) parts.push(badgeSurface('CTRL', 'warning', ctx), ' ');
+        if (e.alt) parts.push(badgeSurface('ALT', 'info', ctx), ' ');
+        if (e.shift) parts.push(badgeSurface('SHIFT', 'accent', ctx), ' ');
+        parts.push(`${e.action} ${e.button} (${e.col}, ${e.row})`);
+        rows.push(row(parts));
       }
     }
 
     if (model.lastClick) {
-      lines.push('');
-      lines.push(box(`Last click: (${model.lastClick.col}, ${model.lastClick.row})`));
+      rows.push(spacer());
+      rows.push(contentSurface(box(`Last click: (${model.lastClick.col}, ${model.lastClick.row})`)));
     }
 
-    lines.push('');
-    lines.push(`  ${kbd('q')} to quit`);
-    lines.push('');
+    rows.push(spacer());
+    rows.push(line(`  ${kbd('q')} to quit`));
+    rows.push(spacer());
 
-    return lines.join('\n');
+    return column(rows);
   },
 };
 

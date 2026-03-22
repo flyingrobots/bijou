@@ -174,7 +174,6 @@ export {
   type BoxOptions,
   type HeaderBoxOptions,
   boxSurface,
-  boxV3,
   headerBoxSurface,
   selectLogoSize,
   loadRandomLogo,

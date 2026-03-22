@@ -1,6 +1,6 @@
 # `select()`
 
-Single-select menu
+Single-select prompt for choosing one stored value from a short, stable set.
 
 ![demo](demo.gif)
 
@@ -10,33 +10,22 @@ Single-select menu
 npx tsx examples/select/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { select, badge } from '@flyingrobots/bijou';
+- the user is choosing one value
+- the options are short, stable, and easy to scan
+- the result becomes stored state rather than triggering a command
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-async function main() {
-  const manager = await select({
-    title: 'Choose a package manager:',
-    options: [
-      { label: 'npm', value: 'npm', description: 'Node Package Manager' },
-      { label: 'yarn', value: 'yarn', description: 'Fast, reliable, and secure' },
-      { label: 'pnpm', value: 'pnpm', description: 'Fast, disk space efficient' },
-      { label: 'bun', value: 'bun', description: 'All-in-one JavaScript runtime' },
-      { label: 'deno', value: 'deno', description: 'Secure runtime for JS and TS' },
-      { label: 'none', value: 'none', description: 'I\'ll manage dependencies myself' },
-    ],
-    ctx,
-  });
+- choose `filter()` when search and narrowing are the real job
+- choose `multiselect()` when the user is building a set
+- choose `commandPaletteSurface()` when the result is an action or navigation command
 
-  console.log();
-  console.log('Selected:', badge(manager.toUpperCase(), { variant: 'primary', ctx }));
-}
+## What this example proves
 
-main().catch(console.error);
-```
+- core `select()` as a value-picking prompt
+- the simplest honest choice surface for one stored value
+- graceful lowering from interactive prompt flow to textual selection modes
 
 [← Examples](../README.md)

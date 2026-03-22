@@ -5,7 +5,17 @@
  * available screen space, with optional scrollbar indicator.
  */
 
-import { graphemeWidth, graphemeClusterWidth, segmentGraphemes, clipToWidth as coreClipToWidth } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  graphemeWidth,
+  graphemeClusterWidth,
+  parseAnsiToSurface,
+  segmentGraphemes,
+  clipToWidth as coreClipToWidth,
+  type LayoutNode,
+  type Surface,
+} from '@flyingrobots/bijou';
+import { layoutNodeToSurface } from './layout-node-surface.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -28,6 +38,17 @@ export interface ViewportOptions {
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
 }
+
+/**
+ * Configuration for rendering a viewport directly into a Surface.
+ */
+export interface ViewportSurfaceOptions extends Omit<ViewportOptions, 'content'> {
+  /** Full content payload, either plain/ANSI text, a pre-rendered surface, or a layout tree. */
+  readonly content: ViewportContent;
+}
+
+/** Content payload that can be masked by a viewport. */
+export type ViewportContent = string | Surface | LayoutNode;
 
 /**
  * Immutable snapshot of scroll position and bounds for a viewport.
@@ -349,6 +370,100 @@ export function viewport(options: ViewportOptions): string {
   return rendered.join('\n');
 }
 
+/**
+ * Render a scrollable viewport directly into a Surface.
+ *
+ * This is the canonical viewport primitive for rich TUI composition. It acts
+ * like a mask over text, an existing `Surface`, or a `LayoutNode` tree and
+ * reveals only the visible scroll window. String content still routes through
+ * {@link viewport} so the explicit text helper stays consistent.
+ *
+ * @param options - Viewport configuration including dimensions, content, and scroll offsets.
+ * @returns Surface sized exactly to the requested viewport rectangle.
+ */
+export function viewportSurface(options: ViewportSurfaceOptions): Surface {
+  const {
+    width,
+    height,
+    content,
+    scrollY = 0,
+    scrollX = 0,
+    showScrollbar = true,
+  } = options;
+
+  const safeWidth = Math.max(0, Math.floor(width));
+  const safeHeight = Math.max(0, Math.floor(height));
+
+  if (typeof content === 'string') {
+    return parseAnsiToSurface(
+      viewport({
+        width: safeWidth,
+        height: safeHeight,
+        content,
+        scrollY,
+        scrollX,
+        showScrollbar,
+      }),
+      safeWidth,
+      safeHeight,
+    );
+  }
+
+  const normalizedContent = normalizeViewportContent(content);
+
+  const result = createSurface(safeWidth, safeHeight, { char: ' ', empty: false });
+  const totalLines = normalizedContent.height;
+  const maxScroll = Math.max(0, totalLines - safeHeight);
+  const clampedY = Math.max(0, Math.min(scrollY, maxScroll));
+
+  const needsScrollbar = showScrollbar && totalLines > safeHeight;
+  const contentWidth = Math.max(0, needsScrollbar ? safeWidth - 1 : safeWidth);
+
+  if (contentWidth > 0 && safeHeight > 0) {
+    result.blit(normalizedContent, 0, 0, Math.max(0, scrollX), clampedY, contentWidth, safeHeight);
+  }
+
+  if (needsScrollbar && safeWidth > 0) {
+    const bar = renderScrollbar(safeHeight, totalLines, clampedY);
+    const scrollbarX = safeWidth - 1;
+    for (let y = 0; y < safeHeight; y++) {
+      result.set(scrollbarX, y, { char: bar[y]!, empty: false });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Create initial scroll state for any viewport-maskable content.
+ *
+ * Use this when the viewport is wrapping an existing `Surface` or `LayoutNode`
+ * instead of plain text. String content can still use `createScrollState()`,
+ * but this helper accepts all viewport content types.
+ */
+export function createScrollStateForContent(
+  content: ViewportContent,
+  viewportHeight: number,
+  viewportWidth?: number,
+): ScrollState {
+  if (typeof content === 'string') {
+    return createScrollState(content, viewportHeight, viewportWidth);
+  }
+
+  const normalized = normalizeViewportContent(content);
+  const visibleLines = Math.max(0, Math.floor(viewportHeight));
+  const safeWidth = viewportWidth == null ? undefined : Math.max(0, Math.floor(viewportWidth));
+
+  return {
+    y: 0,
+    maxY: Math.max(0, normalized.height - visibleLines),
+    x: 0,
+    maxX: safeWidth == null ? 0 : Math.max(0, normalized.width - safeWidth),
+    totalLines: normalized.height,
+    visibleLines,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Scroll state management
 // ---------------------------------------------------------------------------
@@ -387,6 +502,15 @@ export function createScrollState(
     totalLines,
     visibleLines: viewportHeight,
   };
+}
+
+function normalizeViewportContent(content: Surface | LayoutNode): Surface {
+  if (isSurfaceContent(content)) return content;
+  return layoutNodeToSurface(content);
+}
+
+function isSurfaceContent(value: Surface | LayoutNode): value is Surface {
+  return typeof value === 'object' && value !== null && 'cells' in value;
 }
 
 /**

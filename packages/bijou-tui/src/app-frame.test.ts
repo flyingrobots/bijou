@@ -4,6 +4,7 @@ import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobo
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
+import { hitTestNotificationStack } from './notification.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import { QUIT, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
@@ -26,6 +27,12 @@ function makeLongContent(label: string, lines = 40): string {
   return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
 }
 
+function textView(text: string) {
+  const lines = text.split('\n');
+  const width = Math.max(1, ...lines.map((line) => line.length));
+  return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
 function makePage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
   return {
     id,
@@ -38,7 +45,7 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
     layout: () => ({
       kind: 'pane',
       paneId,
-      render: () => makeLongContent(`${id}:${paneId}`),
+      render: () => textView(makeLongContent(`${id}:${paneId}`)),
     }),
     keyMap: createKeyMap<Msg>()
       .bind('x', 'Increment', { type: 'inc' }),
@@ -107,6 +114,25 @@ describe('createFramedApp', () => {
     expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('layout-pane');
   });
 
+  it('rejects raw string pane renderers with an explicit migration error', () => {
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (msg, model) => [model, []],
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => 'string panes are no longer valid' as unknown as any,
+        }),
+      }],
+    });
+
+    const [model] = app.init();
+    expect(() => app.view(model)).toThrow(/Raw strings are no longer supported/);
+  });
+
   it('preserves scroll per page across tab switches', async () => {
     const app = createFramedApp({
       pages: [
@@ -137,8 +163,8 @@ describe('createFramedApp', () => {
         kind: 'split',
         splitId: 's1',
         state: createSplitPaneState({ ratio: 0.5 }),
-        paneA: { kind: 'pane', paneId: 'left', render: () => 'left' },
-        paneB: { kind: 'pane', paneId: 'right', render: () => 'right' },
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
       }),
     };
 
@@ -287,8 +313,8 @@ describe('createFramedApp', () => {
           kind: 'split',
           splitId: 'dup',
           state: createSplitPaneState({ ratio: 0.5 }),
-          paneA: { kind: 'pane', paneId: 'main', render: () => 'left' },
-          paneB: { kind: 'pane', paneId: 'main', render: () => 'right' },
+          paneA: { kind: 'pane', paneId: 'main', render: () => textView('left') },
+          paneB: { kind: 'pane', paneId: 'main', render: () => textView('right') },
         }),
       }],
     });
@@ -310,8 +336,8 @@ describe('createFramedApp', () => {
           rows: ['1fr'],
           areas: ['main'],
           cells: {
-            main: { kind: 'pane', paneId: 'main', render: () => 'main' },
-            ghost: { kind: 'pane', paneId: 'ghost', render: () => 'ghost' },
+            main: { kind: 'pane', paneId: 'main', render: () => textView('main') },
+            ghost: { kind: 'pane', paneId: 'ghost', render: () => textView('ghost') },
           },
         }),
       }],
@@ -343,7 +369,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => makeLongContent('home:main'),
+        render: () => textView(makeLongContent('home:main')),
       }),
       keyMap: createKeyMap<Msg>().bind('l', 'Increment', { type: 'inc' }),
     };
@@ -370,7 +396,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'home',
+        render: () => textView('home'),
       }),
       keyMap: createKeyMap<Msg>()
         .bind('l', 'Cycle placement', { type: 'inc' })
@@ -405,7 +431,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => `${id} pane`,
+        render: () => textView(`${id} pane`),
       }),
     });
 
@@ -430,7 +456,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'home',
+        render: () => textView('home'),
       }),
     };
 
@@ -448,7 +474,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'logs',
+        render: () => textView('logs'),
       }),
       keyMap: createKeyMap<Msg>().bind('x', 'Delayed increment', { type: 'noop' }),
     };
@@ -513,7 +539,7 @@ describe('createFramedApp', () => {
     expect(result.model.scrollByPage.home?.main?.y).toBeGreaterThan(0);
   });
 
-  it('ignores mouse messages at the frame boundary', async () => {
+  it('forwards unhandled mouse messages to the active page', async () => {
     type MsgWithMouse = Msg | MouseMsg;
 
     let sawMouseInPageUpdate = false;
@@ -532,7 +558,7 @@ describe('createFramedApp', () => {
       layout: () => ({
         kind: 'pane',
         paneId: 'main',
-        render: () => 'main',
+        render: () => textView('main'),
       }),
       keyMap: createKeyMap<MsgWithMouse>().bind('x', 'Increment', { type: 'inc' }),
     };
@@ -549,9 +575,34 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
 
-    const result = await runScript(app, [{ msg: mouse }, { key: 'x' }]);
-    expect(sawMouseInPageUpdate).toBe(false);
+    const result = await runScript(app, [{ mouse }, { key: 'x' }]);
+    expect(sawMouseInPageUpdate).toBe(true);
     expect(result.model.pageModels.home?.count).toBe(1);
+  });
+
+  it('switches tabs when the user clicks a header tab', async () => {
+    const app = createFramedApp({
+      title: 'Test',
+      pages: [
+        makePage('home', 'Home', 'main'),
+        makePage('logs', 'Logs', 'main'),
+      ],
+    });
+
+    const result = await runScript(app, [{
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'press',
+        col: 15,
+        row: 0,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    }]);
+
+    expect(result.model.activePageId).toBe('logs');
   });
 
   it('toggles help with ?', async () => {
@@ -599,6 +650,77 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(0);
   });
 
+  it('blocks page mouse updates while help or the command palette is open', async () => {
+    type MsgWithMouse = Msg | MouseMsg;
+
+    const page: FramePage<PageModel, MsgWithMouse> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse') {
+          return [{ ...model, count: model.count + 1 }, []];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('main'),
+      }),
+      commandItems: () => [{
+        id: 'noop',
+        label: 'No-op',
+        action: { type: 'inc' },
+      }],
+    };
+
+    const app = createFramedApp<PageModel, MsgWithMouse>({
+      pages: [page],
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      {
+        key: '?',
+      },
+      {
+        mouse: {
+          type: 'mouse',
+          button: 'none',
+          action: 'scroll-down',
+          col: 4,
+          row: 2,
+          shift: false,
+          alt: false,
+          ctrl: false,
+        },
+      },
+      {
+        key: KEY_ESCAPE,
+      },
+      {
+        key: KEY_CTRL_P,
+      },
+      {
+        mouse: {
+          type: 'mouse',
+          button: 'right',
+          action: 'press',
+          col: 4,
+          row: 2,
+          shift: false,
+          alt: false,
+          ctrl: false,
+        },
+      },
+    ]);
+
+    expect(result.model.helpOpen).toBe(false);
+    expect(result.model.commandPalette).toBeDefined();
+    expect(result.model.pageModels.home?.count).toBe(0);
+  });
+
   it('opens command palette and dispatches selected keymap command', async () => {
     const global = createKeyMap<Msg>()
       .bind('z', 'Zap', { type: 'inc' });
@@ -633,7 +755,7 @@ describe('createFramedApp', () => {
         layout: () => ({
           kind: 'pane',
           paneId: 'main',
-          render: () => 'main',
+          render: () => textView('main'),
         }),
         commandItems: () => [{
           id: 'boost',
@@ -684,8 +806,8 @@ describe('createFramedApp', () => {
           kind: 'split',
           splitId: 'shell',
           state: createSplitPaneState({ ratio: 0.5 }),
-          paneA: { kind: 'pane', paneId: 'left', render: () => 'left' },
-          paneB: { kind: 'pane', paneId: 'right', render: () => 'right' },
+          paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+          paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
         }),
       }],
       overlayFactory(ctx) {
@@ -753,6 +875,64 @@ describe('createFramedApp', () => {
     expect(cmds).toHaveLength(1);
   });
 
+  it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const [model] = app.init();
+    const runtimeMsg = app.routeRuntimeIssue?.({
+      level: 'warning',
+      source: 'runtime',
+      message: 'Framework warning',
+      atMs: 0,
+    });
+    if (runtimeMsg == null) throw new Error('expected runtime issue message');
+
+    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
+    const [visibleModel] = app.update(tickMsg as Msg, nextModel);
+
+    let dismissMouse: MouseMsg | undefined;
+    let sawActionTarget = false;
+    for (let row = 0; row < visibleModel.rows; row++) {
+      for (let col = 0; col < visibleModel.columns; col++) {
+        const target = hitTestNotificationStack(visibleModel.runtimeNotifications, {
+          screenWidth: visibleModel.columns,
+          screenHeight: visibleModel.rows,
+          margin: 1,
+          gap: 1,
+          ctx: testCtx,
+        }, col, row);
+        if (target?.kind === 'action') sawActionTarget = true;
+        if (target?.kind === 'dismiss' && dismissMouse == null) {
+          dismissMouse = {
+            type: 'mouse',
+            action: 'press',
+            button: 'left',
+            col,
+            row,
+            shift: false,
+            alt: false,
+            ctrl: false,
+          };
+        }
+      }
+    }
+
+    expect(sawActionTarget).toBe(false);
+    expect(dismissMouse).toBeDefined();
+
+    const [dismissedModel] = app.update(dismissMouse!, visibleModel);
+    expect(dismissedModel.runtimeNotifications.items).toHaveLength(1);
+    expect(dismissedModel.runtimeNotifications.items[0]?.phase).toBe('exiting');
+    expect(dismissedModel.runtimeNotificationLoopActive).toBe(true);
+  });
+
   it('treats modal keymaps as exclusive while a page modal is open', async () => {
     const app = createFramedApp({
       pages: [{
@@ -767,7 +947,7 @@ describe('createFramedApp', () => {
         layout: () => ({
           kind: 'pane',
           paneId: 'main',
-          render: () => 'modal page',
+          render: () => textView('modal page'),
         }),
         keyMap: createKeyMap<Msg>()
           .bind('x', 'Increment', { type: 'inc' }),

@@ -5,6 +5,7 @@
  * On overlap, center is truncated first, then right.
  */
 
+import { createSurface, parseAnsiToSurface, type Surface } from '@flyingrobots/bijou';
 import { visibleLength, clipToWidth } from './viewport.js';
 
 // ---------------------------------------------------------------------------
@@ -25,6 +26,18 @@ export interface StatusBarOptions {
   readonly fillChar?: string;
 }
 
+interface StatusBarSegment {
+  readonly start: number;
+  readonly len: number;
+  readonly text: string;
+}
+
+interface StatusBarLayout {
+  readonly width: number;
+  readonly fill: string;
+  readonly segments: readonly StatusBarSegment[];
+}
+
 // ---------------------------------------------------------------------------
 // statusBar()
 // ---------------------------------------------------------------------------
@@ -39,6 +52,55 @@ export interface StatusBarOptions {
  * @returns Rendered status bar string of exactly `width` visible characters.
  */
 export function statusBar(options: StatusBarOptions): string {
+  const layout = layoutStatusBar(options);
+  if (layout == null) return '';
+
+  let result = '';
+  let pos = 0;
+
+  for (const seg of layout.segments) {
+    if (seg.start > pos) {
+      result += layout.fill.repeat(seg.start - pos);
+    }
+    result += seg.text;
+    pos = seg.start + seg.len;
+  }
+
+  if (pos < layout.width) {
+    result += layout.fill.repeat(layout.width - pos);
+  }
+
+  return result;
+}
+
+/**
+ * Render a single-line status bar directly into a `Surface`.
+ *
+ * Use this in shell chrome and other structured TUI composition paths where the
+ * bar should stay on the `Surface` path instead of being flattened to text
+ * first. Keep {@link statusBar} for explicit text output or pipe-mode lowering.
+ *
+ * @param options - Bar content, width, and fill character.
+ * @returns Surface sized exactly to the requested bar width and one row tall.
+ */
+export function statusBarSurface(options: StatusBarOptions): Surface {
+  const layout = layoutStatusBar(options);
+  if (layout == null) return createSurface(0, 0);
+
+  const surface = createSurface(layout.width, 1, {
+    char: layout.fill,
+    empty: false,
+  });
+
+  for (const seg of layout.segments) {
+    const segmentSurface = parseAnsiToSurface(seg.text, seg.len, 1);
+    surface.blit(segmentSurface, seg.start, 0, 0, 0, seg.len, 1);
+  }
+
+  return surface;
+}
+
+function layoutStatusBar(options: StatusBarOptions): StatusBarLayout | null {
   const {
     left = '',
     center = '',
@@ -47,7 +109,7 @@ export function statusBar(options: StatusBarOptions): string {
     fillChar: rawFillChar,
   } = options;
 
-  if (width <= 0) return '';
+  if (width <= 0) return null;
 
   // Use first character of fillChar, default to space
   const fill = rawFillChar ? rawFillChar[0]! : ' ';
@@ -132,22 +194,5 @@ export function statusBar(options: StatusBarOptions): string {
   // Sort segments by start position
   segments.sort((a, b) => a.start - b.start);
 
-  // Build result by interleaving fill chars and segments
-  let result = '';
-  let pos = 0;
-
-  for (const seg of segments) {
-    if (seg.start > pos) {
-      result += fill.repeat(seg.start - pos);
-    }
-    result += seg.text;
-    pos = seg.start + seg.len;
-  }
-
-  // Fill remaining
-  if (pos < width) {
-    result += fill.repeat(width - pos);
-  }
-
-  return result;
+  return { width, fill, segments };
 }

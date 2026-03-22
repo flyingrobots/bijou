@@ -1,5 +1,6 @@
 import type { BijouContext, OutputMode } from '@flyingrobots/bijou';
-import { separator } from '@flyingrobots/bijou';
+import { separator, surfaceToString } from '@flyingrobots/bijou';
+import type { ComponentPreview } from './types.js';
 
 /**
  * Create a shallow copy of ctx with a different output mode.
@@ -14,7 +15,7 @@ function withMode(ctx: BijouContext, mode: OutputMode): BijouContext {
  * Each section is labeled with a separator.
  */
 export function triModePreview(
-  renderFn: (width: number, ctx: BijouContext) => string,
+  renderFn: (width: number, ctx: BijouContext) => ComponentPreview,
   width: number,
   ctx: BijouContext,
 ): string {
@@ -32,7 +33,10 @@ export function triModePreview(
     const sep = separator({ label, width: innerWidth, ctx });
     let rendered: string;
     try {
-      rendered = renderFn(innerWidth, modeCtx);
+      const preview = renderFn(innerWidth, modeCtx);
+      rendered = typeof preview === 'string'
+        ? preview
+        : surfaceToString(preview, modeCtx.style);
     } catch {
       rendered = `  (render error in ${mode} mode)`;
     }

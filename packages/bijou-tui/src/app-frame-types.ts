@@ -50,7 +50,7 @@ export interface RenderContext<PageModel, Msg> {
 
 /** Output of a layout node render pass. */
 export interface RenderResult {
-  readonly output: string;
+  readonly surface: import('@flyingrobots/bijou').Surface;
   readonly paneRects: ReadonlyMap<string, import('./layout-rect.js').LayoutRect>;
   readonly paneOrder: readonly string[];
 }

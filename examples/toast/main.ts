@@ -1,13 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator, surfaceToString } from '@flyingrobots/bijou';
+import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
-  composite, toast, type ToastVariant, type ToastAnchor,
+  compositeSurface, toast, type ToastVariant, type ToastAnchor,
 } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, contentSurface, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Msg = 
   | KeyMsg 
@@ -57,21 +56,19 @@ const app: App<Model, Msg> = {
     const { cols, rows } = model;
 
     const header = separator({ label: 'toast demo', width: cols, ctx });
-    const help = [
+    const background = screenSurface(cols, rows, column([
+      contentSurface(header),
+      spacer(),
       '  Keys:',
-      `    ${badgeText('s')} success toast`,
-      `    ${badgeText('e')} error toast`,
-      `    ${badgeText('i')} info toast`,
-      `    ${badgeText('a')} cycle anchor (${model.anchor})`,
-      `    ${badgeText('q')} quit`,
-    ].join('\n');
-
-    const bgLines = [header, '', help];
-    while (bgLines.length < rows) bgLines.push('');
-    const bg = bgLines.join('\n');
+      row(['    ', badgeSurface('s', 'info', ctx), ' success toast']),
+      row(['    ', badgeSurface('e', 'error', ctx), ' error toast']),
+      row(['    ', badgeSurface('i', 'primary', ctx), ' info toast']),
+      row(['    ', badgeSurface('a', 'info', ctx), ` cycle anchor (${model.anchor})`]),
+      row(['    ', badgeSurface('q', 'warning', ctx), ' quit']),
+    ]));
 
     if (!model.lastToast || Date.now() - model.lastToast.timestamp > 3000) {
-      return bg;
+      return background;
     }
 
     const t = toast({
@@ -83,7 +80,7 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return composite(bg, [t]);
+    return compositeSurface(background, [t]);
   },
 };
 

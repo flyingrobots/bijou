@@ -140,9 +140,6 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
 
   return surface;
 }
-
-export const boxV3 = boxSurface;
-
 /**
  * Render a header box as a Surface for V3-native composition.
  *

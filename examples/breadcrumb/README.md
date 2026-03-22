@@ -10,28 +10,22 @@ Navigation breadcrumb trails
 npx tsx examples/breadcrumb/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { breadcrumb, separator } from '@flyingrobots/bijou';
+- path context helps explain the current location
+- hierarchy should stay visible while the user reads the current node or page
+- a compact path summary is more honest than a full navigation control
 
-console.log(separator({ label: 'navigation', ctx }));
-console.log();
+## Choose something else when
 
-console.log(breadcrumb(['Home', 'Settings'], { ctx }));
-console.log();
+- choose `tabs()` when the destinations are peers
+- choose `stepper()` when the user is progressing through ordered stages
+- choose a simple title when the path is too unstable or deep to help comprehension
 
-console.log(breadcrumb(['Home', 'Projects', 'bijou', 'src', 'components'], { ctx }));
-console.log();
+## What this example proves
 
-console.log(separator({ label: 'custom separator', ctx }));
-console.log();
-
-console.log(breadcrumb(['Workspace', 'Documents', 'Reports', '2026'], { separator: ' → ', ctx }));
-console.log();
-
-console.log(breadcrumb(['root', 'usr', 'local', 'bin'], { separator: '/', ctx }));
-```
+- `breadcrumb()` as path context rather than command navigation
+- separator changes for different path semantics
+- a wayfinding component that lowers cleanly to text without losing hierarchy
 
 [← Examples](../README.md)

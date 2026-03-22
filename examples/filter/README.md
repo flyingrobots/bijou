@@ -1,26 +1,8 @@
 # `filter()`
 
-Fuzzy-filter select with vim-style normal/insert modes
+Search-first single-choice prompt for choosing one stored value from a larger set.
 
 ![demo](demo.gif)
-
-## Keyboard
-
-| Mode | Key | Action |
-|------|-----|--------|
-| Normal | `j` / `↓` | Navigate down |
-| Normal | `k` / `↑` | Navigate up |
-| Normal | `/` | Enter insert mode |
-| Normal | any other printable | Enter insert mode + type character |
-| Normal | `Escape` | Cancel |
-| Insert | any printable | Type filter character |
-| Insert | `↑` / `↓` | Navigate |
-| Insert | `Backspace` | Delete last character |
-| Insert | `Escape` | Return to normal mode |
-| Either | `Enter` | Select current item |
-| Either | `Ctrl+C` | Cancel |
-
-The mode indicator shows `:` in normal mode and `/` in insert mode.
 
 ## Run
 
@@ -28,36 +10,22 @@ The mode indicator shows `:` in normal mode and `/` in insert mode.
 npx tsx examples/filter/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { filter, badge } from '@flyingrobots/bijou';
+- the user is still choosing one stored value
+- the option set is large enough that narrowing is the main task
+- search keywords help the right choice surface faster
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-async function main() {
-  const language = await filter({
-    title: 'Choose a programming language:',
-    placeholder: 'j/k navigate, type or / to search',
-    options: [
-      { label: 'TypeScript', value: 'ts', keywords: ['javascript', 'typed', 'web'] },
-      { label: 'Rust', value: 'rust', keywords: ['systems', 'memory', 'safe'] },
-      { label: 'Python', value: 'python', keywords: ['scripting', 'ml', 'data'] },
-      { label: 'Go', value: 'go', keywords: ['google', 'concurrent', 'fast'] },
-      { label: 'Zig', value: 'zig', keywords: ['systems', 'comptime', 'safe'] },
-      { label: 'Elixir', value: 'elixir', keywords: ['erlang', 'functional', 'beam'] },
-      { label: 'Haskell', value: 'haskell', keywords: ['functional', 'pure', 'lazy'] },
-      { label: 'OCaml', value: 'ocaml', keywords: ['functional', 'ml', 'typed'] },
-    ],
-    ctx,
-  });
+- choose `select()` when the list is already short and stable
+- choose `commandPaletteSurface()` when the result is an action or navigation command
+- choose `browsableListSurface()` when the content is really a record browser rather than a filtered prompt
 
-  console.log();
-  console.log('Selected:', badge(language.toUpperCase(), { variant: 'primary', ctx }));
-}
+## What this example proves
 
-main().catch(console.error);
-```
+- `filter()` as a search-first value-selection prompt
+- normal/insert mode filtering behavior
+- graceful lowering of searchable choice into textual prompt flows
 
 [← Examples](../README.md)

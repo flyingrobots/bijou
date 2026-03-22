@@ -7,19 +7,18 @@
 
 import {
   createSurface,
-  parseAnsiToSurface,
+  resolveClock,
   resolveSafeCtx,
   type OverflowBehavior,
   type Surface,
 } from '@flyingrobots/bijou';
 import { helpView, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
-import type { App, Cmd, KeyMsg } from './types.js';
+import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
-import { modal } from './overlay.js';
+import { compositeSurface, modal } from './overlay.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
-import { fitBlock } from './layout-utils.js';
 import { type BuiltinTransition } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import {
@@ -39,6 +38,8 @@ import type { Timeline, TimelineState } from './timeline.js';
 import type { ViewOutput } from './view-output.js';
 import {
   createNotificationState,
+  dismissNotification,
+  hitTestNotificationStack,
   notificationsNeedTick,
   pushNotification,
   renderNotificationStack,
@@ -68,7 +69,7 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import {
-  renderHeaderLine,
+  resolveHeaderLine,
   renderHelpLine,
   renderPageContent,
   renderMaximizedPane,
@@ -76,13 +77,13 @@ import {
 } from './app-frame-render.js';
 import {
   applyFrameAction,
+  switchTab,
   syncPageFrameState,
 } from './app-frame-actions.js';
 import {
   handlePaletteKey,
   openCommandPalette,
 } from './app-frame-palette.js';
-import { visibleLength } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -121,7 +122,7 @@ export type FrameLayoutNode =
   | {
     readonly kind: 'pane';
     readonly paneId: string;
-    /** Pane content may be a legacy string, a Surface, or a LayoutNode. */
+    /** Pane content must be a Surface or LayoutNode. */
     readonly render: (width: number, height: number) => ViewOutput;
     readonly overflowX?: OverflowX;
   }
@@ -409,6 +410,84 @@ export function createFramedApp<PageModel, Msg>(
     return [emitMsgForPage(model.activePageId, observed), ...cmds];
   }
 
+  function updateTargetPage(
+    model: InternalFrameModel<PageModel, Msg>,
+    targetPageId: string,
+    targetMsg: Msg,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+    const targetPage = pagesById.get(targetPageId);
+    if (targetPage == null) return [model, []];
+
+    const pageModel = model.pageModels[targetPageId]!;
+    const updateResult = targetPage.update(targetMsg, pageModel);
+    let nextPageModel: PageModel = pageModel;
+    let cmds: Cmd<Msg>[] = [];
+
+    if (updateResult !== undefined && updateResult !== null) {
+      if (Array.isArray(updateResult)) {
+        nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
+        cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
+      } else {
+        nextPageModel = updateResult as PageModel;
+      }
+    }
+
+    const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
+    const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
+    const wrappedCmds = Array.isArray(cmds)
+      ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd))
+      : [];
+    return [synced, wrappedCmds];
+  }
+
+  function handleFrameMouse(
+    msg: MouseMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
+    if (model.helpOpen || model.commandPalette != null) return [model, []];
+    if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+
+    if (frameNotificationOptions.enabled) {
+      const nowMs = resolveClock(resolveSafeCtx()).now();
+      const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
+        screenWidth: model.columns,
+        screenHeight: model.rows,
+        margin: frameNotificationOptions.margin,
+        gap: frameNotificationOptions.gap,
+        ctx: resolveSafeCtx() ?? undefined,
+      }, msg.col, msg.row);
+
+      if (notificationTarget?.kind === 'dismiss') {
+        return applyFrameNotificationState(
+          model,
+          dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),
+          nowMs,
+        );
+      }
+      if (notificationTarget != null) {
+        return [model, []];
+      }
+    }
+
+    if (msg.row === 0) {
+      const header = resolveHeaderLine(model, options, pagesById);
+      const tab = header.tabTargets.find((target) =>
+        msg.col >= target.startCol && msg.col <= target.endCol,
+      );
+      if (tab != null) {
+        const currentIndex = model.pageOrder.indexOf(model.activePageId);
+        const nextIndex = model.pageOrder.indexOf(tab.pageId);
+        if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
+          return switchTab(model, nextIndex - currentIndex, pagesById, options);
+        }
+        return [model, []];
+      }
+      return [model, []];
+    }
+
+    return undefined;
+  }
+
   function applyFrameNotificationState(
     model: InternalFrameModel<PageModel, Msg>,
     notifications: NotificationState<never>,
@@ -637,40 +716,21 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isMouseMsg(msg)) {
-        return [model, []];
+        const frameResult = handleFrameMouse(msg, model);
+        if (frameResult != null) return frameResult;
+        return updateTargetPage(model, model.activePageId, msg as unknown as Msg);
       }
 
       // Custom message path: route to originating page when command messages are scoped.
       const scoped = isPageScopedMsg<Msg>(msg) ? msg : undefined;
       const targetPageId = scoped?.pageId ?? model.activePageId;
-      const targetPage = pagesById.get(targetPageId);
-      if (targetPage == null) return [model, []];
-
       const targetMsg = scoped?.msg ?? (msg as Msg);
-      const pageModel = model.pageModels[targetPageId]!;
-      
-      const updateResult = targetPage.update(targetMsg, pageModel);
-      let nextPageModel: PageModel = pageModel; // Default to current
-      let cmds: Cmd<Msg>[] = [];
-
-      if (updateResult !== undefined && updateResult !== null) {
-        if (Array.isArray(updateResult)) {
-          nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
-          cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
-        } else {
-          nextPageModel = updateResult as PageModel;
-        }
-      }
-      
-      const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
-      const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
-      const wrappedCmds = Array.isArray(cmds) ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd)) : [];
-      return [synced, wrappedCmds];
+      return updateTargetPage(model, targetPageId, targetMsg);
     },
 
     view(model) {
       const activePage = pagesById.get(model.activePageId)!;
-      const header = renderHeaderLine(model, options, pagesById);
+      const header = resolveHeaderLine(model, options, pagesById).surface;
       const helpLine = renderHelpLine(model, frameKeys, options, activePage);
       const bodyRect = frameBodyRect(model.columns, model.rows);
 
@@ -681,16 +741,16 @@ export function createFramedApp<PageModel, Msg>(
       const activeResult = maximizedPaneId
         ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
         : renderPageContent(model.activePageId, model, bodyRect, pagesById);
-      let bodyOutput = activeResult.output;
+      let bodySurface = activeResult.surface;
 
       const activeTransition = model.activeTransition ?? options.transition;
       if (model.previousPageId != null && model.transitionProgress < 1 && activeTransition && activeTransition !== 'none') {
         const ctx = resolveSafeCtx();
         if (ctx) {
           const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
-          bodyOutput = renderTransition(
-            prevResult.output,
-            activeResult.output,
+          bodySurface = renderTransition(
+            prevResult.surface,
+            activeResult.surface,
             activeTransition,
             model.transitionProgress,
             bodyRect.width,
@@ -700,8 +760,6 @@ export function createFramedApp<PageModel, Msg>(
           );
         }
       }
-
-      bodyOutput = fitBlock(bodyOutput, bodyRect.width, bodyRect.height).join('\n');
 
       const overlays: Overlay[] = [];
       if (options.overlayFactory != null) {
@@ -751,9 +809,9 @@ export function createFramedApp<PageModel, Msg>(
       return composeFrameSurface({
         width: model.columns,
         height: model.rows,
-        header,
-        helpLine,
-        bodyOutput,
+        headerSurface: header,
+        helpLineSurface: helpLine,
+        bodySurface,
         bodyRect,
         overlays,
         dimBackground: overlays.length > 0,
@@ -772,9 +830,9 @@ export function createFramedApp<PageModel, Msg>(
 interface FrameSurfaceOptions {
   width: number;
   height: number;
-  header: string;
-  helpLine: string;
-  bodyOutput: string;
+  headerSurface: Surface;
+  helpLineSurface: Surface;
+  bodySurface: Surface;
   bodyRect: LayoutRect;
   overlays: readonly Overlay[];
   dimBackground: boolean;
@@ -783,46 +841,12 @@ interface FrameSurfaceOptions {
 function composeFrameSurface(options: FrameSurfaceOptions): Surface {
   const frame = createSurface(options.width, options.height);
 
-  frame.blit(parseAnsiToSurface(options.header, options.width, 1), 0, 0);
+  frame.blit(options.headerSurface, 0, 0);
   if (options.height > 1) {
-    frame.blit(parseAnsiToSurface(options.helpLine, options.width, 1), 0, 1);
+    frame.blit(options.helpLineSurface, 0, 1);
   }
   if (options.bodyRect.width > 0 && options.bodyRect.height > 0) {
-    frame.blit(
-      parseAnsiToSurface(options.bodyOutput, options.bodyRect.width, options.bodyRect.height),
-      options.bodyRect.col,
-      options.bodyRect.row,
-    );
+    frame.blit(options.bodySurface, options.bodyRect.col, options.bodyRect.row);
   }
-
-  if (options.dimBackground) {
-    dimSurface(frame);
-  }
-
-  for (const overlay of options.overlays) {
-    const overlaySurface = overlay.surface ?? parseAnsiToSurface(
-      overlay.content,
-      maxVisibleWidth(overlay.content),
-      overlay.content.split('\n').length,
-    );
-    frame.blit(overlaySurface, overlay.col, overlay.row);
-  }
-
-  return frame;
-}
-
-function dimSurface(surface: Surface): void {
-  for (let y = 0; y < surface.height; y++) {
-    for (let x = 0; x < surface.width; x++) {
-      const cell = surface.get(x, y);
-      if (cell.empty || cell.char === ' ') continue;
-      const modifiers = new Set(cell.modifiers ?? []);
-      modifiers.add('dim');
-      surface.set(x, y, { ...cell, modifiers: Array.from(modifiers) });
-    }
-  }
-}
-
-function maxVisibleWidth(text: string): number {
-  return text.split('\n').reduce((max, line) => Math.max(max, visibleLength(line)), 0);
+  return compositeSurface(frame, options.overlays, { dim: options.dimBackground });
 }

@@ -173,16 +173,27 @@ import { createTuiAppSkeleton } from '@flyingrobots/bijou-tui-app';
 
 const ctx = initDefaultContext();
 
-await run(createTuiAppSkeleton({
-  ctx,
-  title: 'My Bijou App',
-  statusMessage: ({ activeTabTitle }) => \`${'${activeTabTitle}'} ready\`,
-}));
+await run(
+  createTuiAppSkeleton({
+    ctx,
+    title: 'My Bijou App',
+    statusMessage: ({ activeTabTitle }) => \`${'${activeTabTitle}'} ready\`,
+  }),
+  { mouse: true },
+);
 `;
 
   const readme = `# ${packageName}
 
 Scaffolded with \`create-bijou-tui-app\`.
+
+This starter is for app-like TUIs with:
+- peer destinations in tabs
+- shell status and command discovery
+- supplemental side work in a drawer
+- blocking review/quit flows in a modal
+
+Avoid this starter for one-shot CLI or prompt-first flows that do not need a framed shell.
 
 ## Run
 
@@ -191,11 +202,22 @@ npm install
 npm run dev
 \`\`\`
 
+## Default shell patterns
+
 The default shell includes:
 - full-screen framed app layout
-- two starter tabs (drawer + split)
+- two starter tabs:
+  - Home: primary workspace plus a supplemental drawer
+  - Split: comparison/inspection layout
 - command palette and help integration
+- mouse enabled by default for shell chrome and pointer-capable surfaces
 - quit confirmation on \`q\` / \`ctrl+c\`
+
+## Customize next
+
+- replace the starter tabs with real destinations
+- repurpose the drawer for filters, context, logs, or side-work inspection
+- keep destructive or blocking decisions in modal flows
 `;
 
   return {

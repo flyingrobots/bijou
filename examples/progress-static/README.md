@@ -1,6 +1,6 @@
 # `progressBar()`
 
-Static progress bars at various states
+Determinate progress bars for work with an honest completion estimate.
 
 ![demo](demo.gif)
 
@@ -10,26 +10,22 @@ Static progress bars at various states
 npx tsx examples/progress-static/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { progressBar, separator } from '@flyingrobots/bijou';
+- completion can be estimated honestly
+- the user benefits from knowing how far through a task they are
+- a static snapshot of progress is enough for the output mode
 
-console.log(separator({ label: 'progress bars', ctx }));
-console.log();
+## Choose something else when
 
-for (const pct of [0, 25, 50, 75, 100]) {
-  console.log(progressBar(pct, { width: 40, showPercent: true, ctx }));
-}
+- choose `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate
+- avoid fake percentages when the system does not actually know progress
+- avoid progress bars for trivial work that starts and finishes too quickly to matter
 
-console.log();
-console.log(separator({ label: 'custom width', ctx }));
-console.log();
+## What this example proves
 
-console.log('Short: ', progressBar(60, { width: 20, ctx }));
-console.log('Medium:', progressBar(60, { width: 40, ctx }));
-console.log('Wide:  ', progressBar(60, { width: 60, ctx }));
-```
+- determinate bars across several completion states
+- width control for compact or wide progress regions
+- `progressBar()` as the honest choice when percent-complete is known
 
 [← Examples](../README.md)

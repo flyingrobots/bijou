@@ -1,12 +1,29 @@
-# canvas
+# `canvas()`, `ShaderFn`
 
-Animated plasma effect using the `canvas()` shader primitive.
+Animated shader surface for deliberate visual moments.
 
 ## Run
 
 ```sh
 npx tsx examples/canvas/main.ts
 ```
+
+## Use this when
+
+- the app needs a purposeful visual field such as a splash screen or atmospheric background
+- the effect supports mood, transition, or identity instead of carrying core task meaning
+- the visual surface is allowed to be expressive without blocking comprehension
+
+## Choose something else when
+
+- choose ordinary layout and status surfaces for routine productivity screens
+- choose a simpler transition or status cue when the effect would distract from the actual task
+
+## What this example proves
+
+- `canvas()` as a shader-driven surface primitive
+- `ShaderFn` over normalized UV coordinates and time
+- a visual effect that still degrades honestly when animation is absent
 
 ## Source (excerpt)
 
@@ -24,3 +41,5 @@ const shader: ShaderFn = ({ u, v, time }) => {
 
 const art = canvas(60, 20, shader, { time });
 ```
+
+[← Examples](../README.md)

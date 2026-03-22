@@ -1,42 +1,50 @@
 import { createNodeContext } from '@flyingrobots/bijou-node';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import {
-  box, headerBox, badge, alert, table, progressBar, separator,
-  setDefaultContext, surfaceToString,
+  box,
+  headerBox,
+  alert,
+  table,
+  progressBar,
+  separatorSurface,
+  setDefaultContext,
 } from '@flyingrobots/bijou';
 import type { BijouContext } from '@flyingrobots/bijou';
+import {
+  badgeSurface,
+  column,
+  contentSurface,
+  renderSurface,
+  row,
+  spacer,
+} from '../_shared/example-surfaces.ts';
 
 // Render the same components in each output mode for comparison.
 
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
-}
-
 function renderSample(label: string, ctx: BijouContext): string {
-  const lines: string[] = [];
-
-  lines.push(separator({ label, width: 40, ctx }));
-  lines.push('');
-  lines.push(box('Hello, bijou!', { ctx }));
-  lines.push('');
-  lines.push(headerBox('Deploy', { detail: 'v1.2.3', ctx }));
-  lines.push('');
-  lines.push([
-    badgeText('OK', 'success', ctx),
-    badgeText('FAIL', 'error', ctx),
-  ].join(' '));
-  lines.push('');
-  lines.push(alert('Build passed.', { variant: 'success', ctx }));
-  lines.push('');
-  lines.push(table({
-    columns: [{ header: 'Name' }, { header: 'Value' }],
-    rows: [['port', '3000'], ['host', 'localhost']],
-    ctx,
-  }));
-  lines.push('');
-  lines.push(progressBar(75, { width: 30, showPercent: true, ctx }));
-
-  return lines.join('\n');
+  return renderSurface(column([
+    separatorSurface({ label, width: 40, ctx }),
+    spacer(1, 1),
+    contentSurface(box('Hello, bijou!', { ctx })),
+    spacer(1, 1),
+    contentSurface(headerBox('Deploy', { detail: 'v1.2.3', ctx })),
+    spacer(1, 1),
+    row([
+      badgeSurface('OK', 'success', ctx),
+      ' ',
+      badgeSurface('FAIL', 'error', ctx),
+    ]),
+    spacer(1, 1),
+    contentSurface(alert('Build passed.', { variant: 'success', ctx })),
+    spacer(1, 1),
+    contentSurface(table({
+      columns: [{ header: 'Name' }, { header: 'Value' }],
+      rows: [['port', '3000'], ['host', 'localhost']],
+      ctx,
+    })),
+    spacer(1, 1),
+    contentSurface(progressBar(75, { width: 30, showPercent: true, ctx })),
+  ]), ctx);
 }
 
 // Create contexts for each mode

@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, badge, enumeratedList, kbd, separator, surfaceToString } from '@flyingrobots/bijou';
+import { box, enumeratedList, kbd, separator } from '@flyingrobots/bijou';
 import {
   run,
   createKeyMap,
@@ -7,6 +7,7 @@ import {
   type FramePage,
   type PageTransition,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
 
@@ -18,8 +19,6 @@ interface PageModel {
 }
 
 const TRANSITIONS: PageTransition[] = ['none', 'wipe', 'dissolve', 'grid', 'fade', 'melt', 'matrix', 'scramble'];
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 function updatePageModel(msg: Msg, model: PageModel): [PageModel, []] {
   if (msg.type === 'set-transition') {
@@ -40,12 +39,12 @@ function createPageKeyMap() {
 function renderContent(pageName: string, model: PageModel, width: number, height: number): string {
   void height;
   const list = enumeratedList(
-    TRANSITIONS.map((transition) => transition === model.selectedTransition ? `${transition} ${badgeText('active', 'success')}` : transition),
+    TRANSITIONS.map((transition) => transition === model.selectedTransition ? `${transition} [active]` : transition),
     { style: 'arabic', indent: 2 }
   );
 
   const content = [
-    `Currently on ${badgeText(pageName, 'primary')}`,
+    `Currently on ${pageName}`,
     '',
     'Press 1-8 to select the NEXT transition:',
     '',
@@ -67,7 +66,7 @@ function makePage(id: string, title: string): FramePage<PageModel, Msg> {
     layout: (model) => ({
       kind: 'pane',
       paneId: `${id}-main`,
-      render: (w, h) => renderContent(title, model, w, h),
+      render: (w, h) => contentSurface(renderContent(title, model, w, h)),
     }),
   };
 }

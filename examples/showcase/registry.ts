@@ -1,7 +1,6 @@
 import type { BijouContext, DagNode, TreeNode, TimelineEvent } from '@flyingrobots/bijou';
 import {
   alert,
-  badge,
   box,
   headerBox,
   separator,
@@ -23,13 +22,10 @@ import {
   dag,
   enumeratedList,
   markdown,
-  surfaceToString,
 } from '@flyingrobots/bijou';
+import { statusBarSurface } from '@flyingrobots/bijou-tui';
 import type { ComponentEntry } from './types.js';
-
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
-}
+import { badgeSurface, column, row, spacer } from '../_shared/example-surfaces.ts';
 
 // ---------------------------------------------------------------------------
 // Sample data
@@ -129,21 +125,31 @@ const DISPLAY: ComponentEntry[] = [
       '',
       '**Degradation:** Rich shows colored pill. Pipe shows plain text. Accessible shows `[TEXT]` brackets.',
     ].join('\n'),
-    render: (_w, ctx) => [
-      [
-        badgeText('SUCCESS', 'success', ctx),
-        badgeText('ERROR', 'error', ctx),
-        badgeText('WARNING', 'warning', ctx),
-      ].join('  '),
-      [
-        badgeText('INFO', 'info', ctx),
-        badgeText('MUTED', 'muted', ctx),
-        badgeText('ACCENT', 'accent', ctx),
-        badgeText('PRIMARY', 'primary', ctx),
-      ].join('  '),
-      '',
-      `Server is ${badgeText('RUNNING', 'success', ctx)} on port ${badgeText('3000', 'primary', ctx)}`,
-    ].join('\n'),
+    render: (_w, ctx) => column([
+      row([
+        badgeSurface('SUCCESS', 'success', ctx),
+        '  ',
+        badgeSurface('ERROR', 'error', ctx),
+        '  ',
+        badgeSurface('WARNING', 'warning', ctx),
+      ]),
+      row([
+        badgeSurface('INFO', 'info', ctx),
+        '  ',
+        badgeSurface('MUTED', 'muted', ctx),
+        '  ',
+        badgeSurface('ACCENT', 'accent', ctx),
+        '  ',
+        badgeSurface('PRIMARY', 'primary', ctx),
+      ]),
+      spacer(1, 1),
+      row([
+        'Server is ',
+        badgeSurface('RUNNING', 'success', ctx),
+        ' on port ',
+        badgeSurface('3000', 'primary', ctx),
+      ]),
+    ]),
   },
   {
     id: 'separator',
@@ -337,9 +343,9 @@ const DATA: ComponentEntry[] = [
         { header: 'Status', width: Math.min(10, Math.floor(w / 4)) },
       ],
       rows: [
-        ['Alice', 'Engineer', badgeText('active', 'success', ctx)],
-        ['Bob', 'Designer', badgeText('away', 'warning', ctx)],
-        ['Carol', 'PM', badgeText('offline', 'muted', ctx)],
+        ['Alice', 'Engineer', 'active'],
+        ['Bob', 'Designer', 'away'],
+        ['Carol', 'PM', 'offline'],
       ],
       ctx,
     }),
@@ -1053,17 +1059,15 @@ const TUI: ComponentEntry[] = [
     description: [
       '# statusBar()',
       '',
-      'Single-line status bar with left, center, and right segments.',
-      'Fill character customizable.',
+      'Single-line status rail with left, center, and right segments.',
+      'Use `statusBarSurface()` when shell chrome stays on the structured surface path.',
     ].join('\n'),
-    render: (_w, _ctx) => {
-      // statusBar is imported from bijou-tui; use a simple mock render
-      const w2 = 40;
-      const left = ' NORMAL';
-      const right = 'Ln 42, Col 8 ';
-      const gap = w2 - left.length - right.length;
-      return left + ' '.repeat(Math.max(1, gap)) + right;
-    },
+    render: () => statusBarSurface({
+      left: ' NORMAL',
+      center: 'TypeScript',
+      right: 'Ln 42, Col 8 ',
+      width: 40,
+    }),
   },
 ];
 

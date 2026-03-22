@@ -1,12 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { runScript } from './driver.js';
-import type { App, Cmd } from './types.js';
+import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
-import { badge, surfaceToString } from '@flyingrobots/bijou';
+import { badge, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext, mockClock, plainStyle } from '@flyingrobots/bijou/adapters/test';
 
 const style = plainStyle();
+
+function textView(text: string) {
+  const lines = text.split('\n');
+  const width = Math.max(1, ...lines.map((line) => line.length));
+  return stringToSurface(text, width, Math.max(1, lines.length));
+}
 
 // ---------------------------------------------------------------------------
 // Test app: counter that increments on 'up', decrements on 'down', quits on 'q'
@@ -29,7 +35,7 @@ const counterApp: App<CounterModel> = {
     return [model, []];
   },
   view(model) {
-    return `Count: ${model.count}`;
+    return textView(`Count: ${model.count}`);
   },
 };
 
@@ -111,7 +117,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return model.loaded ? `Data: ${model.data}` : 'Loading...';
+        return textView(model.loaded ? `Data: ${model.data}` : 'Loading...');
       },
     };
 
@@ -139,7 +145,7 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return `${model.cols}x${model.rows}`;
+        return textView(`${model.cols}x${model.rows}`);
       },
     };
 
@@ -149,14 +155,34 @@ describe('runScript', () => {
     expect(surfaceToString(result.frames[result.frames.length - 1]!, style)).toContain('120x40');
   });
 
-  it('uses the latest scripted dimensions when normalizing legacy string views', async () => {
-    const result = await runScript(counterApp, [
+  it('uses the latest scripted dimensions when normalizing layout views', async () => {
+    interface Model { cols: number; rows: number }
+    const app: App<Model> = {
+      init: () => [{ cols: 8, rows: 1 }, []],
+      update(msg, model) {
+        if (isResizeMsg(msg)) {
+          return [{ cols: msg.columns, rows: msg.rows }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return {
+          type: 'TestLayoutNode',
+          rect: { x: 0, y: 0, width: 8, height: 1 },
+          children: [],
+          surface: stringToSurface(`${model.cols}x${model.rows}`, 8, 1),
+        };
+      },
+    };
+
+    const result = await runScript(app, [
       { resize: { columns: 18, rows: 3 } },
     ]);
 
     const lastFrame = result.frames[result.frames.length - 1]!;
     expect(lastFrame.width).toBe(18);
     expect(lastFrame.height).toBe(3);
+    expect(surfaceToString(lastFrame, style)).toContain('18x3');
   });
 
   it('emits custom msg steps', async () => {
@@ -169,12 +195,44 @@ describe('runScript', () => {
         return [model, []];
       },
       view(model) {
-        return `Count: ${model.count}`;
+        return textView(`Count: ${model.count}`);
       },
     };
 
     const result = await runScript(app, [{ msg: { type: 'inc' } }, { msg: { type: 'inc' } }]);
     expect(result.model.count).toBe(2);
+  });
+
+  it('emits mouse steps', async () => {
+    interface Model { clicked: number }
+    type Msg = MouseMsg;
+    const app: App<Model, Msg> = {
+      init: () => [{ clicked: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse' && msg.action === 'press' && msg.button === 'left') {
+          return [{ clicked: model.clicked + 1 }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return textView(`Clicked: ${model.clicked}`);
+      },
+    };
+
+    const result = await runScript(app, [{
+      mouse: {
+        type: 'mouse',
+        button: 'left',
+        action: 'press',
+        col: 4,
+        row: 2,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    }]);
+
+    expect(result.model.clicked).toBe(1);
   });
 
   it('installs the BCSS resolver when css is provided', async () => {

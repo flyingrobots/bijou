@@ -1,5 +1,5 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd } from '@flyingrobots/bijou';
+import { boxSurface, kbd } from '@flyingrobots/bijou';
 import {
   run,
   createKeyMap,
@@ -61,13 +61,19 @@ const editorPage = createPage('editor', 'Editor', (model) => ({
   paneA: {
     kind: 'pane',
     paneId: 'files',
-    render: (w) => box(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${w} cols`, { width: w }),
+    render: (width) => boxSurface(`Files\n\n- src/app.ts\n- src/frame.ts\n- test/app.test.ts\n\n${width} cols`, {
+      width,
+      ctx,
+    }),
   },
   paneB: {
     kind: 'pane',
     paneId: 'content',
     overflowX: 'scroll',
-    render: (w, h) => box(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${w}x${h}`, { width: w }),
+    render: (width, height) => boxSurface(`Editor\n\ncount = ${model.count}\n\nfunction main() {\n  return 'v1.3 app frame';\n}\n\n${width}x${height}`, {
+      width,
+      ctx,
+    }),
   },
 }));
 
@@ -85,17 +91,17 @@ const dashboardPage = createPage('dashboard', 'Dashboard', (model) => ({
     stats: {
       kind: 'pane',
       paneId: 'stats',
-      render: (w) => box(`Stats: counter=${model.count}`, { width: w }),
+      render: (width) => boxSurface(`Stats: counter=${model.count}`, { width, ctx }),
     },
     left: {
       kind: 'pane',
       paneId: 'left',
-      render: (w) => box('Queues\n\n- build\n- test\n- release', { width: w }),
+      render: (width) => boxSurface('Queues\n\n- build\n- test\n- release', { width, ctx }),
     },
     right: {
       kind: 'pane',
       paneId: 'right',
-      render: (w) => box('Signals\n\n- latency\n- errors\n- throughput', { width: w }),
+      render: (width) => boxSurface('Signals\n\n- latency\n- errors\n- throughput', { width, ctx }),
     },
   },
 }));

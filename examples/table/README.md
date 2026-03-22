@@ -1,6 +1,6 @@
 # `table()`
 
-Data tables with columns and alignment
+Passive row/column comparison grid
 
 ![demo](demo.gif)
 
@@ -9,6 +9,17 @@ Data tables with columns and alignment
 ```sh
 npx tsx examples/table/main.ts
 ```
+
+## Use this when
+
+- the main job is comparing the same attributes across many rows
+- the output should still work cleanly as core string rendering
+
+## Choose something else when
+
+- choose `tableSurface()` when the same comparison should stay on the V3 `Surface` path
+- choose `navigableTable()` when the user must actively traverse rows or cells
+- choose `tree()` or `dag()` when hierarchy or dependency is the real structure
 
 ## Code
 

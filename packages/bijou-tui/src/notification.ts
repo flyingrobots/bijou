@@ -13,6 +13,7 @@ import {
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
+import { resolveNotificationGap, resolveOverlayMargin } from './design-language.js';
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
 export type NotificationTone = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
@@ -95,6 +96,13 @@ export interface RenderNotificationHistoryOptions {
   readonly ctx?: BijouContext;
 }
 
+export type NotificationMouseTargetKind = 'dismiss' | 'action' | 'body';
+
+export interface NotificationMouseTarget<Msg> {
+  readonly item: NotificationRecord<Msg>;
+  readonly kind: NotificationMouseTargetKind;
+}
+
 interface CellTextStyle {
   readonly fg?: string;
   readonly bg?: string;
@@ -104,12 +112,17 @@ interface CellTextStyle {
 interface NotificationRenderEntry<Msg> {
   readonly item: NotificationRecord<Msg>;
   readonly surface: Surface;
+  readonly dismissRect: LayoutRect;
+  readonly actionRect?: LayoutRect;
+}
+
+interface PositionedNotificationRenderEntry<Msg> extends NotificationRenderEntry<Msg> {
+  readonly row: number;
+  readonly col: number;
 }
 
 const ENTER_DURATION_MS = 180;
 const EXIT_DURATION_MS = 320;
-const DEFAULT_MARGIN = 1;
-const DEFAULT_GAP = 1;
 const HISTORY_LIMIT = 250;
 
 const TONE_ICONS: Record<NotificationTone, string> = {
@@ -705,7 +718,7 @@ function renderNotificationSurface<Msg>(
   item: NotificationRecord<Msg>,
   options: RenderNotificationStackOptions,
   focused: boolean,
-): Surface {
+): NotificationRenderEntry<Msg> {
   const ctx = options.ctx;
   const textWidth = measureTextWidth(item, resolveRegion(options).width);
   const mutedStyle = tokenToCellStyle(ctx?.semantic('muted'));
@@ -718,6 +731,7 @@ function renderNotificationSurface<Msg>(
   const overflow = item.overflow;
 
   const rows: Surface[] = [];
+  let actionRect: LayoutRect | undefined;
 
   if (item.variant === 'INLINE') {
     const left = createSegmentSurface([
@@ -751,7 +765,18 @@ function renderNotificationSurface<Msg>(
         ? 'Dismiss'
         : (focused ? `[ ${item.action.label} ]` : `  ${item.action.label}  `);
       const actionStyle = focused ? withModifiers({}, ['bold']) : {};
-      rows.push(...standaloneRows(createSegmentSurface([{ text: actionLabel, style: actionStyle }]), textWidth, overflow));
+      const actionRows = standaloneRows(
+        createSegmentSurface([{ text: actionLabel, style: actionStyle }]),
+        textWidth,
+        overflow,
+      );
+      actionRect = {
+        row: rows.length,
+        col: 2,
+        width: textWidth,
+        height: actionRows.length,
+      };
+      rows.push(...actionRows);
     }
 
     if (item.variant === 'TOAST') {
@@ -798,7 +823,17 @@ function renderNotificationSurface<Msg>(
     );
   }
 
-  return card;
+  return {
+    item,
+    surface: card,
+    dismissRect: {
+      row: 0,
+      col: Math.max(0, card.width - 2),
+      width: 1,
+      height: 1,
+    },
+    actionRect,
+  };
 }
 
 function sortForPlacement<Msg>(
@@ -871,10 +906,7 @@ function createRenderEntry<Msg>(
   options: RenderNotificationStackOptions,
   focusedId: number | undefined,
 ): NotificationRenderEntry<Msg> {
-  return {
-    item,
-    surface: renderNotificationSurface(item, options, focusedId === item.id),
-  };
+  return renderNotificationSurface(item, options, focusedId === item.id);
 }
 
 function selectVisibleNotificationIds<Msg>(
@@ -882,8 +914,8 @@ function selectVisibleNotificationIds<Msg>(
   options: RenderNotificationStackOptions,
 ): ReadonlySet<number> {
   const region = resolveRegion(options);
-  const margin = options.margin ?? DEFAULT_MARGIN;
-  const gap = options.gap ?? DEFAULT_GAP;
+  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
+  const gap = resolveNotificationGap(options.gap);
   const availableHeight = Math.max(1, region.height - (margin * 2));
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
 
@@ -960,13 +992,13 @@ function renderOverflowExits<Msg>(
   gap: number,
   options: RenderNotificationStackOptions,
   focusedId: number | undefined,
-): readonly Overlay[] {
+): readonly PositionedNotificationRenderEntry<Msg>[] {
   if (exits.length === 0) return [];
 
   const rendered = [...exits]
     .sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id)
     .map((item) => createRenderEntry(item, options, focusedId));
-  const overlays: Overlay[] = [];
+  const entries: PositionedNotificationRenderEntry<Msg>[] = [];
   const mode = placementSortSign(placement);
 
   if (mode === 'bottom') {
@@ -981,17 +1013,14 @@ function renderOverflowExits<Msg>(
         margin,
         entry.item.progress,
       );
-      overlays.push({
+      entries.push({
+        ...entry,
         row: region.row + cursor + offset.rowDelta,
         col: region.col + baseCol + offset.colDelta,
-        surface: entry.surface,
-        content: options.ctx != null
-          ? surfaceToString(entry.surface, options.ctx.style)
-          : renderPlainSurface(entry.surface),
       });
       cursor -= gap;
     }
-    return overlays;
+    return entries;
   }
 
   let cursor = mode === 'top'
@@ -1007,24 +1036,21 @@ function renderOverflowExits<Msg>(
       margin,
       entry.item.progress,
     );
-    overlays.push({
+    entries.push({
+      ...entry,
       row: region.row + cursor + offset.rowDelta,
       col: region.col + baseCol + offset.colDelta,
-      surface: entry.surface,
-      content: options.ctx != null
-        ? surfaceToString(entry.surface, options.ctx.style)
-        : renderPlainSurface(entry.surface),
     });
     cursor += entry.surface.height + gap;
   }
 
-  return overlays;
+  return entries;
 }
 
-export function renderNotificationStack<Msg>(
+function resolveNotificationOverlayEntries<Msg>(
   state: NotificationState<Msg>,
   options: RenderNotificationStackOptions,
-): readonly Overlay[] {
+): readonly PositionedNotificationRenderEntry<Msg>[] {
   const screenWidth = Math.max(0, options.screenWidth);
   const screenHeight = Math.max(0, options.screenHeight);
   if (screenWidth <= 0 || screenHeight <= 0) return [];
@@ -1032,8 +1058,8 @@ export function renderNotificationStack<Msg>(
   const region = resolveRegion(options);
   if (region.width <= 0 || region.height <= 0) return [];
 
-  const margin = options.margin ?? DEFAULT_MARGIN;
-  const gap = options.gap ?? DEFAULT_GAP;
+  const margin = resolveOverlayMargin(region.width, region.height, options.margin);
+  const gap = resolveNotificationGap(options.gap);
   const visibleIds = selectVisibleNotificationIds(state, options);
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
   const overflowGrouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
@@ -1051,7 +1077,7 @@ export function renderNotificationStack<Msg>(
     overflowGrouped.set(item.placement, placementItems);
   }
 
-  const overlays: Overlay[] = [];
+  const entries: PositionedNotificationRenderEntry<Msg>[] = [];
   const placements = new Set<NotificationPlacement>([
     ...grouped.keys(),
     ...overflowGrouped.keys(),
@@ -1082,18 +1108,15 @@ export function renderNotificationStack<Msg>(
         margin,
         entry.item.progress,
       );
-      overlays.push({
+      entries.push({
+        ...entry,
         row: region.row + baseRow + offset.rowDelta,
         col: region.col + baseCol + offset.colDelta,
-        surface: entry.surface,
-        content: options.ctx != null
-          ? surfaceToString(entry.surface, options.ctx.style)
-          : renderPlainSurface(entry.surface),
       });
       cursor += entry.surface.height + gap;
     }
 
-    overlays.push(...renderOverflowExits(
+    entries.push(...renderOverflowExits(
       overflowGrouped.get(placement) ?? [],
       placement,
       totalHeight,
@@ -1105,5 +1128,59 @@ export function renderNotificationStack<Msg>(
     ));
   }
 
-  return overlays;
+  return entries;
+}
+
+function containsRect(rect: LayoutRect | undefined, col: number, row: number): boolean {
+  if (rect == null) return false;
+  return col >= rect.col
+    && col < rect.col + rect.width
+    && row >= rect.row
+    && row < rect.row + rect.height;
+}
+
+export function hitTestNotificationStack<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationStackOptions,
+  col: number,
+  row: number,
+): NotificationMouseTarget<Msg> | undefined {
+  const entries = resolveNotificationOverlayEntries(state, options);
+  for (let index = entries.length - 1; index >= 0; index--) {
+    const entry = entries[index]!;
+    if (
+      col < entry.col
+      || col >= entry.col + entry.surface.width
+      || row < entry.row
+      || row >= entry.row + entry.surface.height
+    ) {
+      continue;
+    }
+
+    const localCol = col - entry.col;
+    const localRow = row - entry.row;
+    if (containsRect(entry.dismissRect, localCol, localRow)) {
+      return { item: entry.item, kind: 'dismiss' };
+    }
+    if (containsRect(entry.actionRect, localCol, localRow)) {
+      return { item: entry.item, kind: 'action' };
+    }
+    return { item: entry.item, kind: 'body' };
+  }
+
+  return undefined;
+}
+
+export function renderNotificationStack<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationStackOptions,
+): readonly Overlay[] {
+  return resolveNotificationOverlayEntries(state, options).map((entry) => ({
+    row: entry.row,
+    col: entry.col,
+    surface: entry.surface,
+    content: options.ctx != null
+      ? surfaceToString(entry.surface, options.ctx.style)
+      : renderPlainSurface(entry.surface),
+  }));
 }

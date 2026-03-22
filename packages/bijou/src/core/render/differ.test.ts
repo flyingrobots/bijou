@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createSurface } from '../../ports/surface.js';
-import { renderDiff, isSameCell } from './differ.js';
+import { parseAnsiToSurface, renderDiff, isSameCell, stringToSurface } from './differ.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
 
 describe('isSameCell', () => {
@@ -92,5 +92,23 @@ describe('renderDiff', () => {
     expect(cupMatches?.length).toBe(2);
     expect(cupMatches?.[0]).toBe('\x1b[1;1H');
     expect(cupMatches?.[1]).toBe('\x1b[1;6H');
+  });
+});
+
+describe('surface text bridges', () => {
+  it('stringToSurface preserves double-width graphemes as two columns', () => {
+    const surface = stringToSurface('漢', 2, 1);
+
+    expect(surface.get(0, 0).char).toBe('漢');
+    expect(surface.get(1, 0).char).toBe('');
+  });
+
+  it('parseAnsiToSurface preserves double-width graphemes as two columns', () => {
+    const surface = parseAnsiToSurface('\x1b[38;2;255;0;0m漢\x1b[0m', 2, 1);
+
+    expect(surface.get(0, 0).char).toBe('漢');
+    expect(surface.get(0, 0).fg).toBe('#ff0000');
+    expect(surface.get(1, 0).char).toBe('');
+    expect(surface.get(1, 0).fg).toBe('#ff0000');
   });
 });

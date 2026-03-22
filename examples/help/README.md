@@ -1,4 +1,4 @@
-# `createKeyMap()`, `helpView()`, `helpShort()`
+# `createKeyMap()`, `helpViewSurface()`, `helpShortSurface()`
 
 Keybinding manager with help toggle
 
@@ -10,17 +10,29 @@ Keybinding manager with help toggle
 npx tsx examples/help/main.ts
 ```
 
+## Use this when
+
+- the app is keyboard-owned and users need shortcut discovery
+- shell hints should stay on the structured `Surface` path
+- grouped shortcut reference should reflect behavior and scope, not just raw key names
+
+## Choose something else when
+
+- choose `commandPaletteSurface()` when the real task is action discovery or navigation
+- choose visible inline labels when the controls are already self-evident and help text would only restate them
+
 ## Code
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, kbd, separator } from '@flyingrobots/bijou';
+import { separatorSurface } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createKeyMap, helpView, helpShort, vstack,
+  createKeyMap, helpViewSurface, helpShortSurface,
 } from '@flyingrobots/bijou-tui';
+import { column, row } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 interface Model {
   showHelp: boolean;
@@ -84,32 +96,37 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines: string[] = ['', '  Task List', ''];
+    const rows: Array<string | ReturnType<typeof helpViewSurface>> = ['', '  Task List', ''];
 
     for (let i = 0; i < model.items.length; i++) {
       const cursor = i === model.selected ? '>' : ' ';
-      lines.push(`  ${cursor} ${model.items[i]}`);
+      rows.push(`  ${cursor} ${model.items[i]}`);
     }
 
     if (model.items.length === 0) {
-      lines.push('  (empty)');
+      rows.push('  (empty)');
     }
 
-    lines.push('');
+    rows.push('');
 
     if (model.showHelp) {
-      lines.push(separator({ label: 'help', width: 50 }));
-      lines.push(helpView(keys, { title: 'Keybindings' }));
+      rows.push(separatorSurface({ label: 'help', width: 50, ctx }));
+      rows.push(helpViewSurface(keys, { title: 'Keybindings', width: 50 }));
     } else {
-      lines.push(`  ${helpShort(keys)}`);
+      rows.push(row([
+        '  ',
+        helpShortSurface(keys, { width: Math.max(1, ctx.runtime.columns - 2) }),
+      ]));
     }
 
-    lines.push('');
-    return lines.join('\n');
+    rows.push('');
+    return column(rows);
   },
 };
 
 run(app);
 ```
+
+Use `helpShortSurface()` for single-line shell hints and `helpViewSurface()` when the help body should remain on the structured `Surface` path. Keep `helpShort()` and `helpView()` for explicit text output or pipe-mode lowering.
 
 [← Examples](../README.md)

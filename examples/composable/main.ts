@@ -1,16 +1,14 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
-  box, headerBox, badge, alert, separator, kbd,
-  tabs, table, tree, progressBar, timeline, surfaceToString,
+  headerBox, alert, separator, kbd,
+  tabs, table, tree, progressBar, timeline,
 } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, isResizeMsg, type App,
-  flex, vstack,
+  flexSurface, vstack,
 } from '@flyingrobots/bijou-tui';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 const TAB_ITEMS = [
   { label: 'Overview' },
@@ -30,11 +28,7 @@ function overviewTab(): string {
   return vstack(
     headerBox('bijou', { detail: 'v0.2.0 — physics-powered TUI engine' }),
     '',
-    '  ' + [
-      badgeText('TypeScript', 'info'),
-      badgeText('MIT', 'muted'),
-      badgeText('Zero Deps', 'success'),
-    ].join(' '),
+    '  TypeScript · MIT · Zero Deps',
     '',
     alert('All tests passing — 42 tests in 3 suites', { variant: 'success' }),
     '',
@@ -120,7 +114,7 @@ const app: App<Model, Msg> = {
       default: content = '';
     }
 
-    return flex(
+    return flexSurface(
       { direction: 'column', width: model.cols, height: model.rows },
       { basis: 1, content: `  ${tabBar}` },
       { basis: 1, content: separator({ width: model.cols }) },

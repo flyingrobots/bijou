@@ -20,7 +20,7 @@ export type { TableSurfaceCell, TableSurfaceOptions } from './table-v3.js';
 
 export { box, headerBox } from './box.js';
 export type { BoxOptions, HeaderBoxOptions } from './box.js';
-export { boxSurface, boxV3, headerBoxSurface } from './box-v3.js';
+export { boxSurface, headerBoxSurface } from './box-v3.js';
 
 export { selectLogoSize, loadRandomLogo } from './logo.js';
 export type { LogoSize, LogoResult, LogoConstraints, LogoOptions } from './logo.js';

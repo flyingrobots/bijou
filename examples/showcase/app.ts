@@ -1,5 +1,5 @@
 import type { BijouContext } from '@flyingrobots/bijou';
-import { badge, box, kbd, markdown, surfaceToString } from '@flyingrobots/bijou';
+import { box, kbd, markdown } from '@flyingrobots/bijou';
 import {
   animate,
   createBrowsableListState,
@@ -24,13 +24,16 @@ import {
 import type { ShowcaseMsg, ShowcasePageModel } from './types.js';
 import { CATEGORIES, findEntry, type Category } from './registry.js';
 import { triModePreview } from './tri-mode.js';
+import { contentSurface } from '../_shared/example-surfaces.ts';
 
 // ---------------------------------------------------------------------------
 // Detail pane rendering
 // ---------------------------------------------------------------------------
 
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+function tierLabel(tier: number): string {
+  if (tier === 1) return 'static';
+  if (tier === 2) return 'embeddable';
+  return 'standalone';
 }
 
 function renderDetail(
@@ -55,12 +58,7 @@ function renderDetail(
   sections.push('');
 
   // Tier + package badge
-  const tierBadge = entry.tier === 1
-    ? badgeText('static', 'success', ctx)
-    : entry.tier === 2
-      ? badgeText('embeddable', 'info', ctx)
-      : badgeText('standalone', 'warning', ctx);
-  sections.push(`  ${tierBadge} ${badgeText(entry.pkg, 'muted', ctx)}`);
+  sections.push(`  Tier: ${tierLabel(entry.tier)} · Package: ${entry.pkg}`);
   sections.push('');
 
   // Tri-mode preview
@@ -265,13 +263,13 @@ function createCategoryPage(
         paneA: {
           kind: 'pane',
           paneId: `${category.id}-sidebar`,
-          render: (w, h) => renderSidebar(model, w, h, category, ctx),
+          render: (w, h) => contentSurface(renderSidebar(model, w, h, category, ctx)),
         },
         paneB: {
           kind: 'pane',
           paneId: `${category.id}-detail`,
           overflowX: 'scroll',
-          render: (w, h) => renderDetail(selectedId, w, h, ctx),
+          render: (w, h) => contentSurface(renderDetail(selectedId, w, h, ctx)),
         },
       } satisfies FrameLayoutNode;
     },

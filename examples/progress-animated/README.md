@@ -1,6 +1,6 @@
-# `createAnimatedProgressBar()`
+# `progressBar()` + `tick()`
 
-Progress bar filling to completion
+TEA-driven animated determinate progress.
 
 ![demo](demo.gif)
 
@@ -10,63 +10,22 @@ Progress bar filling to completion
 npx tsx examples/progress-animated/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge } from '@flyingrobots/bijou';
-import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+- the app already owns a runtime loop and wants to animate determinate progress over time
+- completion is known and should visibly advance toward done
+- the final state should become a stable completion result, not just stop moving
 
-initDefaultContext();
+## Choose something else when
 
-interface Model {
-  percent: number;
-  done: boolean;
-}
+- choose `createAnimatedProgressBar()` for a direct controller-style core helper outside a TEA runtime
+- choose `spinnerFrame()` when progress is active but indeterminate
+- avoid animation that obscures the meaning of the final completion state
 
-type Msg = { type: 'tick' } | { type: 'quit' };
+## What this example proves
 
-const app: App<Model, Msg> = {
-  init: () => [
-    { percent: 0, done: false },
-    [tick(50, { type: 'tick' })],
-  ],
-
-  update: (msg, model) => {
-    if (isKeyMsg(msg)) {
-      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
-        return [model, [quit()]];
-      }
-    }
-
-    if ('type' in msg && msg.type === 'tick') {
-      const next = Math.min(model.percent + 1, 100);
-      if (next >= 100) {
-        return [{ percent: 100, done: true }, [tick(1500, { type: 'quit' })]];
-      }
-      return [{ percent: next, done: false }, [tick(50, { type: 'tick' })]];
-    }
-
-    return [model, []];
-  },
-
-  view: (model) => {
-    const lines = ['', '  Building project...', ''];
-
-    if (model.done) {
-      lines.push(`  ${progressBar(100, { width: 50, showPercent: true })}`);
-      lines.push('');
-      lines.push(`  ${badge('COMPLETE', { variant: 'success' })}  Build finished.`);
-    } else {
-      lines.push(`  ${progressBar(model.percent, { width: 50, showPercent: true })}`);
-    }
-
-    lines.push('');
-    return lines.join('\n');
-  },
-};
-
-run(app);
-```
+- a runtime-driven progress loop using `tick()`
+- determinate progress advancing toward completion
+- a stable completion state after the bar finishes instead of endless motion
 
 [← Examples](../README.md)

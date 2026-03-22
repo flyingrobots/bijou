@@ -1,6 +1,6 @@
-# `toast()`, `composite()`
+# `toast()`, `compositeSurface()`
 
-Anchored notification overlay variants
+Low-level transient overlay primitive with explicit anchoring.
 
 ## Run
 
@@ -8,30 +8,22 @@ Anchored notification overlay variants
 npx tsx examples/toast/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, separator } from '@flyingrobots/bijou';
-import {
-  run, quit, type App, type KeyMsg, type ResizeMsg,
-  composite, toast, type ToastVariant, type ToastAnchor,
-} from '@flyingrobots/bijou-tui';
+- you are composing one transient overlay directly
+- explicit anchoring matters
+- the app does not need stack/history management
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-// ... see main.ts for full implementation ...
+- choose `alert()` when the message should remain in page flow
+- choose the notification system when the app needs stacking, actions, routing, or history
+- choose `drawer()` or `modal()` when the overlay needs supplemental work or a blocking decision
 
-    const t = toast({
-      message: `Operation \${model.lastToast.variant}!`,
-      variant: model.lastToast.variant,
-      anchor: model.anchor,
-      screenWidth: cols,
-      screenHeight: rows,
-      ctx,
-    });
+## What this example proves
 
-    return composite(bg, [t]);
-```
+- `toast()` as the low-level transient overlay primitive
+- `compositeSurface()` as the preferred rich-TUI composition path
+- anchor changes and width control for direct overlay placement
 
 [← Examples](../README.md)

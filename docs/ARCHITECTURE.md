@@ -62,10 +62,10 @@ This is the V3 runtime layer:
 The public runtime contract is now `ViewOutput`:
 
 ```ts
-type ViewOutput = string | Surface | LayoutNode;
+type ViewOutput = Surface | LayoutNode;
 ```
 
-Strings remain supported as a legacy compatibility path. Surfaces and layout trees are the preferred V3-native render values.
+The runtime is now pure at the frame boundary. If you still need string output, convert explicitly at the edge instead of teaching the runtime to round-trip text.
 
 ### `@flyingrobots/bijou-node`
 
@@ -85,7 +85,7 @@ This package provides the opinionated framed shell:
 - drawer and modal flows
 - a ready-to-run TUI app skeleton
 
-The shell now accepts `ViewOutput` at pane boundaries, not just strings.
+The shell now accepts `ViewOutput` at pane boundaries, not just string blocks.
 
 ### `create-bijou-tui-app`
 
@@ -151,10 +151,10 @@ stdin / resize / mouse / pulse
 
 Important release-truth points for `3.0.0`:
 
-- `App.view` accepts `string | Surface | LayoutNode`.
+- `App.view` accepts `Surface | LayoutNode`.
 - framed pane renderers accept the same `ViewOutput` contract.
-- the flagship runtime and app-shell path is surface/layout-native at the frame boundary.
-- legacy strings are preserved for compatibility, but are no longer the only real render path.
+- the runtime and app-shell path is surface/layout-native at the frame boundary.
+- string-first APIs still exist in the core toolkit, but they are not part of the fullscreen runtime contract.
 
 ## BCSS And Styling Scope
 
@@ -217,4 +217,4 @@ The examples suite is part of the release contract now, not a side project.
 2. Graceful degradation first for the core toolkit.
 3. Honest public contracts for the runtime and shell.
 4. Pure state transitions for animation, layout, and TEA updates.
-5. Compatibility boundaries are explicit when V3 surface output meets legacy string APIs.
+5. Runtime purity matters: convert explicitly when `Surface` output must cross into string-first toolkit APIs.

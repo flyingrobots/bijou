@@ -151,17 +151,18 @@ describe('matrixShader', () => {
     expect(result.showNext).toBe(true);
   });
 
-  it('produces char override at the leading edge', () => {
+  it('produces cell override at the leading edge', () => {
     // rand just above threshold but within threshold+edge
     const result = matrixShader(cell({ rand: 0.55, progress: 0.5 }));
     expect(result.showNext).toBe(false);
-    expect(result.char).toBeDefined();
+    expect(result.overrideChar).toBeDefined();
+    expect(result.overrideCell?.char).toBe(result.overrideChar);
   });
 
   it('shows next when rand < threshold', () => {
     const result = matrixShader(cell({ rand: 0.3, progress: 0.5 }));
     expect(result.showNext).toBe(true);
-    expect(result.char).toBeUndefined();
+    expect(result.overrideChar).toBeUndefined();
   });
 });
 
@@ -176,17 +177,18 @@ describe('scrambleShader', () => {
     expect(result.showNext).toBe(true);
   });
 
-  it('produces char override at peak scramble (midpoint)', () => {
-    // At progress=0.5, scrambleAmount=1, so rand 0.5 < 0.8 → char override
+  it('produces cell override at peak scramble (midpoint)', () => {
+    // At progress=0.5, scrambleAmount=1, so rand 0.5 < 0.8 → override
     const result = scrambleShader(cell({ rand: 0.5, progress: 0.5 }));
-    expect(result.char).toBeDefined();
+    expect(result.overrideChar).toBeDefined();
+    expect(result.overrideCell?.char).toBe(result.overrideChar);
   });
 
   it('resolves to next page past midpoint with high rand', () => {
     // At progress=0.9, scrambleAmount=0.2, rand 0.5 > 0.16 → no override, showNext true
     const result = scrambleShader(cell({ rand: 0.5, progress: 0.9 }));
     expect(result.showNext).toBe(true);
-    expect(result.char).toBeUndefined();
+    expect(result.overrideChar).toBeUndefined();
   });
 });
 
@@ -304,7 +306,8 @@ describe('typewriterShader', () => {
   it('shows cursor at leading edge', () => {
     // progress=0 → revealed=0, cellIndex=0 → cursor
     const result = typewriterShader(cell({ x: 0, y: 0, width: 80, height: 24, progress: 0 }));
-    expect(result.char).toBeDefined();
+    expect(result.overrideChar).toBeDefined();
+    expect(result.overrideCell?.char).toBe(result.overrideChar);
     expect(result.showNext).toBe(false);
   });
 
@@ -332,6 +335,8 @@ describe('glitchShader', () => {
     // At minimum, the shader should not crash
     expect(typeof a.showNext).toBe('boolean');
     expect(typeof b.showNext).toBe('boolean');
+    if (a.overrideChar !== undefined) expect(a.overrideCell?.char).toBe(a.overrideChar);
+    if (b.overrideChar !== undefined) expect(b.overrideCell?.char).toBe(b.overrideChar);
   });
 });
 
@@ -346,13 +351,14 @@ describe('staticShader', () => {
     expect(staticShader(cell({ progress: 1, rand: 0.5 })).showNext).toBe(true);
   });
 
-  it('produces char overrides during peak static', () => {
+  it('produces overrides during peak static', () => {
     // At progress=0.5 (peak), staticAmount=1, density=0.7
-    // frame-based noise determines whether char override appears
+    // frame-based noise determines whether an override appears
     // Use a frame that produces noise < 0.7 for this cell
     const result = staticShader(cell({ x: 3, y: 3, progress: 0.5, frame: 1 }));
-    // Should either show char override or fall through — no crash
+    // Should either show an override or fall through — no crash
     expect(typeof result.showNext).toBe('boolean');
+    if (result.overrideChar !== undefined) expect(result.overrideCell?.char).toBe(result.overrideChar);
   });
 });
 
@@ -430,7 +436,7 @@ describe('typewriter() factory', () => {
   it('supports custom cursor', () => {
     const shader = typewriter('_');
     const result = shader(cell({ x: 0, y: 0, width: 80, height: 24, progress: 0 }));
-    expect(result.char).toBeDefined();
+    expect(result.overrideChar).toBeDefined();
   });
 });
 
@@ -461,38 +467,38 @@ describe('reverse()', () => {
     expect(reversed(cell({ x: 79, width: 80, progress: 1 })).showNext).toBe(true);
   });
 
-  it('drops marker char overrides from the base shader', () => {
+  it('drops marker overrides from the base shader', () => {
     // reverse(typewriter) at progress=1 evaluates typewriter at progress=0,
-    // which emits a cursor char (charRole='marker') for cell (0,0).
-    // Marker chars are positional and must be dropped on reversal.
+    // which emits a cursor override (overrideRole='marker') for cell (0,0).
+    // Marker overrides are positional and must be dropped on reversal.
     const reversed = reverse(typewriter());
     const result = reversed(cell({ x: 0, y: 0, width: 80, height: 24, progress: 1 }));
     expect(result.showNext).toBe(true);
-    expect(result.char).toBeUndefined();
+    expect(result.overrideChar).toBeUndefined();
   });
 
-  it('preserves decoration char overrides from the base shader', () => {
-    // Decoration chars (glitch noise, static blocks) are ambient and should
+  it('preserves decoration overrides from the base shader', () => {
+    // Decoration overrides (glitch noise, static blocks) are ambient and should
     // survive progress remapping.
     const decorationShader: TransitionShaderFn = () => ({
       showNext: true,
-      char: '█',
-      charRole: 'decoration',
+      overrideChar: '█',
+      overrideRole: 'decoration',
     });
     const reversed = reverse(decorationShader);
     const result = reversed(cell({ progress: 0.5 }));
-    expect(result.char).toBe('█');
-    expect(result.charRole).toBe('decoration');
+    expect(result.overrideChar).toBe('█');
+    expect(result.overrideRole).toBe('decoration');
   });
 
-  it('treats chars without charRole as decoration (preserves them)', () => {
-    const legacyShader: TransitionShaderFn = () => ({
+  it('treats overrides without overrideRole as decoration (preserves them)', () => {
+    const plainOverrideShader: TransitionShaderFn = () => ({
       showNext: true,
-      char: 'X',
+      overrideChar: 'X',
     });
-    const reversed = reverse(legacyShader);
+    const reversed = reverse(plainOverrideShader);
     const result = reversed(cell({ progress: 0.5 }));
-    expect(result.char).toBe('X');
+    expect(result.overrideChar).toBe('X');
   });
 });
 
@@ -515,20 +521,20 @@ describe('chain()', () => {
 });
 
 describe('overlay()', () => {
-  it('uses top shader char override when present', () => {
+  it('uses top shader override when present', () => {
     const base = wipeShader;
-    const top: typeof wipeShader = () => ({ showNext: false, char: 'X' });
+    const top: typeof wipeShader = () => ({ showNext: false, overrideChar: 'X' });
     const combined = overlay(base, top);
     const result = combined(cell());
-    expect(result.char).toBe('X');
+    expect(result.overrideChar).toBe('X');
   });
 
-  it('falls through to base when top has no char', () => {
-    const base: typeof wipeShader = () => ({ showNext: true, char: 'B' });
+  it('falls through to base when top has no override', () => {
+    const base: typeof wipeShader = () => ({ showNext: true, overrideChar: 'B' });
     const top: typeof wipeShader = () => ({ showNext: false });
     const combined = overlay(base, top);
     const result = combined(cell());
-    expect(result.char).toBe('B');
+    expect(result.overrideChar).toBe('B');
   });
 });
 

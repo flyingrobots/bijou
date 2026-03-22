@@ -6,8 +6,9 @@ import {
   focusNext, focusPrev, toggleFocused, expandAll, collapseAll,
   accordionKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const SECTIONS = [
   {
@@ -86,7 +87,7 @@ const app: App<Model, Msg> = {
     const header = separator({ label: 'interactive accordion' });
     const body = interactiveAccordion(model.accordion);
     const help = `  ${helpShort(keys)}`;
-    return vstack('', header, '', body, '', help, '');
+    return ansiSurface(vstack('', header, '', body, '', help, ''), ctx.runtime.columns, ctx.runtime.rows);
   },
 };
 

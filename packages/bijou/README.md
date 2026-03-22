@@ -9,7 +9,7 @@ The pure, zero-dependency core of Bijou.
 - **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
 - **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
 - **Surface-first companions for common V3 chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for the most common layout and status primitives.
-- **Explicit compatibility boundaries** — when you mix surface-native helpers with legacy string APIs, you cross that seam explicitly with `surfaceToString(surface, ctx.style)`.
+- **Explicit core/runtime boundaries** — when you move `Surface` output back into string-first core APIs, you do it explicitly with `surfaceToString(surface, ctx.style)`.
 - **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
 ## Install
@@ -48,22 +48,101 @@ const panel = boxSurface(
 - **Theme system**: preset themes + DTCG-compatible custom token loading via `BIJOU_THEME`.
 - **Test adapters**: deterministic test context and assertion helpers for mock-free component testing.
 
+## Design guidance
+
+For the system-level guidance behind the component catalog, see:
+
+- [`../../docs/design-system/README.md`](../../docs/design-system/README.md)
+- [`../../docs/design-system/foundations.md`](../../docs/design-system/foundations.md)
+- [`../../docs/design-system/patterns.md`](../../docs/design-system/patterns.md)
+- [`../../docs/design-system/component-families.md`](../../docs/design-system/component-families.md)
+
+Those docs answer the questions the API reference cannot:
+
+- when to use a family
+- when not to use it
+- which variation is semantic versus render-path versus interaction-layer
+- what belongs in core Bijou versus `@flyingrobots/bijou-tui`
+
+## Choosing Component Families
+
+### Status and feedback
+
+- Use `badge()` when status is compact and belongs inline with another object.
+- Use `note()` when the user needs explanation without urgency.
+- Use `alert()` when the message should persist inside the page or document flow.
+- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
+
+### Selection and prompts
+
+- Use `select()` when the user is choosing one stored value from a short, stable set.
+- Use `filter()` when the user is still choosing one stored value, but search and narrowing are the real job.
+- Use `multiselect()` when the user is building a lasting set, not firing one-off commands.
+- Use `confirm()` only when the decision is genuinely binary.
+- Move to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` when the outcome is an action or navigation command instead of stored form state.
+
+### Tables and inspection
+
+- Use `table()` when row/column comparison is the main job and string output is still the right endpoint.
+- Use `tableSurface()` when the job is still passive comparison, but your V3 app is already composing `Surface` output.
+- Use `navigableTable()` from `@flyingrobots/bijou-tui` when the user needs keyboard-owned row or cell inspection instead of passive reading.
+
+### Hierarchy and chronology
+
+- Use `tree()` when parent/child nesting is the main thing the reader needs to understand.
+- Use `timeline()` when chronology is the actual reading path.
+- Move to `dag()` when dependency or causal flow matters more than simple order or nesting.
+- Use `dagSlice()` when a local neighborhood or ancestor/descendant chain is the honest scope.
+- Use `dagStats()` when graph health or structural summary matters more than visual shape.
+
+### Wayfinding and progress
+
+- Use `breadcrumb()` when path context helps explain the current location.
+- Use `paginator()` when compact position-in-sequence feedback is enough.
+- Use `stepper()` when the user is progressing through ordered stages rather than switching among peers.
+
+### Containment and formatted content
+
+- Use `box()` when a region needs visible containment or comparison against sibling panels.
+- Use `headerBox()` when that same region also needs a compact title and detail line.
+- Use `markdown()` for bounded help, reference, and release-note prose that should lower honestly across rich, pipe, and accessible output.
+- Avoid turning every subsection into a box or using markdown as a substitute layout engine for full application chrome.
+
+### Loading, links, and expressive moments
+
+- Use `skeleton()` for short-lived placeholders when the final content shape is known.
+- Use `hyperlink()` when the destination itself should remain explicit and trustworthy in terminal output.
+- Use `kbd()` for local inline shortcut cues; use shell help in `@flyingrobots/bijou-tui` when the user needs a broader keybinding reference.
+- Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
+### Progress and custom primitives
+
+- Use `progressBar()` when completion can be estimated honestly.
+- Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
+- Use `renderByMode()` when you are authoring an app-specific primitive that must stay truthful across rich, pipe, and accessible output.
+
 ## Components
 
 ### Layout
-`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — legacy string helpers and V3-native surface companions for layout chrome.
+`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — string-first helpers and surface-native companions for layout chrome.
 
 ### Elements
-`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()` — status indicators and UI primitives.
+`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()`, `hyperlink()` — inline status, in-flow status blocks, loading placeholders, trusted links, and UI primitives.
 
 ### Data
-`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
+`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — passive comparison and structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
+
+### Documents
+`markdown()` — structured terminal prose for help, readmes, and reference content with mode-aware lowering.
 
 ### Navigation
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
 
 ### Animation & Progress
-`spinner()`, `progressBar()`, `gradientText()` — live-updating output with color gradients.
+`spinnerFrame()`, `createSpinner()`, `progressBar()`, `createProgressBar()`, `createAnimatedProgressBar()`, `gradientText()`, `loadRandomLogo()` — determinate and indeterminate progress, live-updating output, expressive gradients, and branded ASCII moments.
+
+### Authoring helpers
+`renderByMode()` — mode-aware helper for app-authored primitives that need honest rich/pipe/accessible lowering.
 
 ### Forms
 `input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
@@ -106,7 +185,7 @@ const result = box('hello', { ctx });
 ```
 
 See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
-For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
+For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
 
 ## Related Packages
 

@@ -198,10 +198,10 @@ export interface App<Model, M = never> {
   update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];
 
   /**
-   * Render the current model as a Surface, LayoutNode, or legacy string view.
+   * Render the current model as a Surface or LayoutNode.
    *
    * @param model - Current application state.
-   * @returns Rendered Surface, Layout tree, or legacy string output.
+   * @returns Rendered Surface or Layout tree.
    */
   view(model: Model): ViewOutput;
 

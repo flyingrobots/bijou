@@ -9,7 +9,7 @@ The high-fidelity TEA runtime for Bijou.
 The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
 
 ### 🌟 What's New
-- **Honest view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`string | Surface | LayoutNode`). Strings still work, but they are the legacy compatibility path.
+- **Pure view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`Surface | LayoutNode`).
 - **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
 - **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
 - **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
@@ -22,7 +22,7 @@ The TUI package has been completely overhauled in v3.0.0 to operate as a true gr
 npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
 ```
 
-If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V3.md`](../../docs/MIGRATING_TO_V3.md).
+If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
 
 ## Quick Start (V3 Sub-App Composition)
 
@@ -73,6 +73,7 @@ run(app);
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
 import { run, quit, type App, isKeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
@@ -91,7 +92,11 @@ const app: App<Model> = {
     return [model, []];
   },
 
-  view: (model) => `Count: ${model.count}\n\nPress +/- to change, q to quit`,
+  view: (model) => {
+    const text = `Count: ${model.count}\n\nPress +/- to change, q to quit`;
+    const lines = text.split('\n');
+    return stringToSurface(text, Math.max(1, ...lines.map((line) => line.length)), lines.length);
+  },
 };
 
 run(app);
@@ -115,6 +120,37 @@ In non-interactive modes, there is no normal interactive event loop.
 - **Overlay composition**: modal, toast, drawer, tooltip, and painter-style compositing primitives (including panel-scoped drawers).
 - **App shell**: `createFramedApp()` for tabs/help/chrome/pane-focus boilerplate with optional command palette.
 - **Stateful building blocks**: navigable table, browsable list, file picker, focus area, and DAG pane with vim-friendly keymaps.
+
+## Choosing Component Families
+
+### Overlays and interruption
+
+- Use `toast()` when you are composing a single transient overlay directly.
+- Use the notification system when the app needs stacking, placement, actions, routing, or history.
+- Use `drawer()` when the user should keep the main surface visible while working in supplemental detail.
+- Use `modal()` when background shortcuts and pointer actions should be blocked.
+- Use `tooltip()` only for tiny local explanation, not for decisions or scrollable content.
+- If the overlay needs embedded component surfaces or multiple real rows, keep it on the structured `Surface` path with `compositeSurface()`.
+
+### Collection interaction
+
+- Use core `table()` or `tableSurface()` for passive comparison.
+- Use `navigableTable()` when row/cell focus and keyboard traversal are the real job.
+- Use `browsableList()` when the content is one-dimensional and description-led rather than grid-oriented.
+- Use `commandPaletteSurface()` when the outcome is an action or navigation target, not a stored form value.
+- If users are really choosing persisted values, keep that work in core `select()` / `filter()` / `multiselect()` instead of turning the palette into a value picker.
+
+### Shell and workspace layout
+
+- Use `createFramedApp()` when the app has multiple destinations, overlays, and workspace state that should be standardized.
+- Use `splitPane()` when the user benefits from primary-versus-secondary context or side-by-side comparison.
+- Use `grid()` when multiple stable regions deserve simultaneous visibility.
+- Use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output.
+- Use `helpShortSurface()` or `helpViewSurface()` when shortcut guidance stays inside the rich shell; keep `helpShort()` / `helpView()` for explicit text output.
+- Use `commandPaletteSurface()` for action discovery and navigation inside the shell, not as a substitute value picker.
+- Use notifications for events and follow-up, not as a replacement for the status rail.
+- Keep status rails concise and global; explanatory text belongs in the page, not in shell chrome.
+- Mouse is enhancement, not baseline. Overlay layers should consume pointer input before shell chrome or page content, and every click target should mirror an existing keyboard path.
 
 ## Animation
 
@@ -174,6 +210,25 @@ const fired = tl.firedCallbacks(prev, tlState); // ['onReady']
 
 Position syntax: `'<'` (parallel), `'+=N'` (gap), `'-=N'` (overlap), `'<+=N'` (offset from previous start), absolute ms, `'label'`, `'label+=N'`.
 
+## Transition Shaders
+
+Custom page transitions are surface-native in v4. Shader functions decide whether each cell shows the previous page or next page, and may optionally provide override data for that cell.
+
+```typescript
+import { type TransitionShaderFn } from '@flyingrobots/bijou-tui';
+
+const shimmer: TransitionShaderFn = ({ progress, x, width }) => {
+  const edge = Math.floor(progress * width);
+  if (x < edge) return { showNext: true };
+  if (x === edge) return { showNext: false, overrideChar: '░', overrideRole: 'marker' };
+  return { showNext: false };
+};
+```
+
+Use `overrideChar` when the base cell styling should stay intact, `overrideCell` when the shader needs full fg/bg/modifier control, and `overrideRole` to tell combinators whether an override is ambient (`'decoration'`) or positional (`'marker'`).
+
+Use transition shaders to reinforce workspace change, not as default spectacle. If the effect makes the new page harder to read or hides state meaning that should remain explicit in static or accessible modes, it is the wrong transition.
+
 ## Layout
 
 ### Flexbox
@@ -200,32 +255,55 @@ Children can be **render functions** `(width, height) => string` — they receiv
 ### Viewport
 
 ```typescript
-import { viewport, createScrollState, scrollBy, pageDown } from '@flyingrobots/bijou-tui';
+import { viewportSurface, createScrollStateForContent, scrollBy, pageDown } from '@flyingrobots/bijou-tui';
+import { boxSurface } from '@flyingrobots/bijou';
 
-let scroll = createScrollState(content, viewportHeight);
+const content = boxSurface(longText, { width: 72 });
+let scroll = createScrollStateForContent(content, viewportHeight);
 
-// Render visible window with scrollbar
-const view = viewport({ width: 60, height: 20, content, scrollY: scroll.y });
+// Mask the content to a visible window with scrollbar
+const view = viewportSurface({ width: 60, height: 20, content, scrollY: scroll.y });
 
 // Handle scroll keys
 scroll = scrollBy(scroll, 1);   // down one line
 scroll = pageDown(scroll);       // down one page
 ```
 
+Treat `viewportSurface()` as the canonical scroll mask for rich TUI composition. Keep `viewport()` for explicit text-lowering paths.
+
 ### Basic Layout
 
 ```typescript
-import { vstack, hstack } from '@flyingrobots/bijou-tui';
+import {
+  hstack,
+  hstackSurface,
+  place,
+  placeSurface,
+  vstack,
+  vstackSurface,
+} from '@flyingrobots/bijou-tui';
 
-vstack(header, content, footer);       // vertical stack
-hstack(2, leftPanel, rightPanel);      // side-by-side with gap
+vstack(header, content, footer);                   // explicit text-lowering path
+hstack(2, leftPanel, rightPanel);                  // explicit text-lowering path
+place('Title', { width: 20, height: 3 });          // text placement
+
+vstackSurface(headerSurface, bodySurface);         // structured surface stack
+hstackSurface(2, navSurface, mainSurface);         // structured horizontal stack
+placeSurface(dialogSurface, {                      // structured placement/alignment
+  width: cols,
+  height: rows,
+  hAlign: 'center',
+  vAlign: 'middle',
+});
 ```
+
+Prefer `vstackSurface()` / `hstackSurface()` / `placeSurface()` when the view is already composed from `Surface` values. Keep `vstack()` / `hstack()` / `place()` for explicit text composition or lowering paths.
 
 ### Split Pane
 
 ```typescript
 import {
-  createSplitPaneState, splitPane, splitPaneResizeBy, splitPaneFocusNext,
+  createSplitPaneState, splitPaneSurface, splitPaneResizeBy, splitPaneFocusNext,
 } from '@flyingrobots/bijou-tui';
 
 let state = createSplitPaneState({ ratio: 0.35 });
@@ -235,7 +313,7 @@ state = splitPaneResizeBy(state, 2, { total: cols, minA: 16, minB: 16 });
 state = splitPaneFocusNext(state);
 
 // in view:
-const output = splitPane(state, {
+const output = splitPaneSurface(state, {
   direction: 'row',
   width: cols,
   height: rows,
@@ -246,12 +324,14 @@ const output = splitPane(state, {
 });
 ```
 
+Prefer `splitPaneSurface()` when the panes are already structured `Surface` views. Keep `splitPane()` for explicit text composition or lowering paths.
+
 ### Grid
 
 ```typescript
-import { grid } from '@flyingrobots/bijou-tui';
+import { gridSurface } from '@flyingrobots/bijou-tui';
 
-const output = grid({
+const output = gridSurface({
   width: cols,
   height: rows,
   columns: [24, '1fr'],
@@ -270,6 +350,8 @@ const output = grid({
   },
 });
 ```
+
+Prefer `gridSurface()` when the regions are already structured `Surface` views. Keep `grid()` for explicit text composition or lowering paths.
 
 ## Resize Handling
 
@@ -341,11 +423,21 @@ kb.enable('Quit');
 Auto-generate help text from registered bindings:
 
 ```typescript
-import { helpView, helpShort, helpFor } from '@flyingrobots/bijou-tui';
+import {
+  helpView,
+  helpViewSurface,
+  helpShort,
+  helpShortSurface,
+  helpFor,
+  helpForSurface,
+} from '@flyingrobots/bijou-tui';
 
-helpView(kb);           // full grouped multi-line help
-helpShort(kb);          // "q Quit • ? Help • Ctrl+c Force quit • j Down • k Up"
-helpFor(kb, 'Nav');     // only Navigation group
+helpView(kb);                       // full grouped multi-line help
+helpShort(kb);                      // "q Quit • ? Help • Ctrl+c Force quit • j Down • k Up"
+helpFor(kb, 'Nav');                 // only Navigation group
+helpShortSurface(kb, { width: 48 }); // shell hint that stays on the Surface path
+helpViewSurface(kb, { width: 48 });  // grouped help as a Surface
+helpForSurface(kb, 'Nav', { width: 48 });
 ```
 
 ### Input Stack
@@ -377,7 +469,7 @@ stack.remove(modalId);
 Paint overlays (modals, toasts) on top of existing content:
 
 ```typescript
-import { composite, modal, toast } from '@flyingrobots/bijou-tui';
+import { compositeSurface, modal, toast } from '@flyingrobots/bijou-tui';
 
 // Create a centered dialog
 const dialog = modal({
@@ -398,12 +490,17 @@ const notification = toast({
 });
 
 // Paint overlays onto background content
-const output = composite(backgroundView, [dialog, notification], { dim: true });
+const output = compositeSurface(backgroundSurface, [dialog, notification], { dim: true });
 ```
 
-Each overlay is a `{ content, row, col }` object. `composite()` splices them onto the background using painter's algorithm (last overlay wins on overlap). The `dim` option fades the background with ANSI dim.
+Each overlay now exposes both `surface` and `content` forms. Prefer `compositeSurface()` when your app is already on the surface-native path. Keep the string-oriented `composite()` path for explicit lowering boundaries, not as the default mental model. The `dim` option fades the background with ANSI dim.
+
+`modal().body`, `modal().hint`, `drawer().content`, and `tooltip().content` accept either plain strings or structured `Surface` content. Use surfaces when the overlay needs real rows, embedded component surfaces, or richer composition inside the interrupting layer.
+
+Reach for `toast()` when the app is composing a one-off overlay directly. Reach for the notification system when stacking, actions, routing, or history matter. The notification lab in `examples/notifications` is the canonical higher-level example.
 
 `drawer()` now supports `left`/`right`/`top`/`bottom` anchors and optional `region` mounting for panel-scoped overlays.
+Use `drawer()` when the user should keep the main task visible while consulting or editing supplemental context. Use `modal()` when the user must stop and decide. Use `tooltip()` only for tiny local explanation, not for commands or scrollable content.
 
 ## App Frame
 
@@ -414,9 +511,16 @@ Each overlay is a `{ content, row, col }` object. `composite()` splices them ont
 - frame help (`?`) and optional command palette (`ctrl+p` / `:`)
 - overlay factory with pane rects for panel-scoped drawers/modals
 
-Pane renderers may return a legacy string, a `Surface`, or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
+Pane renderers return a `Surface` or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
+
+Shell role split matters:
+
+- `statusBarSurface()` communicates concise global state
+- `helpShortSurface()` / `helpViewSurface()` teach shortcuts and scope
+- `commandPaletteSurface()` handles action discovery and navigation
+- notifications surface events and follow-up
 
 ## Building Blocks
 
@@ -426,54 +530,99 @@ Reusable stateful components that follow the TEA state + pure transformers + syn
 
 ```typescript
 import {
-  createNavigableTableState, navigableTable, navTableFocusNext,
+  createNavigableTableState, navigableTable, navigableTableSurface, navTableFocusNext,
   navTableKeyMap, helpShort,
 } from '@flyingrobots/bijou-tui';
 
 const state = createNavigableTableState({ columns, rows, height: 10 });
-const output = navigableTable(state, { ctx });
+const textOutput = navigableTable(state, { ctx });
+const surfaceOutput = navigableTableSurface(state, { ctx });
 const next = navTableFocusNext(state);
 ```
+
+Use `navigableTableSurface()` when the user should actively traverse a table inside a rich TUI surface. Keep `navigableTable()` for explicit text lowering. If the job is still passive comparison, prefer core `table()` or `tableSurface()` and keep the interaction layer simpler.
 
 ### Browsable List
 
 ```typescript
 import {
-  createBrowsableListState, browsableList, listFocusNext,
+  createBrowsableListState, browsableList, browsableListSurface, listFocusNext,
   browsableListKeyMap,
 } from '@flyingrobots/bijou-tui';
 
 const state = createBrowsableListState({ items, height: 10 });
-const output = browsableList(state);
+const textOutput = browsableList(state);
+const surfaceOutput = browsableListSurface(state, { width: 40 });
 ```
+
+Use `browsableListSurface()` when the list belongs inside a rich TUI region and should share viewport masking semantics with pagers and focus areas. Keep `browsableList()` for explicit text lowering.
 
 ### File Picker
 
 ```typescript
 import {
-  createFilePickerState, filePicker, fpFocusNext, fpEnter, fpBack,
+  createFilePickerState, filePicker, filePickerSurface, fpFocusNext, fpEnter, fpBack,
   filePickerKeyMap,
 } from '@flyingrobots/bijou-tui';
 import { nodeIO } from '@flyingrobots/bijou-node';
 
 const io = nodeIO();
 const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
-const output = filePicker(state);
+const textOutput = filePicker(state);
+const surfaceOutput = filePickerSurface(state, { width: 60 });
+```
+
+Use `filePickerSurface()` when the browser lives inside a rich TUI pane and should inherit shared viewport masking semantics. Keep `filePicker()` for explicit text lowering.
+
+### Command Palette
+
+```typescript
+import {
+  createCommandPaletteState, commandPalette, commandPaletteSurface,
+  cpFilter, commandPaletteKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createCommandPaletteState(items, 8);
+const textOutput = commandPalette(state, { width: 60 });
+const surfaceOutput = commandPaletteSurface(state, { width: 60, ctx });
+```
+
+Use `commandPaletteSurface()` when the palette is part of a structured shell or overlay and should share viewport masking semantics. Keep `commandPalette()` for explicit text lowering.
+
+### Pager
+
+```typescript
+import {
+  createPagerStateForSurface,
+  pagerSurface,
+  pagerScrollBy,
+} from '@flyingrobots/bijou-tui';
+
+const state = createPagerStateForSurface(contentSurface, { width: 60, height: 20 });
+const output = pagerSurface(contentSurface, state);
 ```
 
 ### Focus Area
 
 ```typescript
 import {
-  createFocusAreaState, focusArea, focusAreaScrollBy,
+  createFocusAreaStateForSurface, focusAreaScrollBy, focusAreaSurface,
   focusAreaKeyMap,
 } from '@flyingrobots/bijou-tui';
 
-const state = createFocusAreaState({ content, width: 60, height: 20, overflowX: 'scroll' });
-const output = focusArea(state, { focused: true, ctx });
+const state = createFocusAreaStateForSurface(contentSurface, {
+  width: 60,
+  height: 20,
+  overflowX: 'scroll',
+});
+const output = focusAreaSurface(contentSurface, state, { focused: true, ctx });
 ```
 
+If the pane is still intentionally text-composed, `createFocusAreaState()` + `focusArea()` remain the explicit lowering path.
+
 ### DAG Pane
+
+Use `dagPane()` when graph inspection is an active task and the user needs keyboard-owned selection, path highlighting, and scroll control. Keep plain `dag()` in `@flyingrobots/bijou` for passive graph explanation, and move to `dagSlice()` or `dagStats()` when a focused fragment or structural summary would be more honest than a full interactive graph.
 
 ```typescript
 import {

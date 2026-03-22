@@ -20,8 +20,10 @@
  * ```
  */
 
-import type { IOPort } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, type IOPort, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
+import { vstackSurface } from './surface-layout.js';
+import { viewportSurface, visibleLength } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,6 +73,14 @@ export interface FilePickerRenderOptions {
   readonly dirIndicator?: string;
   /** Character(s) shown before file names (default: `"-"`). */
   readonly fileIndicator?: string;
+}
+
+/** Options for rendering the file picker into a `Surface`. */
+export interface FilePickerSurfaceOptions extends FilePickerRenderOptions {
+  /** Fixed viewport width. Defaults to the widest rendered row or cwd header. */
+  readonly width?: number;
+  /** Show a scrollbar track on the right edge. Default: false. */
+  readonly showScrollbar?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -249,6 +259,25 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
   return Math.min(newScrollY, maxScroll);
 }
 
+function renderFilePickerEntryLines(
+  state: FilePickerState,
+  options?: FilePickerRenderOptions,
+): string[] {
+  const indicator = options?.focusIndicator ?? '\u25b8';
+  const dirIcon = options?.dirIndicator ?? 'd';
+  const fileIcon = options?.fileIndicator ?? '-';
+  const pad = ' '.repeat(indicator.length);
+
+  if (state.entries.length === 0) return ['  (empty)'];
+
+  return state.entries.map((entry, index) => {
+    const prefix = index === state.focusIndex ? indicator : pad;
+    const icon = entry.isDirectory ? dirIcon : fileIcon;
+    const suffix = entry.isDirectory ? '/' : '';
+    return `${prefix} ${icon} ${entry.name}${suffix}`;
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
@@ -264,31 +293,47 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
  * @returns Rendered file picker string with cwd header and entry list.
  */
 export function filePicker(state: FilePickerState, options?: FilePickerRenderOptions): string {
-  const indicator = options?.focusIndicator ?? '\u25b8';
-  const dirIcon = options?.dirIndicator ?? 'd';
-  const fileIcon = options?.fileIndicator ?? '-';
-  const pad = ' '.repeat(indicator.length);
+  const entryLines = renderFilePickerEntryLines(state, options);
+  return [
+    state.cwd,
+    ...entryLines.slice(state.scrollY, state.scrollY + state.height),
+  ].join('\n');
+}
 
-  const lines: string[] = [];
-  lines.push(state.cwd);
+/**
+ * Render the file picker into a viewport-backed `Surface`.
+ *
+ * The cwd header remains fixed while the entry list uses the shared
+ * `viewportSurface()` masking primitive for scrolling.
+ *
+ * @param state - Current file picker state.
+ * @param options - Rendering options plus optional fixed width.
+ * @returns Surface containing the cwd header and scrollable entry list.
+ */
+export function filePickerSurface(
+  state: FilePickerState,
+  options?: FilePickerSurfaceOptions,
+): Surface {
+  const entryLines = renderFilePickerEntryLines(state, options);
+  const width = Math.max(
+    1,
+    options?.width ?? 0,
+    visibleLength(state.cwd),
+    ...entryLines.map((line) => visibleLength(line)),
+  );
 
-  if (state.entries.length === 0) {
-    lines.push('  (empty)');
-    return lines.join('\n');
-  }
+  const headerSurface = parseAnsiToSurface(state.cwd, width, 1);
+  const listSurface = entryLines.length === 0
+    ? createSurface(width, Math.max(1, state.height))
+    : viewportSurface({
+      width,
+      height: Math.max(1, state.height),
+      content: entryLines.join('\n'),
+      scrollY: state.scrollY,
+      showScrollbar: options?.showScrollbar ?? false,
+    });
 
-  const visibleEntries = state.entries.slice(state.scrollY, state.scrollY + state.height);
-
-  for (let i = 0; i < visibleEntries.length; i++) {
-    const entry = visibleEntries[i]!;
-    const globalIndex = state.scrollY + i;
-    const prefix = globalIndex === state.focusIndex ? indicator : pad;
-    const icon = entry.isDirectory ? dirIcon : fileIcon;
-    const suffix = entry.isDirectory ? '/' : '';
-    lines.push(`${prefix} ${icon} ${entry.name}${suffix}`);
-  }
-
-  return lines.join('\n');
+  return vstackSurface(headerSurface, listSurface);
 }
 
 // ---------------------------------------------------------------------------

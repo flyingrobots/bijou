@@ -1,6 +1,6 @@
 # `loadRandomLogo()`
 
-Random ASCII brand logos in 3 sizes
+ASCII brand treatment for splash and documentation moments.
 
 ## Run
 
@@ -8,16 +8,22 @@ Random ASCII brand logos in 3 sizes
 npx tsx examples/logo/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { loadRandomLogo, separator, box, headerBox } from '@flyingrobots/bijou';
+- the product needs a deliberate branded or celebratory moment
+- splash screens, demos, and docs benefit from atmosphere before real work begins
+- plain ASCII branding is a better fit than image assets or browser-only artwork
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-const logo = loadRandomLogo({ size: 'medium' });
-console.log(box(logo.ascii, { padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx }));
-```
+- avoid using logos as routine workspace chrome
+- avoid decorative branding that competes with task-critical status, navigation, or instructions
+- if the interface is already busy, let the content speak instead of adding another branded layer
+
+## What this example proves
+
+- multiple ASCII logo sizes
+- pairing logo output with `box()` and `headerBox()` for bounded presentation
+- branding as an intentional moment, not the default voice of the whole application
 
 [← Examples](../README.md)

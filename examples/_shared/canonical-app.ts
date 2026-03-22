@@ -1,12 +1,10 @@
 import type { BijouContext, DagNode } from '@flyingrobots/bijou';
 import {
-  badge,
   box,
   dag,
   kbd,
   progressBar,
   separator,
-  surfaceToString,
   table,
   timeline,
 } from '@flyingrobots/bijou';
@@ -25,6 +23,7 @@ import {
   type FrameModel,
   type FramePage,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface } from './example-surfaces.ts';
 
 const DRAWER_ANCHORS: readonly DrawerAnchor[] = ['right', 'left', 'bottom', 'top'];
 
@@ -227,21 +226,21 @@ function paneIdsForPage(pageId: string): readonly string[] {
   return PANE_IDS_BY_PAGE[pageId as WorkbenchPageId] ?? [];
 }
 
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
+function tag(label: string): string {
+  return `[${label.toUpperCase()}]`;
 }
 
-function statusBadge(status: WorkItem['status'], ctx: BijouContext): string {
-  if (status === 'done') return badgeText('done', 'success', ctx);
-  if (status === 'doing') return badgeText('doing', 'info', ctx);
-  if (status === 'blocked') return badgeText('blocked', 'error', ctx);
-  return badgeText('todo', 'warning', ctx);
+function statusBadge(status: WorkItem['status']): string {
+  if (status === 'done') return tag('done');
+  if (status === 'doing') return tag('doing');
+  if (status === 'blocked') return tag('blocked');
+  return tag('todo');
 }
 
-function serviceBadge(status: ServiceHealth['status'], ctx: BijouContext): string {
-  if (status === 'healthy') return badgeText('healthy', 'success', ctx);
-  if (status === 'watch') return badgeText('watch', 'warning', ctx);
-  return badgeText('degraded', 'error', ctx);
+function serviceBadge(status: ServiceHealth['status']): string {
+  if (status === 'healthy') return tag('healthy');
+  if (status === 'watch') return tag('watch');
+  return tag('degraded');
 }
 
 function toFixedHeight(lines: readonly string[], maxInnerHeight: number): string[] {
@@ -258,10 +257,10 @@ function renderOpsSummary(width: number, height: number, model: WorkbenchPageMod
   const drawerState = model.drawerOpen ? 'open' : 'closed';
 
   const lines = [
-    `Active train ${badgeText(release.id, 'primary', ctx)}`,
+    `Active train ${release.id}`,
     `Window: ${release.window}`,
     `ETA: ${release.eta}`,
-    `${badgeText(`${release.readiness}% ready`, healthVariant, ctx)} checks:${release.failedChecks} incidents:${release.incidents}`,
+    `${tag(`${release.readiness}% ready`)} checks:${release.failedChecks} incidents:${release.incidents}`,
     progressBar(release.readiness, { width: trackWidth, ctx }),
     `Inspector drawer: ${drawerState} (${model.drawerAnchor})`,
     `o toggle drawer, a cycle anchor, y cycle target`,
@@ -290,7 +289,7 @@ function renderOpsHealth(width: number, ctx: BijouContext): string {
     service.name,
     `${service.p95Ms}ms`,
     service.errorRate,
-    serviceBadge(service.status, ctx),
+    serviceBadge(service.status),
   ]);
 
   return box([
@@ -317,7 +316,7 @@ function renderIncidentFeed(width: number, model: WorkbenchPageModel, ctx: Bijou
   const selected = clampIndex(model.incidentIndex, INCIDENT_FEED.length);
   const lines = INCIDENT_FEED.map((line, idx) => {
     if (idx === selected) {
-      return `${badgeText('focus', 'accent', ctx)} ${line}`;
+      return `${tag('focus')} ${line}`;
     }
     return `        ${line}`;
   });
@@ -375,7 +374,7 @@ function renderBoardTicket(width: number, model: WorkbenchPageModel, ctx: BijouC
 
   return box([
     separator({ label: `Ticket ${selected.id}`, width: Math.max(8, width - 4), ctx }),
-    `${statusBadge(selected.status, ctx)} ${selected.title}`,
+    `${statusBadge(selected.status)} ${selected.title}`,
     `Owner: ${selected.owner}`,
     '',
     'Acceptance:',
@@ -560,18 +559,18 @@ export function createCanonicalWorkbenchApp(
         'ops-summary': {
           kind: 'pane',
           paneId: 'ops-summary',
-          render: (width, height) => renderOpsSummary(width, height, model, ctx),
+          render: (width, height) => contentSurface(renderOpsSummary(width, height, model, ctx)),
         },
         'ops-health': {
           kind: 'pane',
           paneId: 'ops-health',
-          render: (width) => renderOpsHealth(width, ctx),
+          render: (width) => contentSurface(renderOpsHealth(width, ctx)),
         },
         'ops-events': {
           kind: 'pane',
           paneId: 'ops-events',
           overflowX: 'scroll',
-          render: (width) => renderIncidentFeed(width, model, ctx),
+          render: (width) => contentSurface(renderIncidentFeed(width, model, ctx)),
         },
       },
     })),
@@ -585,7 +584,7 @@ export function createCanonicalWorkbenchApp(
       paneA: {
         kind: 'pane',
         paneId: 'board-lanes',
-        render: (width) => renderBoardLanes(width, ctx),
+        render: (width) => contentSurface(renderBoardLanes(width, ctx)),
       },
       paneB: {
         kind: 'split',
@@ -598,12 +597,12 @@ export function createCanonicalWorkbenchApp(
           kind: 'pane',
           paneId: 'board-ticket',
           overflowX: 'scroll',
-          render: (width) => renderBoardTicket(width, model, ctx),
+          render: (width) => contentSurface(renderBoardTicket(width, model, ctx)),
         },
         paneB: {
           kind: 'pane',
           paneId: 'board-runbook',
-          render: (width) => renderBoardRunbook(width, ctx),
+          render: (width) => contentSurface(renderBoardRunbook(width, ctx)),
         },
       },
     })),
@@ -622,17 +621,17 @@ export function createCanonicalWorkbenchApp(
           kind: 'pane',
           paneId: 'graph-dag',
           overflowX: 'scroll',
-          render: (width) => renderGraphDag(width, model, ctx),
+          render: (width) => contentSurface(renderGraphDag(width, model, ctx)),
         },
         'graph-timeline': {
           kind: 'pane',
           paneId: 'graph-timeline',
-          render: (width) => renderGraphTimeline(width, model, ctx),
+          render: (width) => contentSurface(renderGraphTimeline(width, model, ctx)),
         },
         'graph-notes': {
           kind: 'pane',
           paneId: 'graph-notes',
-          render: (width) => renderGraphNotes(width, model, ctx),
+          render: (width) => contentSurface(renderGraphNotes(width, model, ctx)),
         },
       },
     })),

@@ -1,6 +1,6 @@
-# `navigableTable()`
+# `navigableTableSurface()`
 
-Keyboard-navigable data table with scrolling
+Keyboard-owned table inspection with focus and scrolling
 
 ![demo](demo.gif)
 
@@ -10,6 +10,16 @@ Keyboard-navigable data table with scrolling
 npx tsx examples/navigable-table/main.ts
 ```
 
+## Use this when
+
+- the user should actively traverse rows or cells
+- keyboard focus and scrolling are part of the interaction model
+
+## Choose something else when
+
+- choose core `table()` or `tableSurface()` for passive comparison
+- choose `browsableList()` when the content is one-dimensional and description-led
+
 ## Code
 
 ```typescript
@@ -17,11 +27,12 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createNavigableTableState, navigableTable,
+  createNavigableTableState, navigableTableSurface,
   navTableFocusNext, navTableFocusPrev,
   navTablePageDown, navTablePageUp,
-  navTableKeyMap, helpShort, vstack,
+  navTableKeyMap, helpShortSurface, vstackSurface,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -86,8 +97,13 @@ const app: App<Model, Msg> = {
     return [model, []];
   },
 
-  view: (model) => vstack(
-    '', navigableTable(model.table), '', `  ${helpShort(keys)}`, '',
+  view: (model) => vstackSurface(
+    spacer(62, 1),
+    contentSurface(separator({ label: 'navigable table', width: 62 })),
+    navigableTableSurface(model.table),
+    spacer(62, 1),
+    helpShortSurface(keys, { width: 62 }),
+    spacer(62, 1),
   ),
 };
 

@@ -1,8 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
 import { run, quit, isKeyMsg, isResizeMsg, type App } from '@flyingrobots/bijou-tui';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 interface Model {
   cols: number;
@@ -41,7 +42,7 @@ const app: App<Model, Msg> = {
     const padLeft = Math.max(0, Math.floor((model.cols - 44) / 2));
     const indent = ' '.repeat(padLeft);
 
-    return '\n'.repeat(padTop) + boxLines.map(l => indent + l).join('\n');
+    return ansiSurface('\n'.repeat(padTop) + boxLines.map(l => indent + l).join('\n'), model.cols, model.rows);
   },
 };
 

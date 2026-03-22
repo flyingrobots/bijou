@@ -15,8 +15,10 @@
  * ```
  */
 
+import { createSurface, parseAnsiToSurface, type Surface } from '@flyingrobots/bijou';
 import type { BindingInfo } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
+import { visibleLength } from './viewport.js';
 
 /** Anything that can list its bindings (satisfied by KeyMap). */
 export interface BindingSource {
@@ -38,6 +40,14 @@ export interface HelpOptions {
   separator?: string;
   /** Title shown at the top (default: none). */
   title?: string;
+}
+
+/** Options for rendering help into a `Surface`. */
+export interface HelpSurfaceOptions extends HelpOptions {
+  /** Optional fixed width. Defaults to the widest visible line. */
+  width?: number;
+  /** Optional fixed height. Defaults to the rendered line count. */
+  height?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +126,21 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
 }
 
 /**
+ * Full grouped help rendered directly into a `Surface`.
+ *
+ * Use this when help content is being embedded into a rich TUI view and should
+ * stay on the `Surface` path instead of being flattened into a multiline
+ * string first.
+ *
+ * @param keymap - Source of key binding information.
+ * @param options - Filtering, formatting, title, and optional surface sizing.
+ * @returns A `Surface` containing the rendered grouped help text.
+ */
+export function helpViewSurface(keymap: BindingSource, options?: HelpSurfaceOptions): Surface {
+  return renderHelpSurface(helpView(keymap, options), options);
+}
+
+/**
  * Short, single-line help — keys only, no groups.
  *
  * ```
@@ -144,6 +169,24 @@ export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'en
 }
 
 /**
+ * Single-line help rendered directly into a `Surface`.
+ *
+ * Use this for shell hints and inline key legends that should remain on the
+ * structured surface path. Keep {@link helpShort} for explicit text output or
+ * pipe-mode lowering.
+ *
+ * @param keymap - Source of key binding information.
+ * @param options - Optional filtering and fixed surface width.
+ * @returns A one-row `Surface` containing the rendered help hint.
+ */
+export function helpShortSurface(
+  keymap: BindingSource,
+  options?: Pick<HelpSurfaceOptions, 'enabledOnly' | 'groupFilter' | 'width'>,
+): Surface {
+  return renderHelpSurface(helpShort(keymap, options), options);
+}
+
+/**
  * Filter help to a specific group (convenience wrapper).
  *
  * @param keymap - Source of key binding information.
@@ -153,4 +196,36 @@ export function helpShort(keymap: BindingSource, options?: Pick<HelpOptions, 'en
  */
 export function helpFor(keymap: BindingSource, groupPrefix: string, options?: HelpOptions): string {
   return helpView(keymap, { ...options, groupFilter: groupPrefix });
+}
+
+/**
+ * Group-filtered help rendered directly into a `Surface`.
+ *
+ * @param keymap - Source of key binding information.
+ * @param groupPrefix - Group name prefix to filter on (case-insensitive).
+ * @param options - Additional formatting and surface sizing options.
+ * @returns A `Surface` containing the filtered help text.
+ */
+export function helpForSurface(
+  keymap: BindingSource,
+  groupPrefix: string,
+  options?: HelpSurfaceOptions,
+): Surface {
+  return renderHelpSurface(helpFor(keymap, groupPrefix, options), options);
+}
+
+function renderHelpSurface(text: string, options?: Pick<HelpSurfaceOptions, 'width' | 'height'>): Surface {
+  const lines = text.length === 0 ? [''] : text.split('\n');
+  const width = Math.max(
+    1,
+    options?.width ?? 0,
+    ...lines.map((line) => visibleLength(line)),
+  );
+  const height = Math.max(1, options?.height ?? lines.length);
+
+  if (text.length === 0) {
+    return createSurface(width, height);
+  }
+
+  return parseAnsiToSurface(text, width, height);
 }

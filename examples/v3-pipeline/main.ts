@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, boxV3 } from '@flyingrobots/bijou';
-import { isKeyMsg, quit, run, type App, type RenderPipeline, vstackV3 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { badge, boxSurface } from '@flyingrobots/bijou';
+import { isKeyMsg, quit, run, type App, type RenderPipeline, vstackSurface } from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 
@@ -21,8 +21,8 @@ export const app: App<Model> = {
   },
   view: (model) => centerSurface(
     ctx,
-    boxV3(
-      vstackV3(
+    boxSurface(
+      vstackSurface(
         badge('Pipeline Hook', { variant: 'primary' }),
         spacer(1, 1),
         line('This app installs a custom PostProcess middleware.'),

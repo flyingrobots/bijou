@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { visibleLength, stripAnsi } from './viewport.js';
 import {
@@ -10,6 +11,7 @@ import {
   cpPageUp,
   cpSelectedItem,
   commandPalette,
+  commandPaletteSurface,
   commandPaletteKeyMap,
 } from './command-palette.js';
 import type { CommandPaletteItem } from './command-palette.js';
@@ -249,6 +251,8 @@ describe('cpSelectedItem', () => {
 // ---------------------------------------------------------------------------
 
 describe('commandPalette render', () => {
+  const ctx = createTestContext();
+
   it('renders search line', () => {
     const state = createCommandPaletteState(items);
     const output = commandPalette(state, { width: 60 });
@@ -324,6 +328,36 @@ describe('commandPalette render', () => {
     const output = commandPalette(state, { width: 60, ctx });
     expect(output).toContain('Open File');
     expect(output).toContain('[File]');
+  });
+
+  it('renders a surface with a fixed search line and results viewport', () => {
+    const surface = commandPaletteSurface(
+      createCommandPaletteState(items, 2),
+      { width: 40, ctx },
+    );
+    const rendered = stripAnsi(surfaceToString(surface, ctx.style));
+    const lines = rendered.split('\n');
+
+    expect(surface.width).toBe(40);
+    expect(surface.height).toBe(3);
+    expect(lines[0]).toContain('> ');
+    expect(lines[1]).toContain('Open File');
+    expect(lines[2]).toContain('Save');
+  });
+
+  it('surface path follows the shared viewport scroll window', () => {
+    let state = createCommandPaletteState(items, 2);
+    state = cpFocusNext(state);
+    state = cpFocusNext(state);
+
+    const rendered = stripAnsi(surfaceToString(
+      commandPaletteSurface(state, { width: 40, ctx }),
+      ctx.style,
+    ));
+
+    expect(rendered).not.toContain('Open File');
+    expect(rendered).toContain('Save');
+    expect(rendered).toContain('Close Tab');
   });
 });
 

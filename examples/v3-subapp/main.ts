@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, boxV3, createSurface, type Surface } from '@flyingrobots/bijou';
+import { badge, boxSurface, createSurface, type Surface } from '@flyingrobots/bijou';
 import {
   initSubApp,
   isKeyMsg,
@@ -9,10 +9,10 @@ import {
   run,
   type App,
   type Cmd,
-  vstackV3,
+  vstackSurface,
   updateSubApp,
 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 
@@ -81,8 +81,8 @@ export const app: App<Model, Msg> = {
     const [leftView] = mount(counterApp, { model: model.left, onMsg: mapLeft });
     const [rightView] = mount(counterApp, { model: model.right, onMsg: mapRight });
 
-    const dashboard = boxV3(
-      vstackV3(
+    const dashboard = boxSurface(
+      vstackSurface(
         row('Left Counter', ensureSurface(leftView)),
         spacer(1, 1),
         row('Right Counter', ensureSurface(rightView)),

@@ -8,7 +8,7 @@ Every bijou-tui app defines three functions:
 interface App<Model, M> {
   init(): [Model, Cmd<M>[]];                            // initial state + startup commands
   update(msg: KeyMsg | ResizeMsg | M, model: Model): [Model, Cmd<M>[]];  // state transition
-  view(model: Model): string;                            // render to string
+  view(model: Model): Surface | LayoutNode;             // render to structured output
 }
 ```
 
@@ -18,6 +18,7 @@ The runtime calls `init()` once, then loops: render → wait for event → `upda
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
 import { run, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
@@ -31,7 +32,7 @@ const app: App<Model, Msg> = {
     if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
     return [model, []];
   },
-  view: (model) => model.text,
+  view: (model) => stringToSurface(model.text, model.text.length, 1),
 };
 
 run(app);
@@ -127,12 +128,12 @@ When a child's `content` is a function, it receives the allocated `(width, heigh
 
 ## Split Pane Layout
 
-Use `splitPane()` for two-pane shells with a stateful ratio and focus.
+Use `splitPaneSurface()` for two-pane shells when the pane bodies are already structured `Surface` values. Keep `splitPane()` for explicit text-lowering paths.
 
 ```typescript
 import {
   createSplitPaneState,
-  splitPane,
+  splitPaneSurface,
   splitPaneResizeBy,
   splitPaneFocusNext,
 } from '@flyingrobots/bijou-tui';
@@ -144,7 +145,7 @@ split = splitPaneResizeBy(split, 2, { total: cols, minA: 16, minB: 16 });
 split = splitPaneFocusNext(split);
 
 // In view:
-const output = splitPane(split, {
+const output = splitPaneSurface(split, {
   direction: 'row',
   width: cols,
   height: rows,
@@ -157,12 +158,12 @@ const output = splitPane(split, {
 
 ## Grid Layout
 
-Use `grid()` for named-area page composition with fixed and fractional tracks.
+Use `gridSurface()` for named-area page composition when the regions are already structured `Surface` values. Keep `grid()` for explicit text-lowering paths.
 
 ```typescript
-import { grid } from '@flyingrobots/bijou-tui';
+import { gridSurface } from '@flyingrobots/bijou-tui';
 
-const output = grid({
+const output = gridSurface({
   width: cols,
   height: rows,
   columns: [24, '1fr'],
@@ -182,16 +183,42 @@ const output = grid({
 });
 ```
 
+## Surface-Native Stack and Placement
+
+Use `vstackSurface()` / `hstackSurface()` / `placeSurface()` when the page is already composed from structured `Surface` values and should stay on that path.
+
+```typescript
+import {
+  hstackSurface,
+  placeSurface,
+  vstackSurface,
+} from '@flyingrobots/bijou-tui';
+
+const body = vstackSurface(headerSurface, contentSurface, footerSurface);
+const split = hstackSurface(2, navSurface, mainSurface);
+const centered = placeSurface(dialogSurface, {
+  width: cols,
+  height: rows,
+  hAlign: 'center',
+  vAlign: 'middle',
+});
+```
+
+Keep `vstack()` / `hstack()` / `place()` for explicit text composition or deliberate lowering to string-first helpers.
+
 ## Scrollable Viewport
 
 ```typescript
 import {
-  viewport, createScrollState, scrollBy, scrollTo,
+  viewportSurface, createScrollStateForContent, scrollBy, scrollTo,
   pageDown, pageUp, scrollToTop, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
+import { boxSurface } from '@flyingrobots/bijou';
+
+const content = boxSurface(longText, { width: 72 });
 
 // Initialize scroll state
-let scroll = createScrollState(content, viewportHeight);
+let scroll = createScrollStateForContent(content, viewportHeight);
 
 // In update — handle scroll keys
 if (msg.type === 'key') {
@@ -206,10 +233,10 @@ if (msg.type === 'key') {
 }
 
 // In view
-viewport({ width: 60, height: 20, content, scrollY: scroll.y });
+viewportSurface({ width: 60, height: 20, content, scrollY: scroll.y });
 ```
 
-The viewport renders a proportional scrollbar in the right gutter. Set `showScrollbar: false` to hide it.
+Treat `viewportSurface()` as the base masking primitive for bounded overflow scrolling. The viewport renders a proportional scrollbar in the right gutter. Set `showScrollbar: false` to hide it. Keep `viewport()` for explicit text-lowering paths.
 
 ## Animation
 
@@ -334,6 +361,56 @@ case 'frame': {
 | `1000` | Absolute time (ms) |
 | `'label'` | At the label's position |
 | `'label+=200'` | 200ms after label |
+
+## Transition Shaders
+
+Use transition shaders to customize page-to-page movement in `createFramedApp()`.
+
+```typescript
+import { createFramedApp, type TransitionShaderFn } from '@flyingrobots/bijou-tui';
+
+const cursorTrail: TransitionShaderFn = ({ progress, x, width, ctx }) => {
+  const edge = Math.floor(progress * width);
+  if (x < edge) return { showNext: true };
+  if (x === edge) {
+    return {
+      showNext: false,
+      overrideChar: '▌',
+      overrideCell: {
+        char: '▌',
+        fg: ctx.status('info').hex,
+        bg: ctx.status('info').bg,
+        empty: false,
+      },
+      overrideRole: 'marker',
+    };
+  }
+  return { showNext: false };
+};
+
+createFramedApp({
+  title: 'Transitions',
+  pages,
+  transitionOverride: () => cursorTrail,
+});
+```
+
+Use the shader result fields like this:
+
+| Field | Meaning |
+|-------|---------|
+| `showNext` | Whether this cell reveals the next page |
+| `overrideChar` | Optional single-character override that keeps the chosen base cell styling |
+| `overrideCell` | Optional full cell override when the shader needs to control fg/bg/modifiers too |
+| `overrideRole` | Semantic hint for combinators; use `'marker'` for positional indicators like cursors and `'decoration'` for ambient noise |
+
+Guidance:
+- Prefer `overrideCell` when the shader wants true visual styling, not just a replacement glyph.
+- Treat `overrideChar` as a light-weight convenience for inheriting the selected base cell styling.
+- Use `'marker'` only for progress-tied indicators that should be dropped by `reverse()` and similar remapping combinators.
+- Use `'decoration'` for ambient effects like glitch blocks, static, and scramble noise that can survive progress remapping.
+- Use transition shaders to reinforce page continuity and state change, not to bury the destination page under spectacle.
+- Reduced-motion and non-interactive paths still need an honest story when the visual effect disappears entirely.
 
 ## Event Bus
 
@@ -464,7 +541,7 @@ Descriptors are case-insensitive — `'Ctrl+C'` and `'ctrl+c'` are equivalent.
 ### Full Help View
 
 ```typescript
-import { helpView } from '@flyingrobots/bijou-tui';
+import { helpView, helpViewSurface } from '@flyingrobots/bijou-tui';
 
 const help = helpView(kb);
 // Navigation
@@ -476,23 +553,28 @@ const help = helpView(kb);
 //   q       Quit
 //   ?       Toggle help
 //   Ctrl+c  Force quit
+
+const helpSurface = helpViewSurface(kb, { width: 48 });
 ```
 
 ### Short Help
 
 ```typescript
-import { helpShort } from '@flyingrobots/bijou-tui';
+import { helpShort, helpShortSurface } from '@flyingrobots/bijou-tui';
 
 helpShort(kb);
 // "q Quit • ? Toggle help • Ctrl+c Force quit • j Down • k Up • Shift+Tab Previous"
+
+helpShortSurface(kb, { width: 48 });
 ```
 
 ### Filtered Help
 
 ```typescript
-import { helpFor } from '@flyingrobots/bijou-tui';
+import { helpFor, helpForSurface } from '@flyingrobots/bijou-tui';
 
 helpFor(kb, 'Nav');  // only Navigation group (prefix match, case-insensitive)
+helpForSurface(kb, 'Nav', { width: 48 });
 ```
 
 ### Options
@@ -506,6 +588,7 @@ helpView(kb, {
 ```
 
 Help functions accept any `BindingSource` — not just `KeyMap`. You can implement custom binding sources for dynamic help content.
+Use the `*Surface()` companions when the hint or help panel should stay on the structured `Surface` path, and keep the string helpers for explicit lowering or plain-text output.
 
 ## Input Stack
 
@@ -574,12 +657,27 @@ for (const layer of stack.layers()) {
 
 ## Overlay Compositing
 
+### Choosing overlay families
+
+- Use `toast()` when you are composing a single transient overlay directly.
+- Use the notification system when the app needs stacking, actions, routing, placement changes, or history.
+- Use `drawer()` for supplemental side work that should not fully block the main surface.
+- Use `modal()` when the user must stop and decide and background interactions should be blocked.
+- Use `tooltip()` only for tiny local explanation. If the content needs commands, scrolling, or recall, pick something else.
+
+Additional guidance:
+
+- If users may need to review prior events, the notification system is the right family, not a pile of ad hoc toasts.
+- If the content belongs in the reading flow, move it back into the page as an `alert()` or normal region instead of forcing it into an overlay.
+- If interruption is not justified, prefer a drawer over a modal.
+- If the overlay needs embedded component surfaces or multiple real rows, keep it on the structured `Surface` path and compose with `compositeSurface()`.
+
 ### Modals
 
 Create centered dialog overlays for confirm prompts, info boxes, or text input:
 
 ```typescript
-import { composite, modal } from '@flyingrobots/bijou-tui';
+import { compositeSurface, modal } from '@flyingrobots/bijou-tui';
 
 // In view:
 let output = renderMainContent(model);
@@ -594,20 +692,22 @@ if (model.showConfirm) {
     borderToken: ctx.theme.theme.border.warning,
     ctx,
   });
-  output = composite(output, [dialog], { dim: true });
+  output = compositeSurface(output, [dialog], { dim: true });
 }
 
 return output;
 ```
 
-The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode.
+Reach for this low-level `toast()` primitive when explicit anchoring matters, but app-wide notification lifecycle does not. If you need stacking, actionable buttons, archive/history, or framed-app routing, move up to the notification system shown in `examples/notifications`.
+
+The `width` option overrides auto-sizing. Without `ctx`, borders render as plain unicode. `body`, `hint`, `drawer().content`, and `tooltip().content` can all be either plain strings or structured `Surface` values; use structured content when the overlay needs real rows or embedded component surfaces.
 
 ### Toasts
 
 Anchored notification overlays for operation feedback:
 
 ```typescript
-import { composite, toast } from '@flyingrobots/bijou-tui';
+import { compositeSurface, toast } from '@flyingrobots/bijou-tui';
 
 // In view:
 let output = renderMainContent(model);
@@ -622,7 +722,7 @@ if (model.notification) {
     screenHeight: model.rows,
     ctx,
   });
-  output = composite(output, [t]);
+  output = compositeSurface(output, [t]);
 }
 
 return output;
@@ -639,8 +739,10 @@ if (model.toast) overlays.push(toast({ ...model.toast, screenWidth, screenHeight
 if (model.modal) overlays.push(modal({ ...model.modal, screenWidth, screenHeight }));
 
 // Modal paints over toast if they overlap
-return composite(background, overlays, { dim: model.modal != null });
+return compositeSurface(background, overlays, { dim: model.modal != null });
 ```
+
+Every overlay still exposes `content` for explicit lowering paths, but surface-native composition is the preferred default in V4-era TUI apps.
 
 ### Drawer Anchors and Panel Scoping
 
@@ -674,40 +776,101 @@ const inspector = drawer({
 
 See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.
 
+Shell doctrine:
+
+- tabs are for peer destinations, not command buttons
+- use `statusBarSurface()` when status rails stay on the structured shell path; keep `statusBar()` for explicit text output
+- use `helpShortSurface()` / `helpViewSurface()` for shortcut guidance and scope, not for action execution
+- use `commandPaletteSurface()` for action discovery and navigation, not as a value picker
+- use notifications for events and follow-up, not as a replacement for the status rail
+- status rails are for concise global context, not page prose
+- split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
+- if a second region does not materially help the task, keep the app in a simpler single-surface flow
+- mouse is enhancement: overlays should consume pointer input before shell/background content, and click targets should mirror existing keyboard behavior
+
+If palette entries start looking like stored field values, move that interaction back to core `select()` / `filter()` / `multiselect()` instead of overloading the shell palette.
+
+## Pager
+
+Use `pagerSurface()` for long linear text that should stay on the structured `Surface` path while still showing pager status and scroll position.
+
+```typescript
+import {
+  createPagerStateForSurface,
+  pagerSurface,
+  pagerScrollBy,
+  pagerPageDown,
+} from '@flyingrobots/bijou-tui';
+
+const pagerState = createPagerStateForSurface(contentSurface, {
+  width: 80,
+  height: 24,
+});
+
+pagerSurface(contentSurface, pagerState);
+pagerScrollBy(pagerState, 1);
+pagerPageDown(pagerState);
+```
+
+If the content is intentionally text-first, `createPagerState()` + `pager()` remain the explicit lowering path.
+
 ## Focus Area
 
 A scrollable pane with a colored left gutter indicating focus state. Wraps `viewport()` with gutter chrome and horizontal overflow support.
 
 ```typescript
 import {
-  createFocusAreaState, focusArea, focusAreaSetContent,
+  createFocusAreaStateForSurface, focusAreaSurface,
   focusAreaScrollBy, focusAreaPageDown, focusAreaScrollByX,
   focusAreaKeyMap,
 } from '@flyingrobots/bijou-tui';
 
 // Create state with horizontal scrolling enabled
-const fa = createFocusAreaState({
-  content: longContent,
+const fa = createFocusAreaStateForSurface(contentSurface, {
   width: 60,
   height: 20,
   overflowX: 'scroll', // or 'hidden' (default)
 });
 
 // In TEA view — gutter is accent-colored when focused, muted when not
-focusArea(fa, { focused: true, ctx });
+focusAreaSurface(contentSurface, fa, { focused: true, ctx });
 
 // In TEA update — scroll transformers
 focusAreaScrollBy(fa, 1);      // down one line
 focusAreaPageDown(fa);          // one page
 focusAreaScrollByX(fa, 5);     // scroll right (only when overflowX='scroll')
-
-// Update content while preserving scroll position
-focusAreaSetContent(fa, newContent);
 ```
 
 The gutter character (`▎`) degrades gracefully:
 - **Interactive/static mode**: colored or unstyled gutter
 - **Pipe/accessible mode**: no gutter (full width to content)
+
+If your pane is still string-composed, `createFocusAreaState()` + `focusArea()` remain available as the explicit text-lowering path.
+
+## Viewport-Backed Collections
+
+`browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now use the same `viewportSurface()` masking model as pagers and focus panes.
+
+Use them when the collection lives inside a rich TUI region and should keep bounded scrolling on the structured `Surface` path:
+
+```typescript
+import {
+  createBrowsableListState,
+  browsableListSurface,
+  createFilePickerState,
+  filePickerSurface,
+  createCommandPaletteState,
+  commandPaletteSurface,
+} from '@flyingrobots/bijou-tui';
+
+const list = browsableListSurface(createBrowsableListState({ items, height: 8 }), { width: 40 });
+const picker = filePickerSurface(createFilePickerState({ cwd, io, height: 12 }), { width: 60 });
+const palette = commandPaletteSurface(createCommandPaletteState(commands, 8), { width: 60, ctx });
+```
+
+Keep `browsableList()`, `filePicker()`, and `commandPalette()` for explicit text-lowering paths, snapshots, or pipe-oriented output.
+
+`navigableTableSurface()` is the related table-inspection variant. It stays surface-native too, but keeps a row-aware scroll model instead of generic line masking so wrapped comparison rows remain honest.
 
 ### Keymap
 
@@ -757,6 +920,8 @@ dagPaneSelectParent(pane, ctx);  // up arrow — picks closest parent by column
 dagPaneSelectLeft(pane, ctx);    // left arrow — sibling in same row
 dagPaneSelectRight(pane, ctx);   // right arrow — sibling in same row
 ```
+
+Use `dagPane()` when the graph itself is the inspection surface. If the graph can remain passive, prefer `dag()`. If the real need is a local neighborhood or a health summary rather than full navigation, prefer `dagSlice()` or `dagStats()` instead of forcing everything into one interactive pane.
 
 ### Navigation Logic
 

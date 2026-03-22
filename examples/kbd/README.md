@@ -1,6 +1,6 @@
 # `kbd()`
 
-Keyboard shortcut display
+Local inline shortcut cues for nearby actions and instructions.
 
 ![demo](demo.gif)
 
@@ -10,30 +10,22 @@ Keyboard shortcut display
 npx tsx examples/kbd/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { kbd, separator } from '@flyingrobots/bijou';
+- a local action needs a compact shortcut hint
+- the keys belong right next to the instruction or control they affect
+- a shell-wide help surface would be too heavy for the moment
 
-console.log(separator({ label: 'keyboard shortcuts', ctx }));
-console.log();
+## Choose something else when
 
-// Single keys
-console.log(kbd('Enter', { ctx }), ' Select');
-console.log(kbd('Esc', { ctx }), '   Cancel');
-console.log(kbd('?', { ctx }), '     Help');
-console.log();
+- choose shell help or a command reference when the user needs a broader keymap
+- avoid scattering shortcut chips everywhere until they become decorative clutter
+- avoid making the chip itself carry the only meaning; the surrounding action text should still be clear
 
-// Arrow keys
-console.log(kbd('↑', { ctx }), kbd('↓', { ctx }), ' Navigate');
-console.log(kbd('←', { ctx }), kbd('→', { ctx }), ' Switch tabs');
-console.log();
+## What this example proves
 
-// Chords
-console.log(kbd('Ctrl', { ctx }), '+', kbd('C', { ctx }), '  Quit');
-console.log(kbd('Ctrl', { ctx }), '+', kbd('S', { ctx }), '  Save');
-console.log(kbd('Cmd', { ctx }), '+', kbd('Shift', { ctx }), '+', kbd('P', { ctx }), '  Command palette');
-```
+- single-key, arrow-key, and chord-style shortcut cues
+- `kbd()` as inline support for nearby actions
+- shortcut chips that stay secondary to the action label they explain
 
 [← Examples](../README.md)

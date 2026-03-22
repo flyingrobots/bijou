@@ -30,7 +30,7 @@ describe('createTuiAppSkeleton', () => {
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Home');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('|');
     expect(stripAnsi(firstLines[0] ?? '')).toContain('Split');
-    expect(stripAnsi(firstString)).toContain('Drawer');
+    expect(stripAnsi(firstString)).toContain('Supplemental drawer');
 
     const switched = await runScript(app, [{ key: ']' }], { ctx });
     expect(switched.model.activePageId).toBe('split');
@@ -39,6 +39,8 @@ describe('createTuiAppSkeleton', () => {
     const splitString = surfaceToString(expectSurface(splitFrame), ctx.style);
     const plain = stripAnsi(splitString);
     expect(plain).toContain('Split');
+    expect(plain).toContain('Primary workspace');
+    expect(plain).toContain('Secondary context');
     expect(plain).toContain('Split ready');
   });
 

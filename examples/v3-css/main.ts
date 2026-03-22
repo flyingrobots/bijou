@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { badge, boxV3 } from '@flyingrobots/bijou';
-import { hstackV3, isKeyMsg, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { badge, boxSurface } from '@flyingrobots/bijou';
+import { hstackSurface, isKeyMsg, quit, run, type App, vstackSurface } from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 
@@ -48,15 +48,15 @@ export const app: App<null> = {
     return [model, []];
   },
   view: () => {
-    const chips = hstackV3(
+    const chips = hstackSurface(
       2,
       badge('Type selector'),
       badge('Class selector', { class: 'active' }),
       badge('Warning', { class: 'warning' }),
     );
 
-    const hero = boxV3(
-      vstackV3(
+    const hero = boxSurface(
+      vstackSurface(
         line('BCSS resolves type, class, id, var(), and media queries in the runtime path.'),
         spacer(1, 1),
         chips,

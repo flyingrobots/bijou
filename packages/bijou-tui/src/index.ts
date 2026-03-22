@@ -85,7 +85,7 @@ export type { MotionOptions } from './motion/types.js';
 
 // Layout
 export { vstack, hstack, place } from './layout.js';
-export { vstackV3, hstackV3 } from './layout-v3.js';
+export { vstackSurface, hstackSurface, placeSurface } from './surface-layout.js';
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
 export type { LayoutRect } from './layout-rect.js';
 
@@ -96,6 +96,7 @@ export {
   type SplitPaneState,
   type SplitPaneLayout,
   type SplitPaneOptions,
+  type SplitPaneSurfaceOptions,
   createSplitPaneState,
   splitPaneSetRatio,
   splitPaneResizeBy,
@@ -103,15 +104,18 @@ export {
   splitPaneFocusPrev,
   splitPaneLayout,
   splitPane,
+  splitPaneSurface,
 } from './split-pane.js';
 
 // Constraint grid layout
 export {
   type GridTrack,
   type GridOptions,
+  type GridSurfaceOptions,
   type GridLayoutResult,
   gridLayout,
   grid,
+  gridSurface,
 } from './grid.js';
 
 // App frame shell
@@ -169,7 +173,7 @@ export {
   type TransitionCell,
   type TransitionResult,
   type TransitionShaderFn,
-  type CharRole,
+  type TransitionOverrideRole,
   type WipeDirection,
   type BuiltinTransition,
   // Original shader instances
@@ -210,7 +214,7 @@ export {
 } from './transition-shaders.js';
 
 // Status bar
-export { statusBar } from './status-bar.js';
+export { statusBar, statusBarSurface } from './status-bar.js';
 export type { StatusBarOptions } from './status-bar.js';
 
 // Animation — spring physics & tweens
@@ -239,12 +243,26 @@ export {
   sequence,
 } from './animate.js';
 
+// Design language defaults
+export {
+  TUI_SPACING,
+  COMPACT_VIEWPORT_WIDTH,
+  COMPACT_VIEWPORT_HEIGHT,
+  isCompactViewport,
+  resolveOverlayMargin,
+  resolveNotificationGap,
+} from './design-language.js';
+
 // Viewport — scrollable content pane
 export {
+  type ViewportContent,
   type ViewportOptions,
+  type ViewportSurfaceOptions,
   type ScrollState,
   viewport,
+  viewportSurface,
   createScrollState,
+  createScrollStateForContent,
   scrollBy,
   scrollTo,
   scrollToTop,
@@ -275,7 +293,9 @@ export {
 export {
   type FlexOptions,
   type FlexChild,
+  type SurfaceFlexChild,
   flex,
+  flexSurface,
 } from './flex.js';
 
 // Keybinding manager
@@ -293,9 +313,13 @@ export {
 export {
   type BindingSource,
   type HelpOptions,
+  type HelpSurfaceOptions,
   helpView,
+  helpViewSurface,
   helpShort,
+  helpShortSurface,
   helpFor,
+  helpForSurface,
 } from './help.js';
 
 // Input stack
@@ -313,7 +337,9 @@ export {
   type PagerOptions,
   type PagerRenderOptions,
   createPagerState,
+  createPagerStateForSurface,
   pager,
+  pagerSurface,
   pagerScrollBy,
   pagerScrollTo,
   pagerScrollToTop,
@@ -345,6 +371,7 @@ export {
   type TooltipDirection,
   type TooltipOptions,
   composite,
+  compositeSurface,
   modal,
   toast,
   drawer,
@@ -362,6 +389,8 @@ export {
   type NotificationPhase,
   type NotificationRecord,
   type NotificationState,
+  type NotificationMouseTargetKind,
+  type NotificationMouseTarget,
   type RenderNotificationHistoryOptions,
   type RenderNotificationStackOptions,
   countNotificationHistory,
@@ -376,6 +405,7 @@ export {
   tickNotifications,
   hasNotifications,
   notificationsNeedTick,
+  hitTestNotificationStack,
   renderNotificationHistory,
   renderNotificationStack,
 } from './notification.js';
@@ -399,8 +429,10 @@ export {
   type NavigableTableState,
   type NavigableTableOptions,
   type NavTableRenderOptions,
+  type NavTableSurfaceOptions,
   createNavigableTableState,
   navigableTable,
+  navigableTableSurface,
   navTableFocusNext,
   navTableFocusPrev,
   navTablePageDown,
@@ -410,12 +442,14 @@ export {
 
 // Browsable list
 export {
+  type BrowsableListSurfaceOptions,
   type BrowsableListItem,
   type BrowsableListState,
   type BrowsableListOptions,
   type BrowsableListRenderOptions,
   createBrowsableListState,
   browsableList,
+  browsableListSurface,
   listFocusNext,
   listFocusPrev,
   listPageDown,
@@ -425,12 +459,14 @@ export {
 
 // File picker
 export {
+  type FilePickerSurfaceOptions,
   type FileEntry,
   type FilePickerState,
   type FilePickerOptions,
   type FilePickerRenderOptions,
   createFilePickerState,
   filePicker,
+  filePickerSurface,
   fpFocusNext,
   fpFocusPrev,
   fpEnter,
@@ -458,6 +494,7 @@ export {
   type CommandPaletteItem,
   type CommandPaletteState,
   type CommandPaletteOptions,
+  type CommandPaletteSurfaceOptions,
   createCommandPaletteState,
   cpFilter,
   cpFocusNext,
@@ -466,6 +503,7 @@ export {
   cpPageUp,
   cpSelectedItem,
   commandPalette,
+  commandPaletteSurface,
   commandPaletteKeyMap,
 } from './command-palette.js';
 
@@ -476,7 +514,9 @@ export {
   type FocusAreaOptions,
   type FocusAreaRenderOptions,
   createFocusAreaState,
+  createFocusAreaStateForSurface,
   focusArea,
+  focusAreaSurface,
   focusAreaScrollBy,
   focusAreaScrollTo,
   focusAreaScrollToTop,

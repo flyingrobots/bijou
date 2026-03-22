@@ -1,13 +1,12 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { separator, badge, surfaceToString } from '@flyingrobots/bijou';
+import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
-  composite, tooltip, type TooltipDirection,
+  compositeSurface, tooltip, type TooltipDirection,
 } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, contentSurface, line, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant'] = 'info') =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 type Msg = KeyMsg | ResizeMsg;
 
@@ -51,22 +50,27 @@ const app: App<Model, Msg> = {
     const dir = directions[dirIndex]!;
 
     const header = separator({ label: 'tooltip demo', width: cols, ctx });
-    const help = `  Arrows: move target · ${badgeText('d')}: cycle direction (${dir}) · ${badgeText('q')}: quit`;
-    const bgLines = [header, '', help];
-    while (bgLines.length < rows) bgLines.push('');
+    const background = screenSurface(cols, rows, column([
+      contentSurface(header),
+      spacer(),
+      row([
+        '  Arrows: move target · ',
+        badgeSurface('d', 'info', ctx),
+        `: cycle direction (${dir}) · `,
+        badgeSurface('q', 'warning', ctx),
+        ': quit',
+      ]),
+    ]));
 
-    // Place a marker at the target position
     const clampedRow = Math.max(0, Math.min(selectedRow, Math.max(0, rows - 1)));
     const clampedCol = Math.max(0, Math.min(selectedCol, Math.max(0, cols - 1)));
-    let markerLine = bgLines[clampedRow] ?? '';
-    if (markerLine.length < clampedCol + 1) {
-      markerLine = markerLine.padEnd(clampedCol + 1, ' ');
-    }
-    bgLines[clampedRow] = markerLine.substring(0, clampedCol) + '◆' + markerLine.substring(clampedCol + 1);
-    const bg = bgLines.join('\n');
+    background.blit(line('◆'), clampedCol, clampedRow);
 
     const tip = tooltip({
-      content: `Direction: ${dir}\nRow: ${selectedRow} Col: ${selectedCol}`,
+      content: column([
+        line(`Direction: ${dir}`),
+        line(`Row: ${selectedRow} Col: ${selectedCol}`),
+      ]),
       row: selectedRow,
       col: selectedCol,
       direction: dir,
@@ -76,7 +80,7 @@ const app: App<Model, Msg> = {
       ctx,
     });
 
-    return composite(bg, [tip]);
+    return compositeSurface(background, [tip]);
   },
 };
 

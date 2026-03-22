@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, boxSurface, separatorSurface } from '@flyingrobots/bijou';
-import { hstackV3, isKeyMsg, quit, run, type App, vstackV3 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/v3.ts';
+import { hstackSurface, isKeyMsg, quit, run, type App, vstackSurface } from '@flyingrobots/bijou-tui';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
 
 export const ctx = initDefaultContext();
 
@@ -25,7 +25,7 @@ export const app: App<Model, Msg> = {
 
   view: (model) => {
     const hero = badge('BIJOU V3', { variant: 'primary' });
-    const metrics = hstackV3(
+    const metrics = hstackSurface(
       2,
       badge(`Count ${model.count}`, { variant: 'accent' }),
       badge(`${ctx.runtime.columns}x${ctx.runtime.rows}`, { variant: 'info' }),
@@ -37,12 +37,12 @@ export const app: App<Model, Msg> = {
       ctx,
     });
 
-    const body = vstackV3(
+    const body = vstackSurface(
       hero,
       spacer(1, 1),
       boxSurface(
-        vstackV3(
-          line('Surface-first runtime, buffered rendering, and honest legacy compatibility.'),
+        vstackSurface(
+          line('Surface-first runtime, buffered rendering, and explicit string boundaries.'),
           spacer(1, 1),
           metricsDivider,
           spacer(1, 1),

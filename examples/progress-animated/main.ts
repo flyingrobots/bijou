@@ -1,10 +1,9 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge, surfaceToString } from '@flyingrobots/bijou';
+import { progressBar, type Surface } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
 
 const ctx = initDefaultContext();
-const badgeText = (label: string, variant: Parameters<typeof badge>[1]['variant']) =>
-  surfaceToString(badge(label, { variant, ctx }), ctx.style);
 
 interface Model {
   percent: number;
@@ -38,18 +37,18 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const lines = ['', '  Building project...', ''];
+    const rows = [spacer(), line('  Building project...'), spacer()] as Surface[];
 
     if (model.done) {
-      lines.push(`  ${progressBar(100, { width: 50, showPercent: true })}`);
-      lines.push('');
-      lines.push(`  ${badgeText('COMPLETE', 'success')}  Build finished.`);
+      rows.push(line(`  ${progressBar(100, { width: 50, showPercent: true })}`));
+      rows.push(spacer());
+      rows.push(row(['  ', badgeSurface('COMPLETE', 'success', ctx), '  Build finished.']));
     } else {
-      lines.push(`  ${progressBar(model.percent, { width: 50, showPercent: true })}`);
+      rows.push(line(`  ${progressBar(model.percent, { width: 50, showPercent: true })}`));
     }
 
-    lines.push('');
-    return lines.join('\n');
+    rows.push(spacer());
+    return column(rows);
   },
 };
 

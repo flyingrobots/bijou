@@ -5,9 +5,11 @@
  * solver returning per-area rectangles.
  */
 
+import { createSurface, type Surface } from '@flyingrobots/bijou';
 import { composite, type Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { fitBlock } from './layout-utils.js';
+import { placeSurface } from './surface-layout.js';
 
 /** Grid track definition. */
 export type GridTrack = number | `${number}fr`;
@@ -28,6 +30,12 @@ export interface GridOptions {
   readonly gap?: number;
   /** Renderer map for named areas. */
   readonly cells: Readonly<Record<string, (width: number, height: number) => string>>;
+}
+
+/** Grid render options for structured surface composition. */
+export interface GridSurfaceOptions extends Omit<GridOptions, 'cells'> {
+  /** Renderer map for named areas. */
+  readonly cells: Readonly<Record<string, (width: number, height: number) => Surface>>;
 }
 
 /** Optional richer result type (kept for future convenience APIs). */
@@ -161,6 +169,34 @@ export function grid(options: GridOptions): string {
   }
 
   return composite(background, overlays);
+}
+
+/**
+ * Render a named-area grid onto a structured surface.
+ */
+export function gridSurface(options: GridSurfaceOptions): Surface {
+  const rects = gridLayout(options);
+  const width = sanitiseDimension(options.width);
+  const height = sanitiseDimension(options.height);
+
+  if (width <= 0 || height <= 0) return createSurface(0, 0);
+
+  const result = createSurface(width, height);
+
+  for (const [name, rect] of rects) {
+    const renderer = options.cells[name];
+    if (renderer === undefined) {
+      throw new Error(`gridSurface: missing renderer for area "${name}"`);
+    }
+
+    const cellSurface = placeSurface(renderer(rect.width, rect.height), {
+      width: rect.width,
+      height: rect.height,
+    });
+    result.blit(cellSurface, rect.col, rect.row, 0, 0, rect.width, rect.height);
+  }
+
+  return result;
 }
 
 /** Distribute space among fixed-pixel and fractional tracks, respecting gaps. */

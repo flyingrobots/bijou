@@ -17,8 +17,8 @@
 // Types
 // ---------------------------------------------------------------------------
 
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
-import { makeBgFill } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue, Surface } from '@flyingrobots/bijou';
+import { createSurface, makeBgFill, parseAnsiToSurface, shouldApplyBg } from '@flyingrobots/bijou';
 
 /**
  * Configuration for the flex layout container.
@@ -47,6 +47,34 @@ export interface FlexChild {
    * receives the allocated (width, height) and returns a string.
    */
   readonly content: string | ((width: number, height: number) => string);
+  /** Flex-grow factor. Children with flex > 0 share remaining space. Default: 0. */
+  readonly flex?: number;
+  /** Fixed size along the main axis (columns for row, rows for column). */
+  readonly basis?: number;
+  /** Minimum size along the main axis. */
+  readonly minSize?: number;
+  /** Maximum size along the main axis. */
+  readonly maxSize?: number;
+  /** Cross-axis alignment. Default: 'start'. */
+  readonly align?: 'start' | 'center' | 'end';
+  /** Background token for this child's allocated region. Requires `bg` field on the token and `ctx` on `FlexOptions`. */
+  readonly bgToken?: TokenValue;
+}
+
+/**
+ * Surface-aware content accepted by {@link flexSurface}.
+ */
+export type SurfaceFlexRenderable =
+  | string
+  | Surface
+  | ((width: number, height: number) => string | Surface);
+
+/**
+ * Descriptor for a surface-native flex child.
+ */
+export interface SurfaceFlexChild {
+  /** Content to render for this allocated region. */
+  readonly content: SurfaceFlexRenderable;
   /** Flex-grow factor. Children with flex > 0 share remaining space. Default: 0. */
   readonly flex?: number;
   /** Fixed size along the main axis (columns for row, rows for column). */
@@ -94,6 +122,25 @@ interface ResolvedChild {
 }
 
 /**
+ * Shared flex-child shape for sizing/layout logic.
+ */
+interface FlexChildLike {
+  readonly content: string | Surface | ((width: number, height: number) => string | Surface);
+  readonly flex?: number;
+  readonly basis?: number;
+  readonly minSize?: number;
+  readonly maxSize?: number;
+  readonly align?: 'start' | 'center' | 'end';
+  readonly bgToken?: TokenValue;
+}
+
+interface ResolvedFlexChild<T extends FlexChildLike> {
+  allocatedSize: number;
+  crossSize: number;
+  child: T;
+}
+
+/**
  * Distribute available main-axis space among children.
  *
  * Fixed-size children (basis or auto-measured) consume space first,
@@ -106,13 +153,13 @@ interface ResolvedChild {
  * @param isRow - True for row direction (main axis = width), false for column.
  * @returns Resolved children with allocated sizes.
  */
-function computeSizes(
-  children: FlexChild[],
+function computeSizes<T extends FlexChildLike>(
+  children: readonly T[],
   mainAxisTotal: number,
   crossAxisTotal: number,
   gap: number,
   isRow: boolean,
-): ResolvedChild[] {
+): ResolvedFlexChild<T>[] {
   if (children.length === 0) return [];
 
   const totalGaps = gap * (children.length - 1);
@@ -184,12 +231,15 @@ function clampSize(size: number, min?: number, max?: number): number {
  * @returns Measured size in the main-axis direction.
  */
 function measureContent(
-  content: string | ((width: number, height: number) => string),
+  content: string | Surface | ((width: number, height: number) => string | Surface),
   isRow: boolean,
 ): number {
   if (typeof content === 'function') {
     // Can't measure a render function — treat as 0 (must use flex or basis)
     return 0;
+  }
+  if (typeof content !== 'string') {
+    return isRow ? content.width : content.height;
   }
   const lines = content.split('\n');
   if (isRow) {
@@ -217,6 +267,17 @@ function renderContent(
   width: number,
   height: number,
 ): string {
+  if (typeof child.content === 'function') {
+    return child.content(width, height);
+  }
+  return child.content;
+}
+
+function renderSurfaceContent(
+  child: SurfaceFlexChild,
+  width: number,
+  height: number,
+): string | Surface {
   if (typeof child.content === 'function') {
     return child.content(width, height);
   }
@@ -299,6 +360,112 @@ function alignCross(
   }
 }
 
+function resolveBackgroundColor(token: TokenValue | undefined, ctx: BijouContext | undefined): string | undefined {
+  if (!token?.bg) return undefined;
+  return shouldApplyBg(ctx) ? token.bg : undefined;
+}
+
+function createRegionSurface(width: number, height: number, bg: string | undefined): Surface {
+  return createSurface(
+    Math.max(0, width),
+    Math.max(0, height),
+    bg ? { char: ' ', bg, empty: false } : { char: ' ', empty: false },
+  );
+}
+
+function inheritBackground(surface: Surface, bg: string | undefined): Surface {
+  if (!bg || surface.width === 0 || surface.height === 0) return surface;
+  const next = surface.clone();
+  for (let i = 0; i < next.cells.length; i++) {
+    const cell = next.cells[i]!;
+    if (!cell.empty && cell.bg === undefined) {
+      next.cells[i] = { ...cell, bg };
+    }
+  }
+  return next;
+}
+
+function alignOffset(total: number, size: number, align: 'start' | 'center' | 'end'): number {
+  if (size >= total) return 0;
+  const spare = total - size;
+  switch (align) {
+    case 'start':
+      return 0;
+    case 'end':
+      return spare;
+    case 'center':
+      return Math.floor(spare / 2);
+  }
+}
+
+function renderTextSurface(
+  content: string,
+  width: number,
+  height: number,
+  hAlign: 'start' | 'center' | 'end',
+  vAlign: 'start' | 'center' | 'end',
+): Surface {
+  const result = createSurface(Math.max(0, width), Math.max(0, height));
+  if (width <= 0 || height <= 0) return result;
+
+  const rawLines = content.split('\n');
+  const lines = rawLines
+    .map((line) => {
+      const vis = visualWidth(line);
+      return vis > width ? clipToWidth(line, width) : line;
+    })
+    .slice(0, height);
+
+  const yOffset = alignOffset(height, lines.length, vAlign);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const lineWidth = visualWidth(line);
+    if (lineWidth <= 0) continue;
+    const lineSurface = parseAnsiToSurface(line, lineWidth, 1);
+    const xOffset = alignOffset(width, lineSurface.width, hAlign);
+    result.blit(lineSurface, xOffset, yOffset + i);
+  }
+
+  return result;
+}
+
+function fitSurface(
+  content: Surface,
+  width: number,
+  height: number,
+  hAlign: 'start' | 'center' | 'end',
+  vAlign: 'start' | 'center' | 'end',
+): Surface {
+  const result = createSurface(Math.max(0, width), Math.max(0, height));
+  if (width <= 0 || height <= 0) return result;
+
+  const xOffset = alignOffset(width, content.width, hAlign);
+  const yOffset = alignOffset(height, content.height, vAlign);
+  result.blit(content, xOffset, yOffset, 0, 0, Math.min(content.width, width), Math.min(content.height, height));
+  return result;
+}
+
+function renderChildSurface(
+  child: SurfaceFlexChild,
+  width: number,
+  height: number,
+  isRow: boolean,
+  containerBg: string | undefined,
+  ctx: BijouContext | undefined,
+): Surface {
+  const bg = resolveBackgroundColor(child.bgToken, ctx) ?? containerBg;
+  const region = createRegionSurface(width, height, bg);
+  const rendered = renderSurfaceContent(child, width, height);
+  const hAlign = isRow ? 'start' : (child.align ?? 'start');
+  const vAlign = isRow ? (child.align ?? 'start') : 'start';
+  const contentSurface = typeof rendered === 'string'
+    ? renderTextSurface(rendered, width, height, hAlign, vAlign)
+    : fitSurface(rendered, width, height, hAlign, vAlign);
+
+  region.blit(inheritBackground(contentSurface, bg), 0, 0);
+  return region;
+}
+
 // ---------------------------------------------------------------------------
 // flex() — main API
 // ---------------------------------------------------------------------------
@@ -347,6 +514,50 @@ export function flex(options: FlexOptions, ...children: FlexChild[]): string {
     return renderRow(resolved, height, gap, containerBg, options.ctx);
   }
   return renderColumn(resolved, width, height, gap, containerBg, options.ctx);
+}
+
+/**
+ * Lay out children using flexbox-style rules and return a Surface directly.
+ *
+ * This is the surface-native companion to {@link flex}. It accepts string,
+ * surface, or render-function content and keeps the layout boundary structured.
+ *
+ * @param options - Layout container configuration (direction, dimensions, gap).
+ * @param children - Child descriptors with string/surface content.
+ * @returns Surface sized to the requested container rectangle.
+ */
+export function flexSurface(options: FlexOptions, ...children: SurfaceFlexChild[]): Surface {
+  const { direction = 'row' } = options;
+  const width = Math.max(0, Math.floor(options.width));
+  const height = Math.max(0, Math.floor(options.height));
+  const gap = Math.max(0, Math.floor(options.gap ?? 0));
+  const isRow = direction === 'row';
+  const containerBg = resolveBackgroundColor(options.bgToken, options.ctx);
+
+  if (children.length === 0) return createSurface(0, 0);
+
+  const mainAxisTotal = isRow ? width : height;
+  const crossAxisTotal = isRow ? height : width;
+  const resolved = computeSizes(children, mainAxisTotal, crossAxisTotal, gap, isRow);
+  const surface = createRegionSurface(width, height, containerBg);
+
+  if (isRow) {
+    let xOffset = 0;
+    for (const item of resolved) {
+      const childSurface = renderChildSurface(item.child, item.allocatedSize, height, true, containerBg, options.ctx);
+      surface.blit(childSurface, xOffset, 0);
+      xOffset += item.allocatedSize + gap;
+    }
+    return surface;
+  }
+
+  let yOffset = 0;
+  for (const item of resolved) {
+    const childSurface = renderChildSurface(item.child, width, item.allocatedSize, false, containerBg, options.ctx);
+    surface.blit(childSurface, 0, yOffset);
+    yOffset += item.allocatedSize + gap;
+  }
+  return surface;
 }
 
 /**

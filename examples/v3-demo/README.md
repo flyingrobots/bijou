@@ -5,7 +5,7 @@ The smallest canonical Bijou V3 app.
 It proves:
 - the public `App` contract accepts a surface-first view,
 - a V3 app can size itself from the Bijou runtime context instead of `process.stdout`,
-- core visual primitives compose without dropping back to legacy string rendering,
+- core visual primitives compose without dropping back through a string bridge,
 - the surface-first companion helpers (`boxSurface`, `separatorSurface`) are ready for real app chrome.
 
 Run it with:

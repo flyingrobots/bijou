@@ -10,6 +10,23 @@ Orchestrated GSAP-style animation
 npx tsx examples/timeline-anim/main.ts
 ```
 
+## Use this when
+
+- motion should clarify staged progress or reveal order
+- multiple animations need one coherent timeline instead of ad hoc timers
+- the visual sequence reinforces the state change rather than replacing it
+
+## Choose something else when
+
+- choose a simpler `animate()` call when full choreography is unnecessary
+- avoid this pattern when the motion would compete with dense content or obscure the destination state
+
+## What this example proves
+
+- timeline-style orchestration on top of Bijou motion primitives
+- staged reveal and progress behavior driven by one deterministic sequence
+- animation that should still make sense when reduced-motion or non-interactive paths collapse it to state snapshots
+
 ## Code
 
 ```typescript
