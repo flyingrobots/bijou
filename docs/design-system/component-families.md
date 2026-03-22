@@ -504,6 +504,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Family:
   - `tree()`
   - `filePicker()`
+  - `filePickerSurface()`
 - Variants:
   - static hierarchy
   - interactive filesystem browser
@@ -514,6 +515,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - labels should make nesting meaningful even when indentation is flattened or linearized
   - path context should be explicit when many siblings have similar names
+  - use `filePickerSurface()` when the picker lives inside a rich TUI pane and should inherit shared viewport masking semantics; keep `filePicker()` as the explicit text-lowering path
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -533,6 +535,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Family:
   - `enumeratedList()`
   - `browsableList()`
+  - `browsableListSurface()`
 - Variants:
   - passive list
   - interactive browsable list
@@ -543,6 +546,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - list rows should begin with the most distinguishing label or identifier
   - descriptions should help the scan task, not turn each row into a paragraph
+  - use `browsableListSurface()` when the list belongs inside a rich TUI region and should share viewport masking semantics with pagers and focus panes; keep `browsableList()` as the explicit text-lowering path
 - Ownership:
   - core plus TUI interaction layer
 - Graceful lowering:
@@ -621,7 +625,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - use `focusArea()` / `focusAreaSurface()` when the pane participates in a larger workspace and needs explicit focus ownership
   - prefer the surface-native path when the pane body is already composed from `Surface` content; keep the string path as explicit lowering, not the default teaching path
   - gutter chrome should communicate focus and workspace ownership, not carry primary content meaning
-  - components still carrying bespoke scroll-window logic and should converge on viewport semantics are `browsableList()`, `navigableTable()`, `filePicker()`, and `commandPalette()`
+  - `browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now converge on viewport semantics; `navigableTable()` remains the row-aware holdout because wrapped-row comparison still needs a more specialized scroll model
 - Graceful lowering:
   - rich: scrollable pane with honest status/focus chrome and bounded viewport behavior
   - static: visible excerpt or current window with enough status context to explain where the user is
@@ -681,6 +685,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `statusBar()`
   - `statusBarSurface()`
   - `commandPalette()`
+  - `commandPaletteSurface()`
 - Variants:
   - shell container, status rail, action discovery
 - Use when:
@@ -692,6 +697,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - the shell should frame destinations and workspace state, not become a dumping ground for unrelated metadata
   - use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output or lowering
+  - use `commandPaletteSurface()` when the palette lives inside a rich TUI shell or overlay and should share viewport masking semantics with other panes; keep `commandPalette()` for explicit text output or lowering
   - status lines should carry concise global context, not replace in-page guidance
   - command palette entries should prefer actions and navigation targets over field-style data entry
   - tabs should represent peer destinations or work areas, not disguised command buttons

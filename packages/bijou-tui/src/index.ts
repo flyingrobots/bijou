@@ -440,12 +440,14 @@ export {
 
 // Browsable list
 export {
+  type BrowsableListSurfaceOptions,
   type BrowsableListItem,
   type BrowsableListState,
   type BrowsableListOptions,
   type BrowsableListRenderOptions,
   createBrowsableListState,
   browsableList,
+  browsableListSurface,
   listFocusNext,
   listFocusPrev,
   listPageDown,
@@ -455,12 +457,14 @@ export {
 
 // File picker
 export {
+  type FilePickerSurfaceOptions,
   type FileEntry,
   type FilePickerState,
   type FilePickerOptions,
   type FilePickerRenderOptions,
   createFilePickerState,
   filePicker,
+  filePickerSurface,
   fpFocusNext,
   fpFocusPrev,
   fpEnter,
@@ -488,6 +492,7 @@ export {
   type CommandPaletteItem,
   type CommandPaletteState,
   type CommandPaletteOptions,
+  type CommandPaletteSurfaceOptions,
   createCommandPaletteState,
   cpFilter,
   cpFocusNext,
@@ -496,6 +501,7 @@ export {
   cpPageUp,
   cpSelectedItem,
   commandPalette,
+  commandPaletteSurface,
   commandPaletteKeyMap,
 } from './command-palette.js';
 

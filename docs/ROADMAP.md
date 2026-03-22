@@ -58,7 +58,7 @@ Release intent:
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| **Viewport Scroll Unification** | bijou-tui | Treat `viewportSurface()` as the canonical scroll-mask primitive and converge bespoke scroll-window components on it. Current ad hoc candidates are `browsableList()`, `navigableTable()`, `filePicker()`, and `commandPalette()`. `pagerSurface()`, `focusAreaSurface()`, and `dagPane()` already sit on the right layering path. |
+| **Viewport Scroll Unification** | bijou-tui | `browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now sit on the shared `viewportSurface()` masking model. Remaining work is `navigableTable()`, whose wrapped-row comparison semantics still need a row-aware viewport model instead of simple line clipping. |
 | **Design-System Documentation Completeness** | docs | The component-family guide now has a structural completeness gate in CI (`docs:design-system:preflight`). Remaining work is deeper content guidance, stronger examples, and sharper edge-case policy. |
 | **Component Guidance & Carbon-Style Usage Docs** | docs + examples + package READMEs | Keep expanding the “what this is / variants / use / avoid / graceful lowering / related families” doctrine until the public docs actually support the design system they claim to describe. |
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Keep the generated TUI canary and published-artifact path healthy on every release candidate. |

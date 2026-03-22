@@ -21,8 +21,9 @@
  * ```
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
+import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
+import { viewportSurface, visibleLength } from './viewport.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -76,6 +77,14 @@ export interface BrowsableListRenderOptions {
   readonly focusIndicator?: string;
   /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
+}
+
+/** Options for rendering the browsable list into a `Surface`. */
+export interface BrowsableListSurfaceOptions extends BrowsableListRenderOptions {
+  /** Fixed viewport width. Defaults to the widest rendered row. */
+  readonly width?: number;
+  /** Show a scrollbar track on the right edge. Default: false. */
+  readonly showScrollbar?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -181,6 +190,18 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
   return Math.min(newScrollY, maxScroll);
 }
 
+function renderBrowsableListLines<T>(
+  state: BrowsableListState<T>,
+  indicator: string,
+): string[] {
+  const pad = ' '.repeat(indicator.length);
+  return state.items.map((item, index) => {
+    const prefix = index === state.focusIndex ? indicator : pad;
+    const desc = item.description ? ` \u2014 ${item.description}` : '';
+    return `${prefix} ${item.label}${desc}`;
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
@@ -203,20 +224,45 @@ export function browsableList<T>(
   if (state.items.length === 0) return '';
 
   const indicator = options?.focusIndicator ?? '\u25b8';
-  const pad = ' '.repeat(indicator.length);
+  return renderBrowsableListLines(state, indicator)
+    .slice(state.scrollY, state.scrollY + state.height)
+    .join('\n');
+}
 
-  const visibleItems = state.items.slice(state.scrollY, state.scrollY + state.height);
-  const lines: string[] = [];
+/**
+ * Render the browsable list directly into a viewport-backed `Surface`.
+ *
+ * This keeps scroll ownership on the shared `viewportSurface()` masking
+ * primitive instead of each list carrying bespoke slice logic.
+ *
+ * @template T - Type of each item's value payload.
+ * @param state - Current list state.
+ * @param options - Rendering options plus optional fixed width.
+ * @returns Surface-sized list viewport using the list height as the visible window.
+ */
+export function browsableListSurface<T>(
+  state: BrowsableListState<T>,
+  options?: BrowsableListSurfaceOptions,
+): Surface {
+  const indicator = options?.focusIndicator ?? '\u25b8';
+  const lines = renderBrowsableListLines(state, indicator);
+  const width = Math.max(
+    1,
+    options?.width ?? 0,
+    ...lines.map((line) => visibleLength(line)),
+  );
 
-  for (let i = 0; i < visibleItems.length; i++) {
-    const item = visibleItems[i]!;
-    const globalIndex = state.scrollY + i;
-    const prefix = globalIndex === state.focusIndex ? indicator : pad;
-    const desc = item.description ? ` \u2014 ${item.description}` : '';
-    lines.push(`${prefix} ${item.label}${desc}`);
+  if (lines.length === 0) {
+    return createSurface(width, Math.max(1, state.height));
   }
 
-  return lines.join('\n');
+  return viewportSurface({
+    width,
+    height: Math.max(1, state.height),
+    content: lines.join('\n'),
+    scrollY: state.scrollY,
+    showScrollbar: options?.showScrollbar ?? false,
+  });
 }
 
 // ---------------------------------------------------------------------------

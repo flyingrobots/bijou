@@ -110,14 +110,14 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`release-workbench`](./release-workbench/) | `createFramedApp()`, `grid()`, `splitPane()`, `drawer()` | Canonical multi-view control room with pane-scoped drawers and command palette |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTable()`, `navTableKeyMap()` | Keyboard-owned table inspection with focus and scrolling |
-| [`browsable-list`](./browsable-list/) | `browsableList()`, `browsableListKeyMap()` | Navigable list with descriptions and scroll viewport |
-| [`file-picker`](./file-picker/) | `filePicker()`, `filePickerKeyMap()` | Directory browser with keyboard navigation |
+| [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |
+| [`file-picker`](./file-picker/) | `filePickerSurface()`, `filePickerKeyMap()` | Directory browser with fixed header and viewport-backed entry list |
 | [`interactive-accordion`](./interactive-accordion/) | `interactiveAccordion()`, `accordionKeyMap()` | Keyboard-navigable accordion with expand/collapse |
 | [`composable`](./composable/) | `composable` | Tabbed dashboard combining many components |
 | [`package-manager`](./package-manager/) | `package-manager` | Simulated `npm install` (resolve → download → link) |
 | [`status-bar`](./status-bar/) | `statusBar()`, `statusBarSurface()` | Segmented header/footer with explicit text and surface paths |
 | [`drawer`](./drawer/) | `drawer()`, `composite()` | Togglable slide-in side panel overlay |
-| [`command-palette`](./command-palette/) | `commandPalette()`, `commandPaletteKeyMap()` | Filterable action list with live search |
+| [`command-palette`](./command-palette/) | `commandPaletteSurface()`, `commandPaletteKeyMap()` | Filterable action list with fixed search row and viewport-backed results |
 | [`tooltip`](./tooltip/) | `tooltip()`, `composite()` | Positioned overlay with directional placement |
 | [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |

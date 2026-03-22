@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { surfaceToString } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import {
   createBrowsableListState,
   listFocusNext,
@@ -6,10 +8,12 @@ import {
   listPageDown,
   listPageUp,
   browsableList,
+  browsableListSurface,
   browsableListKeyMap,
 } from './browsable-list.js';
 
 describe('browsableList', () => {
+  const ctx = createTestContext();
   const items = [
     { label: 'Apple', value: 'apple' },
     { label: 'Banana', value: 'banana', description: 'Yellow fruit' },
@@ -149,6 +153,33 @@ describe('browsableList', () => {
       expect(output).toContain('Apple');
       expect(output).toContain('Banana');
       expect(output).not.toContain('Cherry');
+    });
+
+    it('renders a viewport-backed surface with fixed height', () => {
+      const state = createBrowsableListState({ items, height: 2 });
+      const surface = browsableListSurface(state, { width: 24 });
+      const rendered = surfaceToString(surface, ctx.style);
+
+      expect(surface.width).toBe(24);
+      expect(surface.height).toBe(2);
+      expect(rendered).toContain('Apple');
+      expect(rendered).toContain('Banana');
+      expect(rendered).not.toContain('Cherry');
+    });
+
+    it('surface path follows the shared scroll window', () => {
+      let state = createBrowsableListState({ items, height: 2 });
+      state = listFocusNext(state);
+      state = listFocusNext(state);
+
+      const rendered = surfaceToString(
+        browsableListSurface(state, { width: 24 }),
+        ctx.style,
+      );
+
+      expect(rendered).not.toContain('Apple');
+      expect(rendered).toContain('Banana');
+      expect(rendered).toContain('Cherry');
     });
   });
 

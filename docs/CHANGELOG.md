@@ -21,6 +21,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Viewport now teaches masking, not just text scrolling** — the design-system docs, TUI README/GUIDE, examples index, and viewport demo now describe `viewportSurface()` as the masking primitive layered over existing structured content, with `viewport()` reframed as the explicit text-lowering path.
 - **Viewport now accepts layout-backed content** — `viewportSurface()` and `createScrollStateForContent()` now work with strings, `Surface`s, and `LayoutNode`s, so bounded overflow scrolling can wrap richer components without ad hoc flattening first.
 - **Surface-native shell utilities** — `@flyingrobots/bijou-tui` now ships `statusBarSurface()`, `helpViewSurface()`, `helpShortSurface()`, and `helpForSurface()`, so shell rails and grouped keybinding help can stay on the structured `Surface` path instead of being flattened into strings first.
+- **Viewport-backed collection blocks** — `@flyingrobots/bijou-tui` now ships `browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()`, so these collection/search primitives use the shared `viewportSurface()` mask instead of each carrying bespoke visible-window slicing logic.
 - **Example bridge burn-down in core demos** — the `badge`, `pipe`, and `theme` examples now compose badge/status rows as structured `Surface` content and only lower once at the outer text endpoint, leaving the showcase badge preview as the only intentional `surfaceToString(badge(...))` teaching site.
 - **Surface-native showcase preview contract** — the showcase component explorer now accepts either string or `Surface` previews per entry and lowers once per mode panel, so rich component demos like `badge()` can stay structured all the way through the preview path.
 
@@ -61,6 +62,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Structured overlay example migration** — the `modal`, `drawer`, and `tooltip` demos now pass structured `Surface` content into the overlay family, and the public overlay docs now document structured content as the preferred path when rich TUI layout matters inside an interruption layer.
 - **Workspace layout doctrine update** — the layout-family docs and public TUI guides now explicitly treat `vstackSurface()` / `hstackSurface()` / `placeSurface()` as the canonical rich-TUI composition path and frame `vstack()` / `hstack()` / `place()` as explicit text-composition or lowering tools.
 - **Scrollable pane doctrine update** — the design-system family guide now has a dedicated `pager()` / `focusArea()` family, and the package/example docs now teach `pagerSurface()` and `focusAreaSurface()` as the canonical rich-TUI path while leaving the string renderers as explicit lowering helpers.
+- **Viewport-backed collection docs** — the design-system guide, package docs, example index, and the browsable-list/file-picker/command-palette example docs now teach the surface-native collection path explicitly and narrow viewport-scroll unification to the remaining row-aware `navigableTable()` case.
 
 ## [3.1.0] - 2026-03-18
 

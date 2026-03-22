@@ -528,27 +528,48 @@ Use `navigableTable()` when the user should actively traverse a table. If the jo
 
 ```typescript
 import {
-  createBrowsableListState, browsableList, listFocusNext,
+  createBrowsableListState, browsableList, browsableListSurface, listFocusNext,
   browsableListKeyMap,
 } from '@flyingrobots/bijou-tui';
 
 const state = createBrowsableListState({ items, height: 10 });
-const output = browsableList(state);
+const textOutput = browsableList(state);
+const surfaceOutput = browsableListSurface(state, { width: 40 });
 ```
+
+Use `browsableListSurface()` when the list belongs inside a rich TUI region and should share viewport masking semantics with pagers and focus areas. Keep `browsableList()` for explicit text lowering.
 
 ### File Picker
 
 ```typescript
 import {
-  createFilePickerState, filePicker, fpFocusNext, fpEnter, fpBack,
+  createFilePickerState, filePicker, filePickerSurface, fpFocusNext, fpEnter, fpBack,
   filePickerKeyMap,
 } from '@flyingrobots/bijou-tui';
 import { nodeIO } from '@flyingrobots/bijou-node';
 
 const io = nodeIO();
 const state = createFilePickerState({ cwd: process.cwd(), io, height: 15 });
-const output = filePicker(state);
+const textOutput = filePicker(state);
+const surfaceOutput = filePickerSurface(state, { width: 60 });
 ```
+
+Use `filePickerSurface()` when the browser lives inside a rich TUI pane and should inherit shared viewport masking semantics. Keep `filePicker()` for explicit text lowering.
+
+### Command Palette
+
+```typescript
+import {
+  createCommandPaletteState, commandPalette, commandPaletteSurface,
+  cpFilter, commandPaletteKeyMap,
+} from '@flyingrobots/bijou-tui';
+
+const state = createCommandPaletteState(items, 8);
+const textOutput = commandPalette(state, { width: 60 });
+const surfaceOutput = commandPaletteSurface(state, { width: 60, ctx });
+```
+
+Use `commandPaletteSurface()` when the palette is part of a structured shell or overlay and should share viewport masking semantics. Keep `commandPalette()` for explicit text lowering.
 
 ### Pager
 

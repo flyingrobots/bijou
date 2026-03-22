@@ -838,6 +838,29 @@ The gutter character (`▎`) degrades gracefully:
 
 If your pane is still string-composed, `createFocusAreaState()` + `focusArea()` remain available as the explicit text-lowering path.
 
+## Viewport-Backed Collections
+
+`browsableListSurface()`, `filePickerSurface()`, and `commandPaletteSurface()` now use the same `viewportSurface()` masking model as pagers and focus panes.
+
+Use them when the collection lives inside a rich TUI region and should keep bounded scrolling on the structured `Surface` path:
+
+```typescript
+import {
+  createBrowsableListState,
+  browsableListSurface,
+  createFilePickerState,
+  filePickerSurface,
+  createCommandPaletteState,
+  commandPaletteSurface,
+} from '@flyingrobots/bijou-tui';
+
+const list = browsableListSurface(createBrowsableListState({ items, height: 8 }), { width: 40 });
+const picker = filePickerSurface(createFilePickerState({ cwd, io, height: 12 }), { width: 60 });
+const palette = commandPaletteSurface(createCommandPaletteState(commands, 8), { width: 60, ctx });
+```
+
+Keep `browsableList()`, `filePicker()`, and `commandPalette()` for explicit text-lowering paths, snapshots, or pipe-oriented output.
+
 ### Keymap
 
 Arrow keys are intentionally excluded — reserved for content-specific navigation (e.g., DAG node selection). Scroll uses vim keys:

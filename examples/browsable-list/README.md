@@ -1,6 +1,6 @@
-# `browsableList()`
+# `browsableListSurface()`
 
-Navigable list with descriptions and scroll viewport
+Navigable list with descriptions and viewport-backed surface masking
 
 ![demo](demo.gif)
 
@@ -17,11 +17,12 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  createBrowsableListState, browsableList,
+  createBrowsableListState, browsableListSurface,
   listFocusNext, listFocusPrev, listPageDown, listPageUp,
-  browsableListKeyMap, helpShort, vstack,
+  browsableListKeyMap, helpShortSurface, vstackSurface,
   type BrowsableListItem,
 } from '@flyingrobots/bijou-tui';
+import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
 
 initDefaultContext();
 
@@ -83,10 +84,19 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = separator({ label: 'browsable list' });
-    const body = browsableList(model.list);
-    const help = `  ${helpShort(keys)}`;
-    return vstack('', header, '', body, '', help, '');
+    const width = Math.max(24, ctx.runtime.columns);
+    const header = contentSurface(separator({ label: 'browsable list', width }));
+    const body = browsableListSurface(model.list, { width });
+    const help = helpShortSurface(keys, { width });
+
+    return vstackSurface(
+      spacer(width, 1),
+      header,
+      spacer(width, 1),
+      body,
+      spacer(width, 1),
+      help,
+    );
   },
 };
 

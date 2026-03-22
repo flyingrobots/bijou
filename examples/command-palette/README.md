@@ -1,3 +1,16 @@
+# `commandPaletteSurface()`
+
+Filterable action list with a fixed search row and viewport-backed results
+
+## Run
+
+```sh
+npx tsx examples/command-palette/main.ts
+```
+
+## Code
+
+```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { separator } from '@flyingrobots/bijou';
 import {
@@ -14,16 +27,7 @@ const ctx = initDefaultContext();
 const items: CommandPaletteItem[] = [
   { id: 'box', label: 'box()', description: 'Bordered containers', category: 'Display' },
   { id: 'table', label: 'table()', description: 'Auto-spacing data grids', category: 'Display' },
-  { id: 'dag', label: 'dag()', description: 'Directed acyclic graph', category: 'Display' },
   { id: 'spinner', label: 'spinner()', description: 'Loading indicator', category: 'Feedback' },
-  { id: 'progress', label: 'progressBar()', description: 'Visual progress', category: 'Feedback' },
-  { id: 'select', label: 'select()', description: 'Single-select menu', category: 'Forms', shortcut: 'ctrl+k' },
-  { id: 'input', label: 'input()', description: 'Text input prompt', category: 'Forms' },
-  { id: 'confirm', label: 'confirm()', description: 'Yes/no prompt', category: 'Forms' },
-  { id: 'wizard', label: 'wizard()', description: 'Multi-step form', category: 'Forms' },
-  { id: 'accordion', label: 'accordion()', description: 'Expandable sections', category: 'Layout' },
-  { id: 'tabs', label: 'tabs()', description: 'Tab bar navigation', category: 'Navigation' },
-  { id: 'tree', label: 'tree()', description: 'Hierarchical tree', category: 'Display' },
 ];
 
 type Msg =
@@ -53,7 +57,6 @@ const app: App<Model, Msg> = {
 
   update: (msg, model) => {
     if (msg.type === 'key') {
-      // Let keymap handle navigation keys first
       const action = keys.handle(msg);
       if (action) {
         switch (action.type) {
@@ -66,16 +69,12 @@ const app: App<Model, Msg> = {
         }
       }
 
-      // Printable character → update filter
       if (msg.key.length === 1 && !msg.ctrl && !msg.alt) {
-        const newQuery = model.cp.query + msg.key;
-        return [{ ...model, cp: cpFilter(model.cp, newQuery) }, []];
+        return [{ ...model, cp: cpFilter(model.cp, model.cp.query + msg.key) }, []];
       }
 
-      // Backspace → remove last char from query
       if (msg.key === 'backspace') {
-        const newQuery = model.cp.query.slice(0, -1);
-        return [{ ...model, cp: cpFilter(model.cp, newQuery) }, []];
+        return [{ ...model, cp: cpFilter(model.cp, model.cp.query.slice(0, -1)) }, []];
       }
     }
 
@@ -100,3 +99,6 @@ const app: App<Model, Msg> = {
 };
 
 run(app);
+```
+
+[← Examples](../README.md)

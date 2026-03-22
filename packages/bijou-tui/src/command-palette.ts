@@ -20,9 +20,10 @@
  * ```
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
+import { parseAnsiToSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
-import { clipToWidth } from './viewport.js';
+import { clipToWidth, viewportSurface } from './viewport.js';
+import { vstackSurface } from './surface-layout.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,6 +69,12 @@ export interface CommandPaletteOptions {
   readonly showShortcut?: boolean;
   /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
+}
+
+/** Options for rendering the command palette into a `Surface`. */
+export interface CommandPaletteSurfaceOptions extends CommandPaletteOptions {
+  /** Show a scrollbar track on the results viewport. Default: false. */
+  readonly showScrollbar?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -251,31 +258,37 @@ export function commandPalette(
   options: CommandPaletteOptions,
 ): string {
   const { width, showCategory = true, showShortcut = true, ctx } = options;
-  const lines: string[] = [];
+  const lines: string[] = [clipToWidth(`> ${state.query}`, width)];
+  const itemLines = renderCommandPaletteLines(state, {
+    showCategory,
+    showShortcut,
+    ctx,
+  });
+  lines.push(
+    ...itemLines
+      .slice(state.scrollY, state.scrollY + state.height)
+      .map((line) => clipToWidth(line, width)),
+  );
+  return lines.join('\n');
+}
 
-  // Search line
-  const searchPrefix = '> ';
-  const queryLine = searchPrefix + state.query;
-  lines.push(clipToWidth(queryLine, width));
+function renderCommandPaletteLines(
+  state: CommandPaletteState,
+  options: Pick<CommandPaletteOptions, 'showCategory' | 'showShortcut' | 'ctx'>,
+): string[] {
+  const { showCategory = true, showShortcut = true, ctx } = options;
 
   if (state.filteredItems.length === 0) {
-    lines.push(clipToWidth('  No matches', width));
-    return lines.join('\n');
+    return ['  No matches'];
   }
 
-  // Visible items in viewport
-  const visible = state.filteredItems.slice(state.scrollY, state.scrollY + state.height);
-
-  const indicator = '\u25b8'; // ▸
+  const indicator = '\u25b8';
   const pad = ' ';
   const muted = (text: string) =>
     ctx ? ctx.style.styled(ctx.semantic('muted'), text) : text;
 
-  for (let i = 0; i < visible.length; i++) {
-    const item = visible[i]!;
-    const globalIndex = state.scrollY + i;
-    const prefix = globalIndex === state.focusIndex ? indicator : pad;
-
+  return state.filteredItems.map((item, index) => {
+    const prefix = index === state.focusIndex ? indicator : pad;
     const parts: string[] = [];
 
     if (showCategory && item.category) {
@@ -292,12 +305,36 @@ export function commandPalette(
       parts.push(muted(item.shortcut));
     }
 
-    const content = parts.join('  ');
-    const line = `${prefix} ${content}`;
-    lines.push(clipToWidth(line, width));
-  }
+    return `${prefix} ${parts.join('  ')}`;
+  });
+}
 
-  return lines.join('\n');
+/**
+ * Render the command palette into a `Surface`.
+ *
+ * The search prompt stays fixed while results are masked by the shared
+ * `viewportSurface()` primitive rather than carrying bespoke slice logic.
+ *
+ * @param state - Current command palette state.
+ * @param options - Width, display flags, and context for rendering.
+ * @returns Surface containing the search line and scrollable result list.
+ */
+export function commandPaletteSurface(
+  state: CommandPaletteState,
+  options: CommandPaletteSurfaceOptions,
+): Surface {
+  const width = Math.max(1, options.width);
+  const itemLines = renderCommandPaletteLines(state, options);
+  const searchSurface = parseAnsiToSurface(clipToWidth(`> ${state.query}`, width), width, 1);
+  const listSurface = viewportSurface({
+    width,
+    height: Math.max(1, state.height),
+    content: itemLines.join('\n'),
+    scrollY: state.scrollY,
+    showScrollbar: options.showScrollbar ?? false,
+  });
+
+  return vstackSurface(searchSurface, listSurface);
 }
 
 // ---------------------------------------------------------------------------
