@@ -456,6 +456,9 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Content guidance:
   - path and progress labels should emphasize where the user is, not every possible destination
   - step titles should be stable and action-oriented enough to support review and recovery
+  - use `breadcrumb()` when path context helps orient the current location, not as a decorative header flourish
+  - use `paginator()` when compact position-in-sequence feedback is enough and the user does not need a richer navigation control
+  - use `stepper()` when the current stage and remaining path matter more than peer switching
 - Ownership:
   - core
 - Graceful lowering:
@@ -468,6 +471,44 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `statusBar()`
 - Carbon analogue:
   - breadcrumb / progress indicator / pagination
+
+### Motion and shader effects
+
+- Family:
+  - `canvas()`
+  - transition shaders
+  - `animate()`
+  - `timeline()`
+- Variants:
+  - decorative visual field
+  - transition reinforcement
+  - motion choreography
+  - custom shader override
+- Use when:
+  - motion or shader output clarifies state change, transition, or atmosphere
+- Avoid when:
+  - the effect is only decorative noise
+  - readability, scanning, or task focus would be harmed
+  - the same meaning would be clearer as stable content or a simpler status cue
+- Content guidance:
+  - `canvas()` should be reserved for deliberate visual moments such as splash surfaces, atmospheric backgrounds, or specialized visual regions, not routine productivity chrome
+  - transition shaders should reinforce page or workspace change, not compete with the content being changed
+  - animation timing should support comprehension and must have an honest reduced-motion or non-interactive fallback
+  - shader overrides should preserve semantic content where possible and avoid turning ordinary task flows into spectacle
+- Ownership:
+  - TUI
+- Graceful lowering:
+  - rich: preserve the motion or visual effect when it materially helps
+  - static: lower to truthful final-state snapshots without pretending the transition still exists
+  - pipe: drop decorative effects and keep only the meaning-bearing content
+  - accessible: preserve state change meaning explicitly without requiring visual motion
+- Related families:
+  - `createFramedApp()`
+  - `statusBar()`
+  - notification system
+  - `timeline()`
+- Carbon analogue:
+  - no exact analogue; closest to expressive motion and illustration guidance rather than one component family
 
 ## Data and browsing families
 
@@ -861,6 +902,6 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 These are shipped, but the guidance is still thinner than it should be:
 
-- `note()` public example coverage and cross-linking with the status-escalation ladder
-- `breadcrumb()` / `paginator()` / `stepper()` scenario guidance beyond catalog usage
-- `canvas()` and shader-family guidance for when decorative motion is justified versus distracting
+- `box()` / `headerBox()` scenario guidance beyond simple containment
+- `markdown()` content policy and when not to render rich markdown in terminal output
+- `dag()` / `dagPane()` scenario guidance for when graph shape is worth the cognitive cost

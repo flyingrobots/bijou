@@ -69,6 +69,10 @@ Use `table()` when passive row/column comparison is the job. If your V3 app is a
 
 Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`.
 
+### Wayfinding & progress
+
+Use `breadcrumb()` when path context explains where the user is. Use `paginator()` when compact position-in-sequence feedback is enough. Use `stepper()` when the user is moving through ordered stages rather than switching among peer destinations.
+
 ### Progress & Spinners
 
 ```typescript

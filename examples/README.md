@@ -30,6 +30,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 
 ## Choosing Between Similar Examples
 
+- Use [`note`](./note/) for explanatory, non-urgent support inside a flow.
 - Use [`alert`](./alert/) for in-flow status that should remain part of the page.
 - Use [`toast`](./toast/) for a single low-level transient overlay you are composing directly.
 - Use [`notifications`](./notifications/) when the app needs stacking, actions, placement control, routing, or history.
@@ -46,6 +47,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`accordion`](./accordion/) | `accordion()` | Expandable content sections |
 | [`tabs`](./tabs/) | `tabs()` | Tab bar navigation with badges |
 | [`badge`](./badge/) | `badge()` | Inline status badges in 7 variants |
+| [`note`](./note/) | `note()` | Explanatory, non-urgent supporting text for form flows |
 | [`alert`](./alert/) | `alert()` | In-flow status block that persists in page content |
 | [`separator`](./separator/) | `separator()` | Horizontal dividers with labels |
 | [`skeleton`](./skeleton/) | `skeleton()` | Loading placeholders |
@@ -119,7 +121,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`drawer`](./drawer/) | `drawer()`, `compositeSurface()` | Togglable slide-in side panel overlay |
 | [`command-palette`](./command-palette/) | `commandPaletteSurface()`, `commandPaletteKeyMap()` | Filterable action list with fixed search row and viewport-backed results |
 | [`tooltip`](./tooltip/) | `tooltip()`, `compositeSurface()` | Positioned overlay with directional placement |
-| [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Animated plasma shader effect |
+| [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Deliberate shader-driven visual surface |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |
 | [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG viewer with node navigation |

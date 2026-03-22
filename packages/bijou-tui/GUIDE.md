@@ -409,6 +409,8 @@ Guidance:
 - Treat `overrideChar` as a light-weight convenience for inheriting the selected base cell styling.
 - Use `'marker'` only for progress-tied indicators that should be dropped by `reverse()` and similar remapping combinators.
 - Use `'decoration'` for ambient effects like glitch blocks, static, and scramble noise that can survive progress remapping.
+- Use transition shaders to reinforce page continuity and state change, not to bury the destination page under spectacle.
+- Reduced-motion and non-interactive paths still need an honest story when the visual effect disappears entirely.
 
 ## Event Bus
 

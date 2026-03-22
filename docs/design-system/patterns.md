@@ -348,10 +348,36 @@ Use when:
 
 - the user is moving through a process
 - order matters
+- the current stage should be understandable at a glance
 
 Avoid when:
 
 - the views are non-sequential
+- the user is really switching among peer destinations instead of progressing through a flow
+
+### `breadcrumb()`
+
+Use when:
+
+- the user needs path context
+- hierarchy or nesting should stay visible while reading the current location
+
+Avoid when:
+
+- peer destinations are the real model
+- the path is so deep or unstable that a simpler label plus local navigation would be clearer
+
+### `paginator()`
+
+Use when:
+
+- the current page or position within a bounded sequence matters
+- page count should be visible without turning into a full navigation menu
+
+Avoid when:
+
+- the user needs rich peer navigation rather than compact progress
+- the content is an infinite feed or unbounded stream where page counts are misleading
 
 ## 5. Overlay escalation
 
@@ -543,6 +569,28 @@ Bad early mouse targets:
 Every pattern should have a graceful lowering story.
 
 ### Examples
+
+## 10. Motion and shader effects
+
+Motion and shader effects are supporting patterns, not the product itself.
+
+Use them when:
+
+- they clarify transition, progress, focus, or spatial change
+- the user benefits from seeing continuity rather than a sudden visual jump
+- the effect reinforces the information architecture instead of competing with it
+
+Avoid them when:
+
+- they are only decorative noise
+- they make dense work harder to read
+- the same information would be clearer as stable content, a status change, or a simpler transition
+
+Specific guidance:
+
+- use transition shaders to reinforce page or workspace change, not to show off that the renderer can animate
+- use `canvas()` for purposeful visual surfaces such as splash, background atmosphere, or dedicated visual moments, not as a default wrapper around ordinary productivity screens
+- reduced-motion and non-interactive modes must still tell the truth even when the effect disappears entirely
 
 - notifications may lower to logs or in-flow alerts
 - command palette may lower to documented shortcuts or static command lists

@@ -10,51 +10,22 @@ Step progress indicators
 npx tsx examples/stepper/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { stepper, separator } from '@flyingrobots/bijou';
+- the user is moving through ordered stages
+- progress through a process matters more than peer switching
+- the current stage and remaining path should be visible at a glance
 
-console.log(separator({ label: 'deployment pipeline', ctx }));
-console.log();
+## Choose something else when
 
-console.log(stepper(
-  [
-    { label: 'Build' },
-    { label: 'Test' },
-    { label: 'Review' },
-    { label: 'Stage' },
-    { label: 'Deploy' },
-  ],
-  { current: 2, ctx },
-));
+- choose `tabs()` when the views are peers
+- choose `breadcrumb()` when the user needs path context rather than process progress
+- choose `paginator()` when compact position feedback is enough and process semantics would overstate the flow
 
-console.log();
-console.log(separator({ label: 'onboarding wizard', ctx }));
-console.log();
+## What this example proves
 
-console.log(stepper(
-  [
-    { label: 'Account' },
-    { label: 'Profile' },
-    { label: 'Preferences' },
-    { label: 'Done' },
-  ],
-  { current: 0, ctx },
-));
-
-console.log();
-
-console.log(stepper(
-  [
-    { label: 'Account' },
-    { label: 'Profile' },
-    { label: 'Preferences' },
-    { label: 'Done' },
-  ],
-  { current: 3, ctx },
-));
-```
+- `stepper()` as a staged-process indicator
+- early, middle, and completed-state snapshots
+- process progress that still lowers honestly into text output
 
 [← Examples](../README.md)

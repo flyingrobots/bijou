@@ -10,26 +10,22 @@ Page indicators (dots and text)
 npx tsx examples/paginator/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { ctx } from '../_shared/setup.js';
-import { paginator, separator } from '@flyingrobots/bijou';
+- compact position-in-sequence feedback is enough
+- the user benefits from seeing current page and total count without a richer navigation surface
+- the sequence is genuinely bounded
 
-console.log(separator({ label: 'dot style', ctx }));
-console.log();
+## Choose something else when
 
-for (const page of [0, 4, 9]) {
-  console.log(`Page ${page + 1}:  ${paginator({ current: page, total: 10, style: 'dots', ctx })}`);
-}
+- choose `tabs()` when the user is switching among peer destinations
+- choose `stepper()` when the sequence is a staged process rather than plain pagination
+- choose a list or summary label when the content is effectively unbounded and page counts would mislead
 
-console.log();
-console.log(separator({ label: 'text style', ctx }));
-console.log();
+## What this example proves
 
-for (const page of [0, 4, 9]) {
-  console.log(paginator({ current: page, total: 10, style: 'text', ctx }));
-}
-```
+- `paginator()` in dot and text variants
+- lightweight page-position feedback instead of full navigation chrome
+- clean textual lowering of bounded-sequence state
 
 [← Examples](../README.md)

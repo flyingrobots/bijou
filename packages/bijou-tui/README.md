@@ -227,6 +227,8 @@ const shimmer: TransitionShaderFn = ({ progress, x, width }) => {
 
 Use `overrideChar` when the base cell styling should stay intact, `overrideCell` when the shader needs full fg/bg/modifier control, and `overrideRole` to tell combinators whether an override is ambient (`'decoration'`) or positional (`'marker'`).
 
+Use transition shaders to reinforce workspace change, not as default spectacle. If the effect makes the new page harder to read or hides state meaning that should remain explicit in static or accessible modes, it is the wrong transition.
+
 ## Layout
 
 ### Flexbox

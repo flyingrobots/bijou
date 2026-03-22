@@ -93,6 +93,12 @@ Those docs answer the questions the API reference cannot:
 - Use `timeline()` when chronology is the actual reading path.
 - Move to `dag()` when dependency or causal flow matters more than simple order or nesting.
 
+### Wayfinding and progress
+
+- Use `breadcrumb()` when path context helps explain the current location.
+- Use `paginator()` when compact position-in-sequence feedback is enough.
+- Use `stepper()` when the user is progressing through ordered stages rather than switching among peers.
+
 ## Components
 
 ### Layout
