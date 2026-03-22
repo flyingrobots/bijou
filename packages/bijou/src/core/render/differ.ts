@@ -1,6 +1,6 @@
 import { createSurface, type Surface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
-import { stripAnsi, segmentGraphemes } from '../text/index.js';
+import { graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
 
 /**
  * Convert a multi-line string into a Surface.
@@ -16,8 +16,10 @@ export function stringToSurface(text: string, width: number, height: number): Su
   for (let y = 0; y < Math.min(height, lines.length); y++) {
     const line = lines[y]!;
     const gs = segmentGraphemes(line);
-    for (let x = 0; x < Math.min(width, gs.length); x++) {
-      surface.set(x, y, { char: gs[x]!, empty: false });
+    let x = 0;
+    for (const char of gs) {
+      if (x >= width) break;
+      x += writeSurfaceGrapheme(surface, x, y, char);
     }
   }
 
@@ -49,10 +51,12 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
       const part = line.slice(lastIndex, matchIndex);
       const gs = segmentGraphemes(part);
       for (const char of gs) {
-        if (x < width) {
-          surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: Array.from(currentMods) });
-          x++;
-        }
+        if (x >= width) break;
+        x += writeSurfaceGrapheme(surface, x, y, char, {
+          fg: currentFg,
+          bg: currentBg,
+          modifiers: Array.from(currentMods),
+        });
       }
 
       const codeStr = match[1]!;
@@ -101,13 +105,34 @@ export function parseAnsiToSurface(text: string, width: number, height: number):
     const remaining = line.slice(lastIndex);
     const gs = segmentGraphemes(remaining);
     for (const char of gs) {
-      if (x < width) {
-        surface.set(x, y, { char, fg: currentFg, bg: currentBg, modifiers: Array.from(currentMods) });
-        x++;
-      }
+      if (x >= width) break;
+      x += writeSurfaceGrapheme(surface, x, y, char, {
+        fg: currentFg,
+        bg: currentBg,
+        modifiers: Array.from(currentMods),
+      });
     }
   }
   return surface;
+}
+
+function writeSurfaceGrapheme(
+  surface: Surface,
+  x: number,
+  y: number,
+  char: string,
+  style?: Pick<Cell, 'fg' | 'bg' | 'modifiers'>,
+): number {
+  if (x >= surface.width) return 0;
+
+  const width = Math.max(1, graphemeClusterWidth(char));
+  surface.set(x, y, { char, ...style, empty: false });
+
+  for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
+    surface.set(x + offset, y, { char: '', ...style, empty: false });
+  }
+
+  return width;
 }
 
 /**

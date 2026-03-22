@@ -11,6 +11,7 @@
 import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
 import {
   createSurface,
+  graphemeClusterWidth,
   parseAnsiToSurface,
   segmentGraphemes,
   shouldApplyBg,
@@ -271,6 +272,17 @@ function setStyledCell(surface: Surface, x: number, y: number, char: string, sty
   surface.set(x, y, { char, ...style, empty: false });
 }
 
+function setStyledGrapheme(surface: Surface, x: number, y: number, char: string, style: CellStyle): number {
+  if (x >= surface.width) return 0;
+
+  const width = Math.max(1, graphemeClusterWidth(char));
+  setStyledCell(surface, x, y, char, style);
+  for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
+    setStyledCell(surface, x + offset, y, '', style);
+  }
+  return width;
+}
+
 function lineSurface(text: string, style: CellStyle = {}): Surface {
   if (text.length === 0) return createSurface(0, 1);
 
@@ -283,9 +295,11 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   }
 
   const graphemes = segmentGraphemes(plain);
-  const surface = createSurface(graphemes.length, 1);
-  for (let x = 0; x < graphemes.length; x++) {
-    setStyledCell(surface, x, 0, graphemes[x]!, style);
+  const surface = createSurface(width, 1);
+  let x = 0;
+  for (const grapheme of graphemes) {
+    if (x >= width) break;
+    x += setStyledGrapheme(surface, x, 0, grapheme, style);
   }
   return surface;
 }

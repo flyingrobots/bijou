@@ -254,6 +254,24 @@ describe('modal', () => {
     expect(stripAnsi(content)).toContain('hint');
   });
 
+  it('sizes plain wide glyph content by display width', () => {
+    const result = modal({ body: '漢', screenWidth: 20, screenHeight: 10 });
+    const boxWidth = visibleLength(result.content.split('\n')[0]!);
+    const margin = resolveOverlayMargin(20, 10);
+
+    expect(boxWidth).toBe(6);
+    expect(result.col).toBe(clampCenteredPosition(20, boxWidth, margin));
+  });
+
+  it('sizes ANSI wide glyph content by display width', () => {
+    const result = modal({ body: '\x1b[31m漢\x1b[0m', screenWidth: 20, screenHeight: 10 });
+    const boxWidth = visibleLength(result.content.split('\n')[0]!);
+    const margin = resolveOverlayMargin(20, 10);
+
+    expect(boxWidth).toBe(6);
+    expect(result.col).toBe(clampCenteredPosition(20, boxWidth, margin));
+  });
+
   it('bgToken does not crash with plainStyle ctx', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const token = { hex: '#ffffff', bg: '#003366' };
