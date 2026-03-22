@@ -45,7 +45,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log and completed branch w
 
 The next phase is deliberately narrower than the v4 release branch. Priority order:
 
-1. **Story-first docs platform** — establish the shared content and story substrate before building more one-off examples.
+1. **Learn by Touch** — establish the shared content and story substrate before building more one-off examples.
 2. **Replay and deterministic DX** — make Bijou uniquely inspectable, recordable, and testable.
 3. **Platform hardening and release hygiene** — keep the release/test/tooling base honest while the platform grows.
 4. **Runtime and design-system expansion** — push richer primitives once the substrate above is in place.
@@ -53,7 +53,9 @@ The next phase is deliberately narrower than the v4 release branch. Priority ord
 
 ---
 
-## Milestone 1 — Story-First Docs Platform
+## Learn by Touch
+
+See [docs/strategy/learn-by-touch.md](strategy/learn-by-touch.md) for the design-thinking rationale, primary user, jobs to be done, principles, and recommended first slice.
 
 | Feature | Package | Notes |
 |---------|---------|-------|
@@ -132,7 +134,7 @@ The next phase is deliberately narrower than the v4 release branch. Priority ord
 - `v4.0.0` is no longer treated as “in flight”; it is now a shipped release.
 - Release-blocker items were either moved to [COMPLETED.md](COMPLETED.md), folded into platform hardening, or dropped if they were no longer real backlog.
 - The top of the roadmap now reflects the deliberate post-v4 sequence:
-  1. story-first docs substrate
+  1. Learn by Touch
   2. replay/debugging substrate
   3. hardening and release hygiene
   4. runtime/design-system expansion
