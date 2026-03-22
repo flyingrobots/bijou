@@ -1,6 +1,22 @@
 # Completed Milestones
 
-Shipped work, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+Shipped work and completed branch milestones, newest first. See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+
+---
+
+## v4.0.0 branch progress — Pure Surface Runtime & Design-System Conformance
+
+- **Completed:** 2026-03-21
+- **Summary:** Completed the major v4 pure-surface cuts on branch `feat/v4-pure-v3-release`: raw string `App.view` removal, surface-native frame shell/body/chrome/transitions, structured overlay content, surface-native layout and scrolling primitives (`flexSurface`, `viewportSurface`, `placeSurface`, `pagerSurface`, `splitPaneSurface`, `gridSurface`), transition shader API normalization, viewport masking doctrine, example/canary bridge burn-down, and CI/documentation gates for component-family completeness.
+- **Ref:** branch `feat/v4-pure-v3-release` (pending v4.0.0 release)
+
+---
+
+## Post-v3 repo tooling groundwork
+
+- **Completed:** 2026-03-19
+- **Summary:** Added merge-readiness and review-status tooling, shared release metadata validation, workflow action-runtime upgrades, and the first release-readiness/drill-down commands so release and PR hygiene can be checked locally before pushing.
+- **Ref:** post-v3 tooling groundwork on `main`
 
 ---
 
