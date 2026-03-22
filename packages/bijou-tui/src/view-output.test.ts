@@ -1,0 +1,37 @@
+import { describe, expect, it } from 'vitest';
+import { createSurface, type LayoutNode } from '@flyingrobots/bijou';
+import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
+
+function surfaceLines(surface: ReturnType<typeof createSurface>): string[] {
+  return Array.from({ length: surface.height }, (_, y) =>
+    Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).join(''),
+  );
+}
+
+describe('view output normalization', () => {
+  it('re-roots non-zero-origin layout views before painting them', () => {
+    const nodeSurface = createSurface(3, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    nodeSurface.set(2, 0, { char: 'C', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+
+    const normalized = normalizeViewOutput(layout, { width: 3, height: 1 });
+    expect(surfaceLines(normalized.surface)).toEqual(['ABC']);
+  });
+
+  it('wraps layout views as local roots for the interactive pipeline', () => {
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface: createSurface(3, 1, { char: 'x', empty: false }),
+    };
+
+    const root = wrapViewOutputAsLayoutRoot(layout, { width: 3, height: 1 });
+    expect(root.rect).toEqual({ x: 0, y: 0, width: 3, height: 1 });
+  });
+});

@@ -223,6 +223,8 @@ npm run smoke:examples:all
 
 ## Canonical Runtime References
 
+These directories keep their historical `v3-*` names, but they are still the canonical runtime references for the `4.0.0` line on this branch.
+
 - Runtime starter: [`examples/v3-demo`](../examples/v3-demo/)
 - BCSS: [`examples/v3-css`](../examples/v3-css/)
 - Motion: [`examples/v3-motion`](../examples/v3-motion/)

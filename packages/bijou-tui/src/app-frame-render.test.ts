@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { createSurface, setDefaultContext } from '@flyingrobots/bijou';
+import { createSurface, setDefaultContext, type LayoutNode } from '@flyingrobots/bijou';
 import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { createFrameKeyMap } from './app-frame-utils.js';
-import { renderHelpLine, renderTransition, resolveHeaderLine } from './app-frame-render.js';
+import {
+  framePaneOutputToSurface,
+  renderHelpLine,
+  renderTransition,
+  resolveHeaderLine,
+} from './app-frame-render.js';
 
 afterEach(() => _resetDefaultContextForTesting());
 
@@ -120,5 +125,22 @@ describe('frame shell chrome surfaces', () => {
       expect(header.get(x, 0).empty).toBe(false);
       expect(help.get(x, 0).empty).toBe(false);
     }
+  });
+});
+
+describe('frame pane output normalization', () => {
+  it('re-roots non-zero-origin layout nodes before pane rendering', () => {
+    const nodeSurface = createSurface(3, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    nodeSurface.set(2, 0, { char: 'C', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+
+    const rendered = framePaneOutputToSurface(layout, 3, 1);
+    expect(Array.from({ length: rendered.width }, (_, x) => rendered.get(x, 0).char).join('')).toBe('ABC');
   });
 });

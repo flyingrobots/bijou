@@ -10,12 +10,12 @@ import {
   graphemeWidth,
   graphemeClusterWidth,
   parseAnsiToSurface,
-  paintLayoutNode,
   segmentGraphemes,
   clipToWidth as coreClipToWidth,
   type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
+import { layoutNodeToSurface } from './layout-node-surface.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -506,50 +506,11 @@ export function createScrollState(
 
 function normalizeViewportContent(content: Surface | LayoutNode): Surface {
   if (isSurfaceContent(content)) return content;
-
-  const bounds = measureLayoutBounds(content);
-  const translated = translateLayoutNode(content, -bounds.minX, -bounds.minY);
-  const width = Math.max(0, bounds.maxX - bounds.minX);
-  const height = Math.max(0, bounds.maxY - bounds.minY);
-  const surface = createSurface(width, height);
-  paintLayoutNode(surface, translated);
-  return surface;
+  return layoutNodeToSurface(content);
 }
 
 function isSurfaceContent(value: Surface | LayoutNode): value is Surface {
   return typeof value === 'object' && value !== null && 'cells' in value;
-}
-
-function measureLayoutBounds(
-  node: LayoutNode,
-): { minX: number; minY: number; maxX: number; maxY: number } {
-  let minX = node.rect.x;
-  let minY = node.rect.y;
-  let maxX = node.rect.x + node.rect.width;
-  let maxY = node.rect.y + node.rect.height;
-
-  for (const child of node.children) {
-    const childBounds = measureLayoutBounds(child);
-    minX = Math.min(minX, childBounds.minX);
-    minY = Math.min(minY, childBounds.minY);
-    maxX = Math.max(maxX, childBounds.maxX);
-    maxY = Math.max(maxY, childBounds.maxY);
-  }
-
-  return { minX, minY, maxX, maxY };
-}
-
-function translateLayoutNode(node: LayoutNode, dx: number, dy: number): LayoutNode {
-  return {
-    ...node,
-    rect: {
-      x: node.rect.x + dx,
-      y: node.rect.y + dy,
-      width: node.rect.width,
-      height: node.rect.height,
-    },
-    children: node.children.map((child) => translateLayoutNode(child, dx, dy)),
-  };
 }
 
 /**

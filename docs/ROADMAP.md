@@ -2,9 +2,9 @@
 
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 
-Latest release: **v3.1.0** — Surface-First Confidence Release
+Latest published release: **v3.1.0** — Surface-First Confidence Release
 
-Next target: **v4.0.0** — Pure Surface Release
+Current release line in flight: **v4.0.0** — Pure Surface Release
 
 ---
 
@@ -44,7 +44,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log and completed branch w
 
 ---
 
-## Current target: v4.0.0 — Pure Surface Release
+## Current release line: v4.0.0 — Pure Surface Release
 
 Branch: `feat/v4-pure-v3-release`
 
