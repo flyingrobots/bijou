@@ -90,7 +90,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Animated spinner with phase transitions |
 | [`progress-animated`](./progress-animated/) | `createAnimatedProgressBar()`, `progressBar()` | Progress bar filling to completion |
 | [`progress-download`](./progress-download/) | `progressBar()`, `tick()` | Simulated multi-package download |
-| [`viewport`](./viewport/) | `viewport()`, `scrollBy()`, `pageDown()`, etc. | Scrollable content pager |
+| [`viewport`](./viewport/) | `viewportSurface()`, `createScrollStateForContent()`, `scrollBy()`, etc. | Masking viewport for overflow scrolling |
 | [`flex-layout`](./flex-layout/) | `flex()`, `vstack()`, `hstack()` | Responsive sidebar + main layout |
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |

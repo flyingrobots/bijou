@@ -1,6 +1,6 @@
-# `viewport()`, `scrollBy()`, `pageDown()`, etc.
+# `viewportSurface()`, `createScrollStateForContent()`, `scrollBy()`, etc.
 
-Scrollable content pager
+Viewport masking for overflow scrolling
 
 ![demo](demo.gif)
 
@@ -14,14 +14,15 @@ npx tsx examples/viewport/main.ts
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { kbd, separator } from '@flyingrobots/bijou';
+import { boxSurface, kbd, separatorSurface } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  viewport, createScrollState, scrollBy, pageDown, pageUp,
-  scrollToTop, scrollToBottom, vstack,
+  viewportSurface, createScrollStateForContent, scrollBy, pageDown, pageUp,
+  scrollToTop, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
+import { column, line } from '../_shared/example-surfaces.ts';
 
-initDefaultContext();
+const ctx = initDefaultContext();
 
 const CONTENT = `MIT License
 
@@ -68,15 +69,22 @@ Press q to quit.`;
 
 const VIEWPORT_HEIGHT = 15;
 const VIEWPORT_WIDTH = 72;
+const VIEWPORT_CONTENT = boxSurface(CONTENT, {
+  title: 'Viewport Mask',
+  width: VIEWPORT_WIDTH - 1,
+  ctx,
+});
 
 interface Model {
-  scroll: ReturnType<typeof createScrollState>;
+  scroll: ReturnType<typeof createScrollStateForContent>;
 }
 
 type Msg = { type: 'quit' };
 
 const app: App<Model, Msg> = {
-  init: () => [{ scroll: createScrollState(CONTENT, VIEWPORT_HEIGHT) }, []],
+  init: () => [{
+    scroll: createScrollStateForContent(VIEWPORT_CONTENT, VIEWPORT_HEIGHT, VIEWPORT_WIDTH - 1),
+  }, []],
 
   update: (msg, model) => {
     if (isKeyMsg(msg)) {
@@ -96,22 +104,31 @@ const app: App<Model, Msg> = {
   },
 
   view: (model) => {
-    const header = separator({ label: 'viewport', width: VIEWPORT_WIDTH });
-    const body = viewport({
+    const header = separatorSurface({ label: 'viewport mask', width: VIEWPORT_WIDTH, ctx });
+    const body = viewportSurface({
       width: VIEWPORT_WIDTH,
       height: VIEWPORT_HEIGHT,
-      content: CONTENT,
+      content: VIEWPORT_CONTENT,
       scrollY: model.scroll.y,
       showScrollbar: true,
     });
     const status = `  Line ${model.scroll.y + 1}/${model.scroll.totalLines}`;
     const help = `  ${kbd('j')}${kbd('k')} scroll  ${kbd('d')}${kbd('u')} page  ${kbd('g')}${kbd('G')} top/bottom  ${kbd('q')} quit`;
 
-    return vstack('', header, body, status, help, '');
+    return column([
+      line(''),
+      header,
+      body,
+      line(status, VIEWPORT_WIDTH),
+      line(help, VIEWPORT_WIDTH),
+      line(''),
+    ]);
   },
 };
 
 run(app);
 ```
+
+`viewportSurface()` is the canonical scroll mask in rich TUI composition. Wrap an existing `Surface` or `LayoutNode`, let the viewport clip and scroll it, and only use `viewport()` when you are explicitly lowering plain text.
 
 [← Examples](../README.md)

@@ -10,8 +10,10 @@ import {
   graphemeWidth,
   graphemeClusterWidth,
   parseAnsiToSurface,
+  paintLayoutNode,
   segmentGraphemes,
   clipToWidth as coreClipToWidth,
+  type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
 
@@ -41,9 +43,12 @@ export interface ViewportOptions {
  * Configuration for rendering a viewport directly into a Surface.
  */
 export interface ViewportSurfaceOptions extends Omit<ViewportOptions, 'content'> {
-  /** Full content payload, either plain/ANSI text or a pre-rendered surface. */
-  readonly content: string | Surface;
+  /** Full content payload, either plain/ANSI text, a pre-rendered surface, or a layout tree. */
+  readonly content: ViewportContent;
 }
+
+/** Content payload that can be masked by a viewport. */
+export type ViewportContent = string | Surface | LayoutNode;
 
 /**
  * Immutable snapshot of scroll position and bounds for a viewport.
@@ -368,9 +373,10 @@ export function viewport(options: ViewportOptions): string {
 /**
  * Render a scrollable viewport directly into a Surface.
  *
- * When the content is already a `Surface`, the viewport clips/blits it
- * directly without flattening through a string bridge. String content still
- * routes through {@link viewport} so the legacy text helper stays consistent.
+ * This is the canonical viewport primitive for rich TUI composition. It acts
+ * like a mask over text, an existing `Surface`, or a `LayoutNode` tree and
+ * reveals only the visible scroll window. String content still routes through
+ * {@link viewport} so the explicit text helper stays consistent.
  *
  * @param options - Viewport configuration including dimensions, content, and scroll offsets.
  * @returns Surface sized exactly to the requested viewport rectangle.
@@ -403,8 +409,10 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
     );
   }
 
+  const normalizedContent = normalizeViewportContent(content);
+
   const result = createSurface(safeWidth, safeHeight, { char: ' ', empty: false });
-  const totalLines = content.height;
+  const totalLines = normalizedContent.height;
   const maxScroll = Math.max(0, totalLines - safeHeight);
   const clampedY = Math.max(0, Math.min(scrollY, maxScroll));
 
@@ -412,7 +420,7 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
   const contentWidth = Math.max(0, needsScrollbar ? safeWidth - 1 : safeWidth);
 
   if (contentWidth > 0 && safeHeight > 0) {
-    result.blit(content, 0, 0, Math.max(0, scrollX), clampedY, contentWidth, safeHeight);
+    result.blit(normalizedContent, 0, 0, Math.max(0, scrollX), clampedY, contentWidth, safeHeight);
   }
 
   if (needsScrollbar && safeWidth > 0) {
@@ -424,6 +432,36 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
   }
 
   return result;
+}
+
+/**
+ * Create initial scroll state for any viewport-maskable content.
+ *
+ * Use this when the viewport is wrapping an existing `Surface` or `LayoutNode`
+ * instead of plain text. String content can still use `createScrollState()`,
+ * but this helper accepts all viewport content types.
+ */
+export function createScrollStateForContent(
+  content: ViewportContent,
+  viewportHeight: number,
+  viewportWidth?: number,
+): ScrollState {
+  if (typeof content === 'string') {
+    return createScrollState(content, viewportHeight, viewportWidth);
+  }
+
+  const normalized = normalizeViewportContent(content);
+  const visibleLines = Math.max(0, Math.floor(viewportHeight));
+  const safeWidth = viewportWidth == null ? undefined : Math.max(0, Math.floor(viewportWidth));
+
+  return {
+    y: 0,
+    maxY: Math.max(0, normalized.height - visibleLines),
+    x: 0,
+    maxX: safeWidth == null ? 0 : Math.max(0, normalized.width - safeWidth),
+    totalLines: normalized.height,
+    visibleLines,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -464,6 +502,32 @@ export function createScrollState(
     totalLines,
     visibleLines: viewportHeight,
   };
+}
+
+function normalizeViewportContent(content: Surface | LayoutNode): Surface {
+  if (isSurfaceContent(content)) return content;
+
+  const { width, height } = measureLayoutBounds(content);
+  const surface = createSurface(width, height);
+  paintLayoutNode(surface, content);
+  return surface;
+}
+
+function isSurfaceContent(value: Surface | LayoutNode): value is Surface {
+  return typeof value === 'object' && value !== null && 'cells' in value;
+}
+
+function measureLayoutBounds(node: LayoutNode): { width: number; height: number } {
+  let width = Math.max(0, node.rect.x + node.rect.width);
+  let height = Math.max(0, node.rect.y + node.rect.height);
+
+  for (const child of node.children) {
+    const childBounds = measureLayoutBounds(child);
+    width = Math.max(width, childBounds.width);
+    height = Math.max(height, childBounds.height);
+  }
+
+  return { width, height };
 }
 
 /**

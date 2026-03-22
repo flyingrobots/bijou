@@ -245,17 +245,21 @@ Children can be **render functions** `(width, height) => string` — they receiv
 ### Viewport
 
 ```typescript
-import { viewport, createScrollState, scrollBy, pageDown } from '@flyingrobots/bijou-tui';
+import { viewportSurface, createScrollStateForContent, scrollBy, pageDown } from '@flyingrobots/bijou-tui';
+import { boxSurface } from '@flyingrobots/bijou';
 
-let scroll = createScrollState(content, viewportHeight);
+const content = boxSurface(longText, { width: 72 });
+let scroll = createScrollStateForContent(content, viewportHeight);
 
-// Render visible window with scrollbar
-const view = viewport({ width: 60, height: 20, content, scrollY: scroll.y });
+// Mask the content to a visible window with scrollbar
+const view = viewportSurface({ width: 60, height: 20, content, scrollY: scroll.y });
 
 // Handle scroll keys
 scroll = scrollBy(scroll, 1);   // down one line
 scroll = pageDown(scroll);       // down one page
 ```
+
+Treat `viewportSurface()` as the canonical scroll mask for rich TUI composition. Keep `viewport()` for explicit text-lowering paths.
 
 ### Basic Layout
 

@@ -210,12 +210,15 @@ Keep `vstack()` / `hstack()` / `place()` for explicit text composition or delibe
 
 ```typescript
 import {
-  viewport, createScrollState, scrollBy, scrollTo,
+  viewportSurface, createScrollStateForContent, scrollBy, scrollTo,
   pageDown, pageUp, scrollToTop, scrollToBottom,
 } from '@flyingrobots/bijou-tui';
+import { boxSurface } from '@flyingrobots/bijou';
+
+const content = boxSurface(longText, { width: 72 });
 
 // Initialize scroll state
-let scroll = createScrollState(content, viewportHeight);
+let scroll = createScrollStateForContent(content, viewportHeight);
 
 // In update — handle scroll keys
 if (msg.type === 'key') {
@@ -230,10 +233,10 @@ if (msg.type === 'key') {
 }
 
 // In view
-viewport({ width: 60, height: 20, content, scrollY: scroll.y });
+viewportSurface({ width: 60, height: 20, content, scrollY: scroll.y });
 ```
 
-The viewport renders a proportional scrollbar in the right gutter. Set `showScrollbar: false` to hide it.
+Treat `viewportSurface()` as the base masking primitive for bounded overflow scrolling. The viewport renders a proportional scrollbar in the right gutter. Set `showScrollbar: false` to hide it. Keep `viewport()` for explicit text-lowering paths.
 
 ## Animation
 

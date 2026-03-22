@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { createSurface } from '@flyingrobots/bijou';
+import { createSurface, type LayoutNode } from '@flyingrobots/bijou';
 import {
   viewport,
   viewportSurface,
   createScrollState,
+  createScrollStateForContent,
   scrollBy,
   scrollTo,
   scrollToTop,
@@ -188,6 +189,27 @@ describe('viewportSurface', () => {
     expect(surfaceLines(result)).toEqual([' C', '  ']);
     expect(result.get(1, 0)).toMatchObject({ char: 'C', fg: '#00ff00' });
   });
+
+  it('accepts layout-node content and masks the painted result', () => {
+    const nodeSurface = createSurface(5, 4, { char: '.', empty: false });
+    nodeSurface.set(2, 3, { char: 'Z', fg: '#ff00ff', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 0, y: 0, width: 5, height: 4 },
+      children: [],
+      surface: nodeSurface,
+    };
+
+    const result = viewportSurface({
+      width: 3,
+      height: 2,
+      content: layout,
+      scrollY: 2,
+      showScrollbar: false,
+    });
+
+    expect(surfaceLines(result)).toEqual(['...', '..Z']);
+    expect(result.get(2, 1)).toMatchObject({ char: 'Z', fg: '#ff00ff' });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -207,6 +229,36 @@ describe('createScrollState', () => {
   it('sets maxY to 0 when content fits', () => {
     const state = createScrollState('a\nb', 5);
     expect(state.maxY).toBe(0);
+  });
+});
+
+describe('createScrollStateForContent', () => {
+  it('derives bounds from structured surface content', () => {
+    const content = createSurface(10, 8);
+    const state = createScrollStateForContent(content, 3, 4);
+    expect(state.y).toBe(0);
+    expect(state.maxY).toBe(5);
+    expect(state.maxX).toBe(6);
+    expect(state.totalLines).toBe(8);
+  });
+
+  it('derives bounds from layout-node content', () => {
+    const childSurface = createSurface(6, 1, { char: 'x', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 0, y: 0, width: 2, height: 2 },
+      children: [
+        {
+          rect: { x: 0, y: 4, width: 6, height: 1 },
+          children: [],
+          surface: childSurface,
+        },
+      ],
+    };
+
+    const state = createScrollStateForContent(layout, 2, 4);
+    expect(state.maxY).toBe(3);
+    expect(state.maxX).toBe(2);
+    expect(state.totalLines).toBe(5);
   });
 });
 

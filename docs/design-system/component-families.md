@@ -593,14 +593,17 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - timeline has a close analogue; DAG does not and should be treated as a specialized Bijou family
 
-### Scrollable inspection panes
+### Viewport masking and scrollable inspection panes
 
 - Family:
+  - `viewport()`
+  - `viewportSurface()`
   - `pager()`
   - `pagerSurface()`
   - `focusArea()`
   - `focusAreaSurface()`
 - Variants:
+  - pure scroll mask
   - linear pager
   - focused pane with gutter
   - text-lowering path
@@ -612,10 +615,13 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Ownership:
   - TUI
 - Content guidance:
+  - use `viewportSurface()` as the base masking primitive when any existing `Surface` or layout-backed region simply needs bounded overflow scrolling
+  - keep `viewport()` as the explicit text-lowering path for string-first output, not the default teaching path for rich TUI composition
   - use `pager()` / `pagerSurface()` for long linear text where the status line and current line position matter
   - use `focusArea()` / `focusAreaSurface()` when the pane participates in a larger workspace and needs explicit focus ownership
   - prefer the surface-native path when the pane body is already composed from `Surface` content; keep the string path as explicit lowering, not the default teaching path
   - gutter chrome should communicate focus and workspace ownership, not carry primary content meaning
+  - components still carrying bespoke scroll-window logic and should converge on viewport semantics are `browsableList()`, `navigableTable()`, `filePicker()`, and `commandPalette()`
 - Graceful lowering:
   - rich: scrollable pane with honest status/focus chrome and bounded viewport behavior
   - static: visible excerpt or current window with enough status context to explain where the user is
@@ -623,6 +629,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - accessible: linearize the pane content while preserving scroll position or focus context explicitly
 - Related families:
   - `viewport()`
+  - `viewportSurface()`
   - `dagPane()`
   - `createFramedApp()`
   - `browsableList()`

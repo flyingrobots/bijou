@@ -198,6 +198,39 @@ Use when:
 - descriptions matter
 - the user is exploring or choosing among records
 
+## 3.5 Viewport masking and scroll ownership
+
+### Governing rules
+
+- `viewportSurface()` is the canonical masking primitive for bounded overflow scrolling in rich TUI composition.
+- `viewport()` is the explicit text-lowering path when the content is intentionally string-first.
+- `pagerSurface()` and `focusAreaSurface()` are specialization layers on top of the viewport primitive, not separate scroll systems.
+- If a component only needs a clipped window plus scroll state, it should wrap viewport semantics rather than invent a bespoke `scrollY` slicer.
+
+### `viewportSurface()`
+
+Use when:
+
+- an existing `Surface` or layout-backed region just needs a scrollable mask
+- the app already owns the surrounding chrome and only needs honest overflow scrolling
+- the component should stay on the structured `Surface` path
+
+Avoid when:
+
+- the content is intentionally string-first and the text-lowering path is the actual destination
+- the component needs domain-specific focus chrome or status semantics that belong in a higher-level wrapper
+
+### `pagerSurface()` / `focusAreaSurface()`
+
+Use when:
+
+- the scrollable region needs explicit line status, current-position framing, or focus gutter semantics
+- the pane is part of a larger workspace that needs visible ownership/focus signals
+
+Avoid when:
+
+- a plain masked region is enough and extra chrome would distract from the task
+
 ### `tree()`
 
 Use when:

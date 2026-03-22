@@ -255,12 +255,14 @@ export {
 
 // Viewport — scrollable content pane
 export {
+  type ViewportContent,
   type ViewportOptions,
   type ViewportSurfaceOptions,
   type ScrollState,
   viewport,
   viewportSurface,
   createScrollState,
+  createScrollStateForContent,
   scrollBy,
   scrollTo,
   scrollToTop,
