@@ -46,6 +46,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Runtime helper example cleanup** — the `chat`, `mouse`, `print-key`, and `composable` demos no longer teach badge-string bridges in their runtime views; event inspectors now compose modifier pills as surfaces, while string-first layout demos use plain semantic labels instead of reparsing badge output.
 - **Shared showcase and canary bridge cleanup** — the canonical workbench, showcase detail views, transitions demo, and core static canary now avoid badge-string bridge residue where the badge component was not the thing being demonstrated, leaving the remaining bridges concentrated in actual badge-focused previews and a few string-first layout demos.
 - **Overlay and shell docs pass** — the design-system guides, `@flyingrobots/bijou-tui` docs, examples index, and overlay/shell example READMEs now agree on the overlay escalation ladder, shell role split, and current surface-native APIs, and the missing `drawer`, `tooltip`, and `app-frame` example docs are now first-class pages instead of gaps.
+- **Selection and status docs pass** — the design-system patterns, component-family docs, core/package guides, and the `select`, `filter`, `multiselect`, `confirm`, `command-palette`, `alert`, and `notifications` example docs now more clearly distinguish value-picking prompts from action discovery and sharpen the status-escalation ladder around `note()`, `alert()`, `toast()`, and notifications.
 
 ### 🐛 Fixes
 

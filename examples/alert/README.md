@@ -18,8 +18,15 @@ npx tsx examples/alert/main.ts
 ## Choose something else when
 
 - choose `badge()` for compact inline status
+- choose `note()` for explanatory, non-urgent supporting text
 - choose `toast()` for a single transient overlay
 - choose `notifications` for stacking, actions, routing, or history
+
+## What this example proves
+
+- `alert()` as an in-flow status block
+- severity-oriented variants that stay with surrounding content
+- a status surface that is durable enough to read while the user keeps working nearby
 
 ## Code
 

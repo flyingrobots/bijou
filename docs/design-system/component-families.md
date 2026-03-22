@@ -282,9 +282,11 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the result is stored value state
 - Avoid when:
   - selecting should trigger an app command rather than persist a value
+  - the option set is large enough that search, ranking, or narrowing is the real task
 - Content guidance:
   - option labels should be distinct, parallel, and easy to scan
   - searchable choice should use concise matching text, not long descriptive paragraphs
+  - if search is the real job, prefer `filter()` semantics over stuffing too many options into plain `select()`
 - Ownership:
   - core
 - Graceful lowering:
@@ -308,6 +310,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the user is building a set
 - Avoid when:
   - the choice is singular or immediate action-oriented
+  - the user is really firing commands rather than collecting lasting state
 - Content guidance:
   - options should read like members of one set, not unrelated commands
   - summary text should make selection state obvious without requiring visual checkboxes
@@ -334,6 +337,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the decision is genuinely binary
 - Avoid when:
   - nuance, comparison, or explanation is needed
+  - the prompt is really a multi-option choice disguised as yes/no
 - Content guidance:
   - questions should be explicit about the consequence of yes versus no
   - destructive confirmations should name the thing being changed or removed
@@ -755,7 +759,8 @@ If those checks fail, the component work is not doctrinally complete yet.
   - use `statusBarSurface()` when shell chrome already lives on the structured `Surface` path; keep `statusBar()` for explicit text output or lowering
   - use `commandPaletteSurface()` when the palette lives inside a rich TUI shell or overlay and should share viewport masking semantics with other panes; keep `commandPalette()` for explicit text output or lowering
   - status lines should carry concise global context, not replace in-page guidance
-  - command palette entries should prefer actions and navigation targets over field-style data entry
+  - command palette entries should prefer actions, navigation targets, and recent destinations over field-style data entry
+  - group palette items by user intent when possible, and avoid turning the palette into a browseable record list
   - tabs should represent peer destinations or work areas, not disguised command buttons
   - use notifications for events and follow-up, not the status rail
   - use help hints for shortcut discovery and shell scope, not for action execution or event messaging

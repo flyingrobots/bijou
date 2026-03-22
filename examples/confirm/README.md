@@ -1,6 +1,6 @@
 # `confirm()`
 
-Yes/no confirmation prompt
+Binary confirmation prompt for decisions that are honestly yes-or-no.
 
 ![demo](demo.gif)
 
@@ -10,26 +10,22 @@ Yes/no confirmation prompt
 npx tsx examples/confirm/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { confirm, badge } from '@flyingrobots/bijou';
+- the decision is genuinely binary
+- the consequence of yes versus no is clear
+- the user does not need to compare multiple options or inspect long supporting detail
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-async function main() {
-  const deploy = await confirm({ title: 'Deploy to production?', defaultValue: false, ctx });
-  console.log();
+- choose `modal()` when the decision belongs inside a rich TUI shell with blocked background interaction
+- choose `select()` when there are multiple real options
+- choose `alert()` or page content when the user needs more explanation before deciding
 
-  if (deploy) {
-    console.log(badge('YES', { variant: 'success', ctx }), ' Deploying now...');
-  } else {
-    console.log(badge('NO', { variant: 'muted', ctx }), ' Deploy cancelled.');
-  }
-}
+## What this example proves
 
-main().catch(console.error);
-```
+- `confirm()` as the honest yes/no prompt
+- explicit default-state behavior
+- graceful lowering from interactive confirmation to textual yes/no flow
 
 [← Examples](../README.md)

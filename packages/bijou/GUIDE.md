@@ -26,6 +26,14 @@ Every component returns a string. Print it however you like — `console.log`, `
 - Use `alert()` when the message should stay in document flow.
 - Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
 
+### Choosing prompts versus commands
+
+- Use `select()` for one stored value from a short, stable list.
+- Use `filter()` when one stored value is still the result, but search is the main task.
+- Use `multiselect()` when the user is building a lasting set.
+- Use `confirm()` only when the real question is yes/no.
+- If the outcome is “run this command” or “go to this destination,” move up to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` instead of making a prompt pretend to be an action launcher.
+
 ### Layout
 
 ```typescript

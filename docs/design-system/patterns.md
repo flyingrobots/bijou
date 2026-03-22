@@ -125,12 +125,22 @@ Use when:
 - the set is short and stable
 - the result becomes stored state
 
+Avoid when:
+
+- the list is large enough that search is the real task
+- the outcome should trigger an immediate app command instead of persisting a value
+
 ### `multiselect()`
 
 Use when:
 
 - the user is building a set
 - multiple simultaneous selections are meaningful
+
+Avoid when:
+
+- the user should choose exactly one option
+- the user is really firing commands one at a time instead of building a lasting set
 
 ### `filter()`
 
@@ -139,12 +149,24 @@ Use when:
 - the user is choosing one value from a larger set
 - search/narrowing is the main task
 
+Avoid when:
+
+- the option set is already short and stable enough for `select()`
+- the result is a command or navigation action rather than stored value state
+
 ### `commandPalette()` / `commandPaletteSurface()`
 
 Use when:
 
 - the result is an action, navigation, or command
 - the app wants one global action-discovery surface
+- the user may benefit from mixed command groups such as actions, navigation, or recent destinations
+
+Content guidance:
+
+- palette entries should read like things the app can do, not field values the app stores
+- group commands by user intent (`Navigation`, `Actions`, `Recent`) instead of raw subsystem names when possible
+- keep descriptions short enough to scan without turning the palette into a browseable document
 
 Avoid `commandPalette()` / `commandPaletteSurface()` when:
 

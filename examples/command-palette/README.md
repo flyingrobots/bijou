@@ -1,6 +1,6 @@
 # `commandPaletteSurface()`
 
-Filterable action list with a fixed search row and viewport-backed results
+Filterable action-discovery surface with a fixed search row and viewport-backed results.
 
 ## Run
 
@@ -8,97 +8,23 @@ Filterable action list with a fixed search row and viewport-backed results
 npx tsx examples/command-palette/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { separator } from '@flyingrobots/bijou';
-import {
-  run, quit, type App, type KeyMsg,
-  createCommandPaletteState, commandPaletteSurface,
-  cpFilter, cpFocusNext, cpFocusPrev, cpPageDown, cpPageUp,
-  commandPaletteKeyMap, helpShortSurface, vstackSurface,
-  type CommandPaletteItem,
-} from '@flyingrobots/bijou-tui';
-import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
+- the result is an action, navigation target, or command
+- the app needs one global action-discovery surface
+- grouped command search is more honest than a one-off prompt
 
-const ctx = initDefaultContext();
+## Choose something else when
 
-const items: CommandPaletteItem[] = [
-  { id: 'box', label: 'box()', description: 'Bordered containers', category: 'Display' },
-  { id: 'table', label: 'table()', description: 'Auto-spacing data grids', category: 'Display' },
-  { id: 'spinner', label: 'spinner()', description: 'Loading indicator', category: 'Feedback' },
-];
+- choose `select()` or `filter()` when the result should become stored form state
+- choose `browsableListSurface()` when the content is really a record list instead of an action list
+- choose `filePickerSurface()` when path traversal is the mental model
 
-type Msg =
-  | KeyMsg
-  | { type: 'next' }
-  | { type: 'prev' }
-  | { type: 'page-down' }
-  | { type: 'page-up' }
-  | { type: 'select' }
-  | { type: 'close' };
+## What this example proves
 
-const keys = commandPaletteKeyMap<Msg>({
-  focusNext: { type: 'next' },
-  focusPrev: { type: 'prev' },
-  pageDown: { type: 'page-down' },
-  pageUp: { type: 'page-up' },
-  select: { type: 'select' },
-  close: { type: 'close' },
-});
-
-interface Model {
-  cp: ReturnType<typeof createCommandPaletteState>;
-}
-
-const app: App<Model, Msg> = {
-  init: () => [{ cp: createCommandPaletteState(items, 8) }, []],
-
-  update: (msg, model) => {
-    if (msg.type === 'key') {
-      const action = keys.handle(msg);
-      if (action) {
-        switch (action.type) {
-          case 'close': return [model, [quit()]];
-          case 'select': return [model, [quit()]];
-          case 'next': return [{ ...model, cp: cpFocusNext(model.cp) }, []];
-          case 'prev': return [{ ...model, cp: cpFocusPrev(model.cp) }, []];
-          case 'page-down': return [{ ...model, cp: cpPageDown(model.cp) }, []];
-          case 'page-up': return [{ ...model, cp: cpPageUp(model.cp) }, []];
-        }
-      }
-
-      if (msg.key.length === 1 && !msg.ctrl && !msg.alt) {
-        return [{ ...model, cp: cpFilter(model.cp, model.cp.query + msg.key) }, []];
-      }
-
-      if (msg.key === 'backspace') {
-        return [{ ...model, cp: cpFilter(model.cp, model.cp.query.slice(0, -1)) }, []];
-      }
-    }
-
-    return [model, []];
-  },
-
-  view: (model) => {
-    const width = Math.min(60, Math.max(24, ctx.runtime.columns));
-    const header = contentSurface(separator({ label: 'command palette', width, ctx }));
-    const body = commandPaletteSurface(model.cp, { width, ctx });
-    const help = helpShortSurface(keys, { width });
-
-    return vstackSurface(
-      spacer(width, 1),
-      header,
-      spacer(width, 1),
-      body,
-      spacer(width, 1),
-      help,
-    );
-  },
-};
-
-run(app);
-```
+- `commandPaletteSurface()` on the structured shell path
+- `commandPaletteKeyMap()` plus focus, paging, and query filtering
+- fixed search row with viewport-backed result masking
+- action discovery that stays distinct from value-picking prompts
 
 [← Examples](../README.md)

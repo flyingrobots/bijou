@@ -137,6 +137,8 @@ In non-interactive modes, there is no normal interactive event loop.
 - Use core `table()` or `tableSurface()` for passive comparison.
 - Use `navigableTable()` when row/cell focus and keyboard traversal are the real job.
 - Use `browsableList()` when the content is one-dimensional and description-led rather than grid-oriented.
+- Use `commandPaletteSurface()` when the outcome is an action or navigation target, not a stored form value.
+- If users are really choosing persisted values, keep that work in core `select()` / `filter()` / `multiselect()` instead of turning the palette into a value picker.
 
 ### Shell and workspace layout
 

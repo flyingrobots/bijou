@@ -73,6 +73,14 @@ Those docs answer the questions the API reference cannot:
 - Use `alert()` when the message should persist inside the page or document flow.
 - Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
 
+### Selection and prompts
+
+- Use `select()` when the user is choosing one stored value from a short, stable set.
+- Use `filter()` when the user is still choosing one stored value, but search and narrowing are the real job.
+- Use `multiselect()` when the user is building a lasting set, not firing one-off commands.
+- Use `confirm()` only when the decision is genuinely binary.
+- Move to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` when the outcome is an action or navigation command instead of stored form state.
+
 ### Tables and inspection
 
 - Use `table()` when row/column comparison is the main job and string output is still the right endpoint.

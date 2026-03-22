@@ -785,6 +785,8 @@ Shell doctrine:
 - split panes should express comparison, inspection, or supplemental context, not arbitrary screen filling
 - if a second region does not materially help the task, keep the app in a simpler single-surface flow
 
+If palette entries start looking like stored field values, move that interaction back to core `select()` / `filter()` / `multiselect()` instead of overloading the shell palette.
+
 ## Pager
 
 Use `pagerSurface()` for long linear text that should stay on the structured `Surface` path while still showing pager status and scroll position.
