@@ -51,6 +51,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Frame-modal mouse shielding** — `createFramedApp()` now consumes all mouse input while frame help or the command palette is open, so wheel, move, and non-left-click events can no longer leak through to the hidden page beneath an exclusive frame overlay.
+- **Wide-glyph overlay sizing** — the surface-native overlay path and the core ANSI/plain string-to-surface bridges now preserve double-width graphemes as two terminal columns, so modal, toast, drawer, and tooltip boxes stay correctly sized and centered for CJK and emoji content.
 - **Viewport layout masking now re-roots local layout content** — `viewportSurface()` and `createScrollStateForContent()` now normalize non-zero-origin `LayoutNode` inputs before measuring and painting, so scroll masks treat structured content as local viewport content instead of preserving upstream absolute offsets as blank padding.
 - **Runtime layout views now re-root local content too** — `normalizeViewOutput()`, the interactive runtime pipeline, and framed pane surface normalization now localize non-zero-origin `LayoutNode` roots before painting, so top-level runtime views and pane renderers no longer inherit stray absolute offsets from upstream layout trees.
 - **Frame-managed runtime notifications now document dismiss-only mouse semantics** — the frame shell no longer carries a misleading dead mouse-action branch for runtime notifications, and the app-frame regressions now lock the actual contract: runtime notifications expose dismiss/body hits only and dismiss clicks enter the exit phase through the shell-managed tick loop.
