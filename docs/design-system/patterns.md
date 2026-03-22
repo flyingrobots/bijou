@@ -126,6 +126,30 @@ Avoid when:
 - the loading state is long-lived enough that explicit progress or retry messaging would be more honest
 - the placeholder would imply certainty the app does not actually have yet
 
+#### `progressBar()` / `createAnimatedProgressBar()`
+
+Use when:
+
+- percent-complete is actually known or can be estimated honestly
+- the user benefits from determinate progress instead of generic activity
+
+Avoid when:
+
+- completion is unknown and the percentage would be fake
+- the work is so brief that the bar would only flicker
+
+#### `spinnerFrame()` / `createSpinner()`
+
+Use when:
+
+- the task is active but indeterminate
+- the user needs reassurance that work is still happening
+
+Avoid when:
+
+- completion can be expressed honestly as a determinate bar
+- animation would distract more than it reassures
+
 ## 2. Selection versus action
 
 This is one of the easiest places for a component library to become fuzzy.
@@ -322,6 +346,18 @@ Avoid when:
 - trust depends on seeing the actual destination, but the surrounding content hides it
 - the interaction is really an app-owned action instead of an external destination
 
+### `kbd()`
+
+Use when:
+
+- a local action needs an inline shortcut cue
+- the key hint belongs right next to the control, field, or instruction it affects
+
+Avoid when:
+
+- the user needs a grouped command reference or shell-level keymap
+- shortcut chips would start competing with the real content for attention
+
 ### `pagerSurface()` / `focusAreaSurface()`
 
 Use when:
@@ -395,6 +431,20 @@ Avoid when:
 - ordinary workspace chrome, navigation, status, or instructions need to stay neutral and legible
 - the emphasis would compete with the actual task
 - the color treatment is being asked to carry meaning that should live in text
+
+## 5. App-authored primitives
+
+### `renderByMode()`
+
+Use when:
+
+- the app needs a domain-specific primitive that the shared component library should not own
+- the same semantic concept must lower honestly across rich, pipe, and accessible output
+
+Avoid when:
+
+- a shipped Bijou family already matches the job
+- the branching only exists to chase visual novelty instead of preserving meaning
 
 ## 4. Disclosure and progressive complexity
 

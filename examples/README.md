@@ -33,8 +33,10 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 - Use [`note`](./note/) for explanatory, non-urgent support inside a flow.
 - Use [`alert`](./alert/) for in-flow status that should remain part of the page.
 - Use [`skeleton`](./skeleton/) only for short-lived known-shape loading states; prefer honest partial content once it exists.
+- Use [`kbd`](./kbd/) for local inline shortcut cues; use shell help examples when the user needs a broader keybinding reference.
 - Use [`toast`](./toast/) for a single low-level transient overlay you are composing directly.
 - Use [`notifications`](./notifications/) when the app needs stacking, actions, placement control, routing, or history.
+- Use [`progress-static`](./progress-static/) when completion is determinate; use [`spinner`](./spinner/) when activity is real but percent-complete is not.
 - Use [`table`](./table/) for passive row/column comparison.
 - Use [`navigable-table`](./navigable-table/) when the table itself becomes a keyboard-owned inspection surface.
 - Use [`gradient-text`](./gradient-text/) and [`logo`](./logo/) for deliberate expressive moments, not routine application chrome.
@@ -53,20 +55,20 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`alert`](./alert/) | `alert()` | In-flow status block that persists in page content |
 | [`separator`](./separator/) | `separator()` | Horizontal dividers with labels |
 | [`skeleton`](./skeleton/) | `skeleton()` | Short-lived known-shape loading placeholders |
-| [`kbd`](./kbd/) | `kbd()` | Keyboard shortcut display |
+| [`kbd`](./kbd/) | `kbd()` | Local inline shortcut cues |
 | [`breadcrumb`](./breadcrumb/) | `breadcrumb()` | Navigation breadcrumb trails |
 | [`stepper`](./stepper/) | `stepper()` | Step progress indicators |
 | [`timeline`](./timeline/) | `timeline()` | Event timelines with status |
 | [`paginator`](./paginator/) | `paginator()` | Page indicators (dots and text) |
 | [`gradient-text`](./gradient-text/) | `gradientText()` | Expressive gradient emphasis for splash and docs |
-| [`progress-static`](./progress-static/) | `progressBar()` | Static progress bars at various states |
+| [`progress-static`](./progress-static/) | `progressBar()` | Determinate progress bars at fixed states |
 | [`dag`](./dag/) | `dag()` | Passive dependency and causal-flow graph |
 | [`dag-fragment`](./dag-fragment/) | `dagSlice()` + `dag()` | Focused DAG slices for local dependency review |
 | [`dag-stats`](./dag-stats/) | `dagStats()` | Graph health and structural metrics |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
 | [`markdown`](./markdown/) | `markdown()` | Bounded structured prose with mode-aware lowering |
 | [`logo`](./logo/) | `loadRandomLogo()` | ASCII brand treatment for splash and docs moments |
-| [`custom-component`](./custom-component/) | `renderByMode()` | Custom mode-aware themed components |
+| [`custom-component`](./custom-component/) | `renderByMode()` | App-authored mode-aware primitive example |
 | [`hyperlink`](./hyperlink/) | `hyperlink()` | Trusted terminal links with explicit fallback behavior |
 | [`log`](./log/) | `log()` | Leveled styled output (debug through fatal) |
 | [`pipe`](./pipe/) | Output modes, all components | Same components in interactive/pipe/accessible mode |
@@ -91,9 +93,9 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | Example | Component | Description |
 |---------|-----------|-------------|
 | [`counter`](./counter/) | `run()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
-| [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Animated spinner with phase transitions |
-| [`progress-animated`](./progress-animated/) | `createAnimatedProgressBar()`, `progressBar()` | Progress bar filling to completion |
-| [`progress-download`](./progress-download/) | `progressBar()`, `tick()` | Simulated multi-package download |
+| [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Indeterminate activity with phase transitions |
+| [`progress-animated`](./progress-animated/) | `progressBar()`, `tick()` | TEA-driven animated determinate progress |
+| [`progress-download`](./progress-download/) | `progressBar()`, `spinnerFrame()`, `tick()` | Mixed determinate and indeterminate download feedback |
 | [`viewport`](./viewport/) | `viewportSurface()`, `createScrollStateForContent()`, `scrollBy()`, etc. | Masking viewport for overflow scrolling |
 | [`flex-layout`](./flex-layout/) | `flex()`, `vstack()`, `hstack()` | Responsive sidebar + main layout |
 | [`spring`](./spring/) | `animate()`, `springStep()`, `SPRING_PRESETS` | Spring physics comparison (4 presets) |

@@ -79,9 +79,11 @@ Use `box()` when a region needs visible containment. Use `headerBox()` when the 
 
 ### Loading, links, & expressive output
 
-Use `skeleton()` only for short-lived loading states where the content shape is already known. Use `hyperlink()` when the destination should stay explicit and trustworthy in terminal output. Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+Use `skeleton()` only for short-lived loading states where the content shape is already known. Use `hyperlink()` when the destination should stay explicit and trustworthy in terminal output. Use `kbd()` for inline shortcut cues, not full shell keybinding references. Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
 
 ### Progress & Spinners
+
+Use `progressBar()` when percent-complete is actually known. Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
 
 ```typescript
 // Static progress bar frame
@@ -100,6 +102,10 @@ bar.update(50);
 bar.update(100);
 bar.stop('Complete!');
 ```
+
+### App-authored primitives
+
+Use `renderByMode()` when you need an app-specific primitive that should preserve the same meaning across rich, pipe, and accessible modes.
 
 ### Forms
 

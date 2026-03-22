@@ -1,6 +1,6 @@
-# `progressBar()`
+# `progressBar()` + `spinnerFrame()`
 
-Simulated multi-package download
+Mixed determinate and indeterminate progress for multi-item work.
 
 ![demo](demo.gif)
 
@@ -10,111 +10,22 @@ Simulated multi-package download
 npx tsx examples/progress-download/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { progressBar, badge, separator, spinnerFrame } from '@flyingrobots/bijou';
-import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+- some parts of the workload can report real percentage progress while others are only “in progress”
+- the user needs both per-item and overall progress feedback
+- a richer operational view is more honest than one global spinner or one global percentage
 
-initDefaultContext();
+## Choose something else when
 
-interface Download {
-  name: string;
-  size: string;
-  progress: number;
-  speed: number;      // percent per tick
-  done: boolean;
-}
+- choose a single `progressBar()` when the work is one determinate stream
+- choose a single spinner when all you can say is that work is active
+- avoid over-instrumenting small tasks with multiple indicators that add more noise than clarity
 
-interface Model {
-  downloads: Download[];
-  frame: number;
-}
+## What this example proves
 
-type Msg = { type: 'tick' } | { type: 'quit' };
-
-const PACKAGES: Omit<Download, 'progress' | 'done'>[] = [
-  { name: 'typescript', size: '42.1 MB', speed: 1.8 },
-  { name: 'vitest', size: '12.3 MB', speed: 3.2 },
-  { name: '@types/node', size: '3.8 MB', speed: 4.5 },
-  { name: 'chalk', size: '41 KB', speed: 8.0 },
-];
-
-const app: App<Model, Msg> = {
-  init: () => [
-    {
-      downloads: PACKAGES.map(p => ({ ...p, progress: 0, done: false })),
-      frame: 0,
-    },
-    [tick(60, { type: 'tick' })],
-  ],
-
-  update: (msg, model) => {
-    if (isKeyMsg(msg)) {
-      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
-    }
-
-    if ('type' in msg && msg.type === 'quit') {
-      return [model, [quit()]];
-    }
-
-    if ('type' in msg && msg.type === 'tick') {
-      const downloads = model.downloads.map(d => {
-        if (d.done) return d;
-        const progress = Math.min(d.progress + d.speed + Math.random() * 1.5, 100);
-        return { ...d, progress, done: progress >= 100 };
-      });
-
-      const allDone = downloads.every(d => d.done);
-      const frame = model.frame + 1;
-
-      if (allDone) {
-        return [{ downloads, frame }, [tick(1500, { type: 'quit' })]];
-      }
-
-      return [{ downloads, frame }, [tick(60, { type: 'tick' })]];
-    }
-
-    return [model, []];
-  },
-
-  view: (model) => {
-    const allDone = model.downloads.every(d => d.done);
-
-    const lines: string[] = ['', '  Installing packages...', ''];
-
-    for (const d of model.downloads) {
-      const name = d.name.padEnd(16);
-      const size = d.size.padStart(8);
-
-      if (d.done) {
-        lines.push(`  ${badge('DONE', { variant: 'success' })} ${name} ${size}`);
-      } else {
-        const spinner = spinnerFrame(model.frame, { label: '' });
-        lines.push(`  ${spinner} ${name} ${size}`);
-        lines.push(`    ${progressBar(Math.round(d.progress), { width: 40, showPercent: true })}`);
-      }
-    }
-
-    lines.push('');
-
-    // Overall progress
-    const totalProgress = model.downloads.reduce((sum, d) => sum + d.progress, 0) / model.downloads.length;
-    lines.push(separator({ label: 'total', width: 58 }));
-    lines.push(`  ${progressBar(Math.round(totalProgress), { width: 50, showPercent: true })}`);
-
-    if (allDone) {
-      lines.push('');
-      lines.push(`  ${badge('SUCCESS', { variant: 'success' })} All packages installed.`);
-    }
-
-    lines.push('');
-    return lines.join('\n');
-  },
-};
-
-run(app);
-```
+- per-item indeterminate activity and determinate per-item bars
+- an aggregated overall progress bar
+- mixing spinners and progress bars honestly instead of forcing one model onto every subtask
 
 [← Examples](../README.md)

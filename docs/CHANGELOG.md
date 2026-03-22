@@ -72,6 +72,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Wayfinding, note, and shader docs depth pass** — the design-system guides, package docs, examples index, and example READMEs now add first-class `note()` coverage, sharper `breadcrumb()` / `paginator()` / `stepper()` scenario guidance, and clearer doctrine for `canvas()`, shader effects, and animated timeline usage.
 - **Containment, markdown, and DAG docs depth pass** — the design-system guides, package docs, and example pages now add a first-class `markdown()` family entry, deeper `box()` / `headerBox()` scenario guidance, and sharper rules for when to use passive DAGs, sliced DAGs, DAG metrics, or `dagPane()` inspection.
 - **Loading, link, and expressive-brand docs depth pass** — the design-system guides, package docs, examples index, and example pages now add first-class `skeleton()`, `hyperlink()`, `loadRandomLogo()`, and `gradientText()` guidance, including loading honesty, trusted-link fallback behavior, and boundaries for expressive branding versus routine application chrome.
+- **Shortcut, progress, and custom-primitive docs depth pass** — the design-system guides, package docs, examples index, and example pages now add first-class `kbd()`, `progressBar()` / `spinnerFrame()`, and `renderByMode()` guidance, including inline-versus-shell shortcut rules, determinate-versus-indeterminate progress choices, and honest app-authored mode-aware primitives.
 
 ## [3.1.0] - 2026-03-18
 

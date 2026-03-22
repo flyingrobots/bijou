@@ -213,6 +213,71 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - skeleton state
 
+### Inline shortcut cues
+
+- Family: `kbd()`
+- Variants:
+  - single key, chord, and adjacent grouped key cues
+- Use when:
+  - a local action or instruction needs an inline shortcut hint
+  - the shortcut belongs next to the thing it affects
+- Avoid when:
+  - the user needs a broader command reference or grouped shortcut map
+  - the chip would become the primary content instead of a supporting cue
+- Content guidance:
+  - show only the keys the user actually needs at that moment
+  - keep shortcut chips close to the related action label instead of collecting them into decorative clutter
+  - use shell help views for broader keybinding discovery; keep `kbd()` for inline, local hints
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve compact key-chip treatment inline with related content
+  - pipe: lower to explicit key names in plain text without decorative framing being the only cue
+  - accessible: speak the shortcut and related action in one readable phrase
+- Related families:
+  - `helpView()`
+  - `commandPalette()`
+  - `note()`
+- Carbon analogue:
+  - keyboard key / shortcut hint
+
+### Progress indicators
+
+- Family:
+  - `progressBar()`
+  - `createProgressBar()`
+  - `createAnimatedProgressBar()`
+  - `spinnerFrame()`
+  - `createSpinner()`
+- Variants:
+  - determinate bar
+  - indeterminate spinner
+  - live controller helpers
+  - animated progress interpolation
+- Use when:
+  - the user needs honest feedback that work is ongoing
+  - determinate versus indeterminate progress is actually known
+- Avoid when:
+  - loading is so brief that the indicator would flicker more than it helps
+  - the state should be explained as a durable message or result instead of transient activity
+- Content guidance:
+  - use `progressBar()` when completion can be estimated honestly
+  - use `spinnerFrame()` / `createSpinner()` when activity is real but percent-complete is not
+  - switch from placeholder to progress indicator only when process feedback matters more than preserving layout shape
+  - pair progress indicators with clear labels so users know what is happening, not just that something is moving
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve determinate or indeterminate activity cues honestly
+  - pipe: lower to explicit text progress or repeated status lines without fake animation semantics
+  - accessible: announce task state, progress, and completion explicitly in text
+- Related families:
+  - `skeleton()`
+  - `badge()`
+  - notification system
+- Carbon analogue:
+  - progress bar / loading spinner
+
 ## Structural families
 
 ### Framed grouping
@@ -640,6 +705,40 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - closest to illustration, expressive color, and brand guidance rather than one component family
 
+## Authoring families
+
+### Mode-aware custom primitives
+
+- Family:
+  - `renderByMode()`
+- Variants:
+  - interactive/rich branch
+  - pipe branch
+  - accessible branch
+  - app-specific authored primitive
+- Use when:
+  - the app needs a domain-specific primitive that does not belong in the shared component library
+  - the same semantic thing must render honestly across multiple output modes
+- Avoid when:
+  - an existing Bijou family already matches the job
+  - the branching only exists to chase cosmetics rather than preserve semantic truth
+- Content guidance:
+  - author one semantic primitive first, then define how it lowers by mode
+  - keep all branches truthful to the same underlying meaning instead of inventing different features per mode
+  - prefer app-owned names and domain language over generic helper wrappers
+- Ownership:
+  - core authoring helper for app-defined primitives
+- Graceful lowering:
+  - rich/static: use the richest honest rendering for the environment
+  - pipe: lower to plain, explicit text without hidden styling assumptions
+  - accessible: preserve the same semantic meaning in a reading-order-friendly form
+- Related families:
+  - `note()`
+  - `badge()`
+  - `markdown()`
+- Carbon analogue:
+  - closest to an internal component authoring pattern rather than a shipped Carbon family
+
 ## Data and browsing families
 
 ### Dense comparison
@@ -1039,6 +1138,6 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 These are shipped, but the guidance is still thinner than it should be:
 
-- `kbd()` rules for when shortcut chips belong inline versus in shell-level help
-- `progressBar()` / `spinner()` guidance for choosing determinate versus indeterminate progress surfaces
-- `custom-component` / `renderByMode()` examples and doctrine for authoring app-specific primitives
+- `separator()` label discipline in dense shells and long documents
+- `tabs()` overflow/truncation policy when peer destinations outgrow the available width
+- `wizard()` / `group()` content architecture for long, interruptible setup flows

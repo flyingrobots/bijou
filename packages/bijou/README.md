@@ -112,7 +112,14 @@ Those docs answer the questions the API reference cannot:
 
 - Use `skeleton()` for short-lived placeholders when the final content shape is known.
 - Use `hyperlink()` when the destination itself should remain explicit and trustworthy in terminal output.
+- Use `kbd()` for local inline shortcut cues; use shell help in `@flyingrobots/bijou-tui` when the user needs a broader keybinding reference.
 - Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
+### Progress and custom primitives
+
+- Use `progressBar()` when completion can be estimated honestly.
+- Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
+- Use `renderByMode()` when you are authoring an app-specific primitive that must stay truthful across rich, pipe, and accessible output.
 
 ## Components
 
@@ -132,7 +139,10 @@ Those docs answer the questions the API reference cannot:
 `tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
 
 ### Animation & Progress
-`spinner()`, `progressBar()`, `gradientText()`, `loadRandomLogo()` — live-updating output, expressive gradients, and branded ASCII moments.
+`spinnerFrame()`, `createSpinner()`, `progressBar()`, `createProgressBar()`, `createAnimatedProgressBar()`, `gradientText()`, `loadRandomLogo()` — determinate and indeterminate progress, live-updating output, expressive gradients, and branded ASCII moments.
+
+### Authoring helpers
+`renderByMode()` — mode-aware helper for app-authored primitives that need honest rich/pipe/accessible lowering.
 
 ### Forms
 `input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.

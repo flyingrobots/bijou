@@ -1,6 +1,6 @@
 # `renderByMode()`
 
-Custom mode-aware themed components
+Authoring an app-specific primitive that lowers honestly across output modes.
 
 ## Run
 
@@ -8,27 +8,22 @@ Custom mode-aware themed components
 npx tsx examples/custom-component/main.ts
 ```
 
-## Code
+## Use this when
 
-```typescript
-import { renderByMode, resolveCtx, type BijouContext } from '@flyingrobots/bijou';
+- the app needs a domain-specific primitive that should not become a shared Bijou component
+- the same semantic thing must render truthfully in rich, pipe, and accessible modes
+- you want one authored abstraction instead of scattered mode checks throughout the app
 
-function spark(label: string, value: string, options: { ctx?: BijouContext } = {}) {
-  const ctx = resolveCtx(options.ctx);
+## Choose something else when
 
-  return renderByMode(ctx.mode, {
-    pipe: () => `[\${label.toUpperCase()}] \${value}`,
-    accessible: () => `Status \${label}: \${value}.`,
-    interactive: () => {
-      const accent = ctx.semantic('accent');
-      const muted = ctx.semantic('muted');
-      const sparkIcon = ctx.style.styled(accent, '\u2728');
-      const labelStyled = ctx.style.bold(label);
-      const valueStyled = ctx.style.styled(muted, value);
-      return `\${sparkIcon} \${labelStyled}: \${valueStyled}`;
-    },
-  }, options);
-}
-```
+- choose an existing Bijou family when the job already matches a shipped component
+- avoid mode branching that only chases cosmetic differences instead of preserving semantic truth
+- avoid using `renderByMode()` as a shortcut for inconsistent feature behavior across modes
+
+## What this example proves
+
+- one authored `spark()` primitive with rich, pipe, and accessible branches
+- mode-aware rendering that preserves the same underlying meaning in each output profile
+- `renderByMode()` as an authoring tool for app-owned primitives, not a replacement for the design system
 
 [← Examples](../README.md)
