@@ -1,5 +1,7 @@
-import type { BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext, Surface } from '@flyingrobots/bijou';
 import type { BrowsableListState } from '@flyingrobots/bijou-tui';
+
+export type ComponentPreview = string | Surface;
 
 /** A single component entry in the showcase registry. */
 export interface ComponentEntry {
@@ -15,8 +17,8 @@ export interface ComponentEntry {
   readonly tier: 1 | 2 | 3;
   /** Package the component lives in. */
   readonly pkg: 'bijou' | 'bijou-tui' | 'bijou-tui-app';
-  /** Render a demo of this component. Returns styled string output. */
-  readonly render: (width: number, ctx: BijouContext) => string;
+  /** Render a demo of this component. Returns either text output or a composed Surface preview. */
+  readonly render: (width: number, ctx: BijouContext) => ComponentPreview;
 }
 
 /** Shared page model used by all showcase category pages. */

@@ -1,7 +1,6 @@
 import type { BijouContext, DagNode, TreeNode, TimelineEvent } from '@flyingrobots/bijou';
 import {
   alert,
-  badge,
   box,
   headerBox,
   separator,
@@ -23,13 +22,9 @@ import {
   dag,
   enumeratedList,
   markdown,
-  surfaceToString,
 } from '@flyingrobots/bijou';
 import type { ComponentEntry } from './types.js';
-
-function badgeText(label: string, variant: Parameters<typeof badge>[1]['variant'], ctx: BijouContext): string {
-  return surfaceToString(badge(label, { variant, ctx }), ctx.style);
-}
+import { badgeSurface, column, row, spacer } from '../_shared/example-surfaces.ts';
 
 // ---------------------------------------------------------------------------
 // Sample data
@@ -129,21 +124,31 @@ const DISPLAY: ComponentEntry[] = [
       '',
       '**Degradation:** Rich shows colored pill. Pipe shows plain text. Accessible shows `[TEXT]` brackets.',
     ].join('\n'),
-    render: (_w, ctx) => [
-      [
-        badgeText('SUCCESS', 'success', ctx),
-        badgeText('ERROR', 'error', ctx),
-        badgeText('WARNING', 'warning', ctx),
-      ].join('  '),
-      [
-        badgeText('INFO', 'info', ctx),
-        badgeText('MUTED', 'muted', ctx),
-        badgeText('ACCENT', 'accent', ctx),
-        badgeText('PRIMARY', 'primary', ctx),
-      ].join('  '),
-      '',
-      `Server is ${badgeText('RUNNING', 'success', ctx)} on port ${badgeText('3000', 'primary', ctx)}`,
-    ].join('\n'),
+    render: (_w, ctx) => column([
+      row([
+        badgeSurface('SUCCESS', 'success', ctx),
+        '  ',
+        badgeSurface('ERROR', 'error', ctx),
+        '  ',
+        badgeSurface('WARNING', 'warning', ctx),
+      ]),
+      row([
+        badgeSurface('INFO', 'info', ctx),
+        '  ',
+        badgeSurface('MUTED', 'muted', ctx),
+        '  ',
+        badgeSurface('ACCENT', 'accent', ctx),
+        '  ',
+        badgeSurface('PRIMARY', 'primary', ctx),
+      ]),
+      spacer(1, 1),
+      row([
+        'Server is ',
+        badgeSurface('RUNNING', 'success', ctx),
+        ' on port ',
+        badgeSurface('3000', 'primary', ctx),
+      ]),
+    ]),
   },
   {
     id: 'separator',

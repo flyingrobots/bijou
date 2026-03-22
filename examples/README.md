@@ -26,6 +26,8 @@ npx tsx examples/showcase/main.ts
 
 Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Each component shows rendered output in rich, pipe, and accessible modes side-by-side.
 
+See [showcase](./showcase/) for the structured preview contract and usage notes.
+
 ## Choosing Between Similar Examples
 
 - Use [`alert`](./alert/) for in-flow status that should remain part of the page.
