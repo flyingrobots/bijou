@@ -106,6 +106,8 @@ It is intentionally small:
 
 That slice is not the final docs product. It is the first proof that the story substrate can drive teaching and live previews without re-encoding the doctrine by hand.
 
+It also exposed a broader shell need: when a docs lane is visually focused, that lane should own its local controls. The resulting shell/input design is captured in [Focus Owns Input](focus-owns-input.md) and [Focused Pane Input](../specs/focused-pane-input.spec.json).
+
 ### 1. Story Protocol
 
 This is the highest-leverage foundation.
