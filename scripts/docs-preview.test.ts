@@ -6,6 +6,17 @@ import { createDocsApp } from '../examples/docs/app.js';
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
 
+function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
+  const cells: string[] = [];
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      const cell = frame.get(x, y);
+      cells.push(`${cell.char ?? ' '}|${cell.fg ?? ''}|${cell.bg ?? ''}`);
+    }
+  }
+  return cells.join('\n');
+}
+
 describe('docs preview app', () => {
   it('lands on the hero page first and enters the docs on Enter', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -18,19 +29,8 @@ describe('docs preview app', () => {
     expect((entered.model as any).route).toBe('docs');
   });
 
-  it('keeps landing-page hero whitespace transparent over the page background', async () => {
+  it('renders the landing page as pure animated art without the old copy or stats chrome', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60 } });
-    const app = createDocsApp(ctx);
-
-    const initial = await runScript(app, [], { ctx });
-    const frame = initial.frames[0]!;
-
-    expect(frame.get(50, 10).char).toBe(' ');
-    expect(frame.get(50, 10).bg).toBe(ctx.surface('primary').bg);
-  });
-
-  it('keeps the real BIJOU hero on narrower terminals instead of swapping to a fallback card', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80, rows: 28 } });
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
@@ -44,9 +44,23 @@ describe('docs preview app', () => {
       text += '\n';
     }
 
-    expect(text).not.toContain('Surface-native docs');
-    expect(text).not.toContain('████');
-    expect(text).toMatch(/[▓▒░]/);
+    expect(text).not.toContain('The docs are the demo');
+    expect(text).not.toContain('Press Enter to enter the docs.');
+    expect(text).not.toContain('Families');
+    expect(text).not.toContain('Stories');
+    expect(text).not.toContain('Profiles');
+    expect(text).toMatch(/[█▓▒░·]/);
+  });
+
+  it('animates the landing title screen on pulse', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
+
+    expect((pulsed.model as any).route).toBe('landing');
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
   it('expands a family, selects a story, and cycles its variants', async () => {

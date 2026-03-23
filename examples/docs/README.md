@@ -8,7 +8,7 @@ First Learn by Touch slice: a story-driven docs surface built with Bijou itself.
 npx tsx examples/docs/main.ts
 ```
 
-You now land on a dedicated hero screen first, with the tracked `bijou.txt` mark rendered as a masked shader. Press `Enter` to move into the docs explorer.
+You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt) and [assets/background.txt](/Users/james/git/bijou/assets/background.txt). There is intentionally no instructional chrome on top of it. Press `Enter` to move into the docs explorer.
 
 Mouse is enabled for this preview. In the docs explorer, click a pane to focus it and use the wheel to scroll long docs or help content.
 
@@ -44,6 +44,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 
 - This is intentionally smaller than the existing showcase. It is the first story-driven docs slice, not the final docs product.
 - The docs are the demo: the page text and preview are generated from the same structured story data.
+- The title screen is deliberately just art. If you already know the entry action, it gets out of the way.
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
 
 [← Examples](/Users/james/git/bijou/examples/README.md)

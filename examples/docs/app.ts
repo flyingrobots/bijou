@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import {
   boxSurface,
   createSurface,
-  gradientText,
   lerp3,
   markdown,
   separatorSurface,
@@ -16,7 +15,6 @@ import {
   createBrowsableListState,
   createFramedApp,
   createKeyMap,
-  hstackSurface,
   isKeyMsg,
   isMouseMsg,
   isResizeMsg,
@@ -53,9 +51,14 @@ import {
 } from '../_stories/protocol.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
-const HERO_TEXT = readFileSync(new URL('../../bijou.txt', import.meta.url), 'utf8').trimEnd();
-const HERO_LINES = HERO_TEXT.split(/\r?\n/);
-const HERO_WIDTH = Math.max(1, ...HERO_LINES.map((lineText) => lineText.length));
+const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
+const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
+const LOGO_WIDTH = Math.max(1, ...LOGO_LINES.map((lineText) => lineText.length));
+const LOGO_HEIGHT = LOGO_LINES.length;
+const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', import.meta.url), 'utf8').trimEnd();
+const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
+const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
+const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
 const DOCS_PAGE_ID = 'learn-by-touch';
 const DOCS_SIDEBAR_WIDTH = 32;
 
@@ -97,6 +100,7 @@ interface RootModel {
   readonly route: 'landing' | 'docs';
   readonly columns: number;
   readonly rows: number;
+  readonly landingTimeMs: number;
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
@@ -346,157 +350,103 @@ function activateFocusedRow(model: DocsExplorerModel): DocsExplorerModel {
 function renderLanding(model: RootModel, ctx: BijouContext): Surface {
   const width = Math.max(1, model.columns);
   const height = Math.max(1, model.rows);
-  const background = createLandingBackground(width, height, ctx);
-  const content = createLandingContent(width, height, ctx);
-  background.blit(placeSurface(content, {
-    width,
-    height,
-    hAlign: 'center',
-    vAlign: 'middle',
-  }), 0, 0);
-  return background;
-}
-
-function createLandingBackground(width: number, height: number, ctx: BijouContext): Surface {
   const surface = createSurface(width, height, {
     char: ' ',
     bg: ctx.surface('primary').bg,
     empty: false,
   });
-  const stars = canvas(width, height, ({ u, v }) => {
-    const band = Math.sin((u * 11.5) + (v * 7.2)) + Math.cos((u * 3.1) - (v * 9.4));
-    if (band > 1.55) {
-      return {
-        char: '·',
-        fg: ctx.status('info').hex,
-        modifiers: ['dim'],
-      };
-    }
-    if (band > 1.3) {
-      return {
-        char: '.',
-        fg: ctx.border('muted').hex,
-        modifiers: ['dim'],
-      };
-    }
-    return { char: ' ', empty: true };
-  });
-  surface.blit(stars, 0, 0);
+  surface.blit(createLandingBackground(width, height, ctx, model.landingTimeMs), 0, 0);
+
+  const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
+  const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
+  const logo = createLogoSurface(logoWidth, logoHeight, ctx, model.landingTimeMs);
+  surface.blit(logo, Math.floor((width - logo.width) / 2), Math.floor((height - logo.height) / 2));
   return surface;
 }
 
-function createLandingContent(width: number, height: number, ctx: BijouContext): Surface {
-  const innerWidth = Math.max(24, Math.min(Math.max(24, width - 8), 138));
-  const statsHeight = innerWidth >= (18 * 3) + 4 ? 3 : 11;
-  const reservedHeight = 13 + statsHeight;
-  const heroHeight = Math.max(4, Math.min(HERO_LINES.length, height - reservedHeight));
-  const hero = createHeroSurface(innerWidth, heroHeight, ctx);
-  const summary = makeWhitespaceTransparent(paragraphSurface(
-    'The docs are the demo. Learn the component families, compare graceful lowering across output profiles, and step into the framework through a surface built with Bijou itself.',
-    Math.max(32, innerWidth - 4),
-  ));
-  const stats = createStatsSurface(innerWidth, ctx);
-  const cta = boxSurface(column([
-    line('Press Enter to enter the docs.'),
-    line('Then browse families on the left and variants on the right.'),
-  ]), {
-    title: 'Enter the Docs',
-    width: innerWidth,
-    borderToken: ctx.border('primary'),
-    ctx,
-  });
-  const footer = makeWhitespaceTransparent(line('Enter continue • q quit', innerWidth));
+function createLandingBackground(width: number, height: number, ctx: BijouContext, timeMs: number): Surface {
+  const time = timeMs / 1000;
+  const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
+  const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
 
-  return column([
-    makeWhitespaceTransparent(contentSurface(gradientText('Bijou Docs', ctx.theme.theme.gradient.brand, { style: ctx.style }))),
-    spacer(1, 1),
-    hero,
-    spacer(1, 1),
-    summary,
-    spacer(1, 1),
-    stats,
-    spacer(1, 1),
-    cta,
-    spacer(1, 1),
-    footer,
-  ]);
-}
+  return canvas(width, height, ({ u, v, time: shaderTime }) => {
+    const x = Math.round(u * (width - 1 || 1));
+    const y = Math.round(v * (height - 1 || 1));
+    const rowShift = Math.round(
+      (Math.sin((y * 0.075) + (shaderTime * 0.7)) * 18)
+      + (Math.cos((y * 0.03) - (shaderTime * 0.35)) * 7),
+    );
+    const columnShift = Math.round(Math.sin((x * 0.028) + (shaderTime * 0.42)) * 2);
+    const sourceX = mod(baseX + x + rowShift, BACKGROUND_WIDTH);
+    const sourceY = mod(baseY + y + columnShift, BACKGROUND_HEIGHT);
+    const sourceChar = BACKGROUND_LINES[sourceY]?.[sourceX] ?? ' ';
+    const density = densityFromChar(sourceChar);
+    if (density === 0) return { char: ' ', empty: true };
 
-function createHeroSurface(width: number, height: number, ctx: BijouContext): Surface {
-  const shader = canvas(HERO_WIDTH, HERO_LINES.length, ({ u, v }) => {
-    const shimmer = 0.5 + (Math.sin((u * 8.8) + (v * 5.1)) * 0.25) + (Math.cos((u * 3.2) - (v * 7.4)) * 0.25);
-    const gradientT = Math.max(0, Math.min(1, (u * 0.74) + ((1 - v) * 0.16) + (shimmer * 0.1)));
-    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, gradientT);
-    const density = 0.5 + (Math.sin((u * 18) + (v * 11)) * 0.25) + (Math.cos((u * 6.5) - (v * 9.5)) * 0.25);
-    const char = density > 0.78
-      ? '▓'
-      : density > 0.56
-        ? '▒'
-        : density > 0.34
-          ? '░'
-          : '·';
+    const wave = 0.54
+      + (Math.sin((x * 0.042) + (y * 0.016) + (shaderTime * 1.45)) * 0.24)
+      + (Math.cos((x * 0.012) - (y * 0.085) + (shaderTime * 0.95)) * 0.22);
+    const level = clamp01(density * wave);
+    const char = densityGlyph(level, { airy: true });
+    if (char === ' ') return { char: ' ', empty: true };
+
+    const colorT = clamp01(
+      (u * 0.66)
+      + (0.22 * (0.5 + (Math.sin((shaderTime * 0.3) + (v * 5.2)) * 0.5)))
+      + (0.08 * Math.sin((shaderTime * 0.55) + (x * 0.02))),
+    );
+    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, colorT);
+
     return {
       char,
-      fg: `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`,
-      modifiers: density > 0.72 ? ['bold'] : undefined,
+      fg: rgbHex(r, g, b),
+      modifiers: level < 0.52 ? ['dim'] : undefined,
     };
-  });
+  }, { time });
+}
 
-  const masked = createSurface(HERO_WIDTH, HERO_LINES.length);
-  for (let y = 0; y < HERO_LINES.length; y++) {
-    const lineText = HERO_LINES[y]!.padEnd(HERO_WIDTH);
-    for (let x = 0; x < HERO_WIDTH; x++) {
+function createLogoSurface(width: number, height: number, ctx: BijouContext, timeMs: number): Surface {
+  const shader = canvas(LOGO_WIDTH, LOGO_HEIGHT, ({ u, v, time }) => {
+    const shimmer = 0.46
+      + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
+      + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
+      + (Math.sin((u * 18.0) + (time * 5.5)) * 0.12);
+    const level = clamp01(shimmer);
+    const colorT = clamp01(
+      (u * 0.78)
+      + ((1 - v) * 0.14)
+      + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
+    );
+    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, colorT);
+    return {
+      char: densityGlyph(level, { airy: false }),
+      fg: rgbHex(r, g, b),
+      modifiers: level > 0.7 ? ['bold'] : undefined,
+    };
+  }, { time: timeMs / 1000 });
+
+  const masked = createSurface(LOGO_WIDTH, LOGO_HEIGHT);
+  for (let y = 0; y < LOGO_HEIGHT; y++) {
+    const lineText = LOGO_LINES[y]!.padEnd(LOGO_WIDTH);
+    for (let x = 0; x < LOGO_WIDTH; x++) {
       if (lineText[x] === ' ') {
         masked.set(x, y, { char: ' ', empty: true });
         continue;
       }
-      masked.set(x, y, shader.get(x, y));
+      const shaderCell = shader.get(x, y);
+      masked.set(x, y, {
+        ...shaderCell,
+        char: reinforceGlyph(lineText[x]!, shaderCell.char),
+      });
     }
   }
 
-  return centerCropSurface(masked, width, Math.max(1, height));
-}
-
-function createStatsSurface(width: number, ctx: BijouContext): Surface {
-  const cards = [
-    createStatCard('Families', String(STORY_FAMILIES.length), ctx),
-    createStatCard('Stories', String(COMPONENT_STORIES.length), ctx),
-    createStatCard('Profiles', '4', ctx),
-  ];
-  const horizontal = hstackSurface(2, ...cards);
-  if (width >= horizontal.width) {
-    return horizontal;
-  }
-
-  return column(cards);
-}
-
-function createStatCard(label: string, value: string, ctx: BijouContext): Surface {
-  return boxSurface(column([
-    contentSurface(gradientText(value, ctx.theme.theme.gradient.brand, { style: ctx.style })),
-    line(label),
-  ]), {
-    width: 18,
-    borderToken: ctx.border('muted'),
-    ctx,
-  });
+  return centerCropSurface(masked, width, height);
 }
 
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
-}
-
-function makeWhitespaceTransparent(surface: Surface): Surface {
-  const result = surface.clone();
-  for (let y = 0; y < result.height; y++) {
-    for (let x = 0; x < result.width; x++) {
-      const cell = result.get(x, y);
-      if (cell.empty || cell.char !== ' ' || cell.bg != null) continue;
-      result.set(x, y, { char: ' ', empty: true });
-    }
-  }
-  return result;
 }
 
 function centerCropSurface(content: Surface, width: number, height: number): Surface {
@@ -522,6 +472,56 @@ function centerCropSurface(content: Surface, width: number, height: number): Sur
 
   result.blit(content, destX, destY, srcX, srcY, drawWidth, drawHeight);
   return result;
+}
+
+function densityFromChar(char: string): number {
+  switch (char) {
+    case '█':
+      return 1;
+    case '▓':
+      return 0.78;
+    case '▒':
+      return 0.56;
+    case '░':
+      return 0.32;
+    case '·':
+    case '.':
+      return 0.14;
+    default:
+      return 0;
+  }
+}
+
+function densityGlyph(level: number, options: { readonly airy: boolean }): string {
+  if (level <= 0.08) return ' ';
+  if (options.airy) {
+    if (level > 0.82) return '▓';
+    if (level > 0.58) return '▒';
+    if (level > 0.34) return '░';
+    return '·';
+  }
+  if (level > 0.84) return '█';
+  if (level > 0.66) return '▓';
+  if (level > 0.44) return '▒';
+  return '░';
+}
+
+function reinforceGlyph(source: string, shaderChar: string): string {
+  const sourceDensity = densityFromChar(source);
+  const shaderDensity = densityFromChar(shaderChar);
+  return shaderDensity >= sourceDensity ? shaderChar : densityGlyph(sourceDensity, { airy: false });
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function rgbHex(r: number, g: number, b: number): string {
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function mod(value: number, divisor: number): number {
+  return ((value % divisor) + divisor) % divisor;
 }
 
 function renderFamiliesPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {
@@ -774,6 +774,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
         route: 'landing',
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
+        landingTimeMs: 0,
         docsModel,
       }, mapExplorer(cmds)];
     },
@@ -793,6 +794,9 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
       }
 
       if (model.route === 'landing') {
+        if (msg.type === 'pulse') {
+          return [{ ...model, landingTimeMs: model.landingTimeMs + Math.round(msg.dt * 1000) }, []];
+        }
         if (isKeyMsg(msg)) {
           if (msg.key === 'enter' || msg.key === 'space') {
             return [{ ...model, route: 'docs' }, []];

@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Animated Learn by Touch title screen** — the docs landing page now renders as pure animated art built from `assets/bijou.txt` and `assets/background.txt`, removing the old landing-page copy, stats, and CTA chrome so the first screen is just the shader-driven title treatment.
 - **Learn by Touch docs layout pass** — the landing hero now uses a masked shader treatment derived from `bijou.txt`, the docs explorer now uses symmetric side rails inside the standard frame shell, and the family lane renders as an accordion-style navigation surface instead of a plain chevron list.
 - **Landing-first Learn by Touch docs shell** — the docs preview now opens on a dedicated hero screen using the tracked `bijou.txt` art asset, then enters a three-lane explorer with component families on the left, selected-component docs and live preview in the center, and variants on the right.
 - **Learn by Touch docs preview** — added a first story-driven docs slice in `examples/docs`, plus a reusable `ComponentStory` v0 examples substrate that can render structured docs and live previews for `alert()`, `modal()`, and `viewportSurface()` with profile switching.
