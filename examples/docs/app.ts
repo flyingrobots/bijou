@@ -3,6 +3,7 @@ import {
   boxSurface,
   createSurface,
   gradientText,
+  lerp3,
   markdown,
   separatorSurface,
   wrapToWidth,
@@ -15,7 +16,6 @@ import {
   createBrowsableListState,
   createFramedApp,
   createKeyMap,
-  createSplitPaneState,
   hstackSurface,
   isKeyMsg,
   isMouseMsg,
@@ -57,6 +57,7 @@ const HERO_TEXT = readFileSync(new URL('../../bijou.txt', import.meta.url), 'utf
 const HERO_LINES = HERO_TEXT.split(/\r?\n/);
 const HERO_WIDTH = Math.max(1, ...HERO_LINES.map((lineText) => lineText.length));
 const DOCS_PAGE_ID = 'learn-by-touch';
+const DOCS_SIDEBAR_WIDTH = 32;
 
 interface StoryFamily {
   readonly id: string;
@@ -77,8 +78,6 @@ interface DocsExplorerModel {
   readonly selectedStoryId?: string;
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
-  readonly shellSplit: ReturnType<typeof createSplitPaneState>;
-  readonly detailSplit: ReturnType<typeof createSplitPaneState>;
 }
 
 type ExplorerMsg =
@@ -133,38 +132,21 @@ const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
   .bind('ctrl+c', 'Quit', { type: 'quit' });
 
 const explorerHelpKeys = createKeyMap<ExplorerMsg>()
-  .group('Families', (group) => group
-    .bind('up', 'Previous row', { type: 'family-prev' })
-    .bind('down', 'Next row', { type: 'family-next' })
-    .bind('pageup', 'Page up', { type: 'family-page-up' })
-    .bind('pagedown', 'Page down', { type: 'family-page-down' })
-    .bind('enter', 'Expand or select', { type: 'activate-row' })
-    .bind('right', 'Expand family', { type: 'expand-row' })
-    .bind('left', 'Collapse family', { type: 'collapse-row' }),
-  )
-  .group('Pane scroll', (group) => group
-    .bind('tab', 'Next pane', { type: 'family-next' })
-    .bind('shift+tab', 'Previous pane', { type: 'family-prev' })
-    .bind('j', 'Scroll down', { type: 'family-next' })
-    .bind('k', 'Scroll up', { type: 'family-prev' })
-    .bind('d', 'Page down', { type: 'family-page-down' })
-    .bind('u', 'Page up', { type: 'family-page-up' })
-    .bind('g', 'Top', { type: 'family-prev' })
-    .bind('shift+g', 'Bottom', { type: 'family-next' }),
+  .group('Browse', (group) => group
+    .bind('up', 'Browse', { type: 'family-prev' })
+    .bind('down', 'Browse', { type: 'family-next' })
+    .bind('enter', 'Open', { type: 'activate-row' })
+    .bind('tab', 'Next pane', { type: 'family-next' }),
   )
   .group('Profiles', (group) => group
-    .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
-    .bind('2', 'Static profile', { type: 'set-profile', mode: 'static' })
-    .bind('3', 'Pipe profile', { type: 'set-profile', mode: 'pipe' })
-    .bind('4', 'Accessible profile', { type: 'set-profile', mode: 'accessible' }),
+    .bind('1', 'Rich', { type: 'set-profile', mode: 'interactive' })
+    .bind('2', 'Static', { type: 'set-profile', mode: 'static' })
+    .bind('3', 'Pipe', { type: 'set-profile', mode: 'pipe' })
+    .bind('4', 'Accessible', { type: 'set-profile', mode: 'accessible' }),
   )
   .group('Variants', (group) => group
-    .bind('.', 'Next variant', { type: 'variant-next' })
-    .bind(',', 'Previous variant', { type: 'variant-prev' }),
-  )
-  .group('General', (group) => group
-    .bind('?', 'Toggle help', { type: 'quit' })
-    .bind('q', 'Quit', { type: 'quit' }),
+    .bind('.', 'Next', { type: 'variant-next' })
+    .bind(',', 'Prev', { type: 'variant-prev' }),
   );
 
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
@@ -195,8 +177,6 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     selectedStoryId: undefined,
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
-    shellSplit: createSplitPaneState({ ratio: 0.24 }),
-    detailSplit: createSplitPaneState({ ratio: 0.78 }),
   };
 }
 
@@ -443,9 +423,38 @@ function createLandingContent(width: number, height: number, ctx: BijouContext):
 }
 
 function createHeroSurface(width: number, height: number, ctx: BijouContext): Surface {
-  const gradient = ctx.theme.theme.gradient.brand;
-  const hero = HERO_LINES.map((lineText) => gradientText(lineText, gradient, { style: ctx.style })).join('\n');
-  return centerCropSurface(makeWhitespaceTransparent(contentSurface(hero)), width, Math.max(1, height));
+  const shader = canvas(HERO_WIDTH, HERO_LINES.length, ({ u, v }) => {
+    const shimmer = 0.5 + (Math.sin((u * 8.8) + (v * 5.1)) * 0.25) + (Math.cos((u * 3.2) - (v * 7.4)) * 0.25);
+    const gradientT = Math.max(0, Math.min(1, (u * 0.74) + ((1 - v) * 0.16) + (shimmer * 0.1)));
+    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, gradientT);
+    const density = 0.5 + (Math.sin((u * 18) + (v * 11)) * 0.25) + (Math.cos((u * 6.5) - (v * 9.5)) * 0.25);
+    const char = density > 0.78
+      ? '▓'
+      : density > 0.56
+        ? '▒'
+        : density > 0.34
+          ? '░'
+          : '·';
+    return {
+      char,
+      fg: `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`,
+      modifiers: density > 0.72 ? ['bold'] : undefined,
+    };
+  });
+
+  const masked = createSurface(HERO_WIDTH, HERO_LINES.length);
+  for (let y = 0; y < HERO_LINES.length; y++) {
+    const lineText = HERO_LINES[y]!.padEnd(HERO_WIDTH);
+    for (let x = 0; x < HERO_WIDTH; x++) {
+      if (lineText[x] === ' ') {
+        masked.set(x, y, { char: ' ', empty: true });
+        continue;
+      }
+      masked.set(x, y, shader.get(x, y));
+    }
+  }
+
+  return centerCropSurface(masked, width, Math.max(1, height));
 }
 
 function createStatsSurface(width: number, ctx: BijouContext): Surface {
@@ -517,21 +526,37 @@ function centerCropSurface(content: Surface, width: number, height: number): Sur
 
 function renderFamiliesPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {
   const visibleHeight = Math.max(3, height - 2);
-  const list = browsableListSurface(
-    { ...model.familyState, height: visibleHeight },
-    { width: Math.max(1, width), showScrollbar: true, ctx },
-  );
-  const footer = line(' arrows browse • Enter expand/select ', width);
+  const body = createSurface(Math.max(1, width), visibleHeight);
+  const start = model.familyState.scrollY;
+  const end = Math.min(model.familyState.items.length, start + visibleHeight);
+
+  for (let index = start; index < end; index++) {
+    const row = parseRowValue(model.familyState.items[index]!.value);
+    body.blit(
+      renderFamilyRow({
+        row,
+        width,
+        focused: index === model.familyState.focusIndex,
+        selectedStoryId: model.selectedStoryId,
+        expandedFamilies: model.expandedFamilies,
+        ctx,
+      }),
+      0,
+      index - start,
+    );
+  }
+
+  const footer = line(' ↑/↓ browse • Enter open • Tab next pane ', width);
 
   return column([
     separatorSurface({ label: 'component families', width, ctx }),
-    list,
+    body,
     footer,
   ]);
 }
 
 function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
-  const bodyWidth = Math.max(28, width - 4);
+  const bodyWidth = Math.max(28, width - 6);
   const callout = boxSurface(column([
     line('Select a component to learn more.'),
     spacer(),
@@ -543,7 +568,7 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
     line('Tip: 1-4 switch profiles • ,/. cycle variants'),
   ]), {
     title: 'Start here',
-    width: Math.max(1, width),
+    width: Math.max(24, width - 1),
     borderToken: ctx.border('primary'),
     ctx,
   });
@@ -581,12 +606,12 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
     vAlign: 'top',
   }), {
     title: `live preview • ${preset.label} • ${variant.label}`,
-    width: Math.max(24, width),
+    width: Math.max(24, width - 1),
     borderToken: ctx.border('muted'),
     ctx,
   });
   const docs = markdown(storyDocsMarkdown(story, variant, preset), {
-    width: Math.max(24, width - 2),
+    width: Math.max(24, width - 3),
     ctx,
   });
 
@@ -608,9 +633,9 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
       spacer(1, 1),
       boxSurface(paragraphSurface(
         'Variants appear here once a component is selected.',
-        Math.max(20, width - 4),
+        Math.max(20, width - 6),
       ), {
-        width: Math.max(1, width),
+        width: Math.max(22, width - 1),
         borderToken: ctx.border('muted'),
         ctx,
       }),
@@ -638,11 +663,11 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
     spacer(),
     paragraphSurface(
       variant.description ?? 'No extra description for this variant.',
-      Math.max(20, width - 4),
+      Math.max(20, width - 6),
     ),
   ]), {
     title: 'active variant',
-    width: Math.max(1, width),
+    width: Math.max(22, width - 1),
     borderToken: ctx.border('muted'),
     ctx,
   });
@@ -660,12 +685,15 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
 function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerModel>, ExplorerMsg> {
   return createFramedApp<DocsExplorerModel, ExplorerMsg>({
     title: 'Bijou Docs',
+    initialColumns: ctx.runtime.columns,
+    initialRows: ctx.runtime.rows,
     globalKeys: explorerGlobalKeys,
     helpLineSource: () => explorerHelpKeys,
     pages: [{
       id: DOCS_PAGE_ID,
       title: 'Learn by Touch',
       init: () => [createInitialExplorerModel(ctx), []],
+      helpSource: explorerHelpKeys,
       update(msg, model) {
         switch (msg.type) {
           case 'family-next':
@@ -695,26 +723,24 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
       keyMap: explorerPageKeys,
       layout(model) {
         return {
-          kind: 'split',
-          splitId: 'docs-shell',
-          direction: 'row',
-          state: model.shellSplit,
-          paneA: {
-            kind: 'pane',
-            paneId: 'family-nav',
-            render: (width, height) => renderFamiliesPane(model, width, height, ctx),
-          },
-          paneB: {
-            kind: 'split',
-            splitId: 'docs-detail',
-            direction: 'row',
-            state: model.detailSplit,
-            paneA: {
+          kind: 'grid',
+          gridId: 'docs-shell',
+          columns: [DOCS_SIDEBAR_WIDTH, '1fr', DOCS_SIDEBAR_WIDTH],
+          rows: ['1fr'],
+          areas: ['family main variants'],
+          gap: 1,
+          cells: {
+            family: {
+              kind: 'pane',
+              paneId: 'family-nav',
+              render: (width, height) => renderFamiliesPane(model, width, height, ctx),
+            },
+            main: {
               kind: 'pane',
               paneId: 'story-content',
               render: (width) => renderStoryPane(model, width, ctx),
             },
-            paneB: {
+            variants: {
               kind: 'pane',
               paneId: 'story-variants',
               render: (width, height) => renderVariantsPane(model, width, height, ctx),
@@ -805,4 +831,42 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     || 'family';
+}
+
+function renderFamilyRow(options: {
+  readonly row: RowDescriptor;
+  readonly width: number;
+  readonly focused: boolean;
+  readonly selectedStoryId?: string;
+  readonly expandedFamilies: Readonly<Record<string, boolean>>;
+  readonly ctx: BijouContext;
+}): Surface {
+  const { row, width, focused, selectedStoryId, expandedFamilies, ctx } = options;
+  if (row.kind === 'family') {
+    const family = STORY_FAMILIES.find((candidate) => candidate.id === row.familyId);
+    if (family == null) return line('', width);
+    const expanded = expandedFamilies[row.familyId] ?? false;
+    const focusPrefix = focused
+      ? ctx.style.styled(ctx.semantic('accent'), '›')
+      : ' ';
+    const arrow = ctx.style.styled(ctx.semantic('accent'), expanded ? '▼' : '▶');
+    const title = focused
+      ? ctx.style.styled(ctx.semantic('primary'), family.label)
+      : family.label;
+    return line(`${focusPrefix} ${arrow} ${title}`, width);
+  }
+
+  const story = row.storyId == null ? undefined : findComponentStory(row.storyId);
+  if (story == null) return line('', width);
+  const selected = selectedStoryId === story.id;
+  const focusPrefix = focused
+    ? ctx.style.styled(ctx.semantic('accent'), '›')
+    : ' ';
+  const bullet = selected
+    ? ctx.style.styled(ctx.semantic('accent'), '•')
+    : ctx.style.styled(ctx.border('muted'), '•');
+  const title = selected
+    ? ctx.style.styled(ctx.semantic('accent'), story.title)
+    : story.title;
+  return line(`${focusPrefix}   ${bullet} ${title}`, width);
 }

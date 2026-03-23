@@ -45,7 +45,8 @@ describe('docs preview app', () => {
     }
 
     expect(text).not.toContain('Surface-native docs');
-    expect(text).toContain('████');
+    expect(text).not.toContain('████');
+    expect(text).toMatch(/[▓▒░]/);
   });
 
   it('expands a family, selects a story, and cycles its variants', async () => {
@@ -65,5 +66,25 @@ describe('docs preview app', () => {
     expect((result.model as any).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
+  });
+
+  it('shows accordion-style family headers without the oversized custom help strip', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const frame = entered.frames[entered.frames.length - 1]!;
+
+    let text = '';
+    for (let y = 0; y < frame.height; y++) {
+      for (let x = 0; x < frame.width; x++) {
+        text += frame.get(x, y).char || ' ';
+      }
+      text += '\n';
+    }
+
+    expect(text).toContain('▶ Status and in-flow feedback');
+    expect(text).not.toContain('Expand family');
+    expect(text).not.toContain('Collapse family');
   });
 });
