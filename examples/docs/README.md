@@ -8,6 +8,8 @@ First Learn by Touch slice: a story-driven docs surface built with Bijou itself.
 npx tsx examples/docs/main.ts
 ```
 
+Mouse is enabled for this preview. Click a pane to focus it and use the wheel to scroll long docs or help content.
+
 ## What it proves
 
 - `ComponentStory` v0 can hold structured teaching fields instead of one markdown blob
@@ -23,9 +25,13 @@ npx tsx examples/docs/main.ts
 
 ## Keys
 
-- `j` / `k` or arrow keys: move between stories
+- `↑` / `↓`: move between stories
+- `Tab` / `Shift+Tab`: move focus between panes
+- `j` / `k`: scroll the focused docs or demo pane
+- `d` / `u`: page the focused docs or demo pane
 - `1` `2` `3` `4`: switch rich, static, pipe, and accessible profiles
 - `,` / `.`: previous or next story variant
+- `?`: open or close keyboard help
 - `q`: quit
 
 ## Notes

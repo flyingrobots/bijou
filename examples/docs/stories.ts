@@ -11,7 +11,7 @@ import {
   modal,
   viewportSurface,
 } from '@flyingrobots/bijou-tui';
-import { line, screenSurface, spacer, column } from '../_shared/example-surfaces.js';
+import { line, screenSurface, spacer, textSurface, column } from '../_shared/example-surfaces.js';
 import {
   CANONICAL_STORY_PROFILE_PRESETS,
   type ComponentStory,
@@ -19,20 +19,21 @@ import {
 
 function modalBackdrop(width: number, ctx: BijouContext): Surface {
   const innerWidth = Math.max(28, width - 4);
-  const panel = boxSurface([
+  const content = textSurface([
     'Release queue',
     '',
-    '- web',
-    '- api',
-    '- workers',
+    '  web',
+    '  api',
+    '  workers',
     '',
-    `${kbd('d', { ctx })} deploy  ${kbd('?', { ctx })} help  ${kbd('q', { ctx })} quit`,
-  ].join('\n'), {
+    `  ${kbd('d', { ctx })} deploy  ${kbd('?', { ctx })} help  ${kbd('q', { ctx })} quit`,
+  ].join('\n'), Math.max(1, innerWidth - 2), 12);
+  const fullHeightPanel = boxSurface(content, {
     title: 'release-workbench',
     width: innerWidth,
     ctx,
   });
-  return screenSurface(width, 14, panel);
+  return screenSurface(width, 14, fullHeightPanel);
 }
 
 function viewportPreviewSurface(

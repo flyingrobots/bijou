@@ -632,6 +632,41 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(false);
   });
 
+  it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
+    const tallHelpPage: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('main'),
+      }),
+      keyMap: createKeyMap<Msg>()
+        .group('Extra', (group) => {
+          let next = group;
+          for (let index = 0; index < 32; index++) {
+            next = next.bind(`${index % 10}`, `Binding ${index}`, { type: 'noop' });
+          }
+          return next;
+        }),
+    };
+
+    const app = createFramedApp({
+      initialColumns: 80,
+      initialRows: 16,
+      pages: [tallHelpPage],
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
+
+    expect((model as any).helpOpen).toBe(true);
+    expect((model as any).helpScrollY).toBeGreaterThan(0);
+  });
+
   it('treats help as modal and ignores non-close keys', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -719,6 +754,44 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(false);
     expect(result.model.commandPalette).toBeDefined();
     expect(result.model.pageModels.home?.count).toBe(0);
+  });
+
+  it('focuses the hovered pane and scrolls it with the mouse wheel', async () => {
+    const splitPage: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'split',
+        splitId: 's1',
+        state: createSplitPaneState({ ratio: 0.5 }),
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView(makeLongContent('left')) },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView(makeLongContent('right')) },
+      }),
+    };
+
+    const app = createFramedApp({
+      initialColumns: 80,
+      initialRows: 20,
+      pages: [splitPage],
+    });
+
+    const result = await runScript(app, [{
+      mouse: {
+        type: 'mouse',
+        button: 'none',
+        action: 'scroll-down',
+        col: 60,
+        row: 6,
+        shift: false,
+        alt: false,
+        ctrl: false,
+      },
+    }]);
+
+    expect(result.model.focusedPaneByPage.home).toBe('right');
+    expect(result.model.scrollByPage.home?.right?.y).toBe(1);
   });
 
   it('opens command palette and dispatches selected keymap command', async () => {

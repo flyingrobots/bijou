@@ -12,7 +12,7 @@ import {
   type OverflowBehavior,
   type Surface,
 } from '@flyingrobots/bijou';
-import { helpView, type BindingSource } from './help.js';
+import { helpViewSurface, type BindingSource } from './help.js';
 import type { KeyMap } from './keybindings.js';
 import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
@@ -25,6 +25,15 @@ import {
   commandPalette,
   commandPaletteKeyMap,
 } from './command-palette.js';
+import {
+  createPagerStateForSurface,
+  pagerPageDown,
+  pagerPageUp,
+  pagerScrollBy,
+  pagerScrollToBottom,
+  pagerScrollToTop,
+  pagerSurface,
+} from './pager.js';
 import type { GridTrack } from './grid.js';
 import type { SplitPaneDirection, SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -77,6 +86,7 @@ import {
 } from './app-frame-render.js';
 import {
   applyFrameAction,
+  scrollFocusedPane,
   switchTab,
   syncPageFrameState,
 } from './app-frame-actions.js';
@@ -320,6 +330,8 @@ interface ResolvedFrameNotificationOptions {
   readonly overflow: OverflowBehavior;
 }
 
+const HELP_SCROLL_HINT = 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ? close';
+
 function resolveFrameNotificationOptions<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
 ): ResolvedFrameNotificationOptions {
@@ -444,45 +456,72 @@ export function createFramedApp<PageModel, Msg>(
     msg: MouseMsg,
     model: InternalFrameModel<PageModel, Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
-    if (model.helpOpen || model.commandPalette != null) return [model, []];
-    if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+    const activePage = pagesById.get(model.activePageId)!;
 
-    if (frameNotificationOptions.enabled) {
-      const nowMs = resolveClock(resolveSafeCtx()).now();
-      const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
-        screenWidth: model.columns,
-        screenHeight: model.rows,
-        margin: frameNotificationOptions.margin,
-        gap: frameNotificationOptions.gap,
-        ctx: resolveSafeCtx() ?? undefined,
-      }, msg.col, msg.row);
-
-      if (notificationTarget?.kind === 'dismiss') {
-        return applyFrameNotificationState(
-          model,
-          dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),
-          nowMs,
-        );
+    if (model.helpOpen) {
+      if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+        return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, options), []];
       }
-      if (notificationTarget != null) {
-        return [model, []];
-      }
+      return [model, []];
     }
 
-    if (msg.row === 0) {
-      const header = resolveHeaderLine(model, options, pagesById);
-      const tab = header.tabTargets.find((target) =>
-        msg.col >= target.startCol && msg.col <= target.endCol,
-      );
-      if (tab != null) {
-        const currentIndex = model.pageOrder.indexOf(model.activePageId);
-        const nextIndex = model.pageOrder.indexOf(tab.pageId);
-        if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
-          return switchTab(model, nextIndex - currentIndex, pagesById, options);
+    if (model.commandPalette != null) return [model, []];
+
+    if (msg.action === 'press' && msg.button === 'left') {
+      if (frameNotificationOptions.enabled) {
+        const nowMs = resolveClock(resolveSafeCtx()).now();
+        const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
+          screenWidth: model.columns,
+          screenHeight: model.rows,
+          margin: frameNotificationOptions.margin,
+          gap: frameNotificationOptions.gap,
+          ctx: resolveSafeCtx() ?? undefined,
+        }, msg.col, msg.row);
+
+        if (notificationTarget?.kind === 'dismiss') {
+          return applyFrameNotificationState(
+            model,
+            dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),
+            nowMs,
+          );
+        }
+        if (notificationTarget != null) {
+          return [model, []];
+        }
+      }
+
+      if (msg.row === 0) {
+        const header = resolveHeaderLine(model, options, pagesById);
+        const tab = header.tabTargets.find((target) =>
+          msg.col >= target.startCol && msg.col <= target.endCol,
+        );
+        if (tab != null) {
+          const currentIndex = model.pageOrder.indexOf(model.activePageId);
+          const nextIndex = model.pageOrder.indexOf(tab.pageId);
+          if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
+            return switchTab(model, nextIndex - currentIndex, pagesById, options);
+          }
+          return [model, []];
         }
         return [model, []];
       }
-      return [model, []];
+
+      const clickedPaneId = paneAtPosition(model, msg.col, msg.row, pagesById);
+      if (clickedPaneId != null) {
+        const focusedModel = focusPane(model, clickedPaneId);
+        return [focusedModel, [emitMsgForPage(model.activePageId, msg as unknown as Msg)]];
+      }
+    }
+
+    if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+      const hoveredPaneId = paneAtPosition(model, msg.col, msg.row, pagesById);
+      if (hoveredPaneId != null) {
+        const focusedModel = focusPane(model, hoveredPaneId);
+        const action: FrameAction = msg.action === 'scroll-down'
+          ? { type: 'scroll-down' }
+          : { type: 'scroll-up' };
+        return [scrollFocusedPane(focusedModel, action, pagesById), []];
+      }
     }
 
     return undefined;
@@ -533,6 +572,7 @@ export function createFramedApp<PageModel, Msg>(
         columns: Math.max(1, options.initialColumns ?? 80),
         rows: Math.max(1, options.initialRows ?? 24),
         helpOpen: false,
+        helpScrollY: 0,
         transitionProgress: 1,
         transitionGeneration: 0,
         transitionFrame: 0,
@@ -654,15 +694,23 @@ export function createFramedApp<PageModel, Msg>(
           return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
 
+        const activePage = pagesById.get(model.activePageId)!;
+
         // Help acts as a modal layer when open: only close keys are handled.
         if (model.helpOpen) {
           if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === '?')) {
-            return [{ ...model, helpOpen: false }, withObservedKey(model, [], msg, 'help')];
+            return [{ ...model, helpOpen: false, helpScrollY: 0 }, withObservedKey(model, [], msg, 'help')];
+          }
+          const helpAction = frameKeys.handle(msg);
+          if (helpAction && isHelpScrollAction(helpAction)) {
+            return [
+              applyHelpScrollAction(model, activePage, helpAction, frameKeys, options),
+              withObservedKey(model, [], msg, 'help'),
+            ];
           }
           return [model, withObservedKey(model, [], msg, 'help')];
         }
 
-        const activePage = pagesById.get(model.activePageId)!;
         const activePageModel = model.pageModels[model.activePageId]!;
         const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
         if (modalKeyMap != null) {
@@ -783,11 +831,12 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.helpOpen) {
-        const full = helpView(mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap));
+        const helpOverlay = renderHelpOverlay(model, activePage, frameKeys, options);
         overlays.push(modal({
           title: 'Keyboard Help',
-          body: full.length > 0 ? full : 'No bindings',
-          hint: 'Press ? to close',
+          body: helpOverlay.body,
+          hint: HELP_SCROLL_HINT,
+          width: helpOverlay.body.width + 4,
           screenWidth: model.columns,
           screenHeight: model.rows,
         }));
@@ -849,4 +898,153 @@ function composeFrameSurface(options: FrameSurfaceOptions): Surface {
     frame.blit(options.bodySurface, options.bodyRect.col, options.bodyRect.row);
   }
   return compositeSurface(frame, options.overlays, { dim: options.dimBackground });
+}
+
+function focusPane<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  paneId: string,
+): InternalFrameModel<PageModel, Msg> {
+  if (model.focusedPaneByPage[model.activePageId] === paneId) return model;
+  return {
+    ...model,
+    focusedPaneByPage: {
+      ...model.focusedPaneByPage,
+      [model.activePageId]: paneId,
+    },
+  };
+}
+
+function paneAtPosition<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  col: number,
+  row: number,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): string | undefined {
+  const bodyRect = frameBodyRect(model.columns, model.rows);
+  const maxState = model.maximizedPaneByPage[model.activePageId];
+  const maximizedPaneId = maxState?.maximizedPaneId;
+  const renderResult = maximizedPaneId
+    ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+    : renderPageContent(model.activePageId, model, bodyRect, pagesById);
+
+  for (const [paneId, rect] of renderResult.paneRects.entries()) {
+    if (
+      col >= rect.col
+      && col < rect.col + rect.width
+      && row >= rect.row
+      && row < rect.row + rect.height
+    ) {
+      return paneId;
+    }
+  }
+
+  return undefined;
+}
+
+function renderHelpOverlay<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  activePage: FramePage<PageModel, Msg>,
+  frameKeys: KeyMap<FrameAction>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): { body: Surface; maxScrollY: number; scrollY: number } {
+  const source = mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap);
+  const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
+  const bodyWidth = Math.max(20, maxDialogWidth - 4);
+  const helpSurface = helpViewSurface(source, {
+    title: undefined,
+    width: bodyWidth,
+  });
+  const pagerHeight = Math.max(4, Math.min(helpSurface.height + 1, Math.max(4, model.rows - 8)));
+  const pagerState = createPagerStateForSurface(helpSurface, {
+    width: bodyWidth,
+    height: pagerHeight,
+  });
+  const scrollY = Math.max(0, Math.min(model.helpScrollY, pagerState.scroll.maxY));
+  const scrolledState = {
+    ...pagerState,
+    scroll: {
+      ...pagerState.scroll,
+      y: scrollY,
+    },
+  };
+  return {
+    body: pagerSurface(helpSurface, scrolledState, { showScrollbar: true, showStatus: true }),
+    maxScrollY: pagerState.scroll.maxY,
+    scrollY,
+  };
+}
+
+function isHelpScrollAction(
+  action: FrameAction,
+): action is Extract<FrameAction, { type: 'scroll-up' | 'scroll-down' | 'page-up' | 'page-down' | 'top' | 'bottom' }> {
+  return action.type === 'scroll-up'
+    || action.type === 'scroll-down'
+    || action.type === 'page-up'
+    || action.type === 'page-down'
+    || action.type === 'top'
+    || action.type === 'bottom';
+}
+
+function applyHelpScrollAction<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  activePage: FramePage<PageModel, Msg>,
+  action: Extract<FrameAction, { type: 'scroll-up' | 'scroll-down' | 'page-up' | 'page-down' | 'top' | 'bottom' }>,
+  frameKeys: KeyMap<FrameAction>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): InternalFrameModel<PageModel, Msg> {
+  const overlay = renderHelpOverlay(model, activePage, frameKeys, options);
+  const pagerState = {
+    scroll: {
+      y: overlay.scrollY,
+      maxY: overlay.maxScrollY,
+      x: 0,
+      maxX: 0,
+      totalLines: overlay.maxScrollY + Math.max(1, overlay.body.height - 1),
+      visibleLines: Math.max(1, overlay.body.height - 1),
+    },
+    content: '',
+    width: overlay.body.width,
+    height: overlay.body.height,
+  };
+
+  let next = pagerState;
+  switch (action.type) {
+    case 'scroll-up':
+      next = pagerScrollBy(pagerState, -1);
+      break;
+    case 'scroll-down':
+      next = pagerScrollBy(pagerState, 1);
+      break;
+    case 'page-up':
+      next = pagerPageUp(pagerState);
+      break;
+    case 'page-down':
+      next = pagerPageDown(pagerState);
+      break;
+    case 'top':
+      next = pagerScrollToTop(pagerState);
+      break;
+    case 'bottom':
+      next = pagerScrollToBottom(pagerState);
+      break;
+  }
+
+  return {
+    ...model,
+    helpScrollY: next.scroll.y,
+  };
+}
+
+function applyHelpScroll<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  activePage: FramePage<PageModel, Msg>,
+  delta: number,
+  frameKeys: KeyMap<FrameAction>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): InternalFrameModel<PageModel, Msg> {
+  const overlay = renderHelpOverlay(model, activePage, frameKeys, options);
+  return {
+    ...model,
+    helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)),
+  };
 }

@@ -29,6 +29,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **Docs preview usability pass** — the Learn by Touch preview now enables mouse mode, keeps story navigation on arrow keys instead of colliding with shell scroll keys, surfaces explicit docs-pane scroll hints, and uses a paged frame-help overlay so long keyboard help remains navigable instead of silently overflowing.
 - **Learn by Touch validation slice** — the Learn by Touch strategy doc now points to the first shipped validation surface in `examples/docs`, so the post-v4 docs milestone is grounded in a real story-driven example instead of only a strategy narrative.
 - **ComponentStory v0 design** — added a dedicated design note and formal story-protocol spec that define the first structured story contract for Learn by Touch, including migration from showcase `ComponentEntry`, v0 field shape, scope boundaries, and the recommended first story set.
 - **Learn by Touch strategy doc** — added a dedicated strategy document for the first post-v4 milestone, reframing the docs/story platform work around primary users, jobs to be done, principles, and a recommended first slice instead of treating it as an abstract feature bucket.

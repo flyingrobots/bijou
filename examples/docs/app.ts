@@ -89,7 +89,10 @@ function renderStoryListPane(model: DocsPageModel, width: number, height: number
     { ...model.listState, height: visibleHeight },
     { width: Math.max(1, width), showScrollbar: true, ctx },
   );
-  const footer = line(` ${model.listState.focusIndex + 1}/${model.listState.items.length} • ${story.family}`, width);
+  const footer = line(
+    ` ${model.listState.focusIndex + 1}/${model.listState.items.length} • ${story.family} • ↑/↓ choose • Tab pane`,
+    width,
+  );
 
   return column([
     separatorSurface({ label: 'stories', width, ctx }),
@@ -110,6 +113,7 @@ function renderStoryDocsPane(model: DocsPageModel, width: number, ctx: BijouCont
 
   return column([
     separatorSurface({ label: `docs • ${story.title}`, width, ctx }),
+    line(' scroll: j/k • d/u • g/G • mouse wheel', width),
     contentSurface(docs),
   ]);
 }
@@ -151,13 +155,9 @@ function renderStoryDemoPane(
 const pageKeys = createKeyMap<Msg>()
   .group('Stories', (group) => group
     .bind('down', 'Next story', { type: 'story-next' })
-    .bind('j', 'Next story', { type: 'story-next' })
     .bind('up', 'Previous story', { type: 'story-prev' })
-    .bind('k', 'Previous story', { type: 'story-prev' })
     .bind('pagedown', 'Page down', { type: 'story-page-down' })
-    .bind('d', 'Page down', { type: 'story-page-down' })
-    .bind('pageup', 'Page up', { type: 'story-page-up' })
-    .bind('u', 'Page up', { type: 'story-page-up' }),
+    .bind('pageup', 'Page up', { type: 'story-page-up' }),
   );
 
 const globalKeys = createKeyMap<Msg>()
@@ -174,10 +174,39 @@ const globalKeys = createKeyMap<Msg>()
   .bind('q', 'Quit', { type: 'quit' })
   .bind('ctrl+c', 'Quit', { type: 'quit' });
 
+const docsHelpKeys = createKeyMap<Msg>()
+  .group('Docs', (group) => group
+    .bind('up', 'Previous story', { type: 'story-prev' })
+    .bind('down', 'Next story', { type: 'story-next' })
+    .bind('tab', 'Next pane', { type: 'story-next' })
+    .bind('shift+tab', 'Previous pane', { type: 'story-prev' })
+    .bind('j', 'Scroll down', { type: 'story-next' })
+    .bind('k', 'Scroll up', { type: 'story-prev' })
+    .bind('d', 'Page down', { type: 'story-page-down' })
+    .bind('u', 'Page up', { type: 'story-page-up' })
+    .bind('g', 'Top', { type: 'story-prev' })
+    .bind('shift+g', 'Bottom', { type: 'story-next' }),
+  )
+  .group('Profiles', (group) => group
+    .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
+    .bind('2', 'Static profile', { type: 'set-profile', mode: 'static' })
+    .bind('3', 'Pipe profile', { type: 'set-profile', mode: 'pipe' })
+    .bind('4', 'Accessible profile', { type: 'set-profile', mode: 'accessible' }),
+  )
+  .group('Variants', (group) => group
+    .bind('.', 'Next variant', { type: 'variant-next' })
+    .bind(',', 'Previous variant', { type: 'variant-prev' }),
+  )
+  .group('General', (group) => group
+    .bind('?', 'Toggle help', { type: 'quit' })
+    .bind('q', 'Quit', { type: 'quit' }),
+  );
+
 export function createDocsApp(ctx: BijouContext): App<unknown, Msg> {
   return createFramedApp<DocsPageModel, Msg>({
     title: 'Bijou Docs Preview',
     globalKeys,
+    helpLineSource: () => docsHelpKeys,
     pages: [{
       id: 'learn-by-touch',
       title: 'Learn by Touch',

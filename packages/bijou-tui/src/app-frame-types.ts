@@ -27,6 +27,7 @@ export const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 /** Internal model extending the public FrameModel with palette entries. */
 export interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
   readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[];
+  readonly helpScrollY: number;
 }
 
 /** A command palette entry linking a UI item to an action or message. */
