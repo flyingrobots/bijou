@@ -92,6 +92,20 @@ This milestone should follow these principles:
 
 ## Scope of Learn by Touch
 
+### Current validation slice
+
+The first implementation slice now lives in [examples/docs](/Users/james/git/bijou/examples/docs/README.md).
+
+It is intentionally small:
+
+- three canonical component stories
+- one framed docs shell
+- one docs pane derived from structured story fields
+- one live demo pane driven by the same story record
+- profile switching across `rich`, `static`, `pipe`, and `accessible`
+
+That slice is not the final docs product. It is the first proof that the story substrate can drive teaching and live previews without re-encoding the doctrine by hand.
+
 ### 1. Story Protocol
 
 This is the highest-leverage foundation.

@@ -28,6 +28,22 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 
 See [showcase](./showcase/) for the structured preview contract and usage notes.
 
+## Learn by Touch
+
+First story-driven docs slice built with Bijou itself:
+
+```sh
+npx tsx examples/docs/main.ts
+```
+
+This example proves the new `ComponentStory` v0 loop with three canonical families:
+
+- `alert()` for in-flow status and graceful lowering
+- `modal()` for overlay doctrine and structured interruption
+- `viewportSurface()` for masking and width-sensitive overflow behavior
+
+See [docs](./docs/) for the first living-docs preview built from those shared story records.
+
 ## Choosing Between Similar Examples
 
 - Use [`note`](./note/) for explanatory, non-urgent support inside a flow.
@@ -114,6 +130,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 | [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
 | [`release-workbench`](./release-workbench/) | `createFramedApp()`, `drawer()`, command palette | Canonical multi-view control room with pane-scoped drawers and shell-level action discovery |
+| [`docs`](./docs/) | `ComponentStory` v0, `createFramedApp()` | First story-driven living-docs slice with profile switching and live demos |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
 | [`browsable-list`](./browsable-list/) | `browsableListSurface()`, `browsableListKeyMap()` | Navigable list with viewport-backed surface masking |

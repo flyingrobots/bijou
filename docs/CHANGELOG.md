@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Learn by Touch docs preview** — added a first story-driven docs slice in `examples/docs`, plus a reusable `ComponentStory` v0 examples substrate that can render structured docs and live previews for `alert()`, `modal()`, and `viewportSurface()` with profile switching.
 - **Notification history center** — `@flyingrobots/bijou-tui` now exposes `renderNotificationHistory()` / `countNotificationHistory()`, and the framed notification lab can open a scrollable history modal from the command palette or `Shift+H`, with filter cycling and archived actionable/error review.
 - **Shared TUI design-language defaults** — `@flyingrobots/bijou-tui` now centralizes compact-viewport detection plus overlay/notification inset defaults, so modals, toasts, and the notification lab share one cell-based spacing policy instead of drifting on local magic numbers.
 - **Pointer policy + shell mouse routing** — `@flyingrobots/bijou-tui` now documents keyboard-first mouse policy, lets framed apps route click interactions through shell tabs and notification stacks, exposes notification hit-testing helpers, and enables the notification demo to run in real mouse mode.
@@ -28,6 +29,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **Learn by Touch validation slice** — the Learn by Touch strategy doc now points to the first shipped validation surface in `examples/docs`, so the post-v4 docs milestone is grounded in a real story-driven example instead of only a strategy narrative.
 - **ComponentStory v0 design** — added a dedicated design note and formal story-protocol spec that define the first structured story contract for Learn by Touch, including migration from showcase `ComponentEntry`, v0 field shape, scope boundaries, and the recommended first story set.
 - **Learn by Touch strategy doc** — added a dedicated strategy document for the first post-v4 milestone, reframing the docs/story platform work around primary users, jobs to be done, principles, and a recommended first slice instead of treating it as an abstract feature bucket.
 - **Post-v4 roadmap triage** — the roadmap now reflects `v4.0.0` as a shipped release, moves the pure-surface release work into the completed archive, and reorganizes active backlog into post-v4 priorities: story-first docs, replay/debug tooling, platform hardening, runtime/design-system expansion, and long-range ecosystem bets.
