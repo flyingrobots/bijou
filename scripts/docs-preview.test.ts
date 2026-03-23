@@ -3,30 +3,37 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../examples/docs/app.js';
 
+const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
-const KEY_TAB = '\t';
 
 describe('docs preview app', () => {
-  it('uses arrow keys for story navigation so shell scroll keys stay available', async () => {
+  it('lands on the hero page first and enters the docs on Enter', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
-    const result = await runScript(app, [{ key: KEY_DOWN }], { ctx });
-    const pageModel = (result.model as any).pageModels['learn-by-touch'];
+    const initial = await runScript(app, [], { ctx });
+    expect((initial.model as any).route).toBe('landing');
 
-    expect(pageModel.listState.focusIndex).toBe(1);
+    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    expect((entered.model as any).route).toBe('docs');
   });
 
-  it('keeps j/k available for docs-pane scrolling after focus moves there', async () => {
+  it('expands a family, selects a story, and cycles its variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
     const result = await runScript(app, [
-      { key: KEY_TAB },
-      { key: 'j' },
+      { key: KEY_ENTER },
+      { key: KEY_ENTER },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+      { key: '.' },
     ], { ctx });
 
-    expect((result.model as any).focusedPaneByPage['learn-by-touch']).toBe('story-docs');
-    expect((result.model as any).scrollByPage['learn-by-touch']['story-docs'].y).toBeGreaterThan(0);
+    const pageModel = (result.model as any).docsModel.pageModels['learn-by-touch'];
+
+    expect((result.model as any).route).toBe('docs');
+    expect(pageModel.selectedStoryId).toBe('alert');
+    expect(pageModel.variantIndexByStory.alert).toBe(1);
   });
 });

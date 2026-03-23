@@ -30,13 +30,15 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 
 ## Learn by Touch
 
-First story-driven docs slice built with Bijou itself:
+Landing-first story-driven docs slice built with Bijou itself:
 
 ```sh
 npx tsx examples/docs/main.ts
 ```
 
-This example proves the new `ComponentStory` v0 loop with three canonical families:
+This example now opens on a hero screen, then drops into a three-lane docs explorer with component families on the left, selected-component docs in the center, and variants on the right.
+
+It proves the new `ComponentStory` v0 loop with three canonical families:
 
 - `alert()` for in-flow status and graceful lowering
 - `modal()` for overlay doctrine and structured interruption

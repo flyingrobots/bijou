@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Landing-first Learn by Touch docs shell** — the docs preview now opens on a dedicated hero screen using the tracked `bijou.txt` art asset, then enters a three-lane explorer with component families on the left, selected-component docs and live preview in the center, and variants on the right.
 - **Learn by Touch docs preview** — added a first story-driven docs slice in `examples/docs`, plus a reusable `ComponentStory` v0 examples substrate that can render structured docs and live previews for `alert()`, `modal()`, and `viewportSurface()` with profile switching.
 - **Notification history center** — `@flyingrobots/bijou-tui` now exposes `renderNotificationHistory()` / `countNotificationHistory()`, and the framed notification lab can open a scrollable history modal from the command palette or `Shift+H`, with filter cycling and archived actionable/error review.
 - **Shared TUI design-language defaults** — `@flyingrobots/bijou-tui` now centralizes compact-viewport detection plus overlay/notification inset defaults, so modals, toasts, and the notification lab share one cell-based spacing policy instead of drifting on local magic numbers.
