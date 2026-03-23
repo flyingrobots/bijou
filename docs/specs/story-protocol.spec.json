@@ -1,0 +1,60 @@
+{
+  "name": "Story Protocol",
+  "designPattern": "Structured Content / Demo Contract / Scenario Substrate",
+  "requirements": [
+    "Learn by Touch strategy",
+    "Pure-surface runtime path",
+    "Design-system component-family guidance"
+  ],
+  "userStory": {
+    "asA": "Bijou maintainer or curious builder",
+    "iWant": "a single structured story format for component and pattern teaching",
+    "soThat": "docs, demos, profile comparisons, and later scenario tooling can share one source of truth instead of drifting copies"
+  },
+  "acceptanceCriteria": [
+    "A `ComponentStory` v0 shape is defined with explicit docs fields instead of one freeform description blob",
+    "A story can render a live preview in at least one canonical width using either string or Surface output",
+    "A story can describe graceful lowering for interactive, static, pipe, and accessible modes as structured fields",
+    "A story can model more than one canonical variant for the same component family",
+    "At least three canonical component families can be expressed with the v0 shape without adding bespoke per-story escape hatches",
+    "The first docs surface can render from stories without re-encoding use/avoid/lowering guidance elsewhere"
+  ],
+  "backwardCompatibility": "Existing showcase `ComponentEntry` records may coexist during migration, but the story protocol becomes the intended canonical teaching substrate for new docs-driven work.",
+  "scope": {
+    "inScope": [
+      "ComponentStory v0 design",
+      "Structured docs fields (summary, use, avoid, related families, lowering)",
+      "Variant modeling",
+      "Profile preset metadata",
+      "Source/example references",
+      "Migration path from showcase entries"
+    ],
+    "outScope": [
+      "Full PatternStory schema",
+      "Selector protocol details",
+      "Scenario harness protocol details",
+      "Visual editor integration",
+      "Exhaustive knobs/controls system"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Define three canonical stories (`alert`/`note`, `modal`/`drawer`, and `viewportSurface` or `navigableTableSurface`) and render them in a narrow docs surface with profile switching. Verify that the docs page, preview, and profile comparison all derive from the story record rather than duplicated prose.",
+    "edgeCases": [
+      "A component family with multiple meaningful variants but low interaction complexity",
+      "A TUI-only structured overlay family",
+      "A width-sensitive structured component whose value is more behavioral than decorative"
+    ],
+    "fuzzStress": "Not applicable in v0. The risk is schema overfitting or underfitting, not runtime scale.",
+    "failureCases": [
+      "The schema collapses back into one unstructured markdown blob",
+      "A family requires bespoke fields outside the v0 contract just to be documented honestly",
+      "The docs app must duplicate story guidance because the story record is missing critical teaching fields"
+    ]
+  },
+  "priority": "P0",
+  "estimatedComplexity": {
+    "linesOfCode": "~250 lines for the first typed contract and canonical story set, plus docs wiring",
+    "timeComplexity": "O(1) per story render, excluding the component preview itself",
+    "workEstimate": "Medium"
+  }
+}

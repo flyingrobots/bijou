@@ -96,6 +96,11 @@ This milestone should follow these principles:
 
 This is the highest-leverage foundation.
 
+Reference documents:
+
+- [ComponentStory v0 design note](component-story-v0.md)
+- [Story Protocol spec](../specs/story-protocol.spec.json)
+
 What it is:
 
 - a structured `ComponentStory` / `PatternStory` model
