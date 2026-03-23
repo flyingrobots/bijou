@@ -19,6 +19,17 @@ function serializeFrame(frame: { width: number; height: number; get(x: number, y
   return cells.join('\n');
 }
 
+function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+  let text = '';
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      text += frame.get(x, y).char || ' ';
+    }
+    text += '\n';
+  }
+  return text;
+}
+
 describe('docs preview app', () => {
   it('lands on the hero page first and enters the docs on Enter', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -80,6 +91,22 @@ describe('docs preview app', () => {
 
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
+  });
+
+  it('shows a toast with the theme name when the landing theme changes and clears it later', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const switched = await runScript(app, [{ key: '2' }], { ctx });
+    const switchedFrame = switched.frames[switched.frames.length - 1]!;
+    expect(frameText(switchedFrame)).toContain('Cabinet of Curiosities');
+
+    const settled = await runScript(app, [
+      { key: '2' },
+      { pulse: { dt: 2 } },
+    ], { ctx });
+    const settledFrame = settled.frames[settled.frames.length - 1]!;
+    expect(frameText(settledFrame)).not.toContain('Cabinet of Curiosities');
   });
 
   it('expands a family, selects a story, and cycles its variants', async () => {

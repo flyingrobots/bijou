@@ -12,6 +12,7 @@ import {
 import {
   browsableListSurface,
   canvas,
+  compositeSurface,
   createBrowsableListState,
   createFramedApp,
   createKeyMap,
@@ -25,6 +26,7 @@ import {
   mapCmds,
   placeSurface,
   quit,
+  toast,
   type App,
   type Cmd,
   type FrameModel,
@@ -102,6 +104,7 @@ interface RootModel {
   readonly rows: number;
   readonly landingTimeMs: number;
   readonly landingThemeIndex: number;
+  readonly landingToast?: LandingToastState;
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
@@ -110,39 +113,50 @@ type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
 
 interface LandingThemeTokens {
   readonly id: string;
+  readonly label: string;
   readonly background: string;
   readonly waveGradient: readonly [string, string, string];
   readonly logoGradient: readonly [string, string, string];
+}
+
+interface LandingToastState {
+  readonly message: string;
+  readonly expiresAtMs: number;
 }
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const LANDING_THEMES: readonly LandingThemeTokens[] = [
   {
     id: 'storybook-workstation',
+    label: 'Storybook Workstation',
     background: '#18172b',
     waveGradient: ['#2f3f66', '#5f87c8', '#f2c96b'],
     logoGradient: ['#8ba8ff', '#f3b57a', '#ffd86d'],
   },
   {
     id: 'cabinet-of-curiosities',
+    label: 'Cabinet of Curiosities',
     background: '#1d1720',
     waveGradient: ['#55413a', '#9f7754', '#d7ba7f'],
     logoGradient: ['#8eb489', '#d8b26e', '#d47a4f'],
   },
   {
     id: 'soft-arcade',
+    label: 'Soft Arcade',
     background: '#161a26',
     waveGradient: ['#31557c', '#67a2d3', '#f4a57c'],
     logoGradient: ['#9bb6ff', '#f0a0bf', '#ffd76e'],
   },
   {
     id: 'moss-and-embers',
+    label: 'Moss and Embers',
     background: '#171d1b',
     waveGradient: ['#40594b', '#84af86', '#ef9d51'],
     logoGradient: ['#6fa9a3', '#dfbf73', '#ee7c56'],
   },
   {
     id: 'paper-moon',
+    label: 'Paper Moon',
     background: '#1f1d24',
     waveGradient: ['#52506f', '#8c8ab8', '#f3ceb0'],
     logoGradient: ['#8eb7d8', '#d9a7c7', '#f4d98b'],
@@ -402,6 +416,18 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
   const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
   const logo = createLogoSurface(logoWidth, logoHeight, model.landingTimeMs, tokens);
   surface.blit(logo, Math.floor((width - logo.width) / 2), Math.floor((height - logo.height) / 2));
+
+  if (model.landingToast && model.landingTimeMs < model.landingToast.expiresAtMs) {
+    return compositeSurface(surface, [toast({
+      message: model.landingToast.message,
+      variant: 'info',
+      anchor: 'top-right',
+      screenWidth: width,
+      screenHeight: height,
+      ctx,
+    })]);
+  }
+
   return surface;
 }
 
@@ -573,6 +599,20 @@ function resolveLandingTheme(index: number): LandingThemeTokens {
 
 function nextLandingThemeIndex(current: number, delta: number): number {
   return mod(current + delta, LANDING_THEMES.length);
+}
+
+function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
+  const nextIndex = mod(index, LANDING_THEMES.length);
+  if (nextIndex === model.landingThemeIndex) return model;
+  const theme = resolveLandingTheme(nextIndex);
+  return {
+    ...model,
+    landingThemeIndex: nextIndex,
+    landingToast: {
+      message: theme.label,
+      expiresAtMs: model.landingTimeMs + 1600,
+    },
+  };
 }
 
 function lerpTheme(
@@ -855,6 +895,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingThemeIndex: 0,
+        landingToast: undefined,
         docsModel,
       }, mapExplorer(cmds)];
     },
@@ -875,17 +916,24 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
 
       if (model.route === 'landing') {
         if (msg.type === 'pulse') {
-          return [{ ...model, landingTimeMs: model.landingTimeMs + Math.round(msg.dt * 1000) }, []];
+          const landingTimeMs = model.landingTimeMs + Math.round(msg.dt * 1000);
+          return [{
+            ...model,
+            landingTimeMs,
+            landingToast: model.landingToast && landingTimeMs < model.landingToast.expiresAtMs
+              ? model.landingToast
+              : undefined,
+          }, []];
         }
         if (isKeyMsg(msg)) {
           if (msg.key === 'left') {
-            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, -1) }, []];
+            return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
           }
           if (msg.key === 'right') {
-            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+            return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
           }
           if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
-            return [{ ...model, landingThemeIndex: Number(msg.key) - 1 }, []];
+            return [applyLandingThemeSelection(model, Number(msg.key) - 1), []];
           }
           if (msg.key === 'enter' || msg.key === 'space') {
             return [{ ...model, route: 'docs' }, []];
