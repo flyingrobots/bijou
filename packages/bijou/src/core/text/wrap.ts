@@ -50,40 +50,99 @@ function finalizeWrappedLine(raw: string, activeStyle: string): string {
   return raw + RESET_SGR;
 }
 
+function isWhitespaceToken(token: WrapToken): boolean {
+  return token.kind === 'grapheme' && /^\s+$/.test(token.raw);
+}
+
+function tokensWidth(tokens: readonly WrapToken[]): number {
+  let width = 0;
+  for (const token of tokens) {
+    if (token.kind === 'grapheme') width += token.width;
+  }
+  return width;
+}
+
+function tokensRaw(tokens: readonly WrapToken[]): string {
+  return tokens.map((token) => token.raw).join('');
+}
+
+function trimLeadingWhitespaceTokens(tokens: readonly WrapToken[]): WrapToken[] {
+  const trimmed: WrapToken[] = [];
+  let dropping = true;
+  for (const token of tokens) {
+    if (dropping && isWhitespaceToken(token)) continue;
+    if (token.kind === 'grapheme') dropping = false;
+    trimmed.push(token);
+  }
+  return trimmed;
+}
+
 function wrapSingleLine(str: string, maxWidth: number): string[] {
   if (str.length === 0) return [''];
   if (maxWidth <= 0) return [''];
 
   const tokens = tokenizeAnsiText(str);
   const lines: string[] = [];
-  let currentRaw = '';
+  let currentTokens: WrapToken[] = [];
   let currentWidth = 0;
   let activeStyle = '';
-
-  const pushLine = (): void => {
-    if (currentWidth <= 0) return;
-    lines.push(finalizeWrappedLine(currentRaw, activeStyle));
-    currentRaw = activeStyle;
-    currentWidth = 0;
-  };
+  let lastBreakIndex = -1;
+  let activeStyleAtLastBreak = '';
 
   for (const token of tokens) {
     if (token.kind === 'ansi') {
-      currentRaw += token.raw;
+      currentTokens.push(token);
       activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
       continue;
     }
 
-    if (currentWidth > 0 && currentWidth + token.width > maxWidth) {
-      pushLine();
+    currentTokens.push(token);
+    currentWidth += token.width;
+
+    if (isWhitespaceToken(token)) {
+      lastBreakIndex = currentTokens.length - 1;
+      activeStyleAtLastBreak = activeStyle;
     }
 
-    currentRaw += token.raw;
-    currentWidth += token.width;
+    if (currentWidth <= maxWidth) {
+      continue;
+    }
+
+    if (lastBreakIndex >= 0) {
+      const lineTokens = currentTokens.slice(0, lastBreakIndex);
+      if (tokensWidth(lineTokens) > 0) {
+        lines.push(finalizeWrappedLine(tokensRaw(lineTokens), activeStyleAtLastBreak));
+      }
+
+      const remainder = trimLeadingWhitespaceTokens(currentTokens.slice(lastBreakIndex + 1));
+      currentTokens = activeStyleAtLastBreak.length === 0
+        ? remainder
+        : [
+            ...tokenizeAnsiText(activeStyleAtLastBreak).filter((part): part is Extract<WrapToken, { kind: 'ansi' }> => part.kind === 'ansi'),
+            ...remainder,
+          ];
+      currentWidth = tokensWidth(currentTokens);
+      activeStyle = activeStyleAtLastBreak;
+      lastBreakIndex = -1;
+      activeStyleAtLastBreak = activeStyle;
+      continue;
+    }
+
+    const lineTokens = currentTokens.slice(0, -1);
+    if (tokensWidth(lineTokens) > 0) {
+      lines.push(finalizeWrappedLine(tokensRaw(lineTokens), activeStyle));
+    }
+    currentTokens = activeStyle.length === 0
+      ? [token]
+      : [
+          ...tokenizeAnsiText(activeStyle).filter((part): part is Extract<WrapToken, { kind: 'ansi' }> => part.kind === 'ansi'),
+          token,
+        ];
+    currentWidth = token.width;
   }
 
   if (currentWidth > 0) {
-    lines.push(finalizeWrappedLine(currentRaw, activeStyle));
+    lines.push(finalizeWrappedLine(tokensRaw(currentTokens), activeStyle));
   }
 
   return lines.length > 0 ? lines : [''];

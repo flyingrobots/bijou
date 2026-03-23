@@ -49,7 +49,6 @@ function createInitialModel(ctx: BijouContext): DocsPageModel {
       items: COMPONENT_STORIES.map((story) => ({
         label: story.title,
         value: story.id,
-        description: story.docs.summary,
       })),
       height: 12,
     }),

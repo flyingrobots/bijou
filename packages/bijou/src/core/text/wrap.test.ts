@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { clipToWidth } from './clip.js';
-import { graphemeWidth } from './grapheme.js';
+import { graphemeWidth, stripAnsi } from './grapheme.js';
 import { wrapToWidth } from './wrap.js';
 
 describe('wrapToWidth', () => {
@@ -24,6 +24,19 @@ describe('wrapToWidth', () => {
   it('keeps wrapped lines within the requested display width', () => {
     const wrapped = wrapToWidth('hello world', 4);
     expect(wrapped.every((line) => graphemeWidth(line) <= 4)).toBe(true);
+  });
+
+  it('prefers wrapping on whitespace boundaries when possible', () => {
+    expect(wrapToWidth('hello world again', 11)).toEqual(['hello world', 'again']);
+  });
+
+  it('preserves ANSI styling when whitespace-aware wrapping splits a styled sentence', () => {
+    const styled = '\x1b[31mhello world again\x1b[0m';
+    const wrapped = wrapToWidth(styled, 11);
+
+    expect(wrapped).toHaveLength(2);
+    expect(wrapped.every((line) => line.endsWith('\x1b[0m'))).toBe(true);
+    expect(wrapped.map((line) => stripAnsi(line))).toEqual(['hello world', 'again']);
   });
 
   it('returns an empty visual line when width is non-positive', () => {

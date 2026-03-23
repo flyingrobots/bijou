@@ -128,14 +128,14 @@ export function storyDocsMarkdown<State>(
     '',
     story.docs.summary,
     '',
-    `**Family:** ${story.family}`,
-    `**Package:** \`${story.package}\``,
-    `**Variant:** ${variant.label}`,
-    `**Profile:** ${preset.label} (\`${preset.mode}\`, ${preset.width} cols)`,
+    '- **Family:** ' + story.family,
+    '- **Package:** ' + `\`${story.package}\``,
+    '- **Variant:** ' + variant.label,
+    '- **Profile:** ' + `${preset.label} (\`${preset.mode}\`, ${preset.width} cols)`,
   ];
 
   if (variant.description != null) {
-    lines.push(`**Variant focus:** ${variant.description}`);
+    lines.push(`- **Variant focus:** ${variant.description}`);
   }
 
   lines.push(

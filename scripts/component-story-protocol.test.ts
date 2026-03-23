@@ -73,8 +73,8 @@ describe('ComponentStory protocol', () => {
     expect(markdown).toContain('## Use when');
     expect(markdown).toContain('- A page needs durable status.');
     expect(markdown).toContain('## Graceful lowering');
-    expect(markdown).toContain('**Profile:** Static (`static`, 60 cols)');
-    expect(markdown).toContain('Example: `examples/sample/main.ts`');
+    expect(markdown).toContain('- **Profile:** Static (`static`, 60 cols)');
+    expect(markdown).toContain('- Example: `examples/sample/main.ts`');
   });
 
   it('finds matching profile modes and lowers string previews to surfaces', () => {

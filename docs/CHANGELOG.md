@@ -57,6 +57,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Whitespace-first wrapping for shared text flow** — `wrapToWidth()` now prefers breaking at whitespace boundaries before falling back to hard wraps, so text-bearing components using the default wrap path behave more like readable prose instead of splitting words whenever a line reaches the edge.
+- **Docs preview overflow cleanup** — the first Learn by Touch docs slice now keeps the story list compact and renders story metadata as separate lines, so the preview stops teaching clipped sidebar prose and over-dense one-line metadata blocks.
 - **Frame-modal mouse shielding** — `createFramedApp()` now consumes all mouse input while frame help or the command palette is open, so wheel, move, and non-left-click events can no longer leak through to the hidden page beneath an exclusive frame overlay.
 - **Wide-glyph overlay sizing** — the surface-native overlay path and the core ANSI/plain string-to-surface bridges now preserve double-width graphemes as two terminal columns, so modal, toast, drawer, and tooltip boxes stay correctly sized and centered for CJK and emoji content.
 - **Viewport layout masking now re-roots local layout content** — `viewportSurface()` and `createScrollStateForContent()` now normalize non-zero-origin `LayoutNode` inputs before measuring and painting, so scroll masks treat structured content as local viewport content instead of preserving upstream absolute offsets as blank padding.
