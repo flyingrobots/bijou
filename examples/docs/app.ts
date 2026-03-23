@@ -57,10 +57,22 @@ const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
 const LOGO_WIDTH = Math.max(1, ...LOGO_LINES.map((lineText) => lineText.length));
 const LOGO_HEIGHT = LOGO_LINES.length;
+const FLYING_ROBOTS_WIDE_LARGE_TEXT = readFileSync(
+  new URL('../../assets/flyingrobots-wide-large.txt', import.meta.url),
+  'utf8',
+).trimEnd();
+const FLYING_ROBOTS_WIDE_SMALL_TEXT = readFileSync(
+  new URL('../../assets/flyingrobots-wide-small.txt', import.meta.url),
+  'utf8',
+).trimEnd();
 const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', import.meta.url), 'utf8').trimEnd();
 const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
 const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
 const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
+const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
+const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
+const COPYRIGHT_TEXT = 'Copyright © 2026 James Ross • FlyingRobots';
+const ENTER_PROMPT_TEXT = 'Press [Enter]';
 const DOCS_PAGE_ID = 'learn-by-touch';
 const DOCS_SIDEBAR_WIDTH = 32;
 
@@ -415,7 +427,47 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
   const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
   const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
   const logo = createLogoSurface(logoWidth, logoHeight, model.landingTimeMs, tokens);
-  surface.blit(logo, Math.floor((width - logo.width) / 2), Math.floor((height - logo.height) / 2));
+  const logoX = Math.floor((width - logo.width) / 2);
+  const logoY = Math.floor((height - logo.height) / 2);
+  surface.blit(logo, logoX, logoY);
+
+  const wordmarkGlyphs = width >= 110 && height >= 30
+    ? FLYING_ROBOTS_LARGE_LINES
+    : FLYING_ROBOTS_SMALL_LINES;
+  const wordmark = createWordmarkSurface(wordmarkGlyphs, model.landingTimeMs, tokens);
+  const copyrightLine = createTransparentTextSurface(COPYRIGHT_TEXT, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.72)),
+    modifiers: () => ['dim'],
+  });
+  const promptLine = createTransparentTextSurface(ENTER_PROMPT_TEXT, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: (x) => {
+      const char = ENTER_PROMPT_TEXT[x] ?? ' ';
+      if (char === '[' || char === ']' || (x >= 7 && x <= 11)) {
+        return rgbHex(...lerpTheme(tokens.logoGradient, 0.92));
+      }
+      return rgbHex(...lerpTheme(tokens.waveGradient, 0.58));
+    },
+    modifiers: (x) => {
+      const char = ENTER_PROMPT_TEXT[x] ?? ' ';
+      return char === '[' || char === ']' || (x >= 7 && x <= 11) ? ['bold'] : ['dim'];
+    },
+  });
+
+  const copyrightY = Math.max(0, height - copyrightLine.height - 2);
+  const wordmarkY = Math.max(0, copyrightY - wordmark.height - 1);
+  const promptMinY = Math.min(height - 1, logoY + logo.height + 1);
+  const promptMaxY = Math.max(0, wordmarkY - promptLine.height - 2);
+  const promptY = promptMaxY >= promptMinY
+    ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
+    : Math.max(0, Math.min(height - promptLine.height - 1, promptMinY));
+
+  blitCentered(surface, promptLine, promptY);
+  blitCentered(surface, wordmark, wordmarkY);
+  blitCentered(surface, copyrightLine, copyrightY);
 
   if (model.landingToast && model.landingTimeMs < model.landingToast.expiresAtMs) {
     return compositeSurface(surface, [toast({
@@ -519,6 +571,25 @@ function createLogoSurface(
   }
 
   return centerCropSurface(masked, width, height);
+}
+
+function createWordmarkSurface(
+  lines: readonly (readonly string[])[],
+  timeMs: number,
+  tokens: LandingThemeTokens,
+): Surface {
+  const width = Math.max(1, ...lines.map((lineText) => lineText.length));
+  const height = Math.max(1, lines.length);
+  return createTransparentTextSurface(lines, {
+    fg: (x, y, char, totalWidth) => {
+      if (char === ' ') return undefined;
+      const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
+      const shimmer = 0.08 * Math.sin((timeMs / 1000) * 1.4 + (y * 0.55) + (x * 0.12));
+      const colorT = clamp01((xRatio * 0.82) + 0.1 + shimmer);
+      return rgbHex(...lerpTheme(tokens.logoGradient, colorT));
+    },
+    modifiers: (_x, _y, char) => char === ' ' ? undefined : ['bold'],
+  });
 }
 
 function paragraphSurface(text: string, width: number): Surface {
@@ -641,6 +712,58 @@ function rgbHex(r: number, g: number, b: number): string {
 
 function mod(value: number, divisor: number): number {
   return ((value % divisor) + divisor) % divisor;
+}
+
+function splitGlyphLines(text: string): readonly (readonly string[])[] {
+  return text.split(/\r?\n/).map((lineText) => Array.from(lineText));
+}
+
+function createTransparentTextSurface(
+  text: string | readonly (readonly string[])[],
+  options: {
+    readonly bg?: string;
+    readonly fg?: string | ((x: number, y: number, char: string, width: number) => string | undefined);
+    readonly modifiers?: readonly string[] | ((x: number, y: number, char: string, width: number) => readonly string[] | undefined);
+    readonly transparentSpaces?: boolean;
+  } = {},
+): Surface {
+  const lines: readonly (readonly string[])[] = typeof text === 'string'
+    ? splitGlyphLines(text)
+    : text;
+  const width = Math.max(1, ...lines.map((lineText) => lineText.length));
+  const height = Math.max(1, lines.length);
+  const surface = createSurface(width, height);
+  const transparentSpaces = options.transparentSpaces ?? true;
+
+  for (let y = 0; y < height; y++) {
+    const lineText = lines[y] ?? [];
+    for (let x = 0; x < width; x++) {
+      const char = lineText[x] ?? ' ';
+      if (char === ' ' && transparentSpaces) {
+        surface.set(x, y, { char: ' ', empty: true });
+        continue;
+      }
+      const fg = typeof options.fg === 'function'
+        ? options.fg(x, y, char, width)
+        : options.fg;
+      const modifiers = typeof options.modifiers === 'function'
+        ? options.modifiers(x, y, char, width)
+        : options.modifiers;
+      surface.set(x, y, {
+        char,
+        bg: options.bg,
+        fg,
+        modifiers: modifiers as string[] | undefined,
+        empty: false,
+      });
+    }
+  }
+
+  return surface;
+}
+
+function blitCentered(surface: Surface, content: Surface, y: number): void {
+  surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
 }
 
 function renderFamiliesPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {

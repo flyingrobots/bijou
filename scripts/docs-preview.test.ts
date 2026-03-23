@@ -42,7 +42,7 @@ describe('docs preview app', () => {
     expect((entered.model as any).route).toBe('docs');
   });
 
-  it('renders the landing page as pure animated art without the old copy or stats chrome', async () => {
+  it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60 } });
     const app = createDocsApp(ctx);
 
@@ -57,8 +57,10 @@ describe('docs preview app', () => {
       text += '\n';
     }
 
+    expect(text).toContain('Press [Enter]');
+    expect(text).toContain('Copyright © 2026 James Ross • FlyingRobots');
+    expect(text).toContain('8""""');
     expect(text).not.toContain('The docs are the demo');
-    expect(text).not.toContain('Press Enter to enter the docs.');
     expect(text).not.toContain('Families');
     expect(text).not.toContain('Stories');
     expect(text).not.toContain('Profiles');

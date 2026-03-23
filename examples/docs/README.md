@@ -8,7 +8,7 @@ First Learn by Touch slice: a story-driven docs surface built with Bijou itself.
 npx tsx examples/docs/main.ts
 ```
 
-You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt) and [assets/background.txt](/Users/james/git/bijou/assets/background.txt). There is intentionally no instructional chrome on top of it. Press `Enter` to move into the docs explorer.
+You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt), [assets/background.txt](/Users/james/git/bijou/assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](/Users/james/git/bijou/assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](/Users/james/git/bijou/assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and the copyright line.
 
 On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes.
 
@@ -48,7 +48,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 
 - This is intentionally smaller than the existing showcase. It is the first story-driven docs slice, not the final docs product.
 - The docs are the demo: the page text and preview are generated from the same structured story data.
-- The title screen is deliberately just art. If you already know the entry action, it gets out of the way.
+- The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
 
 [← Examples](/Users/james/git/bijou/examples/README.md)
