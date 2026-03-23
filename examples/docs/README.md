@@ -10,6 +10,8 @@ npx tsx examples/docs/main.ts
 
 You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt) and [assets/background.txt](/Users/james/git/bijou/assets/background.txt). There is intentionally no instructional chrome on top of it. Press `Enter` to move into the docs explorer.
 
+On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes.
+
 Mouse is enabled for this preview. In the docs explorer, click a pane to focus it and use the wheel to scroll long docs or help content.
 
 ## What it proves
@@ -29,6 +31,8 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 ## Keys
 
 - `Enter`: enter the docs from the landing page
+- `1` `2` `3` `4` `5`: switch landing-screen theme presets
+- `←` / `→`: cycle landing-screen themes
 - `↑` / `↓`: move through the family/story rows in the left lane
 - `Enter` / `Space`: expand a family or select a component
 - `←` / `→`: collapse or expand the focused family

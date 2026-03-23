@@ -101,13 +101,53 @@ interface RootModel {
   readonly columns: number;
   readonly rows: number;
   readonly landingTimeMs: number;
+  readonly landingThemeIndex: number;
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
 type RootMsg = { type: 'docs'; msg: ExplorerMsg };
 type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
 
+interface LandingThemeTokens {
+  readonly id: string;
+  readonly background: string;
+  readonly waveGradient: readonly [string, string, string];
+  readonly logoGradient: readonly [string, string, string];
+}
+
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
+const LANDING_THEMES: readonly LandingThemeTokens[] = [
+  {
+    id: 'storybook-workstation',
+    background: '#18172b',
+    waveGradient: ['#2f3f66', '#5f87c8', '#f2c96b'],
+    logoGradient: ['#8ba8ff', '#f3b57a', '#ffd86d'],
+  },
+  {
+    id: 'cabinet-of-curiosities',
+    background: '#1d1720',
+    waveGradient: ['#55413a', '#9f7754', '#d7ba7f'],
+    logoGradient: ['#8eb489', '#d8b26e', '#d47a4f'],
+  },
+  {
+    id: 'soft-arcade',
+    background: '#161a26',
+    waveGradient: ['#31557c', '#67a2d3', '#f4a57c'],
+    logoGradient: ['#9bb6ff', '#f0a0bf', '#ffd76e'],
+  },
+  {
+    id: 'moss-and-embers',
+    background: '#171d1b',
+    waveGradient: ['#40594b', '#84af86', '#ef9d51'],
+    logoGradient: ['#6fa9a3', '#dfbf73', '#ee7c56'],
+  },
+  {
+    id: 'paper-moon',
+    background: '#1f1d24',
+    waveGradient: ['#52506f', '#8c8ab8', '#f3ceb0'],
+    logoGradient: ['#8eb7d8', '#d9a7c7', '#f4d98b'],
+  },
+];
 
 const explorerPageKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
@@ -350,21 +390,27 @@ function activateFocusedRow(model: DocsExplorerModel): DocsExplorerModel {
 function renderLanding(model: RootModel, ctx: BijouContext): Surface {
   const width = Math.max(1, model.columns);
   const height = Math.max(1, model.rows);
+  const tokens = resolveLandingTheme(model.landingThemeIndex);
   const surface = createSurface(width, height, {
     char: ' ',
-    bg: ctx.surface('primary').bg,
+    bg: tokens.background,
     empty: false,
   });
-  surface.blit(createLandingBackground(width, height, ctx, model.landingTimeMs), 0, 0);
+  surface.blit(createLandingBackground(width, height, model.landingTimeMs, tokens), 0, 0);
 
   const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
   const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
-  const logo = createLogoSurface(logoWidth, logoHeight, ctx, model.landingTimeMs);
+  const logo = createLogoSurface(logoWidth, logoHeight, model.landingTimeMs, tokens);
   surface.blit(logo, Math.floor((width - logo.width) / 2), Math.floor((height - logo.height) / 2));
   return surface;
 }
 
-function createLandingBackground(width: number, height: number, ctx: BijouContext, timeMs: number): Surface {
+function createLandingBackground(
+  width: number,
+  height: number,
+  timeMs: number,
+  tokens: LandingThemeTokens,
+): Surface {
   const time = timeMs / 1000;
   const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
   const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
@@ -395,7 +441,7 @@ function createLandingBackground(width: number, height: number, ctx: BijouContex
       + (0.22 * (0.5 + (Math.sin((shaderTime * 0.3) + (v * 5.2)) * 0.5)))
       + (0.08 * Math.sin((shaderTime * 0.55) + (x * 0.02))),
     );
-    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, colorT);
+    const [r, g, b] = lerpTheme(tokens.waveGradient, colorT);
 
     return {
       char,
@@ -405,7 +451,12 @@ function createLandingBackground(width: number, height: number, ctx: BijouContex
   }, { time });
 }
 
-function createLogoSurface(width: number, height: number, ctx: BijouContext, timeMs: number): Surface {
+function createLogoSurface(
+  width: number,
+  height: number,
+  timeMs: number,
+  tokens: LandingThemeTokens,
+): Surface {
   const shader = canvas(LOGO_WIDTH, LOGO_HEIGHT, ({ u, v, time }) => {
     const shimmer = 0.46
       + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
@@ -417,7 +468,7 @@ function createLogoSurface(width: number, height: number, ctx: BijouContext, tim
       + ((1 - v) * 0.14)
       + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
     );
-    const [r, g, b] = lerp3(ctx.theme.theme.gradient.brand, colorT);
+    const [r, g, b] = lerpTheme(tokens.logoGradient, colorT);
     return {
       char: densityGlyph(level, { airy: false }),
       fg: rgbHex(r, g, b),
@@ -514,6 +565,34 @@ function reinforceGlyph(source: string, shaderChar: string): string {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+function resolveLandingTheme(index: number): LandingThemeTokens {
+  return LANDING_THEMES[mod(index, LANDING_THEMES.length)]!;
+}
+
+function nextLandingThemeIndex(current: number, delta: number): number {
+  return mod(current + delta, LANDING_THEMES.length);
+}
+
+function lerpTheme(
+  gradient: readonly [string, string, string],
+  t: number,
+): readonly [number, number, number] {
+  return lerp3([
+    { pos: 0, color: hexToRgb(gradient[0]) },
+    { pos: 0.5, color: hexToRgb(gradient[1]) },
+    { pos: 1, color: hexToRgb(gradient[2]) },
+  ], t);
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const normalized = hex.replace(/^#/, '');
+  return [
+    parseInt(normalized.slice(0, 2), 16),
+    parseInt(normalized.slice(2, 4), 16),
+    parseInt(normalized.slice(4, 6), 16),
+  ];
 }
 
 function rgbHex(r: number, g: number, b: number): string {
@@ -775,6 +854,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
+        landingThemeIndex: 0,
         docsModel,
       }, mapExplorer(cmds)];
     },
@@ -798,6 +878,15 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           return [{ ...model, landingTimeMs: model.landingTimeMs + Math.round(msg.dt * 1000) }, []];
         }
         if (isKeyMsg(msg)) {
+          if (msg.key === 'left') {
+            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, -1) }, []];
+          }
+          if (msg.key === 'right') {
+            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+          }
+          if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
+            return [{ ...model, landingThemeIndex: Number(msg.key) - 1 }, []];
+          }
           if (msg.key === 'enter' || msg.key === 'space') {
             return [{ ...model, route: 'docs' }, []];
           }

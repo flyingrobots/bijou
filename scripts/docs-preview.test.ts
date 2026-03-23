@@ -5,6 +5,8 @@ import { createDocsApp } from '../examples/docs/app.js';
 
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
+const KEY_LEFT = '\x1b[D';
+const KEY_RIGHT = '\x1b[C';
 
 function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
   const cells: string[] = [];
@@ -61,6 +63,23 @@ describe('docs preview app', () => {
 
     expect((pulsed.model as any).route).toBe('landing');
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+  });
+
+  it('switches landing-screen themes with number keys and arrow cycling', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const numbered = await runScript(app, [{ key: '3' }], { ctx });
+    const cycledRight = await runScript(app, [{ key: KEY_RIGHT }], { ctx });
+    const cycledLeft = await runScript(app, [{ key: KEY_LEFT }], { ctx });
+
+    expect((numbered.model as any).landingThemeIndex).toBe(2);
+    expect((cycledRight.model as any).landingThemeIndex).toBe(1);
+    expect((cycledLeft.model as any).landingThemeIndex).toBe(4);
+
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
   });
 
   it('expands a family, selects a story, and cycles its variants', async () => {
