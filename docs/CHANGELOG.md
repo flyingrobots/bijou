@@ -59,6 +59,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **Landing hero whitespace now preserves the page background** — the Learn by Touch landing page now treats plain whitespace in the gradient hero and free-floating copy as transparent, so the tracked `bijou.txt` art floats over the page shader instead of wiping it into a black rectangle.
 - **Whitespace-first wrapping for shared text flow** — `wrapToWidth()` now prefers breaking at whitespace boundaries before falling back to hard wraps, so text-bearing components using the default wrap path behave more like readable prose instead of splitting words whenever a line reaches the edge.
 - **Docs preview overflow cleanup** — the first Learn by Touch docs slice now keeps the story list compact and renders story metadata as separate lines, so the preview stops teaching clipped sidebar prose and over-dense one-line metadata blocks.
 - **Frame-modal mouse shielding** — `createFramedApp()` now consumes all mouse input while frame help or the command palette is open, so wheel, move, and non-left-click events can no longer leak through to the hidden page beneath an exclusive frame overlay.

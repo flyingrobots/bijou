@@ -18,6 +18,17 @@ describe('docs preview app', () => {
     expect((entered.model as any).route).toBe('docs');
   });
 
+  it('keeps landing-page hero whitespace transparent over the page background', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+
+    expect(frame.get(50, 10).char).toBe(' ');
+    expect(frame.get(50, 10).bg).toBe(ctx.surface('primary').bg);
+  });
+
   it('expands a family, selects a story, and cycles its variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

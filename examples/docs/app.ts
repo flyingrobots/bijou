@@ -409,10 +409,10 @@ function createLandingContent(width: number, height: number, ctx: BijouContext):
   const innerWidth = Math.max(24, Math.min(Math.max(24, width - 8), 138));
   const showFullHero = innerWidth >= HERO_WIDTH + 2 && height >= 34;
   const hero = createHeroSurface(innerWidth, showFullHero, ctx);
-  const summary = paragraphSurface(
+  const summary = makeWhitespaceTransparent(paragraphSurface(
     'The docs are the demo. Learn the component families, compare graceful lowering across output profiles, and step into the framework through a surface built with Bijou itself.',
     Math.max(32, innerWidth - 4),
-  );
+  ));
   const stats = createStatsSurface(innerWidth, ctx);
   const cta = boxSurface(column([
     line('Press Enter to enter the docs.'),
@@ -423,10 +423,10 @@ function createLandingContent(width: number, height: number, ctx: BijouContext):
     borderToken: ctx.border('primary'),
     ctx,
   });
-  const footer = line('Enter continue • q quit', innerWidth);
+  const footer = makeWhitespaceTransparent(line('Enter continue • q quit', innerWidth));
 
   return column([
-    contentSurface(gradientText('Bijou Docs', ctx.theme.theme.gradient.brand, { style: ctx.style })),
+    makeWhitespaceTransparent(contentSurface(gradientText('Bijou Docs', ctx.theme.theme.gradient.brand, { style: ctx.style }))),
     spacer(1, 1),
     hero,
     spacer(1, 1),
@@ -444,7 +444,7 @@ function createHeroSurface(width: number, showFullHero: boolean, ctx: BijouConte
   const gradient = ctx.theme.theme.gradient.brand;
   if (showFullHero) {
     const hero = HERO_LINES.map((lineText) => gradientText(lineText, gradient, { style: ctx.style })).join('\n');
-    return contentSurface(hero);
+    return makeWhitespaceTransparent(contentSurface(hero));
   }
 
   const compact = [
@@ -488,6 +488,18 @@ function createStatCard(label: string, value: string, ctx: BijouContext): Surfac
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
+}
+
+function makeWhitespaceTransparent(surface: Surface): Surface {
+  const result = surface.clone();
+  for (let y = 0; y < result.height; y++) {
+    for (let x = 0; x < result.width; x++) {
+      const cell = result.get(x, y);
+      if (cell.empty || cell.char !== ' ' || cell.bg != null) continue;
+      result.set(x, y, { char: ' ', empty: true });
+    }
+  }
+  return result;
 }
 
 function renderFamiliesPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {
