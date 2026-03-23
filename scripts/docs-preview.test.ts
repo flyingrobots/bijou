@@ -29,6 +29,25 @@ describe('docs preview app', () => {
     expect(frame.get(50, 10).bg).toBe(ctx.surface('primary').bg);
   });
 
+  it('keeps the real BIJOU hero on narrower terminals instead of swapping to a fallback card', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80, rows: 28 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const frame = initial.frames[0]!;
+
+    let text = '';
+    for (let y = 0; y < frame.height; y++) {
+      for (let x = 0; x < frame.width; x++) {
+        text += frame.get(x, y).char || ' ';
+      }
+      text += '\n';
+    }
+
+    expect(text).not.toContain('Surface-native docs');
+    expect(text).toContain('████');
+  });
+
   it('expands a family, selects a story, and cycles its variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

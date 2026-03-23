@@ -407,8 +407,10 @@ function createLandingBackground(width: number, height: number, ctx: BijouContex
 
 function createLandingContent(width: number, height: number, ctx: BijouContext): Surface {
   const innerWidth = Math.max(24, Math.min(Math.max(24, width - 8), 138));
-  const showFullHero = innerWidth >= HERO_WIDTH + 2 && height >= 34;
-  const hero = createHeroSurface(innerWidth, showFullHero, ctx);
+  const statsHeight = innerWidth >= (18 * 3) + 4 ? 3 : 11;
+  const reservedHeight = 13 + statsHeight;
+  const heroHeight = Math.max(4, Math.min(HERO_LINES.length, height - reservedHeight));
+  const hero = createHeroSurface(innerWidth, heroHeight, ctx);
   const summary = makeWhitespaceTransparent(paragraphSurface(
     'The docs are the demo. Learn the component families, compare graceful lowering across output profiles, and step into the framework through a surface built with Bijou itself.',
     Math.max(32, innerWidth - 4),
@@ -440,24 +442,10 @@ function createLandingContent(width: number, height: number, ctx: BijouContext):
   ]);
 }
 
-function createHeroSurface(width: number, showFullHero: boolean, ctx: BijouContext): Surface {
+function createHeroSurface(width: number, height: number, ctx: BijouContext): Surface {
   const gradient = ctx.theme.theme.gradient.brand;
-  if (showFullHero) {
-    const hero = HERO_LINES.map((lineText) => gradientText(lineText, gradient, { style: ctx.style })).join('\n');
-    return makeWhitespaceTransparent(contentSurface(hero));
-  }
-
-  const compact = [
-    gradientText('BIJOU', gradient, { style: ctx.style }),
-    gradientText('Learn by Touch', gradient, { style: ctx.style }),
-  ].join('\n');
-
-  return boxSurface(contentSurface(compact), {
-    title: 'Surface-native docs',
-    width: Math.max(32, Math.min(width, 64)),
-    borderToken: ctx.border('primary'),
-    ctx,
-  });
+  const hero = HERO_LINES.map((lineText) => gradientText(lineText, gradient, { style: ctx.style })).join('\n');
+  return centerCropSurface(makeWhitespaceTransparent(contentSurface(hero)), width, Math.max(1, height));
 }
 
 function createStatsSurface(width: number, ctx: BijouContext): Surface {
@@ -499,6 +487,31 @@ function makeWhitespaceTransparent(surface: Surface): Surface {
       result.set(x, y, { char: ' ', empty: true });
     }
   }
+  return result;
+}
+
+function centerCropSurface(content: Surface, width: number, height: number): Surface {
+  const targetWidth = Math.max(1, width);
+  const targetHeight = Math.max(1, height);
+  const result = createSurface(targetWidth, targetHeight);
+
+  const srcX = content.width > targetWidth
+    ? Math.floor((content.width - targetWidth) / 2)
+    : 0;
+  const srcY = content.height > targetHeight
+    ? Math.floor((content.height - targetHeight) / 2)
+    : 0;
+
+  const drawWidth = Math.min(targetWidth, content.width);
+  const drawHeight = Math.min(targetHeight, content.height);
+  const destX = content.width < targetWidth
+    ? Math.floor((targetWidth - content.width) / 2)
+    : 0;
+  const destY = content.height < targetHeight
+    ? Math.floor((targetHeight - content.height) / 2)
+    : 0;
+
+  result.blit(content, destX, destY, srcX, srcY, drawWidth, drawHeight);
   return result;
 }
 
