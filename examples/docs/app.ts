@@ -104,9 +104,11 @@ type ExplorerMsg =
   | { type: 'family-page-down' }
   | { type: 'family-page-up' }
   | { type: 'activate-row' }
+  | { type: 'activate-row-index'; index: number }
   | { type: 'expand-row' }
   | { type: 'collapse-row' }
   | { type: 'select-story'; storyId: string }
+  | { type: 'select-variant'; index: number }
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
@@ -178,7 +180,7 @@ const LANDING_THEMES: readonly LandingThemeTokens[] = [
   },
 ];
 
-const explorerPageKeys = createKeyMap<ExplorerMsg>()
+const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
     .bind('up', 'Previous row', { type: 'family-prev' })
@@ -188,6 +190,14 @@ const explorerPageKeys = createKeyMap<ExplorerMsg>()
     .bind('space', 'Expand or select', { type: 'activate-row' })
     .bind('right', 'Expand family', { type: 'expand-row' })
     .bind('left', 'Collapse family', { type: 'collapse-row' }),
+  );
+
+const variantPaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Variants', (group) => group
+    .bind('down', 'Next variant', { type: 'variant-next' })
+    .bind('up', 'Previous variant', { type: 'variant-prev' })
+    .bind('pagedown', 'Next variant', { type: 'variant-next' })
+    .bind('pageup', 'Previous variant', { type: 'variant-prev' }),
   );
 
 const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
@@ -203,24 +213,6 @@ const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
   )
   .bind('q', 'Quit', { type: 'quit' })
   .bind('ctrl+c', 'Quit', { type: 'quit' });
-
-const explorerHelpKeys = createKeyMap<ExplorerMsg>()
-  .group('Browse', (group) => group
-    .bind('up', 'Browse', { type: 'family-prev' })
-    .bind('down', 'Browse', { type: 'family-next' })
-    .bind('enter', 'Open', { type: 'activate-row' })
-    .bind('tab', 'Next pane', { type: 'family-next' }),
-  )
-  .group('Profiles', (group) => group
-    .bind('1', 'Rich', { type: 'set-profile', mode: 'interactive' })
-    .bind('2', 'Static', { type: 'set-profile', mode: 'static' })
-    .bind('3', 'Pipe', { type: 'set-profile', mode: 'pipe' })
-    .bind('4', 'Accessible', { type: 'set-profile', mode: 'accessible' }),
-  )
-  .group('Variants', (group) => group
-    .bind('.', 'Next', { type: 'variant-next' })
-    .bind(',', 'Prev', { type: 'variant-prev' }),
-  );
 
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
@@ -325,6 +317,25 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
   return Math.min(nextScrollY, maxScroll);
 }
 
+function focusFamilyRow(model: DocsExplorerModel, index: number): DocsExplorerModel {
+  const itemCount = model.familyState.items.length;
+  if (itemCount === 0) return model;
+  const focusIndex = Math.max(0, Math.min(index, itemCount - 1));
+  return {
+    ...model,
+    familyState: {
+      ...model.familyState,
+      focusIndex,
+      scrollY: adjustScroll(
+        focusIndex,
+        model.familyState.scrollY,
+        model.familyState.height,
+        itemCount,
+      ),
+    },
+  };
+}
+
 function selectedStory(model: DocsExplorerModel): ComponentStory | undefined {
   return model.selectedStoryId == null ? undefined : findComponentStory(model.selectedStoryId);
 }
@@ -414,6 +425,10 @@ function activateFocusedRow(model: DocsExplorerModel): DocsExplorerModel {
   return selectStory(model, row.storyId);
 }
 
+function activateFamilyRowIndex(model: DocsExplorerModel, index: number): DocsExplorerModel {
+  return activateFocusedRow(focusFamilyRow(model, index));
+}
+
 function selectStory(model: DocsExplorerModel, storyId?: string): DocsExplorerModel {
   if (storyId == null) return model;
   const story = findComponentStory(storyId);
@@ -429,6 +444,19 @@ function selectStory(model: DocsExplorerModel, storyId?: string): DocsExplorerMo
     expandedFamilies: nextExpandedFamilies,
     selectedStoryId: storyId,
     familyState: rebuildFamilyState(model.familyState, nextExpandedFamilies, `story:${storyId}`),
+  };
+}
+
+function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplorerModel {
+  const story = selectedStory(model);
+  if (story == null || story.variants.length === 0) return model;
+  const nextIndex = Math.max(0, Math.min(index, story.variants.length - 1));
+  return {
+    ...model,
+    variantIndexByStory: {
+      ...model.variantIndexByStory,
+      [story.id]: nextIndex,
+    },
   };
 }
 
@@ -944,18 +972,75 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
   ]);
 }
 
+function familyRowIndexAtPosition(
+  model: DocsExplorerModel,
+  row: number,
+  rect: { readonly row: number; readonly height: number },
+): number | undefined {
+  const visibleHeight = Math.max(3, rect.height - 2);
+  const localRow = row - rect.row;
+  const bodyRow = localRow - 1;
+  if (bodyRow < 0 || bodyRow >= visibleHeight) return undefined;
+
+  const index = model.familyState.scrollY + bodyRow;
+  return index >= 0 && index < model.familyState.items.length ? index : undefined;
+}
+
+function variantRowIndexAtPosition(
+  model: DocsExplorerModel,
+  row: number,
+  rect: { readonly row: number; readonly height: number },
+): number | undefined {
+  const story = selectedStory(model);
+  if (story == null || story.variants.length === 0) return undefined;
+
+  const listHeight = Math.max(3, rect.height - 8);
+  const localRow = row - rect.row;
+  const listRow = localRow - 1;
+  if (listRow < 0 || listRow >= listHeight) return undefined;
+
+  const currentVariantIndex = selectedVariantIndex(model, story.id);
+  const scrollY = adjustScroll(currentVariantIndex, 0, listHeight, story.variants.length);
+  const index = scrollY + listRow;
+  return index >= 0 && index < story.variants.length ? index : undefined;
+}
+
+function resolveFamilyPaneMouse(
+  msg: MouseMsg,
+  model: DocsExplorerModel,
+  rect: { readonly row: number; readonly height: number },
+): ExplorerMsg | undefined {
+  if (msg.action === 'scroll-down') return { type: 'family-next' };
+  if (msg.action === 'scroll-up') return { type: 'family-prev' };
+  if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+
+  const index = familyRowIndexAtPosition(model, msg.row, rect);
+  return index == null ? undefined : { type: 'activate-row-index', index };
+}
+
+function resolveVariantPaneMouse(
+  msg: MouseMsg,
+  model: DocsExplorerModel,
+  rect: { readonly row: number; readonly height: number },
+): ExplorerMsg | undefined {
+  if (msg.action === 'scroll-down') return { type: 'variant-next' };
+  if (msg.action === 'scroll-up') return { type: 'variant-prev' };
+  if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+
+  const index = variantRowIndexAtPosition(model, msg.row, rect);
+  return index == null ? undefined : { type: 'select-variant', index };
+}
+
 function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerModel>, ExplorerMsg> {
   return createFramedApp<DocsExplorerModel, ExplorerMsg>({
     title: 'Bijou Docs',
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     globalKeys: explorerGlobalKeys,
-    helpLineSource: () => explorerHelpKeys,
     pages: [{
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
       init: () => [createInitialExplorerModel(ctx), []],
-      helpSource: explorerHelpKeys,
       update(msg, model) {
         switch (msg.type) {
           case 'family-next':
@@ -968,12 +1053,16 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [{ ...model, familyState: listPageUp(model.familyState) }, []];
           case 'activate-row':
             return [activateFocusedRow(model), []];
+          case 'activate-row-index':
+            return [activateFamilyRowIndex(model, msg.index), []];
           case 'expand-row':
             return [expandFocusedFamily(model), []];
           case 'collapse-row':
             return [collapseFocusedFamily(model), []];
           case 'select-story':
             return [selectStory(model, msg.storyId), []];
+          case 'select-variant':
+            return [selectVariantIndex(model, msg.index), []];
           case 'variant-next':
             return [cycleVariantIndex(model, 1), []];
           case 'variant-prev':
@@ -986,7 +1075,22 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [model, [quit()]];
         }
       },
-      keyMap: explorerPageKeys,
+      inputAreas(model) {
+        return [
+          {
+            paneId: 'family-nav',
+            keyMap: familyPaneKeys,
+            helpSource: familyPaneKeys,
+            mouse: ({ msg, rect }) => resolveFamilyPaneMouse(msg, model, rect),
+          },
+          {
+            paneId: 'story-variants',
+            keyMap: variantPaneKeys,
+            helpSource: variantPaneKeys,
+            mouse: ({ msg, rect }) => resolveVariantPaneMouse(msg, model, rect),
+          },
+        ];
+      },
       commandItems(model) {
         return COMPONENT_STORIES.map((story) => ({
           id: story.id,

@@ -9,6 +9,7 @@ const KEY_DOWN = '\x1b[B';
 const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
 const KEY_ESCAPE = '\x1b';
+const KEY_TAB = '\t';
 
 function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
   const cells: string[] = [];
@@ -202,5 +203,26 @@ describe('docs preview app', () => {
     expect(text).toContain('▶ Status and in-flow feedback');
     expect(text).not.toContain('Expand family');
     expect(text).not.toContain('Collapse family');
+  });
+
+  it('routes arrow keys to the focused docs pane instead of always driving the family nav', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_ENTER },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+      { key: KEY_TAB },
+      { key: KEY_DOWN },
+      { key: KEY_TAB },
+      { key: KEY_DOWN },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    expect(pageModel.familyState.items[pageModel.familyState.focusIndex]?.value).toBe('story:alert');
+    expect(pageModel.variantIndexByStory.alert).toBe(1);
+    expect((result.model as any).docsModel.focusedPaneByPage.dogfood).toBe('story-variants');
   });
 });

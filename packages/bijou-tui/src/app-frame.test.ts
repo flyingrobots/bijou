@@ -24,6 +24,7 @@ const KEY_SHIFT_TAB = '\x1b[Z';
 const KEY_ESCAPE = '\x1b';
 const KEY_CTRL_P = '\x10';
 const KEY_ENTER = '\r';
+const KEY_DOWN = '\x1b[B';
 
 function ctrlKey(key: string) {
   return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
@@ -177,6 +178,53 @@ describe('createFramedApp', () => {
     const app = createFramedApp({ pages: [splitPage] });
     const result = await runScript(app, [{ key: KEY_TAB }, { key: KEY_SHIFT_TAB }]);
     expect(result.model.focusedPaneByPage.home).toBe('left');
+  });
+
+  it('routes pane keymaps only to the focused pane', async () => {
+    type PaneMsg = { type: 'left-hit' } | { type: 'right-hit' };
+    interface PaneModel {
+      leftHits: number;
+      rightHits: number;
+    }
+
+    const page: FramePage<PaneModel, PaneMsg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ leftHits: 0, rightHits: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'left-hit') return [{ ...model, leftHits: model.leftHits + 1 }, []];
+        if (msg.type === 'right-hit') return [{ ...model, rightHits: model.rightHits + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'split',
+        splitId: 's1',
+        state: createSplitPaneState({ ratio: 0.5 }),
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
+      }),
+      inputAreas: () => [
+        {
+          paneId: 'left',
+          keyMap: createKeyMap<PaneMsg>().bind('down', 'Left hit', { type: 'left-hit' }),
+        },
+        {
+          paneId: 'right',
+          keyMap: createKeyMap<PaneMsg>().bind('down', 'Right hit', { type: 'right-hit' }),
+        },
+      ],
+    };
+
+    const app = createFramedApp({ pages: [page] });
+    const result = await runScript(app, [
+      { key: KEY_DOWN },
+      { key: KEY_TAB },
+      { key: KEY_DOWN },
+    ]);
+
+    expect(result.model.pageModels.home?.leftHits).toBe(1);
+    expect(result.model.pageModels.home?.rightHits).toBe(1);
+    expect(result.model.focusedPaneByPage.home).toBe('right');
   });
 
   it('triggers transition animation when switching tabs', async () => {
@@ -1201,5 +1249,45 @@ describe('createFramedApp', () => {
 
     expect(result.model.activePageId).toBe('home');
     expect(result.model.pageModels.home?.count).toBe(0);
+  });
+
+  it('keeps pane keymaps inactive while a page modal is open', async () => {
+    type PaneMsg = { type: 'pane-hit' } | { type: 'close-modal' };
+
+    const page: FramePage<{ paneHits: number; modalOpen: boolean }, PaneMsg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ paneHits: 0, modalOpen: true }, []],
+      update(msg, model) {
+        if (msg.type === 'pane-hit') return [{ ...model, paneHits: model.paneHits + 1 }, []];
+        if (msg.type === 'close-modal') return [{ ...model, modalOpen: false }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'split',
+        splitId: 's1',
+        state: createSplitPaneState({ ratio: 0.5 }),
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
+      }),
+      modalKeyMap(model) {
+        if (!model.modalOpen) return undefined;
+        return createKeyMap<PaneMsg>().bind('escape', 'Close modal', { type: 'close-modal' });
+      },
+      inputAreas: () => [{
+        paneId: 'left',
+        keyMap: createKeyMap<PaneMsg>().bind('down', 'Pane hit', { type: 'pane-hit' }),
+      }],
+    };
+
+    const app = createFramedApp({ pages: [page] });
+    const result = await runScript(app, [
+      { key: KEY_DOWN },
+      { key: KEY_ESCAPE },
+      { key: KEY_DOWN },
+    ]);
+
+    expect(result.model.pageModels.home?.modalOpen).toBe(false);
+    expect(result.model.pageModels.home?.paneHits).toBe(1);
   });
 });

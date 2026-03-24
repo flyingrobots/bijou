@@ -114,6 +114,8 @@ export interface FramePage<PageModel, Msg> {
   layout(model: PageModel): FrameLayoutNode;
   /** Optional page keymap. */
   keyMap?: KeyMap<Msg>;
+  /** Optional pane-scoped input layers owned by the focused pane. */
+  inputAreas?: (model: PageModel) => readonly FrameInputArea<PageModel, Msg>[];
   /** Optional modal keymap. When present, it captures all keys until dismissed. */
   modalKeyMap?: (model: PageModel) => KeyMap<Msg> | undefined;
   /** Optional help source override. */
@@ -126,6 +128,22 @@ export interface FramePage<PageModel, Msg> {
 export interface FrameCommandItem<Msg> extends CommandPaletteItem {
   /** Message dispatched when this item is selected. */
   readonly action?: Msg;
+}
+
+/** Declarative input ownership for a specific pane inside a frame page. */
+export interface FrameInputArea<PageModel, Msg> {
+  /** Target pane id. */
+  readonly paneId: string;
+  /** Optional pane-scoped key bindings. */
+  readonly keyMap?: KeyMap<Msg>;
+  /** Optional focused-pane help bindings. */
+  readonly helpSource?: BindingSource;
+  /** Optional pane-scoped mouse mapper. */
+  readonly mouse?: (args: {
+    readonly msg: MouseMsg;
+    readonly model: PageModel;
+    readonly rect: LayoutRect;
+  }) => Msg | undefined;
 }
 
 /** A single declarative settings row rendered by the frame shell. */
@@ -510,6 +528,8 @@ export function createFramedApp<PageModel, Msg>(
     model: InternalFrameModel<PageModel, Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
     const activePage = pagesById.get(model.activePageId)!;
+    const activePageModel = model.pageModels[model.activePageId]!;
+    const inputAreas = resolveInputAreas(activePage, activePageModel);
 
       if (model.helpOpen) {
         if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
@@ -589,17 +609,35 @@ export function createFramedApp<PageModel, Msg>(
         return [model, []];
       }
 
-      const clickedPaneId = paneAtPosition(model, msg.col, msg.row, pagesById);
-      if (clickedPaneId != null) {
-        const focusedModel = focusPane(model, clickedPaneId);
+      const clickedPane = paneHitAtPosition(model, msg.col, msg.row, pagesById);
+      if (clickedPane != null) {
+        const focusedModel = focusPane(model, clickedPane.paneId);
+        const inputArea = findInputAreaByPaneId(inputAreas, clickedPane.paneId);
+        const areaMsg = inputArea?.mouse?.({
+          msg,
+          model: activePageModel,
+          rect: clickedPane.rect,
+        });
+        if (areaMsg !== undefined) {
+          return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+        }
         return [focusedModel, [emitMsgForPage(model.activePageId, msg as unknown as Msg)]];
       }
     }
 
     if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-      const hoveredPaneId = paneAtPosition(model, msg.col, msg.row, pagesById);
-      if (hoveredPaneId != null) {
-        const focusedModel = focusPane(model, hoveredPaneId);
+      const hoveredPane = paneHitAtPosition(model, msg.col, msg.row, pagesById);
+      if (hoveredPane != null) {
+        const focusedModel = focusPane(model, hoveredPane.paneId);
+        const inputArea = findInputAreaByPaneId(inputAreas, hoveredPane.paneId);
+        const areaMsg = inputArea?.mouse?.({
+          msg,
+          model: activePageModel,
+          rect: hoveredPane.rect,
+        });
+        if (areaMsg !== undefined) {
+          return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+        }
         const action: FrameAction = msg.action === 'scroll-down'
           ? { type: 'scroll-down' }
           : { type: 'scroll-up' };
@@ -854,6 +892,10 @@ export function createFramedApp<PageModel, Msg>(
         }
 
         const activePageModel = model.pageModels[model.activePageId]!;
+        const activeInputArea = findInputAreaByPaneId(
+          resolveInputAreas(activePage, activePageModel),
+          model.focusedPaneByPage[model.activePageId],
+        );
         const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
         if (modalKeyMap != null) {
           const modalAction = modalKeyMap.handle(msg);
@@ -863,12 +905,16 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'page')];
         }
 
+        const paneAction = activeInputArea?.keyMap?.handle(msg);
         const pageAction = activePage.keyMap?.handle(msg);
         const globalAction = options.globalKeys?.handle(msg);
         const frameAction = frameKeys.handle(msg);
         const keyPriority = options.keyPriority ?? 'frame-first';
 
         if (keyPriority === 'page-first') {
+          if (paneAction !== undefined) {
+            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, paneAction)], msg, 'page')];
+          }
           if (pageAction !== undefined) {
             return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
           }
@@ -892,6 +938,10 @@ export function createFramedApp<PageModel, Msg>(
           }
           const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
           return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
+        }
+
+        if (paneAction !== undefined) {
+          return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, paneAction)], msg, 'page')];
         }
 
         if (globalAction !== undefined) {
@@ -1063,12 +1113,12 @@ function focusPane<PageModel, Msg>(
   };
 }
 
-function paneAtPosition<PageModel, Msg>(
+function paneHitAtPosition<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   col: number,
   row: number,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
-): string | undefined {
+): { readonly paneId: string; readonly rect: LayoutRect } | undefined {
   const bodyRect = frameBodyRect(model.columns, model.rows);
   const maxState = model.maximizedPaneByPage[model.activePageId];
   const maximizedPaneId = maxState?.maximizedPaneId;
@@ -1083,7 +1133,7 @@ function paneAtPosition<PageModel, Msg>(
       && row >= rect.row
       && row < rect.row + rect.height
     ) {
-      return paneId;
+      return { paneId, rect };
     }
   }
 
@@ -1096,9 +1146,19 @@ function renderHelpOverlay<PageModel, Msg>(
   frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
 ): { body: Surface; maxScrollY: number; scrollY: number } {
+  const activePageModel = model.pageModels[model.activePageId]!;
+  const activeInputArea = findInputAreaByPaneId(
+    resolveInputAreas(activePage, activePageModel),
+    model.focusedPaneByPage[model.activePageId],
+  );
   const source = model.settingsOpen
     ? settingsHelpKeys
-    : mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap);
+    : mergeBindingSources(
+      frameKeys,
+      options.globalKeys,
+      activeInputArea?.helpSource ?? activeInputArea?.keyMap,
+      activePage.helpSource ?? activePage.keyMap,
+    );
   const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
   const bodyWidth = Math.max(20, maxDialogWidth - 4);
   const helpSurface = helpViewSurface(source, {
@@ -1297,6 +1357,21 @@ function clampSettingsScroll<PageModel, Msg>(
   layout: ResolvedSettingsLayout<Msg>,
 ): number {
   return Math.max(0, Math.min(model.settingsScrollY, layout.maxScrollY));
+}
+
+function resolveInputAreas<PageModel, Msg>(
+  page: FramePage<PageModel, Msg>,
+  pageModel: PageModel,
+): readonly FrameInputArea<PageModel, Msg>[] {
+  return page.inputAreas?.(pageModel) ?? [];
+}
+
+function findInputAreaByPaneId<PageModel, Msg>(
+  inputAreas: readonly FrameInputArea<PageModel, Msg>[],
+  paneId: string | undefined,
+): FrameInputArea<PageModel, Msg> | undefined {
+  if (paneId == null) return undefined;
+  return inputAreas.find((area) => area.paneId === paneId);
 }
 
 function ensureSettingsLineVisible(line: number, scrollY: number, visibleLines: number, maxScrollY: number): number {

@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Focused-pane input ownership in `createFramedApp()`** — framed pages can now declare pane-scoped input areas with local keymaps, help sources, and optional mouse mapping, and the shell routes focused-pane input ahead of page/global fallback so inactive panes stop responding while DOGFOOD’s family and variant lanes behave like real focused workspaces.
 - **Shell-owned settings drawer in `createFramedApp()`** — framed apps can now expose a standard left-edge settings drawer via structured sections and rows, with shell-level `Ctrl+,` / command-palette entry points, independent drawer scrolling, mouse-safe input ownership, and DOGFOOD as the first proving surface through a visible `Show hints` preference.
 - **Animated DOGFOOD title screen** — the docs landing page now renders as an animated shader composition built from `assets/bijou.txt`, `assets/background.txt`, and responsive FlyingRobots wordmark assets, replacing the old landing-page copy, stats, and CTA chrome with a sparse title treatment, centered `Press [Enter]` prompt, copyright line, and landing-theme switching via `1-5` and `←` / `→`.
 - **Command-palette component search in DOGFOOD** — the docs explorer now exposes the standard frame command palette (`ctrl+p` / `:`) with one entry per component story, so users can search by component name or family and jump directly into the selected docs surface instead of walking the accordion tree first.
