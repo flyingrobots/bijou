@@ -677,13 +677,14 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(false);
   });
 
-  it('closes help with escape', async () => {
+  it('opens quit confirm with escape while help is open', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
 
     const result = await runScript(app, [{ key: '?' }, { key: KEY_ESCAPE }]);
     expect(result.model.helpOpen).toBe(false);
+    expect((result.model as any).quitConfirmOpen).toBe(true);
   });
 
   it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
@@ -786,7 +787,7 @@ describe('createFramedApp', () => {
         },
       },
       {
-        key: KEY_ESCAPE,
+        key: '?',
       },
       {
         key: KEY_CTRL_P,
@@ -808,6 +809,82 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(false);
     expect(result.model.commandPalette).toBeDefined();
     expect(result.model.pageModels.home?.count).toBe(0);
+  });
+
+  it('opens settings with F2 and opens the command palette with /', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      enableCommandPalette: true,
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(true);
+
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(false);
+
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPalette).toBeDefined();
+  });
+
+  it('opens a quit-confirm modal from the shell and quits on confirmation', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    let [model] = app.init();
+    let cmds: Cmd<Msg>[] = [];
+    [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+
+    [model, cmds] = app.update({ type: 'key', key: 'y', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(cmds).toHaveLength(1);
+
+    const returned = await cmds[0]!(() => {}, {
+      onPulse() {
+        return { dispose() {} };
+      },
+    });
+    expect(returned).toBe(QUIT);
+  });
+
+  it('quits immediately in pipe mode instead of opening quit confirm', async () => {
+    const pipeCtx = createTestContext({ mode: 'pipe' });
+    setDefaultContext(pipeCtx);
+    try {
+      const app = createFramedApp({
+        pages: [makePage('home', 'Home', 'main')],
+      });
+
+      let [model] = app.init();
+      const [nextModel, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+      expect((nextModel as any).quitConfirmOpen).toBe(false);
+      expect(cmds).toHaveLength(1);
+
+      const returned = await cmds[0]!(() => {}, {
+        onPulse() {
+          return { dispose() {} };
+        },
+      });
+      expect(returned).toBe(QUIT);
+    } finally {
+      setDefaultContext(testCtx);
+    }
   });
 
   it('focuses the hovered pane and scrolls it with the mouse wheel', async () => {

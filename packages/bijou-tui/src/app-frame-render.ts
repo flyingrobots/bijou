@@ -331,6 +331,8 @@ export function renderHelpLine<PageModel, Msg>(
     ? 'PALETTE'
     : model.helpOpen
       ? 'HELP'
+      : model.quitConfirmOpen
+        ? 'QUIT'
       : model.settingsOpen
         ? 'SETTINGS'
         : 'NORMAL';
@@ -338,7 +340,9 @@ export function renderHelpLine<PageModel, Msg>(
   const status = `[${mode}] page:${model.activePageId} pane:${focusedPane}`;
 
   const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
-    ? 'Esc close • ↑/↓ rows • Enter toggle • j/k scroll • Ctrl+P palette'
+    ? 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'
+    : model.quitConfirmOpen
+      ? 'Y quit • N stay'
     : helpShort(options.helpLineSource?.({
       model,
       activePage,

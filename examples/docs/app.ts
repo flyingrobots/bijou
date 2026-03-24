@@ -69,10 +69,15 @@ const BACKGROUND_TEXT = readFileSync(new URL('../../assets/background.txt', impo
 const BACKGROUND_LINES = BACKGROUND_TEXT.split(/\r?\n/);
 const BACKGROUND_WIDTH = Math.max(1, ...BACKGROUND_LINES.map((lineText) => lineText.length));
 const BACKGROUND_HEIGHT = BACKGROUND_LINES.length;
+const BIJOU_PACKAGE_JSON = JSON.parse(
+  readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
+) as { readonly version: string };
+const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
-const COPYRIGHT_TEXT = 'Copyright © 2026 James Ross • FlyingRobots';
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
+const LANDING_CONTROLS_TEXT = 'Esc/q quit • any key continue';
+const VERSION_TEXT = `v${BIJOU_VERSION}`;
 const DOCS_PAGE_ID = 'dogfood';
 const DOCS_SIDEBAR_WIDTH = 32;
 
@@ -112,8 +117,7 @@ type ExplorerMsg =
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
-  | { type: 'toggle-hints' }
-  | { type: 'quit' };
+  | { type: 'toggle-hints' };
 
 interface RootModel {
   readonly route: 'landing' | 'docs';
@@ -181,8 +185,11 @@ const LANDING_THEMES: readonly LandingThemeTokens[] = [
 ];
 
 const docsShellHintSource = createKeyMap<ExplorerMsg>()
-  .group('Help', (group) => group
-    .bind('?', 'Help', { type: 'quit' }),
+  .group('Shell', (group) => group
+    .bind('?', 'Help', { type: 'toggle-hints' })
+    .bind('/', 'Search', { type: 'toggle-hints' })
+    .bind('f2', 'Settings', { type: 'toggle-hints' })
+    .bind('q', 'Quit', { type: 'toggle-hints' }),
   );
 
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
@@ -215,9 +222,7 @@ const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
   .group('Variants', (group) => group
     .bind('.', 'Next variant', { type: 'variant-next' })
     .bind(',', 'Previous variant', { type: 'variant-prev' }),
-  )
-  .bind('q', 'Quit', { type: 'quit' })
-  .bind('ctrl+c', 'Quit', { type: 'quit' });
+  );
 
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
@@ -487,12 +492,6 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
     ? FLYING_ROBOTS_LARGE_LINES
     : FLYING_ROBOTS_SMALL_LINES;
   const wordmark = createWordmarkSurface(wordmarkGlyphs, model.landingTimeMs, tokens);
-  const copyrightLine = createTransparentTextSurface(COPYRIGHT_TEXT, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.72)),
-    modifiers: () => ['dim'],
-  });
   const promptLine = createTransparentTextSurface(ENTER_PROMPT_TEXT, {
     bg: tokens.background,
     transparentSpaces: false,
@@ -508,9 +507,21 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
       return char === '[' || char === ']' || (x >= 7 && x <= 11) ? ['bold'] : ['dim'];
     },
   });
+  const footerControls = createTransparentTextSurface(LANDING_CONTROLS_TEXT, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.52)),
+    modifiers: () => ['dim'],
+  });
+  const footerVersion = createTransparentTextSurface(VERSION_TEXT, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: () => rgbHex(...lerpTheme(tokens.logoGradient, 0.88)),
+    modifiers: () => ['bold'],
+  });
 
-  const copyrightY = Math.max(0, height - copyrightLine.height - 2);
-  const wordmarkY = Math.max(0, copyrightY - wordmark.height - 1);
+  const footerY = Math.max(0, height - 1);
+  const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
   const promptMinY = Math.min(height - 1, logoY + logo.height + 1);
   const promptMaxY = Math.max(0, wordmarkY - promptLine.height - 2);
   const promptY = promptMaxY >= promptMinY
@@ -519,7 +530,8 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
 
   blitCentered(surface, promptLine, promptY);
   blitCentered(surface, wordmark, wordmarkY);
-  blitCentered(surface, copyrightLine, copyrightY);
+  surface.blit(footerControls, 0, footerY);
+  surface.blit(footerVersion, Math.max(0, width - footerVersion.width), footerY);
 
   if (model.landingToast && model.landingTimeMs < model.landingToast.expiresAtMs) {
     return compositeSurface(surface, [toast({
@@ -874,8 +886,8 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
     line('1. Browse component families in the left lane.'),
     line('2. Press Enter to expand a family or open a component.'),
     line('3. Use Tab to move focus between families, docs, and variants.'),
-    line('4. Press Ctrl+P to search by component name at any time.'),
-    line('5. Press ? for the full keyboard help and Ctrl+, for settings.'),
+    line('4. Press / to search by component name at any time.'),
+    line('5. Press F2 for settings, ? for help, and q or Esc to quit.'),
   ]), {
     title: 'How to use these docs',
     width: Math.max(24, width - 1),
@@ -1093,8 +1105,6 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [{ ...model, profileMode: msg.mode }, []];
           case 'toggle-hints':
             return [{ ...model, showHints: !model.showHints }, []];
-          case 'quit':
-            return [model, [quit()]];
         }
       },
       inputAreas(model) {
@@ -1227,6 +1237,9 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           }, []];
         }
         if (isKeyMsg(msg)) {
+          if (!msg.alt && ((msg.ctrl && msg.key === 'c') || (!msg.ctrl && !msg.shift && (msg.key === 'escape' || msg.key === 'q')))) {
+            return [model, [quit()]];
+          }
           if (msg.key === 'left') {
             return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
           }
@@ -1236,11 +1249,8 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
             return [applyLandingThemeSelection(model, Number(msg.key) - 1), []];
           }
-          if (msg.key === 'enter' || msg.key === 'space') {
+          if (!msg.ctrl && !msg.alt) {
             return [{ ...model, route: 'docs' }, []];
-          }
-          if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
-            return [model, [quit()]];
           }
         }
         return [model, []];

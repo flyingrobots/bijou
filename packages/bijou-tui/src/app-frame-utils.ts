@@ -127,6 +127,7 @@ export function createFrameKeyMap(options: { readonly enableSettings?: boolean }
       .bind(']', 'Next tab', { type: 'next-tab' })
       .bind('tab', 'Next pane', { type: 'next-pane' })
       .bind('shift+tab', 'Previous pane', { type: 'prev-pane' })
+      .bind('/', 'Search', { type: 'open-palette' })
       .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
       .bind(':', 'Open command palette', { type: 'open-palette' })
       .bind('ctrl+m', 'Fold/unfold pane', { type: 'toggle-minimize' })
@@ -151,7 +152,8 @@ export function createFrameKeyMap(options: { readonly enableSettings?: boolean }
 
   if (options.enableSettings) {
     keyMap.group('Shell', (g) => g
-      .bind('ctrl+,', 'Settings', { type: 'toggle-settings' }));
+      .bind('ctrl+,', 'Settings', { type: 'toggle-settings' })
+      .bind('f2', 'Settings', { type: 'toggle-settings' }));
   }
 
   return keyMap;
