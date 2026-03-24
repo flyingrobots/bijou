@@ -66,6 +66,7 @@ See [docs/strategy/dogfood.md](strategy/dogfood.md) for the design-thinking rati
 | **Surface Scenario Test Harness** | repo tooling + bijou-tui | Build a Playwright-like test/runtime harness for Bijou surfaces with semantic selectors, scripted input driving, frame assertions, deterministic interaction flows, and integrated recording/playback hooks. If the API stabilizes, this likely graduates into its own package rather than staying as repo-local tooling. |
 | **Interaction Profile Simulator** | bijou-tui + docs | Add a built-in simulator that can flip a surface or app among `rich`, `static`, `pipe`, `accessible`, reduced-motion, no-color, and narrow-width profiles so graceful-lowering behavior can be tested and taught without bespoke demo wiring. |
 | **Component Lab Mode** | docs + bijou-tui-app | Replace isolated knob-heavy demos with one story-driven lab surface inside the docs app. The lab should share stories, selectors, and scenarios instead of inventing its own parallel control model. |
+| **FTUI Onboarding Primitives** | bijou-tui + docs | Build first-time-user-experience components for guided onboarding: tutorial overlays that temporarily block unrelated input, spotlight/popover flows that dim everything except the target surface, stepper-style bottom guidance with skip/dismiss controls, and game-like interactive tutorials that can teach shell navigation inside a real app. |
 
 ## Milestone 2 — Replay, Debugging, and Deterministic DX
 

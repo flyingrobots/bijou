@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD onboarding and workspace polish** — the docs explorer now keeps a one-cell gutter around and between the three main columns, reduces the top status strip to a simple `? Help` cue, and turns the empty center lane into a real Bijou introduction plus “how to use these docs” guide instead of a bare placeholder.
 - **Focused-pane input ownership in `createFramedApp()`** — framed pages can now declare pane-scoped input areas with local keymaps, help sources, and optional mouse mapping, and the shell routes focused-pane input ahead of page/global fallback so inactive panes stop responding while DOGFOOD’s family and variant lanes behave like real focused workspaces.
 - **Shell-owned settings drawer in `createFramedApp()`** — framed apps can now expose a standard left-edge settings drawer via structured sections and rows, with shell-level `Ctrl+,` / command-palette entry points, independent drawer scrolling, mouse-safe input ownership, and DOGFOOD as the first proving surface through a visible `Show hints` preference.
 - **Animated DOGFOOD title screen** — the docs landing page now renders as an animated shader composition built from `assets/bijou.txt`, `assets/background.txt`, and responsive FlyingRobots wordmark assets, replacing the old landing-page copy, stats, and CTA chrome with a sparse title treatment, centered `Press [Enter]` prompt, copyright line, and landing-theme switching via `1-5` and `←` / `→`.
@@ -35,6 +36,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **FTUI onboarding primitives added to the roadmap** — the post-v4 backlog now explicitly tracks first-time-user-experience components for guided tutorials, spotlight popovers, input-teaching modal flows, and stepper-style onboarding UX that can run inside framed Bijou apps.
 - **Shell-owned settings drawer design pass** — added a dedicated post-v4 shell strategy note and spec for a standard left-edge settings drawer in `createFramedApp()`, covering declarative settings sections/rows, iOS-style scrolling preference lists, command-palette entry points, mouse support, and DOGFOOD as the first proving surface.
 - **Focus Owns Input design pass** — added a dedicated post-v4 shell strategy note and spec for pane-scoped input ownership in `createFramedApp()`, framing the next loop as tests-first work on active-pane key/mouse routing instead of a docs-only workaround.
 - **Docs preview usability pass** — the DOGFOOD preview now enables mouse mode, keeps story navigation on arrow keys instead of colliding with shell scroll keys, surfaces explicit docs-pane scroll hints, and uses a paged frame-help overlay so long keyboard help remains navigable instead of silently overflowing.

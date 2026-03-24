@@ -180,6 +180,11 @@ const LANDING_THEMES: readonly LandingThemeTokens[] = [
   },
 ];
 
+const docsShellHintSource = createKeyMap<ExplorerMsg>()
+  .group('Help', (group) => group
+    .bind('?', 'Help', { type: 'quit' }),
+  );
+
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
     .bind('down', 'Next row', { type: 'family-next' })
@@ -848,26 +853,42 @@ function renderFamiliesPane(model: DocsExplorerModel, width: number, height: num
 
 function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
   const bodyWidth = Math.max(28, width - 6);
-  const callout = boxSurface(column([
-    line('Select a component to learn more.'),
-    spacer(),
+  const intro = boxSurface(column([
     paragraphSurface(
-      'Start in the families lane. Expand a family with Enter, choose a component, then compare variants and profiles without leaving the page.',
+      'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.',
       Math.max(24, bodyWidth - 2),
     ),
     spacer(),
-    line('Tip: 1-4 switch profiles • ,/. cycle variants'),
+    paragraphSurface(
+      'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.',
+      Math.max(24, bodyWidth - 2),
+    ),
   ]), {
-    title: 'Start here',
+    title: 'What is Bijou?',
     width: Math.max(24, width - 1),
     borderToken: ctx.border('primary'),
     ctx,
   });
 
+  const guide = boxSurface(column([
+    line('1. Browse component families in the left lane.'),
+    line('2. Press Enter to expand a family or open a component.'),
+    line('3. Use Tab to move focus between families, docs, and variants.'),
+    line('4. Press Ctrl+P to search by component name at any time.'),
+    line('5. Press ? for the full keyboard help and Ctrl+, for settings.'),
+  ]), {
+    title: 'How to use these docs',
+    width: Math.max(24, width - 1),
+    borderToken: ctx.border('muted'),
+    ctx,
+  });
+
   return column([
-    separatorSurface({ label: 'select a component to learn more', width, ctx }),
+    separatorSurface({ label: 'welcome to bijou', width, ctx }),
     spacer(1, 1),
-    callout,
+    intro,
+    spacer(1, 1),
+    guide,
   ]);
 }
 
@@ -1037,6 +1058,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     globalKeys: explorerGlobalKeys,
+    helpLineSource: () => docsShellHintSource,
     pages: [{
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
@@ -1104,10 +1126,14 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
         return {
           kind: 'grid',
           gridId: 'docs-shell',
-          columns: [DOCS_SIDEBAR_WIDTH, '1fr', DOCS_SIDEBAR_WIDTH],
-          rows: ['1fr'],
-          areas: ['family main variants'],
-          gap: 1,
+          columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+          rows: [1, '1fr', 1],
+          areas: [
+            '. . . . . . .',
+            '. family . main . variants .',
+            '. . . . . . .',
+          ],
+          gap: 0,
           cells: {
             family: {
               kind: 'pane',

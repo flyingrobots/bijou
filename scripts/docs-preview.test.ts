@@ -201,8 +201,27 @@ describe('docs preview app', () => {
     }
 
     expect(text).toContain('▶ Status and in-flow feedback');
+    expect(text).toContain('? Help');
     expect(text).not.toContain('Expand family');
     expect(text).not.toContain('Collapse family');
+    expect(text).not.toContain('Previous tab');
+    expect(text).not.toContain('Open command palette');
+  });
+
+  it('shows a Bijou introduction and docs guide when no component is selected', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const frame = entered.frames[entered.frames.length - 1]!;
+    const lines = frameText(frame).split('\n');
+    const text = lines.join('\n');
+
+    expect(lines[2]?.trim()).toBe('');
+    expect(text).toContain('What is Bijou?');
+    expect(text).toContain('How to use these docs');
+    expect(text).toContain('Ctrl+P');
+    expect(text).toContain('surface-native terminal UI framework');
   });
 
   it('routes arrow keys to the focused docs pane instead of always driving the family nav', async () => {

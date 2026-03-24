@@ -33,6 +33,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - `Enter`: enter the docs from the landing page
 - `1` `2` `3` `4` `5`: switch landing-screen theme presets
 - `←` / `→`: cycle landing-screen themes
+- `?`: open keyboard help
 - `↑` / `↓`: move through the focused lane's rows
 - `Enter` / `Space`: expand a family, select a component, or activate the focused row
 - `←` / `→`: collapse or expand the focused family on the left lane
@@ -55,5 +56,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `Ctrl+,` or the command palette can toggle visible preferences like pane hint visibility without the docs app shipping its own overlay plumbing.
 - Focus now owns input in the explorer: the family lane handles browse/expand keys only while it is active, the variants lane can own arrow-key variant changes, and pane clicks or `Tab` move that ownership through the standard frame shell instead of letting inactive lanes keep responding.
+- When no component is selected, the center lane now acts as an onboarding surface: it introduces Bijou itself and explains how to browse, search, and navigate the docs before the user opens a component.
+- The explorer workspace now keeps a one-cell gutter around and between the three major columns so the shell chrome and pane rails do not feel visually chopped off at the frame edges.
 
 [← Examples](/Users/james/git/bijou/examples/README.md)
