@@ -33,6 +33,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **Shell-owned settings drawer design pass** — added a dedicated post-v4 shell strategy note and spec for a standard left-edge settings drawer in `createFramedApp()`, covering declarative settings sections/rows, iOS-style scrolling preference lists, command-palette entry points, mouse support, and Learn by Touch as the first proving surface.
 - **Focus Owns Input design pass** — added a dedicated post-v4 shell strategy note and spec for pane-scoped input ownership in `createFramedApp()`, framing the next loop as tests-first work on active-pane key/mouse routing instead of a docs-only workaround.
 - **Docs preview usability pass** — the Learn by Touch preview now enables mouse mode, keeps story navigation on arrow keys instead of colliding with shell scroll keys, surfaces explicit docs-pane scroll hints, and uses a paged frame-help overlay so long keyboard help remains navigable instead of silently overflowing.
 - **Learn by Touch validation slice** — the Learn by Touch strategy doc now points to the first shipped validation surface in `examples/docs`, so the post-v4 docs milestone is grounded in a real story-driven example instead of only a strategy narrative.

@@ -108,6 +108,13 @@ That slice is not the final docs product. It is the first proof that the story s
 
 It also exposed a broader shell need: when a docs lane is visually focused, that lane should own its local controls. The resulting shell/input design is captured in [Focus Owns Input](focus-owns-input.md) and [Focused Pane Input](../specs/focused-pane-input.spec.json).
 
+The docs shell also now has two obvious shell-level proving surfaces:
+
+- component search should feel like a standard shell affordance, not a bespoke docs shortcut
+- settings should open as a shell-owned drawer rather than as a custom page overlay
+
+The resulting settings direction is captured in [Settings Belong to the Shell](settings-belong-to-the-shell.md) and [Frame Settings Drawer](../specs/frame-settings-drawer.spec.json).
+
 ### 1. Story Protocol
 
 This is the highest-leverage foundation.
@@ -251,6 +258,7 @@ The next pass should not try to build all six pieces at once. It should validate
 4. **Surface Selector Model**
 5. **Surface Scenario Test Harness**
 6. **Component Lab Mode**
+7. **Shell-owned settings drawer**
 
 ### Why this order
 

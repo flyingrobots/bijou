@@ -1,0 +1,69 @@
+{
+  "name": "Settings Belong to the Shell",
+  "designPattern": "Frame-Owned Settings Drawer / Shell-Level Preference Surface",
+  "requirements": [
+    "createFramedApp() shell model",
+    "Focus Owns Input design direction",
+    "Learn by Touch docs app feedback",
+    "Tests ARE the Spec roadmap principle"
+  ],
+  "userStory": {
+    "asA": "user of a framed Bijou app",
+    "iWant": "a standard shell-owned settings drawer I can open without leaving my current page",
+    "soThat": "I can adjust global preferences in place and trust that the shell owns the interaction coherently"
+  },
+  "acceptanceCriteria": [
+    "createFramedApp() can expose a standard settings drawer without each page implementing its own overlay plumbing",
+    "Settings are declared as structured sections and rows rather than ad hoc markdown or custom drawer content",
+    "The settings drawer is anchored to the left edge and keeps the current page visible behind it",
+    "When settings are open, the drawer owns local keyboard and mouse interaction instead of the underlying page",
+    "The settings list can scroll independently when content exceeds the drawer height",
+    "Mouse click and wheel interactions inside the drawer do not leak through to the underlying page",
+    "The shell can expose a standard command-palette entry and binding to open settings",
+    "The help surface can reflect settings-layer controls while the drawer is open",
+    "The Learn by Touch docs app can adopt the standard settings drawer as a proving surface with minimal custom code"
+  ],
+  "backwardCompatibility": "Existing framed apps remain valid without providing settings. The settings drawer is additive in v0 and does not require page layout changes or custom overlay rewrites.",
+  "scope": {
+    "inScope": [
+      "Shell-owned settings drawer in createFramedApp()",
+      "Structured settings sections and rows",
+      "Keyboard navigation and row activation",
+      "Mouse click and wheel support inside the drawer",
+      "Scrollable settings list",
+      "Command-palette entry for opening settings",
+      "Learn by Touch docs app as the first proving surface"
+    ],
+    "outScope": [
+      "Persistence of preferences across sessions",
+      "Editable text fields or arbitrary embedded controls in settings rows",
+      "Page-specific custom settings drawer layouts",
+      "A generalized settings framework for every app outside the frame shell",
+      "Implementing the full Focus Owns Input stack in the same slice"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write failing app-frame tests that prove the shell can open a standard settings drawer, that the drawer consumes keyboard and mouse input while open, that long settings lists scroll independently, and that the command palette can open settings. Then add a docs-preview regression that toggles one visible Learn by Touch preference through the drawer.",
+    "edgeCases": [
+      "Compact terminal width with a narrow drawer",
+      "Settings list longer than the viewport height",
+      "Opening help or command palette while settings are already open",
+      "Mouse wheel scrolling over the drawer vs outside it",
+      "A framed app that does not provide any settings content"
+    ],
+    "fuzzStress": "Not a priority in v0. The core risk is routing precedence and shell coherence, not high-throughput preference mutation.",
+    "failureCases": [
+      "The settings drawer opens but arrow keys still mutate the underlying page",
+      "Mouse interactions inside settings click through to page panes or overlays below",
+      "The drawer cannot scroll a long preference list in compact terminals",
+      "Settings are implemented as one app-specific drawer instead of a reusable shell feature",
+      "The shell help and palette become inconsistent with the settings layer"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~250-450 lines across app-frame state, settings rendering, input routing, palette integration, and docs-shell adoption, plus targeted regressions",
+    "timeComplexity": "O(S) per settings interaction where S is the number of visible or declared settings rows; v0 should keep the active interaction model bounded and simple",
+    "workEstimate": "Medium"
+  }
+}
