@@ -33,7 +33,7 @@ import {
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
-} from '@flyingrobots/bijou-tui';
+} from '../../packages/bijou-tui/src/index.js';
 import {
   column,
   contentSurface,
@@ -95,6 +95,7 @@ interface DocsExplorerModel {
   readonly selectedStoryId?: string;
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
+  readonly showHints: boolean;
 }
 
 type ExplorerMsg =
@@ -109,6 +110,7 @@ type ExplorerMsg =
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
+  | { type: 'toggle-hints' }
   | { type: 'quit' };
 
 interface RootModel {
@@ -248,6 +250,7 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     selectedStoryId: undefined,
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
+    showHints: true,
   };
 }
 
@@ -804,13 +807,15 @@ function renderFamiliesPane(model: DocsExplorerModel, width: number, height: num
     );
   }
 
-  const footer = line(' ↑/↓ browse • Enter open • Tab next pane ', width);
-
-  return column([
+  const surfaces: Surface[] = [
     separatorSurface({ label: 'component families', width, ctx }),
     body,
-    footer,
-  ]);
+  ];
+  if (model.showHints) {
+    surfaces.push(line(' ↑/↓ browse • Enter open • Tab next pane ', width));
+  }
+
+  return column(surfaces);
 }
 
 function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
@@ -875,7 +880,7 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
 
   return column([
     separatorSurface({ label: `docs • ${story.title}`, width, ctx }),
-    line(' scroll: j/k • d/u • g/G • mouse wheel ', width),
+    ...(model.showHints ? [line(' scroll: j/k • d/u • g/G • mouse wheel ', width)] : []),
     spacer(1, 1),
     previewCard,
     spacer(1, 1),
@@ -935,8 +940,7 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
     list,
     spacer(1, 1),
     description,
-    spacer(1, 1),
-    line(' ,/. cycle • 1-4 profiles ', width),
+    ...(model.showHints ? [spacer(1, 1), line(' ,/. cycle • 1-4 profiles ', width)] : []),
   ]);
 }
 
@@ -976,6 +980,8 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [cycleVariantIndex(model, -1), []];
           case 'set-profile':
             return [{ ...model, profileMode: msg.mode }, []];
+          case 'toggle-hints':
+            return [{ ...model, showHints: !model.showHints }, []];
           case 'quit':
             return [model, [quit()]];
         }
@@ -1019,6 +1025,20 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
       },
     }],
     enableCommandPalette: true,
+    settings: ({ pageModel }) => ({
+      title: 'Settings',
+      sections: [{
+        id: 'shell',
+        title: 'Shell',
+        rows: [{
+          id: 'show-hints',
+          label: 'Show hints',
+          valueLabel: pageModel.showHints ? 'On' : 'Off',
+          kind: 'toggle',
+          action: { type: 'toggle-hints' },
+        }],
+      }],
+    }),
   });
 }
 

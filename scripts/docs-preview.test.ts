@@ -8,6 +8,7 @@ const KEY_CTRL_P = '\x10';
 const KEY_DOWN = '\x1b[B';
 const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
+const KEY_ESCAPE = '\x1b';
 
 function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
   const cells: string[] = [];
@@ -153,6 +154,34 @@ describe('docs preview app', () => {
     expect((result.model as any).docsModel.commandPalette).toBeUndefined();
     expect(text).toContain('modal()');
     expect(text).toContain('Confirm deploy');
+  });
+
+  it('toggles a visible DOGFOOD preference through the standard shell settings drawer', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_CTRL_P },
+      { key: 's' },
+      { key: 'e' },
+      { key: 't' },
+      { key: 't' },
+      { key: 'i' },
+      { key: 'n' },
+      { key: 'g' },
+      { key: 's' },
+      { key: KEY_ENTER },
+      { key: KEY_ENTER },
+      { key: KEY_ESCAPE },
+    ], { ctx });
+    const text = frameText(result.frames[result.frames.length - 1]!);
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    expect(pageModel.showHints).toBe(false);
+    expect((result.model as any).docsModel.settingsOpen).toBe(false);
+    expect(text).not.toContain('↑/↓ browse • Enter open • Tab next pane');
+    expect(text).not.toContain(',/. cycle • 1-4 profiles');
+    expect(text).not.toContain('scroll: j/k • d/u • g/G • mouse wheel');
   });
 
   it('shows accordion-style family headers without the oversized custom help strip', async () => {

@@ -9,15 +9,16 @@ import {
   createSurface,
   resolveClock,
   resolveSafeCtx,
+  type Cell,
   type OverflowBehavior,
   type Surface,
 } from '@flyingrobots/bijou';
 import { helpViewSurface, type BindingSource } from './help.js';
-import type { KeyMap } from './keybindings.js';
+import { createKeyMap, type KeyMap } from './keybindings.js';
 import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import type { Overlay } from './overlay.js';
-import { compositeSurface, modal } from './overlay.js';
+import { compositeSurface, drawer, modal } from './overlay.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
 import { type BuiltinTransition } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
@@ -127,6 +128,30 @@ export interface FrameCommandItem<Msg> extends CommandPaletteItem {
   readonly action?: Msg;
 }
 
+/** A single declarative settings row rendered by the frame shell. */
+export interface FrameSettingRow<Msg> {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly valueLabel?: string;
+  readonly action?: Msg;
+  readonly kind?: 'action' | 'toggle' | 'choice' | 'info';
+  readonly enabled?: boolean;
+}
+
+/** A titled section inside the frame-owned settings drawer. */
+export interface FrameSettingSection<Msg> {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly FrameSettingRow<Msg>[];
+}
+
+/** Structured settings content supplied by the app and rendered by the frame shell. */
+export interface FrameSettings<Msg> {
+  readonly title?: string;
+  readonly sections: readonly FrameSettingSection<Msg>[];
+}
+
 /** Declarative frame layout node. */
 export type FrameLayoutNode =
   | {
@@ -218,6 +243,12 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   ) => Msg | undefined;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
+  /** Optional shell-owned settings drawer content. */
+  readonly settings?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly pageModel: PageModel;
+  }) => FrameSettings<Msg> | undefined;
   /** Optional overlay provider (receives pane rects for panel scoping). */
   readonly overlayFactory?: (ctx: FrameOverlayContext<PageModel>) => readonly Overlay[];
   /** Optional runtime warning/error notifications managed by the frame shell. */
@@ -284,6 +315,12 @@ export interface FrameModel<PageModel> {
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
   readonly commandPalette?: CommandPaletteState;
+  /** Settings drawer visibility flag. */
+  readonly settingsOpen: boolean;
+  /** Active settings row index. */
+  readonly settingsFocusIndex: number;
+  /** Vertical scroll offset for the settings drawer. */
+  readonly settingsScrollY: number;
   /** ID of the page we are transitioning away from. */
   readonly previousPageId?: string;
   /** Transition progress (0 to 1). */
@@ -331,6 +368,22 @@ interface ResolvedFrameNotificationOptions {
 }
 
 const HELP_SCROLL_HINT = 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ? close';
+const settingsHelpKeys = createKeyMap<FrameAction>()
+  .group('Settings', (g) => g
+    .bind('escape', 'Close settings', { type: 'toggle-settings' })
+    .bind('up', 'Previous row', { type: 'scroll-up' })
+    .bind('down', 'Next row', { type: 'scroll-down' })
+    .bind('enter', 'Activate setting', { type: 'toggle-settings' })
+    .bind('space', 'Activate setting', { type: 'toggle-settings' })
+    .bind('j', 'Scroll down', { type: 'scroll-down' })
+    .bind('k', 'Scroll up', { type: 'scroll-up' })
+    .bind('d', 'Page down', { type: 'page-down' })
+    .bind('u', 'Page up', { type: 'page-up' })
+    .bind('g', 'Top', { type: 'top' })
+    .bind('shift+g', 'Bottom', { type: 'bottom' })
+    .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
+    .bind(':', 'Open command palette', { type: 'open-palette' })
+    .bind('?', 'Toggle help', { type: 'toggle-help' }));
 
 function resolveFrameNotificationOptions<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -400,7 +453,7 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
-  const frameKeys = createFrameKeyMap();
+  const frameKeys = createFrameKeyMap({ enableSettings: options.settings != null });
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
@@ -458,16 +511,46 @@ export function createFramedApp<PageModel, Msg>(
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
     const activePage = pagesById.get(model.activePageId)!;
 
-    if (model.helpOpen) {
-      if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-        return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, options), []];
+      if (model.helpOpen) {
+        if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+          return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, options), []];
+        }
+        return [model, []];
       }
-      return [model, []];
-    }
 
-    if (model.commandPalette != null) return [model, []];
+      if (model.commandPalette != null) return [model, []];
 
-    if (msg.action === 'press' && msg.button === 'left') {
+      if (model.settingsOpen) {
+        const layout = resolveSettingsLayout(model, options, pagesById);
+        if (layout != null) {
+          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+            if (isInsideSettingsDrawer(msg.col, msg.row, layout, model)) {
+              return [
+                scrollSettingsBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
+                [],
+              ];
+            }
+            return [model, []];
+          }
+
+          if (msg.action === 'press' && msg.button === 'left') {
+            if (!isInsideSettingsDrawer(msg.col, msg.row, layout, model)) {
+              return [model, []];
+            }
+            const hit = settingsRowAtPosition(msg.col, msg.row, model, layout);
+            if (hit == null) return [model, []];
+            const focusedModel = { ...model, settingsFocusIndex: hit.index };
+            if (hit.row.action === undefined || hit.row.enabled === false || hit.row.kind === 'info') {
+              return [focusedModel, []];
+            }
+            return [focusedModel, [emitMsgForPage(model.activePageId, hit.row.action)]];
+          }
+
+          return [model, []];
+        }
+      }
+
+      if (msg.action === 'press' && msg.button === 'left') {
       if (frameNotificationOptions.enabled) {
         const nowMs = resolveClock(resolveSafeCtx()).now();
         const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
@@ -573,6 +656,9 @@ export function createFramedApp<PageModel, Msg>(
         rows: Math.max(1, options.initialRows ?? 24),
         helpOpen: false,
         helpScrollY: 0,
+        settingsOpen: false,
+        settingsFocusIndex: 0,
+        settingsScrollY: 0,
         transitionProgress: 1,
         transitionGeneration: 0,
         transitionFrame: 0,
@@ -711,6 +797,62 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'help')];
         }
 
+        if (model.settingsOpen) {
+          const layout = resolveSettingsLayout(model, options, pagesById);
+          if (layout != null) {
+            if (!msg.ctrl && !msg.alt && (msg.key === 'escape')) {
+              return [{
+                ...model,
+                settingsOpen: false,
+              }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (msg.ctrl && !msg.alt && msg.key === ',') {
+              return [{
+                ...model,
+                settingsOpen: false,
+              }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === '?') {
+              return [{ ...model, helpOpen: true }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
+              return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'up') {
+              return [moveSettingsFocus(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'down') {
+              return [moveSettingsFocus(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'j') {
+              return [scrollSettingsBy(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'k') {
+              return [scrollSettingsBy(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'd') {
+              return [scrollSettingsBy(model, layout, Math.max(1, layout.contentHeight - 1)), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'u') {
+              return [scrollSettingsBy(model, layout, -Math.max(1, layout.contentHeight - 1)), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'g') {
+              return [{ ...model, settingsScrollY: 0 }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'G') {
+              return [{ ...model, settingsScrollY: layout.maxScrollY }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && (msg.key === 'enter' || msg.key === 'space')) {
+              const row = layout.rows[clampSettingsFocus(model, layout)]?.row;
+              if (row?.action !== undefined && row.enabled !== false && row.kind !== 'info') {
+                return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, row.action)], msg, 'frame')];
+              }
+              return [model, withObservedKey(model, [], msg, 'frame')];
+            }
+            return [model, withObservedKey(model, [], msg, 'frame')];
+          }
+        }
+
         const activePageModel = model.pageModels[model.activePageId]!;
         const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
         if (modalKeyMap != null) {
@@ -842,6 +984,13 @@ export function createFramedApp<PageModel, Msg>(
         }));
       }
 
+      if (model.settingsOpen) {
+        const settingsOverlay = renderSettingsDrawer(model, options, pagesById);
+        if (settingsOverlay != null) {
+          overlays.push(settingsOverlay);
+        }
+      }
+
       if (model.commandPalette != null) {
         const paletteWidth = Math.max(20, Math.min(80, model.columns - 4));
         const paletteBody = commandPalette(model.commandPalette, { width: Math.max(16, paletteWidth - 4) });
@@ -947,7 +1096,9 @@ function renderHelpOverlay<PageModel, Msg>(
   frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
 ): { body: Surface; maxScrollY: number; scrollY: number } {
-  const source = mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap);
+  const source = model.settingsOpen
+    ? settingsHelpKeys
+    : mergeBindingSources(frameKeys, options.globalKeys, activePage.helpSource ?? activePage.keyMap);
   const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
   const bodyWidth = Math.max(20, maxDialogWidth - 4);
   const helpSurface = helpViewSurface(source, {
@@ -1046,5 +1197,277 @@ function applyHelpScroll<PageModel, Msg>(
   return {
     ...model,
     helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)),
+  };
+}
+
+interface FlatSettingsRow<Msg> {
+  readonly index: number;
+  readonly line: number;
+  readonly row: FrameSettingRow<Msg>;
+}
+
+interface ResolvedSettingsLayout<Msg> {
+  readonly settings: FrameSettings<Msg>;
+  readonly rows: readonly FlatSettingsRow<Msg>[];
+  readonly drawerWidth: number;
+  readonly contentWidth: number;
+  readonly contentHeight: number;
+  readonly totalLines: number;
+  readonly maxScrollY: number;
+}
+
+function resolveFrameSettings<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): FrameSettings<Msg> | undefined {
+  const activePage = pagesById.get(model.activePageId)!;
+  return options.settings?.({
+    model,
+    activePage,
+    pageModel: model.pageModels[model.activePageId]!,
+  });
+}
+
+function resolveSettingsLayout<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): ResolvedSettingsLayout<Msg> | undefined {
+  const settings = resolveFrameSettings(model, options, pagesById);
+  if (settings == null) return undefined;
+
+  const sections = settings.sections.filter((section) => section.rows.length > 0);
+  if (sections.length === 0) return undefined;
+
+  const rows: FlatSettingsRow<Msg>[] = [];
+  let line = 0;
+
+  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
+    const section = sections[sectionIndex]!;
+    line += 1;
+    for (const row of section.rows) {
+      rows.push({
+        index: rows.length,
+        line,
+        row,
+      });
+      line += 1;
+    }
+    if (sectionIndex < sections.length - 1) {
+      line += 1;
+    }
+  }
+
+  const drawerWidth = resolveSettingsDrawerWidth(model.columns);
+  const contentWidth = Math.max(16, drawerWidth - 4);
+  const contentHeight = Math.max(1, model.rows - 2);
+  const totalLines = Math.max(1, line);
+  const maxScrollY = Math.max(0, totalLines - contentHeight);
+
+  return {
+    settings: {
+      ...settings,
+      sections,
+    },
+    rows,
+    drawerWidth,
+    contentWidth,
+    contentHeight,
+    totalLines,
+    maxScrollY,
+  };
+}
+
+function resolveSettingsDrawerWidth(columns: number): number {
+  const boundedColumns = Math.max(24, columns);
+  return Math.min(Math.max(28, Math.floor(boundedColumns * 0.3)), Math.max(28, boundedColumns - 4), 42);
+}
+
+function clampSettingsFocus<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedSettingsLayout<Msg>,
+): number {
+  if (layout.rows.length === 0) return 0;
+  return Math.max(0, Math.min(model.settingsFocusIndex, layout.rows.length - 1));
+}
+
+function clampSettingsScroll<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedSettingsLayout<Msg>,
+): number {
+  return Math.max(0, Math.min(model.settingsScrollY, layout.maxScrollY));
+}
+
+function ensureSettingsLineVisible(line: number, scrollY: number, visibleLines: number, maxScrollY: number): number {
+  let next = scrollY;
+  if (line < next) {
+    next = line;
+  } else if (line >= next + visibleLines) {
+    next = line - visibleLines + 1;
+  }
+  return Math.max(0, Math.min(next, maxScrollY));
+}
+
+function moveSettingsFocus<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedSettingsLayout<Msg>,
+  delta: number,
+): InternalFrameModel<PageModel, Msg> {
+  if (layout.rows.length === 0) return model;
+  const nextFocus = Math.max(0, Math.min(clampSettingsFocus(model, layout) + delta, layout.rows.length - 1));
+  const focusLine = layout.rows[nextFocus]!.line;
+  return {
+    ...model,
+    settingsFocusIndex: nextFocus,
+    settingsScrollY: ensureSettingsLineVisible(focusLine, clampSettingsScroll(model, layout), layout.contentHeight, layout.maxScrollY),
+  };
+}
+
+function scrollSettingsBy<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedSettingsLayout<Msg>,
+  delta: number,
+): InternalFrameModel<PageModel, Msg> {
+  return {
+    ...model,
+    settingsScrollY: Math.max(0, Math.min(clampSettingsScroll(model, layout) + delta, layout.maxScrollY)),
+  };
+}
+
+function isInsideSettingsDrawer<PageModel, Msg>(
+  col: number,
+  row: number,
+  layout: ResolvedSettingsLayout<Msg>,
+  model: InternalFrameModel<PageModel, Msg>,
+): boolean {
+  return col >= 0
+    && col < layout.drawerWidth
+    && row >= 0
+    && row < model.rows;
+}
+
+function settingsRowAtPosition<PageModel, Msg>(
+  col: number,
+  row: number,
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedSettingsLayout<Msg>,
+): FlatSettingsRow<Msg> | undefined {
+  if (!isInsideSettingsDrawer(col, row, layout, model)) return undefined;
+  if (row <= 0 || row >= model.rows - 1) return undefined;
+  const contentLine = (row - 1) + clampSettingsScroll(model, layout);
+  return layout.rows.find((candidate) => candidate.line === contentLine);
+}
+
+function renderSettingsDrawer<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): Overlay | undefined {
+  const layout = resolveSettingsLayout(model, options, pagesById);
+  if (layout == null) return undefined;
+
+  const scrollY = clampSettingsScroll(model, layout);
+  const content = renderSettingsSurface(layout, model);
+  const pagerState = createPagerStateForSurface(content, {
+    width: layout.contentWidth,
+    height: layout.contentHeight,
+  });
+  const scrolledState = {
+    ...pagerState,
+    scroll: {
+      ...pagerState.scroll,
+      y: scrollY,
+    },
+  };
+  const body = pagerSurface(content, scrolledState, {
+    showScrollbar: layout.maxScrollY > 0,
+    showStatus: false,
+  });
+
+  return drawer({
+    anchor: 'left',
+    title: layout.settings.title ?? 'Settings',
+    content: body,
+    width: layout.drawerWidth,
+    screenWidth: model.columns,
+    screenHeight: model.rows,
+  });
+}
+
+function renderSettingsSurface<PageModel, Msg>(
+  layout: ResolvedSettingsLayout<Msg>,
+  model: InternalFrameModel<PageModel, Msg>,
+): Surface {
+  const surface = createSurface(layout.contentWidth, layout.totalLines);
+  const focusedIndex = clampSettingsFocus(model, layout);
+  const rowsByLine = new Map(layout.rows.map((row) => [row.line, row] as const));
+  let lineIndex = 0;
+
+  for (let sectionIndex = 0; sectionIndex < layout.settings.sections.length; sectionIndex++) {
+    const section = layout.settings.sections[sectionIndex]!;
+    writeSettingsLine(surface, lineIndex, section.title, { bold: true });
+    lineIndex += 1;
+
+    for (const row of section.rows) {
+      const flat = rowsByLine.get(lineIndex);
+      writeSettingsRow(surface, lineIndex, row, layout.contentWidth, flat?.index === focusedIndex);
+      lineIndex += 1;
+    }
+
+    if (sectionIndex < layout.settings.sections.length - 1) {
+      lineIndex += 1;
+    }
+  }
+
+  return surface;
+}
+
+function writeSettingsRow<Msg>(
+  surface: Surface,
+  y: number,
+  row: FrameSettingRow<Msg>,
+  width: number,
+  focused: boolean,
+): void {
+  const prefix = focused ? '›' : ' ';
+  const value = row.valueLabel ?? '';
+  const leftText = `${prefix} ${row.label}`;
+  const leftChars = Array.from(leftText);
+  const valueChars = Array.from(value);
+  const valueStart = valueChars.length === 0 ? width : Math.max(leftChars.length + 1, width - valueChars.length);
+
+  for (let x = 0; x < leftChars.length && x < width; x++) {
+    const char = leftChars[x]!;
+    if (char === ' ') continue;
+    surface.set(x, y, cellForSettingsChar(char, focused));
+  }
+
+  for (let offset = 0; offset < valueChars.length && valueStart + offset < width; offset++) {
+    const char = valueChars[offset]!;
+    if (char === ' ') continue;
+    surface.set(valueStart + offset, y, cellForSettingsChar(char, focused));
+  }
+}
+
+function writeSettingsLine(
+  surface: Surface,
+  y: number,
+  text: string,
+  options: { readonly bold?: boolean } = {},
+): void {
+  const chars = Array.from(text);
+  for (let x = 0; x < chars.length && x < surface.width; x++) {
+    const char = chars[x]!;
+    if (char === ' ') continue;
+    surface.set(x, y, cellForSettingsChar(char, options.bold ?? false));
+  }
+}
+
+function cellForSettingsChar(char: string, strong: boolean): Cell {
+  return {
+    char,
+    modifiers: strong ? ['bold'] : undefined,
+    empty: false,
   };
 }

@@ -11,10 +11,12 @@ import { tick } from './commands.js';
 
 type Msg =
   | { type: 'inc' }
-  | { type: 'noop' };
+  | { type: 'noop' }
+  | { type: 'toggle-hints' };
 
 interface PageModel {
   count: number;
+  showHints?: boolean;
 }
 
 const KEY_TAB = '\t';
@@ -22,6 +24,10 @@ const KEY_SHIFT_TAB = '\x1b[Z';
 const KEY_ESCAPE = '\x1b';
 const KEY_CTRL_P = '\x10';
 const KEY_ENTER = '\r';
+
+function ctrlKey(key: string) {
+  return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
+}
 
 function makeLongContent(label: string, lines = 40): string {
   return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
@@ -850,6 +856,161 @@ describe('createFramedApp', () => {
 
     expect(result.model.pageModels.home?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('opens settings with the standard shell binding and blocks page keys while open', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+            kind: 'toggle',
+            action: { type: 'toggle-hints' },
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    expect((model as any).settingsOpen).toBe(true);
+
+    const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    expect(nextModel.pageModels.home?.count).toBe(0);
+    expect((nextModel as any).settingsOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+  });
+
+  it('scrolls a long settings drawer independently of the underlying page', () => {
+    const app = createFramedApp({
+      initialColumns: 80,
+      initialRows: 14,
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: Array.from({ length: 24 }, (_, index) => ({
+            id: `setting-${index}`,
+            label: `Setting ${index}`,
+            valueLabel: index % 2 === 0 ? 'On' : 'Off',
+          })),
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
+
+    expect((model as any).settingsScrollY).toBeGreaterThan(0);
+    expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
+  });
+
+  it('opens settings from the standard command palette entry', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      enableCommandPalette: true,
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_CTRL_P },
+      { key: 's' },
+      { key: 'e' },
+      { key: 't' },
+      { key: KEY_ENTER },
+    ]);
+
+    expect((result.model as any).settingsOpen).toBe(true);
+    expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('keeps drawer mouse interactions from leaking through to the underlying page', async () => {
+    type MsgWithMouse = Msg | MouseMsg;
+
+    const page: FramePage<PageModel, MsgWithMouse> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse') {
+          return [{ ...model, count: model.count + 1 }, []];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView(makeLongContent('main')),
+      }),
+    };
+
+    const app = createFramedApp<PageModel, MsgWithMouse>({
+      initialColumns: 80,
+      initialRows: 14,
+      pages: [page],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: Array.from({ length: 24 }, (_, index) => ({
+            id: `setting-${index}`,
+            label: `Setting ${index}`,
+            valueLabel: index % 2 === 0 ? 'On' : 'Off',
+          })),
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(',') as unknown as MsgWithMouse, model);
+
+    const wheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 4,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(wheel as unknown as MsgWithMouse, model);
+
+    const click: MouseMsg = {
+      type: 'mouse',
+      button: 'left',
+      action: 'press',
+      col: 4,
+      row: 3,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(click as unknown as MsgWithMouse, model);
+
+    expect((model as any).settingsScrollY).toBeGreaterThan(0);
+    expect(model.pageModels.home?.count).toBe(0);
   });
 
   it('closes command palette with q when query is empty', async () => {

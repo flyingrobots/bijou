@@ -37,6 +37,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - `Enter` / `Space`: expand a family or select a component
 - `←` / `→`: collapse or expand the focused family
 - `Ctrl+P` or `:`: search components in the standard frame command palette
+- `Ctrl+,`: open the standard shell settings drawer
 - `Tab` / `Shift+Tab`: move focus between panes
 - `j` / `k`: scroll the focused docs or demo pane
 - `d` / `u`: page the focused docs or demo pane
@@ -52,5 +53,6 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
 - The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
+- DOGFOOD now also uses the standard shell-owned settings drawer, so `Ctrl+,` or the command palette can toggle visible preferences like pane hint visibility without the docs app shipping its own overlay plumbing.
 
 [← Examples](/Users/james/git/bijou/examples/README.md)

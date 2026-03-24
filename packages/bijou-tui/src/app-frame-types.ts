@@ -63,6 +63,7 @@ export interface RenderResult {
 /** Discriminated union of all frame-level actions (tabs, panes, scroll, palette, help, transitions). */
 export type FrameAction =
   | { type: 'toggle-help' }
+  | { type: 'toggle-settings' }
   | { type: 'prev-tab' }
   | { type: 'next-tab' }
   | { type: 'next-pane' }

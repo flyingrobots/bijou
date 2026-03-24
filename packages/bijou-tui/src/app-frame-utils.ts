@@ -119,8 +119,8 @@ export function mergeBindingSources(...sources: Array<BindingSource | undefined>
 }
 
 /** Build the default key map for frame-level actions (tabs, panes, scroll, help '?', command palette 'ctrl+p'/':'). */
-export function createFrameKeyMap(): KeyMap<FrameAction> {
-  return createKeyMap<FrameAction>()
+export function createFrameKeyMap(options: { readonly enableSettings?: boolean } = {}): KeyMap<FrameAction> {
+  const keyMap = createKeyMap<FrameAction>()
     .group('Frame', (g) => g
       .bind('?', 'Toggle help', { type: 'toggle-help' })
       .bind('[', 'Previous tab', { type: 'prev-tab' })
@@ -148,4 +148,11 @@ export function createFrameKeyMap(): KeyMap<FrameAction> {
       .bind('h', 'Scroll left', { type: 'scroll-left' })
       .bind('l', 'Scroll right', { type: 'scroll-right' }),
     );
+
+  if (options.enableSettings) {
+    keyMap.group('Shell', (g) => g
+      .bind('ctrl+,', 'Settings', { type: 'toggle-settings' }));
+  }
+
+  return keyMap;
 }

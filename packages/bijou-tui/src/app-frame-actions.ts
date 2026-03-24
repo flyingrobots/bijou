@@ -58,6 +58,23 @@ export function applyFrameAction<PageModel, Msg>(
   switch (action.type) {
     case 'toggle-help':
       return [{ ...model, helpOpen: !model.helpOpen }, []];
+    case 'toggle-settings': {
+      const activePage = pagesById.get(model.activePageId)!;
+      const settings = options.settings?.({
+        model,
+        activePage,
+        pageModel: model.pageModels[model.activePageId]!,
+      });
+      if (settings == null || settings.sections.every((section) => section.rows.length === 0)) {
+        return [model, []];
+      }
+      return [{
+        ...model,
+        settingsOpen: !model.settingsOpen,
+        settingsFocusIndex: model.settingsOpen ? model.settingsFocusIndex : 0,
+        settingsScrollY: model.settingsOpen ? model.settingsScrollY : 0,
+      }, []];
+    }
     case 'prev-tab':
       return switchTab(model, -1, pagesById, options);
     case 'next-tab':

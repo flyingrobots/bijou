@@ -331,21 +331,24 @@ export function renderHelpLine<PageModel, Msg>(
     ? 'PALETTE'
     : model.helpOpen
       ? 'HELP'
-      : 'NORMAL';
+      : model.settingsOpen
+        ? 'SETTINGS'
+        : 'NORMAL';
   const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
   const status = `[${mode}] page:${model.activePageId} pane:${focusedPane}`;
 
-  const source = options.helpLineSource?.({
-    model,
-    activePage,
-    frameKeys,
-    globalKeys: options.globalKeys,
-  }) ?? mergeBindingSources(
-    frameKeys,
-    options.globalKeys,
-    activePage.helpSource ?? activePage.keyMap,
-  );
-  const hint = helpShort(source);
+  const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
+    ? 'Esc close • ↑/↓ rows • Enter toggle • j/k scroll • Ctrl+P palette'
+    : helpShort(options.helpLineSource?.({
+      model,
+      activePage,
+      frameKeys,
+      globalKeys: options.globalKeys,
+    }) ?? mergeBindingSources(
+      frameKeys,
+      options.globalKeys,
+      activePage.helpSource ?? activePage.keyMap,
+    ));
   const line = hint.length > 0
     ? ` ${status}  ${hint}`
     : ` ${status}`;
