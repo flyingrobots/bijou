@@ -105,6 +105,7 @@ type ExplorerMsg =
   | { type: 'activate-row' }
   | { type: 'expand-row' }
   | { type: 'collapse-row' }
+  | { type: 'select-story'; storyId: string }
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
@@ -407,9 +408,24 @@ function activateFocusedRow(model: DocsExplorerModel): DocsExplorerModel {
   if (row.kind === 'family') {
     return toggleFamily(model, row.familyId);
   }
+  return selectStory(model, row.storyId);
+}
+
+function selectStory(model: DocsExplorerModel, storyId?: string): DocsExplorerModel {
+  if (storyId == null) return model;
+  const story = findComponentStory(storyId);
+  if (story == null) return model;
+  const family = STORY_FAMILIES.find((candidate) => candidate.stories.some((entry) => entry.id === storyId));
+  if (family == null) return model;
+  const nextExpandedFamilies = {
+    ...model.expandedFamilies,
+    [family.id]: true,
+  };
   return {
     ...model,
-    selectedStoryId: row.storyId,
+    expandedFamilies: nextExpandedFamilies,
+    selectedStoryId: storyId,
+    familyState: rebuildFamilyState(model.familyState, nextExpandedFamilies, `story:${storyId}`),
   };
 }
 
@@ -952,6 +968,8 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [expandFocusedFamily(model), []];
           case 'collapse-row':
             return [collapseFocusedFamily(model), []];
+          case 'select-story':
+            return [selectStory(model, msg.storyId), []];
           case 'variant-next':
             return [cycleVariantIndex(model, 1), []];
           case 'variant-prev':
@@ -963,6 +981,15 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
         }
       },
       keyMap: explorerPageKeys,
+      commandItems(model) {
+        return COMPONENT_STORIES.map((story) => ({
+          id: story.id,
+          label: `Open ${story.title}`,
+          description: story.docs.summary,
+          category: story.family,
+          action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
+        }));
+      },
       layout(model) {
         return {
           kind: 'grid',
@@ -991,6 +1018,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
         };
       },
     }],
+    enableCommandPalette: true,
   });
 }
 

@@ -36,6 +36,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - `↑` / `↓`: move through the family/story rows in the left lane
 - `Enter` / `Space`: expand a family or select a component
 - `←` / `→`: collapse or expand the focused family
+- `Ctrl+P` or `:`: search components in the standard frame command palette
 - `Tab` / `Shift+Tab`: move focus between panes
 - `j` / `k`: scroll the focused docs or demo pane
 - `d` / `u`: page the focused docs or demo pane
@@ -50,5 +51,6 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - The docs are the demo: the page text and preview are generated from the same structured story data.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
+- The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
 
 [← Examples](/Users/james/git/bijou/examples/README.md)
