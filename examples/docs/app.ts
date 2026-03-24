@@ -73,7 +73,7 @@ const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT)
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const COPYRIGHT_TEXT = 'Copyright © 2026 James Ross • FlyingRobots';
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
-const DOCS_PAGE_ID = 'learn-by-touch';
+const DOCS_PAGE_ID = 'dogfood';
 const DOCS_SIDEBAR_WIDTH = 32;
 
 interface StoryFamily {
@@ -949,7 +949,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
     helpLineSource: () => explorerHelpKeys,
     pages: [{
       id: DOCS_PAGE_ID,
-      title: 'Learn by Touch',
+      title: 'DOGFOOD',
       init: () => [createInitialExplorerModel(ctx), []],
       helpSource: explorerHelpKeys,
       update(msg, model) {

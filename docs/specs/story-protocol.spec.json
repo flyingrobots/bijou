@@ -2,7 +2,7 @@
   "name": "Story Protocol",
   "designPattern": "Structured Content / Demo Contract / Scenario Substrate",
   "requirements": [
-    "Learn by Touch strategy",
+    "DOGFOOD strategy",
     "Pure-surface runtime path",
     "Design-system component-family guidance"
   ],

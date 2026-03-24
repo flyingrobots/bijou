@@ -1,6 +1,6 @@
 # Docs Preview
 
-First Learn by Touch slice: a story-driven docs surface built with Bijou itself.
+First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 
 ## Run
 

@@ -1,6 +1,6 @@
 # ComponentStory v0
 
-_Design note for the first Learn by Touch substrate_
+_Design note for the first DOGFOOD substrate_
 
 ## Why this exists
 

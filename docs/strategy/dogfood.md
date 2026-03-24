@@ -1,4 +1,6 @@
-# Learn by Touch
+# DOGFOOD
+
+_Documentation Of Good Foundational Onboarding and Discovery_
 
 _Milestone strategy for the post-v4 living docs platform_
 
@@ -13,7 +15,7 @@ After `v4.0.0`, the next problem is not "what capability can Bijou add next?" It
 
 This milestone is the answer. It is the first post-v4 product milestone because it improves understanding, trust, and development speed at the same time.
 
-`Learn by Touch` is a better name than "Milestone 1" because it reflects the actual philosophy:
+`DOGFOOD` is a better name than "Milestone 1" because it reflects the actual philosophy:
 
 - docs should be experiential, not only descriptive
 - components should be explored in the medium they are built for
@@ -90,7 +92,7 @@ This milestone should follow these principles:
 5. **Regression surfaces should emerge from teaching surfaces**
    If a story is canonical enough to teach, it should be close to canonical enough to test.
 
-## Scope of Learn by Touch
+## Scope of DOGFOOD
 
 ### Current validation slice
 
@@ -340,7 +342,7 @@ That keeps the lab from becoming another disconnected example swamp.
 
 ## Success criteria
 
-Learn by Touch is successful when:
+DOGFOOD is successful when:
 
 - a new contributor can learn a component family from one canonical surface
 - docs, demos, and regressions are visibly converging instead of drifting

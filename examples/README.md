@@ -28,7 +28,7 @@ Browse 45 components across 4 categories (Display, Data, Forms, TUI Blocks). Eac
 
 See [showcase](./showcase/) for the structured preview contract and usage notes.
 
-## Learn by Touch
+## DOGFOOD
 
 Landing-first story-driven docs slice built with Bijou itself:
 

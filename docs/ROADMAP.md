@@ -45,7 +45,7 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log and completed branch w
 
 The next phase is deliberately narrower than the v4 release branch. Priority order:
 
-1. **Learn by Touch** — establish the shared content and story substrate before building more one-off examples.
+1. **DOGFOOD** — establish the shared content and story substrate before building more one-off examples.
 2. **Replay and deterministic DX** — make Bijou uniquely inspectable, recordable, and testable.
 3. **Platform hardening and release hygiene** — keep the release/test/tooling base honest while the platform grows.
 4. **Runtime and design-system expansion** — push richer primitives once the substrate above is in place.
@@ -53,15 +53,15 @@ The next phase is deliberately narrower than the v4 release branch. Priority ord
 
 ---
 
-## Learn by Touch
+## DOGFOOD
 
-See [docs/strategy/learn-by-touch.md](strategy/learn-by-touch.md) for the design-thinking rationale, primary user, jobs to be done, principles, and recommended first slice.
+See [docs/strategy/dogfood.md](strategy/dogfood.md) for the design-thinking rationale, primary user, jobs to be done, principles, and recommended first slice.
 
 | Feature | Package | Notes |
 |---------|---------|-------|
 | **Story Protocol** | docs + examples + repo tooling | Highest-priority post-v4 foundation. Define structured `ComponentStory` and `PatternStory` records that can power docs pages, showcase entries, smoke scenarios, replay artifacts, and regression captures from one source of truth instead of duplicating example logic across the repo. Initial design captured in [ComponentStory v0](strategy/component-story-v0.md) and [Story Protocol spec](specs/story-protocol.spec.json). |
 | **Bijou Docs TUI** | docs + bijou-tui-app | Build a VitePress-like docs application in Bijou itself, with left-nav docs, live component demos, source panes, width/theme toggles, and `rich` / `static` / `pipe` / `accessible` profile switching. Long-term goal: make this the primary human-facing docs surface and retire most ad hoc example READMEs. |
-| **Shell-Owned Settings Drawer** | bijou-tui + docs | Add a standard left-edge settings drawer to `createFramedApp()` so framed apps can expose global preferences without inventing one-off overlays. The first proving surface should be Learn by Touch, with shell-level preferences like landing theme, profile default, animation, and hint visibility. Initial design captured in [Settings Belong to the Shell](strategy/settings-belong-to-the-shell.md) and [Frame Settings Drawer spec](specs/frame-settings-drawer.spec.json). |
+| **Shell-Owned Settings Drawer** | bijou-tui + docs | Add a standard left-edge settings drawer to `createFramedApp()` so framed apps can expose global preferences without inventing one-off overlays. The first proving surface should be DOGFOOD, with shell-level preferences like landing theme, profile default, animation, and hint visibility. Initial design captured in [Settings Belong to the Shell](strategy/settings-belong-to-the-shell.md) and [Frame Settings Drawer spec](specs/frame-settings-drawer.spec.json). |
 | **Surface Selector Model** | bijou + bijou-tui + repo tooling | Add semantic selectors over surfaces and layout output (`id`, `class`, role-like tags, pane scope, text contains) so docs demos, scenario tests, and devtools can target UI meaningfully instead of falling back to frame coordinates or brittle string searches. |
 | **Surface Scenario Test Harness** | repo tooling + bijou-tui | Build a Playwright-like test/runtime harness for Bijou surfaces with semantic selectors, scripted input driving, frame assertions, deterministic interaction flows, and integrated recording/playback hooks. If the API stabilizes, this likely graduates into its own package rather than staying as repo-local tooling. |
 | **Interaction Profile Simulator** | bijou-tui + docs | Add a built-in simulator that can flip a surface or app among `rich`, `static`, `pipe`, `accessible`, reduced-motion, no-color, and narrow-width profiles so graceful-lowering behavior can be tested and taught without bespoke demo wiring. |
@@ -136,7 +136,7 @@ See [docs/strategy/learn-by-touch.md](strategy/learn-by-touch.md) for the design
 - `v4.0.0` is no longer treated as “in flight”; it is now a shipped release.
 - Release-blocker items were either moved to [COMPLETED.md](COMPLETED.md), folded into platform hardening, or dropped if they were no longer real backlog.
 - The top of the roadmap now reflects the deliberate post-v4 sequence:
-  1. Learn by Touch
+  1. DOGFOOD
   2. replay/debugging substrate
   3. hardening and release hygiene
   4. runtime/design-system expansion

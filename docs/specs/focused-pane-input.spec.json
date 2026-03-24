@@ -3,7 +3,7 @@
   "designPattern": "Pane-Scoped Input Ownership / Shell-Managed Input Stack",
   "requirements": [
     "createFramedApp() shell model",
-    "Learn by Touch docs shell feedback",
+    "DOGFOOD docs shell feedback",
     "Tests ARE the Spec roadmap principle"
   ],
   "userStory": {
@@ -20,7 +20,7 @@
     "Frame shell bindings such as pane cycling and help/palette toggles remain coherent while pane-local input exists",
     "Pane-local mouse handling can run for the focused or targeted pane after shell chrome and shell overlays intercept first",
     "The full help surface can reflect the focused pane's bindings instead of only page-global bindings",
-    "The Learn by Touch docs shell can move focus between lanes without arrow keys continuing to mutate the family lane when another pane is active"
+    "The DOGFOOD docs shell can move focus between lanes without arrow keys continuing to mutate the family lane when another pane is active"
   ],
   "backwardCompatibility": "Existing `FramePage.keyMap`, `modalKeyMap`, `globalKeys`, and page update behavior remain supported. Pane-scoped input is additive in v0, with the new layer treated as page-derived routing rather than a breaking shell rewrite.",
   "scope": {
@@ -29,7 +29,7 @@
       "Pane-scoped mouse routing in createFramedApp()",
       "Focused-pane help integration",
       "Shell-managed internal input layering",
-      "Learn by Touch docs shell as the proving surface"
+      "DOGFOOD docs shell as the proving surface"
     ],
     "outScope": [
       "General nested input graphs beyond framed panes",
@@ -40,7 +40,7 @@
     ]
   },
   "testPlan": {
-    "goldenPath": "Write failing app-frame tests that prove pane-local keymaps only fire for the focused pane, that focus changes replace the active layer, and that help/palette/modals still preempt lower layers. Then migrate the Learn by Touch docs shell so focusing the variants pane stops arrow keys from moving the family lane.",
+    "goldenPath": "Write failing app-frame tests that prove pane-local keymaps only fire for the focused pane, that focus changes replace the active layer, and that help/palette/modals still preempt lower layers. Then migrate the DOGFOOD docs shell so focusing the variants pane stops arrow keys from moving the family lane.",
     "edgeCases": [
       "Focus changes via keyboard pane cycling",
       "Focus changes via mouse click and mouse wheel",

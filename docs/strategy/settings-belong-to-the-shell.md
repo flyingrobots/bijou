@@ -4,7 +4,7 @@ _Design note for a frame-owned settings drawer in `createFramedApp()`_
 
 ## Why this exists
 
-The Learn by Touch docs app exposed a product gap that is larger than the docs app itself:
+The DOGFOOD docs app exposed a product gap that is larger than the docs app itself:
 
 - users want global preferences quickly
 - they expect to reach them from the shell, not by navigating into a one-off page
@@ -319,11 +319,11 @@ The next implementation loop should start with failing tests in `app-frame.test.
    - The shell exposes settings as a discoverable shell command, not just a hidden keybinding.
 
 6. **The docs app can expose preferences without custom drawer plumbing**
-   - Learn by Touch becomes a proving surface, not a special-case shell fork.
+   - DOGFOOD becomes a proving surface, not a special-case shell fork.
 
 ## Recommended first proving surface
 
-The Learn by Touch docs app is the right v0 proving surface because it already has obvious shell-level preferences:
+The DOGFOOD docs app is the right v0 proving surface because it already has obvious shell-level preferences:
 
 - landing theme preset
 - default profile

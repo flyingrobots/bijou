@@ -4,7 +4,7 @@ _Design note for pane-scoped input in `createFramedApp()`_
 
 ## Why this exists
 
-The first Learn by Touch docs shell exposed a real shell problem, not just a docs-app bug:
+The first DOGFOOD docs shell exposed a real shell problem, not just a docs-app bug:
 
 - visual focus can move to a different pane
 - the active pane can change in shell state
@@ -95,7 +95,7 @@ That means:
 - help can only talk about shell/global/page bindings, not the active pane
 - mouse focus and keyboard routing are only partially aligned
 
-The Learn by Touch docs shell is just the first visible symptom:
+The DOGFOOD docs shell is just the first visible symptom:
 
 - focus can move to the variants pane
 - but the family lane still responds to arrow keys because the page keymap is still global
@@ -229,14 +229,14 @@ This is a real product value of the feature, not just a nice-to-have.
 - pane-scoped mouse handling in `createFramedApp()`
 - shell-managed focus-to-input ownership
 - help integration for the active pane
-- migration of the Learn by Touch docs shell as a proving surface
+- migration of the DOGFOOD docs shell as a proving surface
 
 ### Out of scope for v0
 
 - arbitrary nested input graphs beyond framed panes
 - full public `InputStack` authoring inside frame apps
 - generalized interactive-component protocol
-- animation work on the Learn by Touch landing hero
+- animation work on the DOGFOOD landing hero
 - redesigning every shell binding or every scroll primitive
 
 ## Tests are the spec
@@ -266,7 +266,7 @@ The first implementation step should be failing tests in `app-frame.test.ts` and
 7. **Help reflects the active pane**
    - The full help surface shows the active pane's bindings instead of stale page-global guidance.
 
-8. **Learn by Touch regression**
+8. **DOGFOOD regression**
    - In the docs shell, focusing the variants pane stops arrow keys from moving the family accordion.
 
 ## Recommended implementation loop
@@ -291,7 +291,7 @@ The first implementation step should be failing tests in `app-frame.test.ts` and
    - wheel-to-focus-and-scroll
    - pane-local click dispatch after shell interception
 
-6. **Migrate Learn by Touch**
+6. **Migrate DOGFOOD**
    - Move its lane controls out of one page-global keymap and into pane-scoped areas
 
 7. **Only then evaluate a richer public stack model**

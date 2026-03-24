@@ -124,7 +124,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['learn-by-touch'];
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
 
     expect((result.model as any).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
@@ -144,7 +144,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['learn-by-touch'];
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
     const frame = result.frames[result.frames.length - 1]!;
     const text = frameText(frame);
 

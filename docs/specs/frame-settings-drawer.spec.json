@@ -4,7 +4,7 @@
   "requirements": [
     "createFramedApp() shell model",
     "Focus Owns Input design direction",
-    "Learn by Touch docs app feedback",
+    "DOGFOOD docs app feedback",
     "Tests ARE the Spec roadmap principle"
   ],
   "userStory": {
@@ -21,7 +21,7 @@
     "Mouse click and wheel interactions inside the drawer do not leak through to the underlying page",
     "The shell can expose a standard command-palette entry and binding to open settings",
     "The help surface can reflect settings-layer controls while the drawer is open",
-    "The Learn by Touch docs app can adopt the standard settings drawer as a proving surface with minimal custom code"
+    "The DOGFOOD docs app can adopt the standard settings drawer as a proving surface with minimal custom code"
   ],
   "backwardCompatibility": "Existing framed apps remain valid without providing settings. The settings drawer is additive in v0 and does not require page layout changes or custom overlay rewrites.",
   "scope": {
@@ -32,7 +32,7 @@
       "Mouse click and wheel support inside the drawer",
       "Scrollable settings list",
       "Command-palette entry for opening settings",
-      "Learn by Touch docs app as the first proving surface"
+      "DOGFOOD docs app as the first proving surface"
     ],
     "outScope": [
       "Persistence of preferences across sessions",
@@ -43,7 +43,7 @@
     ]
   },
   "testPlan": {
-    "goldenPath": "Write failing app-frame tests that prove the shell can open a standard settings drawer, that the drawer consumes keyboard and mouse input while open, that long settings lists scroll independently, and that the command palette can open settings. Then add a docs-preview regression that toggles one visible Learn by Touch preference through the drawer.",
+    "goldenPath": "Write failing app-frame tests that prove the shell can open a standard settings drawer, that the drawer consumes keyboard and mouse input while open, that long settings lists scroll independently, and that the command palette can open settings. Then add a docs-preview regression that toggles one visible DOGFOOD preference through the drawer.",
     "edgeCases": [
       "Compact terminal width with a narrow drawer",
       "Settings list longer than the viewport height",
