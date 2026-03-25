@@ -11,7 +11,6 @@ import {
 } from '@flyingrobots/bijou';
 import {
   browsableListSurface,
-  canvas,
   compositeSurface,
   createBrowsableListState,
   createFramedApp,
@@ -57,6 +56,7 @@ const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
 const LOGO_WIDTH = Math.max(1, ...LOGO_LINES.map((lineText) => lineText.length));
 const LOGO_HEIGHT = LOGO_LINES.length;
+const LOGO_PADDED_LINES = LOGO_LINES.map((lineText) => lineText.padEnd(LOGO_WIDTH));
 const FLYING_ROBOTS_WIDE_LARGE_TEXT = readFileSync(
   new URL('../../assets/flyingrobots-wide-large.txt', import.meta.url),
   'utf8',
@@ -132,13 +132,27 @@ interface RootModel {
 
 type RootMsg = { type: 'docs'; msg: ExplorerMsg };
 type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
+type Rgb = [number, number, number];
 
-interface LandingThemeTokens {
+interface LandingThemeSeed {
   readonly id: string;
   readonly label: string;
   readonly background: string;
   readonly waveGradient: readonly [string, string, string];
   readonly logoGradient: readonly [string, string, string];
+}
+
+interface LandingThemeTokens {
+  readonly id: string;
+  readonly label: string;
+  readonly background: string;
+  readonly waveRamp: readonly string[];
+  readonly logoRamp: readonly string[];
+  readonly promptBodyColor: string;
+  readonly promptAccentColor: string;
+  readonly footerMutedColor: string;
+  readonly footerStrongColor: string;
+  readonly fpsColor: string;
 }
 
 interface LandingToastState {
@@ -148,7 +162,16 @@ interface LandingToastState {
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const LANDING_FPS_ALPHA = 0.2;
-const LANDING_THEMES: readonly LandingThemeTokens[] = [
+const LANDING_COLOR_RAMP_SIZE = 256;
+const DIM_MODIFIERS = ['dim'];
+const BOLD_MODIFIERS = ['bold'];
+const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
+  readonly promptLine: Surface;
+  readonly footerControls: Surface;
+  readonly footerVersion: Surface;
+}>();
+const LANDING_FPS_BADGE_CACHE = new Map<string, Surface>();
+const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   {
     id: 'storybook-workstation',
     label: 'Storybook Workstation',
@@ -184,7 +207,15 @@ const LANDING_THEMES: readonly LandingThemeTokens[] = [
     waveGradient: ['#52506f', '#8c8ab8', '#f3ceb0'],
     logoGradient: ['#8eb7d8', '#d9a7c7', '#f4d98b'],
   },
-];
+ ] as const;
+const LANDING_THEMES: readonly LandingThemeTokens[] = LANDING_THEME_SEEDS.map(compileLandingTheme);
+const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
+  const row = new Float32Array(BACKGROUND_WIDTH);
+  for (let x = 0; x < BACKGROUND_WIDTH; x++) {
+    row[x] = densityFromChar(lineText[x] ?? ' ');
+  }
+  return row;
+});
 
 const docsShellHintSource = createKeyMap<ExplorerMsg>()
   .group('Shell', (group) => group
@@ -494,53 +525,22 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
     ? FLYING_ROBOTS_LARGE_LINES
     : FLYING_ROBOTS_SMALL_LINES;
   const wordmark = createWordmarkSurface(wordmarkGlyphs, model.landingTimeMs, tokens);
-  const promptLine = createTransparentTextSurface(ENTER_PROMPT_TEXT, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: (x) => {
-      const char = ENTER_PROMPT_TEXT[x] ?? ' ';
-      if (char === '[' || char === ']' || (x >= 7 && x <= 11)) {
-        return rgbHex(...lerpTheme(tokens.logoGradient, 0.92));
-      }
-      return rgbHex(...lerpTheme(tokens.waveGradient, 0.58));
-    },
-    modifiers: (x) => {
-      const char = ENTER_PROMPT_TEXT[x] ?? ' ';
-      return char === '[' || char === ']' || (x >= 7 && x <= 11) ? ['bold'] : ['dim'];
-    },
-  });
-  const footerControls = createTransparentTextSurface(LANDING_CONTROLS_TEXT, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.52)),
-    modifiers: () => ['dim'],
-  });
-  const footerVersion = createTransparentTextSurface(VERSION_TEXT, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: () => rgbHex(...lerpTheme(tokens.logoGradient, 0.88)),
-    modifiers: () => ['bold'],
-  });
-  const fpsBadge = createTransparentTextSurface(`${model.landingFps} fps`, {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.62)),
-    modifiers: () => ['dim'],
-  });
+  const staticSurfaces = getLandingStaticSurfaces(tokens);
+  const fpsBadge = getLandingFpsBadge(tokens, model.landingFps);
 
   const footerY = Math.max(0, height - 1);
   const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
   const promptMinY = Math.min(height - 1, logoY + logo.height + 1);
-  const promptMaxY = Math.max(0, wordmarkY - promptLine.height - 2);
+  const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
   const promptY = promptMaxY >= promptMinY
     ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
-    : Math.max(0, Math.min(height - promptLine.height - 1, promptMinY));
+    : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
 
   surface.blit(fpsBadge, 0, 0);
-  blitCentered(surface, promptLine, promptY);
+  blitCentered(surface, staticSurfaces.promptLine, promptY);
   blitCentered(surface, wordmark, wordmarkY);
-  surface.blit(footerControls, 0, footerY);
-  surface.blit(footerVersion, Math.max(0, width - footerVersion.width), footerY);
+  surface.blit(staticSurfaces.footerControls, 0, footerY);
+  surface.blit(staticSurfaces.footerVersion, Math.max(0, width - staticSurfaces.footerVersion.width), footerY);
 
   if (model.landingToast && model.landingTimeMs < model.landingToast.expiresAtMs) {
     return compositeSurface(surface, [toast({
@@ -565,41 +565,53 @@ function createLandingBackground(
   const time = timeMs / 1000;
   const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
   const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
+  const surface = createSurface(width, height);
+  const widthDenominator = width - 1 || 1;
+  const heightDenominator = height - 1 || 1;
 
-  return canvas(width, height, ({ u, v, time: shaderTime }) => {
-    const x = Math.round(u * (width - 1 || 1));
-    const y = Math.round(v * (height - 1 || 1));
+  for (let y = 0; y < height; y++) {
+    const v = y / heightDenominator;
     const rowShift = Math.round(
-      (Math.sin((y * 0.075) + (shaderTime * 0.7)) * 18)
-      + (Math.cos((y * 0.03) - (shaderTime * 0.35)) * 7),
+      (Math.sin((y * 0.075) + (time * 0.7)) * 18)
+      + (Math.cos((y * 0.03) - (time * 0.35)) * 7),
     );
-    const columnShift = Math.round(Math.sin((x * 0.028) + (shaderTime * 0.42)) * 2);
-    const sourceX = mod(baseX + x + rowShift, BACKGROUND_WIDTH);
-    const sourceY = mod(baseY + y + columnShift, BACKGROUND_HEIGHT);
-    const sourceChar = BACKGROUND_LINES[sourceY]?.[sourceX] ?? ' ';
-    const density = densityFromChar(sourceChar);
-    if (density === 0) return { char: ' ', empty: true };
+    for (let x = 0; x < width; x++) {
+      const u = x / widthDenominator;
+      const columnShift = Math.round(Math.sin((x * 0.028) + (time * 0.42)) * 2);
+      const sourceX = mod(baseX + x + rowShift, BACKGROUND_WIDTH);
+      const sourceY = mod(baseY + y + columnShift, BACKGROUND_HEIGHT);
+      const density = BACKGROUND_DENSITY_ROWS[sourceY]?.[sourceX] ?? 0;
+      if (density === 0) {
+        surface.set(x, y, { char: ' ', empty: true });
+        continue;
+      }
 
-    const wave = 0.54
-      + (Math.sin((x * 0.042) + (y * 0.016) + (shaderTime * 1.45)) * 0.24)
-      + (Math.cos((x * 0.012) - (y * 0.085) + (shaderTime * 0.95)) * 0.22);
-    const level = clamp01(density * wave);
-    const char = densityGlyph(level, { airy: true });
-    if (char === ' ') return { char: ' ', empty: true };
+      const wave = 0.54
+        + (Math.sin((x * 0.042) + (y * 0.016) + (time * 1.45)) * 0.24)
+        + (Math.cos((x * 0.012) - (y * 0.085) + (time * 0.95)) * 0.22);
+      const level = clamp01(density * wave);
+      const char = densityGlyph(level, { airy: true });
+      if (char === ' ') {
+        surface.set(x, y, { char: ' ', empty: true });
+        continue;
+      }
 
-    const colorT = clamp01(
-      (u * 0.66)
-      + (0.22 * (0.5 + (Math.sin((shaderTime * 0.3) + (v * 5.2)) * 0.5)))
-      + (0.08 * Math.sin((shaderTime * 0.55) + (x * 0.02))),
-    );
-    const [r, g, b] = lerpTheme(tokens.waveGradient, colorT);
+      const colorT = clamp01(
+        (u * 0.66)
+        + (0.22 * (0.5 + (Math.sin((time * 0.3) + (v * 5.2)) * 0.5)))
+        + (0.08 * Math.sin((time * 0.55) + (x * 0.02))),
+      );
 
-    return {
-      char,
-      fg: rgbHex(r, g, b),
-      modifiers: level < 0.52 ? ['dim'] : undefined,
-    };
-  }, { time });
+      surface.set(x, y, {
+        char,
+        fg: sampleColorRamp(tokens.waveRamp, colorT),
+        modifiers: level < 0.52 ? DIM_MODIFIERS : undefined,
+        empty: false,
+      });
+    }
+  }
+
+  return surface;
 }
 
 function createLogoSurface(
@@ -608,37 +620,36 @@ function createLogoSurface(
   timeMs: number,
   tokens: LandingThemeTokens,
 ): Surface {
-  const shader = canvas(LOGO_WIDTH, LOGO_HEIGHT, ({ u, v, time }) => {
-    const shimmer = 0.46
-      + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
-      + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
-      + (Math.sin((u * 18.0) + (time * 5.5)) * 0.12);
-    const level = clamp01(shimmer);
-    const colorT = clamp01(
-      (u * 0.78)
-      + ((1 - v) * 0.14)
-      + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
-    );
-    const [r, g, b] = lerpTheme(tokens.logoGradient, colorT);
-    return {
-      char: densityGlyph(level, { airy: false }),
-      fg: rgbHex(r, g, b),
-      modifiers: level > 0.7 ? ['bold'] : undefined,
-    };
-  }, { time: timeMs / 1000 });
-
+  const time = timeMs / 1000;
   const masked = createSurface(LOGO_WIDTH, LOGO_HEIGHT);
+  const widthDenominator = LOGO_WIDTH - 1 || 1;
+  const heightDenominator = LOGO_HEIGHT - 1 || 1;
   for (let y = 0; y < LOGO_HEIGHT; y++) {
-    const lineText = LOGO_LINES[y]!.padEnd(LOGO_WIDTH);
+    const lineText = LOGO_PADDED_LINES[y]!;
+    const v = y / heightDenominator;
     for (let x = 0; x < LOGO_WIDTH; x++) {
-      if (lineText[x] === ' ') {
+      const sourceChar = lineText[x]!;
+      if (sourceChar === ' ') {
         masked.set(x, y, { char: ' ', empty: true });
         continue;
       }
-      const shaderCell = shader.get(x, y);
+      const u = x / widthDenominator;
+      const shimmer = 0.46
+        + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
+        + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
+        + (Math.sin((u * 18.0) + (time * 5.5)) * 0.12);
+      const level = clamp01(shimmer);
+      const shaderChar = densityGlyph(level, { airy: false });
+      const colorT = clamp01(
+        (u * 0.78)
+        + ((1 - v) * 0.14)
+        + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
+      );
       masked.set(x, y, {
-        ...shaderCell,
-        char: reinforceGlyph(lineText[x]!, shaderCell.char),
+        char: reinforceGlyph(sourceChar, shaderChar),
+        fg: sampleColorRamp(tokens.logoRamp, colorT),
+        modifiers: level > 0.7 ? BOLD_MODIFIERS : undefined,
+        empty: false,
       });
     }
   }
@@ -659,9 +670,9 @@ function createWordmarkSurface(
       const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
       const shimmer = 0.08 * Math.sin((timeMs / 1000) * 1.4 + (y * 0.55) + (x * 0.12));
       const colorT = clamp01((xRatio * 0.82) + 0.1 + shimmer);
-      return rgbHex(...lerpTheme(tokens.logoGradient, colorT));
+      return sampleColorRamp(tokens.logoRamp, colorT);
     },
-    modifiers: (_x, _y, char) => char === ' ' ? undefined : ['bold'],
+    modifiers: (_x, _y, char) => char === ' ' ? undefined : BOLD_MODIFIERS,
   });
 }
 
@@ -752,6 +763,62 @@ function updateLandingFps(current: number, dtSeconds: number): number {
   return Math.max(1, Math.round((current * (1 - LANDING_FPS_ALPHA)) + (instantFps * LANDING_FPS_ALPHA)));
 }
 
+function getLandingStaticSurfaces(tokens: LandingThemeTokens): {
+  readonly promptLine: Surface;
+  readonly footerControls: Surface;
+  readonly footerVersion: Surface;
+} {
+  const cached = LANDING_STATIC_SURFACE_CACHE.get(tokens.id);
+  if (cached) return cached;
+
+  const surfaces = {
+    promptLine: createTransparentTextSurface(ENTER_PROMPT_TEXT, {
+      bg: tokens.background,
+      transparentSpaces: false,
+      fg: (x) => {
+        const char = ENTER_PROMPT_TEXT[x] ?? ' ';
+        if (char === '[' || char === ']' || (x >= 7 && x <= 11)) {
+          return tokens.promptAccentColor;
+        }
+        return tokens.promptBodyColor;
+      },
+      modifiers: (x) => {
+        const char = ENTER_PROMPT_TEXT[x] ?? ' ';
+        return char === '[' || char === ']' || (x >= 7 && x <= 11) ? BOLD_MODIFIERS : DIM_MODIFIERS;
+      },
+    }),
+    footerControls: createTransparentTextSurface(LANDING_CONTROLS_TEXT, {
+      bg: tokens.background,
+      transparentSpaces: false,
+      fg: tokens.footerMutedColor,
+      modifiers: DIM_MODIFIERS,
+    }),
+    footerVersion: createTransparentTextSurface(VERSION_TEXT, {
+      bg: tokens.background,
+      transparentSpaces: false,
+      fg: tokens.footerStrongColor,
+      modifiers: BOLD_MODIFIERS,
+    }),
+  };
+  LANDING_STATIC_SURFACE_CACHE.set(tokens.id, surfaces);
+  return surfaces;
+}
+
+function getLandingFpsBadge(tokens: LandingThemeTokens, fps: number): Surface {
+  const key = `${tokens.id}:${fps}`;
+  const cached = LANDING_FPS_BADGE_CACHE.get(key);
+  if (cached) return cached;
+
+  const surface = createTransparentTextSurface(`${fps} fps`, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: tokens.fpsColor,
+    modifiers: DIM_MODIFIERS,
+  });
+  LANDING_FPS_BADGE_CACHE.set(key, surface);
+  return surface;
+}
+
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
   const nextIndex = mod(index, LANDING_THEMES.length);
   if (nextIndex === model.landingThemeIndex) return model;
@@ -766,15 +833,46 @@ function applyLandingThemeSelection(model: RootModel, index: number): RootModel 
   };
 }
 
-function lerpTheme(
-  gradient: readonly [string, string, string],
-  t: number,
-): readonly [number, number, number] {
-  return lerp3([
+function compileLandingTheme(seed: LandingThemeSeed): LandingThemeTokens {
+  const waveStops = createGradientStops(seed.waveGradient);
+  const logoStops = createGradientStops(seed.logoGradient);
+  const waveRamp = buildColorRamp(waveStops);
+  const logoRamp = buildColorRamp(logoStops);
+
+  return {
+    id: seed.id,
+    label: seed.label,
+    background: seed.background,
+    waveRamp,
+    logoRamp,
+    promptBodyColor: sampleColorRamp(waveRamp, 0.58),
+    promptAccentColor: sampleColorRamp(logoRamp, 0.92),
+    footerMutedColor: sampleColorRamp(waveRamp, 0.52),
+    footerStrongColor: sampleColorRamp(logoRamp, 0.88),
+    fpsColor: sampleColorRamp(waveRamp, 0.62),
+  };
+}
+
+function createGradientStops(gradient: readonly [string, string, string]): Array<{ pos: number; color: Rgb }> {
+  return [
     { pos: 0, color: hexToRgb(gradient[0]) },
     { pos: 0.5, color: hexToRgb(gradient[1]) },
     { pos: 1, color: hexToRgb(gradient[2]) },
-  ], t);
+  ];
+}
+
+function buildColorRamp(stops: Array<{ pos: number; color: Rgb }>): readonly string[] {
+  const ramp = new Array<string>(LANDING_COLOR_RAMP_SIZE);
+  for (let index = 0; index < LANDING_COLOR_RAMP_SIZE; index++) {
+    const t = index / (LANDING_COLOR_RAMP_SIZE - 1 || 1);
+    ramp[index] = rgbHex(...lerp3(stops, t));
+  }
+  return ramp;
+}
+
+function sampleColorRamp(ramp: readonly string[], t: number): string {
+  const index = Math.max(0, Math.min(ramp.length - 1, Math.round(clamp01(t) * (ramp.length - 1))));
+  return ramp[index]!;
 }
 
 function hexToRgb(hex: string): [number, number, number] {
