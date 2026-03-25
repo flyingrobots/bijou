@@ -1,6 +1,6 @@
 import os from 'node:os';
 
-export type RendererBenchKind = 'render' | 'diff' | 'surface' | 'normalize' | 'styled-diff' | 'frame';
+export type RendererBenchKind = 'render' | 'diff' | 'surface' | 'normalize' | 'styled-diff' | 'frame' | 'runtime';
 
 export interface RendererBenchScenario {
   readonly id: string;
@@ -149,6 +149,15 @@ export const DEFAULT_RENDERER_BENCH_SCENARIOS: readonly RendererBenchScenario[] 
     id: 'frame.compose.medium',
     label: 'Synthetic frame compose (220x58)',
     kind: 'frame',
+    columns: 220,
+    rows: 58,
+    frames: 180,
+    warmupFrames: 15,
+  },
+  {
+    id: 'runtime.noop.medium',
+    label: 'Runtime noop pulses (220x58)',
+    kind: 'runtime',
     columns: 220,
     rows: 58,
     frames: 180,

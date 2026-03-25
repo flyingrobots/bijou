@@ -70,10 +70,10 @@ function loadReport(path: string): RendererBenchReport {
   return JSON.parse(readFileSync(path, 'utf8')) as RendererBenchReport;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
   const baseline = loadReport(resolve(process.cwd(), options.baselinePath));
-  const current = runRendererBenchmarks({ sampleCount: options.sampleCount });
+  const current = await runRendererBenchmarks({ sampleCount: options.sampleCount });
   const comparison = compareRendererBenchReports(baseline, current);
 
   process.stdout.write(
@@ -99,5 +99,5 @@ function main(): void {
 }
 
 if (process.argv[1] != null && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main();
+  void main();
 }

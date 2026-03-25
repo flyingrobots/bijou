@@ -71,8 +71,8 @@ describe('renderer-bench-lib', () => {
     expect(benchmarkFingerprint(baseline.environment)).not.toBe(benchmarkFingerprint(current.environment));
   });
 
-  it('can execute a tiny source-backed benchmark scenario', () => {
-    const report = runRendererBenchmarks({
+  it('can execute a tiny source-backed benchmark scenario', async () => {
+    const report = await runRendererBenchmarks({
       sampleCount: 1,
       scenarios: [
         {
@@ -92,8 +92,8 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
   });
 
-  it('can execute a tiny DOGFOOD docs explorer render scenario', () => {
-    const report = runRendererBenchmarks({
+  it('can execute a tiny DOGFOOD docs explorer render scenario', async () => {
+    const report = await runRendererBenchmarks({
       sampleCount: 1,
       scenarios: [
         {
@@ -112,8 +112,8 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
   });
 
-  it('can execute synthetic surface and normalize scenarios', () => {
-    const report = runRendererBenchmarks({
+  it('can execute synthetic surface and normalize scenarios', async () => {
+    const report = await runRendererBenchmarks({
       sampleCount: 1,
       scenarios: [
         {
@@ -142,8 +142,8 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[1]?.medianAvgFrameMs).toBeGreaterThan(0);
   });
 
-  it('can execute a synthetic styled diff scenario', () => {
-    const report = runRendererBenchmarks({
+  it('can execute a synthetic styled diff scenario', async () => {
+    const report = await runRendererBenchmarks({
       sampleCount: 1,
       scenarios: [
         {
@@ -163,8 +163,8 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
   });
 
-  it('can execute a synthetic frame composition scenario', () => {
-    const report = runRendererBenchmarks({
+  it('can execute a synthetic frame composition scenario', async () => {
+    const report = await runRendererBenchmarks({
       sampleCount: 1,
       scenarios: [
         {
@@ -181,5 +181,26 @@ describe('renderer-bench-lib', () => {
 
     expect(report.scenarios).toHaveLength(1);
     expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+  });
+
+  it('can execute a synthetic runtime noop scenario', async () => {
+    const report = await runRendererBenchmarks({
+      sampleCount: 1,
+      scenarios: [
+        {
+          id: 'runtime.noop.tiny',
+          label: 'Runtime noop pulses (40x12)',
+          kind: 'runtime',
+          columns: 40,
+          rows: 12,
+          frames: 3,
+          warmupFrames: 1,
+        },
+      ],
+    });
+
+    expect(report.scenarios).toHaveLength(1);
+    expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+    expect(report.scenarios[0]?.medianWrites).toBe(0);
   });
 });

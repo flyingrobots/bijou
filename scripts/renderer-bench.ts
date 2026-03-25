@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';
+import { createTestContext, mockClock } from '../packages/bijou/src/adapters/test/index.js';
 import { createSurface, setDefaultContext, type LayoutNode, type Surface } from '../packages/bijou/src/index.js';
 import { renderDiff } from '../packages/bijou/src/core/render/differ.js';
 import { normalizeViewOutput, normalizeViewOutputInto } from '../packages/bijou-tui/src/view-output.js';
@@ -14,6 +14,9 @@ import type { FrameLayoutNode } from '../packages/bijou-tui/src/app-frame.js';
 import { renderFrameNode } from '../packages/bijou-tui/src/app-frame-render.js';
 import { createPanelVisibilityState } from '../packages/bijou-tui/src/panel-state.js';
 import { createPanelDockState } from '../packages/bijou-tui/src/panel-dock.js';
+import { run } from '../packages/bijou-tui/src/runtime.js';
+import { quit } from '../packages/bijou-tui/src/commands.js';
+import type { App } from '../packages/bijou-tui/src/types.js';
 import {
   DEFAULT_RENDERER_BENCH_SCENARIOS,
   detectRendererBenchEnvironment,
@@ -444,7 +447,89 @@ function runFrameScenarioSample(scenario: RendererBenchScenario): RendererBenchS
   };
 }
 
-function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample {
+function countWrittenBytes(chunks: readonly string[]): number {
+  return chunks.reduce((total, chunk) => total + chunk.length, 0);
+}
+
+async function runRuntimeScenarioSample(scenario: RendererBenchScenario): Promise<RendererBenchSample> {
+  const clock = mockClock();
+  const ctx = createTestContext({
+    mode: 'interactive',
+    clock,
+    runtime: {
+      columns: scenario.columns,
+      rows: scenario.rows,
+      refreshRate: 60,
+    },
+  });
+  const pulseIntervalMs = Math.max(1, Math.round(1000 / ctx.runtime.refreshRate));
+  const quitAtMs = pulseIntervalMs * (scenario.warmupFrames + scenario.frames + 2);
+  const model = { value: 0 };
+  let viewCalls = 0;
+
+  const app: App<typeof model, never> = {
+    init: () => [model, []],
+    update(msg, current) {
+      if (msg.type === 'key' && msg.key === 'q') {
+        return [current, [quit()]];
+      }
+      return [current, []];
+    },
+    view(current) {
+      viewCalls += 1;
+      return createSurface(1, 1, current.value === 0
+        ? { char: '·', fg: '#9ba9ff', bg: '#10131f', empty: false }
+        : { char: 'x', fg: '#f67f65', bg: '#10131f', empty: false });
+    },
+  };
+
+  ctx.io.rawInput = (onKey) => {
+    const handle = clock.setTimeout(() => onKey('q'), quitAtMs);
+    return {
+      dispose() {
+        handle.dispose();
+      },
+    };
+  };
+
+  const promise = run(app, { ctx });
+  await clock.advanceByAsync(pulseIntervalMs * scenario.warmupFrames);
+
+  forceGcIfAvailable();
+  const baselineWrites = ctx.io.written.length;
+  const baselineBytes = countWrittenBytes(ctx.io.written);
+  const before = process.memoryUsage();
+  const start = performance.now();
+
+  await clock.advanceByAsync(pulseIntervalMs * scenario.frames);
+
+  const elapsedMs = performance.now() - start;
+  const mid = process.memoryUsage();
+  forceGcIfAvailable();
+  const after = process.memoryUsage();
+
+  const measuredWrites = ctx.io.written.length - baselineWrites;
+  const measuredBytes = countWrittenBytes(ctx.io.written) - baselineBytes;
+
+  await clock.advanceByAsync(pulseIntervalMs * 3);
+  await promise;
+
+  if (viewCalls < 1) {
+    throw new Error('runtime benchmark did not render an initial view');
+  }
+
+  return {
+    elapsedMs,
+    avgFrameMs: elapsedMs / scenario.frames,
+    approxFps: 1000 / (elapsedMs / scenario.frames),
+    writes: measuredWrites,
+    bytesWritten: measuredBytes,
+    transientHeapDelta: typeof global.gc === 'function' ? (mid.heapUsed - before.heapUsed) : undefined,
+    retainedHeapDelta: typeof global.gc === 'function' ? (after.heapUsed - before.heapUsed) : undefined,
+  };
+}
+
+async function runScenarioSample(scenario: RendererBenchScenario): Promise<RendererBenchSample> {
   if (scenario.kind === 'surface') {
     return runSurfaceScenarioSample(scenario);
   }
@@ -459,6 +544,10 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
 
   if (scenario.kind === 'frame') {
     return runFrameScenarioSample(scenario);
+  }
+
+  if (scenario.kind === 'runtime') {
+    return runRuntimeScenarioSample(scenario);
   }
 
   const ctx = createTestContext({
@@ -529,20 +618,20 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
   };
 }
 
-export function runRendererBenchmarks(options: {
+export async function runRendererBenchmarks(options: {
   readonly sampleCount?: number;
   readonly scenarios?: readonly RendererBenchScenario[];
-} = {}): RendererBenchReport {
+} = {}): Promise<RendererBenchReport> {
   const scenarios = options.scenarios ?? DEFAULT_RENDERER_BENCH_SCENARIOS;
   const sampleCount = options.sampleCount ?? 5;
 
-  const scenarioResults = scenarios.map((scenario) => {
+  const scenarioResults = await Promise.all(scenarios.map(async (scenario) => {
     const samples: RendererBenchSample[] = [];
     for (let i = 0; i < sampleCount; i++) {
-      samples.push(runScenarioSample(scenario));
+      samples.push(await runScenarioSample(scenario));
     }
     return summarizeScenarioResult(scenario, samples);
-  });
+  }));
 
   return {
     kind: 'renderer-bench.v1',
@@ -553,9 +642,9 @@ export function runRendererBenchmarks(options: {
   };
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
-  const report = runRendererBenchmarks({ sampleCount: options.sampleCount });
+  const report = await runRendererBenchmarks({ sampleCount: options.sampleCount });
 
   if (options.outPath != null) {
     const outPath = resolve(process.cwd(), options.outPath);
@@ -575,5 +664,5 @@ function main(): void {
 }
 
 if (process.argv[1] != null && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main();
+  void main();
 }
