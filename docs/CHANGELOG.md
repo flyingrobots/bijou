@@ -39,6 +39,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **Low-allocation renderer design pass** — added a dedicated strategy note for moving the runtime toward reusable framebuffers and a low-garbage hot render loop, explicitly separating short-term buffer reuse and direct-cell diffing from the longer-term question of a dedicated internal mutable framebuffer.
 - **FTUI onboarding primitives added to the roadmap** — the post-v4 backlog now explicitly tracks first-time-user-experience components for guided tutorials, spotlight popovers, input-teaching modal flows, and stepper-style onboarding UX that can run inside framed Bijou apps.
 - **Shell-owned settings drawer design pass** — added a dedicated post-v4 shell strategy note and spec for a standard left-edge settings drawer in `createFramedApp()`, covering declarative settings sections/rows, iOS-style scrolling preference lists, command-palette entry points, mouse support, and DOGFOOD as the first proving surface.
 - **Focus Owns Input design pass** — added a dedicated post-v4 shell strategy note and spec for pane-scoped input ownership in `createFramedApp()`, framing the next loop as tests-first work on active-pane key/mouse routing instead of a docs-only workaround.

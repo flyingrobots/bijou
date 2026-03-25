@@ -104,6 +104,7 @@ See [docs/strategy/dogfood.md](strategy/dogfood.md) for the design-thinking rati
 | **Scaffold Canary in CI** | repo tooling + create-bijou-tui-app | Keep the generated TUI canary and published-artifact path healthy on every release candidate. |
 | **Packed Scaffold CLI Test Optimization** | create-bijou-tui-app | Keep the packed bin-shim integration test truthful while continuing to reduce install/pack overhead in the full suite. |
 | **Python Script Artifact Hygiene** | repo tooling | Bytecode suppression and `.gitignore` backstop shipped. Remaining work is keeping the PTY helper self-contained and low-noise. |
+| **Low-Allocation Renderer** | bijou + bijou-tui + bijou-node | Move the runtime toward reusable framebuffers and a low-garbage hot render loop: front/back buffer reuse first, direct-cell diffing second, and only then a possible internal mutable framebuffer type if benchmarks still justify it. Initial design captured in [Low-Allocation Renderer](strategy/low-allocation-renderer.md). |
 
 ## Milestone 4 — Runtime and Design-System Expansion
 
