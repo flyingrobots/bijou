@@ -569,5 +569,84 @@ describe('run', () => {
       const uniqueTargets = new Set(seen.map((entry) => entry.target));
       expect(uniqueTargets.size).toBeLessThanOrEqual(2);
     });
+
+    it('skips rerendering when update returns the same model reference', async () => {
+      let viewCalls = 0;
+      const model = { count: 0 };
+
+      const app: App<typeof model, never> = {
+        init: () => [model, []],
+        update(msg, current) {
+          if (msg.type === 'key' && msg.key === 'x') return [current, []];
+          if (msg.type === 'key' && msg.key === 'q') return [current, [quit()]];
+          return [current, []];
+        },
+        view(current) {
+          viewCalls += 1;
+          return textView(`count: ${current.count}`);
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [
+        { at: 10, key: 'x' },
+        { at: 20, key: 'q' },
+      ]);
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(viewCalls).toBe(1);
+    });
+
+    it('skips idle pulse rerenders when the model is unchanged', async () => {
+      let viewCalls = 0;
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
+          return [model, []];
+        },
+        view(model) {
+          viewCalls += 1;
+          return textView(`count: ${model}`);
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext({ runtime: { refreshRate: 60 } });
+      scheduleKeys(ctx, clock, [{ at: 70, key: 'q' }]);
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(120);
+      await promise;
+
+      expect(viewCalls).toBe(1);
+    });
+
+    it('still rerenders on resize when update returns the same model reference', async () => {
+      let viewCalls = 0;
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
+          return [model, []];
+        },
+        view(model) {
+          viewCalls += 1;
+          return textView(`count: ${model}`);
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleResizes(ctx, clock, [{ at: 10, columns: 100, rows: 30 }]);
+      scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(viewCalls).toBe(2);
+    });
   });
 });

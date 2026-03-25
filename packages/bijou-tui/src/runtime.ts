@@ -314,9 +314,12 @@ export async function run<Model, M>(
       lastCtrlC = now;
     }
 
+    const previousModel = model;
     const [newModel, cmds] = app.update(msg, model);
     model = newModel;
-    render();
+    if (isResizeMsg(msg) || newModel !== previousModel) {
+      render();
+    }
     executeCommands(cmds);
   });
 
