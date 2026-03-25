@@ -1,0 +1,255 @@
+{
+  "kind": "renderer-bench.v1",
+  "generatedAt": "2026-03-25T04:52:16.896Z",
+  "sampleCount": 5,
+  "environment": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.3.0",
+    "nodeVersion": "v25.8.1",
+    "cpuModel": "Apple M1 Pro",
+    "cpuCount": 10,
+    "totalMemoryBytes": 17179869184,
+    "hostname": "Jamess-MacBook-Pro-2.local",
+    "gitCommit": "db48c77",
+    "gcExposed": true
+  },
+  "scenarios": [
+    {
+      "scenario": {
+        "id": "dogfood.render.medium",
+        "label": "DOGFOOD landing render (220x58)",
+        "kind": "render",
+        "columns": 220,
+        "rows": 58,
+        "frames": 240,
+        "warmupFrames": 30
+      },
+      "samples": [
+        {
+          "elapsedMs": 1046.43875,
+          "avgFrameMs": 4.360161458333334,
+          "approxFps": 229.34930496409845,
+          "transientHeapDelta": 57135784,
+          "retainedHeapDelta": 942064
+        },
+        {
+          "elapsedMs": 732.0585000000001,
+          "avgFrameMs": 3.0502437500000004,
+          "approxFps": 327.84265191921133,
+          "transientHeapDelta": 67096992,
+          "retainedHeapDelta": 939368
+        },
+        {
+          "elapsedMs": 892.0002919999997,
+          "avgFrameMs": 3.716667883333332,
+          "approxFps": 269.0582078867751,
+          "transientHeapDelta": 67043440,
+          "retainedHeapDelta": 926896
+        },
+        {
+          "elapsedMs": 744.0265420000001,
+          "avgFrameMs": 3.100110591666667,
+          "approxFps": 322.56913759401874,
+          "transientHeapDelta": 67044504,
+          "retainedHeapDelta": 930424
+        },
+        {
+          "elapsedMs": 804.969,
+          "avgFrameMs": 3.3540375,
+          "approxFps": 298.1481274434171,
+          "transientHeapDelta": 67042592,
+          "retainedHeapDelta": 928320
+        }
+      ],
+      "medianElapsedMs": 804.969,
+      "medianAvgFrameMs": 3.3540375,
+      "medianApproxFps": 298.1481274434171,
+      "medianTransientHeapDelta": 67043440,
+      "medianRetainedHeapDelta": 930424
+    },
+    {
+      "scenario": {
+        "id": "dogfood.diff.medium",
+        "label": "DOGFOOD landing render+diff (220x58)",
+        "kind": "diff",
+        "columns": 220,
+        "rows": 58,
+        "frames": 180,
+        "warmupFrames": 20
+      },
+      "samples": [
+        {
+          "elapsedMs": 711.608792,
+          "avgFrameMs": 3.953382177777778,
+          "approxFps": 252.94797088454186,
+          "writes": 624,
+          "bytesWritten": 2346456,
+          "transientHeapDelta": 28435192,
+          "retainedHeapDelta": 924624
+        },
+        {
+          "elapsedMs": 749.0656250000002,
+          "avgFrameMs": 4.161475694444445,
+          "approxFps": 240.2993729688236,
+          "writes": 624,
+          "bytesWritten": 2346456,
+          "transientHeapDelta": 28435416,
+          "retainedHeapDelta": 924848
+        },
+        {
+          "elapsedMs": 718.5477090000004,
+          "avgFrameMs": 3.991931716666669,
+          "approxFps": 250.50528690781744,
+          "writes": 624,
+          "bytesWritten": 2346456,
+          "transientHeapDelta": 28436680,
+          "retainedHeapDelta": 925920
+        },
+        {
+          "elapsedMs": 849.8409589999992,
+          "avgFrameMs": 4.721338661111107,
+          "approxFps": 211.80433596870233,
+          "writes": 624,
+          "bytesWritten": 2346456,
+          "transientHeapDelta": 28440896,
+          "retainedHeapDelta": 930272
+        },
+        {
+          "elapsedMs": 992.3155409999999,
+          "avgFrameMs": 5.512864116666666,
+          "approxFps": 181.3939140957181,
+          "writes": 624,
+          "bytesWritten": 2346456,
+          "transientHeapDelta": 28435368,
+          "retainedHeapDelta": 924800
+        }
+      ],
+      "medianElapsedMs": 749.0656250000002,
+      "medianAvgFrameMs": 4.161475694444445,
+      "medianApproxFps": 240.2993729688236,
+      "medianWrites": 624,
+      "medianBytesWritten": 2346456,
+      "medianTransientHeapDelta": 28435416,
+      "medianRetainedHeapDelta": 924848
+    },
+    {
+      "scenario": {
+        "id": "dogfood.render.large",
+        "label": "DOGFOOD landing render (271x71)",
+        "kind": "render",
+        "columns": 271,
+        "rows": 71,
+        "frames": 180,
+        "warmupFrames": 20
+      },
+      "samples": [
+        {
+          "elapsedMs": 1008.3833750000013,
+          "avgFrameMs": 5.602129861111118,
+          "approxFps": 178.50353790293278,
+          "transientHeapDelta": 75262608,
+          "retainedHeapDelta": 1395664
+        },
+        {
+          "elapsedMs": 922.1958330000016,
+          "avgFrameMs": 5.123310183333342,
+          "approxFps": 195.18630811249793,
+          "transientHeapDelta": 75321424,
+          "retainedHeapDelta": 1395664
+        },
+        {
+          "elapsedMs": 896.6610000000001,
+          "avgFrameMs": 4.981450000000001,
+          "approxFps": 200.74476307099337,
+          "transientHeapDelta": 75269272,
+          "retainedHeapDelta": 1397672
+        },
+        {
+          "elapsedMs": 853.5812499999993,
+          "avgFrameMs": 4.742118055555552,
+          "approxFps": 210.87623468767634,
+          "transientHeapDelta": 75339464,
+          "retainedHeapDelta": 1395664
+        },
+        {
+          "elapsedMs": 769.4431250000016,
+          "avgFrameMs": 4.274684027777787,
+          "approxFps": 233.93541920333567,
+          "transientHeapDelta": 75320256,
+          "retainedHeapDelta": 1395664
+        }
+      ],
+      "medianElapsedMs": 896.6610000000001,
+      "medianAvgFrameMs": 4.981450000000001,
+      "medianApproxFps": 200.74476307099337,
+      "medianTransientHeapDelta": 75320256,
+      "medianRetainedHeapDelta": 1395664
+    },
+    {
+      "scenario": {
+        "id": "dogfood.diff.large",
+        "label": "DOGFOOD landing render+diff (271x71)",
+        "kind": "diff",
+        "columns": 271,
+        "rows": 71,
+        "frames": 120,
+        "warmupFrames": 15
+      },
+      "samples": [
+        {
+          "elapsedMs": 631.0125420000004,
+          "avgFrameMs": 5.2584378500000035,
+          "approxFps": 190.17054656260686,
+          "writes": 601,
+          "bytesWritten": 2201318,
+          "transientHeapDelta": 84312872,
+          "retainedHeapDelta": 1396904
+        },
+        {
+          "elapsedMs": 721.0760829999999,
+          "avgFrameMs": 6.008967358333333,
+          "approxFps": 166.417945108852,
+          "writes": 601,
+          "bytesWritten": 2201318,
+          "transientHeapDelta": 84324848,
+          "retainedHeapDelta": 1395232
+        },
+        {
+          "elapsedMs": 725.7305830000005,
+          "avgFrameMs": 6.047754858333337,
+          "approxFps": 165.3506174480729,
+          "writes": 601,
+          "bytesWritten": 2201318,
+          "transientHeapDelta": 84237752,
+          "retainedHeapDelta": 1395232
+        },
+        {
+          "elapsedMs": 854.3252090000024,
+          "avgFrameMs": 7.119376741666686,
+          "approxFps": 140.46173370028657,
+          "writes": 601,
+          "bytesWritten": 2201318,
+          "transientHeapDelta": 84147824,
+          "retainedHeapDelta": 1395232
+        },
+        {
+          "elapsedMs": 833.6426670000001,
+          "avgFrameMs": 6.947022225,
+          "approxFps": 143.94656697675958,
+          "writes": 601,
+          "bytesWritten": 2201318,
+          "transientHeapDelta": 84163192,
+          "retainedHeapDelta": 1395232
+        }
+      ],
+      "medianElapsedMs": 725.7305830000005,
+      "medianAvgFrameMs": 6.047754858333337,
+      "medianApproxFps": 165.3506174480729,
+      "medianWrites": 601,
+      "medianBytesWritten": 2201318,
+      "medianTransientHeapDelta": 84237752,
+      "medianRetainedHeapDelta": 1395232
+    }
+  ]
+}
