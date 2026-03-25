@@ -34,6 +34,7 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     : chalk;
   /** Whether ANSI styling is active (respects both noColor flag and chalk level). */
   const ansiEnabled = !isNoColor && instance.level > 0;
+  const styledCache = new Map<string, (text: string) => string>();
 
   /** SGR codes for underline variants (not supported by chalk natively). */
   const UNDERLINE_VARIANT_SGR: Record<string, string> = {
@@ -90,6 +91,29 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
     return result;
   }
 
+  function styleCacheKey(token: TokenValue): string {
+    return [
+      token.hex ?? '',
+      token.bg ?? '',
+      token.modifiers?.join(',') ?? '',
+    ].join('|');
+  }
+
+  function compileStyled(token: TokenValue): (text: string) => string {
+    const base = applyModifiers(token.hex ? instance.hex(token.hex) : instance, token.modifiers);
+    const background = token.bg ? instance.bgHex(token.bg) : null;
+    const modifiers = token.modifiers;
+
+    return (text: string): string => {
+      let result = base(text);
+      result = applyUnderlineVariants(result, modifiers);
+      if (background) {
+        result = background(result);
+      }
+      return result;
+    };
+  }
+
   return {
     /**
      * Apply a resolved design-token's hex color and modifiers to text.
@@ -100,19 +124,13 @@ export function chalkStyle(arg?: boolean | ChalkStyleOptions): StylePort {
      */
     styled(token: TokenValue, text: string): string {
       if (!ansiEnabled) return text;
-      let base: ChalkInstance = instance;
-      if (token.hex) {
-        base = instance.hex(token.hex);
+      const key = styleCacheKey(token);
+      let styler = styledCache.get(key);
+      if (styler == null) {
+        styler = compileStyled(token);
+        styledCache.set(key, styler);
       }
-      let result = applyModifiers(base, token.modifiers)(text);
-      result = applyUnderlineVariants(result, token.modifiers);
-      // Note: bg is applied unconditionally when noColor is false.
-      // Callers (e.g. makeBgFill, box, flex) are responsible for
-      // stripping token.bg in pipe/accessible/noColor modes.
-      if (token.bg) {
-        result = instance.bgHex(token.bg)(result);
-      }
-      return result;
+      return styler(text);
     },
     /**
      * Apply a 24-bit RGB foreground color to text.
