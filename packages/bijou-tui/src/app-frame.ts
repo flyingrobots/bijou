@@ -84,7 +84,9 @@ import {
   resolveHeaderLine,
   renderHelpLine,
   renderPageContent,
+  renderPageContentInto,
   renderMaximizedPane,
+  renderMaximizedPaneInto,
   renderTransition,
 } from './app-frame-render.js';
 import {
@@ -1082,19 +1084,29 @@ export function createFramedApp<PageModel, Msg>(
       const maxState = model.maximizedPaneByPage[model.activePageId];
       const maximizedPaneId = maxState?.maximizedPaneId;
 
-      const activeResult = maximizedPaneId
-        ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
-        : renderPageContent(model.activePageId, model, bodyRect, pagesById);
-      let bodySurface = activeResult.surface;
+      const frameSurface = getComposedFrameScratch(model.columns, model.rows);
+      frameSurface.clear();
+      frameSurface.blit(header, 0, 0);
+      if (model.rows > 1) {
+        frameSurface.blit(helpLine, 0, 1);
+      }
+
+      let activeResult: { paneRects: ReadonlyMap<string, LayoutRect>; paneOrder: readonly string[] };
+      let bodySurface: Surface | undefined;
 
       const activeTransition = model.activeTransition ?? options.transition;
       if (model.previousPageId != null && model.transitionProgress < 1 && activeTransition && activeTransition !== 'none') {
+        const activeBodyResult = maximizedPaneId
+          ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+          : renderPageContent(model.activePageId, model, bodyRect, pagesById);
+        activeResult = activeBodyResult;
+        bodySurface = activeBodyResult.surface;
         const ctx = resolveSafeCtx();
         if (ctx) {
           const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
           bodySurface = renderTransition(
             prevResult.surface,
-            activeResult.surface,
+            activeBodyResult.surface,
             activeTransition,
             model.transitionProgress,
             bodyRect.width,
@@ -1103,6 +1115,10 @@ export function createFramedApp<PageModel, Msg>(
             model.transitionFrame,
           );
         }
+      } else {
+        activeResult = maximizedPaneId
+          ? renderMaximizedPaneInto(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, frameSurface)
+          : renderPageContentInto(model.activePageId, model, bodyRect, pagesById, frameSurface);
       }
 
       const overlays: Overlay[] = [];
@@ -1169,16 +1185,11 @@ export function createFramedApp<PageModel, Msg>(
         }));
       }
 
-      return composeFrameSurface({
-        width: model.columns,
-        height: model.rows,
-        headerSurface: header,
-        helpLineSurface: helpLine,
-        bodySurface,
-        bodyRect,
-        overlays,
-        dimBackground: overlays.length > 0,
-      }, getComposedFrameScratch(model.columns, model.rows));
+      if (bodySurface != null && bodyRect.width > 0 && bodyRect.height > 0) {
+        frameSurface.blit(bodySurface, bodyRect.col, bodyRect.row);
+      }
+
+      return compositeSurfaceInto(frameSurface, frameSurface, overlays, { dim: overlays.length > 0 });
     },
 
     routeRuntimeIssue(issue) {
@@ -1188,35 +1199,6 @@ export function createFramedApp<PageModel, Msg>(
   };
 
   return app;
-}
-
-interface FrameSurfaceOptions {
-  width: number;
-  height: number;
-  headerSurface: Surface;
-  helpLineSurface: Surface;
-  bodySurface: Surface;
-  bodyRect: LayoutRect;
-  overlays: readonly Overlay[];
-  dimBackground: boolean;
-}
-
-function composeFrameSurface(options: FrameSurfaceOptions, scratch?: Surface): Surface {
-  const frame = scratch != null
-    && scratch.width === options.width
-    && scratch.height === options.height
-    ? scratch
-    : createSurface(options.width, options.height);
-  frame.clear();
-
-  frame.blit(options.headerSurface, 0, 0);
-  if (options.height > 1) {
-    frame.blit(options.helpLineSurface, 0, 1);
-  }
-  if (options.bodyRect.width > 0 && options.bodyRect.height > 0) {
-    frame.blit(options.bodySurface, options.bodyRect.col, options.bodyRect.row);
-  }
-  return compositeSurfaceInto(frame, frame, options.overlays, { dim: options.dimBackground });
 }
 
 function focusPane<PageModel, Msg>(

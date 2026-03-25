@@ -6,6 +6,8 @@ import {
   framePaneOutputToSurface,
   renderFrameNode,
   renderHelpLine,
+  renderMaximizedPaneInto,
+  renderPageContentInto,
   renderTransition,
   resolveHeaderLine,
 } from './app-frame-render.js';
@@ -236,5 +238,91 @@ describe('frame layout composition', () => {
     expect(renderedText).toContain('docs');
     expect(renderedText).toContain('demo');
     expect(renderedText).toContain('side');
+  });
+});
+
+describe('frame direct-paint helpers', () => {
+  it('can paint page content directly into an existing frame surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    setDefaultContext(ctx);
+    const target = createSurface(20, 8);
+    const page = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({
+        kind: 'split' as const,
+        splitId: 'shell',
+        state: { ratio: 0.5, focused: 'a' },
+        paneA: { kind: 'pane' as const, paneId: 'left', render: () => parseAnsiToSurface('left', 4, 1) },
+        paneB: { kind: 'pane' as const, paneId: 'right', render: () => parseAnsiToSurface('right', 5, 1) },
+      }),
+    };
+
+    const geometry = renderPageContentInto(
+      'home',
+      {
+        pageModels: { home: {} },
+        focusedPaneByPage: { home: 'left' },
+        scrollByPage: {},
+        minimizedByPage: {},
+        dockStateByPage: {},
+        splitRatioOverrides: {},
+      } as never,
+      { row: 2, col: 3, width: 14, height: 4 },
+      new Map([[page.id, page]]) as never,
+      target,
+    );
+
+    const renderedText = Array.from({ length: target.height }, (_, y) =>
+      Array.from({ length: target.width }, (_, x) => target.get(x, y).char).join(''),
+    ).join('\n');
+    expect(renderedText).toContain('left');
+    expect(renderedText).toContain('right');
+    expect(geometry.paneRects.get('left')).toEqual({ row: 2, col: 3, width: 7, height: 4 });
+    expect(geometry.paneRects.get('right')).toEqual({ row: 2, col: 11, width: 6, height: 4 });
+  });
+
+  it('can paint a maximized pane directly into an existing frame surface', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    setDefaultContext(ctx);
+    const target = createSurface(20, 8);
+    const page = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({
+        kind: 'split' as const,
+        splitId: 'shell',
+        state: { ratio: 0.5, focused: 'a' },
+        paneA: { kind: 'pane' as const, paneId: 'left', render: () => parseAnsiToSurface('left', 4, 1) },
+        paneB: { kind: 'pane' as const, paneId: 'right', render: () => parseAnsiToSurface('right', 5, 1) },
+      }),
+    };
+
+    const geometry = renderMaximizedPaneInto(
+      'home',
+      {
+        pageModels: { home: {} },
+        focusedPaneByPage: { home: 'left' },
+        scrollByPage: {},
+        minimizedByPage: {},
+        dockStateByPage: {},
+        splitRatioOverrides: {},
+      } as never,
+      { row: 1, col: 2, width: 12, height: 3 },
+      new Map([[page.id, page]]) as never,
+      'right',
+      target,
+    );
+
+    const renderedText = Array.from({ length: target.height }, (_, y) =>
+      Array.from({ length: target.width }, (_, x) => target.get(x, y).char).join(''),
+    ).join('\n');
+    expect(renderedText).toContain('right');
+    expect(geometry.paneRects.get('right')).toEqual({ row: 1, col: 2, width: 12, height: 3 });
+    expect(geometry.paneOrder).toEqual(['right']);
   });
 });

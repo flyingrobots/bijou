@@ -23,7 +23,6 @@ import { splitPaneLayout } from './split-pane.js';
 import { gridLayout } from './grid.js';
 import {
   createFocusAreaStateForSurface,
-  focusAreaSurface,
   focusAreaSurfaceInto,
   focusAreaScrollTo,
   focusAreaScrollToX,
@@ -58,6 +57,11 @@ export interface FrameHeaderRenderResult {
 const framePaneScratchBySize = new Map<string, Surface>();
 
 interface PaintedFrameNodeResult {
+  readonly paneRects: ReadonlyMap<string, LayoutRect>;
+  readonly paneOrder: readonly string[];
+}
+
+export interface FramePaneGeometryResult {
   readonly paneRects: ReadonlyMap<string, LayoutRect>;
   readonly paneOrder: readonly string[];
 }
@@ -251,6 +255,21 @@ export function renderPageContent<PageModel, Msg>(
   bodyRect: LayoutRect,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): RenderResult {
+  const surface = createSurface(bodyRect.width, bodyRect.height);
+  const geometry = renderPageContentInto(pageId, model, bodyRect, pagesById, surface, 0, 0);
+  return { surface, paneRects: geometry.paneRects, paneOrder: geometry.paneOrder };
+}
+
+/** Paint a page's layout tree directly into an existing target surface. */
+export function renderPageContentInto<PageModel, Msg>(
+  pageId: string,
+  model: InternalFrameModel<PageModel, Msg>,
+  bodyRect: LayoutRect,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+  target: Surface,
+  offsetRow = bodyRect.row,
+  offsetCol = bodyRect.col,
+): FramePaneGeometryResult {
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const renderCtx: RenderContext<PageModel, Msg> = {
@@ -261,7 +280,13 @@ export function renderPageContent<PageModel, Msg>(
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
   };
-  return renderFrameNode(page.layout(pageModel), bodyRect, renderCtx);
+  return paintFrameNodeInto(
+    page.layout(pageModel),
+    { row: offsetRow, col: offsetCol, width: bodyRect.width, height: bodyRect.height },
+    bodyRect,
+    renderCtx,
+    target,
+  );
 }
 
 /** Render only the maximized pane at the full body rect. */
@@ -272,13 +297,29 @@ export function renderMaximizedPane<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   maximizedPaneId: string,
 ): RenderResult {
+  const surface = createSurface(bodyRect.width, bodyRect.height);
+  const geometry = renderMaximizedPaneInto(pageId, model, bodyRect, pagesById, maximizedPaneId, surface, 0, 0);
+  return { surface, paneRects: geometry.paneRects, paneOrder: geometry.paneOrder };
+}
+
+/** Paint only the maximized pane directly into an existing target surface. */
+export function renderMaximizedPaneInto<PageModel, Msg>(
+  pageId: string,
+  model: InternalFrameModel<PageModel, Msg>,
+  bodyRect: LayoutRect,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+  maximizedPaneId: string,
+  target: Surface,
+  offsetRow = bodyRect.row,
+  offsetCol = bodyRect.col,
+): FramePaneGeometryResult {
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const layoutTree = page.layout(pageModel);
   const paneNode = findPaneNode(layoutTree, maximizedPaneId);
   if (paneNode == null) {
     // Pane not found, fall back to normal rendering
-    return renderPageContent(pageId, model, bodyRect, pagesById);
+    return renderPageContentInto(pageId, model, bodyRect, pagesById, target, offsetRow, offsetCol);
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
@@ -295,15 +336,14 @@ export function renderMaximizedPane<PageModel, Msg>(
   });
   state = focusAreaScrollTo(state, prior.y);
   state = focusAreaScrollToX(state, prior.x);
-  const surface = focusAreaSurface(contentSurface, state, {
+  focusAreaSurfaceInto(contentSurface, state, target, {
     focused: true,
     ctx: resolveSafeCtx(),
     id: maximizedPaneId,
     classes: ['focused', 'maximized'],
-  });
+  }, offsetCol, offsetRow);
 
   return {
-    surface,
     paneRects: new Map([[maximizedPaneId, bodyRect]]),
     paneOrder: [maximizedPaneId],
   };
