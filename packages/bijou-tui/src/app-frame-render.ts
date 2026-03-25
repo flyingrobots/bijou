@@ -40,7 +40,7 @@ import {
   fitLine,
   mergeBindingSources,
 } from './app-frame-utils.js';
-import { normalizeViewOutput, type ViewOutput } from './view-output.js';
+import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
 import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
 
 export interface FrameHeaderTabTarget {
@@ -53,6 +53,8 @@ export interface FrameHeaderRenderResult {
   readonly surface: Surface;
   readonly tabTargets: readonly FrameHeaderTabTarget[];
 }
+
+const framePaneScratchBySize = new Map<string, Surface>();
 
 /** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 export function renderFrameNode<PageModel, Msg>(
@@ -76,7 +78,12 @@ export function renderFrameNode<PageModel, Msg>(
     }
 
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
-    const contentSurface = framePaneOutputToSurface(node.render(rect.width, rect.height), rect.width, rect.height);
+    const contentSurface = framePaneOutputToSurface(
+      node.render(rect.width, rect.height),
+      rect.width,
+      rect.height,
+      getFramePaneScratch(rect.width, rect.height),
+    );
     let state = createFocusAreaStateForSurface(contentSurface, {
       width: rect.width,
       height: rect.height,
@@ -258,6 +265,7 @@ export function renderMaximizedPane<PageModel, Msg>(
     paneNode.render(bodyRect.width, bodyRect.height),
     bodyRect.width,
     bodyRect.height,
+    getFramePaneScratch(bodyRect.width, bodyRect.height),
   );
   let state = createFocusAreaStateForSurface(contentSurface, {
     width: bodyRect.width,
@@ -398,8 +406,15 @@ export function renderTransition(
   return surface;
 }
 
-export function framePaneOutputToSurface(output: ViewOutput, width: number, height: number): Surface {
-  return normalizeViewOutput(output, { width, height }).surface;
+export function framePaneOutputToSurface(
+  output: ViewOutput,
+  width: number,
+  height: number,
+  scratch?: Surface,
+): Surface {
+  return scratch == null
+    ? normalizeViewOutput(output, { width, height }).surface
+    : normalizeViewOutputInto(output, { width, height }, scratch).surface;
 }
 
 export function blockSurface(content: string, width: number, height: number): Surface {
@@ -423,6 +438,16 @@ function paintDivider(
 function resolveDividerUnit(dividerChar: string | undefined, fallback: string): string {
   if (dividerChar == null || dividerChar.length === 0) return fallback;
   return dividerChar[0] ?? fallback;
+}
+
+function getFramePaneScratch(width: number, height: number): Surface {
+  const key = `${width}x${height}`;
+  let scratch = framePaneScratchBySize.get(key);
+  if (scratch == null) {
+    scratch = createSurface(width, height);
+    framePaneScratchBySize.set(key, scratch);
+  }
+  return scratch;
 }
 
 function applyTransitionCell(

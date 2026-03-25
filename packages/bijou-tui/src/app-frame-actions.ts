@@ -5,7 +5,6 @@
  * page frame state sync, and transition tick command.
  */
 
-import { createSurface, type Surface } from '@flyingrobots/bijou';
 import type { FramePage, CreateFramedAppOptions, FramePaneScroll } from './app-frame.js';
 import type {
   InternalFrameModel,
@@ -13,6 +12,7 @@ import type {
 } from './app-frame-types.js';
 import { wrapFrameMsg } from './app-frame-types.js';
 import type { Cmd } from './types.js';
+import { createSurface, type Surface } from '@flyingrobots/bijou';
 import type { DockDirection } from './panel-dock.js';
 import {
   createPanelVisibilityState,
@@ -47,17 +47,21 @@ import {
   findPaneNode,
   frameBodyRect,
 } from './app-frame-utils.js';
-import { renderFrameNode } from './app-frame-render.js';
-import { normalizeViewOutputInto, type ViewOutput } from './view-output.js';
+import { framePaneOutputToSurface, renderFrameNode } from './app-frame-render.js';
+import type { ViewOutput } from './view-output.js';
 
 let focusedPaneMeasureScratch: Surface | null = null;
 
 function renderPaneSurfaceForMeasurement(output: ViewOutput, width: number, height: number): Surface {
-  focusedPaneMeasureScratch = normalizeViewOutputInto(
+  const scratch = focusedPaneMeasureScratch;
+  focusedPaneMeasureScratch = framePaneOutputToSurface(
     output,
-    { width, height },
-    focusedPaneMeasureScratch ?? createSurface(width, height),
-  ).surface;
+    width,
+    height,
+    scratch != null && scratch.width === width && scratch.height === height
+      ? scratch
+      : createSurface(width, height),
+  );
   return focusedPaneMeasureScratch;
 }
 

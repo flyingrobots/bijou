@@ -143,4 +143,23 @@ describe('frame pane output normalization', () => {
     const rendered = framePaneOutputToSurface(layout, 3, 1);
     expect(Array.from({ length: rendered.width }, (_, x) => rendered.get(x, 0).char).join('')).toBe('ABC');
   });
+
+  it('can normalize pane output into a reusable scratch surface', () => {
+    const nodeSurface = createSurface(3, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    nodeSurface.set(2, 0, { char: 'C', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 2, y: 1, width: 3, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+    const scratch = createSurface(3, 1);
+    scratch.fill({ char: 'x', empty: false });
+
+    const rendered = framePaneOutputToSurface(layout, 3, 1, scratch);
+
+    expect(rendered).toBe(scratch);
+    expect(Array.from({ length: rendered.width }, (_, x) => rendered.get(x, 0).char).join('')).toBe('ABC');
+  });
 });
