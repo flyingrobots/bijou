@@ -93,6 +93,30 @@ describe('renderDiff', () => {
     expect(cupMatches?.[0]).toBe('\x1b[1;1H');
     expect(cupMatches?.[1]).toBe('\x1b[1;6H');
   });
+
+  it('writes plain unstyled batches directly without style wrapping', () => {
+    const current = createSurface(2, 1, { char: ' ' });
+    const target = createSurface(2, 1, { char: ' ' });
+    target.set(0, 0, { char: 'A', empty: false });
+    target.set(1, 0, { char: 'B', empty: false });
+
+    const styled = vi.fn((_token: unknown, text: string) => `[STYLE]${text}`);
+    let output = '';
+    const mockIo: WritePort = { write: (s) => output += s, writeError: () => {} };
+    const style: StylePort = {
+      styled,
+      rgb: (_r, _g, _b, text) => text,
+      hex: (_c, text) => text,
+      bgRgb: (_r, _g, _b, text) => text,
+      bgHex: (_c, text) => text,
+      bold: (text) => text,
+    };
+
+    renderDiff(current, target, mockIo, style);
+
+    expect(styled).not.toHaveBeenCalled();
+    expect(output).toBe('\x1b[1;1HAB');
+  });
 });
 
 describe('surface text bridges', () => {

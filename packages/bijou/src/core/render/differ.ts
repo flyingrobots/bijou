@@ -4,6 +4,12 @@ import { graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
 
+function hasVisibleStyle(cell: Cell): boolean {
+  return cell.fg !== undefined
+    || cell.bg !== undefined
+    || (cell.modifiers?.length ?? 0) > 0;
+}
+
 /**
  * Convert a multi-line string into a Surface.
  *
@@ -184,6 +190,7 @@ export function paintLayoutNode(target: Surface, node: LayoutNode): void {
  * Compare two cells for equality (content and style).
  */
 export function isSameCell(a: Cell, b: Cell): boolean {
+  if (a === b) return true;
   if (a.char !== b.char) return false;
   if (a.fg !== b.fg) return false;
   if (a.bg !== b.bg) return false;
@@ -191,6 +198,7 @@ export function isSameCell(a: Cell, b: Cell): boolean {
   
   const aMods = a.modifiers ?? [];
   const bMods = b.modifiers ?? [];
+  if (aMods === bMods) return true;
   if (aMods.length !== bMods.length) return false;
   for (let i = 0; i < aMods.length; i++) {
     if (aMods[i] !== bMods[i]) return false;
@@ -276,11 +284,14 @@ export function renderDiff(
       }
 
       // Render the batch
-      token.hex = targetCell.fg;
-      token.bg = targetCell.bg;
-      token.modifiers = targetCell.modifiers as any;
-
-      output += style.styled(token as any, batchText);
+      if (hasVisibleStyle(targetCell)) {
+        token.hex = targetCell.fg;
+        token.bg = targetCell.bg;
+        token.modifiers = targetCell.modifiers as any;
+        output += style.styled(token as any, batchText);
+      } else {
+        output += batchText;
+      }
 
       // Advance our internal cursor tracking
       const batchWidth = batchX - x;
@@ -290,11 +301,6 @@ export function renderDiff(
       // Advance loop index
       x = batchX;
 
-      // Flush if the buffer is getting large
-      if (output.length > 4096) {
-        io.write(output);
-        output = '';
-      }
     }
   }
 
@@ -307,11 +313,13 @@ export function renderDiff(
  * Compare two cells for style equality only.
  */
 function isSameStyle(a: Cell, b: Cell): boolean {
+  if (a === b) return true;
   if (a.fg !== b.fg) return false;
   if (a.bg !== b.bg) return false;
   
   const aMods = a.modifiers ?? [];
   const bMods = b.modifiers ?? [];
+  if (aMods === bMods) return true;
   if (aMods.length !== bMods.length) return false;
   for (let i = 0; i < aMods.length; i++) {
     if (aMods[i] !== bMods[i]) return false;
