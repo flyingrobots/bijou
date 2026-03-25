@@ -1,6 +1,6 @@
 import os from 'node:os';
 
-export type RendererBenchKind = 'render' | 'diff';
+export type RendererBenchKind = 'render' | 'diff' | 'surface' | 'normalize' | 'styled-diff';
 
 export interface RendererBenchScenario {
   readonly id: string;
@@ -107,6 +107,33 @@ export const DEFAULT_RENDERER_BENCH_SCENARIOS: readonly RendererBenchScenario[] 
     columns: 271,
     rows: 71,
     frames: 120,
+    warmupFrames: 15,
+  },
+  {
+    id: 'surface.paint.medium',
+    label: 'Synthetic surface paint (220x58)',
+    kind: 'surface',
+    columns: 220,
+    rows: 58,
+    frames: 240,
+    warmupFrames: 20,
+  },
+  {
+    id: 'layout.normalize.medium',
+    label: 'Synthetic layout normalize (220x58)',
+    kind: 'normalize',
+    columns: 220,
+    rows: 58,
+    frames: 240,
+    warmupFrames: 20,
+  },
+  {
+    id: 'styled.diff.medium',
+    label: 'Synthetic styled diff (220x58)',
+    kind: 'styled-diff',
+    columns: 220,
+    rows: 58,
+    frames: 180,
     warmupFrames: 15,
   },
 ] as const;

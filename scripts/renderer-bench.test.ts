@@ -91,4 +91,55 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
     expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
   });
+
+  it('can execute synthetic surface and normalize scenarios', () => {
+    const report = runRendererBenchmarks({
+      sampleCount: 1,
+      scenarios: [
+        {
+          id: 'surface.paint.tiny',
+          label: 'Synthetic surface paint (40x12)',
+          kind: 'surface',
+          columns: 40,
+          rows: 12,
+          frames: 2,
+          warmupFrames: 1,
+        },
+        {
+          id: 'layout.normalize.tiny',
+          label: 'Synthetic layout normalize (40x12)',
+          kind: 'normalize',
+          columns: 40,
+          rows: 12,
+          frames: 2,
+          warmupFrames: 1,
+        },
+      ],
+    });
+
+    expect(report.scenarios).toHaveLength(2);
+    expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+    expect(report.scenarios[1]?.medianAvgFrameMs).toBeGreaterThan(0);
+  });
+
+  it('can execute a synthetic styled diff scenario', () => {
+    const report = runRendererBenchmarks({
+      sampleCount: 1,
+      scenarios: [
+        {
+          id: 'styled.diff.tiny',
+          label: 'Synthetic styled diff (40x12)',
+          kind: 'styled-diff',
+          columns: 40,
+          rows: 12,
+          frames: 2,
+          warmupFrames: 1,
+        },
+      ],
+    });
+
+    expect(report.scenarios).toHaveLength(1);
+    expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+    expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
+  });
 });
