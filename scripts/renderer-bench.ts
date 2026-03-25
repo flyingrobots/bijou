@@ -5,9 +5,9 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';
+import { renderDiff } from '../packages/bijou/src/core/render/differ.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
-import { renderSurfaceFrame } from '../packages/bijou-tui/src/screen.js';
 import { createDocsApp } from '../examples/docs/app.js';
 import {
   DEFAULT_RENDERER_BENCH_SCENARIOS,
@@ -93,13 +93,14 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
       this.writes += 1;
       this.bytesWritten += text.length;
     },
+    writeError() {},
   };
 
   for (let i = 0; i < scenario.warmupFrames; i++) {
     [model] = app.update(pulse, model);
     const target = normalizeViewOutput(app.view(model), size).surface;
     if (scenario.kind === 'diff') {
-      renderSurfaceFrame(sink as any, currentSurface, target, ctx.style);
+      renderDiff(currentSurface, target, sink, ctx.style);
     }
     currentSurface = target;
   }
@@ -112,7 +113,7 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
     [model] = app.update(pulse, model);
     const target = normalizeViewOutput(app.view(model), size).surface;
     if (scenario.kind === 'diff') {
-      renderSurfaceFrame(sink as any, currentSurface, target, ctx.style);
+      renderDiff(currentSurface, target, sink, ctx.style);
     }
     currentSurface = target;
   }
