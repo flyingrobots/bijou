@@ -56,6 +56,11 @@ export interface FrameHeaderRenderResult {
 
 const framePaneScratchBySize = new Map<string, Surface>();
 
+interface PaintedFrameNodeResult {
+  readonly paneRects: ReadonlyMap<string, LayoutRect>;
+  readonly paneOrder: readonly string[];
+}
+
 /** Recursively render a layout tree node (pane, split, or grid) into a rect. */
 export function renderFrameNode<PageModel, Msg>(
   node: FrameLayoutNode,
@@ -66,27 +71,50 @@ export function renderFrameNode<PageModel, Msg>(
     return { surface: createSurface(rect.width, rect.height), paneRects: new Map(), paneOrder: [] };
   }
 
+  const surface = createSurface(rect.width, rect.height);
+  const painted = paintFrameNodeInto(
+    node,
+    { row: 0, col: 0, width: rect.width, height: rect.height },
+    rect,
+    ctx,
+    surface,
+  );
+
+  return { surface, paneRects: painted.paneRects, paneOrder: painted.paneOrder };
+}
+
+function paintFrameNodeInto<PageModel, Msg>(
+  node: FrameLayoutNode,
+  localRect: LayoutRect,
+  absoluteRect: LayoutRect,
+  ctx: RenderContext<PageModel, Msg>,
+  target: Surface,
+): PaintedFrameNodeResult {
+  if (localRect.width <= 0 || localRect.height <= 0) {
+    return { paneRects: new Map(), paneOrder: [] };
+  }
+
   if (node.kind === 'pane') {
     // Minimized pane: render as collapsed title bar
     if (isMinimized(ctx.visibility, node.paneId)) {
       const titleBar = `[${node.paneId}] \u25b8`; // ▸
+      target.blit(blockSurface(titleBar, localRect.width, localRect.height), localRect.col, localRect.row);
       return {
-        surface: blockSurface(titleBar, rect.width, rect.height),
-        paneRects: new Map([[node.paneId, rect]]),
+        paneRects: new Map([[node.paneId, absoluteRect]]),
         paneOrder: [node.paneId],
       };
     }
 
     const prior = ctx.scrollByPane[node.paneId] ?? { x: 0, y: 0 };
     const contentSurface = framePaneOutputToSurface(
-      node.render(rect.width, rect.height),
-      rect.width,
-      rect.height,
-      getFramePaneScratch(rect.width, rect.height),
+      node.render(localRect.width, localRect.height),
+      localRect.width,
+      localRect.height,
+      getFramePaneScratch(localRect.width, localRect.height),
     );
     let state = createFocusAreaStateForSurface(contentSurface, {
-      width: rect.width,
-      height: rect.height,
+      width: localRect.width,
+      height: localRect.height,
       overflowX: node.overflowX ?? 'hidden',
     });
     state = focusAreaScrollTo(state, prior.y);
@@ -97,9 +125,9 @@ export function renderFrameNode<PageModel, Msg>(
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
     });
+    target.blit(surface, localRect.col, localRect.row);
     return {
-      surface,
-      paneRects: new Map([[node.paneId, rect]]),
+      paneRects: new Map([[node.paneId, absoluteRect]]),
       paneOrder: [node.paneId],
     };
   }
@@ -127,75 +155,68 @@ export function renderFrameNode<PageModel, Msg>(
 
     if (aMinimized && !bMinimized) {
       // A is minimized: give it minimal space
-      const mainAxisTotal = direction === 'row' ? rect.width : rect.height;
+      const mainAxisTotal = direction === 'row' ? localRect.width : localRect.height;
       const minimizedSize = Math.min(1, mainAxisTotal);
       splitState = { ...splitState, ratio: minimizedSize / Math.max(1, mainAxisTotal) };
     } else if (bMinimized && !aMinimized) {
       // B is minimized: give A most of the space
-      const mainAxisTotal = direction === 'row' ? rect.width : rect.height;
+      const mainAxisTotal = direction === 'row' ? localRect.width : localRect.height;
       const minimizedSize = Math.min(1, mainAxisTotal);
       splitState = { ...splitState, ratio: 1 - minimizedSize / Math.max(1, mainAxisTotal) };
     }
 
     const layout = splitPaneLayout(splitState, {
       direction,
-      width: rect.width,
-      height: rect.height,
+      width: localRect.width,
+      height: localRect.height,
       minA: node.minA,
       minB: node.minB,
     });
 
-    const aRect = offsetRect(layout.paneA, rect.row, rect.col);
-    const bRect = offsetRect(layout.paneB, rect.row, rect.col);
+    const localARect = offsetRect(layout.paneA, localRect.row, localRect.col);
+    const localBRect = offsetRect(layout.paneB, localRect.row, localRect.col);
+    const absoluteARect = offsetRect(layout.paneA, absoluteRect.row, absoluteRect.col);
+    const absoluteBRect = offsetRect(layout.paneB, absoluteRect.row, absoluteRect.col);
 
-    const a = renderFrameNode(effectiveA, aRect, ctx);
-    const b = renderFrameNode(effectiveB, bRect, ctx);
+    const a = paintFrameNodeInto(effectiveA, localARect, absoluteARect, ctx, target);
+    const b = paintFrameNodeInto(effectiveB, localBRect, absoluteBRect, ctx, target);
 
-    const surface = createSurface(rect.width, rect.height);
-    surface.blit(a.surface, layout.paneA.col, layout.paneA.row);
-    surface.blit(b.surface, layout.paneB.col, layout.paneB.row);
-    paintDivider(surface, layout.divider, node.dividerChar, direction);
+    paintDivider(target, offsetRect(layout.divider, localRect.row, localRect.col), node.dividerChar, direction);
 
     return {
-      surface,
       paneRects: mergeMaps(a.paneRects, b.paneRects),
       paneOrder: [...a.paneOrder, ...b.paneOrder],
     };
   }
 
   const relRects = gridLayout({
-    width: rect.width,
-    height: rect.height,
+    width: localRect.width,
+    height: localRect.height,
     columns: node.columns,
     rows: node.rows,
     areas: node.areas,
     gap: node.gap,
   });
 
-  const renderedByArea = new Map<string, RenderResult>();
+  let paneRects = new Map<string, LayoutRect>();
+  const seenPaneIds = new Set<string>();
+  const paneOrder: string[] = [];
   for (const [areaName, areaRect] of relRects) {
-    const absoluteAreaRect = offsetRect(areaRect, rect.row, rect.col);
+    const localAreaRect = offsetRect(areaRect, localRect.row, localRect.col);
+    const absoluteAreaRect = offsetRect(areaRect, absoluteRect.row, absoluteRect.col);
     const child = node.cells[areaName];
     if (child == null) {
       resolveSafeCtx()?.io.writeError(
         `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
-      renderedByArea.set(areaName, renderMissingGridCell(areaName, absoluteAreaRect));
+      target.blit(
+        blockSurface(`[missing grid cell: ${areaName}]`, localAreaRect.width, localAreaRect.height),
+        localAreaRect.col,
+        localAreaRect.row,
+      );
       continue;
     }
-    renderedByArea.set(areaName, renderFrameNode(child, absoluteAreaRect, ctx));
-  }
-
-  const surface = createSurface(rect.width, rect.height);
-  for (const [areaName, areaRect] of relRects) {
-    const rendered = renderedByArea.get(areaName)!;
-    surface.blit(rendered.surface, areaRect.col, areaRect.row);
-  }
-
-  let paneRects = new Map<string, LayoutRect>();
-  const seenPaneIds = new Set<string>();
-  const paneOrder: string[] = [];
-  for (const rendered of renderedByArea.values()) {
+    const rendered = paintFrameNodeInto(child, localAreaRect, absoluteAreaRect, ctx, target);
     for (const [paneId, paneRect] of rendered.paneRects.entries()) {
       if (paneRects.has(paneId)) {
         throw new Error(`createFramedApp: duplicate paneId "${paneId}" in rendered layout`);
@@ -211,7 +232,7 @@ export function renderFrameNode<PageModel, Msg>(
     }
   }
 
-  return { surface, paneRects, paneOrder };
+  return { paneRects, paneOrder };
 }
 
 /** Render a placeholder for a grid area that has no matching cell definition. */
