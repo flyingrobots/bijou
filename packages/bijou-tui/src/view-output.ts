@@ -44,11 +44,13 @@ export function normalizeViewOutput(
   }
 
   const localized = localizeLayoutNode(output);
-  const content = createSurface(localized.width, localized.height);
-  paintLayoutNode(content, localized.node);
+  const width = Math.max(size.width, localized.width, 0);
+  const height = Math.max(size.height, localized.height, 0);
+  const surface = createSurface(width, height);
+  paintLayoutNode(surface, localized.node);
   return {
     kind: 'layout',
-    surface: paintViewLayout(localized.width, localized.height, content, size),
+    surface,
   };
 }
 
@@ -72,16 +74,4 @@ export function wrapViewOutputAsLayoutRoot(
   }
 
   return localizeLayoutNode(output).node;
-}
-
-function paintViewLayout(contentWidth: number, contentHeight: number, content: Surface, size: ViewportSize): Surface {
-  if (content.width === Math.max(size.width, contentWidth, 0) && content.height === Math.max(size.height, contentHeight, 0)) {
-    return content;
-  }
-
-  const width = Math.max(size.width, contentWidth, 0);
-  const height = Math.max(size.height, contentHeight, 0);
-  const surface = createSurface(width, height);
-  surface.blit(content, 0, 0);
-  return surface;
 }

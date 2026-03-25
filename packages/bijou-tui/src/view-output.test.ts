@@ -34,4 +34,24 @@ describe('view output normalization', () => {
     const root = wrapViewOutputAsLayoutRoot(layout, { width: 3, height: 1 });
     expect(root.rect).toEqual({ x: 0, y: 0, width: 3, height: 1 });
   });
+
+  it('pads localized layout output to the requested viewport size', () => {
+    const nodeSurface = createSurface(2, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 1, y: 1, width: 2, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+
+    const normalized = normalizeViewOutput(layout, { width: 4, height: 3 });
+    expect(normalized.surface.width).toBe(4);
+    expect(normalized.surface.height).toBe(3);
+    expect(surfaceLines(normalized.surface)).toEqual([
+      'AB  ',
+      '    ',
+      '    ',
+    ]);
+  });
 });

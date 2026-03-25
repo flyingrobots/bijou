@@ -200,6 +200,26 @@ function maskCell(cell: Cell, mask: CellMask): Cell {
   };
 }
 
+function cloneCell(cell: Cell): Cell {
+  return {
+    char: cell.char,
+    fg: cell.fg,
+    bg: cell.bg,
+    modifiers: cell.modifiers,
+    empty: cell.empty,
+    opacity: cell.opacity,
+  };
+}
+
+function copyCellInto(target: Cell, source: Cell): void {
+  target.char = source.char;
+  target.fg = source.fg;
+  target.bg = source.bg;
+  target.modifiers = source.modifiers;
+  target.empty = source.empty;
+  target.opacity = source.opacity;
+}
+
 /**
  * Apply a source cell to a target cell using a mask, respecting 'empty' transparency.
  *
@@ -208,18 +228,18 @@ function maskCell(cell: Cell, mask: CellMask): Cell {
  * @param mask   - Determines which fields of `source` are applied to `target`.
  * @returns A new Cell with the masked values applied.
  */
-function applyMask(target: Cell, source: Cell, mask: CellMask): Cell {
+function applyMaskInPlace(target: Cell, source: Cell, mask: CellMask): void {
   // Brush/Stamp behavior: if source is empty, do not modify the target.
-  if (source.empty) return target;
+  if (source.empty) return;
 
-  return {
-    char: mask.char ? source.char : target.char,
-    fg: mask.fg ? source.fg : target.fg,
-    bg: mask.bg ? source.bg : target.bg,
-    modifiers: mask.modifiers ? source.modifiers : target.modifiers,
-    empty: mask.alpha ? (source.empty ?? false) : (target.empty ?? false),
-    opacity: mask.alpha ? (source.opacity ?? 1) : (target.opacity ?? 1),
-  };
+  if (mask.char) target.char = source.char;
+  if (mask.fg) target.fg = source.fg;
+  if (mask.bg) target.bg = source.bg;
+  if (mask.modifiers) target.modifiers = source.modifiers;
+  if (mask.alpha) {
+    target.empty = source.empty ?? false;
+    target.opacity = source.opacity ?? 1;
+  }
 }
 
 /**
@@ -235,7 +255,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
   const h = Math.max(0, Math.floor(height));
   const size = w * h;
   const defaultCell: Cell = fill ?? { char: ' ', empty: true };
-  const cells: Cell[] = Array.from({ length: size }, () => ({ ...defaultCell }));
+  const cells: Cell[] = Array.from({ length: size }, () => cloneCell(defaultCell));
 
   const surface: Surface = {
     width: w,
@@ -244,7 +264,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
 
     clear() {
       for (let i = 0; i < cells.length; i++) {
-        cells[i] = { ...defaultCell };
+        copyCellInto(cells[i]!, defaultCell);
       }
     },
 
@@ -257,7 +277,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
     set(x, y, cell, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) return;
       const idx = y * w + x;
-      cells[idx] = applyMask(cells[idx]!, cell, mask);
+      applyMaskInPlace(cells[idx]!, cell, mask);
     },
 
     fill(cell, fx = 0, fy = 0, fw = w, fh = h, mask = FULL_MASK) {
@@ -269,7 +289,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       for (let y = yStart; y < yEnd; y++) {
         for (let x = xStart; x < xEnd; x++) {
           const idx = y * w + x;
-          cells[idx] = applyMask(cells[idx]!, cell, mask);
+          applyMaskInPlace(cells[idx]!, cell, mask);
         }
       }
     },
@@ -309,7 +329,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
           const sourceX = srcXStart + j;
           const tIdx = tRowOffset + targetX;
           const sIdx = sRowOffset + sourceX;
-          cells[tIdx] = applyMask(cells[tIdx]!, source.cells[sIdx]!, mask);
+          applyMaskInPlace(cells[tIdx]!, source.cells[sIdx]!, mask);
         }
       }
     },
@@ -334,7 +354,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
             }
             
             const idx = y * w + x;
-            cells[idx] = applyMask(cells[idx]!, transformedCell, mask);
+            applyMaskInPlace(cells[idx]!, transformedCell, mask);
           }
         }
       }
@@ -356,14 +376,14 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       const count = Math.min(w - xStart, rowCells.length);
       for (let i = 0; i < count; i++) {
         const idx = y * w + xStart + i;
-        cells[idx] = applyMask(cells[idx]!, rowCells[i]!, mask);
+        applyMaskInPlace(cells[idx]!, rowCells[i]!, mask);
       }
     },
 
     clone() {
       const s = createSurface(w, h);
       for (let i = 0; i < cells.length; i++) {
-        s.cells[i] = { ...cells[i]! };
+        copyCellInto(s.cells[i]!, cells[i]!);
       }
       return s;
     },
