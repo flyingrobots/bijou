@@ -6,10 +6,14 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';
-import { createSurface, type LayoutNode, type Surface } from '../packages/bijou/src/index.js';
+import { createSurface, setDefaultContext, type LayoutNode, type Surface } from '../packages/bijou/src/index.js';
 import { renderDiff } from '../packages/bijou/src/core/render/differ.js';
 import { normalizeViewOutput, normalizeViewOutputInto } from '../packages/bijou-tui/src/view-output.js';
 import { createDocsApp } from '../examples/docs/app.js';
+import type { FrameLayoutNode } from '../packages/bijou-tui/src/app-frame.js';
+import { renderFrameNode } from '../packages/bijou-tui/src/app-frame-render.js';
+import { createPanelVisibilityState } from '../packages/bijou-tui/src/panel-state.js';
+import { createPanelDockState } from '../packages/bijou-tui/src/panel-dock.js';
 import {
   DEFAULT_RENDERER_BENCH_SCENARIOS,
   detectRendererBenchEnvironment,
@@ -185,6 +189,83 @@ function buildStyledDiffPair(columns: number, rows: number): { current: Surface;
   return { current, target };
 }
 
+function buildSyntheticFrameLayout(
+  columns: number,
+  rows: number,
+): FrameLayoutNode {
+  const paneCache = new Map<string, Surface>();
+  const patternFor = (width: number, height: number, variant: number): Surface => {
+    const key = `${width}x${height}:${variant}`;
+    const cached = paneCache.get(key);
+    if (cached != null) return cached;
+    const surface = createSurface(width, height, {
+      char: ' ',
+      bg: variant === 0 ? '#111320' : variant === 1 ? '#151927' : '#181d2d',
+      empty: false,
+    });
+    const palette = variant === 0
+      ? ['#4d5f89', '#7084b1', '#d3d7ea']
+      : variant === 1
+        ? ['#f2c572', '#f4d7a8', '#f97068']
+        : ['#6f8cc4', '#9ba9ff', '#c8c7ea'];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const stripe = Math.floor((x + y * 2) / Math.max(1, Math.floor(width / 9))) % palette.length;
+        const char = (x + y) % 7 === 0 ? '·' : (y % 5 === 0 ? '─' : ' ');
+        surface.set(x, y, {
+          char,
+          fg: char === ' ' ? undefined : palette[stripe],
+          bg: variant === 0 ? '#111320' : variant === 1 ? '#151927' : '#181d2d',
+          empty: false,
+        });
+      }
+    }
+    paneCache.set(key, surface);
+    return surface;
+  };
+
+  const railWidth = Math.max(18, Math.floor(columns * 0.16));
+  const demoMinHeight = Math.max(6, Math.floor(rows * 0.22));
+  const ratio = Math.max(0.55, Math.min(0.78, 1 - demoMinHeight / Math.max(1, rows)));
+
+  return {
+    kind: 'grid',
+    gridId: 'bench-shell',
+    columns: [railWidth, '1fr', railWidth],
+    rows: ['1fr'],
+    areas: ['family main variants'],
+    gap: 1,
+    cells: {
+      family: {
+        kind: 'pane',
+        paneId: 'family-nav',
+        render: (width, height) => patternFor(width, height, 0),
+      },
+      main: {
+        kind: 'split',
+        splitId: 'main-stack',
+        direction: 'column',
+        state: { ratio, focused: 'a' },
+        paneA: {
+          kind: 'pane',
+          paneId: 'docs-pane',
+          render: (width, height) => patternFor(width, height, 1),
+        },
+        paneB: {
+          kind: 'pane',
+          paneId: 'demo-pane',
+          render: (width, height) => patternFor(width, height, 2),
+        },
+      },
+      variants: {
+        kind: 'pane',
+        paneId: 'variants-pane',
+        render: (width, height) => patternFor(width, height, 0),
+      },
+    },
+  };
+}
+
 function runSurfaceScenarioSample(scenario: RendererBenchScenario): RendererBenchSample {
   const target = createSurface(scenario.columns, scenario.rows);
   const source = buildPatternSurface(Math.max(24, Math.floor(scenario.columns / 3)), Math.max(8, Math.floor(scenario.rows / 3)));
@@ -309,6 +390,60 @@ function runStyledDiffScenarioSample(scenario: RendererBenchScenario): RendererB
   };
 }
 
+function runFrameScenarioSample(scenario: RendererBenchScenario): RendererBenchSample {
+  const ctx = createTestContext({
+    mode: 'interactive',
+    runtime: {
+      columns: scenario.columns,
+      rows: scenario.rows,
+      refreshRate: 60,
+    },
+  });
+  setDefaultContext(ctx);
+  const layoutTree = buildSyntheticFrameLayout(scenario.columns, scenario.rows);
+  const bodyRect = {
+    row: 0,
+    col: 0,
+    width: scenario.columns,
+    height: scenario.rows,
+  };
+  const renderCtx = {
+    model: {
+      splitRatioOverrides: {},
+    },
+    pageId: 'bench',
+    focusedPaneId: 'docs-pane',
+    scrollByPane: {},
+    visibility: createPanelVisibilityState(),
+    dockState: createPanelDockState(),
+  };
+
+  for (let i = 0; i < scenario.warmupFrames; i++) {
+    renderFrameNode(layoutTree, bodyRect, renderCtx as never);
+  }
+
+  forceGcIfAvailable();
+  const before = process.memoryUsage();
+  const start = performance.now();
+
+  for (let i = 0; i < scenario.frames; i++) {
+    renderFrameNode(layoutTree, bodyRect, renderCtx as never);
+  }
+
+  const elapsedMs = performance.now() - start;
+  const mid = process.memoryUsage();
+  forceGcIfAvailable();
+  const after = process.memoryUsage();
+
+  return {
+    elapsedMs,
+    avgFrameMs: elapsedMs / scenario.frames,
+    approxFps: 1000 / (elapsedMs / scenario.frames),
+    transientHeapDelta: typeof global.gc === 'function' ? (mid.heapUsed - before.heapUsed) : undefined,
+    retainedHeapDelta: typeof global.gc === 'function' ? (after.heapUsed - before.heapUsed) : undefined,
+  };
+}
+
 function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample {
   if (scenario.kind === 'surface') {
     return runSurfaceScenarioSample(scenario);
@@ -320,6 +455,10 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
 
   if (scenario.kind === 'styled-diff') {
     return runStyledDiffScenarioSample(scenario);
+  }
+
+  if (scenario.kind === 'frame') {
+    return runFrameScenarioSample(scenario);
   }
 
   const ctx = createTestContext({

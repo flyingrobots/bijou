@@ -162,4 +162,24 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
     expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
   });
+
+  it('can execute a synthetic frame composition scenario', () => {
+    const report = runRendererBenchmarks({
+      sampleCount: 1,
+      scenarios: [
+        {
+          id: 'frame.compose.tiny',
+          label: 'Synthetic frame compose (40x12)',
+          kind: 'frame',
+          columns: 40,
+          rows: 12,
+          frames: 2,
+          warmupFrames: 1,
+        },
+      ],
+    });
+
+    expect(report.scenarios).toHaveLength(1);
+    expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+  });
 });
