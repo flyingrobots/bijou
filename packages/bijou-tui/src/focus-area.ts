@@ -20,7 +20,7 @@
  * ```
  */
 
-import type { BijouContext, Surface, TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, Cell, Surface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
@@ -95,6 +95,10 @@ export interface FocusAreaRenderOptions {
 
 /** Gutter character: left one quarter block (U+258E). */
 const GUTTER_CHAR = '▎';
+const EMPTY_CELL: Cell = { char: ' ', empty: false };
+const SCROLLBAR_TRACK_CELL: Cell = { char: '│', empty: false };
+const SCROLLBAR_THUMB_CELL: Cell = { char: '█', empty: false };
+const gutterCellCache = new Map<string, Cell>();
 
 // ---------------------------------------------------------------------------
 // State creation
@@ -334,6 +338,24 @@ export function focusAreaSurface(
   state: FocusAreaState,
   options?: FocusAreaRenderOptions,
 ): Surface {
+  const surface = createSurface(state.width, state.height, EMPTY_CELL);
+  return focusAreaSurfaceInto(content, state, surface, options);
+}
+
+/**
+ * Paint the focus area into an existing target surface.
+ *
+ * The caller owns clearing the destination region beforehand when reusing the
+ * same target across frames.
+ */
+export function focusAreaSurfaceInto(
+  content: Surface,
+  state: FocusAreaState,
+  target: Surface,
+  options?: FocusAreaRenderOptions,
+  offsetX = 0,
+  offsetY = 0,
+): Surface {
   const focused = options?.focused ?? true;
   const showScrollbar = options?.showScrollbar ?? true;
   const ctx = options?.ctx;
@@ -348,26 +370,22 @@ export function focusAreaSurface(
     ? Math.max(0, Math.min(state.scroll.x, Math.max(0, content.width - contentWidth)))
     : 0;
 
-  const surface = createSurface(state.width, state.height, { char: ' ', empty: false });
   if (contentWidth > 0 && state.height > 0) {
-    surface.blit(content, gutterWidth, 0, scrollX, scrollY, contentWidth, state.height);
+    target.blit(content, offsetX + gutterWidth, offsetY, scrollX, scrollY, contentWidth, state.height);
   }
 
   if (needsScrollbar) {
-    const scrollCol = gutterWidth + contentWidth;
-    for (const [y, cell] of renderScrollbarCells(state.height, content.height, scrollY).entries()) {
-      surface.set(scrollCol, y, cell);
-    }
+    paintScrollbarInto(target, offsetX + gutterWidth + contentWidth, offsetY, state.height, content.height, scrollY);
   }
 
   if (hasGutter) {
     const gutterCell = resolveGutterCell(focused, ctx, options);
     for (let y = 0; y < state.height; y++) {
-      surface.set(0, y, gutterCell);
+      target.set(offsetX, offsetY + y, gutterCell);
     }
   }
 
-  return surface;
+  return target;
 }
 
 /**
@@ -410,16 +428,27 @@ function resolveGutterCell(
   ctx: BijouContext | undefined,
   options: FocusAreaRenderOptions | undefined,
 ) {
-  return parseAnsiToSurface(resolveGutter(focused, ctx, options), 1, 1).get(0, 0);
+  const key = resolveGutter(focused, ctx, options);
+  const cached = gutterCellCache.get(key);
+  if (cached != null) return cached;
+  const parsed = parseAnsiToSurface(key, 1, 1).get(0, 0);
+  gutterCellCache.set(key, parsed);
+  return parsed;
 }
 
-function renderScrollbarCells(
+function paintScrollbarInto(
+  target: Surface,
+  column: number,
+  row: number,
   viewportHeight: number,
   totalLines: number,
   scrollY: number,
-) {
+): void {
   if (totalLines <= viewportHeight) {
-    return Array.from({ length: viewportHeight }, () => ({ char: ' ', empty: false }));
+    for (let y = 0; y < viewportHeight; y++) {
+      target.set(column, row + y, EMPTY_CELL);
+    }
+    return;
   }
 
   const thumbSize = Math.max(1, Math.round((viewportHeight / totalLines) * viewportHeight));
@@ -427,10 +456,13 @@ function renderScrollbarCells(
   const scrollFraction = maxScroll > 0 ? scrollY / maxScroll : 0;
   const thumbStart = Math.round(scrollFraction * (viewportHeight - thumbSize));
 
-  return Array.from({ length: viewportHeight }, (_, index) => ({
-    char: index >= thumbStart && index < thumbStart + thumbSize ? '█' : '│',
-    empty: false,
-  }));
+  for (let index = 0; index < viewportHeight; index++) {
+    target.set(
+      column,
+      row + index,
+      index >= thumbStart && index < thumbStart + thumbSize ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL,
+    );
+  }
 }
 
 function resolveFocusAreaViewportWidth(

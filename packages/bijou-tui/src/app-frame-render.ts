@@ -24,6 +24,7 @@ import { gridLayout } from './grid.js';
 import {
   createFocusAreaStateForSurface,
   focusAreaSurface,
+  focusAreaSurfaceInto,
   focusAreaScrollTo,
   focusAreaScrollToX,
 } from './focus-area.js';
@@ -119,13 +120,12 @@ function paintFrameNodeInto<PageModel, Msg>(
     });
     state = focusAreaScrollTo(state, prior.y);
     state = focusAreaScrollToX(state, prior.x);
-    const surface = focusAreaSurface(contentSurface, state, {
+    focusAreaSurfaceInto(contentSurface, state, target, {
       focused: node.paneId === ctx.focusedPaneId,
       ctx: resolveSafeCtx(),
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
-    });
-    target.blit(surface, localRect.col, localRect.row);
+    }, localRect.col, localRect.row);
     return {
       paneRects: new Map([[node.paneId, absoluteRect]]),
       paneOrder: [node.paneId],

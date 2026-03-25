@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { auditStyle, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { stringToSurface } from '@flyingrobots/bijou';
+import { createSurface, stringToSurface } from '@flyingrobots/bijou';
 import type { KeyMsg } from './types.js';
 import {
   createFocusAreaState,
   createFocusAreaStateForSurface,
   focusArea,
   focusAreaSurface,
+  focusAreaSurfaceInto,
   focusAreaScrollBy,
   focusAreaScrollTo,
   focusAreaScrollToTop,
@@ -360,6 +361,27 @@ describe('focusAreaSurface', () => {
 
     expect(output.get(0, 0).char).toBe('a');
     expect(output.get(1, 0).char).toBe('b');
+  });
+
+  it('can paint into an existing target surface at an offset', () => {
+    const content = stringToSurface('abcdef\nghijkl\nmnopqr', 6, 3);
+    let state = createFocusAreaStateForSurface(content, {
+      width: 5,
+      height: 2,
+      overflowX: 'scroll',
+    });
+    state = focusAreaScrollTo(focusAreaScrollToX(state, 2), 1);
+    const target = createSurface(8, 4, { char: '.', empty: false });
+
+    const output = focusAreaSurfaceInto(content, state, target, undefined, 2, 1);
+
+    expect(output).toBe(target);
+    expect(output.get(2, 1).char).toBe('▎');
+    expect(output.get(3, 1).char).toBe('i');
+    expect(output.get(4, 1).char).toBe('j');
+    expect(output.get(5, 1).char).toBe('k');
+    expect(output.get(6, 1).char).toMatch(/[█│]/);
+    expect(output.get(1, 1).char).toBe('.');
   });
 });
 
