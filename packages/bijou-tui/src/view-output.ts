@@ -1,10 +1,9 @@
 import {
   createSurface,
-  paintLayoutNode,
   type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
-import { localizeLayoutNode } from './layout-node-surface.js';
+import { localizeLayout, localizeLayoutNode, paintLayoutNodeWithOffset } from './layout-node-surface.js';
 
 export type ViewOutput = Surface | LayoutNode;
 
@@ -30,10 +29,30 @@ export function normalizeViewOutput(
   output: ViewOutput,
   size: ViewportSize,
 ): NormalizedViewOutput {
+  return normalizeViewOutputInto(output, size);
+}
+
+export function normalizeViewOutputInto(
+  output: ViewOutput,
+  size: ViewportSize,
+  scratch?: Surface,
+): NormalizedViewOutput {
   if (isSurfaceView(output)) {
+    if (scratch == null) {
+      return {
+        kind: 'surface',
+        surface: output,
+      };
+    }
+    const surface = prepareNormalizedSurface(
+      Math.max(size.width, output.width, 0),
+      Math.max(size.height, output.height, 0),
+      scratch,
+    );
+    surface.blit(output, 0, 0);
     return {
       kind: 'surface',
-      surface: output,
+      surface,
     };
   }
 
@@ -43,11 +62,11 @@ export function normalizeViewOutput(
     );
   }
 
-  const localized = localizeLayoutNode(output);
-  const width = Math.max(size.width, localized.width, 0);
-  const height = Math.max(size.height, localized.height, 0);
-  const surface = createSurface(width, height);
-  paintLayoutNode(surface, localized.node);
+  const localization = localizeLayout(output);
+  const width = Math.max(size.width, localization.width, 0);
+  const height = Math.max(size.height, localization.height, 0);
+  const surface = prepareNormalizedSurface(width, height, scratch);
+  paintLayoutNodeWithOffset(surface, output, localization.dx, localization.dy);
   return {
     kind: 'layout',
     surface,
@@ -74,4 +93,12 @@ export function wrapViewOutputAsLayoutRoot(
   }
 
   return localizeLayoutNode(output).node;
+}
+
+function prepareNormalizedSurface(width: number, height: number, scratch?: Surface): Surface {
+  if (scratch != null && scratch.width === width && scratch.height === height) {
+    scratch.clear();
+    return scratch;
+  }
+  return createSurface(width, height);
 }

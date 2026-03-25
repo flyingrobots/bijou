@@ -1,6 +1,5 @@
 import {
   createSurface,
-  paintLayoutNode,
   type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
@@ -18,20 +17,54 @@ export interface LocalizedLayoutNode {
   readonly height: number;
 }
 
+export interface LayoutLocalization {
+  readonly width: number;
+  readonly height: number;
+  readonly dx: number;
+  readonly dy: number;
+}
+
 export function localizeLayoutNode(node: LayoutNode): LocalizedLayoutNode {
-  const bounds = measureLayoutBounds(node);
+  const localization = localizeLayout(node);
   return {
-    node: translateLayoutNode(node, -bounds.minX, -bounds.minY),
-    width: Math.max(0, bounds.maxX - bounds.minX),
-    height: Math.max(0, bounds.maxY - bounds.minY),
+    node: localization.dx === 0 && localization.dy === 0
+      ? node
+      : translateLayoutNode(node, localization.dx, localization.dy),
+    width: localization.width,
+    height: localization.height,
   };
 }
 
 export function layoutNodeToSurface(node: LayoutNode): Surface {
-  const localized = localizeLayoutNode(node);
-  const surface = createSurface(localized.width, localized.height);
-  paintLayoutNode(surface, localized.node);
+  const localization = localizeLayout(node);
+  const surface = createSurface(localization.width, localization.height);
+  paintLayoutNodeWithOffset(surface, node, localization.dx, localization.dy);
   return surface;
+}
+
+export function localizeLayout(node: LayoutNode): LayoutLocalization {
+  const bounds = measureLayoutBounds(node);
+  return {
+    width: Math.max(0, bounds.maxX - bounds.minX),
+    height: Math.max(0, bounds.maxY - bounds.minY),
+    dx: -bounds.minX,
+    dy: -bounds.minY,
+  };
+}
+
+export function paintLayoutNodeWithOffset(
+  target: Surface,
+  node: LayoutNode,
+  dx: number,
+  dy: number,
+): void {
+  if (node.surface) {
+    target.blit(node.surface, node.rect.x + dx, node.rect.y + dy);
+  }
+
+  for (const child of node.children) {
+    paintLayoutNodeWithOffset(target, child, dx, dy);
+  }
 }
 
 function measureLayoutBounds(node: LayoutNode): LayoutBounds {

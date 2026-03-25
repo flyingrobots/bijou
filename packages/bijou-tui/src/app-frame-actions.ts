@@ -5,6 +5,7 @@
  * page frame state sync, and transition tick command.
  */
 
+import { createSurface, type Surface } from '@flyingrobots/bijou';
 import type { FramePage, CreateFramedAppOptions, FramePaneScroll } from './app-frame.js';
 import type {
   InternalFrameModel,
@@ -46,7 +47,19 @@ import {
   findPaneNode,
   frameBodyRect,
 } from './app-frame-utils.js';
-import { framePaneOutputToSurface, renderFrameNode } from './app-frame-render.js';
+import { renderFrameNode } from './app-frame-render.js';
+import { normalizeViewOutputInto, type ViewOutput } from './view-output.js';
+
+let focusedPaneMeasureScratch: Surface | null = null;
+
+function renderPaneSurfaceForMeasurement(output: ViewOutput, width: number, height: number): Surface {
+  focusedPaneMeasureScratch = normalizeViewOutputInto(
+    output,
+    { width, height },
+    focusedPaneMeasureScratch ?? createSurface(width, height),
+  ).surface;
+  return focusedPaneMeasureScratch;
+}
 
 /** Dispatch a frame-level action (tab switch, pane cycle, scroll, palette, help toggle, transitions). */
 export function applyFrameAction<PageModel, Msg>(
@@ -234,7 +247,7 @@ export function scrollFocusedPane<PageModel, Msg>(
   const paneNode = findPaneNode(layoutTree, focusedPaneId);
   if (paneNode == null) return model;
 
-  const contentSurface = framePaneOutputToSurface(
+  const contentSurface = renderPaneSurfaceForMeasurement(
     paneNode.render(paneRect.width, paneRect.height),
     paneRect.width,
     paneRect.height,

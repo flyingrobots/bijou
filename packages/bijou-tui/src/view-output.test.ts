@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createSurface, type LayoutNode } from '@flyingrobots/bijou';
-import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
+import { normalizeViewOutput, normalizeViewOutputInto, wrapViewOutputAsLayoutRoot } from './view-output.js';
 
 function surfaceLines(surface: ReturnType<typeof createSurface>): string[] {
   return Array.from({ length: surface.height }, (_, y) =>
@@ -48,6 +48,28 @@ describe('view output normalization', () => {
     const normalized = normalizeViewOutput(layout, { width: 4, height: 3 });
     expect(normalized.surface.width).toBe(4);
     expect(normalized.surface.height).toBe(3);
+    expect(surfaceLines(normalized.surface)).toEqual([
+      'AB  ',
+      '    ',
+      '    ',
+    ]);
+  });
+
+  it('can paint layout output into a reusable scratch surface', () => {
+    const nodeSurface = createSurface(2, 1, { char: ' ', empty: false });
+    nodeSurface.set(0, 0, { char: 'A', empty: false });
+    nodeSurface.set(1, 0, { char: 'B', empty: false });
+    const layout: LayoutNode = {
+      rect: { x: 1, y: 1, width: 2, height: 1 },
+      children: [],
+      surface: nodeSurface,
+    };
+    const scratch = createSurface(4, 3);
+    scratch.fill({ char: 'x', empty: false });
+
+    const normalized = normalizeViewOutputInto(layout, { width: 4, height: 3 }, scratch);
+
+    expect(normalized.surface).toBe(scratch);
     expect(surfaceLines(normalized.surface)).toEqual([
       'AB  ',
       '    ',
