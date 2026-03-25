@@ -69,6 +69,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Fixes
 
+- **DOGFOOD entrypoint now runs against the live local shell/runtime** — the docs example entrypoint now imports the local Node/TUI sources and awaits `run(...)`, so title-screen quit behavior and terminal cleanup stay aligned with current repo code instead of depending on whatever packaged build output happened to be on disk.
 - **Landing hero whitespace now preserves the page background** — the DOGFOOD landing page now treats plain whitespace in the gradient hero and free-floating copy as transparent, so the tracked `bijou.txt` art floats over the page shader instead of wiping it into a black rectangle.
 - **Whitespace-first wrapping for shared text flow** — `wrapToWidth()` now prefers breaking at whitespace boundaries before falling back to hard wraps, so text-bearing components using the default wrap path behave more like readable prose instead of splitting words whenever a line reaches the edge.
 - **Framed-shell quit confirmation and DOGFOOD landing footer** — `createFramedApp()` now reserves normal-mode `q` / `Esc` for a quit-confirm modal in TUI shells while pipe mode still quits immediately, and the DOGFOOD landing screen now exposes that behavior clearly with a reserved last-line footer plus the live Bijou version string.

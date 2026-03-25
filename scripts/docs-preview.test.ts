@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
@@ -45,6 +46,14 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 }
 
 describe('docs preview app', () => {
+  it('uses the live local runtime entrypoint instead of the packaged build', () => {
+    const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');
+
+    expect(source).toContain("../../packages/bijou-node/src/index.js");
+    expect(source).toContain("../../packages/bijou-tui/src/index.js");
+    expect(source).toMatch(/await run\(createDocsApp\(ctx\), \{ ctx, mouse: true \}\);/);
+  });
+
   it('lands on the hero page first and enters the docs on Enter', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

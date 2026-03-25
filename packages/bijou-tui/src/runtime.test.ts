@@ -17,6 +17,8 @@ import {
   EXIT_ALT_SCREEN,
 } from './screen.js';
 
+const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
+
 function counterApp(quitKey = 'q'): App<number, never> {
   return {
     init: () => [0, []],
@@ -164,6 +166,17 @@ describe('run', () => {
 
       const lastWrite = ctx.io.written[ctx.io.written.length - 1]!;
       expect(lastWrite).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
+    });
+
+    it('restores mouse reporting before exiting when a mouse-enabled app quits', async () => {
+      const { clock, ctx } = createInteractiveContext({ io: { keys: ['q'] } });
+      const promise = run(counterApp(), { ctx, mouse: true });
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(ctx.io.written).toContain(DISABLE_MOUSE);
+      expect(ctx.io.written[ctx.io.written.length - 2]).toBe(DISABLE_MOUSE);
+      expect(ctx.io.written[ctx.io.written.length - 1]).toBe(SHOW_CURSOR + WRAP_ENABLE + EXIT_ALT_SCREEN);
     });
 
     it('updates model on key input', async () => {
