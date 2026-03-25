@@ -203,24 +203,43 @@ export function compositeSurface(
   options?: CompositeOptions,
 ): Surface {
   const result = background.clone();
+  return compositeSurfaceInto(result, result, overlays, options);
+}
+
+/**
+ * Paint overlays onto an existing target surface, optionally starting from an
+ * existing background surface.
+ *
+ * When `background` and `target` are the same object, the surface is
+ * composited in place without an extra clone.
+ */
+export function compositeSurfaceInto(
+  background: Surface,
+  target: Surface,
+  overlays: readonly Overlay[],
+  options?: CompositeOptions,
+): Surface {
+  if (target !== background) {
+    target.clear();
+    target.blit(background, 0, 0);
+  }
 
   if (options?.dim) {
-    for (let y = 0; y < result.height; y++) {
-      for (let x = 0; x < result.width; x++) {
-        const cell = result.get(x, y);
-        if (cell.empty || cell.char === ' ') continue;
-        const modifiers = new Set(cell.modifiers ?? []);
-        modifiers.add('dim');
-        result.set(x, y, { ...cell, modifiers: Array.from(modifiers), empty: false });
+    for (const cell of target.cells) {
+      if (cell.empty || cell.char === ' ') continue;
+      const modifiers = cell.modifiers ?? [];
+      if (!modifiers.includes('dim')) {
+        cell.modifiers = [...modifiers, 'dim'];
       }
+      cell.empty = false;
     }
   }
 
   for (const overlay of overlays) {
-    result.blit(overlay.surface ?? surfaceFromContent(overlay.content), overlay.col, overlay.row);
+    target.blit(overlay.surface ?? surfaceFromContent(overlay.content), overlay.col, overlay.row);
   }
 
-  return result;
+  return target;
 }
 
 // ---------------------------------------------------------------------------

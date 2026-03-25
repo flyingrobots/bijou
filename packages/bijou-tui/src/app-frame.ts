@@ -20,7 +20,7 @@ import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import { quit } from './commands.js';
 import type { Overlay } from './overlay.js';
-import { compositeSurface, drawer, modal } from './overlay.js';
+import { compositeSurfaceInto, drawer, modal } from './overlay.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
 import { type BuiltinTransition } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
@@ -484,6 +484,7 @@ export function createFramedApp<PageModel, Msg>(
 
   const frameKeys = createFrameKeyMap({ enableSettings: options.settings != null });
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
+  let composedFrameScratch: Surface | null = null;
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -492,6 +493,17 @@ export function createFramedApp<PageModel, Msg>(
     select: { type: 'cp-select' },
     close: { type: 'cp-close' },
   });
+
+  function getComposedFrameScratch(width: number, height: number): Surface {
+    if (
+      composedFrameScratch == null
+      || composedFrameScratch.width !== width
+      || composedFrameScratch.height !== height
+    ) {
+      composedFrameScratch = createSurface(width, height);
+    }
+    return composedFrameScratch;
+  }
 
   function withObservedKey(
     model: InternalFrameModel<PageModel, Msg>,
@@ -1166,7 +1178,7 @@ export function createFramedApp<PageModel, Msg>(
         bodyRect,
         overlays,
         dimBackground: overlays.length > 0,
-      });
+      }, getComposedFrameScratch(model.columns, model.rows));
     },
 
     routeRuntimeIssue(issue) {
@@ -1189,8 +1201,13 @@ interface FrameSurfaceOptions {
   dimBackground: boolean;
 }
 
-function composeFrameSurface(options: FrameSurfaceOptions): Surface {
-  const frame = createSurface(options.width, options.height);
+function composeFrameSurface(options: FrameSurfaceOptions, scratch?: Surface): Surface {
+  const frame = scratch != null
+    && scratch.width === options.width
+    && scratch.height === options.height
+    ? scratch
+    : createSurface(options.width, options.height);
+  frame.clear();
 
   frame.blit(options.headerSurface, 0, 0);
   if (options.height > 1) {
@@ -1199,7 +1216,7 @@ function composeFrameSurface(options: FrameSurfaceOptions): Surface {
   if (options.bodyRect.width > 0 && options.bodyRect.height > 0) {
     frame.blit(options.bodySurface, options.bodyRect.col, options.bodyRect.row);
   }
-  return compositeSurface(frame, options.overlays, { dim: options.dimBackground });
+  return compositeSurfaceInto(frame, frame, options.overlays, { dim: options.dimBackground });
 }
 
 function focusPane<PageModel, Msg>(

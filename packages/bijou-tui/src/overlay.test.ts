@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface, surfaceToString } from '@flyingrobots/bijou';
-import { composite, compositeSurface, modal, toast, drawer, tooltip } from './overlay.js';
+import { composite, compositeSurface, compositeSurfaceInto, modal, toast, drawer, tooltip } from './overlay.js';
 import type { Overlay, DrawerOptions } from './overlay.js';
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { visibleLength, stripAnsi } from './viewport.js';
@@ -152,6 +152,24 @@ describe('compositeSurface', () => {
 
     const result = compositeSurface(bg, [ov], { dim: true });
 
+    expect(result.get(0, 0).modifiers).toContain('dim');
+    expect(result.get(1, 0).modifiers ?? []).not.toContain('dim');
+    expect(surfaceToString(result, ctx.style)).toBe('AXXA');
+  });
+
+  it('can composite in place without cloning the target surface', () => {
+    const ctx = createTestContext();
+    const bg = stringToSurface('AAAA', 4, 1);
+    const ov: Overlay = {
+      content: 'unused',
+      surface: stringToSurface('XX', 2, 1),
+      row: 0,
+      col: 1,
+    };
+
+    const result = compositeSurfaceInto(bg, bg, [ov], { dim: true });
+
+    expect(result).toBe(bg);
     expect(result.get(0, 0).modifiers).toContain('dim');
     expect(result.get(1, 0).modifiers ?? []).not.toContain('dim');
     expect(surfaceToString(result, ctx.style)).toBe('AXXA');
