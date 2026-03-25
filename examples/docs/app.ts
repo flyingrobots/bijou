@@ -124,6 +124,7 @@ interface RootModel {
   readonly columns: number;
   readonly rows: number;
   readonly landingTimeMs: number;
+  readonly landingFps: number;
   readonly landingThemeIndex: number;
   readonly landingToast?: LandingToastState;
   readonly docsModel: FrameModel<DocsExplorerModel>;
@@ -146,6 +147,7 @@ interface LandingToastState {
 }
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
+const LANDING_FPS_ALPHA = 0.2;
 const LANDING_THEMES: readonly LandingThemeTokens[] = [
   {
     id: 'storybook-workstation',
@@ -519,6 +521,12 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
     fg: () => rgbHex(...lerpTheme(tokens.logoGradient, 0.88)),
     modifiers: () => ['bold'],
   });
+  const fpsBadge = createTransparentTextSurface(`${model.landingFps} fps`, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: () => rgbHex(...lerpTheme(tokens.waveGradient, 0.62)),
+    modifiers: () => ['dim'],
+  });
 
   const footerY = Math.max(0, height - 1);
   const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
@@ -528,6 +536,7 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
     ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
     : Math.max(0, Math.min(height - promptLine.height - 1, promptMinY));
 
+  surface.blit(fpsBadge, 0, 0);
   blitCentered(surface, promptLine, promptY);
   blitCentered(surface, wordmark, wordmarkY);
   surface.blit(footerControls, 0, footerY);
@@ -734,6 +743,13 @@ function resolveLandingTheme(index: number): LandingThemeTokens {
 
 function nextLandingThemeIndex(current: number, delta: number): number {
   return mod(current + delta, LANDING_THEMES.length);
+}
+
+function updateLandingFps(current: number, dtSeconds: number): number {
+  if (!(dtSeconds > 0)) return current;
+  const instantFps = Math.max(1, Math.round(1 / dtSeconds));
+  if (current <= 0) return instantFps;
+  return Math.max(1, Math.round((current * (1 - LANDING_FPS_ALPHA)) + (instantFps * LANDING_FPS_ALPHA)));
 }
 
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
@@ -1205,6 +1221,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
+        landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
         landingThemeIndex: 0,
         landingToast: undefined,
         docsModel,
@@ -1231,6 +1248,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           return [{
             ...model,
             landingTimeMs,
+            landingFps: updateLandingFps(model.landingFps, msg.dt),
             landingToast: model.landingToast && landingTimeMs < model.landingToast.expiresAtMs
               ? model.landingToast
               : undefined,

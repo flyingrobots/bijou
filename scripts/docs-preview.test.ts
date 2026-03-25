@@ -66,7 +66,7 @@ describe('docs preview app', () => {
   });
 
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60 } });
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
@@ -83,6 +83,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Press [Enter]');
     expect(text).toContain('Esc/q quit • any key continue');
     expect(text).toContain('v4.0.0');
+    expect(text).toContain('73 fps');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -114,6 +115,16 @@ describe('docs preview app', () => {
 
     expect((pulsed.model as any).route).toBe('landing');
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
+  });
+
+  it('updates the landing refresh-rate readout from pulse cadence', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
+
+    expect((pulsed.model as any).landingFps).toBe(54);
+    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {

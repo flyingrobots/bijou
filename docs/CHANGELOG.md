@@ -8,6 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD landing refresh-rate readout** — the animated title screen now computes a live FPS value from the landing pulse cadence and displays it in the upper-left corner, so the title treatment exposes its current refresh behavior instead of hiding it.
 - **DOGFOOD onboarding and workspace polish** — the docs explorer now keeps a one-cell gutter around and between the three main columns, reduces the top status strip to a short shell cue instead of a spilled keymap, and turns the empty center lane into a real Bijou introduction plus “how to use these docs” guide instead of a bare placeholder.
 - **DOGFOOD shell discoverability pass** — the docs explorer now advertises `/ Search` and `F2 Settings` in the standard frame help strip, opens shell search directly with `/`, exposes settings through `F2`, and keeps the empty-state guide aligned with those shell-level affordances instead of pointing users at hidden control chords.
 - **Focused-pane input ownership in `createFramedApp()`** — framed pages can now declare pane-scoped input areas with local keymaps, help sources, and optional mouse mapping, and the shell routes focused-pane input ahead of page/global fallback so inactive panes stop responding while DOGFOOD’s family and variant lanes behave like real focused workspaces.
