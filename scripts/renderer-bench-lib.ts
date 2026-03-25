@@ -110,6 +110,15 @@ export const DEFAULT_RENDERER_BENCH_SCENARIOS: readonly RendererBenchScenario[] 
     warmupFrames: 15,
   },
   {
+    id: 'dogfood.docs.render.medium',
+    label: 'DOGFOOD docs explorer render (220x58)',
+    kind: 'render',
+    columns: 220,
+    rows: 58,
+    frames: 180,
+    warmupFrames: 15,
+  },
+  {
     id: 'surface.paint.medium',
     label: 'Synthetic surface paint (220x58)',
     kind: 'surface',

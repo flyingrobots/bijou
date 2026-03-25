@@ -70,6 +70,16 @@ function forceGcIfAvailable(): void {
   }
 }
 
+function keyMsg(key: string) {
+  return {
+    type: 'key' as const,
+    key,
+    ctrl: false,
+    alt: false,
+    shift: false,
+  };
+}
+
 function buildPatternSurface(width: number, height: number): Surface {
   const surface = createSurface(width, height);
   const palette = ['#1b1d3a', '#33415c', '#4b5d8a', '#f1dac4', '#f2c572', '#f97068'];
@@ -323,6 +333,10 @@ function runScenarioSample(scenario: RendererBenchScenario): RendererBenchSample
   const app = createDocsApp(ctx);
   let [model] = app.init();
   [model] = app.update({ type: 'resize', columns: scenario.columns, rows: scenario.rows }, model);
+
+  if (scenario.id === 'dogfood.docs.render.medium') {
+    [model] = app.update(keyMsg('enter'), model);
+  }
 
   const size = { width: scenario.columns, height: scenario.rows };
   const pulse = { type: 'pulse', dt: 1 / 60 } as const;

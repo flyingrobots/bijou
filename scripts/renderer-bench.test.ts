@@ -92,6 +92,26 @@ describe('renderer-bench-lib', () => {
     expect(report.scenarios[0]?.medianWrites).toBeGreaterThan(0);
   });
 
+  it('can execute a tiny DOGFOOD docs explorer render scenario', () => {
+    const report = runRendererBenchmarks({
+      sampleCount: 1,
+      scenarios: [
+        {
+          id: 'dogfood.docs.render.medium',
+          label: 'DOGFOOD docs explorer render (40x12)',
+          kind: 'render',
+          columns: 40,
+          rows: 12,
+          frames: 2,
+          warmupFrames: 1,
+        },
+      ],
+    });
+
+    expect(report.scenarios).toHaveLength(1);
+    expect(report.scenarios[0]?.medianAvgFrameMs).toBeGreaterThan(0);
+  });
+
   it('can execute synthetic surface and normalize scenarios', () => {
     const report = runRendererBenchmarks({
       sampleCount: 1,
