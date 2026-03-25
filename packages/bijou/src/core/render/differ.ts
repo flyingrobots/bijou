@@ -3,6 +3,7 @@ import type { WritePort, StylePort } from '../../ports/index.js';
 import { graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
+const EMPTY_MODIFIERS: readonly string[] = [];
 
 function hasVisibleStyle(cell: Cell): boolean {
   return cell.fg !== undefined
@@ -256,7 +257,26 @@ export function renderDiff(
         ? currentCells[currentRowOffset + x]!
         : EMPTY_CELL;
 
-      if (isSameCell(targetCell, currentCell)) {
+      const targetMods = targetCell.modifiers ?? EMPTY_MODIFIERS;
+      const currentMods = currentCell.modifiers ?? EMPTY_MODIFIERS;
+      let sameCell = targetCell === currentCell
+        || (
+          targetCell.char === currentCell.char
+          && targetCell.fg === currentCell.fg
+          && targetCell.bg === currentCell.bg
+          && targetCell.empty === currentCell.empty
+          && targetMods.length === currentMods.length
+        );
+      if (sameCell && targetCell !== currentCell && targetMods !== currentMods) {
+        for (let i = 0; i < targetMods.length; i++) {
+          if (targetMods[i] !== currentMods[i]) {
+            sameCell = false;
+            break;
+          }
+        }
+      }
+
+      if (sameCell) {
         x++;
         continue;
       }
@@ -270,14 +290,51 @@ export function renderDiff(
       // and also NEED to be updated.
       let batchX = x;
       let batchText = '';
+      const batchStyleMods = targetMods;
       while (batchX < width) {
         const c = targetCells[targetRowOffset + batchX]!;
         const curr = y < currentHeight && batchX < currentWidth
           ? currentCells[currentRowOffset + batchX]!
           : EMPTY_CELL;
-        
-        if (batchX > x && !isSameStyle(c, targetCell)) break;
-        if (isSameCell(c, curr)) break;
+
+        if (batchX > x) {
+          const cellMods = c.modifiers ?? EMPTY_MODIFIERS;
+          let sameStyle = c === targetCell
+            || (
+              c.fg === targetCell.fg
+              && c.bg === targetCell.bg
+              && cellMods.length === batchStyleMods.length
+            );
+          if (sameStyle && c !== targetCell && cellMods !== batchStyleMods) {
+            for (let i = 0; i < cellMods.length; i++) {
+              if (cellMods[i] !== batchStyleMods[i]) {
+                sameStyle = false;
+                break;
+              }
+            }
+          }
+          if (!sameStyle) break;
+        }
+
+        const cellMods = c.modifiers ?? EMPTY_MODIFIERS;
+        const currMods = curr.modifiers ?? EMPTY_MODIFIERS;
+        let cellsMatch = c === curr
+          || (
+            c.char === curr.char
+            && c.fg === curr.fg
+            && c.bg === curr.bg
+            && c.empty === curr.empty
+            && cellMods.length === currMods.length
+          );
+        if (cellsMatch && c !== curr && cellMods !== currMods) {
+          for (let i = 0; i < cellMods.length; i++) {
+            if (cellMods[i] !== currMods[i]) {
+              cellsMatch = false;
+              break;
+            }
+          }
+        }
+        if (cellsMatch) break;
 
         batchText += c.char;
         batchX++;
@@ -307,23 +364,4 @@ export function renderDiff(
   if (output.length > 0) {
     io.write(output);
   }
-}
-
-/**
- * Compare two cells for style equality only.
- */
-function isSameStyle(a: Cell, b: Cell): boolean {
-  if (a === b) return true;
-  if (a.fg !== b.fg) return false;
-  if (a.bg !== b.bg) return false;
-  
-  const aMods = a.modifiers ?? [];
-  const bMods = b.modifiers ?? [];
-  if (aMods === bMods) return true;
-  if (aMods.length !== bMods.length) return false;
-  for (let i = 0; i < aMods.length; i++) {
-    if (aMods[i] !== bMods[i]) return false;
-  }
-  
-  return true;
 }
