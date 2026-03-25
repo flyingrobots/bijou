@@ -512,14 +512,13 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
     bg: tokens.background,
     empty: false,
   });
-  surface.blit(createLandingBackground(width, height, model.landingTimeMs, tokens), 0, 0);
+  paintLandingBackground(surface, model.landingTimeMs, tokens);
 
   const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
   const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
-  const logo = createLogoSurface(logoWidth, logoHeight, model.landingTimeMs, tokens);
-  const logoX = Math.floor((width - logo.width) / 2);
-  const logoY = Math.floor((height - logo.height) / 2);
-  surface.blit(logo, logoX, logoY);
+  const logoX = Math.floor((width - logoWidth) / 2);
+  const logoY = Math.floor((height - logoHeight) / 2);
+  paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, model.landingTimeMs, tokens);
 
   const wordmarkGlyphs = width >= 110 && height >= 30
     ? FLYING_ROBOTS_LARGE_LINES
@@ -530,7 +529,7 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
 
   const footerY = Math.max(0, height - 1);
   const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
-  const promptMinY = Math.min(height - 1, logoY + logo.height + 1);
+  const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
   const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
   const promptY = promptMaxY >= promptMinY
     ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
@@ -556,16 +555,16 @@ function renderLanding(model: RootModel, ctx: BijouContext): Surface {
   return surface;
 }
 
-function createLandingBackground(
-  width: number,
-  height: number,
+function paintLandingBackground(
+  surface: Surface,
   timeMs: number,
   tokens: LandingThemeTokens,
-): Surface {
+): void {
+  const width = surface.width;
+  const height = surface.height;
   const time = timeMs / 1000;
   const baseX = Math.floor((BACKGROUND_WIDTH - width) / 2);
   const baseY = Math.floor((BACKGROUND_HEIGHT - height) / 2);
-  const surface = createSurface(width, height);
   const widthDenominator = width - 1 || 1;
   const heightDenominator = height - 1 || 1;
 
@@ -582,7 +581,6 @@ function createLandingBackground(
       const sourceY = mod(baseY + y + columnShift, BACKGROUND_HEIGHT);
       const density = BACKGROUND_DENSITY_ROWS[sourceY]?.[sourceX] ?? 0;
       if (density === 0) {
-        surface.set(x, y, { char: ' ', empty: true });
         continue;
       }
 
@@ -592,7 +590,6 @@ function createLandingBackground(
       const level = clamp01(density * wave);
       const char = densityGlyph(level, { airy: true });
       if (char === ' ') {
-        surface.set(x, y, { char: ' ', empty: true });
         continue;
       }
 
@@ -610,30 +607,46 @@ function createLandingBackground(
       });
     }
   }
-
-  return surface;
 }
 
-function createLogoSurface(
+function paintLogoInto(
+  target: Surface,
+  dx: number,
+  dy: number,
   width: number,
   height: number,
   timeMs: number,
   tokens: LandingThemeTokens,
-): Surface {
+): void {
+  const srcX = LOGO_WIDTH > width
+    ? Math.floor((LOGO_WIDTH - width) / 2)
+    : 0;
+  const srcY = LOGO_HEIGHT > height
+    ? Math.floor((LOGO_HEIGHT - height) / 2)
+    : 0;
+  const drawWidth = Math.min(width, LOGO_WIDTH);
+  const drawHeight = Math.min(height, LOGO_HEIGHT);
+  const destX = dx + (LOGO_WIDTH < width ? Math.floor((width - LOGO_WIDTH) / 2) : 0);
+  const destY = dy + (LOGO_HEIGHT < height ? Math.floor((height - LOGO_HEIGHT) / 2) : 0);
   const time = timeMs / 1000;
-  const masked = createSurface(LOGO_WIDTH, LOGO_HEIGHT);
   const widthDenominator = LOGO_WIDTH - 1 || 1;
   const heightDenominator = LOGO_HEIGHT - 1 || 1;
-  for (let y = 0; y < LOGO_HEIGHT; y++) {
-    const lineText = LOGO_PADDED_LINES[y]!;
-    const v = y / heightDenominator;
-    for (let x = 0; x < LOGO_WIDTH; x++) {
-      const sourceChar = lineText[x]!;
-      if (sourceChar === ' ') {
-        masked.set(x, y, { char: ' ', empty: true });
-        continue;
-      }
-      const u = x / widthDenominator;
+
+  for (let y = 0; y < drawHeight; y++) {
+    const sourceY = srcY + y;
+    const lineText = LOGO_PADDED_LINES[sourceY]!;
+    const v = sourceY / heightDenominator;
+    const targetY = destY + y;
+    if (targetY < 0 || targetY >= target.height) continue;
+    for (let x = 0; x < drawWidth; x++) {
+      const sourceX = srcX + x;
+      const targetX = destX + x;
+      if (targetX < 0 || targetX >= target.width) continue;
+
+      const sourceChar = lineText[sourceX]!;
+      if (sourceChar === ' ') continue;
+
+      const u = sourceX / widthDenominator;
       const shimmer = 0.46
         + (Math.sin((u * 7.8) - (v * 5.6) + (time * 2.3)) * 0.24)
         + (Math.cos((u * 3.4) + (v * 9.1) - (time * 1.6)) * 0.18)
@@ -645,7 +658,7 @@ function createLogoSurface(
         + ((1 - v) * 0.14)
         + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
       );
-      masked.set(x, y, {
+      target.set(targetX, targetY, {
         char: reinforceGlyph(sourceChar, shaderChar),
         fg: sampleColorRamp(tokens.logoRamp, colorT),
         modifiers: level > 0.7 ? BOLD_MODIFIERS : undefined,
@@ -653,8 +666,6 @@ function createLogoSurface(
       });
     }
   }
-
-  return centerCropSurface(masked, width, height);
 }
 
 function createWordmarkSurface(
@@ -662,8 +673,6 @@ function createWordmarkSurface(
   timeMs: number,
   tokens: LandingThemeTokens,
 ): Surface {
-  const width = Math.max(1, ...lines.map((lineText) => lineText.length));
-  const height = Math.max(1, lines.length);
   return createTransparentTextSurface(lines, {
     fg: (x, y, char, totalWidth) => {
       if (char === ' ') return undefined;
@@ -679,31 +688,6 @@ function createWordmarkSurface(
 function paragraphSurface(text: string, width: number): Surface {
   const wrapped = wrapToWidth(text, Math.max(1, width));
   return textSurface(wrapped.join('\n'), Math.max(1, width), Math.max(1, wrapped.length));
-}
-
-function centerCropSurface(content: Surface, width: number, height: number): Surface {
-  const targetWidth = Math.max(1, width);
-  const targetHeight = Math.max(1, height);
-  const result = createSurface(targetWidth, targetHeight);
-
-  const srcX = content.width > targetWidth
-    ? Math.floor((content.width - targetWidth) / 2)
-    : 0;
-  const srcY = content.height > targetHeight
-    ? Math.floor((content.height - targetHeight) / 2)
-    : 0;
-
-  const drawWidth = Math.min(targetWidth, content.width);
-  const drawHeight = Math.min(targetHeight, content.height);
-  const destX = content.width < targetWidth
-    ? Math.floor((targetWidth - content.width) / 2)
-    : 0;
-  const destY = content.height < targetHeight
-    ? Math.floor((targetHeight - content.height) / 2)
-    : 0;
-
-  result.blit(content, destX, destY, srcX, srcY, drawWidth, drawHeight);
-  return result;
 }
 
 function densityFromChar(char: string): number {
