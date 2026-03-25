@@ -85,9 +85,27 @@ export async function run<Model, M>(
   let currentDt = 0.016; // Default to 60fps for first frame
   let fatalError: unknown = null;
 
-  // Double Buffering: track what is currently on screen
+  // Double buffering: keep a visible front buffer and a reusable back buffer.
   const initialViewport = runtimeViewport();
   let currentSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
+  let nextSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
+
+  function resetFramebuffers(columns: number, rows: number): void {
+    currentSurface = createSurface(columns, rows);
+    nextSurface = createSurface(columns, rows);
+  }
+
+  function ensureFramebufferSize(columns: number, rows: number): void {
+    if (
+      currentSurface.width === columns
+      && currentSurface.height === rows
+      && nextSurface.width === columns
+      && nextSurface.height === rows
+    ) {
+      return;
+    }
+    resetFramebuffers(columns, rows);
+  }
 
   function routeRuntimeIssue(issue: RuntimeIssue): void {
     const routed = app.routeRuntimeIssue?.(issue);
@@ -163,7 +181,9 @@ export async function run<Model, M>(
 
   // Add default Output stage (sync current surface)
   pipeline.use('Output', (state, next) => {
-    currentSurface = state.targetSurface.clone();
+    const previousFront = state.currentSurface;
+    currentSurface = state.targetSurface;
+    nextSurface = previousFront;
     next();
   });
 
@@ -208,17 +228,18 @@ export async function run<Model, M>(
     scheduledHandle = clock.setTimeout(() => {
       try {
         const viewport = runtimeViewport();
-        const targetSurface = createSurface(
+        ensureFramebufferSize(
           viewport.columns,
           viewport.rows,
         );
+        nextSurface.clear();
 
         const renderState: RenderState = {
           model,
           ctx,
           dt: currentDt,
           currentSurface,
-          targetSurface,
+          targetSurface: nextSurface,
           layoutMap: new Map(),
           data: {},
         };
@@ -276,7 +297,7 @@ export async function run<Model, M>(
 
     if (isResizeMsg(msg)) {
       const viewport = updateRuntimeViewport(ctx.runtime, msg.columns, msg.rows);
-      currentSurface = createSurface(
+      resetFramebuffers(
         viewport.columns,
         viewport.rows,
       );
@@ -313,7 +334,7 @@ export async function run<Model, M>(
   // After a potential resize in update, ensure currentSurface matches size
   // to avoid diffing mismatched grids.
   const postResizeViewport = runtimeViewport();
-  currentSurface = createSurface(postResizeViewport.columns, postResizeViewport.rows);
+  resetFramebuffers(postResizeViewport.columns, postResizeViewport.rows);
 
   // Initial render + startup commands
   render();

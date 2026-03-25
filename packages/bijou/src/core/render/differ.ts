@@ -2,6 +2,8 @@ import { createSurface, type Surface, type Cell, type LayoutNode } from '../../p
 import type { WritePort, StylePort } from '../../ports/index.js';
 import { graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
 
+const EMPTY_CELL: Cell = { char: ' ', empty: true };
+
 /**
  * Convert a multi-line string into a Surface.
  *
@@ -226,16 +228,25 @@ export function renderDiff(
 ): void {
   const width = target.width;
   const height = target.height;
+  const targetCells = target.cells;
+  const currentCells = current.cells;
+  const currentWidth = current.width;
+  const currentHeight = current.height;
 
   let output = '';
   let cursorX = -1;
   let cursorY = -1;
+  const token: { hex?: string; bg?: string; modifiers?: Cell['modifiers'] } = {};
 
   for (let y = 0; y < height; y++) {
+    const targetRowOffset = y * width;
+    const currentRowOffset = y * currentWidth;
     let x = 0;
     while (x < width) {
-      const targetCell = target.get(x, y);
-      const currentCell = current.get(x, y);
+      const targetCell = targetCells[targetRowOffset + x]!;
+      const currentCell = y < currentHeight && x < currentWidth
+        ? currentCells[currentRowOffset + x]!
+        : EMPTY_CELL;
 
       if (isSameCell(targetCell, currentCell)) {
         x++;
@@ -252,8 +263,10 @@ export function renderDiff(
       let batchX = x;
       let batchText = '';
       while (batchX < width) {
-        const c = target.get(batchX, y);
-        const curr = current.get(batchX, y);
+        const c = targetCells[targetRowOffset + batchX]!;
+        const curr = y < currentHeight && batchX < currentWidth
+          ? currentCells[currentRowOffset + batchX]!
+          : EMPTY_CELL;
         
         if (batchX > x && !isSameStyle(c, targetCell)) break;
         if (isSameCell(c, curr)) break;
@@ -263,11 +276,9 @@ export function renderDiff(
       }
 
       // Render the batch
-      const token = {
-        hex: targetCell.fg,
-        bg: targetCell.bg,
-        modifiers: targetCell.modifiers as any,
-      };
+      token.hex = targetCell.fg;
+      token.bg = targetCell.bg;
+      token.modifiers = targetCell.modifiers as any;
 
       output += style.styled(token as any, batchText);
 

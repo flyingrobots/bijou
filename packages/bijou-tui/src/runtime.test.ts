@@ -529,5 +529,45 @@ describe('run', () => {
       const clearWrites = ctx.io.written.filter((chunk) => chunk === '\x1b[1;1H ');
       expect(clearWrites).toHaveLength(1);
     });
+
+    it('reuses two framebuffers across steady-state renders', async () => {
+      const seen: Array<{ current: object; target: object }> = [];
+
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'pulse' && model < 2) return [model + 1, []];
+          if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
+          return [model, []];
+        },
+        view: (model) => textView(`count: ${model}`),
+      };
+
+      const { clock, ctx } = createInteractiveContext({ runtime: { refreshRate: 60 } });
+      scheduleKeys(ctx, clock, [{ at: 60, key: 'q' }]);
+
+      const promise = run(app, {
+        ctx,
+        configurePipeline(pipeline) {
+          pipeline.use('Output', (state, next) => {
+            seen.push({
+              current: state.currentSurface,
+              target: state.targetSurface,
+            });
+            next();
+          });
+        },
+      });
+
+      await clock.advanceByAsync(120);
+      await promise;
+
+      expect(seen.length).toBeGreaterThanOrEqual(3);
+      expect(seen[1]?.current).toBe(seen[0]?.target);
+      expect(seen[2]?.current).toBe(seen[1]?.target);
+
+      const uniqueTargets = new Set(seen.map((entry) => entry.target));
+      expect(uniqueTargets.size).toBeLessThanOrEqual(2);
+    });
   });
 });
