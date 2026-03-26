@@ -160,6 +160,15 @@ interface LandingToastState {
   readonly expiresAtMs: number;
 }
 
+interface LandingQualityProfile {
+  readonly id: string;
+  readonly maxArea: number;
+  readonly frameStepMs: number;
+  readonly fpsStep: number;
+  readonly backgroundTile: number;
+  readonly logoTile: number;
+}
+
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
@@ -171,6 +180,11 @@ const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerVersion: Surface;
 }>();
 const LANDING_FPS_BADGE_CACHE = new Map<string, Surface>();
+interface LandingFrameCache {
+  key?: string;
+  front?: Surface;
+  back?: Surface;
+}
 const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   {
     id: 'storybook-workstation',
@@ -209,6 +223,32 @@ const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
   },
  ] as const;
 const LANDING_THEMES: readonly LandingThemeTokens[] = LANDING_THEME_SEEDS.map(compileLandingTheme);
+const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
+  {
+    id: 'full',
+    maxArea: 14_000,
+    frameStepMs: 16,
+    fpsStep: 1,
+    backgroundTile: 1,
+    logoTile: 1,
+  },
+  {
+    id: 'balanced',
+    maxArea: 28_000,
+    frameStepMs: 33,
+    fpsStep: 2,
+    backgroundTile: 2,
+    logoTile: 1,
+  },
+  {
+    id: 'ultra',
+    maxArea: Number.POSITIVE_INFINITY,
+    frameStepMs: 50,
+    fpsStep: 5,
+    backgroundTile: 3,
+    logoTile: 1,
+  },
+] as const;
 const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
   const row = new Float32Array(BACKGROUND_WIDTH);
   for (let x = 0; x < BACKGROUND_WIDTH; x++) {
@@ -503,55 +543,100 @@ function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplor
   };
 }
 
-function renderLanding(model: RootModel, ctx: BijouContext): Surface {
-  const width = Math.max(1, model.columns);
-  const height = Math.max(1, model.rows);
-  const tokens = resolveLandingTheme(model.landingThemeIndex);
-  const surface = createSurface(width, height, {
+function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface {
+  const cache: LandingFrameCache = {};
+
+  return (model: RootModel): Surface => {
+    const width = Math.max(1, model.columns);
+    const height = Math.max(1, model.rows);
+    const tokens = resolveLandingTheme(model.landingThemeIndex);
+    const quality = resolveLandingQuality(width, height);
+    const quantizedTimeMs = Math.floor(model.landingTimeMs / quality.frameStepMs) * quality.frameStepMs;
+    const fpsBadgeValue = quantizeLandingFps(quality, model.landingFps);
+    const hasToast = model.landingToast != null && model.landingTimeMs < model.landingToast.expiresAtMs;
+    const cacheKey = [
+      width,
+      height,
+      tokens.id,
+      quality.id,
+      quantizedTimeMs,
+      fpsBadgeValue,
+      hasToast ? model.landingToast?.message ?? '' : '',
+    ].join(':');
+
+    if (cache.key === cacheKey && cache.front != null) {
+      return cache.front;
+    }
+
+    const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
+    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
+
+    const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
+    const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
+    const logoX = Math.floor((width - logoWidth) / 2);
+    const logoY = Math.floor((height - logoHeight) / 2);
+    paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, quantizedTimeMs, tokens, quality);
+
+    const wordmarkGlyphs = width >= 110 && height >= 30
+      ? FLYING_ROBOTS_LARGE_LINES
+      : FLYING_ROBOTS_SMALL_LINES;
+    const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
+    const staticSurfaces = getLandingStaticSurfaces(tokens);
+    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue);
+
+    const footerY = Math.max(0, height - 1);
+    const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
+    const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
+    const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
+    const promptY = promptMaxY >= promptMinY
+      ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
+      : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
+
+    surface.blit(fpsBadge, 0, 0);
+    blitCentered(surface, staticSurfaces.promptLine, promptY);
+    blitCentered(surface, wordmark, wordmarkY);
+    surface.blit(staticSurfaces.footerControls, 0, footerY);
+    surface.blit(staticSurfaces.footerVersion, Math.max(0, width - staticSurfaces.footerVersion.width), footerY);
+
+    const output = hasToast
+      ? compositeSurface(surface, [toast({
+          message: model.landingToast!.message,
+          variant: 'info',
+          anchor: 'top-right',
+          screenWidth: width,
+          screenHeight: height,
+          ctx,
+        })])
+      : surface;
+
+    cache.key = cacheKey;
+    cache.back = cache.front;
+    cache.front = output;
+    return output;
+  };
+}
+
+function prepareLandingSurface(
+  scratch: Surface | undefined,
+  width: number,
+  height: number,
+  background: string,
+): Surface {
+  const surface = scratch != null && scratch.width === width && scratch.height === height
+    ? scratch
+    : createSurface(width, height, {
+        char: ' ',
+        bg: background,
+        empty: false,
+      });
+  surface.fill({
     char: ' ',
-    bg: tokens.background,
+    bg: background,
     empty: false,
+    fg: undefined,
+    modifiers: undefined,
+    opacity: 1,
   });
-  paintLandingBackground(surface, model.landingTimeMs, tokens);
-
-  const logoWidth = Math.max(1, Math.min(LOGO_WIDTH, width - Math.min(12, Math.max(4, Math.floor(width * 0.08)))));
-  const logoHeight = Math.max(1, Math.min(LOGO_HEIGHT, height - Math.min(8, Math.max(3, Math.floor(height * 0.12)))));
-  const logoX = Math.floor((width - logoWidth) / 2);
-  const logoY = Math.floor((height - logoHeight) / 2);
-  paintLogoInto(surface, logoX, logoY, logoWidth, logoHeight, model.landingTimeMs, tokens);
-
-  const wordmarkGlyphs = width >= 110 && height >= 30
-    ? FLYING_ROBOTS_LARGE_LINES
-    : FLYING_ROBOTS_SMALL_LINES;
-  const wordmark = createWordmarkSurface(wordmarkGlyphs, model.landingTimeMs, tokens);
-  const staticSurfaces = getLandingStaticSurfaces(tokens);
-  const fpsBadge = getLandingFpsBadge(tokens, model.landingFps);
-
-  const footerY = Math.max(0, height - 1);
-  const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
-  const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
-  const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
-  const promptY = promptMaxY >= promptMinY
-    ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
-    : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
-
-  surface.blit(fpsBadge, 0, 0);
-  blitCentered(surface, staticSurfaces.promptLine, promptY);
-  blitCentered(surface, wordmark, wordmarkY);
-  surface.blit(staticSurfaces.footerControls, 0, footerY);
-  surface.blit(staticSurfaces.footerVersion, Math.max(0, width - staticSurfaces.footerVersion.width), footerY);
-
-  if (model.landingToast && model.landingTimeMs < model.landingToast.expiresAtMs) {
-    return compositeSurface(surface, [toast({
-      message: model.landingToast.message,
-      variant: 'info',
-      anchor: 'top-right',
-      screenWidth: width,
-      screenHeight: height,
-      ctx,
-    })]);
-  }
-
   return surface;
 }
 
@@ -559,6 +644,7 @@ function paintLandingBackground(
   surface: Surface,
   timeMs: number,
   tokens: LandingThemeTokens,
+  quality: LandingQualityProfile,
 ): void {
   const width = surface.width;
   const height = surface.height;
@@ -568,25 +654,30 @@ function paintLandingBackground(
   const widthDenominator = width - 1 || 1;
   const heightDenominator = height - 1 || 1;
 
-  for (let y = 0; y < height; y++) {
-    const v = y / heightDenominator;
+  const cells = surface.cells;
+  const tile = quality.backgroundTile;
+
+  for (let tileY = 0; tileY < height; tileY += tile) {
+    const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
+    const v = sampleY / heightDenominator;
     const rowShift = Math.round(
-      (Math.sin((y * 0.075) + (time * 0.7)) * 18)
-      + (Math.cos((y * 0.03) - (time * 0.35)) * 7),
+      (Math.sin((sampleY * 0.075) + (time * 0.7)) * 18)
+      + (Math.cos((sampleY * 0.03) - (time * 0.35)) * 7),
     );
-    for (let x = 0; x < width; x++) {
-      const u = x / widthDenominator;
-      const columnShift = Math.round(Math.sin((x * 0.028) + (time * 0.42)) * 2);
-      const sourceX = mod(baseX + x + rowShift, BACKGROUND_WIDTH);
-      const sourceY = mod(baseY + y + columnShift, BACKGROUND_HEIGHT);
+    for (let tileX = 0; tileX < width; tileX += tile) {
+      const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
+      const u = sampleX / widthDenominator;
+      const columnShift = Math.round(Math.sin((sampleX * 0.028) + (time * 0.42)) * 2);
+      const sourceX = mod(baseX + sampleX + rowShift, BACKGROUND_WIDTH);
+      const sourceY = mod(baseY + sampleY + columnShift, BACKGROUND_HEIGHT);
       const density = BACKGROUND_DENSITY_ROWS[sourceY]?.[sourceX] ?? 0;
       if (density === 0) {
         continue;
       }
 
       const wave = 0.54
-        + (Math.sin((x * 0.042) + (y * 0.016) + (time * 1.45)) * 0.24)
-        + (Math.cos((x * 0.012) - (y * 0.085) + (time * 0.95)) * 0.22);
+        + (Math.sin((sampleX * 0.042) + (sampleY * 0.016) + (time * 1.45)) * 0.24)
+        + (Math.cos((sampleX * 0.012) - (sampleY * 0.085) + (time * 0.95)) * 0.22);
       const level = clamp01(density * wave);
       const char = densityGlyph(level, { airy: true });
       if (char === ' ') {
@@ -596,15 +687,19 @@ function paintLandingBackground(
       const colorT = clamp01(
         (u * 0.66)
         + (0.22 * (0.5 + (Math.sin((time * 0.3) + (v * 5.2)) * 0.5)))
-        + (0.08 * Math.sin((time * 0.55) + (x * 0.02))),
+        + (0.08 * Math.sin((time * 0.55) + (sampleX * 0.02))),
       );
+      const fg = sampleColorRamp(tokens.waveRamp, colorT);
+      const modifiers = level < 0.52 ? DIM_MODIFIERS : undefined;
+      const maxY = Math.min(height, tileY + tile);
+      const maxX = Math.min(width, tileX + tile);
 
-      surface.set(x, y, {
-        char,
-        fg: sampleColorRamp(tokens.waveRamp, colorT),
-        modifiers: level < 0.52 ? DIM_MODIFIERS : undefined,
-        empty: false,
-      });
+      for (let y = tileY; y < maxY; y++) {
+        const rowOffset = y * width;
+        for (let x = tileX; x < maxX; x++) {
+          applyOpaqueCell(cells[rowOffset + x]!, char, fg, modifiers);
+        }
+      }
     }
   }
 }
@@ -617,6 +712,7 @@ function paintLogoInto(
   height: number,
   timeMs: number,
   tokens: LandingThemeTokens,
+  quality: LandingQualityProfile,
 ): void {
   const srcX = LOGO_WIDTH > width
     ? Math.floor((LOGO_WIDTH - width) / 2)
@@ -632,17 +728,16 @@ function paintLogoInto(
   const widthDenominator = LOGO_WIDTH - 1 || 1;
   const heightDenominator = LOGO_HEIGHT - 1 || 1;
 
-  for (let y = 0; y < drawHeight; y++) {
-    const sourceY = srcY + y;
+  const cells = target.cells;
+  const tile = quality.logoTile;
+
+  for (let tileY = 0; tileY < drawHeight; tileY += tile) {
+    const sourceY = srcY + Math.min(drawHeight - 1, tileY + Math.floor(tile / 2));
     const lineText = LOGO_PADDED_LINES[sourceY]!;
     const v = sourceY / heightDenominator;
-    const targetY = destY + y;
-    if (targetY < 0 || targetY >= target.height) continue;
-    for (let x = 0; x < drawWidth; x++) {
-      const sourceX = srcX + x;
-      const targetX = destX + x;
-      if (targetX < 0 || targetX >= target.width) continue;
-
+    const maxY = Math.min(drawHeight, tileY + tile);
+    for (let tileX = 0; tileX < drawWidth; tileX += tile) {
+      const sourceX = srcX + Math.min(drawWidth - 1, tileX + Math.floor(tile / 2));
       const sourceChar = lineText[sourceX]!;
       if (sourceChar === ' ') continue;
 
@@ -658,12 +753,21 @@ function paintLogoInto(
         + ((1 - v) * 0.14)
         + (0.08 * Math.sin((time * 0.9) + (u * 5.2))),
       );
-      target.set(targetX, targetY, {
-        char: reinforceGlyph(sourceChar, shaderChar),
-        fg: sampleColorRamp(tokens.logoRamp, colorT),
-        modifiers: level > 0.7 ? BOLD_MODIFIERS : undefined,
-        empty: false,
-      });
+      const glyph = reinforceGlyph(sourceChar, shaderChar);
+      const fg = sampleColorRamp(tokens.logoRamp, colorT);
+      const modifiers = level > 0.7 ? BOLD_MODIFIERS : undefined;
+      const maxX = Math.min(drawWidth, tileX + tile);
+
+      for (let y = tileY; y < maxY; y++) {
+        const targetY = destY + y;
+        if (targetY < 0 || targetY >= target.height) continue;
+        const rowOffset = targetY * target.width;
+        for (let x = tileX; x < maxX; x++) {
+          const targetX = destX + x;
+          if (targetX < 0 || targetX >= target.width) continue;
+          applyOpaqueCell(cells[rowOffset + targetX]!, glyph, fg, modifiers);
+        }
+      }
     }
   }
 }
@@ -730,6 +834,29 @@ function reinforceGlyph(source: string, shaderChar: string): string {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+function resolveLandingQuality(width: number, height: number): LandingQualityProfile {
+  const area = width * height;
+  return LANDING_QUALITY_PROFILES.find((profile) => area <= profile.maxArea) ?? LANDING_QUALITY_PROFILES[LANDING_QUALITY_PROFILES.length - 1]!;
+}
+
+function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number {
+  if (quality.fpsStep <= 1) return fps;
+  return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
+}
+
+function applyOpaqueCell(
+  target: { char: string; fg?: string; modifiers?: string[]; empty?: boolean; opacity?: number },
+  char: string,
+  fg: string,
+  modifiers?: readonly string[],
+): void {
+  target.char = char;
+  target.fg = fg;
+  target.modifiers = modifiers as string[] | undefined;
+  target.empty = false;
+  target.opacity = 1;
 }
 
 function resolveLandingTheme(index: number): LandingThemeTokens {
@@ -1282,6 +1409,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
 
 export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
   const explorer = createDocsExplorerApp(ctx);
+  const renderLanding = createLandingRenderer(ctx);
 
   function mapExplorer(cmds: Cmd<ExplorerMsg>[]): Cmd<RootMsg>[] {
     return mapCmds(cmds, (msg) => ({ type: 'docs', msg }));
@@ -1365,7 +1493,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
 
     view(model) {
       if (model.route === 'landing') {
-        return renderLanding(model, ctx);
+        return renderLanding(model);
       }
       return explorer.view(model.docsModel);
     },

@@ -117,6 +117,18 @@ describe('docs preview app', () => {
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(pulsed.frames[pulsed.frames.length - 1]!));
   });
 
+  it('reuses giant landing frames across small pulses within the same quality bucket', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 400, rows: 120, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const initial = await runScript(app, [], { ctx });
+    const tinyPulse = await runScript(app, [{ pulse: { dt: 1 / 60 } }], { ctx });
+    const steppedPulse = await runScript(app, [{ pulse: { dt: 0.12 } }], { ctx });
+
+    expect(serializeFrame(initial.frames[0]!)).toEqual(serializeFrame(tinyPulse.frames[tinyPulse.frames.length - 1]!));
+    expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(steppedPulse.frames[steppedPulse.frames.length - 1]!));
+  });
+
   it('updates the landing refresh-rate readout from pulse cadence', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
