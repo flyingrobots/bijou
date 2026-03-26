@@ -101,6 +101,7 @@ interface DocsExplorerModel {
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly showHints: boolean;
+  readonly landingQualityMode: LandingQualityMode;
 }
 
 type ExplorerMsg =
@@ -117,7 +118,8 @@ type ExplorerMsg =
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
-  | { type: 'toggle-hints' };
+  | { type: 'toggle-hints' }
+  | { type: 'cycle-landing-quality' };
 
 interface RootModel {
   readonly route: 'landing' | 'docs';
@@ -168,6 +170,8 @@ interface LandingQualityProfile {
   readonly backgroundTile: number;
   readonly logoTile: number;
 }
+
+type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const LANDING_FPS_ALPHA = 0.2;
@@ -326,6 +330,7 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
     showHints: true,
+    landingQualityMode: 'auto',
   };
 }
 
@@ -550,7 +555,8 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
     const width = Math.max(1, model.columns);
     const height = Math.max(1, model.rows);
     const tokens = resolveLandingTheme(model.landingThemeIndex);
-    const quality = resolveLandingQuality(width, height);
+    const qualityMode = resolveLandingQualityMode(model);
+    const quality = resolveLandingQuality(width, height, qualityMode);
     const quantizedTimeMs = Math.floor(model.landingTimeMs / quality.frameStepMs) * quality.frameStepMs;
     const fpsBadgeValue = quantizeLandingFps(quality, model.landingFps);
     const hasToast = model.landingToast != null && model.landingTimeMs < model.landingToast.expiresAtMs;
@@ -558,6 +564,7 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       width,
       height,
       tokens.id,
+      qualityMode,
       quality.id,
       quantizedTimeMs,
       fpsBadgeValue,
@@ -582,7 +589,7 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens);
-    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality);
+    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode);
 
     const footerY = Math.max(0, height - 1);
     const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
@@ -836,7 +843,15 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
-function resolveLandingQuality(width: number, height: number): LandingQualityProfile {
+function resolveLandingQuality(width: number, height: number, mode: LandingQualityMode = 'auto'): LandingQualityProfile {
+  if (mode !== 'auto') {
+    const forced = LANDING_QUALITY_PROFILES.find((profile) => (
+      (mode === 'quality' && profile.id === 'full')
+      || (mode === 'balanced' && profile.id === 'balanced')
+      || (mode === 'performance' && profile.id === 'ultra')
+    ));
+    if (forced != null) return forced;
+  }
   const area = width * height;
   return LANDING_QUALITY_PROFILES.find((profile) => area <= profile.maxArea) ?? LANDING_QUALITY_PROFILES[LANDING_QUALITY_PROFILES.length - 1]!;
 }
@@ -846,7 +861,7 @@ function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number
   return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
 }
 
-function landingQualityBadgeLabel(quality: LandingQualityProfile): string {
+function landingQualityProfileLabel(quality: LandingQualityProfile): string {
   switch (quality.id) {
     case 'full':
       return 'full';
@@ -857,6 +872,55 @@ function landingQualityBadgeLabel(quality: LandingQualityProfile): string {
     default:
       return quality.id;
   }
+}
+
+function landingQualityModeLabel(mode: LandingQualityMode): string {
+  switch (mode) {
+    case 'auto':
+      return 'Auto';
+    case 'quality':
+      return 'Quality';
+    case 'balanced':
+      return 'Balanced';
+    case 'performance':
+      return 'Performance';
+  }
+}
+
+function landingQualityBadgeLabel(
+  quality: LandingQualityProfile,
+  mode: LandingQualityMode,
+): string {
+  if (mode === 'auto') {
+    return `auto/${landingQualityProfileLabel(quality)}`;
+  }
+  return landingQualityModeLabel(mode).toLowerCase();
+}
+
+function nextLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
+  switch (mode) {
+    case 'auto':
+      return 'quality';
+    case 'quality':
+      return 'balanced';
+    case 'balanced':
+      return 'performance';
+    case 'performance':
+      return 'auto';
+  }
+}
+
+function landingQualitySettingValue(
+  width: number,
+  height: number,
+  mode: LandingQualityMode,
+): string {
+  if (mode !== 'auto') return landingQualityModeLabel(mode);
+  return `${landingQualityModeLabel(mode)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode))})`;
+}
+
+function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
+  return model.docsModel.pageModels[DOCS_PAGE_ID]?.landingQualityMode ?? 'auto';
 }
 
 function applyOpaqueCell(
@@ -928,9 +992,14 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens): {
   return surfaces;
 }
 
-function getLandingFpsBadge(tokens: LandingThemeTokens, fps: number, quality: LandingQualityProfile): Surface {
-  const qualityLabel = landingQualityBadgeLabel(quality);
-  const key = `${tokens.id}:${fps}:${quality.id}`;
+function getLandingFpsBadge(
+  tokens: LandingThemeTokens,
+  fps: number,
+  quality: LandingQualityProfile,
+  mode: LandingQualityMode,
+): Surface {
+  const qualityLabel = landingQualityBadgeLabel(quality, mode);
+  const key = `${tokens.id}:${fps}:${quality.id}:${mode}`;
   const cached = LANDING_FPS_BADGE_CACHE.get(key);
   if (cached) return cached;
 
@@ -1344,6 +1413,8 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [{ ...model, profileMode: msg.mode }, []];
           case 'toggle-hints':
             return [{ ...model, showHints: !model.showHints }, []];
+          case 'cycle-landing-quality':
+            return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
         }
       },
       inputAreas(model) {
@@ -1404,19 +1475,32 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
       },
     }],
     enableCommandPalette: true,
-    settings: ({ pageModel }) => ({
+    settings: ({ model, pageModel }) => ({
       title: 'Settings',
-      sections: [{
-        id: 'shell',
-        title: 'Shell',
-        rows: [{
-          id: 'show-hints',
-          label: 'Show hints',
-          valueLabel: pageModel.showHints ? 'On' : 'Off',
-          kind: 'toggle',
-          action: { type: 'toggle-hints' },
-        }],
-      }],
+      sections: [
+        {
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: pageModel.showHints ? 'On' : 'Off',
+            kind: 'toggle',
+            action: { type: 'toggle-hints' },
+          }],
+        },
+        {
+          id: 'landing',
+          title: 'Landing',
+          rows: [{
+            id: 'landing-quality',
+            label: 'Landing quality',
+            valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
+            kind: 'choice',
+            action: { type: 'cycle-landing-quality' },
+          }],
+        },
+      ],
     }),
   });
 }

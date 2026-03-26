@@ -83,7 +83,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Press [Enter]');
     expect(text).toContain('Esc/q quit • any key continue');
     expect(text).toContain('v4.0.0');
-    expect(text).toContain('73 fps • full');
+    expect(text).toContain('73 fps • auto/full');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -127,7 +127,7 @@ describe('docs preview app', () => {
 
     expect(serializeFrame(initial.frames[0]!)).toEqual(serializeFrame(tinyPulse.frames[tinyPulse.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(steppedPulse.frames[steppedPulse.frames.length - 1]!));
-    expect(frameText(initial.frames[0]!)).toContain('60 fps • performance');
+    expect(frameText(initial.frames[0]!)).toContain('60 fps • auto/performance');
   });
 
   it('updates the landing refresh-rate readout from pulse cadence', async () => {
@@ -137,7 +137,7 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
     expect((pulsed.model as any).landingFps).toBe(54);
-    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps • full');
+    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps • auto/full');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {
@@ -216,7 +216,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Confirm deploy');
   });
 
-  it('opens the standard shell settings drawer with F2 and toggles a visible DOGFOOD preference', async () => {
+  it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -234,6 +234,18 @@ describe('docs preview app', () => {
     if (commandResult !== undefined && commandResult !== QUIT) {
       model = app.update(commandResult as any, model)[0] as any;
     }
+    updateResult = app.update(keyMsg('down') as any, model);
+    model = updateResult[0] as any;
+    updateResult = app.update(keyMsg('enter') as any, model);
+    model = updateResult[0] as any;
+    const secondCommandResult = await updateResult[1][0]!(() => {}, {
+      onPulse() {
+        return { dispose() {} };
+      },
+    });
+    if (secondCommandResult !== undefined && secondCommandResult !== QUIT) {
+      model = app.update(secondCommandResult as any, model)[0] as any;
+    }
     updateResult = app.update(keyMsg('escape') as any, model);
     model = updateResult[0] as any;
 
@@ -245,9 +257,16 @@ describe('docs preview app', () => {
     const pageModel = model.docsModel.pageModels['dogfood'];
     expect(model.docsModel.settingsOpen).toBe(false);
     expect(pageModel.showHints).toBe(false);
+    expect(pageModel.landingQualityMode).toBe('quality');
     expect(text).not.toContain('↑/↓ browse • Enter open • Tab next pane');
     expect(text).not.toContain(',/. cycle • 1-4 profiles');
     expect(text).not.toContain('scroll: j/k • d/u • g/G • mouse wheel');
+
+    const landingFrame = normalizeViewOutput(app.view({ ...model, route: 'landing' }), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    expect(frameText(landingFrame)).toContain('60 fps • quality');
   });
 
   it('shows accordion-style family headers without the oversized custom help strip', async () => {
