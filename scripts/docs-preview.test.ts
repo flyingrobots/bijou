@@ -83,7 +83,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Press [Enter]');
     expect(text).toContain('Esc/q quit • any key continue');
     expect(text).toContain('v4.0.0');
-    expect(text).toContain('73 fps');
+    expect(text).toContain('73 fps • full');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -127,6 +127,7 @@ describe('docs preview app', () => {
 
     expect(serializeFrame(initial.frames[0]!)).toEqual(serializeFrame(tinyPulse.frames[tinyPulse.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(steppedPulse.frames[steppedPulse.frames.length - 1]!));
+    expect(frameText(initial.frames[0]!)).toContain('60 fps • performance');
   });
 
   it('updates the landing refresh-rate readout from pulse cadence', async () => {
@@ -136,7 +137,7 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
     expect((pulsed.model as any).landingFps).toBe(54);
-    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps');
+    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps • full');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {

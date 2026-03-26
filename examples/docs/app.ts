@@ -582,7 +582,7 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens);
-    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue);
+    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality);
 
     const footerY = Math.max(0, height - 1);
     const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
@@ -846,6 +846,19 @@ function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number
   return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
 }
 
+function landingQualityBadgeLabel(quality: LandingQualityProfile): string {
+  switch (quality.id) {
+    case 'full':
+      return 'full';
+    case 'balanced':
+      return 'balanced';
+    case 'ultra':
+      return 'performance';
+    default:
+      return quality.id;
+  }
+}
+
 function applyOpaqueCell(
   target: { char: string; fg?: string; modifiers?: string[]; empty?: boolean; opacity?: number },
   char: string,
@@ -915,12 +928,13 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens): {
   return surfaces;
 }
 
-function getLandingFpsBadge(tokens: LandingThemeTokens, fps: number): Surface {
-  const key = `${tokens.id}:${fps}`;
+function getLandingFpsBadge(tokens: LandingThemeTokens, fps: number, quality: LandingQualityProfile): Surface {
+  const qualityLabel = landingQualityBadgeLabel(quality);
+  const key = `${tokens.id}:${fps}:${quality.id}`;
   const cached = LANDING_FPS_BADGE_CACHE.get(key);
   if (cached) return cached;
 
-  const surface = createTransparentTextSurface(`${fps} fps`, {
+  const surface = createTransparentTextSurface(`${fps} fps • ${qualityLabel}`, {
     bg: tokens.background,
     transparentSpaces: false,
     fg: tokens.fpsColor,
