@@ -599,11 +599,17 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
       : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
 
-    surface.blit(fpsBadge, 0, 0);
     blitCentered(surface, staticSurfaces.promptLine, promptY);
     blitCentered(surface, wordmark, wordmarkY);
     surface.blit(staticSurfaces.footerControls, 0, footerY);
-    surface.blit(staticSurfaces.footerVersion, Math.max(0, width - staticSurfaces.footerVersion.width), footerY);
+    const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
+    const footerBadgeX = Math.floor((width - fpsBadge.width) / 2);
+    const footerBadgeMinX = staticSurfaces.footerControls.width + 2;
+    const footerBadgeMaxX = footerVersionX - fpsBadge.width - 2;
+    if (footerBadgeMinX <= footerBadgeMaxX) {
+      surface.blit(fpsBadge, Math.max(footerBadgeMinX, Math.min(footerBadgeX, footerBadgeMaxX)), footerY);
+    }
+    surface.blit(staticSurfaces.footerVersion, footerVersionX, footerY);
 
     const output = hasToast
       ? compositeSurface(surface, [toast({

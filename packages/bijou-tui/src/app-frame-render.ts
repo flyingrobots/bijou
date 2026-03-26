@@ -389,7 +389,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   };
 }
 
-/** Render the bottom status line showing mode, focused pane, and key hints. */
+/** Render the footer status line showing mode, focused pane, and key hints. */
 export function renderHelpLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   frameKeys: KeyMap<FrameAction>,
@@ -423,7 +423,13 @@ export function renderHelpLine<PageModel, Msg>(
       activePage.helpSource ?? activePage.keyMap,
     ));
   const line = hint.length > 0
-    ? ` ${status}  ${hint}`
+    ? (() => {
+        const statusWithPadding = ` ${status}`;
+        const gap = model.columns - visibleLength(statusWithPadding) - visibleLength(hint);
+        return gap >= 2
+          ? `${statusWithPadding}${' '.repeat(gap)}${hint}`
+          : `${statusWithPadding}  ${hint}`;
+      })()
     : ` ${status}`;
   return createStyledTextSurfaceWithBCSS(fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
     type: 'FrameHelp',

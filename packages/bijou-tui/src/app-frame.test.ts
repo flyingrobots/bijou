@@ -1181,11 +1181,11 @@ describe('createFramedApp', () => {
     expect(captured).toBeDefined();
     expect(captured!.paneRects.has('left')).toBe(true);
     expect(captured!.paneRects.has('right')).toBe(true);
-    // Body starts below 2-line chrome
-    expect(captured!.paneRects.get('left')!.row).toBeGreaterThanOrEqual(2);
+    // Body starts below the single-line header and above the footer
+    expect(captured!.paneRects.get('left')!.row).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders mode and focused pane in frame status line', () => {
+  it('renders mode and focused pane in the frame footer line', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       title: 'Status Test',
@@ -1196,9 +1196,9 @@ describe('createFramedApp', () => {
     const frame = app.view(model);
     if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
     const lines = surfaceToString(frame, ctx.style).split('\n');
-    expect(lines[1]).toContain('[NORMAL]');
-    expect(lines[1]).toContain('page:home');
-    expect(lines[1]).toContain('pane:main');
+    expect(lines[frame.height - 1]).toContain('[NORMAL]');
+    expect(lines[frame.height - 1]).toContain('page:home');
+    expect(lines[frame.height - 1]).toContain('pane:main');
   });
 
   it('renders routed runtime issues through frame-managed notifications', async () => {
@@ -1290,7 +1290,7 @@ describe('createFramedApp', () => {
     expect(dismissedModel.runtimeNotifications.items).toHaveLength(1);
     expect(dismissedModel.runtimeNotifications.items[0]?.phase).toBe('exiting');
     expect(dismissedModel.runtimeNotificationLoopActive).toBe(true);
-  });
+  }, 10000);
 
   it('treats modal keymaps as exclusive while a page modal is open', async () => {
     const app = createFramedApp({

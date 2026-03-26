@@ -1088,7 +1088,7 @@ export function createFramedApp<PageModel, Msg>(
       frameSurface.clear();
       frameSurface.blit(header, 0, 0);
       if (model.rows > 1) {
-        frameSurface.blit(helpLine, 0, 1);
+        frameSurface.blit(helpLine, 0, model.rows - 1);
       }
 
       let activeResult: { paneRects: ReadonlyMap<string, LayoutRect>; paneOrder: readonly string[] };

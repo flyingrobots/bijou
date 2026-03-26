@@ -80,10 +80,14 @@ describe('docs preview app', () => {
       text += '\n';
     }
 
+    const lines = text.split('\n');
+    const footer = lines[frame.height - 1] ?? '';
+
     expect(text).toContain('Press [Enter]');
-    expect(text).toContain('Esc/q quit • any key continue');
-    expect(text).toContain('v4.0.0');
-    expect(text).toContain('73 fps • auto/full');
+    expect(footer).toContain('Esc/q quit • any key continue');
+    expect(footer).toContain('v4.0.0');
+    expect(footer).toContain('73 fps • auto/full');
+    expect(lines[0]).not.toContain('73 fps');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -127,7 +131,8 @@ describe('docs preview app', () => {
 
     expect(serializeFrame(initial.frames[0]!)).toEqual(serializeFrame(tinyPulse.frames[tinyPulse.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(steppedPulse.frames[steppedPulse.frames.length - 1]!));
-    expect(frameText(initial.frames[0]!)).toContain('60 fps • auto/performance');
+    const footer = frameText(initial.frames[0]!).split('\n')[initial.frames[0]!.height - 1] ?? '';
+    expect(footer).toContain('60 fps • auto/performance');
   });
 
   it('updates the landing refresh-rate readout from pulse cadence', async () => {
@@ -137,7 +142,8 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
     expect((pulsed.model as any).landingFps).toBe(54);
-    expect(frameText(pulsed.frames[pulsed.frames.length - 1]!)).toContain('54 fps • auto/full');
+    const footer = frameText(pulsed.frames[pulsed.frames.length - 1]!).split('\n')[pulsed.frames[pulsed.frames.length - 1]!.height - 1] ?? '';
+    expect(footer).toContain('54 fps • auto/full');
   });
 
   it('switches landing-screen themes with number keys and arrow cycling', async () => {
@@ -284,10 +290,12 @@ describe('docs preview app', () => {
       text += '\n';
     }
 
+    const lines = text.split('\n');
     expect(text).toContain('▶ Status and in-flow feedback');
-    expect(text).toContain('? Help');
-    expect(text).toContain('/ Search');
-    expect(text).toContain('F2 Settings');
+    expect(lines[0]).toContain('Bijou Docs');
+    expect(lines[frame.height - 1]).toContain('? Help');
+    expect(lines[frame.height - 1]).toContain('/ Search');
+    expect(lines[frame.height - 1]).toContain('F2 Settings');
   });
 
   it('shows a Bijou introduction and docs guide when no component is selected', async () => {
@@ -299,7 +307,6 @@ describe('docs preview app', () => {
     const lines = frameText(frame).split('\n');
     const text = lines.join('\n');
 
-    expect(lines[2]?.trim()).toBe('');
     expect(text).toContain('What is Bijou?');
     expect(text).toContain('How to use these docs');
     expect(text).toContain('/ to search');
