@@ -117,6 +117,8 @@ The docs shell also now has two obvious shell-level proving surfaces:
 
 The resulting settings direction is captured in [Settings Belong to the Shell](settings-belong-to-the-shell.md) and [Frame Settings Drawer](../specs/frame-settings-drawer.spec.json).
 
+As the docs app grew, that broadened into a larger shell-quality question: the title screen, header, footer, search, help, settings, notifications, confirmation flows, and quit semantics all need to feel like one intentional product. That direction is now captured in [The Humane Shell](humane-shell.md).
+
 ### 1. Story Protocol
 
 This is the highest-leverage foundation.

@@ -67,6 +67,7 @@ See [docs/strategy/dogfood.md](strategy/dogfood.md) for the design-thinking rati
 | **Interaction Profile Simulator** | bijou-tui + docs | Add a built-in simulator that can flip a surface or app among `rich`, `static`, `pipe`, `accessible`, reduced-motion, no-color, and narrow-width profiles so graceful-lowering behavior can be tested and taught without bespoke demo wiring. |
 | **Component Lab Mode** | docs + bijou-tui-app | Replace isolated knob-heavy demos with one story-driven lab surface inside the docs app. The lab should share stories, selectors, and scenarios instead of inventing its own parallel control model. |
 | **FTUI Onboarding Primitives** | bijou-tui + docs | Build first-time-user-experience components for guided onboarding: tutorial overlays that temporarily block unrelated input, spotlight/popover flows that dim everything except the target surface, stepper-style bottom guidance with skip/dismiss controls, and game-like interactive tutorials that can teach shell navigation inside a real app. |
+| **The Humane Shell** | bijou-tui + docs | Refine `createFramedApp()` into a more intentional human-facing product shell: concise header, operational footer, search/help/settings discoverability, shell-owned quit policy, clearer confirmation flows, and a future notification-history surface. DOGFOOD should remain the first proving surface. Initial strategy captured in [The Humane Shell](strategy/humane-shell.md). |
 
 ## Milestone 2 — Replay, Debugging, and Deterministic DX
 
