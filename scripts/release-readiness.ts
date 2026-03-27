@@ -34,7 +34,7 @@ export function buildReleaseReadinessPlan(): readonly ReleaseReadinessStep[] {
     { label: 'release:preflight', command: npm, args: ['run', 'release:preflight'] },
     { label: 'test:frames', command: npm, args: ['run', 'test:frames'] },
     { label: 'smoke:canaries', command: npm, args: ['run', 'smoke:canaries', '--', '--skip-build'] },
-    { label: 'smoke:examples:all', command: npm, args: ['run', 'smoke:examples:all'] },
+    { label: 'smoke:examples:all', command: npm, args: ['run', 'smoke:examples:all', '--', '--skip-build'] },
     { label: 'test', command: npm, args: ['test'] },
   ];
 }

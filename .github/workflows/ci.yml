@@ -31,7 +31,7 @@ jobs:
         run: npm run typecheck:test
       - name: Smoke all examples
         if: matrix.node-version == 22
-        run: npm run smoke:examples:all
+        run: npm run smoke:examples:all -- --skip-build
       - name: Smoke canary apps
         if: matrix.node-version == 22
         run: npm run smoke:canaries -- --skip-build

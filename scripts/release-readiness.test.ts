@@ -21,6 +21,12 @@ describe('release-readiness', () => {
       '--',
       '--skip-build',
     ]);
+    expect(plan.find((step) => step.label === 'smoke:examples:all')?.args).toEqual([
+      'run',
+      'smoke:examples:all',
+      '--',
+      '--skip-build',
+    ]);
   });
 
   it('fails fast when a release gate step fails', () => {

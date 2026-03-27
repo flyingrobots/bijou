@@ -46,7 +46,7 @@ jobs:
         run: npm test
 
       - name: Smoke all examples
-        run: npm run smoke:examples:all
+        run: npm run smoke:examples:all -- --skip-build
 
       - name: Smoke canary apps
         run: npm run smoke:canaries -- --skip-build
