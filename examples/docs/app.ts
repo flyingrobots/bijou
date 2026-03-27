@@ -1500,6 +1500,10 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             valueLabel: pageModel.showHints ? 'On' : 'Off',
             kind: 'toggle',
             action: { type: 'toggle-hints' },
+            feedback: {
+              title: 'Settings',
+              message: pageModel.showHints ? 'Show hints turned off.' : 'Show hints turned on.',
+            },
           }],
         },
         {
@@ -1511,6 +1515,10 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
             kind: 'choice',
             action: { type: 'cycle-landing-quality' },
+            feedback: {
+              title: 'Settings',
+              message: `Landing quality set to ${landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode))}.`,
+            },
           }],
         },
       ],

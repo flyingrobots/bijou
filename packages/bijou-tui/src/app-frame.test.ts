@@ -4,6 +4,7 @@ import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobo
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
+import { normalizeViewOutput } from './view-output.js';
 import {
   createNotificationState,
   dismissNotification,
@@ -1111,6 +1112,45 @@ describe('createFramedApp', () => {
     expect(nextModel.pageModels.home?.count).toBe(0);
     expect((nextModel as any).settingsOpen).toBe(true);
     expect(cmds).toHaveLength(0);
+  });
+
+  it('shows a shell-owned toast when a settings row is activated', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+            kind: 'toggle',
+            action: { type: 'toggle-hints' },
+            feedback: {
+              title: 'Settings',
+              message: 'Show hints turned off.',
+            },
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    const [nextModel, cmds] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+
+    expect(cmds).toHaveLength(2);
+    expect(nextModel.runtimeNotifications.items).toHaveLength(1);
+    expect(nextModel.runtimeNotifications.items[0]?.title).toBe('Settings');
+    expect(nextModel.runtimeNotifications.items[0]?.message).toBe('Show hints turned off.');
+
+    const rendered = surfaceToString(normalizeViewOutput(app.view(nextModel), {
+      width: testCtx.runtime.columns,
+      height: testCtx.runtime.rows,
+    }).surface, testCtx.style);
+    expect(rendered).toContain('notices:1');
   });
 
   it('scrolls a long settings drawer independently of the underlying page', () => {

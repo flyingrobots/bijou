@@ -69,6 +69,7 @@ import {
   type NotificationHistoryFilter,
   type NotificationPlacement,
   type NotificationState,
+  type NotificationTone,
 } from './notification.js';
 
 // Internal modules
@@ -172,8 +173,17 @@ export interface FrameSettingRow<Msg> {
   readonly description?: string;
   readonly valueLabel?: string;
   readonly action?: Msg;
+  readonly feedback?: FrameSettingFeedback;
   readonly kind?: 'action' | 'toggle' | 'choice' | 'info';
   readonly enabled?: boolean;
+}
+
+/** Shell-owned feedback shown after a settings row is activated. */
+export interface FrameSettingFeedback {
+  readonly title?: string;
+  readonly message: string;
+  readonly tone?: NotificationTone;
+  readonly durationMs?: number | null;
 }
 
 /** A titled section inside the frame-owned settings drawer. */
@@ -681,7 +691,7 @@ export function createFramedApp<PageModel, Msg>(
             if (hit.row.action === undefined || hit.row.enabled === false || hit.row.kind === 'info') {
               return [focusedModel, []];
             }
-            return [focusedModel, [emitMsgForPage(model.activePageId, hit.row.action)]];
+            return activateSettingsRow(focusedModel, hit.row);
           }
 
           return [model, []];
@@ -810,6 +820,37 @@ export function createFramedApp<PageModel, Msg>(
       return [nextModel, [createFrameNotificationTickCmd<Msg>()]];
     }
     return [nextModel, []];
+  }
+
+  function activateSettingsRow(
+    model: InternalFrameModel<PageModel, Msg>,
+    row: FrameSettingRow<Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+    if (row.action === undefined || row.enabled === false || row.kind === 'info') {
+      return [model, []];
+    }
+
+    const cmds: Cmd<Msg>[] = [emitMsgForPage(model.activePageId, row.action)];
+    if (!frameNotificationOptions.enabled) {
+      return [model, cmds];
+    }
+
+    const feedback = row.feedback ?? {
+      title: 'Setting updated',
+      message: `${row.label} updated.`,
+    };
+    const nowMs = resolveClock(resolveSafeCtx()).now();
+    const notifications = pushNotification(model.runtimeNotifications, {
+      title: feedback.title ?? 'Setting updated',
+      message: feedback.message,
+      variant: 'TOAST',
+      tone: feedback.tone ?? 'INFO',
+      placement: frameNotificationOptions.placement,
+      durationMs: feedback.durationMs ?? 2_500,
+      overflow: frameNotificationOptions.overflow,
+    }, nowMs);
+    const [nextModel, notificationCmds] = applyFrameNotificationState(model, notifications, nowMs);
+    return [nextModel, [...cmds, ...notificationCmds]];
   }
 
   const app: App<InternalFrameModel<PageModel, Msg>, Msg> = {
@@ -1083,7 +1124,8 @@ export function createFramedApp<PageModel, Msg>(
             if (!msg.ctrl && !msg.alt && (msg.key === 'enter' || msg.key === 'space')) {
               const row = layout.rows[clampSettingsFocus(model, layout)]?.row;
               if (row?.action !== undefined && row.enabled !== false && row.kind !== 'info') {
-                return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, row.action)], msg, 'frame')];
+                const [nextModel, cmds] = activateSettingsRow(model, row);
+                return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
               }
               return [model, withObservedKey(model, [], msg, 'frame')];
             }

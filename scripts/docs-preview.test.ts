@@ -295,6 +295,12 @@ describe('docs preview app', () => {
     if (commandResult !== undefined && commandResult !== QUIT) {
       model = app.update(commandResult as any, model)[0] as any;
     }
+    let frame = normalizeViewOutput(app.view(model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    expect(model.docsModel.runtimeNotifications.items[0]?.message).toBe('Show hints turned off.');
+    expect(frameText(frame)).toContain('notices:1');
     updateResult = app.update(keyMsg('down') as any, model);
     model = updateResult[0] as any;
     updateResult = app.update(keyMsg('enter') as any, model);
@@ -310,7 +316,7 @@ describe('docs preview app', () => {
     updateResult = app.update(keyMsg('escape') as any, model);
     model = updateResult[0] as any;
 
-    const frame = normalizeViewOutput(app.view(model), {
+    frame = normalizeViewOutput(app.view(model), {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
