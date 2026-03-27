@@ -41,6 +41,7 @@ export interface NotificationSpec<Msg> {
   readonly message?: string;
   readonly variant?: NotificationVariant;
   readonly tone?: NotificationTone;
+  readonly width?: number;
   readonly durationMs?: number | null;
   readonly placement?: NotificationPlacement;
   readonly action?: NotificationAction<Msg>;
@@ -57,6 +58,7 @@ export interface NotificationRecord<Msg> {
   readonly message: string;
   readonly variant: NotificationVariant;
   readonly tone: NotificationTone;
+  readonly width?: number;
   readonly durationMs: number | null;
   readonly placement: NotificationPlacement;
   readonly action?: NotificationAction<Msg>;
@@ -334,6 +336,7 @@ export function pushNotification<Msg>(
     message: spec.message ?? '',
     variant,
     tone: spec.tone ?? 'INFO',
+    width: spec.width,
     durationMs: spec.durationMs === undefined ? defaultDurationMs(variant) : spec.durationMs,
     placement: spec.placement ?? 'LOWER_RIGHT',
     action: spec.action,
@@ -701,6 +704,9 @@ function measureTextWidth<Msg>(
   screenWidth: number,
 ): number {
   const available = Math.max(18, screenWidth - 7);
+  if (item.width != null) {
+    return Math.max(18, Math.min(available, item.width));
+  }
   const titleWidth = visibleLength(item.title);
   const messageWidth = visibleLength(item.message);
   const buttonWidth = item.action == null ? 0 : visibleLength(item.action.label) + 6;

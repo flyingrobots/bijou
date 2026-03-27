@@ -428,6 +428,7 @@ export interface FrameModel<PageModel> {
 
 const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
+const SETTINGS_FEEDBACK_TOAST_WIDTH = 40;
 const DEFAULT_NOTIFICATION_CENTER_FILTERS: readonly NotificationHistoryFilter[] = [
   'ALL',
   'ACTIONABLE',
@@ -845,6 +846,7 @@ export function createFramedApp<PageModel, Msg>(
       message: feedback.message,
       variant: 'TOAST',
       tone: feedback.tone ?? 'INFO',
+      width: SETTINGS_FEEDBACK_TOAST_WIDTH,
       placement: frameNotificationOptions.placement,
       durationMs: feedback.durationMs ?? 2_500,
       overflow: frameNotificationOptions.overflow,

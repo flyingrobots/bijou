@@ -186,7 +186,7 @@ describe('notification state', () => {
       filter: 'ACTIONABLE',
     });
 
-    expect(stripAnsi(body)).toMatch(/Dismiss-only actio\s*nable/);
+    expect(stripAnsi(body)).toMatch(/Dismiss-only\s*actionable/);
   });
 
   it('supports scrolling through archived notification history', () => {
@@ -261,6 +261,45 @@ describe('renderNotificationStack', () => {
     });
 
     expect(stripAnsi(overlay!.content)).toContain('[ Retry deploy ]');
+  });
+
+  it('honors an explicit toast width so stacked shell feedback stays uniform', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Settings',
+      message: 'Landing quality set to Auto.',
+      variant: 'TOAST',
+      width: 40,
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+    state = pushNotification(state, {
+      title: 'Settings',
+      message: 'Landing quality set to Performance.',
+      variant: 'TOAST',
+      width: 40,
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 10);
+    state = tickNotifications(state, 250);
+
+    const overlays = renderNotificationStack(state, {
+      screenWidth: 120,
+      screenHeight: 32,
+    });
+
+    expect(overlays).toHaveLength(2);
+    const first = overlays[0];
+    const second = overlays[1];
+    if (first == null || second == null) {
+      throw new Error('expected two rendered notifications');
+    }
+    const firstWidth = first.surface?.width;
+    const secondWidth = second.surface?.width;
+    expect(firstWidth).toBeDefined();
+    expect(secondWidth).toBeDefined();
+    expect(firstWidth).toBe(secondWidth);
+    expect(firstWidth).toBe(43);
   });
 
   it('hit-tests dismiss and action targets inside the rendered stack', () => {
