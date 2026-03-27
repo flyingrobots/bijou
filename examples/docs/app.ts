@@ -18,6 +18,9 @@ import {
   isKeyMsg,
   isMouseMsg,
   isResizeMsg,
+  isShellQuitConfirmAccept,
+  isShellQuitConfirmDismiss,
+  isShellQuitRequest,
   listFocusNext,
   listFocusPrev,
   listPageDown,
@@ -25,6 +28,8 @@ import {
   mapCmds,
   placeSurface,
   quit,
+  renderShellQuitOverlay,
+  shouldUseShellQuitConfirm,
   toast,
   type App,
   type Cmd,
@@ -129,6 +134,7 @@ interface RootModel {
   readonly landingFps: number;
   readonly landingThemeIndex: number;
   readonly landingToast?: LandingToastState;
+  readonly landingQuitConfirmOpen: boolean;
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
@@ -1539,6 +1545,7 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
         landingThemeIndex: 0,
         landingToast: undefined,
+        landingQuitConfirmOpen: false,
         docsModel,
       }, mapExplorer(cmds)];
     },
@@ -1570,8 +1577,29 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           }, []];
         }
         if (isKeyMsg(msg)) {
-          if (!msg.alt && ((msg.ctrl && msg.key === 'c') || (!msg.ctrl && !msg.shift && (msg.key === 'escape' || msg.key === 'q')))) {
-            return [model, [quit()]];
+          if (model.landingQuitConfirmOpen) {
+            if (isShellQuitConfirmAccept(msg)) {
+              return [{
+                ...model,
+                landingQuitConfirmOpen: false,
+              }, [quit()]];
+            }
+            if (isShellQuitConfirmDismiss(msg)) {
+              return [{
+                ...model,
+                landingQuitConfirmOpen: false,
+              }, []];
+            }
+            return [model, []];
+          }
+          if (isShellQuitRequest(msg)) {
+            if (!shouldUseShellQuitConfirm(ctx)) {
+              return [model, [quit()]];
+            }
+            return [{
+              ...model,
+              landingQuitConfirmOpen: true,
+            }, []];
           }
           if (msg.key === 'left') {
             return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
@@ -1598,7 +1626,10 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
 
     view(model) {
       if (model.route === 'landing') {
-        return renderLanding(model);
+        const landing = renderLanding(model);
+        return model.landingQuitConfirmOpen
+          ? compositeSurface(landing, [renderShellQuitOverlay(model.columns, model.rows)])
+          : landing;
       }
       return explorer.view(model.docsModel);
     },

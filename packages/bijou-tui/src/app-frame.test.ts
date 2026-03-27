@@ -811,7 +811,7 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(0);
   });
 
-  it('opens settings with F2, opens search with /, and keeps ctrl+p as the command palette', () => {
+  it('opens settings with F2 and lets / and ctrl+p switch between search and the command palette', () => {
     const app = createFramedApp({
       pages: [{
         ...makePage('home', 'Home', 'main'),
@@ -847,12 +847,16 @@ describe('createFramedApp', () => {
     expect((model as any).commandPalette).toBeDefined();
     expect((model as any).commandPaletteTitle).toBe('Search home');
 
-    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
-    expect((model as any).commandPalette).toBeUndefined();
-
     [model] = app.update(ctrlKey('p'), model);
     expect((model as any).commandPalette).toBeDefined();
     expect((model as any).commandPaletteTitle).toBe('Command Palette');
+
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPalette).toBeDefined();
+    expect((model as any).commandPaletteTitle).toBe('Search home');
+
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPalette).toBeUndefined();
   });
 
   it('opens a quit-confirm modal from the shell and quits on confirmation', async () => {
@@ -876,6 +880,47 @@ describe('createFramedApp', () => {
       },
     });
     expect(returned).toBe(QUIT);
+  });
+
+  it('opens quit confirm with escape while settings are open', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(true);
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(false);
+    expect((model as any).quitConfirmOpen).toBe(true);
+  });
+
+  it('opens quit confirm with escape while the command palette is open', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      enableCommandPalette: true,
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey('p'), model);
+    expect((model as any).commandPalette).toBeDefined();
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPalette).toBeUndefined();
+    expect((model as any).quitConfirmOpen).toBe(true);
   });
 
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {
@@ -1153,7 +1198,7 @@ describe('createFramedApp', () => {
     expect(model.pageModels.home?.count).toBe(0);
   });
 
-  it('closes command palette with q when query is empty', async () => {
+  it('lets q remain text input inside the command palette', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       enableCommandPalette: true,
@@ -1164,7 +1209,9 @@ describe('createFramedApp', () => {
       { key: 'q' },
     ]);
 
-    expect(result.model.commandPalette).toBeUndefined();
+    expect(result.model.commandPalette).toBeDefined();
+    expect(result.model.quitConfirmOpen).toBe(false);
+    expect(result.model.commandPalette?.query).toBe('q');
   });
 
   it('passes pane rects to overlayFactory for panel-scoped overlays', () => {

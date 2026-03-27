@@ -1,0 +1,66 @@
+{
+  "name": "Shell-Owned Quit Policy",
+  "designPattern": "Global Request-Quit Contract / Shell-Level Safe Exit",
+  "requirements": [
+    "The Humane Shell strategy",
+    "createFramedApp() shell model",
+    "DOGFOOD landing route",
+    "Tests ARE the Spec roadmap principle"
+  ],
+  "userStory": {
+    "asA": "user of an interactive framed Bijou app",
+    "iWant": "quit keys to mean the same thing everywhere",
+    "soThat": "I can leave safely without guessing whether a focused pane, overlay, or shell surface will eat my intent"
+  },
+  "acceptanceCriteria": [
+    "Interactive shell surfaces treat `Esc`, `q`, and `Ctrl+C` as request-quit keys routed through one shared policy, with a narrow exception for printable text-entry surfaces that must keep character keys like `q` available for input",
+    "Interactive shell surfaces default to a quit-confirm step instead of quitting immediately",
+    "Pipe/non-interactive shell contexts quit immediately instead of opening a confirmation overlay",
+    "The quit-confirm surface uses stable affordances: `y` or `Enter` to quit, `n`, `q`, or `Esc` to stay",
+    "Requesting quit while help, settings, search, or the command palette are open closes those surfaces behind the confirm modal instead of leaving layered shell state active",
+      "Search, settings, and help remain closable through their own explicit toggle bindings rather than depending on `Esc` as their only exit path",
+      "Search/palette text entry keeps printable query characters available, while `Esc` and `Ctrl+C` still request quit from that surface",
+    "DOGFOOD landing uses the same request-quit policy as the framed docs workspace instead of bypassing it with direct `quit()` calls"
+  ],
+  "backwardCompatibility": "This is a behavioral tightening for interactive shell apps, not a public data-model break. Existing framed apps keep the same page APIs, but shell key semantics become more consistent and less ad hoc.",
+  "scope": {
+    "inScope": [
+      "Shared quit-policy helper(s)",
+      "createFramedApp() quit routing",
+      "DOGFOOD landing-route quit routing",
+      "Quit-confirm overlay copy and stable key semantics",
+      "Search/palette toggle behavior needed to keep shell surfaces dismissible after Esc becomes request-quit"
+    ],
+    "outScope": [
+      "Unsaved-work detection or app-specific dirty-state warnings",
+      "Multi-step shutdown flows",
+      "Persistent preference storage for quit behavior",
+      "Non-shell pages inventing their own quit overlays",
+      "A generalized confirmation framework beyond the standard quit flow in the same slice"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write failing app-frame tests proving that Esc opens quit confirm even while settings or palette are open, that q and Ctrl+C also request quit, and that the shell's explicit surface toggles still close search/settings/help. Then add DOGFOOD preview regressions proving landing Esc opens quit confirm, n dismisses it, y quits, and pipe mode still exits immediately.",
+    "edgeCases": [
+      "Help already open when quit is requested",
+      "Settings open when Esc is pressed",
+      "Search/command palette open when q or Ctrl+C is pressed",
+      "Pipe mode where no interactive confirm should render",
+      "Repeated quit requests while the confirm modal is already open"
+    ],
+    "fuzzStress": "Not a priority in v0. The main risk is behavioral inconsistency and layer precedence, not high-throughput input volume.",
+    "failureCases": [
+      "Esc closes one shell surface but opens quit confirm from another, leaving users unable to predict the outcome",
+      "The shell opens quit confirm but leaves search/settings/help active underneath it",
+      "Pipe mode accidentally opens a quit modal that can never be answered",
+      "DOGFOOD landing still quits immediately while the framed docs route confirms",
+      "Search or settings become impossible to dismiss after quit semantics change"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~150-280 lines across shell helpers, app-frame routing, landing-route adoption, and regressions",
+    "timeComplexity": "O(1) per key event; the work is in routing precedence and coherent shell state transitions, not algorithmic growth",
+    "workEstimate": "Medium"
+  }
+}

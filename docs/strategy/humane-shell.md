@@ -355,6 +355,11 @@ Recommended default:
 
 all map to **request quit**
 
+Narrow exception:
+
+- shell-owned text-entry surfaces may keep printable characters like `q` available for input
+- `Esc` and `Ctrl+C` should still request quit from those surfaces
+
 The shell then applies a policy:
 
 - `confirm` by default for interactive framed apps
@@ -472,4 +477,3 @@ The rule should be:
 
 5. **FTUI onboarding primitives**
    - once the shell itself is stable enough to teach honestly
-

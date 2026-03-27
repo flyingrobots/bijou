@@ -80,14 +80,6 @@ export function handlePaletteKey<PageModel, Msg>(
     return [{ ...model, commandPalette: next }, []];
   }
 
-  if (msg.ctrl && msg.key === 'c') {
-    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
-  }
-
-  if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'q' && cp.query.length === 0) {
-    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
-  }
-
   if (!msg.ctrl && !msg.alt && msg.key.length === 1) {
     const next = cpFilter(cp, cp.query + msg.key);
     return [{ ...model, commandPalette: next }, []];

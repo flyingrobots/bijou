@@ -9,7 +9,6 @@ import {
   createSurface,
   resolveClock,
   resolveSafeCtx,
-  stringToSurface,
   type Cell,
   type OverflowBehavior,
   type Surface,
@@ -21,6 +20,13 @@ import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import { quit } from './commands.js';
 import type { Overlay } from './overlay.js';
 import { compositeSurfaceInto, drawer, modal } from './overlay.js';
+import {
+  isShellQuitConfirmAccept,
+  isShellQuitConfirmDismiss,
+  isShellQuitRequest,
+  renderShellQuitOverlay,
+  shouldUseShellQuitConfirm,
+} from './shell-quit.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
 import { type BuiltinTransition } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
@@ -523,29 +529,11 @@ export function createFramedApp<PageModel, Msg>(
     return [emitMsgForPage(model.activePageId, observed), ...cmds];
   }
 
-  function shouldUseQuitConfirm(): boolean {
-    return resolveSafeCtx()?.mode !== 'pipe';
-  }
-
-  function isQuitRequest(msg: KeyMsg): boolean {
-    if (msg.alt) return false;
-    if (msg.ctrl) return msg.key === 'c';
-    return !msg.shift && (msg.key === 'q' || msg.key === 'escape');
-  }
-
-  function isQuitConfirmAccept(msg: KeyMsg): boolean {
-    return !msg.ctrl && !msg.alt && !msg.shift && (msg.key === 'y' || msg.key === 'enter');
-  }
-
-  function isQuitConfirmDismiss(msg: KeyMsg): boolean {
-    return !msg.ctrl && !msg.alt && !msg.shift && (msg.key === 'n' || msg.key === 'escape' || msg.key === 'q');
-  }
-
   function applyQuitRequest(
     model: InternalFrameModel<PageModel, Msg>,
     msg: KeyMsg,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
-    if (!shouldUseQuitConfirm()) {
+    if (!shouldUseShellQuitConfirm()) {
       return [model, withObservedKey(model, [quit()], msg, 'frame')];
     }
 
@@ -891,8 +879,33 @@ export function createFramedApp<PageModel, Msg>(
 
       if (isKeyMsg(msg)) {
         if (model.commandPalette != null) {
-          if (msg.ctrl && !msg.alt && msg.key === 'c') {
+          if ((msg.ctrl && !msg.alt && msg.key === 'c') || (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape')) {
             return applyQuitRequest(model, msg);
+          }
+          const frameAction = frameKeys.handle(msg);
+          if (frameAction?.type === 'open-search') {
+            const isSearchOpen = model.commandPaletteTitle !== 'Command Palette';
+            if (isSearchOpen) {
+              return [{
+                ...model,
+                commandPalette: undefined,
+                commandPaletteEntries: undefined,
+                commandPaletteTitle: undefined,
+              }, withObservedKey(model, [], msg, 'palette')];
+            }
+            return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
+          }
+          if (frameAction?.type === 'open-palette') {
+            const isCommandPaletteOpen = model.commandPaletteTitle === 'Command Palette';
+            if (isCommandPaletteOpen) {
+              return [{
+                ...model,
+                commandPalette: undefined,
+                commandPaletteEntries: undefined,
+                commandPaletteTitle: undefined,
+              }, withObservedKey(model, [], msg, 'palette')];
+            }
+            return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
           const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
           return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
@@ -905,7 +918,7 @@ export function createFramedApp<PageModel, Msg>(
           if (!msg.ctrl && !msg.alt && msg.key === '?') {
             return [{ ...model, helpOpen: false, helpScrollY: 0 }, withObservedKey(model, [], msg, 'help')];
           }
-          if (isQuitRequest(msg)) {
+          if (isShellQuitRequest(msg)) {
             return applyQuitRequest(model, msg);
           }
           const helpAction = frameKeys.handle(msg);
@@ -921,7 +934,7 @@ export function createFramedApp<PageModel, Msg>(
         if (model.settingsOpen) {
           const layout = resolveSettingsLayout(model, options, pagesById);
           if (layout != null) {
-            if (isQuitRequest(msg) && msg.key !== 'escape') {
+            if (isShellQuitRequest(msg)) {
               return applyQuitRequest(model, msg);
             }
             if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
@@ -987,13 +1000,13 @@ export function createFramedApp<PageModel, Msg>(
         }
 
         if (model.quitConfirmOpen) {
-          if (isQuitConfirmAccept(msg)) {
+          if (isShellQuitConfirmAccept(msg)) {
             return [{
               ...model,
               quitConfirmOpen: false,
             }, withObservedKey(model, [quit()], msg, 'frame')];
           }
-          if (isQuitConfirmDismiss(msg)) {
+          if (isShellQuitConfirmDismiss(msg)) {
             return [{
               ...model,
               quitConfirmOpen: false,
@@ -1016,7 +1029,7 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'page')];
         }
 
-        if (isQuitRequest(msg)) {
+        if (isShellQuitRequest(msg)) {
           return applyQuitRequest(model, msg);
         }
 
@@ -1190,14 +1203,7 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.quitConfirmOpen) {
-        overlays.push(modal({
-          title: 'Quit?',
-          body: stringToSurface('Quit this app?\n\nY quit • N stay', 20, 3),
-          hint: 'Y quit • N stay',
-          width: 24,
-          screenWidth: model.columns,
-          screenHeight: model.rows,
-        }));
+        overlays.push(renderShellQuitOverlay(model.columns, model.rows));
       }
 
       if (bodySurface != null && bodyRect.width > 0 && bodyRect.height > 0) {

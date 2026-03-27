@@ -95,8 +95,43 @@ describe('docs preview app', () => {
     expect(text).toMatch(/[█▓▒░·]/);
   });
 
-  it('quits from the landing screen with escape', async () => {
+  it('opens landing quit confirm with escape and quits on confirmation', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    let [model] = app.init();
+    let cmds: any[] = [];
+
+    [model, cmds] = app.update(keyMsg('escape'), model);
+    expect((model as any).landingQuitConfirmOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+
+    [model, cmds] = app.update(keyMsg('y'), model);
+    expect((model as any).landingQuitConfirmOpen).toBe(false);
+    expect(cmds).toHaveLength(1);
+
+    const returned = await cmds[0]!(() => {}, {
+      onPulse() {
+        return { dispose() {} };
+      },
+    });
+    expect(returned).toBe(QUIT);
+  });
+
+  it('dismisses the landing quit confirm with n', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    let [model] = app.init();
+    [model] = app.update(keyMsg('escape'), model);
+    expect((model as any).landingQuitConfirmOpen).toBe(true);
+
+    [model] = app.update(keyMsg('n'), model);
+    expect((model as any).landingQuitConfirmOpen).toBe(false);
+  });
+
+  it('quits immediately from the landing screen in pipe mode', async () => {
+    const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
     const [model] = app.init();

@@ -55,6 +55,15 @@ export {
 
 // Commands
 export { quit, tick, batch } from './commands.js';
+export {
+  type ShellQuitPolicy,
+  resolveShellQuitPolicy,
+  shouldUseShellQuitConfirm,
+  isShellQuitRequest,
+  isShellQuitConfirmAccept,
+  isShellQuitConfirmDismiss,
+  renderShellQuitOverlay,
+} from './shell-quit.js';
 
 // Runtime
 export { run } from './runtime.js';
