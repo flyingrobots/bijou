@@ -1,0 +1,71 @@
+{
+  "name": "Notification History Belongs to the Shell",
+  "designPattern": "Shell-Owned Notification Center / Reviewable Feedback Surface",
+  "requirements": [
+    "The Humane Shell strategy",
+    "Existing notification stack/history substrate in notification.ts",
+    "createFramedApp() shell model",
+    "Tests ARE the Spec roadmap principle"
+  ],
+  "userStory": {
+    "asA": "user of an interactive framed Bijou app",
+    "iWant": "one shell-owned place to review current and recent notifications",
+    "soThat": "important feedback is recoverable after transient toasts disappear and I do not have to guess where durable notice review lives"
+  },
+  "acceptanceCriteria": [
+    "createFramedApp() can expose a standard shell-owned notification center without each app inventing its own history modal",
+    "The notification center is anchored to the right edge and keeps the current page visible behind it",
+    "The notification center is backed by the existing notification archive/history model instead of introducing a second store",
+    "The shell exposes a standard entry path for notification review through a shell binding and a command-palette command",
+    "The shell footer can surface a subtle notification/inbox cue without dumping the full archive state into the chrome",
+    "The notification center owns keyboard and mouse input while open instead of leaking interaction through to the underlying page",
+    "The notification center can scroll independently when the list of items exceeds the drawer height",
+    "The notification center supports a simple filter model aligned with the existing notification system: `ALL`, `ACTIONABLE`, `ERROR`, `WARNING`, `SUCCESS`, `INFO`",
+    "Archived notifications may expose a follow-up action only when the app provides one explicitly; the shell does not invent replay semantics by default",
+    "A framed app with notification state can adopt the shell-owned center with minimal custom code, and frame-managed runtime notifications can use the same review surface"
+  ],
+  "backwardCompatibility": "This is additive shell behavior. Existing framed apps remain valid without providing a notification center. The first slice adds a standard review container and entry points, not a breaking change to notification records or runtime routing.",
+  "scope": {
+    "inScope": [
+      "Shell-owned notification center/drawer in createFramedApp()",
+      "Standard shell entry points for notification review",
+      "Footer-level discoverability cue",
+      "Scroll and filter behavior inside the center",
+      "Reuse of the existing notification history substrate",
+      "One framed proving surface plus runtime-notification compatibility"
+    ],
+    "outScope": [
+      "Unread/read persistence across sessions",
+      "Grouped notification threads",
+      "Snooze or remind-later workflows",
+      "Replacing structured app logs",
+      "Custom per-app notification-center layouts",
+      "Automatic replay of archived notification actions without explicit app opt-in"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write failing app-frame tests that prove a right-edge notification center can open from standard shell entry points, owns keyboard and mouse input while open, scrolls independently, cycles filters, and exposes a footer cue. Then add a framed notifications-lab regression proving archived items render through the shared shell container rather than an app-specific modal.",
+    "edgeCases": [
+      "No notifications at all",
+      "Active stack empty but archive non-empty",
+      "Archive long enough to require scrolling",
+      "Compact terminal width with a narrow drawer",
+      "Opening help, settings, or the command palette while the notification center is already open",
+      "Archived actionable notifications with no explicit activation handler"
+    ],
+    "fuzzStress": "Not a priority in v0. The main risk is shell coherence, routing precedence, and honest review behavior, not high-throughput message volume.",
+    "failureCases": [
+      "Toasts disappear and there is still no standard place to review them later",
+      "The shell opens a notification center that drifts from the real archive/history state",
+      "The notification center leaks keyboard or mouse input through to the workspace underneath",
+      "Every framed app still needs its own history modal despite the shell feature existing",
+      "The footer becomes a noisy second inbox instead of a subtle discoverability cue"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~220-420 lines across app-frame state, shell bindings, drawer rendering, notification-center routing, and regressions",
+    "timeComplexity": "O(V) per render and interaction where V is the number of visible notification-center rows; the v0 risk is product coherence and shell routing, not algorithmic complexity",
+    "workEstimate": "Medium"
+  }
+}

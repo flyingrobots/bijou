@@ -1062,3 +1062,4 @@ First public release.
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
 - defaulted core box/table component overflow to wrap instead of truncate, with per-instance `overflow: 'truncate'` overrides and matching surface support
+- **Shell-owned notification center design** — added a dedicated humane-shell strategy/spec pair for durable notification review: a right-edge shell notification center, footer-level inbox cue, standard shell entry points, and a v0 contract built on the existing notification archive instead of a second store.

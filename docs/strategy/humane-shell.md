@@ -317,6 +317,10 @@ Design direction:
 - a future notification-history surface should be reachable from shell affordances or the command palette
 - the footer is a good place for a subtle notification count or inbox cue
 
+That more detailed direction is now captured in
+[Notification History Belongs to the Shell](notification-history-belongs-to-the-shell.md)
+and the companion [Shell Notification Center spec](../specs/shell-notification-center.spec.json).
+
 ### 9. Confirmation flows
 
 Confirmation should be treated as a shell/system pattern, not ad hoc prose.
