@@ -1,11 +1,21 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
+  type BijouContext,
   box, headerBox, progressBar, gradientText, separator, badge, alert,
   skeleton, kbd, tree, accordion, timeline, select, PRESETS, surfaceToString
 } from '@flyingrobots/bijou';
 
-async function runDemo() {
-  const ctx = initDefaultContext();
+function createDefaultDemoContext(themeName?: string): BijouContext {
+  if (themeName !== undefined) process.env.BIJOU_THEME = themeName;
+  return initDefaultContext();
+}
+
+export async function main(
+  ctx: BijouContext = createDefaultDemoContext(),
+  createThemedCtx: (themeName: string, currentCtx: BijouContext) => BijouContext = (themeName) => createDefaultDemoContext(themeName),
+): Promise<void> {
 
   const themeName = await select({
     title: 'Choose a theme to preview the bijou component library:',
@@ -13,9 +23,7 @@ async function runDemo() {
     ctx
   });
 
-  // Re-initialize context with the chosen theme
-  process.env.BIJOU_THEME = themeName;
-  const themedCtx = initDefaultContext();
+  const themedCtx = createThemedCtx(themeName, ctx);
 
   const stops = themedCtx.theme.theme.gradient.brand;
 
@@ -70,4 +78,6 @@ async function runDemo() {
   ], { ctx: themedCtx }));
 }
 
-runDemo().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}

@@ -1,6 +1,7 @@
 import type { ClockPort } from '../../ports/clock.js';
-import type { IOPort, RawInputHandle, TimerHandle } from '../../ports/io.js';
+import type { IOPort, KeyInputMsg, RawInputHandle, TimerHandle } from '../../ports/io.js';
 import { resolveClock } from '../../core/clock.js';
+import { decodeRawKeySequence } from '../../core/key-input.js';
 import { join } from 'path';
 
 /**
@@ -11,6 +12,8 @@ export interface MockIOOptions {
   answers?: string[];
   /** Pre-loaded keypress strings delivered by {@link MockIO.rawInput} via microtasks. */
   keys?: string[];
+  /** Pre-loaded semantic keys delivered by {@link MockIO.keyInput} via microtasks. */
+  keyMsgs?: KeyInputMsg[];
   /** Clock override for deterministic timer and microtask scheduling in tests. */
   clock?: ClockPort;
   /** Virtual filesystem entries (path to content) for {@link MockIO.readFile}. */
@@ -102,6 +105,31 @@ export function mockIO(options: MockIOOptions = {}): MockIO {
       const keyQueue = [...(options.keys ?? [])];
       let disposed = false;
       /** @internal Deliver the next key from the queue via microtask. */
+      function deliver() {
+        if (disposed || keyQueue.length === 0) return;
+        const key = keyQueue.shift()!;
+        onKey(key);
+        if (keyQueue.length > 0) clock.queueMicrotask(deliver);
+      }
+      clock.queueMicrotask(deliver);
+      return { dispose() { disposed = true; } };
+    },
+
+    /**
+     * Deliver pre-loaded semantic keys to the callback via microtasks.
+     *
+     * Falls back to decoding `options.keys` so existing tests can keep
+     * expressing scripted input in raw terminal strings while semantic-input
+     * consumers still exercise the higher-level port.
+     *
+     * @param onKey - Callback invoked for each semantic keypress.
+     * @returns A handle whose `dispose()` stops further key delivery.
+     */
+    keyInput(onKey: (key: KeyInputMsg) => void): RawInputHandle {
+      const keyQueue = options.keyMsgs !== undefined
+        ? [...options.keyMsgs]
+        : (options.keys ?? []).flatMap((key) => decodeRawKeySequence(key));
+      let disposed = false;
       function deliver() {
         if (disposed || keyQueue.length === 0) return;
         const key = keyQueue.shift()!;

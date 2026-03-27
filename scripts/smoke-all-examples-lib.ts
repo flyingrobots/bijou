@@ -1,8 +1,10 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { detectGarbage, inputStep, stripAnsi, type PtyStep } from './smoke-utils.js';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { format } from 'node:util';
+import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';
+import { detectGarbage, stripAnsi } from './smoke-utils.js';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -33,59 +35,46 @@ export const DEFAULT_INPUT = [
   '',
 ].join('\n').repeat(8);
 
-export const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, readonly PtyStep[]>> = {
-  'demo.ts': [
-    inputStep('\x1b[B', 250),
-    inputStep('\r', 120),
-  ],
-  'examples/select/main.ts': [
-    inputStep('\x1b[B', 250),
-    inputStep('\r', 120),
-  ],
-  'examples/multiselect/main.ts': [
-    inputStep(' ', 250),
-    inputStep('\x1b[B', 120),
-    inputStep(' ', 120),
-    inputStep('\r', 120),
-  ],
-  'examples/filter/main.ts': [
-    inputStep('/', 250),
-    inputStep('r', 80),
-    inputStep('u', 60),
-    inputStep('s', 60),
-    inputStep('t', 60),
-    inputStep('\r', 120),
-  ],
-  'examples/input/main.ts': [
-    inputStep('my-app\n', 250),
-    inputStep('A short description\n', 250),
-  ],
-  'examples/textarea/main.ts': [
-    inputStep('feat: smoke test', 600),
-    inputStep('\x04', 200),
-  ],
-  'examples/confirm/main.ts': [
-    inputStep('y\n', 250),
-  ],
-  'examples/form-group/main.ts': [
-    inputStep('my-app\n', 250),
-    inputStep('\r', 250),
-    inputStep(' ', 250),
-    inputStep('\x1b[B', 120),
-    inputStep(' ', 120),
-    inputStep('\r', 120),
-    inputStep('y\n', 250),
-  ],
-  'examples/wizard/main.ts': [
-    inputStep('\r', 250),
-    inputStep('aws\n', 250),
-    inputStep('y\n', 250),
-  ],
+export interface InteractiveScriptScenarioSpec {
+  readonly answers?: readonly string[];
+  readonly keys?: readonly string[];
+}
+
+export const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, InteractiveScriptScenarioSpec>> = {
+  'demo.ts': {
+    keys: ['\x1b[B', '\r'],
+  },
+  'examples/select/main.ts': {
+    keys: ['\x1b[B', '\r'],
+  },
+  'examples/multiselect/main.ts': {
+    keys: [' ', '\x1b[B', ' ', '\r'],
+  },
+  'examples/filter/main.ts': {
+    keys: ['/', 'r', 'u', 's', 't', '\r'],
+  },
+  'examples/input/main.ts': {
+    answers: ['my-app', 'A short description'],
+  },
+  'examples/textarea/main.ts': {
+    keys: ['feat: smoke test', '\x04'],
+  },
+  'examples/confirm/main.ts': {
+    answers: ['y'],
+  },
+  'examples/form-group/main.ts': {
+    answers: ['my-app', 'y'],
+    keys: ['\r', ' ', '\x1b[B', ' ', '\r'],
+  },
+  'examples/wizard/main.ts': {
+    answers: ['aws', 'y'],
+    keys: ['\r'],
+  },
 };
 
 export interface Result {
   path: string;
-  mode: 'pipe' | 'static-tty' | 'interactive-tty';
+  mode: 'pipe' | 'static-tty' | 'interactive-scripted';
   status: 'ok' | 'error';
   reason?: string;
   output?: string;
@@ -94,7 +83,7 @@ export interface Result {
 export interface Scenario {
   path: string;
   mode: Result['mode'];
-  steps?: readonly PtyStep[];
+  script?: InteractiveScriptScenarioSpec;
 }
 
 interface SpawnPlan {
@@ -159,10 +148,10 @@ export function buildSmokeScenarios(
       path,
       mode: isTuiTarget(root, path, readFileImpl) ? 'static-tty' as const : 'pipe' as const,
     })),
-    ...Object.entries(INTERACTIVE_FORM_SCRIPTS).map(([path, steps]) => ({
+    ...Object.entries(INTERACTIVE_FORM_SCRIPTS).map(([path, script]) => ({
       path,
-      mode: 'interactive-tty' as const,
-      steps,
+      mode: 'interactive-scripted' as const,
+      script,
     })),
   ];
 }
@@ -213,29 +202,7 @@ export function createScenarioPlan(
     };
   }
 
-  const spec = {
-    argv: [execPath, '--import', 'tsx', absPath],
-    cwd: root,
-    env: {
-      TERM: 'xterm-256color',
-      CI: null,
-      NO_COLOR: null,
-      BIJOU_ACCESSIBLE: null,
-    },
-    steps: scenario.steps ?? [],
-  };
-
-  return {
-    command: 'python3',
-    args: [resolve(root, 'scripts/pty-driver.py')],
-    stdinMode: 'ignore',
-    timeoutMs: 18000,
-    env: {
-      ...env,
-      BIJOU_PTY_SPEC: JSON.stringify(spec),
-      PYTHONDONTWRITEBYTECODE: '1',
-    },
-  };
+  throw new Error(`createScenarioPlan() does not support ${scenario.mode}`);
 }
 
 export async function runScenarioWithTimeout(
@@ -243,6 +210,10 @@ export async function runScenarioWithTimeout(
   scenario: Scenario,
   deps: SmokeDeps = {},
 ): Promise<Result> {
+  if (scenario.mode === 'interactive-scripted') {
+    return runInteractiveScriptedScenario(root, scenario);
+  }
+
   const spawnImpl = deps.spawnImpl ?? spawn;
   const plan = createScenarioPlan(root, scenario, deps);
   const child = spawnImpl(plan.command, [...plan.args], {
@@ -303,6 +274,111 @@ export async function runScenarioWithTimeout(
       finish('ok');
     });
   });
+}
+
+interface InteractiveExampleModule {
+  readonly main?: (...args: unknown[]) => Promise<void>;
+}
+
+async function runInteractiveScriptedScenario(
+  root: string,
+  scenario: Scenario,
+): Promise<Result> {
+  const spec = INTERACTIVE_FORM_SCRIPTS[scenario.path];
+  if (spec === undefined) {
+    return {
+      path: scenario.path,
+      mode: scenario.mode,
+      status: 'error',
+      reason: 'missing scripted interactive spec',
+    };
+  }
+
+  const module = await import(pathToFileURL(resolve(root, scenario.path)).href) as InteractiveExampleModule;
+  if (typeof module.main !== 'function') {
+    return {
+      path: scenario.path,
+      mode: scenario.mode,
+      status: 'error',
+      reason: 'interactive example does not export main()',
+    };
+  }
+
+  const ctx = createTestContext({
+    mode: 'interactive',
+    io: {
+      answers: [...(spec.answers ?? [])],
+      keys: [...(spec.keys ?? [])],
+    },
+  });
+
+  const capturedOut: string[] = [];
+  const capturedErr: string[] = [];
+  const originalLog = console.log;
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  console.log = (...args: unknown[]) => {
+    capturedOut.push(`${format(...args)}\n`);
+  };
+  console.error = (...args: unknown[]) => {
+    capturedErr.push(`${format(...args)}\n`);
+  };
+  console.warn = (...args: unknown[]) => {
+    capturedErr.push(`${format(...args)}\n`);
+  };
+
+  try {
+    if (scenario.path === 'demo.ts') {
+      await module.main(ctx, (_themeName: string, currentCtx: typeof ctx) => currentCtx);
+    } else {
+      await module.main(ctx);
+    }
+  } catch (error) {
+    return finalizeInteractiveResult(
+      scenario,
+      ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join('') + capturedErr.join(''),
+      'error',
+      error instanceof Error ? error.message : String(error),
+    );
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
+    console.warn = originalWarn;
+  }
+
+  return finalizeInteractiveResult(
+    scenario,
+    ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join('') + capturedErr.join(''),
+    'ok',
+  );
+}
+
+function finalizeInteractiveResult(
+  scenario: Scenario,
+  rawOutput: string,
+  status: Result['status'],
+  reason?: string,
+): Result {
+  const output = stripAnsi(rawOutput);
+  if (status === 'ok') {
+    const garbage = detectGarbage(output);
+    if (garbage != null) {
+      return {
+        path: scenario.path,
+        mode: scenario.mode,
+        status: 'error',
+        reason: garbage,
+        output,
+      };
+    }
+  }
+  return {
+    path: scenario.path,
+    mode: scenario.mode,
+    status,
+    reason,
+    output,
+  };
 }
 
 export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<number> {

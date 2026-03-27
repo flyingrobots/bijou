@@ -1,7 +1,18 @@
 import type { SelectFieldOptions, SelectOption } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { formatFormTitle, renderNumberedOptions, terminalRenderer, formDispatch, createStyledFn, createBoldFn, clampScroll, handleVerticalNav } from './form-utils.js';
+import {
+  formatFormTitle,
+  renderNumberedOptions,
+  terminalRenderer,
+  formDispatch,
+  createStyledFn,
+  createBoldFn,
+  clampScroll,
+  handleVerticalNav,
+  isKey,
+  subscribeFormKeyInput,
+} from './form-utils.js';
 
 /**
  * Options for the single-select field.
@@ -138,15 +149,15 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   render();
 
   return new Promise<T>((resolve) => {
-    const handle = ctx.io.rawInput((key: string) => {
+    const handle = subscribeFormKeyInput(ctx, (key) => {
       const next = handleVerticalNav(key, cursor, options.options.length);
       if (next !== null) {
         cursor = next;
         scrollOffset = clampScroll(cursor, scrollOffset, maxVisible, options.options.length);
         clearRender(); render();
-      } else if (key === '\r' || key === '\n') {
+      } else if (isKey(key, 'enter')) {
         handle.dispose(); cleanup(); resolve(options.options[cursor]!.value);
-      } else if (key === '\x03' || key === '\x1b') {
+      } else if (isKey(key, 'c', { ctrl: true }) || isKey(key, 'escape')) {
         // Note: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
         // separate future improvement.

@@ -4,6 +4,27 @@ export interface RawInputHandle {
   dispose(): void;
 }
 
+/**
+ * Structured semantic keypress delivered by test-friendly input adapters.
+ *
+ * Production adapters may omit this higher-level stream and expose only
+ * {@link InteractivePort.rawInput}. Consumers that want deterministic tests
+ * can prefer `keyInput()` when available and fall back to raw key decoding
+ * otherwise.
+ */
+export interface KeyInputMsg {
+  /** Normalized logical key name (`up`, `enter`, `escape`, `a`, etc.). */
+  key: string;
+  /** Whether Control was held. */
+  ctrl: boolean;
+  /** Whether Alt/Meta was held. */
+  alt: boolean;
+  /** Whether Shift was held. */
+  shift: boolean;
+  /** Printable text payload, when this key represents typed text. */
+  text?: string;
+}
+
 /** Disposable handle returned by interval timers. */
 export interface TimerHandle {
   /** Cancel the timer. */
@@ -46,6 +67,17 @@ export interface InteractivePort extends QueryPort {
    * @returns A handle whose `dispose()` restores normal input mode.
    */
   rawInput(onKey: (key: string) => void): RawInputHandle;
+
+  /**
+   * Enter structured key-input mode, invoking {@link onKey} with semantic keys.
+   *
+   * This is primarily intended for deterministic tests. Production adapters may
+   * omit it and expose only {@link rawInput}; consumers should fall back
+   * gracefully when it is unavailable.
+   *
+   * @returns A handle whose `dispose()` restores normal input mode.
+   */
+  keyInput?(onKey: (key: KeyInputMsg) => void): RawInputHandle;
 
   /**
    * Start a repeating timer.

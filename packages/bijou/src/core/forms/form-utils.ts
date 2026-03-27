@@ -8,9 +8,11 @@
  */
 
 import type { BijouContext } from '../../ports/context.js';
+import type { KeyInputMsg, RawInputHandle } from '../../ports/io.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { cursorGuard, type CursorHideHandle } from '../components/cursor-guard.js';
 import { CLEAR_LINE_RETURN } from '../ansi.js';
+import { decodeRawKeySequence } from '../key-input.js';
 
 /**
  * Format a form title with the `?` prefix and theme-aware styling.
@@ -174,18 +176,73 @@ export function clampScroll(cursor: number, scrollOffset: number, maxVisible: nu
 }
 
 /**
+ * Subscribe to semantic form key input, preferring `ctx.io.keyInput()` when
+ * available and falling back to decoding `rawInput()` sequences otherwise.
+ *
+ * This keeps interactive forms deterministic in tests without forcing
+ * production adapters away from the lower-level raw-input contract.
+ *
+ * @param ctx - Bijou context providing the input port.
+ * @param onKey - Callback invoked for each semantic key.
+ * @returns A disposable handle that stops further key delivery.
+ */
+export function subscribeFormKeyInput(
+  ctx: BijouContext,
+  onKey: (key: KeyInputMsg) => void,
+): RawInputHandle {
+  if (typeof ctx.io.keyInput === 'function') {
+    return ctx.io.keyInput(onKey);
+  }
+  return ctx.io.rawInput((key) => {
+    for (const msg of decodeRawKeySequence(key)) {
+      onKey(msg);
+    }
+  });
+}
+
+/**
+ * Whether a semantic key carries printable text.
+ *
+ * @param key - The semantic key to test.
+ * @returns `true` when the key represents typed text.
+ */
+export function isPrintableKey(key: KeyInputMsg): key is KeyInputMsg & { text: string } {
+  return key.text !== undefined;
+}
+
+/**
+ * Match a semantic key by logical key name and optional modifier flags.
+ *
+ * @param msg - The key message to test.
+ * @param key - Expected logical key name.
+ * @param mods - Optional modifier constraints.
+ * @returns `true` when the key matches.
+ */
+export function isKey(
+  msg: KeyInputMsg,
+  key: string,
+  mods: Partial<Pick<KeyInputMsg, 'ctrl' | 'alt' | 'shift'>> = {},
+): boolean {
+  if (msg.key !== key) return false;
+  if (mods.ctrl !== undefined && msg.ctrl !== mods.ctrl) return false;
+  if (mods.alt !== undefined && msg.alt !== mods.alt) return false;
+  if (mods.shift !== undefined && msg.shift !== mods.shift) return false;
+  return true;
+}
+
+/**
  * Handle up/down (arrow key or j/k) navigation in a wrapping list.
  *
- * @param key - The keypress string.
+ * @param key - The semantic keypress.
  * @param cursor - Current cursor index.
  * @param length - Total number of items.
  * @returns The new cursor index, or `null` if the key was not a vertical nav key.
  */
-export function handleVerticalNav(key: string, cursor: number, length: number): number | null {
-  if (key === '\x1b[A' || key === 'k') {
+export function handleVerticalNav(key: KeyInputMsg, cursor: number, length: number): number | null {
+  if (isKey(key, 'up') || key.text === 'k') {
     return (cursor - 1 + length) % length;
   }
-  if (key === '\x1b[B' || key === 'j') {
+  if (isKey(key, 'down') || key.text === 'j') {
     return (cursor + 1) % length;
   }
   return null;

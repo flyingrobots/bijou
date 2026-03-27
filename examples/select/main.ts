@@ -1,9 +1,9 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { select } from '@flyingrobots/bijou';
+import { type BijouContext, select } from '@flyingrobots/bijou';
 
-const ctx = initDefaultContext();
-
-async function main() {
+export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
   const manager = await select({
     title: 'Choose a package manager:',
     options: [
@@ -21,4 +21,6 @@ async function main() {
   console.log(`Selected package manager: ${manager.toUpperCase()}`);
 }
 
-main().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}

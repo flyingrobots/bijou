@@ -1,9 +1,9 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { wizard, input, select, confirm, separator, box } from '@flyingrobots/bijou';
+import { type BijouContext, wizard, input, select, confirm, separator, box } from '@flyingrobots/bijou';
 
-const ctx = initDefaultContext();
-
-async function main() {
+export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
   console.log(separator({ label: 'Deployment Wizard', ctx }));
   console.log();
 
@@ -77,4 +77,6 @@ async function main() {
   console.log(box(lines.join('\n'), { ctx }));
 }
 
-main().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}

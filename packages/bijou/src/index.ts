@@ -16,6 +16,7 @@ export type {
   ClockPort,
   RawInputHandle,
   TimerHandle,
+  KeyInputMsg,
   StylePort,
   BijouContext,
 } from './ports/index.js';
@@ -40,6 +41,7 @@ export {
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';
 export { systemClock, resolveClock, sleep, defer } from './core/clock.js';
+export { decodeRawKeyInput, decodeRawKeySequence } from './core/key-input.js';
 export {
   type RuntimeViewport,
   sanitizeRuntimeDimension,

@@ -8,7 +8,14 @@
 
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import { formatFormTitle, terminalRenderer, createStyledFn } from './form-utils.js';
+import {
+  formatFormTitle,
+  terminalRenderer,
+  createStyledFn,
+  isKey,
+  isPrintableKey,
+  subscribeFormKeyInput,
+} from './form-utils.js';
 
 /**
  * Options for the multi-line textarea field.
@@ -120,8 +127,8 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
   render();
 
   return new Promise<string>((resolve) => {
-    const handle = ctx.io.rawInput((key: string) => {
-      if (key === '\x04') {
+    const handle = subscribeFormKeyInput(ctx, (key) => {
+      if (isKey(key, 'd', { ctrl: true })) {
         // Ctrl+D — submit
         handle.dispose();
         const text = lines.join('\n');
@@ -131,7 +138,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         return;
       }
 
-      if (key === '\x03' || key === '\x1b') {
+      if (isKey(key, 'c', { ctrl: true }) || isKey(key, 'escape')) {
         // Ctrl+C or Escape — cancel
         // TODO: bare \x1b may false-trigger on slow connections where escape
         // sequences arrive as separate bytes. Timer-based disambiguation is a
@@ -143,7 +150,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         return;
       }
 
-      if (key === '\r' || key === '\n') {
+      if (isKey(key, 'enter')) {
         // Enter — newline (counts as 1 character for maxLength)
         if (options.maxLength != null && totalLength >= options.maxLength) return;
         const currentLine = lines[cursorRow]!;
@@ -160,7 +167,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         return;
       }
 
-      if (key === '\x7f' || key === '\b') {
+      if (isKey(key, 'backspace')) {
         // Backspace
         if (cursorCol > 0) {
           const line = lines[cursorRow]!;
@@ -184,7 +191,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       }
 
       // Arrow keys
-      if (key === '\x1b[A') { // Up
+      if (isKey(key, 'up')) { // Up
         if (cursorRow > 0) {
           cursorRow--;
           cursorCol = Math.min(cursorCol, lines[cursorRow]!.length);
@@ -194,7 +201,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         render();
         return;
       }
-      if (key === '\x1b[B') { // Down
+      if (isKey(key, 'down')) { // Down
         if (cursorRow < lines.length - 1) {
           cursorRow++;
           cursorCol = Math.min(cursorCol, lines[cursorRow]!.length);
@@ -204,7 +211,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         render();
         return;
       }
-      if (key === '\x1b[C') { // Right
+      if (isKey(key, 'right')) { // Right
         if (cursorCol < lines[cursorRow]!.length) {
           cursorCol++;
         } else if (cursorRow < lines.length - 1) {
@@ -216,7 +223,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
         render();
         return;
       }
-      if (key === '\x1b[D') { // Left
+      if (isKey(key, 'left')) { // Left
         if (cursorCol > 0) {
           cursorCol--;
         } else if (cursorRow > 0) {
@@ -230,10 +237,10 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
       }
 
       // Printable character
-      if (key.length === 1 && key >= ' ') {
+      if (isPrintableKey(key)) {
         if (options.maxLength != null && totalLength >= options.maxLength) return;
         const line = lines[cursorRow]!;
-        lines[cursorRow] = line.slice(0, cursorCol) + key + line.slice(cursorCol);
+        lines[cursorRow] = line.slice(0, cursorCol) + key.text + line.slice(cursorCol);
         cursorCol++;
         totalLength++;  // added one character
         clearRender();

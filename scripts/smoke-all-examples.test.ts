@@ -3,6 +3,8 @@ import {
   buildSmokeScenarios,
   createScenarioPlan,
   listExampleTargets,
+  runScenarioWithTimeout,
+  ROOT,
 } from './smoke-all-examples-lib.js';
 
 describe('listExampleTargets', () => {
@@ -28,7 +30,7 @@ describe('buildSmokeScenarios', () => {
         : 'console.log("plain");',
     );
 
-    const baseScenarios = scenarios.filter((scenario) => scenario.mode !== 'interactive-tty');
+    const baseScenarios = scenarios.filter((scenario) => scenario.mode !== 'interactive-scripted');
     expect(baseScenarios).toEqual([
       { path: 'demo.ts', mode: 'pipe' },
       { path: 'demo-tui.ts', mode: 'static-tty' },
@@ -39,7 +41,7 @@ describe('buildSmokeScenarios', () => {
 
   it('appends interactive scripted scenarios for form examples', () => {
     const scenarios = buildSmokeScenarios('/repo', ['demo.ts'], () => 'console.log("plain");');
-    const interactive = scenarios.filter((scenario) => scenario.mode === 'interactive-tty');
+    const interactive = scenarios.filter((scenario) => scenario.mode === 'interactive-scripted');
 
     expect(interactive.some((scenario) => scenario.path === 'examples/select/main.ts')).toBe(true);
     expect(interactive.some((scenario) => scenario.path === 'examples/wizard/main.ts')).toBe(true);
@@ -89,26 +91,27 @@ describe('createScenarioPlan', () => {
     ]);
   });
 
-  it('encodes interactive PTY specs with root-aware cwd and step payloads', () => {
-    const plan = createScenarioPlan('/repo', {
+  it('does not build spawn plans for scripted interactive scenarios', () => {
+    expect(() => createScenarioPlan('/repo', {
       path: 'examples/select/main.ts',
-      mode: 'interactive-tty',
-      steps: [{ type: 'input', input: '\r', delayMs: 10 }],
+      mode: 'interactive-scripted',
+      script: { keys: ['\r'] },
     }, {
       execPath: '/custom/node',
       env: {},
+    })).toThrow('does not support interactive-scripted');
+  });
+});
+
+describe('runScenarioWithTimeout', () => {
+  it('runs scripted interactive examples in-process', async () => {
+    const result = await runScenarioWithTimeout(ROOT, {
+      path: 'examples/select/main.ts',
+      mode: 'interactive-scripted',
+      script: { keys: ['\r'] },
     });
 
-    expect(plan.command).toBe('python3');
-    expect(plan.args).toEqual(['/repo/scripts/pty-driver.py']);
-
-    const spec = JSON.parse(plan.env['BIJOU_PTY_SPEC'] ?? '{}') as {
-      argv: string[];
-      cwd: string;
-      steps: Array<{ type: string; input?: string }>;
-    };
-    expect(spec.argv).toEqual(['/custom/node', '--import', 'tsx', '/repo/examples/select/main.ts']);
-    expect(spec.cwd).toBe('/repo');
-    expect(spec.steps).toEqual([{ type: 'input', input: '\r', delayMs: 10 }]);
+    expect(result.status).toBe('ok');
+    expect(result.output).toContain('Selected package manager: YARN');
   });
 });

@@ -10,7 +10,15 @@
 
 import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import { formatFormTitle, terminalRenderer, createStyledFn, createBoldFn } from './form-utils.js';
+import {
+  formatFormTitle,
+  terminalRenderer,
+  createStyledFn,
+  createBoldFn,
+  isKey,
+  isPrintableKey,
+  subscribeFormKeyInput,
+} from './form-utils.js';
 
 /**
  * Single option in a filterable select list.
@@ -222,9 +230,9 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   }
 
   return new Promise<T>((resolve) => {
-    const handle = ctx.io.rawInput((key: string) => {
+    const handle = subscribeFormKeyInput(ctx, (key) => {
       // ── Mode-independent ───────────────────────────────────
-      if (key === '\r' || key === '\n') {
+      if (isKey(key, 'enter')) {
         handle.dispose();
         const selected = filtered[cursor];
         const resolvedLabel = selected ? selected.label : '(none)';
@@ -233,7 +241,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
         return;
       }
 
-      if (key === '\x03') {
+      if (isKey(key, 'c', { ctrl: true })) {
         // Ctrl+C — cancel from either mode
         const fallbackValue = options.defaultValue ?? options.options[0]!.value;
         const fallbackOption = options.options.find((opt) => Object.is(opt.value, fallbackValue));
@@ -245,7 +253,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
 
       // ── Normal mode ────────────────────────────────────────
       if (mode === 'normal') {
-        if (key === '\x1b') {
+        if (isKey(key, 'escape')) {
           // Escape in normal mode — cancel
           // TODO: bare \x1b may false-trigger on slow connections where escape
           // sequences arrive as separate bytes. Timer-based disambiguation is a
@@ -258,26 +266,26 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
           return;
         }
 
-        if (key === 'j' || key === '\x1b[B') {
+        if (key.text === 'j' || isKey(key, 'down')) {
           navigateDown();
           return;
         }
 
-        if (key === 'k' || key === '\x1b[A') {
+        if (key.text === 'k' || isKey(key, 'up')) {
           navigateUp();
           return;
         }
 
-        if (key === '/') {
+        if (key.text === '/') {
           // Enter insert mode without typing
           switchMode('insert');
           return;
         }
 
         // Any other printable — enter insert mode and type the char
-        if (key.length === 1 && key >= ' ') {
+        if (isPrintableKey(key)) {
           mode = 'insert';
-          typeChar(key);
+          typeChar(key.text);
           return;
         }
 
@@ -285,23 +293,23 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       }
 
       // ── Insert mode ────────────────────────────────────────
-      if (key === '\x1b') {
+      if (isKey(key, 'escape')) {
         // Escape in insert mode — return to normal
         switchMode('normal');
         return;
       }
 
-      if (key === '\x1b[A') {
+      if (isKey(key, 'up')) {
         navigateUp();
         return;
       }
 
-      if (key === '\x1b[B') {
+      if (isKey(key, 'down')) {
         navigateDown();
         return;
       }
 
-      if (key === '\x7f' || key === '\b') {
+      if (isKey(key, 'backspace')) {
         if (query.length > 0) {
           const prevLineCount = renderLineCount();
           query = query.slice(0, -1);
@@ -312,8 +320,8 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
       }
 
       // Printable character (all printable keys including j/k)
-      if (key.length === 1 && key >= ' ') {
-        typeChar(key);
+      if (isPrintableKey(key)) {
+        typeChar(key.text);
       }
     });
   });

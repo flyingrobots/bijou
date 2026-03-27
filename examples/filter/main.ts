@@ -1,9 +1,9 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { filter } from '@flyingrobots/bijou';
+import { type BijouContext, filter } from '@flyingrobots/bijou';
 
-const ctx = initDefaultContext();
-
-async function main() {
+export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
   const language = await filter({
     title: 'Choose a programming language:',
     placeholder: 'j/k navigate, type or / to search',
@@ -24,4 +24,6 @@ async function main() {
   console.log(`Selected language: ${language.toUpperCase()}`);
 }
 
-main().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}

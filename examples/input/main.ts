@@ -1,9 +1,9 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { input } from '@flyingrobots/bijou';
+import { type BijouContext, input } from '@flyingrobots/bijou';
 
-const ctx = initDefaultContext();
-
-async function main() {
+export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
   const name = await input({
     title: 'Project name:',
     placeholder: 'my-project',
@@ -28,4 +28,6 @@ async function main() {
   console.log(`Created project: ${name} — ${description || '(no description)'}`);
 }
 
-main().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}

@@ -1,9 +1,9 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { group, input, select, multiselect, confirm, separator, box } from '@flyingrobots/bijou';
+import { type BijouContext, group, input, select, multiselect, confirm, separator, box } from '@flyingrobots/bijou';
 
-const ctx = initDefaultContext();
-
-async function main() {
+export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
   console.log(separator({ label: 'Project Setup', ctx }));
   console.log();
 
@@ -59,4 +59,6 @@ async function main() {
   console.log(box(summary, { ctx }));
 }
 
-main().catch(console.error);
+if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}
