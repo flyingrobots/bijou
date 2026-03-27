@@ -120,7 +120,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 | [`timeline-anim`](./timeline-anim/) | `timeline()`, `animate()`, `sequence()` | Orchestrated GSAP-style animation |
 | [`modal`](./modal/) | `modal()`, `compositeSurface()`, `createInputStack()` | Blocking decision overlay with layered input ownership |
 | [`toast`](./toast/) | `toast()`, `compositeSurface()` | Low-level transient overlay primitive with explicit anchoring |
-| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and history center |
+| [`notifications`](./notifications/) | `renderNotificationStack()`, `renderNotificationHistory()`, `pushNotification()`, `tickNotifications()` | App-managed notification system with stacking, actions, routing, placement changes, and shell-owned notification review |
 | [`help`](./help/) | `createKeyMap()`, `helpViewSurface()`, `helpShortSurface()` | Keybinding manager with surface-native help toggle |
 | [`print-key`](./print-key/) | `parseKey()` | Key event inspector with modifier badges |
 | [`fullscreen`](./fullscreen/) | `enterScreen()`, `exitScreen()` | Alternate screen with centered content |

@@ -22,9 +22,11 @@ describe('serializeLayoutState', () => {
       rows: 24,
       helpOpen: false,
       settingsOpen: false,
+      notificationCenterOpen: false,
       quitConfirmOpen: false,
       settingsFocusIndex: 0,
       settingsScrollY: 0,
+      notificationCenterScrollY: 0,
       transitionProgress: 1,
       transitionGeneration: 0,
       transitionFrame: 0,
@@ -33,6 +35,7 @@ describe('serializeLayoutState', () => {
       dockStateByPage: {},
       splitRatioOverrides: {},
       runtimeNotifications: createNotificationState(),
+      runtimeNotificationHistoryFilter: 'ALL',
       runtimeNotificationLoopActive: false,
     };
 
@@ -55,9 +58,11 @@ describe('serializeLayoutState', () => {
       rows: 24,
       helpOpen: false,
       settingsOpen: false,
+      notificationCenterOpen: false,
       quitConfirmOpen: false,
       settingsFocusIndex: 0,
       settingsScrollY: 0,
+      notificationCenterScrollY: 0,
       transitionProgress: 1,
       transitionGeneration: 0,
       transitionFrame: 0,
@@ -66,6 +71,7 @@ describe('serializeLayoutState', () => {
       dockStateByPage: { page1: { orderByContainer: { 'split-1': ['b', 'a'] } } },
       splitRatioOverrides: { page1: { 'split-1': 0.3 } },
       runtimeNotifications: createNotificationState(),
+      runtimeNotificationHistoryFilter: 'ALL',
       runtimeNotificationLoopActive: false,
     };
 
@@ -87,9 +93,11 @@ describe('serializeLayoutState', () => {
       rows: 24,
       helpOpen: false,
       settingsOpen: false,
+      notificationCenterOpen: false,
       quitConfirmOpen: false,
       settingsFocusIndex: 0,
       settingsScrollY: 0,
+      notificationCenterScrollY: 0,
       transitionProgress: 1,
       transitionGeneration: 0,
       transitionFrame: 0,
@@ -98,6 +106,7 @@ describe('serializeLayoutState', () => {
       dockStateByPage: {},
       splitRatioOverrides: {},
       runtimeNotifications: createNotificationState(),
+      runtimeNotificationHistoryFilter: 'ALL',
       runtimeNotificationLoopActive: false,
     };
 

@@ -85,11 +85,35 @@ export function applyFrameAction<PageModel, Msg>(
       if (settings == null || settings.sections.every((section) => section.rows.length === 0)) {
         return [model, []];
       }
+      const opening = !model.settingsOpen;
       return [{
         ...model,
-        settingsOpen: !model.settingsOpen,
-        settingsFocusIndex: model.settingsOpen ? model.settingsFocusIndex : 0,
-        settingsScrollY: model.settingsOpen ? model.settingsScrollY : 0,
+        settingsOpen: opening,
+        settingsFocusIndex: opening ? 0 : model.settingsFocusIndex,
+        settingsScrollY: opening ? 0 : model.settingsScrollY,
+        notificationCenterOpen: opening ? false : model.notificationCenterOpen,
+        helpOpen: opening ? false : model.helpOpen,
+        helpScrollY: opening ? 0 : model.helpScrollY,
+        commandPalette: opening ? undefined : model.commandPalette,
+        commandPaletteEntries: opening ? undefined : model.commandPaletteEntries,
+        commandPaletteTitle: opening ? undefined : model.commandPaletteTitle,
+      }, []];
+    }
+    case 'toggle-notifications': {
+      if (!hasNotificationCenter(model, options, pagesById)) {
+        return [model, []];
+      }
+      return [{
+        ...model,
+        notificationCenterOpen: !model.notificationCenterOpen,
+        notificationCenterScrollY: model.notificationCenterOpen ? model.notificationCenterScrollY : 0,
+        settingsOpen: false,
+        helpOpen: false,
+        helpScrollY: 0,
+        commandPalette: undefined,
+        commandPaletteEntries: undefined,
+        commandPaletteTitle: undefined,
+        quitConfirmOpen: false,
       }, []];
     }
     case 'prev-tab':
@@ -134,6 +158,23 @@ export function applyFrameAction<PageModel, Msg>(
     case 'transition-complete':
       return [model, []];
   }
+}
+
+function hasNotificationCenter<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): boolean {
+  const activePage = pagesById.get(model.activePageId);
+  if (activePage == null) return options.runtimeNotifications !== false;
+  const pageModel = model.pageModels[model.activePageId]!;
+  const provided = options.notificationCenter?.({
+    model,
+    activePage,
+    pageModel,
+    runtimeNotifications: model.runtimeNotifications,
+  });
+  return provided != null || options.runtimeNotifications !== false;
 }
 
 /** Cycle the active tab by `delta` positions, optionally starting a transition. */

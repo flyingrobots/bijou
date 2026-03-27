@@ -3,7 +3,6 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { box, kbd, resolveClock, stringToSurface } from '@flyingrobots/bijou';
 import {
   activateFocusedNotification,
-  countNotificationHistory,
   createFramedApp,
   createKeyMap,
   createNotificationState,
@@ -11,11 +10,9 @@ import {
   dismissFocusedNotification,
   dismissNotification,
   isMouseMsg,
-  modal,
   notificationsNeedTick,
   pushNotification,
   relocateNotifications,
-  renderNotificationHistory,
   quit,
   renderNotificationStack,
   run,
@@ -32,7 +29,7 @@ import {
   type NotificationState,
   type NotificationTone,
   type NotificationVariant,
-} from '@flyingrobots/bijou-tui';
+} from '../../packages/bijou-tui/src/index.js';
 
 export const ctx = initDefaultContext();
 
@@ -92,13 +89,7 @@ type Msg =
   | { type: 'cycle-duration' }
   | { type: 'toggle-action' }
   | { type: 'toggle-wrap' }
-  | { type: 'open-history' }
-  | { type: 'close-history' }
-  | { type: 'history-next' }
-  | { type: 'history-prev' }
-  | { type: 'history-page-down' }
-  | { type: 'history-page-up' }
-  | { type: 'cycle-history-filter' }
+  | { type: 'set-history-filter'; filter: NotificationHistoryFilter }
   | { type: 'focus-next' }
   | { type: 'focus-prev' }
   | { type: 'activate-focused' }
@@ -116,23 +107,10 @@ const pageKeyMap = createKeyMap<Msg>()
   .bind('d', 'Cycle duration', { type: 'cycle-duration' })
   .bind('a', 'Toggle action button', { type: 'toggle-action' })
   .bind('w', 'Toggle text wrap', { type: 'toggle-wrap' })
-  .bind('shift+h', 'Open notification history', { type: 'open-history' })
   .bind('j', 'Focus next actionable notification', { type: 'focus-next' })
   .bind('k', 'Focus previous actionable notification', { type: 'focus-prev' })
   .bind('enter', 'Run focused notification action', { type: 'activate-focused' })
-  .bind('x', 'Dismiss focused/latest notification', { type: 'dismiss-notification' })
-  .bind('q', 'Quit demo / Close history', { type: 'quit-app' });
-
-const historyKeyMap = createKeyMap<Msg>()
-  .bind('escape', 'Close history center', { type: 'close-history' })
-  .bind('q', 'Close history center', { type: 'close-history' })
-  .bind('up', 'Scroll history up', { type: 'history-prev' })
-  .bind('down', 'Scroll history down', { type: 'history-next' })
-  .bind('j', 'Scroll history down', { type: 'history-next' })
-  .bind('k', 'Scroll history up', { type: 'history-prev' })
-  .bind('pageup', 'History page up', { type: 'history-page-up' })
-  .bind('pagedown', 'History page down', { type: 'history-page-down' })
-  .bind('f', 'Cycle history filter', { type: 'cycle-history-filter' });
+  .bind('x', 'Dismiss focused/latest notification', { type: 'dismiss-notification' });
 
 interface PageModel {
   readonly notifications: NotificationState<Msg>;
@@ -143,8 +121,6 @@ interface PageModel {
   readonly durationIndex: number;
   readonly actionEnabled: boolean;
   readonly wrapText: boolean;
-  readonly historyOpen: boolean;
-  readonly historyScroll: number;
   readonly historyFilterIndex: number;
   readonly nextOrdinal: number;
   readonly lastHandledInput: string;
@@ -161,8 +137,6 @@ function createInitialPageModel(): PageModel {
     durationIndex: 0,
     actionEnabled: true,
     wrapText: true,
-    historyOpen: false,
-    historyScroll: 0,
     historyFilterIndex: 0,
     nextOrdinal: 1,
     lastHandledInput: 'none',
@@ -191,14 +165,6 @@ function currentDuration(model: PageModel) {
 
 function currentHistoryFilter(model: PageModel): NotificationHistoryFilter {
   return HISTORY_FILTERS[model.historyFilterIndex]!;
-}
-
-function maxHistoryScroll(model: PageModel): number {
-  return Math.max(0, countNotificationHistory(model.notifications, currentHistoryFilter(model)) - 1);
-}
-
-function clampHistoryScroll(model: PageModel, nextScroll: number): number {
-  return Math.max(0, Math.min(nextScroll, maxHistoryScroll(model)));
 }
 
 function toneCopy(tone: NotificationTone): { readonly title: string; readonly message: string } {
@@ -259,31 +225,6 @@ function recordInput(model: PageModel, key: string, message: string): PageModel 
   }, `[${key}] ${message}`);
 }
 
-function openHistory(model: PageModel, key: string): PageModel {
-  return recordInput({
-    ...model,
-    historyOpen: true,
-    historyScroll: clampHistoryScroll(model, model.historyScroll),
-  }, key, `Opened notification history (${countNotificationHistory(model.notifications, currentHistoryFilter(model))} items).`);
-}
-
-function blocksBehindHistory(msg: Msg): boolean {
-  switch (msg.type) {
-    case 'open-history':
-    case 'close-history':
-    case 'history-next':
-    case 'history-prev':
-    case 'history-page-down':
-    case 'history-page-up':
-    case 'cycle-history-filter':
-    case 'key-observed':
-    case 'quit-app':
-      return false;
-    default:
-      return true;
-  }
-}
-
 function renderControlsPane(model: PageModel, width: number, notificationCtx = ctx): string {
   const activeVariant = currentVariant(model);
   const activeTone = currentTone(model);
@@ -306,7 +247,7 @@ function renderControlsPane(model: PageModel, width: number, notificationCtx = c
     `Wrap    : ${model.wrapText ? 'enabled' : 'disabled'}`,
     `Stack   : ${model.notifications.items.length}`,
     `History : ${model.notifications.history.length}`,
-    `Center  : ${model.historyOpen ? 'open' : 'closed'} (${historyFilter})`,
+    `Review  : shift+n (${historyFilter})`,
     `Focus   : ${focused}`,
     `Last key: ${model.lastHandledInput}`,
     '',
@@ -317,11 +258,11 @@ function renderControlsPane(model: PageModel, width: number, notificationCtx = c
     `${kbd('d')} cycle duration`,
     `${kbd('a')} toggle action`,
     `${kbd('w')} toggle wrap`,
-    `${kbd('shift+h')} open history center`,
+    `${kbd('shift+n')} shell notification center`,
     `${kbd('j')} / ${kbd('k')} focus action`,
     `${kbd('enter')} run action`,
     `${kbd('x')} dismiss focused/latest`,
-    `${kbd('q')} quit`,
+    `${kbd('/')} search • ${kbd('f2')} settings`,
     '',
     'Try stacking a few in the same corner, then',
     'flip placements to compare the anchor behavior.',
@@ -350,46 +291,6 @@ function renderLogPane(model: PageModel, width: number, notificationCtx = ctx): 
   });
 }
 
-function renderHistoryModal(
-  model: PageModel,
-  screenWidth: number,
-  screenHeight: number,
-  notificationCtx = ctx,
-) {
-  const filter = currentHistoryFilter(model);
-  const compact = isCompactDemoViewport(screenWidth, screenHeight);
-  const edgeMargin = demoOverlayMargin(screenWidth, screenHeight);
-  const title = compact ? 'History' : `Notification History (${filter})`;
-  const hint = compact
-    ? 'Up/Down • PgUp/PgDn • f • Esc'
-    : 'Up/Down scroll • PageUp/PageDown jump • f filter • Esc close';
-  const headerRows = 2;
-  const hintRows = 2;
-  const borderRows = 2;
-  const modalWidth = Math.max(12, Math.min(96, Math.max(12, screenWidth - (edgeMargin * 2))));
-  const bodyWidth = Math.max(1, modalWidth - 4);
-  const bodyHeight = Math.max(
-    1,
-    Math.min(20, screenHeight - borderRows - headerRows - hintRows),
-  );
-
-  return modal({
-    title,
-    body: renderNotificationHistory(model.notifications, {
-      width: bodyWidth,
-      height: bodyHeight,
-      scroll: model.historyScroll,
-      filter,
-      ctx: notificationCtx,
-    }),
-    hint,
-    width: modalWidth,
-    screenWidth,
-    screenHeight,
-    ctx: notificationCtx,
-  });
-}
-
 function applyNotificationState(
   model: PageModel,
   notifications: NotificationState<Msg>,
@@ -413,10 +314,6 @@ function applyNotificationState(
     ...model,
     notifications: trimmed,
     notificationLoopActive: needsTick,
-    historyScroll: clampHistoryScroll({
-      ...model,
-      notifications: trimmed,
-    }, model.historyScroll),
   };
   const shouldScheduleTick = needsTick && (forceTick || !model.notificationLoopActive);
 
@@ -670,12 +567,7 @@ export function createNotificationDemoApp(
     },
     update(msg, model) {
       if (isMouseMsg(msg)) {
-        if (model.historyOpen) return [model, []];
         return handleNotificationMouse(model, msg, notificationCtx);
-      }
-
-      if (model.historyOpen && blocksBehindHistory(msg)) {
-        return [model, []];
       }
 
       switch (msg.type) {
@@ -723,63 +615,18 @@ export function createNotificationDemoApp(
           ...model,
           wrapText: !model.wrapText,
         }, 'w', `Wrap ${!model.wrapText ? 'enabled' : 'disabled'}.`), []];
-      case 'open-history':
-        return [openHistory(model, 'shift+h'), []];
-      case 'close-history':
-        if (!model.historyOpen) return [model, []];
+      case 'set-history-filter':
+        if (msg.filter === currentHistoryFilter(model)) return [model, []];
         return [recordInput({
           ...model,
-          historyOpen: false,
-        }, 'escape', 'Closed notification history.'), []];
-      case 'history-next':
-        if (!model.historyOpen) return [model, []];
-        return [{
-          ...model,
-          historyScroll: clampHistoryScroll(model, model.historyScroll + 1),
-        }, []];
-      case 'history-prev':
-        if (!model.historyOpen) return [model, []];
-        return [{
-          ...model,
-          historyScroll: clampHistoryScroll(model, model.historyScroll - 1),
-        }, []];
-      case 'history-page-down':
-        if (!model.historyOpen) return [model, []];
-        return [{
-          ...model,
-          historyScroll: clampHistoryScroll(model, model.historyScroll + 5),
-        }, []];
-      case 'history-page-up':
-        if (!model.historyOpen) return [model, []];
-        return [{
-          ...model,
-          historyScroll: clampHistoryScroll(model, model.historyScroll - 5),
-        }, []];
-      case 'cycle-history-filter':
-        if (!model.historyOpen) return [model, []];
-        return [recordInput({
-          ...model,
-          historyFilterIndex: (model.historyFilterIndex + 1) % HISTORY_FILTERS.length,
-          historyScroll: 0,
-        }, 'f', `History filter -> ${HISTORY_FILTERS[(model.historyFilterIndex + 1) % HISTORY_FILTERS.length]!}.`), []];
+          historyFilterIndex: HISTORY_FILTERS.indexOf(msg.filter),
+        }, 'f', `History filter -> ${msg.filter}.`), []];
       case 'focus-next':
-        if (model.historyOpen) {
-          return [{
-            ...model,
-            historyScroll: clampHistoryScroll(model, model.historyScroll + 1),
-          }, []];
-        }
         return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, 1),
         }, 'j', 'Focused next actionable notification.'), []];
       case 'focus-prev':
-        if (model.historyOpen) {
-          return [{
-            ...model,
-            historyScroll: clampHistoryScroll(model, model.historyScroll - 1),
-          }, []];
-        }
         return [recordInput({
           ...model,
           notifications: cycleNotificationFocus(model.notifications, -1),
@@ -814,27 +661,12 @@ export function createNotificationDemoApp(
           lastHandledInput: `${msg.key}:${msg.route}`,
         }, `[key ${msg.key}] route=${msg.route}`), []];
       case 'quit-app':
-        if (model.historyOpen) {
-          return [recordInput({
-            ...model,
-            historyOpen: false,
-          }, 'q', 'Closed notification history.'), []];
-        }
         return [model, [quit()]];
       default:
         return [model, []];
     }
     },
     keyMap: pageKeyMap,
-    commandItems(model) {
-      return [{
-        id: 'view-history',
-        label: 'View notifications history',
-        description: `${countNotificationHistory(model.notifications, currentHistoryFilter(model))} archived notifications`,
-        category: 'Notifications',
-        action: { type: 'open-history' },
-      }];
-    },
     layout(model) {
       return {
         kind: 'grid',
@@ -865,17 +697,19 @@ export function createNotificationDemoApp(
     initialColumns: notificationCtx.runtime.columns,
     initialRows: notificationCtx.runtime.rows,
     keyPriority: 'page-first',
-    helpLineSource: ({ model, activePage }) => {
-      const pageModel = model.pageModels[model.activePageId] as PageModel | undefined;
-      if (pageModel?.historyOpen) return historyKeyMap;
-      return activePage.helpSource ?? activePage.keyMap;
-    },
     observeKey: (msg, route) => ({
       type: 'key-observed',
       key: `${msg.ctrl ? 'ctrl+' : ''}${msg.alt ? 'alt+' : ''}${msg.shift ? 'shift+' : ''}${msg.key}`,
       route,
     }),
     enableCommandPalette: true,
+    notificationCenter: ({ pageModel }) => ({
+      title: 'Notification center',
+      state: pageModel.notifications,
+      filters: HISTORY_FILTERS,
+      activeFilter: currentHistoryFilter(pageModel),
+      onFilterChange: (filter) => ({ type: 'set-history-filter', filter }),
+    }),
     overlayFactory(frame) {
       const paneRects = [...frame.paneRects.values()];
       const region = paneRects.length === 0
@@ -895,15 +729,6 @@ export function createNotificationDemoApp(
         gap: 1,
         ctx: notificationCtx,
       })];
-
-      if (frame.pageModel.historyOpen) {
-        overlays.push(renderHistoryModal(
-          frame.pageModel,
-          frame.screenRect.width,
-          frame.screenRect.height,
-          notificationCtx,
-        ));
-      }
 
       return overlays;
     },

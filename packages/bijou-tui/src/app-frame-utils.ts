@@ -119,7 +119,9 @@ export function mergeBindingSources(...sources: Array<BindingSource | undefined>
 }
 
 /** Build the default key map for frame-level actions (tabs, panes, scroll, help '?', command palette 'ctrl+p'/':'). */
-export function createFrameKeyMap(options: { readonly enableSettings?: boolean } = {}): KeyMap<FrameAction> {
+export function createFrameKeyMap(
+  options: { readonly enableSettings?: boolean; readonly enableNotifications?: boolean } = {},
+): KeyMap<FrameAction> {
   const keyMap = createKeyMap<FrameAction>()
     .group('Frame', (g) => g
       .bind('?', 'Toggle help', { type: 'toggle-help' })
@@ -154,6 +156,11 @@ export function createFrameKeyMap(options: { readonly enableSettings?: boolean }
     keyMap.group('Shell', (g) => g
       .bind('ctrl+,', 'Settings', { type: 'toggle-settings' })
       .bind('f2', 'Settings', { type: 'toggle-settings' }));
+  }
+
+  if (options.enableNotifications) {
+    keyMap.group('Shell', (g) => g
+      .bind('shift+n', 'Notifications', { type: 'toggle-notifications' }));
   }
 
   return keyMap;

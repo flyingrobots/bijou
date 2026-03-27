@@ -7,6 +7,7 @@
 
 import {
   createSurface,
+  parseAnsiToSurface,
   resolveClock,
   resolveSafeCtx,
   type Cell,
@@ -55,14 +56,17 @@ import type { OverflowX } from './focus-area.js';
 import type { Timeline, TimelineState } from './timeline.js';
 import type { ViewOutput } from './view-output.js';
 import {
+  countNotificationHistory,
   createNotificationState,
   dismissNotification,
   hitTestNotificationStack,
   notificationsNeedTick,
   pushNotification,
+  renderNotificationHistory,
   renderNotificationStack,
   tickNotifications,
   trimNotificationsToViewport,
+  type NotificationHistoryFilter,
   type NotificationPlacement,
   type NotificationState,
 } from './notification.js';
@@ -185,6 +189,15 @@ export interface FrameSettings<Msg> {
   readonly sections: readonly FrameSettingSection<Msg>[];
 }
 
+/** Structured notification review content supplied by the app and rendered by the frame shell. */
+export interface FrameNotificationCenter<Msg> {
+  readonly title?: string;
+  readonly state: NotificationState<Msg>;
+  readonly filters?: readonly NotificationHistoryFilter[];
+  readonly activeFilter?: NotificationHistoryFilter;
+  readonly onFilterChange?: (filter: NotificationHistoryFilter) => Msg | undefined;
+}
+
 /** Declarative frame layout node. */
 export type FrameLayoutNode =
   | {
@@ -282,6 +295,13 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
     readonly activePage: FramePage<PageModel, Msg>;
     readonly pageModel: PageModel;
   }) => FrameSettings<Msg> | undefined;
+  /** Optional shell-owned notification center content. */
+  readonly notificationCenter?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly pageModel: PageModel;
+    readonly runtimeNotifications: NotificationState<never>;
+  }) => FrameNotificationCenter<Msg> | undefined;
   /** Optional overlay provider (receives pane rects for panel scoping). */
   readonly overlayFactory?: (ctx: FrameOverlayContext<PageModel>) => readonly Overlay[];
   /** Optional runtime warning/error notifications managed by the frame shell. */
@@ -350,12 +370,16 @@ export interface FrameModel<PageModel> {
   readonly commandPalette?: CommandPaletteState;
   /** Settings drawer visibility flag. */
   readonly settingsOpen: boolean;
+  /** Notification center visibility flag. */
+  readonly notificationCenterOpen: boolean;
   /** Quit-confirm modal visibility flag. */
   readonly quitConfirmOpen: boolean;
   /** Active settings row index. */
   readonly settingsFocusIndex: number;
   /** Vertical scroll offset for the settings drawer. */
   readonly settingsScrollY: number;
+  /** Vertical scroll offset for the notification center. */
+  readonly notificationCenterScrollY: number;
   /** ID of the page we are transitioning away from. */
   readonly previousPageId?: string;
   /** Transition progress (0 to 1). */
@@ -382,6 +406,8 @@ export interface FrameModel<PageModel> {
   readonly splitRatioOverrides: Readonly<Record<string, Readonly<Record<string, number>>>>;
   /** Frame-managed runtime notifications. */
   readonly runtimeNotifications: NotificationState<never>;
+  /** Active filter for the shell fallback notification center. */
+  readonly runtimeNotificationHistoryFilter: NotificationHistoryFilter;
   /** Whether the runtime notification tick loop is active. */
   readonly runtimeNotificationLoopActive: boolean;
 }
@@ -392,6 +418,14 @@ export interface FrameModel<PageModel> {
 
 const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
+const DEFAULT_NOTIFICATION_CENTER_FILTERS: readonly NotificationHistoryFilter[] = [
+  'ALL',
+  'ACTIONABLE',
+  'ERROR',
+  'WARNING',
+  'SUCCESS',
+  'INFO',
+];
 
 interface ResolvedFrameNotificationOptions {
   readonly enabled: boolean;
@@ -426,6 +460,22 @@ const settingsHelpKeys = createKeyMap<FrameAction>()
     .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
     .bind(':', 'Open command palette', { type: 'open-palette' })
     .bind('?', 'Toggle help', { type: 'toggle-help' }));
+const notificationCenterHelpKeys = createKeyMap<{ type: 'noop' }>()
+  .group('Notifications', (g) => g
+    .bind('shift+n', 'Close notification center', { type: 'noop' })
+    .bind('up', 'Scroll up', { type: 'noop' })
+    .bind('down', 'Scroll down', { type: 'noop' })
+    .bind('j', 'Scroll down', { type: 'noop' })
+    .bind('k', 'Scroll up', { type: 'noop' })
+    .bind('d', 'Page down', { type: 'noop' })
+    .bind('u', 'Page up', { type: 'noop' })
+    .bind('g', 'Top', { type: 'noop' })
+    .bind('shift+g', 'Bottom', { type: 'noop' })
+    .bind('f', 'Cycle filter', { type: 'noop' })
+    .bind('/', 'Search', { type: 'noop' })
+    .bind('ctrl+p', 'Open command palette', { type: 'noop' })
+    .bind(':', 'Open command palette', { type: 'noop' })
+    .bind('?', 'Toggle help', { type: 'noop' }));
 
 function resolveFrameNotificationOptions<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -495,7 +545,10 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
-  const frameKeys = createFrameKeyMap({ enableSettings: options.settings != null });
+  const frameKeys = createFrameKeyMap({
+    enableSettings: options.settings != null,
+    enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
+  });
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   let composedFrameScratch: Surface | null = null;
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
@@ -547,6 +600,7 @@ export function createFramedApp<PageModel, Msg>(
       helpOpen: false,
       helpScrollY: 0,
       settingsOpen: false,
+      notificationCenterOpen: false,
       commandPalette: undefined,
       commandPaletteEntries: undefined,
       commandPaletteTitle: undefined,
@@ -628,6 +682,27 @@ export function createFramedApp<PageModel, Msg>(
               return [focusedModel, []];
             }
             return [focusedModel, [emitMsgForPage(model.activePageId, hit.row.action)]];
+          }
+
+          return [model, []];
+        }
+      }
+
+      if (model.notificationCenterOpen) {
+        const layout = resolveNotificationCenterLayout(model, options, pagesById);
+        if (layout != null) {
+          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+            if (isInsideNotificationCenterDrawer(msg.col, msg.row, layout, model)) {
+              return [
+                scrollNotificationCenterBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
+                [],
+              ];
+            }
+            return [model, []];
+          }
+
+          if (msg.action === 'press' && msg.button === 'left') {
+            return [model, []];
           }
 
           return [model, []];
@@ -759,9 +834,11 @@ export function createFramedApp<PageModel, Msg>(
         helpOpen: false,
         helpScrollY: 0,
         settingsOpen: false,
+        notificationCenterOpen: false,
         quitConfirmOpen: false,
         settingsFocusIndex: 0,
         settingsScrollY: 0,
+        notificationCenterScrollY: 0,
         transitionProgress: 1,
         transitionGeneration: 0,
         transitionFrame: 0,
@@ -770,6 +847,7 @@ export function createFramedApp<PageModel, Msg>(
         dockStateByPage: {},
         splitRatioOverrides: {},
         runtimeNotifications: createNotificationState(),
+        runtimeNotificationHistoryFilter: 'ALL',
         runtimeNotificationLoopActive: false,
       };
 
@@ -907,6 +985,15 @@ export function createFramedApp<PageModel, Msg>(
             }
             return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
+          if (frameAction?.type === 'toggle-notifications') {
+            const [nextModel, cmds] = applyFrameAction(frameAction, {
+              ...model,
+              commandPalette: undefined,
+              commandPaletteEntries: undefined,
+              commandPaletteTitle: undefined,
+            }, options, pagesById);
+            return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
+          }
           const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
           return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
@@ -934,6 +1021,7 @@ export function createFramedApp<PageModel, Msg>(
         if (model.settingsOpen) {
           const layout = resolveSettingsLayout(model, options, pagesById);
           if (layout != null) {
+            const settingsFrameAction = frameKeys.handle(msg);
             if (isShellQuitRequest(msg)) {
               return applyQuitRequest(model, msg);
             }
@@ -963,6 +1051,10 @@ export function createFramedApp<PageModel, Msg>(
             }
             if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
               return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (settingsFrameAction?.type === 'toggle-notifications') {
+              const [nextModel, cmds] = applyFrameAction(settingsFrameAction, model, options, pagesById);
+              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
             }
             if (!msg.ctrl && !msg.alt && msg.key === 'up') {
               return [moveSettingsFocus(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
@@ -994,6 +1086,69 @@ export function createFramedApp<PageModel, Msg>(
                 return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, row.action)], msg, 'frame')];
               }
               return [model, withObservedKey(model, [], msg, 'frame')];
+            }
+            return [model, withObservedKey(model, [], msg, 'frame')];
+          }
+        }
+
+        if (model.notificationCenterOpen) {
+          const layout = resolveNotificationCenterLayout(model, options, pagesById);
+          if (layout != null) {
+            const centerFrameAction = frameKeys.handle(msg);
+            if (isShellQuitRequest(msg)) {
+              return applyQuitRequest(model, msg);
+            }
+            if (centerFrameAction?.type === 'toggle-notifications') {
+              const [nextModel, cmds] = applyFrameAction(centerFrameAction, model, options, pagesById);
+              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'f2') {
+              const [nextModel, cmds] = applyFrameAction({ type: 'toggle-settings' }, model, options, pagesById);
+              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === '?') {
+              return [{
+                ...model,
+                helpOpen: true,
+                notificationCenterOpen: false,
+                notificationCenterScrollY: 0,
+              }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
+              return [openSearchPalette({
+                ...model,
+                notificationCenterOpen: false,
+                notificationCenterScrollY: 0,
+              }, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
+              return [openCommandPalette({
+                ...model,
+                notificationCenterOpen: false,
+                notificationCenterScrollY: 0,
+              }, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && (msg.key === 'up' || msg.key === 'k')) {
+              return [scrollNotificationCenterBy(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && (msg.key === 'down' || msg.key === 'j')) {
+              return [scrollNotificationCenterBy(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'd') {
+              return [scrollNotificationCenterBy(model, layout, Math.max(1, layout.contentHeight - 2)), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'u') {
+              return [scrollNotificationCenterBy(model, layout, -Math.max(1, layout.contentHeight - 2)), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'g') {
+              return [{ ...model, notificationCenterScrollY: 0 }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'G') {
+              return [{ ...model, notificationCenterScrollY: layout.maxScrollY }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (!msg.ctrl && !msg.alt && msg.key === 'f') {
+              const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
+              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
             }
             return [model, withObservedKey(model, [], msg, 'frame')];
           }
@@ -1105,7 +1260,13 @@ export function createFramedApp<PageModel, Msg>(
     view(model) {
       const activePage = pagesById.get(model.activePageId)!;
       const header = resolveHeaderLine(model, options, pagesById).surface;
-      const helpLine = renderHelpLine(model, frameKeys, options, activePage);
+      const helpLine = renderHelpLine(
+        model,
+        frameKeys,
+        options,
+        activePage,
+        resolveNotificationFooterCue(model, options, pagesById),
+      );
       const bodyRect = frameBodyRect(model.columns, model.rows);
 
       // Check for maximized pane — if set, render only that pane at full body rect
@@ -1186,6 +1347,13 @@ export function createFramedApp<PageModel, Msg>(
         const settingsOverlay = renderSettingsDrawer(model, options, pagesById);
         if (settingsOverlay != null) {
           overlays.push(settingsOverlay);
+        }
+      }
+
+      if (model.notificationCenterOpen) {
+        const notificationCenterOverlay = renderNotificationCenterDrawer(model, options, pagesById);
+        if (notificationCenterOverlay != null) {
+          overlays.push(notificationCenterOverlay);
         }
       }
 
@@ -1276,6 +1444,8 @@ function renderHelpOverlay<PageModel, Msg>(
   );
   const source = model.settingsOpen
     ? mergeBindingSources(settingsHelpKeys, quitHelpKeys)
+    : model.notificationCenterOpen
+      ? mergeBindingSources(notificationCenterHelpKeys, quitHelpKeys)
     : mergeBindingSources(
       frameKeys,
       quitHelpKeys,
@@ -1400,6 +1570,23 @@ interface ResolvedSettingsLayout<Msg> {
   readonly maxScrollY: number;
 }
 
+interface ResolvedFrameNotificationCenter<Msg> {
+  readonly title: string;
+  readonly state: NotificationState<Msg>;
+  readonly filters: readonly NotificationHistoryFilter[];
+  readonly activeFilter: NotificationHistoryFilter;
+  readonly onFilterChange?: (filter: NotificationHistoryFilter) => Msg | undefined;
+}
+
+interface ResolvedNotificationCenterLayout<Msg> {
+  readonly center: ResolvedFrameNotificationCenter<Msg>;
+  readonly drawerWidth: number;
+  readonly contentWidth: number;
+  readonly contentHeight: number;
+  readonly content: Surface;
+  readonly maxScrollY: number;
+}
+
 function resolveFrameSettings<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -1411,6 +1598,46 @@ function resolveFrameSettings<PageModel, Msg>(
     activePage,
     pageModel: model.pageModels[model.activePageId]!,
   });
+}
+
+function resolveFrameNotificationCenter<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): ResolvedFrameNotificationCenter<Msg> | undefined {
+  const activePage = pagesById.get(model.activePageId)!;
+  const pageModel = model.pageModels[model.activePageId]!;
+  const provided = options.notificationCenter?.({
+    model,
+    activePage,
+    pageModel,
+    runtimeNotifications: model.runtimeNotifications,
+  });
+
+  if (provided != null) {
+    const filters = provided.filters != null && provided.filters.length > 0
+      ? provided.filters
+      : DEFAULT_NOTIFICATION_CENTER_FILTERS;
+    const activeFilter = filters.includes(provided.activeFilter ?? 'ALL')
+      ? (provided.activeFilter ?? 'ALL')
+      : filters[0]!;
+    return {
+      title: provided.title ?? 'Notifications',
+      state: provided.state,
+      filters,
+      activeFilter,
+      onFilterChange: provided.onFilterChange,
+    };
+  }
+
+  if (options.runtimeNotifications === false) return undefined;
+
+  return {
+    title: 'Notifications',
+    state: model.runtimeNotifications as NotificationState<Msg>,
+    filters: DEFAULT_NOTIFICATION_CENTER_FILTERS,
+    activeFilter: model.runtimeNotificationHistoryFilter,
+  };
 }
 
 function resolveSettingsLayout<PageModel, Msg>(
@@ -1460,6 +1687,38 @@ function resolveSettingsLayout<PageModel, Msg>(
     contentHeight,
     totalLines,
     maxScrollY,
+  };
+}
+
+function resolveNotificationCenterDrawerWidth(columns: number): number {
+  const boundedColumns = Math.max(28, columns);
+  return Math.min(Math.max(32, Math.floor(boundedColumns * 0.34)), Math.max(32, boundedColumns - 4), 52);
+}
+
+function resolveNotificationCenterLayout<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): ResolvedNotificationCenterLayout<Msg> | undefined {
+  const center = resolveFrameNotificationCenter(model, options, pagesById);
+  if (center == null) return undefined;
+
+  const drawerWidth = resolveNotificationCenterDrawerWidth(model.columns);
+  const contentWidth = Math.max(18, drawerWidth - 4);
+  const content = renderNotificationCenterSurface(center, contentWidth);
+  const contentHeight = Math.max(1, model.rows - 2);
+  const pagerState = createPagerStateForSurface(content, {
+    width: contentWidth,
+    height: contentHeight,
+  });
+
+  return {
+    center,
+    drawerWidth,
+    contentWidth,
+    contentHeight,
+    content,
+    maxScrollY: pagerState.scroll.maxY,
   };
 }
 
@@ -1534,6 +1793,39 @@ function scrollSettingsBy<PageModel, Msg>(
   };
 }
 
+function scrollNotificationCenterBy<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedNotificationCenterLayout<Msg>,
+  delta: number,
+): InternalFrameModel<PageModel, Msg> {
+  return {
+    ...model,
+    notificationCenterScrollY: Math.max(0, Math.min(model.notificationCenterScrollY + delta, layout.maxScrollY)),
+  };
+}
+
+function cycleNotificationCenterFilter<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  layout: ResolvedNotificationCenterLayout<Msg>,
+): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+  const filters = layout.center.filters;
+  if (filters.length < 2) return [model, []];
+  const currentIndex = Math.max(0, filters.indexOf(layout.center.activeFilter));
+  const nextFilter = filters[(currentIndex + 1) % filters.length]!;
+  if (layout.center.onFilterChange != null) {
+    const action = layout.center.onFilterChange(nextFilter);
+    return [{
+      ...model,
+      notificationCenterScrollY: 0,
+    }, action === undefined ? [] : [emitMsgForPage(model.activePageId, action)]];
+  }
+  return [{
+    ...model,
+    runtimeNotificationHistoryFilter: nextFilter,
+    notificationCenterScrollY: 0,
+  }, []];
+}
+
 function isInsideSettingsDrawer<PageModel, Msg>(
   col: number,
   row: number,
@@ -1556,6 +1848,19 @@ function settingsRowAtPosition<PageModel, Msg>(
   if (row <= 0 || row >= model.rows - 1) return undefined;
   const contentLine = (row - 1) + clampSettingsScroll(model, layout);
   return layout.rows.find((candidate) => candidate.line === contentLine);
+}
+
+function isInsideNotificationCenterDrawer<PageModel, Msg>(
+  col: number,
+  row: number,
+  layout: ResolvedNotificationCenterLayout<Msg>,
+  model: InternalFrameModel<PageModel, Msg>,
+): boolean {
+  const startCol = Math.max(0, model.columns - layout.drawerWidth);
+  return col >= startCol
+    && col < model.columns
+    && row >= 0
+    && row < model.rows;
 }
 
 function renderSettingsDrawer<PageModel, Msg>(
@@ -1587,6 +1892,40 @@ function renderSettingsDrawer<PageModel, Msg>(
   return drawer({
     anchor: 'left',
     title: layout.settings.title ?? 'Settings',
+    content: body,
+    width: layout.drawerWidth,
+    screenWidth: model.columns,
+    screenHeight: model.rows,
+  });
+}
+
+function renderNotificationCenterDrawer<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): Overlay | undefined {
+  const layout = resolveNotificationCenterLayout(model, options, pagesById);
+  if (layout == null) return undefined;
+
+  const pagerState = createPagerStateForSurface(layout.content, {
+    width: layout.contentWidth,
+    height: layout.contentHeight,
+  });
+  const scrolledState = {
+    ...pagerState,
+    scroll: {
+      ...pagerState.scroll,
+      y: Math.max(0, Math.min(model.notificationCenterScrollY, layout.maxScrollY)),
+    },
+  };
+  const body = pagerSurface(layout.content, scrolledState, {
+    showScrollbar: layout.maxScrollY > 0,
+    showStatus: false,
+  });
+
+  return drawer({
+    anchor: 'right',
+    title: `${layout.center.title} • ${notificationFilterLabel(layout.center.activeFilter)}`,
     content: body,
     width: layout.drawerWidth,
     screenWidth: model.columns,
@@ -1669,4 +2008,76 @@ function cellForSettingsChar(char: string, strong: boolean): Cell {
     modifiers: strong ? ['bold'] : undefined,
     empty: false,
   };
+}
+
+function resolveNotificationFooterCue<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): string | undefined {
+  const center = resolveFrameNotificationCenter(model, options, pagesById);
+  if (center == null) return undefined;
+  const liveCount = center.state.items.length;
+  const archivedCount = countNotificationHistory(center.state, center.activeFilter);
+  if (liveCount > 0 && archivedCount > 0) return `notices:${liveCount}+${archivedCount}`;
+  if (liveCount > 0) return `notices:${liveCount}`;
+  if (archivedCount > 0) return `inbox:${archivedCount}`;
+  return undefined;
+}
+
+function notificationFilterLabel(filter: NotificationHistoryFilter): string {
+  if (filter === 'ALL') return 'All';
+  if (filter === 'ACTIONABLE') return 'Actionable';
+  return filter;
+}
+
+function renderNotificationCenterSurface<Msg>(
+  center: ResolvedFrameNotificationCenter<Msg>,
+  width: number,
+): Surface {
+  const ctx = resolveSafeCtx() ?? undefined;
+  const lines: string[] = [
+    `Live: ${center.state.items.length} • Archived: ${center.state.history.length}`,
+    `Filter: ${notificationFilterLabel(center.activeFilter)}`,
+  ];
+
+  if (center.state.items.length > 0) {
+    lines.push('', 'Current stack');
+    for (const item of [...center.state.items].sort(
+      (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
+    )) {
+      lines.push(
+        ...wrapNotificationCenterLine(`[${item.tone}] ${item.title}`, width),
+      );
+      if (item.message.length > 0) {
+        lines.push(...wrapNotificationCenterLine(item.message, width));
+      }
+      if (item.action != null) {
+        lines.push(...wrapNotificationCenterLine(`Action: ${item.action.label}`, width));
+      }
+      lines.push(...wrapNotificationCenterLine(`${item.variant} • live`, width), '');
+    }
+  }
+
+  lines.push('', renderNotificationHistory(center.state, {
+    width,
+    height: Number.MAX_SAFE_INTEGER,
+    filter: center.activeFilter,
+    ctx,
+  }));
+
+  const content = lines.join('\n').replace(/\n{3,}/g, '\n\n');
+  const lineCount = Math.max(1, content.split('\n').length);
+  return parseAnsiToSurface(content, width, lineCount);
+}
+
+function wrapNotificationCenterLine(text: string, width: number): readonly string[] {
+  const safeWidth = Math.max(1, width);
+  const lines: string[] = [];
+  let start = 0;
+  while (start < text.length) {
+    lines.push(text.slice(start, start + safeWidth));
+    start += safeWidth;
+  }
+  return lines.length === 0 ? [''] : lines;
 }

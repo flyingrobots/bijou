@@ -13,22 +13,22 @@ describe('notifications demo', () => {
   beforeAll(() => setDefaultContext(testCtx));
   afterAll(() => _resetDefaultContextForTesting());
 
-  it('blocks background notification shortcuts while the history center is open', async () => {
+  it('blocks background notification shortcuts while the shell notification center is open', async () => {
     const app = createNotificationDemoApp(testCtx, { autoDemo: false });
     const result = await runScript(app, [
       { key: 'n' },
-      { key: 'H' },
+      { key: 'N' },
       { key: 'n' },
-      { key: 'q' },
+      { key: 'N' },
     ], { ctx: testCtx });
 
     const pageModel = result.model.pageModels.notifications!;
     expect(pageModel.nextOrdinal).toBe(2);
     expect(pageModel.notifications.items).toHaveLength(1);
-    expect(pageModel.historyOpen).toBe(false);
+    expect(result.model.notificationCenterOpen).toBe(false);
   });
 
-  it('clamps the history center to compact terminals', async () => {
+  it('renders the shell notification center on compact terminals', async () => {
     const compactCtx = createTestContext({
       noColor: true,
       runtime: { columns: 40, rows: 12 },
@@ -36,14 +36,15 @@ describe('notifications demo', () => {
     setDefaultContext(compactCtx);
 
     const app = createNotificationDemoApp(compactCtx, { autoDemo: false });
-    const result = await runScript(app, [{ key: 'H' }], {
+    const result = await runScript(app, [{ key: 'N' }], {
       ctx: compactCtx,
       pulseFps: false,
     });
 
     const rendered = surfaceToString(result.frames.at(-1)!, compactCtx.style);
-    expect(rendered).toContain('History');
-    expect(rendered).toContain('PgUp/PgDn');
+    expect(result.model.notificationCenterOpen).toBe(true);
+    expect(rendered).toContain('Notification center');
+    expect(rendered).toContain('Filter: All');
     expect(rendered).toContain('No archived notifications');
   });
 });

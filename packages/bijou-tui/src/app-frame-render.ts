@@ -395,6 +395,7 @@ export function renderHelpLine<PageModel, Msg>(
   frameKeys: KeyMap<FrameAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   activePage: FramePage<PageModel, Msg>,
+  notificationCue?: string,
 ): Surface {
   const mode = model.commandPalette != null
     ? 'PALETTE'
@@ -404,12 +405,18 @@ export function renderHelpLine<PageModel, Msg>(
         ? 'QUIT'
       : model.settingsOpen
         ? 'SETTINGS'
+        : model.notificationCenterOpen
+          ? 'NOTICES'
         : 'NORMAL';
   const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
-  const status = `[${mode}] page:${model.activePageId} pane:${focusedPane}`;
+  const status = notificationCue == null || notificationCue.length === 0
+    ? `[${mode}] page:${model.activePageId} pane:${focusedPane}`
+    : `[${mode}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
 
   const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
     ? 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'
+    : model.notificationCenterOpen && model.commandPalette == null && !model.helpOpen
+      ? 'Shift+N close • f filter • j/k scroll • q quit'
     : model.quitConfirmOpen
       ? 'Y quit • N stay'
     : helpShort(options.helpLineSource?.({

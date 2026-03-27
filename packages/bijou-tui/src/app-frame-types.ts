@@ -65,6 +65,7 @@ export interface RenderResult {
 export type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'toggle-settings' }
+  | { type: 'toggle-notifications' }
   | { type: 'prev-tab' }
   | { type: 'next-tab' }
   | { type: 'next-pane' }

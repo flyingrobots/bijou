@@ -1,6 +1,6 @@
 # Notification System
 
-App-managed transient messaging with stacking, actions, placement control, and history.
+App-managed transient messaging with stacking, actions, placement control, and shell-owned review.
 
 ## Run
 
@@ -12,7 +12,7 @@ npx tsx examples/notifications/main.ts
 
 - the app owns notification lifecycle instead of rendering a single local overlay
 - stacking, placement changes, actions, routing, or recall matter
-- users may need to reopen archived warnings, errors, or actionable notices
+- users may need to reopen archived warnings, errors, or actionable notices through the standard shell notification center
 
 ## Choose something else when
 
@@ -28,6 +28,7 @@ npx tsx examples/notifications/main.ts
 - per-notification placement and duration
 - animated entry, relocation, and dismissal
 - bounded stack behavior with archived history
-- framed-app routing for actions, dismiss, keyboard shortcuts, and mouse clicks
+- shell-owned notification review via `Shift+N`
+- framed-app routing for actions, dismiss, keyboard shortcuts, mouse clicks, and shell overlays
 
 [← Examples](../README.md)

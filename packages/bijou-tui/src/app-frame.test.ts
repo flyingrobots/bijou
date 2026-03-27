@@ -4,7 +4,15 @@ import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobo
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
-import { hitTestNotificationStack } from './notification.js';
+import {
+  createNotificationState,
+  dismissNotification,
+  hitTestNotificationStack,
+  pushNotification,
+  tickNotifications,
+  type NotificationHistoryFilter,
+  type NotificationState,
+} from './notification.js';
 import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import { QUIT, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
@@ -30,6 +38,10 @@ function ctrlKey(key: string) {
   return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
 }
 
+function shiftKey(key: string) {
+  return { type: 'key' as const, key, ctrl: false, alt: false, shift: true };
+}
+
 function makeLongContent(label: string, lines = 40): string {
   return Array.from({ length: lines }, (_, i) => `${label} line ${i}`).join('\n');
 }
@@ -38,6 +50,35 @@ function textView(text: string) {
   const lines = text.split('\n');
   const width = Math.max(1, ...lines.map((line) => line.length));
   return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
+function seedNotificationHistory<Msg>(
+  specs: ReadonlyArray<{
+    readonly title: string;
+    readonly message?: string;
+    readonly tone?: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+    readonly variant?: 'TOAST' | 'INLINE' | 'ACTIONABLE';
+  }>,
+): NotificationState<Msg> {
+  let state = createNotificationState<Msg>();
+  let nowMs = 0;
+
+  for (const spec of specs) {
+    state = pushNotification(state, {
+      title: spec.title,
+      message: spec.message ?? `${spec.title} message`,
+      tone: spec.tone ?? 'INFO',
+      variant: spec.variant ?? 'TOAST',
+      durationMs: null,
+    }, nowMs);
+    const id = state.items.at(-1)!.id;
+    nowMs += 20;
+    state = dismissNotification(state, id, nowMs);
+    nowMs += 500;
+    state = tickNotifications(state, nowMs);
+  }
+
+  return state;
 }
 
 function makePage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
@@ -1127,6 +1168,257 @@ describe('createFramedApp', () => {
 
     expect((result.model as any).settingsOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('opens the shell notification center with Shift+N and closes it with the same binding', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    let [model] = app.init();
+    [model] = app.update(shiftKey('n'), model);
+    expect((model as any).notificationCenterOpen).toBe(true);
+
+    [model] = app.update(shiftKey('n'), model);
+    expect((model as any).notificationCenterOpen).toBe(false);
+  });
+
+  it('scrolls a shell notification center independently of the underlying page', () => {
+    interface NotificationPageModel extends PageModel {
+      readonly notifications: NotificationState<Msg>;
+    }
+
+    const notifications = seedNotificationHistory<Msg>(
+      Array.from({ length: 18 }, (_, index) => ({
+        title: `Notice ${index}`,
+        tone: index % 2 === 0 ? 'WARNING' : 'INFO',
+      })),
+    );
+
+    const page: FramePage<NotificationPageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{
+        count: 0,
+        notifications,
+      }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView(makeLongContent('home:main')),
+      }),
+      keyMap: createKeyMap<Msg>().bind('x', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp<NotificationPageModel, Msg>({
+      initialColumns: 80,
+      initialRows: 14,
+      pages: [page],
+      notificationCenter: ({ pageModel }) => ({
+        state: pageModel.notifications,
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(shiftKey('n') as unknown as Msg, model);
+    [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false } as unknown as Msg, model);
+
+    expect((model as any).notificationCenterOpen).toBe(true);
+    expect((model as any).notificationCenterScrollY).toBeGreaterThan(0);
+    expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
+
+    const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false } as unknown as Msg, model);
+    expect(nextModel.pageModels.home?.count).toBe(0);
+    expect((nextModel as any).notificationCenterOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+  });
+
+  it('cycles notification-center filters through app-provided filter state', async () => {
+    const filters: readonly NotificationHistoryFilter[] = ['ALL', 'ERROR', 'WARNING'];
+
+    type NotificationMsg =
+      | { type: 'inc' }
+      | { type: 'set-history-filter'; filter: NotificationHistoryFilter };
+
+    interface NotificationPageModel {
+      readonly count: number;
+      readonly notifications: NotificationState<NotificationMsg>;
+      readonly filterIndex: number;
+    }
+
+    const page: FramePage<NotificationPageModel, NotificationMsg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{
+        count: 0,
+        notifications: seedNotificationHistory<NotificationMsg>([
+          { title: 'Deploy blocked', tone: 'ERROR' },
+          { title: 'Queue pressure', tone: 'WARNING' },
+        ]),
+        filterIndex: 0,
+      }, []],
+      update(msg, model) {
+        if (msg.type === 'set-history-filter') {
+          return [{
+            ...model,
+            filterIndex: Math.max(0, filters.indexOf(msg.filter)),
+          }, []];
+        }
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('home'),
+      }),
+    };
+
+    const app = createFramedApp<NotificationPageModel, NotificationMsg>({
+      pages: [page],
+      notificationCenter: ({ pageModel }) => ({
+        state: pageModel.notifications,
+        filters,
+        activeFilter: filters[pageModel.filterIndex]!,
+        onFilterChange: (filter) => ({ type: 'set-history-filter', filter }),
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(shiftKey('n') as unknown as NotificationMsg, model);
+    let cmds: Cmd<NotificationMsg>[] = [];
+    [model, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false } as unknown as NotificationMsg, model);
+
+    expect(cmds).toHaveLength(1);
+    const returned = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+    });
+    [model] = app.update(returned as NotificationMsg, model);
+
+    expect(model.pageModels.home?.filterIndex).toBe(1);
+    expect((model as any).notificationCenterScrollY).toBe(0);
+  });
+
+  it('opens the shell notification center from the command palette', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      enableCommandPalette: true,
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_CTRL_P },
+      { key: 'n' },
+      { key: 'o' },
+      { key: 't' },
+      { key: KEY_ENTER },
+    ]);
+
+    expect((result.model as any).notificationCenterOpen).toBe(true);
+    expect(result.model.commandPalette).toBeUndefined();
+  });
+
+  it('surfaces a footer notification cue when archived shell notifications exist', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const [model] = app.init();
+    const runtimeMsg = app.routeRuntimeIssue?.({
+      level: 'warning',
+      source: 'runtime',
+      message: 'Framework warning',
+      atMs: 0,
+    });
+    if (runtimeMsg == null) throw new Error('expected runtime issue message');
+
+    const [nextModel, cmds] = app.update(runtimeMsg as Msg, model);
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 8_000,
+    });
+    const [archivedModel] = app.update(tickMsg as Msg, nextModel);
+    const frame = app.view(archivedModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    const footer = surfaceToString(frame, testCtx.style).split('\n').at(-1)!;
+
+    expect(footer).toContain('notices:1');
+  });
+
+  it('keeps notification-center mouse interactions from leaking through to the underlying page', () => {
+    type MsgWithMouse = Msg | MouseMsg;
+
+    interface NotificationPageModel extends PageModel {
+      readonly notifications: NotificationState<MsgWithMouse>;
+    }
+
+    const page: FramePage<NotificationPageModel, MsgWithMouse> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{
+        count: 0,
+        notifications: seedNotificationHistory<MsgWithMouse>(
+          Array.from({ length: 20 }, (_, index) => ({
+            title: `Notice ${index}`,
+            tone: index % 2 === 0 ? 'SUCCESS' : 'WARNING',
+          })),
+        ),
+      }, []],
+      update(msg, model) {
+        if (msg.type === 'mouse') {
+          return [{ ...model, count: model.count + 1 }, []];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView(makeLongContent('main')),
+      }),
+    };
+
+    const app = createFramedApp<NotificationPageModel, MsgWithMouse>({
+      initialColumns: 80,
+      initialRows: 14,
+      pages: [page],
+      notificationCenter: ({ pageModel }) => ({
+        state: pageModel.notifications,
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(shiftKey('n') as unknown as MsgWithMouse, model);
+
+    const wheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 76,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(wheel as unknown as MsgWithMouse, model);
+
+    const click: MouseMsg = {
+      type: 'mouse',
+      button: 'left',
+      action: 'press',
+      col: 76,
+      row: 3,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(click as unknown as MsgWithMouse, model);
+
+    expect((model as any).notificationCenterScrollY).toBeGreaterThan(0);
+    expect(model.pageModels.home?.count).toBe(0);
   });
 
   it('keeps drawer mouse interactions from leaking through to the underlying page', async () => {
