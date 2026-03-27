@@ -811,9 +811,16 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.count).toBe(0);
   });
 
-  it('opens settings with F2 and opens the command palette with /', () => {
+  it('opens settings with F2, opens search with /, and keeps ctrl+p as the command palette', () => {
     const app = createFramedApp({
-      pages: [makePage('home', 'Home', 'main')],
+      pages: [{
+        ...makePage('home', 'Home', 'main'),
+        searchTitle: 'Search home',
+        searchItems: () => [{
+          id: 'home-search',
+          label: 'Home result',
+        }],
+      }],
       enableCommandPalette: true,
       settings: () => ({
         title: 'Settings',
@@ -838,6 +845,14 @@ describe('createFramedApp', () => {
 
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeDefined();
+    expect((model as any).commandPaletteTitle).toBe('Search home');
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPalette).toBeUndefined();
+
+    [model] = app.update(ctrlKey('p'), model);
+    expect((model as any).commandPalette).toBeDefined();
+    expect((model as any).commandPaletteTitle).toBe('Command Palette');
   });
 
   it('opens a quit-confirm modal from the shell and quits on confirmation', async () => {

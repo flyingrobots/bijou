@@ -101,10 +101,11 @@ export function applyFrameAction<PageModel, Msg>(
     case 'prev-pane':
       return [cyclePane(model, -1, pagesById), []];
     case 'open-palette':
+    case 'open-search':
       // Palette opening is gated by `enableCommandPalette` and handled in the
       // key-handler path of app-frame.ts → openCommandPalette(). This no-op
       // covers the recursive case (e.g., a palette frame-action entry that
-      // would re-trigger open-palette while the palette is already open).
+      // would re-trigger palette opening while the palette is already open).
       return [model, []];
     case 'toggle-minimize':
       return [applyToggleMinimize(model, pagesById), []];

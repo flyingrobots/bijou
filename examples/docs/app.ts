@@ -1439,11 +1439,12 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           },
         ];
       },
-      commandItems(model) {
+      searchTitle: 'Search components',
+      searchItems(model) {
         return COMPONENT_STORIES.map((story) => ({
           id: story.id,
-          label: `Open ${story.title}`,
-          description: story.docs.summary,
+          label: story.title,
+          description: `${story.family} • ${story.docs.summary}`,
           category: story.family,
           action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
         }));

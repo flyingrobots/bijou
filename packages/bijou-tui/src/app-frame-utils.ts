@@ -127,7 +127,7 @@ export function createFrameKeyMap(options: { readonly enableSettings?: boolean }
       .bind(']', 'Next tab', { type: 'next-tab' })
       .bind('tab', 'Next pane', { type: 'next-pane' })
       .bind('shift+tab', 'Previous pane', { type: 'prev-pane' })
-      .bind('/', 'Search', { type: 'open-palette' })
+      .bind('/', 'Search', { type: 'open-search' })
       .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
       .bind(':', 'Open command palette', { type: 'open-palette' })
       .bind('ctrl+m', 'Fold/unfold pane', { type: 'toggle-minimize' })

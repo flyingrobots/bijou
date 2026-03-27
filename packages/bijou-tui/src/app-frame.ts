@@ -98,6 +98,7 @@ import {
 import {
   handlePaletteKey,
   openCommandPalette,
+  openSearchPalette,
 } from './app-frame-palette.js';
 
 // ---------------------------------------------------------------------------
@@ -126,6 +127,10 @@ export interface FramePage<PageModel, Msg> {
   helpSource?: BindingSource;
   /** Optional page-scoped command items for command palette listing/execution. */
   commandItems?: (model: PageModel) => readonly FrameCommandItem<Msg>[];
+  /** Optional page-scoped search items opened by the shell search action. */
+  searchItems?: (model: PageModel) => readonly FrameCommandItem<Msg>[];
+  /** Optional title used by the shell search surface. */
+  readonly searchTitle?: string;
 }
 
 /** Custom command-palette item with optional message dispatch action. */
@@ -411,7 +416,7 @@ const settingsHelpKeys = createKeyMap<FrameAction>()
     .bind('u', 'Page up', { type: 'page-up' })
     .bind('g', 'Top', { type: 'top' })
     .bind('shift+g', 'Bottom', { type: 'bottom' })
-    .bind('/', 'Open command palette', { type: 'open-palette' })
+    .bind('/', 'Search', { type: 'open-search' })
     .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
     .bind(':', 'Open command palette', { type: 'open-palette' })
     .bind('?', 'Toggle help', { type: 'toggle-help' }));
@@ -556,6 +561,7 @@ export function createFramedApp<PageModel, Msg>(
       settingsOpen: false,
       commandPalette: undefined,
       commandPaletteEntries: undefined,
+      commandPaletteTitle: undefined,
     }, withObservedKey(model, [], msg, 'frame')];
   }
 
@@ -939,7 +945,10 @@ export function createFramedApp<PageModel, Msg>(
             if (!msg.ctrl && !msg.alt && msg.key === '?') {
               return [{ ...model, helpOpen: true }, withObservedKey(model, [], msg, 'frame')];
             }
-            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && (msg.key === ':' || msg.key === '/')))) {
+            if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
+              return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
+            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
               return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
             }
             if (!msg.ctrl && !msg.alt && msg.key === 'up') {
@@ -1028,6 +1037,9 @@ export function createFramedApp<PageModel, Msg>(
             return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
           }
           if (frameAction !== undefined) {
+            if (frameAction.type === 'open-search' && options.enableCommandPalette) {
+              return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+            }
             if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
               return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
             }
@@ -1039,6 +1051,9 @@ export function createFramedApp<PageModel, Msg>(
 
         if (frameAction !== undefined) {
           // Handle palette opening here since applyFrameAction doesn't have access to palette deps
+          if (frameAction.type === 'open-search' && options.enableCommandPalette) {
+            return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
+          }
           if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
             return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
           }
@@ -1165,7 +1180,7 @@ export function createFramedApp<PageModel, Msg>(
         const paletteWidth = Math.max(20, Math.min(80, model.columns - 4));
         const paletteBody = commandPalette(model.commandPalette, { width: Math.max(16, paletteWidth - 4) });
         overlays.push(modal({
-          title: 'Command Palette',
+          title: model.commandPaletteTitle ?? 'Command Palette',
           body: paletteBody,
           hint: 'Enter select • Esc close',
           width: paletteWidth,

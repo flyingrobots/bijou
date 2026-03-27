@@ -48,15 +48,15 @@ export function handlePaletteKey<PageModel, Msg>(
       case 'cp-page-up':
         return [{ ...model, commandPalette: cpPageUp(cp) }, []];
       case 'cp-close':
-        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
       case 'cp-select': {
         const selected = cpSelectedItem(cp);
         if (selected == null) {
-          return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+          return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
         }
         const entry = model.commandPaletteEntries?.find((x) => x.id === selected.id);
         if (entry?.frameAction != null) {
-          const closed = { ...model, commandPalette: undefined, commandPaletteEntries: undefined };
+          const closed = { ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined };
           return applyFrameAction(entry.frameAction, closed, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {
@@ -67,9 +67,10 @@ export function handlePaletteKey<PageModel, Msg>(
             ...model,
             commandPalette: undefined,
             commandPaletteEntries: undefined,
+            commandPaletteTitle: undefined,
           }, [cmd]];
         }
-        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
       }
     }
   }
@@ -80,11 +81,11 @@ export function handlePaletteKey<PageModel, Msg>(
   }
 
   if (msg.ctrl && msg.key === 'c') {
-    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
   }
 
   if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'q' && cp.query.length === 0) {
-    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined }, []];
+    return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
   }
 
   if (!msg.ctrl && !msg.alt && msg.key.length === 1) {
@@ -103,11 +104,33 @@ export function openCommandPalette<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
   const entries = buildPaletteEntries(model, frameKeys, options, pagesById);
+  return openPaletteModel(model, entries, 'Command Palette');
+}
+
+/** Initialize a page-scoped search palette, falling back to page command items when needed. */
+export function openSearchPalette<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  frameKeys: KeyMap<FrameAction>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): InternalFrameModel<PageModel, Msg> {
+  const page = pagesById.get(model.activePageId)!;
+  const entries = buildSearchEntries(model, frameKeys, options, pagesById);
+  const title = page.searchTitle ?? 'Search';
+  return openPaletteModel(model, entries, title);
+}
+
+function openPaletteModel<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  entries: readonly PaletteEntry<Msg>[],
+  title: string,
+): InternalFrameModel<PageModel, Msg> {
   const items = entries.map((x) => x.item);
   return {
     ...model,
     commandPalette: createCommandPaletteState(items, Math.max(5, Math.min(10, model.rows - 8))),
     commandPaletteEntries: entries,
+    commandPaletteTitle: title,
   };
 }
 
@@ -196,4 +219,28 @@ export function buildPaletteEntries<PageModel, Msg>(
   }
 
   return entries;
+}
+
+/** Collect page-scoped search items, falling back to page command items when search items are absent. */
+export function buildSearchEntries<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  _frameKeys: KeyMap<FrameAction>,
+  _options: CreateFramedAppOptions<PageModel, Msg>,
+  pagesById: Map<string, FramePage<PageModel, Msg>>,
+): readonly PaletteEntry<Msg>[] {
+  const page = pagesById.get(model.activePageId)!;
+  const items = page.searchItems?.(model.pageModels[model.activePageId]!)
+    ?? page.commandItems?.(model.pageModels[model.activePageId]!)
+    ?? [];
+
+  return items.map((item, index) => ({
+    id: `search:${index}`,
+    item: {
+      ...item,
+      id: `search:${index}`,
+      category: item.category ?? page.title,
+    },
+    msgAction: item.action,
+    targetPageId: model.activePageId,
+  }));
 }

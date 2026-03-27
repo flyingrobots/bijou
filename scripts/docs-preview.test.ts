@@ -12,6 +12,7 @@ const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
 const KEY_ESCAPE = '\x1b';
 const KEY_TAB = '\t';
+const KEY_CTRL_P = '\x10';
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -198,7 +199,7 @@ describe('docs preview app', () => {
     expect(pageModel.variantIndexByStory.alert).toBe(1);
   });
 
-  it('opens the standard command palette with / and jumps directly to a component story', async () => {
+  it('opens component search with / and jumps directly to a component story', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
 
@@ -220,6 +221,25 @@ describe('docs preview app', () => {
     expect((result.model as any).docsModel.commandPalette).toBeUndefined();
     expect(text).toContain('modal()');
     expect(text).toContain('Confirm deploy');
+  });
+
+  it('keeps ctrl+p as the generic command palette while / is component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const openedSearch = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+    ], { ctx });
+    expect(frameText(openedSearch.frames[openedSearch.frames.length - 1]!)).toContain('Search components');
+
+    const openedPalette = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_CTRL_P },
+    ], { ctx });
+    const paletteText = frameText(openedPalette.frames[openedPalette.frames.length - 1]!);
+    expect(paletteText).toContain('Command Palette');
+    expect(paletteText).not.toContain('Search components');
   });
 
   it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
