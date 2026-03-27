@@ -3,8 +3,12 @@ import {
   buildSmokeScenarios,
   createScenarioPlan,
   listExampleTargets,
+  parseSmokeRunOptions,
+  resolvePipeConcurrency,
   runScenarioWithTimeout,
+  runSmokeAllExamples,
   ROOT,
+  selectSmokeScenarios,
 } from './smoke-all-examples-lib.js';
 
 describe('listExampleTargets', () => {
@@ -45,6 +49,54 @@ describe('buildSmokeScenarios', () => {
 
     expect(interactive.some((scenario) => scenario.path === 'examples/select/main.ts')).toBe(true);
     expect(interactive.some((scenario) => scenario.path === 'examples/wizard/main.ts')).toBe(true);
+  });
+});
+
+describe('selectSmokeScenarios', () => {
+  it('drops static TTY scenarios in fast mode while keeping pipe and scripted cases', () => {
+    const scenarios = selectSmokeScenarios([
+      { path: 'demo.ts', mode: 'pipe' },
+      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+    ], {
+      fast: true,
+    });
+
+    expect(scenarios).toEqual([
+      { path: 'demo.ts', mode: 'pipe' },
+      { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+    ]);
+  });
+});
+
+describe('resolvePipeConcurrency', () => {
+  it('uses an explicit positive integer when provided', () => {
+    expect(resolvePipeConcurrency({ pipeConcurrency: 3 })).toBe(3);
+  });
+
+  it('bounds the default concurrency to a small local worker pool', () => {
+    const concurrency = resolvePipeConcurrency();
+    expect(concurrency).toBeGreaterThanOrEqual(1);
+    expect(concurrency).toBeLessThanOrEqual(4);
+  });
+});
+
+describe('parseSmokeRunOptions', () => {
+  it('parses fast, skip-build, and pipe concurrency flags', () => {
+    expect(parseSmokeRunOptions([
+      '--fast',
+      '--skip-build',
+      '--pipe-concurrency=2',
+    ])).toEqual({
+      fast: true,
+      skipBuild: true,
+      pipeConcurrency: 2,
+    });
+  });
+
+  it('rejects unknown or malformed flags', () => {
+    expect(() => parseSmokeRunOptions(['--wat'])).toThrow('unknown smoke:examples option');
+    expect(() => parseSmokeRunOptions(['--pipe-concurrency=nope'])).toThrow('invalid --pipe-concurrency value');
   });
 });
 
@@ -113,5 +165,73 @@ describe('runScenarioWithTimeout', () => {
 
     expect(result.status).toBe('ok');
     expect(result.output).toContain('Selected package manager: YARN');
+  });
+});
+
+describe('runSmokeAllExamples', () => {
+  it('skips the build and fast-filters static TTY scenarios when requested', async () => {
+    const executed: string[] = [];
+    let buildCount = 0;
+
+    const exitCode = await runSmokeAllExamples({
+      options: {
+        skipBuild: true,
+        fast: true,
+      },
+      scenarios: [
+        { path: 'demo.ts', mode: 'pipe' },
+        { path: 'demo-tui.ts', mode: 'static-tty' },
+        { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+      ],
+      buildImpl() {
+        buildCount += 1;
+      },
+      runScenarioImpl: async (_root, scenario) => {
+        executed.push(`${scenario.path}:${scenario.mode}`);
+        return {
+          path: scenario.path,
+          mode: scenario.mode,
+          status: 'ok',
+        };
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(buildCount).toBe(0);
+    expect(executed).toEqual([
+      'demo.ts:pipe',
+      'examples/select/main.ts:interactive-scripted',
+    ]);
+  });
+
+  it('runs pipe scenarios in parallel up to the configured concurrency', async () => {
+    let active = 0;
+    let peak = 0;
+
+    const exitCode = await runSmokeAllExamples({
+      options: {
+        skipBuild: true,
+        pipeConcurrency: 2,
+      },
+      scenarios: [
+        { path: 'examples/plain-a.ts', mode: 'pipe' },
+        { path: 'examples/plain-b.ts', mode: 'pipe' },
+        { path: 'examples/plain-c.ts', mode: 'pipe' },
+      ],
+      runScenarioImpl: async (_root, scenario) => {
+        active += 1;
+        peak = Math.max(peak, active);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        active -= 1;
+        return {
+          path: scenario.path,
+          mode: scenario.mode,
+          status: 'ok',
+        };
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(peak).toBe(2);
   });
 });

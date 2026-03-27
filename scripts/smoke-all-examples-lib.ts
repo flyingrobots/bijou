@@ -1,5 +1,6 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { availableParallelism } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { format } from 'node:util';
@@ -100,6 +101,11 @@ interface SmokeDeps {
   readonly buildImpl?: (command: string, options: { cwd: string; stdio: 'ignore' }) => unknown;
   readonly readFileImpl?: (path: string, encoding: BufferEncoding) => string;
   readonly spawnImpl?: typeof spawn;
+  readonly runScenarioImpl?: (
+    root: string,
+    scenario: Scenario,
+    deps: SmokeDeps,
+  ) => Promise<Result>;
   readonly platform?: NodeJS.Platform;
   readonly execPath?: string;
   readonly env?: NodeJS.ProcessEnv;
@@ -108,6 +114,14 @@ interface SmokeDeps {
 export interface SmokeAllExamplesIO extends SmokeDeps {
   readonly cwd?: string;
   readonly stdout?: (text: string) => void;
+  readonly options?: SmokeRunOptions;
+  readonly scenarios?: readonly Scenario[];
+}
+
+export interface SmokeRunOptions {
+  readonly skipBuild?: boolean;
+  readonly fast?: boolean;
+  readonly pipeConcurrency?: number;
 }
 
 export function listExampleTargets(
@@ -154,6 +168,25 @@ export function buildSmokeScenarios(
       script,
     })),
   ];
+}
+
+export function selectSmokeScenarios(
+  scenarios: readonly Scenario[],
+  options: SmokeRunOptions = {},
+): readonly Scenario[] {
+  if (options.fast !== true) return scenarios;
+  return scenarios.filter((scenario) => scenario.mode !== 'static-tty');
+}
+
+export function resolvePipeConcurrency(options: SmokeRunOptions = {}): number {
+  const explicit = options.pipeConcurrency;
+  if (explicit !== undefined) {
+    if (!Number.isFinite(explicit) || explicit < 1) {
+      throw new Error(`pipeConcurrency must be a positive integer, got ${explicit}`);
+    }
+    return Math.max(1, Math.floor(explicit));
+  }
+  return Math.max(1, Math.min(4, availableParallelism()));
 }
 
 export function createScenarioPlan(
@@ -386,19 +419,40 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
   const write = io.stdout ?? ((text: string) => process.stdout.write(text));
   const execSyncImpl = io.execSyncImpl ?? defaultExampleDiscoveryExecSync;
   const buildImpl = io.buildImpl ?? defaultBuildExecSync;
+  const runScenario = io.runScenarioImpl ?? runScenarioWithTimeout;
+  const options = io.options ?? {};
 
-  buildImpl('npx tsc -b', { cwd: root, stdio: 'ignore' });
+  if (options.skipBuild !== true) {
+    buildImpl('npx tsc -b', { cwd: root, stdio: 'ignore' });
+  }
 
-  const scenarios = buildSmokeScenarios(
-    root,
-    listExampleTargets(root, execSyncImpl),
-    io.readFileImpl,
+  const scenarios = selectSmokeScenarios(
+    io.scenarios ?? buildSmokeScenarios(
+      root,
+      listExampleTargets(root, execSyncImpl),
+      io.readFileImpl,
+    ),
+    options,
   );
 
   const failures: Result[] = [];
-  for (const scenario of scenarios) {
+  const pipeScenarios = scenarios.filter((scenario) => scenario.mode === 'pipe');
+  const nonPipeScenarios = scenarios.filter((scenario) => scenario.mode !== 'pipe');
+
+  for (const { scenario, result } of await runScenariosInPool(root, pipeScenarios, io, resolvePipeConcurrency(options))) {
     write(`smoke ${scenario.path} (${scenario.mode}) ... `);
-    const result = await runScenarioWithTimeout(root, scenario, io);
+    if (result.status === 'ok') {
+      write('ok\n');
+      continue;
+    }
+
+    failures.push(result);
+    write(`FAIL: ${result.reason}\n`);
+  }
+
+  for (const scenario of nonPipeScenarios) {
+    write(`smoke ${scenario.path} (${scenario.mode}) ... `);
+    const result = await runScenario(root, scenario, io);
     if (result.status === 'ok') {
       write('ok\n');
       continue;
@@ -417,6 +471,59 @@ export async function runSmokeAllExamples(io: SmokeAllExamplesIO = {}): Promise<
   }
 
   return 0;
+}
+
+async function runScenariosInPool(
+  root: string,
+  scenarios: readonly Scenario[],
+  io: SmokeAllExamplesIO,
+  concurrency: number,
+): Promise<Array<{ scenario: Scenario; result: Result }>> {
+  if (scenarios.length === 0) return [];
+  const runScenario = io.runScenarioImpl ?? runScenarioWithTimeout;
+  const results = new Array<{ scenario: Scenario; result: Result }>(scenarios.length);
+  let cursor = 0;
+
+  async function worker(): Promise<void> {
+    while (cursor < scenarios.length) {
+      const index = cursor++;
+      const scenario = scenarios[index]!;
+      const result = await runScenario(root, scenario, io);
+      results[index] = { scenario, result };
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(concurrency, scenarios.length) }, () => worker()));
+  return results;
+}
+
+export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
+  const options: {
+    skipBuild?: boolean;
+    fast?: boolean;
+    pipeConcurrency?: number;
+  } = {};
+  for (const arg of argv) {
+    if (arg === '--skip-build') {
+      options.skipBuild = true;
+      continue;
+    }
+    if (arg === '--fast') {
+      options.fast = true;
+      continue;
+    }
+    if (arg.startsWith('--pipe-concurrency=')) {
+      const raw = arg.slice('--pipe-concurrency='.length);
+      const parsed = Number.parseInt(raw, 10);
+      if (!Number.isFinite(parsed) || String(parsed) !== raw) {
+        throw new Error(`invalid --pipe-concurrency value: ${raw}`);
+      }
+      options.pipeConcurrency = parsed;
+      continue;
+    }
+    throw new Error(`unknown smoke:examples option: ${arg}`);
+  }
+  return options;
 }
 
 function defaultExampleDiscoveryExecSync(

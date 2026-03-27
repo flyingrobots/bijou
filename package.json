@@ -22,6 +22,7 @@
     "docs:design-system:preflight": "tsx scripts/design-system-docs-preflight.ts",
     "workflow:shell:preflight": "tsx scripts/workflow-shell-preflight.ts",
     "smoke:examples": "tsx scripts/smoke-v3-examples.ts",
+    "smoke:examples:fast": "tsx scripts/smoke-all-examples.ts --fast --skip-build",
     "smoke:examples:all": "tsx scripts/smoke-all-examples.ts",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
     "pr:review-status": "tsx scripts/pr-review-status.ts",
