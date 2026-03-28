@@ -1230,6 +1230,14 @@ function docsThemeMutedBorderToken(theme: LandingThemeTokens): TokenValue {
   return { hex: sampleColorRamp(theme.waveRamp, 0.36), modifiers: ['dim'] };
 }
 
+function docsThemeFocusedGutterToken(theme: LandingThemeTokens): TokenValue {
+  return { hex: sampleColorRamp(theme.logoRamp, 0.82), bg: sampleColorRamp(theme.waveRamp, 0.12), modifiers: ['bold'] };
+}
+
+function docsThemeUnfocusedGutterToken(theme: LandingThemeTokens): TokenValue {
+  return { hex: sampleColorRamp(theme.waveRamp, 0.38), bg: sampleColorRamp(theme.waveRamp, 0.08), modifiers: ['dim'] };
+}
+
 function themedSeparatorSurface(
   label: string,
   width: number,
@@ -1620,16 +1628,22 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             family: {
               kind: 'pane',
               paneId: 'family-nav',
+              focusedGutterToken: docsThemeFocusedGutterToken(theme),
+              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
               render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
             },
             main: {
               kind: 'pane',
               paneId: 'story-content',
+              focusedGutterToken: docsThemeFocusedGutterToken(theme),
+              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
               render: (width) => renderStoryPane(model, width, ctx, theme),
             },
             variants: {
               kind: 'pane',
               paneId: 'story-variants',
+              focusedGutterToken: docsThemeFocusedGutterToken(theme),
+              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
               render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
             },
           },
@@ -1658,8 +1672,8 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           }],
         },
         {
-          id: 'landing',
-          title: 'Landing',
+          id: 'appearance',
+          title: 'Appearance',
           rows: [
             {
               id: 'landing-theme',
@@ -1673,6 +1687,12 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
                 message: `Landing theme set to ${landingThemeSettingValue(nextLandingThemeIndex(pageModel.landingThemeIndex, 1))}.`,
               },
             },
+          ],
+        },
+        {
+          id: 'landing',
+          title: 'Landing',
+          rows: [
             {
               id: 'landing-quality',
               label: 'Landing quality',

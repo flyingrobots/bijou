@@ -129,6 +129,8 @@ function paintFrameNodeInto<PageModel, Msg>(
       ctx: resolveSafeCtx(),
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
+      focusedGutterToken: node.focusedGutterToken,
+      unfocusedGutterToken: node.unfocusedGutterToken,
     }, localRect.col, localRect.row);
     return {
       paneRects: new Map([[node.paneId, absoluteRect]]),
@@ -341,6 +343,8 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
     ctx: resolveSafeCtx(),
     id: maximizedPaneId,
     classes: ['focused', 'maximized'],
+    focusedGutterToken: paneNode.focusedGutterToken,
+    unfocusedGutterToken: paneNode.unfocusedGutterToken,
   }, offsetCol, offsetRow);
 
   return {

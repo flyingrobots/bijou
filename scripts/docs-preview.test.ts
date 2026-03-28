@@ -337,13 +337,17 @@ describe('docs preview app', () => {
       height: ctx.runtime.rows,
     }).surface;
     expect(frameText(settingsFrame)).toContain('☑ On');
-    expect(frameText(settingsFrame)).toContain('Show active-pane control cues');
+    expect(frameText(settingsFrame)).toContain('Show active-pane control');
+    expect(frameText(settingsFrame)).toContain('cues in the footer');
+    expect(frameText(settingsFrame)).toContain('Appearance');
     expect(frameText(settingsFrame)).toContain('↻ Landing theme');
     expect(frameText(settingsFrame)).toContain('Storybook Workstation');
+    expect(frameText(settingsFrame)).toContain('Landing');
     expect(frameText(settingsFrame)).toContain('Adapts render cost to');
-    expect(frameText(settingsFrame)).toContain('Options: Auto, Quality');
+    expect(frameText(settingsFrame)).toContain('Options:');
+    expect(frameText(settingsFrame)).toContain('Auto, Quality, Balanced');
     expect(frameText(settingsFrame)).toContain('↻ Landing quality');
-    expect(frameText(settingsFrame)).toContain('Auto (full)');
+    expect(frameText(settingsFrame)).toContain('Auto (ful');
     updateResult = app.update(keyMsg('enter') as any, model);
     model = updateResult[0] as any;
     const commandResult = await updateResult[1][0]!(() => {}, {

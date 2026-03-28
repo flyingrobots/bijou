@@ -14,6 +14,7 @@ import {
   type Cell,
   type OverflowBehavior,
   type Surface,
+  type TokenValue,
 } from '@flyingrobots/bijou';
 import { helpViewSurface, type BindingSource } from './help.js';
 import { createKeyMap, type KeyMap } from './keybindings.js';
@@ -218,6 +219,8 @@ export type FrameLayoutNode =
     /** Pane content must be a Surface or LayoutNode. */
     readonly render: (width: number, height: number) => ViewOutput;
     readonly overflowX?: OverflowX;
+    readonly focusedGutterToken?: TokenValue;
+    readonly unfocusedGutterToken?: TokenValue;
   }
   | {
     readonly kind: 'split';
@@ -1704,11 +1707,16 @@ function resolveSettingsLayout<PageModel, Msg>(
 
   for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
     const section = sections[sectionIndex]!;
+    if (sectionIndex > 0) {
+      line += 1;
+    }
     line += 1;
-    for (const row of section.rows) {
+    line += 1;
+    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
+      const row = section.rows[rowIndex]!;
       const descriptionLines = row.description == null
         ? []
-        : wrapToWidth(row.description, Math.max(1, Math.max(16, resolveSettingsDrawerWidth(model.columns) - 6)));
+        : wrapToWidth(row.description, Math.max(1, Math.max(14, resolveSettingsDrawerWidth(model.columns) - 8)));
       rows.push({
         index: rows.length,
         line,
@@ -1717,9 +1725,9 @@ function resolveSettingsLayout<PageModel, Msg>(
         row,
       });
       line += 1 + descriptionLines.length;
-    }
-    if (sectionIndex < sections.length - 1) {
-      line += 1;
+      if (rowIndex < section.rows.length - 1) {
+        line += 1;
+      }
     }
   }
 
@@ -2011,8 +2019,11 @@ function renderSettingsSurface<PageModel, Msg>(
 
   for (let sectionIndex = 0; sectionIndex < layout.settings.sections.length; sectionIndex++) {
     const section = layout.settings.sections[sectionIndex]!;
+    if (sectionIndex > 0) {
+      lineIndex += 1;
+    }
     writeSettingsLine(surface, lineIndex, section.title, { bold: true });
-    lineIndex += 1;
+    lineIndex += 2;
 
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const flat = rowsByLine.get(lineIndex);
@@ -2022,10 +2033,9 @@ function renderSettingsSurface<PageModel, Msg>(
       }
       writeSettingsRow(surface, lineIndex, flat, layout.contentWidth, flat.index === focusedIndex);
       lineIndex += flat.height;
-    }
-
-    if (sectionIndex < layout.settings.sections.length - 1) {
-      lineIndex += 1;
+      if (rowIndex < section.rows.length - 1) {
+        lineIndex += 1;
+      }
     }
   }
 
@@ -2045,22 +2055,38 @@ function writeSettingsRow<Msg>(
   const leftText = `${prefix} ${settingsRowGlyph(row)} ${row.label}`;
   const leftChars = Array.from(leftText);
   const valueChars = Array.from(value);
-  const valueStart = valueChars.length === 0 ? width : Math.max(leftChars.length + 1, width - valueChars.length);
+  const startX = width >= 3 ? 1 : 0;
+  const innerWidth = Math.max(0, width - (startX * 2));
+  const valueStart = valueChars.length === 0
+    ? innerWidth
+    : Math.max(leftChars.length + 3, innerWidth - valueChars.length);
 
-  for (let x = 0; x < leftChars.length && x < width; x++) {
+  fillSettingsRowBlock(surface, y, flat.height, width, focused);
+
+  for (let x = 0; x < leftChars.length && startX + x < width; x++) {
     const char = leftChars[x]!;
     if (char === ' ') continue;
-    surface.set(x, y, cellForSettingsChar(char, focused));
+    surface.set(startX + x, y, cellForSettingsChar(char, {
+      strong: focused,
+      bg: resolveFocusedSettingsRowBg(focused),
+    }));
   }
 
-  for (let offset = 0; offset < valueChars.length && valueStart + offset < width; offset++) {
+  for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
     const char = valueChars[offset]!;
     if (char === ' ') continue;
-    surface.set(valueStart + offset, y, cellForSettingsChar(char, focused));
+    surface.set(startX + valueStart + offset, y, cellForSettingsChar(char, {
+      strong: true,
+      fg: resolveSettingsValueFg(row),
+      bg: resolveFocusedSettingsRowBg(focused),
+    }));
   }
 
   for (let index = 0; index < flat.descriptionLines.length; index++) {
-    writeSettingsLine(surface, y + 1 + index, `  ${flat.descriptionLines[index]!}`, { dim: true });
+    writeSettingsLine(surface, y + 1 + index, `   ${flat.descriptionLines[index]!}`, {
+      dim: true,
+      bg: resolveFocusedSettingsRowBg(focused),
+    });
   }
 }
 
@@ -2088,20 +2114,68 @@ function writeSettingsLine(
   surface: Surface,
   y: number,
   text: string,
-  options: { readonly bold?: boolean; readonly dim?: boolean } = {},
+  options: { readonly bold?: boolean; readonly dim?: boolean; readonly fg?: string; readonly bg?: string } = {},
 ): void {
   const chars = Array.from(text);
   for (let x = 0; x < chars.length && x < surface.width; x++) {
     const char = chars[x]!;
     if (char === ' ') continue;
-    surface.set(x, y, cellForSettingsChar(char, options.bold ?? false, options.dim ?? false));
+    surface.set(x, y, cellForSettingsChar(char, {
+      strong: options.bold ?? false,
+      dim: options.dim ?? false,
+      fg: options.fg,
+      bg: options.bg,
+    }));
   }
 }
 
-function cellForSettingsChar(char: string, strong: boolean, dim = false): Cell {
+function fillSettingsRowBlock(
+  surface: Surface,
+  y: number,
+  height: number,
+  width: number,
+  focused: boolean,
+): void {
+  const bg = resolveFocusedSettingsRowBg(focused);
+  if (bg == null) return;
+  for (let row = 0; row < height; row++) {
+    for (let x = 0; x < width; x++) {
+      surface.set(x, y + row, {
+        char: ' ',
+        bg,
+        empty: false,
+      });
+    }
+  }
+}
+
+function resolveFocusedSettingsRowBg(focused: boolean): string | undefined {
+  if (!focused) return undefined;
+  return resolveSafeCtx()?.surface('elevated').hex ?? resolveSafeCtx()?.surface('secondary').hex;
+}
+
+function resolveSettingsValueFg<Msg>(row: FrameSettingRow<Msg>): string | undefined {
+  const ctx = resolveSafeCtx();
+  if (ctx == null) return undefined;
+  if (row.kind === 'toggle') return row.checked ? ctx.semantic('accent').hex : ctx.semantic('muted').hex;
+  if (row.kind === 'choice') return ctx.semantic('accent').hex;
+  return ctx.semantic('primary').hex;
+}
+
+function cellForSettingsChar(
+  char: string,
+  options: {
+    readonly strong?: boolean;
+    readonly dim?: boolean;
+    readonly fg?: string;
+    readonly bg?: string;
+  } = {},
+): Cell {
   return {
     char,
-    modifiers: strong ? ['bold'] : dim ? ['dim'] : undefined,
+    fg: options.fg,
+    bg: options.bg,
+    modifiers: options.strong ? ['bold'] : options.dim ? ['dim'] : undefined,
     empty: false,
   };
 }

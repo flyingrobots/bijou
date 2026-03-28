@@ -1230,15 +1230,23 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(ctrlKey(','), model);
-    const rendered = surfaceToString(normalizeViewOutput(app.view(model), {
+    const surface = normalizeViewOutput(app.view(model), {
       width: 90,
       height: 18,
-    }).surface, testCtx.style);
+    }).surface;
+    const rendered = surfaceToString(surface, testCtx.style);
+    const lines = rendered.split('\n');
+    const shellLine = lines.findIndex((line) => line.includes('Shell'));
+    const rowLine = lines.findIndex((line) => line.includes('Show hints'));
+    const rowX = rowLine >= 0 ? lines[rowLine]!.indexOf('Show hints') : -1;
 
     expect(rendered).toContain('Show hints');
     expect(rendered).toContain('☑ On');
     expect(rendered).toContain('Show active control');
     expect(rendered).toContain('cues in the footer');
+    expect(rowLine).toBeGreaterThan(shellLine + 1);
+    expect(rowX).toBeGreaterThan(0);
+    expect(surface.get(rowX, rowLine).bg).toBeDefined();
   });
 
   it('opens settings from the standard command palette entry', async () => {
