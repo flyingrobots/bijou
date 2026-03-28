@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/bijou" },
     { "path": "./packages/bijou-i18n" },
+    { "path": "./packages/bijou-i18n-tools" },
     { "path": "./packages/bijou-node" },
     { "path": "./packages/bijou-tui" },
     { "path": "./packages/bijou-tui-app" },

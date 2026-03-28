@@ -48,5 +48,5 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Current cycle and backlog
 
-- active cycle: [LX-001 — bijou-i18n Runtime Package](/Users/james/git/bijou/docs/design/LX-001-bijou-i18n-runtime-package.md)
-- backlog: [LX-002 — bijou-i18n Tools Package](/Users/james/git/bijou/docs/BACKLOG/LX-002-bijou-i18n-tools-package.md)
+- latest completed cycle: [LX-002 — bijou-i18n Tools Package](/Users/james/git/bijou/docs/design/LX-002-bijou-i18n-tools-package.md)
+- backlog: [LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows](/Users/james/git/bijou/docs/BACKLOG/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md)
