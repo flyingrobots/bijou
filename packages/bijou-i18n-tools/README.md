@@ -8,7 +8,9 @@ Workflow and authoring tooling for Bijou localization.
 - source-hash stale detection
 - provider-neutral tabular export/import rows
 - spreadsheet-friendly workbook export/import
+- CSV/TSV sheet serialization and parsing
 - serializable catalog-bundle export/import
+- JSON bundle serialization and parsing
 - typed value encoding/decoding for strings, data, and refs
 - reference validation and normalization
 - compilation into `@flyingrobots/bijou-i18n` runtime catalogs

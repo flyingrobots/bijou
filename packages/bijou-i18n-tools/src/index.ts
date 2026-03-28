@@ -1,4 +1,12 @@
 export {
+  parseCatalogBundleJson,
+  parseExchangeSheet,
+  serializeCatalogBundleJson,
+  serializeExchangeSheet,
+  type DelimitedFormat,
+} from './adapters.js';
+
+export {
   decodeExchangeValue,
   encodeExchangeValue,
   exportCatalogBundle,
