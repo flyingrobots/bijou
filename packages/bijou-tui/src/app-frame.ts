@@ -1607,6 +1607,7 @@ interface FlatSettingsRow<Msg> {
   readonly index: number;
   readonly line: number;
   readonly height: number;
+  readonly stackValue: boolean;
   readonly descriptionLines: readonly string[];
   readonly row: FrameSettingRow<Msg>;
 }
@@ -1702,6 +1703,8 @@ function resolveSettingsLayout<PageModel, Msg>(
   const sections = settings.sections.filter((section) => section.rows.length > 0);
   if (sections.length === 0) return undefined;
 
+  const drawerWidth = resolveSettingsDrawerWidth(model.columns);
+  const contentWidth = Math.max(16, drawerWidth - 4);
   const rows: FlatSettingsRow<Msg>[] = [];
   let line = 0;
 
@@ -1714,25 +1717,25 @@ function resolveSettingsLayout<PageModel, Msg>(
     line += 1;
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const row = section.rows[rowIndex]!;
+      const stackValue = shouldStackSettingsValue(row, contentWidth);
       const descriptionLines = row.description == null
         ? []
-        : wrapToWidth(row.description, Math.max(1, Math.max(14, resolveSettingsDrawerWidth(model.columns) - 8)));
+        : wrapToWidth(row.description, Math.max(1, Math.max(14, drawerWidth - 8)));
       rows.push({
         index: rows.length,
         line,
-        height: 1 + descriptionLines.length,
+        height: 1 + (stackValue ? 1 : 0) + descriptionLines.length,
+        stackValue,
         descriptionLines,
         row,
       });
-      line += 1 + descriptionLines.length;
+      line += 1 + (stackValue ? 1 : 0) + descriptionLines.length;
       if (rowIndex < section.rows.length - 1) {
         line += 1;
       }
     }
   }
 
-  const drawerWidth = resolveSettingsDrawerWidth(model.columns);
-  const contentWidth = Math.max(16, drawerWidth - 4);
   const contentHeight = Math.max(1, model.rows - 2);
   const totalLines = Math.max(1, line);
   const maxScrollY = Math.max(0, totalLines - contentHeight);
@@ -2073,6 +2076,7 @@ function writeSettingsRow<Msg>(
   }
 
   for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
+    if (flat.stackValue) break;
     const char = valueChars[offset]!;
     if (char === ' ') continue;
     surface.set(startX + valueStart + offset, y, cellForSettingsChar(char, {
@@ -2082,12 +2086,32 @@ function writeSettingsRow<Msg>(
     }));
   }
 
+  if (flat.stackValue && valueChars.length > 0) {
+    const valueText = `   ${value}`;
+    writeSettingsLine(surface, y + 1, valueText, {
+      bold: true,
+      fg: resolveSettingsValueFg(row),
+      bg: resolveFocusedSettingsRowBg(focused),
+    });
+  }
+
   for (let index = 0; index < flat.descriptionLines.length; index++) {
-    writeSettingsLine(surface, y + 1 + index, `   ${flat.descriptionLines[index]!}`, {
+    writeSettingsLine(surface, y + (flat.stackValue ? 2 : 1) + index, `   ${flat.descriptionLines[index]!}`, {
       dim: true,
       bg: resolveFocusedSettingsRowBg(focused),
     });
   }
+}
+
+function shouldStackSettingsValue<Msg>(row: FrameSettingRow<Msg>, width: number): boolean {
+  const value = formatSettingsValueLabel(row);
+  if (value.length === 0) return false;
+  const leftText = `  ${settingsRowGlyph(row)} ${row.label}`;
+  const leftLength = Array.from(leftText).length;
+  const valueLength = Array.from(value).length;
+  const startX = width >= 3 ? 1 : 0;
+  const innerWidth = Math.max(0, width - (startX * 2));
+  return leftLength + 3 + valueLength > innerWidth;
 }
 
 function settingsRowGlyph<Msg>(row: FrameSettingRow<Msg>): string {
@@ -2151,7 +2175,10 @@ function fillSettingsRowBlock(
 
 function resolveFocusedSettingsRowBg(focused: boolean): string | undefined {
   if (!focused) return undefined;
-  return resolveSafeCtx()?.surface('elevated').hex ?? resolveSafeCtx()?.surface('secondary').hex;
+  const ctx = resolveSafeCtx();
+  return ctx?.surface('elevated').bg
+    ?? ctx?.surface('secondary').bg
+    ?? ctx?.surface('muted').bg;
 }
 
 function resolveSettingsValueFg<Msg>(row: FrameSettingRow<Msg>): string | undefined {
@@ -2191,7 +2218,7 @@ function resolveNotificationFooterCue<PageModel, Msg>(
   const archivedCount = countNotificationHistory(center.state, center.activeFilter);
   if (liveCount > 0 && archivedCount > 0) return `notices:${liveCount}+${archivedCount}`;
   if (liveCount > 0) return `notices:${liveCount}`;
-  if (archivedCount > 0) return `inbox:${archivedCount}`;
+  if (archivedCount > 0) return `notices:${archivedCount}`;
   return undefined;
 }
 

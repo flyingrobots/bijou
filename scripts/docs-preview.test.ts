@@ -228,7 +228,7 @@ describe('docs preview app', () => {
     }).surface;
 
     expect(themedModel.docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
-    expect(themedDocsText).toContain('Theme: Cabinet of Curiosities');
+    expect(themedDocsText).not.toContain('Theme:');
     expect(frameText(settingsFrame)).toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Cabinet of Curiosities');
   });

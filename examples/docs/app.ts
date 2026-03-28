@@ -1252,13 +1252,6 @@ function themedSeparatorSurface(
   });
 }
 
-function themeCaptionSurface(theme: LandingThemeTokens, width: number, ctx: BijouContext): Surface {
-  return line(
-    ctx.style.styled(docsThemeMutedBorderToken(theme) as any, `Theme: ${theme.label}`),
-    width,
-  );
-}
-
 function blitCentered(surface: Surface, content: Surface, y: number): void {
   surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
 }
@@ -1333,8 +1326,6 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext, theme: LandingTh
   return column([
     themedSeparatorSurface('welcome to bijou', width, ctx, theme),
     spacer(1, 1),
-    themeCaptionSurface(theme, width, ctx),
-    spacer(1, 1),
     intro,
     spacer(1, 1),
     guide,
@@ -1383,8 +1374,6 @@ function renderStoryPane(
 
   return column([
     themedSeparatorSurface(`docs • ${story.title}`, width, ctx, theme),
-    spacer(1, 1),
-    themeCaptionSurface(theme, width, ctx),
     spacer(1, 1),
     previewCard,
     spacer(1, 1),

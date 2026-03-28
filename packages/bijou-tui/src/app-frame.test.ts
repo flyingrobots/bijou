@@ -1246,7 +1246,41 @@ describe('createFramedApp', () => {
     expect(rendered).toContain('cues in the footer');
     expect(rowLine).toBeGreaterThan(shellLine + 1);
     expect(rowX).toBeGreaterThan(0);
-    expect(surface.get(rowX, rowLine).bg).toBeDefined();
+    expect(surface.get(rowX, rowLine).bg).toBe(testCtx.surface('elevated').bg);
+  });
+
+  it('stacks long settings values beneath the label when inline space is too tight', () => {
+    const app = createFramedApp({
+      initialColumns: 72,
+      initialRows: 18,
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'appearance',
+          title: 'Appearance',
+          rows: [{
+            id: 'theme',
+            label: 'Landing theme',
+            valueLabel: 'Storybook Workstation',
+            kind: 'choice',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    const surface = normalizeViewOutput(app.view(model), {
+      width: 72,
+      height: 18,
+    }).surface;
+    const lines = surfaceToString(surface, testCtx.style).split('\n');
+    const labelLine = lines.findIndex((line) => line.includes('Landing theme'));
+    const valueLine = lines.findIndex((line) => line.includes('Storybook Workstation'));
+
+    expect(labelLine).toBeGreaterThanOrEqual(0);
+    expect(valueLine).toBe(labelLine + 1);
   });
 
   it('opens settings from the standard command palette entry', async () => {
