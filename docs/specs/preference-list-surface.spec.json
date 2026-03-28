@@ -1,0 +1,65 @@
+{
+  "name": "Preference Lists Belong to Bijou",
+  "designPattern": "Canonical Preference List / Preference Row Component Family",
+  "requirements": [
+    "DOGFOOD strategy",
+    "Settings Belong to the Shell design note",
+    "The Humane Shell design note",
+    "Tests ARE the Spec roadmap principle"
+  ],
+  "userStory": {
+    "asA": "user of a framed Bijou app",
+    "iWant": "settings and preference rows to use a clear, reusable Bijou component style",
+    "soThat": "the shell feels intentional and the same preference vocabulary can appear consistently across apps and shell surfaces"
+  },
+  "acceptanceCriteria": [
+    "Bijou exposes a canonical preference-row / preference-list surface family instead of leaving settings-row polish trapped inside shell-local rendering",
+    "The shell settings drawer can render toggle, choice, info, and action rows through that component family",
+    "Selected rows remain visually obvious without relying on ad hoc shell-only drawing behavior",
+    "Long value labels can stack beneath the label instead of colliding or truncating ambiguously",
+    "Descriptions remain readable in compact drawer widths",
+    "DOGFOOD can adopt the canonical preference-list family as the first proving surface",
+    "The first slice works entirely in memory and does not require persistence"
+  ],
+  "backwardCompatibility": "This is an internal and additive design-system promotion step. Existing framed apps remain valid. The shell may continue accepting FrameSettings as the declarative input model while switching its rendering to the canonical preference-list family internally.",
+  "scope": {
+    "inScope": [
+      "Canonical preference row rendering",
+      "Preference list surface composition",
+      "Selected-row treatment",
+      "Stacked-value fallback for narrow widths",
+      "Descriptions and row-kind affordances",
+      "DOGFOOD as the first proving surface",
+      "In-memory settings behavior"
+    ],
+    "outScope": [
+      "Persistence of preferences across sessions",
+      "Arbitrary embedded text fields or editors in preference rows",
+      "A general storage layer for app settings",
+      "Migrating every shell sidecar to the same component family in one slice"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write failing tests for canonical preference-row rendering that lock selected-row treatment, toggle and choice affordances, description layout, and stacked-value fallback. Then migrate the shell settings drawer to use that component family and keep DOGFOOD green through docs-preview regressions.",
+    "edgeCases": [
+      "Very narrow drawer widths where the value cannot fit beside the label",
+      "Long descriptions under a selected row",
+      "Toggle rows with On/Off affordances",
+      "Choice rows with long current values",
+      "Disabled or informational rows"
+    ],
+    "fuzzStress": "Not a priority in v0. The main risk is canonicalizing the visual contract without regressing the shell UX.",
+    "failureCases": [
+      "The shell keeps bespoke settings-row rendering instead of using the new component family",
+      "Long values still collide with labels in narrow drawers",
+      "Selected rows become harder to distinguish after the migration",
+      "The component family quietly assumes storage or persistence concerns"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~180-350 lines across a new component family, shell adoption, and focused regressions",
+    "timeComplexity": "O(R) for rendering visible preference rows where R is the number of rows in the rendered preference list",
+    "workEstimate": "Medium"
+  }
+}

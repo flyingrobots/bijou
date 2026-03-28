@@ -132,10 +132,13 @@ The shell should not feel:
 7. **Settings should explain themselves**
    A setting row should make its control type, current value, and purpose legible without requiring users to infer them from a terse label.
 
-8. **Quit is safe by default**
+8. **Shell polish should graduate into canonical componentry**
+   If the shell discovers a reusable presentation pattern, that pattern should become a Bijou component family instead of staying trapped inside shell-local rendering.
+
+9. **Quit is safe by default**
    Interactive framed apps should treat `Esc`, `q`, and `Ctrl+C` as quit requests routed through the shell.
 
-9. **Notifications scale by weight**
+10. **Notifications scale by weight**
    Short-lived notices, persistent notifications, and reviewable history should be separate layers, not one overloaded mechanism.
 
 ## Proposed shell anatomy
@@ -306,6 +309,8 @@ The app should provide:
 - rows
 - values
 - actions
+
+The shell should keep owning drawer behavior, but the row treatment inside it should be allowed to graduate into canonical Bijou componentry once it proves itself. That follow-on direction is captured in [Preference Lists Belong to Bijou](preference-lists-belong-to-bijou.md).
 
 ### 8. Notifications and notification history
 

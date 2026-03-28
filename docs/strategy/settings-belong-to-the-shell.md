@@ -192,6 +192,8 @@ Why this shape:
 - rows can dispatch messages back into the page/app model without exposing shell internals
 - the model leaves room for future persistence without forcing it in v0
 
+As the first proving surface matured, the row treatment itself proved valuable enough to deserve promotion into canonical Bijou componentry. That follow-on direction is captured in [Preference Lists Belong to Bijou](preference-lists-belong-to-bijou.md) and [Preference List Surface](../specs/preference-list-surface.spec.json).
+
 ## Standard shell behavior
 
 ### Entry

@@ -117,6 +117,8 @@ The docs shell also now has two obvious shell-level proving surfaces:
 
 The resulting settings direction is captured in [Settings Belong to the Shell](settings-belong-to-the-shell.md) and [Frame Settings Drawer](../specs/frame-settings-drawer.spec.json).
 
+As the settings drawer matured, another design truth became clear: if DOGFOOD is serious about proving Bijou, polished preference-row presentation should graduate into canonical Bijou componentry instead of remaining trapped inside shell-local drawing code. That direction is now captured in [Preference Lists Belong to Bijou](preference-lists-belong-to-bijou.md) and [Preference List Surface](../specs/preference-list-surface.spec.json).
+
 As the docs app grew, that broadened into a larger shell-quality question: the title screen, header, footer, search, help, settings, notifications, confirmation flows, and quit semantics all need to feel like one intentional product. That direction is now captured in [The Humane Shell](humane-shell.md).
 
 The next shell-feedback layer under that umbrella is notification review: transient notices need a standard home once they disappear. That direction is now captured in [Notification History Belongs to the Shell](notification-history-belongs-to-the-shell.md) and [Shell Notification Center](../specs/shell-notification-center.spec.json).
