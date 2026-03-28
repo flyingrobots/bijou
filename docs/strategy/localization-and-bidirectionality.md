@@ -22,6 +22,12 @@ Locale affects:
 
 This note exists so Bijou can treat localization and bidirectionality as framework concerns early, before more LTR and English assumptions harden.
 
+Follow-on package direction is now captured in:
+
+- [bijou-i18n Should Be a Real Package](./bijou-i18n-packages.md)
+- [bijou-i18n Runtime spec](../specs/bijou-i18n-runtime.spec.json)
+- [bijou-i18n Tools spec](../specs/bijou-i18n-tools.spec.json)
+
 ## Product stance
 
 Bijou should provide:
@@ -161,6 +167,7 @@ Future framework/tooling support should consider:
 - long-string stress testing
 - layout overflow warnings for localized shells
 - audits for hardcoded user-facing strings in shell/component layers
+- dedicated runtime and tooling package boundaries for localization work
 
 ## DOGFOOD implication
 

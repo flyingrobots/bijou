@@ -1,0 +1,72 @@
+{
+  "name": "bijou-i18n Runtime",
+  "designPattern": "Dedicated Runtime Localization Package",
+  "requirements": [
+    "Localization and Bidirectionality doctrine",
+    "Bijou UX Doctrine",
+    "Content Guide",
+    "Tests ARE the Spec roadmap principle"
+  ],
+  "userStory": {
+    "asA": "builder using Bijou shell, components, or future blocks",
+    "iWant": "a dedicated runtime localization package with catalogs, locale direction, and lookup APIs",
+    "soThat": "localized shell and app content can be resolved consistently without dragging spreadsheet or storage workflows into the runtime"
+  },
+  "acceptanceCriteria": [
+    "Bijou defines a dedicated runtime localization package boundary instead of burying i18n helpers ad hoc inside unrelated packages",
+    "The runtime package supports namespaced catalog keys and catalog load/unload",
+    "The runtime package is usable entirely in memory and assumes no filesystem, browser storage, database, or remote service",
+    "The runtime package exposes locale and direction metadata",
+    "The runtime package supports string-first message lookup but is not limited to string-only resources",
+    "The runtime package provides a path for message, resource, and data entry kinds",
+    "The runtime package can resolve runtime-safe references without becoming a spreadsheet interpreter",
+    "The runtime package exposes locale-aware formatting seams for values like dates, times, numbers, and lists",
+    "The runtime package is cleanly consumable by @flyingrobots/bijou and @flyingrobots/bijou-tui"
+  ],
+  "backwardCompatibility": "This is initially additive. Existing English shell copy and in-memory app models can remain valid while the framework introduces a dedicated runtime i18n seam.",
+  "scope": {
+    "inScope": [
+      "Dedicated bijou-i18n package direction",
+      "Catalog keys with namespace and id",
+      "Locale and direction metadata",
+      "Catalog load and unload",
+      "Message lookup",
+      "Generic resource lookup",
+      "Message, resource, and data entry kinds",
+      "Runtime-safe reference resolution",
+      "Formatter hooks and locale-aware formatting seams",
+      "In-memory default adapter"
+    ],
+    "outScope": [
+      "Spreadsheet import/export workflows",
+      "Catalog publishing pipelines",
+      "Filesystem-backed persistence",
+      "Google Sheets or Excel integration",
+      "Pseudo-localization reports",
+      "Long-string overflow UI policies such as wrap, stack, truncate, or marquee"
+    ]
+  },
+  "testPlan": {
+    "goldenPath": "Write failing tests for catalog registration, message/resource lookup, locale and direction switching, reference resolution, and formatter seams. Then integrate the runtime package into one small shell or docs proving surface without requiring any external storage.",
+    "edgeCases": [
+      "Missing translation falls back to source locale",
+      "Unknown key lookup remains explicit instead of silently returning misleading text",
+      "Reference chains that are invalid or cyclic fail clearly",
+      "Catalog unload removes entries cleanly",
+      "Direction changes without changing locale-specific message ids"
+    ],
+    "fuzzStress": "Catalog lookup and direction-aware key resolution may warrant fuzzing later, but v0 should focus on deterministic runtime behavior and clear failure modes.",
+    "failureCases": [
+      "The runtime package assumes spreadsheets or files are present",
+      "The runtime package only supports plain strings and has no path for resource or data entries",
+      "Direction metadata is left out and shell/layout layers must invent their own locale-direction seams",
+      "Reference support turns the runtime into a complex authoring or spreadsheet execution engine"
+    ]
+  },
+  "priority": "P1",
+  "estimatedComplexity": {
+    "linesOfCode": "~200-450 lines for initial types, in-memory adapter, formatter seams, and focused tests",
+    "timeComplexity": "Lookup should remain near O(1) by key within loaded catalogs, with reference resolution bounded by normalized reference depth",
+    "workEstimate": "Medium"
+  }
+}
