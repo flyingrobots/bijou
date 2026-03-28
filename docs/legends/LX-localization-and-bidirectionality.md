@@ -48,5 +48,5 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Current cycle and backlog
 
-- latest completed cycle: [LX-004 — Provider Adapters for Workbook and Bundle Exchange](/Users/james/git/bijou/docs/design/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md)
-- backlog: [LX-005 — Rich Spreadsheet and Filesystem Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-005-rich-spreadsheet-and-filesystem-adapters.md)
+- latest completed cycle: [LX-005 — Rich Spreadsheet and Filesystem Adapters](/Users/james/git/bijou/docs/design/LX-005-rich-spreadsheet-and-filesystem-adapters.md)
+- backlog: [LX-006 — XLSX and Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-006-xlsx-and-service-oriented-localization-adapters.md)
