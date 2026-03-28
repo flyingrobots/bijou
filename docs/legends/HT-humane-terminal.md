@@ -1,0 +1,48 @@
+# HT — Humane Terminal
+
+_Legend for making Bijou shells and surfaces feel intentional, calm, and trustworthy for humans_
+
+## Goal
+
+Turn Bijou from a pile of useful primitives into a coherent terminal product language.
+
+This legend covers work like:
+
+- shell behavior
+- search/help/settings/notifications/quit
+- focus clarity
+- truthful controls
+- humane defaults
+- canonical shell-adjacent componentry
+
+## Human users
+
+- operators inside framed apps
+- first-time users of DOGFOOD
+- builders using Bijou’s shell primitives
+
+## Agent users
+
+- agents navigating or inspecting framed Bijou apps
+- agents that need deterministic, honest shell affordances
+- agents generating or validating shell-oriented UI
+
+## Human hill
+
+A framed Bijou app feels calm, discoverable, and safe within seconds.
+
+## Agent hill
+
+A framed Bijou app exposes focus, control ownership, and shell affordances clearly enough for an agent to reason about it reliably.
+
+## Core invariants
+
+- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
+- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+
+## Related doctrine
+
+- [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
+- [The Humane Shell](/Users/james/git/bijou/docs/strategy/humane-shell.md)

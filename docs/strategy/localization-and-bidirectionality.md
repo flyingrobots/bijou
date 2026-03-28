@@ -22,11 +22,9 @@ Locale affects:
 
 This note exists so Bijou can treat localization and bidirectionality as framework concerns early, before more LTR and English assumptions harden.
 
-Follow-on package direction is now captured in:
+Concrete follow-on package work is currently tracked as backlog under:
 
-- [bijou-i18n Should Be a Real Package](./bijou-i18n-packages.md)
-- [bijou-i18n Runtime spec](../specs/bijou-i18n-runtime.spec.json)
-- [bijou-i18n Tools spec](../specs/bijou-i18n-tools.spec.json)
+- [LX-001 — bijou-i18n Runtime and Tooling Packages](/Users/james/git/bijou/docs/BACKLOG/LX-001-bijou-i18n-runtime-and-tooling-packages.md)
 
 ## Product stance
 
