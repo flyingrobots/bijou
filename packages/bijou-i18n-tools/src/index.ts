@@ -1,4 +1,22 @@
 export {
+  decodeExchangeValue,
+  encodeExchangeValue,
+  exportCatalogBundle,
+  exportTranslationWorkbook,
+  importCatalogBundle,
+  importTranslationWorkbook,
+  type CatalogBundle,
+  type EncodedExchangeValue,
+  type ExchangeSheet,
+  type ExchangeValueKind,
+  type ExchangeWorkbook,
+  type SerializedAuthoringCatalog,
+  type SerializedAuthoringCatalogEntry,
+  type SerializedAuthoringTranslation,
+  type TranslationWorkbookRow,
+} from './exchange.js';
+
+export {
   compileCatalogs,
   exportTranslationRows,
   hashSourceValue,
