@@ -46,6 +46,7 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 - [Localization and Bidirectionality](/Users/james/git/bijou/docs/strategy/localization-and-bidirectionality.md)
 - [Content Guide](/Users/james/git/bijou/docs/strategy/content-guide.md)
 
-## Initial backlog
+## Current cycle and backlog
 
-- [LX-001 — bijou-i18n Runtime and Tooling Packages](/Users/james/git/bijou/docs/BACKLOG/LX-001-bijou-i18n-runtime-and-tooling-packages.md)
+- active cycle: [LX-001 — bijou-i18n Runtime Package](/Users/james/git/bijou/docs/design/LX-001-bijou-i18n-runtime-package.md)
+- backlog: [LX-002 — bijou-i18n Tools Package](/Users/james/git/bijou/docs/BACKLOG/LX-002-bijou-i18n-tools-package.md)

@@ -1,0 +1,55 @@
+{
+  "name": "@flyingrobots/bijou-i18n",
+  "version": "4.0.0",
+  "description": "In-memory localization runtime for Bijou — catalogs, locale direction, and runtime-safe lookups.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepack": "tsc -b",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "keywords": [
+    "i18n",
+    "localization",
+    "bidirectionality",
+    "catalogs",
+    "bijou",
+    "terminal"
+  ],
+  "author": "James Ross <james@flyingrobots.dev>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyingrobots/bijou.git",
+    "directory": "packages/bijou-i18n"
+  },
+  "homepage": "https://github.com/flyingrobots/bijou",
+  "bugs": "https://github.com/flyingrobots/bijou/issues",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
