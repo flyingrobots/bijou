@@ -1067,9 +1067,6 @@ export function createFramedApp<PageModel, Msg>(
           const layout = resolveSettingsLayout(model, options, pagesById);
           if (layout != null) {
             const settingsFrameAction = frameKeys.handle(msg);
-            if (isShellQuitRequest(msg)) {
-              return applyQuitRequest(model, msg);
-            }
             if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
               return [{
                 ...model,
@@ -1090,6 +1087,9 @@ export function createFramedApp<PageModel, Msg>(
             }
             if (!msg.ctrl && !msg.alt && msg.key === '?') {
               return [{ ...model, helpOpen: true }, withObservedKey(model, [], msg, 'frame')];
+            }
+            if (isShellQuitRequest(msg)) {
+              return applyQuitRequest(model, msg);
             }
             if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
               return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];

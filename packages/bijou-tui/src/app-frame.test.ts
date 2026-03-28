@@ -924,7 +924,7 @@ describe('createFramedApp', () => {
     expect(returned).toBe(QUIT);
   });
 
-  it('opens quit confirm with escape while settings are open', () => {
+  it('closes settings with escape without opening quit confirm', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({
@@ -946,6 +946,32 @@ describe('createFramedApp', () => {
     expect((model as any).settingsOpen).toBe(true);
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(false);
+    expect((model as any).quitConfirmOpen).toBe(false);
+  });
+
+  it('still opens quit confirm with q while settings are open', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(true);
+
+    [model] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).settingsOpen).toBe(false);
     expect((model as any).quitConfirmOpen).toBe(true);
   });
