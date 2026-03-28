@@ -195,11 +195,42 @@ describe('docs preview app', () => {
     const cycledLeft = await runScript(app, [{ key: KEY_LEFT }], { ctx });
 
     expect((numbered.model as any).landingThemeIndex).toBe(2);
+    expect((numbered.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(2);
     expect((cycledRight.model as any).landingThemeIndex).toBe(1);
+    expect((cycledRight.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
     expect((cycledLeft.model as any).landingThemeIndex).toBe(4);
+    expect((cycledLeft.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(4);
 
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
+  });
+
+  it('carries the selected landing theme into the docs surfaces and settings', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const defaultDocs = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const themedDocs = await runScript(app, [
+      { key: '2' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const themedModel = themedDocs.model as any;
+    const themedDocsSurface = normalizeViewOutput(app.view(themedModel), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    const themedDocsText = frameText(themedDocsSurface);
+    const [settingsModel] = app.update(keyMsg('f2') as any, themedModel);
+    const settingsFrame = normalizeViewOutput(app.view(settingsModel as any), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+
+    expect(themedModel.docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
+    expect(themedDocsText).toContain('Theme: Cabinet of Curiosities');
+    expect(frameText(settingsFrame)).toContain('Landing theme');
+    expect(frameText(settingsFrame)).toContain('Cabinet of Curiosities');
   });
 
   it('shows a toast with the theme name when the landing theme changes and clears it later', async () => {
@@ -307,6 +338,8 @@ describe('docs preview app', () => {
     }).surface;
     expect(frameText(settingsFrame)).toContain('☑ On');
     expect(frameText(settingsFrame)).toContain('Show active-pane control cues');
+    expect(frameText(settingsFrame)).toContain('↻ Landing theme');
+    expect(frameText(settingsFrame)).toContain('Storybook Workstation');
     expect(frameText(settingsFrame)).toContain('Adapts render cost to');
     expect(frameText(settingsFrame)).toContain('Options: Auto, Quality');
     expect(frameText(settingsFrame)).toContain('↻ Landing quality');
@@ -327,6 +360,8 @@ describe('docs preview app', () => {
     }).surface;
     expect(model.docsModel.runtimeNotifications.items[0]?.message).toBe('Show hints turned off.');
     expect(frameText(frame)).toContain('notices:1');
+    updateResult = app.update(keyMsg('down') as any, model);
+    model = updateResult[0] as any;
     updateResult = app.update(keyMsg('down') as any, model);
     model = updateResult[0] as any;
     updateResult = app.update(keyMsg('enter') as any, model);

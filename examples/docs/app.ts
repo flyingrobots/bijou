@@ -8,6 +8,7 @@ import {
   wrapToWidth,
   type BijouContext,
   type Surface,
+  type TokenValue,
 } from '@flyingrobots/bijou';
 import {
   browsableListSurface,
@@ -108,6 +109,7 @@ interface DocsExplorerModel {
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly showHints: boolean;
+  readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
 }
 
@@ -126,6 +128,7 @@ type ExplorerMsg =
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
   | { type: 'toggle-hints' }
+  | { type: 'cycle-landing-theme' }
   | { type: 'cycle-landing-quality' };
 
 interface RootModel {
@@ -330,6 +333,7 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
     showHints: true,
+    landingThemeIndex: 0,
     landingQualityMode: 'auto',
   };
 }
@@ -956,6 +960,15 @@ function landingQualitySettingDescription(
   }
 }
 
+function landingThemeSettingValue(index: number): string {
+  return resolveLandingTheme(index).label;
+}
+
+function landingThemeSettingDescription(index: number): string {
+  const theme = resolveLandingTheme(index);
+  return `Sets the DOGFOOD title screen and docs accent palette. Current theme: ${theme.label}. Options: ${LANDING_THEMES.map((entry) => entry.label).join(', ')}.`;
+}
+
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
   return model.docsModel.pageModels[DOCS_PAGE_ID]?.landingQualityMode ?? 'auto';
 }
@@ -1051,12 +1064,23 @@ function getLandingFpsBadge(
 }
 
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
+  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
   const nextIndex = mod(index, LANDING_THEMES.length);
   if (nextIndex === model.landingThemeIndex) return model;
   const theme = resolveLandingTheme(nextIndex);
   return {
     ...model,
     landingThemeIndex: nextIndex,
+    docsModel: pageModel == null ? model.docsModel : {
+      ...model.docsModel,
+      pageModels: {
+        ...model.docsModel.pageModels,
+        [DOCS_PAGE_ID]: {
+          ...pageModel,
+          landingThemeIndex: nextIndex,
+        },
+      },
+    },
     landingToast: {
       message: theme.label,
       expiresAtMs: model.landingTimeMs + 1600,
@@ -1194,11 +1218,50 @@ function createTransparentTextSurface(
   return surface;
 }
 
+function docsThemeAccentToken(theme: LandingThemeTokens): TokenValue {
+  return { hex: sampleColorRamp(theme.logoRamp, 0.78), modifiers: ['bold'] };
+}
+
+function docsThemeBorderToken(theme: LandingThemeTokens): TokenValue {
+  return { hex: sampleColorRamp(theme.waveRamp, 0.58) };
+}
+
+function docsThemeMutedBorderToken(theme: LandingThemeTokens): TokenValue {
+  return { hex: sampleColorRamp(theme.waveRamp, 0.36), modifiers: ['dim'] };
+}
+
+function themedSeparatorSurface(
+  label: string,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
+  return separatorSurface({
+    label,
+    width,
+    ctx,
+    borderToken: docsThemeBorderToken(theme),
+  });
+}
+
+function themeCaptionSurface(theme: LandingThemeTokens, width: number, ctx: BijouContext): Surface {
+  return line(
+    ctx.style.styled(docsThemeMutedBorderToken(theme) as any, `Theme: ${theme.label}`),
+    width,
+  );
+}
+
 function blitCentered(surface: Surface, content: Surface, y: number): void {
   surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
 }
 
-function renderFamiliesPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {
+function renderFamiliesPane(
+  model: DocsExplorerModel,
+  width: number,
+  height: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
   const visibleHeight = Math.max(3, height - 2);
   const body = createSurface(Math.max(1, width), visibleHeight);
   const start = model.familyState.scrollY;
@@ -1214,6 +1277,7 @@ function renderFamiliesPane(model: DocsExplorerModel, width: number, height: num
         selectedStoryId: model.selectedStoryId,
         expandedFamilies: model.expandedFamilies,
         ctx,
+        theme,
       }),
       0,
       index - start,
@@ -1221,12 +1285,12 @@ function renderFamiliesPane(model: DocsExplorerModel, width: number, height: num
   }
 
   return column([
-    separatorSurface({ label: 'component families', width, ctx }),
+    themedSeparatorSurface('component families', width, ctx, theme),
     body,
   ]);
 }
 
-function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
+function renderEmptyStoryPane(width: number, ctx: BijouContext, theme: LandingThemeTokens): Surface {
   const bodyWidth = Math.max(28, width - 6);
   const intro = boxSurface(column([
     paragraphSurface(
@@ -1241,7 +1305,7 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
   ]), {
     title: 'What is Bijou?',
     width: Math.max(24, width - 1),
-    borderToken: ctx.border('primary'),
+    borderToken: docsThemeBorderToken(theme),
     ctx,
   });
 
@@ -1254,12 +1318,14 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
   ]), {
     title: 'How to use these docs',
     width: Math.max(24, width - 1),
-    borderToken: ctx.border('muted'),
+    borderToken: docsThemeMutedBorderToken(theme),
     ctx,
   });
 
   return column([
-    separatorSurface({ label: 'welcome to bijou', width, ctx }),
+    themedSeparatorSurface('welcome to bijou', width, ctx, theme),
+    spacer(1, 1),
+    themeCaptionSurface(theme, width, ctx),
     spacer(1, 1),
     intro,
     spacer(1, 1),
@@ -1267,10 +1333,15 @@ function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
   ]);
 }
 
-function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouContext): Surface {
+function renderStoryPane(
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
   const story = selectedStory(model);
   if (story == null) {
-    return renderEmptyStoryPane(width, ctx);
+    return renderEmptyStoryPane(width, ctx, theme);
   }
 
   const profileIndex = findStoryProfileIndex(story, model.profileMode);
@@ -1294,7 +1365,7 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
   }), {
     title: `live preview • ${preset.label} • ${variant.label}`,
     width: Math.max(24, width - 1),
-    borderToken: ctx.border('muted'),
+    borderToken: docsThemeMutedBorderToken(theme),
     ctx,
   });
   const docs = markdown(storyDocsMarkdown(story, variant, preset), {
@@ -1303,7 +1374,9 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
   });
 
   return column([
-    separatorSurface({ label: `docs • ${story.title}`, width, ctx }),
+    themedSeparatorSurface(`docs • ${story.title}`, width, ctx, theme),
+    spacer(1, 1),
+    themeCaptionSurface(theme, width, ctx),
     spacer(1, 1),
     previewCard,
     spacer(1, 1),
@@ -1311,18 +1384,24 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
   ]);
 }
 
-function renderVariantsPane(model: DocsExplorerModel, width: number, height: number, ctx: BijouContext): Surface {
+function renderVariantsPane(
+  model: DocsExplorerModel,
+  width: number,
+  height: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
   const story = selectedStory(model);
   if (story == null) {
     return column([
-      separatorSurface({ label: 'variants', width, ctx }),
+      themedSeparatorSurface('variants', width, ctx, theme),
       spacer(1, 1),
       boxSurface(paragraphSurface(
         'Variants appear here once a component is selected.',
         Math.max(20, width - 6),
       ), {
         width: Math.max(22, width - 1),
-        borderToken: ctx.border('muted'),
+        borderToken: docsThemeMutedBorderToken(theme),
         ctx,
       }),
     ]);
@@ -1354,12 +1433,12 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
   ]), {
     title: 'active variant',
     width: Math.max(22, width - 1),
-    borderToken: ctx.border('muted'),
+    borderToken: docsThemeMutedBorderToken(theme),
     ctx,
   });
 
   return column([
-    separatorSurface({ label: `variants • ${story.title}`, width, ctx }),
+    themedSeparatorSurface(`variants • ${story.title}`, width, ctx, theme),
     list,
     spacer(1, 1),
     description,
@@ -1492,6 +1571,8 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             return [{ ...model, profileMode: msg.mode }, []];
           case 'toggle-hints':
             return [{ ...model, showHints: !model.showHints }, []];
+          case 'cycle-landing-theme':
+            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
           case 'cycle-landing-quality':
             return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
         }
@@ -1523,6 +1604,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
         }));
       },
       layout(model) {
+        const theme = resolveLandingTheme(model.landingThemeIndex);
         return {
           kind: 'grid',
           gridId: 'docs-shell',
@@ -1538,17 +1620,17 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
             family: {
               kind: 'pane',
               paneId: 'family-nav',
-              render: (width, height) => renderFamiliesPane(model, width, height, ctx),
+              render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
             },
             main: {
               kind: 'pane',
               paneId: 'story-content',
-              render: (width) => renderStoryPane(model, width, ctx),
+              render: (width) => renderStoryPane(model, width, ctx, theme),
             },
             variants: {
               kind: 'pane',
               paneId: 'story-variants',
-              render: (width, height) => renderVariantsPane(model, width, height, ctx),
+              render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
             },
           },
         };
@@ -1578,18 +1660,32 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
         {
           id: 'landing',
           title: 'Landing',
-          rows: [{
-            id: 'landing-quality',
-            label: 'Landing quality',
-            description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode),
-            valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
-            kind: 'choice',
-            action: { type: 'cycle-landing-quality' },
-            feedback: {
-              title: 'Settings',
-              message: `Landing quality set to ${landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode))}.`,
+          rows: [
+            {
+              id: 'landing-theme',
+              label: 'Landing theme',
+              description: landingThemeSettingDescription(pageModel.landingThemeIndex),
+              valueLabel: landingThemeSettingValue(pageModel.landingThemeIndex),
+              kind: 'choice',
+              action: { type: 'cycle-landing-theme' },
+              feedback: {
+                title: 'Settings',
+                message: `Landing theme set to ${landingThemeSettingValue(nextLandingThemeIndex(pageModel.landingThemeIndex, 1))}.`,
+              },
             },
-          }],
+            {
+              id: 'landing-quality',
+              label: 'Landing quality',
+              description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode),
+              valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
+              kind: 'choice',
+              action: { type: 'cycle-landing-quality' },
+              feedback: {
+                title: 'Settings',
+                message: `Landing quality set to ${landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode))}.`,
+              },
+            },
+          ],
         },
       ],
     }),
@@ -1609,7 +1705,12 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
-    return [{ ...model, docsModel }, mapExplorer(cmds)];
+    const pageModel = docsModel.pageModels[DOCS_PAGE_ID];
+    return [{
+      ...model,
+      docsModel,
+      landingThemeIndex: pageModel?.landingThemeIndex ?? model.landingThemeIndex,
+    }, mapExplorer(cmds)];
   }
 
   return {
@@ -1740,18 +1841,21 @@ function renderFamilyRow(options: {
   readonly selectedStoryId?: string;
   readonly expandedFamilies: Readonly<Record<string, boolean>>;
   readonly ctx: BijouContext;
+  readonly theme: LandingThemeTokens;
 }): Surface {
-  const { row, width, focused, selectedStoryId, expandedFamilies, ctx } = options;
+  const { row, width, focused, selectedStoryId, expandedFamilies, ctx, theme } = options;
+  const accentToken = docsThemeAccentToken(theme);
+  const mutedToken = docsThemeMutedBorderToken(theme);
   if (row.kind === 'family') {
     const family = STORY_FAMILIES.find((candidate) => candidate.id === row.familyId);
     if (family == null) return line('', width);
     const expanded = expandedFamilies[row.familyId] ?? false;
     const focusPrefix = focused
-      ? ctx.style.styled(ctx.semantic('accent'), '›')
+      ? ctx.style.styled(accentToken as any, '›')
       : ' ';
-    const arrow = ctx.style.styled(ctx.semantic('accent'), expanded ? '▼' : '▶');
+    const arrow = ctx.style.styled(accentToken as any, expanded ? '▼' : '▶');
     const title = focused
-      ? ctx.style.styled(ctx.semantic('primary'), family.label)
+      ? ctx.style.styled(accentToken as any, family.label)
       : family.label;
     return line(`${focusPrefix} ${arrow} ${title}`, width);
   }
@@ -1760,13 +1864,13 @@ function renderFamilyRow(options: {
   if (story == null) return line('', width);
   const selected = selectedStoryId === story.id;
   const focusPrefix = focused
-    ? ctx.style.styled(ctx.semantic('accent'), '›')
+    ? ctx.style.styled(accentToken as any, '›')
     : ' ';
   const bullet = selected
-    ? ctx.style.styled(ctx.semantic('accent'), '•')
-    : ctx.style.styled(ctx.border('muted'), '•');
+    ? ctx.style.styled(accentToken as any, '•')
+    : ctx.style.styled(mutedToken as any, '•');
   const title = selected
-    ? ctx.style.styled(ctx.semantic('accent'), story.title)
+    ? ctx.style.styled(accentToken as any, story.title)
     : story.title;
   return line(`${focusPrefix}   ${bullet} ${title}`, width);
 }
