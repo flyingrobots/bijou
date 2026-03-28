@@ -63,6 +63,20 @@ export type { PaginatorOptions } from './paginator.js';
 export { stepper } from './stepper.js';
 export type { StepperStep, StepperOptions } from './stepper.js';
 
+export {
+  preferenceListSurface,
+  preferenceRowSurface,
+  resolvePreferenceRowLayout,
+} from './preference-list.js';
+export type {
+  PreferenceRowKind,
+  PreferenceRow,
+  PreferenceSection,
+  PreferenceRowLayout,
+  PreferenceRowSurfaceOptions,
+  PreferenceListSurfaceOptions,
+} from './preference-list.js';
+
 export { dag, dagSlice, dagLayout } from './dag.js';
 export type { DagNode, DagOptions, DagNodePosition, DagLayout } from './dag.js';
 

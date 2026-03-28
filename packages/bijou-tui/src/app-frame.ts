@@ -8,10 +8,12 @@
 import {
   createSurface,
   parseAnsiToSurface,
+  preferenceListSurface,
+  resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
-  wrapToWidth,
-  type Cell,
+  type PreferenceRow,
+  type PreferenceSection,
   type OverflowBehavior,
   type Surface,
   type TokenValue,
@@ -1607,8 +1609,6 @@ interface FlatSettingsRow<Msg> {
   readonly index: number;
   readonly line: number;
   readonly height: number;
-  readonly stackValue: boolean;
-  readonly descriptionLines: readonly string[];
   readonly row: FrameSettingRow<Msg>;
 }
 
@@ -1717,19 +1717,14 @@ function resolveSettingsLayout<PageModel, Msg>(
     line += 1;
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const row = section.rows[rowIndex]!;
-      const stackValue = shouldStackSettingsValue(row, contentWidth);
-      const descriptionLines = row.description == null
-        ? []
-        : wrapToWidth(row.description, Math.max(1, Math.max(14, drawerWidth - 8)));
+      const rowLayout = resolvePreferenceRowLayout(toPreferenceRow(row), contentWidth);
       rows.push({
         index: rows.length,
         line,
-        height: 1 + (stackValue ? 1 : 0) + descriptionLines.length,
-        stackValue,
-        descriptionLines,
+        height: rowLayout.height,
         row,
       });
-      line += 1 + (stackValue ? 1 : 0) + descriptionLines.length;
+      line += rowLayout.height;
       if (rowIndex < section.rows.length - 1) {
         line += 1;
       }
@@ -2015,195 +2010,33 @@ function renderSettingsSurface<PageModel, Msg>(
   layout: ResolvedSettingsLayout<Msg>,
   model: InternalFrameModel<PageModel, Msg>,
 ): Surface {
-  const surface = createSurface(layout.contentWidth, layout.totalLines);
   const focusedIndex = clampSettingsFocus(model, layout);
-  const rowsByLine = new Map(layout.rows.map((row) => [row.line, row] as const));
-  let lineIndex = 0;
-
-  for (let sectionIndex = 0; sectionIndex < layout.settings.sections.length; sectionIndex++) {
-    const section = layout.settings.sections[sectionIndex]!;
-    if (sectionIndex > 0) {
-      lineIndex += 1;
-    }
-    writeSettingsLine(surface, lineIndex, section.title, { bold: true });
-    lineIndex += 2;
-
-    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const flat = rowsByLine.get(lineIndex);
-      if (flat == null) {
-        lineIndex += 1;
-        continue;
-      }
-      writeSettingsRow(surface, lineIndex, flat, layout.contentWidth, flat.index === focusedIndex);
-      lineIndex += flat.height;
-      if (rowIndex < section.rows.length - 1) {
-        lineIndex += 1;
-      }
-    }
-  }
-
-  return surface;
+  return preferenceListSurface(toPreferenceSections(layout.settings.sections), {
+    width: layout.contentWidth,
+    selectedRowId: layout.rows[focusedIndex]?.row.id,
+    ctx: resolveSafeCtx() ?? undefined,
+  });
 }
 
-function writeSettingsRow<Msg>(
-  surface: Surface,
-  y: number,
-  flat: FlatSettingsRow<Msg>,
-  width: number,
-  focused: boolean,
-): void {
-  const { row } = flat;
-  const prefix = focused ? '›' : ' ';
-  const value = formatSettingsValueLabel(row);
-  const leftText = `${prefix} ${settingsRowGlyph(row)} ${row.label}`;
-  const leftChars = Array.from(leftText);
-  const valueChars = Array.from(value);
-  const startX = width >= 3 ? 1 : 0;
-  const innerWidth = Math.max(0, width - (startX * 2));
-  const valueStart = valueChars.length === 0
-    ? innerWidth
-    : Math.max(leftChars.length + 3, innerWidth - valueChars.length);
-
-  fillSettingsRowBlock(surface, y, flat.height, width, focused);
-
-  for (let x = 0; x < leftChars.length && startX + x < width; x++) {
-    const char = leftChars[x]!;
-    if (char === ' ') continue;
-    surface.set(startX + x, y, cellForSettingsChar(char, {
-      strong: focused,
-      bg: resolveFocusedSettingsRowBg(focused),
-    }));
-  }
-
-  for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
-    if (flat.stackValue) break;
-    const char = valueChars[offset]!;
-    if (char === ' ') continue;
-    surface.set(startX + valueStart + offset, y, cellForSettingsChar(char, {
-      strong: true,
-      fg: resolveSettingsValueFg(row),
-      bg: resolveFocusedSettingsRowBg(focused),
-    }));
-  }
-
-  if (flat.stackValue && valueChars.length > 0) {
-    const valueText = `   ${value}`;
-    writeSettingsLine(surface, y + 1, valueText, {
-      bold: true,
-      fg: resolveSettingsValueFg(row),
-      bg: resolveFocusedSettingsRowBg(focused),
-    });
-  }
-
-  for (let index = 0; index < flat.descriptionLines.length; index++) {
-    writeSettingsLine(surface, y + (flat.stackValue ? 2 : 1) + index, `   ${flat.descriptionLines[index]!}`, {
-      dim: true,
-      bg: resolveFocusedSettingsRowBg(focused),
-    });
-  }
+function toPreferenceSections<Msg>(
+  sections: readonly FrameSettingSection<Msg>[],
+): readonly PreferenceSection[] {
+  return sections.map((section) => ({
+    id: section.id,
+    title: section.title,
+    rows: section.rows.map((row) => toPreferenceRow(row)),
+  }));
 }
 
-function shouldStackSettingsValue<Msg>(row: FrameSettingRow<Msg>, width: number): boolean {
-  const value = formatSettingsValueLabel(row);
-  if (value.length === 0) return false;
-  const leftText = `  ${settingsRowGlyph(row)} ${row.label}`;
-  const leftLength = Array.from(leftText).length;
-  const valueLength = Array.from(value).length;
-  const startX = width >= 3 ? 1 : 0;
-  const innerWidth = Math.max(0, width - (startX * 2));
-  return leftLength + 3 + valueLength > innerWidth;
-}
-
-function settingsRowGlyph<Msg>(row: FrameSettingRow<Msg>): string {
-  if (row.kind === 'toggle') {
-    return row.checked === true ? '☑' : '☐';
-  }
-  if (row.kind === 'choice') {
-    return '↻';
-  }
-  return ' ';
-}
-
-function formatSettingsValueLabel<Msg>(row: FrameSettingRow<Msg>): string {
-  if (row.kind === 'toggle' && row.checked != null) {
-    return row.checked ? '☑ On' : '☐ Off';
-  }
-  if (row.kind === 'choice') {
-    return row.valueLabel ?? 'Choose';
-  }
-  return row.valueLabel ?? '';
-}
-
-function writeSettingsLine(
-  surface: Surface,
-  y: number,
-  text: string,
-  options: { readonly bold?: boolean; readonly dim?: boolean; readonly fg?: string; readonly bg?: string } = {},
-): void {
-  const chars = Array.from(text);
-  for (let x = 0; x < chars.length && x < surface.width; x++) {
-    const char = chars[x]!;
-    if (char === ' ') continue;
-    surface.set(x, y, cellForSettingsChar(char, {
-      strong: options.bold ?? false,
-      dim: options.dim ?? false,
-      fg: options.fg,
-      bg: options.bg,
-    }));
-  }
-}
-
-function fillSettingsRowBlock(
-  surface: Surface,
-  y: number,
-  height: number,
-  width: number,
-  focused: boolean,
-): void {
-  const bg = resolveFocusedSettingsRowBg(focused);
-  if (bg == null) return;
-  for (let row = 0; row < height; row++) {
-    for (let x = 0; x < width; x++) {
-      surface.set(x, y + row, {
-        char: ' ',
-        bg,
-        empty: false,
-      });
-    }
-  }
-}
-
-function resolveFocusedSettingsRowBg(focused: boolean): string | undefined {
-  if (!focused) return undefined;
-  const ctx = resolveSafeCtx();
-  return ctx?.surface('elevated').bg
-    ?? ctx?.surface('secondary').bg
-    ?? ctx?.surface('muted').bg;
-}
-
-function resolveSettingsValueFg<Msg>(row: FrameSettingRow<Msg>): string | undefined {
-  const ctx = resolveSafeCtx();
-  if (ctx == null) return undefined;
-  if (row.kind === 'toggle') return row.checked ? ctx.semantic('accent').hex : ctx.semantic('muted').hex;
-  if (row.kind === 'choice') return ctx.semantic('accent').hex;
-  return ctx.semantic('primary').hex;
-}
-
-function cellForSettingsChar(
-  char: string,
-  options: {
-    readonly strong?: boolean;
-    readonly dim?: boolean;
-    readonly fg?: string;
-    readonly bg?: string;
-  } = {},
-): Cell {
+function toPreferenceRow<Msg>(row: FrameSettingRow<Msg>): PreferenceRow {
   return {
-    char,
-    fg: options.fg,
-    bg: options.bg,
-    modifiers: options.strong ? ['bold'] : options.dim ? ['dim'] : undefined,
-    empty: false,
+    id: row.id,
+    label: row.label,
+    description: row.description,
+    valueLabel: row.valueLabel,
+    kind: row.kind,
+    checked: row.checked,
+    enabled: row.enabled,
   };
 }
 
