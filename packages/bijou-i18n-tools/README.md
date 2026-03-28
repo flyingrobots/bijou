@@ -16,4 +16,4 @@ Workflow and authoring tooling for Bijou localization.
 - compilation into `@flyingrobots/bijou-i18n` runtime catalogs
 - pseudo-localization helpers
 
-This package is intentionally provider-neutral. Filesystem, CSV/XLSX, or Google Sheets adapters can be added later without polluting the core tooling API.
+This package is intentionally provider-neutral. Filesystem, XLSX, or service-backed adapters can sit on top of it without polluting the core tooling API.

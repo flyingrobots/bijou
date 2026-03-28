@@ -200,4 +200,4 @@ That is correct. LX-005 made the current exchange seam practical in Node without
 
 Spawned:
 
-- [LX-006 — XLSX and Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-006-xlsx-and-service-oriented-localization-adapters.md)
+- [LX-006 — XLSX Localization Adapters](/Users/james/git/bijou/docs/design/LX-006-xlsx-localization-adapters.md)

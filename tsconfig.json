@@ -5,6 +5,7 @@
     { "path": "./packages/bijou-i18n" },
     { "path": "./packages/bijou-i18n-tools" },
     { "path": "./packages/bijou-i18n-tools-node" },
+    { "path": "./packages/bijou-i18n-tools-xlsx" },
     { "path": "./packages/bijou-node" },
     { "path": "./packages/bijou-tui" },
     { "path": "./packages/bijou-tui-app" },
