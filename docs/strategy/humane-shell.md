@@ -129,10 +129,13 @@ The shell should not feel:
 6. **Settings are shell state**
    Preferences should live in a shell-owned drawer and behave the same way across framed apps.
 
-7. **Quit is safe by default**
+7. **Settings should explain themselves**
+   A setting row should make its control type, current value, and purpose legible without requiring users to infer them from a terse label.
+
+8. **Quit is safe by default**
    Interactive framed apps should treat `Esc`, `q`, and `Ctrl+C` as quit requests routed through the shell.
 
-8. **Notifications scale by weight**
+9. **Notifications scale by weight**
    Short-lived notices, persistent notifications, and reviewable history should be separate layers, not one overloaded mechanism.
 
 ## Proposed shell anatomy

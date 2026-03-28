@@ -81,7 +81,7 @@ const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
-const LANDING_CONTROLS_TEXT = 'Esc/q quit • any key continue';
+const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
 const DOCS_PAGE_ID = 'dogfood';
 const DOCS_SIDEBAR_WIDTH = 32;
@@ -916,6 +916,19 @@ function nextLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
   }
 }
 
+function previousLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
+  switch (mode) {
+    case 'auto':
+      return 'performance';
+    case 'quality':
+      return 'auto';
+    case 'balanced':
+      return 'quality';
+    case 'performance':
+      return 'balanced';
+  }
+}
+
 function landingQualitySettingValue(
   width: number,
   height: number,
@@ -923,6 +936,24 @@ function landingQualitySettingValue(
 ): string {
   if (mode !== 'auto') return landingQualityModeLabel(mode);
   return `${landingQualityModeLabel(mode)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode))})`;
+}
+
+function landingQualitySettingDescription(
+  width: number,
+  height: number,
+  mode: LandingQualityMode,
+): string {
+  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode));
+  switch (mode) {
+    case 'auto':
+      return `Adapts render cost to terminal size. Current auto profile: ${currentProfile}. Options: Auto, Quality, Balanced, Performance.`;
+    case 'quality':
+      return 'Prioritizes the richest title treatment even on larger terminals. Options: Auto, Quality, Balanced, Performance.';
+    case 'balanced':
+      return 'Keeps the title screen expressive while reducing render work on larger terminals. Options: Auto, Quality, Balanced, Performance.';
+    case 'performance':
+      return 'Minimizes title-screen work for giant terminals and slower emulators. Options: Auto, Quality, Balanced, Performance.';
+  }
 }
 
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
@@ -1028,6 +1059,29 @@ function applyLandingThemeSelection(model: RootModel, index: number): RootModel 
     landingThemeIndex: nextIndex,
     landingToast: {
       message: theme.label,
+      expiresAtMs: model.landingTimeMs + 1600,
+    },
+  };
+}
+
+function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode): RootModel {
+  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
+  if (pageModel == null || pageModel.landingQualityMode === mode) return model;
+
+  return {
+    ...model,
+    docsModel: {
+      ...model.docsModel,
+      pageModels: {
+        ...model.docsModel.pageModels,
+        [DOCS_PAGE_ID]: {
+          ...pageModel,
+          landingQualityMode: mode,
+        },
+      },
+    },
+    landingToast: {
+      message: `Landing quality: ${landingQualityModeLabel(mode)}`,
       expiresAtMs: model.landingTimeMs + 1600,
     },
   };
@@ -1510,8 +1564,9 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           rows: [{
             id: 'show-hints',
             label: 'Show hints',
-            description: 'Show active-pane control cues in the footer instead of relying on the full help overlay.',
+            description: 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.',
             valueLabel: pageModel.showHints ? 'On' : 'Off',
+            checked: pageModel.showHints,
             kind: 'toggle',
             action: { type: 'toggle-hints' },
             feedback: {
@@ -1526,7 +1581,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           rows: [{
             id: 'landing-quality',
             label: 'Landing quality',
-            description: 'Choose how aggressively the title screen trades visual fidelity for frame rate on large terminals.',
+            description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode),
             valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
             kind: 'choice',
             action: { type: 'cycle-landing-quality' },
@@ -1629,6 +1684,12 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
           }
           if (msg.key === 'right') {
             return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
+          }
+          if (msg.key === 'up') {
+            return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model))), []];
+          }
+          if (msg.key === 'down') {
+            return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model))), []];
           }
           if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
             return [applyLandingThemeSelection(model, Number(msg.key) - 1), []];

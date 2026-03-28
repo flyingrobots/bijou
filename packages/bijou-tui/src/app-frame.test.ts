@@ -1194,7 +1194,9 @@ describe('createFramedApp', () => {
             id: 'show-hints',
             label: 'Show hints',
             description: 'Show active control cues in the footer.',
+            checked: true,
             valueLabel: 'On',
+            kind: 'toggle',
           }],
         }],
       }),
@@ -1208,6 +1210,7 @@ describe('createFramedApp', () => {
     }).surface, testCtx.style);
 
     expect(rendered).toContain('Show hints');
+    expect(rendered).toContain('☑ On');
     expect(rendered).toContain('Show active control');
     expect(rendered).toContain('cues in the footer');
   });

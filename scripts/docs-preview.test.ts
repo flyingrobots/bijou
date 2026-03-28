@@ -85,7 +85,10 @@ describe('docs preview app', () => {
     const footer = lines[frame.height - 1] ?? '';
 
     expect(text).toContain('Press [Enter]');
-    expect(footer).toContain('Esc/q quit • any key continue');
+    expect(footer).toContain('Esc/q quit');
+    expect(footer).toContain('↑/↓ quality');
+    expect(footer).toContain('←/→ theme');
+    expect(footer).toContain('Enter continue');
     expect(footer).toContain('v4.0.0');
     expect(footer).toContain('73 fps • auto/full');
     expect(lines[0]).not.toContain('73 fps');
@@ -215,6 +218,19 @@ describe('docs preview app', () => {
     expect(frameText(settledFrame)).not.toContain('Cabinet of Curiosities');
   });
 
+  it('lets the landing screen adjust quality before entering the docs and shows feedback', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx);
+
+    const changed = await runScript(app, [{ key: KEY_DOWN }], { ctx });
+    const frame = changed.frames[changed.frames.length - 1]!;
+    const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
+
+    expect((changed.model as any).docsModel.pageModels.dogfood.landingQualityMode).toBe('quality');
+    expect(frameText(frame)).toContain('Landing quality: Quality');
+    expect(footer).toContain('60 fps • quality');
+  });
+
   it('expands a family, selects a story, and cycles its variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
@@ -289,9 +305,12 @@ describe('docs preview app', () => {
       width: ctx.runtime.columns,
       height: ctx.runtime.rows,
     }).surface;
+    expect(frameText(settingsFrame)).toContain('☑ On');
     expect(frameText(settingsFrame)).toContain('Show active-pane control cues');
-    expect(frameText(settingsFrame)).toContain('Choose how aggressively the');
-    expect(frameText(settingsFrame)).toContain('title screen trades visual');
+    expect(frameText(settingsFrame)).toContain('Adapts render cost to');
+    expect(frameText(settingsFrame)).toContain('Options: Auto, Quality');
+    expect(frameText(settingsFrame)).toContain('↻ Landing quality');
+    expect(frameText(settingsFrame)).toContain('Auto (full)');
     updateResult = app.update(keyMsg('enter') as any, model);
     model = updateResult[0] as any;
     const commandResult = await updateResult[1][0]!(() => {}, {

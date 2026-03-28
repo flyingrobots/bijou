@@ -32,6 +32,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 
 - `Enter`: enter the docs from the landing page
 - `Esc` / `q`: quit from the landing page
+- `↑` / `↓`: cycle landing-screen quality modes before entering the docs
 - `1` `2` `3` `4` `5`: switch landing-screen theme presets
 - `←` / `→`: cycle landing-screen themes
 - `?`: open keyboard help
@@ -56,6 +57,8 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
 - The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
+- Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.
+- Settings rows now carry real secondary descriptions, toggles render with checkbox-style `☐` / `☑` affordances, and choice rows use a distinct cycling marker so the drawer reads like a product settings surface instead of a plain text list.
 - Focus now owns input in the explorer: the family lane handles browse/expand keys only while it is active, the variants lane can own arrow-key variant changes, and pane clicks or `Tab` move that ownership through the standard frame shell instead of letting inactive lanes keep responding.
 - The footer is now the truthful control surface for the explorer: shell cues stay visible, active-pane hints only appear when they can actually do something, and stale in-pane legends no longer linger under shell overlays or focus changes.
 - When no component is selected, the center lane now acts as an onboarding surface: it introduces Bijou itself and explains how to browse, search, configure, and navigate the docs before the user opens a component.

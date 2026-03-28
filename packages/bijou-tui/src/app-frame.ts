@@ -173,6 +173,7 @@ export interface FrameSettingRow<Msg> {
   readonly label: string;
   readonly description?: string;
   readonly valueLabel?: string;
+  readonly checked?: boolean;
   readonly action?: Msg;
   readonly feedback?: FrameSettingFeedback;
   readonly kind?: 'action' | 'toggle' | 'choice' | 'info';
@@ -2040,8 +2041,8 @@ function writeSettingsRow<Msg>(
 ): void {
   const { row } = flat;
   const prefix = focused ? '›' : ' ';
-  const value = row.valueLabel ?? '';
-  const leftText = `${prefix} ${row.label}`;
+  const value = formatSettingsValueLabel(row);
+  const leftText = `${prefix} ${settingsRowGlyph(row)} ${row.label}`;
   const leftChars = Array.from(leftText);
   const valueChars = Array.from(value);
   const valueStart = valueChars.length === 0 ? width : Math.max(leftChars.length + 1, width - valueChars.length);
@@ -2061,6 +2062,26 @@ function writeSettingsRow<Msg>(
   for (let index = 0; index < flat.descriptionLines.length; index++) {
     writeSettingsLine(surface, y + 1 + index, `  ${flat.descriptionLines[index]!}`, { dim: true });
   }
+}
+
+function settingsRowGlyph<Msg>(row: FrameSettingRow<Msg>): string {
+  if (row.kind === 'toggle') {
+    return row.checked === true ? '☑' : '☐';
+  }
+  if (row.kind === 'choice') {
+    return '↻';
+  }
+  return ' ';
+}
+
+function formatSettingsValueLabel<Msg>(row: FrameSettingRow<Msg>): string {
+  if (row.kind === 'toggle' && row.checked != null) {
+    return row.checked ? '☑ On' : '☐ Off';
+  }
+  if (row.kind === 'choice') {
+    return row.valueLabel ?? 'Choose';
+  }
+  return row.valueLabel ?? '';
 }
 
 function writeSettingsLine(
