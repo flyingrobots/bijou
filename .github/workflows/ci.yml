@@ -29,9 +29,28 @@ jobs:
       - name: Typecheck tests
         if: matrix.node-version == 22
         run: npm run typecheck:test
-      - name: Smoke all examples
-        if: matrix.node-version == 22
-        run: npm run smoke:examples:all -- --skip-build
       - name: Smoke canary apps
         if: matrix.node-version == 22
         run: npm run smoke:canaries -- --skip-build
+
+  smoke_examples:
+    name: Smoke examples (${{ matrix.lane.label }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lane:
+          - label: pipe
+            command: smoke:examples:pipe
+          - label: static
+            command: smoke:examples:static
+          - label: interactive
+            command: smoke:examples:interactive
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run ${{ matrix.lane.command }}

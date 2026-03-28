@@ -81,9 +81,11 @@ export interface Result {
   output?: string;
 }
 
+export type ScenarioMode = Result['mode'];
+
 export interface Scenario {
   path: string;
-  mode: Result['mode'];
+  mode: ScenarioMode;
   script?: InteractiveScriptScenarioSpec;
 }
 
@@ -122,6 +124,7 @@ export interface SmokeRunOptions {
   readonly skipBuild?: boolean;
   readonly fast?: boolean;
   readonly pipeConcurrency?: number;
+  readonly modes?: readonly ScenarioMode[];
 }
 
 export function listExampleTargets(
@@ -174,8 +177,15 @@ export function selectSmokeScenarios(
   scenarios: readonly Scenario[],
   options: SmokeRunOptions = {},
 ): readonly Scenario[] {
-  if (options.fast !== true) return scenarios;
-  return scenarios.filter((scenario) => scenario.mode !== 'static-tty');
+  return scenarios.filter((scenario) => {
+    if (options.fast === true && scenario.mode === 'static-tty') {
+      return false;
+    }
+    if (options.modes != null && options.modes.length > 0 && !options.modes.includes(scenario.mode)) {
+      return false;
+    }
+    return true;
+  });
 }
 
 export function resolvePipeConcurrency(options: SmokeRunOptions = {}): number {
@@ -502,7 +512,9 @@ export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
     skipBuild?: boolean;
     fast?: boolean;
     pipeConcurrency?: number;
+    modes?: ScenarioMode[];
   } = {};
+  const validModes = new Set<ScenarioMode>(['pipe', 'static-tty', 'interactive-scripted']);
   for (const arg of argv) {
     if (arg === '--skip-build') {
       options.skipBuild = true;
@@ -519,6 +531,15 @@ export function parseSmokeRunOptions(argv: readonly string[]): SmokeRunOptions {
         throw new Error(`invalid --pipe-concurrency value: ${raw}`);
       }
       options.pipeConcurrency = parsed;
+      continue;
+    }
+    if (arg.startsWith('--mode=')) {
+      const raw = arg.slice('--mode='.length) as ScenarioMode;
+      if (!validModes.has(raw)) {
+        throw new Error(`invalid --mode value: ${raw}`);
+      }
+      options.modes ??= [];
+      options.modes.push(raw);
       continue;
     }
     throw new Error(`unknown smoke:examples option: ${arg}`);

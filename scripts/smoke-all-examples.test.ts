@@ -67,6 +67,21 @@ describe('selectSmokeScenarios', () => {
       { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
     ]);
   });
+
+  it('filters scenarios down to explicitly requested modes', () => {
+    const scenarios = selectSmokeScenarios([
+      { path: 'demo.ts', mode: 'pipe' },
+      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+    ], {
+      modes: ['static-tty', 'interactive-scripted'],
+    });
+
+    expect(scenarios).toEqual([
+      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+    ]);
+  });
 });
 
 describe('resolvePipeConcurrency', () => {
@@ -94,9 +109,19 @@ describe('parseSmokeRunOptions', () => {
     });
   });
 
+  it('collects repeated mode flags', () => {
+    expect(parseSmokeRunOptions([
+      '--mode=pipe',
+      '--mode=interactive-scripted',
+    ])).toEqual({
+      modes: ['pipe', 'interactive-scripted'],
+    });
+  });
+
   it('rejects unknown or malformed flags', () => {
     expect(() => parseSmokeRunOptions(['--wat'])).toThrow('unknown smoke:examples option');
     expect(() => parseSmokeRunOptions(['--pipe-concurrency=nope'])).toThrow('invalid --pipe-concurrency value');
+    expect(() => parseSmokeRunOptions(['--mode=banana'])).toThrow('invalid --mode value');
   });
 });
 

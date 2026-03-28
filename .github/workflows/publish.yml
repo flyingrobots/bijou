@@ -60,9 +60,6 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Smoke all examples
-        run: npm run smoke:examples:all -- --skip-build
-
       - name: Smoke canary apps
         run: npm run smoke:canaries -- --skip-build
 
@@ -74,10 +71,37 @@ jobs:
           (cd packages/bijou-tui-app && npm pack --dry-run)
           (cd packages/create-bijou-tui-app && npm pack --dry-run)
 
+  smoke_examples:
+    name: Smoke examples (${{ matrix.lane.label }})
+    runs-on: ubuntu-latest
+    needs: verify
+    strategy:
+      matrix:
+        lane:
+          - label: pipe
+            command: smoke:examples:pipe
+          - label: static
+            command: smoke:examples:static
+          - label: interactive
+            command: smoke:examples:interactive
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.verify.outputs.release_sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run ${{ matrix.lane.command }}
+
   publish_npm:
     name: Publish npm (OIDC)
     runs-on: ubuntu-latest
-    needs: verify
+    needs: [verify, smoke_examples]
     permissions:
       contents: read
       id-token: write
@@ -112,7 +136,7 @@ jobs:
   github_release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [verify, publish_npm]
+    needs: [verify, smoke_examples, publish_npm]
     if: ${{ always() && needs.verify.result == 'success' }}
     permissions:
       contents: write
