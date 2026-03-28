@@ -285,6 +285,13 @@ describe('docs preview app', () => {
     let model = entered.model as any;
     let updateResult = app.update(keyMsg('f2') as any, model);
     model = updateResult[0] as any;
+    let settingsFrame = normalizeViewOutput(app.view(model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface;
+    expect(frameText(settingsFrame)).toContain('Show active-pane control cues');
+    expect(frameText(settingsFrame)).toContain('Choose how aggressively the');
+    expect(frameText(settingsFrame)).toContain('title screen trades visual');
     updateResult = app.update(keyMsg('enter') as any, model);
     model = updateResult[0] as any;
     const commandResult = await updateResult[1][0]!(() => {}, {
@@ -313,7 +320,7 @@ describe('docs preview app', () => {
     if (secondCommandResult !== undefined && secondCommandResult !== QUIT) {
       model = app.update(secondCommandResult as any, model)[0] as any;
     }
-    updateResult = app.update(keyMsg('escape') as any, model);
+    updateResult = app.update(keyMsg('f2') as any, model);
     model = updateResult[0] as any;
 
     frame = normalizeViewOutput(app.view(model), {
@@ -321,12 +328,18 @@ describe('docs preview app', () => {
       height: ctx.runtime.rows,
     }).surface;
     const text = frameText(frame);
+    const footer = text.split('\n')[frame.height - 1] ?? '';
     const pageModel = model.docsModel.pageModels['dogfood'];
     expect(model.docsModel.settingsOpen).toBe(false);
     expect(pageModel.showHints).toBe(false);
     expect(pageModel.landingQualityMode).toBe('quality');
-    expect(text).not.toContain('↑/↓ browse • Enter open • Tab next pane');
-    expect(text).not.toContain(',/. cycle • 1-4 profiles');
+    expect(footer).toContain('? Help');
+    expect(footer).toContain('/ Search');
+    expect(footer).toContain('F2 Settings');
+    expect(footer).toContain('q Quit');
+    expect(footer).not.toContain('↑/↓ browse');
+    expect(footer).not.toContain('Enter open');
+    expect(footer).not.toContain(',/. cycle');
     expect(text).not.toContain('scroll: j/k • d/u • g/G • mouse wheel');
 
     const landingFrame = normalizeViewOutput(app.view({ ...model, route: 'landing' }), {
@@ -357,6 +370,10 @@ describe('docs preview app', () => {
     expect(lines[frame.height - 1]).toContain('? Help');
     expect(lines[frame.height - 1]).toContain('/ Search');
     expect(lines[frame.height - 1]).toContain('F2 Settings');
+    expect(lines[frame.height - 1]).toContain('Tab next pane');
+    expect(lines[frame.height - 1]).toContain('↑/↓ browse');
+    expect(lines[frame.height - 1]).toContain('Enter open');
+    expect(lines.slice(0, frame.height - 1).join('\n')).not.toContain('↑/↓ browse • Enter open • Tab next pane');
   });
 
   it('shows a Bijou introduction and docs guide when no component is selected', async () => {
@@ -394,6 +411,31 @@ describe('docs preview app', () => {
     expect(pageModel.familyState.items[pageModel.familyState.focusIndex]?.value).toBe('story:alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
     expect((result.model as any).docsModel.focusedPaneByPage.dogfood).toBe('story-variants');
+  });
+
+  it('updates the footer hints to match the focused pane instead of leaving stale family controls visible', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_ENTER },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+      { key: KEY_TAB },
+      { key: KEY_TAB },
+    ], { ctx });
+
+    const frame = result.frames[result.frames.length - 1]!;
+    const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
+
+    expect((result.model as any).docsModel.focusedPaneByPage.dogfood).toBe('story-variants');
+    expect(footer).toContain('Tab next pane');
+    expect(footer).toContain('↑/↓ variant');
+    expect(footer).toContain(',/. cycle');
+    expect(footer).toContain('1-4 profiles');
+    expect(footer).not.toContain('Enter open');
+    expect(footer).not.toContain('←/→ collapse/expand');
   });
 
   it('opens a quit-confirm modal from the docs screen and dismisses it with n', async () => {

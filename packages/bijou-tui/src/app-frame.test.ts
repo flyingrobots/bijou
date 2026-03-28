@@ -1180,6 +1180,38 @@ describe('createFramedApp', () => {
     expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
   });
 
+  it('renders settings row descriptions as secondary drawer copy', () => {
+    const app = createFramedApp({
+      initialColumns: 90,
+      initialRows: 18,
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            description: 'Show active control cues in the footer.',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    const rendered = surfaceToString(normalizeViewOutput(app.view(model), {
+      width: 90,
+      height: 18,
+    }).surface, testCtx.style);
+
+    expect(rendered).toContain('Show hints');
+    expect(rendered).toContain('Show active control');
+    expect(rendered).toContain('cues in the footer');
+  });
+
   it('opens settings from the standard command palette entry', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],

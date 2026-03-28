@@ -35,7 +35,7 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - `1` `2` `3` `4` `5`: switch landing-screen theme presets
 - `←` / `→`: cycle landing-screen themes
 - `?`: open keyboard help
-- `/`: search components in the standard frame command palette
+- `/`: search components in the standard shell search surface
 - `F2`: open the standard shell settings drawer
 - `↑` / `↓`: move through the focused lane's rows
 - `Enter` / `Space`: expand a family, select a component, or activate the focused row
@@ -55,8 +55,9 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
 - The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
-- DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like pane hint visibility without the docs app shipping its own overlay plumbing.
+- DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Focus now owns input in the explorer: the family lane handles browse/expand keys only while it is active, the variants lane can own arrow-key variant changes, and pane clicks or `Tab` move that ownership through the standard frame shell instead of letting inactive lanes keep responding.
+- The footer is now the truthful control surface for the explorer: shell cues stay visible, active-pane hints only appear when they can actually do something, and stale in-pane legends no longer linger under shell overlays or focus changes.
 - When no component is selected, the center lane now acts as an onboarding surface: it introduces Bijou itself and explains how to browse, search, configure, and navigate the docs before the user opens a component.
 - The explorer workspace now keeps a one-cell gutter around and between the three major columns so the shell chrome and pane rails do not feel visually chopped off at the frame edges.
 

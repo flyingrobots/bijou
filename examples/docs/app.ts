@@ -85,6 +85,8 @@ const LANDING_CONTROLS_TEXT = 'Esc/q quit • any key continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
 const DOCS_PAGE_ID = 'dogfood';
 const DOCS_SIDEBAR_WIDTH = 32;
+const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
+const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
 
 interface StoryFamily {
   readonly id: string;
@@ -266,14 +268,6 @@ const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
   }
   return row;
 });
-
-const docsShellHintSource = createKeyMap<ExplorerMsg>()
-  .group('Shell', (group) => group
-    .bind('?', 'Help', { type: 'toggle-hints' })
-    .bind('/', 'Search', { type: 'toggle-hints' })
-    .bind('f2', 'Settings', { type: 'toggle-hints' })
-    .bind('q', 'Quit', { type: 'toggle-hints' }),
-  );
 
 const familyPaneKeys = createKeyMap<ExplorerMsg>()
   .group('Families', (group) => group
@@ -1172,15 +1166,10 @@ function renderFamiliesPane(model: DocsExplorerModel, width: number, height: num
     );
   }
 
-  const surfaces: Surface[] = [
+  return column([
     separatorSurface({ label: 'component families', width, ctx }),
     body,
-  ];
-  if (model.showHints) {
-    surfaces.push(line(' ↑/↓ browse • Enter open • Tab next pane ', width));
-  }
-
-  return column(surfaces);
+  ]);
 }
 
 function renderEmptyStoryPane(width: number, ctx: BijouContext): Surface {
@@ -1261,7 +1250,6 @@ function renderStoryPane(model: DocsExplorerModel, width: number, ctx: BijouCont
 
   return column([
     separatorSurface({ label: `docs • ${story.title}`, width, ctx }),
-    ...(model.showHints ? [line(' scroll: j/k • d/u • g/G • mouse wheel ', width)] : []),
     spacer(1, 1),
     previewCard,
     spacer(1, 1),
@@ -1321,8 +1309,33 @@ function renderVariantsPane(model: DocsExplorerModel, width: number, height: num
     list,
     spacer(1, 1),
     description,
-    ...(model.showHints ? [spacer(1, 1), line(' ,/. cycle • 1-4 profiles ', width)] : []),
   ]);
+}
+
+function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>): string {
+  const pageModel = model.pageModels[DOCS_PAGE_ID];
+  if (pageModel == null || !pageModel.showHints) {
+    return DOCS_SHELL_HINT;
+  }
+
+  const focusedPane = model.focusedPaneByPage[DOCS_PAGE_ID];
+  const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
+  const activeHint = (() => {
+    switch (focusedPane) {
+      case 'family-nav':
+        return `${DOCS_PANE_SWITCH_HINT} • ↑/↓ browse • Enter open • ←/→ collapse/expand`;
+      case 'story-content':
+        return `${DOCS_PANE_SWITCH_HINT} • j/k scroll • d/u page • g/G top/bottom`;
+      case 'story-variants':
+        return story == null
+          ? DOCS_PANE_SWITCH_HINT
+          : `${DOCS_PANE_SWITCH_HINT} • ↑/↓ variant • ,/. cycle • 1-4 profiles`;
+      default:
+        return undefined;
+    }
+  })();
+
+  return activeHint == null ? DOCS_SHELL_HINT : `${DOCS_SHELL_HINT} • ${activeHint}`;
 }
 
 function familyRowIndexAtPosition(
@@ -1390,7 +1403,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     globalKeys: explorerGlobalKeys,
-    helpLineSource: () => docsShellHintSource,
+    helpLineSource: ({ model }) => buildDocsFooterHint(model),
     pages: [{
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
@@ -1497,6 +1510,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           rows: [{
             id: 'show-hints',
             label: 'Show hints',
+            description: 'Show active-pane control cues in the footer instead of relying on the full help overlay.',
             valueLabel: pageModel.showHints ? 'On' : 'Off',
             kind: 'toggle',
             action: { type: 'toggle-hints' },
@@ -1512,6 +1526,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           rows: [{
             id: 'landing-quality',
             label: 'Landing quality',
+            description: 'Choose how aggressively the title screen trades visual fidelity for frame rate on large terminals.',
             valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
             kind: 'choice',
             action: { type: 'cycle-landing-quality' },

@@ -120,16 +120,19 @@ The shell should not feel:
 3. **Footer is operational truth**
    The footer should carry the most important current-status and quick-control information.
 
-4. **Header is identity and context**
+4. **Visible controls are a promise**
+   If the shell or page shows a control hint, that control should work for the active layer or focused region right now. Dead hints erode trust faster than missing hints.
+
+5. **Header is identity and context**
    The header should identify where the user is, not attempt to explain every possible action.
 
-5. **Settings are shell state**
+6. **Settings are shell state**
    Preferences should live in a shell-owned drawer and behave the same way across framed apps.
 
-6. **Quit is safe by default**
+7. **Quit is safe by default**
    Interactive framed apps should treat `Esc`, `q`, and `Ctrl+C` as quit requests routed through the shell.
 
-7. **Notifications scale by weight**
+8. **Notifications scale by weight**
    Short-lived notices, persistent notifications, and reviewable history should be separate layers, not one overloaded mechanism.
 
 ## Proposed shell anatomy
@@ -216,6 +219,12 @@ Recommended footer zones:
   - connection / runtime status if relevant
 
 This is the shell surface that should carry fast-truth information. The header should not have to do that job.
+
+The design rule is:
+
+- if a focused pane owns special controls, the footer may advertise them
+- if that pane loses focus or a shell layer opens, those controls should disappear from visible chrome
+- the shell should never keep showing controls that the current layer cannot actually honor
 
 ### 4. Workspace gutters and pane geometry
 

@@ -413,22 +413,25 @@ export function renderHelpLine<PageModel, Msg>(
     ? `[${mode}] page:${model.activePageId} pane:${focusedPane}`
     : `[${mode}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
 
+  const helpLineOverride = options.helpLineSource?.({
+    model,
+    activePage,
+    frameKeys,
+    globalKeys: options.globalKeys,
+  });
   const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
     ? 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'
     : model.notificationCenterOpen && model.commandPalette == null && !model.helpOpen
       ? 'Shift+N close • f filter • j/k scroll • q quit'
     : model.quitConfirmOpen
       ? 'Y quit • N stay'
-    : helpShort(options.helpLineSource?.({
-      model,
-      activePage,
-      frameKeys,
-      globalKeys: options.globalKeys,
-    }) ?? mergeBindingSources(
-      frameKeys,
-      options.globalKeys,
-      activePage.helpSource ?? activePage.keyMap,
-    ));
+    : typeof helpLineOverride === 'string'
+      ? helpLineOverride
+      : helpShort(helpLineOverride ?? mergeBindingSources(
+        frameKeys,
+        options.globalKeys,
+        activePage.helpSource ?? activePage.keyMap,
+      ));
   const line = hint.length > 0
     ? (() => {
         const statusWithPadding = ` ${status}`;

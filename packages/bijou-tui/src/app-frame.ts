@@ -10,6 +10,7 @@ import {
   parseAnsiToSurface,
   resolveClock,
   resolveSafeCtx,
+  wrapToWidth,
   type Cell,
   type OverflowBehavior,
   type Surface,
@@ -285,13 +286,13 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly globalKeys?: KeyMap<Msg>;
   /** Resolve key conflicts in favor of the frame shell or the active page. Default: 'frame-first'. */
   readonly keyPriority?: 'frame-first' | 'page-first';
-  /** Optional override for the short help strip source shown beneath the frame header. */
+  /** Optional override for the short footer hint source shown beneath the frame workspace. */
   readonly helpLineSource?: (args: {
     readonly model: FrameModel<PageModel>;
     readonly activePage: FramePage<PageModel, Msg>;
     readonly frameKeys: KeyMap<FrameAction>;
     readonly globalKeys?: KeyMap<Msg>;
-  }) => BindingSource | undefined;
+  }) => BindingSource | string | undefined;
   /** Optional observer that receives every key plus the route that handled it. Returned messages are scoped to the active page. */
   readonly observeKey?: (
     msg: KeyMsg,
@@ -1601,6 +1602,8 @@ function applyHelpScroll<PageModel, Msg>(
 interface FlatSettingsRow<Msg> {
   readonly index: number;
   readonly line: number;
+  readonly height: number;
+  readonly descriptionLines: readonly string[];
   readonly row: FrameSettingRow<Msg>;
 }
 
@@ -1702,12 +1705,17 @@ function resolveSettingsLayout<PageModel, Msg>(
     const section = sections[sectionIndex]!;
     line += 1;
     for (const row of section.rows) {
+      const descriptionLines = row.description == null
+        ? []
+        : wrapToWidth(row.description, Math.max(1, Math.max(16, resolveSettingsDrawerWidth(model.columns) - 6)));
       rows.push({
         index: rows.length,
         line,
+        height: 1 + descriptionLines.length,
+        descriptionLines,
         row,
       });
-      line += 1;
+      line += 1 + descriptionLines.length;
     }
     if (sectionIndex < sections.length - 1) {
       line += 1;
@@ -1801,12 +1809,19 @@ function findInputAreaByPaneId<PageModel, Msg>(
   return inputAreas.find((area) => area.paneId === paneId);
 }
 
-function ensureSettingsLineVisible(line: number, scrollY: number, visibleLines: number, maxScrollY: number): number {
+function ensureSettingsRangeVisible(
+  startLine: number,
+  height: number,
+  scrollY: number,
+  visibleLines: number,
+  maxScrollY: number,
+): number {
   let next = scrollY;
-  if (line < next) {
-    next = line;
-  } else if (line >= next + visibleLines) {
-    next = line - visibleLines + 1;
+  const endLine = startLine + Math.max(1, height) - 1;
+  if (startLine < next) {
+    next = startLine;
+  } else if (endLine >= next + visibleLines) {
+    next = endLine - visibleLines + 1;
   }
   return Math.max(0, Math.min(next, maxScrollY));
 }
@@ -1818,11 +1833,17 @@ function moveSettingsFocus<PageModel, Msg>(
 ): InternalFrameModel<PageModel, Msg> {
   if (layout.rows.length === 0) return model;
   const nextFocus = Math.max(0, Math.min(clampSettingsFocus(model, layout) + delta, layout.rows.length - 1));
-  const focusLine = layout.rows[nextFocus]!.line;
+  const focusedRow = layout.rows[nextFocus]!;
   return {
     ...model,
     settingsFocusIndex: nextFocus,
-    settingsScrollY: ensureSettingsLineVisible(focusLine, clampSettingsScroll(model, layout), layout.contentHeight, layout.maxScrollY),
+    settingsScrollY: ensureSettingsRangeVisible(
+      focusedRow.line,
+      focusedRow.height,
+      clampSettingsScroll(model, layout),
+      layout.contentHeight,
+      layout.maxScrollY,
+    ),
   };
 }
 
@@ -1891,7 +1912,8 @@ function settingsRowAtPosition<PageModel, Msg>(
   if (!isInsideSettingsDrawer(col, row, layout, model)) return undefined;
   if (row <= 0 || row >= model.rows - 1) return undefined;
   const contentLine = (row - 1) + clampSettingsScroll(model, layout);
-  return layout.rows.find((candidate) => candidate.line === contentLine);
+  return layout.rows.find((candidate) =>
+    contentLine >= candidate.line && contentLine < candidate.line + candidate.height);
 }
 
 function isInsideNotificationCenterDrawer<PageModel, Msg>(
@@ -1991,10 +2013,14 @@ function renderSettingsSurface<PageModel, Msg>(
     writeSettingsLine(surface, lineIndex, section.title, { bold: true });
     lineIndex += 1;
 
-    for (const row of section.rows) {
+    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const flat = rowsByLine.get(lineIndex);
-      writeSettingsRow(surface, lineIndex, row, layout.contentWidth, flat?.index === focusedIndex);
-      lineIndex += 1;
+      if (flat == null) {
+        lineIndex += 1;
+        continue;
+      }
+      writeSettingsRow(surface, lineIndex, flat, layout.contentWidth, flat.index === focusedIndex);
+      lineIndex += flat.height;
     }
 
     if (sectionIndex < layout.settings.sections.length - 1) {
@@ -2008,10 +2034,11 @@ function renderSettingsSurface<PageModel, Msg>(
 function writeSettingsRow<Msg>(
   surface: Surface,
   y: number,
-  row: FrameSettingRow<Msg>,
+  flat: FlatSettingsRow<Msg>,
   width: number,
   focused: boolean,
 ): void {
+  const { row } = flat;
   const prefix = focused ? '›' : ' ';
   const value = row.valueLabel ?? '';
   const leftText = `${prefix} ${row.label}`;
@@ -2030,26 +2057,30 @@ function writeSettingsRow<Msg>(
     if (char === ' ') continue;
     surface.set(valueStart + offset, y, cellForSettingsChar(char, focused));
   }
+
+  for (let index = 0; index < flat.descriptionLines.length; index++) {
+    writeSettingsLine(surface, y + 1 + index, `  ${flat.descriptionLines[index]!}`, { dim: true });
+  }
 }
 
 function writeSettingsLine(
   surface: Surface,
   y: number,
   text: string,
-  options: { readonly bold?: boolean } = {},
+  options: { readonly bold?: boolean; readonly dim?: boolean } = {},
 ): void {
   const chars = Array.from(text);
   for (let x = 0; x < chars.length && x < surface.width; x++) {
     const char = chars[x]!;
     if (char === ' ') continue;
-    surface.set(x, y, cellForSettingsChar(char, options.bold ?? false));
+    surface.set(x, y, cellForSettingsChar(char, options.bold ?? false, options.dim ?? false));
   }
 }
 
-function cellForSettingsChar(char: string, strong: boolean): Cell {
+function cellForSettingsChar(char: string, strong: boolean, dim = false): Cell {
   return {
     char,
-    modifiers: strong ? ['bold'] : undefined,
+    modifiers: strong ? ['bold'] : dim ? ['dim'] : undefined,
     empty: false,
   };
 }
