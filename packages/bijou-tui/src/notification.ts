@@ -1059,9 +1059,26 @@ function createRenderEntry<Msg>(
   return renderNotificationSurface(item, options, focusedId === item.id);
 }
 
+function prepareRenderEntriesById<Msg>(
+  items: readonly NotificationRecord<Msg>[],
+  options: RenderNotificationStackOptions,
+  focusedId: number | undefined,
+): ReadonlyMap<number, NotificationRenderEntry<Msg>> {
+  const prepared = new Map<number, NotificationRenderEntry<Msg>>();
+  for (const item of items) {
+    prepared.set(item.id, createRenderEntry(item, options, focusedId));
+  }
+  return prepared;
+}
+
 function selectVisibleNotificationIds<Msg>(
   state: NotificationState<Msg>,
   options: RenderNotificationStackOptions,
+  preparedEntries: ReadonlyMap<number, NotificationRenderEntry<Msg>> = prepareRenderEntriesById(
+    state.items,
+    options,
+    state.focusedId,
+  ),
 ): ReadonlySet<number> {
   const region = resolveRegion(options);
   const margin = resolveOverlayMargin(region.width, region.height, options.margin);
@@ -1083,7 +1100,7 @@ function selectVisibleNotificationIds<Msg>(
     let keptCount = 0;
 
     for (const item of newestFirst) {
-      const entry = createRenderEntry(item, options, state.focusedId);
+      const entry = preparedEntries.get(item.id)!;
       const required = entry.surface.height + (keptCount > 0 ? gap : 0);
       if (keptCount === 0 || usedHeight + required <= availableHeight) {
         visibleIds.add(item.id);
@@ -1140,14 +1157,14 @@ function renderOverflowExits<Msg>(
   region: LayoutRect,
   margin: number,
   gap: number,
-  options: RenderNotificationStackOptions,
-  focusedId: number | undefined,
+  preparedEntries: ReadonlyMap<number, NotificationRenderEntry<Msg>>,
 ): readonly PositionedNotificationRenderEntry<Msg>[] {
   if (exits.length === 0) return [];
 
   const rendered = [...exits]
     .sort((left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id)
-    .map((item) => createRenderEntry(item, options, focusedId));
+    .map((item) => preparedEntries.get(item.id)!)
+    .filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
   const entries: PositionedNotificationRenderEntry<Msg>[] = [];
   const mode = placementSortSign(placement);
 
@@ -1210,7 +1227,9 @@ function resolveNotificationOverlayEntries<Msg>(
 
   const margin = resolveOverlayMargin(region.width, region.height, options.margin);
   const gap = resolveNotificationGap(options.gap);
-  const visibleIds = selectVisibleNotificationIds(state, options);
+  const activePrepared = prepareRenderEntriesById(state.items, options, state.focusedId);
+  const overflowPrepared = prepareRenderEntriesById(state.overflowExits, options, state.focusedId);
+  const visibleIds = selectVisibleNotificationIds(state, options, activePrepared);
   const grouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
   const overflowGrouped = new Map<NotificationPlacement, NotificationRecord<Msg>[]>();
 
@@ -1236,8 +1255,8 @@ function resolveNotificationOverlayEntries<Msg>(
   for (const placement of placements) {
     const items = grouped.get(placement) ?? [];
     const rendered = sortForPlacement(items, placement).map((item) =>
-      createRenderEntry(item, options, state.focusedId)
-    );
+      activePrepared.get(item.id)!
+    ).filter((entry): entry is NotificationRenderEntry<Msg> => entry != null);
 
     const totalHeight = rendered.reduce((sum, entry) => sum + entry.surface.height, 0)
       + Math.max(0, rendered.length - 1) * gap;
@@ -1273,8 +1292,7 @@ function resolveNotificationOverlayEntries<Msg>(
       region,
       margin,
       gap,
-      options,
-      state.focusedId,
+      overflowPrepared,
     ));
   }
 

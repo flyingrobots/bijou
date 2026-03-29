@@ -326,6 +326,29 @@ describe('renderNotificationStack', () => {
     expect(stripAnsi(overlay!.content)).toContain('[ Retry deploy ]');
   });
 
+  it('renders multilingual actionable stack entries without losing wrapped title or action text', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: '選択中 😀 deploy review',
+      message: 'Lokalisierte Hinweise bleiben in der Overlay-Karte lesbar.',
+      variant: 'ACTIONABLE',
+      action: { label: 'Weiter prüfen', payload: { type: 'ignore' } },
+      placement: 'LOWER_RIGHT',
+      durationMs: null,
+    }, 0);
+    state = tickNotifications(state, 250);
+
+    const [overlay] = renderNotificationStack(state, {
+      screenWidth: 44,
+      screenHeight: 14,
+    });
+
+    const plain = stripAnsi(overlay!.content);
+    expect(plain).toContain('選択中 😀');
+    expect(plain).toContain('deploy');
+    expect(plain).toContain('Weiter prüfen');
+  });
+
   it('honors an explicit toast width so stacked shell feedback stays uniform', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
