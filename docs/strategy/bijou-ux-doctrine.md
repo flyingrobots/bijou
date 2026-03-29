@@ -240,6 +240,33 @@ Reusable blocks and templates are desirable, but only after:
 
 Otherwise Bijou will standardize accidental habits instead of intentional design.
 
+## Additional interaction doctrines
+
+### Mouse input should be keyboard-first, mouse-enhanced
+
+Mouse support is valuable, but it should enhance a truthful keyboard model rather than replace it.
+
+Design implications:
+
+- everything important must remain reachable by keyboard
+- click should usually mean focus, select, or activate in the active region
+- wheel should affect the scoped region under interaction, not some hidden global target
+- hover should not be the only place important meaning lives
+
+### Cognitive load should be budgeted
+
+Bijou should treat cognitive load as a design budget, not a post-hoc complaint.
+
+Useful review questions include:
+
+- how many panes are active at once?
+- how many actions compete for attention right now?
+- how many modes are hidden?
+- how many interrupts are stacked?
+- how much off-screen state must the user remember?
+
+The goal is not fake numeric precision. The goal is to keep complexity visible and bounded.
+
 ## Canonical interaction doctrines
 
 ### Selection

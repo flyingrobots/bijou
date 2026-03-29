@@ -50,6 +50,8 @@ AI-mediated content should use an explicit `[AI]` marker or equivalent canonical
 
 The user should not have to infer that a suggestion, explanation, or summary came from an agent.
 
+That marker should be part of a canonical explainability component/pattern, not a one-off badge.
+
 ### 2. Explain why
 
 AI output should include or make available:
@@ -97,6 +99,7 @@ Bijou should gradually standardize around explainability structures like:
 
 - label: `[AI]`
 - artifact kind
+- source
 - source mode
 - rationale / why
 - evidence basis

@@ -30,6 +30,8 @@ Bijou copy should sound:
 - precise
 - unpretentious
 
+This applies to both human-facing and agent-facing surfaces.
+
 Avoid copy that feels:
 
 - hyped
@@ -105,6 +107,16 @@ They should confirm:
 
 without pretending to be a full explanation surface when they are not.
 
+### Explainability surfaces
+
+Explainability copy should identify:
+
+- source
+- rationale
+- evidence
+- confidence posture
+- next action
+
 ## Writing rules
 
 ### 1. Prefer explicit over clever
@@ -156,6 +168,15 @@ Avoid:
 ### 6. Write for accessible linear reading
 
 When a surface lowers to accessible mode, the copy should still make sense when read top-to-bottom with no spatial context.
+
+### 7. Write for agents as first-class users
+
+Agent-facing copy, labels, and explanations should be:
+
+- explicit
+- inspectable
+- deterministic
+- low on hidden implication
 
 ## AI-specific copy posture
 

@@ -31,6 +31,8 @@ Concrete follow-on package work is currently tracked as backlog under:
 Bijou should provide:
 
 - localization-friendly APIs
+- catalog-based localization runtime
+- generic resource and data lookup, not only strings
 - shell support for localizable message descriptors
 - locale-aware formatting seams
 - logical layout direction
@@ -104,7 +106,36 @@ The shell should not hardcode English strings for:
 
 Those surfaces should be designed to accept localized message descriptors later, even if today they are still powered by in-memory English defaults.
 
-### 5. Bidirectionality should be intentional
+### 5. Translation workflow reality should be designed in
+
+Real localization workflows involve:
+
+- catalogs
+- changed-source detection
+- stale translations
+- spreadsheet exchange
+- translator-facing export and import
+- shared references to controlled terms or structured data
+
+Bijou should treat that as normal rather than pretending localization is always a tiny in-code dictionary.
+
+### 6. Overflow policy should be explicit
+
+For localized text, Bijou should prefer:
+
+- wrap
+- stack
+- reflow
+
+before:
+
+- clipping
+- collision
+- motion
+
+marquee can exist, but only as an explicit overflow policy for compact single-line affordances and not as the default localization fix.
+
+### 7. Bidirectionality should be intentional
 
 Not everything should mirror.
 
@@ -160,8 +191,11 @@ That would allow shell, components, and later blocks to make consistent decision
 Future framework/tooling support should consider:
 
 - message-descriptor APIs
+- catalogs for message, resource, and data entries
 - locale-aware formatting helpers
 - pseudo-localization mode
+- spreadsheet import/export workflows
+- stale-translation detection
 - long-string stress testing
 - layout overflow warnings for localized shells
 - audits for hardcoded user-facing strings in shell/component layers

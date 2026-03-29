@@ -46,3 +46,8 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 
 - [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
 - [The Humane Shell](/Users/james/git/bijou/docs/strategy/humane-shell.md)
+
+## Current cycle and backlog
+
+- backlog:
+  - [HT-001 — Notification Center Polish and Discoverability](/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md)

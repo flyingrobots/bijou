@@ -133,6 +133,8 @@ That model could support:
 - explainability
 - future assistive adapters
 
+This should be treated as a semantic shadow model rather than a visual clone of rich-mode layout.
+
 ## Low-vision design posture
 
 Bijou should eventually support and audit for:
@@ -171,6 +173,8 @@ The likely direction is:
 - explicit “you are here” copy
 - explicit action lists
 - no dependence on three-pane spatial inference
+
+That should be treated as a different truthful experience, not a cramped copy of the rich shell.
 
 That is a different experience, not just a visually flattened copy of the rich shell.
 
