@@ -73,13 +73,13 @@ describe('createTuiAppSkeleton', () => {
     const app = createTuiAppSkeleton({ ctx });
 
     const qOpen = await runScript(app, [{ key: 'q' }], { ctx });
-    expect(stripAnsi(surfaceToString(qOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
+    expect(stripAnsi(surfaceToString(qOpen.frames.at(-1)!, ctx.style))).toContain('Quit?');
 
     const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }], { ctx });
-    expect(stripAnsi(surfaceToString(expectSurface(app.view(qCancel.model)), ctx.style))).not.toContain('Quit App?');
+    expect(stripAnsi(surfaceToString(expectSurface(app.view(qCancel.model)), ctx.style))).not.toContain('Quit?');
 
     const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
-    expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit App?');
+    expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit?');
   });
 
   it('animates drawer changes via physics commands', async () => {

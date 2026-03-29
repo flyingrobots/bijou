@@ -152,7 +152,7 @@ export function applyFrameAction<PageModel, Msg>(
     case 'bottom':
     case 'scroll-left':
     case 'scroll-right':
-      return [scrollFocusedPane(model, action, pagesById), []];
+      return [scrollFocusedPane(model, action, pagesById, options), []];
     case 'runtime-issue':
     case 'notification-tick':
       return [model, []];
@@ -273,6 +273,7 @@ export function scrollFocusedPane<PageModel, Msg>(
     { type: 'scroll-up' | 'scroll-down' | 'page-up' | 'page-down' | 'top' | 'bottom' | 'scroll-left' | 'scroll-right' }
   >,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
 ): InternalFrameModel<PageModel, Msg> {
   const pageId = model.activePageId;
   const focusedPaneId = model.focusedPaneByPage[pageId];
@@ -280,7 +281,12 @@ export function scrollFocusedPane<PageModel, Msg>(
 
   const page = pagesById.get(pageId)!;
   const layoutTree = page.layout(model.pageModels[pageId]!);
-  const bodyRect = frameBodyRect(model.columns, model.rows);
+  const bodyRect = frameBodyRect(
+    model.columns,
+    model.rows,
+    options.bodyTopRows ?? 1,
+    options.bodyBottomRows ?? 1,
+  );
   const resolved = renderFrameNode(layoutTree, bodyRect, {
     model,
     pageId,

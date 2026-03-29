@@ -1,5 +1,17 @@
 import type { KeyInputMsg } from '../ports/io.js';
 
+const ESC = String.fromCharCode(0x1b);
+const ETX = String.fromCharCode(0x03);
+const EOT = String.fromCharCode(0x04);
+const DEL = String.fromCharCode(0x7f);
+const BACKSPACE = String.fromCharCode(0x08);
+const CARRIAGE_RETURN = String.fromCharCode(0x0d);
+const LINE_FEED = String.fromCharCode(0x0a);
+const ARROW_UP = `${ESC}[A`;
+const ARROW_DOWN = `${ESC}[B`;
+const ARROW_RIGHT = `${ESC}[C`;
+const ARROW_LEFT = `${ESC}[D`;
+
 function keyMsg(
   key: string,
   ctrl = false,
@@ -20,25 +32,25 @@ function keyMsg(
  */
 export function decodeRawKeyInput(raw: string): KeyInputMsg | null {
   switch (raw) {
-    case '\x1b[A':
+    case ARROW_UP:
       return keyMsg('up');
-    case '\x1b[B':
+    case ARROW_DOWN:
       return keyMsg('down');
-    case '\x1b[C':
+    case ARROW_RIGHT:
       return keyMsg('right');
-    case '\x1b[D':
+    case ARROW_LEFT:
       return keyMsg('left');
-    case '\r':
-    case '\n':
+    case CARRIAGE_RETURN:
+    case LINE_FEED:
       return keyMsg('enter');
-    case '\x1b':
+    case ESC:
       return keyMsg('escape');
-    case '\x03':
+    case ETX:
       return keyMsg('c', true);
-    case '\x04':
+    case EOT:
       return keyMsg('d', true);
-    case '\x7f':
-    case '\b':
+    case DEL:
+    case BACKSPACE:
       return keyMsg('backspace');
     case ' ':
       return keyMsg('space', false, false, false, ' ');
@@ -59,14 +71,14 @@ export function decodeRawKeyInput(raw: string): KeyInputMsg | null {
  * Decode a raw terminal input string into semantic key messages.
  *
  * This is useful for deterministic tests that want to express scripted input
- * in familiar raw strings (for example `\"my-app\\n\"` or `\"\\x1b[B\"`) while
+ * in familiar raw strings (for example `\"my-app\\n\"` or an ESC-arrow sequence) while
  * still driving consumers through the higher-level semantic key stream.
  */
 export function decodeRawKeySequence(raw: string): KeyInputMsg[] {
   const messages: KeyInputMsg[] = [];
   for (let i = 0; i < raw.length; i++) {
     const ch = raw[i]!;
-    if (ch === '\x1b') {
+    if (ch === ESC) {
       const sequence = raw.slice(i, i + 3);
       const parsedSequence = decodeRawKeyInput(sequence);
       if (parsedSequence !== null) {

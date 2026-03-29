@@ -55,7 +55,7 @@ describe('DL-003 shared surface pattern proof cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    const backlog = read('/Users/james/git/bijou/docs/BACKLOG/DL-004-prove-drawer-rhythm-and-notice-rows.md');
-    expect(backlog).toContain('DL-004 — Prove Drawer Rhythm and Notice Rows');
+    const cycle = read('/Users/james/git/bijou/docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
+    expect(cycle).toContain('# DL-004 — Prove Drawer Rhythm and Notice Rows');
   });
 });

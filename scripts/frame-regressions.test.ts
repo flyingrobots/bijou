@@ -52,10 +52,12 @@ describe('frame regressions', () => {
       runtime: { columns: 64, rows: 18 },
     });
     const app = createTuiAppSkeleton({ ctx });
+    const [model] = app.init();
+    const initialFrame = renderFrameText(app.view(model), ctx.style);
     const result = await runScript(app, [{ key: ']' }], { ctx });
 
-    expect(renderFrameText(result.frames[0]!, ctx.style)).toMatchSnapshot('scaffold-home');
-    expect(renderFrameText(result.frames[1]!, ctx.style)).toMatchSnapshot('scaffold-split');
+    expect(initialFrame).toMatchSnapshot('scaffold-home');
+    expect(renderFrameText(result.frames.at(-1)!, ctx.style)).toMatchSnapshot('scaffold-split');
   });
 
   it('keeps scaffold frames width-correct through scripted resizes', async () => {

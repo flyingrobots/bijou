@@ -211,6 +211,8 @@ export function createTuiAppSkeleton(
     defaultPageId: options.defaultTabId != null && tabsById.has(options.defaultTabId)
       ? options.defaultTabId
       : tabs[0]!.id,
+    bodyTopRows: 2,
+    bodyBottomRows: 3,
     globalKeys: mergedGlobalKeys,
     enableCommandPalette: true,
     overlayFactory: (frame: FrameOverlayContext<SkeletonPageModel>) =>

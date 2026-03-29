@@ -57,10 +57,10 @@ describe('DL-001 design language doctrine cycle', () => {
 
   it('parks notification polish on the Humane Terminal backlog and spawns the next design-language backlog item', () => {
     const htBacklog = read('/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md');
-    const dlBacklog = read('/Users/james/git/bijou/docs/BACKLOG/DL-002-canonicalize-patterns-and-blocks.md');
+    const dlCycle = read('/Users/james/git/bijou/docs/design/DL-002-canonicalize-patterns-and-blocks.md');
 
     expect(htBacklog).toContain('Notification Center Polish and Discoverability');
     expect(htBacklog).toContain('Parked on the backlog');
-    expect(dlBacklog).toContain('Canonicalize Patterns and Blocks');
+    expect(dlCycle).toContain('Canonicalize Patterns and Blocks');
   });
 });

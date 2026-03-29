@@ -160,7 +160,7 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    const backlog = read('/Users/james/git/bijou/docs/BACKLOG/DL-005-prove-inspector-and-guided-flow-rhythm.md');
-    expect(backlog).toContain('DL-005 — Prove Inspector and Guided Flow Rhythm');
+    const cycle = read('/Users/james/git/bijou/docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');
+    expect(cycle).toContain('# DL-005 — Prove Inspector and Guided Flow Rhythm');
   });
 });

@@ -44,7 +44,7 @@ describe('WF-001 workflow adoption', () => {
     expect(cycle).toContain('Agent playback');
     expect(cycle).toContain('Retrospective');
 
-    expect(existsSync(resolve(ROOT, 'docs/BACKLOG/LX-001-bijou-i18n-runtime-and-tooling-packages.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/design/LX-001-bijou-i18n-runtime-package.md'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'docs/BACKLOG/WF-002-migrate-legacy-planning-artifacts.md'))).toBe(true);
   });
 

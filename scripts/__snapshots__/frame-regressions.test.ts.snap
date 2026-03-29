@@ -21,7 +21,7 @@ exports[`frame regressions > captures stable scaffold home and split frames > sc
 ▎                                                 │                            │
 ▎                                                 │                            │
 ▎                                                 │                            │
-▎                                                 │                            │
+▎                                                 └────────────────────────────┘
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
  Home ready                                                                 Home
  [ ] pages | o drawer | tab panes | ctrl+p commands | q quit                    "

@@ -90,13 +90,20 @@ export function offsetRect(rect: LayoutRect, rowOffset: number, colOffset: numbe
   };
 }
 
-/** Compute the available rect for page content (screen minus header and footer). */
-export function frameBodyRect(columns: number, rows: number): LayoutRect {
+/** Compute the available rect for page content after reserving shell chrome rows. */
+export function frameBodyRect(
+  columns: number,
+  rows: number,
+  topRows = 1,
+  bottomRows = 1,
+): LayoutRect {
+  const reservedTop = Math.max(0, Math.floor(topRows));
+  const reservedBottom = Math.max(0, Math.floor(bottomRows));
   return {
-    row: Math.min(1, Math.max(0, rows)),
+    row: Math.min(reservedTop, Math.max(0, rows)),
     col: 0,
     width: Math.max(0, columns),
-    height: Math.max(0, rows - 2),
+    height: Math.max(0, rows - reservedTop - reservedBottom),
   };
 }
 

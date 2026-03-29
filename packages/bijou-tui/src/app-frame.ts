@@ -304,6 +304,10 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly initialColumns?: number;
   /** Initial terminal height before runtime resize events. Default: 24. */
   readonly initialRows?: number;
+  /** Number of reserved top chrome rows above page content. Default: 1. */
+  readonly bodyTopRows?: number;
+  /** Number of reserved bottom chrome rows below page content. Default: 1. */
+  readonly bodyBottomRows?: number;
   /** Optional global keymap layered above page keymap. */
   readonly globalKeys?: KeyMap<Msg>;
   /** Optional shell localization runtime for frame-owned copy and direction. */
@@ -785,7 +789,7 @@ export function createFramedApp<PageModel, Msg>(
         return [model, []];
       }
 
-      const clickedPane = paneHitAtPosition(model, msg.col, msg.row, pagesById);
+      const clickedPane = paneHitAtPosition(model, msg.col, msg.row, pagesById, options);
       if (clickedPane != null) {
         const focusedModel = focusPane(model, clickedPane.paneId);
         const inputArea = findInputAreaByPaneId(inputAreas, clickedPane.paneId);
@@ -802,7 +806,7 @@ export function createFramedApp<PageModel, Msg>(
     }
 
     if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-      const hoveredPane = paneHitAtPosition(model, msg.col, msg.row, pagesById);
+      const hoveredPane = paneHitAtPosition(model, msg.col, msg.row, pagesById, options);
       if (hoveredPane != null) {
         const focusedModel = focusPane(model, hoveredPane.paneId);
         const inputArea = findInputAreaByPaneId(inputAreas, hoveredPane.paneId);
@@ -817,7 +821,7 @@ export function createFramedApp<PageModel, Msg>(
         const action: FrameAction = msg.action === 'scroll-down'
           ? { type: 'scroll-down' }
           : { type: 'scroll-up' };
-        return [scrollFocusedPane(focusedModel, action, pagesById), []];
+        return [scrollFocusedPane(focusedModel, action, pagesById, options), []];
       }
     }
 
@@ -1341,7 +1345,7 @@ export function createFramedApp<PageModel, Msg>(
         activePage,
         resolveNotificationFooterCue(model, options, pagesById),
       );
-      const bodyRect = frameBodyRect(model.columns, model.rows);
+      const bodyRect = resolveBodyRect(model, options);
 
       // Check for maximized pane — if set, render only that pane at full body rect
       const maxState = model.maximizedPaneByPage[model.activePageId];
@@ -1483,8 +1487,9 @@ function paneHitAtPosition<PageModel, Msg>(
   col: number,
   row: number,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
 ): { readonly paneId: string; readonly rect: LayoutRect } | undefined {
-  const bodyRect = frameBodyRect(model.columns, model.rows);
+  const bodyRect = resolveBodyRect(model, options);
   const maxState = model.maximizedPaneByPage[model.activePageId];
   const maximizedPaneId = maxState?.maximizedPaneId;
   const renderResult = maximizedPaneId
@@ -1503,6 +1508,18 @@ function paneHitAtPosition<PageModel, Msg>(
   }
 
   return undefined;
+}
+
+function resolveBodyRect<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  options: CreateFramedAppOptions<PageModel, Msg>,
+): LayoutRect {
+  return frameBodyRect(
+    model.columns,
+    model.rows,
+    options.bodyTopRows ?? 1,
+    options.bodyBottomRows ?? 1,
+  );
 }
 
 function renderHelpOverlay<PageModel, Msg>(
