@@ -69,6 +69,7 @@ export {
   resolvePreferenceRowLayout,
 } from './preference-list.js';
 export type {
+  PreferenceListTheme,
   PreferenceRowKind,
   PreferenceRow,
   PreferenceSection,

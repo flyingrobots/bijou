@@ -1,4 +1,5 @@
 import { createSurface, type Surface } from '../../ports/surface.js';
+import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { wrapToWidth } from '../text/wrap.js';
 import type { BijouNodeOptions } from './types.js';
@@ -28,14 +29,26 @@ export interface PreferenceRowLayout {
   readonly height: number;
 }
 
+export interface PreferenceListTheme {
+  readonly sectionTitleToken?: TokenValue;
+  readonly selectedRowBgToken?: TokenValue;
+  readonly toggleOnToken?: TokenValue;
+  readonly toggleOffToken?: TokenValue;
+  readonly choiceToken?: TokenValue;
+  readonly infoToken?: TokenValue;
+  readonly descriptionToken?: TokenValue;
+}
+
 export interface PreferenceRowSurfaceOptions extends BijouNodeOptions {
   readonly width: number;
   readonly selected?: boolean;
+  readonly theme?: PreferenceListTheme;
 }
 
 export interface PreferenceListSurfaceOptions extends BijouNodeOptions {
   readonly width: number;
   readonly selectedRowId?: string;
+  readonly theme?: PreferenceListTheme;
 }
 
 export function preferenceRowSurface(
@@ -46,7 +59,7 @@ export function preferenceRowSurface(
   const width = Math.max(1, Math.floor(options.width));
   const layout = resolvePreferenceRowLayout(row, width);
   const surface = createSurface(width, layout.height);
-  const bg = options.selected ? resolvePreferenceRowBg(ctx) : undefined;
+  const bg = options.selected ? resolvePreferenceRowBg(ctx, options.theme) : undefined;
 
   fillPreferenceRow(surface, bg);
   writePreferenceLine(surface, 0, buildPreferenceLeftText(row, options.selected === true), {
@@ -58,7 +71,7 @@ export function preferenceRowSurface(
     if (layout.stackValue) {
       writePreferenceLine(surface, 1, `   ${layout.valueLabel}`, {
         strong: true,
-        fg: resolvePreferenceValueFg(row, ctx),
+        fg: resolvePreferenceValueFg(row, ctx, options.theme),
         bg,
       });
     } else {
@@ -71,7 +84,7 @@ export function preferenceRowSurface(
         if (char === ' ') continue;
         surface.set(startX + valueStart + offset, 0, {
           char,
-          fg: resolvePreferenceValueFg(row, ctx),
+          fg: resolvePreferenceValueFg(row, ctx, options.theme),
           bg,
           modifiers: ['bold'],
           empty: false,
@@ -85,7 +98,11 @@ export function preferenceRowSurface(
       surface,
       (layout.stackValue ? 2 : 1) + index,
       `   ${layout.descriptionLines[index]!}`,
-      { dim: true, bg },
+      {
+        dim: options.theme?.descriptionToken == null,
+        fg: options.theme?.descriptionToken?.hex,
+        bg,
+      },
     );
   }
 
@@ -125,7 +142,11 @@ export function preferenceListSurface(
   for (let sectionIndex = 0; sectionIndex < visibleSections.length; sectionIndex++) {
     const section = visibleSections[sectionIndex]!;
     if (sectionIndex > 0) y += 1;
-    writePreferenceLine(surface, y, section.title, { strong: true });
+    writePreferenceLine(surface, y, section.title, {
+      strong: options.theme?.sectionTitleToken == null,
+      fg: options.theme?.sectionTitleToken?.hex,
+      bg: options.theme?.sectionTitleToken?.bg,
+    });
     y += 2;
 
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
@@ -134,6 +155,7 @@ export function preferenceListSurface(
         width,
         selected: options.selectedRowId === row.id,
         ctx,
+        theme: options.theme,
       });
       surface.blit(rowSurface, 0, y);
       y += rowSurface.height;
@@ -190,16 +212,36 @@ function fillPreferenceRow(surface: Surface, bg: string | undefined): void {
   surface.fill({ char: ' ', bg, empty: false });
 }
 
-function resolvePreferenceRowBg(ctx: ReturnType<typeof resolveCtx>): string | undefined {
+function resolvePreferenceRowBg(
+  ctx: ReturnType<typeof resolveCtx>,
+  theme: PreferenceListTheme | undefined,
+): string | undefined {
+  if (theme?.selectedRowBgToken != null) {
+    return theme.selectedRowBgToken.bg ?? theme.selectedRowBgToken.hex;
+  }
   return ctx?.surface('elevated').bg
     ?? ctx?.surface('secondary').bg
     ?? ctx?.surface('muted').bg;
 }
 
-function resolvePreferenceValueFg(row: PreferenceRow, ctx: ReturnType<typeof resolveCtx>): string | undefined {
+function resolvePreferenceValueFg(
+  row: PreferenceRow,
+  ctx: ReturnType<typeof resolveCtx>,
+  theme: PreferenceListTheme | undefined,
+): string | undefined {
+  if (row.kind === 'toggle' && row.checked === true) {
+    return theme?.toggleOnToken?.hex ?? ctx?.semantic('accent').hex;
+  }
+  if (row.kind === 'toggle' && row.checked === false) {
+    return theme?.toggleOffToken?.hex ?? ctx?.semantic('muted').hex;
+  }
+  if (row.kind === 'choice') {
+    return theme?.choiceToken?.hex ?? ctx?.semantic('accent').hex;
+  }
+  if (row.kind === 'info' || row.kind === 'action') {
+    return theme?.infoToken?.hex ?? ctx?.semantic('primary').hex;
+  }
   if (ctx == null) return undefined;
-  if (row.kind === 'toggle') return row.checked ? ctx.semantic('accent').hex : ctx.semantic('muted').hex;
-  if (row.kind === 'choice') return ctx.semantic('accent').hex;
   return ctx.semantic('primary').hex;
 }
 

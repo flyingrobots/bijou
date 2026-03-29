@@ -216,15 +216,6 @@ export {
   stepper,
   type StepperStep,
   type StepperOptions,
-  preferenceListSurface,
-  preferenceRowSurface,
-  resolvePreferenceRowLayout,
-  type PreferenceRowKind,
-  type PreferenceRow,
-  type PreferenceSection,
-  type PreferenceRowLayout,
-  type PreferenceRowSurfaceOptions,
-  type PreferenceListSurfaceOptions,
   dag,
   dagSlice,
   dagLayout,
@@ -264,6 +255,21 @@ export {
   type CursorGuard,
   type CursorHideHandle,
 } from './core/components/index.js';
+
+export {
+  preferenceListSurface,
+  preferenceRowSurface,
+  resolvePreferenceRowLayout,
+} from './core/components/preference-list.js';
+export type {
+  PreferenceListTheme,
+  PreferenceRowKind,
+  PreferenceRow,
+  PreferenceSection,
+  PreferenceRowLayout,
+  PreferenceRowSurfaceOptions,
+  PreferenceListSurfaceOptions,
+} from './core/components/preference-list.js';
 
 // Shared ANSI escape constants
 export { HIDE_CURSOR, SHOW_CURSOR, CLEAR_LINE_RETURN } from './core/ansi.js';

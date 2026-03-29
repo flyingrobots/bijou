@@ -260,31 +260,39 @@ describe('docs preview app', () => {
   });
 
   it('carries the selected landing theme into the docs surfaces and settings', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx);
+    const defaultCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const defaultApp = createDocsApp(defaultCtx);
+    const themedCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const themedApp = createDocsApp(themedCtx);
 
-    const defaultDocs = await runScript(app, [{ key: KEY_ENTER }], { ctx });
-    const themedDocs = await runScript(app, [
+    const defaultDocs = await runScript(defaultApp, [{ key: KEY_ENTER }], { ctx: defaultCtx });
+    const [defaultSettingsModel] = defaultApp.update(keyMsg('f2') as any, defaultDocs.model as any);
+    const defaultSettingsFrame = normalizeViewOutput(defaultApp.view(defaultSettingsModel as any), {
+      width: defaultCtx.runtime.columns,
+      height: defaultCtx.runtime.rows,
+    }).surface;
+    const themedDocs = await runScript(themedApp, [
       { key: '2' },
       { key: KEY_ENTER },
-    ], { ctx });
+    ], { ctx: themedCtx });
 
     const themedModel = themedDocs.model as any;
-    const themedDocsSurface = normalizeViewOutput(app.view(themedModel), {
-      width: ctx.runtime.columns,
-      height: ctx.runtime.rows,
+    const themedDocsSurface = normalizeViewOutput(themedApp.view(themedModel), {
+      width: themedCtx.runtime.columns,
+      height: themedCtx.runtime.rows,
     }).surface;
     const themedDocsText = frameText(themedDocsSurface);
-    const [settingsModel] = app.update(keyMsg('f2') as any, themedModel);
-    const settingsFrame = normalizeViewOutput(app.view(settingsModel as any), {
-      width: ctx.runtime.columns,
-      height: ctx.runtime.rows,
+    const [settingsModel] = themedApp.update(keyMsg('f2') as any, themedModel);
+    const settingsFrame = normalizeViewOutput(themedApp.view(settingsModel as any), {
+      width: themedCtx.runtime.columns,
+      height: themedCtx.runtime.rows,
     }).surface;
 
     expect(themedModel.docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
     expect(themedDocsText).not.toContain('Theme:');
     expect(frameText(settingsFrame)).toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Cabinet of Curiosities');
+    expect(defaultSettingsFrame.get(20, 3).bg).not.toBe(settingsFrame.get(20, 3).bg);
   });
 
   it('shows a toast with the theme name when the landing theme changes and clears it later', async () => {

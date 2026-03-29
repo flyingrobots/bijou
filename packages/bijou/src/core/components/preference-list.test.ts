@@ -104,4 +104,34 @@ describe('preference list surfaces', () => {
     expect(landingLine).toBeGreaterThan(themeLine + 1);
     expect(qualityLine).toBeGreaterThan(landingLine + 1);
   });
+
+  it('honors explicit theme tokens for section titles and selected rows', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = preferenceListSurface([{
+      id: 'appearance',
+      title: 'Appearance',
+      rows: [{
+        id: 'theme',
+        label: 'Landing theme',
+        valueLabel: 'Paper Moon',
+        kind: 'choice',
+      }],
+    }], {
+      width: 32,
+      selectedRowId: 'theme',
+      ctx,
+      theme: {
+        sectionTitleToken: { hex: '#ffaa00' },
+        selectedRowBgToken: { hex: '#102938', bg: '#102938' },
+        choiceToken: { hex: '#ff66cc' },
+        descriptionToken: { hex: '#7799aa' },
+      },
+    });
+
+    expect(surface.get(0, 0).fg).toBe('#ffaa00');
+    expect(surface.get(1, 2).bg).toBe('#102938');
+    expect(
+      Array.from({ length: surface.width }, (_, x) => surface.get(x, 2).fg).includes('#ff66cc'),
+    ).toBe(true);
+  });
 });

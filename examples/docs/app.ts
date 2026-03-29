@@ -4,6 +4,7 @@ import {
   createSurface,
   lerp3,
   markdown,
+  type PreferenceListTheme,
   separatorSurface,
   wrapToWidth,
   type BijouContext,
@@ -1384,6 +1385,39 @@ function docsThemeMutedBorderToken(theme: LandingThemeTokens): TokenValue {
   return { hex: sampleColorRamp(theme.waveRamp, 0.36), modifiers: ['dim'] };
 }
 
+function docsThemeSurfaceToken(theme: LandingThemeTokens): TokenValue {
+  return {
+    hex: sampleColorRamp(theme.waveRamp, 0.44),
+    bg: sampleColorRamp(theme.waveRamp, 0.06),
+  };
+}
+
+function docsThemeSelectedRowBgToken(theme: LandingThemeTokens): TokenValue {
+  return {
+    hex: sampleColorRamp(theme.waveRamp, 0.62),
+    bg: sampleColorRamp(theme.waveRamp, 0.12),
+  };
+}
+
+function docsThemeDescriptionToken(theme: LandingThemeTokens): TokenValue {
+  return {
+    hex: sampleColorRamp(theme.waveRamp, 0.58),
+    modifiers: ['dim'],
+  };
+}
+
+function docsThemePreferenceListTheme(theme: LandingThemeTokens): PreferenceListTheme {
+  return {
+    sectionTitleToken: docsThemeAccentToken(theme),
+    selectedRowBgToken: docsThemeSelectedRowBgToken(theme),
+    toggleOnToken: docsThemeAccentToken(theme),
+    toggleOffToken: docsThemeMutedBorderToken(theme),
+    choiceToken: docsThemeAccentToken(theme),
+    infoToken: { hex: sampleColorRamp(theme.waveRamp, 0.82) },
+    descriptionToken: docsThemeDescriptionToken(theme),
+  };
+}
+
 function docsThemeFocusedGutterToken(theme: LandingThemeTokens): TokenValue {
   return { hex: sampleColorRamp(theme.logoRamp, 0.82), bg: sampleColorRamp(theme.waveRamp, 0.12), modifiers: ['bold'] };
 }
@@ -1826,8 +1860,13 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameM
       },
     }],
     enableCommandPalette: true,
-    settings: ({ model, pageModel }) => ({
-      sections: [
+    settings: ({ model, pageModel }) => {
+      const theme = resolveLandingTheme(pageModel.landingThemeIndex);
+      return {
+        borderToken: docsThemeBorderToken(theme),
+        bgToken: docsThemeSurfaceToken(theme),
+        listTheme: docsThemePreferenceListTheme(theme),
+        sections: [
         {
           id: 'shell',
           title: dogfoodText(i18n, 'settings.section.shell', 'Shell'),
@@ -1895,8 +1934,9 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameM
             },
           ],
         },
-      ],
-    }),
+        ],
+      };
+    },
   });
 }
 

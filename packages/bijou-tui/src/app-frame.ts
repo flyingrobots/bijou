@@ -9,6 +9,7 @@ import {
   createSurface,
   parseAnsiToSurface,
   preferenceListSurface,
+  type PreferenceListTheme,
   resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
@@ -209,6 +210,9 @@ export interface FrameSettingSection<Msg> {
 /** Structured settings content supplied by the app and rendered by the frame shell. */
 export interface FrameSettings<Msg> {
   readonly title?: string;
+  readonly borderToken?: TokenValue;
+  readonly bgToken?: TokenValue;
+  readonly listTheme?: PreferenceListTheme;
   readonly sections: readonly FrameSettingSection<Msg>[];
 }
 
@@ -1992,6 +1996,9 @@ function renderSettingsDrawer<PageModel, Msg>(
     anchor: layout.anchor,
     title: layout.settings.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
     content: body,
+    borderToken: layout.settings.borderToken,
+    bgToken: layout.settings.bgToken,
+    ctx: resolveSafeCtx() ?? undefined,
     width: layout.drawerWidth,
     screenWidth: model.columns,
     screenHeight: model.rows,
@@ -2041,6 +2048,7 @@ function renderSettingsSurface<PageModel, Msg>(
     width: layout.contentWidth,
     selectedRowId: layout.rows[focusedIndex]?.row.id,
     ctx: resolveSafeCtx() ?? undefined,
+    theme: layout.settings.listTheme,
   });
 }
 
