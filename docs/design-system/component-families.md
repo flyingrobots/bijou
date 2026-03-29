@@ -348,6 +348,40 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - no exact analogue; closest to an explainability panel or guided recommendation card
 
+### Inspector panels
+
+- Family: `inspector()`
+- Variants:
+  - current-selection emphasis
+  - compact titled sections
+  - muted supporting-copy sections
+- Use when:
+  - a side panel needs to summarize the currently selected thing without taking over the primary task
+  - supporting context should stay structured and calmer than the main content
+  - the panel needs one obvious current value plus compact supporting sections
+- Avoid when:
+  - the content is a full guided recommendation with evidence and next-action structure; prefer `explainability()`
+  - the surface is really just an alert, note, or one-line status
+  - the panel needs its own complex navigation or multistep interaction model
+- Content guidance:
+  - make the current selection more obvious than supporting copy
+  - keep section titles short and concrete
+  - let supporting details look supporting; do not let descriptions overpower the active value
+  - stack explicit sections before inventing another decorative box inside the panel
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve titled containment, current-selection emphasis, and compact section rhythm
+  - pipe: lower to explicit field labels with one obvious current selection
+  - accessible: linearize the same fields in plain language without borders or color
+- Related families:
+  - `box()`
+  - `explainability()`
+  - `preferenceListSurface()`
+  - notification system
+- Carbon analogue:
+  - side panel / contextual detail panel
+
 ### Formatted documents and prose
 
 - Family: `markdown()`

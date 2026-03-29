@@ -65,6 +65,8 @@ export type { StepperStep, StepperOptions } from './stepper.js';
 
 export { explainability } from './explainability.js';
 export type { ExplainabilityEvidenceItem, ExplainabilityOptions } from './explainability.js';
+export { inspector } from './inspector.js';
+export type { InspectorSectionTone, InspectorSection, InspectorOptions } from './inspector.js';
 
 export {
   preferenceListSurface,

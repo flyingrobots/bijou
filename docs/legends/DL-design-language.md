@@ -54,6 +54,6 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 
 ## Current cycle and backlog
 
-- latest completed cycle: [DL-005 — Prove Inspector and Guided Flow Rhythm](/Users/james/git/bijou/docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md)
+- latest completed cycle: [DL-006 — Prove Inspector Panel Rhythm](/Users/james/git/bijou/docs/design/DL-006-prove-inspector-panel-rhythm.md)
 - backlog:
-  - [DL-006 — Prove Inspector Panel Rhythm](/Users/james/git/bijou/docs/BACKLOG/DL-006-prove-inspector-panel-rhythm.md)
+  - [DL-007 — Promote Inspector Panel Block](/Users/james/git/bijou/docs/BACKLOG/DL-007-promote-inspector-panel-block.md)

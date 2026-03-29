@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import {
   boxSurface,
   createSurface,
+  inspector,
   lerp3,
   markdown,
   progressBar,
@@ -1708,30 +1709,37 @@ function renderVariantsPane(
     label: variant.label,
     value: variant.id,
   }));
+  const listHeight = Math.max(3, Math.min(items.length, Math.max(3, height - 12)));
   const list = browsableListSurface({
     items,
     focusIndex: currentVariantIndex,
-    scrollY: adjustScroll(currentVariantIndex, 0, Math.max(3, height - 8), items.length),
-    height: Math.max(3, height - 8),
+    scrollY: adjustScroll(currentVariantIndex, 0, listHeight, items.length),
+    height: listHeight,
   }, {
     width: Math.max(1, width),
-    showScrollbar: items.length > Math.max(3, height - 8),
+    showScrollbar: items.length > listHeight,
     ctx,
   });
   const variant = resolveStoryVariant(story, currentVariantIndex);
-  const description = boxSurface(column([
-    line(`Profile: ${resolveStoryProfilePreset(story, findStoryProfileIndex(story, model.profileMode)).label}`),
-    spacer(),
-    paragraphSurface(
-      variant.description ?? 'No extra description for this variant.',
-      Math.max(20, width - 6),
-    ),
-  ]), {
+  const description = contentSurface(inspector({
     title: 'active variant',
+    currentValue: variant.label,
+    sections: [
+      {
+        title: 'Profile',
+        content: resolveStoryProfilePreset(story, findStoryProfileIndex(story, model.profileMode)).label,
+      },
+      {
+        title: 'Description',
+        content: variant.description ?? 'No extra description for this variant.',
+        tone: 'muted',
+      },
+    ],
     width: Math.max(22, width - 1),
     borderToken: docsThemeMutedBorderToken(theme),
+    bgToken: docsThemeSurfaceToken(theme),
     ctx,
-  });
+  }));
 
   return column([
     themedSeparatorSurface(`variants • ${story.title}`, width, ctx, theme),

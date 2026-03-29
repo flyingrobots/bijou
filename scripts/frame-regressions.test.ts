@@ -4,6 +4,7 @@ import { chalkStyle } from '@flyingrobots/bijou-node';
 import type { App, KeyMsg } from '@flyingrobots/bijou-tui';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createTuiAppSkeleton } from '../packages/bijou-tui-app/src/index.js';
+import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
 import {
   assertFrameWidth,
   renderFrameText,
@@ -53,7 +54,10 @@ describe('frame regressions', () => {
     });
     const app = createTuiAppSkeleton({ ctx });
     const [model] = app.init();
-    const initialFrame = renderFrameText(app.view(model), ctx.style);
+    const initialFrame = renderFrameText(normalizeViewOutput(app.view(model), {
+      width: ctx.runtime.columns,
+      height: ctx.runtime.rows,
+    }).surface, ctx.style);
     const result = await runScript(app, [{ key: ']' }], { ctx });
 
     expect(initialFrame).toMatchSnapshot('scaffold-home');

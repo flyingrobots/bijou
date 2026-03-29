@@ -109,6 +109,8 @@ An inspector-style side panel is another strong candidate because it naturally c
 - current-value emphasis
 - compact but calm spacing
 
+DL-006 now proves the first canonical seam in this family through `inspector()`, which turns inspector-panel rhythm into a reusable core component instead of leaving it trapped in a bespoke DOGFOOD detail box.
+
 ## Block acceptance bar
 
 A structure is ready to become a canonical block when:

@@ -342,10 +342,17 @@ describe('docs preview app', () => {
     ], { ctx });
 
     const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect((result.model as any).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
+    expect(text).toContain('active variant');
+    expect(text).toContain('Current selection');
+    expect(text).toContain('Warning');
+    expect(text).toContain('Profile');
+    expect(text).toContain('Rich');
+    expect(text).toContain('Description');
   });
 
   it('opens component search with / and jumps directly to a component story', async () => {
