@@ -6,9 +6,10 @@ import type {
 } from '@flyingrobots/bijou';
 import {
   createSurface,
+  prepareWrappedText,
   segmentGraphemes,
   surfaceToString,
-  wrapToWidth,
+  wrapPreparedTextToWidth,
 } from '@flyingrobots/bijou';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
@@ -130,6 +131,13 @@ interface PositionedNotificationRenderEntry<Msg> extends NotificationRenderEntry
   readonly col: number;
 }
 
+interface PreparedNotificationHistoryEntry {
+  readonly title: ReturnType<typeof prepareWrappedText>;
+  readonly metaLine: ReturnType<typeof prepareWrappedText>;
+  readonly messageLine?: ReturnType<typeof prepareWrappedText>;
+  readonly actionLine?: ReturnType<typeof prepareWrappedText>;
+}
+
 const ENTER_DURATION_MS = 180;
 const EXIT_DURATION_MS = 320;
 const HISTORY_LIMIT = 250;
@@ -187,6 +195,22 @@ function renderHistoryEntry<Msg>(
   ctx: BijouContext | undefined,
 ): readonly string[] {
   const safeWidth = Math.max(1, width);
+  const prepared = prepareNotificationHistoryEntry(item, ctx);
+
+  const lines = [
+    ...wrapPreparedTextToWidth(prepared.title, safeWidth),
+    ...wrapPreparedTextToWidth(prepared.metaLine, safeWidth),
+    ...(prepared.messageLine == null ? [] : wrapPreparedTextToWidth(prepared.messageLine, safeWidth)),
+    ...(prepared.actionLine == null ? [] : wrapPreparedTextToWidth(prepared.actionLine, safeWidth)),
+  ];
+
+  return lines.length === 0 ? [''] : lines;
+}
+
+function prepareNotificationHistoryEntry<Msg>(
+  item: NotificationRecord<Msg>,
+  ctx: BijouContext | undefined,
+): PreparedNotificationHistoryEntry {
   const toneLabel = `[${item.tone}]`;
   const title = ctx == null
     ? `${toneLabel} ${item.title}`
@@ -202,14 +226,12 @@ function renderHistoryEntry<Msg>(
     ? undefined
     : (ctx == null ? item.message : ctx.style.styled(ctx.semantic('muted'), item.message));
 
-  const lines = [
-    ...wrapToWidth(title, safeWidth),
-    ...wrapToWidth(metaLine, safeWidth),
-    ...(messageLine == null ? [] : wrapToWidth(messageLine, safeWidth)),
-    ...(actionLine == null ? [] : wrapToWidth(actionLine, safeWidth)),
-  ];
-
-  return lines.length === 0 ? [''] : lines;
+  return {
+    title: prepareWrappedText(title),
+    metaLine: prepareWrappedText(metaLine),
+    messageLine: messageLine == null ? undefined : prepareWrappedText(messageLine),
+    actionLine: actionLine == null ? undefined : prepareWrappedText(actionLine),
+  };
 }
 
 export function renderNotificationHistory<Msg>(
@@ -224,15 +246,13 @@ export function renderNotificationHistory<Msg>(
   const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
 
   if (filtered.length === 0) {
-    const empty = wrapToWidth(
-      options.ctx == null
-        ? `No archived notifications for ${filterLabel(filter)} yet.`
-        : options.ctx.style.styled(
-          options.ctx.semantic('muted'),
-          `No archived notifications for ${filterLabel(filter)} yet.`,
-        ),
-      safeWidth,
-    ).slice(0, maxBodyLines);
+    const emptyText = options.ctx == null
+      ? `No archived notifications for ${filterLabel(filter)} yet.`
+      : options.ctx.style.styled(
+        options.ctx.semantic('muted'),
+        `No archived notifications for ${filterLabel(filter)} yet.`,
+      );
+    const empty = wrapPreparedTextToWidth(prepareWrappedText(emptyText), safeWidth).slice(0, maxBodyLines);
     return [
       `History • ${filterLabel(filter)} • 0 items`,
       '',

@@ -219,6 +219,34 @@ describe('notification state', () => {
     expect(stripAnsi(body)).not.toContain('Archived 3');
   });
 
+  it('renders archived multilingual history content through the review path without dropping wrapped fields', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: '選択中 😀 history',
+      message: 'Lokalisierte Hinweise bleiben auch bei schmalen Flächen lesbar.',
+      variant: 'ACTIONABLE',
+      tone: 'WARNING',
+      durationMs: null,
+      action: { label: 'Weiter prüfen', payload: { type: 'ignore' } },
+    }, 0);
+
+    state = tickNotifications(state, 250);
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = tickNotifications(state, 900);
+
+    const body = renderNotificationHistory(state, {
+      width: 20,
+      height: 10,
+      filter: 'ALL',
+    });
+
+    const plain = stripAnsi(body);
+    expect(plain).toContain('History • All • 1-1 of 1');
+    expect(plain).toContain('選択中 😀');
+    expect(plain).toContain('history');
+    expect(plain).toContain('Lokalisierte');
+  });
+
   it('renders archived notification history as inset review rows in the surface path', () => {
     let state = createNotificationState<Msg>();
     state = pushNotification(state, {
