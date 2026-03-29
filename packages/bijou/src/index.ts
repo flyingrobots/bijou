@@ -137,10 +137,16 @@ export {
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  prepareWrappedText,
+  wrapPreparedTextToWidth,
   clipToWidth,
   wrapToWidth,
   ANSI_SGR_RE,
   stripAnsi,
+} from './core/text/index.js';
+export type {
+  PreparedWrappedLine,
+  PreparedWrappedText,
 } from './core/text/index.js';
 
 // Detection
@@ -263,12 +269,16 @@ export {
   preferenceListSurface,
   preferenceRowSurface,
   resolvePreferenceRowLayout,
+  preparePreferenceRow,
+  preparePreferenceSections,
 } from './core/components/preference-list.js';
 export type {
   PreferenceListTheme,
   PreferenceRowKind,
   PreferenceRow,
+  PreparedPreferenceRow,
   PreferenceSection,
+  PreparedPreferenceSection,
   PreferenceRowLayout,
   PreferenceRowSurfaceOptions,
   PreferenceListSurfaceOptions,

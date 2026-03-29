@@ -5,6 +5,15 @@ type WrapToken =
   | { readonly kind: 'ansi'; readonly raw: string }
   | { readonly kind: 'grapheme'; readonly raw: string; readonly width: number };
 
+export interface PreparedWrappedLine {
+  readonly tokens: readonly WrapToken[];
+}
+
+export interface PreparedWrappedText {
+  readonly source: string;
+  readonly lines: readonly PreparedWrappedLine[];
+}
+
 function tokenizeAnsiText(str: string): WrapToken[] {
   const regex = new RegExp(ANSI_SGR_RE.source, 'g');
   const tokens: WrapToken[] = [];
@@ -39,6 +48,16 @@ function tokenizeAnsiText(str: string): WrapToken[] {
   }
 
   return tokens;
+}
+
+export function prepareWrappedText(str: string): PreparedWrappedText {
+  const source = str ?? '';
+  return {
+    source,
+    lines: source.split('\n').map((line) => ({
+      tokens: tokenizeAnsiText(line),
+    })),
+  };
 }
 
 function isResetEscape(raw: string): boolean {
@@ -77,11 +96,10 @@ function trimLeadingWhitespaceTokens(tokens: readonly WrapToken[]): WrapToken[] 
   return trimmed;
 }
 
-function wrapSingleLine(str: string, maxWidth: number): string[] {
-  if (str.length === 0) return [''];
+function wrapPreparedLine(line: PreparedWrappedLine, maxWidth: number): string[] {
+  if (line.tokens.length === 0) return [''];
   if (maxWidth <= 0) return [''];
 
-  const tokens = tokenizeAnsiText(str);
   const lines: string[] = [];
   let currentTokens: WrapToken[] = [];
   let currentWidth = 0;
@@ -89,7 +107,7 @@ function wrapSingleLine(str: string, maxWidth: number): string[] {
   let lastBreakIndex = -1;
   let activeStyleAtLastBreak = '';
 
-  for (const token of tokens) {
+  for (const token of line.tokens) {
     if (token.kind === 'ansi') {
       currentTokens.push(token);
       activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
@@ -148,6 +166,13 @@ function wrapSingleLine(str: string, maxWidth: number): string[] {
   return lines.length > 0 ? lines : [''];
 }
 
+export function wrapPreparedTextToWidth(
+  prepared: PreparedWrappedText,
+  maxWidth: number,
+): string[] {
+  return prepared.lines.flatMap((line) => wrapPreparedLine(line, maxWidth));
+}
+
 /**
  * Wrap a string to the requested display width while preserving ANSI styling.
  *
@@ -158,7 +183,5 @@ function wrapSingleLine(str: string, maxWidth: number): string[] {
  * @returns Wrapped lines.
  */
 export function wrapToWidth(str: string, maxWidth: number): string[] {
-  const source = str ?? '';
-  const rawLines = source.split('\n');
-  return rawLines.flatMap((line) => wrapSingleLine(line, maxWidth));
+  return wrapPreparedTextToWidth(prepareWrappedText(str), maxWidth);
 }

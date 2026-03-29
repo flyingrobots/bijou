@@ -1,7 +1,12 @@
 import { createSurface, type Surface } from '../../ports/surface.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { wrapToWidth } from '../text/wrap.js';
+import { graphemeWidth } from '../text/grapheme.js';
+import {
+  prepareWrappedText,
+  wrapPreparedTextToWidth,
+  type PreparedWrappedText,
+} from '../text/wrap.js';
 import type { BijouNodeOptions } from './types.js';
 
 export type PreferenceRowKind = 'toggle' | 'choice' | 'info' | 'action';
@@ -29,6 +34,19 @@ export interface PreferenceRowLayout {
   readonly height: number;
 }
 
+export interface PreparedPreferenceRow {
+  readonly row: PreferenceRow;
+  readonly valueLabel: string;
+  readonly baseLeftText: string;
+  readonly preparedDescription?: PreparedWrappedText;
+}
+
+export interface PreparedPreferenceSection {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly PreparedPreferenceRow[];
+}
+
 export interface PreferenceListTheme {
   readonly sectionTitleToken?: TokenValue;
   readonly selectedRowBgToken?: TokenValue;
@@ -51,18 +69,48 @@ export interface PreferenceListSurfaceOptions extends BijouNodeOptions {
   readonly theme?: PreferenceListTheme;
 }
 
+function isPreparedPreferenceRow(row: PreferenceRow | PreparedPreferenceRow): row is PreparedPreferenceRow {
+  return 'row' in row && 'baseLeftText' in row;
+}
+
+function isPreparedPreferenceSection(
+  section: PreferenceSection | PreparedPreferenceSection,
+): section is PreparedPreferenceSection {
+  return section.rows.length === 0 || isPreparedPreferenceRow(section.rows[0] as PreferenceRow | PreparedPreferenceRow);
+}
+
+export function preparePreferenceRow(row: PreferenceRow): PreparedPreferenceRow {
+  return {
+    row,
+    valueLabel: formatPreferenceValueLabel(row),
+    baseLeftText: `  ${preferenceRowGlyph(row)} ${row.label}`,
+    preparedDescription: row.description == null ? undefined : prepareWrappedText(row.description),
+  };
+}
+
+export function preparePreferenceSections(
+  sections: readonly PreferenceSection[],
+): readonly PreparedPreferenceSection[] {
+  return sections.map((section) => ({
+    id: section.id,
+    title: section.title,
+    rows: section.rows.map((row) => preparePreferenceRow(row)),
+  }));
+}
+
 export function preferenceRowSurface(
-  row: PreferenceRow,
+  row: PreferenceRow | PreparedPreferenceRow,
   options: PreferenceRowSurfaceOptions,
 ): Surface {
   const ctx = resolveCtx(options.ctx);
   const width = Math.max(1, Math.floor(options.width));
-  const layout = resolvePreferenceRowLayout(row, width);
+  const prepared = isPreparedPreferenceRow(row) ? row : preparePreferenceRow(row);
+  const layout = resolvePreferenceRowLayout(prepared, width);
   const surface = createSurface(width, layout.height);
   const bg = options.selected ? resolvePreferenceRowBg(ctx, options.theme) : undefined;
 
   fillPreferenceRow(surface, bg);
-  writePreferenceLine(surface, 0, buildPreferenceLeftText(row, options.selected === true), {
+  writePreferenceLine(surface, 0, buildPreferenceLeftText(prepared.row, options.selected === true), {
     strong: options.selected === true,
     bg,
   });
@@ -71,7 +119,7 @@ export function preferenceRowSurface(
     if (layout.stackValue) {
       writePreferenceLine(surface, 1, `   ${layout.valueLabel}`, {
         strong: true,
-        fg: resolvePreferenceValueFg(row, ctx, options.theme),
+        fg: resolvePreferenceValueFg(prepared.row, ctx, options.theme),
         bg,
       });
     } else {
@@ -84,7 +132,7 @@ export function preferenceRowSurface(
         if (char === ' ') continue;
         surface.set(startX + valueStart + offset, 0, {
           char,
-          fg: resolvePreferenceValueFg(row, ctx, options.theme),
+          fg: resolvePreferenceValueFg(prepared.row, ctx, options.theme),
           bg,
           modifiers: ['bold'],
           empty: false,
@@ -110,13 +158,20 @@ export function preferenceRowSurface(
 }
 
 export function preferenceListSurface(
-  sections: readonly PreferenceSection[],
+  sections: readonly PreferenceSection[] | readonly PreparedPreferenceSection[],
   options: PreferenceListSurfaceOptions,
 ): Surface {
   const ctx = resolveCtx(options.ctx);
   const width = Math.max(1, Math.floor(options.width));
-  const visibleSections = sections.filter((section) => section.rows.length > 0);
-  const rows: Array<{ y: number; row: PreferenceRow }> = [];
+  const preparedSections = sections.map((section) => isPreparedPreferenceSection(section)
+    ? section
+    : {
+        id: section.id,
+        title: section.title,
+        rows: section.rows.map((row) => preparePreferenceRow(row)),
+      },
+  );
+  const visibleSections = preparedSections.filter((section) => section.rows.length > 0);
   let totalHeight = 1;
   let y = 0;
 
@@ -128,7 +183,6 @@ export function preferenceListSurface(
 
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const row = section.rows[rowIndex]!;
-      rows.push({ y, row });
       const rowLayout = resolvePreferenceRowLayout(row, width);
       y += rowLayout.height;
       if (rowIndex < section.rows.length - 1) y += 1;
@@ -151,14 +205,15 @@ export function preferenceListSurface(
 
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
       const row = section.rows[rowIndex]!;
+      const rowLayout = resolvePreferenceRowLayout(row, width);
       const rowSurface = preferenceRowSurface(row, {
         width,
-        selected: options.selectedRowId === row.id,
+        selected: options.selectedRowId === row.row.id,
         ctx,
         theme: options.theme,
       });
       surface.blit(rowSurface, 0, y);
-      y += rowSurface.height;
+      y += rowLayout.height;
       if (rowIndex < section.rows.length - 1) y += 1;
     }
   }
@@ -166,17 +221,21 @@ export function preferenceListSurface(
   return surface;
 }
 
-export function resolvePreferenceRowLayout(row: PreferenceRow, width: number): PreferenceRowLayout {
+export function resolvePreferenceRowLayout(
+  row: PreferenceRow | PreparedPreferenceRow,
+  width: number,
+): PreferenceRowLayout {
+  const prepared = isPreparedPreferenceRow(row) ? row : preparePreferenceRow(row);
   const boundedWidth = Math.max(1, Math.floor(width));
-  const valueLabel = formatPreferenceValueLabel(row);
-  const leftText = `  ${preferenceRowGlyph(row)} ${row.label}`;
+  const valueLabel = prepared.valueLabel;
+  const leftText = prepared.baseLeftText;
   const startX = boundedWidth >= 3 ? 1 : 0;
   const innerWidth = Math.max(0, boundedWidth - (startX * 2));
   const stackValue = valueLabel.length > 0
-    && (Array.from(leftText).length + 3 + Array.from(valueLabel).length > innerWidth);
-  const descriptionLines = row.description == null
+    && (graphemeWidth(leftText) + 3 + graphemeWidth(valueLabel) > innerWidth);
+  const descriptionLines = prepared.preparedDescription == null
     ? []
-    : wrapToWidth(row.description, Math.max(1, Math.max(14, boundedWidth - 4)));
+    : wrapPreparedTextToWidth(prepared.preparedDescription, Math.max(1, Math.max(14, boundedWidth - 4)));
 
   return {
     valueLabel,

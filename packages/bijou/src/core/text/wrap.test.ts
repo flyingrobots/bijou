@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { clipToWidth } from './clip.js';
 import { graphemeWidth, stripAnsi } from './grapheme.js';
-import { wrapToWidth } from './wrap.js';
+import { prepareWrappedText, wrapPreparedTextToWidth, wrapToWidth } from './wrap.js';
 
 describe('wrapToWidth', () => {
   it('hard-wraps long lines instead of truncating them', () => {
@@ -41,5 +41,12 @@ describe('wrapToWidth', () => {
 
   it('returns an empty visual line when width is non-positive', () => {
     expect(wrapToWidth('hello', 0)).toEqual(['']);
+  });
+
+  it('reuses prepared wrapped text without changing output', () => {
+    const prepared = prepareWrappedText('\x1b[31mhello world again\x1b[0m');
+
+    expect(wrapPreparedTextToWidth(prepared, 11)).toEqual(wrapToWidth('\x1b[31mhello world again\x1b[0m', 11));
+    expect(wrapPreparedTextToWidth(prepared, 4)).toEqual(wrapToWidth('\x1b[31mhello world again\x1b[0m', 4));
   });
 });

@@ -7,11 +7,13 @@
 
 import {
   createSurface,
+  preparePreferenceSections,
   preferenceListSurface,
   type PreferenceListTheme,
   resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
+  type PreparedPreferenceSection,
   type PreferenceRow,
   type PreferenceSection,
   type OverflowBehavior,
@@ -1635,6 +1637,7 @@ interface FlatSettingsRow<Msg> {
 
 interface ResolvedSettingsLayout<Msg> {
   readonly settings: FrameSettings<Msg>;
+  readonly preferenceSections: readonly PreparedPreferenceSection[];
   readonly rows: readonly FlatSettingsRow<Msg>[];
   readonly anchor: 'left' | 'right';
   readonly startCol: number;
@@ -1732,19 +1735,21 @@ function resolveSettingsLayout<PageModel, Msg>(
   const anchor = frameStartAnchor(options.i18n);
   const startCol = anchor === 'left' ? 0 : Math.max(0, model.columns - drawerWidth);
   const contentWidth = Math.max(16, drawerWidth - 4);
+  const preferenceSections = preparePreferenceSections(toPreferenceSections(sections));
   const rows: FlatSettingsRow<Msg>[] = [];
   let line = 0;
 
-  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
-    const section = sections[sectionIndex]!;
+  for (let sectionIndex = 0; sectionIndex < preferenceSections.length; sectionIndex++) {
+    const section = preferenceSections[sectionIndex]!;
     if (sectionIndex > 0) {
       line += 1;
     }
     line += 1;
     line += 1;
     for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const row = section.rows[rowIndex]!;
-      const rowLayout = resolvePreferenceRowLayout(toPreferenceRow(row), contentWidth);
+      const preparedRow = section.rows[rowIndex]!;
+      const row = sections[sectionIndex]!.rows[rowIndex]!;
+      const rowLayout = resolvePreferenceRowLayout(preparedRow, contentWidth);
       rows.push({
         index: rows.length,
         line,
@@ -1767,6 +1772,7 @@ function resolveSettingsLayout<PageModel, Msg>(
       ...settings,
       sections,
     },
+    preferenceSections,
     rows,
     anchor,
     startCol,
@@ -2046,7 +2052,7 @@ function renderSettingsSurface<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
 ): Surface {
   const focusedIndex = clampSettingsFocus(model, layout);
-  return preferenceListSurface(toPreferenceSections(layout.settings.sections), {
+  return preferenceListSurface(layout.preferenceSections, {
     width: layout.contentWidth,
     selectedRowId: layout.rows[focusedIndex]?.row.id,
     ctx: resolveSafeCtx() ?? undefined,

@@ -70,12 +70,16 @@ export {
   preferenceListSurface,
   preferenceRowSurface,
   resolvePreferenceRowLayout,
+  preparePreferenceRow,
+  preparePreferenceSections,
 } from './preference-list.js';
 export type {
   PreferenceListTheme,
   PreferenceRowKind,
   PreferenceRow,
+  PreparedPreferenceRow,
   PreferenceSection,
+  PreparedPreferenceSection,
   PreferenceRowLayout,
   PreferenceRowSurfaceOptions,
   PreferenceListSurfaceOptions,
