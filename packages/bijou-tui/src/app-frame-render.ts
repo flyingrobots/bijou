@@ -42,6 +42,7 @@ import {
 } from './app-frame-utils.js';
 import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
 import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
+import { frameMessage, frameModeLabel } from './app-frame-i18n.js';
 
 export interface FrameHeaderTabTarget {
   readonly pageId: string;
@@ -413,9 +414,10 @@ export function renderHelpLine<PageModel, Msg>(
           ? 'NOTICES'
         : 'NORMAL';
   const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
+  const modeLabel = frameModeLabel(options.i18n, mode);
   const status = notificationCue == null || notificationCue.length === 0
-    ? `[${mode}] page:${model.activePageId} pane:${focusedPane}`
-    : `[${mode}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
+    ? `[${modeLabel}] page:${model.activePageId} pane:${focusedPane}`
+    : `[${modeLabel}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
 
   const helpLineOverride = options.helpLineSource?.({
     model,
@@ -424,11 +426,11 @@ export function renderHelpLine<PageModel, Msg>(
     globalKeys: options.globalKeys,
   });
   const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
-    ? 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'
+    ? frameMessage(options.i18n, 'settings.footer', 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit')
     : model.notificationCenterOpen && model.commandPalette == null && !model.helpOpen
-      ? 'Shift+N close • f filter • j/k scroll • q quit'
+      ? frameMessage(options.i18n, 'notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit')
     : model.quitConfirmOpen
-      ? 'Y quit • N stay'
+      ? frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay')
     : typeof helpLineOverride === 'string'
       ? helpLineOverride
       : helpShort(helpLineOverride ?? mergeBindingSources(

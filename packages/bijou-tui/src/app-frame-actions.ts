@@ -97,6 +97,7 @@ export function applyFrameAction<PageModel, Msg>(
         commandPalette: opening ? undefined : model.commandPalette,
         commandPaletteEntries: opening ? undefined : model.commandPaletteEntries,
         commandPaletteTitle: opening ? undefined : model.commandPaletteTitle,
+        commandPaletteKind: opening ? undefined : model.commandPaletteKind,
       }, []];
     }
     case 'toggle-notifications': {
@@ -113,6 +114,7 @@ export function applyFrameAction<PageModel, Msg>(
         commandPalette: undefined,
         commandPaletteEntries: undefined,
         commandPaletteTitle: undefined,
+        commandPaletteKind: undefined,
         quitConfirmOpen: false,
       }, []];
     }

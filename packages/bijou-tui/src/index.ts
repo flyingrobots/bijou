@@ -64,6 +64,9 @@ export {
   isShellQuitConfirmDismiss,
   renderShellQuitOverlay,
 } from './shell-quit.js';
+export {
+  FRAME_I18N_CATALOG,
+} from './app-frame-i18n.js';
 
 // Runtime
 export { run } from './runtime.js';

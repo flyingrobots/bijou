@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
+import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
 import { normalizeViewOutput } from './view-output.js';
+import { FRAME_I18N_CATALOG } from './app-frame-i18n.js';
 import {
   createNotificationState,
   dismissNotification,
@@ -899,6 +901,75 @@ describe('createFramedApp', () => {
 
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeUndefined();
+  });
+
+  it('uses localized shell defaults for command palette and settings footer copy', () => {
+    const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
+    runtime.loadCatalog(FRAME_I18N_CATALOG);
+    runtime.loadCatalog({
+      namespace: 'bijou.shell',
+      entries: [
+        {
+          key: { namespace: 'bijou.shell', id: 'palette.title' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Command Palette', fr: 'Palette de commandes' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'settings.title' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Settings', fr: 'Paramètres' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'settings.footer' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit',
+            fr: 'F2/Échap fermer • ↑/↓ lignes • Entrée basculer • / chercher • q quitter',
+          },
+        },
+      ],
+    });
+
+    const app = createFramedApp({
+      i18n: runtime,
+      enableCommandPalette: true,
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey('p'), model);
+    let surface = normalizeViewOutput(app.view(model), {
+      width: 80,
+      height: 24,
+    }).surface;
+    expect(surfaceToString(surface, testCtx.style)).toContain('Palette de commandes');
+
+    [model] = app.update(ctrlKey('p'), model);
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    surface = normalizeViewOutput(app.view(model), {
+      width: 80,
+      height: 24,
+    }).surface;
+    const rendered = surfaceToString(surface, testCtx.style);
+    const footer = rendered.split('\n').at(-1) ?? '';
+
+    expect(rendered).toContain('Paramètres');
+    expect(footer).toContain('Échap fermer');
+    expect(footer).toContain('Entrée basculer');
   });
 
   it('opens a quit-confirm modal from the shell and quits on confirmation', async () => {

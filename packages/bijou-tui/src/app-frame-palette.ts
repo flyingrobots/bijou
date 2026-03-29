@@ -10,12 +10,14 @@ import type {
   FrameAction,
   PaletteAction,
   PaletteEntry,
+  PaletteKind,
 } from './app-frame-types.js';
 import { comboToMsg, emitMsg, emitMsgForPage } from './app-frame-types.js';
 import { applyFrameAction } from './app-frame-actions.js';
 import type { Cmd, KeyMsg } from './types.js';
 import type { KeyMap } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
+import { frameMessage } from './app-frame-i18n.js';
 import {
   createCommandPaletteState,
   cpFilter,
@@ -48,15 +50,21 @@ export function handlePaletteKey<PageModel, Msg>(
       case 'cp-page-up':
         return [{ ...model, commandPalette: cpPageUp(cp) }, []];
       case 'cp-close':
-        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
+        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined, commandPaletteKind: undefined }, []];
       case 'cp-select': {
         const selected = cpSelectedItem(cp);
         if (selected == null) {
-          return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
+          return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined, commandPaletteKind: undefined }, []];
         }
         const entry = model.commandPaletteEntries?.find((x) => x.id === selected.id);
         if (entry?.frameAction != null) {
-          const closed = { ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined };
+          const closed = {
+            ...model,
+            commandPalette: undefined,
+            commandPaletteEntries: undefined,
+            commandPaletteTitle: undefined,
+            commandPaletteKind: undefined,
+          };
           return applyFrameAction(entry.frameAction, closed, options, pagesById);
         }
         if (entry?.msgAction !== undefined) {
@@ -68,9 +76,10 @@ export function handlePaletteKey<PageModel, Msg>(
             commandPalette: undefined,
             commandPaletteEntries: undefined,
             commandPaletteTitle: undefined,
+            commandPaletteKind: undefined,
           }, [cmd]];
         }
-        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined }, []];
+        return [{ ...model, commandPalette: undefined, commandPaletteEntries: undefined, commandPaletteTitle: undefined, commandPaletteKind: undefined }, []];
       }
     }
   }
@@ -96,7 +105,12 @@ export function openCommandPalette<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
   const entries = buildPaletteEntries(model, frameKeys, options, pagesById);
-  return openPaletteModel(model, entries, 'Command Palette');
+  return openPaletteModel(
+    model,
+    entries,
+    frameMessage(options.i18n, 'palette.title', 'Command Palette'),
+    'command',
+  );
 }
 
 /** Initialize a page-scoped search palette, falling back to page command items when needed. */
@@ -108,14 +122,15 @@ export function openSearchPalette<PageModel, Msg>(
 ): InternalFrameModel<PageModel, Msg> {
   const page = pagesById.get(model.activePageId)!;
   const entries = buildSearchEntries(model, frameKeys, options, pagesById);
-  const title = page.searchTitle ?? 'Search';
-  return openPaletteModel(model, entries, title);
+  const title = page.searchTitle ?? frameMessage(options.i18n, 'search.title', 'Search');
+  return openPaletteModel(model, entries, title, 'search');
 }
 
 function openPaletteModel<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   entries: readonly PaletteEntry<Msg>[],
   title: string,
+  kind: PaletteKind,
 ): InternalFrameModel<PageModel, Msg> {
   const items = entries.map((x) => x.item);
   return {
@@ -123,6 +138,7 @@ function openPaletteModel<PageModel, Msg>(
     commandPalette: createCommandPaletteState(items, Math.max(5, Math.min(10, model.rows - 8))),
     commandPaletteEntries: entries,
     commandPaletteTitle: title,
+    commandPaletteKind: kind,
   };
 }
 

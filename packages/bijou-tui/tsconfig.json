@@ -23,5 +23,8 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"],
-  "references": [{ "path": "../bijou" }]
+  "references": [
+    { "path": "../bijou" },
+    { "path": "../bijou-i18n" }
+  ]
 }

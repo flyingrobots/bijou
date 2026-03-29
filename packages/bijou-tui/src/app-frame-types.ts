@@ -20,6 +20,8 @@ import type { FrameModel } from './app-frame.js';
 export const PAGE_MSG_TOKEN = Symbol('app-frame-page-msg');
 export const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 
+export type PaletteKind = 'command' | 'search';
+
 // ---------------------------------------------------------------------------
 // Internal model
 // ---------------------------------------------------------------------------
@@ -28,6 +30,7 @@ export const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 export interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel> {
   readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[];
   readonly commandPaletteTitle?: string;
+  readonly commandPaletteKind?: PaletteKind;
   readonly helpScrollY: number;
 }
 

@@ -48,5 +48,7 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Current cycle and backlog
 
-- latest completed cycle: [LX-006 — XLSX Localization Adapters](/Users/james/git/bijou/docs/design/LX-006-xlsx-localization-adapters.md)
-- backlog: [LX-007 — Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-007-service-oriented-localization-adapters.md)
+- latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](/Users/james/git/bijou/docs/design/LX-008-localize-shell-chrome-and-dogfood.md)
+- backlog:
+  - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](/Users/james/git/bijou/docs/BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
+  - [LX-007 — Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-007-service-oriented-localization-adapters.md)

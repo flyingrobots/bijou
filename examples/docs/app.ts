@@ -11,6 +11,7 @@ import {
   type TokenValue,
 } from '@flyingrobots/bijou';
 import {
+  FRAME_I18N_CATALOG,
   browsableListSurface,
   compositeSurface,
   createBrowsableListState,
@@ -39,6 +40,12 @@ import {
   type MouseMsg,
   type ResizeMsg,
 } from '../../packages/bijou-tui/src/index.js';
+import {
+  createI18nRuntime,
+  type I18nCatalog,
+  type I18nDirection,
+  type I18nRuntime,
+} from '../../packages/bijou-i18n/src/index.js';
 import {
   column,
   contentSurface,
@@ -88,6 +95,68 @@ const DOCS_PAGE_ID = 'dogfood';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
+const DOGFOOD_I18N_NAMESPACE = 'bijou.dogfood';
+
+export { FRAME_I18N_CATALOG };
+
+export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
+  namespace: DOGFOOD_I18N_NAMESPACE,
+  entries: [
+    dogfoodMessage('landing.prompt.enter', 'Press [Enter]'),
+    dogfoodMessage('landing.footer.controls', 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue'),
+    dogfoodMessage('landing.quality.auto', 'Auto'),
+    dogfoodMessage('landing.quality.quality', 'Quality'),
+    dogfoodMessage('landing.quality.balanced', 'Balanced'),
+    dogfoodMessage('landing.quality.performance', 'Performance'),
+    dogfoodMessage('landing.quality.profile.full', 'full'),
+    dogfoodMessage('landing.quality.profile.balanced', 'balanced'),
+    dogfoodMessage('landing.quality.profile.performance', 'performance'),
+    dogfoodMessage('landing.toast.quality', 'Landing quality: {quality}'),
+    dogfoodMessage('docs.footer.shell', '? Help • / Search • F2 Settings • q Quit'),
+    dogfoodMessage('docs.footer.paneSwitch', 'Tab next pane'),
+    dogfoodMessage('docs.footer.family', '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand'),
+    dogfoodMessage('docs.footer.story', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
+    dogfoodMessage('docs.footer.variants', '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles'),
+    dogfoodMessage('docs.search.title', 'Search components'),
+    dogfoodMessage('docs.empty.intro.title', 'What is Bijou?'),
+    dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
+    dogfoodMessage('docs.empty.intro.body2', 'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.'),
+    dogfoodMessage('docs.empty.guide.title', 'How to use these docs'),
+    dogfoodMessage('docs.empty.guide.step1', '1. Browse component families in the left lane.'),
+    dogfoodMessage('docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.'),
+    dogfoodMessage('docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.'),
+    dogfoodMessage('docs.empty.guide.step4', '4. Press / to search by component name at any time.'),
+    dogfoodMessage('docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.'),
+    dogfoodMessage('docs.separator.welcome', 'welcome to bijou'),
+    dogfoodMessage('settings.section.shell', 'Shell'),
+    dogfoodMessage('settings.section.appearance', 'Appearance'),
+    dogfoodMessage('settings.section.landing', 'Landing'),
+    dogfoodMessage('settings.showHints.label', 'Show hints'),
+    dogfoodMessage('settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
+    dogfoodMessage('settings.showHints.on', 'On'),
+    dogfoodMessage('settings.showHints.off', 'Off'),
+    dogfoodMessage('settings.showHints.feedback.on', 'Show hints turned on.'),
+    dogfoodMessage('settings.showHints.feedback.off', 'Show hints turned off.'),
+    dogfoodMessage('settings.landingTheme.label', 'Landing theme'),
+    dogfoodMessage('settings.landingTheme.description', 'Sets the DOGFOOD title screen and docs accent palette. Current theme: {theme}. Options: {options}.'),
+    dogfoodMessage('settings.landingTheme.feedback', 'Landing theme set to {theme}.'),
+    dogfoodMessage('settings.landingQuality.label', 'Landing quality'),
+    dogfoodMessage('settings.landingQuality.description.auto', 'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.'),
+    dogfoodMessage('settings.landingQuality.description.quality', 'Prioritizes the richest title treatment even on larger terminals. Options: {options}.'),
+    dogfoodMessage('settings.landingQuality.description.balanced', 'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.'),
+    dogfoodMessage('settings.landingQuality.description.performance', 'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.'),
+    dogfoodMessage('settings.landingQuality.feedback', 'Landing quality set to {quality}.'),
+  ],
+};
+
+function dogfoodMessage(id: string, value: string) {
+  return {
+    key: { namespace: DOGFOOD_I18N_NAMESPACE, id },
+    kind: 'message' as const,
+    sourceLocale: 'en',
+    values: { en: value },
+  };
+}
 
 interface StoryFamily {
   readonly id: string;
@@ -303,6 +372,45 @@ const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
     .bind('.', 'Next variant', { type: 'variant-next' })
     .bind(',', 'Previous variant', { type: 'variant-prev' }),
   );
+
+interface DocsAppOptions {
+  readonly locale?: string;
+  readonly direction?: I18nDirection;
+  readonly extraI18nCatalogs?: readonly I18nCatalog[];
+}
+
+function dogfoodText(
+  i18n: I18nRuntime | undefined,
+  id: string,
+  fallback: string,
+  values: Readonly<Record<string, unknown>> = {},
+): string {
+  if (i18n == null) return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
+  try {
+    return i18n.t({ namespace: DOGFOOD_I18N_NAMESPACE, id }, values);
+  } catch {
+    return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
+  }
+}
+
+function shellText(
+  i18n: I18nRuntime | undefined,
+  id: string,
+  fallback: string,
+  values: Readonly<Record<string, unknown>> = {},
+): string {
+  if (i18n == null) return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
+  try {
+    return i18n.t({ namespace: FRAME_I18N_CATALOG.namespace, id }, values);
+  } catch {
+    return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
+  }
+}
+
+function formatI18nList(i18n: I18nRuntime | undefined, values: readonly string[]): string {
+  if (i18n == null) return values.join(', ');
+  return i18n.formatList(values, i18n.locale);
+}
 
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
@@ -552,7 +660,7 @@ function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplor
   };
 }
 
-function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface {
+function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
   const cache: LandingFrameCache = {};
 
   return (model: RootModel): Surface => {
@@ -592,8 +700,8 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       ? FLYING_ROBOTS_LARGE_LINES
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
-    const staticSurfaces = getLandingStaticSurfaces(tokens);
-    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode);
+    const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
+    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
 
     const footerY = Math.max(0, height - 1);
     const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
@@ -603,8 +711,8 @@ function createLandingRenderer(ctx: BijouContext): (model: RootModel) => Surface
       ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
       : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
 
-    blitCentered(surface, staticSurfaces.promptLine, promptY);
     blitCentered(surface, wordmark, wordmarkY);
+    blitCentered(surface, staticSurfaces.promptLine, promptY);
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
     const footerBadgeX = Math.floor((width - fpsBadge.width) / 2);
@@ -871,40 +979,41 @@ function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number
   return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
 }
 
-function landingQualityProfileLabel(quality: LandingQualityProfile): string {
+function landingQualityProfileLabel(quality: LandingQualityProfile, i18n?: I18nRuntime): string {
   switch (quality.id) {
     case 'full':
-      return 'full';
+      return dogfoodText(i18n, 'landing.quality.profile.full', 'full');
     case 'balanced':
-      return 'balanced';
+      return dogfoodText(i18n, 'landing.quality.profile.balanced', 'balanced');
     case 'ultra':
-      return 'performance';
+      return dogfoodText(i18n, 'landing.quality.profile.performance', 'performance');
     default:
       return quality.id;
   }
 }
 
-function landingQualityModeLabel(mode: LandingQualityMode): string {
+function landingQualityModeLabel(mode: LandingQualityMode, i18n?: I18nRuntime): string {
   switch (mode) {
     case 'auto':
-      return 'Auto';
+      return dogfoodText(i18n, 'landing.quality.auto', 'Auto');
     case 'quality':
-      return 'Quality';
+      return dogfoodText(i18n, 'landing.quality.quality', 'Quality');
     case 'balanced':
-      return 'Balanced';
+      return dogfoodText(i18n, 'landing.quality.balanced', 'Balanced');
     case 'performance':
-      return 'Performance';
+      return dogfoodText(i18n, 'landing.quality.performance', 'Performance');
   }
 }
 
 function landingQualityBadgeLabel(
   quality: LandingQualityProfile,
   mode: LandingQualityMode,
+  i18n?: I18nRuntime,
 ): string {
   if (mode === 'auto') {
-    return `auto/${landingQualityProfileLabel(quality)}`;
+    return `auto/${landingQualityProfileLabel(quality, i18n)}`;
   }
-  return landingQualityModeLabel(mode).toLowerCase();
+  return landingQualityModeLabel(mode, i18n).toLowerCase();
 }
 
 function nextLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
@@ -937,26 +1046,54 @@ function landingQualitySettingValue(
   width: number,
   height: number,
   mode: LandingQualityMode,
+  i18n?: I18nRuntime,
 ): string {
-  if (mode !== 'auto') return landingQualityModeLabel(mode);
-  return `${landingQualityModeLabel(mode)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode))})`;
+  if (mode !== 'auto') return landingQualityModeLabel(mode, i18n);
+  return `${landingQualityModeLabel(mode, i18n)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode), i18n)})`;
 }
 
 function landingQualitySettingDescription(
   width: number,
   height: number,
   mode: LandingQualityMode,
+  i18n?: I18nRuntime,
 ): string {
-  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode));
+  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode), i18n);
+  const options = formatI18nList(i18n, [
+    landingQualityModeLabel('auto', i18n),
+    landingQualityModeLabel('quality', i18n),
+    landingQualityModeLabel('balanced', i18n),
+    landingQualityModeLabel('performance', i18n),
+  ]);
   switch (mode) {
     case 'auto':
-      return `Adapts render cost to terminal size. Current auto profile: ${currentProfile}. Options: Auto, Quality, Balanced, Performance.`;
+      return dogfoodText(
+        i18n,
+        'settings.landingQuality.description.auto',
+        'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.',
+        { profile: currentProfile, options },
+      );
     case 'quality':
-      return 'Prioritizes the richest title treatment even on larger terminals. Options: Auto, Quality, Balanced, Performance.';
+      return dogfoodText(
+        i18n,
+        'settings.landingQuality.description.quality',
+        'Prioritizes the richest title treatment even on larger terminals. Options: {options}.',
+        { options },
+      );
     case 'balanced':
-      return 'Keeps the title screen expressive while reducing render work on larger terminals. Options: Auto, Quality, Balanced, Performance.';
+      return dogfoodText(
+        i18n,
+        'settings.landingQuality.description.balanced',
+        'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.',
+        { options },
+      );
     case 'performance':
-      return 'Minimizes title-screen work for giant terminals and slower emulators. Options: Auto, Quality, Balanced, Performance.';
+      return dogfoodText(
+        i18n,
+        'settings.landingQuality.description.performance',
+        'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.',
+        { options },
+      );
   }
 }
 
@@ -964,9 +1101,17 @@ function landingThemeSettingValue(index: number): string {
   return resolveLandingTheme(index).label;
 }
 
-function landingThemeSettingDescription(index: number): string {
+function landingThemeSettingDescription(index: number, i18n?: I18nRuntime): string {
   const theme = resolveLandingTheme(index);
-  return `Sets the DOGFOOD title screen and docs accent palette. Current theme: ${theme.label}. Options: ${LANDING_THEMES.map((entry) => entry.label).join(', ')}.`;
+  return dogfoodText(
+    i18n,
+    'settings.landingTheme.description',
+    'Sets the DOGFOOD title screen and docs accent palette. Current theme: {theme}. Options: {options}.',
+    {
+      theme: theme.label,
+      options: formatI18nList(i18n, LANDING_THEMES.map((entry) => entry.label)),
+    },
+  );
 }
 
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
@@ -1001,31 +1146,34 @@ function updateLandingFps(current: number, dtSeconds: number): number {
   return Math.max(1, Math.round((current * (1 - LANDING_FPS_ALPHA)) + (instantFps * LANDING_FPS_ALPHA)));
 }
 
-function getLandingStaticSurfaces(tokens: LandingThemeTokens): {
+function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime): {
   readonly promptLine: Surface;
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 } {
-  const cached = LANDING_STATIC_SURFACE_CACHE.get(tokens.id);
+  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
+  const controlsText = dogfoodText(i18n, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
+  const cacheKey = `${tokens.id}:${promptText}:${controlsText}`;
+  const cached = LANDING_STATIC_SURFACE_CACHE.get(cacheKey);
   if (cached) return cached;
 
   const surfaces = {
-    promptLine: createTransparentTextSurface(ENTER_PROMPT_TEXT, {
+    promptLine: createTransparentTextSurface(promptText, {
       bg: tokens.background,
       transparentSpaces: false,
       fg: (x) => {
-        const char = ENTER_PROMPT_TEXT[x] ?? ' ';
-        if (char === '[' || char === ']' || (x >= 7 && x <= 11)) {
+        const char = promptText[x] ?? ' ';
+        if (char === '[' || char === ']') {
           return tokens.promptAccentColor;
         }
         return tokens.promptBodyColor;
       },
       modifiers: (x) => {
-        const char = ENTER_PROMPT_TEXT[x] ?? ' ';
-        return char === '[' || char === ']' || (x >= 7 && x <= 11) ? BOLD_MODIFIERS : DIM_MODIFIERS;
+        const char = promptText[x] ?? ' ';
+        return char === '[' || char === ']' ? BOLD_MODIFIERS : DIM_MODIFIERS;
       },
     }),
-    footerControls: createTransparentTextSurface(LANDING_CONTROLS_TEXT, {
+    footerControls: createTransparentTextSurface(controlsText, {
       bg: tokens.background,
       transparentSpaces: false,
       fg: tokens.footerMutedColor,
@@ -1038,7 +1186,7 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens): {
       modifiers: BOLD_MODIFIERS,
     }),
   };
-  LANDING_STATIC_SURFACE_CACHE.set(tokens.id, surfaces);
+  LANDING_STATIC_SURFACE_CACHE.set(cacheKey, surfaces);
   return surfaces;
 }
 
@@ -1047,9 +1195,10 @@ function getLandingFpsBadge(
   fps: number,
   quality: LandingQualityProfile,
   mode: LandingQualityMode,
+  i18n?: I18nRuntime,
 ): Surface {
-  const qualityLabel = landingQualityBadgeLabel(quality, mode);
-  const key = `${tokens.id}:${fps}:${quality.id}:${mode}`;
+  const qualityLabel = landingQualityBadgeLabel(quality, mode, i18n);
+  const key = `${tokens.id}:${fps}:${quality.id}:${mode}:${qualityLabel}`;
   const cached = LANDING_FPS_BADGE_CACHE.get(key);
   if (cached) return cached;
 
@@ -1088,7 +1237,7 @@ function applyLandingThemeSelection(model: RootModel, index: number): RootModel 
   };
 }
 
-function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode): RootModel {
+function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode, i18n?: I18nRuntime): RootModel {
   const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
   if (pageModel == null || pageModel.landingQualityMode === mode) return model;
 
@@ -1105,7 +1254,12 @@ function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode
       },
     },
     landingToast: {
-      message: `Landing quality: ${landingQualityModeLabel(mode)}`,
+      message: dogfoodText(
+        i18n,
+        'landing.toast.quality',
+        'Landing quality: {quality}',
+        { quality: landingQualityModeLabel(mode, i18n) },
+      ),
       expiresAtMs: model.landingTimeMs + 1600,
     },
   };
@@ -1291,40 +1445,53 @@ function renderFamiliesPane(
   ]);
 }
 
-function renderEmptyStoryPane(width: number, ctx: BijouContext, theme: LandingThemeTokens): Surface {
+function renderEmptyStoryPane(
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  i18n: I18nRuntime,
+): Surface {
   const bodyWidth = Math.max(28, width - 6);
   const intro = boxSurface(column([
     paragraphSurface(
-      'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.',
+      dogfoodText(
+        i18n,
+        'docs.empty.intro.body',
+        'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.',
+      ),
       Math.max(24, bodyWidth - 2),
     ),
     spacer(),
     paragraphSurface(
-      'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.',
+      dogfoodText(
+        i18n,
+        'docs.empty.intro.body2',
+        'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.',
+      ),
       Math.max(24, bodyWidth - 2),
     ),
   ]), {
-    title: 'What is Bijou?',
+    title: dogfoodText(i18n, 'docs.empty.intro.title', 'What is Bijou?'),
     width: Math.max(24, width - 1),
     borderToken: docsThemeBorderToken(theme),
     ctx,
   });
 
   const guide = boxSurface(column([
-    line('1. Browse component families in the left lane.'),
-    line('2. Press Enter to expand a family or open a component.'),
-    line('3. Use Tab to move focus between families, docs, and variants.'),
-    line('4. Press / to search by component name at any time.'),
-    line('5. Press F2 for settings, ? for help, and q or Esc to quit.'),
+    line(dogfoodText(i18n, 'docs.empty.guide.step1', '1. Browse component families in the left lane.')),
+    line(dogfoodText(i18n, 'docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.')),
+    line(dogfoodText(i18n, 'docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.')),
+    line(dogfoodText(i18n, 'docs.empty.guide.step4', '4. Press / to search by component name at any time.')),
+    line(dogfoodText(i18n, 'docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.')),
   ]), {
-    title: 'How to use these docs',
+    title: dogfoodText(i18n, 'docs.empty.guide.title', 'How to use these docs'),
     width: Math.max(24, width - 1),
     borderToken: docsThemeMutedBorderToken(theme),
     ctx,
   });
 
   return column([
-    themedSeparatorSurface('welcome to bijou', width, ctx, theme),
+    themedSeparatorSurface(dogfoodText(i18n, 'docs.separator.welcome', 'welcome to bijou'), width, ctx, theme),
     spacer(1, 1),
     intro,
     spacer(1, 1),
@@ -1337,10 +1504,11 @@ function renderStoryPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
+  i18n: I18nRuntime,
 ): Surface {
   const story = selectedStory(model);
   if (story == null) {
-    return renderEmptyStoryPane(width, ctx, theme);
+    return renderEmptyStoryPane(width, ctx, theme, i18n);
   }
 
   const profileIndex = findStoryProfileIndex(story, model.profileMode);
@@ -1442,30 +1610,47 @@ function renderVariantsPane(
   ]);
 }
 
-function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>): string {
+function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRuntime): string {
   const pageModel = model.pageModels[DOCS_PAGE_ID];
   if (pageModel == null || !pageModel.showHints) {
-    return DOCS_SHELL_HINT;
+    return dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
   }
 
   const focusedPane = model.focusedPaneByPage[DOCS_PAGE_ID];
   const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
+  const paneSwitch = dogfoodText(i18n, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
   const activeHint = (() => {
     switch (focusedPane) {
       case 'family-nav':
-        return `${DOCS_PANE_SWITCH_HINT} • ↑/↓ browse • Enter open • ←/→ collapse/expand`;
+        return dogfoodText(
+          i18n,
+          'docs.footer.family',
+          '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand',
+          { paneSwitch },
+        );
       case 'story-content':
-        return `${DOCS_PANE_SWITCH_HINT} • j/k scroll • d/u page • g/G top/bottom`;
+        return dogfoodText(
+          i18n,
+          'docs.footer.story',
+          '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom',
+          { paneSwitch },
+        );
       case 'story-variants':
         return story == null
-          ? DOCS_PANE_SWITCH_HINT
-          : `${DOCS_PANE_SWITCH_HINT} • ↑/↓ variant • ,/. cycle • 1-4 profiles`;
+          ? paneSwitch
+          : dogfoodText(
+            i18n,
+            'docs.footer.variants',
+            '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles',
+            { paneSwitch },
+          );
       default:
         return undefined;
     }
   })();
 
-  return activeHint == null ? DOCS_SHELL_HINT : `${DOCS_SHELL_HINT} • ${activeHint}`;
+  const shellHint = dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
+  return activeHint == null ? shellHint : `${shellHint} • ${activeHint}`;
 }
 
 function familyRowIndexAtPosition(
@@ -1527,13 +1712,14 @@ function resolveVariantPaneMouse(
   return index == null ? undefined : { type: 'select-variant', index };
 }
 
-function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerModel>, ExplorerMsg> {
+function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameModel<DocsExplorerModel>, ExplorerMsg> {
   return createFramedApp<DocsExplorerModel, ExplorerMsg>({
+    i18n,
     title: 'Bijou Docs',
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     globalKeys: explorerGlobalKeys,
-    helpLineSource: ({ model }) => buildDocsFooterHint(model),
+    helpLineSource: ({ model }) => buildDocsFooterHint(model, i18n),
     pages: [{
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
@@ -1590,7 +1776,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
           },
         ];
       },
-      searchTitle: 'Search components',
+      searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
       searchItems(model) {
         return COMPONENT_STORIES.map((story) => ({
           id: story.id,
@@ -1626,7 +1812,7 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
               paneId: 'story-content',
               focusedGutterToken: docsThemeFocusedGutterToken(theme),
               unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width) => renderStoryPane(model, width, ctx, theme),
+              render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
             },
             variants: {
               kind: 'pane',
@@ -1641,57 +1827,70 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
     }],
     enableCommandPalette: true,
     settings: ({ model, pageModel }) => ({
-      title: 'Settings',
       sections: [
         {
           id: 'shell',
-          title: 'Shell',
+          title: dogfoodText(i18n, 'settings.section.shell', 'Shell'),
           rows: [{
             id: 'show-hints',
-            label: 'Show hints',
-            description: 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.',
-            valueLabel: pageModel.showHints ? 'On' : 'Off',
+            label: dogfoodText(i18n, 'settings.showHints.label', 'Show hints'),
+            description: dogfoodText(i18n, 'settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
+            valueLabel: pageModel.showHints
+              ? dogfoodText(i18n, 'settings.showHints.on', 'On')
+              : dogfoodText(i18n, 'settings.showHints.off', 'Off'),
             checked: pageModel.showHints,
             kind: 'toggle',
             action: { type: 'toggle-hints' },
             feedback: {
-              title: 'Settings',
-              message: pageModel.showHints ? 'Show hints turned off.' : 'Show hints turned on.',
+              title: shellText(i18n, 'settings.title', 'Settings'),
+              message: pageModel.showHints
+                ? dogfoodText(i18n, 'settings.showHints.feedback.off', 'Show hints turned off.')
+                : dogfoodText(i18n, 'settings.showHints.feedback.on', 'Show hints turned on.'),
             },
           }],
         },
         {
           id: 'appearance',
-          title: 'Appearance',
+          title: dogfoodText(i18n, 'settings.section.appearance', 'Appearance'),
           rows: [
             {
               id: 'landing-theme',
-              label: 'Landing theme',
-              description: landingThemeSettingDescription(pageModel.landingThemeIndex),
+              label: dogfoodText(i18n, 'settings.landingTheme.label', 'Landing theme'),
+              description: landingThemeSettingDescription(pageModel.landingThemeIndex, i18n),
               valueLabel: landingThemeSettingValue(pageModel.landingThemeIndex),
               kind: 'choice',
               action: { type: 'cycle-landing-theme' },
               feedback: {
-                title: 'Settings',
-                message: `Landing theme set to ${landingThemeSettingValue(nextLandingThemeIndex(pageModel.landingThemeIndex, 1))}.`,
+                title: shellText(i18n, 'settings.title', 'Settings'),
+                message: dogfoodText(
+                  i18n,
+                  'settings.landingTheme.feedback',
+                  'Landing theme set to {theme}.',
+                  { theme: landingThemeSettingValue(nextLandingThemeIndex(pageModel.landingThemeIndex, 1)) },
+                ),
               },
             },
           ],
         },
         {
           id: 'landing',
-          title: 'Landing',
+          title: dogfoodText(i18n, 'settings.section.landing', 'Landing'),
           rows: [
             {
               id: 'landing-quality',
-              label: 'Landing quality',
-              description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode),
-              valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode),
+              label: dogfoodText(i18n, 'settings.landingQuality.label', 'Landing quality'),
+              description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode, i18n),
+              valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode, i18n),
               kind: 'choice',
               action: { type: 'cycle-landing-quality' },
               feedback: {
-                title: 'Settings',
-                message: `Landing quality set to ${landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode))}.`,
+                title: shellText(i18n, 'settings.title', 'Settings'),
+                message: dogfoodText(
+                  i18n,
+                  'settings.landingQuality.feedback',
+                  'Landing quality set to {quality}.',
+                  { quality: landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode), i18n) },
+                ),
               },
             },
           ],
@@ -1701,9 +1900,24 @@ function createDocsExplorerApp(ctx: BijouContext): App<FrameModel<DocsExplorerMo
   });
 }
 
-export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
-  const explorer = createDocsExplorerApp(ctx);
-  const renderLanding = createLandingRenderer(ctx);
+function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
+  const runtime = createI18nRuntime({
+    locale: options.locale ?? 'en',
+    direction: options.direction ?? 'ltr',
+    fallbackLocale: 'en',
+  });
+  runtime.loadCatalog(FRAME_I18N_CATALOG);
+  runtime.loadCatalog(DOGFOOD_I18N_CATALOG);
+  for (const catalog of options.extraI18nCatalogs ?? []) {
+    runtime.loadCatalog(catalog);
+  }
+  return runtime;
+}
+
+export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): App<RootModel, RootMsg> {
+  const i18n = createDocsI18nRuntime(options);
+  const explorer = createDocsExplorerApp(ctx, i18n);
+  const renderLanding = createLandingRenderer(ctx, i18n);
 
   function mapExplorer(cmds: Cmd<ExplorerMsg>[]): Cmd<RootMsg>[] {
     return mapCmds(cmds, (msg) => ({ type: 'docs', msg }));
@@ -1796,10 +2010,10 @@ export function createDocsApp(ctx: BijouContext): App<RootModel, RootMsg> {
             return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
           }
           if (msg.key === 'up') {
-            return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model))), []];
+            return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
           }
           if (msg.key === 'down') {
-            return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model))), []];
+            return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
           }
           if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
             return [applyLandingThemeSelection(model, Number(msg.key) - 1), []];

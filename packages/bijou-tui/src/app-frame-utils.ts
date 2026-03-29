@@ -14,6 +14,8 @@ import { createKeyMap, type KeyMap } from './keybindings.js';
 import type { BindingSource } from './help.js';
 import type { BindingInfo } from './keybindings.js';
 import { clipToWidth, visibleLength } from './viewport.js';
+import type { I18nRuntime } from '@flyingrobots/bijou-i18n';
+import { frameMessage } from './app-frame-i18n.js';
 
 /** Recursively collect all pane IDs from a layout tree in declaration order. */
 export function collectPaneIds(node: FrameLayoutNode): string[] {
@@ -120,47 +122,48 @@ export function mergeBindingSources(...sources: Array<BindingSource | undefined>
 
 /** Build the default key map for frame-level actions (tabs, panes, scroll, help '?', command palette 'ctrl+p'/':'). */
 export function createFrameKeyMap(
-  options: { readonly enableSettings?: boolean; readonly enableNotifications?: boolean } = {},
+  options: { readonly enableSettings?: boolean; readonly enableNotifications?: boolean; readonly i18n?: I18nRuntime } = {},
 ): KeyMap<FrameAction> {
+  const t = (id: string, fallback: string) => frameMessage(options.i18n, id, fallback);
   const keyMap = createKeyMap<FrameAction>()
     .group('Frame', (g) => g
-      .bind('?', 'Toggle help', { type: 'toggle-help' })
-      .bind('[', 'Previous tab', { type: 'prev-tab' })
-      .bind(']', 'Next tab', { type: 'next-tab' })
-      .bind('tab', 'Next pane', { type: 'next-pane' })
-      .bind('shift+tab', 'Previous pane', { type: 'prev-pane' })
-      .bind('/', 'Search', { type: 'open-search' })
-      .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
-      .bind(':', 'Open command palette', { type: 'open-palette' })
-      .bind('ctrl+m', 'Fold/unfold pane', { type: 'toggle-minimize' })
-      .bind('ctrl+f', 'Full-screen pane', { type: 'toggle-maximize' }),
+      .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' })
+      .bind('[', t('key.prevTab', 'Previous tab'), { type: 'prev-tab' })
+      .bind(']', t('key.nextTab', 'Next tab'), { type: 'next-tab' })
+      .bind('tab', t('key.nextPane', 'Next pane'), { type: 'next-pane' })
+      .bind('shift+tab', t('key.prevPane', 'Previous pane'), { type: 'prev-pane' })
+      .bind('/', t('key.search', 'Search'), { type: 'open-search' })
+      .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind(':', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind('ctrl+m', t('key.toggleMinimize', 'Fold/unfold pane'), { type: 'toggle-minimize' })
+      .bind('ctrl+f', t('key.toggleMaximize', 'Full-screen pane'), { type: 'toggle-maximize' }),
     )
     .group('Dock', (g) => g
-      .bind('ctrl+shift+up', 'Move pane up', { type: 'dock-up' })
-      .bind('ctrl+shift+down', 'Move pane down', { type: 'dock-down' })
-      .bind('ctrl+shift+left', 'Move pane left', { type: 'dock-left' })
-      .bind('ctrl+shift+right', 'Move pane right', { type: 'dock-right' }),
+      .bind('ctrl+shift+up', t('key.dockUp', 'Move pane up'), { type: 'dock-up' })
+      .bind('ctrl+shift+down', t('key.dockDown', 'Move pane down'), { type: 'dock-down' })
+      .bind('ctrl+shift+left', t('key.dockLeft', 'Move pane left'), { type: 'dock-left' })
+      .bind('ctrl+shift+right', t('key.dockRight', 'Move pane right'), { type: 'dock-right' }),
     )
     .group('Scroll', (g) => g
-      .bind('j', 'Scroll down', { type: 'scroll-down' })
-      .bind('k', 'Scroll up', { type: 'scroll-up' })
-      .bind('d', 'Page down', { type: 'page-down' })
-      .bind('u', 'Page up', { type: 'page-up' })
-      .bind('g', 'Top', { type: 'top' })
-      .bind('shift+g', 'Bottom', { type: 'bottom' })
-      .bind('h', 'Scroll left', { type: 'scroll-left' })
-      .bind('l', 'Scroll right', { type: 'scroll-right' }),
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'scroll-down' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'scroll-up' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'page-down' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'page-up' })
+      .bind('g', t('key.top', 'Top'), { type: 'top' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'bottom' })
+      .bind('h', t('key.scrollLeft', 'Scroll left'), { type: 'scroll-left' })
+      .bind('l', t('key.scrollRight', 'Scroll right'), { type: 'scroll-right' }),
     );
 
   if (options.enableSettings) {
     keyMap.group('Shell', (g) => g
-      .bind('ctrl+,', 'Settings', { type: 'toggle-settings' })
-      .bind('f2', 'Settings', { type: 'toggle-settings' }));
+      .bind('ctrl+,', t('key.settings', 'Settings'), { type: 'toggle-settings' })
+      .bind('f2', t('key.settings', 'Settings'), { type: 'toggle-settings' }));
   }
 
   if (options.enableNotifications) {
     keyMap.group('Shell', (g) => g
-      .bind('shift+n', 'Notifications', { type: 'toggle-notifications' }));
+      .bind('shift+n', t('key.notifications', 'Notifications'), { type: 'toggle-notifications' }));
   }
 
   return keyMap;

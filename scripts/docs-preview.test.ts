@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
-import { createDocsApp } from '../examples/docs/app.js';
+import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
+import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
 
@@ -44,6 +45,40 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
     text += '\n';
   }
   return text;
+}
+
+function withLocaleValues(
+  catalog: {
+    namespace: string;
+    entries: readonly {
+      key: { namespace: string; id: string };
+      kind: 'message' | 'resource' | 'data';
+      sourceLocale: string;
+      values: Readonly<Record<string, unknown>>;
+      fallbackValue?: unknown;
+    }[];
+  },
+  locale: string,
+  translate: (value: string, key: string) => string,
+) {
+  return {
+    namespace: catalog.namespace,
+    entries: catalog.entries.map((entry) => ({
+      ...entry,
+      values: Object.fromEntries(
+        Object.entries(entry.values).map(([lang, value]) => {
+          if (lang !== entry.sourceLocale || typeof value !== 'string') {
+            return [lang, value];
+          }
+          return [lang, value];
+        }).concat(
+          Object.entries(entry.values)
+            .filter(([lang, value]) => lang === entry.sourceLocale && typeof value === 'string')
+            .map(([, value]) => [locale, translate(value as string, entry.key.id)]),
+        ),
+      ),
+    })),
+  };
 }
 
 describe('docs preview app', () => {
@@ -96,6 +131,25 @@ describe('docs preview app', () => {
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
     expect(text).toMatch(/[█▓▒░·]/);
+  });
+
+  it('accepts localized shell and DOGFOOD catalogs for landing and onboarding copy', async () => {
+    const locale = 'qps-ploc';
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 40, refreshRate: 60 } });
+    const app = createDocsApp(ctx, {
+      locale,
+      direction: 'ltr',
+      extraI18nCatalogs: [
+        withLocaleValues(DOGFOOD_I18N_CATALOG, locale, (value) => pseudoLocalize(value)),
+        withLocaleValues(FRAME_I18N_CATALOG, locale, (value) => pseudoLocalize(value)),
+      ],
+    });
+
+    const landing = await runScript(app, [], { ctx });
+    expect(frameText(landing.frames.at(-1)!)).toContain(pseudoLocalize('Press [Enter]'));
+
+    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    expect(frameText(entered.frames.at(-1)!)).toContain(pseudoLocalize('What is Bijou?'));
   });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {
