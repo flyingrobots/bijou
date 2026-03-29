@@ -106,7 +106,6 @@ describe('docs preview app', () => {
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
-    const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const initial = await runScript(app, [], { ctx });
     const frame = initial.frames[0]!;
@@ -130,9 +129,9 @@ describe('docs preview app', () => {
     expect(footer).toContain('v4.0.0');
     expect(footer).toContain('73 fps • auto/full');
     expect(lines[0]).not.toContain('73 fps');
-    expect(text).toContain('docs coverage');
-    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
-    expect(text).toContain(`${coverage.percent}%`);
+    expect(text).not.toContain('Documentation coverage');
+    expect(text).toContain('DOGFOOD');
+    expect(text).toContain('Documentation Of Good');
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
@@ -505,6 +504,7 @@ describe('docs preview app', () => {
   it('shows a Bijou introduction and docs guide when no component is selected', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
+    const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     const frame = entered.frames[entered.frames.length - 1]!;
@@ -513,6 +513,9 @@ describe('docs preview app', () => {
 
     expect(text).toContain('What is Bijou?');
     expect(text).toContain('How to use these docs');
+    expect(text).toContain('Documentation coverage');
+    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
+    expect(text).toContain(`${coverage.percent}%`);
     expect(text).toContain('/ to search');
     expect(text).toContain('F2 for settings');
     expect(text).toContain('surface-native terminal UI framework');

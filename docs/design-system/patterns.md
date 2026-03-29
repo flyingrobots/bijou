@@ -227,6 +227,12 @@ Avoid when:
 - completion is unknown and the percentage would be fake
 - the work is so brief that the bar would only flicker
 
+Loading-screen rule:
+
+- a loading screen should show at most one progress bar
+- that bar must represent actual loading progress
+- do not use a progress bar on a title or splash screen unless the screen is truly a loading surface
+
 #### `spinnerFrame()` / `createSpinner()`
 
 Use when:

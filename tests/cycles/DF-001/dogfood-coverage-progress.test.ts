@@ -42,15 +42,15 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(coverage.referenceFamilies.some((family) => family.label === 'Overlay primitives')).toBe(true);
   });
 
-  it('shows the coverage ratio and percentage on the DOGFOOD landing screen', async () => {
+  it('shows the coverage ratio and percentage in the initial DOGFOOD docs content pane', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    const initial = await runScript(app, [], { ctx });
-    const text = frameText(initial.frames[0]!);
+    const entered = await runScript(app, [{ key: '\r' }], { ctx });
+    const text = frameText(entered.frames[entered.frames.length - 1]!);
 
-    expect(text).toContain('docs coverage');
+    expect(text).toContain('Documentation coverage');
     expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
     expect(text).toContain(`${coverage.percent}%`);
   });

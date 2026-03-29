@@ -12,7 +12,7 @@ Make DOGFOOD a truthful living guide to Bijou:
 
 This legend covers work like:
 
-- DOGFOOD landing honesty and progress signaling
+- DOGFOOD docs-pane honesty and progress signaling
 - docs-shell teaching quality
 - component-family story coverage growth
 - clearer progress tracking between shipped Bijou families and DOGFOOD stories

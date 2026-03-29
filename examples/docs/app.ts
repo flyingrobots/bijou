@@ -4,6 +4,7 @@ import {
   createSurface,
   lerp3,
   markdown,
+  progressBar,
   type PreferenceListTheme,
   separatorSurface,
   wrapToWidth,
@@ -106,9 +107,8 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
   entries: [
     dogfoodMessage('landing.prompt.enter', 'Press [Enter]'),
     dogfoodMessage('landing.footer.controls', 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue'),
-    dogfoodMessage('landing.coverage.summary', 'docs coverage • {documented}/{total} families'),
-    dogfoodMessage('landing.coverage.summary.compact', 'coverage • {documented}/{total}'),
-    dogfoodMessage('landing.coverage.percent', '{percent}%'),
+    dogfoodMessage('landing.dogfood.title', 'DOGFOOD'),
+    dogfoodMessage('landing.dogfood.expansion', 'Documentation Of Good Foundational Onboarding and Discovery'),
     dogfoodMessage('landing.quality.auto', 'Auto'),
     dogfoodMessage('landing.quality.quality', 'Quality'),
     dogfoodMessage('landing.quality.balanced', 'Balanced'),
@@ -127,6 +127,9 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
     dogfoodMessage('docs.empty.intro.body2', 'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.'),
     dogfoodMessage('docs.empty.guide.title', 'How to use these docs'),
+    dogfoodMessage('docs.empty.coverage.title', 'Documentation coverage'),
+    dogfoodMessage('docs.empty.coverage.body', 'DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time.'),
+    dogfoodMessage('docs.empty.coverage.status', '{documented}/{total} families • {percent}%'),
     dogfoodMessage('docs.empty.guide.step1', '1. Browse component families in the left lane.'),
     dogfoodMessage('docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.'),
     dogfoodMessage('docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.'),
@@ -270,7 +273,7 @@ const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerVersion: Surface;
 }>();
 const LANDING_FPS_BADGE_CACHE = new Map<string, Surface>();
-const LANDING_COVERAGE_SURFACE_CACHE = new Map<string, Surface>();
+const LANDING_DOGFOOD_PANEL_CACHE = new Map<string, Surface>();
 interface LandingFrameCache {
   key?: string;
   front?: Surface;
@@ -709,16 +712,14 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
-    const coverageSurface = getLandingCoverageSurface(
+    const dogfoodPanel = getLandingDogfoodPanel(
+      Math.max(28, Math.min(width - 8, 72)),
+      ctx,
       tokens,
-      DOGFOOD_DOCS_COVERAGE,
-      Math.max(24, Math.min(44, width - 8)),
       i18n,
     );
-
     const footerY = Math.max(0, height - 1);
-    const coverageY = Math.max(0, footerY - coverageSurface.height - 1);
-    const wordmarkY = Math.max(0, coverageY - wordmark.height - 1);
+    const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
     const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
     const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
     const promptY = promptMaxY >= promptMinY
@@ -727,7 +728,14 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
 
     blitCentered(surface, wordmark, wordmarkY);
     blitCentered(surface, staticSurfaces.promptLine, promptY);
-    blitCentered(surface, coverageSurface, coverageY);
+    const panelMinY = promptY + staticSurfaces.promptLine.height + 1;
+    const panelMaxY = wordmarkY - dogfoodPanel.height - 1;
+    if (panelMaxY >= panelMinY) {
+      blitCentered(surface, dogfoodPanel, Math.max(
+        panelMinY,
+        Math.min(Math.floor((panelMinY + panelMaxY) / 2), panelMaxY),
+      ));
+    }
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
     const footerBadgeX = Math.floor((width - fpsBadge.width) / 2);
@@ -1227,72 +1235,39 @@ function getLandingFpsBadge(
   return surface;
 }
 
-function getLandingCoverageSurface(
+function getLandingDogfoodPanel(
+  width: number,
+  ctx: BijouContext,
   tokens: LandingThemeTokens,
-  coverage: DogfoodDocsCoverage,
-  availableWidth: number,
   i18n?: I18nRuntime,
 ): Surface {
-  const summary = availableWidth >= 36
-    ? dogfoodText(
-        i18n,
-        'landing.coverage.summary',
-        'docs coverage • {documented}/{total} families',
-        {
-          documented: coverage.documentedFamilies,
-          total: coverage.totalFamilies,
-        },
-      )
-    : dogfoodText(
-        i18n,
-        'landing.coverage.summary.compact',
-        'coverage • {documented}/{total}',
-        {
-          documented: coverage.documentedFamilies,
-          total: coverage.totalFamilies,
-        },
-      );
-  const percentText = dogfoodText(i18n, 'landing.coverage.percent', '{percent}%', {
-    percent: coverage.percent,
-  });
-  const barWidth = Math.max(8, Math.min(24, availableWidth - percentText.length - 4));
-  const barText = `[${renderCoverageBar(barWidth, coverage.percent)}] ${percentText}`;
-  const key = `${tokens.id}:${coverage.documentedFamilies}:${coverage.totalFamilies}:${coverage.percent}:${availableWidth}:${summary}:${percentText}`;
-  const cached = LANDING_COVERAGE_SURFACE_CACHE.get(key);
+  const title = dogfoodText(i18n, 'landing.dogfood.title', 'DOGFOOD');
+  const expansion = dogfoodText(
+    i18n,
+    'landing.dogfood.expansion',
+    'Documentation Of Good Foundational Onboarding and Discovery',
+  );
+  const key = `${tokens.id}:${width}:${title}:${expansion}`;
+  const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
-  const surface = createTransparentTextSurface([
-    Array.from(summary),
-    Array.from(barText),
-  ], {
-    bg: tokens.background,
-    transparentSpaces: false,
-    fg: (x, y, char) => {
-      if (y === 0) {
-        return x < summary.indexOf('•') || !summary.includes('•')
-          ? tokens.footerStrongColor
-          : tokens.footerMutedColor;
-      }
-      if (char === '█') return tokens.promptAccentColor;
-      if (char === '·') return tokens.footerMutedColor;
-      if (char === '[' || char === ']') return tokens.footerMutedColor;
-      return tokens.footerStrongColor;
+  const body = createTransparentTextSurface(
+    wrapToWidth(expansion, Math.max(18, width - 4)).join('\n'),
+    {
+      bg: tokens.background,
+      transparentSpaces: false,
+      fg: tokens.footerStrongColor,
+      modifiers: DIM_MODIFIERS,
     },
-    modifiers: (x, y, char) => {
-      if (y === 0) {
-        return x < summary.indexOf('•') || !summary.includes('•') ? BOLD_MODIFIERS : DIM_MODIFIERS;
-      }
-      if (char === '█') return BOLD_MODIFIERS;
-      return DIM_MODIFIERS;
-    },
+  );
+  const surface = boxSurface(body, {
+    title,
+    width,
+    borderToken: { hex: tokens.footerMutedColor },
+    ctx,
   });
-  LANDING_COVERAGE_SURFACE_CACHE.set(key, surface);
+  LANDING_DOGFOOD_PANEL_CACHE.set(key, surface);
   return surface;
-}
-
-function renderCoverageBar(width: number, percent: number): string {
-  const filled = Math.max(0, Math.min(width, Math.round((clamp01(percent / 100)) * width)));
-  return `${'█'.repeat(filled)}${'·'.repeat(Math.max(0, width - filled))}`;
 }
 
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
@@ -1568,6 +1543,7 @@ function renderEmptyStoryPane(
   i18n: I18nRuntime,
 ): Surface {
   const bodyWidth = Math.max(28, width - 6);
+  const coverageBarWidth = Math.max(16, Math.min(40, bodyWidth - 8));
   const intro = boxSurface(column([
     paragraphSurface(
       dogfoodText(
@@ -1593,6 +1569,43 @@ function renderEmptyStoryPane(
     ctx,
   });
 
+  const coverage = boxSurface(column([
+    paragraphSurface(
+      dogfoodText(
+        i18n,
+        'docs.empty.coverage.body',
+        'DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time.',
+        {
+          documented: DOGFOOD_DOCS_COVERAGE.documentedFamilies,
+          total: DOGFOOD_DOCS_COVERAGE.totalFamilies,
+        },
+      ),
+      Math.max(24, bodyWidth - 2),
+    ),
+    spacer(),
+    contentSurface(progressBar(DOGFOOD_DOCS_COVERAGE.percent, {
+      width: coverageBarWidth,
+      showPercent: true,
+      ctx,
+    })),
+    spacer(),
+    line(dogfoodText(
+      i18n,
+      'docs.empty.coverage.status',
+      '{documented}/{total} families • {percent}%',
+      {
+        documented: DOGFOOD_DOCS_COVERAGE.documentedFamilies,
+        total: DOGFOOD_DOCS_COVERAGE.totalFamilies,
+        percent: DOGFOOD_DOCS_COVERAGE.percent,
+      },
+    )),
+  ]), {
+    title: dogfoodText(i18n, 'docs.empty.coverage.title', 'Documentation coverage'),
+    width: Math.max(24, width - 1),
+    borderToken: docsThemeBorderToken(theme),
+    ctx,
+  });
+
   const guide = boxSurface(column([
     line(dogfoodText(i18n, 'docs.empty.guide.step1', '1. Browse component families in the left lane.')),
     line(dogfoodText(i18n, 'docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.')),
@@ -1610,6 +1623,8 @@ function renderEmptyStoryPane(
     themedSeparatorSurface(dogfoodText(i18n, 'docs.separator.welcome', 'welcome to bijou'), width, ctx, theme),
     spacer(1, 1),
     intro,
+    spacer(1, 1),
+    coverage,
     spacer(1, 1),
     guide,
   ]);
