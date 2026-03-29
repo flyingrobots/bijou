@@ -64,6 +64,7 @@ import {
   type ComponentStory,
   type StoryMode,
 } from '../_stories/protocol.js';
+import { resolveDogfoodDocsCoverage, type DogfoodDocsCoverage } from './coverage.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -105,6 +106,9 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
   entries: [
     dogfoodMessage('landing.prompt.enter', 'Press [Enter]'),
     dogfoodMessage('landing.footer.controls', 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue'),
+    dogfoodMessage('landing.coverage.summary', 'docs coverage • {documented}/{total} families'),
+    dogfoodMessage('landing.coverage.summary.compact', 'coverage • {documented}/{total}'),
+    dogfoodMessage('landing.coverage.percent', '{percent}%'),
     dogfoodMessage('landing.quality.auto', 'Auto'),
     dogfoodMessage('landing.quality.quality', 'Quality'),
     dogfoodMessage('landing.quality.balanced', 'Balanced'),
@@ -255,6 +259,7 @@ interface LandingQualityProfile {
 type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
+const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
 const DIM_MODIFIERS = ['dim'];
@@ -265,6 +270,7 @@ const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
   readonly footerVersion: Surface;
 }>();
 const LANDING_FPS_BADGE_CACHE = new Map<string, Surface>();
+const LANDING_COVERAGE_SURFACE_CACHE = new Map<string, Surface>();
 interface LandingFrameCache {
   key?: string;
   front?: Surface;
@@ -703,9 +709,16 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
+    const coverageSurface = getLandingCoverageSurface(
+      tokens,
+      DOGFOOD_DOCS_COVERAGE,
+      Math.max(24, Math.min(44, width - 8)),
+      i18n,
+    );
 
     const footerY = Math.max(0, height - 1);
-    const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
+    const coverageY = Math.max(0, footerY - coverageSurface.height - 1);
+    const wordmarkY = Math.max(0, coverageY - wordmark.height - 1);
     const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
     const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
     const promptY = promptMaxY >= promptMinY
@@ -714,6 +727,7 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
 
     blitCentered(surface, wordmark, wordmarkY);
     blitCentered(surface, staticSurfaces.promptLine, promptY);
+    blitCentered(surface, coverageSurface, coverageY);
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
     const footerBadgeX = Math.floor((width - fpsBadge.width) / 2);
@@ -1211,6 +1225,74 @@ function getLandingFpsBadge(
   });
   LANDING_FPS_BADGE_CACHE.set(key, surface);
   return surface;
+}
+
+function getLandingCoverageSurface(
+  tokens: LandingThemeTokens,
+  coverage: DogfoodDocsCoverage,
+  availableWidth: number,
+  i18n?: I18nRuntime,
+): Surface {
+  const summary = availableWidth >= 36
+    ? dogfoodText(
+        i18n,
+        'landing.coverage.summary',
+        'docs coverage • {documented}/{total} families',
+        {
+          documented: coverage.documentedFamilies,
+          total: coverage.totalFamilies,
+        },
+      )
+    : dogfoodText(
+        i18n,
+        'landing.coverage.summary.compact',
+        'coverage • {documented}/{total}',
+        {
+          documented: coverage.documentedFamilies,
+          total: coverage.totalFamilies,
+        },
+      );
+  const percentText = dogfoodText(i18n, 'landing.coverage.percent', '{percent}%', {
+    percent: coverage.percent,
+  });
+  const barWidth = Math.max(8, Math.min(24, availableWidth - percentText.length - 4));
+  const barText = `[${renderCoverageBar(barWidth, coverage.percent)}] ${percentText}`;
+  const key = `${tokens.id}:${coverage.documentedFamilies}:${coverage.totalFamilies}:${coverage.percent}:${availableWidth}:${summary}:${percentText}`;
+  const cached = LANDING_COVERAGE_SURFACE_CACHE.get(key);
+  if (cached) return cached;
+
+  const surface = createTransparentTextSurface([
+    Array.from(summary),
+    Array.from(barText),
+  ], {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: (x, y, char) => {
+      if (y === 0) {
+        return x < summary.indexOf('•') || !summary.includes('•')
+          ? tokens.footerStrongColor
+          : tokens.footerMutedColor;
+      }
+      if (char === '█') return tokens.promptAccentColor;
+      if (char === '·') return tokens.footerMutedColor;
+      if (char === '[' || char === ']') return tokens.footerMutedColor;
+      return tokens.footerStrongColor;
+    },
+    modifiers: (x, y, char) => {
+      if (y === 0) {
+        return x < summary.indexOf('•') || !summary.includes('•') ? BOLD_MODIFIERS : DIM_MODIFIERS;
+      }
+      if (char === '█') return BOLD_MODIFIERS;
+      return DIM_MODIFIERS;
+    },
+  });
+  LANDING_COVERAGE_SURFACE_CACHE.set(key, surface);
+  return surface;
+}
+
+function renderCoverageBar(width: number, percent: number): string {
+  const filled = Math.max(0, Math.min(width, Math.round((clamp01(percent / 100)) * width)));
+  return `${'█'.repeat(filled)}${'·'.repeat(Math.max(0, width - filled))}`;
 }
 
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {

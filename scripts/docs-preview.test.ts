@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
+import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
+import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
@@ -104,6 +106,7 @@ describe('docs preview app', () => {
   it('renders the landing page with the animated title treatment and minimal entry copy', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 200, rows: 60, refreshRate: 73 } });
     const app = createDocsApp(ctx);
+    const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     const initial = await runScript(app, [], { ctx });
     const frame = initial.frames[0]!;
@@ -127,6 +130,9 @@ describe('docs preview app', () => {
     expect(footer).toContain('v4.0.0');
     expect(footer).toContain('73 fps • auto/full');
     expect(lines[0]).not.toContain('73 fps');
+    expect(text).toContain('docs coverage');
+    expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
+    expect(text).toContain(`${coverage.percent}%`);
     expect(text).toContain('8""""');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');

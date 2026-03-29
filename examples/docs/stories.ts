@@ -17,6 +17,10 @@ import {
   type ComponentStory,
 } from '../_stories/protocol.js';
 
+export interface DogfoodComponentStory<State = void> extends ComponentStory<State> {
+  readonly coverageFamilyIds: readonly string[];
+}
+
 function modalBackdrop(width: number, ctx: BijouContext): Surface {
   const innerWidth = Math.max(28, width - 4);
   const content = textSurface([
@@ -73,10 +77,11 @@ const LONG_DOCUMENT = [
   'prove clipping, masking, and scroll-state behavior without a separate demo.',
 ].join('\n');
 
-export const COMPONENT_STORIES: readonly ComponentStory[] = [
+export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   {
     kind: 'component',
     id: 'alert',
+    coverageFamilyIds: ['in-flow-status-block'],
     family: 'Status and in-flow feedback',
     title: 'alert()',
     package: 'bijou',
@@ -136,6 +141,7 @@ export const COMPONENT_STORIES: readonly ComponentStory[] = [
   {
     kind: 'component',
     id: 'modal',
+    coverageFamilyIds: ['overlay-primitives'],
     family: 'Overlays and interruption',
     title: 'modal()',
     package: 'bijou-tui',
@@ -221,6 +227,7 @@ export const COMPONENT_STORIES: readonly ComponentStory[] = [
   {
     kind: 'component',
     id: 'viewport-surface',
+    coverageFamilyIds: ['viewport-masking-and-scrollable-inspection-panes'],
     family: 'Masking and overflow',
     title: 'viewportSurface()',
     package: 'bijou-tui',
