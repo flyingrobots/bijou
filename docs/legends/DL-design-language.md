@@ -54,6 +54,6 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 
 ## Current cycle and backlog
 
-- latest completed cycle: [DL-002 — Canonicalize Patterns and Blocks](/Users/james/git/bijou/docs/design/DL-002-canonicalize-patterns-and-blocks.md)
+- latest completed cycle: [DL-003 — Prove Canonical Patterns in Shared Surfaces](/Users/james/git/bijou/docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md)
 - backlog:
-  - [DL-003 — Prove Canonical Patterns in Shared Surfaces](/Users/james/git/bijou/docs/BACKLOG/DL-003-prove-canonical-patterns-in-shared-surfaces.md)
+  - [DL-004 — Prove Drawer Rhythm and Notice Rows](/Users/james/git/bijou/docs/BACKLOG/DL-004-prove-drawer-rhythm-and-notice-rows.md)

@@ -167,6 +167,16 @@ describe('browsableList', () => {
       expect(rendered).not.toContain('Cherry');
     });
 
+    it('uses canonical full-row selection and one-cell inset in the surface path', () => {
+      const themedCtx = createTestContext({ mode: 'interactive' });
+      const state = createBrowsableListState({ items, height: 2 });
+      const surface = browsableListSurface(state, { width: 24, ctx: themedCtx });
+
+      expect(surface.get(0, 0).bg).toBe(themedCtx.surface('elevated').bg);
+      expect(surface.get(1, 0).char).toBe('\u25b8');
+      expect(surface.get(0, 1).bg).not.toBe(themedCtx.surface('elevated').bg);
+    });
+
     it('surface path follows the shared scroll window', () => {
       let state = createBrowsableListState({ items, height: 2 });
       state = listFocusNext(state);

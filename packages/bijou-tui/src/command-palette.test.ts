@@ -345,6 +345,19 @@ describe('commandPalette render', () => {
     expect(lines[2]).toContain('Save');
   });
 
+  it('uses canonical inset rhythm and full-row selection in the surface path', () => {
+    const interactiveCtx = createTestContext({ mode: 'interactive' });
+    const surface = commandPaletteSurface(
+      createCommandPaletteState(items, 2),
+      { width: 40, ctx: interactiveCtx },
+    );
+
+    expect(surface.get(0, 0).char).toBe(' ');
+    expect(surface.get(1, 0).char).toBe('>');
+    expect(surface.get(0, 1).bg).toBe(interactiveCtx.surface('elevated').bg);
+    expect(surface.get(1, 1).char).toBe('\u25b8');
+  });
+
   it('surface path follows the shared viewport scroll window', () => {
     let state = createCommandPaletteState(items, 2);
     state = cpFocusNext(state);

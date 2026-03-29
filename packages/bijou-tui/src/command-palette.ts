@@ -20,10 +20,11 @@
  * ```
  */
 
-import { parseAnsiToSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 import { clipToWidth, viewportSurface } from './viewport.js';
 import { vstackSurface } from './surface-layout.js';
+import { collectionRowsSurface, insetLineSurface } from './collection-surface.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -325,11 +326,16 @@ export function commandPaletteSurface(
 ): Surface {
   const width = Math.max(1, options.width);
   const itemLines = renderCommandPaletteLines(state, options);
-  const searchSurface = parseAnsiToSurface(clipToWidth(`> ${state.query}`, width), width, 1);
+  const searchSurface = insetLineSurface(clipToWidth(`> ${state.query}`, width), width);
+  const content = collectionRowsSurface(itemLines, {
+    width,
+    selectedRowIndex: state.filteredItems.length === 0 ? undefined : state.focusIndex,
+    ctx: options.ctx,
+  });
   const listSurface = viewportSurface({
     width,
     height: Math.max(1, state.height),
-    content: itemLines.join('\n'),
+    content,
     scrollY: state.scrollY,
     showScrollbar: options.showScrollbar ?? false,
   });

@@ -24,6 +24,7 @@
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 import { viewportSurface, visibleLength } from './viewport.js';
+import { collectionRowsSurface } from './collection-surface.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -193,11 +194,16 @@ function adjustScroll(focusIndex: number, scrollY: number, height: number, total
 function renderBrowsableListLines<T>(
   state: BrowsableListState<T>,
   indicator: string,
+  ctx?: BijouContext,
 ): string[] {
   const pad = ' '.repeat(indicator.length);
   return state.items.map((item, index) => {
     const prefix = index === state.focusIndex ? indicator : pad;
-    const desc = item.description ? ` \u2014 ${item.description}` : '';
+    const desc = item.description == null
+      ? ''
+      : ctx
+        ? ` ${ctx.style.styled(ctx.semantic('muted'), `\u2014 ${item.description}`)}`
+        : ` \u2014 ${item.description}`;
     return `${prefix} ${item.label}${desc}`;
   });
 }
@@ -224,7 +230,7 @@ export function browsableList<T>(
   if (state.items.length === 0) return '';
 
   const indicator = options?.focusIndicator ?? '\u25b8';
-  return renderBrowsableListLines(state, indicator)
+  return renderBrowsableListLines(state, indicator, options?.ctx)
     .slice(state.scrollY, state.scrollY + state.height)
     .join('\n');
 }
@@ -245,7 +251,7 @@ export function browsableListSurface<T>(
   options?: BrowsableListSurfaceOptions,
 ): Surface {
   const indicator = options?.focusIndicator ?? '\u25b8';
-  const lines = renderBrowsableListLines(state, indicator);
+  const lines = renderBrowsableListLines(state, indicator, options?.ctx);
   const width = Math.max(
     1,
     options?.width ?? 0,
@@ -256,10 +262,16 @@ export function browsableListSurface<T>(
     return createSurface(width, Math.max(1, state.height));
   }
 
+  const content = collectionRowsSurface(lines, {
+    width,
+    selectedRowIndex: state.focusIndex,
+    ctx: options?.ctx,
+  });
+
   return viewportSurface({
     width,
     height: Math.max(1, state.height),
-    content: lines.join('\n'),
+    content,
     scrollY: state.scrollY,
     showScrollbar: options?.showScrollbar ?? false,
   });
