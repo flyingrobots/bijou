@@ -7,7 +7,6 @@
 
 import {
   createSurface,
-  parseAnsiToSurface,
   preferenceListSurface,
   type PreferenceListTheme,
   resolvePreferenceRowLayout,
@@ -68,7 +67,8 @@ import {
   hitTestNotificationStack,
   notificationsNeedTick,
   pushNotification,
-  renderNotificationHistory,
+  renderNotificationHistorySurface,
+  renderNotificationReviewEntrySurface,
   renderNotificationStack,
   tickNotifications,
   trimNotificationsToViewport,
@@ -77,6 +77,8 @@ import {
   type NotificationState,
   type NotificationTone,
 } from './notification.js';
+import { insetLineSurface } from './collection-surface.js';
+import { vstackSurface } from './surface-layout.js';
 
 // Internal modules
 import type {
@@ -2092,48 +2094,39 @@ function renderNotificationCenterSurface<Msg>(
   i18n?: I18nRuntime,
 ): Surface {
   const ctx = resolveSafeCtx() ?? undefined;
-  const lines: string[] = [
-    `Live: ${center.state.items.length} • Archived: ${center.state.history.length}`,
-    `Filter: ${frameNotificationFilterLabel(i18n, center.activeFilter)}`,
+  const rows: Surface[] = [
+    insetLineSurface(`Live: ${center.state.items.length} • Archived: ${center.state.history.length}`, width),
+    insetLineSurface(`Filter: ${frameNotificationFilterLabel(i18n, center.activeFilter)}`, width),
   ];
 
-  if (center.state.items.length > 0) {
-    lines.push('', 'Current stack');
-    for (const item of [...center.state.items].sort(
-      (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
-    )) {
-      lines.push(
-        ...wrapNotificationCenterLine(`[${item.tone}] ${item.title}`, width),
-      );
-      if (item.message.length > 0) {
-        lines.push(...wrapNotificationCenterLine(item.message, width));
-      }
-      if (item.action != null) {
-        lines.push(...wrapNotificationCenterLine(`Action: ${item.action.label}`, width));
-      }
-      lines.push(...wrapNotificationCenterLine(`${item.variant} • live`, width), '');
+  const liveItems = [...center.state.items].sort(
+    (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
+  );
+
+  if (liveItems.length > 0) {
+    rows.push(createSurface(width, 1));
+    rows.push(insetLineSurface(
+      ctx == null ? 'Current stack' : ctx.style.bold('Current stack'),
+      width,
+    ));
+    rows.push(createSurface(width, 1));
+    for (let index = 0; index < liveItems.length; index++) {
+      rows.push(renderNotificationReviewEntrySurface(liveItems[index]!, {
+        width,
+        ctx,
+        metaLabel: `${liveItems[index]!.variant} • live`,
+      }));
+      if (index < liveItems.length - 1) rows.push(createSurface(width, 1));
     }
   }
 
-  lines.push('', renderNotificationHistory(center.state, {
+  rows.push(createSurface(width, 1));
+  rows.push(renderNotificationHistorySurface(center.state, {
     width,
     height: Number.MAX_SAFE_INTEGER,
     filter: center.activeFilter,
     ctx,
   }));
 
-  const content = lines.join('\n').replace(/\n{3,}/g, '\n\n');
-  const lineCount = Math.max(1, content.split('\n').length);
-  return parseAnsiToSurface(content, width, lineCount);
-}
-
-function wrapNotificationCenterLine(text: string, width: number): readonly string[] {
-  const safeWidth = Math.max(1, width);
-  const lines: string[] = [];
-  let start = 0;
-  while (start < text.length) {
-    lines.push(text.slice(start, start + safeWidth));
-    start += safeWidth;
-  }
-  return lines.length === 0 ? [''] : lines;
+  return vstackSurface(...rows);
 }

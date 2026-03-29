@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { surfaceToString } from '@flyingrobots/bijou';
 import { stripAnsi } from './viewport.js';
 import {
   activateFocusedNotification,
@@ -12,6 +13,7 @@ import {
   notificationsNeedTick,
   pushNotification,
   renderNotificationHistory,
+  renderNotificationHistorySurface,
   renderNotificationStack,
   trimNotificationsToViewport,
   tickNotifications,
@@ -215,6 +217,39 @@ describe('notification state', () => {
     expect(stripAnsi(body)).toContain('History • All • 2-2 of 3');
     expect(stripAnsi(body)).toContain('Archived 2');
     expect(stripAnsi(body)).not.toContain('Archived 3');
+  });
+
+  it('renders archived notification history as inset review rows in the surface path', () => {
+    let state = createNotificationState<Msg>();
+    state = pushNotification(state, {
+      title: 'Archived action',
+      message: 'Needs follow-up.',
+      variant: 'ACTIONABLE',
+      tone: 'ERROR',
+      durationMs: null,
+      action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
+    }, 0);
+
+    state = tickNotifications(state, 250);
+    state = dismissNotification(state, state.items[0]!.id, 300);
+    state = tickNotifications(state, 900);
+
+    const ctx = createTestContext({ mode: 'interactive' });
+    const surface = renderNotificationHistorySurface(state, {
+      width: 34,
+      height: 8,
+      filter: 'ALL',
+      ctx,
+    });
+    const lines = stripAnsi(surfaceToString(surface, ctx.style)).split('\n');
+    const titleLine = lines.findIndex((line) => line.includes('Archived action'));
+    const metaLine = lines.findIndex((line) => line.includes('ACTIONABLE'));
+    const actionLine = lines.findIndex((line) => line.includes('Retry deploy'));
+
+    expect(titleLine).toBeGreaterThan(1);
+    expect(lines[titleLine]!.indexOf('Archived action')).toBeGreaterThan(0);
+    expect(metaLine).toBe(titleLine + 1);
+    expect(actionLine).toBeGreaterThan(metaLine);
   });
 });
 

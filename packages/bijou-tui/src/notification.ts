@@ -14,6 +14,7 @@ import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
 import { resolveNotificationGap, resolveOverlayMargin } from './design-language.js';
+import { vstackSurface } from './surface-layout.js';
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
 export type NotificationTone = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
@@ -96,6 +97,12 @@ export interface RenderNotificationHistoryOptions {
   readonly scroll?: number;
   readonly filter?: NotificationHistoryFilter;
   readonly ctx?: BijouContext;
+}
+
+export interface RenderNotificationReviewEntrySurfaceOptions {
+  readonly width: number;
+  readonly ctx?: BijouContext;
+  readonly metaLabel?: string;
 }
 
 export type NotificationMouseTargetKind = 'dismiss' | 'action' | 'body';
@@ -258,6 +265,99 @@ export function renderNotificationHistory<Msg>(
     '',
     ...bodyLines,
   ].join('\n');
+}
+
+export function renderNotificationReviewEntrySurface<Msg>(
+  item: NotificationRecord<Msg>,
+  options: RenderNotificationReviewEntrySurfaceOptions,
+): Surface {
+  const safeWidth = Math.max(1, options.width);
+  const ctx = options.ctx;
+  const meta = options.metaLabel ?? `${formatTimeLabel(item.createdAtMs)} • ${item.variant} • ${item.placement}`;
+  const mutedStyle = tokenToCellStyle(ctx?.semantic('muted'));
+  const toneStyle = tokenToCellStyle(ctx?.semantic(toneSemanticKey(item.tone)));
+  const titleStyle = withModifiers({}, ['bold']);
+  const rows: Surface[] = [];
+
+  rows.push(...renderInsetWrappedSurface(createSegmentSurface([
+    { text: `[${item.tone}]`, style: toneStyle },
+    { text: ' ' },
+    { text: item.title, style: titleStyle },
+  ]), safeWidth));
+
+  rows.push(...renderInsetWrappedSurface(createSegmentSurface([
+    { text: meta, style: mutedStyle },
+  ]), safeWidth));
+
+  if (item.message.length > 0) {
+    rows.push(...renderInsetWrappedSurface(createSegmentSurface([
+      { text: item.message, style: mutedStyle },
+    ]), safeWidth));
+  }
+
+  if (item.action != null) {
+    rows.push(...renderInsetWrappedSurface(createSegmentSurface([
+      { text: `Action: ${item.action.label}`, style: mutedStyle },
+    ]), safeWidth));
+  }
+
+  return rows.length === 0 ? createBlankLineSurface(safeWidth) : vstackSurface(...rows);
+}
+
+export function renderNotificationHistorySurface<Msg>(
+  state: NotificationState<Msg>,
+  options: RenderNotificationHistoryOptions,
+): Surface {
+  const safeWidth = Math.max(1, options.width);
+  const safeHeight = Math.max(3, options.height);
+  const filter = options.filter ?? 'ALL';
+  const filtered = state.history.filter((item) => matchesHistoryFilter(item, filter));
+  const maxBodyLines = Math.max(1, safeHeight - 2);
+  const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
+
+  const rows: Surface[] = [
+    ...renderInsetWrappedSurface(createSegmentSurface([
+      { text: filtered.length === 0
+        ? `History • ${filterLabel(filter)} • 0 items`
+        : `History • ${filterLabel(filter)} • ${start + 1}-${Math.min(filtered.length, start + 1)} of ${filtered.length}`,
+        style: withModifiers({}, ['bold']) },
+    ]), safeWidth),
+    createBlankLineSurface(safeWidth),
+  ];
+
+  if (filtered.length === 0) {
+    rows.push(...renderInsetWrappedSurface(createSegmentSurface([{
+      text: `No archived notifications for ${filterLabel(filter)} yet.`,
+      style: tokenToCellStyle(options.ctx?.semantic('muted')),
+    }]), safeWidth));
+    return vstackSurface(...rows);
+  }
+
+  let bodyLines = 0;
+  let end = start;
+  for (const item of filtered.slice(start)) {
+    const entry = renderNotificationReviewEntrySurface(item, { width: safeWidth, ctx: options.ctx });
+    const remaining = maxBodyLines - bodyLines;
+    if (remaining <= 0) break;
+    if (bodyLines > 0) {
+      if (remaining <= 1) break;
+      rows.push(createBlankLineSurface(safeWidth));
+      bodyLines += 1;
+    }
+    const clipped = clipSurfaceHeight(entry, maxBodyLines - bodyLines);
+    rows.push(clipped);
+    bodyLines += clipped.height;
+    end += 1;
+    if (clipped.height < entry.height || bodyLines >= maxBodyLines) break;
+  }
+
+  // Rewrite header with the actual rendered end range.
+  rows[0] = renderInsetWrappedSurface(createSegmentSurface([
+    { text: `History • ${filterLabel(filter)} • ${start + 1}-${Math.max(start + 1, end)} of ${filtered.length}`,
+      style: withModifiers({}, ['bold']) },
+  ]), safeWidth)[0]!;
+
+  return vstackSurface(...rows);
 }
 
 function defaultDurationMs(variant: NotificationVariant): number | null {
@@ -606,6 +706,30 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
 
 function createBlankLineSurface(width: number): Surface {
   return createSurface(Math.max(0, width), 1);
+}
+
+function insetContentSurface(surface: Surface, width: number): Surface {
+  const safeWidth = Math.max(1, width);
+  const inset = safeWidth >= 3 ? 1 : 0;
+  const innerWidth = Math.max(1, safeWidth - (inset * 2));
+  const result = createSurface(safeWidth, surface.height);
+  result.blit(surface, inset, 0, 0, 0, innerWidth, surface.height);
+  return result;
+}
+
+function renderInsetWrappedSurface(lineSurface: Surface, width: number): readonly Surface[] {
+  const safeWidth = Math.max(1, width);
+  const inset = safeWidth >= 3 ? 1 : 0;
+  const innerWidth = Math.max(1, safeWidth - (inset * 2));
+  return standaloneRows(lineSurface, innerWidth, 'wrap').map((row) => insetContentSurface(row, safeWidth));
+}
+
+function clipSurfaceHeight(surface: Surface, height: number): Surface {
+  const safeHeight = Math.max(0, height);
+  if (surface.height <= safeHeight) return surface;
+  const clipped = createSurface(surface.width, safeHeight);
+  clipped.blit(surface, 0, 0, 0, 0, surface.width, safeHeight);
+  return clipped;
 }
 
 function fitLineSurface(surface: Surface, width: number): Surface {
