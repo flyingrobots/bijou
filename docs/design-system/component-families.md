@@ -314,6 +314,40 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - tile / contained section
 
+### Explainability walkthroughs
+
+- Family: `explainability()`
+- Variants:
+  - visible provenance label
+  - rationale, evidence, next-action, and governance sections
+  - confidence and source metadata
+- Use when:
+  - AI-mediated or machine-assisted output needs explicit explanation instead of decorative summary
+  - the user needs one calm guided-flow surface that separates recommendation from supporting evidence
+  - the next action matters more than conversational prose
+- Avoid when:
+  - the content is just a generic status or note with no recommendation/evidence structure
+  - the app needs a full multi-step wizard or inspector panel instead of one explainability surface
+  - the app is hiding service latency or speculative output behind an authoritative-looking card
+- Content guidance:
+  - keep the title as the recommendation or explanation itself, not a vague marketing headline
+  - make `[AI]` or equivalent provenance visible
+  - separate rationale, evidence, and next action into distinct sections instead of mixing them together
+  - governance text should clarify review posture without becoming the dominant content
+- Ownership:
+  - core
+- Graceful lowering:
+  - rich/static: preserve section rhythm and explicit provenance inside one calm grouped surface
+  - pipe: lower to labeled plain-text sections with one obvious next action
+  - accessible: linearize the same fields explicitly with no dependence on borders, color, or layout
+- Related families:
+  - `note()`
+  - `alert()`
+  - `stepper()`
+  - `timeline()`
+- Carbon analogue:
+  - no exact analogue; closest to an explainability panel or guided recommendation card
+
 ### Formatted documents and prose
 
 - Family: `markdown()`

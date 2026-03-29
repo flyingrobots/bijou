@@ -98,6 +98,8 @@ This should compose:
 - stepper or timeline language
 - explicit next actions
 
+DL-005 now proves the first canonical seam in this family through `explainability()`, which turns the AI explainability doctrine into a structured guided-flow surface instead of leaving it as prose only.
+
 ### Inspector panel
 
 An inspector-style side panel is another strong candidate because it naturally combines:

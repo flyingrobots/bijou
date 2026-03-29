@@ -52,6 +52,8 @@ The user should not have to infer that a suggestion, explanation, or summary cam
 
 That marker should be part of a canonical explainability component/pattern, not a one-off badge.
 
+DL-005 establishes that first concrete seam through `explainability()`.
+
 ### 2. Explain why
 
 AI output should include or make available:
