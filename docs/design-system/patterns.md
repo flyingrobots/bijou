@@ -4,6 +4,95 @@ This document defines the recurring product patterns that Bijou should support c
 
 These are the decision frameworks behind the component families.
 
+## 0. Selection, focus, and rhythm
+
+### The pattern
+
+Bijou should make it obvious:
+
+- which item is currently selected
+- which region currently owns input
+- which copy is primary versus supporting
+- how dense content is meant to breathe
+
+These decisions should not be improvised per surface.
+
+### Canonical rules
+
+#### Background fill means current selection
+
+Use background fill to indicate the current selected row or item inside a collection.
+
+Why:
+
+- it reads immediately in dense TUIs
+- it does not depend on one tiny pointer glyph
+- it survives better than hue-only emphasis when terminals differ
+
+Selection may also use supporting cues such as:
+
+- a leading chevron
+- bold value text
+- a stronger border inside the selected row
+
+But those are supporting cues. The canonical selected-item treatment is still background fill.
+
+#### Structural accent means active region
+
+Use a structural accent such as a gutter, border emphasis, or region frame to show the active region.
+
+Why:
+
+- region focus and row selection are not the same thing
+- a pane can be active while its selected row changes
+- a selected row can exist inside an inactive region without stealing shell ownership
+
+The accent should describe ownership of input, not merely visual importance.
+
+#### Visible controls are a promise
+
+Follow [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md).
+
+If a region is not active, its controls should not be advertised as though they will work.
+
+When the shell owns focus, shell controls replace pane-local cues.
+
+#### One cell of padding matters
+
+Dense TUIs still need rhythm.
+
+Canonical defaults:
+
+- one cell of padding between content and region edges
+- one blank line between titled sections
+- one blank line between preference rows or similar stacked interactive rows when the surface can afford it
+
+Do not cram labels, values, and descriptions together when one cell of space would make the surface easier to parse.
+
+#### Stack beneath the label before truncating
+
+When labels and values compete for the same horizontal space:
+
+- wrap or stack first
+- reflow second
+- truncate only when the surface truly demands single-line identity
+
+For settings and similar rows, values should stack beneath the label before truncating into ambiguity.
+
+Marquee is an explicit overflow behavior for compact, focused single-line surfaces. It is not the default solution.
+
+#### Supporting copy should look supporting
+
+Descriptions, helper copy, and secondary explanation should look visibly quieter than primary actions and current values.
+
+Use:
+
+- muted tokens
+- dim modifiers when needed
+- more breathing room around primary actions than around support prose
+
+Do not make supporting copy compete with what the user is supposed to act on now.
+
 ## 1. Status and feedback
 
 ### The pattern

@@ -27,9 +27,10 @@ Use these docs when you need to answer:
 
 1. [Foundations](./foundations.md)
 2. [Patterns](./patterns.md)
-3. [Pointer and Mouse Policy](./pointer.md)
-4. [Component Families](./component-families.md)
-5. [Data Visualization Policy](./data-visualization.md)
+3. [Blocks](./blocks.md)
+4. [Pointer and Mouse Policy](./pointer.md)
+5. [Component Families](./component-families.md)
+6. [Data Visualization Policy](./data-visualization.md)
 
 For the raw inventory and taxonomy work behind these docs, see [../COMPONENT_SYSTEM_AUDIT.md](../COMPONENT_SYSTEM_AUDIT.md).
 
@@ -37,7 +38,7 @@ For the raw inventory and taxonomy work behind these docs, see [../COMPONENT_SYS
 
 ### Bijou is not just a component library
 
-Bijou is made of three layers:
+Bijou is made of four layers:
 
 1. **Foundations**
    - color, spacing rhythm, text hierarchy, overflow, motion, focus, interruption
@@ -45,8 +46,10 @@ Bijou is made of three layers:
    - status, selection, browsing, overlays, forms, shell composition
 3. **Component families**
    - specific primitives that implement those patterns
+4. **Blocks**
+   - reusable product-level assemblies such as app frames, settings flows, and guided workflows
 
-Components should be downstream of the first two layers. If the design language is weak, the component catalog becomes noisy no matter how many exports exist.
+Components and blocks should be downstream of the first two layers. If the design language is weak, the component catalog and block library both become noisy no matter how many exports exist.
 
 ### Core versus TUI ownership
 

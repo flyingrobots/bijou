@@ -54,6 +54,6 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 
 ## Current cycle and backlog
 
-- latest completed cycle: [DL-001 — Capture Design Language Doctrine](/Users/james/git/bijou/docs/design/DL-001-capture-design-language-doctrine.md)
+- latest completed cycle: [DL-002 — Canonicalize Patterns and Blocks](/Users/james/git/bijou/docs/design/DL-002-canonicalize-patterns-and-blocks.md)
 - backlog:
-  - [DL-002 — Canonicalize Patterns and Blocks](/Users/james/git/bijou/docs/BACKLOG/DL-002-canonicalize-patterns-and-blocks.md)
+  - [DL-003 — Prove Canonical Patterns in Shared Surfaces](/Users/james/git/bijou/docs/BACKLOG/DL-003-prove-canonical-patterns-in-shared-surfaces.md)
