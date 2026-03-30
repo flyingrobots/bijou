@@ -57,6 +57,9 @@ jobs:
       - name: Type check tests
         run: npm run typecheck:test
 
+      - name: DOGFOOD coverage gate
+        run: npm run dogfood:coverage:gate
+
       - name: Test
         run: npm test
 
