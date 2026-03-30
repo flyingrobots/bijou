@@ -103,6 +103,12 @@ describe('DL-006 inspector panel rhythm cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-007-promote-inspector-panel-block.md')).toBe(true);
+    const cycle = read('/Users/james/git/bijou/docs/design/DL-006-prove-inspector-panel-rhythm.md');
+
+    expect(cycle).toContain('[DL-007 — Promote Inspector Panel Block]');
+    expect(
+      existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-007-promote-inspector-panel-block.md') ||
+      existsSync('/Users/james/git/bijou/docs/design/DL-007-promote-inspector-panel-block.md'),
+    ).toBe(true);
   });
 });

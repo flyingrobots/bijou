@@ -84,6 +84,12 @@ describe('DL-005 inspector and guided-flow rhythm cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-006-prove-inspector-panel-rhythm.md')).toBe(true);
+    const cycle = read('/Users/james/git/bijou/docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');
+
+    expect(cycle).toContain('[DL-006 — Prove Inspector Panel Rhythm]');
+    expect(
+      existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-006-prove-inspector-panel-rhythm.md') ||
+      existsSync('/Users/james/git/bijou/docs/design/DL-006-prove-inspector-panel-rhythm.md'),
+    ).toBe(true);
   });
 });

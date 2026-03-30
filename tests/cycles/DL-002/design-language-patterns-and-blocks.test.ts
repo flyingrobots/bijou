@@ -37,11 +37,11 @@ describe('DL-002 canonical patterns and blocks cycle', () => {
 
   it('updates the design system read order and spawns the next DL backlog item', () => {
     const readme = read('/Users/james/git/bijou/docs/design-system/README.md');
-    const legend = read('/Users/james/git/bijou/docs/legends/DL-design-language.md');
-    const backlog = read('/Users/james/git/bijou/docs/BACKLOG/DL-006-prove-inspector-panel-rhythm.md');
+    const cycle = read('/Users/james/git/bijou/docs/design/DL-002-canonicalize-patterns-and-blocks.md');
+    const backlog = read('/Users/james/git/bijou/docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md');
 
     expect(readme).toContain('[Blocks](./blocks.md)');
-    expect(legend).toContain('[DL-005 — Prove Inspector and Guided Flow Rhythm]');
-    expect(backlog).toContain('DL-006 — Prove Inspector Panel Rhythm');
+    expect(cycle).toContain('[DL-003 — Prove Canonical Patterns in Shared Surfaces]');
+    expect(backlog).toContain('DL-003 — Prove Canonical Patterns in Shared Surfaces');
   });
 });

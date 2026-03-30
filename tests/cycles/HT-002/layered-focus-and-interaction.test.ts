@@ -7,18 +7,17 @@ function read(path: string): string {
 
 describe('HT-002 layered focus and interaction cycle', () => {
   it('captures the humane-terminal layer cycle and its landed follow-on implementation cycle', () => {
-    const legend = read('/Users/james/git/bijou/docs/legends/HT-humane-terminal.md');
     const cycle = read('/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md');
     const implementationCycle = read('/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
 
     expect(cycle).toContain('# HT-002 — Layered Focus and Interaction');
-    expect(legend).toContain('HT-003 — Implement Layer Stack and Input Map Routing');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
     expect(cycle).toContain('input map');
     expect(cycle).toContain('Esc');
     expect(cycle).toContain('## Retrospective');
+    expect(cycle).toContain('[HT-003 — Implement Layer Stack and Input Map Routing]');
 
     expect(implementationCycle).toContain('describeFrameLayerStack()');
     expect(implementationCycle).toContain('topmost-layer-driven key routing');
