@@ -1506,6 +1506,24 @@ function themedSeparatorSurface(
   });
 }
 
+function resolvePaneInset(width: number): number {
+  return width >= 3 ? 1 : 0;
+}
+
+function resolvePaneInnerWidth(width: number): number {
+  const inset = resolvePaneInset(width);
+  return Math.max(1, width - (inset * 2));
+}
+
+function insetPaneSurface(content: Surface, width: number): Surface {
+  const safeWidth = Math.max(1, width);
+  const inset = resolvePaneInset(safeWidth);
+  const innerWidth = Math.max(1, safeWidth - (inset * 2));
+  const result = createSurface(safeWidth, content.height);
+  result.blit(content, inset, 0, 0, 0, innerWidth, content.height);
+  return result;
+}
+
 function blitCentered(surface: Surface, content: Surface, y: number): void {
   surface.blit(content, Math.floor((surface.width - content.width) / 2), y);
 }
@@ -1517,8 +1535,9 @@ function renderFamiliesPane(
   ctx: BijouContext,
   theme: LandingThemeTokens,
 ): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
   const visibleHeight = Math.max(3, height - 2);
-  const body = createSurface(Math.max(1, width), visibleHeight);
+  const body = createSurface(Math.max(1, paneWidth), visibleHeight);
   const start = model.familyState.scrollY;
   const end = Math.min(model.familyState.items.length, start + visibleHeight);
 
@@ -1527,7 +1546,7 @@ function renderFamiliesPane(
     body.blit(
       renderFamilyRow({
         row,
-        width,
+        width: paneWidth,
         focused: index === model.familyState.focusIndex,
         selectedStoryId: model.selectedStoryId,
         expandedFamilies: model.expandedFamilies,
@@ -1539,10 +1558,10 @@ function renderFamiliesPane(
     );
   }
 
-  return column([
-    themedSeparatorSurface('component families', width, ctx, theme),
+  return insetPaneSurface(column([
+    themedSeparatorSurface('component families', paneWidth, ctx, theme),
     body,
-  ]);
+  ]), width);
 }
 
 function renderEmptyStoryPane(
@@ -1551,7 +1570,8 @@ function renderEmptyStoryPane(
   theme: LandingThemeTokens,
   i18n: I18nRuntime,
 ): Surface {
-  const bodyWidth = Math.max(28, width - 6);
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyWidth = Math.max(28, paneWidth - 6);
   const coverageBarWidth = Math.max(16, Math.min(40, bodyWidth - 8));
   const intro = boxSurface(column([
     paragraphSurface(
@@ -1573,8 +1593,9 @@ function renderEmptyStoryPane(
     ),
   ]), {
     title: dogfoodText(i18n, 'docs.empty.intro.title', 'What is Bijou?'),
-    width: Math.max(24, width - 1),
+    width: Math.max(24, paneWidth),
     borderToken: docsThemeBorderToken(theme),
+    padding: { left: 1, right: 1 },
     ctx,
   });
 
@@ -1610,8 +1631,9 @@ function renderEmptyStoryPane(
     )),
   ]), {
     title: dogfoodText(i18n, 'docs.empty.coverage.title', 'Documentation coverage'),
-    width: Math.max(24, width - 1),
+    width: Math.max(24, paneWidth),
     borderToken: docsThemeBorderToken(theme),
+    padding: { left: 1, right: 1 },
     ctx,
   });
 
@@ -1623,20 +1645,21 @@ function renderEmptyStoryPane(
     line(dogfoodText(i18n, 'docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.')),
   ]), {
     title: dogfoodText(i18n, 'docs.empty.guide.title', 'How to use these docs'),
-    width: Math.max(24, width - 1),
+    width: Math.max(24, paneWidth),
     borderToken: docsThemeMutedBorderToken(theme),
+    padding: { left: 1, right: 1 },
     ctx,
   });
 
-  return column([
-    themedSeparatorSurface(dogfoodText(i18n, 'docs.separator.welcome', 'welcome to bijou'), width, ctx, theme),
+  return insetPaneSurface(column([
+    themedSeparatorSurface(dogfoodText(i18n, 'docs.separator.welcome', 'welcome to bijou'), paneWidth, ctx, theme),
     spacer(1, 1),
     intro,
     spacer(1, 1),
     coverage,
     spacer(1, 1),
     guide,
-  ]);
+  ]), width);
 }
 
 function renderStoryPane(
@@ -1651,10 +1674,11 @@ function renderStoryPane(
     return renderEmptyStoryPane(width, ctx, theme, i18n);
   }
 
+  const paneWidth = resolvePaneInnerWidth(width);
   const profileIndex = findStoryProfileIndex(story, model.profileMode);
   const preset = resolveStoryProfilePreset(story, profileIndex);
   const variant = resolveStoryVariant(story, selectedVariantIndex(model, story.id));
-  const previewWidth = Math.max(20, Math.min(Math.max(20, width - 6), preset.width));
+  const previewWidth = Math.max(20, Math.min(Math.max(20, paneWidth - 6), preset.width));
   const previewCtx = createStoryProfileContext(ctx, preset, {
     width: previewWidth,
     height: 14,
@@ -1665,29 +1689,31 @@ function renderStoryPane(
     state: variant.initialState as never,
     timeMs: model.previewTimeMs,
   }));
-  const previewCard = boxSurface(placeSurface(preview, {
-    width: Math.max(preview.width, previewWidth),
-    height: preview.height,
-    hAlign: 'center',
-    vAlign: 'top',
-  }), {
-    title: `live preview • ${preset.label} • ${variant.label}`,
-    width: Math.max(24, width - 1),
+  const previewTitle = `live preview • ${preset.label} • ${variant.label}`;
+  const previewCard = boxSurface(preview, {
+    title: previewTitle,
+    width: Math.min(paneWidth, Math.max(28, preview.width + 4, previewTitle.length + 4)),
     borderToken: docsThemeMutedBorderToken(theme),
+    padding: { left: 1, right: 1 },
     ctx,
   });
   const docs = markdown(storyDocsMarkdown(story, variant, preset), {
-    width: Math.max(24, width - 3),
+    width: Math.max(24, paneWidth - 2),
     ctx,
   });
 
-  return column([
-    themedSeparatorSurface(`docs • ${story.title}`, width, ctx, theme),
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`docs • ${story.title}`, paneWidth, ctx, theme),
     spacer(1, 1),
-    previewCard,
+    placeSurface(previewCard, {
+      width: paneWidth,
+      height: previewCard.height,
+      hAlign: 'center',
+      vAlign: 'top',
+    }),
     spacer(1, 1),
     contentSurface(docs),
-  ]);
+  ]), width);
 }
 
 function renderVariantsPane(
@@ -1697,20 +1723,22 @@ function renderVariantsPane(
   ctx: BijouContext,
   theme: LandingThemeTokens,
 ): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
   const story = selectedStory(model);
   if (story == null) {
-    return column([
-      themedSeparatorSurface('variants', width, ctx, theme),
+    return insetPaneSurface(column([
+      themedSeparatorSurface('variants', paneWidth, ctx, theme),
       spacer(1, 1),
       boxSurface(paragraphSurface(
         'Variants appear here once a component is selected.',
-        Math.max(20, width - 6),
+        Math.max(20, paneWidth - 6),
       ), {
-        width: Math.max(22, width - 1),
+        width: Math.max(22, paneWidth),
         borderToken: docsThemeMutedBorderToken(theme),
+        padding: { left: 1, right: 1 },
         ctx,
       }),
-    ]);
+    ]), width);
   }
 
   const currentVariantIndex = selectedVariantIndex(model, story.id);
@@ -1725,7 +1753,7 @@ function renderVariantsPane(
     scrollY: adjustScroll(currentVariantIndex, 0, listHeight, items.length),
     height: listHeight,
   }, {
-    width: Math.max(1, width),
+    width: Math.max(1, paneWidth),
     showScrollbar: items.length > listHeight,
     ctx,
   });
@@ -1744,18 +1772,19 @@ function renderVariantsPane(
         tone: 'muted',
       },
     ],
-    width: Math.max(22, width - 1),
+    width: Math.max(22, paneWidth),
     borderToken: docsThemeMutedBorderToken(theme),
     bgToken: docsThemeSurfaceToken(theme),
     ctx,
   }));
 
-  return column([
-    themedSeparatorSurface(`variants • ${story.title}`, width, ctx, theme),
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`variants • ${story.title}`, paneWidth, ctx, theme),
+    spacer(1, 1),
     list,
     spacer(1, 1),
     description,
-  ]);
+  ]), width);
 }
 
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRuntime): string {

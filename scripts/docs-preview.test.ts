@@ -674,7 +674,7 @@ describe('docs preview app', () => {
     }
 
     const lines = text.split('\n');
-    expect(text).toContain('▶ Status and in-flow feedback');
+    expect(text).toContain('▶ Status and in-flow');
     expect(lines[0]).toContain('Bijou Docs');
     expect(lines[frame.height - 1]).toContain('? Help');
     expect(lines[frame.height - 1]).toContain('/ Search');
