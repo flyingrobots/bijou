@@ -31,7 +31,6 @@ import { isMinimized, createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState, resolveChildOrder, getNodeId } from './panel-dock.js';
 import { visibleLength } from './viewport.js';
 import { helpShort } from './help.js';
-import type { BindingSource } from './help.js';
 import {
   findPaneNode,
   isPaneMinimized,
@@ -398,7 +397,6 @@ export function resolveHeaderLine<PageModel, Msg>(
 export function renderHelpLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   activeLayer: FrameLayerDescriptor,
-  hintSource: string | BindingSource | undefined,
   i18n: CreateFramedAppOptions<PageModel, Msg>['i18n'],
   notificationCue?: string,
 ): Surface {
@@ -421,11 +419,11 @@ export function renderHelpLine<PageModel, Msg>(
     ? `[${modeLabel}] page:${model.activePageId} pane:${focusedPane}`
     : `[${modeLabel}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
 
-  const hint = typeof hintSource === 'string'
-    ? hintSource
-    : hintSource == null
+  const hint = typeof activeLayer.hintSource === 'string'
+    ? activeLayer.hintSource
+    : activeLayer.hintSource == null
       ? ''
-      : helpShort(hintSource);
+      : helpShort(activeLayer.hintSource);
   const line = hint.length > 0
     ? (() => {
         const statusWithPadding = ` ${status}`;

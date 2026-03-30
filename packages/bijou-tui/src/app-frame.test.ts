@@ -16,7 +16,15 @@ import {
   type NotificationHistoryFilter,
   type NotificationState,
 } from './notification.js';
-import { createFramedApp, describeFrameLayerStack, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
+import {
+  activeFrameLayer,
+  createFramedApp,
+  describeFrameLayerStack,
+  type FramePage,
+  type FrameOverlayContext,
+  type PageTransition,
+  underlyingFrameLayer,
+} from './app-frame.js';
 import { QUIT, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
 
@@ -1213,6 +1221,115 @@ describe('createFramedApp', () => {
       'workspace',
       'page-modal',
     ]);
+  });
+
+  it('supports richer explicit layer titles and control sources for shell introspection', () => {
+    const workspaceHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('tab', 'Next pane', { type: 'noop' });
+    const settingsHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('escape', 'Close settings', { type: 'noop' });
+    const searchHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('enter', 'Select', { type: 'noop' });
+
+    const model = {
+      helpOpen: false,
+      commandPalette: {} as any,
+      commandPaletteKind: 'search' as const,
+      settingsOpen: true,
+      notificationCenterOpen: false,
+      quitConfirmOpen: false,
+    };
+
+    const stack = describeFrameLayerStack(model, {
+      layers: {
+        workspace: {
+          title: 'Workspace',
+          hintSource: 'Tab next pane',
+          helpSource: workspaceHelp,
+        },
+        settings: {
+          title: 'Workspace settings',
+          hintSource: 'F2/Esc close',
+          helpSource: settingsHelp,
+        },
+        search: {
+          title: 'Search components',
+          hintSource: 'Enter select • Esc close',
+          helpSource: searchHelp,
+        },
+      },
+    });
+
+    expect(stack.map((layer) => ({ kind: layer.kind, title: layer.title }))).toEqual([
+      { kind: 'workspace', title: 'Workspace' },
+      { kind: 'settings', title: 'Workspace settings' },
+      { kind: 'search', title: 'Search components' },
+    ]);
+    expect(activeFrameLayer(model, {
+      layers: {
+        workspace: { title: 'Workspace', helpSource: workspaceHelp },
+        settings: { title: 'Workspace settings', hintSource: 'F2/Esc close', helpSource: settingsHelp },
+        search: { title: 'Search components', hintSource: 'Enter select • Esc close', helpSource: searchHelp },
+      },
+    })).toMatchObject({
+      kind: 'search',
+      title: 'Search components',
+      hintSource: 'Enter select • Esc close',
+      inputMapId: 'frame-search',
+    });
+    expect(underlyingFrameLayer(model, {
+      layers: {
+        workspace: { title: 'Workspace', helpSource: workspaceHelp },
+        settings: { title: 'Workspace settings', hintSource: 'F2/Esc close', helpSource: settingsHelp },
+        search: { title: 'Search components', hintSource: 'Enter select • Esc close', helpSource: searchHelp },
+      },
+    })).toMatchObject({
+      kind: 'settings',
+      title: 'Workspace settings',
+      hintSource: 'F2/Esc close',
+      inputMapId: 'frame-settings',
+    });
+    expect(underlyingFrameLayer(model, {
+      layers: {
+        workspace: { title: 'Workspace', helpSource: workspaceHelp },
+        settings: { title: 'Workspace settings', hintSource: 'F2/Esc close', helpSource: settingsHelp },
+        search: { title: 'Search components', hintSource: 'Enter select • Esc close', helpSource: searchHelp },
+      },
+    })?.helpSource).toBe(settingsHelp);
+  });
+
+  it('shows settings controls in help when help opens above settings', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Workspace settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+
+    expect((model as any).settingsOpen).toBe(true);
+    expect((model as any).helpOpen).toBe(true);
+    expect(describeFrameLayerStack(model).map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'help']);
+
+    const rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+
+    expect(rendered).toContain('Close settings');
+    expect(rendered).not.toContain('Increment');
   });
 
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {

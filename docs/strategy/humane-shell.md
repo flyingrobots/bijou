@@ -147,6 +147,9 @@ The shell should not feel:
 12. **Input maps should drive truth**
    The same input map that governs the active layer should also govern the visible controls the shell advertises.
 
+13. **Layers should be explicit objects**
+   A shell layer should own its title, visible controls, and richer help metadata instead of forcing the shell to rediscover them in separate branches.
+
 ## Layer stack doctrine
 
 The shell should treat interactive surfaces as a stack of layers, not as a pile of unrelated branch checks.

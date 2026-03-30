@@ -134,7 +134,9 @@ export {
 export {
   type FrameCommandItem,
   type FrameInputArea,
+  type FrameLayerHintSource,
   type FrameLayerKind,
+  type FrameLayerMetadata,
   type FrameLayerOwner,
   type FrameLayerDescriptor,
   type DescribeFrameLayerStackOptions,
@@ -146,8 +148,10 @@ export {
   type PageTransition,
   type FramePaneScroll,
   type FrameModel,
+  activeFrameLayer,
   describeFrameLayerStack,
   createFramedApp,
+  underlyingFrameLayer,
 } from './app-frame.js';
 
 // Panel state (minimize/maximize)
