@@ -135,4 +135,19 @@ describe('surface text bridges', () => {
     expect(surface.get(1, 0).char).toBe('');
     expect(surface.get(1, 0).fg).toBe('#ff0000');
   });
+
+  it('parseAnsiToSurface ignores OSC 8 hyperlink control sequences while preserving visible text', () => {
+    const surface = parseAnsiToSurface(
+      '\x1b]8;;https://example.com\x1b\\bijou\x1b]8;;\x1b\\',
+      8,
+      1,
+    );
+
+    expect(surface.get(0, 0).char).toBe('b');
+    expect(surface.get(1, 0).char).toBe('i');
+    expect(surface.get(2, 0).char).toBe('j');
+    expect(surface.get(3, 0).char).toBe('o');
+    expect(surface.get(4, 0).char).toBe('u');
+    expect(surface.get(5, 0).char).toBe(' ');
+  });
 });

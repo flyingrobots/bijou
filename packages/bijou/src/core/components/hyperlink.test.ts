@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { hyperlink } from './hyperlink.js';
 import { createTestContext } from '../../adapters/test/index.js';
+import { stripAnsi } from '../text/grapheme.js';
 
 describe('hyperlink', () => {
   it('outputs OSC 8 sequence in interactive mode', () => {
@@ -61,5 +62,11 @@ describe('hyperlink', () => {
     const url = 'https://example.com/path?q=hello%20world&lang=en#section';
     const result = hyperlink('link', url, { ctx });
     expect(result).toBe(`\x1b]8;;${url}\x1b\\link\x1b]8;;\x1b\\`);
+  });
+
+  it('strips OSC 8 sequences down to visible text for measurement and wrapping', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = hyperlink('flyingrobots/bijou', 'https://github.com/flyingrobots/bijou', { ctx });
+    expect(stripAnsi(result)).toBe('flyingrobots/bijou');
   });
 });

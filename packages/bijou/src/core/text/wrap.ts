@@ -1,5 +1,5 @@
 import { RESET_SGR } from '../ansi.js';
-import { ANSI_SGR_RE, graphemeClusterWidth, segmentGraphemes } from './grapheme.js';
+import { ANSI_OSC8_RE, ANSI_SGR_RE, graphemeClusterWidth, segmentGraphemes } from './grapheme.js';
 
 type WrapToken =
   | { readonly kind: 'ansi'; readonly raw: string }
@@ -15,7 +15,7 @@ export interface PreparedWrappedText {
 }
 
 function tokenizeAnsiText(str: string): WrapToken[] {
-  const regex = new RegExp(ANSI_SGR_RE.source, 'g');
+  const regex = new RegExp(`${ANSI_SGR_RE.source}|${ANSI_OSC8_RE.source}`, 'g');
   const tokens: WrapToken[] = [];
   let lastIndex = 0;
 
@@ -64,6 +64,10 @@ function isResetEscape(raw: string): boolean {
   return raw === RESET_SGR;
 }
 
+function isOsc8Escape(raw: string): boolean {
+  return ANSI_OSC8_RE.test(raw);
+}
+
 function finalizeWrappedLine(raw: string, activeStyle: string): string {
   if (activeStyle.length === 0 || raw.endsWith(RESET_SGR)) return raw;
   return raw + RESET_SGR;
@@ -110,6 +114,9 @@ function wrapPreparedLine(line: PreparedWrappedLine, maxWidth: number): string[]
   for (const token of line.tokens) {
     if (token.kind === 'ansi') {
       currentTokens.push(token);
+      if (isOsc8Escape(token.raw)) {
+        continue;
+      }
       activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
       continue;
     }

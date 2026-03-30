@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { createTestContext } from '../../adapters/test/index.js';
+import { hyperlink } from '../components/hyperlink.js';
 import { clipToWidth } from './clip.js';
 import { graphemeWidth, stripAnsi } from './grapheme.js';
 import { prepareWrappedText, wrapPreparedTextToWidth, wrapToWidth } from './wrap.js';
@@ -48,5 +50,14 @@ describe('wrapToWidth', () => {
 
     expect(wrapPreparedTextToWidth(prepared, 11)).toEqual(wrapToWidth('\x1b[31mhello world again\x1b[0m', 11));
     expect(wrapPreparedTextToWidth(prepared, 4)).toEqual(wrapToWidth('\x1b[31mhello world again\x1b[0m', 4));
+  });
+
+  it('treats OSC 8 hyperlink control sequences as zero-width during wrapping', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const linked = hyperlink('README reference', 'https://github.com/flyingrobots/bijou#readme', { ctx });
+    const wrapped = wrapToWidth(`API docs: ${linked}`, 40);
+
+    expect(wrapped.every((line) => graphemeWidth(line) <= 40)).toBe(true);
+    expect(wrapped.map((line) => stripAnsi(line))).toEqual(['API docs: README reference']);
   });
 });

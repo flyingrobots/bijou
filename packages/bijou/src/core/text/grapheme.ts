@@ -133,13 +133,24 @@ export function segmentGraphemes(str: string): string[] {
 export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/;
 
 /**
+ * Pattern matching OSC 8 hyperlink control sequences.
+ *
+ * This strips the invisible open/close control segments while preserving the
+ * visible linked text between them.
+ */
+// eslint-disable-next-line no-control-regex
+export const ANSI_OSC8_RE = /\x1b]8;;[^\x1b\x07]*(?:\x1b\\|\x07)/g;
+
+/**
  * Strip all ANSI SGR escape sequences from a string.
  *
  * @param str - Input string potentially containing ANSI codes.
  * @returns The string with all ANSI SGR sequences removed.
  */
 export function stripAnsi(str: string): string {
-  return str.replace(new RegExp(ANSI_SGR_RE, 'g'), '');
+  return str
+    .replace(ANSI_OSC8_RE, '')
+    .replace(new RegExp(ANSI_SGR_RE, 'g'), '');
 }
 
 // ---------------------------------------------------------------------------

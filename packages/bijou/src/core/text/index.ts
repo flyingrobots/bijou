@@ -11,6 +11,7 @@ export {
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  ANSI_OSC8_RE,
   ANSI_SGR_RE,
   stripAnsi,
 } from './grapheme.js';

@@ -458,6 +458,35 @@ describe('docs preview app', () => {
     expect(text).toContain('Bijou keeps docs');
   });
 
+  it('renders the hyperlink story without OSC 8 width corruption', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'h' },
+      { key: 'y' },
+      { key: 'p' },
+      { key: 'e' },
+      { key: 'r' },
+      { key: 'l' },
+      { key: 'i' },
+      { key: 'n' },
+      { key: 'k' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(text).toContain('hyperlink()');
+    expect(text).toContain('Repository:');
+    expect(text).toContain('flyingrobots/bijou');
+    expect(text).toContain('API docs:');
+    expect(text).toContain('README reference');
+    expect(text).not.toContain('https://github.com/flyingrobots/bijou#readmeREA');
+  });
+
   it('can open the new confirm story directly from component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

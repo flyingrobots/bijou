@@ -1,6 +1,7 @@
 import {
   badge,
   createSurface,
+  graphemeWidth,
   parseAnsiToSurface,
   stringToSurface,
   stripAnsi,
@@ -67,5 +68,5 @@ export function renderSurface(surface: Surface, ctx: BijouContext): string {
 }
 
 function visibleWidth(text: string): number {
-  return text.replace(/\x1b\[[0-9;]*m/g, '').length;
+  return graphemeWidth(stripAnsi(text));
 }

@@ -1,6 +1,6 @@
 import { createSurface, type Surface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
-import { graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
+import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
 const EMPTY_MODIFIERS: readonly string[] = [];
@@ -40,7 +40,7 @@ export function stringToSurface(text: string, width: number, height: number): Su
  */
 export function parseAnsiToSurface(text: string, width: number, height: number): Surface {
   const surface = createSurface(width, height);
-  const lines = text.split(/\r?\n/);
+  const lines = text.replace(ANSI_OSC8_RE, '').split(/\r?\n/);
 
   const ANSI_RE = /\x1b\[([0-9;]*)m/g;
 
