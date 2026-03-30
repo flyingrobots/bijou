@@ -407,6 +407,29 @@ describe('docs preview app', () => {
     expect(text).toContain('package summary');
   });
 
+  it('can open the new toast story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 't' },
+      { key: 'o' },
+      { key: 'a' },
+      { key: 's' },
+      { key: 't' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('toast');
+    expect(text).toContain('toast()');
+    expect(text).toContain('Operation saved.');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

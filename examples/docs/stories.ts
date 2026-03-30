@@ -6,6 +6,7 @@ import {
   headerBox,
   inspector,
   kbd,
+  log,
   progressBar,
   separatorSurface,
   skeleton,
@@ -15,6 +16,7 @@ import {
 import {
   compositeSurface,
   modal,
+  toast,
   viewportSurface,
 } from '@flyingrobots/bijou-tui';
 import {
@@ -53,6 +55,20 @@ function modalBackdrop(width: number, ctx: BijouContext): Surface {
     ctx,
   });
   return screenSurface(width, 14, fullHeightPanel);
+}
+
+function toastBackdrop(width: number, height: number, ctx: BijouContext): Surface {
+  const panel = boxSurface(column([
+    row(['release queue  ', badgeSurface('LIVE', 'success', ctx)]),
+    spacer(),
+    line('Canaries stable in eu-west'),
+    line('Promotion window opens in 4m'),
+  ]), {
+    title: 'release dashboard',
+    width: Math.max(28, width - 4),
+    ctx,
+  });
+  return screenSurface(width, height, panel, 1, 1);
 }
 
 function viewportPreviewSurface(
@@ -464,6 +480,149 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Loading placeholders',
     },
     tags: ['loading', 'placeholder', 'layout'],
+  },
+  {
+    kind: 'component',
+    id: 'toast',
+    coverageFamilyIds: ['low-level-transient-overlay'],
+    family: 'Feedback overlays and history',
+    title: 'toast()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Low-level transient overlay primitive for one directly composed, anchored notification when the full notification system would be too heavy.',
+      useWhen: [
+        'You are composing one transient overlay directly inside a local surface.',
+        'Explicit corner anchoring matters.',
+        'The app does not need stacking, routing, actions, or history for this message.',
+      ],
+      avoidWhen: [
+        'The app needs stacking, routing, actions, or recall; prefer the notification system.',
+        'The message should stay in page flow; prefer `alert()` or `note()`.',
+        'The surface needs supplemental work or a blocking decision; prefer `drawer()` or `modal()`.',
+      ],
+      relatedFamilies: ['alert()', 'notification system', 'modal()'],
+      gracefulLowering: {
+        interactive: 'Anchored transient overlay with explicit variant and placement over the current surface.',
+        static: 'Single deterministic overlay frame preserving the same variant and placement.',
+        pipe: 'Plain one-off event line or app-owned status output instead of a floating overlay.',
+        accessible: 'Explicit announcement text describing the transient event without relying on spatial position.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'saved-top-right',
+        label: 'Saved notification',
+        description: 'A directly composed success toast anchored to the current working surface.',
+        render: ({ width, ctx }) => {
+          const screenWidth = Math.max(36, width);
+          const screenHeight = 12;
+          const overlay = toast({
+            message: 'Operation saved.',
+            variant: 'success',
+            anchor: 'top-right',
+            screenWidth,
+            screenHeight,
+            ctx,
+          });
+          if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+            return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
+          }
+          return overlay.content;
+        },
+      },
+      {
+        id: 'error-bottom-left',
+        label: 'Anchored error',
+        description: 'Low-level toast placement remains explicit when one local failure needs brief attention.',
+        render: ({ width, ctx }) => {
+          const screenWidth = Math.max(36, width);
+          const screenHeight = 12;
+          const overlay = toast({
+            message: 'Rollback required before promote.',
+            variant: 'error',
+            anchor: 'bottom-left',
+            screenWidth,
+            screenHeight,
+            ctx,
+          });
+          if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+            return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
+          }
+          return overlay.content;
+        },
+      },
+    ],
+    source: {
+      examplePath: 'examples/toast/main.ts',
+      snippetLabel: 'Anchored transient overlay',
+    },
+    tags: ['feedback', 'overlay', 'transient'],
+  },
+  {
+    kind: 'component',
+    id: 'log',
+    coverageFamilyIds: ['activity-stream'],
+    family: 'Feedback overlays and history',
+    title: 'log()',
+    package: 'bijou',
+    docs: {
+      summary: 'Chronological activity-stream primitive for accumulating operational events with explicit severity and optional timestamps.',
+      useWhen: [
+        'Order and accumulation matter more than interruption.',
+        'The user benefits from scanning a timeline of events instead of only the latest status.',
+        'The output should remain honest in pipe and accessible modes as plain chronological text.',
+      ],
+      avoidWhen: [
+        'The message should interrupt or demand immediate attention; prefer `alert()` or `toast()`.',
+        'A single inline label or current status is enough.',
+        'The user needs a summary panel instead of raw chronological events.',
+      ],
+      relatedFamilies: ['notification system', 'alert()', 'badge()'],
+      gracefulLowering: {
+        interactive: 'Chronological lines with level cues and optional timestamps remain scannable in place.',
+        static: 'Single deterministic activity transcript preserving order and severity cues.',
+        pipe: 'Plain sequential output is already a natural fit.',
+        accessible: 'Timestamps and levels stay explicit in linear text without decorative formatting.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-events',
+        label: 'Release events',
+        description: 'Chronological accumulation of mixed-severity deployment events.',
+        render: ({ ctx }) => box([
+          log('debug', 'Connecting to release queue...', { ctx }),
+          log('info', 'Canary started in eu-west', { ctx }),
+          log('warn', '2 workers still draining old jobs', { ctx }),
+          log('error', 'One verification probe timed out', { ctx }),
+        ].join('\n'), {
+          title: 'activity stream',
+          width: 54,
+          ctx,
+        }),
+      },
+      {
+        id: 'timed-audit',
+        label: 'Timed audit',
+        description: 'Optional timestamps help when the event order itself needs auditing.',
+        render: ({ ctx }) => box([
+          log('info', 'Rollout window opened', { timestamp: true, ctx }),
+          log('info', 'Canaries reached 25%', { timestamp: true, ctx }),
+          log('warn', 'Waiting on staging approval', { timestamp: true, ctx }),
+        ].join('\n'), {
+          title: 'release audit',
+          width: 54,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/log/main.ts',
+      snippetLabel: 'Chronological event stream',
+    },
+    tags: ['feedback', 'history', 'events'],
   },
   {
     kind: 'component',

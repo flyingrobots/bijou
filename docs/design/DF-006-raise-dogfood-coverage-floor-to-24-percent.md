@@ -158,4 +158,4 @@ The cycle stayed intentionally narrow: two real structural stories, one ratchet 
 
 Spawned:
 
-- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](/Users/james/git/bijou/docs/BACKLOG/DF-007-raise-dogfood-coverage-floor-to-29-percent.md)
+- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](/Users/james/git/bijou/docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md)
