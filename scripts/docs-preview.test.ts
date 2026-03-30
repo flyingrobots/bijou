@@ -430,6 +430,34 @@ describe('docs preview app', () => {
     expect(text).toContain('Operation saved.');
   });
 
+  it('can open the new markdown story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'm' },
+      { key: 'a' },
+      { key: 'r' },
+      { key: 'k' },
+      { key: 'd' },
+      { key: 'o' },
+      { key: 'w' },
+      { key: 'n' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('markdown');
+    expect(text).toContain('markdown()');
+    expect(text).toContain('Release note');
+    expect(text).toContain('This slice');
+    expect(text).toContain('Bijou keeps docs');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

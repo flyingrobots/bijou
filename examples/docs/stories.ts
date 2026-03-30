@@ -4,9 +4,11 @@ import {
   box,
   boxSurface,
   headerBox,
+  hyperlink,
   inspector,
   kbd,
   log,
+  markdown,
   progressBar,
   separatorSurface,
   skeleton,
@@ -106,6 +108,20 @@ const LONG_DOCUMENT = [
   '',
   'The viewport story is intentionally width-sensitive so the docs app can',
   'prove clipping, masking, and scroll-state behavior without a separate demo.',
+].join('\n');
+
+const MARKDOWN_RELEASE_NOTES = [
+  '# Release note',
+  '',
+  '**Bijou** keeps docs, shell, and examples inside the same runtime.',
+  '',
+  '## This slice',
+  '',
+  '- documents bounded prose honestly',
+  '- keeps links explicit instead of vague',
+  '- avoids turning markdown into layout chrome',
+  '',
+  '> Move to pager patterns if the content becomes a document-reading task.',
 ].join('\n');
 
 function loopingProgressPercent(timeMs: number, offsetMs = 0, cycleMs = 2_800): number {
@@ -623,6 +639,136 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Chronological event stream',
     },
     tags: ['feedback', 'history', 'events'],
+  },
+  {
+    kind: 'component',
+    id: 'markdown',
+    coverageFamilyIds: ['formatted-documents-and-prose'],
+    family: 'Documents and references',
+    title: 'markdown()',
+    package: 'bijou',
+    docs: {
+      summary: 'Bounded structured prose renderer for help, release notes, and reference text that should stay honest across rich, pipe, and accessible modes.',
+      useWhen: [
+        'Help, reference, or release-note prose needs lightweight structure without becoming a whole document reader.',
+        'The same content should remain understandable in interactive, static, pipe, and accessible modes.',
+        'Headings, lists, links, or short quotes materially improve scannability.',
+      ],
+      avoidWhen: [
+        'The app is really composing interface chrome, forms, or layout rather than prose.',
+        'The content needs deep navigation instead of one bounded rendered block.',
+        'Browser-grade markdown fidelity or arbitrary user-authored documents are expected.',
+      ],
+      relatedFamilies: ['hyperlink()', 'box()', 'pager()'],
+      gracefulLowering: {
+        interactive: 'Bounded structured prose keeps headings, emphasis, lists, and links readable within terminal constraints.',
+        static: 'Single deterministic document block preserves the same structure without live interaction.',
+        pipe: 'Plain text keeps heading/list/code semantics understandable without styling.',
+        accessible: 'Headings, lists, links, and code cues stay explicit in reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-note',
+        label: 'Release note',
+        description: 'A bounded markdown document that behaves like reference prose instead of layout chrome.',
+        render: ({ ctx }) => box(markdown(MARKDOWN_RELEASE_NOTES, { width: 42, ctx }), {
+          title: 'release note',
+          width: 50,
+          ctx,
+        }),
+      },
+      {
+        id: 'help-excerpt',
+        label: 'Help excerpt',
+        description: 'Short structured help text stays scannable without becoming a full document browser.',
+        render: ({ ctx }) => box(markdown([
+          '## Quick start',
+          '',
+          '1. Open the command palette.',
+          '2. Search for a component family.',
+          '3. Read the usage notes before choosing a surface.',
+          '',
+          'Use [`hyperlink()`](https://github.com/flyingrobots/bijou) when the destination itself matters.',
+        ].join('\n'), { width: 42, ctx }), {
+          title: 'help excerpt',
+          width: 50,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/markdown/main.ts',
+      snippetLabel: 'Bounded markdown prose',
+    },
+    tags: ['docs', 'prose', 'reference'],
+  },
+  {
+    kind: 'component',
+    id: 'hyperlink',
+    coverageFamilyIds: ['linked-destinations'],
+    family: 'Documents and references',
+    title: 'hyperlink()',
+    package: 'bijou',
+    docs: {
+      summary: 'Explicit destination primitive for links that should remain meaningful whether or not the terminal supports clickable OSC 8 output.',
+      useWhen: [
+        'The destination matters and should remain part of the rendered output.',
+        'Supporting terminals should get clickability without hiding the destination semantics.',
+        'Fallback behavior needs to stay intentional in pipe or accessible modes.',
+      ],
+      avoidWhen: [
+        'The destination is ambiguous or should not be activated casually.',
+        'The label is generic and hides the real meaning or trust context.',
+        'The user needs an app-owned action rather than an external destination.',
+      ],
+      relatedFamilies: ['markdown()', 'note()', 'helpView()'],
+      gracefulLowering: {
+        interactive: 'Meaningful visible link text remains present while supporting terminals get OSC 8 clickability.',
+        static: 'Deterministic link text still preserves the same explicit destination semantics.',
+        pipe: 'Fallback modes keep the destination or label explicit in plain text.',
+        accessible: 'Label and destination remain clear in reading order without assuming clickability.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'explicit-destinations',
+        label: 'Explicit destinations',
+        description: 'Link labels describe the destination instead of hiding it behind generic action copy.',
+        render: ({ ctx }) => box([
+          `Repository: ${hyperlink('flyingrobots/bijou', 'https://github.com/flyingrobots/bijou', { ctx })}`,
+          '',
+          `API docs: ${hyperlink('README reference', 'https://github.com/flyingrobots/bijou#readme', { ctx })}`,
+        ].join('\n'), {
+          title: 'linked destinations',
+          width: 58,
+          ctx,
+        }),
+      },
+      {
+        id: 'fallback-modes',
+        label: 'Fallback modes',
+        description: 'Fallback formatting remains an explicit product choice when clickable links are unavailable.',
+        render: ({ ctx }) => box([
+          `Both: ${hyperlink('Release notes', 'https://example.com/release-notes', { fallback: 'both', ctx })}`,
+          '',
+          `URL only: ${hyperlink('API reference', 'https://example.com/api', { fallback: 'url', ctx })}`,
+          '',
+          `Text only: ${hyperlink('Trusted local handbook', 'https://example.com/handbook', { fallback: 'text', ctx })}`,
+        ].join('\n'), {
+          title: 'fallback policy',
+          width: 62,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/hyperlink/main.ts',
+      snippetLabel: 'Explicit link destinations',
+    },
+    tags: ['docs', 'links', 'destinations'],
   },
   {
     kind: 'component',

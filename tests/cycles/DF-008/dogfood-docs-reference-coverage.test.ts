@@ -1,0 +1,50 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import {
+  DOGFOOD_COVERAGE_FLOOR_PERCENT,
+  DOGFOOD_COVERAGE_INCREMENT_PERCENT,
+  DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT,
+} from '../../../examples/docs/coverage-policy.js';
+import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
+import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
+
+function read(path: string): string {
+  return readFileSync(path, 'utf8');
+}
+
+describe('DF-008 DOGFOOD docs and reference coverage cycle', () => {
+  it('creates an active cycle doc with the required workflow sections', () => {
+    const cycle = read('/Users/james/git/bijou/docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md');
+
+    expect(cycle).toContain('## Human playback');
+    expect(cycle).toContain('## Agent playback');
+    expect(cycle).toContain('## Linked invariants');
+    expect(cycle).toContain('## Implementation outline');
+    expect(cycle).toContain('## Retrospective');
+  });
+
+  it('raises DOGFOOD coverage to thirteen documented families and 37 percent', () => {
+    const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
+
+    expect(coverage.documentedFamilies).toBe(13);
+    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.percent).toBe(37);
+    expect(coverage.coveredFamilyIds).toContain('formatted-documents-and-prose');
+    expect(coverage.coveredFamilyIds).toContain('linked-destinations');
+  });
+
+  it('adds real DOGFOOD stories for formatted prose and explicit links', () => {
+    expect(COMPONENT_STORIES.some((story) => story.id === 'markdown')).toBe(true);
+    expect(COMPONENT_STORIES.some((story) => story.id === 'hyperlink')).toBe(true);
+  });
+
+  it('raises the enforced floor to 34 percent and the next target to 39 percent', () => {
+    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBe(34);
+    expect(DOGFOOD_COVERAGE_INCREMENT_PERCENT).toBe(5);
+    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(39);
+  });
+
+  it('spawns the next DOGFOOD backlog item', () => {
+    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-009-raise-dogfood-coverage-floor-to-39-percent.md')).toBe(true);
+  });
+});

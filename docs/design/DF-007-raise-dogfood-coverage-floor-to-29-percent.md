@@ -158,4 +158,4 @@ The cycle intentionally over-earned the floor by documenting two related familie
 
 Spawned:
 
-- [DF-008 — Raise DOGFOOD Coverage Floor to 34%](/Users/james/git/bijou/docs/BACKLOG/DF-008-raise-dogfood-coverage-floor-to-34-percent.md)
+- [DF-008 — Raise DOGFOOD Coverage Floor to 34%](/Users/james/git/bijou/docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md)
