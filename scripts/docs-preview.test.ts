@@ -547,6 +547,36 @@ describe('docs preview app', () => {
     expect(text).toContain('surface-native terminal UI framework');
   });
 
+  it('keeps static progress previews stable while looping previews animate on pulse', async () => {
+    const openDocs = [{ key: KEY_ENTER }] as const;
+    const openProgressStory = [{ msg: { type: 'docs', msg: { type: 'select-story', storyId: 'progress-bar' } } }] as const;
+    const chooseLoopingVariant = [{ msg: { type: 'docs', msg: { type: 'select-variant', index: 1 } } }] as const;
+    const pulse = [{ pulse: { dt: 0.45 } }] as const;
+
+    async function renderFrame(steps: readonly any[]) {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+      const app = createDocsApp(ctx);
+      const result = await runScript(app, [...steps], { ctx, pulseFps: false });
+      const frame = result.frames.at(-1)!;
+      return {
+        text: frameText(frame),
+        serialized: serializeFrame(frame),
+      };
+    }
+
+    const staticBase = await renderFrame([...openDocs, ...openProgressStory]);
+    const staticPulsed = await renderFrame([...openDocs, ...openProgressStory, ...pulse]);
+
+    expect(staticBase.text).toContain('progressBar()');
+    expect(staticBase.serialized).toEqual(staticPulsed.serialized);
+
+    const loopingBase = await renderFrame([...openDocs, ...openProgressStory, ...chooseLoopingVariant]);
+    const loopingPulsed = await renderFrame([...openDocs, ...openProgressStory, ...chooseLoopingVariant, ...pulse]);
+
+    expect(loopingBase.text).toContain('Looping rollout');
+    expect(loopingBase.serialized).not.toEqual(loopingPulsed.serialized);
+  });
+
   it('routes arrow keys to the focused docs pane instead of always driving the family nav', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);

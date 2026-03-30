@@ -12,9 +12,9 @@ function read(path: string): string {
   return readFileSync(path, 'utf8');
 }
 
-describe('DF-004 DOGFOOD coverage ratchet cycle', () => {
+describe('DF-005 DOGFOOD progress and coverage cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md');
+    const cycle = read('/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -23,28 +23,28 @@ describe('DF-004 DOGFOOD coverage ratchet cycle', () => {
     expect(cycle).toContain('## Retrospective');
   });
 
-  it('preserves the families this ratchet added even after later coverage increases', () => {
+  it('raises DOGFOOD coverage to seven documented families and 20 percent', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(5);
+    expect(coverage.documentedFamilies).toBe(7);
     expect(coverage.totalFamilies).toBe(35);
-    expect(coverage.percent).toBeGreaterThanOrEqual(14);
-    expect(coverage.coveredFamilyIds).toContain('inline-status');
-    expect(coverage.coveredFamilyIds).toContain('inline-shortcut-cues');
+    expect(coverage.percent).toBe(20);
+    expect(coverage.coveredFamilyIds).toContain('progress-indicators');
+    expect(coverage.coveredFamilyIds).toContain('loading-placeholders');
   });
 
-  it('keeps the ratchet moving upward in 5-point increments', () => {
-    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBeGreaterThanOrEqual(14);
+  it('adds real DOGFOOD stories for progress bars and loading placeholders', () => {
+    expect(COMPONENT_STORIES.some((story) => story.id === 'progress-bar')).toBe(true);
+    expect(COMPONENT_STORIES.some((story) => story.id === 'skeleton')).toBe(true);
+  });
+
+  it('raises the enforced floor to 19 percent and the next target to 24 percent', () => {
+    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBe(19);
     expect(DOGFOOD_COVERAGE_INCREMENT_PERCENT).toBe(5);
-    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(
-      DOGFOOD_COVERAGE_FLOOR_PERCENT + DOGFOOD_COVERAGE_INCREMENT_PERCENT,
-    );
+    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(24);
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
-    expect(
-      existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md') ||
-      existsSync('/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md'),
-    ).toBe(true);
+    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-006-raise-dogfood-coverage-floor-to-24-percent.md')).toBe(true);
   });
 });

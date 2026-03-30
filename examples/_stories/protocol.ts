@@ -35,6 +35,7 @@ export interface StoryVariant<State = void> {
     readonly width: number;
     readonly ctx: BijouContext;
     readonly state: State;
+    readonly timeMs: number;
   }) => StoryPreview;
 }
 

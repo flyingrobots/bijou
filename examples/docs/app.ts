@@ -186,6 +186,7 @@ interface DocsExplorerModel {
   readonly selectedStoryId?: string;
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
+  readonly previewTimeMs: number;
   readonly showHints: boolean;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
@@ -223,6 +224,7 @@ interface RootModel {
 
 type RootMsg = { type: 'docs'; msg: ExplorerMsg };
 type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
+type DocsMsg = ExplorerMsg | PulseLikeMsg;
 type Rgb = [number, number, number];
 
 interface LandingThemeSeed {
@@ -451,6 +453,7 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     selectedStoryId: undefined,
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
+    previewTimeMs: 0,
     showHints: true,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
@@ -567,6 +570,7 @@ function cycleVariantIndex(model: DocsExplorerModel, delta: number): DocsExplore
       ...model.variantIndexByStory,
       [story.id]: next,
     },
+    previewTimeMs: 0,
   };
 }
 
@@ -588,6 +592,7 @@ function toggleFamily(model: DocsExplorerModel, familyId: string): DocsExplorerM
     ...model,
     expandedFamilies: nextExpandedFamilies,
     selectedStoryId: nextSelectedStoryId,
+    previewTimeMs: 0,
     familyState: rebuildFamilyState(model.familyState, nextExpandedFamilies, `family:${familyId}`),
   };
 }
@@ -612,6 +617,7 @@ function collapseFocusedFamily(model: DocsExplorerModel): DocsExplorerModel {
   return {
     ...model,
     selectedStoryId: model.selectedStoryId === row.storyId ? undefined : model.selectedStoryId,
+    previewTimeMs: 0,
     expandedFamilies: {
       ...model.expandedFamilies,
       [row.familyId]: false,
@@ -654,6 +660,7 @@ function selectStory(model: DocsExplorerModel, storyId?: string): DocsExplorerMo
     ...model,
     expandedFamilies: nextExpandedFamilies,
     selectedStoryId: storyId,
+    previewTimeMs: 0,
     familyState: rebuildFamilyState(model.familyState, nextExpandedFamilies, `story:${storyId}`),
   };
 }
@@ -668,6 +675,7 @@ function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplor
       ...model.variantIndexByStory,
       [story.id]: nextIndex,
     },
+    previewTimeMs: 0,
   };
 }
 
@@ -1655,6 +1663,7 @@ function renderStoryPane(
     width: previewWidth,
     ctx: previewCtx,
     state: variant.initialState as never,
+    timeMs: model.previewTimeMs,
   }));
   const previewCard = boxSurface(placeSurface(preview, {
     width: Math.max(preview.width, previewWidth),
@@ -1851,8 +1860,8 @@ function resolveVariantPaneMouse(
   return index == null ? undefined : { type: 'select-variant', index };
 }
 
-function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameModel<DocsExplorerModel>, ExplorerMsg> {
-  return createFramedApp<DocsExplorerModel, ExplorerMsg>({
+function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameModel<DocsExplorerModel>, DocsMsg> {
+  return createFramedApp<DocsExplorerModel, DocsMsg>({
     i18n,
     title: 'Bijou Docs',
     initialColumns: ctx.runtime.columns,
@@ -1863,7 +1872,13 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameM
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
       init: () => [createInitialExplorerModel(ctx), []],
-      update(msg, model) {
+      update(msg: DocsMsg, model) {
+        if (msg.type === 'pulse') {
+          return [{
+            ...model,
+            previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+          }, []];
+        }
         switch (msg.type) {
           case 'family-next':
             return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
@@ -2064,8 +2079,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const explorer = createDocsExplorerApp(ctx, i18n);
   const renderLanding = createLandingRenderer(ctx, i18n);
 
-  function mapExplorer(cmds: Cmd<ExplorerMsg>[]): Cmd<RootMsg>[] {
-    return mapCmds(cmds, (msg) => ({ type: 'docs', msg }));
+  function mapExplorer(cmds: Cmd<DocsMsg>[]): Cmd<RootMsg>[] {
+    return mapCmds(cmds as Cmd<ExplorerMsg>[], (msg) => ({ type: 'docs', msg }));
   }
 
   function updateExplorer(
@@ -2189,7 +2204,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
 
     routeRuntimeIssue(issue) {
       const routed = explorer.routeRuntimeIssue?.(issue);
-      return routed === undefined ? undefined : { type: 'docs', msg: routed };
+      return routed === undefined ? undefined : { type: 'docs', msg: routed as ExplorerMsg };
     },
   };
 }

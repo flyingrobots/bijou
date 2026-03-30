@@ -152,4 +152,4 @@ This cycle stayed intentionally narrow: two honest families, one ratchet step, a
 
 Spawned:
 
-- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](/Users/james/git/bijou/docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md)
+- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md)

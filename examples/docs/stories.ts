@@ -3,7 +3,10 @@ import {
   alert,
   boxSurface,
   kbd,
+  progressBar,
   separatorSurface,
+  skeleton,
+  spinnerFrame,
   type Surface,
 } from '@flyingrobots/bijou';
 import {
@@ -14,6 +17,7 @@ import {
 import {
   badgeSurface,
   column,
+  contentSurface,
   line,
   row,
   screenSurface,
@@ -84,6 +88,13 @@ const LONG_DOCUMENT = [
   'The viewport story is intentionally width-sensitive so the docs app can',
   'prove clipping, masking, and scroll-state behavior without a separate demo.',
 ].join('\n');
+
+function loopingProgressPercent(timeMs: number, offsetMs = 0, cycleMs = 2_800): number {
+  const normalized = (((timeMs + offsetMs) % cycleMs) + cycleMs) % cycleMs;
+  const phase = normalized / cycleMs;
+  const pingPong = phase <= 0.5 ? phase * 2 : (1 - phase) * 2;
+  return Math.round(pingPong * 100);
+}
 
 export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   {
@@ -300,6 +311,156 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Blocking decision overlay',
     },
     tags: ['overlay', 'interruption', 'surface'],
+  },
+  {
+    kind: 'component',
+    id: 'progress-bar',
+    coverageFamilyIds: ['progress-indicators'],
+    family: 'Progress and loading',
+    title: 'progressBar()',
+    package: 'bijou',
+    docs: {
+      summary: 'Honest determinate progress indicator for work that can report a real completion percentage, with related support for indeterminate activity cues.',
+      useWhen: [
+        'The user needs clear feedback that work is ongoing and you can estimate percent-complete honestly.',
+        'A task spans long enough that progress feedback helps more than it distracts.',
+        'You want the task label and the progress indicator to stay visibly attached.',
+      ],
+      avoidWhen: [
+        'The work is so brief that the indicator would flicker more than it helps.',
+        'The state is better explained as a durable note, alert, or completion result.',
+        'You do not know progress honestly; prefer an indeterminate spinner or explicit loading text.',
+      ],
+      relatedFamilies: ['skeleton()', 'badge()', 'notification system'],
+      gracefulLowering: {
+        interactive: 'Determinate bars and indeterminate activity cues stay visible with real motion only where motion is actually available.',
+        static: 'Single deterministic frame preserving the same label and completion state without fake animation.',
+        pipe: 'Explicit text progress like `Progress: 42%` or repeated status lines without pretending to animate.',
+        accessible: 'Plain language announcing task, progress, and completion state explicitly.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-milestones',
+        label: 'Release milestones',
+        description: 'Static determinate checkpoints for work whose completion percentage is known.',
+        render: ({ ctx }) => boxSurface(column([
+          line(`Compile     ${progressBar(18, { width: 28, showPercent: true, ctx })}`),
+          spacer(),
+          line(`Canaries    ${progressBar(46, { width: 28, showPercent: true, ctx })}`),
+          spacer(),
+          line(`Artifacts   ${progressBar(73, { width: 28, showPercent: true, ctx })}`),
+          spacer(),
+          line(`Promote     ${progressBar(100, { width: 28, showPercent: true, ctx })}`),
+        ]), {
+          title: 'release pipeline',
+          width: 48,
+          ctx,
+        }),
+      },
+      {
+        id: 'looping-rollout',
+        label: 'Looping rollout',
+        description: 'Looping progress previews prove pulse-driven motion without requiring a separate story runtime.',
+        render: ({ ctx, timeMs }) => {
+          const rollout = loopingProgressPercent(timeMs, 0);
+          const canaries = loopingProgressPercent(timeMs, 700);
+          const assets = loopingProgressPercent(timeMs, 1_300);
+          const spinnerTick = Math.floor(timeMs / 90);
+          return boxSurface(column([
+            line(`Rollout    ${progressBar(rollout, { width: 28, showPercent: true, ctx })}`),
+            spacer(),
+            line(`Canaries   ${progressBar(canaries, { width: 28, showPercent: true, ctx })}`),
+            spacer(),
+            line(`Assets     ${progressBar(assets, { width: 28, showPercent: true, ctx })}`),
+            spacer(),
+            line(`Watch      ${spinnerFrame(spinnerTick, { label: 'waiting for verification window', ctx })}`),
+          ]), {
+            title: 'looping rollout monitor',
+            width: 56,
+            ctx,
+          });
+        },
+      },
+    ],
+    source: {
+      examplePath: 'examples/progress-animated/main.ts',
+      snippetLabel: 'Looping rollout progress',
+    },
+    tags: ['progress', 'loading', 'animation'],
+  },
+  {
+    kind: 'component',
+    id: 'skeleton',
+    coverageFamilyIds: ['loading-placeholders'],
+    family: 'Progress and loading',
+    title: 'skeleton()',
+    package: 'bijou',
+    docs: {
+      summary: 'Shape-preserving loading placeholder for short-lived uncertainty when you know the information layout but not the data yet.',
+      useWhen: [
+        'The final content shape is known and preserving layout stability helps more than a separate loading page.',
+        'The loading window is short enough that a placeholder remains believable.',
+        'The surrounding labels can stay explicit so the user knows what is loading.',
+      ],
+      avoidWhen: [
+        'Real partial content can already be shown honestly.',
+        'The delay is long enough that a clearer progress indicator, retry path, or durable message is needed.',
+        'The placeholder would become decorative filler instead of a faithful stand-in for the final layout.',
+      ],
+      relatedFamilies: ['progressBar()', 'spinnerFrame()', 'note()'],
+      gracefulLowering: {
+        interactive: 'Placeholder bars preserve approximate content shape while loading is genuinely transient.',
+        static: 'Single deterministic placeholder frame with the same layout footprint.',
+        pipe: 'Explicit loading text or field labels instead of decorative placeholder bars.',
+        accessible: 'Plain loading-state language describing the affected region instead of relying on shape alone.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'form-shell',
+        label: 'Form shell',
+        description: 'Short-lived placeholders that preserve a known form layout without implying fake text.',
+        render: ({ ctx }) => boxSurface(column([
+          line('Name'),
+          contentSurface(skeleton({ width: 26, ctx })),
+          spacer(),
+          line('Description'),
+          contentSurface(skeleton({ width: 34, lines: 3, ctx })),
+          spacer(),
+          line('Owner'),
+          contentSurface(skeleton({ width: 18, ctx })),
+        ]), {
+          title: 'new package',
+          width: 40,
+          ctx,
+        }),
+      },
+      {
+        id: 'card-region',
+        label: 'Card region',
+        description: 'Region-shaped placeholders that match the density of a summary card instead of spraying generic bars everywhere.',
+        render: ({ ctx }) => boxSurface(column([
+          line('Package summary'),
+          spacer(),
+          contentSurface(skeleton({ width: 32, lines: 2, ctx })),
+          spacer(),
+          line('Recent activity'),
+          contentSurface(skeleton({ width: 28, lines: 3, ctx })),
+        ]), {
+          title: 'registry overview',
+          width: 38,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/skeleton/main.ts',
+      snippetLabel: 'Loading placeholders',
+    },
+    tags: ['loading', 'placeholder', 'layout'],
   },
   {
     kind: 'component',
