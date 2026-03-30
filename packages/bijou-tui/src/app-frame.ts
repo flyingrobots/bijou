@@ -102,6 +102,10 @@ import {
   mergeBindingSources,
 } from './app-frame-utils.js';
 import {
+  activeFrameLayer,
+  underlyingFrameLayer,
+} from './app-frame-layers.js';
+import {
   frameEndAnchor,
   frameMessage,
   frameNotificationCue,
@@ -407,6 +411,8 @@ export interface FrameModel<PageModel> {
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
   readonly commandPalette?: CommandPaletteState;
+  /** Kind of active shell palette (`search` vs `command`). */
+  readonly commandPaletteKind?: 'command' | 'search';
   /** Settings drawer visibility flag. */
   readonly settingsOpen: boolean;
   /** Notification center visibility flag. */
@@ -450,6 +456,16 @@ export interface FrameModel<PageModel> {
   /** Whether the runtime notification tick loop is active. */
   readonly runtimeNotificationLoopActive: boolean;
 }
+
+export type {
+  FrameLayerKind,
+  FrameLayerOwner,
+  FrameLayerDescriptor,
+  DescribeFrameLayerStackOptions,
+} from './app-frame-layers.js';
+export {
+  describeFrameLayerStack,
+} from './app-frame-layers.js';
 
 // ---------------------------------------------------------------------------
 // Frame Notification Helpers
@@ -660,6 +676,82 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
+  function resolveLayerContext(
+    model: InternalFrameModel<PageModel, Msg>,
+  ) {
+    const activePage = pagesById.get(model.activePageId)!;
+    const activePageModel = model.pageModels[model.activePageId]!;
+    const inputAreas = resolveInputAreas(activePage, activePageModel);
+    const activeInputArea = findInputAreaByPaneId(
+      inputAreas,
+      model.focusedPaneByPage[model.activePageId],
+    );
+    const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
+    const pageModalOpen = modalKeyMap != null;
+    const activeLayer = activeFrameLayer(model, { pageModalOpen });
+    return {
+      activePage,
+      activePageModel,
+      inputAreas,
+      activeInputArea,
+      modalKeyMap,
+      pageModalOpen,
+      activeLayer,
+    };
+  }
+
+  function resolveWorkspaceHintSource(
+    model: InternalFrameModel<PageModel, Msg>,
+    activePage: FramePage<PageModel, Msg>,
+    activeInputArea: FrameInputArea<PageModel, Msg> | undefined,
+  ): string | BindingSource | undefined {
+    const helpLineOverride = options.helpLineSource?.({
+      model,
+      activePage,
+      frameKeys,
+      globalKeys: options.globalKeys,
+    });
+    if (typeof helpLineOverride === 'string') {
+      return helpLineOverride;
+    }
+    return helpLineOverride ?? mergeBindingSources(
+      frameKeys,
+      options.globalKeys,
+      activeInputArea?.helpSource ?? activeInputArea?.keyMap,
+      activePage.helpSource ?? activePage.keyMap,
+    );
+  }
+
+  function resolveFooterHintSource(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): string | BindingSource | undefined {
+    const {
+      activePage,
+      activeInputArea,
+      modalKeyMap,
+      activeLayer,
+    } = resolveLayerContext(model);
+
+    switch (activeLayer.kind) {
+      case 'search':
+      case 'command-palette':
+        return frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close');
+      case 'help':
+        return frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close');
+      case 'settings':
+        return frameMessage(options.i18n, 'settings.footer', 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit');
+      case 'notification-center':
+        return frameMessage(options.i18n, 'notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit');
+      case 'quit-confirm':
+        return frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay');
+      case 'page-modal':
+        return modalKeyMap ?? activePage.helpSource ?? activePage.keyMap;
+      case 'workspace':
+      default:
+        return resolveWorkspaceHintSource(model, activePage, activeInputArea);
+    }
+  }
+
   function updateTargetPage(
     model: InternalFrameModel<PageModel, Msg>,
     targetPageId: string,
@@ -694,24 +786,29 @@ export function createFramedApp<PageModel, Msg>(
     msg: MouseMsg,
     model: InternalFrameModel<PageModel, Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
-    const activePage = pagesById.get(model.activePageId)!;
-    const activePageModel = model.pageModels[model.activePageId]!;
-    const inputAreas = resolveInputAreas(activePage, activePageModel);
+    const {
+      activePage,
+      activePageModel,
+      inputAreas,
+      activeLayer,
+    } = resolveLayerContext(model);
 
-      if (model.helpOpen) {
-        if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-          return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, options), []];
-        }
-        return [model, []];
+    if (activeLayer.kind === 'help') {
+      if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+        return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, options), []];
       }
+      return [model, []];
+    }
 
-      if (model.commandPalette != null) return [model, []];
+    if (activeLayer.kind === 'search' || activeLayer.kind === 'command-palette') {
+      return [model, []];
+    }
 
-      if (model.quitConfirmOpen) {
-        return [model, []];
-      }
+    if (activeLayer.kind === 'quit-confirm' || activeLayer.kind === 'page-modal') {
+      return [model, []];
+    }
 
-      if (model.settingsOpen) {
+    if (activeLayer.kind === 'settings') {
         const layout = resolveSettingsLayout(model, options, pagesById);
         if (layout != null) {
           if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
@@ -739,9 +836,9 @@ export function createFramedApp<PageModel, Msg>(
 
           return [model, []];
         }
-      }
+    }
 
-      if (model.notificationCenterOpen) {
+    if (activeLayer.kind === 'notification-center') {
         const layout = resolveNotificationCenterLayout(model, options, pagesById);
         if (layout != null) {
           if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
@@ -760,7 +857,7 @@ export function createFramedApp<PageModel, Msg>(
 
           return [model, []];
         }
-      }
+    }
 
       if (msg.action === 'press' && msg.button === 'left') {
       if (frameNotificationOptions.enabled) {
@@ -1042,7 +1139,14 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isKeyMsg(msg)) {
-        if (model.commandPalette != null) {
+        const {
+          activePage,
+          activeInputArea,
+          modalKeyMap,
+          activeLayer,
+        } = resolveLayerContext(model);
+
+        if (activeLayer.kind === 'search' || activeLayer.kind === 'command-palette') {
           if (msg.ctrl && !msg.alt && msg.key === 'c') {
             return applyQuitRequest(model, msg);
           }
@@ -1051,15 +1155,13 @@ export function createFramedApp<PageModel, Msg>(
           }
           const frameAction = frameKeys.handle(msg);
           if (frameAction?.type === 'open-search') {
-            const isSearchOpen = model.commandPaletteKind === 'search';
-            if (isSearchOpen) {
+            if (activeLayer.kind === 'search') {
               return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
           if (frameAction?.type === 'open-palette') {
-            const isCommandPaletteOpen = model.commandPaletteKind === 'command';
-            if (isCommandPaletteOpen) {
+            if (activeLayer.kind === 'command-palette') {
               return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
@@ -1072,11 +1174,8 @@ export function createFramedApp<PageModel, Msg>(
           return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
 
-        const activePage = pagesById.get(model.activePageId)!;
-
-        // Help acts as a modal layer when open: only close keys are handled.
-        if (model.helpOpen) {
-          if (!msg.ctrl && !msg.alt && msg.key === '?') {
+        if (activeLayer.kind === 'help') {
+          if (!msg.ctrl && !msg.alt && (msg.key === '?' || msg.key === 'escape')) {
             return [{ ...model, helpOpen: false, helpScrollY: 0 }, withObservedKey(model, [], msg, 'help')];
           }
           if (isShellQuitRequest(msg)) {
@@ -1092,7 +1191,7 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'help')];
         }
 
-        if (model.settingsOpen) {
+        if (activeLayer.kind === 'settings') {
           const layout = resolveSettingsLayout(model, options, pagesById);
           if (layout != null) {
             const settingsFrameAction = frameKeys.handle(msg);
@@ -1166,10 +1265,17 @@ export function createFramedApp<PageModel, Msg>(
           }
         }
 
-        if (model.notificationCenterOpen) {
+        if (activeLayer.kind === 'notification-center') {
           const layout = resolveNotificationCenterLayout(model, options, pagesById);
           if (layout != null) {
             const centerFrameAction = frameKeys.handle(msg);
+            if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
+              return [{
+                ...model,
+                notificationCenterOpen: false,
+                notificationCenterScrollY: 0,
+              }, withObservedKey(model, [], msg, 'frame')];
+            }
             if (isShellQuitRequest(msg)) {
               return applyQuitRequest(model, msg);
             }
@@ -1229,7 +1335,7 @@ export function createFramedApp<PageModel, Msg>(
           }
         }
 
-        if (model.quitConfirmOpen) {
+        if (activeLayer.kind === 'quit-confirm') {
           if (isShellQuitConfirmAccept(msg)) {
             return [{
               ...model,
@@ -1245,13 +1351,7 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'frame')];
         }
 
-        const activePageModel = model.pageModels[model.activePageId]!;
-        const activeInputArea = findInputAreaByPaneId(
-          resolveInputAreas(activePage, activePageModel),
-          model.focusedPaneByPage[model.activePageId],
-        );
-        const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
-        if (modalKeyMap != null) {
+        if (activeLayer.kind === 'page-modal' && modalKeyMap != null) {
           const modalAction = modalKeyMap.handle(msg);
           if (modalAction !== undefined) {
             return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, modalAction)], msg, 'page')];
@@ -1333,13 +1433,16 @@ export function createFramedApp<PageModel, Msg>(
     },
 
     view(model) {
-      const activePage = pagesById.get(model.activePageId)!;
+      const {
+        activePage,
+        activeLayer,
+      } = resolveLayerContext(model);
       const header = resolveHeaderLine(model, options, pagesById).surface;
       const helpLine = renderHelpLine(
         model,
-        frameKeys,
-        options,
-        activePage,
+        activeLayer,
+        resolveFooterHintSource(model),
+        options.i18n,
         resolveNotificationFooterCue(model, options, pagesById),
       );
       const bodyRect = resolveBodyRect(model, options);
@@ -1406,18 +1509,6 @@ export function createFramedApp<PageModel, Msg>(
         }));
       }
 
-      if (model.helpOpen) {
-        const helpOverlay = renderHelpOverlay(model, activePage, frameKeys, options);
-        overlays.push(modal({
-          title: frameMessage(options.i18n, 'help.title', 'Keyboard Help'),
-          body: helpOverlay.body,
-          hint: frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ? close'),
-          width: helpOverlay.body.width + 4,
-          screenWidth: model.columns,
-          screenHeight: model.rows,
-        }));
-      }
-
       if (model.settingsOpen) {
         const settingsOverlay = renderSettingsDrawer(model, options, pagesById);
         if (settingsOverlay != null) {
@@ -1430,6 +1521,18 @@ export function createFramedApp<PageModel, Msg>(
         if (notificationCenterOverlay != null) {
           overlays.push(notificationCenterOverlay);
         }
+      }
+
+      if (model.helpOpen) {
+        const helpOverlay = renderHelpOverlay(model, activePage, frameKeys, options);
+        overlays.push(modal({
+          title: frameMessage(options.i18n, 'help.title', 'Keyboard Help'),
+          body: helpOverlay.body,
+          hint: frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close'),
+          width: helpOverlay.body.width + 4,
+          screenWidth: model.columns,
+          screenHeight: model.rows,
+        }));
       }
 
       if (model.commandPalette != null) {
@@ -1530,17 +1633,21 @@ function renderHelpOverlay<PageModel, Msg>(
     resolveInputAreas(activePage, activePageModel),
     model.focusedPaneByPage[model.activePageId],
   );
-  const source = model.settingsOpen
+  const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
+  const beneathHelpLayer = underlyingFrameLayer(model, { pageModalOpen: modalKeyMap != null });
+  const source = beneathHelpLayer?.kind === 'settings'
     ? mergeBindingSources(settingsHelpKeys, quitHelpKeys)
-    : model.notificationCenterOpen
+    : beneathHelpLayer?.kind === 'notification-center'
       ? mergeBindingSources(notificationCenterHelpKeys, quitHelpKeys)
-    : mergeBindingSources(
-      frameKeys,
-      quitHelpKeys,
-      options.globalKeys,
-      activeInputArea?.helpSource ?? activeInputArea?.keyMap,
-      activePage.helpSource ?? activePage.keyMap,
-    );
+      : beneathHelpLayer?.kind === 'page-modal'
+        ? mergeBindingSources(quitHelpKeys, modalKeyMap, activePage.helpSource ?? activePage.keyMap)
+        : mergeBindingSources(
+          frameKeys,
+          quitHelpKeys,
+          options.globalKeys,
+          activeInputArea?.helpSource ?? activeInputArea?.keyMap,
+          activePage.helpSource ?? activePage.keyMap,
+        );
   const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
   const bodyWidth = Math.max(20, maxDialogWidth - 4);
   const helpSurface = helpViewSurface(source, {

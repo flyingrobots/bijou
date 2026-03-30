@@ -198,4 +198,4 @@ What it clarified:
 Drift and follow-on:
 
 - the runtime still routes most shell layers ad hoc today
-- follow-on implementation is captured as [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/BACKLOG/HT-003-implement-layer-stack-and-input-map-routing.md)
+- that follow-on has now landed as [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md)

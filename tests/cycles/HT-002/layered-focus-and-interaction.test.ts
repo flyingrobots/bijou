@@ -6,12 +6,12 @@ function read(path: string): string {
 }
 
 describe('HT-002 layered focus and interaction cycle', () => {
-  it('captures the humane-terminal layer cycle and follow-on backlog', () => {
+  it('captures the humane-terminal layer cycle and its landed follow-on implementation cycle', () => {
     const legend = read('/Users/james/git/bijou/docs/legends/HT-humane-terminal.md');
     const cycle = read('/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md');
-    const backlog = read('/Users/james/git/bijou/docs/BACKLOG/HT-003-implement-layer-stack-and-input-map-routing.md');
+    const implementationCycle = read('/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
 
-    expect(legend).toContain('HT-002 — Layered Focus and Interaction');
+    expect(cycle).toContain('# HT-002 — Layered Focus and Interaction');
     expect(legend).toContain('HT-003 — Implement Layer Stack and Input Map Routing');
 
     expect(cycle).toContain('## Human playback');
@@ -20,8 +20,8 @@ describe('HT-002 layered focus and interaction cycle', () => {
     expect(cycle).toContain('Esc');
     expect(cycle).toContain('## Retrospective');
 
-    expect(backlog).toContain('Refactor `createFramedApp()`');
-    expect(backlog).toContain('topmost-layer dismissal');
+    expect(implementationCycle).toContain('describeFrameLayerStack()');
+    expect(implementationCycle).toContain('topmost-layer-driven key routing');
   });
 
   it('records the new dismiss-order invariant and doctrine links', () => {

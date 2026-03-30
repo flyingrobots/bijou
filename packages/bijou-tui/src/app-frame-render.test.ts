@@ -122,7 +122,13 @@ describe('frame shell chrome surfaces', () => {
     const options = { title: 'Test', pages: [activePage] };
 
     const header = resolveHeaderLine(model as any, options as any, pagesById as any).surface;
-    const help = renderHelpLine(model as any, createFrameKeyMap(), options as any, activePage as any);
+    const help = renderHelpLine(model as any, {
+      kind: 'workspace',
+      owner: 'frame',
+      inputMapId: 'frame-workspace',
+      dismissible: false,
+      blocksUnderlyingInput: false,
+    }, createFrameKeyMap(), undefined);
 
     for (let x = 0; x < 12; x++) {
       expect(header.get(x, 0).bg).toBe('#112233');

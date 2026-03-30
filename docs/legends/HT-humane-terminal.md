@@ -51,7 +51,7 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 ## Current cycle and backlog
 
 - active cycle:
-  - [HT-002 — Layered Focus and Interaction](/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md)
+  - [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md)
 - backlog:
   - [HT-001 — Notification Center Polish and Discoverability](/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md)
-  - [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/BACKLOG/HT-003-implement-layer-stack-and-input-map-routing.md)
+  - [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](/Users/james/git/bijou/docs/BACKLOG/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)

@@ -16,18 +16,21 @@ import {
   type NotificationHistoryFilter,
   type NotificationState,
 } from './notification.js';
-import { createFramedApp, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
+import { createFramedApp, describeFrameLayerStack, type FramePage, type FrameOverlayContext, type PageTransition } from './app-frame.js';
 import { QUIT, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
 
 type Msg =
   | { type: 'inc' }
   | { type: 'noop' }
-  | { type: 'toggle-hints' };
+  | { type: 'toggle-hints' }
+  | { type: 'toggle-modal' }
+  | { type: 'close-modal' };
 
 interface PageModel {
   count: number;
   showHints?: boolean;
+  modalOpen?: boolean;
 }
 
 const KEY_TAB = '\t';
@@ -100,6 +103,30 @@ function makePage(id: string, title: string, paneId: string): FramePage<PageMode
     }),
     keyMap: createKeyMap<Msg>()
       .bind('x', 'Increment', { type: 'inc' }),
+  };
+}
+
+function makeModalPage(id: string, title: string, paneId: string): FramePage<PageModel, Msg> {
+  return {
+    id,
+    title,
+    init: () => [{ count: 0, modalOpen: false }, []],
+    update(msg, model) {
+      if (msg.type === 'toggle-modal') return [{ ...model, modalOpen: !model.modalOpen }, []];
+      if (msg.type === 'close-modal') return [{ ...model, modalOpen: false }, []];
+      return [model, []];
+    },
+    layout: () => ({
+      kind: 'pane',
+      paneId,
+      render: () => textView(makeLongContent(`${id}:${paneId}`)),
+    }),
+    keyMap: createKeyMap<Msg>()
+      .bind('m', 'Toggle modal', { type: 'toggle-modal' })
+      .bind('x', 'Increment', { type: 'inc' }),
+    modalKeyMap: (model) => model.modalOpen
+      ? createKeyMap<Msg>().bind('escape', 'Close modal', { type: 'close-modal' })
+      : undefined,
   };
 }
 
@@ -721,14 +748,14 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(false);
   });
 
-  it('opens quit confirm with escape while help is open', async () => {
+  it('closes help with escape without opening quit confirm', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
     });
 
     const result = await runScript(app, [{ key: '?' }, { key: KEY_ESCAPE }]);
     expect(result.model.helpOpen).toBe(false);
-    expect((result.model as any).quitConfirmOpen).toBe(true);
+    expect((result.model as any).quitConfirmOpen).toBe(false);
   });
 
   it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
@@ -1105,6 +1132,89 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(false);
   });
 
+  it('dismisses topmost layers before opening quit confirm', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(true);
+    expect((model as any).helpOpen).toBe(true);
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).helpOpen).toBe(false);
+    expect((model as any).settingsOpen).toBe(true);
+    expect((model as any).quitConfirmOpen).toBe(false);
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).settingsOpen).toBe(false);
+    expect((model as any).quitConfirmOpen).toBe(false);
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).quitConfirmOpen).toBe(true);
+  });
+
+  it('describes the active frame layer stack for shell surfaces and page modals', async () => {
+    const shellApp = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+      enableCommandPalette: true,
+    });
+
+    let [shellModel] = shellApp.init();
+    expect(describeFrameLayerStack(shellModel).map((layer) => layer.kind)).toEqual(['workspace']);
+
+    [shellModel] = shellApp.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, shellModel);
+    expect(describeFrameLayerStack(shellModel).map((layer) => layer.kind)).toEqual(['workspace', 'settings']);
+
+    [shellModel] = shellApp.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, shellModel);
+    expect(describeFrameLayerStack(shellModel).map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'help']);
+
+    [shellModel] = shellApp.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, shellModel);
+    [shellModel] = shellApp.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, shellModel);
+    expect(describeFrameLayerStack(shellModel).map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'search']);
+
+    [shellModel] = shellApp.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, shellModel);
+    [shellModel] = shellApp.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, shellModel);
+    expect(describeFrameLayerStack(shellModel).map((layer) => layer.kind)).toEqual(['workspace', 'quit-confirm']);
+
+    const modalApp = createFramedApp({
+      pages: [makeModalPage('home', 'Home', 'main')],
+    });
+
+    const modalResult = await runScript(modalApp, [{ key: 'm' }]);
+    const modalModel = modalResult.model;
+    expect(describeFrameLayerStack(modalModel, { pageModalOpen: !!modalModel.pageModels.home?.modalOpen }).map((layer) => layer.kind)).toEqual([
+      'workspace',
+      'page-modal',
+    ]);
+  });
+
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     setDefaultContext(pipeCtx);
@@ -1438,6 +1548,20 @@ describe('createFramedApp', () => {
 
     [model] = app.update(shiftKey('n'), model);
     expect((model as any).notificationCenterOpen).toBe(false);
+  });
+
+  it('closes the shell notification center with escape without opening quit confirm', () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    let [model] = app.init();
+    [model] = app.update(shiftKey('n'), model);
+    expect((model as any).notificationCenterOpen).toBe(true);
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).notificationCenterOpen).toBe(false);
+    expect((model as any).quitConfirmOpen).toBe(false);
   });
 
   it('scrolls a shell notification center independently of the underlying page', () => {
@@ -1822,6 +1946,53 @@ describe('createFramedApp', () => {
     expect(result.model.commandPalette).toBeDefined();
     expect(result.model.quitConfirmOpen).toBe(false);
     expect(result.model.commandPalette?.query).toBe('q');
+  });
+
+  it('derives footer hints from the topmost active layer input map', async () => {
+    const app = createFramedApp({
+      pages: [makeModalPage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+          }],
+        }],
+      }),
+    });
+
+    let model = (await runScript(app, [{ key: 'm' }])).model;
+
+    let frame = normalizeViewOutput(app.view(model), {
+      width: model.columns,
+      height: model.rows,
+    }).surface;
+    let footer = surfaceToString(frame, testCtx.style).split('\n').at(-1) ?? '';
+    expect(footer).toContain('Escape Close modal');
+    expect(footer).not.toContain('x Increment');
+
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    frame = normalizeViewOutput(app.view(model), {
+      width: model.columns,
+      height: model.rows,
+    }).surface;
+    footer = surfaceToString(frame, testCtx.style).split('\n').at(-1) ?? '';
+    expect(footer).toContain('Escape Close modal');
+    expect(footer).not.toContain('F2/Esc close');
+
+    model = (await runScript(app, [{ key: 'm' }, { key: KEY_ESCAPE }])).model;
+    [model] = app.update({ type: 'key', key: 'f2', ctrl: false, alt: false, shift: false }, model);
+    frame = normalizeViewOutput(app.view(model), {
+      width: model.columns,
+      height: model.rows,
+    }).surface;
+    footer = surfaceToString(frame, testCtx.style).split('\n').at(-1) ?? '';
+    expect(footer).toContain('F2/Esc close');
+    expect(footer).not.toContain('Escape Close modal');
   });
 
   it('passes pane rects to overlayFactory for panel-scoped overlays', () => {

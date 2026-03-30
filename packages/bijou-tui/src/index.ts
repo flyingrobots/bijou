@@ -134,6 +134,10 @@ export {
 export {
   type FrameCommandItem,
   type FrameInputArea,
+  type FrameLayerKind,
+  type FrameLayerOwner,
+  type FrameLayerDescriptor,
+  type DescribeFrameLayerStackOptions,
   type FramePage,
   type FrameLayoutNode,
   type FrameOverlayContext,
@@ -142,6 +146,7 @@ export {
   type PageTransition,
   type FramePaneScroll,
   type FrameModel,
+  describeFrameLayerStack,
   createFramedApp,
 } from './app-frame.js';
 

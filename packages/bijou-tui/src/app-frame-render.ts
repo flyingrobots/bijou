@@ -14,7 +14,7 @@ import {
   type Surface,
 } from '@flyingrobots/bijou';
 import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-frame.js';
-import type { InternalFrameModel, RenderContext, RenderResult, FrameAction } from './app-frame-types.js';
+import type { InternalFrameModel, RenderContext, RenderResult } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
 import type { PageTransition } from './app-frame.js';
 import { TRANSITION_SHADERS, type TransitionResult } from './transition-shaders.js';
@@ -31,18 +31,18 @@ import { isMinimized, createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState, resolveChildOrder, getNodeId } from './panel-dock.js';
 import { visibleLength } from './viewport.js';
 import { helpShort } from './help.js';
-import type { KeyMap } from './keybindings.js';
+import type { BindingSource } from './help.js';
 import {
   findPaneNode,
   isPaneMinimized,
   mergeMaps,
   offsetRect,
   fitLine,
-  mergeBindingSources,
 } from './app-frame-utils.js';
 import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
 import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
-import { frameMessage, frameModeLabel } from './app-frame-i18n.js';
+import { frameModeLabel } from './app-frame-i18n.js';
+import type { FrameLayerDescriptor } from './app-frame-layers.js';
 
 export interface FrameHeaderTabTarget {
   readonly pageId: string;
@@ -397,47 +397,35 @@ export function resolveHeaderLine<PageModel, Msg>(
 /** Render the footer status line showing mode, focused pane, and key hints. */
 export function renderHelpLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
-  frameKeys: KeyMap<FrameAction>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  activePage: FramePage<PageModel, Msg>,
+  activeLayer: FrameLayerDescriptor,
+  hintSource: string | BindingSource | undefined,
+  i18n: CreateFramedAppOptions<PageModel, Msg>['i18n'],
   notificationCue?: string,
 ): Surface {
-  const mode = model.commandPalette != null
+  const mode = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
     ? 'PALETTE'
-    : model.helpOpen
+    : activeLayer.kind === 'help'
       ? 'HELP'
-      : model.quitConfirmOpen
+      : activeLayer.kind === 'quit-confirm'
         ? 'QUIT'
-      : model.settingsOpen
-        ? 'SETTINGS'
-        : model.notificationCenterOpen
-          ? 'NOTICES'
-        : 'NORMAL';
+        : activeLayer.kind === 'settings'
+          ? 'SETTINGS'
+          : activeLayer.kind === 'notification-center'
+            ? 'NOTICES'
+            : activeLayer.kind === 'page-modal'
+              ? 'MODAL'
+              : 'NORMAL';
   const focusedPane = model.focusedPaneByPage[model.activePageId] ?? '-';
-  const modeLabel = frameModeLabel(options.i18n, mode);
+  const modeLabel = frameModeLabel(i18n, mode);
   const status = notificationCue == null || notificationCue.length === 0
     ? `[${modeLabel}] page:${model.activePageId} pane:${focusedPane}`
     : `[${modeLabel}] page:${model.activePageId} pane:${focusedPane} ${notificationCue}`;
 
-  const helpLineOverride = options.helpLineSource?.({
-    model,
-    activePage,
-    frameKeys,
-    globalKeys: options.globalKeys,
-  });
-  const hint = model.settingsOpen && model.commandPalette == null && !model.helpOpen
-    ? frameMessage(options.i18n, 'settings.footer', 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit')
-    : model.notificationCenterOpen && model.commandPalette == null && !model.helpOpen
-      ? frameMessage(options.i18n, 'notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit')
-    : model.quitConfirmOpen
-      ? frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay')
-    : typeof helpLineOverride === 'string'
-      ? helpLineOverride
-      : helpShort(helpLineOverride ?? mergeBindingSources(
-        frameKeys,
-        options.globalKeys,
-        activePage.helpSource ?? activePage.keyMap,
-      ));
+  const hint = typeof hintSource === 'string'
+    ? hintSource
+    : hintSource == null
+      ? ''
+      : helpShort(hintSource);
   const line = hint.length > 0
     ? (() => {
         const statusWithPadding = ` ${status}`;

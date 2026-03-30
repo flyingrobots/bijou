@@ -24,7 +24,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('notifications.filter.all', 'All'),
     message('notifications.filter.actionable', 'Actionable'),
     message('help.title', 'Keyboard Help'),
-    message('help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ? close'),
+    message('help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close'),
     message('quit.title', 'Quit?'),
     message('quit.body', 'Quit this app?\n\nY quit • N stay'),
     message('quit.footer', 'Y quit • N stay'),
@@ -34,6 +34,7 @@ export const FRAME_I18N_CATALOG: I18nCatalog = {
     message('mode.quit', 'QUIT'),
     message('mode.settings', 'SETTINGS'),
     message('mode.notices', 'NOTICES'),
+    message('mode.modal', 'MODAL'),
   ],
 };
 
@@ -88,7 +89,7 @@ export function frameEndAnchor(i18n: I18nRuntime | undefined): 'left' | 'right' 
 
 export function frameModeLabel(
   i18n: I18nRuntime | undefined,
-  mode: 'NORMAL' | 'PALETTE' | 'HELP' | 'QUIT' | 'SETTINGS' | 'NOTICES',
+  mode: 'NORMAL' | 'PALETTE' | 'HELP' | 'QUIT' | 'SETTINGS' | 'NOTICES' | 'MODAL',
 ): string {
   return frameMessage(i18n, `mode.${mode.toLowerCase()}`, mode);
 }
