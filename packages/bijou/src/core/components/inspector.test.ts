@@ -58,4 +58,23 @@ describe('inspector', () => {
     expect(rendered).toContain('Current selection: Warning');
     expect(rendered).toContain('Profile: Rich');
   });
+
+  it('supports chrome-less rich rendering for block composition', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const rendered = inspector({
+      title: 'active variant',
+      currentValue: 'Warning',
+      sections: [
+        { title: 'Profile', content: 'Rich' },
+      ],
+      chrome: 'none',
+      ctx,
+    });
+
+    expect(rendered).toContain('Current selection');
+    expect(rendered).toContain('Warning');
+    expect(rendered).toContain('Profile');
+    expect(rendered).not.toContain('┌');
+    expect(rendered).not.toContain('┘');
+  });
 });

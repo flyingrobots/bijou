@@ -6,6 +6,7 @@ import { box } from './box.js';
 import type { BijouNodeOptions } from './types.js';
 
 export type InspectorSectionTone = 'default' | 'muted';
+export type InspectorChrome = 'boxed' | 'none';
 
 /** A compact titled section within an inspector surface. */
 export interface InspectorSection {
@@ -31,6 +32,8 @@ export interface InspectorOptions extends BijouNodeOptions {
   readonly supportingTextLabel?: string;
   /** Compact titled sections shown below the active value. */
   readonly sections?: readonly InspectorSection[];
+  /** Visual chrome for rich/static rendering. Defaults to `boxed`. */
+  readonly chrome?: InspectorChrome;
   /** Optional border token for the visual surface. */
   readonly borderToken?: TokenValue;
   /** Optional background token for the visual surface. */
@@ -139,7 +142,7 @@ function buildInteractiveContent(options: InspectorOptions, ctx: BijouContext): 
  * Render a canonical inspector surface for compact side-panel context.
  *
  * Output adapts by mode:
- * - `interactive` / `static`: boxed current-selection panel with compact titled sections.
+ * - `interactive` / `static`: boxed current-selection panel with compact titled sections by default, or plain sectioned content when `chrome: 'none'`.
  * - `pipe`: plain grouped text with explicit field labels.
  * - `accessible`: explicit linearized field/value output with the same meaning.
  */
@@ -149,13 +152,17 @@ export function inspector(options: InspectorOptions): string {
   return renderByMode(ctx.mode, {
     pipe: () => buildPipeSections(options).join('\n'),
     accessible: () => buildAccessibleSections(options).join('\n'),
-    interactive: () => box(buildInteractiveContent(options, ctx), {
-      title: options.title,
-      borderToken: options.borderToken ?? ctx.border('muted'),
-      bgToken: options.bgToken ?? ctx.surface('elevated'),
-      padding: { left: 1, right: 1 },
-      width: options.width,
-      ctx,
-    }),
+    interactive: () => {
+      const content = buildInteractiveContent(options, ctx);
+      if (options.chrome === 'none') return content;
+      return box(content, {
+        title: options.title,
+        borderToken: options.borderToken ?? ctx.border('muted'),
+        bgToken: options.bgToken ?? ctx.surface('elevated'),
+        padding: { left: 1, right: 1 },
+        width: options.width,
+        ctx,
+      });
+    },
   }, options);
 }

@@ -226,6 +226,7 @@ export {
   type ExplainabilityEvidenceItem,
   type ExplainabilityOptions,
   inspector,
+  type InspectorChrome,
   type InspectorSectionTone,
   type InspectorSection,
   type InspectorOptions,

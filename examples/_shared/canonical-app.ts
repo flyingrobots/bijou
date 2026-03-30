@@ -12,7 +12,7 @@ import {
   createFramedApp,
   createKeyMap,
   createSplitPaneState,
-  drawer,
+  inspectorDrawer,
   modal,
   quit,
   statusBar,
@@ -23,7 +23,7 @@ import {
   type FrameModel,
   type FramePage,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from './example-surfaces.ts';
+import { contentSurface } from './example-surfaces.js';
 
 const DRAWER_ANCHORS: readonly DrawerAnchor[] = ['right', 'left', 'bottom', 'top'];
 
@@ -668,18 +668,6 @@ export function createCanonicalWorkbenchApp(
           ? 'screen'
           : `${frame.activePageId}:${targetPaneId}`;
 
-        const content = [
-          `Target: ${targetLabel}`,
-          `Anchor: ${pageModel.drawerAnchor}`,
-          '',
-          `Page: ${frame.activePageId}`,
-          `Release: ${RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)]!.id}`,
-          '',
-          `${kbd('o', { ctx })} toggle`,
-          `${kbd('a', { ctx })} anchor`,
-          `${kbd('y', { ctx })} target`,
-        ].join('\n');
-
         const frameWidth = region?.width ?? frame.screenRect.width;
         const frameHeight = region?.height ?? frame.screenRect.height;
         const anchor = pageModel.drawerAnchor;
@@ -687,21 +675,35 @@ export function createCanonicalWorkbenchApp(
           const base = {
             region,
             title: 'Panel Inspector',
-            content,
             screenWidth: frame.screenRect.width,
             screenHeight: frame.screenRect.height,
             borderToken: ctx.border('primary'),
             bgToken: ctx.surface('elevated'),
             ctx,
+            inspector: {
+              title: 'Focused context',
+              currentValue: targetLabel,
+              currentValueLabel: 'Current selection',
+              sections: [
+                { title: 'Page', content: frame.activePageId },
+                { title: 'Release', content: RELEASES[clampIndex(pageModel.releaseIndex, RELEASES.length)]!.id },
+                { title: 'Anchor', content: pageModel.drawerAnchor, tone: 'muted' as const },
+                {
+                  title: 'Controls',
+                  content: `${kbd('o', { ctx })} toggle • ${kbd('a', { ctx })} anchor • ${kbd('y', { ctx })} target`,
+                  tone: 'muted' as const,
+                },
+              ],
+            },
           };
           if (anchor === 'left' || anchor === 'right') {
-            return drawer({
+            return inspectorDrawer({
               ...base,
               anchor,
               width: Math.max(24, Math.floor(frameWidth * 0.46)),
             });
           }
-          return drawer({
+          return inspectorDrawer({
             ...base,
             anchor,
             height: Math.max(8, Math.floor(frameHeight * 0.4)),

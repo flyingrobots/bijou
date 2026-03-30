@@ -23,7 +23,7 @@ npx tsx examples/app-frame/main.ts
 
 - `createFramedApp()` with tabbed pages and shared shell behavior
 - split and grid page layouts inside the framed shell
-- a pane-scoped inspector `drawer()` driven from the shell overlay factory
+- a pane-scoped `inspectorDrawer()` block driven from the shell overlay factory
 - shell-level help and command palette integration without each page reimplementing them
 
 [← Examples](../README.md)

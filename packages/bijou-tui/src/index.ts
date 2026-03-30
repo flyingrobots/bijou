@@ -390,6 +390,10 @@ export {
   drawer,
   tooltip,
 } from './overlay.js';
+export {
+  type InspectorDrawerOptions,
+  inspectorDrawer,
+} from './inspector-drawer.js';
 
 // Notification stack overlays
 export {

@@ -379,6 +379,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `explainability()`
   - `preferenceListSurface()`
   - notification system
+  - `inspectorDrawer()`
 - Carbon analogue:
   - side panel / contextual detail panel
 

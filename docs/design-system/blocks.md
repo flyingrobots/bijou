@@ -110,6 +110,7 @@ An inspector-style side panel is another strong candidate because it naturally c
 - compact but calm spacing
 
 DL-006 now proves the first canonical seam in this family through `inspector()`, which turns inspector-panel rhythm into a reusable core component instead of leaving it trapped in a bespoke DOGFOOD detail box.
+DL-007 promotes the first block-level seam in this family through `inspectorDrawer()`, which standardizes drawer-attached inspector composition in TUI shells instead of leaving existing inspector drawers to hand-compose strings.
 
 ## Block acceptance bar
 

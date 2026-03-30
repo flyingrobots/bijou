@@ -24,7 +24,7 @@ npx tsx examples/release-workbench/main.ts
 - tabs and shared frame chrome
 - multi-pane layouts with split and grid page composition
 - pane focus plus per-pane scroll isolation
-- pane-scoped `drawer()` overlays
+- pane-scoped `inspectorDrawer()` overlays
 - shell-level command palette and confirmation flow
 
 ## Controls

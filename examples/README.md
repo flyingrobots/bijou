@@ -131,7 +131,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 | [`grid-layout`](./grid-layout/) | `grid()`, `gridLayout()` | Named-area grid layout with fixed and fractional tracks |
 | [`app-frame`](./app-frame/) | `createFramedApp()` | Tabbed shell with pane focus, help, overlays, and command palette |
 | [`transitions`](./transitions/) | `createFramedApp()`, transitions | Dynamic tab transition animations (melt, matrix, scramble, etc.) |
-| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `drawer()`, command palette | Canonical multi-view control room with pane-scoped drawers and shell-level action discovery |
+| [`release-workbench`](./release-workbench/) | `createFramedApp()`, `inspectorDrawer()`, command palette | Canonical multi-view control room with pane-scoped inspector drawers and shell-level action discovery |
 | [`docs`](./docs/) | `ComponentStory` v0, `createFramedApp()` | First story-driven living-docs slice with profile switching and live demos |
 | [`pager`](./pager/) | `pager()`, `pagerKeyMap()` | Scrollable text viewer with status line |
 | [`navigable-table`](./navigable-table/) | `navigableTableSurface()`, `navTableKeyMap()` | Keyboard-owned table inspection with row-aware surface scrolling |
