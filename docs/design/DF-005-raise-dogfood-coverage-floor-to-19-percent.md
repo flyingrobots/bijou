@@ -159,4 +159,4 @@ The only architectural addition beyond new stories was a tiny preview-time input
 
 Spawned:
 
-- [DF-006 — Raise DOGFOOD Coverage Floor to 24%](/Users/james/git/bijou/docs/BACKLOG/DF-006-raise-dogfood-coverage-floor-to-24-percent.md)
+- [DF-006 — Raise DOGFOOD Coverage Floor to 24%](/Users/james/git/bijou/docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md)

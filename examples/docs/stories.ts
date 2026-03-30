@@ -1,7 +1,10 @@
 import type { BijouContext } from '@flyingrobots/bijou';
 import {
   alert,
+  box,
   boxSurface,
+  headerBox,
+  inspector,
   kbd,
   progressBar,
   separatorSurface,
@@ -461,6 +464,152 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Loading placeholders',
     },
     tags: ['loading', 'placeholder', 'layout'],
+  },
+  {
+    kind: 'component',
+    id: 'box',
+    coverageFamilyIds: ['framed-grouping'],
+    family: 'Structural grouping and inspection',
+    title: 'box()',
+    package: 'bijou',
+    docs: {
+      summary: 'Canonical containment primitive for grouped content and compact titled panels, with `headerBox()` and surface companions for richer layout composition.',
+      useWhen: [
+        'A region needs visible containment so sibling working areas read as distinct jobs.',
+        'A compact titled panel needs terse supporting detail such as scope, version, or environment.',
+        'Grouping helps comprehension more honestly than another heading or paragraph break alone.',
+      ],
+      avoidWhen: [
+        'The border would only add decoration and not communicate real containment.',
+        'Urgency or interruption is the primary job; prefer `alert()` or `modal()`.',
+        'Whitespace, a separator, or a simple heading would already explain the structure clearly.',
+      ],
+      relatedFamilies: ['separator()', 'alert()', 'inspector()'],
+      gracefulLowering: {
+        interactive: 'Bordered or titled containment stays visible so grouped regions remain distinct working areas.',
+        static: 'Single deterministic grouped panels preserve the same containment and title/detail cues.',
+        pipe: 'Plain grouped text with spacing and optional titles instead of decorative borders.',
+        accessible: 'Preserve title and content order without depending on borders or color.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'header-detail',
+        label: 'Header detail',
+        description: 'Compact titled grouping with terse metadata instead of a full explanatory sentence.',
+        render: ({ ctx }) => [
+          headerBox('Deploy', { detail: 'v4.0.0 → production', ctx }),
+          '',
+          box('Window\n\n- freeze at 17:00\n- canaries at 17:15\n- promote after verification', {
+            title: 'release window',
+            width: 38,
+            ctx,
+          }),
+        ].join('\n'),
+      },
+      {
+        id: 'peer-panels',
+        label: 'Peer panels',
+        description: 'Contained sibling regions that read as separate work areas instead of one blended block.',
+        render: ({ ctx }) => row([
+          boxSurface('Signals\n\n- latency\n- throughput\n- queue depth', {
+            title: 'ops',
+            width: 20,
+            ctx,
+          }),
+          spacer(2),
+          boxSurface('Actions\n\n- confirm deploy\n- watch canaries\n- page owner', {
+            title: 'release',
+            width: 22,
+            ctx,
+          }),
+        ]),
+      },
+    ],
+    source: {
+      examplePath: 'examples/box/main.ts',
+      snippetLabel: 'Grouped containment',
+    },
+    tags: ['structure', 'grouping', 'panels'],
+  },
+  {
+    kind: 'component',
+    id: 'inspector',
+    coverageFamilyIds: ['inspector-panels'],
+    family: 'Structural grouping and inspection',
+    title: 'inspector()',
+    package: 'bijou',
+    docs: {
+      summary: 'Canonical side-panel summary surface for the currently selected thing, keeping one obvious active value and calmer supporting sections nearby.',
+      useWhen: [
+        'A side panel needs to summarize the currently selected object without taking over the main task.',
+        'One obvious active value should stay more prominent than the supporting details beneath it.',
+        'Supporting context benefits from compact titled sections instead of freeform prose.',
+      ],
+      avoidWhen: [
+        'The content is a guided recommendation with evidence and next-action structure; prefer `explainability()`.',
+        'The content is only a one-line status or note.',
+        'The panel needs its own deep navigation or multistep interaction model.',
+      ],
+      relatedFamilies: ['box()', 'explainability()', 'preferenceListSurface()'],
+      gracefulLowering: {
+        interactive: 'Titled containment, current-selection emphasis, and compact section rhythm stay visible in one calm panel.',
+        static: 'Single deterministic panel preserves the same hierarchy without motion.',
+        pipe: 'Explicit field labels keep the current selection obvious in plain grouped text.',
+        accessible: 'Linearized plain-language fields preserve the same meaning without borders or color.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'package-summary',
+        label: 'Package summary',
+        description: 'A current selection with concise supporting sections that stay calmer than the main value.',
+        render: ({ ctx }) => inspector({
+          title: 'package summary',
+          currentValue: 'release-control',
+          supportingText: 'Currently selected package in the registry overview.',
+          sections: [
+            { title: 'Owner', content: 'Platform' },
+            { title: 'Profile', content: 'Rich' },
+            {
+              title: 'Description',
+              content: 'Coordinates the release queue, rollout window, and production promotion handoff.',
+              tone: 'muted',
+            },
+          ],
+          width: 40,
+          ctx,
+        }),
+      },
+      {
+        id: 'rollout-review',
+        label: 'Rollout review',
+        description: 'Inspector rhythm stays useful for operational review without turning into a second page.',
+        render: ({ ctx }) => inspector({
+          title: 'active rollout',
+          currentValue: 'canary-eu-west',
+          supportingText: 'Watching the currently selected rollout slice before promotion.',
+          sections: [
+            { title: 'Health', content: 'Stable • 0 failed checks' },
+            { title: 'ETA', content: '8 minutes remaining' },
+            {
+              title: 'Description',
+              content: 'Use the inspector for concise sidecar context, not a full operational dashboard.',
+              tone: 'muted',
+            },
+          ],
+          width: 42,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/app-frame/main.ts',
+      snippetLabel: 'Inspector side panel',
+    },
+    tags: ['structure', 'inspection', 'side-panel'],
   },
   {
     kind: 'component',
