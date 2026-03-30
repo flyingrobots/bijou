@@ -8,11 +8,10 @@
  */
 
 import type { BijouContext } from '../ports/context.js';
-import { hexToRgb } from './theme/color.js';
+import { ANSI_SGR_RE } from './text/index.js';
 import type { TokenValue } from './theme/tokens.js';
 
-// eslint-disable-next-line no-control-regex
-const ANSI_SGR_GLOBAL_RE = /\x1b\[([0-9;]*)m/g;
+const ANSI_SGR_GLOBAL_RE = new RegExp(ANSI_SGR_RE.source, 'g');
 const MARKER = '\u0000';
 
 /**
@@ -61,21 +60,19 @@ export function makeBgFill(
     return (text: string) => ctx!.style.bgHex(token.bg!, text);
   }
 
-  return (text: string) => wrapPreservingBackground(token.bg!, text, prefix, suffix);
+  return (text: string) => wrapPreservingBackground(text, prefix, suffix);
 }
 
 function wrapPreservingBackground(
-  color: string,
   text: string,
   prefix: string,
   suffix: string,
 ): string {
-  const [r, g, b] = hexToRgb(color);
-  const bgOpen = `\x1b[48;2;${r};${g};${b}m`;
-  const reapplied = text.replace(ANSI_SGR_GLOBAL_RE, (match, codes) => {
+  const reapplied = text.replace(ANSI_SGR_GLOBAL_RE, (match) => {
+    const codes = match.slice(2, -1);
     const parts = codes === '' ? ['0'] : codes.split(';');
     return parts.includes('0') || parts.includes('49')
-      ? match + bgOpen
+      ? match + prefix
       : match;
   });
   return prefix + reapplied + suffix;
