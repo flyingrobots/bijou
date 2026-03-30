@@ -131,6 +131,145 @@ function loopingProgressPercent(timeMs: number, offsetMs = 0, cycleMs = 2_800): 
   return Math.round(pingPong * 100);
 }
 
+function infoText(ctx: BijouContext, text: string): string {
+  return ctx.theme.noColor ? text : ctx.style.styled(ctx.semantic('info'), text);
+}
+
+function mutedText(ctx: BijouContext, text: string): string {
+  return ctx.theme.noColor ? text : ctx.style.styled(ctx.semantic('muted'), text);
+}
+
+function successText(ctx: BijouContext, text: string): string {
+  return ctx.theme.noColor ? text : ctx.style.styled(ctx.status('success'), text);
+}
+
+function warningText(ctx: BijouContext, text: string): string {
+  return ctx.theme.noColor ? text : ctx.style.styled(ctx.status('warning'), text);
+}
+
+function confirmPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly question: string;
+  readonly defaultValue?: boolean;
+  readonly yesMeaning: string;
+  readonly noMeaning: string;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    question,
+    defaultValue = true,
+    yesMeaning,
+    noMeaning,
+  } = input;
+  const hint = defaultValue ? '[Y/n]' : '[y/N]';
+  const defaultLabel = defaultValue ? 'Yes' : 'No';
+
+  if (ctx.mode === 'pipe') {
+    return [
+      `${question} ${defaultValue ? 'Y/n' : 'y/N'}?`,
+      `Yes: ${yesMeaning}`,
+      `No: ${noMeaning}`,
+    ].join('\n');
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      question,
+      `Type yes or no (default: ${defaultValue ? 'yes' : 'no'}).`,
+      `Yes: ${yesMeaning}`,
+      `No: ${noMeaning}`,
+    ].join('\n');
+  }
+
+  const panelWidth = Math.max(38, Math.min(width, 54));
+  return boxSurface(contentSurface([
+    `${infoText(ctx, '?')} ${question} ${mutedText(ctx, hint)}`,
+    '',
+    `Default: ${defaultValue ? successText(ctx, defaultLabel) : warningText(ctx, defaultLabel)}`,
+    `Yes: ${yesMeaning}`,
+    `No: ${noMeaning}`,
+    '',
+    mutedText(ctx, 'Enter accepts the default.'),
+  ].join('\n')), {
+    title: 'binary decision',
+    width: panelWidth,
+    ctx,
+  });
+}
+
+interface MultiselectPreviewOption {
+  readonly label: string;
+  readonly description?: string;
+}
+
+function multiselectPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly options: readonly MultiselectPreviewOption[];
+  readonly selectedIndices: readonly number[];
+  readonly focusedIndex?: number;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    options,
+    selectedIndices,
+    focusedIndex = 0,
+  } = input;
+  const selectedSet = new Set(selectedIndices);
+  const selectedLabels = options
+    .filter((_, index) => selectedSet.has(index))
+    .map((option) => option.label);
+
+  if (ctx.mode === 'pipe') {
+    return [
+      title,
+      '',
+      ...options.map((option, index) => `${index + 1}. ${option.label}`),
+      '',
+      `Enter numbers (comma-separated): ${selectedIndices.map((index) => index + 1).join(', ')}`,
+      `Selected: ${selectedLabels.join(', ')}`,
+    ].join('\n');
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      ...options.map((option, index) => {
+        const state = selectedSet.has(index) ? 'selected' : 'not selected';
+        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
+      }),
+      '',
+      'Enter numbers separated by commas to choose a set.',
+      `Current set: ${selectedLabels.join(', ')}`,
+    ].join('\n');
+  }
+
+  const lines = [
+    `${infoText(ctx, '?')} ${title}`,
+    '',
+    ...options.map((option, index) => {
+      const pointer = index === focusedIndex ? infoText(ctx, '\u276f') : ' ';
+      const mark = selectedSet.has(index) ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
+      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
+      return `${pointer} ${mark} ${option.label}${description}`;
+    }),
+    '',
+    mutedText(ctx, '(space to toggle, enter to confirm)'),
+  ];
+
+  return boxSurface(contentSurface(lines.join('\n')), {
+    title: 'multiple choice',
+    width: Math.max(40, Math.min(width, 58)),
+    ctx,
+  });
+}
+
 export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   {
     kind: 'component',
@@ -639,6 +778,140 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Chronological event stream',
     },
     tags: ['feedback', 'history', 'events'],
+  },
+  {
+    kind: 'component',
+    id: 'confirm',
+    coverageFamilyIds: ['binary-decision'],
+    family: 'Decision and selection forms',
+    title: 'confirm()',
+    package: 'bijou',
+    docs: {
+      summary: 'Binary decision prompt for real yes/no choices where the consequence of accepting or declining should stay explicit.',
+      useWhen: [
+        'The user is making a genuine yes/no decision and both outcomes are easy to explain plainly.',
+        'A destructive or consequential action needs one explicit final checkpoint.',
+        'The prompt can stay short while still naming what yes and no actually do.',
+      ],
+      avoidWhen: [
+        'The user really needs to compare more than two outcomes.',
+        'The prompt is vague enough that yes or no would be ambiguous.',
+        'The choice belongs inside a longer staged flow with more context; prefer `wizard()` or `group()` there.',
+      ],
+      relatedFamilies: ['modal()', 'alert()', 'wizard()'],
+      gracefulLowering: {
+        interactive: 'Focused yes/no prompt with an explicit default and natural keyboard confirmation.',
+        static: 'Deterministic prompt snapshot that keeps the question and default state honest.',
+        pipe: 'Plain textual yes/no prompt with the default orientation preserved.',
+        accessible: 'Explicit binary question plus default state in plain language.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'deploy-gate',
+        label: 'Deploy gate',
+        description: 'Default-no confirmation for a consequential production action.',
+        render: ({ width, ctx }) => confirmPreview({
+          width,
+          ctx,
+          question: 'Deploy to production?',
+          defaultValue: false,
+          yesMeaning: 'Promote the canary and begin the production rollout.',
+          noMeaning: 'Keep the rollout paused for review.',
+        }),
+      },
+      {
+        id: 'discard-draft',
+        label: 'Discard draft',
+        description: 'A destructive decision still needs both outcomes named explicitly.',
+        render: ({ width, ctx }) => confirmPreview({
+          width,
+          ctx,
+          question: 'Discard unsaved release notes?',
+          defaultValue: false,
+          yesMeaning: 'Drop the local draft and close the editor.',
+          noMeaning: 'Return to editing and keep the draft open.',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/confirm/main.ts',
+      snippetLabel: 'Binary decision prompt',
+    },
+    tags: ['forms', 'decision', 'confirmation'],
+  },
+  {
+    kind: 'component',
+    id: 'multiselect',
+    coverageFamilyIds: ['multiple-choice'],
+    family: 'Decision and selection forms',
+    title: 'multiselect()',
+    package: 'bijou',
+    docs: {
+      summary: 'Set-selection prompt for building a durable group of choices with keyboard toggling and truthful numbered fallbacks.',
+      useWhen: [
+        'The user is choosing several members of one coherent set.',
+        'Default selections should be visible before the user starts toggling.',
+        'The flow should lower honestly to numbered or comma-separated selection outside rich mode.',
+      ],
+      avoidWhen: [
+        'The result is singular; prefer `select()` or `filter()`.',
+        'The rows are really actions or commands instead of lasting set members.',
+        'The flow needs grouped validation or staged progression; prefer `group()` or `wizard()`.',
+      ],
+      relatedFamilies: ['select()', 'filter()', 'group()'],
+      gracefulLowering: {
+        interactive: 'Checkbox-style set selection with focus, toggling, and explicit confirmation.',
+        static: 'Deterministic snapshot of the current set and visible choices.',
+        pipe: 'Numbered textual selection with comma-separated input.',
+        accessible: 'Plain text list that names which options are currently selected.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-stack',
+        label: 'Release stack',
+        description: 'Preselected tools keep the initial set obvious before the user starts changing it.',
+        render: ({ width, ctx }) => multiselectPreview({
+          width,
+          ctx,
+          title: 'Enable release checks:',
+          options: [
+            { label: 'TypeScript', description: 'type-safe JavaScript' },
+            { label: 'Vitest', description: 'unit testing' },
+            { label: 'Playwright', description: 'end-to-end tests' },
+            { label: 'Docker', description: 'container packaging' },
+          ],
+          selectedIndices: [0, 1],
+          focusedIndex: 1,
+        }),
+      },
+      {
+        id: 'notification-channels',
+        label: 'Notification channels',
+        description: 'Multiple related outputs can be chosen together without turning the flow into command dispatch.',
+        render: ({ width, ctx }) => multiselectPreview({
+          width,
+          ctx,
+          title: 'Notify rollout channels:',
+          options: [
+            { label: 'Slack', description: 'release room' },
+            { label: 'Status page', description: 'customer-facing notice' },
+            { label: 'PagerDuty', description: 'incident escalation' },
+            { label: 'Email', description: 'stakeholder summary' },
+          ],
+          selectedIndices: [0, 1, 3],
+          focusedIndex: 2,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/multiselect/main.ts',
+      snippetLabel: 'Set-building form prompt',
+    },
+    tags: ['forms', 'selection', 'set-building'],
   },
   {
     kind: 'component',

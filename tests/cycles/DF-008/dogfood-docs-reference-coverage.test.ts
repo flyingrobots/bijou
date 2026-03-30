@@ -23,12 +23,12 @@ describe('DF-008 DOGFOOD docs and reference coverage cycle', () => {
     expect(cycle).toContain('## Retrospective');
   });
 
-  it('raises DOGFOOD coverage to thirteen documented families and 37 percent', () => {
+  it('preserves the docs and reference families this ratchet added even after later coverage increases', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.documentedFamilies).toBe(13);
+    expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(13);
     expect(coverage.totalFamilies).toBe(35);
-    expect(coverage.percent).toBe(37);
+    expect(coverage.percent).toBeGreaterThanOrEqual(37);
     expect(coverage.coveredFamilyIds).toContain('formatted-documents-and-prose');
     expect(coverage.coveredFamilyIds).toContain('linked-destinations');
   });
@@ -38,13 +38,18 @@ describe('DF-008 DOGFOOD docs and reference coverage cycle', () => {
     expect(COMPONENT_STORIES.some((story) => story.id === 'hyperlink')).toBe(true);
   });
 
-  it('raises the enforced floor to 34 percent and the next target to 39 percent', () => {
-    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBe(34);
+  it('keeps the ratchet moving upward in 5-point increments after this cycle', () => {
+    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBeGreaterThanOrEqual(34);
     expect(DOGFOOD_COVERAGE_INCREMENT_PERCENT).toBe(5);
-    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(39);
+    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(
+      DOGFOOD_COVERAGE_FLOOR_PERCENT + DOGFOOD_COVERAGE_INCREMENT_PERCENT,
+    );
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-009-raise-dogfood-coverage-floor-to-39-percent.md')).toBe(true);
+    expect(
+      existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-009-raise-dogfood-coverage-floor-to-39-percent.md') ||
+      existsSync('/Users/james/git/bijou/docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md'),
+    ).toBe(true);
   });
 });

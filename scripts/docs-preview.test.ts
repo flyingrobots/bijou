@@ -458,6 +458,33 @@ describe('docs preview app', () => {
     expect(text).toContain('Bijou keeps docs');
   });
 
+  it('can open the new confirm story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'c' },
+      { key: 'o' },
+      { key: 'n' },
+      { key: 'f' },
+      { key: 'i' },
+      { key: 'r' },
+      { key: 'm' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('confirm');
+    expect(text).toContain('confirm()');
+    expect(text).toContain('Deploy to production?');
+    expect(text).toContain('Default');
+    expect(text).toContain('No');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

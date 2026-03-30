@@ -158,4 +158,4 @@ The cycle stayed focused on documentation-oriented surfaces instead of adding an
 
 Spawned:
 
-- [DF-009 — Raise DOGFOOD Coverage Floor to 39%](/Users/james/git/bijou/docs/BACKLOG/DF-009-raise-dogfood-coverage-floor-to-39-percent.md)
+- [DF-009 — Raise DOGFOOD Coverage Floor to 39%](/Users/james/git/bijou/docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md)
