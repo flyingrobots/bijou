@@ -11,7 +11,15 @@ import {
   modal,
   viewportSurface,
 } from '@flyingrobots/bijou-tui';
-import { line, screenSurface, spacer, textSurface, column } from '../_shared/example-surfaces.js';
+import {
+  badgeSurface,
+  column,
+  line,
+  row,
+  screenSurface,
+  spacer,
+  textSurface,
+} from '../_shared/example-surfaces.js';
 import {
   CANONICAL_STORY_PROFILE_PRESETS,
   type ComponentStory,
@@ -137,6 +145,75 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Alert basics',
     },
     tags: ['status', 'feedback', 'lowering'],
+  },
+  {
+    kind: 'component',
+    id: 'badge',
+    coverageFamilyIds: ['inline-status'],
+    family: 'Status and in-flow feedback',
+    title: 'badge()',
+    package: 'bijou',
+    docs: {
+      summary: 'Compact inline status label for states that belong beside another object instead of becoming their own block.',
+      useWhen: [
+        'A state needs to stay attached to a row, heading, or summary instead of interrupting the layout.',
+        'The label can stay short, stable, and glanceable.',
+        'You need lightweight semantic emphasis that still lowers honestly outside rich mode.',
+      ],
+      avoidWhen: [
+        'The message needs explanation or next-step guidance; prefer `alert()` or `note()`.',
+        'The content is long enough to become a sentence instead of a label.',
+        'The user must acknowledge the state before continuing.',
+      ],
+      relatedFamilies: ['alert()', 'note()', 'notification system'],
+      gracefulLowering: {
+        interactive: 'Compact themed inline chip that stays attached to the owning object.',
+        static: 'Single-frame inline chip preserving the same terse label.',
+        pipe: 'Plain inline text status label without depending on color.',
+        accessible: 'Explicit spoken status next to the owning object in plain language.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'service-health',
+        label: 'Service health',
+        description: 'Inline status labels attached to operational rows instead of detached callouts.',
+        render: ({ ctx }) => column([
+          row(['api    ', badgeSurface('LIVE', 'success', ctx), '  p95 84ms']),
+          spacer(),
+          row(['queue  ', badgeSurface('DEGRADED', 'warning', ctx), '  backlog 12']),
+          spacer(),
+          row(['cron   ', badgeSurface('PAUSED', 'muted', ctx), '  waiting for window']),
+        ]),
+      },
+      {
+        id: 'release-metadata',
+        label: 'Release metadata',
+        description: 'Short supporting labels that belong inline with other metadata.',
+        render: ({ ctx }) => column([
+          row([
+            badgeSurface('v4.0.0', 'accent', ctx),
+            ' ',
+            badgeSurface('MIT', 'muted', ctx),
+            ' ',
+            badgeSurface('TypeScript', 'info', ctx),
+          ]),
+          spacer(),
+          row([
+            'Server is ',
+            badgeSurface('RUNNING', 'success', ctx),
+            ' on port ',
+            badgeSurface('3000', 'primary', ctx),
+          ]),
+        ]),
+      },
+    ],
+    source: {
+      examplePath: 'examples/badge/main.ts',
+      snippetLabel: 'Inline status labels',
+    },
+    tags: ['status', 'inline', 'labels'],
   },
   {
     kind: 'component',
@@ -303,6 +380,62 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Masking viewport',
     },
     tags: ['layout', 'masking', 'scroll'],
+  },
+  {
+    kind: 'component',
+    id: 'kbd',
+    coverageFamilyIds: ['inline-shortcut-cues'],
+    family: 'Hints and shortcut cues',
+    title: 'kbd()',
+    package: 'bijou',
+    docs: {
+      summary: 'Inline shortcut cue for local actions that should stay adjacent to the thing they affect.',
+      useWhen: [
+        'A nearby action needs a compact keyboard reminder.',
+        'The shortcut belongs to one local surface, not the whole shell.',
+        'The user benefits from inline discoverability without opening full help.',
+      ],
+      avoidWhen: [
+        'You are trying to document the whole app keymap; prefer shell help or a command surface.',
+        'The chip would become the main content instead of a supporting cue.',
+        'The shortcut is stale or inactive for the current focus region.',
+      ],
+      relatedFamilies: ['helpView()', 'commandPalette()', 'note()'],
+      gracefulLowering: {
+        interactive: 'Compact key-chip treatment inline with the surrounding instruction.',
+        static: 'Single-frame key cue preserving the same nearby action language.',
+        pipe: 'Plain explicit key names inline with the instruction text.',
+        accessible: 'Spoken shortcut and action phrased together in plain text.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'local-actions',
+        label: 'Local actions',
+        description: 'Shortcut cues that stay beside the immediate action instead of moving into shell chrome.',
+        render: ({ ctx }) => column([
+          line(`${kbd('Enter', { ctx })} Select item`),
+          line(`${kbd('Esc', { ctx })} Dismiss panel`),
+          line(`${kbd('?', { ctx })} Open help`),
+        ]),
+      },
+      {
+        id: 'chords-and-navigation',
+        label: 'Chords and navigation',
+        description: 'Mixed single keys and chords that still read as one local instruction cluster.',
+        render: ({ ctx }) => column([
+          line(`${kbd('↑', { ctx })} ${kbd('↓', { ctx })} Browse rows`),
+          line(`${kbd('←', { ctx })} ${kbd('→', { ctx })} Switch tabs`),
+          line(`${kbd('Cmd', { ctx })} + ${kbd('Shift', { ctx })} + ${kbd('P', { ctx })} Command palette`),
+        ]),
+      },
+    ],
+    source: {
+      examplePath: 'examples/kbd/main.ts',
+      snippetLabel: 'Inline shortcut cues',
+    },
+    tags: ['shortcuts', 'inline', 'hints'],
   },
 ] as const;
 

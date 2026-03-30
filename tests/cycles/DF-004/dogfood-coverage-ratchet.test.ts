@@ -12,9 +12,9 @@ function read(path: string): string {
   return readFileSync(path, 'utf8');
 }
 
-describe('DF-003 DOGFOOD coverage floor gate cycle', () => {
+describe('DF-004 DOGFOOD coverage ratchet cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DF-003-enforce-dogfood-coverage-floor.md');
+    const cycle = read('/Users/james/git/bijou/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -23,23 +23,23 @@ describe('DF-003 DOGFOOD coverage floor gate cycle', () => {
     expect(cycle).toContain('## Retrospective');
   });
 
-  it('tracks the current floor and next target explicitly', () => {
+  it('raises DOGFOOD coverage to five documented families and 14 percent', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.percent).toBeGreaterThanOrEqual(DOGFOOD_COVERAGE_FLOOR_PERCENT);
+    expect(coverage.documentedFamilies).toBe(5);
+    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.percent).toBe(14);
+    expect(coverage.coveredFamilyIds).toContain('inline-status');
+    expect(coverage.coveredFamilyIds).toContain('inline-shortcut-cues');
+  });
+
+  it('raises the enforced floor to 14 percent and the next target to 19 percent', () => {
+    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBe(14);
     expect(DOGFOOD_COVERAGE_INCREMENT_PERCENT).toBe(5);
-    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(
-      DOGFOOD_COVERAGE_FLOOR_PERCENT + DOGFOOD_COVERAGE_INCREMENT_PERCENT,
-    );
+    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(19);
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DF-003-enforce-dogfood-coverage-floor.md');
-
-    expect(cycle).toContain('[DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target]');
-    expect(
-      existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-004-raise-dogfood-coverage-floor-to-next-target.md') ||
-      existsSync('/Users/james/git/bijou/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md'),
-    ).toBe(true);
+    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md')).toBe(true);
   });
 });

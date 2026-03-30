@@ -51,7 +51,7 @@ An agent can measure current DOGFOOD component-family coverage against the canon
 
 ## Current cycle and backlog
 
-- active cycle: [DF-003 — Enforce DOGFOOD Coverage Floor](/Users/james/git/bijou/docs/design/DF-003-enforce-dogfood-coverage-floor.md)
+- active cycle: [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](/Users/james/git/bijou/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md)
 - backlog:
   - [DF-002 — Expand DOGFOOD Component Family Coverage](/Users/james/git/bijou/docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
-  - [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](/Users/james/git/bijou/docs/BACKLOG/DF-004-raise-dogfood-coverage-floor-to-next-target.md)
+  - [DF-005 — Raise DOGFOOD Coverage Floor to 19%](/Users/james/git/bijou/docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md)
