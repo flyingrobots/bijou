@@ -8,7 +8,12 @@
  */
 
 import type { BijouContext } from '../ports/context.js';
+import { hexToRgb } from './theme/color.js';
 import type { TokenValue } from './theme/tokens.js';
+
+// eslint-disable-next-line no-control-regex
+const ANSI_SGR_GLOBAL_RE = /\x1b\[([0-9;]*)m/g;
+const MARKER = '\u0000';
 
 /**
  * Determine whether background color should be applied in the current context.
@@ -41,5 +46,37 @@ export function makeBgFill(
   ctx: BijouContext | undefined,
 ): ((text: string) => string) | undefined {
   if (!token?.bg || !shouldApplyBg(ctx)) return undefined;
-  return (text: string) => ctx!.style.bgHex(token.bg!, text);
+
+  const wrappedMarker = ctx!.style.bgHex(token.bg!, MARKER);
+  const markerIndex = wrappedMarker.indexOf(MARKER);
+
+  if (markerIndex < 0 || wrappedMarker === MARKER) {
+    return (text: string) => ctx!.style.bgHex(token.bg!, text);
+  }
+
+  const prefix = wrappedMarker.slice(0, markerIndex);
+  const suffix = wrappedMarker.slice(markerIndex + MARKER.length);
+
+  if (prefix.length === 0 || suffix.length === 0) {
+    return (text: string) => ctx!.style.bgHex(token.bg!, text);
+  }
+
+  return (text: string) => wrapPreservingBackground(token.bg!, text, prefix, suffix);
+}
+
+function wrapPreservingBackground(
+  color: string,
+  text: string,
+  prefix: string,
+  suffix: string,
+): string {
+  const [r, g, b] = hexToRgb(color);
+  const bgOpen = `\x1b[48;2;${r};${g};${b}m`;
+  const reapplied = text.replace(ANSI_SGR_GLOBAL_RE, (match, codes) => {
+    const parts = codes === '' ? ['0'] : codes.split(';');
+    return parts.includes('0') || parts.includes('49')
+      ? match + bgOpen
+      : match;
+  });
+  return prefix + reapplied + suffix;
 }
