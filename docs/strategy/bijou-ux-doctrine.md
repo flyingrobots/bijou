@@ -259,6 +259,16 @@ Bijou should treat cognitive load as a design budget, not a post-hoc complaint.
 
 Useful review questions include:
 
+### Layers should dismiss from the top
+
+Layered TUIs should behave predictably:
+
+- the thing on top owns input
+- the thing on top owns visible controls
+- `Esc` dismisses the topmost dismissible layer before it requests quit or reaches underlying content
+
+This is both a human-clarity rule and an agent-clarity rule. The shell should not require users or agents to reverse-engineer branch order to know what dismissal will do.
+
 - how many panes are active at once?
 - how many actions compete for attention right now?
 - how many modes are hidden?

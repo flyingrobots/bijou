@@ -93,6 +93,19 @@ Use:
 
 Do not make supporting copy compete with what the user is supposed to act on now.
 
+#### Layers should behave like a stack
+
+When interactive layers overlap, they should behave in top-down order.
+
+Canonical rules:
+
+- the topmost layer owns input
+- the topmost layer owns the visible control hints
+- dismiss actions target the topmost dismissible layer first
+- underlying regions do not keep advertising controls while covered
+
+This means a palette, drawer, or modal should not merely look on top. It should also be the source of truth for routing and footer/help copy.
+
 ## 1. Status and feedback
 
 ### The pattern

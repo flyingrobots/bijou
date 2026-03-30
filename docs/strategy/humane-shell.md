@@ -141,6 +141,63 @@ The shell should not feel:
 10. **Notifications scale by weight**
    Short-lived notices, persistent notifications, and reviewable history should be separate layers, not one overloaded mechanism.
 
+11. **Layers dismiss from the top**
+   `Esc` should dismiss the topmost dismissible layer before it ever falls through to shell quit behavior.
+
+12. **Input maps should drive truth**
+   The same input map that governs the active layer should also govern the visible controls the shell advertises.
+
+## Layer stack doctrine
+
+The shell should treat interactive surfaces as a stack of layers, not as a pile of unrelated branch checks.
+
+Candidate layers include:
+
+- workspace base layer
+- pane-local modal layer
+- search / command palette layer
+- help layer
+- settings layer
+- notification-center layer
+- quit-confirm layer
+
+The key rule is:
+
+- only the topmost layer owns input
+
+That rule should govern:
+
+- routing
+- `Esc` dismiss order
+- footer hints
+- help/control summaries
+- future agent-visible shell semantics
+
+### Dismiss order
+
+`Esc` should follow one humane rule:
+
+1. dismiss the topmost dismissible layer
+2. restore the next layer beneath it
+3. only when no dismissible layer remains, interpret `Esc` as a quit request
+
+This prevents the shell from closing one layer and accidentally acting on the thing beneath it in the same keystroke.
+
+### Input maps as the source of truth
+
+Each layer should eventually own an input map that describes:
+
+- what keys it handles
+- what dismissal behavior it supports
+- what controls may be shown in the footer/help
+- whether it blocks, reviews, or augments underlying content
+
+This is the cleanest seam for keeping:
+
+- control hints truthful
+- agents able to reason about the active layer
+- focus semantics aligned with actual runtime routing
+
 ## Proposed shell anatomy
 
 ### 1. Landing screen

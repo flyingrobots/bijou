@@ -38,6 +38,7 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 ## Core invariants
 
 - [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
 - [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
 - [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
 - [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
@@ -49,5 +50,8 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 
 ## Current cycle and backlog
 
+- active cycle:
+  - [HT-002 — Layered Focus and Interaction](/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md)
 - backlog:
   - [HT-001 — Notification Center Polish and Discoverability](/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md)
+  - [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/BACKLOG/HT-003-implement-layer-stack-and-input-map-routing.md)
