@@ -10,6 +10,7 @@ import {
   log,
   markdown,
   progressBar,
+  tabs,
   separatorSurface,
   skeleton,
   spinnerFrame,
@@ -204,6 +205,12 @@ interface MultiselectPreviewOption {
   readonly description?: string;
 }
 
+interface SingleChoicePreviewOption {
+  readonly label: string;
+  readonly description?: string;
+  readonly keywords?: readonly string[];
+}
+
 function multiselectPreview(input: {
   readonly width: number;
   readonly ctx: BijouContext;
@@ -266,6 +273,139 @@ function multiselectPreview(input: {
   return boxSurface(contentSurface(lines.join('\n')), {
     title: 'multiple choice',
     width: Math.max(40, Math.min(width, 58)),
+    ctx,
+  });
+}
+
+function selectPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly options: readonly SingleChoicePreviewOption[];
+  readonly selectedIndex: number;
+  readonly focusedIndex?: number;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    options,
+    selectedIndex,
+    focusedIndex = selectedIndex,
+  } = input;
+  const selected = options[selectedIndex] ?? options[0];
+
+  if (ctx.mode === 'pipe') {
+    return [
+      title,
+      '',
+      ...options.map((option, index) => `${index + 1}. ${option.label}`),
+      '',
+      `> ${selectedIndex + 1}`,
+      `Selected: ${selected?.label ?? ''}`,
+    ].join('\n');
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      ...options.map((option, index) => {
+        const state = index === selectedIndex ? 'selected' : 'not selected';
+        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}`;
+      }),
+      '',
+      `Current choice: ${selected?.label ?? ''}`,
+      'Enter a number to choose one option.',
+    ].join('\n');
+  }
+
+  const lines = [
+    `${infoText(ctx, '?')} ${title}`,
+    '',
+    ...options.map((option, index) => {
+      const pointer = index === focusedIndex ? infoText(ctx, '\u276f') : ' ';
+      const mark = index === selectedIndex ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
+      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
+      return `${pointer} ${mark} ${option.label}${description}`;
+    }),
+    '',
+    mutedText(ctx, '(↑/↓ browse, enter to confirm)'),
+  ];
+
+  return box(lines.join('\n'), {
+    title: 'single choice',
+    width: Math.max(42, Math.min(width, 60)),
+    ctx,
+  });
+}
+
+function filterPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly query: string;
+  readonly options: readonly SingleChoicePreviewOption[];
+  readonly matchedIndices: readonly number[];
+  readonly selectedIndex: number;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    query,
+    options,
+    matchedIndices,
+    selectedIndex,
+  } = input;
+  const selected = options[selectedIndex] ?? options[0];
+  const matchedOptions = matchedIndices.map((index) => options[index]).filter(Boolean) as SingleChoicePreviewOption[];
+
+  if (ctx.mode === 'pipe') {
+    return [
+      title,
+      '',
+      ...matchedOptions.map((option, index) => `${index + 1}. ${option.label}`),
+      '',
+      `Enter number or search: ${query}`,
+      `Matched: ${selected?.label ?? ''}`,
+    ].join('\n');
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      `Search query: ${query}`,
+      ...matchedOptions.map((option, index) => {
+        const state = matchedIndices[index] === selectedIndex ? 'selected match' : 'match';
+        const keywords = option.keywords?.length ? ` — keywords: ${option.keywords.join(', ')}` : '';
+        return `${index + 1}. ${option.label} (${state})${option.description ? ` — ${option.description}` : ''}${keywords}`;
+      }),
+      '',
+      `Current match: ${selected?.label ?? ''}`,
+      'Type or enter a number to choose one option.',
+    ].join('\n');
+  }
+
+  const lines = [
+    `${infoText(ctx, '?')} ${title}`,
+    `${mutedText(ctx, 'Search:')} ${query}`,
+    '',
+    ...matchedOptions.map((option, index) => {
+      const globalIndex = matchedIndices[index]!;
+      const pointer = globalIndex === selectedIndex ? infoText(ctx, '\u276f') : ' ';
+      const mark = globalIndex === selectedIndex ? successText(ctx, '\u25c9') : mutedText(ctx, '\u25cb');
+      const description = option.description ? mutedText(ctx, ` \u2014 ${option.description}`) : '';
+      return `${pointer} ${mark} ${option.label}${description}`;
+    }),
+    '',
+    mutedText(ctx, '(type to narrow, enter to confirm)'),
+  ];
+
+  return box(lines.join('\n'), {
+    title: 'filterable single choice',
+    width: Math.max(44, Math.min(width, 64)),
     ctx,
   });
 }
@@ -912,6 +1052,150 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Set-building form prompt',
     },
     tags: ['forms', 'selection', 'set-building'],
+  },
+  {
+    kind: 'component',
+    id: 'select',
+    coverageFamilyIds: ['single-choice'],
+    family: 'Decision and selection forms',
+    title: 'select() / filter()',
+    package: 'bijou',
+    docs: {
+      summary: 'Single-choice prompt family for choosing one lasting value, either from a visible list or from a searchable narrowed list.',
+      useWhen: [
+        'The user is choosing exactly one durable value from a known set of options.',
+        'The options can either fit as a visible list (`select()`) or benefit from search narrowing (`filter()`).',
+        'The flow should lower honestly to numbered or text-search prompts outside rich mode.',
+      ],
+      avoidWhen: [
+        'The user needs to keep several options at once; prefer `multiselect()`.',
+        'The rows are commands or tabs rather than one chosen value.',
+        'The flow needs grouped validation or staged progression; prefer `group()` or `wizard()`.',
+      ],
+      relatedFamilies: ['multiselect()', 'confirm()', 'tabs()'],
+      gracefulLowering: {
+        interactive: 'Focused list or filter prompt that keeps one obvious current choice and supports natural keyboard confirmation.',
+        static: 'Deterministic snapshot of the current choice set or narrowed search results.',
+        pipe: 'Numbered or text-search prompt that still resolves to one final value explicitly.',
+        accessible: 'Plain-language options that name the selected value and search query directly.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-policy',
+        label: 'Release policy',
+        description: 'Visible single-choice list where the whole decision set fits on screen without search.',
+        render: ({ width, ctx }) => selectPreview({
+          width,
+          ctx,
+          title: 'Choose a release policy:',
+          options: [
+            { label: 'Canary only', description: 'ship to 10% and stop' },
+            { label: 'Auto promote', description: 'promote once checks pass' },
+            { label: 'Hold for review', description: 'require manual approval' },
+            { label: 'Abort', description: 'cancel the rollout' },
+          ],
+          selectedIndex: 1,
+          focusedIndex: 1,
+        }),
+      },
+      {
+        id: 'runtime-search',
+        label: 'Searchable runtime',
+        description: 'Search narrows a larger single-choice list without changing the one-value contract.',
+        render: ({ width, ctx }) => filterPreview({
+          width,
+          ctx,
+          title: 'Choose a programming language:',
+          query: 'ty',
+          options: [
+            { label: 'TypeScript', description: 'typed JavaScript for apps', keywords: ['javascript', 'typed', 'web'] },
+            { label: 'Python', description: 'scripting and data work', keywords: ['scripting', 'ml', 'data'] },
+            { label: 'OCaml', description: 'typed ML family runtime', keywords: ['functional', 'ml', 'typed'] },
+            { label: 'Rust', description: 'systems safety and speed', keywords: ['systems', 'memory', 'safe'] },
+          ],
+          matchedIndices: [0, 1, 2],
+          selectedIndex: 0,
+        }),
+      },
+    ],
+    tags: ['forms', 'selection', 'search'],
+  },
+  {
+    kind: 'component',
+    id: 'tabs',
+    coverageFamilyIds: ['peer-navigation'],
+    family: 'Navigation and organization',
+    title: 'tabs()',
+    package: 'bijou',
+    docs: {
+      summary: 'Peer-navigation strip for switching between sibling sections that share one workspace and one conceptual level.',
+      useWhen: [
+        'The user is moving between peer sections of the same task or document.',
+        'One active sibling needs to stay obvious without implying progress or hierarchy.',
+        'The labels can stay short enough to scan inline as one navigation band.',
+      ],
+      avoidWhen: [
+        'The steps imply sequence or completion; prefer `stepper()` or another progress-oriented surface.',
+        'The content is hierarchical rather than peer-level; prefer `tree()` or progressive disclosure.',
+        'The labels are so numerous or verbose that the strip stops being glanceable.',
+      ],
+      relatedFamilies: ['breadcrumb()', 'paginator()', 'accordion()'],
+      gracefulLowering: {
+        interactive: 'Active tab stays visually distinct while sibling sections remain visible beside it.',
+        static: 'Single deterministic tab strip preserves the same peer relationship and active section.',
+        pipe: 'Plain text tab labels keep the active peer explicit with bracketed emphasis.',
+        accessible: 'Each peer section is read explicitly with active state called out in order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-workbench',
+        label: 'Release workbench',
+        description: 'Peer operational sections stay visible as one band without implying a step-by-step wizard.',
+        render: ({ ctx }) => box([
+          tabs([
+            { label: 'Overview' },
+            { label: 'Checks', badge: '3' },
+            { label: 'Rollout', badge: '2' },
+            { label: 'Logs' },
+          ], { active: 2, ctx }),
+          '',
+          `Current pane: ${infoText(ctx, 'Rollout')}`,
+          mutedText(ctx, 'Peer sections share one workspace; switching does not imply completion.'),
+        ].join('\n'), {
+          title: 'peer navigation',
+          width: 60,
+          ctx,
+        }),
+      },
+      {
+        id: 'settings-sections',
+        label: 'Settings sections',
+        description: 'Compact peer sections remain readable even when one carries supporting metadata.',
+        render: ({ ctx }) => box([
+          tabs([
+            { label: 'General' },
+            { label: 'Appearance' },
+            { label: 'Notifications', badge: '2' },
+          ], { active: 1, ctx }),
+          '',
+          `Current pane: ${infoText(ctx, 'Appearance')}`,
+          mutedText(ctx, 'Use tabs when the user is switching sibling sections, not confirming steps.'),
+        ].join('\n'), {
+          title: 'settings sections',
+          width: 56,
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/tabs/main.ts',
+      snippetLabel: 'Peer navigation strip',
+    },
+    tags: ['navigation', 'tabs', 'organization'],
   },
   {
     kind: 'component',

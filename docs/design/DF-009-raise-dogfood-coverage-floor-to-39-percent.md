@@ -158,4 +158,4 @@ The cycle stayed focused on genuine form and decision families instead of adding
 
 Spawned:
 
-- [DF-010 — Raise DOGFOOD Coverage Floor to 44%](/Users/james/git/bijou/docs/BACKLOG/DF-010-raise-dogfood-coverage-floor-to-44-percent.md)
+- [DF-010 — Raise DOGFOOD Coverage Floor to 44%](/Users/james/git/bijou/docs/design/DF-010-raise-dogfood-coverage-floor-to-44-percent.md)

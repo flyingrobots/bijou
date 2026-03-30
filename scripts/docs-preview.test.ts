@@ -514,6 +514,29 @@ describe('docs preview app', () => {
     expect(text).toContain('No');
   });
 
+  it('can open the new tabs story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 't' },
+      { key: 'a' },
+      { key: 'b' },
+      { key: 's' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('tabs');
+    expect(text).toContain('tabs()');
+    expect(text).toContain('Current pane');
+    expect(text).toContain('Rollout');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
