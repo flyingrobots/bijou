@@ -398,6 +398,25 @@ describe('docs preview app', () => {
     expect(paletteText).not.toContain('Search components');
   });
 
+  it('closes component search with escape without opening quit confirm', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: KEY_ESCAPE },
+    ], { ctx });
+
+    expect((result.model as any).docsModel.commandPalette).toBeUndefined();
+    expect((result.model as any).docsModel.quitConfirmOpen).toBe(false);
+
+    const frame = result.frames[result.frames.length - 1]!;
+    const text = frameText(frame);
+    expect(text).not.toContain('Search components');
+    expect(text).toContain('welcome to bijou');
+  });
+
   it('opens the standard shell settings drawer with F2 and toggles visible DOGFOOD preferences', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

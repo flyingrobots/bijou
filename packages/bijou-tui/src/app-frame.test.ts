@@ -1090,7 +1090,7 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(true);
   });
 
-  it('opens quit confirm with escape while the command palette is open', () => {
+  it('closes the command palette with escape without opening quit confirm', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
       enableCommandPalette: true,
@@ -1102,7 +1102,7 @@ describe('createFramedApp', () => {
 
     [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeUndefined();
-    expect((model as any).quitConfirmOpen).toBe(true);
+    expect((model as any).quitConfirmOpen).toBe(false);
   });
 
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {

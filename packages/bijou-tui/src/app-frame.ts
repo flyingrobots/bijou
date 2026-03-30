@@ -648,6 +648,18 @@ export function createFramedApp<PageModel, Msg>(
     }, withObservedKey(model, [], msg, 'frame')];
   }
 
+  function closeCommandPalette(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): InternalFrameModel<PageModel, Msg> {
+    return {
+      ...model,
+      commandPalette: undefined,
+      commandPaletteEntries: undefined,
+      commandPaletteTitle: undefined,
+      commandPaletteKind: undefined,
+    };
+  }
+
   function updateTargetPage(
     model: InternalFrameModel<PageModel, Msg>,
     targetPageId: string,
@@ -1031,44 +1043,29 @@ export function createFramedApp<PageModel, Msg>(
 
       if (isKeyMsg(msg)) {
         if (model.commandPalette != null) {
-          if ((msg.ctrl && !msg.alt && msg.key === 'c') || (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape')) {
+          if (msg.ctrl && !msg.alt && msg.key === 'c') {
             return applyQuitRequest(model, msg);
+          }
+          if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape') {
+            return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
           }
           const frameAction = frameKeys.handle(msg);
           if (frameAction?.type === 'open-search') {
             const isSearchOpen = model.commandPaletteKind === 'search';
             if (isSearchOpen) {
-              return [{
-                ...model,
-                commandPalette: undefined,
-                commandPaletteEntries: undefined,
-                commandPaletteTitle: undefined,
-                commandPaletteKind: undefined,
-              }, withObservedKey(model, [], msg, 'palette')];
+              return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
           if (frameAction?.type === 'open-palette') {
             const isCommandPaletteOpen = model.commandPaletteKind === 'command';
             if (isCommandPaletteOpen) {
-              return [{
-                ...model,
-                commandPalette: undefined,
-                commandPaletteEntries: undefined,
-                commandPaletteTitle: undefined,
-                commandPaletteKind: undefined,
-              }, withObservedKey(model, [], msg, 'palette')];
+              return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
           if (frameAction?.type === 'toggle-notifications') {
-            const [nextModel, cmds] = applyFrameAction(frameAction, {
-              ...model,
-              commandPalette: undefined,
-              commandPaletteEntries: undefined,
-              commandPaletteTitle: undefined,
-              commandPaletteKind: undefined,
-            }, options, pagesById);
+            const [nextModel, cmds] = applyFrameAction(frameAction, closeCommandPalette(model), options, pagesById);
             return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
           }
           const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
