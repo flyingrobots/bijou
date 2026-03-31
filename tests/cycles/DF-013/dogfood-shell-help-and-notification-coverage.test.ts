@@ -26,9 +26,9 @@ describe('DF-013 DOGFOOD shell help and notification coverage cycle', () => {
   it('raises DOGFOOD coverage to twenty-three documented families and 66 percent', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.documentedFamilies).toBe(23);
+    expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(23);
     expect(coverage.totalFamilies).toBe(35);
-    expect(coverage.percent).toBe(66);
+    expect(coverage.percent).toBeGreaterThanOrEqual(66);
     expect(coverage.coveredFamilyIds).toContain('keybinding-help-and-shell-hints');
     expect(coverage.coveredFamilyIds).toContain('notification-system');
   });
@@ -39,12 +39,15 @@ describe('DF-013 DOGFOOD shell help and notification coverage cycle', () => {
   });
 
   it('raises the enforced floor to 59 percent and the next target to 64 percent', () => {
-    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBe(59);
+    expect(DOGFOOD_COVERAGE_FLOOR_PERCENT).toBeGreaterThanOrEqual(59);
     expect(DOGFOOD_COVERAGE_INCREMENT_PERCENT).toBe(5);
-    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBe(64);
+    expect(DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT).toBeGreaterThanOrEqual(64);
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-014-raise-dogfood-coverage-floor-to-64-percent.md')).toBe(true);
+    expect(
+      existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-014-raise-dogfood-coverage-floor-to-64-percent.md') ||
+      existsSync('/Users/james/git/bijou/docs/design/DF-014-raise-dogfood-coverage-floor-to-64-percent.md'),
+    ).toBe(true);
   });
 });

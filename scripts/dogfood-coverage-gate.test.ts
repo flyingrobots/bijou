@@ -52,7 +52,7 @@ describe('dogfood coverage gate', () => {
     const stderr: string[] = [];
 
     const code = runDogfoodCoverageGate({
-      floorPercent: 100,
+      floorPercent: 101,
       stdout: (text) => stdout.push(text),
       stderr: (text) => stderr.push(text),
     });
@@ -60,6 +60,6 @@ describe('dogfood coverage gate', () => {
     expect(code).toBe(1);
     expect(stdout).toEqual([]);
     expect(stderr.join('')).toContain('DOGFOOD documentation coverage floor not met');
-    expect(stderr.join('')).toContain('floor 100%');
+    expect(stderr.join('')).toContain('floor 101%');
   });
 });

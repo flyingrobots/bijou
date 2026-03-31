@@ -1,40 +1,68 @@
 import type { BijouContext } from '@flyingrobots/bijou';
 import {
+  accordion,
   alert,
   box,
   boxSurface,
+  breadcrumb,
+  createSurface,
+  dag,
+  enumeratedList,
   explainability,
+  gradientText,
   headerBox,
   hyperlink,
   inspector,
   kbd,
+  loadRandomLogo,
   log,
   markdown,
+  paginator,
   progressBar,
+  renderByMode,
   separator,
-  tabs,
   separatorSurface,
   skeleton,
   spinnerFrame,
+  stepper,
+  table,
+  tabs,
+  timeline,
+  tree,
   type Surface,
 } from '@flyingrobots/bijou';
 import {
+  canvas,
   compositeSurface,
+  browsableListSurface,
+  cpFilter,
   createKeyMap,
+  createAccordionState,
+  createBrowsableListState,
+  createCommandPaletteState,
+  createNavigableTableState,
   createNotificationState,
+  createSplitPaneState,
   dismissNotification,
+  filePickerSurface,
+  gridSurface,
   helpShort,
   helpShortSurface,
   helpView,
   helpViewSurface,
+  interactiveAccordion,
   modal,
+  navigableTableSurface,
   pushNotification,
   renderNotificationHistory,
   renderNotificationHistorySurface,
   renderNotificationStack,
+  splitPaneSurface,
+  statusBarSurface,
   tickNotifications,
   toast,
   viewportSurface,
+  commandPaletteSurface,
 } from '@flyingrobots/bijou-tui';
 import {
   badgeSurface,
@@ -788,6 +816,679 @@ function notificationPreview(input: {
     ctx,
     margin: 1,
   }));
+}
+
+function transientAppNotificationPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'actionable' | 'mixed';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+  const nowMs = 1_710_000_001_000;
+
+  let state = createNotificationState<string>();
+  state = pushNotification(state, {
+    title: 'Deploy approval ready',
+    message: 'The canary stayed green for 20 minutes.',
+    variant: mode === 'actionable' ? 'ACTIONABLE' : 'INLINE',
+    tone: 'SUCCESS',
+    placement: 'UPPER_RIGHT',
+    action: { label: 'Promote rollout', payload: 'promote' },
+  }, nowMs);
+  state = pushNotification(state, {
+    title: mode === 'actionable' ? 'Queue drift detected' : 'Release notes synced',
+    message: mode === 'actionable'
+      ? 'Rollback remains available if latency climbs again.'
+      : 'Support docs now match the promoted build.',
+    variant: 'TOAST',
+    tone: mode === 'actionable' ? 'WARNING' : 'INFO',
+    placement: 'LOWER_RIGHT',
+  }, nowMs + 40);
+  state = tickNotifications(state, nowMs + 500);
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      '[SUCCESS] Deploy approval ready',
+      'Action: Promote rollout',
+      '',
+      mode === 'actionable'
+        ? '[WARNING] Queue drift detected'
+        : '[INFO] Release notes synced',
+    ].join('\n');
+  }
+
+  const screenWidth = Math.max(48, Math.min(width, 64));
+  const screenHeight = 13;
+  const background = screenSurface(
+    screenWidth,
+    screenHeight,
+    boxSurface(column([
+      row(['release coordinator  ', badgeSurface(mode === 'actionable' ? 'READY' : 'SYNCED', 'info', ctx)]),
+      spacer(),
+      line('App-owned notifications can stack by tone and placement.', screenWidth - 6),
+      line(mutedText(ctx, 'This family is about transient app events, not archived review history.'), screenWidth - 6),
+    ]), {
+      title,
+      width: Math.max(34, screenWidth - 4),
+      ctx,
+    }),
+    1,
+    2,
+  );
+
+  return compositeSurface(background, renderNotificationStack(state, {
+    screenWidth,
+    screenHeight,
+    ctx,
+    margin: 1,
+  }));
+}
+
+function progressiveDisclosurePreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly interactive: boolean;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    interactive,
+  } = input;
+
+  const sections = [
+    {
+      title: 'Build',
+      content: 'Compile assets, freeze versions, and stamp the candidate build.',
+      expanded: true,
+    },
+    {
+      title: 'Review',
+      content: 'Surface release notes, migration risks, and owner acknowledgements.',
+      expanded: interactive,
+    },
+    {
+      title: 'Promote',
+      content: 'Roll canary traffic upward only after the review section is cleared.',
+      expanded: false,
+    },
+  ];
+
+  const body = interactive
+    ? interactiveAccordion(createAccordionState(sections), { ctx })
+    : accordion(sections, { ctx });
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      body,
+    ].join('\n');
+  }
+
+  const panelWidth = Math.max(44, Math.min(width, 62));
+  return boxSurface(contentSurface(body), {
+    title,
+    width: panelWidth,
+    ctx,
+  });
+}
+
+function pathAndProgressPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'wayfinding' | 'rollout';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  const text = mode === 'wayfinding'
+    ? [
+        breadcrumb(['Workspace', 'Docs', 'Families', 'Progress indicators'], { ctx }),
+        '',
+        paginator({ current: 2, total: 7, style: 'text', ctx }),
+      ].join('\n')
+    : [
+        stepper([
+          { label: 'Build' },
+          { label: 'Review' },
+          { label: 'Canary' },
+          { label: 'Promote' },
+        ], { current: 2, ctx }),
+        '',
+        breadcrumb(['Release', 'Canary', 'eu-west'], { ctx }),
+      ].join('\n');
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      text,
+    ].join('\n');
+  }
+
+  return boxSurface(contentSurface(text), {
+    title,
+    width: Math.max(44, Math.min(width, 62)),
+    ctx,
+  });
+}
+
+function brandingPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'launch' | 'heading';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+  const stops = ctx.theme.theme.gradient.brand;
+  const logo = loadRandomLogo('logos', 'bijou', 'small', undefined, {
+    ctx,
+    fallbackText: 'BIJOU',
+  }).text;
+  const heading = gradientText(
+    mode === 'launch' ? 'Documentation you can ship' : 'Release ready',
+    stops,
+    { style: ctx.style, noColor: ctx.theme.noColor },
+  );
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      logo,
+      '',
+      mode === 'launch' ? 'Documentation you can ship' : 'Release ready',
+    ].join('\n');
+  }
+
+  return boxSurface(column([
+    contentSurface(logo),
+    spacer(),
+    line(heading, Math.max(22, width - 8)),
+    ...(mode === 'launch'
+      ? [line(mutedText(ctx, 'Brand moments should open the experience, then get out of the way.'), Math.max(22, width - 8))]
+      : [line(mutedText(ctx, 'Expressive emphasis should remain rare and clearly non-critical.'), Math.max(22, width - 8))]),
+  ]), {
+    title,
+    width: Math.max(42, Math.min(width, 62)),
+    ctx,
+  });
+}
+
+function customSpark(label: string, value: string, ctx: BijouContext): string {
+  return renderByMode(ctx.mode, {
+    pipe: () => `[${label.toUpperCase()}] ${value}`,
+    accessible: () => `${label}: ${value}.`,
+    interactive: () => {
+      const icon = ctx.style.styled(ctx.semantic('accent'), '✦');
+      const labelText = ctx.style.bold(label);
+      const valueText = ctx.style.styled(ctx.semantic('muted'), value);
+      return `${icon} ${labelText}: ${valueText}`;
+    },
+  }, undefined);
+}
+
+function customPrimitivePreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+  } = input;
+  const preview = [
+    customSpark('Deploy', 'v5.2.1 rolling', ctx),
+    customSpark('Docs', 'coverage floor met', ctx),
+  ].join('\n');
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      preview,
+    ].join('\n');
+  }
+
+  return boxSurface(contentSurface(preview), {
+    title,
+    width: Math.max(40, Math.min(width, 56)),
+    ctx,
+  });
+}
+
+function denseComparisonPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'passive' | 'navigable';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+  const columns = [
+    { header: 'Service', width: 16 },
+    { header: 'Region', width: 12 },
+    { header: 'p95', width: 8 },
+    { header: 'Error', width: 8 },
+  ];
+  const rows = [
+    ['api', 'us-east', '84ms', '0.1%'],
+    ['queue', 'eu-west', '121ms', '0.4%'],
+    ['worker', 'ap-south', '142ms', '0.7%'],
+    ['docs', 'us-west', '77ms', '0.0%'],
+  ];
+
+  if (mode === 'passive') {
+    const preview = table({ columns, rows, ctx });
+    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+      return [title, '', preview].join('\n');
+    }
+    return boxSurface(contentSurface(preview), {
+      title,
+      width: Math.max(46, Math.min(width, 64)),
+      ctx,
+    });
+  }
+
+  const state = createNavigableTableState({ columns, rows, height: 3 });
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      table({ columns, rows: rows.slice(0, 3), ctx }),
+    ].join('\n');
+  }
+
+  return boxSurface(navigableTableSurface(state, { ctx }), {
+    title,
+    width: Math.max(46, Math.min(width, 64)),
+    ctx,
+  });
+}
+
+function hierarchyPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'tree' | 'picker';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  if (mode === 'tree') {
+    const preview = tree([
+      { label: 'src', children: [
+        { label: 'components', children: [{ label: 'box.ts' }, { label: 'table.ts' }] },
+        { label: 'stories', children: [{ label: 'stories.ts' }] },
+      ]},
+      { label: 'docs', children: [{ label: 'design-system' }, { label: 'legends' }] },
+      { label: 'package.json' },
+    ], { ctx });
+
+    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+      return [title, '', preview].join('\n');
+    }
+
+    return boxSurface(contentSurface(preview), {
+      title,
+      width: Math.max(42, Math.min(width, 58)),
+      ctx,
+    });
+  }
+
+  const pickerState = {
+    cwd: '/workspace/bijou',
+    entries: [
+      { name: 'docs', isDirectory: true },
+      { name: 'examples', isDirectory: true },
+      { name: 'packages', isDirectory: true },
+      { name: 'README.md', isDirectory: false },
+      { name: 'package.json', isDirectory: false },
+    ],
+    focusIndex: 2,
+    scrollY: 0,
+    height: 5,
+  };
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      '/workspace/bijou',
+      '  docs/',
+      '  examples/',
+      '▶ packages/',
+      '  README.md',
+      '  package.json',
+    ].join('\n');
+  }
+
+  return boxSurface(filePickerSurface(pickerState, {
+    width: Math.max(28, Math.min(width, 44)),
+  }), {
+    title,
+    width: Math.max(34, Math.min(width, 48)),
+    ctx,
+  });
+}
+
+function explorationListPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'enumerated' | 'browsable';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  if (mode === 'enumerated') {
+    const preview = enumeratedList([
+      'Review deployment notes',
+      'Open notification archive',
+      'Promote canary',
+      'Watch rollout health',
+    ], {
+      style: 'arabic',
+      indent: 2,
+      ctx,
+    });
+
+    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+      return [title, '', preview].join('\n');
+    }
+
+    return boxSurface(contentSurface(preview), {
+      title,
+      width: Math.max(40, Math.min(width, 58)),
+      ctx,
+    });
+  }
+
+  const listState = createBrowsableListState({
+    items: [
+      { label: 'Release dashboard', value: 'dash', description: 'Operational overview and current rollout state' },
+      { label: 'Notification archive', value: 'archive', description: 'Review earlier warnings and actions' },
+      { label: 'Component field guide', value: 'docs', description: 'Reference surface for shipped families' },
+      { label: 'Settings', value: 'settings', description: 'Tune shell hints and landing quality' },
+    ],
+    height: 4,
+  });
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      '• Release dashboard',
+      '• Notification archive',
+      '• Component field guide',
+      '• Settings',
+    ].join('\n');
+  }
+
+  return boxSurface(browsableListSurface(listState, {
+    width: Math.max(34, Math.min(width, 52)),
+    ctx,
+  }), {
+    title,
+    width: Math.max(38, Math.min(width, 56)),
+    ctx,
+  });
+}
+
+function temporalPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'timeline' | 'dag';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  const preview = mode === 'timeline'
+    ? timeline([
+        { label: 'Build created', description: 'Artifacts stamped for review', status: 'success' },
+        { label: 'Canary promoted', description: '10% traffic live in eu-west', status: 'info' },
+        { label: 'Latency drift detected', description: 'Retry backlog climbed above baseline', status: 'warning' },
+      ], { ctx })
+    : dag([
+        { id: 'build', label: 'Build', edges: ['test'], badge: 'DONE' },
+        { id: 'test', label: 'Test', edges: ['review'], badge: 'DONE' },
+        { id: 'review', label: 'Review', edges: ['deploy'], badge: 'READY' },
+        { id: 'deploy', label: 'Deploy', badge: 'BLOCKED' },
+      ], { ctx });
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [title, '', preview].join('\n');
+  }
+
+  return boxSurface(contentSurface(preview), {
+    title,
+    width: Math.max(42, Math.min(width, 64)),
+    ctx,
+  });
+}
+
+function motionPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'wave' | 'braille';
+  readonly timeMs: number;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+    timeMs,
+  } = input;
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      mode === 'wave'
+        ? 'Animated shader field lowers to a truthful final-state snapshot.'
+        : 'High-resolution motion lowers to explicit static state text when motion is unavailable.',
+    ].join('\n');
+  }
+
+  const panelWidth = Math.max(42, Math.min(width, 60));
+  const art = canvas(panelWidth - 2, 8, ({ u, v, time }) => {
+    const dx = u - 0.5;
+    const dy = (v - 0.5) * 1.8;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const wave = Math.sin(dist * 10 - time * 3) * 0.5 + 0.5;
+    return wave > (mode === 'wave' ? 0.55 : 0.6) ? '█' : ' ';
+  }, {
+    time: timeMs / 1000,
+    resolution: mode === 'wave' ? 'quad' : 'braille',
+  });
+
+  return boxSurface(column([
+    art,
+    spacer(),
+    line(mutedText(ctx, mode === 'wave'
+      ? 'Use motion when it reinforces state change, not just because it looks lively.'
+      : 'Higher-resolution shader output still needs an honest no-motion fallback.'), panelWidth - 2),
+  ]), {
+    title,
+    width: panelWidth,
+    ctx,
+  });
+}
+
+function appShellPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'shell' | 'palette';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      'DOGFOOD shell',
+      'Page: Docs',
+      mode === 'palette' ? 'Command palette: search “docs”' : 'Status: NORMAL • docs • ctrl+p palette',
+    ].join('\n');
+  }
+
+  const screenWidth = Math.max(50, Math.min(width, 66));
+  const screenHeight = 14;
+  const screen = createSurface(screenWidth, screenHeight);
+  const header = statusBarSurface({
+    left: 'DOGFOOD',
+    center: mode === 'palette' ? 'command discovery' : 'docs workspace',
+    right: 'ctrl+p palette',
+    width: screenWidth,
+    fillChar: '─',
+  });
+  const footer = statusBarSurface({
+    left: 'NORMAL',
+    center: 'page:docs',
+    right: '? help • / search',
+    width: screenWidth,
+    fillChar: '─',
+  });
+  const pane = boxSurface(column([
+    line('Current page', screenWidth - 8),
+    spacer(),
+    line('DOGFOOD now teaches shell chrome, overlays, and docs content in the same runtime.', screenWidth - 8),
+  ]), {
+    title,
+    width: screenWidth - 4,
+    ctx,
+  });
+  screen.blit(header, 0, 0);
+  screen.blit(pane, 2, 2);
+  screen.blit(footer, 0, screenHeight - 1);
+
+  if (mode === 'palette') {
+    const paletteState = cpFilter(createCommandPaletteState([
+      { id: 'docs', label: 'Open docs', description: 'Jump to the field guide', category: 'Navigate' },
+      { id: 'download', label: 'Download coverage report', description: 'Open the latest docs summary', category: 'Actions' },
+      { id: 'settings', label: 'Open settings', description: 'Shell-level preferences', category: 'Shell', shortcut: 'F2' },
+      { id: 'notify', label: 'Review notifications', description: 'Open the notice drawer', category: 'Shell' },
+    ], 4), 'do');
+    const palette = commandPaletteSurface(paletteState, {
+      width: Math.max(30, screenWidth - 12),
+      ctx,
+    });
+    screen.blit(palette, 6, 4);
+  }
+
+  return screen;
+}
+
+function workspaceLayoutPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'split' | 'grid';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      mode === 'split'
+        ? 'Files | Editor'
+        : 'Header / Navigation / Logs / Main view',
+    ].join('\n');
+  }
+
+  const panelWidth = Math.max(48, Math.min(width, 64));
+  const body = mode === 'split'
+    ? splitPaneSurface(createSplitPaneState({ ratio: 0.36, focused: 'b' }), {
+        direction: 'row',
+        width: panelWidth - 2,
+        height: 10,
+        minA: 16,
+        minB: 18,
+        paneA: (paneWidth, paneHeight) => boxSurface(`Files\n\n- stories.ts\n- app.ts\n- coverage.ts\n\n${paneWidth}x${paneHeight}`, {
+          width: paneWidth,
+          ctx,
+        }),
+        paneB: (paneWidth, paneHeight) => boxSurface(`Editor\n\nconst floor = 64;\nconst next = 69;\n\n${paneWidth}x${paneHeight}`, {
+          width: paneWidth,
+          ctx,
+        }),
+      })
+    : gridSurface({
+        width: panelWidth - 2,
+        height: 10,
+        columns: [18, '1fr'],
+        rows: [3, '1fr', 4],
+        areas: [
+          'header header',
+          'nav main',
+          'log main',
+        ],
+        gap: 1,
+        cells: {
+          header: (paneWidth) => boxSurface('Workspace layout', { width: paneWidth, ctx }),
+          nav: (paneWidth, paneHeight) => boxSurface(`Families\n\n- forms\n- docs\n- shell\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
+          log: (paneWidth, paneHeight) => boxSurface(`Log\n\n[ok] build\n[ok] docs\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
+          main: (paneWidth, paneHeight) => boxSurface(`Main pane\n\nLayout primitives keep simultaneous context honest.\n\n${paneWidth}x${paneHeight}`, { width: paneWidth, ctx }),
+        },
+      });
+
+  return boxSurface(body, {
+    title,
+    width: panelWidth,
+    ctx,
+  });
 }
 
 export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
@@ -2408,6 +3109,692 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Inline shortcut cues',
     },
     tags: ['shortcuts', 'inline', 'hints'],
+  },
+  {
+    kind: 'component',
+    id: 'transient-app-notifications',
+    coverageFamilyIds: ['transient-app-notifications'],
+    family: 'Feedback overlays and history',
+    title: 'pushNotification() / renderNotificationStack()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'App-owned transient notification family for live stacked events, tones, actions, and placements before archived review or broader shell routing becomes the main concern.',
+      useWhen: [
+        'The app owns transient event messaging and placement materially affects interruption level.',
+        'A notice may need one clear next action without turning into a mini workflow.',
+        'The system should feel richer than one raw toast primitive but does not need the whole review/archive story in the current moment.',
+      ],
+      avoidWhen: [
+        'The content should remain in page flow; prefer `alert()` or `note()`.',
+        'One directly composed local overlay is enough; prefer `toast()`.',
+        'The user mainly needs chronological recall and archived review; move up to the full notification-system history surfaces.',
+      ],
+      relatedFamilies: ['toast()', 'notification system', 'modal()'],
+      gracefulLowering: {
+        interactive: 'Stacked app-owned notices with tones, placement, and optional actions.',
+        static: 'Single deterministic live-notice snapshot preserving stacking and tone.',
+        pipe: 'Plain chronological event lines with action language kept explicit.',
+        accessible: 'Linearized transient notices that preserve action, severity, and ordering without spatial assumptions.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'actionable-live',
+        label: 'Actionable live notice',
+        description: 'One clear next action stays attached to the live transient event.',
+        render: ({ width, ctx }) => transientAppNotificationPreview({
+          width,
+          ctx,
+          title: 'transient notifications',
+          mode: 'actionable',
+        }),
+      },
+      {
+        id: 'mixed-variants',
+        label: 'Mixed live variants',
+        description: 'App-owned transient notices can mix inline and toast variants without becoming the history view.',
+        render: ({ width, ctx }) => transientAppNotificationPreview({
+          width,
+          ctx,
+          title: 'mixed live notices',
+          mode: 'mixed',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/notifications/main.ts',
+      snippetLabel: 'Live transient notifications',
+    },
+    tags: ['notifications', 'transient', 'stack'],
+  },
+  {
+    kind: 'component',
+    id: 'progressive-disclosure',
+    coverageFamilyIds: ['progressive-disclosure'],
+    family: 'Navigation and organization',
+    title: 'accordion() / interactiveAccordion()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Progressive-disclosure family for scanning summaries first and revealing detail only when the user chooses to open a section.',
+      useWhen: [
+        'Detail is secondary to summary and the user benefits from scanning section headers first.',
+        'Expanded content stays tightly related to one summary row.',
+        'The same disclosure story should remain honest in pipe, accessible, and rich modes.',
+      ],
+      avoidWhen: [
+        'The sections are really peer destinations; prefer `tabs()`.',
+        'The content is always critical and should not be hidden behind disclosure.',
+        'The summary rows are too vague to let the user decide what to expand.',
+      ],
+      relatedFamilies: ['tabs()', 'box()', 'interactiveAccordion()'],
+      gracefulLowering: {
+        interactive: 'Expandable sections with keyboard-owned focus for richer inspection.',
+        static: 'Deterministic disclosure snapshot preserving expanded and collapsed state.',
+        pipe: 'Section headings with disclosed content kept plainly visible in text.',
+        accessible: 'Section labels and disclosure state remain explicit in reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'summary-first',
+        label: 'Summary-first disclosure',
+        description: 'Static disclosure keeps summary rows scannable before details unfold.',
+        render: ({ width, ctx }) => progressiveDisclosurePreview({
+          width,
+          ctx,
+          title: 'release accordion',
+          interactive: false,
+        }),
+      },
+      {
+        id: 'keyboard-inspection',
+        label: 'Keyboard inspection',
+        description: 'The TUI path adds focus ownership without changing the semantic disclosure model.',
+        render: ({ width, ctx }) => progressiveDisclosurePreview({
+          width,
+          ctx,
+          title: 'interactive disclosure',
+          interactive: true,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/interactive-accordion/main.ts',
+      snippetLabel: 'Keyboard-owned disclosure',
+    },
+    tags: ['disclosure', 'accordion', 'navigation'],
+  },
+  {
+    kind: 'component',
+    id: 'path-and-progress',
+    coverageFamilyIds: ['path-and-progress'],
+    family: 'Navigation and organization',
+    title: 'breadcrumb() / stepper() / paginator()',
+    package: 'bijou',
+    docs: {
+      summary: 'Wayfinding and progress family for showing where the user is, what stage they are in, or how far through a sequence they have moved.',
+      useWhen: [
+        'The interface needs explicit location, stage, or page-progress context.',
+        'A compact path or step summary helps review, recovery, or coordination.',
+        'The user should understand current position without opening another navigation surface.',
+      ],
+      avoidWhen: [
+        'Peer switching is the main job; prefer `tabs()`.',
+        'The path is decorative and does not materially orient the user.',
+        'Dense explanatory prose is doing the work instead of clear path labels.',
+      ],
+      relatedFamilies: ['tabs()', 'wizard()', 'statusBarSurface()'],
+      gracefulLowering: {
+        interactive: 'Visible path, stage, or page state stays compact and scannable.',
+        static: 'Single-frame wayfinding and progress snapshots preserve current-state meaning.',
+        pipe: 'Plain path and step summaries remain readable without styling.',
+        accessible: 'Current location, order, and active stage are stated explicitly in text.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'wayfinding',
+        label: 'Wayfinding',
+        description: 'Breadcrumbs and pagination keep location and scale explicit.',
+        render: ({ width, ctx }) => pathAndProgressPreview({
+          width,
+          ctx,
+          title: 'wayfinding',
+          mode: 'wayfinding',
+        }),
+      },
+      {
+        id: 'rollout-steps',
+        label: 'Rollout steps',
+        description: 'A stepper clarifies staged progress when the current stage matters more than peer switching.',
+        render: ({ width, ctx }) => pathAndProgressPreview({
+          width,
+          ctx,
+          title: 'rollout path',
+          mode: 'rollout',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/stepper/main.ts',
+      snippetLabel: 'Wayfinding and progress',
+    },
+    tags: ['wayfinding', 'progress', 'navigation'],
+  },
+  {
+    kind: 'component',
+    id: 'expressive-branding',
+    coverageFamilyIds: ['expressive-branding-and-decorative-emphasis'],
+    family: 'Branding, motion, and authoring',
+    title: 'loadRandomLogo() / gradientText()',
+    package: 'bijou',
+    docs: {
+      summary: 'Expressive branding family for rare logo and gradient emphasis moments that add atmosphere without becoming routine application chrome.',
+      useWhen: [
+        'A splash, landing, or documentation moment benefits from deliberate brand voice or celebration.',
+        'The emphasized text is non-critical and can fall back cleanly in constrained modes.',
+        'The decoration opens or punctuates the experience instead of dominating everyday work.',
+      ],
+      avoidWhen: [
+        'Critical status, navigation, or instructions depend on decorative treatment.',
+        'The interface is already busy and another branded flourish would compete with the task.',
+        'The same text must remain equally plain and scannable in every mode.',
+      ],
+      relatedFamilies: ['canvas()', 'markdown()', 'box()'],
+      gracefulLowering: {
+        interactive: 'Logo and gradient emphasis create atmosphere without owning the whole interface.',
+        static: 'Expressive emphasis remains visible in one deterministic frame.',
+        pipe: 'Plain text remains fully meaningful without pretending decorative color still exists.',
+        accessible: 'Text content stays explicit and decorative output does not pollute reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'launch-moment',
+        label: 'Launch moment',
+        description: 'Brand treatment can open a docs or splash surface, then get out of the way.',
+        render: ({ width, ctx }) => brandingPreview({
+          width,
+          ctx,
+          title: 'launch moment',
+          mode: 'launch',
+        }),
+      },
+      {
+        id: 'celebratory-heading',
+        label: 'Celebratory heading',
+        description: 'Short gradient emphasis works best as a rare heading-level accent.',
+        render: ({ width, ctx }) => brandingPreview({
+          width,
+          ctx,
+          title: 'celebratory heading',
+          mode: 'heading',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/gradient-text/main.ts',
+      snippetLabel: 'Expressive branding emphasis',
+    },
+    tags: ['branding', 'gradient', 'logo'],
+  },
+  {
+    kind: 'component',
+    id: 'mode-aware-custom-primitives',
+    coverageFamilyIds: ['mode-aware-custom-primitives'],
+    family: 'Branding, motion, and authoring',
+    title: 'renderByMode()',
+    package: 'bijou',
+    docs: {
+      summary: 'Authoring seam for app-defined primitives that keep one semantic meaning while lowering honestly across interactive, pipe, and accessible modes.',
+      useWhen: [
+        'The app needs a domain-specific primitive that does not belong in shared Bijou componentry.',
+        'The same concept must remain truthful across modes without inventing different behaviors per branch.',
+        'You are authoring one semantic thing first and then describing its honest lowerings.',
+      ],
+      avoidWhen: [
+        'A shipped Bijou family already matches the job.',
+        'The branching only exists for cosmetic novelty instead of semantic truth.',
+        'The accessible or pipe branch would hide meaning that the rich branch relies on.',
+      ],
+      relatedFamilies: ['note()', 'badge()', 'markdown()'],
+      gracefulLowering: {
+        interactive: 'The richest honest rendering can use styling and composition without losing the underlying semantic meaning.',
+        static: 'The same authored primitive remains visible in a deterministic single frame.',
+        pipe: 'The primitive lowers to explicit text instead of silent style loss.',
+        accessible: 'The same semantic thing is linearized into plain language without decorative assumptions.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'deployment-spark',
+        label: 'Deployment spark',
+        description: 'One app-owned primitive can keep the same meaning while changing representation by mode.',
+        render: ({ width, ctx }) => customPrimitivePreview({
+          width,
+          ctx,
+          title: 'custom primitive',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/custom-component/main.ts',
+      snippetLabel: 'Mode-aware custom primitive',
+    },
+    tags: ['authoring', 'custom', 'lowering'],
+  },
+  {
+    kind: 'component',
+    id: 'dense-comparison',
+    coverageFamilyIds: ['dense-comparison'],
+    family: 'Data and browsing',
+    title: 'table() / navigableTableSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Dense comparison family for row-and-column inspection when the main task is comparing attributes across records instead of reading a narrative list.',
+      useWhen: [
+        'Row and column comparison is the main job.',
+        'Headers describe comparable attributes and the table remains compact enough to stay readable.',
+        'Keyboard-owned row inspection materially helps the task.',
+      ],
+      avoidWhen: [
+        'Hierarchy or dependencies dominate the meaning; prefer `tree()` or `dag()`.',
+        'The data is really one-dimensional and should read like a list.',
+        'The rows wrap so heavily that comparison stops being honest.',
+      ],
+      relatedFamilies: ['browsableListSurface()', 'tree()', 'navigableTableSurface()'],
+      gracefulLowering: {
+        interactive: 'Passive or keyboard-owned table inspection preserves headers and row focus.',
+        static: 'Single-frame dense comparison remains visible where width allows.',
+        pipe: 'Plain textual row and column output keeps comparison semantics explicit.',
+        accessible: 'Headers, row labels, and focused comparison state remain clear in text.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'passive-grid',
+        label: 'Passive grid',
+        description: 'A compact data table remains the honest view when comparison, not interaction, is primary.',
+        render: ({ width, ctx }) => denseComparisonPreview({
+          width,
+          ctx,
+          title: 'passive table',
+          mode: 'passive',
+        }),
+      },
+      {
+        id: 'focused-inspection',
+        label: 'Focused inspection',
+        description: 'The TUI path adds row-aware focus without collapsing the table into a generic list.',
+        render: ({ width, ctx }) => denseComparisonPreview({
+          width,
+          ctx,
+          title: 'focused table',
+          mode: 'navigable',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/navigable-table/main.ts',
+      snippetLabel: 'Dense comparison',
+    },
+    tags: ['table', 'comparison', 'data'],
+  },
+  {
+    kind: 'component',
+    id: 'hierarchy',
+    coverageFamilyIds: ['hierarchy'],
+    family: 'Data and browsing',
+    title: 'tree() / filePickerSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Hierarchy family for parent-child structure and filesystem-style browsing where nesting, path context, and directory boundaries matter more than tabular comparison.',
+      useWhen: [
+        'Parent-child nesting is the mental model.',
+        'Path context or directory/file distinction helps the user orient themselves.',
+        'The hierarchy should still read honestly when flattened into text.',
+      ],
+      avoidWhen: [
+        'Multiple parents or causal dependencies dominate; prefer `dag()`.',
+        'The user is comparing attributes across peers; prefer `table()`.',
+        'The content is really a linear list with no nesting benefit.',
+      ],
+      relatedFamilies: ['browsableListSurface()', 'dag()', 'filePickerSurface()'],
+      gracefulLowering: {
+        interactive: 'Nested structure and file-browser snapshots preserve parent-child meaning.',
+        static: 'A deterministic hierarchy frame still communicates nesting and path context.',
+        pipe: 'Indented textual hierarchy remains natural and honest.',
+        accessible: 'Parent-child relationships stay explicit in reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'project-tree',
+        label: 'Project tree',
+        description: 'A passive hierarchy is enough when the user is understanding shape and ownership.',
+        render: ({ width, ctx }) => hierarchyPreview({
+          width,
+          ctx,
+          title: 'project hierarchy',
+          mode: 'tree',
+        }),
+      },
+      {
+        id: 'file-browser',
+        label: 'File browser snapshot',
+        description: 'A file-picker view adds path and directory semantics on the rich TUI path.',
+        render: ({ width, ctx }) => hierarchyPreview({
+          width,
+          ctx,
+          title: 'file picker',
+          mode: 'picker',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/file-picker/main.ts',
+      snippetLabel: 'Hierarchy and file browsing',
+    },
+    tags: ['hierarchy', 'tree', 'filesystem'],
+  },
+  {
+    kind: 'component',
+    id: 'lists-for-exploration',
+    coverageFamilyIds: ['lists-for-exploration'],
+    family: 'Data and browsing',
+    title: 'enumeratedList() / browsableListSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Exploration-list family for one-dimensional scanning where item order and focused inspection matter more than columns or hierarchy.',
+      useWhen: [
+        'The content is fundamentally a list, not a table or tree.',
+        'The first distinguishing label should lead each row or item.',
+        'Keyboard browsing materially helps the user inspect records or destinations.',
+      ],
+      avoidWhen: [
+        'Columns carry the meaning; prefer `table()`.',
+        'Parent-child nesting matters; prefer `tree()`.',
+        'The user is executing commands rather than exploring records; prefer `commandPaletteSurface()`.',
+      ],
+      relatedFamilies: ['table()', 'tree()', 'commandPaletteSurface()'],
+      gracefulLowering: {
+        interactive: 'Browsable list rows preserve active selection and optional descriptions.',
+        static: 'Ordered list snapshots remain readable without active keyboard focus.',
+        pipe: 'Plain list text keeps order and labels explicit.',
+        accessible: 'Selection, order, and descriptions remain explicit in linear text.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'ordered-outline',
+        label: 'Ordered outline',
+        description: 'A passive list is enough when the task is scan-first review.',
+        render: ({ width, ctx }) => explorationListPreview({
+          width,
+          ctx,
+          title: 'ordered outline',
+          mode: 'enumerated',
+        }),
+      },
+      {
+        id: 'browsable-records',
+        label: 'Browsable records',
+        description: 'The TUI path adds row focus and descriptions without pretending the content is a command palette.',
+        render: ({ width, ctx }) => explorationListPreview({
+          width,
+          ctx,
+          title: 'browsable records',
+          mode: 'browsable',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/browsable-list/main.ts',
+      snippetLabel: 'Lists for exploration',
+    },
+    tags: ['list', 'browsing', 'exploration'],
+  },
+  {
+    kind: 'component',
+    id: 'temporal-or-dependency-views',
+    coverageFamilyIds: ['temporal-or-dependency-views'],
+    family: 'Data and browsing',
+    title: 'timeline() / dag()',
+    package: 'bijou',
+    docs: {
+      summary: 'Temporal and dependency family for explaining what happened next or what depends on what when order or causality is the real structure.',
+      useWhen: [
+        'Chronology or dependency is the actual organizing principle.',
+        'The user needs to follow sequence or causal structure, not just compare rows.',
+        'A summary metric alone would hide the important relationship between events or nodes.',
+      ],
+      avoidWhen: [
+        'A plain table or tree answers the question more directly.',
+        'The graph is decorative wallpaper instead of meaningful structure.',
+        'The content has only one parent and is mainly consumed as sequence; a timeline or tree may be clearer than a DAG.',
+      ],
+      relatedFamilies: ['table()', 'tree()', 'log()'],
+      gracefulLowering: {
+        interactive: 'Chronological or dependency structure stays visible as the main story.',
+        static: 'A deterministic frame preserves order or causal relationships honestly.',
+        pipe: 'Ordered event lines or dependency traces keep the same semantic meaning in plain text.',
+        accessible: 'Temporal or causal relationships remain explicit without relying on shape alone.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'release-timeline',
+        label: 'Release timeline',
+        description: 'Chronology is the right frame when the question is what happened next.',
+        render: ({ width, ctx }) => temporalPreview({
+          width,
+          ctx,
+          title: 'release timeline',
+          mode: 'timeline',
+        }),
+      },
+      {
+        id: 'dependency-graph',
+        label: 'Dependency graph',
+        description: 'Dependency structure matters when readiness depends on upstream steps.',
+        render: ({ width, ctx }) => temporalPreview({
+          width,
+          ctx,
+          title: 'dependency graph',
+          mode: 'dag',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/timeline/main.ts',
+      snippetLabel: 'Timeline and dependency views',
+    },
+    tags: ['timeline', 'dag', 'dependency'],
+  },
+  {
+    kind: 'component',
+    id: 'motion-and-shader-effects',
+    coverageFamilyIds: ['motion-and-shader-effects'],
+    family: 'Branding, motion, and authoring',
+    title: 'canvas()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Motion and shader family for deliberate visual emphasis, transitions, and animated atmosphere when the effect reinforces state change or product voice instead of competing with the task.',
+      useWhen: [
+        'Motion or shader output materially clarifies a transition, state change, or atmosphere.',
+        'The effect has an honest reduced-motion or static fallback.',
+        'The visual moment is deliberate and bounded instead of routine chrome noise.',
+      ],
+      avoidWhen: [
+        'The effect is only decorative and distracts from the task.',
+        'Readability or scanning would be harmed by the animation.',
+        'A stable status cue would communicate the meaning more directly.',
+      ],
+      relatedFamilies: ['gradientText()', 'createFramedApp()', 'notification system'],
+      gracefulLowering: {
+        interactive: 'Shader-driven or animated surfaces reinforce state change or atmosphere deliberately.',
+        static: 'The final visual state remains truthful without pretending motion still exists.',
+        pipe: 'Decorative effects disappear and the meaning-bearing content remains.',
+        accessible: 'State-change meaning stays explicit without requiring visual motion.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'shader-wave',
+        label: 'Shader wave',
+        description: 'A low-key animated field can reinforce atmosphere when it stays subordinate to the content.',
+        render: ({ width, ctx, timeMs }) => motionPreview({
+          width,
+          ctx,
+          title: 'shader wave',
+          mode: 'wave',
+          timeMs,
+        }),
+      },
+      {
+        id: 'braille-field',
+        label: 'Braille field',
+        description: 'Higher-resolution shader output still needs an honest non-motion fallback.',
+        render: ({ width, ctx, timeMs }) => motionPreview({
+          width,
+          ctx,
+          title: 'braille field',
+          mode: 'braille',
+          timeMs,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/canvas/main.ts',
+      snippetLabel: 'Shader-based motion',
+    },
+    tags: ['motion', 'shader', 'canvas'],
+  },
+  {
+    kind: 'component',
+    id: 'app-shell',
+    coverageFamilyIds: ['app-shell'],
+    family: 'Shell and workspace',
+    title: 'createFramedApp() / statusBarSurface() / commandPaletteSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'App-shell family for multi-view framed applications with global status, command discovery, overlays, and consistent shell-owned chrome.',
+      useWhen: [
+        'The app has multiple pages, overlays, or global shell concerns.',
+        'Status context and action discovery should stay distinct from in-page content.',
+        'The shell needs to frame workspace state without becoming a dumping ground for unrelated metadata.',
+      ],
+      avoidWhen: [
+        'The app is really a single screen or one prompt.',
+        'Status bars or command palettes would only duplicate obvious local labels.',
+        'The surface needs record browsing rather than action discovery; prefer `browsableListSurface()`.',
+      ],
+      relatedFamilies: ['statusBarSurface()', 'helpViewSurface()', 'commandPaletteSurface()', 'tabs()'],
+      gracefulLowering: {
+        interactive: 'Full shell chrome keeps status, navigation, and command discovery distinct from page content.',
+        static: 'The active page and essential shell context remain visible in one deterministic frame.',
+        pipe: 'Current page content plus minimal shell context stays readable without pretending background interactivity exists.',
+        accessible: 'Shell state, overlays, and active context linearize into one readable flow.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'framed-page',
+        label: 'Framed page',
+        description: 'Status rails and framed page content create calm global context around the current workspace.',
+        render: ({ width, ctx }) => appShellPreview({
+          width,
+          ctx,
+          title: 'framed shell',
+          mode: 'shell',
+        }),
+      },
+      {
+        id: 'command-discovery',
+        label: 'Command discovery',
+        description: 'The palette should surface actions and destinations, not become a record browser in disguise.',
+        render: ({ width, ctx }) => appShellPreview({
+          width,
+          ctx,
+          title: 'command palette',
+          mode: 'palette',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/app-frame/main.ts',
+      snippetLabel: 'Framed app shell',
+    },
+    tags: ['shell', 'status-bar', 'command-palette'],
+  },
+  {
+    kind: 'component',
+    id: 'workspace-layout',
+    coverageFamilyIds: ['workspace-layout'],
+    family: 'Shell and workspace',
+    title: 'splitPaneSurface() / gridSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Workspace-layout family for honest spatial composition when simultaneous context materially helps the task and sequential flow would hide important relationships.',
+      useWhen: [
+        'Spatial arrangement materially helps the task.',
+        'Primary and secondary regions should stay visible together.',
+        'The regions already have meaningful jobs and are not just geometry for its own sake.',
+      ],
+      avoidWhen: [
+        'A sequential flow would be simpler and more legible.',
+        'The borders only expose layout math instead of region purpose.',
+        'The same meaning would be clearer as one focused pane.',
+      ],
+      relatedFamilies: ['createFramedApp()', 'box()', 'focusAreaSurface()'],
+      gracefulLowering: {
+        interactive: 'Spatial relationships stay visible through split and grid composition.',
+        static: 'A deterministic layout snapshot preserves region jobs without fake interactivity.',
+        pipe: 'Regions lower to a sensible sequential reading order.',
+        accessible: 'Labeled regions linearize predictably without losing section identity.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'split-context',
+        label: 'Split context',
+        description: 'A split keeps primary work and secondary context visible at once.',
+        render: ({ width, ctx }) => workspaceLayoutPreview({
+          width,
+          ctx,
+          title: 'split workspace',
+          mode: 'split',
+        }),
+      },
+      {
+        id: 'dashboard-grid',
+        label: 'Dashboard grid',
+        description: 'A grid is honest when multiple stable regions deserve simultaneous visibility.',
+        render: ({ width, ctx }) => workspaceLayoutPreview({
+          width,
+          ctx,
+          title: 'grid workspace',
+          mode: 'grid',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/split-pane/main.ts',
+      snippetLabel: 'Workspace layout',
+    },
+    tags: ['layout', 'split', 'grid'],
   },
 ] as const;
 

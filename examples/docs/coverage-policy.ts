@@ -1,9 +1,11 @@
 import type { DogfoodDocsCoverage } from './coverage.js';
 
-export const DOGFOOD_COVERAGE_FLOOR_PERCENT = 59;
+export const DOGFOOD_COVERAGE_FLOOR_PERCENT = 100;
 export const DOGFOOD_COVERAGE_INCREMENT_PERCENT = 5;
-export const DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT =
-  DOGFOOD_COVERAGE_FLOOR_PERCENT + DOGFOOD_COVERAGE_INCREMENT_PERCENT;
+export const DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT = Math.min(
+  100,
+  DOGFOOD_COVERAGE_FLOOR_PERCENT + DOGFOOD_COVERAGE_INCREMENT_PERCENT,
+);
 
 export interface DogfoodCoverageFloorOptions {
   readonly floorPercent?: number;

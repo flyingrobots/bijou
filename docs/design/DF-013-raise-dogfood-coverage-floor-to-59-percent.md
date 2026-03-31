@@ -160,4 +160,4 @@ The cycle stayed focused on shell-facing teaching value rather than simply addin
 
 Spawned:
 
-- [DF-014 — Raise DOGFOOD Coverage Floor to 64%](/Users/james/git/bijou/docs/BACKLOG/DF-014-raise-dogfood-coverage-floor-to-64-percent.md)
+- [DF-014 — Raise DOGFOOD Coverage Floor to 64%](/Users/james/git/bijou/docs/design/DF-014-raise-dogfood-coverage-floor-to-64-percent.md)

@@ -614,6 +614,33 @@ describe('docs preview app', () => {
     expect(text).toContain('Open help');
   });
 
+  it('can open the new app-shell story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'p' },
+      { key: 'a' },
+      { key: 'l' },
+      { key: 'e' },
+      { key: 't' },
+      { key: 't' },
+      { key: 'e' },
+      { key: KEY_ENTER },
+      { key: '.' },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('app-shell');
+    expect(text).toContain('createFramedApp()');
+    expect(text).toContain('command palette');
+    expect(text).toContain('Current page');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
