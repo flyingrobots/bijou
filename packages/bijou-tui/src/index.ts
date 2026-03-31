@@ -24,6 +24,27 @@ export type {
 } from './types.js';
 export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 
+// Runtime engine
+export type {
+  RuntimeStateLike,
+  RuntimeStateMachine,
+  RuntimeViewLayer,
+  RuntimeStackLayer,
+  RuntimeViewStack,
+  PopRuntimeViewResult,
+} from './runtime-engine.js';
+export {
+  activeRuntimeView,
+  clearRuntimeViewsToRoot,
+  createRuntimeStateMachine,
+  createRuntimeViewStack,
+  popRuntimeView,
+  pushRuntimeView,
+  replaceRuntimeRootView,
+  replaceTopRuntimeView,
+  transitionRuntimeState,
+} from './runtime-engine.js';
+
 // Key parsing
 export { parseKey, parseMouse } from './keys.js';
 

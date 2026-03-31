@@ -1,0 +1,31 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+
+function read(path: string): string {
+  return readFileSync(path, 'utf8');
+}
+
+describe('RE-002 first-class state machine and view stack cycle', () => {
+  it('captures the active cycle, legend progression, and remaining runtime-engine backlog slices', () => {
+    const legend = read('/Users/james/git/bijou/docs/legends/RE-runtime-engine.md');
+    const cycle = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
+    const backlogLayout = read('/Users/james/git/bijou/docs/BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md');
+    const backlogRouting = read('/Users/james/git/bijou/docs/BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md');
+    const backlogBuffers = read('/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md');
+
+    expect(legend).toContain('RE-002 — Promote First-Class State Machine and View Stack');
+    expect(legend).toContain('RE-003 — Retain Layout Trees and Layout Invalidation');
+
+    expect(cycle).toContain('## Human playback');
+    expect(cycle).toContain('## Agent playback');
+    expect(cycle).toContain('first-class state-machine object');
+    expect(cycle).toContain('first-class view-stack object');
+    expect(cycle).toContain('non-dismissible workspace root view');
+    expect(cycle).toContain('push/pop/replace/clear semantics');
+    expect(cycle).toContain('## Retrospective');
+
+    expect(backlogLayout).toContain('Retain layout trees');
+    expect(backlogRouting).toContain('topmost layer first');
+    expect(backlogBuffers).toContain('command and effect buffer contracts');
+  });
+});

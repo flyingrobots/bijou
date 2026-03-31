@@ -62,9 +62,8 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 ## Current cycle and backlog
 
 - active cycle:
-  - [RE-001 — Define Runtime Engine Architecture](/Users/james/git/bijou/docs/design/RE-001-define-runtime-engine-architecture.md)
+  - [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
 - backlog:
-  - [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/BACKLOG/RE-002-promote-first-class-state-machine-and-view-stack.md)
   - [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md)
   - [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md)
   - [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md)
