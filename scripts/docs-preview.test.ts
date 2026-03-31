@@ -588,6 +588,32 @@ describe('docs preview app', () => {
     expect(text).toContain('Promote the canary build');
   });
 
+  it('can open the new help story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'h' },
+      { key: 'e' },
+      { key: 'l' },
+      { key: 'p' },
+      { key: 'v' },
+      { key: KEY_ENTER },
+      { key: '.' },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('help-view');
+    expect(text).toContain('helpView() / helpShortSurface()');
+    expect(text).toContain('Keyboard shortcuts');
+    expect(text).toContain('Navigation');
+    expect(text).toContain('Open help');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

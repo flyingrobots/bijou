@@ -20,7 +20,19 @@ import {
 } from '@flyingrobots/bijou';
 import {
   compositeSurface,
+  createKeyMap,
+  createNotificationState,
+  dismissNotification,
+  helpShort,
+  helpShortSurface,
+  helpView,
+  helpViewSurface,
   modal,
+  pushNotification,
+  renderNotificationHistory,
+  renderNotificationHistorySurface,
+  renderNotificationStack,
+  tickNotifications,
   toast,
   viewportSurface,
 } from '@flyingrobots/bijou-tui';
@@ -583,6 +595,199 @@ function dividerPreview(input: {
     width: panelWidth,
     ctx,
   });
+}
+
+const HELP_PREVIEW_KEYS = createKeyMap<{ readonly type: string }>()
+  .group('Navigation', (g) => g
+    .bind('j', 'Move down', { type: 'down' })
+    .bind('k', 'Move up', { type: 'up' })
+    .bind('tab', 'Next pane', { type: 'next-pane' })
+  )
+  .group('Actions', (g) => g
+    .bind('enter', 'Open selection', { type: 'open' })
+    .bind('/', 'Search components', { type: 'search' })
+    .bind('f2', 'Open settings', { type: 'settings' })
+  )
+  .group('Shell', (g) => g
+    .bind('?', 'Open help', { type: 'help' })
+    .bind('q', 'Quit', { type: 'quit' })
+  );
+
+function helpPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'hint' | 'reference';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+  const panelWidth = Math.max(42, Math.min(width, 62));
+  const innerWidth = Math.max(20, panelWidth - 2);
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    if (mode === 'hint') {
+      return [
+        title,
+        '',
+        helpShort(HELP_PREVIEW_KEYS),
+      ].join('\n');
+    }
+
+    return [
+      title,
+      '',
+      helpView(HELP_PREVIEW_KEYS, { title: 'Keyboard shortcuts' }),
+    ].join('\n');
+  }
+
+  if (mode === 'hint') {
+    return boxSurface(column([
+      line('Shell footer hint', innerWidth),
+      spacer(),
+      helpShortSurface(HELP_PREVIEW_KEYS, { width: innerWidth }),
+    ]), {
+      title,
+      width: panelWidth,
+      ctx,
+    });
+  }
+
+  return boxSurface(helpViewSurface(HELP_PREVIEW_KEYS, {
+    title: 'Keyboard shortcuts',
+    width: innerWidth,
+  }), {
+    title,
+    width: panelWidth,
+    ctx,
+  });
+}
+
+function createLiveNotificationState(nowMs: number) {
+  let state = createNotificationState<string>();
+  state = pushNotification(state, {
+    title: 'Canary ready',
+    message: 'eu-west has stayed green for 15 minutes.',
+    variant: 'ACTIONABLE',
+    tone: 'SUCCESS',
+    placement: 'UPPER_RIGHT',
+    action: { label: 'Promote rollout', payload: 'promote' },
+  }, nowMs);
+  state = pushNotification(state, {
+    title: 'Queue drift detected',
+    message: 'Retry backlog is trending upward in the worker pool.',
+    variant: 'TOAST',
+    tone: 'WARNING',
+    placement: 'LOWER_RIGHT',
+  }, nowMs + 20);
+  return tickNotifications(state, nowMs + 500);
+}
+
+function createArchivedNotificationState(nowMs: number) {
+  let state = createNotificationState<string>();
+  state = pushNotification(state, {
+    title: 'Deploy blocked',
+    message: 'The runtime failed to boot the latest candidate.',
+    variant: 'ACTIONABLE',
+    tone: 'ERROR',
+    placement: 'UPPER_RIGHT',
+    action: { label: 'Retry deploy', payload: 'retry' },
+  }, nowMs);
+  state = pushNotification(state, {
+    title: 'Background sync ready',
+    message: 'Fresh reference data is available for review.',
+    variant: 'INLINE',
+    tone: 'INFO',
+    placement: 'LOWER_RIGHT',
+  }, nowMs + 20);
+  state = tickNotifications(state, nowMs + 500);
+  state = dismissNotification(state, 1, nowMs + 900);
+  state = dismissNotification(state, 2, nowMs + 920);
+  return tickNotifications(state, nowMs + 1_400);
+}
+
+function notificationPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'stack' | 'history';
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+  } = input;
+  const nowMs = 1_710_000_000_000;
+
+  if (mode === 'history') {
+    const historyState = createArchivedNotificationState(nowMs);
+    if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+      return [
+        title,
+        '',
+        renderNotificationHistory(historyState, {
+          width: Math.max(32, Math.min(width, 56)),
+          height: 10,
+          filter: 'ALL',
+          ctx,
+        }),
+      ].join('\n');
+    }
+
+    return boxSurface(renderNotificationHistorySurface(historyState, {
+      width: Math.max(32, Math.min(width, 56)),
+      height: 10,
+      filter: 'ALL',
+      ctx,
+    }), {
+      title,
+      width: Math.max(36, Math.min(width, 60)),
+      ctx,
+    });
+  }
+
+  const liveState = createLiveNotificationState(nowMs);
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      '[SUCCESS] Canary ready',
+      'Action: Promote rollout',
+      '',
+      '[WARNING] Queue drift detected',
+      'Retry backlog is trending upward in the worker pool.',
+    ].join('\n');
+  }
+
+  const screenWidth = Math.max(48, Math.min(width, 64));
+  const screenHeight = 14;
+  const background = screenSurface(
+    screenWidth,
+    screenHeight,
+    boxSurface(column([
+      row(['release dashboard  ', badgeSurface('LIVE', 'success', ctx)]),
+      spacer(),
+      line('Window opens in 4m', screenWidth - 6),
+      line(mutedText(ctx, 'The notification system owns transient events and archived review.'), screenWidth - 6),
+    ]), {
+      title,
+      width: Math.max(32, screenWidth - 4),
+      ctx,
+    }),
+    1,
+    2,
+  );
+
+  return compositeSurface(background, renderNotificationStack(liveState, {
+    screenWidth,
+    screenHeight,
+    ctx,
+    margin: 1,
+  }));
 }
 
 export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
@@ -1951,6 +2156,122 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Labeled and unlabeled section dividers',
     },
     tags: ['structure', 'rhythm', 'dividers'],
+  },
+  {
+    kind: 'component',
+    id: 'help-view',
+    coverageFamilyIds: ['keybinding-help-and-shell-hints'],
+    family: 'Hints and shortcut cues',
+    title: 'helpView() / helpShortSurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Grouped keyboard reference plus compact shell hint surfaces for keyboard-owned apps that need shortcut discovery without turning every footer into prose.',
+      useWhen: [
+        'The app is keyboard-owned and the user needs grouped shortcut reference or compact shell hints.',
+        'Shortcut discovery should stay distinct from action execution or command search.',
+        'Grouped help names can describe jobs like navigation and actions instead of raw input mechanics.',
+      ],
+      avoidWhen: [
+        'The controls are already obvious from context and the help surface would just restate visible labels.',
+        'The UI needs discoverable actions or destinations rather than shortcut explanation; prefer the command palette.',
+        'The surface is trying to become a general-purpose note or status card.',
+      ],
+      relatedFamilies: ['kbd()', 'commandPalette()', 'createFramedApp()'],
+      gracefulLowering: {
+        interactive: 'Compact shell hints and grouped help surfaces stay on the rich TUI path without losing scope or grouping.',
+        static: 'Single-frame help snapshots preserve the same grouped reference and shell hint language.',
+        pipe: 'Plain text shortcut summaries and grouped help blocks remain readable without rich surface chrome.',
+        accessible: 'Help content linearizes into explicit grouped sections with shortcut and action labels kept together.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'shell-hint',
+        label: 'Shell hint',
+        description: 'Compact footer-style shortcut help stays terse and scoped.',
+        render: ({ width, ctx }) => helpPreview({
+          width,
+          ctx,
+          title: 'shell hint',
+          mode: 'hint',
+        }),
+      },
+      {
+        id: 'grouped-reference',
+        label: 'Grouped reference',
+        description: 'Full grouped help explains jobs and scope instead of one long hotkey sentence.',
+        render: ({ width, ctx }) => helpPreview({
+          width,
+          ctx,
+          title: 'grouped help',
+          mode: 'reference',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/help/main.ts',
+      snippetLabel: 'Grouped help and shell hints',
+    },
+    tags: ['shortcuts', 'help', 'shell'],
+  },
+  {
+    kind: 'component',
+    id: 'notification-system',
+    coverageFamilyIds: ['notification-system'],
+    family: 'Feedback overlays and history',
+    title: 'renderNotificationStack() / renderNotificationHistorySurface()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Shell-owned transient messaging system with stacked live notifications, explicit placement, actions, and archived review history.',
+      useWhen: [
+        'The app owns transient messaging as a system instead of rendering one ad hoc overlay at a time.',
+        'Warnings or follow-up prompts should be reviewable after the moment they first appear.',
+        'Placement, stacking, and interruption level materially affect the user experience.',
+      ],
+      avoidWhen: [
+        'The message should remain part of the normal page flow; prefer `alert()` or `note()`.',
+        'A single local transient overlay is enough and no archive or routing matters.',
+        'The user must stop and decide before continuing; prefer `modal()` or a confirmation flow.',
+      ],
+      relatedFamilies: ['toast()', 'modal()', 'alert()', 'createFramedApp()'],
+      gracefulLowering: {
+        interactive: 'Live stacked notifications and archived review remain one system instead of scattered one-off overlays.',
+        static: 'Current notifications or a truthful history snapshot stay visible without pretending transient timing still exists.',
+        pipe: 'Sequential event text and archived warning/error records preserve the same system meaning in plain text.',
+        accessible: 'Current and archived notices linearize with tone, action, and recall made explicit.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'live-stack',
+        label: 'Live stack',
+        description: 'System-owned stacked notifications can carry one clear next action without turning into mini workflows.',
+        render: ({ width, ctx }) => notificationPreview({
+          width,
+          ctx,
+          title: 'notification stack',
+          mode: 'stack',
+        }),
+      },
+      {
+        id: 'history-review',
+        label: 'History review',
+        description: 'Archived notices remain reviewable instead of disappearing after the first interruption.',
+        render: ({ width, ctx }) => notificationPreview({
+          width,
+          ctx,
+          title: 'notification history',
+          mode: 'history',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/notifications/main.ts',
+      snippetLabel: 'Stacked notifications and archived review',
+    },
+    tags: ['notifications', 'history', 'shell'],
   },
   {
     kind: 'component',

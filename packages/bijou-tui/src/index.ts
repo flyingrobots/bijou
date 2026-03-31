@@ -433,6 +433,7 @@ export {
   notificationsNeedTick,
   hitTestNotificationStack,
   renderNotificationHistory,
+  renderNotificationHistorySurface,
   renderNotificationStack,
 } from './notification.js';
 

@@ -161,4 +161,4 @@ The cycle stayed disciplined about broadening DOGFOOD's teaching surface instead
 
 Spawned:
 
-- [DF-013 — Raise DOGFOOD Coverage Floor to 59%](/Users/james/git/bijou/docs/BACKLOG/DF-013-raise-dogfood-coverage-floor-to-59-percent.md)
+- [DF-013 — Raise DOGFOOD Coverage Floor to 59%](/Users/james/git/bijou/docs/design/DF-013-raise-dogfood-coverage-floor-to-59-percent.md)
