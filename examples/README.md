@@ -33,7 +33,7 @@ See [showcase](./showcase/) for the structured preview contract and usage notes.
 Landing-first story-driven docs slice built with Bijou itself:
 
 ```sh
-npx tsx examples/docs/main.ts
+npm run dogfood
 ```
 
 This example now opens on a hero screen, then drops into a three-lane docs explorer with component families on the left, selected-component docs in the center, and variants on the right.

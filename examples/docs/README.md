@@ -5,7 +5,7 @@ First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 ## Run
 
 ```sh
-npx tsx examples/docs/main.ts
+npm run dogfood
 ```
 
 You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt), [assets/background.txt](/Users/james/git/bijou/assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](/Users/james/git/bijou/assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](/Users/james/git/bijou/assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
