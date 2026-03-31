@@ -160,4 +160,4 @@ The cycle stayed disciplined about family honesty: the field guide teaches paire
 
 Spawned:
 
-- [DF-012 — Raise DOGFOOD Coverage Floor to 54%](/Users/james/git/bijou/docs/BACKLOG/DF-012-raise-dogfood-coverage-floor-to-54-percent.md)
+- [DF-012 — Raise DOGFOOD Coverage Floor to 54%](/Users/james/git/bijou/docs/design/DF-012-raise-dogfood-coverage-floor-to-54-percent.md)

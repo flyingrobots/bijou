@@ -1,10 +1,10 @@
-# DF-012 — Raise DOGFOOD Coverage Floor to 54%
+# DF-013 — Raise DOGFOOD Coverage Floor to 59%
 
 Legend: [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
 
 ## Idea
 
-DF-011 raises DOGFOOD to the next honest floor by documenting text entry plus grouped and staged forms.
+DF-012 raises DOGFOOD to the next honest floor by documenting explainability walkthroughs plus dividers.
 
 The next obvious move is to keep the ratchet going with another deliberate 5-point gain instead of letting the coverage gate stall after the next successful raise.
 
@@ -12,8 +12,8 @@ The next obvious move is to keep the ratchet going with another deliberate 5-poi
 
 Once the repo enforces a coverage floor, each cycle needs to either add real family coverage or explicitly choose not to move the ratchet yet.
 
-This backlog item exists to track the next 5-point DF ratchet after the text-entry and staged-form slice.
+This backlog item exists to track the next 5-point DF ratchet after the explainability and divider slice.
 
 ## Status
 
-Backlog spawned by the retrospective for DF-011.
+Backlog spawned by the retrospective for DF-012.

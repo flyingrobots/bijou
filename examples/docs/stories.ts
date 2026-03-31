@@ -3,6 +3,7 @@ import {
   alert,
   box,
   boxSurface,
+  explainability,
   headerBox,
   hyperlink,
   inspector,
@@ -10,6 +11,7 @@ import {
   log,
   markdown,
   progressBar,
+  separator,
   tabs,
   separatorSurface,
   skeleton,
@@ -521,6 +523,63 @@ function stagedFormPreview(input: {
     line(mutedText(ctx, summaryText), innerWidth),
   ]), {
     title: mode === 'wizard' ? 'staged form' : 'form group',
+    width: panelWidth,
+    ctx,
+  });
+}
+
+function dividerPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly sections: readonly {
+    readonly label?: string;
+    readonly lines: readonly string[];
+  }[];
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    sections,
+  } = input;
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    const separatorWidth = Math.max(24, Math.min(width, 58));
+    const lines = [title, ''];
+
+    sections.forEach((section, index) => {
+      if (index > 0) {
+        lines.push(separator({ label: section.label, width: separatorWidth, ctx }));
+      }
+      lines.push(...section.lines);
+      if (index < sections.length - 1) {
+        lines.push('');
+      }
+    });
+
+    return lines.join('\n');
+  }
+
+  const panelWidth = Math.max(46, Math.min(width, 62));
+  const innerWidth = Math.max(24, panelWidth - 2);
+  const nodes: Surface[] = [];
+
+  sections.forEach((section, index) => {
+    if (index > 0) {
+      nodes.push(separatorSurface({ label: section.label, width: innerWidth, ctx }));
+      nodes.push(spacer());
+    }
+    section.lines.forEach((entry) => {
+      nodes.push(line(entry, innerWidth));
+    });
+    if (index < sections.length - 1) {
+      nodes.push(spacer());
+    }
+  });
+
+  return boxSurface(column(nodes), {
+    title,
     width: panelWidth,
     ctx,
   });
@@ -1725,6 +1784,173 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       snippetLabel: 'Inspector side panel',
     },
     tags: ['structure', 'inspection', 'side-panel'],
+  },
+  {
+    kind: 'component',
+    id: 'explainability',
+    coverageFamilyIds: ['explainability-walkthroughs'],
+    family: 'Structural grouping and inspection',
+    title: 'explainability()',
+    package: 'bijou',
+    docs: {
+      summary: 'Calm guided recommendation surface for AI-mediated or machine-assisted output that must make provenance, evidence, and next action explicit.',
+      useWhen: [
+        'A recommendation needs visible provenance and a clear next action instead of a vague summary card.',
+        'Rationale and supporting evidence need to stay distinct from the recommendation itself.',
+        'The app needs one honest explainability surface rather than a whole wizard or inspector.',
+      ],
+      avoidWhen: [
+        'The content is just a generic note or status with no evidence-backed recommendation.',
+        'The user needs a full multi-step flow or editable review workspace.',
+        'The surface would be used to hide uncertainty behind authoritative-looking chrome.',
+      ],
+      relatedFamilies: ['inspector()', 'note()', 'alert()'],
+      gracefulLowering: {
+        interactive: 'One calm grouped surface keeps provenance, rationale, evidence, and next action visibly distinct.',
+        static: 'Single deterministic explainability card preserves the same section rhythm.',
+        pipe: 'Labeled text sections keep the recommendation and evidence honest without decorative chrome.',
+        accessible: 'Plain linear explanation preserves provenance, evidence, and next action explicitly in reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'rollout-recommendation',
+        label: 'Rollout recommendation',
+        description: 'Guided recommendation with visible evidence and one clear next action.',
+        render: ({ width, ctx }) => explainability({
+          title: 'Promote the canary build',
+          artifactKind: 'Recommendation',
+          source: 'Release advisor',
+          sourceMode: 'Advisory draft',
+          rationale: 'Traffic and error budgets have stayed healthy long enough to make the canary promotion a reviewable next step.',
+          evidence: [
+            { label: 'Error rate', detail: '0.02% across the last 15 minutes' },
+            { label: 'Latency', detail: 'p95 stayed below 110ms in both canary regions' },
+            { label: 'Capacity', detail: 'queue depth remained under 12 during peak traffic' },
+          ],
+          nextAction: 'Promote the canary ring to the full production rollout after human review.',
+          governance: 'A release owner must confirm the recommendation before production promotion.',
+          confidence: 0.86,
+          width: Math.max(54, Math.min(width, 72)),
+          ctx,
+        }),
+      },
+      {
+        id: 'rollback-brief',
+        label: 'Rollback brief',
+        description: 'Explainability can recommend caution just as clearly as promotion.',
+        render: ({ width, ctx }) => explainability({
+          title: 'Hold the rollout for another review pass',
+          artifactKind: 'Review brief',
+          source: 'Incident assistant',
+          sourceMode: 'Human-in-the-loop',
+          rationale: 'The rollout is mostly healthy, but one region still shows elevated latency that could turn the recommendation premature.',
+          evidence: [
+            { label: 'eu-west latency', detail: 'p95 is 27ms above the baseline window' },
+            { label: 'Error budget', detail: 'still healthy, but trending upward for two intervals' },
+          ],
+          nextAction: 'Keep the rollout paused and inspect the eu-west cache warmup path.',
+          governance: 'Treat this as advisory guidance, not an automatic rollback trigger.',
+          confidence: 71,
+          width: Math.max(54, Math.min(width, 72)),
+          ctx,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/explainability/main.ts',
+      snippetLabel: 'Explainable recommendation surface',
+    },
+    tags: ['guidance', 'ai', 'explainability'],
+  },
+  {
+    kind: 'component',
+    id: 'separator',
+    coverageFamilyIds: ['dividers'],
+    family: 'Structural grouping and inspection',
+    title: 'separator() / separatorSurface()',
+    package: 'bijou',
+    docs: {
+      summary: 'Section-boundary primitive for marking real transitions without promoting every boundary into a boxed panel.',
+      useWhen: [
+        'A section break is needed, but full containment would add more chrome than clarity.',
+        'A label can name the next section or state more honestly than another repeated heading.',
+        'The layout needs calmer rhythm between clusters of related content.',
+      ],
+      avoidWhen: [
+        'The content needs its own grouped region or titled panel; prefer `box()` or `inspector()`.',
+        'The dividers would become decorative stripes rather than meaningful structure.',
+        'The label would only repeat an already-visible page title.',
+      ],
+      relatedFamilies: ['box()', 'tabs()', 'breadcrumb()'],
+      gracefulLowering: {
+        interactive: 'Visual rules and labeled separators mark real boundaries without over-boxing the layout.',
+        static: 'Deterministic divider treatment keeps the same section rhythm and labels.',
+        pipe: 'Plain text separators or labels preserve the boundary without decorative dependence.',
+        accessible: 'Section boundaries stay explicit through labels and reading order, not just visual lines.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'labeled-breaks',
+        label: 'Labeled breaks',
+        description: 'Labels should name the next section instead of repeating the current page title.',
+        render: ({ width, ctx }) => dividerPreview({
+          width,
+          ctx,
+          title: 'release review',
+          sections: [
+            {
+              lines: [
+                'Preflight checks are green.',
+                mutedText(ctx, 'No blocking migrations or schema locks are active.'),
+              ],
+            },
+            {
+              label: 'Promote canaries',
+              lines: [
+                'Two regions are ready for promotion.',
+                mutedText(ctx, 'Use labeled dividers when the boundary itself needs a name.'),
+              ],
+            },
+            {
+              label: 'Aftercare',
+              lines: [
+                'Watch latency for 15 minutes after promotion.',
+              ],
+            },
+          ],
+        }),
+      },
+      {
+        id: 'quiet-rhythm',
+        label: 'Quiet rhythm',
+        description: 'Unlabeled dividers can separate short sibling clusters without turning them into separate boxes.',
+        render: ({ width, ctx }) => dividerPreview({
+          width,
+          ctx,
+          title: 'ops checklist',
+          sections: [
+            {
+              lines: ['Confirm deploy window'],
+            },
+            {
+              lines: ['Page the fallback owner'],
+            },
+            {
+              lines: ['Archive the rollout notes'],
+            },
+          ],
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/separator/main.ts',
+      snippetLabel: 'Labeled and unlabeled section dividers',
+    },
+    tags: ['structure', 'rhythm', 'dividers'],
   },
   {
     kind: 'component',

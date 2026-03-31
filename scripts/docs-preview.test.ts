@@ -561,6 +561,33 @@ describe('docs preview app', () => {
     expect(text).toContain('Verification');
   });
 
+  it('can open the new explainability story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'e' },
+      { key: 'x' },
+      { key: 'p' },
+      { key: 'l' },
+      { key: 'a' },
+      { key: 'i' },
+      { key: 'n' },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('explainability');
+    expect(text).toContain('explainability()');
+    expect(text).toContain('[AI]');
+    expect(text).toContain('Evidence');
+    expect(text).toContain('Promote the canary build');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
