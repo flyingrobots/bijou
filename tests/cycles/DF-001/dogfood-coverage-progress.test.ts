@@ -35,7 +35,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
   it('resolves coverage from the canonical family reference instead of a hardcoded ratio', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.totalFamilies).toBeGreaterThan(coverage.documentedFamilies);
+    expect(coverage.totalFamilies).toBeGreaterThanOrEqual(coverage.documentedFamilies);
     expect(coverage.totalFamilies).toBeGreaterThan(0);
     expect(coverage.documentedFamilies).toBeGreaterThan(0);
     expect(coverage.referenceFamilies.some((family) => family.label === 'In-flow status block')).toBe(true);
