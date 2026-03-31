@@ -396,6 +396,15 @@ Avoid when:
 - `pagerSurface()` and `focusAreaSurface()` are specialization layers on top of the viewport primitive, not separate scroll systems.
 - If a component only needs a clipped window plus scroll state, it should wrap viewport semantics rather than invent a bespoke `scrollY` slicer.
 - `navigableTableSurface()` is the important exception: wrapped comparison rows keep row-aware scroll semantics, so generic line clipping is the wrong abstraction there.
+- Scroll ownership must stay unified. If keyboard focus, mouse hit-testing, and rendering disagree about the visible window height, the component has a layout bug.
+- Scrollbars belong to the viewport layer. Components should not fake overflow by moving rows around without giving the user a truthful masked window.
+
+### Layout rules
+
+- Components should either fill the rectangle their parent assigns them or be intentionally placed within it by a parent-owned layout helper such as `placeSurface()`.
+- Parents own outer whitespace and anchoring. Child components should not silently shrink and leave accidental slack against a pane edge.
+- When a pane has a fixed header or separator row, the remaining rows should belong to one honest body region rather than an ad hoc mix of body plus invisible slack.
+- Overflow handling must be explicit: wrap, stack, clip, or viewport. Scrolling content without a matching viewport contract is not an acceptable fallback.
 
 ### `viewportSurface()`
 

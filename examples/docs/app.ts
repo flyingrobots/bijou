@@ -36,6 +36,7 @@ import {
   renderShellQuitOverlay,
   shouldUseShellQuitConfirm,
   toast,
+  viewportSurface,
   type App,
   type Cmd,
   type FrameModel,
@@ -100,6 +101,9 @@ const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
 const DOGFOOD_I18N_NAMESPACE = 'bijou.dogfood';
+const DOCS_FRAME_CHROME_ROWS = 2;
+const DOCS_LAYOUT_VERTICAL_MARGIN_ROWS = 2;
+const DOCS_FAMILY_SEPARATOR_ROWS = 1;
 
 export { FRAME_I18N_CATALOG };
 
@@ -1527,6 +1531,13 @@ function resolvePaneInnerWidth(width: number): number {
   return Math.max(1, width - (inset * 2));
 }
 
+function resolveFamilyPaneBodyHeight(frameRows: number): number {
+  return Math.max(
+    1,
+    frameRows - DOCS_FRAME_CHROME_ROWS - DOCS_LAYOUT_VERTICAL_MARGIN_ROWS - DOCS_FAMILY_SEPARATOR_ROWS,
+  );
+}
+
 function insetPaneSurface(content: Surface, width: number): Surface {
   const safeWidth = Math.max(1, width);
   const inset = resolvePaneInset(safeWidth);
@@ -1548,14 +1559,12 @@ function renderFamiliesPane(
   theme: LandingThemeTokens,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
-  const visibleHeight = Math.max(3, height - 2);
-  const body = createSurface(Math.max(1, paneWidth), visibleHeight);
-  const start = model.familyState.scrollY;
-  const end = Math.min(model.familyState.items.length, start + visibleHeight);
+  const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const content = createSurface(Math.max(1, paneWidth), Math.max(1, model.familyState.items.length));
 
-  for (let index = start; index < end; index++) {
+  for (let index = 0; index < model.familyState.items.length; index++) {
     const row = parseRowValue(model.familyState.items[index]!.value);
-    body.blit(
+    content.blit(
       renderFamilyRow({
         row,
         width: paneWidth,
@@ -1566,9 +1575,17 @@ function renderFamiliesPane(
         theme,
       }),
       0,
-      index - start,
+      index,
     );
   }
+
+  const body = viewportSurface({
+    width: Math.max(1, paneWidth),
+    height: bodyHeight,
+    content,
+    scrollY: model.familyState.scrollY,
+    showScrollbar: true,
+  });
 
   return insetPaneSurface(column([
     themedSeparatorSurface('component families', paneWidth, ctx, theme),
@@ -1847,7 +1864,7 @@ function familyRowIndexAtPosition(
   row: number,
   rect: { readonly row: number; readonly height: number },
 ): number | undefined {
-  const visibleHeight = Math.max(3, rect.height - 2);
+  const visibleHeight = Math.max(1, rect.height - DOCS_FAMILY_SEPARATOR_ROWS);
   const localRow = row - rect.row;
   const bodyRow = localRow - 1;
   if (bodyRow < 0 || bodyRow >= visibleHeight) return undefined;
@@ -2101,6 +2118,38 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameM
   });
 }
 
+function syncDocsExplorerViewportLayout(
+  docsModel: FrameModel<DocsExplorerModel>,
+): FrameModel<DocsExplorerModel> {
+  const pageModel = docsModel.pageModels[DOCS_PAGE_ID];
+  if (pageModel == null) return docsModel;
+
+  const nextHeight = resolveFamilyPaneBodyHeight(docsModel.rows);
+  if (pageModel.familyState.height === nextHeight) return docsModel;
+
+  const nextFamilyState = {
+    ...pageModel.familyState,
+    height: nextHeight,
+    scrollY: adjustScroll(
+      pageModel.familyState.focusIndex,
+      pageModel.familyState.scrollY,
+      nextHeight,
+      pageModel.familyState.items.length,
+    ),
+  };
+
+  return {
+    ...docsModel,
+    pageModels: {
+      ...docsModel.pageModels,
+      [DOCS_PAGE_ID]: {
+        ...pageModel,
+        familyState: nextFamilyState,
+      },
+    },
+  };
+}
+
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
   const runtime = createI18nRuntime({
     locale: options.locale ?? 'en',
@@ -2129,10 +2178,11 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
-    const pageModel = docsModel.pageModels[DOCS_PAGE_ID];
+    const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
+    const pageModel = syncedDocsModel.pageModels[DOCS_PAGE_ID];
     return [{
       ...model,
-      docsModel,
+      docsModel: syncedDocsModel,
       landingThemeIndex: pageModel?.landingThemeIndex ?? model.landingThemeIndex,
     }, mapExplorer(cmds)];
   }
@@ -2140,6 +2190,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   return {
     init() {
       const [docsModel, cmds] = explorer.init();
+      const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
       return [{
         route: 'landing',
         columns: Math.max(1, ctx.runtime.columns),
@@ -2149,7 +2200,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
         landingThemeIndex: 0,
         landingToast: undefined,
         landingQuitConfirmOpen: false,
-        docsModel,
+        docsModel: syncedDocsModel,
       }, mapExplorer(cmds)];
     },
 

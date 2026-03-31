@@ -805,6 +805,40 @@ describe('docs preview app', () => {
     expect(lines.slice(0, frame.height - 1).join('\n')).not.toContain('↑/↓ browse • Enter open • Tab next pane');
   });
 
+  it('keeps family scrolling anchored until the real viewport height is exhausted', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_ENTER },
+      ...Array.from({ length: 14 }, () => ({ key: KEY_DOWN })),
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels.dogfood;
+
+    expect(pageModel.familyState.height).toBeGreaterThan(14);
+    expect(pageModel.familyState.focusIndex).toBe(14);
+    expect(pageModel.familyState.scrollY).toBe(0);
+  });
+
+  it('renders the family pane through a viewport-backed scrollbar when it overflows', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 16 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const frame = result.frames.at(-1)!;
+    const pageModel = (result.model as any).docsModel.pageModels.dogfood;
+    const leftPaneText = frameText(frame)
+      .split('\n')
+      .slice(0, -1)
+      .map((line) => line.slice(0, 34))
+      .join('\n');
+
+    expect(pageModel.familyState.items.length).toBeGreaterThan(pageModel.familyState.height);
+    expect(leftPaneText).toMatch(/[█│]/);
+  });
+
   it('shows a Bijou introduction and docs guide when no component is selected', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
