@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { runScript } from '@flyingrobots/bijou-tui';
+import { parseKey, runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
@@ -14,6 +14,7 @@ const KEY_DOWN = '\x1b[B';
 const KEY_LEFT = '\x1b[D';
 const KEY_RIGHT = '\x1b[C';
 const KEY_ESCAPE = '\x1b';
+const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
 
@@ -656,6 +657,22 @@ describe('docs preview app', () => {
       height: ctx.runtime.rows,
     }).surface;
     expect(frameText(landingFrame)).toContain('60 fps • quality');
+  });
+
+  it('routes landing F2 into the shell settings layer and lets escape dismiss it without quitting', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    let [model] = app.init();
+    [model] = app.update(parseKey(KEY_F2) as any, model);
+    expect((model as any).route).toBe('docs');
+    expect((model as any).docsModel.settingsOpen).toBe(true);
+    expect((model as any).docsModel.quitConfirmOpen).toBe(false);
+
+    [model] = app.update(parseKey(KEY_ESCAPE) as any, model);
+    expect((model as any).route).toBe('docs');
+    expect((model as any).docsModel.settingsOpen).toBe(false);
+    expect((model as any).docsModel.quitConfirmOpen).toBe(false);
   });
 
   it('shows accordion-style family headers without the oversized custom help strip', async () => {

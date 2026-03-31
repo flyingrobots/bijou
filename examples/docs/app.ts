@@ -425,6 +425,18 @@ function formatI18nList(i18n: I18nRuntime | undefined, values: readonly string[]
   return i18n.formatList(values, i18n.locale);
 }
 
+function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
+  if (msg.alt) return false;
+  if (msg.ctrl) {
+    return msg.key === ',' || msg.key === 'p';
+  }
+  return msg.key === 'f2'
+    || msg.key === '?'
+    || msg.key === '/'
+    || msg.key === ':'
+    || (msg.key === 'n' && msg.shift);
+}
+
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
   for (const story of stories) {
@@ -2191,6 +2203,12 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
               ...model,
               landingQuitConfirmOpen: true,
             }, []];
+          }
+          if (shouldRouteLandingKeyIntoShell(msg)) {
+            return updateExplorer(msg, {
+              ...model,
+              route: 'docs',
+            });
           }
           if (msg.key === 'left') {
             return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
