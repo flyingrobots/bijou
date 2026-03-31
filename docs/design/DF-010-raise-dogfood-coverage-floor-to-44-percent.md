@@ -161,4 +161,4 @@ The cycle stayed disciplined about family honesty: `select()` and `filter()` sha
 
 Spawned:
 
-- [DF-011 — Raise DOGFOOD Coverage Floor to 49%](/Users/james/git/bijou/docs/BACKLOG/DF-011-raise-dogfood-coverage-floor-to-49-percent.md)
+- [DF-011 — Raise DOGFOOD Coverage Floor to 49%](/Users/james/git/bijou/docs/design/DF-011-raise-dogfood-coverage-floor-to-49-percent.md)

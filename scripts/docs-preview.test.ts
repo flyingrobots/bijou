@@ -538,6 +538,29 @@ describe('docs preview app', () => {
     expect(text).toContain('Rollout');
   });
 
+  it('can open the new group and wizard story directly from component search', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '/' },
+      { key: 'w' },
+      { key: 'i' },
+      { key: 'z' },
+      { key: KEY_ENTER },
+      { key: '.' },
+    ], { ctx });
+
+    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedStoryId).toBe('group-wizard');
+    expect(text).toContain('group() / wizard()');
+    expect(text).toContain('Step 2 of 3');
+    expect(text).toContain('Verification');
+  });
+
   it('keeps ctrl+p as the generic command palette while / is component search', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

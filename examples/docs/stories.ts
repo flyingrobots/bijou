@@ -410,6 +410,122 @@ function filterPreview(input: {
   });
 }
 
+function textEntryPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly label: string;
+  readonly value: string;
+  readonly helperText?: string;
+  readonly validationText?: string;
+  readonly multiline?: boolean;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    label,
+    value,
+    helperText,
+    validationText,
+    multiline = false,
+  } = input;
+
+  if (ctx.mode === 'pipe') {
+    return [
+      title,
+      '',
+      `${label}:`,
+      value,
+      ...(helperText ? ['', `Help: ${helperText}`] : []),
+      ...(validationText ? [`Validation: ${validationText}`] : []),
+    ].join('\n');
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      title,
+      '',
+      `Field: ${label}`,
+      `Input type: ${multiline ? 'multiline text' : 'single-line text'}`,
+      `Current value: ${value.replace(/\n/g, ' / ')}`,
+      ...(helperText ? [`Help: ${helperText}`] : []),
+      ...(validationText ? [`Validation: ${validationText}`] : []),
+    ].join('\n');
+  }
+
+  return boxSurface(contentSurface([
+    `${infoText(ctx, '?')} ${title}`,
+    '',
+    mutedText(ctx, label),
+    value,
+    ...(helperText ? ['', mutedText(ctx, helperText)] : []),
+    ...(validationText ? [mutedText(ctx, validationText)] : []),
+  ].join('\n')), {
+    title: multiline ? 'multiline entry' : 'text entry',
+    width: Math.max(42, Math.min(width, multiline ? 62 : 54)),
+    ctx,
+  });
+}
+
+function stagedFormPreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly mode: 'group' | 'wizard';
+  readonly stepLabel?: string;
+  readonly fields: readonly { readonly label: string; readonly value: string }[];
+  readonly summaryText: string;
+}): string | Surface {
+  const {
+    width,
+    ctx,
+    title,
+    mode,
+    stepLabel,
+    fields,
+    summaryText,
+  } = input;
+
+  if (ctx.mode === 'pipe') {
+    return [
+      title,
+      ...(stepLabel ? ['', stepLabel] : []),
+      '',
+      ...fields.flatMap((field) => [`${field.label}:`, field.value, '']),
+      `Summary: ${summaryText}`,
+    ].join('\n').trimEnd();
+  }
+
+  if (ctx.mode === 'accessible') {
+    return [
+      title,
+      ...(stepLabel ? [`Current step: ${stepLabel}`] : []),
+      '',
+      ...fields.map((field) => `${field.label}: ${field.value}`),
+      '',
+      `Summary: ${summaryText}`,
+    ].join('\n');
+  }
+
+  const panelWidth = Math.max(46, Math.min(width, 64));
+  const innerWidth = Math.max(24, panelWidth - 2);
+  return boxSurface(column([
+    ...(stepLabel ? [separatorSurface({ label: stepLabel, width: innerWidth, ctx }), spacer()] : []),
+    ...fields.flatMap((field, index) => ([
+      line(mutedText(ctx, field.label), innerWidth),
+      contentSurface(field.value),
+      ...(index < fields.length - 1 ? [spacer()] : []),
+    ])),
+    spacer(),
+    line(mutedText(ctx, summaryText), innerWidth),
+  ]), {
+    title: mode === 'wizard' ? 'staged form' : 'form group',
+    width: panelWidth,
+    ctx,
+  });
+}
+
 export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   {
     kind: 'component',
@@ -1121,6 +1237,143 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       },
     ],
     tags: ['forms', 'selection', 'search'],
+  },
+  {
+    kind: 'component',
+    id: 'text-entry',
+    coverageFamilyIds: ['text-entry'],
+    family: 'Decision and selection forms',
+    title: 'input() / textarea()',
+    package: 'bijou',
+    docs: {
+      summary: 'Text-entry family for collecting freeform user input, from short single-line identifiers to longer multiline notes that still need honest lowering.',
+      useWhen: [
+        'The user is providing text rather than choosing from a fixed set of options.',
+        'A short field (`input()`) or a longer multiline editor (`textarea()`) is the real job, not just supporting metadata.',
+        'Prompt, current value, and validation state should remain truthful in rich, pipe, and accessible modes.',
+      ],
+      avoidWhen: [
+        'The options are already enumerable; prefer `select()` or `multiselect()`.',
+        'The user is progressing through several related inputs as one staged task; prefer `group()` or `wizard()`.',
+        'The content is only a passive note or status and does not require user text entry.',
+      ],
+      relatedFamilies: ['select()', 'filter()', 'group()', 'wizard()'],
+      gracefulLowering: {
+        interactive: 'Focused field or editor treatment keeps prompt, current value, and validation visible without pretending text entry is just static prose.',
+        static: 'Single deterministic snapshot of the current value or prompt state remains honest about what the field is collecting.',
+        pipe: 'Line-buffered textual prompts keep the label, value, and validation explicit in plain text.',
+        accessible: 'Prompt, entry type, current value, and validation cues remain explicit in one readable linear flow.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'service-name',
+        label: 'Service name',
+        description: 'Single-line entry for a stable identifier with clear constraints and current value.',
+        render: ({ width, ctx }) => textEntryPreview({
+          width,
+          ctx,
+          title: 'Choose a package slug:',
+          label: 'Package name',
+          value: 'release-control',
+          helperText: 'Used in URLs, artifacts, and release announcements.',
+          validationText: 'Use lowercase kebab-case.',
+        }),
+      },
+      {
+        id: 'incident-summary',
+        label: 'Incident summary',
+        description: 'Multiline entry for operator notes and context that would not fit honestly in one short field.',
+        render: ({ width, ctx }) => textEntryPreview({
+          width,
+          ctx,
+          title: 'Write a rollout summary:',
+          label: 'Summary',
+          value: [
+            'Canary passed in eu-west after one retry.',
+            'Hold promotion until the background queue drains.',
+          ].join('\n'),
+          helperText: 'Use multiline entry when the note itself matters, not just the final status.',
+          multiline: true,
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/input/main.ts',
+      snippetLabel: 'Text entry prompts',
+    },
+    tags: ['forms', 'input', 'text'],
+  },
+  {
+    kind: 'component',
+    id: 'group-wizard',
+    coverageFamilyIds: ['multi-field-and-staged-forms'],
+    family: 'Decision and selection forms',
+    title: 'group() / wizard()',
+    package: 'bijou',
+    docs: {
+      summary: 'Grouped and staged form family for related inputs that belong together, whether they happen in one focused section or across explicit steps.',
+      useWhen: [
+        'Several related fields need one shared goal instead of feeling like disconnected prompts.',
+        'A grouped form (`group()`) or staged flow (`wizard()`) should keep progress and summary language explicit.',
+        'The result needs more structure than one choice or one text field can provide honestly.',
+      ],
+      avoidWhen: [
+        'Only one binary or one-choice decision is being made; prefer `confirm()` or `select()`.',
+        'The fields are unrelated and should not be bundled into one form narrative.',
+        'The content is really documentation, explanation, or inspection rather than data collection.',
+      ],
+      relatedFamilies: ['input()', 'textarea()', 'select()', 'confirm()'],
+      gracefulLowering: {
+        interactive: 'Grouped or staged form panels preserve field rhythm, current step, and summary cues without pretending the flow is just one big text prompt.',
+        static: 'Deterministic snapshots keep the current group or wizard step explicit for docs and screenshots.',
+        pipe: 'Sequential textual prompts preserve grouping and step intent instead of flattening unrelated fields together.',
+        accessible: 'Field labels, step names, and progress stay explicit in linear reading order.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'deploy-group',
+        label: 'Deploy group',
+        description: 'One grouped deployment form keeps related fields together without inventing fake steps.',
+        render: ({ width, ctx }) => stagedFormPreview({
+          width,
+          ctx,
+          title: 'Prepare a production deploy:',
+          mode: 'group',
+          fields: [
+            { label: 'Environment', value: 'production' },
+            { label: 'Window', value: 'Tonight, 17:00-18:00 PDT' },
+            { label: 'Approver', value: 'Release manager on call' },
+          ],
+          summaryText: 'Use grouped forms when the user is filling out one coherent packet of related fields.',
+        }),
+      },
+      {
+        id: 'rollout-wizard',
+        label: 'Rollout wizard',
+        description: 'A staged flow keeps the current step and remaining work explicit instead of dumping every field at once.',
+        render: ({ width, ctx }) => stagedFormPreview({
+          width,
+          ctx,
+          title: 'Plan the rollout:',
+          mode: 'wizard',
+          stepLabel: 'Step 2 of 3 • Verification',
+          fields: [
+            { label: 'Health threshold', value: '0 failed probes for 10m' },
+            { label: 'Fallback owner', value: 'platform-ops' },
+          ],
+          summaryText: 'Use staged forms when progress and step boundaries matter more than one giant grouped panel.',
+        }),
+      },
+    ],
+    source: {
+      examplePath: 'examples/wizard/main.ts',
+      snippetLabel: 'Staged rollout wizard',
+    },
+    tags: ['forms', 'wizard', 'group'],
   },
   {
     kind: 'component',
