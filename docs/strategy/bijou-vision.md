@@ -289,7 +289,7 @@ This document sits above more specific doctrine and design notes:
 - [Localization and Bidirectionality](localization-and-bidirectionality.md)
 - [AI Explainability Standard](ai-explainability-standard.md)
 - [Content Guide](content-guide.md)
-- [Architecture — Bijou](/Users/james/git/bijou/docs/ARCHITECTURE.md)
+- [Architecture — Bijou](../ARCHITECTURE.md)
 
 ## Living-document note
 
