@@ -12,7 +12,7 @@ describe('RE-001 runtime engine architecture cycle', () => {
     const stateInvariant = read('/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md');
     const layoutInvariant = read('/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md');
     const commandEffectInvariant = read('/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md');
-    const backlogState = read('/Users/james/git/bijou/docs/BACKLOG/RE-002-promote-first-class-state-machine-and-view-stack.md');
+    const landedState = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
     const backlogLayout = read('/Users/james/git/bijou/docs/BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md');
     const backlogRouting = read('/Users/james/git/bijou/docs/BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md');
     const backlogBuffers = read('/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md');
@@ -40,7 +40,8 @@ describe('RE-001 runtime engine architecture cycle', () => {
     expect(cycle).toContain('commands and effects are buffered separately');
     expect(cycle).toContain('## Retrospective');
 
-    expect(backlogState).toContain('state machines and view stacks first-class runtime objects');
+    expect(landedState).toContain('state-machine object');
+    expect(landedState).toContain('view-stack object');
     expect(backlogLayout).toContain('Retain layout trees');
     expect(backlogRouting).toContain('topmost layer first');
     expect(backlogBuffers).toContain('command and effect buffer contracts');
