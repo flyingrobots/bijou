@@ -46,6 +46,36 @@ All published packages are versioned in lock-step.
 - keeping tests close to user-visible behavior through surfaces, smoke suites, and scaffolding canaries
 - giving you a documented design-system track instead of leaving component choice entirely to improvisation
 
+## DOGFOOD
+
+DOGFOOD is the canonical Bijou docs surface and proving app.
+
+It is not just an example. It is where the repo now proves:
+
+- the framed shell and interactive runtime in a real full-screen product surface
+- the component-family field guide and design-language track in one living docs app
+- shell concerns like search, settings, help, quit, and layout behavior under real usage
+
+Run it locally:
+
+```bash
+npm run dogfood
+```
+
+Capture the tracked GIFs:
+
+```bash
+npm run record:dogfood:gifs
+```
+
+Title screen:
+
+![DOGFOOD landing](./examples/docs/landing.gif)
+
+Docs explorer:
+
+![DOGFOOD docs explorer](./examples/docs/dogfood.gif)
+
 ## Quick Start
 
 ### Core CLI Flow
@@ -157,7 +187,7 @@ Error: Connection refused on port 5432.
 
 ## Design System
 
-Bijou ships a design-system documentation track in addition to API docs.
+Bijou ships a design-system documentation track in addition to API docs, and DOGFOOD is the primary living surface for that work.
 
 Start here:
 
@@ -177,6 +207,7 @@ Those docs are meant to answer:
 
 ## Documentation Map
 
+- [DOGFOOD Docs Surface](./examples/docs/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
 - [Changelog](./docs/CHANGELOG.md)
