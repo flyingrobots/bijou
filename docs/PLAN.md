@@ -46,9 +46,9 @@ This is the center of gravity because the next major improvements all depend on 
 
 ### Planned order
 
-1. [RE-003 — Retain Layout Trees and Layout Invalidation](BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md)
-2. [RE-004 — Route Input Through Layouts and Layer Bubbling](BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md)
-3. [RE-005 — Buffer Commands and Effects Separately](BACKLOG/RE-005-buffer-commands-and-effects-separately.md)
+1. [RE-003 — Retain Layout Trees and Layout Invalidation](design/RE-003-retain-layout-trees-and-layout-invalidation.md)
+2. [RE-004 — Route Input Through Layouts and Layer Bubbling](design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
+3. [RE-005 — Buffer Commands and Effects Separately](design/RE-005-buffer-commands-and-effects-separately.md)
 4. [RE-006 — Formalize Component Layout and Interaction Contracts](BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md)
 5. [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 

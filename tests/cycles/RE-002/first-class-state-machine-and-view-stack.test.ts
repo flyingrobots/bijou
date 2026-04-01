@@ -11,10 +11,10 @@ describe('RE-002 first-class state machine and view stack cycle', () => {
     const cycle = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
     const landedLayout = read('/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
     const landedRouting = read('/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
-    const backlogBuffers = read('/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md');
+    const landedBuffers = read('/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md');
 
-    expect(legend).toContain('RE-004 — Route Input Through Layouts and Layer Bubbling');
     expect(legend).toContain('RE-005 — Buffer Commands and Effects Separately');
+    expect(legend).toContain('RE-006 — Formalize Component Layout and Interaction Contracts');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -26,6 +26,6 @@ describe('RE-002 first-class state machine and view stack cycle', () => {
 
     expect(landedLayout).toContain('retained-layout registry');
     expect(landedRouting).toContain('topmost view first');
-    expect(backlogBuffers).toContain('command and effect buffer contracts');
+    expect(landedBuffers).toContain('append multiple route results');
   });
 });

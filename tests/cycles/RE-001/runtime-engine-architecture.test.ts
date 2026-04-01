@@ -15,7 +15,7 @@ describe('RE-001 runtime engine architecture cycle', () => {
     const landedState = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
     const landedLayout = read('/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
     const landedRouting = read('/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
-    const backlogBuffers = read('/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md');
+    const landedBuffers = read('/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md');
     const backlogComponents = read('/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md');
     const backlogShell = read('/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
@@ -44,7 +44,9 @@ describe('RE-001 runtime engine architecture cycle', () => {
     expect(landedState).toContain('view-stack object');
     expect(landedLayout).toContain('retained-layout registry');
     expect(landedRouting).toContain('topmost view first');
-    expect(backlogBuffers).toContain('command and effect buffer contracts');
+    expect(landedBuffers).toContain('command and effect buffers');
+    expect(landedBuffers).toContain('commands are applied later in FIFO order');
+    expect(landedBuffers).toContain('effects are executed later in FIFO order');
     expect(backlogComponents).toContain('layout, overflow, and interaction');
     expect(backlogShell).toContain('framed shell');
   });
