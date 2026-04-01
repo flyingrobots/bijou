@@ -3,6 +3,8 @@
 > **Tests ARE the Spec.** Every feature is defined by its tests. If it's not tested, it's not guaranteed. Acceptance criteria are written as test descriptions first, implementation second.
 >
 > **Legacy planning note:** new work now starts in `docs/BACKLOG/`, moves into `docs/design/` when a cycle begins, and is grouped by legend docs in `docs/legends/`. This roadmap remains as a migration/reference surface until older planning artifacts are rehomed.
+>
+> **Current execution note:** the shorter living execution summary now lives in [PLAN.md](PLAN.md).
 
 Latest published release: **v4.0.0** — Pure Surface Release
 

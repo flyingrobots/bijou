@@ -1,5 +1,10 @@
 # Architecture — Bijou
 
+See also:
+
+- [Bijou Vision](strategy/bijou-vision.md)
+- [Current Plan](PLAN.md)
+
 ## Overview
 
 Bijou is a five-package monorepo for building terminal interfaces in TypeScript.
