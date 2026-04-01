@@ -315,3 +315,232 @@ export function dropInactiveRuntimeLayouts<
     ? { byViewId: nextByViewId }
     : layouts;
 }
+
+// ---------------------------------------------------------------------------
+// Input routing
+// ---------------------------------------------------------------------------
+
+export const RUNTIME_POINTER_ACTIONS = [
+  'press',
+  'release',
+  'move',
+  'scroll-up',
+  'scroll-down',
+] as const;
+
+export const RUNTIME_POINTER_BUTTONS = [
+  'left',
+  'middle',
+  'right',
+] as const;
+
+export type RuntimePointerAction = (typeof RUNTIME_POINTER_ACTIONS)[number];
+export type RuntimePointerButton = (typeof RUNTIME_POINTER_BUTTONS)[number];
+
+export interface RuntimeKeyInputEvent {
+  readonly kind: 'key';
+  readonly key: string;
+}
+
+export interface RuntimePointerInputEvent {
+  readonly kind: 'pointer';
+  readonly action: RuntimePointerAction;
+  readonly x: number;
+  readonly y: number;
+  readonly button?: RuntimePointerButton;
+}
+
+export type RuntimeInputEvent =
+  | RuntimeKeyInputEvent
+  | RuntimePointerInputEvent;
+
+export interface RuntimeLayoutHit<Node extends LayoutNode = LayoutNode> {
+  readonly viewId: string;
+  readonly point: {
+    readonly x: number;
+    readonly y: number;
+  };
+  readonly path: readonly Node[];
+  readonly target: Node;
+}
+
+export interface RuntimeInputRouteContext<
+  Node extends LayoutNode = LayoutNode,
+  Model = unknown,
+> {
+  readonly layer: RuntimeStackLayer<Model>;
+  readonly retainedLayout?: RuntimeRetainedLayout<Node>;
+  readonly event: RuntimeInputEvent;
+  readonly hit?: RuntimeLayoutHit<Node>;
+}
+
+export interface RuntimeInputRouteOutcome<Command = unknown, Effect = unknown> {
+  readonly handled?: boolean;
+  readonly bubble?: boolean;
+  readonly stop?: boolean;
+  readonly commands?: readonly Command[];
+  readonly effects?: readonly Effect[];
+}
+
+export interface RuntimeInputRouteResult<
+  Command = unknown,
+  Effect = unknown,
+  Node extends LayoutNode = LayoutNode,
+> {
+  readonly handled: boolean;
+  readonly commands: readonly Command[];
+  readonly effects: readonly Effect[];
+  readonly visitedViewIds: readonly string[];
+  readonly handledByViewId?: string;
+  readonly handledByNodeId?: string;
+  readonly stoppedByViewId?: string;
+  readonly hit?: RuntimeLayoutHit<Node>;
+}
+
+export type RuntimeInputHandler<
+  Node extends LayoutNode = LayoutNode,
+  Model = unknown,
+  Command = unknown,
+  Effect = unknown,
+> = (
+  context: RuntimeInputRouteContext<Node, Model>,
+) => RuntimeInputRouteOutcome<Command, Effect> | undefined;
+
+export function hitTestRuntimeLayout<Node extends LayoutNode = LayoutNode>(
+  viewId: string,
+  tree: Node,
+  x: number,
+  y: number,
+): RuntimeLayoutHit<Node> | undefined {
+  const path = hitTestLayoutPath(tree, x, y);
+  if (path == null || path.length === 0) {
+    return undefined;
+  }
+
+  return {
+    viewId,
+    point: { x, y },
+    path,
+    target: path[path.length - 1]!,
+  };
+}
+
+export function routeRuntimeInput<
+  Node extends LayoutNode = LayoutNode,
+  Model = unknown,
+  Command = unknown,
+  Effect = unknown,
+>(
+  stack: RuntimeViewStack<Model>,
+  layouts: RuntimeRetainedLayouts<Node>,
+  event: RuntimeInputEvent,
+  handle: RuntimeInputHandler<Node, Model, Command, Effect>,
+): RuntimeInputRouteResult<Command, Effect, Node> {
+  const visitedViewIds: string[] = [];
+  const commands: Command[] = [];
+  const effects: Effect[] = [];
+  let lastHit: RuntimeLayoutHit<Node> | undefined;
+
+  for (let index = stack.layers.length - 1; index >= 0; index -= 1) {
+    const layer = stack.layers[index]!;
+    visitedViewIds.push(layer.id);
+
+    const retainedLayout = getRuntimeRetainedLayout(layouts, layer.id);
+    const hit = event.kind === 'pointer' && retainedLayout != null
+      ? hitTestRuntimeLayout(layer.id, retainedLayout.tree, event.x, event.y)
+      : undefined;
+
+    if (hit != null) {
+      lastHit = hit;
+    }
+
+    const outcome = handle({
+      layer,
+      retainedLayout,
+      event,
+      hit,
+    });
+
+    if (outcome?.commands != null) {
+      commands.push(...outcome.commands);
+    }
+    if (outcome?.effects != null) {
+      effects.push(...outcome.effects);
+    }
+
+    if (outcome?.handled) {
+      return {
+        handled: true,
+        commands,
+        effects,
+        visitedViewIds,
+        handledByViewId: layer.id,
+        handledByNodeId: hit?.target.id,
+        hit: hit ?? lastHit,
+      };
+    }
+
+    if (outcome?.stop) {
+      return {
+        handled: false,
+        commands,
+        effects,
+        visitedViewIds,
+        stoppedByViewId: layer.id,
+        hit: hit ?? lastHit,
+      };
+    }
+
+    if (!outcome?.bubble && layer.blocksBelow) {
+      return {
+        handled: false,
+        commands,
+        effects,
+        visitedViewIds,
+        stoppedByViewId: layer.id,
+        hit: hit ?? lastHit,
+      };
+    }
+  }
+
+  return {
+    handled: false,
+    commands,
+    effects,
+    visitedViewIds,
+    hit: lastHit,
+  };
+}
+
+function hitTestLayoutPath<Node extends LayoutNode = LayoutNode>(
+  node: Node,
+  x: number,
+  y: number,
+): Node[] | undefined {
+  if (!pointInRect(node.rect, x, y)) {
+    return undefined;
+  }
+
+  for (let index = node.children.length - 1; index >= 0; index -= 1) {
+    const child = node.children[index] as Node;
+    const childPath = hitTestLayoutPath(child, x, y);
+    if (childPath != null) {
+      return [node, ...childPath];
+    }
+  }
+
+  return [node];
+}
+
+function pointInRect(
+  rect: LayoutNode['rect'],
+  x: number,
+  y: number,
+): boolean {
+  return (
+    x >= rect.x
+    && y >= rect.y
+    && x < rect.x + rect.width
+    && y < rect.y + rect.height
+  );
+}
