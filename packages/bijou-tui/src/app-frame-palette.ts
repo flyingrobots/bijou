@@ -11,6 +11,7 @@ import type {
   PaletteAction,
   PaletteEntry,
   PaletteKind,
+  FramedAppMsg,
 } from './app-frame-types.js';
 import { comboToMsg, emitMsg, emitMsgForPage } from './app-frame-types.js';
 import { applyFrameAction } from './app-frame-actions.js';
@@ -35,7 +36,7 @@ export function handlePaletteKey<PageModel, Msg>(
   paletteKeys: KeyMap<PaletteAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
-): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   const cp = model.commandPalette!;
   const action = paletteKeys.handle(msg);
 

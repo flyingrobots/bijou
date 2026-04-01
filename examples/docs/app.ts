@@ -39,7 +39,10 @@ import {
   viewportSurface,
   type App,
   type Cmd,
+  type FramePageMsg,
   type FrameModel,
+  type FramedApp,
+  type FramedAppMsg,
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
@@ -226,7 +229,7 @@ interface RootModel {
   readonly docsModel: FrameModel<DocsExplorerModel>;
 }
 
-type RootMsg = { type: 'docs'; msg: ExplorerMsg };
+type RootMsg = { type: 'docs'; msg: FramedAppMsg<DocsMsg> };
 type PulseLikeMsg = { readonly type: 'pulse'; readonly dt: number };
 type DocsMsg = ExplorerMsg | PulseLikeMsg;
 type Rgb = [number, number, number];
@@ -1918,7 +1921,7 @@ function resolveVariantPaneMouse(
   return index == null ? undefined : { type: 'select-variant', index };
 }
 
-function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameModel<DocsExplorerModel>, DocsMsg> {
+function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<DocsExplorerModel, DocsMsg> {
   return createFramedApp<DocsExplorerModel, DocsMsg>({
     i18n,
     title: 'Bijou Docs',
@@ -1930,7 +1933,10 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): App<FrameM
       id: DOCS_PAGE_ID,
       title: 'DOGFOOD',
       init: () => [createInitialExplorerModel(ctx), []],
-      update(msg: DocsMsg, model) {
+      update(msg: FramePageMsg<DocsMsg>, model) {
+        if (msg.type === 'mouse') {
+          return [model, []];
+        }
         if (msg.type === 'pulse') {
           return [{
             ...model,
@@ -2169,12 +2175,12 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const explorer = createDocsExplorerApp(ctx, i18n);
   const renderLanding = createLandingRenderer(ctx, i18n);
 
-  function mapExplorer(cmds: Cmd<DocsMsg>[]): Cmd<RootMsg>[] {
-    return mapCmds(cmds as Cmd<ExplorerMsg>[], (msg) => ({ type: 'docs', msg }));
+  function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
+    return mapCmds(cmds, (msg) => ({ type: 'docs', msg }));
   }
 
   function updateExplorer(
-    message: KeyMsg | ResizeMsg | MouseMsg | PulseLikeMsg | ExplorerMsg,
+    message: KeyMsg | ResizeMsg | MouseMsg | PulseLikeMsg | FramedAppMsg<DocsMsg>,
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);

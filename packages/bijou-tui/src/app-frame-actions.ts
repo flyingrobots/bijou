@@ -9,6 +9,7 @@ import type { FramePage, CreateFramedAppOptions, FramePaneScroll } from './app-f
 import type {
   InternalFrameModel,
   FrameAction,
+  FramedAppMsg,
 } from './app-frame-types.js';
 import { wrapFrameMsg } from './app-frame-types.js';
 import type { Cmd } from './types.js';
@@ -71,7 +72,7 @@ export function applyFrameAction<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
-): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   switch (action.type) {
     case 'toggle-help':
       return [{ ...model, helpOpen: !model.helpOpen }, []];
@@ -185,7 +186,7 @@ export function switchTab<PageModel, Msg>(
   delta: number,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   options: CreateFramedAppOptions<PageModel, Msg>,
-): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   const idx = model.pageOrder.indexOf(model.activePageId);
   if (idx < 0) return [model, []];
   const nextIdx = (idx + delta + model.pageOrder.length) % model.pageOrder.length;
@@ -233,7 +234,7 @@ export function switchTab<PageModel, Msg>(
   if (hasTransition) {
     // Schedule render ticks at ~60fps for the duration of the transition.
     // Each tick advances the timeline using wall-clock elapsed time.
-    const cmd: Cmd<Msg> = createTransitionTickCmd(durationMs, nextGeneration);
+    const cmd: Cmd<FramedAppMsg<Msg>> = createTransitionTickCmd(durationMs, nextGeneration);
     return [nextModel, [cmd]];
   }
 
@@ -470,11 +471,11 @@ export function syncPageFrameState<PageModel, Msg>(
 /**
  * Create a TEA command that drives transition re-renders from the shared pulse.
  */
-export function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<Msg> {
+export function createTransitionTickCmd<Msg>(durationMs: number, generation: number): Cmd<FramedAppMsg<Msg>> {
   return (emit, caps) =>
     new Promise<void>((resolve) => {
       if (durationMs <= 0) {
-        emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction) as unknown as Msg);
+        emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction));
         resolve();
         return;
       }
@@ -490,11 +491,11 @@ export function createTransitionTickCmd<Msg>(durationMs: number, generation: num
           generation,
           dt,
           elapsedMs,
-        } as FrameAction) as unknown as Msg);
+        } as FrameAction));
 
         if (rawProgress >= 1) {
           pulse.dispose();
-          emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction) as unknown as Msg);
+          emit(wrapFrameMsg({ type: 'transition-complete', generation } as FrameAction));
           resolve();
         }
       });

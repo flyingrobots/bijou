@@ -11,12 +11,12 @@ import {
   quit,
   statusBar,
   visibleLength,
-  type App,
   type Cmd,
+  type FramedApp,
   type FrameLayoutNode,
-  type FrameModel,
   type FrameOverlayContext,
   type FramePage,
+  type FramePageMsg,
   type KeyCombo,
   type KeyMap,
   type KeyMsg,
@@ -157,7 +157,7 @@ const DEFAULT_SPLIT_RATIO = 1 / 3;
  */
 export function createTuiAppSkeleton(
   options: CreateTuiAppSkeletonOptions,
-): App<FrameModel<SkeletonPageModel>, SkeletonMsg> {
+): FramedApp<SkeletonPageModel, SkeletonMsg> {
   const tabs = options.tabs ?? DEFAULT_TABS;
   if (tabs.length === 0) {
     throw new Error('createTuiAppSkeleton: "tabs" must contain at least one tab');
@@ -181,7 +181,7 @@ export function createTuiAppSkeleton(
       id: spec.tab.id,
       title: spec.tab.title,
       init: () => [createInitialPageModel(config), []],
-      update(msg: SkeletonMsg, model: SkeletonPageModel) {
+      update(msg: FramePageMsg<SkeletonMsg>, model: SkeletonPageModel) {
         return updateSkeletonPage(msg, model, config);
       },
       layout: () => layoutFor(spec, options.ctx),
@@ -488,10 +488,12 @@ function createInitialPageModel(config: SkeletonPageConfig): SkeletonPageModel {
 
 /** TEA update handler for skeleton page messages (quit, drawer toggle, etc.). */
 function updateSkeletonPage(
-  msg: SkeletonMsg,
+  msg: FramePageMsg<SkeletonMsg>,
   model: SkeletonPageModel,
   config: SkeletonPageConfig,
 ): [SkeletonPageModel, Cmd<SkeletonMsg>[]] {
+  if (msg.type === 'mouse' || msg.type === 'pulse') return [model, []];
+
   switch (msg.type) {
     case 'request-quit':
       if (model.quitConfirmOpen) return [model, []];

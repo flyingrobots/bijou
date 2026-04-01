@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
@@ -21,6 +21,10 @@ import {
   createFramedApp,
   describeFrameLayerStack,
   type FramePage,
+  type FramePageMsg,
+  type FramedApp,
+  type FramedAppMsg,
+  type FramedAppUpdateResult,
   type FrameOverlayContext,
   type PageTransition,
   underlyingFrameLayer,
@@ -198,6 +202,44 @@ describe('createFramedApp', () => {
 
     const result = await runScript(app, []);
     expect(surfaceToString(result.frames.at(-1)!, testCtx.style)).toContain('layout-pane');
+  });
+
+  it('preserves framed message typing through shell composition', () => {
+    type TypedMsg =
+      | { type: 'select'; value: string }
+      | { type: 'refresh' };
+
+    interface TypedPageModel {
+      readonly selected?: string;
+    }
+
+    const page: FramePage<TypedPageModel, TypedMsg> = {
+      id: 'typed',
+      title: 'Typed',
+      init: () => [{ selected: undefined }, []],
+      update(msg, model) {
+        expectTypeOf(msg).toEqualTypeOf<FramePageMsg<TypedMsg>>();
+        if (msg.type === 'mouse' || msg.type === 'pulse') return [model, []];
+        if (msg.type === 'select') return [{ selected: msg.value }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('typed'),
+      }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+    });
+    const [model] = app.init();
+    const result = app.update({ type: 'select', value: 'alpha' }, model);
+
+    expectTypeOf(app).toEqualTypeOf<FramedApp<TypedPageModel, TypedMsg>>();
+    expectTypeOf(result).toEqualTypeOf<FramedAppUpdateResult<TypedPageModel, TypedMsg>>();
+    expectTypeOf(result[1]).toEqualTypeOf<Cmd<FramedAppMsg<TypedMsg>>[]>();
+    expect(result[0].pageModels.typed?.selected).toBe('alpha');
   });
 
   it('rejects raw string pane renderers with an explicit migration error', () => {
@@ -633,13 +675,16 @@ describe('createFramedApp', () => {
     });
     expect(noopResult).toBeDefined();
     expect(noopResult).not.toBe(QUIT);
+    if (noopResult === undefined || noopResult === QUIT) {
+      throw new Error('expected a scoped noop result');
+    }
 
-    update = app.update(noopResult as Msg, model);
+    update = app.update(noopResult, model);
     model = update[0];
     const delayedCmd = update[1][0];
     expect(delayedCmd).toBeDefined();
 
-    const emitted: Msg[] = [];
+    const emitted: FramedAppMsg<Msg>[] = [];
     const delayedPromise = delayedCmd!((msg) => emitted.push(msg), {
       onPulse: () => ({ dispose() {} }),
       sleep: () => Promise.resolve(),
@@ -1056,7 +1101,7 @@ describe('createFramedApp', () => {
     });
 
     let [model] = app.init();
-    let cmds: Cmd<Msg>[] = [];
+    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
     [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
@@ -1788,7 +1833,7 @@ describe('createFramedApp', () => {
 
     let [model] = app.init();
     [model] = app.update(shiftKey('n') as unknown as NotificationMsg, model);
-    let cmds: Cmd<NotificationMsg>[] = [];
+    let cmds: Cmd<FramedAppMsg<NotificationMsg>>[] = [];
     [model, cmds] = app.update({ type: 'key', key: 'f', ctrl: false, alt: false, shift: false } as unknown as NotificationMsg, model);
 
     expect(cmds).toHaveLength(1);

@@ -87,6 +87,10 @@ import type {
   InternalFrameModel,
   FrameAction,
   PaletteAction,
+  FramePageMsg,
+  FramePageUpdateResult,
+  FramedApp,
+  FramedAppMsg,
 } from './app-frame-types.js';
 import {
   isFrameScopedMsg,
@@ -147,9 +151,9 @@ export interface FramePage<PageModel, Msg> {
   /** Tab title. */
   readonly title: string;
   /** Page-level initializer. */
-  init(): [PageModel, Cmd<Msg>[]];
-  /** Page-level updater (custom messages only). */
-  update(msg: Msg, model: PageModel): [PageModel, Cmd<Msg>[]];
+  init(): FramePageUpdateResult<PageModel, Msg>;
+  /** Page-level updater (custom messages plus raw mouse forwarding). */
+  update(msg: FramePageMsg<Msg>, model: PageModel): FramePageUpdateResult<PageModel, Msg>;
   /** Page layout tree. */
   layout(model: PageModel): FrameLayoutNode;
   /** Optional page keymap. */
@@ -461,6 +465,16 @@ export interface FrameModel<PageModel> {
 }
 
 export type {
+  FramePageMsg,
+  FramePageUpdateResult,
+  FramedApp,
+  FramedAppMsg,
+  FramedAppUpdateResult,
+  FrameScopedMsg,
+  PageScopedMsg,
+} from './app-frame-types.js';
+
+export type {
   FrameLayerHintSource,
   FrameLayerKind,
   FrameLayerMetadata,
@@ -586,7 +600,7 @@ function resolveFrameNotificationOptions<PageModel, Msg>(
   };
 }
 
-function createFrameNotificationTickCmd<Msg>(): Cmd<Msg> {
+function createFrameNotificationTickCmd<Msg>(): Cmd<FramedAppMsg<Msg>> {
   return async (_emit, caps) => {
     if (!caps.sleep) {
       throw new Error('createFrameNotificationTickCmd requires sleep capability');
@@ -595,7 +609,7 @@ function createFrameNotificationTickCmd<Msg>(): Cmd<Msg> {
     return wrapFrameMsg({
       type: 'notification-tick',
       atMs: caps.now?.() ?? 0,
-    }) as unknown as Msg;
+    });
   };
 }
 
@@ -607,7 +621,7 @@ function createFrameNotificationTickCmd<Msg>(): Cmd<Msg> {
  */
 export function createFramedApp<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
-): App<FrameModel<PageModel>, Msg> {
+): FramedApp<PageModel, Msg> {
   if (options.pages.length === 0) {
     throw new Error('createFramedApp: "pages" must contain at least one page');
   }
@@ -655,10 +669,10 @@ export function createFramedApp<PageModel, Msg>(
 
   function withObservedKey(
     model: InternalFrameModel<PageModel, Msg>,
-    cmds: readonly Cmd<Msg>[],
+    cmds: readonly Cmd<FramedAppMsg<Msg>>[],
     msg: KeyMsg,
     route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
-  ): Cmd<Msg>[] {
+  ): Cmd<FramedAppMsg<Msg>>[] {
     const observed = options.observeKey?.(msg, route);
     if (observed === undefined) return [...cmds];
     return [emitMsgForPage(model.activePageId, observed), ...cmds];
@@ -667,7 +681,7 @@ export function createFramedApp<PageModel, Msg>(
   function applyQuitRequest(
     model: InternalFrameModel<PageModel, Msg>,
     msg: KeyMsg,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     if (!shouldUseShellQuitConfirm()) {
       return [model, withObservedKey(model, [quit()], msg, 'frame')];
     }
@@ -871,37 +885,25 @@ export function createFramedApp<PageModel, Msg>(
   function updateTargetPage(
     model: InternalFrameModel<PageModel, Msg>,
     targetPageId: string,
-    targetMsg: Msg,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+    targetMsg: FramePageMsg<Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     const targetPage = pagesById.get(targetPageId);
     if (targetPage == null) return [model, []];
 
     const pageModel = model.pageModels[targetPageId]!;
     const updateResult = targetPage.update(targetMsg, pageModel);
-    let nextPageModel: PageModel = pageModel;
-    let cmds: Cmd<Msg>[] = [];
-
-    if (updateResult !== undefined && updateResult !== null) {
-      if (Array.isArray(updateResult)) {
-        nextPageModel = (updateResult[0] ?? pageModel) as PageModel;
-        cmds = (updateResult[1] ?? []) as Cmd<Msg>[];
-      } else {
-        nextPageModel = updateResult as PageModel;
-      }
-    }
+    const [nextPageModel, cmds = []] = updateResult;
 
     const nextModels = { ...model.pageModels, [targetPageId]: nextPageModel };
     const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
-    const wrappedCmds = Array.isArray(cmds)
-      ? cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd))
-      : [];
+    const wrappedCmds = cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd));
     return [synced, wrappedCmds];
   }
 
   function handleFrameMouse(
     msg: MouseMsg,
     model: InternalFrameModel<PageModel, Msg>,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] | undefined {
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] | undefined {
     const {
       activePage,
       activePageModel,
@@ -1026,7 +1028,7 @@ export function createFramedApp<PageModel, Msg>(
         if (areaMsg !== undefined) {
           return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
         }
-        return [focusedModel, [emitMsgForPage(model.activePageId, msg as unknown as Msg)]];
+        return [focusedModel, [emitMsgForPage<Msg>(model.activePageId, msg)]];
       }
     }
 
@@ -1058,7 +1060,7 @@ export function createFramedApp<PageModel, Msg>(
     notifications: NotificationState<never>,
     nowMs: number,
     forceTick = false,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     const trimmed = trimNotificationsToViewport(notifications, {
       screenWidth: model.columns,
       screenHeight: model.rows,
@@ -1081,12 +1083,12 @@ export function createFramedApp<PageModel, Msg>(
   function activateSettingsRow(
     model: InternalFrameModel<PageModel, Msg>,
     row: FrameSettingRow<Msg>,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     if (row.action === undefined || row.enabled === false || row.kind === 'info') {
       return [model, []];
     }
 
-    const cmds: Cmd<Msg>[] = [emitMsgForPage(model.activePageId, row.action)];
+    const cmds: Cmd<FramedAppMsg<Msg>>[] = [emitMsgForPage(model.activePageId, row.action)];
     if (!frameNotificationOptions.enabled) {
       return [model, cmds];
     }
@@ -1110,10 +1112,10 @@ export function createFramedApp<PageModel, Msg>(
     return [nextModel, [...cmds, ...notificationCmds]];
   }
 
-  const app: App<InternalFrameModel<PageModel, Msg>, Msg> = {
+  const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
     init() {
       const pageModels: Record<string, PageModel> = {};
-      const initCmds: Cmd<Msg>[] = [];
+      const initCmds: Cmd<FramedAppMsg<Msg>>[] = [];
 
       for (const page of options.pages) {
         const [pageModel, cmds] = page.init();
@@ -1538,14 +1540,14 @@ export function createFramedApp<PageModel, Msg>(
       if (isMouseMsg(msg)) {
         const frameResult = handleFrameMouse(msg, model);
         if (frameResult != null) return frameResult;
-        return updateTargetPage(model, model.activePageId, msg as unknown as Msg);
+        return updateTargetPage(model, model.activePageId, msg);
       }
 
       // Custom message path: route to originating page when command messages are scoped.
-      const scoped = isPageScopedMsg<Msg>(msg) ? msg : undefined;
-      const targetPageId = scoped?.pageId ?? model.activePageId;
-      const targetMsg = scoped?.msg ?? (msg as Msg);
-      return updateTargetPage(model, targetPageId, targetMsg);
+      if (isPageScopedMsg<Msg>(msg)) {
+        return updateTargetPage(model, msg.pageId, msg.msg);
+      }
+      return updateTargetPage(model, model.activePageId, msg);
     },
 
     view(model) {
@@ -1698,7 +1700,7 @@ export function createFramedApp<PageModel, Msg>(
 
     routeRuntimeIssue(issue) {
       if (!frameNotificationOptions.enabled) return undefined;
-      return wrapFrameMsg({ type: 'runtime-issue', issue }) as unknown as Msg;
+      return wrapFrameMsg({ type: 'runtime-issue', issue });
     },
   };
 
@@ -2243,7 +2245,7 @@ function scrollNotificationCenterBy<PageModel, Msg>(
 function cycleNotificationCenterFilter<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   layout: ResolvedNotificationCenterLayout<Msg>,
-): [InternalFrameModel<PageModel, Msg>, Cmd<Msg>[]] {
+): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   const filters = layout.center.filters;
   if (filters.length < 2) return [model, []];
   const currentIndex = Math.max(0, filters.indexOf(layout.center.activeFilter));

@@ -16,12 +16,11 @@ import {
   modal,
   quit,
   statusBar,
-  type App,
   type DrawerAnchor,
   type Overlay,
   type FrameLayoutNode,
-  type FrameModel,
   type FramePage,
+  type FramedApp,
 } from '@flyingrobots/bijou-tui';
 import { contentSurface } from './example-surfaces.js';
 
@@ -480,6 +479,10 @@ function buildPage(
     title,
     init: () => [INITIAL_PAGE_MODEL, []],
     update(msg, model) {
+      if (msg.type === 'mouse' || msg.type === 'pulse') {
+        return [model, []];
+      }
+
       if (msg.type === 'force-quit') {
         return [model, [quit()]];
       }
@@ -543,7 +546,7 @@ function buildPage(
 
 export function createCanonicalWorkbenchApp(
   ctx: BijouContext,
-): App<FrameModel<WorkbenchPageModel>, WorkbenchMsg> {
+): FramedApp<WorkbenchPageModel, WorkbenchMsg> {
   const pages: FramePage<WorkbenchPageModel, WorkbenchMsg>[] = [
     buildPage('ops', 'Ops', OPS_PANES, (model) => ({
       kind: 'grid',
