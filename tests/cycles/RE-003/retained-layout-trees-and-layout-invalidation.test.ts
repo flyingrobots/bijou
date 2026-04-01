@@ -11,10 +11,10 @@ describe('RE-003 retained layout trees and layout invalidation cycle', () => {
     const cycle = read('/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
     const landedRouting = read('/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
     const landedBuffers = read('/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md');
-    const backlogComponents = read('/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md');
+    const landedComponents = read('/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md');
 
-    expect(legend).toContain('RE-005 — Buffer Commands and Effects Separately');
     expect(legend).toContain('RE-006 — Formalize Component Layout and Interaction Contracts');
+    expect(legend).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -27,6 +27,6 @@ describe('RE-003 retained layout trees and layout invalidation cycle', () => {
 
     expect(landedRouting).toContain('topmost view first');
     expect(landedBuffers).toContain('command and effect buffers');
-    expect(backlogComponents).toContain('layout, overflow, and interaction');
+    expect(landedComponents).toContain('explicit layout rules');
   });
 });

@@ -13,8 +13,8 @@ describe('RE-002 first-class state machine and view stack cycle', () => {
     const landedRouting = read('/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
     const landedBuffers = read('/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md');
 
-    expect(legend).toContain('RE-005 — Buffer Commands and Effects Separately');
     expect(legend).toContain('RE-006 — Formalize Component Layout and Interaction Contracts');
+    expect(legend).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');

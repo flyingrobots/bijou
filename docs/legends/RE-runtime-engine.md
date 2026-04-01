@@ -62,7 +62,6 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 ## Current cycle and backlog
 
 - active cycle:
-  - [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md)
+  - [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - backlog:
-  - [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md)
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

@@ -112,7 +112,7 @@ An agent can inspect retained layout state and answer which views have authorita
    - mark retained layouts stale with one or more invalidation causes
    - drop layouts whose views are no longer present in the active view stack
 4. Keep the implementation shell-agnostic and avoid routing work in this cycle.
-5. Leave detailed component sizing/anchoring contracts for [RE-006](/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md).
+5. Leave detailed component sizing/anchoring contracts for [RE-006](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md).
 
 ## Tests to write first
 
@@ -149,5 +149,5 @@ Follow-on:
 
 - [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
 - [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md)
-- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md)
+- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

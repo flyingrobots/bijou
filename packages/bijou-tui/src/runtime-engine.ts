@@ -12,7 +12,7 @@
  * buffering, and shell migration on top of these objects.
  */
 
-import type { LayoutNode } from '@flyingrobots/bijou';
+import type { LayoutNode, LayoutRect, Surface } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // State machine
@@ -421,6 +421,153 @@ export interface ExecuteRuntimeEffectBufferResult<Effect = unknown> {
   readonly buffer: RuntimeEffectBuffer<Effect>;
 }
 
+export const RUNTIME_COMPONENT_SIZE_MODES = [
+  'content',
+  'fill',
+  'fixed',
+] as const;
+
+export const RUNTIME_COMPONENT_ALIGNMENTS = [
+  'start',
+  'center',
+  'end',
+  'stretch',
+] as const;
+
+export const RUNTIME_COMPONENT_INLINE_OVERFLOW_POLICIES = [
+  'clip',
+  'truncate',
+  'viewport',
+] as const;
+
+export const RUNTIME_COMPONENT_BLOCK_OVERFLOW_POLICIES = [
+  'wrap',
+  'stack',
+  'clip',
+  'viewport',
+] as const;
+
+export type RuntimeComponentSizeMode =
+  (typeof RUNTIME_COMPONENT_SIZE_MODES)[number];
+
+export type RuntimeComponentAlignment =
+  (typeof RUNTIME_COMPONENT_ALIGNMENTS)[number];
+
+export type RuntimeComponentInlineOverflowPolicy =
+  (typeof RUNTIME_COMPONENT_INLINE_OVERFLOW_POLICIES)[number];
+
+export type RuntimeComponentBlockOverflowPolicy =
+  (typeof RUNTIME_COMPONENT_BLOCK_OVERFLOW_POLICIES)[number];
+
+export type RuntimeComponentKeyBindings = readonly string[] | 'any';
+export type RuntimeComponentPointerBindings =
+  readonly RuntimePointerAction[] | 'any';
+
+export interface RuntimeComponentLayoutRules {
+  readonly width: RuntimeComponentSizeMode;
+  readonly height: RuntimeComponentSizeMode;
+  readonly alignX: RuntimeComponentAlignment;
+  readonly alignY: RuntimeComponentAlignment;
+  readonly minWidth?: number;
+  readonly maxWidth?: number;
+  readonly minHeight?: number;
+  readonly maxHeight?: number;
+  readonly fixedWidth?: number;
+  readonly fixedHeight?: number;
+}
+
+export interface RuntimeComponentOverflowRules {
+  readonly inline: RuntimeComponentInlineOverflowPolicy;
+  readonly block: RuntimeComponentBlockOverflowPolicy;
+}
+
+export interface RuntimeComponentInteractionContract<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+> {
+  readonly enabled: boolean;
+  readonly focusable?: boolean;
+  readonly keyBindings?: RuntimeComponentKeyBindings;
+  readonly pointerActions?: RuntimeComponentPointerBindings;
+  readonly scrollable?: boolean;
+  readonly handleInput?: (
+    context: RuntimeComponentInputContext<Command, Effect, Model>,
+  ) => RuntimeInputRouteOutcome<Command, Effect> | undefined;
+}
+
+export interface RuntimeComponentContract<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+> {
+  readonly componentId: string;
+  readonly layout: RuntimeComponentLayoutRules;
+  readonly overflow: RuntimeComponentOverflowRules;
+  readonly interaction?: RuntimeComponentInteractionContract<
+    Command,
+    Effect,
+    Model
+  >;
+}
+
+export interface RuntimeComponentLayoutNode<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+> extends LayoutNode {
+  readonly component?: RuntimeComponentContract<Command, Effect, Model>;
+  readonly children: RuntimeComponentLayoutNode<Command, Effect, Model>[];
+}
+
+export interface RuntimeComponentInputContext<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+  Node extends RuntimeComponentLayoutNode<
+    Command,
+    Effect,
+    Model
+  > = RuntimeComponentLayoutNode<Command, Effect, Model>,
+> extends RuntimeInputRouteContext<Node, Model> {
+  readonly node: Node;
+  readonly component: RuntimeComponentContract<Command, Effect, Model>;
+}
+
+export interface CreateRuntimeComponentContractOptions<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+> {
+  readonly componentId: string;
+  readonly layout?: Partial<RuntimeComponentLayoutRules>;
+  readonly overflow?: Partial<RuntimeComponentOverflowRules>;
+  readonly interaction?: Omit<
+    RuntimeComponentInteractionContract<Command, Effect, Model>,
+    'enabled'
+  > & {
+    readonly enabled?: boolean;
+  };
+}
+
+export interface CreateRuntimeComponentNodeOptions<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+> {
+  readonly id?: string;
+  readonly type?: string;
+  readonly classes?: string[];
+  readonly rect: LayoutRect;
+  readonly surface?: Surface;
+  readonly children?: readonly RuntimeComponentLayoutNode<
+    Command,
+    Effect,
+    Model
+  >[];
+  readonly component: RuntimeComponentContract<Command, Effect, Model>;
+}
+
 export type RuntimeInputHandler<
   Node extends LayoutNode = LayoutNode,
   Model = unknown,
@@ -641,6 +788,143 @@ export async function executeRuntimeEffectBuffer<Effect = unknown>(
   };
 }
 
+export function createRuntimeComponentContract<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+>(
+  options: CreateRuntimeComponentContractOptions<Command, Effect, Model>,
+): RuntimeComponentContract<Command, Effect, Model> {
+  return {
+    componentId: options.componentId,
+    layout: {
+      width: options.layout?.width ?? 'content',
+      height: options.layout?.height ?? 'content',
+      alignX: options.layout?.alignX ?? 'start',
+      alignY: options.layout?.alignY ?? 'start',
+      minWidth: options.layout?.minWidth,
+      maxWidth: options.layout?.maxWidth,
+      minHeight: options.layout?.minHeight,
+      maxHeight: options.layout?.maxHeight,
+      fixedWidth: options.layout?.fixedWidth,
+      fixedHeight: options.layout?.fixedHeight,
+    },
+    overflow: {
+      inline: options.overflow?.inline ?? 'clip',
+      block: options.overflow?.block ?? 'wrap',
+    },
+    interaction: options.interaction == null
+      ? undefined
+      : {
+          ...options.interaction,
+          enabled: options.interaction.enabled ?? true,
+        },
+  };
+}
+
+export function createRuntimeComponentNode<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+>(
+  options: CreateRuntimeComponentNodeOptions<Command, Effect, Model>,
+): RuntimeComponentLayoutNode<Command, Effect, Model> {
+  return {
+    id: options.id,
+    type: options.type,
+    classes: options.classes == null ? undefined : [...options.classes],
+    rect: options.rect,
+    surface: options.surface,
+    children: options.children == null ? [] : [...options.children],
+    component: options.component,
+  };
+}
+
+export function getRuntimeComponentContract<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+>(
+  node: RuntimeComponentLayoutNode<Command, Effect, Model>,
+): RuntimeComponentContract<Command, Effect, Model> | undefined {
+  return node.component;
+}
+
+export function runtimeComponentAcceptsInput<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+>(
+  component: RuntimeComponentContract<Command, Effect, Model>,
+  event: RuntimeInputEvent,
+): boolean {
+  const interaction = component.interaction;
+  if (interaction == null || interaction.enabled === false) {
+    return false;
+  }
+
+  if (event.kind === 'key') {
+    const bindings = interaction.keyBindings;
+    return bindings === 'any'
+      || (Array.isArray(bindings) && bindings.includes(event.key));
+  }
+
+  if (isScrollRuntimePointerAction(event.action)) {
+    return interaction.scrollable === true
+      && component.overflow.block === 'viewport';
+  }
+
+  const bindings = interaction.pointerActions;
+  return bindings === 'any'
+    || (Array.isArray(bindings) && bindings.includes(event.action));
+}
+
+export function resolveRuntimeInteractiveTarget<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+  Node extends RuntimeComponentLayoutNode<
+    Command,
+    Effect,
+    Model
+  > = RuntimeComponentLayoutNode<Command, Effect, Model>,
+>(
+  hit: RuntimeLayoutHit<Node>,
+  event: RuntimeInputEvent,
+): Node | undefined {
+  for (let index = hit.path.length - 1; index >= 0; index -= 1) {
+    const node = hit.path[index];
+    if (node == null || node.component == null) {
+      continue;
+    }
+
+    if (runtimeComponentAcceptsInput(node.component, event)) {
+      return node;
+    }
+  }
+
+  return undefined;
+}
+
+export function handleRuntimeComponentInput<
+  Command = unknown,
+  Effect = unknown,
+  Model = unknown,
+  Node extends RuntimeComponentLayoutNode<
+    Command,
+    Effect,
+    Model
+  > = RuntimeComponentLayoutNode<Command, Effect, Model>,
+>(
+  context: RuntimeComponentInputContext<Command, Effect, Model, Node>,
+): RuntimeInputRouteOutcome<Command, Effect> | undefined {
+  if (!runtimeComponentAcceptsInput(context.component, context.event)) {
+    return undefined;
+  }
+
+  return context.component.interaction?.handleInput?.(context);
+}
+
 function hitTestLayoutPath<Node extends LayoutNode = LayoutNode>(
   node: Node,
   x: number,
@@ -672,4 +956,10 @@ function pointInRect(
     && x < rect.x + rect.width
     && y < rect.y + rect.height
   );
+}
+
+function isScrollRuntimePointerAction(
+  action: RuntimePointerAction,
+): boolean {
+  return action === 'scroll-up' || action === 'scroll-down';
 }

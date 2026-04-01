@@ -7,6 +7,8 @@ import {
   applyRuntimeCommandBuffer,
   bufferRuntimeRouteResult,
   clearRuntimeViewsToRoot,
+  createRuntimeComponentContract,
+  createRuntimeComponentNode,
   createRuntimeBuffers,
   createRuntimeCommandBuffer,
   createRuntimeEffectBuffer,
@@ -16,14 +18,18 @@ import {
   dropInactiveRuntimeLayouts,
   executeRuntimeEffectBuffer,
   getRuntimeRetainedLayout,
+  getRuntimeComponentContract,
+  handleRuntimeComponentInput,
   invalidateRuntimeLayouts,
   listRuntimeRetainedLayouts,
   popRuntimeView,
   pushRuntimeView,
+  resolveRuntimeInteractiveTarget,
   routeRuntimeInput,
   retainRuntimeLayout,
   replaceRuntimeRootView,
   replaceTopRuntimeView,
+  runtimeComponentAcceptsInput,
   transitionRuntimeState,
 } from './runtime-engine.js';
 
@@ -628,5 +634,226 @@ describe('runtime command and effect buffers', () => {
     expect(executed).toEqual(['play-click', 'announce.confirm']);
     expect(result.executed).toEqual(['play-click', 'announce.confirm']);
     expect(result.buffer).toEqual({ items: [] });
+  });
+});
+
+describe('runtime component contracts', () => {
+  it('creates retained component nodes with explicit layout rules and overflow ownership', () => {
+    const contract = createRuntimeComponentContract({
+      componentId: 'confirm.primary-action',
+      layout: {
+        width: 'fill',
+        height: 'content',
+        alignX: 'stretch',
+      },
+      overflow: {
+        inline: 'truncate',
+        block: 'wrap',
+      },
+      interaction: {
+        focusable: true,
+        keyBindings: ['Enter'],
+        pointerActions: ['press'],
+      },
+    });
+    const node = createRuntimeComponentNode({
+      id: 'primary-action',
+      type: 'Button',
+      rect: { x: 10, y: 8, width: 12, height: 1 },
+      component: contract,
+    });
+
+    expect(getRuntimeComponentContract(node)).toMatchObject({
+      componentId: 'confirm.primary-action',
+      layout: {
+        width: 'fill',
+        height: 'content',
+        alignX: 'stretch',
+        alignY: 'start',
+      },
+      overflow: {
+        inline: 'truncate',
+        block: 'wrap',
+      },
+    });
+  });
+
+  it('prefers the deepest enabled interactive node in a retained hit path', () => {
+    const root = createRuntimeComponentNode({
+      id: 'confirm-root',
+      rect: { x: 0, y: 0, width: 40, height: 10 },
+      component: createRuntimeComponentContract({
+        componentId: 'confirm.root',
+        interaction: {
+          pointerActions: ['press'],
+        },
+      }),
+      children: [
+        createRuntimeComponentNode({
+          id: 'confirm-card',
+          rect: { x: 5, y: 2, width: 20, height: 5 },
+          component: createRuntimeComponentContract({
+            componentId: 'confirm.card',
+            interaction: {
+              pointerActions: ['press'],
+            },
+          }),
+          children: [
+            createRuntimeComponentNode({
+              id: 'confirm-primary',
+              rect: { x: 8, y: 5, width: 10, height: 1 },
+              component: createRuntimeComponentContract({
+                componentId: 'confirm.primary',
+                interaction: {
+                  enabled: true,
+                  pointerActions: ['press'],
+                },
+              }),
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const hit = {
+      viewId: 'modal',
+      point: { x: 10, y: 5 },
+      path: [
+        root,
+        root.children[0]!,
+        root.children[0]!.children[0]!,
+      ],
+      target: root.children[0]!.children[0]!,
+    };
+
+    const target = resolveRuntimeInteractiveTarget(hit, {
+      kind: 'pointer',
+      action: 'press',
+      button: 'left',
+      x: 10,
+      y: 5,
+    });
+
+    expect(target?.id).toBe('confirm-primary');
+  });
+
+  it('skips disabled or unsupported descendants and falls back to an enabled ancestor', () => {
+    const root = createRuntimeComponentNode({
+      id: 'scroll-card',
+      rect: { x: 0, y: 0, width: 40, height: 10 },
+      component: createRuntimeComponentContract({
+        componentId: 'card.root',
+        interaction: {
+          pointerActions: ['press'],
+        },
+      }),
+      children: [
+        createRuntimeComponentNode({
+          id: 'disabled-child',
+          rect: { x: 2, y: 2, width: 10, height: 1 },
+          component: createRuntimeComponentContract({
+            componentId: 'card.disabled',
+            interaction: {
+              enabled: false,
+              pointerActions: ['press'],
+            },
+          }),
+        }),
+      ],
+    });
+
+    const hit = {
+      viewId: 'workspace',
+      point: { x: 3, y: 2 },
+      path: [root, root.children[0]!],
+      target: root.children[0]!,
+    };
+
+    const target = resolveRuntimeInteractiveTarget(hit, {
+      kind: 'pointer',
+      action: 'press',
+      button: 'left',
+      x: 3,
+      y: 2,
+    });
+
+    expect(target?.id).toBe('scroll-card');
+  });
+
+  it('lets component handlers emit multiple commands and effects', () => {
+    const node = createRuntimeComponentNode<string, string>({
+      id: 'confirm-primary',
+      rect: { x: 8, y: 5, width: 10, height: 1 },
+      component: createRuntimeComponentContract<string, string>({
+        componentId: 'confirm.primary',
+        interaction: {
+          pointerActions: ['press'],
+          handleInput: ({ component, node }) => ({
+            handled: true,
+            commands: [`activate:${component.componentId}`, `focus:${node.id}`],
+            effects: ['play-click'],
+          }),
+        },
+      }),
+    });
+
+    const result = handleRuntimeComponentInput({
+      layer: {
+        id: 'modal',
+        kind: 'modal',
+        dismissible: true,
+        blocksBelow: true,
+        root: false,
+      },
+      event: {
+        kind: 'pointer',
+        action: 'press',
+        button: 'left',
+        x: 8,
+        y: 5,
+      },
+      node,
+      component: node.component!,
+    });
+
+    expect(result).toEqual({
+      handled: true,
+      commands: ['activate:confirm.primary', 'focus:confirm-primary'],
+      effects: ['play-click'],
+    });
+  });
+
+  it('aligns scroll ownership with viewport overflow instead of ordinary block content', () => {
+    const viewportList = createRuntimeComponentContract({
+      componentId: 'list.viewport',
+      overflow: {
+        block: 'viewport',
+      },
+      interaction: {
+        scrollable: true,
+      },
+    });
+    const wrappedNote = createRuntimeComponentContract({
+      componentId: 'note.body',
+      overflow: {
+        block: 'wrap',
+      },
+      interaction: {
+        scrollable: true,
+      },
+    });
+
+    expect(runtimeComponentAcceptsInput(viewportList, {
+      kind: 'pointer',
+      action: 'scroll-down',
+      x: 5,
+      y: 8,
+    })).toBe(true);
+    expect(runtimeComponentAcceptsInput(wrappedNote, {
+      kind: 'pointer',
+      action: 'scroll-down',
+      x: 5,
+      y: 8,
+    })).toBe(false);
   });
 });

@@ -49,7 +49,7 @@ This is the center of gravity because the next major improvements all depend on 
 1. [RE-003 — Retain Layout Trees and Layout Invalidation](design/RE-003-retain-layout-trees-and-layout-invalidation.md)
 2. [RE-004 — Route Input Through Layouts and Layer Bubbling](design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
 3. [RE-005 — Buffer Commands and Effects Separately](design/RE-005-buffer-commands-and-effects-separately.md)
-4. [RE-006 — Formalize Component Layout and Interaction Contracts](BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md)
+4. [RE-006 — Formalize Component Layout and Interaction Contracts](design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 5. [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 
 ### Why this order
@@ -163,11 +163,10 @@ This document is a summary of that truth, not a replacement for it.
 
 If choosing the next few cycles now, the intended sequence is:
 
-1. `RE-003`
+1. `RE-006`
 2. `DX-001`
-3. `RE-004`
+3. `RE-007`
 4. `DX-002`
-5. `RE-005`
 
 Then reassess before `RE-006` / `RE-007` based on how much the new runtime seams changed the shell and public API surface.
 
