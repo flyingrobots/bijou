@@ -47,11 +47,25 @@ describe('mapCmds', () => {
   });
 
   it('passes QUIT signals through unaltered', async () => {
-    const cmd: Cmd<any> = async () => QUIT as QuitSignal;
+    const cmd: Cmd<any> = () => QUIT as QuitSignal;
     const mapped = mapCmds([cmd], (m) => m);
 
     const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
     expect(result).toBe(QUIT);
+  });
+
+  it('passes cleanup handles through unaltered', async () => {
+    type SubMsg = { sub: true; val: number };
+    type ParentMsg = { parent: true; val: number };
+    const dispose = vi.fn();
+    const handle = { dispose };
+
+    const cmd: Cmd<SubMsg> = () => handle;
+    const mapped = mapCmds([cmd], (msg) => ({ parent: true as const, val: msg.val }));
+
+    const result = await mapped[0]!(vi.fn(), { onPulse: vi.fn() });
+    expect(result).toBe(handle);
+    expect(dispose).not.toHaveBeenCalled();
   });
 });
 
@@ -105,7 +119,7 @@ describe('updateSubApp', () => {
 
     const child: App<number, SubMsg> = {
       init: () => [0, []],
-      update: (_msg, model) => [model, [async () => QUIT as QuitSignal]],
+      update: (_msg, model) => [model, [() => QUIT as QuitSignal]],
       view: () => createSurface(1, 1),
     };
 

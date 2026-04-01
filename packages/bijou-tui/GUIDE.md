@@ -7,7 +7,7 @@ Every bijou-tui app defines three functions:
 ```typescript
 interface App<Model, M> {
   init(): [Model, Cmd<M>[]];                            // initial state + startup commands
-  update(msg: KeyMsg | ResizeMsg | M, model: Model): [Model, Cmd<M>[]];  // state transition
+  update(msg: KeyMsg | ResizeMsg | MouseMsg | PulseMsg | M, model: Model): [Model, Cmd<M>[]];  // state transition
   view(model: Model): Surface | LayoutNode;             // render to structured output
 }
 ```
@@ -36,6 +36,26 @@ const app: App<Model, Msg> = {
 };
 
 run(app);
+```
+
+### Command Contract
+
+`Cmd<M>` may return synchronously or asynchronously:
+
+- a final message
+- `QUIT`
+- a cleanup handle or cleanup function for a long-lived effect
+- `void`
+
+If a command installs a long-lived effect through runtime capabilities, return the cleanup so the event bus/runtime can dispose it on shutdown:
+
+```typescript
+import type { Cmd } from '@flyingrobots/bijou-tui';
+
+const followPulse: Cmd<Msg> = (_emit, caps) =>
+  caps.onPulse((dt) => {
+    // update local driver state, emit messages, or coordinate external work
+  });
 ```
 
 ## Cursor Control
@@ -432,7 +452,7 @@ bus.on((msg) => {
 // Emit custom events
 bus.emit({ type: 'customThing', data: 42 });
 
-// Run a command — result is emitted as a message
+// Run a command — final messages are re-emitted, cleanup handles are retained
 bus.runCmd(someCmd);
 
 // Handle quit signals separately
@@ -773,6 +793,12 @@ const inspector = drawer({
 - `Esc` closes help and dismisses the command palette
 - quit behavior is app-defined (examples commonly bind `q` via `globalKeys`)
 - overlay hook with pane rect introspection
+
+Typing notes:
+
+- `createFramedApp<PageModel, Msg>()` returns `FramedApp<PageModel, Msg>`
+- page `update()` receives `FramePageMsg<Msg>` so custom messages stay typed while raw `mouse` / `pulse` forwarding remains explicit
+- wrapped shell commands use `FramedAppMsg<Msg>` instead of pretending page-scoped or frame-scoped shell messages are plain `Msg`
 
 See `examples/release-workbench/main.ts` for a full canonical shell implementation and `examples/app-frame/main.ts` for a compact focused example.
 

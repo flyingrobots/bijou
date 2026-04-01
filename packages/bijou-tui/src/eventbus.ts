@@ -27,8 +27,8 @@
 
 import type { IOPort } from '@flyingrobots/bijou';
 import { defer, resolveClock, sleep, type ClockPort } from '@flyingrobots/bijou';
-import type { Cmd, KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from './types.js';
-import { QUIT } from './types.js';
+import type { Cmd, CmdCleanup, CmdDisposable, CmdResult, KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from './types.js';
+import { QUIT, isCmdCleanup } from './types.js';
 import { parseKey, parseMouse } from './keys.js';
 
 // ---------------------------------------------------------------------------
@@ -162,6 +162,13 @@ interface Disposable {
   dispose(): void;
 }
 
+function normalizeCmdCleanup(cleanup: CmdCleanup): CmdDisposable {
+  if (typeof cleanup === 'function') {
+    return { dispose: cleanup };
+  }
+  return cleanup;
+}
+
 // ---------------------------------------------------------------------------
 // Implementation
 // ---------------------------------------------------------------------------
@@ -183,6 +190,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
   const subscribers = new Set<(msg: BusMsg<M>) => void>();
   const quitHandlers = new Set<() => void>();
   const pulseHandlers = new Set<(dt: number) => void>();
+  const activeCommandCleanups = new Set<CmdDisposable>();
   const middlewares: Middleware<M>[] = [];
   const disposables: Disposable[] = [];
   let disposed = false;
@@ -306,7 +314,7 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         now: () => clock.now(),
       };
 
-      let commandPromise: Promise<M | typeof QUIT | void>;
+      let commandPromise: Promise<CmdResult<M>>;
       try {
         commandPromise = Promise.resolve(cmd(emit, caps));
       } catch (err: unknown) {
@@ -314,6 +322,15 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
       }
 
       commandPromise.then((result) => {
+        if (isCmdCleanup(result)) {
+          const cleanup = normalizeCmdCleanup(result);
+          if (disposed) {
+            cleanup.dispose();
+            return;
+          }
+          activeCommandCleanups.add(cleanup);
+          return;
+        }
         if (disposed) return;
         if (result === QUIT) {
           for (const handler of quitHandlers) {
@@ -425,6 +442,10 @@ export function createEventBus<M>(busOptions?: CreateEventBusOptions): EventBus<
         pulseTimer.dispose();
         pulseTimer = null;
       }
+      for (const cleanup of activeCommandCleanups) {
+        cleanup.dispose();
+      }
+      activeCommandCleanups.clear();
       resolveIdleIfNeeded();
       for (const d of disposables) {
         d.dispose();

@@ -111,6 +111,17 @@ run(app);
 
 In non-interactive modes, there is no normal interactive event loop.
 
+## Command Model
+
+`Cmd<M>` may resolve synchronously or asynchronously to:
+
+- a final message
+- `QUIT`
+- a cleanup handle or cleanup function for a long-lived effect
+- `void`
+
+If a command installs a long-lived effect through `onPulse()` or another runtime-backed capability, return that cleanup so the event bus/runtime can dispose it on shutdown.
+
 ## Features Breakdown
 
 - **TEA runtime core**: deterministic model/update/view loop with command-driven side effects.
@@ -385,7 +396,7 @@ const bus = createEventBus<MyMsg>();
 bus.connectIO(ctx.io);           // keyboard + resize
 bus.on((msg) => { /* ... */ });  // single subscription
 bus.emit(customMsg);             // synthetic events
-bus.runCmd(someCommand);         // command results re-emitted
+bus.runCmd(someCommand);         // final messages re-emitted, cleanup retained
 bus.dispose();                   // clean shutdown
 ```
 
@@ -512,6 +523,12 @@ Use `drawer()` when the user should keep the main task visible while consulting 
 - overlay factory with pane rects for panel-scoped drawers/modals
 
 Pane renderers return a `Surface` or a `LayoutNode`. The shell normalizes those outputs into the framed scroll/focus path for you.
+
+Typed shell notes:
+
+- `createFramedApp<PageModel, Msg>()` returns `FramedApp<PageModel, Msg>`
+- page `update()` receives `FramePageMsg<Msg>` so raw `mouse` / `pulse` delivery is explicit
+- wrapped shell commands carry `FramedAppMsg<Msg>` instead of collapsing frame/page wrappers into plain `Msg`
 
 See `examples/release-workbench/main.ts` for the canonical shell demo and `examples/app-frame/main.ts` for a compact focused example.
 

@@ -29,7 +29,7 @@ import {
   type PageTransition,
   underlyingFrameLayer,
 } from './app-frame.js';
-import { QUIT, type Cmd, type MouseMsg } from './types.js';
+import { QUIT, isCmdCleanup, type Cmd, type MouseMsg } from './types.js';
 import { tick } from './commands.js';
 
 type Msg =
@@ -372,7 +372,7 @@ describe('createFramedApp', () => {
     const messages: any[] = [];
     const pulseHandlers = new Set<(dt: number) => void>();
     let settled = false;
-    const promise = switchCmds[0]!((m) => messages.push(m), {
+    const promise = Promise.resolve(switchCmds[0]!((m) => messages.push(m), {
       onPulse(handler) {
         pulseHandlers.add(handler);
         return {
@@ -381,7 +381,7 @@ describe('createFramedApp', () => {
           },
         };
       },
-    }).then(() => {
+    })).then(() => {
       settled = true;
     });
 
@@ -679,6 +679,10 @@ describe('createFramedApp', () => {
       throw new Error('expected a scoped noop result');
     }
 
+    if (isCmdCleanup(noopResult)) {
+      throw new Error('expected delayed page command to resolve to a framed message');
+    }
+
     update = app.update(noopResult, model);
     model = update[0];
     const delayedCmd = update[1][0];
@@ -699,7 +703,7 @@ describe('createFramedApp', () => {
       update = app.update(msg, model);
       model = update[0];
     }
-    if (returned !== undefined && returned !== QUIT) {
+    if (returned !== undefined && returned !== QUIT && !isCmdCleanup(returned)) {
       update = app.update(returned, model);
       model = update[0];
     }

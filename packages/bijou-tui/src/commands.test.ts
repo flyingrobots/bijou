@@ -42,7 +42,7 @@ describe('commands', () => {
       const { clock, caps } = createClockCapabilities();
       const cmd = tick(500, 'done');
       let resolved = false;
-      void cmd(() => {}, caps).then(() => {
+      void Promise.resolve(cmd(() => {}, caps)).then(() => {
         resolved = true;
       });
       await clock.advanceByAsync(499);

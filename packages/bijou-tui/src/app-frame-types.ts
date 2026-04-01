@@ -7,7 +7,7 @@
 
 import type { CommandPaletteItem } from './command-palette.js';
 import type { App, Cmd, KeyMsg, MouseMsg, PulseMsg } from './types.js';
-import { QUIT } from './types.js';
+import { QUIT, isCmdCleanup } from './types.js';
 import type { BindingInfo } from './keybindings.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PanelDockState } from './panel-dock.js';
@@ -187,6 +187,7 @@ export function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<FramedAp
   return async (emit, caps) => {
     const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg)), caps);
     if (result === undefined || result === QUIT) return result;
+    if (isCmdCleanup(result)) return result;
     return wrapPageMsg(pageId, result);
   };
 }

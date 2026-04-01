@@ -55,7 +55,7 @@ describe('animate', () => {
       const caps = createMockCaps();
       
       let settled = false;
-      const promise = cmd((msg) => emitted.push(msg as number), caps).then(() => {
+      const promise = Promise.resolve(cmd((msg) => emitted.push(msg as number), caps)).then(() => {
         settled = true;
       });
       
@@ -88,7 +88,7 @@ describe('animate', () => {
 
       const caps = createMockCaps();
       let settled = false;
-      const promise = cmd(() => {}, caps).then(() => { settled = true; });
+      const promise = Promise.resolve(cmd(() => {}, caps)).then(() => { settled = true; });
       
       // Pulse
       for (let i = 0; i < 1000 && !settled; i++) {

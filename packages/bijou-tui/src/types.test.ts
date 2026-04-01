@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
+import { isCmdCleanup, isCmdDisposable, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 import type { KeyMsg, ResizeMsg, MouseMsg } from './types.js';
 
 describe('isKeyMsg', () => {
@@ -108,5 +108,25 @@ describe('isMouseMsg', () => {
 
   it('returns false for empty object', () => {
     expect(isMouseMsg({})).toBe(false);
+  });
+});
+
+describe('command cleanup helpers', () => {
+  it('recognizes disposable cleanup handles', () => {
+    const handle = { dispose() {} };
+    expect(isCmdDisposable(handle)).toBe(true);
+    expect(isCmdCleanup(handle)).toBe(true);
+  });
+
+  it('recognizes cleanup functions', () => {
+    const cleanup = () => {};
+    expect(isCmdDisposable(cleanup)).toBe(false);
+    expect(isCmdCleanup(cleanup)).toBe(true);
+  });
+
+  it('rejects non-cleanup values', () => {
+    expect(isCmdCleanup({})).toBe(false);
+    expect(isCmdCleanup('cleanup')).toBe(false);
+    expect(isCmdCleanup(undefined)).toBe(false);
   });
 });

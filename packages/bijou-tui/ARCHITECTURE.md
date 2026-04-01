@@ -18,7 +18,8 @@ bijou-tui implements The Elm Architecture (TEA) for terminal UIs. It provides a 
 │  EventBus                                       │
 │  ├─ parseKey(raw) → KeyMsg                      │
 │  ├─ (cols, rows) → ResizeMsg                    │
-│  ├─ cmd() → Promise<M> → emit(M)               │
+│  ├─ cmd() → M | Promise<M> → emit(M)           │
+│  ├─ cmd() → cleanup → retained for shutdown    │
 │  └─ cmd() → QUIT → onQuit handler              │
 │                                                 │
 │  bus.on(msg => ...)  ◄── single subscription    │
@@ -115,7 +116,7 @@ acceleration = F / mass
 
 ### animate() / sequence()
 
-`animate()` wraps spring/tween simulation into a `Cmd<M>`. The command runs an internal interval, calls `onFrame` each tick, and resolves when done.
+`animate()` wraps spring/tween simulation into a `Cmd<M>`. The command subscribes to the shared pulse, calls `onFrame` each tick, disposes its pulse handle when complete, and then settles.
 
 `sequence(...cmds)` chains commands — each completes before the next starts.
 
@@ -159,8 +160,8 @@ The bus is a typed publish/subscribe system:
 
 - **Subscribers**: `Set<(msg) => void>` — all receive every event
 - **I/O connection**: `connectIO(io)` wires `rawInput` + `onResize`, returns disposable
-- **Command runner**: `runCmd(cmd)` awaits the promise, emits result or fires quit handler
-- **Lifecycle**: `dispose()` disconnects all sources, clears all handlers
+- **Command runner**: `runCmd(cmd)` resolves sync/async command results, emits final messages, retains cleanup handles for long-lived effects, or fires the quit handler
+- **Lifecycle**: `dispose()` disconnects all sources, disposes retained command cleanups, and clears all handlers
 
 The TEA runtime creates an EventBus internally. Apps can also create their own for custom event sources or testing.
 

@@ -1,4 +1,5 @@
 import type { App, Cmd, QuitSignal } from '../types.js';
+import { isCmdCleanup } from '../types.js';
 import type { ViewOutput } from '../view-output.js';
 
 /**
@@ -129,6 +130,7 @@ function mapSingleCmd<SubMsg, ParentMsg>(
     // Quit signals are passed through unaltered.
     if (result === undefined) return undefined;
     if (typeof result === 'symbol') return result as QuitSignal; // QUIT
+    if (isCmdCleanup(result)) return result;
     return mapper(result as SubMsg);
   };
 }

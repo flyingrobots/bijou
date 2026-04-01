@@ -16,7 +16,7 @@ import { QUIT, type Cmd, type QuitSignal } from './types.js';
  * @returns A command that resolves to the {@link QUIT} sentinel.
  */
 export function quit<M>(): Cmd<M> {
-  return async (_emit, _caps) => QUIT as QuitSignal;
+  return (_emit, _caps) => QUIT as QuitSignal;
 }
 
 /**

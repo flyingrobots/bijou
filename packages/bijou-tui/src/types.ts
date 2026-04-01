@@ -124,15 +124,46 @@ export const QUIT: unique symbol = Symbol('QUIT');
 /** The type of the {@link QUIT} sentinel symbol. */
 export type QuitSignal = typeof QUIT;
 
+/** Disposable cleanup handle returned by long-lived command effects. */
+export interface CmdDisposable {
+  dispose(): void;
+}
+
+/** Cleanup forms a command may return after installing a long-lived effect. */
+export type CmdCleanup = CmdDisposable | (() => void);
+
+/** Final output a command may resolve to. */
+export type CmdResult<M> = M | QuitSignal | CmdCleanup | void;
+
+/** Narrow an unknown value to a disposable command handle. */
+export function isCmdDisposable(value: unknown): value is CmdDisposable {
+  return typeof value === 'object'
+    && value !== null
+    && 'dispose' in value
+    && typeof (value as CmdDisposable).dispose === 'function';
+}
+
+/** Narrow an unknown value to a supported command cleanup form. */
+export function isCmdCleanup(value: unknown): value is CmdCleanup {
+  return typeof value === 'function' || isCmdDisposable(value);
+}
+
 /**
  * A side-effect function that can emit messages back to the application.
  *
  * Receive an `emit` callback for dispatching intermediate messages during
- * execution. Resolve to a final message, a {@link QuitSignal}, or `void`.
+ * execution. It may resolve synchronously or asynchronously to:
+ * - a final message
+ * - a {@link QuitSignal}
+ * - a cleanup handle/function for a long-lived effect
+ * - `void`
  *
  * @template M - Application message type.
  */
-export type Cmd<M> = (emit: (msg: M) => void, capabilities: CmdCapabilities) => Promise<M | QuitSignal | void>;
+export type Cmd<M> = (
+  emit: (msg: M) => void,
+  capabilities: CmdCapabilities,
+) => CmdResult<M> | Promise<CmdResult<M>>;
 
 /** Capabilities provided to commands by the runtime. */
 export interface CmdCapabilities {
@@ -140,7 +171,7 @@ export interface CmdCapabilities {
    * Subscribe to the system animation pulse. 
    * Returns a dispose function.
    */
-  onPulse(handler: (dt: number) => void): { dispose(): void };
+  onPulse(handler: (dt: number) => void): CmdDisposable;
   /** Sleep for a bounded amount of time using the runtime clock. */
   sleep?(ms: number): Promise<void>;
   /** Yield to the next microtask using the runtime clock. */

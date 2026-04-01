@@ -271,7 +271,7 @@ describe('runCmd', () => {
     const quitCalled = vi.fn();
     bus.onQuit(quitCalled);
 
-    const cmd: Cmd<TestMsg> = async () => QUIT;
+    const cmd: Cmd<TestMsg> = () => QUIT;
     bus.runCmd(cmd);
 
     await bus.drain();
@@ -284,11 +284,54 @@ describe('runCmd', () => {
     bus.on((msg) => received.push(msg));
     bus.onQuit(() => {});
 
-    const cmd: Cmd<TestMsg> = async () => QUIT;
+    const cmd: Cmd<TestMsg> = () => QUIT;
     bus.runCmd(cmd);
 
     await bus.drain();
     expect(received).toHaveLength(0);
+  });
+
+  it('retains and disposes cleanup handles returned by commands', async () => {
+    const bus = createEventBus<TestMsg>();
+    const dispose = vi.fn();
+
+    const cmd: Cmd<TestMsg> = () => ({ dispose });
+    bus.runCmd(cmd);
+
+    await bus.drain();
+    expect(dispose).not.toHaveBeenCalled();
+
+    bus.dispose();
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it('supports cleanup function shorthand for long-lived commands', async () => {
+    const bus = createEventBus<TestMsg>();
+    const cleanup = vi.fn();
+
+    const cmd: Cmd<TestMsg> = () => cleanup;
+    bus.runCmd(cmd);
+
+    await bus.drain();
+    bus.dispose();
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
+  it('disposes cleanup results that settle after the bus is already disposed', async () => {
+    const bus = createEventBus<TestMsg>();
+    const dispose = vi.fn();
+    let resolveCleanup: ((value: { dispose(): void }) => void) | undefined;
+
+    const cmd: Cmd<TestMsg> = () => new Promise((resolve) => {
+      resolveCleanup = resolve;
+    });
+
+    bus.runCmd(cmd);
+    bus.dispose();
+    resolveCleanup?.({ dispose });
+    await Promise.resolve();
+
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 
   it('surfaces rejected commands through onCommandRejected', async () => {
@@ -411,7 +454,7 @@ describe('onQuit', () => {
     const handle = bus.onQuit(quitCalled);
     handle.dispose();
 
-    const cmd: Cmd<TestMsg> = async () => QUIT;
+    const cmd: Cmd<TestMsg> = () => QUIT;
     bus.runCmd(cmd);
 
     await bus.drain();
@@ -544,7 +587,7 @@ describe('dispose', () => {
 
     bus.dispose();
     bus.emit({ type: 'custom', value: 1 });
-    bus.runCmd(async () => QUIT);
+    bus.runCmd(() => QUIT);
 
     await bus.drain();
     expect(received).toHaveLength(0);

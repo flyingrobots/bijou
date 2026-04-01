@@ -502,6 +502,25 @@ describe('run', () => {
       expect(activeTimeoutCount()).toBe(0);
     });
 
+    it('disposes cleanup-producing commands during shutdown', async () => {
+      let disposeCalls = 0;
+      const dispose = () => {
+        disposeCalls += 1;
+      };
+      const { clock, ctx } = createInteractiveContext();
+      const app: App<string, never> = {
+        init: () => ['cleanup', [() => ({ dispose }), quit()]],
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(20);
+      await promise;
+
+      expect(disposeCalls).toBe(1);
+    });
+
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {
       const app: App<boolean, never> = {
         init: () => [true, []],
