@@ -162,7 +162,7 @@ What did not land:
 Follow-on:
 
 - [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
-- [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md)
+- [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md)
 - [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md)
 - [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md)
 - [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md)

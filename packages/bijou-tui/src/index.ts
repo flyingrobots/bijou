@@ -26,20 +26,31 @@ export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
 
 // Runtime engine
 export type {
+  RetainRuntimeLayoutOptions,
+  RuntimeLayoutInvalidationCause,
   RuntimeStateLike,
   RuntimeStateMachine,
+  RuntimeRetainedLayout,
+  RuntimeRetainedLayouts,
   RuntimeViewLayer,
   RuntimeStackLayer,
   RuntimeViewStack,
   PopRuntimeViewResult,
 } from './runtime-engine.js';
 export {
+  RUNTIME_LAYOUT_INVALIDATION_CAUSES,
   activeRuntimeView,
   clearRuntimeViewsToRoot,
   createRuntimeStateMachine,
+  createRuntimeRetainedLayouts,
   createRuntimeViewStack,
+  dropInactiveRuntimeLayouts,
+  getRuntimeRetainedLayout,
+  invalidateRuntimeLayouts,
+  listRuntimeRetainedLayouts,
   popRuntimeView,
   pushRuntimeView,
+  retainRuntimeLayout,
   replaceRuntimeRootView,
   replaceTopRuntimeView,
   transitionRuntimeState,

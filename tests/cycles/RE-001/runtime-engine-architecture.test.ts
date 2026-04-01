@@ -13,7 +13,7 @@ describe('RE-001 runtime engine architecture cycle', () => {
     const layoutInvariant = read('/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md');
     const commandEffectInvariant = read('/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md');
     const landedState = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
-    const backlogLayout = read('/Users/james/git/bijou/docs/BACKLOG/RE-003-retain-layout-trees-and-layout-invalidation.md');
+    const landedLayout = read('/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
     const backlogRouting = read('/Users/james/git/bijou/docs/BACKLOG/RE-004-route-input-through-layouts-and-layer-bubbling.md');
     const backlogBuffers = read('/Users/james/git/bijou/docs/BACKLOG/RE-005-buffer-commands-and-effects-separately.md');
     const backlogComponents = read('/Users/james/git/bijou/docs/BACKLOG/RE-006-formalize-component-layout-and-interaction-contracts.md');
@@ -42,7 +42,7 @@ describe('RE-001 runtime engine architecture cycle', () => {
 
     expect(landedState).toContain('state-machine object');
     expect(landedState).toContain('view-stack object');
-    expect(backlogLayout).toContain('Retain layout trees');
+    expect(landedLayout).toContain('retained-layout registry');
     expect(backlogRouting).toContain('topmost layer first');
     expect(backlogBuffers).toContain('command and effect buffer contracts');
     expect(backlogComponents).toContain('layout, overflow, and interaction');
