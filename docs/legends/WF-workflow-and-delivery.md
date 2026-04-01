@@ -42,3 +42,4 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 
 - [WF-001 — Adopt the Legends/Cycles Workflow](/Users/james/git/bijou/docs/design/WF-001-adopt-cycle-workflow.md)
 - [WF-002 — Migrate Legacy Planning Artifacts](/Users/james/git/bijou/docs/BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](/Users/james/git/bijou/docs/BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
