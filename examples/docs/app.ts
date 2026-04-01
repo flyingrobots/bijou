@@ -397,6 +397,7 @@ interface DocsAppOptions {
   readonly locale?: string;
   readonly direction?: I18nDirection;
   readonly extraI18nCatalogs?: readonly I18nCatalog[];
+  readonly initialRoute?: RootModel['route'];
 }
 
 function dogfoodText(
@@ -2174,6 +2175,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const i18n = createDocsI18nRuntime(options);
   const explorer = createDocsExplorerApp(ctx, i18n);
   const renderLanding = createLandingRenderer(ctx, i18n);
+  const initialRoute = options.initialRoute ?? 'landing';
 
   function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
     return mapCmds(cmds, (msg) => ({ type: 'docs', msg }));
@@ -2198,7 +2200,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
       const [docsModel, cmds] = explorer.init();
       const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
       return [{
-        route: 'landing',
+        route: initialRoute,
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
