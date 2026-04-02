@@ -4,27 +4,27 @@ The high-fidelity TEA runtime for Bijou.
 
 `bijou-tui` provides the application loop, layout primitives, motion, and orchestration needed to build complex interactive terminal apps on top of the Bijou core.
 
-## V3.0.0 Evolution
+## Package Role in v4.0.0
 
-The TUI package has been completely overhauled in v3.0.0 to operate as a true graphics engine.
+The TUI package is the surface-first fullscreen runtime in the Bijou stack.
 
-### 🌟 What's New
+### What's Included
 - **Pure view contract:** `App.view` and framed pane renderers now speak `ViewOutput` (`Surface | LayoutNode`).
 - **Programmable Rendering Pipeline:** The TEA `view` output is now processed through a 5-stage middleware pipeline (`Layout -> Paint -> PostProcess -> Diff -> Output`). Add custom fragment shaders or logging middleware effortlessly.
 - **Fractal TEA (Sub-Apps):** Compose nested apps with `initSubApp()`, `updateSubApp()`, `mount()`, and `mapCmds()` instead of flattening everything into one update loop.
-- **Bijou CSS (BCSS):** Style supported V3 surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
+- **Bijou CSS (BCSS):** Style supported runtime surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
 - **Declarative Motion:** Wrap any component in `motion({ key: 'id' }, ...)` and watch it smoothly interpolate layout changes (move, resize) using physics-based springs.
 - **Unified Heartbeat:** All animations and physics calculations are now synchronized to a single `PulseMsg`, eliminating timer jitter and saving CPU.
 
 ## Installation
 
 ```bash
-npm install @flyingrobots/bijou@3.0.0 @flyingrobots/bijou-node@3.0.0 @flyingrobots/bijou-tui@3.0.0
+npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
 ```
 
 If you are upgrading an existing app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
 
-## Quick Start (V3 Sub-App Composition)
+## Quick Start (Sub-App Composition)
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';

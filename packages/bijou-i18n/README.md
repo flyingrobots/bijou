@@ -11,4 +11,4 @@ The in-memory localization runtime for Bijou.
 - runtime-safe references
 - locale-aware formatting seams
 
-This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in a future tooling package.
+This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in `@flyingrobots/bijou-i18n-tools`.

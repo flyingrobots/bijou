@@ -2,14 +2,14 @@
 
 The pure, zero-dependency core of Bijou.
 
-`@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the V3 runtime builds on.
+`@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the interactive runtime builds on.
 
-## What's New in v3.0.0
+## Package Role in v4.0.0
 
-- **Truthful core/runtime split** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the high-fidelity fullscreen runtime.
-- **Surface primitives without abandoning strings** — V3 adds serious surface/layout infrastructure to the core package, but `3.0.0` does not pretend every component is now surface-native. String-oriented helpers remain first-class where they fit the toolkit identity.
-- **Surface-first companions for common V3 chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for the most common layout and status primitives.
-- **Explicit core/runtime boundaries** — when you move `Surface` output back into string-first core APIs, you do it explicitly with `surfaceToString(surface, ctx.style)`.
+- **Core/runtime split stays explicit** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the fullscreen runtime.
+- **Surface primitives without abandoning strings** — the package is intentionally mixed-mode. String-oriented helpers remain first-class where they fit the toolkit identity, and runtime-friendly surface helpers exist where they actually help.
+- **Surface-first companions for common runtime chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for common layout and status primitives.
+- **Explicit seam crossing** — when you move `Surface` output back into string-first APIs, you do it deliberately with `surfaceToString(surface, ctx.style)`.
 - **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
 
 ## Install
@@ -36,7 +36,7 @@ const panel = boxSurface(
   { title: 'Runtime', padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx },
 );
 
-// Return `panel` from a V3 `view()` function or framed pane renderer.
+// Return `panel` from a runtime `view()` function or framed pane renderer.
 ```
 
 ## Features Breakdown
@@ -84,7 +84,7 @@ Those docs answer the questions the API reference cannot:
 ### Tables and inspection
 
 - Use `table()` when row/column comparison is the main job and string output is still the right endpoint.
-- Use `tableSurface()` when the job is still passive comparison, but your V3 app is already composing `Surface` output.
+- Use `tableSurface()` when the job is still passive comparison, but your runtime app is already composing `Surface` output.
 - Use `navigableTable()` from `@flyingrobots/bijou-tui` when the user needs keyboard-owned row or cell inspection instead of passive reading.
 
 ### Hierarchy and chronology

@@ -2,7 +2,9 @@
 
 ## Overview
 
-bijou's core is a zero-dependency TypeScript library that uses **hexagonal architecture** (Ports and Adapters) to decouple UI components from platform I/O. Every component is a pure function that takes data and returns a string — no `process`, `chalk`, or `readline` imports.
+bijou's core is a zero-dependency TypeScript library that uses **hexagonal architecture** (Ports and Adapters) to decouple UI components from platform I/O.
+
+Many core components are pure functions that take data and return strings. The package also exposes `Surface` primitives and a smaller set of surface-returning companions for runtime composition. None of that changes the port boundary: no `process`, `chalk`, or `readline` imports leak into the core.
 
 ## Ports
 
@@ -85,7 +87,7 @@ Every component accepts an optional `ctx?: BijouContext`. If omitted, it calls `
 
 ## Component Pattern
 
-All components follow the same structure:
+Many string-first components follow the same structure:
 
 1. Accept content + options (including optional `ctx`)
 2. Resolve the context (`ctx ?? getDefaultContext()`)
@@ -101,6 +103,8 @@ export function box(content: string, options: BoxOptions = {}): string {
   // ... unicode box drawing with ctx.style
 }
 ```
+
+Surface primitives and `*Surface` companions follow the same purity rule, but they return structured render values instead of strings.
 
 ## Theme Engine
 
@@ -124,7 +128,7 @@ The `@flyingrobots/bijou/adapters/test` export provides:
 - `plainStyle()` — returns text unchanged (no ANSI)
 - `createTestContext()` — bundles the above with an explicit `mode`
 
-Tests assert on returned strings — no process mocking, no TTY simulation.
+Tests can assert on returned strings or structured surfaces without process mocking or real TTY simulation.
 
 ## Directory Structure
 
