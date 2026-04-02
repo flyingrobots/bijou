@@ -1,14 +1,11 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('DL-001 design language doctrine cycle', () => {
   it('creates a Design Language legend and cycle doc with required workflow sections', () => {
-    const legend = read('/Users/james/git/bijou/docs/legends/DL-design-language.md');
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-001-capture-design-language-doctrine.md');
+    const legend = readRepoFile('docs/legends/DL-design-language.md');
+    const cycle = readRepoFile('docs/design/DL-001-capture-design-language-doctrine.md');
 
     expect(legend).toContain('# DL — Design Language');
     expect(legend).toContain('[Bijou UX Doctrine]');
@@ -24,11 +21,11 @@ describe('DL-001 design language doctrine cycle', () => {
   });
 
   it('captures mouse, cognitive load, AI, localization, and future blocks in doctrine', () => {
-    const ux = read('/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md');
-    const a11y = read('/Users/james/git/bijou/docs/strategy/accessibility-and-assistive-modes.md');
-    const lx = read('/Users/james/git/bijou/docs/strategy/localization-and-bidirectionality.md');
-    const ai = read('/Users/james/git/bijou/docs/strategy/ai-explainability-standard.md');
-    const content = read('/Users/james/git/bijou/docs/strategy/content-guide.md');
+    const ux = readRepoFile('docs/strategy/bijou-ux-doctrine.md');
+    const a11y = readRepoFile('docs/strategy/accessibility-and-assistive-modes.md');
+    const lx = readRepoFile('docs/strategy/localization-and-bidirectionality.md');
+    const ai = readRepoFile('docs/strategy/ai-explainability-standard.md');
+    const content = readRepoFile('docs/strategy/content-guide.md');
 
     expect(ux).toContain('keyboard-first, mouse-enhanced');
     expect(ux).toContain('cognitive load');
@@ -56,8 +53,8 @@ describe('DL-001 design language doctrine cycle', () => {
   });
 
   it('parks notification polish on the Humane Terminal backlog and spawns the next design-language backlog item', () => {
-    const htBacklog = read('/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md');
-    const dlCycle = read('/Users/james/git/bijou/docs/design/DL-002-canonicalize-patterns-and-blocks.md');
+    const htBacklog = readRepoFile('docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md');
+    const dlCycle = readRepoFile('docs/design/DL-002-canonicalize-patterns-and-blocks.md');
 
     expect(htBacklog).toContain('Notification Center Polish and Discoverability');
     expect(htBacklog).toContain('Parked on the backlog');

@@ -1,14 +1,11 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { inspectorDrawer } from '../../../packages/bijou-tui/src/index.js';
 import { createCanonicalWorkbenchApp } from '../../../examples/_shared/canonical-app.js';
 import { createAppFrameDemo } from '../../../examples/app-frame/main.js';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -23,7 +20,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 
 describe('DL-007 inspector panel block cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-007-promote-inspector-panel-block.md');
+    const cycle = readRepoFile('docs/design/DL-007-promote-inspector-panel-block.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -84,6 +81,6 @@ describe('DL-007 inspector panel block cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-008-promote-guided-flow-block.md')).toBe(true);
+    expect(existsRepoPath('docs/BACKLOG/DL-008-promote-guided-flow-block.md')).toBe(true);
   });
 });

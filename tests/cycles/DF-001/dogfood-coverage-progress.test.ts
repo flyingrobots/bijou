@@ -1,14 +1,11 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -23,7 +20,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 
 describe('DF-001 DOGFOOD coverage progress cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DF-001-show-dogfood-coverage-progress.md');
+    const cycle = readRepoFile('docs/design/DF-001-show-dogfood-coverage-progress.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -56,6 +53,6 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
-    expect(existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md')).toBe(true);
+    expect(existsRepoPath('docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md')).toBe(true);
   });
 });

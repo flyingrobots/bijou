@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
+import { readRepoFile } from '../repo.js';
 import {
   createBrowsableListState,
   browsableListSurface,
@@ -10,13 +10,10 @@ import {
   commandPaletteSurface,
 } from '../../../packages/bijou-tui/src/command-palette.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('DL-003 shared surface pattern proof cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md');
+    const cycle = readRepoFile('docs/design/DL-003-prove-canonical-patterns-in-shared-surfaces.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -55,7 +52,7 @@ describe('DL-003 shared surface pattern proof cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
+    const cycle = readRepoFile('docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
     expect(cycle).toContain('# DL-004 — Prove Drawer Rhythm and Notice Rows');
   });
 });

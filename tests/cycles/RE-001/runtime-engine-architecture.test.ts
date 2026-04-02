@@ -1,23 +1,20 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('RE-001 runtime engine architecture cycle', () => {
   it('captures the new runtime-engine legend, invariants, design doc, and follow-on backlog slices', () => {
-    const legend = read('/Users/james/git/bijou/docs/legends/RE-runtime-engine.md');
-    const cycle = read('/Users/james/git/bijou/docs/design/RE-001-define-runtime-engine-architecture.md');
-    const stateInvariant = read('/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md');
-    const layoutInvariant = read('/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md');
-    const commandEffectInvariant = read('/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md');
-    const landedState = read('/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
-    const landedLayout = read('/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
-    const landedRouting = read('/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
-    const landedBuffers = read('/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md');
-    const landedComponents = read('/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md');
-    const backlogShell = read('/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
+    const legend = readRepoFile('docs/legends/RE-runtime-engine.md');
+    const cycle = readRepoFile('docs/design/RE-001-define-runtime-engine-architecture.md');
+    const stateInvariant = readRepoFile('docs/invariants/state-machine-and-view-stack-are-distinct.md');
+    const layoutInvariant = readRepoFile('docs/invariants/layout-owns-interaction-geometry.md');
+    const commandEffectInvariant = readRepoFile('docs/invariants/commands-change-state-effects-do-not.md');
+    const landedState = readRepoFile('docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md');
+    const landedLayout = readRepoFile('docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md');
+    const landedRouting = readRepoFile('docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
+    const landedBuffers = readRepoFile('docs/design/RE-005-buffer-commands-and-effects-separately.md');
+    const landedComponents = readRepoFile('docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md');
+    const backlogShell = readRepoFile('docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
     expect(legend).toContain('RE — Runtime Engine');
     expect(legend).toContain('state machines');

@@ -1,14 +1,11 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('HT-002 layered focus and interaction cycle', () => {
   it('captures the humane-terminal layer cycle and its landed follow-on implementation cycle', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md');
-    const implementationCycle = read('/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
+    const cycle = readRepoFile('docs/design/HT-002-layered-focus-and-interaction.md');
+    const implementationCycle = readRepoFile('docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
 
     expect(cycle).toContain('# HT-002 — Layered Focus and Interaction');
 
@@ -24,11 +21,11 @@ describe('HT-002 layered focus and interaction cycle', () => {
   });
 
   it('records the new dismiss-order invariant and doctrine links', () => {
-    const invariants = read('/Users/james/git/bijou/docs/invariants/README.md');
-    const invariant = read('/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md');
-    const shell = read('/Users/james/git/bijou/docs/strategy/humane-shell.md');
-    const patterns = read('/Users/james/git/bijou/docs/design-system/patterns.md');
-    const ux = read('/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md');
+    const invariants = readRepoFile('docs/invariants/README.md');
+    const invariant = readRepoFile('docs/invariants/topmost-layer-dismisses-first.md');
+    const shell = readRepoFile('docs/strategy/humane-shell.md');
+    const patterns = readRepoFile('docs/design-system/patterns.md');
+    const ux = readRepoFile('docs/strategy/bijou-ux-doctrine.md');
 
     expect(invariants).toContain('Topmost Layer Dismisses First');
     expect(invariant).toContain('dismiss actions should target the topmost dismissible layer');
