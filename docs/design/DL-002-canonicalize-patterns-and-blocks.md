@@ -1,6 +1,6 @@
 # DL-002 — Canonicalize Patterns and Blocks
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -85,11 +85,11 @@ An agent can evaluate or propose Bijou surfaces against explicit pattern languag
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -154,4 +154,4 @@ This cycle stayed documentation-first on purpose. It names the canonical pattern
 
 Spawned:
 
-- [DL-003 — Prove Canonical Patterns in Shared Surfaces](/Users/james/git/bijou/docs/BACKLOG/DL-003-prove-canonical-patterns-in-shared-surfaces.md)
+- [DL-003 — Prove Canonical Patterns in Shared Surfaces](../BACKLOG/DL-003-prove-canonical-patterns-in-shared-surfaces.md)

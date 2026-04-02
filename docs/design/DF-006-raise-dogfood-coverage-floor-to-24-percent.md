@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md)
+- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](./DF-005-raise-dogfood-coverage-floor-to-19-percent.md)
 
 ## Why this cycle exists
 
@@ -86,9 +86,9 @@ An agent can raise DOGFOOD to the 24% floor only by adding real stories for `Fra
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
 
 ## Invariants for this cycle
 
@@ -158,4 +158,4 @@ The cycle stayed intentionally narrow: two real structural stories, one ratchet 
 
 Spawned:
 
-- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](/Users/james/git/bijou/docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md)
+- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](./DF-007-raise-dogfood-coverage-floor-to-29-percent.md)

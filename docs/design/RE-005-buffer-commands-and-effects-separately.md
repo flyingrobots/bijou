@@ -4,14 +4,14 @@ _Cycle for formalizing buffered runtime outputs so routing can emit many command
 
 Legend:
 
-- [RE — Runtime Engine](/Users/james/git/bijou/docs/legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 Depends on:
 
-- [RE-001 — Define Runtime Engine Architecture](/Users/james/git/bijou/docs/design/RE-001-define-runtime-engine-architecture.md)
-- [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
-- [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md)
-- [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
+- [RE-001 — Define Runtime Engine Architecture](./RE-001-define-runtime-engine-architecture.md)
+- [RE-002 — Promote First-Class State Machine and View Stack](./RE-002-promote-first-class-state-machine-and-view-stack.md)
+- [RE-003 — Retain Layout Trees and Layout Invalidation](./RE-003-retain-layout-trees-and-layout-invalidation.md)
+- [RE-004 — Route Input Through Layouts and Layer Bubbling](./RE-004-route-input-through-layouts-and-layer-bubbling.md)
 
 ## Why this cycle exists
 
@@ -100,10 +100,10 @@ An agent can inspect runtime buffers and explain which stateful commands remain 
 
 ## Linked invariants
 
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
-- [State Machine and View Stack Are Distinct](/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md)
-- [Layout Owns Interaction Geometry](/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md)
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
+- [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
+- [Layout Owns Interaction Geometry](../invariants/layout-owns-interaction-geometry.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 
 ## Implementation outline
 
@@ -159,5 +159,5 @@ What did not land:
 
 Follow-on:
 
-- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

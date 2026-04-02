@@ -1,6 +1,6 @@
 # DF-002 — Expand DOGFOOD Component Family Coverage
 
-Legend: [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+Legend: [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 ## Idea
 

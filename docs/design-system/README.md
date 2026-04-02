@@ -32,7 +32,7 @@ Use these docs when you need to answer:
 5. [Component Families](./component-families.md)
 6. [Data Visualization Policy](./data-visualization.md)
 
-For the raw inventory and taxonomy work behind these docs, see [../COMPONENT_SYSTEM_AUDIT.md](../COMPONENT_SYSTEM_AUDIT.md).
+For the raw inventory and taxonomy work behind these docs, see [../archive/component-system-audit.md](../archive/component-system-audit.md).
 
 ## Core system ideas
 

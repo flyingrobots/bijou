@@ -99,6 +99,8 @@ Every active cycle design doc should include:
 
 ## Relationship to existing docs
 
+For the current docs entrypoint and "read this first" order, start at [docs/README.md](./README.md).
+
 Some older documents still reflect the previous planning model:
 
 - `docs/ROADMAP.md`

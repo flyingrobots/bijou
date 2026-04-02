@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-013 — Raise DOGFOOD Coverage Floor to 59%](/Users/james/git/bijou/docs/design/DF-013-raise-dogfood-coverage-floor-to-59-percent.md)
+- [DF-013 — Raise DOGFOOD Coverage Floor to 59%](./DF-013-raise-dogfood-coverage-floor-to-59-percent.md)
 
 ## Why this cycle exists
 
@@ -66,9 +66,9 @@ An agent can only satisfy DF-014 by adding real app-shell and workspace-layout s
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
 
 ## Implementation outline
 
@@ -102,4 +102,4 @@ No material drift.
 
 Spawned:
 
-- [DF-015 — Raise DOGFOOD Coverage Floor to 69%](/Users/james/git/bijou/docs/design/DF-015-raise-dogfood-coverage-floor-to-69-percent.md)
+- [DF-015 — Raise DOGFOOD Coverage Floor to 69%](./DF-015-raise-dogfood-coverage-floor-to-69-percent.md)

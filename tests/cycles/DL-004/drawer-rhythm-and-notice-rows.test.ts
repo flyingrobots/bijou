@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { readRepoFile } from '../repo.js';
 import {
   _resetDefaultContextForTesting,
   createTestContext,
@@ -22,9 +22,6 @@ import {
   type FramePage,
 } from '../../../packages/bijou-tui/src/app-frame.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 type Msg = { type: 'noop' };
 
@@ -73,7 +70,7 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
   afterAll(() => _resetDefaultContextForTesting());
 
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
+    const cycle = readRepoFile('docs/design/DL-004-prove-drawer-rhythm-and-notice-rows.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -160,7 +157,7 @@ describe('DL-004 drawer rhythm and notice rows cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');
+    const cycle = readRepoFile('docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md');
     expect(cycle).toContain('# DL-005 — Prove Inspector and Guided Flow Rhythm');
   });
 });

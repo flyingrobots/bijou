@@ -1,6 +1,6 @@
 # LX-001 — bijou-i18n Runtime Package
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -75,9 +75,9 @@ An agent can reason about localized runtime content through explicit catalog, lo
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -206,4 +206,4 @@ Under `packages/bijou-i18n/src/`:
 
 ### Debt spawned
 
-- [LX-002 — bijou-i18n Tools Package](/Users/james/git/bijou/docs/BACKLOG/LX-002-bijou-i18n-tools-package.md)
+- [LX-002 — bijou-i18n Tools Package](../BACKLOG/LX-002-bijou-i18n-tools-package.md)

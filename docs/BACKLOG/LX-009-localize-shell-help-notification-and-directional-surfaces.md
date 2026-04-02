@@ -1,6 +1,6 @@
 # LX-009 — Localize Shell Help, Notification, and Directional Surfaces
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Idea
 

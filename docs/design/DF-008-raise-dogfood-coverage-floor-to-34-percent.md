@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](/Users/james/git/bijou/docs/design/DF-007-raise-dogfood-coverage-floor-to-29-percent.md)
+- [DF-007 — Raise DOGFOOD Coverage Floor to 29%](./DF-007-raise-dogfood-coverage-floor-to-29-percent.md)
 
 ## Why this cycle exists
 
@@ -86,9 +86,9 @@ An agent can raise DOGFOOD to the 34% floor only by adding real `markdown()` and
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
 
 ## Invariants for this cycle
 
@@ -158,4 +158,4 @@ The cycle stayed focused on documentation-oriented surfaces instead of adding an
 
 Spawned:
 
-- [DF-009 — Raise DOGFOOD Coverage Floor to 39%](/Users/james/git/bijou/docs/design/DF-009-raise-dogfood-coverage-floor-to-39-percent.md)
+- [DF-009 — Raise DOGFOOD Coverage Floor to 39%](./DF-009-raise-dogfood-coverage-floor-to-39-percent.md)

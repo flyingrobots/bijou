@@ -8,7 +8,7 @@ First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 npm run dogfood
 ```
 
-You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](/Users/james/git/bijou/assets/bijou.txt), [assets/background.txt](/Users/james/git/bijou/assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](/Users/james/git/bijou/assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](/Users/james/git/bijou/assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
+You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
 
 On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs explorer.
 
@@ -64,4 +64,4 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - When no component is selected, the center lane now acts as an onboarding surface: it introduces Bijou itself and explains how to browse, search, configure, and navigate the docs before the user opens a component.
 - The explorer workspace now keeps a one-cell gutter around and between the three major columns so the shell chrome and pane rails do not feel visually chopped off at the frame edges.
 
-[← Examples](/Users/james/git/bijou/examples/README.md)
+[← Examples](../README.md)

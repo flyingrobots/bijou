@@ -46,22 +46,22 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Core invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [State Machine and View Stack Are Distinct](/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md)
-- [Layout Owns Interaction Geometry](/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md)
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
+- [Layout Owns Interaction Geometry](../invariants/layout-owns-interaction-geometry.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 
 ## Related doctrine
 
-- [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
-- [The Humane Shell](/Users/james/git/bijou/docs/strategy/humane-shell.md)
-- [Design-System Patterns](/Users/james/git/bijou/docs/design-system/patterns.md)
+- [Bijou UX Doctrine](../strategy/bijou-ux-doctrine.md)
+- [The Humane Shell](../strategy/humane-shell.md)
+- [Design-System Patterns](../design-system/patterns.md)
 
 ## Current cycle and backlog
 
 - active cycle:
-  - [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
+  - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - backlog:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

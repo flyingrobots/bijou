@@ -1,15 +1,12 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { readRepoFile } from '../repo.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('HT-003 layer stack routing cycle', () => {
   it('captures the implementation cycle and richer follow-on backlog item', () => {
-    const legend = read('/Users/james/git/bijou/docs/legends/HT-humane-terminal.md');
-    const cycle = read('/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
-    const nextCycle = read('/Users/james/git/bijou/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md');
+    const legend = readRepoFile('docs/legends/HT-humane-terminal.md');
+    const cycle = readRepoFile('docs/design/HT-003-implement-layer-stack-and-input-map-routing.md');
+    const nextCycle = readRepoFile('docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md');
 
     expect(legend).toContain('HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection');
 

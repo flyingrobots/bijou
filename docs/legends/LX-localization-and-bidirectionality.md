@@ -38,17 +38,17 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Core invariants
 
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Related doctrine
 
-- [Localization and Bidirectionality](/Users/james/git/bijou/docs/strategy/localization-and-bidirectionality.md)
-- [Content Guide](/Users/james/git/bijou/docs/strategy/content-guide.md)
+- [Localization and Bidirectionality](../strategy/localization-and-bidirectionality.md)
+- [Content Guide](../strategy/content-guide.md)
 
 ## Current cycle and backlog
 
-- latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](/Users/james/git/bijou/docs/design/LX-008-localize-shell-chrome-and-dogfood.md)
+- latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](../design/LX-008-localize-shell-chrome-and-dogfood.md)
 - backlog:
-  - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](/Users/james/git/bijou/docs/BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
-  - [LX-007 — Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-007-service-oriented-localization-adapters.md)
+  - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
+  - [LX-007 — Service-Oriented Localization Adapters](../BACKLOG/LX-007-service-oriented-localization-adapters.md)

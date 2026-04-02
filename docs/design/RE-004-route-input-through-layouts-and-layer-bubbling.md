@@ -4,13 +4,13 @@ _Cycle for making retained layouts the authoritative routing surface for input, 
 
 Legend:
 
-- [RE — Runtime Engine](/Users/james/git/bijou/docs/legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 Depends on:
 
-- [RE-001 — Define Runtime Engine Architecture](/Users/james/git/bijou/docs/design/RE-001-define-runtime-engine-architecture.md)
-- [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
-- [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md)
+- [RE-001 — Define Runtime Engine Architecture](./RE-001-define-runtime-engine-architecture.md)
+- [RE-002 — Promote First-Class State Machine and View Stack](./RE-002-promote-first-class-state-machine-and-view-stack.md)
+- [RE-003 — Retain Layout Trees and Layout Invalidation](./RE-003-retain-layout-trees-and-layout-invalidation.md)
 
 ## Why this cycle exists
 
@@ -94,11 +94,11 @@ An agent can inspect the runtime routing result and explain which layers were vi
 
 ## Linked invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [Layout Owns Interaction Geometry](/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md)
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [Layout Owns Interaction Geometry](../invariants/layout-owns-interaction-geometry.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 
 ## Implementation outline
 
@@ -154,6 +154,6 @@ What did not land:
 
 Follow-on:
 
-- [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md)
-- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
+- [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

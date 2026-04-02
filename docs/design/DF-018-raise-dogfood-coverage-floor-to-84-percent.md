@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-017 — Raise DOGFOOD Coverage Floor to 79%](/Users/james/git/bijou/docs/design/DF-017-raise-dogfood-coverage-floor-to-79-percent.md)
+- [DF-017 — Raise DOGFOOD Coverage Floor to 79%](./DF-017-raise-dogfood-coverage-floor-to-79-percent.md)
 
 ## Why this cycle exists
 
@@ -57,8 +57,8 @@ An agent can only satisfy DF-018 by adding real branding and shader stories with
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Implementation outline
 
@@ -90,4 +90,4 @@ No material drift.
 
 Spawned:
 
-- [DF-019 — Raise DOGFOOD Coverage Floor to 100%](/Users/james/git/bijou/docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md)
+- [DF-019 — Raise DOGFOOD Coverage Floor to 100%](./DF-019-raise-dogfood-coverage-floor-to-100-percent.md)

@@ -4,11 +4,11 @@ _Cycle for turning DOGFOOD coverage honesty into a CI-enforced release gate inst
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-001 — Show DOGFOOD Coverage Progress](/Users/james/git/bijou/docs/design/DF-001-show-dogfood-coverage-progress.md)
+- [DF-001 — Show DOGFOOD Coverage Progress](./DF-001-show-dogfood-coverage-progress.md)
 
 ## Why this cycle exists
 
@@ -77,9 +77,9 @@ An agent can determine from source-controlled policy whether the current DOGFOOD
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
 
 ## Implementation outline
 
@@ -124,4 +124,4 @@ What did not land:
 
 Follow-on:
 
-- [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](/Users/james/git/bijou/docs/BACKLOG/DF-004-raise-dogfood-coverage-floor-to-next-target.md)
+- [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](../BACKLOG/DF-004-raise-dogfood-coverage-floor-to-next-target.md)

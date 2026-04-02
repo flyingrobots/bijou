@@ -2,9 +2,9 @@
 
 Scaffold a new Bijou TUI app with batteries-included defaults.
 
-## What's New in v3.0.0
+## Package Role in v4.0.0
 
-- **Canonical V3 starter** — generated apps target the current `@flyingrobots/bijou-tui` + `@flyingrobots/bijou-tui-app` path instead of an older string-only shell story.
+- **Canonical starter** — generated apps target the current `@flyingrobots/bijou-tui` + `@flyingrobots/bijou-tui-app` path instead of an older shell-starter path.
 - **Public API only** — the scaffolded app uses public package APIs so it can serve as a downstream canary for real-world upgrades.
 - **Release-aligned defaults** — the generated project matches the same shell/runtime split described in the root docs and migration guide.
 

@@ -2,12 +2,12 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-003 — Enforce DOGFOOD Coverage Floor](/Users/james/git/bijou/docs/design/DF-003-enforce-dogfood-coverage-floor.md)
-- [DF-002 — Expand DOGFOOD Component Family Coverage](/Users/james/git/bijou/docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+- [DF-003 — Enforce DOGFOOD Coverage Floor](./DF-003-enforce-dogfood-coverage-floor.md)
+- [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
 
 ## Why this cycle exists
 
@@ -86,9 +86,9 @@ An agent can raise the DOGFOOD floor to the next target only by adding real stor
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -152,4 +152,4 @@ This cycle stayed intentionally narrow: two honest families, one ratchet step, a
 
 Spawned:
 
-- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md)
+- [DF-005 — Raise DOGFOOD Coverage Floor to 19%](./DF-005-raise-dogfood-coverage-floor-to-19-percent.md)

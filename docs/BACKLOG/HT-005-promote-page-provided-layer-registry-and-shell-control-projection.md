@@ -2,11 +2,11 @@
 
 Legend:
 
-- [HT — Humane Terminal](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 Depends on:
 
-- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](/Users/james/git/bijou/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
+- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
 
 ## Goal
 

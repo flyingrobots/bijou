@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 import {
   _resetDefaultContextForTesting,
   createTestContext,
@@ -11,16 +11,13 @@ import {
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('DL-006 inspector panel rhythm cycle', () => {
   beforeAll(() => setDefaultContext(createTestContext({ mode: 'interactive' })));
   afterAll(() => _resetDefaultContextForTesting());
 
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-006-prove-inspector-panel-rhythm.md');
+    const cycle = readRepoFile('docs/design/DL-006-prove-inspector-panel-rhythm.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -103,12 +100,12 @@ describe('DL-006 inspector panel rhythm cycle', () => {
   });
 
   it('spawns the next design-language backlog item', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DL-006-prove-inspector-panel-rhythm.md');
+    const cycle = readRepoFile('docs/design/DL-006-prove-inspector-panel-rhythm.md');
 
     expect(cycle).toContain('[DL-007 — Promote Inspector Panel Block]');
     expect(
-      existsSync('/Users/james/git/bijou/docs/BACKLOG/DL-007-promote-inspector-panel-block.md') ||
-      existsSync('/Users/james/git/bijou/docs/design/DL-007-promote-inspector-panel-block.md'),
+      existsRepoPath('docs/BACKLOG/DL-007-promote-inspector-panel-block.md') ||
+      existsRepoPath('docs/design/DL-007-promote-inspector-panel-block.md'),
     ).toBe(true);
   });
 });

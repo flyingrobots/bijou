@@ -1,6 +1,6 @@
 # DF-001 — Show DOGFOOD Coverage Progress
 
-Legend: [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+Legend: [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 ## Why this cycle exists
 
@@ -79,9 +79,9 @@ An agent can add or remove DOGFOOD story coverage and see the docs-pane progress
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -140,4 +140,4 @@ That is intentional. The goal here is honesty first, not pretending that a progr
 
 Spawned:
 
-- [DF-002 — Expand DOGFOOD Component Family Coverage](/Users/james/git/bijou/docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+- [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)

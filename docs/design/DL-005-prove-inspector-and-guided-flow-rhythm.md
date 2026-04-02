@@ -1,6 +1,6 @@
 # DL-005 — Prove Inspector and Guided Flow Rhythm
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -14,7 +14,7 @@ The next design-language proof should move into another likely future block cand
 
 Inspector panels are still part of the original idea, but they should not share a cycle with guided-flow proof if that forces us to invent two half-finished surfaces.
 
-This cycle exists to prove the guided-flow side first by turning the [AI Explainability Standard](/Users/james/git/bijou/docs/strategy/ai-explainability-standard.md) into a canonical component instead of leaving it as doctrine only.
+This cycle exists to prove the guided-flow side first by turning the [AI Explainability Standard](../strategy/ai-explainability-standard.md) into a canonical component instead of leaving it as doctrine only.
 
 ## Scope of this cycle
 
@@ -84,9 +84,9 @@ An agent can point to one reusable explainability surface and show that Bijou’
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -148,4 +148,4 @@ Trying to prove guided-flow and inspector language in the same cycle would have 
 
 Spawned:
 
-- [DL-006 — Prove Inspector Panel Rhythm](/Users/james/git/bijou/docs/BACKLOG/DL-006-prove-inspector-panel-rhythm.md)
+- [DL-006 — Prove Inspector Panel Rhythm](../BACKLOG/DL-006-prove-inspector-panel-rhythm.md)

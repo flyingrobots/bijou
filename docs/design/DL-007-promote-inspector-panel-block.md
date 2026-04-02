@@ -1,6 +1,6 @@
 # DL-007 — Promote Inspector Panel Block
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -83,11 +83,11 @@ An agent can point to one canonical `inspectorDrawer()` helper, prove it in two 
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -151,4 +151,4 @@ The right promotion step was one block helper composed from stable patterns and 
 
 Spawned:
 
-- [DL-008 — Promote Guided Flow Block](/Users/james/git/bijou/docs/BACKLOG/DL-008-promote-guided-flow-block.md)
+- [DL-008 — Promote Guided Flow Block](../BACKLOG/DL-008-promote-guided-flow-block.md)

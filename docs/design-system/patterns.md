@@ -51,7 +51,7 @@ The accent should describe ownership of input, not merely visual importance.
 
 #### Visible controls are a promise
 
-Follow [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md).
+Follow [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md).
 
 If a region is not active, its controls should not be advertised as though they will work.
 

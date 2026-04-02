@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-006 — Raise DOGFOOD Coverage Floor to 24%](/Users/james/git/bijou/docs/design/DF-006-raise-dogfood-coverage-floor-to-24-percent.md)
+- [DF-006 — Raise DOGFOOD Coverage Floor to 24%](./DF-006-raise-dogfood-coverage-floor-to-24-percent.md)
 
 ## Why this cycle exists
 
@@ -86,9 +86,9 @@ An agent can raise DOGFOOD to the 29% floor only by adding real `toast()` and `l
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
 
 ## Invariants for this cycle
 
@@ -158,4 +158,4 @@ The cycle intentionally over-earned the floor by documenting two related familie
 
 Spawned:
 
-- [DF-008 — Raise DOGFOOD Coverage Floor to 34%](/Users/james/git/bijou/docs/design/DF-008-raise-dogfood-coverage-floor-to-34-percent.md)
+- [DF-008 — Raise DOGFOOD Coverage Floor to 34%](./DF-008-raise-dogfood-coverage-floor-to-34-percent.md)

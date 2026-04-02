@@ -1,23 +1,26 @@
 # Architecture — Bijou
 
-See also:
+This document is the structural reference for the current repository shape.
 
-- [Bijou Vision](strategy/bijou-vision.md)
-- [Current Plan](PLAN.md)
+If you want the current execution order, read [PLAN.md](./PLAN.md).
+If you want the public front door, read [../README.md](../README.md).
 
 ## Overview
 
-Bijou is a five-package monorepo for building terminal interfaces in TypeScript.
+Bijou is a nine-package monorepo for terminal software in TypeScript.
 
-The important design decision in `3.0.0` is the product split:
+The repo now has three connected lanes:
 
-- `@flyingrobots/bijou` is the pure, degradation-first terminal toolkit.
-- `@flyingrobots/bijou-tui` is the high-fidelity interactive runtime.
-- `@flyingrobots/bijou-node` is the Node adapter layer plus Node-specific runtime utilities.
-- `@flyingrobots/bijou-tui-app` is the batteries-included framed shell.
-- `create-bijou-tui-app` scaffolds new apps using that stack.
+- a degradation-first core toolkit for prompts, components, surfaces, and output-mode-aware rendering
+- a surface-first interactive runtime and framed shell stack for full-screen TUI apps
+- a localization runtime and tooling lane that supports catalogs, direction, exchange workflows, and shell/docs localization
 
-The repo still follows Ports and Adapters (hexagonal) at the core. The V3 work did not replace that architecture; it tightened the runtime/rendering story around it.
+The architectural posture after `v4.0.0` is:
+
+- keep the core toolkit honest about degradation and string/surface seams
+- keep the fullscreen runtime honest about its `Surface | LayoutNode` boundary
+- use DOGFOOD as the proving surface for shell, design-language, and runtime behavior
+- keep the current execution center of gravity on the runtime-engine seams described in [PLAN.md](./PLAN.md)
 
 ## Package Graph
 
@@ -26,106 +29,146 @@ create-bijou-tui-app
         │
         │ scaffolds apps that use
         ▼
-@flyingrobots/bijou
-├── @flyingrobots/bijou-tui
-│   └── @flyingrobots/bijou-node
-└── @flyingrobots/bijou-tui-app
-    └── depends on @flyingrobots/bijou-tui
+@flyingrobots/bijou       @flyingrobots/bijou-i18n
+        │                         │
+        │ peer / runtime base     └── @flyingrobots/bijou-i18n-tools
+        ▼                                  ├── @flyingrobots/bijou-i18n-tools-node
+@flyingrobots/bijou-tui                     └── @flyingrobots/bijou-i18n-tools-xlsx
+        │
+        ├── @flyingrobots/bijou-node
+        └── @flyingrobots/bijou-tui-app
 ```
 
 Key facts:
 
-- `@flyingrobots/bijou` has zero runtime dependencies.
-- `@flyingrobots/bijou-tui` depends on the core package.
-- `@flyingrobots/bijou-node` now depends on `@flyingrobots/bijou-tui` because it owns the worker runtime and native recorder APIs in addition to the port adapters.
+- `@flyingrobots/bijou` remains the pure foundation.
+- `@flyingrobots/bijou-tui` depends on `@flyingrobots/bijou-i18n` and peers on `@flyingrobots/bijou`.
+- `@flyingrobots/bijou-node` depends on `@flyingrobots/bijou-tui` and peers on `@flyingrobots/bijou`.
 - `@flyingrobots/bijou-tui-app` depends on both the core and runtime packages.
+- the localization tooling lane is now real workspace surface area, not only roadmap intent.
 
 ## Package Responsibilities
 
 ### `@flyingrobots/bijou`
 
-This is the stable, pure foundation:
+The stable, pure foundation:
 
-- components, prompts, layout helpers, and themes
-- output-mode detection and graceful degradation
-- the `RuntimePort`, `IOPort`, and `StylePort` interfaces
-- test adapters and deterministic test contexts
-- the `Surface` and `LayoutNode` primitives used by the V3 runtime
+- prompts, components, output helpers, and themes
+- output-mode detection and graceful lowering
+- `Surface` primitives and composition helpers
+- ports such as `RuntimePort`, `IOPort`, and `StylePort`
+- deterministic test adapters and context helpers
 
-This package intentionally supports both string-oriented and surface-oriented APIs. `3.0.0` does not require every component to be surface-native.
+This package is intentionally mixed-mode. Some APIs are string-first, some are surface-first, and that is still the correct product shape.
 
 ### `@flyingrobots/bijou-tui`
 
-This is the V3 runtime layer:
+The interactive runtime:
 
-- TEA `App`/`Cmd` loop
-- input, resize, mouse, and animation pulse handling
-- layout and overlay primitives
-- motion, transition shaders, and render pipeline middleware
-- framed shell composition helpers and sub-app lifecycle helpers
+- TEA `App` / `Cmd` loop
+- fullscreen rendering, diffing, resize, mouse, and pulse handling
+- layout trees and surface composition
+- overlays, shell primitives, transitions, and runtime-engine seams
+- framed shell support and sub-app lifecycle helpers
 
-The public runtime contract is now `ViewOutput`:
+The public render boundary is:
 
 ```ts
 type ViewOutput = Surface | LayoutNode;
 ```
 
-The runtime is now pure at the frame boundary. If you still need string output, convert explicitly at the edge instead of teaching the runtime to round-trip text.
+The runtime should not pretend that raw strings are still a fullscreen render contract.
 
 ### `@flyingrobots/bijou-node`
 
-This package owns the Node boundary:
+The Node boundary:
 
 - `nodeRuntime()`, `nodeIO()`, and `chalkStyle()`
 - `createNodeContext()` / `initDefaultContext()`
-- worker runtime helpers: `runInWorker()` and `startWorkerApp()`
-- native demo recorder helpers such as `recordDemoGif()`
+- worker runtime helpers
+- recorder helpers and native surface-to-GIF capture
+
+This package owns integration with the host process, filesystem, timers, and terminal behavior.
 
 ### `@flyingrobots/bijou-tui-app`
 
-This package provides the opinionated framed shell:
+The opinionated shell layer:
 
-- tab/header/footer chrome
-- help and command-palette plumbing
-- drawer and modal flows
-- a ready-to-run TUI app skeleton
+- framed app structure
+- header/footer/help/search/settings/notification shell surfaces
+- common overlay and pane-management flows
+- a strong default product shell for TUI applications
 
-The shell now accepts `ViewOutput` at pane boundaries, not just string blocks.
+This package is where shell quality becomes visible fastest, which is why DOGFOOD keeps using it as the first proving surface.
 
 ### `create-bijou-tui-app`
 
-This is the scaffolder:
+The scaffolder:
 
-- generates a runnable TypeScript app
-- uses only public package APIs
-- targets the framed-shell V3 path by default
+- generates a runnable TUI app
+- targets the current public shell/runtime path
+- should stay aligned with the actual release-ready stack rather than internal repo folklore
 
-## Hexagonal Core
+### `@flyingrobots/bijou-i18n`
 
-Three ports define the pure/platform boundary:
+The in-memory localization runtime:
+
+- catalogs and locale selection
+- direction (`ltr` / `rtl`) resolution
+- runtime-safe lookup seams
+
+This keeps shell and docs localization out of hidden string tables and ad hoc app-local structures.
+
+### `@flyingrobots/bijou-i18n-tools`
+
+Localization workflow tooling:
+
+- catalog authoring and compilation support
+- stale-detection and exchange workflow seams
+- the non-runtime layer for working with localization assets
+
+### `@flyingrobots/bijou-i18n-tools-node`
+
+Node-side localization helpers:
+
+- filesystem and local exchange workflows for the tooling lane
+
+### `@flyingrobots/bijou-i18n-tools-xlsx`
+
+Spreadsheet exchange adapters:
+
+- XLSX import/export helpers for localization workflows
+
+## Core Architectural Posture
+
+Bijou still follows a ports-and-adapters core.
+
+Three ports remain the important purity boundary:
 
 | Port | Responsibility | Representative methods |
 |------|----------------|------------------------|
 | `RuntimePort` | environment and terminal facts | `env()`, `stdoutIsTTY`, `stdinIsTTY`, `columns`, `rows` |
-| `IOPort` | input/output and timers | `write()`, `question()`, `rawInput()`, `onResize()`, `setInterval()`, `readFile()` |
-| `StylePort` | text styling | `styled()`, `rgb()`, `hex()`, `bold()` |
+| `IOPort` | output, input, timers, files | `write()`, `question()`, `rawInput()`, `onResize()`, `setInterval()`, `readFile()` |
+| `StylePort` | styling and color decisions | `styled()`, `rgb()`, `hex()`, `bold()` |
 
-Adapters live outside the core:
+Adapters continue to live outside the core:
 
 | Adapter | Package | Wraps |
 |---------|---------|-------|
-| `nodeRuntime()` | `@flyingrobots/bijou-node` | `process.env`, `process.stdout` |
-| `nodeIO()` | `@flyingrobots/bijou-node` | stdin/stdout, readline, fs |
+| `nodeRuntime()` | `@flyingrobots/bijou-node` | process and terminal facts |
+| `nodeIO()` | `@flyingrobots/bijou-node` | stdin/stdout, timers, filesystem |
 | `chalkStyle()` | `@flyingrobots/bijou-node` | Chalk |
-| `mockRuntime()` | `@flyingrobots/bijou/adapters/test` | deterministic runtime stub |
-| `mockIO()` | `@flyingrobots/bijou/adapters/test` | captured writes, canned answers |
-| `plainStyle()` | `@flyingrobots/bijou/adapters/test` | no-op styling |
+| `mockRuntime()` | `@flyingrobots/bijou` test adapters | deterministic runtime stub |
+| `mockIO()` | `@flyingrobots/bijou` test adapters | captured writes, canned answers |
+| `plainStyle()` | `@flyingrobots/bijou` test adapters | no-op styling |
 
-## Rendering Model
+The i18n packages add another explicit runtime/tooling seam instead of burying locale behavior inside app-specific strings.
+
+## Rendering And Runtime Model
 
 ### Core Toolkit Path
 
-For CLI-first flows, the model is still straightforward:
+For CLI-first flows, the model is still deliberately simple:
 
 ```text
 data + options
@@ -135,91 +178,80 @@ data + options
   -> stdout / tests / pipe / accessibility flow
 ```
 
-That path is intentionally simple and degradation-first.
+That degradation-first path is still core to Bijou's identity.
 
-### V3 Runtime Path
+### Interactive Runtime Path
 
-The interactive runtime uses a stricter pipeline:
+The fullscreen runtime is stricter:
 
 ```text
 stdin / resize / mouse / pulse
   -> event bus
   -> update(msg, model)
   -> [model, cmds]
-  -> view(model): ViewOutput
-  -> normalize ViewOutput
-  -> Surface
-  -> render pipeline middleware
+  -> view(model): Surface | LayoutNode
+  -> normalize layout/view output
+  -> surface
   -> diff renderer
   -> terminal output
 ```
 
-Important release-truth points for `3.0.0`:
+The current post-`v4.0.0` architectural work is making the engine seams beneath that loop more explicit:
 
-- `App.view` accepts `Surface | LayoutNode`.
-- framed pane renderers accept the same `ViewOutput` contract.
-- the runtime and app-shell path is surface/layout-native at the frame boundary.
-- string-first APIs still exist in the core toolkit, but they are not part of the fullscreen runtime contract.
+- retained layouts
+- layout-driven input routing
+- separate command and effect buffering
+- explicit component interaction contracts
+- shell migration onto those seams
 
-## BCSS And Styling Scope
+See [PLAN.md](./PLAN.md) and the [RE legend](./legends/RE-runtime-engine.md) for sequencing.
 
-`run(app, { css })` installs BCSS resolution into the runtime context.
+## DOGFOOD As Architecture Pressure
 
-Guaranteed in `3.0.0`:
+DOGFOOD is not just docs. It is where the architecture gets pressured in public.
 
-- `Type`, `.class`, and `#id` selectors
-- `var(token.path)` lookups
-- terminal width/height media queries
-- documented text-style support on V3 surface primitives and frame shell regions
+It currently proves:
 
-Not guaranteed in `3.0.0`:
+- the framed shell under real app behavior
+- the design-system field guide in a living TUI
+- search, settings, help, quit, and layout behavior in one product surface
+- localization and graceful-lowering concerns in the same runtime stack
 
-- a global CSS cascade over arbitrary layout nodes
-- blanket styling of every component in the repo
-
-That scope is deliberate and reflected in the public docs.
-
-## Sub-Apps And Composition
-
-Nested TEA composition is supported through:
-
-- `mount()` for rendering child views
-- `initSubApp()` for child initialization
-- `updateSubApp()` for child update + command mapping
-- `mapCmds()` for explicit command translation
-
-`mount()` alone is not the whole lifecycle story.
+That is why DOGFOOD now matters architecturally, not just editorially.
 
 ## Output Modes
 
-The core toolkit and Node adapter continue to auto-detect output modes:
+The repo still treats graceful lowering as a first-class rule:
 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
-| `interactive` | TTY stdout | full color, motion, input loop |
-| `static` | CI with TTY stdout | single-frame render, no interactive loop |
+| `interactive` | TTY stdout | full runtime, color, input, motion, shell chrome |
+| `static` | CI with TTY stdout | single-frame render, no interaction loop |
 | `pipe` | non-TTY stdout, `NO_COLOR`, or `TERM=dumb` | plain-text-safe output |
 | `accessible` | `BIJOU_ACCESSIBLE=1` | linearized, screen-reader-friendly output |
 
-That degradation-first behavior is still part of Bijou's identity in `3.0.0`.
+The core toolkit and the runtime do not treat those modes as afterthoughts.
 
-## Test And Release Gates
+## Examples, DOGFOOD, And Release Truth
 
-The repo's release-ready gates for `3.0.0` are:
+The repo still has canonical example coverage, but the direction has shifted:
 
-- `npm run build`
-- `npm run lint`
-- `npm test`
-- `npm run typecheck:test`
-- `npm run smoke:examples:all`
-- `npm pack --dry-run --workspaces`
+- DOGFOOD is the primary living-docs and proving surface
+- a smaller set of canonical examples still carries runtime, migration, and reference value
+- the repo is moving toward DOGFOOD-centered smoke coverage instead of relying forever on example sprawl
 
-The examples suite is part of the release contract now, not a side project.
+See:
 
-## Design Principles
+- [DOGFOOD docs surface](../examples/docs/README.md)
+- [Curated Example Map](./EXAMPLES.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
-1. Ports over platform imports.
-2. Graceful degradation first for the core toolkit.
-3. Honest public contracts for the runtime and shell.
-4. Pure state transitions for animation, layout, and TEA updates.
-5. Runtime purity matters: convert explicitly when `Surface` output must cross into string-first toolkit APIs.
+## What This File Is Not
+
+This is not the planning source of truth.
+
+Use:
+
+- [Documentation Map](./README.md) for the docs entrypoint
+- [PLAN.md](./PLAN.md) for current execution order
+- [ROADMAP.md](./ROADMAP.md) only as the broader legacy/reference surface

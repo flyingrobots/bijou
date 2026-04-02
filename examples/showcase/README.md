@@ -28,4 +28,4 @@ Use a `Surface` preview when the component being demonstrated is already surface
 - The badge preview now uses structured surface composition instead of lowering each badge individually.
 - The showcase still presents all three modes side by side so degradation behavior stays visible.
 
-[← Examples](/Users/james/git/bijou/examples/README.md)
+[← Examples](../README.md)

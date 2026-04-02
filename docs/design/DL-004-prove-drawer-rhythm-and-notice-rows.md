@@ -1,6 +1,6 @@
 # DL-004 — Prove Drawer Rhythm and Notice Rows
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -90,10 +90,10 @@ An agent can point to concrete drawer/notice-row behavior that follows the docum
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
 
 ## Invariants for this cycle
 
@@ -150,4 +150,4 @@ This cycle intentionally kept behavior stable and only proved calmer structure a
 
 Spawned:
 
-- [DL-005 — Prove Inspector and Guided Flow Rhythm](/Users/james/git/bijou/docs/BACKLOG/DL-005-prove-inspector-and-guided-flow-rhythm.md)
+- [DL-005 — Prove Inspector and Guided Flow Rhythm](../BACKLOG/DL-005-prove-inspector-and-guided-flow-rhythm.md)

@@ -22,7 +22,7 @@ The goal is not to design the forever-schema. The goal is to create the smallest
 
 ## The problem with `ComponentEntry`
 
-Today’s showcase contract in [examples/showcase/types.ts](/Users/james/git/bijou/examples/showcase/types.ts) is useful, but too compressed:
+Today’s showcase contract in [examples/showcase/types.ts](../../examples/showcase/types.ts) is useful, but too compressed:
 
 - `description` is one markdown blob
 - `render(width, ctx)` is one opaque demo function

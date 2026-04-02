@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 import {
   DOGFOOD_COVERAGE_FLOOR_PERCENT,
   DOGFOOD_COVERAGE_INCREMENT_PERCENT,
@@ -8,13 +8,10 @@ import {
 import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 
-function read(path: string): string {
-  return readFileSync(path, 'utf8');
-}
 
 describe('DF-004 DOGFOOD coverage ratchet cycle', () => {
   it('creates an active cycle doc with the required workflow sections', () => {
-    const cycle = read('/Users/james/git/bijou/docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md');
+    const cycle = readRepoFile('docs/design/DF-004-raise-dogfood-coverage-floor-to-next-target.md');
 
     expect(cycle).toContain('## Human playback');
     expect(cycle).toContain('## Agent playback');
@@ -43,8 +40,8 @@ describe('DF-004 DOGFOOD coverage ratchet cycle', () => {
 
   it('spawns the next DOGFOOD backlog item', () => {
     expect(
-      existsSync('/Users/james/git/bijou/docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md') ||
-      existsSync('/Users/james/git/bijou/docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md'),
+      existsRepoPath('docs/BACKLOG/DF-005-raise-dogfood-coverage-floor-to-19-percent.md') ||
+      existsRepoPath('docs/design/DF-005-raise-dogfood-coverage-floor-to-19-percent.md'),
     ).toBe(true);
   });
 });

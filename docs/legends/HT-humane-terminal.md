@@ -37,21 +37,21 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 
 ## Core invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Related doctrine
 
-- [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
-- [The Humane Shell](/Users/james/git/bijou/docs/strategy/humane-shell.md)
+- [Bijou UX Doctrine](../strategy/bijou-ux-doctrine.md)
+- [The Humane Shell](../strategy/humane-shell.md)
 
 ## Current cycle and backlog
 
 - active cycle:
-  - [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](/Users/james/git/bijou/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
+  - [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
 - backlog:
-  - [HT-001 — Notification Center Polish and Discoverability](/Users/james/git/bijou/docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md)
-  - [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](/Users/james/git/bijou/docs/BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)
+  - [HT-001 — Notification Center Polish and Discoverability](../BACKLOG/HT-001-notification-center-polish-and-discoverability.md)
+  - [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)

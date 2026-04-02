@@ -8,7 +8,7 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox, table, badge, spinner } from '@flyingrobots/bijou';
+import { box, headerBox, table, badge } from '@flyingrobots/bijou';
 
 initDefaultContext();
 ```
@@ -17,7 +17,9 @@ initDefaultContext();
 
 ## Components
 
-Every component returns a string. Print it however you like — `console.log`, `process.stdout.write`, or pass it to another component.
+Many core helpers return strings. Surface primitives and runtime-friendly companions such as `boxSurface()` and `tableSurface()` return `Surface` instead.
+
+Use string-first helpers when the endpoint is still CLI output. Use the surface path when the surrounding app is already rendering structured output. Cross that seam explicitly with `surfaceToString(surface, ctx.style)` when you truly need text again.
 
 ### Choosing feedback surfaces
 
@@ -63,7 +65,7 @@ console.log(table(data, {
 }));
 ```
 
-Use `table()` when passive row/column comparison is the job. If your V3 app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
+Use `table()` when passive row/column comparison is the job. If your runtime app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
 
 ### Hierarchy & chronology
 

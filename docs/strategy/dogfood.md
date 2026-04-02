@@ -96,7 +96,7 @@ This milestone should follow these principles:
 
 ### Current validation slice
 
-The first implementation slice now lives in [examples/docs](/Users/james/git/bijou/examples/docs/README.md).
+The first implementation slice now lives in [examples/docs](../../examples/docs/README.md).
 
 It is intentionally small:
 
