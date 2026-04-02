@@ -24,7 +24,7 @@ Key changes:
 - framed shells, overlays, transitions, viewport helpers, and most higher-value layout/runtime paths now stay on the surface path instead of relying on implicit string fallback
 - the core toolkit still supports string-first CLI and prompt flows where that is the right abstraction
 - the repo includes deterministic tests, example smoke coverage, scaffold canaries, and release-readiness checks
-- 
+
 In short: the runtime is surface-first, but the toolkit is not string-free. This is a more honest and focused evolution than claiming “everything is now a surface.”
 
 ## Package Map
