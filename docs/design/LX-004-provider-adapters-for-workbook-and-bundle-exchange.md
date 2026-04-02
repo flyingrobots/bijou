@@ -1,6 +1,6 @@
 # LX-004 — Provider Adapters for Workbook and Bundle Exchange
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -87,9 +87,9 @@ An agent can move localization exchange data through explicit adapter APIs inste
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -199,4 +199,4 @@ That is correct for this cycle. LX-004 proved the adapter surface with plain tex
 
 Spawned:
 
-- [LX-005 — Rich Spreadsheet and Filesystem Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-005-rich-spreadsheet-and-filesystem-adapters.md)
+- [LX-005 — Rich Spreadsheet and Filesystem Adapters](../BACKLOG/LX-005-rich-spreadsheet-and-filesystem-adapters.md)

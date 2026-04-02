@@ -1,6 +1,6 @@
 # DL-001 — Capture Design Language Doctrine
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -91,11 +91,11 @@ An agent can review or propose Bijou UX with explicit doctrine, playbacks, and b
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -167,4 +167,4 @@ This cycle intentionally stayed documentation-only and did not try to fold the d
 
 Spawned:
 
-- [DL-002 — Canonicalize Patterns and Blocks](/Users/james/git/bijou/docs/BACKLOG/DL-002-canonicalize-patterns-and-blocks.md)
+- [DL-002 — Canonicalize Patterns and Blocks](../BACKLOG/DL-002-canonicalize-patterns-and-blocks.md)

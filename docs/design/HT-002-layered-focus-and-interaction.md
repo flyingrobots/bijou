@@ -4,7 +4,7 @@ _Cycle for defining how Bijou shells should treat focus layers, dismiss order, a
 
 Legend:
 
-- [HT — Humane Terminal](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 ## Why this cycle exists
 
@@ -92,10 +92,10 @@ An agent can inspect or infer a single active layer stack and know which input m
 
 ## Linked invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
 
 ## Proposed direction
 
@@ -198,4 +198,4 @@ What it clarified:
 Drift and follow-on:
 
 - the runtime still routes most shell layers ad hoc today
-- that follow-on has now landed as [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md)
+- that follow-on has now landed as [HT-003 — Implement Layer Stack and Input Map Routing](./HT-003-implement-layer-stack-and-input-map-routing.md)

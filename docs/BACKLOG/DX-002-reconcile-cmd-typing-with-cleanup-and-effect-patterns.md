@@ -1,6 +1,6 @@
 # DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns
 
-Legend: [DX — Developer Experience](/Users/james/git/bijou/docs/legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
 ## Idea
 

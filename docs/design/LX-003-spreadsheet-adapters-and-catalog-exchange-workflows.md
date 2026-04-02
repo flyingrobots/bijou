@@ -1,6 +1,6 @@
 # LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -94,9 +94,9 @@ An agent can reason about localization exchange through explicit workbook/bundle
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -209,4 +209,4 @@ That is correct for this cycle. LX-003 defined the exchange seam those adapters 
 
 Spawned:
 
-- [LX-004 — Provider Adapters for Workbook and Bundle Exchange](/Users/james/git/bijou/docs/BACKLOG/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md)
+- [LX-004 — Provider Adapters for Workbook and Bundle Exchange](../BACKLOG/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md)

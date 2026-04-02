@@ -1,6 +1,6 @@
 # DL-008 — Promote Guided Flow Block
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Idea
 

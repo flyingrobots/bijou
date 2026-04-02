@@ -39,23 +39,23 @@ An agent can measure current DOGFOOD component-family coverage against the canon
 
 ## Core invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Related doctrine
 
-- [Humane Shell](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
-- [Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
-- [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
+- [Humane Shell](./HT-humane-terminal.md)
+- [Design Language](./DL-design-language.md)
+- [Bijou UX Doctrine](../strategy/bijou-ux-doctrine.md)
 
 ## Current cycle and backlog
 
-- latest completed cycle: [DF-019 — Raise DOGFOOD Coverage Floor to 100%](/Users/james/git/bijou/docs/design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md)
+- latest completed cycle: [DF-019 — Raise DOGFOOD Coverage Floor to 100%](../design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
   - the next work is depth and quality, not another family-count ratchet
 - backlog:
-  - [DF-002 — Expand DOGFOOD Component Family Coverage](/Users/james/git/bijou/docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
-  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](/Users/james/git/bijou/docs/BACKLOG/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+  - [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)

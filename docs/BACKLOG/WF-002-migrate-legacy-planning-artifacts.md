@@ -1,6 +1,6 @@
 # WF-002 — Migrate Legacy Planning Artifacts
 
-Legend: [WF — Workflow and Delivery](/Users/james/git/bijou/docs/legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
 
 ## Idea
 

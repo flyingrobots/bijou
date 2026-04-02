@@ -1,6 +1,6 @@
 # WF-001 — Adopt the Legends/Cycles Workflow
 
-Legend: [WF — Workflow and Delivery](/Users/james/git/bijou/docs/legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
 
 ## Why this cycle exists
 
@@ -73,7 +73,7 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 
 ## Agent playback
 
-1. An agent reads [Bijou Workflow](/Users/james/git/bijou/docs/WORKFLOW.md).
+1. An agent reads [Bijou Workflow](../WORKFLOW.md).
 2. The agent finds the relevant legend doc.
 3. The agent checks linked invariants.
 4. The agent discovers the active cycle doc in `docs/design/`.
@@ -82,12 +82,12 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Deliverables
 
@@ -132,4 +132,4 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 
 ### Debt spawned
 
-- [WF-002 — Migrate Legacy Planning Artifacts](/Users/james/git/bijou/docs/BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
+- [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)

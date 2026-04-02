@@ -24,7 +24,7 @@ This note exists so Bijou can treat localization and bidirectionality as framewo
 
 Concrete follow-on package work is currently tracked as backlog under:
 
-- [LX-001 — bijou-i18n Runtime and Tooling Packages](/Users/james/git/bijou/docs/BACKLOG/LX-001-bijou-i18n-runtime-and-tooling-packages.md)
+- [LX-001 — bijou-i18n Runtime and Tooling Packages](../BACKLOG/LX-001-bijou-i18n-runtime-and-tooling-packages.md)
 
 ## Product stance
 

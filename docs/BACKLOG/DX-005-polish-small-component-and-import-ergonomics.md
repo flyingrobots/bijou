@@ -1,6 +1,6 @@
 # DX-005 — Polish Small Component and Import Ergonomics
 
-Legend: [DX — Developer Experience](/Users/james/git/bijou/docs/legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
 ## Idea
 

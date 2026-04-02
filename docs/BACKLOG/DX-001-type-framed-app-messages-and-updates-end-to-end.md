@@ -1,6 +1,6 @@
 # DX-001 — Type Framed App Messages and Updates End-to-End
 
-Legend: [DX — Developer Experience](/Users/james/git/bijou/docs/legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
 ## Idea
 

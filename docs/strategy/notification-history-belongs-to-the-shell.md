@@ -142,7 +142,7 @@ If an event may matter after it disappears, the shell needs a review surface.
 ## Relationship to the existing substrate
 
 Bijou should build this feature on the notification model that already exists in
-[`notification.ts`](/Users/james/git/bijou/packages/bijou-tui/src/notification.ts):
+[`notification.ts`](../../packages/bijou-tui/src/notification.ts):
 
 - `NotificationState.items`
 - `NotificationState.overflowExits`
@@ -327,7 +327,7 @@ not as if the archived notification were still a live toast waiting for immediat
 The first proving surfaces should be:
 
 1. the framed notifications lab in
-   [examples/notifications/main.ts](/Users/james/git/bijou/examples/notifications/main.ts)
+   [examples/notifications/main.ts](../../examples/notifications/main.ts)
 2. frame-managed runtime notifications in `createFramedApp()`
 
 DOGFOOD should adopt the shell cues later, but it should not be forced to invent fake notifications just to validate the shell container.

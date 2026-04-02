@@ -1,6 +1,6 @@
 # LX-006 — XLSX Localization Adapters
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -83,9 +83,9 @@ An agent can automate true spreadsheet exchange without shelling out to ad hoc c
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -185,4 +185,4 @@ That work did **not** land here, and that is correct. LX-006 proved the richer s
 
 Spawned:
 
-- [LX-007 — Service-Oriented Localization Adapters](/Users/james/git/bijou/docs/BACKLOG/LX-007-service-oriented-localization-adapters.md)
+- [LX-007 — Service-Oriented Localization Adapters](../BACKLOG/LX-007-service-oriented-localization-adapters.md)

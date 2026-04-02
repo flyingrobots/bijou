@@ -36,14 +36,14 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 
 ## Core invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
 
 ## Initial backlog
 
-- [DX-001 — Type Framed App Messages and Updates End-to-End](/Users/james/git/bijou/docs/BACKLOG/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
-- [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](/Users/james/git/bijou/docs/BACKLOG/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
-- [DX-003 — Rationalize Table APIs and Public Table Types](/Users/james/git/bijou/docs/BACKLOG/DX-003-rationalize-table-apis-and-public-table-types.md)
-- [DX-004 — Smooth Surface and String Composition Seams](/Users/james/git/bijou/docs/BACKLOG/DX-004-smooth-surface-and-string-composition-seams.md)
-- [DX-005 — Polish Small Component and Import Ergonomics](/Users/james/git/bijou/docs/BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)
+- [DX-001 — Type Framed App Messages and Updates End-to-End](../BACKLOG/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
+- [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../BACKLOG/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
+- [DX-003 — Rationalize Table APIs and Public Table Types](../BACKLOG/DX-003-rationalize-table-apis-and-public-table-types.md)
+- [DX-004 — Smooth Surface and String Composition Seams](../BACKLOG/DX-004-smooth-surface-and-string-composition-seams.md)
+- [DX-005 — Polish Small Component and Import Ergonomics](../BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)

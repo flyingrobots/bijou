@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-018 — Raise DOGFOOD Coverage Floor to 84%](/Users/james/git/bijou/docs/design/DF-018-raise-dogfood-coverage-floor-to-84-percent.md)
+- [DF-018 — Raise DOGFOOD Coverage Floor to 84%](./DF-018-raise-dogfood-coverage-floor-to-84-percent.md)
 
 ## Why this cycle exists
 
@@ -66,9 +66,9 @@ An agent can only satisfy DF-019 by making `resolveDogfoodDocsCoverage(COMPONENT
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
 
 ## Implementation outline
 
@@ -106,4 +106,4 @@ DOGFOOD now covers the whole component-family map. The remaining work is depth, 
 
 Spawned:
 
-- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](/Users/james/git/bijou/docs/BACKLOG/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)

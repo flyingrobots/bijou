@@ -1,6 +1,6 @@
 # DX-004 — Smooth Surface and String Composition Seams
 
-Legend: [DX — Developer Experience](/Users/james/git/bijou/docs/legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
 ## Idea
 

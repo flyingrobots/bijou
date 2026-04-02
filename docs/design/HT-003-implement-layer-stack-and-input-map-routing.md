@@ -4,11 +4,11 @@ _Cycle for turning the shell layer-stack doctrine into real routing, dismissal, 
 
 Legend:
 
-- [HT — Humane Terminal](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 Depends on:
 
-- [HT-002 — Layered Focus and Interaction](/Users/james/git/bijou/docs/design/HT-002-layered-focus-and-interaction.md)
+- [HT-002 — Layered Focus and Interaction](./HT-002-layered-focus-and-interaction.md)
 
 ## Why this cycle exists
 
@@ -86,10 +86,10 @@ An agent can inspect a frame model and understand the current shell/page layer s
 
 ## Linked invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
 
 ## Implementation outline
 
@@ -134,4 +134,4 @@ What did not land:
 
 Follow-on:
 
-- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](/Users/james/git/bijou/docs/BACKLOG/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
+- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../BACKLOG/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)

@@ -4,12 +4,12 @@ _Cycle for formalizing Bijou's hexagonal runtime around state machines, view sta
 
 Legend:
 
-- [RE — Runtime Engine](/Users/james/git/bijou/docs/legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 Depends on:
 
-- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](/Users/james/git/bijou/docs/design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
-- [DL-009 — Formalize Layout and Viewport Rules](/Users/james/git/bijou/docs/BACKLOG/DL-009-formalize-layout-and-viewport-rules.md)
+- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](./HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
+- [DL-009 — Formalize Layout and Viewport Rules](../BACKLOG/DL-009-formalize-layout-and-viewport-rules.md)
 
 ## Why this cycle exists
 
@@ -98,12 +98,12 @@ An agent can inspect the runtime model and answer what is visible, what is inter
 
 ## Linked invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [State Machine and View Stack Are Distinct](/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md)
-- [Layout Owns Interaction Geometry](/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md)
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
+- [Layout Owns Interaction Geometry](../invariants/layout-owns-interaction-geometry.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 
 ## Implementation outline
 
@@ -148,7 +148,7 @@ An agent can inspect the runtime model and answer what is visible, what is inter
 
 What landed:
 
-- a new [RE — Runtime Engine](/Users/james/git/bijou/docs/legends/RE-runtime-engine.md) legend
+- a new [RE — Runtime Engine](../legends/RE-runtime-engine.md) legend
 - explicit invariants for state/view separation, layout-owned interaction geometry, and command/effect separation
 - this cycle doc capturing the runtime model as the design source of truth
 - a decomposition backlog for implementation slices
@@ -161,9 +161,9 @@ What did not land:
 
 Follow-on:
 
-- [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
-- [RE-003 — Retain Layout Trees and Layout Invalidation](/Users/james/git/bijou/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md)
-- [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
-- [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md)
-- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-002 — Promote First-Class State Machine and View Stack](./RE-002-promote-first-class-state-machine-and-view-stack.md)
+- [RE-003 — Retain Layout Trees and Layout Invalidation](./RE-003-retain-layout-trees-and-layout-invalidation.md)
+- [RE-004 — Route Input Through Layouts and Layer Bubbling](./RE-004-route-input-through-layouts-and-layer-bubbling.md)
+- [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
+- [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

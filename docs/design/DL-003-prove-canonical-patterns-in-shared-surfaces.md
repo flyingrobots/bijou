@@ -1,6 +1,6 @@
 # DL-003 — Prove Canonical Patterns in Shared Surfaces
 
-Legend: [DL — Design Language](/Users/james/git/bijou/docs/legends/DL-design-language.md)
+Legend: [DL — Design Language](../legends/DL-design-language.md)
 
 ## Why this cycle exists
 
@@ -84,10 +84,10 @@ An agent can verify that shared list-like surfaces now honor the design-language
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
 
 ## Invariants for this cycle
 
@@ -143,4 +143,4 @@ This cycle intentionally proved the pattern language in two shared collection su
 
 Spawned:
 
-- [DL-004 — Prove Drawer Rhythm and Notice Rows](/Users/james/git/bijou/docs/BACKLOG/DL-004-prove-drawer-rhythm-and-notice-rows.md)
+- [DL-004 — Prove Drawer Rhythm and Notice Rows](../BACKLOG/DL-004-prove-drawer-rhythm-and-notice-rows.md)

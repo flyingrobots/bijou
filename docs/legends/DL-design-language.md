@@ -38,22 +38,22 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 
 ## Core invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Related doctrine
 
-- [Bijou UX Doctrine](/Users/james/git/bijou/docs/strategy/bijou-ux-doctrine.md)
-- [Accessibility and Assistive Modes](/Users/james/git/bijou/docs/strategy/accessibility-and-assistive-modes.md)
-- [Localization and Bidirectionality](/Users/james/git/bijou/docs/strategy/localization-and-bidirectionality.md)
-- [AI Explainability Standard](/Users/james/git/bijou/docs/strategy/ai-explainability-standard.md)
-- [Content Guide](/Users/james/git/bijou/docs/strategy/content-guide.md)
+- [Bijou UX Doctrine](../strategy/bijou-ux-doctrine.md)
+- [Accessibility and Assistive Modes](../strategy/accessibility-and-assistive-modes.md)
+- [Localization and Bidirectionality](../strategy/localization-and-bidirectionality.md)
+- [AI Explainability Standard](../strategy/ai-explainability-standard.md)
+- [Content Guide](../strategy/content-guide.md)
 
 ## Current cycle and backlog
 
-- latest completed cycle: [DL-007 — Promote Inspector Panel Block](/Users/james/git/bijou/docs/design/DL-007-promote-inspector-panel-block.md)
+- latest completed cycle: [DL-007 — Promote Inspector Panel Block](../design/DL-007-promote-inspector-panel-block.md)
 - backlog:
-  - [DL-008 — Promote Guided Flow Block](/Users/james/git/bijou/docs/BACKLOG/DL-008-promote-guided-flow-block.md)
+  - [DL-008 — Promote Guided Flow Block](../BACKLOG/DL-008-promote-guided-flow-block.md)

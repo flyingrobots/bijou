@@ -1,6 +1,6 @@
 # LX-002 — bijou-i18n Tools Package
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -94,9 +94,9 @@ An agent can reason about localization workflow state explicitly through authori
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](/Users/james/git/bijou/docs/invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -209,4 +209,4 @@ That is a feature, not a miss. The cycle stayed focused on the pure tooling core
 
 Spawned:
 
-- [LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows](/Users/james/git/bijou/docs/BACKLOG/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md)
+- [LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows](../BACKLOG/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md)

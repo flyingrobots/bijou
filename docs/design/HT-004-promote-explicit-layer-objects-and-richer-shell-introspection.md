@@ -4,11 +4,11 @@ _Cycle for turning the shell layer stack into richer explicit layer objects that
 
 Legend:
 
-- [HT — Humane Terminal](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
+- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 Depends on:
 
-- [HT-003 — Implement Layer Stack and Input Map Routing](/Users/james/git/bijou/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md)
+- [HT-003 — Implement Layer Stack and Input Map Routing](./HT-003-implement-layer-stack-and-input-map-routing.md)
 
 ## Why this cycle exists
 
@@ -82,10 +82,10 @@ An agent can inspect a frame model and obtain richer explicit layer objects with
 
 ## Linked invariants
 
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Topmost Layer Dismisses First](/Users/james/git/bijou/docs/invariants/topmost-layer-dismisses-first.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
 
 ## Implementation outline
 
@@ -130,4 +130,4 @@ What did not land:
 
 Follow-on:
 
-- [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](/Users/james/git/bijou/docs/BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)
+- [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)

@@ -4,12 +4,12 @@ _Cycle for turning layout from a transient render byproduct into an explicit ret
 
 Legend:
 
-- [RE — Runtime Engine](/Users/james/git/bijou/docs/legends/RE-runtime-engine.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 Depends on:
 
-- [RE-001 — Define Runtime Engine Architecture](/Users/james/git/bijou/docs/design/RE-001-define-runtime-engine-architecture.md)
-- [RE-002 — Promote First-Class State Machine and View Stack](/Users/james/git/bijou/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md)
+- [RE-001 — Define Runtime Engine Architecture](./RE-001-define-runtime-engine-architecture.md)
+- [RE-002 — Promote First-Class State Machine and View Stack](./RE-002-promote-first-class-state-machine-and-view-stack.md)
 
 ## Why this cycle exists
 
@@ -90,10 +90,10 @@ An agent can inspect retained layout state and answer which views have authorita
 
 ## Linked invariants
 
-- [State Machine and View Stack Are Distinct](/Users/james/git/bijou/docs/invariants/state-machine-and-view-stack-are-distinct.md)
-- [Layout Owns Interaction Geometry](/Users/james/git/bijou/docs/invariants/layout-owns-interaction-geometry.md)
-- [Commands Change State, Effects Do Not](/Users/james/git/bijou/docs/invariants/commands-change-state-effects-do-not.md)
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
+- [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
+- [Layout Owns Interaction Geometry](../invariants/layout-owns-interaction-geometry.md)
+- [Commands Change State, Effects Do Not](../invariants/commands-change-state-effects-do-not.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 
 ## Implementation outline
 
@@ -112,7 +112,7 @@ An agent can inspect retained layout state and answer which views have authorita
    - mark retained layouts stale with one or more invalidation causes
    - drop layouts whose views are no longer present in the active view stack
 4. Keep the implementation shell-agnostic and avoid routing work in this cycle.
-5. Leave detailed component sizing/anchoring contracts for [RE-006](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md).
+5. Leave detailed component sizing/anchoring contracts for [RE-006](./RE-006-formalize-component-layout-and-interaction-contracts.md).
 
 ## Tests to write first
 
@@ -147,7 +147,7 @@ What did not land:
 
 Follow-on:
 
-- [RE-004 — Route Input Through Layouts and Layer Bubbling](/Users/james/git/bijou/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md)
-- [RE-005 — Buffer Commands and Effects Separately](/Users/james/git/bijou/docs/design/RE-005-buffer-commands-and-effects-separately.md)
-- [RE-006 — Formalize Component Layout and Interaction Contracts](/Users/james/git/bijou/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](/Users/james/git/bijou/docs/BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-004 — Route Input Through Layouts and Layer Bubbling](./RE-004-route-input-through-layouts-and-layer-bubbling.md)
+- [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
+- [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

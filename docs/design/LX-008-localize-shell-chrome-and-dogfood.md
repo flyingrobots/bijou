@@ -1,6 +1,6 @@
 # LX-008 — Localize Shell Chrome and DOGFOOD
 
-Legend: [LX — Localization and Bidirectionality](/Users/james/git/bijou/docs/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why this cycle exists
 
@@ -96,11 +96,11 @@ An agent can localize shell chrome and DOGFOOD through explicit i18n contracts i
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Visible Controls Are a Promise](/Users/james/git/bijou/docs/invariants/visible-controls-are-a-promise.md)
-- [Focus Owns Input](/Users/james/git/bijou/docs/invariants/focus-owns-input.md)
-- [Shell Owns Shell Concerns](/Users/james/git/bijou/docs/invariants/shell-owns-shell-concerns.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Visible Controls Are a Promise](../invariants/visible-controls-are-a-promise.md)
+- [Focus Owns Input](../invariants/focus-owns-input.md)
+- [Shell Owns Shell Concerns](../invariants/shell-owns-shell-concerns.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Invariants for this cycle
 
@@ -210,4 +210,4 @@ That drift is acceptable for LX-008 because the point of the cycle was to prove 
 
 Spawned:
 
-- [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](/Users/james/git/bijou/docs/BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
+- [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)

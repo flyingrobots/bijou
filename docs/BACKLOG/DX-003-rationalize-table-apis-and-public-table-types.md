@@ -1,6 +1,6 @@
 # DX-003 — Rationalize Table APIs and Public Table Types
 
-Legend: [DX — Developer Experience](/Users/james/git/bijou/docs/legends/DX-developer-experience.md)
+Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
 ## Idea
 

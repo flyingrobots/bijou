@@ -1,6 +1,6 @@
 # HT-001 — Notification Center Polish and Discoverability
 
-Legend: [HT — Humane Terminal](/Users/james/git/bijou/docs/legends/HT-humane-terminal.md)
+Legend: [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 ## Idea
 

@@ -2,11 +2,11 @@
 
 Legend:
 
-- [DF — DOGFOOD Field Guide](/Users/james/git/bijou/docs/legends/DF-dogfood-field-guide.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
 
 Depends on:
 
-- [DF-016 — Raise DOGFOOD Coverage Floor to 74%](/Users/james/git/bijou/docs/design/DF-016-raise-dogfood-coverage-floor-to-74-percent.md)
+- [DF-016 — Raise DOGFOOD Coverage Floor to 74%](./DF-016-raise-dogfood-coverage-floor-to-74-percent.md)
 
 ## Why this cycle exists
 
@@ -57,8 +57,8 @@ An agent can only satisfy DF-017 by adding real hierarchy and temporal/dependenc
 
 ## Linked invariants
 
-- [Tests Are the Spec](/Users/james/git/bijou/docs/invariants/tests-are-the-spec.md)
-- [Docs Are the Demo](/Users/james/git/bijou/docs/invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
+- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Implementation outline
 
@@ -90,4 +90,4 @@ No material drift.
 
 Spawned:
 
-- [DF-018 — Raise DOGFOOD Coverage Floor to 84%](/Users/james/git/bijou/docs/design/DF-018-raise-dogfood-coverage-floor-to-84-percent.md)
+- [DF-018 — Raise DOGFOOD Coverage Floor to 84%](./DF-018-raise-dogfood-coverage-floor-to-84-percent.md)
