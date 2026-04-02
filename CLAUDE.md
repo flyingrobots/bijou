@@ -1,71 +1,72 @@
 # Git Rules
 
-- NEVER push to main without explicit permission
-- ALWAYS make changes in feature branches
-- ALWAYS PR to main
-- NEVER deploy locally or publish locally
 - NEVER amend commits
 - NEVER rebase
 - NEVER force any git operation
+- Do not push to `main` without explicit permission
 
-# Task Tracking System
+# Documentation And Planning Map
 
-## File Layout
+## Read These First
 
-| File | Purpose | Lifespan |
-|------|---------|----------|
-| `TASKS.md` | Current work-in-progress checklist. Step-by-step instructions for the active milestone. | Replaced each milestone. |
-| `docs/ROADMAP.md` | Long-term vision: upcoming milestones, future features, backlog (P1–P3). | Persistent. |
-| `docs/COMPLETED.md` | Shipped work: finished milestones with summary, date, and PR/commit ref. | Append-only. |
-| `docs/GRAVEYARD.md` | Abandoned or indefinitely deferred ideas with rationale for why they were killed. | Append-only. |
-| `docs/CHANGELOG.md` | Public-facing release notes per version. | Append-only. |
+When recovering context or auditing the repo's current truth:
 
-## Rules
+1. `docs/README.md`
+   - documentation entrypoint and source-of-truth map
+2. `README.md`
+   - public front door: package map, DOGFOOD overview, quick start
+3. `docs/PLAN.md`
+   - current execution order
+4. relevant `docs/legends/*`, `docs/BACKLOG/*`, and `docs/design/*`
+   - thematic intent, not-started work, and active/landed cycle detail
+5. `docs/CHANGELOG.md`
+   - shipped changes and notable repo-facing behavior shifts
 
-### TASKS.md (the "current sprint")
+## Current Truth Surfaces
 
-- Contains a flat checklist (`- [ ]` / `- [x]`) for the active body of work.
-- Each item MUST be self-contained: an agent with no prior context can read any unchecked item and execute it. Include file paths, code patterns, and acceptance criteria inline.
-- Items are executed top-to-bottom. To resume after context loss, find the first `- [ ]` and start there.
-- When ALL items are checked, move a summary entry to `docs/COMPLETED.md`, then replace `TASKS.md` contents with the next milestone's checklist (pulled from `docs/ROADMAP.md`).
+| Path | Purpose |
+|------|---------|
+| `docs/README.md` | docs entrypoint and source-of-truth map |
+| `docs/PLAN.md` | shortest honest answer to "what is next?" |
+| `docs/legends/` | thematic workstreams |
+| `docs/BACKLOG/` | not-started work |
+| `docs/design/` | active and landed cycle design docs |
+| `docs/invariants/` | project-wide truths |
+| `docs/CHANGELOG.md` | shipped changes |
+| `examples/docs/README.md` | DOGFOOD proving surface |
 
-### docs/ROADMAP.md (what's next)
+## Reference And Historical Surfaces
 
-- Organized by milestone (e.g. `## vX.Y.Z — Milestone title`).
-- Each milestone has phases/tasks described at planning level (not step-by-step — that's TASKS.md's job).
-- When a milestone becomes the active work, expand its tasks into `TASKS.md` as a detailed checklist.
-- Strike through (`~~task~~`) tasks as they complete; this is a mirror of TASKS.md progress.
+These still matter, but they are not the main execution truth:
 
-### docs/COMPLETED.md (what shipped)
-
-- Append-only log of finished milestones.
-- Each entry: milestone name, completion date, one-line summary, link to PR or merge commit.
-- Keeps the ROADMAP clean — shipped milestones move here instead of accumulating strikethroughs.
-
-### docs/GRAVEYARD.md (what died)
-
-- Append-only log of ideas that were explored but abandoned or deferred indefinitely.
-- Each entry: idea name, date killed, 1–2 sentence rationale (why it was cut, what replaced it, or why it's not worth doing).
-- Moving something here is a deliberate decision, not a TODO — it means "we considered this and said no."
+| Path | Role |
+|------|------|
+| `docs/ARCHITECTURE.md` | current structural reference |
+| `docs/MIGRATING_TO_V4.md` | release-line migration guide |
+| `docs/EXAMPLES.md` | curated canonical-example map |
+| `docs/ROADMAP.md` | broad legacy/reference surface |
+| `docs/COMPLETED.md` | shipped milestone archive |
+| `docs/GRAVEYARD.md` | explicitly abandoned ideas |
+| `docs/specs/` | frozen legacy planning artifacts |
+| `docs/archive/` | exploratory and historical docs that should not read like front-door guidance |
 
 ## Context Recovery Protocol
 
-When starting a new session or recovering from context exhaustion:
+When starting a new session or recovering from context loss:
 
-1. Read `TASKS.md` — find the first unchecked item. That's where you are.
-2. Read `docs/ROADMAP.md` — understand the current milestone and what comes after.
-3. Read `docs/CHANGELOG.md` `[Unreleased]` section — see what's already been done in this cycle.
-4. Check `git log --oneline -10` and `git status` — see recent commits and working tree state.
+1. Read `docs/README.md`.
+2. Read `docs/PLAN.md`.
+3. Read the relevant legend, backlog item, and design doc.
+4. Read the latest relevant section of `docs/CHANGELOG.md`.
+5. Check `git log --oneline -10` and `git status`.
 
-Do NOT re-run audits, re-explore the codebase, or re-plan unless the task description explicitly calls for it. Trust the checklist.
+Do not assume `docs/ROADMAP.md` is the active source of truth for current work.
 
-# End of Turn Checklist
+# End Of Turn Checklist
 
-At the end of every turn that alters files, ALWAYS:
+At the end of a turn that alters files:
 
-1. Update docs/CHANGELOG.md if necessary
-2. Bump version if necessary
-3. Update documentation as needed
-4. Update TASKS.md — check off completed items
-5. `git add -A`
-6. `git commit` with a conventional commit message
+1. Update documentation when it changed materially.
+2. Update `docs/CHANGELOG.md` if the change is repo-facing enough to belong there.
+3. Add follow-on backlog debt if something real was deferred.
+4. Commit focused changes with a conventional message.

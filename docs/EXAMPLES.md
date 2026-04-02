@@ -1,471 +1,89 @@
-# Examples Catalog
+# Curated Example Map
 
-> One app per component. Flagship runtime examples get `main.ts` + `README.md` and use the native Surface recorder; tape-backed examples can keep `demo.tape` (VHS).
->
-> Run any example: `npx tsx examples/<name>/main.ts`
-> Record flagship runtime GIFs: `npx tsx scripts/record-gifs.ts`
+This file is no longer a giant per-example status ledger.
 
----
+That old format made sense when examples were the main teaching surface. It is now actively misleading because Bijou has a stronger split:
 
-## Runtime Features
+- DOGFOOD is the primary living-docs and proving surface
+- a smaller set of examples still matters as canonical runtime, shell, or migration references
+- the rest of the examples are useful leaf demos, not the source of truth for the product story
 
-These directories keep their historical `v3-*` names, but they are the canonical runtime demos for the `4.0.0` line:
+For the full example inventory, use [../examples/README.md](../examples/README.md).
 
-- `examples/v3-demo` — smallest correct surface-native starter app.
-- `examples/v3-css` — BCSS selector/value/media-query workbench.
-- `examples/v3-motion` — keyed layout motion with springs and tweens.
-- `examples/v3-subapp` — Fractal TEA composition helpers.
-- `examples/v3-worker` — worker runtime plus data-channel story.
-- `examples/v3-pipeline` — programmable render-pipeline extension.
+## Keep
 
----
+These examples still have clear canonical value.
 
-## Static Components
+### Runtime References
 
-Render output and exit. GIFs are short recordings of the final output.
+Keep these as the main runtime reference set for the `v4.0.0` line:
 
-### [x] `box`
+- `examples/v3-demo`
+- `examples/v3-css`
+- `examples/v3-motion`
+- `examples/v3-subapp`
+- `examples/v3-worker`
+- `examples/v3-pipeline`
 
-**Component:** `box()`, `headerBox()`
-**Demo:** Render a plain box, a headerBox with label+detail, nested boxes, and boxes in each output mode side-by-side.
-**GIF:** Single frame showing all box variants stacked vertically. ~2s.
+They keep the historical `v3-*` names, but they remain the clearest runtime seam references on this branch.
 
-### [x] `table`
+### DOGFOOD And Shell Proving Surfaces
 
-**Component:** `table()`
-**Demo:** Render a data table with 5-6 columns (mixed alignment), a second table with long content that truncates, and a pipe-mode table (TSV).
-**GIF:** Single frame showing both tables. ~2s.
+Keep these because they prove product-level behavior rather than isolated leaf rendering:
 
-### [x] `tree`
+- `examples/docs`
+  - the living docs app and current proving surface
+- `examples/release-workbench`
+  - canonical multi-view control-room shell
+- `examples/notifications`
+  - notification stack, routing, history, and shell review behavior
+- `examples/app-frame`
+  - framed shell reference
 
-**Component:** `tree()`
-**Demo:** Render a filesystem-style tree (src/ with nested dirs and files), and a second tree showing a dependency hierarchy with badges.
-**GIF:** Single frame. ~2s.
+### Reference Leaf Examples
 
-### [x] `accordion`
+Keep leaf examples when they are the clearest isolated explanation of a family or API seam.
 
-**Component:** `accordion()`
-**Demo:** Render an accordion with 4 sections, 2 expanded and 2 collapsed. Content includes multi-line text in expanded sections.
-**GIF:** Single frame. ~2s.
+Examples that still fit that role include:
 
-### [x] `tabs`
+- `alert`, `note`, `badge`, `kbd`
+- `table`, `tree`, `dag`, `dag-fragment`, `dag-stats`
+- `input`, `select`, `multiselect`, `filter`, `wizard`, `textarea`
+- `viewport`, `pager`, `navigable-table`, `browsable-list`, `file-picker`
+- `modal`, `drawer`, `tooltip`, `toast`
+- `canvas`, `mouse`, `focus-area`, `dag-pane`
 
-**Component:** `tabs()`
-**Demo:** Render 3 tab bars: one with the first tab active, one with the middle tab active, one with icons/badges in tab labels.
-**GIF:** Single frame showing all 3 tab bars. ~2s.
+The full list lives in [../examples/README.md](../examples/README.md). This page is intentionally not a second exhaustive catalog.
 
-### [x] `badge`
+## Merge Into DOGFOOD
 
-**Component:** `badge()`
-**Demo:** Render all 7 badge variants (success, error, warning, info, accent, primary, muted) in a horizontal row, then a second row showing badges used inline in a sentence.
-**GIF:** Single frame. ~2s.
+Prefer moving teaching value into DOGFOOD when the example is primarily there to show:
 
-### [x] `alert`
+- a component family's semantic guidance
+- lowering behavior across profiles
+- shell discoverability and navigation
+- settings/help/search patterns
+- product-writing or design-language decisions
 
-**Component:** `alert()`
-**Demo:** Render all 4 alert variants (success, error, warning, info) stacked vertically with realistic messages (deploy succeeded, build failed, deprecation warning, version available).
-**GIF:** Single frame. ~2s.
+If an example's best value is "this should really be a story inside the docs app," it should migrate there instead of growing a parallel README/demo/test story.
 
-### [x] `separator`
+## Cut Later
 
-**Component:** `separator()`
-**Demo:** Render separators: plain, with a left-aligned label, with a centered label, and between content blocks to show them as dividers.
-**GIF:** Single frame. ~2s.
+An example becomes a retirement candidate only when all of the following are true:
 
-### [x] `skeleton`
+1. DOGFOOD or another canonical scenario now teaches the same decision clearly.
+2. No migration guide or package README still points to the example.
+3. It is not carrying unique smoke or regression value.
+4. It is not the clearest isolated proof of a public API seam.
 
-**Component:** `skeleton()`
-**Demo:** Render a "loading" layout: skeleton lines mimicking a card with a title skeleton, 3 body-text skeletons, and a badge skeleton.
-**GIF:** Single frame. ~2s.
+Until then, deleting examples is usually just deleting reference coverage under a nicer label.
 
-### [x] `kbd`
+## Relationship To Release Smoke
 
-**Component:** `kbd()`
-**Demo:** Render a help legend: `kbd('Ctrl') + kbd('C')` to quit, `kbd('↑') kbd('↓')` to navigate, `kbd('Enter')` to select. Show single keys and chord combos.
-**GIF:** Single frame. ~2s.
+The repo still carries `smoke:examples:*`, but that should not be treated as the long-term end state.
 
-### [x] `breadcrumb`
+Tracked direction:
 
-**Component:** `breadcrumb()`
-**Demo:** Render 3 breadcrumb trails: short (Home > Settings), medium (Home > Projects > bijou > src > components), and one with a custom separator.
-**GIF:** Single frame. ~2s.
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
-### [x] `stepper`
-
-**Component:** `stepper()`
-**Demo:** Render a 4-step stepper (Setup > Configure > Review > Deploy) with step 2 active, steps 1 complete, steps 3-4 pending.
-**GIF:** Single frame. ~2s.
-
-### [x] `timeline`
-
-**Component:** `timeline()`
-**Demo:** Render a project timeline with 5 events: "Project created", "v0.1.0 released", "Hexagonal refactor", "v0.2.0 released", "Examples added". Mix of completed and upcoming.
-**GIF:** Single frame. ~2s.
-
-### [x] `paginator`
-
-**Component:** `paginator()`
-**Demo:** Render 3 paginator states: page 1 of 10, page 5 of 10, page 10 of 10. Show both dot-style and number-style if supported.
-**GIF:** Single frame. ~2s.
-
-### [x] `gradient-text`
-
-**Component:** `gradientText()`
-**Demo:** Render "bijou" in large ASCII art letters with a cyan-to-magenta gradient, then a second line with a different gradient (teal-orange-pink).
-**GIF:** Single frame. ~2s.
-
-### [x] `progress-static`
-
-**Component:** `progressBar()`
-**Demo:** Render 5 progress bars at 0%, 25%, 50%, 75%, 100% with labels. Show different widths.
-**GIF:** Single frame. ~2s.
-
-### [x] `dag`
-
-**Component:** `dag()`
-**Demo:** Render a project dependency DAG (7-8 nodes) with badges showing status (DONE, WIP, BLOCKED). Highlight a critical path in a contrasting color.
-**GIF:** Single frame showing the full graph. ~2s.
-
-### [x] `dag-fragment`
-
-**Component:** `dagSlice()` + `dag()`
-**Demo:** Start with a large DAG (12+ nodes), then render 3 fragments: ancestors of a leaf node, descendants of the root, and a 2-hop neighborhood around a middle node. Show ghost nodes with dashed borders at slice boundaries.
-**GIF:** Single frame showing full DAG then the 3 fragments. ~3s.
-
-### [x] `dag-stats`
-
-**Component:** `dagStats()` + `dag()` + `table()`
-**Demo:** Render a project planning DAG (8 nodes with status badges), then display graph statistics (nodes, edges, depth, width, roots, leaves) in a table. Show a summary box with key metrics.
-**GIF:** Single frame showing the DAG, stats table, and summary box. ~2s.
-
-### [ ] `enumerated-list`
-
-**Component:** `enumeratedList()`
-**Demo:** Render ordered and unordered lists in 5 bullet styles: numeric (default), alpha, roman, bullet, and dash. Each list has 3-4 items showing the style variation.
-**GIF:** Single frame showing all 5 list styles stacked vertically. ~2s.
-
-### [ ] `hyperlink`
-
-**Component:** `hyperlink()`
-**Demo:** Render 3 hyperlinks demonstrating OSC 8 terminal links: a standard link with display text, a link with URL fallback mode, and a link with text-only fallback. Shows clickable terminal links where supported.
-**GIF:** Single frame showing all 3 hyperlink variants. ~2s.
-
-### [ ] `log`
-
-**Component:** `log()`
-**Demo:** Render leveled log output at all 5 levels (debug, info, warn, error, fatal) with colored prefixes. Show a second group with timestamps enabled and a third with prefix disabled.
-**GIF:** Single frame showing all log levels and variants. ~2s.
-
-### [x] `pipe`
-
-**Component:** Output modes, all components
-**Demo:** Render the same content (a box with a table inside, a badge, an alert) in 3 output modes side-by-side: interactive, pipe, accessible. Use `createTestContext()` with explicit modes.
-**GIF:** Single frame showing the 3-column comparison. ~3s.
-
-### [x] `theme`
-
-**Component:** Theme system, `createBijou()`, presets
-**Demo:** Render identical components (box, badge, alert, progress bar, separator) in each built-in theme preset (cyan-magenta, teal-orange-pink). Show them side-by-side or stacked with theme name labels.
-**GIF:** Single frame. ~3s.
-
----
-
-## Interactive Forms
-
-Prompt the user, collect input, display result. GIFs show the interaction.
-
-### [x] `input`
-
-**Component:** `input()`
-**Demo:** Prompt for a project name with placeholder text, then a second prompt with validation (must be lowercase, no spaces). Show the validation error on bad input, then successful entry.
-**GIF:** Type "My Project" → see error → clear → type "my-project" → accept. ~6s.
-
-### [x] `select`
-
-**Component:** `select()`
-**Demo:** Present a list of 6 package managers (npm, yarn, pnpm, bun, deno, none). Navigate with arrow keys, select one.
-**GIF:** Arrow down 3 times → Enter to select "bun". ~5s.
-
-### [x] `multiselect`
-
-**Component:** `multiselect()`
-**Demo:** Present a list of 8 features to enable (TypeScript, ESLint, Prettier, Vitest, etc.) with 2 pre-selected. Toggle a few, confirm.
-**GIF:** Space to toggle 2 items, arrow around, Enter to confirm. ~6s.
-
-### [x] `confirm`
-
-**Component:** `confirm()`
-**Demo:** Ask "Deploy to production?" with default No. Show pressing Enter (gets default No), then re-prompt and type "y" for Yes.
-**GIF:** Enter → No result → second prompt → "y" → Yes result. ~5s.
-
-### [x] `form-group`
-
-**Component:** `group()`
-**Demo:** Multi-field form: project name (input), framework (select), features (multiselect), deploy now? (confirm). Show the final collected result object.
-**GIF:** Fill out each field in sequence, show final JSON result. ~12s.
-
-### [x] `textarea`
-
-**Component:** `textarea()`
-**Demo:** Multi-line text input for writing a commit message. Shows line numbers, placeholder text, and cursor navigation. On submit, displays the result in a header box. Cancel shows a cancellation message.
-**GIF:** Type a multi-line message → navigate with arrow keys → submit → see result. ~8s.
-
-### [x] `filter`
-
-**Component:** `filter()`
-**Demo:** Fuzzy-filter select from a list of 8 programming languages with keyword metadata and vim-style normal/insert modes. See the example's [README](../examples/filter/README.md) for keyboard details.
-**GIF:** Type "fun" → see Elixir/Haskell/OCaml → select one → see badge result. ~6s.
-
-### [x] `wizard`
-
-**Component:** `wizard()`
-**Demo:** Multi-step deployment wizard with conditional skip logic: choose a target (cloud/self-hosted/local), then conditionally prompt for cloud provider or server hostname based on the selection, then confirm monitoring. Shows the summary in a box.
-**GIF:** Select "cloud" → enter provider → skip hostname → confirm monitoring → see summary. ~10s.
-
----
-
-## TUI Apps
-
-Full-screen interactive apps using the TEA runtime. GIFs show live interaction.
-
-### [x] `counter`
-
-**Component:** TEA runtime (`run()`, `App`, `Cmd`)
-**Demo:** Minimal TEA hello-world. A number on screen. Press `+`/`k` to increment, `-`/`j` to decrement, `q` to quit. Show the count updating.
-**GIF:** Press + a few times, press - once, press q. ~5s.
-
-### [x] `spinner`
-
-**Component:** `spinnerFrame()` + TEA `tick()`
-**Demo:** Show a spinner with "Loading..." status text, then after 3s it changes to "Processing...", then after 2s shows a success checkmark and exits.
-**GIF:** Watch the spinner animate through 3 phases. ~6s.
-
-### [x] `progress-animated`
-
-**Component:** `createAnimatedProgressBar()` or TEA + `progressBar()`
-**Demo:** A single progress bar that fills from 0-100% with smooth animation over 4 seconds, then shows "Complete!" and exits.
-**GIF:** Watch the bar fill up. ~5s.
-
-### [x] `progress-download`
-
-**Component:** `progressBar()` + TEA `tick()`
-**Demo:** Simulate downloading 4 packages. Each has its own progress bar. They complete at different rates (staggered). Show package names, speeds, and a total progress bar at the bottom.
-**GIF:** Watch 4 bars fill at different rates, total bar tracks overall. ~8s.
-
-### [x] `viewport`
-
-**Component:** `viewport()`, `scrollBy()`, `pageDown()`, etc.
-**Demo:** Display a long document (the MIT license or a poem) in a viewport that's ~15 rows tall. Show scrollbar on the right. Scroll with j/k, Page Up/Down.
-**GIF:** Scroll down, scroll back up, page down, scroll to bottom. ~8s.
-
-### [x] `flex-layout`
-
-**Component:** `flex()`, `vstack()`, `hstack()`
-**Demo:** Build a responsive dashboard: header bar (basis), sidebar (fixed width) + main content (flex: 1). Resize the terminal to show the layout reflowing.
-**GIF:** Show the layout, then resize terminal narrower and wider. ~8s.
-
-### [x] `spring`
-
-**Component:** `animate()`, `springStep()`, `SPRING_PRESETS`
-**Demo:** Animate a block sliding across the screen using different spring presets. Show 4 springs in parallel (gentle, default, wobbly, stiff) so you can compare the motion character.
-**GIF:** Watch 4 blocks spring to position simultaneously. ~5s.
-
-### [x] `timeline-anim`
-
-**Component:** `timeline()`, `animate()`, `sequence()`
-**Demo:** Orchestrated animation: a title slides in from left (spring), pauses, then 3 cards fade in sequentially with staggered delays (tween), then a progress bar fills (tween). GSAP-style position syntax.
-**GIF:** Watch the choreographed sequence play out. ~6s.
-
-### [x] `modal`
-
-**Component:** `createInputStack()`, `viewport()`
-**Demo:** Main screen shows a list. Press `?` to open a help modal overlay (semi-transparent border). Press `Esc` to dismiss. Press `d` to open a confirmation dialog. Show input routing correctly between layers.
-**GIF:** Browse list → ? for help → Esc → d for dialog → confirm. ~8s.
-
-### [x] `help`
-
-**Component:** `createKeyMap()`, `helpView()`, `helpShort()`
-**Demo:** App with keybindings for navigation, actions, and mode switching. Bottom bar shows `helpShort()`. Press `?` to toggle full `helpView()` overlay showing all bindings grouped by category.
-**GIF:** Show short help → press ? → full help → press ? to dismiss. ~6s.
-
-### [x] `print-key`
-
-**Component:** `parseKey()`
-**Demo:** Full-screen key event inspector. Press any key and see its parsed `KeyMsg` properties: name, shift, ctrl, alt, meta, raw bytes (hex). Shows a scrolling log of recent keypresses.
-**GIF:** Press various keys: Enter, Ctrl+C, arrows, Escape, letters, Shift+Tab. ~8s.
-
-### [x] `fullscreen`
-
-**Component:** `enterScreen()`, `exitScreen()`, alt screen
-**Demo:** Start in normal terminal. Press Enter to toggle into alt screen (full-screen mode) showing a centered message. Press Enter again to return to normal terminal with scrollback preserved.
-**GIF:** Normal → Enter → alt screen → Enter → back to normal. ~5s.
-
-### [x] `stopwatch`
-
-**Component:** TEA `tick()` + view rendering
-**Demo:** A stopwatch display (MM:SS.ms). Press Space to start/stop, `r` to reset, `l` to lap (shows lap times below), `q` to quit.
-**GIF:** Start → run 2s → lap → run 1s → lap → stop → reset → quit. ~8s.
-
-### [x] `chat`
-
-**Component:** `viewport()` + `input()` + `vstack()` + `flex()`
-**Demo:** Chat UI with a scrollable message history viewport and an input bar at the bottom. Pre-populated with a few messages. Type a message, press Enter, it appears in the viewport which auto-scrolls.
-**GIF:** Read messages → type "Hello!" → Enter → see it appear → scroll up → scroll back. ~8s.
-
-### [x] `split-editors`
-
-**Component:** `flex()` + `hstack()` + `createInputStack()`
-**Demo:** Two side-by-side panes (50/50 flex). Each is a scrollable viewport. Tab to switch focus (highlighted border on active pane). Each pane scrolls independently.
-**GIF:** Scroll left pane → Tab → scroll right pane → Tab → scroll left again. ~8s.
-
-### [x] `pager`
-
-**Component:** `pager()`, `pagerKeyMap()`
-**Demo:** Scrollable text viewer displaying 80 lines of content with section headers. Vim-style navigation (j/k to scroll, d/u for half-page, g/G for top/bottom) with a status line. Handles terminal resize.
-**GIF:** Scroll down with j → page down → jump to bottom → scroll back up. ~8s.
-
-### [x] `navigable-table`
-
-**Component:** `navigableTable()`, `navTableKeyMap()`
-**Demo:** Keyboard-navigable data table showing 12 open-source projects with name, language, stars, and license columns. Arrow keys move the focused row, page up/down for fast scrolling, with a scrollable viewport.
-**GIF:** Navigate rows with j/k → page down → page up → quit. ~8s.
-
-### [x] `browsable-list`
-
-**Component:** `browsableList()`, `browsableListKeyMap()`
-**Demo:** Navigable list of 12 bijou components, each with a label and description. Arrow keys move focus, page up/down for fast scrolling through a viewport. Enter selects the focused item.
-**GIF:** Browse items with j/k → page down → select an item → quit. ~8s.
-
-### [x] `file-picker`
-
-**Component:** `filePicker()`, `filePickerKeyMap()`
-**Demo:** Directory browser starting at the current working directory. Shows files and directories with icons. Arrow keys navigate, Enter opens directories or selects files, Backspace goes up a level. Handles terminal resize.
-**GIF:** Navigate files → enter a directory → go back → select a file → quit. ~8s.
-
-### [x] `interactive-accordion`
-
-**Component:** `interactiveAccordion()`, `accordionKeyMap()`
-**Demo:** Keyboard-navigable accordion with 5 sections about bijou (what it is, components, runtime, themes, getting started). Arrow keys move focus between sections, Enter/Space toggles expand/collapse, `e`/`c` to expand/collapse all.
-**GIF:** Navigate sections → expand → collapse → expand all → collapse all → quit. ~8s.
-
-### [x] `composable`
-
-**Component:** Multiple components together
-**Demo:** Dashboard combining: header (box with app name + badge), tab bar, main content area (table or tree depending on active tab), status bar with paginator and kbd hints. Show switching tabs to change content.
-**GIF:** Browse tabs, see content change, navigate pages. ~10s.
-
-### [x] `package-manager`
-
-**Component:** Real-world showcase
-**Demo:** Simulate `npm install`. Show a spinner with "Resolving dependencies...", then switch to a multi-progress view as packages "download", then a tree view of what was installed, then a success alert with stats. Fully automated (no user input).
-**GIF:** Watch the full install simulation play out. ~10s.
-
-### [ ] `status-bar`
-
-**Component:** `statusBar()`
-**Demo:** Render 3 status bar variants: a code-editor bar with filename, language, and cursor position; a minimal bar with mode and line count using a fill character; and a recording bar with emoji icons. All with configurable width.
-**GIF:** Single frame showing all 3 status bar variants stacked. ~2s.
-
-### [ ] `drawer`
-
-**Component:** `drawer()`, `composite()`
-**Demo:** Full-screen app with a togglable side panel. Press `d` to slide in a drawer overlay showing a details panel (name, version, status). The background dims when the drawer is open. Press `d` again to close.
-**GIF:** Show main screen → press d → drawer opens → press d → drawer closes. ~6s.
-
-### [ ] `command-palette`
-
-**Component:** `commandPalette()`, `commandPaletteKeyMap()`
-**Demo:** Filterable action list showing 12 bijou components organized by category (Display, Feedback, Forms, Layout, Navigation). Type to filter in real-time, arrow keys to navigate, Enter to select. Shows keyboard shortcuts where available.
-**GIF:** Type "tab" → see filtered results → select one → quit. ~6s.
-
-### [ ] `tooltip`
-
-**Component:** `tooltip()`, `composite()`
-**Demo:** Positioned overlay demo with a movable target marker. Arrow keys reposition the target, `d` cycles through 4 tooltip directions (top, bottom, left, right). The tooltip shows its current direction and coordinates.
-**GIF:** Move target → cycle directions → see tooltip reposition. ~6s.
-
-### [ ] `canvas`
-
-**Component:** `canvas()`, `ShaderFn`
-**Demo:** Animated plasma shader effect rendered as ASCII art. A radial wave pattern emanates from the center of the screen using a 10-character density ramp. Runs at 60fps with smooth time-based animation. Press `q` to quit.
-**GIF:** Watch the plasma animation pulse for a few seconds → quit. ~5s.
-
-### [ ] `mouse`
-
-**Component:** `parseMouse()`, `MouseMsg`
-**Demo:** Mouse event inspector that logs click, scroll, and drag events with modifier badges (CTRL, ALT, SHIFT). Shows the last 10 events in a scrolling log with button type, action, and coordinates. Displays the last click position in a box.
-**GIF:** Click around → scroll → see event log populate → quit. ~6s.
-
-### [x] `splash`
-
-**Component:** Spring animations + `gradientText()` + `timeline()`
-**Demo:** Animated splash screen: logo springs in from above, tagline fades in with a tween, gradient sweeps across, then a "Press any key" prompt pulses. Press a key to exit.
-**GIF:** Watch the splash animate in, press a key. ~6s.
-
-### [x] `focus-area`
-
-**Component:** `focusArea()`, `focusAreaScrollBy()`, `focusAreaKeyMap()`
-**Demo:** Scrollable text pane with a colored left gutter bar. Vim-style scroll (j/k/d/u/g/G) plus horizontal scroll (h/l). Press Tab to toggle focus state (accent vs muted gutter).
-**GIF:** Scroll through content → toggle focus → scroll horizontally → quit. ~8s.
-
-### [x] `dag-pane`
-
-**Component:** `dagPane()`, `dagPaneSelectChild()`, `dagPaneKeyMap()`
-**Demo:** Interactive DAG viewer showing a project dependency graph. Arrow keys navigate nodes spatially, auto-highlighting the path from root to selected node. Vim keys scroll the viewport.
-**GIF:** Arrow down through nodes → left/right between siblings → scroll → quit. ~10s.
-
----
-
-## Totals
-
-| Category | Count |
-|---|---|
-| Static components | 24/24 |
-| Interactive forms | 8/8 |
-| TUI apps | 22/31 |
-| **Total** | **54/63** |
-
-> 54 of 63 examples have GIFs recorded. Remaining 9 need demo tapes.
-
----
-
-## VHS Tape Template
-
-```tape
-# examples/<name>/demo.tape
-Output examples/<name>/demo.gif
-Set Shell zsh
-Set FontFamily "Berkeley Mono"
-Set FontSize 14
-Set Width 100
-Set Height 30
-Set Theme "Catppuccin Mocha"
-Set Padding 20
-
-Type "npx tsx examples/<name>/main.ts"
-Enter
-Sleep 2s
-
-# ... interaction-specific commands ...
-
-Sleep 1s
-```
-
-## Directory Structure
-
-```
-examples/
-├── README.md              # Index with GIF thumbnails + descriptions
-├── _shared/               # Shared utilities (e.g., init context helper)
-│   └── setup.ts           # initDefaultContext() + common imports
-├── box/
-│   ├── main.ts
-│   └── demo.tape
-├── table/
-│   ├── main.ts
-│   └── demo.tape
-├── ...
-└── package-manager/
-    ├── main.ts
-    └── demo.tape
-```
+That shift should happen in stages, not through blind example deletion.

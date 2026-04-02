@@ -1,0 +1,7 @@
+# Search hygiene for repo-local audits and developer tooling
+.claude/
+node_modules/
+dist/
+coverage/
+.obsidian/
+.DS_Store

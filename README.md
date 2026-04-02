@@ -2,7 +2,7 @@
 
 Bijou is a TypeScript toolkit for terminal software.
 
-It has two main layers:
+The public stack has two main UI/runtime layers, plus Node and localization support packages:
 
 - [`@flyingrobots/bijou`](./packages/bijou/) for prompts, output helpers, themes, and mode-aware components
 - [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) for surface-based interactive apps, layout, motion, overlays, and framed shells
@@ -36,6 +36,10 @@ That is a narrower and more truthful claim than â€œeverything is a surface now.â
 | [`@flyingrobots/bijou-node`](./packages/bijou-node/) | Node adapters: runtime, IO, style ports, recorder and worker helpers |
 | [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) | Opinionated app shell with tabs, drawers, help, and status areas |
 | [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) | Scaffolder for a runnable Bijou TUI app |
+| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | In-memory localization runtime: catalogs, direction, and runtime-safe lookups |
+| [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) | Localization workflow tooling: authoring, stale detection, exchange, compilation |
+| [`@flyingrobots/bijou-i18n-tools-node`](./packages/bijou-i18n-tools-node/) | Node filesystem helpers for localization exchange workflows |
+| [`@flyingrobots/bijou-i18n-tools-xlsx`](./packages/bijou-i18n-tools-xlsx/) | XLSX workbook adapters for localization exchange workflows |
 
 All published packages are versioned in lock-step.
 
@@ -207,6 +211,8 @@ Those docs are meant to answer:
 
 ## Documentation Map
 
+- [Docs Index](./docs/README.md)
+- [Current Plan](./docs/PLAN.md)
 - [DOGFOOD Docs Surface](./examples/docs/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
@@ -225,7 +231,7 @@ These are directions we are actively interested in, but they are not being prese
 - replay artifacts, richer scenario tooling, and time-travel debugging
 - deeper BCSS/devtools work beyond the currently shipped scoped runtime styling
 
-See [docs/ROADMAP.md](./docs/ROADMAP.md) for the tracked backlog.
+See [docs/PLAN.md](./docs/PLAN.md) for the current execution order and [docs/ROADMAP.md](./docs/ROADMAP.md) for the broader legacy/reference backlog.
 
 ## License
 

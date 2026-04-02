@@ -19,6 +19,7 @@
     "bench:renderer:guard": "node --expose-gc --import tsx scripts/renderer-bench-compare.ts --fail-on-regression",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
+    "docs:inventory": "tsx scripts/docs-inventory.ts",
     "docs:design-system:preflight": "tsx scripts/design-system-docs-preflight.ts",
     "dogfood": "node --import tsx examples/docs/main.ts",
     "record:dogfood:landing": "vhs examples/docs/landing.tape",
