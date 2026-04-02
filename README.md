@@ -1,31 +1,31 @@
 # Bijou v4.0.0
 
-Bijou is a TypeScript toolkit for terminal software.
+**Bijou** is a TypeScript toolkit for building delightful terminal software.
 
 The public stack has two main UI/runtime layers, plus Node and localization support packages:
 
 - [`@flyingrobots/bijou`](./packages/bijou/) for prompts, output helpers, themes, and mode-aware components
 - [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) for surface-based interactive apps, layout, motion, overlays, and framed shells
 
-The goal is practical rather than ornamental: local TTY apps should feel good, and the same codebase should still behave honestly in CI, pipes, and accessibility-oriented runs.
+The philosophy is practical over ornamental: local TTY apps should feel great, while the same codebase gracefully degrades in CI, pipes, and accessibility-focused environments.
 
 [![npm version](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
 [![License](https://img.shields.io/github/license/flyingrobots/bijou)](./LICENSE)
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What Ships In v4.0.0
+## What’s New in v4.0.0
 
-`4.0.0` is the pure-surface release line for the interactive runtime.
+v4.0.0 marks the pure-surface release for the interactive runtime.
 
-What that means today:
+Key changes:
 
 - the `@flyingrobots/bijou-tui` runtime public view contract is `Surface | LayoutNode`
 - framed shells, overlays, transitions, viewport helpers, and most higher-value layout/runtime paths now stay on the surface path instead of relying on implicit string fallback
 - the core toolkit still supports string-first CLI and prompt flows where that is the right abstraction
 - the repo includes deterministic tests, example smoke coverage, scaffold canaries, and release-readiness checks
-
-That is a narrower and more truthful claim than “everything is a surface now.” The runtime is surface-first; the whole toolkit is not string-free.
+- 
+In short: the runtime is surface-first, but the toolkit is not string-free. This is a more honest and focused evolution than claiming “everything is now a surface.”
 
 ## Package Map
 
@@ -65,20 +65,6 @@ Run it locally:
 ```bash
 npm run dogfood
 ```
-
-Capture the tracked GIFs:
-
-```bash
-npm run record:dogfood:gifs
-```
-
-Title screen:
-
-![DOGFOOD landing](./examples/docs/landing.gif)
-
-Docs explorer:
-
-![DOGFOOD docs explorer](./examples/docs/dogfood.gif)
 
 ## Quick Start
 
