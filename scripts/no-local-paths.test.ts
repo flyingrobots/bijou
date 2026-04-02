@@ -71,7 +71,7 @@ describe('repo hygiene', () => {
         violations.push(`${relativePath}: contains POSIX home absolute path`);
       }
       if (text.includes(FILE_SCHEME)) {
-        violations.push(`${relativePath}: contains file:// URL`);
+        violations.push(`${relativePath}: contains file URL`);
       }
       if (WINDOWS_ABSOLUTE_PATH.test(text)) {
         violations.push(`${relativePath}: contains Windows absolute path`);
