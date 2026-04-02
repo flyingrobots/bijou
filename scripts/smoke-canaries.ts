@@ -186,13 +186,15 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
     'Home',
   ]);
   assertCheckpointContains(checkpoints, 'quit-open', [
-    'Quit App?',
+    'Quit?',
+    'Quit this app?',
   ]);
   assertCheckpointAbsent(checkpoints, 'quit-cancel', [
-    'Quit App?',
+    'Quit?',
   ]);
   assertCheckpointContains(checkpoints, 'quit-reopen', [
-    'Quit App?',
+    'Quit?',
+    'Quit this app?',
   ]);
   process.stdout.write('ok\n');
 }
