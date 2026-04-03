@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsRepoPath, readRepoFile } from '../repo';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 
 describe('WF-006 cut clean 4.1.0 release boundary', () => {
   it('promotes the final release-boundary blocker into a landed workflow cycle', () => {

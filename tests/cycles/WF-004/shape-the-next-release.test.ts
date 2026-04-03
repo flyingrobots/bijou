@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsRepoPath, readRepoFile } from '../repo';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 
 describe('WF-004 shape the next release', () => {
   it('captures the next release as an explicit 4.1.0 decision', () => {

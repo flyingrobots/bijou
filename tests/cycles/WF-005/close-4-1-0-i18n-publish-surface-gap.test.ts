@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsRepoPath, readRepoFile } from '../repo';
+import { existsRepoPath, readRepoFile } from '../repo.js';
 
 const I18N_PACKAGES = [
   'bijou-i18n',
