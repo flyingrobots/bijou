@@ -156,10 +156,10 @@ The workspace now includes:
 And the shell/docs surface now has real localized behavior instead of
 only English-first assumptions.
 
-Important release note: `v4.1.0` should only be considered ready once
-the i18n publish-surface decision is closed. The preferred outcome is
-to expand the publish matrix so these packages are actually shipped as
-public release artifacts.
+Important release note: the i18n packages are now part of the planned
+`v4.1.0` automated release path. The publish workflow, release dry-run
+workflow, and release docs now all agree that these packages are public
+release artifacts for the `4.1.0` line.
 
 ## Design Language: More Explicit Product Taste
 
@@ -242,8 +242,6 @@ This release still does not mean:
 - every shell concern has been pushed fully behind the runtime seams
 - DOGFOOD is "done forever"
 - localization is complete across every shell surface
-- the i18n publish-surface gap is already solved just because the code
-  exists in the workspace
 
 The point is not that the work is finished. The point is that the repo
 now has much more honest runtime truth, shell truth, docs truth, and

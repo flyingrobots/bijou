@@ -262,10 +262,11 @@ runtime slice. `4.1.0` should ship the runtime-engine story through
 
 - `CHANGELOG.md` still needs its final `4.1.0` cut during actual release
   execution
-- the i18n publish matrix is still a real blocker until resolved in code
-  or narrowed in release promise
+- at the time this cycle closed, the i18n publish matrix was still a
+  real blocker; [WF-005](./WF-005-close-4-1-0-i18n-publish-surface-gap.md)
+  closes that gap in the release automation
 
 ### Debt spawned
 
-- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](../BACKLOG/v4.1.0/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
+- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 - [WF-006 — Cut Clean 4.1.0 Release Boundary](../BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)

@@ -81,19 +81,17 @@ These packages move together:
 
 ### Current Automated npm Publish Matrix
 
-As of now, the publish workflows automatically publish only:
+As of now, the publish workflows automatically publish:
 
 - `@flyingrobots/bijou`
 - `@flyingrobots/bijou-node`
 - `@flyingrobots/bijou-tui`
 - `@flyingrobots/bijou-tui-app`
 - `create-bijou-tui-app`
-
-The i18n packages are versioned and validated as workspace packages, but
-they are **not** currently in the automated publish matrix.
-
-Do not claim they were released unless the workflow is expanded or they
-are published deliberately through an updated process.
+- `@flyingrobots/bijou-i18n`
+- `@flyingrobots/bijou-i18n-tools`
+- `@flyingrobots/bijou-i18n-tools-node`
+- `@flyingrobots/bijou-i18n-tools-xlsx`
 
 ## Phase 1: Repo Guards
 
@@ -292,6 +290,10 @@ npm view @flyingrobots/bijou-node version dist-tags --json
 npm view @flyingrobots/bijou-tui version dist-tags --json
 npm view @flyingrobots/bijou-tui-app version dist-tags --json
 npm view create-bijou-tui-app version dist-tags --json
+npm view @flyingrobots/bijou-i18n version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools-node version dist-tags --json
+npm view @flyingrobots/bijou-i18n-tools-xlsx version dist-tags --json
 ```
 
 ## Abort Conditions
@@ -318,8 +320,6 @@ Abort immediately if any of these are true:
 - branch-sync, latest-tag, and tag-collision checks are documented
   here, but they do not yet have a dedicated repo-native script
 - signed tags are not currently a repo policy
-- the automated publish matrix does not yet include the i18n packages,
-  even though they are lock-step versioned workspace packages
 
 If any of those policies change, update this doc and the automation
 together.

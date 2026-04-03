@@ -58,6 +58,10 @@ jobs:
           (cd packages/bijou-tui && npm pack --dry-run)
           (cd packages/bijou-tui-app && npm pack --dry-run)
           (cd packages/create-bijou-tui-app && npm pack --dry-run)
+          (cd packages/bijou-i18n && npm pack --dry-run)
+          (cd packages/bijou-i18n-tools && npm pack --dry-run)
+          (cd packages/bijou-i18n-tools-node && npm pack --dry-run)
+          (cd packages/bijou-i18n-tools-xlsx && npm pack --dry-run)
 
   smoke_examples:
     name: Smoke examples (${{ matrix.lane.label }})
@@ -90,7 +94,7 @@ jobs:
     needs: [verify, smoke_examples]
     strategy:
       matrix:
-        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app]
+        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app, bijou-i18n, bijou-i18n-tools, bijou-i18n-tools-node, bijou-i18n-tools-xlsx]
     steps:
       - uses: actions/checkout@v6
 

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`) are versioned in lock-step.
+All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`) are versioned in lock-step.
 
 ## [Unreleased]
 
@@ -113,6 +113,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **WF-005 i18n publish-surface closure** — the release docs, workflow signposts, and repo-native release guide now treat the four i18n packages as part of the planned `4.1.0` automated release path, and the publish / release-dry-run workflows now pack and dry-run all nine public workspace packages instead of only the older five-package matrix.
 - **XLSX dependency guidance clarification** — the `@flyingrobots/bijou-i18n-tools-xlsx` README now time-bounds the security note for the stale npm `xlsx` package and points maintainers at the official SheetJS Node installation guidance for the supported CDN tarball workflow.
 - **Shell quit-policy spec** — added a dedicated shell quit-policy spec that pins down request-quit semantics across framed apps and DOGFOOD landing, including the text-entry exception for printable keys like `q` inside search surfaces.
 - **Low-allocation renderer design pass** — added a dedicated strategy note for moving the runtime toward reusable framebuffers and a low-garbage hot render loop, explicitly separating short-term buffer reuse and direct-cell diffing from the longer-term question of a dedicated internal mutable framebuffer.

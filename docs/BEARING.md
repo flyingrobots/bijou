@@ -23,17 +23,16 @@ That means:
 
 ## What Just Shipped?
 
-The latest merged runtime-focused slices are:
+The latest merged runtime- and release-shaping slices are:
 
 - [RE-006](./design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - [DX-001](./design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
 - [DX-002](./design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 - [WF-004](./design/WF-004-shape-the-next-release.md)
+- [WF-005](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 
 ## What Feels Wrong?
 
-- the release is now shaped as `4.1.0`, but the i18n publish matrix is
-  still smaller than the workspace's public package story
 - `CHANGELOG.md` still needs its final `4.1.0` cut from the real
   `v4.0.0..HEAD` boundary
 - the pre-release blockers need to stay visibly separate from ordinary

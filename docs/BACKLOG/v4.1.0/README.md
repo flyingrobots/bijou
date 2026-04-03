@@ -8,3 +8,6 @@ and there is still bounded pre-release work to close.
 
 Do not put general follow-on product work here. This lane is for
 release-blocking cycles only.
+
+Right now that remaining blocker is
+[`WF-006`](./WF-006-cut-clean-4-1-0-release-boundary.md).

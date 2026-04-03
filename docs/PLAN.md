@@ -39,8 +39,9 @@ The release decision is now:
 - target version: `4.1.0`
 - release type: stable minor
 - `RE-007` is explicitly deferred until after `4.1.0`
-- the remaining release blockers are changelog cut, publish-surface
-  closure for the i18n packages, and the normal release gauntlet
+- the i18n publish surface is now closed in the automated release path
+- the remaining release blockers are changelog cut and the normal
+  release gauntlet
 
 The cycle-shaped blockers now live in
 [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md).
@@ -54,11 +55,10 @@ So the work now should stay narrower and more structural:
 
 ## Active Cycle
 
-- [WF-004 — Shape The Next Release](./design/WF-004-shape-the-next-release.md)
+- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 
 ## Before 4.1.0 Ships
 
-- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./BACKLOG/v4.1.0/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 - [WF-006 — Cut Clean 4.1.0 Release Boundary](./BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
 
 ### Up Next

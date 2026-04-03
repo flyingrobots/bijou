@@ -41,11 +41,10 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 ## Current cycle and backlog
 
 - active cycle:
-  - [WF-004 — Shape The Next Release](../design/WF-004-shape-the-next-release.md)
+  - [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](../design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 - latest completed cycle:
-  - [WF-001 — Adopt the Legends/Cycles Workflow](../design/WF-001-adopt-cycle-workflow.md)
+  - [WF-004 — Shape The Next Release](../design/WF-004-shape-the-next-release.md)
 - release-target backlog:
-  - [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](../BACKLOG/v4.1.0/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
   - [WF-006 — Cut Clean 4.1.0 Release Boundary](../BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
 - live backlog:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)

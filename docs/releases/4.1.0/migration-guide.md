@@ -54,9 +54,16 @@ packages:
 npm install @flyingrobots/bijou-i18n@4.1.0 @flyingrobots/bijou-i18n-tools@4.1.0
 ```
 
-Important note: `v4.1.0` should only be treated as fully ready once the
-i18n publish-surface decision is closed. Verify package availability on
-npm before relying on those package names in a published app.
+If you also need filesystem or XLSX exchange adapters, install those in
+the same lock-step release:
+
+```bash
+npm install @flyingrobots/bijou-i18n-tools-node@4.1.0 @flyingrobots/bijou-i18n-tools-xlsx@4.1.0
+```
+
+These i18n packages are part of the planned `4.1.0` automated publish
+surface, so they should land together with the rest of the workspace
+when `4.1.0` is released.
 
 ## 2. Framed Apps: Move Onto The Typed Shell Surface
 
