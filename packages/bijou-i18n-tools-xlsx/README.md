@@ -12,4 +12,4 @@ XLSX workbook adapters for Bijou localization exchange workflows.
 This package intentionally keeps spreadsheet-provider logic out of the pure `@flyingrobots/bijou-i18n-tools` package.
 
 Dependency note:
-`xlsx` is installed from the official SheetJS CDN tarball rather than the stale npm registry release. The npm package line is no longer maintained and carries unresolved security advisories; this package pins the maintained upstream tarball instead.
+As of 2026-04-02, `xlsx` is installed from the official SheetJS CDN tarball rather than the npm registry release, which is stale and carries known security advisories. See https://docs.sheetjs.com/docs/getting-started/installation/nodejs/ for the current upstream installation guidance.
