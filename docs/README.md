@@ -53,6 +53,8 @@ These are still active references, but they are not the main execution surface.
   - which examples are still canonical versus merely illustrative
 - [Release Guide](./release.md)
   - repo-native release process, guards, validation, and publish verification
+- [Release Docs](./releases/README.md)
+  - long-form "what's new" and migration guides for individual releases
 - [Workflow](./WORKFLOW.md)
   - repo-local planning and delivery model
 

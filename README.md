@@ -206,6 +206,7 @@ Those docs are meant to answer:
 - [DOGFOOD Docs Surface](./examples/docs/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
+- [Release Docs](./docs/releases/README.md)
 - [Release Guide](./docs/release.md)
 - [Changelog](./docs/CHANGELOG.md)
 - [Examples Index](./examples/README.md)

@@ -46,6 +46,8 @@ Bijou now tracks work through:
 - Legends, cycle docs, tests, and backlog placement must agree.
 - Agents are first-class users and should have explicit hills and
   playback questions where relevant.
+- Version-target backlog lanes like `docs/BACKLOG/v4.1.0/` are only for
+  cycles that must land before that shaped release ships.
 
 ## Read Order
 

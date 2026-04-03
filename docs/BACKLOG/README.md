@@ -8,6 +8,7 @@ Bijou now uses METHOD-style lanes inside the backlog:
 - [`inbox/`](./inbox/README.md)
 - [`asap/`](./asap/README.md)
 - [`up-next/`](./up-next/README.md)
+- [`v4.1.0/`](./v4.1.0/README.md)
 - [`cool-ideas/`](./cool-ideas/README.md)
 - [`bad-code/`](./bad-code/README.md)
 
@@ -21,3 +22,6 @@ Bijou now uses METHOD-style lanes inside the backlog:
 
 If a file looks like current work, it should usually live in `asap/` or
 `up-next/`, not only in the root backlog.
+
+Version-target lanes like `v4.1.0/` are temporary. Use them only for
+cycles that must close before that release ships.

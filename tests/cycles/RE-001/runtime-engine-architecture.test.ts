@@ -14,7 +14,7 @@ describe('RE-001 runtime engine architecture cycle', () => {
     const landedRouting = readRepoFile('docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md');
     const landedBuffers = readRepoFile('docs/design/RE-005-buffer-commands-and-effects-separately.md');
     const landedComponents = readRepoFile('docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md');
-    const backlogShell = readRepoFile('docs/BACKLOG/asap/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
+    const backlogShell = readRepoFile('docs/BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
     expect(legend).toContain('RE — Runtime Engine');
     expect(legend).toContain('state machines');

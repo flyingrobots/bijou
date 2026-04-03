@@ -61,6 +61,7 @@ docs/
     inbox/                         raw ideas
     asap/                          pull soon
     up-next/                       next in line
+    v4.1.0/                        temporary release-blocking lane
     cool-ideas/                    experiments and optional bets
     bad-code/                      debt that bothers us
     *.md                           untriaged or historical backlog captures
@@ -102,6 +103,7 @@ Backlog items are markdown files. The filesystem is the queue.
 | `inbox/` | Raw ideas. Capture first, sort later. |
 | `asap/` | Pull into a cycle soon. |
 | `up-next/` | Next in line once `asap/` clears. |
+| `vX.Y.Z/` | Temporary lane for cycles that must close before that shaped release ships. |
 | `cool-ideas/` | Interesting, not committed. |
 | `bad-code/` | Debt that works but bothers us. |
 
@@ -132,6 +134,8 @@ At cycle boundaries:
 
 - process `inbox/`
 - move the truly current work into `asap/` and `up-next/`
+- create or prune version-target lanes like `v4.1.0/` only when a
+  shaped release has genuine remaining blockers
 - push stale but still valid work back to root backlog or `cool-ideas/`
 - file irritating debt in `bad-code/`
 - move rejected work into `docs/graveyard/`
@@ -188,6 +192,7 @@ Bijou does not need process theater if the repo answers these questions:
 
 - What is next? `ls docs/BACKLOG/asap`
 - What is queued after that? `ls docs/BACKLOG/up-next`
+- What must close before the current shaped release? `ls docs/BACKLOG/v4.1.0`
 - What is actively or historically committed? `ls docs/design`
 - What shipped? read `docs/CHANGELOG.md`
 - What direction are we steering? read `docs/BEARING.md`
@@ -199,7 +204,7 @@ adding ceremony.
 
 ```text
 idea -> BACKLOG/inbox
-  -> BACKLOG/asap | BACKLOG/up-next | BACKLOG/cool-ideas | BACKLOG/bad-code
+  -> BACKLOG/asap | BACKLOG/up-next | BACKLOG/vX.Y.Z | BACKLOG/cool-ideas | BACKLOG/bad-code
   -> design/<cycle-doc>.md
   -> RED -> GREEN -> playback
   -> retro/ or inline retrospective

@@ -21,7 +21,8 @@ filesystem listing.
 
 ## Current Posture
 
-Bijou is no longer proving whether it can exist.
+Bijou is no longer proving whether it can exist, and it is no longer
+undecided about the next release.
 
 The repo now has:
 
@@ -30,21 +31,39 @@ The repo now has:
 - a humane shell direction
 - complete DOGFOOD family coverage
 - landed DX cleanup on the most painful framed-shell typing seams
+- a shaped next release target through
+  [WF-004](./design/WF-004-shape-the-next-release.md)
+
+The release decision is now:
+
+- target version: `4.1.0`
+- release type: stable minor
+- `RE-007` is explicitly deferred until after `4.1.0`
+- the remaining release blockers are changelog cut, publish-surface
+  closure for the i18n packages, and the normal release gauntlet
+
+The cycle-shaped blockers now live in
+[`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md).
 
 So the work now should stay narrower and more structural:
 
-- finish the runtime-engine spine
+- finish preparing `4.1.0` honestly
 - keep work-tracking truth honest through METHOD lanes and signposts
-- use DOGFOOD and design-language follow-ons as proving surfaces
+- pick the next engineering slice after the release instead of smuggling
+  it into the release boundary
 
-## Pull Order
+## Active Cycle
 
-### ASAP
+- [WF-004 — Shape The Next Release](./design/WF-004-shape-the-next-release.md)
 
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/asap/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+## Before 4.1.0 Ships
+
+- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./BACKLOG/v4.1.0/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
+- [WF-006 — Cut Clean 4.1.0 Release Boundary](./BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
 
 ### Up Next
 
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - [DL-009 — Formalize Layout and Viewport Rules](./BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
@@ -75,3 +94,7 @@ mistake every root backlog file for live queue priority.
 3. Keep legends, backlog placement, cycle docs, and changelog truth in
    sync. If they disagree, fix the docs instead of adding more summary
    prose.
+4. Shape releases explicitly: what is in, what is out, what number it
+   wants, and what ready means.
+5. Do not let follow-on architecture work silently expand the current
+   release boundary after it has been shaped.

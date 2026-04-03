@@ -56,6 +56,15 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 ## Current Version And Publish Surface
 
+### Current Shaped Target
+
+The currently shaped next release target is **`4.1.0`**.
+
+Its long-form release docs live in:
+
+- [`docs/releases/4.1.0/whats-new.md`](./releases/4.1.0/whats-new.md)
+- [`docs/releases/4.1.0/migration-guide.md`](./releases/4.1.0/migration-guide.md)
+
 ### Lock-step Versioned Units
 
 These packages move together:
@@ -162,6 +171,20 @@ references to the exact same version.
 - add or replace `## What's New in vX.Y.Z`
 - keep it concise and user-facing
 - keep a visible link to [`CHANGELOG.md`](./CHANGELOG.md)
+
+### 5. Draft long-form release docs
+
+Before the version is chosen, draft these in `docs/releases/next/`:
+
+- `whats-new.md`
+- `migration-guide.md`
+
+When the version is chosen, move that directory to
+`docs/releases/X.Y.Z/` and update any version placeholders inside the
+docs.
+
+For the currently shaped release, that work has already happened under
+`docs/releases/4.1.0/`.
 
 ## Phase 3: Local Validation
 

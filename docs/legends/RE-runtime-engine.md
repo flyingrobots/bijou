@@ -69,4 +69,4 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 - latest completed cycle:
   - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - live queue:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/asap/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
