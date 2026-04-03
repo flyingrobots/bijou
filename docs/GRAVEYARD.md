@@ -1,7 +1,9 @@
 # Graveyard
 
-Ideas explored and deliberately abandoned or deferred indefinitely. If something is here, it means we considered it and said no — not that we forgot about it.
+The active graveyard now lives in [docs/graveyard/](./graveyard/README.md).
 
----
+Use that directory for rejected or indefinitely deferred work that needs
+to stay discoverable.
 
-*Nothing here yet. That's a good sign.*
+This signpost remains so older docs can still point at a stable
+graveyard entrypoint.

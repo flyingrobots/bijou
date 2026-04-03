@@ -50,8 +50,9 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 
 ## Current cycle and backlog
 
-- active cycle:
+- latest completed cycle:
   - [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../design/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
-- backlog:
-  - [HT-001 — Notification Center Polish and Discoverability](../BACKLOG/HT-001-notification-center-polish-and-discoverability.md)
+- live backlog:
   - [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)
+- older backlog still needing explicit re-triage:
+  - [HT-001 — Notification Center Polish and Discoverability](../BACKLOG/HT-001-notification-center-polish-and-discoverability.md)

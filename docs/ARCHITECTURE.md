@@ -4,6 +4,8 @@ This document is the structural reference for the current repository shape.
 
 If you want the current execution order, read [PLAN.md](./PLAN.md).
 If you want the public front door, read [../README.md](../README.md).
+If you want the engineering doctrine behind the repo shape, read
+[system-style-javascript.md](./system-style-javascript.md).
 
 ## Overview
 
@@ -143,6 +145,11 @@ Spreadsheet exchange adapters:
 
 Bijou still follows a ports-and-adapters core.
 
+The repo-wide engineering doctrine for that posture lives in
+[System-Style JavaScript](./system-style-javascript.md): runtime truth
+outranks type-only trust, schemas live at boundaries, host APIs stay
+behind adapters, and codecs do not get to masquerade as domain models.
+
 Three ports remain the important purity boundary:
 
 | Port | Responsibility | Representative methods |
@@ -244,7 +251,7 @@ See:
 
 - [DOGFOOD docs surface](../examples/docs/README.md)
 - [Curated Example Map](./EXAMPLES.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 ## What This File Is Not
 

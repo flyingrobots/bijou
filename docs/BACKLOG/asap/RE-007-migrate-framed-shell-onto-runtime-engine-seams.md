@@ -1,6 +1,6 @@
 # RE-007 — Migrate Framed Shell Onto Runtime Engine Seams
 
-Legend: [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
 ## Idea
 

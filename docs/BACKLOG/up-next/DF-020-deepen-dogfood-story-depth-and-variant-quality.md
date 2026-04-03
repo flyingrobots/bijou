@@ -1,6 +1,6 @@
 # DF-020 — Deepen DOGFOOD Story Depth and Variant Quality
 
-Legend: [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
+Legend: [DF — DOGFOOD Field Guide](../../legends/DF-dogfood-field-guide.md)
 
 ## Idea
 

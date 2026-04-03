@@ -56,6 +56,7 @@ An agent can measure current DOGFOOD component-family coverage against the canon
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
   - the next work is depth and quality, not another family-count ratchet
-- backlog:
+- live backlog:
+  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+- historical backlog lineage:
   - [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
-  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)

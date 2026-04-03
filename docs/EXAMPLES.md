@@ -84,6 +84,6 @@ The repo still carries `smoke:examples:*`, but that should not be treated as the
 
 Tracked direction:
 
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 That shift should happen in stages, not through blind example deletion.

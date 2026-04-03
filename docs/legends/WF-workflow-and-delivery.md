@@ -38,8 +38,11 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 - [Tests Are the Spec](../invariants/tests-are-the-spec.md)
 - [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
-## Initial cycles
+## Current cycle and backlog
 
-- [WF-001 — Adopt the Legends/Cycles Workflow](../design/WF-001-adopt-cycle-workflow.md)
-- [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- latest completed cycle:
+  - [WF-001 — Adopt the Legends/Cycles Workflow](../design/WF-001-adopt-cycle-workflow.md)
+- live queue:
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- migration debt still worth tracking:
+  - [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)

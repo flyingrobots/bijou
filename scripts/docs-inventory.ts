@@ -15,6 +15,10 @@ const SECTIONS: readonly InventorySection[] = [
     entries: [
       'README.md',
       'docs/README.md',
+      'docs/METHOD.md',
+      'docs/BEARING.md',
+      'docs/VISION.md',
+      'docs/system-style-javascript.md',
       'docs/PLAN.md',
       'docs/legends/README.md',
       'docs/BACKLOG/README.md',
@@ -31,6 +35,7 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/ARCHITECTURE.md',
       'docs/MIGRATING_TO_V4.md',
       'docs/EXAMPLES.md',
+      'docs/release.md',
       'docs/WORKFLOW.md',
     ],
   },

@@ -1,6 +1,6 @@
 # DL-009 — Formalize Layout and Viewport Rules
 
-Legend: [DL — Design Language](../legends/DL-design-language.md)
+Legend: [DL — Design Language](../../legends/DL-design-language.md)
 
 ## Idea
 

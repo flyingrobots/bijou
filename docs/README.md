@@ -16,12 +16,20 @@ These are the docs that describe what Bijou is, what it is doing now, and how cu
 
 - [Root README](../README.md)
   - front door: package map, DOGFOOD overview, quick start, and public positioning
+- [METHOD](./METHOD.md)
+  - repo work doctrine: backlog lanes, cycle loop, signposts, and ship sync
+- [BEARING](./BEARING.md)
+  - current direction, latest merged work, and tensions
+- [VISION](./VISION.md)
+  - bounded synthesis of where Bijou is trying to go
+- [System-Style JavaScript](./system-style-javascript.md)
+  - engineering doctrine for runtime-backed modeling, boundaries, adapters, and codecs
 - [Current Plan](./PLAN.md)
-  - the shortest honest answer to "what are we doing next?"
+  - short narrative summary of the current queue; supporting signpost, not the authority
 - [Legends](./legends/README.md)
   - thematic workstreams and the intent behind them
 - [Backlog](./BACKLOG/README.md)
-  - not-started work items
+  - not-started work items, with METHOD lanes
 - [Design Cycles](./design/README.md)
   - active and landed cycle docs; historical implementation record
 - [Invariants](./invariants/README.md)
@@ -43,6 +51,8 @@ These are still active references, but they are not the main execution surface.
   - upgrade guidance for existing apps
 - [Curated Example Map](./EXAMPLES.md)
   - which examples are still canonical versus merely illustrative
+- [Release Guide](./release.md)
+  - repo-native release process, guards, validation, and publish verification
 - [Workflow](./WORKFLOW.md)
   - repo-local planning and delivery model
 
@@ -66,7 +76,9 @@ These files still matter, but they should not be mistaken for the current source
 If you are a human or an agent trying to answer "what is true right now?":
 
 1. read [Root README](../README.md)
-2. read [Current Plan](./PLAN.md)
-3. read the relevant [Legend](./legends/README.md) and [Backlog](./BACKLOG/README.md) item
-4. use [DOGFOOD](../examples/docs/README.md) and the [Design System](./design-system/README.md) as the proving surfaces
-5. only then reach for [Roadmap](./ROADMAP.md), archived docs, or legacy specs
+2. read [METHOD](./METHOD.md), [BEARING](./BEARING.md), and [VISION](./VISION.md)
+3. for engineering questions, read [System-Style JavaScript](./system-style-javascript.md) and [Architecture](./ARCHITECTURE.md)
+4. read the relevant [Legend](./legends/README.md) and the actual backlog lane or cycle doc
+5. check [Changelog](./CHANGELOG.md) if landed behavior matters
+6. use [DOGFOOD](../examples/docs/README.md) and the [Design System](./design-system/README.md) as the proving surfaces
+7. only then reach for [Plan](./PLAN.md), [Roadmap](./ROADMAP.md), archived docs, or legacy specs

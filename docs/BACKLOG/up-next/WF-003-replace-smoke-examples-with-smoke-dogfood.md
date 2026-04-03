@@ -1,6 +1,6 @@
 # WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`
 
-Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+Legend: [WF — Workflow and Delivery](../../legends/WF-workflow-and-delivery.md)
 
 ## Idea
 

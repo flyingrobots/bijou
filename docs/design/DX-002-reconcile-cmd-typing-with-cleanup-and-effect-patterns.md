@@ -2,7 +2,16 @@
 
 Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 
-## Idea
+## Historical note
+
+This slice is already landed.
+
+It originally lived as a backlog capture and was promoted into
+`docs/design/` during METHOD adoption so the active backlog would stop
+advertising completed work as upcoming queue. The file is lighter than
+newer cycle docs for that reason.
+
+## Why this cycle existed
 
 Make command typing match the cleanup-function and runtime-effect patterns Bijou actually encourages.
 
@@ -29,3 +38,17 @@ From `warp-ttd` TUI development:
 - decide whether cleanup handles, effects, and commands need clearer separation
 - align public typing with the documented timer/cleanup pattern
 - add tests proving the typed API supports cleanup-producing runtime work without casts
+
+## Outcome
+
+This work landed and is reflected in [CHANGELOG.md](../CHANGELOG.md).
+
+`Cmd<M>` now matches the cleanup-capable runtime patterns Bijou actually
+uses, and the runtime retains and disposes cleanup results instead of
+forcing those paths through fake message contracts.
+
+## Follow-on
+
+- [DX-003 — Rationalize Table APIs and Public Table Types](../BACKLOG/DX-003-rationalize-table-apis-and-public-table-types.md)
+- [DX-004 — Smooth Surface and String Composition Seams](../BACKLOG/DX-004-smooth-surface-and-string-composition-seams.md)
+- [DX-005 — Polish Small Component and Import Ergonomics](../BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)

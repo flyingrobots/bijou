@@ -9,6 +9,8 @@ Each legend should describe:
 - the agent users
 - the hills
 - the relevant invariants
-- example or likely cycles
+- the latest completed cycle
+- the live backlog that still matters
 
-Cycles should link back to their legend doc.
+Cycles should link back to their legend doc, and legend docs should not
+pretend shipped backlog items are still upcoming work.

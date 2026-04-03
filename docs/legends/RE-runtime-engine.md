@@ -46,6 +46,10 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Core invariants
 
+- [Runtime Truth Wins](../invariants/runtime-truth-wins.md)
+- [Schemas Live At Boundaries](../invariants/schemas-live-at-boundaries.md)
+- [Host APIs Stay Behind Adapters](../invariants/host-apis-stay-behind-adapters.md)
+- [Codecs Are Not Domain Models](../invariants/codecs-are-not-domain-models.md)
 - [Focus Owns Input](../invariants/focus-owns-input.md)
 - [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
 - [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
@@ -55,13 +59,14 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Related doctrine
 
+- [System-Style JavaScript](../system-style-javascript.md)
 - [Bijou UX Doctrine](../strategy/bijou-ux-doctrine.md)
 - [The Humane Shell](../strategy/humane-shell.md)
 - [Design-System Patterns](../design-system/patterns.md)
 
 ## Current cycle and backlog
 
-- active cycle:
+- latest completed cycle:
   - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- backlog:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- live queue:
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/asap/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

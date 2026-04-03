@@ -198,10 +198,15 @@ Those docs are meant to answer:
 ## Documentation Map
 
 - [Docs Index](./docs/README.md)
+- [METHOD](./docs/METHOD.md)
+- [BEARING](./docs/BEARING.md)
+- [VISION](./docs/VISION.md)
+- [System-Style JavaScript](./docs/system-style-javascript.md)
 - [Current Plan](./docs/PLAN.md)
 - [DOGFOOD Docs Surface](./examples/docs/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
+- [Release Guide](./docs/release.md)
 - [Changelog](./docs/CHANGELOG.md)
 - [Examples Index](./examples/README.md)
 - [Curated Example Map](./docs/EXAMPLES.md)
@@ -217,7 +222,13 @@ These are directions we are actively interested in, but they are not being prese
 - replay artifacts, richer scenario tooling, and time-travel debugging
 - deeper BCSS/devtools work beyond the currently shipped scoped runtime styling
 
-See [docs/PLAN.md](./docs/PLAN.md) for the current execution order and [docs/ROADMAP.md](./docs/ROADMAP.md) for the broader legacy/reference backlog.
+See [docs/METHOD.md](./docs/METHOD.md) for the repo work doctrine,
+[docs/BEARING.md](./docs/BEARING.md) for the current direction,
+[docs/system-style-javascript.md](./docs/system-style-javascript.md) for
+the engineering doctrine,
+[docs/PLAN.md](./docs/PLAN.md) for the short queue summary, and
+[docs/ROADMAP.md](./docs/ROADMAP.md) for the broader legacy/reference
+backlog.
 
 ## License
 

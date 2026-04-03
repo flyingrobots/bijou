@@ -17,3 +17,10 @@ This backlog item exists to track that content-expansion work separately from sh
 ## Status
 
 Backlog spawned by the retrospective for DF-001.
+
+## METHOD Note
+
+This file is kept as historical backlog lineage.
+
+It is not the current DOGFOOD queue. The live follow-on now is
+[DF-020](./up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md).

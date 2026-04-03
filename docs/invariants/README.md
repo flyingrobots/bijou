@@ -7,6 +7,10 @@ When a design doc or legend references an invariant, it should link to the speci
 Current invariants:
 
 - [Tests Are the Spec](./tests-are-the-spec.md)
+- [Runtime Truth Wins](./runtime-truth-wins.md)
+- [Schemas Live At Boundaries](./schemas-live-at-boundaries.md)
+- [Host APIs Stay Behind Adapters](./host-apis-stay-behind-adapters.md)
+- [Codecs Are Not Domain Models](./codecs-are-not-domain-models.md)
 - [Focus Owns Input](./focus-owns-input.md)
 - [Topmost Layer Dismisses First](./topmost-layer-dismisses-first.md)
 - [Visible Controls Are a Promise](./visible-controls-are-a-promise.md)

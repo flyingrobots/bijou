@@ -38,17 +38,21 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Core invariants
 
+- [Runtime Truth Wins](../invariants/runtime-truth-wins.md)
+- [Schemas Live At Boundaries](../invariants/schemas-live-at-boundaries.md)
+- [Codecs Are Not Domain Models](../invariants/codecs-are-not-domain-models.md)
 - [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
 - [Docs Are the Demo](../invariants/docs-are-the-demo.md)
 
 ## Related doctrine
 
+- [System-Style JavaScript](../system-style-javascript.md)
 - [Localization and Bidirectionality](../strategy/localization-and-bidirectionality.md)
 - [Content Guide](../strategy/content-guide.md)
 
 ## Current cycle and backlog
 
 - latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](../design/LX-008-localize-shell-chrome-and-dogfood.md)
-- backlog:
+- live backlog:
   - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
   - [LX-007 — Service-Oriented Localization Adapters](../BACKLOG/LX-007-service-oriented-localization-adapters.md)

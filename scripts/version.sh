@@ -64,4 +64,9 @@ for pkg in "${PACKAGES[@]}"; do
 done
 
 echo ""
-echo "Done. Run: git add -A && git commit -m 'v$VERSION' && git tag v$VERSION && git push --tags"
+echo "Done. Recommended next steps:"
+echo "  git add -A"
+echo "  git commit -m 'chore(release): v$VERSION'"
+echo "  git tag -a v$VERSION -m 'release: v$VERSION'"
+echo "  git push origin main"
+echo "  git push origin v$VERSION"
