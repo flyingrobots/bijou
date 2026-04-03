@@ -33,6 +33,8 @@ The repo now has:
 - landed DX cleanup on the most painful framed-shell typing seams
 - a shaped next release target through
   [WF-004](./design/WF-004-shape-the-next-release.md)
+- closed release-blocker cycles through
+  [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
 
 The release decision is now:
 
@@ -40,11 +42,10 @@ The release decision is now:
 - release type: stable minor
 - `RE-007` is explicitly deferred until after `4.1.0`
 - the i18n publish surface is now closed in the automated release path
-- the remaining release blockers are changelog cut and the normal
-  release gauntlet
-
-The cycle-shaped blockers now live in
-[`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md).
+- the short-form release surfaces are now aligned to the real
+  `v4.0.0..HEAD` boundary
+- no cycle-shaped release blockers remain; the next step is the normal
+  release gauntlet and release execution
 
 So the work now should stay narrower and more structural:
 
@@ -55,11 +56,15 @@ So the work now should stay narrower and more structural:
 
 ## Active Cycle
 
-- [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
+- [WF-006 — Cut Clean 4.1.0 Release Boundary](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
 
 ## Before 4.1.0 Ships
 
-- [WF-006 — Cut Clean 4.1.0 Release Boundary](./BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
+- run `npm run release:preflight`
+- run `npm run release:readiness`
+- run the GitHub Release Dry Run workflow
+- execute the version bump, tag, and publish flow in
+  [docs/release.md](./release.md)
 
 ### Up Next
 

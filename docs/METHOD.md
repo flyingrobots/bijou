@@ -61,7 +61,7 @@ docs/
     inbox/                         raw ideas
     asap/                          pull soon
     up-next/                       next in line
-    v4.1.0/                        temporary release-blocking lane
+    vX.Y.Z/                        temporary release-blocking lane when needed
     cool-ideas/                    experiments and optional bets
     bad-code/                      debt that bothers us
     *.md                           untriaged or historical backlog captures
@@ -134,7 +134,7 @@ At cycle boundaries:
 
 - process `inbox/`
 - move the truly current work into `asap/` and `up-next/`
-- create or prune version-target lanes like `v4.1.0/` only when a
+- create or prune version-target lanes like `vX.Y.Z/` only when a
   shaped release has genuine remaining blockers
 - push stale but still valid work back to root backlog or `cool-ideas/`
 - file irritating debt in `bad-code/`
@@ -192,7 +192,9 @@ Bijou does not need process theater if the repo answers these questions:
 
 - What is next? `ls docs/BACKLOG/asap`
 - What is queued after that? `ls docs/BACKLOG/up-next`
-- What must close before the current shaped release? `ls docs/BACKLOG/v4.1.0`
+- What must close before the current shaped release? inspect
+  `docs/BACKLOG/vX.Y.Z/` if it exists; otherwise there are no
+  cycle-shaped release blockers
 - What is actively or historically committed? `ls docs/design`
 - What shipped? read `docs/CHANGELOG.md`
 - What direction are we steering? read `docs/BEARING.md`

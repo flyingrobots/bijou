@@ -269,4 +269,4 @@ runtime slice. `4.1.0` should ship the runtime-engine story through
 ### Debt spawned
 
 - [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](./WF-005-close-4-1-0-i18n-publish-surface-gap.md)
-- [WF-006 — Cut Clean 4.1.0 Release Boundary](../BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
+- [WF-006 — Cut Clean 4.1.0 Release Boundary](./WF-006-cut-clean-4-1-0-release-boundary.md)

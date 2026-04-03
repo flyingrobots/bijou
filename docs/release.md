@@ -60,6 +60,9 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 The currently shaped next release target is **`4.1.0`**.
 
+The cycle-shaped `4.1.0` blockers are now closed. Remaining work is the
+actual release execution path from this guide.
+
 Its long-form release docs live in:
 
 - [`docs/releases/4.1.0/whats-new.md`](./releases/4.1.0/whats-new.md)

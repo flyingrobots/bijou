@@ -19,10 +19,9 @@ describe('WF-004 shape the next release', () => {
     expect(releaseDocs).toContain('Migration Guide (v4.1.0)');
   });
 
-  it('spawns a dedicated 4.1.0 backlog lane for remaining pre-release cycles', () => {
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md')).toBe(true);
+  it('spawns explicit 4.1.0 follow-on cycles from the release-shaping decision', () => {
     expect(existsRepoPath('docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md')).toBe(true);
+    expect(existsRepoPath('docs/design/WF-006-cut-clean-4-1-0-release-boundary.md')).toBe(true);
 
     const cycle = readRepoFile('docs/design/WF-004-shape-the-next-release.md');
     expect(cycle).toContain('WF-005 — Close 4.1.0 i18n Publish-Surface Gap');

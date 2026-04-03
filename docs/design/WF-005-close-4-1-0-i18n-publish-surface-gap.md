@@ -104,7 +104,7 @@ The public `4.1.0` package surface must be discoverable through:
 - choosing the exact changelog wording for the final release cut
 - changing package versions before release execution
 - solving the remaining `4.1.0` blocker captured in
-  [WF-006](../BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
+  [WF-006](./WF-006-cut-clean-4-1-0-release-boundary.md)
 
 ## Evidence
 
@@ -195,4 +195,4 @@ Bijou should therefore:
 ### Debt spawned
 
 - no new follow-on debt beyond the already-shaped
-  [WF-006](../BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md)
+  [WF-006](./WF-006-cut-clean-4-1-0-release-boundary.md)

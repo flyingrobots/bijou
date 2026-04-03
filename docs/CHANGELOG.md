@@ -6,6 +6,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+This unreleased section is the planned `4.1.0` release slice and is now
+aligned to the actual `v4.0.0..HEAD` boundary. During release
+execution, rename this heading to `[4.1.0] - YYYY-MM-DD`.
+
 ### ✨ Features
 
 - **DX-002 cleanup-capable command contract** — `@flyingrobots/bijou-tui` now lets `Cmd<M>` settle synchronously or asynchronously, and commands may now return cleanup handles/functions for long-lived runtime work instead of pretending every command ends in a message or `QUIT`. The event bus now retains those cleanups and disposes them on shutdown, and mapped sub-app commands preserve cleanup results instead of coercing them through parent message space. The cycle is captured in [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md).
@@ -182,6 +186,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Containment, markdown, and DAG docs depth pass** — the design-system guides, package docs, and example pages now add a first-class `markdown()` family entry, deeper `box()` / `headerBox()` scenario guidance, and sharper rules for when to use passive DAGs, sliced DAGs, DAG metrics, or `dagPane()` inspection.
 - **Loading, link, and expressive-brand docs depth pass** — the design-system guides, package docs, examples index, and example pages now add first-class `skeleton()`, `hyperlink()`, `loadRandomLogo()`, and `gradientText()` guidance, including loading honesty, trusted-link fallback behavior, and boundaries for expressive branding versus routine application chrome.
 - **Shortcut, progress, and custom-primitive docs depth pass** — the design-system guides, package docs, examples index, and example pages now add first-class `kbd()`, `progressBar()` / `spinnerFrame()`, and `renderByMode()` guidance, including inline-versus-shell shortcut rules, determinate-versus-indeterminate progress choices, and honest app-authored mode-aware primitives.
+
+## [4.0.0] - 2026-03-22
+
+### ✨ Features
+
+- **Pure-surface interactive runtime release** — `@flyingrobots/bijou-tui`
+  made `Surface | LayoutNode` the public view contract and moved framed
+  shells, overlays, transitions, viewport helpers, and most high-value
+  runtime/layout paths onto the surface path instead of implicit string
+  fallback.
+- **String-first toolkit still supported** — Bijou kept prompt-driven
+  CLI and output helpers honest for string-first flows instead of
+  pretending the whole toolkit had to become surface-only.
+- **Release hardening for the v4 line** — deterministic tests, example
+  smoke coverage, scaffold canaries, and release-readiness checks
+  shipped as part of the release.
 
 ## [3.1.0] - 2026-03-18
 
@@ -1096,7 +1116,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/flyingrobots/bijou/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/flyingrobots/bijou/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/flyingrobots/bijou/compare/v2.0.0...v2.1.0
@@ -1122,5 +1143,3 @@ First public release.
 [0.3.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.3.0
 [0.2.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.2.0
 [0.1.0]: https://github.com/flyingrobots/bijou/releases/tag/v0.1.0
-- defaulted core box/table component overflow to wrap instead of truncate, with per-instance `overflow: 'truncate'` overrides and matching surface support
-- **Shell-owned notification center design** — added a dedicated humane-shell strategy/spec pair for durable notification review: a right-edge shell notification center, footer-level inbox cue, standard shell entry points, and a v0 contract built on the existing notification archive instead of a second store.

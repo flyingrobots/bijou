@@ -1,4 +1,4 @@
-# Bijou v4.0.0
+# Bijou
 
 **Bijou** is a TypeScript toolkit for building delightful terminal software.
 
@@ -14,18 +14,37 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What’s New in v4.0.0
+## What's New in v4.1.0
 
-v4.0.0 marks the pure-surface release for the interactive runtime.
+The next shaped release is `v4.1.0`.
+
+Compared to `v4.0.0`, it moves Bijou from the pure-surface release line
+toward a more coherent terminal application platform.
 
 Key changes:
 
-- the `@flyingrobots/bijou-tui` runtime public view contract is `Surface | LayoutNode`
-- framed shells, overlays, transitions, viewport helpers, and most higher-value layout/runtime paths now stay on the surface path instead of relying on implicit string fallback
-- the core toolkit still supports string-first CLI and prompt flows where that is the right abstraction
-- the repo includes deterministic tests, example smoke coverage, scaffold canaries, and release-readiness checks
+- the runtime-engine story now reaches through `RE-006`, giving
+  `@flyingrobots/bijou-tui` explicit state/view stacks, retained
+  layouts, layout-driven input routing, buffered commands/effects, and
+  component-level interaction contracts
+- the humane shell and DOGFOOD surface matured together, with layered
+  shell routing, calmer settings/search/notification/quit behavior, and
+  complete `35/35` DOGFOOD component-family coverage
+- localization is now a real package line with
+  `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`,
+  `@flyingrobots/bijou-i18n-tools-node`, and
+  `@flyingrobots/bijou-i18n-tools-xlsx`
+- the repo's release and engineering doctrine is much more explicit,
+  with METHOD signposts, long-form release docs, and a tighter automated
+  release path
 
-In short: the runtime is surface-first, but the toolkit is not string-free. This is a more honest and focused evolution than claiming “everything is now a surface.”
+In short: `v4.1.0` is the release where Bijou stops feeling like a
+surface toolkit plus demos and starts feeling like a real terminal
+application platform.
+
+Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
+[What's New guide](./docs/releases/4.1.0/whats-new.md), and the
+[migration guide](./docs/releases/4.1.0/migration-guide.md).
 
 ## Package Map
 
