@@ -113,6 +113,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 📝 Documentation
 
+- **XLSX dependency guidance clarification** — the `@flyingrobots/bijou-i18n-tools-xlsx` README now time-bounds the security note for the stale npm `xlsx` package and points maintainers at the official SheetJS Node installation guidance for the supported CDN tarball workflow.
 - **Shell quit-policy spec** — added a dedicated shell quit-policy spec that pins down request-quit semantics across framed apps and DOGFOOD landing, including the text-entry exception for printable keys like `q` inside search surfaces.
 - **Low-allocation renderer design pass** — added a dedicated strategy note for moving the runtime toward reusable framebuffers and a low-garbage hot render loop, explicitly separating short-term buffer reuse and direct-cell diffing from the longer-term question of a dedicated internal mutable framebuffer.
 - **FTUI onboarding primitives added to the roadmap** — the post-v4 backlog now explicitly tracks first-time-user-experience components for guided tutorials, spotlight popovers, input-teaching modal flows, and stepper-style onboarding UX that can run inside framed Bijou apps.
