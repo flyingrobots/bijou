@@ -17,6 +17,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_F2 = '\x1bOQ';
 const KEY_TAB = '\t';
 const KEY_CTRL_P = '\x10';
+const KEY_NEXT_TAB = ']';
 
 function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: boolean } = {}) {
   return {
@@ -48,6 +49,14 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
     text += '\n';
   }
   return text;
+}
+
+function activeDocsPageModel(model: any) {
+  return model.docsModel.pageModels[model.docsModel.activePageId];
+}
+
+function docsPageModel(model: any, pageId: string) {
+  return model.docsModel.pageModels[pageId];
 }
 
 function withLocaleValues(
@@ -155,7 +164,9 @@ describe('docs preview app', () => {
     expect(frameText(landing.frames.at(-1)!)).toContain(pseudoLocalize('Press [Enter]'));
 
     const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
-    expect(frameText(entered.frames.at(-1)!)).toContain(pseudoLocalize('What is Bijou?'));
+    const text = frameText(entered.frames.at(-1)!);
+    expect(text).toContain(pseudoLocalize('Guides'));
+    expect(text).toMatch(/Šëàřçħ/);
   });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {
@@ -255,11 +266,11 @@ describe('docs preview app', () => {
     const cycledLeft = await runScript(app, [{ key: KEY_LEFT }], { ctx });
 
     expect((numbered.model as any).landingThemeIndex).toBe(2);
-    expect((numbered.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(2);
+    expect(activeDocsPageModel(numbered.model as any).landingThemeIndex).toBe(2);
     expect((cycledRight.model as any).landingThemeIndex).toBe(1);
-    expect((cycledRight.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
+    expect(activeDocsPageModel(cycledRight.model as any).landingThemeIndex).toBe(1);
     expect((cycledLeft.model as any).landingThemeIndex).toBe(4);
-    expect((cycledLeft.model as any).docsModel.pageModels.dogfood.landingThemeIndex).toBe(4);
+    expect(activeDocsPageModel(cycledLeft.model as any).landingThemeIndex).toBe(4);
 
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
@@ -294,7 +305,7 @@ describe('docs preview app', () => {
       height: themedCtx.runtime.rows,
     }).surface;
 
-    expect(themedModel.docsModel.pageModels.dogfood.landingThemeIndex).toBe(1);
+    expect(activeDocsPageModel(themedModel).landingThemeIndex).toBe(1);
     expect(themedDocsText).not.toContain('Theme:');
     expect(frameText(settingsFrame)).toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Cabinet of Curiosities');
@@ -325,7 +336,7 @@ describe('docs preview app', () => {
     const frame = changed.frames[changed.frames.length - 1]!;
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
-    expect((changed.model as any).docsModel.pageModels.dogfood.landingQualityMode).toBe('quality');
+    expect(activeDocsPageModel(changed.model as any).landingQualityMode).toBe('quality');
     expect(frameText(frame)).toContain('Landing quality: Quality');
     expect(footer).toContain('60 fps • quality');
   });
@@ -336,13 +347,14 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: KEY_ENTER },
       { key: KEY_DOWN },
       { key: KEY_ENTER },
       { key: '.' },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect((result.model as any).route).toBe('docs');
@@ -362,6 +374,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'm' },
       { key: 'o' },
@@ -369,7 +382,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const frame = result.frames[result.frames.length - 1]!;
     const text = frameText(frame);
 
@@ -386,6 +399,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'i' },
       { key: 'n' },
@@ -399,7 +413,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('inspector');
@@ -414,6 +428,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 't' },
       { key: 'o' },
@@ -423,7 +438,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('toast');
@@ -437,6 +452,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'm' },
       { key: 'a' },
@@ -449,7 +465,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('markdown');
@@ -465,6 +481,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'h' },
       { key: 'y' },
@@ -494,6 +511,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'c' },
       { key: 'o' },
@@ -505,7 +523,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('confirm');
@@ -521,6 +539,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 't' },
       { key: 'a' },
@@ -529,7 +548,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('tabs');
@@ -544,6 +563,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'w' },
       { key: 'i' },
@@ -552,7 +572,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('group-wizard');
@@ -567,6 +587,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'e' },
       { key: 'x' },
@@ -578,7 +599,7 @@ describe('docs preview app', () => {
       { key: KEY_ENTER },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('explainability');
@@ -594,6 +615,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'h' },
       { key: 'e' },
@@ -604,7 +626,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('help-view');
@@ -620,6 +642,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: 'p' },
       { key: 'a' },
@@ -632,7 +655,7 @@ describe('docs preview app', () => {
       { key: '.' },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedStoryId).toBe('app-shell');
@@ -647,12 +670,14 @@ describe('docs preview app', () => {
 
     const openedSearch = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
     ], { ctx });
     expect(frameText(openedSearch.frames[openedSearch.frames.length - 1]!)).toContain('Search components');
 
     const openedPalette = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: KEY_CTRL_P },
     ], { ctx });
     const paletteText = frameText(openedPalette.frames[openedPalette.frames.length - 1]!);
@@ -666,6 +691,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: '/' },
       { key: KEY_ESCAPE },
     ], { ctx });
@@ -742,7 +768,7 @@ describe('docs preview app', () => {
     }).surface;
     const text = frameText(frame);
     const footer = text.split('\n')[frame.height - 1] ?? '';
-    const pageModel = model.docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(model, 'guides');
     expect(model.docsModel.settingsOpen).toBe(false);
     expect(pageModel.showHints).toBe(false);
     expect(pageModel.landingQualityMode).toBe('quality');
@@ -782,7 +808,7 @@ describe('docs preview app', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 40 } });
     const app = createDocsApp(ctx);
 
-    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
     const frame = entered.frames[entered.frames.length - 1]!;
 
     let text = '';
@@ -794,7 +820,7 @@ describe('docs preview app', () => {
     }
 
     const lines = text.split('\n');
-    expect(text).toContain('▶ Status and in-flow');
+    expect(text).toContain('Status and in-flow');
     expect(lines[0]).toContain('Bijou Docs');
     expect(lines[frame.height - 1]).toContain('? Help');
     expect(lines[frame.height - 1]).toContain('/ Search');
@@ -811,11 +837,12 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: KEY_ENTER },
       ...Array.from({ length: 14 }, () => ({ key: KEY_DOWN })),
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels.dogfood;
+    const pageModel = docsPageModel(result.model as any, 'components');
 
     expect(pageModel.familyState.height).toBeGreaterThan(14);
     expect(pageModel.familyState.focusIndex).toBe(14);
@@ -826,9 +853,9 @@ describe('docs preview app', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 16 } });
     const app = createDocsApp(ctx);
 
-    const result = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const result = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
     const frame = result.frames.at(-1)!;
-    const pageModel = (result.model as any).docsModel.pageModels.dogfood;
+    const pageModel = docsPageModel(result.model as any, 'components');
     const leftPaneText = frameText(frame)
       .split('\n')
       .slice(0, -1)
@@ -844,7 +871,7 @@ describe('docs preview app', () => {
     const app = createDocsApp(ctx);
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    const entered = await runScript(app, [{ key: KEY_ENTER }], { ctx });
+    const entered = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }], { ctx });
     const frame = entered.frames[entered.frames.length - 1]!;
     const lines = frameText(frame).split('\n');
     const text = lines.join('\n');
@@ -860,7 +887,7 @@ describe('docs preview app', () => {
   });
 
   it('keeps static progress previews stable while looping previews animate on pulse', async () => {
-    const openDocs = [{ key: KEY_ENTER }] as const;
+    const openDocs = [{ key: KEY_ENTER }, { key: KEY_NEXT_TAB }] as const;
     const openProgressStory = [{ msg: { type: 'docs', msg: { type: 'select-story', storyId: 'progress-bar' } } }] as const;
     const chooseLoopingVariant = [{ msg: { type: 'docs', msg: { type: 'select-variant', index: 1 } } }] as const;
     const pulse = [{ pulse: { dt: 0.45 } }] as const;
@@ -895,6 +922,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: KEY_ENTER },
       { key: KEY_DOWN },
       { key: KEY_ENTER },
@@ -904,10 +932,10 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
     ], { ctx });
 
-    const pageModel = (result.model as any).docsModel.pageModels['dogfood'];
+    const pageModel = docsPageModel(result.model as any, 'components');
     expect(pageModel.familyState.items[pageModel.familyState.focusIndex]?.value).toBe('story:alert');
     expect(pageModel.variantIndexByStory.alert).toBe(1);
-    expect((result.model as any).docsModel.focusedPaneByPage.dogfood).toBe('story-variants');
+    expect((result.model as any).docsModel.focusedPaneByPage.components).toBe('story-variants');
   });
 
   it('updates the footer hints to match the focused pane instead of leaving stale family controls visible', async () => {
@@ -916,6 +944,7 @@ describe('docs preview app', () => {
 
     const result = await runScript(app, [
       { key: KEY_ENTER },
+      { key: KEY_NEXT_TAB },
       { key: KEY_ENTER },
       { key: KEY_DOWN },
       { key: KEY_ENTER },
@@ -926,7 +955,7 @@ describe('docs preview app', () => {
     const frame = result.frames[result.frames.length - 1]!;
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
-    expect((result.model as any).docsModel.focusedPaneByPage.dogfood).toBe('story-variants');
+    expect((result.model as any).docsModel.focusedPaneByPage.components).toBe('story-variants');
     expect(footer).toContain('Tab next pane');
     expect(footer).toContain('↑/↓ variant');
     expect(footer).toContain(',/. cycle');

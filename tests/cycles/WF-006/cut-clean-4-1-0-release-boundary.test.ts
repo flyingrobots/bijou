@@ -7,12 +7,11 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md')).toBe(false);
   });
 
-  it('prunes the temporary v4.1.0 blocker lane once cycle-shaped blockers are closed', () => {
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
+  it('keeps WF-006 landed even if later cycles reopen a version-target release lane', () => {
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
 
     const backlogReadme = readRepoFile('docs/BACKLOG/README.md');
-    expect(backlogReadme).toContain('No version-target release lane is active right now.');
-    expect(backlogReadme).not.toContain('[`v4.1.0/`](./v4.1.0/README.md)');
+    expect(backlogReadme).toContain('The active version-target release lane is currently `v4.1.0/`.');
   });
 
   it('aligns the short-form release surfaces to the v4.0.0..HEAD boundary', () => {
