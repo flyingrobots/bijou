@@ -278,7 +278,6 @@ const LANDING_COLOR_RAMP_SIZE = 256;
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
-  readonly promptLine: Surface;
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 }>();
@@ -740,6 +739,7 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
+    const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, i18n);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
     const dogfoodPanel = getLandingDogfoodPanel(
       Math.max(28, Math.min(width - 6, 88)),
@@ -747,25 +747,27 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
       tokens,
       i18n,
     );
+    const panelPromptGap = 1;
+    const promptWordmarkGap = 1;
     const footerY = Math.max(0, height - 1);
     const contentTop = Math.min(height - 1, logoY + logoHeight + 1);
     const contentBottom = Math.max(contentTop, footerY - 2);
     const availableHeight = Math.max(0, contentBottom - contentTop + 1);
-    const fullClusterHeight = dogfoodPanel.height + 1 + staticSurfaces.promptLine.height + 1 + wordmark.height;
-    const compactClusterHeight = dogfoodPanel.height + staticSurfaces.promptLine.height;
+    const fullClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap + wordmark.height;
+    const compactClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height;
 
     if (availableHeight >= fullClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
-      blitCentered(surface, staticSurfaces.promptLine, startY + dogfoodPanel.height + 1);
-      blitCentered(surface, wordmark, startY + dogfoodPanel.height + 1 + staticSurfaces.promptLine.height + 1);
+      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
+      blitCentered(surface, wordmark, startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap);
     } else if (availableHeight >= compactClusterHeight) {
       const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
       blitCentered(surface, dogfoodPanel, startY);
-      blitCentered(surface, staticSurfaces.promptLine, startY + dogfoodPanel.height);
+      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
     } else {
-      const promptY = Math.max(0, Math.min(contentBottom - staticSurfaces.promptLine.height + 1, contentTop));
-      blitCentered(surface, staticSurfaces.promptLine, promptY);
+      const promptY = Math.max(0, Math.min(contentBottom - promptLine.height + 1, contentTop));
+      blitCentered(surface, promptLine, promptY);
       if (availableHeight >= dogfoodPanel.height) {
         blitCentered(surface, dogfoodPanel, contentTop);
       }
@@ -1204,32 +1206,15 @@ function updateLandingFps(current: number, dtSeconds: number): number {
 }
 
 function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime): {
-  readonly promptLine: Surface;
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 } {
-  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
   const controlsText = dogfoodText(i18n, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
-  const cacheKey = `${tokens.id}:${promptText}:${controlsText}`;
+  const cacheKey = `${tokens.id}:${controlsText}`;
   const cached = LANDING_STATIC_SURFACE_CACHE.get(cacheKey);
   if (cached) return cached;
 
   const surfaces = {
-    promptLine: createTransparentTextSurface(promptText, {
-      bg: tokens.background,
-      transparentSpaces: false,
-      fg: (x) => {
-        const char = promptText[x] ?? ' ';
-        if (char === '[' || char === ']') {
-          return tokens.promptAccentColor;
-        }
-        return tokens.promptBodyColor;
-      },
-      modifiers: (x) => {
-        const char = promptText[x] ?? ' ';
-        return char === '[' || char === ']' ? BOLD_MODIFIERS : DIM_MODIFIERS;
-      },
-    }),
     footerControls: createTransparentTextSurface(controlsText, {
       bg: tokens.background,
       transparentSpaces: false,
@@ -1245,6 +1230,43 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime)
   };
   LANDING_STATIC_SURFACE_CACHE.set(cacheKey, surfaces);
   return surfaces;
+}
+
+function createLandingPromptSurface(
+  tokens: LandingThemeTokens,
+  timeMs: number,
+  i18n?: I18nRuntime,
+): Surface {
+  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
+  const highlightStart = promptText.indexOf('[');
+  const highlightEnd = promptText.indexOf(']');
+  const time = timeMs / 1000;
+
+  return createTransparentTextSurface(promptText, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: (x) => {
+      const inHighlight = highlightStart >= 0
+        && highlightEnd >= highlightStart
+        && x >= highlightStart
+        && x <= highlightEnd;
+      if (!inHighlight) {
+        return tokens.promptBodyColor;
+      }
+
+      const span = Math.max(1, highlightEnd - highlightStart);
+      const local = (x - highlightStart) / span;
+      const shimmer = 0.5 + (Math.sin((time * 4.2) + (local * Math.PI * 2.2)) * 0.5);
+      return sampleColorRamp(tokens.logoRamp, clamp01(0.56 + (shimmer * 0.38)));
+    },
+    modifiers: (x) => {
+      const inHighlight = highlightStart >= 0
+        && highlightEnd >= highlightStart
+        && x >= highlightStart
+        && x <= highlightEnd;
+      return inHighlight ? BOLD_MODIFIERS : DIM_MODIFIERS;
+    },
+  });
 }
 
 function getLandingFpsBadge(

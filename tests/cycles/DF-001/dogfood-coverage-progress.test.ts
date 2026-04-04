@@ -57,12 +57,17 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const app = createDocsApp(ctx);
 
     const landing = await runScript(app, [], { ctx });
-    const text = frameText(landing.frames[landing.frames.length - 1]!);
+    const initialFrame = landing.frames[landing.frames.length - 1]!;
+    const text = frameText(initialFrame);
     const expansion = 'Documentation Of Good Foundational Onboarding and Discovery';
-    const expansionLine = text.split('\n').find((lineText) => lineText.includes(expansion));
+    const prompt = 'Press [Enter]';
+    const lines = text.split('\n');
+    const expansionRow = lines.findIndex((lineText) => lineText.includes(expansion));
+    const expansionLine = expansionRow >= 0 ? lines[expansionRow] : undefined;
 
     expect(text).toContain('DOGFOOD');
     expect(text).toContain(expansion);
+    expect(text).toContain(prompt);
     expect(expansionLine).toBeDefined();
 
     const contentStart = expansionLine!.indexOf(expansion);
@@ -74,6 +79,22 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const leftPadding = contentStart - leftBorder - 1;
     const rightPadding = rightBorder - contentStart - expansion.length;
     expect(Math.abs(leftPadding - rightPadding)).toBeLessThanOrEqual(2);
+
+    const promptRow = lines.findIndex((lineText) => lineText.includes(prompt));
+    expect(promptRow).toBeGreaterThan(expansionRow);
+    expect(promptRow - expansionRow).toBeGreaterThanOrEqual(3);
+
+    const promptStart = lines[promptRow]!.indexOf(prompt);
+    const enterCellBefore = initialFrame.get(promptStart + 'Press ['.length, promptRow);
+    expect(enterCellBefore.char).toBe('E');
+    expect(enterCellBefore.fg).toBeDefined();
+
+    const pulsed = await runScript(app, [{ msg: { type: 'pulse', dt: 0.6 } as const }], { ctx });
+    const pulsedFrame = pulsed.frames[pulsed.frames.length - 1]!;
+    const enterCellAfter = pulsedFrame.get(promptStart + 'Press ['.length, promptRow);
+    expect(enterCellAfter.char).toBe('E');
+    expect(enterCellAfter.fg).toBeDefined();
+    expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
