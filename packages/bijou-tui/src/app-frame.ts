@@ -492,11 +492,14 @@ export type {
   FrameLayerMetadata,
   FrameLayerOwner,
   FrameLayerDescriptor,
+  FrameRuntimeLayer,
+  FrameRuntimeViewStack,
   DescribeFrameLayerStackOptions,
 } from './app-frame-layers.js';
 export {
   activeFrameLayer,
   describeFrameLayerStack,
+  describeFrameRuntimeViewStack,
   underlyingFrameLayer,
 } from './app-frame-layers.js';
 

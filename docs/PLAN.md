@@ -64,15 +64,15 @@ The `4.1.0` release outcome is now:
 So the work now should stay narrower and more structural:
 
 - keep signposts honest about `4.1.0` being shipped instead of pending
-- promote `RE-007` as the next active engineering cycle
+- run `RE-007` as the active runtime-engine cycle
 - keep `DF-020` and `DL-009` as near follow-ons
 - keep work-tracking truth honest through METHOD lanes and signposts
 - leave `4.2.0` unshaped until there is enough real new material to
   justify another release-shaping pass
 
-## Next Active Cycle
+## Active Cycle
 
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 
 ## After 4.1.0
 

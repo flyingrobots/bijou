@@ -2,6 +2,12 @@
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
+## Status
+
+Promoted into the active cycle doc:
+
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+
 ## Idea
 
 Move the current framed shell onto the new runtime-engine seams once the first-class objects exist.

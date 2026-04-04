@@ -40,14 +40,14 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     const dogfoodLegend = readRepoFile('docs/legends/DF-dogfood-field-guide.md');
 
     expect(plan).toContain('Bijou has shipped `4.1.0`');
-    expect(plan).toContain('## Next Active Cycle');
+    expect(plan).toContain('## Active Cycle');
     expect(plan).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
     expect(plan).not.toContain('## Before 4.1.0 Ships');
 
     expect(bearing).toContain('Return to post-`4.1.0` engineering work');
     expect(bearing).toContain('The runtime engine is back at the center of gravity.');
     expect(bearing).toContain('treat `4.1.0` as shipped truth');
-    expect(bearing).toContain('[RE-007](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)');
+    expect(bearing).toContain('[RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)');
 
     expect(releaseGuide).toContain('The latest shipped release is **`4.1.0`**.');
     expect(releaseGuide).toContain('The next release is intentionally **not shaped yet**.');
@@ -55,6 +55,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
 
     expect(workflowLegend).toContain('`4.1.0` is shipped');
     expect(workflowLegend).toContain('no version-target release lane is active right now');
+    expect(workflowLegend).toContain('the active engineering cycle is');
     expect(dogfoodLegend).toContain('DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface');
   });
 });

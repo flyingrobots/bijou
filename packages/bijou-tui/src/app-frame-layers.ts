@@ -1,5 +1,13 @@
 import type { FrameModel } from './app-frame.js';
 import type { BindingSource } from './help.js';
+import {
+  activeRuntimeView,
+  createRuntimeViewStack,
+  pushRuntimeView,
+  type RuntimeStackLayer,
+  type RuntimeViewLayer,
+  type RuntimeViewStack,
+} from './runtime-engine.js';
 
 export type FrameLayerKind =
   | 'workspace'
@@ -37,6 +45,9 @@ export interface DescribeFrameLayerStackOptions {
   readonly pageModalOpen?: boolean;
   readonly layers?: Partial<Record<FrameLayerKind, FrameLayerMetadata>>;
 }
+
+export type FrameRuntimeLayer = RuntimeStackLayer<FrameLayerDescriptor>;
+export type FrameRuntimeViewStack = RuntimeViewStack<FrameLayerDescriptor>;
 
 const FRAME_LAYER_BASE: Readonly<Record<FrameLayerKind, Omit<FrameLayerDescriptor, 'title' | 'hintSource' | 'helpSource'>>> = {
   workspace: {
@@ -115,6 +126,82 @@ function frameLayer(
   };
 }
 
+function toRuntimeViewLayer(
+  descriptor: FrameLayerDescriptor,
+): RuntimeViewLayer<FrameLayerDescriptor> {
+  return {
+    id: descriptor.id,
+    kind: descriptor.kind,
+    dismissible: descriptor.dismissible,
+    blocksBelow: descriptor.blocksUnderlyingInput,
+    model: descriptor,
+  };
+}
+
+function descriptorFromRuntimeLayer(
+  layer: FrameRuntimeLayer | undefined,
+): FrameLayerDescriptor | undefined {
+  if (layer == null) {
+    return undefined;
+  }
+
+  if (layer.model == null) {
+    throw new Error(`describeFrameRuntimeViewStack: runtime layer "${layer.id}" is missing its frame descriptor model`);
+  }
+
+  return layer.model;
+}
+
+export function describeFrameRuntimeViewStack<PageModel>(
+  model: Pick<
+    FrameModel<PageModel>,
+    | 'helpOpen'
+    | 'commandPalette'
+    | 'commandPaletteKind'
+    | 'settingsOpen'
+    | 'notificationCenterOpen'
+    | 'quitConfirmOpen'
+  >,
+  options: DescribeFrameLayerStackOptions = {},
+): FrameRuntimeViewStack {
+  let stack = createRuntimeViewStack(
+    toRuntimeViewLayer(frameLayer('workspace', options)),
+  );
+
+  if (options.pageModalOpen) {
+    stack = pushRuntimeView(stack, toRuntimeViewLayer(frameLayer('page-modal', options)));
+  }
+
+  if (model.settingsOpen) {
+    stack = pushRuntimeView(stack, toRuntimeViewLayer(frameLayer('settings', options)));
+  }
+
+  if (model.helpOpen) {
+    stack = pushRuntimeView(stack, toRuntimeViewLayer(frameLayer('help', options)));
+  }
+
+  if (model.notificationCenterOpen) {
+    stack = pushRuntimeView(
+      stack,
+      toRuntimeViewLayer(frameLayer('notification-center', options)),
+    );
+  }
+
+  if (model.commandPalette != null) {
+    const kind = model.commandPaletteKind === 'search' ? 'search' : 'command-palette';
+    stack = pushRuntimeView(stack, toRuntimeViewLayer(frameLayer(kind, options)));
+  }
+
+  if (model.quitConfirmOpen) {
+    stack = pushRuntimeView(
+      stack,
+      toRuntimeViewLayer(frameLayer('quit-confirm', options)),
+    );
+  }
+
+  return stack;
+}
+
 export function describeFrameLayerStack<PageModel>(
   model: Pick<
     FrameModel<PageModel>,
@@ -127,34 +214,13 @@ export function describeFrameLayerStack<PageModel>(
   >,
   options: DescribeFrameLayerStackOptions = {},
 ): readonly FrameLayerDescriptor[] {
-  const stack: FrameLayerDescriptor[] = [frameLayer('workspace', options)];
-
-  if (options.pageModalOpen) {
-    stack.push(frameLayer('page-modal', options));
-  }
-
-  if (model.settingsOpen) {
-    stack.push(frameLayer('settings', options));
-  }
-
-  if (model.helpOpen) {
-    stack.push(frameLayer('help', options));
-  }
-
-  if (model.notificationCenterOpen) {
-    stack.push(frameLayer('notification-center', options));
-  }
-
-  if (model.commandPalette != null) {
-    const kind = model.commandPaletteKind === 'search' ? 'search' : 'command-palette';
-    stack.push(frameLayer(kind, options));
-  }
-
-  if (model.quitConfirmOpen) {
-    stack.push(frameLayer('quit-confirm', options));
-  }
-
-  return stack;
+  return describeFrameRuntimeViewStack(model, options).layers.map((layer) => {
+    const descriptor = descriptorFromRuntimeLayer(layer);
+    if (descriptor == null) {
+      throw new Error(`describeFrameLayerStack: runtime layer "${layer.id}" is missing its frame descriptor model`);
+    }
+    return descriptor;
+  });
 }
 
 export function activeFrameLayer<PageModel>(
@@ -169,8 +235,12 @@ export function activeFrameLayer<PageModel>(
   >,
   options: DescribeFrameLayerStackOptions = {},
 ): FrameLayerDescriptor {
-  const stack = describeFrameLayerStack(model, options);
-  return stack[stack.length - 1]!;
+  const activeLayer = activeRuntimeView(describeFrameRuntimeViewStack(model, options));
+  const descriptor = descriptorFromRuntimeLayer(activeLayer);
+  if (descriptor == null) {
+    throw new Error('activeFrameLayer: frame layer stack is missing an active descriptor');
+  }
+  return descriptor;
 }
 
 export function underlyingFrameLayer<PageModel>(
@@ -185,6 +255,8 @@ export function underlyingFrameLayer<PageModel>(
   >,
   options: DescribeFrameLayerStackOptions = {},
 ): FrameLayerDescriptor | undefined {
-  const stack = describeFrameLayerStack(model, options);
-  return stack.length > 1 ? stack[stack.length - 2] : undefined;
+  const stack = describeFrameRuntimeViewStack(model, options);
+  return descriptorFromRuntimeLayer(
+    stack.layers.length > 1 ? stack.layers[stack.layers.length - 2] : undefined,
+  );
 }

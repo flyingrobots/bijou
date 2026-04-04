@@ -10,9 +10,9 @@ The runtime engine is back at the center of gravity.
 That means:
 
 - treat `4.1.0` as shipped truth, not as pending release intent
-- promote
-  [RE-007](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
-  as the next live engineering move
+- run
+  [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  as the live runtime-engine cycle
 - use the framed shell as the proving surface for the next runtime
   slice, not as a reason to leave shell behavior half inside old branch
   structure
@@ -60,8 +60,8 @@ are:
   which leaves the most visible architectural debt outside the new seams
 - some internal reference tooling still carries example-first names even
   though the public posture is now DOGFOOD-first
-- `RE-007` is still waiting in backlog instead of already proving the
-  runtime-engine seams through the framed shell
+- `RE-007` has started, but only its first shell/runtime seam is honest
+  yet
 - the `4.1.0` release workflow history is cosmetically messy even though
   the shipped registry state is correct
 - `PLAN.md`, legends, and backlog placement had drifted from what had

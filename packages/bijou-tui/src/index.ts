@@ -222,6 +222,8 @@ export {
   type FrameLayerMetadata,
   type FrameLayerOwner,
   type FrameLayerDescriptor,
+  type FrameRuntimeLayer,
+  type FrameRuntimeViewStack,
   type DescribeFrameLayerStackOptions,
   type FrameHeaderStyle,
   type FramePage,
@@ -241,6 +243,7 @@ export {
   type PageScopedMsg,
   activeFrameLayer,
   describeFrameLayerStack,
+  describeFrameRuntimeViewStack,
   createFramedApp,
   underlyingFrameLayer,
 } from './app-frame.js';
