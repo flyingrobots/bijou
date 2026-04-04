@@ -38,6 +38,6 @@ describe('WF-005 close 4.1.0 i18n publish-surface gap', () => {
     expect(releaseGuide).toContain('@flyingrobots/bijou-i18n-tools-xlsx');
     expect(releaseGuide).not.toContain('they are **not** currently in the automated publish matrix');
     expect(whatsNew).toContain('the i18n packages are now part of the planned');
-    expect(migrationGuide).toContain('These i18n packages are part of the planned `4.1.0` automated publish');
+    expect(migrationGuide).toContain('These i18n packages are part of the `4.1.0` automated publish');
   });
 });

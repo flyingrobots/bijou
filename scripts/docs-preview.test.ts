@@ -136,7 +136,7 @@ describe('docs preview app', () => {
     expect(footer).toContain('↑/↓ quality');
     expect(footer).toContain('←/→ theme');
     expect(footer).toContain('Enter continue');
-    expect(footer).toContain('v4.0.0');
+    expect(footer).toContain('v4.1.0');
     expect(footer).toContain('73 fps • auto/full');
     expect(lines[0]).not.toContain('73 fps');
     expect(text).not.toContain('Documentation coverage');

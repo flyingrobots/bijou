@@ -4,11 +4,10 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`) are versioned in lock-step.
 
-## [Unreleased]
+## [4.1.0] - 2026-04-04
 
-This unreleased section is the planned `4.1.0` release slice and is now
-aligned to the actual `v4.0.0..HEAD` boundary. During release
-execution, rename this heading to `[4.1.0] - YYYY-MM-DD`.
+This release section is aligned to the actual `v4.0.0..v4.1.0`
+boundary.
 
 ### ✨ Features
 
@@ -116,7 +115,7 @@ execution, rename this heading to `[4.1.0] - YYYY-MM-DD`.
 
 ### 📝 Documentation
 
-- **WF-005 i18n publish-surface closure** — the release docs, workflow signposts, and repo-native release guide now treat the four i18n packages as part of the planned `4.1.0` automated release path, and the publish / release-dry-run workflows now pack and dry-run all nine public workspace packages instead of only the older five-package matrix.
+- **WF-005 i18n publish-surface closure** — the release docs, workflow signposts, and repo-native release guide now treat the four i18n packages as part of the `4.1.0` automated release path, and the publish / release-dry-run workflows now pack and dry-run all nine public workspace packages instead of only the older five-package matrix.
 - **XLSX dependency guidance clarification** — the `@flyingrobots/bijou-i18n-tools-xlsx` README now time-bounds the security note for the stale npm `xlsx` package and points maintainers at the official SheetJS Node installation guidance for the supported CDN tarball workflow.
 - **Shell quit-policy spec** — added a dedicated shell quit-policy spec that pins down request-quit semantics across framed apps and DOGFOOD landing, including the text-entry exception for printable keys like `q` inside search surfaces.
 - **Low-allocation renderer design pass** — added a dedicated strategy note for moving the runtime toward reusable framebuffers and a low-garbage hot render loop, explicitly separating short-term buffer reuse and direct-cell diffing from the longer-term question of a dedicated internal mutable framebuffer.
@@ -1115,7 +1114,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/flyingrobots/bijou/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/flyingrobots/bijou/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/flyingrobots/bijou/compare/v2.1.0...v3.0.0

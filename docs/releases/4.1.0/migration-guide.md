@@ -61,9 +61,8 @@ the same lock-step release:
 npm install @flyingrobots/bijou-i18n-tools-node@4.1.0 @flyingrobots/bijou-i18n-tools-xlsx@4.1.0
 ```
 
-These i18n packages are part of the planned `4.1.0` automated publish
-surface, so they should land together with the rest of the workspace
-when `4.1.0` is released.
+These i18n packages are part of the `4.1.0` automated publish surface,
+so they land together with the rest of the workspace in this release.
 
 ## 2. Framed Apps: Move Onto The Typed Shell Surface
 

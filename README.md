@@ -16,7 +16,7 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ## What's New in v4.1.0
 
-The next shaped release is `v4.1.0`.
+Bijou `v4.1.0` is the current release.
 
 Compared to `v4.0.0`, it moves Bijou from the pure-surface release line
 toward a more coherent terminal application platform.
