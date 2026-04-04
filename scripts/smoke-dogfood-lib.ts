@@ -103,11 +103,19 @@ export function selectDogfoodScenarios(options: SmokeDogfoodOptions = {}): reado
 }
 
 export function normalizeDogfoodOutput(rawOutput: string): string {
-  let normalized = stripAnsi(rawOutput).replace(/\r/g, '\n');
-  while (normalized.includes('\b')) {
-    normalized = normalized.replace(/.\x08/g, '');
+  const output: string[] = [];
+  for (const char of stripAnsi(rawOutput).replace(/\r\n?/g, '\n')) {
+    if (char === '\b') {
+      if (output.length > 0 && output[output.length - 1] !== '\n') {
+        output.pop();
+      }
+      continue;
+    }
+    if (char === '\n' || char === '\t' || (char >= '\x20' && char <= '\x7e')) {
+      output.push(char);
+    }
   }
-  return normalized.replace(/[^\n\t\x20-\x7e]/g, '');
+  return output.join('');
 }
 
 export function missingRequiredSnippets(

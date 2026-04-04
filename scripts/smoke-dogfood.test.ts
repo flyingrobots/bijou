@@ -28,7 +28,13 @@ describe('normalizeDogfoodOutput', () => {
   it('strips ansi and noisy control characters from captured TTY output', () => {
     const raw = '\u0004A\b\u001b[31mDOGFOOD\u001b[0m\r\nPress [Enter]\n';
 
-    expect(normalizeDogfoodOutput(raw)).toBe('DOGFOOD\n\nPress [Enter]\n');
+    expect(normalizeDogfoodOutput(raw)).toBe('DOGFOOD\nPress [Enter]\n');
+  });
+
+  it('terminates cleanly on unmatched leading and newline-following backspaces', () => {
+    const raw = '\bA\n\bB\bC\r\n';
+
+    expect(normalizeDogfoodOutput(raw)).toBe('A\nC\n');
   });
 });
 
