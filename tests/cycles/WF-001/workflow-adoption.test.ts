@@ -18,10 +18,15 @@ describe('WF-001 workflow adoption', () => {
     expect(existsSync(resolve(ROOT, 'docs/invariants/README.md'))).toBe(true);
 
     const workflow = read('docs/WORKFLOW.md');
+    const method = read('docs/METHOD.md');
     expect(workflow).toContain('Legends');
     expect(workflow).toContain('Cycles');
     expect(workflow).toContain('tests/cycles/<cycle>/');
     expect(workflow).toContain('docs/specs/');
+    expect(workflow).toContain('cycle/<cycle_name>');
+    expect(workflow).toContain('open a pull request to `main`');
+    expect(method).toContain('cycle/<cycle_name>');
+    expect(method).toContain('open a pull request to `main`');
   });
 
   it('adds explicit legend and invariant docs', () => {

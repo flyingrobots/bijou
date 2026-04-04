@@ -30,12 +30,14 @@ Bijou now tracks work through:
 ## Working Loop
 
 1. Pull from `docs/BACKLOG/asap/` or `docs/BACKLOG/up-next/`.
-2. Move the file into `docs/design/` and enrich it into a real cycle doc.
-3. Write failing tests. Playback questions become the executable spec.
-4. Green the tests.
-5. Record witness material when needed.
-6. Close honestly: retrospective, drift notes, and follow-on backlog.
-7. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
+2. Create a branch named `cycle/<cycle_name>` for that cycle.
+3. Move the file into `docs/design/` and enrich it into a real cycle doc.
+4. Write failing tests. Playback questions become the executable spec.
+5. Green the tests.
+6. Record witness material when needed.
+7. Close honestly: retrospective, drift notes, and follow-on backlog.
+8. Push the cycle branch and open a pull request to `main`.
+9. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
    signposts that changed.
 
 ## Repo Rules

@@ -50,6 +50,16 @@ one. The repo keeps a few established conventions:
 This is deliberate. The METHOD discipline matters more than copying the
 template filesystem literally.
 
+Bijou now also standardizes cycle branch naming and merge posture:
+
+- active cycle work must happen on a branch named
+  `cycle/<cycle_name>`
+- `<cycle_name>` should match the cycle doc identity without the `.md`
+  suffix, for example
+  `cycle/RE-007-migrate-framed-shell-onto-runtime-engine-seams`
+- when the cycle is complete, including its retrospective, push that
+  branch and open a pull request to `main`
+
 ## Structure
 
 ```text
@@ -178,12 +188,15 @@ If a posture does not matter, say so explicitly.
 ### The loop
 
 1. Pull from `docs/BACKLOG/asap/` or `docs/BACKLOG/up-next/`.
-2. Move the item into `docs/design/` and enrich it.
-3. Write failing tests. Playback questions become specs.
-4. Make the tests pass.
-5. Produce witness material when the hill needs it.
-6. Close the cycle honestly, including drift notes and follow-on debt.
-7. After merge on `main`, sync signposts such as `BEARING.md` and
+2. Create a branch named `cycle/<cycle_name>` for that cycle work.
+3. Move the item into `docs/design/` and enrich it.
+4. Write failing tests. Playback questions become specs.
+5. Make the tests pass.
+6. Produce witness material when the hill needs it.
+7. Close the cycle honestly, including drift notes, retrospective, and
+   follow-on debt.
+8. Push the cycle branch and open a pull request to `main`.
+9. After merge on `main`, sync signposts such as `BEARING.md` and
    `CHANGELOG.md`.
 
 ## Coordination
@@ -207,10 +220,11 @@ adding ceremony.
 ```text
 idea -> BACKLOG/inbox
   -> BACKLOG/asap | BACKLOG/up-next | BACKLOG/vX.Y.Z | BACKLOG/cool-ideas | BACKLOG/bad-code
+  -> cycle/<cycle_name>
   -> design/<cycle-doc>.md
   -> RED -> GREEN -> playback
   -> retro/ or inline retrospective
-  -> PR -> main
+  -> push cycle/<cycle_name> -> PR -> main
   -> BEARING / CHANGELOG / release sync when relevant
       - or ->
   -> graveyard/
