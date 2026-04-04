@@ -98,12 +98,35 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
           registry-url: https://registry.npmjs.org
 
       - run: npm ci
       - run: npm run build
+
+      - name: Verify trusted-publishing toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version
+          npm --version
+          node --input-type=module <<'EOF'
+          const version = process.versions.npm ?? '0.0.0';
+          const [major = 0, minor = 0, patch = 0] = version
+            .split('.')
+            .map((part) => Number.parseInt(part, 10));
+          const isSupported =
+            major > 11 ||
+            (major === 11 && (minor > 5 || (minor === 5 && patch >= 1)));
+
+          if (!isSupported) {
+            console.error(
+              `npm ${version} is too old for trusted publishing; need >=11.5.1`,
+            );
+            process.exit(1);
+          }
+          EOF
 
       - name: npm publish dry-run packages/${{ matrix.package }}
         run: cd packages/${{ matrix.package }} && npm publish --dry-run --access public --tag dry-run

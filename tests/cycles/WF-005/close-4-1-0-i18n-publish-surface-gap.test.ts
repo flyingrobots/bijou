@@ -30,6 +30,20 @@ describe('WF-005 close 4.1.0 i18n publish-surface gap', () => {
     }
   });
 
+  it('keeps the publish workflow recoverable for an already-cut tag and avoids npm self-upgrade drift', () => {
+    const publishWorkflow = readRepoFile('.github/workflows/publish.yml');
+    const dryRunWorkflow = readRepoFile('.github/workflows/release-dry-run.yml');
+
+    expect(publishWorkflow).toContain('workflow_dispatch:');
+    expect(publishWorkflow).toContain('github.event.inputs.tag || github.ref_name');
+    expect(publishWorkflow).toContain('github.event.inputs.ref || github.event.inputs.tag || github.ref_name');
+    expect(publishWorkflow).toContain('Verify trusted-publishing toolchain');
+    expect(publishWorkflow).not.toContain('npm i -g npm@latest');
+
+    expect(dryRunWorkflow).toContain('Verify trusted-publishing toolchain');
+    expect(dryRunWorkflow).not.toContain('npm i -g npm@latest');
+  });
+
   it('updates the release docs to describe the i18n packages as part of 4.1.0', () => {
     const releaseGuide = readRepoFile('docs/release.md');
     const whatsNew = readRepoFile('docs/releases/4.1.0/whats-new.md');
@@ -37,6 +51,8 @@ describe('WF-005 close 4.1.0 i18n publish-surface gap', () => {
 
     expect(releaseGuide).toContain('@flyingrobots/bijou-i18n-tools-xlsx');
     expect(releaseGuide).not.toContain('they are **not** currently in the automated publish matrix');
+    expect(releaseGuide).toContain("workflow's `workflow_dispatch` entrypoint");
+    expect(releaseGuide).toContain('existing tag and release ref');
     expect(whatsNew).toContain('the i18n packages are now part of the planned');
     expect(migrationGuide).toContain('These i18n packages are part of the `4.1.0` automated publish');
   });

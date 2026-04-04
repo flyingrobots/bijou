@@ -3,12 +3,22 @@ name: Release
 on:
   push:
     tags: [ "v*.*.*", "v*.*.*-*" ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish or recover (for example v4.1.0)
+        required: true
+        type: string
+      ref:
+        description: Git ref to checkout for the release workflow. Defaults to the tag when omitted.
+        required: false
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref_name }}
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -24,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event.inputs.ref || github.event.inputs.tag || github.ref_name }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v6
@@ -38,7 +48,7 @@ jobs:
         id: meta
         run: |
           npx tsx scripts/release-metadata.ts \
-            --tag "${{ github.ref_name }}" \
+            --tag "${{ github.event.inputs.tag || github.ref_name }}" \
             --github-output "$GITHUB_OUTPUT"
 
       - name: Capture verified release commit
@@ -121,15 +131,35 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
           registry-url: https://registry.npmjs.org
 
       - run: npm ci
       - run: npm run build
 
-      - name: Upgrade npm CLI (>=11.5.1 for trusted publishing)
-        run: npm i -g npm@latest
+      - name: Verify trusted-publishing toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version
+          npm --version
+          node --input-type=module <<'EOF'
+          const version = process.versions.npm ?? '0.0.0';
+          const [major = 0, minor = 0, patch = 0] = version
+            .split('.')
+            .map((part) => Number.parseInt(part, 10));
+          const isSupported =
+            major > 11 ||
+            (major === 11 && (minor > 5 || (minor === 5 && patch >= 1)));
+
+          if (!isSupported) {
+            console.error(
+              `npm ${version} is too old for trusted publishing; need >=11.5.1`,
+            );
+            process.exit(1);
+          }
+          EOF
 
       - name: Publish packages/${{ matrix.package }}
         uses: ./.github/actions/retry
@@ -168,7 +198,8 @@ jobs:
           Dist-tag: `${{ needs.verify.outputs.npm_dist_tag }}`
           Version: `${{ needs.verify.outputs.tag_version }}`
 
-          If npm failed, re-run only that job from Actions.
+          If npm failed, fix the publish workflow and re-run this workflow
+          with `workflow_dispatch` against the same tag.
           EOF
 
           gh api \

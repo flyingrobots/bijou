@@ -285,6 +285,12 @@ The publish workflow then owns:
 - npm publication for the automated publish matrix
 - GitHub Release creation or update
 
+If a tag has already been pushed and the publish workflow itself needs a
+repair, fix `.github/workflows/publish.yml` on `main` and then rerun the
+same release through the workflow's `workflow_dispatch` entrypoint using
+the existing tag and release ref. Do not delete or move the release tag
+just to recover from workflow drift.
+
 Do not manually create a GitHub Release unless the automation fails and
 the process is being explicitly repaired.
 
