@@ -2147,6 +2147,19 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    const scrolledY = (model as any).notificationCenterScrollY;
+
+    const outsideWheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 10,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -2160,7 +2173,8 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click as unknown as MsgWithMouse, model);
 
-    expect((model as any).notificationCenterScrollY).toBeGreaterThan(0);
+    expect((model as any).notificationCenterScrollY).toBe(scrolledY);
+    expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
 
@@ -2216,6 +2230,19 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    const scrolledY = (model as any).settingsScrollY;
+
+    const outsideWheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 60,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -2229,7 +2256,8 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click as unknown as MsgWithMouse, model);
 
-    expect((model as any).settingsScrollY).toBeGreaterThan(0);
+    expect((model as any).settingsScrollY).toBe(scrolledY);
+    expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
 

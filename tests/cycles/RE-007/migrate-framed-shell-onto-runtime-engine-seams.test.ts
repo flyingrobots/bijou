@@ -40,8 +40,10 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(appFrame).toContain('FrameRuntimeViewStack');
     expect(appFrame).toContain('describeFrameRuntimeViewStack');
     expect(appFrame).toContain('routeRuntimeInput');
+    expect(appFrame).toContain('retainRuntimeLayout');
     expect(index).toContain('FrameRuntimeViewStack');
     expect(index).toContain('describeFrameRuntimeViewStack');
     expect(cycle).toContain('key ownership through the runtime view stack');
+    expect(cycle).toContain('retained shell drawer layouts');
   });
 });

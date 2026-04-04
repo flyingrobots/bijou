@@ -152,5 +152,8 @@ Follow-on inside this same cycle:
 
 - route key ownership through the runtime view stack instead of
   choosing shell owners from ad hoc top-layer branches
+- use retained shell drawer layouts so pointer ownership for settings
+  and notification center comes from runtime hit-testing instead of
+  drawer-specific inside/outside helpers alone
 - migrate shell routing onto retained layouts
 - migrate shell command/effect dispatch onto runtime buffers

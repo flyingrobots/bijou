@@ -7,6 +7,7 @@
 
 import {
   createSurface,
+  type LayoutNode as SurfaceLayoutNode,
   preparePreferenceSections,
   preferenceListSurface,
   type PreferenceListTheme,
@@ -116,6 +117,7 @@ import {
 } from './app-frame-layers.js';
 import {
   createRuntimeRetainedLayouts,
+  retainRuntimeLayout,
   routeRuntimeInput,
 } from './runtime-engine.js';
 import {
@@ -834,6 +836,109 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
+  function createShellRetainedLayoutNode(
+    id: string,
+    rect: LayoutRect,
+  ): SurfaceLayoutNode {
+    return {
+      id,
+      rect: {
+        x: rect.col,
+        y: rect.row,
+        width: rect.width,
+        height: rect.height,
+      },
+      children: [],
+    };
+  }
+
+  function resolveFrameMouseRuntimeLayouts(
+    model: InternalFrameModel<PageModel, Msg>,
+  ) {
+    let layouts = EMPTY_RUNTIME_LAYOUTS;
+
+    const settingsLayout = resolveSettingsLayout(model, options, pagesById);
+    if (settingsLayout != null) {
+      layouts = retainRuntimeLayout(layouts, {
+        viewId: 'settings',
+        tree: createShellRetainedLayoutNode('settings-drawer', {
+          row: 0,
+          col: settingsLayout.startCol,
+          width: settingsLayout.drawerWidth,
+          height: model.rows,
+        }),
+      });
+    }
+
+    const notificationCenterLayout = resolveNotificationCenterLayout(model, options, pagesById);
+    if (notificationCenterLayout != null) {
+      layouts = retainRuntimeLayout(layouts, {
+        viewId: 'notification-center',
+        tree: createShellRetainedLayoutNode('notification-center-drawer', {
+          row: 0,
+          col: notificationCenterLayout.startCol,
+          width: notificationCenterLayout.drawerWidth,
+          height: model.rows,
+        }),
+      });
+    }
+
+    return layouts;
+  }
+
+  function resolveRoutedMouseLayer(
+    msg: MouseMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ) {
+    const context = resolveLayerContext(model);
+    const runtimeStack = describeFrameRuntimeViewStack(model, {
+      pageModalOpen: context.pageModalOpen,
+    });
+    const runtimeRoute = routeRuntimeInput(
+      runtimeStack,
+      resolveFrameMouseRuntimeLayouts(model),
+      {
+        kind: 'pointer',
+        action: msg.action,
+        x: msg.col,
+        y: msg.row,
+        button: msg.button === 'none' ? undefined : msg.button,
+      },
+      ({ layer, hit }) => {
+        const frameLayer = layer.model;
+        if (frameLayer == null) {
+          return undefined;
+        }
+
+        switch (frameLayer.kind) {
+          case 'settings':
+          case 'notification-center':
+            return hit == null ? { stop: true } : { handled: true };
+          case 'help':
+          case 'search':
+          case 'command-palette':
+          case 'quit-confirm':
+          case 'page-modal':
+          case 'workspace':
+            return { handled: true };
+          default:
+            return undefined;
+        }
+      },
+    );
+
+    const routedLayer = runtimeStack.layers.find(
+      (layer) => layer.id === (runtimeRoute.handledByViewId ?? runtimeRoute.stoppedByViewId),
+    )?.model ?? context.activeLayer;
+
+    return {
+      ...context,
+      runtimeStack,
+      routedLayer,
+      routedHit: runtimeRoute.hit,
+    };
+  }
+
   function resolveWorkspaceHelpSource(
     activePage: FramePage<PageModel, Msg>,
     activeInputArea: FrameInputArea<PageModel, Msg> | undefined,
@@ -1002,29 +1107,31 @@ export function createFramedApp<PageModel, Msg>(
       activePage,
       activePageModel,
       inputAreas,
-      activeLayer,
-    } = resolveLayerContext(model);
+      routedLayer,
+      routedHit,
+    } = resolveRoutedMouseLayer(msg, model);
 
-    if (activeLayer.kind === 'help') {
+    if (routedLayer.kind === 'help') {
       if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
         return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, paletteKeys, options, pagesById), []];
       }
       return [model, []];
     }
 
-    if (activeLayer.kind === 'search' || activeLayer.kind === 'command-palette') {
+    if (routedLayer.kind === 'search' || routedLayer.kind === 'command-palette') {
       return [model, []];
     }
 
-    if (activeLayer.kind === 'quit-confirm' || activeLayer.kind === 'page-modal') {
+    if (routedLayer.kind === 'quit-confirm' || routedLayer.kind === 'page-modal') {
       return [model, []];
     }
 
-    if (activeLayer.kind === 'settings') {
+    if (routedLayer.kind === 'settings') {
         const layout = resolveSettingsLayout(model, options, pagesById);
         if (layout != null) {
+          const insideDrawer = routedHit?.viewId === 'settings';
           if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-            if (isInsideSettingsDrawer(msg.col, msg.row, layout, model)) {
+            if (insideDrawer) {
               return [
                 scrollSettingsBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
                 [],
@@ -1034,7 +1141,7 @@ export function createFramedApp<PageModel, Msg>(
           }
 
           if (msg.action === 'press' && msg.button === 'left') {
-            if (!isInsideSettingsDrawer(msg.col, msg.row, layout, model)) {
+            if (!insideDrawer) {
               return [model, []];
             }
             const hit = settingsRowAtPosition(msg.col, msg.row, model, layout);
@@ -1050,11 +1157,12 @@ export function createFramedApp<PageModel, Msg>(
         }
     }
 
-    if (activeLayer.kind === 'notification-center') {
+    if (routedLayer.kind === 'notification-center') {
         const layout = resolveNotificationCenterLayout(model, options, pagesById);
         if (layout != null) {
+          const insideDrawer = routedHit?.viewId === 'notification-center';
           if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-            if (isInsideNotificationCenterDrawer(msg.col, msg.row, layout, model)) {
+            if (insideDrawer) {
               return [
                 scrollNotificationCenterBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
                 [],
@@ -2381,18 +2489,6 @@ function settingsRowAtPosition<PageModel, Msg>(
   const contentLine = (row - 1) + clampSettingsScroll(model, layout);
   return layout.rows.find((candidate) =>
     contentLine >= candidate.line && contentLine < candidate.line + candidate.height);
-}
-
-function isInsideNotificationCenterDrawer<PageModel, Msg>(
-  col: number,
-  row: number,
-  layout: ResolvedNotificationCenterLayout<Msg>,
-  model: InternalFrameModel<PageModel, Msg>,
-): boolean {
-  return col >= layout.startCol
-    && col < layout.startCol + layout.drawerWidth
-    && row >= 0
-    && row < model.rows;
 }
 
 function renderSettingsDrawer<PageModel, Msg>(
