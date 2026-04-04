@@ -108,10 +108,16 @@ import {
 import {
   activeFrameLayer,
   describeFrameLayerStack,
+  describeFrameRuntimeViewStack,
+  type FrameLayerDescriptor,
   type FrameLayerMetadata,
   type FrameLayerHintSource,
   type FrameLayerKind,
 } from './app-frame-layers.js';
+import {
+  createRuntimeRetainedLayouts,
+  routeRuntimeInput,
+} from './runtime-engine.js';
 import {
   frameEndAnchor,
   frameMessage,
@@ -510,6 +516,7 @@ export {
 const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
 const SETTINGS_FEEDBACK_TOAST_WIDTH = 40;
+const EMPTY_RUNTIME_LAYOUTS = createRuntimeRetainedLayouts();
 const DEFAULT_NOTIFICATION_CENTER_FILTERS: readonly NotificationHistoryFilter[] = [
   'ALL',
   'ACTIONABLE',
@@ -527,6 +534,14 @@ interface ResolvedFrameNotificationOptions {
   readonly gap: number;
   readonly overflow: OverflowBehavior;
 }
+
+type ObservedKeyRoute =
+  | 'palette'
+  | 'help'
+  | 'frame'
+  | 'global'
+  | 'page'
+  | 'unhandled';
 
 const quitHelpKeys = createKeyMap<FrameAction>()
   .group('Exit', (g) => g
@@ -686,7 +701,7 @@ export function createFramedApp<PageModel, Msg>(
     model: InternalFrameModel<PageModel, Msg>,
     cmds: readonly Cmd<FramedAppMsg<Msg>>[],
     msg: KeyMsg,
-    route: 'palette' | 'help' | 'frame' | 'global' | 'page' | 'unhandled',
+    route: ObservedKeyRoute,
   ): Cmd<FramedAppMsg<Msg>>[] {
     const observed = options.observeKey?.(msg, route);
     if (observed === undefined) return [...cmds];
@@ -752,6 +767,70 @@ export function createFramedApp<PageModel, Msg>(
       modalKeyMap,
       pageModalOpen,
       activeLayer,
+    };
+  }
+
+  function observedRouteForLayer(layer: FrameLayerDescriptor): ObservedKeyRoute {
+    switch (layer.kind) {
+      case 'search':
+      case 'command-palette':
+        return 'palette';
+      case 'help':
+        return 'help';
+      case 'page-modal':
+        return 'page';
+      case 'settings':
+      case 'notification-center':
+      case 'quit-confirm':
+        return 'frame';
+      default:
+        return 'unhandled';
+    }
+  }
+
+  function resolveRoutedKeyLayer(
+    msg: KeyMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ) {
+    const context = resolveLayerContext(model);
+    const runtimeStack = describeFrameRuntimeViewStack(model, {
+      pageModalOpen: context.pageModalOpen,
+    });
+    const runtimeRoute = routeRuntimeInput(
+      runtimeStack,
+      EMPTY_RUNTIME_LAYOUTS,
+      { kind: 'key', key: msg.key },
+      ({ layer }) => {
+        const frameLayer = layer.model;
+        if (frameLayer == null) {
+          return undefined;
+        }
+
+        if (frameLayer.kind === 'settings') {
+          return resolveSettingsLayout(model, options, pagesById) == null
+            ? { bubble: true }
+            : { handled: true };
+        }
+
+        if (frameLayer.kind === 'notification-center') {
+          return resolveNotificationCenterLayout(model, options, pagesById) == null
+            ? { bubble: true }
+            : { handled: true };
+        }
+
+        return { handled: true };
+      },
+    );
+
+    const routedLayer = runtimeStack.layers.find(
+      (layer) => layer.id === runtimeRoute.handledByViewId,
+    )?.model ?? context.activeLayer;
+
+    return {
+      ...context,
+      runtimeStack,
+      routedLayer,
+      routedRoute: observedRouteForLayer(routedLayer),
     };
   }
 
@@ -1276,10 +1355,10 @@ export function createFramedApp<PageModel, Msg>(
           activePage,
           activeInputArea,
           modalKeyMap,
-          activeLayer,
-        } = resolveLayerContext(model);
+          routedLayer,
+        } = resolveRoutedKeyLayer(msg, model);
 
-        if (activeLayer.kind === 'search' || activeLayer.kind === 'command-palette') {
+        if (routedLayer.kind === 'search' || routedLayer.kind === 'command-palette') {
           if (msg.ctrl && !msg.alt && msg.key === 'c') {
             return applyQuitRequest(model, msg);
           }
@@ -1288,13 +1367,13 @@ export function createFramedApp<PageModel, Msg>(
           }
           const frameAction = frameKeys.handle(msg);
           if (frameAction?.type === 'open-search') {
-            if (activeLayer.kind === 'search') {
+            if (routedLayer.kind === 'search') {
               return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
           }
           if (frameAction?.type === 'open-palette') {
-            if (activeLayer.kind === 'command-palette') {
+            if (routedLayer.kind === 'command-palette') {
               return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
             }
             return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
@@ -1307,7 +1386,7 @@ export function createFramedApp<PageModel, Msg>(
           return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
         }
 
-        if (activeLayer.kind === 'help') {
+        if (routedLayer.kind === 'help') {
           if (!msg.ctrl && !msg.alt && (msg.key === '?' || msg.key === 'escape')) {
             return [{ ...model, helpOpen: false, helpScrollY: 0 }, withObservedKey(model, [], msg, 'help')];
           }
@@ -1324,7 +1403,7 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'help')];
         }
 
-        if (activeLayer.kind === 'settings') {
+        if (routedLayer.kind === 'settings') {
           const layout = resolveSettingsLayout(model, options, pagesById);
           if (layout != null) {
             const settingsFrameAction = frameKeys.handle(msg);
@@ -1398,7 +1477,7 @@ export function createFramedApp<PageModel, Msg>(
           }
         }
 
-        if (activeLayer.kind === 'notification-center') {
+        if (routedLayer.kind === 'notification-center') {
           const layout = resolveNotificationCenterLayout(model, options, pagesById);
           if (layout != null) {
             const centerFrameAction = frameKeys.handle(msg);
@@ -1468,7 +1547,7 @@ export function createFramedApp<PageModel, Msg>(
           }
         }
 
-        if (activeLayer.kind === 'quit-confirm') {
+        if (routedLayer.kind === 'quit-confirm') {
           if (isShellQuitConfirmAccept(msg)) {
             return [{
               ...model,
@@ -1484,7 +1563,7 @@ export function createFramedApp<PageModel, Msg>(
           return [model, withObservedKey(model, [], msg, 'frame')];
         }
 
-        if (activeLayer.kind === 'page-modal' && modalKeyMap != null) {
+        if (routedLayer.kind === 'page-modal' && modalKeyMap != null) {
           const modalAction = modalKeyMap.handle(msg);
           if (modalAction !== undefined) {
             return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, modalAction)], msg, 'page')];

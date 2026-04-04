@@ -150,5 +150,7 @@ What this first slice does not land:
 
 Follow-on inside this same cycle:
 
+- route key ownership through the runtime view stack instead of
+  choosing shell owners from ad hoc top-layer branches
 - migrate shell routing onto retained layouts
 - migrate shell command/effect dispatch onto runtime buffers
