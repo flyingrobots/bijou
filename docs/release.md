@@ -67,7 +67,6 @@ Do **not** start release execution until the active lane in
 
 The current blockers are:
 
-- [DF-026 — Demote Examples To Secondary Reference Status](./BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
 - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 The shell-foundation work was closed in
@@ -76,9 +75,10 @@ The repo/package/release corpus publication was closed in
 [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md).
 The philosophy/architecture corpus publication was closed in
 [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md).
-The remaining blockers are about making the release posture stop
-depending on the broad examples tree as a public docs and smoke
-surface.
+The example-demotion posture was closed in
+[DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md).
+The remaining blocker is now the release smoke contract:
+`smoke:examples:*` still needs to move onto DOGFOOD.
 
 Its long-form release docs live in:
 

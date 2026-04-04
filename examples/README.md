@@ -1,6 +1,7 @@
 # Example Inventory
 
-This is a secondary/internal inventory.
+This is a secondary/internal inventory for maintainers, agents, and
+targeted reference use.
 
 If you are trying to learn Bijou, start with
 [DOGFOOD](../docs/DOGFOOD.md), not this page.
@@ -12,7 +13,7 @@ The example tree still matters for:
 - smoke and regression substrate
 - implementation sandboxes
 
-It is not the primary public docs surface anymore.
+It is not the primary public docs surface or learning path anymore.
 
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record release-facing GIFs: `npx tsx scripts/record-gifs.ts`

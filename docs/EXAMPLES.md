@@ -2,6 +2,9 @@
 
 This file is no longer a giant per-example status ledger.
 
+It is a maintainer-facing and agent-facing reference map, not a public
+docs hub.
+
 That old format made sense when examples were the main teaching surface. It is now actively misleading because Bijou has a stronger split:
 
 - DOGFOOD is the primary living-docs and proving surface
@@ -11,7 +14,7 @@ That old format made sense when examples were the main teaching surface. It is n
 If you are trying to learn Bijou, start with [DOGFOOD](./DOGFOOD.md),
 not this file.
 
-For the full internal example inventory, use
+For the full secondary/internal inventory, use
 [../examples/README.md](../examples/README.md).
 
 ## Keep

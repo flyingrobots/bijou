@@ -97,6 +97,7 @@ const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
 const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
+const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md');
 const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
 const PACKAGE_BIJOU_TEXT = readMarkdownDocExcerpt('../../packages/bijou/README.md', ['## Install']);
 const PACKAGE_BIJOU_NODE_TEXT = readMarkdownDocExcerpt('../../packages/bijou-node/README.md', ['## Install']);
@@ -366,6 +367,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Documentation Map',
     summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
     body: GUIDES_DOCUMENTATION_MAP_TEXT,
+  },
+  {
+    id: 'secondary-example-map',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Secondary Example Map',
+    summary: 'Why examples are now secondary/internal and what reference value they still keep.',
+    body: GUIDES_SECONDARY_EXAMPLES_TEXT,
   },
   {
     id: 'packages-overview',
