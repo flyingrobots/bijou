@@ -35,31 +35,45 @@ The repo now has:
   [WF-004](./design/WF-004-shape-the-next-release.md)
 - closed release-blocker cycles through
   [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- a new DOGFOOD docs-site shaping cycle through
+  [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+- a landed DOGFOOD docs-shell foundation through
+  [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- a landed DOGFOOD repo/package/release corpus publication through
+  [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- a landed DOGFOOD philosophy/architecture corpus publication through
+  [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+- a landed example-demotion posture through
+  [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
+- a new DOGFOOD-only docs-surface policy through
+  [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 
 The release decision is now:
 
 - target version: `4.1.0`
 - release type: stable minor
 - `RE-007` is explicitly deferred until after `4.1.0`
-- the i18n publish surface is now closed in the automated release path
-- the short-form release surfaces are now aligned to the real
+- the i18n publish surface is closed in the automated release path
+- the short-form release surfaces are aligned to the real
   `v4.0.0..HEAD` boundary
-- no cycle-shaped release blockers remain; the next step is the normal
-  release gauntlet and release execution
+- the cycle-shaped blockers are cleared again after DOGFOOD took over
+  the release smoke contract
 
 So the work now should stay narrower and more structural:
 
-- finish preparing `4.1.0` honestly
+- close the remaining `4.1.0` DOGFOOD docs-system blockers honestly
 - keep work-tracking truth honest through METHOD lanes and signposts
-- pick the next engineering slice after the release instead of smuggling
-  it into the release boundary
+- keep `RE-007` and other follow-on engineering work outside the current
+  release boundary
 
 ## Active Cycle
 
-- [WF-006 — Cut Clean 4.1.0 Release Boundary](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 
 ## Before 4.1.0 Ships
 
+- keep the cycle-shaped blocker lane cleared:
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - run `npm run release:preflight`
 - run `npm run release:readiness`
 - run the GitHub Release Dry Run workflow
@@ -69,7 +83,6 @@ So the work now should stay narrower and more structural:
 ### Up Next
 
 - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - [DL-009 — Formalize Layout and Viewport Rules](./BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
 
@@ -84,6 +97,7 @@ These are valid follow-ons, but not the current center of gravity:
 - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](./BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
 - [LX-007 — Service-Oriented Localization Adapters](./BACKLOG/LX-007-service-oriented-localization-adapters.md)
 - [WF-002 — Migrate Legacy Planning Artifacts](./BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
+- [WF-007 — Align Local Validation With CI `typecheck:test` Gate](./BACKLOG/bad-code/WF-007-align-local-validation-with-ci-typecheck-test-gate.md)
 
 ## Historical Note
 
@@ -103,3 +117,7 @@ mistake every root backlog file for live queue priority.
    wants, and what ready means.
 5. Do not let follow-on architecture work silently expand the current
    release boundary after it has been shaped.
+6. Do not call DOGFOOD complete while visible sections still only carry
+   starter copy instead of the real corpus.
+7. Do not treat `examples/` as a competing human-facing docs surface
+   while DOGFOOD is the canonical docs product.

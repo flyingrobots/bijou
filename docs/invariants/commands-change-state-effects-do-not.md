@@ -1,5 +1,10 @@
 # Commands Change State, Effects Do Not
 
+## Protected by legends
+
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [DX — Developer Experience](../legends/DX-developer-experience.md)
+
 Commands are requests for app-owned stateful action. Effects are non-stateful runtime consequences.
 
 Implications:

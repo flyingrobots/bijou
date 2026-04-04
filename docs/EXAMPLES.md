@@ -1,18 +1,25 @@
-# Curated Example Map
+# Secondary Example Map
 
 This file is no longer a giant per-example status ledger.
+
+It is a maintainer-facing and agent-facing reference map, not a public
+docs hub.
 
 That old format made sense when examples were the main teaching surface. It is now actively misleading because Bijou has a stronger split:
 
 - DOGFOOD is the primary living-docs and proving surface
-- a smaller set of examples still matters as canonical runtime, shell, or migration references
+- a smaller set of examples still matters as canonical runtime, shell, migration, or regression references
 - the rest of the examples are useful leaf demos, not the source of truth for the product story
 
-For the full example inventory, use [../examples/README.md](../examples/README.md).
+If you are trying to learn Bijou, start with [DOGFOOD](./DOGFOOD.md),
+not this file.
+
+For the full secondary/internal inventory, use
+[../examples/README.md](../examples/README.md).
 
 ## Keep
 
-These examples still have clear canonical value.
+These examples still have clear secondary/reference value.
 
 ### Runtime References
 
@@ -80,10 +87,12 @@ Until then, deleting examples is usually just deleting reference coverage under 
 
 ## Relationship To Release Smoke
 
-The repo still carries `smoke:examples:*`, but that should not be treated as the long-term end state.
+Release smoke now runs through `smoke:dogfood`.
 
-Tracked direction:
+Tracked closure:
 
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
-That shift should happen in stages, not through blind example deletion.
+That means examples are no longer the release-facing smoke contract even
+if some internal reference tooling around example scenarios still
+exists.

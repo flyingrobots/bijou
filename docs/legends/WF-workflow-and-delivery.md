@@ -41,12 +41,10 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 ## Current cycle and backlog
 
 - active cycle:
-  - [WF-006 — Cut Clean 4.1.0 Release Boundary](../design/WF-006-cut-clean-4-1-0-release-boundary.md)
+  - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest completed cycle:
-  - [WF-005 — Close 4.1.0 i18n Publish-Surface Gap](../design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
-- release-target backlog:
-  - none; the cycle-shaped `4.1.0` blockers are closed
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live backlog:
-  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - migration debt still worth tracking:
   - [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
-import { createDocsApp } from '../../../examples/docs/app.js';
+import { createDocsApp, resolveDocsThemeActiveHeaderTabToken } from '../../../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
@@ -39,17 +39,91 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(coverage.referenceFamilies.some((family) => family.label === 'Overlay primitives')).toBe(true);
   });
 
-  it('shows the coverage ratio and percentage in the initial DOGFOOD docs content pane', async () => {
+  it('shows the coverage ratio and percentage in the Components section once DOGFOOD switches there', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    const entered = await runScript(app, [{ key: '\r' }], { ctx });
+    const entered = await runScript(app, [{ key: '\r' }, { key: ']' }], { ctx });
     const text = frameText(entered.frames[entered.frames.length - 1]!);
 
     expect(text).toContain('Documentation coverage');
     expect(text).toContain(`${coverage.documentedFamilies}/${coverage.totalFamilies}`);
     expect(text).toContain(`${coverage.percent}%`);
+  });
+
+  it('shows the DOGFOOD banner and expansion on the landing screen at a normal viewport size', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const landing = await runScript(app, [], { ctx });
+    const initialFrame = landing.frames[landing.frames.length - 1]!;
+    const text = frameText(initialFrame);
+    const expansion = 'Documentation Of Good Foundational Onboarding and Discovery';
+    const prompt = 'Press [Enter]';
+    const lines = text.split('\n');
+    const expansionRow = lines.findIndex((lineText) => lineText.includes(expansion));
+    const expansionLine = expansionRow >= 0 ? lines[expansionRow] : undefined;
+
+    expect(text).toContain('DOGFOOD');
+    expect(text).toContain(expansion);
+    expect(text).toContain(prompt);
+    expect(expansionLine).toBeDefined();
+
+    const contentStart = expansionLine!.indexOf(expansion);
+    const leftBorder = expansionLine!.lastIndexOf('│', contentStart);
+    const rightBorder = expansionLine!.indexOf('│', contentStart + expansion.length);
+    expect(leftBorder).toBeGreaterThanOrEqual(0);
+    expect(rightBorder).toBeGreaterThan(contentStart + expansion.length);
+
+    const leftPadding = contentStart - leftBorder - 1;
+    const rightPadding = rightBorder - contentStart - expansion.length;
+    expect(Math.abs(leftPadding - rightPadding)).toBeLessThanOrEqual(2);
+
+    const promptRow = lines.findIndex((lineText) => lineText.includes(prompt));
+    expect(promptRow).toBeGreaterThan(expansionRow);
+    expect(promptRow - expansionRow).toBeGreaterThanOrEqual(3);
+
+    const promptStart = lines[promptRow]!.indexOf(prompt);
+    const enterCellBefore = initialFrame.get(promptStart + 'Press ['.length, promptRow);
+    expect(enterCellBefore.char).toBe('E');
+    expect(enterCellBefore.fg).toBeDefined();
+
+    const pulsed = await runScript(app, [{ pulse: { dt: 0.6 } }], { ctx });
+    const pulsedFrame = pulsed.frames[pulsed.frames.length - 1]!;
+    const enterCellAfter = pulsedFrame.get(promptStart + 'Press ['.length, promptRow);
+    expect(enterCellAfter.char).toBe('E');
+    expect(enterCellAfter.fg).toBeDefined();
+    expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
+  });
+
+  it('scores the active docs tab color against the real tab background', () => {
+    const waveRamp = Array.from({ length: 100 }, () => '#666666');
+    waveRamp[6] = '#111111';
+    waveRamp[14] = '#eeeeee';
+    waveRamp[44] = '#666666';
+    waveRamp[87] = '#000000';
+
+    const logoRamp = Array.from({ length: 100 }, () => '#bbbbbb');
+    logoRamp[61] = '#bbbbbb';
+    logoRamp[83] = '#dddddd';
+    logoRamp[97] = '#ffffff';
+
+    const token = resolveDocsThemeActiveHeaderTabToken({
+      id: 'contrast-regression',
+      label: 'Contrast Regression',
+      background: '#000000',
+      waveRamp,
+      logoRamp,
+      promptBodyColor: '#000000',
+      promptAccentColor: '#000000',
+      footerMutedColor: '#000000',
+      footerStrongColor: '#000000',
+      fpsColor: '#000000',
+    });
+
+    expect(token.bg).toBe('#eeeeee');
+    expect(token.hex).toBe('#000000');
   });
 
   it('spawns the next DOGFOOD backlog item', () => {

@@ -223,6 +223,7 @@ export {
   type FrameLayerOwner,
   type FrameLayerDescriptor,
   type DescribeFrameLayerStackOptions,
+  type FrameHeaderStyle,
   type FramePage,
   type FramePageMsg,
   type FramePageUpdateResult,

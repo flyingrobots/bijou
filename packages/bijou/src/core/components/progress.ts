@@ -1,7 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TimerHandle } from '../../ports/io.js';
-import type { GradientStop } from '../theme/tokens.js';
+import type { GradientStop, TokenValue } from '../theme/tokens.js';
 import { lerp3 } from '../theme/gradient.js';
+import { mix } from '../theme/color.js';
 import { resolveClock } from '../clock.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
@@ -18,6 +19,14 @@ export interface ProgressBarOptions {
   empty?: string;
   /** Gradient color stops applied across filled segments. */
   gradient?: GradientStop[];
+  /** Theme token for the leading edge of the filled range. Defaults to `semantic.info`. */
+  filledToken?: TokenValue;
+  /** Theme token for the trailing edge of the filled range. Defaults to `semantic.accent`. */
+  filledEndToken?: TokenValue;
+  /** Theme token applied to the empty range. Defaults to `ui.trackEmpty`. */
+  emptyToken?: TokenValue;
+  /** Theme token applied to the percentage label. Defaults to `semantic.primary`. */
+  labelToken?: TokenValue;
   /** Whether to prepend a percentage label (defaults to `true`). */
   showPercent?: boolean;
   /** Bijou context for I/O, styling, and mode detection. */
@@ -54,23 +63,35 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
       const filledCount = Math.min(width, Math.max(0, Math.round((pct / 100) * width)));
 
       const noColor = ctx.theme.noColor;
-      const stops = options.gradient ?? ctx.gradient('progress');
+      const stops = options.gradient;
+      const filledToken = options.filledToken ?? ctx.semantic('info');
+      const filledEndToken = options.filledEndToken ?? ctx.semantic('accent');
+      const emptyToken = options.emptyToken ?? ctx.ui('trackEmpty');
+      const labelToken = options.labelToken ?? ctx.semantic('primary');
 
       let bar = '';
-      if (noColor || stops.length === 0) {
+      if (noColor) {
         bar = filledChar.repeat(filledCount) + emptyChar.repeat(width - filledCount);
-      } else {
+      } else if (stops != null && stops.length > 0) {
         for (let i = 0; i < filledCount; i++) {
           const t_val = filledCount <= 1 ? 0 : i / (filledCount - 1);
           const [r, g, b] = lerp3(stops, t_val * (pct / 100));
           bar += ctx.style.rgb(r, g, b, filledChar);
         }
-        const emptyToken = ctx.ui('trackEmpty');
-        bar += ctx.style.hex(emptyToken.hex, emptyChar.repeat(width - filledCount));
+        bar += ctx.style.styled(emptyToken, emptyChar.repeat(width - filledCount));
+      } else {
+        for (let i = 0; i < filledCount; i++) {
+          const t_val = filledCount <= 1 ? 0 : i / (filledCount - 1);
+          const token = mix(filledToken, filledEndToken, t_val);
+          bar += ctx.style.styled(token, filledChar);
+        }
+        bar += ctx.style.styled(emptyToken, emptyChar.repeat(width - filledCount));
       }
 
       const label = showPercent ? `${Math.round(pct)}%` : '';
-      return label ? `${label.padStart(4)} ${bar}` : bar;
+      return label
+        ? `${noColor ? label.padStart(4) : ctx.style.styled(labelToken, label.padStart(4))} ${bar}`
+        : bar;
     },
   }, options);
 }

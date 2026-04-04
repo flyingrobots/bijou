@@ -1,5 +1,9 @@
 # State Machine and View Stack Are Distinct
 
+## Protected by legends
+
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+
 Application state and visible views are related, but they do not mean the same thing.
 
 Implications:

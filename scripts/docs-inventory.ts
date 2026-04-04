@@ -19,6 +19,7 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/BEARING.md',
       'docs/VISION.md',
       'docs/system-style-javascript.md',
+      'docs/DOGFOOD.md',
       'docs/PLAN.md',
       'docs/legends/README.md',
       'docs/BACKLOG/README.md',
@@ -26,7 +27,6 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/invariants/README.md',
       'docs/design-system/README.md',
       'docs/CHANGELOG.md',
-      'examples/docs/README.md',
     ],
   },
   {

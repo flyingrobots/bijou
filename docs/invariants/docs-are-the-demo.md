@@ -1,5 +1,11 @@
 # Docs Are the Demo
 
+## Protected by legends
+
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
+- [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+- [DL — Design Language](../legends/DL-design-language.md)
+
 DOGFOOD is not just reference material. It is a proving surface.
 
 Implications:

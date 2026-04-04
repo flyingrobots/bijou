@@ -36,18 +36,16 @@ jobs:
         if: matrix.node-version == 22
         run: npm run smoke:canaries -- --skip-build
 
-  smoke_examples:
-    name: Smoke examples (${{ matrix.lane.label }})
+  smoke_dogfood:
+    name: Smoke DOGFOOD (${{ matrix.lane.label }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         lane:
-          - label: pipe
-            command: smoke:examples:pipe
-          - label: static
-            command: smoke:examples:static
-          - label: interactive
-            command: smoke:examples:interactive
+          - label: landing
+            command: smoke:dogfood:landing
+          - label: docs
+            command: smoke:dogfood:docs
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

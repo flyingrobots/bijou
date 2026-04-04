@@ -60,8 +60,23 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 The currently shaped next release target is **`4.1.0`**.
 
-The cycle-shaped `4.1.0` blockers are now closed. Remaining work is the
-actual release execution path from this guide.
+A later DOGFOOD shaping cycle reopened cycle-shaped `4.1.0` blockers.
+
+That lane is now closed again.
+
+The last blocker was
+[WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md).
+
+The shell-foundation work was closed in
+[DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md).
+The repo/package/release corpus publication was closed in
+[DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md).
+The philosophy/architecture corpus publication was closed in
+[DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md).
+The example-demotion posture was closed in
+[DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md).
+The release smoke contract is now DOGFOOD-centered through
+`smoke:dogfood`, `smoke:dogfood:landing`, and `smoke:dogfood:docs`.
 
 Its long-form release docs live in:
 
@@ -208,10 +223,15 @@ these gates in order:
 7. `release:preflight`
 8. `test:frames`
 9. `smoke:canaries -- --skip-build`
-10. `smoke:examples:all -- --skip-build`
+10. `smoke:dogfood -- --skip-build`
 11. `npm test`
 
 Abort on any failure.
+
+This reflects the current repo tooling after
+[WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+moved the release smoke gate onto the DOGFOOD contract used for
+`4.1.0`.
 
 ## Phase 4: CI Dry Run
 

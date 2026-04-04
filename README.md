@@ -79,6 +79,9 @@ It is not just an example. It is where the repo now proves:
 - the component-family field guide and design-language track in one living docs app
 - shell concerns like search, settings, help, quit, and layout behavior under real usage
 
+If you are learning Bijou, start with DOGFOOD. The `examples/` tree is
+now secondary reference material, not the public docs front door.
+
 Run it locally:
 
 ```bash
@@ -220,16 +223,14 @@ Those docs are meant to answer:
 - [METHOD](./docs/METHOD.md)
 - [BEARING](./docs/BEARING.md)
 - [VISION](./docs/VISION.md)
+- [DOGFOOD](./docs/DOGFOOD.md)
 - [System-Style JavaScript](./docs/system-style-javascript.md)
 - [Current Plan](./docs/PLAN.md)
-- [DOGFOOD Docs Surface](./examples/docs/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
 - [Release Docs](./docs/releases/README.md)
 - [Release Guide](./docs/release.md)
 - [Changelog](./docs/CHANGELOG.md)
-- [Examples Index](./examples/README.md)
-- [Curated Example Map](./docs/EXAMPLES.md)
 - [Roadmap](./docs/ROADMAP.md)
 
 ## Roadmap

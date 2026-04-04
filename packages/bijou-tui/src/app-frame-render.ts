@@ -7,11 +7,17 @@
 
 import {
   createSurface,
+  darken,
+  hexToRgb,
+  lighten,
+  mix,
   parseAnsiToSurface,
+  saturate,
   type Cell,
   resolveSafeCtx,
   type BijouContext,
   type Surface,
+  type TokenValue,
 } from '@flyingrobots/bijou';
 import type { FrameLayoutNode, FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type { InternalFrameModel, RenderContext, RenderResult } from './app-frame-types.js';
@@ -64,6 +70,115 @@ interface PaintedFrameNodeResult {
 export interface FramePaneGeometryResult {
   readonly paneRects: ReadonlyMap<string, LayoutRect>;
   readonly paneOrder: readonly string[];
+}
+
+function relativeLuminance(hex: string): number {
+  const [red, green, blue] = hexToRgb(hex);
+  const r = srgbChannelToLinear(red);
+  const g = srgbChannelToLinear(green);
+  const b = srgbChannelToLinear(blue);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function srgbChannelToLinear(channel: number): number {
+  const normalized = channel / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function contrastRatio(a: string, b: string): number {
+  const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
+  const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function colorDistance(a: string, b: string): number {
+  const [ar, ag, ab] = hexToRgb(a);
+  const [br, bg, bb] = hexToRgb(b);
+  return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2);
+}
+
+function deriveActiveHeaderTabToken(ctx: BijouContext, backgroundHex: string, baseHex: string): TokenValue {
+  const darkBackground = relativeLuminance(backgroundHex) < 0.35;
+  const accent = ctx.semantic('accent');
+  const info = ctx.semantic('info');
+  const primary = ctx.semantic('primary');
+  const warning = ctx.semantic('warning');
+  const seeds: TokenValue[] = [
+    accent,
+    info,
+    mix(accent, info, 0.5),
+    mix(accent, warning, 0.3),
+    mix(primary, accent, 0.3),
+  ];
+
+  const candidates = seeds.flatMap((seed) => {
+    const emphasized = saturate(seed, 0.35);
+    return darkBackground
+      ? [
+          emphasized,
+          lighten(seed, 0.18),
+          lighten(emphasized, 0.3),
+          lighten(mix(seed, primary, 0.25), 0.2),
+        ]
+      : [
+          darken(seed, 0.18),
+          darken(emphasized, 0.28),
+          darken(mix(seed, primary, 0.1), 0.22),
+        ];
+  });
+
+  let best = candidates[0] ?? accent;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  for (const candidate of candidates) {
+    const contrast = contrastRatio(candidate.hex, backgroundHex);
+    const distance = colorDistance(candidate.hex, baseHex) / Math.sqrt(3 * 255 * 255);
+    const score = contrast * 3 + distance;
+    if (score > bestScore) {
+      bestScore = score;
+      best = candidate;
+    }
+  }
+
+  return {
+    hex: best.hex,
+    modifiers: ['bold'],
+  };
+}
+
+function paintActiveHeaderTab(
+  surface: Surface,
+  tabTargets: readonly FrameHeaderTabTarget[],
+  activePageId: string,
+  ctx: BijouContext | undefined,
+  tokenOverride?: TokenValue,
+): void {
+  if (ctx == null) return;
+  const activeTarget = tabTargets.find((target) => target.pageId === activePageId);
+  if (activeTarget == null) return;
+  const sampleCell = surface.get(activeTarget.startCol, 0);
+  const backgroundHex = sampleCell.bg
+    ?? ctx.surface('primary').bg
+    ?? ctx.surface('secondary').bg
+    ?? '#000000';
+  const baseHex = sampleCell.fg
+    ?? ctx.surface('primary').hex
+    ?? ctx.semantic('primary').hex;
+  const token = tokenOverride ?? deriveActiveHeaderTabToken(ctx, backgroundHex, baseHex);
+
+  for (let x = activeTarget.startCol; x <= activeTarget.endCol; x++) {
+    const cell = surface.get(x, 0);
+    surface.set(x, 0, {
+      ...cell,
+      fg: token.hex,
+      bg: token.bg ?? cell.bg,
+      modifiers: token.modifiers == null
+        ? cell.modifiers
+        : Array.from(new Set([...(cell.modifiers ?? []), ...token.modifiers])),
+      empty: false,
+    });
+  }
 }
 
 /** Recursively render a layout tree node (pane, split, or grid) into a rect. */
@@ -359,6 +474,14 @@ export function resolveHeaderLine<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): FrameHeaderRenderResult {
+  const ctx = resolveSafeCtx();
+  const activePage = pagesById.get(model.activePageId)!;
+  const activePageModel = model.pageModels[model.activePageId]!;
+  const headerStyle = options.headerStyle?.({
+    model,
+    activePage,
+    pageModel: activePageModel,
+  });
   const title = options.title ?? 'App';
   let cursor = visibleLength(title) + 2;
   const tabTargets: FrameHeaderTabTarget[] = [];
@@ -383,12 +506,14 @@ export function resolveHeaderLine<PageModel, Msg>(
   }).join(' ');
 
   const line = fitLine(`${title}  ${tabs}`, model.columns);
+  const surface = createStyledTextSurfaceWithBCSS(line, model.columns, ctx, {
+    type: 'FrameHeader',
+    id: 'frame-header',
+    classes: [`page-${model.activePageId}`],
+  });
+  paintActiveHeaderTab(surface, tabTargets, model.activePageId, ctx, headerStyle?.activeTabToken);
   return {
-    surface: createStyledTextSurfaceWithBCSS(line, model.columns, resolveSafeCtx(), {
-      type: 'FrameHeader',
-      id: 'frame-header',
-      classes: [`page-${model.activePageId}`],
-    }),
+    surface,
     tabTargets,
   };
 }

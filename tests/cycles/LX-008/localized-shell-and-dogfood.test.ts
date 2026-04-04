@@ -130,7 +130,7 @@ describe('LX-008 localized shell chrome and DOGFOOD cycle', () => {
     expect(footer).toContain('Entrée basculer');
   });
 
-  it('renders pseudo-localized DOGFOOD shell and onboarding copy when given localized catalogs', async () => {
+  it('renders pseudo-localized DOGFOOD shell and landing copy when given localized catalogs', async () => {
     const tools: typeof import('../../../packages/bijou-i18n-tools/src/index.js') = await import(pathToFileURL(TOOLS_ENTRY).href);
     const docsMod: typeof import('../../../examples/docs/app.js') = await import(pathToFileURL(DOCS_ENTRY).href);
 
@@ -154,8 +154,8 @@ describe('LX-008 localized shell chrome and DOGFOOD cycle', () => {
 
     const docs = await runScript(app, [{ key: KEY_ENTER }], { ctx });
     const docsText = frameText(docs.frames.at(-1)!);
-    expect(docsText).not.toContain('What is Bijou?');
-    expect(docsText).toContain(tools.pseudoLocalize('What is Bijou?'));
+    expect(docsText).not.toContain('Tab next pane');
+    expect(docsText).toContain(tools.pseudoLocalize('Tab next pane'));
   });
 
   it('uses i18n direction metadata to mirror the settings drawer anchor', async () => {

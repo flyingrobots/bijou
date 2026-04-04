@@ -24,6 +24,7 @@ If a file looks like current work, it should usually live in `asap/` or
 `up-next/`, not only in the root backlog.
 
 Version-target lanes like `v4.1.0/` are temporary. Use them only for
-cycles that must close before that release ships.
+cycles that must close before that release ships, including cases where
+release posture, docs-surface truth, and validation still disagree.
 
-No version-target release lane is active right now.
+There is no active version-target release lane right now.

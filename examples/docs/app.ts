@@ -94,12 +94,39 @@ const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
 ) as { readonly version: string };
 const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
+const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
+const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
+const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
+const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md');
+const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
+const PACKAGE_BIJOU_TEXT = readMarkdownDocExcerpt('../../packages/bijou/README.md', ['## Install']);
+const PACKAGE_BIJOU_NODE_TEXT = readMarkdownDocExcerpt('../../packages/bijou-node/README.md', ['## Install']);
+const PACKAGE_BIJOU_TUI_TEXT = readMarkdownDocExcerpt('../../packages/bijou-tui/README.md', ['## Installation']);
+const PACKAGE_BIJOU_TUI_APP_TEXT = readMarkdownDocExcerpt('../../packages/bijou-tui-app/README.md', ['## Quick Scaffold']);
+const PACKAGE_CREATE_TUI_APP_TEXT = readMarkdownDocExcerpt('../../packages/create-bijou-tui-app/README.md', ['## Flags']);
+const PACKAGE_BIJOU_I18N_TEXT = readMarkdownDoc('../../packages/bijou-i18n/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_NODE_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-node/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_XLSX_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-xlsx/README.md');
+const PHILOSOPHY_OVERVIEW_TEXT = readMarkdownDoc('./content/philosophy-overview.md');
+const PHILOSOPHY_SYSTEM_STYLE_TEXT = readMarkdownDoc('../../docs/system-style-javascript.md');
+const PHILOSOPHY_ARCHITECTURE_TEXT = readMarkdownDoc('../../docs/ARCHITECTURE.md');
+const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-ux-doctrine.md');
+const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
+const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
+const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
+const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/whats-new.md');
+const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/migration-guide.md');
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
 const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
-const DOCS_PAGE_ID = 'dogfood';
+const GUIDES_PAGE_ID = 'guides';
+const COMPONENTS_PAGE_ID = 'components';
+const PACKAGES_PAGE_ID = 'packages';
+const PHILOSOPHY_PAGE_ID = 'philosophy';
+const RELEASE_PAGE_ID = 'release';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
@@ -130,6 +157,14 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('docs.footer.family', '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand'),
     dogfoodMessage('docs.footer.story', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
     dogfoodMessage('docs.footer.variants', '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles'),
+    dogfoodMessage('docs.footer.guideNav', '{paneSwitch} • ↑/↓ browse • Enter open'),
+    dogfoodMessage('docs.footer.guide', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
+    dogfoodMessage('docs.footer.guideMeta', '{paneSwitch} • section overview'),
+    dogfoodMessage('docs.page.guides', 'Guides'),
+    dogfoodMessage('docs.page.components', 'Components'),
+    dogfoodMessage('docs.page.packages', 'Packages'),
+    dogfoodMessage('docs.page.philosophy', 'Philosophy'),
+    dogfoodMessage('docs.page.release', 'Release'),
     dogfoodMessage('docs.search.title', 'Search components'),
     dogfoodMessage('docs.empty.intro.title', 'What is Bijou?'),
     dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
@@ -180,6 +215,28 @@ interface StoryFamily {
   readonly stories: readonly ComponentStory[];
 }
 
+type DocsPageId =
+  | typeof GUIDES_PAGE_ID
+  | typeof COMPONENTS_PAGE_ID
+  | typeof PACKAGES_PAGE_ID
+  | typeof PHILOSOPHY_PAGE_ID
+  | typeof RELEASE_PAGE_ID;
+
+type GuideDocsPageId = Exclude<DocsPageId, typeof COMPONENTS_PAGE_ID>;
+
+interface GuideDoc {
+  readonly id: string;
+  readonly pageId: GuideDocsPageId;
+  readonly title: string;
+  readonly summary: string;
+  readonly body: string;
+}
+
+interface DocsPageSpec {
+  readonly id: DocsPageId;
+  readonly title: string;
+}
+
 interface RowDescriptor {
   readonly kind: 'family' | 'story';
   readonly id: string;
@@ -194,6 +251,8 @@ interface DocsExplorerModel {
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly previewTimeMs: number;
+  readonly guideState: ReturnType<typeof createBrowsableListState<string>>;
+  readonly selectedGuideId?: string;
   readonly showHints: boolean;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
@@ -213,6 +272,13 @@ type ExplorerMsg =
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
+  | { type: 'guide-next' }
+  | { type: 'guide-prev' }
+  | { type: 'guide-page-down' }
+  | { type: 'guide-page-up' }
+  | { type: 'activate-guide' }
+  | { type: 'activate-guide-index'; index: number }
+  | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
   | { type: 'cycle-landing-theme' }
   | { type: 'cycle-landing-quality' };
@@ -273,12 +339,181 @@ type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
+const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
+  { id: GUIDES_PAGE_ID, title: 'Guides' },
+  { id: COMPONENTS_PAGE_ID, title: 'Components' },
+  { id: PACKAGES_PAGE_ID, title: 'Packages' },
+  { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
+  { id: RELEASE_PAGE_ID, title: 'Release' },
+]);
+const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
+  {
+    id: 'start-here',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Start Here',
+    summary: 'What Bijou is, what DOGFOOD is for, and how the docs map is now shaped.',
+    body: GUIDES_START_HERE_TEXT,
+  },
+  {
+    id: 'navigate-dogfood',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Navigate DOGFOOD',
+    summary: 'How to move between sections, panes, search, settings, and component stories.',
+    body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
+  },
+  {
+    id: 'documentation-map',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Documentation Map',
+    summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    body: GUIDES_DOCUMENTATION_MAP_TEXT,
+  },
+  {
+    id: 'secondary-example-map',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Secondary Example Map',
+    summary: 'Why examples are now secondary/internal and what reference value they still keep.',
+    body: GUIDES_SECONDARY_EXAMPLES_TEXT,
+  },
+  {
+    id: 'packages-overview',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'Packages Overview',
+    summary: 'How the public workspace packages fit together in the Bijou stack.',
+    body: PACKAGES_OVERVIEW_TEXT,
+  },
+  {
+    id: 'package-bijou',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou',
+    summary: 'The pure core toolkit: prompts, components, themes, ports, and surface primitives.',
+    body: PACKAGE_BIJOU_TEXT,
+  },
+  {
+    id: 'package-bijou-node',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-node',
+    summary: 'Node runtime, IO, style, worker, and recorder adapters for Bijou apps.',
+    body: PACKAGE_BIJOU_NODE_TEXT,
+  },
+  {
+    id: 'package-bijou-tui',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-tui',
+    summary: 'The fullscreen runtime: TEA loop, layout, motion, overlays, and shell infrastructure.',
+    body: PACKAGE_BIJOU_TUI_TEXT,
+  },
+  {
+    id: 'package-bijou-tui-app',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-tui-app',
+    summary: 'The opinionated framed-shell starter for tabbed fullscreen Bijou apps.',
+    body: PACKAGE_BIJOU_TUI_APP_TEXT,
+  },
+  {
+    id: 'package-create-bijou-tui-app',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'create-bijou-tui-app',
+    summary: 'The scaffolder for bootstrapping a runnable Bijou TUI app project.',
+    body: PACKAGE_CREATE_TUI_APP_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-i18n',
+    summary: 'The in-memory localization runtime for catalogs, direction, and runtime-safe lookups.',
+    body: PACKAGE_BIJOU_I18N_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools',
+    summary: 'Provider-neutral localization tooling for exchange, stale detection, and catalog compilation.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools-node',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools-node',
+    summary: 'Node filesystem adapters for localization exchange workflows and bundle files.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_NODE_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools-xlsx',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools-xlsx',
+    summary: 'XLSX workbook adapters for spreadsheet-driven localization exchange.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_XLSX_TEXT,
+  },
+  {
+    id: 'philosophy-overview',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Philosophy and Architecture',
+    summary: 'How the doctrine, architecture, and design stance pages fit together in DOGFOOD.',
+    body: PHILOSOPHY_OVERVIEW_TEXT,
+  },
+  {
+    id: 'philosophy-system-style-javascript',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'System-Style JavaScript',
+    summary: 'Runtime truth, boundaries, adapters, codecs, and the repo-wide infrastructure doctrine.',
+    body: PHILOSOPHY_SYSTEM_STYLE_TEXT,
+  },
+  {
+    id: 'philosophy-architecture',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Architecture',
+    summary: 'The structural reference for the nine-package workspace and its core/runtime/i18n lanes.',
+    body: PHILOSOPHY_ARCHITECTURE_TEXT,
+  },
+  {
+    id: 'philosophy-ux-doctrine',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Bijou UX Doctrine',
+    summary: 'The product doctrine for calm, explicit, humane terminal UX.',
+    body: PHILOSOPHY_UX_DOCTRINE_TEXT,
+  },
+  {
+    id: 'philosophy-invariants',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Invariants',
+    summary: 'The non-negotiable project truths and the legends that protect them.',
+    body: PHILOSOPHY_INVARIANTS_TEXT,
+  },
+  {
+    id: 'philosophy-design-system',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Design System Overview',
+    summary: 'The foundations, patterns, blocks, and component-family doctrine behind Bijou UI.',
+    body: PHILOSOPHY_DESIGN_SYSTEM_TEXT,
+  },
+  {
+    id: 'release-overview',
+    pageId: RELEASE_PAGE_ID,
+    title: 'Release Overview',
+    summary: 'How the current release line is shaped and where to read the detailed 4.1.0 release docs.',
+    body: RELEASE_OVERVIEW_TEXT,
+  },
+  {
+    id: 'release-whats-new-4-1-0',
+    pageId: RELEASE_PAGE_ID,
+    title: 'What\'s New in v4.1.0',
+    summary: 'The long-form release story for the 4.1.0 line.',
+    body: RELEASE_WHATS_NEW_TEXT,
+  },
+  {
+    id: 'release-migration-4-1-0',
+    pageId: RELEASE_PAGE_ID,
+    title: 'Migration Guide v4.1.0',
+    summary: 'How users coming from v4.0.0 should handle the 4.1.0 upgrade.',
+    body: RELEASE_MIGRATION_GUIDE_TEXT,
+  },
+]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
 const DIM_MODIFIERS = ['dim'];
 const BOLD_MODIFIERS = ['bold'];
 const LANDING_STATIC_SURFACE_CACHE = new Map<string, {
-  readonly promptLine: Surface;
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 }>();
@@ -381,7 +616,17 @@ const variantPaneKeys = createKeyMap<ExplorerMsg>()
     .bind('pageup', 'Previous variant', { type: 'variant-prev' }),
   );
 
-const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
+const guidePaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Guides', (group) => group
+    .bind('down', 'Next guide', { type: 'guide-next' })
+    .bind('up', 'Previous guide', { type: 'guide-prev' })
+    .bind('pagedown', 'Page down', { type: 'guide-page-down' })
+    .bind('pageup', 'Page up', { type: 'guide-page-up' })
+    .bind('enter', 'Open guide', { type: 'activate-guide' })
+    .bind('space', 'Open guide', { type: 'activate-guide' }),
+  );
+
+const componentsPageKeys = createKeyMap<ExplorerMsg>()
   .group('Profiles', (group) => group
     .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
     .bind('2', 'Static profile', { type: 'set-profile', mode: 'static' })
@@ -445,6 +690,44 @@ function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
     || (msg.key === 'n' && msg.shift);
 }
 
+function readMarkdownDoc(path: string): string {
+  return readFileSync(new URL(path, import.meta.url), 'utf8').trim();
+}
+
+function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
+  const content = readMarkdownDoc(path);
+  const lines = content.split('\n');
+  const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
+  return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
+}
+
+function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
+  return GUIDE_DOCS.filter((doc) => doc.pageId === pageId);
+}
+
+function guideItemsForPage(pageId: DocsPageId): readonly { label: string; value: string; description?: string }[] {
+  return guideDocsForPage(pageId).map((doc) => ({
+    label: doc.title,
+    value: doc.id,
+    description: doc.summary,
+  }));
+}
+
+function pageTitle(pageId: DocsPageId, i18n?: I18nRuntime): string {
+  switch (pageId) {
+    case GUIDES_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.guides', 'Guides');
+    case COMPONENTS_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.components', 'Components');
+    case PACKAGES_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.packages', 'Packages');
+    case PHILOSOPHY_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.philosophy', 'Philosophy');
+    case RELEASE_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.release', 'Release');
+  }
+}
+
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
   for (const story of stories) {
@@ -462,8 +745,9 @@ function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryF
   }));
 }
 
-function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
+function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): DocsExplorerModel {
   const expandedFamilies = Object.fromEntries(STORY_FAMILIES.map((family) => [family.id, false]));
+  const guideItems = guideItemsForPage(pageId);
   return {
     familyState: createBrowsableListState({
       items: buildFamilyItems(expandedFamilies),
@@ -474,6 +758,11 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
     previewTimeMs: 0,
+    guideState: createBrowsableListState({
+      items: guideItems,
+      height: 14,
+    }),
+    selectedGuideId: guideItems[0]?.value,
     showHints: true,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
@@ -699,6 +988,56 @@ function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplor
   };
 }
 
+function focusGuideRow(model: DocsExplorerModel, index: number): DocsExplorerModel {
+  const itemCount = model.guideState.items.length;
+  if (itemCount === 0) return model;
+  const focusIndex = Math.max(0, Math.min(index, itemCount - 1));
+  return {
+    ...model,
+    guideState: {
+      ...model.guideState,
+      focusIndex,
+      scrollY: adjustScroll(
+        focusIndex,
+        model.guideState.scrollY,
+        model.guideState.height,
+        itemCount,
+      ),
+    },
+  };
+}
+
+function selectedGuide(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc | undefined {
+  const docs = guideDocsForPage(pageId);
+  const selected = docs.find((doc) => doc.id === model.selectedGuideId);
+  return selected ?? docs[0];
+}
+
+function selectGuide(pageId: DocsPageId, model: DocsExplorerModel, guideId?: string): DocsExplorerModel {
+  if (guideId == null) return model;
+  const docs = guideDocsForPage(pageId);
+  const index = docs.findIndex((doc) => doc.id === guideId);
+  if (index < 0) return model;
+  return {
+    ...model,
+    selectedGuideId: guideId,
+    guideState: {
+      ...model.guideState,
+      focusIndex: index,
+      scrollY: adjustScroll(index, model.guideState.scrollY, model.guideState.height, model.guideState.items.length),
+    },
+  };
+}
+
+function activateGuideRow(model: DocsExplorerModel, pageId: DocsPageId): DocsExplorerModel {
+  const guideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  return selectGuide(pageId, model, guideId);
+}
+
+function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, index: number): DocsExplorerModel {
+  return activateGuideRow(focusGuideRow(model, index), pageId);
+}
+
 function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
   const cache: LandingFrameCache = {};
 
@@ -740,30 +1079,38 @@ function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: Ro
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
     const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
+    const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, i18n);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
     const dogfoodPanel = getLandingDogfoodPanel(
-      Math.max(28, Math.min(width - 8, 72)),
+      Math.max(28, Math.min(width - 6, 88)),
       ctx,
       tokens,
       i18n,
     );
+    const panelPromptGap = 1;
+    const promptWordmarkGap = 1;
     const footerY = Math.max(0, height - 1);
-    const wordmarkY = Math.max(0, footerY - wordmark.height - 2);
-    const promptMinY = Math.min(height - 1, logoY + logoHeight + 1);
-    const promptMaxY = Math.max(0, wordmarkY - staticSurfaces.promptLine.height - 2);
-    const promptY = promptMaxY >= promptMinY
-      ? Math.max(promptMinY, Math.min(Math.floor(height * 0.72), promptMaxY))
-      : Math.max(0, Math.min(height - staticSurfaces.promptLine.height - 1, promptMinY));
+    const contentTop = Math.min(height - 1, logoY + logoHeight + 1);
+    const contentBottom = Math.max(contentTop, footerY - 2);
+    const availableHeight = Math.max(0, contentBottom - contentTop + 1);
+    const fullClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap + wordmark.height;
+    const compactClusterHeight = dogfoodPanel.height + panelPromptGap + promptLine.height;
 
-    blitCentered(surface, wordmark, wordmarkY);
-    blitCentered(surface, staticSurfaces.promptLine, promptY);
-    const panelMinY = promptY + staticSurfaces.promptLine.height + 1;
-    const panelMaxY = wordmarkY - dogfoodPanel.height - 1;
-    if (panelMaxY >= panelMinY) {
-      blitCentered(surface, dogfoodPanel, Math.max(
-        panelMinY,
-        Math.min(Math.floor((panelMinY + panelMaxY) / 2), panelMaxY),
-      ));
+    if (availableHeight >= fullClusterHeight) {
+      const startY = contentTop + Math.max(0, Math.floor((availableHeight - fullClusterHeight) / 2));
+      blitCentered(surface, dogfoodPanel, startY);
+      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
+      blitCentered(surface, wordmark, startY + dogfoodPanel.height + panelPromptGap + promptLine.height + promptWordmarkGap);
+    } else if (availableHeight >= compactClusterHeight) {
+      const startY = contentTop + Math.max(0, Math.floor((availableHeight - compactClusterHeight) / 2));
+      blitCentered(surface, dogfoodPanel, startY);
+      blitCentered(surface, promptLine, startY + dogfoodPanel.height + panelPromptGap);
+    } else {
+      const promptY = Math.max(0, Math.min(contentBottom - promptLine.height + 1, contentTop));
+      blitCentered(surface, promptLine, promptY);
+      if (availableHeight >= dogfoodPanel.height) {
+        blitCentered(surface, dogfoodPanel, contentTop);
+      }
     }
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     const footerVersionX = Math.max(0, width - staticSurfaces.footerVersion.width);
@@ -1167,7 +1514,7 @@ function landingThemeSettingDescription(index: number, i18n?: I18nRuntime): stri
 }
 
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
-  return model.docsModel.pageModels[DOCS_PAGE_ID]?.landingQualityMode ?? 'auto';
+  return model.docsModel.pageModels[model.docsModel.activePageId]?.landingQualityMode ?? 'auto';
 }
 
 function applyOpaqueCell(
@@ -1199,32 +1546,15 @@ function updateLandingFps(current: number, dtSeconds: number): number {
 }
 
 function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime): {
-  readonly promptLine: Surface;
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 } {
-  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
   const controlsText = dogfoodText(i18n, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
-  const cacheKey = `${tokens.id}:${promptText}:${controlsText}`;
+  const cacheKey = `${tokens.id}:${controlsText}`;
   const cached = LANDING_STATIC_SURFACE_CACHE.get(cacheKey);
   if (cached) return cached;
 
   const surfaces = {
-    promptLine: createTransparentTextSurface(promptText, {
-      bg: tokens.background,
-      transparentSpaces: false,
-      fg: (x) => {
-        const char = promptText[x] ?? ' ';
-        if (char === '[' || char === ']') {
-          return tokens.promptAccentColor;
-        }
-        return tokens.promptBodyColor;
-      },
-      modifiers: (x) => {
-        const char = promptText[x] ?? ' ';
-        return char === '[' || char === ']' ? BOLD_MODIFIERS : DIM_MODIFIERS;
-      },
-    }),
     footerControls: createTransparentTextSurface(controlsText, {
       bg: tokens.background,
       transparentSpaces: false,
@@ -1240,6 +1570,43 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime)
   };
   LANDING_STATIC_SURFACE_CACHE.set(cacheKey, surfaces);
   return surfaces;
+}
+
+function createLandingPromptSurface(
+  tokens: LandingThemeTokens,
+  timeMs: number,
+  i18n?: I18nRuntime,
+): Surface {
+  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
+  const highlightStart = promptText.indexOf('[');
+  const highlightEnd = promptText.indexOf(']');
+  const time = timeMs / 1000;
+
+  return createTransparentTextSurface(promptText, {
+    bg: tokens.background,
+    transparentSpaces: false,
+    fg: (x) => {
+      const inHighlight = highlightStart >= 0
+        && highlightEnd >= highlightStart
+        && x >= highlightStart
+        && x <= highlightEnd;
+      if (!inHighlight) {
+        return tokens.promptBodyColor;
+      }
+
+      const span = Math.max(1, highlightEnd - highlightStart);
+      const local = (x - highlightStart) / span;
+      const shimmer = 0.5 + (Math.sin((time * 4.2) + (local * Math.PI * 2.2)) * 0.5);
+      return sampleColorRamp(tokens.logoRamp, clamp01(0.56 + (shimmer * 0.38)));
+    },
+    modifiers: (x) => {
+      const inHighlight = highlightStart >= 0
+        && highlightEnd >= highlightStart
+        && x >= highlightStart
+        && x <= highlightEnd;
+      return inHighlight ? BOLD_MODIFIERS : DIM_MODIFIERS;
+    },
+  });
 }
 
 function getLandingFpsBadge(
@@ -1280,43 +1647,84 @@ function getLandingDogfoodPanel(
   const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
-  const body = createTransparentTextSurface(
-    wrapToWidth(expansion, Math.max(18, width - 4)).join('\n'),
+  const bodyWidth = Math.max(18, width - 4);
+  const body = centerSurfaceHorizontally(createTransparentTextSurface(
+    wrapToWidth(expansion, bodyWidth).join('\n'),
     {
       bg: tokens.background,
       transparentSpaces: false,
       fg: tokens.footerStrongColor,
-      modifiers: DIM_MODIFIERS,
+      modifiers: BOLD_MODIFIERS,
     },
-  );
+  ), bodyWidth);
   const surface = boxSurface(body, {
     title,
     width,
-    borderToken: { hex: tokens.footerMutedColor },
+    borderToken: landingDogfoodPanelBorderToken(tokens),
+    padding: { left: 1, right: 1 },
     ctx,
   });
   LANDING_DOGFOOD_PANEL_CACHE.set(key, surface);
   return surface;
 }
 
+function mapDocsPageModels(
+  docsModel: FrameModel<DocsExplorerModel>,
+  transform: (pageModel: DocsExplorerModel, pageId: DocsPageId) => DocsExplorerModel,
+): FrameModel<DocsExplorerModel> {
+  let changed = false;
+  const nextPageModels: Record<string, DocsExplorerModel> = {};
+
+  for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
+    const nextPageModel = transform(pageModel, pageId as DocsPageId);
+    nextPageModels[pageId] = nextPageModel;
+    if (nextPageModel !== pageModel) {
+      changed = true;
+    }
+  }
+
+  return changed
+    ? {
+        ...docsModel,
+        pageModels: nextPageModels,
+      }
+    : docsModel;
+}
+
+function syncDocsSharedSettings(
+  docsModel: FrameModel<DocsExplorerModel>,
+): FrameModel<DocsExplorerModel> {
+  const activePageModel = docsModel.pageModels[docsModel.activePageId];
+  if (activePageModel == null) return docsModel;
+  return mapDocsPageModels(docsModel, (pageModel) => {
+    if (
+      pageModel.showHints === activePageModel.showHints
+      && pageModel.landingThemeIndex === activePageModel.landingThemeIndex
+      && pageModel.landingQualityMode === activePageModel.landingQualityMode
+    ) {
+      return pageModel;
+    }
+    return {
+      ...pageModel,
+      showHints: activePageModel.showHints,
+      landingThemeIndex: activePageModel.landingThemeIndex,
+      landingQualityMode: activePageModel.landingQualityMode,
+    };
+  });
+}
+
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
-  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
   const nextIndex = mod(index, LANDING_THEMES.length);
   if (nextIndex === model.landingThemeIndex) return model;
   const theme = resolveLandingTheme(nextIndex);
   return {
     ...model,
     landingThemeIndex: nextIndex,
-    docsModel: pageModel == null ? model.docsModel : {
-      ...model.docsModel,
-      pageModels: {
-        ...model.docsModel.pageModels,
-        [DOCS_PAGE_ID]: {
-          ...pageModel,
-          landingThemeIndex: nextIndex,
-        },
-      },
-    },
+    docsModel: mapDocsPageModels(model.docsModel, (pageModel) => (
+      pageModel.landingThemeIndex === nextIndex
+        ? pageModel
+        : { ...pageModel, landingThemeIndex: nextIndex }
+    )),
     landingToast: {
       message: theme.label,
       expiresAtMs: model.landingTimeMs + 1600,
@@ -1325,21 +1733,16 @@ function applyLandingThemeSelection(model: RootModel, index: number): RootModel 
 }
 
 function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode, i18n?: I18nRuntime): RootModel {
-  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
-  if (pageModel == null || pageModel.landingQualityMode === mode) return model;
+  const activePageModel = model.docsModel.pageModels[model.docsModel.activePageId];
+  if (activePageModel == null || activePageModel.landingQualityMode === mode) return model;
 
   return {
     ...model,
-    docsModel: {
-      ...model.docsModel,
-      pageModels: {
-        ...model.docsModel.pageModels,
-        [DOCS_PAGE_ID]: {
-          ...pageModel,
-          landingQualityMode: mode,
-        },
-      },
-    },
+    docsModel: mapDocsPageModels(model.docsModel, (pageModel) => (
+      pageModel.landingQualityMode === mode
+        ? pageModel
+        : { ...pageModel, landingQualityMode: mode }
+    )),
     landingToast: {
       message: dogfoodText(
         i18n,
@@ -1407,6 +1810,47 @@ function rgbHex(r: number, g: number, b: number): string {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
+function srgbChannelToLinear(channel: number): number {
+  const normalized = channel / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
+  return (0.2126 * srgbChannelToLinear(r))
+    + (0.7152 * srgbChannelToLinear(g))
+    + (0.0722 * srgbChannelToLinear(b));
+}
+
+function contrastRatio(a: string, b: string): number {
+  const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
+  const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function colorDistance(a: string, b: string): number {
+  const [ar, ag, ab] = hexToRgb(a);
+  const [br, bg, bb] = hexToRgb(b);
+  return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2);
+}
+
+function pickStandoutColor(background: string, base: string, candidates: readonly string[]): string {
+  let best = candidates[0] ?? base;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  for (const candidate of candidates) {
+    const contrast = contrastRatio(candidate, background);
+    const distance = colorDistance(candidate, base) / Math.sqrt(3 * 255 * 255);
+    const score = contrast * 3 + distance;
+    if (score > bestScore) {
+      bestScore = score;
+      best = candidate;
+    }
+  }
+  return best;
+}
+
 function mod(value: number, divisor: number): number {
   return ((value % divisor) + divisor) % divisor;
 }
@@ -1459,6 +1903,12 @@ function createTransparentTextSurface(
   return surface;
 }
 
+function centerSurfaceHorizontally(content: Surface, width: number): Surface {
+  const centered = createSurface(Math.max(1, width), Math.max(1, content.height));
+  centered.blit(content, Math.max(0, Math.floor((centered.width - content.width) / 2)), 0);
+  return centered;
+}
+
 function docsThemeAccentToken(theme: LandingThemeTokens): TokenValue {
   return { hex: sampleColorRamp(theme.logoRamp, 0.78), modifiers: ['bold'] };
 }
@@ -1489,6 +1939,65 @@ function docsThemeDescriptionToken(theme: LandingThemeTokens): TokenValue {
   return {
     hex: sampleColorRamp(theme.waveRamp, 0.58),
     modifiers: ['dim'],
+  };
+}
+
+export function resolveDocsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
+  const base = docsThemeSurfaceToken(theme).hex;
+  const background = sampleColorRamp(theme.waveRamp, 0.14);
+  return {
+    hex: pickStandoutColor(background, base, [
+      sampleColorRamp(theme.logoRamp, 0.98),
+      sampleColorRamp(theme.logoRamp, 0.84),
+      sampleColorRamp(theme.waveRamp, 0.88),
+      sampleColorRamp(theme.logoRamp, 0.62),
+    ]),
+    bg: background,
+    modifiers: ['bold'],
+  };
+}
+
+function docsThemeProgressTokens(theme: LandingThemeTokens): {
+  readonly filledToken: TokenValue;
+  readonly filledEndToken: TokenValue;
+  readonly emptyToken: TokenValue;
+  readonly labelToken: TokenValue;
+} {
+  const surface = docsThemeSurfaceToken(theme);
+  const background = surface.bg ?? theme.background;
+  const base = surface.hex;
+  const filledStart = pickStandoutColor(background, base, [
+    sampleColorRamp(theme.waveRamp, 0.58),
+    sampleColorRamp(theme.logoRamp, 0.34),
+    sampleColorRamp(theme.waveRamp, 0.74),
+  ]);
+  const filledEnd = pickStandoutColor(background, filledStart, [
+    sampleColorRamp(theme.logoRamp, 0.78),
+    sampleColorRamp(theme.logoRamp, 0.96),
+    sampleColorRamp(theme.waveRamp, 0.9),
+  ]);
+  return {
+    filledToken: { hex: filledStart, modifiers: ['bold'] },
+    filledEndToken: { hex: filledEnd, modifiers: ['bold'] },
+    emptyToken: { hex: sampleColorRamp(theme.waveRamp, 0.22), modifiers: ['dim'] },
+    labelToken: {
+      hex: pickStandoutColor(background, base, [
+        sampleColorRamp(theme.logoRamp, 0.9),
+        sampleColorRamp(theme.waveRamp, 0.84),
+        sampleColorRamp(theme.logoRamp, 0.7),
+      ]),
+      modifiers: ['bold'],
+    },
+  };
+}
+
+function landingDogfoodPanelBorderToken(theme: LandingThemeTokens): TokenValue {
+  return {
+    hex: pickStandoutColor(theme.background, theme.footerMutedColor, [
+      theme.footerStrongColor,
+      sampleColorRamp(theme.logoRamp, 0.84),
+      sampleColorRamp(theme.waveRamp, 0.78),
+    ]),
   };
 }
 
@@ -1649,6 +2158,7 @@ function renderEmptyStoryPane(
     contentSurface(progressBar(DOGFOOD_DOCS_COVERAGE.percent, {
       width: coverageBarWidth,
       showPercent: true,
+      ...docsThemeProgressTokens(theme),
       ctx,
     })),
     spacer(),
@@ -1820,16 +2330,174 @@ function renderVariantsPane(
   ]), width);
 }
 
+function renderGuideNavPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  height: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  i18n: I18nRuntime,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const content = createSurface(Math.max(1, paneWidth), Math.max(1, model.guideState.items.length));
+
+  for (let index = 0; index < model.guideState.items.length; index++) {
+    content.blit(
+      renderGuideRow({
+        item: model.guideState.items[index]!,
+        width: paneWidth,
+        focused: index === model.guideState.focusIndex,
+        selectedGuideId: model.selectedGuideId,
+        ctx,
+        theme,
+      }),
+      0,
+      index,
+    );
+  }
+
+  const body = viewportSurface({
+    width: Math.max(1, paneWidth),
+    height: bodyHeight,
+    content,
+    scrollY: model.guideState.scrollY,
+    showScrollbar: true,
+  });
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(pageTitle(pageId, i18n).toLowerCase(), paneWidth, ctx, theme),
+    body,
+  ]), width);
+}
+
+function renderGuideReaderPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const doc = selectedGuide(pageId, model);
+  if (doc == null) {
+    return insetPaneSurface(column([
+      themedSeparatorSurface('docs', paneWidth, ctx, theme),
+      spacer(1, 1),
+      boxSurface(paragraphSurface(
+        'This section does not have published docs yet.',
+        Math.max(20, paneWidth - 6),
+      ), {
+        width: Math.max(22, paneWidth),
+        borderToken: docsThemeMutedBorderToken(theme),
+        padding: { left: 1, right: 1 },
+        ctx,
+      }),
+    ]), width);
+  }
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(markdown(doc.body, {
+      width: Math.max(24, paneWidth - 2),
+      ctx,
+    })),
+  ]), width);
+}
+
+function renderGuideInfoPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  i18n: I18nRuntime,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const doc = selectedGuide(pageId, model);
+  const description = doc?.summary ?? 'This section is still being expanded.';
+  const currentPosture = (() => {
+    switch (pageId) {
+      case GUIDES_PAGE_ID:
+        return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
+      case PACKAGES_PAGE_ID:
+        return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
+      case PHILOSOPHY_PAGE_ID:
+        return 'This section now publishes the key doctrine, architecture, invariants, and design-system guidance inside DOGFOOD.';
+      case RELEASE_PAGE_ID:
+        return 'This section now publishes the 4.1.0 release story and migration guidance inside DOGFOOD.';
+      default:
+        return 'This section now has a visible home in DOGFOOD.';
+    }
+  })();
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`section • ${pageTitle(pageId, i18n).toLowerCase()}`, paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(inspector({
+      title: 'guide info',
+      currentValue: doc?.title ?? pageTitle(pageId, i18n),
+      sections: [
+        {
+          title: 'Summary',
+          content: description,
+          tone: 'muted',
+        },
+        {
+          title: 'Current posture',
+          content: currentPosture,
+          tone: 'muted',
+        },
+      ],
+      width: Math.max(22, paneWidth),
+      borderToken: docsThemeMutedBorderToken(theme),
+      bgToken: docsThemeSurfaceToken(theme),
+      ctx,
+    })),
+  ]), width);
+}
+
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRuntime): string {
-  const pageModel = model.pageModels[DOCS_PAGE_ID];
+  const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
+  const pageModel = model.pageModels[pageId];
   if (pageModel == null || !pageModel.showHints) {
     return dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
   }
 
-  const focusedPane = model.focusedPaneByPage[DOCS_PAGE_ID];
+  const focusedPane = model.focusedPaneByPage[pageId];
   const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
   const paneSwitch = dogfoodText(i18n, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
   const activeHint = (() => {
+    if (pageId !== COMPONENTS_PAGE_ID) {
+      switch (focusedPane) {
+        case 'guide-nav':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guideNav',
+            '{paneSwitch} • ↑/↓ browse • Enter open',
+            { paneSwitch },
+          );
+        case 'guide-content':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guide',
+            '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom',
+            { paneSwitch },
+          );
+        case 'guide-meta':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guideMeta',
+            '{paneSwitch} • section overview',
+            { paneSwitch },
+          );
+        default:
+          return undefined;
+      }
+    }
+
     switch (focusedPane) {
       case 'family-nav':
         return dogfoodText(
@@ -1877,6 +2545,20 @@ function familyRowIndexAtPosition(
   return index >= 0 && index < model.familyState.items.length ? index : undefined;
 }
 
+function guideRowIndexAtPosition(
+  model: DocsExplorerModel,
+  row: number,
+  rect: { readonly row: number; readonly height: number },
+): number | undefined {
+  const visibleHeight = Math.max(1, rect.height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const localRow = row - rect.row;
+  const bodyRow = localRow - 1;
+  if (bodyRow < 0 || bodyRow >= visibleHeight) return undefined;
+
+  const index = model.guideState.scrollY + bodyRow;
+  return index >= 0 && index < model.guideState.items.length ? index : undefined;
+}
+
 function variantRowIndexAtPosition(
   model: DocsExplorerModel,
   row: number,
@@ -1922,128 +2604,241 @@ function resolveVariantPaneMouse(
   return index == null ? undefined : { type: 'select-variant', index };
 }
 
+function resolveGuidePaneMouse(
+  msg: MouseMsg,
+  model: DocsExplorerModel,
+  rect: { readonly row: number; readonly height: number },
+): ExplorerMsg | undefined {
+  if (msg.action === 'scroll-down') return { type: 'guide-next' };
+  if (msg.action === 'scroll-up') return { type: 'guide-prev' };
+  if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+
+  const index = guideRowIndexAtPosition(model, msg.row, rect);
+  return index == null ? undefined : { type: 'activate-guide-index', index };
+}
+
 function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<DocsExplorerModel, DocsMsg> {
   return createFramedApp<DocsExplorerModel, DocsMsg>({
     i18n,
     title: 'Bijou Docs',
+    headerStyle: ({ pageModel }) => ({
+      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
+    }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
-    globalKeys: explorerGlobalKeys,
     helpLineSource: ({ model }) => buildDocsFooterHint(model, i18n),
-    pages: [{
-      id: DOCS_PAGE_ID,
-      title: 'DOGFOOD',
-      init: () => [createInitialExplorerModel(ctx), []],
-      update(msg: FramePageMsg<DocsMsg>, model) {
-        if (msg.type === 'mouse') {
-          return [model, []];
-        }
-        if (msg.type === 'pulse') {
-          return [{
-            ...model,
-            previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
-          }, []];
-        }
-        switch (msg.type) {
-          case 'family-next':
-            return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
-          case 'family-prev':
-            return [{ ...model, familyState: listFocusPrev(model.familyState) }, []];
-          case 'family-page-down':
-            return [{ ...model, familyState: listPageDown(model.familyState) }, []];
-          case 'family-page-up':
-            return [{ ...model, familyState: listPageUp(model.familyState) }, []];
-          case 'activate-row':
-            return [activateFocusedRow(model), []];
-          case 'activate-row-index':
-            return [activateFamilyRowIndex(model, msg.index), []];
-          case 'expand-row':
-            return [expandFocusedFamily(model), []];
-          case 'collapse-row':
-            return [collapseFocusedFamily(model), []];
-          case 'select-story':
-            return [selectStory(model, msg.storyId), []];
-          case 'select-variant':
-            return [selectVariantIndex(model, msg.index), []];
-          case 'variant-next':
-            return [cycleVariantIndex(model, 1), []];
-          case 'variant-prev':
-            return [cycleVariantIndex(model, -1), []];
-          case 'set-profile':
-            return [{ ...model, profileMode: msg.mode }, []];
-          case 'toggle-hints':
-            return [{ ...model, showHints: !model.showHints }, []];
-          case 'cycle-landing-theme':
-            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
-          case 'cycle-landing-quality':
-            return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
-        }
-      },
-      inputAreas(model) {
-        return [
-          {
-            paneId: 'family-nav',
-            keyMap: familyPaneKeys,
-            helpSource: familyPaneKeys,
-            mouse: ({ msg, rect }) => resolveFamilyPaneMouse(msg, model, rect),
-          },
-          {
-            paneId: 'story-variants',
-            keyMap: variantPaneKeys,
-            helpSource: variantPaneKeys,
-            mouse: ({ msg, rect }) => resolveVariantPaneMouse(msg, model, rect),
-          },
-        ];
-      },
-      searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
-      searchItems(model) {
-        return COMPONENT_STORIES.map((story) => ({
-          id: story.id,
-          label: story.title,
-          description: `${story.family} • ${story.docs.summary}`,
-          category: story.family,
-          action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
-        }));
-      },
-      layout(model) {
-        const theme = resolveLandingTheme(model.landingThemeIndex);
+    pages: DOCS_SITE_PAGES.map((spec) => {
+      if (spec.id === COMPONENTS_PAGE_ID) {
         return {
-          kind: 'grid',
-          gridId: 'docs-shell',
-          columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
-          rows: [1, '1fr', 1],
-          areas: [
-            '. . . . . . .',
-            '. family . main . variants .',
-            '. . . . . . .',
-          ],
-          gap: 0,
-          cells: {
-            family: {
-              kind: 'pane',
-              paneId: 'family-nav',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
-            },
-            main: {
-              kind: 'pane',
-              paneId: 'story-content',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
-            },
-            variants: {
-              kind: 'pane',
-              paneId: 'story-variants',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
-            },
+          id: spec.id,
+          title: pageTitle(spec.id, i18n),
+          keyMap: componentsPageKeys,
+          init: () => [createInitialExplorerModel(ctx, spec.id), []],
+          update(msg: FramePageMsg<DocsMsg>, model) {
+            if (msg.type === 'mouse') {
+              return [model, []];
+            }
+            if (msg.type === 'pulse') {
+              return [{
+                ...model,
+                previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+              }, []];
+            }
+            switch (msg.type) {
+              case 'family-next':
+                return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
+              case 'family-prev':
+                return [{ ...model, familyState: listFocusPrev(model.familyState) }, []];
+              case 'family-page-down':
+                return [{ ...model, familyState: listPageDown(model.familyState) }, []];
+              case 'family-page-up':
+                return [{ ...model, familyState: listPageUp(model.familyState) }, []];
+              case 'activate-row':
+                return [activateFocusedRow(model), []];
+              case 'activate-row-index':
+                return [activateFamilyRowIndex(model, msg.index), []];
+              case 'expand-row':
+                return [expandFocusedFamily(model), []];
+              case 'collapse-row':
+                return [collapseFocusedFamily(model), []];
+              case 'select-story':
+                return [selectStory(model, msg.storyId), []];
+              case 'select-variant':
+                return [selectVariantIndex(model, msg.index), []];
+              case 'variant-next':
+                return [cycleVariantIndex(model, 1), []];
+              case 'variant-prev':
+                return [cycleVariantIndex(model, -1), []];
+              case 'set-profile':
+                return [{ ...model, profileMode: msg.mode }, []];
+              case 'toggle-hints':
+                return [{ ...model, showHints: !model.showHints }, []];
+              case 'cycle-landing-theme':
+                return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+              case 'cycle-landing-quality':
+                return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+              default:
+                return [model, []];
+            }
+          },
+          inputAreas(model) {
+            return [
+              {
+                paneId: 'family-nav',
+                keyMap: familyPaneKeys,
+                helpSource: familyPaneKeys,
+                mouse: ({ msg, rect }) => resolveFamilyPaneMouse(msg, model, rect),
+              },
+              {
+                paneId: 'story-variants',
+                keyMap: variantPaneKeys,
+                helpSource: variantPaneKeys,
+                mouse: ({ msg, rect }) => resolveVariantPaneMouse(msg, model, rect),
+              },
+            ];
+          },
+          searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
+          searchItems(model) {
+            return COMPONENT_STORIES.map((story) => ({
+              id: story.id,
+              label: story.title,
+              description: `${story.family} • ${story.docs.summary}`,
+              category: story.family,
+              action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
+            }));
+          },
+          layout(model) {
+            const theme = resolveLandingTheme(model.landingThemeIndex);
+            return {
+              kind: 'grid',
+              gridId: 'docs-shell',
+              columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+              rows: [1, '1fr', 1],
+              areas: [
+                '. . . . . . .',
+                '. family . main . variants .',
+                '. . . . . . .',
+              ],
+              gap: 0,
+              cells: {
+                family: {
+                  kind: 'pane',
+                  paneId: 'family-nav',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
+                },
+                main: {
+                  kind: 'pane',
+                  paneId: 'story-content',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
+                },
+                variants: {
+                  kind: 'pane',
+                  paneId: 'story-variants',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
+                },
+              },
+            };
           },
         };
-      },
-    }],
+      }
+
+      return {
+        id: spec.id,
+        title: pageTitle(spec.id, i18n),
+        init: () => [createInitialExplorerModel(ctx, spec.id), []],
+        update(msg: FramePageMsg<DocsMsg>, model) {
+          if (msg.type === 'mouse' || msg.type === 'pulse') {
+            return [model, []];
+          }
+          switch (msg.type) {
+            case 'guide-next':
+              return [{ ...model, guideState: listFocusNext(model.guideState) }, []];
+            case 'guide-prev':
+              return [{ ...model, guideState: listFocusPrev(model.guideState) }, []];
+            case 'guide-page-down':
+              return [{ ...model, guideState: listPageDown(model.guideState) }, []];
+            case 'guide-page-up':
+              return [{ ...model, guideState: listPageUp(model.guideState) }, []];
+            case 'activate-guide':
+              return [activateGuideRow(model, spec.id), []];
+            case 'activate-guide-index':
+              return [activateGuideRowIndex(model, spec.id, msg.index), []];
+            case 'select-guide':
+              return [selectGuide(spec.id, model, msg.guideId), []];
+            case 'toggle-hints':
+              return [{ ...model, showHints: !model.showHints }, []];
+            case 'cycle-landing-theme':
+              return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+            case 'cycle-landing-quality':
+              return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+            default:
+              return [model, []];
+          }
+        },
+        inputAreas(model) {
+          return [{
+            paneId: 'guide-nav',
+            keyMap: guidePaneKeys,
+            helpSource: guidePaneKeys,
+            mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
+          }];
+        },
+        searchTitle: `Search ${pageTitle(spec.id, i18n).toLowerCase()}`,
+        searchItems() {
+          return guideDocsForPage(spec.id).map((doc) => ({
+            id: doc.id,
+            label: doc.title,
+            description: doc.summary,
+            category: pageTitle(spec.id, i18n),
+            action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
+          }));
+        },
+        layout(model) {
+          const theme = resolveLandingTheme(model.landingThemeIndex);
+          return {
+            kind: 'grid',
+            gridId: `docs-${spec.id}`,
+            columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+            rows: [1, '1fr', 1],
+            areas: [
+              '. . . . . . .',
+              '. nav . main . meta .',
+              '. . . . . . .',
+            ],
+            gap: 0,
+            cells: {
+              nav: {
+                kind: 'pane',
+                paneId: 'guide-nav',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, ctx, theme, i18n),
+              },
+              main: {
+                kind: 'pane',
+                paneId: 'guide-content',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width) => renderGuideReaderPane(spec.id, model, width, ctx, theme),
+              },
+              meta: {
+                kind: 'pane',
+                paneId: 'guide-meta',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width) => renderGuideInfoPane(spec.id, model, width, ctx, theme, i18n),
+              },
+            },
+          };
+        },
+      };
+    }),
     enableCommandPalette: true,
     settings: ({ model, pageModel }) => {
       const theme = resolveLandingTheme(pageModel.landingThemeIndex);
@@ -2128,33 +2923,56 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
 function syncDocsExplorerViewportLayout(
   docsModel: FrameModel<DocsExplorerModel>,
 ): FrameModel<DocsExplorerModel> {
-  const pageModel = docsModel.pageModels[DOCS_PAGE_ID];
-  if (pageModel == null) return docsModel;
-
   const nextHeight = resolveFamilyPaneBodyHeight(docsModel.rows);
-  if (pageModel.familyState.height === nextHeight) return docsModel;
+  let changed = false;
+  const nextPageModels: Record<string, DocsExplorerModel> = {};
 
-  const nextFamilyState = {
-    ...pageModel.familyState,
-    height: nextHeight,
-    scrollY: adjustScroll(
-      pageModel.familyState.focusIndex,
-      pageModel.familyState.scrollY,
-      nextHeight,
-      pageModel.familyState.items.length,
-    ),
-  };
+  for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
+    let nextPageModel = pageModel;
+    if (pageId === COMPONENTS_PAGE_ID) {
+      if (pageModel.familyState.height !== nextHeight) {
+        nextPageModel = {
+          ...nextPageModel,
+          familyState: {
+            ...pageModel.familyState,
+            height: nextHeight,
+            scrollY: adjustScroll(
+              pageModel.familyState.focusIndex,
+              pageModel.familyState.scrollY,
+              nextHeight,
+              pageModel.familyState.items.length,
+            ),
+          },
+        };
+      }
+    } else if (pageModel.guideState.height !== nextHeight) {
+      nextPageModel = {
+        ...nextPageModel,
+        guideState: {
+          ...pageModel.guideState,
+          height: nextHeight,
+          scrollY: adjustScroll(
+            pageModel.guideState.focusIndex,
+            pageModel.guideState.scrollY,
+            nextHeight,
+            pageModel.guideState.items.length,
+          ),
+        },
+      };
+    }
 
-  return {
-    ...docsModel,
-    pageModels: {
-      ...docsModel.pageModels,
-      [DOCS_PAGE_ID]: {
-        ...pageModel,
-        familyState: nextFamilyState,
-      },
-    },
-  };
+    nextPageModels[pageId] = nextPageModel;
+    if (nextPageModel !== pageModel) {
+      changed = true;
+    }
+  }
+
+  return changed
+    ? {
+        ...docsModel,
+        pageModels: nextPageModels,
+      }
+    : docsModel;
 }
 
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
@@ -2186,8 +3004,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
-    const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
-    const pageModel = syncedDocsModel.pageModels[DOCS_PAGE_ID];
+    const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
+    const pageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
     return [{
       ...model,
       docsModel: syncedDocsModel,
@@ -2198,14 +3016,15 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   return {
     init() {
       const [docsModel, cmds] = explorer.init();
-      const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
+      const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
+      const activePageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
       return [{
         route: initialRoute,
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
-        landingThemeIndex: 0,
+        landingThemeIndex: activePageModel?.landingThemeIndex ?? 0,
         landingToast: undefined,
         landingQuitConfirmOpen: false,
         docsModel: syncedDocsModel,
@@ -2362,4 +3181,28 @@ function renderFamilyRow(options: {
     ? ctx.style.styled(accentToken as any, story.title)
     : story.title;
   return line(`${focusPrefix}   ${bullet} ${title}`, width);
+}
+
+function renderGuideRow(options: {
+  readonly item: { readonly label: string; readonly value: string; readonly description?: string };
+  readonly width: number;
+  readonly focused: boolean;
+  readonly selectedGuideId?: string;
+  readonly ctx: BijouContext;
+  readonly theme: LandingThemeTokens;
+}): Surface {
+  const { item, width, focused, selectedGuideId, ctx, theme } = options;
+  const accentToken = docsThemeAccentToken(theme);
+  const mutedToken = docsThemeMutedBorderToken(theme);
+  const selected = selectedGuideId === item.value;
+  const focusPrefix = focused
+    ? ctx.style.styled(accentToken as any, '›')
+    : ' ';
+  const bullet = selected
+    ? ctx.style.styled(accentToken as any, '•')
+    : ctx.style.styled(mutedToken as any, '•');
+  const title = selected || focused
+    ? ctx.style.styled(accentToken as any, item.label)
+    : item.label;
+  return line(`${focusPrefix} ${bullet} ${title}`, width);
 }

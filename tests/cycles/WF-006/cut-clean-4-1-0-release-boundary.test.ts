@@ -7,17 +7,17 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/WF-006-cut-clean-4-1-0-release-boundary.md')).toBe(false);
   });
 
-  it('prunes the temporary v4.1.0 blocker lane once cycle-shaped blockers are closed', () => {
+  it('keeps WF-006 landed even after the temporary version-target lane is pruned again', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
 
     const backlogReadme = readRepoFile('docs/BACKLOG/README.md');
-    expect(backlogReadme).toContain('No version-target release lane is active right now.');
-    expect(backlogReadme).not.toContain('[`v4.1.0/`](./v4.1.0/README.md)');
+    expect(backlogReadme).toContain('There is no active version-target release lane right now.');
   });
 
   it('aligns the short-form release surfaces to the v4.0.0..HEAD boundary', () => {
     const readme = readRepoFile('README.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
+    const releaseGuide = readRepoFile('docs/release.md');
 
     expect(readme).toContain("## What's New in v4.1.0");
     expect(readme).toContain('./docs/releases/4.1.0/whats-new.md');
@@ -25,5 +25,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(changelog).toContain('## [4.0.0] - 2026-03-22');
     expect(changelog).toContain('[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.0.0...HEAD');
     expect(changelog).toContain('[4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0');
+    expect(releaseGuide).toContain('moved the release smoke gate onto the DOGFOOD contract used for');
+    expect(releaseGuide).not.toContain('This still reflects the current repo tooling, not the intended end');
   });
 });

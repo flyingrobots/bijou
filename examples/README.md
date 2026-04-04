@@ -1,4 +1,19 @@
-# Examples
+# Example Inventory
+
+This is a secondary/internal inventory for maintainers, agents, and
+targeted reference use.
+
+If you are trying to learn Bijou, start with
+[DOGFOOD](../docs/DOGFOOD.md), not this page.
+
+The example tree still matters for:
+
+- isolated API seam references
+- migration and runtime reference cases
+- smoke and regression substrate
+- implementation sandboxes
+
+It is not the primary public docs surface or learning path anymore.
 
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record release-facing GIFs: `npx tsx scripts/record-gifs.ts`
@@ -36,13 +51,19 @@ Landing-first story-driven docs slice built with Bijou itself:
 npm run dogfood
 ```
 
-This example now opens on a hero screen, then drops into a three-lane docs explorer with component families on the left, selected-component docs in the center, and variants on the right.
+This example now opens on a hero screen, then drops into a terminal docs
+shell with top-level sections for guides, components, packages,
+philosophy, and release material. The `Components` section keeps the
+three-lane explorer with families on the left, selected-component docs
+in the center, and variants on the right.
 
-It proves the new `ComponentStory` v0 loop with three canonical families:
+It proves DOGFOOD as both a docs shell and a living component field
+guide:
 
-- `alert()` for in-flow status and graceful lowering
-- `modal()` for overlay doctrine and structured interruption
-- `viewportSurface()` for masking and width-sensitive overflow behavior
+- `Guides` establishes the reader-first docs path
+- `Components` carries the full family/story/variant browser
+- `Packages` and `Release` now publish real repo/package/release docs
+- `Philosophy` now publishes the doctrine/architecture corpus too
 
 See [docs](./docs/) for the first living-docs preview built from those shared story records.
 
