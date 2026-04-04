@@ -61,9 +61,9 @@ describe('DF-022 build prose docs reader and top-level DOGFOOD nav cycle', () =>
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
     const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
 
+    expect(lane).toContain('Just closed');
     expect(lane).toContain('DF-023');
     expect(lane).toContain('DF-024');
-    expect(lane).toContain('Just closed');
     expect(lane).toContain('DF-022');
   });
 });

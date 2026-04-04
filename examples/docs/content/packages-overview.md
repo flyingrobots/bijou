@@ -1,7 +1,6 @@
 # Packages
 
-This section exists so package guidance has a visible, terminal-native
-home inside DOGFOOD.
+This section is the package guide for Bijou's published workspace.
 
 ## Current package map
 
@@ -12,8 +11,12 @@ home inside DOGFOOD.
 - `create-bijou-tui-app` — project template and starter workflow
 - `@flyingrobots/bijou-i18n*` — localization runtime, tools, and adapters
 
-## What is still missing
+## How to use this section
 
-The full package-by-package guidance has not landed in DOGFOOD yet. The
-current release blocker is to turn this section from a placeholder home
-into a real package guide for the shipped workspace units.
+- use the left lane to open the package you care about
+- use the center pane to read the package role and surface guide
+- use the right pane for a short summary of what that page is for
+
+The package pages in this section are published from the repo's real
+workspace docs so DOGFOOD can act like a proper package guide instead of
+just a placeholder home.

@@ -1,20 +1,20 @@
 # Release and Migration
 
-This section is where release notes, migration guidance, and current-line
-upgrade advice should live inside DOGFOOD.
+This section publishes the current-line release story and migration
+guidance inside DOGFOOD.
 
 ## Current target
 
 The next shaped release is `4.1.0`.
 
-## What already exists in the repo
+## Published now
 
-- `docs/releases/4.1.0/whats-new.md`
-- `docs/releases/4.1.0/migration-guide.md`
-- `docs/CHANGELOG.md`
+- `What's New in v4.1.0`
+- `Migration Guide v4.1.0`
+- the short-form `CHANGELOG.md` still remains the ledger outside DOGFOOD
 
-## What is still missing
+## How to use this section
 
-DOGFOOD now has a visible `Release` home, but the full release and
-migration docs are not yet published into the app. That remains a
-release blocker before `4.1.0` can ship honestly.
+- read the overview first if you want the release boundary and story
+- open `What's New in v4.1.0` for the long-form explanation of the line
+- open `Migration Guide v4.1.0` if you are upgrading from `v4.0.0`

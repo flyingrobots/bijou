@@ -39,6 +39,8 @@ The repo now has:
   [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 - a landed DOGFOOD docs-shell foundation through
   [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- a landed DOGFOOD repo/package/release corpus publication through
+  [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - a new DOGFOOD-only docs-surface policy through
   [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 
@@ -52,9 +54,8 @@ The release decision is now:
   `v4.0.0..HEAD` boundary
 - cycle-shaped blockers are open again in
   [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) because DOGFOOD
-  still lacks the real repo/package/release/philosophy corpus inside the
-  newly visible docs-site shell and because the repo still needs to
-  finish demoting `examples/` behind DOGFOOD
+  still needs to publish the philosophy/doctrine corpus and because the
+  repo still needs to finish demoting `examples/` behind DOGFOOD
 
 So the work now should stay narrower and more structural:
 
@@ -70,7 +71,6 @@ So the work now should stay narrower and more structural:
 ## Before 4.1.0 Ships
 
 - close the `v4.1.0` backlog lane:
-  - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
   - [DF-026 — Demote Examples To Secondary Reference Status](./BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)

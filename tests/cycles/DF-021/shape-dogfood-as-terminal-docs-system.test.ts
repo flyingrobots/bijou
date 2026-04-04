@@ -16,7 +16,7 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
   it('spawns explicit 4.1.0 blocker items for the missing DOGFOOD docs surfaces', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
     expect(existsRepoPath('docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md')).toBe(true);
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
+    expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(true);
 
     const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
@@ -33,8 +33,10 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
 
     expect(plan).toContain('DF-021');
     expect(plan).toContain('DF-022');
+    expect(plan).toContain('DF-023');
     expect(plan).toContain('docs/BACKLOG/v4.1.0/');
     expect(bearing).toContain('DF-022');
+    expect(bearing).toContain('DF-023');
     expect(bearing).toContain('docs/BACKLOG/v4.1.0/');
     expect(release).toContain('docs/BACKLOG/v4.1.0/');
     expect(release).toContain('DF-023');

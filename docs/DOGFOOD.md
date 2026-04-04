@@ -34,8 +34,15 @@ The current DOGFOOD shell includes top-level sections for:
 - `Philosophy`
 - `Release`
 
-The component-family explorer is still an important part of DOGFOOD, but
-it is no longer the whole story.
+Inside that shell, DOGFOOD now carries:
+
+- repo orientation and navigation guides
+- the live component-family explorer
+- package guides for the published workspace
+- `4.1.0` release and migration docs
+
+The component-family explorer is still an important part of DOGFOOD,
+but it is no longer the whole story.
 
 ## Relationship To `examples/`
 

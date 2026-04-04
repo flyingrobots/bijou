@@ -212,7 +212,7 @@ to have.
 This cycle should spawn three explicit `4.1.0` blockers:
 
 - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
-- [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 
 ## Implementation outline

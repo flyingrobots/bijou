@@ -67,16 +67,17 @@ Do **not** start release execution until the active lane in
 
 The current blockers are:
 
-- [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - [DF-026 — Demote Examples To Secondary Reference Status](./BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
 - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 The shell-foundation work was closed in
 [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md).
-The remaining blockers are about publishing the real corpus inside that
-shell and making the release posture stop depending on the broad
-examples tree as a public docs and smoke surface.
+The repo/package/release corpus publication was closed in
+[DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md).
+The remaining blockers are about publishing the philosophy/doctrine
+corpus inside that shell and making the release posture stop depending
+on the broad examples tree as a public docs and smoke surface.
 
 Its long-form release docs live in:
 

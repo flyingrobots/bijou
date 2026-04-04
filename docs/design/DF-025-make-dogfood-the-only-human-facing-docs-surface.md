@@ -174,7 +174,7 @@ They do **not** get to remain a competing public docs navigation layer.
 
 This cycle should tighten the `4.1.0` blocker lane by:
 
-- keeping [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- keeping [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   as a release blocker
 - keeping [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
   as a release blocker

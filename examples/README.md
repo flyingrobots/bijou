@@ -61,8 +61,9 @@ guide:
 
 - `Guides` establishes the reader-first docs path
 - `Components` carries the full family/story/variant browser
-- the remaining top-level sections make the missing repo/package/release
-  and doctrine corpus visible inside the app instead of hiding that work
+- `Packages` and `Release` now publish real repo/package/release docs
+- `Philosophy` keeps the remaining doctrine/architecture corpus gap
+  visible inside the app instead of hiding that work
 
 See [docs](./docs/) for the first living-docs preview built from those shared story records.
 

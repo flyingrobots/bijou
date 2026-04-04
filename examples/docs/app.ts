@@ -96,9 +96,21 @@ const BIJOU_PACKAGE_JSON = JSON.parse(
 const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
+const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
 const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
+const PACKAGE_BIJOU_TEXT = readMarkdownDocExcerpt('../../packages/bijou/README.md', ['## Install']);
+const PACKAGE_BIJOU_NODE_TEXT = readMarkdownDocExcerpt('../../packages/bijou-node/README.md', ['## Install']);
+const PACKAGE_BIJOU_TUI_TEXT = readMarkdownDocExcerpt('../../packages/bijou-tui/README.md', ['## Installation']);
+const PACKAGE_BIJOU_TUI_APP_TEXT = readMarkdownDocExcerpt('../../packages/bijou-tui-app/README.md', ['## Quick Scaffold']);
+const PACKAGE_CREATE_TUI_APP_TEXT = readMarkdownDocExcerpt('../../packages/create-bijou-tui-app/README.md', ['## Flags']);
+const PACKAGE_BIJOU_I18N_TEXT = readMarkdownDoc('../../packages/bijou-i18n/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_NODE_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-node/README.md');
+const PACKAGE_BIJOU_I18N_TOOLS_XLSX_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-xlsx/README.md');
 const PHILOSOPHY_OVERVIEW_TEXT = readMarkdownDoc('./content/philosophy-overview.md');
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
+const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/whats-new.md');
+const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/migration-guide.md');
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
@@ -344,11 +356,81 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
   },
   {
+    id: 'documentation-map',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Documentation Map',
+    summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
+    body: GUIDES_DOCUMENTATION_MAP_TEXT,
+  },
+  {
     id: 'packages-overview',
     pageId: PACKAGES_PAGE_ID,
     title: 'Packages Overview',
-    summary: 'The visible home for package-level docs before the detailed package corpus lands.',
+    summary: 'How the public workspace packages fit together in the Bijou stack.',
     body: PACKAGES_OVERVIEW_TEXT,
+  },
+  {
+    id: 'package-bijou',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou',
+    summary: 'The pure core toolkit: prompts, components, themes, ports, and surface primitives.',
+    body: PACKAGE_BIJOU_TEXT,
+  },
+  {
+    id: 'package-bijou-node',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-node',
+    summary: 'Node runtime, IO, style, worker, and recorder adapters for Bijou apps.',
+    body: PACKAGE_BIJOU_NODE_TEXT,
+  },
+  {
+    id: 'package-bijou-tui',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-tui',
+    summary: 'The fullscreen runtime: TEA loop, layout, motion, overlays, and shell infrastructure.',
+    body: PACKAGE_BIJOU_TUI_TEXT,
+  },
+  {
+    id: 'package-bijou-tui-app',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-tui-app',
+    summary: 'The opinionated framed-shell starter for tabbed fullscreen Bijou apps.',
+    body: PACKAGE_BIJOU_TUI_APP_TEXT,
+  },
+  {
+    id: 'package-create-bijou-tui-app',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'create-bijou-tui-app',
+    summary: 'The scaffolder for bootstrapping a runnable Bijou TUI app project.',
+    body: PACKAGE_CREATE_TUI_APP_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n',
+    pageId: PACKAGES_PAGE_ID,
+    title: '@flyingrobots/bijou-i18n',
+    summary: 'The in-memory localization runtime for catalogs, direction, and runtime-safe lookups.',
+    body: PACKAGE_BIJOU_I18N_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools',
+    summary: 'Provider-neutral localization tooling for exchange, stale detection, and catalog compilation.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools-node',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools-node',
+    summary: 'Node filesystem adapters for localization exchange workflows and bundle files.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_NODE_TEXT,
+  },
+  {
+    id: 'package-bijou-i18n-tools-xlsx',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'bijou-i18n-tools-xlsx',
+    summary: 'XLSX workbook adapters for spreadsheet-driven localization exchange.',
+    body: PACKAGE_BIJOU_I18N_TOOLS_XLSX_TEXT,
   },
   {
     id: 'philosophy-overview',
@@ -360,9 +442,23 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'release-overview',
     pageId: RELEASE_PAGE_ID,
-    title: 'Release and Migration',
-    summary: 'The visible home for current-line release notes and migration guidance inside DOGFOOD.',
+    title: 'Release Overview',
+    summary: 'How the current release line is shaped and where to read the detailed 4.1.0 release docs.',
     body: RELEASE_OVERVIEW_TEXT,
+  },
+  {
+    id: 'release-whats-new-4-1-0',
+    pageId: RELEASE_PAGE_ID,
+    title: 'What\'s New in v4.1.0',
+    summary: 'The long-form release story for the 4.1.0 line.',
+    body: RELEASE_WHATS_NEW_TEXT,
+  },
+  {
+    id: 'release-migration-4-1-0',
+    pageId: RELEASE_PAGE_ID,
+    title: 'Migration Guide v4.1.0',
+    summary: 'How users coming from v4.0.0 should handle the 4.1.0 upgrade.',
+    body: RELEASE_MIGRATION_GUIDE_TEXT,
   },
 ]);
 const LANDING_FPS_ALPHA = 0.2;
@@ -548,6 +644,13 @@ function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
 
 function readMarkdownDoc(path: string): string {
   return readFileSync(new URL(path, import.meta.url), 'utf8').trim();
+}
+
+function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
+  const content = readMarkdownDoc(path);
+  const lines = content.split('\n');
+  const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
+  return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
 }
 
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
@@ -2268,6 +2371,18 @@ function renderGuideInfoPane(
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
   const description = doc?.summary ?? 'This section is still being expanded.';
+  const currentPosture = (() => {
+    switch (pageId) {
+      case GUIDES_PAGE_ID:
+        return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
+      case PACKAGES_PAGE_ID:
+        return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
+      case RELEASE_PAGE_ID:
+        return 'This section now publishes the 4.1.0 release story and migration guidance inside DOGFOOD.';
+      default:
+        return 'This section now has a visible home in DOGFOOD, but its full corpus is still part of the active 4.1.0 blocker work.';
+    }
+  })();
 
   return insetPaneSurface(column([
     themedSeparatorSurface(`section • ${pageTitle(pageId, i18n).toLowerCase()}`, paneWidth, ctx, theme),
@@ -2283,9 +2398,7 @@ function renderGuideInfoPane(
         },
         {
           title: 'Current posture',
-          content: pageId === GUIDES_PAGE_ID
-            ? 'This is the starter docs reader and top-level shell foundation for DOGFOOD.'
-            : 'This section now has a visible home in DOGFOOD, but its full corpus is still part of the active 4.1.0 blocker work.',
+          content: currentPosture,
           tone: 'muted',
         },
       ],

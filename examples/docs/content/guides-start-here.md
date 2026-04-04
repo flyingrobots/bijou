@@ -24,6 +24,7 @@ what is happening on screen.
 
 ## Current posture
 
-`4.1.0` is the next shaped release. DOGFOOD now has the shell shape of a
-real docs site, but the repo is still finishing the remaining package,
-release, philosophy, and architecture corpus before the release ships.
+`4.1.0` is the next shaped release. DOGFOOD now carries real repo,
+package, and release guidance inside the app. The remaining docs-system
+release work is about philosophy/doctrine depth and fully demoting the
+old examples-first posture.

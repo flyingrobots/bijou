@@ -43,9 +43,8 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 - active cycle:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest completed cycle:
-  - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+  - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - release-target backlog:
-  - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
   - [DF-026 — Demote Examples To Secondary Reference Status](../BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
