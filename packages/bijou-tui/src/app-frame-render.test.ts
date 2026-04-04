@@ -139,6 +139,67 @@ describe('frame shell chrome surfaces', () => {
       expect(help.get(x, 0).empty).toBe(false);
     }
   });
+
+  it('derives a stronger active-tab foreground than the base header color', () => {
+    const ctx = {
+      ...createTestContext({ mode: 'interactive' }),
+      resolveBCSS(identity: { type: string; id?: string; classes?: string[] }) {
+        if (identity.id === 'frame-header') return { color: '#d8dee9', background: '#2e3440' };
+        return {} as Record<string, string>;
+      },
+    };
+    setDefaultContext(ctx);
+
+    const homePage = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({ kind: 'pane' as const, paneId: 'main', render: () => createSurface(1, 1) }),
+    };
+    const logsPage = {
+      ...homePage,
+      id: 'logs',
+      title: 'Logs',
+    };
+    const pagesById = new Map([
+      ['home', homePage],
+      ['logs', logsPage],
+    ]);
+    const model = {
+      activePageId: 'home',
+      pageOrder: ['home', 'logs'],
+      pageModels: { home: {}, logs: {} },
+      focusedPaneByPage: { home: 'main', logs: 'main' },
+      scrollByPage: {},
+      columns: 24,
+      rows: 5,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
+      runtimeNotifications: {} as never,
+      runtimeNotificationLoopActive: false,
+    };
+
+    const header = resolveHeaderLine(model as any, { title: 'DOGFOOD', pages: [homePage, logsPage] } as any, pagesById as any);
+    const activeTarget = header.tabTargets.find((target) => target.pageId === 'home');
+    const inactiveTarget = header.tabTargets.find((target) => target.pageId === 'logs');
+    expect(activeTarget).toBeDefined();
+    expect(inactiveTarget).toBeDefined();
+
+    const activeCell = header.surface.get(activeTarget!.startCol + 1, 0);
+    const inactiveCell = header.surface.get(inactiveTarget!.startCol + 1, 0);
+    expect(activeCell.bg).toBe('#2e3440');
+    expect(inactiveCell.bg).toBe('#2e3440');
+    expect(activeCell.fg).not.toBe('#d8dee9');
+    expect(activeCell.fg).not.toBe(inactiveCell.fg);
+    expect(activeCell.modifiers).toContain('bold');
+  });
 });
 
 describe('frame pane output normalization', () => {
