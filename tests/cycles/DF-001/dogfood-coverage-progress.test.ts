@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
-import { createDocsApp } from '../../../examples/docs/app.js';
+import { createDocsApp, resolveDocsThemeActiveHeaderTabToken } from '../../../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
@@ -95,6 +95,35 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(enterCellAfter.char).toBe('E');
     expect(enterCellAfter.fg).toBeDefined();
     expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
+  });
+
+  it('scores the active docs tab color against the real tab background', () => {
+    const waveRamp = Array.from({ length: 100 }, () => '#666666');
+    waveRamp[6] = '#111111';
+    waveRamp[14] = '#eeeeee';
+    waveRamp[44] = '#666666';
+    waveRamp[87] = '#000000';
+
+    const logoRamp = Array.from({ length: 100 }, () => '#bbbbbb');
+    logoRamp[61] = '#bbbbbb';
+    logoRamp[83] = '#dddddd';
+    logoRamp[97] = '#ffffff';
+
+    const token = resolveDocsThemeActiveHeaderTabToken({
+      id: 'contrast-regression',
+      label: 'Contrast Regression',
+      background: '#000000',
+      waveRamp,
+      logoRamp,
+      promptBodyColor: '#000000',
+      promptAccentColor: '#000000',
+      footerMutedColor: '#000000',
+      footerStrongColor: '#000000',
+      fpsColor: '#000000',
+    });
+
+    expect(token.bg).toBe('#eeeeee');
+    expect(token.hex).toBe('#000000');
   });
 
   it('spawns the next DOGFOOD backlog item', () => {

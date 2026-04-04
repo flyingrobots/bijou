@@ -1942,10 +1942,9 @@ function docsThemeDescriptionToken(theme: LandingThemeTokens): TokenValue {
   };
 }
 
-function docsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
-  const surface = docsThemeSurfaceToken(theme);
-  const background = surface.bg ?? theme.background;
-  const base = surface.hex;
+export function resolveDocsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
+  const base = docsThemeSurfaceToken(theme).hex;
+  const background = sampleColorRamp(theme.waveRamp, 0.14);
   return {
     hex: pickStandoutColor(background, base, [
       sampleColorRamp(theme.logoRamp, 0.98),
@@ -1953,7 +1952,7 @@ function docsThemeActiveHeaderTabToken(theme: LandingThemeTokens): TokenValue {
       sampleColorRamp(theme.waveRamp, 0.88),
       sampleColorRamp(theme.logoRamp, 0.62),
     ]),
-    bg: sampleColorRamp(theme.waveRamp, 0.14),
+    bg: background,
     modifiers: ['bold'],
   };
 }
@@ -2623,7 +2622,7 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
     i18n,
     title: 'Bijou Docs',
     headerStyle: ({ pageModel }) => ({
-      activeTabToken: docsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
+      activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
     }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,

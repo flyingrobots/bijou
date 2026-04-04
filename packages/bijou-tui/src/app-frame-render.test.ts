@@ -252,6 +252,64 @@ describe('frame shell chrome surfaces', () => {
     expect(activeCell.bg).toBe('#332211');
     expect(activeCell.modifiers).toContain('bold');
   });
+
+  it('preserves existing header modifiers when the active-tab override only changes color', () => {
+    const ctx = {
+      ...createTestContext({ mode: 'interactive' }),
+      resolveBCSS(identity: { type: string; id?: string; classes?: string[] }) {
+        if (identity.id === 'frame-header') {
+          return {
+            color: '#d8dee9',
+            background: '#2e3440',
+            'text-decoration': 'underline',
+          };
+        }
+        return {} as Record<string, string>;
+      },
+    };
+    setDefaultContext(ctx);
+
+    const homePage = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({ kind: 'pane' as const, paneId: 'main', render: () => createSurface(1, 1) }),
+    };
+    const pagesById = new Map([['home', homePage]]);
+    const model = {
+      activePageId: 'home',
+      pageOrder: ['home'],
+      pageModels: { home: {} },
+      focusedPaneByPage: { home: 'main' },
+      scrollByPage: {},
+      columns: 20,
+      rows: 5,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
+      runtimeNotifications: {} as never,
+      runtimeNotificationLoopActive: false,
+    };
+
+    const header = resolveHeaderLine(model as any, {
+      title: 'DOGFOOD',
+      pages: [homePage],
+      headerStyle: () => ({ activeTabToken: { hex: '#ffaa33', bg: '#332211' } }),
+    } as any, pagesById as any);
+
+    const activeTarget = header.tabTargets.find((target) => target.pageId === 'home');
+    expect(activeTarget).toBeDefined();
+    const activeCell = header.surface.get(activeTarget!.startCol + 1, 0);
+    expect(activeCell.fg).toBe('#ffaa33');
+    expect(activeCell.bg).toBe('#332211');
+    expect(activeCell.modifiers).toContain('underline');
+  });
 });
 
 describe('frame pane output normalization', () => {

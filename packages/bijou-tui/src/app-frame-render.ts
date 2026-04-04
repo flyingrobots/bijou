@@ -173,7 +173,9 @@ function paintActiveHeaderTab(
       ...cell,
       fg: token.hex,
       bg: token.bg ?? cell.bg,
-      modifiers: token.modifiers,
+      modifiers: token.modifiers == null
+        ? cell.modifiers
+        : Array.from(new Set([...(cell.modifiers ?? []), ...token.modifiers])),
       empty: false,
     });
   }
