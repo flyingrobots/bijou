@@ -1,5 +1,10 @@
 # Codecs Are Not Domain Models
 
+## Protected by legends
+
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
+
 Serialization formats and decoded payload objects are not the same thing
 as trusted domain values.
 
@@ -11,4 +16,3 @@ Implications:
 - decoded bytes or JSON should be turned into runtime-backed values
   before business logic trusts them
 - a stable wire format does not excuse weak domain modeling
-

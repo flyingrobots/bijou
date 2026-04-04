@@ -24,6 +24,8 @@ These are the docs that describe what Bijou is, what it is doing now, and how cu
   - bounded synthesis of where Bijou is trying to go
 - [System-Style JavaScript](./system-style-javascript.md)
   - engineering doctrine for runtime-backed modeling, boundaries, adapters, and codecs
+- [DOGFOOD](./DOGFOOD.md)
+  - canonical human-facing docs surface and terminal docs app entrypoint
 - [Current Plan](./PLAN.md)
   - short narrative summary of the current queue; supporting signpost, not the authority
 - [Legends](./legends/README.md)
@@ -34,8 +36,6 @@ These are the docs that describe what Bijou is, what it is doing now, and how cu
   - active and landed cycle docs; historical implementation record
 - [Invariants](./invariants/README.md)
   - project-wide truths design and implementation should not violate casually
-- [DOGFOOD Docs Surface](../examples/docs/README.md)
-  - the living docs app and proving surface
 - [Design System](./design-system/README.md)
   - foundations, patterns, component families, and policy docs
 - [Changelog](./CHANGELOG.md)
@@ -49,8 +49,8 @@ These are still active references, but they are not the main execution surface.
   - current monorepo/package/runtime structure
 - [Migrating to v4.0.0](./MIGRATING_TO_V4.md)
   - upgrade guidance for existing apps
-- [Curated Example Map](./EXAMPLES.md)
-  - which examples are still canonical versus merely illustrative
+- [Secondary Example Map](./EXAMPLES.md)
+  - secondary/internal example inventory and retirement policy
 - [Release Guide](./release.md)
   - repo-native release process, guards, validation, and publish verification
 - [Release Docs](./releases/README.md)
@@ -82,5 +82,5 @@ If you are a human or an agent trying to answer "what is true right now?":
 3. for engineering questions, read [System-Style JavaScript](./system-style-javascript.md) and [Architecture](./ARCHITECTURE.md)
 4. read the relevant [Legend](./legends/README.md) and the actual backlog lane or cycle doc
 5. check [Changelog](./CHANGELOG.md) if landed behavior matters
-6. use [DOGFOOD](../examples/docs/README.md) and the [Design System](./design-system/README.md) as the proving surfaces
+6. use [DOGFOOD](./DOGFOOD.md) and the [Design System](./design-system/README.md) as the proving surfaces
 7. only then reach for [Plan](./PLAN.md), [Roadmap](./ROADMAP.md), archived docs, or legacy specs

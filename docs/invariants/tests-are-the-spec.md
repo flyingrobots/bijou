@@ -1,5 +1,12 @@
 # Tests Are the Spec
 
+## Protected by legends
+
+- [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [DF — DOGFOOD Field Guide](../legends/DF-dogfood-field-guide.md)
+- [DL — Design Language](../legends/DL-design-language.md)
+
 If behavior matters, it must be proved in tests.
 
 Implications:

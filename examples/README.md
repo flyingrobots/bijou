@@ -1,4 +1,18 @@
-# Examples
+# Example Inventory
+
+This is a secondary/internal inventory.
+
+If you are trying to learn Bijou, start with
+[DOGFOOD](../docs/DOGFOOD.md), not this page.
+
+The example tree still matters for:
+
+- isolated API seam references
+- migration and runtime reference cases
+- smoke and regression substrate
+- implementation sandboxes
+
+It is not the primary public docs surface anymore.
 
 > Run any example: `npx tsx examples/<name>/main.ts`
 > Record release-facing GIFs: `npx tsx scripts/record-gifs.ts`

@@ -21,6 +21,7 @@ This legend covers work like:
 - clearer progress tracking between shipped Bijou families and DOGFOOD stories
 - prose-doc reading and docs-site information architecture
 - exposing repo/package/philosophy docs inside DOGFOOD
+- demoting `examples/` behind DOGFOOD as a secondary/reference surface
 
 ## Human users
 
@@ -39,13 +40,16 @@ This legend covers work like:
 A user can open DOGFOOD and understand what Bijou is, where to find its
 guides and philosophy docs, and how the component library fits into that
 broader docs system without mistaking the app for either "only
-components" or a complete exhaustive reference.
+components" or a complete exhaustive reference, and without being sent
+back to the `examples/` tree as if that were the product docs front
+door.
 
 ## Agent hill
 
 An agent can measure current DOGFOOD component-family coverage
-honestly, and can also see which non-component docs surfaces still need
-to exist before DOGFOOD counts as a real terminal docs product.
+honestly, can see which non-component docs surfaces still need to exist
+before DOGFOOD counts as a real terminal docs product, and can see that
+`examples/` is now secondary rather than canonical.
 
 ## Core invariants
 
@@ -61,18 +65,21 @@ to exist before DOGFOOD counts as a real terminal docs product.
 
 ## Current cycle and backlog
 
-- active cycle: [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
-- latest completed cycle: [DF-021 — Shape DOGFOOD As Terminal Docs System](../design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+- active cycle: [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+- latest completed cycle: [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
   - DOGFOOD now has visible top-level docs sections and a starter prose
     reader
-  - the next important gap is no longer shell shape; it is publishing
-    the real repo/package/release/philosophy corpus into that shell
+  - the next important gaps are no longer shell shape; they are
+    publishing the real repo/package/release/philosophy corpus into that
+    shell and finishing the examples-to-DOGFOOD posture shift
 - release-target backlog:
   - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+  - [DF-026 — Demote Examples To Secondary Reference Status](../BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live follow-on backlog:
   - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - historical backlog lineage:

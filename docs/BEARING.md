@@ -18,6 +18,9 @@ That means:
 - treat [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
   as the cycle that gives DOGFOOD a visible docs-site shell and prose
   reader
+- treat [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+  as the cycle that makes DOGFOOD, not `examples/`, the only
+  human-facing docs front door for `4.1.0`
 - clear the active `v4.1.0` blocker lane in
   [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) before release
   execution begins
@@ -48,9 +51,11 @@ The latest merged runtime- and release-shaping slices are:
 - DOGFOOD now has the shell shape of a docs site, but its visible
   `Packages`, `Philosophy`, and `Release` sections still only carry
   starter copy instead of the real corpus
+- the repo still exposes too much example-first language for a release
+  that claims DOGFOOD is the docs product
 - the remaining `4.1.0` work is still not only release execution; the
-  open blockers are now content-publication cycles rather than shell
-  shape
+  open blockers are now content-publication, docs-surface, and
+  smoke-contract cycles rather than shell shape
 - `RE-007` and other follow-ons still need to stay outside the `4.1.0`
   release boundary
 - `PLAN.md`, legends, and backlog placement had drifted from what had

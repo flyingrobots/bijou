@@ -31,7 +31,8 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
     const bearing = readRepoFile('docs/BEARING.md');
     const release = readRepoFile('docs/release.md');
 
-    expect(plan).toContain('DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav');
+    expect(plan).toContain('DF-021');
+    expect(plan).toContain('DF-022');
     expect(plan).toContain('docs/BACKLOG/v4.1.0/');
     expect(bearing).toContain('DF-022');
     expect(bearing).toContain('docs/BACKLOG/v4.1.0/');

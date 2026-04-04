@@ -39,4 +39,6 @@ This should also make future example deletion or consolidation safer because the
 
 ## Status
 
-Backlog spawned from post-v4 DOGFOOD consolidation discussion.
+Promoted to a `4.1.0` blocker by
+[DF-025](../../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+because release smoke still rewards the old examples-first posture.

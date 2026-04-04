@@ -1,4 +1,8 @@
-# Docs Preview
+# DOGFOOD App Notes
+
+If you are trying to learn Bijou, start with
+[../../docs/DOGFOOD.md](../../docs/DOGFOOD.md). This file is the
+implementation-facing note for the current DOGFOOD app surface.
 
 First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 
@@ -67,4 +71,4 @@ focus it and use the wheel to scroll long docs or help content.
 - When no component is selected, the center lane now acts as an onboarding surface: it introduces Bijou itself and explains how to browse, search, configure, and navigate the docs before the user opens a component.
 - The explorer workspace now keeps a one-cell gutter around and between the three major columns so the shell chrome and pane rails do not feel visually chopped off at the frame edges.
 
-[← Examples](../README.md)
+[← DOGFOOD](../../docs/DOGFOOD.md)

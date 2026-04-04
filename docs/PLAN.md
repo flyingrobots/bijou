@@ -39,6 +39,8 @@ The repo now has:
   [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 - a landed DOGFOOD docs-shell foundation through
   [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- a new DOGFOOD-only docs-surface policy through
+  [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 
 The release decision is now:
 
@@ -51,7 +53,8 @@ The release decision is now:
 - cycle-shaped blockers are open again in
   [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) because DOGFOOD
   still lacks the real repo/package/release/philosophy corpus inside the
-  newly visible docs-site shell
+  newly visible docs-site shell and because the repo still needs to
+  finish demoting `examples/` behind DOGFOOD
 
 So the work now should stay narrower and more structural:
 
@@ -62,13 +65,15 @@ So the work now should stay narrower and more structural:
 
 ## Active Cycle
 
-- [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 
 ## Before 4.1.0 Ships
 
 - close the `v4.1.0` backlog lane:
   - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+  - [DF-026 — Demote Examples To Secondary Reference Status](./BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - run `npm run release:preflight`
 - run `npm run release:readiness`
 - run the GitHub Release Dry Run workflow
@@ -78,7 +83,6 @@ So the work now should stay narrower and more structural:
 ### Up Next
 
 - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/up-next/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - [DL-009 — Formalize Layout and Viewport Rules](./BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
 
@@ -114,3 +118,5 @@ mistake every root backlog file for live queue priority.
    release boundary after it has been shaped.
 6. Do not call DOGFOOD complete while visible sections still only carry
    starter copy instead of the real corpus.
+7. Do not treat `examples/` as a competing human-facing docs surface
+   while DOGFOOD is the canonical docs product.

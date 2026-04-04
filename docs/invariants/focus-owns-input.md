@@ -1,5 +1,11 @@
 # Focus Owns Input
 
+## Protected by legends
+
+- [HT — Humane Terminal](../legends/HT-humane-terminal.md)
+- [RE — Runtime Engine](../legends/RE-runtime-engine.md)
+- [DL — Design Language](../legends/DL-design-language.md)
+
 The active thing should own the controls.
 
 Implications:
