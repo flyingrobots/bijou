@@ -1285,19 +1285,21 @@ function getLandingDogfoodPanel(
   const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
-  const body = createTransparentTextSurface(
-    wrapToWidth(expansion, Math.max(18, width - 4)).join('\n'),
+  const bodyWidth = Math.max(18, width - 4);
+  const body = centerSurfaceHorizontally(createTransparentTextSurface(
+    wrapToWidth(expansion, bodyWidth).join('\n'),
     {
       bg: tokens.background,
       transparentSpaces: false,
       fg: tokens.footerStrongColor,
       modifiers: BOLD_MODIFIERS,
     },
-  );
+  ), bodyWidth);
   const surface = boxSurface(body, {
     title,
     width,
     borderToken: landingDogfoodPanelBorderToken(tokens),
+    padding: { left: 1, right: 1 },
     ctx,
   });
   LANDING_DOGFOOD_PANEL_CACHE.set(key, surface);
@@ -1503,6 +1505,12 @@ function createTransparentTextSurface(
   }
 
   return surface;
+}
+
+function centerSurfaceHorizontally(content: Surface, width: number): Surface {
+  const centered = createSurface(Math.max(1, width), Math.max(1, content.height));
+  centered.blit(content, Math.max(0, Math.floor((centered.width - content.width) / 2)), 0);
+  return centered;
 }
 
 function docsThemeAccentToken(theme: LandingThemeTokens): TokenValue {

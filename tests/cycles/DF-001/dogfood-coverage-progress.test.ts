@@ -58,9 +58,22 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
 
     const landing = await runScript(app, [], { ctx });
     const text = frameText(landing.frames[landing.frames.length - 1]!);
+    const expansion = 'Documentation Of Good Foundational Onboarding and Discovery';
+    const expansionLine = text.split('\n').find((lineText) => lineText.includes(expansion));
 
     expect(text).toContain('DOGFOOD');
-    expect(text).toContain('Documentation Of Good Foundational Onboarding and Discovery');
+    expect(text).toContain(expansion);
+    expect(expansionLine).toBeDefined();
+
+    const contentStart = expansionLine!.indexOf(expansion);
+    const leftBorder = expansionLine!.lastIndexOf('│', contentStart);
+    const rightBorder = expansionLine!.indexOf('│', contentStart + expansion.length);
+    expect(leftBorder).toBeGreaterThanOrEqual(0);
+    expect(rightBorder).toBeGreaterThan(contentStart + expansion.length);
+
+    const leftPadding = contentStart - leftBorder - 1;
+    const rightPadding = rightBorder - contentStart - expansion.length;
+    expect(Math.abs(leftPadding - rightPadding)).toBeLessThanOrEqual(2);
   });
 
   it('spawns the next DOGFOOD backlog item', () => {
