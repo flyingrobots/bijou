@@ -5,12 +5,17 @@
 Return to post-`4.1.0` engineering work without letting the repo keep
 pretending the release is still ahead of us.
 
+The runtime engine is back at the center of gravity.
+
 That means:
 
 - treat `4.1.0` as shipped truth, not as pending release intent
 - promote
   [RE-007](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   as the next live engineering move
+- use the framed shell as the proving surface for the next runtime
+  slice, not as a reason to leave shell behavior half inside old branch
+  structure
 - keep
   [DF-020](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
   and
@@ -22,8 +27,9 @@ That means:
 - keep `examples/` secondary and reference-oriented
 - leave `4.2.0` unshaped until there is enough real new material to
   justify another release-shaping cycle
-- use DOGFOOD and design-language work as proving surfaces, not as
-  excuses to postpone runtime clarity
+- use DOGFOOD and design-language work as proving surfaces, not as the
+  repo's center of gravity while runtime clarity still has unfinished
+  spine work
 
 ## What Just Shipped?
 
@@ -50,6 +56,8 @@ are:
 
 ## What Feels Wrong?
 
+- the runtime-engine story stops one slice short of the framed shell,
+  which leaves the most visible architectural debt outside the new seams
 - some internal reference tooling still carries example-first names even
   though the public posture is now DOGFOOD-first
 - `RE-007` is still waiting in backlog instead of already proving the

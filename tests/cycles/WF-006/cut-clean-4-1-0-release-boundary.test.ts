@@ -45,6 +45,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(plan).not.toContain('## Before 4.1.0 Ships');
 
     expect(bearing).toContain('Return to post-`4.1.0` engineering work');
+    expect(bearing).toContain('The runtime engine is back at the center of gravity.');
     expect(bearing).toContain('treat `4.1.0` as shipped truth');
     expect(bearing).toContain('[RE-007](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)');
 
