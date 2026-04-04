@@ -82,7 +82,7 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
       } else {
         for (let i = 0; i < filledCount; i++) {
           const t_val = filledCount <= 1 ? 0 : i / (filledCount - 1);
-          const token = mix(filledToken, filledEndToken, t_val * (pct / 100));
+          const token = mix(filledToken, filledEndToken, t_val);
           bar += ctx.style.styled(token, filledChar);
         }
         bar += ctx.style.styled(emptyToken, emptyChar.repeat(width - filledCount));

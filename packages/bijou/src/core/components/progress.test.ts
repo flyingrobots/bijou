@@ -92,6 +92,24 @@ describe('progressBar', () => {
     expect(style.calls.some((call) => call.method === 'styled' && call.token?.hex === '#112233' && call.text.includes('⠐'))).toBe(true);
   });
 
+  it('reaches the filled-end token at the trailing edge of a partial bar', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ mode: 'static', style });
+
+    progressBar(50, {
+      width: 4,
+      filledToken: { hex: '#00aaee' },
+      filledEndToken: { hex: '#ff44aa' },
+      emptyToken: { hex: '#112233' },
+      ctx,
+    });
+
+    const filledCalls = style.calls.filter((call) => call.method === 'styled' && call.text === '█');
+    expect(filledCalls).toHaveLength(2);
+    expect(filledCalls[0]?.token?.hex).toBe('#00aaee');
+    expect(filledCalls[1]?.token?.hex).toBe('#ff44aa');
+  });
+
   it('still honors explicit gradient overrides', () => {
     const style = auditStyle();
     const ctx = createTestContext({ mode: 'static', style });
