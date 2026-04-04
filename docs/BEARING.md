@@ -2,8 +2,8 @@
 
 ## Where Are We Going?
 
-Prepare a deliberate `4.1.0` release without pretending that every
-follow-on must land first.
+Prepare a deliberate `4.1.0` release without pretending that DOGFOOD is
+already a full terminal docs site.
 
 That means:
 
@@ -12,8 +12,12 @@ That means:
 - treat [WF-005](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
   and [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md) as
   the closing release-blocker cycles
-- treat the cycle-shaped `4.1.0` backlog as closed; remaining work is
-  release execution and the normal gauntlet
+- treat [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+  as the active release-shaping follow-on that reopens cycle-shaped
+  `4.1.0` blockers around DOGFOOD's scope
+- clear the active `v4.1.0` blocker lane in
+  [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) before release
+  execution begins
 - ship the runtime-engine story through
   [RE-006](./design/RE-006-formalize-component-layout-and-interaction-contracts.md)
   in `4.1.0`
@@ -37,8 +41,12 @@ The latest merged runtime- and release-shaping slices are:
 
 ## What Feels Wrong?
 
-- the remaining `4.1.0` work is now operational release execution, not
-  another cycle-shaped design question
+- DOGFOOD is still too component-only for the docs product story the
+  repo now implies
+- there is still no real prose-doc reader or repo/package/philosophy
+  docs path inside DOGFOOD
+- the remaining `4.1.0` work is not only release execution anymore;
+  DOGFOOD docs-scope blockers are open again
 - `RE-007` and other follow-ons still need to stay outside the `4.1.0`
   release boundary
 - `PLAN.md`, legends, and backlog placement had drifted from what had

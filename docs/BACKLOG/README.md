@@ -26,4 +26,4 @@ If a file looks like current work, it should usually live in `asap/` or
 Version-target lanes like `v4.1.0/` are temporary. Use them only for
 cycles that must close before that release ships.
 
-No version-target release lane is active right now.
+The active version-target release lane is currently `v4.1.0/`.

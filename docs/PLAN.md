@@ -35,31 +35,39 @@ The repo now has:
   [WF-004](./design/WF-004-shape-the-next-release.md)
 - closed release-blocker cycles through
   [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- a new DOGFOOD docs-site shaping cycle through
+  [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 
 The release decision is now:
 
 - target version: `4.1.0`
 - release type: stable minor
 - `RE-007` is explicitly deferred until after `4.1.0`
-- the i18n publish surface is now closed in the automated release path
-- the short-form release surfaces are now aligned to the real
+- the i18n publish surface is closed in the automated release path
+- the short-form release surfaces are aligned to the real
   `v4.0.0..HEAD` boundary
-- no cycle-shaped release blockers remain; the next step is the normal
-  release gauntlet and release execution
+- cycle-shaped blockers are open again in
+  [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) because DOGFOOD
+  still behaves like a components docs view rather than a terminal docs
+  site for the repo as a whole
 
 So the work now should stay narrower and more structural:
 
-- finish preparing `4.1.0` honestly
+- close the reopened `4.1.0` DOGFOOD docs-system blockers honestly
 - keep work-tracking truth honest through METHOD lanes and signposts
-- pick the next engineering slice after the release instead of smuggling
-  it into the release boundary
+- keep `RE-007` and other follow-on engineering work outside the current
+  release boundary
 
 ## Active Cycle
 
-- [WF-006 — Cut Clean 4.1.0 Release Boundary](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- [DF-021 — Shape DOGFOOD As Terminal Docs System](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 
 ## Before 4.1.0 Ships
 
+- close the `v4.1.0` backlog lane:
+  - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+  - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+  - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - run `npm run release:preflight`
 - run `npm run release:readiness`
 - run the GitHub Release Dry Run workflow
@@ -103,3 +111,5 @@ mistake every root backlog file for live queue priority.
    wants, and what ready means.
 5. Do not let follow-on architecture work silently expand the current
    release boundary after it has been shaped.
+6. Do not call DOGFOOD a docs product while it still only behaves like a
+   components explorer.

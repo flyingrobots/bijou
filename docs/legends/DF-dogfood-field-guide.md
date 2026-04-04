@@ -7,8 +7,11 @@ _Legend for making DOGFOOD an honest, humane, and progressively more complete fi
 Make DOGFOOD a truthful living guide to Bijou:
 
 - honest about what is currently documented
-- strong enough to act as the proving surface for shell and design-language work
-- steadily expanding toward broader component-family coverage without pretending it is finished before it is
+- strong enough to act as the proving surface for shell, docs, and
+  design-language work
+- broad enough to carry components, guides, packages, and philosophy
+  docs instead of pretending that the component browser is the whole
+  docs product
 
 This legend covers work like:
 
@@ -16,6 +19,8 @@ This legend covers work like:
 - docs-shell teaching quality
 - component-family story coverage growth
 - clearer progress tracking between shipped Bijou families and DOGFOOD stories
+- prose-doc reading and docs-site information architecture
+- exposing repo/package/philosophy docs inside DOGFOOD
 
 ## Human users
 
@@ -31,11 +36,16 @@ This legend covers work like:
 
 ## Human hill
 
-A user can open DOGFOOD and immediately understand both what it is and how complete it currently is, without mistaking the app for a finished exhaustive reference.
+A user can open DOGFOOD and understand what Bijou is, where to find its
+guides and philosophy docs, and how the component library fits into that
+broader docs system without mistaking the app for either "only
+components" or a complete exhaustive reference.
 
 ## Agent hill
 
-An agent can measure current DOGFOOD component-family coverage against the canonical family reference and surface that progress honestly inside the app.
+An agent can measure current DOGFOOD component-family coverage
+honestly, and can also see which non-component docs surfaces still need
+to exist before DOGFOOD counts as a real terminal docs product.
 
 ## Core invariants
 
@@ -51,12 +61,19 @@ An agent can measure current DOGFOOD component-family coverage against the canon
 
 ## Current cycle and backlog
 
+- active cycle: [DF-021 — Shape DOGFOOD As Terminal Docs System](../design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 - latest completed cycle: [DF-019 — Raise DOGFOOD Coverage Floor to 100%](../design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
-  - the next work is depth and quality, not another family-count ratchet
-- live backlog:
+  - the next important gap is no longer family-count breadth; it is
+    that DOGFOOD still does not behave like a docs site for the rest of
+    Bijou
+- release-target backlog:
+  - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+  - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+  - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+- live follow-on backlog:
   - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - historical backlog lineage:
   - [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)

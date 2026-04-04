@@ -60,8 +60,16 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 The currently shaped next release target is **`4.1.0`**.
 
-The cycle-shaped `4.1.0` blockers are now closed. Remaining work is the
-actual release execution path from this guide.
+A later DOGFOOD shaping cycle reopened cycle-shaped `4.1.0` blockers.
+
+Do **not** start release execution until the active lane in
+[`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) is closed again.
+
+The current blockers are:
+
+- [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 
 Its long-form release docs live in:
 
