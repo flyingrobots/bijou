@@ -110,9 +110,11 @@ jobs:
         run: |
           set -euo pipefail
           node --version
-          npm --version
+          NPM_VERSION="$(npm --version)"
+          echo "$NPM_VERSION"
+          export NPM_VERSION
           node --input-type=module <<'EOF'
-          const version = process.versions.npm ?? '0.0.0';
+          const version = process.env.NPM_VERSION ?? '0.0.0';
           const [major = 0, minor = 0, patch = 0] = version
             .split('.')
             .map((part) => Number.parseInt(part, 10));

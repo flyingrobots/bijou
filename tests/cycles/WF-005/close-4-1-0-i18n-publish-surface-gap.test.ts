@@ -38,9 +38,13 @@ describe('WF-005 close 4.1.0 i18n publish-surface gap', () => {
     expect(publishWorkflow).toContain('github.event.inputs.tag || github.ref_name');
     expect(publishWorkflow).toContain('github.event.inputs.ref || github.event.inputs.tag || github.ref_name');
     expect(publishWorkflow).toContain('Verify trusted-publishing toolchain');
+    expect(publishWorkflow).toContain('NPM_VERSION="$(npm --version)"');
+    expect(publishWorkflow).not.toContain('process.versions.npm');
     expect(publishWorkflow).not.toContain('npm i -g npm@latest');
 
     expect(dryRunWorkflow).toContain('Verify trusted-publishing toolchain');
+    expect(dryRunWorkflow).toContain('NPM_VERSION="$(npm --version)"');
+    expect(dryRunWorkflow).not.toContain('process.versions.npm');
     expect(dryRunWorkflow).not.toContain('npm i -g npm@latest');
   });
 
