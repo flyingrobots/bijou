@@ -13,7 +13,7 @@ This section is the package guide for Bijou's published workspace.
 
 ## How to use this section
 
-- use the left lane to open the package you care about
+- use the left pane to open the package you care about
 - use the center pane to read the package role and surface guide
 - use the right pane for a short summary of what that page is for
 

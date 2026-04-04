@@ -228,10 +228,10 @@ these gates in order:
 
 Abort on any failure.
 
-This still reflects the current repo tooling, not the intended end
-state. [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
-is a release blocker specifically because this phase must move to a
-DOGFOOD-centered smoke contract before `4.1.0` is cut.
+This reflects the current repo tooling after
+[WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+moved the release smoke gate onto the DOGFOOD contract used for
+`4.1.0`.
 
 ## Phase 4: CI Dry Run
 

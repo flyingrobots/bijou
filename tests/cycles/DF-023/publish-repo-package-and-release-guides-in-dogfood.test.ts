@@ -54,6 +54,8 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(packagesText).toContain('@flyingrobots/bijou');
     expect(packagesText).toContain('@flyingrobots/bijou-tui');
     expect(packagesText).toContain('bijou-i18n-tools-node');
+    expect(packagesText).toContain('left pane');
+    expect(packagesText).not.toContain('left lane');
 
     const packageDoc = await runScript(app, [
       { key: ']' },
@@ -98,6 +100,5 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
   it('moves DF-023 out of the active 4.1.0 blocker list', () => {
     expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(false);
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
   });
 });

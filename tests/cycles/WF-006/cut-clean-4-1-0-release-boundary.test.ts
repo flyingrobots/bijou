@@ -17,6 +17,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
   it('aligns the short-form release surfaces to the v4.0.0..HEAD boundary', () => {
     const readme = readRepoFile('README.md');
     const changelog = readRepoFile('docs/CHANGELOG.md');
+    const releaseGuide = readRepoFile('docs/release.md');
 
     expect(readme).toContain("## What's New in v4.1.0");
     expect(readme).toContain('./docs/releases/4.1.0/whats-new.md');
@@ -24,5 +25,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(changelog).toContain('## [4.0.0] - 2026-03-22');
     expect(changelog).toContain('[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.0.0...HEAD');
     expect(changelog).toContain('[4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0');
+    expect(releaseGuide).toContain('moved the release smoke gate onto the DOGFOOD contract used for');
+    expect(releaseGuide).not.toContain('This still reflects the current repo tooling, not the intended end');
   });
 });
