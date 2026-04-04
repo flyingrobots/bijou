@@ -141,7 +141,7 @@ jobs:
   github_release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [verify, smoke_examples, publish_npm]
+    needs: [verify, smoke_dogfood, publish_npm]
     if: ${{ always() && needs.verify.result == 'success' }}
     permissions:
       contents: write

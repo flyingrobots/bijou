@@ -39,6 +39,11 @@ describe('WF-003 replace smoke examples with smoke dogfood', () => {
       expect(workflow).not.toContain('smoke:examples:static');
       expect(workflow).not.toContain('smoke:examples:interactive');
     }
+
+    expect(dryRun).toContain('needs: [verify, smoke_dogfood]');
+    expect(publish).toContain('publish_npm:\n    name: Publish npm (OIDC)\n    runs-on: ubuntu-latest\n    needs: [verify, smoke_dogfood]');
+    expect(publish).toContain('github_release:\n    name: Create GitHub Release\n    runs-on: ubuntu-latest\n    needs: [verify, smoke_dogfood, publish_npm]');
+    expect(publish).not.toContain('needs: [verify, smoke_examples, publish_npm]');
   });
 
   it('updates release-facing docs to treat DOGFOOD as the smoke contract', () => {
