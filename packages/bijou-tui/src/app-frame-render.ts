@@ -152,6 +152,7 @@ function paintActiveHeaderTab(
   tabTargets: readonly FrameHeaderTabTarget[],
   activePageId: string,
   ctx: BijouContext | undefined,
+  tokenOverride?: TokenValue,
 ): void {
   if (ctx == null) return;
   const activeTarget = tabTargets.find((target) => target.pageId === activePageId);
@@ -164,13 +165,14 @@ function paintActiveHeaderTab(
   const baseHex = sampleCell.fg
     ?? ctx.surface('primary').hex
     ?? ctx.semantic('primary').hex;
-  const token = deriveActiveHeaderTabToken(ctx, backgroundHex, baseHex);
+  const token = tokenOverride ?? deriveActiveHeaderTabToken(ctx, backgroundHex, baseHex);
 
   for (let x = activeTarget.startCol; x <= activeTarget.endCol; x++) {
     const cell = surface.get(x, 0);
     surface.set(x, 0, {
       ...cell,
       fg: token.hex,
+      bg: token.bg ?? cell.bg,
       modifiers: token.modifiers,
       empty: false,
     });
@@ -471,6 +473,13 @@ export function resolveHeaderLine<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): FrameHeaderRenderResult {
   const ctx = resolveSafeCtx();
+  const activePage = pagesById.get(model.activePageId)!;
+  const activePageModel = model.pageModels[model.activePageId]!;
+  const headerStyle = options.headerStyle?.({
+    model,
+    activePage,
+    pageModel: activePageModel,
+  });
   const title = options.title ?? 'App';
   let cursor = visibleLength(title) + 2;
   const tabTargets: FrameHeaderTabTarget[] = [];
@@ -500,7 +509,7 @@ export function resolveHeaderLine<PageModel, Msg>(
     id: 'frame-header',
     classes: [`page-${model.activePageId}`],
   });
-  paintActiveHeaderTab(surface, tabTargets, model.activePageId, ctx);
+  paintActiveHeaderTab(surface, tabTargets, model.activePageId, ctx, headerStyle?.activeTabToken);
   return {
     surface,
     tabTargets,

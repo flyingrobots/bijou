@@ -240,6 +240,12 @@ export interface FrameNotificationCenter<Msg> {
   readonly onFilterChange?: (filter: NotificationHistoryFilter) => Msg | undefined;
 }
 
+/** Optional styling overrides for the frame-owned header line. */
+export interface FrameHeaderStyle {
+  /** Foreground token for the active tab/page label in the header. */
+  readonly activeTabToken?: TokenValue;
+}
+
 /** Declarative frame layout node. */
 export type FrameLayoutNode =
   | {
@@ -311,6 +317,12 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly defaultPageId?: string;
   /** Optional frame title. */
   readonly title?: string;
+  /** Optional app-owned styling override for the active header tab/page label. */
+  readonly headerStyle?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly pageModel: PageModel;
+  }) => FrameHeaderStyle | undefined;
   /** Initial terminal width before runtime resize events. Default: 80. */
   readonly initialColumns?: number;
   /** Initial terminal height before runtime resize events. Default: 24. */

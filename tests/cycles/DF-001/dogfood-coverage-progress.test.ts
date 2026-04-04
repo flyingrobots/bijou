@@ -52,6 +52,17 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(text).toContain(`${coverage.percent}%`);
   });
 
+  it('shows the DOGFOOD banner and expansion on the landing screen at a normal viewport size', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const landing = await runScript(app, [], { ctx });
+    const text = frameText(landing.frames[landing.frames.length - 1]!);
+
+    expect(text).toContain('DOGFOOD');
+    expect(text).toContain('Documentation Of Good Foundational Onboarding and Discovery');
+  });
+
   it('spawns the next DOGFOOD backlog item', () => {
     expect(existsRepoPath('docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md')).toBe(true);
   });
