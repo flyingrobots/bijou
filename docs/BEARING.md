@@ -21,6 +21,9 @@ That means:
 - treat [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   as the cycle that publishes repo/package/release guidance into that
   shell
+- treat [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+  as the cycle that publishes doctrine and architecture guidance into
+  that shell
 - treat [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
   as the cycle that makes DOGFOOD, not `examples/`, the only
   human-facing docs front door for `4.1.0`
@@ -49,16 +52,18 @@ The latest merged runtime- and release-shaping slices are:
 - [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
 - [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 - [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 
 ## What Feels Wrong?
 
-- DOGFOOD now has the repo/package/release corpus inside the app, but
-  its visible `Philosophy` section still only carries starter copy
+- DOGFOOD now has the repo/package/release/philosophy corpus inside the
+  app, but the repo still has not finished demoting `examples/` or
+  moving release smoke onto DOGFOOD
 - the repo still exposes too much example-first language for a release
   that claims DOGFOOD is the docs product
 - the remaining `4.1.0` work is still not only release execution; the
-  open blockers are now philosophy-publication, docs-surface, and
-  smoke-contract cycles rather than shell shape
+  open blockers are now docs-surface and smoke-contract cycles rather
+  than shell shape
 - `RE-007` and other follow-ons still need to stay outside the `4.1.0`
   release boundary
 - `PLAN.md`, legends, and backlog placement had drifted from what had

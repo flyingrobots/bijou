@@ -11,9 +11,20 @@ documentation as a proving surface.
 - docs should exercise the real framework
 - shell chrome should teach rather than obscure
 
-## What is still missing
+## Published now
 
-The key doctrine and architecture documents already exist in `docs/`,
-but DOGFOOD does not yet publish that corpus in full. The current
-release blocker is to bring those documents into this section in a
-reader-first form.
+- `System-Style JavaScript`
+- `Architecture`
+- `Bijou UX Doctrine`
+- `Invariants`
+- `Design System Overview`
+
+## How to use this section
+
+- start with this overview if you want the big-picture frame
+- open `System-Style JavaScript` for the runtime-truth engineering stance
+- open `Architecture` for the package and boundary structure
+- open `Bijou UX Doctrine` and `Design System Overview` for the product
+  and interface stance
+- open `Invariants` when you need to see the repo truths the legends are
+  protecting

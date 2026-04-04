@@ -17,10 +17,12 @@ describe('DF-025 make DOGFOOD the only human-facing docs surface', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md')).toBe(true);
     expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
+    expect(existsRepoPath('docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(true);
 
     const dogfood = readRepoFile('docs/DOGFOOD.md');
     expect(dogfood).toContain('canonical human-facing docs surface');
     expect(dogfood).toContain('package guides for the published workspace');
+    expect(dogfood).toContain('doctrine, architecture, invariants, and design-system guidance');
 
     const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
     expect(lane).toContain('Just closed');

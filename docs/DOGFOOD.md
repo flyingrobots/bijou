@@ -40,6 +40,7 @@ Inside that shell, DOGFOOD now carries:
 - the live component-family explorer
 - package guides for the published workspace
 - `4.1.0` release and migration docs
+- doctrine, architecture, invariants, and design-system guidance
 
 The component-family explorer is still an important part of DOGFOOD,
 but it is no longer the whole story.

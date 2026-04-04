@@ -66,18 +66,18 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 ## Current cycle and backlog
 
 - active cycle: [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-- latest completed cycle: [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- latest completed cycle: [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
   - DOGFOOD now has visible top-level docs sections and a prose reader
-  - DOGFOOD now publishes repo orientation, package docs, and release
-    docs inside that shell
-  - the next important gaps are no longer shell shape or repo/package
-    corpus; they are philosophy/doctrine publication and finishing the
-    examples-to-DOGFOOD posture shift
+  - DOGFOOD now publishes repo orientation, package docs, release docs,
+    doctrine, architecture, invariants, and design-system guidance
+    inside that shell
+  - the next important gaps are no longer shell shape or docs corpus;
+    they are finishing the examples-to-DOGFOOD posture shift and moving
+    the release smoke contract onto DOGFOOD
 - release-target backlog:
-  - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
   - [DF-026 — Demote Examples To Secondary Reference Status](../BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md)
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live follow-on backlog:

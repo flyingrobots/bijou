@@ -108,6 +108,11 @@ const PACKAGE_BIJOU_I18N_TOOLS_TEXT = readMarkdownDoc('../../packages/bijou-i18n
 const PACKAGE_BIJOU_I18N_TOOLS_NODE_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-node/README.md');
 const PACKAGE_BIJOU_I18N_TOOLS_XLSX_TEXT = readMarkdownDoc('../../packages/bijou-i18n-tools-xlsx/README.md');
 const PHILOSOPHY_OVERVIEW_TEXT = readMarkdownDoc('./content/philosophy-overview.md');
+const PHILOSOPHY_SYSTEM_STYLE_TEXT = readMarkdownDoc('../../docs/system-style-javascript.md');
+const PHILOSOPHY_ARCHITECTURE_TEXT = readMarkdownDoc('../../docs/ARCHITECTURE.md');
+const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-ux-doctrine.md');
+const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
+const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
 const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/whats-new.md');
 const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/migration-guide.md');
@@ -436,8 +441,43 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     id: 'philosophy-overview',
     pageId: PHILOSOPHY_PAGE_ID,
     title: 'Philosophy and Architecture',
-    summary: 'The visible home for doctrine and architecture material before the full corpus lands.',
+    summary: 'How the doctrine, architecture, and design stance pages fit together in DOGFOOD.',
     body: PHILOSOPHY_OVERVIEW_TEXT,
+  },
+  {
+    id: 'philosophy-system-style-javascript',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'System-Style JavaScript',
+    summary: 'Runtime truth, boundaries, adapters, codecs, and the repo-wide infrastructure doctrine.',
+    body: PHILOSOPHY_SYSTEM_STYLE_TEXT,
+  },
+  {
+    id: 'philosophy-architecture',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Architecture',
+    summary: 'The structural reference for the nine-package workspace and its core/runtime/i18n lanes.',
+    body: PHILOSOPHY_ARCHITECTURE_TEXT,
+  },
+  {
+    id: 'philosophy-ux-doctrine',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Bijou UX Doctrine',
+    summary: 'The product doctrine for calm, explicit, humane terminal UX.',
+    body: PHILOSOPHY_UX_DOCTRINE_TEXT,
+  },
+  {
+    id: 'philosophy-invariants',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Invariants',
+    summary: 'The non-negotiable project truths and the legends that protect them.',
+    body: PHILOSOPHY_INVARIANTS_TEXT,
+  },
+  {
+    id: 'philosophy-design-system',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Design System Overview',
+    summary: 'The foundations, patterns, blocks, and component-family doctrine behind Bijou UI.',
+    body: PHILOSOPHY_DESIGN_SYSTEM_TEXT,
   },
   {
     id: 'release-overview',
@@ -2377,10 +2417,12 @@ function renderGuideInfoPane(
         return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
       case PACKAGES_PAGE_ID:
         return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
+      case PHILOSOPHY_PAGE_ID:
+        return 'This section now publishes the key doctrine, architecture, invariants, and design-system guidance inside DOGFOOD.';
       case RELEASE_PAGE_ID:
         return 'This section now publishes the 4.1.0 release story and migration guidance inside DOGFOOD.';
       default:
-        return 'This section now has a visible home in DOGFOOD, but its full corpus is still part of the active 4.1.0 blocker work.';
+        return 'This section now has a visible home in DOGFOOD.';
     }
   })();
 
