@@ -21,21 +21,22 @@ filesystem listing.
 
 ## Current Posture
 
-Bijou is no longer proving whether it can exist, and it is no longer
-undecided about the next release.
+Bijou has shipped `4.1.0`, so the repo is no longer shaping that
+release. It is back in normal post-release engineering posture.
 
 The repo now has:
 
+- a current shipped release at `4.1.0`
 - a runtime-engine legend with real landed slices through
   [RE-006](./design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - a humane shell direction
 - complete DOGFOOD family coverage
 - landed DX cleanup on the most painful framed-shell typing seams
-- a shaped next release target through
+- a landed release-shaping decision through
   [WF-004](./design/WF-004-shape-the-next-release.md)
 - closed release-blocker cycles through
   [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
-- a new DOGFOOD docs-site shaping cycle through
+- a landed DOGFOOD docs-site shaping cycle through
   [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 - a landed DOGFOOD docs-shell foundation through
   [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
@@ -43,46 +44,47 @@ The repo now has:
   [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - a landed DOGFOOD philosophy/architecture corpus publication through
   [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+- a landed DOGFOOD-only docs-surface policy through
+  [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - a landed example-demotion posture through
   [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
-- a new DOGFOOD-only docs-surface policy through
-  [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+- a landed release-smoke migration through
+  [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
-The release decision is now:
+The `4.1.0` release outcome is now:
 
-- target version: `4.1.0`
+- shipped version: `4.1.0`
 - release type: stable minor
-- `RE-007` is explicitly deferred until after `4.1.0`
-- the i18n publish surface is closed in the automated release path
-- the short-form release surfaces are aligned to the real
-  `v4.0.0..HEAD` boundary
-- the cycle-shaped blockers are cleared again after DOGFOOD took over
-  the release smoke contract
+- `RE-007` stayed outside the release boundary
+- all nine workspace packages now move together at `4.1.0`
+- DOGFOOD owns the human-facing docs posture and the release smoke
+  contract
+- the next release has not been shaped yet
 
 So the work now should stay narrower and more structural:
 
-- close the remaining `4.1.0` DOGFOOD docs-system blockers honestly
+- keep signposts honest about `4.1.0` being shipped instead of pending
+- promote `RE-007` as the next active engineering cycle
+- keep `DF-020` and `DL-009` as near follow-ons
 - keep work-tracking truth honest through METHOD lanes and signposts
-- keep `RE-007` and other follow-on engineering work outside the current
-  release boundary
+- leave `4.2.0` unshaped until there is enough real new material to
+  justify another release-shaping pass
 
-## Active Cycle
-
-- [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-
-## Before 4.1.0 Ships
-
-- keep the cycle-shaped blocker lane cleared:
-  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
-- run `npm run release:preflight`
-- run `npm run release:readiness`
-- run the GitHub Release Dry Run workflow
-- execute the version bump, tag, and publish flow in
-  [docs/release.md](./release.md)
-
-### Up Next
+## Next Active Cycle
 
 - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+
+## After 4.1.0
+
+- keep the release-shaping arc closed as shipped history, not as a live
+  blocker lane
+- treat the `4.1.0` release docs under [`docs/releases/4.1.0/`](./releases/4.1.0/whats-new.md)
+  and the shipped changelog section as historical truth
+- use [docs/release.md](./release.md) as the procedure for the next
+  release only when a new version is deliberately shaped
+
+## Near Follow-ons
+
 - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - [DL-009 — Formalize Layout and Viewport Rules](./BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
 

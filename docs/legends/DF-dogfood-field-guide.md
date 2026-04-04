@@ -65,8 +65,6 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 
 ## Current cycle and backlog
 
-- active cycle: [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-- latest completed cycle: [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
@@ -75,6 +73,10 @@ before DOGFOOD counts as a real terminal docs product, and can see that
     doctrine, architecture, invariants, and design-system guidance
     inside that shell
   - DOGFOOD now also owns the release-facing smoke contract
+- latest DOGFOOD docs-surface closure:
+  - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+- latest supporting closure:
+  - [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live follow-on backlog:

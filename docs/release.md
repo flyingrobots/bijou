@@ -54,27 +54,25 @@ That is why `release:readiness` is the validation gauntlet, not the
    - tag publish: `.github/workflows/publish.yml`
 8. Respect lock-step versioning across the workspace.
 
-## Current Version And Publish Surface
+## Current Release And Publish Surface
 
-### Current Shaped Target
+### Latest Shipped Release
 
-The currently shaped next release target is **`4.1.0`**.
+The latest shipped release is **`4.1.0`**.
 
-A later DOGFOOD shaping cycle reopened cycle-shaped `4.1.0` blockers.
+The shaping arc that got `4.1.0` out the door included:
 
-That lane is now closed again.
+- [WF-004](./design/WF-004-shape-the-next-release.md)
+- [WF-005](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
+- [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+- [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
+- [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+- [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
+- [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
+- [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
-The last blocker was
-[WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md).
-
-The shell-foundation work was closed in
-[DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md).
-The repo/package/release corpus publication was closed in
-[DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md).
-The philosophy/architecture corpus publication was closed in
-[DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md).
-The example-demotion posture was closed in
-[DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md).
 The release smoke contract is now DOGFOOD-centered through
 `smoke:dogfood`, `smoke:dogfood:landing`, and `smoke:dogfood:docs`.
 
@@ -82,6 +80,14 @@ Its long-form release docs live in:
 
 - [`docs/releases/4.1.0/whats-new.md`](./releases/4.1.0/whats-new.md)
 - [`docs/releases/4.1.0/migration-guide.md`](./releases/4.1.0/migration-guide.md)
+
+### Next Release Posture
+
+The next release is intentionally **not shaped yet**.
+
+Do not reuse `4.1.0` planning language as if it were still a live lane.
+When the next release is worth shaping, capture that explicitly in cycle
+docs and signposts first.
 
 ### Lock-step Versioned Units
 
@@ -199,7 +205,7 @@ When the version is chosen, move that directory to
 `docs/releases/X.Y.Z/` and update any version placeholders inside the
 docs.
 
-For the currently shaped release, that work has already happened under
+For the latest shipped release, that work lives under
 `docs/releases/4.1.0/`.
 
 ## Phase 3: Local Validation
@@ -231,7 +237,7 @@ Abort on any failure.
 This reflects the current repo tooling after
 [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 moved the release smoke gate onto the DOGFOOD contract used for
-`4.1.0`.
+`4.1.0` and later releases.
 
 ## Phase 4: CI Dry Run
 
