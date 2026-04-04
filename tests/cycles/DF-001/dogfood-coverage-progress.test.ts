@@ -89,7 +89,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(enterCellBefore.char).toBe('E');
     expect(enterCellBefore.fg).toBeDefined();
 
-    const pulsed = await runScript(app, [{ msg: { type: 'pulse', dt: 0.6 } as const }], { ctx });
+    const pulsed = await runScript(app, [{ pulse: { dt: 0.6 } }], { ctx });
     const pulsedFrame = pulsed.frames[pulsed.frames.length - 1]!;
     const enterCellAfter = pulsedFrame.get(promptStart + 'Press ['.length, promptRow);
     expect(enterCellAfter.char).toBe('E');
