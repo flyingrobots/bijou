@@ -61,16 +61,16 @@ to exist before DOGFOOD counts as a real terminal docs product.
 
 ## Current cycle and backlog
 
-- active cycle: [DF-021 — Shape DOGFOOD As Terminal Docs System](../design/DF-021-shape-dogfood-as-terminal-docs-system.md)
-- latest completed cycle: [DF-019 — Raise DOGFOOD Coverage Floor to 100%](../design/DF-019-raise-dogfood-coverage-floor-to-100-percent.md)
+- active cycle: [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+- latest completed cycle: [DF-021 — Shape DOGFOOD As Terminal Docs System](../design/DF-021-shape-dogfood-as-terminal-docs-system.md)
 - current state:
   - DOGFOOD now documents all `35/35` canonical component families
   - the enforced coverage floor is `100%`
-  - the next important gap is no longer family-count breadth; it is
-    that DOGFOOD still does not behave like a docs site for the rest of
-    Bijou
+  - DOGFOOD now has visible top-level docs sections and a starter prose
+    reader
+  - the next important gap is no longer shell shape; it is publishing
+    the real repo/package/release/philosophy corpus into that shell
 - release-target backlog:
-  - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](../BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
   - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](../BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - live follow-on backlog:

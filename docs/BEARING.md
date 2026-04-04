@@ -15,6 +15,9 @@ That means:
 - treat [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
   as the active release-shaping follow-on that reopens cycle-shaped
   `4.1.0` blockers around DOGFOOD's scope
+- treat [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
+  as the cycle that gives DOGFOOD a visible docs-site shell and prose
+  reader
 - clear the active `v4.1.0` blocker lane in
   [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) before release
   execution begins
@@ -38,15 +41,16 @@ The latest merged runtime- and release-shaping slices are:
 - [WF-004](./design/WF-004-shape-the-next-release.md)
 - [WF-005](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
 - [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
+- [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 
 ## What Feels Wrong?
 
-- DOGFOOD is still too component-only for the docs product story the
-  repo now implies
-- there is still no real prose-doc reader or repo/package/philosophy
-  docs path inside DOGFOOD
-- the remaining `4.1.0` work is not only release execution anymore;
-  DOGFOOD docs-scope blockers are open again
+- DOGFOOD now has the shell shape of a docs site, but its visible
+  `Packages`, `Philosophy`, and `Release` sections still only carry
+  starter copy instead of the real corpus
+- the remaining `4.1.0` work is still not only release execution; the
+  open blockers are now content-publication cycles rather than shell
+  shape
 - `RE-007` and other follow-ons still need to stay outside the `4.1.0`
   release boundary
 - `PLAN.md`, legends, and backlog placement had drifted from what had

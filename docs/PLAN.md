@@ -37,6 +37,8 @@ The repo now has:
   [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
 - a new DOGFOOD docs-site shaping cycle through
   [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+- a landed DOGFOOD docs-shell foundation through
+  [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 
 The release decision is now:
 
@@ -48,24 +50,23 @@ The release decision is now:
   `v4.0.0..HEAD` boundary
 - cycle-shaped blockers are open again in
   [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) because DOGFOOD
-  still behaves like a components docs view rather than a terminal docs
-  site for the repo as a whole
+  still lacks the real repo/package/release/philosophy corpus inside the
+  newly visible docs-site shell
 
 So the work now should stay narrower and more structural:
 
-- close the reopened `4.1.0` DOGFOOD docs-system blockers honestly
+- close the remaining `4.1.0` DOGFOOD docs-system blockers honestly
 - keep work-tracking truth honest through METHOD lanes and signposts
 - keep `RE-007` and other follow-on engineering work outside the current
   release boundary
 
 ## Active Cycle
 
-- [DF-021 — Shape DOGFOOD As Terminal Docs System](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
+- [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 
 ## Before 4.1.0 Ships
 
 - close the `v4.1.0` backlog lane:
-  - [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
   - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
   - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - run `npm run release:preflight`
@@ -111,5 +112,5 @@ mistake every root backlog file for live queue priority.
    wants, and what ready means.
 5. Do not let follow-on architecture work silently expand the current
    release boundary after it has been shaped.
-6. Do not call DOGFOOD a docs product while it still only behaves like a
-   components explorer.
+6. Do not call DOGFOOD complete while visible sections still only carry
+   starter copy instead of the real corpus.

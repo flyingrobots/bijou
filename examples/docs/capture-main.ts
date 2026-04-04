@@ -36,6 +36,7 @@ const CAPTURE_SCENARIOS: Record<CaptureScenarioName, CaptureScenario> = {
     initialRoute: 'docs',
     pace: 1.05,
     steps: [
+      { delayMs: 700, key: ']' },
       { delayMs: 1200, key: 'enter' },
       { delayMs: 700, key: 'down' },
       { delayMs: 450, key: 'enter' },

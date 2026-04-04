@@ -94,12 +94,21 @@ const BIJOU_PACKAGE_JSON = JSON.parse(
   readFileSync(new URL('../../packages/bijou/package.json', import.meta.url), 'utf8'),
 ) as { readonly version: string };
 const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
+const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
+const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
+const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
+const PHILOSOPHY_OVERVIEW_TEXT = readMarkdownDoc('./content/philosophy-overview.md');
+const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
 const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue';
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
-const DOCS_PAGE_ID = 'dogfood';
+const GUIDES_PAGE_ID = 'guides';
+const COMPONENTS_PAGE_ID = 'components';
+const PACKAGES_PAGE_ID = 'packages';
+const PHILOSOPHY_PAGE_ID = 'philosophy';
+const RELEASE_PAGE_ID = 'release';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
@@ -130,6 +139,14 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('docs.footer.family', '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand'),
     dogfoodMessage('docs.footer.story', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
     dogfoodMessage('docs.footer.variants', '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles'),
+    dogfoodMessage('docs.footer.guideNav', '{paneSwitch} • ↑/↓ browse • Enter open'),
+    dogfoodMessage('docs.footer.guide', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
+    dogfoodMessage('docs.footer.guideMeta', '{paneSwitch} • section overview'),
+    dogfoodMessage('docs.page.guides', 'Guides'),
+    dogfoodMessage('docs.page.components', 'Components'),
+    dogfoodMessage('docs.page.packages', 'Packages'),
+    dogfoodMessage('docs.page.philosophy', 'Philosophy'),
+    dogfoodMessage('docs.page.release', 'Release'),
     dogfoodMessage('docs.search.title', 'Search components'),
     dogfoodMessage('docs.empty.intro.title', 'What is Bijou?'),
     dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
@@ -180,6 +197,28 @@ interface StoryFamily {
   readonly stories: readonly ComponentStory[];
 }
 
+type DocsPageId =
+  | typeof GUIDES_PAGE_ID
+  | typeof COMPONENTS_PAGE_ID
+  | typeof PACKAGES_PAGE_ID
+  | typeof PHILOSOPHY_PAGE_ID
+  | typeof RELEASE_PAGE_ID;
+
+type GuideDocsPageId = Exclude<DocsPageId, typeof COMPONENTS_PAGE_ID>;
+
+interface GuideDoc {
+  readonly id: string;
+  readonly pageId: GuideDocsPageId;
+  readonly title: string;
+  readonly summary: string;
+  readonly body: string;
+}
+
+interface DocsPageSpec {
+  readonly id: DocsPageId;
+  readonly title: string;
+}
+
 interface RowDescriptor {
   readonly kind: 'family' | 'story';
   readonly id: string;
@@ -194,6 +233,8 @@ interface DocsExplorerModel {
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly previewTimeMs: number;
+  readonly guideState: ReturnType<typeof createBrowsableListState<string>>;
+  readonly selectedGuideId?: string;
   readonly showHints: boolean;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
@@ -213,6 +254,13 @@ type ExplorerMsg =
   | { type: 'variant-next' }
   | { type: 'variant-prev' }
   | { type: 'set-profile'; mode: StoryMode }
+  | { type: 'guide-next' }
+  | { type: 'guide-prev' }
+  | { type: 'guide-page-down' }
+  | { type: 'guide-page-up' }
+  | { type: 'activate-guide' }
+  | { type: 'activate-guide-index'; index: number }
+  | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
   | { type: 'cycle-landing-theme' }
   | { type: 'cycle-landing-quality' };
@@ -273,6 +321,50 @@ type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
+const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
+  { id: GUIDES_PAGE_ID, title: 'Guides' },
+  { id: COMPONENTS_PAGE_ID, title: 'Components' },
+  { id: PACKAGES_PAGE_ID, title: 'Packages' },
+  { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
+  { id: RELEASE_PAGE_ID, title: 'Release' },
+]);
+const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
+  {
+    id: 'start-here',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Start Here',
+    summary: 'What Bijou is, what DOGFOOD is for, and how the docs map is now shaped.',
+    body: GUIDES_START_HERE_TEXT,
+  },
+  {
+    id: 'navigate-dogfood',
+    pageId: GUIDES_PAGE_ID,
+    title: 'Navigate DOGFOOD',
+    summary: 'How to move between sections, panes, search, settings, and component stories.',
+    body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
+  },
+  {
+    id: 'packages-overview',
+    pageId: PACKAGES_PAGE_ID,
+    title: 'Packages Overview',
+    summary: 'The visible home for package-level docs before the detailed package corpus lands.',
+    body: PACKAGES_OVERVIEW_TEXT,
+  },
+  {
+    id: 'philosophy-overview',
+    pageId: PHILOSOPHY_PAGE_ID,
+    title: 'Philosophy and Architecture',
+    summary: 'The visible home for doctrine and architecture material before the full corpus lands.',
+    body: PHILOSOPHY_OVERVIEW_TEXT,
+  },
+  {
+    id: 'release-overview',
+    pageId: RELEASE_PAGE_ID,
+    title: 'Release and Migration',
+    summary: 'The visible home for current-line release notes and migration guidance inside DOGFOOD.',
+    body: RELEASE_OVERVIEW_TEXT,
+  },
+]);
 const LANDING_FPS_ALPHA = 0.2;
 const LANDING_COLOR_RAMP_SIZE = 256;
 const DIM_MODIFIERS = ['dim'];
@@ -380,7 +472,17 @@ const variantPaneKeys = createKeyMap<ExplorerMsg>()
     .bind('pageup', 'Previous variant', { type: 'variant-prev' }),
   );
 
-const explorerGlobalKeys = createKeyMap<ExplorerMsg>()
+const guidePaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Guides', (group) => group
+    .bind('down', 'Next guide', { type: 'guide-next' })
+    .bind('up', 'Previous guide', { type: 'guide-prev' })
+    .bind('pagedown', 'Page down', { type: 'guide-page-down' })
+    .bind('pageup', 'Page up', { type: 'guide-page-up' })
+    .bind('enter', 'Open guide', { type: 'activate-guide' })
+    .bind('space', 'Open guide', { type: 'activate-guide' }),
+  );
+
+const componentsPageKeys = createKeyMap<ExplorerMsg>()
   .group('Profiles', (group) => group
     .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
     .bind('2', 'Static profile', { type: 'set-profile', mode: 'static' })
@@ -444,6 +546,37 @@ function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
     || (msg.key === 'n' && msg.shift);
 }
 
+function readMarkdownDoc(path: string): string {
+  return readFileSync(new URL(path, import.meta.url), 'utf8').trim();
+}
+
+function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
+  return GUIDE_DOCS.filter((doc) => doc.pageId === pageId);
+}
+
+function guideItemsForPage(pageId: DocsPageId): readonly { label: string; value: string; description?: string }[] {
+  return guideDocsForPage(pageId).map((doc) => ({
+    label: doc.title,
+    value: doc.id,
+    description: doc.summary,
+  }));
+}
+
+function pageTitle(pageId: DocsPageId, i18n?: I18nRuntime): string {
+  switch (pageId) {
+    case GUIDES_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.guides', 'Guides');
+    case COMPONENTS_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.components', 'Components');
+    case PACKAGES_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.packages', 'Packages');
+    case PHILOSOPHY_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.philosophy', 'Philosophy');
+    case RELEASE_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.release', 'Release');
+  }
+}
+
 function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryFamily[] {
   const families = new Map<string, { label: string; stories: ComponentStory[] }>();
   for (const story of stories) {
@@ -461,8 +594,9 @@ function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryF
   }));
 }
 
-function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
+function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): DocsExplorerModel {
   const expandedFamilies = Object.fromEntries(STORY_FAMILIES.map((family) => [family.id, false]));
+  const guideItems = guideItemsForPage(pageId);
   return {
     familyState: createBrowsableListState({
       items: buildFamilyItems(expandedFamilies),
@@ -473,6 +607,11 @@ function createInitialExplorerModel(ctx: BijouContext): DocsExplorerModel {
     profileMode: ctx.mode,
     variantIndexByStory: Object.fromEntries(COMPONENT_STORIES.map((story) => [story.id, 0])),
     previewTimeMs: 0,
+    guideState: createBrowsableListState({
+      items: guideItems,
+      height: 14,
+    }),
+    selectedGuideId: guideItems[0]?.value,
     showHints: true,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
@@ -696,6 +835,56 @@ function selectVariantIndex(model: DocsExplorerModel, index: number): DocsExplor
     },
     previewTimeMs: 0,
   };
+}
+
+function focusGuideRow(model: DocsExplorerModel, index: number): DocsExplorerModel {
+  const itemCount = model.guideState.items.length;
+  if (itemCount === 0) return model;
+  const focusIndex = Math.max(0, Math.min(index, itemCount - 1));
+  return {
+    ...model,
+    guideState: {
+      ...model.guideState,
+      focusIndex,
+      scrollY: adjustScroll(
+        focusIndex,
+        model.guideState.scrollY,
+        model.guideState.height,
+        itemCount,
+      ),
+    },
+  };
+}
+
+function selectedGuide(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc | undefined {
+  const docs = guideDocsForPage(pageId);
+  const selected = docs.find((doc) => doc.id === model.selectedGuideId);
+  return selected ?? docs[0];
+}
+
+function selectGuide(pageId: DocsPageId, model: DocsExplorerModel, guideId?: string): DocsExplorerModel {
+  if (guideId == null) return model;
+  const docs = guideDocsForPage(pageId);
+  const index = docs.findIndex((doc) => doc.id === guideId);
+  if (index < 0) return model;
+  return {
+    ...model,
+    selectedGuideId: guideId,
+    guideState: {
+      ...model.guideState,
+      focusIndex: index,
+      scrollY: adjustScroll(index, model.guideState.scrollY, model.guideState.height, model.guideState.items.length),
+    },
+  };
+}
+
+function activateGuideRow(model: DocsExplorerModel, pageId: DocsPageId): DocsExplorerModel {
+  const guideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  return selectGuide(pageId, model, guideId);
+}
+
+function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, index: number): DocsExplorerModel {
+  return activateGuideRow(focusGuideRow(model, index), pageId);
 }
 
 function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
@@ -1174,7 +1363,7 @@ function landingThemeSettingDescription(index: number, i18n?: I18nRuntime): stri
 }
 
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
-  return model.docsModel.pageModels[DOCS_PAGE_ID]?.landingQualityMode ?? 'auto';
+  return model.docsModel.pageModels[model.docsModel.activePageId]?.landingQualityMode ?? 'auto';
 }
 
 function applyOpaqueCell(
@@ -1328,24 +1517,63 @@ function getLandingDogfoodPanel(
   return surface;
 }
 
+function mapDocsPageModels(
+  docsModel: FrameModel<DocsExplorerModel>,
+  transform: (pageModel: DocsExplorerModel, pageId: DocsPageId) => DocsExplorerModel,
+): FrameModel<DocsExplorerModel> {
+  let changed = false;
+  const nextPageModels: Record<string, DocsExplorerModel> = {};
+
+  for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
+    const nextPageModel = transform(pageModel, pageId as DocsPageId);
+    nextPageModels[pageId] = nextPageModel;
+    if (nextPageModel !== pageModel) {
+      changed = true;
+    }
+  }
+
+  return changed
+    ? {
+        ...docsModel,
+        pageModels: nextPageModels,
+      }
+    : docsModel;
+}
+
+function syncDocsSharedSettings(
+  docsModel: FrameModel<DocsExplorerModel>,
+): FrameModel<DocsExplorerModel> {
+  const activePageModel = docsModel.pageModels[docsModel.activePageId];
+  if (activePageModel == null) return docsModel;
+  return mapDocsPageModels(docsModel, (pageModel) => {
+    if (
+      pageModel.showHints === activePageModel.showHints
+      && pageModel.landingThemeIndex === activePageModel.landingThemeIndex
+      && pageModel.landingQualityMode === activePageModel.landingQualityMode
+    ) {
+      return pageModel;
+    }
+    return {
+      ...pageModel,
+      showHints: activePageModel.showHints,
+      landingThemeIndex: activePageModel.landingThemeIndex,
+      landingQualityMode: activePageModel.landingQualityMode,
+    };
+  });
+}
+
 function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
-  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
   const nextIndex = mod(index, LANDING_THEMES.length);
   if (nextIndex === model.landingThemeIndex) return model;
   const theme = resolveLandingTheme(nextIndex);
   return {
     ...model,
     landingThemeIndex: nextIndex,
-    docsModel: pageModel == null ? model.docsModel : {
-      ...model.docsModel,
-      pageModels: {
-        ...model.docsModel.pageModels,
-        [DOCS_PAGE_ID]: {
-          ...pageModel,
-          landingThemeIndex: nextIndex,
-        },
-      },
-    },
+    docsModel: mapDocsPageModels(model.docsModel, (pageModel) => (
+      pageModel.landingThemeIndex === nextIndex
+        ? pageModel
+        : { ...pageModel, landingThemeIndex: nextIndex }
+    )),
     landingToast: {
       message: theme.label,
       expiresAtMs: model.landingTimeMs + 1600,
@@ -1354,21 +1582,16 @@ function applyLandingThemeSelection(model: RootModel, index: number): RootModel 
 }
 
 function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode, i18n?: I18nRuntime): RootModel {
-  const pageModel = model.docsModel.pageModels[DOCS_PAGE_ID];
-  if (pageModel == null || pageModel.landingQualityMode === mode) return model;
+  const activePageModel = model.docsModel.pageModels[model.docsModel.activePageId];
+  if (activePageModel == null || activePageModel.landingQualityMode === mode) return model;
 
   return {
     ...model,
-    docsModel: {
-      ...model.docsModel,
-      pageModels: {
-        ...model.docsModel.pageModels,
-        [DOCS_PAGE_ID]: {
-          ...pageModel,
-          landingQualityMode: mode,
-        },
-      },
-    },
+    docsModel: mapDocsPageModels(model.docsModel, (pageModel) => (
+      pageModel.landingQualityMode === mode
+        ? pageModel
+        : { ...pageModel, landingQualityMode: mode }
+    )),
     landingToast: {
       message: dogfoodText(
         i18n,
@@ -1957,16 +2180,162 @@ function renderVariantsPane(
   ]), width);
 }
 
+function renderGuideNavPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  height: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  i18n: I18nRuntime,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const content = createSurface(Math.max(1, paneWidth), Math.max(1, model.guideState.items.length));
+
+  for (let index = 0; index < model.guideState.items.length; index++) {
+    content.blit(
+      renderGuideRow({
+        item: model.guideState.items[index]!,
+        width: paneWidth,
+        focused: index === model.guideState.focusIndex,
+        selectedGuideId: model.selectedGuideId,
+        ctx,
+        theme,
+      }),
+      0,
+      index,
+    );
+  }
+
+  const body = viewportSurface({
+    width: Math.max(1, paneWidth),
+    height: bodyHeight,
+    content,
+    scrollY: model.guideState.scrollY,
+    showScrollbar: true,
+  });
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(pageTitle(pageId, i18n).toLowerCase(), paneWidth, ctx, theme),
+    body,
+  ]), width);
+}
+
+function renderGuideReaderPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const doc = selectedGuide(pageId, model);
+  if (doc == null) {
+    return insetPaneSurface(column([
+      themedSeparatorSurface('docs', paneWidth, ctx, theme),
+      spacer(1, 1),
+      boxSurface(paragraphSurface(
+        'This section does not have published docs yet.',
+        Math.max(20, paneWidth - 6),
+      ), {
+        width: Math.max(22, paneWidth),
+        borderToken: docsThemeMutedBorderToken(theme),
+        padding: { left: 1, right: 1 },
+        ctx,
+      }),
+    ]), width);
+  }
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(markdown(doc.body, {
+      width: Math.max(24, paneWidth - 2),
+      ctx,
+    })),
+  ]), width);
+}
+
+function renderGuideInfoPane(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  i18n: I18nRuntime,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const doc = selectedGuide(pageId, model);
+  const description = doc?.summary ?? 'This section is still being expanded.';
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(`section • ${pageTitle(pageId, i18n).toLowerCase()}`, paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(inspector({
+      title: 'guide info',
+      currentValue: doc?.title ?? pageTitle(pageId, i18n),
+      sections: [
+        {
+          title: 'Summary',
+          content: description,
+          tone: 'muted',
+        },
+        {
+          title: 'Current posture',
+          content: pageId === GUIDES_PAGE_ID
+            ? 'This is the starter docs reader and top-level shell foundation for DOGFOOD.'
+            : 'This section now has a visible home in DOGFOOD, but its full corpus is still part of the active 4.1.0 blocker work.',
+          tone: 'muted',
+        },
+      ],
+      width: Math.max(22, paneWidth),
+      borderToken: docsThemeMutedBorderToken(theme),
+      bgToken: docsThemeSurfaceToken(theme),
+      ctx,
+    })),
+  ]), width);
+}
+
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRuntime): string {
-  const pageModel = model.pageModels[DOCS_PAGE_ID];
+  const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
+  const pageModel = model.pageModels[pageId];
   if (pageModel == null || !pageModel.showHints) {
     return dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
   }
 
-  const focusedPane = model.focusedPaneByPage[DOCS_PAGE_ID];
+  const focusedPane = model.focusedPaneByPage[pageId];
   const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
   const paneSwitch = dogfoodText(i18n, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
   const activeHint = (() => {
+    if (pageId !== COMPONENTS_PAGE_ID) {
+      switch (focusedPane) {
+        case 'guide-nav':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guideNav',
+            '{paneSwitch} • ↑/↓ browse • Enter open',
+            { paneSwitch },
+          );
+        case 'guide-content':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guide',
+            '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom',
+            { paneSwitch },
+          );
+        case 'guide-meta':
+          return dogfoodText(
+            i18n,
+            'docs.footer.guideMeta',
+            '{paneSwitch} • section overview',
+            { paneSwitch },
+          );
+        default:
+          return undefined;
+      }
+    }
+
     switch (focusedPane) {
       case 'family-nav':
         return dogfoodText(
@@ -2014,6 +2383,20 @@ function familyRowIndexAtPosition(
   return index >= 0 && index < model.familyState.items.length ? index : undefined;
 }
 
+function guideRowIndexAtPosition(
+  model: DocsExplorerModel,
+  row: number,
+  rect: { readonly row: number; readonly height: number },
+): number | undefined {
+  const visibleHeight = Math.max(1, rect.height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const localRow = row - rect.row;
+  const bodyRow = localRow - 1;
+  if (bodyRow < 0 || bodyRow >= visibleHeight) return undefined;
+
+  const index = model.guideState.scrollY + bodyRow;
+  return index >= 0 && index < model.guideState.items.length ? index : undefined;
+}
+
 function variantRowIndexAtPosition(
   model: DocsExplorerModel,
   row: number,
@@ -2059,6 +2442,19 @@ function resolveVariantPaneMouse(
   return index == null ? undefined : { type: 'select-variant', index };
 }
 
+function resolveGuidePaneMouse(
+  msg: MouseMsg,
+  model: DocsExplorerModel,
+  rect: { readonly row: number; readonly height: number },
+): ExplorerMsg | undefined {
+  if (msg.action === 'scroll-down') return { type: 'guide-next' };
+  if (msg.action === 'scroll-up') return { type: 'guide-prev' };
+  if (msg.action !== 'press' || msg.button !== 'left') return undefined;
+
+  const index = guideRowIndexAtPosition(model, msg.row, rect);
+  return index == null ? undefined : { type: 'activate-guide-index', index };
+}
+
 function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<DocsExplorerModel, DocsMsg> {
   return createFramedApp<DocsExplorerModel, DocsMsg>({
     i18n,
@@ -2068,122 +2464,219 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
     }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
-    globalKeys: explorerGlobalKeys,
     helpLineSource: ({ model }) => buildDocsFooterHint(model, i18n),
-    pages: [{
-      id: DOCS_PAGE_ID,
-      title: 'DOGFOOD',
-      init: () => [createInitialExplorerModel(ctx), []],
-      update(msg: FramePageMsg<DocsMsg>, model) {
-        if (msg.type === 'mouse') {
-          return [model, []];
-        }
-        if (msg.type === 'pulse') {
-          return [{
-            ...model,
-            previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
-          }, []];
-        }
-        switch (msg.type) {
-          case 'family-next':
-            return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
-          case 'family-prev':
-            return [{ ...model, familyState: listFocusPrev(model.familyState) }, []];
-          case 'family-page-down':
-            return [{ ...model, familyState: listPageDown(model.familyState) }, []];
-          case 'family-page-up':
-            return [{ ...model, familyState: listPageUp(model.familyState) }, []];
-          case 'activate-row':
-            return [activateFocusedRow(model), []];
-          case 'activate-row-index':
-            return [activateFamilyRowIndex(model, msg.index), []];
-          case 'expand-row':
-            return [expandFocusedFamily(model), []];
-          case 'collapse-row':
-            return [collapseFocusedFamily(model), []];
-          case 'select-story':
-            return [selectStory(model, msg.storyId), []];
-          case 'select-variant':
-            return [selectVariantIndex(model, msg.index), []];
-          case 'variant-next':
-            return [cycleVariantIndex(model, 1), []];
-          case 'variant-prev':
-            return [cycleVariantIndex(model, -1), []];
-          case 'set-profile':
-            return [{ ...model, profileMode: msg.mode }, []];
-          case 'toggle-hints':
-            return [{ ...model, showHints: !model.showHints }, []];
-          case 'cycle-landing-theme':
-            return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
-          case 'cycle-landing-quality':
-            return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
-        }
-      },
-      inputAreas(model) {
-        return [
-          {
-            paneId: 'family-nav',
-            keyMap: familyPaneKeys,
-            helpSource: familyPaneKeys,
-            mouse: ({ msg, rect }) => resolveFamilyPaneMouse(msg, model, rect),
-          },
-          {
-            paneId: 'story-variants',
-            keyMap: variantPaneKeys,
-            helpSource: variantPaneKeys,
-            mouse: ({ msg, rect }) => resolveVariantPaneMouse(msg, model, rect),
-          },
-        ];
-      },
-      searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
-      searchItems(model) {
-        return COMPONENT_STORIES.map((story) => ({
-          id: story.id,
-          label: story.title,
-          description: `${story.family} • ${story.docs.summary}`,
-          category: story.family,
-          action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
-        }));
-      },
-      layout(model) {
-        const theme = resolveLandingTheme(model.landingThemeIndex);
+    pages: DOCS_SITE_PAGES.map((spec) => {
+      if (spec.id === COMPONENTS_PAGE_ID) {
         return {
-          kind: 'grid',
-          gridId: 'docs-shell',
-          columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
-          rows: [1, '1fr', 1],
-          areas: [
-            '. . . . . . .',
-            '. family . main . variants .',
-            '. . . . . . .',
-          ],
-          gap: 0,
-          cells: {
-            family: {
-              kind: 'pane',
-              paneId: 'family-nav',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
-            },
-            main: {
-              kind: 'pane',
-              paneId: 'story-content',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
-            },
-            variants: {
-              kind: 'pane',
-              paneId: 'story-variants',
-              focusedGutterToken: docsThemeFocusedGutterToken(theme),
-              unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-              render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
-            },
+          id: spec.id,
+          title: pageTitle(spec.id, i18n),
+          keyMap: componentsPageKeys,
+          init: () => [createInitialExplorerModel(ctx, spec.id), []],
+          update(msg: FramePageMsg<DocsMsg>, model) {
+            if (msg.type === 'mouse') {
+              return [model, []];
+            }
+            if (msg.type === 'pulse') {
+              return [{
+                ...model,
+                previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+              }, []];
+            }
+            switch (msg.type) {
+              case 'family-next':
+                return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
+              case 'family-prev':
+                return [{ ...model, familyState: listFocusPrev(model.familyState) }, []];
+              case 'family-page-down':
+                return [{ ...model, familyState: listPageDown(model.familyState) }, []];
+              case 'family-page-up':
+                return [{ ...model, familyState: listPageUp(model.familyState) }, []];
+              case 'activate-row':
+                return [activateFocusedRow(model), []];
+              case 'activate-row-index':
+                return [activateFamilyRowIndex(model, msg.index), []];
+              case 'expand-row':
+                return [expandFocusedFamily(model), []];
+              case 'collapse-row':
+                return [collapseFocusedFamily(model), []];
+              case 'select-story':
+                return [selectStory(model, msg.storyId), []];
+              case 'select-variant':
+                return [selectVariantIndex(model, msg.index), []];
+              case 'variant-next':
+                return [cycleVariantIndex(model, 1), []];
+              case 'variant-prev':
+                return [cycleVariantIndex(model, -1), []];
+              case 'set-profile':
+                return [{ ...model, profileMode: msg.mode }, []];
+              case 'toggle-hints':
+                return [{ ...model, showHints: !model.showHints }, []];
+              case 'cycle-landing-theme':
+                return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+              case 'cycle-landing-quality':
+                return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+              default:
+                return [model, []];
+            }
+          },
+          inputAreas(model) {
+            return [
+              {
+                paneId: 'family-nav',
+                keyMap: familyPaneKeys,
+                helpSource: familyPaneKeys,
+                mouse: ({ msg, rect }) => resolveFamilyPaneMouse(msg, model, rect),
+              },
+              {
+                paneId: 'story-variants',
+                keyMap: variantPaneKeys,
+                helpSource: variantPaneKeys,
+                mouse: ({ msg, rect }) => resolveVariantPaneMouse(msg, model, rect),
+              },
+            ];
+          },
+          searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
+          searchItems(model) {
+            return COMPONENT_STORIES.map((story) => ({
+              id: story.id,
+              label: story.title,
+              description: `${story.family} • ${story.docs.summary}`,
+              category: story.family,
+              action: { type: 'select-story', storyId: story.id } satisfies ExplorerMsg,
+            }));
+          },
+          layout(model) {
+            const theme = resolveLandingTheme(model.landingThemeIndex);
+            return {
+              kind: 'grid',
+              gridId: 'docs-shell',
+              columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+              rows: [1, '1fr', 1],
+              areas: [
+                '. . . . . . .',
+                '. family . main . variants .',
+                '. . . . . . .',
+              ],
+              gap: 0,
+              cells: {
+                family: {
+                  kind: 'pane',
+                  paneId: 'family-nav',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
+                },
+                main: {
+                  kind: 'pane',
+                  paneId: 'story-content',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
+                },
+                variants: {
+                  kind: 'pane',
+                  paneId: 'story-variants',
+                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                  render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
+                },
+              },
+            };
           },
         };
-      },
-    }],
+      }
+
+      return {
+        id: spec.id,
+        title: pageTitle(spec.id, i18n),
+        init: () => [createInitialExplorerModel(ctx, spec.id), []],
+        update(msg: FramePageMsg<DocsMsg>, model) {
+          if (msg.type === 'mouse' || msg.type === 'pulse') {
+            return [model, []];
+          }
+          switch (msg.type) {
+            case 'guide-next':
+              return [{ ...model, guideState: listFocusNext(model.guideState) }, []];
+            case 'guide-prev':
+              return [{ ...model, guideState: listFocusPrev(model.guideState) }, []];
+            case 'guide-page-down':
+              return [{ ...model, guideState: listPageDown(model.guideState) }, []];
+            case 'guide-page-up':
+              return [{ ...model, guideState: listPageUp(model.guideState) }, []];
+            case 'activate-guide':
+              return [activateGuideRow(model, spec.id), []];
+            case 'activate-guide-index':
+              return [activateGuideRowIndex(model, spec.id, msg.index), []];
+            case 'select-guide':
+              return [selectGuide(spec.id, model, msg.guideId), []];
+            case 'toggle-hints':
+              return [{ ...model, showHints: !model.showHints }, []];
+            case 'cycle-landing-theme':
+              return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
+            case 'cycle-landing-quality':
+              return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+            default:
+              return [model, []];
+          }
+        },
+        inputAreas(model) {
+          return [{
+            paneId: 'guide-nav',
+            keyMap: guidePaneKeys,
+            helpSource: guidePaneKeys,
+            mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
+          }];
+        },
+        searchTitle: `Search ${pageTitle(spec.id, i18n).toLowerCase()}`,
+        searchItems() {
+          return guideDocsForPage(spec.id).map((doc) => ({
+            id: doc.id,
+            label: doc.title,
+            description: doc.summary,
+            category: pageTitle(spec.id, i18n),
+            action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
+          }));
+        },
+        layout(model) {
+          const theme = resolveLandingTheme(model.landingThemeIndex);
+          return {
+            kind: 'grid',
+            gridId: `docs-${spec.id}`,
+            columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+            rows: [1, '1fr', 1],
+            areas: [
+              '. . . . . . .',
+              '. nav . main . meta .',
+              '. . . . . . .',
+            ],
+            gap: 0,
+            cells: {
+              nav: {
+                kind: 'pane',
+                paneId: 'guide-nav',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, ctx, theme, i18n),
+              },
+              main: {
+                kind: 'pane',
+                paneId: 'guide-content',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width) => renderGuideReaderPane(spec.id, model, width, ctx, theme),
+              },
+              meta: {
+                kind: 'pane',
+                paneId: 'guide-meta',
+                focusedGutterToken: docsThemeFocusedGutterToken(theme),
+                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+                render: (width) => renderGuideInfoPane(spec.id, model, width, ctx, theme, i18n),
+              },
+            },
+          };
+        },
+      };
+    }),
     enableCommandPalette: true,
     settings: ({ model, pageModel }) => {
       const theme = resolveLandingTheme(pageModel.landingThemeIndex);
@@ -2268,33 +2761,56 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
 function syncDocsExplorerViewportLayout(
   docsModel: FrameModel<DocsExplorerModel>,
 ): FrameModel<DocsExplorerModel> {
-  const pageModel = docsModel.pageModels[DOCS_PAGE_ID];
-  if (pageModel == null) return docsModel;
-
   const nextHeight = resolveFamilyPaneBodyHeight(docsModel.rows);
-  if (pageModel.familyState.height === nextHeight) return docsModel;
+  let changed = false;
+  const nextPageModels: Record<string, DocsExplorerModel> = {};
 
-  const nextFamilyState = {
-    ...pageModel.familyState,
-    height: nextHeight,
-    scrollY: adjustScroll(
-      pageModel.familyState.focusIndex,
-      pageModel.familyState.scrollY,
-      nextHeight,
-      pageModel.familyState.items.length,
-    ),
-  };
+  for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
+    let nextPageModel = pageModel;
+    if (pageId === COMPONENTS_PAGE_ID) {
+      if (pageModel.familyState.height !== nextHeight) {
+        nextPageModel = {
+          ...nextPageModel,
+          familyState: {
+            ...pageModel.familyState,
+            height: nextHeight,
+            scrollY: adjustScroll(
+              pageModel.familyState.focusIndex,
+              pageModel.familyState.scrollY,
+              nextHeight,
+              pageModel.familyState.items.length,
+            ),
+          },
+        };
+      }
+    } else if (pageModel.guideState.height !== nextHeight) {
+      nextPageModel = {
+        ...nextPageModel,
+        guideState: {
+          ...pageModel.guideState,
+          height: nextHeight,
+          scrollY: adjustScroll(
+            pageModel.guideState.focusIndex,
+            pageModel.guideState.scrollY,
+            nextHeight,
+            pageModel.guideState.items.length,
+          ),
+        },
+      };
+    }
 
-  return {
-    ...docsModel,
-    pageModels: {
-      ...docsModel.pageModels,
-      [DOCS_PAGE_ID]: {
-        ...pageModel,
-        familyState: nextFamilyState,
-      },
-    },
-  };
+    nextPageModels[pageId] = nextPageModel;
+    if (nextPageModel !== pageModel) {
+      changed = true;
+    }
+  }
+
+  return changed
+    ? {
+        ...docsModel,
+        pageModels: nextPageModels,
+      }
+    : docsModel;
 }
 
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
@@ -2326,8 +2842,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
-    const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
-    const pageModel = syncedDocsModel.pageModels[DOCS_PAGE_ID];
+    const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
+    const pageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
     return [{
       ...model,
       docsModel: syncedDocsModel,
@@ -2338,14 +2854,15 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   return {
     init() {
       const [docsModel, cmds] = explorer.init();
-      const syncedDocsModel = syncDocsExplorerViewportLayout(docsModel);
+      const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
+      const activePageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
       return [{
         route: initialRoute,
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
-        landingThemeIndex: 0,
+        landingThemeIndex: activePageModel?.landingThemeIndex ?? 0,
         landingToast: undefined,
         landingQuitConfirmOpen: false,
         docsModel: syncedDocsModel,
@@ -2502,4 +3019,28 @@ function renderFamilyRow(options: {
     ? ctx.style.styled(accentToken as any, story.title)
     : story.title;
   return line(`${focusPrefix}   ${bullet} ${title}`, width);
+}
+
+function renderGuideRow(options: {
+  readonly item: { readonly label: string; readonly value: string; readonly description?: string };
+  readonly width: number;
+  readonly focused: boolean;
+  readonly selectedGuideId?: string;
+  readonly ctx: BijouContext;
+  readonly theme: LandingThemeTokens;
+}): Surface {
+  const { item, width, focused, selectedGuideId, ctx, theme } = options;
+  const accentToken = docsThemeAccentToken(theme);
+  const mutedToken = docsThemeMutedBorderToken(theme);
+  const selected = selectedGuideId === item.value;
+  const focusPrefix = focused
+    ? ctx.style.styled(accentToken as any, '›')
+    : ' ';
+  const bullet = selected
+    ? ctx.style.styled(accentToken as any, '•')
+    : ctx.style.styled(mutedToken as any, '•');
+  const title = selected || focused
+    ? ctx.style.styled(accentToken as any, item.label)
+    : item.label;
+  return line(`${focusPrefix} ${bullet} ${title}`, width);
 }

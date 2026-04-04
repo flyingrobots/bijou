@@ -77,6 +77,7 @@ describe('DL-006 inspector panel rhythm cycle', () => {
     const app = createDocsApp(ctx);
     const result = await runScript(app, [
       { key: '\r' },
+      { key: ']' },
       { key: '\r' },
       { key: '\x1b[B' },
       { key: '\r' },

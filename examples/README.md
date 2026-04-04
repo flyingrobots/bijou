@@ -36,13 +36,19 @@ Landing-first story-driven docs slice built with Bijou itself:
 npm run dogfood
 ```
 
-This example now opens on a hero screen, then drops into a three-lane docs explorer with component families on the left, selected-component docs in the center, and variants on the right.
+This example now opens on a hero screen, then drops into a terminal docs
+shell with top-level sections for guides, components, packages,
+philosophy, and release material. The `Components` section keeps the
+three-lane explorer with families on the left, selected-component docs
+in the center, and variants on the right.
 
-It proves the new `ComponentStory` v0 loop with three canonical families:
+It proves DOGFOOD as both a docs shell and a living component field
+guide:
 
-- `alert()` for in-flow status and graceful lowering
-- `modal()` for overlay doctrine and structured interruption
-- `viewportSurface()` for masking and width-sensitive overflow behavior
+- `Guides` establishes the reader-first docs path
+- `Components` carries the full family/story/variant browser
+- the remaining top-level sections make the missing repo/package/release
+  and doctrine corpus visible inside the app instead of hiding that work
 
 See [docs](./docs/) for the first living-docs preview built from those shared story records.
 

@@ -10,17 +10,19 @@ npm run dogfood
 
 You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
 
-On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs explorer.
+On the landing screen only, `1-5` switch between palette presets and `←` / `→` cycle themes. `Esc` or `q` quit immediately there; any other unmodified key enters the docs shell.
 
-Mouse is enabled for this preview. In the docs explorer, click a pane to focus it and use the wheel to scroll long docs or help content.
+Mouse is enabled for this preview. In the docs shell, click a pane to
+focus it and use the wheel to scroll long docs or help content.
 
 ## What it proves
 
 - `ComponentStory` v0 can hold structured teaching fields instead of one markdown blob
 - a landing page and a documentation shell can both be driven from the same story substrate
-- the docs pane and preview pane both derive from the same story record once you enter the explorer
+- the docs shell can carry both prose guides and the component explorer
+- the docs pane and preview pane both derive from the same story record once you enter the `Components` section
 - profile switching is part of the experience, not an afterthought
-- a framed shell can present accordion-style component families, selected component docs, and variant comparisons in a more website-like layout
+- a framed shell can present both top-level docs sections and a rich component browser without pretending those are the same thing
 
 ## Included stories
 
@@ -35,27 +37,28 @@ Mouse is enabled for this preview. In the docs explorer, click a pane to focus i
 - `↑` / `↓`: cycle landing-screen quality modes before entering the docs
 - `1` `2` `3` `4` `5`: switch landing-screen theme presets
 - `←` / `→`: cycle landing-screen themes
+- `[` / `]`: move between top-level docs sections
 - `?`: open keyboard help
-- `/`: search components in the standard shell search surface
+- `/`: search the current docs section in the standard shell search surface
 - `F2`: open the standard shell settings drawer
-- `↑` / `↓`: move through the focused lane's rows
-- `Enter` / `Space`: expand a family, select a component, or activate the focused row
-- `←` / `→`: collapse or expand the focused family on the left lane
+- `↑` / `↓`: move through the focused pane's rows
+- `Enter` / `Space`: open the focused guide, expand a family, select a component, or activate the focused row
+- `←` / `→`: collapse or expand the focused family on the left lane inside `Components`
 - `Tab` / `Shift+Tab`: move focus between panes
 - `j` / `k`: scroll the focused docs or demo pane
 - `d` / `u`: page the focused docs or demo pane
 - `1` `2` `3` `4`: switch rich, static, pipe, and accessible profiles
-- `,` / `.`: previous or next story variant
+- `,` / `.`: previous or next story variant inside `Components`
 - `?`: open or close keyboard help
 - `q` / `Esc`: open the standard quit-confirm modal
 
 ## Notes
 
-- This is intentionally smaller than the existing showcase. It is the first story-driven docs slice, not the final docs product.
+- This is intentionally smaller than the existing showcase. It is a living docs product in progress, not yet the final reference.
 - The docs are the demo: the page text and preview are generated from the same structured story data.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
-- The left and right rails are intentionally symmetric. The center lane keeps the extra space so the docs and live preview remain the primary reading surface.
-- The docs explorer already exposes shell-level search through the standard frame command palette, so users can jump straight to a component by name instead of walking the family tree first.
+- The `Guides`, `Packages`, `Philosophy`, and `Release` sections currently establish DOGFOOD's docs-site shape. The full repo/package/doctrine corpus still lands in follow-on release-blocker cycles.
+- The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to the current section's content instead of walking every list manually first.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.
 - Settings rows now carry real secondary descriptions, toggles render with checkbox-style `☐` / `☑` affordances, and choice rows use a distinct cycling marker so the drawer reads like a product settings surface instead of a plain text list.

@@ -67,9 +67,13 @@ Do **not** start release execution until the active lane in
 
 The current blockers are:
 
-- [DF-022 — Build Prose Docs Reader And Top-Level DOGFOOD Nav](./BACKLOG/v4.1.0/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
 - [DF-023 — Publish Repo, Package, And Release Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
+
+The shell-foundation work was closed in
+[DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md).
+The remaining blockers are about publishing the real corpus inside that
+shell.
 
 Its long-form release docs live in:
 
