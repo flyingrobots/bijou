@@ -97,6 +97,7 @@ These are valid follow-ons, but not the current center of gravity:
 - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](./BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
 - [LX-007 — Service-Oriented Localization Adapters](./BACKLOG/LX-007-service-oriented-localization-adapters.md)
 - [WF-002 — Migrate Legacy Planning Artifacts](./BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
+- [WF-007 — Align Local Validation With CI `typecheck:test` Gate](./BACKLOG/bad-code/WF-007-align-local-validation-with-ci-typecheck-test-gate.md)
 
 ## Historical Note
 
