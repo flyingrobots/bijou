@@ -43,9 +43,7 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 - active cycle:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest completed cycle:
-  - [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
-- release-target backlog:
-  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live backlog:
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - migration debt still worth tracking:

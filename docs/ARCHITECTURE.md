@@ -251,7 +251,7 @@ See:
 
 - [DOGFOOD](./DOGFOOD.md)
 - [Secondary Example Map](./EXAMPLES.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 ## What This File Is Not
 

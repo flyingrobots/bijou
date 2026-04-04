@@ -13,20 +13,15 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
     expect(cycle).toContain('Release / Migration');
   });
 
-  it('spawns explicit 4.1.0 blocker items for the missing DOGFOOD docs surfaces', () => {
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
+  it('spawns explicit DOGFOOD follow-on cycles that now exist as landed design docs', () => {
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
     expect(existsRepoPath('docs/design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md')).toBe(true);
     expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(true);
-
-    const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
-    expect(lane).toContain('Just closed');
-    expect(lane).toContain('DF-022');
-    expect(lane).toContain('DF-023');
-    expect(lane).toContain('DF-024');
+    expect(existsRepoPath('docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md')).toBe(true);
   });
 
-  it('updates the release signposts to acknowledge reopened 4.1.0 blockers', () => {
+  it('updates the release signposts to acknowledge the DOGFOOD follow-through and smoke closure', () => {
     const plan = readRepoFile('docs/PLAN.md');
     const bearing = readRepoFile('docs/BEARING.md');
     const release = readRepoFile('docs/release.md');
@@ -35,13 +30,13 @@ describe('DF-021 shape DOGFOOD as terminal docs system', () => {
     expect(plan).toContain('DF-022');
     expect(plan).toContain('DF-023');
     expect(plan).toContain('DF-024');
-    expect(plan).toContain('docs/BACKLOG/v4.1.0/');
+    expect(plan).toContain('WF-003');
     expect(bearing).toContain('DF-022');
     expect(bearing).toContain('DF-023');
     expect(bearing).toContain('DF-024');
-    expect(bearing).toContain('docs/BACKLOG/v4.1.0/');
-    expect(release).toContain('docs/BACKLOG/v4.1.0/');
+    expect(bearing).toContain('WF-003');
     expect(release).toContain('DF-023');
     expect(release).toContain('DF-024');
+    expect(release).toContain('smoke:dogfood');
   });
 });

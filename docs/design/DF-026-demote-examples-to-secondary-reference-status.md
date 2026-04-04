@@ -107,4 +107,4 @@ examples are for.
 
 That leaves one remaining `4.1.0` blocker:
 
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./WF-003-replace-smoke-examples-with-smoke-dogfood.md)

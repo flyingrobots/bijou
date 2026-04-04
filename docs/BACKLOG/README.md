@@ -27,4 +27,4 @@ Version-target lanes like `v4.1.0/` are temporary. Use them only for
 cycles that must close before that release ships, including cases where
 release posture, docs-surface truth, and validation still disagree.
 
-The active version-target release lane is currently `v4.1.0/`.
+There is no active version-target release lane right now.

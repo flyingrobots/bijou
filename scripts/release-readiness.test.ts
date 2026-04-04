@@ -14,7 +14,7 @@ describe('release-readiness', () => {
       'release:preflight',
       'test:frames',
       'smoke:canaries',
-      'smoke:examples:all',
+      'smoke:dogfood',
       'test',
     ]);
     expect(plan.find((step) => step.label === 'smoke:canaries')?.args).toEqual([
@@ -23,9 +23,9 @@ describe('release-readiness', () => {
       '--',
       '--skip-build',
     ]);
-    expect(plan.find((step) => step.label === 'smoke:examples:all')?.args).toEqual([
+    expect(plan.find((step) => step.label === 'smoke:dogfood')?.args).toEqual([
       'run',
-      'smoke:examples:all',
+      'smoke:dogfood',
       '--',
       '--skip-build',
     ]);

@@ -62,12 +62,10 @@ The currently shaped next release target is **`4.1.0`**.
 
 A later DOGFOOD shaping cycle reopened cycle-shaped `4.1.0` blockers.
 
-Do **not** start release execution until the active lane in
-[`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) is closed again.
+That lane is now closed again.
 
-The current blockers are:
-
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+The last blocker was
+[WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md).
 
 The shell-foundation work was closed in
 [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md).
@@ -77,8 +75,8 @@ The philosophy/architecture corpus publication was closed in
 [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md).
 The example-demotion posture was closed in
 [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md).
-The remaining blocker is now the release smoke contract:
-`smoke:examples:*` still needs to move onto DOGFOOD.
+The release smoke contract is now DOGFOOD-centered through
+`smoke:dogfood`, `smoke:dogfood:landing`, and `smoke:dogfood:docs`.
 
 Its long-form release docs live in:
 
@@ -225,13 +223,13 @@ these gates in order:
 7. `release:preflight`
 8. `test:frames`
 9. `smoke:canaries -- --skip-build`
-10. `smoke:examples:all -- --skip-build`
+10. `smoke:dogfood -- --skip-build`
 11. `npm test`
 
 Abort on any failure.
 
 This still reflects the current repo tooling, not the intended end
-state. [WF-003](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+state. [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 is a release blocker specifically because this phase must move to a
 DOGFOOD-centered smoke contract before `4.1.0` is cut.
 

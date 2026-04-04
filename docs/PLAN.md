@@ -56,9 +56,8 @@ The release decision is now:
 - the i18n publish surface is closed in the automated release path
 - the short-form release surfaces are aligned to the real
   `v4.0.0..HEAD` boundary
-- cycle-shaped blockers are open again in
-  [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) because DOGFOOD
-  still needs to move the release smoke contract onto DOGFOOD
+- the cycle-shaped blockers are cleared again after DOGFOOD took over
+  the release smoke contract
 
 So the work now should stay narrower and more structural:
 
@@ -73,8 +72,8 @@ So the work now should stay narrower and more structural:
 
 ## Before 4.1.0 Ships
 
-- close the `v4.1.0` backlog lane:
-  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- keep the cycle-shaped blocker lane cleared:
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - run `npm run release:preflight`
 - run `npm run release:readiness`
 - run the GitHub Release Dry Run workflow

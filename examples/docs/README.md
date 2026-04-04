@@ -62,7 +62,7 @@ focus it and use the wheel to scroll long docs or help content.
 - This is intentionally smaller than the existing showcase. It is a living docs product in progress, not yet the final reference.
 - The docs are the demo: the page text and preview are generated from the same structured story data.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
-- The `Guides`, `Packages`, `Philosophy`, and `Release` sections are no longer just shell shape. They now publish real corpus pages inside the app. The remaining `4.1.0` DOGFOOD work is about demoting the old examples-first posture and moving smoke coverage onto DOGFOOD.
+- The `Guides`, `Packages`, `Philosophy`, and `Release` sections are no longer just shell shape. They now publish real corpus pages inside the app, and the release-facing smoke contract now runs through DOGFOOD instead of the broad examples tree.
 - The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to the current section's content instead of walking every list manually first.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.

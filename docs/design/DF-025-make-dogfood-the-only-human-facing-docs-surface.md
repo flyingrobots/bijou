@@ -178,7 +178,7 @@ This cycle should tighten the `4.1.0` blocker lane by:
   as a release blocker
 - keeping [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
   as a release blocker
-- moving [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- moving [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./WF-003-replace-smoke-examples-with-smoke-dogfood.md)
   into the `v4.1.0` blocker lane
 - spawning [DF-026 — Demote Examples To Secondary Reference Status](./DF-026-demote-examples-to-secondary-reference-status.md)
   as an explicit docs-surface blocker

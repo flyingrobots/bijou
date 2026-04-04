@@ -120,7 +120,7 @@ Bijou keeps its established naming:
 ```text
 RE-007-migrate-framed-shell-onto-runtime-engine-seams.md
 DX-004-smooth-surface-and-string-composition-seams.md
-WF-003-replace-smoke-examples-with-smoke-dogfood.md
+DF-020-deepen-dogfood-story-depth-and-variant-quality.md
 ```
 
 ### Promotion

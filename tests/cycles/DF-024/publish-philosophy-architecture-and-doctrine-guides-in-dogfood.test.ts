@@ -66,11 +66,6 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
   it('moves DF-024 out of the active 4.1.0 blocker list', () => {
     expect(existsRepoPath('docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(false);
-
-    const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
-    const currentBlockers = lane.split('## Current blockers')[1]?.split('## Just closed')[0] ?? '';
-    expect(currentBlockers).not.toContain('DF-024');
-    expect(lane).toContain('Just closed');
-    expect(lane).toContain('DF-024');
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
   });
 });

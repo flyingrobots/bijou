@@ -125,4 +125,4 @@ That leaves the remaining blocker work more honest and more focused:
 
 - [DF-024 — Publish Philosophy, Architecture, And Doctrine Guides In DOGFOOD](./DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - [DF-026 — Demote Examples To Secondary Reference Status](./DF-026-demote-examples-to-secondary-reference-status.md)
-- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](./WF-003-replace-smoke-examples-with-smoke-dogfood.md)

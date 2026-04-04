@@ -29,9 +29,9 @@ That means:
 - treat [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
   as the cycle that makes DOGFOOD, not `examples/`, the only
   human-facing docs front door for `4.1.0`
-- clear the active `v4.1.0` blocker lane in
-  [`docs/BACKLOG/v4.1.0/`](./BACKLOG/v4.1.0/README.md) before release
-  execution begins
+- treat [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+  as the cycle that moves release smoke onto DOGFOOD and clears the last
+  cycle-shaped `4.1.0` blocker
 - ship the runtime-engine story through
   [RE-006](./design/RE-006-formalize-component-layout-and-interaction-contracts.md)
   in `4.1.0`
@@ -56,16 +56,16 @@ The latest merged runtime- and release-shaping slices are:
 - [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
 - [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
 - [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
+- [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 
 ## What Feels Wrong?
 
-- DOGFOOD now has the repo/package/release/philosophy corpus inside the
-  app, and the repo-facing docs now treat examples as secondary, but
-  release smoke still has not moved onto DOGFOOD
-- some implementation and validation surfaces still center examples even
-  though DOGFOOD is now the docs product
-- the remaining `4.1.0` work is still not only release execution; the
-  open blocker is now the smoke-contract cycle rather than shell shape
+- DOGFOOD now owns the public docs corpus and the release smoke
+  contract, but the actual `4.1.0` execution steps still remain
+- some internal reference tooling still carries example-first names even
+  though the public posture is now DOGFOOD-first
+- the remaining `4.1.0` work is operational release execution rather
+  than another cycle-shaped blocker
 - `RE-007` and other follow-ons still need to stay outside the `4.1.0`
   release boundary
 - `PLAN.md`, legends, and backlog placement had drifted from what had

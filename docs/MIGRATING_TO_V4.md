@@ -218,7 +218,7 @@ At minimum, run:
 npm run build
 npm test
 npm run typecheck:test
-npm run smoke:examples:all
+npm run smoke:dogfood -- --skip-build
 ```
 
 ## Canonical Runtime References

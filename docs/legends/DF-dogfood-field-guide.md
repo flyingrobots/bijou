@@ -74,10 +74,9 @@ before DOGFOOD counts as a real terminal docs product, and can see that
   - DOGFOOD now publishes repo orientation, package docs, release docs,
     doctrine, architecture, invariants, and design-system guidance
     inside that shell
-  - the next important gap is no longer docs posture; it is moving the
-    release smoke contract onto DOGFOOD
-- release-target backlog:
-  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+  - DOGFOOD now also owns the release-facing smoke contract
+- latest workflow closure:
+  - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live follow-on backlog:
   - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - historical backlog lineage:

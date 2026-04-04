@@ -57,13 +57,10 @@ describe('DF-022 build prose docs reader and top-level DOGFOOD nav cycle', () =>
     expect(text).toContain('Documentation coverage');
   });
 
-  it('leaves the remaining 4.1.0 blockers focused on corpus publication', () => {
-    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(true);
-    const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
-
-    expect(lane).toContain('Just closed');
-    expect(lane).toContain('DF-023');
-    expect(lane).toContain('DF-024');
-    expect(lane).toContain('DF-022');
+  it('now sits alongside the landed DOGFOOD publication and smoke cycles', () => {
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
+    expect(existsRepoPath('docs/design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md')).toBe(true);
+    expect(existsRepoPath('docs/design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md')).toBe(true);
+    expect(existsRepoPath('docs/design/WF-003-replace-smoke-examples-with-smoke-dogfood.md')).toBe(true);
   });
 });

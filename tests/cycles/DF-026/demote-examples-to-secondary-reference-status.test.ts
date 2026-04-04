@@ -53,15 +53,10 @@ describe('DF-026 demote examples to secondary reference status', () => {
     expect(docsExamples).toContain('start with [DOGFOOD]');
   });
 
-  it('leaves WF-003 as the only active 4.1.0 blocker', () => {
+  it('keeps examples secondary after the DOGFOOD smoke closure', () => {
     expect(existsRepoPath('docs/design/DF-026-demote-examples-to-secondary-reference-status.md')).toBe(true);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/DF-026-demote-examples-to-secondary-reference-status.md')).toBe(false);
-
-    const lane = readRepoFile('docs/BACKLOG/v4.1.0/README.md');
-    const currentBlockers = lane.split('## Current blockers')[1]?.split('## Just closed')[0] ?? '';
-    expect(currentBlockers).not.toContain('DF-026');
-    expect(currentBlockers).toContain('WF-003');
-    expect(lane).toContain('Just closed');
-    expect(lane).toContain('DF-026');
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
+    expect(readRepoFile('docs/EXAMPLES.md')).toContain('Release smoke now runs through `smoke:dogfood`.');
   });
 });

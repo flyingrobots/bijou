@@ -187,7 +187,7 @@ The next release should be **`4.1.0`**, stable.
 ### Explicitly deferred from `4.1.0`
 
 - [RE-007](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
-- [WF-003](../BACKLOG/v4.1.0/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- [WF-003](./WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - [DF-020](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - [DL-009](../BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
 - the remaining localization follow-ons in
