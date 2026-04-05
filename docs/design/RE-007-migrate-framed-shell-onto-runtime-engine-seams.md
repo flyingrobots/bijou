@@ -15,6 +15,48 @@ Depends on:
 - [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
 - [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
 
+## Sponsor human
+
+A maintainer evolving the framed shell who needs to explain layer
+ownership, routing, and command dispatch in runtime-engine terms instead
+of tracing ad hoc branch order.
+
+## Sponsor agent
+
+An agent inspecting or testing the framed shell that needs to recover
+runtime-backed view stacks, retained layout geometry, and buffered
+command/effect truth through the same vocabulary the runtime engine
+exposes everywhere else.
+
+## Non-goals
+
+- Rewriting shell rendering or visual output. This cycle migrates
+  ownership and routing, not painting.
+- Changing outward shell behavior. The shell should act the same after
+  each slice; only the internal truth source changes.
+- Migrating non-shell runtime consumers. Other runtime adopters are
+  separate cycles.
+
+## Accessibility / assistive reading posture
+
+Not directly affected. This cycle changes internal ownership, not
+user-facing output. Assistive reading contracts remain wherever the
+shell already honors them.
+
+## Localization / directionality posture
+
+Not directly affected. Shell localization surfaces are unchanged by
+this migration. Directionality remains the responsibility of the
+rendering layer, which this cycle does not touch.
+
+## Agent inspectability / explainability posture
+
+Central to this cycle. Every slice must leave the shell's runtime
+state inspectable through the same `RuntimeViewStack`,
+`RuntimeRetainedLayouts`, and runtime buffer vocabulary that agents
+already use for non-shell runtime work. The agent hill is the
+primary proof surface.
+
 ## Why this cycle exists
 
 The runtime engine now has explicit seams for:
