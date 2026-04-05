@@ -1606,6 +1606,65 @@ describe('createFramedApp', () => {
     expect(cmds).toHaveLength(0);
   });
 
+  it('routes key ownership through the runtime view stack before page bindings', () => {
+    const observed: string[] = [];
+    const app = createFramedApp<PageModel, Msg>({
+      pages: [makePage('home', 'Home', 'main')],
+      settings: () => ({
+        title: 'Settings',
+        sections: [{
+          id: 'shell',
+          title: 'Shell',
+          rows: [{
+            id: 'show-hints',
+            label: 'Show hints',
+            valueLabel: 'On',
+            kind: 'toggle',
+            action: { type: 'toggle-hints' },
+          }],
+        }],
+      }),
+      enableCommandPalette: true,
+      observeKey(msg, route) {
+        observed.push(`${route}:${msg.ctrl ? 'ctrl+' : ''}${msg.key}`);
+        return undefined;
+      },
+    });
+
+    let [model] = app.init();
+    [model] = app.update(ctrlKey(','), model);
+    expect((model as any).settingsOpen).toBe(true);
+
+    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    [model, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+    expect(model.pageModels.home?.count).toBe(0);
+    expect(cmds).toHaveLength(0);
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).helpOpen).toBe(true);
+
+    [model] = app.update(ctrlKey('p'), model);
+    expect((model as any).commandPalette).toBeUndefined();
+
+    [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).helpOpen).toBe(false);
+
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).commandPaletteKind).toBe('search');
+
+    [model] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
+
+    expect(observed).toEqual([
+      'frame:ctrl+,',
+      'frame:x',
+      'frame:?',
+      'help:ctrl+p',
+      'help:escape',
+      'frame:/',
+      'palette:x',
+    ]);
+  });
+
   it('shows a shell-owned toast when a settings row is activated', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -2088,6 +2147,19 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    const scrolledY = (model as any).notificationCenterScrollY;
+
+    const outsideWheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 10,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -2101,7 +2173,8 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click as unknown as MsgWithMouse, model);
 
-    expect((model as any).notificationCenterScrollY).toBeGreaterThan(0);
+    expect((model as any).notificationCenterScrollY).toBe(scrolledY);
+    expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
 
@@ -2157,6 +2230,19 @@ describe('createFramedApp', () => {
       ctrl: false,
     };
     [model] = app.update(wheel as unknown as MsgWithMouse, model);
+    const scrolledY = (model as any).settingsScrollY;
+
+    const outsideWheel: MouseMsg = {
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 60,
+      row: 5,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    };
+    [model] = app.update(outsideWheel as unknown as MsgWithMouse, model);
 
     const click: MouseMsg = {
       type: 'mouse',
@@ -2170,7 +2256,8 @@ describe('createFramedApp', () => {
     };
     [model] = app.update(click as unknown as MsgWithMouse, model);
 
-    expect((model as any).settingsScrollY).toBeGreaterThan(0);
+    expect((model as any).settingsScrollY).toBe(scrolledY);
+    expect(scrolledY).toBeGreaterThan(0);
     expect(model.pageModels.home?.count).toBe(0);
   });
 

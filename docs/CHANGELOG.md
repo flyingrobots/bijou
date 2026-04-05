@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`) are versioned in lock-step.
 
+## Unreleased
+
+### ✨ Features
+
+- **RE-007 migrate framed shell onto runtime engine seams** — the framed shell now routes all key and mouse input through the runtime engine's `routeRuntimeInput` infrastructure, producing `FrameShellCommand` facts that are buffered via `bufferRuntimeRouteResult` and applied via `applyRuntimeCommandBuffer`. Shell commands are a plain discriminated union interpreted by a handler table inside `createFramedApp`, not classes with behavior. Sub-layer mouse hit-testing uses retained layout trees with `tab:{pageId}`, `pane:{paneId}`, and `settings-row:{index}` layout nodes. The `update()` key and mouse branches are reduced to single-line buffer drains. Removed: `handleFrameMouse`, `paneHitAtPosition`, `settingsRowAtPosition`, `isInsideSettingsDrawer`, `withObservedKey`, `applyQuitRequest`, `observedRouteForLayer`, `applyHelpScrollAction`. The cycle is captured in [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md).
+
 ## [4.1.0] - 2026-04-04
 
 This release section is aligned to the actual `v4.0.0..v4.1.0`

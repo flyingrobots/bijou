@@ -15,6 +15,48 @@ Depends on:
 - [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
 - [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
 
+## Sponsor human
+
+A maintainer evolving the framed shell who needs to explain layer
+ownership, routing, and command dispatch in runtime-engine terms instead
+of tracing ad hoc branch order.
+
+## Sponsor agent
+
+An agent inspecting or testing the framed shell that needs to recover
+runtime-backed view stacks, retained layout geometry, and buffered
+command/effect truth through the same vocabulary the runtime engine
+exposes everywhere else.
+
+## Non-goals
+
+- Rewriting shell rendering or visual output. This cycle migrates
+  ownership and routing, not painting.
+- Changing outward shell behavior. The shell should act the same after
+  each slice; only the internal truth source changes.
+- Migrating non-shell runtime consumers. Other runtime adopters are
+  separate cycles.
+
+## Accessibility / assistive reading posture
+
+Not directly affected. This cycle changes internal ownership, not
+user-facing output. Assistive reading contracts remain wherever the
+shell already honors them.
+
+## Localization / directionality posture
+
+Not directly affected. Shell localization surfaces are unchanged by
+this migration. Directionality remains the responsibility of the
+rendering layer, which this cycle does not touch.
+
+## Agent inspectability / explainability posture
+
+Central to this cycle. Every slice must leave the shell's runtime
+state inspectable through the same `RuntimeViewStack`,
+`RuntimeRetainedLayouts`, and runtime buffer vocabulary that agents
+already use for non-shell runtime work. The agent hill is the
+primary proof surface.
+
 ## Why this cycle exists
 
 The runtime engine now has explicit seams for:
@@ -148,7 +190,149 @@ What this first slice does not land:
 - no runtime-buffer-backed shell command/effect dispatch yet
 - no removal of every shell-local branch
 
-Follow-on inside this same cycle:
+What the second slice lands:
 
-- migrate shell routing onto retained layouts
-- migrate shell command/effect dispatch onto runtime buffers
+- route key ownership through the runtime view stack instead of
+  choosing shell owners from ad hoc top-layer branches
+- use retained shell drawer layouts so pointer ownership for settings
+  and notification center comes from runtime hit-testing instead of
+  drawer-specific inside/outside helpers alone
+
+What the third slice lands:
+
+- a workspace retained layout tree with header tab and pane children
+  so sub-layer hit-testing uses the same retained layout infrastructure
+- settings row children in the settings retained layout so row click
+  resolution uses layout path inspection instead of scroll-offset math
+- `paneHitAtPosition`, `settingsRowAtPosition`, and
+  `isInsideSettingsDrawer` removed — all replaced by retained layout
+  path inspection through `routedHit`
+- `resolveWorkspacePaneRects` extracted as a shared pane geometry
+  resolver for both the workspace layout tree and the mouse handler
+
+What the fourth slice lands:
+
+- `FrameShellCommand<Msg>` discriminated union in `app-frame-types.ts`
+  covering every shell mutation and command emission as plain data facts
+- a handler table inside `createFramedApp` that interprets each command
+  variant through model mutation and TEA command accumulation
+- `drainShellCommandBuffer` using `bufferRuntimeRouteResult` and
+  `applyRuntimeCommandBuffer` to process route results
+- mouse routing handler produces shell commands directly instead of
+  delegating to a separate `handleFrameMouse` function
+- key routing handler produces shell commands through per-layer helper
+  functions (`handlePaletteLayerKeyCommands`,
+  `handleSettingsLayerKeyCommands`, `handleWorkspaceLayerKeyCommands`,
+  etc.) instead of a 280-line if-chain in `update()`
+- `update()` key and mouse branches reduced to single-line buffer
+  drains
+- removed: `handleFrameMouse`, `withObservedKey`, `applyQuitRequest`,
+  `observedRouteForLayer`, `applyHelpScrollAction`
+
+What this cycle does not address:
+
+- notification toast hit-testing stays outside the retained layout
+  system (viewport-positioned overlays managed by notification.ts)
+- FrameScopedMsg branches (timers, transitions, notification ticks)
+  stay as special cases in update() — they are frame-owned state
+  mutations, not routed input events
+
+## Runtime-buffer-backed command/effect dispatch — design intent
+
+This section captures the architectural intent for the final slice so it
+is not lost across sessions.
+
+### Current pattern
+
+The shell's `update()` function has two separate steps:
+
+1. **Routing**: `resolveRoutedKeyLayer()` / `resolveRoutedMouseLayer()`
+   calls `routeRuntimeInput()` to determine which layer owns the input.
+   The routing handler callback returns `{ handled: true }` or
+   `{ stop: true }` — it never produces commands or effects.
+
+2. **Command production**: After routing, the `update()` function
+   matches on `routedLayer.kind` through a long chain of `if` branches,
+   each producing `[model, Cmd<FramedAppMsg<Msg>>[]]` tuples with
+   manually accumulated command arrays.
+
+These are decoupled: routing decides ownership, then entirely separate
+code produces commands. The runtime buffer API
+(`RuntimeCommandBuffer`, `RuntimeEffectBuffer`, `bufferRuntimeRouteResult`,
+`applyRuntimeCommandBuffer`) exists but the shell does not use it.
+
+### Target pattern
+
+Input is routed through the runtime view stack. Instead of routing
+handlers returning bare `{ handled: true }`, they return commands and
+effects as part of the route outcome:
+
+```
+routeRuntimeInput(stack, layouts, event, ({ layer, hit }) => {
+  // Layer-specific command production happens HERE,
+  // inside the routing callback
+  return {
+    handled: true,
+    commands: [emitMsgForPage(pageId, action)],
+    effects: [],
+  };
+});
+```
+
+The route result carries accumulated commands and effects from all
+visited layers. The shell then buffers them:
+
+```
+const buffers = bufferRuntimeRouteResult(
+  createRuntimeBuffers(),
+  routeResult,
+);
+```
+
+And applies them after routing completes:
+
+```
+const { state, applied } = applyRuntimeCommandBuffer(
+  model,
+  buffers.commands,
+  applyCommand,
+);
+```
+
+### Why this matters
+
+- Routing and command production become one step instead of two. The
+  layer that handles the input also says what should happen, inside the
+  same callback.
+- The long `if (routedLayer.kind === ...)` chain in `update()` moves
+  into the routing handler, which already knows the layer context.
+- Commands are collected through the same buffer mechanism the runtime
+  engine uses for component-level input handling, instead of through
+  ad-hoc array accumulation.
+- Effects become a first-class channel. The shell currently has no
+  explicit effect separation — everything is a command. The buffer API
+  gives effects their own lane without changing the TEA return type.
+
+### Scope
+
+This is a structural refactoring of the shell's update function. It
+touches ~20 functions across `app-frame.ts`, `app-frame-actions.ts`,
+and `app-frame-palette.ts`. The change is repetitive but mechanical:
+every `[model, cmds]` return site moves into a routing handler that
+returns `{ handled: true, commands: [...] }`.
+
+Outward shell behavior must not change. The same inputs must produce
+the same model transitions and the same commands.
+
+### Risks
+
+- The routing handler closure becomes large because it absorbs all
+  layer-specific logic. May need to extract per-layer handler functions
+  to keep readability.
+- The TEA `update()` return type (`[Model, Cmd[]]`) is consumed by
+  the event bus. The buffer API produces `RuntimeBuffers`, which must
+  be drained back into `Cmd[]` at the boundary. This is a seam, not a
+  full TEA replacement.
+- Key priority logic (`frame-first` vs `page-first`) currently lives
+  outside routing. It needs to move into the routing handler or be
+  resolved before routing begins.
