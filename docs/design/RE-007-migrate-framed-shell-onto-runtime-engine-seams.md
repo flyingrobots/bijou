@@ -190,12 +190,33 @@ What this first slice does not land:
 - no runtime-buffer-backed shell command/effect dispatch yet
 - no removal of every shell-local branch
 
-Follow-on inside this same cycle:
+What the second slice lands:
 
 - route key ownership through the runtime view stack instead of
   choosing shell owners from ad hoc top-layer branches
 - use retained shell drawer layouts so pointer ownership for settings
   and notification center comes from runtime hit-testing instead of
   drawer-specific inside/outside helpers alone
-- migrate shell routing onto retained layouts
+
+What the third slice lands:
+
+- a workspace retained layout tree with header tab and pane children
+  so sub-layer hit-testing uses the same retained layout infrastructure
+- settings row children in the settings retained layout so row click
+  resolution uses layout path inspection instead of scroll-offset math
+- `paneHitAtPosition`, `settingsRowAtPosition`, and
+  `isInsideSettingsDrawer` removed — all replaced by retained layout
+  path inspection through `routedHit`
+- `resolveWorkspacePaneRects` extracted as a shared pane geometry
+  resolver for both the workspace layout tree and the mouse handler
+
+What this cycle does not land yet:
+
+- no runtime-buffer-backed shell command/effect dispatch yet
+- no removal of every remaining shell-local branch
+- notification toast hit-testing stays outside the retained layout
+  system (viewport-positioned overlays managed by notification.ts)
+
+Follow-on inside this same cycle:
+
 - migrate shell command/effect dispatch onto runtime buffers

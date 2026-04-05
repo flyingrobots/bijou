@@ -46,4 +46,30 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(cycle).toContain('key ownership through the runtime view stack');
     expect(cycle).toContain('retained shell drawer layouts');
   });
+
+  it('migrates workspace and settings sub-layer routing onto retained layouts', () => {
+    const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
+    const cycle = readRepoFile('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
+
+    // Workspace layout tree with tab and pane children
+    expect(appFrame).toContain('buildWorkspaceLayoutTree');
+    expect(appFrame).toContain("'header-bar'");
+    expect(appFrame).toContain("'workspace-body'");
+    expect(appFrame).toContain("`tab:${");
+    expect(appFrame).toContain("`pane:${");
+
+    // Settings row children in the retained layout
+    expect(appFrame).toContain('buildSettingsRowChildren');
+    expect(appFrame).toContain("`settings-row:${");
+
+    // Pane geometry extraction
+    expect(appFrame).toContain('resolveWorkspacePaneRects');
+
+    // Workspace retained layout registration
+    expect(appFrame).toContain("viewId: 'workspace'");
+
+    // Cycle doc records the slice
+    expect(cycle).toContain('workspace retained layout');
+    expect(cycle).toContain('settings row children');
+  });
 });

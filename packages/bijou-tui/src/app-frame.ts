@@ -839,6 +839,7 @@ export function createFramedApp<PageModel, Msg>(
   function createShellRetainedLayoutNode(
     id: string,
     rect: LayoutRect,
+    children?: SurfaceLayoutNode[],
   ): SurfaceLayoutNode {
     return {
       id,
@@ -848,8 +849,81 @@ export function createFramedApp<PageModel, Msg>(
         width: rect.width,
         height: rect.height,
       },
-      children: [],
+      children: children ?? [],
     };
+  }
+
+  function resolveWorkspacePaneRects(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): ReadonlyMap<string, LayoutRect> {
+    const bodyRect = resolveBodyRect(model, options);
+    const maxState = model.maximizedPaneByPage[model.activePageId];
+    const maximizedPaneId = maxState?.maximizedPaneId;
+    const renderResult = maximizedPaneId
+      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+      : renderPageContent(model.activePageId, model, bodyRect, pagesById);
+    return renderResult.paneRects;
+  }
+
+  function buildWorkspaceLayoutTree(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): SurfaceLayoutNode {
+    const header = resolveHeaderLine(model, options, pagesById);
+    const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
+      createShellRetainedLayoutNode(`tab:${target.pageId}`, {
+        row: 0,
+        col: target.startCol,
+        width: target.endCol - target.startCol + 1,
+        height: 1,
+      }),
+    );
+
+    const bodyRect = resolveBodyRect(model, options);
+    const paneRects = resolveWorkspacePaneRects(model);
+    const paneChildren: SurfaceLayoutNode[] = [];
+    for (const [paneId, rect] of paneRects.entries()) {
+      paneChildren.push(createShellRetainedLayoutNode(`pane:${paneId}`, rect));
+    }
+
+    return createShellRetainedLayoutNode(
+      'workspace',
+      { row: 0, col: 0, width: model.columns, height: model.rows },
+      [
+        createShellRetainedLayoutNode(
+          'header-bar',
+          { row: 0, col: 0, width: model.columns, height: 1 },
+          tabChildren,
+        ),
+        createShellRetainedLayoutNode(
+          'workspace-body',
+          bodyRect,
+          paneChildren,
+        ),
+      ],
+    );
+  }
+
+  function buildSettingsRowChildren(
+    model: InternalFrameModel<PageModel, Msg>,
+    layout: ResolvedSettingsLayout<Msg>,
+  ): SurfaceLayoutNode[] {
+    const scrollY = clampSettingsScroll(model, layout);
+    const viewportTop = 1;
+    const viewportBottom = model.rows - 1;
+    const children: SurfaceLayoutNode[] = [];
+    for (const flatRow of layout.rows) {
+      const screenRow = flatRow.line - scrollY + viewportTop;
+      const clippedTop = Math.max(viewportTop, screenRow);
+      const clippedBottom = Math.min(viewportBottom, screenRow + flatRow.height);
+      if (clippedTop >= clippedBottom) continue;
+      children.push(createShellRetainedLayoutNode(`settings-row:${flatRow.index}`, {
+        row: clippedTop,
+        col: layout.startCol,
+        width: layout.drawerWidth,
+        height: clippedBottom - clippedTop,
+      }));
+    }
+    return children;
   }
 
   function resolveFrameMouseRuntimeLayouts(
@@ -866,7 +940,7 @@ export function createFramedApp<PageModel, Msg>(
           col: settingsLayout.startCol,
           width: settingsLayout.drawerWidth,
           height: model.rows,
-        }),
+        }, buildSettingsRowChildren(model, settingsLayout)),
       });
     }
 
@@ -882,6 +956,11 @@ export function createFramedApp<PageModel, Msg>(
         }),
       });
     }
+
+    layouts = retainRuntimeLayout(layouts, {
+      viewId: 'workspace',
+      tree: buildWorkspaceLayoutTree(model),
+    });
 
     return layouts;
   }
@@ -1144,13 +1223,16 @@ export function createFramedApp<PageModel, Msg>(
             if (!insideDrawer) {
               return [model, []];
             }
-            const hit = settingsRowAtPosition(msg.col, msg.row, model, layout);
-            if (hit == null) return [model, []];
-            const focusedModel = { ...model, settingsFocusIndex: hit.index };
-            if (hit.row.action === undefined || hit.row.enabled === false || hit.row.kind === 'info') {
+            const rowNode = routedHit?.path.find((n) => n.id?.startsWith('settings-row:'));
+            if (rowNode == null) return [model, []];
+            const rowIndex = parseInt(rowNode.id!.slice('settings-row:'.length), 10);
+            const hitRow = layout.rows.find((r) => r.index === rowIndex);
+            if (hitRow == null) return [model, []];
+            const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
+            if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
               return [focusedModel, []];
             }
-            return activateSettingsRow(focusedModel, hit.row);
+            return activateSettingsRow(focusedModel, hitRow.row);
           }
 
           return [model, []];
@@ -1202,55 +1284,63 @@ export function createFramedApp<PageModel, Msg>(
         }
       }
 
-      if (msg.row === 0) {
-        const header = resolveHeaderLine(model, options, pagesById);
-        const tab = header.tabTargets.find((target) =>
-          msg.col >= target.startCol && msg.col <= target.endCol,
-        );
-        if (tab != null) {
-          const currentIndex = model.pageOrder.indexOf(model.activePageId);
-          const nextIndex = model.pageOrder.indexOf(tab.pageId);
-          if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
-            return switchTab(model, nextIndex - currentIndex, pagesById, options);
-          }
-          return [model, []];
+      const tabNode = routedHit?.path.find((n) => n.id?.startsWith('tab:'));
+      if (tabNode != null) {
+        const pageId = tabNode.id!.slice('tab:'.length);
+        const currentIndex = model.pageOrder.indexOf(model.activePageId);
+        const nextIndex = model.pageOrder.indexOf(pageId);
+        if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
+          return switchTab(model, nextIndex - currentIndex, pagesById, options);
         }
         return [model, []];
       }
+      if (msg.row === 0) {
+        return [model, []];
+      }
 
-      const clickedPane = paneHitAtPosition(model, msg.col, msg.row, pagesById, options);
-      if (clickedPane != null) {
-        const focusedModel = focusPane(model, clickedPane.paneId);
-        const inputArea = findInputAreaByPaneId(inputAreas, clickedPane.paneId);
-        const areaMsg = inputArea?.mouse?.({
-          msg,
-          model: activePageModel,
-          rect: clickedPane.rect,
-        });
-        if (areaMsg !== undefined) {
-          return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+      const clickedPaneNode = routedHit?.path.find((n) => n.id?.startsWith('pane:'));
+      if (clickedPaneNode != null) {
+        const paneId = clickedPaneNode.id!.slice('pane:'.length);
+        const paneRects = resolveWorkspacePaneRects(model);
+        const paneRect = paneRects.get(paneId);
+        if (paneRect != null) {
+          const focusedModel = focusPane(model, paneId);
+          const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+          const areaMsg = inputArea?.mouse?.({
+            msg,
+            model: activePageModel,
+            rect: paneRect,
+          });
+          if (areaMsg !== undefined) {
+            return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+          }
+          return [focusedModel, [emitMsgForPage<Msg>(model.activePageId, msg)]];
         }
-        return [focusedModel, [emitMsgForPage<Msg>(model.activePageId, msg)]];
       }
     }
 
     if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-      const hoveredPane = paneHitAtPosition(model, msg.col, msg.row, pagesById, options);
-      if (hoveredPane != null) {
-        const focusedModel = focusPane(model, hoveredPane.paneId);
-        const inputArea = findInputAreaByPaneId(inputAreas, hoveredPane.paneId);
-        const areaMsg = inputArea?.mouse?.({
-          msg,
-          model: activePageModel,
-          rect: hoveredPane.rect,
-        });
-        if (areaMsg !== undefined) {
-          return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+      const scrollPaneNode = routedHit?.path.find((n) => n.id?.startsWith('pane:'));
+      if (scrollPaneNode != null) {
+        const paneId = scrollPaneNode.id!.slice('pane:'.length);
+        const paneRects = resolveWorkspacePaneRects(model);
+        const paneRect = paneRects.get(paneId);
+        if (paneRect != null) {
+          const focusedModel = focusPane(model, paneId);
+          const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+          const areaMsg = inputArea?.mouse?.({
+            msg,
+            model: activePageModel,
+            rect: paneRect,
+          });
+          if (areaMsg !== undefined) {
+            return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
+          }
+          const action: FrameAction = msg.action === 'scroll-down'
+            ? { type: 'scroll-down' }
+            : { type: 'scroll-up' };
+          return [scrollFocusedPane(focusedModel, action, pagesById, options), []];
         }
-        const action: FrameAction = msg.action === 'scroll-down'
-          ? { type: 'scroll-down' }
-          : { type: 'scroll-up' };
-        return [scrollFocusedPane(focusedModel, action, pagesById, options), []];
       }
     }
 
@@ -1923,34 +2013,6 @@ function focusPane<PageModel, Msg>(
   };
 }
 
-function paneHitAtPosition<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  col: number,
-  row: number,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-): { readonly paneId: string; readonly rect: LayoutRect } | undefined {
-  const bodyRect = resolveBodyRect(model, options);
-  const maxState = model.maximizedPaneByPage[model.activePageId];
-  const maximizedPaneId = maxState?.maximizedPaneId;
-  const renderResult = maximizedPaneId
-    ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
-    : renderPageContent(model.activePageId, model, bodyRect, pagesById);
-
-  for (const [paneId, rect] of renderResult.paneRects.entries()) {
-    if (
-      col >= rect.col
-      && col < rect.col + rect.width
-      && row >= rect.row
-      && row < rect.row + rect.height
-    ) {
-      return { paneId, rect };
-    }
-  }
-
-  return undefined;
-}
-
 function resolveBodyRect<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -2464,31 +2526,6 @@ function cycleNotificationCenterFilter<PageModel, Msg>(
     runtimeNotificationHistoryFilter: nextFilter,
     notificationCenterScrollY: 0,
   }, []];
-}
-
-function isInsideSettingsDrawer<PageModel, Msg>(
-  col: number,
-  row: number,
-  layout: ResolvedSettingsLayout<Msg>,
-  model: InternalFrameModel<PageModel, Msg>,
-): boolean {
-  return col >= layout.startCol
-    && col < layout.startCol + layout.drawerWidth
-    && row >= 0
-    && row < model.rows;
-}
-
-function settingsRowAtPosition<PageModel, Msg>(
-  col: number,
-  row: number,
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedSettingsLayout<Msg>,
-): FlatSettingsRow<Msg> | undefined {
-  if (!isInsideSettingsDrawer(col, row, layout, model)) return undefined;
-  if (row <= 0 || row >= model.rows - 1) return undefined;
-  const contentLine = (row - 1) + clampSettingsScroll(model, layout);
-  return layout.rows.find((candidate) =>
-    contentLine >= candidate.line && contentLine < candidate.line + candidate.height);
 }
 
 function renderSettingsDrawer<PageModel, Msg>(

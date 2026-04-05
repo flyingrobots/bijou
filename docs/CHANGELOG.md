@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`) are versioned in lock-step.
 
+## Unreleased
+
+### ✨ Features
+
+- **RE-007 migrate shell routing onto retained layouts** — the framed shell's sub-layer mouse hit-testing now routes through the runtime engine's retained layout infrastructure instead of ad-hoc coordinate checks. Header tab clicks resolve from a `tab:{pageId}` layout node, workspace pane clicks and scrolls resolve from `pane:{paneId}` layout nodes, and settings row clicks resolve from `settings-row:{index}` layout nodes. The workspace layer now registers a full retained layout tree in `resolveFrameMouseRuntimeLayouts()`, and settings drawer layouts carry visible-row children with scroll-aware screen-space clipping. The ad-hoc `paneHitAtPosition()`, `settingsRowAtPosition()`, and `isInsideSettingsDrawer()` helpers are removed. The cycle is captured in [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md).
+
 ## [4.1.0] - 2026-04-04
 
 This release section is aligned to the actual `v4.0.0..v4.1.0`
