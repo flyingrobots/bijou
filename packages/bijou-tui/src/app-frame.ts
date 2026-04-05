@@ -1333,7 +1333,7 @@ export function createFramedApp<PageModel, Msg>(
   ) {
     let layouts = EMPTY_RUNTIME_LAYOUTS;
 
-    const settingsLayout = resolveSettingsLayout(model, options, pagesById);
+    const settingsLayout = model.settingsOpen ? resolveSettingsLayout(model, options, pagesById) : undefined;
     if (settingsLayout != null) {
       layouts = retainRuntimeLayout(layouts, {
         viewId: 'settings',
@@ -1346,7 +1346,7 @@ export function createFramedApp<PageModel, Msg>(
       });
     }
 
-    const notificationCenterLayout = resolveNotificationCenterLayout(model, options, pagesById);
+    const notificationCenterLayout = model.notificationCenterOpen ? resolveNotificationCenterLayout(model, options, pagesById) : undefined;
     if (notificationCenterLayout != null) {
       layouts = retainRuntimeLayout(layouts, {
         viewId: 'notification-center',
