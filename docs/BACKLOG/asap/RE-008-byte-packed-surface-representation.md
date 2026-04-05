@@ -2,6 +2,9 @@
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
+See [RE-008 Perf Findings](../../design/RE-008-perf-findings.md) for
+the full benchmark data that motivates this work.
+
 ## Problem
 
 `Surface` was introduced to move bijou away from raw ANSI strings, but
