@@ -26,7 +26,7 @@ import {
 initDefaultContext();
 
 const CAPPED_MS = Math.round(1000 / 60);
-const UNCAPPED_MS = 0;
+const UNCAPPED_MS = 1; // >0 to yield to the event loop for key input
 const GRAPH_SAMPLES = 60;
 
 // --- Ring buffer for frame time history (zero-alloc after init) ---
