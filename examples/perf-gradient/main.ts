@@ -29,21 +29,88 @@ const CAPPED_MS = Math.round(1000 / 60);
 const UNCAPPED_MS = 1; // >0 to yield to the event loop for key input
 const GRAPH_SAMPLES = 60;
 
-// --- Ring buffer for frame time history (zero-alloc after init) ---
-const ftRing = new Float64Array(GRAPH_SAMPLES);
-let ftRingHead = 0;
-let ftRingCount = 0;
+// --- Ring buffer for view() time history (zero-alloc after init) ---
+const vtRing = new Float64Array(GRAPH_SAMPLES);
+let vtRingHead = 0;
+let vtRingCount = 0;
 
-function pushFt(ms: number): void {
-  ftRing[ftRingHead] = ms;
-  ftRingHead = (ftRingHead + 1) % GRAPH_SAMPLES;
-  if (ftRingCount < GRAPH_SAMPLES) ftRingCount++;
+function pushVt(ms: number): void {
+  vtRing[vtRingHead] = ms;
+  vtRingHead = (vtRingHead + 1) % GRAPH_SAMPLES;
+  if (vtRingCount < GRAPH_SAMPLES) vtRingCount++;
 }
 
-function readFt(i: number): number {
-  // i=0 is oldest, i=ftRingCount-1 is newest
-  const idx = (ftRingHead - ftRingCount + i + GRAPH_SAMPLES) % GRAPH_SAMPLES;
-  return ftRing[idx]!;
+function readVt(i: number): number {
+  const idx = (vtRingHead - vtRingCount + i + GRAPH_SAMPLES) % GRAPH_SAMPLES;
+  return vtRing[idx]!;
+}
+
+// --- Braille line chart renderer ---
+// Each braille char is a 2×4 dot grid (U+2800 base).
+// Dot positions:  col0: bits 0,1,2,6  col1: bits 3,4,5,7
+// Row mapping (top=0): row0=bit0/3, row1=bit1/4, row2=bit2/5, row3=bit6/7
+const BRAILLE_BASE = 0x2800;
+const BRAILLE_DOT_LEFT  = [0x01, 0x02, 0x04, 0x40]; // rows 0-3, left column
+const BRAILLE_DOT_RIGHT = [0x08, 0x10, 0x20, 0x80]; // rows 0-3, right column
+
+function renderBrailleLineChart(
+  surface: ReturnType<typeof createSurface>,
+  sx: number, sy: number,
+  chartW: number, chartH: number, // in chars
+  sampleCount: number,
+  readSample: (i: number) => number,
+  maxVal: number,
+  fg: string, bg: string, refFg: string,
+  refVal?: number,
+): void {
+  const dotsH = chartH * 4; // vertical dot resolution
+  const dotsW = chartW * 2; // horizontal dot resolution
+
+  // Build braille grid (one code point per char cell)
+  const grid = new Uint8Array(chartW * chartH);
+
+  // Plot the reference line
+  if (refVal !== undefined && refVal <= maxVal) {
+    const refDotY = dotsH - 1 - Math.round((refVal / maxVal) * (dotsH - 1));
+    const refCharRow = Math.floor(refDotY / 4);
+    const refDotRow = refDotY % 4;
+    for (let cx = 0; cx < chartW; cx++) {
+      // Set both left and right dots for a full horizontal line
+      grid[refCharRow * chartW + cx] |= BRAILLE_DOT_LEFT[refDotRow]! | BRAILLE_DOT_RIGHT[refDotRow]!;
+    }
+    // Draw the reference line first in ref color
+    for (let cx = 0; cx < chartW; cx++) {
+      const code = BRAILLE_BASE | grid[refCharRow * chartW + cx]!;
+      surface.set(sx + cx, sy + refCharRow, { char: String.fromCharCode(code), fg: refFg, bg });
+    }
+  }
+
+  // Plot data points as a connected line
+  for (let dotX = 0; dotX < dotsW && dotX < sampleCount; dotX++) {
+    const sampleIdx = sampleCount - dotsW + dotX;
+    if (sampleIdx < 0) continue;
+    const val = readSample(sampleIdx);
+    const dotY = dotsH - 1 - Math.round((Math.min(val, maxVal) / maxVal) * (dotsH - 1));
+    const charCol = Math.floor(dotX / 2);
+    const charRow = Math.floor(dotY / 4);
+    const dotCol = dotX % 2;
+    const dotRow = dotY % 4;
+    const bits = dotCol === 0 ? BRAILLE_DOT_LEFT[dotRow]! : BRAILLE_DOT_RIGHT[dotRow]!;
+    grid[charRow * chartW + charCol] |= bits;
+  }
+
+  // Render to surface
+  for (let cy = 0; cy < chartH; cy++) {
+    for (let cx = 0; cx < chartW; cx++) {
+      const code = grid[cy * chartW + cx]!;
+      if (code !== 0) {
+        surface.set(sx + cx, sy + cy, {
+          char: String.fromCharCode(BRAILLE_BASE | code),
+          fg, bg,
+        });
+      }
+    }
+  }
 }
 
 interface MemStats {
@@ -152,7 +219,7 @@ function stampText(
   }
 }
 
-const MODE_NAMES = ['gradient', 'horizon', 'noise', 'quad'];
+const MODE_NAMES = ['gradient', 'horizon', 'noise'];
 const MODE_COUNT = MODE_NAMES.length;
 
 // --- OpenSimplex noise (adapted from ertdfgcvb) ---
@@ -220,15 +287,12 @@ function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
 const noise2D = openSimplexNoise2D(42);
 const DENSITY = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';
 
-interface Rect { x: number; y: number; w: number; h: number }
-
-type Surf = ReturnType<typeof createSurface>;
-
-function fillGradient(surface: Surf, model: Model, r: Rect): void {
-  const direction = model.mouseDown ? -1 : 1;
-  const f = model.frame * 0.05 * direction;
-  for (let row = 0; row < r.h; row++) {
-    for (let col = 0; col < r.w; col++) {
+function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
+  const direction = mouseDown ? -1 : 1;
+  const f = frame * 0.05 * direction;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
       const phase = (col + row * 0.5) * 0.08;
       const r1 = clamp((cos(phase + 1 * f) + 1) * 127.5, 0, 255);
       const g1 = clamp((cos(phase + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
@@ -238,31 +302,32 @@ function fillGradient(surface: Surf, model: Model, r: Rect): void {
       const b2 = clamp((cos(phase * 0.08 + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
       cell.fg = rgbHex(r2, g2, b2);
       cell.bg = rgbHex(r1, g1, b1);
-      surface.set(r.x + col, r.y + row, cell);
+      surface.set(col, row, cell);
     }
   }
 }
 
-function fillHorizon(surface: Surf, model: Model, r: Rect): void {
-  const halfY = r.h / 2;
-  const halfX = r.w / 2;
-  const speed = (model.mouseDown ? -0.3 : 0.3);
+function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
+  const halfY = rows / 2;
+  const halfX = cols / 2;
+  const speed = (mouseDown ? -0.3 : 0.3);
 
-  for (let row = 0; row < r.h; row++) {
+  for (let row = 0; row < rows; row++) {
     const z = row - halfY;
-    for (let col = 0; col < r.w; col++) {
+    for (let col = 0; col < cols; col++) {
       if (z === 0) {
-        surface.set(r.x + col, r.y + row, { char: '─', fg: '#ffffff', bg: '#000000' });
+        surface.set(col, row, { char: '─', fg: '#ffffff', bg: '#000000' });
         continue;
       }
       const val = (col - halfX) / z;
-      const code = (Math.floor(val + halfX + model.frame * speed) % 94 + 94) % 94 + 33;
+      const code = (Math.floor(val + halfX + frame * speed) % 94 + 94) % 94 + 33;
       const depth = clamp(1 - Math.abs(z) / halfY, 0, 1);
       const bright = Math.round(depth * 200 + 55);
       const skyGround = z < 0
         ? rgbHex(bright * 0.3, bright * 0.4, bright)
         : rgbHex(bright * 0.2, bright * 0.6, bright * 0.2);
-      surface.set(r.x + col, r.y + row, {
+      surface.set(col, row, {
         char: String.fromCharCode(code),
         fg: rgbHex(bright, bright, bright),
         bg: skyGround,
@@ -271,40 +336,25 @@ function fillHorizon(surface: Surf, model: Model, r: Rect): void {
   }
 }
 
-function fillNoise(surface: Surf, model: Model, r: Rect): void {
-  const t = model.elapsed * 0.0007 * (model.mouseDown ? -1 : 1);
+function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, mouseDown } = model;
+  const t = model.elapsed * 0.0007 * (mouseDown ? -1 : 1);
   const s = 0.03;
-  const aspect = 0.5;
+  const aspect = 0.5; // terminal chars are ~2:1
 
-  for (let row = 0; row < r.h; row++) {
-    for (let col = 0; col < r.w; col++) {
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
       const x = col * s;
       const y = row * s / aspect + t;
       const n = noise2D(x, y + t * 0.3) * 0.5 + 0.5;
       const i = Math.floor(n * DENSITY.length);
       const ch = DENSITY[clamp(i, 0, DENSITY.length - 1)] ?? ' ';
+      // Lerp between the two colors based on noise value
       const bright = n;
-      const rv = Math.round(255 * bright * 0.3 + 246 * (1 - bright));
-      const gv = Math.round(89 * bright * 0.3 + 246 * (1 - bright));
-      const bv = Math.round(55 * bright * 0.3 + 244 * (1 - bright));
-      surface.set(r.x + col, r.y + row, { char: ch, fg: rgbHex(rv, gv, bv), bg: '#000000' });
-    }
-  }
-}
-
-function fillQuad(surface: Surf, model: Model, full: Rect): void {
-  const hw = Math.floor(full.w / 2);
-  const hh = Math.floor(full.h / 2);
-  // top-right = gradient
-  fillGradient(surface, model, { x: full.x + hw, y: full.y, w: full.w - hw, h: hh });
-  // bottom-left = horizon
-  fillHorizon(surface, model, { x: full.x, y: full.y + hh, w: hw, h: full.h - hh });
-  // bottom-right = noise
-  fillNoise(surface, model, { x: full.x + hw, y: full.y + hh, w: full.w - hw, h: full.h - hh });
-  // top-left = stats only (filled black, overlay draws on top)
-  for (let row = 0; row < hh; row++) {
-    for (let col = 0; col < hw; col++) {
-      surface.set(full.x + col, full.y + row, { char: ' ', fg: '#333333', bg: '#000000' });
+      const r = Math.round(255 * bright * 0.3 + 246 * (1 - bright));
+      const g = Math.round(89 * bright * 0.3 + 246 * (1 - bright));
+      const b = Math.round(55 * bright * 0.3 + 244 * (1 - bright));
+      surface.set(col, row, { char: ch, fg: rgbHex(r, g, b), bg: '#000000' });
     }
   }
 }
@@ -313,12 +363,10 @@ function renderFrame(model: Model) {
   const { cols, rows, mem } = model;
   const surface = getOrCreateSurface(cols, rows);
 
-  const full: Rect = { x: 0, y: 0, w: cols, h: rows };
   switch (model.mode) {
-    case 0: fillGradient(surface, model, full); break;
-    case 1: fillHorizon(surface, model, full); break;
-    case 2: fillNoise(surface, model, full); break;
-    case 3: fillQuad(surface, model, full); break;
+    case 0: fillGradient(surface, model); break;
+    case 1: fillHorizon(surface, model); break;
+    case 2: fillNoise(surface, model); break;
   }
 
   // --- Stats overlay ---
@@ -347,11 +395,12 @@ function renderFrame(model: Model) {
     { text: `gc    ${mem.gcCountSinceLastSample}/0.5s`, fg: mem.gcCountSinceLastSample > 5 ? '#ff6666' : '#88aaff' },
   ];
 
-  const graphW = GRAPH_SAMPLES;
-  const graphH = 8;
+  const graphCharsW = 30; // braille chars wide (60 dot columns = 60 samples)
+  const graphCharsH = 6;  // braille chars tall (24 dot rows of resolution)
+  const axisW = 6;        // width of Y axis labels
   const textW = max(...stats.map((s) => s.text.length));
-  const boxW = max(textW + 4, graphW + 4);
-  const boxH = stats.length + 2 + graphH + 2;
+  const boxW = max(textW + 4, graphCharsW + axisW + 5);
+  const boxH = stats.length + 2 + graphCharsH + 3; // stats + border + label + graph + x-label
 
   if (cols >= boxW + 2 && rows >= boxH + 2) {
     // Background
@@ -369,40 +418,40 @@ function renderFrame(model: Model) {
       }
     }
 
-    // --- Frame time graph ---
+    // --- View time braille line chart ---
     const graphTop = 2 + stats.length + 1;
-    const graphLeft = 3;
+    const graphLeft = 3 + axisW;
 
-    stampText(surface, graphLeft, graphTop - 1, 'frame time (ms)', '#666666', BG);
-
-    // Scale
-    let maxFt = 16.7;
-    for (let i = 0; i < ftRingCount; i++) {
-      const v = readFt(i);
-      if (v > maxFt) maxFt = v;
+    // Determine max scale from data
+    let maxVt = 4; // minimum 4ms scale
+    for (let i = 0; i < vtRingCount; i++) {
+      const v = readVt(i);
+      if (v > maxVt) maxVt = v;
     }
-    const scale = graphH / maxFt;
-    const refRow = graphTop + graphH - 1 - round(16.7 * scale);
+    maxVt = Math.ceil(maxVt); // round up for clean labels
 
-    for (let x = 0; x < graphW; x++) {
-      const sampleIdx = ftRingCount - graphW + x;
-      const ft = sampleIdx >= 0 ? readFt(sampleIdx) : 0;
-      const barH = max(0, min(graphH, round(ft * scale)));
+    // Title
+    stampText(surface, 3, graphTop - 1, `view() ms  (max ${maxVt.toFixed(0)}ms)`, '#666666', BG);
 
-      for (let y = 0; y < graphH; y++) {
-        const screenRow = graphTop + y;
-        const screenCol = graphLeft + x;
-        const barY = graphH - 1 - y;
-        const inBar = barY < barH;
+    // Y axis labels (top, middle, bottom)
+    stampText(surface, 3, graphTop, `${maxVt.toFixed(0).padStart(4)}┤`, '#555555', BG);
+    stampText(surface, 3, graphTop + Math.floor(graphCharsH / 2), `${(maxVt / 2).toFixed(0).padStart(4)}┤`, '#555555', BG);
+    stampText(surface, 3, graphTop + graphCharsH - 1, `   0┤`, '#555555', BG);
 
-        if (inBar) {
-          const fg = ft < 16.7 ? '#00cc66' : ft < 33.3 ? '#ccaa00' : '#cc3333';
-          surface.set(screenCol, screenRow, { char: '▄', fg, bg: BG });
-        } else if (y === refRow - graphTop) {
-          surface.set(screenCol, screenRow, { char: '╌', fg: '#444444', bg: BG });
-        }
-      }
-    }
+    // Render braille chart
+    renderBrailleLineChart(
+      surface,
+      graphLeft, graphTop,
+      graphCharsW, graphCharsH,
+      vtRingCount,
+      readVt,
+      maxVt,
+      '#00cc66', BG, '#444444',
+      maxVt > 16.7 ? 16.7 : undefined, // show 16.7ms ref line if in range
+    );
+
+    // X axis label
+    stampText(surface, graphLeft, graphTop + graphCharsH, `╰${'─'.repeat(graphCharsW - 1)}  ${GRAPH_SAMPLES} frames`, '#555555', BG);
   }
 
   // Controls hint
@@ -464,7 +513,7 @@ const app: App<Model, Msg> = {
       const now = updateStart;
       const frameTimeMs = now - model.lastTickMs;
 
-      pushFt(frameTimeMs);
+      pushVt(phaseTiming.viewMs);
 
       const dt = frameTimeMs / 1000;
       const nextElapsed = model.elapsed + frameTimeMs;
