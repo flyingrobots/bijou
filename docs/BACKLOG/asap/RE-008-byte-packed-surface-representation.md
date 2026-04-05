@@ -41,7 +41,7 @@ API away from strings without moving the data away from strings.
 
 The internal surface representation becomes a flat typed array:
 
-```
+```text
 Per cell: 10 bytes
   [0-1]    char (uint16 code point, or side-table index for multi-codepoint graphemes)
   [2-4]    fg R, G, B
