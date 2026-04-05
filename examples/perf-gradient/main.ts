@@ -21,8 +21,6 @@ import {
   run, quit, tick,
   isKeyMsg, isMouseMsg, isResizeMsg,
   type App,
-  type RenderPipeline,
-  type RenderStage,
 } from '@flyingrobots/bijou-tui';
 
 initDefaultContext();
@@ -405,4 +403,4 @@ const app: App<Model, Msg> = {
   },
 };
 
-run(app, { mouse: true, configurePipeline: configurePerfPipeline });
+run(app, { mouse: true });
