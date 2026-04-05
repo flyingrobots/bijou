@@ -152,7 +152,7 @@ function stampText(
   }
 }
 
-const MODE_NAMES = ['gradient', 'horizon', 'noise'];
+const MODE_NAMES = ['gradient', 'horizon', 'noise', 'quad'];
 const MODE_COUNT = MODE_NAMES.length;
 
 // --- OpenSimplex noise (adapted from ertdfgcvb) ---
@@ -220,12 +220,15 @@ function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
 const noise2D = openSimplexNoise2D(42);
 const DENSITY = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';
 
-function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): void {
-  const { cols, rows, frame, mouseDown } = model;
-  const direction = mouseDown ? -1 : 1;
-  const f = frame * 0.05 * direction;
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
+interface Rect { x: number; y: number; w: number; h: number }
+
+type Surf = ReturnType<typeof createSurface>;
+
+function fillGradient(surface: Surf, model: Model, r: Rect): void {
+  const direction = model.mouseDown ? -1 : 1;
+  const f = model.frame * 0.05 * direction;
+  for (let row = 0; row < r.h; row++) {
+    for (let col = 0; col < r.w; col++) {
       const phase = (col + row * 0.5) * 0.08;
       const r1 = clamp((cos(phase + 1 * f) + 1) * 127.5, 0, 255);
       const g1 = clamp((cos(phase + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
@@ -235,32 +238,31 @@ function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): 
       const b2 = clamp((cos(phase * 0.08 + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
       cell.fg = rgbHex(r2, g2, b2);
       cell.bg = rgbHex(r1, g1, b1);
-      surface.set(col, row, cell);
+      surface.set(r.x + col, r.y + row, cell);
     }
   }
 }
 
-function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): void {
-  const { cols, rows, frame, mouseDown } = model;
-  const halfY = rows / 2;
-  const halfX = cols / 2;
-  const speed = (mouseDown ? -0.3 : 0.3);
+function fillHorizon(surface: Surf, model: Model, r: Rect): void {
+  const halfY = r.h / 2;
+  const halfX = r.w / 2;
+  const speed = (model.mouseDown ? -0.3 : 0.3);
 
-  for (let row = 0; row < rows; row++) {
+  for (let row = 0; row < r.h; row++) {
     const z = row - halfY;
-    for (let col = 0; col < cols; col++) {
+    for (let col = 0; col < r.w; col++) {
       if (z === 0) {
-        surface.set(col, row, { char: '─', fg: '#ffffff', bg: '#000000' });
+        surface.set(r.x + col, r.y + row, { char: '─', fg: '#ffffff', bg: '#000000' });
         continue;
       }
       const val = (col - halfX) / z;
-      const code = (Math.floor(val + halfX + frame * speed) % 94 + 94) % 94 + 33;
+      const code = (Math.floor(val + halfX + model.frame * speed) % 94 + 94) % 94 + 33;
       const depth = clamp(1 - Math.abs(z) / halfY, 0, 1);
       const bright = Math.round(depth * 200 + 55);
       const skyGround = z < 0
         ? rgbHex(bright * 0.3, bright * 0.4, bright)
         : rgbHex(bright * 0.2, bright * 0.6, bright * 0.2);
-      surface.set(col, row, {
+      surface.set(r.x + col, r.y + row, {
         char: String.fromCharCode(code),
         fg: rgbHex(bright, bright, bright),
         bg: skyGround,
@@ -269,25 +271,40 @@ function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): v
   }
 }
 
-function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): void {
-  const { cols, rows, mouseDown } = model;
-  const t = model.elapsed * 0.0007 * (mouseDown ? -1 : 1);
+function fillNoise(surface: Surf, model: Model, r: Rect): void {
+  const t = model.elapsed * 0.0007 * (model.mouseDown ? -1 : 1);
   const s = 0.03;
-  const aspect = 0.5; // terminal chars are ~2:1
+  const aspect = 0.5;
 
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
+  for (let row = 0; row < r.h; row++) {
+    for (let col = 0; col < r.w; col++) {
       const x = col * s;
       const y = row * s / aspect + t;
       const n = noise2D(x, y + t * 0.3) * 0.5 + 0.5;
       const i = Math.floor(n * DENSITY.length);
       const ch = DENSITY[clamp(i, 0, DENSITY.length - 1)] ?? ' ';
-      // Lerp between the two colors based on noise value
       const bright = n;
-      const r = Math.round(255 * bright * 0.3 + 246 * (1 - bright));
-      const g = Math.round(89 * bright * 0.3 + 246 * (1 - bright));
-      const b = Math.round(55 * bright * 0.3 + 244 * (1 - bright));
-      surface.set(col, row, { char: ch, fg: rgbHex(r, g, b), bg: '#000000' });
+      const rv = Math.round(255 * bright * 0.3 + 246 * (1 - bright));
+      const gv = Math.round(89 * bright * 0.3 + 246 * (1 - bright));
+      const bv = Math.round(55 * bright * 0.3 + 244 * (1 - bright));
+      surface.set(r.x + col, r.y + row, { char: ch, fg: rgbHex(rv, gv, bv), bg: '#000000' });
+    }
+  }
+}
+
+function fillQuad(surface: Surf, model: Model, full: Rect): void {
+  const hw = Math.floor(full.w / 2);
+  const hh = Math.floor(full.h / 2);
+  // top-right = gradient
+  fillGradient(surface, model, { x: full.x + hw, y: full.y, w: full.w - hw, h: hh });
+  // bottom-left = horizon
+  fillHorizon(surface, model, { x: full.x, y: full.y + hh, w: hw, h: full.h - hh });
+  // bottom-right = noise
+  fillNoise(surface, model, { x: full.x + hw, y: full.y + hh, w: full.w - hw, h: full.h - hh });
+  // top-left = stats only (filled black, overlay draws on top)
+  for (let row = 0; row < hh; row++) {
+    for (let col = 0; col < hw; col++) {
+      surface.set(full.x + col, full.y + row, { char: ' ', fg: '#333333', bg: '#000000' });
     }
   }
 }
@@ -296,10 +313,12 @@ function renderFrame(model: Model) {
   const { cols, rows, mem } = model;
   const surface = getOrCreateSurface(cols, rows);
 
+  const full: Rect = { x: 0, y: 0, w: cols, h: rows };
   switch (model.mode) {
-    case 0: fillGradient(surface, model); break;
-    case 1: fillHorizon(surface, model); break;
-    case 2: fillNoise(surface, model); break;
+    case 0: fillGradient(surface, model, full); break;
+    case 1: fillHorizon(surface, model, full); break;
+    case 2: fillNoise(surface, model, full); break;
+    case 3: fillQuad(surface, model, full); break;
   }
 
   // --- Stats overlay ---
