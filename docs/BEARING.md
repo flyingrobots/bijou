@@ -54,17 +54,34 @@ are:
 - [DX-001](./design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
 - [DX-002](./design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 
+## RE-007 Progress
+
+Three slices have landed on the cycle branch:
+
+1. Frame layer introspection backed by `RuntimeViewStack`
+2. Key routing through `routeRuntimeInput` instead of ad-hoc branches
+3. Pointer ownership through retained drawer layouts
+4. Workspace and settings sub-layer routing onto retained layout trees
+
+The remaining slice is runtime-buffer-backed command/effect dispatch.
+The design intent is now formally captured in the cycle doc: routing
+handler callbacks should produce commands and effects as part of the
+route outcome, and the shell should buffer and apply them through
+`RuntimeBuffers` instead of manually accumulating `Cmd[]` arrays.
+
 ## What Feels Wrong?
 
-- the runtime-engine story stops one slice short of the framed shell,
-  which leaves the most visible architectural debt outside the new seams
+- the shell's command production is still decoupled from routing —
+  `routeRuntimeInput` decides ownership, then entirely separate code
+  in the `update()` function matches `routedLayer.kind` and produces
+  commands through ad-hoc array accumulation
+- notification toast hit-testing stays outside the retained layout
+  system (viewport-positioned overlays managed by notification.ts)
 - some internal reference tooling still carries example-first names even
   though the public posture is now DOGFOOD-first
-- `RE-007` has started, but only its first shell/runtime seam is honest
-  yet
 - the `4.1.0` release workflow history is cosmetically messy even though
   the shipped registry state is correct
-- `PLAN.md`, legends, and backlog placement had drifted from what had
-  actually landed.
+- `@flyingrobots/bijou-i18n` has no built-in catalog loader — users
+  must manually orchestrate the load-parse-register pipeline
 - some older backlog files are historical lineage, not live queue, but
   were still reading like current work

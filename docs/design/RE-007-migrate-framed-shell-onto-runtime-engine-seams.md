@@ -220,3 +220,103 @@ What this cycle does not land yet:
 Follow-on inside this same cycle:
 
 - migrate shell command/effect dispatch onto runtime buffers
+
+## Runtime-buffer-backed command/effect dispatch — design intent
+
+This section captures the architectural intent for the final slice so it
+is not lost across sessions.
+
+### Current pattern
+
+The shell's `update()` function has two separate steps:
+
+1. **Routing**: `resolveRoutedKeyLayer()` / `resolveRoutedMouseLayer()`
+   calls `routeRuntimeInput()` to determine which layer owns the input.
+   The routing handler callback returns `{ handled: true }` or
+   `{ stop: true }` — it never produces commands or effects.
+
+2. **Command production**: After routing, the `update()` function
+   matches on `routedLayer.kind` through a long chain of `if` branches,
+   each producing `[model, Cmd<FramedAppMsg<Msg>>[]]` tuples with
+   manually accumulated command arrays.
+
+These are decoupled: routing decides ownership, then entirely separate
+code produces commands. The runtime buffer API
+(`RuntimeCommandBuffer`, `RuntimeEffectBuffer`, `bufferRuntimeRouteResult`,
+`applyRuntimeCommandBuffer`) exists but the shell does not use it.
+
+### Target pattern
+
+Input is routed through the runtime view stack. Instead of routing
+handlers returning bare `{ handled: true }`, they return commands and
+effects as part of the route outcome:
+
+```
+routeRuntimeInput(stack, layouts, event, ({ layer, hit }) => {
+  // Layer-specific command production happens HERE,
+  // inside the routing callback
+  return {
+    handled: true,
+    commands: [emitMsgForPage(pageId, action)],
+    effects: [],
+  };
+});
+```
+
+The route result carries accumulated commands and effects from all
+visited layers. The shell then buffers them:
+
+```
+const buffers = bufferRuntimeRouteResult(
+  createRuntimeBuffers(),
+  routeResult,
+);
+```
+
+And applies them after routing completes:
+
+```
+const { state, applied } = applyRuntimeCommandBuffer(
+  model,
+  buffers.commands,
+  applyCommand,
+);
+```
+
+### Why this matters
+
+- Routing and command production become one step instead of two. The
+  layer that handles the input also says what should happen, inside the
+  same callback.
+- The long `if (routedLayer.kind === ...)` chain in `update()` moves
+  into the routing handler, which already knows the layer context.
+- Commands are collected through the same buffer mechanism the runtime
+  engine uses for component-level input handling, instead of through
+  ad-hoc array accumulation.
+- Effects become a first-class channel. The shell currently has no
+  explicit effect separation — everything is a command. The buffer API
+  gives effects their own lane without changing the TEA return type.
+
+### Scope
+
+This is a structural refactoring of the shell's update function. It
+touches ~20 functions across `app-frame.ts`, `app-frame-actions.ts`,
+and `app-frame-palette.ts`. The change is repetitive but mechanical:
+every `[model, cmds]` return site moves into a routing handler that
+returns `{ handled: true, commands: [...] }`.
+
+Outward shell behavior must not change. The same inputs must produce
+the same model transitions and the same commands.
+
+### Risks
+
+- The routing handler closure becomes large because it absorbs all
+  layer-specific logic. May need to extract per-layer handler functions
+  to keep readability.
+- The TEA `update()` return type (`[Model, Cmd[]]`) is consumed by
+  the event bus. The buffer API produces `RuntimeBuffers`, which must
+  be drained back into `Cmd[]` at the boundary. This is a seam, not a
+  full TEA replacement.
+- Key priority logic (`frame-first` vs `page-first`) currently lives
+  outside routing. It needs to move into the routing handler or be
+  resolved before routing begins.
