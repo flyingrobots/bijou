@@ -2,12 +2,15 @@
  * Performance stress test — animated cosine gradient.
  *
  * Fills the entire terminal with a per-cell color gradient that
- * animates every frame.  Tracks FPS, frame time, and frame count.
- * Hold mouse button to reverse the gradient direction.
+ * animates every frame.  Tracks FPS, frame time, heap usage, and
+ * GC pauses.
  *
  * Keys:
  *   space  — toggle 60fps cap (uncapped = as fast as possible)
  *   q      — quit
+ *
+ * Mouse:
+ *   hold   — reverse gradient direction
  *
  * Usage:  npx tsx examples/perf-gradient/main.ts
  */
@@ -19,14 +22,65 @@ import {
   isKeyMsg, isMouseMsg, isResizeMsg,
   type App,
 } from '@flyingrobots/bijou-tui';
+import v8 from 'node:v8';
 
 initDefaultContext();
 
 const CAPPED_MS = Math.round(1000 / 60);
 const UNCAPPED_MS = 0;
-
-// Frame-time graph history length (one sample per frame)
 const GRAPH_SAMPLES = 60;
+
+// --- Ring buffer for frame time history (zero-alloc after init) ---
+const ftRing = new Float64Array(GRAPH_SAMPLES);
+let ftRingHead = 0;
+let ftRingCount = 0;
+
+function pushFt(ms: number): void {
+  ftRing[ftRingHead] = ms;
+  ftRingHead = (ftRingHead + 1) % GRAPH_SAMPLES;
+  if (ftRingCount < GRAPH_SAMPLES) ftRingCount++;
+}
+
+function readFt(i: number): number {
+  // i=0 is oldest, i=ftRingCount-1 is newest
+  const idx = (ftRingHead - ftRingCount + i + GRAPH_SAMPLES) % GRAPH_SAMPLES;
+  return ftRing[idx]!;
+}
+
+interface MemStats {
+  heapUsedMB: number;
+  heapTotalMB: number;
+  rssMB: number;
+  externalMB: number;
+  gcCountSinceLastSample: number;
+}
+
+// --- GC tracking via PerformanceObserver ---
+let gcCount = 0;
+let gcCountAtLastSample = 0;
+
+try {
+  const { PerformanceObserver } = await import('node:perf_hooks');
+  const obs = new PerformanceObserver((list) => {
+    gcCount += list.getEntries().length;
+  });
+  obs.observe({ entryTypes: ['gc'] });
+} catch {
+  // GC observation not available — gcCount stays 0
+}
+
+function sampleMemStats(): MemStats {
+  const mem = process.memoryUsage();
+  const gcSince = gcCount - gcCountAtLastSample;
+  gcCountAtLastSample = gcCount;
+  return {
+    heapUsedMB: mem.heapUsed / (1024 * 1024),
+    heapTotalMB: mem.heapTotal / (1024 * 1024),
+    rssMB: mem.rss / (1024 * 1024),
+    externalMB: mem.external / (1024 * 1024),
+    gcCountSinceLastSample: gcSince,
+  };
+}
 
 interface Model {
   frame: number;
@@ -40,10 +94,11 @@ interface Model {
   capped: boolean;
   lastTickMs: number;
   frameTimeMs: number;
-  frameTimeHistory: number[];
+  mem: MemStats;
+  memSampleFrame: number;
 }
 
-type Msg = { type: 'tick'; atMs: number };
+type Msg = { type: 'tick' };
 
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
@@ -60,9 +115,36 @@ function rgbHex(r: number, g: number, b: number): string {
 
 const { cos, PI, max, min, round } = Math;
 
+// Reusable surface — only reallocated on resize
+let cachedSurface: ReturnType<typeof createSurface> | undefined;
+let cachedW = 0;
+let cachedH = 0;
+
+function getOrCreateSurface(w: number, h: number): ReturnType<typeof createSurface> {
+  if (cachedSurface == null || cachedW !== w || cachedH !== h) {
+    cachedSurface = createSurface(w, h);
+    cachedW = w;
+    cachedH = h;
+  }
+  return cachedSurface;
+}
+
+// Reusable cell object — mutated in place to avoid per-cell allocation
+const cell: { char: string; fg: string; bg: string } = { char: '█', fg: '', bg: '' };
+
+function stampText(
+  surface: ReturnType<typeof createSurface>,
+  x: number, y: number,
+  text: string, fg: string, bg: string,
+): void {
+  for (let j = 0; j < text.length; j++) {
+    surface.set(x + j, y, { char: text[j]!, fg, bg });
+  }
+}
+
 function renderGradient(model: Model) {
-  const { cols, rows, frame, mouseDown } = model;
-  const surface = createSurface(cols, rows);
+  const { cols, rows, frame, mouseDown, mem } = model;
+  const surface = getOrCreateSurface(cols, rows);
   const direction = mouseDown ? -1 : 1;
   const f = frame * 0.05 * direction;
 
@@ -76,46 +158,49 @@ function renderGradient(model: Model) {
       const g2 = clamp((cos(phase * 0.07 + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
       const b2 = clamp((cos(phase * 0.08 + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
 
-      surface.set(col, row, {
-        char: '█',
-        fg: rgbHex(r2, g2, b2),
-        bg: rgbHex(r1, g1, b1),
-      });
+      cell.fg = rgbHex(r2, g2, b2);
+      cell.bg = rgbHex(r1, g1, b1);
+      surface.set(col, row, cell);
     }
   }
 
-  // --- Stats overlay (top-left) ---
+  // --- Stats overlay ---
+  const BG = '#000000';
+  const FG = '#cccccc';
   const stats = [
-    `FPS   ${model.fps.toFixed(0).padStart(5)}`,
-    `frame ${String(model.frame).padStart(7)}`,
-    `time  ${(model.elapsed / 1000).toFixed(1).padStart(6)}s`,
-    `ft    ${model.frameTimeMs.toFixed(1).padStart(5)}ms`,
-    `size  ${cols}×${rows}`,
-    `cap   ${model.capped ? '60fps' : 'OFF'}`,
-    `mouse ${mouseDown ? 'DOWN' : 'up'}`,
+    { text: `FPS   ${model.fps.toFixed(0).padStart(5)}`, fg: '#00ff88' },
+    { text: `frame ${String(model.frame).padStart(7)}`, fg: FG },
+    { text: `time  ${(model.elapsed / 1000).toFixed(1).padStart(6)}s`, fg: FG },
+    { text: `ft    ${model.frameTimeMs.toFixed(1).padStart(5)}ms`, fg: '#ffaa00' },
+    { text: `size  ${cols}×${rows}`, fg: FG },
+    { text: `cap   ${model.capped ? '60fps' : 'OFF'}`, fg: model.capped ? FG : '#ff6666' },
+    { text: `mouse ${mouseDown ? 'DOWN' : 'up'}`, fg: FG },
+    { text: '', fg: FG },
+    { text: `heap  ${mem.heapUsedMB.toFixed(1)}/${mem.heapTotalMB.toFixed(1)} MB`, fg: '#88aaff' },
+    { text: `rss   ${mem.rssMB.toFixed(1)} MB`, fg: '#88aaff' },
+    { text: `ext   ${mem.externalMB.toFixed(1)} MB`, fg: '#88aaff' },
+    { text: `gc    ${mem.gcCountSinceLastSample}/0.5s`, fg: mem.gcCountSinceLastSample > 5 ? '#ff6666' : '#88aaff' },
   ];
 
   const graphW = GRAPH_SAMPLES;
   const graphH = 8;
-  const boxW = max(max(...stats.map((s) => s.length)) + 4, graphW + 4);
-  const boxH = stats.length + 2 + graphH + 2; // stats + border + graph + label+border
+  const textW = max(...stats.map((s) => s.text.length));
+  const boxW = max(textW + 4, graphW + 4);
+  const boxH = stats.length + 2 + graphH + 2;
 
   if (cols >= boxW + 2 && rows >= boxH + 2) {
     // Background
     for (let r = 1; r < 1 + boxH; r++) {
       for (let c = 1; c < 1 + boxW; c++) {
-        surface.set(c, r, { char: ' ', bg: '#000000', fg: '#cccccc' });
+        surface.set(c, r, { char: ' ', bg: BG, fg: FG });
       }
     }
+
     // Stats text
     for (let i = 0; i < stats.length; i++) {
-      const text = stats[i]!;
-      for (let j = 0; j < text.length; j++) {
-        surface.set(3 + j, 2 + i, {
-          char: text[j]!,
-          fg: i === 0 ? '#00ff88' : i === 3 ? '#ffaa00' : '#cccccc',
-          bg: '#000000',
-        });
+      const s = stats[i]!;
+      if (s.text.length > 0) {
+        stampText(surface, 3, 2 + i, s.text, s.fg, BG);
       }
     }
 
@@ -123,27 +208,20 @@ function renderGradient(model: Model) {
     const graphTop = 2 + stats.length + 1;
     const graphLeft = 3;
 
-    // Graph label
-    const label = 'frame time (ms)';
-    for (let j = 0; j < label.length; j++) {
-      surface.set(graphLeft + j, graphTop - 1, {
-        char: label[j]!,
-        fg: '#666666',
-        bg: '#000000',
-      });
+    stampText(surface, graphLeft, graphTop - 1, 'frame time (ms)', '#666666', BG);
+
+    // Scale
+    let maxFt = 16.7;
+    for (let i = 0; i < ftRingCount; i++) {
+      const v = readFt(i);
+      if (v > maxFt) maxFt = v;
     }
-
-    // Find scale
-    const history = model.frameTimeHistory;
-    const maxFt = max(16.7, ...history);
     const scale = graphH / maxFt;
-
-    // 16.7ms reference line row
     const refRow = graphTop + graphH - 1 - round(16.7 * scale);
 
     for (let x = 0; x < graphW; x++) {
-      const sampleIdx = history.length - graphW + x;
-      const ft = sampleIdx >= 0 ? history[sampleIdx]! : 0;
+      const sampleIdx = ftRingCount - graphW + x;
+      const ft = sampleIdx >= 0 ? readFt(sampleIdx) : 0;
       const barH = max(0, min(graphH, round(ft * scale)));
 
       for (let y = 0; y < graphH; y++) {
@@ -153,36 +231,24 @@ function renderGradient(model: Model) {
         const inBar = barY < barH;
 
         if (inBar) {
-          // Color by frame time: green < 16ms, yellow < 33ms, red >= 33ms
           const fg = ft < 16.7 ? '#00cc66' : ft < 33.3 ? '#ccaa00' : '#cc3333';
-          surface.set(screenCol, screenRow, { char: '▄', fg, bg: '#000000' });
+          surface.set(screenCol, screenRow, { char: '▄', fg, bg: BG });
         } else if (y === refRow - graphTop) {
-          // 16.7ms reference line
-          surface.set(screenCol, screenRow, { char: '╌', fg: '#444444', bg: '#000000' });
+          surface.set(screenCol, screenRow, { char: '╌', fg: '#444444', bg: BG });
         }
       }
     }
   }
 
-  // Controls hint (bottom)
+  // Controls hint
   const hint = ' space: toggle cap │ hold mouse: reverse │ q: quit ';
   if (rows > 2 && cols >= hint.length + 2) {
     const hintRow = rows - 1;
     const hintCol = round((cols - hint.length) / 2);
-    for (let j = 0; j < hint.length; j++) {
-      surface.set(hintCol + j, hintRow, {
-        char: hint[j]!,
-        fg: '#888888',
-        bg: '#111111',
-      });
-    }
+    stampText(surface, hintCol, hintRow, hint, '#888888', '#111111');
   }
 
   return surface;
-}
-
-function nowMs(): number {
-  return performance.now();
 }
 
 const app: App<Model, Msg> = {
@@ -196,10 +262,11 @@ const app: App<Model, Msg> = {
     rows: process.stdout.rows ?? 24,
     mouseDown: false,
     capped: true,
-    lastTickMs: nowMs(),
+    lastTickMs: performance.now(),
     frameTimeMs: 0,
-    frameTimeHistory: [],
-  }, [tick(CAPPED_MS, { type: 'tick', atMs: nowMs() })]],
+    mem: sampleMemStats(),
+    memSampleFrame: 0,
+  }, [tick(CAPPED_MS, { type: 'tick' })]],
 
   update: (msg, model) => {
     if (isKeyMsg(msg)) {
@@ -208,8 +275,7 @@ const app: App<Model, Msg> = {
       }
       if (msg.key === ' ' || msg.key === 'space') {
         const next = !model.capped;
-        const delay = next ? CAPPED_MS : UNCAPPED_MS;
-        return [{ ...model, capped: next }, [tick(delay, { type: 'tick', atMs: nowMs() })]];
+        return [{ ...model, capped: next }, [tick(next ? CAPPED_MS : UNCAPPED_MS, { type: 'tick' })]];
       }
       return [model, []];
     }
@@ -223,8 +289,11 @@ const app: App<Model, Msg> = {
       return [{ ...model, mouseDown: down }, []];
     }
     if (msg.type === 'tick') {
-      const now = msg.atMs;
+      const now = performance.now();
       const frameTimeMs = now - model.lastTickMs;
+
+      pushFt(frameTimeMs);
+
       const dt = frameTimeMs / 1000;
       const nextElapsed = model.elapsed + frameTimeMs;
       const nextAccum = model.fpsAccum + dt;
@@ -237,10 +306,13 @@ const app: App<Model, Msg> = {
         accum = 0;
         samples = 0;
       }
-      const history = [...model.frameTimeHistory, frameTimeMs];
-      if (history.length > GRAPH_SAMPLES * 2) {
-        history.splice(0, history.length - GRAPH_SAMPLES);
-      }
+
+      // Sample memory every 30 frames (~0.5s at 60fps)
+      const mem = (model.frame - model.memSampleFrame >= 30)
+        ? sampleMemStats()
+        : model.mem;
+      const memFrame = mem !== model.mem ? model.frame : model.memSampleFrame;
+
       const delay = model.capped ? CAPPED_MS : UNCAPPED_MS;
       return [{
         ...model,
@@ -251,8 +323,9 @@ const app: App<Model, Msg> = {
         fpsSamples: samples,
         lastTickMs: now,
         frameTimeMs,
-        frameTimeHistory: history,
-      }, [tick(delay, { type: 'tick', atMs: nowMs() })]];
+        mem,
+        memSampleFrame: memFrame,
+      }, [tick(delay, { type: 'tick' })]];
     }
     return [model, []];
   },
