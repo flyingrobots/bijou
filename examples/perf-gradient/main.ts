@@ -226,7 +226,7 @@ function renderFrame(model: Model) {
     { text: `size  ${cols}×${rows}  (${cols * rows} cells)`, fg: FG },
     { text: `cap   ${model.capped ? '60fps' : 'OFF'}`, fg: model.capped ? FG : '#ff6666' },
     { text: `mode  ${model.mode + 1}`, fg: FG },
-    { text: `mouse ${mouseDown ? 'DOWN' : 'up'}`, fg: FG },
+    { text: `mouse ${model.mouseDown ? 'DOWN' : 'up'}`, fg: FG },
     { text: '', fg: FG },
     { text: '── timing ────────────', fg: '#555555' },
     { text: `upd   ${p.updateMs.toFixed(1).padStart(5)}ms`, fg: ftColor(p.updateMs) },
