@@ -293,7 +293,7 @@ function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): voi
 }
 
 function renderFrame(model: Model) {
-  const { cols, rows } = model;
+  const { cols, rows, mem } = model;
   const surface = getOrCreateSurface(cols, rows);
 
   switch (model.mode) {
