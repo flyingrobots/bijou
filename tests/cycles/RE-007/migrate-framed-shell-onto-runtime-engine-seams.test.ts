@@ -72,4 +72,36 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     expect(cycle).toContain('workspace retained layout');
     expect(cycle).toContain('settings row children');
   });
+
+  it('routes shell command/effect dispatch through runtime buffers', () => {
+    const appFrame = readRepoFile('packages/bijou-tui/src/app-frame.ts');
+    const types = readRepoFile('packages/bijou-tui/src/app-frame-types.ts');
+    const cycle = readRepoFile('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
+
+    // FrameShellCommand type defined as discriminated union
+    expect(types).toContain('FrameShellCommand');
+    expect(types).toContain("readonly type: 'observed-key'");
+    expect(types).toContain("readonly type: 'emit-page-msg'");
+    expect(types).toContain("readonly type: 'apply-frame-action'");
+    expect(types).toContain("readonly type: 'quit'");
+
+    // Handler table interprets commands inside createFramedApp
+    expect(appFrame).toContain('shellCommandHandlers');
+    expect(appFrame).toContain('drainShellCommandBuffer');
+
+    // Buffer infrastructure wired
+    expect(appFrame).toContain('bufferRuntimeRouteResult');
+    expect(appFrame).toContain('applyRuntimeCommandBuffer');
+    expect(appFrame).toContain('createRuntimeBuffers');
+
+    // Old ad-hoc dispatch removed
+    expect(appFrame).not.toContain('withObservedKey');
+    expect(appFrame).not.toContain('handleFrameMouse');
+    expect(appFrame).not.toContain('applyQuitRequest');
+
+    // Cycle doc records the buffer migration
+    expect(cycle).toContain('FrameShellCommand');
+    expect(cycle).toContain('handler table');
+    expect(cycle).toContain('drainShellCommandBuffer');
+  });
 });

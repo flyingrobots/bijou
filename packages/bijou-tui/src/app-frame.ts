@@ -45,11 +45,6 @@ import {
 } from './command-palette.js';
 import {
   createPagerStateForSurface,
-  pagerPageDown,
-  pagerPageUp,
-  pagerScrollBy,
-  pagerScrollToBottom,
-  pagerScrollToTop,
   pagerSurface,
 } from './pager.js';
 import type { GridTrack } from './grid.js';
@@ -87,6 +82,8 @@ import { vstackSurface } from './surface-layout.js';
 import type {
   InternalFrameModel,
   FrameAction,
+  FrameShellCommand,
+  ObservedKeyRoute,
   PaletteAction,
   FramePageMsg,
   FramePageUpdateResult,
@@ -116,9 +113,13 @@ import {
   type FrameLayerKind,
 } from './app-frame-layers.js';
 import {
+  applyRuntimeCommandBuffer,
+  bufferRuntimeRouteResult,
+  createRuntimeBuffers,
   createRuntimeRetainedLayouts,
   retainRuntimeLayout,
   routeRuntimeInput,
+  type RuntimeInputRouteResult,
 } from './runtime-engine.js';
 import {
   frameEndAnchor,
@@ -537,13 +538,6 @@ interface ResolvedFrameNotificationOptions {
   readonly overflow: OverflowBehavior;
 }
 
-type ObservedKeyRoute =
-  | 'palette'
-  | 'help'
-  | 'frame'
-  | 'global'
-  | 'page'
-  | 'unhandled';
 
 const quitHelpKeys = createKeyMap<FrameAction>()
   .group('Exit', (g) => g
@@ -699,43 +693,6 @@ export function createFramedApp<PageModel, Msg>(
     return composedFrameScratch;
   }
 
-  function withObservedKey(
-    model: InternalFrameModel<PageModel, Msg>,
-    cmds: readonly Cmd<FramedAppMsg<Msg>>[],
-    msg: KeyMsg,
-    route: ObservedKeyRoute,
-  ): Cmd<FramedAppMsg<Msg>>[] {
-    const observed = options.observeKey?.(msg, route);
-    if (observed === undefined) return [...cmds];
-    return [emitMsgForPage(model.activePageId, observed), ...cmds];
-  }
-
-  function applyQuitRequest(
-    model: InternalFrameModel<PageModel, Msg>,
-    msg: KeyMsg,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
-    if (!shouldUseShellQuitConfirm()) {
-      return [model, withObservedKey(model, [quit()], msg, 'frame')];
-    }
-
-    if (model.quitConfirmOpen) {
-      return [model, withObservedKey(model, [], msg, 'frame')];
-    }
-
-    return [{
-      ...model,
-      quitConfirmOpen: true,
-      helpOpen: false,
-      helpScrollY: 0,
-      settingsOpen: false,
-      notificationCenterOpen: false,
-      commandPalette: undefined,
-      commandPaletteEntries: undefined,
-      commandPaletteTitle: undefined,
-      commandPaletteKind: undefined,
-    }, withObservedKey(model, [], msg, 'frame')];
-  }
-
   function closeCommandPalette(
     model: InternalFrameModel<PageModel, Msg>,
   ): InternalFrameModel<PageModel, Msg> {
@@ -746,6 +703,198 @@ export function createFramedApp<PageModel, Msg>(
       commandPaletteTitle: undefined,
       commandPaletteKind: undefined,
     };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shell command handler table — interprets plain FrameShellCommand facts
+  // emitted by routing handlers.  Each handler receives the current model
+  // and returns the next model; TEA commands are pushed into a mutable
+  // accumulator captured by the drain function.
+  // ---------------------------------------------------------------------------
+
+  type ShellCommandHandler = (
+    model: InternalFrameModel<PageModel, Msg>,
+    cmd: FrameShellCommand<Msg>,
+    teaCmds: Cmd<FramedAppMsg<Msg>>[],
+  ) => InternalFrameModel<PageModel, Msg>;
+
+  const shellCommandHandlers: Record<FrameShellCommand<Msg>['type'], ShellCommandHandler> = {
+    // --- overlay lifecycle ---
+    'close-help': (model) =>
+      ({ ...model, helpOpen: false, helpScrollY: 0 }),
+    'close-settings': (model) =>
+      ({ ...model, settingsOpen: false }),
+    'close-notification-center': (model) =>
+      ({ ...model, notificationCenterOpen: false, notificationCenterScrollY: 0 }),
+    'close-palette': (model) => closeCommandPalette(model),
+    'close-quit-confirm': (model) =>
+      ({ ...model, quitConfirmOpen: false }),
+    'open-help': (model) =>
+      ({ ...model, helpOpen: true }),
+    'open-quit-confirm': (model) => {
+      if (!shouldUseShellQuitConfirm()) return model;
+      if (model.quitConfirmOpen) return model;
+      return {
+        ...model,
+        quitConfirmOpen: true,
+        helpOpen: false,
+        helpScrollY: 0,
+        settingsOpen: false,
+        notificationCenterOpen: false,
+        commandPalette: undefined,
+        commandPaletteEntries: undefined,
+        commandPaletteTitle: undefined,
+        commandPaletteKind: undefined,
+      };
+    },
+    'open-search-palette': (model) =>
+      openSearchPalette(model, frameKeys, options, pagesById),
+    'open-command-palette': (model) =>
+      openCommandPalette(model, frameKeys, options, pagesById),
+
+    // --- settings ---
+    'settings-focus-move': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-focus-move' }>;
+      const layout = resolveSettingsLayout(model, options, pagesById);
+      return layout != null ? moveSettingsFocus(model, layout, c.delta) : model;
+    },
+    'settings-scroll': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll' }>;
+      const layout = resolveSettingsLayout(model, options, pagesById);
+      return layout != null ? scrollSettingsBy(model, layout, c.delta) : model;
+    },
+    'settings-scroll-to': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll-to' }>;
+      const layout = resolveSettingsLayout(model, options, pagesById);
+      if (layout == null) return model;
+      return { ...model, settingsScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
+    },
+    'activate-settings-row': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'activate-settings-row' }>;
+      const layout = resolveSettingsLayout(model, options, pagesById);
+      if (layout == null) return model;
+      const hitRow = layout.rows.find((r) => r.index === c.rowIndex);
+      if (hitRow == null) return model;
+      const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
+      if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
+        return focusedModel;
+      }
+      const [nextModel, cmds] = activateSettingsRow(focusedModel, hitRow.row);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+
+    // --- notification center ---
+    'notification-center-scroll': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll' }>;
+      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      return layout != null ? scrollNotificationCenterBy(model, layout, c.delta) : model;
+    },
+    'notification-center-scroll-to': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll-to' }>;
+      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      if (layout == null) return model;
+      return { ...model, notificationCenterScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
+    },
+    'cycle-notification-filter': (model, _cmd, teaCmds) => {
+      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      if (layout == null) return model;
+      const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+
+    // --- help ---
+    'help-scroll': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
+      const activePage = pagesById.get(model.activePageId)!;
+      return applyHelpScroll(model, activePage, c.delta, frameKeys, paletteKeys, options, pagesById);
+    },
+
+    // --- workspace ---
+    'focus-pane': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'focus-pane' }>;
+      return focusPane(model, c.paneId);
+    },
+    'scroll-focused-pane': (model, cmd) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'scroll-focused-pane' }>;
+      return scrollFocusedPane(model, { type: c.direction === 'down' ? 'scroll-down' : 'scroll-up' }, pagesById, options);
+    },
+    'switch-tab': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'switch-tab' }>;
+      const [nextModel, cmds] = switchTab(model, c.delta, pagesById, options);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+
+    // --- delegation ---
+    'apply-frame-action': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'apply-frame-action' }>;
+      const [nextModel, cmds] = applyFrameAction(c.action, model, options, pagesById);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+    'palette-key': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'palette-key' }>;
+      const [nextModel, cmds] = handlePaletteKey(c.msg, model, paletteKeys, options, pagesById);
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+
+    // --- TEA command emissions ---
+    'emit-page-msg': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'emit-page-msg' }>;
+      teaCmds.push(emitMsgForPage(c.pageId, c.msg));
+      return model;
+    },
+    'emit-global-msg': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'emit-global-msg' }>;
+      teaCmds.push(emitMsg(c.msg));
+      return model;
+    },
+    'quit': (_model, _cmd, teaCmds) => {
+      teaCmds.push(quit());
+      return _model;
+    },
+    'dismiss-notification': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'dismiss-notification' }>;
+      if (!frameNotificationOptions.enabled) return model;
+      const nowMs = resolveClock(resolveSafeCtx()).now();
+      const [nextModel, cmds] = applyFrameNotificationState(
+        model,
+        dismissNotification(model.runtimeNotifications, c.notificationId, nowMs),
+        nowMs,
+      );
+      teaCmds.push(...cmds);
+      return nextModel;
+    },
+
+    // --- observation ---
+    'observed-key': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'observed-key' }>;
+      const observed = options.observeKey?.(c.msg, c.route);
+      if (observed !== undefined) {
+        teaCmds.push(emitMsgForPage(model.activePageId, observed));
+      }
+      return model;
+    },
+  };
+
+  function drainShellCommandBuffer(
+    model: InternalFrameModel<PageModel, Msg>,
+    routeResult: RuntimeInputRouteResult<FrameShellCommand<Msg>>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    const buffers = bufferRuntimeRouteResult(
+      createRuntimeBuffers<FrameShellCommand<Msg>>(),
+      routeResult,
+    );
+    const teaCmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    const { state } = applyRuntimeCommandBuffer(
+      model,
+      buffers.commands,
+      (s, cmd) => shellCommandHandlers[cmd.type](s, cmd, teaCmds),
+    );
+    return [state, teaCmds];
   }
 
   function resolveLayerContext(
@@ -772,68 +921,311 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
-  function observedRouteForLayer(layer: FrameLayerDescriptor): ObservedKeyRoute {
-    switch (layer.kind) {
-      case 'search':
-      case 'command-palette':
-        return 'palette';
-      case 'help':
-        return 'help';
-      case 'page-modal':
-        return 'page';
-      case 'settings':
-      case 'notification-center':
-      case 'quit-confirm':
-        return 'frame';
-      default:
-        return 'unhandled';
+
+  function quitRequestCommands(
+    msg: KeyMsg,
+    route: ObservedKeyRoute,
+  ): FrameShellCommand<Msg>[] {
+    if (!shouldUseShellQuitConfirm()) {
+      return [{ type: 'observed-key', msg, route }, { type: 'quit' }];
     }
+    return [{ type: 'observed-key', msg, route }, { type: 'open-quit-confirm' }];
+  }
+
+  function resolveFrameActionCommands(
+    msg: KeyMsg,
+    action: FrameAction,
+    route: ObservedKeyRoute,
+  ): FrameShellCommand<Msg>[] {
+    if (action.type === 'open-search' && options.enableCommandPalette) {
+      return [{ type: 'observed-key', msg, route }, { type: 'open-search-palette' }];
+    }
+    if (action.type === 'open-palette' && options.enableCommandPalette) {
+      return [{ type: 'observed-key', msg, route }, { type: 'open-command-palette' }];
+    }
+    return [{ type: 'observed-key', msg, route }, { type: 'apply-frame-action', action }];
+  }
+
+  function handlePaletteLayerKeyCommands(
+    msg: KeyMsg,
+    routedLayerKind: FrameLayerKind,
+  ): FrameShellCommand<Msg>[] {
+    const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'palette' };
+    if (msg.ctrl && !msg.alt && msg.key === 'c') {
+      return quitRequestCommands(msg, 'palette');
+    }
+    if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape') {
+      return [obs, { type: 'close-palette' }];
+    }
+    const frameAction = frameKeys.handle(msg);
+    if (frameAction?.type === 'open-search') {
+      return routedLayerKind === 'search'
+        ? [obs, { type: 'close-palette' }]
+        : [obs, { type: 'open-search-palette' }];
+    }
+    if (frameAction?.type === 'open-palette') {
+      return routedLayerKind === 'command-palette'
+        ? [obs, { type: 'close-palette' }]
+        : [obs, { type: 'open-command-palette' }];
+    }
+    if (frameAction?.type === 'toggle-notifications') {
+      return [obs, { type: 'close-palette' }, { type: 'apply-frame-action', action: frameAction }];
+    }
+    return [obs, { type: 'palette-key', msg }];
+  }
+
+  function handleHelpLayerKeyCommands(
+    msg: KeyMsg,
+  ): FrameShellCommand<Msg>[] {
+    const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'help' };
+    if (!msg.ctrl && !msg.alt && (msg.key === '?' || msg.key === 'escape')) {
+      return [obs, { type: 'close-help' }];
+    }
+    if (isShellQuitRequest(msg)) {
+      return quitRequestCommands(msg, 'help');
+    }
+    const helpAction = frameKeys.handle(msg);
+    if (helpAction && isHelpScrollAction(helpAction)) {
+      const delta = helpAction.type === 'scroll-down' ? 3
+        : helpAction.type === 'scroll-up' ? -3
+        : helpAction.type === 'page-down' ? 999
+        : helpAction.type === 'page-up' ? -999
+        : helpAction.type === 'bottom' ? Infinity
+        : helpAction.type === 'top' ? -Infinity
+        : 0;
+      return [obs, { type: 'help-scroll', delta }];
+    }
+    return [obs];
+  }
+
+  function handleSettingsLayerKeyCommands(
+    msg: KeyMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ): FrameShellCommand<Msg>[] | undefined {
+    const layout = resolveSettingsLayout(model, options, pagesById);
+    if (layout == null) return undefined;
+    const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
+    if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === 'f2')) {
+      return [obs, { type: 'close-settings' }];
+    }
+    if (msg.ctrl && !msg.alt && msg.key === ',') {
+      return [obs, { type: 'close-settings' }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === '?') {
+      return [obs, { type: 'open-help' }];
+    }
+    if (isShellQuitRequest(msg)) {
+      return quitRequestCommands(msg, 'frame');
+    }
+    if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
+      return [obs, { type: 'open-search-palette' }];
+    }
+    if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
+      return [obs, { type: 'open-command-palette' }];
+    }
+    const settingsFrameAction = frameKeys.handle(msg);
+    if (settingsFrameAction?.type === 'toggle-notifications') {
+      return [obs, { type: 'apply-frame-action', action: settingsFrameAction }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'up') {
+      return [obs, { type: 'settings-focus-move', delta: -1 }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'down') {
+      return [obs, { type: 'settings-focus-move', delta: 1 }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'j') {
+      return [obs, { type: 'settings-scroll', delta: 1 }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'k') {
+      return [obs, { type: 'settings-scroll', delta: -1 }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'd') {
+      return [obs, { type: 'settings-scroll', delta: Math.max(1, layout.contentHeight - 1) }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'u') {
+      return [obs, { type: 'settings-scroll', delta: -Math.max(1, layout.contentHeight - 1) }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'g') {
+      return [obs, { type: 'settings-scroll-to', position: 'top' }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'G') {
+      return [obs, { type: 'settings-scroll-to', position: 'bottom' }];
+    }
+    if (!msg.ctrl && !msg.alt && (msg.key === 'enter' || msg.key === 'space')) {
+      const rowIndex = clampSettingsFocus(model, layout);
+      const row = layout.rows[rowIndex];
+      if (row?.row.action !== undefined && row.row.enabled !== false && row.row.kind !== 'info') {
+        return [obs, { type: 'activate-settings-row', rowIndex: row.index }];
+      }
+      return [obs];
+    }
+    return [obs];
+  }
+
+  function handleNotificationCenterLayerKeyCommands(
+    msg: KeyMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ): FrameShellCommand<Msg>[] | undefined {
+    const layout = resolveNotificationCenterLayout(model, options, pagesById);
+    if (layout == null) return undefined;
+    const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
+    if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
+      return [obs, { type: 'close-notification-center' }];
+    }
+    if (isShellQuitRequest(msg)) {
+      return quitRequestCommands(msg, 'frame');
+    }
+    const centerFrameAction = frameKeys.handle(msg);
+    if (centerFrameAction?.type === 'toggle-notifications') {
+      return [obs, { type: 'apply-frame-action', action: centerFrameAction }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'f2') {
+      return [obs, { type: 'close-notification-center' }, { type: 'apply-frame-action', action: { type: 'toggle-settings' } }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === '?') {
+      return [obs, { type: 'close-notification-center' }, { type: 'open-help' }];
+    }
+    if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
+      return [obs, { type: 'close-notification-center' }, { type: 'open-search-palette' }];
+    }
+    if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
+      return [obs, { type: 'close-notification-center' }, { type: 'open-command-palette' }];
+    }
+    if (!msg.ctrl && !msg.alt && (msg.key === 'up' || msg.key === 'k')) {
+      return [obs, { type: 'notification-center-scroll', delta: -1 }];
+    }
+    if (!msg.ctrl && !msg.alt && (msg.key === 'down' || msg.key === 'j')) {
+      return [obs, { type: 'notification-center-scroll', delta: 1 }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'd') {
+      return [obs, { type: 'notification-center-scroll', delta: Math.max(1, layout.contentHeight - 2) }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'u') {
+      return [obs, { type: 'notification-center-scroll', delta: -Math.max(1, layout.contentHeight - 2) }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'g') {
+      return [obs, { type: 'notification-center-scroll-to', position: 'top' }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'G') {
+      return [obs, { type: 'notification-center-scroll-to', position: 'bottom' }];
+    }
+    if (!msg.ctrl && !msg.alt && msg.key === 'f') {
+      return [obs, { type: 'cycle-notification-filter' }];
+    }
+    return [obs];
+  }
+
+  function handleWorkspaceLayerKeyCommands(
+    msg: KeyMsg,
+    model: InternalFrameModel<PageModel, Msg>,
+  ): FrameShellCommand<Msg>[] {
+    if (isShellQuitRequest(msg)) {
+      return quitRequestCommands(msg, 'frame');
+    }
+    const context = resolveLayerContext(model);
+    const { activePage, activeInputArea } = context;
+    const paneAction = activeInputArea?.keyMap?.handle(msg);
+    const pageAction = activePage.keyMap?.handle(msg);
+    const globalAction = options.globalKeys?.handle(msg);
+    const frameAction = frameKeys.handle(msg);
+    const keyPriority = options.keyPriority ?? 'frame-first';
+
+    if (keyPriority === 'page-first') {
+      if (paneAction !== undefined) {
+        return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: paneAction }];
+      }
+      if (pageAction !== undefined) {
+        return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: pageAction }];
+      }
+      if (globalAction !== undefined) {
+        return [{ type: 'observed-key', msg, route: 'global' }, { type: 'emit-global-msg', msg: globalAction }];
+      }
+      if (frameAction !== undefined) {
+        return resolveFrameActionCommands(msg, frameAction, 'frame');
+      }
+      return [{ type: 'observed-key', msg, route: 'unhandled' }];
+    }
+
+    // frame-first (default)
+    if (frameAction !== undefined) {
+      return resolveFrameActionCommands(msg, frameAction, 'frame');
+    }
+    if (paneAction !== undefined) {
+      return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: paneAction }];
+    }
+    if (globalAction !== undefined) {
+      return [{ type: 'observed-key', msg, route: 'global' }, { type: 'emit-global-msg', msg: globalAction }];
+    }
+    if (pageAction !== undefined) {
+      return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: pageAction }];
+    }
+    return [{ type: 'observed-key', msg, route: 'unhandled' }];
   }
 
   function resolveRoutedKeyLayer(
     msg: KeyMsg,
     model: InternalFrameModel<PageModel, Msg>,
-  ) {
+  ): RuntimeInputRouteResult<FrameShellCommand<Msg>> {
     const context = resolveLayerContext(model);
     const runtimeStack = describeFrameRuntimeViewStack(model, {
       pageModalOpen: context.pageModalOpen,
     });
-    const runtimeRoute = routeRuntimeInput(
+
+    return routeRuntimeInput<
+      SurfaceLayoutNode, FrameLayerDescriptor, FrameShellCommand<Msg>
+    >(
       runtimeStack,
       EMPTY_RUNTIME_LAYOUTS,
       { kind: 'key', key: msg.key },
       ({ layer }) => {
         const frameLayer = layer.model;
-        if (frameLayer == null) {
-          return undefined;
+        if (frameLayer == null) return undefined;
+
+        if (frameLayer.kind === 'search' || frameLayer.kind === 'command-palette') {
+          return { handled: true, commands: handlePaletteLayerKeyCommands(msg, frameLayer.kind) };
+        }
+
+        if (frameLayer.kind === 'help') {
+          return { handled: true, commands: handleHelpLayerKeyCommands(msg) };
         }
 
         if (frameLayer.kind === 'settings') {
-          return resolveSettingsLayout(model, options, pagesById) == null
-            ? { bubble: true }
-            : { handled: true };
+          const cmds = handleSettingsLayerKeyCommands(msg, model);
+          return cmds != null ? { handled: true, commands: cmds } : { bubble: true };
         }
 
         if (frameLayer.kind === 'notification-center') {
-          return resolveNotificationCenterLayout(model, options, pagesById) == null
-            ? { bubble: true }
-            : { handled: true };
+          const cmds = handleNotificationCenterLayerKeyCommands(msg, model);
+          return cmds != null ? { handled: true, commands: cmds } : { bubble: true };
         }
 
-        return { handled: true };
+        if (frameLayer.kind === 'quit-confirm') {
+          const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
+          if (isShellQuitConfirmAccept(msg)) {
+            return { handled: true, commands: [obs, { type: 'close-quit-confirm' }, { type: 'quit' }] };
+          }
+          if (isShellQuitConfirmDismiss(msg)) {
+            return { handled: true, commands: [obs, { type: 'close-quit-confirm' }] };
+          }
+          return { handled: true, commands: [obs] };
+        }
+
+        if (frameLayer.kind === 'page-modal') {
+          const { modalKeyMap } = context;
+          const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'page' };
+          if (modalKeyMap != null) {
+            const modalAction = modalKeyMap.handle(msg);
+            if (modalAction !== undefined) {
+              return { handled: true, commands: [obs, { type: 'emit-page-msg', pageId: model.activePageId, msg: modalAction }] };
+            }
+          }
+          return { handled: true, commands: [obs] };
+        }
+
+        // workspace (root layer)
+        return { handled: true, commands: handleWorkspaceLayerKeyCommands(msg, model) };
       },
     );
-
-    const routedLayer = runtimeStack.layers.find(
-      (layer) => layer.id === runtimeRoute.handledByViewId,
-    )?.model ?? context.activeLayer;
-
-    return {
-      ...context,
-      runtimeStack,
-      routedLayer,
-      routedRoute: observedRouteForLayer(routedLayer),
-    };
   }
 
   function createShellRetainedLayoutNode(
@@ -968,12 +1360,16 @@ export function createFramedApp<PageModel, Msg>(
   function resolveRoutedMouseLayer(
     msg: MouseMsg,
     model: InternalFrameModel<PageModel, Msg>,
-  ) {
+  ): RuntimeInputRouteResult<FrameShellCommand<Msg>> {
     const context = resolveLayerContext(model);
+    const { activePageModel, inputAreas } = context;
     const runtimeStack = describeFrameRuntimeViewStack(model, {
       pageModalOpen: context.pageModalOpen,
     });
-    const runtimeRoute = routeRuntimeInput(
+
+    return routeRuntimeInput<
+      SurfaceLayoutNode, FrameLayerDescriptor, FrameShellCommand<Msg>
+    >(
       runtimeStack,
       resolveFrameMouseRuntimeLayouts(model),
       {
@@ -985,37 +1381,126 @@ export function createFramedApp<PageModel, Msg>(
       },
       ({ layer, hit }) => {
         const frameLayer = layer.model;
-        if (frameLayer == null) {
-          return undefined;
+        if (frameLayer == null) return undefined;
+
+        const cmds: FrameShellCommand<Msg>[] = [];
+
+        if (frameLayer.kind === 'help') {
+          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+            cmds.push({ type: 'help-scroll', delta: msg.action === 'scroll-down' ? 3 : -3 });
+          }
+          return { handled: true, commands: cmds };
         }
 
-        switch (frameLayer.kind) {
-          case 'settings':
-          case 'notification-center':
-            return hit == null ? { stop: true } : { handled: true };
-          case 'help':
-          case 'search':
-          case 'command-palette':
-          case 'quit-confirm':
-          case 'page-modal':
-          case 'workspace':
-            return { handled: true };
-          default:
-            return undefined;
+        if (frameLayer.kind === 'search' || frameLayer.kind === 'command-palette'
+          || frameLayer.kind === 'quit-confirm' || frameLayer.kind === 'page-modal') {
+          return { handled: true };
         }
+
+        if (frameLayer.kind === 'settings') {
+          if (hit == null) return { handled: true };
+          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+            cmds.push({ type: 'settings-scroll', delta: msg.action === 'scroll-down' ? 3 : -3 });
+            return { handled: true, commands: cmds };
+          }
+          if (msg.action === 'press' && msg.button === 'left') {
+            const rowNode = hit.path.find((n) => n.id?.startsWith('settings-row:'));
+            if (rowNode != null) {
+              const rowIndex = parseInt(rowNode.id!.slice('settings-row:'.length), 10);
+              cmds.push({ type: 'activate-settings-row', rowIndex });
+            }
+            return { handled: true, commands: cmds };
+          }
+          return { handled: true };
+        }
+
+        if (frameLayer.kind === 'notification-center') {
+          if (hit == null) return { handled: true };
+          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+            cmds.push({ type: 'notification-center-scroll', delta: msg.action === 'scroll-down' ? 3 : -3 });
+            return { handled: true, commands: cmds };
+          }
+          return { handled: true };
+        }
+
+        // workspace layer
+        if (msg.action === 'press' && msg.button === 'left') {
+          // notification toast hit-testing (outside retained layouts)
+          if (frameNotificationOptions.enabled) {
+            const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
+              screenWidth: model.columns,
+              screenHeight: model.rows,
+              margin: frameNotificationOptions.margin,
+              gap: frameNotificationOptions.gap,
+              ctx: resolveSafeCtx() ?? undefined,
+            }, msg.col, msg.row);
+            if (notificationTarget?.kind === 'dismiss') {
+              cmds.push({ type: 'dismiss-notification', notificationId: notificationTarget.item.id });
+              return { handled: true, commands: cmds };
+            }
+            if (notificationTarget != null) {
+              return { handled: true };
+            }
+          }
+
+          // tab click
+          const tabNode = hit?.path.find((n) => n.id?.startsWith('tab:'));
+          if (tabNode != null) {
+            const pageId = tabNode.id!.slice('tab:'.length);
+            const currentIndex = model.pageOrder.indexOf(model.activePageId);
+            const nextIndex = model.pageOrder.indexOf(pageId);
+            if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
+              cmds.push({ type: 'switch-tab', delta: nextIndex - currentIndex });
+            }
+            return { handled: true, commands: cmds };
+          }
+          if (msg.row === 0) {
+            return { handled: true };
+          }
+
+          // pane click
+          const clickedPaneNode = hit?.path.find((n) => n.id?.startsWith('pane:'));
+          if (clickedPaneNode != null) {
+            const paneId = clickedPaneNode.id!.slice('pane:'.length);
+            const paneRects = resolveWorkspacePaneRects(model);
+            const paneRect = paneRects.get(paneId);
+            if (paneRect != null) {
+              cmds.push({ type: 'focus-pane', paneId });
+              const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+              const areaMsg = inputArea?.mouse?.({ msg, model: activePageModel, rect: paneRect });
+              cmds.push({
+                type: 'emit-page-msg',
+                pageId: model.activePageId,
+                msg: areaMsg !== undefined ? areaMsg : msg,
+              });
+              return { handled: true, commands: cmds };
+            }
+          }
+        }
+
+        if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
+          const scrollPaneNode = hit?.path.find((n) => n.id?.startsWith('pane:'));
+          if (scrollPaneNode != null) {
+            const paneId = scrollPaneNode.id!.slice('pane:'.length);
+            const paneRects = resolveWorkspacePaneRects(model);
+            const paneRect = paneRects.get(paneId);
+            if (paneRect != null) {
+              cmds.push({ type: 'focus-pane', paneId });
+              const inputArea = findInputAreaByPaneId(inputAreas, paneId);
+              const areaMsg = inputArea?.mouse?.({ msg, model: activePageModel, rect: paneRect });
+              if (areaMsg !== undefined) {
+                cmds.push({ type: 'emit-page-msg', pageId: model.activePageId, msg: areaMsg });
+              } else {
+                cmds.push({ type: 'scroll-focused-pane', direction: msg.action === 'scroll-down' ? 'down' : 'up' });
+              }
+              return { handled: true, commands: cmds };
+            }
+          }
+        }
+
+        return { handled: true };
       },
     );
-
-    const routedLayer = runtimeStack.layers.find(
-      (layer) => layer.id === (runtimeRoute.handledByViewId ?? runtimeRoute.stoppedByViewId),
-    )?.model ?? context.activeLayer;
-
-    return {
-      ...context,
-      runtimeStack,
-      routedLayer,
-      routedHit: runtimeRoute.hit,
-    };
   }
 
   function resolveWorkspaceHelpSource(
@@ -1176,175 +1661,6 @@ export function createFramedApp<PageModel, Msg>(
     const synced = syncPageFrameState({ ...model, pageModels: nextModels }, targetPageId, pagesById);
     const wrappedCmds = cmds.map((cmd) => wrapCmdForPage(targetPageId, cmd));
     return [synced, wrappedCmds];
-  }
-
-  function handleFrameMouse(
-    msg: MouseMsg,
-    model: InternalFrameModel<PageModel, Msg>,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] | undefined {
-    const {
-      activePage,
-      activePageModel,
-      inputAreas,
-      routedLayer,
-      routedHit,
-    } = resolveRoutedMouseLayer(msg, model);
-
-    if (routedLayer.kind === 'help') {
-      if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-        return [applyHelpScroll(model, activePage, msg.action === 'scroll-down' ? 3 : -3, frameKeys, paletteKeys, options, pagesById), []];
-      }
-      return [model, []];
-    }
-
-    if (routedLayer.kind === 'search' || routedLayer.kind === 'command-palette') {
-      return [model, []];
-    }
-
-    if (routedLayer.kind === 'quit-confirm' || routedLayer.kind === 'page-modal') {
-      return [model, []];
-    }
-
-    if (routedLayer.kind === 'settings') {
-        const layout = resolveSettingsLayout(model, options, pagesById);
-        if (layout != null) {
-          const insideDrawer = routedHit?.viewId === 'settings';
-          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-            if (insideDrawer) {
-              return [
-                scrollSettingsBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
-                [],
-              ];
-            }
-            return [model, []];
-          }
-
-          if (msg.action === 'press' && msg.button === 'left') {
-            if (!insideDrawer) {
-              return [model, []];
-            }
-            const rowNode = routedHit?.path.find((n) => n.id?.startsWith('settings-row:'));
-            if (rowNode == null) return [model, []];
-            const rowIndex = parseInt(rowNode.id!.slice('settings-row:'.length), 10);
-            const hitRow = layout.rows.find((r) => r.index === rowIndex);
-            if (hitRow == null) return [model, []];
-            const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
-            if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
-              return [focusedModel, []];
-            }
-            return activateSettingsRow(focusedModel, hitRow.row);
-          }
-
-          return [model, []];
-        }
-    }
-
-    if (routedLayer.kind === 'notification-center') {
-        const layout = resolveNotificationCenterLayout(model, options, pagesById);
-        if (layout != null) {
-          const insideDrawer = routedHit?.viewId === 'notification-center';
-          if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-            if (insideDrawer) {
-              return [
-                scrollNotificationCenterBy(model, layout, msg.action === 'scroll-down' ? 3 : -3),
-                [],
-              ];
-            }
-            return [model, []];
-          }
-
-          if (msg.action === 'press' && msg.button === 'left') {
-            return [model, []];
-          }
-
-          return [model, []];
-        }
-    }
-
-      if (msg.action === 'press' && msg.button === 'left') {
-      if (frameNotificationOptions.enabled) {
-        const nowMs = resolveClock(resolveSafeCtx()).now();
-        const notificationTarget = hitTestNotificationStack(model.runtimeNotifications, {
-          screenWidth: model.columns,
-          screenHeight: model.rows,
-          margin: frameNotificationOptions.margin,
-          gap: frameNotificationOptions.gap,
-          ctx: resolveSafeCtx() ?? undefined,
-        }, msg.col, msg.row);
-
-        if (notificationTarget?.kind === 'dismiss') {
-          return applyFrameNotificationState(
-            model,
-            dismissNotification(model.runtimeNotifications, notificationTarget.item.id, nowMs),
-            nowMs,
-          );
-        }
-        if (notificationTarget != null) {
-          return [model, []];
-        }
-      }
-
-      const tabNode = routedHit?.path.find((n) => n.id?.startsWith('tab:'));
-      if (tabNode != null) {
-        const pageId = tabNode.id!.slice('tab:'.length);
-        const currentIndex = model.pageOrder.indexOf(model.activePageId);
-        const nextIndex = model.pageOrder.indexOf(pageId);
-        if (currentIndex >= 0 && nextIndex >= 0 && nextIndex !== currentIndex) {
-          return switchTab(model, nextIndex - currentIndex, pagesById, options);
-        }
-        return [model, []];
-      }
-      if (msg.row === 0) {
-        return [model, []];
-      }
-
-      const clickedPaneNode = routedHit?.path.find((n) => n.id?.startsWith('pane:'));
-      if (clickedPaneNode != null) {
-        const paneId = clickedPaneNode.id!.slice('pane:'.length);
-        const paneRects = resolveWorkspacePaneRects(model);
-        const paneRect = paneRects.get(paneId);
-        if (paneRect != null) {
-          const focusedModel = focusPane(model, paneId);
-          const inputArea = findInputAreaByPaneId(inputAreas, paneId);
-          const areaMsg = inputArea?.mouse?.({
-            msg,
-            model: activePageModel,
-            rect: paneRect,
-          });
-          if (areaMsg !== undefined) {
-            return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
-          }
-          return [focusedModel, [emitMsgForPage<Msg>(model.activePageId, msg)]];
-        }
-      }
-    }
-
-    if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-      const scrollPaneNode = routedHit?.path.find((n) => n.id?.startsWith('pane:'));
-      if (scrollPaneNode != null) {
-        const paneId = scrollPaneNode.id!.slice('pane:'.length);
-        const paneRects = resolveWorkspacePaneRects(model);
-        const paneRect = paneRects.get(paneId);
-        if (paneRect != null) {
-          const focusedModel = focusPane(model, paneId);
-          const inputArea = findInputAreaByPaneId(inputAreas, paneId);
-          const areaMsg = inputArea?.mouse?.({
-            msg,
-            model: activePageModel,
-            rect: paneRect,
-          });
-          if (areaMsg !== undefined) {
-            return [focusedModel, [emitMsgForPage(model.activePageId, areaMsg)]];
-          }
-          const action: FrameAction = msg.action === 'scroll-down'
-            ? { type: 'scroll-down' }
-            : { type: 'scroll-up' };
-          return [scrollFocusedPane(focusedModel, action, pagesById, options), []];
-        }
-      }
-    }
-
-    return undefined;
   }
 
   function applyFrameNotificationState(
@@ -1549,289 +1865,14 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (isKeyMsg(msg)) {
-        const {
-          activePage,
-          activeInputArea,
-          modalKeyMap,
-          routedLayer,
-        } = resolveRoutedKeyLayer(msg, model);
-
-        if (routedLayer.kind === 'search' || routedLayer.kind === 'command-palette') {
-          if (msg.ctrl && !msg.alt && msg.key === 'c') {
-            return applyQuitRequest(model, msg);
-          }
-          if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape') {
-            return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
-          }
-          const frameAction = frameKeys.handle(msg);
-          if (frameAction?.type === 'open-search') {
-            if (routedLayer.kind === 'search') {
-              return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
-            }
-            return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
-          }
-          if (frameAction?.type === 'open-palette') {
-            if (routedLayer.kind === 'command-palette') {
-              return [closeCommandPalette(model), withObservedKey(model, [], msg, 'palette')];
-            }
-            return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'palette')];
-          }
-          if (frameAction?.type === 'toggle-notifications') {
-            const [nextModel, cmds] = applyFrameAction(frameAction, closeCommandPalette(model), options, pagesById);
-            return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
-          }
-          const [nextModel, cmds] = handlePaletteKey(msg, model, paletteKeys, options, pagesById);
-          return [nextModel, withObservedKey(model, cmds, msg, 'palette')];
-        }
-
-        if (routedLayer.kind === 'help') {
-          if (!msg.ctrl && !msg.alt && (msg.key === '?' || msg.key === 'escape')) {
-            return [{ ...model, helpOpen: false, helpScrollY: 0 }, withObservedKey(model, [], msg, 'help')];
-          }
-          if (isShellQuitRequest(msg)) {
-            return applyQuitRequest(model, msg);
-          }
-          const helpAction = frameKeys.handle(msg);
-          if (helpAction && isHelpScrollAction(helpAction)) {
-            return [
-              applyHelpScrollAction(model, activePage, helpAction, frameKeys, paletteKeys, options, pagesById),
-              withObservedKey(model, [], msg, 'help'),
-            ];
-          }
-          return [model, withObservedKey(model, [], msg, 'help')];
-        }
-
-        if (routedLayer.kind === 'settings') {
-          const layout = resolveSettingsLayout(model, options, pagesById);
-          if (layout != null) {
-            const settingsFrameAction = frameKeys.handle(msg);
-            if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
-              return [{
-                ...model,
-                settingsOpen: false,
-              }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (msg.ctrl && !msg.alt && msg.key === ',') {
-              return [{
-                ...model,
-                settingsOpen: false,
-              }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'f2') {
-              return [{
-                ...model,
-                settingsOpen: false,
-              }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === '?') {
-              return [{ ...model, helpOpen: true }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (isShellQuitRequest(msg)) {
-              return applyQuitRequest(model, msg);
-            }
-            if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
-              return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
-              return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (settingsFrameAction?.type === 'toggle-notifications') {
-              const [nextModel, cmds] = applyFrameAction(settingsFrameAction, model, options, pagesById);
-              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'up') {
-              return [moveSettingsFocus(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'down') {
-              return [moveSettingsFocus(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'j') {
-              return [scrollSettingsBy(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'k') {
-              return [scrollSettingsBy(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'd') {
-              return [scrollSettingsBy(model, layout, Math.max(1, layout.contentHeight - 1)), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'u') {
-              return [scrollSettingsBy(model, layout, -Math.max(1, layout.contentHeight - 1)), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'g') {
-              return [{ ...model, settingsScrollY: 0 }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'G') {
-              return [{ ...model, settingsScrollY: layout.maxScrollY }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && (msg.key === 'enter' || msg.key === 'space')) {
-              const row = layout.rows[clampSettingsFocus(model, layout)]?.row;
-              if (row?.action !== undefined && row.enabled !== false && row.kind !== 'info') {
-                const [nextModel, cmds] = activateSettingsRow(model, row);
-                return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-              }
-              return [model, withObservedKey(model, [], msg, 'frame')];
-            }
-            return [model, withObservedKey(model, [], msg, 'frame')];
-          }
-        }
-
-        if (routedLayer.kind === 'notification-center') {
-          const layout = resolveNotificationCenterLayout(model, options, pagesById);
-          if (layout != null) {
-            const centerFrameAction = frameKeys.handle(msg);
-            if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
-              return [{
-                ...model,
-                notificationCenterOpen: false,
-                notificationCenterScrollY: 0,
-              }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (isShellQuitRequest(msg)) {
-              return applyQuitRequest(model, msg);
-            }
-            if (centerFrameAction?.type === 'toggle-notifications') {
-              const [nextModel, cmds] = applyFrameAction(centerFrameAction, model, options, pagesById);
-              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'f2') {
-              const [nextModel, cmds] = applyFrameAction({ type: 'toggle-settings' }, model, options, pagesById);
-              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === '?') {
-              return [{
-                ...model,
-                helpOpen: true,
-                notificationCenterOpen: false,
-                notificationCenterScrollY: 0,
-              }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
-              return [openSearchPalette({
-                ...model,
-                notificationCenterOpen: false,
-                notificationCenterScrollY: 0,
-              }, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (options.enableCommandPalette && ((msg.ctrl && !msg.alt && msg.key === 'p') || (!msg.ctrl && !msg.alt && msg.key === ':'))) {
-              return [openCommandPalette({
-                ...model,
-                notificationCenterOpen: false,
-                notificationCenterScrollY: 0,
-              }, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && (msg.key === 'up' || msg.key === 'k')) {
-              return [scrollNotificationCenterBy(model, layout, -1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && (msg.key === 'down' || msg.key === 'j')) {
-              return [scrollNotificationCenterBy(model, layout, 1), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'd') {
-              return [scrollNotificationCenterBy(model, layout, Math.max(1, layout.contentHeight - 2)), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'u') {
-              return [scrollNotificationCenterBy(model, layout, -Math.max(1, layout.contentHeight - 2)), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'g') {
-              return [{ ...model, notificationCenterScrollY: 0 }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'G') {
-              return [{ ...model, notificationCenterScrollY: layout.maxScrollY }, withObservedKey(model, [], msg, 'frame')];
-            }
-            if (!msg.ctrl && !msg.alt && msg.key === 'f') {
-              const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
-              return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-            }
-            return [model, withObservedKey(model, [], msg, 'frame')];
-          }
-        }
-
-        if (routedLayer.kind === 'quit-confirm') {
-          if (isShellQuitConfirmAccept(msg)) {
-            return [{
-              ...model,
-              quitConfirmOpen: false,
-            }, withObservedKey(model, [quit()], msg, 'frame')];
-          }
-          if (isShellQuitConfirmDismiss(msg)) {
-            return [{
-              ...model,
-              quitConfirmOpen: false,
-            }, withObservedKey(model, [], msg, 'frame')];
-          }
-          return [model, withObservedKey(model, [], msg, 'frame')];
-        }
-
-        if (routedLayer.kind === 'page-modal' && modalKeyMap != null) {
-          const modalAction = modalKeyMap.handle(msg);
-          if (modalAction !== undefined) {
-            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, modalAction)], msg, 'page')];
-          }
-          return [model, withObservedKey(model, [], msg, 'page')];
-        }
-
-        if (isShellQuitRequest(msg)) {
-          return applyQuitRequest(model, msg);
-        }
-
-        const paneAction = activeInputArea?.keyMap?.handle(msg);
-        const pageAction = activePage.keyMap?.handle(msg);
-        const globalAction = options.globalKeys?.handle(msg);
-        const frameAction = frameKeys.handle(msg);
-        const keyPriority = options.keyPriority ?? 'frame-first';
-
-        if (keyPriority === 'page-first') {
-          if (paneAction !== undefined) {
-            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, paneAction)], msg, 'page')];
-          }
-          if (pageAction !== undefined) {
-            return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
-          }
-          if (globalAction !== undefined) {
-            return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
-          }
-          if (frameAction !== undefined) {
-            if (frameAction.type === 'open-search' && options.enableCommandPalette) {
-              return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
-              return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-            }
-            const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
-            return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-          }
-          return [model, withObservedKey(model, [], msg, 'unhandled')];
-        }
-
-        if (frameAction !== undefined) {
-          // Handle palette opening here since applyFrameAction doesn't have access to palette deps
-          if (frameAction.type === 'open-search' && options.enableCommandPalette) {
-            return [openSearchPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-          }
-          if (frameAction.type === 'open-palette' && options.enableCommandPalette) {
-            return [openCommandPalette(model, frameKeys, options, pagesById), withObservedKey(model, [], msg, 'frame')];
-          }
-          const [nextModel, cmds] = applyFrameAction(frameAction, model, options, pagesById);
-          return [nextModel, withObservedKey(model, cmds, msg, 'frame')];
-        }
-
-        if (paneAction !== undefined) {
-          return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, paneAction)], msg, 'page')];
-        }
-
-        if (globalAction !== undefined) {
-          return [model, withObservedKey(model, [emitMsg(globalAction)], msg, 'global')];
-        }
-
-        if (pageAction !== undefined) {
-          return [model, withObservedKey(model, [emitMsgForPage(model.activePageId, pageAction)], msg, 'page')];
-        }
-
-        return [model, withObservedKey(model, [], msg, 'unhandled')];
+        return drainShellCommandBuffer(model, resolveRoutedKeyLayer(msg, model));
       }
 
       if (isMouseMsg(msg)) {
-        const frameResult = handleFrameMouse(msg, model);
-        if (frameResult != null) return frameResult;
+        const mouseRouteResult = resolveRoutedMouseLayer(msg, model);
+        if (mouseRouteResult.handled) {
+          return drainShellCommandBuffer(model, mouseRouteResult);
+        }
         return updateTargetPage(model, model.activePageId, msg);
       }
 
@@ -2149,58 +2190,6 @@ function isHelpScrollAction(
     || action.type === 'page-down'
     || action.type === 'top'
     || action.type === 'bottom';
-}
-
-function applyHelpScrollAction<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  activePage: FramePage<PageModel, Msg>,
-  action: Extract<FrameAction, { type: 'scroll-up' | 'scroll-down' | 'page-up' | 'page-down' | 'top' | 'bottom' }>,
-  frameKeys: KeyMap<FrameAction>,
-  paletteKeys: KeyMap<PaletteAction>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): InternalFrameModel<PageModel, Msg> {
-  const overlay = renderHelpOverlay(model, activePage, frameKeys, paletteKeys, options, pagesById);
-  const pagerState = {
-    scroll: {
-      y: overlay.scrollY,
-      maxY: overlay.maxScrollY,
-      x: 0,
-      maxX: 0,
-      totalLines: overlay.maxScrollY + Math.max(1, overlay.body.height - 1),
-      visibleLines: Math.max(1, overlay.body.height - 1),
-    },
-    content: '',
-    width: overlay.body.width,
-    height: overlay.body.height,
-  };
-
-  let next = pagerState;
-  switch (action.type) {
-    case 'scroll-up':
-      next = pagerScrollBy(pagerState, -1);
-      break;
-    case 'scroll-down':
-      next = pagerScrollBy(pagerState, 1);
-      break;
-    case 'page-up':
-      next = pagerPageUp(pagerState);
-      break;
-    case 'page-down':
-      next = pagerPageDown(pagerState);
-      break;
-    case 'top':
-      next = pagerScrollToTop(pagerState);
-      break;
-    case 'bottom':
-      next = pagerScrollToBottom(pagerState);
-      break;
-  }
-
-  return {
-    ...model,
-    helpScrollY: next.scroll.y,
-  };
 }
 
 function applyHelpScroll<PageModel, Msg>(

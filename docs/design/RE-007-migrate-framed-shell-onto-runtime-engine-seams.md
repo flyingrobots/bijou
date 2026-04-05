@@ -210,16 +210,32 @@ What the third slice lands:
 - `resolveWorkspacePaneRects` extracted as a shared pane geometry
   resolver for both the workspace layout tree and the mouse handler
 
-What this cycle does not land yet:
+What the fourth slice lands:
 
-- no runtime-buffer-backed shell command/effect dispatch yet
-- no removal of every remaining shell-local branch
+- `FrameShellCommand<Msg>` discriminated union in `app-frame-types.ts`
+  covering every shell mutation and command emission as plain data facts
+- a handler table inside `createFramedApp` that interprets each command
+  variant through model mutation and TEA command accumulation
+- `drainShellCommandBuffer` using `bufferRuntimeRouteResult` and
+  `applyRuntimeCommandBuffer` to process route results
+- mouse routing handler produces shell commands directly instead of
+  delegating to a separate `handleFrameMouse` function
+- key routing handler produces shell commands through per-layer helper
+  functions (`handlePaletteLayerKeyCommands`,
+  `handleSettingsLayerKeyCommands`, `handleWorkspaceLayerKeyCommands`,
+  etc.) instead of a 280-line if-chain in `update()`
+- `update()` key and mouse branches reduced to single-line buffer
+  drains
+- removed: `handleFrameMouse`, `withObservedKey`, `applyQuitRequest`,
+  `observedRouteForLayer`, `applyHelpScrollAction`
+
+What this cycle does not address:
+
 - notification toast hit-testing stays outside the retained layout
   system (viewport-positioned overlays managed by notification.ts)
-
-Follow-on inside this same cycle:
-
-- migrate shell command/effect dispatch onto runtime buffers
+- FrameScopedMsg branches (timers, transitions, notification ticks)
+  stay as special cases in update() — they are frame-owned state
+  mutations, not routed input events
 
 ## Runtime-buffer-backed command/effect dispatch — design intent
 

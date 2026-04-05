@@ -126,6 +126,63 @@ export type FrameAction =
   | { type: 'transition'; progress: number; generation: number; dt: number; elapsedMs: number }
   | { type: 'transition-complete'; generation: number };
 
+// ---------------------------------------------------------------------------
+// Shell commands — plain facts emitted by routing handlers, interpreted
+// inside createFramedApp via a handler table.  The buffer holds data,
+// not code.
+// ---------------------------------------------------------------------------
+
+/** Route label for the key-observation callback. */
+export type ObservedKeyRoute =
+  | 'palette'
+  | 'help'
+  | 'frame'
+  | 'page'
+  | 'global'
+  | 'unhandled';
+
+/**
+ * Discriminated union of every shell mutation or command emission that
+ * routing handlers can produce.  Each variant is a plain fact describing
+ * WHAT should happen, not HOW.
+ */
+export type FrameShellCommand<Msg> =
+  // --- overlay lifecycle ---
+  | { readonly type: 'close-help' }
+  | { readonly type: 'close-settings' }
+  | { readonly type: 'close-notification-center' }
+  | { readonly type: 'close-palette' }
+  | { readonly type: 'close-quit-confirm' }
+  | { readonly type: 'open-help' }
+  | { readonly type: 'open-quit-confirm' }
+  | { readonly type: 'open-search-palette' }
+  | { readonly type: 'open-command-palette' }
+  // --- settings ---
+  | { readonly type: 'settings-focus-move'; readonly delta: number }
+  | { readonly type: 'settings-scroll'; readonly delta: number }
+  | { readonly type: 'settings-scroll-to'; readonly position: 'top' | 'bottom' }
+  | { readonly type: 'activate-settings-row'; readonly rowIndex: number }
+  // --- notification center ---
+  | { readonly type: 'notification-center-scroll'; readonly delta: number }
+  | { readonly type: 'notification-center-scroll-to'; readonly position: 'top' | 'bottom' }
+  | { readonly type: 'cycle-notification-filter' }
+  // --- help ---
+  | { readonly type: 'help-scroll'; readonly delta: number }
+  // --- workspace ---
+  | { readonly type: 'focus-pane'; readonly paneId: string }
+  | { readonly type: 'scroll-focused-pane'; readonly direction: 'up' | 'down' }
+  | { readonly type: 'switch-tab'; readonly delta: number }
+  // --- delegation to existing reducers ---
+  | { readonly type: 'apply-frame-action'; readonly action: FrameAction }
+  | { readonly type: 'palette-key'; readonly msg: KeyMsg }
+  // --- TEA command emissions ---
+  | { readonly type: 'emit-page-msg'; readonly pageId: string; readonly msg: Msg | MouseMsg }
+  | { readonly type: 'emit-global-msg'; readonly msg: Msg }
+  | { readonly type: 'quit' }
+  | { readonly type: 'dismiss-notification'; readonly notificationId: number }
+  // --- observation ---
+  | { readonly type: 'observed-key'; readonly msg: KeyMsg; readonly route: ObservedKeyRoute };
+
 /** Discriminated union of command palette navigation/selection actions. */
 export type PaletteAction =
   | { type: 'cp-next' }
