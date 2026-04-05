@@ -152,8 +152,73 @@ function stampText(
   }
 }
 
-const MODE_NAMES = ['gradient', 'horizon'];
+const MODE_NAMES = ['gradient', 'horizon', 'noise'];
 const MODE_COUNT = MODE_NAMES.length;
+
+// --- OpenSimplex noise (adapted from ertdfgcvb) ---
+function openSimplexNoise2D(seed: number): (x: number, y: number) => number {
+  const STRETCH = (1 / Math.sqrt(3) - 1) / 2;
+  const SQUISH = (Math.sqrt(3) - 1) / 2;
+  const NORM = 1.0 / 47.0;
+  const grads = [5,2, 2,5, -5,2, -2,5, 5,-2, 2,-5, -5,-2, -2,-5];
+  const perm = new Uint8Array(256);
+  const source = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) source[i] = i;
+  let s = (seed * 1664525 + 1013904223) | 0;
+  s = (s * 1664525 + 1013904223) | 0;
+  s = (s * 1664525 + 1013904223) | 0;
+  for (let i = 255; i >= 0; i--) {
+    s = (s * 1664525 + 1013904223) | 0;
+    let r = ((s + 31) % (i + 1));
+    if (r < 0) r += i + 1;
+    perm[i] = source[r];
+    source[r] = source[i];
+  }
+  return (x: number, y: number): number => {
+    const stretch = (x + y) * STRETCH;
+    const xs = x + stretch, ys = y + stretch;
+    const xsb = Math.floor(xs), ysb = Math.floor(ys);
+    const squish = (xsb + ysb) * SQUISH;
+    const dx0 = x - (xsb + squish), dy0 = y - (ysb + squish);
+    const xins = xs - xsb, yins = ys - ysb;
+    const inSum = xins + yins;
+    let value = 0;
+    // Contribution (0,0)
+    let dx = dx0, dy = dy0;
+    let attn = 2 - dx * dx - dy * dy;
+    if (attn > 0) {
+      const i = (perm[(perm[xsb & 0xFF] + ysb) & 0xFF] & 0x0E);
+      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+    }
+    // (1,0)
+    dx = dx0 - 1 - SQUISH; dy = dy0 - SQUISH;
+    attn = 2 - dx * dx - dy * dy;
+    if (attn > 0) {
+      const i = (perm[(perm[(xsb + 1) & 0xFF] + ysb) & 0xFF] & 0x0E);
+      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+    }
+    // (0,1)
+    dx = dx0 - SQUISH; dy = dy0 - 1 - SQUISH;
+    attn = 2 - dx * dx - dy * dy;
+    if (attn > 0) {
+      const i = (perm[(perm[xsb & 0xFF] + ysb + 1) & 0xFF] & 0x0E);
+      attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+    }
+    if (inSum > 1) {
+      // (1,1)
+      dx = dx0 - 1 - 2 * SQUISH; dy = dy0 - 1 - 2 * SQUISH;
+      attn = 2 - dx * dx - dy * dy;
+      if (attn > 0) {
+        const i = (perm[(perm[(xsb + 1) & 0xFF] + ysb + 1) & 0xFF] & 0x0E);
+        attn *= attn; value += attn * attn * (grads[i] * dx + grads[i + 1] * dy);
+      }
+    }
+    return value * NORM;
+  };
+}
+
+const noise2D = openSimplexNoise2D(42);
+const DENSITY = 'Ñ@#W$9876543210?!abcxyz;:+=-,._ ';
 
 function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): void {
   const { cols, rows, frame, mouseDown } = model;
@@ -204,13 +269,37 @@ function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): v
   }
 }
 
+function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, mouseDown } = model;
+  const t = model.elapsed * 0.0007 * (mouseDown ? -1 : 1);
+  const s = 0.03;
+  const aspect = 0.5; // terminal chars are ~2:1
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = col * s;
+      const y = row * s / aspect + t;
+      const n = noise2D(x, y + t * 0.3) * 0.5 + 0.5;
+      const i = Math.floor(n * DENSITY.length);
+      const ch = DENSITY[clamp(i, 0, DENSITY.length - 1)] ?? ' ';
+      // Lerp between the two colors based on noise value
+      const bright = n;
+      const r = Math.round(255 * bright * 0.3 + 246 * (1 - bright));
+      const g = Math.round(89 * bright * 0.3 + 246 * (1 - bright));
+      const b = Math.round(55 * bright * 0.3 + 244 * (1 - bright));
+      surface.set(col, row, { char: ch, fg: rgbHex(r, g, b), bg: '#000000' });
+    }
+  }
+}
+
 function renderFrame(model: Model) {
-  const { cols, rows, mem } = model;
+  const { cols, rows } = model;
   const surface = getOrCreateSurface(cols, rows);
 
   switch (model.mode) {
     case 0: fillGradient(surface, model); break;
     case 1: fillHorizon(surface, model); break;
+    case 2: fillNoise(surface, model); break;
   }
 
   // --- Stats overlay ---
