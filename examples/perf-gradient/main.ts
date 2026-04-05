@@ -169,13 +169,14 @@ interface Model {
   mouseDown: boolean;
   mode: number;
   capped: boolean;
+  tickGen: number;
   lastTickMs: number;
   frameTimeMs: number;
   mem: MemStats;
   memSampleFrame: number;
 }
 
-type Msg = { type: 'tick' };
+type Msg = { type: 'tick'; gen: number };
 
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
@@ -431,7 +432,7 @@ function renderFrame(model: Model) {
     maxVt = Math.ceil(maxVt); // round up for clean labels
 
     // Title
-    stampText(surface, 3, graphTop - 1, `view() ms  (max ${maxVt.toFixed(0)}ms)`, '#666666', BG);
+    stampText(surface, 3, graphTop - 1, `render time (ms)`, '#666666', BG);
 
     // Y axis labels (top, middle, bottom)
     stampText(surface, 3, graphTop, `${maxVt.toFixed(0).padStart(4)}┤`, '#555555', BG);
@@ -451,7 +452,8 @@ function renderFrame(model: Model) {
     );
 
     // X axis label
-    stampText(surface, graphLeft, graphTop + graphCharsH, `╰${'─'.repeat(graphCharsW - 1)}  ${GRAPH_SAMPLES} frames`, '#555555', BG);
+    const xLabel = `last ${GRAPH_SAMPLES}`;
+    stampText(surface, graphLeft, graphTop + graphCharsH, `╰${'─'.repeat(max(1, graphCharsW - xLabel.length - 1))} ${xLabel}`, '#555555', BG);
   }
 
   // Controls hint
@@ -478,11 +480,12 @@ const app: App<Model, Msg> = {
     mouseDown: false,
     mode: 0,
     capped: true,
+    tickGen: 0,
     lastTickMs: performance.now(),
     frameTimeMs: 0,
     mem: sampleMemStats(),
     memSampleFrame: 0,
-  }, [tick(CAPPED_MS, { type: 'tick' })]],
+  }, [tick(CAPPED_MS, { type: 'tick', gen: 0 })]],
 
   update: (msg, model) => {
     if (isKeyMsg(msg)) {
@@ -495,7 +498,8 @@ const app: App<Model, Msg> = {
       }
       if (msg.key === ' ' || msg.key === 'space') {
         const next = !model.capped;
-        return [{ ...model, capped: next }, [tick(next ? CAPPED_MS : UNCAPPED_MS, { type: 'tick' })]];
+        const nextGen = model.tickGen + 1;
+        return [{ ...model, capped: next, tickGen: nextGen }, [tick(next ? CAPPED_MS : UNCAPPED_MS, { type: 'tick', gen: nextGen })]];
       }
       return [model, []];
     }
@@ -509,6 +513,8 @@ const app: App<Model, Msg> = {
       return [{ ...model, mouseDown: down }, []];
     }
     if (msg.type === 'tick') {
+      // Ignore ticks from a stale generation (previous cap/uncap cycle)
+      if (msg.gen !== model.tickGen) return [model, []];
       const updateStart = performance.now();
       const now = updateStart;
       const frameTimeMs = now - model.lastTickMs;
@@ -547,7 +553,7 @@ const app: App<Model, Msg> = {
         frameTimeMs,
         mem,
         memSampleFrame: memFrame,
-      }, [tick(delay, { type: 'tick' })]];
+      }, [tick(delay, { type: 'tick', gen: model.tickGen })]];
     }
     return [model, []];
   },
