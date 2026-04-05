@@ -1608,7 +1608,7 @@ describe('createFramedApp', () => {
 
   it('routes key ownership through the runtime view stack before page bindings', () => {
     const observed: string[] = [];
-    const app = createFramedApp({
+    const app = createFramedApp<PageModel, Msg>({
       pages: [makePage('home', 'Home', 'main')],
       settings: () => ({
         title: 'Settings',

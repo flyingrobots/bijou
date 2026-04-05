@@ -86,6 +86,7 @@ So the work now should stay narrower and more structural:
 ## ASAP
 
 - [LX-010 — Built-in i18n Catalog Loader](./BACKLOG/asap/LX-010-built-in-i18n-catalog-loader.md)
+- [RE-008 — Byte-Packed Surface Representation](./BACKLOG/asap/RE-008-byte-packed-surface-representation.md)
 
 ## Near Follow-ons
 

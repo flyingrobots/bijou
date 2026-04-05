@@ -42,12 +42,18 @@ API away from strings without moving the data away from strings.
 The internal surface representation becomes a flat typed array:
 
 ```
-Per cell: 8 bytes (or 12 with extended char support)
-  [0]      char code point (or index into side table for multi-codepoint graphemes)
-  [1-3]    fg R, G, B
-  [4-6]    bg R, G, B
-  [7]      flags bitfield (empty, bold, dim, underline, italic, strikethrough, inverse, blink)
+Per cell: 10 bytes
+  [0-1]    char (uint16 code point, or side-table index for multi-codepoint graphemes)
+  [2-4]    fg R, G, B
+  [5-7]    bg R, G, B
+  [8]      flags bitfield (empty, bold, dim, underline, italic, strikethrough, inverse, blink)
+  [9]      reserved (opacity quantized to 0-255, or future use)
 ```
+
+A uint16 char slot covers the entire BMP (U+0000–U+FFFF) directly.
+Characters outside the BMP and multi-codepoint grapheme clusters use
+a side-table index in the high range (e.g., values >= 0xF000 index
+into a per-surface `string[]` side table).
 
 ```typescript
 // Internal: zero-alloc, GC-invisible
