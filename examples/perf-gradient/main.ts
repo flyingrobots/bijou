@@ -220,7 +220,7 @@ function stampText(
   }
 }
 
-const MODE_NAMES = ['gradient', 'horizon', 'noise'];
+const MODE_NAMES = ['gradient', 'horizon', 'noise', 'quad'];
 const MODE_COUNT = MODE_NAMES.length;
 
 // --- OpenSimplex noise (adapted from ertdfgcvb) ---
@@ -360,6 +360,43 @@ function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): voi
   }
 }
 
+function fillQuad(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows } = model;
+  const halfC = Math.floor(cols / 2);
+  const halfR = Math.floor(rows / 2);
+
+  // Build sub-models for each quadrant
+  const tl: Model = { ...model, cols: halfC, rows: halfR };
+  const tr: Model = { ...model, cols: cols - halfC, rows: halfR };
+  const bl: Model = { ...model, cols: halfC, rows: rows - halfR };
+  const br: Model = { ...model, cols: cols - halfC, rows: rows - halfR };
+
+  // Create temp surfaces for each quadrant
+  const sTL = createSurface(tl.cols, tl.rows);
+  const sTR = createSurface(tr.cols, tr.rows);
+  const sBL = createSurface(bl.cols, bl.rows);
+  const sBR = createSurface(br.cols, br.rows);
+
+  // Top-left is left empty (stats overlay will draw over it)
+  // Fill with dark background
+  sTL.fill({ char: ' ', bg: '#0a0a0a' });
+
+  // Top-right: gradient
+  fillGradient(sTR, { ...tr, cols: tr.cols, rows: tr.rows });
+
+  // Bottom-left: noise
+  fillNoise(sBL, { ...bl, cols: bl.cols, rows: bl.rows });
+
+  // Bottom-right: horizon
+  fillHorizon(sBR, { ...br, cols: br.cols, rows: br.rows });
+
+  // Blit quadrants onto main surface
+  surface.blit(sTL, 0, 0);
+  surface.blit(sTR, halfC, 0);
+  surface.blit(sBL, 0, halfR);
+  surface.blit(sBR, halfC, halfR);
+}
+
 function renderFrame(model: Model) {
   const { cols, rows, mem } = model;
   const surface = getOrCreateSurface(cols, rows);
@@ -368,6 +405,7 @@ function renderFrame(model: Model) {
     case 0: fillGradient(surface, model); break;
     case 1: fillHorizon(surface, model); break;
     case 2: fillNoise(surface, model); break;
+    case 3: fillQuad(surface, model); break;
   }
 
   // --- Stats overlay ---
