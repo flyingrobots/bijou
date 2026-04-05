@@ -4,7 +4,7 @@ Node.js adapters and runtime utilities for Bijou.
 
 This package bridges the pure `@flyingrobots/bijou` core and the `@flyingrobots/bijou-tui` runtime to the Node.js environment. It owns runtime detection, terminal I/O, Chalk-backed styling, worker-thread helpers, and the native surface recorder.
 
-## Package Role in v4.0.0
+## Package Role
 
 - **Worker runtime support** — `runInWorker()` and `startWorkerApp()` let TEA apps move heavy update work off the main thread while keeping input and rendering responsive.
 - **Native surface recorder** — scripted captures can be recorded directly from captured `Surface[]` frames with `recordDemoGif()`.

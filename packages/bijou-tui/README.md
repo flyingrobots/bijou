@@ -4,7 +4,7 @@ The high-fidelity TEA runtime for Bijou.
 
 `bijou-tui` provides the application loop, layout primitives, motion, and orchestration needed to build complex interactive terminal apps on top of the Bijou core.
 
-## Package Role in v4.0.0
+## Package Role
 
 The TUI package is the surface-first fullscreen runtime in the Bijou stack.
 

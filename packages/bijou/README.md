@@ -4,7 +4,7 @@ The pure, zero-dependency core of Bijou.
 
 `@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the interactive runtime builds on.
 
-## Package Role in v4.0.0
+## Package Role
 
 - **Core/runtime split stays explicit** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the fullscreen runtime.
 - **Surface primitives without abandoning strings** — the package is intentionally mixed-mode. String-oriented helpers remain first-class where they fit the toolkit identity, and runtime-friendly surface helpers exist where they actually help.

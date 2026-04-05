@@ -2,7 +2,7 @@
 
 Batteries-included TUI app skeleton built on `createFramedApp()`.
 
-## Package Role in v4.0.0
+## Package Role
 
 - **Pure shell contract** — framed panes now stay on the surface/layout path. Shell panes render `Surface` or `LayoutNode`, not string views.
 - **Truthful shell role** — this package is the opinionated shell layer in the Bijou stack, not the whole runtime. Use it when you want tabs, footer/help chrome, overlays, and a ready-to-run app frame.
