@@ -808,7 +808,18 @@ export function createFramedApp<PageModel, Msg>(
     'help-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
       const activePage = pagesById.get(model.activePageId)!;
-      return applyHelpScroll(model, activePage, c.delta, frameKeys, paletteKeys, options, pagesById);
+      const overlay = renderHelpOverlay(model, activePage, frameKeys, paletteKeys, options, pagesById);
+      const viewportHeight = Math.max(1, overlay.body.height - 1);
+      const delta = c.action === 'down' ? 3
+        : c.action === 'up' ? -3
+        : c.action === 'page-down' ? viewportHeight
+        : c.action === 'page-up' ? -viewportHeight
+        : c.action === 'bottom' ? Infinity
+        : /* top */ -Infinity;
+      return {
+        ...model,
+        helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)),
+      };
     },
 
     // --- workspace ---
@@ -986,14 +997,13 @@ export function createFramedApp<PageModel, Msg>(
     }
     const helpAction = frameKeys.handle(msg);
     if (helpAction && isHelpScrollAction(helpAction)) {
-      const delta = helpAction.type === 'scroll-down' ? 3
-        : helpAction.type === 'scroll-up' ? -3
-        : helpAction.type === 'page-down' ? 999
-        : helpAction.type === 'page-up' ? -999
-        : helpAction.type === 'bottom' ? Infinity
-        : helpAction.type === 'top' ? -Infinity
-        : 0;
-      return [obs, { type: 'help-scroll', delta }];
+      const action = helpAction.type === 'scroll-down' ? 'down' as const
+        : helpAction.type === 'scroll-up' ? 'up' as const
+        : helpAction.type === 'page-down' ? 'page-down' as const
+        : helpAction.type === 'page-up' ? 'page-up' as const
+        : helpAction.type === 'bottom' ? 'bottom' as const
+        : 'top' as const;
+      return [obs, { type: 'help-scroll', action }];
     }
     return [obs];
   }
@@ -1387,7 +1397,7 @@ export function createFramedApp<PageModel, Msg>(
 
         if (frameLayer.kind === 'help') {
           if (msg.action === 'scroll-up' || msg.action === 'scroll-down') {
-            cmds.push({ type: 'help-scroll', delta: msg.action === 'scroll-down' ? 3 : -3 });
+            cmds.push({ type: 'help-scroll', action: msg.action === 'scroll-down' ? 'down' : 'up' });
           }
           return { handled: true, commands: cmds };
         }
@@ -2192,21 +2202,7 @@ function isHelpScrollAction(
     || action.type === 'bottom';
 }
 
-function applyHelpScroll<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  activePage: FramePage<PageModel, Msg>,
-  delta: number,
-  frameKeys: KeyMap<FrameAction>,
-  paletteKeys: KeyMap<PaletteAction>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): InternalFrameModel<PageModel, Msg> {
-  const overlay = renderHelpOverlay(model, activePage, frameKeys, paletteKeys, options, pagesById);
-  return {
-    ...model,
-    helpScrollY: Math.max(0, Math.min(overlay.maxScrollY, overlay.scrollY + delta)),
-  };
-}
+
 
 interface FlatSettingsRow<Msg> {
   readonly index: number;

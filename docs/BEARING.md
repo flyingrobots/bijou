@@ -56,25 +56,20 @@ are:
 
 ## RE-007 Progress
 
-Three slices have landed on the cycle branch:
+All slices have landed on the cycle branch:
 
 1. Frame layer introspection backed by `RuntimeViewStack`
 2. Key routing through `routeRuntimeInput` instead of ad-hoc branches
 3. Pointer ownership through retained drawer layouts
 4. Workspace and settings sub-layer routing onto retained layout trees
+5. Runtime-buffer-backed command/effect dispatch via
+   `FrameShellCommand` facts, a handler table, and
+   `bufferRuntimeRouteResult` / `applyRuntimeCommandBuffer`
 
-The remaining slice is runtime-buffer-backed command/effect dispatch.
-The design intent is now formally captured in the cycle doc: routing
-handler callbacks should produce commands and effects as part of the
-route outcome, and the shell should buffer and apply them through
-`RuntimeBuffers` instead of manually accumulating `Cmd[]` arrays.
+The cycle is ready for PR review and merge.
 
 ## What Feels Wrong?
 
-- the shell's command production is still decoupled from routing —
-  `routeRuntimeInput` decides ownership, then entirely separate code
-  in the `update()` function matches `routedLayer.kind` and produces
-  commands through ad-hoc array accumulation
 - notification toast hit-testing stays outside the retained layout
   system (viewport-positioned overlays managed by notification.ts)
 - some internal reference tooling still carries example-first names even

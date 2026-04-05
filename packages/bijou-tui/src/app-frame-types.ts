@@ -167,7 +167,7 @@ export type FrameShellCommand<Msg> =
   | { readonly type: 'notification-center-scroll-to'; readonly position: 'top' | 'bottom' }
   | { readonly type: 'cycle-notification-filter' }
   // --- help ---
-  | { readonly type: 'help-scroll'; readonly delta: number }
+  | { readonly type: 'help-scroll'; readonly action: 'up' | 'down' | 'page-up' | 'page-down' | 'top' | 'bottom' }
   // --- workspace ---
   | { readonly type: 'focus-pane'; readonly paneId: string }
   | { readonly type: 'scroll-focused-pane'; readonly direction: 'up' | 'down' }
