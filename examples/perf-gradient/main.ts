@@ -21,8 +21,9 @@ import {
   run, quit, tick,
   isKeyMsg, isMouseMsg, isResizeMsg,
   type App,
+  type RenderPipeline,
+  type RenderStage,
 } from '@flyingrobots/bijou-tui';
-import v8 from 'node:v8';
 
 initDefaultContext();
 
@@ -82,6 +83,16 @@ function sampleMemStats(): MemStats {
   };
 }
 
+// --- Frame phase timing ---
+// Stored outside the model to avoid TEA allocation overhead.
+// Written by update() and view(), read by view() on the next frame.
+interface PhaseTiming {
+  updateMs: number;
+  viewMs: number;
+}
+
+const phaseTiming: PhaseTiming = { updateMs: 0, viewMs: 0 };
+
 interface Model {
   frame: number;
   elapsed: number;
@@ -91,6 +102,7 @@ interface Model {
   cols: number;
   rows: number;
   mouseDown: boolean;
+  mode: number;
   capped: boolean;
   lastTickMs: number;
   frameTimeMs: number;
@@ -142,12 +154,13 @@ function stampText(
   }
 }
 
-function renderGradient(model: Model) {
-  const { cols, rows, frame, mouseDown, mem } = model;
-  const surface = getOrCreateSurface(cols, rows);
+const MODE_NAMES = ['gradient', 'horizon'];
+const MODE_COUNT = MODE_NAMES.length;
+
+function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
   const direction = mouseDown ? -1 : 1;
   const f = frame * 0.05 * direction;
-
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const phase = (col + row * 0.5) * 0.08;
@@ -157,25 +170,71 @@ function renderGradient(model: Model) {
       const r2 = clamp((cos(phase * 0.06 + 1 * f) + 1) * 127.5, 0, 255);
       const g2 = clamp((cos(phase * 0.07 + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
       const b2 = clamp((cos(phase * 0.08 + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
-
       cell.fg = rgbHex(r2, g2, b2);
       cell.bg = rgbHex(r1, g1, b1);
       surface.set(col, row, cell);
     }
   }
+}
+
+function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
+  const halfY = rows / 2;
+  const halfX = cols / 2;
+  const speed = (mouseDown ? -0.3 : 0.3);
+
+  for (let row = 0; row < rows; row++) {
+    const z = row - halfY;
+    for (let col = 0; col < cols; col++) {
+      if (z === 0) {
+        surface.set(col, row, { char: '─', fg: '#ffffff', bg: '#000000' });
+        continue;
+      }
+      const val = (col - halfX) / z;
+      const code = (Math.floor(val + halfX + frame * speed) % 94 + 94) % 94 + 33;
+      const depth = clamp(1 - Math.abs(z) / halfY, 0, 1);
+      const bright = Math.round(depth * 200 + 55);
+      const skyGround = z < 0
+        ? rgbHex(bright * 0.3, bright * 0.4, bright)
+        : rgbHex(bright * 0.2, bright * 0.6, bright * 0.2);
+      surface.set(col, row, {
+        char: String.fromCharCode(code),
+        fg: rgbHex(bright, bright, bright),
+        bg: skyGround,
+      });
+    }
+  }
+}
+
+function renderFrame(model: Model) {
+  const { cols, rows, mem } = model;
+  const surface = getOrCreateSurface(cols, rows);
+
+  switch (model.mode) {
+    case 0: fillGradient(surface, model); break;
+    case 1: fillHorizon(surface, model); break;
+  }
 
   // --- Stats overlay ---
   const BG = '#000000';
   const FG = '#cccccc';
+  const p = phaseTiming;
+  const ftColor = (ms: number) => ms < 2 ? '#00cc66' : ms < 8 ? '#ccaa00' : '#cc3333';
   const stats = [
     { text: `FPS   ${model.fps.toFixed(0).padStart(5)}`, fg: '#00ff88' },
     { text: `frame ${String(model.frame).padStart(7)}`, fg: FG },
     { text: `time  ${(model.elapsed / 1000).toFixed(1).padStart(6)}s`, fg: FG },
     { text: `ft    ${model.frameTimeMs.toFixed(1).padStart(5)}ms`, fg: '#ffaa00' },
-    { text: `size  ${cols}×${rows}`, fg: FG },
+    { text: `size  ${cols}×${rows}  (${cols * rows} cells)`, fg: FG },
     { text: `cap   ${model.capped ? '60fps' : 'OFF'}`, fg: model.capped ? FG : '#ff6666' },
+    { text: `mode  ${model.mode + 1}`, fg: FG },
     { text: `mouse ${mouseDown ? 'DOWN' : 'up'}`, fg: FG },
     { text: '', fg: FG },
+    { text: '── timing ────────────', fg: '#555555' },
+    { text: `upd   ${p.updateMs.toFixed(1).padStart(5)}ms`, fg: ftColor(p.updateMs) },
+    { text: `view  ${p.viewMs.toFixed(1).padStart(5)}ms`, fg: ftColor(p.viewMs) },
+    { text: '', fg: FG },
+    { text: '── memory ────────────', fg: '#555555' },
     { text: `heap  ${mem.heapUsedMB.toFixed(1)}/${mem.heapTotalMB.toFixed(1)} MB`, fg: '#88aaff' },
     { text: `rss   ${mem.rssMB.toFixed(1)} MB`, fg: '#88aaff' },
     { text: `ext   ${mem.externalMB.toFixed(1)} MB`, fg: '#88aaff' },
@@ -241,7 +300,8 @@ function renderGradient(model: Model) {
   }
 
   // Controls hint
-  const hint = ' space: toggle cap │ hold mouse: reverse │ q: quit ';
+  const modeName = MODE_NAMES[model.mode] ?? '?';
+  const hint = ` space: cap │ 1-${MODE_COUNT}: mode (${modeName}) │ mouse: reverse │ q: quit `;
   if (rows > 2 && cols >= hint.length + 2) {
     const hintRow = rows - 1;
     const hintCol = round((cols - hint.length) / 2);
@@ -261,6 +321,7 @@ const app: App<Model, Msg> = {
     cols: process.stdout.columns ?? 80,
     rows: process.stdout.rows ?? 24,
     mouseDown: false,
+    mode: 0,
     capped: true,
     lastTickMs: performance.now(),
     frameTimeMs: 0,
@@ -272,6 +333,10 @@ const app: App<Model, Msg> = {
     if (isKeyMsg(msg)) {
       if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
         return [model, [quit()]];
+      }
+      const modeKey = parseInt(msg.key, 10);
+      if (modeKey >= 1 && modeKey <= MODE_COUNT) {
+        return [{ ...model, mode: modeKey - 1 }, []];
       }
       if (msg.key === ' ' || msg.key === 'space') {
         const next = !model.capped;
@@ -289,7 +354,8 @@ const app: App<Model, Msg> = {
       return [{ ...model, mouseDown: down }, []];
     }
     if (msg.type === 'tick') {
-      const now = performance.now();
+      const updateStart = performance.now();
+      const now = updateStart;
       const frameTimeMs = now - model.lastTickMs;
 
       pushFt(frameTimeMs);
@@ -314,6 +380,7 @@ const app: App<Model, Msg> = {
       const memFrame = mem !== model.mem ? model.frame : model.memSampleFrame;
 
       const delay = model.capped ? CAPPED_MS : UNCAPPED_MS;
+      phaseTiming.updateMs = performance.now() - updateStart;
       return [{
         ...model,
         frame: model.frame + 1,
@@ -330,7 +397,12 @@ const app: App<Model, Msg> = {
     return [model, []];
   },
 
-  view: (model) => renderGradient(model),
+  view: (model) => {
+    const viewStart = performance.now();
+    const surface = renderFrame(model);
+    phaseTiming.viewMs = performance.now() - viewStart;
+    return surface;
+  },
 };
 
-run(app, { mouse: true });
+run(app, { mouse: true, configurePipeline: configurePerfPipeline });
