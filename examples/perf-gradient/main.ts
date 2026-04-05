@@ -360,37 +360,42 @@ function fillNoise(surface: ReturnType<typeof createSurface>, model: Model): voi
   }
 }
 
+// Cached quadrant surfaces — only reallocated on resize
+let quadSurfaces: ReturnType<typeof createSurface>[] | undefined;
+let quadW = 0;
+let quadH = 0;
+
+function getQuadSurfaces(cols: number, rows: number): ReturnType<typeof createSurface>[] {
+  if (quadSurfaces == null || quadW !== cols || quadH !== rows) {
+    const halfC = Math.floor(cols / 2);
+    const halfR = Math.floor(rows / 2);
+    quadSurfaces = [
+      createSurface(halfC, halfR),
+      createSurface(cols - halfC, halfR),
+      createSurface(halfC, rows - halfR),
+      createSurface(cols - halfC, rows - halfR),
+    ];
+    quadW = cols;
+    quadH = rows;
+  }
+  return quadSurfaces;
+}
+
 function fillQuad(surface: ReturnType<typeof createSurface>, model: Model): void {
   const { cols, rows } = model;
   const halfC = Math.floor(cols / 2);
   const halfR = Math.floor(rows / 2);
+  const [sTL, sTR, sBL, sBR] = getQuadSurfaces(cols, rows);
 
-  // Build sub-models for each quadrant
-  const tl: Model = { ...model, cols: halfC, rows: halfR };
   const tr: Model = { ...model, cols: cols - halfC, rows: halfR };
   const bl: Model = { ...model, cols: halfC, rows: rows - halfR };
   const br: Model = { ...model, cols: cols - halfC, rows: rows - halfR };
 
-  // Create temp surfaces for each quadrant
-  const sTL = createSurface(tl.cols, tl.rows);
-  const sTR = createSurface(tr.cols, tr.rows);
-  const sBL = createSurface(bl.cols, bl.rows);
-  const sBR = createSurface(br.cols, br.rows);
-
-  // Top-left is left empty (stats overlay will draw over it)
-  // Fill with dark background
   sTL.fill({ char: ' ', bg: '#0a0a0a' });
+  fillGradient(sTR, tr);
+  fillNoise(sBL, bl);
+  fillHorizon(sBR, br);
 
-  // Top-right: gradient
-  fillGradient(sTR, { ...tr, cols: tr.cols, rows: tr.rows });
-
-  // Bottom-left: noise
-  fillNoise(sBL, { ...bl, cols: bl.cols, rows: bl.rows });
-
-  // Bottom-right: horizon
-  fillHorizon(sBR, { ...br, cols: br.cols, rows: br.rows });
-
-  // Blit quadrants onto main surface
   surface.blit(sTL, 0, 0);
   surface.blit(sTR, halfC, 0);
   surface.blit(sBL, 0, halfR);
