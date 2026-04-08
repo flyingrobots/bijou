@@ -72,7 +72,11 @@ So the work now should stay narrower and more structural:
 
 ## Active Cycle
 
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-008 — Byte-Packed Surface Representation](./design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md) (in PR review)
+
+## Recently Shipped
+
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md) (shipped in 4.2.0)
 
 ## After 4.1.0
 

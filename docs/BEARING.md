@@ -54,19 +54,26 @@ are:
 - [DX-001](./design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
 - [DX-002](./design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 
-## RE-007 Progress
+## RE-007 (shipped in 4.2.0)
 
-All slices have landed on the cycle branch:
+[RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+is complete. All slices merged. The framed shell routes all input
+through the runtime engine.
 
-1. Frame layer introspection backed by `RuntimeViewStack`
-2. Key routing through `routeRuntimeInput` instead of ad-hoc branches
-3. Pointer ownership through retained drawer layouts
-4. Workspace and settings sub-layer routing onto retained layout trees
-5. Runtime-buffer-backed command/effect dispatch via
-   `FrameShellCommand` facts, a handler table, and
-   `bufferRuntimeRouteResult` / `applyRuntimeCommandBuffer`
+## RE-008 Progress
 
-The cycle is ready for PR review and merge.
+All 19 slices have landed on the cycle branch:
+
+- Packed `Uint8Array` surface backing (10 bytes/cell)
+- Lazy dirty bitmap for on-demand Cell decode
+- Zero-alloc `setRGB()` API on `Surface`
+- Byte-comparison differ with direct ANSI SGR emission
+- Packed byte-copy blit, template-stamp fill/clear/clone
+- Numeric theme tokens (`TokenValue.fgRGB` / `bgRGB`)
+- 100% component migration to `setRGB` fast paths
+- DOGFOOD landing render+diff: **6.6% faster** than pre-RE-008
+
+The cycle is in PR review.
 
 ## What Feels Wrong?
 

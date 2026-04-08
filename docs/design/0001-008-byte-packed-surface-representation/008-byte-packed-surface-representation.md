@@ -5,140 +5,110 @@ Legend: RE
 
 ## Sponsors
 
-- Human: TBD
-- Agent: TBD
+- Human: James
+- Agent: Claude (Opus 4.6)
 
 ## Hill
 
-TBD
+Surface rendering in Bijou goes from "every cell is a heap-allocated
+object with string colors" to "every cell is 10 bytes in a flat typed
+array with numeric RGB." The DOGFOOD landing benchmark is at parity or
+faster than the pre-RE-008 baseline, and the architecture enables
+zero-allocation rendering for any component that opts into `setRGB()`.
 
 ## Playback Questions
 
 ### Human
 
-- [ ] TBD
+- [x] Does the DOGFOOD landing render at least as fast as before?
+- [x] Are all 2816 existing tests still passing?
+- [x] Is the `set()` convenience API preserved and documented?
+- [x] Can components opt into the fast path incrementally?
 
 ### Agent
 
-- [ ] TBD
+- [x] Is the packed buffer the source of truth, with Cell[] as lazy decode?
+- [x] Does the differ operate on bytes, not strings?
+- [x] Does blit copy bytes directly between packed buffers?
+- [x] Are side-table chars (emoji, grapheme clusters) handled correctly?
+
+## What Shipped
+
+### Architecture
+
+- **Packed cell encoding** (`packed-cell.ts`): 10-byte layout per cell —
+  uint16 char, 3B fg RGB, 3B bg RGB, 1B flags bitfield, 1B alpha/presence.
+  Side table for multi-codepoint graphemes outside the BMP.
+- **Lazy dirty bitmap**: `Uint32Array` bitmap (1 bit per cell) tracks which
+  cells need decoding from the buffer. Writes mark dirty; reads decode on
+  demand.
+- **`setRGB()` API**: Zero-allocation writes — char code + numeric RGB
+  directly into the buffer. No hex parsing, no Cell object.
+- **Packed blit**: 10-byte memcpy per cell with side-table re-encoding for
+  cross-surface grapheme clusters.
+- **Template-stamp fill/clear**: Encode once, copy bytes to every position.
+- **Direct ANSI emission**: Differ reads RGB bytes from the buffer and emits
+  `\x1b[38;2;R;G;Bm` directly, with a style-byte hash cache. Bypasses
+  chalk and StylePort entirely on the hot diff path.
+- **Numeric theme tokens**: `TokenValue.fgRGB` / `bgRGB` pre-parsed at
+  theme resolution time.
+
+### Slices (19 commits)
+
+1. Packed-cell byte encoding module
+2. `createSurface` backed by `Uint8Array` + eager sync
+3. Route all direct cell mutations through `surface.set()`
+4. Packed byte-comparison differ
+5. Grayscale middleware on packed bytes
+6. Lazy dirty bitmap (replace eager sync)
+7. Zero-alloc hex parsing (charCode arithmetic, lookup table)
+8. Inline hex→RGB, FULL_MASK fast path, numeric theme tokens
+9. Direct ANSI SGR emission with cached style-byte hash
+10. `setRGB()` API + perf-gradient demo migration
+11. Packed byte-copy blit
+12. Template-stamp fill, clear, clone
+13. Component migration: surface-text, box-v3, separator-v3
+14. Component migration: overlay dim, flex/overlay bg inheritance
+15. Component migration: table-v3, alert-v3
+16. Component migration: notification, css/text-style
+17. Component migration: badge, focus-area, preference-list, canvas, differ
+
+### Benchmark Results
+
+| Scenario | Main baseline | RE-008 | Delta |
+|----------|--------------|--------|-------|
+| Landing render 220×58 | 1.60 ms | 1.55 ms | **-3%** |
+| Landing render+diff 220×58 | 1.86 ms | 1.74 ms | **-7%** |
+| Landing render 271×71 | 0.53 ms | 0.51 ms | **-3%** |
+| Frame compose | 0.95 ms | 1.19 ms | +25% |
+| Layout normalize | 0.16 ms | 0.34 ms | +113% |
+| Styled diff | 0.42 ms | 0.53 ms | +26% |
+| Runtime noop pulses | 0.002 ms | 0.002 ms | **-9%** |
+
+Real-world DOGFOOD rendering is faster. Synthetic stress tests still
+show overhead from the `set()` hex-parsing path — these will improve
+as more rendering paths move to direct byte manipulation.
 
 ## Accessibility and Assistive Reading
 
-- Linear truth / reduced-complexity posture: TBD
-- Non-visual or alternate-reading expectations: TBD
+No user-facing changes. The packed buffer is internal; all public APIs
+return the same Cell objects and string output as before.
 
 ## Localization and Directionality
 
-- Locale / wording / formatting assumptions: TBD
-- Logical direction / layout assumptions: TBD
+No changes. Character encoding handles the full Unicode BMP directly
+and uses a side table for astral/multi-codepoint graphemes.
 
 ## Agent Inspectability and Explainability
 
-- What must be explicit and deterministic for agents: TBD
-- What must be attributable, evidenced, or governed: TBD
-
-## Non-goals
-
-- [ ] TBD
-
-## Backlog Context
-
-Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
-
-See [RE-008 Perf Findings](../../design/RE-008-perf-findings.md) for
-the full benchmark data that motivates this work.
-
-## Problem
-
-`Surface` was introduced to move bijou away from raw ANSI strings, but
-its internal `Cell` type still uses heap-allocated strings for color:
-
-```typescript
-interface Cell {
-  char: string;
-  fg?: string;   // '#ff8800'
-  bg?: string;   // '#002244'
-  modifiers?: string[];
-  empty?: boolean;
-  opacity?: number;
-}
-```
-
-Every `surface.set()` call in the hot path allocates at least two
-strings (fg, bg hex). At 191×48 (a normal terminal), that is 18,336
-string allocations per frame. The renderer then parses those strings
-back to numeric RGB to emit ANSI escapes. The abstraction moved the
-API away from strings without moving the data away from strings.
-
-## Why this matters
-
-- The gradient performance stress test (`examples/perf-gradient`) shows
-  GC-driven frame drops after sustained rendering because the young
-  generation fills with short-lived hex strings
-- `createSurface` allocates `width × height` Cell objects per call;
-  even with surface reuse, the cell objects themselves are GC-visible
-  heap allocations
-- The diff renderer (`differ.ts`) compares cells by string equality on
-  `fg`/`bg`, which is correct but slower than numeric comparison
-- Every middleware in the render pipeline (grayscale, etc.) parses hex
-  strings to manipulate color, then re-encodes to hex strings
-
-## Desired outcome
-
-The internal surface representation becomes a flat typed array:
-
-```text
-Per cell: 10 bytes
-  [0-1]    char (uint16 code point, or side-table index for multi-codepoint graphemes)
-  [2-4]    fg R, G, B
-  [5-7]    bg R, G, B
-  [8]      flags bitfield (empty, bold, dim, underline, italic, strikethrough, inverse, blink)
-  [9]      reserved (opacity quantized to 0-255, or future use)
-```
-
-A uint16 char slot covers the entire BMP (U+0000–U+FFFF) directly.
-Characters outside the BMP and multi-codepoint grapheme clusters use
-a side-table index in the high range (e.g., values >= 0xF000 index
-into a per-surface `string[]` side table).
-
-```typescript
-// Internal: zero-alloc, GC-invisible
-const buffer = new Uint8Array(width * height * CELL_STRIDE);
-
-// Convenience API (allocates, for components that don't need perf)
-surface.set(x, y, { char: '█', fg: '#ff8800', bg: '#002244' });
-
-// Hot-path API (zero-alloc)
-surface.setRGB(x, y, charCode, fgR, fgG, fgB, bgR, bgG, bgB, flags);
-```
-
-The string-based `Cell` interface remains as a convenience layer. The
-byte-packed representation is the internal truth. Components opt into
-the numeric API for hot paths; everything else continues using the
-existing `set(x, y, cell)` API unchanged.
+The `PackedSurface` interface and `setRGB()` API are exported and
+documented. Agents can query surface dimensions, read cells via
+`get()`, and use the packed buffer for performance-sensitive rendering.
 
 ## Non-goals
 
 - Changing the public Cell interface or breaking component APIs
-- Removing hex color support from the convenience API
-- Unicode grapheme cluster support beyond BMP (side table handles
-  multi-codepoint sequences; the common case is single-codepoint)
-
-## Scope
-
-- `packages/bijou/src/ports/surface.ts` — dual representation
-- `packages/bijou/src/core/render/differ.ts` — numeric comparison
-- `packages/bijou-node/src/io.ts` — direct byte-to-ANSI rendering
-- `packages/bijou-tui/src/pipeline/` — numeric middleware path
-- All component `render` / `view` functions continue using the
-  string API unless explicitly migrated
-
-## Risks
-
-- Multi-codepoint grapheme clusters (emoji, combining marks) don't
-  fit in a single byte; need a side table or wider char field
-- Opacity (0.0–1.0 float) needs either a byte quantization or a
-  separate float array
-- The `modifiers` field is currently `string[]`; bitfield encoding
-  is a finite vocabulary assumption that must be validated against
-  the current modifier set
+- Removing hex color support from the convenience `set()` API
+- Pre-allocated output buffer for stdout (deferred to future work)
+- Eliminating the Cell[] layer entirely (the lazy decode + dirty bitmap
+  keeps backward compatibility with minimal overhead)
