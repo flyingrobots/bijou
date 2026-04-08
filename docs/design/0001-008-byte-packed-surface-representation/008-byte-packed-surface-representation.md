@@ -1,5 +1,48 @@
 # RE-008 — Byte-Packed Surface Representation
 
+Source backlog item: `docs/method/backlog/asap/RE_008-byte-packed-surface-representation.md`
+Legend: RE
+
+## Sponsors
+
+- Human: TBD
+- Agent: TBD
+
+## Hill
+
+TBD
+
+## Playback Questions
+
+### Human
+
+- [ ] TBD
+
+### Agent
+
+- [ ] TBD
+
+## Accessibility and Assistive Reading
+
+- Linear truth / reduced-complexity posture: TBD
+- Non-visual or alternate-reading expectations: TBD
+
+## Localization and Directionality
+
+- Locale / wording / formatting assumptions: TBD
+- Logical direction / layout assumptions: TBD
+
+## Agent Inspectability and Explainability
+
+- What must be explicit and deterministic for agents: TBD
+- What must be attributable, evidenced, or governed: TBD
+
+## Non-goals
+
+- [ ] TBD
+
+## Backlog Context
+
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
 See [RE-008 Perf Findings](../../design/RE-008-perf-findings.md) for
