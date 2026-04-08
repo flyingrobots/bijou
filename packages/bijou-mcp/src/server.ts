@@ -19,6 +19,20 @@ import { dagTool } from './tools/dag.js';
 import { timelineTool } from './tools/timeline.js';
 import { accordionTool } from './tools/accordion.js';
 import { stepperTool } from './tools/stepper.js';
+import { badgeTool } from './tools/badge.js';
+import { separatorTool } from './tools/separator.js';
+import { skeletonTool } from './tools/skeleton.js';
+import { kbdTool } from './tools/kbd.js';
+import { tabsTool } from './tools/tabs.js';
+import { breadcrumbTool } from './tools/breadcrumb.js';
+import { paginatorTool } from './tools/paginator.js';
+import { enumeratedListTool } from './tools/enumerated-list.js';
+import { hyperlinkTool } from './tools/hyperlink.js';
+import { logTool } from './tools/log.js';
+import { constrainTool } from './tools/constrain.js';
+import { progressBarTool } from './tools/progress.js';
+import { explainabilityTool } from './tools/explainability.js';
+import { inspectorTool } from './tools/inspector.js';
 
 const TOOLS: readonly ToolRegistration[] = [
   tableTool,
@@ -30,6 +44,20 @@ const TOOLS: readonly ToolRegistration[] = [
   timelineTool,
   accordionTool,
   stepperTool,
+  badgeTool,
+  separatorTool,
+  skeletonTool,
+  kbdTool,
+  tabsTool,
+  breadcrumbTool,
+  paginatorTool,
+  enumeratedListTool,
+  hyperlinkTool,
+  logTool,
+  constrainTool,
+  progressBarTool,
+  explainabilityTool,
+  inspectorTool,
 ];
 
 const server = new McpServer({

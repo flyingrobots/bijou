@@ -26,24 +26,17 @@ const inputSchema = z.object(inputShape);
 
 export const explainabilityTool: ToolRegistration = {
   name: 'bijou_explainability',
-  description: 'Render an AI explainability card showing a decision with rationale, evidence, confidence, and governance. Useful for documenting AI-assisted decisions.',
+  description: 'Render an AI explainability card showing a decision with rationale, evidence, confidence, and governance.',
   inputSchema: inputShape,
   handler: async (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
     const result = explainability({
-      title: input.title,
-      label: input.label,
-      artifactKind: input.artifactKind,
-      source: input.source,
-      sourceMode: input.sourceMode,
-      rationale: input.rationale,
-      evidence: input.evidence,
-      nextAction: input.nextAction,
-      governance: input.governance,
-      confidence: input.confidence,
-      width: input.width,
-      ctx,
+      title: input.title, label: input.label, artifactKind: input.artifactKind,
+      source: input.source, sourceMode: input.sourceMode, rationale: input.rationale,
+      evidence: input.evidence?.map((e) => ({ label: e.label, detail: e.value })),
+      nextAction: input.nextAction, governance: input.governance,
+      confidence: input.confidence, width: input.width, ctx,
     });
     return { content: [{ type: 'text', text: result }] };
   },

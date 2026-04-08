@@ -4,7 +4,7 @@ import { mcpContext } from '../context.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
-  percent: z.number().min(0).max(100).describe('Progress percentage (0–100).'),
+  percent: z.number().min(0).max(100).describe('Progress percentage (0-100).'),
   width: z.number().optional().describe('Bar width in characters.'),
   showPercent: z.boolean().optional().describe('Show percentage label (default true).'),
   filled: z.string().optional().describe('Character for filled portion.'),

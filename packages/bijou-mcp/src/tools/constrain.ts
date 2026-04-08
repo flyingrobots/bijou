@@ -7,7 +7,7 @@ const inputShape = {
   content: z.string().describe('Text content to constrain.'),
   maxWidth: z.number().optional().describe('Maximum width in columns.'),
   maxHeight: z.number().optional().describe('Maximum height in lines.'),
-  ellipsis: z.string().optional().describe('Ellipsis string for truncation (default "…").'),
+  ellipsis: z.string().optional().describe('Ellipsis string for truncation (default "...").'),
   terminalWidth: z.number().optional().describe('Terminal width override (default 80).'),
 };
 

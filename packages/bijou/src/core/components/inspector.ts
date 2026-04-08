@@ -125,7 +125,8 @@ function buildInteractiveContent(options: InspectorOptions, ctx: BijouContext): 
   }
 
   if (options.supportingText) {
-    contentSections.push(ctx.style.styled(muted, options.supportingText));
+    const stLabel = options.supportingTextLabel ?? 'Context';
+    contentSections.push(`${ctx.style.styled(muted, stLabel)}\n${ctx.style.styled(muted, options.supportingText)}`);
   }
 
   for (const section of nonEmptySections(options)) {
