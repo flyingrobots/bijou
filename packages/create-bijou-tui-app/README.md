@@ -78,3 +78,7 @@ The generated app is intentionally opinionated:
 Use this scaffolder when you want a real shell starter, not just an empty `run(app)` bootstrap.
 
 For upgrade notes and architecture context, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md) and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md).
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

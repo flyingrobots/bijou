@@ -91,3 +91,7 @@ await run(
 - Skeleton keys: `o` drawer toggle, `q`/`ctrl+c` quit confirm, `y`/`enter` confirm quit, `n`/`escape` cancel quit
 
 For upgrading an existing shell-based app, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

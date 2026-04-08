@@ -13,3 +13,7 @@ This package intentionally keeps spreadsheet-provider logic out of the pure `@fl
 
 Dependency note:
 As of 2026-04-02, `xlsx` is installed from the official SheetJS CDN tarball rather than the npm registry release, which is stale and carries known security advisories. See https://docs.sheetjs.com/docs/getting-started/installation/nodejs/ for the current upstream installation guidance.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.
