@@ -268,32 +268,55 @@ import {
   encodeChar, decodeChar,
   encodeModifiers, decodeModifiers,
   encodeOpacity, decodeOpacity,
-  parseHex, toHex,
+  toHex,
   packCell,
 } from '../core/render/packed-cell.js';
 
-/** Encode a Cell into the packed buffer and sync the cell object. */
+// --- Inline hex → RGB for maximum throughput ---
+
+function hexD(c: number): number {
+  if (c >= 97) return c - 87;
+  if (c >= 65) return c - 55;
+  return c - 48;
+}
+
+function inlineHexRGB(hex: string, out: Uint8Array, off: number): boolean {
+  if (hex.length !== 7) return false;
+  const c1 = hex.charCodeAt(1), c2 = hex.charCodeAt(2);
+  const c3 = hex.charCodeAt(3), c4 = hex.charCodeAt(4);
+  const c5 = hex.charCodeAt(5), c6 = hex.charCodeAt(6);
+  out[off] = (hexD(c1) << 4) | hexD(c2);
+  out[off + 1] = (hexD(c3) << 4) | hexD(c4);
+  out[off + 2] = (hexD(c5) << 4) | hexD(c6);
+  return true;
+}
+
+/** Encode a Cell into the packed buffer. */
 function encodeCellIntoBuf(
   buf: Uint8Array,
   idx: number,
   cell: Cell,
   sideTable: string[],
 ): void {
+  const off = idx * CELL_STRIDE;
   const charCode = encodeChar(cell.char, sideTable);
-  // Read fg RGB into locals before parsing bg (parseHex reuses a static tuple)
-  let fgR = 0, fgG = 0, fgB = 0, fgSet = false;
-  if (cell.fg) {
-    const fg = parseHex(cell.fg);
-    if (fg) { fgR = fg[0]; fgG = fg[1]; fgB = fg[2]; fgSet = true; }
+  buf[off + OFF_CHAR] = charCode & 0xFF;
+  buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
+
+  let alphaBits = 0;
+  if (cell.fg && inlineHexRGB(cell.fg, buf, off + OFF_FG_R)) {
+    alphaBits |= FLAG_FG_SET;
+  } else {
+    buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
   }
-  let bgR = 0, bgG = 0, bgB = 0, bgSet = false;
-  if (cell.bg) {
-    const bg = parseHex(cell.bg);
-    if (bg) { bgR = bg[0]; bgG = bg[1]; bgB = bg[2]; bgSet = true; }
+  if (cell.bg && inlineHexRGB(cell.bg, buf, off + OFF_BG_R)) {
+    alphaBits |= FLAG_BG_SET;
+  } else {
+    buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;
   }
-  const flags = encodeModifiers(cell.modifiers) | (cell.empty ? FLAG_EMPTY : 0);
-  const opacity = encodeOpacity(cell.opacity);
-  packCell(buf, idx, charCode, fgR, fgG, fgB, fgSet, bgR, bgG, bgB, bgSet, flags, opacity);
+
+  buf[off + OFF_FLAGS] = encodeModifiers(cell.modifiers) | (cell.empty ? FLAG_EMPTY : 0);
+  buf[off + OFF_ALPHA] = (encodeOpacity(cell.opacity) & OPACITY_MASK) | alphaBits;
 }
 
 /** Decode a packed buffer cell into a Cell object. */
@@ -356,23 +379,20 @@ function applyMaskToBuf(
     buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
   }
   if (mask.fg) {
-    const fg = source.fg ? parseHex(source.fg) : undefined;
-    // Read values immediately — parseHex reuses a static tuple
-    const fR = fg ? fg[0] : 0, fG = fg ? fg[1] : 0, fB = fg ? fg[2] : 0;
-    buf[off + OFF_FG_R] = fR;
-    buf[off + OFF_FG_G] = fG;
-    buf[off + OFF_FG_B] = fB;
-    const alpha = buf[off + OFF_ALPHA]!;
-    buf[off + OFF_ALPHA] = fg ? (alpha | FLAG_FG_SET) : (alpha & ~FLAG_FG_SET);
+    if (source.fg && inlineHexRGB(source.fg, buf, off + OFF_FG_R)) {
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_FG_SET;
+    } else {
+      buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! & ~FLAG_FG_SET;
+    }
   }
   if (mask.bg) {
-    const bg = source.bg ? parseHex(source.bg) : undefined;
-    const bR = bg ? bg[0] : 0, bG = bg ? bg[1] : 0, bB = bg ? bg[2] : 0;
-    buf[off + OFF_BG_R] = bR;
-    buf[off + OFF_BG_G] = bG;
-    buf[off + OFF_BG_B] = bB;
-    const alpha = buf[off + OFF_ALPHA]!;
-    buf[off + OFF_ALPHA] = bg ? (alpha | FLAG_BG_SET) : (alpha & ~FLAG_BG_SET);
+    if (source.bg && inlineHexRGB(source.bg, buf, off + OFF_BG_R)) {
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+    } else {
+      buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! & ~FLAG_BG_SET;
+    }
   }
   if (mask.modifiers) {
     const modFlags = encodeModifiers(source.modifiers);
@@ -481,10 +501,15 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
     set(x, y, cell, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) return;
+      if (cell.empty) return;
       const idx = y * w + x;
-      applyMaskToBuf(buf, idx, cell, mask, sideTable);
-      // Preserve exact opacity on the cell to avoid quantization drift
-      if (!cell.empty && mask.alpha) {
+      // Fast path: full mask (the common case) uses direct encode
+      if (mask === FULL_MASK) {
+        encodeCellIntoBuf(buf, idx, cell, sideTable);
+      } else {
+        applyMaskToBuf(buf, idx, cell, mask, sideTable);
+      }
+      if (mask.alpha) {
         cells[idx]!.opacity = cell.opacity ?? 1;
       }
       markDirty(idx);

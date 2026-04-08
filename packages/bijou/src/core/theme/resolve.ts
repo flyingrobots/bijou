@@ -4,9 +4,27 @@ import type { WritePort } from '../../ports/io.js';
 import { createEnvAccessor } from '../../ports/env.js';
 import type { ColorScheme } from '../detect/tty.js';
 import { detectColorScheme } from '../detect/tty.js';
-import { PRESETS, CYAN_MAGENTA } from './presets.js';
+import { PRESETS, CYAN_MAGENTA, populateTokenRGB } from './presets.js';
 import { createTokenGraph, type TokenGraph } from './graph.js';
 import type { TokenDefinitions } from './graph-types.js';
+
+/** Walk all token values in a theme and populate fgRGB/bgRGB. */
+function populateThemeRGB(theme: Theme): void {
+  const groups: (Record<string, TokenValue> | undefined)[] = [
+    theme.status,
+    theme.semantic,
+    theme.border,
+    theme.ui,
+    theme.surface,
+  ];
+  for (const group of groups) {
+    if (!group) continue;
+    for (const key of Object.keys(group)) {
+      const token = group[key];
+      if (token) populateTokenRGB(token);
+    }
+  }
+}
 
 /**
  * Check the no-color.org spec: `NO_COLOR` defined (any value) means no color.
@@ -60,6 +78,7 @@ export interface ResolvedTheme {
  * @returns ResolvedTheme with convenience accessors.
  */
 export function createResolved(theme: Theme, noColor: boolean, colorScheme: ColorScheme = 'dark'): ResolvedTheme {
+  populateThemeRGB(theme);
   const tokenGraph = createTokenGraph(theme as unknown as TokenDefinitions);
 
   return {

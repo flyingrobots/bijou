@@ -1,13 +1,46 @@
-import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
+import type { Theme, BaseStatusKey, TokenValue, TextModifier, RGB } from './tokens.js';
+
+/** Parse '#rrggbb' to [r, g, b] via charCode arithmetic. */
+function hexToRGB(hex: string): RGB | undefined {
+  if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
+  const d = (c: number): number =>
+    c >= 97 ? c - 87 : c >= 65 ? c - 55 : c >= 48 ? c - 48 : -1;
+  const r = (d(hex.charCodeAt(1)) << 4) | d(hex.charCodeAt(2));
+  const g = (d(hex.charCodeAt(3)) << 4) | d(hex.charCodeAt(4));
+  const b = (d(hex.charCodeAt(5)) << 4) | d(hex.charCodeAt(6));
+  if (r < 0 || g < 0 || b < 0) return undefined;
+  return [r, g, b];
+}
 
 /**
  * Shorthand helper to create a TokenValue with less boilerplate.
+ * Automatically pre-parses hex into numeric fgRGB for hot rendering paths.
  * @param hex - Hex color string (e.g. `'#00ffff'`).
  * @param modifiers - Optional text modifiers to attach.
- * @returns TokenValue with the given hex and optional modifiers.
+ * @returns TokenValue with the given hex, fgRGB, and optional modifiers.
  */
 export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
-  return modifiers !== undefined ? { hex, modifiers } : { hex };
+  const fgRGB = hexToRGB(hex);
+  if (modifiers !== undefined) {
+    return fgRGB ? { hex, modifiers, fgRGB } : { hex, modifiers };
+  }
+  return fgRGB ? { hex, fgRGB } : { hex };
+}
+
+/**
+ * Populate fgRGB and bgRGB on an existing TokenValue if not already set.
+ * Used by theme resolution to ensure all tokens carry numeric RGB.
+ */
+export function populateTokenRGB(token: TokenValue): TokenValue {
+  if (!token.fgRGB) {
+    const rgb = hexToRGB(token.hex);
+    if (rgb) token.fgRGB = rgb;
+  }
+  if (token.bg && !token.bgRGB) {
+    const rgb = hexToRGB(token.bg);
+    if (rgb) token.bgRGB = rgb;
+  }
+  return token;
 }
 
 /**
