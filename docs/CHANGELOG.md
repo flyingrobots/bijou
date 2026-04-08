@@ -8,9 +8,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
-- **bijou-mcp: MCP rendering server** — new `@flyingrobots/bijou-mcp` package exposes Bijou terminal components as MCP (Model Context Protocol) tools over stdio. Any MCP client (Claude Code, etc.) can call tools like `bijou_table`, `bijou_box`, `bijou_alert`, `bijou_tree`, `bijou_dag`, `bijou_timeline`, `bijou_accordion`, `bijou_stepper`, and `bijou_markdown` to get Unicode box-drawing output that renders cleanly in monospace chat contexts. Uses `createTestContext` with `plainStyle()` to produce structured text without ANSI escape codes.
+- **bijou-mcp: MCP rendering server** — new `@flyingrobots/bijou-mcp` package exposes Bijou terminal components as MCP (Model Context Protocol) tools over stdio. Any MCP client (Claude Code, Cursor, etc.) can call 22 tools — `bijou_table`, `bijou_tree`, `bijou_dag`, `bijou_box`, `bijou_alert`, `bijou_stepper`, `bijou_timeline`, `bijou_progress_bar`, `bijou_separator`, `bijou_enumerated_list`, `bijou_breadcrumb`, `bijou_paginator`, `bijou_tabs`, `bijou_explainability`, `bijou_inspector`, `bijou_accordion`, `bijou_header_box`, `bijou_badge`, `bijou_kbd`, `bijou_hyperlink`, `bijou_skeleton`, `bijou_log`, and `bijou_constrain` — to get Unicode box-drawing output that renders cleanly in monospace chat contexts. Uses `createTestContext` with `plainStyle()` to produce structured text without ANSI escape codes.
 
 - **RE-007 migrate framed shell onto runtime engine seams** — the framed shell now routes all key and mouse input through the runtime engine's `routeRuntimeInput` infrastructure, producing `FrameShellCommand` facts that are buffered via `bufferRuntimeRouteResult` and applied via `applyRuntimeCommandBuffer`. Shell commands are a plain discriminated union interpreted by a handler table inside `createFramedApp`, not classes with behavior. Sub-layer mouse hit-testing uses retained layout trees with `tab:{pageId}`, `pane:{paneId}`, and `settings-row:{index}` layout nodes. The `update()` key and mouse branches are reduced to single-line buffer drains. Removed: `handleFrameMouse`, `paneHitAtPosition`, `settingsRowAtPosition`, `isInsideSettingsDrawer`, `withObservedKey`, `applyQuitRequest`, `observedRouteForLayer`, `applyHelpScrollAction`. The cycle is captured in [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md).
+
+### 🐛 Bug Fixes
+
+- **bijou: inspector `supportingTextLabel` now renders in interactive mode** — pipe and accessible modes already included the label; interactive mode was silently dropping it.
+- **bijou-mcp: explainability evidence values now render** — the MCP wrapper now maps the `value` field to Bijou's `detail` field so evidence items render as "label — value" instead of label-only.
+
+### 📦 Infrastructure
+
+- **bijou-mcp added to release infrastructure** — publish workflow, dry-run workflow, pack verification, release docs, and npm verify checks all include the new package.
+- **METHOD migration** — backlog and legends migrated from `docs/BACKLOG/` to `docs/method/backlog/` with METHOD-compatible filenames. All 7 legends (DF, DL, DX, HT, LX, RE, WF) resolve correctly.
 
 ## [4.1.0] - 2026-04-04
 

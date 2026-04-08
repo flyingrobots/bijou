@@ -14,37 +14,30 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What's New in v4.1.0
+## What's New in v4.2.0
 
-Bijou `v4.1.0` is the current release.
-
-Compared to `v4.0.0`, it moves Bijou from the pure-surface release line
-toward a more coherent terminal application platform.
+Bijou `v4.2.0` is the current release.
 
 Key changes:
 
-- the runtime-engine story now reaches through `RE-006`, giving
-  `@flyingrobots/bijou-tui` explicit state/view stacks, retained
-  layouts, layout-driven input routing, buffered commands/effects, and
-  component-level interaction contracts
-- the humane shell and DOGFOOD surface matured together, with layered
-  shell routing, calmer settings/search/notification/quit behavior, and
-  complete `35/35` DOGFOOD component-family coverage
-- localization is now a real package line with
-  `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`,
-  `@flyingrobots/bijou-i18n-tools-node`, and
-  `@flyingrobots/bijou-i18n-tools-xlsx`
-- the repo's release and engineering doctrine is much more explicit,
-  with METHOD signposts, long-form release docs, and a tighter automated
-  release path
+- **MCP rendering server** — new `@flyingrobots/bijou-mcp` package
+  exposes 22 Bijou components as MCP tools over stdio. Any MCP client
+  (Claude Code, Cursor, etc.) can render tables, trees, DAGs, alerts,
+  progress bars, and more directly in chat. No ANSI, no terminal
+  required.
+- **RE-007 framed shell migration** — the framed shell now routes all
+  input through the runtime engine's `routeRuntimeInput` infrastructure
+  with `FrameShellCommand` facts, retained layout hit-testing, and
+  runtime buffer dispatch. Ad-hoc key/mouse branches are gone.
+- **Inspector fix** — `supportingTextLabel` now renders in interactive
+  mode.
 
-In short: `v4.1.0` is the release where Bijou stops feeling like a
-surface toolkit plus demos and starts feeling like a real terminal
-application platform.
+In short: `v4.2.0` is the release where Bijou becomes usable outside
+the terminal — AI tools can now render Bijou components in chat.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/4.1.0/whats-new.md), and the
-[migration guide](./docs/releases/4.1.0/migration-guide.md).
+[What's New guide](./docs/releases/4.2.0/whats-new.md), and the
+[migration guide](./docs/releases/4.2.0/migration-guide.md).
 
 ## Package Map
 
