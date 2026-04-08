@@ -16,6 +16,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **`PackedSurface` interface** — extends `Surface` with `.buffer` (the raw `Uint8Array`), `.sideTable` (grapheme cluster lookup), and `.markAllDirty()` for buffer-copy workflows. Exported from the main barrel.
 - **`TokenValue.fgRGB` / `TokenValue.bgRGB`** — theme tokens now carry pre-parsed numeric RGB channels alongside hex strings, populated automatically at theme resolution time.
 - **Modifier flag constants** — `FLAG_BOLD`, `FLAG_DIM`, `FLAG_STRIKETHROUGH`, `FLAG_INVERSE`, `UNDERLINE_SOLID`, etc. exported from the main barrel for `setRGB` flag arguments.
+- **`@flyingrobots/bijou/perf` subpath export** — public access to packed-cell utilities (`parseHex`, `encodeModifiers`, flag constants) for performance-sensitive consumer code.
+
+### 🐛 Bug Fixes
+
+- **RE-015 braille art corruption resolved** — `flexSurface` with `align: 'center'` no longer corrupts braille characters (U+2800–U+28FF). The packed byte-copy blit preserves all character codes directly without intermediate string processing. Verified with a 420×140 (58,800 cell) braille art test case — zero mismatches.
 
 ## [4.2.0] - 2026-04-08
 
