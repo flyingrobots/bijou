@@ -254,6 +254,10 @@ function copyCellInto(target: Cell, source: Cell): void {
   target.opacity = source.opacity;
 }
 
+function isPackedSurface(s: Surface): s is PackedSurface {
+  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
+}
+
 // ── Packed buffer helpers ────────────────────────────────
 
 import {
@@ -265,6 +269,7 @@ import {
   FLAG_EMPTY,
   FLAG_FG_SET, FLAG_BG_SET,
   OPACITY_MASK,
+  SIDE_TABLE_THRESHOLD,
   encodeChar, decodeChar,
   encodeModifiers, decodeModifiers,
   encodeOpacity, decodeOpacity,
@@ -565,6 +570,40 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const blitH = Math.min(h - yStart, sH - (srcYStart - sY));
       if (blitW <= 0 || blitH <= 0) return;
 
+      // Fast path: packed-to-packed with FULL_MASK — byte copy per cell
+      const srcPacked = isPackedSurface(source);
+      if (srcPacked && mask === FULL_MASK) {
+        const sBuf = (source as PackedSurface).buffer;
+        const sSide = (source as PackedSurface).sideTable;
+        for (let i = 0; i < blitH; i++) {
+          const targetY = yStart + i;
+          const sourceY = srcYStart + i;
+          const tRowBase = targetY * w;
+          const sRowBase = sourceY * source.width;
+          for (let j = 0; j < blitW; j++) {
+            const sOff = (sRowBase + srcXStart + j) * CELL_STRIDE;
+            // Skip empty source cells (brush transparency)
+            if (sBuf[sOff + OFF_FLAGS]! & FLAG_EMPTY) continue;
+            const tOff = (tRowBase + xStart + j) * CELL_STRIDE;
+            // Copy 10 bytes directly
+            for (let b = 0; b < CELL_STRIDE; b++) {
+              buf[tOff + b] = sBuf[sOff + b]!;
+            }
+            // Re-encode side-table chars into target's side table
+            const charCode = sBuf[sOff]! | (sBuf[sOff + 1]! << 8);
+            if (charCode >= SIDE_TABLE_THRESHOLD) {
+              const srcChar = sSide[charCode - SIDE_TABLE_THRESHOLD] ?? ' ';
+              const tCharCode = encodeChar(srcChar, sideTable);
+              buf[tOff + OFF_CHAR] = tCharCode & 0xFF;
+              buf[tOff + OFF_CHAR + 1] = (tCharCode >> 8) & 0xFF;
+            }
+            markDirty(tRowBase + xStart + j);
+          }
+        }
+        return;
+      }
+
+      // Slow path: decode source cells and re-encode
       for (let i = 0; i < blitH; i++) {
         const targetY = yStart + i;
         const sourceY = srcYStart + i;
@@ -574,7 +613,6 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
           const targetX = xStart + j;
           const sourceX = srcXStart + j;
           const tIdx = tRowOffset + targetX;
-          // Read through get() to ensure source cell is decoded if packed
           const srcCell = source.get(sourceX, sourceY);
           applyMaskToBuf(buf, tIdx, srcCell, mask, sideTable);
           markDirty(tIdx);
