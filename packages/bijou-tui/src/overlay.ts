@@ -312,15 +312,19 @@ function overlayContentFromSurface(surface: Surface, ctx: BijouContext | undefin
   return ctx ? surfaceToString(surface, ctx.style) : plainSurfaceToString(surface);
 }
 
-function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle): void {
-  surface.set(x, y, { char, ...style, empty: false });
+function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle, numStyle?: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number }): void {
+  if (numStyle && 'buffer' in surface) {
+    (surface as PackedSurface).setRGB(x, y, char, numStyle.fR, numStyle.fG, numStyle.fB, numStyle.bR, numStyle.bG, numStyle.bB, numStyle.fl);
+  } else {
+    surface.set(x, y, { char, ...style, empty: false });
+  }
 }
 
-function setStyledGrapheme(surface: Surface, x: number, y: number, char: string, style: CellStyle): number {
+function setStyledGrapheme(surface: Surface, x: number, y: number, char: string, style: CellStyle, numStyle?: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number }): number {
   if (x >= surface.width) return 0;
 
   const width = Math.max(1, graphemeClusterWidth(char));
-  setStyledCell(surface, x, y, char, style);
+  setStyledCell(surface, x, y, char, style, numStyle);
   for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
     setStyledCell(surface, x + offset, y, '', style);
   }
@@ -340,10 +344,19 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
 
   const graphemes = segmentGraphemes(plain);
   const surface = createSurface(width, 1);
+  // Pre-parse style for setRGB fast path
+  const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+  let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
+  if ('buffer' in surface) {
+    let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
+    if (style.fg?.length === 7) { fR = (hd(style.fg.charCodeAt(1)) << 4) | hd(style.fg.charCodeAt(2)); fG = (hd(style.fg.charCodeAt(3)) << 4) | hd(style.fg.charCodeAt(4)); fB = (hd(style.fg.charCodeAt(5)) << 4) | hd(style.fg.charCodeAt(6)); }
+    if (style.bg?.length === 7) { bR = (hd(style.bg.charCodeAt(1)) << 4) | hd(style.bg.charCodeAt(2)); bG = (hd(style.bg.charCodeAt(3)) << 4) | hd(style.bg.charCodeAt(4)); bB = (hd(style.bg.charCodeAt(5)) << 4) | hd(style.bg.charCodeAt(6)); }
+    ns = { fR, fG, fB, bR, bG, bB, fl: 0 };
+  }
   let x = 0;
   for (const grapheme of graphemes) {
     if (x >= width) break;
-    x += setStyledGrapheme(surface, x, 0, grapheme, style);
+    x += setStyledGrapheme(surface, x, 0, grapheme, style, ns);
   }
   return surface;
 }

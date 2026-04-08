@@ -145,10 +145,23 @@ function writeSurfaceGrapheme(
   if (x >= surface.width) return 0;
 
   const width = Math.max(1, graphemeClusterWidth(char));
-  surface.set(x, y, { char, ...style, empty: false });
 
-  for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
-    surface.set(x + offset, y, { char: '', ...style, empty: false });
+  if (isPackedSurface(surface) && style?.fg) {
+    const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+    const fR = (hd(style.fg.charCodeAt(1)) << 4) | hd(style.fg.charCodeAt(2));
+    const fG = (hd(style.fg.charCodeAt(3)) << 4) | hd(style.fg.charCodeAt(4));
+    const fB = (hd(style.fg.charCodeAt(5)) << 4) | hd(style.fg.charCodeAt(6));
+    let bR = -1, bG = 0, bB = 0;
+    if (style.bg?.length === 7) { bR = (hd(style.bg.charCodeAt(1)) << 4) | hd(style.bg.charCodeAt(2)); bG = (hd(style.bg.charCodeAt(3)) << 4) | hd(style.bg.charCodeAt(4)); bB = (hd(style.bg.charCodeAt(5)) << 4) | hd(style.bg.charCodeAt(6)); }
+    surface.setRGB(x, y, char, fR, fG, fB, bR, bG, bB);
+    for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
+      surface.setRGB(x + offset, y, '', fR, fG, fB, bR, bG, bB);
+    }
+  } else {
+    surface.set(x, y, { char, ...style, empty: false });
+    for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
+      surface.set(x + offset, y, { char: '', ...style, empty: false });
+    }
   }
 
   return width;

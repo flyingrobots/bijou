@@ -20,7 +20,7 @@
  * ```
  */
 
-import type { BijouContext, Cell, Surface, TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, Cell, Surface, PackedSurface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
@@ -380,8 +380,21 @@ export function focusAreaSurfaceInto(
 
   if (hasGutter) {
     const gutterCell = resolveGutterCell(focused, ctx, options);
-    for (let y = 0; y < state.height; y++) {
-      target.set(offsetX, offsetY + y, gutterCell);
+    const packed: boolean = 'buffer' in target;
+    if (packed && gutterCell.fg) {
+      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+      const fR = (hd(gutterCell.fg.charCodeAt(1)) << 4) | hd(gutterCell.fg.charCodeAt(2));
+      const fG = (hd(gutterCell.fg.charCodeAt(3)) << 4) | hd(gutterCell.fg.charCodeAt(4));
+      const fB = (hd(gutterCell.fg.charCodeAt(5)) << 4) | hd(gutterCell.fg.charCodeAt(6));
+      let bR = -1, bG = 0, bB = 0;
+      if (gutterCell.bg?.length === 7) { bR = (hd(gutterCell.bg.charCodeAt(1)) << 4) | hd(gutterCell.bg.charCodeAt(2)); bG = (hd(gutterCell.bg.charCodeAt(3)) << 4) | hd(gutterCell.bg.charCodeAt(4)); bB = (hd(gutterCell.bg.charCodeAt(5)) << 4) | hd(gutterCell.bg.charCodeAt(6)); }
+      for (let y = 0; y < state.height; y++) {
+        (target as PackedSurface).setRGB(offsetX, offsetY + y, gutterCell.char, fR, fG, fB, bR, bG, bB);
+      }
+    } else {
+      for (let y = 0; y < state.height; y++) {
+        target.set(offsetX, offsetY + y, gutterCell);
+      }
     }
   }
 
@@ -445,8 +458,10 @@ function paintScrollbarInto(
   scrollY: number,
 ): void {
   if (totalLines <= viewportHeight) {
+    const p: boolean = 'buffer' in target;
     for (let y = 0; y < viewportHeight; y++) {
-      target.set(column, row + y, EMPTY_CELL);
+      if (p) (target as PackedSurface).setRGB(column, row + y, 0x20, -1, 0, 0, -1, 0, 0);
+      else target.set(column, row + y, EMPTY_CELL);
     }
     return;
   }
@@ -456,12 +471,14 @@ function paintScrollbarInto(
   const scrollFraction = maxScroll > 0 ? scrollY / maxScroll : 0;
   const thumbStart = Math.round(scrollFraction * (viewportHeight - thumbSize));
 
+  const sp: boolean = 'buffer' in target;
   for (let index = 0; index < viewportHeight; index++) {
-    target.set(
-      column,
-      row + index,
-      index >= thumbStart && index < thumbStart + thumbSize ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL,
-    );
+    const isThumb = index >= thumbStart && index < thumbStart + thumbSize;
+    if (sp) {
+      (target as PackedSurface).setRGB(column, row + index, isThumb ? 0x2588 : 0x2502, -1, 0, 0, -1, 0, 0);
+    } else {
+      target.set(column, row + index, isThumb ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL);
+    }
   }
 }
 
