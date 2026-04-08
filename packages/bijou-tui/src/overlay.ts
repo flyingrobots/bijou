@@ -225,13 +225,15 @@ export function compositeSurfaceInto(
   }
 
   if (options?.dim) {
-    for (const cell of target.cells) {
-      if (cell.empty || cell.char === ' ') continue;
-      const modifiers = cell.modifiers ?? [];
-      if (!modifiers.includes('dim')) {
-        cell.modifiers = [...modifiers, 'dim'];
+    for (let y = 0; y < target.height; y++) {
+      for (let x = 0; x < target.width; x++) {
+        const cell = target.get(x, y);
+        if (cell.empty || cell.char === ' ') continue;
+        const modifiers = cell.modifiers ?? [];
+        if (!modifiers.includes('dim')) {
+          target.set(x, y, { ...cell, modifiers: [...modifiers, 'dim'], empty: false });
+        }
       }
-      cell.empty = false;
     }
   }
 

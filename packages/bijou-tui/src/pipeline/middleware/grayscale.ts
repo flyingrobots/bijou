@@ -9,18 +9,18 @@ import type { RenderMiddleware } from '../pipeline.js';
 export function grayscaleFilter(): RenderMiddleware {
   return (state, next) => {
     const { targetSurface } = state;
-    
-    for (let i = 0; i < targetSurface.cells.length; i++) {
-      const cell = targetSurface.cells[i]!;
-      
-      if (cell.fg) {
-        cell.fg = hexToGrayscale(cell.fg);
-      }
-      if (cell.bg) {
-        cell.bg = hexToGrayscale(cell.bg);
+
+    for (let y = 0; y < targetSurface.height; y++) {
+      for (let x = 0; x < targetSurface.width; x++) {
+        const cell = targetSurface.get(x, y);
+        const newFg = cell.fg ? hexToGrayscale(cell.fg) : undefined;
+        const newBg = cell.bg ? hexToGrayscale(cell.bg) : undefined;
+        if (newFg !== cell.fg || newBg !== cell.bg) {
+          targetSurface.set(x, y, { ...cell, fg: newFg, bg: newBg });
+        }
       }
     }
-    
+
     next();
   };
 }

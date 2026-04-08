@@ -376,10 +376,12 @@ function createRegionSurface(width: number, height: number, bg: string | undefin
 function inheritBackground(surface: Surface, bg: string | undefined): Surface {
   if (!bg || surface.width === 0 || surface.height === 0) return surface;
   const next = surface.clone();
-  for (let i = 0; i < next.cells.length; i++) {
-    const cell = next.cells[i]!;
-    if (!cell.empty && cell.bg === undefined) {
-      next.cells[i] = { ...cell, bg };
+  for (let y = 0; y < next.height; y++) {
+    for (let x = 0; x < next.width; x++) {
+      const cell = next.get(x, y);
+      if (!cell.empty && cell.bg === undefined) {
+        next.set(x, y, { ...cell, bg });
+      }
     }
   }
   return next;
