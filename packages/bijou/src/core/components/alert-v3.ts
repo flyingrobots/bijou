@@ -6,8 +6,8 @@ import { boxSurface } from './box-v3.js';
 import { createTextSurface, tokenToCellStyle } from './surface-text.js';
 
 const ICONS: Record<AlertVariant, string> = {
-  success: '\u2713',  // ✓
-  error: '\u2717',    // ✗
+  success: '*',       // ASCII — unambiguous 1-wide
+  error: 'x',        // ASCII — unambiguous 1-wide
   warning: '!',       // ASCII — unambiguous 1-wide
   info: 'i',          // ASCII — unambiguous 1-wide
 };
