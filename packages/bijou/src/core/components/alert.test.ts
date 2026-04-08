@@ -6,7 +6,8 @@ describe('alert', () => {
   it('renders box with icon in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = alert('Something happened', { variant: 'info', ctx });
-    expect(result).toContain('\u2139');
+    // Info icon is ASCII 'i' (unambiguous 1-wide across terminals and chat)
+    expect(result).toContain('i');
     expect(result).toContain('Something happened');
     expect(result).toContain('─');
   });

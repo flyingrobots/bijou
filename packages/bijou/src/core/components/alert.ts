@@ -17,12 +17,19 @@ export interface AlertOptions extends BijouNodeOptions {
   bgToken?: TokenValue;
 }
 
-/** Unicode icon characters for each alert variant. */
+/**
+ * Unicode icon characters for each alert variant.
+ *
+ * Uses characters with consistent single-column width across terminals
+ * and chat UIs. U+26A0 (⚠) and U+2139 (ℹ) are ambiguous-width and
+ * render as 2 columns in many non-terminal monospace contexts, breaking
+ * box alignment. The alternatives below are unambiguously 1-wide.
+ */
 const ICONS: Record<AlertVariant, string> = {
-  success: '\u2713',
-  error: '\u2717',
-  warning: '\u26A0',
-  info: '\u2139',
+  success: '\u2713',  // ✓ CHECK MARK
+  error: '\u2717',    // ✗ BALLOT X
+  warning: '!',       // ASCII exclamation — unambiguous 1-wide
+  info: 'i',          // ASCII i — unambiguous 1-wide
 };
 
 /** Uppercase labels used in pipe mode output. */
