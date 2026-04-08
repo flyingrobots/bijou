@@ -426,6 +426,8 @@ export interface PackedSurface extends Surface {
   readonly buffer: Uint8Array;
   /** Side table for multi-codepoint grapheme clusters. */
   readonly sideTable: readonly string[];
+  /** Mark all cells as needing lazy decode from the buffer. */
+  markAllDirty(): void;
 }
 
 /**
@@ -480,18 +482,28 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
     dirtyWords.fill(0);
   }
 
+  function markAllDirty(): void {
+    dirtyWords.fill(0xFFFFFFFF);
+  }
+
   const surface: PackedSurface = {
     width: w,
     height: h,
     cells,
     buffer: buf,
     sideTable,
+    markAllDirty,
 
     clear() {
-      for (let i = 0; i < size; i++) {
-        encodeCellIntoBuf(buf, i, defaultCell, sideTable);
-        copyCellInto(cells[i]!, defaultCell);
+      // Stamp the default cell template across the entire buffer
+      if (size > 0) {
+        encodeCellIntoBuf(buf, 0, defaultCell, sideTable);
+        for (let i = 1; i < size; i++) {
+          const off = i * CELL_STRIDE;
+          for (let b = 0; b < CELL_STRIDE; b++) buf[off + b] = buf[b]!;
+        }
       }
+      for (let i = 0; i < size; i++) copyCellInto(cells[i]!, defaultCell);
       markAllClean();
     },
 
@@ -543,12 +555,26 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const yStart = Math.max(0, fy);
       const xEnd = Math.min(w, xStart + fw);
       const yEnd = Math.min(h, yStart + fh);
+      if (xStart >= xEnd || yStart >= yEnd) return;
 
-      for (let y = yStart; y < yEnd; y++) {
-        for (let x = xStart; x < xEnd; x++) {
-          const idx = y * w + x;
-          applyMaskToBuf(buf, idx, cell, mask, sideTable);
-          markDirty(idx);
+      if (mask === FULL_MASK && !cell.empty) {
+        // Encode template once, stamp it into every position
+        const template = new Uint8Array(CELL_STRIDE);
+        encodeCellIntoBuf(template, 0, cell, sideTable);
+        for (let y = yStart; y < yEnd; y++) {
+          for (let x = xStart; x < xEnd; x++) {
+            const off = (y * w + x) * CELL_STRIDE;
+            for (let b = 0; b < CELL_STRIDE; b++) buf[off + b] = template[b]!;
+            dirtyWords[(y * w + x) >> 5]! |= 1 << ((y * w + x) & 31);
+          }
+        }
+      } else {
+        for (let y = yStart; y < yEnd; y++) {
+          for (let x = xStart; x < xEnd; x++) {
+            const idx = y * w + x;
+            applyMaskToBuf(buf, idx, cell, mask, sideTable);
+            markDirty(idx);
+          }
         }
       }
     },
@@ -673,14 +699,16 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
     clone() {
       const s = createSurface(w, h);
+      // Copy buffer wholesale — O(n) byte copy instead of per-cell encode
       s.buffer.set(buf);
-      // Mark everything dirty so cells decode lazily from copied buffer
-      const sDirty = new Uint32Array(Math.ceil(size / 32));
-      sDirty.fill(0xFFFFFFFF);
-      // Can't access clone's dirtyWords directly — use the cells path
-      for (let i = 0; i < size; i++) {
-        syncCellFromBuf(s.cells[i]!, s.buffer, i, s.sideTable);
+      // Copy side-table entries into the clone
+      for (const entry of sideTable) {
+        if (!(s.sideTable as string[]).includes(entry)) {
+          (s.sideTable as string[]).push(entry);
+        }
       }
+      // Cells will decode lazily from the copied buffer
+      s.markAllDirty();
       return s;
     },
   };
