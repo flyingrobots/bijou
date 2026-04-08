@@ -12,6 +12,7 @@ import {
   surfaceToString,
   wrapPreparedTextToWidth,
 } from '@flyingrobots/bijou';
+import { parseHex } from '@flyingrobots/bijou/perf';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
@@ -714,10 +715,11 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
     // Pre-parse style once per segment for setRGB fast path
     const s = segment.style;
     if (packed && s) {
-      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
       let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-      if (s.fg && s.fg.length === 7) { fR = (hd(s.fg.charCodeAt(1)) << 4) | hd(s.fg.charCodeAt(2)); fG = (hd(s.fg.charCodeAt(3)) << 4) | hd(s.fg.charCodeAt(4)); fB = (hd(s.fg.charCodeAt(5)) << 4) | hd(s.fg.charCodeAt(6)); }
-      if (s.bg && s.bg.length === 7) { bR = (hd(s.bg.charCodeAt(1)) << 4) | hd(s.bg.charCodeAt(2)); bG = (hd(s.bg.charCodeAt(3)) << 4) | hd(s.bg.charCodeAt(4)); bB = (hd(s.bg.charCodeAt(5)) << 4) | hd(s.bg.charCodeAt(6)); }
+      const fgRgb = s.fg ? parseHex(s.fg) : undefined;
+      if (fgRgb) { [fR, fG, fB] = fgRgb; }
+      const bgRgb = s.bg ? parseHex(s.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
       for (const char of segment.graphemes) {
         (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB);
         x++;
@@ -964,13 +966,12 @@ function renderNotificationSurface<Msg>(
 
   const cardPacked: boolean = 'buffer' in card;
   for (let y = 0; y < contentRows.length; y++) {
-    if (cardPacked && accentStyle.fg?.length === 7) {
-      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
-      const fR = (hd(accentStyle.fg.charCodeAt(1)) << 4) | hd(accentStyle.fg.charCodeAt(2));
-      const fG = (hd(accentStyle.fg.charCodeAt(3)) << 4) | hd(accentStyle.fg.charCodeAt(4));
-      const fB = (hd(accentStyle.fg.charCodeAt(5)) << 4) | hd(accentStyle.fg.charCodeAt(6));
+    const accentRgb = cardPacked && accentStyle.fg ? parseHex(accentStyle.fg) : undefined;
+    if (accentRgb) {
+      const [fR, fG, fB] = accentRgb;
       let bR = -1, bG = 0, bB = 0;
-      if (backgroundStyle.bg?.length === 7) { bR = (hd(backgroundStyle.bg.charCodeAt(1)) << 4) | hd(backgroundStyle.bg.charCodeAt(2)); bG = (hd(backgroundStyle.bg.charCodeAt(3)) << 4) | hd(backgroundStyle.bg.charCodeAt(4)); bB = (hd(backgroundStyle.bg.charCodeAt(5)) << 4) | hd(backgroundStyle.bg.charCodeAt(6)); }
+      const bgRgb = backgroundStyle.bg ? parseHex(backgroundStyle.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
       (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB);
     } else {
       card.set(0, y, {

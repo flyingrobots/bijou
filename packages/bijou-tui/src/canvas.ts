@@ -6,6 +6,7 @@
  */
 
 import { createSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
+import { parseHex } from '@flyingrobots/bijou/perf';
 
 /**
  * Parameters passed to the shader function.
@@ -82,19 +83,19 @@ export function canvas(
   return surface;
 }
 
-const _hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
-
 function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
-  if (packed && cell.fg?.length === 7) {
-    const fR = (_hd(cell.fg.charCodeAt(1)) << 4) | _hd(cell.fg.charCodeAt(2));
-    const fG = (_hd(cell.fg.charCodeAt(3)) << 4) | _hd(cell.fg.charCodeAt(4));
-    const fB = (_hd(cell.fg.charCodeAt(5)) << 4) | _hd(cell.fg.charCodeAt(6));
-    let bR = -1, bG = 0, bB = 0;
-    if (cell.bg?.length === 7) { bR = (_hd(cell.bg.charCodeAt(1)) << 4) | _hd(cell.bg.charCodeAt(2)); bG = (_hd(cell.bg.charCodeAt(3)) << 4) | _hd(cell.bg.charCodeAt(4)); bB = (_hd(cell.bg.charCodeAt(5)) << 4) | _hd(cell.bg.charCodeAt(6)); }
-    (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB);
-  } else {
-    surface.set(x, y, cell);
+  if (packed && cell.fg) {
+    const fg = parseHex(cell.fg);
+    if (fg) {
+      const [fR, fG, fB] = fg;
+      let bR = -1, bG = 0, bB = 0;
+      const bg = cell.bg ? parseHex(cell.bg) : undefined;
+      if (bg) { [bR, bG, bB] = bg; }
+      (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB);
+      return;
+    }
   }
+  surface.set(x, y, cell);
 }
 
 function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {

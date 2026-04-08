@@ -4,8 +4,10 @@ import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from 
 import {
   CELL_STRIDE,
   OFF_FG_R,
+  FLAG_BOLD, FLAG_DIM, FLAG_STRIKETHROUGH, FLAG_INVERSE,
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
-  decodeChar,
+  FLAG_DASHED,
+  decodeChar, parseHex,
 } from './packed-cell.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
@@ -146,13 +148,13 @@ function writeSurfaceGrapheme(
 
   const width = Math.max(1, graphemeClusterWidth(char));
 
-  if (isPackedSurface(surface) && style?.fg) {
-    const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
-    const fR = (hd(style.fg.charCodeAt(1)) << 4) | hd(style.fg.charCodeAt(2));
-    const fG = (hd(style.fg.charCodeAt(3)) << 4) | hd(style.fg.charCodeAt(4));
-    const fB = (hd(style.fg.charCodeAt(5)) << 4) | hd(style.fg.charCodeAt(6));
+  if (isPackedSurface(surface) && (style?.fg || style?.bg)) {
+    const fg = style?.fg ? parseHex(style.fg) : undefined;
+    let fR = -1, fG = 0, fB = 0;
+    if (fg) { fR = fg[0]; fG = fg[1]; fB = fg[2]; }
+    const bg = style?.bg ? parseHex(style.bg) : undefined;
     let bR = -1, bG = 0, bB = 0;
-    if (style.bg?.length === 7) { bR = (hd(style.bg.charCodeAt(1)) << 4) | hd(style.bg.charCodeAt(2)); bG = (hd(style.bg.charCodeAt(3)) << 4) | hd(style.bg.charCodeAt(4)); bB = (hd(style.bg.charCodeAt(5)) << 4) | hd(style.bg.charCodeAt(6)); }
+    if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
     surface.setRGB(x, y, char, fR, fG, fB, bR, bG, bB);
     for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
       surface.setRGB(x + offset, y, '', fR, fG, fB, bR, bG, bB);
@@ -268,11 +270,15 @@ export function renderDiff(
 
 // ── Packed byte-comparison differ ───────────────────────
 
-/** Empty cell encoded as packed bytes for boundary comparison. */
+/**
+ * Empty cell encoded as packed bytes for out-of-bounds boundary comparison.
+ * Must match what createSurface produces for `{ char: ' ', empty: true }`.
+ * Static shared buffer — do not mutate.
+ */
 const EMPTY_PACKED = new Uint8Array(CELL_STRIDE);
-EMPTY_PACKED[0] = 0x20; // space
-EMPTY_PACKED[8] = FLAG_EMPTY; // flags: empty
-EMPTY_PACKED[9] = 63; // opacity: 1.0, no fg, no bg
+EMPTY_PACKED[0] = 0x20; // char: space (0x0020 LE)
+EMPTY_PACKED[8] = FLAG_EMPTY; // flags: empty bit set
+EMPTY_PACKED[9] = 63; // alpha: opacity=63 (1.0), fg/bg not present
 
 function packedBytesEqual(
   a: Uint8Array, aOff: number,
@@ -308,12 +314,12 @@ function packedHasVisibleStyle(buf: Uint8Array, off: number): boolean {
 
 // --- Direct ANSI SGR emission from packed bytes ---
 
-// Modifier flag → SGR code mapping
+// Modifier flag → SGR code mapping (uses imported constants)
 const FLAG_SGR: [number, string][] = [
-  [0x01, '\x1b[1m'],  // bold
-  [0x02, '\x1b[2m'],  // dim
-  [0x04, '\x1b[9m'],  // strikethrough
-  [0x08, '\x1b[7m'],  // inverse
+  [FLAG_BOLD,          '\x1b[1m'],
+  [FLAG_DIM,           '\x1b[2m'],
+  [FLAG_STRIKETHROUGH, '\x1b[9m'],
+  [FLAG_INVERSE,       '\x1b[7m'],
 ];
 // Underline styles (bits 4-5 of flags byte)
 const UNDERLINE_SGR: string[] = [
@@ -325,20 +331,17 @@ const UNDERLINE_SGR: string[] = [
 const DASHED_SGR = '\x1b[4:5m';
 const RESET_SGR = '\x1b[0m';
 
-// SGR cache: maps style bytes (8 bytes from OFF_FG_R through OFF_ALPHA) to pre-built SGR prefix.
-const sgrCache = new Map<number, string>();
+// SGR cache: maps style bytes to pre-built SGR prefix string.
+// Key is a collision-free string built from the 8 style bytes.
+const sgrCache = new Map<string, string>();
 
-/** Pack 8 style bytes into two 32-bit numbers for cache key. */
-function styleCacheKey(buf: Uint8Array, off: number): number {
-  // Use only the style-relevant bytes: fg(3) + bg(3) + flags(1) + alpha(1) = 8 bytes
-  // Pack into a single 64-bit-safe integer via two 32-bit halves XORed together
-  const a = (buf[off + OFF_FG_R]! << 24) | (buf[off + OFF_FG_R + 1]! << 16)
-          | (buf[off + OFF_FG_R + 2]! << 8) | buf[off + 5]!;
-  const b = (buf[off + 6]! << 24) | (buf[off + 7]! << 16)
-          | (buf[off + 8]! << 8) | buf[off + 9]!;
-  // Combine into a single number — may collide for >2^32 unique styles
-  // but themes have ~50 unique token values, so collisions are negligible
-  return (a * 2654435761) ^ b;
+/** Build a collision-free cache key from the 8 style bytes (fg RGB, bg RGB, flags, alpha). */
+function styleCacheKey(buf: Uint8Array, off: number): string {
+  return String.fromCharCode(
+    buf[off + OFF_FG_R]!, buf[off + OFF_FG_R + 1]!, buf[off + OFF_FG_R + 2]!,
+    buf[off + 5]!, buf[off + 6]!, buf[off + 7]!,
+    buf[off + 8]!, buf[off + 9]!,
+  );
 }
 
 function buildSgr(buf: Uint8Array, off: number): string {
@@ -357,7 +360,7 @@ function buildSgr(buf: Uint8Array, off: number): string {
   }
   const uStyle = (flags >> 4) & 0x03;
   if (uStyle > 0) {
-    sgr += (uStyle === 3 && (flags & 0x40)) ? DASHED_SGR : UNDERLINE_SGR[uStyle]!;
+    sgr += (uStyle === 3 && (flags & FLAG_DASHED)) ? DASHED_SGR : UNDERLINE_SGR[uStyle]!;
   }
   return sgr;
 }

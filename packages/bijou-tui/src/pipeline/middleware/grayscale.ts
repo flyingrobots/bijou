@@ -1,22 +1,10 @@
-import type { Surface } from '@flyingrobots/bijou';
+import type { Surface, PackedSurface } from '@flyingrobots/bijou';
+import { CELL_STRIDE, OFF_FG_R, OFF_BG_R, OFF_ALPHA, FLAG_FG_SET, FLAG_BG_SET } from '@flyingrobots/bijou/perf';
 import type { RenderMiddleware } from '../pipeline.js';
-
-interface PackedSurface extends Surface {
-  readonly buffer: Uint8Array;
-  readonly sideTable: readonly string[];
-}
 
 function isPackedSurface(s: Surface): s is PackedSurface {
   return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
 }
-
-// Packed-cell constants inlined to avoid cross-package import
-const CELL_STRIDE = 10;
-const OFF_FG_R = 2;
-const OFF_BG_R = 5;
-const OFF_ALPHA = 9;
-const FLAG_FG_SET = 1 << 6;
-const FLAG_BG_SET = 1 << 7;
 /**
  * Creates a post-processing middleware that converts all colors in the
  * target surface to grayscale luminance values.
@@ -81,6 +69,8 @@ function grayscalePackedBuffer(surface: PackedSurface): void {
       cell.bg = `#${h}${h}${h}`;
     }
   }
+
+  surface.markAllDirty();
 }
 
 function grayscaleCellFallback(surface: Surface): void {

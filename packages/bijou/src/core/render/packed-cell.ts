@@ -2,48 +2,25 @@
  * Byte-packed cell encoding for zero-allocation surface rendering.
  *
  * Layout per cell: 10 bytes
- *   [0-1]  char (uint16 code point, or side-table index if >= SIDE_TABLE_THRESHOLD)
- *   [2]    fg R
- *   [3]    fg G
- *   [4]    fg B
- *   [5]    bg R
- *   [6]    bg G
- *   [7]    bg B
+ *   [0-1]  char (uint16 LE code point, or side-table index if >= SIDE_TABLE_THRESHOLD)
+ *   [2-4]  fg R, G, B
+ *   [5-7]  bg R, G, B
  *   [8]    flags bitfield
- *   [9]    alpha (opacity quantized to 0–255)
+ *   [9]    alpha byte
  *
- * Flags byte layout:
- *   bit 0: bold
- *   bit 1: dim
- *   bit 2: strikethrough
- *   bit 3: inverse
- *   bit 4: underline style (2 bits, 4–5):
- *          00 = none, 01 = underline, 10 = curly-underline, 11 = dotted/dashed
- *   bit 6: dashed-underline (disambiguates dotted vs dashed when bits 4–5 = 11)
- *   bit 7: empty
- *
- * A fg/bg of (0,0,0) with the DEFAULT_FG or DEFAULT_BG sentinel means
- * "terminal default" (undefined in the Cell interface). We use byte 255
- * in each channel as the sentinel since pure (255,255,255) white is
- * representable as (254,255,255) with negligible visual difference.
- * Actually — sentinels are tricky. Instead we use a separate bit
- * approach: we reserve two bits in a second flags byte... but we only
- * have 1 byte left (alpha). Let's use a simpler approach: store fg/bg
- * presence in the flags byte. We have bits to spare.
- *
- * Revised flags byte:
+ * Flags byte [8]:
  *   bit 0: bold
  *   bit 1: dim
  *   bit 2: strikethrough
  *   bit 3: inverse
  *   bit 4-5: underline style (00=none, 01=underline, 10=curly, 11=dotted-or-dashed)
- *   bit 6: dashed (when underline style = 11)
+ *   bit 6: dashed (disambiguates dotted vs dashed when bits 4-5 = 11)
  *   bit 7: empty
  *
- * We need fg_present and bg_present bits. Let's use the alpha byte:
- *   [9] bits 0-5: opacity (0–63, quantized from 0.0–1.0)
- *       bit 6: fg present (0 = terminal default, 1 = explicit RGB)
- *       bit 7: bg present (0 = terminal default, 1 = explicit RGB)
+ * Alpha byte [9]:
+ *   bits 0-5: opacity (0-63, quantized from 0.0-1.0)
+ *   bit 6: fg present (0 = terminal default, 1 = explicit RGB)
+ *   bit 7: bg present (0 = terminal default, 1 = explicit RGB)
  */
 
 /** Bytes per packed cell. */
@@ -175,10 +152,14 @@ const RGB_OUT: [number, number, number] = [0, 0, 0];
 /**
  * Parse '#rrggbb' into [r, g, b].
  *
- * Returns a **static reusable tuple** — callers must read values
- * immediately or copy them. Returns undefined for invalid input.
+ * **WARNING: returns a static reusable tuple.** The returned array is
+ * shared across all calls. Callers MUST read or destructure the values
+ * before calling `parseHex` again. Holding a reference across another
+ * `parseHex` call will see clobbered values.
  *
  * Zero-alloc: no slice(), no parseInt(), no intermediate strings.
+ *
+ * @returns A static [r, g, b] tuple, or undefined for invalid input.
  */
 export function parseHex(hex: string): [number, number, number] | undefined {
   if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
@@ -196,6 +177,23 @@ export function parseHex(hex: string): [number, number, number] | undefined {
 const HEX_BYTE: string[] = new Array(256);
 for (let i = 0; i < 256; i++) {
   HEX_BYTE[i] = (i < 16 ? '0' : '') + i.toString(16);
+}
+
+/**
+ * Parse '#rrggbb' and write R, G, B directly into a Uint8Array at the
+ * given offset. Returns true on success, false for invalid input.
+ * Zero-alloc: no intermediate strings or tuples.
+ */
+export function parseHexInto(hex: string, out: Uint8Array, off: number): boolean {
+  if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return false;
+  const r = hexPair(hex.charCodeAt(1), hex.charCodeAt(2));
+  const g = hexPair(hex.charCodeAt(3), hex.charCodeAt(4));
+  const b = hexPair(hex.charCodeAt(5), hex.charCodeAt(6));
+  if (r < 0 || g < 0 || b < 0) return false;
+  out[off] = r;
+  out[off + 1] = g;
+  out[off + 2] = b;
+  return true;
 }
 
 /** Encode [r, g, b] to '#rrggbb'. Uses a lookup table — no toString(16) per call. */
@@ -236,8 +234,6 @@ export function encodeChar(
     if (code < SIDE_TABLE_THRESHOLD) return code;
   }
   // Slow path: multi-char string (astral plane, grapheme cluster, etc.)
-  const code = char.codePointAt(0)!;
-  if (code < SIDE_TABLE_THRESHOLD && char.length === 1) return code;
   let idx = sideTable.indexOf(char);
   if (idx === -1) {
     idx = sideTable.length;

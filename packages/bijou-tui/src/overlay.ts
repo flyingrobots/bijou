@@ -10,12 +10,7 @@
 
 import type { BijouContext, Surface, PackedSurface, TokenValue, Cell } from '@flyingrobots/bijou';
 import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
-
-// Packed-cell constants inlined to avoid deep import
-const PACKED_STRIDE = 10;
-const PACKED_FLAGS = 8;
-const PACKED_ALPHA = 9;
-const PACKED_BG_SET = 1 << 7; // bit 7 of alpha byte
+import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex } from '@flyingrobots/bijou/perf';
 import {
   createSurface,
   graphemeClusterWidth,
@@ -236,14 +231,13 @@ export function compositeSurfaceInto(
     if (packed) {
       // Fast path: set the dim flag bit directly in the buffer
       const buf = (target as PackedSurface).buffer;
-      const STRIDE = 10, FLAGS = 8;
       const size = target.width * target.height;
       for (let i = 0; i < size; i++) {
-        const off = i * STRIDE;
-        if (buf[off + FLAGS]! & FLAG_EMPTY) continue;
+        const off = i * CELL_STRIDE;
+        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
         // Skip space chars (charCode 0x20)
         if (buf[off]! === 0x20 && buf[off + 1]! === 0) continue;
-        buf[off + FLAGS] = buf[off + FLAGS]! | FLAG_DIM;
+        buf[off + OFF_FLAGS] = buf[off + OFF_FLAGS]! | FLAG_DIM;
       }
       (target as PackedSurface).markAllDirty();
     } else {
@@ -345,12 +339,13 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   const graphemes = segmentGraphemes(plain);
   const surface = createSurface(width, 1);
   // Pre-parse style for setRGB fast path
-  const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
   let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
   if ('buffer' in surface) {
     let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-    if (style.fg?.length === 7) { fR = (hd(style.fg.charCodeAt(1)) << 4) | hd(style.fg.charCodeAt(2)); fG = (hd(style.fg.charCodeAt(3)) << 4) | hd(style.fg.charCodeAt(4)); fB = (hd(style.fg.charCodeAt(5)) << 4) | hd(style.fg.charCodeAt(6)); }
-    if (style.bg?.length === 7) { bR = (hd(style.bg.charCodeAt(1)) << 4) | hd(style.bg.charCodeAt(2)); bG = (hd(style.bg.charCodeAt(3)) << 4) | hd(style.bg.charCodeAt(4)); bB = (hd(style.bg.charCodeAt(5)) << 4) | hd(style.bg.charCodeAt(6)); }
+    const fgRgb = style.fg ? parseHex(style.fg) : undefined;
+    if (fgRgb) { [fR, fG, fB] = fgRgb; }
+    const bgRgb = style.bg ? parseHex(style.bg) : undefined;
+    if (bgRgb) { [bR, bG, bB] = bgRgb; }
     ns = { fR, fG, fB, bR, bG, bB, fl: 0 };
   }
   let x = 0;
@@ -366,18 +361,16 @@ function lineWithInheritedBackground(line: Surface, bg: string | undefined): Sur
   const result = line.clone();
   // Fast path: packed surface — write bg bytes directly
   const packed = 'buffer' in result && (result as PackedSurface).buffer instanceof Uint8Array;
-  if (packed && bg.length === 7 && bg.charCodeAt(0) === 0x23) {
-    const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
-    const bgR = (hd(bg.charCodeAt(1)) << 4) | hd(bg.charCodeAt(2));
-    const bgG = (hd(bg.charCodeAt(3)) << 4) | hd(bg.charCodeAt(4));
-    const bgB = (hd(bg.charCodeAt(5)) << 4) | hd(bg.charCodeAt(6));
+  const rgb = packed ? parseHex(bg) : undefined;
+  if (rgb) {
+    const [bgR, bgG, bgB] = rgb;
     const buf = (result as PackedSurface).buffer;
     for (let i = 0; i < result.width; i++) {
-      const off = i * PACKED_STRIDE;
-      if (buf[off + PACKED_FLAGS]! & FLAG_EMPTY) continue;
-      if (buf[off + PACKED_ALPHA]! & PACKED_BG_SET) continue;
+      const off = i * CELL_STRIDE;
+      if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+      if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
       buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
-      buf[off + PACKED_ALPHA] = buf[off + PACKED_ALPHA]! | PACKED_BG_SET;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
     }
     (result as PackedSurface).markAllDirty();
     return result;

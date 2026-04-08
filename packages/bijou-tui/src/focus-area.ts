@@ -22,6 +22,7 @@
 
 import type { BijouContext, Cell, Surface, PackedSurface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
+import { parseHex } from '@flyingrobots/bijou/perf';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
   type ScrollState,
@@ -381,13 +382,12 @@ export function focusAreaSurfaceInto(
   if (hasGutter) {
     const gutterCell = resolveGutterCell(focused, ctx, options);
     const packed: boolean = 'buffer' in target;
-    if (packed && gutterCell.fg) {
-      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
-      const fR = (hd(gutterCell.fg.charCodeAt(1)) << 4) | hd(gutterCell.fg.charCodeAt(2));
-      const fG = (hd(gutterCell.fg.charCodeAt(3)) << 4) | hd(gutterCell.fg.charCodeAt(4));
-      const fB = (hd(gutterCell.fg.charCodeAt(5)) << 4) | hd(gutterCell.fg.charCodeAt(6));
+    const fgRgb = packed && gutterCell.fg ? parseHex(gutterCell.fg) : undefined;
+    if (fgRgb) {
+      const [fR, fG, fB] = fgRgb;
       let bR = -1, bG = 0, bB = 0;
-      if (gutterCell.bg?.length === 7) { bR = (hd(gutterCell.bg.charCodeAt(1)) << 4) | hd(gutterCell.bg.charCodeAt(2)); bG = (hd(gutterCell.bg.charCodeAt(3)) << 4) | hd(gutterCell.bg.charCodeAt(4)); bB = (hd(gutterCell.bg.charCodeAt(5)) << 4) | hd(gutterCell.bg.charCodeAt(6)); }
+      const bgRgb = gutterCell.bg ? parseHex(gutterCell.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
       for (let y = 0; y < state.height; y++) {
         (target as PackedSurface).setRGB(offsetX, offsetY + y, gutterCell.char, fR, fG, fB, bR, bG, bB);
       }
