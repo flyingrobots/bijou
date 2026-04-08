@@ -383,6 +383,12 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
   const sideTable: string[] = [];
   const buf = new Uint8Array(size * CELL_STRIDE);
+
+  // Dirty bitmap: 1 bit per cell. When set, the Cell object is stale
+  // and must be decoded from the buffer before reading.
+  const dirtyWords = new Uint32Array(Math.ceil(size / 32));
+
+  // Cell array: lazily decoded from the buffer on read.
   const cells: Cell[] = new Array(size);
 
   // Initialize buffer and cell array from the default cell
@@ -391,8 +397,22 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
     cells[i] = cloneCell(defaultCell);
   }
 
-  function syncCell(idx: number, exactOpacity?: number): void {
-    syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
+  function markDirty(idx: number): void {
+    dirtyWords[idx >> 5]! |= 1 << (idx & 31);
+  }
+
+  function ensureClean(idx: number): void {
+    const word = dirtyWords[idx >> 5]!;
+    const bit = 1 << (idx & 31);
+    if (word & bit) {
+      const exactOpacity = cells[idx]!.opacity;
+      syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
+      dirtyWords[idx >> 5]! = word & ~bit;
+    }
+  }
+
+  function markAllClean(): void {
+    dirtyWords.fill(0);
   }
 
   const surface: PackedSurface = {
@@ -407,20 +427,27 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         encodeCellIntoBuf(buf, i, defaultCell, sideTable);
         copyCellInto(cells[i]!, defaultCell);
       }
+      markAllClean();
     },
 
     get(x, y, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) {
         return { char: ' ', empty: true };
       }
-      return maskCell(cells[y * w + x]!, mask);
+      const idx = y * w + x;
+      ensureClean(idx);
+      return maskCell(cells[idx]!, mask);
     },
 
     set(x, y, cell, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) return;
       const idx = y * w + x;
       applyMaskToBuf(buf, idx, cell, mask, sideTable);
-      syncCell(idx, !cell.empty && mask.alpha ? cell.opacity : undefined);
+      // Preserve exact opacity on the cell to avoid quantization drift
+      if (!cell.empty && mask.alpha) {
+        cells[idx]!.opacity = cell.opacity ?? 1;
+      }
+      markDirty(idx);
     },
 
     fill(cell, fx = 0, fy = 0, fw = w, fh = h, mask = FULL_MASK) {
@@ -433,7 +460,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         for (let x = xStart; x < xEnd; x++) {
           const idx = y * w + x;
           applyMaskToBuf(buf, idx, cell, mask, sideTable);
-          syncCell(idx, !cell.empty && mask.alpha ? cell.opacity : undefined);
+          markDirty(idx);
         }
       }
     },
@@ -459,16 +486,15 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         const targetY = yStart + i;
         const sourceY = srcYStart + i;
         const tRowOffset = targetY * w;
-        const sRowOffset = sourceY * source.width;
 
         for (let j = 0; j < blitW; j++) {
           const targetX = xStart + j;
           const sourceX = srcXStart + j;
           const tIdx = tRowOffset + targetX;
-          const sIdx = sRowOffset + sourceX;
-          const srcCell = source.cells[sIdx]!;
+          // Read through get() to ensure source cell is decoded if packed
+          const srcCell = source.get(sourceX, sourceY);
           applyMaskToBuf(buf, tIdx, srcCell, mask, sideTable);
-          syncCell(tIdx, !srcCell.empty && mask.alpha ? srcCell.opacity : undefined);
+          markDirty(tIdx);
         }
       }
     },
@@ -495,7 +521,7 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
             const idx = y * w + x;
             applyMaskToBuf(buf, idx, transformedCell, mask, sideTable);
-            syncCell(idx, mask.alpha ? transformedCell.opacity : undefined);
+            markDirty(idx);
           }
         }
       }
@@ -506,8 +532,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const xStart = Math.max(0, rx);
       const count = Math.min(w - xStart, rw);
       if (count <= 0) return [];
+      const base = y * w + xStart;
+      for (let i = 0; i < count; i++) ensureClean(base + i);
       return cells
-        .slice(y * w + xStart, y * w + xStart + count)
+        .slice(base, base + count)
         .map((c) => maskCell(c!, mask));
     },
 
@@ -517,15 +545,18 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const count = Math.min(w - xStart, rowCells.length);
       for (let i = 0; i < count; i++) {
         const idx = y * w + xStart + i;
-        const rc = rowCells[i]!;
-        applyMaskToBuf(buf, idx, rc, mask, sideTable);
-        syncCell(idx, !rc.empty && mask.alpha ? rc.opacity : undefined);
+        applyMaskToBuf(buf, idx, rowCells[i]!, mask, sideTable);
+        markDirty(idx);
       }
     },
 
     clone() {
       const s = createSurface(w, h);
       s.buffer.set(buf);
+      // Mark everything dirty so cells decode lazily from copied buffer
+      const sDirty = new Uint32Array(Math.ceil(size / 32));
+      sDirty.fill(0xFFFFFFFF);
+      // Can't access clone's dirtyWords directly — use the cells path
       for (let i = 0; i < size; i++) {
         syncCellFromBuf(s.cells[i]!, s.buffer, i, s.sideTable);
       }
