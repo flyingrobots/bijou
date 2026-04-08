@@ -6,7 +6,7 @@ import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.j
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
+import { parseHex, encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
 
 function isPackedSurface(s: Surface): s is PackedSurface {
   return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
@@ -50,18 +50,16 @@ function withInheritedBackground(surface: Surface, background: string | undefine
     const bgRGB = parseHex(background);
     if (bgRGB) {
       const buf = next.buffer;
-      const bgR = bgRGB[0], bgG = bgRGB[1], bgB = bgRGB[2];
+      const [bgR, bgG, bgB] = bgRGB;
       const size = next.width * next.height;
-      const STRIDE = 10, FLAGS_OFF = 8, ALPHA_OFF = 9;
-      const BG_SET = 1 << 7, EMPTY_BIT = 1 << 7;
       for (let i = 0; i < size; i++) {
-        const off = i * STRIDE;
-        if (buf[off + FLAGS_OFF]! & EMPTY_BIT) continue; // skip empty
-        if (buf[off + ALPHA_OFF]! & BG_SET) continue; // already has bg
+        const off = i * CELL_STRIDE;
+        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+        if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
         buf[off + 5] = bgR;
         buf[off + 6] = bgG;
         buf[off + 7] = bgB;
-        buf[off + ALPHA_OFF] = buf[off + ALPHA_OFF]! | BG_SET;
+        buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
       }
       next.markAllDirty();
       return next;

@@ -84,10 +84,12 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   // Pre-parse border style for setRGB fast path
   let bfR = -1, bfG = 0, bfB = 0, bbR = -1, bbG = 0, bbB = 0, bflags = 0;
   if (packed && borderStyle.fg) {
-    const rgb = parseHex(borderStyle.fg); if (rgb) { bfR = rgb[0]; bfG = rgb[1]; bfB = rgb[2]; }
+    const rgb = parseHex(borderStyle.fg);
+    if (rgb) { const [r, g, b] = rgb; bfR = r; bfG = g; bfB = b; }
   }
   if (packed && borderStyle.bg) {
-    const rgb = parseHex(borderStyle.bg); if (rgb) { bbR = rgb[0]; bbG = rgb[1]; bbB = rgb[2]; }
+    const rgb = parseHex(borderStyle.bg);
+    if (rgb) { const [r, g, b] = rgb; bbR = r; bbG = g; bbB = b; }
   }
   if (packed) bflags = encodeModifiers(borderStyle.modifiers);
 

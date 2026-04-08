@@ -75,6 +75,7 @@ export function createTextSurface(text: string, style: CellTextStyle = {}): Surf
   const numStyle = isPackedSurface(surface) ? parseNumericStyle(style) : undefined;
   if (numStyle && isPackedSurface(surface)) {
     const { fgR, fgG, fgB, bgR, bgG, bgB, flags } = numStyle;
+    // -1 signals "terminal default" to setRGB; fgG/fgB and bgG/bgB are ignored when fR/bR === -1
     const fR = numStyle.fgSet ? fgR : -1;
     const bR = numStyle.bgSet ? bgR : -1;
     for (let y = 0; y < lines.length; y++) {

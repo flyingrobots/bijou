@@ -30,6 +30,8 @@ export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
 /**
  * Populate fgRGB and bgRGB on an existing TokenValue if not already set.
  * Used by theme resolution to ensure all tokens carry numeric RGB.
+ *
+ * **Mutates the token in place.** Callers should not pass frozen/shared tokens.
  */
 export function populateTokenRGB(token: TokenValue): TokenValue {
   if (!token.fgRGB) {
