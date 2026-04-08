@@ -8,7 +8,14 @@
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
-import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, PackedSurface, TokenValue, Cell } from '@flyingrobots/bijou';
+import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
+
+// Packed-cell constants inlined to avoid deep import
+const PACKED_STRIDE = 10;
+const PACKED_FLAGS = 8;
+const PACKED_ALPHA = 9;
+const PACKED_BG_SET = 1 << 7; // bit 7 of alpha byte
 import {
   createSurface,
   graphemeClusterWidth,
@@ -225,13 +232,29 @@ export function compositeSurfaceInto(
   }
 
   if (options?.dim) {
-    for (let y = 0; y < target.height; y++) {
-      for (let x = 0; x < target.width; x++) {
-        const cell = target.get(x, y);
-        if (cell.empty || cell.char === ' ') continue;
-        const modifiers = cell.modifiers ?? [];
-        if (!modifiers.includes('dim')) {
-          target.set(x, y, { ...cell, modifiers: [...modifiers, 'dim'], empty: false });
+    const packed = 'buffer' in target && (target as PackedSurface).buffer instanceof Uint8Array;
+    if (packed) {
+      // Fast path: set the dim flag bit directly in the buffer
+      const buf = (target as PackedSurface).buffer;
+      const STRIDE = 10, FLAGS = 8;
+      const size = target.width * target.height;
+      for (let i = 0; i < size; i++) {
+        const off = i * STRIDE;
+        if (buf[off + FLAGS]! & FLAG_EMPTY) continue;
+        // Skip space chars (charCode 0x20)
+        if (buf[off]! === 0x20 && buf[off + 1]! === 0) continue;
+        buf[off + FLAGS] = buf[off + FLAGS]! | FLAG_DIM;
+      }
+      (target as PackedSurface).markAllDirty();
+    } else {
+      for (let y = 0; y < target.height; y++) {
+        for (let x = 0; x < target.width; x++) {
+          const cell = target.get(x, y);
+          if (cell.empty || cell.char === ' ') continue;
+          const modifiers = cell.modifiers ?? [];
+          if (!modifiers.includes('dim')) {
+            target.set(x, y, { ...cell, modifiers: [...modifiers, 'dim'], empty: false });
+          }
         }
       }
     }
@@ -328,6 +351,24 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
 function lineWithInheritedBackground(line: Surface, bg: string | undefined): Surface {
   if (bg == null || line.width === 0) return line;
   const result = line.clone();
+  // Fast path: packed surface — write bg bytes directly
+  const packed = 'buffer' in result && (result as PackedSurface).buffer instanceof Uint8Array;
+  if (packed && bg.length === 7 && bg.charCodeAt(0) === 0x23) {
+    const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+    const bgR = (hd(bg.charCodeAt(1)) << 4) | hd(bg.charCodeAt(2));
+    const bgG = (hd(bg.charCodeAt(3)) << 4) | hd(bg.charCodeAt(4));
+    const bgB = (hd(bg.charCodeAt(5)) << 4) | hd(bg.charCodeAt(6));
+    const buf = (result as PackedSurface).buffer;
+    for (let i = 0; i < result.width; i++) {
+      const off = i * PACKED_STRIDE;
+      if (buf[off + PACKED_FLAGS]! & FLAG_EMPTY) continue;
+      if (buf[off + PACKED_ALPHA]! & PACKED_BG_SET) continue;
+      buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
+      buf[off + PACKED_ALPHA] = buf[off + PACKED_ALPHA]! | PACKED_BG_SET;
+    }
+    (result as PackedSurface).markAllDirty();
+    return result;
+  }
   for (let x = 0; x < result.width; x++) {
     const cell = result.get(x, 0);
     if (cell.empty) continue;

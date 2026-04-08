@@ -17,7 +17,8 @@
 // Types
 // ---------------------------------------------------------------------------
 
-import type { BijouContext, TokenValue, Surface } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue, Surface, PackedSurface } from '@flyingrobots/bijou';
+import { FLAG_EMPTY } from '@flyingrobots/bijou';
 import { createSurface, makeBgFill, parseAnsiToSurface, shouldApplyBg } from '@flyingrobots/bijou';
 
 /**
@@ -376,6 +377,26 @@ function createRegionSurface(width: number, height: number, bg: string | undefin
 function inheritBackground(surface: Surface, bg: string | undefined): Surface {
   if (!bg || surface.width === 0 || surface.height === 0) return surface;
   const next = surface.clone();
+  // Fast path: packed surface — write bg bytes directly
+  const packed = 'buffer' in next && (next as PackedSurface).buffer instanceof Uint8Array;
+  if (packed && bg.length === 7 && bg.charCodeAt(0) === 0x23) {
+    const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+    const bgR = (hd(bg.charCodeAt(1)) << 4) | hd(bg.charCodeAt(2));
+    const bgG = (hd(bg.charCodeAt(3)) << 4) | hd(bg.charCodeAt(4));
+    const bgB = (hd(bg.charCodeAt(5)) << 4) | hd(bg.charCodeAt(6));
+    const buf = (next as PackedSurface).buffer;
+    const STRIDE = 10, FLAGS = 8, ALPHA = 9, BG_SET = 1 << 7;
+    const size = next.width * next.height;
+    for (let i = 0; i < size; i++) {
+      const off = i * STRIDE;
+      if (buf[off + FLAGS]! & FLAG_EMPTY) continue;
+      if (buf[off + ALPHA]! & BG_SET) continue;
+      buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
+      buf[off + ALPHA] = buf[off + ALPHA]! | BG_SET;
+    }
+    (next as PackedSurface).markAllDirty();
+    return next;
+  }
   for (let y = 0; y < next.height; y++) {
     for (let x = 0; x < next.width; x++) {
       const cell = next.get(x, y);
