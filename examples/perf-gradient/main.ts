@@ -16,7 +16,7 @@
  */
 
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { createSurface } from '@flyingrobots/bijou';
+import { createSurface, type PackedSurface } from '@flyingrobots/bijou';
 import {
   run, quit, tick,
   isKeyMsg, isMouseMsg, isResizeMsg,
@@ -308,6 +308,73 @@ function fillGradient(surface: ReturnType<typeof createSurface>, model: Model): 
   }
 }
 
+function fillGradientRGB(surface: PackedSurface, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
+  const direction = mouseDown ? -1 : 1;
+  const f = frame * 0.05 * direction;
+  const BLOCK = 0x2588; // █
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const phase = (col + row * 0.5) * 0.08;
+      const r1 = clamp((cos(phase + 1 * f) + 1) * 127.5, 0, 255);
+      const g1 = clamp((cos(phase + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
+      const b1 = clamp((cos(phase + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
+      const r2 = clamp((cos(phase * 0.06 + 1 * f) + 1) * 127.5, 0, 255);
+      const g2 = clamp((cos(phase * 0.07 + 2 * f + 2 * PI / 3) + 1) * 127.5, 0, 255);
+      const b2 = clamp((cos(phase * 0.08 + 3 * f + 4 * PI / 3) + 1) * 127.5, 0, 255);
+      surface.setRGB(col, row, BLOCK, r2, g2, b2, r1, g1, b1);
+    }
+  }
+}
+
+function fillHorizonRGB(surface: PackedSurface, model: Model): void {
+  const { cols, rows, frame, mouseDown } = model;
+  const halfY = rows / 2;
+  const halfX = cols / 2;
+  const speed = (mouseDown ? -0.3 : 0.3);
+  const DASH = 0x2500; // ─
+
+  for (let row = 0; row < rows; row++) {
+    const z = row - halfY;
+    for (let col = 0; col < cols; col++) {
+      if (z === 0) {
+        surface.setRGB(col, row, DASH, 255, 255, 255, 0, 0, 0);
+        continue;
+      }
+      const val = (col - halfX) / z;
+      const code = (Math.floor(val + halfX + frame * speed) % 94 + 94) % 94 + 33;
+      const depth = clamp(1 - Math.abs(z) / halfY, 0, 1);
+      const bright = round(depth * 200 + 55);
+      const skyR = z < 0 ? round(bright * 0.3) : round(bright * 0.2);
+      const skyG = z < 0 ? round(bright * 0.4) : round(bright * 0.6);
+      const skyB = z < 0 ? bright : round(bright * 0.2);
+      surface.setRGB(col, row, code, bright, bright, bright, skyR, skyG, skyB);
+    }
+  }
+}
+
+function fillNoiseRGB(surface: PackedSurface, model: Model): void {
+  const { cols, rows, mouseDown } = model;
+  const t = model.elapsed * 0.0007 * (mouseDown ? -1 : 1);
+  const s = 0.03;
+  const aspect = 0.5;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = col * s;
+      const y = row * s / aspect + t;
+      const n = noise2D(x, y + t * 0.3) * 0.5 + 0.5;
+      const i = Math.floor(n * DENSITY.length);
+      const ch = DENSITY[clamp(i, 0, DENSITY.length - 1)] ?? ' ';
+      const bright = n;
+      const r = round(255 * bright * 0.3 + 246 * (1 - bright));
+      const g = round(89 * bright * 0.3 + 246 * (1 - bright));
+      const b = round(55 * bright * 0.3 + 244 * (1 - bright));
+      surface.setRGB(col, row, ch, r, g, b, 0, 0, 0);
+    }
+  }
+}
+
 function fillHorizon(surface: ReturnType<typeof createSurface>, model: Model): void {
   const { cols, rows, frame, mouseDown } = model;
   const halfY = rows / 2;
@@ -407,9 +474,9 @@ function renderFrame(model: Model) {
   const surface = getOrCreateSurface(cols, rows);
 
   switch (model.mode) {
-    case 0: fillGradient(surface, model); break;
-    case 1: fillHorizon(surface, model); break;
-    case 2: fillNoise(surface, model); break;
+    case 0: fillGradientRGB(surface, model); break;
+    case 1: fillHorizonRGB(surface, model); break;
+    case 2: fillNoiseRGB(surface, model); break;
     case 3: fillQuad(surface, model); break;
   }
 
