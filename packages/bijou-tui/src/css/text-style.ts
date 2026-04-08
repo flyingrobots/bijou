@@ -1,5 +1,14 @@
 import { createSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
 
+// Inline encodeModifiers to avoid deep import
+function encodeModifiers(mods: readonly string[] | undefined): number {
+  if (!mods || mods.length === 0) return 0;
+  const MAP: Record<string, number> = { bold: 1, dim: 2, strikethrough: 4, inverse: 8, underline: 16, 'curly-underline': 32, 'dotted-underline': 48, 'dashed-underline': 112 };
+  let f = 0;
+  for (const m of mods) f |= MAP[m] ?? 0;
+  return f;
+}
+
 export interface StyledTextToken {
   hex?: string;
   bg?: string;
@@ -117,14 +126,28 @@ export function createStyledTextSurfaceWithBCSS(
     empty: false,
   });
   const graphemes = segmentGraphemes(text ?? '');
-  for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
-    surface.set(x, 0, {
-      char: graphemes[x]!,
-      fg: token.hex,
-      bg: token.bg,
-      modifiers: token.modifiers,
-      empty: false,
-    });
+  const packed: boolean = 'buffer' in surface;
+  const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+  if (packed && token.hex?.length === 7) {
+    const fR = (hd(token.hex.charCodeAt(1)) << 4) | hd(token.hex.charCodeAt(2));
+    const fG = (hd(token.hex.charCodeAt(3)) << 4) | hd(token.hex.charCodeAt(4));
+    const fB = (hd(token.hex.charCodeAt(5)) << 4) | hd(token.hex.charCodeAt(6));
+    let bR = -1, bG = 0, bB = 0;
+    if (token.bg?.length === 7) { bR = (hd(token.bg.charCodeAt(1)) << 4) | hd(token.bg.charCodeAt(2)); bG = (hd(token.bg.charCodeAt(3)) << 4) | hd(token.bg.charCodeAt(4)); bB = (hd(token.bg.charCodeAt(5)) << 4) | hd(token.bg.charCodeAt(6)); }
+    const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      (surface as any).setRGB(x, 0, graphemes[x]!, fR, fG, fB, bR, bG, bB, flags);
+    }
+  } else {
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      surface.set(x, 0, {
+        char: graphemes[x]!,
+        fg: token.hex,
+        bg: token.bg,
+        modifiers: token.modifiers,
+        empty: false,
+      });
+    }
   }
   return surface;
 }

@@ -2,6 +2,7 @@ import type {
   BijouContext,
   OverflowBehavior,
   Surface,
+  PackedSurface,
   TokenValue,
 } from '@flyingrobots/bijou';
 import {
@@ -708,16 +709,30 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
   const surface = createSurface(width, 1);
   let x = 0;
 
+  const packed: boolean = 'buffer' in surface;
   for (const segment of graphemeSegments) {
-    for (const char of segment.graphemes) {
-      surface.set(x, 0, {
-        char,
-        fg: segment.style?.fg,
-        bg: segment.style?.bg,
-        modifiers: segment.style?.modifiers ? [...segment.style.modifiers] : undefined,
-        empty: false,
-      });
-      x++;
+    // Pre-parse style once per segment for setRGB fast path
+    const s = segment.style;
+    if (packed && s) {
+      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+      let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
+      if (s.fg && s.fg.length === 7) { fR = (hd(s.fg.charCodeAt(1)) << 4) | hd(s.fg.charCodeAt(2)); fG = (hd(s.fg.charCodeAt(3)) << 4) | hd(s.fg.charCodeAt(4)); fB = (hd(s.fg.charCodeAt(5)) << 4) | hd(s.fg.charCodeAt(6)); }
+      if (s.bg && s.bg.length === 7) { bR = (hd(s.bg.charCodeAt(1)) << 4) | hd(s.bg.charCodeAt(2)); bG = (hd(s.bg.charCodeAt(3)) << 4) | hd(s.bg.charCodeAt(4)); bB = (hd(s.bg.charCodeAt(5)) << 4) | hd(s.bg.charCodeAt(6)); }
+      for (const char of segment.graphemes) {
+        (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB);
+        x++;
+      }
+    } else {
+      for (const char of segment.graphemes) {
+        surface.set(x, 0, {
+          char,
+          fg: s?.fg,
+          bg: s?.bg,
+          modifiers: s?.modifiers ? [...s.modifiers] : undefined,
+          empty: false,
+        });
+        x++;
+      }
     }
   }
 
@@ -947,14 +962,25 @@ function renderNotificationSurface<Msg>(
     empty: false,
   });
 
+  const cardPacked: boolean = 'buffer' in card;
   for (let y = 0; y < contentRows.length; y++) {
-    card.set(0, y, {
-      char: '\u258e',
-      fg: accentStyle.fg,
-      bg: backgroundStyle.bg,
-      modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
-      empty: false,
-    });
+    if (cardPacked && accentStyle.fg?.length === 7) {
+      const hd = (c: number): number => c >= 97 ? c - 87 : c >= 65 ? c - 55 : c - 48;
+      const fR = (hd(accentStyle.fg.charCodeAt(1)) << 4) | hd(accentStyle.fg.charCodeAt(2));
+      const fG = (hd(accentStyle.fg.charCodeAt(3)) << 4) | hd(accentStyle.fg.charCodeAt(4));
+      const fB = (hd(accentStyle.fg.charCodeAt(5)) << 4) | hd(accentStyle.fg.charCodeAt(6));
+      let bR = -1, bG = 0, bB = 0;
+      if (backgroundStyle.bg?.length === 7) { bR = (hd(backgroundStyle.bg.charCodeAt(1)) << 4) | hd(backgroundStyle.bg.charCodeAt(2)); bG = (hd(backgroundStyle.bg.charCodeAt(3)) << 4) | hd(backgroundStyle.bg.charCodeAt(4)); bB = (hd(backgroundStyle.bg.charCodeAt(5)) << 4) | hd(backgroundStyle.bg.charCodeAt(6)); }
+      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB);
+    } else {
+      card.set(0, y, {
+        char: '\u258e',
+        fg: accentStyle.fg,
+        bg: backgroundStyle.bg,
+        modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
+        empty: false,
+      });
+    }
     card.blit(
       contentRows[y]!,
       2,
