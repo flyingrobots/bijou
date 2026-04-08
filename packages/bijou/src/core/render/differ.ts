@@ -1,9 +1,19 @@
-import { createSurface, type Surface, type Cell, type LayoutNode } from '../../ports/surface.js';
+import { createSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
 import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
+import {
+  CELL_STRIDE,
+  OFF_FG_R,
+  FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
+  decodeChar, decodeModifiers, toHex,
+} from './packed-cell.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
 const EMPTY_MODIFIERS: readonly string[] = [];
+
+function isPackedSurface(s: Surface): s is PackedSurface {
+  return 'buffer' in s && s.buffer instanceof Uint8Array;
+}
 
 function hasVisibleStyle(cell: Cell): boolean {
   return cell.fg !== undefined
@@ -235,6 +245,163 @@ export function renderDiff(
   io: WritePort,
   style: StylePort,
 ): void {
+  // Use packed byte path when both surfaces have buffers
+  if (isPackedSurface(target) && isPackedSurface(current)) {
+    renderDiffPacked(current, target, io, style);
+    return;
+  }
+  renderDiffCells(current, target, io, style);
+}
+
+// ── Packed byte-comparison differ ───────────────────────
+
+/** Empty cell encoded as packed bytes for boundary comparison. */
+const EMPTY_PACKED = new Uint8Array(CELL_STRIDE);
+EMPTY_PACKED[0] = 0x20; // space
+EMPTY_PACKED[8] = FLAG_EMPTY; // flags: empty
+EMPTY_PACKED[9] = 63; // opacity: 1.0, no fg, no bg
+
+function packedBytesEqual(
+  a: Uint8Array, aOff: number,
+  b: Uint8Array, bOff: number,
+): boolean {
+  for (let i = 0; i < CELL_STRIDE; i++) {
+    if (a[aOff + i] !== b[bOff + i]) return false;
+  }
+  return true;
+}
+
+function packedStyleBytesEqual(
+  a: Uint8Array, aOff: number,
+  b: Uint8Array, bOff: number,
+): boolean {
+  // Compare from OFF_FG_R through end (fg, bg, flags, alpha) — skip char
+  for (let i = OFF_FG_R; i < CELL_STRIDE; i++) {
+    if (a[aOff + i] !== b[bOff + i]) return false;
+  }
+  return true;
+}
+
+function readCharFromBuf(buf: Uint8Array, off: number, sideTable: readonly string[]): string {
+  const code = buf[off]! | (buf[off + 1]! << 8);
+  return decodeChar(code, sideTable);
+}
+
+function readFgFromBuf(buf: Uint8Array, off: number): string | undefined {
+  return (buf[off + 9]! & FLAG_FG_SET)
+    ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_R + 1]!, buf[off + OFF_FG_R + 2]!)
+    : undefined;
+}
+
+function readBgFromBuf(buf: Uint8Array, off: number): string | undefined {
+  return (buf[off + 9]! & FLAG_BG_SET)
+    ? toHex(buf[off + 5]!, buf[off + 6]!, buf[off + 7]!)
+    : undefined;
+}
+
+function packedHasVisibleStyle(buf: Uint8Array, off: number): boolean {
+  const alpha = buf[off + 9]!;
+  return (alpha & (FLAG_FG_SET | FLAG_BG_SET)) !== 0
+    || (buf[off + 8]! & ~FLAG_EMPTY) !== 0;
+}
+
+function renderDiffPacked(
+  current: PackedSurface,
+  target: PackedSurface,
+  io: WritePort,
+  style: StylePort,
+): void {
+  const width = target.width;
+  const height = target.height;
+  const tBuf = target.buffer;
+  const cBuf = current.buffer;
+  const cWidth = current.width;
+  const cHeight = current.height;
+  const tSide = target.sideTable;
+
+  let output = '';
+  let cursorX = -1;
+  let cursorY = -1;
+  const token: { hex?: string; bg?: string; modifiers?: Cell['modifiers'] } = {};
+
+  for (let y = 0; y < height; y++) {
+    let x = 0;
+    while (x < width) {
+      const tIdx = y * width + x;
+      const tOff = tIdx * CELL_STRIDE;
+
+      // Current cell: use buffer if in bounds, else EMPTY_PACKED
+      const inBounds = y < cHeight && x < cWidth;
+      const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
+
+      // Fast skip: compare 10 bytes
+      const same = inBounds
+        ? packedBytesEqual(tBuf, tOff, cBuf, cOff)
+        : packedBytesEqual(tBuf, tOff, EMPTY_PACKED, 0);
+
+      if (same) {
+        x++;
+        continue;
+      }
+
+      if (x !== cursorX || y !== cursorY) {
+        output += moveCursor(x, y);
+      }
+
+      // Batch contiguous cells with same style that need updating
+      let batchX = x;
+      let batchText = '';
+      while (batchX < width) {
+        const bIdx = y * width + batchX;
+        const bOff = bIdx * CELL_STRIDE;
+
+        // Style check: does this cell match the batch leader's style?
+        if (batchX > x && !packedStyleBytesEqual(tBuf, tOff, tBuf, bOff)) {
+          break;
+        }
+
+        // Cell changed check
+        const bInBounds = y < cHeight && batchX < cWidth;
+        const bcOff = bInBounds ? (y * cWidth + batchX) * CELL_STRIDE : -1;
+        const cellsMatch = bInBounds
+          ? packedBytesEqual(tBuf, bOff, cBuf, bcOff)
+          : packedBytesEqual(tBuf, bOff, EMPTY_PACKED, 0);
+
+        if (cellsMatch) break;
+
+        batchText += readCharFromBuf(tBuf, bOff, tSide);
+        batchX++;
+      }
+
+      // Emit styled batch
+      if (packedHasVisibleStyle(tBuf, tOff)) {
+        token.hex = readFgFromBuf(tBuf, tOff);
+        token.bg = readBgFromBuf(tBuf, tOff);
+        token.modifiers = decodeModifiers(tBuf[tOff + 8]! & ~FLAG_EMPTY) as Cell['modifiers'];
+        output += style.styled(token as any, batchText);
+      } else {
+        output += batchText;
+      }
+
+      cursorX = batchX;
+      cursorY = y;
+      x = batchX;
+    }
+  }
+
+  if (output.length > 0) {
+    io.write(output);
+  }
+}
+
+// ── Legacy cell-based differ (fallback) ─────────────────
+
+function renderDiffCells(
+  current: Surface,
+  target: Surface,
+  io: WritePort,
+  style: StylePort,
+): void {
   const width = target.width;
   const height = target.height;
   const targetCells = target.cells;
@@ -281,13 +448,10 @@ export function renderDiff(
         continue;
       }
 
-      // If we are not at the expected cursor position, move it
       if (x !== cursorX || y !== cursorY) {
         output += moveCursor(x, y);
       }
 
-      // Find how many contiguous cells have the SAME style as this one
-      // and also NEED to be updated.
       let batchX = x;
       let batchText = '';
       const batchStyleMods = targetMods;
@@ -340,7 +504,6 @@ export function renderDiff(
         batchX++;
       }
 
-      // Render the batch
       if (hasVisibleStyle(targetCell)) {
         token.hex = targetCell.fg;
         token.bg = targetCell.bg;
@@ -350,14 +513,10 @@ export function renderDiff(
         output += batchText;
       }
 
-      // Advance our internal cursor tracking
       const batchWidth = batchX - x;
       cursorX = x + batchWidth;
       cursorY = y;
-      
-      // Advance loop index
       x = batchX;
-
     }
   }
 
