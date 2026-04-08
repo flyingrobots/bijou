@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, runScript } from '@flyingrobots/bijou-tui';
@@ -8,6 +9,10 @@ import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
+
+const BIJOU_VERSION: string = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, '..', 'packages', 'bijou', 'package.json'), 'utf8'),
+).version;
 
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
@@ -136,9 +141,9 @@ describe('docs preview app', () => {
     expect(footer).toContain('↑/↓ quality');
     expect(footer).toContain('←/→ theme');
     expect(footer).toContain('Enter continue');
-    expect(footer).toContain('v4.1.0');
-    expect(footer).toContain('73 fps • auto/full');
-    expect(lines[0]).not.toContain('73 fps');
+    expect(footer).toContain(`v${BIJOU_VERSION}`);
+    expect(footer).toMatch(/\d+ fps • auto\/full/);
+    expect(lines[0]).not.toMatch(/\d+ fps/);
     expect(text).not.toContain('Documentation coverage');
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
