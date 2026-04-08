@@ -7,8 +7,13 @@
  * rendered string.
  */
 
+import { readFileSync } from 'node:fs';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+const { version: PACKAGE_VERSION } = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { version: string };
 
 import type { ToolRegistration } from './types.js';
 import { tableTool } from './tools/table.js';
@@ -62,7 +67,7 @@ const TOOLS: readonly ToolRegistration[] = [
 
 const server = new McpServer({
   name: 'bijou-mcp',
-  version: '4.1.0',
+  version: PACKAGE_VERSION,
 });
 
 for (const tool of TOOLS) {

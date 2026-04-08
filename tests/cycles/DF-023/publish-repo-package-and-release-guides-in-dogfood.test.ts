@@ -1,8 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
+
+const BIJOU_VERSION: string = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'packages', 'bijou', 'package.json'), 'utf8'),
+).version;
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -68,33 +74,34 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(packageText).toContain('Surface primitives without abandoning');
   });
 
-  it('publishes the 4.1.0 release story and migration guide in Release', async () => {
+  it('publishes the current release story and migration guide in Release', async () => {
+    const versionSlug = BIJOU_VERSION.replaceAll('.', '-');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
     const opened = await runScript(app, [{ key: ']' }, { key: ']' }, { key: ']' }, { key: ']' }], { ctx });
     const releaseText = frameText(opened.frames.at(-1)!);
 
     expect(opened.model.docsModel.activePageId).toBe('release');
-    expect(releaseText).toContain('What\'s New in v4.1.0');
-    expect(releaseText).toContain('Migration Guide v4.1.0');
+    expect(releaseText).toContain(`What's New in v${BIJOU_VERSION}`);
+    expect(releaseText).toContain(`Migration Guide v${BIJOU_VERSION}`);
 
     const whatsNew = await runScript(app, [
       { key: ']' },
       { key: ']' },
       { key: ']' },
       { key: ']' },
-      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'release-whats-new-4-1-0' } } },
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-whats-new-${versionSlug}` } } },
     ], { ctx });
-    expect(frameText(whatsNew.frames.at(-1)!)).toContain('coherent application');
+    expect(frameText(whatsNew.frames.at(-1)!)).toContain(`New in Bijou ${BIJOU_VERSION}`);
 
     const migration = await runScript(app, [
       { key: ']' },
       { key: ']' },
       { key: ']' },
       { key: ']' },
-      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'release-migration-4-1-0' } } },
+      { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-migration-${versionSlug}` } } },
     ], { ctx });
-    expect(frameText(migration.frames.at(-1)!)).toContain('Migration Guide: Bijou v4.0.0 To v4.1.0');
+    expect(frameText(migration.frames.at(-1)!)).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);
   });
 
   it('moves DF-023 out of the active 4.1.0 blocker list', () => {

@@ -115,8 +115,8 @@ const PHILOSOPHY_UX_DOCTRINE_TEXT = readMarkdownDoc('../../docs/strategy/bijou-u
 const PHILOSOPHY_INVARIANTS_TEXT = readMarkdownDoc('../../docs/invariants/README.md');
 const PHILOSOPHY_DESIGN_SYSTEM_TEXT = readMarkdownDoc('../../docs/design-system/README.md');
 const RELEASE_OVERVIEW_TEXT = readMarkdownDoc('./content/release-overview.md');
-const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/whats-new.md');
-const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc('../../docs/releases/4.1.0/migration-guide.md');
+const RELEASE_WHATS_NEW_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/whats-new.md`);
+const RELEASE_MIGRATION_GUIDE_TEXT = readMarkdownDoc(`../../docs/releases/${BIJOU_VERSION}/migration-guide.md`);
 const FLYING_ROBOTS_LARGE_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_LARGE_TEXT);
 const FLYING_ROBOTS_SMALL_LINES = splitGlyphLines(FLYING_ROBOTS_WIDE_SMALL_TEXT);
 const ENTER_PROMPT_TEXT = 'Press [Enter]';
@@ -491,21 +491,21 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     id: 'release-overview',
     pageId: RELEASE_PAGE_ID,
     title: 'Release Overview',
-    summary: 'How the current release line is shaped and where to read the detailed 4.1.0 release docs.',
+    summary: `How the current release line is shaped and where to read the detailed ${BIJOU_VERSION} release docs.`,
     body: RELEASE_OVERVIEW_TEXT,
   },
   {
-    id: 'release-whats-new-4-1-0',
+    id: `release-whats-new-${BIJOU_VERSION.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,
-    title: 'What\'s New in v4.1.0',
-    summary: 'The long-form release story for the 4.1.0 line.',
+    title: `What's New in v${BIJOU_VERSION}`,
+    summary: `The long-form release story for the ${BIJOU_VERSION} line.`,
     body: RELEASE_WHATS_NEW_TEXT,
   },
   {
-    id: 'release-migration-4-1-0',
+    id: `release-migration-${BIJOU_VERSION.replaceAll('.', '-')}`,
     pageId: RELEASE_PAGE_ID,
-    title: 'Migration Guide v4.1.0',
-    summary: 'How users coming from v4.0.0 should handle the 4.1.0 upgrade.',
+    title: `Migration Guide v${BIJOU_VERSION}`,
+    summary: `Migration guidance for the ${BIJOU_VERSION} upgrade.`,
     body: RELEASE_MIGRATION_GUIDE_TEXT,
   },
 ]);
@@ -2427,7 +2427,7 @@ function renderGuideInfoPane(
       case PHILOSOPHY_PAGE_ID:
         return 'This section now publishes the key doctrine, architecture, invariants, and design-system guidance inside DOGFOOD.';
       case RELEASE_PAGE_ID:
-        return 'This section now publishes the 4.1.0 release story and migration guidance inside DOGFOOD.';
+        return `This section now publishes the ${BIJOU_VERSION} release story and migration guidance inside DOGFOOD.`;
       default:
         return 'This section now has a visible home in DOGFOOD.';
     }
