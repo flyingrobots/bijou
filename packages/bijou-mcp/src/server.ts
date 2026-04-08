@@ -19,7 +19,6 @@ import { dagTool } from './tools/dag.js';
 import { timelineTool } from './tools/timeline.js';
 import { accordionTool } from './tools/accordion.js';
 import { stepperTool } from './tools/stepper.js';
-import { markdownTool } from './tools/markdown.js';
 
 const TOOLS: readonly ToolRegistration[] = [
   tableTool,
@@ -31,7 +30,6 @@ const TOOLS: readonly ToolRegistration[] = [
   timelineTool,
   accordionTool,
   stepperTool,
-  markdownTool,
 ];
 
 const server = new McpServer({
