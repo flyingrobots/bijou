@@ -59,6 +59,7 @@ Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
 | [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) | Localization workflow tooling: authoring, stale detection, exchange, compilation |
 | [`@flyingrobots/bijou-i18n-tools-node`](./packages/bijou-i18n-tools-node/) | Node filesystem helpers for localization exchange workflows |
 | [`@flyingrobots/bijou-i18n-tools-xlsx`](./packages/bijou-i18n-tools-xlsx/) | XLSX workbook adapters for localization exchange workflows |
+| [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) | MCP server: Bijou rendering tools for AI chat contexts |
 
 All published packages are versioned in lock-step.
 

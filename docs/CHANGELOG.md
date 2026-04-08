@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`) are versioned in lock-step.
+All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
 ## Unreleased
 
 ### ✨ Features
+
+- **bijou-mcp: MCP rendering server** — new `@flyingrobots/bijou-mcp` package exposes Bijou terminal components as MCP (Model Context Protocol) tools over stdio. Any MCP client (Claude Code, etc.) can call tools like `bijou_table`, `bijou_box`, `bijou_alert`, `bijou_tree`, `bijou_dag`, `bijou_timeline`, `bijou_accordion`, `bijou_stepper`, and `bijou_markdown` to get Unicode box-drawing output that renders cleanly in monospace chat contexts. Uses `createTestContext` with `plainStyle()` to produce structured text without ANSI escape codes.
 
 - **RE-007 migrate framed shell onto runtime engine seams** — the framed shell now routes all key and mouse input through the runtime engine's `routeRuntimeInput` infrastructure, producing `FrameShellCommand` facts that are buffered via `bufferRuntimeRouteResult` and applied via `applyRuntimeCommandBuffer`. Shell commands are a plain discriminated union interpreted by a handler table inside `createFramedApp`, not classes with behavior. Sub-layer mouse hit-testing uses retained layout trees with `tab:{pageId}`, `pane:{paneId}`, and `settings-row:{index}` layout nodes. The `update()` key and mouse branches are reduced to single-line buffer drains. Removed: `handleFrameMouse`, `paneHitAtPosition`, `settingsRowAtPosition`, `isInsideSettingsDrawer`, `withObservedKey`, `applyQuitRequest`, `observedRouteForLayer`, `applyHelpScrollAction`. The cycle is captured in [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md).
 
