@@ -55,7 +55,9 @@ describe('renderDiff', () => {
     // Should move to (2,2) and write 'b'
     // 0-based (2,2) is 1-based (3,3) in ANSI
     expect(output).toContain('\x1b[3;3H');
-    expect(output).toContain('[STYLE:#ff0000]b');
+    // Packed differ emits ANSI SGR directly, bypassing StylePort
+    expect(output).toContain('\x1b[38;2;255;0;0m');
+    expect(output).toContain('b');
   });
 
   it('skips CUP move for contiguous horizontal changes', () => {

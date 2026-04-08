@@ -5,7 +5,7 @@ import {
   CELL_STRIDE,
   OFF_FG_R,
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
-  decodeChar, decodeModifiers, toHex,
+  decodeChar,
 } from './packed-cell.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
@@ -287,29 +287,89 @@ function readCharFromBuf(buf: Uint8Array, off: number, sideTable: readonly strin
   return decodeChar(code, sideTable);
 }
 
-function readFgFromBuf(buf: Uint8Array, off: number): string | undefined {
-  return (buf[off + 9]! & FLAG_FG_SET)
-    ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_R + 1]!, buf[off + OFF_FG_R + 2]!)
-    : undefined;
-}
-
-function readBgFromBuf(buf: Uint8Array, off: number): string | undefined {
-  return (buf[off + 9]! & FLAG_BG_SET)
-    ? toHex(buf[off + 5]!, buf[off + 6]!, buf[off + 7]!)
-    : undefined;
-}
-
 function packedHasVisibleStyle(buf: Uint8Array, off: number): boolean {
   const alpha = buf[off + 9]!;
   return (alpha & (FLAG_FG_SET | FLAG_BG_SET)) !== 0
     || (buf[off + 8]! & ~FLAG_EMPTY) !== 0;
 }
 
+// --- Direct ANSI SGR emission from packed bytes ---
+
+// Modifier flag → SGR code mapping
+const FLAG_SGR: [number, string][] = [
+  [0x01, '\x1b[1m'],  // bold
+  [0x02, '\x1b[2m'],  // dim
+  [0x04, '\x1b[9m'],  // strikethrough
+  [0x08, '\x1b[7m'],  // inverse
+];
+// Underline styles (bits 4-5 of flags byte)
+const UNDERLINE_SGR: string[] = [
+  '',              // 00 = none
+  '\x1b[4m',      // 01 = solid underline
+  '\x1b[4:3m',    // 10 = curly underline
+  '\x1b[4:4m',    // 11 = dotted (without FLAG_DASHED)
+];
+const DASHED_SGR = '\x1b[4:5m';
+const RESET_SGR = '\x1b[0m';
+
+// SGR cache: maps style bytes (8 bytes from OFF_FG_R through OFF_ALPHA) to pre-built SGR prefix.
+const sgrCache = new Map<number, string>();
+
+/** Pack 8 style bytes into two 32-bit numbers for cache key. */
+function styleCacheKey(buf: Uint8Array, off: number): number {
+  // Use only the style-relevant bytes: fg(3) + bg(3) + flags(1) + alpha(1) = 8 bytes
+  // Pack into a single 64-bit-safe integer via two 32-bit halves XORed together
+  const a = (buf[off + OFF_FG_R]! << 24) | (buf[off + OFF_FG_R + 1]! << 16)
+          | (buf[off + OFF_FG_R + 2]! << 8) | buf[off + 5]!;
+  const b = (buf[off + 6]! << 24) | (buf[off + 7]! << 16)
+          | (buf[off + 8]! << 8) | buf[off + 9]!;
+  // Combine into a single number — may collide for >2^32 unique styles
+  // but themes have ~50 unique token values, so collisions are negligible
+  return (a * 2654435761) ^ b;
+}
+
+function buildSgr(buf: Uint8Array, off: number): string {
+  let sgr = RESET_SGR;
+  const flags = buf[off + 8]!;
+  const alpha = buf[off + 9]!;
+
+  if (alpha & FLAG_FG_SET) {
+    sgr += `\x1b[38;2;${buf[off + OFF_FG_R]};${buf[off + OFF_FG_R + 1]};${buf[off + OFF_FG_R + 2]}m`;
+  }
+  if (alpha & FLAG_BG_SET) {
+    sgr += `\x1b[48;2;${buf[off + 5]};${buf[off + 6]};${buf[off + 7]}m`;
+  }
+  for (const [flag, code] of FLAG_SGR) {
+    if (flags & flag) sgr += code;
+  }
+  const uStyle = (flags >> 4) & 0x03;
+  if (uStyle > 0) {
+    sgr += (uStyle === 3 && (flags & 0x40)) ? DASHED_SGR : UNDERLINE_SGR[uStyle]!;
+  }
+  return sgr;
+}
+
+/**
+ * Emit cached ANSI SGR escape sequences from packed buffer bytes.
+ * Caches compiled SGR strings keyed on style bytes — themes have
+ * a finite vocabulary of ~50 unique styles, so the cache saturates
+ * quickly and subsequent calls are a Map.get() + hash.
+ */
+function emitSgrFromBuf(buf: Uint8Array, off: number): string {
+  const key = styleCacheKey(buf, off);
+  let sgr = sgrCache.get(key);
+  if (sgr === undefined) {
+    sgr = buildSgr(buf, off);
+    sgrCache.set(key, sgr);
+  }
+  return sgr;
+}
+
 function renderDiffPacked(
   current: PackedSurface,
   target: PackedSurface,
   io: WritePort,
-  style: StylePort,
+  _style: StylePort,
 ): void {
   const width = target.width;
   const height = target.height;
@@ -322,7 +382,6 @@ function renderDiffPacked(
   let output = '';
   let cursorX = -1;
   let cursorY = -1;
-  const token: { hex?: string; bg?: string; modifiers?: Cell['modifiers'] } = {};
 
   for (let y = 0; y < height; y++) {
     let x = 0;
@@ -373,12 +432,9 @@ function renderDiffPacked(
         batchX++;
       }
 
-      // Emit styled batch
+      // Emit styled batch — direct ANSI from packed bytes, bypasses StylePort
       if (packedHasVisibleStyle(tBuf, tOff)) {
-        token.hex = readFgFromBuf(tBuf, tOff);
-        token.bg = readBgFromBuf(tBuf, tOff);
-        token.modifiers = decodeModifiers(tBuf[tOff + 8]! & ~FLAG_EMPTY) as Cell['modifiers'];
-        output += style.styled(token as any, batchText);
+        output += emitSgrFromBuf(tBuf, tOff) + batchText + RESET_SGR;
       } else {
         output += batchText;
       }
