@@ -62,6 +62,7 @@ jobs:
           (cd packages/bijou-i18n-tools && npm pack --dry-run)
           (cd packages/bijou-i18n-tools-node && npm pack --dry-run)
           (cd packages/bijou-i18n-tools-xlsx && npm pack --dry-run)
+          (cd packages/bijou-mcp && npm pack --dry-run)
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
@@ -92,7 +93,7 @@ jobs:
     needs: [verify, smoke_dogfood]
     strategy:
       matrix:
-        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app, bijou-i18n, bijou-i18n-tools, bijou-i18n-tools-node, bijou-i18n-tools-xlsx]
+        package: [bijou, bijou-node, bijou-tui, bijou-tui-app, create-bijou-tui-app, bijou-i18n, bijou-i18n-tools, bijou-i18n-tools-node, bijou-i18n-tools-xlsx, bijou-mcp]
     steps:
       - uses: actions/checkout@v6
 

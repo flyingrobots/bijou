@@ -102,6 +102,7 @@ These packages move together:
 - `@flyingrobots/bijou-i18n-tools`
 - `@flyingrobots/bijou-i18n-tools-node`
 - `@flyingrobots/bijou-i18n-tools-xlsx`
+- `@flyingrobots/bijou-mcp`
 
 ### Current Automated npm Publish Matrix
 
@@ -116,6 +117,7 @@ As of now, the publish workflows automatically publish:
 - `@flyingrobots/bijou-i18n-tools`
 - `@flyingrobots/bijou-i18n-tools-node`
 - `@flyingrobots/bijou-i18n-tools-xlsx`
+- `@flyingrobots/bijou-mcp`
 
 ## Phase 1: Repo Guards
 
@@ -329,6 +331,7 @@ npm view @flyingrobots/bijou-i18n version dist-tags --json
 npm view @flyingrobots/bijou-i18n-tools version dist-tags --json
 npm view @flyingrobots/bijou-i18n-tools-node version dist-tags --json
 npm view @flyingrobots/bijou-i18n-tools-xlsx version dist-tags --json
+npm view @flyingrobots/bijou-mcp version dist-tags --json
 ```
 
 ## Abort Conditions
