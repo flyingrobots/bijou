@@ -152,19 +152,55 @@ export function decodeModifiers(flags: number): string[] | undefined {
 
 // --- Hex color encoding/decoding ---
 
-/** Parse '#rrggbb' into [r, g, b]. Returns undefined for invalid input. */
-export function parseHex(hex: string): [number, number, number] | undefined {
-  if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return undefined;
-  return [r, g, b];
+/** Convert a hex digit char code to its numeric value (0–15). Returns -1 for invalid. */
+function hexVal(c: number): number {
+  // 0–9: 0x30–0x39, a–f: 0x61–0x66, A–F: 0x41–0x46
+  if (c >= 48 && c <= 57) return c - 48;
+  if (c >= 97 && c <= 102) return c - 87;
+  if (c >= 65 && c <= 70) return c - 55;
+  return -1;
 }
 
-/** Encode [r, g, b] back to '#rrggbb'. */
+/** Decode two hex digit char codes into a byte (0–255). Returns -1 for invalid. */
+function hexPair(c1: number, c2: number): number {
+  const hi = hexVal(c1);
+  const lo = hexVal(c2);
+  if (hi < 0 || lo < 0) return -1;
+  return (hi << 4) | lo;
+}
+
+/** Reusable static tuple to avoid allocation in parseHex. */
+const RGB_OUT: [number, number, number] = [0, 0, 0];
+
+/**
+ * Parse '#rrggbb' into [r, g, b].
+ *
+ * Returns a **static reusable tuple** — callers must read values
+ * immediately or copy them. Returns undefined for invalid input.
+ *
+ * Zero-alloc: no slice(), no parseInt(), no intermediate strings.
+ */
+export function parseHex(hex: string): [number, number, number] | undefined {
+  if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
+  const r = hexPair(hex.charCodeAt(1), hex.charCodeAt(2));
+  const g = hexPair(hex.charCodeAt(3), hex.charCodeAt(4));
+  const b = hexPair(hex.charCodeAt(5), hex.charCodeAt(6));
+  if (r < 0 || g < 0 || b < 0) return undefined;
+  RGB_OUT[0] = r;
+  RGB_OUT[1] = g;
+  RGB_OUT[2] = b;
+  return RGB_OUT;
+}
+
+// Pre-computed lookup: byte value → 2-char hex string
+const HEX_BYTE: string[] = new Array(256);
+for (let i = 0; i < 256; i++) {
+  HEX_BYTE[i] = (i < 16 ? '0' : '') + i.toString(16);
+}
+
+/** Encode [r, g, b] to '#rrggbb'. Uses a lookup table — no toString(16) per call. */
 export function toHex(r: number, g: number, b: number): string {
-  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  return '#' + HEX_BYTE[r]! + HEX_BYTE[g]! + HEX_BYTE[b]!;
 }
 
 // --- Alpha encoding ---

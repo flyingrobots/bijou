@@ -280,17 +280,20 @@ function encodeCellIntoBuf(
   sideTable: string[],
 ): void {
   const charCode = encodeChar(cell.char, sideTable);
-  const fgParsed = cell.fg ? parseHex(cell.fg) : undefined;
-  const bgParsed = cell.bg ? parseHex(cell.bg) : undefined;
+  // Read fg RGB into locals before parsing bg (parseHex reuses a static tuple)
+  let fgR = 0, fgG = 0, fgB = 0, fgSet = false;
+  if (cell.fg) {
+    const fg = parseHex(cell.fg);
+    if (fg) { fgR = fg[0]; fgG = fg[1]; fgB = fg[2]; fgSet = true; }
+  }
+  let bgR = 0, bgG = 0, bgB = 0, bgSet = false;
+  if (cell.bg) {
+    const bg = parseHex(cell.bg);
+    if (bg) { bgR = bg[0]; bgG = bg[1]; bgB = bg[2]; bgSet = true; }
+  }
   const flags = encodeModifiers(cell.modifiers) | (cell.empty ? FLAG_EMPTY : 0);
   const opacity = encodeOpacity(cell.opacity);
-  packCell(
-    buf, idx, charCode,
-    fgParsed ? fgParsed[0] : 0, fgParsed ? fgParsed[1] : 0, fgParsed ? fgParsed[2] : 0, fgParsed !== undefined,
-    bgParsed ? bgParsed[0] : 0, bgParsed ? bgParsed[1] : 0, bgParsed ? bgParsed[2] : 0, bgParsed !== undefined,
-    flags,
-    opacity,
-  );
+  packCell(buf, idx, charCode, fgR, fgG, fgB, fgSet, bgR, bgG, bgB, bgSet, flags, opacity);
 }
 
 /** Decode a packed buffer cell into a Cell object. */
@@ -354,17 +357,20 @@ function applyMaskToBuf(
   }
   if (mask.fg) {
     const fg = source.fg ? parseHex(source.fg) : undefined;
-    buf[off + OFF_FG_R] = fg ? fg[0] : 0;
-    buf[off + OFF_FG_G] = fg ? fg[1] : 0;
-    buf[off + OFF_FG_B] = fg ? fg[2] : 0;
+    // Read values immediately — parseHex reuses a static tuple
+    const fR = fg ? fg[0] : 0, fG = fg ? fg[1] : 0, fB = fg ? fg[2] : 0;
+    buf[off + OFF_FG_R] = fR;
+    buf[off + OFF_FG_G] = fG;
+    buf[off + OFF_FG_B] = fB;
     const alpha = buf[off + OFF_ALPHA]!;
     buf[off + OFF_ALPHA] = fg ? (alpha | FLAG_FG_SET) : (alpha & ~FLAG_FG_SET);
   }
   if (mask.bg) {
     const bg = source.bg ? parseHex(source.bg) : undefined;
-    buf[off + OFF_BG_R] = bg ? bg[0] : 0;
-    buf[off + OFF_BG_G] = bg ? bg[1] : 0;
-    buf[off + OFF_BG_B] = bg ? bg[2] : 0;
+    const bR = bg ? bg[0] : 0, bG = bg ? bg[1] : 0, bB = bg ? bg[2] : 0;
+    buf[off + OFF_BG_R] = bR;
+    buf[off + OFF_BG_G] = bG;
+    buf[off + OFF_BG_B] = bB;
     const alpha = buf[off + OFF_ALPHA]!;
     buf[off + OFF_ALPHA] = bg ? (alpha | FLAG_BG_SET) : (alpha & ~FLAG_BG_SET);
   }
