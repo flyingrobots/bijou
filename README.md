@@ -14,30 +14,34 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What's New in v4.2.0
+## What's New in v4.3.0
 
-Bijou `v4.2.0` is the current release.
+Bijou `v4.3.0` is the current release.
 
 Key changes:
 
-- **MCP rendering server** — new `@flyingrobots/bijou-mcp` package
-  exposes 22 Bijou components as MCP tools over stdio. Any MCP client
-  (Claude Code, Cursor, etc.) can render tables, trees, DAGs, alerts,
-  progress bars, and more directly in chat. No ANSI, no terminal
-  required.
-- **RE-007 framed shell migration** — the framed shell now routes all
-  input through the runtime engine's `routeRuntimeInput` infrastructure
-  with `FrameShellCommand` facts, retained layout hit-testing, and
-  runtime buffer dispatch. Ad-hoc key/mouse branches are gone.
-- **Inspector fix** — `supportingTextLabel` now renders in interactive
-  mode.
+- **Byte-packed surface rendering** — the internal `Surface` is now
+  backed by a packed `Uint8Array` (10 bytes per cell). Colors are raw
+  RGB bytes, modifiers are a flags bitfield, and the differ compares
+  cells as 10-byte sequences instead of string equality. DOGFOOD
+  landing render+diff is **7% faster** than the previous release.
+- **`Surface.setRGB()` zero-alloc API** — new hot-path method that
+  writes character code + numeric RGB directly into the packed buffer.
+  Roughly 10–50x faster than `set()` for per-cell writes. All built-in
+  components use it automatically.
+- **Direct ANSI emission** — the differ emits SGR escape sequences
+  directly from buffer bytes with a cached style lookup, bypassing
+  chalk entirely on the hot diff path.
+- **Braille rendering fix** — surface composition no longer corrupts
+  braille characters (U+2800–U+28FF). Verified with 58,800-cell art.
 
-In short: `v4.2.0` is the release where Bijou becomes usable outside
-the terminal — AI tools can now render Bijou components in chat.
+In short: `v4.3.0` is the release where Bijou gets fast. Not just
+fast — the entire rendering pipeline is built on typed arrays and
+byte-level operations.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/4.2.0/whats-new.md), and the
-[migration guide](./docs/releases/4.2.0/migration-guide.md).
+[What's New guide](./docs/releases/4.3.0/whats-new.md), and the
+[migration guide](./docs/releases/4.3.0/migration-guide.md).
 
 ## Package Map
 
