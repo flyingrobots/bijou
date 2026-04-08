@@ -220,50 +220,191 @@ function copyCellInto(target: Cell, source: Cell): void {
   target.opacity = source.opacity;
 }
 
-/**
- * Apply a source cell to a target cell using a mask, respecting 'empty' transparency.
- *
- * @param target - The existing cell to be modified.
- * @param source - The cell containing the new values.
- * @param mask   - Determines which fields of `source` are applied to `target`.
- * @returns A new Cell with the masked values applied.
- */
-function applyMaskInPlace(target: Cell, source: Cell, mask: CellMask): void {
-  // Brush/Stamp behavior: if source is empty, do not modify the target.
-  if (source.empty) return;
+// ── Packed buffer helpers ────────────────────────────────
 
-  if (mask.char) target.char = source.char;
-  if (mask.fg) target.fg = source.fg;
-  if (mask.bg) target.bg = source.bg;
-  if (mask.modifiers) target.modifiers = source.modifiers;
-  if (mask.alpha) {
-    target.empty = source.empty ?? false;
-    target.opacity = source.opacity ?? 1;
+import {
+  CELL_STRIDE,
+  OFF_CHAR,
+  OFF_FG_R, OFF_FG_G, OFF_FG_B,
+  OFF_BG_R, OFF_BG_G, OFF_BG_B,
+  OFF_FLAGS, OFF_ALPHA,
+  FLAG_EMPTY,
+  FLAG_FG_SET, FLAG_BG_SET,
+  OPACITY_MASK,
+  encodeChar, decodeChar,
+  encodeModifiers, decodeModifiers,
+  encodeOpacity, decodeOpacity,
+  parseHex, toHex,
+  packCell,
+} from '../core/render/packed-cell.js';
+
+/** Encode a Cell into the packed buffer and sync the cell object. */
+function encodeCellIntoBuf(
+  buf: Uint8Array,
+  idx: number,
+  cell: Cell,
+  sideTable: string[],
+): void {
+  const charCode = encodeChar(cell.char, sideTable);
+  const fgParsed = cell.fg ? parseHex(cell.fg) : undefined;
+  const bgParsed = cell.bg ? parseHex(cell.bg) : undefined;
+  const flags = encodeModifiers(cell.modifiers) | (cell.empty ? FLAG_EMPTY : 0);
+  const opacity = encodeOpacity(cell.opacity);
+  packCell(
+    buf, idx, charCode,
+    fgParsed ? fgParsed[0] : 0, fgParsed ? fgParsed[1] : 0, fgParsed ? fgParsed[2] : 0, fgParsed !== undefined,
+    bgParsed ? bgParsed[0] : 0, bgParsed ? bgParsed[1] : 0, bgParsed ? bgParsed[2] : 0, bgParsed !== undefined,
+    flags,
+    opacity,
+  );
+}
+
+/** Decode a packed buffer cell into a Cell object. */
+function decodeCellFromBuf(
+  buf: Uint8Array,
+  idx: number,
+  sideTable: readonly string[],
+): Cell {
+  const off = idx * CELL_STRIDE;
+  const charCode = buf[off + OFF_CHAR]! | (buf[off + OFF_CHAR + 1]! << 8);
+  const alphaByte = buf[off + OFF_ALPHA]!;
+  const flags = buf[off + OFF_FLAGS]!;
+  const fgSet = (alphaByte & FLAG_FG_SET) !== 0;
+  const bgSet = (alphaByte & FLAG_BG_SET) !== 0;
+  return {
+    char: decodeChar(charCode, sideTable),
+    fg: fgSet ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!) : undefined,
+    bg: bgSet ? toHex(buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!) : undefined,
+    modifiers: decodeModifiers(flags & ~FLAG_EMPTY),
+    empty: (flags & FLAG_EMPTY) !== 0,
+    opacity: decodeOpacity(alphaByte & OPACITY_MASK),
+  };
+}
+
+/** Sync a Cell object from the packed buffer (overwrite all fields). */
+function syncCellFromBuf(
+  cell: Cell,
+  buf: Uint8Array,
+  idx: number,
+  sideTable: readonly string[],
+  exactOpacity?: number,
+): void {
+  const decoded = decodeCellFromBuf(buf, idx, sideTable);
+  cell.char = decoded.char;
+  cell.fg = decoded.fg;
+  cell.bg = decoded.bg;
+  cell.modifiers = decoded.modifiers;
+  cell.empty = decoded.empty;
+  // Preserve exact float when available; use quantized only for buffer-decoded reads
+  cell.opacity = exactOpacity ?? decoded.opacity;
+}
+
+/**
+ * Apply a masked write of a source Cell into the packed buffer,
+ * respecting empty-cell brush transparency.
+ */
+function applyMaskToBuf(
+  buf: Uint8Array,
+  idx: number,
+  source: Cell,
+  mask: CellMask,
+  sideTable: string[],
+): void {
+  if (source.empty) return;
+  const off = idx * CELL_STRIDE;
+
+  if (mask.char) {
+    const charCode = encodeChar(source.char, sideTable);
+    buf[off + OFF_CHAR] = charCode & 0xFF;
+    buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
   }
+  if (mask.fg) {
+    const fg = source.fg ? parseHex(source.fg) : undefined;
+    buf[off + OFF_FG_R] = fg ? fg[0] : 0;
+    buf[off + OFF_FG_G] = fg ? fg[1] : 0;
+    buf[off + OFF_FG_B] = fg ? fg[2] : 0;
+    const alpha = buf[off + OFF_ALPHA]!;
+    buf[off + OFF_ALPHA] = fg ? (alpha | FLAG_FG_SET) : (alpha & ~FLAG_FG_SET);
+  }
+  if (mask.bg) {
+    const bg = source.bg ? parseHex(source.bg) : undefined;
+    buf[off + OFF_BG_R] = bg ? bg[0] : 0;
+    buf[off + OFF_BG_G] = bg ? bg[1] : 0;
+    buf[off + OFF_BG_B] = bg ? bg[2] : 0;
+    const alpha = buf[off + OFF_ALPHA]!;
+    buf[off + OFF_ALPHA] = bg ? (alpha | FLAG_BG_SET) : (alpha & ~FLAG_BG_SET);
+  }
+  if (mask.modifiers) {
+    const modFlags = encodeModifiers(source.modifiers);
+    const existing = buf[off + OFF_FLAGS]!;
+    // Preserve the empty bit, replace modifier bits
+    buf[off + OFF_FLAGS] = (existing & FLAG_EMPTY) | modFlags;
+  }
+  if (mask.alpha) {
+    const existing = buf[off + OFF_FLAGS]!;
+    buf[off + OFF_FLAGS] = source.empty
+      ? (existing | FLAG_EMPTY)
+      : (existing & ~FLAG_EMPTY);
+    const alphaByte = buf[off + OFF_ALPHA]!;
+    const opacityBits = encodeOpacity(source.opacity ?? 1);
+    buf[off + OFF_ALPHA] = (alphaByte & ~OPACITY_MASK) | opacityBits;
+  }
+}
+
+// ── Surface factory ─────────────────────────────────────
+
+/**
+ * Extended surface interface exposing the packed buffer for hot-path consumers.
+ */
+export interface PackedSurface extends Surface {
+  /** Raw packed byte buffer. CELL_STRIDE bytes per cell, row-major. */
+  readonly buffer: Uint8Array;
+  /** Side table for multi-codepoint grapheme clusters. */
+  readonly sideTable: readonly string[];
 }
 
 /**
  * Factory for creating a blank surface.
+ *
+ * Internally backed by a packed Uint8Array (10 bytes per cell).
+ * The Cell[] array is kept in sync for backward compatibility with
+ * consumers that access .cells directly.
  *
  * @param width - Width in columns.
  * @param height - Height in rows.
  * @param fill - Optional cell to fill the surface with (defaults to space).
  * @returns A new Surface instance.
  */
-export function createSurface(width: number, height: number, fill?: Cell): Surface {
+export function createSurface(width: number, height: number, fill?: Cell): PackedSurface {
   const w = Math.max(0, Math.floor(width));
   const h = Math.max(0, Math.floor(height));
   const size = w * h;
   const defaultCell: Cell = fill ?? { char: ' ', empty: true };
-  const cells: Cell[] = Array.from({ length: size }, () => cloneCell(defaultCell));
 
-  const surface: Surface = {
+  const sideTable: string[] = [];
+  const buf = new Uint8Array(size * CELL_STRIDE);
+  const cells: Cell[] = new Array(size);
+
+  // Initialize buffer and cell array from the default cell
+  for (let i = 0; i < size; i++) {
+    encodeCellIntoBuf(buf, i, defaultCell, sideTable);
+    cells[i] = cloneCell(defaultCell);
+  }
+
+  function syncCell(idx: number, exactOpacity?: number): void {
+    syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
+  }
+
+  const surface: PackedSurface = {
     width: w,
     height: h,
     cells,
+    buffer: buf,
+    sideTable,
 
     clear() {
-      for (let i = 0; i < cells.length; i++) {
+      for (let i = 0; i < size; i++) {
+        encodeCellIntoBuf(buf, i, defaultCell, sideTable);
         copyCellInto(cells[i]!, defaultCell);
       }
     },
@@ -274,10 +415,12 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       }
       return maskCell(cells[y * w + x]!, mask);
     },
+
     set(x, y, cell, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) return;
       const idx = y * w + x;
-      applyMaskInPlace(cells[idx]!, cell, mask);
+      applyMaskToBuf(buf, idx, cell, mask, sideTable);
+      syncCell(idx, !cell.empty && mask.alpha ? cell.opacity : undefined);
     },
 
     fill(cell, fx = 0, fy = 0, fw = w, fh = h, mask = FULL_MASK) {
@@ -289,33 +432,27 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       for (let y = yStart; y < yEnd; y++) {
         for (let x = xStart; x < xEnd; x++) {
           const idx = y * w + x;
-          applyMaskInPlace(cells[idx]!, cell, mask);
+          applyMaskToBuf(buf, idx, cell, mask, sideTable);
+          syncCell(idx, !cell.empty && mask.alpha ? cell.opacity : undefined);
         }
       }
     },
 
     blit(source, dx, dy, sx = 0, sy = 0, sw = source.width, sh = source.height, mask = FULL_MASK) {
-      // 1. Clamp source rectangle to source surface bounds
       const sX = Math.max(0, sx);
       const sY = Math.max(0, sy);
       const sW = Math.min(sw - (sX - sx), source.width - sX);
       const sH = Math.min(sh - (sY - sy), source.height - sY);
-
       if (sW <= 0 || sH <= 0) return;
 
-      // 2. Map to destination and clamp to target surface bounds
       const dX = dx + (sX - sx);
       const dY = dy + (sY - sy);
-
       const xStart = Math.max(0, dX);
       const yStart = Math.max(0, dY);
-
       const srcXStart = sX + (xStart - dX);
       const srcYStart = sY + (yStart - dY);
-
       const blitW = Math.min(w - xStart, sW - (srcXStart - sX));
       const blitH = Math.min(h - yStart, sH - (srcYStart - sY));
-
       if (blitW <= 0 || blitH <= 0) return;
 
       for (let i = 0; i < blitH; i++) {
@@ -329,10 +466,13 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
           const sourceX = srcXStart + j;
           const tIdx = tRowOffset + targetX;
           const sIdx = sRowOffset + sourceX;
-          applyMaskInPlace(cells[tIdx]!, source.cells[sIdx]!, mask);
+          const srcCell = source.cells[sIdx]!;
+          applyMaskToBuf(buf, tIdx, srcCell, mask, sideTable);
+          syncCell(tIdx, !srcCell.empty && mask.alpha ? srcCell.opacity : undefined);
         }
       }
     },
+
     transform(source, matrix, options = {}) {
       const { charMap = {}, mask = FULL_MASK } = options;
       const [a, b, c, d, tx, ty] = matrix;
@@ -352,9 +492,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
             if (charMap[transformedCell.char]) {
               transformedCell.char = charMap[transformedCell.char]!;
             }
-            
+
             const idx = y * w + x;
-            applyMaskInPlace(cells[idx]!, transformedCell, mask);
+            applyMaskToBuf(buf, idx, transformedCell, mask, sideTable);
+            syncCell(idx, mask.alpha ? transformedCell.opacity : undefined);
           }
         }
       }
@@ -376,14 +517,17 @@ export function createSurface(width: number, height: number, fill?: Cell): Surfa
       const count = Math.min(w - xStart, rowCells.length);
       for (let i = 0; i < count; i++) {
         const idx = y * w + xStart + i;
-        applyMaskInPlace(cells[idx]!, rowCells[i]!, mask);
+        const rc = rowCells[i]!;
+        applyMaskToBuf(buf, idx, rc, mask, sideTable);
+        syncCell(idx, !rc.empty && mask.alpha ? rc.opacity : undefined);
       }
     },
 
     clone() {
       const s = createSurface(w, h);
-      for (let i = 0; i < cells.length; i++) {
-        copyCellInto(s.cells[i]!, cells[i]!);
+      s.buffer.set(buf);
+      for (let i = 0; i < size; i++) {
+        syncCellFromBuf(s.cells[i]!, s.buffer, i, s.sideTable);
       }
       return s;
     },

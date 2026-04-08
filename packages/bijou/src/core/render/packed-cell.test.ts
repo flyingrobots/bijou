@@ -118,8 +118,9 @@ describe('packed-cell encoding', () => {
       expect(sideTable).toHaveLength(0);
     });
 
-    it('encodes empty string as space', () => {
-      expect(encodeChar('', [])).toBe(0x20);
+    it('encodes empty string as CHAR_EMPTY sentinel', () => {
+      expect(encodeChar('', [])).toBe(0);
+      expect(decodeChar(0, [])).toBe('');
     });
 
     it('encodes box-drawing characters in BMP', () => {

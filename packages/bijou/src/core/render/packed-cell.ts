@@ -185,12 +185,15 @@ export function decodeOpacity(quantized: number): number {
 
 // --- Char encoding ---
 
+/** Sentinel code for an empty-string char (double-width continuation cell). */
+export const CHAR_EMPTY = 0;
+
 /** Encode a character string into a uint16 value and optional side-table entry. */
 export function encodeChar(
   char: string,
   sideTable: string[],
 ): number {
-  if (char.length === 0) return 0x20; // space
+  if (char.length === 0) return CHAR_EMPTY;
   const code = char.codePointAt(0)!;
   // Single BMP codepoint that fits in uint16 and matches the full string
   if (code < SIDE_TABLE_THRESHOLD && String.fromCodePoint(code) === char) {
@@ -207,6 +210,7 @@ export function encodeChar(
 
 /** Decode a uint16 char value back to a string. */
 export function decodeChar(code: number, sideTable: readonly string[]): string {
+  if (code === CHAR_EMPTY) return '';
   if (code >= SIDE_TABLE_THRESHOLD) {
     const idx = code - SIDE_TABLE_THRESHOLD;
     return sideTable[idx] ?? ' ';
