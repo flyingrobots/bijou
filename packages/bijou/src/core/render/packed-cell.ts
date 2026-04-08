@@ -230,12 +230,14 @@ export function encodeChar(
   sideTable: string[],
 ): number {
   if (char.length === 0) return CHAR_EMPTY;
-  const code = char.codePointAt(0)!;
-  // Single BMP codepoint that fits in uint16 and matches the full string
-  if (code < SIDE_TABLE_THRESHOLD && String.fromCodePoint(code) === char) {
-    return code;
+  // Fast path: single JS char — guaranteed single BMP codepoint
+  if (char.length === 1) {
+    const code = char.charCodeAt(0);
+    if (code < SIDE_TABLE_THRESHOLD) return code;
   }
-  // Multi-codepoint or astral: use side table
+  // Slow path: multi-char string (astral plane, grapheme cluster, etc.)
+  const code = char.codePointAt(0)!;
+  if (code < SIDE_TABLE_THRESHOLD && char.length === 1) return code;
   let idx = sideTable.indexOf(char);
   if (idx === -1) {
     idx = sideTable.length;
