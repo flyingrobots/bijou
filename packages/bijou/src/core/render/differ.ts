@@ -402,11 +402,9 @@ function renderDiffPacked(
       const tIdx = y * width + x;
       const tOff = tIdx * CELL_STRIDE;
 
-      // Current cell: use buffer if in bounds, else EMPTY_PACKED
       const inBounds = y < cHeight && x < cWidth;
       const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
 
-      // Fast skip: compare 10 bytes
       const same = inBounds
         ? packedBytesEqual(tBuf, tOff, cBuf, cOff)
         : packedBytesEqual(tBuf, tOff, EMPTY_PACKED, 0);
@@ -420,7 +418,6 @@ function renderDiffPacked(
         output += moveCursor(x, y);
       }
 
-      // Batch contiguous cells with same style that need updating
       let batchX = x;
       let batchText = '';
       while (batchX < width) {
