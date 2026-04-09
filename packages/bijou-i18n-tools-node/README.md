@@ -10,3 +10,7 @@ Node filesystem helpers for Bijou localization exchange workflows.
 - extension-based format inference for `.csv`, `.tsv`, and `.json`
 
 This package intentionally keeps Node/file concerns out of the pure `@flyingrobots/bijou-i18n-tools` package.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

@@ -21,58 +21,38 @@ filesystem listing.
 
 ## Current Posture
 
-Bijou has shipped `4.1.0`, so the repo is no longer shaping that
-release. It is back in normal post-release engineering posture.
+Bijou has shipped `4.3.0`. The rendering pipeline is now byte-packed
+and benchmarked. The repo is in post-performance-release posture.
 
 The repo now has:
 
-- a current shipped release at `4.1.0`
-- a runtime-engine legend with real landed slices through
-  [RE-006](./design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- a humane shell direction
-- complete DOGFOOD family coverage
-- landed DX cleanup on the most painful framed-shell typing seams
-- a landed release-shaping decision through
-  [WF-004](./design/WF-004-shape-the-next-release.md)
-- closed release-blocker cycles through
-  [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
-- a landed DOGFOOD docs-site shaping cycle through
-  [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
-- a landed DOGFOOD docs-shell foundation through
-  [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
-- a landed DOGFOOD repo/package/release corpus publication through
-  [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
-- a landed DOGFOOD philosophy/architecture corpus publication through
-  [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
-- a landed DOGFOOD-only docs-surface policy through
-  [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-- a landed example-demotion posture through
-  [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
-- a landed release-smoke migration through
-  [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
+- a current shipped release at `4.3.0`
+- a byte-packed surface architecture (RE-008) with zero-alloc `setRGB`
+  API and 100% component migration
+- an MCP rendering server (`@flyingrobots/bijou-mcp`) with 22 tools
+- runtime-engine slices landed through RE-007 (framed shell migration)
+- DOGFOOD as the canonical docs surface and release smoke contract
+- all ten workspace packages versioned in lock-step
+- METHOD-based planning with all 7 legends resolving
 
-The `4.1.0` release outcome is now:
+Bijou has shipped `4.1.0`, `4.2.0`, and `4.3.0`. The DOGFOOD
+docs-site posture landed through DF-021, DF-022, DF-023, DF-024,
+DF-025, DF-026, and WF-003.
 
-- shipped version: `4.1.0`
-- release type: stable minor
-- `RE-007` stayed outside the release boundary
-- all nine workspace packages now move together at `4.1.0`
-- DOGFOOD owns the human-facing docs posture and the release smoke
-  contract
-- the next release has not been shaped yet
+The work now should favor:
 
-So the work now should stay narrower and more structural:
-
-- keep signposts honest about `4.1.0` being shipped instead of pending
-- run `RE-007` as the active runtime-engine cycle
-- keep `DF-020` and `DL-009` as near follow-ons
-- keep work-tracking truth honest through METHOD lanes and signposts
-- leave `4.2.0` unshaped until there is enough real new material to
-  justify another release-shaping pass
+- proving performance gains in more real-world scenarios
+- deepening DOGFOOD story quality (DF-020)
+- the i18n catalog loader (LX-010)
+- MCP interactive documentation
 
 ## Active Cycle
 
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-008 — Byte-Packed Surface Representation](./design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md) (in PR review)
+
+## Recently Shipped
+
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md) (shipped in 4.2.0)
 
 ## After 4.1.0
 

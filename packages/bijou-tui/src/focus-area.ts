@@ -20,8 +20,9 @@
  * ```
  */
 
-import type { BijouContext, Cell, Surface, TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, Cell, Surface, PackedSurface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
   type ScrollState,
@@ -380,8 +381,20 @@ export function focusAreaSurfaceInto(
 
   if (hasGutter) {
     const gutterCell = resolveGutterCell(focused, ctx, options);
-    for (let y = 0; y < state.height; y++) {
-      target.set(offsetX, offsetY + y, gutterCell);
+    const packed: boolean = 'buffer' in target;
+    const fgRgb = packed && gutterCell.fg ? parseHex(gutterCell.fg) : undefined;
+    if (fgRgb) {
+      const [fR, fG, fB] = fgRgb;
+      let bR = -1, bG = 0, bB = 0;
+      const bgRgb = gutterCell.bg ? parseHex(gutterCell.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
+      for (let y = 0; y < state.height; y++) {
+        (target as PackedSurface).setRGB(offsetX, offsetY + y, gutterCell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(gutterCell.modifiers));
+      }
+    } else {
+      for (let y = 0; y < state.height; y++) {
+        target.set(offsetX, offsetY + y, gutterCell);
+      }
     }
   }
 
@@ -445,8 +458,10 @@ function paintScrollbarInto(
   scrollY: number,
 ): void {
   if (totalLines <= viewportHeight) {
+    const p: boolean = 'buffer' in target;
     for (let y = 0; y < viewportHeight; y++) {
-      target.set(column, row + y, EMPTY_CELL);
+      if (p) (target as PackedSurface).setRGB(column, row + y, 0x20, -1, 0, 0, -1, 0, 0);
+      else target.set(column, row + y, EMPTY_CELL);
     }
     return;
   }
@@ -456,12 +471,14 @@ function paintScrollbarInto(
   const scrollFraction = maxScroll > 0 ? scrollY / maxScroll : 0;
   const thumbStart = Math.round(scrollFraction * (viewportHeight - thumbSize));
 
+  const sp: boolean = 'buffer' in target;
   for (let index = 0; index < viewportHeight; index++) {
-    target.set(
-      column,
-      row + index,
-      index >= thumbStart && index < thumbStart + thumbSize ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL,
-    );
+    const isThumb = index >= thumbStart && index < thumbStart + thumbSize;
+    if (sp) {
+      (target as PackedSurface).setRGB(column, row + index, isThumb ? 0x2588 : 0x2502, -1, 0, 0, -1, 0, 0);
+    } else {
+      target.set(column, row + index, isThumb ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL);
+    }
   }
 }
 

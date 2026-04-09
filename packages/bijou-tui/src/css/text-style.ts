@@ -1,4 +1,5 @@
 import { createSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 export interface StyledTextToken {
   hex?: string;
@@ -117,14 +118,27 @@ export function createStyledTextSurfaceWithBCSS(
     empty: false,
   });
   const graphemes = segmentGraphemes(text ?? '');
-  for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
-    surface.set(x, 0, {
-      char: graphemes[x]!,
-      fg: token.hex,
-      bg: token.bg,
-      modifiers: token.modifiers,
-      empty: false,
-    });
+  const packed: boolean = 'buffer' in surface;
+  const fg = packed && token.hex ? parseHex(token.hex) : undefined;
+  if (fg) {
+    const [fR, fG, fB] = fg;
+    const bg = token.bg ? parseHex(token.bg) : undefined;
+    let bR = -1, bG = 0, bB = 0;
+    if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
+    const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      (surface as any).setRGB(x, 0, graphemes[x]!, fR, fG, fB, bR, bG, bB, flags);
+    }
+  } else {
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      surface.set(x, 0, {
+        char: graphemes[x]!,
+        fg: token.hex,
+        bg: token.bg,
+        modifiers: token.modifiers,
+        empty: false,
+      });
+    }
   }
   return surface;
 }

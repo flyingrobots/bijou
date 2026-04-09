@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { createSurface, type LayoutNode } from '@flyingrobots/bijou';
+import { createSurface, type Surface, type LayoutNode } from '@flyingrobots/bijou';
 import { normalizeViewOutput, normalizeViewOutputInto, wrapViewOutputAsLayoutRoot } from './view-output.js';
 
-function surfaceLines(surface: ReturnType<typeof createSurface>): string[] {
+function surfaceLines(surface: Surface): string[] {
   return Array.from({ length: surface.height }, (_, y) =>
     Array.from({ length: surface.width }, (_, x) => surface.get(x, y).char).join(''),
   );

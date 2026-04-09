@@ -24,6 +24,7 @@ export type {
 export {
   type Cell,
   type Surface,
+  type PackedSurface,
   type CellMask,
   type Matrix3x3,
   type TransformOptions,
@@ -31,6 +32,18 @@ export {
   FULL_MASK,
   ROTATION_CHAR_MAP,
 } from './ports/surface.js';
+
+export {
+  FLAG_BOLD,
+  FLAG_DIM,
+  FLAG_STRIKETHROUGH,
+  FLAG_INVERSE,
+  FLAG_EMPTY,
+  UNDERLINE_SOLID,
+  UNDERLINE_CURLY,
+  UNDERLINE_DOTDASH,
+  FLAG_DASHED,
+} from './core/render/packed-cell.js';
 
 // Context
 export {

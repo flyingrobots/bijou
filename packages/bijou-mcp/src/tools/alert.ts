@@ -14,7 +14,7 @@ const inputSchema = z.object(inputShape);
 
 export const alertTool: ToolRegistration = {
   name: 'bijou_alert',
-  description: 'Render an alert box with an icon and message. Variants: success (checkmark), error (cross), warning (triangle), info (i). Returns plain-text with box-drawing characters.',
+  description: 'Render an alert box with an icon and message. Variants: success (*), error (x), warning (!), info (i). Returns plain-text with box-drawing characters.',
   inputSchema: inputShape,
   handler: async (args) => {
     const input = inputSchema.parse(args);

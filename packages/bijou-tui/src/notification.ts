@@ -2,6 +2,7 @@ import type {
   BijouContext,
   OverflowBehavior,
   Surface,
+  PackedSurface,
   TokenValue,
 } from '@flyingrobots/bijou';
 import {
@@ -11,6 +12,7 @@ import {
   surfaceToString,
   wrapPreparedTextToWidth,
 } from '@flyingrobots/bijou';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
@@ -708,16 +710,32 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
   const surface = createSurface(width, 1);
   let x = 0;
 
+  const packed: boolean = 'buffer' in surface;
   for (const segment of graphemeSegments) {
-    for (const char of segment.graphemes) {
-      surface.set(x, 0, {
-        char,
-        fg: segment.style?.fg,
-        bg: segment.style?.bg,
-        modifiers: segment.style?.modifiers ? [...segment.style.modifiers] : undefined,
-        empty: false,
-      });
-      x++;
+    // Pre-parse style once per segment for setRGB fast path
+    const s = segment.style;
+    if (packed && s) {
+      let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
+      const fgRgb = s.fg ? parseHex(s.fg) : undefined;
+      if (fgRgb) { [fR, fG, fB] = fgRgb; }
+      const bgRgb = s.bg ? parseHex(s.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
+      const fl = s.modifiers ? encodeModifiers(s.modifiers) : 0;
+      for (const char of segment.graphemes) {
+        (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB, fl);
+        x++;
+      }
+    } else {
+      for (const char of segment.graphemes) {
+        surface.set(x, 0, {
+          char,
+          fg: s?.fg,
+          bg: s?.bg,
+          modifiers: s?.modifiers ? [...s.modifiers] : undefined,
+          empty: false,
+        });
+        x++;
+      }
     }
   }
 
@@ -947,14 +965,24 @@ function renderNotificationSurface<Msg>(
     empty: false,
   });
 
+  const cardPacked: boolean = 'buffer' in card;
   for (let y = 0; y < contentRows.length; y++) {
-    card.set(0, y, {
-      char: '\u258e',
-      fg: accentStyle.fg,
-      bg: backgroundStyle.bg,
-      modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
-      empty: false,
-    });
+    const accentRgb = cardPacked && accentStyle.fg ? parseHex(accentStyle.fg) : undefined;
+    if (accentRgb) {
+      const [fR, fG, fB] = accentRgb;
+      let bR = -1, bG = 0, bB = 0;
+      const bgRgb = backgroundStyle.bg ? parseHex(backgroundStyle.bg) : undefined;
+      if (bgRgb) { [bR, bG, bB] = bgRgb; }
+      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
+    } else {
+      card.set(0, y, {
+        char: '\u258e',
+        fg: accentStyle.fg,
+        bg: backgroundStyle.bg,
+        modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
+        empty: false,
+      });
+    }
     card.blit(
       contentRows[y]!,
       2,

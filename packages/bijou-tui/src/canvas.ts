@@ -5,7 +5,8 @@
  * with normalized UV mapping and full color/styling support.
  */
 
-import { createSurface, type Surface, type Cell } from '@flyingrobots/bijou';
+import { createSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 /**
  * Parameters passed to the shader function.
@@ -82,23 +83,41 @@ export function canvas(
   return surface;
 }
 
+function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
+  if (packed && cell.fg) {
+    const fg = parseHex(cell.fg);
+    if (fg) {
+      const [fR, fG, fB] = fg;
+      let bR = -1, bG = 0, bB = 0;
+      const bg = cell.bg ? parseHex(cell.bg) : undefined;
+      if (bg) { [bR, bG, bB] = bg; }
+      (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
+      return;
+    }
+  }
+  surface.set(x, y, cell);
+}
+
 function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
+  const packed: boolean = 'buffer' in surface;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const cell = shader({
+      const result = shader({
         u: x / (width - 1 || 1),
         v: y / (height - 1 || 1),
         time,
         uniforms
       });
-      surface.set(x, y, typeof cell === 'string' ? { char: cell } : cell);
+      const cell = typeof result === 'string' ? { char: result } : result;
+      setCellFast(surface, packed, x, y, cell);
     }
   }
 }
 
 function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
+  const packed: boolean = 'buffer' in surface;
   const subW = width * 2;
   const subH = height * 2;
 
@@ -133,7 +152,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
         }
       }
 
-      surface.set(x, y, {
+      setCellFast(surface, packed, x, y, {
         ...(firstStyledCell || { char: ' ' }),
         char: QUAD_CHARS[mask] || ' '
       });
@@ -143,6 +162,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
 
 function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
+  const packed: boolean = 'buffer' in surface;
   const subW = width * 2;
   const subH = height * 4;
 
@@ -177,7 +197,7 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
         }
       }
 
-      surface.set(x, y, {
+      setCellFast(surface, packed, x, y, {
         ...(firstStyledCell || { char: ' ' }),
         char: String.fromCharCode(0x2800 + code)
       });

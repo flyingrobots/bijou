@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type Cell } from '../../ports/surface.js';
+import { createSurface, type Surface, type Cell, type PackedSurface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { clipToWidth } from '../text/clip.js';
 import { wrapToWidth } from '../text/wrap.js';
@@ -6,6 +6,32 @@ import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.j
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
+import { parseHex, encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
+
+function isPackedSurface(s: Surface): s is PackedSurface {
+  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
+}
+
+/** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
+function parseStyleRGB(style: { fg?: string; bg?: string; modifiers?: string[] }): {
+  fgR: number; fgG: number; fgB: number;
+  bgR: number; bgG: number; bgB: number;
+  flags: number;
+} | undefined {
+  let fgR = -1, fgG = 0, fgB = 0;
+  let bgR = -1, bgG = 0, bgB = 0;
+  if (style.fg) {
+    const rgb = parseHex(style.fg);
+    if (!rgb) return undefined;
+    fgR = rgb[0]; fgG = rgb[1]; fgB = rgb[2];
+  }
+  if (style.bg) {
+    const rgb = parseHex(style.bg);
+    if (!rgb) return undefined;
+    bgR = rgb[0]; bgG = rgb[1]; bgB = rgb[2];
+  }
+  return { fgR, fgG, fgB, bgR, bgG, bgB, flags: encodeModifiers(style.modifiers) };
+}
 
 const BORDER = { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' };
 
@@ -19,6 +45,26 @@ function withInheritedBackground(surface: Surface, background: string | undefine
   if (background == null) return surface;
 
   const next = surface.clone();
+  if (isPackedSurface(next)) {
+    // Fast path: write bg bytes directly into the buffer
+    const bgRGB = parseHex(background);
+    if (bgRGB) {
+      const buf = next.buffer;
+      const [bgR, bgG, bgB] = bgRGB;
+      const size = next.width * next.height;
+      for (let i = 0; i < size; i++) {
+        const off = i * CELL_STRIDE;
+        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+        if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+        buf[off + 5] = bgR;
+        buf[off + 6] = bgG;
+        buf[off + 7] = bgB;
+        buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+      }
+      next.markAllDirty();
+      return next;
+    }
+  }
   for (let y = 0; y < next.height; y++) {
     for (let x = 0; x < next.width; x++) {
       const cell = next.get(x, y);
@@ -95,35 +141,62 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     bg: borderToken?.bg,
     modifiers: borderToken?.modifiers as any,
   }, bcss);
-  const borderCell: Cell = { 
-    char: ' ', 
-    fg: borderStyle.fg,
-    bg: borderStyle.bg,
-    modifiers: borderStyle.modifiers,
-  };
 
-  // Draw borders
-  for (let x = 0; x < outerW; x++) {
-    surface.set(x, 0, { ...borderCell, char: BORDER.h });
-    surface.set(x, outerH - 1, { ...borderCell, char: BORDER.h });
-  }
-  for (let y = 0; y < outerH; y++) {
-    surface.set(0, y, { ...borderCell, char: BORDER.v });
-    surface.set(outerW - 1, y, { ...borderCell, char: BORDER.v });
-  }
-  surface.set(0, 0, { ...borderCell, char: BORDER.tl });
-  surface.set(outerW - 1, 0, { ...borderCell, char: BORDER.tr });
-  surface.set(0, outerH - 1, { ...borderCell, char: BORDER.bl });
-  surface.set(outerW - 1, outerH - 1, { ...borderCell, char: BORDER.br });
+  // Fast path: use setRGB for borders when surface is packed
+  const bRGB = isPackedSurface(surface) ? parseStyleRGB(borderStyle) : undefined;
+  if (bRGB && isPackedSurface(surface)) {
+    const { fgR, fgG, fgB, bgR, bgG, bgB, flags } = bRGB;
+    const H = BORDER.h, V = BORDER.v;
+    for (let x = 0; x < outerW; x++) {
+      surface.setRGB(x, 0, H, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      surface.setRGB(x, outerH - 1, H, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    }
+    for (let y = 0; y < outerH; y++) {
+      surface.setRGB(0, y, V, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      surface.setRGB(outerW - 1, y, V, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    }
+    surface.setRGB(0, 0, BORDER.tl, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(outerW - 1, 0, BORDER.tr, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(0, outerH - 1, BORDER.bl, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+    surface.setRGB(outerW - 1, outerH - 1, BORDER.br, fgR, fgG, fgB, bgR, bgG, bgB, flags);
 
-  // Draw title
-  if (title && outerW >= 4) {
-    const available = Math.max(0, outerW - 4);
-    const titleText = clipToWidth(` ${title} `, available);
-    const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
-    const titleLen = Math.min(titleGs.length, available);
-    for (let i = 0; i < titleLen; i++) {
-      surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
+    if (title && outerW >= 4) {
+      const available = Math.max(0, outerW - 4);
+      const titleText = clipToWidth(` ${title} `, available);
+      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleLen = Math.min(titleGs.length, available);
+      for (let i = 0; i < titleLen; i++) {
+        surface.setRGB(i + 2, 0, titleGs[i]!, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+      }
+    }
+  } else {
+    const borderCell: Cell = {
+      char: ' ',
+      fg: borderStyle.fg,
+      bg: borderStyle.bg,
+      modifiers: borderStyle.modifiers,
+    };
+    for (let x = 0; x < outerW; x++) {
+      surface.set(x, 0, { ...borderCell, char: BORDER.h });
+      surface.set(x, outerH - 1, { ...borderCell, char: BORDER.h });
+    }
+    for (let y = 0; y < outerH; y++) {
+      surface.set(0, y, { ...borderCell, char: BORDER.v });
+      surface.set(outerW - 1, y, { ...borderCell, char: BORDER.v });
+    }
+    surface.set(0, 0, { ...borderCell, char: BORDER.tl });
+    surface.set(outerW - 1, 0, { ...borderCell, char: BORDER.tr });
+    surface.set(0, outerH - 1, { ...borderCell, char: BORDER.bl });
+    surface.set(outerW - 1, outerH - 1, { ...borderCell, char: BORDER.br });
+
+    if (title && outerW >= 4) {
+      const available = Math.max(0, outerW - 4);
+      const titleText = clipToWidth(` ${title} `, available);
+      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleLen = Math.min(titleGs.length, available);
+      for (let i = 0; i < titleLen; i++) {
+        surface.set(i + 2, 0, { ...borderCell, char: titleGs[i]! });
+      }
     }
   }
 

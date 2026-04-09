@@ -12,3 +12,7 @@ The in-memory localization runtime for Bijou.
 - locale-aware formatting seams
 
 This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in `@flyingrobots/bijou-i18n-tools`.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

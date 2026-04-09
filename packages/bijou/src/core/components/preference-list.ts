@@ -1,4 +1,5 @@
-import { createSurface, type Surface } from '../../ports/surface.js';
+import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { parseHex, FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { graphemeWidth } from '../text/grapheme.js';
@@ -127,16 +128,32 @@ export function preferenceRowSurface(
       const startX = width >= 3 ? 1 : 0;
       const innerWidth = Math.max(0, width - (startX * 2));
       const valueStart = Math.max(0, innerWidth - valueChars.length);
-      for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
-        const char = valueChars[offset]!;
-        if (char === ' ') continue;
-        surface.set(startX + valueStart + offset, 0, {
-          char,
-          fg: resolvePreferenceValueFg(prepared.row, ctx, options.theme),
-          bg,
-          modifiers: ['bold'],
-          empty: false,
-        });
+      const valFg = resolvePreferenceValueFg(prepared.row, ctx, options.theme);
+      const packed: boolean = 'buffer' in surface;
+      if (packed && valFg) {
+        const fgP = parseHex(valFg);
+        if (fgP) {
+          const fR = fgP[0], fG = fgP[1], fB = fgP[2];
+          let bR = -1, bG = 0, bB = 0;
+          if (bg) { const bgP = parseHex(bg); if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; } }
+          for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
+            const char = valueChars[offset]!;
+            if (char === ' ') continue;
+            (surface as PackedSurface).setRGB(startX + valueStart + offset, 0, char, fR, fG, fB, bR, bG, bB, FLAG_BOLD);
+          }
+        } else {
+          for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
+            const char = valueChars[offset]!;
+            if (char === ' ') continue;
+            surface.set(startX + valueStart + offset, 0, { char, fg: valFg, bg, modifiers: ['bold'], empty: false });
+          }
+        }
+      } else {
+        for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
+          const char = valueChars[offset]!;
+          if (char === ' ') continue;
+          surface.set(startX + valueStart + offset, 0, { char, fg: valFg, bg, modifiers: ['bold'], empty: false });
+        }
       }
     }
   }
@@ -316,6 +333,22 @@ function writePreferenceLine(
   } = {},
 ): void {
   const chars = Array.from(text);
+  const pp: boolean = 'buffer' in surface;
+  if (pp && options.fg) {
+    const fgP = parseHex(options.fg);
+    if (fgP) {
+      const fR = fgP[0], fG = fgP[1], fB = fgP[2];
+      let bR = -1, bG = 0, bB = 0;
+      if (options.bg) { const bgP = parseHex(options.bg); if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; } }
+      const flags = options.strong ? FLAG_BOLD : options.dim ? FLAG_DIM : 0;
+      for (let x = 0; x < chars.length && x < surface.width; x++) {
+        const char = chars[x]!;
+        if (char === ' ') continue;
+        (surface as PackedSurface).setRGB(x, y, char, fR, fG, fB, bR, bG, bB, flags);
+      }
+      return;
+    }
+  }
   for (let x = 0; x < chars.length && x < surface.width; x++) {
     const char = chars[x]!;
     if (char === ' ') continue;

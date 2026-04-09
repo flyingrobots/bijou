@@ -8,7 +8,9 @@
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
-import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, PackedSurface, TokenValue, Cell } from '@flyingrobots/bijou';
+import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
+import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import {
   createSurface,
   graphemeClusterWidth,
@@ -225,13 +227,30 @@ export function compositeSurfaceInto(
   }
 
   if (options?.dim) {
-    for (const cell of target.cells) {
-      if (cell.empty || cell.char === ' ') continue;
-      const modifiers = cell.modifiers ?? [];
-      if (!modifiers.includes('dim')) {
-        cell.modifiers = [...modifiers, 'dim'];
+    const packed = 'buffer' in target && (target as PackedSurface).buffer instanceof Uint8Array;
+    if (packed) {
+      // Fast path: set the dim flag bit directly in the buffer
+      const buf = (target as PackedSurface).buffer;
+      const size = target.width * target.height;
+      for (let i = 0; i < size; i++) {
+        const off = i * CELL_STRIDE;
+        if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+        // Skip space chars (charCode 0x20)
+        if (buf[off]! === 0x20 && buf[off + 1]! === 0) continue;
+        buf[off + OFF_FLAGS] = buf[off + OFF_FLAGS]! | FLAG_DIM;
       }
-      cell.empty = false;
+      (target as PackedSurface).markAllDirty();
+    } else {
+      for (let y = 0; y < target.height; y++) {
+        for (let x = 0; x < target.width; x++) {
+          const cell = target.get(x, y);
+          if (cell.empty || cell.char === ' ') continue;
+          const modifiers = cell.modifiers ?? [];
+          if (!modifiers.includes('dim')) {
+            target.set(x, y, { ...cell, modifiers: [...modifiers, 'dim'], empty: false });
+          }
+        }
+      }
     }
   }
 
@@ -287,15 +306,19 @@ function overlayContentFromSurface(surface: Surface, ctx: BijouContext | undefin
   return ctx ? surfaceToString(surface, ctx.style) : plainSurfaceToString(surface);
 }
 
-function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle): void {
-  surface.set(x, y, { char, ...style, empty: false });
+function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle, numStyle?: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number }): void {
+  if (numStyle && 'buffer' in surface) {
+    (surface as PackedSurface).setRGB(x, y, char, numStyle.fR, numStyle.fG, numStyle.fB, numStyle.bR, numStyle.bG, numStyle.bB, numStyle.fl);
+  } else {
+    surface.set(x, y, { char, ...style, empty: false });
+  }
 }
 
-function setStyledGrapheme(surface: Surface, x: number, y: number, char: string, style: CellStyle): number {
+function setStyledGrapheme(surface: Surface, x: number, y: number, char: string, style: CellStyle, numStyle?: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number }): number {
   if (x >= surface.width) return 0;
 
   const width = Math.max(1, graphemeClusterWidth(char));
-  setStyledCell(surface, x, y, char, style);
+  setStyledCell(surface, x, y, char, style, numStyle);
   for (let offset = 1; offset < width && x + offset < surface.width; offset++) {
     setStyledCell(surface, x + offset, y, '', style);
   }
@@ -315,10 +338,20 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
 
   const graphemes = segmentGraphemes(plain);
   const surface = createSurface(width, 1);
+  // Pre-parse style for setRGB fast path
+  let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
+  if ('buffer' in surface) {
+    let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
+    const fgRgb = style.fg ? parseHex(style.fg) : undefined;
+    if (fgRgb) { [fR, fG, fB] = fgRgb; }
+    const bgRgb = style.bg ? parseHex(style.bg) : undefined;
+    if (bgRgb) { [bR, bG, bB] = bgRgb; }
+    ns = { fR, fG, fB, bR, bG, bB, fl: style.modifiers ? encodeModifiers(style.modifiers) : 0 };
+  }
   let x = 0;
   for (const grapheme of graphemes) {
     if (x >= width) break;
-    x += setStyledGrapheme(surface, x, 0, grapheme, style);
+    x += setStyledGrapheme(surface, x, 0, grapheme, style, ns);
   }
   return surface;
 }
@@ -326,6 +359,22 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
 function lineWithInheritedBackground(line: Surface, bg: string | undefined): Surface {
   if (bg == null || line.width === 0) return line;
   const result = line.clone();
+  // Fast path: packed surface — write bg bytes directly
+  const packed = 'buffer' in result && (result as PackedSurface).buffer instanceof Uint8Array;
+  const rgb = packed ? parseHex(bg) : undefined;
+  if (rgb) {
+    const [bgR, bgG, bgB] = rgb;
+    const buf = (result as PackedSurface).buffer;
+    for (let i = 0; i < result.width; i++) {
+      const off = i * CELL_STRIDE;
+      if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+      if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+      buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+    }
+    (result as PackedSurface).markAllDirty();
+    return result;
+  }
   for (let x = 0; x < result.width; x++) {
     const cell = result.get(x, 0);
     if (cell.empty) continue;

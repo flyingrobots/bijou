@@ -11,6 +11,11 @@ The pure, zero-dependency core of Bijou.
 - **Surface-first companions for common runtime chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for common layout and status primitives.
 - **Explicit seam crossing** — when you move `Surface` output back into string-first APIs, you do it deliberately with `surfaceToString(surface, ctx.style)`.
 - **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
+- **Byte-packed surfaces** — `Surface` is backed by a `Uint8Array` (10 bytes per cell). The `setRGB()` method writes character code + numeric RGB directly into the buffer with zero string parsing or object allocation. All built-in surface components use this fast path automatically.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, design system, and DOGFOOD proving surface.
 
 ## Install
 

@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
+## Unreleased
+
+### ⚡ Performance
+
+- **RE-008 byte-packed surface representation** — the internal `Surface` data structure is now backed by a packed `Uint8Array` (10 bytes per cell) instead of an array of heap-allocated `Cell` objects. Colors are stored as raw RGB bytes, modifiers as a flags bitfield, and characters as uint16 code points with a side table for multi-codepoint graphemes. The differ compares cells via 10-byte equality checks instead of string comparison, and emits ANSI SGR escape sequences directly from buffer bytes with a cached style lookup — bypassing chalk entirely on the hot diff path. Surface composition (`blit`) copies bytes directly between packed buffers. `fill()` and `clear()` use a template-stamp approach. A new `setRGB()` API writes numeric RGB values directly into the buffer with zero string parsing or object allocation. All components have been migrated to use `setRGB` when the surface is packed, with Cell-based fallbacks preserved. Benchmark result: DOGFOOD landing render+diff is **7% faster** than the pre-RE-008 baseline. Synthetic stress tests show remaining overhead from the `set()` hex-parsing path; see the [RE-008 design doc](design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md) for full benchmark numbers.
+
+### ✨ Features
+
+- **`Surface.setRGB()` zero-allocation API** — new method for hot rendering paths that writes character code + numeric RGB directly into the packed buffer. Roughly 10–50x faster than `set()` for per-cell writes. The `set()` API is preserved with documentation noting it parses hex strings on every call.
+- **`PackedSurface` interface** — extends `Surface` with `.buffer` (the raw `Uint8Array`), `.sideTable` (grapheme cluster lookup), and `.markAllDirty()` for buffer-copy workflows. Exported from the main barrel.
+- **`TokenValue.fgRGB` / `TokenValue.bgRGB`** — theme tokens now carry pre-parsed numeric RGB channels alongside hex strings, populated automatically at theme resolution time.
+- **Modifier flag constants** — `FLAG_BOLD`, `FLAG_DIM`, `FLAG_STRIKETHROUGH`, `FLAG_INVERSE`, `UNDERLINE_SOLID`, etc. exported from the main barrel for `setRGB` flag arguments.
+- **`@flyingrobots/bijou/perf` subpath export** — public access to packed-cell utilities (`parseHex`, `encodeModifiers`, flag constants) for performance-sensitive consumer code.
+
+### 🐛 Bug Fixes
+
+- **RE-016 modifier-dropping in setRGB fast paths** — `setRGB` calls in `canvas.ts`, `overlay.ts`, `focus-area.ts`, and `notification.ts` now pass `encodeModifiers(cell.modifiers)` instead of omitting the flags argument. Previously the Cell-based fallback preserved bold/dim/strikethrough/etc. but the packed fast path silently dropped them.
+- **RE-015 braille art corruption resolved** — `flexSurface` with `align: 'center'` no longer corrupts braille characters (U+2800–U+28FF). The packed byte-copy blit preserves all character codes directly without intermediate string processing. Verified with a 420×140 (58,800 cell) braille art test case — zero mismatches.
+
 ## [4.2.0] - 2026-04-08
 
 ### ✨ Features

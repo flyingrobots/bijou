@@ -17,8 +17,9 @@
 // Types
 // ---------------------------------------------------------------------------
 
-import type { BijouContext, TokenValue, Surface } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue, Surface, PackedSurface } from '@flyingrobots/bijou';
 import { createSurface, makeBgFill, parseAnsiToSurface, shouldApplyBg } from '@flyingrobots/bijou';
+import { parseHex, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, FLAG_EMPTY } from '@flyingrobots/bijou/perf';
 
 /**
  * Configuration for the flex layout container.
@@ -376,10 +377,29 @@ function createRegionSurface(width: number, height: number, bg: string | undefin
 function inheritBackground(surface: Surface, bg: string | undefined): Surface {
   if (!bg || surface.width === 0 || surface.height === 0) return surface;
   const next = surface.clone();
-  for (let i = 0; i < next.cells.length; i++) {
-    const cell = next.cells[i]!;
-    if (!cell.empty && cell.bg === undefined) {
-      next.cells[i] = { ...cell, bg };
+  // Fast path: packed surface — write bg bytes directly
+  const packed = 'buffer' in next && (next as PackedSurface).buffer instanceof Uint8Array;
+  const rgb = packed ? parseHex(bg) : undefined;
+  if (rgb) {
+    const [bgR, bgG, bgB] = rgb;
+    const buf = (next as PackedSurface).buffer;
+    const size = next.width * next.height;
+    for (let i = 0; i < size; i++) {
+      const off = i * CELL_STRIDE;
+      if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
+      if (buf[off + OFF_ALPHA]! & FLAG_BG_SET) continue;
+      buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+    }
+    (next as PackedSurface).markAllDirty();
+    return next;
+  }
+  for (let y = 0; y < next.height; y++) {
+    for (let x = 0; x < next.width; x++) {
+      const cell = next.get(x, y);
+      if (!cell.empty && cell.bg === undefined) {
+        next.set(x, y, { ...cell, bg });
+      }
     }
   }
   return next;

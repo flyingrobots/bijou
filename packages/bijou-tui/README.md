@@ -15,6 +15,11 @@ The TUI package is the surface-first fullscreen runtime in the Bijou stack.
 - **Bijou CSS (BCSS):** Style supported runtime surface components and frame shell regions with type/class/id selectors, `var()` token lookups, and terminal-aware media queries (`@media (width < 80)`). This is not yet a global cascade across arbitrary layout nodes.
 - **Declarative Motion:** Wrap any component in `motion({ key: 'id' }, ...)` and watch it smoothly interpolate layout changes (move, resize) using physics-based springs.
 - **Unified Heartbeat:** All animations and physics calculations are now synchronized to a single `PulseMsg`, eliminating timer jitter and saving CPU.
+- **Byte-Packed Rendering:** The surface layer is backed by a `Uint8Array` with a zero-alloc `setRGB()` path. The differ compares cells as 10-byte sequences and emits ANSI directly from buffer bytes. All built-in components use the fast path automatically.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, design system, and DOGFOOD proving surface.
 
 ## Installation
 

@@ -15,6 +15,10 @@
       "types": "./dist/adapters/test/index.d.ts",
       "default": "./dist/adapters/test/index.js"
     },
+    "./perf": {
+      "types": "./dist/core/render/packed-cell.d.ts",
+      "default": "./dist/core/render/packed-cell.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [

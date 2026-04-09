@@ -42,6 +42,18 @@ export interface TokenValue {
   bg?: string;
   /** Optional text style modifiers to apply alongside the color. */
   modifiers?: TextModifier[];
+  /**
+   * Pre-parsed foreground RGB channels (0–255 each).
+   * When present, hot rendering paths use these directly instead of
+   * parsing the `hex` string. Populated automatically by theme resolution.
+   */
+  fgRGB?: RGB;
+  /**
+   * Pre-parsed background RGB channels (0–255 each).
+   * When present, hot rendering paths use these directly instead of
+   * parsing the `bg` string. Populated automatically by theme resolution.
+   */
+  bgRGB?: RGB;
 }
 
 /** Color returned for Ink components — `undefined` means "use default terminal color" (NO_COLOR). */

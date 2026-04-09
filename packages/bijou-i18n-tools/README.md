@@ -17,3 +17,7 @@ Workflow and authoring tooling for Bijou localization.
 - pseudo-localization helpers
 
 This package is intentionally provider-neutral. Filesystem, XLSX, or service-backed adapters can sit on top of it without polluting the core tooling API.
+
+## Documentation
+
+See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

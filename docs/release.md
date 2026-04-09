@@ -58,36 +58,23 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 ### Latest Shipped Release
 
-The latest shipped release is **`4.1.0`**.
+The latest shipped release is **`4.3.0`**.
 
-The shaping arc that got `4.1.0` out the door included:
+- `4.3.0` — RE-008 byte-packed surface, RE-015 braille fix, `setRGB` API
+- `4.2.0` — RE-007 framed shell, `@flyingrobots/bijou-mcp`, METHOD migration
+- `4.1.0` — runtime engine through RE-006, DOGFOOD maturation (DF-021
+  through DF-026, including DF-023, DF-024, WF-003), i18n packages
 
-- [WF-004](./design/WF-004-shape-the-next-release.md)
-- [WF-005](./design/WF-005-close-4-1-0-i18n-publish-surface-gap.md)
-- [WF-006](./design/WF-006-cut-clean-4-1-0-release-boundary.md)
-- [DF-021](./design/DF-021-shape-dogfood-as-terminal-docs-system.md)
-- [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md)
-- [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md)
-- [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md)
-- [DF-025](./design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-- [DF-026](./design/DF-026-demote-examples-to-secondary-reference-status.md)
-- [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
-
-The release smoke contract is now DOGFOOD-centered through
+The release smoke contract is DOGFOOD-centered through
 `smoke:dogfood`, `smoke:dogfood:landing`, and `smoke:dogfood:docs`.
 
-Its long-form release docs live in:
-
-- [`docs/releases/4.1.0/whats-new.md`](./releases/4.1.0/whats-new.md)
-- [`docs/releases/4.1.0/migration-guide.md`](./releases/4.1.0/migration-guide.md)
+Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-The next release is intentionally **not shaped yet**.
-
-Do not reuse `4.1.0` planning language as if it were still a live lane.
-When the next release is worth shaping, capture that explicitly in cycle
-docs and signposts first.
+The next release is not shaped yet. The engineering focus is on
+proving the packed-surface performance in more scenarios and
+deepening the product surface (DOGFOOD, i18n, MCP docs).
 
 ### Lock-step Versioned Units
 
