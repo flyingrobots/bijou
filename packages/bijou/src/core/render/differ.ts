@@ -417,6 +417,10 @@ function renderDiffPacked(
   let cursorX = -1;
   let cursorY = -1;
 
+  // Fast path: skip expensive side-table string verification when neither
+  // surface has any side-table entries (the common case — no emoji/astral).
+  const needsSideTableCheck = tSide.length > 0 || cSide.length > 0;
+
   for (let y = 0; y < height; y++) {
     let x = 0;
     while (x < width) {
@@ -427,7 +431,9 @@ function renderDiffPacked(
       const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
 
       const same = inBounds
-        ? packedCellsSemanticallyEqual(tBuf, tOff, tSide, cBuf, cOff, cSide)
+        ? (needsSideTableCheck
+            ? packedCellsSemanticallyEqual(tBuf, tOff, tSide, cBuf, cOff, cSide)
+            : packedBytesEqual(tBuf, tOff, cBuf, cOff))
         : packedBytesEqual(tBuf, tOff, EMPTY_PACKED, 0);
 
       if (same) {
@@ -450,11 +456,13 @@ function renderDiffPacked(
           break;
         }
 
-        // Cell changed check (side-table-aware to prevent infinite loops)
+        // Cell changed check
         const bInBounds = y < cHeight && batchX < cWidth;
         const bcOff = bInBounds ? (y * cWidth + batchX) * CELL_STRIDE : -1;
         const cellsMatch = bInBounds
-          ? packedCellsSemanticallyEqual(tBuf, bOff, tSide, cBuf, bcOff, cSide)
+          ? (needsSideTableCheck
+              ? packedCellsSemanticallyEqual(tBuf, bOff, tSide, cBuf, bcOff, cSide)
+              : packedBytesEqual(tBuf, bOff, cBuf, bcOff))
           : packedBytesEqual(tBuf, bOff, EMPTY_PACKED, 0);
 
         if (cellsMatch) break;
