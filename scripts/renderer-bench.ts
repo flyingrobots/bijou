@@ -317,7 +317,7 @@ function runSurfaceScenarioSample(scenario: RendererBenchScenario): RendererBenc
 function runNormalizeScenarioSample(scenario: RendererBenchScenario): RendererBenchSample {
   const layout = buildSyntheticLayout(scenario.columns, scenario.rows);
   const size = { width: scenario.columns, height: scenario.rows };
-  let scratch = createSurface(size.width, size.height);
+  let scratch: Surface = createSurface(size.width, size.height);
 
   for (let i = 0; i < scenario.warmupFrames; i++) {
     scratch = normalizeViewOutputInto(layout, size, scratch).surface;

@@ -472,6 +472,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
     const word = dirtyWords[idx >> 5]!;
     const bit = 1 << (idx & 31);
     if (word & bit) {
+      // Preserve the exact float opacity stored by set() to avoid quantization
+      // drift. When set() marks dirty, it writes the caller's opacity to the
+      // cell first. When markAllDirty() marks dirty (clone), the cell retains
+      // whatever opacity it had, which is acceptable.
       const exactOpacity = cells[idx]!.opacity;
       syncCellFromBuf(cells[idx]!, buf, idx, sideTable, exactOpacity);
       dirtyWords[idx >> 5]! = word & ~bit;

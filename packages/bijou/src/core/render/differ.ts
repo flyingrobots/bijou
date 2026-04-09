@@ -7,6 +7,7 @@ import {
   FLAG_BOLD, FLAG_DIM, FLAG_STRIKETHROUGH, FLAG_INVERSE,
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
   FLAG_DASHED,
+  SIDE_TABLE_THRESHOLD,
   decodeChar, parseHex,
 } from './packed-cell.js';
 
@@ -408,9 +409,19 @@ function renderDiffPacked(
       const inBounds = y < cHeight && x < cWidth;
       const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
 
-      const same = inBounds
+      let same = inBounds
         ? packedBytesEqual(tBuf, tOff, cBuf, cOff)
         : packedBytesEqual(tBuf, tOff, EMPTY_PACKED, 0);
+      // Side-table chars: bytes may match but represent different graphemes
+      // across independently-managed side tables.
+      if (same && inBounds) {
+        const tChar = tBuf[tOff]! | (tBuf[tOff + 1]! << 8);
+        if (tChar >= SIDE_TABLE_THRESHOLD) {
+          const cChar = cBuf[cOff]! | (cBuf[cOff + 1]! << 8);
+          same = tChar === cChar
+            && decodeChar(tChar, tSide) === decodeChar(cChar, current.sideTable);
+        }
+      }
 
       if (same) {
         x++;
