@@ -15,15 +15,29 @@ export interface Cell {
   fg?: string;
   /** Background hex color (e.g. '#000000'). Undefined = terminal default. */
   bg?: string;
+  /**
+   * Pre-parsed foreground RGB channels `[r, g, b]` (0–255 each).
+   * When present, the hot path skips hex string parsing of `fg`
+   * entirely. If both `fg` and `fgRGB` are present, `fgRGB` wins.
+   * Populated automatically by theme resolution for theme tokens;
+   * components can also set this directly for cached or computed
+   * colors.
+   */
+  fgRGB?: readonly [number, number, number];
+  /**
+   * Pre-parsed background RGB channels `[r, g, b]` (0–255 each).
+   * See `fgRGB`. If both `bg` and `bgRGB` are present, `bgRGB` wins.
+   */
+  bgRGB?: readonly [number, number, number];
   /** Text modifiers (bold, dim, underline, etc.). */
   modifiers?: string[];
-  /** 
-   * Whether this cell is 'empty' (transparent). 
+  /**
+   * Whether this cell is 'empty' (transparent).
    * When true, this cell is ignored during blit/fill operations (acting as a brush hole).
    */
   empty?: boolean;
   /**
-   * Opacity of the cell (0.0 to 1.0). 
+   * Opacity of the cell (0.0 to 1.0).
    * Used for alpha blending colors during post-processing.
    */
   opacity?: number;
@@ -308,13 +322,29 @@ function encodeCellIntoBuf(
   buf[off + OFF_CHAR] = charCode & 0xFF;
   buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
 
+  // Foreground: pre-parsed `fgRGB` wins over `fg` hex string.
+  // Theme tokens populate fgRGB via resolve.ts populateThemeRGB(),
+  // so theme-driven paints skip inlineHexRGB entirely.
   let alphaBits = 0;
-  if (cell.fg && inlineHexRGB(cell.fg, buf, off + OFF_FG_R)) {
+  const fgRGB = cell.fgRGB;
+  if (fgRGB !== undefined) {
+    buf[off + OFF_FG_R] = fgRGB[0]!;
+    buf[off + OFF_FG_G] = fgRGB[1]!;
+    buf[off + OFF_FG_B] = fgRGB[2]!;
+    alphaBits |= FLAG_FG_SET;
+  } else if (cell.fg && inlineHexRGB(cell.fg, buf, off + OFF_FG_R)) {
     alphaBits |= FLAG_FG_SET;
   } else {
     buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
   }
-  if (cell.bg && inlineHexRGB(cell.bg, buf, off + OFF_BG_R)) {
+
+  const bgRGB = cell.bgRGB;
+  if (bgRGB !== undefined) {
+    buf[off + OFF_BG_R] = bgRGB[0]!;
+    buf[off + OFF_BG_G] = bgRGB[1]!;
+    buf[off + OFF_BG_B] = bgRGB[2]!;
+    alphaBits |= FLAG_BG_SET;
+  } else if (cell.bg && inlineHexRGB(cell.bg, buf, off + OFF_BG_R)) {
     alphaBits |= FLAG_BG_SET;
   } else {
     buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;

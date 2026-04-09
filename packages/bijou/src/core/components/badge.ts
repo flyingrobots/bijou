@@ -46,13 +46,17 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
     ? ctx.semantic(variant)
     : ctx.status(variant);
 
+  // Pass both hex and pre-parsed fgRGB — encodeCellIntoBuf picks
+  // fgRGB first, skipping inlineHexRGB on the hot path.
+  const baseStyle: Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'> = {
+    fg: baseToken.hex,
+    bg: undefined,
+    modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
+  };
+  if (baseToken.fgRGB) baseStyle.fgRGB = baseToken.fgRGB;
   const cell: Cell = {
     char: ' ',
-    ...applyBCSSCellTextStyles({
-      fg: baseToken.hex,
-      bg: undefined,
-      modifiers: [...(baseToken.modifiers ?? []), 'inverse'],
-    }, bcss),
+    ...applyBCSSCellTextStyles(baseStyle, bcss),
     empty: false
   };
 

@@ -10,6 +10,7 @@
 import type { AnyScenario } from './types.js';
 import { paintGradientRgb } from './paint-gradient-rgb.js';
 import { paintThemeSet } from './paint-theme-set.js';
+import { paintThemeSetFast } from './paint-theme-set-fast.js';
 import { paintAscii } from './paint-ascii.js';
 import { paintRgbFixed } from './paint-rgb-fixed.js';
 import { diffGradient } from './diff-gradient.js';
@@ -20,6 +21,7 @@ export const SCENARIOS: readonly AnyScenario[] = [
   paintAscii,
   paintRgbFixed,
   paintThemeSet,
+  paintThemeSetFast,
   paintGradientRgb,
   diffGradient,
 ] as unknown as readonly AnyScenario[];

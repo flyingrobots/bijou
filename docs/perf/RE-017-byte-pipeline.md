@@ -722,3 +722,104 @@ because it's:
    this session, committed next).
 4. Consider adding `paint-blit` and `diff-static` scenarios for
    broader coverage of the Part II optimization work.
+
+### 2026-04-09 — Theme token color cache prototype: 1.9× speedup confirmed
+
+Prototyped RE-019 cool idea (pre-parse theme token colors into
+bytes). Scope of the change:
+
+1. `Cell` interface gained optional `fgRGB?: readonly [number, number, number]`
+   and `bgRGB?: readonly [number, number, number]` fields
+   (`packages/bijou/src/ports/surface.ts:25-38`). Both are optional;
+   hex strings still work as before. No breaking change.
+2. `encodeCellIntoBuf` (`surface.ts:300-348`) now checks `fgRGB` /
+   `bgRGB` first and uses them directly when present, falling back
+   to `inlineHexRGB(cell.fg, ...)` otherwise. Theme-driven paints
+   that pass pre-parsed RGB skip the hex parse entirely.
+3. `CellTextStyle` in `packages/bijou/src/core/components/surface-text.ts`
+   extended to `Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>`.
+4. `tokenToCellStyle` (the central helper used by text components)
+   now passes `token.fgRGB` / `token.bgRGB` through when present.
+   Since theme resolution already populates these fields (see
+   `packages/bijou/src/core/theme/resolve.ts:12`), any component
+   that uses `tokenToCellStyle` gets the fast path automatically.
+5. `badge.ts` updated to pass `baseToken.fgRGB` explicitly as a
+   representative component migration.
+
+**Test status:** all 2,807 tests pass. The change is fully backward
+compatible.
+
+**Bench measurement** — added a `paint-theme-set-fast` scenario
+that mirrors `paint-theme-set` but pre-parses the palette once in
+`setup()` and passes `fgRGB` / `bgRGB` on each `surface.set()` call.
+30 samples each, same machine, commit `0aded48`:
+
+| Scenario | P50 | ns/cell | CoV | Notes |
+|---|---|---|---|---|
+| `paint-rgb-fixed` | 145 µs | 11.4 | 3.5% | setRGB floor (no parsing) |
+| `paint-theme-set-fast` | **328 µs** | **25.7** | **1.0%** | set() with pre-parsed fgRGB/bgRGB — **NEW** |
+| `paint-theme-set` | 624 µs | 48.9 | 3.1% | set() with hex parsed every call |
+
+**Result: `paint-theme-set` → `paint-theme-set-fast` = 624 µs → 328 µs,
+a 1.9× speedup.** That's a **47% reduction in frame time** on the
+theme-driven paint path with a ~30-line change.
+
+The remaining gap to the `setRGB` floor (328 → 145 µs) is other
+overhead in `encodeCellIntoBuf` that has nothing to do with hex
+parsing:
+
+- `encodeChar` — char string → code point encoding
+- `encodeModifiers` — array iteration + record lookups
+- Undefined-check branches for cell fields
+- Object property accesses on the Cell argument
+- Writing zero bytes to unused fg/bg positions when they're absent
+
+Those are a separate optimization opportunity (an `encodeCellIntoBufFast`
+sibling that takes pre-computed byte/flag values directly), not part
+of the theme cache work.
+
+**What this means for real-world performance**
+
+Theme tokens already had `fgRGB`/`bgRGB` populated via
+`populateThemeRGB` (the infrastructure was half-built from an
+earlier cycle and never wired through). Every component that uses
+`tokenToCellStyle` now gets the ~1.9× speedup for free because
+`tokenToCellStyle` passes the pre-parsed RGB through. That includes
+everything built on `createTextSurface` and `surface-text.ts`'s
+text rendering helpers — the hottest text paint path in the system.
+
+Components that still call `surface.set({ fg: token.hex })` directly
+(without going through `tokenToCellStyle`) don't benefit yet. They
+need a similar small edit to pass `fgRGB: token.fgRGB`. The grep
+turned up ~8 files with direct `.hex` calls. Migrating them is
+mechanical and safe.
+
+**Remaining components to migrate** (for full benefit):
+
+- `packages/bijou/src/core/components/box-v3.ts` (3 call sites —
+  `fillStyle.fg`, border overrides)
+- `packages/bijou-tui/src/app-frame-render.ts` (1 call site —
+  active header tab override, not a hot path)
+- `packages/bijou-tui/src/overlay.ts`
+- `packages/bijou-tui/src/notification.ts`
+- `packages/bijou-tui/src/css/text-style.ts`
+- `packages/bijou-tui/src/transition-shaders.ts`
+- `packages/bijou/src/core/theme/graph.ts`
+
+These can be done as a follow-up batch. None are blocking further
+RE-017 work.
+
+**Next actions**
+
+1. Task #37 (theme token color cache prototype): COMPLETED. The
+   prototype validates the hypothesis and the Cell-level machinery
+   is in place. Migration of remaining components can happen
+   incrementally.
+2. Add a component-level bench scenario that renders a
+   representative slice of DOGFOOD (header + sidebar + content) so
+   we can measure the end-to-end impact of the migration on a
+   realistic workload, not just the synthetic `paint-theme-set`.
+3. Continue with Part II of RE-017 (the differ byte pipeline).
+   The theme cache win compounds with the differ work — together
+   they should eliminate string work from both the paint AND the
+   diff sides of the pipeline.

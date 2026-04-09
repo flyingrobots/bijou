@@ -3,7 +3,7 @@ import type { TokenValue } from '../theme/tokens.js';
 import { graphemeClusterWidth, segmentGraphemes } from '../text/grapheme.js';
 import { encodeModifiers, parseHex } from '../render/packed-cell.js';
 
-export type CellTextStyle = Pick<Cell, 'fg' | 'bg' | 'modifiers'>;
+export type CellTextStyle = Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>;
 
 /** Pre-parsed numeric style for setRGB fast path. */
 interface NumericStyle {
@@ -59,11 +59,17 @@ export function segmentSurfaceText(text: string, purpose: string = 'Surface text
 
 export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
   if (token == null) return {};
-  return {
+  // Pass both hex string and pre-parsed RGB bytes. encodeCellIntoBuf
+  // in the packed surface path will prefer fgRGB/bgRGB when present,
+  // skipping inlineHexRGB entirely. See docs/perf/RE-017-byte-pipeline.md.
+  const style: CellTextStyle = {
     fg: token.hex,
     bg: token.bg,
     modifiers: token.modifiers,
   };
+  if (token.fgRGB) style.fgRGB = token.fgRGB;
+  if (token.bgRGB) style.bgRGB = token.bgRGB;
+  return style;
 }
 
 export function createTextSurface(text: string, style: CellTextStyle = {}): Surface {
