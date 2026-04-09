@@ -1,0 +1,26 @@
+{
+  "name": "@flyingrobots/bijou-bench",
+  "version": "4.2.0",
+  "description": "Headless performance benchmarks for bijou — frame-time, memory, and interactive sandbox.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bench": "node --import tsx src/cli.ts run",
+    "bench:compare": "node --import tsx src/cli.ts compare",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "*",
+    "@flyingrobots/bijou-node": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18"
+  }
+}

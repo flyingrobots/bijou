@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "bench"
   ],
   "scripts": {
     "clean": "rm -rf packages/bijou/dist packages/bijou-i18n/dist packages/bijou-i18n-tools/dist packages/bijou-i18n-tools-node/dist packages/bijou-i18n-tools-xlsx/dist packages/bijou-mcp/dist packages/bijou-node/dist packages/bijou-tui/dist packages/bijou-tui-app/dist packages/create-bijou-tui-app/dist packages/bijou/*.tsbuildinfo packages/bijou-i18n/*.tsbuildinfo packages/bijou-i18n-tools/*.tsbuildinfo packages/bijou-i18n-tools-node/*.tsbuildinfo packages/bijou-i18n-tools-xlsx/*.tsbuildinfo packages/bijou-mcp/*.tsbuildinfo packages/bijou-node/*.tsbuildinfo packages/bijou-tui/*.tsbuildinfo packages/bijou-tui-app/*.tsbuildinfo packages/create-bijou-tui-app/*.tsbuildinfo",
@@ -13,10 +14,9 @@
     "test:frames": "vitest run --config vitest.config.ts scripts/frame-assertions.test.ts scripts/frame-regressions.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
-    "bench:renderer": "node --expose-gc --import tsx scripts/renderer-bench.ts",
-    "bench:renderer:baseline": "node --expose-gc --import tsx scripts/renderer-bench.ts --out benchmarks/renderer-baseline.json",
-    "bench:renderer:compare": "node --expose-gc --import tsx scripts/renderer-bench-compare.ts",
-    "bench:renderer:guard": "node --expose-gc --import tsx scripts/renderer-bench-compare.ts --fail-on-regression",
+    "bench": "node --import tsx bench/src/cli.ts run",
+    "bench:compare": "node --import tsx bench/src/cli.ts compare",
+    "bench:baseline": "node --import tsx bench/src/cli.ts run --out bench/baselines",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",

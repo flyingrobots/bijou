@@ -1,0 +1,591 @@
+# RE-017 — Byte-Pipeline Recovery
+
+> **Status:** In progress (audit phase).
+> **Goal:** Recover the render pipeline to pre-RE-008 performance or
+> better by eliminating all per-frame allocation and string work on
+> the render path, moving to a pure byte-level output pipeline.
+> **Cycle ID note:** the `bad-code` backlog already has an
+> `RE-017-frame-does-not-fill-surface-background.md` file using the
+> same cycle number. These are separate concerns and we may need to
+> renumber one of them before landing this cycle.
+
+## Table of Contents
+
+1. [Background](#background)
+2. [Measurement Methodology](#measurement-methodology)
+3. [Baseline Audit (pre-RE017 HEAD)](#baseline-audit-pre-re017-head)
+4. [Optimization Steps](#optimization-steps)
+5. [Final Results](#final-results)
+6. [Learnings](#learnings)
+
+## Background
+
+After RE-008 merged (byte-packed surface representation, PR #62,
+merge commit `0df3e97`), an audit of the existing renderer benchmark
+suite revealed a broad performance regression across every scenario:
+
+| Scenario | Pre-RE-008 → Post-RE-008 |
+|---|---|
+| dogfood.render.medium | 1.60 → 2.32 ms/frame (-31%) |
+| dogfood.diff.medium | 1.86 → 2.71 ms/frame (-31%) |
+| dogfood.render.large | 0.53 → 1.09 ms/frame (-51%) |
+| dogfood.diff.large | 0.78 → 1.55 ms/frame (-50%) |
+| dogfood.docs.render.medium | 2.61 → 2.99 ms/frame (-12%) |
+| surface.paint.medium | 0.22 → 0.41 ms/frame (-45%) |
+| layout.normalize.medium | 0.16 → 0.34 ms/frame (-53%) |
+| styled.diff.medium | 0.42 → 0.70 ms/frame (-40%) |
+| frame.compose.medium | 0.95 → 1.21 ms/frame (-22%) |
+| runtime.noop.medium | neutral |
+
+The most dramatic finding: **`styled.diff.medium` transient heap
+allocation grew from 1.4 MiB to 62 MiB per scenario run (44×
+increase)**. This is the signature of the current `renderDiffPacked`
+path: `sgrCache` Map growth, `String.fromCharCode` key allocation
+per cell, `batchText += ...` string concatenation, and side-table
+grapheme string churn.
+
+The original RE-017 plan was scoped to fix the gradient stress
+worst-case (`examples/perf-gradient` mode 1, which had regressed
+from 49 → 25 FPS). The audit revealed that the regression is much
+broader: every non-noop scenario is slower, and the heap allocation
+on the styled diff path is catastrophic. The byte-pipeline rewrite
+is now targeting the full regression, not just the gradient case.
+
+An earlier claim of "-5.5% DOGFOOD" from the RE-008 handoff does not
+reconcile with these bench numbers. Its origin is unknown. It may
+have measured the live `npm run dogfood` experience rather than the
+headless bench, or it may have compared against a different
+reference. It is not being used as a success criterion for RE-017.
+
+## Measurement Methodology
+
+### Harness
+
+- **Entry point:** `scripts/renderer-bench.ts` (invoked via
+  `npm run bench:renderer` with `node --expose-gc --import tsx`).
+- **Library:** `scripts/renderer-bench-lib.ts` — scenario
+  definitions, stats computation, environment detection, comparison.
+- **Baseline storage:** `benchmarks/renderer-baseline.json`.
+- **Audit runs:** `benchmarks/re017-audit/run-NN.json` (expanded
+  10×10 stats runs used in this cycle).
+- **Machine fingerprint:** platform, arch, kernel release, Node
+  version, CPU model, CPU count, total memory, hostname. Comparisons
+  between runs on different fingerprints are treated as
+  informational, not as a regression gate.
+
+### Scenarios
+
+The `DEFAULT_RENDERER_BENCH_SCENARIOS` array in `renderer-bench-lib.ts`
+defines 10 scenarios across 7 `kind`s. Each scenario has fixed
+`columns`, `rows`, `frames`, and `warmupFrames`. Warmup frames run
+before timing starts so JIT optimization has stabilized.
+
+| Scenario | Kind | Size | Frames | What it measures |
+|---|---|---|---|---|
+| `dogfood.render.medium` | `render` | 220×58 | 240 | DOGFOOD landing: `app.view(model)` + `normalizeViewOutput` per frame. No diff. |
+| `dogfood.diff.medium` | `diff` | 220×58 | 180 | Same as above + `renderDiff(current, target, sink, style)` to a counting sink. |
+| `dogfood.render.large` | `render` | 271×71 | 180 | Larger terminal, render only. |
+| `dogfood.diff.large` | `diff` | 271×71 | 120 | Larger terminal, render + diff. |
+| `dogfood.docs.render.medium` | `render` | 220×58 | 180 | DOGFOOD docs explorer page (sidebar + doc body). |
+| `surface.paint.medium` | `surface` | 220×58 | 240 | Pure surface paint: `target.clear(); target.fill(...); target.blit(source, ...)` three times per frame + one `setRow`. No app/layout/diff. |
+| `layout.normalize.medium` | `normalize` | 220×58 | 240 | `normalizeViewOutputInto(syntheticLayout, size, scratch)` per frame — the layout normalization stage in isolation. |
+| `styled.diff.medium` | `styled-diff` | 220×58 | 180 | Synthetic styled diff: two surfaces built by `buildStyledDiffPair` (every 3rd/5th/7th cell styled with rotating palette + occasional modifiers), `renderDiff` called in a tight loop. Exercises the packed differ's SGR cache + string concat. |
+| `frame.compose.medium` | `frame` | 220×58 | 180 | `renderFrameNode(layoutTree, bodyRect, renderCtx)` — the frame shell composition stage (grid/split/pane tree). |
+| `runtime.noop.medium` | `runtime` | 220×58 | 180 | Full runtime loop (`run(app, { ctx })`) with a trivial view function — measures the cost of the event loop, pulse ticks, and pipeline overhead without real rendering work. |
+
+### Metrics (current)
+
+Per sample, as defined in `RendererBenchSample` at
+`scripts/renderer-bench-lib.ts:28`:
+
+| Field | Meaning | How it's measured |
+|---|---|---|
+| `elapsedMs` | Total wall time for `frames` iterations (excluding warmup) | `performance.now()` deltas |
+| `avgFrameMs` | `elapsedMs / frames` | Derived |
+| `approxFps` | `1000 / avgFrameMs` | Derived |
+| `writes` | Count of `io.write()` calls observed by the sink (diff scenarios only) | Sink counter |
+| `bytesWritten` | Sum of `.length` of all strings passed to `write()` | Sink counter |
+| `transientHeapDelta` | `heapUsed` after run minus before, **without** forced GC before taking the "after" reading. Measures peak allocation during the run. | `process.memoryUsage()` (requires `--expose-gc`) |
+| `retainedHeapDelta` | `heapUsed` after run minus before, **with** forced GC before both readings. Measures long-lived allocations. | `process.memoryUsage()` after `global.gc()` (requires `--expose-gc`) |
+
+Per scenario (aggregated across samples), only **median** is
+currently computed. This is a known gap — see
+[RE-017 task I-2](../design/) for the expansion to mean / stddev /
+min / max / p50 / p90 / p99.
+
+### Current limitations
+
+1. **No percentile statistics.** Only median across samples. A
+   bimodal distribution (e.g. one slow sample every 10) would be
+   invisible.
+2. **No per-stage breakdown.** The `render` kind covers layout +
+   paint as a unit; the `diff` kind adds the diff stage on top. We
+   can see "total" cost but not "how much in layout vs paint vs
+   diff".
+3. **No conversion-hot-path counters.** The bench cannot answer
+   "how many `parseHex` calls per frame?" or "how many
+   `String.fromCharCode` key builds per frame?" — both suspected
+   sources of the RE-008 slowdown.
+4. **No GC pause time.** Only heap deltas. We can see how much
+   allocation happened, but not whether it triggered a costly GC.
+5. **First-run variance.** JIT warmup may be incomplete even after
+   the scenario's `warmupFrames` — the 10-run expanded audit is
+   partly to characterize this.
+6. **`styled.diff.medium` uses the legacy `surface.set({char,fg,bg})`
+   API, not `setRGB`.** The underlying surface is a `PackedSurface`
+   either way, but the paint code path going into the diff is the
+   hex-string-parsing path, not the byte-passing fast path. A
+   `setRGB` variant should be added.
+7. **No gradient / truecolor stress scenario.** The
+   `examples/perf-gradient` worst case (every cell a unique RGB pair,
+   9168+ unique styles per frame) is not represented in the headless
+   bench. It is the scenario that originally surfaced the `sgrCache`
+   worst-case regression (49 → 25 FPS).
+
+## Baseline Audit (pre-RE017 HEAD)
+
+### Run parameters
+
+- **HEAD commit:** `941f62c` (RE-008 merge + follow-up fixes)
+- **Machine:** Apple M1 Pro, 10 cores, 16 GiB, macOS 25.3, Node v25.8.1
+- **Samples per scenario per process:** 10
+- **Independent processes:** 10
+- **Total samples per scenario:** 100
+- **Run files:** `benchmarks/re017-audit/run-01.json` through `run-10.json`
+
+### Aggregate statistics
+
+<!-- TO BE FILLED BY I-0b aggregation step -->
+
+### Comparison vs pre-RE-008 baseline (`87747f7`)
+
+<!-- TO BE FILLED BY I-0b aggregation step -->
+
+### Observations
+
+<!-- TO BE FILLED BY I-0b aggregation step -->
+
+## Optimization Steps
+
+Each step is implemented in isolation, measured before and after
+against the full scenario matrix, and kept only if it shows a
+meaningful improvement on at least one scenario with no regressions
+elsewhere.
+
+### Step 0: Investigation (I-0e)
+
+<!-- Findings from the RE-008 slowdown investigation: what specific
+     change(s) caused the broad regression, and which are fixable
+     independently of the byte-pipeline rewrite. -->
+
+### Step II-1: Render-dirty bitmap
+
+### Step II-2: WritePort.writeBytes
+
+### Step II-3: Pooled output byte buffer
+
+### Step II-4: Differ emits bytes directly
+
+### Step II-5: ASCII fast path
+
+### Step II-6: Pre-encoded side-table bytes
+
+### Step II-7: Decimal lookup tables
+
+## Final Results
+
+<!-- Filled after III-5 final regression bench -->
+
+## Learnings
+
+This section and everything below it is an append-only running log.
+**Do not rewrite earlier entries.** Each entry is dated (and may be
+turn-marked). To correct or supersede a prior entry, add a new entry
+that references the old one. The sections above this point form the
+initial scaffold; findings that would have filled their placeholders
+are recorded as new log entries below instead, cross-referenced by
+section name.
+
+### 2026-04-09 — Doc scaffolded, append-only policy adopted
+
+Initial scaffold written with placeholders for Baseline Audit,
+Optimization Steps, and Final Results. Before any of those
+placeholders were filled, adopted an append-only policy: all future
+content — including audit findings, optimization results, and
+investigation notes — is appended to this log rather than edited
+into the scaffold sections. The scaffold stays as a table of
+contents; the truth lives in the log.
+
+### 2026-04-09 — Audit kickoff, 10×10 bench run launched
+
+Completed task I-0 (bench infrastructure audit). Key findings:
+
+1. The existing baseline at `benchmarks/renderer-baseline.json` was
+   captured at commit `87747f7` — **before** the RE-008 merge
+   (`0df3e97`). It represents the old cell-object path, not the
+   byte-packed path we're optimizing. It is effectively a historical
+   reference, not the RE-017 starting point.
+2. A single run of the existing bench at HEAD (`941f62c`) against
+   the stale baseline showed 12-53% regressions across every
+   non-noop scenario, and a 44× transient heap allocation jump
+   (1.4 MiB → 62 MiB) in `styled.diff.medium`. These numbers are
+   from one run and have not yet been confirmed for stability.
+3. To confirm stability, launched a 10-process × 10-samples-each
+   expanded stats run (100 samples per scenario total), saving each
+   process output to `benchmarks/re017-audit/run-NN.json`. Task
+   I-0b tracks this.
+4. Created new audit tasks: I-0c (methodology docs), I-0d (pipeline
+   instrumentation), I-0e (investigate broad slowdown).
+5. Hypothesis to test in I-0e: per-cell hex string parsing in the
+   `set()` path is the bulk of the regression. Trace:
+   `packages/bijou/src/ports/surface.ts:532` → `encodeCellIntoBuf`
+   (line 300) → `inlineHexRGB` (line 288) + `encodeChar` +
+   `encodeModifiers`. Pre-RE-008, `set()` was an object assignment.
+   Post-RE-008, every `set()` call does 6 `charCodeAt`s, 6 `hexD`
+   lookups, modifier array iteration, and two byte writes per
+   color. For a paint-heavy scenario that calls `set()` per cell,
+   this adds ~20-30 operations per cell on a path that used to be
+   a single object assignment. No compensating savings on
+   `surface.paint.medium` because it never enters the diff path
+   where the byte-packed representation pays off.
+
+If the hypothesis holds, a cheap early win is possible: cache
+theme-token hex parses so repeated calls to `set({fg: theme.primary, ...})`
+reuse pre-parsed bytes instead of re-parsing on every call. This
+would be independent of the byte-pipeline rewrite.
+
+### 2026-04-09 — Expanded 10×10 stats results (100 samples per scenario)
+
+The 10-process × 10-samples-each run completed in ~5 minutes. All
+10 JSON reports saved under `benchmarks/re017-audit/run-NN.json`.
+Aggregator at `scripts/aggregate-audit-runs.ts`. Raw aggregate table
+at `benchmarks/re017-audit/aggregate.md`.
+
+**Run parameters**
+
+- HEAD commit `941f62c`, M1 Pro / macOS 25.3 / Node v25.8.1
+- 10 independent processes, 10 samples per scenario per process
+- 100 samples per scenario total
+- Baseline comparison against `87747f7` (pre-RE-008)
+
+**Frame time (ms) — full stats across 100 samples**
+
+| Scenario | Mean | StdDev | Min | P50 | P90 | P99 | Max | CoV |
+|---|---|---|---|---|---|---|---|---|
+| dogfood.render.medium | 2.40 | 0.608 | 2.29 | 2.33 | 2.35 | 3.79 | 8.25 | 25.3% |
+| dogfood.diff.medium | 2.71 | 0.043 | 2.67 | 2.71 | 2.75 | 2.79 | 3.06 | 1.6% |
+| dogfood.render.large | 1.10 | 0.016 | 1.07 | 1.10 | 1.11 | 1.15 | 1.20 | 1.5% |
+| dogfood.diff.large | 1.55 | 0.021 | 1.52 | 1.55 | 1.58 | 1.62 | 1.63 | 1.3% |
+| dogfood.docs.render.medium | 3.07 | 0.133 | 2.89 | 3.07 | 3.18 | 3.70 | 3.89 | 4.3% |
+| surface.paint.medium | 0.407 | 0.010 | 0.395 | 0.406 | 0.411 | 0.426 | 0.501 | 2.6% |
+| layout.normalize.medium | 0.345 | 0.0074 | 0.335 | 0.343 | 0.348 | 0.382 | 0.398 | 2.2% |
+| styled.diff.medium | 0.730 | 0.116 | 0.694 | 0.708 | 0.808 | 0.841 | 1.83 | 15.8% |
+| frame.compose.medium | 1.24 | 0.039 | 1.19 | 1.24 | 1.28 | 1.33 | 1.49 | 3.2% |
+| runtime.noop.medium | 0.0015 | 0.0003 | 0.0012 | 0.0014 | 0.0020 | 0.0022 | 0.0023 | 20.0% |
+
+**Transient heap per scenario run (mean across 100 samples)**
+
+| Scenario | Mean | StdDev | Min | P50 | P90 | Max |
+|---|---|---|---|---|---|---|
+| dogfood.render.medium | 33.88 MiB | 16.11 MiB | 1.22 MiB | 45.38 MiB | 45.59 MiB | 45.67 MiB |
+| dogfood.diff.medium | 49.14 MiB | 17.81 MiB | 14.22 MiB | 61.73 MiB | 61.88 MiB | 62.14 MiB |
+| dogfood.render.large | 25.17 MiB | 4.08 MiB | 10.34 MiB | 26.25 MiB | 26.35 MiB | 26.43 MiB |
+| dogfood.diff.large | 28.86 MiB | 3.46 MiB | 13.82 MiB | 29.66 MiB | 29.73 MiB | 29.79 MiB |
+| dogfood.docs.render.medium | 53.26 MiB | 26.83 MiB | 10.73 MiB | 58.11 MiB | 92.65 MiB | 98.49 MiB |
+| surface.paint.medium | 0.10 MiB | 0.01 MiB | 0.08 MiB | 0.09 MiB | 0.10 MiB | 0.16 MiB |
+| layout.normalize.medium | 0.46 MiB | 0.00 MiB | 0.45 MiB | 0.45 MiB | 0.46 MiB | 0.46 MiB |
+| styled.diff.medium | 51.79 MiB | 14.13 MiB | 30.29 MiB | 60.99 MiB | 61.00 MiB | 61.03 MiB |
+| frame.compose.medium | 61.10 MiB | 18.63 MiB | 20.01 MiB | 52.02 MiB | 92.14 MiB | 107.03 MiB |
+| runtime.noop.medium | 0.74 MiB | 0.08 MiB | 0.48 MiB | 0.73 MiB | 0.74 MiB | 1.19 MiB |
+
+**Regression vs pre-RE-008 baseline (median comparison — most fair)**
+
+| Scenario | Baseline median | Post-RE-008 P50 | Δ % |
+|---|---|---|---|
+| dogfood.render.medium | 1.60 ms | 2.33 ms | **+45.6%** |
+| dogfood.diff.medium | 1.86 ms | 2.71 ms | **+45.7%** |
+| dogfood.render.large | 0.534 ms | 1.10 ms | **+106%** |
+| dogfood.diff.large | 0.781 ms | 1.55 ms | **+98%** |
+| dogfood.docs.render.medium | 2.61 ms | 3.07 ms | +17.5% |
+| surface.paint.medium | 0.224 ms | 0.406 ms | **+81%** |
+| layout.normalize.medium | 0.161 ms | 0.343 ms | **+113%** |
+| styled.diff.medium | 0.421 ms | 0.708 ms | **+68%** |
+| frame.compose.medium | 0.951 ms | 1.24 ms | +30% |
+| runtime.noop.medium | 0.0019 ms | 0.0014 ms | -17% (noise; control) |
+
+**Heap regression vs baseline**
+
+| Scenario | Baseline median | Post-RE-008 P50 | Multiple |
+|---|---|---|---|
+| styled.diff.medium | 1.34 MiB | 60.99 MiB | **~46×** |
+| dogfood.render.large | 10.29 MiB | 26.25 MiB | 2.6× |
+| surface.paint.medium | 64 KiB | 94 KiB | 1.5× |
+| all others | - | - | ~1× (noisy, no clear trend) |
+
+**Key observations**
+
+1. **The regression is reproducible and large.** Run-to-run variance
+   is tight (CoV < 5% for most scenarios). The 10 independent
+   processes agree with each other. These are trustworthy numbers.
+
+2. **The regression is bigger than the single-run showed.** Median
+   comparison now gives 30%-113% regression, not 12-53%. Some
+   scenarios literally doubled in frame time (layout.normalize.medium
+   +113%, dogfood.render.large +106%, dogfood.diff.large +98%).
+
+3. **Smaller scenarios regressed harder.** Scenarios with smaller
+   baselines (layout.normalize 0.16ms, surface.paint 0.22ms,
+   dogfood.render.large 0.53ms) regressed the most in percentage
+   terms. This is consistent with per-cell overhead dominating when
+   there's less fixed work to amortize against.
+
+4. **`styled.diff.medium` heap allocation is catastrophic and
+   confirmed at ~46× baseline.** Mean 51.79 MiB, P50 60.99 MiB, very
+   stable (min 30 MiB, max 61 MiB). The differ's `sgrCache` +
+   string concat + side table churn is the culprit — exactly what
+   RE-017 is rewriting.
+
+5. **Two scenarios are bimodal** (dogfood.render.medium CoV 25%,
+   styled.diff.medium CoV 16%). Long right tails with max values
+   3-3.5× the P50. This is the GC pause signature: most samples are
+   fast, occasional samples catch a generational GC triggered by
+   the high allocation rate. Visible GC jank.
+
+6. **`runtime.noop.medium` is unaffected.** The control scenario
+   (full runtime loop with trivial view, no real rendering) matches
+   baseline. This confirms the regression is specifically in the
+   render/paint/diff/layout path, not in runtime/event loop
+   overhead.
+
+7. **The bimodal tail on `dogfood.render.medium` is the concerning
+   one for end users** — occasional 8ms frames on a 2ms mean means
+   stutters during interaction, even though averages look OK.
+
+**Hypothesis status**
+
+The per-cell hex parsing hypothesis is consistent with every
+pattern observed:
+- Scenarios that set every cell (layout.normalize, surface.paint,
+  dogfood.render) regress hardest.
+- Smaller scenarios regress harder (per-cell overhead dominates).
+- Heap allocation on styled-diff is the sgrCache + string concat
+  side of the same story (diff path, not paint path).
+- The control scenario is unaffected.
+
+But it's still a hypothesis. Confirming requires instrumentation
+(task I-0d) to count parseHex / encodeChar / encodeModifiers calls
+per frame and measure time spent in each.
+
+**Open questions**
+
+- Why does `layout.normalize.medium` regress so hard (+113%) when
+  it uses pre-built pattern surfaces? The setup cost of building
+  those surfaces is outside the timed region, so hex parsing during
+  setup shouldn't show. Does the blit operation in the packed path
+  do extra work? Needs investigation. Possible explanation: blit
+  copying from a legacy cell-array surface to a packed surface (or
+  vice versa) forces per-cell re-encoding.
+- Why does `frame.compose.medium` regress only 30% when it's
+  structurally similar to the dogfood.render paths? Is the frame
+  shell short-circuiting some rendering?
+- Why does `dogfood.docs.render.medium` (+17%) regress much less
+  than `dogfood.render.medium` (+45%) despite both using the docs
+  app? What's different about the keyed explorer state?
+
+These questions go into task I-0e (investigate).
+
+**Next actions**
+
+1. Task I-0b: COMPLETE.
+2. Task I-0e (investigate RE-008 broad slowdown): unblocked, can
+   start now. Priority: identify the specific hot paths causing
+   the regression using bisection across the RE-008 commits if
+   needed.
+3. Task I-0d (instrument pipeline): can start in parallel with
+   I-0e; the instrumentation will accelerate the investigation.
+4. Task I-0c (document methodology): largely already done as part
+   of the scaffold + this log entry; needs a final pass to confirm
+   nothing is missing.
+
+**Deferred decisions**
+
+- Whether to refresh `benchmarks/renderer-baseline.json` to reflect
+  the post-RE-008 state as the new RE-017 starting point (task I-9).
+  Leaning yes, but keeping the `87747f7` baseline as a historical
+  reference for the ultimate "did we recover?" question at end of
+  cycle.
+- Whether the gradient stress scenario (task I-5) is still a
+  priority given the existing bench already exposes the regression.
+  Still yes — the gradient case is the worst-case stress and we
+  want it in the CI gate.
+
+### 2026-04-09 — Scrapped the existing bench, built bench v2 from scratch
+
+After the expanded 10×10 audit revealed that the `PerformanceObserver('gc')`-based
+heap measurement fix produced garbage data (zero GC events reported
+across 1,000 samples even for scenarios with negative heap deltas,
+which can only happen if GC fires), we made the call to throw out
+`scripts/renderer-bench*.ts` + `benchmarks/renderer-baseline.json`
+entirely and build a new bench from scratch around the principle
+"measure only what you can trust."
+
+**What was deleted:**
+
+- `scripts/renderer-bench.ts`
+- `scripts/renderer-bench-lib.ts`
+- `scripts/renderer-bench-compare.ts`
+- `scripts/renderer-bench.test.ts`
+- `scripts/aggregate-audit-runs.ts`
+- `benchmarks/` (the whole directory, including the 10 audit runs)
+- `npm run bench:renderer*` scripts from the root package.json
+
+**What was built:**
+
+- `bench/` — new top-level workspace package `@flyingrobots/bijou-bench`
+- Harness-agnostic `Scenario` interface in `bench/src/scenarios/types.ts`
+- 4 initial scenarios:
+  - `paint-ascii` — baseline "no colors, no hex parsing"
+  - `paint-theme-set` — rotating theme palette, exercises `inlineHexRGB`
+  - `paint-gradient-rgb` — per-cell unique RGB via `setRGB`
+  - `diff-gradient` — full-screen gradient diff (sgrCache stress)
+- `bench/src/harnesses/wall-time/` — process-isolated wall-time harness
+  - `child.ts` runs ONE sample of ONE scenario in a fresh V8 isolate and exits
+  - `runner.ts` spawns N children per scenario, aggregates stats
+  - `compare.ts` diffs two report JSONs with a regression gate
+- `bench/src/stats.ts` — percentile/mean/stddev/CoV helpers (linear-interpolated)
+- `bench/src/cli.ts` — `bench run | compare | list`
+- `bench/README.md` — design principles and usage
+- `bench/baselines/HEAD-941f62c-pre-RE017.json` — first trustworthy baseline
+
+**New npm scripts in root package.json:**
+
+- `npm run bench` → `node --import tsx bench/src/cli.ts run`
+- `npm run bench:compare`
+- `npm run bench:baseline`
+
+**Design principles documented in `bench/README.md`:**
+
+1. Process isolation per sample. Fresh V8 isolate every time. No
+   cross-sample GC state. No accumulated JIT state. The scenario's
+   own warmup loop stabilizes JIT within each child.
+2. Wall time only in the main bench. No heap deltas, no inline GC
+   observers, no anything that can be wrong. `process.hrtime.bigint()`
+   start + end, divide by frame count, done.
+3. Scenarios are pure: `setup()` + `frame()` + metadata. No
+   coupling to measurement. The same module can drive the wall-time
+   harness, a future memory harness, and a future interactive
+   sandbox — three harnesses sharing one scenario registry.
+4. Report stats, not means. mean / stddev / CoV / min / max / p50 /
+   p90 / p99. CoV < 5% is the "trust this" signal.
+
+**First trustworthy baseline at HEAD (`941f62c`, Apple M1 Pro, Node v25.8.1):**
+
+| Scenario | P50 | P90 | P99 | Min | Max | CoV |
+|---|---|---|---|---|---|---|
+| paint-ascii | 234.27 µs | 236.69 µs | 239.32 µs | 229.01 µs | 240.24 µs | **1.1%** |
+| paint-theme-set | 633.92 µs | 644.29 µs | 729.63 µs | 624.38 µs | 761.45 µs | **3.8%** |
+| paint-gradient-rgb | 946.29 µs | 951.75 µs | 954.92 µs | 878.78 µs | 955.14 µs | **2.6%** |
+| diff-gradient | 2.13 ms | 2.16 ms | 2.19 ms | 2.04 ms | 2.20 ms | **2.0%** |
+
+30 samples per scenario. **All CoVs under 4%.** These are
+trustworthy numbers for the first time in this cycle. The bench is
+reproducible and the new sample runs take ~45 seconds total, which
+makes iterative optimization measurement practical.
+
+**Per-cell cost breakdown (for context, rough):**
+
+- `paint-ascii`: 234 µs / 12,760 cells ≈ **18 ns/cell** (baseline)
+- `paint-theme-set`: 634 µs / 12,760 cells ≈ **50 ns/cell** (2.7×
+  ASCII cost — the delta is hex parsing + modifier encoding per
+  set() call)
+- `paint-gradient-rgb`: 946 µs / 12,760 cells ≈ **74 ns/cell**
+  (4.0× ASCII cost — BUT this scenario's cost is dominated by 6
+  `Math.cos` calls per cell for animation, not by `setRGB` itself.
+  Scenario design note below.)
+
+**Scenario design concern — `paint-gradient-rgb` is animation-bound:**
+
+The scenario spends most of its per-cell time on `Math.cos` × 6
+for the animation phase, not on `setRGB`. This means it does not
+cleanly isolate the `setRGB` path cost. To fix: add a variant that
+precomputes a large RGB table in `setup()` and indexes into it in
+`frame()` with cheap arithmetic. That would give us a pure
+"`setRGB` vs `set`" comparison. Captured as TODO — not blocking the
+RE-017 investigation since the scenario still exposes the sgrCache
+stress case in `diff-gradient`.
+
+**Backlog entries captured this session (from observations during
+the audit):**
+
+Bad-code:
+
+- `docs/method/backlog/bad-code/RE-018-hex-color-string-as-canonical-fg-bg.md`
+  — the hex-string-as-canonical-fg/bg smell. The broad RE-008
+  regression's likely root cause.
+- `docs/method/backlog/bad-code/RE-019-dirtyWords-serves-lazy-cache-not-render-dirty.md`
+  — the `dirtyWords` bitmap in `surface.ts` serves the lazy Cell[]
+  cache, not render tracking. Blocks the Task II-1 repurposing
+  until the lazy cache is retired.
+- `docs/method/backlog/bad-code/DAG-layer-skipping-edges-occluded.md`
+  — the DAG renderer occludes layer-skipping edges. Correctness
+  bug (git-warp consumer). Not blocking RE-017 but important.
+- `docs/method/backlog/bad-code/DX-008-performance-observer-gc-unreliable.md`
+  — `PerformanceObserver('gc')` didn't report events it should
+  have. Do not use it as a measurement filter in bijou benches
+  until someone reproduces it in isolation.
+
+Cool ideas:
+
+- `docs/method/backlog/cool-ideas/RE-019-theme-token-color-cache.md`
+  — pre-parse hex at theme load time; internal optimization only,
+  no API break. Cheap early win candidate.
+- `docs/method/backlog/cool-ideas/RE-020-typed-color-representation.md`
+  — `ColorRef` branded type. Follow-on to the theme cache, makes
+  the fast path first-class in the type system.
+- `docs/method/backlog/cool-ideas/DX-016-scenario-provenance-tags.md`
+  — tag scenarios for intelligent filtering. Enables targeted CI
+  gates and coverage analysis.
+- `docs/method/backlog/cool-ideas/DX-017-agent-first-bench-output-format.md`
+  — JSONL flat-record output format for agent consumption. An
+  agent-first observation from this session: I work faster when
+  tools emit grep/jq-friendly data.
+
+**Agent-first lessons from this audit**
+
+(This section is the agent advocating for what the agent needs.)
+
+1. **Measurement integrity is the first thing to validate, not the
+   last.** I spent real time building on top of a broken
+   measurement before questioning the tool. When numbers look
+   weird (negative heap deltas, zero GC events), that's a tool
+   problem until proven otherwise.
+2. **Claims I make about code behavior need to be backed by a
+   citation or a minimal repro.** I claimed the DAG renderer hid
+   edges via transitive reduction. It didn't. I claimed a 5.5%
+   DOGFOOD regression existed. It might not. Both cost trust.
+3. **Append-only discipline on running logs is a real requirement,
+   not an aesthetic preference.** I had to be told this. The
+   memory is saved.
+4. **The backlog lanes (`bad-code/`, `cool-ideas/`) are my tools
+   too, not just the user's.** I am a co-author of the project's
+   self-knowledge. When I notice smells or have ideas I should
+   log them immediately, not wait to be asked. This session
+   flipped that for me.
+
+**Next actions**
+
+1. Task I-0b (expanded stats run): COMPLETED with the new bench.
+2. Task I-0c (document methodology): COMPLETED as part of this log
+   entry + `bench/README.md`.
+3. Task I-0e (investigate RE-008 broad slowdown): unblocked. The
+   hypothesis to test is `RE-018` — per-cell hex parsing in
+   `surface.set()`. Direct way to measure: bisect across the
+   RE-008 commits with `bench run --scenario=paint-theme-set`.
+4. Task I-0d (instrument pipeline stages): still valuable but can
+   be deferred until after I-0e identifies the specific hot path.
+5. Adding more scenarios: `diff-static`, `diff-sparse`,
+   `paint-blit`, `layout-normalize`, and fixing
+   `paint-gradient-rgb` to separate animation cost from setRGB
+   cost. Can grow organically during Part II as we need coverage.
+6. Commit everything as one focused "RE-017 audit + bench v2"
+   commit.
