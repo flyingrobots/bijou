@@ -6,7 +6,7 @@
  */
 
 import { createSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
-import { parseHex } from '@flyingrobots/bijou/perf';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 /**
  * Parameters passed to the shader function.
@@ -91,7 +91,7 @@ function setCellFast(surface: Surface, packed: boolean, x: number, y: number, ce
       let bR = -1, bG = 0, bB = 0;
       const bg = cell.bg ? parseHex(cell.bg) : undefined;
       if (bg) { [bR, bG, bB] = bg; }
-      (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB);
+      (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;
     }
   }

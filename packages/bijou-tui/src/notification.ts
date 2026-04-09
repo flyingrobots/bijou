@@ -12,7 +12,7 @@ import {
   surfaceToString,
   wrapPreparedTextToWidth,
 } from '@flyingrobots/bijou';
-import { parseHex } from '@flyingrobots/bijou/perf';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import type { Overlay } from './overlay.js';
 import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
@@ -720,8 +720,9 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
       if (fgRgb) { [fR, fG, fB] = fgRgb; }
       const bgRgb = s.bg ? parseHex(s.bg) : undefined;
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
+      const fl = s.modifiers ? encodeModifiers(s.modifiers) : 0;
       for (const char of segment.graphemes) {
-        (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB);
+        (surface as PackedSurface).setRGB(x, 0, char, fR, fG, fB, bR, bG, bB, fl);
         x++;
       }
     } else {
@@ -972,7 +973,7 @@ function renderNotificationSurface<Msg>(
       let bR = -1, bG = 0, bB = 0;
       const bgRgb = backgroundStyle.bg ? parseHex(backgroundStyle.bg) : undefined;
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
-      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB);
+      (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
     } else {
       card.set(0, y, {
         char: '\u258e',

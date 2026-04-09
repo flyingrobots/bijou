@@ -10,7 +10,7 @@
 
 import type { BijouContext, Surface, PackedSurface, TokenValue, Cell } from '@flyingrobots/bijou';
 import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
-import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex } from '@flyingrobots/bijou/perf';
+import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import {
   createSurface,
   graphemeClusterWidth,
@@ -346,7 +346,7 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
     if (fgRgb) { [fR, fG, fB] = fgRgb; }
     const bgRgb = style.bg ? parseHex(style.bg) : undefined;
     if (bgRgb) { [bR, bG, bB] = bgRgb; }
-    ns = { fR, fG, fB, bR, bG, bB, fl: 0 };
+    ns = { fR, fG, fB, bR, bG, bB, fl: style.modifiers ? encodeModifiers(style.modifiers) : 0 };
   }
   let x = 0;
   for (const grapheme of graphemes) {

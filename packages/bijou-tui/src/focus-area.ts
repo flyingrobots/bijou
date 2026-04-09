@@ -22,7 +22,7 @@
 
 import type { BijouContext, Cell, Surface, PackedSurface, TokenValue } from '@flyingrobots/bijou';
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
-import { parseHex } from '@flyingrobots/bijou/perf';
+import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
   type ScrollState,
@@ -389,7 +389,7 @@ export function focusAreaSurfaceInto(
       const bgRgb = gutterCell.bg ? parseHex(gutterCell.bg) : undefined;
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
       for (let y = 0; y < state.height; y++) {
-        (target as PackedSurface).setRGB(offsetX, offsetY + y, gutterCell.char, fR, fG, fB, bR, bG, bB);
+        (target as PackedSurface).setRGB(offsetX, offsetY + y, gutterCell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(gutterCell.modifiers));
       }
     } else {
       for (let y = 0; y < state.height; y++) {

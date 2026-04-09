@@ -307,11 +307,12 @@ export function packedCellsEqualCross(
   return true;
 }
 
-/** Check if two packed cells have the same style (fg, bg, flags — ignoring char and empty). */
+/** Check if two packed cells have the same style (fg, bg, flags, alpha — ignoring char). */
 export function packedStyleEqual(buf: Uint8Array, idxA: number, idxB: number): boolean {
   const offA = idxA * CELL_STRIDE;
   const offB = idxB * CELL_STRIDE;
-  // Compare fg RGB, bg RGB, flags, and alpha (which includes fg/bg presence)
+  // Compare from OFF_FG_R through end: fg RGB, bg RGB, flags (including
+  // modifiers and the empty bit), and alpha (opacity + fg/bg presence).
   for (let i = OFF_FG_R; i < CELL_STRIDE; i++) {
     if (buf[offA + i] !== buf[offB + i]) return false;
   }

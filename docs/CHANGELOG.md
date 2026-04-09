@@ -20,6 +20,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **RE-016 modifier-dropping in setRGB fast paths** — `setRGB` calls in `canvas.ts`, `overlay.ts`, `focus-area.ts`, and `notification.ts` now pass `encodeModifiers(cell.modifiers)` instead of omitting the flags argument. Previously the Cell-based fallback preserved bold/dim/strikethrough/etc. but the packed fast path silently dropped them.
 - **RE-015 braille art corruption resolved** — `flexSurface` with `align: 'center'` no longer corrupts braille characters (U+2800–U+28FF). The packed byte-copy blit preserves all character codes directly without intermediate string processing. Verified with a 420×140 (58,800 cell) braille art test case — zero mismatches.
 
 ## [4.2.0] - 2026-04-08

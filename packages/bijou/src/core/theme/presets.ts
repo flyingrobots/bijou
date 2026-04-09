@@ -1,6 +1,12 @@
 import type { Theme, BaseStatusKey, TokenValue, TextModifier, RGB } from './tokens.js';
 
-/** Parse '#rrggbb' to [r, g, b] via charCode arithmetic. */
+/**
+ * Parse '#rrggbb' to [r, g, b] via charCode arithmetic.
+ *
+ * Validates hex digits: `d()` returns -1 for any non-hex character, and
+ * because -1 propagates through bitwise OR/shift, the final `< 0` guard
+ * catches invalid input even when only one nibble is bad.
+ */
 function hexToRGB(hex: string): RGB | undefined {
   if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
   const d = (c: number): number =>

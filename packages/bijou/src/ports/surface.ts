@@ -705,7 +705,9 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
       const s = createSurface(w, h);
       // Copy buffer wholesale — O(n) byte copy instead of per-cell encode
       s.buffer.set(buf);
-      // Copy side-table entries into the clone
+      // Copy side-table entries into the clone.
+      // includes() is O(n) per entry, but side tables are typically small
+      // (only entries for multi-codepoint grapheme clusters above SIDE_TABLE_THRESHOLD).
       for (const entry of sideTable) {
         if (!(s.sideTable as string[]).includes(entry)) {
           (s.sideTable as string[]).push(entry);
