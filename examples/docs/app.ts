@@ -1219,9 +1219,8 @@ function paintLandingBackground(
       const maxX = Math.min(width, tileX + tile);
 
       for (let y = tileY; y < maxY; y++) {
-        const rowOffset = y * width;
         for (let x = tileX; x < maxX; x++) {
-          applyOpaqueCell(cells[rowOffset + x]!, char, fg, modifiers);
+          surface.set(x, y, { char, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
         }
       }
     }
@@ -1285,11 +1284,10 @@ function paintLogoInto(
       for (let y = tileY; y < maxY; y++) {
         const targetY = destY + y;
         if (targetY < 0 || targetY >= target.height) continue;
-        const rowOffset = targetY * target.width;
         for (let x = tileX; x < maxX; x++) {
           const targetX = destX + x;
           if (targetX < 0 || targetX >= target.width) continue;
-          applyOpaqueCell(cells[rowOffset + targetX]!, glyph, fg, modifiers);
+          target.set(targetX, targetY, { char: glyph, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
         }
       }
     }
