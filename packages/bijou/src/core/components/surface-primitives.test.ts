@@ -60,7 +60,7 @@ describe('surface-first primitives', () => {
     ));
 
     expect(rendered).toContain('READY');
-    expect(rendered).toContain('*');
+    expect(rendered).toContain('\u2713');
   });
 
   it('boxSurface paints the requested background token behind content cells', () => {

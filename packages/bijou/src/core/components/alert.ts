@@ -18,20 +18,18 @@ export interface AlertOptions extends BijouNodeOptions {
 }
 
 /**
- * Alert icon characters.
+ * Unicode icon characters for each alert variant.
  *
- * All icons are unambiguously single-column-width across terminals and
- * chat UIs. U+2713 (✓) and U+2717 (✗) fall in the Dingbats range
- * which isWideChar() classifies as 2-wide, causing box misalignment.
- * U+26A0 (⚠) and U+2139 (ℹ) are ambiguous-width and render as 2
- * columns in many non-terminal monospace contexts. ASCII alternatives
- * avoid all of these issues.
+ * ✓ (U+2713) and ✗ (U+2717) are Narrow per Unicode East Asian Width.
+ * ⚠ (U+26A0) and ℹ (U+2139) are Ambiguous — 1-wide in terminals,
+ * potentially 2-wide in some chat UIs. We treat them as 1-wide here
+ * since graphemeWidth correctly classifies them as Narrow.
  */
 const ICONS: Record<AlertVariant, string> = {
-  success: '*',       // ASCII — unambiguous 1-wide
-  error: 'x',        // ASCII — unambiguous 1-wide
-  warning: '!',       // ASCII — unambiguous 1-wide
-  info: 'i',          // ASCII — unambiguous 1-wide
+  success: '\u2713',  // ✓ CHECK MARK
+  error: '\u2717',    // ✗ BALLOT X
+  warning: '\u26A0',  // ⚠ WARNING SIGN
+  info: '\u2139',     // ℹ INFORMATION SOURCE
 };
 
 /** Uppercase labels used in pipe mode output. */

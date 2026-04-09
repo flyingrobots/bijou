@@ -87,8 +87,11 @@ export function isWideChar(cp: number): boolean {
   if (cp >= 0x1F600 && cp <= 0x1F64F) return true;
   // Transport and Map Symbols
   if (cp >= 0x1F680 && cp <= 0x1F6FF) return true;
-  // Dingbats (common emoji like ✂️ ✈️)
-  if (cp >= 0x2702 && cp <= 0x27B0) return true;
+  // Dingbats (U+2702–U+27B0) are NOT uniformly wide per Unicode
+  // East Asian Width. Most are Narrow text characters (✓ ✗ ✌).
+  // They only become wide with emoji presentation (U+FE0F), which
+  // is handled by graphemeClusterWidth checking for the variation
+  // selector in the grapheme cluster.
   // Regional indicators (flags)
   if (cp >= 0x1F1E0 && cp <= 0x1F1FF) return true;
   // Playing Cards, Mahjong Tiles
@@ -173,10 +176,16 @@ export function stripAnsi(str: string): string {
  */
 export function graphemeClusterWidth(grapheme: string): number {
   let maxWidth = 1;
+  let hasEmojiPresentation = false;
   for (const ch of grapheme) {
     const cp = ch.codePointAt(0)!;
-    // Skip zero-width joiners and variation selectors
-    if (cp === 0x200D || (cp >= 0xFE00 && cp <= 0xFE0F) || (cp >= 0xE0100 && cp <= 0xE01EF)) {
+    // Detect emoji presentation selector (U+FE0F) — forces base char to 2-wide
+    if (cp === 0xFE0F) {
+      hasEmojiPresentation = true;
+      continue;
+    }
+    // Skip zero-width joiners and other variation selectors
+    if (cp === 0x200D || (cp >= 0xFE00 && cp <= 0xFE0E) || (cp >= 0xE0100 && cp <= 0xE01EF)) {
       continue;
     }
     if (isWideChar(cp)) {
@@ -184,6 +193,9 @@ export function graphemeClusterWidth(grapheme: string): number {
       break;  // Can't be wider than 2
     }
   }
+  // Emoji presentation (U+FE0F) makes any base character 2-wide.
+  // This handles Dingbats (✂️ ✈️) and other text chars presented as emoji.
+  if (hasEmojiPresentation && maxWidth < 2) maxWidth = 2;
   return maxWidth;
 }
 

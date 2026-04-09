@@ -6,8 +6,7 @@ describe('alert', () => {
   it('renders box with icon in interactive mode', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = alert('Something happened', { variant: 'info', ctx });
-    // Info icon is ASCII 'i' (unambiguous 1-wide across terminals and chat)
-    expect(result).toContain('i');
+    expect(result).toContain('\u2139');
     expect(result).toContain('Something happened');
     expect(result).toContain('─');
   });
@@ -15,7 +14,7 @@ describe('alert', () => {
   it('renders success variant with check icon', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = alert('Done!', { variant: 'success', ctx });
-    expect(result).toContain('*');
+    expect(result).toContain('\u2713');
     expect(result).toContain('Done!');
   });
 
@@ -49,7 +48,7 @@ describe('alert', () => {
   it('renders in static mode same as interactive', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = alert('msg', { variant: 'error', ctx });
-    expect(result).toContain('x');
+    expect(result).toContain('\u2717');
     expect(result).toContain('msg');
   });
 

@@ -41,7 +41,10 @@ export interface SurfaceTextSegment {
   readonly style?: CellTextStyle;
 }
 
-const SURFACE_NARROW_OVERRIDES = new Set(['✓', '✗']);
+// Previously overrode ✓/✗ as narrow when the Dingbats range was
+// blanket-classified as wide. Now isWideChar correctly excludes
+// Dingbats (they're Narrow per Unicode East Asian Width).
+const SURFACE_NARROW_OVERRIDES = new Set<string>();
 
 export function segmentSurfaceText(text: string, purpose: string = 'Surface text'): string[] {
   const graphemes = segmentGraphemes(text ?? '');
