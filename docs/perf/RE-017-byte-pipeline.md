@@ -589,3 +589,136 @@ Cool ideas:
    cost. Can grow organically during Part II as we need coverage.
 6. Commit everything as one focused "RE-017 audit + bench v2"
    commit.
+
+### 2026-04-09 — Investigation result: RE-018 hex-parse hypothesis CONFIRMED
+
+Approach: source-diff the pre-RE-008 (`87747f7`) `surface.ts` against
+current HEAD, then add a minimal A/B/C bench scenario to quantify
+the cost of each path empirically.
+
+**Code review — pre vs post RE-008 `set()` path**
+
+Pre-RE-008 `surface.ts:277` (`git show 87747f7:packages/bijou/src/ports/surface.ts`):
+
+```ts
+set(x, y, cell, mask = FULL_MASK) {
+  if (x < 0 || x >= w || y < 0 || y >= h) return;
+  const idx = y * w + x;
+  applyMaskInPlace(cells[idx]!, cell, mask);
+},
+```
+
+Pre-RE-008 `applyMaskInPlace` (line 231): five property assignments.
+`target.fg = source.fg` was a string reference copy. No parsing.
+No encoding. Total per-call work: bounds check + array index + ~5
+property assignments. Cheap.
+
+Post-RE-008 `set()` (current `surface.ts:523-540`) routes through
+`encodeCellIntoBuf` (line 300), which does on every call:
+
+- `encodeChar(cell.char, sideTable)` — length check + `charCodeAt`
+  or sideTable lookup
+- `inlineHexRGB(cell.fg, buf, off+2)` — 6× `charCodeAt` + 6× `hexD`
+  (lookup table) + 3 byte writes
+- `inlineHexRGB(cell.bg, buf, off+5)` — same, 6 more charCodeAt
+- `encodeModifiers(cell.modifiers)` — array iteration + 2 record
+  lookups per modifier
+- 10 total byte writes into the packed buffer
+- `markDirty(idx)` — bit flip
+
+**Per-call cost blowup:** ~5 operations → ~40-60 operations. 8-12×
+more work per `set()` call, depending on whether fg/bg/modifiers
+are present.
+
+**A/B/C bench — three scenarios on the same painting**
+
+Added `paint-rgb-fixed` as the "no hex parse, no math" baseline.
+Same 12,760-cell paint, but via `setRGB(x, y, BLOCK, 0x9b, 0xa9,
+0xff, 0x11, 0x13, 0x20)` — pre-parsed bytes, no string work at all.
+
+30 samples each, CoV < 5%:
+
+| Scenario | P50 | ns/cell | Path |
+|---|---|---|---|
+| `paint-rgb-fixed` | 143 µs | **11.2 ns** | `setRGB` → `packCell` direct (bytes in, bytes out) |
+| `paint-ascii` | 231 µs | **18.1 ns** | `set({char})` → `encodeCellIntoBuf` (no colors, but all branches still evaluated) |
+| `paint-theme-set` | 625 µs | **49.0 ns** | `set({char, fg, bg})` → `encodeCellIntoBuf` → 2× `inlineHexRGB` |
+
+**The deltas tell the story:**
+
+- **`paint-theme-set` − `paint-rgb-fixed` = 482 µs per frame of
+  pure hex-parsing + modifier-encoding overhead.** That is
+  38 ns × 12,760 cells of work that is *entirely* spent
+  reparsing the same ~5 theme colors over and over. This is
+  **77% of `paint-theme-set`'s total frame time**.
+- **`paint-ascii` − `paint-rgb-fixed` = 88 µs / 7 ns/cell.**
+  This is the raw cost of `encodeCellIntoBuf`'s function
+  overhead + branch-check path even when there's no hex to
+  parse. Not huge, but real.
+- **`setRGB` is unambiguously the fast path.** It writes MORE
+  data per call (10 bytes vs ~2-3 bytes of char code) but is
+  ~1.6× faster than `set({char})` because it skips
+  `encodeCellIntoBuf` and hits `packCell` directly.
+
+**Conclusion**
+
+The RE-018 hypothesis is confirmed. The broad RE-008 regression
+(30-113% across every rendering scenario in the earlier audit)
+is driven by per-cell hex parsing in the legacy `surface.set`
+path, which is what ~every component currently uses. `setRGB`
+exists and works, but adoption is partial — most components still
+pass hex strings.
+
+**Two independent fixes are implied, and they compose:**
+
+1. **Cheap, no-API-break win:** the cool idea
+   `RE-019-theme-token-color-cache.md`. Pre-parse theme token
+   colors at theme load time into byte arrays. `surface.set`
+   (or a new internal variant) detects already-parsed byte values
+   and skips `inlineHexRGB`. Components that pull fg/bg from
+   theme tokens (which is the common case) get the fast path for
+   free. Expected impact: `paint-theme-set` drops from 625 µs
+   toward 143 µs — potentially a **4×** speedup on that scenario
+   and roughly proportional speedups on `dogfood.render.*`.
+2. **Deeper fix:** the cool idea `RE-020-typed-color-representation.md`.
+   A branded `ColorRef` type that lets the entire hot path work
+   in bytes. Hex strings stay supported at the user edge.
+   Components that build Cells directly can `resolveColor(hex)`
+   at setup time and reuse the result.
+
+The theme cache (RE-019 cool idea) is the right first landing
+because it's:
+
+- Zero API break — purely internal optimization.
+- Directly measurable — `paint-theme-set` delta is the success
+  criterion.
+- Compounds with the byte-pipeline differ work in Part II — if
+  we land both, the entire render pipeline runs in bytes end to
+  end.
+
+**Also worth noting for the byte-pipeline design**
+
+- **`setRGB` not being ~identical in cost to `set({char})` is a
+  design assertion we can make now.** `setRGB` is the fast path;
+  components should use it wherever they have the RGB values
+  already. Converting more components to `setRGB` would be an
+  early partial win even without any new caching.
+- **`paint-ascii` being 1.6× slower than `paint-rgb-fixed`
+  suggests there is room to optimize `encodeCellIntoBuf`'s
+  no-colors path.** Currently the branches are evaluated but
+  never taken. A fast-path version that detects "no fg, no bg,
+  no modifiers" at the top and jumps to a minimal char-only
+  writer would recover most of that 88 µs delta. Not blocking,
+  but an obvious cleanup for the same cycle.
+
+**Next actions**
+
+1. Task I-0e: COMPLETED. Hypothesis confirmed empirically.
+2. New task: prototype the theme token color cache (RE-019 cool
+   idea). Measure the `paint-theme-set` delta. If it matches
+   expectations (3-4× speedup), land it as a standalone
+   improvement before the Part II byte-pipeline work.
+3. Add `paint-rgb-fixed` as a permanent bench scenario (done in
+   this session, committed next).
+4. Consider adding `paint-blit` and `diff-static` scenarios for
+   broader coverage of the Part II optimization work.

@@ -11,12 +11,14 @@ import type { AnyScenario } from './types.js';
 import { paintGradientRgb } from './paint-gradient-rgb.js';
 import { paintThemeSet } from './paint-theme-set.js';
 import { paintAscii } from './paint-ascii.js';
+import { paintRgbFixed } from './paint-rgb-fixed.js';
 import { diffGradient } from './diff-gradient.js';
 
 export { type Scenario, type AnyScenario } from './types.js';
 
 export const SCENARIOS: readonly AnyScenario[] = [
   paintAscii,
+  paintRgbFixed,
   paintThemeSet,
   paintGradientRgb,
   diffGradient,
