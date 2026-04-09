@@ -336,6 +336,22 @@ const RESET_SGR = '\x1b[0m';
 // Key is a collision-free string built from the 8 style bytes.
 const sgrCache = new Map<string, string>();
 
+/**
+ * Semantic packed-cell equality across two buffers with independent side tables.
+ * Raw bytes are compared first; if they match and the char is a side-table
+ * index, the actual grapheme strings are verified.
+ */
+function packedCellsSemanticallyEqual(
+  aBuf: Uint8Array, aOff: number, aSide: readonly string[],
+  bBuf: Uint8Array, bOff: number, bSide: readonly string[],
+): boolean {
+  if (!packedBytesEqual(aBuf, aOff, bBuf, bOff)) return false;
+  const aChar = aBuf[aOff]! | (aBuf[aOff + 1]! << 8);
+  if (aChar < SIDE_TABLE_THRESHOLD) return true;
+  const bChar = bBuf[bOff]! | (bBuf[bOff + 1]! << 8);
+  return aChar === bChar && decodeChar(aChar, aSide) === decodeChar(bChar, bSide);
+}
+
 /** Build a collision-free cache key from the 8 style bytes (fg RGB, bg RGB, flags, alpha). */
 function styleCacheKey(buf: Uint8Array, off: number): string {
   return String.fromCharCode(
@@ -395,6 +411,7 @@ function renderDiffPacked(
   const cWidth = current.width;
   const cHeight = current.height;
   const tSide = target.sideTable;
+  const cSide = current.sideTable;
 
   let output = '';
   let cursorX = -1;
@@ -409,19 +426,9 @@ function renderDiffPacked(
       const inBounds = y < cHeight && x < cWidth;
       const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
 
-      let same = inBounds
-        ? packedBytesEqual(tBuf, tOff, cBuf, cOff)
+      const same = inBounds
+        ? packedCellsSemanticallyEqual(tBuf, tOff, tSide, cBuf, cOff, cSide)
         : packedBytesEqual(tBuf, tOff, EMPTY_PACKED, 0);
-      // Side-table chars: bytes may match but represent different graphemes
-      // across independently-managed side tables.
-      if (same && inBounds) {
-        const tChar = tBuf[tOff]! | (tBuf[tOff + 1]! << 8);
-        if (tChar >= SIDE_TABLE_THRESHOLD) {
-          const cChar = cBuf[cOff]! | (cBuf[cOff + 1]! << 8);
-          same = tChar === cChar
-            && decodeChar(tChar, tSide) === decodeChar(cChar, current.sideTable);
-        }
-      }
 
       if (same) {
         x++;
@@ -443,11 +450,11 @@ function renderDiffPacked(
           break;
         }
 
-        // Cell changed check
+        // Cell changed check (side-table-aware to prevent infinite loops)
         const bInBounds = y < cHeight && batchX < cWidth;
         const bcOff = bInBounds ? (y * cWidth + batchX) * CELL_STRIDE : -1;
         const cellsMatch = bInBounds
-          ? packedBytesEqual(tBuf, bOff, cBuf, bcOff)
+          ? packedCellsSemanticallyEqual(tBuf, bOff, tSide, cBuf, bcOff, cSide)
           : packedBytesEqual(tBuf, bOff, EMPTY_PACKED, 0);
 
         if (cellsMatch) break;

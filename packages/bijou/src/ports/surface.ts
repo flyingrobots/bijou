@@ -522,9 +522,12 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
     set(x, y, cell, mask = FULL_MASK) {
       if (x < 0 || x >= w || y < 0 || y >= h) return;
+      // Brush/stamp transparency: empty cells are no-ops for set().
+      // This matches the original applyMaskInPlace behavior and is relied
+      // on by blit, overlay composition, and component rendering.
+      // To clear a cell, use fill({ char: ' ', empty: true }, x, y, 1, 1).
       if (cell.empty) return;
       const idx = y * w + x;
-      // Fast path: full mask (the common case) uses direct encode
       if (mask === FULL_MASK) {
         encodeCellIntoBuf(buf, idx, cell, sideTable);
       } else {
@@ -551,6 +554,8 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         flags,
         63, // full opacity
       );
+      // Sync cached opacity so ensureClean doesn't resurrect a stale value
+      cells[idx]!.opacity = 1;
       markDirty(idx);
     },
 
