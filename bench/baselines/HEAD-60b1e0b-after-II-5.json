@@ -1,0 +1,2101 @@
+{
+  "kind": "bench.v2",
+  "generatedAt": "2026-04-10T04:47:44.235Z",
+  "commit": "a4388a3",
+  "fingerprint": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.3.0",
+    "nodeVersion": "v25.8.1",
+    "cpuModel": "Apple M1 Pro",
+    "cpuCount": 10,
+    "totalMemoryBytes": 17179869184,
+    "hostname": "Jamess-MacBook-Pro-2.local"
+  },
+  "params": {
+    "samples": 30,
+    "warmupFrames": "scenario-default",
+    "measureFrames": "scenario-default"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "paint-ascii",
+      "label": "Paint: plain ASCII, no colors (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 200,
+      "samples": [
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 0,
+          "elapsedNs": 47372625,
+          "frames": 200,
+          "nsPerFrame": 236863.125
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 1,
+          "elapsedNs": 46820458,
+          "frames": 200,
+          "nsPerFrame": 234102.29
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 2,
+          "elapsedNs": 45619166,
+          "frames": 200,
+          "nsPerFrame": 228095.83
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 3,
+          "elapsedNs": 45592667,
+          "frames": 200,
+          "nsPerFrame": 227963.335
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 4,
+          "elapsedNs": 45376084,
+          "frames": 200,
+          "nsPerFrame": 226880.42
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 5,
+          "elapsedNs": 47104459,
+          "frames": 200,
+          "nsPerFrame": 235522.295
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 6,
+          "elapsedNs": 47140500,
+          "frames": 200,
+          "nsPerFrame": 235702.5
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 7,
+          "elapsedNs": 45515584,
+          "frames": 200,
+          "nsPerFrame": 227577.92
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 8,
+          "elapsedNs": 47281667,
+          "frames": 200,
+          "nsPerFrame": 236408.335
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 9,
+          "elapsedNs": 45948000,
+          "frames": 200,
+          "nsPerFrame": 229740
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 10,
+          "elapsedNs": 47302458,
+          "frames": 200,
+          "nsPerFrame": 236512.29
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 11,
+          "elapsedNs": 46349334,
+          "frames": 200,
+          "nsPerFrame": 231746.67
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 12,
+          "elapsedNs": 46663708,
+          "frames": 200,
+          "nsPerFrame": 233318.54
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 13,
+          "elapsedNs": 47096792,
+          "frames": 200,
+          "nsPerFrame": 235483.96
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 14,
+          "elapsedNs": 47579417,
+          "frames": 200,
+          "nsPerFrame": 237897.085
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 15,
+          "elapsedNs": 47063416,
+          "frames": 200,
+          "nsPerFrame": 235317.08
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 16,
+          "elapsedNs": 45228458,
+          "frames": 200,
+          "nsPerFrame": 226142.29
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 17,
+          "elapsedNs": 46601542,
+          "frames": 200,
+          "nsPerFrame": 233007.71
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 18,
+          "elapsedNs": 47237459,
+          "frames": 200,
+          "nsPerFrame": 236187.295
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 19,
+          "elapsedNs": 46620542,
+          "frames": 200,
+          "nsPerFrame": 233102.71
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 20,
+          "elapsedNs": 45277834,
+          "frames": 200,
+          "nsPerFrame": 226389.17
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 21,
+          "elapsedNs": 46921334,
+          "frames": 200,
+          "nsPerFrame": 234606.67
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 22,
+          "elapsedNs": 48060750,
+          "frames": 200,
+          "nsPerFrame": 240303.75
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 23,
+          "elapsedNs": 45698333,
+          "frames": 200,
+          "nsPerFrame": 228491.665
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 24,
+          "elapsedNs": 45479000,
+          "frames": 200,
+          "nsPerFrame": 227395
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 25,
+          "elapsedNs": 47298417,
+          "frames": 200,
+          "nsPerFrame": 236492.085
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 26,
+          "elapsedNs": 47236875,
+          "frames": 200,
+          "nsPerFrame": 236184.375
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 27,
+          "elapsedNs": 47225000,
+          "frames": 200,
+          "nsPerFrame": 236125
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 28,
+          "elapsedNs": 46223000,
+          "frames": 200,
+          "nsPerFrame": 231115
+        },
+        {
+          "scenarioId": "paint-ascii",
+          "sampleIndex": 29,
+          "elapsedNs": 47186125,
+          "frames": 200,
+          "nsPerFrame": 235930.625
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 233020.16733333332,
+        "stddev": 4028.53027355291,
+        "cov": 0.017288333107194676,
+        "min": 226142.29,
+        "max": 240303.75,
+        "p50": 234354.48,
+        "p90": 236547.37350000002,
+        "p99": 239605.81715000002
+      }
+    },
+    {
+      "scenarioId": "paint-rgb-fixed",
+      "label": "Paint: fixed RGB via setRGB, no math (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 200,
+      "samples": [
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 0,
+          "elapsedNs": 28936875,
+          "frames": 200,
+          "nsPerFrame": 144684.375
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 1,
+          "elapsedNs": 26217208,
+          "frames": 200,
+          "nsPerFrame": 131086.04
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 2,
+          "elapsedNs": 28923625,
+          "frames": 200,
+          "nsPerFrame": 144618.125
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 3,
+          "elapsedNs": 26426458,
+          "frames": 200,
+          "nsPerFrame": 132132.29
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 4,
+          "elapsedNs": 29123292,
+          "frames": 200,
+          "nsPerFrame": 145616.46
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 5,
+          "elapsedNs": 29054291,
+          "frames": 200,
+          "nsPerFrame": 145271.455
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 6,
+          "elapsedNs": 26013792,
+          "frames": 200,
+          "nsPerFrame": 130068.96
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 7,
+          "elapsedNs": 29078292,
+          "frames": 200,
+          "nsPerFrame": 145391.46
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 8,
+          "elapsedNs": 28989875,
+          "frames": 200,
+          "nsPerFrame": 144949.375
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 9,
+          "elapsedNs": 26331167,
+          "frames": 200,
+          "nsPerFrame": 131655.835
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 10,
+          "elapsedNs": 28991500,
+          "frames": 200,
+          "nsPerFrame": 144957.5
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 11,
+          "elapsedNs": 26051834,
+          "frames": 200,
+          "nsPerFrame": 130259.17
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 12,
+          "elapsedNs": 26454375,
+          "frames": 200,
+          "nsPerFrame": 132271.875
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 13,
+          "elapsedNs": 29351084,
+          "frames": 200,
+          "nsPerFrame": 146755.42
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 14,
+          "elapsedNs": 28818416,
+          "frames": 200,
+          "nsPerFrame": 144092.08
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 15,
+          "elapsedNs": 29055875,
+          "frames": 200,
+          "nsPerFrame": 145279.375
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 16,
+          "elapsedNs": 26144875,
+          "frames": 200,
+          "nsPerFrame": 130724.375
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 17,
+          "elapsedNs": 29093834,
+          "frames": 200,
+          "nsPerFrame": 145469.17
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 18,
+          "elapsedNs": 26231125,
+          "frames": 200,
+          "nsPerFrame": 131155.625
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 19,
+          "elapsedNs": 28916417,
+          "frames": 200,
+          "nsPerFrame": 144582.085
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 20,
+          "elapsedNs": 29074625,
+          "frames": 200,
+          "nsPerFrame": 145373.125
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 21,
+          "elapsedNs": 29042167,
+          "frames": 200,
+          "nsPerFrame": 145210.835
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 22,
+          "elapsedNs": 28986250,
+          "frames": 200,
+          "nsPerFrame": 144931.25
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 23,
+          "elapsedNs": 28974000,
+          "frames": 200,
+          "nsPerFrame": 144870
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 24,
+          "elapsedNs": 28877416,
+          "frames": 200,
+          "nsPerFrame": 144387.08
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 25,
+          "elapsedNs": 26245042,
+          "frames": 200,
+          "nsPerFrame": 131225.21
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 26,
+          "elapsedNs": 29193917,
+          "frames": 200,
+          "nsPerFrame": 145969.585
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 27,
+          "elapsedNs": 29194500,
+          "frames": 200,
+          "nsPerFrame": 145972.5
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 28,
+          "elapsedNs": 26267708,
+          "frames": 200,
+          "nsPerFrame": 131338.54
+        },
+        {
+          "scenarioId": "paint-rgb-fixed",
+          "sampleIndex": 29,
+          "elapsedNs": 26322083,
+          "frames": 200,
+          "nsPerFrame": 131610.415
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 140063.653,
+        "stddev": 6866.395578659933,
+        "cov": 0.04902339351851642,
+        "min": 130068.96,
+        "max": 146755.42,
+        "p50": 144651.25,
+        "p90": 145651.7725,
+        "p99": 146528.37320000003
+      }
+    },
+    {
+      "scenarioId": "paint-theme-set",
+      "label": "Paint: rotating theme palette via surface.set (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 200,
+      "samples": [
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 0,
+          "elapsedNs": 125405292,
+          "frames": 200,
+          "nsPerFrame": 627026.46
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 1,
+          "elapsedNs": 127113334,
+          "frames": 200,
+          "nsPerFrame": 635566.67
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 2,
+          "elapsedNs": 125556000,
+          "frames": 200,
+          "nsPerFrame": 627780
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 3,
+          "elapsedNs": 122121042,
+          "frames": 200,
+          "nsPerFrame": 610605.21
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 4,
+          "elapsedNs": 127786917,
+          "frames": 200,
+          "nsPerFrame": 638934.585
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 5,
+          "elapsedNs": 125178083,
+          "frames": 200,
+          "nsPerFrame": 625890.415
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 6,
+          "elapsedNs": 125429708,
+          "frames": 200,
+          "nsPerFrame": 627148.54
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 7,
+          "elapsedNs": 127066041,
+          "frames": 200,
+          "nsPerFrame": 635330.205
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 8,
+          "elapsedNs": 149861125,
+          "frames": 200,
+          "nsPerFrame": 749305.625
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 9,
+          "elapsedNs": 126449083,
+          "frames": 200,
+          "nsPerFrame": 632245.415
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 10,
+          "elapsedNs": 122291333,
+          "frames": 200,
+          "nsPerFrame": 611456.665
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 11,
+          "elapsedNs": 126041750,
+          "frames": 200,
+          "nsPerFrame": 630208.75
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 12,
+          "elapsedNs": 125418166,
+          "frames": 200,
+          "nsPerFrame": 627090.83
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 13,
+          "elapsedNs": 127534667,
+          "frames": 200,
+          "nsPerFrame": 637673.335
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 14,
+          "elapsedNs": 125728708,
+          "frames": 200,
+          "nsPerFrame": 628643.54
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 15,
+          "elapsedNs": 126815917,
+          "frames": 200,
+          "nsPerFrame": 634079.585
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 16,
+          "elapsedNs": 122706292,
+          "frames": 200,
+          "nsPerFrame": 613531.46
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 17,
+          "elapsedNs": 122601833,
+          "frames": 200,
+          "nsPerFrame": 613009.165
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 18,
+          "elapsedNs": 125138416,
+          "frames": 200,
+          "nsPerFrame": 625692.08
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 19,
+          "elapsedNs": 123682250,
+          "frames": 200,
+          "nsPerFrame": 618411.25
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 20,
+          "elapsedNs": 126601041,
+          "frames": 200,
+          "nsPerFrame": 633005.205
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 21,
+          "elapsedNs": 126109208,
+          "frames": 200,
+          "nsPerFrame": 630546.04
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 22,
+          "elapsedNs": 126120375,
+          "frames": 200,
+          "nsPerFrame": 630601.875
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 23,
+          "elapsedNs": 125692334,
+          "frames": 200,
+          "nsPerFrame": 628461.67
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 24,
+          "elapsedNs": 125670333,
+          "frames": 200,
+          "nsPerFrame": 628351.665
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 25,
+          "elapsedNs": 125681000,
+          "frames": 200,
+          "nsPerFrame": 628405
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 26,
+          "elapsedNs": 125461375,
+          "frames": 200,
+          "nsPerFrame": 627306.875
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 27,
+          "elapsedNs": 127105375,
+          "frames": 200,
+          "nsPerFrame": 635526.875
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 28,
+          "elapsedNs": 130043917,
+          "frames": 200,
+          "nsPerFrame": 650219.585
+        },
+        {
+          "scenarioId": "paint-theme-set",
+          "sampleIndex": 29,
+          "elapsedNs": 127100875,
+          "frames": 200,
+          "nsPerFrame": 635504.375
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 632585.2983333335,
+        "stddev": 23656.497560987573,
+        "cov": 0.03739653391141894,
+        "min": 610605.21,
+        "max": 749305.625,
+        "p50": 628552.605,
+        "p90": 637799.46,
+        "p99": 720570.6734
+      }
+    },
+    {
+      "scenarioId": "paint-theme-set-fast",
+      "label": "Paint: rotating theme palette via surface.set + fgRGB/bgRGB (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 200,
+      "samples": [
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 0,
+          "elapsedNs": 64328042,
+          "frames": 200,
+          "nsPerFrame": 321640.21
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 1,
+          "elapsedNs": 65950334,
+          "frames": 200,
+          "nsPerFrame": 329751.67
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 2,
+          "elapsedNs": 65904583,
+          "frames": 200,
+          "nsPerFrame": 329522.915
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 3,
+          "elapsedNs": 64203250,
+          "frames": 200,
+          "nsPerFrame": 321016.25
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 4,
+          "elapsedNs": 66286625,
+          "frames": 200,
+          "nsPerFrame": 331433.125
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 5,
+          "elapsedNs": 66683708,
+          "frames": 200,
+          "nsPerFrame": 333418.54
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 6,
+          "elapsedNs": 73194542,
+          "frames": 200,
+          "nsPerFrame": 365972.71
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 7,
+          "elapsedNs": 66346625,
+          "frames": 200,
+          "nsPerFrame": 331733.125
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 8,
+          "elapsedNs": 66098250,
+          "frames": 200,
+          "nsPerFrame": 330491.25
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 9,
+          "elapsedNs": 65819833,
+          "frames": 200,
+          "nsPerFrame": 329099.165
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 10,
+          "elapsedNs": 64663584,
+          "frames": 200,
+          "nsPerFrame": 323317.92
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 11,
+          "elapsedNs": 66359209,
+          "frames": 200,
+          "nsPerFrame": 331796.045
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 12,
+          "elapsedNs": 66356250,
+          "frames": 200,
+          "nsPerFrame": 331781.25
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 13,
+          "elapsedNs": 65741625,
+          "frames": 200,
+          "nsPerFrame": 328708.125
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 14,
+          "elapsedNs": 65527333,
+          "frames": 200,
+          "nsPerFrame": 327636.665
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 15,
+          "elapsedNs": 66943250,
+          "frames": 200,
+          "nsPerFrame": 334716.25
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 16,
+          "elapsedNs": 65090000,
+          "frames": 200,
+          "nsPerFrame": 325450
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 17,
+          "elapsedNs": 66376000,
+          "frames": 200,
+          "nsPerFrame": 331880
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 18,
+          "elapsedNs": 66115459,
+          "frames": 200,
+          "nsPerFrame": 330577.295
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 19,
+          "elapsedNs": 65981750,
+          "frames": 200,
+          "nsPerFrame": 329908.75
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 20,
+          "elapsedNs": 65882334,
+          "frames": 200,
+          "nsPerFrame": 329411.67
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 21,
+          "elapsedNs": 63974417,
+          "frames": 200,
+          "nsPerFrame": 319872.085
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 22,
+          "elapsedNs": 66332292,
+          "frames": 200,
+          "nsPerFrame": 331661.46
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 23,
+          "elapsedNs": 66485875,
+          "frames": 200,
+          "nsPerFrame": 332429.375
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 24,
+          "elapsedNs": 65800125,
+          "frames": 200,
+          "nsPerFrame": 329000.625
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 25,
+          "elapsedNs": 64056750,
+          "frames": 200,
+          "nsPerFrame": 320283.75
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 26,
+          "elapsedNs": 65592375,
+          "frames": 200,
+          "nsPerFrame": 327961.875
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 27,
+          "elapsedNs": 65580834,
+          "frames": 200,
+          "nsPerFrame": 327904.17
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 28,
+          "elapsedNs": 66043375,
+          "frames": 200,
+          "nsPerFrame": 330216.875
+        },
+        {
+          "scenarioId": "paint-theme-set-fast",
+          "sampleIndex": 29,
+          "elapsedNs": 65908208,
+          "frames": 200,
+          "nsPerFrame": 329541.04
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 329937.8061666666,
+        "stddev": 7842.22853123261,
+        "cov": 0.02376880849862699,
+        "min": 319872.085,
+        "max": 365972.71,
+        "p50": 329646.355,
+        "p90": 332528.2915,
+        "p99": 356908.33660000004
+      }
+    },
+    {
+      "scenarioId": "paint-gradient-rgb",
+      "label": "Paint: per-cell unique RGB via setRGB (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 200,
+      "samples": [
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 0,
+          "elapsedNs": 186298375,
+          "frames": 200,
+          "nsPerFrame": 931491.875
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 1,
+          "elapsedNs": 187915792,
+          "frames": 200,
+          "nsPerFrame": 939578.96
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 2,
+          "elapsedNs": 176103084,
+          "frames": 200,
+          "nsPerFrame": 880515.42
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 3,
+          "elapsedNs": 188468625,
+          "frames": 200,
+          "nsPerFrame": 942343.125
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 4,
+          "elapsedNs": 176033167,
+          "frames": 200,
+          "nsPerFrame": 880165.835
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 5,
+          "elapsedNs": 186856708,
+          "frames": 200,
+          "nsPerFrame": 934283.54
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 6,
+          "elapsedNs": 186592792,
+          "frames": 200,
+          "nsPerFrame": 932963.96
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 7,
+          "elapsedNs": 186937583,
+          "frames": 200,
+          "nsPerFrame": 934687.915
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 8,
+          "elapsedNs": 176235583,
+          "frames": 200,
+          "nsPerFrame": 881177.915
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 9,
+          "elapsedNs": 176251542,
+          "frames": 200,
+          "nsPerFrame": 881257.71
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 10,
+          "elapsedNs": 186302500,
+          "frames": 200,
+          "nsPerFrame": 931512.5
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 11,
+          "elapsedNs": 187681917,
+          "frames": 200,
+          "nsPerFrame": 938409.585
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 12,
+          "elapsedNs": 187752916,
+          "frames": 200,
+          "nsPerFrame": 938764.58
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 13,
+          "elapsedNs": 188672208,
+          "frames": 200,
+          "nsPerFrame": 943361.04
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 14,
+          "elapsedNs": 188189000,
+          "frames": 200,
+          "nsPerFrame": 940945
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 15,
+          "elapsedNs": 187159042,
+          "frames": 200,
+          "nsPerFrame": 935795.21
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 16,
+          "elapsedNs": 176004750,
+          "frames": 200,
+          "nsPerFrame": 880023.75
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 17,
+          "elapsedNs": 188192584,
+          "frames": 200,
+          "nsPerFrame": 940962.92
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 18,
+          "elapsedNs": 201385792,
+          "frames": 200,
+          "nsPerFrame": 1006928.96
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 19,
+          "elapsedNs": 187457708,
+          "frames": 200,
+          "nsPerFrame": 937288.54
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 20,
+          "elapsedNs": 176299625,
+          "frames": 200,
+          "nsPerFrame": 881498.125
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 21,
+          "elapsedNs": 187965000,
+          "frames": 200,
+          "nsPerFrame": 939825
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 22,
+          "elapsedNs": 176468709,
+          "frames": 200,
+          "nsPerFrame": 882343.545
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 23,
+          "elapsedNs": 187112916,
+          "frames": 200,
+          "nsPerFrame": 935564.58
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 24,
+          "elapsedNs": 185783041,
+          "frames": 200,
+          "nsPerFrame": 928915.205
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 25,
+          "elapsedNs": 175804375,
+          "frames": 200,
+          "nsPerFrame": 879021.875
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 26,
+          "elapsedNs": 186284791,
+          "frames": 200,
+          "nsPerFrame": 931423.955
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 27,
+          "elapsedNs": 175267083,
+          "frames": 200,
+          "nsPerFrame": 876335.415
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 28,
+          "elapsedNs": 187772000,
+          "frames": 200,
+          "nsPerFrame": 938860
+        },
+        {
+          "scenarioId": "paint-gradient-rgb",
+          "sampleIndex": 29,
+          "elapsedNs": 188297125,
+          "frames": 200,
+          "nsPerFrame": 941485.625
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 922257.7221666665,
+        "stddev": 30907.42539355142,
+        "cov": 0.03351278568960137,
+        "min": 876335.415,
+        "max": 1006928.96,
+        "p50": 934485.7275,
+        "p90": 941571.375,
+        "p99": 988494.2632
+      }
+    },
+    {
+      "scenarioId": "diff-gradient",
+      "label": "Diff: per-cell unique RGB gradient (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 100,
+      "samples": [
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 0,
+          "elapsedNs": 150848250,
+          "frames": 100,
+          "nsPerFrame": 1508482.5
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 1,
+          "elapsedNs": 145907917,
+          "frames": 100,
+          "nsPerFrame": 1459079.17
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 2,
+          "elapsedNs": 145686083,
+          "frames": 100,
+          "nsPerFrame": 1456860.83
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 3,
+          "elapsedNs": 146274792,
+          "frames": 100,
+          "nsPerFrame": 1462747.92
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 4,
+          "elapsedNs": 146192708,
+          "frames": 100,
+          "nsPerFrame": 1461927.08
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 5,
+          "elapsedNs": 142472375,
+          "frames": 100,
+          "nsPerFrame": 1424723.75
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 6,
+          "elapsedNs": 144882792,
+          "frames": 100,
+          "nsPerFrame": 1448827.92
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 7,
+          "elapsedNs": 145362625,
+          "frames": 100,
+          "nsPerFrame": 1453626.25
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 8,
+          "elapsedNs": 143427458,
+          "frames": 100,
+          "nsPerFrame": 1434274.58
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 9,
+          "elapsedNs": 145875958,
+          "frames": 100,
+          "nsPerFrame": 1458759.58
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 10,
+          "elapsedNs": 148157375,
+          "frames": 100,
+          "nsPerFrame": 1481573.75
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 11,
+          "elapsedNs": 145021958,
+          "frames": 100,
+          "nsPerFrame": 1450219.58
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 12,
+          "elapsedNs": 145351000,
+          "frames": 100,
+          "nsPerFrame": 1453510
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 13,
+          "elapsedNs": 145284250,
+          "frames": 100,
+          "nsPerFrame": 1452842.5
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 14,
+          "elapsedNs": 144413750,
+          "frames": 100,
+          "nsPerFrame": 1444137.5
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 15,
+          "elapsedNs": 145426125,
+          "frames": 100,
+          "nsPerFrame": 1454261.25
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 16,
+          "elapsedNs": 145698833,
+          "frames": 100,
+          "nsPerFrame": 1456988.33
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 17,
+          "elapsedNs": 145497542,
+          "frames": 100,
+          "nsPerFrame": 1454975.42
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 18,
+          "elapsedNs": 145882667,
+          "frames": 100,
+          "nsPerFrame": 1458826.67
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 19,
+          "elapsedNs": 145024250,
+          "frames": 100,
+          "nsPerFrame": 1450242.5
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 20,
+          "elapsedNs": 145404167,
+          "frames": 100,
+          "nsPerFrame": 1454041.67
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 21,
+          "elapsedNs": 145577542,
+          "frames": 100,
+          "nsPerFrame": 1455775.42
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 22,
+          "elapsedNs": 145072500,
+          "frames": 100,
+          "nsPerFrame": 1450725
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 23,
+          "elapsedNs": 143454084,
+          "frames": 100,
+          "nsPerFrame": 1434540.84
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 24,
+          "elapsedNs": 144940292,
+          "frames": 100,
+          "nsPerFrame": 1449402.92
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 25,
+          "elapsedNs": 144646375,
+          "frames": 100,
+          "nsPerFrame": 1446463.75
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 26,
+          "elapsedNs": 145375500,
+          "frames": 100,
+          "nsPerFrame": 1453755
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 27,
+          "elapsedNs": 150492917,
+          "frames": 100,
+          "nsPerFrame": 1504929.17
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 28,
+          "elapsedNs": 145586375,
+          "frames": 100,
+          "nsPerFrame": 1455863.75
+        },
+        {
+          "scenarioId": "diff-gradient",
+          "sampleIndex": 29,
+          "elapsedNs": 145600959,
+          "frames": 100,
+          "nsPerFrame": 1456009.59
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 1456279.806333334,
+        "stddev": 16891.27040152386,
+        "cov": 0.01159891823539957,
+        "min": 1424723.75,
+        "max": 1508482.5,
+        "p50": 1454151.46,
+        "p90": 1464630.503,
+        "p99": 1507452.0343
+      }
+    },
+    {
+      "scenarioId": "diff-sparse",
+      "label": "Diff: sparse ~10% dirty (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 150,
+      "samples": [
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 0,
+          "elapsedNs": 18800125,
+          "frames": 150,
+          "nsPerFrame": 125334.16666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 1,
+          "elapsedNs": 18457791,
+          "frames": 150,
+          "nsPerFrame": 123051.94
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 2,
+          "elapsedNs": 18894417,
+          "frames": 150,
+          "nsPerFrame": 125962.78
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 3,
+          "elapsedNs": 18448250,
+          "frames": 150,
+          "nsPerFrame": 122988.33333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 4,
+          "elapsedNs": 18653084,
+          "frames": 150,
+          "nsPerFrame": 124353.89333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 5,
+          "elapsedNs": 18740625,
+          "frames": 150,
+          "nsPerFrame": 124937.5
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 6,
+          "elapsedNs": 18731917,
+          "frames": 150,
+          "nsPerFrame": 124879.44666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 7,
+          "elapsedNs": 18536458,
+          "frames": 150,
+          "nsPerFrame": 123576.38666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 8,
+          "elapsedNs": 18750750,
+          "frames": 150,
+          "nsPerFrame": 125005
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 9,
+          "elapsedNs": 18744917,
+          "frames": 150,
+          "nsPerFrame": 124966.11333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 10,
+          "elapsedNs": 18850750,
+          "frames": 150,
+          "nsPerFrame": 125671.66666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 11,
+          "elapsedNs": 18174542,
+          "frames": 150,
+          "nsPerFrame": 121163.61333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 12,
+          "elapsedNs": 18401750,
+          "frames": 150,
+          "nsPerFrame": 122678.33333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 13,
+          "elapsedNs": 18733500,
+          "frames": 150,
+          "nsPerFrame": 124890
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 14,
+          "elapsedNs": 18764375,
+          "frames": 150,
+          "nsPerFrame": 125095.83333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 15,
+          "elapsedNs": 18753667,
+          "frames": 150,
+          "nsPerFrame": 125024.44666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 16,
+          "elapsedNs": 18460250,
+          "frames": 150,
+          "nsPerFrame": 123068.33333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 17,
+          "elapsedNs": 18793917,
+          "frames": 150,
+          "nsPerFrame": 125292.78
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 18,
+          "elapsedNs": 19299125,
+          "frames": 150,
+          "nsPerFrame": 128660.83333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 19,
+          "elapsedNs": 19169958,
+          "frames": 150,
+          "nsPerFrame": 127799.72
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 20,
+          "elapsedNs": 19019833,
+          "frames": 150,
+          "nsPerFrame": 126798.88666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 21,
+          "elapsedNs": 23374083,
+          "frames": 150,
+          "nsPerFrame": 155827.22
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 22,
+          "elapsedNs": 18558166,
+          "frames": 150,
+          "nsPerFrame": 123721.10666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 23,
+          "elapsedNs": 18983834,
+          "frames": 150,
+          "nsPerFrame": 126558.89333333333
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 24,
+          "elapsedNs": 18875416,
+          "frames": 150,
+          "nsPerFrame": 125836.10666666667
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 25,
+          "elapsedNs": 18939000,
+          "frames": 150,
+          "nsPerFrame": 126260
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 26,
+          "elapsedNs": 28702042,
+          "frames": 150,
+          "nsPerFrame": 191346.94666666666
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 27,
+          "elapsedNs": 19002417,
+          "frames": 150,
+          "nsPerFrame": 126682.78
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 28,
+          "elapsedNs": 21775250,
+          "frames": 150,
+          "nsPerFrame": 145168.33333333334
+        },
+        {
+          "scenarioId": "diff-sparse",
+          "sampleIndex": 29,
+          "elapsedNs": 18900500,
+          "frames": 150,
+          "nsPerFrame": 126003.33333333333
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 128953.4908888889,
+        "stddev": 13595.768736799955,
+        "cov": 0.10543156794812614,
+        "min": 121163.61333333333,
+        "max": 191346.94666666666,
+        "p50": 125194.30666666667,
+        "p90": 130311.58333333336,
+        "p99": 181046.22593333336
+      }
+    },
+    {
+      "scenarioId": "diff-static",
+      "label": "Diff: identical surfaces, zero changes (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 300,
+      "samples": [
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 0,
+          "elapsedNs": 2823625,
+          "frames": 300,
+          "nsPerFrame": 9412.083333333334
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 1,
+          "elapsedNs": 2954959,
+          "frames": 300,
+          "nsPerFrame": 9849.863333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 2,
+          "elapsedNs": 2973209,
+          "frames": 300,
+          "nsPerFrame": 9910.696666666667
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 3,
+          "elapsedNs": 2320084,
+          "frames": 300,
+          "nsPerFrame": 7733.613333333334
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 4,
+          "elapsedNs": 2962583,
+          "frames": 300,
+          "nsPerFrame": 9875.276666666667
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 5,
+          "elapsedNs": 2926958,
+          "frames": 300,
+          "nsPerFrame": 9756.526666666667
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 6,
+          "elapsedNs": 2985125,
+          "frames": 300,
+          "nsPerFrame": 9950.416666666666
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 7,
+          "elapsedNs": 2202750,
+          "frames": 300,
+          "nsPerFrame": 7342.5
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 8,
+          "elapsedNs": 2012250,
+          "frames": 300,
+          "nsPerFrame": 6707.5
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 9,
+          "elapsedNs": 2107375,
+          "frames": 300,
+          "nsPerFrame": 7024.583333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 10,
+          "elapsedNs": 2210291,
+          "frames": 300,
+          "nsPerFrame": 7367.636666666666
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 11,
+          "elapsedNs": 2908000,
+          "frames": 300,
+          "nsPerFrame": 9693.333333333334
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 12,
+          "elapsedNs": 2870875,
+          "frames": 300,
+          "nsPerFrame": 9569.583333333334
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 13,
+          "elapsedNs": 2799708,
+          "frames": 300,
+          "nsPerFrame": 9332.36
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 14,
+          "elapsedNs": 2828667,
+          "frames": 300,
+          "nsPerFrame": 9428.89
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 15,
+          "elapsedNs": 2160708,
+          "frames": 300,
+          "nsPerFrame": 7202.36
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 16,
+          "elapsedNs": 2897209,
+          "frames": 300,
+          "nsPerFrame": 9657.363333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 17,
+          "elapsedNs": 2594458,
+          "frames": 300,
+          "nsPerFrame": 8648.193333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 18,
+          "elapsedNs": 2795458,
+          "frames": 300,
+          "nsPerFrame": 9318.193333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 19,
+          "elapsedNs": 2164792,
+          "frames": 300,
+          "nsPerFrame": 7215.973333333333
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 20,
+          "elapsedNs": 2937708,
+          "frames": 300,
+          "nsPerFrame": 9792.36
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 21,
+          "elapsedNs": 2308250,
+          "frames": 300,
+          "nsPerFrame": 7694.166666666667
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 22,
+          "elapsedNs": 2798583,
+          "frames": 300,
+          "nsPerFrame": 9328.61
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 23,
+          "elapsedNs": 2916417,
+          "frames": 300,
+          "nsPerFrame": 9721.39
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 24,
+          "elapsedNs": 2890833,
+          "frames": 300,
+          "nsPerFrame": 9636.11
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 25,
+          "elapsedNs": 2181333,
+          "frames": 300,
+          "nsPerFrame": 7271.11
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 26,
+          "elapsedNs": 2922917,
+          "frames": 300,
+          "nsPerFrame": 9743.056666666667
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 27,
+          "elapsedNs": 2948958,
+          "frames": 300,
+          "nsPerFrame": 9829.86
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 28,
+          "elapsedNs": 2170083,
+          "frames": 300,
+          "nsPerFrame": 7233.61
+        },
+        {
+          "scenarioId": "diff-static",
+          "sampleIndex": 29,
+          "elapsedNs": 2887417,
+          "frames": 300,
+          "nsPerFrame": 9624.723333333333
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 8829.064777777776,
+        "stddev": 1152.7684425467062,
+        "cov": 0.13056518120108881,
+        "min": 6707.5,
+        "max": 9950.416666666666,
+        "p50": 9420.486666666668,
+        "p90": 9852.404666666667,
+        "p99": 9938.897866666666
+      }
+    },
+    {
+      "scenarioId": "dogfood-realistic",
+      "label": "Dogfood-realistic: header+sidebar+body+footer (220×58)",
+      "columns": 220,
+      "rows": 58,
+      "warmupFrames": 30,
+      "measureFrames": 120,
+      "samples": [
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 0,
+          "elapsedNs": 50120541,
+          "frames": 120,
+          "nsPerFrame": 417671.175
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 1,
+          "elapsedNs": 49169958,
+          "frames": 120,
+          "nsPerFrame": 409749.65
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 2,
+          "elapsedNs": 49009625,
+          "frames": 120,
+          "nsPerFrame": 408413.5416666667
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 3,
+          "elapsedNs": 48903958,
+          "frames": 120,
+          "nsPerFrame": 407532.98333333334
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 4,
+          "elapsedNs": 49285709,
+          "frames": 120,
+          "nsPerFrame": 410714.24166666664
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 5,
+          "elapsedNs": 49452750,
+          "frames": 120,
+          "nsPerFrame": 412106.25
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 6,
+          "elapsedNs": 49504375,
+          "frames": 120,
+          "nsPerFrame": 412536.4583333333
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 7,
+          "elapsedNs": 49057500,
+          "frames": 120,
+          "nsPerFrame": 408812.5
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 8,
+          "elapsedNs": 49126583,
+          "frames": 120,
+          "nsPerFrame": 409388.19166666665
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 9,
+          "elapsedNs": 49242541,
+          "frames": 120,
+          "nsPerFrame": 410354.50833333336
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 10,
+          "elapsedNs": 49519333,
+          "frames": 120,
+          "nsPerFrame": 412661.10833333334
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 11,
+          "elapsedNs": 49165000,
+          "frames": 120,
+          "nsPerFrame": 409708.3333333333
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 12,
+          "elapsedNs": 49180334,
+          "frames": 120,
+          "nsPerFrame": 409836.11666666664
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 13,
+          "elapsedNs": 48955375,
+          "frames": 120,
+          "nsPerFrame": 407961.4583333333
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 14,
+          "elapsedNs": 49068875,
+          "frames": 120,
+          "nsPerFrame": 408907.2916666667
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 15,
+          "elapsedNs": 49306959,
+          "frames": 120,
+          "nsPerFrame": 410891.325
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 16,
+          "elapsedNs": 49125750,
+          "frames": 120,
+          "nsPerFrame": 409381.25
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 17,
+          "elapsedNs": 49179917,
+          "frames": 120,
+          "nsPerFrame": 409832.64166666666
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 18,
+          "elapsedNs": 48972292,
+          "frames": 120,
+          "nsPerFrame": 408102.43333333335
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 19,
+          "elapsedNs": 49487209,
+          "frames": 120,
+          "nsPerFrame": 412393.4083333333
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 20,
+          "elapsedNs": 49315541,
+          "frames": 120,
+          "nsPerFrame": 410962.8416666667
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 21,
+          "elapsedNs": 49766000,
+          "frames": 120,
+          "nsPerFrame": 414716.6666666667
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 22,
+          "elapsedNs": 49971042,
+          "frames": 120,
+          "nsPerFrame": 416425.35
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 23,
+          "elapsedNs": 49703416,
+          "frames": 120,
+          "nsPerFrame": 414195.13333333336
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 24,
+          "elapsedNs": 49958625,
+          "frames": 120,
+          "nsPerFrame": 416321.875
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 25,
+          "elapsedNs": 49061667,
+          "frames": 120,
+          "nsPerFrame": 408847.225
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 26,
+          "elapsedNs": 49545458,
+          "frames": 120,
+          "nsPerFrame": 412878.81666666665
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 27,
+          "elapsedNs": 49430208,
+          "frames": 120,
+          "nsPerFrame": 411918.4
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 28,
+          "elapsedNs": 49169625,
+          "frames": 120,
+          "nsPerFrame": 409746.875
+        },
+        {
+          "scenarioId": "dogfood-realistic",
+          "sampleIndex": 29,
+          "elapsedNs": 49592542,
+          "frames": 120,
+          "nsPerFrame": 413271.18333333335
+        }
+      ],
+      "nsPerFrameStats": {
+        "count": 30,
+        "mean": 411207.97444444435,
+        "stddev": 2666.4592585962214,
+        "cov": 0.006484454155342431,
+        "min": 407532.98333333334,
+        "max": 417671.175,
+        "p50": 410534.375,
+        "p90": 414877.1875,
+        "p99": 417309.88575
+      }
+    }
+  ]
+}
