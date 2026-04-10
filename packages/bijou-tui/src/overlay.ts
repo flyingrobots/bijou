@@ -288,9 +288,17 @@ function backgroundStyleFromToken(token: TokenValue | undefined, ctx: BijouConte
 
 function mergeStyles(base: CellStyle, extra: CellStyle): CellStyle {
   const modifiers = [...(base.modifiers ?? []), ...(extra.modifiers ?? [])];
+  const fg = extra.fg ?? base.fg;
+  const bg = extra.bg ?? base.bg;
   return {
-    fg: extra.fg ?? base.fg,
-    bg: extra.bg ?? base.bg,
+    fg,
+    bg,
+    // When extra.fg overrides base.fg, use extra's fgRGB (may be
+    // undefined — correctly clearing the pre-parsed cache so the
+    // differ falls back to inlineHexRGB for the new hex string).
+    // When extra.fg is absent, inherit base's fgRGB if available.
+    fgRGB: extra.fg != null ? extra.fgRGB : (extra.fgRGB ?? base.fgRGB),
+    bgRGB: extra.bg != null ? extra.bgRGB : (extra.bgRGB ?? base.bgRGB),
     modifiers: modifiers.length > 0 ? Array.from(new Set(modifiers)) : undefined,
   };
 }
