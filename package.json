@@ -17,6 +17,7 @@
     "bench": "node --import tsx bench/src/cli.ts run",
     "bench:compare": "node --import tsx bench/src/cli.ts compare",
     "bench:baseline": "node --import tsx bench/src/cli.ts run --out bench/baselines",
+    "soak": "node --import tsx bench/src/soak-runner.ts",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",
