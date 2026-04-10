@@ -1,95 +1,129 @@
 /**
- * Soak runner — per-frame timing with live progress and stability analysis.
+ * Soak runner — long-running loop through all bench scenarios.
  *
- * Unlike the wall-time harness which spawns child processes and reports
- * aggregate stats, this runner executes the soak scenario in-process and
- * times every frame individually. The output answers: "is frame 900 as
- * fast as frame 10?"
+ * Cycles through every registered scenario repeatedly, collecting
+ * frame-time and memory metrics per cycle and appending them as
+ * JSONL to a log file. Runs until interrupted (Ctrl+C).
  *
  * Usage:
- *   node --import tsx bench/src/soak-runner.ts [--frames=N] [--warmup=N]
+ *   npm run soak                       # default log location
+ *   npm run soak -- --out=my-soak.jsonl # custom log path
+ *   npm run soak -- --cycles=50        # stop after N cycles
  *
- * Outputs:
- *   - Live progress line: frame count / elapsed / current frame µs
- *   - Per-window p50 comparison: early (50-250), mid (375-625), late (750-1000)
- *   - Drift indicator: late p50 vs early p50 as a percentage
+ * The log file is append-only JSONL. Each line is one scenario run:
+ *   {"ts":"...","cycle":0,"scenario":"paint-ascii","frames":200,
+ *    "nsPerFrame":234000,"p50Ns":230000,...,"heapUsedMB":12.3,...}
+ *
+ * Tail it live:    tail -f bench/soak.jsonl | jq .
+ * Quick summary:   cat bench/soak.jsonl | jq -r '[.cycle,.scenario,.p50] | @tsv'
  */
 
-import { soak } from './scenarios/soak.js';
+import { appendFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { SCENARIOS } from './scenarios/index.js';
 import { computeStats, formatNs } from './stats.js';
 
 // --- CLI args ---
-const args = process.argv.slice(2);
+const argv = process.argv.slice(2);
+function argStr(name: string, fallback: string): string {
+  const match = argv.find((a) => a.startsWith(`--${name}=`));
+  return match ? match.split('=')[1]! : fallback;
+}
 function argInt(name: string, fallback: number): number {
-  const match = args.find((a) => a.startsWith(`--${name}=`));
+  const match = argv.find((a) => a.startsWith(`--${name}=`));
   return match ? parseInt(match.split('=')[1]!, 10) : fallback;
 }
-const WARMUP = argInt('warmup', soak.defaultWarmupFrames);
-const FRAMES = argInt('frames', soak.defaultMeasureFrames);
 
-// --- Run ---
-const state = soak.setup();
-const frameTimes: number[] = new Array(FRAMES);
-const startWall = performance.now();
+const LOG_PATH = resolve(argStr('out', 'bench/soak.jsonl'));
+const MAX_CYCLES = argInt('cycles', Infinity);
 
-// Warmup (untimed)
-process.stderr.write(`soak: warming up (${WARMUP} frames)...\r`);
-for (let i = 0; i < WARMUP; i++) {
-  soak.frame(state, i);
+// Scenarios to include. Skip the 'soak' scenario itself — it's a
+// 1000-frame stability test that would slow down each cycle. The soak
+// runner IS the stability test; each scenario runs with its own
+// default frame count.
+const scenarios = SCENARIOS.filter((s) => s.id !== 'soak');
+
+// --- Setup ---
+let running = true;
+process.on('SIGINT', () => {
+  running = false;
+  process.stderr.write('\nsoak: interrupted, finishing current scenario...\n');
+});
+
+if (!existsSync(LOG_PATH)) {
+  writeFileSync(LOG_PATH, '');
 }
 
-// Measurement
-process.stderr.write(`soak: measuring ${FRAMES} frames\n`);
-const measureStart = performance.now();
+process.stderr.write(`soak: ${scenarios.length} scenarios, logging to ${LOG_PATH}\n`);
+process.stderr.write('soak: Ctrl+C to stop\n\n');
 
-for (let i = 0; i < FRAMES; i++) {
-  const t0 = performance.now();
-  soak.frame(state, WARMUP + i);
-  const t1 = performance.now();
-  frameTimes[i] = (t1 - t0) * 1_000_000; // ms → ns
+// --- Main loop ---
+let cycle = 0;
 
-  // Live progress every 50 frames
-  if (i % 50 === 49 || i === FRAMES - 1) {
-    const elapsed = ((performance.now() - measureStart) / 1000).toFixed(1);
-    const current = formatNs(frameTimes[i]!);
-    process.stderr.write(`  frame ${String(i + 1).padStart(5)}/${FRAMES}  elapsed ${elapsed}s  last ${current}\r`);
+while (running && cycle < MAX_CYCLES) {
+  const cycleStart = performance.now();
+
+  for (const scenario of scenarios) {
+    if (!running) break;
+
+    const warmup = scenario.defaultWarmupFrames;
+    const frames = scenario.defaultMeasureFrames;
+
+    // Setup
+    const state = scenario.setup();
+
+    // Warmup (untimed)
+    for (let i = 0; i < warmup; i++) {
+      scenario.frame(state, i);
+    }
+
+    // Timed measurement with per-frame recording
+    const frameTimes: number[] = new Array(frames);
+    for (let i = 0; i < frames; i++) {
+      const t0 = performance.now();
+      scenario.frame(state, warmup + i);
+      const t1 = performance.now();
+      frameTimes[i] = (t1 - t0) * 1_000_000; // ms → ns
+    }
+
+    // Teardown
+    scenario.teardown?.(state);
+
+    // Memory snapshot (post-scenario, pre-GC — shows working set)
+    const mem = process.memoryUsage();
+
+    // Stats
+    const stats = computeStats(frameTimes);
+
+    const entry = {
+      ts: new Date().toISOString(),
+      cycle,
+      scenario: scenario.id,
+      frames,
+      nsPerFrame: Math.round(stats.mean),
+      p50: Math.round(stats.p50),
+      p90: Math.round(stats.p90),
+      p99: Math.round(stats.p99),
+      min: Math.round(stats.min),
+      max: Math.round(stats.max),
+      covPct: Math.round(stats.cov * 1000) / 10,
+      heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
+      heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024 * 10) / 10,
+      rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+      externalMB: Math.round(mem.external / 1024 / 1024 * 10) / 10,
+    };
+
+    appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
+
+    // Live status
+    process.stderr.write(
+      `  cycle ${String(cycle).padStart(4)} | ${scenario.id.padEnd(22)} | p50 ${formatNs(stats.p50).padStart(10)} | heap ${entry.heapUsedMB} MB\n`,
+    );
   }
+
+  const cycleMs = ((performance.now() - cycleStart) / 1000).toFixed(1);
+  process.stderr.write(`  --- cycle ${cycle} done (${cycleMs}s) ---\n`);
+  cycle++;
 }
 
-const totalElapsed = ((performance.now() - startWall) / 1000).toFixed(2);
-process.stderr.write('\n\n');
-
-// --- Analysis ---
-// Split into three windows for stability comparison.
-const earlyStart = Math.min(50, Math.floor(FRAMES * 0.05));
-const earlyEnd = Math.min(250, Math.floor(FRAMES * 0.25));
-const midStart = Math.floor(FRAMES * 0.375);
-const midEnd = Math.floor(FRAMES * 0.625);
-const lateStart = Math.floor(FRAMES * 0.75);
-const lateEnd = FRAMES;
-
-const earlyWindow = frameTimes.slice(earlyStart, earlyEnd);
-const midWindow = frameTimes.slice(midStart, midEnd);
-const lateWindow = frameTimes.slice(lateStart, lateEnd);
-const allStats = computeStats(frameTimes);
-const earlyStats = computeStats(earlyWindow);
-const midStats = computeStats(midWindow);
-const lateStats = computeStats(lateWindow);
-
-const drift = earlyStats.p50 !== 0
-  ? ((lateStats.p50 - earlyStats.p50) / earlyStats.p50) * 100
-  : 0;
-const driftSign = drift >= 0 ? '+' : '';
-const driftLabel = Math.abs(drift) < 3 ? 'stable' : (drift > 0 ? 'DEGRADED' : 'improved');
-
-// --- Output ---
-console.log(`soak — ${FRAMES} frames, ${WARMUP} warmup, ${totalElapsed}s total`);
-console.log('');
-console.log('| Window | Frames | P50 | P90 | P99 | CoV |');
-console.log('|---|---|---|---|---|---|');
-console.log(`| overall | 0–${FRAMES} | ${formatNs(allStats.p50)} | ${formatNs(allStats.p90)} | ${formatNs(allStats.p99)} | ${(allStats.cov * 100).toFixed(1)}% |`);
-console.log(`| early | ${earlyStart}–${earlyEnd} | ${formatNs(earlyStats.p50)} | ${formatNs(earlyStats.p90)} | ${formatNs(earlyStats.p99)} | ${(earlyStats.cov * 100).toFixed(1)}% |`);
-console.log(`| mid | ${midStart}–${midEnd} | ${formatNs(midStats.p50)} | ${formatNs(midStats.p90)} | ${formatNs(midStats.p99)} | ${(midStats.cov * 100).toFixed(1)}% |`);
-console.log(`| late | ${lateStart}–${lateEnd} | ${formatNs(lateStats.p50)} | ${formatNs(lateStats.p90)} | ${formatNs(lateStats.p99)} | ${(lateStats.cov * 100).toFixed(1)}% |`);
-console.log('');
-console.log(`drift: late vs early p50 = ${driftSign}${drift.toFixed(1)}% (${driftLabel})`);
+process.stderr.write(`\nsoak: ${cycle} cycles completed, log at ${LOG_PATH}\n`);

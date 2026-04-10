@@ -26,6 +26,7 @@ coverage/
 
 # Logs
 *.log
+*.jsonl
 npm-debug.log*
 
 # Build
