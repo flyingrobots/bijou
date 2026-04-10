@@ -6,7 +6,8 @@
  * gradient animating, cells flickering, the dogfood layout composing.
  * A status bar shows the current scenario, frame time, and cycle.
  *
- * Press q, Esc, or Ctrl+C to quit.
+ * Built on createFramedApp — the frame shell handles alt-screen,
+ * raw mode, resize, keyboard input, and quit confirmation.
  *
  * Usage:
  *   npm run soak                       # run until quit
@@ -17,16 +18,23 @@
 
 import { appendFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
-  createSurface,
-  renderDiff,
-  type Surface,
-} from '@flyingrobots/bijou';
-import { createNodeContext } from '@flyingrobots/bijou-node';
+  createFramedApp,
+  quit,
+  run,
+  type Cmd,
+  type FramePageMsg,
+} from '@flyingrobots/bijou-tui';
 import { SCENARIOS } from './scenarios/index.js';
+import type { AnyScenario } from './scenarios/types.js';
 import { computeStats, formatNs } from './stats.js';
 
-// --- CLI args ---
+// ---------------------------------------------------------------------------
+// CLI args
+// ---------------------------------------------------------------------------
+
 const argv = process.argv.slice(2);
 function argNum(name: string, fallback: number): number {
   const match = argv.find((a) => a.startsWith(`--${name}=`));
@@ -43,187 +51,199 @@ const DWELL_SECS = argNum('dwell', 4);
 const LOG_PATH = resolve(argStr('out', 'bench/soak.jsonl'));
 
 // Scenarios that have a display surface to show.
-const scenarios = SCENARIOS.filter((s) => s.getDisplaySurface !== undefined);
+const displayScenarios = SCENARIOS.filter(
+  (s): s is AnyScenario & { getDisplaySurface: NonNullable<AnyScenario['getDisplaySurface']> } =>
+    s.getDisplaySurface !== undefined,
+);
 
-// --- Terminal setup ---
-const ctx = createNodeContext();
-const io = ctx.io;
-const style = ctx.style;
-
-let cols = process.stdout.columns ?? 220;
-let rows = process.stdout.rows ?? 58;
-
-let quit = false;
-if (process.stdin.isTTY) {
-  process.stdin.setRawMode(true);
-  process.stdin.resume();
-  process.stdin.on('data', (data: Buffer) => {
-    const ch = data[0]!;
-    if (ch === 0x71 || ch === 0x51 || ch === 0x1b || ch === 0x03) {
-      quit = true;
-    }
-  });
-}
-process.on('SIGINT', () => { quit = true; });
-
-// ANSI helpers
-const ESC = '\x1b[';
-const ENTER_ALT = ESC + '?1049h';
-const EXIT_ALT = ESC + '?1049l';
-const HIDE_CURSOR = ESC + '?25l';
-const SHOW_CURSOR = ESC + '?25h';
-const CLEAR = ESC + '2J' + ESC + 'H';
-const WRAP_OFF = ESC + '?7l';
-const WRAP_ON = ESC + '?7h';
-
-// Log file
+// Ensure log file exists.
 if (!existsSync(LOG_PATH)) writeFileSync(LOG_PATH, '');
 
-// --- Status bar rendering ---
-function drawStatusBar(
-  scenarioLabel: string,
-  frameIdx: number,
-  frameTimeNs: number,
-  cycle: number,
-  scenarioIdx: number,
-  total: number,
-): void {
-  const ft = formatNs(frameTimeNs);
-  const left = ` ${scenarioLabel}  frame ${frameIdx}  ${ft}/frame`;
-  const right = `cycle ${cycle}  [${scenarioIdx + 1}/${total}]  q to quit `;
-  const pad = Math.max(0, cols - left.length - right.length);
-  const bar = `${ESC}${rows};1H${ESC}7m${left}${' '.repeat(pad)}${right}${ESC}0m`;
-  process.stdout.write(bar);
+// ---------------------------------------------------------------------------
+// Model & Messages
+// ---------------------------------------------------------------------------
+
+interface SoakModel {
+  readonly scenarioIndex: number;
+  readonly scenarioState: unknown;
+  readonly frameIndex: number;
+  readonly frameTimes: number[];
+  readonly cycle: number;
+  readonly elapsedMs: number;
+  readonly lastFrameNs: number;
+  readonly warmedUp: boolean;
 }
 
-// --- Main loop ---
-async function main(): Promise<void> {
-  io.write(ENTER_ALT + HIDE_CURSOR + WRAP_OFF + CLEAR);
+type SoakMsg = { readonly type: 'advance-scenario' };
 
-  // Track terminal dimensions — recreate surfaces on resize.
-  let renderRows = rows - 1;
-  let currentSurface: Surface = createSurface(cols, renderRows);
-  let displaySurface: Surface = createSurface(cols, renderRows);
-  let resized = false;
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-  process.stdout.on('resize', () => {
-    cols = process.stdout.columns ?? cols;
-    rows = process.stdout.rows ?? rows;
-    resized = true;
-  });
+const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
 
-  const frameIntervalMs = 1000 / TARGET_FPS;
-  let cycle = 0;
+function currentScenario(model: SoakModel): (typeof displayScenarios)[number] {
+  return displayScenarios[model.scenarioIndex]!;
+}
 
-  try {
-    while (!quit && cycle < MAX_CYCLES) {
-      for (let si = 0; si < scenarios.length && !quit; si++) {
-        const scenario = scenarios[si]!;
-        const state = scenario.setup();
-
-        // Warmup (untimed, off-screen)
-        for (let w = 0; w < scenario.defaultWarmupFrames && !quit; w++) {
-          scenario.frame(state, w);
-        }
-
-        // Clear + fresh surfaces for the new scenario.
-        io.write(CLEAR);
-        renderRows = rows - 1;
-        currentSurface = createSurface(cols, renderRows);
-        resized = false;
-
-        const dwellFrames = Math.ceil(DWELL_SECS * TARGET_FPS);
-        const frameTimes: number[] = [];
-        const startFrame = scenario.defaultWarmupFrames;
-
-        for (let f = 0; f < dwellFrames && !quit; f++) {
-          // Handle terminal resize mid-scenario
-          if (resized) {
-            renderRows = rows - 1;
-            currentSurface = createSurface(cols, renderRows);
-            io.write(CLEAR);
-            resized = false;
-          }
-
-          const t0 = performance.now();
-
-          // Run the scenario frame
-          scenario.frame(state, startFrame + f);
-
-          // Get the display surface and tile it across the full terminal.
-          const sceneSurface = scenario.getDisplaySurface!(state);
-          if (sceneSurface) {
-            displaySurface = createSurface(cols, renderRows);
-            const sw = sceneSurface.width;
-            const sh = sceneSurface.height;
-            for (let ty = 0; ty < renderRows; ty += sh) {
-              for (let tx = 0; tx < cols; tx += sw) {
-                displaySurface.blit(sceneSurface, tx, ty);
-              }
-            }
-          }
-
-          // Render to terminal via the real byte pipeline
-          renderDiff(currentSurface, displaySurface, io, style);
-
-          // Swap
-          const prev = currentSurface;
-          currentSurface = displaySurface;
-          displaySurface = prev;
-
-          const t1 = performance.now();
-          const frameNs = (t1 - t0) * 1_000_000;
-          frameTimes.push(frameNs);
-
-          // Status bar pinned to terminal bottom
-          drawStatusBar(scenario.label, f + 1, frameNs, cycle, si, scenarios.length);
-
-          // Throttle to target FPS
-          const elapsed = t1 - t0;
-          const sleepMs = frameIntervalMs - elapsed;
-          if (sleepMs > 1) {
-            await new Promise((r) => setTimeout(r, sleepMs));
-          } else {
-            // Yield to let stdin events process
-            await new Promise((r) => setTimeout(r, 0));
-          }
-        }
-
-        // Log this scenario run
-        const stats = computeStats(frameTimes);
-        const mem = process.memoryUsage();
-        const entry = {
-          ts: new Date().toISOString(),
-          cycle,
-          scenario: scenario.id,
-          frames: frameTimes.length,
-          nsPerFrame: Math.round(stats.mean),
-          p50: Math.round(stats.p50),
-          p90: Math.round(stats.p90),
-          p99: Math.round(stats.p99),
-          covPct: Math.round(stats.cov * 1000) / 10,
-          heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
-          rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
-        };
-        appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
-
-        scenario.teardown?.(state);
-      }
-
-      cycle++;
-    }
-  } finally {
-    io.write(SHOW_CURSOR + WRAP_ON + EXIT_ALT);
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(false);
-      process.stdin.pause();
-    }
-    console.log(`soak: ${cycle} cycles, log at ${LOG_PATH}`);
+function runWarmup(scenario: AnyScenario, state: unknown): void {
+  for (let w = 0; w < scenario.defaultWarmupFrames; w++) {
+    scenario.frame(state, w);
   }
 }
 
-main().catch((err) => {
-  io.write(SHOW_CURSOR + WRAP_ON + EXIT_ALT);
-  console.error(err);
-  process.exit(1);
-});
+function logScenarioStats(model: SoakModel): void {
+  const scenario = currentScenario(model);
+  const stats = computeStats(model.frameTimes);
+  const mem = process.memoryUsage();
+  const entry = {
+    ts: new Date().toISOString(),
+    cycle: model.cycle,
+    scenario: scenario.id,
+    frames: model.frameTimes.length,
+    nsPerFrame: Math.round(stats.mean),
+    p50: Math.round(stats.p50),
+    p90: Math.round(stats.p90),
+    p99: Math.round(stats.p99),
+    covPct: Math.round(stats.cov * 1000) / 10,
+    heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
+    rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+  };
+  appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
+}
+
+function tileScenarioSurface(model: SoakModel, width: number, height: number): Surface {
+  const scenario = currentScenario(model);
+  const sceneSurface = scenario.getDisplaySurface(model.scenarioState);
+  const tiled = createSurface(width, height);
+  if (sceneSurface) {
+    const sw = sceneSurface.width;
+    const sh = sceneSurface.height;
+    for (let ty = 0; ty < height; ty += sh) {
+      for (let tx = 0; tx < width; tx += sw) {
+        tiled.blit(sceneSurface, tx, ty);
+      }
+    }
+  }
+  return tiled;
+}
+
+function initScenario(scenarioIndex: number, cycle: number): SoakModel {
+  const scenario = displayScenarios[scenarioIndex]!;
+  const state = scenario.setup();
+  runWarmup(scenario, state);
+  return {
+    scenarioIndex,
+    scenarioState: state,
+    frameIndex: 0,
+    frameTimes: [],
+    cycle,
+    elapsedMs: 0,
+    lastFrameNs: 0,
+    warmedUp: true,
+  };
+}
+
+function logAndAdvanceCmd(model: SoakModel): Cmd<SoakMsg> {
+  return () => {
+    logScenarioStats(model);
+    currentScenario(model).teardown?.(model.scenarioState);
+    return { type: 'advance-scenario' } satisfies SoakMsg;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// App
+// ---------------------------------------------------------------------------
+
+function createSoakApp(_ctx: BijouContext) {
+  return createFramedApp<SoakModel, SoakMsg>({
+    title: 'Soak Runner',
+    pages: [{
+      id: 'soak',
+      title: 'Soak',
+      init(): [SoakModel, Cmd<SoakMsg>[]] {
+        return [initScenario(0, 0), []];
+      },
+      update(msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
+        if (msg.type === 'advance-scenario') {
+          const nextIndex = model.scenarioIndex + 1;
+          if (nextIndex >= displayScenarios.length) {
+            const nextCycle = model.cycle + 1;
+            if (nextCycle >= MAX_CYCLES) {
+              return [model, [quit()]];
+            }
+            return [initScenario(0, nextCycle), []];
+          }
+          return [initScenario(nextIndex, model.cycle), []];
+        }
+
+        if (msg.type === 'pulse') {
+          const dtMs = msg.dt * 1000;
+          const newElapsed = model.elapsedMs + dtMs;
+          const dwellMs = DWELL_SECS * 1000;
+
+          // Check if dwell time expired.
+          if (newElapsed >= dwellMs) {
+            const updated: SoakModel = { ...model, elapsedMs: newElapsed };
+            return [updated, [logAndAdvanceCmd(updated)]];
+          }
+
+          // Throttle: only advance a scenario frame at the target FPS rate.
+          const prevFrameSlot = Math.floor(model.elapsedMs / FRAME_INTERVAL_MS);
+          const nextFrameSlot = Math.floor(newElapsed / FRAME_INTERVAL_MS);
+
+          if (nextFrameSlot <= prevFrameSlot) {
+            return [{ ...model, elapsedMs: newElapsed }, []];
+          }
+
+          // Advance the scenario frame.
+          const scenario = currentScenario(model);
+          const startFrame = scenario.defaultWarmupFrames;
+          const t0 = performance.now();
+          scenario.frame(model.scenarioState, startFrame + model.frameIndex);
+          const t1 = performance.now();
+          const frameNs = (t1 - t0) * 1_000_000;
+
+          // frameTimes is a mutable array shared across model snapshots —
+          // this is intentional: allocating a new array per frame would
+          // defeat the purpose of a memory-stability soak test.
+          model.frameTimes.push(frameNs);
+
+          return [{
+            ...model,
+            frameIndex: model.frameIndex + 1,
+            elapsedMs: newElapsed,
+            lastFrameNs: frameNs,
+          }, []];
+        }
+
+        // Mouse events: ignore.
+        return [model, []];
+      },
+      layout(model: SoakModel) {
+        return {
+          kind: 'pane' as const,
+          paneId: 'soak',
+          render: (width: number, height: number) => tileScenarioSurface(model, width, height),
+        };
+      },
+    }],
+    helpLineSource({ model: frameModel }) {
+      const pageModel = frameModel.pageModels[frameModel.activePageId];
+      if (!pageModel) return '';
+      const scenario = currentScenario(pageModel);
+      const ft = formatNs(pageModel.lastFrameNs);
+      const left = `${scenario.label}  frame ${pageModel.frameIndex}  ${ft}/frame`;
+      const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
+      return `${left}  |  ${right}`;
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Bootstrap
+// ---------------------------------------------------------------------------
+
+const ctx = initDefaultContext();
+await run(createSoakApp(ctx), { ctx });
