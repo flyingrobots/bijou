@@ -17,6 +17,7 @@ import { diffGradient } from './diff-gradient.js';
 import { diffSparse } from './diff-sparse.js';
 import { diffStatic } from './diff-static.js';
 import { dogfoodRealistic } from './dogfood-realistic.js';
+import { soak } from './soak.js';
 
 export { type Scenario, type AnyScenario } from './types.js';
 
@@ -30,6 +31,7 @@ export const SCENARIOS: readonly AnyScenario[] = [
   diffSparse,
   diffStatic,
   dogfoodRealistic,
+  soak,
 ] as unknown as readonly AnyScenario[];
 
 /** Look up a scenario by ID, or throw if not found. */
