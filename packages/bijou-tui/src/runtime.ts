@@ -90,9 +90,16 @@ export async function run<Model, M>(
   let currentSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
   let nextSurface: Surface = createSurface(initialViewport.columns, initialViewport.rows);
 
+  // Pooled output byte buffer for the packed differ's direct-byte path.
+  // Sized against the current viewport with an upper-bound cell budget
+  // (every cell worst-case ~64 bytes of ANSI + char). Reused across frames
+  // and resized in lockstep with the framebuffers on terminal resize.
+  let outBuf: Uint8Array = allocOutBuf(initialViewport.columns, initialViewport.rows);
+
   function resetFramebuffers(columns: number, rows: number): void {
     currentSurface = createSurface(columns, rows);
     nextSurface = createSurface(columns, rows);
+    outBuf = allocOutBuf(columns, rows);
   }
 
   function ensureFramebufferSize(columns: number, rows: number): void {
@@ -174,7 +181,8 @@ export async function run<Model, M>(
       state.ctx.io,
       state.currentSurface,
       state.targetSurface,
-      state.ctx.style
+      state.ctx.style,
+      state.outBuf,
     );
     next();
   });
@@ -240,6 +248,7 @@ export async function run<Model, M>(
           dt: currentDt,
           currentSurface,
           targetSurface: nextSurface,
+          outBuf,
           layoutMap: new Map(),
           data: {},
         };
@@ -381,6 +390,32 @@ export async function run<Model, M>(
 
 function disposeTimerHandle(handle: TimerHandle | null): void {
   handle?.dispose();
+}
+
+/**
+ * Upper-bound byte budget per surface cell for the pooled output buffer.
+ * Each cell can emit at most a CUP move (~10 bytes), a full RGB SGR
+ * prefix (~44 bytes), a few modifier codes (~10 bytes), a grapheme
+ * (~4 bytes UTF-8 in the fast path), and an SGR reset (~4 bytes).
+ * 64 bytes per cell comfortably covers the common case where the
+ * differ batches contiguous styles. Frames whose UTF-8 output exceeds
+ * the budget transparently fall back to the legacy `io.write(string)`
+ * path inside the differ — correctness before optimization.
+ */
+const OUTBUF_BYTES_PER_CELL = 64;
+/** Fixed slack added on top of the cell budget for ANSI preamble/tail. */
+const OUTBUF_SLACK = 4096;
+
+/**
+ * Allocate a pooled output buffer sized to a given viewport.
+ *
+ * @param columns - Terminal columns in the current viewport.
+ * @param rows    - Terminal rows in the current viewport.
+ * @returns A zero-initialized Uint8Array large enough for a worst-case
+ *          frame in this viewport.
+ */
+function allocOutBuf(columns: number, rows: number): Uint8Array {
+  return new Uint8Array(columns * rows * OUTBUF_BYTES_PER_CELL + OUTBUF_SLACK);
 }
 
 /** Write an error message to stderr if available, otherwise stdout. */

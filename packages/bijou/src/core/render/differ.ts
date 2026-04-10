@@ -244,26 +244,38 @@ function moveCursor(x: number, y: number): string {
 
 /**
  * Diff two surfaces and write the minimal set of changes to the WritePort.
- * 
+ *
  * Optimizations:
  * 1. Skips identical cells.
  * 2. Minimizes CUP (move cursor) commands by detecting contiguous changes.
  * 3. Batches cells with identical styles to minimize SGR codes and keep strings contiguous.
- * 
+ *
+ * When both surfaces are {@link PackedSurface}, the caller owns a pooled
+ * `outBuf`, and the IO port implements {@link WritePort.writeBytes}, the
+ * composed frame is UTF-8 encoded into the supplied buffer once and
+ * handed off via `writeBytes` instead of `write(string)`. This lets the
+ * TUI runtime own the output allocation and bypass the implicit
+ * string→UTF-8 conversion inside the underlying stream.
+ *
+ * Callers without an `outBuf` (tests, bench scenarios, simple drivers)
+ * fall through to the legacy `io.write(string)` path with no overhead.
+ *
  * @param current - The surface currently on the terminal.
  * @param target  - The desired surface state.
  * @param io      - The port to write ANSI codes to.
  * @param style   - The port to resolve cell styling.
+ * @param outBuf  - Optional pooled byte buffer for the packed byte path.
  */
 export function renderDiff(
   current: Surface,
   target: Surface,
   io: WritePort,
   style: StylePort,
+  outBuf?: Uint8Array,
 ): void {
   // Use packed byte path when both surfaces have buffers
   if (isPackedSurface(target) && isPackedSurface(current)) {
-    renderDiffPacked(current, target, io, style);
+    renderDiffPacked(current, target, io, style, outBuf);
     return;
   }
   renderDiffCells(current, target, io, style);
@@ -336,6 +348,11 @@ const RESET_SGR = '\x1b[0m';
 // Key is a collision-free string built from the 8 style bytes.
 const sgrCache = new Map<string, string>();
 
+// Reusable UTF-8 encoder for the byte-output path. encodeInto writes
+// directly into a target view without allocating an intermediate
+// Uint8Array, so the same encoder instance is shared across all calls.
+const textEncoder = new TextEncoder();
+
 /**
  * Semantic packed-cell equality across two buffers with independent side tables.
  * Raw bytes are compared first; if they match and the char is a side-table
@@ -403,6 +420,7 @@ function renderDiffPacked(
   target: PackedSurface,
   io: WritePort,
   _style: StylePort,
+  outBuf?: Uint8Array,
 ): void {
   const width = target.width;
   const height = target.height;
@@ -538,9 +556,29 @@ function renderDiffPacked(
     }
   }
 
-  if (output.length > 0) {
-    io.write(output);
+  if (output.length === 0) {
+    return;
   }
+
+  // Byte transport: when the caller owns a pooled buffer (the TUI
+  // runtime) and the IO port supports writeBytes (Node stdout), encode
+  // the composed frame into the buffer once and hand the bytes off
+  // directly. This avoids the implicit string→UTF-8 conversion inside
+  // the underlying stream and gives II-4 a place to land direct
+  // byte-emission without re-touching every caller. Tests, bench
+  // scenarios, and simple drivers do not pass `outBuf` and stay on
+  // the legacy `io.write(string)` path with no overhead.
+  if (
+    outBuf !== undefined
+    && io.writeBytes !== undefined
+    && output.length * 4 <= outBuf.length
+  ) {
+    const { written } = textEncoder.encodeInto(output, outBuf);
+    io.writeBytes(outBuf, written);
+    return;
+  }
+
+  io.write(output);
 }
 
 // ── Legacy cell-based differ (fallback) ─────────────────

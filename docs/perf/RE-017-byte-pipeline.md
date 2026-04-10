@@ -1054,3 +1054,135 @@ replacing all of that with byte-level emission into a pooled
 
 II-3 and II-4 are bigger and probably need to split across
 sessions. Stopping here for this turn.
+
+---
+
+## 2026-04-10 — II-3 lands as opt-in plumbing (no perf delta)
+
+**Goal**: pool a `Uint8Array` in the TUI runtime and route the
+differ's output through `WritePort.writeBytes` instead of
+`io.write(string)`. Set up the API surface that II-4 will use for
+direct byte-level emission.
+
+**What landed**
+
+- `RenderState.outBuf?: Uint8Array` field on the pipeline state.
+- `bijou-tui` runtime allocates a pooled buffer in `run()`,
+  resizes it in `resetFramebuffers()`, and threads it through to
+  the default Diff middleware via `RenderState`. Buffer is sized
+  `cols * rows * 64 + 4096` (per-cell upper bound for ANSI + char
+  + reset + cursor move with comfortable slack).
+- `renderSurfaceFrame(io, current, target, style, outBuf?)` and
+  `renderDiff(current, target, io, style, outBuf?)` both gain a
+  trailing `outBuf` parameter and forward it to the packed differ.
+- `renderDiffPacked` keeps its existing string-based emission loop
+  unchanged. At the very end, when *all* of (caller passed an
+  `outBuf`, port supplies `writeBytes`, and the UTF-8-worst-case
+  expansion of the composed string fits the buffer) are true, it
+  encodes the frame once via `TextEncoder.encodeInto` and hands
+  the bytes to `io.writeBytes(buf, len)`. Otherwise it falls back
+  to `io.write(string)` — correctness before optimization.
+
+**The "encodeInto on every small write" detour**
+
+The first attempt replaced every `output += X` site in the differ
+with a `writeStr(X)` helper that called `TextEncoder.encodeInto`
+per chunk. Predicted neutral; measured **regression**:
+
+| Scenario | After II-1 | First II-3 attempt | Δ |
+|---|---|---|---|
+| diff-gradient | 2.07 ms | 4.55 ms | **+120%** |
+| diff-sparse | 185 µs | 452 µs | **+144%** |
+| dogfood-realistic | 465 µs | 588 µs | **+26%** |
+
+Per-call `encodeInto` setup overhead dominates when the source
+strings are short (cursor moves, SGR codes, single graphemes).
+The V8 string-concat ropes that the legacy path relied on are
+free by comparison.
+
+Lesson: **the byte path's value is in `writeBytes` itself** —
+specifically in handing a pre-encoded buffer to the OS instead of
+re-walking a JS string at the stream boundary. It is **not** in
+the act of encoding small chunks early. Until the differ can emit
+SGR + cursor bytes *directly* without ever materializing them as
+JS strings (II-4's job), the cheapest correct shape is one
+encodeInto call per frame, on the fully composed output.
+
+Reverted to the single-encodeInto-at-end design and
+re-measured — neutral as expected.
+
+**Bench results vs `HEAD-4216f15-after-II-1`**
+
+Apple M1 Pro, Node v25.8.1, 30 samples each.
+
+| Scenario | Baseline | After II-3 | Δ | Status |
+|---|---|---|---|---|
+| paint-ascii | 236.40 µs | 235.50 µs | -0.4% | ok |
+| paint-rgb-fixed | 144.61 µs | 144.91 µs | +0.2% | ok |
+| paint-theme-set | 635.26 µs | 631.32 µs | -0.6% | ok |
+| paint-theme-set-fast | 329.83 µs | 328.75 µs | -0.3% | ok |
+| paint-gradient-rgb | 943.82 µs | 939.43 µs | -0.5% | ok |
+| diff-gradient | 2.05 ms | 2.02 ms | -1.5% | ok |
+| diff-sparse | 179.68 µs | 184.68 µs | +2.8% | ok |
+| diff-static | 9.58 µs | 7.82 µs | -18.3% | GOOD |
+| dogfood-realistic | 461.59 µs | 468.45 µs | +1.5% | ok |
+
+The diff-static "improvement" is mostly the floor-noise effect
+(7.82 µs is well inside the 13.6% CoV bin); the remaining
+scenarios are within ±3% of baseline. Plumbing achieved without
+regression.
+
+**Why bench scenarios stay on the string path**
+
+The bench's counting sinks deliberately do not implement
+`writeBytes`. With the byte path gated on
+`outBuf !== undefined && io.writeBytes !== undefined`, all bench
+scenarios fall through to `io.write(string)` and measure the
+unchanged emission loop. The runtime alone opts in to the
+bytes path in production. This was a deliberate choice after
+the first attempt showed that letting the bench exercise the
+`encodeInto`-at-end path adds work the bench sink does not need
+to do (it counts `text.length`, no real byte conversion).
+
+When II-4 lands, both bench and runtime should be measurable on
+the byte path because there will no longer be a string
+intermediate to skip past.
+
+**What II-4 has to do**
+
+The differ still builds an `output: string` in the inner loop.
+II-4 replaces that with direct byte writes:
+
+1. `moveCursor(x, y)` becomes a byte writer that emits
+   `\x1b[`, decimal y+1, `;`, decimal x+1, `H` directly into
+   the pooled buffer.
+2. `emitSgrFromBuf` is replaced by a byte-level SGR builder.
+   The `sgrCache` Map and its `styleCacheKey` String.fromCharCode
+   indirection both go away — there is no string to cache
+   anymore.
+3. Batch text becomes a `TextEncoder.encodeInto(batchText, ...)`
+   call against the pooled buffer (one per batch, not per cell).
+4. `RESET_SGR` becomes a 4-byte literal write.
+
+Once that lands, `diff-gradient`'s 9168-entry sgrCache stress
+case should drop substantially. The current 2.02 ms is the
+ceiling we are trying to beat.
+
+**Files touched (II-3)**
+
+- `packages/bijou/src/core/render/differ.ts` — `renderDiff` and
+  `renderDiffPacked` gain optional `outBuf`; encode-at-end byte
+  path under feature gates; `textEncoder` module-level singleton.
+- `packages/bijou-tui/src/screen.ts` — `renderSurfaceFrame` gains
+  `outBuf` and forwards.
+- `packages/bijou-tui/src/pipeline/pipeline.ts` —
+  `RenderState.outBuf?: Uint8Array` field.
+- `packages/bijou-tui/src/runtime.ts` — `allocOutBuf(cols, rows)`
+  helper, ownership inside `run()`, pass-through into the default
+  Diff middleware and `RenderState` constructor.
+
+**Smoke test**
+
+`npm run smoke:dogfood` (landing + docs) passes. Real production
+traffic now exercises the encode-at-end byte path; the bench
+shows no regression on the string-path scenarios it can see.

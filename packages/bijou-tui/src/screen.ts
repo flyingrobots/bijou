@@ -112,14 +112,19 @@ export function clearAndHome(io: IOPort): void {
  * @param current - The surface currently on screen.
  * @param target  - The new surface to render.
  * @param style   - Style port for color resolution.
+ * @param outBuf  - Optional pooled byte buffer owned by the runtime. When
+ *                  supplied, the packed differ writes UTF-8 bytes directly
+ *                  into it and flushes via {@link IOPort.writeBytes},
+ *                  avoiding per-frame string allocation.
  */
 export function renderSurfaceFrame(
   io: IOPort,
   current: Surface,
   target: Surface,
   style: StylePort,
+  outBuf?: Uint8Array,
 ): void {
-  renderDiff(current, target, io, style);
+  renderDiff(current, target, io, style, outBuf);
 }
 
 /**

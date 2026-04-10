@@ -21,6 +21,13 @@ export interface RenderState {
    */
   targetSurface: Surface;
   /**
+   * Pooled byte buffer owned by the runtime for direct UTF-8 emission
+   * from the Diff stage. The buffer is sized to the current viewport and
+   * reused across frames. Absent only in non-interactive modes or custom
+   * pipelines that do not drive the default Diff middleware.
+   */
+  outBuf?: Uint8Array;
+  /**
    * Layout geometry calculated during the `Layout` stage.
    * Keyed by component ID.
    */
