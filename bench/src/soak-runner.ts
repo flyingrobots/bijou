@@ -82,18 +82,22 @@ if (!existsSync(LOG_PATH)) writeFileSync(LOG_PATH, '');
 // --- Status bar rendering ---
 function drawStatusBar(
   scenarioLabel: string,
+  scenarioCols: number,
+  scenarioRows: number,
   frameIdx: number,
   frameTimeNs: number,
   cycle: number,
   scenarioIdx: number,
   total: number,
 ): void {
-  const row = rows;
+  // Place the bar directly below the scenario surface, not at terminal bottom.
+  const barRow = scenarioRows + 1;
+  const barWidth = Math.max(scenarioCols, cols);
   const ft = formatNs(frameTimeNs);
   const left = ` ${scenarioLabel}  frame ${frameIdx}  ${ft}/frame`;
   const right = `cycle ${cycle}  [${scenarioIdx + 1}/${total}]  q to quit `;
-  const pad = Math.max(0, cols - left.length - right.length);
-  const bar = `${ESC}${row};1H${ESC}7m${left}${' '.repeat(pad)}${right}${ESC}0m`;
+  const pad = Math.max(0, barWidth - left.length - right.length);
+  const bar = `${ESC}${barRow};1H${ESC}7m${left}${' '.repeat(pad)}${right}${ESC}0m`;
   process.stdout.write(bar);
 }
 
@@ -101,10 +105,11 @@ function drawStatusBar(
 async function main(): Promise<void> {
   io.write(ENTER_ALT + HIDE_CURSOR + WRAP_OFF + CLEAR);
 
-  // Rendering surfaces sized to terminal minus 1 row for status bar.
-  const renderRows = rows - 1;
-  let currentSurface: Surface = createSurface(cols, renderRows);
-  let displaySurface: Surface = createSurface(cols, renderRows);
+  // Rendering surfaces are sized per-scenario (not terminal) since each
+  // scenario defines its own surface dimensions. Declared here and
+  // re-created on each scenario transition.
+  let currentSurface: Surface = createSurface(1, 1);
+  let displaySurface: Surface = createSurface(1, 1);
 
   const frameIntervalMs = 1000 / TARGET_FPS;
   let cycle = 0;
@@ -120,8 +125,11 @@ async function main(): Promise<void> {
           scenario.frame(state, w);
         }
 
-        // Clear current surface for the new scenario (force full redraw).
-        currentSurface = createSurface(cols, renderRows);
+        // Clear screen + create surfaces matching this scenario's dimensions.
+        io.write(CLEAR);
+        const sCols = scenario.columns;
+        const sRows = scenario.rows;
+        currentSurface = createSurface(sCols, sRows);
 
         const dwellFrames = Math.ceil(DWELL_SECS * TARGET_FPS);
         const frameTimes: number[] = [];
@@ -136,7 +144,7 @@ async function main(): Promise<void> {
           // Get the display surface and blit it to our render surface
           const sceneSurface = scenario.getDisplaySurface!(state);
           if (sceneSurface) {
-            displaySurface = createSurface(cols, renderRows);
+            displaySurface = createSurface(sCols, sRows);
             displaySurface.blit(sceneSurface, 0, 0);
           }
 
@@ -152,8 +160,8 @@ async function main(): Promise<void> {
           const frameNs = (t1 - t0) * 1_000_000;
           frameTimes.push(frameNs);
 
-          // Status bar
-          drawStatusBar(scenario.label, f + 1, frameNs, cycle, si, scenarios.length);
+          // Status bar — placed right below the scenario surface
+          drawStatusBar(scenario.label, sCols, sRows, f + 1, frameNs, cycle, si, scenarios.length);
 
           // Throttle to target FPS
           const elapsed = t1 - t0;
