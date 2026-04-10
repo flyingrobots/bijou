@@ -1,21 +1,14 @@
 /**
- * Soak runner — long-running loop through all bench scenarios.
+ * Soak runner — headed live dashboard with keyboard quit.
  *
- * Cycles through every registered scenario repeatedly, collecting
- * frame-time and memory metrics per cycle and appending them as
- * JSONL to a log file. Runs until interrupted (Ctrl+C).
+ * Cycles through all bench scenarios in a loop, showing a live
+ * updating table of per-scenario metrics. Press q, Esc, or Ctrl+C
+ * to quit cleanly between scenarios.
  *
  * Usage:
- *   npm run soak                       # default log location
- *   npm run soak -- --out=my-soak.jsonl # custom log path
+ *   npm run soak                       # default log + live display
  *   npm run soak -- --cycles=50        # stop after N cycles
- *
- * The log file is append-only JSONL. Each line is one scenario run:
- *   {"ts":"...","cycle":0,"scenario":"paint-ascii","frames":200,
- *    "nsPerFrame":234000,"p50Ns":230000,...,"heapUsedMB":12.3,...}
- *
- * Tail it live:    tail -f bench/soak.jsonl | jq .
- * Quick summary:   cat bench/soak.jsonl | jq -r '[.cycle,.scenario,.p50] | @tsv'
+ *   npm run soak -- --out=custom.jsonl # custom log path
  */
 
 import { appendFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -37,93 +30,190 @@ function argInt(name: string, fallback: number): number {
 const LOG_PATH = resolve(argStr('out', 'bench/soak.jsonl'));
 const MAX_CYCLES = argInt('cycles', Infinity);
 
-// Scenarios to include. Skip the 'soak' scenario itself — it's a
-// 1000-frame stability test that would slow down each cycle. The soak
-// runner IS the stability test; each scenario runs with its own
-// default frame count.
 const scenarios = SCENARIOS.filter((s) => s.id !== 'soak');
 
-// --- Setup ---
-let running = true;
-process.on('SIGINT', () => {
-  running = false;
-  process.stderr.write('\nsoak: interrupted, finishing current scenario...\n');
-});
+// --- Quit detection ---
+let quit = false;
 
+if (process.stdin.isTTY) {
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.on('data', (data: Buffer) => {
+    const ch = data[0]!;
+    // q, Q, Esc, Ctrl+C
+    if (ch === 0x71 || ch === 0x51 || ch === 0x1b || ch === 0x03) {
+      quit = true;
+    }
+  });
+}
+
+process.on('SIGINT', () => { quit = true; });
+
+// --- ANSI helpers ---
+const CSI = '\x1b[';
+const CLEAR = CSI + '2J' + CSI + 'H';
+const HIDE_CURSOR = CSI + '?25l';
+const SHOW_CURSOR = CSI + '?25h';
+const BOLD = CSI + '1m';
+const DIM = CSI + '2m';
+const RESET = CSI + '0m';
+const GREEN = CSI + '32m';
+const YELLOW = CSI + '33m';
+const CYAN = CSI + '36m';
+
+function moveTo(row: number, col: number): string {
+  return `${CSI}${row};${col}H`;
+}
+
+// --- Log file ---
 if (!existsSync(LOG_PATH)) {
   writeFileSync(LOG_PATH, '');
 }
 
-process.stderr.write(`soak: ${scenarios.length} scenarios, logging to ${LOG_PATH}\n`);
-process.stderr.write('soak: Ctrl+C to stop\n\n');
-
-// --- Main loop ---
-let cycle = 0;
-
-while (running && cycle < MAX_CYCLES) {
-  const cycleStart = performance.now();
-
-  for (const scenario of scenarios) {
-    if (!running) break;
-
-    const warmup = scenario.defaultWarmupFrames;
-    const frames = scenario.defaultMeasureFrames;
-
-    // Setup
-    const state = scenario.setup();
-
-    // Warmup (untimed)
-    for (let i = 0; i < warmup; i++) {
-      scenario.frame(state, i);
-    }
-
-    // Timed measurement with per-frame recording
-    const frameTimes: number[] = new Array(frames);
-    for (let i = 0; i < frames; i++) {
-      const t0 = performance.now();
-      scenario.frame(state, warmup + i);
-      const t1 = performance.now();
-      frameTimes[i] = (t1 - t0) * 1_000_000; // ms → ns
-    }
-
-    // Teardown
-    scenario.teardown?.(state);
-
-    // Memory snapshot (post-scenario, pre-GC — shows working set)
-    const mem = process.memoryUsage();
-
-    // Stats
-    const stats = computeStats(frameTimes);
-
-    const entry = {
-      ts: new Date().toISOString(),
-      cycle,
-      scenario: scenario.id,
-      frames,
-      nsPerFrame: Math.round(stats.mean),
-      p50: Math.round(stats.p50),
-      p90: Math.round(stats.p90),
-      p99: Math.round(stats.p99),
-      min: Math.round(stats.min),
-      max: Math.round(stats.max),
-      covPct: Math.round(stats.cov * 1000) / 10,
-      heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
-      heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024 * 10) / 10,
-      rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
-      externalMB: Math.round(mem.external / 1024 / 1024 * 10) / 10,
-    };
-
-    appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
-
-    // Live status
-    process.stderr.write(
-      `  cycle ${String(cycle).padStart(4)} | ${scenario.id.padEnd(22)} | p50 ${formatNs(stats.p50).padStart(10)} | heap ${entry.heapUsedMB} MB\n`,
-    );
-  }
-
-  const cycleMs = ((performance.now() - cycleStart) / 1000).toFixed(1);
-  process.stderr.write(`  --- cycle ${cycle} done (${cycleMs}s) ---\n`);
-  cycle++;
+// --- State per scenario ---
+interface ScenarioRow {
+  id: string;
+  p50: string;
+  p90: string;
+  cov: string;
+  heap: string;
+  lastCycle: number;
+  status: 'pending' | 'running' | 'done';
 }
 
-process.stderr.write(`\nsoak: ${cycle} cycles completed, log at ${LOG_PATH}\n`);
+const rows: ScenarioRow[] = scenarios.map((s) => ({
+  id: s.id,
+  p50: '—',
+  p90: '—',
+  cov: '—',
+  heap: '—',
+  lastCycle: -1,
+  status: 'pending' as const,
+}));
+
+// --- Render dashboard ---
+function render(cycle: number, elapsed: string): void {
+  let out = CLEAR;
+  out += moveTo(1, 1);
+  out += `${BOLD}${CYAN} soak ${RESET}${DIM} cycle ${cycle} | elapsed ${elapsed}s | q/esc to quit${RESET}\n\n`;
+
+  // Table header
+  out += `  ${DIM}${'Scenario'.padEnd(24)} ${'P50'.padStart(12)} ${'P90'.padStart(12)} ${'CoV'.padStart(8)} ${'Heap'.padStart(10)}${RESET}\n`;
+  out += `  ${DIM}${'─'.repeat(24)} ${'─'.repeat(12)} ${'─'.repeat(12)} ${'─'.repeat(8)} ${'─'.repeat(10)}${RESET}\n`;
+
+  for (const row of rows) {
+    const indicator = row.status === 'running'
+      ? `${YELLOW}▸${RESET} `
+      : row.status === 'done'
+        ? `${GREEN}✓${RESET} `
+        : '  ';
+    out += `${indicator}${row.id.padEnd(24)} ${row.p50.padStart(12)} ${row.p90.padStart(12)} ${row.cov.padStart(8)} ${row.heap.padStart(10)}\n`;
+  }
+
+  out += `\n  ${DIM}log: ${LOG_PATH}${RESET}\n`;
+
+  process.stdout.write(out);
+}
+
+// --- Main loop ---
+async function main(): Promise<void> {
+  process.stdout.write(HIDE_CURSOR);
+  const startWall = performance.now();
+  let cycle = 0;
+
+  try {
+    while (!quit && cycle < MAX_CYCLES) {
+      // Reset row status for this cycle
+      for (const row of rows) row.status = 'pending';
+
+      for (let si = 0; si < scenarios.length; si++) {
+        if (quit) break;
+
+        const scenario = scenarios[si]!;
+        const row = rows[si]!;
+        row.status = 'running';
+
+        const elapsed = ((performance.now() - startWall) / 1000).toFixed(0);
+        render(cycle, elapsed);
+
+        // Yield to let stdin events process before the blocking frame loop
+        await new Promise((r) => setTimeout(r, 0));
+        if (quit) break;
+
+        const warmup = scenario.defaultWarmupFrames;
+        const frames = scenario.defaultMeasureFrames;
+
+        // Setup + warmup
+        const state = scenario.setup();
+        for (let i = 0; i < warmup; i++) {
+          scenario.frame(state, i);
+        }
+
+        // Timed measurement
+        const frameTimes: number[] = new Array(frames);
+        for (let i = 0; i < frames; i++) {
+          const t0 = performance.now();
+          scenario.frame(state, warmup + i);
+          const t1 = performance.now();
+          frameTimes[i] = (t1 - t0) * 1_000_000;
+        }
+        scenario.teardown?.(state);
+
+        // Stats + memory
+        const stats = computeStats(frameTimes);
+        const mem = process.memoryUsage();
+
+        // Update row
+        row.p50 = formatNs(stats.p50);
+        row.p90 = formatNs(stats.p90);
+        row.cov = `${(stats.cov * 100).toFixed(1)}%`;
+        row.heap = `${(mem.heapUsed / 1024 / 1024).toFixed(1)} MB`;
+        row.lastCycle = cycle;
+        row.status = 'done';
+
+        // Log
+        const entry = {
+          ts: new Date().toISOString(),
+          cycle,
+          scenario: scenario.id,
+          frames,
+          nsPerFrame: Math.round(stats.mean),
+          p50: Math.round(stats.p50),
+          p90: Math.round(stats.p90),
+          p99: Math.round(stats.p99),
+          min: Math.round(stats.min),
+          max: Math.round(stats.max),
+          covPct: Math.round(stats.cov * 1000) / 10,
+          heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
+          heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024 * 10) / 10,
+          rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+          externalMB: Math.round(mem.external / 1024 / 1024 * 10) / 10,
+        };
+        appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
+
+        // Render updated dashboard
+        const elapsedNow = ((performance.now() - startWall) / 1000).toFixed(0);
+        render(cycle, elapsedNow);
+      }
+
+      cycle++;
+    }
+  } finally {
+    // Clean exit: show cursor, move below the dashboard
+    const finalElapsed = ((performance.now() - startWall) / 1000).toFixed(1);
+    render(cycle, finalElapsed);
+    process.stdout.write(`\n  ${BOLD}soak: ${cycle} cycles, ${finalElapsed}s${RESET}\n\n`);
+    process.stdout.write(SHOW_CURSOR);
+
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(false);
+      process.stdin.pause();
+    }
+  }
+}
+
+main().catch((err) => {
+  process.stdout.write(SHOW_CURSOR);
+  console.error(err);
+  process.exit(1);
+});
