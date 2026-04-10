@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-bench",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "Headless performance benchmarks for bijou — frame-time, memory, and interactive sandbox.",
   "private": true,
   "type": "module",

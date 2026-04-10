@@ -1477,3 +1477,42 @@ target, every representative scenario is faster than
 pre-RE017, and no regressions survive. Ready to move into
 Phase E ship work (III-5 regression bench, III-1..4 DOGFOOD
 polish, III-6 version bump to 4.3.0).
+
+---
+
+## 2026-04-10 — III-5 regression gate passes, Phase E ship
+
+**III-5 Final regression bench**
+
+Formal gate run comparing `HEAD-60b1e0b-after-II-5` against
+the pre-RE017 baseline (`HEAD-941f62c`):
+
+| Scenario | Pre-RE017 | After II-5 | Δ | Gate |
+|---|---|---|---|---|
+| paint-ascii | 234.27 µs | 234.35 µs | +0.0% | ok |
+| paint-theme-set | 633.92 µs | 628.55 µs | −0.8% | ok |
+| paint-gradient-rgb | 946.29 µs | 934.49 µs | −1.2% | ok |
+| diff-gradient | 2.13 ms | 1.45 ms | **−31.7%** | **GOOD** |
+
+Only 4 scenarios existed in the pre-RE017 baseline. Full
+trajectory comparison against Phase A (`HEAD-f966c72`) shows
+all 9 bench v2 scenarios:
+
+| Scenario | Phase A | After II-5 | Δ | Gate |
+|---|---|---|---|---|
+| paint-ascii | 231 µs | 234 µs | +1.3% | ok |
+| paint-rgb-fixed | 145 µs | 145 µs | −0.3% | ok |
+| paint-theme-set | 635 µs | 629 µs | −1.0% | ok |
+| paint-theme-set-fast | 328 µs | 330 µs | +0.6% | ok |
+| paint-gradient-rgb | 950 µs | 934 µs | −1.6% | ok |
+| diff-gradient | 2.08 ms | 1.45 ms | **−30.0%** | **GOOD** |
+| diff-sparse | 349 µs | 125 µs | **−64.1%** | **GOOD** |
+| diff-static | 227 µs | 9.42 µs | **−95.9%** | **GOOD** |
+| dogfood-realistic | 469 µs | 411 µs | **−12.5%** | **GOOD** |
+
+Zero regressions. All paint scenarios recovered to neutral.
+All diff scenarios faster than any prior baseline by
+double-digit margins.
+
+**Gate verdict: PASS.** The RE-017 perf cycle meets its
+objectives. Ready for 4.3.0 version bump.
