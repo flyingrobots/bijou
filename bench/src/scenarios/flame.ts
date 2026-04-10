@@ -3,17 +3,17 @@
  *
  * A classic demoscene flame: value noise seeds the floor, heat
  * propagates upward with random lateral drift and decay. Every cell
- * is painted every frame with a full-color palette lookup. This is
- * the "every cell changes every frame, each with a unique-ish color"
- * worst case for the differ, and it looks spectacular in the soak
- * runner.
+ * is painted every frame with smooth gradient interpolation between
+ * palette stops. This is the "every cell changes every frame, each
+ * with a unique color" worst case for the differ, and it looks
+ * spectacular in the soak runner.
  *
  * Algorithm adapted from ertdfgcvb's play.ertdfgcvb.xyz doom flame.
  *
  * Exercises:
  * - Full-surface setRGB every frame (no unchanged cells)
- * - Per-cell palette lookup with fractional indexing
- * - Pseudo-random propagation (cache-unfriendly access patterns)
+ * - Per-cell smooth palette interpolation (hundreds of effective colors)
+ * - Random propagation (Math.random for organic motion)
  * - Value noise evaluation per floor cell per frame
  */
 
@@ -29,25 +29,46 @@ interface State {
   readonly noise: (x: number, y: number) => number;
 }
 
-// Fire palette: black → purple → red → orange → gold → white.
-// Each entry is [fgR, fgG, fgB, bgR, bgG, bgB].
-const PALETTE: readonly (readonly [number, number, number, number, number, number])[] = [
-  [0x00, 0x00, 0x00, 0x00, 0x00, 0x00], // 0 black
-  [0x80, 0x00, 0x80, 0x20, 0x00, 0x20], // 1 purple
-  [0x8b, 0x00, 0x00, 0x40, 0x00, 0x00], // 2 darkred
-  [0xff, 0x00, 0x00, 0x8b, 0x00, 0x00], // 3 red
-  [0xff, 0x45, 0x00, 0xcc, 0x20, 0x00], // 4 orangered
-  [0xff, 0xd7, 0x00, 0xff, 0x8c, 0x00], // 5 gold
-  [0xff, 0xfa, 0xcd, 0xff, 0xd7, 0x00], // 6 lemonchiffon
-  [0xff, 0xff, 0xff, 0xff, 0xfa, 0xcd], // 7 white
+// Palette stops for smooth interpolation.
+// Each stop is [r, g, b] at a normalized position along the heat range.
+const STOPS: readonly { pos: number; r: number; g: number; b: number }[] = [
+  { pos: 0.00, r: 0x00, g: 0x00, b: 0x00 }, // black
+  { pos: 0.10, r: 0x30, g: 0x00, b: 0x30 }, // deep purple
+  { pos: 0.25, r: 0x8b, g: 0x00, b: 0x00 }, // darkred
+  { pos: 0.40, r: 0xff, g: 0x00, b: 0x00 }, // red
+  { pos: 0.55, r: 0xff, g: 0x45, b: 0x00 }, // orangered
+  { pos: 0.70, r: 0xff, g: 0xd7, b: 0x00 }, // gold
+  { pos: 0.85, r: 0xff, g: 0xfa, b: 0xcd }, // lemonchiffon
+  { pos: 1.00, r: 0xff, g: 0xff, b: 0xff }, // white
 ];
 
-// Flame column: maps heat intensity (0-25) to palette index (0-7).
-// Lower indices = cooler (top of flame), higher = hotter (bottom).
-const FLAME_MAP = [0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7];
+/** Lerp between palette stops for a smooth continuous gradient. */
+function samplePalette(t: number): [number, number, number] {
+  const clamped = Math.max(0, Math.min(1, t));
+  // Find the two stops we're between.
+  let lo = STOPS[0]!;
+  let hi = STOPS[STOPS.length - 1]!;
+  for (let i = 0; i < STOPS.length - 1; i++) {
+    if (clamped >= STOPS[i]!.pos && clamped <= STOPS[i + 1]!.pos) {
+      lo = STOPS[i]!;
+      hi = STOPS[i + 1]!;
+      break;
+    }
+  }
+  const range = hi.pos - lo.pos;
+  const f = range === 0 ? 0 : (clamped - lo.pos) / range;
+  return [
+    Math.round(lo.r + f * (hi.r - lo.r)),
+    Math.round(lo.g + f * (hi.g - lo.g)),
+    Math.round(lo.b + f * (hi.b - lo.b)),
+  ];
+}
 
-// Fire display chars: blocks and shades for visual texture.
-const FIRE_CHARS = [0x20, 0x2591, 0x2592, 0x2593, 0x2588, 0x2588, 0x2588, 0x2588]; // ' ░▒▓████'
+// Block char for the fire. We use █ everywhere and let color do the work.
+const BLOCK = 0x2588;
+
+// Max heat value — higher = taller flames.
+const MAX_HEAT = 50;
 
 /**
  * Value noise generator with permutation table.
@@ -58,7 +79,7 @@ function createValueNoise(): (px: number, py: number) => number {
   const r = new Float64Array(tableSize);
   const perm = new Uint16Array(tableSize * 2);
 
-  // Deterministic seed for reproducibility across runs.
+  // Deterministic seed for reproducibility of the noise field shape.
   let seed = 42;
   function rng(): number {
     seed = (seed * 1664525 + 1013904223) & 0xffffffff;
@@ -104,18 +125,11 @@ function createValueNoise(): (px: number, py: number) => number {
   };
 }
 
-/** Deterministic pseudo-random int in [a, b] inclusive, seeded by position. */
-function rndi(a: number, b: number, seed: number): number {
-  if (a > b) { const t = a; a = b; b = t; }
-  const s = ((seed * 1664525 + 1013904223) & 0x7fffffff) / 0x80000000;
-  return Math.floor(a + s * (b - a + 1));
-}
-
 export const flame: Scenario<State> = {
   id: 'flame',
   label: 'Flame: doom fire effect (220×58)',
   description:
-    'Classic demoscene fire: value noise seeds the floor, heat propagates upward with random lateral drift and decay. Every cell painted every frame with palette lookup via setRGB. Worst case for the differ — zero unchanged cells, visually rich color distribution. Exercises setRGB, per-cell palette lookup, and pseudo-random access patterns.',
+    'Classic demoscene fire: value noise seeds the floor, heat propagates upward with random lateral drift and decay. Every cell painted every frame with smooth gradient interpolation via setRGB. Worst case for the differ — zero unchanged cells, hundreds of effective colors. Exercises setRGB, per-cell interpolation, and random access patterns.',
   columns: 220,
   rows: 58,
   defaultWarmupFrames: 30,
@@ -137,35 +151,39 @@ export const flame: Scenario<State> = {
 
   frame(state, frameIndex) {
     const { surface, cols, rows, heat, noise } = state;
-    const t = frameIndex * 0.0015;
+    const t = frameIndex * 0.002;
 
     // Seed the floor row with noise-driven heat.
     const last = cols * (rows - 1);
     for (let x = 0; x < cols; x++) {
-      const val = Math.floor(noise(x * 0.05, t) * 45 + 5);
-      heat[last + x] = Math.min(val, heat[last + x]! + 2);
+      const val = noise(x * 0.04, t) * MAX_HEAT * 0.9 + MAX_HEAT * 0.1;
+      heat[last + x] = Math.min(MAX_HEAT, Math.max(heat[last + x]!, val));
     }
 
-    // Propagate upward: each cell pulls heat from below with lateral drift and decay.
+    // Propagate upward: each cell pulls heat from below with random
+    // lateral drift and decay. Math.random() gives organic motion.
     for (let y = 0; y < rows - 1; y++) {
       for (let x = 0; x < cols; x++) {
-        const drift = rndi(-1, 1, x * 7 + y * 13 + frameIndex * 3);
+        const drift = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
         const srcX = Math.max(0, Math.min(cols - 1, x + drift));
         const srcY = y + 1;
-        const decay = rndi(0, 2, x * 11 + y * 17 + frameIndex * 7);
+        const decay = Math.random() * 1.8;
         heat[y * cols + x] = Math.max(0, heat[srcY * cols + srcX]! - decay);
       }
     }
 
-    // Paint every cell based on heat value.
+    // Paint every cell: smooth palette interpolation from heat value.
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const h = heat[y * cols + x]!;
-        const idx = Math.min(FLAME_MAP.length - 1, Math.max(0, Math.round(h)));
-        const paletteIdx = FLAME_MAP[idx]!;
-        const [fgR, fgG, fgB, bgR, bgG, bgB] = PALETTE[paletteIdx]!;
-        const ch = FIRE_CHARS[paletteIdx]!;
-        surface.setRGB(x, y, ch, fgR, fgG, fgB, bgR, bgG, bgB);
+        const t = h / MAX_HEAT;
+        const [r, g, b] = samplePalette(t);
+        // Bg is a slightly darker version for depth.
+        const bgF = 0.4;
+        const bgR = Math.round(r * bgF);
+        const bgG = Math.round(g * bgF);
+        const bgB = Math.round(b * bgF);
+        surface.setRGB(x, y, BLOCK, r, g, b, bgR, bgG, bgB);
       }
     }
   },
