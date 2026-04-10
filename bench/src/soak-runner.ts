@@ -101,10 +101,12 @@ async function main(): Promise<void> {
   io.write(ENTER_ALT + HIDE_CURSOR + WRAP_OFF + CLEAR);
 
   // Rendering surfaces fill the terminal. Scenarios paint into their
-  // native region (typically 220×58); the rest stays dark.
+  // native region (typically 220×58); border cells get a dark fill
+  // that blends with the scenario backgrounds.
   const renderRows = rows - 1; // leave room for status bar
-  let currentSurface: Surface = createSurface(cols, renderRows);
-  let displaySurface: Surface = createSurface(cols, renderRows);
+  const BORDER_FILL = { char: ' ', bg: '#111320', empty: false };
+  let currentSurface: Surface = createSurface(cols, renderRows, BORDER_FILL);
+  let displaySurface: Surface = createSurface(cols, renderRows, BORDER_FILL);
 
   const frameIntervalMs = 1000 / TARGET_FPS;
   let cycle = 0;
@@ -121,8 +123,9 @@ async function main(): Promise<void> {
         }
 
         // Clear + fresh surfaces for the new scenario (force full redraw).
+        // Pre-fill with dark background so border areas blend visually.
         io.write(CLEAR);
-        currentSurface = createSurface(cols, renderRows);
+        currentSurface = createSurface(cols, renderRows, BORDER_FILL);
 
         const dwellFrames = Math.ceil(DWELL_SECS * TARGET_FPS);
         const frameTimes: number[] = [];
@@ -134,10 +137,12 @@ async function main(): Promise<void> {
           // Run the scenario frame
           scenario.frame(state, startFrame + f);
 
-          // Get the display surface and blit it into our terminal-sized surface
+          // Get the display surface and blit it into our terminal-sized surface.
+          // Pre-fill ensures border cells outside the scenario's 220×58 region
+          // show a dark background that blends with scenario themes.
           const sceneSurface = scenario.getDisplaySurface!(state);
           if (sceneSurface) {
-            displaySurface = createSurface(cols, renderRows);
+            displaySurface = createSurface(cols, renderRows, BORDER_FILL);
             displaySurface.blit(sceneSurface, 0, 0);
           }
 
