@@ -689,17 +689,26 @@ function renderDiffPacked(
         off = writeSgrFromBufBytes(buf, off, tBuf, tOff);
       }
 
-      let batchX = x;
+      // Write the first cell of the batch unconditionally: the outer
+      // "same?" check above already told us it differs from current,
+      // and the batch-leader style check is trivially true at the
+      // leader position. This removes a redundant 10-byte compare and
+      // a branch from the hot path — in diff-gradient, every batch is
+      // one cell, so that's one compare saved per cell per frame.
+      off = writeCharBytes(buf, off, tBuf, tOff, tSide);
+      let batchX = x + 1;
+
       while (batchX < width) {
         const bIdx = y * width + batchX;
         const bOff = bIdx * CELL_STRIDE;
 
-        // Style check: does this cell match the batch leader's style?
-        if (batchX > x && !packedStyleBytesEqual(tBuf, tOff, tBuf, bOff)) {
+        // Style check vs batch leader (always — batchX > x here).
+        if (!packedStyleBytesEqual(tBuf, tOff, tBuf, bOff)) {
           break;
         }
 
-        // Cell changed check
+        // Cell-match break check: stop the batch when we hit a cell
+        // that already matches current and has nothing to emit.
         const bInBounds = y < cHeight && batchX < cWidth;
         const bcOff = bInBounds ? (y * cWidth + batchX) * CELL_STRIDE : -1;
         const cellsMatch = bInBounds

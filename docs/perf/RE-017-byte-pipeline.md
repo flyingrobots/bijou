@@ -1338,3 +1338,142 @@ II-5/6/7 micro-opts are still on the table:
   remaining diff-gradient gap to the < 1.5 ms target)
 
 Phase E ship work (III-1..6) is otherwise untouched.
+
+---
+
+## 2026-04-10 — II-5 hot-loop restructure (diff-gradient hits < 1.5 ms)
+
+**Goal**: close the last ~60 µs gap on diff-gradient
+(1.56 ms → < 1.5 ms target).
+
+**The decimal-lookup-table detour**
+
+First attempt was the handoff-planned II-7 optimization: a
+precomputed `U8_DECIMAL[256 * 4]` table of `[length, d0, d1, d2]`
+for every byte value 0–255, with `writeDecimal` short-circuiting
+to a direct table read for `n < 256`. The reasoning was that the
+SGR RGB path calls `writeDecimal` six times per cell × 9168
+cells = 55 k calls per frame, and swapping integer division for
+table reads should shave meaningfully.
+
+Bench said otherwise. 40-sample run:
+
+| Scenario | After II-4 | With u8 table | Δ |
+|---|---|---|---|
+| diff-gradient | 1.56 ms | 1.54 ms | −1.3% (noise) |
+| diff-sparse | 134 µs | 138 µs | +3.0% |
+| dogfood-realistic | 418 µs | 422 µs | +1.0% |
+
+V8 is already generating near-optimal code for the 2/3-digit
+arithmetic path — the `| 0` integer-cast divisions lower to
+simple imuls, and the per-call cost is already dominated by the
+function-call and the byte writes themselves, not the arithmetic.
+Reverted the table; the arithmetic path stays.
+
+**The win: skip the redundant first-cell compare**
+
+The inner batch loop was doing a redundant `cellsMatch`
+10-byte compare on its first iteration. The outer loop had
+already proven `!same` for that exact cell moments before
+entering the batch; the inner compare at `batchX === x`
+recomputes the same value with the same source offsets.
+
+In diff-gradient every batch is one cell (next cell has a
+different style, so the batch exits immediately). That single
+iteration does the redundant compare, writes the char, then
+loops back and breaks on the next iteration's style mismatch.
+The redundant compare fires 9168 times per frame — pure waste.
+
+The fix is a small restructure: hoist the first-cell char write
+out of the loop, because both break conditions are already
+guaranteed false at the leader position. The loop starts at
+`batchX = x + 1` with a cleaner invariant: `batchX > x` is
+always true, so the style-break branch drops its `batchX > x`
+guard as well.
+
+```ts
+// Write the first cell unconditionally (known !same + leader style).
+off = writeCharBytes(buf, off, tBuf, tOff, tSide);
+let batchX = x + 1;
+
+while (batchX < width) {
+  const bIdx = y * width + batchX;
+  const bOff = bIdx * CELL_STRIDE;
+  if (!packedStyleBytesEqual(tBuf, tOff, tBuf, bOff)) break;
+  // ... cellsMatch break check, writeCharBytes, batchX++ ...
+}
+```
+
+**Bench results vs `HEAD-137c1fa-after-II-4`**
+
+Apple M1 Pro, Node v25.8.1, 30 samples each.
+
+| Scenario | After II-4 | After II-5 | Δ | Status |
+|---|---|---|---|---|
+| paint-ascii | 239.89 µs | 234.35 µs | −2.3% | ok |
+| paint-rgb-fixed | 148.14 µs | 144.65 µs | −2.4% | ok |
+| paint-theme-set | 647.21 µs | 628.55 µs | −2.9% | ok |
+| paint-theme-set-fast | 338.70 µs | 329.65 µs | −2.7% | ok |
+| paint-gradient-rgb | 958.89 µs | 934.49 µs | −2.5% | ok |
+| **diff-gradient** | **1.56 ms** | **1.45 ms** | **−6.6%** | **GOOD** |
+| **diff-sparse** | **134.40 µs** | **125.19 µs** | **−6.9%** | **GOOD** |
+| diff-static | 9.48 µs | 9.42 µs | −0.6% | ok |
+| dogfood-realistic | 418.14 µs | 410.53 µs | −1.8% | ok |
+
+**diff-gradient is officially under the 1.5 ms target.** 1.45 ms
+p50, 1.42 ms p-min. The paint scenarios drift −2 to −3% in the
+same direction but within CoV; they don't touch the inner loop
+at all, so the paint shift is most likely JIT reshuffling from
+the smaller hot-path symbol footprint.
+
+**Cycle-over-cycle recovery**
+
+Comparison against `HEAD-941f62c-pre-RE017` (the cycle start,
+before the hex-parse regression was even understood):
+
+| Scenario | Pre-RE017 | After II-5 | Δ |
+|---|---|---|---|
+| diff-gradient | 2.13 ms | 1.45 ms | **−32%** |
+| diff-sparse | 349 µs | 125 µs | **−64%** |
+| diff-static | 227 µs | 9.42 µs | **−96%** |
+| dogfood-realistic | 469 µs | 410 µs | **−13%** |
+| paint-theme-set | 633 µs | 628 µs | −0.8% (recovered) |
+| paint-ascii | 234 µs | 234 µs | 0% (recovered) |
+
+The hex-parse paint-side regression (RE-008's theme-heavy paint
+path) is now paid back to neutral via the theme token color
+cache (phase A), and the diff path is 32–96 % faster than it
+was before RE-008 ever landed. The cycle's primary goal —
+recovering from the `paint-theme-set` regression without
+losing anything else — is comfortably met.
+
+**Files touched (II-5)**
+
+- `packages/bijou/src/core/render/differ.ts` — inner batch
+  loop restructure in `renderDiffPacked`, comment block
+  explaining the invariant change.
+
+(The u8 decimal table from the detour is not in the commit —
+it was reverted after measuring no real gain.)
+
+**Smoke test**
+
+`npm run smoke:dogfood` (landing + docs) passes. All 2807
+tests pass. The hoisted first-cell emission produces the same
+bytes as the old path for every test surface.
+
+**What Part II still has on the table**
+
+II-6 (pre-encoded side-table UTF-8) and II-7 (decimal lookup
+table) stay on the deferred list:
+- II-6 would only pay off on emoji-heavy frames, which none
+  of the current bench scenarios exercise.
+- II-7 has been measured and produced no real gain on this
+  hardware + V8 combo. Revisit if a profile points back at
+  `writeDecimal` later.
+
+Part II is now effectively done — diff-gradient hits its
+target, every representative scenario is faster than
+pre-RE017, and no regressions survive. Ready to move into
+Phase E ship work (III-5 regression bench, III-1..4 DOGFOOD
+polish, III-6 version bump to 4.3.0).
