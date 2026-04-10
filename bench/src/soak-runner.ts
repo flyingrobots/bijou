@@ -73,7 +73,6 @@ interface SoakModel {
   readonly frameTimes: number[];
   readonly cycle: number;
   readonly elapsedMs: number;
-  readonly lastFrameNs: number;
   readonly paneWidth: number;
   readonly paneHeight: number;
 }
@@ -148,7 +147,6 @@ function initScenario(scenarioIndex: number, cycle: number, width: number, heigh
     frameTimes: [],
     cycle,
     elapsedMs: 0,
-    lastFrameNs: 0,
     paneWidth: width,
     paneHeight: height,
   };
@@ -165,7 +163,6 @@ function reinitAtSize(model: SoakModel, width: number, height: number): SoakMode
     frameIndex: 0,
     frameTimes: [],
     elapsedMs: 0,
-    lastFrameNs: 0,
     paneWidth: width,
     paneHeight: height,
   };
@@ -259,7 +256,6 @@ function createSoakApp(_ctx: BijouContext) {
             ...model,
             frameIndex: model.frameIndex + 1,
             elapsedMs: newElapsed,
-            lastFrameNs: frameNs,
           }, []];
         }
 
@@ -282,7 +278,18 @@ function createSoakApp(_ctx: BijouContext) {
     helpLineSource({ model: frameModel }) {
       const pageModel = frameModel.pageModels[frameModel.activePageId];
       if (!pageModel) return '';
-      const ft = formatNs(pageModel.lastFrameNs);
+      // Show rolling average over recent frames for a stable reading.
+      const recent = pageModel.frameTimes;
+      const windowSize = Math.min(20, recent.length);
+      let avg = 0;
+      if (windowSize > 0) {
+        let sum = 0;
+        for (let i = recent.length - windowSize; i < recent.length; i++) {
+          sum += recent[i]!;
+        }
+        avg = sum / windowSize;
+      }
+      const ft = formatNs(avg);
       const dims = `${pageModel.paneWidth}×${pageModel.paneHeight}`;
       const left = `${scenarioShortLabel(pageModel)}  ${dims}  frame ${pageModel.frameIndex}  ${ft}/frame`;
       const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
