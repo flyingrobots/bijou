@@ -6,6 +6,9 @@
  * gradient animating, cells flickering, the dogfood layout composing.
  * A status bar shows the current scenario, frame time, and cycle.
  *
+ * Scenarios run at the actual terminal dimensions — resize the window
+ * and the scenario re-initializes at the new size.
+ *
  * Built on createFramedApp — the frame shell handles alt-screen,
  * raw mode, resize, keyboard input, and quit confirmation.
  *
@@ -71,7 +74,8 @@ interface SoakModel {
   readonly cycle: number;
   readonly elapsedMs: number;
   readonly lastFrameNs: number;
-  readonly warmedUp: boolean;
+  readonly paneWidth: number;
+  readonly paneHeight: number;
 }
 
 type SoakMsg = { readonly type: 'advance-scenario' };
@@ -117,25 +121,25 @@ function logScenarioStats(model: SoakModel): void {
   appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
 }
 
-function tileScenarioSurface(model: SoakModel, width: number, height: number): Surface {
+function renderScenarioSurface(model: SoakModel, width: number, height: number): Surface {
   const scenario = currentScenario(model);
-  const sceneSurface = scenario.getDisplaySurface(model.scenarioState);
-  const tiled = createSurface(width, height);
-  if (sceneSurface) {
-    const sw = sceneSurface.width;
-    const sh = sceneSurface.height;
-    for (let ty = 0; ty < height; ty += sh) {
-      for (let tx = 0; tx < width; tx += sw) {
-        tiled.blit(sceneSurface, tx, ty);
-      }
-    }
+  const surface = scenario.getDisplaySurface(model.scenarioState);
+  if (surface && surface.width === width && surface.height === height) {
+    return surface;
   }
-  return tiled;
+  // Scenario surface doesn't match pane — blit what we have into a
+  // correctly-sized surface. This only happens transiently before
+  // a resize re-init completes.
+  const fallback = createSurface(width, height);
+  if (surface) {
+    fallback.blit(surface, 0, 0);
+  }
+  return fallback;
 }
 
-function initScenario(scenarioIndex: number, cycle: number): SoakModel {
+function initScenario(scenarioIndex: number, cycle: number, width: number, height: number): SoakModel {
   const scenario = displayScenarios[scenarioIndex]!;
-  const state = scenario.setup();
+  const state = scenario.setup(undefined, width, height);
   runWarmup(scenario, state);
   return {
     scenarioIndex,
@@ -145,7 +149,25 @@ function initScenario(scenarioIndex: number, cycle: number): SoakModel {
     cycle,
     elapsedMs: 0,
     lastFrameNs: 0,
-    warmedUp: true,
+    paneWidth: width,
+    paneHeight: height,
+  };
+}
+
+function reinitAtSize(model: SoakModel, width: number, height: number): SoakModel {
+  currentScenario(model).teardown?.(model.scenarioState);
+  const scenario = displayScenarios[model.scenarioIndex]!;
+  const state = scenario.setup(undefined, width, height);
+  runWarmup(scenario, state);
+  return {
+    ...model,
+    scenarioState: state,
+    frameIndex: 0,
+    frameTimes: [],
+    elapsedMs: 0,
+    lastFrameNs: 0,
+    paneWidth: width,
+    paneHeight: height,
   };
 }
 
@@ -161,6 +183,11 @@ function logAndAdvanceCmd(model: SoakModel): Cmd<SoakMsg> {
 // App
 // ---------------------------------------------------------------------------
 
+// The pane render callback tells us the actual terminal content area.
+// We track the latest dimensions so the update loop can detect resizes.
+let latestPaneWidth = 0;
+let latestPaneHeight = 0;
+
 function createSoakApp(_ctx: BijouContext) {
   return createFramedApp<SoakModel, SoakMsg>({
     title: 'Soak Runner',
@@ -168,25 +195,38 @@ function createSoakApp(_ctx: BijouContext) {
       id: 'soak',
       title: 'Soak',
       init(): [SoakModel, Cmd<SoakMsg>[]] {
-        return [initScenario(0, 0), []];
+        // Use the latest known pane dimensions, or a reasonable default
+        // until the first render tells us the real size.
+        const w = latestPaneWidth || 80;
+        const h = latestPaneHeight || 24;
+        return [initScenario(0, 0, w, h), []];
       },
       update(msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
         if (msg.type === 'advance-scenario') {
+          const w = latestPaneWidth || model.paneWidth;
+          const h = latestPaneHeight || model.paneHeight;
           const nextIndex = model.scenarioIndex + 1;
           if (nextIndex >= displayScenarios.length) {
             const nextCycle = model.cycle + 1;
             if (nextCycle >= MAX_CYCLES) {
               return [model, [quit()]];
             }
-            return [initScenario(0, nextCycle), []];
+            return [initScenario(0, nextCycle, w, h), []];
           }
-          return [initScenario(nextIndex, model.cycle), []];
+          return [initScenario(nextIndex, model.cycle, w, h), []];
         }
 
         if (msg.type === 'pulse') {
           const dtMs = msg.dt * 1000;
           const newElapsed = model.elapsedMs + dtMs;
           const dwellMs = DWELL_SECS * 1000;
+
+          // Detect terminal resize — re-init scenario at new dimensions.
+          const pw = latestPaneWidth || model.paneWidth;
+          const ph = latestPaneHeight || model.paneHeight;
+          if (pw !== model.paneWidth || ph !== model.paneHeight) {
+            return [reinitAtSize(model, pw, ph), []];
+          }
 
           // Check if dwell time expired.
           if (newElapsed >= dwellMs) {
@@ -230,7 +270,12 @@ function createSoakApp(_ctx: BijouContext) {
         return {
           kind: 'pane' as const,
           paneId: 'soak',
-          render: (width: number, height: number) => tileScenarioSurface(model, width, height),
+          render: (width: number, height: number) => {
+            // Capture actual pane dimensions for the update loop.
+            latestPaneWidth = width;
+            latestPaneHeight = height;
+            return renderScenarioSurface(model, width, height);
+          },
         };
       },
     }],
@@ -238,7 +283,8 @@ function createSoakApp(_ctx: BijouContext) {
       const pageModel = frameModel.pageModels[frameModel.activePageId];
       if (!pageModel) return '';
       const ft = formatNs(pageModel.lastFrameNs);
-      const left = `${scenarioShortLabel(pageModel)}  frame ${pageModel.frameIndex}  ${ft}/frame`;
+      const dims = `${pageModel.paneWidth}×${pageModel.paneHeight}`;
+      const left = `${scenarioShortLabel(pageModel)}  ${dims}  frame ${pageModel.frameIndex}  ${ft}/frame`;
       const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
       return `${left}  |  ${right}`;
     },

@@ -45,9 +45,9 @@ export const diffGradient: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 100,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('diff-gradient requires PackedSurfaces');
     }
@@ -56,8 +56,8 @@ export const diffGradient: Scenario<State> = {
       target,
       sink: createSink(),
       style: stubStyle,
-      cols: 220,
-      rows: 58,
+      cols: columns,
+      rows,
     };
   },
 

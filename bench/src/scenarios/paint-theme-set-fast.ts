@@ -49,13 +49,13 @@ export const paintThemeSetFast: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 200,
 
-  setup() {
+  setup(_ctx, columns = 220, rows = 58) {
     const palette = PALETTE_FG_HEX.map((hex) => ({ hex, rgb: parseHex(hex) }));
     const bgPalette = PALETTE_BG_HEX.map((hex) => ({ hex, rgb: parseHex(hex) }));
     return {
-      surface: createSurface(220, 58),
-      cols: 220,
-      rows: 58,
+      surface: createSurface(columns, rows),
+      cols: columns,
+      rows,
       palette,
       bgPalette,
     };

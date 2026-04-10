@@ -29,6 +29,8 @@ interface State {
   readonly target: PackedSurface;
   readonly sink: CountingSink;
   readonly style: StylePort;
+  readonly cols: number;
+  readonly rows: number;
 }
 
 
@@ -44,16 +46,16 @@ export const diffStatic: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 300,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('diff-static requires PackedSurfaces');
     }
 
     // Paint both surfaces identically.
-    for (let y = 0; y < 58; y++) {
-      for (let x = 0; x < 220; x++) {
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < columns; x++) {
         const r = ((x + y) * 7) & 0xff;
         const g = ((x + y * 2) * 13) & 0xff;
         const b = ((x * 3 + y) * 5) & 0xff;
@@ -62,7 +64,7 @@ export const diffStatic: Scenario<State> = {
       }
     }
 
-    return { current, target, sink: createSink(), style: stubStyle };
+    return { current, target, sink: createSink(), style: stubStyle, cols: columns, rows };
   },
 
   frame(state, _frameIndex) {

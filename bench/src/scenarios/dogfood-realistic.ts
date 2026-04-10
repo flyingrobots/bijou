@@ -63,13 +63,13 @@ export const dogfoodRealistic: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 120,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('dogfood-realistic requires PackedSurfaces');
     }
-    return { current, target, sink: createSink(), style: stubStyle, cols: 220, rows: 58 };
+    return { current, target, sink: createSink(), style: stubStyle, cols: columns, rows };
   },
 
   frame(state, frameIndex) {

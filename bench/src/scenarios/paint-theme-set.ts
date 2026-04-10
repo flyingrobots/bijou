@@ -33,11 +33,11 @@ export const paintThemeSet: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 200,
 
-  setup() {
+  setup(_ctx, columns = 220, rows = 58) {
     return {
-      surface: createSurface(220, 58),
-      cols: 220,
-      rows: 58,
+      surface: createSurface(columns, rows),
+      cols: columns,
+      rows,
     };
   },
 

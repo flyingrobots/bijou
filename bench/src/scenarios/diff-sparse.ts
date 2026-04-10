@@ -57,16 +57,15 @@ export const diffSparse: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 150,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('diff-sparse requires PackedSurfaces');
     }
 
     // Paint a base pattern into BOTH surfaces so they start matching.
-    const cols = 220;
-    const rows = 58;
+    const cols = columns;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const [r, g, b] = PALETTE[(x + y) % PALETTE.length]!;
