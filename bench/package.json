@@ -10,8 +10,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou": "*",
-    "@flyingrobots/bijou-node": "*"
+    "@flyingrobots/bijou": "4.3.0",
+    "@flyingrobots/bijou-node": "4.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

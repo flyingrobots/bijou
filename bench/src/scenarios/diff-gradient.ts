@@ -19,10 +19,9 @@ import {
   renderDiff,
   type PackedSurface,
   type StylePort,
-  type WritePort,
-  type Surface,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
+import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;
@@ -33,41 +32,6 @@ interface State {
   readonly rows: number;
 }
 
-interface CountingSink extends WritePort {
-  writes: number;
-  bytesWritten: number;
-}
-
-function isPacked(s: Surface): s is PackedSurface {
-  return 'buffer' in (s as { buffer?: unknown }) && (s as { buffer?: unknown }).buffer instanceof Uint8Array;
-}
-
-function createSink(): CountingSink {
-  return {
-    writes: 0,
-    bytesWritten: 0,
-    write(text: string) {
-      this.writes += 1;
-      this.bytesWritten += text.length;
-    },
-    writeBytes(_buf: Uint8Array, len: number) {
-      this.writes += 1;
-      this.bytesWritten += len;
-    },
-    writeError() {},
-  };
-}
-
-/**
- * Minimal StylePort stub. The packed differ bypasses StylePort for
- * the byte path, but the interface is still required. This stub
- * returns the input unchanged.
- */
-const stubStyle: StylePort = {
-  styled(_token: unknown, text: string): string {
-    return text;
-  },
-} as unknown as StylePort;
 
 const BLOCK = 0x2588;
 

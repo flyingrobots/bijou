@@ -14,8 +14,9 @@
  * all), the delta is the cost of writing RGB bytes.
  */
 
-import { createSurface, type PackedSurface, type Surface } from '@flyingrobots/bijou';
+import { createSurface, type PackedSurface } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
+import { isPacked } from './_shared.js';
 
 interface State {
   readonly surface: PackedSurface;
@@ -23,9 +24,6 @@ interface State {
   readonly rows: number;
 }
 
-function isPacked(s: Surface): s is PackedSurface {
-  return 'buffer' in (s as { buffer?: unknown }) && (s as { buffer?: unknown }).buffer instanceof Uint8Array;
-}
 
 const BLOCK = 0x2588; // █
 
