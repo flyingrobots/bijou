@@ -140,6 +140,10 @@ export const dogfoodRealistic: Scenario<State> = {
 
     // Diff against the blank current surface (full repaint case).
     renderDiff(current, target, sink, style);
+    // Model the runtime swap+clear: reset bitmaps so each frame
+    // only carries the dirty bits we just set.
+    target.markAllRenderClean();
+    current.markAllRenderClean();
   },
 
   getDisplaySurface(state) {

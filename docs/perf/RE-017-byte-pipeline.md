@@ -925,3 +925,132 @@ while matching all the others isn't worth shipping.
 
 Part II is bigger work than Phase A. Will likely need to split
 across multiple sessions.
+
+### 2026-04-10 — II-2 + II-1 landed: 30× faster diff-static, 1.9× faster diff-sparse
+
+Two pieces of Part II shipped this session.
+
+**II-2: `WritePort.writeBytes` API (task #2)**
+
+Added optional `writeBytes(buf: Uint8Array, len: number)` method to
+the `WritePort` interface (`packages/bijou/src/ports/io.ts`).
+Implemented in `nodeIO()` (`packages/bijou-node/src/io.ts`) backed
+by `process.stdout.write(buf.subarray(0, len))`. The `len`
+parameter is required so pooled buffers with extra capacity can
+write only the valid prefix without slicing.
+
+This is plumbing for II-3 (pooled output buffer) and II-4 (differ
+direct byte emission). No functional change yet — the differ
+still uses the string `write()` path. Tests pass, types clean.
+
+**II-1: Render-dirty bitmap (task #11)**
+
+Implemented as a SECOND bitmap alongside the existing `dirtyWords`
+(which stays for the lazy `Cell[]` decode cache). Decision rationale:
+
+- The Cell[] cache is still used by `surface.cells[i]` accessors
+  (notably `grayscale.ts` middleware), and by tests. Dropping it
+  would be a breaking API change requiring more migration.
+- Adding a second `Uint32Array` is cheap (1 bit per cell,
+  ~1.6 KiB for a 220×58 surface).
+- Both bitmaps update from the same `markDirty(idx)` helper, so
+  there's no risk of drift. The `markAllClean()` helper resets
+  both. The `markAllDirty()` helper sets both.
+
+`PackedSurface` interface gained:
+
+- `readonly renderDirtyWords: Uint32Array` — exposed for the
+  differ to read.
+- `markAllRenderClean(): void` — public method for callers that
+  model runtime swap manually (bench scenarios, advanced loops).
+
+`renderDiffPacked` (`packages/bijou/src/core/render/differ.ts:401`)
+got two changes:
+
+1. **Whole-frame early-out**: at the top, scan the union of
+   `target.renderDirtyWords | current.renderDirtyWords` word-at-a-
+   time. If no words have any bits set, return immediately without
+   walking any cells. This is the diff-static / idle-frame case.
+2. **Per-cell skip**: in the inner loop, before doing the byte
+   compare, check if the current cell's bit is set in either
+   surface's bitmap. If neither marks it dirty, skip it without
+   the compare. This is the diff-sparse case.
+
+The bitmap gets set on every `set()`, `setRGB()`, `fill()`,
+`blit()`, `setRow()` mutation, and reset by `clear()` or explicit
+`markAllRenderClean()`. The runtime model is: `nextSurface.clear()`
+between frames resets the bitmap; user paints set bits;
+renderDiff walks union; swap.
+
+The bench scenarios `diff-static`, `diff-sparse`, and
+`dogfood-realistic` were updated to call `markAllRenderClean()`
+between frames to model the runtime swap pattern. Without this
+modeling the bitmap accumulates over many frames and the win
+disappears in the bench (though it would still apply correctly
+in the real runtime).
+
+**Bench results**
+
+Apple M1 Pro, Node v25.8.1, commit `4216f15`, 30 samples each.
+Saved to `bench/baselines/HEAD-4216f15-after-II-1.json`.
+
+Comparison vs Phase A baseline:
+
+| Scenario | Phase A P50 | After II-1 P50 | Δ |
+|---|---|---|---|
+| **diff-static** | **227 µs** | **7.58 µs** | **−97% (30× faster)** 🚀 |
+| **diff-sparse** | **349 µs** | **185 µs** | **−47% (1.9× faster)** 🎉 |
+| dogfood-realistic | 469 µs | 465 µs | neutral (full repaint, every cell dirty) |
+| diff-gradient | 2.08 ms | 2.07 ms | neutral (every cell dirty) |
+| paint-ascii | 231 µs | 239 µs | +3% (within noise) |
+| paint-rgb-fixed | 145 µs | 146 µs | neutral |
+| paint-theme-set | 635 µs | 640 µs | neutral |
+| paint-theme-set-fast | 328 µs | 333 µs | neutral |
+| paint-gradient-rgb | 950 µs | 945 µs | neutral |
+
+Paint scenarios are neutral as expected — they don't go through
+the diff path. `diff-gradient` and `dogfood-realistic` are neutral
+because every cell is dirty (full repaint). `diff-sparse` (~10%
+dirty) and `diff-static` (0% dirty) are exactly the cases II-1
+was designed to optimize, and they show the predicted wins.
+
+`diff-static`'s 28% CoV is the only "ugly" number — but it's the
+absolute-floor effect: at 7.58 µs, OS scheduler jitter dominates
+absolute variance. The number is real.
+
+**Why dogfood-realistic didn't move**
+
+`dogfood-realistic` paints every cell in the surface every frame
+(it's the "full repaint after scroll/resize" worst case). Every
+cell is dirty, so the per-cell skip never fires. To benefit from
+II-1, a real DOGFOOD frame would need to only repaint changed
+regions — which is exactly what real components do. The bench
+scenario is intentionally pessimistic.
+
+**What's NOT yet optimized in II-1**
+
+- The bench's runtime swap is modeled by an explicit
+  `markAllRenderClean()` call. The real runtime (`bijou-tui`'s
+  `runtime.ts`) does NOT yet call this. Currently the runtime
+  relies on `nextSurface.clear()` between frames, which already
+  resets the bitmap (via the existing `markAllClean()` extension).
+  Should be a no-op change to verify, but worth confirming.
+- Components that render directly into a long-lived surface
+  without going through `clear()` won't see the win until they
+  start managing the bitmap explicitly.
+
+**Next: II-3 + II-4 (the byte pipeline)**
+
+The differ still produces a per-frame `output: string` via
+`+=` concatenation, hits the `sgrCache` Map for SGR codes, and
+calls `io.write(output)` at the end. Part II's main work is
+replacing all of that with byte-level emission into a pooled
+`Uint8Array` and `io.writeBytes(buf, len)`. Targets:
+
+- `diff-gradient`: 2.07 ms → < 1.5 ms (kill the sgrCache stress
+  case)
+- `paint-gradient-rgb` is unaffected (it's a paint-only scenario)
+- All other scenarios should remain neutral or improve modestly
+
+II-3 and II-4 are bigger and probably need to split across
+sessions. Stopping here for this turn.

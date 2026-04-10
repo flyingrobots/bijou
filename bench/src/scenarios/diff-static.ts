@@ -95,6 +95,13 @@ export const diffStatic: Scenario<State> = {
   frame(state, _frameIndex) {
     const { current, target, sink, style } = state;
     renderDiff(current, target, sink, style);
+    // Model the runtime swap+clear pattern: between frames, the
+    // back buffer's renderDirtyWords gets reset by clear(). Without
+    // this, the bitmap stays full forever and the diff-static
+    // early-out (II-1) never triggers. Bench scenarios that don't
+    // call this measure the pre-II-1 cost.
+    target.markAllRenderClean();
+    current.markAllRenderClean();
   },
 
   getDisplaySurface(state) {

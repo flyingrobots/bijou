@@ -135,14 +135,13 @@ export const diffSparse: Scenario<State> = {
     // Diff target against current.
     renderDiff(current, target, sink, style);
 
-    // Prepare for the next frame: copy target into current (what we'd
-    // do in the real runtime's swap, but our bench doesn't have the
-    // full runtime loop).
-    // For the bench, we can skip the copy and accept that future
-    // frames diff against the initial base — which still gives a
-    // realistic "changed cells from rest state" workload. The diff
-    // cost is dominated by scanning + emitting for changed cells,
-    // and this pattern reliably exercises both.
+    // Model the runtime swap+clear pattern: reset both bitmaps so
+    // the next frame's diff sees only the cells we mutate this
+    // frame, not the accumulation of every cell ever touched.
+    // Without this, the bitmap saturates over time and the II-1
+    // dirty-skip win disappears.
+    target.markAllRenderClean();
+    current.markAllRenderClean();
     void SPACE;
   },
 

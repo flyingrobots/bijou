@@ -33,6 +33,24 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
     },
 
     /**
+     * Write raw bytes directly to `process.stdout`. Allows the
+     * renderer to bypass string encoding on the hot path. Respects
+     * `len` so pooled buffers with extra capacity write only the
+     * valid prefix. See WritePort.writeBytes docs for the contract.
+     *
+     * @param buf - The byte buffer (may be a pooled, reused buffer).
+     * @param len - Number of valid bytes in `buf` to write.
+     */
+    writeBytes(buf: Uint8Array, len: number): void {
+      if (len <= 0) return;
+      if (len === buf.length) {
+        process.stdout.write(buf);
+      } else {
+        process.stdout.write(buf.subarray(0, len));
+      }
+    },
+
+    /**
      * Write a string directly to `process.stderr`.
      *
      * @param data - Text to write.

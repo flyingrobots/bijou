@@ -456,8 +456,33 @@ export interface PackedSurface extends Surface {
   readonly buffer: Uint8Array;
   /** Side table for multi-codepoint grapheme clusters. */
   readonly sideTable: readonly string[];
+  /**
+   * Per-cell render-dirty bitmap. One bit per cell, packed into
+   * Uint32 words (`renderDirtyWords[idx >> 5] & (1 << (idx & 31))`).
+   * A bit is set when its cell was mutated since the last `clear()`
+   * or `markAllRenderClean()`, and used by `renderDiffPacked` to
+   * skip cells that haven't been painted this frame. Walk the union
+   * with the front-buffer's `renderDirtyWords` to catch cells that
+   * were painted last frame but not this frame (they need to be
+   * erased).
+   *
+   * Cleared by `clear()` (which resets the surface to default) and
+   * by explicit `markAllRenderClean()` calls. Set by `set()`,
+   * `setRGB()`, `fill()`, `blit()`, `setRow()`, and `markAllDirty()`.
+   * NOT cleared by `renderDiff` itself — clearing is the next frame's
+   * `clear()` responsibility in the runtime swap model.
+   */
+  readonly renderDirtyWords: Uint32Array;
   /** Mark all cells as needing lazy decode from the buffer. */
   markAllDirty(): void;
+  /**
+   * Reset the render-dirty bitmap without touching the cell bytes.
+   * Used by callers that want to model a runtime swap manually
+   * (e.g., bench scenarios, advanced render loops). The runtime
+   * normally relies on `clear()` to reset the bitmap as part of
+   * preparing the back buffer for the next frame.
+   */
+  markAllRenderClean(): void;
 }
 
 /**
@@ -481,9 +506,16 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
   const sideTable: string[] = [];
   const buf = new Uint8Array(size * CELL_STRIDE);
 
-  // Dirty bitmap: 1 bit per cell. When set, the Cell object is stale
-  // and must be decoded from the buffer before reading.
+  // Cell-decode dirty bitmap: 1 bit per cell. When set, the Cell
+  // object is stale and must be decoded from the buffer before reading.
   const dirtyWords = new Uint32Array(Math.ceil(size / 32));
+
+  // Render-dirty bitmap: 1 bit per cell. When set, the cell was
+  // mutated since the last `clear()`. Used by `renderDiffPacked` to
+  // skip cells that haven't been painted this frame. NOT cleared by
+  // renderDiff — it's the next frame's `clear()` responsibility.
+  // See PackedSurface.renderDirtyWords docs for the full contract.
+  const renderDirtyWords = new Uint32Array(Math.ceil(size / 32));
 
   // Cell array: lazily decoded from the buffer on read.
   const cells: Cell[] = new Array(size);
@@ -495,7 +527,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
   }
 
   function markDirty(idx: number): void {
-    dirtyWords[idx >> 5]! |= 1 << (idx & 31);
+    const w = idx >> 5;
+    const bit = 1 << (idx & 31);
+    dirtyWords[w]! |= bit;
+    renderDirtyWords[w]! |= bit;
   }
 
   function ensureClean(idx: number): void {
@@ -514,10 +549,16 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
 
   function markAllClean(): void {
     dirtyWords.fill(0);
+    renderDirtyWords.fill(0);
   }
 
   function markAllDirty(): void {
     dirtyWords.fill(0xFFFFFFFF);
+    renderDirtyWords.fill(0xFFFFFFFF);
+  }
+
+  function markAllRenderClean(): void {
+    renderDirtyWords.fill(0);
   }
 
   const surface: PackedSurface = {
@@ -526,7 +567,9 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
     cells,
     buffer: buf,
     sideTable,
+    renderDirtyWords,
     markAllDirty,
+    markAllRenderClean,
 
     clear() {
       // Stamp the default cell template across the entire buffer
@@ -602,9 +645,10 @@ export function createSurface(width: number, height: number, fill?: Cell): Packe
         encodeCellIntoBuf(template, 0, cell, sideTable);
         for (let y = yStart; y < yEnd; y++) {
           for (let x = xStart; x < xEnd; x++) {
-            const off = (y * w + x) * CELL_STRIDE;
+            const idx = y * w + x;
+            const off = idx * CELL_STRIDE;
             for (let b = 0; b < CELL_STRIDE; b++) buf[off + b] = template[b]!;
-            dirtyWords[(y * w + x) >> 5]! |= 1 << ((y * w + x) & 31);
+            markDirty(idx);
           }
         }
       } else {

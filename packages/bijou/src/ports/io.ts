@@ -42,6 +42,23 @@ export interface WritePort {
   write(data: string): void;
   /** Write a string to the error stream (typically stderr). */
   writeError(data: string): void;
+  /**
+   * Optionally write raw bytes to the output stream. Allows the
+   * renderer to bypass string encoding on the hot path by building
+   * the ANSI stream directly into a reusable `Uint8Array` and
+   * handing it to the port.
+   *
+   * Adapters that support byte-level writes (e.g. Node's
+   * `process.stdout.write(buf)`) SHOULD implement this. Adapters
+   * that don't (e.g. test sinks that only track strings) can
+   * omit it — callers MUST fall back to `write(TextDecoder.decode(buf))`
+   * when `writeBytes` is absent.
+   *
+   * The `len` parameter is the number of valid bytes in `buf`
+   * (which may be a pooled buffer with extra capacity). Implementations
+   * MUST respect `len` and not read past it.
+   */
+  writeBytes?(buf: Uint8Array, len: number): void;
 }
 
 /**

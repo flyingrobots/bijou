@@ -413,6 +413,47 @@ function renderDiffPacked(
   const tSide = target.sideTable;
   const cSide = current.sideTable;
 
+  // Render-dirty bitmap fast path. Cells that weren't mutated since
+  // the last clear() in EITHER surface are guaranteed unchanged on
+  // the buffer level, so we can skip them entirely. We walk the union
+  // of the two bitmaps because:
+  //   - Bits in target.renderDirtyWords = cells the user painted this frame
+  //   - Bits in current.renderDirtyWords = cells the user painted last frame
+  //     (which may now need to be erased if not painted this frame)
+  // The union covers both "new content" and "needs erasure" cases.
+  const tDirty = target.renderDirtyWords;
+  const cDirty = current.renderDirtyWords;
+  const cellCount = width * height;
+  const wordCount = (cellCount + 31) >>> 5;
+
+  // Early out: if no cells in EITHER surface are dirty, there is
+  // nothing to emit. This is the diff-static / unchanged-frame case
+  // and should be near-zero cost.
+  let anyDirty = false;
+  // Both bitmaps may have different lengths if width/height differ,
+  // but in practice they're the same. Walk min(both).
+  const tWords = Math.min(wordCount, tDirty.length);
+  const cWords = Math.min(wordCount, cDirty.length);
+  const minWords = Math.min(tWords, cWords);
+  for (let w = 0; w < minWords; w++) {
+    if ((tDirty[w]! | cDirty[w]!) !== 0) {
+      anyDirty = true;
+      break;
+    }
+  }
+  if (!anyDirty) {
+    // Check tail words from whichever bitmap is longer
+    for (let w = minWords; w < tWords && !anyDirty; w++) {
+      if (tDirty[w]! !== 0) anyDirty = true;
+    }
+    for (let w = minWords; w < cWords && !anyDirty; w++) {
+      if (cDirty[w]! !== 0) anyDirty = true;
+    }
+  }
+  if (!anyDirty) {
+    return;
+  }
+
   let output = '';
   let cursorX = -1;
   let cursorY = -1;
@@ -425,8 +466,21 @@ function renderDiffPacked(
     let x = 0;
     while (x < width) {
       const tIdx = y * width + x;
-      const tOff = tIdx * CELL_STRIDE;
 
+      // Per-cell dirty skip: if neither surface marked this cell as
+      // touched, the bytes are guaranteed identical and there is
+      // nothing to emit. Skip it without doing the byte compare.
+      const wordIdx = tIdx >>> 5;
+      const bitMask = 1 << (tIdx & 31);
+      const cellDirty =
+        ((wordIdx < tDirty.length ? tDirty[wordIdx]! : 0) & bitMask) !== 0
+        || ((wordIdx < cDirty.length ? cDirty[wordIdx]! : 0) & bitMask) !== 0;
+      if (!cellDirty) {
+        x++;
+        continue;
+      }
+
+      const tOff = tIdx * CELL_STRIDE;
       const inBounds = y < cHeight && x < cWidth;
       const cOff = inBounds ? (y * cWidth + x) * CELL_STRIDE : -1;
 
