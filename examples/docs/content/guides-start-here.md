@@ -24,7 +24,6 @@ what is happening on screen.
 
 ## Current posture
 
-`4.1.0` is the next shaped release. DOGFOOD now carries real repo,
-package, and release guidance inside the app. The remaining docs-system
-release work is about philosophy/doctrine depth and fully demoting the
-old examples-first posture.
+The rendering pipeline is byte-packed, benchmarked, and fast. DOGFOOD
+carries real repo, package, and release guidance inside the app. See
+the Release section for what shipped in the current version.
