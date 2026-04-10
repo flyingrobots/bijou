@@ -118,6 +118,8 @@ export interface NotificationMouseTarget<Msg> {
 interface CellTextStyle {
   readonly fg?: string;
   readonly bg?: string;
+  readonly fgRGB?: readonly [number, number, number];
+  readonly bgRGB?: readonly [number, number, number];
   readonly modifiers?: readonly string[];
 }
 
@@ -683,9 +685,14 @@ function formatTimeLabel(ms: number): string {
 
 function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
   if (token == null) return {};
+  // Pass pre-parsed RGB alongside hex so encodeCellIntoBuf can skip
+  // inlineHexRGB on the hot path. Build the object with conditional
+  // spreads so readonly fields stay readonly.
   return {
     fg: token.hex,
     bg: token.bg,
+    ...(token.fgRGB ? { fgRGB: token.fgRGB } : {}),
+    ...(token.bgRGB ? { bgRGB: token.bgRGB } : {}),
     modifiers: token.modifiers,
   };
 }

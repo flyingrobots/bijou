@@ -14,6 +14,9 @@ import { paintThemeSetFast } from './paint-theme-set-fast.js';
 import { paintAscii } from './paint-ascii.js';
 import { paintRgbFixed } from './paint-rgb-fixed.js';
 import { diffGradient } from './diff-gradient.js';
+import { diffSparse } from './diff-sparse.js';
+import { diffStatic } from './diff-static.js';
+import { dogfoodRealistic } from './dogfood-realistic.js';
 
 export { type Scenario, type AnyScenario } from './types.js';
 
@@ -24,6 +27,9 @@ export const SCENARIOS: readonly AnyScenario[] = [
   paintThemeSetFast,
   paintGradientRgb,
   diffGradient,
+  diffSparse,
+  diffStatic,
+  dogfoodRealistic,
 ] as unknown as readonly AnyScenario[];
 
 /** Look up a scenario by ID, or throw if not found. */

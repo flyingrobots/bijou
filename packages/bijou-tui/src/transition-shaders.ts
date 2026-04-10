@@ -80,13 +80,16 @@ export type BuiltinTransition =
   | 'static';
 
 function tokenCell(char: string, token: TokenValue): Cell {
-  return {
+  const cell: Cell = {
     char,
     fg: token.hex,
     bg: token.bg,
     modifiers: token.modifiers ? [...token.modifiers] : [],
     empty: false,
   };
+  if (token.fgRGB) cell.fgRGB = token.fgRGB;
+  if (token.bgRGB) cell.bgRGB = token.bgRGB;
+  return cell;
 }
 
 // ---------------------------------------------------------------------------

@@ -169,7 +169,7 @@ function paintActiveHeaderTab(
 
   for (let x = activeTarget.startCol; x <= activeTarget.endCol; x++) {
     const cell = surface.get(x, 0);
-    surface.set(x, 0, {
+    const nextCell = {
       ...cell,
       fg: token.hex,
       bg: token.bg ?? cell.bg,
@@ -177,7 +177,10 @@ function paintActiveHeaderTab(
         ? cell.modifiers
         : Array.from(new Set([...(cell.modifiers ?? []), ...token.modifiers])),
       empty: false,
-    });
+    } as Cell;
+    if (token.fgRGB) nextCell.fgRGB = token.fgRGB;
+    if (token.bgRGB) nextCell.bgRGB = token.bgRGB;
+    surface.set(x, 0, nextCell);
   }
 }
 

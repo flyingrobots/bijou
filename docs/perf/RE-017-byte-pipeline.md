@@ -823,3 +823,105 @@ RE-017 work.
    The theme cache win compounds with the differ work — together
    they should eliminate string work from both the paint AND the
    diff sides of the pipeline.
+
+### 2026-04-10 — Phase A complete: component migration, 3 new scenarios, baseline captured
+
+Phase A of the execution plan is done. Work done this session:
+
+**Component migration (task #38)**
+
+Migrated 5 remaining component call sites to pass `fgRGB`/`bgRGB`
+alongside `fg`/`bg` so the packed surface fast path skips
+`inlineHexRGB`:
+
+- `packages/bijou-tui/src/notification.ts` — local `CellTextStyle`
+  interface extended with optional `fgRGB`/`bgRGB` fields;
+  `tokenToCellStyle` now threads them through.
+- `packages/bijou-tui/src/overlay.ts` — `CellStyle` type extended;
+  `styleFromToken` / `backgroundStyleFromToken` updated.
+- `packages/bijou-tui/src/transition-shaders.ts` — `tokenCell`
+  helper updated.
+- `packages/bijou-tui/src/app-frame-render.ts` — active header tab
+  override path updated.
+
+Skipped:
+
+- `packages/bijou-tui/src/css/text-style.ts` — uses a local
+  `StyledTextToken` type built from CSS strings (`styles['color']`),
+  not from a resolved `TokenValue`. No pre-parsed RGB available
+  without a bigger refactor. The existing `setRGB` loop already
+  manually parses hex once and reuses, so this file isn't actually
+  in a hot repeated-parse path.
+- `packages/bijou/src/core/components/box-v3.ts` — already has a
+  `setRGB` fast path for packed surfaces. The `surface.set` fallback
+  only runs on non-packed surfaces which don't exist anymore.
+- `packages/bijou/src/core/theme/graph.ts` — internal theme graph
+  state, not a rendering hot path.
+
+**New bench scenarios (tasks #39, #40, #41)**
+
+- `bench/src/scenarios/diff-sparse.ts` — paints a full surface in
+  setup, mutates ~10% of cells per frame (1,276 cells), runs
+  renderDiff. Represents realistic interactive updates.
+- `bench/src/scenarios/diff-static.ts` — paints a full surface in
+  setup, calls renderDiff against itself every frame. No changes.
+  Measures the cost of the scan itself. Reference baseline for
+  the II-1 render-dirty bitmap optimization target.
+- `bench/src/scenarios/dogfood-realistic.ts` — multi-region
+  composition: header bar (2 rows) + sidebar (20 cols) + body +
+  footer (1 row). Each region uses different theme bytes via
+  setRGB. Cross-component regression gate for Part II.
+
+**Phase A baseline** (task #43)
+
+Saved as `bench/baselines/HEAD-f966c72-phase-a.json`. This is the
+reference that every Part II step will be measured against.
+
+30 samples each, Apple M1 Pro, Node v25.8.1, commit `f966c72`:
+
+| Scenario | P50 | ns/cell | CoV | Notes |
+|---|---|---|---|---|
+| paint-ascii | 231 µs | 18.1 | 1.5% | `set({char})` floor |
+| paint-rgb-fixed | 145 µs | 11.4 | 7.4% | `setRGB` floor |
+| paint-theme-set | 635 µs | 49.7 | 1.1% | hex parse every cell |
+| **paint-theme-set-fast** | **328 µs** | **25.7** | **0.7%** | **pre-parsed RGB (theme cache)** |
+| paint-gradient-rgb | 950 µs | 74.4 | 2.1% | dominated by Math.cos |
+| diff-gradient | 2.08 ms | — | 2.0% | paint + diff, sgrCache stress |
+| **diff-sparse** | **349 µs** | **27.3** | **3.3%** | **~10% dirty cells — NEW** |
+| **diff-static** | **227 µs** | **17.8** | **4.9%** | **zero changes — NEW** |
+| **dogfood-realistic** | **469 µs** | **36.7** | **1.0%** | **multi-region — NEW** |
+
+All CoVs under 8% (paint-rgb-fixed's 7.4% is the absolute-floor
+effect; 145 µs is tight enough that OS jitter dominates). All
+others under 5%. Numbers are trustworthy.
+
+**Targets for Part II**
+
+Baseline numbers give us concrete Part II targets:
+
+1. **`diff-static`: 227 µs → ~0 µs** (II-1 render-dirty bitmap
+   should skip the scan entirely on an unchanged surface). This
+   is the sharpest measurable win target in Part II.
+2. **`diff-gradient`: 2.08 ms → <1.5 ms** (II-4 byte pipeline
+   should drop the sgrCache overhead and string concat garbage).
+3. **`dogfood-realistic`: 469 µs → <350 µs** (combined win from
+   II-1 dirty-bit skip + II-4 byte emission).
+4. **`diff-sparse`: 349 µs → <200 µs** (II-1 should skip the 90%
+   unchanged cells; II-4 should cheapen the 10% emit).
+
+Any Part II step that doesn't move at least one of these needles
+while matching all the others isn't worth shipping.
+
+**Next: Phase B — Part II prereqs**
+
+1. **II-2: `WritePort.writeBytes` API** — small interface addition.
+   Can run in parallel with II-1 conceptually; I'll do it first
+   since it's isolated and small.
+2. **II-1: Repurpose `dirtyWords` as render-dirty bitmap** — the
+   big unlock. Requires auditing `surface.get()` hot-path usage
+   first (see bad-code RE-019). Then decide drop-cache vs
+   separate-bitmap. Then implement + measure against `diff-static`
+   and `diff-sparse`.
+
+Part II is bigger work than Phase A. Will likely need to split
+across multiple sessions.

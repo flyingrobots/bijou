@@ -265,20 +265,25 @@ export function compositeSurfaceInto(
 // surface helpers
 // ---------------------------------------------------------------------------
 
-type CellStyle = Pick<Cell, 'fg' | 'bg' | 'modifiers'>;
+type CellStyle = Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>;
 
 function styleFromToken(token: TokenValue | undefined, ctx: BijouContext | undefined): CellStyle {
   if (!ctx || token == null) return {};
-  return {
+  const style: CellStyle = {
     fg: token.hex,
     bg: token.bg,
     modifiers: token.modifiers ? [...token.modifiers] : undefined,
   };
+  if (token.fgRGB) style.fgRGB = token.fgRGB;
+  if (token.bgRGB) style.bgRGB = token.bgRGB;
+  return style;
 }
 
 function backgroundStyleFromToken(token: TokenValue | undefined, ctx: BijouContext | undefined): CellStyle {
   if (!ctx || !shouldApplyBg(ctx) || !token?.bg) return {};
-  return { bg: token.bg };
+  const style: CellStyle = { bg: token.bg };
+  if (token.bgRGB) style.bgRGB = token.bgRGB;
+  return style;
 }
 
 function mergeStyles(base: CellStyle, extra: CellStyle): CellStyle {
