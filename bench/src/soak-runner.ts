@@ -81,9 +81,14 @@ type SoakMsg = { readonly type: 'advance-scenario' };
 // ---------------------------------------------------------------------------
 
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
+const SCENARIO_LABEL_DIMENSION_SUFFIX = /\s*\(\d+[×x]\d+\)\s*$/;
 
 function currentScenario(model: SoakModel): (typeof displayScenarios)[number] {
   return displayScenarios[model.scenarioIndex]!;
+}
+
+function scenarioShortLabel(model: SoakModel): string {
+  return currentScenario(model).label.replace(SCENARIO_LABEL_DIMENSION_SUFFIX, '');
 }
 
 function runWarmup(scenario: AnyScenario, state: unknown): void {
@@ -232,9 +237,8 @@ function createSoakApp(_ctx: BijouContext) {
     helpLineSource({ model: frameModel }) {
       const pageModel = frameModel.pageModels[frameModel.activePageId];
       if (!pageModel) return '';
-      const scenario = currentScenario(pageModel);
       const ft = formatNs(pageModel.lastFrameNs);
-      const left = `${scenario.label}  frame ${pageModel.frameIndex}  ${ft}/frame`;
+      const left = `${scenarioShortLabel(pageModel)}  frame ${pageModel.frameIndex}  ${ft}/frame`;
       const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
       return `${left}  |  ${right}`;
     },
