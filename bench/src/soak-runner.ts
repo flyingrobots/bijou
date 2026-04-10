@@ -50,8 +50,8 @@ const ctx = createNodeContext();
 const io = ctx.io;
 const style = ctx.style;
 
-const cols = process.stdout.columns ?? 220;
-const rows = process.stdout.rows ?? 58;
+let cols = process.stdout.columns ?? 220;
+let rows = process.stdout.rows ?? 58;
 
 let quit = false;
 if (process.stdin.isTTY) {
@@ -100,13 +100,17 @@ function drawStatusBar(
 async function main(): Promise<void> {
   io.write(ENTER_ALT + HIDE_CURSOR + WRAP_OFF + CLEAR);
 
-  // Rendering surfaces fill the terminal. Scenarios paint into their
-  // native region (typically 220×58); border cells get a dark fill
-  // that blends with the scenario backgrounds.
-  const renderRows = rows - 1; // leave room for status bar
-  const BORDER_FILL = { char: ' ', bg: '#111320', empty: false };
-  let currentSurface: Surface = createSurface(cols, renderRows, BORDER_FILL);
-  let displaySurface: Surface = createSurface(cols, renderRows, BORDER_FILL);
+  // Track terminal dimensions — recreate surfaces on resize.
+  let renderRows = rows - 1;
+  let currentSurface: Surface = createSurface(cols, renderRows);
+  let displaySurface: Surface = createSurface(cols, renderRows);
+  let resized = false;
+
+  process.stdout.on('resize', () => {
+    cols = process.stdout.columns ?? cols;
+    rows = process.stdout.rows ?? rows;
+    resized = true;
+  });
 
   const frameIntervalMs = 1000 / TARGET_FPS;
   let cycle = 0;
@@ -122,24 +126,31 @@ async function main(): Promise<void> {
           scenario.frame(state, w);
         }
 
-        // Clear + fresh surfaces for the new scenario (force full redraw).
-        // Pre-fill with dark background so border areas blend visually.
+        // Clear + fresh surfaces for the new scenario.
         io.write(CLEAR);
-        currentSurface = createSurface(cols, renderRows, BORDER_FILL);
+        renderRows = rows - 1;
+        currentSurface = createSurface(cols, renderRows);
+        resized = false;
 
         const dwellFrames = Math.ceil(DWELL_SECS * TARGET_FPS);
         const frameTimes: number[] = [];
         const startFrame = scenario.defaultWarmupFrames;
 
         for (let f = 0; f < dwellFrames && !quit; f++) {
+          // Handle terminal resize mid-scenario
+          if (resized) {
+            renderRows = rows - 1;
+            currentSurface = createSurface(cols, renderRows);
+            io.write(CLEAR);
+            resized = false;
+          }
+
           const t0 = performance.now();
 
           // Run the scenario frame
           scenario.frame(state, startFrame + f);
 
           // Get the display surface and tile it across the full terminal.
-          // Scenarios render at a fixed size (typically 220×58); tiling
-          // fills the whole screen so there are no dark border strips.
           const sceneSurface = scenario.getDisplaySurface!(state);
           if (sceneSurface) {
             displaySurface = createSurface(cols, renderRows);
