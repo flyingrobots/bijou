@@ -1186,3 +1186,155 @@ ceiling we are trying to beat.
 `npm run smoke:dogfood` (landing + docs) passes. Real production
 traffic now exercises the encode-at-end byte path; the bench
 shows no regression on the string-path scenarios it can see.
+
+---
+
+## 2026-04-10 — II-4 lands the byte-native differ (-23% diff-gradient)
+
+**Goal**: replace the composed `output: string` inside
+`renderDiffPacked` with direct byte writes into the pooled buffer.
+Drop the `sgrCache`, `styleCacheKey`, `buildSgr`, and
+`emitSgrFromBuf` machinery entirely. Beat the old cached-string
+path on diff-gradient, which the handoff targeted at < 1.5 ms.
+
+**What landed**
+
+- New byte writers inside `differ.ts`:
+  - `writeDecimal(buf, off, n)` — ASCII decimal for 0–999 values
+    (cursor coordinates + RGB channels).
+  - `writeCursorBytes(buf, off, x, y)` — `\x1b[Y;XH` directly.
+  - `writeSgrFromBufBytes(buf, off, srcBuf, srcOff)` — full SGR
+    prelude (reset + optional FG truecolor + optional BG
+    truecolor + bold/dim/strike/inverse + underline variants)
+    byte-identical to the legacy `buildSgr()` output.
+  - `writeCharBytes(buf, off, srcBuf, srcOff, sideTable)` —
+    inlines ASCII / 2-byte BMP / 3-byte BMP UTF-8 encoding;
+    falls back to `TextEncoder.encodeInto` only for side-table
+    graphemes (multi-codepoint clusters).
+- `renderDiffPacked` rewritten: the inner loop writes cursor +
+  SGR + chars + trailing reset directly into `buf` at `off`, and
+  the function flushes via `io.writeBytes(buf, off)` at the end
+  (with a `TextDecoder.decode` fallback when the sink lacks
+  `writeBytes`, preserving the mock-sink test contract).
+- The `sgrCache` / `styleCacheKey` / `buildSgr` /
+  `emitSgrFromBuf` string-cache layer is gone. So are the
+  `FLAG_SGR` / `UNDERLINE_SGR` / `DASHED_SGR` / `RESET_SGR`
+  string constants used only by `buildSgr`.
+- `renderDiff(current, target, io, style, outBuf?)` still has
+  the II-3 public signature; the byte path now *always* runs on
+  `PackedSurface` regardless of whether the caller passes an
+  `outBuf`. Tests/bench without `outBuf` hit a lazy module-level
+  scratch buffer sized against the live surface.
+- `bijou-tui` runtime `OUTBUF_BYTES_PER_CELL` bumped from 64 → 96
+  with `OUTBUF_SLACK` 4096 → 8192, matching the differ's
+  `SCRATCH_BYTES_PER_CELL` budget for worst-case-per-cell direct
+  emission.
+- Bench counting sinks (`diff-gradient`, `diff-sparse`,
+  `diff-static`, `dogfood-realistic`) implement `writeBytes`
+  again so they exercise the same code path as production Node
+  stdout rather than the `TextDecoder.decode` fallback.
+
+**The `buf.set(SHORT_CONST, off)` detour**
+
+First cut used pre-allocated `Uint8Array` constants for every
+fixed byte sequence (`BYTES_RESET_SGR`, `BYTES_SGR_FG_TRUECOLOR`,
+`BYTES_SGR_BOLD`, …) and blitted them with `buf.set(src, off)`.
+Clean code, but bench showed diff-gradient *regressed* to 2.16 ms
+vs the 2.02 ms II-3 baseline — still better than the uncached
+string build in theory, but worse in practice.
+
+Root cause: `TypedArray.set` has per-call setup cost that
+dominates when the source is tiny (4–7 bytes). The hot path was
+calling `buf.set` ~15× per cell × 9168 cells per frame. Inlining
+the sequences as individual `buf[off] = …` writes:
+
+| Scenario | With `buf.set` | With inlined writes | Δ |
+|---|---|---|---|
+| diff-gradient | 2.16 ms | 1.56 ms | **−28%** |
+| diff-sparse | 199 µs | 134 µs | **−33%** |
+| dogfood-realistic | 426 µs | 418 µs | −1.9% |
+
+Inline byte writes beat `Uint8Array` constants + `set()` on
+every scenario, massively on diff-gradient. Kept the inlined
+form and deleted the unused `BYTES_*` constants.
+
+**Bench results vs `HEAD-2c8e11d-after-II-3`**
+
+Apple M1 Pro, Node v25.8.1, 30 samples each.
+
+| Scenario | After II-3 | After II-4 | Δ | Status |
+|---|---|---|---|---|
+| paint-ascii | 234.90 µs | 239.89 µs | +2.1% | ok |
+| paint-rgb-fixed | 143.13 µs | 148.14 µs | +3.5% | ok |
+| paint-theme-set | 630.79 µs | 647.21 µs | +2.6% | ok |
+| paint-theme-set-fast | 329.37 µs | 338.70 µs | +2.8% | ok |
+| paint-gradient-rgb | 936.13 µs | 958.89 µs | +2.4% | ok |
+| **diff-gradient** | **2.02 ms** | **1.56 ms** | **−23.1%** | **GOOD** |
+| **diff-sparse** | **184.03 µs** | **134.40 µs** | **−27.0%** | **GOOD** |
+| diff-static | 9.43 µs | 9.48 µs | +0.5% | ok |
+| **dogfood-realistic** | **464.56 µs** | **418.14 µs** | **−10.0%** | **GOOD** |
+
+Paint scenarios drift +2–3% — within CoV noise on most and
+probably attributable to a small JIT reshuffle from the new
+byte-writer symbol set. The wins are on the differ hot path,
+which is what Part II was designed to move.
+
+vs the pre-RE017 baseline (`HEAD-941f62c`, the cycle start):
+diff-gradient 2.13 ms → 1.56 ms (−27%). The hex-parse regression
+and the byte-pipeline recovery combined land the differ hot path
+meaningfully *below* where it was when the cycle started.
+
+**Why the `sgrCache` "stress" was a misdiagnosis**
+
+The cycle start assumed `sgrCache` was hurting diff-gradient
+because the scenario's per-cell unique styles filled the cache
+with ~9168 entries per frame that each got used once. The handoff
+targeted 2.07 ms → < 1.5 ms by "killing the sgrCache stress".
+
+In practice, the cache was near-neutral at 2.02 ms — V8's map
+hashing is fast enough that a high-miss-rate cache is just a
+small tax, not a dominant cost. The real wins came from the
+*emission* rewrite: eliminating the per-frame string concat
+ladder (`output += sgr + batchText + reset` × many cells) and
+replacing it with direct byte writes into a pooled buffer. The
+byte-cache-vs-string-cache question turned out to be a
+distraction; what mattered was killing the string allocations
+on the hot path.
+
+The handoff target of < 1.5 ms came close (1.56 ms p50, 1.51 µs
+p-min). The remaining gap would need an II-5-class micro-opt on
+top of the byte writer — probably a 256-entry decimal byte
+table or inlining `writeSgrFromBufBytes` into the per-cell loop.
+Deferring.
+
+**Files touched (II-4)**
+
+- `packages/bijou/src/core/render/differ.ts` — full
+  `renderDiffPacked` rewrite, new byte writers
+  (`writeDecimal` / `writeCursorBytes` / `writeSgrFromBufBytes`
+  / `writeCharBytes`), dropped legacy `sgrCache` / `styleCacheKey`
+  / `buildSgr` / `emitSgrFromBuf` / `readCharFromBuf` and the
+  string-form SGR constants.
+- `packages/bijou-tui/src/runtime.ts` — `OUTBUF_BYTES_PER_CELL`
+  64 → 96 and `OUTBUF_SLACK` 4096 → 8192.
+- `bench/src/scenarios/{diff-gradient,diff-sparse,diff-static,dogfood-realistic}.ts`
+  — sink implements `writeBytes` so the bench exercises the
+  production byte path.
+
+**Smoke test**
+
+`npm run smoke:dogfood` (landing + docs) passes. All 2807 tests
+pass — the byte path is byte-identical to the old string path
+for every test scenario, so the mock-sink `TextDecoder.decode`
+fallback produces the same strings the tests asserted against.
+
+**What remains for Phase B**
+
+II-5/6/7 micro-opts are still on the table:
+- II-5 ASCII fast-path char writer specialization
+- II-6 Pre-encoded side-table UTF-8 bytes (avoids `encodeInto`
+  for repeated emoji graphemes)
+- II-7 Decimal lookup table for cursor/RGB (closes the
+  remaining diff-gradient gap to the < 1.5 ms target)
+
+Phase E ship work (III-1..6) is otherwise untouched.

@@ -395,16 +395,17 @@ function disposeTimerHandle(handle: TimerHandle | null): void {
 /**
  * Upper-bound byte budget per surface cell for the pooled output buffer.
  * Each cell can emit at most a CUP move (~10 bytes), a full RGB SGR
- * prefix (~44 bytes), a few modifier codes (~10 bytes), a grapheme
- * (~4 bytes UTF-8 in the fast path), and an SGR reset (~4 bytes).
- * 64 bytes per cell comfortably covers the common case where the
- * differ batches contiguous styles. Frames whose UTF-8 output exceeds
- * the budget transparently fall back to the legacy `io.write(string)`
- * path inside the differ — correctness before optimization.
+ * prefix (~44 bytes), four modifier codes (~16 bytes), a grapheme
+ * (~4 bytes UTF-8 in the fast path, ~28 bytes for side-table emoji
+ * clusters), and an SGR reset (~4 bytes). 96 bytes per cell covers the
+ * worst case where diff-gradient-style frames emit a unique style per
+ * cell with no batching; the differ also flushes mid-frame if the
+ * pool runs low, so this budget is a comfort margin rather than an
+ * absolute bound.
  */
-const OUTBUF_BYTES_PER_CELL = 64;
+const OUTBUF_BYTES_PER_CELL = 96;
 /** Fixed slack added on top of the cell budget for ANSI preamble/tail. */
-const OUTBUF_SLACK = 4096;
+const OUTBUF_SLACK = 8192;
 
 /**
  * Allocate a pooled output buffer sized to a given viewport.

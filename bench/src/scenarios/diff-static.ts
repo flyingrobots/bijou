@@ -49,6 +49,10 @@ function createSink(): CountingSink {
       this.writes += 1;
       this.bytesWritten += text.length;
     },
+    writeBytes(_buf: Uint8Array, len: number) {
+      this.writes += 1;
+      this.bytesWritten += len;
+    },
     writeError() {},
   };
 }

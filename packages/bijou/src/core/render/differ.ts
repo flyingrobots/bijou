@@ -314,44 +314,209 @@ function packedStyleBytesEqual(
   return true;
 }
 
-function readCharFromBuf(buf: Uint8Array, off: number, sideTable: readonly string[]): string {
-  const code = buf[off]! | (buf[off + 1]! << 8);
-  return decodeChar(code, sideTable);
-}
-
 function packedHasVisibleStyle(buf: Uint8Array, off: number): boolean {
   const alpha = buf[off + 9]!;
   return (alpha & (FLAG_FG_SET | FLAG_BG_SET)) !== 0
     || (buf[off + 8]! & ~FLAG_EMPTY) !== 0;
 }
 
-// --- Direct ANSI SGR emission from packed bytes ---
+// --- Direct ANSI byte emission ─────────────────────────
+//
+// II-4: the differ no longer builds SGR/cursor/batch strings and
+// concatenates them. It writes raw UTF-8 bytes directly into the
+// pooled output buffer using the helpers below. The legacy
+// `sgrCache` / `buildSgr` / `styleCacheKey` machinery is gone — the
+// direct byte writers are fast enough that caching hash-indexed
+// strings is pure overhead.
 
-// Modifier flag → SGR code mapping (uses imported constants)
-const FLAG_SGR: [number, string][] = [
-  [FLAG_BOLD,          '\x1b[1m'],
-  [FLAG_DIM,           '\x1b[2m'],
-  [FLAG_STRIKETHROUGH, '\x1b[9m'],
-  [FLAG_INVERSE,       '\x1b[7m'],
-];
-// Underline styles (bits 4-5 of flags byte)
-const UNDERLINE_SGR: string[] = [
-  '',              // 00 = none
-  '\x1b[4m',      // 01 = solid underline
-  '\x1b[4:3m',    // 10 = curly underline
-  '\x1b[4:4m',    // 11 = dotted (without FLAG_DASHED)
-];
-const DASHED_SGR = '\x1b[4:5m';
-const RESET_SGR = '\x1b[0m';
-
-// SGR cache: maps style bytes to pre-built SGR prefix string.
-// Key is a collision-free string built from the 8 style bytes.
-const sgrCache = new Map<string, string>();
-
-// Reusable UTF-8 encoder for the byte-output path. encodeInto writes
-// directly into a target view without allocating an intermediate
-// Uint8Array, so the same encoder instance is shared across all calls.
+// Reusable UTF-8 encoder/decoder for the byte-output path. encodeInto
+// writes UTF-8 directly into a target view without an intermediate
+// Uint8Array; the decoder is only used on the fallback path where the
+// IO port lacks writeBytes (tests, mock sinks).
 const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder('utf-8');
+
+// Lazy module-level scratch buffer used when the caller does not pass
+// an outBuf (tests, bench scenarios, simple drivers). Grown once to
+// match the largest surface seen and reused thereafter.
+let scratchOutBuf: Uint8Array | null = null;
+
+/** Upper bound on bytes the differ may emit per surface cell. */
+const SCRATCH_BYTES_PER_CELL = 96;
+/** Fixed slack on top of the scratch cell budget. */
+const SCRATCH_SLACK = 8192;
+
+// ANSI byte constants are emitted as inline `buf[off++] = …` writes in
+// writeCursorBytes / writeSgrFromBufBytes. TypedArray.set has per-call
+// setup cost that dominates for 4-byte sequences, so inline writes beat
+// pre-allocated Uint8Array constants in the hot path.
+
+/**
+ * Write an unsigned integer (0–999) as ASCII digits. Returns new offset.
+ * Covers every value a cursor coordinate or RGB component can take.
+ */
+function writeDecimal(buf: Uint8Array, off: number, n: number): number {
+  if (n >= 100) {
+    const h = (n / 100) | 0;
+    const rem = n - h * 100;
+    const t = (rem / 10) | 0;
+    buf[off] = 0x30 + h;
+    buf[off + 1] = 0x30 + t;
+    buf[off + 2] = 0x30 + (rem - t * 10);
+    return off + 3;
+  }
+  if (n >= 10) {
+    const t = (n / 10) | 0;
+    buf[off] = 0x30 + t;
+    buf[off + 1] = 0x30 + (n - t * 10);
+    return off + 2;
+  }
+  buf[off] = 0x30 + n;
+  return off + 1;
+}
+
+/** Write `\x1b[Y;XH` (CUP) with 1-based coordinates. */
+function writeCursorBytes(buf: Uint8Array, off: number, x: number, y: number): number {
+  buf[off] = 0x1b;        // ESC
+  buf[off + 1] = 0x5b;    // [
+  off += 2;
+  off = writeDecimal(buf, off, y + 1);
+  buf[off++] = 0x3b;      // ;
+  off = writeDecimal(buf, off, x + 1);
+  buf[off++] = 0x48;      // H
+  return off;
+}
+
+/**
+ * Emit the full SGR prelude for the style bytes at `srcOff` into `buf`.
+ * Matches the legacy `buildSgr()` emission order byte-for-byte: reset,
+ * optional truecolor FG, optional truecolor BG, modifier flags (bold,
+ * dim, strike, inverse in that order), optional underline.
+ *
+ * Short (≤6 byte) byte sequences are inlined via direct index writes
+ * rather than `buf.set(CONST, off)` — the call overhead on a tiny
+ * TypedArray.set outweighs the memcpy for 4-byte bursts in V8.
+ */
+function writeSgrFromBufBytes(
+  buf: Uint8Array, off: number,
+  srcBuf: Uint8Array, srcOff: number,
+): number {
+  // Leading reset: \x1b[0m — 4 inline byte writes.
+  buf[off] = 0x1b;
+  buf[off + 1] = 0x5b;
+  buf[off + 2] = 0x30;
+  buf[off + 3] = 0x6d;
+  off += 4;
+
+  const flags = srcBuf[srcOff + 8]!;
+  const alpha = srcBuf[srcOff + 9]!;
+
+  if (alpha & FLAG_FG_SET) {
+    // \x1b[38;2;R;G;Bm — 7-byte prefix inlined as individual writes.
+    buf[off] = 0x1b;
+    buf[off + 1] = 0x5b;
+    buf[off + 2] = 0x33;
+    buf[off + 3] = 0x38;
+    buf[off + 4] = 0x3b;
+    buf[off + 5] = 0x32;
+    buf[off + 6] = 0x3b;
+    off += 7;
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R]!);
+    buf[off++] = 0x3b;
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R + 1]!);
+    buf[off++] = 0x3b;
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_FG_R + 2]!);
+    buf[off++] = 0x6d;
+  }
+
+  if (alpha & FLAG_BG_SET) {
+    // \x1b[48;2;R;G;Bm
+    buf[off] = 0x1b;
+    buf[off + 1] = 0x5b;
+    buf[off + 2] = 0x34;
+    buf[off + 3] = 0x38;
+    buf[off + 4] = 0x3b;
+    buf[off + 5] = 0x32;
+    buf[off + 6] = 0x3b;
+    off += 7;
+    off = writeDecimal(buf, off, srcBuf[srcOff + 5]!);
+    buf[off++] = 0x3b;
+    off = writeDecimal(buf, off, srcBuf[srcOff + 6]!);
+    buf[off++] = 0x3b;
+    off = writeDecimal(buf, off, srcBuf[srcOff + 7]!);
+    buf[off++] = 0x6d;
+  }
+
+  // Modifier flags — 4-byte sequences inlined.
+  if (flags & FLAG_BOLD) {
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x31;  buf[off + 3] = 0x6d;  off += 4;
+  }
+  if (flags & FLAG_DIM) {
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x32;  buf[off + 3] = 0x6d;  off += 4;
+  }
+  if (flags & FLAG_STRIKETHROUGH) {
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x39;  buf[off + 3] = 0x6d;  off += 4;
+  }
+  if (flags & FLAG_INVERSE) {
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x37;  buf[off + 3] = 0x6d;  off += 4;
+  }
+
+  const uStyle = (flags >> 4) & 0x03;
+  if (uStyle === 1) {
+    // \x1b[4m
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x34;  buf[off + 3] = 0x6d;  off += 4;
+  } else if (uStyle === 2) {
+    // \x1b[4:3m
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x34;
+    buf[off + 3] = 0x3a;  buf[off + 4] = 0x33;  buf[off + 5] = 0x6d;
+    off += 6;
+  } else if (uStyle === 3) {
+    // \x1b[4:4m (dotted) or \x1b[4:5m (dashed)
+    buf[off] = 0x1b;  buf[off + 1] = 0x5b;  buf[off + 2] = 0x34;  buf[off + 3] = 0x3a;
+    buf[off + 4] = (flags & FLAG_DASHED) ? 0x35 : 0x34;
+    buf[off + 5] = 0x6d;
+    off += 6;
+  }
+
+  return off;
+}
+
+/**
+ * Write one packed cell's character into the output buffer as UTF-8.
+ * ASCII and BMP code points are encoded inline; only side-table graphemes
+ * (multi-codepoint clusters) require a `TextEncoder.encodeInto` call.
+ */
+function writeCharBytes(
+  buf: Uint8Array, off: number,
+  srcBuf: Uint8Array, srcOff: number,
+  sideTable: readonly string[],
+): number {
+  const code = srcBuf[srcOff]! | (srcBuf[srcOff + 1]! << 8);
+
+  if (code < 0x80) {
+    // ASCII fast path
+    buf[off] = code;
+    return off + 1;
+  }
+
+  if (code < SIDE_TABLE_THRESHOLD) {
+    // BMP code point: 0x0080..0x07ff → 2 bytes, 0x0800..0xffff → 3 bytes.
+    if (code < 0x800) {
+      buf[off] = 0xc0 | (code >> 6);
+      buf[off + 1] = 0x80 | (code & 0x3f);
+      return off + 2;
+    }
+    buf[off] = 0xe0 | (code >> 12);
+    buf[off + 1] = 0x80 | ((code >> 6) & 0x3f);
+    buf[off + 2] = 0x80 | (code & 0x3f);
+    return off + 3;
+  }
+
+  // Side-table index — multi-codepoint grapheme cluster.
+  const grapheme = sideTable[code - SIDE_TABLE_THRESHOLD] ?? '';
+  const { written } = textEncoder.encodeInto(grapheme, buf.subarray(off));
+  return off + written;
+}
 
 /**
  * Semantic packed-cell equality across two buffers with independent side tables.
@@ -369,51 +534,19 @@ function packedCellsSemanticallyEqual(
   return aChar === bChar && decodeChar(aChar, aSide) === decodeChar(bChar, bSide);
 }
 
-/** Build a collision-free cache key from the 8 style bytes (fg RGB, bg RGB, flags, alpha). */
-function styleCacheKey(buf: Uint8Array, off: number): string {
-  return String.fromCharCode(
-    buf[off + OFF_FG_R]!, buf[off + OFF_FG_R + 1]!, buf[off + OFF_FG_R + 2]!,
-    buf[off + 5]!, buf[off + 6]!, buf[off + 7]!,
-    buf[off + 8]!, buf[off + 9]!,
-  );
-}
-
-function buildSgr(buf: Uint8Array, off: number): string {
-  let sgr = RESET_SGR;
-  const flags = buf[off + 8]!;
-  const alpha = buf[off + 9]!;
-
-  if (alpha & FLAG_FG_SET) {
-    sgr += `\x1b[38;2;${buf[off + OFF_FG_R]};${buf[off + OFF_FG_R + 1]};${buf[off + OFF_FG_R + 2]}m`;
-  }
-  if (alpha & FLAG_BG_SET) {
-    sgr += `\x1b[48;2;${buf[off + 5]};${buf[off + 6]};${buf[off + 7]}m`;
-  }
-  for (const [flag, code] of FLAG_SGR) {
-    if (flags & flag) sgr += code;
-  }
-  const uStyle = (flags >> 4) & 0x03;
-  if (uStyle > 0) {
-    sgr += (uStyle === 3 && (flags & FLAG_DASHED)) ? DASHED_SGR : UNDERLINE_SGR[uStyle]!;
-  }
-  return sgr;
-}
-
 /**
- * Emit cached ANSI SGR escape sequences from packed buffer bytes.
- * Caches compiled SGR strings keyed on style bytes — themes have
- * a finite vocabulary of ~50 unique styles, so the cache saturates
- * quickly and subsequent calls are a Map.get() + hash.
+ * Worst-case byte budget at the start of a new batch, including the
+ * batch's entire emission: cursor (~10) + SGR preamble (~70) + up to
+ * `width` cells of chars (worst case ~32 bytes each for side-table
+ * emoji clusters) + trailing reset (4). A row can have at most one
+ * batch per dirty run; reserving this much at batch start means the
+ * inner char-write loop never needs a per-cell capacity check.
+ *
+ * For a 220-wide terminal the worst case is ~7160 bytes (220 × 32 +
+ * 96 + 4). We round up to 8192 so the math is easy and batches with
+ * an unusual mix of large graphemes still fit.
  */
-function emitSgrFromBuf(buf: Uint8Array, off: number): string {
-  const key = styleCacheKey(buf, off);
-  let sgr = sgrCache.get(key);
-  if (sgr === undefined) {
-    sgr = buildSgr(buf, off);
-    sgrCache.set(key, sgr);
-  }
-  return sgr;
-}
+const BATCH_PREAMBLE_BUDGET = 8192;
 
 function renderDiffPacked(
   current: PackedSurface,
@@ -472,7 +605,36 @@ function renderDiffPacked(
     return;
   }
 
-  let output = '';
+  // Acquire the pooled output buffer. The runtime supplies one sized
+  // against the current viewport; all other callers land on the
+  // module-level scratch buffer (sized against the live surface and
+  // reused across calls).
+  let buf: Uint8Array;
+  if (outBuf !== undefined) {
+    buf = outBuf;
+  } else {
+    const needed = cellCount * SCRATCH_BYTES_PER_CELL + SCRATCH_SLACK;
+    if (scratchOutBuf === null || scratchOutBuf.length < needed) {
+      scratchOutBuf = new Uint8Array(needed);
+    }
+    buf = scratchOutBuf;
+  }
+  let off = 0;
+
+  // Flush the pending bytes to the IO port and reset the cursor to
+  // the start of the pool. Direct `writeBytes` handoff on the Node
+  // stdout path; TextDecoder fallback for mock sinks that only carry
+  // a string-level `write`.
+  const flush = (): void => {
+    if (off === 0) return;
+    if (io.writeBytes !== undefined) {
+      io.writeBytes(buf, off);
+    } else {
+      io.write(textDecoder.decode(buf.subarray(0, off)));
+    }
+    off = 0;
+  };
+
   let cursorX = -1;
   let cursorY = -1;
 
@@ -513,12 +675,21 @@ function renderDiffPacked(
         continue;
       }
 
+      // Flush if the batch preamble (cursor + SGR) cannot fit contiguously.
+      if (off + BATCH_PREAMBLE_BUDGET > buf.length) {
+        flush();
+      }
+
       if (x !== cursorX || y !== cursorY) {
-        output += moveCursor(x, y);
+        off = writeCursorBytes(buf, off, x, y);
+      }
+
+      const hasStyle = packedHasVisibleStyle(tBuf, tOff);
+      if (hasStyle) {
+        off = writeSgrFromBufBytes(buf, off, tBuf, tOff);
       }
 
       let batchX = x;
-      let batchText = '';
       while (batchX < width) {
         const bIdx = y * width + batchX;
         const bOff = bIdx * CELL_STRIDE;
@@ -539,15 +710,18 @@ function renderDiffPacked(
 
         if (cellsMatch) break;
 
-        batchText += readCharFromBuf(tBuf, bOff, tSide);
+        off = writeCharBytes(buf, off, tBuf, bOff, tSide);
         batchX++;
       }
 
-      // Emit styled batch — direct ANSI from packed bytes, bypasses StylePort
-      if (packedHasVisibleStyle(tBuf, tOff)) {
-        output += emitSgrFromBuf(tBuf, tOff) + batchText + RESET_SGR;
-      } else {
-        output += batchText;
+      // Trailing reset after styled batch — matches legacy emission.
+      // 4-byte inline write, same as the leading reset inside writeSgrFromBufBytes.
+      if (hasStyle) {
+        buf[off] = 0x1b;
+        buf[off + 1] = 0x5b;
+        buf[off + 2] = 0x30;
+        buf[off + 3] = 0x6d;
+        off += 4;
       }
 
       cursorX = batchX;
@@ -556,29 +730,7 @@ function renderDiffPacked(
     }
   }
 
-  if (output.length === 0) {
-    return;
-  }
-
-  // Byte transport: when the caller owns a pooled buffer (the TUI
-  // runtime) and the IO port supports writeBytes (Node stdout), encode
-  // the composed frame into the buffer once and hand the bytes off
-  // directly. This avoids the implicit string→UTF-8 conversion inside
-  // the underlying stream and gives II-4 a place to land direct
-  // byte-emission without re-touching every caller. Tests, bench
-  // scenarios, and simple drivers do not pass `outBuf` and stay on
-  // the legacy `io.write(string)` path with no overhead.
-  if (
-    outBuf !== undefined
-    && io.writeBytes !== undefined
-    && output.length * 4 <= outBuf.length
-  ) {
-    const { written } = textEncoder.encodeInto(output, outBuf);
-    io.writeBytes(outBuf, written);
-    return;
-  }
-
-  io.write(output);
+  flush();
 }
 
 // ── Legacy cell-based differ (fallback) ─────────────────
