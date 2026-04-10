@@ -45,7 +45,7 @@ import {
   fitLine,
 } from './app-frame-utils.js';
 import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
-import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
+import { paintStyledTextSurfaceWithBCSS } from './css/text-style.js';
 import { frameModeLabel } from './app-frame-i18n.js';
 import type { FrameLayerDescriptor } from './app-frame-layers.js';
 
@@ -476,6 +476,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  scratch?: Surface,
 ): FrameHeaderRenderResult {
   const ctx = resolveSafeCtx();
   const activePage = pagesById.get(model.activePageId)!;
@@ -509,7 +510,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   }).join(' ');
 
   const line = fitLine(`${title}  ${tabs}`, model.columns);
-  const surface = createStyledTextSurfaceWithBCSS(line, model.columns, ctx, {
+  const surface = paintStyledTextSurfaceWithBCSS(scratch, line, model.columns, ctx, {
     type: 'FrameHeader',
     id: 'frame-header',
     classes: [`page-${model.activePageId}`],
@@ -527,6 +528,7 @@ export function renderHelpLine<PageModel, Msg>(
   activeLayer: FrameLayerDescriptor,
   i18n: CreateFramedAppOptions<PageModel, Msg>['i18n'],
   notificationCue?: string,
+  scratch?: Surface,
 ): Surface {
   const mode = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
     ? 'PALETTE'
@@ -561,7 +563,7 @@ export function renderHelpLine<PageModel, Msg>(
           : `${statusWithPadding}  ${hint}`;
       })()
     : ` ${status}`;
-  return createStyledTextSurfaceWithBCSS(fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
+  return paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],

@@ -142,3 +142,67 @@ export function createStyledTextSurfaceWithBCSS(
   }
   return surface;
 }
+
+/**
+ * Repaint an existing surface in-place with styled text. Zero allocation
+ * when the surface width already matches — only cell values are mutated.
+ * Falls back to creating a new surface when the width changed (resize).
+ */
+export function paintStyledTextSurfaceWithBCSS(
+  surface: Surface | undefined,
+  text: string,
+  width: number,
+  ctx: BijouContext | undefined,
+  identity: BCSSIdentity,
+  base: StyledTextToken = {},
+): Surface {
+  const safeWidth = Math.max(0, Math.floor(width));
+
+  // Need a new surface if none exists or width changed.
+  if (surface == null || surface.width !== safeWidth || surface.height !== 1) {
+    return createStyledTextSurfaceWithBCSS(text, width, ctx, identity, base);
+  }
+
+  // Repaint in-place: fill with base style, then write graphemes.
+  if (!ctx) {
+    surface.clear();
+    const graphemes = segmentGraphemes(text ?? '');
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      surface.set(x, 0, { char: graphemes[x]!, empty: false });
+    }
+    return surface;
+  }
+
+  const token = resolveBCSSTextToken(ctx, identity, base);
+  surface.fill({
+    char: ' ',
+    fg: token.hex,
+    bg: token.bg,
+    modifiers: token.modifiers,
+    empty: false,
+  });
+  const graphemes = segmentGraphemes(text ?? '');
+  const packed: boolean = 'buffer' in surface;
+  const fg = packed && token.hex ? parseHex(token.hex) : undefined;
+  if (fg) {
+    const [fR, fG, fB] = fg;
+    const bg = token.bg ? parseHex(token.bg) : undefined;
+    let bR = -1, bG = 0, bB = 0;
+    if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
+    const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      (surface as any).setRGB(x, 0, graphemes[x]!, fR, fG, fB, bR, bG, bB, flags);
+    }
+  } else {
+    for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
+      surface.set(x, 0, {
+        char: graphemes[x]!,
+        fg: token.hex,
+        bg: token.bg,
+        modifiers: token.modifiers,
+        empty: false,
+      });
+    }
+  }
+  return surface;
+}

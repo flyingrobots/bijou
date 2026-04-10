@@ -673,6 +673,8 @@ export function createFramedApp<PageModel, Msg>(
   });
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   let composedFrameScratch: Surface | null = null;
+  let headerScratch: Surface | undefined;
+  let helpLineScratch: Surface | undefined;
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -1270,7 +1272,8 @@ export function createFramedApp<PageModel, Msg>(
   function buildWorkspaceLayoutTree(
     model: InternalFrameModel<PageModel, Msg>,
   ): SurfaceLayoutNode {
-    const header = resolveHeaderLine(model, options, pagesById);
+    const header = resolveHeaderLine(model, options, pagesById, headerScratch);
+    headerScratch = header.surface;
     const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
       createShellRetainedLayoutNode(`tab:${target.pageId}`, {
         row: 0,
@@ -1899,13 +1902,17 @@ export function createFramedApp<PageModel, Msg>(
         layerStack,
         activeLayer,
       } = resolvePresentedLayerContext(model);
-      const header = resolveHeaderLine(model, options, pagesById).surface;
-      const helpLine = renderHelpLine(
+      const headerResult = resolveHeaderLine(model, options, pagesById, headerScratch);
+      headerScratch = headerResult.surface;
+      const header = headerResult.surface;
+      helpLineScratch = renderHelpLine(
         model,
         activeLayer,
         options.i18n,
         resolveNotificationFooterCue(model, options, pagesById),
+        helpLineScratch,
       );
+      const helpLine = helpLineScratch;
       const bodyRect = resolveBodyRect(model, options);
 
       // Check for maximized pane — if set, render only that pane at full body rect
