@@ -4,6 +4,7 @@ import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from 
 import {
   CELL_STRIDE,
   OFF_FG_R,
+  OFF_BG_R, OFF_BG_G, OFF_BG_B,
   FLAG_BOLD, FLAG_DIM, FLAG_STRIKETHROUGH, FLAG_INVERSE,
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
   FLAG_DASHED,
@@ -352,10 +353,23 @@ const SCRATCH_SLACK = 8192;
 // pre-allocated Uint8Array constants in the hot path.
 
 /**
- * Write an unsigned integer (0–999) as ASCII digits. Returns new offset.
- * Covers every value a cursor coordinate or RGB component can take.
+ * Write an unsigned integer (0–9999) as ASCII digits. Returns new offset.
+ * Covers cursor coordinates (1-based, up to 9999 for ultra-wide
+ * terminals) and RGB components (0–255).
  */
 function writeDecimal(buf: Uint8Array, off: number, n: number): number {
+  if (n >= 1000) {
+    const th = (n / 1000) | 0;
+    const rem3 = n - th * 1000;
+    const h = (rem3 / 100) | 0;
+    const rem2 = rem3 - h * 100;
+    const t = (rem2 / 10) | 0;
+    buf[off] = 0x30 + th;
+    buf[off + 1] = 0x30 + h;
+    buf[off + 2] = 0x30 + t;
+    buf[off + 3] = 0x30 + (rem2 - t * 10);
+    return off + 4;
+  }
   if (n >= 100) {
     const h = (n / 100) | 0;
     const rem = n - h * 100;
@@ -389,7 +403,7 @@ function writeCursorBytes(buf: Uint8Array, off: number, x: number, y: number): n
 
 /**
  * Emit the full SGR prelude for the style bytes at `srcOff` into `buf`.
- * Matches the legacy `buildSgr()` emission order byte-for-byte: reset,
+ * Functionally equivalent to the legacy `buildSgr()` emission: reset,
  * optional truecolor FG, optional truecolor BG, modifier flags (bold,
  * dim, strike, inverse in that order), optional underline.
  *
@@ -439,11 +453,11 @@ function writeSgrFromBufBytes(
     buf[off + 5] = 0x32;
     buf[off + 6] = 0x3b;
     off += 7;
-    off = writeDecimal(buf, off, srcBuf[srcOff + 5]!);
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_R]!);
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + 6]!);
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_G]!);
     buf[off++] = 0x3b;
-    off = writeDecimal(buf, off, srcBuf[srcOff + 7]!);
+    off = writeDecimal(buf, off, srcBuf[srcOff + OFF_BG_B]!);
     buf[off++] = 0x6d;
   }
 
@@ -535,18 +549,16 @@ function packedCellsSemanticallyEqual(
 }
 
 /**
- * Worst-case byte budget at the start of a new batch, including the
- * batch's entire emission: cursor (~10) + SGR preamble (~70) + up to
- * `width` cells of chars (worst case ~32 bytes each for side-table
- * emoji clusters) + trailing reset (4). A row can have at most one
- * batch per dirty run; reserving this much at batch start means the
- * inner char-write loop never needs a per-cell capacity check.
- *
- * For a 220-wide terminal the worst case is ~7160 bytes (220 × 32 +
- * 96 + 4). We round up to 8192 so the math is easy and batches with
- * an unusual mix of large graphemes still fit.
+ * Fixed byte budget for the cursor move + full SGR prelude + trailing
+ * reset that bookend a batch. The variable per-batch cost comes from
+ * the char writes, which are bounded by `width * MAX_CHAR_BYTES`.
+ * The full batch budget is computed inside `renderDiffPacked` as
+ * `BATCH_FIXED_BUDGET + width * MAX_CHAR_BYTES` so it scales with
+ * terminal width and never overflows on ultra-wide monitors.
  */
-const BATCH_PREAMBLE_BUDGET = 8192;
+const BATCH_FIXED_BUDGET = 128;
+/** Worst-case UTF-8 bytes per cell character (side-table emoji cluster). */
+const MAX_CHAR_BYTES = 32;
 
 function renderDiffPacked(
   current: PackedSurface,
@@ -642,6 +654,11 @@ function renderDiffPacked(
   // surface has any side-table entries (the common case — no emoji/astral).
   const needsSideTableCheck = tSide.length > 0 || cSide.length > 0;
 
+  // Per-batch byte budget computed from the current surface width so
+  // the inner char-write loop never needs a per-cell capacity check,
+  // even on ultra-wide terminals.
+  const batchBudget = BATCH_FIXED_BUDGET + width * MAX_CHAR_BYTES;
+
   for (let y = 0; y < height; y++) {
     let x = 0;
     while (x < width) {
@@ -676,7 +693,7 @@ function renderDiffPacked(
       }
 
       // Flush if the batch preamble (cursor + SGR) cannot fit contiguously.
-      if (off + BATCH_PREAMBLE_BUDGET > buf.length) {
+      if (off + batchBudget > buf.length) {
         flush();
       }
 
@@ -698,6 +715,12 @@ function renderDiffPacked(
       off = writeCharBytes(buf, off, tBuf, tOff, tSide);
       let batchX = x + 1;
 
+      // NOTE: The batch continuation loop does not consult the render-
+      // dirty bitmap per cell. This is intentional — the cellsMatch
+      // byte-compare below catches unchanged cells and breaks the
+      // batch. Checking the bitmap here would add a branch to every
+      // iteration of the hot inner loop for negligible benefit, since
+      // batches are short in practice (style changes break them).
       while (batchX < width) {
         const bIdx = y * width + batchX;
         const bOff = bIdx * CELL_STRIDE;
