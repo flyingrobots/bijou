@@ -137,13 +137,19 @@ async function main(): Promise<void> {
           // Run the scenario frame
           scenario.frame(state, startFrame + f);
 
-          // Get the display surface and blit it into our terminal-sized surface.
-          // Pre-fill ensures border cells outside the scenario's 220×58 region
-          // show a dark background that blends with scenario themes.
+          // Get the display surface and tile it across the full terminal.
+          // Scenarios render at a fixed size (typically 220×58); tiling
+          // fills the whole screen so there are no dark border strips.
           const sceneSurface = scenario.getDisplaySurface!(state);
           if (sceneSurface) {
-            displaySurface = createSurface(cols, renderRows, BORDER_FILL);
-            displaySurface.blit(sceneSurface, 0, 0);
+            displaySurface = createSurface(cols, renderRows);
+            const sw = sceneSurface.width;
+            const sh = sceneSurface.height;
+            for (let ty = 0; ty < renderRows; ty += sh) {
+              for (let tx = 0; tx < cols; tx += sw) {
+                displaySurface.blit(sceneSurface, tx, ty);
+              }
+            }
           }
 
           // Render to terminal via the real byte pipeline
