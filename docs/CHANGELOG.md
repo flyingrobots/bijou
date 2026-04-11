@@ -24,7 +24,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### 📦 Infrastructure
 
 - **DOGFOOD data-viz stories** — sparkline, brailleChartSurface, statsPanelSurface, and perfOverlaySurface stories added to the component gallery. Component-family reference grows from 35 to 36 families at 100% coverage.
-- **Backlog cleanup** — resolved RE-008, RE-007, RE-009, RE-010, RE-015. Added RE-021 (frame owns the pump) as a cool idea. Removed PLAN.md.
+- **Backlog cleanup** — closed stale backlog items for RE-008, RE-007, RE-009, RE-010, RE-015 (code fixes shipped in earlier releases; backlog trackers administratively resolved). Added RE-021 (frame owns the pump) as a cool idea. Removed PLAN.md.
 - **Stale test fixes** — 22 cycle tests updated: removed assertions against deleted PLAN.md, pointed RE-007 backlog refs to landed design doc, bumped coverage ratchets from 35 to 36 families.
 
 ## [4.3.0] - 2026-04-10

@@ -81,7 +81,7 @@ The benchmark harness gains two new scenarios:
 - **flame** — doom fire effect with full-screen palette interpolation
   (~2.6 ms/frame)
 - **component-app** — realistic TUI using real bijou components
-  (boxSurface, tableSurface, alertSurface, etc., ~564 us/frame)
+  (boxSurface, tableSurface, alertSurface, etc., ~564 µs/frame)
 
 All scenarios now support dynamic sizing via an optional `columns` /
 `rows` argument to `setup()`. The soak runner has been rewritten on
@@ -95,6 +95,7 @@ reference from 35 to 36 families at 100% documented coverage.
 
 ## Backlog Cleanup
 
-- Resolved: RE-008, RE-007, RE-009, RE-010, RE-015
+- Closed stale backlog items: RE-008, RE-007, RE-009, RE-010, RE-015
+  (code fixes shipped in earlier releases; trackers administratively closed)
 - Added: RE-021 (frame owns the pump — cool idea for next major)
 - Removed: PLAN.md (redundant narrative wrapper)

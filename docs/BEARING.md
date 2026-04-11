@@ -21,13 +21,15 @@ The next gravity is split between:
 
 ### 4.4.0
 
-- Data visualization toolkit: `sparkline()`, `brailleChartSurface()`,
-  `statsPanelSurface()`, `perfOverlaySurface()`
+- [Data visualization toolkit](./releases/4.4.0/whats-new.md): `sparkline()`,
+  `brailleChartSurface()`, `statsPanelSurface()`, `perfOverlaySurface()`
 - Zero-alloc framed app header/footer, scoped pane scratch pool (RE-010)
 - New bench scenarios: flame, component-app (dynamic sizing)
 - Soak runner rewritten on `createFramedApp`
 - DOGFOOD data-viz stories (36/36 families at 100% coverage)
-- Backlog cleanup: RE-008, RE-007, RE-009, RE-010, RE-015 resolved
+- Closed stale backlog items for RE-008, RE-007, RE-009, RE-010, RE-015
+- [RE-021](./method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md) logged
+  as cool idea for next major
 
 ### 4.3.0
 
