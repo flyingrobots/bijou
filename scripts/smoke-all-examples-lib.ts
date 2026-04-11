@@ -9,22 +9,14 @@ import { detectGarbage, stripAnsi } from './smoke-utils.js';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-export const TOP_LEVEL = [
-  'demo.ts',
-  'demo-tui.ts',
-] as const;
+export const TOP_LEVEL: readonly string[] = [];
 
 export const PLAIN_INPUTS: Readonly<Record<string, string>> = {
-  'demo.ts': '2\n',
-  'examples/confirm/main.ts': 'y\n',
   'examples/filter/main.ts': '1\n',
   'examples/form-group/main.ts': 'my-app\n1\n1,2\ny\n',
-  'examples/input/main.ts': 'my-app\nA short description\n',
-  'examples/multiselect/main.ts': '1,2\n',
   'examples/select/main.ts': '1\n',
   'examples/textarea/main.ts': 'test commit message\n',
   'examples/theme/main.ts': '',
-  'examples/wizard/main.ts': '1\naws\ny\n',
 };
 
 export const DEFAULT_INPUT = [
@@ -42,34 +34,18 @@ export interface InteractiveScriptScenarioSpec {
 }
 
 export const INTERACTIVE_FORM_SCRIPTS: Readonly<Record<string, InteractiveScriptScenarioSpec>> = {
-  'demo.ts': {
-    keys: ['\x1b[B', '\r'],
-  },
   'examples/select/main.ts': {
     keys: ['\x1b[B', '\r'],
-  },
-  'examples/multiselect/main.ts': {
-    keys: [' ', '\x1b[B', ' ', '\r'],
   },
   'examples/filter/main.ts': {
     keys: ['/', 'r', 'u', 's', 't', '\r'],
   },
-  'examples/input/main.ts': {
-    answers: ['my-app', 'A short description'],
-  },
   'examples/textarea/main.ts': {
     keys: ['feat: smoke test', '\x04'],
-  },
-  'examples/confirm/main.ts': {
-    answers: ['y'],
   },
   'examples/form-group/main.ts': {
     answers: ['my-app', 'y'],
     keys: ['\r', ' ', '\x1b[B', ' ', '\r'],
-  },
-  'examples/wizard/main.ts': {
-    answers: ['aws', 'y'],
-    keys: ['\r'],
   },
 };
 

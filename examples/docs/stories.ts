@@ -1550,10 +1550,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/alert/main.ts',
-      snippetLabel: 'Alert basics',
-    },
     tags: ['status', 'feedback', 'lowering'],
   },
   {
@@ -1619,10 +1615,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/badge/main.ts',
-      snippetLabel: 'Inline status labels',
-    },
     tags: ['status', 'inline', 'labels'],
   },
   {
@@ -1705,10 +1697,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/modal/main.ts',
-      snippetLabel: 'Blocking decision overlay',
-    },
     tags: ['overlay', 'interruption', 'surface'],
   },
   {
@@ -1783,10 +1771,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/progress-animated/main.ts',
-      snippetLabel: 'Looping rollout progress',
-    },
     tags: ['progress', 'loading', 'animation'],
   },
   {
@@ -1855,10 +1839,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/skeleton/main.ts',
-      snippetLabel: 'Loading placeholders',
-    },
     tags: ['loading', 'placeholder', 'layout'],
   },
   {
@@ -1933,10 +1913,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/toast/main.ts',
-      snippetLabel: 'Anchored transient overlay',
-    },
     tags: ['feedback', 'overlay', 'transient'],
   },
   {
@@ -1998,10 +1974,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/log/main.ts',
-      snippetLabel: 'Chronological event stream',
-    },
     tags: ['feedback', 'history', 'events'],
   },
   {
@@ -2060,10 +2032,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/confirm/main.ts',
-      snippetLabel: 'Binary decision prompt',
-    },
     tags: ['forms', 'decision', 'confirmation'],
   },
   {
@@ -2132,10 +2100,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/multiselect/main.ts',
-      snippetLabel: 'Set-building form prompt',
-    },
     tags: ['forms', 'selection', 'set-building'],
   },
   {
@@ -2268,10 +2232,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/input/main.ts',
-      snippetLabel: 'Text entry prompts',
-    },
     tags: ['forms', 'input', 'text'],
   },
   {
@@ -2338,10 +2298,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/wizard/main.ts',
-      snippetLabel: 'Staged rollout wizard',
-    },
     tags: ['forms', 'wizard', 'group'],
   },
   {
@@ -2413,10 +2369,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/tabs/main.ts',
-      snippetLabel: 'Peer navigation strip',
-    },
     tags: ['navigation', 'tabs', 'organization'],
   },
   {
@@ -2477,10 +2429,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/markdown/main.ts',
-      snippetLabel: 'Bounded markdown prose',
-    },
     tags: ['docs', 'prose', 'reference'],
   },
   {
@@ -2543,10 +2491,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/hyperlink/main.ts',
-      snippetLabel: 'Explicit link destinations',
-    },
     tags: ['docs', 'links', 'destinations'],
   },
   {
@@ -2611,10 +2555,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/box/main.ts',
-      snippetLabel: 'Grouped containment',
-    },
     tags: ['structure', 'grouping', 'panels'],
   },
   {
@@ -2768,10 +2708,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/explainability/main.ts',
-      snippetLabel: 'Explainable recommendation surface',
-    },
     tags: ['guidance', 'ai', 'explainability'],
   },
   {
@@ -2856,10 +2792,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/separator/main.ts',
-      snippetLabel: 'Labeled and unlabeled section dividers',
-    },
     tags: ['structure', 'rhythm', 'dividers'],
   },
   {
@@ -2914,10 +2846,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/help/main.ts',
-      snippetLabel: 'Grouped help and shell hints',
-    },
     tags: ['shortcuts', 'help', 'shell'],
   },
   {
@@ -3052,10 +2980,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ),
       },
     ],
-    source: {
-      examplePath: 'examples/viewport/main.ts',
-      snippetLabel: 'Masking viewport',
-    },
     tags: ['layout', 'masking', 'scroll'],
   },
   {
@@ -3108,10 +3032,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/kbd/main.ts',
-      snippetLabel: 'Inline shortcut cues',
-    },
     tags: ['shortcuts', 'inline', 'hints'],
   },
   {
@@ -3224,10 +3144,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/interactive-accordion/main.ts',
-      snippetLabel: 'Keyboard-owned disclosure',
-    },
     tags: ['disclosure', 'accordion', 'navigation'],
   },
   {
@@ -3282,10 +3198,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/stepper/main.ts',
-      snippetLabel: 'Wayfinding and progress',
-    },
     tags: ['wayfinding', 'progress', 'navigation'],
   },
   {
@@ -3340,10 +3252,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/gradient-text/main.ts',
-      snippetLabel: 'Expressive branding emphasis',
-    },
     tags: ['branding', 'gradient', 'logo'],
   },
   {
@@ -3386,10 +3294,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/custom-component/main.ts',
-      snippetLabel: 'Mode-aware custom primitive',
-    },
     tags: ['authoring', 'custom', 'lowering'],
   },
   {
@@ -3444,10 +3348,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/navigable-table/main.ts',
-      snippetLabel: 'Dense comparison',
-    },
     tags: ['table', 'comparison', 'data'],
   },
   {
@@ -3502,10 +3402,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/file-picker/main.ts',
-      snippetLabel: 'Hierarchy and file browsing',
-    },
     tags: ['hierarchy', 'tree', 'filesystem'],
   },
   {
@@ -3560,10 +3456,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/browsable-list/main.ts',
-      snippetLabel: 'Lists for exploration',
-    },
     tags: ['list', 'browsing', 'exploration'],
   },
   {
@@ -3618,10 +3510,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/timeline/main.ts',
-      snippetLabel: 'Timeline and dependency views',
-    },
     tags: ['timeline', 'dag', 'dependency'],
   },
   {
@@ -3678,10 +3566,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/canvas/main.ts',
-      snippetLabel: 'Shader-based motion',
-    },
     tags: ['motion', 'shader', 'canvas'],
   },
   {
@@ -3794,10 +3678,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/split-pane/main.ts',
-      snippetLabel: 'Workspace layout',
-    },
     tags: ['layout', 'split', 'grid'],
   },
 
