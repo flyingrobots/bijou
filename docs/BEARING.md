@@ -4,7 +4,8 @@
 
 The runtime engine has its performance foundation and the render pipeline
 is byte-packed and zero-alloc on the hot path. The framed app render
-loop itself is now zero-alloc for header/footer painting.
+loop itself is now zero-alloc for header/footer painting, and `4.4.1`
+closes the immediate framed-shell polish fallout from `4.4.0`.
 
 The next gravity is split between:
 
@@ -19,6 +20,15 @@ The next gravity is split between:
 
 ## What Just Shipped?
 
+### 4.4.1
+
+- [Framed shell polish release](./releases/4.4.1/whats-new.md):
+  background fill restored across body and shell chrome
+- `createFramedApp()` now supports stock shell theme cycling via
+  `shellThemes` and exposes `FrameModel.activeShellThemeId`
+- DOGFOOD title + docs theme state unified; new `Verdant Plum` palette
+- Quit-confirm accepts uppercase `Y` / `N`
+
 ### 4.4.0
 
 - [Data visualization toolkit](./releases/4.4.0/whats-new.md): `sparkline()`,
@@ -28,7 +38,7 @@ The next gravity is split between:
 - Soak runner rewritten on `createFramedApp`
 - DOGFOOD data-viz stories (36/36 families at 100% coverage)
 - Closed stale backlog items for RE-008, RE-007, RE-009, RE-010, RE-015
-- [RE-021](./method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md) logged
+- [RE-021](./BACKLOG/v5.0.0/RE-021-frame-owns-the-pump.md) logged
   as cool idea for next major
 
 ### 4.3.0
@@ -56,14 +66,11 @@ See [4.1.0 release docs](./releases/4.1.0/whats-new.md).
 
 ## What's Next?
 
-- [LX-010](./method/backlog/asap/LX_010-built-in-i18n-catalog-loader.md)
-  — built-in i18n catalog loader (ASAP)
-- [DF-020](./method/backlog/up-next/DF_020-deepen-dogfood-story-depth-and-variant-quality.md)
-  — deepen DOGFOOD story depth
-- [DL-009](./method/backlog/up-next/DL_009-formalize-layout-and-viewport-rules.md)
-  — formalize layout and viewport rules
-- MCP interactive documentation (inbox)
-- WritePort byte-level API (inbox)
+- built-in i18n catalog loader work in the METHOD backlog
+- deeper DOGFOOD story quality and variant polish
+- MCP interactive documentation for shipped component families
+- layout and viewport formalization after the current shell polish pass
+- longer-horizon frame timing and perf-overlay integration
 
 ## What Feels Wrong?
 

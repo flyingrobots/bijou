@@ -21,11 +21,15 @@ export function isShellQuitRequest(msg: KeyMsg): boolean {
 }
 
 export function isShellQuitConfirmAccept(msg: KeyMsg): boolean {
-  return !msg.ctrl && !msg.alt && !msg.shift && (msg.key === 'y' || msg.key === 'enter');
+  if (msg.ctrl || msg.alt) return false;
+  if (msg.key === 'y') return true;
+  return !msg.shift && msg.key === 'enter';
 }
 
 export function isShellQuitConfirmDismiss(msg: KeyMsg): boolean {
-  return !msg.ctrl && !msg.alt && !msg.shift && (msg.key === 'n' || msg.key === 'escape' || msg.key === 'q');
+  if (msg.ctrl || msg.alt) return false;
+  if (msg.key === 'n') return true;
+  return !msg.shift && (msg.key === 'escape' || msg.key === 'q');
 }
 
 export function renderShellQuitOverlay(

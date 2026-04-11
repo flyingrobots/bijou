@@ -163,7 +163,8 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
     'Home',
     'Split',
     'Home ready',
-    'Supplemental drawer',
+    'Drawer',
+    'Open:',
   ]);
   assertCheckpointContains(checkpoints, 'split', [
     'Split ready',
@@ -172,7 +173,8 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
   ]);
   assertCheckpointContains(checkpoints, 'home-return', [
     'Home ready',
-    'Supplemental drawer',
+    'Drawer',
+    'Open:',
   ]);
   assertCheckpointContains(checkpoints, 'drawer-closed', [
     'Open: no',

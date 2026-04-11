@@ -6,7 +6,9 @@
  */
 
 import {
+  createResolved,
   createSurface,
+  createThemeAccessors,
   type LayoutNode as SurfaceLayoutNode,
   preparePreferenceSections,
   preferenceListSurface,
@@ -14,11 +16,13 @@ import {
   resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
+  setDefaultContext,
   type PreparedPreferenceSection,
   type PreferenceRow,
   type PreferenceSection,
   type OverflowBehavior,
   type Surface,
+  type Theme,
   type TokenValue,
 } from '@flyingrobots/bijou';
 import type { I18nRuntime } from '@flyingrobots/bijou-i18n';
@@ -256,6 +260,18 @@ export interface FrameHeaderStyle {
   readonly activeTabToken?: TokenValue;
 }
 
+/** A stock shell-theme option that the frame can surface in its settings drawer. */
+export interface FrameShellTheme {
+  /** Stable option id. */
+  readonly id: string;
+  /** Visible label shown in the settings drawer. */
+  readonly label: string;
+  /** Theme payload applied when this option is selected. */
+  readonly theme: Theme;
+  /** Optional helper copy shown beneath the row when active. */
+  readonly description?: string;
+}
+
 /** Declarative frame layout node. */
 export type FrameLayoutNode =
   | {
@@ -361,6 +377,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   ) => Msg | undefined;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
+  /** Optional stock shell-theme choices surfaced by the frame settings drawer. */
+  readonly shellThemes?: readonly FrameShellTheme[];
   /** Optional shell-owned settings drawer content. */
   readonly settings?: (args: {
     readonly model: FrameModel<PageModel>;
@@ -424,6 +442,8 @@ export interface FramePaneScroll {
 export interface FrameModel<PageModel> {
   /** Current active page id. */
   readonly activePageId: string;
+  /** Currently selected stock shell theme id (if shell themes are enabled). */
+  readonly activeShellThemeId?: string;
   /** Stable page order. */
   readonly pageOrder: readonly string[];
   /** Current model per page id. */
@@ -640,6 +660,125 @@ function createFrameNotificationTickCmd<Msg>(): Cmd<FramedAppMsg<Msg>> {
   };
 }
 
+function applyResolvedShellThemeToContext(
+  ctx: NonNullable<ReturnType<typeof resolveSafeCtx>>,
+  resolvedTheme: ReturnType<typeof createResolved>,
+): void {
+  const accessors = createThemeAccessors(resolvedTheme);
+  Object.assign(ctx as {
+    theme: typeof resolvedTheme;
+    tokenGraph: typeof resolvedTheme.tokenGraph;
+    semantic: typeof accessors.semantic;
+    border: typeof accessors.border;
+    surface: typeof accessors.surface;
+    status: typeof accessors.status;
+    ui: typeof accessors.ui;
+    gradient: typeof accessors.gradient;
+  }, {
+    theme: resolvedTheme,
+    tokenGraph: resolvedTheme.tokenGraph,
+    ...accessors,
+  });
+  setDefaultContext(ctx);
+}
+
+function resolveShellThemeOptionsText(
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  i18n: I18nRuntime | undefined,
+): string {
+  const labels = shellThemes.map((theme) => theme.label);
+  if (labels.length === 0) return '';
+  if (i18n == null) return labels.join(', ');
+  return i18n.formatList(labels, i18n.locale);
+}
+
+function resolveCurrentShellTheme(
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  activeShellThemeId: string | undefined,
+): ResolvedFrameShellTheme | undefined {
+  return shellThemes.find((theme) => theme.id === activeShellThemeId) ?? shellThemes[0];
+}
+
+function resolveNextShellTheme(
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  activeShellThemeId: string | undefined,
+): ResolvedFrameShellTheme | undefined {
+  if (shellThemes.length === 0) return undefined;
+  const currentIndex = Math.max(0, shellThemes.findIndex((theme) => theme.id === activeShellThemeId));
+  return shellThemes[(currentIndex + 1) % shellThemes.length];
+}
+
+function mergeShellThemeSettings<Msg>(
+  settings: FrameSettings<Msg> | undefined,
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  activeShellThemeId: string | undefined,
+  i18n: I18nRuntime | undefined,
+): FrameSettings<Msg> | undefined {
+  if (shellThemes.length < 2) return settings;
+
+  const currentTheme = resolveCurrentShellTheme(shellThemes, activeShellThemeId);
+  const nextTheme = resolveNextShellTheme(shellThemes, activeShellThemeId);
+  if (currentTheme == null || nextTheme == null) return settings;
+
+  const row: FrameSettingRow<Msg> = {
+    id: FRAME_SHELL_THEME_ROW_ID,
+    label: frameMessage(i18n, 'settings.shellTheme.label', 'Shell theme'),
+    description: currentTheme.description ?? frameMessage(
+      i18n,
+      'settings.shellTheme.description',
+      'Current theme: {theme}. Options: {options}.',
+      {
+        theme: currentTheme.label,
+        options: resolveShellThemeOptionsText(shellThemes, i18n),
+      },
+    ),
+    valueLabel: currentTheme.label,
+    kind: 'choice',
+    feedback: {
+      title: frameMessage(i18n, 'settings.title', 'Settings'),
+      message: frameMessage(
+        i18n,
+        'settings.shellTheme.feedback',
+        'Shell theme set to {theme}.',
+        { theme: nextTheme.label },
+      ),
+    },
+  };
+
+  const shellSectionTitle = frameMessage(i18n, 'settings.section.shell', 'Shell');
+  if (settings == null) {
+    return {
+      title: frameMessage(i18n, 'settings.title', 'Settings'),
+      sections: [{ id: 'shell', title: shellSectionTitle, rows: [row] }],
+    };
+  }
+
+  const shellSectionIndex = settings.sections.findIndex((section) => section.id === 'shell');
+  if (shellSectionIndex >= 0) {
+    const shellSection = settings.sections[shellSectionIndex]!;
+    const existingRowIndex = shellSection.rows.findIndex((existingRow) => existingRow.id === FRAME_SHELL_THEME_ROW_ID);
+    const nextRows = existingRowIndex >= 0
+      ? shellSection.rows.map((existingRow, index) => (index === existingRowIndex ? row : existingRow))
+      : [...shellSection.rows, row];
+    return {
+      ...settings,
+      sections: settings.sections.map((section, index) => (
+        index === shellSectionIndex
+          ? { ...shellSection, rows: nextRows }
+          : section
+      )),
+    };
+  }
+
+  return {
+    ...settings,
+    sections: [
+      { id: 'shell', title: shellSectionTitle, rows: [row] },
+      ...settings.sections,
+    ],
+  };
+}
+
 // Factory
 // ---------------------------------------------------------------------------
 
@@ -667,8 +806,29 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
+  const frameCtx = options.shellThemes != null && options.shellThemes.length > 0
+    ? resolveSafeCtx()
+    : undefined;
+  if (options.shellThemes != null && options.shellThemes.length > 0 && frameCtx == null) {
+    throw new Error('createFramedApp: shellThemes requires a default Bijou context');
+  }
+  const resolvedShellThemes: readonly ResolvedFrameShellTheme[] = options.shellThemes?.map((theme) => ({
+    id: theme.id,
+    label: theme.label,
+    description: theme.description,
+    resolvedTheme: createResolved(
+      theme.theme,
+      frameCtx!.theme.noColor,
+      frameCtx!.theme.colorScheme,
+    ),
+  })) ?? [];
+  const enableShellThemeSettings = resolvedShellThemes.length > 1;
+  const initialShellTheme = resolvedShellThemes.find(
+    (theme) => theme.resolvedTheme.theme.name === frameCtx?.theme.theme.name,
+  ) ?? resolvedShellThemes[0];
+
   const frameKeys = createFrameKeyMap({
-    enableSettings: options.settings != null,
+    enableSettings: options.settings != null || enableShellThemeSettings,
     enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
     i18n: options.i18n,
   });
@@ -759,27 +919,32 @@ export function createFramedApp<PageModel, Msg>(
     // --- settings ---
     'settings-focus-move': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-focus-move' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById);
+      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
       return layout != null ? moveSettingsFocus(model, layout, c.delta) : model;
     },
     'settings-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById);
+      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
       return layout != null ? scrollSettingsBy(model, layout, c.delta) : model;
     },
     'settings-scroll-to': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'settings-scroll-to' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById);
+      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
       if (layout == null) return model;
       return { ...model, settingsScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
     },
     'activate-settings-row': (model, cmd, teaCmds) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'activate-settings-row' }>;
-      const layout = resolveSettingsLayout(model, options, pagesById);
+      const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
       if (layout == null) return model;
       const hitRow = layout.rows.find((r) => r.index === c.rowIndex);
       if (hitRow == null) return model;
       const focusedModel = { ...model, settingsFocusIndex: hitRow.index };
+      if (hitRow.behavior === 'cycle-shell-theme') {
+        const [nextModel, cmds] = cycleShellThemeSetting(focusedModel, hitRow.row);
+        teaCmds.push(...cmds);
+        return nextModel;
+      }
       if (hitRow.row.action === undefined || hitRow.row.enabled === false || hitRow.row.kind === 'info') {
         return focusedModel;
       }
@@ -812,7 +977,15 @@ export function createFramedApp<PageModel, Msg>(
     'help-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
       const activePage = pagesById.get(model.activePageId)!;
-      const overlay = renderHelpOverlay(model, activePage, frameKeys, paletteKeys, options, pagesById);
+      const overlay = renderHelpOverlay(
+        model,
+        activePage,
+        frameKeys,
+        paletteKeys,
+        options,
+        pagesById,
+        resolvedShellThemes,
+      );
       const viewportHeight = Math.max(1, overlay.body.height - 1);
       const delta = c.action === 'down' ? 3
         : c.action === 'up' ? -3
@@ -1016,7 +1189,7 @@ export function createFramedApp<PageModel, Msg>(
     msg: KeyMsg,
     model: InternalFrameModel<PageModel, Msg>,
   ): FrameShellCommand<Msg>[] | undefined {
-    const layout = resolveSettingsLayout(model, options, pagesById);
+    const layout = resolveSettingsLayout(model, options, pagesById, resolvedShellThemes);
     if (layout == null) return undefined;
     const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
     if (!msg.ctrl && !msg.alt && (msg.key === 'escape' || msg.key === 'f2')) {
@@ -1068,7 +1241,12 @@ export function createFramedApp<PageModel, Msg>(
     if (!msg.ctrl && !msg.alt && (msg.key === 'enter' || msg.key === 'space')) {
       const rowIndex = clampSettingsFocus(model, layout);
       const row = layout.rows[rowIndex];
-      if (row?.row.action !== undefined && row.row.enabled !== false && row.row.kind !== 'info') {
+      if (
+        row != null
+        && row.row.enabled !== false
+        && row.row.kind !== 'info'
+        && (row.behavior === 'cycle-shell-theme' || row.row.action !== undefined)
+      ) {
         return [obs, { type: 'activate-settings-row', rowIndex: row.index }];
       }
       return [obs];
@@ -1338,7 +1516,9 @@ export function createFramedApp<PageModel, Msg>(
   ) {
     let layouts = EMPTY_RUNTIME_LAYOUTS;
 
-    const settingsLayout = model.settingsOpen ? resolveSettingsLayout(model, options, pagesById) : undefined;
+    const settingsLayout = model.settingsOpen
+      ? resolveSettingsLayout(model, options, pagesById, resolvedShellThemes)
+      : undefined;
     if (settingsLayout != null) {
       layouts = retainRuntimeLayout(layouts, {
         viewId: 'settings',
@@ -1559,7 +1739,7 @@ export function createFramedApp<PageModel, Msg>(
     activeInputArea: FrameInputArea<PageModel, Msg> | undefined,
     modalKeyMap: KeyMap<Msg> | undefined,
   ): Partial<Record<FrameLayerKind, FrameLayerMetadata>> {
-    const settings = resolveFrameSettings(model, options, pagesById);
+    const settings = resolveFrameSettings(model, options, pagesById, resolvedShellThemes);
     const notificationCenter = resolveFrameNotificationCenter(model, options, pagesById);
     const workspaceHintSource = resolveWorkspaceHintSource(model, activePage, activeInputArea);
     const workspaceHelpSource = resolveWorkspaceHelpSource(activePage, activeInputArea);
@@ -1703,19 +1883,13 @@ export function createFramedApp<PageModel, Msg>(
     return [nextModel, []];
   }
 
-  function activateSettingsRow(
+  function pushSettingsFeedback(
     model: InternalFrameModel<PageModel, Msg>,
     row: FrameSettingRow<Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
-    if (row.action === undefined || row.enabled === false || row.kind === 'info') {
+    if (!frameNotificationOptions.enabled) {
       return [model, []];
     }
-
-    const cmds: Cmd<FramedAppMsg<Msg>>[] = [emitMsgForPage(model.activePageId, row.action)];
-    if (!frameNotificationOptions.enabled) {
-      return [model, cmds];
-    }
-
     const feedback = row.feedback ?? {
       title: 'Setting updated',
       message: `${row.label} updated.`,
@@ -1731,8 +1905,36 @@ export function createFramedApp<PageModel, Msg>(
       durationMs: feedback.durationMs ?? 2_500,
       overflow: frameNotificationOptions.overflow,
     }, nowMs);
-    const [nextModel, notificationCmds] = applyFrameNotificationState(model, notifications, nowMs);
+    return applyFrameNotificationState(model, notifications, nowMs);
+  }
+
+  function activateSettingsRow(
+    model: InternalFrameModel<PageModel, Msg>,
+    row: FrameSettingRow<Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    if (row.action === undefined || row.enabled === false || row.kind === 'info') {
+      return [model, []];
+    }
+
+    const cmds: Cmd<FramedAppMsg<Msg>>[] = [emitMsgForPage(model.activePageId, row.action)];
+    const [nextModel, notificationCmds] = pushSettingsFeedback(model, row);
     return [nextModel, [...cmds, ...notificationCmds]];
+  }
+
+  function cycleShellThemeSetting(
+    model: InternalFrameModel<PageModel, Msg>,
+    row: FrameSettingRow<Msg>,
+  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
+    const nextTheme = resolveNextShellTheme(resolvedShellThemes, model.activeShellThemeId);
+    if (nextTheme == null || frameCtx == null) {
+      return [model, []];
+    }
+    applyResolvedShellThemeToContext(frameCtx, nextTheme.resolvedTheme);
+    const [nextModel, notificationCmds] = pushSettingsFeedback({
+      ...model,
+      activeShellThemeId: nextTheme.id,
+    }, row);
+    return [nextModel, notificationCmds];
   }
 
   const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
@@ -1773,7 +1975,16 @@ export function createFramedApp<PageModel, Msg>(
         runtimeNotifications: createNotificationState(),
         runtimeNotificationHistoryFilter: 'ALL',
         runtimeNotificationLoopActive: false,
+        activeShellThemeId: initialShellTheme?.id,
       };
+
+      if (
+        initialShellTheme != null
+        && frameCtx != null
+        && frameCtx.theme.theme.name !== initialShellTheme.resolvedTheme.theme.name
+      ) {
+        applyResolvedShellThemeToContext(frameCtx, initialShellTheme.resolvedTheme);
+      }
 
       for (const pageId of pageOrder) {
         model = syncPageFrameState(model, pageId, pagesById);
@@ -1987,6 +2198,7 @@ export function createFramedApp<PageModel, Msg>(
           model,
           options,
           pagesById,
+          resolvedShellThemes,
           settingsLayer?.title,
         );
         if (settingsOverlay != null) {
@@ -2008,7 +2220,15 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.helpOpen) {
-        const helpOverlay = renderHelpOverlay(model, activePage, frameKeys, paletteKeys, options, pagesById);
+        const helpOverlay = renderHelpOverlay(
+          model,
+          activePage,
+          frameKeys,
+          paletteKeys,
+          options,
+          pagesById,
+          resolvedShellThemes,
+        );
         overlays.push(modal({
           title: activeLayer.kind === 'help'
             ? (activeLayer.title ?? frameMessage(options.i18n, 'help.title', 'Keyboard Help'))
@@ -2094,6 +2314,7 @@ function renderHelpOverlay<PageModel, Msg>(
   paletteKeys: KeyMap<PaletteAction>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  shellThemes: readonly ResolvedFrameShellTheme[],
 ): { body: Surface; maxScrollY: number; scrollY: number } {
   const activePageModel = model.pageModels[model.activePageId]!;
   const activeInputArea = findInputAreaByPaneId(
@@ -2101,7 +2322,7 @@ function renderHelpOverlay<PageModel, Msg>(
     model.focusedPaneByPage[model.activePageId],
   );
   const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
-  const settings = resolveFrameSettings(model, options, pagesById);
+  const settings = resolveFrameSettings(model, options, pagesById, shellThemes);
   const notificationCenter = resolveFrameNotificationCenter(model, options, pagesById);
   const workspaceHintSource = options.helpLineSource?.({
     model,
@@ -2215,11 +2436,23 @@ function isHelpScrollAction(
 
 
 
+const FRAME_SHELL_THEME_ROW_ID = '__frame-shell-theme__';
+
+type SettingsRowBehavior = 'cycle-shell-theme';
+
+interface ResolvedFrameShellTheme {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly resolvedTheme: ReturnType<typeof createResolved>;
+}
+
 interface FlatSettingsRow<Msg> {
   readonly index: number;
   readonly line: number;
   readonly height: number;
   readonly row: FrameSettingRow<Msg>;
+  readonly behavior?: SettingsRowBehavior;
 }
 
 interface ResolvedSettingsLayout<Msg> {
@@ -2258,13 +2491,15 @@ function resolveFrameSettings<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  shellThemes: readonly ResolvedFrameShellTheme[],
 ): FrameSettings<Msg> | undefined {
   const activePage = pagesById.get(model.activePageId)!;
-  return options.settings?.({
+  const provided = options.settings?.({
     model,
     activePage,
     pageModel: model.pageModels[model.activePageId]!,
   });
+  return mergeShellThemeSettings(provided, shellThemes, model.activeShellThemeId, options.i18n);
 }
 
 function resolveFrameNotificationCenter<PageModel, Msg>(
@@ -2311,8 +2546,9 @@ function resolveSettingsLayout<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  shellThemes: readonly ResolvedFrameShellTheme[],
 ): ResolvedSettingsLayout<Msg> | undefined {
-  const settings = resolveFrameSettings(model, options, pagesById);
+  const settings = resolveFrameSettings(model, options, pagesById, shellThemes);
   if (settings == null) return undefined;
 
   const sections = settings.sections.filter((section) => section.rows.length > 0);
@@ -2342,6 +2578,7 @@ function resolveSettingsLayout<PageModel, Msg>(
         line,
         height: rowLayout.height,
         row,
+        behavior: row.id === FRAME_SHELL_THEME_ROW_ID ? 'cycle-shell-theme' : undefined,
       });
       line += rowLayout.height;
       if (rowIndex < section.rows.length - 1) {
@@ -2528,9 +2765,10 @@ function renderSettingsDrawer<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  shellThemes: readonly ResolvedFrameShellTheme[],
   titleOverride?: string,
 ): Overlay | undefined {
-  const layout = resolveSettingsLayout(model, options, pagesById);
+  const layout = resolveSettingsLayout(model, options, pagesById, shellThemes);
   if (layout == null) return undefined;
 
   const scrollY = clampSettingsScroll(model, layout);

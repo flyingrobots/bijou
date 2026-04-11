@@ -221,7 +221,11 @@ function paintFrameNodeInto<PageModel, Msg>(
     // Minimized pane: render as collapsed title bar
     if (isMinimized(ctx.visibility, node.paneId)) {
       const titleBar = `[${node.paneId}] \u25b8`; // ▸
-      target.blit(blockSurface(titleBar, localRect.width, localRect.height), localRect.col, localRect.row);
+      target.blit(
+        applySurfaceBackground(blockSurface(titleBar, localRect.width, localRect.height), ctx.frameBackgroundHex),
+        localRect.col,
+        localRect.row,
+      );
       return {
         paneRects: new Map([[node.paneId, absoluteRect]]),
         paneOrder: [node.paneId],
@@ -235,6 +239,7 @@ function paintFrameNodeInto<PageModel, Msg>(
       localRect.height,
       getFramePaneScratch(scratchPool, localRect.width, localRect.height),
     );
+    applySurfaceBackground(contentSurface, ctx.frameBackgroundHex);
     let state = createFocusAreaStateForSurface(contentSurface, {
       width: localRect.width,
       height: localRect.height,
@@ -334,7 +339,10 @@ function paintFrameNodeInto<PageModel, Msg>(
         `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
       target.blit(
-        blockSurface(`[missing grid cell: ${areaName}]`, localAreaRect.width, localAreaRect.height),
+        applySurfaceBackground(
+          blockSurface(`[missing grid cell: ${areaName}]`, localAreaRect.width, localAreaRect.height),
+          ctx.frameBackgroundHex,
+        ),
         localAreaRect.col,
         localAreaRect.row,
       );
@@ -391,6 +399,8 @@ export function renderPageContentInto<PageModel, Msg>(
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
 ): FramePaneGeometryResult {
+  const frameBackgroundHex = resolveFrameBackgroundHex(resolveSafeCtx());
+  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const renderCtx: RenderContext<PageModel, Msg> = {
@@ -400,6 +410,7 @@ export function renderPageContentInto<PageModel, Msg>(
     scrollByPane: model.scrollByPage[pageId] ?? {},
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
+    frameBackgroundHex,
   };
   return paintFrameNodeInto(
     page.layout(pageModel),
@@ -437,6 +448,8 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
 ): FramePaneGeometryResult {
+  const frameBackgroundHex = resolveFrameBackgroundHex(resolveSafeCtx());
+  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const layoutTree = page.layout(pageModel);
@@ -453,6 +466,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
     bodyRect.height,
     getFramePaneScratch(scratchPool, bodyRect.width, bodyRect.height),
   );
+  applySurfaceBackground(contentSurface, frameBackgroundHex);
   let state = createFocusAreaStateForSurface(contentSurface, {
     width: bodyRect.width,
     height: bodyRect.height,
@@ -483,6 +497,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   scratch?: Surface,
 ): FrameHeaderRenderResult {
   const ctx = resolveSafeCtx();
+  const frameBackgroundHex = resolveFrameBackgroundHex(ctx);
   const activePage = pagesById.get(model.activePageId)!;
   const activePageModel = model.pageModels[model.activePageId]!;
   const headerStyle = options.headerStyle?.({
@@ -520,6 +535,7 @@ export function resolveHeaderLine<PageModel, Msg>(
     classes: [`page-${model.activePageId}`],
   });
   paintActiveHeaderTab(surface, tabTargets, model.activePageId, ctx, headerStyle?.activeTabToken);
+  applySurfaceBackground(surface, frameBackgroundHex);
   return {
     surface,
     tabTargets,
@@ -534,6 +550,7 @@ export function renderHelpLine<PageModel, Msg>(
   notificationCue?: string,
   scratch?: Surface,
 ): Surface {
+  const ctx = resolveSafeCtx();
   const mode = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
     ? 'PALETTE'
     : activeLayer.kind === 'help'
@@ -567,11 +584,11 @@ export function renderHelpLine<PageModel, Msg>(
           : `${statusWithPadding}  ${hint}`;
       })()
     : ` ${status}`;
-  return paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
+  return applySurfaceBackground(paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, ctx, {
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
-  });
+  }), resolveFrameBackgroundHex(ctx));
 }
 
 /**
@@ -623,6 +640,39 @@ export function blockSurface(content: string, width: number, height: number): Su
   return parseAnsiToSurface(fitBlock(content, width, height).join('\n'), width, height);
 }
 
+function resolveFrameBackgroundHex(ctx: BijouContext | undefined): string | undefined {
+  return ctx?.surface('primary').bg ?? ctx?.surface('secondary').bg;
+}
+
+function fillSurfaceBackground(
+  target: Surface,
+  offsetCol: number,
+  offsetRow: number,
+  width: number,
+  height: number,
+  backgroundHex: string | undefined,
+): void {
+  if (backgroundHex == null || width <= 0 || height <= 0) return;
+  target.fill({ char: ' ', bg: backgroundHex, empty: false }, offsetCol, offsetRow, width, height);
+}
+
+function applySurfaceBackground(surface: Surface, backgroundHex: string | undefined): Surface {
+  if (backgroundHex == null) return surface;
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      const cell = surface.get(x, y);
+      if (cell.bg != null || cell.bgRGB != null) continue;
+      surface.set(x, y, {
+        ...cell,
+        char: cell.char.length > 0 ? cell.char : ' ',
+        bg: backgroundHex,
+        empty: false,
+      });
+    }
+  }
+  return surface;
+}
+
 function paintDivider(
   target: Surface,
   rect: LayoutRect,
@@ -632,7 +682,8 @@ function paintDivider(
   const unit = resolveDividerUnit(dividerChar, direction === 'row' ? '│' : '─');
   for (let y = 0; y < rect.height; y++) {
     for (let x = 0; x < rect.width; x++) {
-      target.set(rect.col + x, rect.row + y, { char: unit, empty: false });
+      const existing = target.get(rect.col + x, rect.row + y);
+      target.set(rect.col + x, rect.row + y, { ...existing, char: unit, empty: false });
     }
   }
 }

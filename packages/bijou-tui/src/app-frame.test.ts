@@ -1124,6 +1124,38 @@ describe('createFramedApp', () => {
     expect(returned).toBe(QUIT);
   });
 
+  it('accepts uppercase Y and N in the quit-confirm modal', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    let [model] = app.init();
+    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+
+    [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+
+    [model, cmds] = app.update(shiftKey('n'), model);
+    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(cmds).toHaveLength(0);
+
+    [model, cmds] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+    expect((model as any).quitConfirmOpen).toBe(true);
+    expect(cmds).toHaveLength(0);
+
+    [model, cmds] = app.update(shiftKey('y'), model);
+    expect((model as any).quitConfirmOpen).toBe(false);
+    expect(cmds).toHaveLength(1);
+
+    const returned = await cmds[0]!(() => {}, {
+      onPulse() {
+        return { dispose() {} };
+      },
+    });
+    expect(returned).toBe(QUIT);
+  });
+
   it('closes settings with escape without opening quit confirm', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -1772,6 +1804,44 @@ describe('createFramedApp', () => {
     expect(rowLine).toBeGreaterThan(shellLine + 1);
     expect(rowX).toBeGreaterThan(0);
     expect(surface.get(rowX, rowLine).bg).toBe(testCtx.surface('elevated').bg);
+  });
+
+  it('fills the entire frame body with the primary surface background', () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') return [{ ...model, count: model.count + 1 }, []];
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'split',
+        splitId: 'body-split',
+        state: createSplitPaneState({ ratio: 0.5 }),
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView(makeLongContent('left', 12)) },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView(makeLongContent('right', 12)) },
+      }),
+    };
+    const app = createFramedApp({
+      initialColumns: 24,
+      initialRows: 6,
+      pages: [page],
+    });
+
+    const [model] = app.init();
+    const surface = normalizeViewOutput(app.view(model), {
+      width: 24,
+      height: 6,
+    }).surface;
+    const expectedBg = testCtx.surface('primary').bg;
+
+    expect(expectedBg).toBeDefined();
+    for (let y = 1; y < surface.height - 1; y++) {
+      for (let x = 0; x < surface.width; x++) {
+        expect(surface.get(x, y).bg).toBe(expectedBg);
+      }
+    }
   });
 
   it('stacks long settings values beneath the label when inline space is too tight', () => {

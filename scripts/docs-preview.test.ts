@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { afterEach, describe, expect, it } from 'vitest';
+import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
@@ -99,12 +99,23 @@ function withLocaleValues(
 }
 
 describe('docs preview app', () => {
+  afterEach(() => _resetDefaultContextForTesting());
+
   it('uses the live local runtime entrypoint instead of the packaged build', () => {
     const source = readFileSync(new URL('../examples/docs/main.ts', import.meta.url), 'utf8');
 
     expect(source).toContain("../../packages/bijou-node/src/index.js");
     expect(source).toContain("../../packages/bijou-tui/src/index.js");
     expect(source).toMatch(/await run\(createDocsApp\(ctx\), \{ ctx, mouse: true \}\);/);
+  });
+
+  it('registers the provided ctx before building the framed explorer shell', async () => {
+    _resetDefaultContextForTesting();
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs' });
+
+    const result = await runScript(app, [], { ctx });
+    expect((result.model as any).route).toBe('docs');
   });
 
   it('lands on the hero page first and enters the docs on Enter', async () => {
@@ -276,14 +287,15 @@ describe('docs preview app', () => {
     expect(activeDocsPageModel(numbered.model as any).landingThemeIndex).toBe(2);
     expect((cycledRight.model as any).landingThemeIndex).toBe(1);
     expect(activeDocsPageModel(cycledRight.model as any).landingThemeIndex).toBe(1);
-    expect((cycledLeft.model as any).landingThemeIndex).toBe(4);
-    expect(activeDocsPageModel(cycledLeft.model as any).landingThemeIndex).toBe(4);
+    expect((cycledLeft.model as any).landingThemeIndex).toBe(5);
+    expect(activeDocsPageModel(cycledLeft.model as any).landingThemeIndex).toBe(5);
+    expect((cycledLeft.model as any).docsModel.activeShellThemeId).toBe('verdant-plum');
 
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(numbered.frames[numbered.frames.length - 1]!));
     expect(serializeFrame(initial.frames[0]!)).not.toEqual(serializeFrame(cycledRight.frames[cycledRight.frames.length - 1]!));
   });
 
-  it('carries the selected landing theme into the docs surfaces and settings', async () => {
+  it('carries the selected landing theme into docs through the shared shell theme setting', async () => {
     const defaultCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const defaultApp = createDocsApp(defaultCtx);
     const themedCtx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
@@ -313,9 +325,11 @@ describe('docs preview app', () => {
     }).surface;
 
     expect(activeDocsPageModel(themedModel).landingThemeIndex).toBe(1);
+    expect(themedModel.docsModel.activeShellThemeId).toBe('cabinet-of-curiosities');
     expect(themedDocsText).not.toContain('Theme:');
-    expect(frameText(settingsFrame)).toContain('Landing theme');
+    expect(frameText(settingsFrame)).toContain('Shell theme');
     expect(frameText(settingsFrame)).toContain('Cabinet of Curiosities');
+    expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(defaultSettingsFrame.get(20, 3).bg).not.toBe(settingsFrame.get(20, 3).bg);
   });
 
@@ -727,9 +741,9 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('☑ On');
     expect(frameText(settingsFrame)).toContain('Show active-pane control');
     expect(frameText(settingsFrame)).toContain('cues in the footer');
-    expect(frameText(settingsFrame)).toContain('Appearance');
-    expect(frameText(settingsFrame)).toContain('↻ Landing theme');
+    expect(frameText(settingsFrame)).toContain('↻ Shell theme');
     expect(frameText(settingsFrame)).toContain('Storybook Workstation');
+    expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Landing');
     expect(frameText(settingsFrame)).toContain('Adapts render cost to');
     expect(frameText(settingsFrame)).toContain('Options:');

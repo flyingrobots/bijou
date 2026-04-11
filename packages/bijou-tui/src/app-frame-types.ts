@@ -83,6 +83,7 @@ export interface RenderContext<PageModel, Msg> {
   readonly scrollByPane: Readonly<Record<string, { readonly x: number; readonly y: number }>>;
   readonly visibility: PanelVisibilityState;
   readonly dockState: PanelDockState;
+  readonly frameBackgroundHex: string | undefined;
 }
 
 /** Output of a layout node render pass. */

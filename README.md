@@ -14,27 +14,32 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What's New in v4.4.0
+## What's New in v4.4.1
 
-Bijou `v4.4.0` is the current release.
+Bijou `v4.4.1` is a framed-shell polish release focused on the `4.4.0`
+regression fallout.
 
 Key changes:
 
-- **Data visualization toolkit** — four new components:
-  `sparkline()` for inline Unicode block trends, `brailleChartSurface()`
-  for high-density 2x4 sub-pixel area charts, `statsPanelSurface()`
-  for titled key-value metric panels with optional sparklines, and
-  `perfOverlaySurface()` as a prebuilt FPS + memory dashboard.
-- **Zero-alloc framed app render loop** — header and footer painting
-  now reuses surfaces in-place. Pane scratch pool scoped to the
-  `createFramedApp` closure.
-- **New bench scenarios** — doom fire (`flame`) and a realistic
-  multi-component TUI (`component-app`). All scenarios support
-  dynamic terminal sizing.
+- **Framed-shell background rendering fixed end-to-end** —
+  `createFramedApp()` now preserves `surface.primary.bg` through pane
+  composition, gutters, scrollbars, split dividers, minimized panes,
+  placeholder surfaces, and the stock header/footer chrome. Custom
+  themed shells no longer fall back to the terminal default background
+  in either the body or the shell bars.
+- **New stock shell theme support in `createFramedApp()`** — framed apps
+  can now opt into a frame-owned theme chooser with `shellThemes`, and
+  the active selection is exposed on `FrameModel.activeShellThemeId`.
+  DOGFOOD uses that to keep the title screen and docs shell on one
+  shared theme setting, including the new `Verdant Plum` palette.
+- **Quit confirm is more forgiving** — the stock quit dialog now accepts
+  uppercase `Y` / `N` as well as lowercase `y` / `n`.
+- **Backwards compatible release** — no breaking changes; the new shell
+  theme API is optional.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/4.4.0/whats-new.md), and the
-[migration guide](./docs/releases/4.4.0/migration-guide.md).
+[What's New guide](./docs/releases/4.4.1/whats-new.md), and the
+[migration guide](./docs/releases/4.4.1/migration-guide.md).
 
 ## Package Map
 
