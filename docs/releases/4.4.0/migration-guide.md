@@ -1,4 +1,4 @@
-# Migration Guide: 4.3.0 to 4.4.0
+# Migrating to Bijou 4.4.0
 
 ## No Breaking Changes
 
