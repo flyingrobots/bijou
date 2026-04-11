@@ -9,21 +9,19 @@ describe('sparkline', () => {
   it('returns a single block char for a single value', () => {
     const result = sparkline([5]);
     expect(result).toHaveLength(1);
-    expect(result).toBe('▄'); // single value normalizes to midpoint
+    expect(result).toBe('▅'); // single value normalizes to midpoint
   });
 
   it('renders min as lowest block and max as highest', () => {
     const result = sparkline([0, 100]);
-    expect(result[0]).toBe(' ');
+    expect(result[0]).toBe('▁');
     expect(result[1]).toBe('█');
   });
 
   it('uses all block levels for a linear ramp', () => {
-    const result = sparkline([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-    expect(result).toHaveLength(9);
-    // First should be lowest, last should be highest
-    expect(result[0]).toBe(' ');
-    expect(result[8]).toBe('█');
+    const result = sparkline([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(result).toHaveLength(8);
+    expect(result).toBe('▁▂▃▄▅▆▇█');
   });
 
   it('respects explicit width by sampling', () => {
@@ -33,7 +31,7 @@ describe('sparkline', () => {
 
   it('respects explicit min/max', () => {
     const result = sparkline([50], { min: 0, max: 100 });
-    expect(result).toBe('▄');
+    expect(result).toBe('▅');
   });
 
   it('handles all-same values', () => {
@@ -41,7 +39,7 @@ describe('sparkline', () => {
     expect(result).toHaveLength(4);
     // All same → all midpoint
     for (const ch of result) {
-      expect(ch).toBe('▄');
+      expect(ch).toBe('▅');
     }
   });
 
@@ -52,7 +50,7 @@ describe('sparkline', () => {
   it('handles negative values', () => {
     const result = sparkline([-10, 0, 10]);
     expect(result).toHaveLength(3);
-    expect(result[0]).toBe(' ');
+    expect(result[0]).toBe('▁');
     expect(result[2]).toBe('█');
   });
 });

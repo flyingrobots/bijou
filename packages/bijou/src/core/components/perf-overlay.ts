@@ -22,7 +22,7 @@ import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { brailleChartSurface } from './braille-chart.js';
 import { statsPanelSurface, type StatsPanelEntry } from './stats-panel.js';
 import type { BijouNodeOptions } from './types.js';
-import type { TokenValue } from '../../core/theme/tokens.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 export interface PerfOverlayStats {
   /** Current frames per second. */
@@ -80,8 +80,8 @@ export function perfOverlaySurface(
   const chartHeight = options.chartHeight ?? 4;
 
   const entries: StatsPanelEntry[] = [
-    { label: 'FPS', value: String(Math.round(stats.fps)), sparkline: stats.frameTimeHistory },
-    { label: 'frame', value: fmt(stats.frameTimeMs, 2) + ' ms' },
+    { label: 'FPS', value: String(Math.round(stats.fps)) },
+    { label: 'frame', value: fmt(stats.frameTimeMs, 2) + ' ms', sparkline: stats.frameTimeHistory },
     { label: 'size', value: `${stats.width}×${stats.height}` },
   ];
 

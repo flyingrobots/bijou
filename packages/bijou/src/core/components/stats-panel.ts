@@ -21,7 +21,7 @@ import { tokenToCellStyle, createSegmentSurface, type SurfaceTextSegment } from 
 import { createSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import type { BijouNodeOptions } from './types.js';
-import type { TokenValue } from '../../core/theme/tokens.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 export interface StatsPanelEntry {
   /** Left-aligned label. */
@@ -85,10 +85,12 @@ export function statsPanelSurface(
       { text: ' '.repeat(gap), style: {} },
     ];
 
-    // Value + optional sparkline.
+    // Value + optional sparkline (only if it fits within the inner width).
     const sparkData = entry.sparkline;
-    if (sparkData && sparkData.length > 0) {
-      const sparkWidth = Math.max(1, innerWidth - maxLabelLen - gap - entry.value.length - 1);
+    const sparkFits = sparkData && sparkData.length > 0
+      && innerWidth - maxLabelLen - gap - entry.value.length - 1 > 0;
+    if (sparkFits) {
+      const sparkWidth = innerWidth - maxLabelLen - gap - entry.value.length - 1;
       const sparkStr = sparkline(sparkData, { width: sparkWidth });
       segments.push({ text: entry.value, style: valueStyle });
       segments.push({ text: ' ', style: {} });
@@ -102,7 +104,7 @@ export function statsPanelSurface(
 
   // Compose rows into a single content surface.
   const contentHeight = rowSurfaces.length;
-  const contentWidth = Math.max(innerWidth, ...rowSurfaces.map((s) => s.width));
+  const contentWidth = innerWidth;
   const content = createSurface(contentWidth, contentHeight);
   for (let i = 0; i < rowSurfaces.length; i++) {
     content.blit(rowSurfaces[i]!, 0, i);

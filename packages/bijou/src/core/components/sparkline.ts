@@ -3,6 +3,7 @@
  *
  * Renders a sequence of numeric values as a string of block chars (▁▂▃▄▅▆▇█).
  * Values are normalized between min and max (auto-detected or caller-supplied).
+ * Non-finite values (NaN, Infinity) are treated as 0.
  *
  * @example
  * ```ts
@@ -15,8 +16,9 @@
  */
 
 import type { BijouNodeOptions } from './types.js';
+import { safeMax, safeMin, sampleToWidth, sanitizeValues } from './data-viz-utils.js';
 
-const BLOCKS = [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+const BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
 
 export interface SparklineOptions extends BijouNodeOptions {
   /** Output width in characters. Defaults to `values.length`. */
@@ -25,37 +27,6 @@ export interface SparklineOptions extends BijouNodeOptions {
   readonly min?: number;
   /** Explicit maximum value for scaling. Defaults to `Math.max(...values)`. */
   readonly max?: number;
-}
-
-/**
- * Sample `values` into `width` buckets. When the data array is longer
- * than the target width, each bucket averages the values that fall into
- * it. When shorter, values are stretched via nearest-neighbor sampling.
- */
-function sampleToWidth(values: readonly number[], width: number): number[] {
-  if (values.length === 0) return new Array<number>(width).fill(0);
-  if (values.length === width) return [...values];
-
-  const out: number[] = [];
-  const ratio = values.length / width;
-  for (let i = 0; i < width; i++) {
-    const start = i * ratio;
-    const end = (i + 1) * ratio;
-    const lo = Math.floor(start);
-    const hi = Math.min(values.length - 1, Math.floor(end));
-    if (lo === hi) {
-      out.push(values[lo]!);
-    } else {
-      let sum = 0;
-      let count = 0;
-      for (let j = lo; j <= hi; j++) {
-        sum += values[j]!;
-        count++;
-      }
-      out.push(sum / count);
-    }
-  }
-  return out;
 }
 
 /**
@@ -70,9 +41,9 @@ export function sparkline(values: readonly number[], options: SparklineOptions =
   const width = options.width ?? values.length;
   if (width <= 0) return '';
 
-  const sampled = sampleToWidth(values, width);
-  const min = options.min ?? Math.min(...sampled);
-  const max = options.max ?? Math.max(...sampled);
+  const sampled = sampleToWidth(sanitizeValues(values), width);
+  const min = options.min ?? safeMin(sampled);
+  const max = options.max ?? safeMax(sampled);
   const range = max - min;
 
   let result = '';

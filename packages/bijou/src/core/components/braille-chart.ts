@@ -20,9 +20,10 @@
 
 import { createSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { safeMax, safeMin, sampleToWidth, sanitizeValues } from './data-viz-utils.js';
 import { tokenToCellStyle } from './surface-text.js';
 import type { BijouNodeOptions } from './types.js';
-import type { TokenValue } from '../../core/theme/tokens.js';
+import type { TokenValue } from '../theme/tokens.js';
 
 export interface BrailleChartOptions extends BijouNodeOptions {
   /** Chart width in terminal columns. Required. */
@@ -52,32 +53,7 @@ const DOT_BITS = [
   [0x40, 0x80], // row 3
 ] as const;
 
-/**
- * Sample values into `count` buckets, averaging where needed.
- */
-function sampleValues(values: readonly number[], count: number): number[] {
-  if (values.length === 0) return new Array<number>(count).fill(0);
-  if (values.length === count) return [...values];
-
-  const out: number[] = [];
-  const ratio = values.length / count;
-  for (let i = 0; i < count; i++) {
-    const lo = Math.floor(i * ratio);
-    const hi = Math.min(values.length - 1, Math.floor((i + 1) * ratio));
-    if (lo === hi) {
-      out.push(values[lo]!);
-    } else {
-      let sum = 0;
-      let n = 0;
-      for (let j = lo; j <= hi; j++) {
-        sum += values[j]!;
-        n++;
-      }
-      out.push(sum / n);
-    }
-  }
-  return out;
-}
+// sampleToWidth, safeMin, safeMax, sanitizeValues imported from data-viz-utils.
 
 /**
  * Render a filled area chart using Unicode Braille characters.
@@ -99,10 +75,10 @@ export function brailleChartSurface(
   // Each cell is 2 dots wide, so we have width*2 horizontal sample points.
   const subCols = width * 2;
   const subRows = height * 4;
-  const sampled = sampleValues(values, subCols);
+  const sampled = sampleToWidth(sanitizeValues(values), subCols);
 
-  const min = options.min ?? Math.min(...sampled);
-  const max = options.max ?? Math.max(...sampled);
+  const min = options.min ?? safeMin(sampled);
+  const max = options.max ?? safeMax(sampled);
   const range = max - min;
 
   // Normalize values to sub-pixel row heights (0 = bottom, subRows = top).
