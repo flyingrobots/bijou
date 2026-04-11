@@ -24,7 +24,7 @@ describe('DF-009 DOGFOOD form coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(15);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(43);
     expect(coverage.coveredFamilyIds).toContain('multiple-choice');
     expect(coverage.coveredFamilyIds).toContain('binary-decision');

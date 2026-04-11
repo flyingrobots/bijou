@@ -4,6 +4,7 @@ import {
   alert,
   box,
   boxSurface,
+  brailleChartSurface,
   breadcrumb,
   createSurface,
   dag,
@@ -18,12 +19,15 @@ import {
   log,
   markdown,
   paginator,
+  perfOverlaySurface,
   progressBar,
   renderByMode,
   separator,
   separatorSurface,
   skeleton,
+  sparkline,
   spinnerFrame,
+  statsPanelSurface,
   stepper,
   table,
   tabs,
@@ -1546,10 +1550,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/alert/main.ts',
-      snippetLabel: 'Alert basics',
-    },
     tags: ['status', 'feedback', 'lowering'],
   },
   {
@@ -1615,10 +1615,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/badge/main.ts',
-      snippetLabel: 'Inline status labels',
-    },
     tags: ['status', 'inline', 'labels'],
   },
   {
@@ -1701,10 +1697,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/modal/main.ts',
-      snippetLabel: 'Blocking decision overlay',
-    },
     tags: ['overlay', 'interruption', 'surface'],
   },
   {
@@ -1779,10 +1771,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/progress-animated/main.ts',
-      snippetLabel: 'Looping rollout progress',
-    },
     tags: ['progress', 'loading', 'animation'],
   },
   {
@@ -1851,10 +1839,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/skeleton/main.ts',
-      snippetLabel: 'Loading placeholders',
-    },
     tags: ['loading', 'placeholder', 'layout'],
   },
   {
@@ -1929,10 +1913,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         },
       },
     ],
-    source: {
-      examplePath: 'examples/toast/main.ts',
-      snippetLabel: 'Anchored transient overlay',
-    },
     tags: ['feedback', 'overlay', 'transient'],
   },
   {
@@ -1994,10 +1974,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/log/main.ts',
-      snippetLabel: 'Chronological event stream',
-    },
     tags: ['feedback', 'history', 'events'],
   },
   {
@@ -2056,10 +2032,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/confirm/main.ts',
-      snippetLabel: 'Binary decision prompt',
-    },
     tags: ['forms', 'decision', 'confirmation'],
   },
   {
@@ -2128,10 +2100,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/multiselect/main.ts',
-      snippetLabel: 'Set-building form prompt',
-    },
     tags: ['forms', 'selection', 'set-building'],
   },
   {
@@ -2264,10 +2232,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/input/main.ts',
-      snippetLabel: 'Text entry prompts',
-    },
     tags: ['forms', 'input', 'text'],
   },
   {
@@ -2334,10 +2298,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/wizard/main.ts',
-      snippetLabel: 'Staged rollout wizard',
-    },
     tags: ['forms', 'wizard', 'group'],
   },
   {
@@ -2409,10 +2369,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/tabs/main.ts',
-      snippetLabel: 'Peer navigation strip',
-    },
     tags: ['navigation', 'tabs', 'organization'],
   },
   {
@@ -2473,10 +2429,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/markdown/main.ts',
-      snippetLabel: 'Bounded markdown prose',
-    },
     tags: ['docs', 'prose', 'reference'],
   },
   {
@@ -2539,10 +2491,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/hyperlink/main.ts',
-      snippetLabel: 'Explicit link destinations',
-    },
     tags: ['docs', 'links', 'destinations'],
   },
   {
@@ -2607,10 +2555,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/box/main.ts',
-      snippetLabel: 'Grouped containment',
-    },
     tags: ['structure', 'grouping', 'panels'],
   },
   {
@@ -2764,10 +2708,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/explainability/main.ts',
-      snippetLabel: 'Explainable recommendation surface',
-    },
     tags: ['guidance', 'ai', 'explainability'],
   },
   {
@@ -2852,10 +2792,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/separator/main.ts',
-      snippetLabel: 'Labeled and unlabeled section dividers',
-    },
     tags: ['structure', 'rhythm', 'dividers'],
   },
   {
@@ -2910,10 +2846,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/help/main.ts',
-      snippetLabel: 'Grouped help and shell hints',
-    },
     tags: ['shortcuts', 'help', 'shell'],
   },
   {
@@ -3048,10 +2980,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ),
       },
     ],
-    source: {
-      examplePath: 'examples/viewport/main.ts',
-      snippetLabel: 'Masking viewport',
-    },
     tags: ['layout', 'masking', 'scroll'],
   },
   {
@@ -3104,10 +3032,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         ]),
       },
     ],
-    source: {
-      examplePath: 'examples/kbd/main.ts',
-      snippetLabel: 'Inline shortcut cues',
-    },
     tags: ['shortcuts', 'inline', 'hints'],
   },
   {
@@ -3220,10 +3144,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/interactive-accordion/main.ts',
-      snippetLabel: 'Keyboard-owned disclosure',
-    },
     tags: ['disclosure', 'accordion', 'navigation'],
   },
   {
@@ -3278,10 +3198,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/stepper/main.ts',
-      snippetLabel: 'Wayfinding and progress',
-    },
     tags: ['wayfinding', 'progress', 'navigation'],
   },
   {
@@ -3336,10 +3252,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/gradient-text/main.ts',
-      snippetLabel: 'Expressive branding emphasis',
-    },
     tags: ['branding', 'gradient', 'logo'],
   },
   {
@@ -3382,10 +3294,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/custom-component/main.ts',
-      snippetLabel: 'Mode-aware custom primitive',
-    },
     tags: ['authoring', 'custom', 'lowering'],
   },
   {
@@ -3440,10 +3348,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/navigable-table/main.ts',
-      snippetLabel: 'Dense comparison',
-    },
     tags: ['table', 'comparison', 'data'],
   },
   {
@@ -3498,10 +3402,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/file-picker/main.ts',
-      snippetLabel: 'Hierarchy and file browsing',
-    },
     tags: ['hierarchy', 'tree', 'filesystem'],
   },
   {
@@ -3556,10 +3456,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/browsable-list/main.ts',
-      snippetLabel: 'Lists for exploration',
-    },
     tags: ['list', 'browsing', 'exploration'],
   },
   {
@@ -3614,10 +3510,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/timeline/main.ts',
-      snippetLabel: 'Timeline and dependency views',
-    },
     tags: ['timeline', 'dag', 'dependency'],
   },
   {
@@ -3674,10 +3566,6 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/canvas/main.ts',
-      snippetLabel: 'Shader-based motion',
-    },
     tags: ['motion', 'shader', 'canvas'],
   },
   {
@@ -3790,11 +3678,224 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         }),
       },
     ],
-    source: {
-      examplePath: 'examples/split-pane/main.ts',
-      snippetLabel: 'Workspace layout',
-    },
     tags: ['layout', 'split', 'grid'],
+  },
+
+  // ── Data visualization ──────────────────────────────────────────
+
+  {
+    kind: 'component',
+    id: 'sparkline',
+    coverageFamilyIds: ['data-visualization'],
+    family: 'Data visualization',
+    title: 'sparkline()',
+    package: 'bijou',
+    docs: {
+      summary: 'Compact inline trend graph using Unicode block characters — a glanceable shape next to a label instead of a number alone.',
+      useWhen: [
+        'A numeric trend is more informative than the latest scalar value.',
+        'The graph must fit inline beside a label or inside a table cell.',
+        'You have a rolling window of 8–60 samples and need instant visual context.',
+      ],
+      avoidWhen: [
+        'The user needs exact numeric values — use a table or formatted number.',
+        'The data needs area-chart density or sub-pixel smoothness — use brailleChartSurface().',
+        'The visualization is decorative and does not change decision-making.',
+      ],
+      relatedFamilies: ['brailleChartSurface()', 'statsPanelSurface()', 'progressBar()'],
+      gracefulLowering: {
+        interactive: 'Unicode block characters (▁▂▃▄▅▆▇█) with optional semantic color.',
+        static: 'Same block rendering, no animation.',
+        pipe: 'Same block characters (no mode-aware lowering yet — sparkline returns a plain string).',
+        accessible: 'Same block characters (accessible text summary is a future direction).',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'basic',
+        label: 'Basic trend',
+        description: 'Raw block-character rendering of a short time series.',
+        render: ({ ctx }) => sparkline([1, 5, 3, 8, 2, 7, 4, 6, 9, 3], { ctx }),
+      },
+      {
+        id: 'fixed-width',
+        label: 'Fixed width',
+        description: 'Values resampled to fit a specific character width.',
+        render: ({ width, ctx }) => sparkline(
+          [10, 20, 15, 40, 35, 25, 30, 50, 45, 20, 10, 30, 60, 55, 40],
+          { width: Math.max(8, width - 4), ctx },
+        ),
+      },
+      {
+        id: 'explicit-range',
+        label: 'Explicit min/max',
+        description: 'Fixed axis bounds for stable cross-comparison.',
+        render: ({ ctx }) => sparkline([3, 5, 4, 6, 5, 7], { min: 0, max: 10, ctx }),
+      },
+    ],
+    tags: ['visualization', 'inline', 'trend'],
+  },
+  {
+    kind: 'component',
+    id: 'braille-chart',
+    coverageFamilyIds: ['data-visualization'],
+    family: 'Data visualization',
+    title: 'brailleChartSurface()',
+    package: 'bijou',
+    docs: {
+      summary: 'High-density filled area chart using Unicode Braille characters — 2×4 sub-pixel resolution per terminal cell for smooth curves in tight space.',
+      useWhen: [
+        'The data deserves area-chart density and sub-pixel smoothness.',
+        'A filled shape conveys volume or magnitude better than a line.',
+        'You need a chart in a fixed region (e.g. dashboard pane or overlay).',
+      ],
+      avoidWhen: [
+        'A sparkline is sufficient and width is critical — use sparkline().',
+        'Exact numeric values must be readable from the chart — use a table.',
+        'The terminal may not support Unicode Braille rendering.',
+      ],
+      relatedFamilies: ['sparkline()', 'statsPanelSurface()', 'perfOverlaySurface()'],
+      gracefulLowering: {
+        interactive: 'Braille-dot area chart with semantic color tokens.',
+        static: 'Same Braille rendering, no animation.',
+        pipe: 'Same Braille characters (no mode-aware lowering yet — returns a Surface).',
+        accessible: 'Same Braille characters (accessible summary is a future direction).',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'basic',
+        label: 'Basic area chart',
+        description: 'Auto-scaled filled area chart.',
+        render: ({ width, ctx }) => brailleChartSurface(
+          [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],
+          { width: Math.max(10, width - 4), height: 6, ctx },
+        ),
+      },
+      {
+        id: 'explicit-range',
+        label: 'Explicit min/max',
+        description: 'Fixed axis range for stable comparison across variants.',
+        render: ({ width, ctx }) => brailleChartSurface(
+          [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],
+          { width: Math.max(10, width - 4), height: 6, min: 0, max: 10, ctx },
+        ),
+      },
+    ],
+    tags: ['visualization', 'chart', 'braille', 'time-series'],
+  },
+  {
+    kind: 'component',
+    id: 'stats-panel',
+    coverageFamilyIds: ['data-visualization'],
+    family: 'Data visualization',
+    title: 'statsPanelSurface()',
+    package: 'bijou',
+    docs: {
+      summary: 'Titled bordered panel with aligned key-value metric rows and optional inline sparklines — the go-to component for labeled metric groups.',
+      useWhen: [
+        'Multiple named metrics belong together in one titled region.',
+        'Key-value alignment improves scannability over free-form text.',
+        'Inline sparklines beside values would give trend context without a separate chart.',
+      ],
+      avoidWhen: [
+        'A single metric does not warrant a bordered panel — use a label and value inline.',
+        'The metrics need interactive drill-down or filtering — use navigableTableSurface().',
+        'The data is tabular with many columns — use table().',
+      ],
+      relatedFamilies: ['sparkline()', 'perfOverlaySurface()', 'table()', 'box()'],
+      gracefulLowering: {
+        interactive: 'Bordered box with aligned labels, values, and sparklines.',
+        static: 'Same bordered layout, single-frame snapshot.',
+        pipe: 'Key: value lines, one per row.',
+        accessible: 'Labeled metric list read sequentially.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'basic',
+        label: 'Basic metrics',
+        description: 'Labeled key-value rows in a titled box.',
+        render: ({ width, ctx }) => statsPanelSurface([
+          { label: 'FPS', value: '60' },
+          { label: 'frame time', value: '16.7 ms' },
+          { label: 'heap', value: '42.1 MB' },
+          { label: 'rss', value: '128 MB' },
+        ], { title: 'Runtime', width: Math.min(36, Math.max(24, width - 4)), ctx }),
+      },
+      {
+        id: 'with-sparklines',
+        label: 'Inline sparklines',
+        description: 'Sparkline trails after each value give rolling trend context.',
+        render: ({ width, ctx }) => statsPanelSurface([
+          { label: 'FPS', value: '58', sparkline: [55, 60, 58, 62, 57, 60, 58, 61] },
+          { label: 'frame', value: '17.2 ms', sparkline: [18, 16, 17, 15, 18, 17, 16, 17] },
+          { label: 'heap', value: '42 MB', sparkline: [38, 40, 42, 41, 43, 42, 40, 42] },
+        ], { title: 'Perf', width: Math.min(44, Math.max(30, width - 4)), ctx }),
+      },
+    ],
+    tags: ['visualization', 'metrics', 'panel', 'dashboard'],
+  },
+  {
+    kind: 'component',
+    id: 'perf-overlay',
+    coverageFamilyIds: ['data-visualization'],
+    family: 'Data visualization',
+    title: 'perfOverlaySurface()',
+    package: 'bijou',
+    docs: {
+      summary: 'Prebuilt FPS + memory dashboard composing statsPanelSurface and brailleChartSurface — drop-in performance overlay for any app.',
+      useWhen: [
+        'You need a ready-made FPS and memory dashboard without wiring stats and charts manually.',
+        'A performance overlay should be blittable onto an existing app surface.',
+        'The app tracks frame time history and wants a chart alongside numeric metrics.',
+      ],
+      avoidWhen: [
+        'The metrics are domain-specific rather than runtime performance — use statsPanelSurface() directly.',
+        'You need a custom chart layout that does not match the stats-on-top chart-below pattern.',
+        'The overlay is permanent and would obstruct primary content — reconsider placement.',
+      ],
+      relatedFamilies: ['statsPanelSurface()', 'brailleChartSurface()', 'sparkline()'],
+      gracefulLowering: {
+        interactive: 'Stats panel with braille area chart, semantic color tokens.',
+        static: 'Same panel and chart layout, single-frame snapshot.',
+        pipe: 'FPS/memory lines as plain key-value output.',
+        accessible: 'Spoken metric summary: FPS, frame time, memory usage.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'basic',
+        label: 'Standard overlay',
+        description: 'FPS, frame time, and memory with a braille frame-time chart.',
+        render: ({ ctx }) => perfOverlaySurface({
+          fps: 60,
+          frameTimeMs: 16.7,
+          frameTimeHistory: [18, 16, 17, 15, 18, 17, 16, 17, 15, 16, 18, 17, 16, 15, 17, 16],
+          width: 120,
+          height: 40,
+          heapUsedMB: 42.1,
+          rssMB: 128,
+        }, { ctx }),
+      },
+      {
+        id: 'no-chart',
+        label: 'Stats only',
+        description: 'Compact panel without the braille chart for tight spaces.',
+        render: ({ ctx }) => perfOverlaySurface({
+          fps: 30,
+          frameTimeMs: 33.3,
+          width: 80,
+          height: 24,
+          heapUsedMB: 64.2,
+        }, { showChart: false, ctx }),
+      },
+    ],
+    tags: ['visualization', 'performance', 'overlay', 'dashboard'],
   },
 ] as const;
 

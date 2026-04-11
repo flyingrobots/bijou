@@ -228,8 +228,10 @@ export function isSameCell(a: Cell, b: Cell): boolean {
   const bMods = b.modifiers ?? [];
   if (aMods === bMods) return true;
   if (aMods.length !== bMods.length) return false;
+  // Order-insensitive comparison: every modifier in a must exist in b.
+  // For short arrays (typically 0-3 modifiers) this is faster than sorting.
   for (let i = 0; i < aMods.length; i++) {
-    if (aMods[i] !== bMods[i]) return false;
+    if (!bMods.includes(aMods[i]!)) return false;
   }
   
   return true;

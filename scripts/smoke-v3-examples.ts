@@ -5,8 +5,6 @@ import { dirname, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..');
 const EXAMPLES = [
-  'demo.ts',
-  'demo-tui.ts',
   'examples/v3-demo/main.ts',
   'examples/v3-css/main.ts',
   'examples/v3-motion/main.ts',

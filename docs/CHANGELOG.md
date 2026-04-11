@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
+## [Unreleased]
+
+## [4.4.0] - 2026-04-10
+
+### ✨ Features
+
+- **Data visualization toolkit** — four new components in `@flyingrobots/bijou`:
+  - `sparkline(values, opts?)` — compact inline trend graph using Unicode block characters (▁▂▃▄▅▆▇█). Values are normalized between min/max and resampled to fit a target width.
+  - `brailleChartSurface(values, opts)` — high-density filled area chart using Unicode Braille characters. Each terminal cell is a 2×4 sub-pixel grid (8 dots per character), giving smooth curves in tight space.
+  - `statsPanelSurface(entries, opts)` — titled bordered panel with aligned key-value metric rows and optional inline sparklines after each value.
+  - `perfOverlaySurface(stats, opts?)` — prebuilt FPS + memory dashboard composing `statsPanelSurface` and `brailleChartSurface` into a single drop-in overlay.
+- **New bench scenarios** — `flame` (doom fire effect, full-screen palette interpolation, ~2.6 ms/frame) and `component-app` (realistic TUI using real bijou components, ~564 µs/frame). All scenarios now support dynamic sizing via optional `columns`/`rows` in `setup()`.
+- **Soak runner rewrite** — the soak runner is now built on `createFramedApp` + `run()`. Perf overlay toggles with backtick. Rolling average frame time display.
+
+### ⚡ Performance
+
+- **Zero-alloc framed app header/footer** — `paintStyledTextSurfaceWithBCSS` repaints in-place instead of creating new surfaces each frame.
+- **Scoped pane scratch pool** — `framePaneScratchBySize` moved from module-level into the `createFramedApp` closure, resolving RE-010.
+
+### 📦 Infrastructure
+
+- **DOGFOOD data-viz stories** — sparkline, brailleChartSurface, statsPanelSurface, and perfOverlaySurface stories added to the component gallery. Component-family reference grows from 35 to 36 families at 100% coverage.
+- **Backlog cleanup** — closed stale backlog items for RE-008, RE-007, RE-009, RE-010, RE-015 (code fixes shipped in earlier releases; backlog trackers administratively closed). Added RE-021 (frame owns the pump) as a cool idea. Removed PLAN.md.
+- **Stale test fixes** — 22 cycle tests updated: removed assertions against deleted PLAN.md, pointed RE-007 backlog refs to landed design doc, bumped coverage ratchets from 35 to 36 families.
+
 ## [4.3.0] - 2026-04-10
 
 ### ⚡ Performance
@@ -1159,7 +1184,10 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.4.0...HEAD
+[4.4.0]: https://github.com/flyingrobots/bijou/compare/v4.3.0...v4.4.0
+[4.3.0]: https://github.com/flyingrobots/bijou/compare/v4.2.0...v4.3.0
+[4.2.0]: https://github.com/flyingrobots/bijou/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/flyingrobots/bijou/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0
 [3.1.0]: https://github.com/flyingrobots/bijou/compare/v3.0.0...v3.1.0

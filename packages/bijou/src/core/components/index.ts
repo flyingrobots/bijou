@@ -116,3 +116,15 @@ export type { TimerOptions, TimerController, CreateTimerOptions, CreateStopwatch
 
 export { cursorGuard, withHiddenCursor } from './cursor-guard.js';
 export type { CursorGuard, CursorHideHandle } from './cursor-guard.js';
+
+export { sparkline } from './sparkline.js';
+export type { SparklineOptions } from './sparkline.js';
+
+export { brailleChartSurface } from './braille-chart.js';
+export type { BrailleChartOptions } from './braille-chart.js';
+
+export { statsPanelSurface } from './stats-panel.js';
+export type { StatsPanelEntry, StatsPanelOptions } from './stats-panel.js';
+
+export { perfOverlaySurface } from './perf-overlay.js';
+export type { PerfOverlayStats, PerfOverlayOptions } from './perf-overlay.js';

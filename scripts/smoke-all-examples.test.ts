@@ -12,12 +12,10 @@ import {
 } from './smoke-all-examples-lib.js';
 
 describe('listExampleTargets', () => {
-  it('prepends top-level demos and sorts discovered examples deterministically', () => {
+  it('sorts discovered examples deterministically', () => {
     const targets = listExampleTargets('/repo', () => 'examples/zeta/main.ts\nexamples/alpha/main.ts\n');
 
     expect(targets).toEqual([
-      'demo.ts',
-      'demo-tui.ts',
       'examples/alpha/main.ts',
       'examples/zeta/main.ts',
     ]);
@@ -28,7 +26,7 @@ describe('buildSmokeScenarios', () => {
   it('classifies TUI targets onto TTY launchers and plain scripts onto pipe mode', () => {
     const scenarios = buildSmokeScenarios(
       '/repo',
-      ['demo.ts', 'demo-tui.ts', 'examples/plain/main.ts', 'examples/tui/main.ts'],
+      ['examples/plain/main.ts', 'examples/tui/main.ts'],
       (path) => path.endsWith('examples/tui/main.ts')
         ? 'import "@flyingrobots/bijou-tui";'
         : 'console.log("plain");',
@@ -36,49 +34,46 @@ describe('buildSmokeScenarios', () => {
 
     const baseScenarios = scenarios.filter((scenario) => scenario.mode !== 'interactive-scripted');
     expect(baseScenarios).toEqual([
-      { path: 'demo.ts', mode: 'pipe' },
-      { path: 'demo-tui.ts', mode: 'static-tty' },
       { path: 'examples/plain/main.ts', mode: 'pipe' },
       { path: 'examples/tui/main.ts', mode: 'static-tty' },
     ]);
   });
 
   it('appends interactive scripted scenarios for form examples', () => {
-    const scenarios = buildSmokeScenarios('/repo', ['demo.ts'], () => 'console.log("plain");');
+    const scenarios = buildSmokeScenarios('/repo', ['examples/select/main.ts'], () => 'console.log("plain");');
     const interactive = scenarios.filter((scenario) => scenario.mode === 'interactive-scripted');
 
     expect(interactive.some((scenario) => scenario.path === 'examples/select/main.ts')).toBe(true);
-    expect(interactive.some((scenario) => scenario.path === 'examples/wizard/main.ts')).toBe(true);
   });
 });
 
 describe('selectSmokeScenarios', () => {
   it('drops static TTY scenarios in fast mode while keeping pipe and scripted cases', () => {
     const scenarios = selectSmokeScenarios([
-      { path: 'demo.ts', mode: 'pipe' },
-      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/counter/main.ts', mode: 'pipe' },
+      { path: 'examples/v3-demo/main.ts', mode: 'static-tty' },
       { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
     ], {
       fast: true,
     });
 
     expect(scenarios).toEqual([
-      { path: 'demo.ts', mode: 'pipe' },
+      { path: 'examples/counter/main.ts', mode: 'pipe' },
       { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
     ]);
   });
 
   it('filters scenarios down to explicitly requested modes', () => {
     const scenarios = selectSmokeScenarios([
-      { path: 'demo.ts', mode: 'pipe' },
-      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/counter/main.ts', mode: 'pipe' },
+      { path: 'examples/v3-demo/main.ts', mode: 'static-tty' },
       { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
     ], {
       modes: ['static-tty', 'interactive-scripted'],
     });
 
     expect(scenarios).toEqual([
-      { path: 'demo-tui.ts', mode: 'static-tty' },
+      { path: 'examples/v3-demo/main.ts', mode: 'static-tty' },
       { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
     ]);
   });
@@ -140,12 +135,12 @@ describe('createScenarioPlan', () => {
   });
 
   it('uses platform-specific static TTY launchers', () => {
-    const darwinPlan = createScenarioPlan('/repo', { path: 'demo-tui.ts', mode: 'static-tty' }, {
+    const darwinPlan = createScenarioPlan('/repo', { path: 'examples/v3-demo/main.ts', mode: 'static-tty' }, {
       platform: 'darwin',
       execPath: '/custom/node',
       env: {},
     });
-    const linuxPlan = createScenarioPlan('/repo', { path: 'demo-tui.ts', mode: 'static-tty' }, {
+    const linuxPlan = createScenarioPlan('/repo', { path: 'examples/v3-demo/main.ts', mode: 'static-tty' }, {
       platform: 'linux',
       execPath: '/custom/node',
       env: {},
@@ -157,13 +152,13 @@ describe('createScenarioPlan', () => {
       '/dev/null',
       'zsh',
       '-lc',
-      "/custom/node --import tsx '/repo/demo-tui.ts'",
+      "/custom/node --import tsx '/repo/examples/v3-demo/main.ts'",
     ]);
     expect(linuxPlan.args).toEqual([
       '-q',
       '-e',
       '-c',
-      "/custom/node --import tsx '/repo/demo-tui.ts'",
+      "/custom/node --import tsx '/repo/examples/v3-demo/main.ts'",
       '/dev/null',
     ]);
   });
@@ -204,8 +199,8 @@ describe('runSmokeAllExamples', () => {
         fast: true,
       },
       scenarios: [
-        { path: 'demo.ts', mode: 'pipe' },
-        { path: 'demo-tui.ts', mode: 'static-tty' },
+        { path: 'examples/counter/main.ts', mode: 'pipe' },
+        { path: 'examples/v3-demo/main.ts', mode: 'static-tty' },
         { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
       ],
       buildImpl() {
@@ -224,7 +219,7 @@ describe('runSmokeAllExamples', () => {
     expect(exitCode).toBe(0);
     expect(buildCount).toBe(0);
     expect(executed).toEqual([
-      'demo.ts:pipe',
+      'examples/counter/main.ts:pipe',
       'examples/select/main.ts:interactive-scripted',
     ]);
   });

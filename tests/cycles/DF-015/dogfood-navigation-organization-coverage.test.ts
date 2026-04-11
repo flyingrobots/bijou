@@ -24,7 +24,7 @@ describe('DF-015 DOGFOOD navigation and organization coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(27);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(77);
     expect(coverage.coveredFamilyIds).toContain('progressive-disclosure');
     expect(coverage.coveredFamilyIds).toContain('path-and-progress');

@@ -136,6 +136,7 @@ import {
   renderMaximizedPane,
   renderMaximizedPaneInto,
   renderTransition,
+  createFramePaneScratchPool,
 } from './app-frame-render.js';
 import {
   applyFrameAction,
@@ -673,6 +674,9 @@ export function createFramedApp<PageModel, Msg>(
   });
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   let composedFrameScratch: Surface | null = null;
+  let headerScratch: Surface | undefined;
+  let helpLineScratch: Surface | undefined;
+  const paneScratchPool = createFramePaneScratchPool();
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -1262,7 +1266,7 @@ export function createFramedApp<PageModel, Msg>(
     const maxState = model.maximizedPaneByPage[model.activePageId];
     const maximizedPaneId = maxState?.maximizedPaneId;
     const renderResult = maximizedPaneId
-      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool)
       : renderPageContent(model.activePageId, model, bodyRect, pagesById);
     return renderResult.paneRects;
   }
@@ -1270,7 +1274,8 @@ export function createFramedApp<PageModel, Msg>(
   function buildWorkspaceLayoutTree(
     model: InternalFrameModel<PageModel, Msg>,
   ): SurfaceLayoutNode {
-    const header = resolveHeaderLine(model, options, pagesById);
+    const header = resolveHeaderLine(model, options, pagesById, headerScratch);
+    headerScratch = header.surface;
     const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
       createShellRetainedLayoutNode(`tab:${target.pageId}`, {
         row: 0,
@@ -1899,13 +1904,17 @@ export function createFramedApp<PageModel, Msg>(
         layerStack,
         activeLayer,
       } = resolvePresentedLayerContext(model);
-      const header = resolveHeaderLine(model, options, pagesById).surface;
-      const helpLine = renderHelpLine(
+      const headerResult = resolveHeaderLine(model, options, pagesById, headerScratch);
+      headerScratch = headerResult.surface;
+      const header = headerResult.surface;
+      helpLineScratch = renderHelpLine(
         model,
         activeLayer,
         options.i18n,
         resolveNotificationFooterCue(model, options, pagesById),
+        helpLineScratch,
       );
+      const helpLine = helpLineScratch;
       const bodyRect = resolveBodyRect(model, options);
 
       // Check for maximized pane — if set, render only that pane at full body rect
@@ -1913,6 +1922,8 @@ export function createFramedApp<PageModel, Msg>(
       const maximizedPaneId = maxState?.maximizedPaneId;
 
       const frameSurface = getComposedFrameScratch(model.columns, model.rows);
+      // clear() is load-bearing: it resets dim flags left by overlay compositing
+      // on the previous frame. Do not skip or defer this call.
       frameSurface.clear();
       frameSurface.blit(header, 0, 0);
       if (model.rows > 1) {
@@ -1925,7 +1936,7 @@ export function createFramedApp<PageModel, Msg>(
       const activeTransition = model.activeTransition ?? options.transition;
       if (model.previousPageId != null && model.transitionProgress < 1 && activeTransition && activeTransition !== 'none') {
         const activeBodyResult = maximizedPaneId
-          ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId)
+          ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool)
           : renderPageContent(model.activePageId, model, bodyRect, pagesById);
         activeResult = activeBodyResult;
         bodySurface = activeBodyResult.surface;
@@ -1945,8 +1956,8 @@ export function createFramedApp<PageModel, Msg>(
         }
       } else {
         activeResult = maximizedPaneId
-          ? renderMaximizedPaneInto(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, frameSurface)
-          : renderPageContentInto(model.activePageId, model, bodyRect, pagesById, frameSurface);
+          ? renderMaximizedPaneInto(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, frameSurface, bodyRect.row, bodyRect.col, paneScratchPool)
+          : renderPageContentInto(model.activePageId, model, bodyRect, pagesById, frameSurface, bodyRect.row, bodyRect.col, paneScratchPool);
       }
 
       const overlays: Overlay[] = [];

@@ -26,7 +26,7 @@ import {
   type StylePort,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
-import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
+import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;
@@ -63,13 +63,15 @@ export const dogfoodRealistic: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 120,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const cols = Math.max(22, columns); // sidebar (20) + divider + 1
+    const rws = Math.max(4, rows);     // header (2) + footer (1) + 1
+    const current = createSurface(cols, rws);
+    const target = createSurface(cols, rws);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('dogfood-realistic requires PackedSurfaces');
     }
-    return { current, target, sink: createSink(), style: stubStyle, cols: 220, rows: 58 };
+    return { current, target, sink: createSink(), style: stubStyle, cols, rows: rws };
   },
 
   frame(state, frameIndex) {

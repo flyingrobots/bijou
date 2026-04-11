@@ -26,7 +26,7 @@ import {
   type StylePort,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
-import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
+import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;
@@ -57,16 +57,15 @@ export const diffSparse: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 150,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('diff-sparse requires PackedSurfaces');
     }
 
     // Paint a base pattern into BOTH surfaces so they start matching.
-    const cols = 220;
-    const rows = 58;
+    const cols = columns;
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const [r, g, b] = PALETTE[(x + y) % PALETTE.length]!;
@@ -78,7 +77,7 @@ export const diffSparse: Scenario<State> = {
     // Pre-compute the 10% set of cell indices that will be dirtied
     // each frame. Deterministic so every sample sees the same work.
     const total = cols * rows;
-    const dirtyCount = Math.floor(total * 0.10);
+    const dirtyCount = total > 0 ? Math.max(1, Math.floor(total * 0.10)) : 0;
     const dirtyIndices: number[] = [];
     // Distribute them evenly across the surface using a stride.
     const stride = Math.floor(total / dirtyCount);

@@ -14,34 +14,27 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What's New in v4.3.0
+## What's New in v4.4.0
 
-Bijou `v4.3.0` is the current release.
+Bijou `v4.4.0` is the current release.
 
 Key changes:
 
-- **Byte-packed surface rendering** — the internal `Surface` is now
-  backed by a packed `Uint8Array` (10 bytes per cell). Colors are raw
-  RGB bytes, modifiers are a flags bitfield, and the differ compares
-  cells as 10-byte sequences instead of string equality. DOGFOOD
-  landing render+diff is **7% faster** than the previous release.
-- **`Surface.setRGB()` zero-alloc API** — new hot-path method that
-  writes character code + numeric RGB directly into the packed buffer.
-  Roughly 10–50x faster than `set()` for per-cell writes. All built-in
-  components use it automatically.
-- **Direct ANSI emission** — the differ emits SGR escape sequences
-  directly from buffer bytes with a cached style lookup, bypassing
-  chalk entirely on the hot diff path.
-- **Braille rendering fix** — surface composition no longer corrupts
-  braille characters (U+2800–U+28FF). Verified with 58,800-cell art.
-
-In short: `v4.3.0` is the release where Bijou gets fast. Not just
-fast — the entire rendering pipeline is built on typed arrays and
-byte-level operations.
+- **Data visualization toolkit** — four new components:
+  `sparkline()` for inline Unicode block trends, `brailleChartSurface()`
+  for high-density 2x4 sub-pixel area charts, `statsPanelSurface()`
+  for titled key-value metric panels with optional sparklines, and
+  `perfOverlaySurface()` as a prebuilt FPS + memory dashboard.
+- **Zero-alloc framed app render loop** — header and footer painting
+  now reuses surfaces in-place. Pane scratch pool scoped to the
+  `createFramedApp` closure.
+- **New bench scenarios** — doom fire (`flame`) and a realistic
+  multi-component TUI (`component-app`). All scenarios support
+  dynamic terminal sizing.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/4.3.0/whats-new.md), and the
-[migration guide](./docs/releases/4.3.0/migration-guide.md).
+[What's New guide](./docs/releases/4.4.0/whats-new.md), and the
+[migration guide](./docs/releases/4.4.0/migration-guide.md).
 
 ## Package Map
 
@@ -223,7 +216,6 @@ Those docs are meant to answer:
 - [VISION](./docs/VISION.md)
 - [DOGFOOD](./docs/DOGFOOD.md)
 - [System-Style JavaScript](./docs/system-style-javascript.md)
-- [Current Plan](./docs/PLAN.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Migration Guide](./docs/MIGRATING_TO_V4.md)
 - [Release Docs](./docs/releases/README.md)
@@ -244,8 +236,7 @@ These are directions we are actively interested in, but they are not being prese
 See [docs/METHOD.md](./docs/METHOD.md) for the repo work doctrine,
 [docs/BEARING.md](./docs/BEARING.md) for the current direction,
 [docs/system-style-javascript.md](./docs/system-style-javascript.md) for
-the engineering doctrine,
-[docs/PLAN.md](./docs/PLAN.md) for the short queue summary, and
+the engineering doctrine, and
 [docs/ROADMAP.md](./docs/ROADMAP.md) for the broader legacy/reference
 backlog.
 

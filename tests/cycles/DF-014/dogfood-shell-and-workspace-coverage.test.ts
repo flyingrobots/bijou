@@ -24,7 +24,7 @@ describe('DF-014 DOGFOOD shell and workspace coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(25);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(71);
     expect(coverage.coveredFamilyIds).toContain('app-shell');
     expect(coverage.coveredFamilyIds).toContain('workspace-layout');

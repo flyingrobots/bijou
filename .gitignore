@@ -42,3 +42,4 @@ last-chat.txt
 EDITORS-REPORT.md
 /bijou-tui-app/
 scripts/__pycache__/
+.mcp.json

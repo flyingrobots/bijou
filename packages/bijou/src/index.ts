@@ -281,6 +281,16 @@ export {
   withHiddenCursor,
   type CursorGuard,
   type CursorHideHandle,
+  sparkline,
+  type SparklineOptions,
+  brailleChartSurface,
+  type BrailleChartOptions,
+  statsPanelSurface,
+  type StatsPanelEntry,
+  type StatsPanelOptions,
+  perfOverlaySurface,
+  type PerfOverlayStats,
+  type PerfOverlayOptions,
 } from './core/components/index.js';
 
 export {

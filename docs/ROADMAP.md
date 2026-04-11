@@ -4,9 +4,9 @@
 >
 > **Legacy planning note:** new work now starts in `docs/BACKLOG/`, moves into `docs/design/` when a cycle begins, and is grouped by legend docs in `docs/legends/`. This roadmap remains as a migration/reference surface until older planning artifacts are rehomed.
 >
-> **Current execution note:** the shorter living execution summary now lives in [PLAN.md](PLAN.md).
+> **Current execution note:** execution truth now lives in [BEARING.md](BEARING.md) and the backlog/design lanes.
 
-Latest published release: **v4.0.0** — Pure Surface Release
+Latest published release: **v4.4.0** — Data Visualization Toolkit
 
 Current planning horizon: **post-v4 platform buildout**
 
@@ -18,6 +18,10 @@ See [COMPLETED.md](COMPLETED.md) for the full shipped log and completed branch w
 
 | Version | Milestone | Key deliverables |
 |---------|-----------|-----------------|
+| v4.4.0 | Data Visualization Toolkit | sparkline, brailleChart, statsPanel, perfOverlay; zero-alloc framed app render; new bench scenarios |
+| v4.3.0 | Byte-Packed Surface Rendering | Packed Uint8Array surfaces, setRGB API, direct ANSI emission, bench v2 |
+| v4.2.0 | MCP and Runtime Engine Migration | bijou-mcp, RE-007 shell migration, METHOD migration, DOGFOOD corpus |
+| v4.1.0 | Runtime Engine and DOGFOOD | Runtime engine RE-001 through RE-006, DOGFOOD DF-003 through DF-026, i18n packages |
 | v4.0.0 | Pure Surface Release | Pure-surface runtime contract, structured shell/overlay/layout primitives, design-system conformance pass, release/docs hardening |
 | v3.1.0 | Surface-First Confidence Release | Surface-first primitives, deterministic clock/runtime seams, frame regressions, shared viewport overlay groundwork, smoke/release hardening, notification system |
 | v3.0.0 | Truthful V3 Release | Surface-native runtime path, framed `ViewOutput`, BCSS scope, worker runtime, native recorder, release demos |

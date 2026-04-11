@@ -24,7 +24,7 @@ describe('DF-012 DOGFOOD explainability and divider coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(21);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(60);
     expect(coverage.coveredFamilyIds).toContain('explainability-walkthroughs');
     expect(coverage.coveredFamilyIds).toContain('dividers');

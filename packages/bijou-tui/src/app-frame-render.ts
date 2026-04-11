@@ -45,7 +45,7 @@ import {
   fitLine,
 } from './app-frame-utils.js';
 import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
-import { createStyledTextSurfaceWithBCSS } from './css/text-style.js';
+import { paintStyledTextSurfaceWithBCSS } from './css/text-style.js';
 import { frameModeLabel } from './app-frame-i18n.js';
 import type { FrameLayerDescriptor } from './app-frame-layers.js';
 
@@ -59,8 +59,6 @@ export interface FrameHeaderRenderResult {
   readonly surface: Surface;
   readonly tabTargets: readonly FrameHeaderTabTarget[];
 }
-
-const framePaneScratchBySize = new Map<string, Surface>();
 
 interface PaintedFrameNodeResult {
   readonly paneRects: ReadonlyMap<string, LayoutRect>;
@@ -201,6 +199,7 @@ export function renderFrameNode<PageModel, Msg>(
     rect,
     ctx,
     surface,
+    createFramePaneScratchPool(),
   );
 
   return { surface, paneRects: painted.paneRects, paneOrder: painted.paneOrder };
@@ -212,6 +211,7 @@ function paintFrameNodeInto<PageModel, Msg>(
   absoluteRect: LayoutRect,
   ctx: RenderContext<PageModel, Msg>,
   target: Surface,
+  scratchPool: FramePaneScratchPool,
 ): PaintedFrameNodeResult {
   if (localRect.width <= 0 || localRect.height <= 0) {
     return { paneRects: new Map(), paneOrder: [] };
@@ -233,7 +233,7 @@ function paintFrameNodeInto<PageModel, Msg>(
       node.render(localRect.width, localRect.height),
       localRect.width,
       localRect.height,
-      getFramePaneScratch(localRect.width, localRect.height),
+      getFramePaneScratch(scratchPool, localRect.width, localRect.height),
     );
     let state = createFocusAreaStateForSurface(contentSurface, {
       width: localRect.width,
@@ -302,8 +302,8 @@ function paintFrameNodeInto<PageModel, Msg>(
     const absoluteARect = offsetRect(layout.paneA, absoluteRect.row, absoluteRect.col);
     const absoluteBRect = offsetRect(layout.paneB, absoluteRect.row, absoluteRect.col);
 
-    const a = paintFrameNodeInto(effectiveA, localARect, absoluteARect, ctx, target);
-    const b = paintFrameNodeInto(effectiveB, localBRect, absoluteBRect, ctx, target);
+    const a = paintFrameNodeInto(effectiveA, localARect, absoluteARect, ctx, target, scratchPool);
+    const b = paintFrameNodeInto(effectiveB, localBRect, absoluteBRect, ctx, target, scratchPool);
 
     paintDivider(target, offsetRect(layout.divider, localRect.row, localRect.col), node.dividerChar, direction);
 
@@ -340,7 +340,7 @@ function paintFrameNodeInto<PageModel, Msg>(
       );
       continue;
     }
-    const rendered = paintFrameNodeInto(child, localAreaRect, absoluteAreaRect, ctx, target);
+    const rendered = paintFrameNodeInto(child, localAreaRect, absoluteAreaRect, ctx, target, scratchPool);
     for (const [paneId, paneRect] of rendered.paneRects.entries()) {
       if (paneRects.has(paneId)) {
         throw new Error(`createFramedApp: duplicate paneId "${paneId}" in rendered layout`);
@@ -389,6 +389,7 @@ export function renderPageContentInto<PageModel, Msg>(
   target: Surface,
   offsetRow = bodyRect.row,
   offsetCol = bodyRect.col,
+  scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
 ): FramePaneGeometryResult {
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
@@ -406,6 +407,7 @@ export function renderPageContentInto<PageModel, Msg>(
     bodyRect,
     renderCtx,
     target,
+    scratchPool,
   );
 }
 
@@ -416,9 +418,10 @@ export function renderMaximizedPane<PageModel, Msg>(
   bodyRect: LayoutRect,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   maximizedPaneId: string,
+  scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
 ): RenderResult {
   const surface = createSurface(bodyRect.width, bodyRect.height);
-  const geometry = renderMaximizedPaneInto(pageId, model, bodyRect, pagesById, maximizedPaneId, surface, 0, 0);
+  const geometry = renderMaximizedPaneInto(pageId, model, bodyRect, pagesById, maximizedPaneId, surface, 0, 0, scratchPool);
   return { surface, paneRects: geometry.paneRects, paneOrder: geometry.paneOrder };
 }
 
@@ -432,6 +435,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   target: Surface,
   offsetRow = bodyRect.row,
   offsetCol = bodyRect.col,
+  scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
 ): FramePaneGeometryResult {
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
@@ -439,7 +443,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   const paneNode = findPaneNode(layoutTree, maximizedPaneId);
   if (paneNode == null) {
     // Pane not found, fall back to normal rendering
-    return renderPageContentInto(pageId, model, bodyRect, pagesById, target, offsetRow, offsetCol);
+    return renderPageContentInto(pageId, model, bodyRect, pagesById, target, offsetRow, offsetCol, scratchPool);
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
@@ -447,7 +451,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
     paneNode.render(bodyRect.width, bodyRect.height),
     bodyRect.width,
     bodyRect.height,
-    getFramePaneScratch(bodyRect.width, bodyRect.height),
+    getFramePaneScratch(scratchPool, bodyRect.width, bodyRect.height),
   );
   let state = createFocusAreaStateForSurface(contentSurface, {
     width: bodyRect.width,
@@ -476,6 +480,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  scratch?: Surface,
 ): FrameHeaderRenderResult {
   const ctx = resolveSafeCtx();
   const activePage = pagesById.get(model.activePageId)!;
@@ -509,7 +514,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   }).join(' ');
 
   const line = fitLine(`${title}  ${tabs}`, model.columns);
-  const surface = createStyledTextSurfaceWithBCSS(line, model.columns, ctx, {
+  const surface = paintStyledTextSurfaceWithBCSS(scratch, line, model.columns, ctx, {
     type: 'FrameHeader',
     id: 'frame-header',
     classes: [`page-${model.activePageId}`],
@@ -527,6 +532,7 @@ export function renderHelpLine<PageModel, Msg>(
   activeLayer: FrameLayerDescriptor,
   i18n: CreateFramedAppOptions<PageModel, Msg>['i18n'],
   notificationCue?: string,
+  scratch?: Surface,
 ): Surface {
   const mode = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
     ? 'PALETTE'
@@ -561,14 +567,13 @@ export function renderHelpLine<PageModel, Msg>(
           : `${statusWithPadding}  ${hint}`;
       })()
     : ` ${status}`;
-  return createStyledTextSurfaceWithBCSS(fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
+  return paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, resolveSafeCtx(), {
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
   });
 }
 
-/**
 /**
  * Apply a transition shader to blend between the previous and next page views.
  *
@@ -637,12 +642,19 @@ function resolveDividerUnit(dividerChar: string | undefined, fallback: string): 
   return dividerChar[0] ?? fallback;
 }
 
-function getFramePaneScratch(width: number, height: number): Surface {
+/** Per-size scratch surface pool for pane rendering. */
+export type FramePaneScratchPool = Map<string, Surface>;
+
+export function createFramePaneScratchPool(): FramePaneScratchPool {
+  return new Map();
+}
+
+function getFramePaneScratch(pool: FramePaneScratchPool, width: number, height: number): Surface {
   const key = `${width}x${height}`;
-  let scratch = framePaneScratchBySize.get(key);
+  let scratch = pool.get(key);
   if (scratch == null) {
     scratch = createSurface(width, height);
-    framePaneScratchBySize.set(key, scratch);
+    pool.set(key, scratch);
   }
   return scratch;
 }

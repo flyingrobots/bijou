@@ -24,7 +24,7 @@ describe('DF-006 DOGFOOD structural coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(9);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(26);
     expect(coverage.coveredFamilyIds).toContain('framed-grouping');
     expect(coverage.coveredFamilyIds).toContain('inspector-panels');

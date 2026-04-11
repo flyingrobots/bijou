@@ -24,7 +24,7 @@ describe('DF-018 DOGFOOD branding and motion coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(33);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(94);
     expect(coverage.coveredFamilyIds).toContain('expressive-branding-and-decorative-emphasis');
     expect(coverage.coveredFamilyIds).toContain('motion-and-shader-effects');

@@ -26,8 +26,6 @@ These are the docs that describe what Bijou is, what it is doing now, and how cu
   - engineering doctrine for runtime-backed modeling, boundaries, adapters, and codecs
 - [DOGFOOD](./DOGFOOD.md)
   - canonical human-facing docs surface and terminal docs app entrypoint
-- [Current Plan](./PLAN.md)
-  - short narrative summary of the current queue; supporting signpost, not the authority
 - [Legends](./legends/README.md)
   - thematic workstreams and the intent behind them
 - [Backlog](./BACKLOG/README.md)
@@ -83,4 +81,4 @@ If you are a human or an agent trying to answer "what is true right now?":
 4. read the relevant [Legend](./legends/README.md) and the actual backlog lane or cycle doc
 5. check [Changelog](./CHANGELOG.md) if landed behavior matters
 6. use [DOGFOOD](./DOGFOOD.md) and the [Design System](./design-system/README.md) as the proving surfaces
-7. only then reach for [Plan](./PLAN.md), [Roadmap](./ROADMAP.md), archived docs, or legacy specs
+7. only then reach for [Roadmap](./ROADMAP.md), archived docs, or legacy specs

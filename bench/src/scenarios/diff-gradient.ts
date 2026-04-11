@@ -21,7 +21,7 @@ import {
   type StylePort,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
-import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
+import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;
@@ -31,7 +31,6 @@ interface State {
   readonly cols: number;
   readonly rows: number;
 }
-
 
 const BLOCK = 0x2588;
 
@@ -45,9 +44,9 @@ export const diffGradient: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 100,
 
-  setup() {
-    const current = createSurface(220, 58);
-    const target = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('diff-gradient requires PackedSurfaces');
     }
@@ -56,8 +55,8 @@ export const diffGradient: Scenario<State> = {
       target,
       sink: createSink(),
       style: stubStyle,
-      cols: 220,
-      rows: 58,
+      cols: columns,
+      rows,
     };
   },
 
@@ -77,8 +76,10 @@ export const diffGradient: Scenario<State> = {
         target.setRGB(col, row, BLOCK, r1, g1, b1, r2, g2, b2);
       }
     }
-    // Run the diff
+    // Run the diff and reset dirty bitmaps for the next frame.
     renderDiff(current, target, sink, style);
+    if (isPacked(target)) target.markAllRenderClean();
+    if (isPacked(current)) current.markAllRenderClean();
   },
 
   getDisplaySurface(state) {

@@ -7,7 +7,7 @@ describe('RE-005 buffer commands and effects separately cycle', () => {
     const legend = readRepoFile('docs/legends/RE-runtime-engine.md');
     const cycle = readRepoFile('docs/design/RE-005-buffer-commands-and-effects-separately.md');
     const landedComponents = readRepoFile('docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md');
-    const backlogShell = readRepoFile('docs/BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
+    const landedShell = readRepoFile('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
     expect(legend).toContain('RE-006 — Formalize Component Layout and Interaction Contracts');
     expect(legend).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
@@ -22,6 +22,6 @@ describe('RE-005 buffer commands and effects separately cycle', () => {
     expect(cycle).toContain('## Retrospective');
 
     expect(landedComponents).toContain('first migration candidates');
-    expect(backlogShell).toContain('framed shell');
+    expect(landedShell).toContain('framed shell');
   });
 });

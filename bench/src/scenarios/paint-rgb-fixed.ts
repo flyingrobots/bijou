@@ -37,12 +37,12 @@ export const paintRgbFixed: Scenario<State> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 200,
 
-  setup() {
-    const surface = createSurface(220, 58);
+  setup(_ctx, columns = 220, rows = 58) {
+    const surface = createSurface(columns, rows);
     if (!isPacked(surface)) {
       throw new Error('paint-rgb-fixed requires a PackedSurface');
     }
-    return { surface, cols: 220, rows: 58 };
+    return { surface, cols: columns, rows };
   },
 
   frame(state, _frameIndex) {

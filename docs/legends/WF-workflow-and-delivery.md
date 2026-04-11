@@ -41,15 +41,12 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 ## Current cycle and backlog
 
 - current posture:
-  - `4.1.0` is shipped
+  - `4.4.0` is shipped
   - no version-target release lane is active right now
-  - the active engineering cycle is
-    [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  - the active engineering focus is DOGFOOD depth, i18n catalog loader, and layout formalization
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - latest docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
-- live backlog:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - migration debt still worth tracking:
   - [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)

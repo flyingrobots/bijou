@@ -24,7 +24,7 @@ describe('DF-005 DOGFOOD progress and coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(7);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(20);
     expect(coverage.coveredFamilyIds).toContain('progress-indicators');
     expect(coverage.coveredFamilyIds).toContain('loading-placeholders');

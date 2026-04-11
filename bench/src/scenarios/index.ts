@@ -18,6 +18,8 @@ import { diffSparse } from './diff-sparse.js';
 import { diffStatic } from './diff-static.js';
 import { dogfoodRealistic } from './dogfood-realistic.js';
 import { soak } from './soak.js';
+import { flame } from './flame.js';
+import { componentApp } from './component-app.js';
 
 export { type Scenario, type AnyScenario } from './types.js';
 
@@ -31,8 +33,10 @@ export const SCENARIOS: readonly AnyScenario[] = [
   diffSparse,
   diffStatic,
   dogfoodRealistic,
+  componentApp,
+  flame,
   soak,
-] as unknown as readonly AnyScenario[];
+] as unknown as readonly AnyScenario[]; // Scenario<T> is invariant on T; cast required for the heterogeneous registry
 
 /** Look up a scenario by ID, or throw if not found. */
 export function getScenario(id: string): AnyScenario {

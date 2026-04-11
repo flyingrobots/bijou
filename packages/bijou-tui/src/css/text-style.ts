@@ -90,23 +90,29 @@ export function styleTextWithBCSS(
   return ctx.style.styled(token as any, text);
 }
 
-export function createStyledTextSurfaceWithBCSS(
+/**
+ * Fill a surface with styled text graphemes. Shared implementation used by
+ * both the create and paint paths to avoid logic duplication.
+ */
+function fillStyledText(
+  surface: Surface,
   text: string,
-  width: number,
   ctx: BijouContext | undefined,
   identity: BCSSIdentity,
-  base: StyledTextToken = {},
-): Surface {
-  const safeWidth = Math.max(0, Math.floor(width));
-  const surface = createSurface(safeWidth, 1, { char: ' ', empty: false });
-  if (safeWidth === 0) return surface;
+  base: StyledTextToken,
+): void {
+  const safeWidth = surface.width;
+  if (safeWidth === 0) return;
 
   if (!ctx) {
-    const graphemes = segmentGraphemes(text ?? '');
+    // Fill all cells first to clear stale content from previous paints,
+    // then overwrite with the new graphemes.
+    surface.fill({ char: ' ', empty: false });
+    const graphemes = segmentGraphemes(text);
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
       surface.set(x, 0, { char: graphemes[x]!, empty: false });
     }
-    return surface;
+    return;
   }
 
   const token = resolveBCSSTextToken(ctx, identity, base);
@@ -117,7 +123,7 @@ export function createStyledTextSurfaceWithBCSS(
     modifiers: token.modifiers,
     empty: false,
   });
-  const graphemes = segmentGraphemes(text ?? '');
+  const graphemes = segmentGraphemes(text);
   const packed: boolean = 'buffer' in surface;
   const fg = packed && token.hex ? parseHex(token.hex) : undefined;
   if (fg) {
@@ -140,5 +146,41 @@ export function createStyledTextSurfaceWithBCSS(
       });
     }
   }
+}
+
+export function createStyledTextSurfaceWithBCSS(
+  text: string,
+  width: number,
+  ctx: BijouContext | undefined,
+  identity: BCSSIdentity,
+  base: StyledTextToken = {},
+): Surface {
+  const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
+  const surface = createSurface(safeWidth, 1, { char: ' ', empty: false });
+  fillStyledText(surface, text, ctx, identity, base);
+  return surface;
+}
+
+/**
+ * Repaint an existing surface in-place with styled text. Zero allocation
+ * when the surface width already matches — only cell values are mutated.
+ * Falls back to creating a new surface when the width changed (resize).
+ */
+export function paintStyledTextSurfaceWithBCSS(
+  surface: Surface | undefined,
+  text: string,
+  width: number,
+  ctx: BijouContext | undefined,
+  identity: BCSSIdentity,
+  base: StyledTextToken = {},
+): Surface {
+  const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
+
+  // Need a new surface if none exists or width changed.
+  if (surface == null || surface.width !== safeWidth || surface.height !== 1) {
+    return createStyledTextSurfaceWithBCSS(text, width, ctx, identity, base);
+  }
+
+  fillStyledText(surface, text, ctx, identity, base);
   return surface;
 }

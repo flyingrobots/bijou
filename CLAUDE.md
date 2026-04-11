@@ -15,11 +15,9 @@ When recovering context or auditing the repo's current truth:
    - documentation entrypoint and source-of-truth map
 2. `README.md`
    - public front door: package map, DOGFOOD overview, quick start
-3. `docs/PLAN.md`
-   - current execution order
-4. relevant `docs/legends/*`, `docs/BACKLOG/*`, and `docs/design/*`
+3. relevant `docs/legends/*`, `docs/BACKLOG/*`, and `docs/design/*`
    - thematic intent, not-started work, and active/landed cycle detail
-5. `docs/CHANGELOG.md`
+4. `docs/CHANGELOG.md`
    - shipped changes and notable repo-facing behavior shifts
 
 ## Current Truth Surfaces
@@ -27,7 +25,6 @@ When recovering context or auditing the repo's current truth:
 | Path | Purpose |
 |------|---------|
 | `docs/README.md` | docs entrypoint and source-of-truth map |
-| `docs/PLAN.md` | shortest honest answer to "what is next?" |
 | `docs/legends/` | thematic workstreams |
 | `docs/BACKLOG/` | not-started work |
 | `docs/design/` | active and landed cycle design docs |
@@ -55,10 +52,9 @@ These still matter, but they are not the main execution truth:
 When starting a new session or recovering from context loss:
 
 1. Read `docs/README.md`.
-2. Read `docs/PLAN.md`.
-3. Read the relevant legend, backlog item, and design doc.
-4. Read the latest relevant section of `docs/CHANGELOG.md`.
-5. Check `git log --oneline -10` and `git status`.
+2. Read the relevant legend, backlog item, and design doc.
+3. Read the latest relevant section of `docs/CHANGELOG.md`.
+4. Check `git log --oneline -10` and `git status`.
 
 Do not assume `docs/ROADMAP.md` is the active source of truth for current work.
 

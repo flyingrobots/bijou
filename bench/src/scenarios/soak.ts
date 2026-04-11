@@ -25,8 +25,8 @@ import type { Scenario } from './types.js';
 import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
-  current: PackedSurface;
-  target: PackedSurface;
+  readonly current: PackedSurface;
+  readonly target: PackedSurface;
   readonly sink: CountingSink;
   readonly style: StylePort;
   readonly cols: number;
@@ -58,14 +58,14 @@ const FOOTER_ROWS = 1;
  * Paint the full base layout into a surface. Used on setup and on
  * simulated resize events.
  */
-function paintBase(target: PackedSurface): void {
+function paintBase(target: PackedSurface, cols: number, rows: number): void {
   // Header
-  for (let x = 0; x < COLS; x++) {
+  for (let x = 0; x < cols; x++) {
     target.setRGB(x, 0, H_BAR, HEADER_FG[0], HEADER_FG[1], HEADER_FG[2], HEADER_BG[0], HEADER_BG[1], HEADER_BG[2]);
     target.setRGB(x, 1, BLOCK, HEADER_FG[0], HEADER_FG[1], HEADER_FG[2], HEADER_BG[0], HEADER_BG[1], HEADER_BG[2]);
   }
   // Sidebar + divider
-  for (let y = HEADER_ROWS; y < ROWS - FOOTER_ROWS; y++) {
+  for (let y = HEADER_ROWS; y < rows - FOOTER_ROWS; y++) {
     for (let x = 0; x < SIDEBAR_COLS; x++) {
       target.setRGB(x, y, BLOCK, SIDEBAR_FG[0], SIDEBAR_FG[1], SIDEBAR_FG[2], SIDEBAR_BG[0], SIDEBAR_BG[1], SIDEBAR_BG[2]);
     }
@@ -73,15 +73,15 @@ function paintBase(target: PackedSurface): void {
   }
   // Body
   const bodyStartX = SIDEBAR_COLS + 1;
-  const bodyEndY = ROWS - FOOTER_ROWS - 1;
+  const bodyEndY = rows - FOOTER_ROWS - 1;
   for (let y = HEADER_ROWS + 1; y <= bodyEndY; y++) {
-    for (let x = bodyStartX; x < COLS; x++) {
+    for (let x = bodyStartX; x < cols; x++) {
       target.setRGB(x, y, SHADE, BODY_FG[0], BODY_FG[1], BODY_FG[2], BODY_BG[0], BODY_BG[1], BODY_BG[2]);
     }
   }
   // Footer
-  for (let x = 0; x < COLS; x++) {
-    target.setRGB(x, ROWS - 1, BLOCK, FOOTER_FG[0], FOOTER_FG[1], FOOTER_FG[2], FOOTER_BG[0], FOOTER_BG[1], FOOTER_BG[2]);
+  for (let x = 0; x < cols; x++) {
+    target.setRGB(x, rows - 1, BLOCK, FOOTER_FG[0], FOOTER_FG[1], FOOTER_FG[2], FOOTER_BG[0], FOOTER_BG[1], FOOTER_BG[2]);
   }
 }
 
@@ -95,19 +95,19 @@ export const soak: Scenario<State> = {
   defaultWarmupFrames: 50,
   defaultMeasureFrames: 1000,
 
-  setup() {
-    const current = createSurface(COLS, ROWS);
-    const target = createSurface(COLS, ROWS);
+  setup(_ctx, columns = COLS, rows = ROWS) {
+    const current = createSurface(columns, rows);
+    const target = createSurface(columns, rows);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('soak requires PackedSurfaces');
     }
     // Paint the initial base layout into both surfaces so the first
     // frame diff starts from a realistic "already rendered" state.
-    paintBase(target);
-    paintBase(current);
+    paintBase(target, columns, rows);
+    paintBase(current, columns, rows);
     target.markAllRenderClean();
     current.markAllRenderClean();
-    return { current, target, sink: createSink(), style: stubStyle, cols: COLS, rows: ROWS };
+    return { current, target, sink: createSink(), style: stubStyle, cols: columns, rows };
   },
 
   frame(state, frameIndex) {
@@ -120,7 +120,7 @@ export const soak: Scenario<State> = {
     if (frameIndex > 0 && frameIndex % 100 === 0) {
       target.clear();
       current.clear();
-      paintBase(target);
+      paintBase(target, cols, rows);
       renderDiff(current, target, sink, style);
       target.markAllRenderClean();
       current.markAllRenderClean();

@@ -63,7 +63,7 @@ export interface Scenario<State = unknown> {
    * @param ctx - Optional bijou context. Harnesses should provide a
    *   test context so scenarios don't depend on process globals.
    */
-  setup(ctx?: BijouContext): State;
+  setup(ctx?: BijouContext, columns?: number, rows?: number): State;
 
   /**
    * Run one frame of the scenario's work. Mutates `state` in place.
