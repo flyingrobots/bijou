@@ -140,7 +140,7 @@ function renderScenarioSurface(model: SoakModel, width: number, height: number):
   return fallback;
 }
 
-function initScenario(scenarioIndex: number, cycle: number, width: number, height: number): SoakModel {
+function initScenario(scenarioIndex: number, cycle: number, width: number, height: number, prev?: SoakModel): SoakModel {
   const scenario = displayScenarios[scenarioIndex]!;
   const state = scenario.setup(undefined, width, height);
   runWarmup(scenario, state);
@@ -153,7 +153,7 @@ function initScenario(scenarioIndex: number, cycle: number, width: number, heigh
     elapsedMs: 0,
     paneWidth: width,
     paneHeight: height,
-    showPerf: true,
+    showPerf: prev?.showPerf ?? true,
   };
 }
 
@@ -218,9 +218,9 @@ function createSoakApp(appCtx: BijouContext) {
             if (nextCycle >= MAX_CYCLES) {
               return [model, [quit()]];
             }
-            return [initScenario(0, nextCycle, w, h), []];
+            return [initScenario(0, nextCycle, w, h, model), []];
           }
-          return [initScenario(nextIndex, model.cycle, w, h), []];
+          return [initScenario(nextIndex, model.cycle, w, h, model), []];
         }
 
         if (msg.type === 'pulse') {
