@@ -28,6 +28,7 @@ you can now hand that concern to the stock frame:
 
 ```ts
 let currentCtx = ctx;
+const getCurrentCtx = () => currentCtx;
 
 const app = createFramedApp({
   ctx: currentCtx,
@@ -38,7 +39,17 @@ const app = createFramedApp({
   onShellThemeChange: ({ ctx: nextCtx }) => {
     currentCtx = nextCtx;
   },
-  pages: [/* ... */],
+  pages: [{
+    id: 'home',
+    title: 'Home',
+    init: () => [model, []],
+    update: (msg, model) => [model, []],
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'main',
+      render: (width, height) => renderHome(getCurrentCtx(), model, width, height),
+    }),
+  }],
 });
 ```
 
@@ -49,9 +60,10 @@ The frame will:
 - expose the current selection via `FrameModel.activeShellThemeId`
 
 If your page renderers already resolve theme data from an explicit
-`BijouContext`, pass that context into `createFramedApp({ ctx })` and
-sync `onShellThemeChange` back into your app-owned state. Apps that rely
-only on the ambient default context can omit both options.
+`BijouContext`, pass that context into `createFramedApp({ ctx })`,
+mirror `onShellThemeChange` back into your app-owned state, and make
+your page renderers read the updated context on each render. Apps that
+rely only on the ambient default context can omit both options.
 
 You do not need to adopt this API, but it is now the simplest way to
 keep a landing screen, docs shell, or other frame-owned chrome on one

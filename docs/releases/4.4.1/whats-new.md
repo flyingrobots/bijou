@@ -36,6 +36,7 @@ cycling:
 
 ```ts
 let currentCtx = ctx;
+const getCurrentCtx = () => currentCtx;
 
 const app = createFramedApp({
   ctx: currentCtx,
@@ -46,7 +47,17 @@ const app = createFramedApp({
   onShellThemeChange: ({ ctx: nextCtx }) => {
     currentCtx = nextCtx;
   },
-  pages: [/* ... */],
+  pages: [{
+    id: 'home',
+    title: 'Home',
+    init: () => [model, []],
+    update: (msg, model) => [model, []],
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'main',
+      render: (width, height) => renderHome(getCurrentCtx(), model, width, height),
+    }),
+  }],
 });
 ```
 
@@ -58,9 +69,10 @@ When `shellThemes` are provided:
 - the current selection is exposed as `FrameModel.activeShellThemeId`
 
 If your page renderers read from an explicit app-owned `BijouContext`,
-pass that context to `createFramedApp({ ctx })` and mirror
-`onShellThemeChange` back into your app state so the frame shell and page
-content stay on one theme source of truth.
+pass that context to `createFramedApp({ ctx })`, mirror
+`onShellThemeChange` back into your app state, and make your page
+renderers read the updated context on each render so the frame shell and
+page content stay on one theme source of truth.
 
 DOGFOOD now uses that shared frame-owned state so the title screen and
 docs explorer stay on one theme setting instead of drifting into mixed

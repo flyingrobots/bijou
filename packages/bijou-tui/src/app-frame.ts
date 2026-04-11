@@ -45,7 +45,7 @@ import type { TransitionShaderFn } from './transition-shaders.js';
 import { type BuiltinTransition } from './transition-shaders.js';
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import {
-  commandPalette,
+  commandPaletteSurface,
   commandPaletteKeyMap,
 } from './command-palette.js';
 import {
@@ -2334,9 +2334,10 @@ export function createFramedApp<PageModel, Msg>(
 
       if (model.commandPalette != null) {
         const paletteWidth = Math.max(20, Math.min(80, model.columns - 4));
-        const paletteBody = commandPalette(model.commandPalette, {
+        const paletteBody = commandPaletteSurface(model.commandPalette, {
           width: Math.max(16, paletteWidth - 4),
           ctx: themedFrameCtx,
+          showScrollbar: false,
         });
         const paletteLayer = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
           ? activeLayer
@@ -2909,9 +2910,8 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
 ): Overlay | undefined {
   const layout = resolveNotificationCenterLayout(model, options, pagesById, ctx);
   if (layout == null) return undefined;
-  const content = renderNotificationCenterSurface(layout.center, layout.contentWidth, options.i18n, ctx);
 
-  const pagerState = createPagerStateForSurface(content, {
+  const pagerState = createPagerStateForSurface(layout.content, {
     width: layout.contentWidth,
     height: layout.contentHeight,
   });
@@ -2922,7 +2922,7 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
       y: Math.max(0, Math.min(model.notificationCenterScrollY, layout.maxScrollY)),
     },
   };
-  const body = pagerSurface(content, scrolledState, {
+  const body = pagerSurface(layout.content, scrolledState, {
     showScrollbar: layout.maxScrollY > 0,
     showStatus: false,
   });
