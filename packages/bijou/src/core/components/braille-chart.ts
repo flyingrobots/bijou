@@ -30,9 +30,9 @@ export interface BrailleChartOptions extends BijouNodeOptions {
   readonly width: number;
   /** Chart height in terminal rows. Required. */
   readonly height: number;
-  /** Explicit minimum value for scaling. Defaults to `Math.min(...values)`. */
+  /** Explicit minimum value for scaling. Defaults to the minimum of the sampled values. */
   readonly min?: number;
-  /** Explicit maximum value for scaling. Defaults to `Math.max(...values)`. */
+  /** Explicit maximum value for scaling. Defaults to the maximum of the sampled values. */
   readonly max?: number;
   /** Foreground token for the chart dots. */
   readonly fgToken?: TokenValue;

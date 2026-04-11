@@ -118,7 +118,9 @@ export function perfOverlaySurface(
     ctx,
   });
 
-  // Compose: panel on top, chart below (inside a box-like frame).
+  // Compose: panel on top, chart below. The chart is intentionally outside
+  // the panel box border — it renders as a "dangling" area chart beneath the
+  // titled stats box, visually extending the overlay without a second border.
   const totalHeight = panel.height + chartHeight;
   const surface = createSurface(panelWidth, totalHeight);
   surface.blit(panel, 0, 0);

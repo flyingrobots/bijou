@@ -22,7 +22,7 @@ import {
   type StylePort,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
-import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
+import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;

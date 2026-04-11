@@ -41,6 +41,8 @@ export function safeMax(values: readonly number[]): number {
  * than the target count, each bucket averages the values that fall into
  * it (using exclusive upper bounds to avoid double-counting). When
  * shorter, values are stretched via nearest-neighbor sampling.
+ *
+ * Returns an empty array when `count <= 0`.
  */
 export function sampleToWidth(values: readonly number[], count: number): number[] {
   if (values.length === 0) return new Array<number>(count).fill(0);

@@ -68,7 +68,8 @@ export function statsPanelSurface(
   }
 
   // Compute column widths.
-  const maxLabelLen = Math.max(...entries.map((e) => e.label.length));
+  let maxLabelLen = 0;
+  for (const e of entries) { if (e.label.length > maxLabelLen) maxLabelLen = e.label.length; }
   const gap = 1;
 
   // Build each row as a surface with styled segments.
