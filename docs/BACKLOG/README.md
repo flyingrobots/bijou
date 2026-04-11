@@ -27,4 +27,7 @@ Version-target lanes like `v4.1.0/` are temporary. Use them only for
 cycles that must close before that release ships, including cases where
 release posture, docs-surface truth, and validation still disagree.
 
-There is no active version-target release lane right now.
+Active version-target release lanes:
+
+- [`v4.5.0/`](./v4.5.0/README.md) — hardening: input validation, i18n catalog loader, DOGFOOD depth
+- [`v5.0.0/`](./v5.0.0/README.md) — frame owns the pump, layout formalization, scrollbar upstreaming
