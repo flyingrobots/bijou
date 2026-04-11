@@ -21,7 +21,7 @@
 
 import { appendFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, perfOverlaySurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   createFramedApp,
@@ -185,7 +185,7 @@ function logAndAdvanceCmd(model: SoakModel): Cmd<SoakMsg> {
 let latestPaneWidth = 0;
 let latestPaneHeight = 0;
 
-function createSoakApp(_ctx: BijouContext) {
+function createSoakApp(appCtx: BijouContext) {
   return createFramedApp<SoakModel, SoakMsg>({
     title: 'Soak Runner',
     pages: [{
@@ -270,7 +270,40 @@ function createSoakApp(_ctx: BijouContext) {
             // Capture actual pane dimensions for the update loop.
             latestPaneWidth = width;
             latestPaneHeight = height;
-            return renderScenarioSurface(model, width, height);
+            const scene = renderScenarioSurface(model, width, height);
+
+            // Composite the perf overlay into the top-right corner.
+            const recent = model.frameTimes;
+            const windowSize = Math.min(20, recent.length);
+            let avgNs = 0;
+            if (windowSize > 0) {
+              let sum = 0;
+              for (let i = recent.length - windowSize; i < recent.length; i++) sum += recent[i]!;
+              avgNs = sum / windowSize;
+            }
+            const mem = process.memoryUsage();
+            const historyMs = recent.length > 1 ? recent.map((ns) => ns / 1_000_000) : [];
+            const perfPanel = perfOverlaySurface({
+              fps: TARGET_FPS,
+              frameTimeMs: avgNs / 1_000_000,
+              frameTimeHistory: historyMs,
+              width,
+              height,
+              heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
+              rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+              extras: [
+                { label: 'scenario', value: scenarioShortLabel(model) },
+                { label: 'frame', value: String(model.frameIndex) },
+                { label: 'cycle', value: `${model.cycle} [${model.scenarioIndex + 1}/${displayScenarios.length}]` },
+              ],
+            }, {
+              title: 'Perf',
+              width: Math.min(36, Math.floor(width * 0.4)),
+              chartHeight: 5,
+              ctx: appCtx,
+            });
+            scene.blit(perfPanel, width - perfPanel.width - 1, 1);
+            return scene;
           },
         };
       },
