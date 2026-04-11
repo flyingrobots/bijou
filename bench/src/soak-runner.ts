@@ -25,6 +25,7 @@ import { createSurface, perfOverlaySurface, type BijouContext, type Surface } fr
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import {
   createFramedApp,
+  createKeyMap,
   quit,
   run,
   type Cmd,
@@ -75,9 +76,12 @@ interface SoakModel {
   readonly elapsedMs: number;
   readonly paneWidth: number;
   readonly paneHeight: number;
+  readonly showPerf: boolean;
 }
 
-type SoakMsg = { readonly type: 'advance-scenario' };
+type SoakMsg =
+  | { readonly type: 'advance-scenario' }
+  | { readonly type: 'toggle-perf' };
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -149,6 +153,7 @@ function initScenario(scenarioIndex: number, cycle: number, width: number, heigh
     elapsedMs: 0,
     paneWidth: width,
     paneHeight: height,
+    showPerf: true,
   };
 }
 
@@ -198,7 +203,12 @@ function createSoakApp(appCtx: BijouContext) {
         const h = latestPaneHeight || 24;
         return [initScenario(0, 0, w, h), []];
       },
+      keyMap: createKeyMap<SoakMsg>().bind('`', 'Toggle perf overlay', { type: 'toggle-perf' }),
       update(msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
+        if (msg.type === 'toggle-perf') {
+          return [{ ...model, showPerf: !model.showPerf }, []];
+        }
+
         if (msg.type === 'advance-scenario') {
           const w = latestPaneWidth || model.paneWidth;
           const h = latestPaneHeight || model.paneHeight;
@@ -272,6 +282,8 @@ function createSoakApp(appCtx: BijouContext) {
             latestPaneHeight = height;
             const scene = renderScenarioSurface(model, width, height);
 
+            if (!model.showPerf) return scene;
+
             // Composite the perf overlay into the top-right corner.
             const recent = model.frameTimes;
             const windowSize = Math.min(20, recent.length);
@@ -326,7 +338,7 @@ function createSoakApp(appCtx: BijouContext) {
       const dims = `${pageModel.paneWidth}×${pageModel.paneHeight}`;
       const left = `${scenarioShortLabel(pageModel)}  ${dims}  frame ${pageModel.frameIndex}  ${ft}/frame`;
       const right = `cycle ${pageModel.cycle}  [${pageModel.scenarioIndex + 1}/${displayScenarios.length}]`;
-      return `${left}  |  ${right}`;
+      return `${left}  |  ${right}  |  \` perf`;
     },
   });
 }
