@@ -42,6 +42,9 @@ const STOPS: readonly { pos: number; r: number; g: number; b: number }[] = [
   { pos: 1.00, r: 0xff, g: 0xff, b: 0xff }, // white
 ];
 
+/** Background brightness factor for depth effect. */
+const BG_FACTOR = 0.4;
+
 /** Lerp between palette stops for a smooth continuous gradient. */
 function samplePalette(t: number): [number, number, number] {
   const clamped = Math.max(0, Math.min(1, t));
@@ -178,11 +181,9 @@ export const flame: Scenario<State> = {
         const h = heat[y * cols + x]!;
         const heatNorm = h / MAX_HEAT;
         const [r, g, b] = samplePalette(heatNorm);
-        // Bg is a slightly darker version for depth.
-        const bgF = 0.4;
-        const bgR = Math.round(r * bgF);
-        const bgG = Math.round(g * bgF);
-        const bgB = Math.round(b * bgF);
+        const bgR = Math.round(r * BG_FACTOR);
+        const bgG = Math.round(g * BG_FACTOR);
+        const bgB = Math.round(b * BG_FACTOR);
         surface.setRGB(x, y, BLOCK, r, g, b, bgR, bgG, bgB);
       }
     }

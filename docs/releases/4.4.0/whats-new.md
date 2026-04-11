@@ -97,5 +97,6 @@ reference from 35 to 36 families at 100% documented coverage.
 
 - Closed stale backlog items: RE-008, RE-007, RE-009, RE-010, RE-015
   (code fixes shipped in earlier releases; trackers administratively closed)
-- Added: RE-021 (frame owns the pump — cool idea for next major)
+- Added: [RE-021](../../method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md)
+  (frame owns the pump — cool idea for next major)
 - Removed: PLAN.md (redundant narrative wrapper)

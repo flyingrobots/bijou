@@ -32,7 +32,6 @@ interface State {
   readonly rows: number;
 }
 
-
 const BLOCK = 0x2588;
 
 export const diffGradient: Scenario<State> = {

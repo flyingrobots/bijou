@@ -59,7 +59,7 @@ export interface PerfOverlayOptions extends BijouNodeOptions {
 }
 
 function fmt(n: number, decimals: number): string {
-  return n.toFixed(decimals);
+  return Number.isFinite(n) ? n.toFixed(decimals) : '--';
 }
 
 /**

@@ -25,8 +25,8 @@ import type { Scenario } from './types.js';
 import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
-  current: PackedSurface;
-  target: PackedSurface;
+  readonly current: PackedSurface;
+  readonly target: PackedSurface;
   readonly sink: CountingSink;
   readonly style: StylePort;
   readonly cols: number;

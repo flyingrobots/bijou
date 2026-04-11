@@ -94,6 +94,7 @@ type SoakMsg =
 // ---------------------------------------------------------------------------
 
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
+// Matches both ASCII 'x' and Unicode '×' (U+00D7) in dimension suffixes like "(220×58)".
 const SCENARIO_LABEL_DIMENSION_SUFFIX = /\s*\(\d+[×x]\d+\)\s*$/;
 
 function currentScenario(model: SoakModel): (typeof displayScenarios)[number] {

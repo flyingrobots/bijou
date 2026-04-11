@@ -36,7 +36,7 @@ export const SCENARIOS: readonly AnyScenario[] = [
   componentApp,
   flame,
   soak,
-] as unknown as readonly AnyScenario[];
+] as unknown as readonly AnyScenario[]; // Scenario<T> is invariant on T; cast required for the heterogeneous registry
 
 /** Look up a scenario by ID, or throw if not found. */
 export function getScenario(id: string): AnyScenario {
