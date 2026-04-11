@@ -66,9 +66,9 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Current cycle and backlog
 
-- active cycle:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - latest completed cycle:
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- previous completed cycle:
   - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
-- remaining queue note:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- cool ideas:
+  - [RE-021 — Frame Owns the Pump](../method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md)

@@ -82,7 +82,6 @@ docs/
   graveyard/                       deliberately rejected work
   release.md                       repo-native release process
   CHANGELOG.md                     ship-facing truth
-  PLAN.md                          short narrative summary of current posture
   ROADMAP.md                       broad legacy/reference surface
 ```
 
@@ -98,9 +97,9 @@ Bijou's bounded signposts are:
 | [`docs/VISION.md`](./VISION.md) | Bounded synthesis of what Bijou is trying to become. |
 | [`docs/CHANGELOG.md`](./CHANGELOG.md) | Shipped or merged behavior truth. |
 
-`PLAN.md` is a narrative summary, not the authority. The authority is
-the combined repo state of backlog lanes, design docs, tests, changelog,
-and signposts.
+The authority is the combined repo state of backlog lanes, design
+docs, tests, changelog, and signposts. `BEARING.md` provides the
+current direction summary.
 
 ## Backlog
 
@@ -150,7 +149,7 @@ At cycle boundaries:
 - file irritating debt in `bad-code/`
 - move rejected work into `docs/graveyard/`
 
-Do not let `PLAN.md` substitute for this filesystem work.
+Do not let narrative summaries substitute for this filesystem work.
 
 ## Legends
 

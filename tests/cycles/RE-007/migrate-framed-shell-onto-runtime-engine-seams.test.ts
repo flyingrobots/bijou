@@ -8,7 +8,6 @@ describe('RE-007 migrate framed shell onto runtime engine seams cycle', () => {
     const cycle = readRepoFile('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md');
 
     expect(existsRepoPath('docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md')).toBe(true);
-    expect(legend).toContain('active cycle:');
     expect(legend).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
     expect(bearing).toContain('[RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)');
 

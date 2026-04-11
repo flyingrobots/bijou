@@ -44,7 +44,7 @@ Bijou now tracks work through:
 
 - `docs/specs/` remains a legacy/reference surface for older artifacts.
 - `docs/ROADMAP.md` is reference, not the current queue.
-- `docs/PLAN.md` is a narrative summary, not the source of truth.
+- `docs/BEARING.md` is a direction summary, not the source of truth.
 - Legends, cycle docs, tests, and backlog placement must agree.
 - Agents are first-class users and should have explicit hills and
   playback questions where relevant.

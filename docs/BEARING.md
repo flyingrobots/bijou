@@ -2,27 +2,38 @@
 
 ## Where Are We Going?
 
-The runtime engine has its performance foundation. The render pipeline
-is now byte-packed, zero-alloc on the hot path, and benchmarked.
+The runtime engine has its performance foundation and the render pipeline
+is byte-packed and zero-alloc on the hot path. The framed app render
+loop itself is now zero-alloc for header/footer painting.
 
-That means the next gravity is split between:
+The next gravity is split between:
 
-- **making the runtime provably fast in real apps** — the synthetic
-  benchmarks still show overhead from the `set()` hex-parsing path;
-  future work (byte-level WritePort, pre-allocated output buffers)
-  will close this gap
 - **deepening the product surface** — DOGFOOD story quality, layout
   and viewport formalization, and the i18n catalog loader are all
   waiting behind the engine work
 - **making Bijou self-documenting for AI** — the MCP rendering server
   shipped in 4.2.0, and interactive component documentation is next
+- **data visualization maturity** — the sparkline/braille/stats/perf
+  toolkit shipped in 4.4.0; deeper chart types and interactivity are
+  future directions
 
 ## What Just Shipped?
+
+### 4.4.0
+
+- Data visualization toolkit: `sparkline()`, `brailleChartSurface()`,
+  `statsPanelSurface()`, `perfOverlaySurface()`
+- Zero-alloc framed app header/footer, scoped pane scratch pool (RE-010)
+- New bench scenarios: flame, component-app (dynamic sizing)
+- Soak runner rewritten on `createFramedApp`
+- DOGFOOD data-viz stories (36/36 families at 100% coverage)
+- Backlog cleanup: RE-008, RE-007, RE-009, RE-010, RE-015 resolved
 
 ### 4.3.0
 
 - [RE-008](./design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md)
   — byte-packed surface representation (23 commits, 19 slices)
+- [RE-017](./perf/RE-017-byte-pipeline.md) — byte-pipeline performance recovery
 - RE-015 fix — braille art corruption resolved by packed byte-copy blit
 - RE-010 closed — mutable surface caches resolved by packed buffer + dirty bitmap
 
@@ -56,9 +67,6 @@ See [4.1.0 release docs](./releases/4.1.0/whats-new.md).
 
 - notification toast hit-testing stays outside the retained layout
   system (viewport-positioned overlays managed by notification.ts)
-- synthetic benchmarks still regress vs pre-packed-surface baseline
-  (the `set()` hex-parsing path dominates in stress tests, though
-  real apps are faster)
 - `@flyingrobots/bijou-i18n` has no built-in catalog loader — users
   must manually orchestrate the load-parse-register pipeline
 - RE-016 (grapheme width for ambiguous-width emoji icons) has no

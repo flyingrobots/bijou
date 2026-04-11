@@ -2,7 +2,7 @@
 
 This document is the structural reference for the current repository shape.
 
-If you want the current execution order, read [PLAN.md](./PLAN.md).
+If you want the current execution direction, read [BEARING.md](./BEARING.md).
 If you want the public front door, read [../README.md](../README.md).
 If you want the engineering doctrine behind the repo shape, read
 [system-style-javascript.md](./system-style-javascript.md).
@@ -22,7 +22,7 @@ The architectural posture after `v4.0.0` is:
 - keep the core toolkit honest about degradation and string/surface seams
 - keep the fullscreen runtime honest about its `Surface | LayoutNode` boundary
 - use DOGFOOD as the proving surface for shell, design-language, and runtime behavior
-- keep the current execution center of gravity on the runtime-engine seams described in [PLAN.md](./PLAN.md)
+- keep the current execution center of gravity on the runtime-engine seams described in [BEARING.md](./BEARING.md)
 
 ## Package Graph
 
@@ -211,7 +211,7 @@ The current post-`v4.0.0` architectural work is making the engine seams beneath 
 - explicit component interaction contracts
 - shell migration onto those seams
 
-See [PLAN.md](./PLAN.md) and the [RE legend](./legends/RE-runtime-engine.md) for sequencing.
+See [BEARING.md](./BEARING.md) and the [RE legend](./legends/RE-runtime-engine.md) for sequencing.
 
 ## DOGFOOD As Architecture Pressure
 
@@ -260,5 +260,5 @@ This is not the planning source of truth.
 Use:
 
 - [Documentation Map](./README.md) for the docs entrypoint
-- [PLAN.md](./PLAN.md) for current execution order
+- [BEARING.md](./BEARING.md) for current execution order
 - [ROADMAP.md](./ROADMAP.md) only as the broader legacy/reference surface

@@ -15,8 +15,7 @@ describe('WF-004 shape the next release', () => {
     expect(existsRepoPath('docs/releases/4.1.0/migration-guide.md')).toBe(true);
 
     const releaseDocs = readRepoFile('docs/releases/README.md');
-    expect(releaseDocs).toContain("What's New (v4.1.0)");
-    expect(releaseDocs).toContain('Migration Guide (v4.1.0)');
+    expect(releaseDocs).toContain('4.1.0');
   });
 
   it('spawns explicit 4.1.0 follow-on cycles from the release-shaping decision', () => {

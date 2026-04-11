@@ -58,8 +58,9 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 ### Latest Shipped Release
 
-The latest shipped release is **`4.3.0`**.
+The latest shipped release is **`4.4.0`**.
 
+- `4.4.0` — data-viz toolkit, zero-alloc framed app render, new bench scenarios
 - `4.3.0` — RE-008 byte-packed surface, RE-015 braille fix, `setRGB` API
 - `4.2.0` — RE-007 framed shell, `@flyingrobots/bijou-mcp`, METHOD migration
 - `4.1.0` — runtime engine through RE-006, DOGFOOD maturation (DF-021
@@ -73,8 +74,8 @@ Long-form release docs live under `docs/releases/<version>/`.
 ### Next Release Posture
 
 The next release is not shaped yet. The engineering focus is on
-proving the packed-surface performance in more scenarios and
-deepening the product surface (DOGFOOD, i18n, MCP docs).
+deepening the product surface (DOGFOOD story quality, i18n catalog
+loader, MCP interactive docs) and layout/viewport formalization.
 
 ### Lock-step Versioned Units
 
@@ -195,7 +196,7 @@ When the version is chosen, move that directory to
 docs.
 
 For the latest shipped release, that work lives under
-`docs/releases/4.1.0/`.
+`docs/releases/4.4.0/`.
 
 ## Phase 3: Local Validation
 

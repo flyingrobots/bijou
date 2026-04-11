@@ -4,6 +4,38 @@ Shipped work and completed branch milestones, newest first. See [CHANGELOG.md](C
 
 ---
 
+## v4.4.0 — Data Visualization Toolkit
+
+- **Completed:** 2026-04-10
+- **Summary:** Shipped the data-visualization component family (`sparkline`, `brailleChartSurface`, `statsPanelSurface`, `perfOverlaySurface`) with 27 tests. Zero-alloc framed app header/footer painting. Scoped pane scratch pool (RE-010). New bench scenarios (flame, component-app) with dynamic sizing. Soak runner rewritten on `createFramedApp`. DOGFOOD data-viz stories (36/36 families at 100% coverage). Backlog cleanup: RE-008, RE-007, RE-009, RE-010, RE-015 resolved.
+- **Ref:** [`v4.4.0`](https://github.com/flyingrobots/bijou/releases/tag/v4.4.0)
+
+---
+
+## v4.3.0 — Byte-Packed Surface Rendering
+
+- **Completed:** 2026-04-10
+- **Summary:** Byte-packed surface representation (RE-008), byte-pipeline performance recovery (RE-017), `setRGB` zero-alloc API, direct ANSI emission, braille rendering fix (RE-015), bench v2 harness.
+- **Ref:** [`v4.3.0`](https://github.com/flyingrobots/bijou/releases/tag/v4.3.0)
+
+---
+
+## v4.2.0 — MCP and Runtime Engine Migration
+
+- **Completed:** 2026-04-08
+- **Summary:** RE-007 framed shell migration, `@flyingrobots/bijou-mcp` rendering server (22 tools), METHOD migration, DOGFOOD corpus cycles (DF-022 through DF-026), WF-003 smoke migration, inspector fix.
+- **Ref:** [`v4.2.0`](https://github.com/flyingrobots/bijou/releases/tag/v4.2.0)
+
+---
+
+## v4.1.0 — Runtime Engine and DOGFOOD Maturation
+
+- **Completed:** 2026-04-04
+- **Summary:** Runtime engine through RE-006, DOGFOOD maturation (DF-021 through DF-026), i18n packages, explicit layer objects, layer-stack routing. See [4.1.0 release docs](releases/4.1.0/whats-new.md).
+- **Ref:** [`v4.1.0`](https://github.com/flyingrobots/bijou/releases/tag/v4.1.0)
+
+---
+
 ## v4.0.0 — Pure Surface Release
 
 - **Completed:** 2026-03-22
