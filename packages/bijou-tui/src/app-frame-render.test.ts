@@ -454,7 +454,7 @@ describe('frame layout composition', () => {
         scrollByPane: {},
         visibility: createPanelVisibilityState(),
         dockState: createPanelDockState(),
-        frameBackgroundHex: undefined,
+        frameBackgroundToken: undefined,
       },
     );
 

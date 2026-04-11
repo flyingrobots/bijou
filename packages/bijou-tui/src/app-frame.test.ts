@@ -1,6 +1,6 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext, stringToSurface, surfaceToString, type BijouContext } from '@flyingrobots/bijou';
+import { setDefaultContext, stringToSurface, surfaceToString, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
@@ -70,6 +70,54 @@ function textView(text: string) {
   const lines = text.split('\n');
   const width = Math.max(1, ...lines.map((line) => line.length));
   return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
+function createAlternateShellTheme(ctx: BijouContext) {
+  const baseTheme = ctx.theme.theme;
+  return {
+    ...baseTheme,
+    name: 'alternate-shell',
+    semantic: {
+      ...baseTheme.semantic,
+      muted: {
+        ...baseTheme.semantic.muted,
+        hex: '#7dd3fc',
+      },
+    },
+    border: {
+      ...baseTheme.border,
+      primary: {
+        ...baseTheme.border.primary,
+        hex: '#ff66cc',
+      },
+    },
+    surface: {
+      ...baseTheme.surface,
+      elevated: {
+        ...baseTheme.surface.elevated,
+        hex: '#e8f6ff',
+        bg: '#18324a',
+      },
+    },
+  };
+}
+
+function surfaceHasFg(surface: Surface, fg: string): boolean {
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      if (surface.get(x, y).fg === fg) return true;
+    }
+  }
+  return false;
+}
+
+function surfaceHasBg(surface: Surface, bg: string): boolean {
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      if (surface.get(x, y).bg === bg) return true;
+    }
+  }
+  return false;
 }
 
 function seedNotificationHistory<Msg>(
@@ -1740,7 +1788,7 @@ describe('createFramedApp', () => {
     const explicitCtx = createTestContext({ mode: 'interactive' });
     const originalTheme = explicitCtx.theme;
     const originalTokenGraph = explicitCtx.tokenGraph;
-    const alternateTheme = { ...explicitCtx.theme.theme, name: 'alternate-shell' } as any;
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
     const emitted: Array<{ readonly id: string; readonly ctx: BijouContext }> = [];
 
     _resetDefaultContextForTesting();
@@ -1775,6 +1823,62 @@ describe('createFramedApp', () => {
       expect(explicitCtx.theme).toBe(originalTheme);
       expect(explicitCtx.tokenGraph).toBe(originalTokenGraph);
       expect(explicitCtx.theme.theme.name).not.toBe('alternate-shell');
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
+  it('uses the active shell theme for shell-owned modals and palette content with an explicit ctx', () => {
+    const explicitCtx = createTestContext({
+      mode: 'interactive',
+      runtime: { columns: 80, rows: 24 },
+    });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        enableCommandPalette: true,
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: explicitCtx.theme.theme },
+          { id: 'alternate', label: 'Alternate', theme: alternateTheme },
+        ],
+      });
+
+      let [model] = app.init();
+      [model] = app.update(ctrlKey(','), model);
+      [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+      expect(model.activeShellThemeId).toBe('alternate');
+
+      [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+      let surface = normalizeViewOutput(app.view(model), {
+        width: explicitCtx.runtime.columns,
+        height: explicitCtx.runtime.rows,
+      }).surface;
+      expect(surfaceToString(surface, explicitCtx.style)).toContain('Keyboard Help');
+      expect(surfaceHasBg(surface, '#18324a')).toBe(true);
+
+      [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+      [model] = app.update(ctrlKey('p'), model);
+      surface = normalizeViewOutput(app.view(model), {
+        width: explicitCtx.runtime.columns,
+        height: explicitCtx.runtime.rows,
+      }).surface;
+      expect(surfaceToString(surface, explicitCtx.style)).toContain('Command Palette');
+      expect(surfaceHasBg(surface, '#18324a')).toBe(true);
+      expect(surfaceHasFg(surface, '#7dd3fc')).toBe(true);
+
+      [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+      [model] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+      surface = normalizeViewOutput(app.view(model), {
+        width: explicitCtx.runtime.columns,
+        height: explicitCtx.runtime.rows,
+      }).surface;
+      expect(surfaceToString(surface, explicitCtx.style)).toContain('Quit?');
+      expect(surfaceHasBg(surface, '#18324a')).toBe(true);
+      expect(surfaceHasFg(surface, '#ff66cc')).toBe(true);
     } finally {
       setDefaultContext(testCtx);
     }
@@ -2176,6 +2280,55 @@ describe('createFramedApp', () => {
     expect(noticeLine).toBeGreaterThan(stackLine + 1);
     expect(lines[noticeLine]!.indexOf('Deploy failed')).toBeGreaterThan(0);
     expect(historyLine).toBeGreaterThan(noticeLine + 2);
+  });
+
+  it('uses the active shell theme for the notification center drawer with an explicit ctx', () => {
+    const explicitCtx = createTestContext({
+      mode: 'interactive',
+      runtime: { columns: 90, rows: 18 },
+    });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+    const live = pushNotification(createNotificationState<Msg>(), {
+      title: 'Deploy failed',
+      message: 'The worker crashed before boot.',
+      tone: 'ERROR',
+      durationMs: null,
+    }, 999);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        initialColumns: 90,
+        initialRows: 18,
+        pages: [makePage('home', 'Home', 'main')],
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: explicitCtx.theme.theme },
+          { id: 'alternate', label: 'Alternate', theme: alternateTheme },
+        ],
+        notificationCenter: () => ({
+          state: live,
+        }),
+      });
+
+      let [model] = app.init();
+      [model] = app.update(ctrlKey(','), model);
+      [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+      [model] = app.update(shiftKey('n') as unknown as Msg, model);
+
+      const surface = normalizeViewOutput(app.view(model), {
+        width: explicitCtx.runtime.columns,
+        height: explicitCtx.runtime.rows,
+      }).surface;
+      const rendered = surfaceToString(surface, explicitCtx.style);
+
+      expect(rendered).toContain('Notifications');
+      expect(rendered).toContain('Deploy failed');
+      expect(surfaceHasBg(surface, '#18324a')).toBe(true);
+      expect(surfaceHasFg(surface, '#ff66cc')).toBe(true);
+    } finally {
+      setDefaultContext(testCtx);
+    }
   });
 
   it('surfaces a footer notification cue when archived shell notifications exist', async () => {

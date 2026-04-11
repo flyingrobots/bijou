@@ -2323,6 +2323,9 @@ export function createFramedApp<PageModel, Msg>(
           hint: typeof activeLayer.hintSource === 'string'
             ? activeLayer.hintSource
             : frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close'),
+          borderToken: themedFrameCtx?.border('primary'),
+          bgToken: themedFrameCtx?.surface('elevated'),
+          ctx: themedFrameCtx,
           width: helpOverlay.body.width + 4,
           screenWidth: model.columns,
           screenHeight: model.rows,
@@ -2331,7 +2334,10 @@ export function createFramedApp<PageModel, Msg>(
 
       if (model.commandPalette != null) {
         const paletteWidth = Math.max(20, Math.min(80, model.columns - 4));
-        const paletteBody = commandPalette(model.commandPalette, { width: Math.max(16, paletteWidth - 4) });
+        const paletteBody = commandPalette(model.commandPalette, {
+          width: Math.max(16, paletteWidth - 4),
+          ctx: themedFrameCtx,
+        });
         const paletteLayer = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
           ? activeLayer
           : undefined;
@@ -2341,6 +2347,9 @@ export function createFramedApp<PageModel, Msg>(
           hint: typeof paletteLayer?.hintSource === 'string'
             ? paletteLayer.hintSource
             : frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close'),
+          borderToken: themedFrameCtx?.border('primary'),
+          bgToken: themedFrameCtx?.surface('elevated'),
+          ctx: themedFrameCtx,
           width: paletteWidth,
           screenWidth: model.columns,
           screenHeight: model.rows,
@@ -2348,7 +2357,7 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.quitConfirmOpen) {
-        overlays.push(renderShellQuitOverlay(model.columns, model.rows, options.i18n));
+        overlays.push(renderShellQuitOverlay(model.columns, model.rows, options.i18n, themedFrameCtx));
       }
 
       if (bodySurface != null && bodyRect.width > 0 && bodyRect.height > 0) {
@@ -2922,6 +2931,9 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
     anchor: layout.anchor,
     title: titleOverride ?? `${layout.center.title} • ${frameNotificationFilterLabel(options.i18n, layout.center.activeFilter)}`,
     content: body,
+    borderToken: ctx?.border('primary'),
+    bgToken: ctx?.surface('elevated'),
+    ctx,
     width: layout.drawerWidth,
     screenWidth: model.columns,
     screenHeight: model.rows,

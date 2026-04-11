@@ -222,7 +222,7 @@ function paintFrameNodeInto<PageModel, Msg>(
     if (isMinimized(ctx.visibility, node.paneId)) {
       const titleBar = `[${node.paneId}] \u25b8`; // ▸
       target.blit(
-        applySurfaceBackground(blockSurface(titleBar, localRect.width, localRect.height), ctx.frameBackgroundHex),
+        applySurfaceBackground(blockSurface(titleBar, localRect.width, localRect.height), ctx.frameBackgroundToken),
         localRect.col,
         localRect.row,
       );
@@ -239,7 +239,7 @@ function paintFrameNodeInto<PageModel, Msg>(
       localRect.height,
       getFramePaneScratch(scratchPool, localRect.width, localRect.height),
     );
-    applySurfaceBackground(contentSurface, ctx.frameBackgroundHex);
+    applySurfaceBackground(contentSurface, ctx.frameBackgroundToken);
     let state = createFocusAreaStateForSurface(contentSurface, {
       width: localRect.width,
       height: localRect.height,
@@ -341,7 +341,7 @@ function paintFrameNodeInto<PageModel, Msg>(
       target.blit(
         applySurfaceBackground(
           blockSurface(`[missing grid cell: ${areaName}]`, localAreaRect.width, localAreaRect.height),
-          ctx.frameBackgroundHex,
+          ctx.frameBackgroundToken,
         ),
         localAreaRect.col,
         localAreaRect.row,
@@ -402,8 +402,8 @@ export function renderPageContentInto<PageModel, Msg>(
   ctx?: BijouContext,
 ): FramePaneGeometryResult {
   const themeCtx = resolveRenderCtx(ctx);
-  const frameBackgroundHex = resolveFrameBackgroundHex(themeCtx);
-  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
+  const frameBackgroundToken = resolveFrameBackgroundToken(themeCtx);
+  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundToken);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const renderCtx: RenderContext<PageModel, Msg> = {
@@ -413,7 +413,7 @@ export function renderPageContentInto<PageModel, Msg>(
     scrollByPane: model.scrollByPage[pageId] ?? {},
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
-    frameBackgroundHex,
+    frameBackgroundToken,
     ctx: themeCtx,
   };
   return paintFrameNodeInto(
@@ -455,8 +455,8 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   ctx?: BijouContext,
 ): FramePaneGeometryResult {
   const themeCtx = resolveRenderCtx(ctx);
-  const frameBackgroundHex = resolveFrameBackgroundHex(themeCtx);
-  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
+  const frameBackgroundToken = resolveFrameBackgroundToken(themeCtx);
+  fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundToken);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
   const layoutTree = page.layout(pageModel);
@@ -473,7 +473,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
     bodyRect.height,
     getFramePaneScratch(scratchPool, bodyRect.width, bodyRect.height),
   );
-  applySurfaceBackground(contentSurface, frameBackgroundHex);
+  applySurfaceBackground(contentSurface, frameBackgroundToken);
   let state = createFocusAreaStateForSurface(contentSurface, {
     width: bodyRect.width,
     height: bodyRect.height,
@@ -505,7 +505,7 @@ export function resolveHeaderLine<PageModel, Msg>(
   ctx?: BijouContext,
 ): FrameHeaderRenderResult {
   const renderCtx = resolveRenderCtx(ctx);
-  const frameBackgroundHex = resolveFrameBackgroundHex(renderCtx);
+  const frameBackgroundToken = resolveFrameBackgroundToken(renderCtx);
   const activePage = pagesById.get(model.activePageId)!;
   const activePageModel = model.pageModels[model.activePageId]!;
   const headerStyle = options.headerStyle?.({
@@ -543,7 +543,7 @@ export function resolveHeaderLine<PageModel, Msg>(
     classes: [`page-${model.activePageId}`],
   });
   paintActiveHeaderTab(surface, tabTargets, model.activePageId, renderCtx, headerStyle?.activeTabToken);
-  applySurfaceBackground(surface, frameBackgroundHex);
+  applySurfaceBackground(surface, frameBackgroundToken);
   return {
     surface,
     tabTargets,
@@ -597,7 +597,7 @@ export function renderHelpLine<PageModel, Msg>(
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
-  }), resolveFrameBackgroundHex(renderCtx));
+  }), resolveFrameBackgroundToken(renderCtx));
 }
 
 /**
@@ -649,8 +649,12 @@ export function blockSurface(content: string, width: number, height: number): Su
   return parseAnsiToSurface(fitBlock(content, width, height).join('\n'), width, height);
 }
 
-function resolveFrameBackgroundHex(ctx: BijouContext | undefined): string | undefined {
-  return ctx?.surface('primary').bg ?? ctx?.surface('secondary').bg;
+function resolveFrameBackgroundToken(ctx: BijouContext | undefined): TokenValue | undefined {
+  const primary = ctx?.surface('primary');
+  if (primary?.bg != null || primary?.bgRGB != null) return primary;
+  const secondary = ctx?.surface('secondary');
+  if (secondary?.bg != null || secondary?.bgRGB != null) return secondary;
+  return undefined;
 }
 
 function resolveRenderCtx(ctx: BijouContext | undefined): BijouContext | undefined {
@@ -663,14 +667,21 @@ function fillSurfaceBackground(
   offsetRow: number,
   width: number,
   height: number,
-  backgroundHex: string | undefined,
+  backgroundToken: TokenValue | undefined,
 ): void {
-  if (backgroundHex == null || width <= 0 || height <= 0) return;
-  target.fill({ char: ' ', bg: backgroundHex, empty: false }, offsetCol, offsetRow, width, height);
+  if (backgroundToken == null || width <= 0 || height <= 0) return;
+  if (backgroundToken.bg == null && backgroundToken.bgRGB == null) return;
+  target.fill({
+    char: ' ',
+    bg: backgroundToken.bg,
+    bgRGB: backgroundToken.bgRGB,
+    empty: false,
+  }, offsetCol, offsetRow, width, height);
 }
 
-function applySurfaceBackground(surface: Surface, backgroundHex: string | undefined): Surface {
-  if (backgroundHex == null) return surface;
+function applySurfaceBackground(surface: Surface, backgroundToken: TokenValue | undefined): Surface {
+  if (backgroundToken == null) return surface;
+  if (backgroundToken.bg == null && backgroundToken.bgRGB == null) return surface;
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
@@ -678,7 +689,8 @@ function applySurfaceBackground(surface: Surface, backgroundHex: string | undefi
       surface.set(x, y, {
         ...cell,
         char: cell.char.length > 0 ? cell.char : ' ',
-        bg: backgroundHex,
+        bg: backgroundToken.bg,
+        bgRGB: backgroundToken.bgRGB,
         empty: false,
       });
     }

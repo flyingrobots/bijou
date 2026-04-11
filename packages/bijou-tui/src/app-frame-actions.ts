@@ -299,7 +299,7 @@ export function scrollFocusedPane<PageModel, Msg>(
     scrollByPane: model.scrollByPage[pageId] ?? {},
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
-    frameBackgroundHex: undefined,
+    frameBackgroundToken: undefined,
   });
   const paneRect = resolved.paneRects.get(focusedPaneId);
   if (paneRect == null || paneRect.width <= 0 || paneRect.height <= 0) return model;

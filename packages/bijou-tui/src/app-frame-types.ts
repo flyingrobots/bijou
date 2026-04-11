@@ -12,7 +12,7 @@ import type { BindingInfo } from './keybindings.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PanelDockState } from './panel-dock.js';
 import type { FrameModel } from './app-frame.js';
-import type { BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
 // Symbols
@@ -84,7 +84,7 @@ export interface RenderContext<PageModel, Msg> {
   readonly scrollByPane: Readonly<Record<string, { readonly x: number; readonly y: number }>>;
   readonly visibility: PanelVisibilityState;
   readonly dockState: PanelDockState;
-  readonly frameBackgroundHex: string | undefined;
+  readonly frameBackgroundToken: TokenValue | undefined;
   readonly ctx?: BijouContext;
 }
 
