@@ -176,8 +176,8 @@ export const flame: Scenario<State> = {
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const h = heat[y * cols + x]!;
-        const t = h / MAX_HEAT;
-        const [r, g, b] = samplePalette(t);
+        const heatNorm = h / MAX_HEAT;
+        const [r, g, b] = samplePalette(heatNorm);
         // Bg is a slightly darker version for depth.
         const bgF = 0.4;
         const bgR = Math.round(r * bgF);

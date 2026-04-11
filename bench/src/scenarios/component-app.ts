@@ -42,7 +42,7 @@ interface State {
   readonly cols: number;
   readonly rows: number;
   readonly ctx: BijouContext;
-  readonly sparkData: number[];
+  sparkData: number[];
 }
 
 const SIDEBAR_WIDTH = 28;
@@ -93,7 +93,7 @@ function paintApp(state: State, frameIndex: number): void {
   }
 
   // --- Body: table + progress ---
-  const tableWidth = Math.min(bodyWidth - 2, 60);
+  const tableWidth = Math.max(1, Math.min(bodyWidth - 2, 60));
   const tbl = tableSurface({
     columns: [
       { header: 'Service' },

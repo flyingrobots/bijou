@@ -40,10 +40,13 @@ export function createSink(): CountingSink {
 /**
  * Minimal StylePort stub. The packed differ bypasses StylePort for
  * the byte path, but the interface is still required. This stub
- * returns the input unchanged.
+ * returns all text unchanged.
  */
 export const stubStyle: StylePort = {
-  styled(_token: unknown, text: string): string {
-    return text;
-  },
-} as unknown as StylePort;
+  styled(_token: unknown, text: string): string { return text; },
+  rgb(_r: number, _g: number, _b: number, text: string): string { return text; },
+  hex(_color: string, text: string): string { return text; },
+  bgRgb(_r: number, _g: number, _b: number, text: string): string { return text; },
+  bgHex(_color: string, text: string): string { return text; },
+  bold(text: string): string { return text; },
+};

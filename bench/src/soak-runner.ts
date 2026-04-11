@@ -42,7 +42,9 @@ import { computeStats, formatNs } from './stats.js';
 const argv = process.argv.slice(2);
 function argNum(name: string, fallback: number): number {
   const match = argv.find((a) => a.startsWith(`--${name}=`));
-  return match ? parseFloat(match.split('=')[1]!) : fallback;
+  if (!match) return fallback;
+  const n = parseFloat(match.split('=')[1]!);
+  return Number.isFinite(n) ? n : fallback;
 }
 function argStr(name: string, fallback: string): string {
   const match = argv.find((a) => a.startsWith(`--${name}=`));
@@ -60,6 +62,10 @@ const displayScenarios = SCENARIOS.filter(
     s.getDisplaySurface !== undefined,
 );
 
+if (displayScenarios.length === 0) {
+  throw new Error('No display scenarios found — at least one scenario must define getDisplaySurface');
+}
+
 // Ensure log file exists.
 if (!existsSync(LOG_PATH)) writeFileSync(LOG_PATH, '');
 
@@ -71,7 +77,7 @@ interface SoakModel {
   readonly scenarioIndex: number;
   readonly scenarioState: unknown;
   readonly frameIndex: number;
-  readonly frameTimes: number[];
+  frameTimes: number[];
   readonly cycle: number;
   readonly elapsedMs: number;
   readonly paneWidth: number;
@@ -255,6 +261,9 @@ function createSoakApp(appCtx: BijouContext) {
           const t0 = performance.now();
           scenario.frame(model.scenarioState, startFrame + model.frameIndex);
           const t1 = performance.now();
+          // performance.now() has microsecond resolution; the multiplication
+          // gives µs-precision values stored as nanoseconds for consistency
+          // with the headless harness output format.
           const frameNs = (t1 - t0) * 1_000_000;
 
           // frameTimes is a mutable array shared across model snapshots —

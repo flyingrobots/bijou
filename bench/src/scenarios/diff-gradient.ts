@@ -21,7 +21,7 @@ import {
   type StylePort,
 } from '@flyingrobots/bijou';
 import type { Scenario } from './types.js';
-import { CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
+import { type CountingSink, isPacked, createSink, stubStyle } from './_shared.js';
 
 interface State {
   readonly current: PackedSurface;
@@ -77,8 +77,10 @@ export const diffGradient: Scenario<State> = {
         target.setRGB(col, row, BLOCK, r1, g1, b1, r2, g2, b2);
       }
     }
-    // Run the diff
+    // Run the diff and reset dirty bitmaps for the next frame.
     renderDiff(current, target, sink, style);
+    if (isPacked(target)) target.markAllRenderClean();
+    if (isPacked(current)) current.markAllRenderClean();
   },
 
   getDisplaySurface(state) {
