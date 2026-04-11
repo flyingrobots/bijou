@@ -50,7 +50,22 @@ view — no framework integration required.
 - Should the overlay be tree-shakeable (dev-only) or always available?
 - Should it support custom metrics (app-defined counters/gauges)?
 
+## Progress (2026-04-10)
+
+The generic toolkit components are now shipped in `@flyingrobots/bijou`:
+`sparkline`, `brailleChartSurface`, `statsPanelSurface`, `perfOverlaySurface`.
+The soak runner uses `perfOverlaySurface` as a composited overlay with
+backtick toggle. This proves the composable-surface approach works.
+
+The remaining open question — "should the pipeline expose phase timing
+natively?" — is addressed by [RE-021 Frame Owns the Pump](RE-021-frame-owns-the-pump.md).
+If the frame owns the render loop, it naturally measures update/view/diff
+phase timing and can feed it to a built-in perf overlay without any
+special capability injection.
+
 ## Related
 
+- [RE-021 Frame Owns the Pump](RE-021-frame-owns-the-pump.md) — enables native phase timing
 - RE-008 byte-packed surface representation (affects rendering perf)
 - The perf gradient demo (`examples/perf-gradient`) as proof of concept
+- The soak runner perf overlay (this session) as integration proof
