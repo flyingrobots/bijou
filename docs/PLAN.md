@@ -21,57 +21,51 @@ filesystem listing.
 
 ## Current Posture
 
-Bijou has shipped `4.3.0`. The rendering pipeline is now byte-packed
-and benchmarked. The repo is in post-performance-release posture.
+Bijou is shaping `4.4.0`. The release adds the data-viz component
+toolkit, a rewritten soak runner, new bench scenarios, and frame
+rendering optimizations.
 
 The repo now has:
 
 - a current shipped release at `4.3.0`
+- `4.4.0` in progress with data-viz components, bench improvements,
+  and zero-alloc frame chrome
 - a byte-packed surface architecture (RE-008) with zero-alloc `setRGB`
   API and 100% component migration
+- data-viz toolkit: `sparkline`, `brailleChartSurface`, `statsPanelSurface`, `perfOverlaySurface`
+- soak runner rewritten on `createFramedApp` with dynamic-size scenarios
+- new bench scenarios: doom flame, component-app (realistic TUI)
+- zero-alloc header/footer in framed app render loop
 - an MCP rendering server (`@flyingrobots/bijou-mcp`) with 22 tools
-- runtime-engine slices landed through RE-007 (framed shell migration)
 - DOGFOOD as the canonical docs surface and release smoke contract
 - all ten workspace packages versioned in lock-step
 - METHOD-based planning with all 7 legends resolving
 
-Bijou has shipped `4.1.0`, `4.2.0`, and `4.3.0`. The DOGFOOD
-docs-site posture landed through DF-021, DF-022, DF-023, DF-024,
-DF-025, DF-026, and WF-003.
-
 The work now should favor:
 
-- proving performance gains in more real-world scenarios
-- deepening DOGFOOD story quality (DF-020)
+- cutting 4.4.0 (data-viz + bench + perf)
+- deepening DOGFOOD story quality (DF-020) — data-viz stories needed
 - the i18n catalog loader (LX-010)
-- MCP interactive documentation
+- frame-owns-the-pump architecture exploration (RE-021)
 
 ## Active Cycle
 
-- [RE-008 — Byte-Packed Surface Representation](./design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md) (in PR review)
+- 4.4.0 release shaping
 
 ## Recently Shipped
 
+- [RE-008 — Byte-Packed Surface Representation](./design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md) (shipped in 4.3.0)
 - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md) (shipped in 4.2.0)
-
-## After 4.1.0
-
-- keep the release-shaping arc closed as shipped history, not as a live
-  blocker lane
-- treat the `4.1.0` release docs under [`docs/releases/4.1.0/`](./releases/4.1.0/whats-new.md)
-  and the shipped changelog section as historical truth
-- use [docs/release.md](./release.md) as the procedure for the next
-  release only when a new version is deliberately shaped
 
 ## ASAP
 
 - [LX-010 — Built-in i18n Catalog Loader](./BACKLOG/asap/LX-010-built-in-i18n-catalog-loader.md)
-- [RE-008 — Byte-Packed Surface Representation](./BACKLOG/asap/RE-008-byte-packed-surface-representation.md)
 
 ## Near Follow-ons
 
-- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](./BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md) — data-viz stories needed
 - [DL-009 — Formalize Layout and Viewport Rules](./BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
+- [RE-021 — Frame Owns the Pump](./method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md) — next major architecture shift
 
 ## Supporting Backlog That Still Matters
 
