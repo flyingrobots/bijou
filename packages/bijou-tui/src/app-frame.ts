@@ -9,6 +9,7 @@ import {
   cloneContextWithResolvedTheme,
   createResolved,
   createSurface,
+  setDefaultContext,
   type LayoutNode as SurfaceLayoutNode,
   preparePreferenceSections,
   preferenceListSurface,
@@ -706,6 +707,14 @@ function resolveNextShellTheme(
   return shellThemes[(currentIndex + 1) % shellThemes.length];
 }
 
+function resolveShellThemeForContext(
+  shellThemes: readonly ResolvedFrameShellTheme[],
+  ctx: BijouContext | undefined,
+): ResolvedFrameShellTheme | undefined {
+  if (ctx == null) return undefined;
+  return shellThemes.find((theme) => theme.resolvedTheme.theme === ctx.theme.theme);
+}
+
 function mergeShellThemeSettings<Msg>(
   settings: FrameSettings<Msg> | undefined,
   shellThemes: readonly ResolvedFrameShellTheme[],
@@ -820,10 +829,11 @@ export function createFramedApp<PageModel, Msg>(
     ),
   })) ?? [];
   const enableShellThemeSettings = resolvedShellThemes.length > 1;
-  const initialShellTheme = resolvedShellThemes.find(
-    (theme) => theme.resolvedTheme.theme.name === defaultFrameCtx?.theme.theme.name,
-  ) ?? resolvedShellThemes[0];
+  const initialShellTheme = resolveShellThemeForContext(resolvedShellThemes, defaultFrameCtx)
+    ?? resolvedShellThemes[0];
+  const usesAmbientDefaultContext = options.ctx == null && defaultFrameCtx != null;
   let frameCtx = options.ctx;
+  let frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, frameCtx)?.id;
 
   function resolveFrameCtx(): BijouContext | undefined {
     return frameCtx ?? options.ctx ?? resolveSafeCtx();
@@ -834,7 +844,10 @@ export function createFramedApp<PageModel, Msg>(
     if (defaultFrameCtx == null) return baseCtx;
     const activeTheme = resolveCurrentShellTheme(resolvedShellThemes, activeShellThemeId);
     if (activeTheme == null) return baseCtx;
-    if (baseCtx?.theme.theme.name === activeTheme.resolvedTheme.theme.name) {
+    if (frameCtx != null && frameCtxShellThemeId === activeTheme.id) {
+      return frameCtx;
+    }
+    if (resolveShellThemeForContext(resolvedShellThemes, baseCtx)?.id === activeTheme.id) {
       return baseCtx;
     }
     return cloneShellThemeContext(defaultFrameCtx, activeTheme.resolvedTheme);
@@ -843,6 +856,10 @@ export function createFramedApp<PageModel, Msg>(
   function publishShellThemeContext(nextTheme: ResolvedFrameShellTheme): BijouContext | undefined {
     if (defaultFrameCtx == null) return resolveFrameCtx();
     frameCtx = cloneShellThemeContext(defaultFrameCtx, nextTheme.resolvedTheme);
+    frameCtxShellThemeId = nextTheme.id;
+    if (usesAmbientDefaultContext) {
+      setDefaultContext(frameCtx);
+    }
     options.onShellThemeChange?.({
       shellTheme: nextTheme.shellTheme,
       ctx: frameCtx,

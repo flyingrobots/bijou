@@ -72,7 +72,9 @@ If your page renderers read from an explicit app-owned `BijouContext`,
 pass that context to `createFramedApp({ ctx })`, mirror
 `onShellThemeChange` back into your app state, and make your page
 renderers read the updated context on each render so the frame shell and
-page content stay on one theme source of truth.
+page content stay on one theme source of truth. Apps that rely on the
+ambient default context can omit that wiring; the frame updates the
+default context when the stock shell theme changes.
 
 DOGFOOD now uses that shared frame-owned state so the title screen and
 docs explorer stay on one theme setting instead of drifting into mixed

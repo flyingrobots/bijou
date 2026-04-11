@@ -63,7 +63,9 @@ If your page renderers already resolve theme data from an explicit
 `BijouContext`, pass that context into `createFramedApp({ ctx })`,
 mirror `onShellThemeChange` back into your app-owned state, and make
 your page renderers read the updated context on each render. Apps that
-rely only on the ambient default context can omit both options.
+rely only on the ambient default context can omit both options; the
+frame will update that default context when the stock shell theme
+changes.
 
 You do not need to adopt this API, but it is now the simplest way to
 keep a landing screen, docs shell, or other frame-owned chrome on one

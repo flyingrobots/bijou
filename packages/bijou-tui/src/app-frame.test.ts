@@ -1,6 +1,14 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext, stringToSurface, surfaceToString, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  getDefaultContext,
+  setDefaultContext,
+  stringToSurface,
+  surfaceToString,
+  type BijouContext,
+  type Surface,
+} from '@flyingrobots/bijou';
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
@@ -99,6 +107,13 @@ function createAlternateShellTheme(ctx: BijouContext) {
         bg: '#18324a',
       },
     },
+  };
+}
+
+function createSameNameAlternateShellTheme(ctx: BijouContext) {
+  return {
+    ...createAlternateShellTheme(ctx),
+    name: ctx.theme.theme.name,
   };
 }
 
@@ -1828,6 +1843,74 @@ describe('createFramedApp', () => {
     }
   });
 
+  it('keeps ambient default-context apps in sync when shellThemes change without explicit ctx wiring', () => {
+    const defaultCtx = createTestContext({
+      mode: 'interactive',
+      runtime: { columns: 80, rows: 24 },
+    });
+    const alternateTheme = createAlternateShellTheme(defaultCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      setDefaultContext(defaultCtx);
+      const app = createFramedApp({
+        pages: [{
+          id: 'home',
+          title: 'Home',
+          init: () => [{ count: 0 }, []],
+          update: (msg, model) => [model, []],
+          layout: () => ({
+            kind: 'pane',
+            paneId: 'main',
+            render: () => {
+              const ctx = getDefaultContext();
+              const surface = createSurface(8, 1);
+              surface.fill({
+                char: ' ',
+                bg: ctx.surface('primary').bg,
+                bgRGB: ctx.surface('primary').bgRGB,
+                empty: false,
+              });
+              surface.set(0, 0, {
+                char: 'A',
+                fg: ctx.semantic('muted').hex,
+                fgRGB: ctx.semantic('muted').fgRGB,
+                bg: ctx.surface('primary').bg,
+                bgRGB: ctx.surface('primary').bgRGB,
+                empty: false,
+              });
+              return surface;
+            },
+          }),
+        }],
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: defaultCtx.theme.theme },
+          { id: 'alternate', label: 'Alternate', theme: alternateTheme },
+        ],
+      });
+
+      let [model] = app.init();
+      expect(model.activeShellThemeId).toBe('default');
+      expect(getDefaultContext().theme.theme).toBe(defaultCtx.theme.theme);
+
+      [model] = app.update(ctrlKey(','), model);
+      [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+      [model] = app.update({ type: 'key', key: 'escape', ctrl: false, alt: false, shift: false }, model);
+
+      expect(model.activeShellThemeId).toBe('alternate');
+      expect(getDefaultContext().theme.theme).toBe(alternateTheme);
+
+      const surface = normalizeViewOutput(app.view(model), {
+        width: defaultCtx.runtime.columns,
+        height: defaultCtx.runtime.rows,
+      }).surface;
+      expect(surfaceHasFg(surface, '#7dd3fc')).toBe(true);
+      expect(surfaceHasBg(surface, defaultCtx.surface('primary').bg ?? '')).toBe(true);
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
   it('uses the active shell theme for shell-owned modals and palette content with an explicit ctx', () => {
     const explicitCtx = createTestContext({
       mode: 'interactive',
@@ -1876,6 +1959,45 @@ describe('createFramedApp', () => {
         width: explicitCtx.runtime.columns,
         height: explicitCtx.runtime.rows,
       }).surface;
+      expect(surfaceToString(surface, explicitCtx.style)).toContain('Quit?');
+      expect(surfaceHasBg(surface, '#18324a')).toBe(true);
+      expect(surfaceHasFg(surface, '#ff66cc')).toBe(true);
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
+  it('applies shellThemes by option id even when multiple themes share the same Theme.name', () => {
+    const explicitCtx = createTestContext({
+      mode: 'interactive',
+      runtime: { columns: 80, rows: 24 },
+    });
+    const alternateTheme = createSameNameAlternateShellTheme(explicitCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: explicitCtx.theme.theme },
+          { id: 'same-name-alternate', label: 'Same Name Alternate', theme: alternateTheme },
+        ],
+      });
+
+      let [model] = app.init();
+      expect(model.activeShellThemeId).toBe('default');
+
+      [model] = app.update(ctrlKey(','), model);
+      [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+      [model] = app.update({ type: 'key', key: 'q', ctrl: false, alt: false, shift: false }, model);
+
+      const surface = normalizeViewOutput(app.view(model), {
+        width: explicitCtx.runtime.columns,
+        height: explicitCtx.runtime.rows,
+      }).surface;
+
+      expect(model.activeShellThemeId).toBe('same-name-alternate');
       expect(surfaceToString(surface, explicitCtx.style)).toContain('Quit?');
       expect(surfaceHasBg(surface, '#18324a')).toBe(true);
       expect(surfaceHasFg(surface, '#ff66cc')).toBe(true);
