@@ -575,7 +575,6 @@ export function renderHelpLine<PageModel, Msg>(
 }
 
 /**
-/**
  * Apply a transition shader to blend between the previous and next page views.
  *
  * @param frame - Monotonic frame counter passed to shaders for temporal effects

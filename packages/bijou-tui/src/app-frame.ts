@@ -1922,6 +1922,8 @@ export function createFramedApp<PageModel, Msg>(
       const maximizedPaneId = maxState?.maximizedPaneId;
 
       const frameSurface = getComposedFrameScratch(model.columns, model.rows);
+      // clear() is load-bearing: it resets dim flags left by overlay compositing
+      // on the previous frame. Do not skip or defer this call.
       frameSurface.clear();
       frameSurface.blit(header, 0, 0);
       if (model.rows > 1) {
