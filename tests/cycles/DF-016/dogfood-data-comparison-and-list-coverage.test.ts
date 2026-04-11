@@ -24,7 +24,7 @@ describe('DF-016 DOGFOOD data comparison and list coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(29);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(83);
     expect(coverage.coveredFamilyIds).toContain('dense-comparison');
     expect(coverage.coveredFamilyIds).toContain('lists-for-exploration');

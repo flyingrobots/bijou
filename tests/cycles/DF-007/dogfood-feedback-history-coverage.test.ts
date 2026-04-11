@@ -24,7 +24,7 @@ describe('DF-007 DOGFOOD feedback and history coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(11);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(31);
     expect(coverage.coveredFamilyIds).toContain('low-level-transient-overlay');
     expect(coverage.coveredFamilyIds).toContain('activity-stream');

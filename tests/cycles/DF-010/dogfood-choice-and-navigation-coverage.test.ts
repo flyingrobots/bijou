@@ -24,7 +24,7 @@ describe('DF-010 DOGFOOD choice and navigation coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(17);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(49);
     expect(coverage.coveredFamilyIds).toContain('single-choice');
     expect(coverage.coveredFamilyIds).toContain('peer-navigation');

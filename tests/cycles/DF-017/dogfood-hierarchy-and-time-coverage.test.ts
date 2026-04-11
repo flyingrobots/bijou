@@ -24,7 +24,7 @@ describe('DF-017 DOGFOOD hierarchy and time/dependency coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(31);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(89);
     expect(coverage.coveredFamilyIds).toContain('hierarchy');
     expect(coverage.coveredFamilyIds).toContain('temporal-or-dependency-views');

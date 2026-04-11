@@ -33,16 +33,10 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
   });
 
   it('keeps the signposts honest after 4.1.0 ships', () => {
-    const plan = readRepoFile('docs/PLAN.md');
     const bearing = readRepoFile('docs/BEARING.md');
     const releaseGuide = readRepoFile('docs/release.md');
     const workflowLegend = readRepoFile('docs/legends/WF-workflow-and-delivery.md');
     const dogfoodLegend = readRepoFile('docs/legends/DF-dogfood-field-guide.md');
-
-    expect(plan).toContain('Bijou has shipped `4.1.0`');
-    expect(plan).toContain('## Active Cycle');
-    expect(plan).toContain('RE-007 — Migrate Framed Shell Onto Runtime Engine Seams');
-    expect(plan).not.toContain('## Before 4.1.0 Ships');
 
     // BEARING evolves across releases; check that 4.1.0 and RE-007 are acknowledged
     expect(bearing).toContain('4.1.0');

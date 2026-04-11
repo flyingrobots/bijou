@@ -1203,6 +1203,43 @@ If those checks fail, the component work is not doctrinally complete yet.
 - Carbon analogue:
   - layout grid / split layout / stack primitives
 
+### Data visualization
+
+- Family:
+  - `sparkline()`
+  - `brailleChartSurface()`
+  - `statsPanelSurface()`
+  - `perfOverlaySurface()`
+- Variants:
+  - inline trend (sparkline string), high-density area chart (braille Surface), labeled metric panel (boxed key-value Surface), prebuilt performance dashboard (composed Surface)
+- Use when:
+  - the user needs to see numeric trends at a glance without leaving the terminal
+  - a time-series or rolling metric is the primary decision input
+  - you need a compact performance or status dashboard overlay
+- Avoid when:
+  - exact numeric precision matters more than shape — use `table()` instead
+  - the data is categorical rather than continuous — use `table()` or `tree()`
+  - the visualization would be decorative rather than informative
+- Ownership:
+  - Core
+- Content guidance:
+  - use `sparkline()` for inline trend hints next to a label; keep it short (8–20 chars)
+  - use `brailleChartSurface()` when the data deserves area-chart density and sub-pixel smoothness
+  - use `statsPanelSurface()` when multiple labeled metrics belong in one titled panel
+  - use `perfOverlaySurface()` as the ready-made FPS + memory overlay; prefer it over assembling stats + chart manually
+  - always supply `min`/`max` when comparing across views so axes stay stable
+- Graceful lowering:
+  - rich: Unicode block or Braille glyphs with semantic color tokens
+  - static: same glyph rendering without animation
+  - pipe: numeric summary (min/max/mean) or CSV-style output
+  - accessible: spoken trend summary (e.g. "rising from 2 to 8 over 10 samples")
+- Related families:
+  - `table()`
+  - `progressBar()`
+  - `timeline()`
+- Carbon analogue:
+  - sparkline / area chart / metric card
+
 ## Families that still need stronger doctrine
 
 These are shipped, but the guidance is still thinner than it should be:

@@ -24,7 +24,7 @@ describe('DF-013 DOGFOOD shell help and notification coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(23);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(66);
     expect(coverage.coveredFamilyIds).toContain('keybinding-help-and-shell-hints');
     expect(coverage.coveredFamilyIds).toContain('notification-system');

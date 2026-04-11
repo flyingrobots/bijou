@@ -24,7 +24,7 @@ describe('DF-011 DOGFOOD text-entry and staged-form coverage cycle', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
     expect(coverage.documentedFamilies).toBeGreaterThanOrEqual(19);
-    expect(coverage.totalFamilies).toBe(35);
+    expect(coverage.totalFamilies).toBe(36);
     expect(coverage.percent).toBeGreaterThanOrEqual(54);
     expect(coverage.coveredFamilyIds).toContain('text-entry');
     expect(coverage.coveredFamilyIds).toContain('multi-field-and-staged-forms');
