@@ -42,6 +42,6 @@ describe('DF-019 DOGFOOD complete family coverage cycle', () => {
   });
 
   it('spawns the next non-ratchet DOGFOOD backlog item', () => {
-    expect(existsRepoPath('docs/BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md')).toBe(true);
+    expect(existsRepoPath('docs/BACKLOG/v4.5.0/DF-020-deepen-dogfood-story-depth-and-variant-quality.md')).toBe(true);
   });
 });

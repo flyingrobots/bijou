@@ -11,7 +11,8 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
 
     const backlogReadme = readRepoFile('docs/BACKLOG/README.md');
-    expect(backlogReadme).toContain('There is no active version-target release lane right now.');
+    // v4.1.0 lane was temporary and pruned.
+    expect(existsRepoPath('docs/BACKLOG/v4.1.0')).toBe(false);
   });
 
   it('aligns the short-form release surfaces to the v4.0.0..HEAD boundary', () => {
