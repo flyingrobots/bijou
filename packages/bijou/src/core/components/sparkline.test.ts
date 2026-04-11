@@ -47,10 +47,47 @@ describe('sparkline', () => {
     expect(sparkline([1, 2, 3], { width: 0 })).toBe('');
   });
 
+  it('returns empty string for negative width', () => {
+    expect(sparkline([1, 2, 3], { width: -5 })).toBe('');
+  });
+
   it('handles negative values', () => {
     const result = sparkline([-10, 0, 10]);
     expect(result).toHaveLength(3);
     expect(result[0]).toBe('▁');
     expect(result[2]).toBe('█');
+  });
+
+  it('treats NaN values as 0', () => {
+    const result = sparkline([0, NaN, 10]);
+    expect(result).toHaveLength(3);
+    // NaN becomes 0, so [0, 0, 10] → min=0, max=10
+    expect(result[0]).toBe('▁');
+    expect(result[1]).toBe('▁');
+    expect(result[2]).toBe('█');
+  });
+
+  it('treats Infinity values as 0', () => {
+    const result = sparkline([0, Infinity, 10]);
+    expect(result).toHaveLength(3);
+    // Infinity becomes 0, so [0, 0, 10]
+    expect(result[0]).toBe('▁');
+    expect(result[2]).toBe('█');
+  });
+
+  it('treats -Infinity values as 0', () => {
+    const result = sparkline([0, -Infinity, 10]);
+    expect(result).toHaveLength(3);
+    expect(result[2]).toBe('█');
+  });
+
+  it('handles large arrays without stack overflow', () => {
+    const values = new Array(100_000).fill(0).map((_, i) => Math.sin(i * 0.01));
+    const result = sparkline(values, { width: 50 });
+    expect(result).toHaveLength(50);
+    // Every character should be a valid block element
+    for (const ch of result) {
+      expect('▁▂▃▄▅▆▇█').toContain(ch);
+    }
   });
 });
