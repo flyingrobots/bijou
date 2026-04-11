@@ -83,7 +83,11 @@ export function applyFrameAction<PageModel, Msg>(
         activePage,
         pageModel: model.pageModels[model.activePageId]!,
       });
-      if (settings == null || settings.sections.every((section) => section.rows.length === 0)) {
+      const hasStockShellThemeSettings = (options.shellThemes?.length ?? 0) > 1;
+      if (
+        !hasStockShellThemeSettings
+        && (settings == null || settings.sections.every((section) => section.rows.length === 0))
+      ) {
         return [model, []];
       }
       const opening = !model.settingsOpen;

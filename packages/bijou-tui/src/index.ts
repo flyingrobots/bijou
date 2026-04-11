@@ -227,6 +227,7 @@ export {
   type DescribeFrameLayerStackOptions,
   type FrameHeaderStyle,
   type FrameShellTheme,
+  type FrameShellThemeChange,
   type FramePage,
   type FramePageMsg,
   type FramePageUpdateResult,

@@ -14,9 +14,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   now accepts `shellThemes`, pre-resolves those themes once against the
   active Bijou context, adds a frame-owned shell-theme choice row to the
   stock settings drawer, and exposes the current selection on
-  `FrameModel.activeShellThemeId`. DOGFOOD uses that shared state to
-  keep its title screen and docs shell on one theme setting and adds the
-  new `Verdant Plum` palette.
+  `FrameModel.activeShellThemeId`. Apps with explicit page-rendering
+  contexts can pass `ctx` and sync `onShellThemeChange` without mutating
+  the original `BijouContext`. DOGFOOD uses that shared state to keep
+  its title screen and docs shell on one theme setting and adds the new
+  `Verdant Plum` palette.
 
 ### 🐛 Bug Fixes
 

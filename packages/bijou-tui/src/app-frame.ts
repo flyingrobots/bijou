@@ -6,9 +6,9 @@
  */
 
 import {
+  cloneContextWithResolvedTheme,
   createResolved,
   createSurface,
-  createThemeAccessors,
   type LayoutNode as SurfaceLayoutNode,
   preparePreferenceSections,
   preferenceListSurface,
@@ -16,11 +16,12 @@ import {
   resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
-  setDefaultContext,
+  type BijouContext,
   type PreparedPreferenceSection,
   type PreferenceRow,
   type PreferenceSection,
   type OverflowBehavior,
+  type ResolvedTheme,
   type Surface,
   type Theme,
   type TokenValue,
@@ -272,6 +273,14 @@ export interface FrameShellTheme {
   readonly description?: string;
 }
 
+/** Notification payload emitted when the stock frame shell theme changes. */
+export interface FrameShellThemeChange {
+  /** Selected stock shell theme definition. */
+  readonly shellTheme: FrameShellTheme;
+  /** Fresh context cloned with the selected theme. */
+  readonly ctx: BijouContext;
+}
+
 /** Declarative frame layout node. */
 export type FrameLayoutNode =
   | {
@@ -361,6 +370,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly globalKeys?: KeyMap<Msg>;
   /** Optional shell localization runtime for frame-owned copy and direction. */
   readonly i18n?: I18nRuntime;
+  /** Optional explicit context for frame-owned rendering and shell theme resolution. */
+  readonly ctx?: BijouContext;
   /** Resolve key conflicts in favor of the frame shell or the active page. Default: 'frame-first'. */
   readonly keyPriority?: 'frame-first' | 'page-first';
   /** Optional override for the short footer hint source shown beneath the frame workspace. */
@@ -379,6 +390,8 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly enableCommandPalette?: boolean;
   /** Optional stock shell-theme choices surfaced by the frame settings drawer. */
   readonly shellThemes?: readonly FrameShellTheme[];
+  /** Optional callback for syncing app-owned rendering with the stock shell theme. */
+  readonly onShellThemeChange?: (change: FrameShellThemeChange) => void;
   /** Optional shell-owned settings drawer content. */
   readonly settings?: (args: {
     readonly model: FrameModel<PageModel>;
@@ -660,26 +673,11 @@ function createFrameNotificationTickCmd<Msg>(): Cmd<FramedAppMsg<Msg>> {
   };
 }
 
-function applyResolvedShellThemeToContext(
-  ctx: NonNullable<ReturnType<typeof resolveSafeCtx>>,
-  resolvedTheme: ReturnType<typeof createResolved>,
-): void {
-  const accessors = createThemeAccessors(resolvedTheme);
-  Object.assign(ctx as {
-    theme: typeof resolvedTheme;
-    tokenGraph: typeof resolvedTheme.tokenGraph;
-    semantic: typeof accessors.semantic;
-    border: typeof accessors.border;
-    surface: typeof accessors.surface;
-    status: typeof accessors.status;
-    ui: typeof accessors.ui;
-    gradient: typeof accessors.gradient;
-  }, {
-    theme: resolvedTheme,
-    tokenGraph: resolvedTheme.tokenGraph,
-    ...accessors,
-  });
-  setDefaultContext(ctx);
+function cloneShellThemeContext(
+  ctx: BijouContext,
+  resolvedTheme: ResolvedTheme,
+): BijouContext {
+  return cloneContextWithResolvedTheme(ctx, resolvedTheme);
 }
 
 function resolveShellThemeOptionsText(
@@ -806,26 +804,51 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
-  const frameCtx = options.shellThemes != null && options.shellThemes.length > 0
-    ? resolveSafeCtx()
-    : undefined;
-  if (options.shellThemes != null && options.shellThemes.length > 0 && frameCtx == null) {
-    throw new Error('createFramedApp: shellThemes requires a default Bijou context');
+  const defaultFrameCtx = options.ctx ?? resolveSafeCtx();
+  if (options.shellThemes != null && options.shellThemes.length > 0 && defaultFrameCtx == null) {
+    throw new Error('createFramedApp: shellThemes requires options.ctx or a default Bijou context');
   }
   const resolvedShellThemes: readonly ResolvedFrameShellTheme[] = options.shellThemes?.map((theme) => ({
     id: theme.id,
     label: theme.label,
     description: theme.description,
+    shellTheme: theme,
     resolvedTheme: createResolved(
       theme.theme,
-      frameCtx!.theme.noColor,
-      frameCtx!.theme.colorScheme,
+      defaultFrameCtx!.theme.noColor,
+      defaultFrameCtx!.theme.colorScheme,
     ),
   })) ?? [];
   const enableShellThemeSettings = resolvedShellThemes.length > 1;
   const initialShellTheme = resolvedShellThemes.find(
-    (theme) => theme.resolvedTheme.theme.name === frameCtx?.theme.theme.name,
+    (theme) => theme.resolvedTheme.theme.name === defaultFrameCtx?.theme.theme.name,
   ) ?? resolvedShellThemes[0];
+  let frameCtx = options.ctx;
+
+  function resolveFrameCtx(): BijouContext | undefined {
+    return frameCtx ?? options.ctx ?? resolveSafeCtx();
+  }
+
+  function resolveFrameThemeCtx(activeShellThemeId: string | undefined): BijouContext | undefined {
+    const baseCtx = resolveFrameCtx();
+    if (defaultFrameCtx == null) return baseCtx;
+    const activeTheme = resolveCurrentShellTheme(resolvedShellThemes, activeShellThemeId);
+    if (activeTheme == null) return baseCtx;
+    if (baseCtx?.theme.theme.name === activeTheme.resolvedTheme.theme.name) {
+      return baseCtx;
+    }
+    return cloneShellThemeContext(defaultFrameCtx, activeTheme.resolvedTheme);
+  }
+
+  function publishShellThemeContext(nextTheme: ResolvedFrameShellTheme): BijouContext | undefined {
+    if (defaultFrameCtx == null) return resolveFrameCtx();
+    frameCtx = cloneShellThemeContext(defaultFrameCtx, nextTheme.resolvedTheme);
+    options.onShellThemeChange?.({
+      shellTheme: nextTheme.shellTheme,
+      ctx: frameCtx,
+    });
+    return frameCtx;
+  }
 
   const frameKeys = createFrameKeyMap({
     enableSettings: options.settings != null || enableShellThemeSettings,
@@ -956,17 +979,32 @@ export function createFramedApp<PageModel, Msg>(
     // --- notification center ---
     'notification-center-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll' }>;
-      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      const layout = resolveNotificationCenterLayout(
+        model,
+        options,
+        pagesById,
+        resolveFrameThemeCtx(model.activeShellThemeId),
+      );
       return layout != null ? scrollNotificationCenterBy(model, layout, c.delta) : model;
     },
     'notification-center-scroll-to': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'notification-center-scroll-to' }>;
-      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      const layout = resolveNotificationCenterLayout(
+        model,
+        options,
+        pagesById,
+        resolveFrameThemeCtx(model.activeShellThemeId),
+      );
       if (layout == null) return model;
       return { ...model, notificationCenterScrollY: c.position === 'top' ? 0 : layout.maxScrollY };
     },
     'cycle-notification-filter': (model, _cmd, teaCmds) => {
-      const layout = resolveNotificationCenterLayout(model, options, pagesById);
+      const layout = resolveNotificationCenterLayout(
+        model,
+        options,
+        pagesById,
+        resolveFrameThemeCtx(model.activeShellThemeId),
+      );
       if (layout == null) return model;
       const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
       teaCmds.push(...cmds);
@@ -1047,7 +1085,7 @@ export function createFramedApp<PageModel, Msg>(
     'dismiss-notification': (model, cmd, teaCmds) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'dismiss-notification' }>;
       if (!frameNotificationOptions.enabled) return model;
-      const nowMs = resolveClock(resolveSafeCtx()).now();
+      const nowMs = resolveClock(resolveFrameCtx()).now();
       const [nextModel, cmds] = applyFrameNotificationState(
         model,
         dismissNotification(model.runtimeNotifications, c.notificationId, nowMs),
@@ -1258,7 +1296,12 @@ export function createFramedApp<PageModel, Msg>(
     msg: KeyMsg,
     model: InternalFrameModel<PageModel, Msg>,
   ): FrameShellCommand<Msg>[] | undefined {
-    const layout = resolveNotificationCenterLayout(model, options, pagesById);
+    const layout = resolveNotificationCenterLayout(
+      model,
+      options,
+      pagesById,
+      resolveFrameThemeCtx(model.activeShellThemeId),
+    );
     if (layout == null) return undefined;
     const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
     if (!msg.ctrl && !msg.alt && msg.key === 'escape') {
@@ -1443,16 +1486,23 @@ export function createFramedApp<PageModel, Msg>(
     const bodyRect = resolveBodyRect(model, options);
     const maxState = model.maximizedPaneByPage[model.activePageId];
     const maximizedPaneId = maxState?.maximizedPaneId;
+    const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
     const renderResult = maximizedPaneId
-      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool)
-      : renderPageContent(model.activePageId, model, bodyRect, pagesById);
+      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool, themedFrameCtx)
+      : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
     return renderResult.paneRects;
   }
 
   function buildWorkspaceLayoutTree(
     model: InternalFrameModel<PageModel, Msg>,
   ): SurfaceLayoutNode {
-    const header = resolveHeaderLine(model, options, pagesById, headerScratch);
+    const header = resolveHeaderLine(
+      model,
+      options,
+      pagesById,
+      headerScratch,
+      resolveFrameThemeCtx(model.activeShellThemeId),
+    );
     headerScratch = header.surface;
     const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
       createShellRetainedLayoutNode(`tab:${target.pageId}`, {
@@ -1531,7 +1581,14 @@ export function createFramedApp<PageModel, Msg>(
       });
     }
 
-    const notificationCenterLayout = model.notificationCenterOpen ? resolveNotificationCenterLayout(model, options, pagesById) : undefined;
+    const notificationCenterLayout = model.notificationCenterOpen
+      ? resolveNotificationCenterLayout(
+          model,
+          options,
+          pagesById,
+          resolveFrameThemeCtx(model.activeShellThemeId),
+        )
+      : undefined;
     if (notificationCenterLayout != null) {
       layouts = retainRuntimeLayout(layouts, {
         viewId: 'notification-center',
@@ -1627,7 +1684,7 @@ export function createFramedApp<PageModel, Msg>(
               screenHeight: model.rows,
               margin: frameNotificationOptions.margin,
               gap: frameNotificationOptions.gap,
-              ctx: resolveSafeCtx() ?? undefined,
+              ctx: resolveFrameThemeCtx(model.activeShellThemeId) ?? undefined,
             }, msg.col, msg.row);
             if (notificationTarget?.kind === 'dismiss') {
               cmds.push({ type: 'dismiss-notification', notificationId: notificationTarget.item.id });
@@ -1894,7 +1951,7 @@ export function createFramedApp<PageModel, Msg>(
       title: 'Setting updated',
       message: `${row.label} updated.`,
     };
-    const nowMs = resolveClock(resolveSafeCtx()).now();
+    const nowMs = resolveClock(resolveFrameCtx()).now();
     const notifications = pushNotification(model.runtimeNotifications, {
       title: feedback.title ?? 'Setting updated',
       message: feedback.message,
@@ -1926,10 +1983,10 @@ export function createFramedApp<PageModel, Msg>(
     row: FrameSettingRow<Msg>,
   ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
     const nextTheme = resolveNextShellTheme(resolvedShellThemes, model.activeShellThemeId);
-    if (nextTheme == null || frameCtx == null) {
+    if (nextTheme == null) {
       return [model, []];
     }
-    applyResolvedShellThemeToContext(frameCtx, nextTheme.resolvedTheme);
+    publishShellThemeContext(nextTheme);
     const [nextModel, notificationCmds] = pushSettingsFeedback({
       ...model,
       activeShellThemeId: nextTheme.id,
@@ -1978,12 +2035,8 @@ export function createFramedApp<PageModel, Msg>(
         activeShellThemeId: initialShellTheme?.id,
       };
 
-      if (
-        initialShellTheme != null
-        && frameCtx != null
-        && frameCtx.theme.theme.name !== initialShellTheme.resolvedTheme.theme.name
-      ) {
-        applyResolvedShellThemeToContext(frameCtx, initialShellTheme.resolvedTheme);
+      if (initialShellTheme != null) {
+        publishShellThemeContext(initialShellTheme);
       }
 
       for (const pageId of pageOrder) {
@@ -2110,12 +2163,13 @@ export function createFramedApp<PageModel, Msg>(
     },
 
     view(model) {
+      const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
       const {
         activePage,
         layerStack,
         activeLayer,
       } = resolvePresentedLayerContext(model);
-      const headerResult = resolveHeaderLine(model, options, pagesById, headerScratch);
+      const headerResult = resolveHeaderLine(model, options, pagesById, headerScratch, themedFrameCtx);
       headerScratch = headerResult.surface;
       const header = headerResult.surface;
       helpLineScratch = renderHelpLine(
@@ -2124,6 +2178,7 @@ export function createFramedApp<PageModel, Msg>(
         options.i18n,
         resolveNotificationFooterCue(model, options, pagesById),
         helpLineScratch,
+        themedFrameCtx,
       );
       const helpLine = helpLineScratch;
       const bodyRect = resolveBodyRect(model, options);
@@ -2147,13 +2202,21 @@ export function createFramedApp<PageModel, Msg>(
       const activeTransition = model.activeTransition ?? options.transition;
       if (model.previousPageId != null && model.transitionProgress < 1 && activeTransition && activeTransition !== 'none') {
         const activeBodyResult = maximizedPaneId
-          ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool)
-          : renderPageContent(model.activePageId, model, bodyRect, pagesById);
+          ? renderMaximizedPane(
+              model.activePageId,
+              model,
+              bodyRect,
+              pagesById,
+              maximizedPaneId,
+              paneScratchPool,
+              themedFrameCtx,
+            )
+          : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
         activeResult = activeBodyResult;
         bodySurface = activeBodyResult.surface;
-        const ctx = resolveSafeCtx();
+        const ctx = themedFrameCtx;
         if (ctx) {
-          const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById);
+          const prevResult = renderPageContent(model.previousPageId, model, bodyRect, pagesById, themedFrameCtx);
           bodySurface = renderTransition(
             prevResult.surface,
             activeBodyResult.surface,
@@ -2167,8 +2230,29 @@ export function createFramedApp<PageModel, Msg>(
         }
       } else {
         activeResult = maximizedPaneId
-          ? renderMaximizedPaneInto(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, frameSurface, bodyRect.row, bodyRect.col, paneScratchPool)
-          : renderPageContentInto(model.activePageId, model, bodyRect, pagesById, frameSurface, bodyRect.row, bodyRect.col, paneScratchPool);
+          ? renderMaximizedPaneInto(
+              model.activePageId,
+              model,
+              bodyRect,
+              pagesById,
+              maximizedPaneId,
+              frameSurface,
+              bodyRect.row,
+              bodyRect.col,
+              paneScratchPool,
+              themedFrameCtx,
+            )
+          : renderPageContentInto(
+              model.activePageId,
+              model,
+              bodyRect,
+              pagesById,
+              frameSurface,
+              bodyRect.row,
+              bodyRect.col,
+              paneScratchPool,
+              themedFrameCtx,
+            );
       }
 
       const overlays: Overlay[] = [];
@@ -2182,7 +2266,7 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (frameNotificationOptions.enabled) {
-        const ctx = resolveSafeCtx();
+        const ctx = themedFrameCtx;
         overlays.push(...renderNotificationStack(model.runtimeNotifications, {
           screenWidth: model.columns,
           screenHeight: model.rows,
@@ -2200,6 +2284,7 @@ export function createFramedApp<PageModel, Msg>(
           pagesById,
           resolvedShellThemes,
           settingsLayer?.title,
+          themedFrameCtx,
         );
         if (settingsOverlay != null) {
           overlays.push(settingsOverlay);
@@ -2213,6 +2298,7 @@ export function createFramedApp<PageModel, Msg>(
           options,
           pagesById,
           notificationLayer?.title,
+          themedFrameCtx,
         );
         if (notificationCenterOverlay != null) {
           overlays.push(notificationCenterOverlay);
@@ -2444,7 +2530,8 @@ interface ResolvedFrameShellTheme {
   readonly id: string;
   readonly label: string;
   readonly description?: string;
-  readonly resolvedTheme: ReturnType<typeof createResolved>;
+  readonly shellTheme: FrameShellTheme;
+  readonly resolvedTheme: ResolvedTheme;
 }
 
 interface FlatSettingsRow<Msg> {
@@ -2617,6 +2704,7 @@ function resolveNotificationCenterLayout<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  ctx?: BijouContext,
 ): ResolvedNotificationCenterLayout<Msg> | undefined {
   const center = resolveFrameNotificationCenter(model, options, pagesById);
   if (center == null) return undefined;
@@ -2625,7 +2713,7 @@ function resolveNotificationCenterLayout<PageModel, Msg>(
   const anchor = frameEndAnchor(options.i18n);
   const startCol = anchor === 'left' ? 0 : Math.max(0, model.columns - drawerWidth);
   const contentWidth = Math.max(18, drawerWidth - 4);
-  const content = renderNotificationCenterSurface(center, contentWidth, options.i18n);
+  const content = renderNotificationCenterSurface(center, contentWidth, options.i18n, ctx);
   const contentHeight = Math.max(1, model.rows - 2);
   const pagerState = createPagerStateForSurface(content, {
     width: contentWidth,
@@ -2767,12 +2855,13 @@ function renderSettingsDrawer<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   shellThemes: readonly ResolvedFrameShellTheme[],
   titleOverride?: string,
+  ctx?: BijouContext,
 ): Overlay | undefined {
   const layout = resolveSettingsLayout(model, options, pagesById, shellThemes);
   if (layout == null) return undefined;
 
   const scrollY = clampSettingsScroll(model, layout);
-  const content = renderSettingsSurface(layout, model);
+  const content = renderSettingsSurface(layout, model, ctx);
   const pagerState = createPagerStateForSurface(content, {
     width: layout.contentWidth,
     height: layout.contentHeight,
@@ -2795,7 +2884,7 @@ function renderSettingsDrawer<PageModel, Msg>(
     content: body,
     borderToken: layout.settings.borderToken,
     bgToken: layout.settings.bgToken,
-    ctx: resolveSafeCtx() ?? undefined,
+    ctx,
     width: layout.drawerWidth,
     screenWidth: model.columns,
     screenHeight: model.rows,
@@ -2807,11 +2896,13 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   titleOverride?: string,
+  ctx?: BijouContext,
 ): Overlay | undefined {
-  const layout = resolveNotificationCenterLayout(model, options, pagesById);
+  const layout = resolveNotificationCenterLayout(model, options, pagesById, ctx);
   if (layout == null) return undefined;
+  const content = renderNotificationCenterSurface(layout.center, layout.contentWidth, options.i18n, ctx);
 
-  const pagerState = createPagerStateForSurface(layout.content, {
+  const pagerState = createPagerStateForSurface(content, {
     width: layout.contentWidth,
     height: layout.contentHeight,
   });
@@ -2822,7 +2913,7 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
       y: Math.max(0, Math.min(model.notificationCenterScrollY, layout.maxScrollY)),
     },
   };
-  const body = pagerSurface(layout.content, scrolledState, {
+  const body = pagerSurface(content, scrolledState, {
     showScrollbar: layout.maxScrollY > 0,
     showStatus: false,
   });
@@ -2840,12 +2931,13 @@ function renderNotificationCenterDrawer<PageModel, Msg>(
 function renderSettingsSurface<PageModel, Msg>(
   layout: ResolvedSettingsLayout<Msg>,
   model: InternalFrameModel<PageModel, Msg>,
+  ctx?: BijouContext,
 ): Surface {
   const focusedIndex = clampSettingsFocus(model, layout);
   return preferenceListSurface(layout.preferenceSections, {
     width: layout.contentWidth,
     selectedRowId: layout.rows[focusedIndex]?.row.id,
-    ctx: resolveSafeCtx() ?? undefined,
+    ctx,
     theme: layout.settings.listTheme,
   });
 }
@@ -2888,8 +2980,8 @@ function renderNotificationCenterSurface<Msg>(
   center: ResolvedFrameNotificationCenter<Msg>,
   width: number,
   i18n?: I18nRuntime,
+  ctx?: BijouContext,
 ): Surface {
-  const ctx = resolveSafeCtx() ?? undefined;
   const rows: Surface[] = [
     insetLineSurface(`Live: ${center.state.items.length} • Archived: ${center.state.history.length}`, width),
     insetLineSurface(`Filter: ${frameNotificationFilterLabel(i18n, center.activeFilter)}`, width),

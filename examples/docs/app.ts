@@ -1,9 +1,8 @@
 import { readFileSync } from 'node:fs';
 import {
   boxSurface,
-  createResolved,
+  cloneContextWithTheme,
   createSurface,
-  createThemeAccessors,
   CYAN_MAGENTA,
   inspector,
   lerp3,
@@ -17,7 +16,6 @@ import {
   type Surface,
   type Theme,
   type TokenValue,
-  setDefaultContext,
 } from '@flyingrobots/bijou';
 import {
   FRAME_I18N_CATALOG,
@@ -1119,10 +1117,11 @@ function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, ind
   return activateGuideRow(focusGuideRow(model, index), pageId);
 }
 
-function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
+function createLandingRenderer(getCtx: () => BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
   const cache: LandingFrameCache = {};
 
   return (model: RootModel): Surface => {
+    const ctx = getCtx();
     const width = Math.max(1, model.columns);
     const height = Math.max(1, model.rows);
     const tokens = resolveLandingTheme(model.landingThemeIndex);
@@ -1776,11 +1775,15 @@ function syncDocsSharedSettings(
   });
 }
 
-function applyLandingThemeSelection(ctx: BijouContext, model: RootModel, index: number): RootModel {
+function applyLandingThemeSelection(
+  syncShellThemeContext: (themeId: string | undefined) => void,
+  model: RootModel,
+  index: number,
+): RootModel {
   const nextIndex = mod(index, LANDING_THEMES.length);
   const theme = resolveLandingTheme(nextIndex);
   if (nextIndex === model.landingThemeIndex && model.docsModel.activeShellThemeId === theme.id) return model;
-  applyDocsShellThemeToContext(ctx, theme.id);
+  syncShellThemeContext(theme.id);
   return {
     ...model,
     landingThemeIndex: nextIndex,
@@ -2169,25 +2172,9 @@ function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number
   return LANDING_THEME_INDEX_BY_ID.get(resolveDocsShellThemeById(id).id) ?? 0;
 }
 
-function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): void {
+function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
   const shellTheme = resolveDocsShellThemeById(themeId);
-  const resolvedTheme = createResolved(shellTheme.theme, ctx.theme.noColor, ctx.theme.colorScheme);
-  const accessors = createThemeAccessors(resolvedTheme);
-  Object.assign(ctx as {
-    theme: typeof resolvedTheme;
-    tokenGraph: typeof resolvedTheme.tokenGraph;
-    semantic: typeof accessors.semantic;
-    border: typeof accessors.border;
-    surface: typeof accessors.surface;
-    status: typeof accessors.status;
-    ui: typeof accessors.ui;
-    gradient: typeof accessors.gradient;
-  }, {
-    theme: resolvedTheme,
-    tokenGraph: resolvedTheme.tokenGraph,
-    ...accessors,
-  });
-  setDefaultContext(ctx);
+  return cloneContextWithTheme(ctx, shellTheme.theme);
 }
 
 function themedSeparatorSurface(
@@ -2786,8 +2773,14 @@ function resolveGuidePaneMouse(
   return index == null ? undefined : { type: 'activate-guide-index', index };
 }
 
-function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<DocsExplorerModel, DocsMsg> {
+function createDocsExplorerApp(
+  getCtx: () => BijouContext,
+  onShellThemeChange: (ctx: BijouContext) => void,
+  i18n: I18nRuntime,
+): FramedApp<DocsExplorerModel, DocsMsg> {
+  const ctx = getCtx();
   return createFramedApp<DocsExplorerModel, DocsMsg>({
+    ctx,
     i18n,
     title: 'Bijou Docs',
     headerStyle: ({ pageModel }) => ({
@@ -2894,21 +2887,21 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                   paneId: 'family-nav',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
+                  render: (width, height) => renderFamiliesPane(model, width, height, getCtx(), theme),
                 },
                 main: {
                   kind: 'pane',
                   paneId: 'story-content',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
+                  render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
                 },
                 variants: {
                   kind: 'pane',
                   paneId: 'story-variants',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
+                  render: (width, height) => renderVariantsPane(model, width, height, getCtx(), theme),
                 },
               },
             };
@@ -2984,21 +2977,21 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                 paneId: 'guide-nav',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, ctx, theme, i18n),
+                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, getCtx(), theme, i18n),
               },
               main: {
                 kind: 'pane',
                 paneId: 'guide-content',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideReaderPane(spec.id, model, width, ctx, theme),
+                render: (width) => renderGuideReaderPane(spec.id, model, width, getCtx(), theme),
               },
               meta: {
                 kind: 'pane',
                 paneId: 'guide-meta',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideInfoPane(spec.id, model, width, ctx, theme, i18n),
+                render: (width) => renderGuideInfoPane(spec.id, model, width, getCtx(), theme, i18n),
               },
             },
           };
@@ -3006,6 +2999,9 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
       };
     }),
     enableCommandPalette: true,
+    onShellThemeChange: ({ ctx: nextCtx }) => {
+      onShellThemeChange(nextCtx);
+    },
     settings: ({ model, pageModel }) => {
       const theme = resolveLandingTheme(pageModel.landingThemeIndex);
       return {
@@ -3133,13 +3129,15 @@ function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
 }
 
 export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): App<RootModel, RootMsg> {
-  // Ensure shell-theme resolution sees the same explicit context the
-  // caller passed, even when DOGFOOD is imported through a different
-  // module path than the process that created `ctx`.
-  setDefaultContext(ctx);
+  let currentCtx = ctx;
+  const syncShellThemeContext = (themeId: string | undefined) => {
+    currentCtx = applyDocsShellThemeToContext(ctx, themeId);
+  };
   const i18n = createDocsI18nRuntime(options);
-  const explorer = createDocsExplorerApp(ctx, i18n);
-  const renderLanding = createLandingRenderer(ctx, i18n);
+  const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
+    currentCtx = nextCtx;
+  }, i18n);
+  const renderLanding = createLandingRenderer(() => currentCtx, i18n);
   const initialRoute = options.initialRoute ?? 'landing';
 
   function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
@@ -3234,10 +3232,10 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
             });
           }
           if (msg.key === 'left') {
-            return [applyLandingThemeSelection(ctx, model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
+            return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
           }
           if (msg.key === 'right') {
-            return [applyLandingThemeSelection(ctx, model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
+            return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
           }
           if (msg.key === 'up') {
             return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
@@ -3248,7 +3246,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           if (!msg.ctrl && !msg.alt && /^[1-9]$/.test(msg.key)) {
             const themeIndex = Number(msg.key) - 1;
             if (themeIndex < LANDING_THEMES.length) {
-              return [applyLandingThemeSelection(ctx, model, themeIndex), []];
+              return [applyLandingThemeSelection(syncShellThemeContext, model, themeIndex), []];
             }
           }
           if (!msg.ctrl && !msg.alt) {

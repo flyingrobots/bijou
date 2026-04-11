@@ -35,21 +35,32 @@ shell chrome.
 cycling:
 
 ```ts
+let currentCtx = ctx;
+
 const app = createFramedApp({
+  ctx: currentCtx,
   shellThemes: [
     { id: 'default', label: 'Default', theme: defaultTheme },
     { id: 'verdant-plum', label: 'Verdant Plum', theme: plumTheme },
   ],
+  onShellThemeChange: ({ ctx: nextCtx }) => {
+    currentCtx = nextCtx;
+  },
   pages: [/* ... */],
 });
 ```
 
 When `shellThemes` are provided:
 
-- the frame pre-resolves those themes once against the active Bijou
-  context
+- the frame pre-resolves those themes once against the provided Bijou
+  context, or the active default context when `ctx` is omitted
 - the stock settings drawer gets a built-in shell-theme choice row
 - the current selection is exposed as `FrameModel.activeShellThemeId`
+
+If your page renderers read from an explicit app-owned `BijouContext`,
+pass that context to `createFramedApp({ ctx })` and mirror
+`onShellThemeChange` back into your app state so the frame shell and page
+content stay on one theme source of truth.
 
 DOGFOOD now uses that shared frame-owned state so the title screen and
 docs explorer stay on one theme setting instead of drifting into mixed

@@ -27,11 +27,17 @@ If your app currently manages shell theme switching in page-local state,
 you can now hand that concern to the stock frame:
 
 ```ts
+let currentCtx = ctx;
+
 const app = createFramedApp({
+  ctx: currentCtx,
   shellThemes: [
     { id: 'default', label: 'Default', theme: defaultTheme },
     { id: 'verdant-plum', label: 'Verdant Plum', theme: plumTheme },
   ],
+  onShellThemeChange: ({ ctx: nextCtx }) => {
+    currentCtx = nextCtx;
+  },
   pages: [/* ... */],
 });
 ```
@@ -41,6 +47,11 @@ The frame will:
 - add a stock shell-theme row to the settings drawer
 - keep the resolved shell theme in one shared frame-owned place
 - expose the current selection via `FrameModel.activeShellThemeId`
+
+If your page renderers already resolve theme data from an explicit
+`BijouContext`, pass that context into `createFramedApp({ ctx })` and
+sync `onShellThemeChange` back into your app-owned state. Apps that rely
+only on the ambient default context can omit both options.
 
 You do not need to adopt this API, but it is now the simplest way to
 keep a landing screen, docs shell, or other frame-owned chrome on one

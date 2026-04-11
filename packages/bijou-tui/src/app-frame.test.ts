@@ -1,6 +1,6 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { setDefaultContext, stringToSurface, surfaceToString } from '@flyingrobots/bijou';
+import { setDefaultContext, stringToSurface, surfaceToString, type BijouContext } from '@flyingrobots/bijou';
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
 import { createSplitPaneState } from './split-pane.js';
@@ -1734,6 +1734,50 @@ describe('createFramedApp', () => {
       height: testCtx.runtime.rows,
     }).surface, testCtx.style);
     expect(rendered).toContain('notices:1');
+  });
+
+  it('supports shellThemes with an explicit ctx and emits fresh contexts without mutating the caller context', () => {
+    const explicitCtx = createTestContext({ mode: 'interactive' });
+    const originalTheme = explicitCtx.theme;
+    const originalTokenGraph = explicitCtx.tokenGraph;
+    const alternateTheme = { ...explicitCtx.theme.theme, name: 'alternate-shell' } as any;
+    const emitted: Array<{ readonly id: string; readonly ctx: BijouContext }> = [];
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        ctx: explicitCtx,
+        pages: [makePage('home', 'Home', 'main')],
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: explicitCtx.theme.theme },
+          { id: 'alternate', label: 'Alternate', theme: alternateTheme },
+        ],
+        onShellThemeChange(change) {
+          emitted.push({ id: change.shellTheme.id, ctx: change.ctx });
+        },
+      });
+
+      let [model] = app.init();
+      expect(model.activeShellThemeId).toBe('default');
+      expect(emitted).toHaveLength(1);
+      expect(emitted[0]?.id).toBe('default');
+      expect(emitted[0]?.ctx).not.toBe(explicitCtx);
+
+      [model] = app.update(ctrlKey(','), model);
+      [model] = app.update({ type: 'key', key: 'enter', ctrl: false, alt: false, shift: false }, model);
+
+      expect(model.activeShellThemeId).toBe('alternate');
+      expect(emitted).toHaveLength(2);
+      expect(emitted[1]?.id).toBe('alternate');
+      expect(emitted[1]?.ctx).not.toBe(explicitCtx);
+      expect(emitted[1]?.ctx.theme).not.toBe(originalTheme);
+      expect(emitted[1]?.ctx.tokenGraph).not.toBe(originalTokenGraph);
+      expect(explicitCtx.theme).toBe(originalTheme);
+      expect(explicitCtx.tokenGraph).toBe(originalTokenGraph);
+      expect(explicitCtx.theme.theme.name).not.toBe('alternate-shell');
+    } finally {
+      setDefaultContext(testCtx);
+    }
   });
 
   it('scrolls a long settings drawer independently of the underlying page', () => {

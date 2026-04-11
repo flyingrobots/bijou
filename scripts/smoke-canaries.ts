@@ -163,8 +163,8 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
     'Home',
     'Split',
     'Home ready',
-    'Drawer',
-    'Open:',
+    'Supplemental drawer',
+    'Open: yes',
   ]);
   assertCheckpointContains(checkpoints, 'split', [
     'Split ready',
@@ -173,8 +173,8 @@ function runTuiCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, st
   ]);
   assertCheckpointContains(checkpoints, 'home-return', [
     'Home ready',
-    'Drawer',
-    'Open:',
+    'Supplemental drawer',
+    'Open: yes',
   ]);
   assertCheckpointContains(checkpoints, 'drawer-closed', [
     'Open: no',
@@ -357,7 +357,8 @@ function assertCheckpointContains(
     throw new Error(`missing PTY checkpoint "${label}"`);
   }
 
-  const missing = expected.filter((needle) => !segment.includes(needle));
+  const compactSegment = compactWhitespace(segment);
+  const missing = expected.filter((needle) => !compactSegment.includes(compactWhitespace(needle)));
   if (missing.length > 0) {
     throw new Error(`checkpoint "${label}" missing expected text: ${missing.join(', ')}\n${tail(segment)}`);
   }
@@ -373,10 +374,15 @@ function assertCheckpointAbsent(
     throw new Error(`missing PTY checkpoint "${label}"`);
   }
 
-  const present = forbidden.filter((needle) => segment.includes(needle));
+  const compactSegment = compactWhitespace(segment);
+  const present = forbidden.filter((needle) => compactSegment.includes(compactWhitespace(needle)));
   if (present.length > 0) {
     throw new Error(`checkpoint "${label}" unexpectedly contained: ${present.join(', ')}\n${tail(segment)}`);
   }
+}
+
+function compactWhitespace(text: string): string {
+  return text.replace(/\s+/g, '').trim();
 }
 
 function tail(text: string, lineCount = 80): string {

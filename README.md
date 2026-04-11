@@ -30,8 +30,10 @@ Key changes:
 - **New stock shell theme support in `createFramedApp()`** — framed apps
   can now opt into a frame-owned theme chooser with `shellThemes`, and
   the active selection is exposed on `FrameModel.activeShellThemeId`.
-  DOGFOOD uses that to keep the title screen and docs shell on one
-  shared theme setting, including the new `Verdant Plum` palette.
+  Apps with explicit page-rendering contexts can pass `ctx` and sync
+  `onShellThemeChange` to keep shell and page content aligned. DOGFOOD
+  uses that shared path for the title screen and docs shell, including
+  the new `Verdant Plum` palette.
 - **Quit confirm is more forgiving** — the stock quit dialog now accepts
   uppercase `Y` / `N` as well as lowercase `y` / `n`.
 - **Backwards compatible release** — no breaking changes; the new shell

@@ -25,7 +25,8 @@ The next gravity is split between:
 - [Framed shell polish release](./releases/4.4.1/whats-new.md):
   background fill restored across body and shell chrome
 - `createFramedApp()` now supports stock shell theme cycling via
-  `shellThemes` and exposes `FrameModel.activeShellThemeId`
+  `shellThemes`, exposes `FrameModel.activeShellThemeId`, and can sync
+  explicit page contexts through `ctx` + `onShellThemeChange`
 - DOGFOOD title + docs theme state unified; new `Verdant Plum` palette
 - Quit-confirm accepts uppercase `Y` / `N`
 

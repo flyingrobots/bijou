@@ -12,9 +12,9 @@ import {
   lighten,
   mix,
   parseAnsiToSurface,
+  resolveSafeCtx,
   saturate,
   type Cell,
-  resolveSafeCtx,
   type BijouContext,
   type Surface,
   type TokenValue,
@@ -249,7 +249,7 @@ function paintFrameNodeInto<PageModel, Msg>(
     state = focusAreaScrollToX(state, prior.x);
     focusAreaSurfaceInto(contentSurface, state, target, {
       focused: node.paneId === ctx.focusedPaneId,
-      ctx: resolveSafeCtx(),
+      ctx: ctx.ctx,
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
       focusedGutterToken: node.focusedGutterToken,
@@ -335,7 +335,7 @@ function paintFrameNodeInto<PageModel, Msg>(
     const absoluteAreaRect = offsetRect(areaRect, absoluteRect.row, absoluteRect.col);
     const child = node.cells[areaName];
     if (child == null) {
-      resolveSafeCtx()?.io.writeError(
+      ctx.ctx?.io.writeError(
         `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
       target.blit(
@@ -382,9 +382,10 @@ export function renderPageContent<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   bodyRect: LayoutRect,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  ctx?: BijouContext,
 ): RenderResult {
   const surface = createSurface(bodyRect.width, bodyRect.height);
-  const geometry = renderPageContentInto(pageId, model, bodyRect, pagesById, surface, 0, 0);
+  const geometry = renderPageContentInto(pageId, model, bodyRect, pagesById, surface, 0, 0, createFramePaneScratchPool(), ctx);
   return { surface, paneRects: geometry.paneRects, paneOrder: geometry.paneOrder };
 }
 
@@ -398,8 +399,10 @@ export function renderPageContentInto<PageModel, Msg>(
   offsetRow = bodyRect.row,
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
+  ctx?: BijouContext,
 ): FramePaneGeometryResult {
-  const frameBackgroundHex = resolveFrameBackgroundHex(resolveSafeCtx());
+  const themeCtx = resolveRenderCtx(ctx);
+  const frameBackgroundHex = resolveFrameBackgroundHex(themeCtx);
   fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
@@ -411,6 +414,7 @@ export function renderPageContentInto<PageModel, Msg>(
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
     frameBackgroundHex,
+    ctx: themeCtx,
   };
   return paintFrameNodeInto(
     page.layout(pageModel),
@@ -430,9 +434,10 @@ export function renderMaximizedPane<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   maximizedPaneId: string,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
+  ctx?: BijouContext,
 ): RenderResult {
   const surface = createSurface(bodyRect.width, bodyRect.height);
-  const geometry = renderMaximizedPaneInto(pageId, model, bodyRect, pagesById, maximizedPaneId, surface, 0, 0, scratchPool);
+  const geometry = renderMaximizedPaneInto(pageId, model, bodyRect, pagesById, maximizedPaneId, surface, 0, 0, scratchPool, ctx);
   return { surface, paneRects: geometry.paneRects, paneOrder: geometry.paneOrder };
 }
 
@@ -447,8 +452,10 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   offsetRow = bodyRect.row,
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
+  ctx?: BijouContext,
 ): FramePaneGeometryResult {
-  const frameBackgroundHex = resolveFrameBackgroundHex(resolveSafeCtx());
+  const themeCtx = resolveRenderCtx(ctx);
+  const frameBackgroundHex = resolveFrameBackgroundHex(themeCtx);
   fillSurfaceBackground(target, offsetCol, offsetRow, bodyRect.width, bodyRect.height, frameBackgroundHex);
   const page = pagesById.get(pageId)!;
   const pageModel = model.pageModels[pageId]!;
@@ -456,7 +463,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   const paneNode = findPaneNode(layoutTree, maximizedPaneId);
   if (paneNode == null) {
     // Pane not found, fall back to normal rendering
-    return renderPageContentInto(pageId, model, bodyRect, pagesById, target, offsetRow, offsetCol, scratchPool);
+    return renderPageContentInto(pageId, model, bodyRect, pagesById, target, offsetRow, offsetCol, scratchPool, ctx);
   }
 
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };
@@ -476,7 +483,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   state = focusAreaScrollToX(state, prior.x);
   focusAreaSurfaceInto(contentSurface, state, target, {
     focused: true,
-    ctx: resolveSafeCtx(),
+    ctx: themeCtx,
     id: maximizedPaneId,
     classes: ['focused', 'maximized'],
     focusedGutterToken: paneNode.focusedGutterToken,
@@ -495,9 +502,10 @@ export function resolveHeaderLine<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   scratch?: Surface,
+  ctx?: BijouContext,
 ): FrameHeaderRenderResult {
-  const ctx = resolveSafeCtx();
-  const frameBackgroundHex = resolveFrameBackgroundHex(ctx);
+  const renderCtx = resolveRenderCtx(ctx);
+  const frameBackgroundHex = resolveFrameBackgroundHex(renderCtx);
   const activePage = pagesById.get(model.activePageId)!;
   const activePageModel = model.pageModels[model.activePageId]!;
   const headerStyle = options.headerStyle?.({
@@ -529,12 +537,12 @@ export function resolveHeaderLine<PageModel, Msg>(
   }).join(' ');
 
   const line = fitLine(`${title}  ${tabs}`, model.columns);
-  const surface = paintStyledTextSurfaceWithBCSS(scratch, line, model.columns, ctx, {
+  const surface = paintStyledTextSurfaceWithBCSS(scratch, line, model.columns, renderCtx, {
     type: 'FrameHeader',
     id: 'frame-header',
     classes: [`page-${model.activePageId}`],
   });
-  paintActiveHeaderTab(surface, tabTargets, model.activePageId, ctx, headerStyle?.activeTabToken);
+  paintActiveHeaderTab(surface, tabTargets, model.activePageId, renderCtx, headerStyle?.activeTabToken);
   applySurfaceBackground(surface, frameBackgroundHex);
   return {
     surface,
@@ -549,8 +557,9 @@ export function renderHelpLine<PageModel, Msg>(
   i18n: CreateFramedAppOptions<PageModel, Msg>['i18n'],
   notificationCue?: string,
   scratch?: Surface,
+  ctx?: BijouContext,
 ): Surface {
-  const ctx = resolveSafeCtx();
+  const renderCtx = resolveRenderCtx(ctx);
   const mode = activeLayer.kind === 'search' || activeLayer.kind === 'command-palette'
     ? 'PALETTE'
     : activeLayer.kind === 'help'
@@ -584,11 +593,11 @@ export function renderHelpLine<PageModel, Msg>(
           : `${statusWithPadding}  ${hint}`;
       })()
     : ` ${status}`;
-  return applySurfaceBackground(paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, ctx, {
+  return applySurfaceBackground(paintStyledTextSurfaceWithBCSS(scratch, fitLine(line, model.columns), model.columns, renderCtx, {
     type: 'FrameHelp',
     id: 'frame-help',
     classes: [`mode-${mode.toLowerCase()}`, `page-${model.activePageId}`],
-  }), resolveFrameBackgroundHex(ctx));
+  }), resolveFrameBackgroundHex(renderCtx));
 }
 
 /**
@@ -642,6 +651,10 @@ export function blockSurface(content: string, width: number, height: number): Su
 
 function resolveFrameBackgroundHex(ctx: BijouContext | undefined): string | undefined {
   return ctx?.surface('primary').bg ?? ctx?.surface('secondary').bg;
+}
+
+function resolveRenderCtx(ctx: BijouContext | undefined): BijouContext | undefined {
+  return ctx ?? resolveSafeCtx();
 }
 
 function fillSurfaceBackground(

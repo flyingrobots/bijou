@@ -109,7 +109,7 @@ describe('docs preview app', () => {
     expect(source).toMatch(/await run\(createDocsApp\(ctx\), \{ ctx, mouse: true \}\);/);
   });
 
-  it('registers the provided ctx before building the framed explorer shell', async () => {
+  it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {
     _resetDefaultContextForTesting();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs' });
