@@ -3706,8 +3706,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Unicode block characters (▁▂▃▄▅▆▇█) with optional semantic color.',
         static: 'Same block rendering, no animation.',
-        pipe: 'Numeric CSV or min/avg/max summary.',
-        accessible: 'Spoken trend summary like "rising from 2 to 8 over 10 samples".',
+        pipe: 'Same block characters (no mode-aware lowering yet — sparkline returns a plain string).',
+        accessible: 'Same block characters (accessible text summary is a future direction).',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3802,7 +3802,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       ],
       avoidWhen: [
         'A single metric does not warrant a bordered panel — use a label and value inline.',
-        'The metrics need interactive drill-down or filtering — use navigableTable().',
+        'The metrics need interactive drill-down or filtering — use navigableTableSurface().',
         'The data is tabular with many columns — use table().',
       ],
       relatedFamilies: ['sparkline()', 'perfOverlaySurface()', 'table()', 'box()'],

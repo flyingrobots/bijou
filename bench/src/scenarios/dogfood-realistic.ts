@@ -64,12 +64,14 @@ export const dogfoodRealistic: Scenario<State> = {
   defaultMeasureFrames: 120,
 
   setup(_ctx, columns = 220, rows = 58) {
-    const current = createSurface(columns, rows);
-    const target = createSurface(columns, rows);
+    const cols = Math.max(22, columns); // sidebar (20) + divider + 1
+    const rws = Math.max(4, rows);     // header (2) + footer (1) + 1
+    const current = createSurface(cols, rws);
+    const target = createSurface(cols, rws);
     if (!isPacked(current) || !isPacked(target)) {
       throw new Error('dogfood-realistic requires PackedSurfaces');
     }
-    return { current, target, sink: createSink(), style: stubStyle, cols: columns, rows };
+    return { current, target, sink: createSink(), style: stubStyle, cols, rows: rws };
   },
 
   frame(state, frameIndex) {

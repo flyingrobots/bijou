@@ -1,6 +1,6 @@
 # RE-021 — Frame Owns the Pump
 
-Legend: [RE — Render Engine](../../legends/RE-render-engine.md)
+Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
 ## Idea
 
@@ -15,7 +15,7 @@ want full control. The framed app is the path for everyone else.
 
 ## Current architecture
 
-```
+```text
 runtime (owns loop, surfaces, differ, IO)
   → App.update(msg, model)    ← frame returns [model, cmds]
   → App.view(model)           ← frame returns Surface
@@ -28,7 +28,7 @@ frame budget, or memory pressure.
 
 ## Proposed architecture
 
-```
+```text
 FramedApp (owns loop, timing, perf stats, frame budget)
   → acquires input from IO
   → page.update(msg, model)

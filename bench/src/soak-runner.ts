@@ -305,8 +305,9 @@ function createSoakApp(appCtx: BijouContext) {
             }
             const mem = process.memoryUsage();
             const historyMs = recent.length > 1 ? recent.map((ns) => ns / 1_000_000) : [];
+            const measuredFps = avgNs > 0 ? 1_000_000_000 / avgNs : 0;
             const perfPanel = perfOverlaySurface({
-              fps: TARGET_FPS,
+              fps: measuredFps,
               frameTimeMs: avgNs / 1_000_000,
               frameTimeHistory: historyMs,
               width,
@@ -324,8 +325,13 @@ function createSoakApp(appCtx: BijouContext) {
               chartHeight: 5,
               ctx: appCtx,
             });
-            scene.blit(perfPanel, width - perfPanel.width - 1, 1);
-            return scene;
+            // Composite onto a fresh surface to avoid mutating the
+            // scenario-owned buffer (which would leave stale overlay
+            // pixels after toggling perf off).
+            const composite = createSurface(width, height);
+            composite.blit(scene, 0, 0);
+            composite.blit(perfPanel, width - perfPanel.width - 1, 1);
+            return composite;
           },
         };
       },

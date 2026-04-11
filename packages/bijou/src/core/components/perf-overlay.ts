@@ -109,8 +109,10 @@ export function perfOverlaySurface(
     return panel;
   }
 
-  // Build the braille chart.
-  const chartWidth = panelWidth - 4; // match inner box width
+  // Build the braille chart. Use the panel's actual width (which may be
+  // clamped by statsPanelSurface) for consistent composition.
+  const actualWidth = panel.width;
+  const chartWidth = Math.max(1, actualWidth - 4); // match inner box width
   const chart = brailleChartSurface(history, {
     width: chartWidth,
     height: chartHeight,
@@ -122,7 +124,7 @@ export function perfOverlaySurface(
   // the panel box border — it renders as a "dangling" area chart beneath the
   // titled stats box, visually extending the overlay without a second border.
   const totalHeight = panel.height + chartHeight;
-  const surface = createSurface(panelWidth, totalHeight);
+  const surface = createSurface(actualWidth, totalHeight);
   surface.blit(panel, 0, 0);
   surface.blit(chart, 2, panel.height); // indent by 2 to align with box padding
 

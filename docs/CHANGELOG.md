@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/bijou-tui`, `@flyingrobots/bijou-tui-app`, `create-bijou-tui-app`, `@flyingrobots/bijou-i18n`, `@flyingrobots/bijou-i18n-tools`, `@flyingrobots/bijou-i18n-tools-node`, `@flyingrobots/bijou-i18n-tools-xlsx`, `@flyingrobots/bijou-mcp`) are versioned in lock-step.
 
+## [Unreleased]
+
 ## [4.4.0] - 2026-04-10
 
 ### ✨ Features

@@ -26,6 +26,6 @@ Along with their option/entry types:
 ## Bench Scenario API Change (Internal)
 
 If you have custom benchmark scenarios, the `setup()` function
-signature now accepts an optional second argument
-`{ columns, rows }` for dynamic sizing. Existing scenarios that
-ignore this argument continue to work unchanged.
+signature now accepts optional `columns` and `rows` positional
+arguments after `ctx`: `setup(ctx?, columns?, rows?)`. Existing
+scenarios that ignore these arguments continue to work unchanged.

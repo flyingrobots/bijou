@@ -77,7 +77,7 @@ export const diffSparse: Scenario<State> = {
     // Pre-compute the 10% set of cell indices that will be dirtied
     // each frame. Deterministic so every sample sees the same work.
     const total = cols * rows;
-    const dirtyCount = Math.floor(total * 0.10);
+    const dirtyCount = total > 0 ? Math.max(1, Math.floor(total * 0.10)) : 0;
     const dirtyIndices: number[] = [];
     // Distribute them evenly across the surface using a stride.
     const stride = Math.floor(total / dirtyCount);

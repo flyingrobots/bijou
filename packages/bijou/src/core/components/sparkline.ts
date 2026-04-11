@@ -38,12 +38,13 @@ export interface SparklineOptions extends BijouNodeOptions {
 export function sparkline(values: readonly number[], options: SparklineOptions = {}): string {
   if (values.length === 0) return '';
 
-  const width = options.width ?? values.length;
-  if (width <= 0) return '';
+  const rawWidth = options.width ?? values.length;
+  const width = Math.max(0, Math.floor(rawWidth));
+  if (width <= 0 || !Number.isFinite(rawWidth)) return '';
 
   const sampled = sampleToWidth(sanitizeValues(values), width);
-  const min = options.min ?? safeMin(sampled);
-  const max = options.max ?? safeMax(sampled);
+  const min = Number.isFinite(options.min) ? options.min! : safeMin(sampled);
+  const max = Number.isFinite(options.max) ? options.max! : safeMax(sampled);
   const range = max - min;
 
   let result = '';

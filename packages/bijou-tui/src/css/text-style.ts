@@ -105,6 +105,9 @@ function fillStyledText(
   if (safeWidth === 0) return;
 
   if (!ctx) {
+    // Fill all cells first to clear stale content from previous paints,
+    // then overwrite with the new graphemes.
+    surface.fill({ char: ' ', empty: false });
     const graphemes = segmentGraphemes(text);
     for (let x = 0; x < Math.min(safeWidth, graphemes.length); x++) {
       surface.set(x, 0, { char: graphemes[x]!, empty: false });
