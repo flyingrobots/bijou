@@ -3759,8 +3759,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Braille-dot area chart with semantic color tokens.',
         static: 'Same Braille rendering, no animation.',
-        pipe: 'Numeric summary table (min, max, mean, samples).',
-        accessible: 'Spoken range and trend description.',
+        pipe: 'Same Braille characters (no mode-aware lowering yet — returns a Surface).',
+        accessible: 'Same Braille characters (accessible summary is a future direction).',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,

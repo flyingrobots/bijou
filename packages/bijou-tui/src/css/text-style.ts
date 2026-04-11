@@ -155,7 +155,7 @@ export function createStyledTextSurfaceWithBCSS(
   identity: BCSSIdentity,
   base: StyledTextToken = {},
 ): Surface {
-  const safeWidth = Math.max(0, Math.floor(width));
+  const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
   const surface = createSurface(safeWidth, 1, { char: ' ', empty: false });
   fillStyledText(surface, text, ctx, identity, base);
   return surface;
@@ -174,7 +174,7 @@ export function paintStyledTextSurfaceWithBCSS(
   identity: BCSSIdentity,
   base: StyledTextToken = {},
 ): Surface {
-  const safeWidth = Math.max(0, Math.floor(width));
+  const safeWidth = Number.isFinite(width) ? Math.max(0, Math.floor(width)) : 0;
 
   // Need a new surface if none exists or width changed.
   if (surface == null || surface.width !== safeWidth || surface.height !== 1) {
