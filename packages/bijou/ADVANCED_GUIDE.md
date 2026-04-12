@@ -70,7 +70,8 @@ If you are touching the render bedrock, read:
 
 The beginner guide covers presets and basic extension. The advanced lane is:
 
-- semantic token accessors like `semantic()`, `surface()`, `border()`, `ui()`
+- token accessors like `semantic()`, `surface()`, `border()`, `status()`,
+  `ui()`, and `gradient()`
 - token graph references and transforms
 - DTCG import/export
 - custom theme extension without coupling app code to raw theme object shape
@@ -78,6 +79,7 @@ The beginner guide covers presets and basic extension. The advanced lane is:
 Read:
 
 - [GUIDE theme section](./GUIDE.md#themes)
+- [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md)
 - [token graph spec](../../docs/specs/token-graph.spec.json)
 - [theme graph implementation](./src/core/theme/graph.ts)
 - [theme graph types](./src/core/theme/graph-types.ts)

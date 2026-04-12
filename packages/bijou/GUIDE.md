@@ -72,12 +72,15 @@ Bijou provides two primary output formats:
 `cyan-magenta` (default), `nord`, `catppuccin`.
 
 ### Lookups
-Use semantic helpers on the context to avoid coupling to theme structure:
+Use token helpers on the context to avoid coupling to theme structure:
 ```typescript
 const primary = ctx.semantic('primary');
 const border = ctx.border('muted');
 const success = ctx.status('success');
 ```
+
+For the canonical meaning of each token family and the first-party usage rules,
+read [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md).
 
 ## Custom Components
 

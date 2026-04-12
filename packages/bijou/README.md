@@ -68,7 +68,7 @@ Select the family based on the interaction semantic, not just the visual shape.
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Rendering doctrine, themes, and testing.
-- **[Design System](../../docs/design-system/README.md)**: Semantic guidance and component families.
+- **[Design System](../../docs/design-system/README.md)**: Foundations, token vocabulary, and component families.
 
 ---
 Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)
