@@ -602,7 +602,13 @@ export {
   type ScriptStep,
   type RunScriptOptions,
   type RunScriptResult,
+  type TestRuntimeOptions,
+  type TestRuntimeCommandResolution,
+  type TestRuntimeCommandRecord,
+  type TestRuntimeSnapshot,
+  type TestHarness,
   runScript,
+  testRuntime,
 } from './driver.js';
 
 // Canvas — shader-based character grid

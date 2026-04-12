@@ -99,6 +99,28 @@ const tl = timeline()
   .build();
 ```
 
+## Testing
+
+Use `testRuntime()` when you want an inspectable harness instead of a
+one-shot script result:
+
+```typescript
+import { testRuntime } from '@flyingrobots/bijou-tui';
+
+const harness = await testRuntime(app, { ctx });
+await harness.press('q');
+
+expect(harness.frame).toBeDefined();
+expect(harness.messages).toHaveLength(1);
+expect(harness.commands.every((record) => record.settled)).toBe(true);
+
+await harness.teardown();
+```
+
+Keep `runScript()` for fixture-style interaction playback and GIF/demo
+capture, and use `testRuntime()` when you need direct assertions on
+snapshots, emitted messages, command outcomes, or cleanup disposal.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path for building apps.

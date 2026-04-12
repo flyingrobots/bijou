@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runScript } from './driver.js';
+import { runScript, testRuntime } from './driver.js';
 import type { App, Cmd, MouseMsg } from './types.js';
 import { quit } from './commands.js';
 import { isKeyMsg, isResizeMsg } from './types.js';
@@ -259,5 +259,63 @@ describe('runScript', () => {
     const badgeCell = result.frames[0]!.get(1, 0);
     expect(badgeCell.fg).toBe('#001122');
     expect(badgeCell.bg).toBe('#33aa44');
+  });
+
+  it('records snapshots, handled messages, and emitted command messages', async () => {
+    type Msg = { type: 'load' } | { type: 'loaded'; value: string };
+    interface Model { value: string; loaded: boolean }
+
+    const app: App<Model, Msg> = {
+      init: () => [{
+        value: '',
+        loaded: false,
+      }, [() => ({ type: 'loaded', value: 'hello' })]],
+      update(msg, model) {
+        if ('type' in msg && msg.type === 'loaded') {
+          return [{ value: msg.value, loaded: true }, []];
+        }
+        return [model, []];
+      },
+      view(model) {
+        return textView(model.loaded ? `Loaded: ${model.value}` : 'Loading...');
+      },
+    };
+
+    const harness = await testRuntime(app);
+
+    expect(harness.snapshots).toHaveLength(2);
+    expect(harness.snapshots[0]!.cause).toBe('init');
+    expect(harness.snapshots[1]!.cause).toBe('update');
+    expect(harness.messages).toEqual([{ type: 'loaded', value: 'hello' }]);
+    expect(harness.emittedMessages).toEqual([{ type: 'loaded', value: 'hello' }]);
+    expect(harness.commands).toHaveLength(1);
+    expect(harness.commands[0]!.source).toBe('init');
+    expect(harness.commands[0]!.resolution).toBe('message');
+    expect(harness.commands[0]!.settled).toBe(true);
+    expect(surfaceToString(harness.frame, style)).toContain('Loaded: hello');
+  });
+
+  it('disposes cleanup-producing commands during harness teardown', async () => {
+    let disposeCalls = 0;
+    const cleanup = () => {
+      disposeCalls += 1;
+    };
+
+    const app: App<string, never> = {
+      init: () => ['cleanup', [() => cleanup]],
+      update: (_msg, model) => [model, []],
+      view: (model) => textView(model),
+    };
+
+    const harness = await testRuntime(app);
+    expect(harness.commands).toHaveLength(1);
+    expect(harness.commands[0]!.resolution).toBe('cleanup');
+    expect(harness.commands[0]!.cleanedUp).toBe(false);
+
+    await harness.teardown();
+
+    expect(disposeCalls).toBe(1);
+    expect(harness.commands[0]!.cleanedUp).toBe(true);
+    expect(harness.running).toBe(false);
   });
 });

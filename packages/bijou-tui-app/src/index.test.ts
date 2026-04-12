@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { runScript, stripAnsi, visibleLength } from '@flyingrobots/bijou-tui';
 import { surfaceToString } from '@flyingrobots/bijou';
+import { testRuntime } from '../../bijou-tui/src/index.js';
 import { createTuiAppSkeleton } from './index.js';
 
 function expectSurface(value: ReturnType<ReturnType<typeof createTuiAppSkeleton>['view']>) {
@@ -72,11 +73,15 @@ describe('createTuiAppSkeleton', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const app = createTuiAppSkeleton({ ctx });
 
-    const qOpen = await runScript(app, [{ key: 'q' }], { ctx });
-    expect(stripAnsi(surfaceToString(qOpen.frames.at(-1)!, ctx.style))).toContain('Quit?');
+    const harness = await testRuntime(app, { ctx });
+    await harness.press('q');
+    expect(stripAnsi(surfaceToString(harness.frame, ctx.style))).toContain('Quit?');
+    expect(harness.messages).toHaveLength(1);
 
-    const qCancel = await runScript(app, [{ key: 'q' }, { key: 'n' }], { ctx });
-    expect(stripAnsi(surfaceToString(expectSurface(app.view(qCancel.model)), ctx.style))).not.toContain('Quit?');
+    await harness.press('n');
+    expect(stripAnsi(surfaceToString(expectSurface(app.view(harness.model)), ctx.style))).not.toContain('Quit?');
+    expect(harness.snapshots.length).toBeGreaterThan(2);
+    await harness.teardown();
 
     const ctrlCOpen = await runScript(app, [{ key: '\x03' }], { ctx });
     expect(stripAnsi(surfaceToString(ctrlCOpen.frames.at(-1)!, ctx.style))).toContain('Quit?');

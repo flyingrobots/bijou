@@ -123,5 +123,32 @@ timeline()
 - **`InputStack`**: Layered input routing for modals and overlays.
 - **`MouseMsg`**: Support for SGR mouse reporting (click, drag, scroll).
 
+## Testing with `testRuntime()`
+
+Use `testRuntime()` when you want to assert against the live runtime
+without wiring an `EventBus` by hand.
+
+```typescript
+import { testRuntime } from '@flyingrobots/bijou-tui';
+
+const harness = await testRuntime(app, { ctx });
+
+await harness.press('q');
+expect(harness.snapshot().frame).toBeDefined();
+expect(harness.messages).toHaveLength(1);
+expect(harness.commands.every((record) => record.settled)).toBe(true);
+
+await harness.teardown();
+```
+
+`TestHarness` exposes:
+- `snapshots` for render/model checkpoints
+- `messages` for handled runtime messages
+- `emittedMessages` for messages produced by commands
+- `commands` for final command outcomes and cleanup disposal
+
+Keep `runScript()` for fixture playback, demo capture, and tests where you
+only need final frames plus model state.
+
 ---
 **The runtime view contract requires either a `Surface` or a `LayoutNode`. Raw strings must be converted explicitly.**
