@@ -2,13 +2,13 @@
 
 Node.js adapters and runtime utilities for Bijou.
 
-This package bridges the pure `@flyingrobots/bijou` core and the `@flyingrobots/bijou-tui` runtime to the Node.js environment. It owns runtime detection, terminal I/O, Chalk-backed styling, worker-thread helpers, and the native surface recorder.
+`@flyingrobots/bijou-node` bridges the pure core and the TUI runtime to the Node.js environment. It owns platform detection, terminal I/O, Chalk-backed styling, and worker-thread helpers.
 
-## Package Role
+## Role
 
-- **Worker runtime support** — `runInWorker()` and `startWorkerApp()` let TEA apps move heavy update work off the main thread while keeping input and rendering responsive.
-- **Native surface recorder** — scripted captures can be recorded directly from captured `Surface[]` frames with `recordDemoGif()`.
-- **Node boundary stays explicit** — runtime facts, I/O, and styling remain behind the port interfaces instead of leaking `process`, `readline`, or Chalk into the pure packages.
+- **Port Implementation**: Maps Node.js APIs to the Bijou port interfaces.
+- **Worker Runtime**: Offloads heavy TEA logic to worker threads while maintaining main-thread responsiveness.
+- **Bootstrapping**: One-line context initialization with `initDefaultContext()`.
 
 ## Install
 
@@ -16,86 +16,36 @@ This package bridges the pure `@flyingrobots/bijou` core and the `@flyingrobots/
 npm install @flyingrobots/bijou @flyingrobots/bijou-node
 ```
 
-## Usage
+## Quick Start
 
 ```typescript
 import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { box, headerBox } from '@flyingrobots/bijou';
+import { headerBox } from '@flyingrobots/bijou';
 
-// Wire up Node.js adapters and set the default context.
-// Auto-detects TTY, CI, NO_COLOR, and TERM=dumb.
 initDefaultContext();
 
 console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 ```
 
-## Features Breakdown
+## Port Mapping
 
-- **Port implementation for Node.js**: complete `RuntimePort`, `IOPort`, and `StylePort` adapters for `@flyingrobots/bijou`.
-- **Runtime detection**: environment variables, TTY state, and terminal dimensions sourced from `process`.
-- **Interactive terminal I/O**: stdin/stdout integration with readline and resize-event support.
-- **Styling backend**: Chalk-powered color/style methods wired into bijou styling APIs.
-- **One-line bootstrap**: `initDefaultContext()` creates a production-ready context and registers it as default on first call.
-- **Worker helpers**: `runInWorker()` and `startWorkerApp()` for moving app logic into a worker thread.
-- **Native recorder**: `recordDemoGif()` and related helpers for scripted surface capture.
-
-## What It Provides
-
-`bijou-node` implements the three ports that `@flyingrobots/bijou` requires:
-
-| Port | Implementation | What it does |
+| Port | Node.js Implementation | Responsibility |
 | :--- | :--- | :--- |
-| `RuntimePort` | `nodeRuntime()` | `process.env`, TTY detection, terminal dimensions |
-| `IOPort` | `nodeIO()` | `process.stdout/stdin`, readline, resize events |
-| `StylePort` | `chalkStyle()` | RGB/hex color via chalk, respects `NO_COLOR` |
+| **`RuntimePort`** | `nodeRuntime()` | `process.env`, TTY detection, dimensions |
+| **`IOPort`** | `nodeIO()` | `stdout`/`stdin`, readline, resize events |
+| **`StylePort`** | `chalkStyle()` | RGB/hex styling, `NO_COLOR` support |
 
-### API
+## API
 
-```typescript
-// Individual port factories
-import { nodeRuntime, nodeIO, chalkStyle } from '@flyingrobots/bijou-node';
+- **`createNodeContext()`**: Returns a wired `BijouContext` without setting it as the global default.
+- **`initDefaultContext()`**: Registers the first context as the global default for all Bijou components.
+- **`runInWorker()`**: Starts a TEA app inside a worker thread.
+- **`recordDemoGif()`**: Captures surface frames and rasterizes them to GIF for documentation.
 
-// All-in-one context (most common)
-import { createNodeContext, initDefaultContext } from '@flyingrobots/bijou-node';
+## Documentation
 
-// createNodeContext() — returns a BijouContext without setting it as default
-const ctx = createNodeContext();
-
-// initDefaultContext() — first call registers as global default; later calls return fresh unregistered contexts
-initDefaultContext();
-```
-
-If you need to replace the default context later in-process, call `setDefaultContext(createNodeContext())` from `@flyingrobots/bijou`.
-
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for how the adapter maps to Node.js APIs, and [GUIDE.md](./GUIDE.md) for usage patterns.
-For upgrading existing apps, see [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
-
-## Related Packages
-
-- [`@flyingrobots/bijou`](https://www.npmjs.com/package/@flyingrobots/bijou) — Zero-dependency core with all components and theme engine
-- [`@flyingrobots/bijou-tui`](https://www.npmjs.com/package/@flyingrobots/bijou-tui) — TEA runtime for interactive terminal apps
-
-## License
-
-Apache-2.0
+- **[GUIDE.md](./GUIDE.md)**: Productive-fast path for Node setups.
+- **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Worker thread and recorder internals.
 
 ---
-
-<p align="center">
-Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
-</p>
-
-```rust
-.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
-;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
-[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
-`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
- 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
- "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
-:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
-;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
- [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
- $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
- 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
- MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
-```
+Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)

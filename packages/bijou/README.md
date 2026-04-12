@@ -2,20 +2,13 @@
 
 The pure, zero-dependency core of Bijou.
 
-`@flyingrobots/bijou` is the degradation-first terminal toolkit in the Bijou stack. It contains components, prompts, themes, environment detection, test adapters, and the foundational `Surface` and `LayoutNode` primitives that the interactive runtime builds on.
+`@flyingrobots/bijou` provides the foundational primitives for CLIs, prompts, and portable terminal output. It manages components, themes, environment detection, and the core `Surface` and `LayoutNode` types.
 
-## Package Role
+## Role
 
-- **Core/runtime split stays explicit** — the core package remains the right place for CLIs, prompts, logs, and portable terminal output, while `@flyingrobots/bijou-tui` owns the fullscreen runtime.
-- **Surface primitives without abandoning strings** — the package is intentionally mixed-mode. String-oriented helpers remain first-class where they fit the toolkit identity, and runtime-friendly surface helpers exist where they actually help.
-- **Surface-first companions for common runtime chrome** — `boxSurface`, `headerBoxSurface`, `separatorSurface`, `alertSurface`, and `tableSurface` let runtime apps stay on the `Surface` path for common layout and status primitives.
-- **Explicit seam crossing** — when you move `Surface` output back into string-first APIs, you do it deliberately with `surfaceToString(surface, ctx.style)`.
-- **Same hexagonal core** — ports, themes, output-mode detection, and test adapters remain pure and dependency-free.
-- **Byte-packed surfaces** — `Surface` is backed by a `Uint8Array` (10 bytes per cell). The `setRGB()` method writes character code + numeric RGB directly into the buffer with zero string parsing or object allocation. All built-in surface components use this fast path automatically.
-
-## Documentation
-
-See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, design system, and DOGFOOD proving surface.
+- **Degradation-First**: Automatic mode detection for `interactive`, `static`, `pipe`, and `accessible` output.
+- **Mixed-Mode**: High-performance `Surface` primitives for rich apps, plus string-first helpers for standalone scripts.
+- **Hexagonal Core**: Pure TypeScript logic isolated from platform IO via `Runtime`, `IO`, and `Style` ports.
 
 ## Install
 
@@ -29,7 +22,6 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, boxSurface, tableSurface } from '@flyingrobots/bijou';
 
-// Initialize Node.js adapters (auto-detects TTY, CI, NO_COLOR)
 const ctx = initDefaultContext();
 
 const panel = boxSurface(
@@ -38,186 +30,42 @@ const panel = boxSurface(
     rows: [['api', badge('LIVE', { variant: 'success', ctx })]],
     ctx,
   }),
-  { title: 'Runtime', padding: { top: 1, bottom: 1, left: 2, right: 2 }, ctx },
+  { title: 'Runtime', padding: 1, ctx },
 );
-
-// Return `panel` from a runtime `view()` function or framed pane renderer.
 ```
 
-## Features Breakdown
+## Strategy: Choosing Component Families
 
-- **Resilient rendering**: automatic mode switching for interactive, static, pipe, and accessible output.
-- **Core UI primitives**: `box`, `headerBox`, `table`, `tree`, `accordion`, `tabs`, `breadcrumb`, `stepper`, `timeline`, `paginator`.
-- **Graph tooling**: `dag`, `dagSlice`, and `dagStats` for visualizing and analyzing DAGs.
-- **Interactive forms**: `input`, `select`, `multiselect`, `confirm`, `group`, `wizard`, `textarea`, and `filter`.
-- **Theme system**: preset themes + DTCG-compatible custom token loading via `BIJOU_THEME`.
-- **Test adapters**: deterministic test context and assertion helpers for mock-free component testing.
+Select the family based on the interaction semantic, not just the visual shape.
 
-## Design guidance
+### Status and Feedback
+- **`badge()`**: Compact, inline status.
+- **`note()`**: Non-urgent explanation.
+- **`alert()`**: Persistent, in-flow message.
+- *Use `@flyingrobots/bijou-tui` notifications for stacking, history, or active routing.*
 
-For the system-level guidance behind the component catalog, see:
+### Selection and Prompts
+- **`select()`**: Single choice from a stable set.
+- **`filter()`**: Search-led choice from a large or dynamic set.
+- **`multiselect()`**: Choosing multiple values to build a set.
+- **`confirm()`**: Strictly binary decisions.
 
-- [`../../docs/design-system/README.md`](../../docs/design-system/README.md)
-- [`../../docs/design-system/foundations.md`](../../docs/design-system/foundations.md)
-- [`../../docs/design-system/patterns.md`](../../docs/design-system/patterns.md)
-- [`../../docs/design-system/component-families.md`](../../docs/design-system/component-families.md)
+### Hierarchy and Chronology
+- **`tree()`**: Parent/child nesting.
+- **`timeline()`**: Sequential, time-ordered events.
+- **`dag()`**: Causal or dependency-based graphs.
 
-Those docs answer the questions the API reference cannot:
+### Progress and Wayfinding
+- **`progressBar()`**: Determinate completion.
+- **`spinner()`**: Indeterminate activity.
+- **`breadcrumb()`**: Path context.
+- **`stepper()`**: Ordered stages in a linear process.
 
-- when to use a family
-- when not to use it
-- which variation is semantic versus render-path versus interaction-layer
-- what belongs in core Bijou versus `@flyingrobots/bijou-tui`
+## Documentation
 
-## Choosing Component Families
-
-### Status and feedback
-
-- Use `badge()` when status is compact and belongs inline with another object.
-- Use `note()` when the user needs explanation without urgency.
-- Use `alert()` when the message should persist inside the page or document flow.
-- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
-
-### Selection and prompts
-
-- Use `select()` when the user is choosing one stored value from a short, stable set.
-- Use `filter()` when the user is still choosing one stored value, but search and narrowing are the real job.
-- Use `multiselect()` when the user is building a lasting set, not firing one-off commands.
-- Use `confirm()` only when the decision is genuinely binary.
-- Move to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` when the outcome is an action or navigation command instead of stored form state.
-
-### Tables and inspection
-
-- Use `table()` when row/column comparison is the main job and string output is still the right endpoint.
-- Use `tableSurface()` when the job is still passive comparison, but your runtime app is already composing `Surface` output.
-- Use `navigableTable()` from `@flyingrobots/bijou-tui` when the user needs keyboard-owned row or cell inspection instead of passive reading.
-
-### Hierarchy and chronology
-
-- Use `tree()` when parent/child nesting is the main thing the reader needs to understand.
-- Use `timeline()` when chronology is the actual reading path.
-- Move to `dag()` when dependency or causal flow matters more than simple order or nesting.
-- Use `dagSlice()` when a local neighborhood or ancestor/descendant chain is the honest scope.
-- Use `dagStats()` when graph health or structural summary matters more than visual shape.
-
-### Wayfinding and progress
-
-- Use `breadcrumb()` when path context helps explain the current location.
-- Use `paginator()` when compact position-in-sequence feedback is enough.
-- Use `stepper()` when the user is progressing through ordered stages rather than switching among peers.
-
-### Containment and formatted content
-
-- Use `box()` when a region needs visible containment or comparison against sibling panels.
-- Use `headerBox()` when that same region also needs a compact title and detail line.
-- Use `markdown()` for bounded help, reference, and release-note prose that should lower honestly across rich, pipe, and accessible output.
-- Avoid turning every subsection into a box or using markdown as a substitute layout engine for full application chrome.
-
-### Loading, links, and expressive moments
-
-- Use `skeleton()` for short-lived placeholders when the final content shape is known.
-- Use `hyperlink()` when the destination itself should remain explicit and trustworthy in terminal output.
-- Use `kbd()` for local inline shortcut cues; use shell help in `@flyingrobots/bijou-tui` when the user needs a broader keybinding reference.
-- Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
-
-### Progress and custom primitives
-
-- Use `progressBar()` when completion can be estimated honestly.
-- Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
-- Use `renderByMode()` when you are authoring an app-specific primitive that must stay truthful across rich, pipe, and accessible output.
-
-## Components
-
-### Layout
-`box()`, `headerBox()`, `separator()` plus `boxSurface()`, `headerBoxSurface()`, `separatorSurface()` — string-first helpers and surface-native companions for layout chrome.
-
-### Elements
-`badge()`, `alert()`, `alertSurface()`, `kbd()`, `skeleton()`, `hyperlink()` — inline status, in-flow status blocks, loading placeholders, trusted links, and UI primitives.
-
-### Data
-`table()`, `tableSurface()`, `tree()`, `accordion()`, `timeline()`, `dag()`, `dagSlice()`, `dagLayout()`, `dagStats()` — passive comparison and structured data display, DAG rendering with `DagSource` adapter, and graph statistics.
-
-### Documents
-`markdown()` — structured terminal prose for help, readmes, and reference content with mode-aware lowering.
-
-### Navigation
-`tabs()`, `breadcrumb()`, `stepper()`, `paginator()` — wayfinding components.
-
-### Animation & Progress
-`spinnerFrame()`, `createSpinner()`, `progressBar()`, `createProgressBar()`, `createAnimatedProgressBar()`, `gradientText()`, `loadRandomLogo()` — determinate and indeterminate progress, live-updating output, expressive gradients, and branded ASCII moments.
-
-### Authoring helpers
-`renderByMode()` — mode-aware helper for app-authored primitives that need honest rich/pipe/accessible lowering.
-
-### Forms
-`input()`, `select()`, `multiselect()`, `confirm()`, `group()`, `wizard()`, `textarea()`, `filter()` — interactive prompts with validation that degrade to numbered-list selection in pipe/CI modes.
-
-### Theme Engine
-DTCG (Design Tokens Community Group) interop. Built-in presets: `nord`, `catppuccin`, `cyan-magenta`, `teal-orange-pink`. Load custom themes via `BIJOU_THEME` env var or `extendTheme()`.
-
-## Architecture
-
-bijou uses a Ports and Adapters (hexagonal) architecture. See [ARCHITECTURE.md](./ARCHITECTURE.md) for the package-level design and [`../../docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) for the monorepo-wide architecture.
-
-The core is pure TypeScript with zero runtime dependencies — all platform concerns flow through three ports:
-
-- **`RuntimePort`** — environment variables, TTY detection, terminal dimensions
-- **`IOPort`** — stdout writes, stdin reads, resize events, file I/O
-- **`StylePort`** — RGB/hex color application, bold/italic/etc.
-
-### Output Modes
-
-bijou auto-detects the environment and adapts rendering:
-
-| Mode | Trigger | Behavior |
-| :--- | :--- | :--- |
-| **Interactive** | TTY | Full RGB, unicode, animations |
-| **Static** | `CI=true` | Single-frame, no animations |
-| **Pipe** | Piped stdout | Plain text, ASCII fallbacks |
-| **Accessible** | `BIJOU_ACCESSIBLE=1` | Screen-reader friendly |
-
-## Testing
-
-Import test adapters for deterministic, mock-free component testing:
-
-```typescript
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { box } from '@flyingrobots/bijou';
-
-const ctx = createTestContext({ mode: 'interactive' });
-const result = box('hello', { ctx });
-// Assert on the string directly — no process mocking needed
-```
-
-See [GUIDE.md](./GUIDE.md) for more on testing, theming, and component usage.
-For upgrading existing apps, see the monorepo migration guide at [`../../docs/MIGRATING_TO_V4.md`](../../docs/MIGRATING_TO_V4.md).
-
-## Related Packages
-
-- [`@flyingrobots/bijou-node`](https://www.npmjs.com/package/@flyingrobots/bijou-node) — Node.js runtime adapter (chalk, readline, process)
-- [`@flyingrobots/bijou-tui`](https://www.npmjs.com/package/@flyingrobots/bijou-tui) — TEA runtime for interactive terminal apps
-
-## License
-
-Apache-2.0
+- **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
+- **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Rendering doctrine, themes, and testing.
+- **[Design System](../../docs/design-system/README.md)**: Semantic guidance and component families.
 
 ---
-
-<p align="center">
-Built with 💎 by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
-</p>
-
-```rust
-.-:::::':::   .-:.     ::-.::::::.    :::.  .,-:::::/
-;;;'''' ;;;    ';;.   ;;;;';;;`;;;;,  `;;;,;;-'````'
-[[[,,== [[[      '[[,[[['  [[[  [[[[[. '[[[[[   [[[[[[/
-`$$$"`` $$'        c$$"    $$$  $$$ "Y$c$$"$$c.    "$$
- 888   o88oo,.__ ,8P"`     888  888    Y88 `Y8bo,,,o88o
- "MM,  """"YUMMMmM"        MMM  MMM     YM   `'YMUP"YMM
-:::::::..       ...     :::::::.      ...   :::::::::::: .::::::.
-;;;;``;;;;   .;;;;;;;.   ;;;'';;'  .;;;;;;;.;;;;;;;;'''';;;`    `
- [[[,/[[['  ,[[     \[[, [[[__[[\.,[[     \[[,   [[     '[==/[[[[,
- $$$$$$c    $$$,     $$$ $$""""Y$$$$$,     $$$   $$       '''    $
- 888b "88bo,"888,_ _,88P_88o,,od8P"888,_ _,88P   88,     88b    dP
- MMMM   "W"   "YMMMMMP" ""YUMMMP"   "YMMMMMP"    MMM      "YMmMY"
-```
+Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)
