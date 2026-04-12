@@ -1082,6 +1082,228 @@ function customPrimitivePreview(input: {
   });
 }
 
+interface DataVizSeriesSummary {
+  readonly count: number;
+  readonly first: number;
+  readonly last: number;
+  readonly min: number;
+  readonly max: number;
+  readonly trend: string;
+}
+
+interface DataVizMetricEntry {
+  readonly label: string;
+  readonly value: string;
+  readonly sparkline?: readonly number[];
+}
+
+function summarizeDataVizSeries(values: readonly number[]): DataVizSeriesSummary {
+  const safeValues = values.map((value) => Number.isFinite(value) ? value : 0);
+  if (safeValues.length === 0) {
+    return { count: 0, first: 0, last: 0, min: 0, max: 0, trend: 'flat' };
+  }
+
+  const first = safeValues[0]!;
+  const last = safeValues[safeValues.length - 1]!;
+  let min = first;
+  let max = first;
+  let rises = 0;
+  let falls = 0;
+
+  for (let index = 1; index < safeValues.length; index++) {
+    const previous = safeValues[index - 1]!;
+    const current = safeValues[index]!;
+    if (current > previous) rises++;
+    else if (current < previous) falls++;
+    if (current < min) min = current;
+    if (current > max) max = current;
+  }
+
+  const range = max - min;
+  let trend = 'flat';
+  if (rises === 0 && falls === 0) trend = 'flat';
+  else if (rises === 0) trend = 'falling';
+  else if (falls === 0) trend = 'rising';
+  else if (Math.abs(last - first) <= Math.max(1, range * 0.2)) trend = 'mixed';
+  else trend = last > first ? 'rising with dips' : 'falling with rebounds';
+
+  return { count: safeValues.length, first, last, min, max, trend };
+}
+
+function formatDataVizNumber(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  return Number.isInteger(rounded)
+    ? String(rounded)
+    : rounded.toFixed(1).replace(/\.0$/, '');
+}
+
+function compactDataVizValues(values: readonly number[], maxItems = 6): string {
+  const formatted = values
+    .map((value) => Number.isFinite(value) ? value : 0)
+    .map((value) => formatDataVizNumber(value));
+  if (formatted.length <= maxItems) {
+    return formatted.join(', ');
+  }
+
+  const headCount = Math.max(2, Math.ceil(maxItems / 2));
+  const tailCount = Math.max(1, Math.floor(maxItems / 2) - 1);
+  return `${formatted.slice(0, headCount).join(', ')}, ..., ${formatted.slice(-tailCount).join(', ')}`;
+}
+
+function dataVizSummarySurface(width: number, lines: readonly string[]): Surface {
+  return column(lines.map((entry) => line(entry, Math.max(20, width))));
+}
+
+function renderSparklineStoryPreview(
+  values: readonly number[],
+  options: { readonly width?: number; readonly min?: number; readonly max?: number },
+  ctx: BijouContext,
+  width: number,
+): string | Surface {
+  if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+    return sparkline(values, { ...options, ctx });
+  }
+
+  const summary = summarizeDataVizSeries(values);
+  if (ctx.mode === 'pipe') {
+    return dataVizSummarySurface(width, [
+      `samples: ${summary.count}`,
+      `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
+      `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
+      `values: ${compactDataVizValues(values)}`,
+    ]);
+  }
+
+  return dataVizSummarySurface(width, [
+    `${summary.count} samples.`,
+    `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
+    `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; latest ${formatDataVizNumber(summary.last)}.`,
+    `Overall ${summary.trend} trend.`,
+  ]);
+}
+
+function renderBrailleChartStoryPreview(
+  values: readonly number[],
+  options: { readonly width: number; readonly height: number; readonly min?: number; readonly max?: number },
+  ctx: BijouContext,
+  width: number,
+): Surface {
+  if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+    return brailleChartSurface(values, { ...options, ctx });
+  }
+
+  const summary = summarizeDataVizSeries(values);
+  if (ctx.mode === 'pipe') {
+    return dataVizSummarySurface(width, [
+      `samples: ${summary.count}`,
+      `range: ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}`,
+      `peak: ${formatDataVizNumber(summary.max)}`,
+      `latest: ${formatDataVizNumber(summary.last)} (${summary.trend})`,
+    ]);
+  }
+
+  return dataVizSummarySurface(width, [
+    `${summary.count} samples.`,
+    `Started at ${formatDataVizNumber(summary.first)} and ended at ${formatDataVizNumber(summary.last)}.`,
+    `Range ${formatDataVizNumber(summary.min)} to ${formatDataVizNumber(summary.max)}; peak ${formatDataVizNumber(summary.max)}.`,
+    `Overall ${summary.trend} area trend.`,
+  ]);
+}
+
+function renderMetricListPreview(
+  title: string,
+  entries: readonly DataVizMetricEntry[],
+  ctx: BijouContext,
+  width: number,
+): Surface {
+  if (ctx.mode === 'pipe') {
+    return dataVizSummarySurface(width, [
+      title,
+      ...entries.map((entry) => {
+        if (entry.sparkline == null || entry.sparkline.length === 0) {
+          return `${entry.label}: ${entry.value}`;
+        }
+        const summary = summarizeDataVizSeries(entry.sparkline);
+        return `${entry.label}: ${entry.value} (${formatDataVizNumber(summary.min)}-${formatDataVizNumber(summary.max)}, ${summary.trend})`;
+      }),
+    ]);
+  }
+
+  return dataVizSummarySurface(width, [
+    `${title} metrics.`,
+    ...entries.map((entry) => {
+      if (entry.sparkline == null || entry.sparkline.length === 0) {
+        return `${entry.label}: ${entry.value}.`;
+      }
+      const summary = summarizeDataVizSeries(entry.sparkline);
+      return `${entry.label}: ${entry.value}. Trend ${formatDataVizNumber(summary.min)}-${formatDataVizNumber(summary.max)}, ${summary.trend}.`;
+    }),
+  ]);
+}
+
+function renderStatsPanelStoryPreview(
+  entries: readonly DataVizMetricEntry[],
+  options: { readonly title?: string; readonly width: number },
+  ctx: BijouContext,
+  width: number,
+): Surface {
+  if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+    return statsPanelSurface(entries, { ...options, ctx });
+  }
+
+  return renderMetricListPreview(options.title ?? 'Metrics', entries, ctx, width);
+}
+
+function formatPerfValue(value: number, decimals: number): string {
+  return Number.isFinite(value) ? value.toFixed(decimals) : '--';
+}
+
+function perfOverlayEntries(stats: {
+  readonly fps: number;
+  readonly frameTimeMs: number;
+  readonly frameTimeHistory?: readonly number[];
+  readonly width: number;
+  readonly height: number;
+  readonly heapUsedMB?: number;
+  readonly rssMB?: number;
+}): DataVizMetricEntry[] {
+  const entries: DataVizMetricEntry[] = [
+    { label: 'FPS', value: String(Math.round(stats.fps)) },
+    { label: 'frame', value: `${formatPerfValue(stats.frameTimeMs, 2)} ms`, sparkline: stats.frameTimeHistory },
+    { label: 'size', value: `${stats.width}×${stats.height}` },
+  ];
+
+  if (stats.heapUsedMB != null) {
+    entries.push({ label: 'heap', value: `${formatPerfValue(stats.heapUsedMB, 1)} MB` });
+  }
+  if (stats.rssMB != null) {
+    entries.push({ label: 'rss', value: `${formatPerfValue(stats.rssMB, 1)} MB` });
+  }
+
+  return entries;
+}
+
+function renderPerfOverlayStoryPreview(
+  stats: {
+    readonly fps: number;
+    readonly frameTimeMs: number;
+    readonly frameTimeHistory?: readonly number[];
+    readonly width: number;
+    readonly height: number;
+    readonly heapUsedMB?: number;
+    readonly rssMB?: number;
+  },
+  options: { readonly title?: string; readonly showChart?: boolean },
+  ctx: BijouContext,
+  width: number,
+): Surface {
+  if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+    return perfOverlaySurface(stats, { ...options, ctx });
+  }
+
+  return renderMetricListPreview(options.title ?? 'Perf', perfOverlayEntries(stats), ctx, width);
+}
+
 function denseComparisonPreview(input: {
   readonly width: number;
   readonly ctx: BijouContext;
@@ -3706,8 +3928,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Unicode block characters (▁▂▃▄▅▆▇█) with optional semantic color.',
         static: 'Same block rendering, no animation.',
-        pipe: 'Same block characters (no mode-aware lowering yet — sparkline returns a plain string).',
-        accessible: 'Same block characters (accessible text summary is a future direction).',
+        pipe: 'Plain trend summary with range, latest value, and a compact sample list.',
+        accessible: 'Trend summary stating sample count, range, start/end, and overall direction.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3716,22 +3938,34 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         id: 'basic',
         label: 'Basic trend',
         description: 'Raw block-character rendering of a short time series.',
-        render: ({ ctx }) => sparkline([1, 5, 3, 8, 2, 7, 4, 6, 9, 3], { ctx }),
+        render: ({ width, ctx }) => renderSparklineStoryPreview(
+          [1, 5, 3, 8, 2, 7, 4, 6, 9, 3],
+          {},
+          ctx,
+          width,
+        ),
       },
       {
         id: 'fixed-width',
         label: 'Fixed width',
         description: 'Values resampled to fit a specific character width.',
-        render: ({ width, ctx }) => sparkline(
+        render: ({ width, ctx }) => renderSparklineStoryPreview(
           [10, 20, 15, 40, 35, 25, 30, 50, 45, 20, 10, 30, 60, 55, 40],
-          { width: Math.max(8, width - 4), ctx },
+          { width: Math.max(8, width - 4) },
+          ctx,
+          width,
         ),
       },
       {
         id: 'explicit-range',
         label: 'Explicit min/max',
         description: 'Fixed axis bounds for stable cross-comparison.',
-        render: ({ ctx }) => sparkline([3, 5, 4, 6, 5, 7], { min: 0, max: 10, ctx }),
+        render: ({ width, ctx }) => renderSparklineStoryPreview(
+          [3, 5, 4, 6, 5, 7],
+          { min: 0, max: 10 },
+          ctx,
+          width,
+        ),
       },
     ],
     tags: ['visualization', 'inline', 'trend'],
@@ -3759,8 +3993,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Braille-dot area chart with semantic color tokens.',
         static: 'Same Braille rendering, no animation.',
-        pipe: 'Same Braille characters (no mode-aware lowering yet — returns a Surface).',
-        accessible: 'Same Braille characters (accessible summary is a future direction).',
+        pipe: 'Plain trend summary with range, peak, and latest value instead of Braille area fill.',
+        accessible: 'Area-chart meaning restated as sample count, range, peak, and direction in reading order.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3769,18 +4003,22 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         id: 'basic',
         label: 'Basic area chart',
         description: 'Auto-scaled filled area chart.',
-        render: ({ width, ctx }) => brailleChartSurface(
+        render: ({ width, ctx }) => renderBrailleChartStoryPreview(
           [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],
-          { width: Math.max(10, width - 4), height: 6, ctx },
+          { width: Math.max(10, width - 4), height: 6 },
+          ctx,
+          width,
         ),
       },
       {
         id: 'explicit-range',
         label: 'Explicit min/max',
         description: 'Fixed axis range for stable comparison across variants.',
-        render: ({ width, ctx }) => brailleChartSurface(
+        render: ({ width, ctx }) => renderBrailleChartStoryPreview(
           [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],
-          { width: Math.max(10, width - 4), height: 6, min: 0, max: 10, ctx },
+          { width: Math.max(10, width - 4), height: 6, min: 0, max: 10 },
+          ctx,
+          width,
         ),
       },
     ],
@@ -3809,8 +4047,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Bordered box with aligned labels, values, and sparklines.',
         static: 'Same bordered layout, single-frame snapshot.',
-        pipe: 'Key: value lines, one per row.',
-        accessible: 'Labeled metric list read sequentially.',
+        pipe: 'Key: value lines, one per row, with trend notes when sparklines are present.',
+        accessible: 'Labeled metric list read sequentially, with trend notes made explicit.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3819,22 +4057,22 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         id: 'basic',
         label: 'Basic metrics',
         description: 'Labeled key-value rows in a titled box.',
-        render: ({ width, ctx }) => statsPanelSurface([
+        render: ({ width, ctx }) => renderStatsPanelStoryPreview([
           { label: 'FPS', value: '60' },
           { label: 'frame time', value: '16.7 ms' },
           { label: 'heap', value: '42.1 MB' },
           { label: 'rss', value: '128 MB' },
-        ], { title: 'Runtime', width: Math.min(36, Math.max(24, width - 4)), ctx }),
+        ], { title: 'Runtime', width: Math.min(36, Math.max(24, width - 4)) }, ctx, width),
       },
       {
         id: 'with-sparklines',
         label: 'Inline sparklines',
         description: 'Sparkline trails after each value give rolling trend context.',
-        render: ({ width, ctx }) => statsPanelSurface([
+        render: ({ width, ctx }) => renderStatsPanelStoryPreview([
           { label: 'FPS', value: '58', sparkline: [55, 60, 58, 62, 57, 60, 58, 61] },
           { label: 'frame', value: '17.2 ms', sparkline: [18, 16, 17, 15, 18, 17, 16, 17] },
           { label: 'heap', value: '42 MB', sparkline: [38, 40, 42, 41, 43, 42, 40, 42] },
-        ], { title: 'Perf', width: Math.min(44, Math.max(30, width - 4)), ctx }),
+        ], { title: 'Perf', width: Math.min(44, Math.max(30, width - 4)) }, ctx, width),
       },
     ],
     tags: ['visualization', 'metrics', 'panel', 'dashboard'],
@@ -3862,8 +4100,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Stats panel with braille area chart, semantic color tokens.',
         static: 'Same panel and chart layout, single-frame snapshot.',
-        pipe: 'FPS/memory lines as plain key-value output.',
-        accessible: 'Spoken metric summary: FPS, frame time, memory usage.',
+        pipe: 'FPS/memory lines plus frame-time trend summary in plain text.',
+        accessible: 'Spoken metric summary with frame-time trend described explicitly.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3872,7 +4110,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         id: 'basic',
         label: 'Standard overlay',
         description: 'FPS, frame time, and memory with a braille frame-time chart.',
-        render: ({ ctx }) => perfOverlaySurface({
+        render: ({ width, ctx }) => renderPerfOverlayStoryPreview({
           fps: 60,
           frameTimeMs: 16.7,
           frameTimeHistory: [18, 16, 17, 15, 18, 17, 16, 17, 15, 16, 18, 17, 16, 15, 17, 16],
@@ -3880,19 +4118,19 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           height: 40,
           heapUsedMB: 42.1,
           rssMB: 128,
-        }, { ctx }),
+        }, {}, ctx, width),
       },
       {
         id: 'no-chart',
         label: 'Stats only',
         description: 'Compact panel without the braille chart for tight spaces.',
-        render: ({ ctx }) => perfOverlaySurface({
+        render: ({ width, ctx }) => renderPerfOverlayStoryPreview({
           fps: 30,
           frameTimeMs: 33.3,
           width: 80,
           height: 24,
           heapUsedMB: 64.2,
-        }, { showChart: false, ctx }),
+        }, { showChart: false }, ctx, width),
       },
     ],
     tags: ['visualization', 'performance', 'overlay', 'dashboard'],
