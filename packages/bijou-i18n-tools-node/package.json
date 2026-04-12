@@ -24,6 +24,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@flyingrobots/bijou-i18n": "4.4.1",
     "@flyingrobots/bijou-i18n-tools": "4.4.1"
   },
   "devDependencies": {
