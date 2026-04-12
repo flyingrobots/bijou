@@ -70,6 +70,28 @@ describe('table', () => {
     expect(result).toBe('Name\tStatus\tScore');
   });
 
+  it('pads emoji-presentation dingbats so later columns stay aligned', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = table({
+      columns: [
+        { header: 'Name' },
+        { header: 'Status' },
+        { header: 'Count' },
+      ],
+      rows: [
+        ['Alpha', 'ok', '1'],
+        ['Beta', '❌', '2'],
+        ['Gamma', '✅', '3'],
+      ],
+      ctx,
+    });
+
+    const lines = result.split('\n');
+    expect(lines[3]).toBe('│ Alpha │ ok     │ 1     │');
+    expect(lines[4]).toBe('│ Beta  │ ❌     │ 2     │');
+    expect(lines[5]).toBe('│ Gamma │ ✅     │ 3     │');
+  });
+
   describe('background fill', () => {
     it('applies headerBgToken', () => {
       const style = auditStyle();
