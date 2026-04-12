@@ -42,7 +42,11 @@ Adapters (e.g., `nodeRuntime`, `nodeIO`, `chalkStyle`) live in `@flyingrobots/bi
 `data -> core component -> mode-aware render -> string/surface result -> stdout`
 
 ### Interactive Path (TUI)
-`input -> TEA update -> view() -> Surface | LayoutNode -> Diff -> terminal`
+`input -> TEA update -> view() -> Surface | LayoutNode -> localize root -> paint -> Diff -> terminal`
+
+For the `LayoutNode` branch specifically, the runtime rebases the tree into a
+local non-negative root before paint. The detailed ownership model is captured
+in [docs/strategy/layout-localization-pipeline.md](./docs/strategy/layout-localization-pipeline.md).
 
 ## Interaction Profiles
 

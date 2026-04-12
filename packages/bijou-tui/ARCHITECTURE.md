@@ -154,6 +154,22 @@ Scrollable window into content:
 
 Scroll state is a separate immutable record with helpers: `scrollBy`, `scrollTo`, `pageUp`, `pageDown`, `scrollToTop`, `scrollToBottom`.
 
+### Layout localization pipeline
+
+`LayoutNode` trees have an explicit ownership handoff before paint:
+
+1. `app.view(model)` returns a `Surface` or `LayoutNode`
+2. `wrapViewOutputAsLayoutRoot(...)` turns that into a runtime-owned root
+3. `localizeLayoutNode(...)` rebases negative or off-origin trees into a local
+   non-negative coordinate space
+4. the paint middleware blits the localized tree into the target surface
+
+That means paint is not responsible for measuring bounds or discovering root
+offsets. Localization already solved that earlier in the pipeline.
+
+Read [docs/strategy/layout-localization-pipeline.md](../../docs/strategy/layout-localization-pipeline.md)
+for the full recursion, coordinate-space, and retained-layout story.
+
 ## EventBus
 
 The bus is a typed publish/subscribe system:
