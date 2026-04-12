@@ -1,9 +1,5 @@
 # Guide — @flyingrobots/bijou
 
-This guide covers the productive-fast path for the core package.
-
-For render-path doctrine, byte-packed surface expectations, token-graph work, custom mode-aware components, and the deeper component-family lanes, use [ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md).
-
 ## Setup
 
 ```bash
@@ -19,90 +15,247 @@ initDefaultContext();
 
 `initDefaultContext()` auto-detects your environment (TTY, CI, pipe, NO_COLOR) and sets the global context. All components use it automatically.
 
-## Output Modes
+## Components
 
-Every component checks `ctx.mode` and adapts its rendering:
+Many core helpers return strings. Surface primitives and runtime-friendly companions such as `boxSurface()` and `tableSurface()` return `Surface` instead.
 
-| Mode | Trigger | Behavior |
-| :--- | :--- | :--- |
-| **`interactive`** | TTY detected | Full RGB colors, Unicode borders, animations. |
-| **`static`** | `CI=true` | Single-frame rendering; no animations. |
-| **`pipe`** | Piped stdout or `TERM=dumb` | Plain text, ASCII-only fallback. |
-| **`accessible`** | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader friendly output. |
+Use string-first helpers when the endpoint is still CLI output. Use the surface path when the surrounding app is already rendering structured output. Cross that seam explicitly with `surfaceToString(surface, ctx.style)` when you truly need text again.
 
-## Components: String vs. Surface
+### Choosing feedback surfaces
 
-Bijou provides two primary output formats:
+- Use `badge()` for compact inline status.
+- Use `note()` for explanatory, non-urgent supporting text.
+- Use `alert()` when the message should stay in document flow.
+- Move to `@flyingrobots/bijou-tui` notifications when stacking, placement, actions, or history matter.
 
-1. **String-first**: Returns a themed ANSI string. Best for standalone CLIs and scripts.
-2. **Surface-first**: Returns a `Surface` (byte-buffer). Best for high-performance TUIs and complex layouts.
+### Choosing prompts versus commands
 
-### Choosing Feedback Surfaces
-- **`badge()`**: Compact, inline status.
-- **`note()`**: Explanatory, non-urgent supporting text.
-- **`alert()`**: Persistent message that stays in the document flow.
-- **`markdown()`**: Renders formatted prose with mode-aware fallbacks.
+- Use `select()` for one stored value from a short, stable list.
+- Use `filter()` when one stored value is still the result, but search is the main task.
+- Use `multiselect()` when the user is building a lasting set.
+- Use `confirm()` only when the real question is yes/no.
+- If the outcome is “run this command” or “go to this destination,” move up to `commandPaletteSurface()` in `@flyingrobots/bijou-tui` instead of making a prompt pretend to be an action launcher.
 
-### Choosing Prompts
-- **`input()`**: Raw text entry.
-- **`select()`**: Single choice from a stable list.
-- **`filter()`**: Search-led choice from a large or dynamic set.
-- **`multiselect()`**: Choosing multiple values to build a set.
-- **`confirm()`**: Strictly binary (yes/no) decisions.
+### Layout
 
-### Layout & Containers
-- **`box()` / `boxSurface()`**: Visible containment with optional titles.
-- **`headerBox()`**: Region with a title and a detail line.
-- **`separator()`**: Section divider with an optional label.
+```typescript
+// Simple box
+console.log(box('Hello, world!'));
 
-### Data & Hierarchy
-- **`table()` / `tableSurface()`**: Passive row/column comparison.
-- **`tree()`**: Parent/child nesting.
-- **`timeline()`**: Chronological sequences.
-- **`dag()` / `dagSlice()`**: Causal or dependency-based graphs.
+// Box with header
+console.log(headerBox('Deploy', { detail: 'v2.1.0 → production' }));
 
-### Progress & Loading
-- **`progressBar()`**: Determinate completion.
-- **`spinnerFrame()`**: Indeterminate activity.
-- **`skeleton()`**: Short-lived loading placeholders.
+// Separator
+console.log(separator('Section Title'));
+```
+
+### Tables
+
+```typescript
+const data = [
+  { name: 'api', status: 'Active' },
+  { name: 'worker', status: 'Pending' },
+];
+
+console.log(table(data, {
+  columns: [
+    { key: 'name', label: 'Name' },
+    { key: 'status', label: 'Status' },
+  ],
+}));
+```
+
+Use `table()` when passive row/column comparison is the job. If your runtime app is already composing `Surface` output, choose `tableSurface()`. If the user needs keyboard-owned inspection instead of passive reading, move up to `navigableTable()` in `@flyingrobots/bijou-tui`.
+
+### Hierarchy & chronology
+
+Use `tree()` when parent/child nesting is the mental model and the hierarchy should stay passive. Use `timeline()` when chronology is the reading path. If the real structure is dependency or causal flow rather than simple order, move to `dag()`. Use `dagSlice()` when a local neighborhood is the honest scope, and `dagStats()` when graph health matters more than visual shape.
+
+### Wayfinding & progress
+
+Use `breadcrumb()` when path context explains where the user is. Use `paginator()` when compact position-in-sequence feedback is enough. Use `stepper()` when the user is moving through ordered stages rather than switching among peer destinations.
+
+### Containment & formatted content
+
+Use `box()` when a region needs visible containment. Use `headerBox()` when the same region also needs a compact title plus detail line. Use `markdown()` for bounded help, reference, and release-note prose that should degrade honestly across rich, pipe, and accessible modes. Avoid using boxes as default decoration or markdown as a substitute layout engine for application chrome.
+
+### Loading, links, & expressive output
+
+Use `skeleton()` only for short-lived loading states where the content shape is already known. Use `hyperlink()` when the destination should stay explicit and trustworthy in terminal output. Use `kbd()` for inline shortcut cues, not full shell keybinding references. Use `gradientText()` and `loadRandomLogo()` sparingly for splash, docs, and celebratory moments rather than routine workspace chrome.
+
+### Progress & Spinners
+
+Use `progressBar()` when percent-complete is actually known. Use `spinnerFrame()` or `createSpinner()` when the task is active but indeterminate.
+
+```typescript
+// Static progress bar frame
+console.log(progressBar(75));
+
+// Live spinner
+const spin = createSpinner({ label: 'Installing...' });
+spin.start();
+// ... later
+spin.stop('Done!');
+
+// Live progress bar with smooth interpolation
+const bar = createAnimatedProgressBar({ duration: 300 });
+bar.start();
+bar.update(50);
+bar.update(100);
+bar.stop('Complete!');
+```
+
+### App-authored primitives
+
+Use `renderByMode()` when you need an app-specific primitive that should preserve the same meaning across rich, pipe, and accessible modes.
+
+### Forms
+
+```typescript
+const name = await input({ message: 'Your name:' });
+const framework = await select({
+  message: 'Pick a framework:',
+  options: [
+    { label: 'Next.js', value: 'next' },
+    { label: 'Remix', value: 'remix' },
+  ],
+});
+const confirmed = await confirm({ message: 'Continue?' });
+```
+
+Forms degrade automatically:
+- **Interactive**: Arrow-key navigation, real-time rendering
+- **Pipe/CI**: Numbered list, line-buffered input
+- **Accessible**: Screen-reader friendly prompts
 
 ## Themes
 
-### Presets
+### Built-in Presets
+
 `cyan-magenta` (default), `nord`, `catppuccin`.
 
-### Lookups
-Use semantic helpers on the context to avoid coupling to theme structure:
+### Custom Themes via Environment
+
+```bash
+BIJOU_THEME=./themes/my-brand.json node my-cli.js
+```
+
+### Extending Themes in Code
+
+```typescript
+import { extendTheme, tv, CYAN_MAGENTA } from '@flyingrobots/bijou';
+
+const myTheme = extendTheme(CYAN_MAGENTA, {
+  status: {
+    DEPLOYED: tv('#34d399'),
+    CANCELLED: tv('#6b7280', ['strikethrough']),
+  },
+  ui: {
+    clusterName: tv('#60a5fa', ['bold']),
+  },
+});
+```
+
+### Text Modifiers
+
+Token values accept an array of modifiers: `'bold'`, `'dim'`, `'strikethrough'`, `'inverse'`, `'underline'`, `'curly-underline'`, `'dotted-underline'`, `'dashed-underline'`.
+
+```typescript
+tv('#ff0000', ['bold'])                    // bold red
+tv('#808080', ['dim', 'strikethrough'])    // dimmed strikethrough
+tv('#00aaff', ['underline'])               // standard underline
+tv('#ff6600', ['curly-underline'])         // wavy underline (kitty, iTerm2, WezTerm, Windows Terminal)
+tv('#00ff00', ['dotted-underline'])        // dotted underline
+tv('#ffaa00', ['dashed-underline'])        // dashed underline
+```
+
+### Looking Up Tokens
+
+Use semantic helpers on the context to look up tokens without coupling to theme object structure:
+
 ```typescript
 const primary = ctx.semantic('primary');
 const border = ctx.border('muted');
-const success = ctx.status('success');
+const bg = ctx.surface('secondary');
+const status = ctx.status('success'); // falls back to 'muted' if missing
+const icon = ctx.ui('cursor');
+```
+
+### DTCG Interop
+
+```typescript
+import { fromDTCG, toDTCG } from '@flyingrobots/bijou';
+
+// Load from Tokens Studio / Style Dictionary JSON
+const theme = fromDTCG(jsonDocument);
+
+// Export back to DTCG format
+const doc = toDTCG(theme);
 ```
 
 ## Custom Components
 
-Build mode-aware components using the `renderByMode` dispatcher:
+Build your own mode-aware components using the `renderByMode` dispatcher:
 
 ```typescript
-import { renderByMode, resolveCtx, type BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext } from '@flyingrobots/bijou';
+import { renderByMode, resolveCtx } from '@flyingrobots/bijou';
 
-export function myComponent(text: string, options: { ctx?: BijouContext } = {}) {
+export function myComponent(
+  text: string,
+  options: { ctx?: BijouContext } = {},
+) {
   const ctx = resolveCtx(options.ctx);
+
   return renderByMode(ctx.mode, {
     pipe: () => `[${text}]`,
-    interactive: () => ctx.style.styled(ctx.semantic('accent'), `✨ ${text}`),
+    accessible: () => `Component: ${text}`,
+    interactive: () => {
+      const token = ctx.semantic('accent');
+      return ctx.style.styled(token, `\u2728 ${text}`);
+    }
   }, options);
 }
 ```
 
+The dispatcher automatically handles mode selection and fallback logic (e.g. `static` falls back to `interactive` by default).
+
 ## Testing
 
-Use `createTestContext` to verify behavior across all modes without mocking:
+Use the test adapters — no mocks, no process globals:
 
 ```typescript
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { box, badge } from '@flyingrobots/bijou';
 
-const ctx = createTestContext({ mode: 'pipe' });
+// Test interactive mode
+const ctx = createTestContext({ mode: 'interactive' });
 const result = box('hello', { ctx });
-expect(result).toBe('hello'); // In pipe mode, boxes are stripped.
+expect(result).toContain('┌');
+expect(result).toContain('hello');
+
+// Test pipe mode (graceful degradation)
+const pipeCtx = createTestContext({ mode: 'pipe' });
+const plain = box('hello', { ctx: pipeCtx });
+expect(plain).toBe('hello');
+
+// Test across all modes
+for (const mode of ['interactive', 'static', 'pipe', 'accessible'] as const) {
+  const ctx = createTestContext({ mode });
+  const result = badge('OK', { variant: 'success', ctx });
+  expect(result).toContain('OK');
+}
 ```
+
+## Output Modes
+
+Every component checks `ctx.mode` and adapts:
+
+| Mode | When | What happens |
+|------|------|-------------|
+| `interactive` | TTY detected | Full RGB colors, unicode borders, animations |
+| `static` | `CI=true` | Single-frame rendering, no animations |
+| `pipe` | Piped stdout or `TERM=dumb` | Plain text, ASCII only |
+| `accessible` | `BIJOU_ACCESSIBLE=1` | Screen-reader friendly descriptions |
+
+You never need to handle this manually — components degrade automatically.

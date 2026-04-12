@@ -1,48 +1,34 @@
 # VISION
 
-Bijou is an industrial-grade TypeScript engine for terminal software where runtime truth, design language, and documentation are unified.
+Bijou is trying to become a serious, humane terminal-software toolkit
+whose runtime truth, design language, and documentation all agree with
+each other.
 
-```mermaid
-mindmap
-    root((Bijou))
-        Runtime Integrity
-            TEA Loop
-            Seams for Effects
-            Hexagonal Boundary
-        Byte-Packed Performance
-            Typed Arrays
-            Zero-Allocation
-            Bytes Not Strings
-        Humane Interaction
-            Accessible
-            Localizable
-            Resilient Viewports
-        Empirical Documentation
-            DOGFOOD
-            Living Field Guide
-            Docs Are the Demo
-        Agent-First Legibility
-            MCP Services
-            Machine-Readable
-            Explainable AI
-```
+The product direction is not "more terminal widgets." It is a tighter
+combination of:
 
-## Core Tenets
+- a runtime-engine core with explicit state, view, layout, routing,
+  command, and effect seams
+- a performance foundation built on typed arrays and zero-allocation
+  rendering — the surface layer speaks bytes, not strings
+- a humane shell model that stays truthful under keyboard, mouse,
+  compact viewport, accessibility, and localization pressure
+- a DOGFOOD docs surface that proves the framework in the same repo that
+  publishes it
+- an MCP rendering service that makes Bijou usable outside the terminal
+  — AI tools can render components and query documentation directly
+- tests and cycle docs that make behavior explainable to both humans and
+  agents
 
-### 1. Runtime Integrity
-A deterministic state-update-view loop (TEA) with explicit seams for effects and commands. Logic is isolated from platform IO via a strict hexagonal boundary.
+Near-horizon Bijou work should therefore favor:
 
-### 2. Byte-Packed Performance
-A rendering foundation built on typed arrays and zero-allocation hot paths. The surface layer speaks bytes, not strings, ensuring high-fidelity output at scale.
+- proving the performance foundation in real apps and closing the
+  remaining synthetic benchmark gaps
+- deepening DOGFOOD story quality and design-language surfaces
+- building interactive, machine-readable documentation for all
+  components
+- tightening developer-facing API seams where they block real usage
+- keeping repo truth bounded and inspectable through METHOD signposts
 
-### 3. Humane Interaction
-A shell model that remains truthful under the pressures of keyboard, mouse, compact viewports, and localization. Accessibility and internationalization are substrate properties, not afterthoughts.
-
-### 4. Empirical Documentation
-DOGFOOD is the canonical proving ground. Every component and pattern is verified in a living product surface within the repository.
-
-### 5. Agent-First Legibility
-The system is designed to be codable and inspectable by both humans and AI. MCP rendering services and interactive documentation provide a machine-readable interface to the toolkit.
-
----
-**The goal is not more terminal widgets. It is the geometric lawfulness of the terminal as a professional application bedrock.**
+Broad roadmap ideas still matter, but they should not outrank the
+current repo-visible proof of what Bijou is actually becoming.

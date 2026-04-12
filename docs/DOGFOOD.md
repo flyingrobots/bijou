@@ -2,31 +2,61 @@
 
 _Documentation Of Good Foundational Onboarding and Discovery_
 
-DOGFOOD is the canonical human-facing docs surface and proving ground for the
-Bijou engine.
+DOGFOOD is Bijou's canonical human-facing docs surface.
+
+If you are trying to learn Bijou, start here, not with the general
+`examples/` inventory.
 
 ## Run
+
 ```bash
 npm run dogfood
 ```
 
-## Purpose
+## What DOGFOOD Is For
 
-DOGFOOD is where Bijou proves its architectural integrity by building itself.
-It is not an example; it is the repository's living docs application.
+DOGFOOD is where Bijou now proves:
 
-It gathers the package guides for the published workspace, release guidance,
-and the doctrine, architecture, invariants, and design-system guidance that
-operators need when learning or validating Bijou.
+- how the shell behaves in a real product surface
+- how the component library is documented and explored
+- how package, release, and philosophy docs fit together in one
+  terminal-native docs experience
 
-### Today's Proof Points
-- **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
-- **Component Explorer**: A live, interactive field guide to every component family.
-- **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
-- **Design Language**: Defining and enforcing the project's visual and interactive standards.
+It is not just another demo. It is the repo's living docs app.
 
-### Relationship to Examples
-The `examples/` tree contains isolated reference material and API proofs. **DOGFOOD** is the primary entry point for understanding the system's unified behavior.
+## What It Covers Today
 
----
-**DOGFOOD implementation lives in `examples/docs/`.**
+The current DOGFOOD shell includes top-level sections for:
+
+- `Guides`
+- `Components`
+- `Packages`
+- `Philosophy`
+- `Release`
+
+Inside that shell, DOGFOOD now carries:
+
+- repo orientation and navigation guides
+- the live component-family explorer
+- package guides for the published workspace
+- `4.1.0` release and migration docs
+- doctrine, architecture, invariants, and design-system guidance
+
+The component-family explorer is still an important part of DOGFOOD,
+but it is no longer the whole story.
+
+## Relationship To `examples/`
+
+The `examples/` tree still exists, but it is now secondary. Treat it as:
+
+- reference and migration material
+- isolated API seam proofs
+- smoke and regression substrate
+
+not as the main public docs path.
+
+## Implementation Note
+
+The app currently lives under [`examples/docs/`](../examples/docs/README.md)
+for implementation reasons. That path should not be mistaken for the
+user-facing information architecture.

@@ -1,9 +1,5 @@
 # Guide — @flyingrobots/bijou-node
 
-This guide covers the common Node bootstrap path and the bridge between the pure Bijou core and the terminal process.
-
-For explicit context ownership, worker runtime flows, recorder/capture work, and deeper runtime-boundary concerns, use [ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md).
-
 ## Basic Setup
 
 ```typescript
@@ -14,11 +10,11 @@ initDefaultContext();
 ```
 
 This detects:
-- **TTY** → interactive mode (full colors, Unicode).
-- **`CI=true`** → static mode (single-frame, no animations).
-- **Piped stdout / `TERM=dumb`** → pipe mode (plain text).
-- **`NO_COLOR`** → disables all color output.
-- **`BIJOU_ACCESSIBLE=1`** → accessible mode (screen-reader friendly).
+- **TTY** → interactive mode (full colors, unicode)
+- **`CI=true`** → static mode (single-frame, no animations)
+- **Piped stdout / `TERM=dumb`** → pipe mode (plain text)
+- **`NO_COLOR`** → disables all color output
+- **`BIJOU_ACCESSIBLE=1`** → accessible mode (screen-reader friendly)
 
 ## Custom Context
 
@@ -54,45 +50,30 @@ if (runtime.stdoutIsTTY) {
 io.write(style.hex('#ff6600', 'Orange text\n'));
 ```
 
-## Worker Runtime
+## Resize Events
 
-If your app's `update()` logic is heavy (e.g., complex graph calculations), you can offload the TEA loop to a worker thread while keeping the main thread dedicated to rendering and I/O.
-
-```typescript
-import { runInWorker } from '@flyingrobots/bijou-node';
-
-runInWorker({
-  workerPath: './my-app-worker.js',
-  options: { mouse: true },
-});
-```
-
-## Recorder
-
-`bijou-node` can capture every frame of a `Surface` and rasterize them to a GIF. This is perfect for documentation or CI visual regression.
+The Node.js adapter listens to terminal resize via `process.stdout`:
 
 ```typescript
-import { recordDemoGif } from '@flyingrobots/bijou-node';
+const io = nodeIO();
 
-await recordDemoGif({
-  outputPath: 'demo.gif',
-  render: (frame) => renderMyApp(frame),
-  frames: 120,
-  fps: 30,
+const handle = io.onResize((cols, rows) => {
+  console.log(`Terminal resized to ${cols}x${rows}`);
 });
+
+// Clean up when done
+handle.dispose();
 ```
+
+In TUI apps using `@flyingrobots/bijou-tui`, resize events are dispatched automatically as `ResizeMsg` — you don't need to set this up manually.
 
 ## Environment Variables
 
 | Variable | Effect |
-| :--- | :--- |
-| `NO_COLOR` | Disables all color output. |
-| `FORCE_COLOR` | Forces color even in non-TTY environments. |
-| `CI` | Switches to static output mode. |
-| `TERM=dumb` | Switches to pipe output mode. |
-| `BIJOU_ACCESSIBLE=1` | Enables accessible output mode. |
-| `BIJOU_THEME=./path.json` | Loads a custom DTCG theme file. |
-| `BIJOU_FPS=60` | Overrides the detected terminal refresh rate. |
-
----
-**The Node package bridges the pure TypeScript foundation to the physical terminal and the host OS.**
+|---|---|
+| `NO_COLOR` | Disables all color output |
+| `FORCE_COLOR` | Forces color even in non-TTY |
+| `CI` | Switches to static output mode |
+| `TERM=dumb` | Switches to pipe output mode |
+| `BIJOU_ACCESSIBLE=1` | Enables accessible output mode |
+| `BIJOU_THEME=./path.json` | Loads a custom DTCG theme file |

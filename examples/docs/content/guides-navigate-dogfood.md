@@ -1,15 +1,19 @@
 # Navigate DOGFOOD
 
-Use the top-level tabs to transition between major documentation sections.
+Use the top-level tabs to move between the major docs sections.
 
-## Within a Section
-- **`Tab`**: Move focus between panes.
-- **`Up` / `Down`**: Browse lists or rows.
-- **`Page Up` / `Page Down`**: Page through large collections.
-- **`j` / `k`**: Scroll prose (also `d`/`u` and `g`/`G`).
-- **`/`**: Open global search.
-- **`F2`**: Open settings.
-- **`?`**: Toggle help.
+Within a section:
 
-## Proving Ground
-The `Components` section is the primary proving ground for the library, shell, and runtime. Other sections publish repository-facing documentation inside the application, ensuring the DOGFOOD shell is a truthful product, not a placeholder.
+- move focus between panes with `Tab`
+- browse rows with `Up` and `Down`
+- page through longer lists with `Page Up` and `Page Down`
+- scroll prose panes with `j` / `k`, `d` / `u`, and `g` / `G`
+- open search with `/`
+- open settings with `F2`
+
+The `Components` section is still the richest part of DOGFOOD today. It
+proves the component library, the shell, and the runtime together.
+
+The other sections now exist so repo-facing docs have a visible home
+inside the app instead of pretending the component browser is the whole
+documentation product.
