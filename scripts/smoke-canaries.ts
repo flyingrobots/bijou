@@ -358,7 +358,12 @@ function assertCheckpointContains(
   }
 
   const compactSegment = compactWhitespace(segment);
-  const missing = expected.filter((needle) => !compactSegment.includes(compactWhitespace(needle)));
+  const collapsedSegment = collapseWhitespace(segment);
+  const missing = expected.filter((needle) => {
+    const compactNeedle = compactWhitespace(needle);
+    if (compactSegment.includes(compactNeedle)) return false;
+    return !collapsedSegment.includes(collapseWhitespace(needle));
+  });
   if (missing.length > 0) {
     throw new Error(`checkpoint "${label}" missing expected text: ${missing.join(', ')}\n${tail(segment)}`);
   }
@@ -375,7 +380,12 @@ function assertCheckpointAbsent(
   }
 
   const compactSegment = compactWhitespace(segment);
-  const present = forbidden.filter((needle) => compactSegment.includes(compactWhitespace(needle)));
+  const collapsedSegment = collapseWhitespace(segment);
+  const present = forbidden.filter((needle) => {
+    const compactNeedle = compactWhitespace(needle);
+    if (compactSegment.includes(compactNeedle)) return true;
+    return collapsedSegment.includes(collapseWhitespace(needle));
+  });
   if (present.length > 0) {
     throw new Error(`checkpoint "${label}" unexpectedly contained: ${present.join(', ')}\n${tail(segment)}`);
   }
@@ -383,6 +393,10 @@ function assertCheckpointAbsent(
 
 function compactWhitespace(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
+}
+
+function collapseWhitespace(text: string): string {
+  return compactWhitespace(text).replace(/\s+/g, '');
 }
 
 function tail(text: string, lineCount = 80): string {

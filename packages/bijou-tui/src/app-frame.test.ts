@@ -1906,7 +1906,7 @@ describe('createFramedApp', () => {
         height: defaultCtx.runtime.rows,
       }).surface;
       expect(surfaceHasFg(surface, '#7dd3fc')).toBe(true);
-      expect(surfaceHasBg(surface, defaultCtx.surface('primary').bg ?? '')).toBe(true);
+      expect(surfaceHasBg(surface, getDefaultContext().surface('primary').bg ?? '')).toBe(true);
     } finally {
       setDefaultContext(testCtx);
     }
