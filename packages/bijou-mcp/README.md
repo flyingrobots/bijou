@@ -104,9 +104,9 @@ bijou_table
 ┌────────────┬─────────┬─────────┐
 │ Name       │ Status  │ Version │
 ├────────────┼─────────┼─────────┤
-│ bijou      │ healthy │ 4.1.0   │
-│ bijou-node │ healthy │ 4.1.0   │
-│ bijou-mcp  │ new     │ 4.1.0   │
+│ bijou      │ healthy │ 4.4.1   │
+│ bijou-node │ healthy │ 4.4.1   │
+│ bijou-mcp  │ new     │ 4.4.1   │
 └────────────┴─────────┴─────────┘
 
 bijou_tree
