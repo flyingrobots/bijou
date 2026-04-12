@@ -36,7 +36,7 @@ Key changes:
   the new `Verdant Plum` palette.
 - **Quit confirm is more forgiving** — the stock quit dialog now accepts
   uppercase `Y` / `N` as well as lowercase `y` / `n`.
-- **Backwards compatible release** — no breaking changes; the new shell
+- **Backward-compatible release** — no breaking changes; the new shell
   theme API is optional.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form

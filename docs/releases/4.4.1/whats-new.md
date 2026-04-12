@@ -37,6 +37,7 @@ cycling:
 ```ts
 let currentCtx = ctx;
 const getCurrentCtx = () => currentCtx;
+const initialModel = {};
 
 const app = createFramedApp({
   ctx: currentCtx,
@@ -50,7 +51,7 @@ const app = createFramedApp({
   pages: [{
     id: 'home',
     title: 'Home',
-    init: () => [model, []],
+    init: () => [initialModel, []],
     update: (msg, model) => [model, []],
     layout: (model) => ({
       kind: 'pane',
@@ -65,7 +66,8 @@ When `shellThemes` are provided:
 
 - the frame pre-resolves those themes once against the provided Bijou
   context, or the active default context when `ctx` is omitted
-- the stock settings drawer gets a built-in shell-theme choice row
+- the stock settings drawer gets a built-in shell-theme choice row when
+  two or more shell themes are available
 - the current selection is exposed as `FrameModel.activeShellThemeId`
 
 If your page renderers read from an explicit app-owned `BijouContext`,

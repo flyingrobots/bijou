@@ -144,6 +144,7 @@ describe('frame shell chrome surfaces', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     setDefaultContext(ctx);
     const expectedBg = ctx.surface('primary').bg ?? ctx.surface('secondary').bg;
+    expect(expectedBg).toBeDefined();
 
     const activePage = {
       id: 'home',

@@ -390,14 +390,15 @@ export function focusAreaSurfaceInto(
 
 function paintCellPreservingBackground(target: Surface, x: number, y: number, cell: Cell): void {
   const existing = target.get(x, y);
+  const hasExplicitBackground = cell.bg != null || cell.bgRGB != null;
   target.set(x, y, {
     char: cell.char,
     fg: cell.fg,
-    bg: cell.bg ?? existing.bg,
+    bg: hasExplicitBackground ? cell.bg : existing.bg,
     fgRGB: cell.fgRGB,
-    bgRGB: cell.bgRGB ?? existing.bgRGB,
+    bgRGB: hasExplicitBackground ? cell.bgRGB : existing.bgRGB,
     modifiers: cell.modifiers,
-    opacity: cell.opacity ?? existing.opacity,
+    opacity: hasExplicitBackground ? cell.opacity : (cell.opacity ?? existing.opacity),
     empty: false,
   });
 }

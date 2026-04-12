@@ -382,7 +382,7 @@ function assertCheckpointAbsent(
 }
 
 function compactWhitespace(text: string): string {
-  return text.replace(/\s+/g, '').trim();
+  return text.replace(/\s+/g, ' ').trim();
 }
 
 function tail(text: string, lineCount = 80): string {

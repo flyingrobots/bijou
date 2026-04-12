@@ -11,6 +11,7 @@ import {
 } from '@flyingrobots/bijou';
 import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
 import { createKeyMap } from './keybindings.js';
+import { parseKey } from './keys.js';
 import { createSplitPaneState } from './split-pane.js';
 import { runScript } from './driver.js';
 import { normalizeViewOutput } from './view-output.js';
@@ -1199,7 +1200,7 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
-    [model, cmds] = app.update(shiftKey('n'), model);
+    [model, cmds] = app.update(parseKey('N'), model);
     expect((model as any).quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(0);
 
@@ -1207,7 +1208,7 @@ describe('createFramedApp', () => {
     expect((model as any).quitConfirmOpen).toBe(true);
     expect(cmds).toHaveLength(0);
 
-    [model, cmds] = app.update(shiftKey('y'), model);
+    [model, cmds] = app.update(parseKey('Y'), model);
     expect((model as any).quitConfirmOpen).toBe(false);
     expect(cmds).toHaveLength(1);
 

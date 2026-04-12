@@ -29,6 +29,7 @@ you can now hand that concern to the stock frame:
 ```ts
 let currentCtx = ctx;
 const getCurrentCtx = () => currentCtx;
+const initialModel = {};
 
 const app = createFramedApp({
   ctx: currentCtx,
@@ -42,7 +43,7 @@ const app = createFramedApp({
   pages: [{
     id: 'home',
     title: 'Home',
-    init: () => [model, []],
+    init: () => [initialModel, []],
     update: (msg, model) => [model, []],
     layout: (model) => ({
       kind: 'pane',
@@ -55,7 +56,8 @@ const app = createFramedApp({
 
 The frame will:
 
-- add a stock shell-theme row to the settings drawer
+- add a stock shell-theme row to the settings drawer when two or more
+  shell themes are available
 - keep the resolved shell theme in one shared frame-owned place
 - expose the current selection via `FrameModel.activeShellThemeId`
 

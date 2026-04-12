@@ -339,10 +339,7 @@ function paintFrameNodeInto<PageModel, Msg>(
         `createFramedApp: grid cell "${areaName}" missing in page "${ctx.pageId}" — rendering placeholder\n`,
       );
       target.blit(
-        applySurfaceBackground(
-          blockSurface(`[missing grid cell: ${areaName}]`, localAreaRect.width, localAreaRect.height),
-          ctx.frameBackgroundToken,
-        ),
+        renderMissingGridCell(areaName, localAreaRect, ctx.frameBackgroundToken).surface,
         localAreaRect.col,
         localAreaRect.row,
       );
@@ -368,9 +365,16 @@ function paintFrameNodeInto<PageModel, Msg>(
 }
 
 /** Render a placeholder for a grid area that has no matching cell definition. */
-export function renderMissingGridCell(areaName: string, rect: LayoutRect): RenderResult {
+export function renderMissingGridCell(
+  areaName: string,
+  rect: LayoutRect,
+  frameBackgroundToken?: TokenValue,
+): RenderResult {
   return {
-    surface: blockSurface(`[missing grid cell: ${areaName}]`, rect.width, rect.height),
+    surface: applySurfaceBackground(
+      blockSurface(`[missing grid cell: ${areaName}]`, rect.width, rect.height),
+      frameBackgroundToken,
+    ),
     paneRects: new Map(),
     paneOrder: [],
   };
