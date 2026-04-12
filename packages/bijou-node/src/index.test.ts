@@ -1,7 +1,12 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
-import { createNodeContext, initDefaultContext, _resetInitializedForTesting } from './index.js';
-import { getDefaultContext } from '@flyingrobots/bijou';
-import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { createNodeContext, initDefaultContext, startApp, _resetInitializedForTesting } from './index.js';
+import { getDefaultContext, stringToSurface, type Surface } from '@flyingrobots/bijou';
+import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
+
+function textSurface(text: string): Surface {
+  const lines = text.split('\n');
+  return stringToSurface(text, Math.max(1, ...lines.map((line) => line.length)), Math.max(1, lines.length));
+}
 
 describe('createNodeContext()', () => {
   afterEach(() => {
@@ -71,5 +76,50 @@ describe('initDefaultContext()', () => {
     const second = initDefaultContext();
     expect(second).not.toBe(first);
     expect(getDefaultContext()).toBe(first);
+  });
+});
+
+describe('startApp()', () => {
+  beforeEach(() => {
+    _resetInitializedForTesting();
+    _resetDefaultContextForTesting();
+    vi.unstubAllEnvs();
+  });
+
+  afterEach(() => {
+    _resetInitializedForTesting();
+    _resetDefaultContextForTesting();
+    vi.unstubAllEnvs();
+  });
+
+  it('initializes the default node context automatically when ctx is omitted', async () => {
+    vi.stubEnv('TERM', 'dumb');
+    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+
+    await startApp({
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('hello from startApp'),
+    });
+
+    expect(getDefaultContext()).toBeDefined();
+    expect(spy).toHaveBeenCalledWith('hello from startApp');
+    spy.mockRestore();
+  });
+
+  it('uses an explicit ctx without overwriting the existing default context', async () => {
+    vi.stubEnv('TERM', 'dumb');
+    const defaultCtx = initDefaultContext();
+    const explicitCtx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
+    const writeSpy = vi.spyOn(explicitCtx.io, 'write');
+
+    await startApp({
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('explicit ctx path'),
+    }, { ctx: explicitCtx });
+
+    expect(getDefaultContext()).toBe(defaultCtx);
+    expect(writeSpy).toHaveBeenCalledWith('explicit ctx path');
   });
 });

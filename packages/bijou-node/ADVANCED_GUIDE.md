@@ -10,11 +10,13 @@ Node boundary between the pure packages and the real terminal process.
 
 There are two distinct paths:
 
+- `startApp()` when you want the hosted Node fast path
 - `initDefaultContext()` when you want a convenient ambient default
 - `createNodeContext()` when you want explicit ownership and explicit passing
 
 Advanced rule of thumb:
 
+- start with `startApp()` unless you already know you need lower-level runtime ownership
 - use the default only when the app really wants a shared ambient context
 - prefer explicit `ctx` ownership when multiple surfaces, shell theme changes,
   or tests need deliberate context propagation

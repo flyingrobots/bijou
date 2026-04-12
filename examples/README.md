@@ -131,7 +131,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 
 | Example | Component | Description |
 |---------|-----------|-------------|
-| [`counter`](./counter/) | `run()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
+| [`counter`](./counter/) | `startApp()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
 | [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Indeterminate activity with phase transitions |
 | [`progress-animated`](./progress-animated/) | `progressBar()`, `tick()` | TEA-driven animated determinate progress |
 | [`progress-download`](./progress-download/) | `progressBar()`, `spinnerFrame()`, `tick()` | Mixed determinate and indeterminate download feedback |

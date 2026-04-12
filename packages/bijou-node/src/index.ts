@@ -11,6 +11,7 @@
 
 import type { BijouContext } from '@flyingrobots/bijou';
 import { createBijou, setDefaultContext } from '@flyingrobots/bijou';
+import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
 import { nodeRuntime } from './runtime.js';
 import { nodeIO } from './io.js';
 import { chalkStyle } from './style.js';
@@ -38,6 +39,9 @@ export {
   type RecorderResult,
   type SurfaceGifOptions,
 } from './recorder.js';
+
+/** Options for {@link startApp}. Mirrors {@link RunOptions}. */
+export type StartAppOptions<M = any> = RunOptions<M>;
 
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
@@ -98,4 +102,23 @@ export function initDefaultContext(): BijouContext {
     return ctx;
   }
   return createNodeContext();
+}
+
+/**
+ * Start a Bijou TUI app on the current Node.js host.
+ *
+ * This is the first-app convenience path for Node hosts. When no context is
+ * provided, it initializes and registers the default Node context so apps that
+ * rely on ambient `ctx` resolution still behave correctly. Callers that need
+ * explicit ownership can pass `options.ctx` directly.
+ *
+ * @param app - The TEA application to run.
+ * @param options - Runtime options forwarded to {@link run}.
+ */
+export async function startApp<Model, M>(
+  app: App<Model, M>,
+  options?: StartAppOptions<M>,
+): Promise<void> {
+  const ctx = options?.ctx ?? initDefaultContext();
+  await run(app, { ...options, ctx });
 }

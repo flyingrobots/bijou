@@ -4,6 +4,10 @@
 
 bijou-node is the official Node.js adapter for `@flyingrobots/bijou`. It implements the three port interfaces using Node.js built-ins and chalk.
 
+At the public API layer it also provides `startApp()` as the hosted fast path:
+initialize a Node context when needed, then hand the app off to
+`@flyingrobots/bijou-tui`'s `run()` loop.
+
 ## Port Mapping
 
 ```
@@ -92,6 +96,12 @@ Respects `NO_COLOR` — when active, all methods return text unchanged.
 4. Returns a frozen `BijouContext` object
 
 `initDefaultContext()` calls `createNodeContext()` and registers the result as the global default via `setDefaultContext()`.
+
+`startApp(app, options)` is the higher-level host helper:
+
+1. Uses `options.ctx` when the host provides one
+2. Otherwise calls `initDefaultContext()` so ambient component calls still work
+3. Delegates runtime ownership to `run(app, { ...options, ctx })`
 
 ## Directory Structure
 

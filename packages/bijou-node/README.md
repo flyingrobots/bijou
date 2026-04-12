@@ -8,7 +8,7 @@ Node.js adapters and runtime utilities for Bijou.
 
 - **Port Implementation**: Maps Node.js APIs to the Bijou port interfaces.
 - **Worker Runtime**: Offloads heavy TEA logic to worker threads while maintaining main-thread responsiveness.
-- **Bootstrapping**: One-line context initialization with `initDefaultContext()`.
+- **Bootstrapping**: One-call hosted app startup with `startApp()`.
 
 ## Install
 
@@ -19,12 +19,20 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node
 ## Quick Start
 
 ```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { headerBox } from '@flyingrobots/bijou';
+import { stringToSurface } from '@flyingrobots/bijou';
+import { startApp } from '@flyingrobots/bijou-node';
+import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
 
-initDefaultContext();
+const app: App<{ count: number }> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => {
+    if (isKeyMsg(msg) && msg.key === 'q') return [model, [quit()]];
+    return [model, []];
+  },
+  view: (model) => stringToSurface(`Count: ${model.count}\\nPress q to quit`, 16, 2),
+};
 
-console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
+await startApp(app);
 ```
 
 ## Port Mapping
@@ -39,6 +47,7 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 
 - **`createNodeContext()`**: Returns a wired `BijouContext` without setting it as the global default.
 - **`initDefaultContext()`**: Registers the first context as the global default for all Bijou components.
+- **`startApp()`**: Initializes a default Node context when needed and runs a TUI app through the hosted runtime.
 - **`scopedNodeIO()`**: Wraps the Node file adapter in a rooted filesystem boundary for app-level reads and guarded path resolution.
 - **`runInWorker()`**: Starts a TEA app inside a worker thread.
 - **`recordDemoGif()`**: Captures surface frames and rasterizes them to GIF for documentation.

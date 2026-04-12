@@ -7,18 +7,31 @@ For explicit context ownership, worker runtime flows, recorder/capture work, and
 ## Basic Setup
 
 ```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
+import { startApp } from '@flyingrobots/bijou-node';
+import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
 
-// One line — auto-detects everything
-initDefaultContext();
+const app: App<{ count: number }> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => {
+    if (isKeyMsg(msg) && msg.key === 'q') return [model, [quit()]];
+    return [model, []];
+  },
+  view: (model) => stringToSurface(`Count: ${model.count}\nPress q to quit`, 16, 2),
+};
+
+await startApp(app);
 ```
 
-This detects:
+`startApp()` detects:
 - **TTY** → interactive mode (full colors, Unicode).
 - **`CI=true`** → static mode (single-frame, no animations).
 - **Piped stdout / `TERM=dumb`** → pipe mode (plain text).
 - **`NO_COLOR`** → disables all color output.
 - **`BIJOU_ACCESSIBLE=1`** → accessible mode (screen-reader friendly).
+
+It also registers the default context automatically so lower-level helpers that
+rely on ambient `ctx` resolution still work in the common path.
 
 ## Custom Context
 

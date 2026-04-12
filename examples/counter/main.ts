@@ -1,9 +1,7 @@
-import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { startApp } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
-import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
 import { ansiSurface } from '../_shared/example-surfaces.ts';
-
-const ctx = initDefaultContext();
 
 interface Model {
   count: number;
@@ -34,8 +32,12 @@ const app: App<Model, Msg> = {
       `  ${kbd('q')}          quit`,
       '',
     ];
-    return ansiSurface(lines.join('\n'), ctx.runtime.columns, ctx.runtime.rows);
+    return ansiSurface(
+      lines.join('\n'),
+      Math.max(24, ...lines.map((line) => line.length)),
+      Math.max(1, lines.length),
+    );
   },
 };
 
-run(app);
+await startApp(app);
