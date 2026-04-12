@@ -1,6 +1,6 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
-import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
+import { ANSI_OSC8_RE, graphemeClusterWidth, sanitizeTerminalText, segmentGraphemes } from '../text/index.js';
 import {
   CELL_STRIDE,
   OFF_FG_R,
@@ -29,8 +29,8 @@ function hasVisibleStyle(cell: Cell): boolean {
  */
 export function stringToSurface(text: string, width: number, height: number): Surface {
   const surface = createSurface(width, height);
-  const plainText = stripAnsi(text);
-  const lines = plainText.split(/\r?\n/);
+  const plainText = sanitizeTerminalText(text);
+  const lines = plainText.split('\n');
 
   for (let y = 0; y < Math.min(height, lines.length); y++) {
     const line = lines[y]!;
@@ -50,7 +50,11 @@ export function stringToSurface(text: string, width: number, height: number): Su
  */
 export function parseAnsiToSurface(text: string, width: number, height: number): Surface {
   const surface = createSurface(width, height);
-  const lines = text.replace(ANSI_OSC8_RE, '').split(/\r?\n/);
+  const safeText = sanitizeTerminalText(text, {
+    allowAnsiStyling: true,
+    allowHyperlinks: true,
+  });
+  const lines = safeText.replace(ANSI_OSC8_RE, '').split('\n');
 
   const ANSI_RE = /\x1b\[([0-9;]*)m/g;
 

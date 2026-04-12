@@ -145,6 +145,25 @@ export const ANSI_SGR_RE = /\x1b\[[0-9;]*m/;
 export const ANSI_OSC8_RE = /\x1b]8;;[^\x1b\x07]*(?:\x1b\\|\x07)/g;
 
 /**
+ * Pattern matching broad ANSI control sequences (CSI, OSC, DCS, APC, etc.).
+ *
+ * Used for sanitizing untrusted terminal text at string-entry boundaries.
+ * SGR and OSC 8 sequences can be temporarily preserved by higher-level helpers
+ * when a caller intentionally opts into styled parsing.
+ */
+// eslint-disable-next-line no-control-regex
+export const ANSI_CONTROL_SEQUENCE_RE = /\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x1b\x07]*(?:\x1b\\|\x07)|[PX^_][\s\S]*?(?:\x1b\\|\x07)|[@-_])/g;
+
+export interface SanitizeTerminalTextOptions {
+  /** Preserve ANSI SGR styling escapes such as `\x1b[31m`. */
+  readonly allowAnsiStyling?: boolean;
+  /** Preserve OSC 8 hyperlink control sequences. */
+  readonly allowHyperlinks?: boolean;
+  /** Replacement width for literal tabs. Defaults to 2 spaces. */
+  readonly tabWidth?: number;
+}
+
+/**
  * Strip all ANSI SGR escape sequences from a string.
  *
  * @param str - Input string potentially containing ANSI codes.
@@ -154,6 +173,61 @@ export function stripAnsi(str: string): string {
   return str
     .replace(ANSI_OSC8_RE, '')
     .replace(new RegExp(ANSI_SGR_RE, 'g'), '');
+}
+
+/**
+ * Sanitize raw terminal text before it crosses into the surface model.
+ *
+ * Removes destructive ANSI/control sequences and normalizes tabs/newlines so
+ * untrusted content cannot inject cursor movement or clear-screen behavior when
+ * later rendered back out through {@link surfaceToString} or the diff writer.
+ *
+ * By default this removes all ANSI sequences. Callers that intentionally parse
+ * styled content can preserve SGR and/or OSC 8 sequences with the option flags.
+ */
+export function sanitizeTerminalText(
+  str: string,
+  options: SanitizeTerminalTextOptions = {},
+): string {
+  const allowAnsiStyling = options.allowAnsiStyling ?? false;
+  const allowHyperlinks = options.allowHyperlinks ?? false;
+  const tabWidth = Math.max(1, Math.floor(options.tabWidth ?? 2));
+  const placeholders: string[] = [];
+
+  let text = str
+    .replace(/\r\n?/g, '\n')
+    .replace(/\t/g, ' '.repeat(tabWidth));
+
+  if (allowHyperlinks) {
+    text = stashTerminalSequences(text, ANSI_OSC8_RE, placeholders);
+  }
+  if (allowAnsiStyling) {
+    text = stashTerminalSequences(text, new RegExp(ANSI_SGR_RE, 'g'), placeholders);
+  }
+
+  text = text
+    .replace(ANSI_CONTROL_SEQUENCE_RE, '')
+    .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '');
+
+  return restoreTerminalSequences(text, placeholders);
+}
+
+function stashTerminalSequences(
+  text: string,
+  pattern: RegExp,
+  placeholders: string[],
+): string {
+  return text.replace(pattern, (match) => {
+    const index = placeholders.push(match) - 1;
+    return `\uE000${index}\uE001`;
+  });
+}
+
+function restoreTerminalSequences(text: string, placeholders: readonly string[]): string {
+  return text.replace(/\uE000(\d+)\uE001/g, (_match, rawIndex: string) => {
+    const index = Number.parseInt(rawIndex, 10);
+    return placeholders[index] ?? '';
+  });
 }
 
 // ---------------------------------------------------------------------------

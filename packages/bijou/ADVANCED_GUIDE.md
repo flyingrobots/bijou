@@ -29,6 +29,25 @@ For the deeper rendering posture, also read:
 - [Root Advanced Guide](../../ADVANCED_GUIDE.md)
 - [Byte-Pipeline Recovery](../../docs/perf/RE-017-byte-pipeline.md)
 
+## Terminal Text Sanitization Boundary
+
+Raw terminal text should be sanitized when it crosses into the surface model,
+not after it has already become cells.
+
+Rule of thumb:
+
+- use `stringToSurface()` for plain text boundaries
+- use `parseAnsiToSurface()` only when you are intentionally accepting SGR or
+  OSC 8 styling input
+- use `sanitizeTerminalText()` first when untrusted or user-provided terminal
+  text is being inspected outside those helpers
+- do not let arbitrary cursor movement, clear-screen, bell, or other control
+  sequences survive into a `Surface`
+
+This keeps the string boundary explicit and prevents accidental terminal
+injection when a surface later flows back out through `surfaceToString()` or
+the runtime diff writer.
+
 ## Byte-Packed Surface Expectations
 
 `Surface` is a byte-backed render structure, not a themed string blob.

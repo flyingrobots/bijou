@@ -161,10 +161,12 @@ export {
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  sanitizeTerminalText,
   prepareWrappedText,
   wrapPreparedTextToWidth,
   clipToWidth,
   wrapToWidth,
+  ANSI_CONTROL_SEQUENCE_RE,
   ANSI_SGR_RE,
   stripAnsi,
 } from './core/text/index.js';
