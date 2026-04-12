@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-i18n-tools-xlsx",
-  "version": "4.4.0",
+  "version": "4.4.1",
   "description": "XLSX workbook adapters for Bijou localization exchange workflows.",
   "type": "module",
   "sideEffects": false,
@@ -24,7 +24,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou-i18n-tools": "4.4.0",
+    "@flyingrobots/bijou-i18n-tools": "4.4.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {

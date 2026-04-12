@@ -1,16 +1,20 @@
 import { readFileSync } from 'node:fs';
 import {
   boxSurface,
+  cloneContextWithTheme,
   createSurface,
+  CYAN_MAGENTA,
   inspector,
   lerp3,
   markdown,
   progressBar,
   type PreferenceListTheme,
   separatorSurface,
+  tv,
   wrapToWidth,
   type BijouContext,
   type Surface,
+  type Theme,
   type TokenValue,
 } from '@flyingrobots/bijou';
 import {
@@ -43,6 +47,7 @@ import {
   type FrameModel,
   type FramedApp,
   type FramedAppMsg,
+  type FrameShellTheme,
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
@@ -188,9 +193,6 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('settings.showHints.off', 'Off'),
     dogfoodMessage('settings.showHints.feedback.on', 'Show hints turned on.'),
     dogfoodMessage('settings.showHints.feedback.off', 'Show hints turned off.'),
-    dogfoodMessage('settings.landingTheme.label', 'Landing theme'),
-    dogfoodMessage('settings.landingTheme.description', 'Sets the DOGFOOD title screen and docs accent palette. Current theme: {theme}. Options: {options}.'),
-    dogfoodMessage('settings.landingTheme.feedback', 'Landing theme set to {theme}.'),
     dogfoodMessage('settings.landingQuality.label', 'Landing quality'),
     dogfoodMessage('settings.landingQuality.description.auto', 'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.'),
     dogfoodMessage('settings.landingQuality.description.quality', 'Prioritizes the richest title treatment even on larger terminals. Options: {options}.'),
@@ -280,7 +282,6 @@ type ExplorerMsg =
   | { type: 'activate-guide-index'; index: number }
   | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
-  | { type: 'cycle-landing-theme' }
   | { type: 'cycle-landing-quality' };
 
 interface RootModel {
@@ -560,6 +561,13 @@ const LANDING_THEME_SEEDS: readonly LandingThemeSeed[] = [
     waveGradient: ['#52506f', '#8c8ab8', '#f3ceb0'],
     logoGradient: ['#8eb7d8', '#d9a7c7', '#f4d98b'],
   },
+  {
+    id: 'verdant-plum',
+    label: 'Verdant Plum',
+    background: '#043015',
+    waveGradient: ['#265408', '#968425', '#b96862'],
+    logoGradient: ['#968425', '#b96862', '#c281af'],
+  },
  ] as const;
 const LANDING_THEMES: readonly LandingThemeTokens[] = LANDING_THEME_SEEDS.map(compileLandingTheme);
 const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
@@ -588,6 +596,74 @@ const LANDING_QUALITY_PROFILES: readonly LandingQualityProfile[] = [
     logoTile: 1,
   },
 ] as const;
+const VERDANT_PLUM_COLORS = ['#043015', '#265408', '#968425', '#b96862', '#c281af'] as const;
+const VERDANT_PLUM_THEME: Theme = {
+  ...CYAN_MAGENTA,
+  name: 'dogfood-verdant-plum',
+  status: {
+    ...CYAN_MAGENTA.status,
+    success: tv(VERDANT_PLUM_COLORS[2]),
+    error: tv(VERDANT_PLUM_COLORS[3]),
+    warning: tv(VERDANT_PLUM_COLORS[4]),
+    info: tv(VERDANT_PLUM_COLORS[4]),
+    active: tv(VERDANT_PLUM_COLORS[4]),
+    muted: tv(VERDANT_PLUM_COLORS[1], ['dim', 'strikethrough']),
+  },
+  semantic: {
+    ...CYAN_MAGENTA.semantic,
+    success: tv(VERDANT_PLUM_COLORS[2]),
+    error: tv(VERDANT_PLUM_COLORS[3]),
+    warning: tv(VERDANT_PLUM_COLORS[4]),
+    info: tv(VERDANT_PLUM_COLORS[2]),
+    accent: tv(VERDANT_PLUM_COLORS[3]),
+    muted: tv(VERDANT_PLUM_COLORS[2], ['dim']),
+    primary: tv(VERDANT_PLUM_COLORS[4], ['bold']),
+  },
+  gradient: {
+    ...CYAN_MAGENTA.gradient,
+    brand: gradientStopsFromHexes(VERDANT_PLUM_COLORS),
+    progress: gradientStopsFromHexes([
+      VERDANT_PLUM_COLORS[1],
+      VERDANT_PLUM_COLORS[2],
+      VERDANT_PLUM_COLORS[3],
+      VERDANT_PLUM_COLORS[4],
+    ]),
+  },
+  border: {
+    ...CYAN_MAGENTA.border,
+    primary: tv(VERDANT_PLUM_COLORS[2]),
+    secondary: tv(VERDANT_PLUM_COLORS[3]),
+    success: tv(VERDANT_PLUM_COLORS[2]),
+    warning: tv(VERDANT_PLUM_COLORS[4]),
+    error: tv(VERDANT_PLUM_COLORS[3]),
+    muted: tv(VERDANT_PLUM_COLORS[1]),
+  },
+  ui: {
+    ...CYAN_MAGENTA.ui,
+    cursor: tv(VERDANT_PLUM_COLORS[4]),
+    scrollThumb: tv(VERDANT_PLUM_COLORS[4]),
+    scrollTrack: tv(VERDANT_PLUM_COLORS[1]),
+    sectionHeader: tv(VERDANT_PLUM_COLORS[2], ['bold']),
+    logo: tv(VERDANT_PLUM_COLORS[4]),
+    tableHeader: tv(VERDANT_PLUM_COLORS[4]),
+    trackEmpty: tv(VERDANT_PLUM_COLORS[1]),
+  },
+  surface: {
+    primary: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
+    secondary: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[1] },
+    elevated: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[1] },
+    overlay: { hex: VERDANT_PLUM_COLORS[4], bg: VERDANT_PLUM_COLORS[0] },
+    muted: { hex: VERDANT_PLUM_COLORS[2], bg: VERDANT_PLUM_COLORS[0] },
+  },
+};
+const DOCS_SHELL_THEMES: readonly FrameShellTheme[] = LANDING_THEMES.map((theme) => ({
+  id: theme.id,
+  label: theme.label,
+  theme: theme.id === 'verdant-plum'
+    ? VERDANT_PLUM_THEME
+    : landingTokensToShellTheme(theme),
+}));
+const LANDING_THEME_INDEX_BY_ID = new Map(LANDING_THEMES.map((theme, index) => [theme.id, index] as const));
 const BACKGROUND_DENSITY_ROWS = BACKGROUND_LINES.map((lineText) => {
   const row = new Float32Array(BACKGROUND_WIDTH);
   for (let x = 0; x < BACKGROUND_WIDTH; x++) {
@@ -1038,10 +1114,11 @@ function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, ind
   return activateGuideRow(focusGuideRow(model, index), pageId);
 }
 
-function createLandingRenderer(ctx: BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
+function createLandingRenderer(getCtx: () => BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
   const cache: LandingFrameCache = {};
 
   return (model: RootModel): Surface => {
+    const ctx = getCtx();
     const width = Math.max(1, model.columns);
     const height = Math.max(1, model.rows);
     const tokens = resolveLandingTheme(model.landingThemeIndex);
@@ -1494,23 +1571,6 @@ function landingQualitySettingDescription(
   }
 }
 
-function landingThemeSettingValue(index: number): string {
-  return resolveLandingTheme(index).label;
-}
-
-function landingThemeSettingDescription(index: number, i18n?: I18nRuntime): string {
-  const theme = resolveLandingTheme(index);
-  return dogfoodText(
-    i18n,
-    'settings.landingTheme.description',
-    'Sets the DOGFOOD title screen and docs accent palette. Current theme: {theme}. Options: {options}.',
-    {
-      theme: theme.label,
-      options: formatI18nList(i18n, LANDING_THEMES.map((entry) => entry.label)),
-    },
-  );
-}
-
 function resolveLandingQualityMode(model: RootModel): LandingQualityMode {
   return model.docsModel.pageModels[model.docsModel.activePageId]?.landingQualityMode ?? 'auto';
 }
@@ -1694,10 +1754,11 @@ function syncDocsSharedSettings(
 ): FrameModel<DocsExplorerModel> {
   const activePageModel = docsModel.pageModels[docsModel.activePageId];
   if (activePageModel == null) return docsModel;
+  const landingThemeIndex = resolveLandingThemeIndexForShellThemeId(docsModel.activeShellThemeId);
   return mapDocsPageModels(docsModel, (pageModel) => {
     if (
       pageModel.showHints === activePageModel.showHints
-      && pageModel.landingThemeIndex === activePageModel.landingThemeIndex
+      && pageModel.landingThemeIndex === landingThemeIndex
       && pageModel.landingQualityMode === activePageModel.landingQualityMode
     ) {
       return pageModel;
@@ -1705,24 +1766,28 @@ function syncDocsSharedSettings(
     return {
       ...pageModel,
       showHints: activePageModel.showHints,
-      landingThemeIndex: activePageModel.landingThemeIndex,
+      landingThemeIndex,
       landingQualityMode: activePageModel.landingQualityMode,
     };
   });
 }
 
-function applyLandingThemeSelection(model: RootModel, index: number): RootModel {
+function applyLandingThemeSelection(
+  syncShellThemeContext: (themeId: string | undefined) => void,
+  model: RootModel,
+  index: number,
+): RootModel {
   const nextIndex = mod(index, LANDING_THEMES.length);
-  if (nextIndex === model.landingThemeIndex) return model;
   const theme = resolveLandingTheme(nextIndex);
+  if (nextIndex === model.landingThemeIndex && model.docsModel.activeShellThemeId === theme.id) return model;
+  syncShellThemeContext(theme.id);
   return {
     ...model,
     landingThemeIndex: nextIndex,
-    docsModel: mapDocsPageModels(model.docsModel, (pageModel) => (
-      pageModel.landingThemeIndex === nextIndex
-        ? pageModel
-        : { ...pageModel, landingThemeIndex: nextIndex }
-    )),
+    docsModel: syncDocsSharedSettings({
+      ...model.docsModel,
+      activeShellThemeId: theme.id,
+    }),
     landingToast: {
       message: theme.label,
       expiresAtMs: model.landingTimeMs + 1600,
@@ -1779,6 +1844,17 @@ function createGradientStops(gradient: readonly [string, string, string]): Array
     { pos: 0.5, color: hexToRgb(gradient[1]) },
     { pos: 1, color: hexToRgb(gradient[2]) },
   ];
+}
+
+function gradientStopsFromHexes(colors: readonly string[]): Array<{ pos: number; color: Rgb }> {
+  if (colors.length === 0) return [];
+  if (colors.length === 1) {
+    return [{ pos: 0, color: hexToRgb(colors[0]!) }];
+  }
+  return colors.map((hex, index) => ({
+    pos: index / (colors.length - 1),
+    color: hexToRgb(hex),
+  }));
 }
 
 function buildColorRamp(stops: Array<{ pos: number; color: Rgb }>): readonly string[] {
@@ -2017,6 +2093,85 @@ function docsThemeFocusedGutterToken(theme: LandingThemeTokens): TokenValue {
 
 function docsThemeUnfocusedGutterToken(theme: LandingThemeTokens): TokenValue {
   return { hex: sampleColorRamp(theme.waveRamp, 0.38), bg: sampleColorRamp(theme.waveRamp, 0.08), modifiers: ['dim'] };
+}
+
+function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
+  return {
+    ...CYAN_MAGENTA,
+    name: `dogfood-${theme.id}`,
+    status: {
+      ...CYAN_MAGENTA.status,
+      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
+      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
+      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
+      info: tv(sampleColorRamp(theme.waveRamp, 0.66)),
+      active: tv(sampleColorRamp(theme.logoRamp, 0.84)),
+      muted: tv(sampleColorRamp(theme.waveRamp, 0.44), ['dim', 'strikethrough']),
+    },
+    semantic: {
+      ...CYAN_MAGENTA.semantic,
+      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
+      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
+      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
+      info: tv(sampleColorRamp(theme.waveRamp, 0.66)),
+      accent: tv(sampleColorRamp(theme.logoRamp, 0.84)),
+      muted: tv(sampleColorRamp(theme.waveRamp, 0.58), ['dim']),
+      primary: tv(sampleColorRamp(theme.logoRamp, 0.96), ['bold']),
+    },
+    gradient: {
+      ...CYAN_MAGENTA.gradient,
+      brand: gradientStopsFromHexes([
+        sampleColorRamp(theme.waveRamp, 0.08),
+        sampleColorRamp(theme.waveRamp, 0.52),
+        sampleColorRamp(theme.logoRamp, 0.9),
+      ]),
+      progress: gradientStopsFromHexes([
+        sampleColorRamp(theme.waveRamp, 0.24),
+        sampleColorRamp(theme.waveRamp, 0.62),
+        sampleColorRamp(theme.logoRamp, 0.76),
+        sampleColorRamp(theme.logoRamp, 0.94),
+      ]),
+    },
+    border: {
+      ...CYAN_MAGENTA.border,
+      primary: tv(sampleColorRamp(theme.waveRamp, 0.72)),
+      secondary: tv(sampleColorRamp(theme.logoRamp, 0.74)),
+      success: tv(sampleColorRamp(theme.waveRamp, 0.78)),
+      warning: tv(sampleColorRamp(theme.logoRamp, 0.92)),
+      error: tv(sampleColorRamp(theme.logoRamp, 0.7)),
+      muted: tv(sampleColorRamp(theme.waveRamp, 0.38)),
+    },
+    ui: {
+      ...CYAN_MAGENTA.ui,
+      cursor: tv(sampleColorRamp(theme.logoRamp, 0.88)),
+      scrollThumb: tv(sampleColorRamp(theme.logoRamp, 0.88)),
+      scrollTrack: tv(sampleColorRamp(theme.waveRamp, 0.18)),
+      sectionHeader: tv(sampleColorRamp(theme.waveRamp, 0.8), ['bold']),
+      logo: tv(sampleColorRamp(theme.logoRamp, 0.94)),
+      tableHeader: tv(sampleColorRamp(theme.logoRamp, 0.9)),
+      trackEmpty: tv(sampleColorRamp(theme.waveRamp, 0.26)),
+    },
+    surface: {
+      primary: { hex: sampleColorRamp(theme.logoRamp, 0.96), bg: theme.background },
+      secondary: { hex: sampleColorRamp(theme.waveRamp, 0.84), bg: sampleColorRamp(theme.waveRamp, 0.14) },
+      elevated: { hex: sampleColorRamp(theme.logoRamp, 0.92), bg: sampleColorRamp(theme.waveRamp, 0.18) },
+      overlay: { hex: sampleColorRamp(theme.logoRamp, 0.96), bg: theme.background },
+      muted: { hex: sampleColorRamp(theme.waveRamp, 0.62), bg: sampleColorRamp(theme.waveRamp, 0.08) },
+    },
+  };
+}
+
+function resolveDocsShellThemeById(id: string | undefined): FrameShellTheme {
+  return DOCS_SHELL_THEMES.find((theme) => theme.id === id) ?? DOCS_SHELL_THEMES[0]!;
+}
+
+function resolveLandingThemeIndexForShellThemeId(id: string | undefined): number {
+  return LANDING_THEME_INDEX_BY_ID.get(resolveDocsShellThemeById(id).id) ?? 0;
+}
+
+function applyDocsShellThemeToContext(ctx: BijouContext, themeId: string | undefined): BijouContext {
+  const shellTheme = resolveDocsShellThemeById(themeId);
+  return cloneContextWithTheme(ctx, shellTheme.theme);
 }
 
 function themedSeparatorSurface(
@@ -2615,8 +2770,14 @@ function resolveGuidePaneMouse(
   return index == null ? undefined : { type: 'activate-guide-index', index };
 }
 
-function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<DocsExplorerModel, DocsMsg> {
+function createDocsExplorerApp(
+  getCtx: () => BijouContext,
+  onShellThemeChange: (ctx: BijouContext) => void,
+  i18n: I18nRuntime,
+): FramedApp<DocsExplorerModel, DocsMsg> {
+  const ctx = getCtx();
   return createFramedApp<DocsExplorerModel, DocsMsg>({
+    ctx,
     i18n,
     title: 'Bijou Docs',
     headerStyle: ({ pageModel }) => ({
@@ -2625,6 +2786,7 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
     helpLineSource: ({ model }) => buildDocsFooterHint(model, i18n),
+    shellThemes: DOCS_SHELL_THEMES,
     pages: DOCS_SITE_PAGES.map((spec) => {
       if (spec.id === COMPONENTS_PAGE_ID) {
         return {
@@ -2671,8 +2833,6 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                 return [{ ...model, profileMode: msg.mode }, []];
               case 'toggle-hints':
                 return [{ ...model, showHints: !model.showHints }, []];
-              case 'cycle-landing-theme':
-                return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
               case 'cycle-landing-quality':
                 return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
               default:
@@ -2724,21 +2884,21 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                   paneId: 'family-nav',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderFamiliesPane(model, width, height, ctx, theme),
+                  render: (width, height) => renderFamiliesPane(model, width, height, getCtx(), theme),
                 },
                 main: {
                   kind: 'pane',
                   paneId: 'story-content',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width) => renderStoryPane(model, width, ctx, theme, i18n),
+                  render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
                 },
                 variants: {
                   kind: 'pane',
                   paneId: 'story-variants',
                   focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderVariantsPane(model, width, height, ctx, theme),
+                  render: (width, height) => renderVariantsPane(model, width, height, getCtx(), theme),
                 },
               },
             };
@@ -2771,8 +2931,6 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
               return [selectGuide(spec.id, model, msg.guideId), []];
             case 'toggle-hints':
               return [{ ...model, showHints: !model.showHints }, []];
-            case 'cycle-landing-theme':
-              return [{ ...model, landingThemeIndex: nextLandingThemeIndex(model.landingThemeIndex, 1) }, []];
             case 'cycle-landing-quality':
               return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
             default:
@@ -2816,21 +2974,21 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                 paneId: 'guide-nav',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, ctx, theme, i18n),
+                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, getCtx(), theme, i18n),
               },
               main: {
                 kind: 'pane',
                 paneId: 'guide-content',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideReaderPane(spec.id, model, width, ctx, theme),
+                render: (width) => renderGuideReaderPane(spec.id, model, width, getCtx(), theme),
               },
               meta: {
                 kind: 'pane',
                 paneId: 'guide-meta',
                 focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideInfoPane(spec.id, model, width, ctx, theme, i18n),
+                render: (width) => renderGuideInfoPane(spec.id, model, width, getCtx(), theme, i18n),
               },
             },
           };
@@ -2838,6 +2996,9 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
       };
     }),
     enableCommandPalette: true,
+    onShellThemeChange: ({ ctx: nextCtx }) => {
+      onShellThemeChange(nextCtx);
+    },
     settings: ({ model, pageModel }) => {
       const theme = resolveLandingTheme(pageModel.landingThemeIndex);
       return {
@@ -2865,29 +3026,6 @@ function createDocsExplorerApp(ctx: BijouContext, i18n: I18nRuntime): FramedApp<
                 : dogfoodText(i18n, 'settings.showHints.feedback.on', 'Show hints turned on.'),
             },
           }],
-        },
-        {
-          id: 'appearance',
-          title: dogfoodText(i18n, 'settings.section.appearance', 'Appearance'),
-          rows: [
-            {
-              id: 'landing-theme',
-              label: dogfoodText(i18n, 'settings.landingTheme.label', 'Landing theme'),
-              description: landingThemeSettingDescription(pageModel.landingThemeIndex, i18n),
-              valueLabel: landingThemeSettingValue(pageModel.landingThemeIndex),
-              kind: 'choice',
-              action: { type: 'cycle-landing-theme' },
-              feedback: {
-                title: shellText(i18n, 'settings.title', 'Settings'),
-                message: dogfoodText(
-                  i18n,
-                  'settings.landingTheme.feedback',
-                  'Landing theme set to {theme}.',
-                  { theme: landingThemeSettingValue(nextLandingThemeIndex(pageModel.landingThemeIndex, 1)) },
-                ),
-              },
-            },
-          ],
         },
         {
           id: 'landing',
@@ -2988,9 +3126,15 @@ function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
 }
 
 export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): App<RootModel, RootMsg> {
+  let currentCtx = ctx;
+  const syncShellThemeContext = (themeId: string | undefined) => {
+    currentCtx = applyDocsShellThemeToContext(ctx, themeId);
+  };
   const i18n = createDocsI18nRuntime(options);
-  const explorer = createDocsExplorerApp(ctx, i18n);
-  const renderLanding = createLandingRenderer(ctx, i18n);
+  const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
+    currentCtx = nextCtx;
+  }, i18n);
+  const renderLanding = createLandingRenderer(() => currentCtx, i18n);
   const initialRoute = options.initialRoute ?? 'landing';
 
   function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
@@ -3003,11 +3147,10 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
     const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
-    const pageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
     return [{
       ...model,
       docsModel: syncedDocsModel,
-      landingThemeIndex: pageModel?.landingThemeIndex ?? model.landingThemeIndex,
+      landingThemeIndex: resolveLandingThemeIndexForShellThemeId(syncedDocsModel.activeShellThemeId),
     }, mapExplorer(cmds)];
   }
 
@@ -3015,14 +3158,13 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     init() {
       const [docsModel, cmds] = explorer.init();
       const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
-      const activePageModel = syncedDocsModel.pageModels[syncedDocsModel.activePageId];
       return [{
         route: initialRoute,
         columns: Math.max(1, ctx.runtime.columns),
         rows: Math.max(1, ctx.runtime.rows),
         landingTimeMs: 0,
         landingFps: Math.max(1, Math.round(ctx.runtime.refreshRate)),
-        landingThemeIndex: activePageModel?.landingThemeIndex ?? 0,
+        landingThemeIndex: resolveLandingThemeIndexForShellThemeId(syncedDocsModel.activeShellThemeId),
         landingToast: undefined,
         landingQuitConfirmOpen: false,
         docsModel: syncedDocsModel,
@@ -3087,10 +3229,10 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
             });
           }
           if (msg.key === 'left') {
-            return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
+            return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, -1)), []];
           }
           if (msg.key === 'right') {
-            return [applyLandingThemeSelection(model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
+            return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
           }
           if (msg.key === 'up') {
             return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
@@ -3098,8 +3240,11 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
           if (msg.key === 'down') {
             return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
           }
-          if (!msg.ctrl && !msg.alt && /^[1-5]$/.test(msg.key)) {
-            return [applyLandingThemeSelection(model, Number(msg.key) - 1), []];
+          if (!msg.ctrl && !msg.alt && /^[1-9]$/.test(msg.key)) {
+            const themeIndex = Number(msg.key) - 1;
+            if (themeIndex < LANDING_THEMES.length) {
+              return [applyLandingThemeSelection(syncShellThemeContext, model, themeIndex), []];
+            }
           }
           if (!msg.ctrl && !msg.alt) {
             return [{ ...model, route: 'docs' }, []];

@@ -73,9 +73,15 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-The next release is not shaped yet. The engineering focus is on
-deepening the product surface (DOGFOOD story quality, i18n catalog
-loader, MCP interactive docs) and layout/viewport formalization.
+The next release being prepared is **`4.4.1`**, a focused framed-shell
+polish release after `4.4.0`.
+
+It closes the downstream background-fill regression, extends that fix to
+the stock shell header/footer chrome, adds opt-in frame-owned shell
+theme cycling for `createFramedApp()`, and makes the stock quit dialog
+accept uppercase `Y` / `N`. The broader engineering focus after that
+release remains DOGFOOD story quality, i18n catalog loader work, MCP
+interactive docs, and layout/viewport formalization.
 
 ### Lock-step Versioned Units
 
@@ -195,8 +201,8 @@ When the version is chosen, move that directory to
 `docs/releases/X.Y.Z/` and update any version placeholders inside the
 docs.
 
-For the latest shipped release, that work lives under
-`docs/releases/4.4.0/`.
+For the release currently being prepared, that work lives under
+`docs/releases/4.4.1/`.
 
 ## Phase 3: Local Validation
 

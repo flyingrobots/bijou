@@ -50,6 +50,10 @@ export {
   getDefaultContext,
   setDefaultContext,
 } from './context.js';
+export {
+  cloneContextWithResolvedTheme,
+  cloneContextWithTheme,
+} from './context-theme.js';
 
 // Context resolution helpers
 export { resolveCtx, resolveSafeCtx } from './core/resolve-ctx.js';

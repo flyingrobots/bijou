@@ -6,6 +6,36 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [4.4.1] - 2026-04-11
+
+### ✨ Features
+
+- **Stock shell theme cycling in framed apps** — `createFramedApp()`
+  now accepts `shellThemes`, pre-resolves those themes once against the
+  active Bijou context, adds a frame-owned shell-theme choice row to the
+  stock settings drawer, and exposes the current selection on
+  `FrameModel.activeShellThemeId`. Apps with explicit page-rendering
+  contexts can pass `ctx` and sync `onShellThemeChange` without mutating
+  the original `BijouContext`. DOGFOOD uses that shared state to keep
+  its title screen and docs shell on one theme setting and adds the new
+  `Verdant Plum` palette.
+
+### 🐛 Bug Fixes
+
+- **Framed app background fill regression** — `createFramedApp()` now
+  fills the frame body with `surface.primary.bg` and preserves that
+  background through pane composition, gutters, scrollbars, split
+  dividers, minimized pane bars, and frame-owned placeholder surfaces.
+  Custom themed shells no longer fall back to the terminal default
+  background on unstyled cells. Added a regression test that asserts the
+  full frame body keeps the primary surface background.
+- **Shell chrome background fill** — framed app header and footer rows
+  now inherit the frame background when BCSS does not provide an
+  explicit shell background, so themed shells no longer render black
+  chrome bars over colored surfaces.
+- **Quit-confirm uppercase input** — the stock shell quit dialog now
+  accepts uppercase `Y` / `N` alongside lowercase `y` / `n`.
+
 ## [4.4.0] - 2026-04-10
 
 ### ✨ Features
@@ -1184,7 +1214,8 @@ First public release.
 - **Screen control** — `enterScreen()`, `exitScreen()`, `clearAndHome()`, `renderFrame()`
 - **Layout helpers** — `vstack()`, `hstack()`
 
-[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.4.0...HEAD
+[Unreleased]: https://github.com/flyingrobots/bijou/compare/v4.4.1...HEAD
+[4.4.1]: https://github.com/flyingrobots/bijou/compare/v4.4.0...v4.4.1
 [4.4.0]: https://github.com/flyingrobots/bijou/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/flyingrobots/bijou/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/flyingrobots/bijou/compare/v4.1.0...v4.2.0

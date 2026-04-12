@@ -9,7 +9,7 @@
  * const cpState = createCommandPaletteState(items);
  *
  * // In TEA view:
- * const output = commandPalette(model.cpState, { width: 60 });
+ * const output = commandPaletteSurface(model.cpState, { width: 60 });
  *
  * // In TEA update:
  * case 'filter':
@@ -241,8 +241,10 @@ export function cpSelectedItem(state: CommandPaletteState): CommandPaletteItem |
 // ---------------------------------------------------------------------------
 
 /**
- * Render the command palette — a search line followed by filtered items
- * in the viewport with a focus indicator.
+ * Render the command palette to a plain string boundary.
+ *
+ * Prefer {@link commandPaletteSurface} for in-app TUI rendering so the
+ * palette stays on the Surface path end-to-end.
  *
  * Layout:
  * - Line 1: `> {query}` search input

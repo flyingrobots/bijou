@@ -1,5 +1,9 @@
 # Guide — @flyingrobots/bijou-node
 
+This guide covers the common Node bootstrap path and the bridge between the pure Bijou core and the terminal process.
+
+For explicit context ownership, worker runtime flows, recorder/capture work, and deeper runtime-boundary concerns, use [ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md).
+
 ## Basic Setup
 
 ```typescript
@@ -10,11 +14,11 @@ initDefaultContext();
 ```
 
 This detects:
-- **TTY** → interactive mode (full colors, unicode)
-- **`CI=true`** → static mode (single-frame, no animations)
-- **Piped stdout / `TERM=dumb`** → pipe mode (plain text)
-- **`NO_COLOR`** → disables all color output
-- **`BIJOU_ACCESSIBLE=1`** → accessible mode (screen-reader friendly)
+- **TTY** → interactive mode (full colors, Unicode).
+- **`CI=true`** → static mode (single-frame, no animations).
+- **Piped stdout / `TERM=dumb`** → pipe mode (plain text).
+- **`NO_COLOR`** → disables all color output.
+- **`BIJOU_ACCESSIBLE=1`** → accessible mode (screen-reader friendly).
 
 ## Custom Context
 
@@ -50,30 +54,65 @@ if (runtime.stdoutIsTTY) {
 io.write(style.hex('#ff6600', 'Orange text\n'));
 ```
 
-## Resize Events
+## Worker Runtime
 
-The Node.js adapter listens to terminal resize via `process.stdout`:
+If your app's `update()` logic is heavy (e.g., complex graph calculations), you can offload the TEA loop to a worker thread while keeping the main thread dedicated to rendering and I/O.
 
 ```typescript
-const io = nodeIO();
+import { runInWorker } from '@flyingrobots/bijou-node';
+import { fileURLToPath } from 'node:url';
 
-const handle = io.onResize((cols, rows) => {
-  console.log(`Terminal resized to ${cols}x${rows}`);
+const entry = fileURLToPath(new URL('./my-app-worker.js', import.meta.url));
+
+runInWorker({
+  entry,
+  mouse: true,
 });
-
-// Clean up when done
-handle.dispose();
 ```
 
-In TUI apps using `@flyingrobots/bijou-tui`, resize events are dispatched automatically as `ResizeMsg` — you don't need to set this up manually.
+`RunWorkerOptions.entry` should be an absolute path. Deriving it from
+`import.meta.url` keeps the example copyable in ESM projects.
+
+## Recorder
+
+`bijou-node` can capture every frame of a `Surface` and rasterize them to a GIF. This is perfect for documentation or CI visual regression.
+
+```typescript
+import { recordDemoGif } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
+import { type App } from '@flyingrobots/bijou-tui';
+
+type Model = { count: number };
+type Msg = { type: 'increment' } | { type: 'quit' };
+
+const app: App<Model, Msg> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => [model, []],
+  view: (model) => stringToSurface(`Count: ${model.count}`, 8, 1),
+};
+
+const result = await recordDemoGif<Model, Msg>({
+  name: 'counter-demo',
+  app,
+  outputPath: 'demo.gif',
+  steps: [{ kind: 'wait', ms: 300 }],
+  frameDelayMs: 33,
+});
+
+console.log(result.outputPath, result.frames);
+```
 
 ## Environment Variables
 
 | Variable | Effect |
-|---|---|
-| `NO_COLOR` | Disables all color output |
-| `FORCE_COLOR` | Forces color even in non-TTY |
-| `CI` | Switches to static output mode |
-| `TERM=dumb` | Switches to pipe output mode |
-| `BIJOU_ACCESSIBLE=1` | Enables accessible output mode |
-| `BIJOU_THEME=./path.json` | Loads a custom DTCG theme file |
+| :--- | :--- |
+| `NO_COLOR` | Disables all color output. |
+| `FORCE_COLOR` | Forces color even in non-TTY environments. |
+| `CI` | Switches to static output mode. |
+| `TERM=dumb` | Switches to pipe output mode. |
+| `BIJOU_ACCESSIBLE=1` | Enables accessible output mode. |
+| `BIJOU_THEME=./path.json` | Loads a custom DTCG theme file. |
+| `BIJOU_FPS=60` | Overrides the detected terminal refresh rate. |
+
+---
+**The Node package bridges the pure TypeScript foundation to the physical terminal and the host OS.**

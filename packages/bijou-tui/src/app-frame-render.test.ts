@@ -140,6 +140,60 @@ describe('frame shell chrome surfaces', () => {
     }
   });
 
+  it('falls back to the frame background when chrome rows have no explicit BCSS background', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    setDefaultContext(ctx);
+    const expectedBg = ctx.surface('primary').bg ?? ctx.surface('secondary').bg;
+    expect(expectedBg).toBeDefined();
+
+    const activePage = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({ kind: 'pane' as const, paneId: 'main', render: () => createSurface(1, 1) }),
+    };
+    const pagesById = new Map([['home', activePage]]);
+    const model = {
+      activePageId: 'home',
+      pageOrder: ['home'],
+      pageModels: { home: {} },
+      focusedPaneByPage: { home: 'main' },
+      scrollByPage: {},
+      columns: 12,
+      rows: 5,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
+      runtimeNotifications: {} as never,
+      runtimeNotificationLoopActive: false,
+    };
+    const options = { title: 'Test', pages: [activePage] };
+
+    const header = resolveHeaderLine(model as any, options as any, pagesById as any).surface;
+    const help = renderHelpLine(model as any, {
+      id: 'workspace',
+      kind: 'workspace',
+      owner: 'frame',
+      inputMapId: 'frame-workspace',
+      dismissible: false,
+      blocksUnderlyingInput: false,
+      hintSource: createFrameKeyMap(),
+    }, undefined);
+
+    for (let x = 0; x < 12; x++) {
+      expect(header.get(x, 0).bg).toBe(expectedBg);
+      expect(help.get(x, 0).bg).toBe(expectedBg);
+      expect(header.get(x, 0).empty).toBe(false);
+      expect(help.get(x, 0).empty).toBe(false);
+    }
+  });
+
   it('derives a stronger active-tab foreground than the base header color', () => {
     const ctx = {
       ...createTestContext({ mode: 'interactive' }),
@@ -401,6 +455,7 @@ describe('frame layout composition', () => {
         scrollByPane: {},
         visibility: createPanelVisibilityState(),
         dockState: createPanelDockState(),
+        frameBackgroundToken: undefined,
       },
     );
 

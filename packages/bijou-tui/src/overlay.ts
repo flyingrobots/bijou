@@ -355,9 +355,9 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
   if ('buffer' in surface) {
     let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-    const fgRgb = style.fg ? parseHex(style.fg) : undefined;
+    const fgRgb = style.fgRGB ?? (style.fg ? parseHex(style.fg) : undefined);
     if (fgRgb) { [fR, fG, fB] = fgRgb; }
-    const bgRgb = style.bg ? parseHex(style.bg) : undefined;
+    const bgRgb = style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined);
     if (bgRgb) { [bR, bG, bB] = bgRgb; }
     ns = { fR, fG, fB, bR, bG, bB, fl: style.modifiers ? encodeModifiers(style.modifiers) : 0 };
   }
@@ -369,12 +369,12 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   return surface;
 }
 
-function lineWithInheritedBackground(line: Surface, bg: string | undefined): Surface {
-  if (bg == null || line.width === 0) return line;
+function lineWithInheritedBackground(line: Surface, style: Pick<CellStyle, 'bg' | 'bgRGB'>): Surface {
+  if ((style.bg == null && style.bgRGB == null) || line.width === 0) return line;
   const result = line.clone();
   // Fast path: packed surface — write bg bytes directly
   const packed = 'buffer' in result && (result as PackedSurface).buffer instanceof Uint8Array;
-  const rgb = packed ? parseHex(bg) : undefined;
+  const rgb = packed ? (style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined)) : undefined;
   if (rgb) {
     const [bgR, bgG, bgB] = rgb;
     const buf = (result as PackedSurface).buffer;
@@ -391,7 +391,12 @@ function lineWithInheritedBackground(line: Surface, bg: string | undefined): Sur
   for (let x = 0; x < result.width; x++) {
     const cell = result.get(x, 0);
     if (cell.empty) continue;
-    result.set(x, 0, { ...cell, bg: cell.bg ?? bg, empty: false });
+    result.set(x, 0, {
+      ...cell,
+      bg: cell.bg ?? style.bg,
+      bgRGB: cell.bgRGB ?? style.bgRGB,
+      empty: false,
+    });
   }
   return result;
 }
@@ -442,7 +447,7 @@ function renderBoxSurface(
     for (let x = 1; x < width - 1; x++) setStyledCell(surface, x, y, ' ', fillStyle);
     setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
 
-    const line = lineWithInheritedBackground(lines[i]!, fillStyle.bg);
+    const line = lineWithInheritedBackground(lines[i]!, fillStyle);
     if (line.width > 0 && innerWidth > 0) {
       surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
     }
@@ -706,7 +711,7 @@ export function drawer(options: DrawerOptions): Overlay {
     }
     if (width >= 2) setStyledCell(surface, width - 1, y, BORDER.v, borderStyle);
 
-    const line = lineWithInheritedBackground(rows[i] ?? createSurface(0, 1), fillStyle.bg);
+    const line = lineWithInheritedBackground(rows[i] ?? createSurface(0, 1), fillStyle);
     if (line.width > 0 && innerWidth > 0 && width >= 4) {
       surface.blit(line, 2, y, 0, 0, Math.min(line.width, innerWidth), 1);
     }
