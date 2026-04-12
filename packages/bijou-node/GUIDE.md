@@ -95,4 +95,4 @@ await recordDemoGif({
 | `BIJOU_FPS=60` | Overrides the detected terminal refresh rate. |
 
 ---
-**The Node package bridges the pure TypeScript substrate to the physical terminal and the host OS.**
+**The Node package bridges the pure TypeScript foundation to the physical terminal and the host OS.**

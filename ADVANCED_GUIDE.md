@@ -4,7 +4,7 @@ This is the second-track manual for Bijou.
 
 ```mermaid
 flowchart TD
-    subgraph Core["@flyingrobots/bijou (Substrate)"]
+    subgraph Core["@flyingrobots/bijou (Foundation)"]
         S1[Surface Definition]
         S2[Component Rendering]
     end

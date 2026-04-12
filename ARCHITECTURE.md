@@ -16,7 +16,7 @@ Adapters (e.g., `nodeRuntime`, `nodeIO`, `chalkStyle`) live in `@flyingrobots/bi
 
 ## Package Stack
 
-### 1. `@flyingrobots/bijou` (The Substrate)
+### 1. `@flyingrobots/bijou` (The Foundation)
 - Zero-dependency primitives: `Surface`, `LayoutNode`, and `BijouContext`.
 - Core component families and interactive prompts.
 - Output-mode detection and graceful lowering.

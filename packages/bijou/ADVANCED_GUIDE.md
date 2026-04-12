@@ -41,7 +41,7 @@ That matters because:
 - component authors should think in terms of cells, spans, and render modes,
   not just formatted text snippets
 
-If you are touching the render substrate, read:
+If you are touching the render bedrock, read:
 
 - [README](./README.md)
 - [surface primitives tests](./src/core/components/surface-primitives.test.ts)

@@ -45,4 +45,4 @@ DOGFOOD is the canonical proving ground. Every component and pattern is verified
 The system is designed to be codable and inspectable by both humans and AI. MCP rendering services and interactive documentation provide a machine-readable interface to the toolkit.
 
 ---
-**The goal is not more terminal widgets. It is the geometric lawfulness of the terminal as a professional application substrate.**
+**The goal is not more terminal widgets. It is the geometric lawfulness of the terminal as a professional application bedrock.**

@@ -38,4 +38,4 @@ AI-mediated output must be explicit about its nature, evidence, and confidence. 
 - **DOGFOOD is the Proving Ground**: The documentation itself must exercise the shell, search, and accessibility posture truthfully.
 
 ---
-**The goal is to move the terminal from a collection of widgets to a professional application substrate.**
+**The goal is to move the terminal from a collection of widgets to a professional application bedrock.**

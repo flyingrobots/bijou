@@ -2,7 +2,7 @@
 
 Bijou is an industrial-grade TypeScript engine for terminal software where runtime truth, design language, and documentation are unified.
 
-DOGFOOD is the canonical terminal documentation surface for the repository. Built in Bijou itself, the docs shell, interaction model, and examples all exercise the same substrate the framework provides to users.
+DOGFOOD is the canonical terminal documentation surface for the repository. Built in Bijou itself, the docs shell, interaction model, and examples all exercise the same medium the framework provides to users.
 
 ## What is Bijou?
 

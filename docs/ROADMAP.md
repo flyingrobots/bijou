@@ -11,7 +11,7 @@ timeline
 
 ## Strategic Horizon
 
-### Phase 1: Substrate Integrity
+### Phase 1: Foundation Integrity
 - **DOGFOOD Consolidation**: Unify documentation, story protocols, and component explorers.
 - **Layout & Viewport Formalization**: Ensure split panes and scroll regions share a unified interaction model.
 - **i18n Automation**: Implement a built-in catalog loader to simplify the localization pipeline.

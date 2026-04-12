@@ -9,7 +9,7 @@ Since Bijou uses Mermaid for its documentation, wouldn't it be cool to render Me
 ## Why
 
 1. **Self-Documentation**: A TUI app can render its own architecture or cycle state without external tools.
-2. **Data-Viz Maturity**: It pushes the "geometric lawfulness" of the terminal by showing that complex, logic-heavy graphs are native to the substrate.
+2. **Data-Viz Maturity**: It pushes the "geometric lawfulness" of the terminal by showing that complex, logic-heavy graphs are native to the medium.
 3. **Docs Synergy**: If DOGFOOD could render diagrams locally, it would complete the "docs are the demo" story.
 
 ## Effort
