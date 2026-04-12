@@ -1,29 +1,21 @@
 # Start Here
 
-Bijou is a surface-native terminal UI framework for building styled,
-stateful, and testable terminal applications without dropping back into
-stringly view code.
+Bijou is an industrial-grade TypeScript engine for terminal software where runtime truth, design language, and documentation are unified.
 
-DOGFOOD is the terminal documentation surface for the repo. It is built
-in Bijou itself so the docs shell, interaction model, and examples all
-exercise the same runtime the framework asks users to trust.
+DOGFOOD is the canonical terminal documentation surface for the repository. Built in Bijou itself, the docs shell, interaction model, and examples all exercise the same medium the framework provides to users.
 
 ## What is Bijou?
 
-It is a framework for building terminal applications with explicit
-surfaces, testable runtime behavior, and a shell that stays honest about
-what is happening on screen.
+Bijou is a high-fidelity engine for building terminal applications with explicit surfaces, deterministic runtime behavior, and a shell that remains truthful under pressure.
 
-## Docs map
+## Documentation Map
 
-- `Guides` explains what Bijou is and how to get oriented.
-- `Components` is the live component family and variant browser.
-- `Packages` is where package-level guidance lives.
-- `Philosophy` is where doctrine and architecture guidance lives.
-- `Release` is where current-line release and migration guidance lives.
+- **Guides**: Orientation and navigation within the Bijou ecosystem.
+- **Components**: The live, interactive field guide to component families and variants.
+- **Packages**: Deep dives into the roles and responsibilities of each workspace package.
+- **Philosophy**: Architectural doctrine, invariants, and the project's engineering stance.
+- **Release**: Current-line release notes and migration guidance.
 
-## Current posture
+## Current Posture
 
-The rendering pipeline is byte-packed, benchmarked, and fast. DOGFOOD
-carries real repo, package, and release guidance inside the app. See
-the Release section for what shipped in the current version.
+The rendering foundation is byte-packed, zero-allocation, and optimized for high-performance TUIs. DOGFOOD reflects the repository's real-time state, including the latest release and migration truth.

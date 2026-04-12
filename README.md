@@ -1,13 +1,8 @@
 # Bijou
 
-**Bijou** is a TypeScript toolkit for building delightful terminal software.
+An industrial-grade TypeScript engine for terminal software. Use the pure primitives to build your own CLI, or drop into the batteries-included app shell for a full-screen TUI out of the box.
 
-The public stack has two main UI/runtime layers, plus Node and localization support packages:
-
-- [`@flyingrobots/bijou`](./packages/bijou/) for prompts, output helpers, themes, and mode-aware components
-- [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) for surface-based interactive apps, layout, motion, overlays, and framed shells
-
-The philosophy is practical over ornamental: local TTY apps should feel great, while the same codebase gracefully degrades in CI, pipes, and accessibility-focused environments.
+Bijou is designed for the mechanic who demands geometric lawfulness and the architect who needs a stable substrate. It scales from simple mode-aware prompts to high-fidelity, physics-powered terminal applications.
 
 [![npm version](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
 [![License](https://img.shields.io/github/license/flyingrobots/bijou)](./LICENSE)
@@ -19,76 +14,37 @@ The philosophy is practical over ornamental: local TTY apps should feel great, w
 Bijou `v4.4.1` is a framed-shell polish release focused on the `4.4.0`
 regression fallout.
 
-Key changes:
-
-- **Framed-shell background rendering fixed end-to-end** —
-  `createFramedApp()` now preserves `surface.primary.bg` through pane
-  composition, gutters, scrollbars, split dividers, minimized panes,
-  placeholder surfaces, and the stock header/footer chrome. Custom
-  themed shells no longer fall back to the terminal default background
-  in either the body or the shell bars.
-- **New stock shell theme support in `createFramedApp()`** — framed apps
-  can now opt into a frame-owned theme chooser with `shellThemes`, and
-  the active selection is exposed on `FrameModel.activeShellThemeId`.
-  Apps with explicit page-rendering contexts can pass `ctx` and sync
-  `onShellThemeChange` to keep shell and page content aligned. DOGFOOD
-  uses that shared path for the title screen and docs shell, including
-  the new `Verdant Plum` palette.
-- **Quit confirm is more forgiving** — the stock quit dialog now accepts
-  uppercase `Y` / `N` as well as lowercase `y` / `n`.
-- **Backward-compatible release** — no breaking changes; the new shell
-  theme API is optional.
+- `createFramedApp()` now preserves shell and pane background fill more
+  honestly, including stock header/footer chrome.
+- framed apps can opt into stock shell theme cycling through
+  `shellThemes`, and DOGFOOD now proves that shared path end to end.
+- the stock quit confirm accepts uppercase `Y` / `N` as well as lowercase
+  input.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
 [What's New guide](./docs/releases/4.4.1/whats-new.md), and the
 [migration guide](./docs/releases/4.4.1/migration-guide.md).
 
-## Package Map
+## Why Bijou?
 
-| Package | Role |
-| --- | --- |
-| [`@flyingrobots/bijou`](./packages/bijou/) | Core toolkit: prompts, components, themes, output modes, surfaces, ports |
-| [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) | Interactive runtime: TEA loop, layout, overlays, motion, diffed rendering |
-| [`@flyingrobots/bijou-node`](./packages/bijou-node/) | Node adapters: runtime, IO, style ports, recorder and worker helpers |
-| [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) | Opinionated app shell with tabs, drawers, help, and status areas |
-| [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) | Scaffolder for a runnable Bijou TUI app |
-| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | In-memory localization runtime: catalogs, direction, and runtime-safe lookups |
-| [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) | Localization workflow tooling: authoring, stale detection, exchange, compilation |
-| [`@flyingrobots/bijou-i18n-tools-node`](./packages/bijou-i18n-tools-node/) | Node filesystem helpers for localization exchange workflows |
-| [`@flyingrobots/bijou-i18n-tools-xlsx`](./packages/bijou-i18n-tools-xlsx/) | XLSX workbook adapters for localization exchange workflows |
-| [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) | MCP server: Bijou rendering tools for AI chat contexts |
+Unlike Virtual-DOM wrappers that treat the terminal as a low-resolution browser, Bijou treats the terminal as a physical character grid.
 
-All published packages are versioned in lock-step.
+- **Deterministic State**: The TEA loop ensures your UI is a pure function of your state history. No hooks, no side-effect soup, and no reconciliation drift.
+- **Byte-Packed Performance**: Rendering happens on zero-allocation byte buffers (`Uint8Array`). It is designed for high-frequency updates and complex layouts that would choke string-heavy engines.
+- **Geometric Honesty**: Portability is not an afterthought. Bijou adapts to CI logs, pipes, and screen readers by changing its rendering strategy, not just stripping colors.
+- **Physics-Powered Motion**: Animations are driven by a unified heartbeat and spring physics, providing fluid movement that remains synchronized with the render loop.
 
-## What Bijou Is Good At
+## Essence
 
-- building prompt-driven CLIs that still lower cleanly in pipes and CI
-- building full-screen terminal apps with a real update/view/runtime model
-- keeping tests close to user-visible behavior through surfaces, smoke suites, and scaffolding canaries
-- giving you a documented design-system track instead of leaving component choice entirely to improvisation
-
-## DOGFOOD
-
-DOGFOOD is the canonical Bijou docs surface and proving app.
-
-It is not just an example. It is where the repo now proves:
-
-- the framed shell and interactive runtime in a real full-screen product surface
-- the component-family field guide and design-language track in one living docs app
-- shell concerns like search, settings, help, quit, and layout behavior under real usage
-
-If you are learning Bijou, start with DOGFOOD. The `examples/` tree is
-now secondary reference material, not the public docs front door.
-
-Run it locally:
-
-```bash
-npm run dogfood
-```
+- **Degradation as a Substrate Property**: Write once; render perfectly in local TTYs, CI logs, pipes, and accessible environments.
+- **The Elm Architecture (TEA)**: A deterministic state-update-view loop for industrial-strength interactive UIs.
+- **Physics-Powered Motion**: Declarative spring and tween animations synchronized to a unified heartbeat.
+- **Zero-Dependency Core**: The fundamental toolkit is pure TypeScript, isolated from platform-specific IO.
 
 ## Quick Start
 
-### Core CLI Flow
+### 1. Pure CLI Flow
+Standalone primitives for prompts and structured output.
 
 ```ts
 import { group, headerBox, input, select } from '@flyingrobots/bijou';
@@ -98,24 +54,20 @@ initDefaultContext();
 
 const answers = await group({
   project: () => input({ title: 'Project name', required: true }),
-  template: () =>
-    select({
-      title: 'Template',
-      options: [
-        { label: 'TypeScript', value: 'ts' },
-        { label: 'Go', value: 'go' },
-      ],
-    }),
+  template: () => select({
+    title: 'Template',
+    options: [
+      { label: 'TypeScript', value: 'ts' },
+      { label: 'Go', value: 'go' },
+    ],
+  }),
 });
 
-console.log(
-  headerBox('Scaffold', {
-    detail: `${answers.project} (${answers.template})`,
-  }),
-);
+console.log(headerBox('Scaffold', { detail: `${answers.project} (${answers.template})` }));
 ```
 
-### Interactive Runtime
+### 2. Interactive Runtime
+Full-screen TEA loop with layout, overlays, and motion.
 
 ```ts
 import { type App, quit, run, vstackSurface } from '@flyingrobots/bijou-tui';
@@ -124,135 +76,55 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 
 const ctx = initDefaultContext();
 
-type Model = { count: number };
-
-const app: App<Model> = {
+const app: App<{ count: number }> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => {
     if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
     if (msg.type === 'key' && msg.key === 'k') return [{ count: model.count + 1 }, []];
-    if (msg.type === 'key' && msg.key === 'j') return [{ count: model.count - 1 }, []];
     return [model, []];
   },
-  view: (model) =>
-    boxSurface(
-      vstackSurface(
-        `Current count: ${model.count}`,
-        badge(model.count > 10 ? 'HIGH' : 'LOW', { variant: 'info', ctx }),
-      ),
-      { title: 'Counter', padding: 1, ctx },
+  view: (model) => boxSurface(
+    vstackSurface(
+      `Count: ${model.count}`,
+      badge(model.count > 10 ? 'HIGH' : 'LOW', { variant: 'info', ctx }),
     ),
+    { title: 'Counter', padding: 1, ctx },
+  ),
 };
 
 await run(app);
 ```
 
-### Scaffold A New App
+### 3. Scaffold a Framed App
+Get the batteries-included workspace shell immediately.
 
 ```bash
 npm create bijou-tui-app@latest my-app
 ```
 
-## Output Modes
+## Packages
 
-Bijou is designed to adapt to the environment instead of assuming every run is a full local TTY.
+| Package | Role |
+| :--- | :--- |
+| [`@flyingrobots/bijou`](./packages/bijou/) | Core toolkit: prompts, components, themes, ports. |
+| [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) | Interactive runtime: TEA, layout, motion, overlays. |
+| [`@flyingrobots/bijou-node`](./packages/bijou-node/) | Node.js adapters: IO, styling, worker helpers. |
+| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | Localization: in-memory runtime and catalogs. |
 
-| Mode | Typical trigger | What happens |
-| --- | --- | --- |
-| `interactive` | Local TTY | Full runtime, input loop, color, motion, shell chrome |
-| `static` | CI with TTY stdout | Single-frame render, no interactive loop |
-| `pipe` | Non-TTY stdout, `NO_COLOR`, or `TERM=dumb` | Plain-text-safe output |
-| `accessible` | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader-friendly output |
+## Documentation
 
-Example:
+- **[Guide](./GUIDE.md)**: Orientation, the fast path, and monorepo orchestration.
+- **[Advanced Guide](./ADVANCED_GUIDE.md)**: Deep dives into the pipeline, shaders, and motion.
+- **[DOGFOOD](./docs/DOGFOOD.md)**: The canonical documentation app. Run `npm run dogfood` to see Bijou in action.
+- **[Design System](./docs/design-system/README.md)**: The foundations and component families.
+- **[Architecture](./ARCHITECTURE.md)**: The hexagonal design and core properties.
 
-```ts
-import { alert } from '@flyingrobots/bijou';
-import { initDefaultContext } from '@flyingrobots/bijou-node';
+## DOGFOOD
 
-const ctx = initDefaultContext();
+DOGFOOD is the canonical human-facing docs surface for Bijou.
 
-console.log(
-  alert('Connection refused on port 5432.', {
-    variant: 'error',
-    ctx,
-  }),
-);
-```
-
-That same call lowers differently depending on the interaction profile:
-
-```text
-interactive / static
-┌─────────────────────────────────────┐
-│ ✗ Connection refused on port 5432. │
-└─────────────────────────────────────┘
-
-pipe
-[ERROR] Connection refused on port 5432.
-
-accessible
-Error: Connection refused on port 5432.
-```
-
-## Design System
-
-Bijou ships a design-system documentation track in addition to API docs, and DOGFOOD is the primary living surface for that work.
-
-Start here:
-
-- [Design System Overview](./docs/design-system/README.md)
-- [Foundations](./docs/design-system/foundations.md)
-- [Patterns](./docs/design-system/patterns.md)
-- [Component Families](./docs/design-system/component-families.md)
-- [Data Visualization Policy](./docs/design-system/data-visualization.md)
-
-Those docs are meant to answer:
-
-- what a component is for
-- when to use it
-- when not to use it
-- how it lowers across interaction profiles
-- what the nearest related family is
-
-## Documentation Map
-
-- [Docs Index](./docs/README.md)
-- [METHOD](./docs/METHOD.md)
-- [BEARING](./docs/BEARING.md)
-- [VISION](./docs/VISION.md)
-- [DOGFOOD](./docs/DOGFOOD.md)
-- [System-Style JavaScript](./docs/system-style-javascript.md)
-- [Architecture](./docs/ARCHITECTURE.md)
-- [Migration Guide](./docs/MIGRATING_TO_V4.md)
-- [Release Docs](./docs/releases/README.md)
-- [Release Guide](./docs/release.md)
-- [Changelog](./docs/CHANGELOG.md)
-- [Roadmap](./docs/ROADMAP.md)
-
-## Roadmap
-
-These are directions we are actively interested in, but they are not being presented as shipped `4.0.0` features:
-
-- browser and Wasm adapters
-- a Bijou-native docs TUI
-- a story/studio workflow for isolated component and pattern work
-- replay artifacts, richer scenario tooling, and time-travel debugging
-- deeper BCSS/devtools work beyond the currently shipped scoped runtime styling
-
-See [docs/METHOD.md](./docs/METHOD.md) for the repo work doctrine,
-[docs/BEARING.md](./docs/BEARING.md) for the current direction,
-[docs/system-style-javascript.md](./docs/system-style-javascript.md) for
-the engineering doctrine, and
-[docs/ROADMAP.md](./docs/ROADMAP.md) for the broader legacy/reference
-backlog.
-
-## License
-
-Apache-2.0 ([LICENSE](./LICENSE))
+If you are learning the framework, start there first. The `examples/` tree is
+secondary/internal reference material, not the main public docs path.
 
 ---
-
-<p align="center">
-Built with terminal ambition by <a href="https://github.com/flyingrobots">FLYING ROBOTS</a>
-</p>
+Built with terminal ambition by [FLYING ROBOTS](https://github.com/flyingrobots)
