@@ -5,6 +5,8 @@
  * of terminal output (character + styling).
  */
 
+import { sanitizeNonNegativeInt } from '../core/numeric.js';
+
 /**
  * A single terminal character cell.
  */
@@ -268,7 +270,7 @@ function copyCellInto(target: Cell, source: Cell): void {
   target.opacity = source.opacity;
 }
 
-function isPackedSurface(s: Surface): s is PackedSurface {
+export function isPackedSurface(s: Surface): s is PackedSurface {
   return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
 }
 
@@ -498,8 +500,8 @@ export interface PackedSurface extends Surface {
  * @returns A new Surface instance.
  */
 export function createSurface(width: number, height: number, fill?: Cell): PackedSurface {
-  const w = Math.max(0, Math.floor(width));
-  const h = Math.max(0, Math.floor(height));
+  const w = sanitizeNonNegativeInt(width, 0);
+  const h = sanitizeNonNegativeInt(height, 0);
   const size = w * h;
   const defaultCell: Cell = fill ?? { char: ' ', empty: true };
 

@@ -25,6 +25,7 @@ describe('runtime viewport helpers', () => {
     expect(sanitizeRuntimeDimension(12.9)).toBe(12);
     expect(sanitizeRuntimeDimension(-5)).toBe(0);
     expect(sanitizeRuntimeDimension(Number.NaN)).toBe(0);
+    expect(sanitizeRuntimeDimension(Number.POSITIVE_INFINITY)).toBe(0);
   });
 
   it('installs a mutable viewport overlay without mutating the base runtime object', () => {

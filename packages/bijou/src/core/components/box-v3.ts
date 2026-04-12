@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type Cell, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { clipToWidth } from '../text/clip.js';
 import { wrapToWidth } from '../text/wrap.js';
@@ -7,10 +7,6 @@ import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
 import { parseHex, encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
 function parseStyleRGB(style: { fg?: string; bg?: string; modifiers?: string[] }): {

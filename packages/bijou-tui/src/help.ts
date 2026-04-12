@@ -15,7 +15,7 @@
  * ```
  */
 
-import { createSurface, parseAnsiToSurface, type Surface } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, sanitizePositiveInt, type Surface } from '@flyingrobots/bijou';
 import type { BindingInfo } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
 import { visibleLength } from './viewport.js';
@@ -216,12 +216,9 @@ export function helpForSurface(
 
 function renderHelpSurface(text: string, options?: Pick<HelpSurfaceOptions, 'width' | 'height'>): Surface {
   const lines = text.length === 0 ? [''] : text.split('\n');
-  const width = Math.max(
-    1,
-    options?.width ?? 0,
-    ...lines.map((line) => visibleLength(line)),
-  );
-  const height = Math.max(1, options?.height ?? lines.length);
+  const contentWidth = Math.max(1, ...lines.map((line) => visibleLength(line)));
+  const width = Math.max(contentWidth, sanitizePositiveInt(options?.width, 1));
+  const height = sanitizePositiveInt(options?.height, lines.length);
 
   if (text.length === 0) {
     return createSurface(width, height);

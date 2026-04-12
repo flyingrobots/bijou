@@ -1,10 +1,6 @@
-import type { Surface, PackedSurface } from '@flyingrobots/bijou';
+import { isPackedSurface, type Surface, type PackedSurface } from '@flyingrobots/bijou';
 import { CELL_STRIDE, OFF_FG_R, OFF_BG_R, OFF_ALPHA, FLAG_FG_SET, FLAG_BG_SET } from '@flyingrobots/bijou/perf';
 import type { RenderMiddleware } from '../pipeline.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
 /**
  * Creates a post-processing middleware that converts all colors in the
  * target surface to grayscale luminance values.

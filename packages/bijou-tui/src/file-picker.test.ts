@@ -216,6 +216,12 @@ describe('height clamping', () => {
     const state = createFilePickerState({ cwd: '/dir', io, height: -5 });
     expect(state.height).toBe(1);
   });
+
+  it('falls back for non-finite height and floors fractional height', () => {
+    const io = mockIO({ dirs: { '/dir': ['a.txt'] } });
+    expect(createFilePickerState({ cwd: '/dir', io, height: Number.NaN }).height).toBe(10);
+    expect(createFilePickerState({ cwd: '/dir', io, height: 4.7 }).height).toBe(4);
+  });
 });
 
 // ── render ────────────────────────────────────────────────────────

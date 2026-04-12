@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type PackedSurface, type Cell } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '../../ports/surface.js';
 import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
@@ -66,7 +66,7 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
     cell.modifiers = cell.modifiers?.filter(m => m !== 'inverse');
   }
 
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   if (packed && cell.fg) {
     const fg = parseHex(cell.fg);
     if (fg) {

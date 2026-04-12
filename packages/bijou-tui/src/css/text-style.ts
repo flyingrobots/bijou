@@ -1,4 +1,4 @@
-import { createSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 export interface StyledTextToken {
@@ -124,7 +124,7 @@ function fillStyledText(
     empty: false,
   });
   const graphemes = segmentGraphemes(text);
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   const fg = packed && token.hex ? parseHex(token.hex) : undefined;
   if (fg) {
     const [fR, fG, fB] = fg;

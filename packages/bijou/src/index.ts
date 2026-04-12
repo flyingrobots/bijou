@@ -29,6 +29,7 @@ export {
   type Matrix3x3,
   type TransformOptions,
   createSurface,
+  isPackedSurface,
   FULL_MASK,
   ROTATION_CHAR_MAP,
 } from './ports/surface.js';
@@ -66,6 +67,10 @@ export {
   installRuntimeViewportOverlay,
   updateRuntimeViewport,
 } from './core/runtime-viewport.js';
+export {
+  sanitizeNonNegativeInt,
+  sanitizePositiveInt,
+} from './core/numeric.js';
 
 // Mode rendering strategy
 export {

@@ -7,6 +7,7 @@ import type {
 } from '@flyingrobots/bijou';
 import {
   createSurface,
+  isPackedSurface,
   prepareWrappedText,
   segmentGraphemes,
   surfaceToString,
@@ -717,7 +718,7 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
   const surface = createSurface(width, 1);
   let x = 0;
 
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   for (const segment of graphemeSegments) {
     // Pre-parse style once per segment for setRGB fast path
     const s = segment.style;
@@ -972,7 +973,7 @@ function renderNotificationSurface<Msg>(
     empty: false,
   });
 
-  const cardPacked: boolean = 'buffer' in card;
+  const cardPacked = isPackedSurface(card);
   for (let y = 0; y < contentRows.length; y++) {
     const accentRgb = cardPacked && accentStyle.fg ? parseHex(accentStyle.fg) : undefined;
     if (accentRgb) {

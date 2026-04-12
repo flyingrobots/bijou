@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
 import { parseHex, FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
@@ -129,7 +129,7 @@ export function preferenceRowSurface(
       const innerWidth = Math.max(0, width - (startX * 2));
       const valueStart = Math.max(0, innerWidth - valueChars.length);
       const valFg = resolvePreferenceValueFg(prepared.row, ctx, options.theme);
-      const packed: boolean = 'buffer' in surface;
+      const packed = isPackedSurface(surface);
       if (packed && valFg) {
         const fgP = parseHex(valFg);
         if (fgP) {
@@ -333,7 +333,7 @@ function writePreferenceLine(
   } = {},
 ): void {
   const chars = Array.from(text);
-  const pp: boolean = 'buffer' in surface;
+  const pp = isPackedSurface(surface);
   if (pp && options.fg) {
     const fgP = parseHex(options.fg);
     if (fgP) {

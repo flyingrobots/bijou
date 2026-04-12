@@ -1,4 +1,4 @@
-import { createSurface, type Cell, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { graphemeClusterWidth, segmentGraphemes } from '../text/grapheme.js';
 import { encodeModifiers, parseHex } from '../render/packed-cell.js';
@@ -30,10 +30,6 @@ function parseNumericStyle(style: CellTextStyle): NumericStyle | undefined {
     bgR, bgG, bgB, bgSet,
     flags: encodeModifiers(style.modifiers),
   };
-}
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
 }
 
 export interface SurfaceTextSegment {

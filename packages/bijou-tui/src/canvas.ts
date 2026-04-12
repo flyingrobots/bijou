@@ -5,7 +5,7 @@
  * with normalized UV mapping and full color/styling support.
  */
 
-import { createSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 /**
@@ -100,7 +100,7 @@ function setCellFast(surface: Surface, packed: boolean, x: number, y: number, ce
 
 function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const result = shader({
@@ -117,7 +117,7 @@ function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, 
 
 function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   const subW = width * 2;
   const subH = height * 2;
 
@@ -162,7 +162,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
 
 function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   const subW = width * 2;
   const subH = height * 4;
 

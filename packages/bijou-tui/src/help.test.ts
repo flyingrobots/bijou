@@ -200,4 +200,17 @@ describe('help surfaces', () => {
     expect(rendered.split('\n').map((line) => line.trimEnd()).join('\n'))
       .toBe(helpFor(sampleKeyMap(), 'Nav'));
   });
+
+  it('falls back for non-finite width and height', () => {
+    const rendered = surfaceToString(
+      helpViewSurface(sampleKeyMap(), {
+        width: Number.NaN,
+        height: Number.POSITIVE_INFINITY,
+      }),
+      ctx.style,
+    );
+
+    expect(rendered.split('\n').map((line) => line.trimEnd()).join('\n'))
+      .toBe(helpView(sampleKeyMap()));
+  });
 });

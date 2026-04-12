@@ -45,6 +45,11 @@ describe('browsableList', () => {
       const state = createBrowsableListState({ items, height: -5 });
       expect(state.height).toBe(1);
     });
+
+    it('falls back for non-finite height and floors fractional height', () => {
+      expect(createBrowsableListState({ items, height: Number.NaN }).height).toBe(10);
+      expect(createBrowsableListState({ items, height: 3.8 }).height).toBe(3);
+    });
   });
 
   describe('focus navigation', () => {

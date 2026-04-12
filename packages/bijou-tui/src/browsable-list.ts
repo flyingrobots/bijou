@@ -21,7 +21,7 @@
  * ```
  */
 
-import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 import { viewportSurface, visibleLength } from './viewport.js';
 import { collectionRowsSurface } from './collection-surface.js';
@@ -102,7 +102,7 @@ export interface BrowsableListSurfaceOptions extends BrowsableListRenderOptions 
 export function createBrowsableListState<T = string>(
   options: BrowsableListOptions<T>,
 ): BrowsableListState<T> {
-  const height = Math.max(1, options.height ?? 10);
+  const height = sanitizePositiveInt(options.height, 10);
   return {
     items: [...options.items],
     focusIndex: 0,

@@ -1,12 +1,8 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import type { SeparatorOptions } from './separator.js';
 import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 import { parseHex, encodeModifiers } from '../render/packed-cell.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
 
 /**
  * Render a horizontal separator as a Surface for V3-native composition.

@@ -1,4 +1,5 @@
 import type { RuntimePort } from '../ports/runtime.js';
+import { sanitizeNonNegativeInt } from './numeric.js';
 
 /** Sanitized terminal viewport dimensions. */
 export interface RuntimeViewport {
@@ -14,8 +15,7 @@ export interface RuntimeViewport {
  * non-negative cell counts.
  */
 export function sanitizeRuntimeDimension(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.floor(value));
+  return sanitizeNonNegativeInt(value, 0);
 }
 
 /** Read the current runtime viewport using Bijou's shared dimension rules. */

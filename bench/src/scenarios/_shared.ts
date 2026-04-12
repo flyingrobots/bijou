@@ -3,7 +3,7 @@
  * used across diff and paint scenarios.
  */
 
-import type { WritePort, StylePort, Surface, PackedSurface } from '@flyingrobots/bijou';
+import { isPackedSurface, type WritePort, type StylePort, type Surface, type PackedSurface } from '@flyingrobots/bijou';
 
 /** WritePort that counts writes and bytes without producing real output. */
 export interface CountingSink extends WritePort {
@@ -13,7 +13,7 @@ export interface CountingSink extends WritePort {
 
 /** Type guard: does this Surface have a packed byte buffer? */
 export function isPacked(s: Surface): s is PackedSurface {
-  return 'buffer' in (s as { buffer?: unknown }) && (s as { buffer?: unknown }).buffer instanceof Uint8Array;
+  return isPackedSurface(s);
 }
 
 /**

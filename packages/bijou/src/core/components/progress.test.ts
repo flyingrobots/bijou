@@ -56,6 +56,11 @@ describe('progressBar', () => {
     expect(result).toBe('45 percent complete.');
   });
 
+  it('falls back to the default width for non-finite width input', () => {
+    const ctx = createTestContext({ mode: 'static' });
+    expect(progressBar(45, { width: Number.NaN, ctx })).toBe(progressBar(45, { ctx }));
+  });
+
   it('uses custom filled and empty characters', () => {
     const ctx = createTestContext({ mode: 'static' });
     const result = progressBar(50, { width: 4, filled: '#', empty: '-', ctx });
@@ -258,6 +263,24 @@ describe('createAnimatedProgressBar', () => {
     const lastRenderWrite = ctx.io.written.filter(w => w.includes('%')).at(-1);
     expect(lastRenderWrite).toContain('100%');
 
+    bar.stop();
+  });
+
+  it('falls back to default fps and duration for non-finite animation options', () => {
+    const clock = mockClock();
+    const ctx = createTestContext({ mode: 'interactive', clock });
+    const bar = createAnimatedProgressBar({
+      fps: Number.POSITIVE_INFINITY,
+      duration: Number.NaN,
+      ctx,
+    });
+
+    bar.start();
+    const writesBeforeUpdate = ctx.io.written.length;
+    bar.update(100);
+    clock.advanceBy(40);
+
+    expect(ctx.io.written.length).toBeGreaterThan(writesBeforeUpdate);
     bar.stop();
   });
 });

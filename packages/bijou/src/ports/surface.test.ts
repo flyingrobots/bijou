@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSurface } from './surface.js';
+import { createSurface, isPackedSurface } from './surface.js';
 
 describe('createSurface', () => {
   it('reuses cell objects when clearing a surface', () => {
@@ -71,5 +71,23 @@ describe('createSurface', () => {
       empty: false,
       opacity: 1,
     });
+  });
+
+  it('exports the packed surface guard for public callers', () => {
+    const surface = createSurface(1, 1);
+    expect(isPackedSurface(surface)).toBe(true);
+    expect(surface.buffer).toBeInstanceOf(Uint8Array);
+  });
+
+  it('sanitizes non-finite and fractional dimensions before allocation', () => {
+    const zeroed = createSurface(Number.POSITIVE_INFINITY, Number.NaN);
+    expect(zeroed.width).toBe(0);
+    expect(zeroed.height).toBe(0);
+    expect(zeroed.cells).toHaveLength(0);
+
+    const truncated = createSurface(3.9, 2.1);
+    expect(truncated.width).toBe(3);
+    expect(truncated.height).toBe(2);
+    expect(truncated.cells).toHaveLength(6);
   });
 });

@@ -105,4 +105,30 @@ describe('perfOverlaySurface', () => {
     expect(text).toContain('custom');
     expect(text).toContain('999');
   });
+
+  it('falls back for non-finite width and chart height', () => {
+    const history = Array.from({ length: 12 }, (_, i) => i);
+    const baseline = perfOverlaySurface({
+      fps: 30,
+      frameTimeMs: 1,
+      width: 80,
+      height: 24,
+      frameTimeHistory: history,
+    }, { ctx });
+
+    const surface = perfOverlaySurface({
+      fps: 30,
+      frameTimeMs: 1,
+      width: 80,
+      height: 24,
+      frameTimeHistory: history,
+    }, {
+      width: Number.NaN,
+      chartHeight: Number.POSITIVE_INFINITY,
+      ctx,
+    });
+
+    expect(surface.width).toBe(32);
+    expect(surface.height).toBe(baseline.height);
+  });
 });

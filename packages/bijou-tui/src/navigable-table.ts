@@ -18,6 +18,7 @@
  */
 
 import {
+  sanitizePositiveInt,
   table,
   tableSurface,
   type TableColumn,
@@ -78,7 +79,7 @@ export type NavTableSurfaceOptions = NavTableRenderOptions;
  * @returns Fresh table state with focus on the first row.
  */
 export function createNavigableTableState(options: NavigableTableOptions): NavigableTableState {
-  const height = Math.max(1, options.height ?? 10);
+  const height = sanitizePositiveInt(options.height, 10);
   return {
     columns: [...options.columns],
     rows: options.rows.map((row) => [...row]),

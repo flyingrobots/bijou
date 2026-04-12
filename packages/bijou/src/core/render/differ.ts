@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
 import { ANSI_OSC8_RE, graphemeClusterWidth, stripAnsi, segmentGraphemes } from '../text/index.js';
 import {
@@ -14,10 +14,6 @@ import {
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
 const EMPTY_MODIFIERS: readonly string[] = [];
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && s.buffer instanceof Uint8Array;
-}
 
 function hasVisibleStyle(cell: Cell): boolean {
   return cell.fg !== undefined

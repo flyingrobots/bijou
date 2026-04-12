@@ -2,6 +2,7 @@ import {
   createSurface,
   FULL_MASK,
   parseAnsiToSurface,
+  sanitizePositiveInt,
   type BijouContext,
   type CellMask,
   type Surface,
@@ -18,7 +19,7 @@ function rowInsetForWidth(width: number): number {
 }
 
 export function insetLineSurface(text: string, width: number): Surface {
-  const safeWidth = Math.max(1, Math.floor(width));
+  const safeWidth = sanitizePositiveInt(width, 1);
   const startCol = rowInsetForWidth(safeWidth);
   const innerWidth = Math.max(1, safeWidth - (startCol * 2));
   const surface = createSurface(safeWidth, 1, { char: ' ', empty: false });
@@ -35,7 +36,7 @@ export function collectionRowsSurface(
     readonly ctx?: BijouContext;
   },
 ): Surface {
-  const safeWidth = Math.max(1, Math.floor(options.width));
+  const safeWidth = sanitizePositiveInt(options.width, 1);
   const height = Math.max(1, lines.length);
   const startCol = rowInsetForWidth(safeWidth);
   const innerWidth = Math.max(1, safeWidth - (startCol * 2));

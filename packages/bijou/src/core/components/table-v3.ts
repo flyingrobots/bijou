@@ -1,4 +1,4 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import type { TableOptions } from './table.js';
 import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
@@ -79,23 +79,23 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   const totalHeight = 1 + headerHeight + 1 + rowHeights.reduce((sum, height) => sum + height, 0) + 1;
   const surface = createSurface(totalWidth, totalHeight, { char: ' ', empty: false });
 
-  const packed: boolean = 'buffer' in surface;
+  const packedSurface = isPackedSurface(surface) ? surface : undefined;
 
   // Pre-parse border style for setRGB fast path
   let bfR = -1, bfG = 0, bfB = 0, bbR = -1, bbG = 0, bbB = 0, bflags = 0;
-  if (packed && borderStyle.fg) {
+  if (packedSurface && borderStyle.fg) {
     const rgb = parseHex(borderStyle.fg);
     if (rgb) { const [r, g, b] = rgb; bfR = r; bfG = g; bfB = b; }
   }
-  if (packed && borderStyle.bg) {
+  if (packedSurface && borderStyle.bg) {
     const rgb = parseHex(borderStyle.bg);
     if (rgb) { const [r, g, b] = rgb; bbR = r; bbG = g; bbB = b; }
   }
-  if (packed) bflags = encodeModifiers(borderStyle.modifiers);
+  if (packedSurface) bflags = encodeModifiers(borderStyle.modifiers);
 
   const setBorder = (x: number, y: number, char: string, bg?: string): void => {
-    if (packed && !bg) {
-      (surface as PackedSurface).setRGB(x, y, char, bfR, bfG, bfB, bbR, bbG, bbB, bflags);
+    if (packedSurface && !bg) {
+      packedSurface.setRGB(x, y, char, bfR, bfG, bfB, bbR, bbG, bbB, bflags);
     } else {
       surface.set(x, y, { char, ...borderStyle, bg: bg ?? borderStyle.bg, empty: false });
     }
@@ -162,7 +162,7 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
         const cellWidth = colWidths[colIndex]!;
         setBorder(x - 1, y + line, '\u2502');
         for (let fillX = x; fillX < x + cellWidth + 2; fillX++) {
-          if (packed) (surface as PackedSurface).setRGB(fillX, y + line, 0x20, -1, 0, 0, -1, 0, 0);
+          if (packedSurface) packedSurface.setRGB(fillX, y + line, 0x20, -1, 0, 0, -1, 0, 0);
           else surface.set(fillX, y + line, { char: ' ', empty: false });
         }
         x += cellWidth + 3;
