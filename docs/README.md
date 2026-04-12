@@ -1,6 +1,14 @@
 # DOCUMENTATION
 
-Bijou documentation is organized by intent. Do not audit the repository by recursively walking the filesystem; follow the entrypoints below.
+This is the repo documentation map for Bijou. Documentation is organized by
+intent. Do not audit the repository by recursively walking the filesystem;
+follow the entrypoints below.
+
+## Current Truth
+
+If you want the current-truth docs lane, start with the root README, this repo
+documentation map, and the signposts below before you drift into historical or
+reference material.
 
 ## Entrypoints
 

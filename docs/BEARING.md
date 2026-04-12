@@ -2,6 +2,18 @@
 
 Current direction and active tensions. Historical ship data is in `CHANGELOG.md`.
 
+## Recent Ships
+
+- `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
+- `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  lands the framed shell on the runtime-engine seams and ships
+  `@flyingrobots/bijou-mcp`.
+- `4.1.0` — DOGFOOD matures through
+  [DF-022](./design/DF-022-build-prose-docs-reader-and-top-level-dogfood-nav.md),
+  [DF-023](./design/DF-023-publish-repo-package-and-release-guides-in-dogfood.md),
+  [DF-024](./design/DF-024-publish-philosophy-architecture-and-doctrine-guides-in-dogfood.md),
+  and [WF-003](./design/WF-003-replace-smoke-examples-with-smoke-dogfood.md).
+
 ## Active Gravity
 
 ### 1. Product Surface Depth

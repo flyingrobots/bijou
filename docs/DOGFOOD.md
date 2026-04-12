@@ -2,7 +2,8 @@
 
 _Documentation Of Good Foundational Onboarding and Discovery_
 
-DOGFOOD is the canonical human-facing documentation and proving ground for the Bijou engine.
+DOGFOOD is the canonical human-facing docs surface and proving ground for the
+Bijou engine.
 
 ## Run
 ```bash
@@ -11,7 +12,12 @@ npm run dogfood
 
 ## Purpose
 
-DOGFOOD is where Bijou proves its architectural integrity by building itself. It is not an example; it is the repository's living docs application.
+DOGFOOD is where Bijou proves its architectural integrity by building itself.
+It is not an example; it is the repository's living docs application.
+
+It gathers the package guides for the published workspace, release guidance,
+and the doctrine, architecture, invariants, and design-system guidance that
+operators need when learning or validating Bijou.
 
 ### Today's Proof Points
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.

@@ -9,6 +9,22 @@ Bijou is designed for the mechanic who demands geometric lawfulness and the arch
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
+## What's New in v4.4.1
+
+Bijou `v4.4.1` is a framed-shell polish release focused on the `4.4.0`
+regression fallout.
+
+- `createFramedApp()` now preserves shell and pane background fill more
+  honestly, including stock header/footer chrome.
+- framed apps can opt into stock shell theme cycling through
+  `shellThemes`, and DOGFOOD now proves that shared path end to end.
+- the stock quit confirm accepts uppercase `Y` / `N` as well as lowercase
+  input.
+
+Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
+[What's New guide](./docs/releases/4.4.1/whats-new.md), and the
+[migration guide](./docs/releases/4.4.1/migration-guide.md).
+
 ## Why Bijou?
 
 Unlike Virtual-DOM wrappers that treat the terminal as a low-resolution browser, Bijou treats the terminal as a physical character grid.
@@ -103,7 +119,12 @@ npm create bijou-tui-app@latest my-app
 - **[Design System](./docs/design-system/README.md)**: The foundations and component families.
 - **[Architecture](./ARCHITECTURE.md)**: The hexagonal design and core properties.
 
+## DOGFOOD
+
+DOGFOOD is the canonical human-facing docs surface for Bijou.
+
+If you are learning the framework, start there first. The `examples/` tree is
+secondary/internal reference material, not the main public docs path.
+
 ---
 Built with terminal ambition by [FLYING ROBOTS](https://github.com/flyingrobots)
-)
-ts)

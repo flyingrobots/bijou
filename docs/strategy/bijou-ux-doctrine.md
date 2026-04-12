@@ -33,9 +33,13 @@ AI-mediated output must be explicit about its nature, evidence, and confidence. 
 
 ## Interaction Patterns
 
+- In practice, the shell stays keyboard-first, mouse-enhanced.
 - **Keyboard-First, Mouse-Enhanced**: Everything important remains reachable by keyboard. Mouse input enhances this truthful model through spatial interaction.
 - **Topmost Layer Dismisses First**: Layered TUIs must be predictable. The top dismissible layer always owns input and is the first to be dismissed by `Esc`.
+- Layers should dismiss from the top.
+- the thing on top owns visible controls.
 - **DOGFOOD is the Proving Ground**: The documentation itself must exercise the shell, search, and accessibility posture truthfully.
+- Blocks come after doctrine.
 
 ---
 **The goal is to move the terminal from a collection of widgets to a professional application bedrock.**
