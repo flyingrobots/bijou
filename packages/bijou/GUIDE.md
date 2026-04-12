@@ -28,7 +28,7 @@ Every component checks `ctx.mode` and adapts its rendering:
 | **`interactive`** | TTY detected | Full RGB colors, Unicode borders, animations. |
 | **`static`** | `CI=true` | Single-frame rendering; no animations. |
 | **`pipe`** | Piped stdout or `TERM=dumb` | Plain text, ASCII-only fallback. |
-| **`accessible`** | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader friendly output. |
+| **`accessible`** | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader-friendly output. |
 
 ## Components: String vs. Surface
 
@@ -101,6 +101,7 @@ Use `createTestContext` to verify behavior across all modes without mocking:
 
 ```typescript
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { box } from '@flyingrobots/bijou';
 
 const ctx = createTestContext({ mode: 'pipe' });
 const result = box('hello', { ctx });

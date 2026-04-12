@@ -45,11 +45,11 @@ Bijou is a tiered engine. You choose your depth based on the task:
 
 ## Rule of Thumb
 
-If you need a comprehensive inventory, use [docs/README.md](./docs/README.md).
+For a comprehensive inventory, use [docs/README.md](./docs/README.md).
 
-If you need to know "what's true right now," use [docs/BEARING.md](./docs/BEARING.md).
+To know "what's true right now," use [docs/BEARING.md](./docs/BEARING.md).
 
-If you are just starting, use the [README.md](./README.md) and the package guides linked above.
+New to the project? Start with the [README.md](./README.md) and the package guides linked above.
 
 ---
 **The goal is to move the terminal from a collection of widgets to a professional application bedrock.**

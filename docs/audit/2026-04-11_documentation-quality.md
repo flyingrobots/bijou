@@ -34,6 +34,6 @@
 
 - **3.1. Recommendation Type:** **A. Incremental updates to the existing README and documentation.** (The core has been overhauled; now it needs polish).
 
-- **3.2. Deliverable (Prompt Generation):** `Refine the App interface examples in all READMEs to use strictly typed models. Align CONTRIBUTING.md with the METHOD.md cycle loop. Create 'docs/strategy/retained-layouts.md' to explain the geometry localization pipeline.`
+- **3.2. Deliverable (Prompt Generation):** `Refine the App interface examples in all READMEs to use strictly typed models. Align CONTRIBUTING.md with the METHOD.md cycle loop. Create 'docs/strategy/layout-engine.md' to explain the geometry localization pipeline.`
 
 - **3.3. Mitigation Prompt:** `Update 'packages/bijou-tui/README.md' and 'GUIDE.md' to replace 'App<any, any>' with a concrete 'App<Model, Msg>' example. Update 'CONTRIBUTING.md' to link directly to 'docs/METHOD.md' for the cycle loop definition. Create a new doc 'docs/strategy/layout-engine.md' detailing the spatial localization and recursion strategies used in the Layout stage.`

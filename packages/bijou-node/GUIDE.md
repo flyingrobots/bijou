@@ -60,12 +60,18 @@ If your app's `update()` logic is heavy (e.g., complex graph calculations), you 
 
 ```typescript
 import { runInWorker } from '@flyingrobots/bijou-node';
+import { fileURLToPath } from 'node:url';
+
+const entry = fileURLToPath(new URL('./my-app-worker.js', import.meta.url));
 
 runInWorker({
-  entry: './my-app-worker.js',
+  entry,
   mouse: true,
 });
 ```
+
+`RunWorkerOptions.entry` should be an absolute path. Deriving it from
+`import.meta.url` keeps the example copyable in ESM projects.
 
 ## Recorder
 

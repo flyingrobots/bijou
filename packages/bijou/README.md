@@ -7,10 +7,10 @@ The pure, zero-dependency core of Bijou.
 ## Role
 
 - **Degradation-First**: Automatic mode detection for `interactive`, `static`, `pipe`, and `accessible` output.
-- **Mixed-Mode**: High-performance `Surface` primitives for rich apps, plus string-first helpers for standalone scripts.
-- **Surface primitives without abandoning strings**: runtime apps can stay on
-  the surface path, while CLI-first flows still use the string-first helpers
-  honestly.
+- **Mixed-Mode**: High-performance `Surface` primitives for rich TUI apps, with
+  string-first helpers for standalone CLI scripts.
+- **Surface primitives without abandoning strings**: Runtime apps can stay on
+  the surface path while CLI-first flows still use the string-first helpers.
 - **Hexagonal Core**: Pure TypeScript logic isolated from platform IO via `Runtime`, `IO`, and `Style` ports.
 
 ## Install

@@ -33,7 +33,7 @@
     - **Action Prompt (Documentation Creation):** `Create 'docs/strategy/pipeline-extensibility.md' detailing the RenderState lifecycle and how to implement custom Post-Process middleware for effects like Grayscale or CRT flicker.`
 
 - **2.2. Customization Score (1-10):** 9
-    - **Answer:** The programmable pipeline is a world-class extension point. The weakest point is theme-token reactivity outside of core components.
+    - **Answer:** The programmable pipeline is a world-class extension point. The weakest point is theme-token reactivity outside core components.
     - **Action Prompt (Extension Improvement):** `Expose 'tokenGraph.subscribe()' in the BijouContext to allow third-party components to react to theme changes without manual context cloning.`
 
 ---

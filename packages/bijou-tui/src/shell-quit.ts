@@ -22,13 +22,13 @@ export function isShellQuitRequest(msg: KeyMsg): boolean {
 
 export function isShellQuitConfirmAccept(msg: KeyMsg): boolean {
   if (msg.ctrl || msg.alt) return false;
-  if (msg.key === 'y') return true;
+  if (msg.key === 'y' || msg.key === 'Y') return true;
   return !msg.shift && msg.key === 'enter';
 }
 
 export function isShellQuitConfirmDismiss(msg: KeyMsg): boolean {
   if (msg.ctrl || msg.alt) return false;
-  if (msg.key === 'n') return true;
+  if (msg.key === 'n' || msg.key === 'N') return true;
   return !msg.shift && (msg.key === 'escape' || msg.key === 'q');
 }
 

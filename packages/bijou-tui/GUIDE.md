@@ -60,7 +60,7 @@ const [nextChildModel, childCmds] = updateSubApp(childApp, childMsg, model.child
 });
 
 // 2. Parent view
-const [childView, childCmds] = mount(childApp, {
+const [childView, childMountCmds] = mount(childApp, {
   model: model.child,
   onMsg: (m) => ({ type: 'childMsg', m }),
 });
