@@ -48,4 +48,16 @@ describe('mockRuntime()', () => {
   it('rows reflects options', () => {
     expect(mockRuntime({ rows: 50 }).rows).toBe(50);
   });
+
+  it('sanitizes non-finite and fractional numeric options', () => {
+    const rt = mockRuntime({
+      columns: Number.NaN,
+      rows: 30.9,
+      refreshRate: Number.POSITIVE_INFINITY,
+    });
+
+    expect(rt.columns).toBe(80);
+    expect(rt.rows).toBe(30);
+    expect(rt.refreshRate).toBe(60);
+  });
 });

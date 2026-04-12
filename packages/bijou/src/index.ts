@@ -69,6 +69,8 @@ export {
 } from './core/runtime-viewport.js';
 export {
   sanitizeNonNegativeInt,
+  sanitizeOptionalNonNegativeInt,
+  sanitizeOptionalPositiveInt,
   sanitizePositiveInt,
 } from './core/numeric.js';
 

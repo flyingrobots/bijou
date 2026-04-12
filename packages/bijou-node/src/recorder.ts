@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createRequire } from 'node:module';
-import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { runScript, type App, type ScriptStep } from '@flyingrobots/bijou-tui';
 
 const require = createRequire(import.meta.url);
@@ -80,8 +80,8 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
   }
 
   const rasterOptions: RasterizeOptions = {
-    cellWidth: options.cellWidth ?? 8,
-    cellHeight: options.cellHeight ?? 10,
+    cellWidth: sanitizePositiveInt(options.cellWidth, 8),
+    cellHeight: sanitizePositiveInt(options.cellHeight, 10),
     foreground: options.foreground ?? DEFAULT_FOREGROUND,
     background: options.background ?? DEFAULT_BACKGROUND,
   };
@@ -93,7 +93,7 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
     .map((frame) => rasterizeSurface(frame, rasterOptions));
   const palette = quantize(joinFrames(frames), 256, { format: 'rgb565' });
   const gif = GIFEncoder();
-  const delay = Math.max(2, Math.round((options.frameDelayMs ?? 90) / 10));
+  const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10));
 
   for (const frame of frames) {
     const indexed = applyPalette(frame, palette);
@@ -116,8 +116,8 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
 }
 
 export function rasterizeSurface(surface: Surface, options?: Partial<RasterizeOptions>): Uint8Array {
-  const cellWidth = options?.cellWidth ?? 8;
-  const cellHeight = options?.cellHeight ?? 10;
+  const cellWidth = sanitizePositiveInt(options?.cellWidth, 8);
+  const cellHeight = sanitizePositiveInt(options?.cellHeight, 10);
   const foreground = options?.foreground ?? DEFAULT_FOREGROUND;
   const background = options?.background ?? DEFAULT_BACKGROUND;
   const width = surface.width * cellWidth;

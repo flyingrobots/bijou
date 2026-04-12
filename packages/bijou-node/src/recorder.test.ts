@@ -87,4 +87,29 @@ describe('recorder', () => {
     expect(gifWidth).toBe(32);
     expect(gifHeight).toBe(20);
   });
+
+  it('sanitizes non-finite and fractional recorder dimensions and delays', () => {
+    const surface = createSurface(1, 1);
+    surface.set(0, 0, { char: 'A', fg: '#ffffff', bg: '#000000', empty: false });
+
+    const rgba = rasterizeSurface(surface, {
+      cellWidth: Number.NaN,
+      cellHeight: 10.8,
+    });
+
+    expect(rgba.length).toBe(1 * 8 * 10 * 4);
+
+    const dir = mkdtempSync(join(tmpdir(), 'bijou-recorder-'));
+    const outputPath = join(dir, 'sanitized.gif');
+    const result = writeSurfaceGif({
+      outputPath,
+      frames: [surface],
+      cellWidth: Number.POSITIVE_INFINITY,
+      cellHeight: 6.9,
+      frameDelayMs: Number.NaN,
+    });
+
+    expect(result.width).toBe(8);
+    expect(result.height).toBe(6);
+  });
 });

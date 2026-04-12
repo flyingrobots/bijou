@@ -13,6 +13,7 @@ import {
   isKey,
   subscribeFormKeyInput,
 } from './form-utils.js';
+import { sanitizePositiveInt } from '../numeric.js';
 
 /**
  * Options for the single-select field.
@@ -90,10 +91,7 @@ async function interactiveSelect<T>(options: SelectOptions<T>, ctx: BijouContext
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const term = terminalRenderer(ctx);
-  const rawMaxVisible = options.maxVisible ?? 7;
-  const maxVisible = Number.isFinite(rawMaxVisible)
-    ? Math.max(1, Math.floor(rawMaxVisible))
-    : 7;
+  const maxVisible = sanitizePositiveInt(options.maxVisible, 7);
 
   let cursor = 0;
   let scrollOffset = 0;

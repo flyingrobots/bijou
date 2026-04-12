@@ -15,6 +15,7 @@ import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
 import { createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
+import { sanitizeOptionalPositiveInt, sanitizePositiveInt } from '../numeric.js';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -208,9 +209,10 @@ export function renderInteractiveLayout(
   for (const layer of layers) {
     if (layer.length > maxNodesPerLayer) maxNodesPerLayer = layer.length;
   }
-  const maxWidth = options.maxWidth ?? ctx.runtime.columns;
+  const maxWidth = sanitizePositiveInt(options.maxWidth, ctx.runtime.columns);
+  const explicitNodeWidth = sanitizeOptionalPositiveInt(options.nodeWidth);
 
-  let nodeWidth = options.nodeWidth ?? nodes.reduce(
+  let nodeWidth = explicitNodeWidth ?? nodes.reduce(
     (max, n) => Math.max(max, visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
     16,
   );
@@ -219,12 +221,12 @@ export function renderInteractiveLayout(
   let colStride = nodeWidth + gap;
   let totalWidth = maxNodesPerLayer * colStride;
 
-  if (totalWidth > maxWidth && !options.nodeWidth) {
+  if (totalWidth > maxWidth && explicitNodeWidth == null) {
     gap = 2;
     colStride = nodeWidth + gap;
     totalWidth = maxNodesPerLayer * colStride;
   }
-  if (totalWidth > maxWidth && !options.nodeWidth) {
+  if (totalWidth > maxWidth && explicitNodeWidth == null) {
     nodeWidth = Math.max(16, Math.floor((maxWidth - gap) / maxNodesPerLayer) - gap);
     colStride = nodeWidth + gap;
     totalWidth = maxNodesPerLayer * colStride;

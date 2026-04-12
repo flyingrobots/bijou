@@ -1,5 +1,6 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { sanitizeNonNegativeInt } from '../numeric.js';
 import type { SeparatorOptions } from './separator.js';
 import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 import { parseHex, encodeModifiers } from '../render/packed-cell.js';
@@ -14,7 +15,7 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const borderStyle = tokenToCellStyle(token);
   const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `, 'separatorSurface label') : [];
   const fallbackWidth = labelGraphemes.length > 0 ? labelGraphemes.length : 3;
-  const width = Math.max(0, Math.floor(options.width ?? ctx?.runtime.columns ?? fallbackWidth));
+  const width = sanitizeNonNegativeInt(options.width, ctx?.runtime.columns ?? fallbackWidth);
   const surface = createSurface(width, 1);
 
   if (width === 0) return surface;

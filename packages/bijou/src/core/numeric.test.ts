@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeNonNegativeInt, sanitizePositiveInt } from './numeric.js';
+import {
+  sanitizeNonNegativeInt,
+  sanitizeOptionalNonNegativeInt,
+  sanitizeOptionalPositiveInt,
+  sanitizePositiveInt,
+} from './numeric.js';
 
 describe('numeric sanitizers', () => {
   it('normalizes non-negative integers with finite fallback semantics', () => {
@@ -15,5 +20,19 @@ describe('numeric sanitizers', () => {
     expect(sanitizePositiveInt(-3, 5)).toBe(1);
     expect(sanitizePositiveInt(Number.NaN, 5.9)).toBe(5);
     expect(sanitizePositiveInt(Number.POSITIVE_INFINITY, 6)).toBe(6);
+  });
+
+  it('normalizes optional non-negative integers without forcing a fallback', () => {
+    expect(sanitizeOptionalNonNegativeInt(undefined)).toBeUndefined();
+    expect(sanitizeOptionalNonNegativeInt(Number.NaN)).toBeUndefined();
+    expect(sanitizeOptionalNonNegativeInt(-5)).toBe(0);
+    expect(sanitizeOptionalNonNegativeInt(9.8)).toBe(9);
+  });
+
+  it('normalizes optional positive integers without forcing a fallback', () => {
+    expect(sanitizeOptionalPositiveInt(undefined)).toBeUndefined();
+    expect(sanitizeOptionalPositiveInt(Number.POSITIVE_INFINITY)).toBeUndefined();
+    expect(sanitizeOptionalPositiveInt(0)).toBe(1);
+    expect(sanitizeOptionalPositiveInt(6.2)).toBe(6);
   });
 });

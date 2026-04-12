@@ -101,6 +101,17 @@ describe('dag', () => {
       expect(result).toContain('C');
       expect(result).toContain('D');
     });
+
+    it('sanitizes non-finite sizing overrides', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag(twoNodes, {
+        nodeWidth: Number.NaN,
+        maxWidth: 30.9,
+        ctx,
+      });
+      expect(result).toContain('Alpha');
+      expect(result).toContain('Beta');
+    });
   });
 
   describe('non-BMP characters (emoji)', () => {

@@ -27,3 +27,15 @@ export function sanitizeNonNegativeInt(value: number | undefined, fallback = 0):
 export function sanitizePositiveInt(value: number | undefined, fallback = 1): number {
   return sanitizeInt(value, fallback, 1);
 }
+
+/** Normalize an optional finite whole number greater than or equal to zero. */
+export function sanitizeOptionalNonNegativeInt(value: number | undefined): number | undefined {
+  const safeValue = normalizeFiniteInt(value);
+  return safeValue == null ? undefined : Math.max(0, safeValue);
+}
+
+/** Normalize an optional finite whole number greater than or equal to one. */
+export function sanitizeOptionalPositiveInt(value: number | undefined): number | undefined {
+  const safeValue = normalizeFiniteInt(value);
+  return safeValue == null ? undefined : Math.max(1, safeValue);
+}

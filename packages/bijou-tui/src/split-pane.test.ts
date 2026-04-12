@@ -76,6 +76,23 @@ describe('splitPaneLayout', () => {
     expect(layout.paneB.width).toBeGreaterThanOrEqual(15);
   });
 
+  it('sanitizes non-finite and fractional geometry inputs', () => {
+    const state = createSplitPaneState({ ratio: 0.5 });
+    const layout = splitPaneLayout(state, {
+      direction: 'row',
+      width: Number.NaN,
+      height: 9.8,
+      dividerSize: Number.POSITIVE_INFINITY,
+      minA: 3.9,
+      minB: Number.NaN,
+    });
+
+    expect(layout.paneA.height).toBe(9);
+    expect(layout.divider.width).toBe(1);
+    expect(layout.paneA.width).toBe(0);
+    expect(layout.paneB.width).toBe(0);
+  });
+
   it('prioritizes minB when constraints conflict', () => {
     const state = createSplitPaneState({ ratio: 0.9 });
     const layout = splitPaneLayout(state, {
@@ -105,6 +122,18 @@ describe('splitPaneResizeBy', () => {
     const next = splitPaneResizeBy(state, 50, { total: 40, dividerSize: 1, minA: 5, minB: 20 });
     const layout = splitPaneLayout(next, { direction: 'row', width: 40, height: 2, dividerSize: 1, minA: 5, minB: 20 });
     expect(layout.paneB.width).toBeGreaterThanOrEqual(20);
+  });
+
+  it('ignores non-finite resize delta and sanitizes limit inputs', () => {
+    const state = createSplitPaneState({ ratio: 0.5 });
+    const next = splitPaneResizeBy(state, Number.NaN, {
+      total: 21.8,
+      dividerSize: Number.NaN,
+      minA: 2.9,
+      minB: Number.POSITIVE_INFINITY,
+    });
+
+    expect(next.ratio).toBe(state.ratio);
   });
 });
 
@@ -202,5 +231,19 @@ describe('splitPane render', () => {
     expect(surface.get(0, 0).char).toBe('L');
     expect(surface.get(0, 0).fg).toBe('#00ffff');
     expect(surface.get(0, 0).bg).toBe('#112233');
+  });
+
+  it('sanitizes non-finite and fractional surface dimensions', () => {
+    const state = createSplitPaneState({ ratio: 0.5 });
+    const surface = splitPaneSurface(state, {
+      direction: 'row',
+      width: 9.9,
+      height: Number.NaN,
+      paneA: () => stringToSurface('LEFT', 4, 1),
+      paneB: () => stringToSurface('RIGHT', 5, 1),
+    });
+
+    expect(surface.width).toBe(0);
+    expect(surface.height).toBe(0);
   });
 });

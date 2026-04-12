@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { sanitizeNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
 
 /** Configuration options for the {@link paginator} component. */
 export interface PaginatorOptions {
@@ -27,8 +28,9 @@ export interface PaginatorOptions {
  */
 export function paginator(options: PaginatorOptions): string {
   const ctx = resolveCtx(options.ctx);
-  const page = options.current + 1; // convert 0-indexed to 1-indexed for display
-  const total = options.total;
+  const total = sanitizePositiveInt(options.total, 1);
+  const current = Math.min(sanitizeNonNegativeInt(options.current, 0), total - 1);
+  const page = current + 1; // convert 0-indexed to 1-indexed for display
 
   return renderByMode(ctx.mode, {
     pipe: () => `[${page}/${total}]`,
@@ -42,7 +44,7 @@ export function paginator(options: PaginatorOptions): string {
       // dots style
       const dots: string[] = [];
       for (let i = 0; i < total; i++) {
-        if (i === options.current) {
+        if (i === current) {
           dots.push(ctx.style.styled(ctx.semantic('primary'), '●'));
         } else {
           dots.push(ctx.style.styled(ctx.semantic('muted'), '○'));

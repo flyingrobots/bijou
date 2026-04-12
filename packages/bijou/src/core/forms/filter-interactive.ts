@@ -19,6 +19,7 @@ import {
   isPrintableKey,
   subscribeFormKeyInput,
 } from './form-utils.js';
+import { sanitizePositiveInt } from '../numeric.js';
 
 /**
  * Single option in a filterable select list.
@@ -91,10 +92,7 @@ export async function interactiveFilter<T>(options: FilterOptions<T>, ctx: Bijou
   const styledFn = createStyledFn(ctx);
   const boldFn = createBoldFn(ctx);
   const matchFn = options.match ?? defaultMatch;
-  const rawMaxVisible = options.maxVisible ?? 7;
-  const maxVisible = Number.isFinite(rawMaxVisible)
-    ? Math.max(1, Math.floor(rawMaxVisible))
-    : 7;
+  const maxVisible = sanitizePositiveInt(options.maxVisible, 7);
   const term = terminalRenderer(ctx);
 
   let mode: 'normal' | 'insert' = 'normal';

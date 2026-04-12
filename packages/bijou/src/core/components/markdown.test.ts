@@ -237,6 +237,20 @@ describe('markdown()', () => {
         expect(line.length).toBeLessThanOrEqual(40);
       }
     });
+
+    it('sanitizes non-finite and fractional widths', () => {
+      const result = markdown('word '.repeat(12).trim(), {
+        ctx: ctx('pipe', 18),
+        width: Number.NaN,
+      });
+      const fractional = markdown('word '.repeat(12).trim(), {
+        ctx: ctx('pipe', 40),
+        width: 9.9,
+      });
+
+      for (const line of result.split('\n')) expect(line.length).toBeLessThanOrEqual(18);
+      for (const line of fractional.split('\n')) expect(line.length).toBeLessThanOrEqual(9);
+    });
   });
 
   describe('width validation', () => {

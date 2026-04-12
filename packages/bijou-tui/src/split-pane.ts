@@ -11,6 +11,7 @@ import {
   createSurface,
   graphemeClusterWidth,
   graphemeWidth,
+  sanitizeNonNegativeInt,
   segmentGraphemes,
   type Surface,
   type WritePort,
@@ -102,17 +103,19 @@ export function splitPaneResizeBy(
   delta: number,
   limits: { total: number; minA?: number; minB?: number; dividerSize?: number },
 ): SplitPaneState {
-  const dividerSize = Math.max(0, limits.dividerSize ?? 1);
-  const available = Math.max(0, limits.total - dividerSize);
+  const safeDelta = Number.isFinite(delta) ? Math.trunc(delta) : 0;
+  const dividerSize = sanitizeNonNegativeInt(limits.dividerSize, 1);
+  const total = sanitizeNonNegativeInt(limits.total, 0);
+  const available = Math.max(0, total - dividerSize);
   if (available <= 0) return { ...state, ratio: 0 };
 
-  const minA = Math.max(0, limits.minA ?? 0);
-  const minB = Math.max(0, limits.minB ?? 0);
+  const minA = sanitizeNonNegativeInt(limits.minA, 0);
+  const minB = sanitizeNonNegativeInt(limits.minB, 0);
   const [currA] = solveSplit(available, state.ratio, minA, minB);
 
   const maxA = Math.max(0, available - Math.min(minB, available));
   const clampedMinA = Math.min(minA, maxA);
-  const nextA = clamp(currA + delta, clampedMinA, maxA);
+  const nextA = clamp(currA + safeDelta, clampedMinA, maxA);
   return { ...state, ratio: nextA / available };
 }
 
@@ -145,11 +148,11 @@ export function splitPaneLayout(
   options: Omit<SplitPaneOptions, 'paneA' | 'paneB'>,
 ): SplitPaneLayout {
   const direction = options.direction ?? 'row';
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
-  const dividerSize = Math.max(0, options.dividerSize ?? 1);
-  const minA = Math.max(0, options.minA ?? 0);
-  const minB = Math.max(0, options.minB ?? 0);
+  const width = sanitizeNonNegativeInt(options.width, 0);
+  const height = sanitizeNonNegativeInt(options.height, 0);
+  const dividerSize = sanitizeNonNegativeInt(options.dividerSize, 1);
+  const minA = sanitizeNonNegativeInt(options.minA, 0);
+  const minB = sanitizeNonNegativeInt(options.minB, 0);
 
   if (direction === 'row') {
     const available = Math.max(0, width - dividerSize);
@@ -202,8 +205,8 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
  * Render a split-pane surface.
  */
 export function splitPaneSurface(state: SplitPaneState, options: SplitPaneSurfaceOptions): Surface {
-  const width = Math.max(0, Math.floor(options.width));
-  const height = Math.max(0, Math.floor(options.height));
+  const width = sanitizeNonNegativeInt(options.width, 0);
+  const height = sanitizeNonNegativeInt(options.height, 0);
   if (width === 0 || height === 0) return createSurface(0, 0);
 
   const direction = options.direction ?? 'row';
