@@ -62,8 +62,8 @@ If your app's `update()` logic is heavy (e.g., complex graph calculations), you 
 import { runInWorker } from '@flyingrobots/bijou-node';
 
 runInWorker({
-  workerPath: './my-app-worker.js',
-  options: { mouse: true },
+  entry: './my-app-worker.js',
+  mouse: true,
 });
 ```
 
@@ -73,13 +73,27 @@ runInWorker({
 
 ```typescript
 import { recordDemoGif } from '@flyingrobots/bijou-node';
+import { stringToSurface } from '@flyingrobots/bijou';
+import { type App } from '@flyingrobots/bijou-tui';
 
-await recordDemoGif({
+type Model = { count: number };
+type Msg = { type: 'increment' } | { type: 'quit' };
+
+const app: App<Model, Msg> = {
+  init: () => [{ count: 0 }, []],
+  update: (msg, model) => [model, []],
+  view: (model) => stringToSurface(`Count: ${model.count}`, 8, 1),
+};
+
+const result = await recordDemoGif<Model, Msg>({
+  name: 'counter-demo',
+  app,
   outputPath: 'demo.gif',
-  render: (frame) => renderMyApp(frame),
-  frames: 120,
-  fps: 30,
+  steps: [{ kind: 'wait', ms: 300 }],
+  frameDelayMs: 33,
 });
+
+console.log(result.outputPath, result.frames);
 ```
 
 ## Environment Variables
