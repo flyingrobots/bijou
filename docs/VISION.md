@@ -2,6 +2,31 @@
 
 Bijou is an industrial-grade TypeScript engine for terminal software where runtime truth, design language, and documentation are unified.
 
+```mermaid
+mindmap
+    root((Bijou))
+        Runtime Integrity
+            TEA Loop
+            Seams for Effects
+            Hexagonal Boundary
+        Byte-Packed Performance
+            Typed Arrays
+            Zero-Allocation
+            Bytes Not Strings
+        Humane Interaction
+            Accessible
+            Localizable
+            Resilient Viewports
+        Empirical Documentation
+            DOGFOOD
+            Living Field Guide
+            Docs Are the Demo
+        Agent-First Legibility
+            MCP Services
+            Machine-Readable
+            Explainable AI
+```
+
 ## Core Tenets
 
 ### 1. Runtime Integrity

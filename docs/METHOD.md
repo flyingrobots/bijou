@@ -32,6 +32,18 @@ The Bijou work doctrine: A backlog, a loop, and honest bookkeeping.
 
 ## The Cycle Loop
 
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Pull: asap/
+    Pull --> Branch: cycle/
+    Branch --> Red: failing tests
+    Red --> Green: passing tests
+    Green --> Retro: findings/debt
+    Retro --> Ship: PR to main
+    Ship --> [*]
+```
+
 1. **Pull**: Move an item from `asap/` to `docs/design/`.
 2. **Branch**: Create `cycle/<cycle_name>`.
 3. **Red**: Write failing tests based on the design's playback questions.

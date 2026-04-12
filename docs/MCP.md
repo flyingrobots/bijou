@@ -2,6 +2,17 @@
 
 This signpost covers Bijou's current MCP surface.
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant MCPServer
+    participant BijouCore
+    Client->>MCPServer: Render tableRequest(data)
+    MCPServer->>BijouCore: renderByMode('pipe', data)
+    BijouCore->>MCPServer: string(ansi)
+    MCPServer->>Client: formattedOutput(string)
+```
+
 ## What Ships Today
 
 Bijou currently ships one MCP package:

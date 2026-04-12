@@ -2,6 +2,30 @@
 
 This is the second-track manual for Bijou.
 
+```mermaid
+flowchart TD
+    subgraph Core["@flyingrobots/bijou (Substrate)"]
+        S1[Surface Definition]
+        S2[Component Rendering]
+    end
+    subgraph TUI["@flyingrobots/bijou-tui (Engine)"]
+        T1[Layout Stage]
+        T2[Paint Stage]
+        T3[Post-Process Shaders]
+        T4[Diffing Layer]
+    end
+    subgraph Node["@flyingrobots/bijou-node (Host)"]
+        N1[ANSI Emission]
+        N2[Worker Orchestration]
+    end
+
+    S2 --> T1
+    T1 --> T2
+    T2 --> T3
+    T3 --> T4
+    T4 --> N1
+```
+
 Use the root [README](./README.md) and the package `GUIDE.md` files when you
 want the productive-fast path. Use this guide when you need the deeper
 doctrine, the proving surfaces, or the repo workflows that sit behind the

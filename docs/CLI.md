@@ -2,6 +2,18 @@
 
 The Bijou command surface is a composite of published binaries and repo-local operator scripts.
 
+```mermaid
+flowchart LR
+    A[Bijou CLI Surface] --> B[Published Binaries]
+    A --> C[Operator Scripts]
+    B --> B1[create-bijou-tui-app]
+    B --> B2[bijou-mcp]
+    C --> C1[Build/Test]
+    C --> C2[DOGFOOD]
+    C --> C3[Benchmarks]
+    C --> C4[Release]
+```
+
 ## Published Binaries
 
 ### `create-bijou-tui-app`

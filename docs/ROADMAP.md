@@ -2,6 +2,13 @@
 
 Bijou's execution is tracked via `docs/BACKLOG/` and `docs/design/`. This document captures the broader strategic horizon.
 
+```mermaid
+timeline
+    Phase 1 : DOGFOOD Consolidation : Layout/Viewport Formalization : i18n Automation
+    Phase 2 : Replay Pipeline : Scenario Test Harness : Low-Allocation Rendering
+    Phase 3 : MCP Interactivity : Data Visualization Maturity : Ecosystem Adapters
+```
+
 ## Strategic Horizon
 
 ### Phase 1: Substrate Integrity
