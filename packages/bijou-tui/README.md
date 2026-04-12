@@ -26,7 +26,12 @@ import { createSurface } from '@flyingrobots/bijou';
 
 initDefaultContext();
 
-const childApp: App<{ count: number }, any> = {
+type ChildModel = { count: number };
+type ChildMsg = { type: 'noop' };
+type Model = { left: ChildModel; right: ChildModel };
+type Msg = { pane: 'left' | 'right'; msg: ChildMsg };
+
+const childApp: App<ChildModel, ChildMsg> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
@@ -36,12 +41,18 @@ const childApp: App<{ count: number }, any> = {
   }
 };
 
-const app: App<any, any> = {
+const app: App<Model, Msg> = {
   init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
-    const [left] = mount(childApp, { model: model.left, onMsg: m => m });
-    const [right] = mount(childApp, { model: model.right, onMsg: m => m });
+    const [left] = mount(childApp, {
+      model: model.left,
+      onMsg: (msg) => ({ pane: 'left', msg }),
+    });
+    const [right] = mount(childApp, {
+      model: model.right,
+      onMsg: (msg) => ({ pane: 'right', msg }),
+    });
     
     const screen = createSurface(80, 24);
     screen.blit(left, 0, 0);

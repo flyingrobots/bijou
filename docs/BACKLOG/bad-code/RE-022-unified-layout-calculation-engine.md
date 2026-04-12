@@ -10,7 +10,7 @@ Extract the "pure geometry" phase into a shared, zero-dependency engine in `@fly
 
 ## Why
 
-1. **Parity**: A 0.4 split-pane ratio should resolve to the exact same column boundary regardless of whether we are rendering a string box or a TUI surface.
+1. **Parity**: A 0.4 split-pane ratio should resolve to the same column boundary regardless of whether we are rendering a string box or a TUI surface.
 2. **Maintenance**: Bug fixes in the gap/constraint logic only need to happen in one place.
 3. **Purity**: Geometry calculation is inherently pure and belongs in the foundation, not the interactive runtime.
 

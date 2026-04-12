@@ -121,7 +121,7 @@ Start here:
 - [grayscale middleware](./packages/bijou-tui/src/pipeline/middleware/grayscale.ts)
 - [transition shaders](./packages/bijou-tui/src/transition-shaders.ts)
 - [Shader V2 Spec](./docs/specs/shader-v2.spec.json)
-- [Render Pipeline guide backlog note](./docs/method/backlog/inbox/DX_008-render-pipeline-guide.md)
+- [Render Pipeline guide backlog note](./docs/BACKLOG/inbox/DX-008-render-pipeline-guide.md)
 
 ## Performance And Soak Work
 
@@ -133,7 +133,7 @@ The current performance and soak lane is spread across:
 - [perf overlay](./packages/bijou/src/core/components/perf-overlay.ts)
 - [Byte-Pipeline Recovery](./docs/perf/RE-017-byte-pipeline.md)
 - [4.4.0 release notes](./docs/releases/4.4.0/whats-new.md)
-- [Debug Performance Overlay Component](./docs/method/backlog/cool-ideas/DX_006-debug-performance-overlay-component.md)
+- [Debug Performance Overlay Component](./docs/BACKLOG/cool-ideas/DX-006-debug-performance-overlay-component.md)
 
 That is the lane to read when you are investigating hot-loop cost, proving a
 new optimization, or deciding whether a feature belongs in the runtime,
