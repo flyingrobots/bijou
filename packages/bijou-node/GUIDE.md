@@ -54,6 +54,24 @@ if (runtime.stdoutIsTTY) {
 io.write(style.hex('#ff6600', 'Orange text\n'));
 ```
 
+## Scoped File Access
+
+Use `scopedNodeIO()` when app-level file reads should stay inside one rooted project
+directory instead of inheriting unrestricted host filesystem access.
+
+```typescript
+import { scopedNodeIO } from '@flyingrobots/bijou-node';
+
+const io = scopedNodeIO({ root: process.cwd() });
+
+const themeJson = io.readFile('themes/app.json');
+const capturePath = io.resolvePath('captures/demo.gif');
+```
+
+`readFile()`, `readDir()`, and `joinPath()` reject any path that escapes the declared
+root. `resolvePath()` is the companion escape hatch for host-owned writes that still need
+the same boundary before calling `fs.writeFileSync()` or similar Node APIs.
+
 ## Worker Runtime
 
 If your app's `update()` logic is heavy (e.g., complex graph calculations), you can offload the TEA loop to a worker thread while keeping the main thread dedicated to rendering and I/O.

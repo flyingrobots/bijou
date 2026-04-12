@@ -17,6 +17,7 @@ bijou-node is the official Node.js adapter for `@flyingrobots/bijou`. It impleme
 │  @flyingrobots/bijou-node (adapters)         │
 │                                              │
 │  nodeRuntime()   nodeIO()      chalkStyle()  │
+│                   scopedNodeIO()             │
 │  ├─ process.env  ├─ stdout     ├─ chalk.rgb  │
 │  ├─ stdout.isTTY ├─ stdin      ├─ chalk.hex  │
 │  ├─ stdin.isTTY  ├─ readline   └─ chalk.bold │
@@ -53,6 +54,20 @@ Maps `IOPort` to Node.js I/O:
 | `readFile(path)` | `fs.readFileSync(path, 'utf8')` |
 | `readDir(path)` | `fs.readdirSync(path)` |
 | `joinPath(...segs)` | `path.join(...segs)` |
+
+### scopedNodeIO()
+
+Wraps `nodeIO()` with a rooted filesystem boundary:
+
+| Port method | Behavior |
+|---|---|
+| `readFile(path)` | Resolves inside the declared root, then delegates to `nodeIO().readFile` |
+| `readDir(path)` | Resolves inside the declared root, then delegates to `nodeIO().readDir` |
+| `joinPath(...segs)` | Joins and resolves inside the declared root |
+| `resolvePath(path)` | Returns an absolute in-root path or throws on escape |
+
+This keeps app-level reads and traversal constrained without moving Node filesystem
+policy into the pure packages.
 
 ### chalkStyle()
 

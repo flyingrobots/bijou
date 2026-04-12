@@ -34,6 +34,7 @@ one-line bootstrap:
 
 - `nodeRuntime()`
 - `nodeIO()`
+- `scopedNodeIO()`
 - `chalkStyle()`
 
 That is the right lane for:
@@ -47,6 +48,25 @@ Read:
 
 - [GUIDE individual adapters](./GUIDE.md#individual-adapters)
 - [monorepo architecture guide](../../docs/ARCHITECTURE.md)
+
+## Scoped Filesystem Boundary
+
+Use `scopedNodeIO()` when the app should have a rooted asset or workspace view rather
+than raw host filesystem reach.
+
+That is the right lane for:
+
+- file pickers rooted to one project
+- theme or asset loading from an app-owned directory
+- host code that still writes files, but should first validate destinations with
+  `resolvePath()`
+
+Boundary rule:
+
+- `readFile()`, `readDir()`, and `joinPath()` stay inside the declared root
+- `resolvePath()` is for host-owned writes or interop with raw Node APIs
+- if the app truly needs unrestricted filesystem access, keep using raw `nodeIO()`
+  and make that choice explicit
 
 ## Worker Runtime
 

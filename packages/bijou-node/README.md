@@ -39,8 +39,27 @@ console.log(headerBox('My CLI', { detail: 'v1.0.0' }));
 
 - **`createNodeContext()`**: Returns a wired `BijouContext` without setting it as the global default.
 - **`initDefaultContext()`**: Registers the first context as the global default for all Bijou components.
+- **`scopedNodeIO()`**: Wraps the Node file adapter in a rooted filesystem boundary for app-level reads and guarded path resolution.
 - **`runInWorker()`**: Starts a TEA app inside a worker thread.
 - **`recordDemoGif()`**: Captures surface frames and rasterizes them to GIF for documentation.
+
+## Scoped File Access
+
+Prefer `scopedNodeIO()` over raw `nodeIO()` when the app should only read assets from
+one project directory.
+
+```typescript
+import { scopedNodeIO } from '@flyingrobots/bijou-node';
+
+const io = scopedNodeIO({ root: process.cwd() });
+
+const theme = io.readFile('themes/app.json');
+const outputPath = io.resolvePath('captures/demo.gif');
+```
+
+`readFile()`, `readDir()`, and `joinPath()` now stay inside the declared root. `resolvePath()`
+gives hosts the same boundary check before they hand a path to raw Node writes such as
+`fs.writeFileSync()`.
 
 ## Documentation
 
