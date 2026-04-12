@@ -9,6 +9,15 @@ Bijou is designed for the mechanic who demands geometric lawfulness and the arch
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
+## Why Bijou?
+
+Unlike Virtual-DOM wrappers that treat the terminal as a low-resolution browser, Bijou treats the terminal as a physical character grid.
+
+- **Deterministic State**: The TEA loop ensures your UI is a pure function of your state history. No hooks, no side-effect soup, and no reconciliation drift.
+- **Byte-Packed Performance**: Rendering happens on zero-allocation byte buffers (`Uint8Array`). It is designed for high-frequency updates and complex layouts that would choke string-heavy engines.
+- **Geometric Honesty**: Portability is not an afterthought. Bijou adapts to CI logs, pipes, and screen readers by changing its rendering strategy, not just stripping colors.
+- **Physics-Powered Motion**: Animations are driven by a unified heartbeat and spring physics, providing fluid movement that remains synchronized with the render loop.
+
 ## Essence
 
 - **Degradation as a Substrate Property**: Write once; render perfectly in local TTYs, CI logs, pipes, and accessible environments.
