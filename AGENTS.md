@@ -15,6 +15,7 @@ Do not audit the repository by recursively walking the filesystem. Follow the au
 
 ### 1. The Entrance
 - **`README.md`**: Public front door, package roles, and quick start.
+- **`GUIDE.md`**: Orientation, the fast path, and monorepo orchestration.
 - **`docs/README.md`**: Documentation entrypoint and intent-based map.
 
 ### 2. The Bedrock

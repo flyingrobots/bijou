@@ -97,10 +97,11 @@ npm create bijou-tui-app@latest my-app
 
 ## Documentation
 
+- **[Guide](./GUIDE.md)**: Orientation, the fast path, and monorepo orchestration.
+- **[Advanced Guide](./ADVANCED_GUIDE.md)**: Deep dives into the pipeline, shaders, and motion.
 - **[DOGFOOD](./docs/DOGFOOD.md)**: The canonical documentation app. Run `npm run dogfood` to see Bijou in action.
 - **[Design System](./docs/design-system/README.md)**: The foundations and component families.
 - **[Architecture](./ARCHITECTURE.md)**: The hexagonal design and core properties.
-- **[Advanced Guide](./ADVANCED_GUIDE.md)**: Deep dives into the pipeline, shaders, and motion.
 
 ---
 Built with terminal ambition by [FLYING ROBOTS](https://github.com/flyingrobots)
