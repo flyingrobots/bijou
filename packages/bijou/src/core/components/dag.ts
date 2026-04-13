@@ -174,7 +174,7 @@ export function dagLayout(
  *
  * Adapts output to the current context mode:
  * - `'interactive'` / `'static'`: Unicode box-drawing with ANSI styling.
- * - `'pipe'`: Plain text `Label -> Target` lines.
+ * - `'pipe'`: Plain text dependency lines, one per rendered edge.
  * - `'accessible'`: Structured text with cycle-tolerant layer groupings.
  *
  * @param input - A `SlicedDagSource` or `DagNode[]` to render.

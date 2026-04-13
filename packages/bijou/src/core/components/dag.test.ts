@@ -194,13 +194,16 @@ describe('dag', () => {
       expect(result).toBe('Alone');
     });
 
-    it('renders multiple edges', () => {
+    it('renders one pipe line per edge when a node fans out', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const result = dag(diamond, { ctx });
-      expect(result).toContain('Start -> Left, Right');
-      expect(result).toContain('Left -> End');
-      expect(result).toContain('Right -> End');
-      expect(result).toContain('End');
+      expect(result.split('\n')).toEqual([
+        'Start -> Left',
+        'Start -> Right',
+        'Left -> End',
+        'Right -> End',
+        'End',
+      ]);
     });
 
     it('includes badges in parentheses', () => {

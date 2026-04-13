@@ -497,7 +497,7 @@ const DATA: ComponentEntry[] = [
       'ASCII art directed acyclic graph with status badges, edge routing,',
       'node selection, and highlight paths.',
       '',
-      '**Degradation:** Rich shows colored graph. Pipe shows ASCII art. Accessible shows dependency list.',
+      '**Degradation:** Rich shows colored graph. Pipe shows plain dependency lines. Accessible shows dependency list.',
     ].join('\n'),
     render: (w, ctx) => dag(SAMPLE_DAG, {
       selectedId: 'dev',

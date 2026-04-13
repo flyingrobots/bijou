@@ -445,8 +445,9 @@ export function renderInteractiveLayout(
 /**
  * Render the graph as plain text for piped (non-TTY) output.
  *
- * Produces one line per node in the format `Label -> Target1, Target2`
- * with no ANSI styling or box-drawing characters.
+ * Produces one plain-text dependency line per rendered edge so multi-parent
+ * and fan-out relationships remain explicit in linear output. Nodes with no
+ * outgoing edges still render as standalone lines.
  *
  * @param nodes - The graph nodes to render.
  * @returns Plain text representation of the graph.
@@ -459,10 +460,9 @@ export function renderPipe(nodes: DagNode[]): string {
     const edges = n.edges ?? [];
     const badgePart = n.badge ? ` (${n.badge})` : '';
     if (edges.length > 0) {
-      const targets = edges
-        .map(id => labelById.get(id) ?? id)
-        .join(', ');
-      lines.push(`${n.label}${badgePart} -> ${targets}`);
+      for (const id of edges) {
+        lines.push(`${n.label}${badgePart} -> ${labelById.get(id) ?? id}`);
+      }
     } else {
       lines.push(`${n.label}${badgePart}`);
     }
