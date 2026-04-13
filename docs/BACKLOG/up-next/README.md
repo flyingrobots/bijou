@@ -1,6 +1,6 @@
-# Up Next
+# Legacy Up Next Archive
 
-This lane holds the next honest queue after `asap/`.
+This lane is a historical archive of pre-METHOD `up-next/` notes.
 
-Items here matter, but they should not compete with `asap/` by accident.
-
+The canonical live lane is
+[`docs/method/backlog/up-next/`](../../method/backlog/up-next/README.md).

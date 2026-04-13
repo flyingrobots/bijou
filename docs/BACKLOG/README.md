@@ -1,33 +1,40 @@
-# Backlog
+# Legacy Backlog Archive
 
-This directory is the source of truth for proposed work that has **not**
-started yet.
+This directory is **not** the canonical live backlog anymore.
 
-Bijou now uses METHOD-style lanes inside the backlog:
+Bijou now keeps the live queue in
+[`docs/method/backlog/`](../method/backlog/README.md). This tree remains
+only as:
+
+- a historical archive of pre-METHOD backlog notes
+- a compatibility surface for old links in design docs, audits, tests,
+  and release notes
+- a place where older shaped-release snapshots can remain legible
+  without pretending to be current queue truth
+
+## Canonical Current Surfaces
+
+- [`docs/method/backlog/`](../method/backlog/README.md) — live backlog
+- [`docs/method/retro/`](../method/retro/README.md) — finished ideas
+- [`docs/method/graveyard/`](../method/graveyard/README.md) — superseded
+  or abandoned ideas
+
+## Rule
+
+Do **not** add new live backlog work here.
+
+If a legacy note is still active, give it a canonical METHOD copy and
+continue the work there. Keep the legacy file only for historical
+provenance or compatibility.
+
+## Legacy Lanes
+
+These subdirectories remain as archive views of older planning states:
 
 - [`inbox/`](./inbox/README.md)
 - [`asap/`](./asap/README.md)
 - [`up-next/`](./up-next/README.md)
-- `vX.Y.Z/` when a shaped release still has cycle-shaped blockers
 - [`cool-ideas/`](./cool-ideas/README.md)
 - [`bad-code/`](./bad-code/README.md)
-
-## Rules
-
-- one file per backlog item
-- filename format stays `<LEGEND>-<id>-<slug>.md`
-- when a cycle starts, move the file into `docs/design/`
-- the root of `docs/BACKLOG/` is reserved for untriaged, legacy, or
-  historical backlog captures that have not yet been re-laned
-
-If a file looks like current work, it should usually live in `asap/` or
-`up-next/`, not only in the root backlog.
-
-Version-target lanes like `v4.1.0/` are temporary. Use them only for
-cycles that must close before that release ships, including cases where
-release posture, docs-surface truth, and validation still disagree.
-
-Active version-target release lanes:
-
-- [`v4.5.0/`](./v4.5.0/README.md) — hardening: input validation, i18n catalog loader, DOGFOOD depth
-- [`v5.0.0/`](./v5.0.0/README.md) — frame owns the pump, layout formalization, scrollbar upstreaming
+- [`v4.5.0/`](./v4.5.0/README.md)
+- [`v5.0.0/`](./v5.0.0/README.md)

@@ -13,7 +13,7 @@ Do **not** start new work here.
 
 New work should use:
 
-- `docs/BACKLOG/` for backlog capture
+- `docs/method/backlog/` for backlog capture
 - `docs/design/` for active cycle design docs
 - `tests/cycles/<cycle>/` for cycle-owned tests
 

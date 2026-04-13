@@ -1,6 +1,6 @@
-# Bad Code
+# Legacy Bad-Code Archive
 
-Use this lane for debt that already works but keeps bothering us.
+This lane is a historical archive of pre-METHOD `bad-code/` notes.
 
-The hill for a debt cycle is simple: this no longer bothers us.
-
+The canonical live lane is
+[`docs/method/backlog/bad-code/`](../../method/backlog/bad-code/README.md).

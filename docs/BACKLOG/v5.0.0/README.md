@@ -1,24 +1,7 @@
-# v5.0.0 — Frame Owns the Pump
+# v5.0.0 — Legacy Release Lane Snapshot
 
-Next major version. Architectural changes that justify a semver major bump.
+This directory remains as the historical shaping snapshot for the
+pre-METHOD `v5.0.0` release lane.
 
-## Shaped scope
-
-- **RE-021** — frame owns the pump: `createFramedApp` owns the render
-  loop, timing, frame budget, and perf bookkeeping
-- **DL-009** — formalize layout and viewport rules (prerequisite for
-  honest scrollbar upstreaming)
-- **HT-upstream** — upstream edge-overlay scrollbars and BCSS overflow
-  handling from XYPH into bijou-tui
-- **RE-020** — typed color representation (numeric RGB as the canonical
-  internal form, hex strings at boundaries only)
-- **DX-007-decompose** — decompose app-frame mega closure
-
-## Not yet shaped
-
-These are candidates but not committed:
-
-- RE-019 theme token color cache (may fold into RE-020)
-- RE-012 pipeline observability hooks
-- HT-005 page-provided layer registry
-- HT-006 page-level notification push
+The canonical live `v5.0.0` lane now lives in
+[`docs/method/backlog/v5.0.0/`](../../method/backlog/v5.0.0/README.md).

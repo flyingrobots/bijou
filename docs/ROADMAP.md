@@ -5,7 +5,7 @@ This file is a reference-only strategic horizon.
 Active execution does not start here. Current work is tracked through:
 
 - `docs/METHOD.md` for workflow doctrine
-- `docs/BACKLOG/` for live backlog capture
+- `docs/method/backlog/` for live backlog capture
 - `docs/design/` for cycle-owned design truth
 - `docs/BEARING.md` for current directional tension
 

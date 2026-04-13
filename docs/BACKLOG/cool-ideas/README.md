@@ -1,7 +1,6 @@
-# Cool Ideas
+# Legacy Cool Ideas Archive
 
-Interesting work that is not yet a commitment.
+This lane is a historical archive of pre-METHOD `cool-ideas/` notes.
 
-These files should stay legible but should not read like hidden
-promises.
-
+The canonical live lane is
+[`docs/method/backlog/cool-ideas/`](../../method/backlog/cool-ideas/README.md).

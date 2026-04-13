@@ -57,4 +57,5 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 - latest completed cycle: [DL-008 — Promote Guided Flow Block](../retro/DL_008-promote-guided-flow-block.md)
 - previous completed cycle: [DL-007 — Promote Inspector Panel Block](../design/DL-007-promote-inspector-panel-block.md)
 - live backlog:
-  - [DL-009 — Formalize Layout and Viewport Rules](../BACKLOG/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md)
+  - [DL-009 — Formalize Layout and Viewport Rules](../backlog/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md)
+  - [DL-010 — Strictly Typed App Interface Examples](../backlog/cool-ideas/DL-010-strictly-typed-app-examples.md)

@@ -27,6 +27,7 @@ reference material.
 | **[VISION](./VISION.md)** | Core tenets and project identity. |
 | **[BEARING](./BEARING.md)** | Current direction and active tensions. |
 | **[METHOD](./METHOD.md)** | Repo work doctrine: backlog lanes and the cycle loop. |
+| **[method/backlog/README.md](./method/backlog/README.md)** | Live queue: canonical backlog lanes and shaped release lanes. |
 | **[strategy/README.md](./strategy/README.md)** | Doctrine map: living strategy notes vs historical planning artifacts. |
 | **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
 | **[Design System](./design-system/README.md)** | Foundations, patterns, and component families. |

@@ -27,7 +27,7 @@ only append middleware after the default stages — it cannot wrap
 them for timing.
 
 This blocks:
-- [DX-006](DX-006-debug-performance-overlay-component.md) from
+- [DX-006](../../retro/DX_006-debug-performance-overlay-component.md) from
   showing a full phase breakdown
 - Any app from diagnosing whether their bottleneck is layout, paint,
   or diff

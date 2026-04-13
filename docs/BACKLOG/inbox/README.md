@@ -1,7 +1,6 @@
-# Inbox
+# Legacy Inbox Archive
 
-Raw ideas land here first.
+This lane is a historical archive of pre-METHOD `inbox/` notes.
 
-If the idea is worth keeping, promote it into `asap/`, `up-next/`,
-`cool-ideas/`, `bad-code/`, or the root backlog during maintenance.
-
+The canonical live lane is
+[`docs/method/backlog/inbox/`](../../method/backlog/inbox/README.md).

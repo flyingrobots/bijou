@@ -65,4 +65,5 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
   - [DX-001 — Type Framed App Messages and Updates End-to-End](../design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
   - [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 - live backlog:
-  - no dedicated DX cycle is live right now
+  - [DX-007 — Decompose app-frame.ts Mega-Closure](../backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md)
+  - [DX-021 — Error Surface for Crash Post-Mortems](../backlog/cool-ideas/DX-021-error-surface-post-mortem.md)

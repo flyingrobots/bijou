@@ -1,13 +1,8 @@
-# v4.5.0 — Hardening Release
+# v4.5.0 — Legacy Release Lane Snapshot
 
-Hardening release focused on systemic input validation, the long-deferred
-i18n catalog loader, and DOGFOOD depth.
+This directory remains as the historical shaping snapshot for the
+`v4.5.0` hardening release.
 
-## Shaped scope
-
-- **DX-007 + DX-008** — project-wide numeric input sanitization audit
-  and shared sanitize wrapper. Close the NaN/Infinity class of bug.
-- **LX-010** — built-in i18n catalog loader (ASAP since v4.1.0)
-- **RE-022** — export public `isPackedSurface` type guard
-- **DF-020** — deepen DOGFOOD story depth and variant quality
-  (mode-aware lowering for data-viz, retire more examples)
+It is not the live queue. Current release-target backlog work belongs in
+[`docs/method/backlog/`](../../method/backlog/README.md), and completed
+release truth belongs in [`docs/CHANGELOG.md`](../../CHANGELOG.md).

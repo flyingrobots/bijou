@@ -16,8 +16,10 @@ Bijou now tracks work through:
 - **Cycles**
   - [`docs/design/`](./design/README.md)
   - active and landed cycle docs
+- [`docs/method/backlog/`](./method/backlog/README.md)
+  - canonical live backlog lanes and shaped release lanes
 - [`docs/BACKLOG/`](./BACKLOG/README.md)
-  - lane-based backlog and untriaged historical captures
+  - legacy archive and compatibility surface for pre-METHOD backlog notes
 - [`docs/BEARING.md`](./BEARING.md)
   - current direction and tensions
 - [`docs/VISION.md`](./VISION.md)
@@ -29,7 +31,7 @@ Bijou now tracks work through:
 
 ## Working Loop
 
-1. Pull from `docs/BACKLOG/asap/` or `docs/BACKLOG/up-next/`.
+1. Pull from `docs/method/backlog/asap/` or `docs/method/backlog/up-next/`.
 2. Create a branch named `cycle/<cycle_name>` for that cycle.
 3. Move the file into `docs/design/` and enrich it into a real cycle doc.
 4. Write failing tests. Playback questions become the executable spec.
@@ -49,7 +51,7 @@ Bijou now tracks work through:
 - Legends, cycle docs, tests, and backlog placement must agree.
 - Agents are first-class users and should have explicit hills and
   playback questions where relevant.
-- Version-target backlog lanes like `docs/BACKLOG/vX.Y.Z/` are only for
+- Version-target backlog lanes like `docs/method/backlog/vX.Y.Z/` are only for
   cycles that must land before that shaped release ships.
 
 ## Read Order

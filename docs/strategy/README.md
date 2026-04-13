@@ -5,7 +5,7 @@ This directory mixes living doctrine with older planning notes.
 Do **not** start new delivery work here. Current queue truth lives in:
 
 - `docs/METHOD.md`
-- `docs/BACKLOG/`
+- `docs/method/backlog/`
 - `docs/design/`
 
 Use strategy notes for doctrine, rationale, and historical reference.
