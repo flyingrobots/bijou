@@ -45,6 +45,8 @@ Select the family based on the interaction semantic, not just the visual shape.
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Non-urgent explanation.
 - **`alert()`**: Persistent, in-flow message.
+- **`guidedFlow()`**: Calm multi-step assistance with one explicit next action.
+- **`explainability()`**: AI- or machine-mediated recommendation with visible provenance and evidence.
 - *Use `@flyingrobots/bijou-tui` notifications for stacking, history, or active routing.*
 
 ### Selection and Prompts

@@ -1,4 +1,16 @@
+---
+title: DL-008 — Promote Guided Flow Block
+lane: graveyard
+legend: DL
+---
+
 # DL-008 — Promote Guided Flow Block
+
+## Disposition
+
+Implemented on release/v4.5.0 by adding the reusable guidedFlow() block in @flyingrobots/bijou, refactoring explainability() onto the same guided-flow rhythm, proving the block in DOGFOOD, and capturing the work in the DL-008 cycle doc. This is now completed design-language work, not live backlog.
+
+## Original Proposal
 
 Legend: [DL — Design Language](../legends/DL-design-language.md)
 

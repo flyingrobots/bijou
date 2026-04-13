@@ -41,6 +41,8 @@ Bijou provides two primary output formats:
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Explanatory, non-urgent supporting text.
 - **`alert()`**: Persistent message that stays in the document flow.
+- **`guidedFlow()`**: Calm multi-step assistance with one obvious next action.
+- **`explainability()`**: AI- or machine-mediated recommendation with explicit provenance and evidence.
 - **`markdown()`**: Renders formatted prose with mode-aware fallbacks.
 
 ### Choosing Prompts

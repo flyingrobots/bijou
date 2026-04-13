@@ -63,6 +63,14 @@ export type { PaginatorOptions } from './paginator.js';
 export { stepper } from './stepper.js';
 export type { StepperStep, StepperOptions } from './stepper.js';
 
+export { guidedFlow } from './guided-flow.js';
+export type {
+  GuidedFlowStepStatus,
+  GuidedFlowStep,
+  GuidedFlowSectionTone,
+  GuidedFlowSection,
+  GuidedFlowOptions,
+} from './guided-flow.js';
 export { explainability } from './explainability.js';
 export type { ExplainabilityEvidenceItem, ExplainabilityOptions } from './explainability.js';
 export { inspector } from './inspector.js';
