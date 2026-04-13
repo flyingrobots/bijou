@@ -49,6 +49,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [DX-012 — Document Render-Path Naming Convention](../graveyard/DX_012-render-path-naming-convention.md)
   - [DX-011 — Key Collision Warnings at Registration Time](../graveyard/DX_011-key-collision-warnings.md)
   - [DX-010 — Typed Sub-App Adapter Factory](../graveyard/DX_010-typed-subapp-adapter.md)
   - [DX-006 — Debug Performance Overlay Component](../graveyard/DX_006-debug-performance-overlay-component.md)

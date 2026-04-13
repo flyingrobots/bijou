@@ -37,6 +37,12 @@ Bijou provides two primary output formats:
 1. **String-first**: Returns a themed ANSI string. Best for standalone CLIs and scripts.
 2. **Surface-first**: Returns a `Surface` (byte-buffer). Best for high-performance TUIs and complex layouts.
 
+Naming follows the same rule across families: the base export is the public
+family name, and a `*Surface()` companion means “this family on the composable
+surface path.” If there is no `*Surface()` variant, that usually means the
+family is already surface-native, intentionally string-first, or a second name
+would only create fake API duplication.
+
 ### Choosing Feedback Surfaces
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Explanatory, non-urgent supporting text.

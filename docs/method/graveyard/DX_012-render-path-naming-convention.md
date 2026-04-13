@@ -1,4 +1,16 @@
+---
+title: DX-012 — Document Render-Path Naming Convention
+lane: graveyard
+legend: DX
+---
+
 # DX-012 — Document Render-Path Naming Convention
+
+## Disposition
+
+Documented the render-path naming rule explicitly in the `@flyingrobots/bijou` README and GUIDE: the base family name is the public component family, and a `*Surface()` companion means the same family on the composable surface path. The broader doctrine was already present across ADVANCED_GUIDE, migration docs, and design-system material, so this closes the remaining front-door POLA gap the note described.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

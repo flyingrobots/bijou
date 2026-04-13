@@ -41,6 +41,12 @@ const panel = boxSurface(
 
 Select the family based on the interaction semantic, not just the visual shape.
 
+Render-path naming follows one house rule: the base family name is the public
+component, and a `*Surface()` companion means “the same family on the composable
+surface path.” If there is no `*Surface()` companion, the family is either
+already surface-native, intentionally string-first, or both paths would be
+fake duplication rather than a real second API.
+
 ### Status and Feedback
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Non-urgent explanation.
