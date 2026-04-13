@@ -44,6 +44,9 @@ npm run bench
 # Run one scenario
 npm run bench -- run --scenario=paint-gradient-rgb
 
+# Run the fixed CI gradient lane locally
+npm run -s bench:ci:gradient
+
 # Custom sample count and override frame counts
 npm run bench -- run --samples=50 --warmup=30 --frames=200
 
@@ -96,3 +99,22 @@ This command intentionally runs outside the main wall-time harness with
 `--expose-gc` so you can compare `heapUsed` deltas against observer-reported GC
 events without polluting production scenarios. It is a diagnostic tool only,
 not a release gate and not part of the trusted wall-time bench story.
+
+## CI gradient lane
+
+The repo now runs a dedicated gradient benchmark lane in CI using the
+wall-time harness, not heap deltas or `PerformanceObserver('gc')`.
+
+It is an informational reporting lane, not a hard regression gate. The harness
+is trusted; the workflow publishes the numbers and JSON artifact so future gate
+work can be built on real CI data instead of guessed thresholds.
+
+- Scenario set: `paint-gradient-rgb`, `diff-gradient`
+- Samples: `30`
+- Output: JSON artifact plus a markdown step summary on the workflow run
+
+Use the same lane locally when you want to reproduce the CI benchmark surface:
+
+```bash
+npm run -s bench:ci:gradient -- --out /tmp/bijou-gradient-ci.json
+```

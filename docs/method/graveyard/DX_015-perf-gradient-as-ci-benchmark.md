@@ -1,4 +1,16 @@
+---
+title: DX-015 — Perf Gradient as CI Benchmark
+lane: graveyard
+legend: DX
+---
+
 # DX-015 — Perf Gradient as CI Benchmark
+
+## Disposition
+
+Shipped a dedicated CI gradient benchmark lane using the existing wall-time harness. The repo now exposes npm run -s bench:ci:gradient for the fixed paint-gradient-rgb and diff-gradient scenario set, CI runs that lane on GitHub Actions, publishes the markdown summary to the step summary, and uploads the JSON report as an artifact. The docs make the contract explicit: this is an informational wall-time benchmark lane, not a heap/GC regression gate.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

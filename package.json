@@ -15,6 +15,7 @@
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
     "bench": "node --import tsx bench/src/cli.ts run",
+    "bench:ci:gradient": "node --import tsx bench/src/cli.ts run --scenario=paint-gradient-rgb,diff-gradient --samples=30",
     "bench:compare": "node --import tsx bench/src/cli.ts compare",
     "bench:baseline": "node --import tsx bench/src/cli.ts run --out bench/baselines",
     "bench:gc-observer-repro": "node --expose-gc --import tsx bench/src/gc-observer-repro.ts",

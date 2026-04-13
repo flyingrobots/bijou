@@ -43,6 +43,7 @@ Execute these from the monorepo root.
 
 ### Performance & Benchmarks
 - `npm run bench`: Execute the benchmark suite.
+- `npm run bench:ci:gradient`: Run the fixed gradient stress lane used in CI.
 - `npm run bench:compare`: Compare results against a baseline.
 - `npm run soak`: Run long-duration soak tests.
 
