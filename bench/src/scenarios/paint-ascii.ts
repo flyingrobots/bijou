@@ -24,6 +24,7 @@ interface State {
 export const paintAscii: Scenario<State> = {
   id: 'paint-ascii',
   label: 'Paint: plain ASCII, no colors (220×58)',
+  tags: ['paint', 'set', 'ascii', 'no-color'],
   description:
     'Fills every cell of a 220×58 surface with a plain ASCII char via surface.set({char}). No fg, no bg, no modifiers, no hex parsing. The baseline "how much does char encoding alone cost" measurement. Isolates the encodeChar path from hex parsing.',
   columns: 220,

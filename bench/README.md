@@ -44,6 +44,10 @@ npm run bench
 # Run one scenario
 npm run bench -- run --scenario=paint-gradient-rgb
 
+# Run by tag (comma-separated tags are AND)
+npm run bench -- run --tag=diff
+npm run bench -- run --tag=paint,unique-styles
+
 # Run the fixed CI gradient lane locally
 npm run -s bench:ci:gradient
 
@@ -61,6 +65,19 @@ npm run bench:compare baseline.json current.json
 
 See `src/scenarios/` for the current registry. Each scenario module
 contains a description explaining what it stresses.
+
+Tag filters are now part of that contract:
+
+- comma-separated tags inside one `--tag=...` are AND
+- repeated `--tag` flags are OR across groups
+
+Examples:
+
+```bash
+npm run bench -- run --tag=diff
+npm run bench -- run --tag=paint,unique-styles
+npm run bench -- list --tag=dogfood
+```
 
 ## Adding a scenario
 

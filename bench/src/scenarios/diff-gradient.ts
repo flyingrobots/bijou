@@ -37,6 +37,7 @@ const BLOCK = 0x2588;
 export const diffGradient: Scenario<State> = {
   id: 'diff-gradient',
   label: 'Diff: per-cell unique RGB gradient (220×58)',
+  tags: ['diff', 'setRGB', 'gradient', 'unique-styles', 'dense-diff'],
   description:
     'Paints a full-screen cosine-derived RGB gradient into a target surface via setRGB, then runs renderDiff against a fixed current surface. Every cell differs; every cell has a unique style. This is the sgrCache stress test. Measures paint + diff combined, which matches a real frame shape.',
   columns: 220,

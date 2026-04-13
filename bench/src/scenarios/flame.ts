@@ -131,6 +131,7 @@ function createValueNoise(): (px: number, py: number) => number {
 export const flame: Scenario<State> = {
   id: 'flame',
   label: 'Flame: doom fire effect (220×58)',
+  tags: ['paint', 'setRGB', 'gradient', 'dense-diff', 'noise'],
   description:
     'Classic demoscene fire: value noise seeds the floor, heat propagates upward with random lateral drift and decay. Every cell painted every frame with smooth gradient interpolation via setRGB. Worst case for the differ — zero unchanged cells, hundreds of effective colors. Exercises setRGB, per-cell interpolation, and random access patterns.',
   columns: 220,

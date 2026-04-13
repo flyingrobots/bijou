@@ -1,4 +1,15 @@
+---
+title: DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering
+lane: graveyard
+---
+
 # DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering
+
+## Disposition
+
+Shipped scenario provenance tags across the bench registry. Scenarios now declare stable lowercase tags, the CLI supports tag-filtered run/list flows with comma-separated AND inside one --tag and OR across repeated --tag flags, bench docs explain the contract, and focused bench tests cover tag parsing and selection.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

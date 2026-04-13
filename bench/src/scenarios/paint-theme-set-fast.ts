@@ -42,6 +42,7 @@ function parseHex(hex: string): RGB {
 export const paintThemeSetFast: Scenario<State> = {
   id: 'paint-theme-set-fast',
   label: 'Paint: rotating theme palette via surface.set + fgRGB/bgRGB (220×58)',
+  tags: ['paint', 'set', 'preparsed-rgb', 'theme-cache'],
   description:
     'Same painting as paint-theme-set but the palette is pre-parsed once in setup() and each set() call includes fgRGB/bgRGB so encodeCellIntoBuf can skip inlineHexRGB. Delta vs paint-theme-set is the theme-token color cache win (RE-019 cool idea).',
   columns: 220,

@@ -17,7 +17,12 @@
 
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
-import { SCENARIOS, listScenarioIds } from './scenarios/index.js';
+import {
+  listScenarioIds,
+  parseScenarioTagGroup,
+  selectScenarios,
+  type ScenarioTagGroup,
+} from './scenarios/index.js';
 import { runBench, type RunReport } from './harnesses/wall-time/runner.js';
 import { compareReports, formatComparison } from './harnesses/wall-time/compare.js';
 import { formatNs } from './stats.js';
@@ -48,6 +53,36 @@ function parseKv(argv: readonly string[]): Map<string, string> {
   return out;
 }
 
+function flagValues(argv: readonly string[], key: string): string[] {
+  const values: string[] = [];
+  const longFlag = `--${key}`;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (arg === longFlag) {
+      const next = argv[i + 1];
+      if (next != null && !next.startsWith('--')) {
+        values.push(next);
+        i++;
+      }
+      continue;
+    }
+    if (arg.startsWith(`${longFlag}=`)) {
+      values.push(arg.slice(longFlag.length + 1));
+    }
+  }
+
+  return values;
+}
+
+function parseTagGroups(argv: readonly string[]): readonly ScenarioTagGroup[] {
+  return flagValues(argv, 'tag').map(parseScenarioTagGroup);
+}
+
+function formatTagGroups(tagGroups: readonly ScenarioTagGroup[]): string {
+  return tagGroups.map((group) => group.join('+')).join('|');
+}
+
 function positional(argv: readonly string[]): string[] {
   // Positionals are non-flag args that are not consumed as values for
   // preceding `--key value` flags. We walk the argv mirroring parseKv's
@@ -70,11 +105,17 @@ function positional(argv: readonly string[]): string[] {
   return result;
 }
 
-function cmdList(): void {
-  process.stdout.write('scenarios:\n');
-  for (const s of SCENARIOS) {
+function cmdList(argv: readonly string[]): void {
+  const tagGroups = parseTagGroups(argv);
+  const scenarios = selectScenarios({ tagGroups });
+
+  process.stdout.write(tagGroups.length > 0
+    ? `scenarios (tags: ${formatTagGroups(tagGroups)}):\n`
+    : 'scenarios:\n');
+  for (const s of scenarios) {
     process.stdout.write(`  ${s.id}\n`);
     process.stdout.write(`    ${s.label}\n`);
+    process.stdout.write(`    tags: ${s.tags.join(', ')}\n`);
     process.stdout.write(`    ${s.columns}×${s.rows}, warmup=${s.defaultWarmupFrames}, measure=${s.defaultMeasureFrames}\n`);
     process.stdout.write(`    ${s.description}\n`);
     process.stdout.write('\n');
@@ -93,19 +134,24 @@ function cmdRun(argv: readonly string[]): void {
   const framesOverride = kv.get('frames');
   const scenarioArg = kv.get('scenario');
   const outArg = kv.get('out');
+  const tagGroups = parseTagGroups(argv);
 
-  const scenarioIds =
+  const requestedScenarioIds =
     scenarioArg && scenarioArg !== 'all'
       ? scenarioArg.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
       : undefined;
+  const scenarioIds = selectScenarios({
+    ...(requestedScenarioIds != null ? { ids: requestedScenarioIds } : {}),
+    ...(tagGroups.length > 0 ? { tagGroups } : {}),
+  }).map((scenario) => scenario.id);
 
   process.stderr.write(
-    `bench: scenarios=${scenarioIds?.join(',') ?? 'all'}, samples=${samples}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
+    `bench: scenarios=${scenarioIds.join(',')}, tags=${tagGroups.length > 0 ? formatTagGroups(tagGroups) : 'none'}, samples=${samples}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
   );
 
   const report = runBench({
     samples,
-    ...(scenarioIds != null ? { scenarioIds } : {}),
+    scenarioIds,
     ...(warmupOverride != null ? { warmupFramesOverride: Number.parseInt(warmupOverride, 10) } : {}),
     ...(framesOverride != null ? { measureFramesOverride: Number.parseInt(framesOverride, 10) } : {}),
     onProgress: (event) => {
@@ -177,10 +223,11 @@ function main(): void {
         'bijou-bench — performance harness',
         '',
         'usage:',
-        '  bench run [--scenario=ID|all] [--samples=30] [--warmup=N] [--frames=N] [--out=path]',
+        '  bench run [--scenario=ID|all] [--tag=TAG[,TAG]] [--samples=30] [--warmup=N] [--frames=N] [--out=path]',
         '  bench compare <baseline.json> <current.json>',
-        '  bench list',
+        '  bench list [--tag=TAG[,TAG]]',
         '',
+        'Tag filters: comma-separated tags are AND within one --tag, repeated --tag flags are OR across groups.',
         `scenarios: ${listScenarioIds().join(', ')}`,
       ].join('\n') + '\n',
     );
@@ -195,7 +242,7 @@ function main(): void {
       cmdCompare(rest);
       break;
     case 'list':
-      cmdList();
+      cmdList(rest);
       break;
     default:
       throw new Error(`unknown subcommand: ${subcommand}`);

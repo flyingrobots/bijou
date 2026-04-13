@@ -151,6 +151,7 @@ function paintApp(state: State, frameIndex: number): void {
 export const componentApp: Scenario<State> = {
   id: 'component-app',
   label: 'Component app: realistic bijou TUI (220×58)',
+  tags: ['paint', 'compose', 'components', 'hex-parse'],
   description:
     'Renders a typical TUI application using real bijou components: boxSurface, tableSurface, alertSurface, separatorSurface, progressBar, badge, statsPanelSurface, sparkline. Tests the component rendering path — hex parsing, token resolution, text segmentation, box borders, table alignment, and surface composition. Progress bar and sparkline advance each frame for realistic partial updates.',
   columns: 220,

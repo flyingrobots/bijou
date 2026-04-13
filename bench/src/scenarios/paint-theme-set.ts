@@ -26,6 +26,7 @@ const PALETTE_BG = ['#111320', '#151927', '#181d2d'];
 export const paintThemeSet: Scenario<State> = {
   id: 'paint-theme-set',
   label: 'Paint: rotating theme palette via surface.set (220×58)',
+  tags: ['paint', 'set', 'hex-parse', 'small-palette'],
   description:
     'Fills every cell of a 220×58 surface with a foreground + background picked from small rotating palettes, using the legacy surface.set({char, fg, bg}) API that hex-parses the colors inline. Unique style count per frame is ~15, but every cell pays the hex parse cost. Designed to measure the impact of inlineHexRGB on the paint path.',
   columns: 220,

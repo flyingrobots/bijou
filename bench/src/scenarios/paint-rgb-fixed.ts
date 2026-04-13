@@ -30,6 +30,7 @@ const BLOCK = 0x2588; // █
 export const paintRgbFixed: Scenario<State> = {
   id: 'paint-rgb-fixed',
   label: 'Paint: fixed RGB via setRGB, no math (220×58)',
+  tags: ['paint', 'setRGB', 'fixed-rgb', 'no-hex-parse'],
   description:
     'Fills every cell of a 220×58 surface with a constant RGB fg + bg via setRGB(). No math, no animation, no hex parsing. The purest measurement of the setRGB byte-pack path. Compare against paint-theme-set for the hex-parse overhead, and against paint-ascii for the color-write overhead alone.',
   columns: 220,

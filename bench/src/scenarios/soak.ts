@@ -88,6 +88,7 @@ function paintBase(target: PackedSurface, cols: number, rows: number): void {
 export const soak: Scenario<State> = {
   id: 'soak',
   label: 'Soak: 1000-frame stability (220×58)',
+  tags: ['diff', 'compose', 'soak', 'nightly', 'long-run'],
   description:
     'Multi-region composition with rotating partial updates (~15-20% dirty/frame) over 1000 measurement frames. Cycles header/sidebar/body/footer hotspots. Simulates a resize clear+repaint every 100 frames. Designed to surface memory leaks, cache pollution, and frame-time degradation.',
   columns: COLS,
