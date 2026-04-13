@@ -1,7 +1,7 @@
 ---
-title: "WritePort byte-level API for zero-alloc ANSI output"
+title: WritePort byte-level API for zero-alloc ANSI output
 legend: RE
-lane: inbox
+lane: cool-ideas
 ---
 
 # WritePort byte-level API for zero-alloc ANSI output

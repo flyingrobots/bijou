@@ -1,3 +1,9 @@
+---
+title: DX-009 — Auto-Init Context and Actionable Error Messages
+lane: up-next
+legend: DX
+---
+
 # DX-009 — Auto-Init Context and Actionable Error Messages
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)

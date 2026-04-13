@@ -1,3 +1,9 @@
+---
+title: DX-008 — Render Pipeline Documentation Guide
+lane: root
+legend: DX
+---
+
 # DX-008 — Render Pipeline Documentation Guide
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)

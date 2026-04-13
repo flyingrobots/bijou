@@ -1,3 +1,9 @@
+---
+title: RE-011 — Eliminate Per-Frame Allocation in Render Pipeline
+lane: up-next
+legend: RE
+---
+
 # RE-011 — Eliminate Per-Frame Allocation in Render Pipeline
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)

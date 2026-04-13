@@ -1,7 +1,7 @@
 ---
-title: "MCP interactive documentation for all Bijou components"
+title: MCP interactive documentation for all Bijou components
 legend: DF
-lane: inbox
+lane: cool-ideas
 ---
 
 # MCP interactive documentation for all Bijou components

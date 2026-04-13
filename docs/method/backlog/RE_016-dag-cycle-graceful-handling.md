@@ -1,3 +1,9 @@
+---
+title: "RE-016: DAG renderer should handle cycles gracefully"
+lane: root
+legend: RE
+---
+
 # RE-016: DAG renderer should handle cycles gracefully
 
 ## Problem
