@@ -27,6 +27,7 @@ reference material.
 | **[VISION](./VISION.md)** | Core tenets and project identity. |
 | **[BEARING](./BEARING.md)** | Current direction and active tensions. |
 | **[METHOD](./METHOD.md)** | Repo work doctrine: backlog lanes and the cycle loop. |
+| **[strategy/README.md](./strategy/README.md)** | Doctrine map: living strategy notes vs historical planning artifacts. |
 | **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
 | **[Design System](./design-system/README.md)** | Foundations, patterns, and component families. |
 
@@ -38,7 +39,8 @@ reference material.
 | **[MCP](./MCP.md)** | MCP server posture and tool reference. |
 | **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |
-| **[ROADMAP](./ROADMAP.md)** | Broad strategic horizon. |
+| **[ROADMAP](./ROADMAP.md)** | Reference-only strategic horizon, not the active queue. |
+| **[specs/README.md](./specs/README.md)** | Legacy spec archive policy and migration rule. |
 
 ---
 **For a machine-readable inventory of all documentation, run `npm run docs:inventory`.**

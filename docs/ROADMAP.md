@@ -1,6 +1,15 @@
 # ROADMAP
 
-Bijou's execution is tracked via `docs/BACKLOG/` and `docs/design/`. This document captures the broader strategic horizon.
+This file is a reference-only strategic horizon.
+
+Active execution does not start here. Current work is tracked through:
+
+- `docs/METHOD.md` for workflow doctrine
+- `docs/BACKLOG/` for live backlog capture
+- `docs/design/` for cycle-owned design truth
+- `docs/BEARING.md` for current directional tension
+
+Use this page to understand long-range direction, not to infer the current queue.
 
 ```mermaid
 timeline

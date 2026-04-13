@@ -44,12 +44,14 @@ An agent can place docs, tests, and follow-on debt in the right location by read
   - `4.5.0` is the active release branch
   - no dedicated workflow cycle is active right now
   - the most recent completed runtime-engine cycle is
-    [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+    [RE-016 — DAG renderer should handle cycles gracefully](../graveyard/RE_016-dag-cycle-graceful-handling.md)
 - latest workflow closure:
+  - [WF-002 — Migrate Legacy Planning Artifacts](../graveyard/WF_002-migrate-legacy-planning-artifacts.md)
+- previous workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - latest docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - live backlog:
-  - [WF-002 — Migrate Legacy Planning Artifacts](../backlog/WF_002-migrate-legacy-planning-artifacts.md)
+  - no dedicated workflow cycle is live right now
 - next runtime-engine issue in the live backlog:
-  - [RE-016: DAG renderer should handle cycles gracefully](../backlog/RE_016-dag-cycle-graceful-handling.md)
+  - [RE-012 — Pipeline Observability Hooks](../backlog/cool-ideas/RE_012-pipeline-observability-hooks.md)

@@ -1,4 +1,16 @@
+---
+title: WF-002 — Migrate Legacy Planning Artifacts
+lane: graveyard
+legend: WF
+---
+
 # WF-002 — Migrate Legacy Planning Artifacts
+
+## Disposition
+
+Legacy planning entrypoints now identify themselves honestly: ROADMAP is reference-only, docs/specs is a frozen legacy spec archive with an explicit migration rule, docs/strategy now has a directory index separating living doctrine from historical notes, and the older strategy notes that overlap newer signposts now point readers back to the canonical surfaces.
+
+## Original Proposal
 
 Legend: [WF — Workflow and Delivery](../legends/WF-workflow-and-delivery.md)
 

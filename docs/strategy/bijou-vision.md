@@ -1,5 +1,9 @@
 # Bijou Vision
 
+> Historical note: the canonical project-identity signpost is now
+> [`docs/VISION.md`](../VISION.md). This file remains as expanded background and
+> provenance, not as the active queue surface.
+
 _Living statement of what Bijou is for, how it should feel, and where it should be used_
 
 ## What Bijou is

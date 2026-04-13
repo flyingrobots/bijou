@@ -1,5 +1,9 @@
 # DOGFOOD
 
+> Historical note: this milestone framing is kept for provenance. The current
+> docs-surface signpost is [`docs/DOGFOOD.md`](../DOGFOOD.md), and new delivery
+> work should start in METHOD backlog/design surfaces instead of here.
+
 _Documentation Of Good Foundational Onboarding and Discovery_
 
 _Milestone strategy for the post-v4 living docs platform_
