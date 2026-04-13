@@ -1,8 +1,9 @@
 /**
- * Scenario: paint with a rotating theme palette via surface.set, but
+ * Scenario: paint with rotating small pre-parsed palettes via surface.set,
+ * but
  * using PRE-PARSED RGB bytes on the Cell (`fgRGB`/`bgRGB` fields).
  *
- * Identical to `paint-theme-set` except that the palette strings
+ * Identical to `paint-set-hex-palette` except that the palette strings
  * are pre-parsed once in `setup()` into RGB tuples, and each
  * `surface.set()` call includes `fgRGB`/`bgRGB` alongside the hex
  * strings. When `encodeCellIntoBuf` sees a pre-parsed RGB, it
@@ -13,7 +14,7 @@
  * where the token carries both the hex string (for DTCG/human
  * export) and the pre-parsed bytes (for the hot path).
  *
- * Delta vs `paint-theme-set` = the theme-token color cache win.
+ * Delta vs `paint-set-hex-palette` = the pre-parsed RGB fast-path win.
  */
 
 import { createSurface, type Surface } from '@flyingrobots/bijou';
@@ -40,11 +41,11 @@ function parseHex(hex: string): RGB {
 }
 
 export const paintThemeSetFast: Scenario<State> = {
-  id: 'paint-theme-set-fast',
-  label: 'Paint: rotating theme palette via surface.set + fgRGB/bgRGB (220×58)',
+  id: 'paint-set-preparsed-palette',
+  label: 'Paint: rotating small pre-parsed palettes via surface.set (220×58)',
   tags: ['paint', 'set', 'preparsed-rgb', 'theme-cache'],
   description:
-    'Same painting as paint-theme-set but the palette is pre-parsed once in setup() and each set() call includes fgRGB/bgRGB so encodeCellIntoBuf can skip inlineHexRGB. Delta vs paint-theme-set is the theme-token color cache win (RE-019 cool idea).',
+    'Same painting as paint-set-hex-palette but the palettes are pre-parsed once in setup() and each set() call includes fgRGB/bgRGB so encodeCellIntoBuf can skip inlineHexRGB. Delta vs paint-set-hex-palette isolates the pre-parsed RGB fast path.',
   columns: 220,
   rows: 58,
   defaultWarmupFrames: 30,

@@ -9,8 +9,8 @@
 
 import type { AnyScenario, ScenarioTagGroup } from './types.js';
 import { paintGradientRgb } from './paint-gradient-rgb.js';
-import { paintThemeSet } from './paint-theme-set.js';
-import { paintThemeSetFast } from './paint-theme-set-fast.js';
+import { paintThemeSet } from './paint-set-hex-palette.js';
+import { paintThemeSetFast } from './paint-set-preparsed-palette.js';
 import { paintAscii } from './paint-ascii.js';
 import { paintRgbFixed } from './paint-rgb-fixed.js';
 import { diffGradient } from './diff-gradient.js';
@@ -37,6 +37,11 @@ export const SCENARIOS: readonly AnyScenario[] = [
   flame,
   soak,
 ] as unknown as readonly AnyScenario[]; // Scenario<T> is invariant on T; cast required for the heterogeneous registry
+
+const SCENARIO_ALIASES: Readonly<Record<string, string>> = {
+  'paint-theme-set': 'paint-set-hex-palette',
+  'paint-theme-set-fast': 'paint-set-preparsed-palette',
+};
 
 export function parseScenarioTagGroup(value: string): ScenarioTagGroup {
   const tags = [...new Set(
@@ -90,7 +95,8 @@ export function selectScenarios(options: {
 
 /** Look up a scenario by ID, or throw if not found. */
 export function getScenario(id: string): AnyScenario {
-  const match = SCENARIOS.find((s) => s.id === id);
+  const resolvedId = SCENARIO_ALIASES[id] ?? id;
+  const match = SCENARIOS.find((s) => s.id === resolvedId);
   if (!match) {
     throw new Error(`unknown scenario: ${id} (available: ${SCENARIOS.map((s) => s.id).join(', ')})`);
   }

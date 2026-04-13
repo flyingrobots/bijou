@@ -5,7 +5,7 @@
  * bytes go into every cell. This is the purest possible measurement
  * of the setRGB path cost — just the byte-pack write, nothing else.
  *
- * Compared against `paint-theme-set` (same painting, but via
+ * Compared against `paint-set-hex-palette` (same painting, but via
  * `surface.set({fg, bg})` with hex strings), the delta is the cost
  * of hex parsing + char encoding + modifier encoding in the
  * legacy set() path.
@@ -32,7 +32,7 @@ export const paintRgbFixed: Scenario<State> = {
   label: 'Paint: fixed RGB via setRGB, no math (220×58)',
   tags: ['paint', 'setRGB', 'fixed-rgb', 'no-hex-parse'],
   description:
-    'Fills every cell of a 220×58 surface with a constant RGB fg + bg via setRGB(). No math, no animation, no hex parsing. The purest measurement of the setRGB byte-pack path. Compare against paint-theme-set for the hex-parse overhead, and against paint-ascii for the color-write overhead alone.',
+    'Fills every cell of a 220×58 surface with a constant RGB fg + bg via setRGB(). No math, no animation, no hex parsing. The purest measurement of the setRGB byte-pack path. Compare against paint-set-hex-palette for the hex-parse overhead, and against paint-ascii for the color-write overhead alone.',
   columns: 220,
   rows: 58,
   defaultWarmupFrames: 30,

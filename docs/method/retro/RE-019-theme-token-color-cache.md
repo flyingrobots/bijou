@@ -81,7 +81,7 @@ related cool idea `RE-020-typed-color-representation.md`.
    is purely an optimization under the hood.
 2. **Self-healing.** Any code that already uses theme tokens
    benefits automatically; no caller rewrites.
-3. **Measurable.** The RE-017 bench has a `paint-theme-set`
+3. **Measurable.** The RE-017 bench has a `paint-set-hex-palette`
    scenario designed exactly to measure this. We can land the
    change and see the impact in a single bench run.
 4. **Composable with RE-017's byte-pipeline work.** This removes

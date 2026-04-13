@@ -8,7 +8,7 @@
  * menus, and body text produce collectively.
  *
  * This is the cross-component regression gate for RE-017's
- * Part II work. Synthetic scenarios (`paint-theme-set`,
+ * Part II work. Synthetic scenarios (`paint-set-hex-palette`,
  * `diff-gradient`, etc.) exercise one code path at a time;
  * `dogfood-realistic` exercises the composition.
  *

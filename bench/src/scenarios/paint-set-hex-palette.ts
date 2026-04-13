@@ -1,5 +1,5 @@
 /**
- * Scenario: paint with a rotating theme palette via surface.set().
+ * Scenario: paint with rotating small hex palettes via surface.set().
  *
  * Exercises the legacy `surface.set({char, fg, bg})` path that most
  * components still use. Every set() call hex-parses the fg and bg
@@ -24,11 +24,11 @@ const PALETTE_FG = ['#9ba9ff', '#c8c7ea', '#f4c389', '#f67f65', '#f2c572'];
 const PALETTE_BG = ['#111320', '#151927', '#181d2d'];
 
 export const paintThemeSet: Scenario<State> = {
-  id: 'paint-theme-set',
-  label: 'Paint: rotating theme palette via surface.set (220×58)',
+  id: 'paint-set-hex-palette',
+  label: 'Paint: rotating small hex palettes via surface.set (220×58)',
   tags: ['paint', 'set', 'hex-parse', 'small-palette'],
   description:
-    'Fills every cell of a 220×58 surface with a foreground + background picked from small rotating palettes, using the legacy surface.set({char, fg, bg}) API that hex-parses the colors inline. Unique style count per frame is ~15, but every cell pays the hex parse cost. Designed to measure the impact of inlineHexRGB on the paint path.',
+    'Fills every cell of a 220×58 surface with a foreground + background picked from small rotating hex palettes, using the legacy surface.set({char, fg, bg}) API that hex-parses the colors inline. Unique style count per frame is ~15, but every cell pays the hex parse cost. Designed to measure the impact of inlineHexRGB on the paint path.',
   columns: 220,
   rows: 58,
   defaultWarmupFrames: 30,

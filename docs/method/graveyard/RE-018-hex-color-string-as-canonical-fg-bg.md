@@ -44,7 +44,7 @@ same bytes over and over for the same theme colors.
   call that provides fg or bg.
 - The RE-017 audit showed broad 30-113% regressions across every
   rendering scenario in the bench after RE-008 merged. Paint-heavy
-  scenarios (`paint-theme-set`, `surface.paint.medium`, pure
+  scenarios (`paint-set-hex-palette`, `surface.paint.medium`, pure
   `dogfood.render.*`) regressed hardest. Paint scenarios that use
   `setRGB` (which takes pre-parsed bytes) are less affected in
   principle, but are still dominated by the paint cost because
@@ -96,7 +96,7 @@ path allocation-free.
 
 Measuring against the RE-017 post-merge baseline:
 
-- `paint-theme-set` at 220×58: 634 µs/frame, 12,760 cells, ~2
+- `paint-set-hex-palette` at 220×58: 634 µs/frame, 12,760 cells, ~2
   hex parses per cell (fg + bg). Roughly ~25,000 parses / frame.
 - If each parse is ~200 ns (conservative), that's 5 ms of parse
   work per frame, dwarfing the 634 µs total. But the actual parse

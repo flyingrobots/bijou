@@ -445,7 +445,7 @@ entirely and build a new bench from scratch around the principle
 - Harness-agnostic `Scenario` interface in `bench/src/scenarios/types.ts`
 - 4 initial scenarios:
   - `paint-ascii` — baseline "no colors, no hex parsing"
-  - `paint-theme-set` — rotating theme palette, exercises `inlineHexRGB`
+  - `paint-set-hex-palette` — rotating theme palette, exercises `inlineHexRGB`
   - `paint-gradient-rgb` — per-cell unique RGB via `setRGB`
   - `diff-gradient` — full-screen gradient diff (sgrCache stress)
 - `bench/src/harnesses/wall-time/` — process-isolated wall-time harness
@@ -483,7 +483,7 @@ entirely and build a new bench from scratch around the principle
 | Scenario | P50 | P90 | P99 | Min | Max | CoV |
 |---|---|---|---|---|---|---|
 | paint-ascii | 234.27 µs | 236.69 µs | 239.32 µs | 229.01 µs | 240.24 µs | **1.1%** |
-| paint-theme-set | 633.92 µs | 644.29 µs | 729.63 µs | 624.38 µs | 761.45 µs | **3.8%** |
+| paint-set-hex-palette | 633.92 µs | 644.29 µs | 729.63 µs | 624.38 µs | 761.45 µs | **3.8%** |
 | paint-gradient-rgb | 946.29 µs | 951.75 µs | 954.92 µs | 878.78 µs | 955.14 µs | **2.6%** |
 | diff-gradient | 2.13 ms | 2.16 ms | 2.19 ms | 2.04 ms | 2.20 ms | **2.0%** |
 
@@ -495,7 +495,7 @@ makes iterative optimization measurement practical.
 **Per-cell cost breakdown (for context, rough):**
 
 - `paint-ascii`: 234 µs / 12,760 cells ≈ **18 ns/cell** (baseline)
-- `paint-theme-set`: 634 µs / 12,760 cells ≈ **50 ns/cell** (2.7×
+- `paint-set-hex-palette`: 634 µs / 12,760 cells ≈ **50 ns/cell** (2.7×
   ASCII cost — the delta is hex parsing + modifier encoding per
   set() call)
 - `paint-gradient-rgb`: 946 µs / 12,760 cells ≈ **74 ns/cell**
@@ -580,7 +580,7 @@ Cool ideas:
 3. Task I-0e (investigate RE-008 broad slowdown): unblocked. The
    hypothesis to test is `RE-018` — per-cell hex parsing in
    `surface.set()`. Direct way to measure: bisect across the
-   RE-008 commits with `bench run --scenario=paint-theme-set`.
+   RE-008 commits with `bench run --scenario=paint-set-hex-palette`.
 4. Task I-0d (instrument pipeline stages): still valuable but can
    be deferred until after I-0e identifies the specific hot path.
 5. Adding more scenarios: `diff-static`, `diff-sparse`,
@@ -642,15 +642,15 @@ Same 12,760-cell paint, but via `setRGB(x, y, BLOCK, 0x9b, 0xa9,
 |---|---|---|---|
 | `paint-rgb-fixed` | 143 µs | **11.2 ns** | `setRGB` → `packCell` direct (bytes in, bytes out) |
 | `paint-ascii` | 231 µs | **18.1 ns** | `set({char})` → `encodeCellIntoBuf` (no colors, but all branches still evaluated) |
-| `paint-theme-set` | 625 µs | **49.0 ns** | `set({char, fg, bg})` → `encodeCellIntoBuf` → 2× `inlineHexRGB` |
+| `paint-set-hex-palette` | 625 µs | **49.0 ns** | `set({char, fg, bg})` → `encodeCellIntoBuf` → 2× `inlineHexRGB` |
 
 **The deltas tell the story:**
 
-- **`paint-theme-set` − `paint-rgb-fixed` = 482 µs per frame of
+- **`paint-set-hex-palette` − `paint-rgb-fixed` = 482 µs per frame of
   pure hex-parsing + modifier-encoding overhead.** That is
   38 ns × 12,760 cells of work that is *entirely* spent
   reparsing the same ~5 theme colors over and over. This is
-  **77% of `paint-theme-set`'s total frame time**.
+  **77% of `paint-set-hex-palette`'s total frame time**.
 - **`paint-ascii` − `paint-rgb-fixed` = 88 µs / 7 ns/cell.**
   This is the raw cost of `encodeCellIntoBuf`'s function
   overhead + branch-check path even when there's no hex to
@@ -677,7 +677,7 @@ pass hex strings.
    (or a new internal variant) detects already-parsed byte values
    and skips `inlineHexRGB`. Components that pull fg/bg from
    theme tokens (which is the common case) get the fast path for
-   free. Expected impact: `paint-theme-set` drops from 625 µs
+   free. Expected impact: `paint-set-hex-palette` drops from 625 µs
    toward 143 µs — potentially a **4×** speedup on that scenario
    and roughly proportional speedups on `dogfood.render.*`.
 2. **Deeper fix:** the cool idea `RE-020-typed-color-representation.md`.
@@ -690,7 +690,7 @@ The theme cache (RE-019 cool idea) is the right first landing
 because it's:
 
 - Zero API break — purely internal optimization.
-- Directly measurable — `paint-theme-set` delta is the success
+- Directly measurable — `paint-set-hex-palette` delta is the success
   criterion.
 - Compounds with the byte-pipeline differ work in Part II — if
   we land both, the entire render pipeline runs in bytes end to
@@ -715,7 +715,7 @@ because it's:
 
 1. Task I-0e: COMPLETED. Hypothesis confirmed empirically.
 2. New task: prototype the theme token color cache (RE-019 cool
-   idea). Measure the `paint-theme-set` delta. If it matches
+   idea). Measure the `paint-set-hex-palette` delta. If it matches
    expectations (3-4× speedup), land it as a standalone
    improvement before the Part II byte-pipeline work.
 3. Add `paint-rgb-fixed` as a permanent bench scenario (done in
@@ -749,18 +749,18 @@ bytes). Scope of the change:
 **Test status:** all 2,807 tests pass. The change is fully backward
 compatible.
 
-**Bench measurement** — added a `paint-theme-set-fast` scenario
-that mirrors `paint-theme-set` but pre-parses the palette once in
+**Bench measurement** — added a `paint-set-preparsed-palette` scenario
+that mirrors `paint-set-hex-palette` but pre-parses the palette once in
 `setup()` and passes `fgRGB` / `bgRGB` on each `surface.set()` call.
 30 samples each, same machine, commit `0aded48`:
 
 | Scenario | P50 | ns/cell | CoV | Notes |
 |---|---|---|---|---|
 | `paint-rgb-fixed` | 145 µs | 11.4 | 3.5% | setRGB floor (no parsing) |
-| `paint-theme-set-fast` | **328 µs** | **25.7** | **1.0%** | set() with pre-parsed fgRGB/bgRGB — **NEW** |
-| `paint-theme-set` | 624 µs | 48.9 | 3.1% | set() with hex parsed every call |
+| `paint-set-preparsed-palette` | **328 µs** | **25.7** | **1.0%** | set() with pre-parsed fgRGB/bgRGB — **NEW** |
+| `paint-set-hex-palette` | 624 µs | 48.9 | 3.1% | set() with hex parsed every call |
 
-**Result: `paint-theme-set` → `paint-theme-set-fast` = 624 µs → 328 µs,
+**Result: `paint-set-hex-palette` → `paint-set-preparsed-palette` = 624 µs → 328 µs,
 a 1.9× speedup.** That's a **47% reduction in frame time** on the
 theme-driven paint path with a ~30-line change.
 
@@ -818,7 +818,7 @@ RE-017 work.
 2. Add a component-level bench scenario that renders a
    representative slice of DOGFOOD (header + sidebar + content) so
    we can measure the end-to-end impact of the migration on a
-   realistic workload, not just the synthetic `paint-theme-set`.
+   realistic workload, not just the synthetic `paint-set-hex-palette`.
 3. Continue with Part II of RE-017 (the differ byte pipeline).
    The theme cache win compounds with the differ work — together
    they should eliminate string work from both the paint AND the
@@ -883,8 +883,8 @@ reference that every Part II step will be measured against.
 |---|---|---|---|---|
 | paint-ascii | 231 µs | 18.1 | 1.5% | `set({char})` floor |
 | paint-rgb-fixed | 145 µs | 11.4 | 7.4% | `setRGB` floor |
-| paint-theme-set | 635 µs | 49.7 | 1.1% | hex parse every cell |
-| **paint-theme-set-fast** | **328 µs** | **25.7** | **0.7%** | **pre-parsed RGB (theme cache)** |
+| paint-set-hex-palette | 635 µs | 49.7 | 1.1% | hex parse every cell |
+| **paint-set-preparsed-palette** | **328 µs** | **25.7** | **0.7%** | **pre-parsed RGB (theme cache)** |
 | paint-gradient-rgb | 950 µs | 74.4 | 2.1% | dominated by Math.cos |
 | diff-gradient | 2.08 ms | — | 2.0% | paint + diff, sgrCache stress |
 | **diff-sparse** | **349 µs** | **27.3** | **3.3%** | **~10% dirty cells — NEW** |
@@ -1004,8 +1004,8 @@ Comparison vs Phase A baseline:
 | diff-gradient | 2.08 ms | 2.07 ms | neutral (every cell dirty) |
 | paint-ascii | 231 µs | 239 µs | +3% (within noise) |
 | paint-rgb-fixed | 145 µs | 146 µs | neutral |
-| paint-theme-set | 635 µs | 640 µs | neutral |
-| paint-theme-set-fast | 328 µs | 333 µs | neutral |
+| paint-set-hex-palette | 635 µs | 640 µs | neutral |
+| paint-set-preparsed-palette | 328 µs | 333 µs | neutral |
 | paint-gradient-rgb | 950 µs | 945 µs | neutral |
 
 Paint scenarios are neutral as expected — they don't go through
@@ -1119,8 +1119,8 @@ Apple M1 Pro, Node v25.8.1, 30 samples each.
 |---|---|---|---|---|
 | paint-ascii | 236.40 µs | 235.50 µs | -0.4% | ok |
 | paint-rgb-fixed | 144.61 µs | 144.91 µs | +0.2% | ok |
-| paint-theme-set | 635.26 µs | 631.32 µs | -0.6% | ok |
-| paint-theme-set-fast | 329.83 µs | 328.75 µs | -0.3% | ok |
+| paint-set-hex-palette | 635.26 µs | 631.32 µs | -0.6% | ok |
+| paint-set-preparsed-palette | 329.83 µs | 328.75 µs | -0.3% | ok |
 | paint-gradient-rgb | 943.82 µs | 939.43 µs | -0.5% | ok |
 | diff-gradient | 2.05 ms | 2.02 ms | -1.5% | ok |
 | diff-sparse | 179.68 µs | 184.68 µs | +2.8% | ok |
@@ -1266,8 +1266,8 @@ Apple M1 Pro, Node v25.8.1, 30 samples each.
 |---|---|---|---|---|
 | paint-ascii | 234.90 µs | 239.89 µs | +2.1% | ok |
 | paint-rgb-fixed | 143.13 µs | 148.14 µs | +3.5% | ok |
-| paint-theme-set | 630.79 µs | 647.21 µs | +2.6% | ok |
-| paint-theme-set-fast | 329.37 µs | 338.70 µs | +2.8% | ok |
+| paint-set-hex-palette | 630.79 µs | 647.21 µs | +2.6% | ok |
+| paint-set-preparsed-palette | 329.37 µs | 338.70 µs | +2.8% | ok |
 | paint-gradient-rgb | 936.13 µs | 958.89 µs | +2.4% | ok |
 | **diff-gradient** | **2.02 ms** | **1.56 ms** | **−23.1%** | **GOOD** |
 | **diff-sparse** | **184.03 µs** | **134.40 µs** | **−27.0%** | **GOOD** |
@@ -1412,8 +1412,8 @@ Apple M1 Pro, Node v25.8.1, 30 samples each.
 |---|---|---|---|---|
 | paint-ascii | 239.89 µs | 234.35 µs | −2.3% | ok |
 | paint-rgb-fixed | 148.14 µs | 144.65 µs | −2.4% | ok |
-| paint-theme-set | 647.21 µs | 628.55 µs | −2.9% | ok |
-| paint-theme-set-fast | 338.70 µs | 329.65 µs | −2.7% | ok |
+| paint-set-hex-palette | 647.21 µs | 628.55 µs | −2.9% | ok |
+| paint-set-preparsed-palette | 338.70 µs | 329.65 µs | −2.7% | ok |
 | paint-gradient-rgb | 958.89 µs | 934.49 µs | −2.5% | ok |
 | **diff-gradient** | **1.56 ms** | **1.45 ms** | **−6.6%** | **GOOD** |
 | **diff-sparse** | **134.40 µs** | **125.19 µs** | **−6.9%** | **GOOD** |
@@ -1437,14 +1437,14 @@ before the hex-parse regression was even understood):
 | diff-sparse | 349 µs | 125 µs | **−64%** |
 | diff-static | 227 µs | 9.42 µs | **−96%** |
 | dogfood-realistic | 469 µs | 410 µs | **−13%** |
-| paint-theme-set | 633 µs | 628 µs | −0.8% (recovered) |
+| paint-set-hex-palette | 633 µs | 628 µs | −0.8% (recovered) |
 | paint-ascii | 234 µs | 234 µs | 0% (recovered) |
 
 The hex-parse paint-side regression (RE-008's theme-heavy paint
 path) is now paid back to neutral via the theme token color
 cache (phase A), and the diff path is 32–96 % faster than it
 was before RE-008 ever landed. The cycle's primary goal —
-recovering from the `paint-theme-set` regression without
+recovering from the `paint-set-hex-palette` regression without
 losing anything else — is comfortably met.
 
 **Files touched (II-5)**
@@ -1490,7 +1490,7 @@ the pre-RE017 baseline (`HEAD-941f62c`):
 | Scenario | Pre-RE017 | After II-5 | Δ | Gate |
 |---|---|---|---|---|
 | paint-ascii | 234.27 µs | 234.35 µs | +0.0% | ok |
-| paint-theme-set | 633.92 µs | 628.55 µs | −0.8% | ok |
+| paint-set-hex-palette | 633.92 µs | 628.55 µs | −0.8% | ok |
 | paint-gradient-rgb | 946.29 µs | 934.49 µs | −1.2% | ok |
 | diff-gradient | 2.13 ms | 1.45 ms | **−31.7%** | **GOOD** |
 
@@ -1502,8 +1502,8 @@ all 9 bench v2 scenarios:
 |---|---|---|---|---|
 | paint-ascii | 231 µs | 234 µs | +1.3% | ok |
 | paint-rgb-fixed | 145 µs | 145 µs | −0.3% | ok |
-| paint-theme-set | 635 µs | 629 µs | −1.0% | ok |
-| paint-theme-set-fast | 328 µs | 330 µs | +0.6% | ok |
+| paint-set-hex-palette | 635 µs | 629 µs | −1.0% | ok |
+| paint-set-preparsed-palette | 328 µs | 330 µs | +0.6% | ok |
 | paint-gradient-rgb | 950 µs | 934 µs | −1.6% | ok |
 | diff-gradient | 2.08 ms | 1.45 ms | **−30.0%** | **GOOD** |
 | diff-sparse | 349 µs | 125 µs | **−64.1%** | **GOOD** |

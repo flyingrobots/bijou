@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getScenario,
   listScenarioTags,
   parseScenarioTagGroup,
   scenarioMatchesTagGroups,
@@ -39,5 +40,10 @@ describe('scenario tag helpers', () => {
     expect(listScenarioTags()).toContain('diff');
     expect(listScenarioTags()).toContain('paint');
     expect(listScenarioTags()).toContain('unique-styles');
+  });
+
+  it('resolves legacy scenario ids through aliases', () => {
+    expect(getScenario('paint-theme-set').id).toBe('paint-set-hex-palette');
+    expect(getScenario('paint-theme-set-fast').id).toBe('paint-set-preparsed-palette');
   });
 });
