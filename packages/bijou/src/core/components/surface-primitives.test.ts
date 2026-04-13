@@ -186,6 +186,24 @@ describe('surface-first primitives', () => {
     expect(rendered).toContain('┌');
   });
 
+  it('tableSurface supports the common shorthand call shape', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const rendered = stripAnsi(surfaceToString(tableSurface(
+      [
+        { header: 'Status' },
+        { header: 'Score' },
+      ],
+      [
+        [badge('LIVE', { variant: 'success', ctx }), '95'],
+      ],
+      ctx,
+    ), ctx.style));
+
+    expect(rendered).toContain('Status');
+    expect(rendered).toContain('LIVE');
+    expect(rendered).toContain('95');
+  });
+
   it('tableSurface paints the requested header background into the surface cells', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const surface = tableSurface({

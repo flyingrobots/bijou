@@ -1,4 +1,16 @@
+---
+title: DX-003 — Rationalize Table APIs and Public Table Types
+lane: graveyard
+legend: DX
+---
+
 # DX-003 — Rationalize Table APIs and Public Table Types
+
+## Disposition
+
+Implemented on release/v4.5.0 by adding common table shorthands for table() and tableSurface(), introducing clearer public row types for plain and surface tables, and broadening navigable-table inputs so lightweight snapshots no longer require a separate state mental model for simple rendering. Focused table, surface, and navigable-table tests now prove the family feels consistent across plain and interactive use.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 

@@ -1,14 +1,22 @@
+import type { BijouContext } from '../../ports/context.js';
 import { createSurface, isPackedSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import type { TableOptions } from './table.js';
+import type { TableColumn, TableOptions } from './table.js';
 import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
 import { parseHex, encodeModifiers } from '../render/packed-cell.js';
 
 export type TableSurfaceCell = string | Surface;
+export type TableSurfaceRow = readonly TableSurfaceCell[];
 
 export interface TableSurfaceOptions extends Omit<TableOptions, 'rows'> {
-  readonly rows: TableSurfaceCell[][];
+  readonly rows: readonly TableSurfaceRow[];
+}
+
+function isTableSurfaceOptions(
+  value: TableSurfaceOptions | readonly TableColumn[],
+): value is TableSurfaceOptions {
+  return !Array.isArray(value);
 }
 
 function normalizeColumnWidth(width: number | undefined): number | undefined {
@@ -30,7 +38,23 @@ function resolveColumns(
 /**
  * Render a bordered data table as a Surface for V3-native composition.
  */
-export function tableSurface(options: TableSurfaceOptions): Surface {
+export function tableSurface(options: TableSurfaceOptions): Surface;
+export function tableSurface(
+  columns: readonly TableColumn[],
+  rows: readonly TableSurfaceRow[],
+  context?: BijouContext,
+): Surface;
+export function tableSurface(
+  optionsOrColumns: TableSurfaceOptions | readonly TableColumn[],
+  rowData?: readonly TableSurfaceRow[],
+  context?: BijouContext,
+): Surface {
+  let options: TableSurfaceOptions;
+  if (isTableSurfaceOptions(optionsOrColumns)) {
+    options = optionsOrColumns;
+  } else {
+    options = { columns: [...optionsOrColumns], rows: rowData ?? [], ctx: context };
+  }
   const ctx = resolveCtx(options.ctx);
   const overflow = resolveOverflowBehavior(
     options.overflow,

@@ -58,7 +58,7 @@ Bijou provides two primary output formats:
 - **`separator()`**: Section divider with an optional label.
 
 ### Data & Hierarchy
-- **`table()` / `tableSurface()`**: Passive row/column comparison.
+- **`table()` / `tableSurface()`**: Passive row/column comparison. The common case now supports `table(columns, rows, ctx)` and `tableSurface(columns, rows, ctx)` shorthands, while the object form remains available for advanced token/overflow options.
 - **`tree()`**: Parent/child nesting.
 - **`timeline()`**: Chronological sequences.
 - **`dag()` / `dagSlice()`**: Causal or dependency-based graphs.

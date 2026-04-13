@@ -23,6 +23,17 @@ describe('table', () => {
     expect(result).toContain('─'); // table border chars
   });
 
+  it('supports the common shorthand call shape', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const result = table(columns, rows, ctx);
+
+    expect(result).toBe([
+      'Name\tStatus\tScore',
+      'Alice\tactive\t95',
+      'Bob\tpending\t72',
+    ].join('\n'));
+  });
+
   it('wraps fixed-width cell content by default', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = table({

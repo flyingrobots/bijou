@@ -16,12 +16,15 @@ export interface TableColumn {
   width?: number;
 }
 
+export type TableTextCell = string;
+export type TableTextRow = readonly TableTextCell[];
+
 /** Configuration for rendering a table. */
 export interface TableOptions extends BijouNodeOptions {
   /** Column definitions (headers and optional widths). */
-  columns: TableColumn[];
+  columns: readonly TableColumn[];
   /** Two-dimensional array of cell strings, one inner array per row. */
-  rows: string[][];
+  rows: readonly TableTextRow[];
   /** Theme token applied to header text. */
   headerToken?: TokenValue;
   /** Theme token applied to border characters. */
@@ -30,6 +33,10 @@ export interface TableOptions extends BijouNodeOptions {
   headerBgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
+}
+
+function isTableOptions(value: TableOptions | readonly TableColumn[]): value is TableOptions {
+  return !Array.isArray(value);
 }
 
 /**
@@ -210,7 +217,23 @@ function wrapCellToWidth(str: string, maxWidth: number): string[] {
  * @param options - Table configuration including columns and row data.
  * @returns The rendered table string.
  */
-export function table(options: TableOptions): string {
+export function table(options: TableOptions): string;
+export function table(
+  columns: readonly TableColumn[],
+  rows: readonly TableTextRow[],
+  context?: BijouContext,
+): string;
+export function table(
+  optionsOrColumns: TableOptions | readonly TableColumn[],
+  rowData?: readonly TableTextRow[],
+  context?: BijouContext,
+): string {
+  let options: TableOptions;
+  if (isTableOptions(optionsOrColumns)) {
+    options = optionsOrColumns;
+  } else {
+    options = { columns: [...optionsOrColumns], rows: rowData ?? [], ctx: context };
+  }
   const ctx = resolveCtx(options.ctx);
   const columns = options.columns ?? [];
   const rows = (options.rows ?? []).map(row => (row ?? []).map(cell => cell ?? ''));

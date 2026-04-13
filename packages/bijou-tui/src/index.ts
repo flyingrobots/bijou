@@ -550,6 +550,7 @@ export {
 // Navigable table
 export {
   type NavigableTableState,
+  type NavigableTableInput,
   type NavigableTableOptions,
   type NavTableRenderOptions,
   type NavTableSurfaceOptions,

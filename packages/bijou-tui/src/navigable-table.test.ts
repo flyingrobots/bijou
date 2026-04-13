@@ -36,6 +36,13 @@ describe('navigableTable', () => {
       expect(state.height).toBe(3);
     });
 
+    it('supports the shorthand constructor shape', () => {
+      const state = createNavigableTableState(columns, rows, 3);
+      expect(state.height).toBe(3);
+      expect(state.rows).toEqual(rows);
+      expect(state.focusRow).toBe(0);
+    });
+
     it('clamps height to 1 when 0 is provided', () => {
       const state = createNavigableTableState({ columns, rows, height: 0 });
       expect(state.height).toBe(1);
@@ -154,6 +161,21 @@ describe('navigableTable', () => {
       expect(surface.height).toBeGreaterThan(0);
       expect(rendered).toContain('\u25b8');
       expect(rendered).toContain('Alice');
+    });
+
+    it('accepts a lightweight input snapshot instead of a full state object', () => {
+      const ctx = createTestContext({ mode: 'interactive' });
+      const surface = navigableTableSurface({
+        columns,
+        rows,
+        height: 3,
+        focusRow: 1,
+        scrollY: 0,
+      }, { ctx });
+      const rendered = surfaceToString(surface, ctx.style);
+
+      expect(rendered).toContain('\u25b8');
+      expect(rendered).toContain('Bob');
     });
 
     it('surface path keeps row-aware scrolling when rows wrap', () => {
