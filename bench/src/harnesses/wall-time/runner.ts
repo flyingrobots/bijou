@@ -8,6 +8,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import os from 'node:os';
@@ -31,6 +32,7 @@ export interface ChildSample {
 export interface ScenarioReport {
   readonly scenarioId: string;
   readonly label: string;
+  readonly tags: readonly string[];
   readonly columns: number;
   readonly rows: number;
   readonly warmupFrames: number;
@@ -41,6 +43,7 @@ export interface ScenarioReport {
 
 export interface RunReport {
   readonly kind: 'bench.v2';
+  readonly runId: string;
   readonly generatedAt: string;
   readonly commit: string | null;
   readonly fingerprint: Fingerprint;
@@ -168,6 +171,7 @@ export function runBench(options: RunOptions): RunReport {
     const report: ScenarioReport = {
       scenarioId: scenario.id,
       label: scenario.label,
+      tags: scenario.tags,
       columns: scenario.columns,
       rows: scenario.rows,
       warmupFrames,
@@ -181,6 +185,7 @@ export function runBench(options: RunOptions): RunReport {
 
   return {
     kind: 'bench.v2',
+    runId: randomUUID(),
     generatedAt: new Date().toISOString(),
     commit,
     fingerprint,

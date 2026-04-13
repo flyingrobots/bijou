@@ -3,13 +3,13 @@
  *
  * Subcommands:
  *   run       — wall-time bench. Spawns N children per scenario,
- *               aggregates stats, optionally writes a report JSON.
- *   compare   — diff two bench.v2 run reports.
+ *               aggregates stats, optionally writes a structured report.
+ *   compare   — diff two bench reports (nested JSON or flat JSONL).
  *   list      — print the scenario registry with IDs and labels.
  *
  * Usage:
  *   node --import tsx bench/src/cli.ts run [--scenario=ID] [--samples=30]
- *                                          [--warmup=N] [--frames=N]
+ *                                          [--warmup=N] [--frames=N] [--format=summary|json|jsonl]
  *                                          [--out=path.json]
  *   node --import tsx bench/src/cli.ts compare <baseline.json> <current.json>
  *   node --import tsx bench/src/cli.ts list
@@ -23,9 +23,13 @@ import {
   selectScenarios,
   type ScenarioTagGroup,
 } from './scenarios/index.js';
+import { formatReportAsJsonl } from './harnesses/wall-time/format-jsonl.js';
+import { readBenchReport } from './harnesses/wall-time/read-report.js';
 import { runBench, type RunReport } from './harnesses/wall-time/runner.js';
 import { compareReports, formatComparison } from './harnesses/wall-time/compare.js';
 import { formatNs } from './stats.js';
+
+type BenchOutputFormat = 'summary' | 'json' | 'jsonl';
 
 /**
  * Parse `--key=value`, `--key value`, and bare `--flag` forms.
@@ -83,6 +87,27 @@ function formatTagGroups(tagGroups: readonly ScenarioTagGroup[]): string {
   return tagGroups.map((group) => group.join('+')).join('|');
 }
 
+function parseOutputFormat(value: string | undefined): BenchOutputFormat {
+  if (value == null || value === 'summary') return 'summary';
+  if (value === 'json') return 'json';
+  if (value === 'jsonl' || value === 'flat') return 'jsonl';
+  throw new Error(`invalid --format: ${value} (expected summary, json, or jsonl)`);
+}
+
+function fileFormatForOutput(format: BenchOutputFormat): Exclude<BenchOutputFormat, 'summary'> {
+  return format === 'summary' ? 'json' : format;
+}
+
+function defaultOutExtension(format: Exclude<BenchOutputFormat, 'summary'>): string {
+  return format === 'jsonl' ? 'jsonl' : 'json';
+}
+
+function renderStructuredReport(report: RunReport, format: Exclude<BenchOutputFormat, 'summary'>): string {
+  return format === 'json'
+    ? JSON.stringify(report, null, 2) + '\n'
+    : formatReportAsJsonl(report);
+}
+
 function positional(argv: readonly string[]): string[] {
   // Positionals are non-flag args that are not consumed as values for
   // preceding `--key value` flags. We walk the argv mirroring parseKv's
@@ -134,6 +159,7 @@ function cmdRun(argv: readonly string[]): void {
   const framesOverride = kv.get('frames');
   const scenarioArg = kv.get('scenario');
   const outArg = kv.get('out');
+  const format = parseOutputFormat(kv.get('format'));
   const tagGroups = parseTagGroups(argv);
 
   const requestedScenarioIds =
@@ -164,9 +190,14 @@ function cmdRun(argv: readonly string[]): void {
     },
   });
 
-  printSummary(report);
+  if (format === 'summary') {
+    printSummary(report);
+  } else {
+    process.stdout.write(renderStructuredReport(report, format));
+  }
 
   if (outArg != null) {
+    const outFormat = fileFormatForOutput(format);
     let outPath = resolve(process.cwd(), outArg);
     // If the user gave a directory, auto-name the file.
     try {
@@ -174,13 +205,13 @@ function cmdRun(argv: readonly string[]): void {
       if (stat.isDirectory()) {
         const stamp = new Date().toISOString().replace(/[:.]/g, '-');
         const commit = report.commit ?? 'unknown';
-        outPath = join(outPath, `bench-${stamp}-${commit}.json`);
+        outPath = join(outPath, `bench-${stamp}-${commit}.${defaultOutExtension(outFormat)}`);
       }
     } catch {
       // doesn't exist — assume it's a file path
     }
     mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+    writeFileSync(outPath, renderStructuredReport(report, outFormat), 'utf8');
     process.stderr.write(`\nsaved: ${outPath}\n`);
   }
 }
@@ -207,8 +238,8 @@ function cmdCompare(argv: readonly string[]): void {
   }
   const baselinePath = resolve(process.cwd(), positionals[0]!);
   const currentPath = resolve(process.cwd(), positionals[1]!);
-  const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as RunReport;
-  const current = JSON.parse(readFileSync(currentPath, 'utf8')) as RunReport;
+  const baseline = readBenchReport(baselinePath);
+  const current = readBenchReport(currentPath);
   const comparison = compareReports(baseline, current);
   process.stdout.write(formatComparison(comparison) + '\n');
 }
@@ -223,10 +254,11 @@ function main(): void {
         'bijou-bench — performance harness',
         '',
         'usage:',
-        '  bench run [--scenario=ID|all] [--tag=TAG[,TAG]] [--samples=30] [--warmup=N] [--frames=N] [--out=path]',
+        '  bench run [--scenario=ID|all] [--tag=TAG[,TAG]] [--samples=30] [--warmup=N] [--frames=N] [--format=summary|json|jsonl] [--out=path]',
         '  bench compare <baseline.json> <current.json>',
         '  bench list [--tag=TAG[,TAG]]',
         '',
+        'Formats: summary=human table (default), json=nested bench.v2, jsonl=flat metric records.',
         'Tag filters: comma-separated tags are AND within one --tag, repeated --tag flags are OR across groups.',
         `scenarios: ${listScenarioIds().join(', ')}`,
       ].join('\n') + '\n',

@@ -49,6 +49,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [DX-017 — Agent-First Bench Output Format](../graveyard/DX-017-agent-first-bench-output-format.md)
   - [DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering](../graveyard/DX-016-scenario-provenance-tags.md)
   - [DX-015 — Perf Gradient as CI Benchmark](../graveyard/DX_015-perf-gradient-as-ci-benchmark.md)
   - [DX-014 — Fix Root README Interactive Example](../graveyard/DX_014-readme-interactive-example-fix.md)

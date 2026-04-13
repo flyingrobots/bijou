@@ -48,6 +48,10 @@ npm run bench -- run --scenario=paint-gradient-rgb
 npm run bench -- run --tag=diff
 npm run bench -- run --tag=paint,unique-styles
 
+# Emit structured output instead of the default summary
+npm run bench -- run --format=json
+npm run bench -- run --format=jsonl
+
 # Run the fixed CI gradient lane locally
 npm run -s bench:ci:gradient
 
@@ -78,6 +82,14 @@ npm run bench -- run --tag=diff
 npm run bench -- run --tag=paint,unique-styles
 npm run bench -- list --tag=dogfood
 ```
+
+Output formats are also selectable:
+
+- default console output: human summary table
+- `--format=json`: nested `bench.v2` JSON
+- `--format=jsonl` or `--format=flat`: one metric record per line
+
+`bench compare` accepts either nested JSON or flat JSONL reports.
 
 ## Adding a scenario
 

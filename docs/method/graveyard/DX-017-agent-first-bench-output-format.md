@@ -1,4 +1,15 @@
+---
+title: DX-017 — Agent-First Bench Output Format
+lane: graveyard
+---
+
 # DX-017 — Agent-First Bench Output Format
+
+## Disposition
+
+Shipped an additive flat bench output format. bench run now supports --format=json for nested bench.v2 output and --format=jsonl/--format=flat for one-metric-per-line records, compare auto-detects nested JSON vs flat JSONL, RunReport now carries a stable runId, and the bench docs describe the new structured output contract while preserving the existing human summary as the default console view.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 
