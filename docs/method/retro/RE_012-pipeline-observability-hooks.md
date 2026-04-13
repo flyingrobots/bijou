@@ -1,10 +1,21 @@
 ---
 title: RE-012 — Pipeline Observability Hooks
-lane: asap
+lane: retro
 legend: RE
 ---
 
 # RE-012 — Pipeline Observability Hooks
+
+## Disposition
+
+Completed on `release/v4.5.0`. The programmable render pipeline now exposes
+`pipeline.onStageComplete(...)` observers, records per-stage timing samples in
+`RenderState.data`, and ships `getRenderStageTimings(state)` as the typed read
+path for middleware and apps. Stage timings are emitted in global stage order,
+include empty stages as zero-duration samples, and are visible both through the
+observer callback and the shared per-frame metadata bag.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

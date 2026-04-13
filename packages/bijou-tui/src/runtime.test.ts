@@ -4,6 +4,7 @@ import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@f
 import { run } from './runtime.js';
 import { quit } from './commands.js';
 import type { App, KeyMsg, Cmd } from './types.js';
+import { getRenderStageTimings } from './pipeline/pipeline.js';
 import {
   ENTER_ALT_SCREEN,
   HIDE_CURSOR,
@@ -432,6 +433,39 @@ describe('run', () => {
       await promise;
 
       expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
+    });
+
+    it('exposes per-stage pipeline timings through observers and render state data', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const completed: string[] = [];
+      const seenDuringDiff: string[][] = [];
+      const app: App<null, never> = {
+        init: () => [null, [quit()]],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      const promise = run(app, {
+        ctx,
+        configurePipeline(pipeline) {
+          pipeline.onStageComplete((stage, _durationMs, state) => {
+            completed.push(stage);
+            if (stage === 'Diff') {
+              seenDuringDiff.push(getRenderStageTimings(state).map((timing) => timing.stage));
+            }
+          });
+        },
+      });
+
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(completed).toEqual(['Layout', 'Paint', 'PostProcess', 'Diff', 'Output']);
+      expect(seenDuringDiff).toEqual([['Layout', 'Paint', 'PostProcess', 'Diff']]);
     });
 
     it('forces a clean redraw when the terminal resizes', async () => {

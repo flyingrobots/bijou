@@ -72,6 +72,32 @@ run(app, {
 Because `configurePipeline()` appends after the defaults, this middleware runs
 after `paintMiddleware()` and before the built-in `Diff` stage.
 
+## Stage Timing Hooks
+
+The pipeline also exposes per-stage timing observers:
+
+```typescript
+import { getRenderStageTimings, run } from '@flyingrobots/bijou-tui';
+
+run(app, {
+  configurePipeline(pipeline) {
+    pipeline.onStageComplete((stage, durationMs, state) => {
+      console.log(stage, durationMs);
+      console.log(getRenderStageTimings(state));
+    });
+  },
+});
+```
+
+Important details:
+
+- `onStageComplete(...)` fires after each stage finishes, in global stage order.
+- `getRenderStageTimings(state)` reads the current frame's timings from
+  `state.data`.
+- The timings array is replaced on every `pipeline.execute(state)` call.
+- Empty stages still report a timing sample so callers can see the full frame
+  breakdown.
+
 ## RenderState
 
 The public `RenderState` contract gives middleware these fields:
@@ -94,6 +120,8 @@ The public `RenderState` contract gives middleware these fields:
   built-in middleware does not populate it yet.
 - `data`
   Shared per-frame scratch bag for middleware coordination.
+  The pipeline now stores per-stage timings here; prefer
+  `getRenderStageTimings(state)` over reaching into raw keys yourself.
 
 ## Important Internal Wrinkle
 
@@ -110,6 +138,7 @@ If you need to share your own state between middleware, use `state.data`.
 - `configurePipeline` is called once during `run()` setup, after the built-in
   middleware is registered.
 - `pipeline.use(stage, middleware)` appends to that stage.
+- `pipeline.onStageComplete(handler)` subscribes to per-stage timing samples.
 - Stage order is fixed. You cannot insert a new stage between `Paint` and
   `PostProcess`, for example.
 - There is no public API for removing or replacing built-in middleware.

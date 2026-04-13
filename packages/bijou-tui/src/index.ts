@@ -168,8 +168,17 @@ export {
 export type { ViewOutput } from './view-output.js';
 
 // Pipeline
-export type { RenderState, RenderMiddleware, RenderStage, RenderPipeline } from './pipeline/pipeline.js';
-export { createPipeline } from './pipeline/pipeline.js';
+export type {
+  RenderState,
+  RenderMiddleware,
+  RenderStage,
+  RenderPipeline,
+  RenderStageTiming,
+  RenderStageCompleteHandler,
+  RenderStageObserver,
+  CreatePipelineOptions,
+} from './pipeline/pipeline.js';
+export { createPipeline, getRenderStageTimings, RENDER_STAGE_TIMINGS_KEY } from './pipeline/pipeline.js';
 export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
 
 // Sub-App Composition

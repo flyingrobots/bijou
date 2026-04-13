@@ -53,6 +53,21 @@ run(app, {
 });
 ```
 
+If you need frame breakdown data instead of another mutating middleware, hook
+the built-in stage observer:
+
+```typescript
+import { getRenderStageTimings, run } from '@flyingrobots/bijou-tui';
+
+run(app, {
+  configurePipeline: (p) => {
+    p.onStageComplete((stage, durationMs, state) => {
+      console.log(stage, durationMs, getRenderStageTimings(state));
+    });
+  },
+});
+```
+
 For the exact stage order, default runtime wiring, and `RenderState` contract,
 use the dedicated [render pipeline guide](../../docs/guides/render-pipeline.md).
 
