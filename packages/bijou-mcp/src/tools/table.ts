@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { table } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -14,7 +15,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const tableTool: ToolRegistration = {
+export const tableTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_table',
   description: 'Render a table with Unicode box-drawing borders. Returns a plain-text string with box-drawing characters that displays correctly in monospace contexts.',
   inputSchema: inputShape,
@@ -24,4 +25,4 @@ export const tableTool: ToolRegistration = {
     const result = table({ columns: input.columns, rows: input.rows, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

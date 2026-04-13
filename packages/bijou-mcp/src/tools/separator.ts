@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { separator } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -11,7 +12,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const separatorTool: ToolRegistration = {
+export const separatorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_separator',
   description: 'Render a horizontal separator line with an optional centered label.',
   inputSchema: inputShape,
@@ -21,4 +22,4 @@ export const separatorTool: ToolRegistration = {
     const result = separator({ label: input.label, width: input.width, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

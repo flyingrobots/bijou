@@ -157,6 +157,12 @@ renders correctly in any monospace context.
 Each tool accepts structured JSON input, renders via the corresponding
 Bijou component, and returns the result as a plain text string.
 
+All tools also accept an optional `output` field:
+
+- `text` (default): return the rendered plain-text output in `content`
+- `data`: return only MCP `structuredContent` with machine-readable semantic payload
+- `both`: return both the rendered text and the structured payload
+
 ## License
 
 Apache-2.0

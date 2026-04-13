@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { kbd } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -10,7 +11,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const kbdTool: ToolRegistration = {
+export const kbdTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_kbd',
   description: 'Render a keyboard key indicator (like an HTML <kbd> element). Shows a styled key label.',
   inputSchema: inputShape,
@@ -20,4 +21,4 @@ export const kbdTool: ToolRegistration = {
     const result = kbd(input.key, { ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

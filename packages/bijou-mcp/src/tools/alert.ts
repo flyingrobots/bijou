@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { alert } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -12,7 +13,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const alertTool: ToolRegistration = {
+export const alertTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_alert',
   description: 'Render an alert box with an icon and message. Variants: success (✓), error (✗), warning (⚠), info (ℹ). Returns plain-text with box-drawing characters.',
   inputSchema: inputShape,
@@ -22,4 +23,4 @@ export const alertTool: ToolRegistration = {
     const result = alert(input.message, { variant: input.variant, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

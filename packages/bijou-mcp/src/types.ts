@@ -10,6 +10,7 @@ export interface ToolResultContent {
 export interface ToolResult {
   [key: string]: unknown;
   content: ToolResultContent[];
+  structuredContent?: Record<string, unknown>;
 }
 
 /** Zod raw shape: keys mapping to Zod types, as MCP SDK expects. */
@@ -20,5 +21,6 @@ export interface ToolRegistration {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: ZodShape;
+  readonly outputSchema?: ZodShape;
   readonly handler: (args: Record<string, unknown>) => Promise<ToolResult>;
 }

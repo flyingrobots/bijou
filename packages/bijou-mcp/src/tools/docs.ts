@@ -14,6 +14,11 @@ import {
 } from '@flyingrobots/bijou';
 import { plainStyle } from '@flyingrobots/bijou/adapters/test';
 import { mcpContext } from '../context.js';
+import {
+  buildStructuredToolResult,
+  structuredToolOutputShape,
+  withOutputMode,
+} from '../output.js';
 import type { ToolRegistration, ToolResult } from '../types.js';
 
 interface ToolInteractionProfiles {
@@ -848,7 +853,10 @@ function scoreDocsEntry(entry: ToolDocsCatalogEntry, normalizedQuery: string): n
 }
 
 function exampleText(result: ToolResult): string {
-  return result.content.find((block) => block.type === 'text')?.text ?? '';
+  return result.content.find((block) => block.type === 'text')?.text
+    ?? (typeof result.structuredContent?.['rendered'] === 'string'
+      ? result.structuredContent['rendered']
+      : '');
 }
 
 function resolvedInteractionProfiles(
@@ -872,17 +880,18 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
     return { entry, tool, docsOnlyRenderer, mcpExposed: tool !== undefined };
   });
 
-  const inputShape = {
+  const inputShape = withOutputMode({
     query: z.string().optional().describe('Tool or component query (for example "table", "dag", or "progress").'),
     limit: z.number().int().positive().max(50).optional().describe('Maximum number of entries to return.'),
     includeExamples: z.boolean().optional().describe('Include rendered example output and sample input for the returned entries. Defaults to true when the result set is small.'),
-  };
+  });
   const inputSchema = z.object(inputShape);
 
   return {
     name: 'bijou_docs',
     description: 'Query machine-readable documentation for bijou-mcp render tools plus selected first-party Bijou component families that do not yet have a dedicated MCP renderer. Returns usage guidance, interaction-profile notes, related tools, sample input, and optional rendered example output.',
     inputSchema: inputShape,
+    outputSchema: structuredToolOutputShape,
     handler: async (args) => {
       const input = inputSchema.parse(args);
       const normalizedQuery = normalizeDocsTerm(input.query ?? '');
@@ -939,9 +948,11 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
         entries,
       };
 
-      return {
-        content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
-      };
+      return buildStructuredToolResult(
+        JSON.stringify(payload, null, 2),
+        payload,
+        input.output ?? 'text',
+      );
     },
   };
 }

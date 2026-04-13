@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { inspector } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -21,7 +22,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const inspectorTool: ToolRegistration = {
+export const inspectorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_inspector',
   description: 'Render an inspector panel with a title, primary value, supporting text, and detail sections.',
   inputSchema: inputShape,
@@ -36,4 +37,4 @@ export const inspectorTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

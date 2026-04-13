@@ -74,12 +74,11 @@ const server = new McpServer({
 });
 
 for (const tool of [...TOOLS, docsTool]) {
-  server.tool(
-    tool.name,
-    tool.description,
-    tool.inputSchema,
-    async (args) => tool.handler(args as Record<string, unknown>),
-  );
+  server.registerTool(tool.name, {
+    description: tool.description,
+    inputSchema: tool.inputSchema,
+    outputSchema: tool.outputSchema,
+  }, async (args) => tool.handler(args as Record<string, unknown>));
 }
 
 const transport = new StdioServerTransport();

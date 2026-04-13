@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { box, headerBox } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const boxShape = {
@@ -23,7 +24,7 @@ const headerBoxShape = {
 
 const headerBoxSchema = z.object(headerBoxShape);
 
-export const boxTool: ToolRegistration = {
+export const boxTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_box',
   description: 'Render text inside a Unicode bordered box. Returns plain-text with box-drawing characters.',
   inputSchema: boxShape,
@@ -39,9 +40,9 @@ export const boxTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});
 
-export const headerBoxTool: ToolRegistration = {
+export const headerBoxTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_header_box',
   description: 'Render a labeled box with an optional detail line. Returns plain-text with box-drawing characters.',
   inputSchema: headerBoxShape,
@@ -57,4 +58,4 @@ export const headerBoxTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

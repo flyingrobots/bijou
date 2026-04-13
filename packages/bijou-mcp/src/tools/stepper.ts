@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { stepper } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -13,7 +14,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const stepperTool: ToolRegistration = {
+export const stepperTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_stepper',
   description: 'Render a horizontal step-progress indicator with checkmarks, dots, and connectors. Returns plain-text with Unicode characters.',
   inputSchema: inputShape,
@@ -23,4 +24,4 @@ export const stepperTool: ToolRegistration = {
     const result = stepper(input.steps, { current: input.current, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

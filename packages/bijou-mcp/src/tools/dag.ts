@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { dag } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -16,7 +17,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const dagTool: ToolRegistration = {
+export const dagTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_dag',
   description: 'Render a directed graph with boxed nodes and edge lines. Returns plain-text with Unicode box-drawing characters.',
   inputSchema: inputShape,
@@ -27,4 +28,4 @@ export const dagTool: ToolRegistration = {
     const result = dag(input.nodes, { maxWidth: input.maxWidth, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

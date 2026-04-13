@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { accordion } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -14,7 +15,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const accordionTool: ToolRegistration = {
+export const accordionTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_accordion',
   description: 'Render collapsible accordion sections with expand/collapse indicators. Returns plain-text with Unicode arrow characters.',
   inputSchema: inputShape,
@@ -24,4 +25,4 @@ export const accordionTool: ToolRegistration = {
     const result = accordion(input.sections, { ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

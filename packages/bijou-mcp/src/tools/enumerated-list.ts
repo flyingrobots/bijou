@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { enumeratedList } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -14,7 +15,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const enumeratedListTool: ToolRegistration = {
+export const enumeratedListTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_enumerated_list',
   description: 'Render a list with bullets, numbers (arabic), letters (alpha), roman numerals, or dashes.',
   inputSchema: inputShape,
@@ -26,4 +27,4 @@ export const enumeratedListTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});
