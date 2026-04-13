@@ -74,18 +74,25 @@ export function createPipeline(): RenderPipeline {
   };
 
   const STAGE_ORDER: RenderStage[] = ['Layout', 'Paint', 'PostProcess', 'Diff', 'Output'];
+  let cachedChain: RenderMiddleware[] = [];
+  let chainDirty = true;
 
   function use(stage: RenderStage, middleware: RenderMiddleware): void {
     stages[stage].push(middleware);
+    chainDirty = true;
+  }
+
+  function getExecutionChain(): RenderMiddleware[] {
+    if (chainDirty) {
+      cachedChain = STAGE_ORDER.flatMap((stage) => stages[stage]);
+      chainDirty = false;
+    }
+
+    return cachedChain;
   }
 
   function execute(state: RenderState): void {
-    // Flatten all middleware into a single execution chain based on stage order
-    const chain: RenderMiddleware[] = [];
-    for (const stage of STAGE_ORDER) {
-      chain.push(...stages[stage]);
-    }
-
+    const chain = getExecutionChain();
     let index = 0;
 
     const next = () => {

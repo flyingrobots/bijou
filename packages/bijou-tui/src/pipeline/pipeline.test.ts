@@ -78,4 +78,31 @@ describe('createPipeline', () => {
     expect(log).toEqual(['1', '3']); // Continued after error
     expect(state.ctx.io.writeError).toHaveBeenCalledWith(expect.stringContaining('[Pipeline Error]'));
   });
+
+  it('reuses the flattened chain until middleware registration changes', () => {
+    const flatMapSpy = vi.spyOn(Array.prototype, 'flatMap');
+    const pipeline = createPipeline();
+    const log: string[] = [];
+
+    pipeline.use('Layout', (_, next) => { log.push('layout'); next(); });
+    pipeline.use('Paint', (_, next) => { log.push('paint'); next(); });
+
+    pipeline.execute(createMockState());
+    pipeline.execute(createMockState());
+
+    expect(flatMapSpy).toHaveBeenCalledTimes(1);
+    expect(log).toEqual(['layout', 'paint', 'layout', 'paint']);
+
+    pipeline.use('PostProcess', (_, next) => { log.push('post'); next(); });
+    pipeline.execute(createMockState());
+
+    expect(flatMapSpy).toHaveBeenCalledTimes(2);
+    expect(log).toEqual([
+      'layout', 'paint',
+      'layout', 'paint',
+      'layout', 'paint', 'post',
+    ]);
+
+    flatMapSpy.mockRestore();
+  });
 });

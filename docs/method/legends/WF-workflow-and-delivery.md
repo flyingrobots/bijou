@@ -51,5 +51,5 @@ An agent can place docs, tests, and follow-on debt in the right location by read
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - live backlog:
   - [WF-002 — Migrate Legacy Planning Artifacts](../backlog/WF_002-migrate-legacy-planning-artifacts.md)
-- migration debt still worth tracking:
-  - [RE-011 — Eliminate Per-Frame Allocation in Render Pipeline](../backlog/up-next/RE_011-pipeline-per-frame-allocation.md)
+- next runtime-engine issue in the live backlog:
+  - [RE-016: DAG renderer should handle cycles gracefully](../backlog/RE_016-dag-cycle-graceful-handling.md)

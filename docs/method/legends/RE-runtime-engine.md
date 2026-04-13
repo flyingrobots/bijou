@@ -71,4 +71,4 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 - previous completed cycle:
   - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - next queue note:
-  - [RE-011 — Eliminate Per-Frame Allocation in Render Pipeline](../backlog/up-next/RE_011-pipeline-per-frame-allocation.md)
+  - [RE-016: DAG renderer should handle cycles gracefully](../backlog/RE_016-dag-cycle-graceful-handling.md)

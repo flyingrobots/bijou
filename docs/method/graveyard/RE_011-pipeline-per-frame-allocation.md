@@ -1,10 +1,16 @@
 ---
 title: RE-011 — Eliminate Per-Frame Allocation in Render Pipeline
-lane: up-next
+lane: graveyard
 legend: RE
 ---
 
 # RE-011 — Eliminate Per-Frame Allocation in Render Pipeline
+
+## Disposition
+
+Implemented on release/v4.5.0 by caching the flattened render middleware chain inside createPipeline(), marking it dirty only when use() mutates the stage registry, and covering cache reuse plus invalidation in pipeline tests. The per-frame chain allocation is no longer live backlog work.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
