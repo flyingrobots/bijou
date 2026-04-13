@@ -64,6 +64,20 @@ const myShader: TransitionShaderFn = ({ progress, x, width, ctx }) => {
 };
 ```
 
+For canvas-style shader authoring, `@flyingrobots/bijou-tui` now re-exports the
+core types that usually travel with the API:
+```typescript
+import { canvas, type ShaderFn, type Surface, type BijouContext } from '@flyingrobots/bijou-tui';
+
+const wave: ShaderFn = ({ u, v, time }) => ({
+  char: u + v + time > 1 ? 'X' : ' ',
+});
+
+function renderWave(_ctx: BijouContext): Surface {
+  return canvas(24, 8, wave);
+}
+```
+
 ## Advanced Logic
 
 - **Event Bus Middleware**: Intercept or transform every message in the system.

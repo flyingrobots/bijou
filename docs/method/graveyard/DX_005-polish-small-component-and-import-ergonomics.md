@@ -1,4 +1,16 @@
+---
+title: DX-005 — Polish Small Component and Import Ergonomics
+lane: graveyard
+legend: DX
+---
+
 # DX-005 — Polish Small Component and Import Ergonomics
+
+## Disposition
+
+Closed the remaining live DX-005 import seam by re-exporting BijouContext, Cell, and Surface from @flyingrobots/bijou-tui so canvas/shader authoring can stay on a single package-root import, added a type-level regression proving the single-import path works, and refreshed advanced docs accordingly. The older boxSurface title-padding subfinding is already satisfied by current repo truth: box() and boxSurface() both inject calm default title spacing internally rather than requiring manual spaces.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 

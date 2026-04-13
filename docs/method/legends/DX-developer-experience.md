@@ -49,9 +49,10 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [DX-005 — Polish Small Component and Import Ergonomics](../graveyard/DX_005-polish-small-component-and-import-ergonomics.md)
   - [DX-004 — Smooth Surface and String Composition Seams](../graveyard/DX_004-smooth-surface-and-string-composition-seams.md)
   - [DX-003 — Rationalize Table APIs and Public Table Types](../graveyard/DX_003-rationalize-table-apis-and-public-table-types.md)
   - [DX-001 — Type Framed App Messages and Updates End-to-End](../design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
   - [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 - live backlog:
-  - [DX-005 — Polish Small Component and Import Ergonomics](../BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)
+  - no dedicated DX cycle is live right now

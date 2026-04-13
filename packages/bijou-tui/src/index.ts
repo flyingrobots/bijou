@@ -7,6 +7,9 @@
  * @module
  */
 
+// Common core types paired with TUI authoring surfaces
+export type { BijouContext, Cell, Surface } from '@flyingrobots/bijou';
+
 // Types
 export type {
   App,
