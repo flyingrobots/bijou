@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createSurface, stringToSurface, type Surface } from '@flyingrobots/bijou';
-import { hstackSurface, placeSurface, vstackSurface } from './surface-layout.js';
+import { contentSurface, hstackSurface, placeSurface, vstackSurface } from './surface-layout.js';
 
 function plainSurface(surface: Surface): string {
   const lines: string[] = [];
@@ -14,10 +14,31 @@ function plainSurface(surface: Surface): string {
   return lines.join('\n');
 }
 
+describe('contentSurface', () => {
+  it('measures ANSI-colored multiline text before bridging into a surface', () => {
+    const result = contentSurface('\x1b[31mAB\x1b[0m\nZ');
+
+    expect(result.width).toBe(2);
+    expect(result.height).toBe(2);
+    expect(plainSurface(result)).toBe('AB\nZ ');
+  });
+});
+
 describe('vstackSurface', () => {
   it('stacks surfaces vertically and widens to the widest child', () => {
     const result = vstackSurface(
       stringToSurface('ab', 2, 1),
+      stringToSurface('x', 1, 1),
+    );
+
+    expect(result.width).toBe(2);
+    expect(result.height).toBe(2);
+    expect(plainSurface(result)).toBe('ab\nx ');
+  });
+
+  it('bridges string blocks at the composition edge', () => {
+    const result = vstackSurface(
+      'ab',
       stringToSurface('x', 1, 1),
     );
 
@@ -39,12 +60,35 @@ describe('hstackSurface', () => {
     expect(result.height).toBe(2);
     expect(plainSurface(result)).toBe('a cd\nb   ');
   });
+
+  it('bridges string blocks without forcing callers through stringToSurface first', () => {
+    const result = hstackSurface(
+      1,
+      'a\nb',
+      stringToSurface('cd', 2, 1),
+    );
+
+    expect(result.width).toBe(4);
+    expect(result.height).toBe(2);
+    expect(plainSurface(result)).toBe('a cd\nb   ');
+  });
 });
 
 describe('placeSurface', () => {
   it('left/top aligns by default', () => {
     const result = placeSurface(stringToSurface('hi', 2, 1), { width: 4, height: 2 });
     expect(plainSurface(result)).toBe('hi  \n    ');
+  });
+
+  it('accepts raw string content at the placement edge', () => {
+    const result = placeSurface('hi\nok', {
+      width: 4,
+      height: 3,
+      hAlign: 'right',
+      vAlign: 'bottom',
+    });
+
+    expect(plainSurface(result)).toBe('    \n  hi\n  ok');
   });
 
   it('centers content horizontally and vertically', () => {

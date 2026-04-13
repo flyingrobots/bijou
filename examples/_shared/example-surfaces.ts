@@ -10,7 +10,11 @@ import {
   type BijouContext,
   type Surface,
 } from '@flyingrobots/bijou';
-import { hstackSurface, vstackSurface } from '@flyingrobots/bijou-tui';
+import {
+  contentSurface as composeContentSurface,
+  hstackSurface,
+  vstackSurface,
+} from '@flyingrobots/bijou-tui';
 
 export function line(text: string, width = visibleWidth(text)): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), 1);
@@ -45,10 +49,7 @@ export function ansiSurface(text: string, width: number, height: number): Surfac
 }
 
 export function contentSurface(text: string): Surface {
-  const lines = text.split(/\r?\n/);
-  const width = Math.max(1, ...lines.map((line) => stripAnsi(line).length));
-  const height = Math.max(1, lines.length);
-  return parseAnsiToSurface(text, width, height);
+  return composeContentSurface(text);
 }
 
 export function badgeSurface(label: string, variant: BadgeVariant, ctx: BijouContext): Surface {
@@ -56,11 +57,11 @@ export function badgeSurface(label: string, variant: BadgeVariant, ctx: BijouCon
 }
 
 export function row(parts: readonly (string | Surface)[]): Surface {
-  return hstackSurface(0, ...parts.map((part) => typeof part === 'string' ? line(part) : part));
+  return hstackSurface(0, ...parts);
 }
 
 export function column(rows: readonly (string | Surface)[]): Surface {
-  return vstackSurface(...rows.map((entry) => typeof entry === 'string' ? contentSurface(entry) : entry));
+  return vstackSurface(...rows);
 }
 
 export function renderSurface(surface: Surface, ctx: BijouContext): string {

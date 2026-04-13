@@ -1,4 +1,16 @@
+---
+title: DX-004 — Smooth Surface and String Composition Seams
+lane: graveyard
+legend: DX
+---
+
 # DX-004 — Smooth Surface and String Composition Seams
+
+## Disposition
+
+Shipped a public mixed composition seam in @flyingrobots/bijou-tui: contentSurface() now bridges raw text into surface-land, vstackSurface()/hstackSurface()/placeSurface() accept string | Surface inputs at the composition edge, runtime view normalization points callers at the sanctioned bridge, and package docs now explain how to keep composition on the surface side without loosening App.view back to raw strings.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../legends/DX-developer-experience.md)
 

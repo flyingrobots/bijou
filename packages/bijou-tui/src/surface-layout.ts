@@ -1,10 +1,29 @@
-import { createSurface, type Surface } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  graphemeWidth,
+  parseAnsiToSurface,
+  stripAnsi,
+  type Surface,
+} from '@flyingrobots/bijou';
 import type { PlaceOptions } from './layout.js';
+
+export type SurfaceContent = string | Surface;
+
+/**
+ * Bridge raw text into surface-land at the composition edge.
+ */
+export function contentSurface(content: string): Surface {
+  const lines = content.split(/\r?\n/);
+  const width = Math.max(1, ...lines.map((line) => graphemeWidth(stripAnsi(line))));
+  const height = Math.max(1, lines.length);
+  return parseAnsiToSurface(content, width, height);
+}
 
 /**
  * Vertical stack for surfaces.
  */
-export function vstackSurface(...surfaces: Surface[]): Surface {
+export function vstackSurface(...content: SurfaceContent[]): Surface {
+  const surfaces = content.map(resolveSurfaceContent);
   if (surfaces.length === 0) return createSurface(0, 0);
 
   const width = Math.max(...surfaces.map(s => s.width));
@@ -24,7 +43,8 @@ export function vstackSurface(...surfaces: Surface[]): Surface {
 /**
  * Horizontal stack for surfaces with an optional gap.
  */
-export function hstackSurface(gap: number, ...surfaces: Surface[]): Surface {
+export function hstackSurface(gap: number, ...content: SurfaceContent[]): Surface {
+  const surfaces = content.map(resolveSurfaceContent);
   if (surfaces.length === 0) return createSurface(0, 0);
 
   const width = surfaces.reduce((acc, s) => acc + s.width, 0) + (surfaces.length - 1) * gap;
@@ -49,7 +69,8 @@ export function hstackSurface(gap: number, ...surfaces: Surface[]): Surface {
  * region, mirroring the string-based `place()` behavior. When the content is smaller than
  * the target rectangle, it is aligned within the blank result surface.
  */
-export function placeSurface(content: Surface, options: PlaceOptions): Surface {
+export function placeSurface(content: SurfaceContent, options: PlaceOptions): Surface {
+  const surfaceContent = resolveSurfaceContent(content);
   const width = Math.max(0, Math.floor(options.width));
   const height = Math.max(0, Math.floor(options.height));
   const hAlign = options.hAlign ?? 'left';
@@ -58,17 +79,17 @@ export function placeSurface(content: Surface, options: PlaceOptions): Surface {
   if (width === 0 || height === 0) return createSurface(0, 0);
 
   const result = createSurface(width, height);
-  const clipWidth = Math.min(width, content.width);
-  const clipHeight = Math.min(height, content.height);
+  const clipWidth = Math.min(width, surfaceContent.width);
+  const clipHeight = Math.min(height, surfaceContent.height);
 
   let col = 0;
-  if (content.width < width) {
+  if (surfaceContent.width < width) {
     switch (hAlign) {
       case 'right':
-        col = width - content.width;
+        col = width - surfaceContent.width;
         break;
       case 'center':
-        col = Math.floor((width - content.width) / 2);
+        col = Math.floor((width - surfaceContent.width) / 2);
         break;
       case 'left':
       default:
@@ -78,13 +99,13 @@ export function placeSurface(content: Surface, options: PlaceOptions): Surface {
   }
 
   let row = 0;
-  if (content.height < height) {
+  if (surfaceContent.height < height) {
     switch (vAlign) {
       case 'bottom':
-        row = height - content.height;
+        row = height - surfaceContent.height;
         break;
       case 'middle':
-        row = Math.floor((height - content.height) / 2);
+        row = Math.floor((height - surfaceContent.height) / 2);
         break;
       case 'top':
       default:
@@ -94,8 +115,12 @@ export function placeSurface(content: Surface, options: PlaceOptions): Surface {
   }
 
   if (clipWidth > 0 && clipHeight > 0) {
-    result.blit(content, Math.max(0, col), Math.max(0, row), 0, 0, clipWidth, clipHeight);
+    result.blit(surfaceContent, Math.max(0, col), Math.max(0, row), 0, 0, clipWidth, clipHeight);
   }
 
   return result;
+}
+
+function resolveSurfaceContent(content: SurfaceContent): Surface {
+  return typeof content === 'string' ? contentSurface(content) : content;
 }

@@ -54,6 +54,11 @@ await startApp(app);
 For Node hosts, prefer `startApp()` for the first-app path. Reach for
 `run(app, { ctx })` when the host owns context creation explicitly.
 
+When you need to mix small string fragments with surface-returning primitives,
+keep composition on the surface side: use `contentSurface()` directly or pass
+strings into `vstackSurface()` / `hstackSurface()`. Raw strings are still not a
+valid `view()` return type.
+
 ## Strategy: Choosing Component Families
 
 Select the family based on the interaction semantic.
