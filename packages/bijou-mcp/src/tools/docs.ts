@@ -1,4 +1,19 @@
 import { z } from 'zod';
+import {
+  brailleChartSurface,
+  guidedFlow,
+  markdown,
+  perfOverlaySurface,
+  preferenceListSurface,
+  sparkline,
+  spinnerFrame,
+  statsPanelSurface,
+  stripAnsi,
+  surfaceToString,
+  timer,
+} from '@flyingrobots/bijou';
+import { plainStyle } from '@flyingrobots/bijou/adapters/test';
+import { mcpContext } from '../context.js';
 import type { ToolRegistration, ToolResult } from '../types.js';
 
 interface ToolInteractionProfiles {
@@ -18,11 +33,12 @@ interface ToolDocsCatalogEntry {
   readonly avoidWhen: readonly string[];
   readonly interactionProfiles?: Partial<ToolInteractionProfiles>;
   readonly related: readonly string[];
-  readonly exampleArgs: Record<string, unknown>;
+  readonly exampleArgs?: Record<string, unknown>;
 }
 
 interface SerializedToolDocsEntry {
   readonly tool: string;
+  readonly mcpExposed: boolean;
   readonly family: string;
   readonly category: string;
   readonly summary: string;
@@ -40,6 +56,13 @@ const DEFAULT_INTERACTION_PROFILES: ToolInteractionProfiles = {
   static: 'Matches the interactive MCP output because the wrapper returns a plain-text rendering rather than a live terminal state.',
   pipe: 'Not separately lowered by the MCP wrapper; the returned result is already plain text suitable for logs, prompts, and transcripts.',
   accessible: 'No dedicated accessible lowering is exposed by this MCP wrapper yet, so callers should treat the plain-text structure as the accessible fallback.',
+};
+
+const DEFAULT_DOCS_ONLY_INTERACTION_PROFILES: ToolInteractionProfiles = {
+  interactive: 'No dedicated MCP render tool is exposed today. bijou_docs documents this first-party family directly and can synthesize a representative plain-text example when examples are requested.',
+  static: 'Matches the docs-only interactive sample because bijou_docs returns a plain-text reference rendering rather than a live terminal session.',
+  pipe: 'The synthesized example output is already plain text suitable for logs, prompts, and transcripts.',
+  accessible: 'No dedicated accessible lowering is exposed for this docs-only entry yet, so callers should treat the plain-text sample and guidance as the accessible fallback.',
 };
 
 export const MCP_DOCS_CATALOG: readonly ToolDocsCatalogEntry[] = [
@@ -525,7 +548,275 @@ export const MCP_DOCS_CATALOG: readonly ToolDocsCatalogEntry[] = [
       lines: 2,
     },
   },
+  {
+    toolName: 'bijou_markdown',
+    family: 'markdown()',
+    category: 'Narrative and Content',
+    summary: 'Mode-aware terminal markdown renderer for headings, lists, code blocks, links, and quotes.',
+    aliases: ['markdown', 'md', 'rich text', 'docs prose'],
+    useWhen: [
+      'Source text already exists as markdown and should stay authored that way.',
+      'You need headings, lists, quotes, and inline emphasis without rebuilding the prose by hand.',
+    ],
+    avoidWhen: [
+      'The content is structured data that should be table-, tree-, or graph-shaped.',
+      'You need one focused callout rather than a narrative document block.',
+    ],
+    related: ['hyperlink()', 'box()', 'guidedFlow()'],
+    exampleArgs: {
+      source: '# Release\n\n- Build\n- Test\n- Deploy',
+      width: 32,
+    },
+  },
+  {
+    toolName: 'bijou_guided_flow',
+    family: 'guidedFlow()',
+    category: 'Narrative and Content',
+    summary: 'Structured explainability block for posture, steps, sections, and next action.',
+    aliases: ['guided flow', 'runbook', 'operator guide', 'playbook'],
+    useWhen: [
+      'Readers need a guided operational story instead of an undifferentiated text dump.',
+      'You want summary, steps, supporting sections, and a next action inside one coherent block.',
+    ],
+    avoidWhen: [
+      'A lightweight list, table, or alert would explain the state more directly.',
+      'The content is free-form markdown rather than a guided operational flow.',
+    ],
+    related: ['explainability()', 'markdown()', 'stepper()'],
+    exampleArgs: {
+      title: 'Release canary',
+      label: 'Flow',
+      summary: 'Roll canaries to 25% before global promote.',
+      steps: [
+        { title: 'Build', status: 'complete' },
+        { title: 'Canary', status: 'current', detail: 'Watch error budget for 15 minutes.' },
+        { title: 'Promote', status: 'pending' },
+      ],
+      nextAction: 'Hold at 25% until latency stays green.',
+      width: 48,
+    },
+  },
+  {
+    toolName: 'bijou_preference_list',
+    family: 'preferenceListSurface()',
+    category: 'Forms and Settings',
+    summary: 'Structured settings list with toggles, actions, descriptions, and selected-row state.',
+    aliases: ['preference list', 'settings list', 'preferences', 'settings panel'],
+    useWhen: [
+      'Settings need sectioned rows, values, and secondary descriptions.',
+      'A shell or page needs a settings surface rather than an ad hoc list of toggles.',
+    ],
+    avoidWhen: [
+      'You only need one or two status pills or buttons.',
+      'The content is narrative guidance rather than configurable rows.',
+    ],
+    related: ['tabs()', 'box()', 'guidedFlow()'],
+    exampleArgs: {
+      sections: [
+        {
+          id: 'shell',
+          title: 'Shell',
+          rows: [
+            { id: 'theme', label: 'Theme', valueLabel: 'Verdant Plum', kind: 'choice' },
+            { id: 'perf', label: 'Perf HUD', checked: true, kind: 'toggle', description: 'Show development perf overlay.' },
+          ],
+        },
+      ],
+      width: 42,
+      selectedRowId: 'perf',
+    },
+  },
+  {
+    toolName: 'bijou_spinner',
+    family: 'spinnerFrame() / createSpinner()',
+    category: 'Feedback and Status',
+    summary: 'Inline spinner glyphs and live spinner controller for indeterminate work.',
+    aliases: ['spinner', 'loading spinner', 'busy indicator', 'working'],
+    useWhen: [
+      'Work is in flight but there is no honest percentage yet.',
+      'You need a compact live-status affordance rather than a large placeholder.',
+    ],
+    avoidWhen: [
+      'Progress is determinate enough for a progress bar or stepper.',
+      'The load state wants a full skeleton or empty-state narrative instead.',
+    ],
+    related: ['progressBar()', 'skeleton()', 'timer()'],
+    exampleArgs: {
+      tick: 3,
+      label: 'Build',
+    },
+  },
+  {
+    toolName: 'bijou_timer',
+    family: 'timer() / createTimer() / createStopwatch()',
+    category: 'Feedback and Status',
+    summary: 'Static and live timer family for countdowns, stopwatches, and elapsed-time readouts.',
+    aliases: ['timer', 'countdown', 'stopwatch', 'elapsed time'],
+    useWhen: [
+      'Time remaining or elapsed time is the core signal.',
+      'You need a compact time readout that can degrade across output modes.',
+    ],
+    avoidWhen: [
+      'The user needs task progression rather than wall-clock duration.',
+      'A timestamp label is enough and no live timer semantics are needed.',
+    ],
+    related: ['progressBar()', 'spinnerFrame() / createSpinner()', 'perfOverlaySurface()'],
+    exampleArgs: {
+      ms: 150000,
+      label: 'Deploy',
+    },
+  },
+  {
+    toolName: 'bijou_sparkline',
+    family: 'sparkline()',
+    category: 'Data Visualization',
+    summary: 'Compact inline trend graph using Unicode block characters.',
+    aliases: ['sparkline', 'inline chart', 'trend line', 'micro chart'],
+    useWhen: [
+      'You need a tiny trend summary inline with a metric.',
+      'A full chart would be too heavy for the available space.',
+    ],
+    avoidWhen: [
+      'The chart needs axes, dense labels, or higher detail.',
+      'The audience needs exact values rather than a quick trend read.',
+    ],
+    related: ['brailleChartSurface()', 'statsPanelSurface()', 'perfOverlaySurface()'],
+    exampleArgs: {
+      values: [1, 5, 3, 8, 2, 7],
+      width: 8,
+    },
+  },
+  {
+    toolName: 'bijou_braille_chart',
+    family: 'brailleChartSurface()',
+    category: 'Data Visualization',
+    summary: 'High-density filled area chart using Unicode Braille sub-pixels.',
+    aliases: ['braille chart', 'area chart', 'dense chart', 'tiny chart'],
+    useWhen: [
+      'You need more visual density than a sparkline can provide.',
+      'The chart should stay text-native but still show trend shape clearly.',
+    ],
+    avoidWhen: [
+      'Exact values or labeled axes matter more than density.',
+      'A single metric trend is compact enough for sparkline().',
+    ],
+    related: ['sparkline()', 'statsPanelSurface()', 'perfOverlaySurface()'],
+    exampleArgs: {
+      values: [1, 4, 2, 8, 3, 7, 5],
+      width: 16,
+      height: 4,
+    },
+  },
+  {
+    toolName: 'bijou_stats_panel',
+    family: 'statsPanelSurface()',
+    category: 'Data Visualization',
+    summary: 'Aligned metrics panel with labels, values, and optional inline sparklines.',
+    aliases: ['stats panel', 'metrics panel', 'telemetry panel', 'perf panel'],
+    useWhen: [
+      'Several metrics belong together inside one compact panel.',
+      'Labels, values, and small trends should stay aligned and readable.',
+    ],
+    avoidWhen: [
+      'You only need one metric and a badge or inline value would do.',
+      'The content is narrative or workflow guidance rather than telemetry.',
+    ],
+    related: ['sparkline()', 'brailleChartSurface()', 'perfOverlaySurface()'],
+    exampleArgs: {
+      entries: [
+        { label: 'FPS', value: '60' },
+        { label: 'frame', value: '16.7 ms', sparkline: [15.8, 16.1, 16.7, 16.4, 17.0] },
+      ],
+      title: 'Perf',
+      width: 28,
+    },
+  },
+  {
+    toolName: 'bijou_perf_overlay',
+    family: 'perfOverlaySurface()',
+    category: 'Data Visualization',
+    summary: 'Prebuilt performance dashboard combining a stats panel and braille chart.',
+    aliases: ['perf overlay', 'performance overlay', 'telemetry overlay', 'fps overlay'],
+    useWhen: [
+      'You need an immediately useful perf HUD without composing several primitives yourself.',
+      'Frame timing, terminal size, and memory should be visible together as one overlay.',
+    ],
+    avoidWhen: [
+      'The app only needs one inline metric or a small sparkline.',
+      'The shell should stay clean and no telemetry overlay belongs on screen.',
+    ],
+    related: ['statsPanelSurface()', 'brailleChartSurface()', 'sparkline()'],
+    exampleArgs: {
+      fps: 60,
+      frameTimeMs: 16.7,
+      frameTimeHistory: [15.8, 16.1, 16.7, 16.4, 17.0],
+      width: 80,
+      height: 24,
+      title: 'Perf',
+    },
+  },
 ];
+
+type DocsOnlyExampleRenderer = (args: Record<string, unknown>) => string;
+
+const DOCS_ONLY_EXAMPLE_RENDERERS: Readonly<Record<string, DocsOnlyExampleRenderer>> = {
+  bijou_markdown: (args) => stripAnsi(markdown(String(args['source'] ?? ''), {
+    width: typeof args['width'] === 'number' ? args['width'] : undefined,
+    ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+  })),
+  bijou_guided_flow: (args) => stripAnsi(guidedFlow({
+    ...(args as unknown as Parameters<typeof guidedFlow>[0]),
+    ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+  })),
+  bijou_preference_list: (args) => surfaceToString(preferenceListSurface(
+    args['sections'] as Parameters<typeof preferenceListSurface>[0],
+    {
+      width: Number(args['width'] ?? 40),
+      selectedRowId: typeof args['selectedRowId'] === 'string' ? args['selectedRowId'] : undefined,
+      ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+    },
+  ), plainStyle()),
+  bijou_spinner: (args) => spinnerFrame(Number(args['tick'] ?? 0), {
+    label: typeof args['label'] === 'string' ? args['label'] : undefined,
+  }),
+  bijou_timer: (args) => stripAnsi(timer(Number(args['ms'] ?? 0), {
+    label: typeof args['label'] === 'string' ? args['label'] : undefined,
+    ctx: mcpContext(),
+  })),
+  bijou_sparkline: (args) => sparkline(
+    (args['values'] as readonly number[] | undefined) ?? [],
+    { width: typeof args['width'] === 'number' ? args['width'] : undefined },
+  ),
+  bijou_braille_chart: (args) => surfaceToString(brailleChartSurface(
+    (args['values'] as readonly number[] | undefined) ?? [],
+    {
+      width: Number(args['width'] ?? 0),
+      height: Number(args['height'] ?? 0),
+      ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+    },
+  ), plainStyle()),
+  bijou_stats_panel: (args) => surfaceToString(statsPanelSurface(
+    (args['entries'] as Parameters<typeof statsPanelSurface>[0]) ?? [],
+    {
+      title: typeof args['title'] === 'string' ? args['title'] : undefined,
+      width: Number(args['width'] ?? 28),
+      ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+    },
+  ), plainStyle()),
+  bijou_perf_overlay: (args) => surfaceToString(perfOverlaySurface(
+    {
+      fps: Number(args['fps'] ?? 0),
+      frameTimeMs: Number(args['frameTimeMs'] ?? 0),
+      frameTimeHistory: (args['frameTimeHistory'] as readonly number[] | undefined) ?? [],
+      width: Number(args['width'] ?? 80),
+      height: Number(args['height'] ?? 24),
+    },
+    {
+      title: typeof args['title'] === 'string' ? args['title'] : undefined,
+      ctx: mcpContext(typeof args['width'] === 'number' ? args['width'] : undefined),
+    },
+  ), plainStyle()),
+};
 
 function normalizeDocsTerm(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -562,21 +853,23 @@ function exampleText(result: ToolResult): string {
 
 function resolvedInteractionProfiles(
   entry: ToolDocsCatalogEntry,
+  mcpExposed: boolean,
 ): ToolInteractionProfiles {
   return {
-    ...DEFAULT_INTERACTION_PROFILES,
+    ...(mcpExposed ? DEFAULT_INTERACTION_PROFILES : DEFAULT_DOCS_ONLY_INTERACTION_PROFILES),
     ...entry.interactionProfiles,
   };
 }
 
 export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistration {
   const toolMap = new Map(tools.map(tool => [tool.name, tool]));
-  const documentedTools = MCP_DOCS_CATALOG.map((entry) => {
+  const documentedEntries = MCP_DOCS_CATALOG.map((entry) => {
     const tool = toolMap.get(entry.toolName);
-    if (tool === undefined) {
-      throw new Error(`[bijou-mcp] bijou_docs catalog entry "${entry.toolName}" has no matching tool registration`);
+    const docsOnlyRenderer = DOCS_ONLY_EXAMPLE_RENDERERS[entry.toolName];
+    if (tool === undefined && docsOnlyRenderer === undefined) {
+      throw new Error(`[bijou-mcp] bijou_docs catalog entry "${entry.toolName}" has no matching tool registration or docs-only example renderer`);
     }
-    return { entry, tool };
+    return { entry, tool, docsOnlyRenderer, mcpExposed: tool !== undefined };
   });
 
   const inputShape = {
@@ -588,15 +881,17 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
 
   return {
     name: 'bijou_docs',
-    description: 'Query machine-readable documentation for the component and utility tools exposed by bijou-mcp. Returns usage guidance, interaction-profile notes, related tools, sample input, and optional rendered example output.',
+    description: 'Query machine-readable documentation for bijou-mcp render tools plus selected first-party Bijou component families that do not yet have a dedicated MCP renderer. Returns usage guidance, interaction-profile notes, related tools, sample input, and optional rendered example output.',
     inputSchema: inputShape,
     handler: async (args) => {
       const input = inputSchema.parse(args);
       const normalizedQuery = normalizeDocsTerm(input.query ?? '');
-      const ranked = documentedTools
-        .map(({ entry, tool }) => ({
+      const ranked = documentedEntries
+        .map(({ entry, tool, docsOnlyRenderer, mcpExposed }) => ({
           entry,
           tool,
+          docsOnlyRenderer,
+          mcpExposed,
           score: scoreDocsEntry(entry, normalizedQuery),
         }))
         .filter(({ score }) => normalizedQuery === '' || score > 0)
@@ -606,29 +901,38 @@ export function createDocsTool(tools: readonly ToolRegistration[]): ToolRegistra
       const selected = ranked.slice(0, limit);
       const includeExamples = input.includeExamples ?? normalizedQuery !== '';
 
-      const entries = await Promise.all(selected.map(async ({ entry, tool }) => {
+      const entries = await Promise.all(selected.map(async ({ entry, tool, docsOnlyRenderer, mcpExposed }) => {
         const result: SerializedToolDocsEntry = {
           tool: entry.toolName,
+          mcpExposed,
           family: entry.family,
           category: entry.category,
           summary: entry.summary,
           useWhen: entry.useWhen,
           avoidWhen: entry.avoidWhen,
-          interactionProfiles: resolvedInteractionProfiles(entry),
+          interactionProfiles: resolvedInteractionProfiles(entry, mcpExposed),
           related: entry.related,
           aliases: entry.aliases,
         };
-        if (includeExamples) {
+        if (entry.exampleArgs !== undefined) {
           result['exampleInput'] = entry.exampleArgs;
-          result['exampleOutput'] = exampleText(await tool.handler(entry.exampleArgs));
+        }
+        if (includeExamples && entry.exampleArgs !== undefined) {
+          if (tool !== undefined) {
+            result['exampleOutput'] = exampleText(await tool.handler(entry.exampleArgs));
+          } else if (docsOnlyRenderer !== undefined) {
+            result['exampleOutput'] = docsOnlyRenderer(entry.exampleArgs);
+          }
         }
         return result;
       }));
 
       const payload = {
         scope: 'bijou-mcp',
-        note: 'This catalog currently covers the component and utility surface that bijou-mcp exposes today. Broader DOGFOOD-level field-guide extraction remains future expansion.',
-        documentedTools: documentedTools.length,
+        note: 'This catalog covers the current bijou-mcp render-tool surface plus selected first-party Bijou component families that are documented here before they gain dedicated MCP render tools. Broader DOGFOOD-level field-guide extraction remains future expansion.',
+        documentedEntries: documentedEntries.length,
+        documentedTools: documentedEntries.filter(({ mcpExposed }) => mcpExposed).length,
+        docsOnlyEntries: documentedEntries.filter(({ mcpExposed }) => !mcpExposed).length,
         returnedEntries: entries.length,
         query: input.query ?? null,
         includeExamples,

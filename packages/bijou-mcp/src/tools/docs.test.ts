@@ -51,6 +51,7 @@ const ALL_TOOLS = [
 
 interface DocsPayloadEntry {
   readonly tool: string;
+  readonly mcpExposed: boolean;
   readonly family: string;
   readonly exampleOutput?: string;
 }
@@ -59,13 +60,17 @@ describe('bijou_docs tool', () => {
   it('returns the full catalog without examples by default', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
     const payload = JSON.parse((await docsTool.handler({})).content[0]!.text) as {
+      documentedEntries: number;
       documentedTools: number;
+      docsOnlyEntries: number;
       returnedEntries: number;
       includeExamples: boolean;
       entries: Array<Record<string, unknown>>;
     };
 
-    expect(payload.documentedTools).toBe(MCP_DOCS_CATALOG.length);
+    expect(payload.documentedEntries).toBe(MCP_DOCS_CATALOG.length);
+    expect(payload.documentedTools).toBe(ALL_TOOLS.length);
+    expect(payload.docsOnlyEntries).toBe(MCP_DOCS_CATALOG.length - ALL_TOOLS.length);
     expect(payload.returnedEntries).toBe(MCP_DOCS_CATALOG.length);
     expect(payload.includeExamples).toBe(false);
     expect(payload.entries[0]).not.toHaveProperty('exampleOutput');
@@ -84,6 +89,21 @@ describe('bijou_docs tool', () => {
     expect(payload.entries[0]!.family).toBe('table()');
     expect(String(payload.entries[0]!.exampleOutput)).toContain('Service');
     expect(String(payload.entries[0]!.exampleOutput)).toContain('healthy');
+  });
+
+  it('returns docs-only entries with synthesized example output', async () => {
+    const docsTool = createDocsTool(ALL_TOOLS);
+    const payload = JSON.parse((await docsTool.handler({ query: 'markdown' })).content[0]!.text) as {
+      includeExamples: boolean;
+      entries: DocsPayloadEntry[];
+    };
+
+    expect(payload.includeExamples).toBe(true);
+    expect(payload.entries.length).toBeGreaterThanOrEqual(1);
+    expect(payload.entries[0]!.tool).toBe('bijou_markdown');
+    expect(payload.entries[0]!.mcpExposed).toBe(false);
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('Release');
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('Build');
   });
 
   it('returns an empty entry set for unknown queries without throwing', async () => {
