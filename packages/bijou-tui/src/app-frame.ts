@@ -77,6 +77,7 @@ import {
   tickNotifications,
   trimNotificationsToViewport,
   type NotificationHistoryFilter,
+  type NotificationHistoryLabels,
   type NotificationPlacement,
   type NotificationState,
   type NotificationTone,
@@ -580,65 +581,83 @@ interface ResolvedFrameNotificationOptions {
   readonly overflow: OverflowBehavior;
 }
 
+function createQuitHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<FrameAction>()
+    .group(t('help.group.quit', 'Quit'), (g) => g
+      .bind('q', t('help.key.quit', 'Quit'), { type: 'toggle-help' })
+      .bind('escape', t('help.key.quit', 'Quit'), { type: 'toggle-help' })
+      .bind('ctrl+c', t('help.key.quit', 'Quit'), { type: 'toggle-help' }));
+}
 
-const quitHelpKeys = createKeyMap<FrameAction>()
-  .group('Exit', (g) => g
-    .bind('q', 'Quit', { type: 'toggle-help' })
-    .bind('escape', 'Quit', { type: 'toggle-help' })
-    .bind('ctrl+c', 'Quit', { type: 'toggle-help' }));
-const helpLayerHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Help', (g) => g
-    .bind('escape', 'Close help', { type: 'noop' })
-    .bind('?', 'Close help', { type: 'noop' })
-    .bind('up', 'Scroll up', { type: 'noop' })
-    .bind('down', 'Scroll down', { type: 'noop' })
-    .bind('j', 'Scroll down', { type: 'noop' })
-    .bind('k', 'Scroll up', { type: 'noop' })
-    .bind('d', 'Page down', { type: 'noop' })
-    .bind('u', 'Page up', { type: 'noop' })
-    .bind('g', 'Top', { type: 'noop' })
-    .bind('shift+g', 'Bottom', { type: 'noop' }));
-const settingsHelpKeys = createKeyMap<FrameAction>()
-  .group('Settings', (g) => g
-    .bind('escape', 'Close settings', { type: 'toggle-settings' })
-    .bind('f2', 'Close settings', { type: 'toggle-settings' })
-    .bind('up', 'Previous row', { type: 'scroll-up' })
-    .bind('down', 'Next row', { type: 'scroll-down' })
-    .bind('enter', 'Activate setting', { type: 'toggle-settings' })
-    .bind('space', 'Activate setting', { type: 'toggle-settings' })
-    .bind('j', 'Scroll down', { type: 'scroll-down' })
-    .bind('k', 'Scroll up', { type: 'scroll-up' })
-    .bind('d', 'Page down', { type: 'page-down' })
-    .bind('u', 'Page up', { type: 'page-up' })
-    .bind('g', 'Top', { type: 'top' })
-    .bind('shift+g', 'Bottom', { type: 'bottom' })
-    .bind('/', 'Search', { type: 'open-search' })
-    .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
-    .bind(':', 'Open command palette', { type: 'open-palette' })
-    .bind('?', 'Toggle help', { type: 'toggle-help' }));
-const notificationCenterHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Notifications', (g) => g
-    .bind('shift+n', 'Close notification center', { type: 'noop' })
-    .bind('up', 'Scroll up', { type: 'noop' })
-    .bind('down', 'Scroll down', { type: 'noop' })
-    .bind('j', 'Scroll down', { type: 'noop' })
-    .bind('k', 'Scroll up', { type: 'noop' })
-    .bind('d', 'Page down', { type: 'noop' })
-    .bind('u', 'Page up', { type: 'noop' })
-    .bind('g', 'Top', { type: 'noop' })
-    .bind('shift+g', 'Bottom', { type: 'noop' })
-    .bind('f', 'Cycle filter', { type: 'noop' })
-    .bind('/', 'Search', { type: 'noop' })
-    .bind('ctrl+p', 'Open command palette', { type: 'noop' })
-    .bind(':', 'Open command palette', { type: 'noop' })
-    .bind('?', 'Toggle help', { type: 'noop' }));
-const quitConfirmHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Quit', (g) => g
-    .bind('y', 'Quit', { type: 'noop' })
-    .bind('enter', 'Quit', { type: 'noop' })
-    .bind('n', 'Stay', { type: 'noop' })
-    .bind('escape', 'Stay', { type: 'noop' })
-    .bind('q', 'Stay', { type: 'noop' }));
+function createHelpLayerHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.help', 'Help'), (g) => g
+      .bind('escape', t('help.key.closeHelp', 'Close help'), { type: 'noop' })
+      .bind('?', t('help.key.closeHelp', 'Close help'), { type: 'noop' })
+      .bind('up', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('down', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'noop' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'noop' })
+      .bind('g', t('key.top', 'Top'), { type: 'noop' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'noop' }));
+}
+
+function createSettingsHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<FrameAction>()
+    .group(t('help.group.settings', 'Settings'), (g) => g
+      .bind('escape', t('help.key.closeSettings', 'Close settings'), { type: 'toggle-settings' })
+      .bind('f2', t('help.key.closeSettings', 'Close settings'), { type: 'toggle-settings' })
+      .bind('up', t('help.key.previousRow', 'Previous row'), { type: 'scroll-up' })
+      .bind('down', t('help.key.nextRow', 'Next row'), { type: 'scroll-down' })
+      .bind('enter', t('help.key.activateSetting', 'Activate setting'), { type: 'toggle-settings' })
+      .bind('space', t('help.key.activateSetting', 'Activate setting'), { type: 'toggle-settings' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'scroll-down' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'scroll-up' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'page-down' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'page-up' })
+      .bind('g', t('key.top', 'Top'), { type: 'top' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'bottom' })
+      .bind('/', t('key.search', 'Search'), { type: 'open-search' })
+      .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind(':', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' }));
+}
+
+function createNotificationCenterHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.notifications', 'Notifications'), (g) => g
+      .bind('shift+n', t('help.key.closeNotifications', 'Close notification center'), { type: 'noop' })
+      .bind('up', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('down', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'noop' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'noop' })
+      .bind('g', t('key.top', 'Top'), { type: 'noop' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'noop' })
+      .bind('f', t('help.key.cycleFilter', 'Cycle filter'), { type: 'noop' })
+      .bind('/', t('key.search', 'Search'), { type: 'noop' })
+      .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'noop' })
+      .bind(':', t('key.openPalette', 'Open command palette'), { type: 'noop' })
+      .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'noop' }));
+}
+
+function createQuitConfirmHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.quit', 'Quit'), (g) => g
+      .bind('y', t('help.key.quit', 'Quit'), { type: 'noop' })
+      .bind('enter', t('help.key.quit', 'Quit'), { type: 'noop' })
+      .bind('n', t('help.key.stay', 'Stay'), { type: 'noop' })
+      .bind('escape', t('help.key.stay', 'Stay'), { type: 'noop' })
+      .bind('q', t('help.key.stay', 'Stay'), { type: 'noop' }));
+}
 
 function resolveFrameNotificationOptions<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -879,6 +898,11 @@ export function createFramedApp<PageModel, Msg>(
     enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
     i18n: options.i18n,
   });
+  const quitHelpKeys = createQuitHelpKeys(options.i18n);
+  const helpLayerHelpKeys = createHelpLayerHelpKeys(options.i18n);
+  const settingsHelpKeys = createSettingsHelpKeys(options.i18n);
+  const notificationCenterHelpKeys = createNotificationCenterHelpKeys(options.i18n);
+  const quitConfirmHelpKeys = createQuitConfirmHelpKeys(options.i18n);
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   let composedFrameScratch: Surface | null = null;
   let headerScratch: Surface | undefined;
@@ -1098,7 +1122,7 @@ export function createFramedApp<PageModel, Msg>(
       if (helpSource == null) {
         return model;
       }
-      const overlay = renderHelpOverlay(model, helpSource);
+      const overlay = renderHelpOverlay(model, helpSource, options.i18n);
       const viewportHeight = Math.max(1, overlay.body.height - 1);
       const delta = c.action === 'down' ? 3
         : c.action === 'up' ? -3
@@ -2396,7 +2420,7 @@ export function createFramedApp<PageModel, Msg>(
         if (helpSource == null) {
           throw new Error('createFramedApp: help layer projection is missing a help source');
         }
-        const helpOverlay = renderHelpOverlay(model, helpSource);
+        const helpOverlay = renderHelpOverlay(model, helpSource, options.i18n);
         overlays.push(modal({
           title: activeLayer.kind === 'help'
             ? (activeLayer.title ?? frameMessage(options.i18n, 'help.title', 'Keyboard Help'))
@@ -2488,12 +2512,14 @@ function resolveBodyRect<PageModel, Msg>(
 function renderHelpOverlay<PageModel, Msg>(
   model: Pick<InternalFrameModel<PageModel, Msg>, 'columns' | 'rows' | 'helpScrollY'>,
   source: BindingSource,
+  i18n?: I18nRuntime,
 ): { body: Surface; maxScrollY: number; scrollY: number } {
   const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
   const bodyWidth = Math.max(20, maxDialogWidth - 4);
   const helpSurface = helpViewSurface(source, {
     title: undefined,
     width: bodyWidth,
+    defaultGroupName: frameMessage(i18n, 'help.group.general', 'General'),
   });
   const pagerHeight = Math.max(4, Math.min(helpSurface.height + 1, Math.max(4, model.rows - 8)));
   const pagerState = createPagerStateForSurface(helpSurface, {
@@ -2984,15 +3010,70 @@ function resolveNotificationFooterCue<PageModel, Msg>(
   return frameNotificationCue(options.i18n, liveCount, archivedCount);
 }
 
+function notificationHistoryLabels(
+  i18n: I18nRuntime | undefined,
+): NotificationHistoryLabels {
+  return {
+    filterLabel: (filter) => frameNotificationFilterLabel(i18n, filter),
+    headerLabel: ({ filterLabel, start, end, total }) => frameMessage(
+      i18n,
+      'notifications.history.title',
+      'History • {filter} • {range}',
+      {
+        filter: filterLabel,
+        range: total === 0
+          ? frameMessage(i18n, 'notifications.history.range.empty', '0 items')
+          : frameMessage(i18n, 'notifications.history.range.window', '{start}-{end} of {total}', {
+            start,
+            end,
+            total,
+          }),
+      },
+    ),
+    emptyLabel: ({ filterLabel }) => frameMessage(
+      i18n,
+      'notifications.history.empty',
+      'No archived notifications for {filter} yet.',
+      { filter: filterLabel },
+    ),
+    actionLabel: (label) => frameMessage(
+      i18n,
+      'notifications.history.action',
+      'Action: {label}',
+      { label },
+    ),
+  };
+}
+
 function renderNotificationCenterSurface<Msg>(
   center: ResolvedFrameNotificationCenter<Msg>,
   width: number,
   i18n?: I18nRuntime,
   ctx?: BijouContext,
 ): Surface {
+  const historyLabels = notificationHistoryLabels(i18n);
   const rows: Surface[] = [
-    insetLineSurface(`Live: ${center.state.items.length} • Archived: ${center.state.history.length}`, width),
-    insetLineSurface(`Filter: ${frameNotificationFilterLabel(i18n, center.activeFilter)}`, width),
+    insetLineSurface(
+      frameMessage(
+        i18n,
+        'notifications.summary.liveArchived',
+        'Live: {liveCount} • Archived: {archivedCount}',
+        {
+          liveCount: center.state.items.length,
+          archivedCount: center.state.history.length,
+        },
+      ),
+      width,
+    ),
+    insetLineSurface(
+      frameMessage(
+        i18n,
+        'notifications.summary.filter',
+        'Filter: {filter}',
+        { filter: frameNotificationFilterLabel(i18n, center.activeFilter) },
+      ),
+      width,
+    ),
   ];
 
   const liveItems = [...center.state.items].sort(
@@ -3002,7 +3083,9 @@ function renderNotificationCenterSurface<Msg>(
   if (liveItems.length > 0) {
     rows.push(createSurface(width, 1));
     rows.push(insetLineSurface(
-      ctx == null ? 'Current stack' : ctx.style.bold('Current stack'),
+      ctx == null
+        ? frameMessage(i18n, 'notifications.currentStack', 'Current stack')
+        : ctx.style.bold(frameMessage(i18n, 'notifications.currentStack', 'Current stack')),
       width,
     ));
     rows.push(createSurface(width, 1));
@@ -3010,6 +3093,7 @@ function renderNotificationCenterSurface<Msg>(
       rows.push(renderNotificationReviewEntrySurface(liveItems[index]!, {
         width,
         ctx,
+        actionLabel: historyLabels.actionLabel,
         metaLabel: `${liveItems[index]!.variant} • live`,
       }));
       if (index < liveItems.length - 1) rows.push(createSurface(width, 1));
@@ -3022,6 +3106,7 @@ function renderNotificationCenterSurface<Msg>(
     height: Number.MAX_SAFE_INTEGER,
     filter: center.activeFilter,
     ctx,
+    labels: historyLabels,
   }));
 
   return vstackSurface(...rows);

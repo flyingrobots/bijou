@@ -102,12 +102,28 @@ export interface RenderNotificationHistoryOptions {
   readonly scroll?: number;
   readonly filter?: NotificationHistoryFilter;
   readonly ctx?: BijouContext;
+  readonly labels?: NotificationHistoryLabels;
 }
 
 export interface RenderNotificationReviewEntrySurfaceOptions {
   readonly width: number;
   readonly ctx?: BijouContext;
   readonly metaLabel?: string;
+  readonly actionLabel?: (label: string) => string;
+}
+
+export interface NotificationHistoryLabels {
+  readonly filterLabel?: (filter: NotificationHistoryFilter) => string;
+  readonly headerLabel?: (args: {
+    readonly filterLabel: string;
+    readonly start: number;
+    readonly end: number;
+    readonly total: number;
+  }) => string;
+  readonly emptyLabel?: (args: {
+    readonly filterLabel: string;
+  }) => string;
+  readonly actionLabel?: (label: string) => string;
 }
 
 export type NotificationMouseTargetKind = 'dismiss' | 'action' | 'body';
@@ -191,17 +207,22 @@ export function countNotificationHistory<Msg>(
   return count;
 }
 
-function filterLabel(filter: NotificationHistoryFilter): string {
-  return filter === 'ALL' ? 'All' : filter === 'ACTIONABLE' ? 'Actionable' : filter;
+function filterLabel(
+  filter: NotificationHistoryFilter,
+  labels?: NotificationHistoryLabels,
+): string {
+  return labels?.filterLabel?.(filter)
+    ?? (filter === 'ALL' ? 'All' : filter === 'ACTIONABLE' ? 'Actionable' : filter);
 }
 
 function renderHistoryEntry<Msg>(
   item: NotificationRecord<Msg>,
   width: number,
   ctx: BijouContext | undefined,
+  actionLabel: ((label: string) => string) | undefined,
 ): readonly string[] {
   const safeWidth = Math.max(1, width);
-  const prepared = prepareNotificationHistoryEntry(item, ctx);
+  const prepared = prepareNotificationHistoryEntry(item, ctx, actionLabel);
 
   const lines = [
     ...wrapPreparedTextToWidth(prepared.title, safeWidth),
@@ -216,6 +237,7 @@ function renderHistoryEntry<Msg>(
 function prepareNotificationHistoryEntry<Msg>(
   item: NotificationRecord<Msg>,
   ctx: BijouContext | undefined,
+  actionLabel: ((label: string) => string) | undefined,
 ): PreparedNotificationHistoryEntry {
   const toneLabel = `[${item.tone}]`;
   const title = ctx == null
@@ -226,8 +248,11 @@ function prepareNotificationHistoryEntry<Msg>(
   const actionLine = item.action == null
     ? undefined
     : (ctx == null
-      ? `Action: ${item.action.label}`
-      : ctx.style.styled(ctx.semantic('muted'), `Action: ${item.action.label}`));
+      ? (actionLabel?.(item.action.label) ?? `Action: ${item.action.label}`)
+      : ctx.style.styled(
+        ctx.semantic('muted'),
+        actionLabel?.(item.action.label) ?? `Action: ${item.action.label}`,
+      ));
   const messageLine = item.message.length === 0
     ? undefined
     : (ctx == null ? item.message : ctx.style.styled(ctx.semantic('muted'), item.message));
@@ -247,20 +272,27 @@ export function renderNotificationHistory<Msg>(
   const safeWidth = Math.max(1, options.width);
   const safeHeight = Math.max(3, options.height);
   const filter = options.filter ?? 'ALL';
+  const filterName = filterLabel(filter, options.labels);
   const filtered = state.history.filter((item) => matchesHistoryFilter(item, filter));
   const maxBodyLines = Math.max(1, safeHeight - 2);
   const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
 
   if (filtered.length === 0) {
     const emptyText = options.ctx == null
-      ? `No archived notifications for ${filterLabel(filter)} yet.`
+      ? (options.labels?.emptyLabel?.({ filterLabel: filterName }) ?? `No archived notifications for ${filterName} yet.`)
       : options.ctx.style.styled(
         options.ctx.semantic('muted'),
-        `No archived notifications for ${filterLabel(filter)} yet.`,
+        options.labels?.emptyLabel?.({ filterLabel: filterName }) ?? `No archived notifications for ${filterName} yet.`,
       );
     const empty = wrapPreparedTextToWidth(prepareWrappedText(emptyText), safeWidth).slice(0, maxBodyLines);
+    const header = options.labels?.headerLabel?.({
+      filterLabel: filterName,
+      start: 0,
+      end: 0,
+      total: 0,
+    }) ?? `History • ${filterName} • 0 items`;
     return [
-      `History • ${filterLabel(filter)} • 0 items`,
+      header,
       '',
       ...empty,
     ].join('\n');
@@ -270,7 +302,7 @@ export function renderNotificationHistory<Msg>(
   let renderedCount = 0;
 
   for (const item of filtered.slice(start)) {
-    const entryLines = renderHistoryEntry(item, safeWidth, options.ctx);
+    const entryLines = renderHistoryEntry(item, safeWidth, options.ctx, options.labels?.actionLabel);
     const remaining = maxBodyLines - bodyLines.length;
     if (remaining <= 0) break;
 
@@ -286,8 +318,14 @@ export function renderNotificationHistory<Msg>(
   }
 
   const end = Math.min(filtered.length, start + Math.max(1, renderedCount));
+  const header = options.labels?.headerLabel?.({
+    filterLabel: filterName,
+    start: start + 1,
+    end,
+    total: filtered.length,
+  }) ?? `History • ${filterName} • ${start + 1}-${end} of ${filtered.length}`;
   return [
-    `History • ${filterLabel(filter)} • ${start + 1}-${end} of ${filtered.length}`,
+    header,
     '',
     ...bodyLines,
   ].join('\n');
@@ -323,7 +361,7 @@ export function renderNotificationReviewEntrySurface<Msg>(
 
   if (item.action != null) {
     rows.push(...renderInsetWrappedSurface(createSegmentSurface([
-      { text: `Action: ${item.action.label}`, style: mutedStyle },
+      { text: options.actionLabel?.(item.action.label) ?? `Action: ${item.action.label}`, style: mutedStyle },
     ]), safeWidth));
   }
 
@@ -337,6 +375,7 @@ export function renderNotificationHistorySurface<Msg>(
   const safeWidth = Math.max(1, options.width);
   const safeHeight = Math.max(3, options.height);
   const filter = options.filter ?? 'ALL';
+  const filterName = filterLabel(filter, options.labels);
   const filtered = state.history.filter((item) => matchesHistoryFilter(item, filter));
   const maxBodyLines = Math.max(1, safeHeight - 2);
   const start = Math.max(0, Math.min(options.scroll ?? 0, Math.max(0, filtered.length - 1)));
@@ -344,8 +383,18 @@ export function renderNotificationHistorySurface<Msg>(
   const rows: Surface[] = [
     ...renderInsetWrappedSurface(createSegmentSurface([
       { text: filtered.length === 0
-        ? `History • ${filterLabel(filter)} • 0 items`
-        : `History • ${filterLabel(filter)} • ${start + 1}-${Math.min(filtered.length, start + 1)} of ${filtered.length}`,
+        ? (options.labels?.headerLabel?.({
+          filterLabel: filterName,
+          start: 0,
+          end: 0,
+          total: 0,
+        }) ?? `History • ${filterName} • 0 items`)
+        : (options.labels?.headerLabel?.({
+          filterLabel: filterName,
+          start: start + 1,
+          end: Math.min(filtered.length, start + 1),
+          total: filtered.length,
+        }) ?? `History • ${filterName} • ${start + 1}-${Math.min(filtered.length, start + 1)} of ${filtered.length}`),
         style: withModifiers({}, ['bold']) },
     ]), safeWidth),
     createBlankLineSurface(safeWidth),
@@ -353,7 +402,7 @@ export function renderNotificationHistorySurface<Msg>(
 
   if (filtered.length === 0) {
     rows.push(...renderInsetWrappedSurface(createSegmentSurface([{
-      text: `No archived notifications for ${filterLabel(filter)} yet.`,
+      text: options.labels?.emptyLabel?.({ filterLabel: filterName }) ?? `No archived notifications for ${filterName} yet.`,
       style: tokenToCellStyle(options.ctx?.semantic('muted')),
     }]), safeWidth));
     return vstackSurface(...rows);
@@ -362,7 +411,11 @@ export function renderNotificationHistorySurface<Msg>(
   let bodyLines = 0;
   let end = start;
   for (const item of filtered.slice(start)) {
-    const entry = renderNotificationReviewEntrySurface(item, { width: safeWidth, ctx: options.ctx });
+    const entry = renderNotificationReviewEntrySurface(item, {
+      width: safeWidth,
+      ctx: options.ctx,
+      actionLabel: options.labels?.actionLabel,
+    });
     const remaining = maxBodyLines - bodyLines;
     if (remaining <= 0) break;
     if (bodyLines > 0) {
@@ -379,7 +432,12 @@ export function renderNotificationHistorySurface<Msg>(
 
   // Rewrite header with the actual rendered end range.
   rows[0] = renderInsetWrappedSurface(createSegmentSurface([
-    { text: `History • ${filterLabel(filter)} • ${start + 1}-${Math.max(start + 1, end)} of ${filtered.length}`,
+    { text: options.labels?.headerLabel?.({
+      filterLabel: filterName,
+      start: start + 1,
+      end: Math.max(start + 1, end),
+      total: filtered.length,
+    }) ?? `History • ${filterName} • ${start + 1}-${Math.max(start + 1, end)} of ${filtered.length}`,
       style: withModifiers({}, ['bold']) },
   ]), safeWidth)[0]!;
 

@@ -132,8 +132,9 @@ export function createFrameKeyMap(
   options: { readonly enableSettings?: boolean; readonly enableNotifications?: boolean; readonly i18n?: I18nRuntime } = {},
 ): KeyMap<FrameAction> {
   const t = (id: string, fallback: string) => frameMessage(options.i18n, id, fallback);
+  const group = (id: string, fallback: string) => frameMessage(options.i18n, id, fallback);
   const keyMap = createKeyMap<FrameAction>()
-    .group('Frame', (g) => g
+    .group(group('key.group.frame', 'Frame'), (g) => g
       .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' })
       .bind('[', t('key.prevTab', 'Previous tab'), { type: 'prev-tab' })
       .bind(']', t('key.nextTab', 'Next tab'), { type: 'next-tab' })
@@ -145,13 +146,13 @@ export function createFrameKeyMap(
       .bind('ctrl+m', t('key.toggleMinimize', 'Fold/unfold pane'), { type: 'toggle-minimize' })
       .bind('ctrl+f', t('key.toggleMaximize', 'Full-screen pane'), { type: 'toggle-maximize' }),
     )
-    .group('Dock', (g) => g
+    .group(group('key.group.dock', 'Dock'), (g) => g
       .bind('ctrl+shift+up', t('key.dockUp', 'Move pane up'), { type: 'dock-up' })
       .bind('ctrl+shift+down', t('key.dockDown', 'Move pane down'), { type: 'dock-down' })
       .bind('ctrl+shift+left', t('key.dockLeft', 'Move pane left'), { type: 'dock-left' })
       .bind('ctrl+shift+right', t('key.dockRight', 'Move pane right'), { type: 'dock-right' }),
     )
-    .group('Scroll', (g) => g
+    .group(group('key.group.scroll', 'Scroll'), (g) => g
       .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'scroll-down' })
       .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'scroll-up' })
       .bind('d', t('key.pageDown', 'Page down'), { type: 'page-down' })
@@ -163,13 +164,13 @@ export function createFrameKeyMap(
     );
 
   if (options.enableSettings) {
-    keyMap.group('Shell', (g) => g
+    keyMap.group(group('key.group.shell', 'Shell'), (g) => g
       .bind('ctrl+,', t('key.settings', 'Settings'), { type: 'toggle-settings' })
       .bind('f2', t('key.settings', 'Settings'), { type: 'toggle-settings' }));
   }
 
   if (options.enableNotifications) {
-    keyMap.group('Shell', (g) => g
+    keyMap.group(group('key.group.shell', 'Shell'), (g) => g
       .bind('shift+n', t('key.notifications', 'Notifications'), { type: 'toggle-notifications' }));
   }
 

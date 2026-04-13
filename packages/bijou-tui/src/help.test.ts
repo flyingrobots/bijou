@@ -104,6 +104,13 @@ describe('helpView', () => {
 
     expect(helpView(km)).toContain('General');
   });
+
+  it('uses a localized fallback group label when provided', () => {
+    const km = createKeyMap<Msg>()
+      .bind('q', 'Quit', { type: 'quit' });
+
+    expect(helpView(km, { defaultGroupName: 'Général' })).toContain('Général');
+  });
 });
 
 // ---------------------------------------------------------------------------

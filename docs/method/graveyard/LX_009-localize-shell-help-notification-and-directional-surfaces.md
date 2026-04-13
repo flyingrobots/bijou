@@ -1,4 +1,23 @@
+---
+title: LX-009 — Localize Shell Help, Notification, and Directional Surfaces
+lane: graveyard
+legend: LX
+---
+
 # LX-009 — Localize Shell Help, Notification, and Directional Surfaces
+
+## Disposition
+
+Landed in `release/v4.5.0`. Shell help now localizes its default group label,
+frame-owned group names, and shell-owned key descriptions through the frame
+catalog instead of leaking English strings from static key maps. The
+notification-center drawer now localizes its summary rows, filter copy, current
+stack label, history header/empty states, and action label through the same
+shell i18n seam. The visible logical-direction behavior from LX-008 remains the
+active direction contract for shell drawers and related chrome, so the obvious
+remaining English islands are no longer a live LX backlog item.
+
+## Original Proposal
 
 Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 

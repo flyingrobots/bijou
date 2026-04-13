@@ -40,6 +40,8 @@ export interface HelpOptions {
   separator?: string;
   /** Title shown at the top (default: none). */
   title?: string;
+  /** Label used when a binding does not declare a group (default: `General`). */
+  defaultGroupName?: string;
 }
 
 /** Options for rendering help into a `Surface`. */
@@ -75,6 +77,7 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   const enabledOnly = options?.enabledOnly ?? true;
   const sep = options?.separator ?? '  ';
   const groupFilter = options?.groupFilter;
+  const defaultGroupName = options?.defaultGroupName ?? 'General';
 
   let all = keymap.bindings();
   if (enabledOnly) all = all.filter((b) => b.enabled);
@@ -89,7 +92,7 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   // Group by group name
   const groups = new Map<string, BindingInfo[]>();
   for (const b of all) {
-    const group = b.group || 'General';
+    const group = b.group || defaultGroupName;
     let list = groups.get(group);
     if (!list) {
       list = [];
