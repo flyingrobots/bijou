@@ -131,6 +131,7 @@ snapshots, emitted messages, command outcomes, or cleanup disposal.
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path for building apps.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Shell doctrine, shaders, and motion internals.
+- **[Render Pipeline Guide](../../docs/guides/render-pipeline.md)**: Stage order, `RenderState`, and `configurePipeline()` truth.
 - **[Design System](../../docs/design-system/README.md)**: Semantic guidance and patterns.
 
 ---

@@ -36,6 +36,7 @@ reference material.
 | :--- | :--- |
 | **[CLI](./CLI.md)** | Command surface: binaries and operator scripts. |
 | **[MCP](./MCP.md)** | MCP server posture and tool reference. |
+| **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |
 | **[ROADMAP](./ROADMAP.md)** | Broad strategic horizon. |
 

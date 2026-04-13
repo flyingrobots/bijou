@@ -1,10 +1,16 @@
 ---
 title: DX-008 — Render Pipeline Documentation Guide
-lane: root
+lane: graveyard
 legend: DX
 ---
 
 # DX-008 — Render Pipeline Documentation Guide
+
+## Disposition
+
+Published docs/guides/render-pipeline.md covering the fixed render stage order, default runtime wiring, RenderState lifecycle, configurePipeline semantics, and current limitations. Linked the guide from the bijou-tui README, the repo docs map, and the bijou-tui advanced guide, and corrected the stale `Post-Process` stage spelling in the advanced guide example.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

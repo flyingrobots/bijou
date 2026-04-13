@@ -48,10 +48,13 @@ Extend the pipeline via `options.configurePipeline` in `run()`:
 ```typescript
 run(app, {
   configurePipeline: (p) => {
-    p.use('Post-Process', grayscaleMiddleware());
+    p.use('PostProcess', grayscaleMiddleware());
   }
 });
 ```
+
+For the exact stage order, default runtime wiring, and `RenderState` contract,
+use the dedicated [render pipeline guide](../../docs/guides/render-pipeline.md).
 
 ## Transition Shaders
 
