@@ -51,6 +51,7 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
 ## Current cycle and backlog
 
 - latest completed cycle:
+  - [HT-006 — Allow pages to push notifications in createFramedApp](../graveyard/HT-006-page-level-notification-push.md)
   - [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../graveyard/HT_005-promote-page-provided-layer-registry-and-shell-control-projection.md)
 - live backlog:
   - no dedicated Humane Terminal cycle is live right now

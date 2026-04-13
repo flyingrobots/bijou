@@ -525,6 +525,8 @@ export interface FrameModel<PageModel> {
 }
 
 export type {
+  FrameAction,
+  FrameNotificationSpec,
   FramePageMsg,
   FramePageUpdateResult,
   FramedApp,
@@ -532,6 +534,10 @@ export type {
   FramedAppUpdateResult,
   FrameScopedMsg,
   PageScopedMsg,
+} from './app-frame-types.js';
+export {
+  emitFrameAction,
+  notify,
 } from './app-frame-types.js';
 
 export type {
@@ -2185,6 +2191,19 @@ export function createFramedApp<PageModel, Msg>(
             overflow: frameNotificationOptions.overflow,
           }, action.issue.atMs);
           return applyFrameNotificationState(model, notifications, action.issue.atMs);
+        }
+        if (action.type === 'push-notification') {
+          if (!frameNotificationOptions.enabled) return [model, []];
+          const nowMs = resolveClock(resolveFrameCtx()).now();
+          const notifications = pushNotification(model.runtimeNotifications, {
+            ...action.notification,
+            placement: action.notification.placement ?? frameNotificationOptions.placement,
+            durationMs: action.notification.durationMs === undefined
+              ? frameNotificationOptions.durationMs
+              : action.notification.durationMs,
+            overflow: action.notification.overflow ?? frameNotificationOptions.overflow,
+          }, nowMs);
+          return applyFrameNotificationState(model, notifications, nowMs);
         }
         if (action.type === 'notification-tick') {
           const notifications = tickNotifications(model.runtimeNotifications, action.atMs);

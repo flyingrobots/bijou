@@ -123,6 +123,8 @@ export function applyFrameAction<PageModel, Msg>(
         quitConfirmOpen: false,
       }, []];
     }
+    case 'push-notification':
+      return [model, []];
     case 'prev-tab':
       return switchTab(model, -1, pagesById, options);
     case 'next-tab':

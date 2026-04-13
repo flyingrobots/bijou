@@ -6,6 +6,7 @@
  */
 
 import type { CommandPaletteItem } from './command-palette.js';
+import type { NotificationSpec } from './notification.js';
 import type { App, Cmd, KeyMsg, MouseMsg, PulseMsg } from './types.js';
 import { QUIT, isCmdCleanup } from './types.js';
 import type { BindingInfo } from './keybindings.js';
@@ -22,6 +23,7 @@ export const PAGE_MSG_TOKEN = Symbol('app-frame-page-msg');
 export const FRAME_MSG_TOKEN = Symbol('app-frame-frame-msg');
 
 export type PaletteKind = 'command' | 'search';
+export type FrameNotificationSpec = Omit<NotificationSpec<never>, 'action'>;
 
 // ---------------------------------------------------------------------------
 // Public message contracts
@@ -105,6 +107,7 @@ export type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'toggle-settings' }
   | { type: 'toggle-notifications' }
+  | { type: 'push-notification'; notification: FrameNotificationSpec }
   | { type: 'prev-tab' }
   | { type: 'next-tab' }
   | { type: 'next-pane' }
@@ -217,6 +220,16 @@ export function wrapFrameMsg(action: FrameAction): FrameScopedMsg {
   };
 }
 
+/** Create a page command that emits a frame-scoped action back to the shell. */
+export function emitFrameAction<Msg>(action: FrameAction): Cmd<Msg> {
+  return async (_emit, _caps) => wrapFrameMsg(action) as unknown as Msg;
+}
+
+/** Create a page command that pushes a frame-managed transient notification. */
+export function notify<Msg>(notification: FrameNotificationSpec): Cmd<Msg> {
+  return emitFrameAction<Msg>({ type: 'push-notification', notification });
+}
+
 /** Type guard: is this message a page-scoped wrapper? */
 export function isPageScopedMsg<Msg>(value: unknown): value is PageScopedMsg<Msg> {
   return typeof value === 'object'
@@ -247,9 +260,16 @@ export function emitMsgForPage<Msg>(pageId: string, msg: FramePageMsg<Msg>): Cmd
 /** Wrap a page-level command so its emitted messages are tagged with the page ID. */
 export function wrapCmdForPage<Msg>(pageId: string, cmd: Cmd<Msg>): Cmd<FramedAppMsg<Msg>> {
   return async (emit, caps) => {
-    const result = await cmd((msg) => emit(wrapPageMsg(pageId, msg)), caps);
+    const result = await cmd((msg) => {
+      if (isFrameScopedMsg(msg)) {
+        emit(msg);
+        return;
+      }
+      emit(wrapPageMsg(pageId, msg));
+    }, caps);
     if (result === undefined || result === QUIT) return result;
     if (isCmdCleanup(result)) return result;
+    if (isFrameScopedMsg(result)) return result;
     return wrapPageMsg(pageId, result);
   };
 }

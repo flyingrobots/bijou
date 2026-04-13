@@ -30,6 +30,7 @@ import {
   createFramedApp,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  notify,
   projectFrameControls,
   type FramePage,
   type FramePageMsg,
@@ -3138,6 +3139,86 @@ describe('createFramedApp', () => {
     const rendered = surfaceToString(frame, testCtx.style);
     expect(rendered).toContain('Command rejected: worker crashed during boot');
     expect(cmds).toHaveLength(1);
+  });
+
+  it('lets pages push frame-managed notifications with notify()', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') {
+          return [{
+            ...model,
+            count: model.count + 1,
+          }, [notify<Msg>({
+            title: 'Saved draft',
+            tone: 'SUCCESS',
+            message: 'Frame-managed notification from the page update',
+          })]];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('home'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('x', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+      runtimeNotifications: {
+        placement: 'TOP_CENTER',
+        durationMs: 2_500,
+      },
+    });
+
+    let [model] = app.init();
+    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    [model, cmds] = app.update({ type: 'inc' }, model);
+
+    expect(model.pageModels.home?.count).toBe(1);
+    expect(cmds).toHaveLength(1);
+
+    const returned = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 123,
+    });
+
+    expect(returned).not.toBeUndefined();
+    if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) {
+      throw new Error('expected a frame notification message');
+    }
+
+    [model, cmds] = app.update(returned as Msg, model);
+
+    expect(model.runtimeNotifications.items).toHaveLength(1);
+    expect(model.runtimeNotifications.items[0]).toMatchObject({
+      title: 'Saved draft',
+      tone: 'SUCCESS',
+      message: 'Frame-managed notification from the page update',
+      placement: 'TOP_CENTER',
+      durationMs: 2_500,
+    });
+    expect(cmds).toHaveLength(1);
+
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
+    expect(tickMsg).not.toBeUndefined();
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) {
+      throw new Error('expected a notification tick message');
+    }
+
+    const [visibleModel] = app.update(tickMsg as Msg, model);
+    const frame = app.view(visibleModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    expect(surfaceToString(frame, testCtx.style)).toContain('notices:1');
   });
 
   it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {

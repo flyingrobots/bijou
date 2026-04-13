@@ -1,6 +1,18 @@
+---
+title: HT-006 — Allow pages to push notifications in createFramedApp
+lane: graveyard
+legend: HT
+---
+
 # HT-006 — Allow pages to push notifications in createFramedApp
 
-Legend: [HT — Humane Terminal](../../legends/HT-humane-terminal.md)
+## Disposition
+
+Landed in `release/v4.5.0`. `createFramedApp()` now exposes `emitFrameAction()` and `notify()` so framed pages can emit shell-owned transient notifications without reaching into frame state, the page command wrapper preserves frame-scoped messages instead of re-wrapping them as page messages, focused `app-frame` coverage proves the runtime path, and the TUI guides now document the seam.
+
+## Original Proposal
+
+Legend: [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
 ## Problem
 

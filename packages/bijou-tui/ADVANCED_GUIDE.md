@@ -149,6 +149,7 @@ projection.helpSource;        // what the help overlay should explain right now
 
 Keep this boundary narrow:
 - pages own `workspace` and `page-modal` metadata
+- pages may emit transient shell notifications via `notify(...)`, but the frame still owns notification state/history
 - the frame still owns shell layers like settings, help, notifications, and quit confirm
 - agents should inspect `projectFrameControls()` instead of reverse-engineering rendered chrome
 

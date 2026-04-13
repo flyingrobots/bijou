@@ -247,6 +247,8 @@ export {
   type PageTransition,
   type FramePaneScroll,
   type FrameModel,
+  type FrameAction,
+  type FrameNotificationSpec,
   type FramedApp,
   type FramedAppMsg,
   type FramedAppUpdateResult,
@@ -256,6 +258,8 @@ export {
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
   createFramedApp,
+  emitFrameAction,
+  notify,
   projectFrameControls,
   underlyingFrameLayer,
 } from './app-frame.js';

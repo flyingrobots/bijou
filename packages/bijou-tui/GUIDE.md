@@ -127,6 +127,19 @@ timeline()
 - Built-in help (`?`) and command-palette (`Ctrl+P`).
 - Notification review and shell-owned settings.
 
+Pages can surface transient shell notifications without owning frame state:
+
+```typescript
+import { createFramedApp, notify } from '@flyingrobots/bijou-tui';
+
+update(msg, model) {
+  if (msg.type === 'save-complete') {
+    return [model, [notify({ title: 'Saved', tone: 'SUCCESS' })]];
+  }
+  return [model, []];
+}
+```
+
 ## Interaction
 
 - **`KeyMap`**: Declarative keyboard bindings with group-aware help generation.
