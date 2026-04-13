@@ -1,4 +1,15 @@
+---
+title: DX-008 — `PerformanceObserver('gc')` Is Unreliable For Our Measurement Needs
+lane: graveyard
+---
+
 # DX-008 — `PerformanceObserver('gc')` Is Unreliable For Our Measurement Needs
+
+## Disposition
+
+Retired on `release/v4.5.0` in commit `69291fa`. We are no longer treating `PerformanceObserver('gc')` as a trusted bench signal; the repo now ships a dedicated `bench:gc-observer-repro` diagnostic and documents the limitation explicitly in `bench/README.md`, so the remaining work is operational guidance rather than an open product/runtime bug.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

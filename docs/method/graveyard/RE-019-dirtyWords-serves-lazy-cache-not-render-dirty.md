@@ -1,4 +1,15 @@
+---
+title: RE-019 — Surface `dirtyWords` Bitmap Serves The Wrong Master
+lane: graveyard
+---
+
 # RE-019 — Surface `dirtyWords` Bitmap Serves The Wrong Master
+
+## Disposition
+
+Fixed earlier in the runtime engine: `PackedSurface` now carries distinct `dirtyWords` and `renderDirtyWords` responsibilities, and render dirtiness is tracked separately from lazy decode state in `packages/bijou/src/ports/surface.ts`. This is no longer an active bad-code item.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

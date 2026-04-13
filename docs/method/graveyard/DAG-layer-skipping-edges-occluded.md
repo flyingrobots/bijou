@@ -1,4 +1,15 @@
+---
+title: DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes
+lane: graveyard
+---
+
 # DAG — Layer-Skipping Edges Silently Occluded By Intermediate Nodes
+
+## Disposition
+
+Fixed on `release/v4.5.0` in commit `69291fa`. `dag-edges.ts` now routes same-column skip edges through a detour column beside intermediate nodes instead of drawing straight through the occluding node column, `GridState.arrows` now tracks inbound multiplicity without collapsing routes into a boolean set, and the regression coverage in `dag-edges.test.ts` / `dag.test.ts` locks the visual invariant down.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

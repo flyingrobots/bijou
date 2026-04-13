@@ -1,4 +1,16 @@
+---
+title: WF-007 — Align Local Validation With CI `typecheck:test` Gate
+lane: graveyard
+legend: WF
+---
+
 # WF-007 — Align Local Validation With CI `typecheck:test` Gate
+
+## Disposition
+
+Fixed on `release/v4.5.0` in commit `69291fa`. `scripts/hooks/pre-push` now runs `npm run typecheck:test` before the full test suite, `scripts/hooks.test.ts` locks that order down, and the existing i18n test typing drift that would have kept the new gate red was fixed in the same commit so local pre-push truth now matches CI.
+
+## Original Proposal
 
 Legend: [WF — Workflow and Delivery](../../legends/WF-workflow-and-delivery.md)
 

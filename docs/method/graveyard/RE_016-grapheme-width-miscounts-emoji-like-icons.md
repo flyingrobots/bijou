@@ -1,4 +1,16 @@
+---
+title: RE-016 — graphemeWidth Miscounts Emoji-Like Icon Characters
+lane: graveyard
+legend: RE
+---
+
 # RE-016 — graphemeWidth Miscounts Emoji-Like Icon Characters
+
+## Disposition
+
+Fixed on `release/v4.5.0` in commit `69291fa`. First-party status icon paths now force text presentation with VS15 in core alerts, notes, overlay toasts, and notifications, and the grapheme regression coverage proves those symbols stay in the narrow text-width lane instead of drifting into emoji-width rendering.
+
+## Original Proposal
 
 ## Summary
 

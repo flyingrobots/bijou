@@ -1,4 +1,15 @@
+---
+title: RE-017 — Frame does not fill terminal background with surface.primary.bg
+lane: graveyard
+---
+
 # RE-017 — Frame does not fill terminal background with surface.primary.bg
+
+## Disposition
+
+Fixed in the `v4.4.1` release line and already shipped on `main` at tag `v4.4.1`. The frame now fills the body and shell chrome with the active shell background, the stock `shellThemes` path exercises that end to end, and the `RE-017` DOGFOOD cycle coverage plus the 4.4.1 release docs are the source of truth now.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
