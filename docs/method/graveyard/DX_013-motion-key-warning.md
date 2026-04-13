@@ -1,4 +1,16 @@
+---
+title: DX-013 — Motion Key Lifecycle Warning
+lane: graveyard
+legend: DX
+---
+
 # DX-013 — Motion Key Lifecycle Warning
+
+## Disposition
+
+Shipped runtime warning for unstable motion key birth/death swaps in the motion reconciler, wired through the live runtime middleware, documented the stable-key rule, and covered the behavior with focused reconciler tests.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

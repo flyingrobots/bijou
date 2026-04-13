@@ -87,6 +87,17 @@ function renderWave(_ctx: BijouContext): Surface {
 - **Command Capabilities**: Access the system clock and pulse from within `Cmd`.
 - **Worker Runtime Seams**: Map main-thread input to off-thread logic.
 
+## Motion Keys
+
+`motion({ key }, ...)` only works when `key` is stable across renders for the
+same conceptual thing. Do not use shifting list indices or other ephemeral
+values here.
+
+The runtime now emits a development warning when one set of motion keys appears
+on the same frame that a different set disappears. Treat that as a strong signal
+that your component identity is unstable and the reconciler is being forced to
+start new animations instead of continuing existing ones.
+
 ## Framed Shell Layer Projection
 
 `createFramedApp()` now has a stable seam for page-owned layer metadata and

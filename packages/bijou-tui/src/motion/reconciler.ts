@@ -1,4 +1,4 @@
-import type { LayoutNode, LayoutRect } from '@flyingrobots/bijou';
+import type { LayoutNode, LayoutRect, WritePort } from '@flyingrobots/bijou';
 import {
   resolveSpringConfig,
   resolveTweenConfig,
@@ -15,35 +15,46 @@ type MotionNode = LayoutNode & { motion?: MotionOptions };
  */
 export class MotionReconciler {
   private tracked = new Map<string, TrackedMotion>();
+  private warnedTransitions = new Set<string>();
 
   /**
    * Reconcile the target layout tree with the last known positions.
    * If a node with a known key has moved, it initiates/continues a transition.
    */
-  reconcile(node: LayoutNode, dt: number): void {
-    if (node.id) {
-      this.processNode(node, dt);
+  reconcile(node: LayoutNode, dt: number, io?: Pick<WritePort, 'writeError'>): void {
+    const previousKeys = new Set(this.tracked.keys());
+    const seenKeys = new Set<string>();
+    this.reconcileNode(node, dt, seenKeys);
+    this.warnOnLikelyUnstableKeys(previousKeys, seenKeys, io);
+    this.pruneMissingKeys(seenKeys);
+  }
+
+  private reconcileNode(node: LayoutNode, dt: number, seenKeys: Set<string>): void {
+    const motionNode = node as MotionNode;
+    if (motionNode.motion != null) {
+      seenKeys.add(motionNode.motion.key);
+      this.processNode(motionNode, dt);
     }
 
     for (const child of node.children) {
-      this.reconcile(child, dt);
+      this.reconcileNode(child, dt, seenKeys);
     }
   }
 
-  private processNode(node: LayoutNode, dt: number): void {
-    const key = node.id!;
-    const motion = (node as MotionNode).motion;
+  private processNode(node: MotionNode, dt: number): void {
+    const motion = node.motion!;
+    const key = motion.key;
     const targetRect = { ...node.rect };
     let state = this.tracked.get(key);
 
     if (!state) {
-      const initialRect = resolveInitialRect(targetRect, motion?.initial);
+      const initialRect = resolveInitialRect(targetRect, motion.initial);
       state = {
         key,
         targetRect,
         currentRect: initialRect,
         velocity: { x: 0, y: 0, w: 0, h: 0 },
-        mode: motion?.transition?.type ?? 'spring',
+        mode: motion.transition?.type ?? 'spring',
         tweenElapsedMs: 0,
         tweenFromRect: initialRect,
         done: isSameRect(initialRect, targetRect),
@@ -51,7 +62,7 @@ export class MotionReconciler {
       this.tracked.set(key, state);
     }
 
-    const nextMode = motion?.transition?.type ?? state.mode ?? 'spring';
+    const nextMode = motion.transition?.type ?? state.mode ?? 'spring';
     const targetChanged = !isSameRect(state.targetRect, targetRect) || state.mode !== nextMode;
     if (targetChanged) {
       state.targetRect = targetRect;
@@ -70,14 +81,14 @@ export class MotionReconciler {
       if (state.mode === 'tween') {
         const tween = tweenStep(
           { value: state.tweenElapsedMs <= 0 ? 0 : state.tweenElapsedMs, elapsed: state.tweenElapsedMs, done: false },
-          resolveTweenConfig({ duration: Math.max(1, motion?.transition?.duration ?? 300) }),
+          resolveTweenConfig({ duration: Math.max(1, motion.transition?.duration ?? 300) }),
           dt * 1000,
         );
         state.tweenElapsedMs = tween.elapsed;
         state.currentRect = lerpRect(state.tweenFromRect, state.targetRect, tween.value);
         state.done = tween.done;
       } else {
-        const config = resolveSpringConfig(motion?.transition?.spring ?? 'gentle');
+        const config = resolveSpringConfig(motion.transition?.spring ?? 'gentle');
         const nextX = this.step(state.currentRect.x, state.targetRect.x, state.velocity.x, config, dt);
         const nextY = this.step(state.currentRect.y, state.targetRect.y, state.velocity.y, config, dt);
         const nextW = this.step(state.currentRect.width, state.targetRect.width, state.velocity.w, config, dt);
@@ -91,6 +102,34 @@ export class MotionReconciler {
 
     // Apply interpolated rect to the layout node for the paint pass
     node.rect = roundRect(state.currentRect);
+  }
+
+  private warnOnLikelyUnstableKeys(
+    previousKeys: ReadonlySet<string>,
+    seenKeys: ReadonlySet<string>,
+    io?: Pick<WritePort, 'writeError'>,
+  ): void {
+    const appeared = [...seenKeys].filter((key) => !previousKeys.has(key)).sort();
+    const disappeared = [...previousKeys].filter((key) => !seenKeys.has(key)).sort();
+    if (appeared.length === 0 || disappeared.length === 0) return;
+
+    const signature = `${appeared.join(',')}|${disappeared.join(',')}`;
+    if (this.warnedTransitions.has(signature)) return;
+    this.warnedTransitions.add(signature);
+
+    io?.writeError(
+      `[bijou-tui] motion(): keys [${appeared.join(', ')}] appeared on the same frame that `
+        + `[${disappeared.join(', ')}] disappeared. This often means motion keys are unstable `
+        + `across renders; use a stable key instead of a shifting index.\n`,
+    );
+  }
+
+  private pruneMissingKeys(seenKeys: ReadonlySet<string>): void {
+    for (const key of this.tracked.keys()) {
+      if (!seenKeys.has(key)) {
+        this.tracked.delete(key);
+      }
+    }
   }
 
   private step(curr: number, target: number, vel: number, config: SpringConfig, dt: number) {
