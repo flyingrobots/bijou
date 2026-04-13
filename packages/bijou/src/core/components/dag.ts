@@ -10,7 +10,7 @@ import { renderByMode } from '../mode-render.js';
 // ── Types ──────────────────────────────────────────────────────────
 
 /**
- * A single node in a directed acyclic graph.
+ * A single node in a directed graph rendered through the DAG component.
  *
  * Each node has a unique `id`, a display `label`, and optional outgoing
  * `edges` pointing to child node IDs. Nodes may carry per-node style
@@ -170,16 +170,19 @@ export function dagLayout(
 // ── Main Entry Point ───────────────────────────────────────────────
 
 /**
- * Render a directed acyclic graph as a styled string.
+ * Render a directed graph as a styled string.
  *
  * Adapts output to the current context mode:
  * - `'interactive'` / `'static'`: Unicode box-drawing with ANSI styling.
  * - `'pipe'`: Plain text `Label -> Target` lines.
- * - `'accessible'`: Structured text with layer groupings.
+ * - `'accessible'`: Structured text with cycle-tolerant layer groupings.
  *
  * @param input - A `SlicedDagSource` or `DagNode[]` to render.
  * @param options - Rendering options (tokens, selection, sizing).
  * @returns The rendered graph string.
+ * Cycle-forming back-edges are ignored only for layer assignment; the full
+ * original edge set is still rendered.
+ *
  * @throws If given an unbounded `DagSource` (must call `dagSlice()` first).
  */
 export function dag(source: SlicedDagSource, options?: DagOptions): string;

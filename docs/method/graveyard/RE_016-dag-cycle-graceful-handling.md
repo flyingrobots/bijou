@@ -1,10 +1,16 @@
 ---
 title: "RE-016: DAG renderer should handle cycles gracefully"
-lane: root
+lane: graveyard
 legend: RE
 ---
 
 # RE-016: DAG renderer should handle cycles gracefully
+
+## Disposition
+
+Rendered DAG graphs now tolerate cycles by stripping cycle-forming back-edges only for the layering pass while preserving the full original edge set in interactive and accessible output. dag() and dagLayout() no longer fail on cyclic graphs or self-loops, and focused regressions cover both paths.
+
+## Original Proposal
 
 ## Problem
 
