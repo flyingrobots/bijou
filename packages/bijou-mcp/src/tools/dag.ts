@@ -18,7 +18,7 @@ const inputSchema = z.object(inputShape);
 
 export const dagTool: ToolRegistration = {
   name: 'bijou_dag',
-  description: 'Render a directed acyclic graph with boxed nodes and edge lines. Returns plain-text with Unicode box-drawing characters.',
+  description: 'Render a directed graph with boxed nodes and edge lines. Returns plain-text with Unicode box-drawing characters.',
   inputSchema: inputShape,
   handler: async (args) => {
     const input = inputSchema.parse(args);

@@ -38,6 +38,7 @@ import { constrainTool } from './tools/constrain.js';
 import { progressBarTool } from './tools/progress.js';
 import { explainabilityTool } from './tools/explainability.js';
 import { inspectorTool } from './tools/inspector.js';
+import { createDocsTool } from './tools/docs.js';
 
 const TOOLS: readonly ToolRegistration[] = [
   tableTool,
@@ -65,12 +66,14 @@ const TOOLS: readonly ToolRegistration[] = [
   inspectorTool,
 ];
 
+const docsTool = createDocsTool(TOOLS);
+
 const server = new McpServer({
   name: 'bijou-mcp',
   version: PACKAGE_VERSION,
 });
 
-for (const tool of TOOLS) {
+for (const tool of [...TOOLS, docsTool]) {
   server.tool(
     tool.name,
     tool.description,
