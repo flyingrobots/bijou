@@ -1,4 +1,16 @@
+---
+title: HT-001 — Notification Center Polish and Discoverability
+lane: graveyard
+legend: HT
+---
+
 # HT-001 — Notification Center Polish and Discoverability
+
+## Disposition
+
+Retired as stale backlog tracking. Repo truth already shipped the shell-owned notification center in createFramedApp(), including the standard Shift+N entrypoint, footer-level discoverability cue, command-palette entry, independent scroll/filter ownership, calmer drawer rhythm and structured review rows, shell-theme support, and logical-end localization follow-on work. The note's own 'park this until DL-001' status is also outdated relative to the completed DL/LX cycles and current app-frame tests.
+
+## Original Proposal
 
 Legend: [HT — Humane Terminal](../legends/HT-humane-terminal.md)
 
