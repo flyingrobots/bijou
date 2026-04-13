@@ -1,4 +1,16 @@
+---
+title: DX-014 — Fix Root README Interactive Example
+lane: graveyard
+legend: DX
+---
+
 # DX-014 — Fix Root README Interactive Example
+
+## Disposition
+
+Stale note. The root README interactive example already imports initDefaultContext() from @flyingrobots/bijou-node, calls it before run(app), and the surrounding docs now also teach startApp() as the preferred hosted Node bootstrap path.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 
