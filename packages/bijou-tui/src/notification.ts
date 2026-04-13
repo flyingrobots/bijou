@@ -19,6 +19,7 @@ import type { LayoutRect } from './layout-rect.js';
 import { visibleLength } from './viewport.js';
 import { resolveNotificationGap, resolveOverlayMargin } from './design-language.js';
 import { vstackSurface } from './surface-layout.js';
+import { forceTextPresentation } from './icon-presentation.js';
 
 export type NotificationVariant = 'ACTIONABLE' | 'INLINE' | 'TOAST';
 export type NotificationTone = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
@@ -148,10 +149,10 @@ const EXIT_DURATION_MS = 320;
 const HISTORY_LIMIT = 250;
 
 const TONE_ICONS: Record<NotificationTone, string> = {
-  INFO: '\u2139',
-  SUCCESS: '\u2714',
-  WARNING: '\u26a0',
-  ERROR: '\u2718',
+  INFO: forceTextPresentation('\u2139'),
+  SUCCESS: forceTextPresentation('\u2714'),
+  WARNING: forceTextPresentation('\u26a0'),
+  ERROR: forceTextPresentation('\u2718'),
 };
 
 const TONE_BORDER_KEYS: Record<NotificationTone, 'primary' | 'success' | 'warning' | 'error'> = {
@@ -724,9 +725,9 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
     const s = segment.style;
     if (packed && s) {
       let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-      const fgRgb = s.fg ? parseHex(s.fg) : undefined;
+      const fgRgb = s.fgRGB ?? (s.fg ? parseHex(s.fg) : undefined);
       if (fgRgb) { [fR, fG, fB] = fgRgb; }
-      const bgRgb = s.bg ? parseHex(s.bg) : undefined;
+      const bgRgb = s.bgRGB ?? (s.bg ? parseHex(s.bg) : undefined);
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
       const fl = s.modifiers ? encodeModifiers(s.modifiers) : 0;
       for (const char of segment.graphemes) {
@@ -739,6 +740,8 @@ function createSegmentSurface(segments: readonly { readonly text: string; readon
           char,
           fg: s?.fg,
           bg: s?.bg,
+          fgRGB: s?.fgRGB,
+          bgRGB: s?.bgRGB,
           modifiers: s?.modifiers ? [...s.modifiers] : undefined,
           empty: false,
         });
@@ -975,11 +978,13 @@ function renderNotificationSurface<Msg>(
 
   const cardPacked = isPackedSurface(card);
   for (let y = 0; y < contentRows.length; y++) {
-    const accentRgb = cardPacked && accentStyle.fg ? parseHex(accentStyle.fg) : undefined;
+    const accentRgb = cardPacked
+      ? (accentStyle.fgRGB ?? (accentStyle.fg ? parseHex(accentStyle.fg) : undefined))
+      : undefined;
     if (accentRgb) {
       const [fR, fG, fB] = accentRgb;
       let bR = -1, bG = 0, bB = 0;
-      const bgRgb = backgroundStyle.bg ? parseHex(backgroundStyle.bg) : undefined;
+      const bgRgb = backgroundStyle.bgRGB ?? (backgroundStyle.bg ? parseHex(backgroundStyle.bg) : undefined);
       if (bgRgb) { [bR, bG, bB] = bgRgb; }
       (card as PackedSurface).setRGB(0, y, '\u258e', fR, fG, fB, bR, bG, bB, encodeModifiers(accentStyle.modifiers));
     } else {
@@ -987,6 +992,8 @@ function renderNotificationSurface<Msg>(
         char: '\u258e',
         fg: accentStyle.fg,
         bg: backgroundStyle.bg,
+        fgRGB: accentStyle.fgRGB,
+        bgRGB: backgroundStyle.bgRGB,
         modifiers: accentStyle.modifiers ? [...accentStyle.modifiers] : undefined,
         empty: false,
       });

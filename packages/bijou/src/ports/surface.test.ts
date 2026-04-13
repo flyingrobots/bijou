@@ -49,6 +49,8 @@ describe('createSurface', () => {
       char: 'A',
       fg: '#ff0000',
       bg: '#001122',
+      fgRGB: [255, 0, 0],
+      bgRGB: [0, 17, 34],
       modifiers: ['bold'],
       empty: false,
       opacity: 0.5,
@@ -67,6 +69,8 @@ describe('createSurface', () => {
       char: 'A',
       fg: '#00ff00',
       bg: undefined,
+      fgRGB: [0, 255, 0],
+      bgRGB: undefined,
       modifiers: undefined,
       empty: false,
       opacity: 1,
@@ -77,6 +81,55 @@ describe('createSurface', () => {
     const surface = createSurface(1, 1);
     expect(isPackedSurface(surface)).toBe(true);
     expect(surface.buffer).toBeInstanceOf(Uint8Array);
+  });
+
+  it('preserves pre-parsed rgb metadata through packed writes and reads', () => {
+    const surface = createSurface(1, 1);
+
+    surface.set(0, 0, {
+      char: 'A',
+      fgRGB: [1, 2, 3],
+      bgRGB: [4, 5, 6],
+      empty: false,
+    });
+
+    expect(surface.get(0, 0)).toEqual({
+      char: 'A',
+      fg: '#010203',
+      bg: '#040506',
+      fgRGB: [1, 2, 3],
+      bgRGB: [4, 5, 6],
+      modifiers: undefined,
+      empty: false,
+      opacity: 1,
+    });
+  });
+
+  it('masked writes use fgRGB/bgRGB without requiring hex strings', () => {
+    const surface = createSurface(1, 1);
+
+    surface.set(
+      0,
+      0,
+      {
+        char: 'X',
+        fgRGB: [10, 20, 30],
+        bgRGB: [40, 50, 60],
+        empty: false,
+      },
+      { char: true, fg: true, bg: true, modifiers: false, alpha: true },
+    );
+
+    expect(surface.get(0, 0)).toEqual({
+      char: 'X',
+      fg: '#0a141e',
+      bg: '#28323c',
+      fgRGB: [10, 20, 30],
+      bgRGB: [40, 50, 60],
+      modifiers: undefined,
+      empty: false,
+      opacity: 1,
+    });
   });
 
   it('sanitizes non-finite and fractional dimensions before allocation', () => {

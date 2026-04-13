@@ -1,4 +1,4 @@
-import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type Cell } from '../../ports/surface.js';
 import type { BaseStatusKey } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
@@ -66,16 +66,17 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
     cell.modifiers = cell.modifiers?.filter(m => m !== 'inverse');
   }
 
-  const packed = isPackedSurface(surface);
-  if (packed && cell.fg) {
-    const fg = parseHex(cell.fg);
+  const packedSurface = isPackedSurface(surface) ? surface : undefined;
+  if (packedSurface) {
+    const fg = cell.fgRGB ?? (cell.fg ? parseHex(cell.fg) : undefined);
     if (fg) {
       const [fR, fG, fB] = fg;
       let bR = -1, bG = 0, bB = 0;
-      if (cell.bg) { const bg = parseHex(cell.bg); if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; } }
+      const bg = cell.bgRGB ?? (cell.bg ? parseHex(cell.bg) : undefined);
+      if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
       const flags = encodeModifiers(cell.modifiers);
       for (let i = 0; i < width; i++) {
-        (surface as PackedSurface).setRGB(i, 0, graphemes[i]!, fR, fG, fB, bR, bG, bB, flags);
+        packedSurface.setRGB(i, 0, graphemes[i]!, fR, fG, fB, bR, bG, bB, flags);
       }
     } else {
       for (let i = 0; i < width; i++) surface.set(i, 0, { ...cell, char: graphemes[i]! });

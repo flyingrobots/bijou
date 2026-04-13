@@ -135,6 +135,12 @@ describe('graphemeClusterWidth', () => {
   it('returns 2 for fullwidth forms', () => {
     expect(graphemeClusterWidth('Ａ')).toBe(2);
   });
+
+  it('keeps text-presentation status symbols narrow', () => {
+    expect(graphemeClusterWidth('⚠\uFE0E')).toBe(1);
+    expect(graphemeClusterWidth('ℹ\uFE0E')).toBe(1);
+    expect(graphemeClusterWidth('✗\uFE0E')).toBe(1);
+  });
 });
 
 describe('graphemeWidth', () => {

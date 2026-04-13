@@ -160,6 +160,8 @@ export {
 
 // Text / grapheme utilities
 export {
+  forceTextPresentation,
+  TEXT_PRESENTATION_SELECTOR,
   isWideChar,
   segmentGraphemes,
   graphemeClusterWidth,

@@ -277,6 +277,21 @@ describe('dag', () => {
       expect(result).toContain('Middle');
       expect(result).toContain('Bottom');
     });
+
+    it('keeps layer-skipping edges visible when another node sits in the same column', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'A', edges: ['b', 'c'] },
+        { id: 'b', label: 'B', edges: ['c'] },
+        { id: 'c', label: 'C' },
+      ];
+      const result = dag(nodes, { ctx });
+
+      expect(result).toContain('A');
+      expect(result).toContain('B');
+      expect(result).toContain('C');
+      expect(result).toContain('├');
+    });
   });
 
   // ── Edge Characters ─────────────────────────────────────────────

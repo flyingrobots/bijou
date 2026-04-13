@@ -301,6 +301,25 @@ describe('surface-first primitives', () => {
     expect(() => createTextSurface('漢')).toThrow(/does not yet support wide graphemes/);
   });
 
+  it('createTextSurface accepts rgb-only styles without hex strings', () => {
+    const surface = createTextSurface('OK', {
+      fgRGB: [12, 34, 56],
+      bgRGB: [65, 43, 21],
+      modifiers: ['bold'],
+    });
+
+    expect(surface.get(0, 0)).toEqual({
+      char: 'O',
+      fg: '#0c2238',
+      bg: '#412b15',
+      fgRGB: [12, 34, 56],
+      bgRGB: [65, 43, 21],
+      modifiers: ['bold'],
+      empty: false,
+      opacity: 1,
+    });
+  });
+
   it('separatorSurface rejects wide labels until surface wide-cell support exists', () => {
     const ctx = createTestContext({ mode: 'interactive' });
 

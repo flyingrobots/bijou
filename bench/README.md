@@ -81,3 +81,18 @@ we rebuilt the bench around the principle that measurements you
 can't trust are worse than no measurement at all.
 
 See `docs/perf/RE-017-byte-pipeline.md` for the full context.
+
+## GC observer repro
+
+If you need to investigate the old `PerformanceObserver('gc')` question in
+isolation, use the dedicated repro instead of rebuilding the measurement logic
+inside a real bench harness:
+
+```bash
+npm run bench:gc-observer-repro
+```
+
+This command intentionally runs outside the main wall-time harness with
+`--expose-gc` so you can compare `heapUsed` deltas against observer-reported GC
+events without polluting production scenarios. It is a diagnostic tool only,
+not a release gate and not part of the trusted wall-time bench story.

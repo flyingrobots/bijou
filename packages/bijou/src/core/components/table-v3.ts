@@ -83,12 +83,12 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
 
   // Pre-parse border style for setRGB fast path
   let bfR = -1, bfG = 0, bfB = 0, bbR = -1, bbG = 0, bbB = 0, bflags = 0;
-  if (packedSurface && borderStyle.fg) {
-    const rgb = parseHex(borderStyle.fg);
+  if (packedSurface) {
+    const rgb = borderStyle.fgRGB ?? (borderStyle.fg ? parseHex(borderStyle.fg) : undefined);
     if (rgb) { const [r, g, b] = rgb; bfR = r; bfG = g; bfB = b; }
   }
-  if (packedSurface && borderStyle.bg) {
-    const rgb = parseHex(borderStyle.bg);
+  if (packedSurface) {
+    const rgb = borderStyle.bgRGB ?? (borderStyle.bg ? parseHex(borderStyle.bg) : undefined);
     if (rgb) { const [r, g, b] = rgb; bbR = r; bbG = g; bbB = b; }
   }
   if (packedSurface) bflags = encodeModifiers(borderStyle.modifiers);
@@ -105,6 +105,8 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
       char: ' ',
       fg: fg ?? headerBg?.fg,
       bg: bg ?? headerBg?.bg,
+      fgRGB: headerBg?.fgRGB,
+      bgRGB: headerBg?.bgRGB,
       modifiers: headerBg?.modifiers,
       empty: false,
     });

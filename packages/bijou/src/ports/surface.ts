@@ -244,6 +244,8 @@ function maskCell(cell: Cell, mask: CellMask): Cell {
     char: mask.char ? cell.char : ' ',
     fg: mask.fg ? cell.fg : undefined,
     bg: mask.bg ? cell.bg : undefined,
+    fgRGB: mask.fg ? cell.fgRGB : undefined,
+    bgRGB: mask.bg ? cell.bgRGB : undefined,
     modifiers: mask.modifiers ? cell.modifiers : undefined,
     empty: mask.alpha ? (cell.empty ?? false) : false,
     opacity: mask.alpha ? (cell.opacity ?? 1) : 1,
@@ -255,6 +257,8 @@ function cloneCell(cell: Cell): Cell {
     char: cell.char,
     fg: cell.fg,
     bg: cell.bg,
+    fgRGB: cell.fgRGB,
+    bgRGB: cell.bgRGB,
     modifiers: cell.modifiers,
     empty: cell.empty,
     opacity: cell.opacity,
@@ -265,6 +269,8 @@ function copyCellInto(target: Cell, source: Cell): void {
   target.char = source.char;
   target.fg = source.fg;
   target.bg = source.bg;
+  target.fgRGB = source.fgRGB;
+  target.bgRGB = source.bgRGB;
   target.modifiers = source.modifiers;
   target.empty = source.empty;
   target.opacity = source.opacity;
@@ -372,6 +378,8 @@ function decodeCellFromBuf(
     char: decodeChar(charCode, sideTable),
     fg: fgSet ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!) : undefined,
     bg: bgSet ? toHex(buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!) : undefined,
+    fgRGB: fgSet ? [buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!] : undefined,
+    bgRGB: bgSet ? [buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!] : undefined,
     modifiers: decodeModifiers(flags & ~FLAG_EMPTY),
     empty: (flags & FLAG_EMPTY) !== 0,
     opacity: decodeOpacity(alphaByte & OPACITY_MASK),
@@ -390,6 +398,8 @@ function syncCellFromBuf(
   cell.char = decoded.char;
   cell.fg = decoded.fg;
   cell.bg = decoded.bg;
+  cell.fgRGB = decoded.fgRGB;
+  cell.bgRGB = decoded.bgRGB;
   cell.modifiers = decoded.modifiers;
   cell.empty = decoded.empty;
   // Preserve exact float when available; use quantized only for buffer-decoded reads
@@ -416,7 +426,12 @@ function applyMaskToBuf(
     buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
   }
   if (mask.fg) {
-    if (source.fg && inlineHexRGB(source.fg, buf, off + OFF_FG_R)) {
+    if (source.fgRGB !== undefined) {
+      buf[off + OFF_FG_R] = source.fgRGB[0]!;
+      buf[off + OFF_FG_G] = source.fgRGB[1]!;
+      buf[off + OFF_FG_B] = source.fgRGB[2]!;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_FG_SET;
+    } else if (source.fg && inlineHexRGB(source.fg, buf, off + OFF_FG_R)) {
       buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_FG_SET;
     } else {
       buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
@@ -424,7 +439,12 @@ function applyMaskToBuf(
     }
   }
   if (mask.bg) {
-    if (source.bg && inlineHexRGB(source.bg, buf, off + OFF_BG_R)) {
+    if (source.bgRGB !== undefined) {
+      buf[off + OFF_BG_R] = source.bgRGB[0]!;
+      buf[off + OFF_BG_G] = source.bgRGB[1]!;
+      buf[off + OFF_BG_B] = source.bgRGB[2]!;
+      buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
+    } else if (source.bg && inlineHexRGB(source.bg, buf, off + OFF_BG_R)) {
       buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
     } else {
       buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createI18nRuntime, createI18nRuntimeAsync, ref } from './index.js';
+import type { I18nCatalogLoader } from './index.js';
 
 describe('bijou-i18n runtime', () => {
   it('interpolates simple scalar values in messages', () => {
@@ -96,7 +97,7 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('creates an async runtime that preloads the initial locale through the loader', async () => {
-    const loader = vi.fn(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
       namespace: 'shell',
       entries: [
         {
@@ -121,7 +122,7 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('switches loader-managed catalogs on locale change and caches prior loads', async () => {
-    const loader = vi.fn(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
       namespace: 'shell',
       entries: [
         {
@@ -151,7 +152,7 @@ describe('bijou-i18n runtime', () => {
   });
 
   it('preloads a locale without switching until setLocale is called', async () => {
-    const loader = vi.fn(async (locale: string) => [{
+    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
       namespace: 'shell',
       entries: [
         {

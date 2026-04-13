@@ -84,12 +84,12 @@ export function canvas(
 }
 
 function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
-  if (packed && cell.fg) {
-    const fg = parseHex(cell.fg);
+  if (packed && (cell.fgRGB != null || cell.fg != null)) {
+    const fg = cell.fgRGB ?? (cell.fg ? parseHex(cell.fg) : undefined);
     if (fg) {
       const [fR, fG, fB] = fg;
       let bR = -1, bG = 0, bB = 0;
-      const bg = cell.bg ? parseHex(cell.bg) : undefined;
+      const bg = cell.bgRGB ?? (cell.bg ? parseHex(cell.bg) : undefined);
       if (bg) { [bR, bG, bB] = bg; }
       (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;

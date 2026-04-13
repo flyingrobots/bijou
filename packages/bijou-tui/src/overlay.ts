@@ -24,6 +24,7 @@ import {
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
+import { forceTextPresentation } from './icon-presentation.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -509,9 +510,9 @@ export function modal(options: ModalOptions): Overlay {
 
 /** Unicode icon characters mapped by toast variant. */
 const TOAST_ICONS: Record<ToastVariant, string> = {
-  success: '\u2714', // ✔
-  error: '\u2718',   // ✘
-  info: '\u2139',    // ℹ
+  success: forceTextPresentation('\u2714'), // ✔
+  error: forceTextPresentation('\u2718'),   // ✘
+  info: forceTextPresentation('\u2139'),    // ℹ
 };
 
 /** Semantic border token keys mapped by toast variant. */

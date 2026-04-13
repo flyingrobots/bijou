@@ -12,7 +12,7 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
-import { createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
+import { buildEdgeRoute, createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
 import { sanitizeOptionalPositiveInt, sanitizePositiveInt } from '../numeric.js';
@@ -248,7 +248,7 @@ export function renderInteractiveLayout(
       const tLayer = layerMap.get(childId);
       const tCol = colIndex.get(childId);
       if (tLayer === undefined || tCol === undefined) continue;
-      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter);
+      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth);
     }
   }
 
@@ -344,28 +344,10 @@ export function renderInteractiveLayout(
       const fCol = colIndex.get(fromId);
       const tCol = colIndex.get(toId);
       if (fLayer === undefined || tLayer === undefined || fCol === undefined || tCol === undefined) continue;
-
-      const srcC = colCenter(fCol);
-      const dstC = colCenter(tCol);
-      const sRow = fLayer * RS + 3;
-      const dRow = tLayer * RS - 1;
-      const midRow = sRow + 1;
-
-      if (srcC === dstC) {
-        for (let r = sRow; r <= dRow && r < gridRows; r++) {
-          if (srcC < gridCols) hlCells.add(encodeArrowPos(r, srcC));
-        }
-      } else {
-        if (sRow < gridRows && srcC < gridCols) hlCells.add(encodeArrowPos(sRow, srcC));
-        const minC = Math.min(srcC, dstC);
-        const maxC2 = Math.max(srcC, dstC);
-        if (midRow < gridRows) {
-          for (let c = minC; c <= maxC2 && c < gridCols; c++) {
-            hlCells.add(encodeArrowPos(midRow, c));
-          }
-        }
-        for (let r = midRow; r <= dRow && r < gridRows; r++) {
-          if (dstC < gridCols) hlCells.add(encodeArrowPos(r, dstC));
+      const route = buildEdgeRoute(fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth, gridCols);
+      for (const point of route.path) {
+        if (point.row >= 0 && point.row < gridRows && point.col >= 0 && point.col < gridCols) {
+          hlCells.add(encodeArrowPos(point.row, point.col));
         }
       }
     }
@@ -405,7 +387,8 @@ export function renderInteractiveLayout(
 
     // 2. Arrowhead
     const encoded = encodeArrowPos(row, col);
-    if (g.arrows.has(encoded)) {
+    const arrowCount = g.arrows.get(encoded) ?? 0;
+    if (arrowCount > 0) {
       const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
       return { ch: '\u25bc', token };
     }

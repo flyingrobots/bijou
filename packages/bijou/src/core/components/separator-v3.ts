@@ -23,12 +23,12 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   // Pre-parse border style for setRGB fast path
   const packed = isPackedSurface(surface);
   let bfgR = -1, bfgG = 0, bfgB = 0, bbgR = -1, bbgG = 0, bbgB = 0, bflags = 0;
-  if (packed && borderStyle.fg) {
-    const rgb = parseHex(borderStyle.fg);
+  if (packed) {
+    const rgb = borderStyle.fgRGB ?? (borderStyle.fg ? parseHex(borderStyle.fg) : undefined);
     if (rgb) { bfgR = rgb[0]; bfgG = rgb[1]; bfgB = rgb[2]; }
   }
-  if (packed && borderStyle.bg) {
-    const rgb = parseHex(borderStyle.bg);
+  if (packed) {
+    const rgb = borderStyle.bgRGB ?? (borderStyle.bg ? parseHex(borderStyle.bg) : undefined);
     if (rgb) { bbgR = rgb[0]; bbgG = rgb[1]; bbgB = rgb[2]; }
   }
   if (packed) bflags = encodeModifiers(borderStyle.modifiers);

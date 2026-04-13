@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { forceTextPresentation } from '../text/icon-presentation.js';
 
 /** Configuration for a display-only note within a form flow. */
 export interface NoteOptions {
@@ -50,7 +51,7 @@ function formatPlain(title: string | undefined, message: string): string {
 
 /** Format a styled note for interactive/static modes. */
 function formatVisual(title: string | undefined, message: string, ctx: BijouContext): string {
-  const infoIcon = 'ℹ';
+  const infoIcon = forceTextPresentation('ℹ');
   const accentToken = ctx.semantic('info');
   const mutedToken = ctx.semantic('muted');
 

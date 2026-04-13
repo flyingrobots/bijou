@@ -3,6 +3,7 @@ import { resolveCtx } from '../resolve-ctx.js';
 import { box } from './box.js';
 import { renderByMode } from '../mode-render.js';
 import type { BijouNodeOptions } from './types.js';
+import { forceTextPresentation } from '../text/icon-presentation.js';
 
 /** Alert severity level. */
 export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
@@ -20,16 +21,14 @@ export interface AlertOptions extends BijouNodeOptions {
 /**
  * Unicode icon characters for each alert variant.
  *
- * ✓ (U+2713) and ✗ (U+2717) are Narrow per Unicode East Asian Width.
- * ⚠ (U+26A0) and ℹ (U+2139) are Ambiguous — 1-wide in terminals,
- * potentially 2-wide in some chat UIs. We treat them as 1-wide here
- * since graphemeWidth correctly classifies them as Narrow.
+ * The symbols are forced into text presentation with VS15 (U+FE0E) so
+ * chat UIs and web terminals do not widen them into emoji presentation.
  */
 const ICONS: Record<AlertVariant, string> = {
-  success: '\u2713',  // ✓ CHECK MARK
-  error: '\u2717',    // ✗ BALLOT X
-  warning: '\u26A0',  // ⚠ WARNING SIGN
-  info: '\u2139',     // ℹ INFORMATION SOURCE
+  success: forceTextPresentation('\u2713'), // ✓ CHECK MARK
+  error: forceTextPresentation('\u2717'),   // ✗ BALLOT X
+  warning: forceTextPresentation('\u26A0'), // ⚠ WARNING SIGN
+  info: forceTextPresentation('\u2139'),    // ℹ INFORMATION SOURCE
 };
 
 /** Uppercase labels used in pipe mode output. */

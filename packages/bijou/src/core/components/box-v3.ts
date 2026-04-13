@@ -9,22 +9,28 @@ import { resolveOverflowBehavior } from './overflow.js';
 import { parseHex, encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
-function parseStyleRGB(style: { fg?: string; bg?: string; modifiers?: string[] }): {
+function parseStyleRGB(style: {
+  fg?: string;
+  bg?: string;
+  fgRGB?: readonly [number, number, number];
+  bgRGB?: readonly [number, number, number];
+  modifiers?: string[];
+}): {
   fgR: number; fgG: number; fgB: number;
   bgR: number; bgG: number; bgB: number;
   flags: number;
 } | undefined {
   let fgR = -1, fgG = 0, fgB = 0;
   let bgR = -1, bgG = 0, bgB = 0;
-  if (style.fg) {
-    const rgb = parseHex(style.fg);
-    if (!rgb) return undefined;
-    fgR = rgb[0]; fgG = rgb[1]; fgB = rgb[2];
+  const fgRgb = style.fgRGB ?? (style.fg ? parseHex(style.fg) : undefined);
+  if (style.fg != null && fgRgb == null) return undefined;
+  if (fgRgb) {
+    fgR = fgRgb[0]; fgG = fgRgb[1]; fgB = fgRgb[2];
   }
-  if (style.bg) {
-    const rgb = parseHex(style.bg);
-    if (!rgb) return undefined;
-    bgR = rgb[0]; bgG = rgb[1]; bgB = rgb[2];
+  const bgRgb = style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined);
+  if (style.bg != null && bgRgb == null) return undefined;
+  if (bgRgb) {
+    bgR = bgRgb[0]; bgG = bgRgb[1]; bgB = bgRgb[2];
   }
   return { fgR, fgG, fgB, bgR, bgG, bgB, flags: encodeModifiers(style.modifiers) };
 }

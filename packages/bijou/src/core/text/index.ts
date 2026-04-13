@@ -18,6 +18,11 @@ export {
   stripAnsi,
 } from './grapheme.js';
 
+export {
+  forceTextPresentation,
+  TEXT_PRESENTATION_SELECTOR,
+} from './icon-presentation.js';
+
 export { clipToWidth } from './clip.js';
 export {
   wrapToWidth,
