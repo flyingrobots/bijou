@@ -30,6 +30,13 @@ The Bijou work doctrine: A backlog, a loop, and honest bookkeeping.
 | **`bad-code/`** | Technical debt that must be addressed. |
 | **`inbox/`** | Raw ideas. |
 
+## Closure Archives
+
+| Directory | Purpose |
+| :--- | :--- |
+| **`docs/method/retro/`** | Finished ideas with shipped or otherwise completed dispositions. These are historical retros, not live backlog. |
+| **`docs/method/graveyard/`** | Superseded or abandoned ideas that should not be mistaken for current queue work. |
+
 ## The Cycle Loop
 
 ```mermaid

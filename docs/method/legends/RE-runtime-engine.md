@@ -67,8 +67,8 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 ## Current cycle and backlog
 
 - latest completed cycle:
-  - [RE-016 — DAG renderer should handle cycles gracefully](../graveyard/RE_016-dag-cycle-graceful-handling.md)
+  - [RE-016 — DAG renderer should handle cycles gracefully](../retro/RE_016-dag-cycle-graceful-handling.md)
 - previous completed cycle:
-  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+  - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../retro/RE_007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - next queue note:
   - [RE-012 — Pipeline Observability Hooks](../backlog/cool-ideas/RE_012-pipeline-observability-hooks.md)

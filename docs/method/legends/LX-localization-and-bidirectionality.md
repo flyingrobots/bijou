@@ -52,6 +52,6 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Current cycle and backlog
 
-- latest completed cycle: [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../graveyard/LX_009-localize-shell-help-notification-and-directional-surfaces.md)
+- latest completed cycle: [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../retro/LX_009-localize-shell-help-notification-and-directional-surfaces.md)
 - live backlog:
   - no dedicated localization cycle is live right now

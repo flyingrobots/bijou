@@ -11,7 +11,7 @@ Retired from `bad-code` on `release/v4.5.0` in commit `69291fa`. This branch fix
 
 ## Original Proposal
 
-Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
+Legend: [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 ## Problem
 

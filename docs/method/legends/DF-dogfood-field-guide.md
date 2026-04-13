@@ -84,4 +84,4 @@ before DOGFOOD counts as a real terminal docs product, and can see that
   - exploratory follow-on:
     [MCP interactive documentation for all Bijou components](../backlog/cool-ideas/DF_mcp-interactive-documentation-for-all-bijou-components.md)
 - historical backlog lineage:
-  - [DF-002 — Expand DOGFOOD Component Family Coverage](../graveyard/DF_002-expand-dogfood-component-family-coverage.md)
+  - [DF-002 — Expand DOGFOOD Component Family Coverage](../retro/DF_002-expand-dogfood-component-family-coverage.md)

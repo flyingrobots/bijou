@@ -44,9 +44,9 @@ An agent can place docs, tests, and follow-on debt in the right location by read
   - `4.5.0` is the active release branch
   - no dedicated workflow cycle is active right now
   - the most recent completed runtime-engine cycle is
-    [RE-016 — DAG renderer should handle cycles gracefully](../graveyard/RE_016-dag-cycle-graceful-handling.md)
+    [RE-016 — DAG renderer should handle cycles gracefully](../retro/RE_016-dag-cycle-graceful-handling.md)
 - latest workflow closure:
-  - [WF-002 — Migrate Legacy Planning Artifacts](../graveyard/WF_002-migrate-legacy-planning-artifacts.md)
+  - [WF-002 — Migrate Legacy Planning Artifacts](../retro/WF_002-migrate-legacy-planning-artifacts.md)
 - previous workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - latest docs-surface closure:
