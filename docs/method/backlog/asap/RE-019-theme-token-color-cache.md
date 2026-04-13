@@ -1,3 +1,8 @@
+---
+title: RE-019 — Pre-Parse Theme Token Colors Into Bytes
+lane: asap
+---
+
 # RE-019 — Pre-Parse Theme Token Colors Into Bytes
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)

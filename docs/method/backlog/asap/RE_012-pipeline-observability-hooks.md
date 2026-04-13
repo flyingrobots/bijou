@@ -1,3 +1,9 @@
+---
+title: RE-012 — Pipeline Observability Hooks
+lane: asap
+legend: RE
+---
+
 # RE-012 — Pipeline Observability Hooks
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)

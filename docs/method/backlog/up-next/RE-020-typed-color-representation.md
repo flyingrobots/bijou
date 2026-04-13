@@ -1,3 +1,8 @@
+---
+title: RE-020 — Typed Color Representation (`ColorRef` Branded Type)
+lane: up-next
+---
+
 # RE-020 — Typed Color Representation (`ColorRef` Branded Type)
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)

@@ -1,3 +1,9 @@
+---
+title: RE-013 — Memoize Workspace Layout Tree
+lane: asap
+legend: RE
+---
+
 # RE-013 — Memoize Workspace Layout Tree
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
