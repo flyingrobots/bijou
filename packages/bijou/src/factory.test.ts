@@ -42,6 +42,15 @@ describe('createBijou()', () => {
     expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
   });
 
+  it('uses the same token graph for accessors and the public context field', () => {
+    const ctx = createBijou(basePorts());
+
+    expect(ctx.tokenGraph).toBe(ctx.theme.tokenGraph);
+
+    ctx.tokenGraph.set('semantic.accent', '#112233');
+    expect(ctx.semantic('accent').hex).toBe('#112233');
+  });
+
   it('reads BIJOU_THEME from runtime.env and resolves matching preset', () => {
     const ctx = createBijou(basePorts({ BIJOU_THEME: 'teal-orange-pink' }));
     expect(ctx.theme.theme).toBe(TEAL_ORANGE_PINK);

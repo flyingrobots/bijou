@@ -85,6 +85,40 @@ Read:
 - [theme graph types](./src/core/theme/graph-types.ts)
 - [DTCG tests](./src/core/theme/dtcg.test.ts)
 
+### Observing Theme Changes
+
+Third-party component authors should use `observeTheme(ctx, handler)` as the
+supported reactivity seam.
+
+Use it when a component caches theme-derived work such as:
+
+- prebuilt surfaces
+- measured widths or wrapped text that depend on token modifiers
+- resolved token choices or theme-conditioned component variants
+
+Pattern:
+
+```typescript
+import { observeTheme } from '@flyingrobots/bijou';
+
+const subscription = observeTheme(ctx, () => {
+  cachedSurface = undefined;
+});
+```
+
+Rules:
+
+- invalidate cached theme-derived work in the handler
+- reread tokens through `ctx.semantic()`, `ctx.surface()`, and friends
+- do not subscribe to `ctx.tokenGraph.on()` directly unless you are working on
+  theme-engine internals
+- if the host replaces the entire `ctx` object, dispose the old subscription
+  and resubscribe to the new context
+
+The public context keeps the accessor layer and `tokenGraph` in sync, so
+third-party code can observe theme changes without mutating the context object
+or reaching into private internals.
+
 ## Custom Components And Mode-Aware Authoring
 
 Use `renderByMode()` when you are building a component that must stay truthful

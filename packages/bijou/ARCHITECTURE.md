@@ -126,6 +126,9 @@ DTCG interop (`fromDTCG`/`toDTCG`) bridges external design token systems. Theme 
 The type system defines the token families; the intended first-party usage
 rules are documented in
 [`docs/design-system/theme-tokens.md`](../../docs/design-system/theme-tokens.md).
+Third-party code that needs reactivity should observe a context with
+`observeTheme(ctx, handler)` rather than subscribing to `tokenGraph.on()`
+directly.
 
 ## Test Adapters
 

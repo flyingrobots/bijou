@@ -245,6 +245,8 @@ Rules for extension:
   contract is intentionally widened
 - prefer wrapping a component with explicit token options over hard-coding raw
   token-path lookups
+- when theme changes must invalidate cached component work, prefer the public
+  `observeTheme(ctx, handler)` seam over direct `tokenGraph.on(...)`
 
 ## Access Pattern
 

@@ -54,6 +54,9 @@ export {
 export {
   cloneContextWithResolvedTheme,
   cloneContextWithTheme,
+  observeTheme,
+  type ThemeChange,
+  type ThemeObservation,
 } from './context-theme.js';
 
 // Context resolution helpers

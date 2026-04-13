@@ -26,7 +26,12 @@ export interface BijouContext {
   readonly clock?: ClockPort;
   /** Color / text-decoration adapter. */
   readonly style: StylePort;
-  /** Reactive and Semantic Token Graph for advanced theming. */
+  /**
+   * Reactive token graph for advanced theming.
+   *
+   * Third-party component authors should prefer the public `observeTheme()`
+   * seam over subscribing to this graph directly.
+   */
   readonly tokenGraph: TokenGraph;
 
   /** Resolve styles from a global stylesheet based on component identity. */
