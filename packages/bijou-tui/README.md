@@ -7,7 +7,7 @@ The high-fidelity TEA runtime for Bijou.
 ## Role
 
 - **The Elm Architecture (TEA)**: A deterministic state-update-view loop for industrial-strength terminal software.
-- **Fractal TEA**: Compose nested sub-apps with `initSubApp()`, `updateSubApp()`, and `mount()`.
+- **Fractal TEA**: Compose nested sub-apps with `createSubAppAdapter()`, `initSubApp()`, `updateSubApp()`, and `mount()`.
 - **Declarative Motion**: Interpolate layout changes smoothly with physics-based springs and tween animations.
 - **Surface-First Pipeline**: Programmable rendering middleware for fragments, diffing, and shader-based transitions.
 
@@ -21,10 +21,13 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
 
 ```typescript
 import { startApp } from '@flyingrobots/bijou-node';
-import { mount, type App } from '@flyingrobots/bijou-tui';
+import { createSubAppAdapter, mount, type App } from '@flyingrobots/bijou-tui';
 import { createSurface } from '@flyingrobots/bijou';
 
-const childApp: App<{ count: number }, any> = {
+type ChildMsg = { type: 'tick' };
+type ParentMsg = { type: 'left'; msg: ChildMsg } | { type: 'right'; msg: ChildMsg };
+
+const childApp: App<{ count: number }, ChildMsg> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
@@ -34,12 +37,20 @@ const childApp: App<{ count: number }, any> = {
   }
 };
 
-const app: App<any, any> = {
+const mapLeft = createSubAppAdapter<ParentMsg, ChildMsg>({
+  tick: (msg) => ({ type: 'left', msg }),
+});
+
+const mapRight = createSubAppAdapter<ParentMsg, ChildMsg>({
+  tick: (msg) => ({ type: 'right', msg }),
+});
+
+const app: App<any, ParentMsg> = {
   init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
-    const [left] = mount(childApp, { model: model.left, onMsg: m => m });
-    const [right] = mount(childApp, { model: model.right, onMsg: m => m });
+    const [left] = mount(childApp, { model: model.left, onMsg: mapLeft });
+    const [right] = mount(childApp, { model: model.right, onMsg: mapRight });
     
     const screen = createSurface(80, 24);
     screen.blit(left, 0, 0);

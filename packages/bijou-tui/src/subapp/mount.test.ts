@@ -1,8 +1,26 @@
 import { describe, it, expect, vi } from 'vitest';
-import { initSubApp, mount, mapCmds, updateSubApp } from './mount.js';
+import { createSubAppAdapter, initSubApp, mount, mapCmds, updateSubApp } from './mount.js';
 import type { App, Cmd, QuitSignal } from '../types.js';
 import { QUIT } from '../types.js';
 import { createSurface } from '@flyingrobots/bijou';
+
+type AdapterChildMsg =
+  | { type: 'child-done'; count: number }
+  | { type: 'child-error'; error: string };
+
+type AdapterParentMsg =
+  | { type: 'panel-closed'; count: number }
+  | { type: 'show-alert'; text: string };
+
+const adapter = createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
+  'child-done': (msg) => ({ type: 'panel-closed', count: msg.count }),
+  'child-error': (msg) => ({ type: 'show-alert', text: msg.error }),
+});
+
+// @ts-expect-error Exhaustive child message coverage is required.
+createSubAppAdapter<AdapterParentMsg, AdapterChildMsg>({
+  'child-done': (msg) => ({ type: 'panel-closed', count: msg.count }),
+});
 
 describe('mount', () => {
   it('returns the sub-app surface', () => {
@@ -23,6 +41,11 @@ describe('mount', () => {
 });
 
 describe('mapCmds', () => {
+  it('builds exhaustive parent mappers from child discriminants', () => {
+    expect(adapter({ type: 'child-done', count: 7 })).toEqual({ type: 'panel-closed', count: 7 });
+    expect(adapter({ type: 'child-error', error: 'boom' })).toEqual({ type: 'show-alert', text: 'boom' });
+  });
+
   it('maps emitted messages to the parent type', async () => {
     type SubMsg = { sub: true; val: number };
     type ParentMsg = { parent: true; val: number };

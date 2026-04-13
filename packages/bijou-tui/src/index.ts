@@ -173,8 +173,8 @@ export { createPipeline } from './pipeline/pipeline.js';
 export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
 
 // Sub-App Composition
-export type { MountOptions, MountedApp } from './subapp/mount.js';
-export { mount, mapCmds, initSubApp, updateSubApp } from './subapp/mount.js';
+export type { MountOptions, MountedApp, SubAppAdapterCases } from './subapp/mount.js';
+export { mount, mapCmds, initSubApp, updateSubApp, createSubAppAdapter } from './subapp/mount.js';
 
 // Motion API
 export { motion } from './motion/motion.js';

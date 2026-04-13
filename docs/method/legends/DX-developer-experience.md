@@ -49,6 +49,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [DX-010 — Typed Sub-App Adapter Factory](../graveyard/DX_010-typed-subapp-adapter.md)
   - [DX-006 — Debug Performance Overlay Component](../graveyard/DX_006-debug-performance-overlay-component.md)
   - [DX-008 — Render Pipeline Documentation Guide](../graveyard/DX_008-render-pipeline-guide.md)
   - [DX-005 — Polish Small Component and Import Ergonomics](../graveyard/DX_005-polish-small-component-and-import-ergonomics.md)

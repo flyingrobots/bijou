@@ -1,4 +1,16 @@
+---
+title: DX-010 — Typed Sub-App Adapter Factory
+lane: graveyard
+legend: DX
+---
+
 # DX-010 — Typed Sub-App Adapter Factory
+
+## Disposition
+
+Shipped `createSubAppAdapter()` in `@flyingrobots/bijou-tui` as an exhaustive discriminant-based `onMsg` factory for sub-app composition. The canonical sub-app example, package docs, and guide now use the helper, and compile-time coverage is proven with `@ts-expect-error` regression assertions in the sub-app mount tests while `mapCmd` remains available for explicit command interception.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

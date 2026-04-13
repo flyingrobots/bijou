@@ -50,20 +50,25 @@ when your host owns context creation explicitly.
 
 ## Fractal TEA (Sub-Apps)
 
-Compose complex UIs by nesting smaller apps using `mount()`, `initSubApp()`, and `updateSubApp()`.
+Compose complex UIs by nesting smaller apps using `createSubAppAdapter()`, `mount()`, `initSubApp()`, and `updateSubApp()`.
 
 ```typescript
-import { mount, initSubApp, updateSubApp, type App } from '@flyingrobots/bijou-tui';
+import { createSubAppAdapter, mount, initSubApp, updateSubApp, type App } from '@flyingrobots/bijou-tui';
+
+const childToParent = createSubAppAdapter<ParentMsg, ChildMsg>({
+  ready: (msg) => ({ type: 'child-ready', value: msg.value }),
+  failed: (msg) => ({ type: 'child-failed', error: msg.error }),
+});
 
 // 1. Parent update
 const [nextChildModel, childCmds] = updateSubApp(childApp, childMsg, model.child, {
-  onMsg: (m) => ({ type: 'childMsg', m }),
+  onMsg: childToParent,
 });
 
 // 2. Parent view
 const [childView, childCmds] = mount(childApp, {
   model: model.child,
-  onMsg: (m) => ({ type: 'childMsg', m }),
+  onMsg: childToParent,
 });
 ```
 

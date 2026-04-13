@@ -2,6 +2,7 @@ import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, boxSurface, createSurface, type Surface } from '@flyingrobots/bijou';
 import {
+  createSubAppAdapter,
   initSubApp,
   isKeyMsg,
   mount,
@@ -44,13 +45,15 @@ type Msg =
   | { type: 'left'; msg: CounterMsg }
   | { type: 'right'; msg: CounterMsg };
 
-function mapLeft(msg: CounterMsg): Msg {
-  return { type: 'left', msg };
-}
+const mapLeft = createSubAppAdapter<Msg, CounterMsg>({
+  inc: (msg) => ({ type: 'left', msg }),
+  dec: (msg) => ({ type: 'left', msg }),
+});
 
-function mapRight(msg: CounterMsg): Msg {
-  return { type: 'right', msg };
-}
+const mapRight = createSubAppAdapter<Msg, CounterMsg>({
+  inc: (msg) => ({ type: 'right', msg }),
+  dec: (msg) => ({ type: 'right', msg }),
+});
 
 export const app: App<Model, Msg> = {
   init() {

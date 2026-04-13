@@ -3,6 +3,7 @@
 Canonical Fractal TEA demo for V3.
 
 It proves:
+- `createSubAppAdapter()` for exhaustive parent message mapping,
 - `initSubApp()` for child initialization,
 - `updateSubApp()` for child lifecycle updates and command mapping,
 - `mount()` as the render helper,
