@@ -29,6 +29,20 @@ export function hexToRgb(hex: string): RGB {
 }
 
 /**
+ * Parse a hex color string to an RGB tuple, returning `undefined` for invalid input.
+ *
+ * Use this when theme/runtime code wants to preserve invalid authored input
+ * without throwing, but still cache parsed bytes for valid colors.
+ */
+export function tryHexToRgb(hex: string): RGB | undefined {
+  try {
+    return hexToRgb(hex);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Convert an RGB tuple to a `#rrggbb` hex string.
  * @param rgb - RGB tuple to convert. Values are clamped to [0, 255].
  * @returns Lowercase hex string with leading `#`.

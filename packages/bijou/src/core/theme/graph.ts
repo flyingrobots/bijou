@@ -1,6 +1,7 @@
-import type { TokenValue } from './tokens.js';
+import type { TokenValue, RGB } from './tokens.js';
 import { 
   hexToRgb, 
+  tryHexToRgb,
   rgbToHex, 
   lighten, 
   darken, 
@@ -47,6 +48,8 @@ function isTokenValue(obj: any): obj is TokenValue {
 export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
   const definitions = new Map<string, any>();
   const subscribers = new Set<(path: string) => void>();
+  const tokenCache = new Map<string, TokenValue>();
+  const rgbCache = new Map<string, RGB | null>();
 
   if (initial) {
     importInternal('', initial);
@@ -62,6 +65,8 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
           fg: value.hex,
           bg: value.bg,
           modifiers: value.modifiers,
+          fgRGB: value.fgRGB,
+          bgRGB: value.bgRGB,
         });
       } else if (typeof value === 'object' && value !== null && !('ref' in value) && !('light' in value) && !('fg' in value)) {
         importInternal(fullPath, value);
@@ -69,6 +74,22 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
         definitions.set(fullPath, value);
       }
     }
+  }
+
+  function clearCaches(): void {
+    tokenCache.clear();
+    rgbCache.clear();
+  }
+
+  function resolveRgb(hex: string | undefined): RGB | undefined {
+    if (hex == null) return undefined;
+    if (rgbCache.has(hex)) {
+      return rgbCache.get(hex) ?? undefined;
+    }
+
+    const rgb = tryHexToRgb(hex);
+    rgbCache.set(hex, rgb ?? null);
+    return rgb;
   }
 
   function resolveColor(def: ColorDefinition, mode: ThemeMode, visited: Set<string>): string {
@@ -146,22 +167,37 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
 
   const graph: TokenGraph = {
     get(path, mode = 'dark') {
+      const cacheKey = `${mode}:${path}`;
+      const cached = tokenCache.get(cacheKey);
+      if (cached) return cached;
+
       const def = definitions.get(path);
       if (!def) throw new Error(`Token not found: ${path}`);
 
       if (typeof def === 'object' && 'fg' in def) {
         const tokenDef = def as TokenDefinition;
-        return {
+        const token = {
           hex: resolveColor(tokenDef.fg, mode, new Set([path])),
           bg: tokenDef.bg ? resolveColor(tokenDef.bg, mode, new Set([path])) : undefined,
           modifiers: tokenDef.modifiers,
         };
+        const resolved: TokenValue = {
+          ...token,
+          fgRGB: tokenDef.fgRGB ?? resolveRgb(token.hex),
+          bgRGB: token.bg != null ? (tokenDef.bgRGB ?? resolveRgb(token.bg)) : undefined,
+        };
+        tokenCache.set(cacheKey, resolved);
+        return resolved;
       }
 
       // If it's just a color definition, return it as a TokenValue
-      return {
-        hex: resolveColor(def as ColorDefinition, mode, new Set([path])),
+      const hex = resolveColor(def as ColorDefinition, mode, new Set([path]));
+      const resolved: TokenValue = {
+        hex,
+        fgRGB: resolveRgb(hex),
       };
+      tokenCache.set(cacheKey, resolved);
+      return resolved;
     },
 
     getColor(def, mode = 'dark') {
@@ -169,7 +205,18 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
     },
 
     set(path, definition) {
-      definitions.set(path, definition);
+      if (isTokenValue(definition)) {
+        definitions.set(path, {
+          fg: definition.hex,
+          bg: definition.bg,
+          modifiers: definition.modifiers,
+          fgRGB: definition.fgRGB,
+          bgRGB: definition.bgRGB,
+        });
+      } else {
+        definitions.set(path, definition);
+      }
+      clearCaches();
       for (const handler of subscribers) {
         handler(path);
       }
@@ -186,12 +233,14 @@ export function createTokenGraph(initial?: TokenDefinitions): TokenGraph {
 
     import(defs) {
       importInternal('', defs);
+      clearCaches();
       for (const handler of subscribers) {
         handler('*'); // Notify full re-import
       }
     },
 
     dispose() {
+      clearCaches();
       definitions.clear();
       subscribers.clear();
     },

@@ -1,9 +1,23 @@
 ---
 title: RE-019 — Pre-Parse Theme Token Colors Into Bytes
-lane: asap
+lane: retro
+legend: RE
 ---
 
 # RE-019 — Pre-Parse Theme Token Colors Into Bytes
+
+## Disposition
+
+Completed on `release/v4.5.0`. Theme resolution now preserves and caches
+pre-parsed `fgRGB` / `bgRGB` bytes through the live `TokenGraph` path instead
+of dropping them after `createResolved()`. Accessor-returned tokens from
+`ctx.semantic()`, `ctx.surface()`, `ctx.border()`, `ctx.status()`, and
+`ctx.ui()` now carry reusable RGB bytes, live `tokenGraph.set()` / `import()`
+updates repopulate those bytes, and repeated token reads reuse cached per-hex
+and per-token resolution instead of reparsing the same theme colors in hot
+render paths.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

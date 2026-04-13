@@ -49,6 +49,7 @@ describe('createBijou()', () => {
 
     ctx.tokenGraph.set('semantic.accent', '#112233');
     expect(ctx.semantic('accent').hex).toBe('#112233');
+    expect(ctx.semantic('accent').fgRGB).toEqual([0x11, 0x22, 0x33]);
   });
 
   it('reads BIJOU_THEME from runtime.env and resolves matching preset', () => {
