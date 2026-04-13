@@ -1,4 +1,22 @@
+---
+title: HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection
+lane: graveyard
+legend: HT
+---
+
 # HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection
+
+## Disposition
+
+Landed in `release/v4.5.0`. `createFramedApp()` now lets pages publish a
+bounded layer registry for `workspace` and `page-modal` metadata through
+`FramePage.layers(model)`, and the frame exports `projectFrameControls()` so
+footer/help/tooling all consume the same active-layer, underlying-layer, footer
+hint, and help-source projection. The shell still owns shell layers like
+settings, help, notifications, search, and quit confirm, but page-owned layer
+metadata is no longer limited to the older `modalKeyMap` seam.
+
+## Original Proposal
 
 Legend:
 

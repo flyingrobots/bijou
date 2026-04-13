@@ -30,6 +30,7 @@ import {
   createFramedApp,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  projectFrameControls,
   type FramePage,
   type FramePageMsg,
   type FramedApp,
@@ -1554,6 +1555,52 @@ describe('createFramedApp', () => {
     })?.helpSource).toBe(settingsHelp);
   });
 
+  it('projects footer and help controls from the explicit frame layer stack', () => {
+    const workspaceHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('tab', 'Next pane', { type: 'noop' });
+    const settingsHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('enter', 'Apply settings', { type: 'noop' });
+
+    const projection = projectFrameControls({
+      helpOpen: true,
+      commandPalette: undefined,
+      commandPaletteKind: undefined,
+      settingsOpen: true,
+      notificationCenterOpen: false,
+      quitConfirmOpen: false,
+    }, {
+      layers: {
+        workspace: {
+          title: 'Workspace',
+          hintSource: 'Tab next pane',
+          helpSource: workspaceHelp,
+        },
+        settings: {
+          title: 'Workspace settings',
+          hintSource: 'F2/Esc close',
+          helpSource: settingsHelp,
+        },
+        help: {
+          title: 'Keyboard Help',
+          hintSource: 'j/k scroll • Esc close',
+        },
+      },
+    });
+
+    expect(projection.layerStack.map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'help']);
+    expect(projection.activeLayer).toMatchObject({
+      kind: 'help',
+      title: 'Keyboard Help',
+      hintSource: 'j/k scroll • Esc close',
+    });
+    expect(projection.underlyingLayer).toMatchObject({
+      kind: 'settings',
+      title: 'Workspace settings',
+    });
+    expect(projection.footerHintSource).toBe('j/k scroll • Esc close');
+    expect(projection.helpSource).toBe(settingsHelp);
+  });
+
   it('backs frame layer introspection with a runtime view stack', () => {
     const workspaceHelp = createKeyMap<{ type: 'noop' }>()
       .bind('tab', 'Next pane', { type: 'noop' });
@@ -1660,6 +1707,58 @@ describe('createFramedApp', () => {
 
     expect(rendered).toContain('Close settings');
     expect(rendered).not.toContain('Increment');
+  });
+
+  it('uses page-provided layer registry metadata for workspace and page-modal control projection', async () => {
+    const workspaceHelp = createKeyMap<Msg>()
+      .bind('enter', 'Open workspace command', { type: 'noop' });
+    const modalHelp = createKeyMap<Msg>()
+      .bind('enter', 'Apply modal action', { type: 'noop' });
+    const page: FramePage<PageModel, Msg> = {
+      ...makeModalPage('home', 'Home', 'main'),
+      layers(model) {
+        return {
+          workspace: {
+            title: 'Home workspace',
+            hintSource: 'Workspace custom hint',
+            helpSource: workspaceHelp,
+          },
+          'page-modal': model.modalOpen
+            ? {
+                title: 'Inspector',
+                hintSource: 'Modal custom hint',
+                helpSource: modalHelp,
+              }
+            : undefined,
+        };
+      },
+    };
+    const app = createFramedApp({
+      pages: [page],
+    });
+
+    let [model] = app.init();
+    let rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Workspace custom hint');
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Open workspace command');
+    expect(rendered).not.toContain('Apply modal action');
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = (await runScript(app, [{ key: 'm' }])).model;
+    rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Modal custom hint');
   });
 
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {

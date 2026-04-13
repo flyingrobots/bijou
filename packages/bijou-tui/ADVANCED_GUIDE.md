@@ -87,5 +87,59 @@ function renderWave(_ctx: BijouContext): Surface {
 - **Command Capabilities**: Access the system clock and pulse from within `Cmd`.
 - **Worker Runtime Seams**: Map main-thread input to off-thread logic.
 
+## Framed Shell Layer Projection
+
+`createFramedApp()` now has a stable seam for page-owned layer metadata and
+agent-facing control introspection.
+
+Use `FramePage.layers(model)` when a page needs to publish workspace or
+page-modal metadata to the shell:
+
+```typescript
+import { createFramedApp, createKeyMap, type FramePage } from '@flyingrobots/bijou-tui';
+
+const page: FramePage<Model, Msg> = {
+  id: 'home',
+  title: 'Home',
+  init: () => [initialModel, []],
+  update: (msg, model) => [model, []],
+  layout: (model) => model.layout,
+  layers: (model) => ({
+    workspace: {
+      hintSource: 'Workspace custom hint',
+    },
+    'page-modal': model.modalOpen
+      ? {
+          title: 'Inspector',
+          hintSource: 'Modal custom hint',
+          helpSource: createKeyMap<Msg>().bind('enter', 'Apply modal action', { type: 'apply' }),
+        }
+      : undefined,
+  }),
+};
+```
+
+Use `projectFrameControls()` when tooling or custom shell code needs the same
+control ownership that footer/help surfaces use:
+
+```typescript
+import { projectFrameControls } from '@flyingrobots/bijou-tui';
+
+const projection = projectFrameControls(frameModel, {
+  pageModalOpen: true,
+  layers: resolvedLayerMetadata,
+});
+
+projection.activeLayer;       // topmost visible layer object
+projection.underlyingLayer;   // layer beneath help/search/etc when present
+projection.footerHintSource;  // what the footer should promise right now
+projection.helpSource;        // what the help overlay should explain right now
+```
+
+Keep this boundary narrow:
+- pages own `workspace` and `page-modal` metadata
+- the frame still owns shell layers like settings, help, notifications, and quit confirm
+- agents should inspect `projectFrameControls()` instead of reverse-engineering rendered chrome
+
 ---
 **The runtime engine's primary goal is deterministic, high-fidelity TUI ownership with minimal allocation overhead.**

@@ -23,11 +23,15 @@ export type FrameLayerOwner = 'frame' | 'page';
 
 export type FrameLayerHintSource = string | BindingSource;
 
+export type FramePageLayerKind = Extract<FrameLayerKind, 'workspace' | 'page-modal'>;
+
 export interface FrameLayerMetadata {
   readonly title?: string;
   readonly hintSource?: FrameLayerHintSource;
   readonly helpSource?: BindingSource;
 }
+
+export type FramePageLayerRegistry = Partial<Record<FramePageLayerKind, FrameLayerMetadata>>;
 
 export interface FrameLayerDescriptor {
   readonly id: string;
@@ -44,6 +48,14 @@ export interface FrameLayerDescriptor {
 export interface DescribeFrameLayerStackOptions {
   readonly pageModalOpen?: boolean;
   readonly layers?: Partial<Record<FrameLayerKind, FrameLayerMetadata>>;
+}
+
+export interface FrameControlProjection {
+  readonly layerStack: readonly FrameLayerDescriptor[];
+  readonly activeLayer: FrameLayerDescriptor;
+  readonly underlyingLayer?: FrameLayerDescriptor;
+  readonly footerHintSource?: FrameLayerHintSource;
+  readonly helpSource?: BindingSource;
 }
 
 export type FrameRuntimeLayer = RuntimeStackLayer<FrameLayerDescriptor>;
@@ -259,4 +271,36 @@ export function underlyingFrameLayer<PageModel>(
   return descriptorFromRuntimeLayer(
     stack.layers.length > 1 ? stack.layers[stack.layers.length - 2] : undefined,
   );
+}
+
+export function projectFrameControls<PageModel>(
+  model: Pick<
+    FrameModel<PageModel>,
+    | 'helpOpen'
+    | 'commandPalette'
+    | 'commandPaletteKind'
+    | 'settingsOpen'
+    | 'notificationCenterOpen'
+    | 'quitConfirmOpen'
+  >,
+  options: DescribeFrameLayerStackOptions = {},
+): FrameControlProjection {
+  const layerStack = describeFrameLayerStack(model, options);
+  const activeLayer = layerStack[layerStack.length - 1];
+  if (activeLayer == null) {
+    throw new Error('projectFrameControls: frame layer stack is missing an active descriptor');
+  }
+  const underlyingLayer = layerStack.length > 1 ? layerStack[layerStack.length - 2] : undefined;
+  const workspaceLayer = layerStack[0];
+  const helpSource = activeLayer.kind === 'help'
+    ? (underlyingLayer?.helpSource ?? workspaceLayer?.helpSource)
+    : (activeLayer.helpSource ?? workspaceLayer?.helpSource);
+
+  return {
+    layerStack,
+    activeLayer,
+    underlyingLayer,
+    footerHintSource: activeLayer.hintSource,
+    helpSource,
+  };
 }

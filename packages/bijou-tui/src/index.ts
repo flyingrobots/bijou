@@ -226,6 +226,9 @@ export {
   type FrameLayerMetadata,
   type FrameLayerOwner,
   type FrameLayerDescriptor,
+  type FramePageLayerKind,
+  type FramePageLayerRegistry,
+  type FrameControlProjection,
   type FrameRuntimeLayer,
   type FrameRuntimeViewStack,
   type DescribeFrameLayerStackOptions,
@@ -251,6 +254,7 @@ export {
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
   createFramedApp,
+  projectFrameControls,
   underlyingFrameLayer,
 } from './app-frame.js';
 

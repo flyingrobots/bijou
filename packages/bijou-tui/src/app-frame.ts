@@ -111,12 +111,13 @@ import {
 } from './app-frame-utils.js';
 import {
   activeFrameLayer,
-  describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  projectFrameControls,
   type FrameLayerDescriptor,
   type FrameLayerMetadata,
   type FrameLayerHintSource,
   type FrameLayerKind,
+  type FramePageLayerRegistry,
 } from './app-frame-layers.js';
 import {
   applyRuntimeCommandBuffer,
@@ -178,6 +179,8 @@ export interface FramePage<PageModel, Msg> {
   inputAreas?: (model: PageModel) => readonly FrameInputArea<PageModel, Msg>[];
   /** Optional modal keymap. When present, it captures all keys until dismissed. */
   modalKeyMap?: (model: PageModel) => KeyMap<Msg> | undefined;
+  /** Optional page-owned layer registry surfaced to the frame for workspace and page-modal control projection. */
+  layers?: (model: PageModel) => FramePageLayerRegistry;
   /** Optional help source override. */
   helpSource?: BindingSource;
   /** Optional page-scoped command items for command palette listing/execution. */
@@ -531,11 +534,14 @@ export type {
 } from './app-frame-types.js';
 
 export type {
+  FrameControlProjection,
   FrameLayerHintSource,
   FrameLayerKind,
   FrameLayerMetadata,
   FrameLayerOwner,
   FrameLayerDescriptor,
+  FramePageLayerKind,
+  FramePageLayerRegistry,
   FrameRuntimeLayer,
   FrameRuntimeViewStack,
   DescribeFrameLayerStackOptions,
@@ -544,6 +550,7 @@ export {
   activeFrameLayer,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  projectFrameControls,
   underlyingFrameLayer,
 } from './app-frame-layers.js';
 
@@ -1087,16 +1094,11 @@ export function createFramedApp<PageModel, Msg>(
     // --- help ---
     'help-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
-      const activePage = pagesById.get(model.activePageId)!;
-      const overlay = renderHelpOverlay(
-        model,
-        activePage,
-        frameKeys,
-        paletteKeys,
-        options,
-        pagesById,
-        resolvedShellThemes,
-      );
+      const helpSource = resolvePresentedLayerContext(model).controlProjection.helpSource;
+      if (helpSource == null) {
+        return model;
+      }
+      const overlay = renderHelpOverlay(model, helpSource);
       const viewportHeight = Math.max(1, overlay.body.height - 1);
       const delta = c.action === 'down' ? 3
         : c.action === 'up' ? -3
@@ -1868,6 +1870,7 @@ export function createFramedApp<PageModel, Msg>(
   function resolveLayerMetadata(
     model: InternalFrameModel<PageModel, Msg>,
     activePage: FramePage<PageModel, Msg>,
+    activePageModel: PageModel,
     activeInputArea: FrameInputArea<PageModel, Msg> | undefined,
     modalKeyMap: KeyMap<Msg> | undefined,
   ): Partial<Record<FrameLayerKind, FrameLayerMetadata>> {
@@ -1888,22 +1891,27 @@ export function createFramedApp<PageModel, Msg>(
     const notificationsTitle = notificationCenter == null
       ? frameMessage(options.i18n, 'notifications.title', 'Notifications')
       : `${notificationCenter.title} • ${frameNotificationFilterLabel(options.i18n, notificationCenter.activeFilter)}`;
+    const pageLayers = activePage.layers?.(activePageModel);
+    const workspaceLayer: FrameLayerMetadata = {
+      title: activePage.title,
+      hintSource: workspaceHintSource,
+      helpSource: workspaceHelpSource,
+      ...pageLayers?.workspace,
+    };
+    const pageModalLayer: FrameLayerMetadata = {
+      title: activePage.title,
+      hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
+      helpSource: mergeBindingSources(
+        quitHelpKeys,
+        modalKeyMap,
+        activePage.helpSource ?? activePage.keyMap,
+      ),
+      ...pageLayers?.['page-modal'],
+    };
 
     return {
-      workspace: {
-        title: activePage.title,
-        hintSource: workspaceHintSource,
-        helpSource: workspaceHelpSource,
-      },
-      'page-modal': {
-        title: activePage.title,
-        hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
-        helpSource: mergeBindingSources(
-          quitHelpKeys,
-          modalKeyMap,
-          activePage.helpSource ?? activePage.keyMap,
-        ),
-      },
+      workspace: workspaceLayer,
+      'page-modal': pageModalLayer,
       settings: {
         title: settings?.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
         hintSource: settingsHint,
@@ -1948,17 +1956,17 @@ export function createFramedApp<PageModel, Msg>(
       modalKeyMap,
       pageModalOpen,
     } = resolveLayerContext(model);
-    const layerStack = describeFrameLayerStack(model, {
+    const layerMetadata = resolveLayerMetadata(
+      model,
+      activePage,
+      activePageModel,
+      activeInputArea,
+      modalKeyMap,
+    );
+    const controlProjection = projectFrameControls(model, {
       pageModalOpen,
-      layers: resolveLayerMetadata(
-        model,
-        activePage,
-        activeInputArea,
-        modalKeyMap,
-      ),
+      layers: layerMetadata,
     });
-    const activeLayer = layerStack[layerStack.length - 1]!;
-    const underlyingLayer = layerStack.length > 1 ? layerStack[layerStack.length - 2] : undefined;
     return {
       activePage,
       activePageModel,
@@ -1966,9 +1974,11 @@ export function createFramedApp<PageModel, Msg>(
       activeInputArea,
       modalKeyMap,
       pageModalOpen,
-      layerStack,
-      activeLayer,
-      underlyingLayer,
+      layerMetadata,
+      controlProjection,
+      layerStack: controlProjection.layerStack,
+      activeLayer: controlProjection.activeLayer,
+      underlyingLayer: controlProjection.underlyingLayer,
     };
   }
 
@@ -2241,7 +2251,7 @@ export function createFramedApp<PageModel, Msg>(
     view(model) {
       const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
       const {
-        activePage,
+        controlProjection,
         layerStack,
         activeLayer,
       } = resolvePresentedLayerContext(model);
@@ -2382,15 +2392,11 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.helpOpen) {
-        const helpOverlay = renderHelpOverlay(
-          model,
-          activePage,
-          frameKeys,
-          paletteKeys,
-          options,
-          pagesById,
-          resolvedShellThemes,
-        );
+        const helpSource = controlProjection.helpSource;
+        if (helpSource == null) {
+          throw new Error('createFramedApp: help layer projection is missing a help source');
+        }
+        const helpOverlay = renderHelpOverlay(model, helpSource);
         overlays.push(modal({
           title: activeLayer.kind === 'help'
             ? (activeLayer.title ?? frameMessage(options.i18n, 'help.title', 'Keyboard Help'))
@@ -2480,95 +2486,9 @@ function resolveBodyRect<PageModel, Msg>(
 }
 
 function renderHelpOverlay<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  activePage: FramePage<PageModel, Msg>,
-  frameKeys: KeyMap<FrameAction>,
-  paletteKeys: KeyMap<PaletteAction>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  shellThemes: readonly ResolvedFrameShellTheme[],
+  model: Pick<InternalFrameModel<PageModel, Msg>, 'columns' | 'rows' | 'helpScrollY'>,
+  source: BindingSource,
 ): { body: Surface; maxScrollY: number; scrollY: number } {
-  const activePageModel = model.pageModels[model.activePageId]!;
-  const activeInputArea = findInputAreaByPaneId(
-    resolveInputAreas(activePage, activePageModel),
-    model.focusedPaneByPage[model.activePageId],
-  );
-  const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
-  const settings = resolveFrameSettings(model, options, pagesById, shellThemes);
-  const notificationCenter = resolveFrameNotificationCenter(model, options, pagesById);
-  const workspaceHintSource = options.helpLineSource?.({
-    model,
-    activePage,
-    frameKeys,
-    globalKeys: options.globalKeys,
-  });
-  const workspaceHelpSource = mergeBindingSources(
-    frameKeys,
-    quitHelpKeys,
-    options.globalKeys,
-    activeInputArea?.helpSource ?? activeInputArea?.keyMap,
-    activePage.helpSource ?? activePage.keyMap,
-  );
-  const layerStack = describeFrameLayerStack(model, {
-    pageModalOpen: modalKeyMap != null,
-    layers: {
-      workspace: {
-        title: activePage.title,
-        hintSource: typeof workspaceHintSource === 'string'
-          ? workspaceHintSource
-          : workspaceHintSource ?? mergeBindingSources(
-            frameKeys,
-            options.globalKeys,
-            activeInputArea?.helpSource ?? activeInputArea?.keyMap,
-            activePage.helpSource ?? activePage.keyMap,
-          ),
-        helpSource: workspaceHelpSource,
-      },
-      'page-modal': {
-        title: activePage.title,
-        hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
-        helpSource: mergeBindingSources(
-          quitHelpKeys,
-          modalKeyMap,
-          activePage.helpSource ?? activePage.keyMap,
-        ),
-      },
-      settings: {
-        title: settings?.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
-        hintSource: frameMessage(options.i18n, 'settings.footer', 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'),
-        helpSource: mergeBindingSources(settingsHelpKeys, quitHelpKeys),
-      },
-      help: {
-        title: frameMessage(options.i18n, 'help.title', 'Keyboard Help'),
-        hintSource: frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close'),
-        helpSource: helpLayerHelpKeys,
-      },
-      'notification-center': {
-        title: notificationCenter == null
-          ? frameMessage(options.i18n, 'notifications.title', 'Notifications')
-          : `${notificationCenter.title} • ${frameNotificationFilterLabel(options.i18n, notificationCenter.activeFilter)}`,
-        hintSource: frameMessage(options.i18n, 'notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit'),
-        helpSource: mergeBindingSources(notificationCenterHelpKeys, quitHelpKeys),
-      },
-      search: {
-        title: model.commandPaletteTitle ?? activePage.searchTitle ?? frameMessage(options.i18n, 'search.title', 'Search'),
-        hintSource: frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close'),
-        helpSource: mergeBindingSources(paletteKeys, quitHelpKeys),
-      },
-      'command-palette': {
-        title: model.commandPaletteTitle ?? frameMessage(options.i18n, 'palette.title', 'Command Palette'),
-        hintSource: frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close'),
-        helpSource: mergeBindingSources(paletteKeys, quitHelpKeys),
-      },
-      'quit-confirm': {
-        title: frameMessage(options.i18n, 'quit.title', 'Quit?'),
-        hintSource: frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay'),
-        helpSource: quitConfirmHelpKeys,
-      },
-    },
-  });
-  const beneathHelpLayer = layerStack.length > 1 ? layerStack[layerStack.length - 2] : undefined;
-  const source = beneathHelpLayer?.helpSource ?? workspaceHelpSource;
   const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
   const bodyWidth = Math.max(20, maxDialogWidth - 4);
   const helpSurface = helpViewSurface(source, {

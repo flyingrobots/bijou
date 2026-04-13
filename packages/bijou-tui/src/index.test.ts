@@ -6,6 +6,7 @@ import type {
 } from '@flyingrobots/bijou';
 import {
   canvas,
+  projectFrameControls,
   type BijouContext,
   type Cell,
   type ShaderFn,
@@ -21,5 +22,9 @@ describe('package root export ergonomics', () => {
     expectTypeOf<BijouContext>().toEqualTypeOf<CoreBijouContext>();
     expectTypeOf<Cell>().toEqualTypeOf<CoreCell>();
     expectTypeOf<Surface>().toEqualTypeOf<CoreSurface>();
+  });
+
+  it('re-exports framed shell control projection helpers from the package root', () => {
+    expect(typeof projectFrameControls).toBe('function');
   });
 });
