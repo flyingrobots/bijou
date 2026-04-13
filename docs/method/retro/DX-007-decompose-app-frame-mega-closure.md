@@ -1,4 +1,28 @@
+---
+title: DX-007 — Decompose app-frame.ts Mega-Closure
+lane: retro
+legend: DX
+---
+
 # DX-007 — Decompose app-frame.ts Mega-Closure
+
+## Disposition
+
+Completed on `release/v4.5.0`. The remaining high-value closure debt in
+`app-frame.ts` is now materially decomposed: `FrameModel` and
+`FramePaneScroll` live in `app-frame-types.ts`, the circular import between
+`app-frame.ts` and `app-frame-types.ts` is gone, and the shell-theme/help/
+settings/notification helper cluster now lives in the independently
+importable `app-frame-overlays.ts` module with direct unit coverage in
+`app-frame-overlays.test.ts`. This work reduced `app-frame.ts` from 3,132
+lines to 2,348 while preserving the earlier module splits across render,
+actions, palette, layers, and utils.
+
+The original "under 800 lines" target was an early umbrella goal from before
+those prior extractions landed. Repo truth now lives in the decomposed module
+boundaries and testability, not that stale numeric threshold.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

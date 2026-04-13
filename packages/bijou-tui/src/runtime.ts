@@ -225,15 +225,24 @@ export async function run<Model, M>(
   }
 
   // Render helper
-  let renderRequested = false;
+  let renderQueued = false;
+  let renderInFlight = false;
   let renderHandle: TimerHandle | null = null;
-  /** Render the current model's view to the terminal. */
-  function render(): void {
-    if (!running || renderRequested) return;
-    renderRequested = true;
+  function scheduleRender(): void {
+    if (renderHandle != null || renderInFlight) return;
 
-    let scheduledHandle: TimerHandle | null = null;
-    scheduledHandle = clock.setTimeout(() => {
+    const scheduledHandle = clock.setTimeout(() => {
+      if (renderHandle === scheduledHandle) {
+        renderHandle = null;
+      }
+      scheduledHandle.dispose();
+      if (!renderQueued) {
+        return;
+      }
+
+      renderInFlight = true;
+      renderQueued = false;
+
       try {
         const viewport = runtimeViewport();
         ensureFramebufferSize(
@@ -268,14 +277,21 @@ export async function run<Model, M>(
         );
         shutdown(error);
       } finally {
-        renderRequested = false;
-        scheduledHandle?.dispose();
-        if (renderHandle === scheduledHandle) {
-          renderHandle = null;
+        renderInFlight = false;
+        if (renderQueued) {
+          scheduleRender();
         }
       }
     }, 0);
+
     renderHandle = scheduledHandle;
+  }
+
+  /** Render the current model's view to the terminal. */
+  function render(): void {
+    if (!running) return;
+    renderQueued = true;
+    scheduleRender();
   }
 
   // Execute commands through the bus
@@ -360,7 +376,7 @@ export async function run<Model, M>(
   });
 
   // Ensure any pending render is flushed before exiting
-  if (renderRequested) {
+  if (renderHandle != null || renderInFlight) {
     await new Promise<void>((resolve) => {
       let flushHandle: TimerHandle | null = null;
       flushHandle = clock.setTimeout(() => {

@@ -1,4 +1,21 @@
+---
+title: RE-023 — Stabilize Render Scheduling in runtime.ts
+lane: retro
+legend: RE
+---
+
 # RE-023 — Stabilize Render Scheduling in runtime.ts
+
+## Disposition
+
+Completed on `release/v4.5.0`. `runtime.ts` now uses a stable render handle
+plus explicit `renderQueued` / `renderInFlight` state instead of a bare
+`renderRequested` boolean. That gives the runtime one pending render at a
+time, safely coalesces same-timestamp input bursts into a single follow-up
+render, and flushes pending work cleanly during shutdown. Focused runtime
+tests now cover the coalesced-burst behavior directly.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

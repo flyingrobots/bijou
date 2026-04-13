@@ -5,14 +5,13 @@
  * internal wiring used by `createFramedApp`.
  */
 
-import type { CommandPaletteItem } from './command-palette.js';
+import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import type { NotificationSpec } from './notification.js';
 import type { App, Cmd, KeyMsg, MouseMsg, PulseMsg } from './types.js';
 import { QUIT, isCmdCleanup } from './types.js';
 import type { BindingInfo } from './keybindings.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PanelDockState } from './panel-dock.js';
-import type { FrameModel } from './app-frame.js';
 import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
 
 // ---------------------------------------------------------------------------
@@ -56,6 +55,82 @@ export type FramedAppUpdateResult<PageModel, Msg> = [FrameModel<PageModel>, Cmd<
 
 /** Fully typed `App` contract returned by `createFramedApp()`. */
 export type FramedApp<PageModel, Msg> = App<FrameModel<PageModel>, FramedAppMsg<Msg>>;
+
+/** Stored pane scroll coordinates. */
+export interface FramePaneScroll {
+  /** Horizontal offset. */
+  readonly x: number;
+  /** Vertical offset. */
+  readonly y: number;
+}
+
+/** Runtime model owned by the frame. */
+export interface FrameModel<PageModel> {
+  /** Current active page id. */
+  readonly activePageId: string;
+  /** Currently selected stock shell theme id (if shell themes are enabled). */
+  readonly activeShellThemeId?: string;
+  /** Stable page order. */
+  readonly pageOrder: readonly string[];
+  /** Current model per page id. */
+  readonly pageModels: Readonly<Record<string, PageModel>>;
+  /** Focused pane id per page (if any). */
+  readonly focusedPaneByPage: Readonly<Record<string, string | undefined>>;
+  /** Per-page/per-pane scroll positions. */
+  readonly scrollByPage: Readonly<Record<string, Readonly<Record<string, FramePaneScroll>>>>;
+  /** Current terminal width. */
+  readonly columns: number;
+  /** Current terminal height. */
+  readonly rows: number;
+  /** Help visibility flag. */
+  readonly helpOpen: boolean;
+  /** Command palette state (undefined when closed). */
+  readonly commandPalette?: CommandPaletteState;
+  /** Kind of active shell palette (`search` vs `command`). */
+  readonly commandPaletteKind?: 'command' | 'search';
+  /** Settings drawer visibility flag. */
+  readonly settingsOpen: boolean;
+  /** Notification center visibility flag. */
+  readonly notificationCenterOpen: boolean;
+  /** Quit-confirm modal visibility flag. */
+  readonly quitConfirmOpen: boolean;
+  /** Active settings row index. */
+  readonly settingsFocusIndex: number;
+  /** Vertical scroll offset for the settings drawer. */
+  readonly settingsScrollY: number;
+  /** Vertical scroll offset for the notification center. */
+  readonly notificationCenterScrollY: number;
+  /** ID of the page we are transitioning away from. */
+  readonly previousPageId?: string;
+  /** Transition progress (0 to 1). */
+  readonly transitionProgress: number;
+  /** Monotonic counter to discard stale transition ticks. */
+  readonly transitionGeneration: number;
+  /** Currently active transition style. */
+  readonly activeTransition?: import('./app-frame.js').PageTransition;
+  /** Wall-clock start time of the active transition (ms since epoch). */
+  readonly transitionStartMs?: number;
+  /** Compiled timeline driving the active transition. */
+  readonly transitionTimeline?: import('./timeline.js').Timeline;
+  /** Timeline state for the active transition. */
+  readonly transitionTimelineState?: import('./timeline.js').TimelineState;
+  /** Monotonic frame counter for the active transition (for temporal shader effects). */
+  readonly transitionFrame: number;
+  /** Per-page panel visibility (minimize/fold) state. */
+  readonly minimizedByPage: Readonly<Record<string, import('./panel-state.js').PanelVisibilityState>>;
+  /** Per-page maximized pane state. */
+  readonly maximizedPaneByPage: Readonly<Record<string, import('./panel-state.js').PanelMaximizeState>>;
+  /** Per-page dock order state. */
+  readonly dockStateByPage: Readonly<Record<string, import('./panel-dock.js').PanelDockState>>;
+  /** Per-page split ratio overrides (from layout presets/session restore). */
+  readonly splitRatioOverrides: Readonly<Record<string, Readonly<Record<string, number>>>>;
+  /** Frame-managed runtime notifications. */
+  readonly runtimeNotifications: import('./notification.js').NotificationState<never>;
+  /** Active filter for the shell fallback notification center. */
+  readonly runtimeNotificationHistoryFilter: import('./notification.js').NotificationHistoryFilter;
+  /** Whether the runtime notification tick loop is active. */
+  readonly runtimeNotificationLoopActive: boolean;
+}
 
 // ---------------------------------------------------------------------------
 // Internal model

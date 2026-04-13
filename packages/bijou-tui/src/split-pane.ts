@@ -12,14 +12,17 @@ import {
   graphemeClusterWidth,
   graphemeWidth,
   sanitizeNonNegativeInt,
+  solveSplitAxisSizes,
+  solveSplitPaneRects,
   segmentGraphemes,
+  type SplitLayoutDirection,
   type Surface,
   type WritePort,
 } from '@flyingrobots/bijou';
 import { placeSurface } from './surface-layout.js';
 
 /** Split direction. */
-export type SplitPaneDirection = 'row' | 'column';
+export type SplitPaneDirection = SplitLayoutDirection;
 /** Focused pane identifier. */
 export type SplitPaneFocus = 'a' | 'b';
 
@@ -111,7 +114,12 @@ export function splitPaneResizeBy(
 
   const minA = sanitizeNonNegativeInt(limits.minA, 0);
   const minB = sanitizeNonNegativeInt(limits.minB, 0);
-  const [currA] = solveSplit(available, state.ratio, minA, minB);
+  const { paneA: currA } = solveSplitAxisSizes({
+    available,
+    ratio: state.ratio,
+    minA,
+    minB,
+  });
 
   const maxA = Math.max(0, available - Math.min(minB, available));
   const clampedMinA = Math.min(minA, maxA);
@@ -147,29 +155,20 @@ export function splitPaneLayout(
   state: SplitPaneState,
   options: Omit<SplitPaneOptions, 'paneA' | 'paneB'>,
 ): SplitPaneLayout {
-  const direction = options.direction ?? 'row';
-  const width = sanitizeNonNegativeInt(options.width, 0);
-  const height = sanitizeNonNegativeInt(options.height, 0);
-  const dividerSize = sanitizeNonNegativeInt(options.dividerSize, 1);
-  const minA = sanitizeNonNegativeInt(options.minA, 0);
-  const minB = sanitizeNonNegativeInt(options.minB, 0);
+  const layout = solveSplitPaneRects({
+    direction: options.direction,
+    width: options.width,
+    height: options.height,
+    ratio: state.ratio,
+    minA: options.minA,
+    minB: options.minB,
+    dividerSize: options.dividerSize,
+  });
 
-  if (direction === 'row') {
-    const available = Math.max(0, width - dividerSize);
-    const [a, b] = solveSplit(available, state.ratio, minA, minB);
-    return {
-      paneA: { row: 0, col: 0, width: a, height },
-      divider: { row: 0, col: a, width: dividerSize, height },
-      paneB: { row: 0, col: a + dividerSize, width: b, height },
-    };
-  }
-
-  const available = Math.max(0, height - dividerSize);
-  const [a, b] = solveSplit(available, state.ratio, minA, minB);
   return {
-    paneA: { row: 0, col: 0, width, height: a },
-    divider: { row: a, col: 0, width, height: dividerSize },
-    paneB: { row: a + dividerSize, col: 0, width, height: b },
+    paneA: { row: layout.paneA.y, col: layout.paneA.x, width: layout.paneA.width, height: layout.paneA.height },
+    divider: { row: layout.divider.y, col: layout.divider.x, width: layout.divider.width, height: layout.divider.height },
+    paneB: { row: layout.paneB.y, col: layout.paneB.x, width: layout.paneB.width, height: layout.paneB.height },
   };
 }
 
@@ -233,30 +232,6 @@ export function splitPaneSurface(state: SplitPaneState, options: SplitPaneSurfac
   }
 
   return result;
-}
-
-/** Divide available space between two panes, respecting ratio and minimum constraints. */
-function solveSplit(available: number, ratio: number, minA: number, minB: number): [number, number] {
-  if (available <= 0) return [0, 0];
-
-  // Priority: minB > minA when they conflict (B keeps its minimum first).
-  const maxAFromMinB = Math.max(0, available - Math.min(minB, available));
-  // A's minimum cannot exceed the maximum that still satisfies B's minimum.
-  const clampedMinA = Math.min(minA, maxAFromMinB);
-
-  // Ratio target is clamped to feasible bounds after applying constraints.
-  let desiredA = Math.round(clampRatio(ratio) * available);
-  desiredA = clamp(desiredA, clampedMinA, maxAFromMinB);
-
-  // Guardrail: if rounding drift undercuts B's minimum, pull A back into range.
-  const desiredB = available - desiredA;
-  if (desiredB < Math.min(minB, available)) {
-    desiredA = Math.max(clampedMinA, available - Math.min(minB, available));
-  }
-
-  const a = clamp(desiredA, 0, available);
-  const b = Math.max(0, available - a);
-  return [a, b];
 }
 
 /** Normalize a ratio to the 0–1 range, defaulting non-finite values to 0.5. */

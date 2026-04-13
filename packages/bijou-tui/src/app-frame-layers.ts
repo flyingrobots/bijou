@@ -1,4 +1,4 @@
-import type { FrameModel } from './app-frame.js';
+import type { FrameModel } from './app-frame-types.js';
 import type { BindingSource } from './help.js';
 import {
   activeRuntimeView,

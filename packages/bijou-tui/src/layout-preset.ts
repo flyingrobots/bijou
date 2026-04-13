@@ -5,7 +5,7 @@
  * structures and applying them back.
  */
 
-import type { FrameModel } from './app-frame.js';
+import type { FrameModel } from './app-frame-types.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PanelMaximizeState } from './panel-state.js';
 import type { PanelDockState } from './panel-dock.js';

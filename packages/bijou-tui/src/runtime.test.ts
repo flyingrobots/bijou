@@ -513,6 +513,42 @@ describe('run', () => {
       expect(activeTimeoutCount()).toBe(0);
     });
 
+    it('coalesces same-timestamp input bursts into one follow-up render', async () => {
+      let viewCalls = 0;
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            if (msg.key === 'q') return [model, [quit()]];
+            if (msg.key === 'up') return [model + 1, []];
+          }
+          return [model, []];
+        },
+        view(model) {
+          viewCalls += 1;
+          return textView(`count: ${model}`);
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [
+        { at: 1, key: '\x1b[A' },
+        { at: 1, key: '\x1b[A' },
+        { at: 1, key: '\x1b[A' },
+        { at: 5, key: 'q' },
+      ]);
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(20);
+      await promise;
+
+      const renderWrites = ctx.io.written.filter((chunk) => chunk.includes('count:') || chunk.endsWith('3'));
+      expect(viewCalls).toBe(2);
+      expect(renderWrites).toContainEqual(expect.stringContaining('count: 0'));
+      expect(renderWrites.some((chunk) => chunk.endsWith('3'))).toBe(true);
+      expect(renderWrites.some((chunk) => chunk.includes('count: 1') || chunk.includes('count: 2'))).toBe(false);
+    });
+
     it('disposes cleanup-producing commands during shutdown', async () => {
       let disposeCalls = 0;
       const dispose = () => {

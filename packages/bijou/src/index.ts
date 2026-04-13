@@ -77,6 +77,18 @@ export {
   sanitizeOptionalPositiveInt,
   sanitizePositiveInt,
 } from './core/numeric.js';
+export {
+  solveGridRects,
+  solveSplitAxisSizes,
+  solveSplitPaneRects,
+  type GridTrack,
+  type SplitAxisOptions,
+  type SplitAxisSizes,
+  type SplitLayoutDirection,
+  type SplitPaneRectOptions,
+  type SplitPaneRects,
+  type GridRectOptions,
+} from './core/layout/geometry.js';
 
 // Mode rendering strategy
 export {

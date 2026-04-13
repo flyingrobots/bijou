@@ -66,9 +66,10 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Current cycle and backlog
 
-- latest completed cycle:
+- latest completed cycles:
+  - [RE-023 — Stabilize Render Scheduling in runtime.ts](../retro/RE-023-stabilize-render-scheduling.md)
+  - [RE-022 — Unified Layout Calculation Engine](../retro/RE-022-unified-layout-calculation-engine.md)
   - [RE-016 — DAG renderer should handle cycles gracefully](../retro/RE_016-dag-cycle-graceful-handling.md)
-- previous completed cycle:
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../retro/RE_007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - live backlog:
   - [RE-012 — Pipeline Observability Hooks](../backlog/cool-ideas/RE_012-pipeline-observability-hooks.md)
@@ -76,5 +77,3 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
   - [RE-014 — The Buffer Holds Facts](../backlog/cool-ideas/RE_014-buffer-holds-facts-doctrine.md)
   - [RE-020 — Typed Color Representation](../backlog/v5.0.0/RE-020-typed-color-representation.md)
   - [RE-021 — Frame Owns the Pump](../backlog/v5.0.0/RE-021-frame-owns-the-pump.md)
-  - [RE-022 — Unified Layout Calculation Engine](../backlog/bad-code/RE-022-unified-layout-calculation-engine.md)
-  - [RE-023 — Stabilize Render Scheduling in runtime.ts](../backlog/bad-code/RE-023-stabilize-render-scheduling.md)

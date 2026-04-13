@@ -1,4 +1,22 @@
+---
+title: RE-022 — Unified Layout Calculation Engine
+lane: retro
+legend: RE
+---
+
 # RE-022 — Unified Layout Calculation Engine
+
+## Disposition
+
+Completed on `release/v4.5.0`. Pure split/grid geometry now lives in
+`@flyingrobots/bijou` under `packages/bijou/src/core/layout/geometry.ts`,
+with shared `solveGridRects()`, `solveSplitPaneRects()`, and
+`solveSplitAxisSizes()` utilities plus foundation tests. The `bijou-tui`
+`grid` and `split-pane` helpers now delegate to that shared engine instead of
+maintaining their own duplicate geometry math, so the string and surface paths
+resolve the same rectangles from the same source of truth.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 

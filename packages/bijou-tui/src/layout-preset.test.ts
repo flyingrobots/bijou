@@ -7,7 +7,7 @@ import {
   presetFocused,
   type SerializedLayoutState,
 } from './layout-preset.js';
-import type { FrameModel } from './app-frame.js';
+import type { FrameModel } from './app-frame-types.js';
 import { createNotificationState } from './notification.js';
 
 describe('serializeLayoutState', () => {

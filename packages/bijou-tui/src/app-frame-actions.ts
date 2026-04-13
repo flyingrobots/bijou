@@ -5,8 +5,9 @@
  * page frame state sync, and transition tick command.
  */
 
-import type { FramePage, CreateFramedAppOptions, FramePaneScroll } from './app-frame.js';
+import type { FramePage, CreateFramedAppOptions } from './app-frame.js';
 import type {
+  FramePaneScroll,
   InternalFrameModel,
   FrameAction,
   FramedAppMsg,
