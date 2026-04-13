@@ -38,3 +38,16 @@ export {
   type AuthoringTranslationStatus,
   type TranslationRow,
 } from './tools.js';
+
+export {
+  pullCatalogBundleFromService,
+  pullTranslationWorkbookFromService,
+  pushCatalogBundleToService,
+  pushTranslationWorkbookToService,
+  type CatalogBundleServiceAdapter,
+  type CatalogBundleServicePullResult,
+  type ExchangeWorkbookServiceAdapter,
+  type ServiceExchangeAdapter,
+  type ServiceExchangeSnapshot,
+  type TranslationWorkbookServicePullResult,
+} from './service.js';

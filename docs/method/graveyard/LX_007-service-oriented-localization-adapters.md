@@ -1,4 +1,22 @@
+---
+title: LX-007 — Service-Oriented Localization Adapters
+lane: graveyard
+legend: LX
+---
+
 # LX-007 — Service-Oriented Localization Adapters
+
+## Disposition
+
+Landed in `release/v4.5.0` as a provider-neutral async service seam in
+`@flyingrobots/bijou-i18n-tools`. The package now exports revision-aware
+service snapshots and adapter ports for translation workbooks and catalog
+bundles, plus push/pull helpers that build directly on the existing workbook and
+bundle exchange contracts. Concrete Google Sheets or other remote-service
+clients still belong outside the pure tooling package, but the service-backed
+workflow surface is no longer missing.
+
+## Original Proposal
 
 Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 

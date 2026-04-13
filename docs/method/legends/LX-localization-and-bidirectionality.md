@@ -52,7 +52,6 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 ## Current cycle and backlog
 
-- latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](../design/LX-008-localize-shell-chrome-and-dogfood.md)
+- latest completed cycle: [LX-007 — Service-Oriented Localization Adapters](../graveyard/LX_007-service-oriented-localization-adapters.md)
 - live backlog:
   - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
-  - [LX-007 — Service-Oriented Localization Adapters](../BACKLOG/LX-007-service-oriented-localization-adapters.md)
