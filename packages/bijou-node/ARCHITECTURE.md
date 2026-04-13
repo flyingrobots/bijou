@@ -97,6 +97,10 @@ Respects `NO_COLOR` — when active, all methods return text unchanged.
 
 `initDefaultContext()` calls `createNodeContext()` and registers the result as the global default via `setDefaultContext()`.
 
+Module import also registers a lazy Node default-context initializer with the
+core package. That keeps low-level `run(app)` and ambient component calls on the
+common Node path from failing before an explicit `initDefaultContext()` call.
+
 `startApp(app, options)` is the higher-level host helper:
 
 1. Uses `options.ctx` when the host provides one

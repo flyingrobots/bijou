@@ -10,7 +10,12 @@
  */
 
 import type { BijouContext } from '@flyingrobots/bijou';
-import { createBijou, setDefaultContext } from '@flyingrobots/bijou';
+import {
+  createBijou,
+  resolveSafeCtx,
+  setDefaultContext,
+  setDefaultContextInitializer,
+} from '@flyingrobots/bijou';
 import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
 import { nodeRuntime } from './runtime.js';
 import { nodeIO } from './io.js';
@@ -43,6 +48,11 @@ export {
 /** Options for {@link startApp}. Mirrors {@link RunOptions}. */
 export type StartAppOptions<M = any> = RunOptions<M>;
 
+/** Test-only helper that restores the Node ambient-context initializer after resets. */
+export function _registerDefaultContextInitializerForTesting(): void {
+  setDefaultContextInitializer(() => createNodeContext());
+}
+
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
  *
@@ -64,6 +74,8 @@ export function createNodeContext(): BijouContext {
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
   });
 }
+
+_registerDefaultContextInitializerForTesting();
 
 /**
  * Guard flag ensuring {@link initDefaultContext} only registers the global
@@ -95,6 +107,11 @@ export function _resetInitializedForTesting(): void {
  *   fresh context on subsequent calls.
  */
 export function initDefaultContext(): BijouContext {
+  const existing = resolveSafeCtx();
+  if (!initialized && existing != null) {
+    initialized = true;
+    return existing;
+  }
   if (!initialized) {
     const ctx = createNodeContext();
     setDefaultContext(ctx);

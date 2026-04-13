@@ -1,7 +1,14 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
-import { createNodeContext, initDefaultContext, startApp, _resetInitializedForTesting } from './index.js';
+import {
+  createNodeContext,
+  initDefaultContext,
+  startApp,
+  _resetInitializedForTesting,
+  _registerDefaultContextInitializerForTesting,
+} from './index.js';
 import { getDefaultContext, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { run } from '@flyingrobots/bijou-tui';
 
 function textSurface(text: string): Surface {
   const lines = text.split('\n');
@@ -50,11 +57,13 @@ describe('initDefaultContext()', () => {
   beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
+    _registerDefaultContextInitializerForTesting();
   });
 
   afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
+    _registerDefaultContextInitializerForTesting();
   });
 
   it('first call returns a BijouContext with all five fields', () => {
@@ -83,12 +92,14 @@ describe('startApp()', () => {
   beforeEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
+    _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
   afterEach(() => {
     _resetInitializedForTesting();
     _resetDefaultContextForTesting();
+    _registerDefaultContextInitializerForTesting();
     vi.unstubAllEnvs();
   });
 
@@ -121,5 +132,20 @@ describe('startApp()', () => {
 
     expect(getDefaultContext()).toBe(defaultCtx);
     expect(writeSpy).toHaveBeenCalledWith('explicit ctx path');
+  });
+
+  it('lets run() resolve the Node default context without a manual init step', async () => {
+    vi.stubEnv('TERM', 'dumb');
+    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+
+    await run({
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('hello from ambient run'),
+    });
+
+    expect(getDefaultContext()).toBeDefined();
+    expect(spy).toHaveBeenCalledWith('hello from ambient run');
+    spy.mockRestore();
   });
 });

@@ -50,6 +50,7 @@ export {
 export {
   getDefaultContext,
   setDefaultContext,
+  setDefaultContextInitializer,
 } from './context.js';
 export {
   cloneContextWithResolvedTheme,

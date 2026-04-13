@@ -625,6 +625,115 @@ describe('createFramedApp', () => {
     expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
   });
 
+  it('warns when frame-first key priority shadows page bindings', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('home'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('?', 'Ask page', { type: 'noop' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+    });
+
+    let [model, initCmds] = app.init();
+    expect(initCmds).toHaveLength(0);
+
+    const [nextModel, cmds] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = nextModel;
+    expect(model.helpOpen).toBe(true);
+    expect(cmds).toHaveLength(1);
+
+    const warningMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (warningMsg == null || warningMsg === QUIT || isCmdCleanup(warningMsg)) {
+      throw new Error('expected runtime warning message');
+    }
+
+    const [warnedModel] = app.update(warningMsg, model);
+    expect(warnedModel.runtimeNotifications.items).toHaveLength(1);
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('Page "home" key binding ?');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('?');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('"Ask page"');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('"Toggle help"');
+  });
+
+  it('warns only once per page for frame-first binding collisions', async () => {
+    const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
+      id,
+      title,
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView(title),
+      }),
+      keyMap: createKeyMap<Msg>().bind('?', `${title} help`, { type: 'noop' }),
+    });
+
+    const app = createFramedApp({
+      pages: [page('home', 'Home'), page('logs', 'Logs')],
+    });
+
+    let [model, initCmds] = app.init();
+    expect(initCmds).toHaveLength(0);
+
+    let update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(update[1]).toHaveLength(1);
+
+    const homeWarning = await update[1][0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (homeWarning == null || homeWarning === QUIT || isCmdCleanup(homeWarning)) {
+      throw new Error('expected home collision warning');
+    }
+    [model] = app.update(homeWarning, model);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+
+    update = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('logs');
+    expect(update[1]).toHaveLength(0);
+
+    update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(update[1]).toHaveLength(1);
+
+    const logsWarning = await update[1][0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (logsWarning == null || logsWarning === QUIT || isCmdCleanup(logsWarning)) {
+      throw new Error('expected logs collision warning');
+    }
+    [model] = app.update(logsWarning, model);
+    expect(model.runtimeNotifications.items).toHaveLength(2);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+
+    update = app.update({ type: 'key', key: '[', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('home');
+    expect(update[1]).toHaveLength(0);
+
+    update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    expect(update[1]).toHaveLength(0);
+  });
+
   it('can override the short help strip with page bindings only', async () => {
     const page: FramePage<PageModel, Msg> = {
       id: 'home',

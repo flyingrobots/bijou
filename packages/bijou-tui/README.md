@@ -20,11 +20,9 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
 ## Quick Start (Sub-App Composition)
 
 ```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, mount, type App } from '@flyingrobots/bijou-tui';
+import { startApp } from '@flyingrobots/bijou-node';
+import { mount, type App } from '@flyingrobots/bijou-tui';
 import { createSurface } from '@flyingrobots/bijou';
-
-initDefaultContext();
 
 const childApp: App<{ count: number }, any> = {
   init: () => [{ count: 0 }, []],
@@ -50,8 +48,11 @@ const app: App<any, any> = {
   }
 };
 
-run(app);
+await startApp(app);
 ```
+
+For Node hosts, prefer `startApp()` for the first-app path. Reach for
+`run(app, { ctx })` when the host owns context creation explicitly.
 
 ## Strategy: Choosing Component Families
 

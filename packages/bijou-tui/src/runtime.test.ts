@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createSurface, stringToSurface, type TimerHandle } from '@flyingrobots/bijou';
-import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { run } from './runtime.js';
 import { quit } from './commands.js';
 import type { App, KeyMsg, Cmd } from './types.js';
@@ -124,6 +124,17 @@ function scheduleResizes(
 }
 
 describe('run', () => {
+  it('throws an actionable startup error when no ctx or ambient default is available', async () => {
+    _resetDefaultContextForTesting();
+
+    await expect(run(counterApp())).rejects.toThrow(
+      'Import @flyingrobots/bijou-node to register Node auto-init, call startApp(app), or call setDefaultContext() explicitly.',
+    );
+    await expect(run(counterApp())).rejects.toThrow(
+      'https://github.com/flyingrobots/bijou/tree/main/packages/bijou-node/GUIDE.md#basic-setup',
+    );
+  });
+
   describe('non-interactive mode', () => {
     it('renders once in pipe mode and returns', async () => {
       const ctx = createTestContext({ mode: 'pipe' });

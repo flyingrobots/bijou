@@ -65,6 +65,7 @@ export interface InternalFrameModel<PageModel, Msg> extends FrameModel<PageModel
   readonly commandPaletteTitle?: string;
   readonly commandPaletteKind?: PaletteKind;
   readonly helpScrollY: number;
+  readonly warnedFrameKeyCollisionPages: Readonly<Record<string, true>>;
 }
 
 /** A command palette entry linking a UI item to an action or message. */
@@ -169,6 +170,7 @@ export type FrameShellCommand<Msg> =
   | { readonly type: 'notification-center-scroll'; readonly delta: number }
   | { readonly type: 'notification-center-scroll-to'; readonly position: 'top' | 'bottom' }
   | { readonly type: 'cycle-notification-filter' }
+  | { readonly type: 'warn-frame-key-collision'; readonly msg: KeyMsg }
   // --- help ---
   | { readonly type: 'help-scroll'; readonly action: 'up' | 'down' | 'page-up' | 'page-down' | 'top' | 'bottom' }
   // --- workspace ---

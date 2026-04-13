@@ -1,10 +1,18 @@
 ---
 title: DX-009 — Auto-Init Context and Actionable Error Messages
-lane: up-next
+lane: graveyard
 legend: DX
 ---
 
 # DX-009 — Auto-Init Context and Actionable Error Messages
+
+## Disposition
+
+Completed on release/v4.5.0. Ambient default-context bootstrapping is now host-pluggable through the core default-context initializer seam, @flyingrobots/bijou-node registers the Node initializer so common run() flows no longer require a manual initDefaultContext() call, runtime startup errors now point directly at the Node setup guide, and createFramedApp emits a one-time runtime warning when frame-first shell bindings shadow page key bindings.
+
+Replacement: `docs/method/graveyard/DX_009-context-auto-init-and-error-messages.md`
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

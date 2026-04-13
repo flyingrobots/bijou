@@ -21,11 +21,9 @@ The runtime calls `init()` once, then loops: render → wait for event → `upda
 ## Minimal Example
 
 ```typescript
-import { run, quit, type App } from '@flyingrobots/bijou-tui';
+import { quit, type App } from '@flyingrobots/bijou-tui';
 import { stringToSurface } from '@flyingrobots/bijou';
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-
-initDefaultContext();
+import { startApp } from '@flyingrobots/bijou-node';
 
 const app: App<{ text: string }, never> = {
   init: () => [{ text: 'Hello!' }, []],
@@ -36,8 +34,11 @@ const app: App<{ text: string }, never> = {
   view: (model) => stringToSurface(model.text, model.text.length, 1),
 };
 
-run(app);
+await startApp(app);
 ```
+
+`startApp()` is the preferred Node-host bootstrap path. Use `run(app, { ctx })`
+when your host owns context creation explicitly.
 
 ### Command Contract
 

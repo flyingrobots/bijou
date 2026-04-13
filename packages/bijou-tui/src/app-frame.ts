@@ -29,7 +29,7 @@ import {
 } from '@flyingrobots/bijou';
 import type { I18nRuntime } from '@flyingrobots/bijou-i18n';
 import { helpViewSurface, type BindingSource } from './help.js';
-import { createKeyMap, type KeyMap } from './keybindings.js';
+import { createKeyMap, formatKeyCombo, type BindingInfo, type KeyMap } from './keybindings.js';
 import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import { quit } from './commands.js';
@@ -886,6 +886,58 @@ export function createFramedApp<PageModel, Msg>(
     close: { type: 'cp-close' },
   });
 
+  function bindingComboKey(binding: BindingInfo): string {
+    const combo = binding.combo;
+    return `${combo.key}|${combo.ctrl ? 1 : 0}|${combo.alt ? 1 : 0}|${combo.shift ? 1 : 0}`;
+  }
+
+  function findBindingForMessage(
+    bindings: readonly BindingInfo[],
+    msg: KeyMsg,
+  ): BindingInfo | undefined {
+    const comboKey = `${msg.key}|${msg.ctrl ? 1 : 0}|${msg.alt ? 1 : 0}|${msg.shift ? 1 : 0}`;
+    return bindings.find((binding) => binding.enabled && bindingComboKey(binding) === comboKey);
+  }
+
+  function queueFrameKeyCollisionWarning(
+    model: InternalFrameModel<PageModel, Msg>,
+    msg: KeyMsg,
+    teaCmds: Cmd<FramedAppMsg<Msg>>[],
+  ): InternalFrameModel<PageModel, Msg> {
+    if (!frameNotificationOptions.enabled) return model;
+    if ((options.keyPriority ?? 'frame-first') !== 'frame-first') return model;
+    if (model.warnedFrameKeyCollisionPages[model.activePageId]) return model;
+    const activePage = pagesById.get(model.activePageId);
+    if (activePage?.keyMap == null) return model;
+
+    const pageBinding = findBindingForMessage(activePage.keyMap.bindings(), msg);
+    const frameBinding = findBindingForMessage(frameKeys.bindings(), msg);
+    if (pageBinding == null || frameBinding == null) return model;
+
+    const warningCmd: Cmd<FramedAppMsg<Msg>> = async () => wrapFrameMsg({
+      type: 'runtime-issue',
+      issue: {
+        level: 'warning',
+        source: 'runtime',
+        message:
+          `Page "${model.activePageId}" key binding ${formatKeyCombo(pageBinding.combo)} `
+          + `("${pageBinding.description}") is shadowed by the frame binding `
+          + `"${frameBinding.description}" under keyPriority="frame-first". `
+          + `Use keyPriority: 'page-first' or choose a different page binding.`,
+        atMs: resolveClock(resolveFrameCtx()).now(),
+      },
+    });
+    teaCmds.push(warningCmd);
+
+    return {
+      ...model,
+      warnedFrameKeyCollisionPages: {
+        ...model.warnedFrameKeyCollisionPages,
+        [model.activePageId]: true,
+      },
+    };
+  }
+
   function getComposedFrameScratch(width: number, height: number): Surface {
     if (
       composedFrameScratch == null
@@ -1026,6 +1078,10 @@ export function createFramedApp<PageModel, Msg>(
       const [nextModel, cmds] = cycleNotificationCenterFilter(model, layout);
       teaCmds.push(...cmds);
       return nextModel;
+    },
+    'warn-frame-key-collision': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'warn-frame-key-collision' }>;
+      return queueFrameKeyCollisionWarning(model, c.msg, teaCmds);
     },
 
     // --- help ---
@@ -1400,7 +1456,9 @@ export function createFramedApp<PageModel, Msg>(
 
     // frame-first (default)
     if (frameAction !== undefined) {
-      return resolveFrameActionCommands(msg, frameAction, 'frame');
+      return pageAction !== undefined
+        ? [...resolveFrameActionCommands(msg, frameAction, 'frame'), { type: 'warn-frame-key-collision', msg }]
+        : resolveFrameActionCommands(msg, frameAction, 'frame');
     }
     if (paneAction !== undefined) {
       return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: paneAction }];
@@ -2026,6 +2084,7 @@ export function createFramedApp<PageModel, Msg>(
         activePageId: defaultPageId,
         pageOrder,
         pageModels,
+        warnedFrameKeyCollisionPages: {},
         focusedPaneByPage: {},
         scrollByPage: {},
         columns: Math.max(1, options.initialColumns ?? 80),

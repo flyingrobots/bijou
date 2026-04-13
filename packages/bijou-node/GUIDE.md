@@ -33,6 +33,11 @@ await startApp(app);
 It also registers the default context automatically so lower-level helpers that
 rely on ambient `ctx` resolution still work in the common path.
 
+Importing `@flyingrobots/bijou-node` also registers a lazy Node default-context
+initializer. That means low-level `run(app)` flows can still resolve ambient
+`ctx` on first use, but `startApp()` remains the preferred first-app entrypoint
+because it makes host ownership explicit in the call site.
+
 ## Custom Context
 
 If you need more control, create the context without setting the global default:
