@@ -1,4 +1,16 @@
+---
+title: DX-011 — Key Collision Warnings at Registration Time
+lane: graveyard
+legend: DX
+---
+
 # DX-011 — Key Collision Warnings at Registration Time
+
+## Disposition
+
+Repo truth already ships this warning. `createFramedApp()` queues a runtime warning when a page key binding is shadowed by a frame binding under `keyPriority: 'frame-first'`, and `app-frame.test.ts` already covers both the warning emission and the once-per-page guard. The backlog note is stale relative to shipped behavior.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 
