@@ -88,6 +88,7 @@ viewportSurface({ width: 60, height: 20, content: largeSurface, scrollY: 10 });
 - **`modal()`**: Centered dialog that blocks background interactions.
 - **`toast()`**: Transient notification anchored to a screen edge.
 - **`drawer()`**: Supplemental side-panel (left, right, top, bottom).
+- **`debugOverlay()`**: Corner-anchored perf dashboard for development instrumentation.
 - **`compositeSurface()`**: Painters-algorithm compositor for background and overlays.
 
 ## Animation

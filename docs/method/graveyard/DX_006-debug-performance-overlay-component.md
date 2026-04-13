@@ -1,4 +1,16 @@
+---
+title: DX-006 — Debug Performance Overlay Component
+lane: graveyard
+legend: DX
+---
+
 # DX-006 — Debug Performance Overlay Component
+
+## Disposition
+
+Shipped a first-class `debugOverlay()` wrapper in `@flyingrobots/bijou-tui`. It composes the existing `perfOverlaySurface()` into any app surface with corner anchoring, optional background dimming, package exports, docs, and focused regression coverage, so the original perf-overlay component idea is now real repo truth rather than backlog intent.
+
+## Original Proposal
 
 Legend: [DX — Developer Experience](../../legends/DX-developer-experience.md)
 

@@ -68,6 +68,7 @@ Select the family based on the interaction semantic.
 - **`modal()`**: Required decision that blocks background activity.
 - **`toast()`**: Transient notification for a single event.
 - **`tooltip()`**: Micro-explanation for a local target.
+- **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
 
 ### Collection Interaction
 - **`navigableTable()`**: Keyboard-driven traversal and cell inspection.

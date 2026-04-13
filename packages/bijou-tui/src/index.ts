@@ -187,6 +187,8 @@ export { contentSurface, vstackSurface, hstackSurface, placeSurface } from './su
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
 export type { SurfaceContent } from './surface-layout.js';
 export type { LayoutRect } from './layout-rect.js';
+export type { DebugOverlayAnchor, DebugOverlayOptions } from './debug-overlay.js';
+export { debugOverlay } from './debug-overlay.js';
 
 // Split pane layout
 export {
