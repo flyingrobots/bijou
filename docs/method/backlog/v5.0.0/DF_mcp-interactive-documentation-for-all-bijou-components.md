@@ -1,7 +1,7 @@
 ---
 title: MCP interactive documentation for all Bijou components
 legend: DF
-lane: cool-ideas
+lane: v5.0.0
 ---
 
 # MCP interactive documentation for all Bijou components

@@ -1,3 +1,8 @@
+---
+title: DL-010 — Strictly Typed App Interface Examples
+lane: v5.0.0
+---
+
 # DL-010 — Strictly Typed App Interface Examples
 
 Legend: [DL — Design Language](../../legends/DL-design-language.md)

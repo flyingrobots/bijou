@@ -1,3 +1,8 @@
+---
+title: CI-003 — Surface Shaders (CRT / Scanlines)
+lane: v5.0.0
+---
+
 # CI-003 — Surface Shaders (CRT / Scanlines)
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)

@@ -1,3 +1,9 @@
+---
+title: RE-014 — "The Buffer Holds Facts" Design Doctrine
+lane: v5.0.0
+legend: RE
+---
+
 # RE-014 — "The Buffer Holds Facts" Design Doctrine
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
