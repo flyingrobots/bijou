@@ -18,10 +18,12 @@ or mitigation within 7 days for critical issues.
 
 ## Supported Versions
 
+Bijou provides security fixes for the latest stable release line.
+
 | Version | Supported |
 |---------|-----------|
-| 4.1.x   | Yes       |
-| < 4.0   | No        |
+| 4.4.x   | Yes       |
+| < 4.4   | No        |
 
 ## Scope
 
@@ -29,6 +31,7 @@ This policy covers the following packages:
 
 - `@flyingrobots/bijou`
 - `@flyingrobots/bijou-node`
+- `@flyingrobots/bijou-mcp`
 - `@flyingrobots/bijou-tui`
 - `@flyingrobots/bijou-tui-app`
 - `@flyingrobots/bijou-i18n`

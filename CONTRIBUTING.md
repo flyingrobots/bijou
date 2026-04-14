@@ -6,10 +6,11 @@ covers the workflow, expectations, and resources for contributors.
 ## Getting Started
 
 1. Fork the repository and clone your fork.
-2. Install dependencies: `pnpm install`
+2. Install dependencies: `npm install`
 3. Set up git hooks: `git config --local core.hooksPath scripts/hooks`
-4. Run the test suite: `npm test`
-5. Run the linter: `npm run lint`
+4. Run the linter: `npm run lint`
+5. Run the test suite: `npm test`
+6. Verify docs references: `npm run docs:inventory`
 
 ## Development Workflow
 
@@ -24,6 +25,13 @@ points for contributors:
   modify a test to make it pass — fix the code instead.
 - **Zero tolerance**: Lint must pass cleanly. All tests must pass.
   No warnings.
+
+Common validation commands:
+
+- `npm run lint`
+- `npm test`
+- `npm run docs:inventory`
+- `npm run release:readiness` for release-sensitive changes or before cutting a release branch
 
 ## Pull Requests
 

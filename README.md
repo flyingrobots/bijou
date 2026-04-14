@@ -41,6 +41,15 @@ Unlike Virtual-DOM wrappers that treat the terminal as a low-resolution browser,
 - **Physics-Powered Motion**: Declarative spring and tween animations synchronized to a unified heartbeat.
 - **Zero-Dependency Core**: The fundamental toolkit is pure TypeScript, isolated from platform-specific IO.
 
+## Choose Your Lane
+
+- **CLI or script**: start with [`@flyingrobots/bijou`](./packages/bijou/) and host it through [`@flyingrobots/bijou-node`](./packages/bijou-node/).
+- **Interactive TUI**: start with [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) and the hosted Node entrypoint in [`@flyingrobots/bijou-node`](./packages/bijou-node/).
+- **Batteries-included app shell**: scaffold with [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) or study [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/).
+- **MCP server**: use [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) and the reference docs in [`docs/MCP.md`](./docs/MCP.md).
+- **Localization**: start with [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) plus the catalog tooling packages.
+- **Guided walkthroughs and proof**: use [`GUIDE.md`](./GUIDE.md) and run [`npm run dogfood`](./docs/DOGFOOD.md).
+
 ## Quick Start
 
 ### 1. Pure CLI Flow
@@ -70,29 +79,21 @@ console.log(headerBox('Scaffold', { detail: `${answers.project} (${answers.templ
 Full-screen TEA loop with layout, overlays, and motion.
 
 ```ts
-import { type App, quit, run, vstackSurface } from '@flyingrobots/bijou-tui';
-import { badge, boxSurface } from '@flyingrobots/bijou';
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-
-const ctx = initDefaultContext();
+import { stringToSurface } from '@flyingrobots/bijou';
+import { startApp } from '@flyingrobots/bijou-node';
+import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
 
 const app: App<{ count: number }> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => {
-    if (msg.type === 'key' && msg.key === 'q') return [model, [quit()]];
-    if (msg.type === 'key' && msg.key === 'k') return [{ count: model.count + 1 }, []];
+    if (isKeyMsg(msg) && msg.key === 'q') return [model, [quit()]];
+    if (isKeyMsg(msg) && msg.key === 'k') return [{ count: model.count + 1 }, []];
     return [model, []];
   },
-  view: (model) => boxSurface(
-    vstackSurface(
-      `Count: ${model.count}`,
-      badge(model.count > 10 ? 'HIGH' : 'LOW', { variant: 'info', ctx }),
-    ),
-    { title: 'Counter', padding: 1, ctx },
-  ),
+  view: (model) => stringToSurface(`Count: ${model.count}\nPress k to increment\nPress q to quit`, 20, 3),
 };
 
-await run(app);
+await startApp(app);
 ```
 
 ### 3. Scaffold a Framed App
@@ -109,7 +110,13 @@ npm create bijou-tui-app@latest my-app
 | [`@flyingrobots/bijou`](./packages/bijou/) | Core toolkit: prompts, components, themes, ports. |
 | [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) | Interactive runtime: TEA, layout, motion, overlays. |
 | [`@flyingrobots/bijou-node`](./packages/bijou-node/) | Node.js adapters: IO, styling, worker helpers. |
-| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | Localization: in-memory runtime and catalogs. |
+| [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) | Batteries-included framed shell and higher-level app composition. |
+| [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) | Project scaffolder for a hosted framed TUI app. |
+| [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) | MCP server package for exposing Bijou-backed tooling. |
+| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | Localization runtime: catalogs, formatting, and translation lookup. |
+| [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) | Catalog tooling primitives and workflow helpers. |
+| [`@flyingrobots/bijou-i18n-tools-node`](./packages/bijou-i18n-tools-node/) | Node-hosted localization tooling helpers. |
+| [`@flyingrobots/bijou-i18n-tools-xlsx`](./packages/bijou-i18n-tools-xlsx/) | Spreadsheet import/export adapters for localization workflows. |
 
 ## Documentation
 
