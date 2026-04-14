@@ -4,8 +4,10 @@ import {
   pullTranslationWorkbookFromService,
   pushCatalogBundleToService,
   pushTranslationWorkbookToService,
+  type CatalogBundle,
   type CatalogBundleServiceAdapter,
   type ExchangeWorkbookServiceAdapter,
+  type ServiceExchangeSnapshot,
 } from './index.js';
 
 const authoringCatalogs = [
@@ -89,7 +91,7 @@ describe('bijou-i18n-tools service adapters', () => {
   });
 
   it('pushes and pulls catalog bundles through the same service seam', async () => {
-    let stored = {
+    let stored: ServiceExchangeSnapshot<CatalogBundle> = {
       revision: 'bundle-rev-1',
       value: { version: 1 as const, catalogs: [] },
     };

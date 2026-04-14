@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { colorHex, type ColorRef } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
@@ -34,12 +35,12 @@ function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: b
   };
 }
 
-function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
+function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: ColorRef; bg?: ColorRef } }) {
   const cells: string[] = [];
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
       const cell = frame.get(x, y);
-      cells.push(`${cell.char ?? ' '}|${cell.fg ?? ''}|${cell.bg ?? ''}`);
+      cells.push(`${cell.char ?? ' '}|${colorHex(cell.fg) ?? ''}|${colorHex(cell.bg) ?? ''}`);
     }
   }
   return cells.join('\n');
