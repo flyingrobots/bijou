@@ -124,6 +124,18 @@ describe('viewport', () => {
     }
   });
 
+  it('supports overlay scrollbars without reserving an extra gutter column', () => {
+    const result = viewport({
+      width: 5,
+      height: 2,
+      content: 'abcde\nfghij\nklmno\npqrst',
+      showScrollbar: true,
+      scrollbarMode: 'overlay',
+    });
+
+    expect(result.split('\n')).toEqual(['abcd█', 'fghi│']);
+  });
+
   it('hides scrollbar when content fits', () => {
     const shortContent = 'a\nb\nc';
     const result = viewport({
@@ -230,6 +242,25 @@ describe('viewportSurface', () => {
     });
 
     expect(surfaceLines(result)).toEqual(['ABC']);
+  });
+
+  it('supports overlay scrollbars for structured surfaces without shrinking the body width', () => {
+    const content = createSurface(5, 4, { char: ' ', empty: false });
+    for (const [y, row] of ['abcde', 'fghij', 'klmno', 'pqrst'].entries()) {
+      for (const [x, char] of row.split('').entries()) {
+        content.set(x, y, { char, empty: false });
+      }
+    }
+
+    const result = viewportSurface({
+      width: 5,
+      height: 2,
+      content,
+      showScrollbar: true,
+      scrollbarMode: 'overlay',
+    });
+
+    expect(surfaceLines(result)).toEqual(['abcd█', 'fghi│']);
   });
 });
 

@@ -63,6 +63,25 @@ describe('createFocusAreaState', () => {
     expect(state.scroll.maxX).toBeGreaterThan(0);
   });
 
+  it('preserves one extra content column when overlay scrollbars are requested', () => {
+    const gutterState = createFocusAreaState({
+      content: WIDE_CONTENT,
+      width: 40,
+      height: 5,
+      overflowX: 'scroll',
+      scrollbarMode: 'gutter',
+    });
+    const overlayState = createFocusAreaState({
+      content: WIDE_CONTENT,
+      width: 40,
+      height: 5,
+      overflowX: 'scroll',
+      scrollbarMode: 'overlay',
+    });
+
+    expect(overlayState.scroll.maxX).toBe(gutterState.scroll.maxX - 1);
+  });
+
   it('maxX is 0 when overflowX is hidden', () => {
     const state = createFocusAreaState({ content: WIDE_CONTENT, width: 40, height: 10 });
     expect(state.scroll.maxX).toBe(0);
@@ -325,6 +344,18 @@ describe('focusArea', () => {
     expect(output).not.toContain('│');
     expect(output).not.toContain('█');
   });
+
+  it('supports overlay scrollbars without adding a dead body gutter', () => {
+    const state = createFocusAreaState({
+      content: 'abcde\nfghij\nklmno\npqrst',
+      width: 6,
+      height: 2,
+      scrollbarMode: 'overlay',
+    });
+    const output = focusArea(state, { showScrollbar: true });
+
+    expect(output.split('\n')).toEqual(['▎abcd█', '▎fghi│']);
+  });
 });
 
 describe('focusAreaSurface', () => {
@@ -382,6 +413,37 @@ describe('focusAreaSurface', () => {
     expect(output.get(5, 1).char).toBe('k');
     expect(output.get(6, 1).char).toMatch(/[█│]/);
     expect(output.get(1, 1).char).toBe('.');
+  });
+
+  it('exposes BCSS-targetable track and thumb cells for the scrollbar rail', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    ctx.resolveBCSS = (identity): Record<string, string> => {
+      if (identity.type === 'FocusAreaScrollbarThumb' && identity.id === 'main') {
+        return { color: '#ff00ff', background: '#101010' };
+      }
+      if (identity.type === 'FocusAreaScrollbarTrack' && identity.id === 'main') {
+        return { color: '#00ffff' };
+      }
+      return {};
+    };
+
+    const content = stringToSurface('abcde\nfghij\nklmno\npqrst', 5, 4);
+    const state = createFocusAreaStateForSurface(content, {
+      width: 6,
+      height: 2,
+      overflowX: 'hidden',
+      scrollbarMode: 'overlay',
+    });
+
+    const output = focusAreaSurface(content, state, { ctx, id: 'main' });
+    expect(output.get(5, 0).char).toBe('█');
+    expect(output.get(5, 1).char).toBe('│');
+
+    const thumbCall = style.calls.find((call) => call.method === 'styled' && call.text === '█');
+    const trackCall = style.calls.find((call) => call.method === 'styled' && call.text === '│');
+    expect(thumbCall?.token).toMatchObject({ hex: '#ff00ff', bg: '#101010' });
+    expect(trackCall?.token).toMatchObject({ hex: '#00ffff' });
   });
 });
 

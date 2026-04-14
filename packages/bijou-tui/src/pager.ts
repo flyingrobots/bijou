@@ -19,6 +19,7 @@
 
 import { createSurface, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import {
+  type ScrollbarMode,
   type ScrollState,
   viewport,
   viewportSurface,
@@ -62,6 +63,8 @@ export interface PagerOptions {
 export interface PagerRenderOptions {
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
+  /** Reserve a gutter column or overlay the rightmost content cell. Default: `'gutter'`. */
+  readonly scrollbarMode?: ScrollbarMode;
   /** Show a "Line N/M" status line below the viewport. Default: true. */
   readonly showStatus?: boolean;
 }
@@ -214,6 +217,7 @@ export function pagerSetContent(state: PagerState, content: string): PagerState 
  */
 export function pager(state: PagerState, options?: PagerRenderOptions): string {
   const showScrollbar = options?.showScrollbar ?? true;
+  const scrollbarMode = options?.scrollbarMode ?? 'gutter';
   const showStatus = options?.showStatus ?? true;
 
   const viewportHeight = showStatus
@@ -231,6 +235,7 @@ export function pager(state: PagerState, options?: PagerRenderOptions): string {
     content: state.content,
     scrollY: clampedY,
     showScrollbar,
+    scrollbarMode,
   });
 
   if (!showStatus) return body;
@@ -255,6 +260,7 @@ export function pagerSurface(
   options?: PagerRenderOptions,
 ): Surface {
   const showScrollbar = options?.showScrollbar ?? true;
+  const scrollbarMode = options?.scrollbarMode ?? 'gutter';
   const showStatus = options?.showStatus ?? true;
   const safeWidth = Math.max(0, Math.floor(state.width));
   const safeHeight = Math.max(0, Math.floor(state.height));
@@ -273,6 +279,7 @@ export function pagerSurface(
     content,
     scrollY: clampedY,
     showScrollbar,
+    scrollbarMode,
   });
 
   if (!showStatus) return body;

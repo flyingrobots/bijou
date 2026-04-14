@@ -12,6 +12,7 @@ import {
   parseAnsiToSurface,
   segmentGraphemes,
   clipToWidth as coreClipToWidth,
+  type Cell,
   type LayoutNode,
   type Surface,
 } from '@flyingrobots/bijou';
@@ -20,6 +21,9 @@ import { layoutNodeToSurface } from './layout-node-surface.js';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+/** Scrollbar ownership model for the viewport edge. */
+export type ScrollbarMode = 'gutter' | 'overlay';
 
 /**
  * Configuration for rendering a scrollable viewport window.
@@ -37,6 +41,12 @@ export interface ViewportOptions {
   readonly scrollX?: number;
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
+  /** Reserve a gutter column or overlay the rightmost content cell. Default: `'gutter'`. */
+  readonly scrollbarMode?: ScrollbarMode;
+  /** Character used for the scrollbar track in string rendering. Default: `'│'`. */
+  readonly scrollbarTrackChar?: string;
+  /** Character used for the scrollbar thumb in string rendering. Default: `'█'`. */
+  readonly scrollbarThumbChar?: string;
 }
 
 /**
@@ -45,6 +55,10 @@ export interface ViewportOptions {
 export interface ViewportSurfaceOptions extends Omit<ViewportOptions, 'content'> {
   /** Full content payload, either plain/ANSI text, a pre-rendered surface, or a layout tree. */
   readonly content: ViewportContent;
+  /** Cell used for the scrollbar track in surface rendering. */
+  readonly scrollbarTrackCell?: Cell;
+  /** Cell used for the scrollbar thumb in surface rendering. */
+  readonly scrollbarThumbCell?: Cell;
 }
 
 /** Content payload that can be masked by a viewport. */
@@ -271,6 +285,8 @@ const SCROLLBAR_TRACK = '│';
 
 /** Character used for the scrollbar thumb (filled portion). */
 const SCROLLBAR_THUMB = '█';
+const SCROLLBAR_TRACK_CELL: Cell = { char: SCROLLBAR_TRACK, empty: false };
+const SCROLLBAR_THUMB_CELL: Cell = { char: SCROLLBAR_THUMB, empty: false };
 
 /**
  * Render a vertical scrollbar as an array of single-character strings.
@@ -287,6 +303,8 @@ function renderScrollbar(
   viewportHeight: number,
   totalLines: number,
   scrollY: number,
+  trackChar = SCROLLBAR_TRACK,
+  thumbChar = SCROLLBAR_THUMB,
 ): string[] {
   if (totalLines <= viewportHeight) {
     // No scrolling needed — empty gutter
@@ -303,9 +321,31 @@ function renderScrollbar(
 
   const bar: string[] = [];
   for (let i = 0; i < viewportHeight; i++) {
-    bar.push(i >= thumbStart && i < thumbStart + thumbSize ? SCROLLBAR_THUMB : SCROLLBAR_TRACK);
+    bar.push(i >= thumbStart && i < thumbStart + thumbSize ? thumbChar : trackChar);
   }
   return bar;
+}
+
+function resolveViewportContentWidth(
+  width: number,
+  needsScrollbar: boolean,
+  scrollbarMode: ScrollbarMode,
+): number {
+  if (!needsScrollbar) return width;
+  return scrollbarMode === 'overlay' ? width : Math.max(0, width - 1);
+}
+
+function overlayScrollbarChar(
+  line: string,
+  width: number,
+  railChar: string,
+): string {
+  if (width <= 0) return '';
+  if (width === 1) return railChar;
+  const prefixWidth = width - 1;
+  const prefix = sliceAnsi(line, 0, prefixWidth);
+  const prefixVisible = visibleLength(prefix);
+  return prefix + ' '.repeat(Math.max(0, prefixWidth - prefixVisible)) + railChar;
 }
 
 // ---------------------------------------------------------------------------
@@ -329,6 +369,9 @@ export function viewport(options: ViewportOptions): string {
     scrollY = 0,
     scrollX = 0,
     showScrollbar = true,
+    scrollbarMode = 'gutter',
+    scrollbarTrackChar = SCROLLBAR_TRACK,
+    scrollbarThumbChar = SCROLLBAR_THUMB,
   } = options;
 
   const allLines = content.split('\n');
@@ -336,9 +379,8 @@ export function viewport(options: ViewportOptions): string {
   const maxScroll = Math.max(0, totalLines - height);
   const clampedY = Math.max(0, Math.min(scrollY, maxScroll));
 
-  // Content width: leave 1 column for scrollbar if shown and needed
   const needsScrollbar = showScrollbar && totalLines > height;
-  const contentWidth = needsScrollbar ? width - 1 : width;
+  const contentWidth = resolveViewportContentWidth(width, needsScrollbar, scrollbarMode);
 
   // Slice visible window
   const visibleSlice = allLines.slice(clampedY, clampedY + height);
@@ -363,8 +405,12 @@ export function viewport(options: ViewportOptions): string {
 
   // Append scrollbar
   if (needsScrollbar) {
-    const bar = renderScrollbar(height, totalLines, clampedY);
-    return rendered.map((line, i) => line + bar[i]!).join('\n');
+    const bar = renderScrollbar(height, totalLines, clampedY, scrollbarTrackChar, scrollbarThumbChar);
+    return rendered.map((line, i) => (
+      scrollbarMode === 'overlay'
+        ? overlayScrollbarChar(line, width, bar[i]!)
+        : line + bar[i]!
+    )).join('\n');
   }
 
   return rendered.join('\n');
@@ -389,6 +435,11 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
     scrollY = 0,
     scrollX = 0,
     showScrollbar = true,
+    scrollbarMode = 'gutter',
+    scrollbarTrackChar = SCROLLBAR_TRACK,
+    scrollbarThumbChar = SCROLLBAR_THUMB,
+    scrollbarTrackCell = SCROLLBAR_TRACK_CELL,
+    scrollbarThumbCell = SCROLLBAR_THUMB_CELL,
   } = options;
 
   const safeWidth = Math.max(0, Math.floor(width));
@@ -403,6 +454,9 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
         scrollY,
         scrollX,
         showScrollbar,
+        scrollbarMode,
+        scrollbarTrackChar,
+        scrollbarThumbChar,
       }),
       safeWidth,
       safeHeight,
@@ -417,17 +471,18 @@ export function viewportSurface(options: ViewportSurfaceOptions): Surface {
   const clampedY = Math.max(0, Math.min(scrollY, maxScroll));
 
   const needsScrollbar = showScrollbar && totalLines > safeHeight;
-  const contentWidth = Math.max(0, needsScrollbar ? safeWidth - 1 : safeWidth);
+  const contentWidth = resolveViewportContentWidth(safeWidth, needsScrollbar, scrollbarMode);
 
   if (contentWidth > 0 && safeHeight > 0) {
     result.blit(normalizedContent, 0, 0, Math.max(0, scrollX), clampedY, contentWidth, safeHeight);
   }
 
   if (needsScrollbar && safeWidth > 0) {
-    const bar = renderScrollbar(safeHeight, totalLines, clampedY);
+    const bar = renderScrollbar(safeHeight, totalLines, clampedY, scrollbarTrackChar, scrollbarThumbChar);
     const scrollbarX = safeWidth - 1;
     for (let y = 0; y < safeHeight; y++) {
-      result.set(scrollbarX, y, { char: bar[y]!, empty: false });
+      const cell = bar[y] === scrollbarThumbChar ? scrollbarThumbCell : scrollbarTrackCell;
+      result.set(scrollbarX, y, { ...cell, char: bar[y]!, empty: false });
     }
   }
 
