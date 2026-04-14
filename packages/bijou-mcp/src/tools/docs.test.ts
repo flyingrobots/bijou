@@ -56,6 +56,17 @@ interface DocsPayloadEntry {
   readonly exampleOutput?: string;
 }
 
+const EXPECTED_DOCS_ONLY_FAMILIES = [
+  'note()',
+  'input() / textarea()',
+  'select() / filter()',
+  'multiselect()',
+  'confirm()',
+  'group() / wizard()',
+  'loadRandomLogo() / gradientText()',
+  'renderByMode()',
+] as const;
+
 describe('bijou_docs tool', () => {
   it('returns the full catalog without examples by default', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
@@ -65,7 +76,7 @@ describe('bijou_docs tool', () => {
       docsOnlyEntries: number;
       returnedEntries: number;
       includeExamples: boolean;
-      entries: Array<Record<string, unknown>>;
+      entries: DocsPayloadEntry[];
     };
 
     expect(payload.documentedEntries).toBe(MCP_DOCS_CATALOG.length);
@@ -74,6 +85,9 @@ describe('bijou_docs tool', () => {
     expect(payload.returnedEntries).toBe(MCP_DOCS_CATALOG.length);
     expect(payload.includeExamples).toBe(false);
     expect(payload.entries[0]).not.toHaveProperty('exampleOutput');
+    for (const family of EXPECTED_DOCS_ONLY_FAMILIES) {
+      expect(payload.entries.some((entry) => entry.family === family)).toBe(true);
+    }
   });
 
   it('matches tool docs by query and renders example output for small result sets', async () => {
@@ -104,6 +118,36 @@ describe('bijou_docs tool', () => {
     expect(payload.entries[0]!.mcpExposed).toBe(false);
     expect(String(payload.entries[0]!.exampleOutput)).toContain('Release');
     expect(String(payload.entries[0]!.exampleOutput)).toContain('Build');
+  });
+
+  it('documents the staged form family with a synthesized prompt snapshot', async () => {
+    const docsTool = createDocsTool(ALL_TOOLS);
+    const payload = JSON.parse((await docsTool.handler({ query: 'wizard' })).content[0]!.text) as {
+      includeExamples: boolean;
+      entries: DocsPayloadEntry[];
+    };
+
+    expect(payload.includeExamples).toBe(true);
+    expect(payload.entries.length).toBeGreaterThanOrEqual(1);
+    expect(payload.entries[0]!.tool).toBe('bijou_multi_field_forms');
+    expect(payload.entries[0]!.mcpExposed).toBe(false);
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('Step 2 of 3');
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('Continue deployment? [Y/n]');
+  });
+
+  it('documents the mode-aware authoring helper as a docs-only family', async () => {
+    const docsTool = createDocsTool(ALL_TOOLS);
+    const payload = JSON.parse((await docsTool.handler({ query: 'renderByMode' })).content[0]!.text) as {
+      includeExamples: boolean;
+      entries: DocsPayloadEntry[];
+    };
+
+    expect(payload.includeExamples).toBe(true);
+    expect(payload.entries.length).toBeGreaterThanOrEqual(1);
+    expect(payload.entries[0]!.tool).toBe('bijou_mode_aware_authoring');
+    expect(payload.entries[0]!.mcpExposed).toBe(false);
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('interactive ->');
+    expect(String(payload.entries[0]!.exampleOutput)).toContain('accessible ->');
   });
 
   it('returns an empty entry set for unknown queries without throwing', async () => {

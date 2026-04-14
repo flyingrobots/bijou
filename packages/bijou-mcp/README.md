@@ -95,7 +95,7 @@ Or point directly at a local checkout:
 | `bijou_kbd` | Keyboard key indicator |
 | `bijou_hyperlink` | Terminal hyperlink (OSC 8) |
 | `bijou_skeleton` | Placeholder loading block |
-| `bijou_docs` | Machine-readable docs for the current MCP surface plus docs-only first-party component families |
+| `bijou_docs` | Machine-readable docs for the MCP surface plus the full first-party component-family field guide |
 
 ## Example Output
 

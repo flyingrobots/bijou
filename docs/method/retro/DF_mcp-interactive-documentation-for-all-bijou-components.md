@@ -13,3 +13,13 @@ bijou-mcp should serve as interactive documentation for all of Bijou, not just a
 `bijou_docs` now exists and already covers the current `bijou-mcp` render-tool surface. It also documents a first bounded set of public first-party component families that do not yet have dedicated MCP render tools, including `markdown()`, `guidedFlow()`, `preferenceListSurface()`, the spinner/timer family, and the current data-viz surfaces such as `sparkline()` and `perfOverlaySurface()`.
 
 The remaining gap is breadth, not direction: the catalog still is not a complete field guide for every first-party component or every DOGFOOD surface, and the docs-only families still stop short of a one-tool-per-component interactive render story.
+
+## Completed (2026-04-14)
+
+`bijou_docs` now covers the public first-party Bijou component-family
+surface exposed by `@flyingrobots/bijou`, including the previously
+missing `note()`, the core choice/form families, expressive branding
+helpers, and the `renderByMode()` authoring helper. The catalog still
+prefers real MCP render tools when they exist, and it now synthesizes
+representative plain-text examples for the remaining docs-only
+families.
