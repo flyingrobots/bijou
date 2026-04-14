@@ -20,6 +20,7 @@ These notes are still current reference surfaces:
 - `content-guide.md`
 - `focus-owns-input.md`
 - `humane-shell.md`
+- `layout-and-viewport-rules.md`
 - `layout-localization-pipeline.md`
 - `localization-and-bidirectionality.md`
 - `low-allocation-renderer.md`

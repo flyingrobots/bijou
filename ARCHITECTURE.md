@@ -47,6 +47,18 @@ Adapters (e.g., `nodeRuntime`, `nodeIO`, `chalkStyle`) live in `@flyingrobots/bi
 For the `LayoutNode` branch specifically, the runtime rebases the tree into a
 local non-negative root before paint. The detailed ownership model is captured
 in [docs/strategy/layout-localization-pipeline.md](./docs/strategy/layout-localization-pipeline.md).
+The user-facing layout and overflow rules that sit on top of that pipeline are
+captured in [docs/strategy/layout-and-viewport-rules.md](./docs/strategy/layout-and-viewport-rules.md).
+
+## Buffered Protocols
+
+When Bijou buffers commands, events, or cross-boundary actions, those buffers
+should carry plain facts rather than executable behavior. The execution owner
+stays outside the buffer, which keeps queued state inspectable, replayable, and
+testable.
+
+Use [The Buffer Holds Facts](./docs/invariants/buffer-holds-facts.md) as the
+canonical invariant for that rule.
 
 ## Interaction Profiles
 

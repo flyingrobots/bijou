@@ -21,6 +21,7 @@ Current invariants:
 - [Shell Owns Shell Concerns](./shell-owns-shell-concerns.md)
 - [Docs Are the Demo](./docs-are-the-demo.md)
 - [Commands Change State, Effects Do Not](./commands-change-state-effects-do-not.md)
+- [The Buffer Holds Facts](./buffer-holds-facts.md)
 - [Layout Owns Interaction Geometry](./layout-owns-interaction-geometry.md)
 - [State Machine and View Stack Are Distinct](./state-machine-and-view-stack-are-distinct.md)
 
@@ -40,5 +41,6 @@ Current invariants:
 | [Shell Owns Shell Concerns](./shell-owns-shell-concerns.md) | [HT](../legends/HT-humane-terminal.md), [DF](../legends/DF-dogfood-field-guide.md) |
 | [Docs Are the Demo](./docs-are-the-demo.md) | [DF](../legends/DF-dogfood-field-guide.md), [WF](../legends/WF-workflow-and-delivery.md), [DL](../legends/DL-design-language.md) |
 | [Commands Change State, Effects Do Not](./commands-change-state-effects-do-not.md) | [RE](../legends/RE-runtime-engine.md), [DX](../legends/DX-developer-experience.md) |
+| [The Buffer Holds Facts](./buffer-holds-facts.md) | [RE](../legends/RE-runtime-engine.md), [DX](../legends/DX-developer-experience.md) |
 | [Layout Owns Interaction Geometry](./layout-owns-interaction-geometry.md) | [RE](../legends/RE-runtime-engine.md), [DL](../legends/DL-design-language.md) |
 | [State Machine and View Stack Are Distinct](./state-machine-and-view-stack-are-distinct.md) | [RE](../legends/RE-runtime-engine.md) |

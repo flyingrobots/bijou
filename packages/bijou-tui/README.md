@@ -25,6 +25,10 @@ import { createSubAppAdapter, mount, type App } from '@flyingrobots/bijou-tui';
 import { createSurface } from '@flyingrobots/bijou';
 
 type ChildMsg = { type: 'tick' };
+type ParentModel = {
+  left: { count: number };
+  right: { count: number };
+};
 type ParentMsg = { type: 'left'; msg: ChildMsg } | { type: 'right'; msg: ChildMsg };
 
 const childApp: App<{ count: number }, ChildMsg> = {
@@ -45,7 +49,7 @@ const mapRight = createSubAppAdapter<ParentMsg, ChildMsg>({
   tick: (msg) => ({ type: 'right', msg }),
 });
 
-const app: App<any, ParentMsg> = {
+const app: App<ParentModel, ParentMsg> = {
   init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
   update: (msg, model) => [model, []],
   view: (model) => {

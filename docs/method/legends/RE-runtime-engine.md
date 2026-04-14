@@ -50,6 +50,7 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 - [Schemas Live At Boundaries](../invariants/schemas-live-at-boundaries.md)
 - [Host APIs Stay Behind Adapters](../invariants/host-apis-stay-behind-adapters.md)
 - [Codecs Are Not Domain Models](../invariants/codecs-are-not-domain-models.md)
+- [The Buffer Holds Facts](../invariants/buffer-holds-facts.md)
 - [Focus Owns Input](../invariants/focus-owns-input.md)
 - [Topmost Layer Dismisses First](../invariants/topmost-layer-dismisses-first.md)
 - [State Machine and View Stack Are Distinct](../invariants/state-machine-and-view-stack-are-distinct.md)
@@ -67,6 +68,7 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [RE-014 — The Buffer Holds Facts](../retro/RE_014-buffer-holds-facts-doctrine.md)
   - [RE-020 — Typed Color Representation](../retro/RE-020-typed-color-representation.md)
   - [RE-013 — Memoize Workspace Layout Tree](../retro/RE_013-memoize-workspace-layout-tree.md)
   - [WritePort byte-level API for zero-alloc ANSI output](../retro/RE_writeport-byte-level-api-for-zero-alloc-ansi-output.md)
@@ -77,5 +79,4 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
   - [RE-016 — DAG renderer should handle cycles gracefully](../retro/RE_016-dag-cycle-graceful-handling.md)
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../retro/RE_007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - live backlog:
-  - [RE-014 — The Buffer Holds Facts](../backlog/v5.0.0/RE_014-buffer-holds-facts-doctrine.md)
   - [RE-021 — Frame Owns the Pump](../backlog/v5.0.0/RE-021-frame-owns-the-pump.md)

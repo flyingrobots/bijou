@@ -130,6 +130,15 @@ Third-party code that needs reactivity should observe a context with
 `observeTheme(ctx, handler)` rather than subscribing to `tokenGraph.on()`
 directly.
 
+## Buffered Facts, Not Behavior
+
+When commands, queued actions, or cross-boundary messages need to move through
+the core package, keep them as plain discriminated data and interpret them at
+the owning boundary. Do not hide meaning inside buffered closures or objects
+with embedded execution behavior.
+
+See [The Buffer Holds Facts](../../docs/invariants/buffer-holds-facts.md).
+
 ## Test Adapters
 
 The `@flyingrobots/bijou/adapters/test` export provides:
