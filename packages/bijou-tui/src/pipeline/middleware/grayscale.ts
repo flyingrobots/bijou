@@ -73,8 +73,10 @@ function grayscaleCellFallback(surface: Surface): void {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
-      const newFg = cell.fg ? hexToGrayscale(cell.fg) : undefined;
-      const newBg = cell.bg ? hexToGrayscale(cell.bg) : undefined;
+      const fgHex = typeof cell.fg === 'string' ? cell.fg : cell.fg?.hex;
+      const bgHex = typeof cell.bg === 'string' ? cell.bg : cell.bg?.hex;
+      const newFg = fgHex ? hexToGrayscale(fgHex) : undefined;
+      const newBg = bgHex ? hexToGrayscale(bgHex) : undefined;
       if (newFg !== cell.fg || newBg !== cell.bg) {
         surface.set(x, y, { ...cell, fg: newFg, bg: newBg });
       }

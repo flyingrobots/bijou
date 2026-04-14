@@ -156,11 +156,11 @@ function paintActiveHeaderTab(
   const activeTarget = tabTargets.find((target) => target.pageId === activePageId);
   if (activeTarget == null) return;
   const sampleCell = surface.get(activeTarget.startCol, 0);
-  const backgroundHex = sampleCell.bg
+  const backgroundHex = (typeof sampleCell.bg === 'string' ? sampleCell.bg : sampleCell.bg?.hex)
     ?? ctx.surface('primary').bg
     ?? ctx.surface('secondary').bg
     ?? '#000000';
-  const baseHex = sampleCell.fg
+  const baseHex = (typeof sampleCell.fg === 'string' ? sampleCell.fg : sampleCell.fg?.hex)
     ?? ctx.surface('primary').hex
     ?? ctx.semantic('primary').hex;
   const token = tokenOverride ?? deriveActiveHeaderTabToken(ctx, backgroundHex, baseHex);

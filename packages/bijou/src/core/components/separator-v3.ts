@@ -1,9 +1,10 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { sanitizeNonNegativeInt } from '../numeric.js';
+import { colorRgb } from '../theme/color.js';
 import type { SeparatorOptions } from './separator.js';
 import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
+import { encodeModifiers } from '../render/packed-cell.js';
 
 /**
  * Render a horizontal separator as a Surface for V3-native composition.
@@ -24,11 +25,11 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const packed = isPackedSurface(surface);
   let bfgR = -1, bfgG = 0, bfgB = 0, bbgR = -1, bbgG = 0, bbgB = 0, bflags = 0;
   if (packed) {
-    const rgb = borderStyle.fgRGB ?? (borderStyle.fg ? parseHex(borderStyle.fg) : undefined);
+    const rgb = borderStyle.fgRGB ?? colorRgb(borderStyle.fg);
     if (rgb) { bfgR = rgb[0]; bfgG = rgb[1]; bfgB = rgb[2]; }
   }
   if (packed) {
-    const rgb = borderStyle.bgRGB ?? (borderStyle.bg ? parseHex(borderStyle.bg) : undefined);
+    const rgb = borderStyle.bgRGB ?? colorRgb(borderStyle.bg);
     if (rgb) { bbgR = rgb[0]; bbgG = rgb[1]; bbgB = rgb[2]; }
   }
   if (packed) bflags = encodeModifiers(borderStyle.modifiers);

@@ -1,5 +1,6 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell, type LayoutNode } from '../../ports/surface.js';
 import type { WritePort, StylePort } from '../../ports/index.js';
+import { colorHex, colorRgb } from '../theme/color.js';
 import { ANSI_OSC8_RE, graphemeClusterWidth, sanitizeTerminalText, segmentGraphemes } from '../text/index.js';
 import {
   CELL_STRIDE,
@@ -9,7 +10,7 @@ import {
   FLAG_FG_SET, FLAG_BG_SET, FLAG_EMPTY,
   FLAG_DASHED,
   SIDE_TABLE_THRESHOLD,
-  decodeChar, parseHex,
+  decodeChar,
 } from './packed-cell.js';
 
 const EMPTY_CELL: Cell = { char: ' ', empty: true };
@@ -151,10 +152,10 @@ function writeSurfaceGrapheme(
   const width = Math.max(1, graphemeClusterWidth(char));
 
   if (isPackedSurface(surface) && (style?.fg || style?.bg)) {
-    const fg = style?.fg ? parseHex(style.fg) : undefined;
+    const fg = colorRgb(style?.fg);
     let fR = -1, fG = 0, fB = 0;
     if (fg) { fR = fg[0]; fG = fg[1]; fB = fg[2]; }
-    const bg = style?.bg ? parseHex(style.bg) : undefined;
+    const bg = colorRgb(style?.bg);
     let bR = -1, bG = 0, bB = 0;
     if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
     surface.setRGB(x, y, char, fR, fG, fB, bR, bG, bB);
@@ -878,8 +879,8 @@ function renderDiffCells(
       }
 
       if (hasVisibleStyle(targetCell)) {
-        token.hex = targetCell.fg;
-        token.bg = targetCell.bg;
+        token.hex = colorHex(targetCell.fg) ?? token.hex;
+        token.bg = colorHex(targetCell.bg);
         token.modifiers = targetCell.modifiers as any;
         output += style.styled(token as any, batchText);
       } else {

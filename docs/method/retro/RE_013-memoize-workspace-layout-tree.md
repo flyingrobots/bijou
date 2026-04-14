@@ -1,12 +1,24 @@
 ---
 title: RE-013 — Memoize Workspace Layout Tree
-lane: asap
+lane: retro
 legend: RE
 ---
 
 # RE-013 — Memoize Workspace Layout Tree
 
-Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
+## Disposition
+
+Implemented on `release/v5.0.0`. `createFramedApp()` now remembers the last
+rendered workspace pane rects and retained layout tree, then reuses that
+geometry when mouse routing asks for pane hit-testing or wheel scrolling
+without a layout-affecting change. That removes the redundant
+`buildWorkspaceLayoutTree()` churn from steady-state mouse interaction while
+keeping resize, page switch, dock, maximize, and split-ratio changes as cache
+invalidation boundaries.
+
+## Original Proposal
+
+Legend: [RE — Runtime Engine](../legends/RE-runtime-engine.md)
 
 ## Idea
 

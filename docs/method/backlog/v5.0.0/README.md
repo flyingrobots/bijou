@@ -15,19 +15,23 @@ surface.
 - [**HT-upstream**](./HT_upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.md) —
   upstream edge-overlay scrollbars and BCSS overflow handling from XYPH
   into `bijou-tui`
-- [**RE-020**](./RE-020-typed-color-representation.md) — typed color
-  representation: numeric RGB as the canonical internal form, hex
-  strings only at the boundaries
-- [**DX-007-decompose**](../bad-code/DX-007-decompose-app-frame-mega-closure.md) —
-  decompose the `app-frame.ts` mega-closure
+- [**CI-003**](./CI-003-surface-shaders.md) — post-process surface shaders
+  for CRT, scanline, and other byte-path effects
+- [**RE-014**](./RE_014-buffer-holds-facts-doctrine.md) — lock the
+  runtime doctrine around data-first buffers and explicit interpretation
+- [**DX-021**](./DX-021-error-surface-post-mortem.md) — render a crash
+  surface before alt-screen teardown
+- [**DL-010**](./DL-010-strictly-typed-app-examples.md) — keep the docs
+  examples strictly typed end to end
+- [**DF docs**](./DF_mcp-interactive-documentation-for-all-bijou-components.md) —
+  grow MCP docs breadth into a real field guide for first-party components
 
 ## Adjacent Work
 
-Still-open related ideas:
+Recently completed adjacent work:
 
-- [RE-019 — Pre-Parse Theme Token Colors Into Bytes](../cool-ideas/RE-019-theme-token-color-cache.md)
-- [RE-012 — Pipeline Observability Hooks](../cool-ideas/RE_012-pipeline-observability-hooks.md)
-
-Already-landed adjacent work:
-
+- [RE-020 — Typed Color Representation](../../retro/RE-020-typed-color-representation.md)
+- [RE-019 — Pre-Parse Theme Token Colors Into Bytes](../../retro/RE-019-theme-token-color-cache.md)
+- [RE-013 — Memoize Workspace Layout Tree](../../retro/RE_013-memoize-workspace-layout-tree.md)
+- [RE-012 — Pipeline Observability Hooks](../../retro/RE_012-pipeline-observability-hooks.md)
 - [HT-006 — Allow pages to push notifications in createFramedApp](../../retro/HT-006-page-level-notification-push.md)

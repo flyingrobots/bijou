@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { resolveColor } from '../core/theme/color.js';
 import { createSurface, isPackedSurface } from './surface.js';
 
 describe('createSurface', () => {
@@ -90,6 +91,28 @@ describe('createSurface', () => {
       char: 'A',
       fgRGB: [1, 2, 3],
       bgRGB: [4, 5, 6],
+      empty: false,
+    });
+
+    expect(surface.get(0, 0)).toEqual({
+      char: 'A',
+      fg: '#010203',
+      bg: '#040506',
+      fgRGB: [1, 2, 3],
+      bgRGB: [4, 5, 6],
+      modifiers: undefined,
+      empty: false,
+      opacity: 1,
+    });
+  });
+
+  it('accepts resolved color refs without separate fgRGB/bgRGB bookkeeping', () => {
+    const surface = createSurface(1, 1);
+
+    surface.set(0, 0, {
+      char: 'A',
+      fg: resolveColor('#010203'),
+      bg: resolveColor('#040506'),
       empty: false,
     });
 

@@ -23,6 +23,27 @@ import {
 } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
+
+function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'rgb' in ref
+    ? (ref as { rgb: readonly [number, number, number] }).rgb
+    : undefined;
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
 import { forceTextPresentation } from './icon-presentation.js';
 
@@ -357,9 +378,11 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
   if (isPackedSurface(surface)) {
     let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-    const fgRgb = style.fgRGB ?? (style.fg ? parseHex(style.fg) : undefined);
+    const fgHex = resolvedColorHex(style.fg);
+    const fgRgb = style.fgRGB ?? resolvedColorRgb(style.fg) ?? (fgHex ? parseHex(fgHex) : undefined);
     if (fgRgb) { [fR, fG, fB] = fgRgb; }
-    const bgRgb = style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined);
+    const bgHex = resolvedColorHex(style.bg);
+    const bgRgb = style.bgRGB ?? resolvedColorRgb(style.bg) ?? (bgHex ? parseHex(bgHex) : undefined);
     if (bgRgb) { [bR, bG, bB] = bgRgb; }
     ns = { fR, fG, fB, bR, bG, bB, fl: style.modifiers ? encodeModifiers(style.modifiers) : 0 };
   }
@@ -376,7 +399,10 @@ function lineWithInheritedBackground(line: Surface, style: Pick<CellStyle, 'bg' 
   const result = line.clone();
   // Fast path: packed surface — write bg bytes directly
   const packedSurface = isPackedSurface(result) ? result : undefined;
-  const rgb = packedSurface ? (style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined)) : undefined;
+  const bgHex = resolvedColorHex(style.bg);
+  const rgb = packedSurface
+    ? (style.bgRGB ?? resolvedColorRgb(style.bg) ?? (bgHex ? parseHex(bgHex) : undefined))
+    : undefined;
   if (packedSurface && rgb) {
     const [bgR, bgG, bgB] = rgb;
     const buf = packedSurface.buffer;

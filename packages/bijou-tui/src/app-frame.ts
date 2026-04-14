@@ -732,6 +732,20 @@ export function createFramedApp<PageModel, Msg>(
   let headerScratch: Surface | undefined;
   let helpLineScratch: Surface | undefined;
   const paneScratchPool = createFramePaneScratchPool();
+  let workspaceLayoutCache:
+    | {
+      readonly activePageId: string;
+      readonly activePageModel: PageModel;
+      readonly columns: number;
+      readonly rows: number;
+      readonly visibilityState: unknown;
+      readonly dockState: unknown;
+      readonly splitRatioOverrides: unknown;
+      readonly maximizedPaneId: string | undefined;
+      readonly paneRects: ReadonlyMap<string, LayoutRect>;
+      readonly tree: SurfaceLayoutNode;
+    }
+    | undefined;
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -1405,31 +1419,23 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
-  function resolveWorkspacePaneRects(
+  function buildWorkspaceLayoutTreeFromPaneRects(
     model: InternalFrameModel<PageModel, Msg>,
-  ): ReadonlyMap<string, LayoutRect> {
-    const bodyRect = resolveBodyRect(model, options);
-    const maxState = model.maximizedPaneByPage[model.activePageId];
-    const maximizedPaneId = maxState?.maximizedPaneId;
-    const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
-    const renderResult = maximizedPaneId
-      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool, themedFrameCtx)
-      : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
-    return renderResult.paneRects;
-  }
-
-  function buildWorkspaceLayoutTree(
-    model: InternalFrameModel<PageModel, Msg>,
+    paneRects: ReadonlyMap<string, LayoutRect>,
+    tabTargets?: readonly {
+      readonly pageId: string;
+      readonly startCol: number;
+      readonly endCol: number;
+    }[],
   ): SurfaceLayoutNode {
-    const header = resolveHeaderLine(
+    const resolvedTabTargets = tabTargets ?? resolveHeaderLine(
       model,
       options,
       pagesById,
       headerScratch,
       resolveFrameThemeCtx(model.activeShellThemeId),
-    );
-    headerScratch = header.surface;
-    const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
+    ).tabTargets;
+    const tabChildren: SurfaceLayoutNode[] = resolvedTabTargets.map((target) =>
       createShellRetainedLayoutNode(`tab:${target.pageId}`, {
         row: 0,
         col: target.startCol,
@@ -1439,7 +1445,6 @@ export function createFramedApp<PageModel, Msg>(
     );
 
     const bodyRect = resolveBodyRect(model, options);
-    const paneRects = resolveWorkspacePaneRects(model);
     const paneChildren: SurfaceLayoutNode[] = [];
     for (const [paneId, rect] of paneRects.entries()) {
       paneChildren.push(createShellRetainedLayoutNode(`pane:${paneId}`, rect));
@@ -1461,6 +1466,97 @@ export function createFramedApp<PageModel, Msg>(
         ),
       ],
     );
+  }
+
+  function rememberWorkspaceLayout(
+    model: InternalFrameModel<PageModel, Msg>,
+    paneRects: ReadonlyMap<string, LayoutRect>,
+    tabTargets?: readonly {
+      readonly pageId: string;
+      readonly startCol: number;
+      readonly endCol: number;
+    }[],
+  ): {
+    readonly activePageId: string;
+    readonly activePageModel: PageModel;
+    readonly columns: number;
+    readonly rows: number;
+    readonly visibilityState: unknown;
+    readonly dockState: unknown;
+    readonly splitRatioOverrides: unknown;
+    readonly maximizedPaneId: string | undefined;
+    readonly paneRects: ReadonlyMap<string, LayoutRect>;
+    readonly tree: SurfaceLayoutNode;
+  } {
+    const activePageId = model.activePageId;
+    const next = {
+      activePageId,
+      activePageModel: model.pageModels[activePageId]!,
+      columns: model.columns,
+      rows: model.rows,
+      visibilityState: model.minimizedByPage[activePageId],
+      dockState: model.dockStateByPage[activePageId],
+      splitRatioOverrides: model.splitRatioOverrides,
+      maximizedPaneId: model.maximizedPaneByPage[activePageId]?.maximizedPaneId,
+      paneRects,
+      tree: buildWorkspaceLayoutTreeFromPaneRects(model, paneRects, tabTargets),
+    } as const;
+    workspaceLayoutCache = next;
+    return next;
+  }
+
+  function matchesWorkspaceLayoutCache(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): boolean {
+    if (workspaceLayoutCache == null) return false;
+    const activePageId = model.activePageId;
+    return workspaceLayoutCache.activePageId === activePageId
+      && workspaceLayoutCache.activePageModel === model.pageModels[activePageId]
+      && workspaceLayoutCache.columns === model.columns
+      && workspaceLayoutCache.rows === model.rows
+      && workspaceLayoutCache.visibilityState === model.minimizedByPage[activePageId]
+      && workspaceLayoutCache.dockState === model.dockStateByPage[activePageId]
+      && workspaceLayoutCache.splitRatioOverrides === model.splitRatioOverrides
+      && workspaceLayoutCache.maximizedPaneId === model.maximizedPaneByPage[activePageId]?.maximizedPaneId;
+  }
+
+  function resolveWorkspaceLayout(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): {
+    readonly activePageId: string;
+    readonly activePageModel: PageModel;
+    readonly columns: number;
+    readonly rows: number;
+    readonly visibilityState: unknown;
+    readonly dockState: unknown;
+    readonly splitRatioOverrides: unknown;
+    readonly maximizedPaneId: string | undefined;
+    readonly paneRects: ReadonlyMap<string, LayoutRect>;
+    readonly tree: SurfaceLayoutNode;
+  } {
+    if (matchesWorkspaceLayoutCache(model)) {
+      return workspaceLayoutCache!;
+    }
+    const bodyRect = resolveBodyRect(model, options);
+    const maxState = model.maximizedPaneByPage[model.activePageId];
+    const maximizedPaneId = maxState?.maximizedPaneId;
+    const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
+    const renderResult = maximizedPaneId
+      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool, themedFrameCtx)
+      : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
+    return rememberWorkspaceLayout(model, renderResult.paneRects);
+  }
+
+  function resolveWorkspacePaneRects(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): ReadonlyMap<string, LayoutRect> {
+    return resolveWorkspaceLayout(model).paneRects;
+  }
+
+  function buildWorkspaceLayoutTree(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): SurfaceLayoutNode {
+    return resolveWorkspaceLayout(model).tree;
   }
 
   function buildSettingsRowChildren(
@@ -2201,6 +2297,7 @@ export function createFramedApp<PageModel, Msg>(
               themedFrameCtx,
             );
       }
+      rememberWorkspaceLayout(model, activeResult.paneRects, headerResult.tabTargets);
 
       const overlays: Overlay[] = [];
       if (options.overlayFactory != null) {

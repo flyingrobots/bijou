@@ -1,5 +1,6 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
-import { parseHex, FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
+import { FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
+import { colorRgb } from '../theme/color.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { graphemeWidth } from '../text/grapheme.js';
@@ -141,11 +142,11 @@ export function preferenceRowSurface(
       const valueStart = Math.max(0, innerWidth - valueChars.length);
       const packed = isPackedSurface(surface);
       if (packed && (valueStyle.fgRGB != null || valueStyle.fg != null)) {
-        const fgP = valueStyle.fgRGB ?? (valueStyle.fg ? parseHex(valueStyle.fg) : undefined);
+        const fgP = valueStyle.fgRGB ?? colorRgb(valueStyle.fg);
         if (fgP) {
           const fR = fgP[0], fG = fgP[1], fB = fgP[2];
           let bR = -1, bG = 0, bB = 0;
-          const bgP = bgRGB ?? (bg ? parseHex(bg) : undefined);
+          const bgP = bgRGB ?? colorRgb(bg);
           if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
           for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
             const char = valueChars[offset]!;
@@ -381,11 +382,11 @@ function writePreferenceLine(
   const chars = Array.from(text);
   const pp = isPackedSurface(surface);
   if (pp && (options.fgRGB != null || options.fg != null)) {
-    const fgP = options.fgRGB ?? (options.fg ? parseHex(options.fg) : undefined);
+    const fgP = options.fgRGB ?? colorRgb(options.fg);
     if (fgP) {
       const fR = fgP[0], fG = fgP[1], fB = fgP[2];
       let bR = -1, bG = 0, bB = 0;
-      const bgP = options.bgRGB ?? (options.bg ? parseHex(options.bg) : undefined);
+      const bgP = options.bgRGB ?? colorRgb(options.bg);
       if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
       const flags = options.strong ? FLAG_BOLD : options.dim ? FLAG_DIM : 0;
       for (let x = 0; x < chars.length && x < surface.width; x++) {

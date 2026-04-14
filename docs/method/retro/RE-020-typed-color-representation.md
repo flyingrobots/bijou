@@ -1,9 +1,23 @@
 ---
 title: RE-020 — Typed Color Representation (`ColorRef` Branded Type)
-lane: up-next
+lane: retro
+legend: RE
 ---
 
 # RE-020 — Typed Color Representation (`ColorRef` Branded Type)
+
+## Disposition
+
+Implemented on `release/v5.0.0` as a compatibility-first `ColorRef` landing.
+`Cell.fg` / `Cell.bg` now accept `ColorRef`, the runtime exports
+`ResolvedColor`, `resolveColor()`, `tryResolveColor()`, `colorHex()`, and
+`colorRgb()`, and packed surface writes can consume either user-authored hex
+strings or eager resolved color objects without reparsing on the hot path.
+Theme-token byte caching from RE-019 remains the automatic fast path, while
+components and adapters can now thread typed resolved colors through paint and
+output code explicitly.
+
+## Original Proposal
 
 Legend: [RE — Runtime Engine](../../legends/RE-runtime-engine.md)
 
@@ -74,41 +88,3 @@ system.
 `ColorRef` lets us keep hex strings for ergonomic user code while
 threading a parsed representation through the hot path. The type
 system makes it clear which layer you're at.
-
-## Migration Path
-
-1. Land `RE-019-theme-token-color-cache.md` first — that's the
-   cheap no-breaking-changes version.
-2. Add `ColorRef` as a type alias that's currently just `string`,
-   update Cell to use it. This is a rename, no runtime change.
-3. Add a `ResolvedColor` case to the union. Update `surface.set`
-   to handle it.
-4. Update theme resolver to produce `ResolvedColor` objects.
-5. Components that build cells directly (not via theme tokens)
-   can opt in by calling `resolveColor(hex)` once at setup time
-   and reusing the result.
-6. Eventually, `string` is still valid for user code but
-   components use `ResolvedColor` internally.
-
-No breaking changes at any step.
-
-## Why This Is Cool
-
-- **Ergonomic at the edge, fast at the core.** The right
-  abstraction at the right layer.
-- **Type-directed optimization.** The type system tells you when
-  you're on the slow path vs the fast path.
-- **Composable with other optimizations.** Gradients can store
-  `ResolvedColor` stops, animations can interpolate in byte space
-  without string conversions.
-- **Pairs with the RE-017 byte pipeline.** The byte pipeline
-  eliminates string work from the diff path; this eliminates string
-  work from the paint path. Together they close the loop.
-
-## Related
-
-- `RE-018` (bad-code) — the hex string smell.
-- `RE-019` (cool idea) — the simpler precursor: theme-token byte
-  cache without exposing a new type.
-- DTCG interop at `packages/bijou/src/core/theme/dtcg.ts` — this
-  must continue to round-trip to hex strings for export.

@@ -1,10 +1,11 @@
 import { createSurface, isPackedSurface, type Surface, type Cell } from '../../ports/surface.js';
 import type { BaseStatusKey } from '../theme/tokens.js';
+import { colorRgb } from '../theme/color.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { segmentGraphemes } from '../text/grapheme.js';
 import type { BijouNodeOptions } from './types.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
+import { encodeModifiers } from '../render/packed-cell.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -68,11 +69,11 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
 
   const packedSurface = isPackedSurface(surface) ? surface : undefined;
   if (packedSurface) {
-    const fg = cell.fgRGB ?? (cell.fg ? parseHex(cell.fg) : undefined);
+    const fg = cell.fgRGB ?? colorRgb(cell.fg);
     if (fg) {
       const [fR, fG, fB] = fg;
       let bR = -1, bG = 0, bB = 0;
-      const bg = cell.bgRGB ?? (cell.bg ? parseHex(cell.bg) : undefined);
+      const bg = cell.bgRGB ?? colorRgb(cell.bg);
       if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
       const flags = encodeModifiers(cell.modifiers);
       for (let i = 0; i < width; i++) {

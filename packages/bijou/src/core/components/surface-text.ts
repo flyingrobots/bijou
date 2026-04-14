@@ -1,7 +1,8 @@
 import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import type { TokenValue } from '../theme/tokens.js';
+import { colorRgb } from '../theme/color.js';
 import { graphemeClusterWidth, segmentGraphemes } from '../text/grapheme.js';
-import { encodeModifiers, parseHex } from '../render/packed-cell.js';
+import { encodeModifiers } from '../render/packed-cell.js';
 
 export type CellTextStyle = Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>;
 
@@ -15,12 +16,12 @@ interface NumericStyle {
 function parseNumericStyle(style: CellTextStyle): NumericStyle | undefined {
   let fgR = 0, fgG = 0, fgB = 0, fgSet = false;
   let bgR = 0, bgG = 0, bgB = 0, bgSet = false;
-  const fgRgb = style.fgRGB ?? (style.fg ? parseHex(style.fg) : undefined);
+  const fgRgb = style.fgRGB ?? colorRgb(style.fg);
   if (style.fg != null && fgRgb == null) return undefined;
   if (fgRgb) {
     fgR = fgRgb[0]; fgG = fgRgb[1]; fgB = fgRgb[2]; fgSet = true;
   }
-  const bgRgb = style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined);
+  const bgRgb = style.bgRGB ?? colorRgb(style.bg);
   if (style.bg != null && bgRgb == null) return undefined;
   if (bgRgb) {
     bgR = bgRgb[0]; bgG = bgRgb[1]; bgB = bgRgb[2]; bgSet = true;

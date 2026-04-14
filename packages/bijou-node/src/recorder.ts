@@ -17,6 +17,31 @@ const GLYPH_MAP = new Map<string, number>(FONT.lookup.map((char, index) => [char
 const DEFAULT_FOREGROUND = '#f5f7ff';
 const DEFAULT_BACKGROUND = '#0b1020';
 
+function resolvedColorRgb(ref: unknown): Rgb | undefined {
+  if (typeof ref !== 'object' || ref == null) return undefined;
+  if (!('kind' in ref) || (ref as { kind?: unknown }).kind !== 'resolved-color') return undefined;
+  if (!('rgb' in ref)) return undefined;
+  const rgb = (ref as { rgb: readonly [number, number, number] }).rgb;
+  return { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! };
+}
+
+function normalizeRgb(rgb: Rgb | readonly [number, number, number]): Rgb {
+  return Array.isArray(rgb)
+    ? { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! }
+    : (rgb as Rgb);
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
+
 export interface NativeDemoSpec<Model, M = never> {
   name: string;
   app: App<Model, M>;
@@ -146,8 +171,10 @@ function drawCell(
   fallbackBackground: string,
 ): void {
   const modifiers = new Set(cell.modifiers ?? []);
-  let fg = parseHex(cell.fg ?? fallbackForeground);
-  let bg = parseHex(cell.bg ?? fallbackBackground);
+  const fgHex = resolvedColorHex(cell.fg);
+  const bgHex = resolvedColorHex(cell.bg);
+  let fg = normalizeRgb(cell.fgRGB ?? resolvedColorRgb(cell.fg) ?? parseHex(fgHex ?? fallbackForeground));
+  let bg = normalizeRgb(cell.bgRGB ?? resolvedColorRgb(cell.bg) ?? parseHex(bgHex ?? fallbackBackground));
 
   if (modifiers.has('inverse')) {
     [fg, bg] = [bg, fg];

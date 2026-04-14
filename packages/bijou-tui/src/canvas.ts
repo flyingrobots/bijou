@@ -8,6 +8,27 @@
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
+function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'rgb' in ref
+    ? (ref as { rgb: readonly [number, number, number] }).rgb
+    : undefined;
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
+
 /**
  * Parameters passed to the shader function.
  */
@@ -85,11 +106,11 @@ export function canvas(
 
 function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
   if (packed && (cell.fgRGB != null || cell.fg != null)) {
-    const fg = cell.fgRGB ?? (cell.fg ? parseHex(cell.fg) : undefined);
+    const fg = cell.fgRGB ?? resolvedColorRgb(cell.fg) ?? (resolvedColorHex(cell.fg) ? parseHex(resolvedColorHex(cell.fg)!) : undefined);
     if (fg) {
       const [fR, fG, fB] = fg;
       let bR = -1, bG = 0, bB = 0;
-      const bg = cell.bgRGB ?? (cell.bg ? parseHex(cell.bg) : undefined);
+      const bg = cell.bgRGB ?? resolvedColorRgb(cell.bg) ?? (resolvedColorHex(cell.bg) ? parseHex(resolvedColorHex(cell.bg)!) : undefined);
       if (bg) { [bR, bG, bB] = bg; }
       (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;

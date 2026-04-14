@@ -1,10 +1,11 @@
 import type { BijouContext } from '../../ports/context.js';
-import { createSurface, isPackedSurface, type Surface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { colorRgb, type ColorRef } from '../theme/color.js';
 import type { TableColumn, TableOptions } from './table.js';
 import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
+import { encodeModifiers } from '../render/packed-cell.js';
 
 export type TableSurfaceCell = string | Surface;
 export type TableSurfaceRow = readonly TableSurfaceCell[];
@@ -108,23 +109,23 @@ export function tableSurface(
   // Pre-parse border style for setRGB fast path
   let bfR = -1, bfG = 0, bfB = 0, bbR = -1, bbG = 0, bbB = 0, bflags = 0;
   if (packedSurface) {
-    const rgb = borderStyle.fgRGB ?? (borderStyle.fg ? parseHex(borderStyle.fg) : undefined);
+    const rgb = borderStyle.fgRGB ?? colorRgb(borderStyle.fg);
     if (rgb) { const [r, g, b] = rgb; bfR = r; bfG = g; bfB = b; }
   }
   if (packedSurface) {
-    const rgb = borderStyle.bgRGB ?? (borderStyle.bg ? parseHex(borderStyle.bg) : undefined);
+    const rgb = borderStyle.bgRGB ?? colorRgb(borderStyle.bg);
     if (rgb) { const [r, g, b] = rgb; bbR = r; bbG = g; bbB = b; }
   }
   if (packedSurface) bflags = encodeModifiers(borderStyle.modifiers);
 
-  const setBorder = (x: number, y: number, char: string, bg?: string): void => {
+  const setBorder = (x: number, y: number, char: string, bg?: ColorRef): void => {
     if (packedSurface && !bg) {
       packedSurface.setRGB(x, y, char, bfR, bfG, bfB, bbR, bbG, bbB, bflags);
     } else {
       surface.set(x, y, { char, ...borderStyle, bg: bg ?? borderStyle.bg, empty: false });
     }
   };
-  const setSpace = (x: number, y: number, bg?: string, fg?: string): void => {
+  const setSpace = (x: number, y: number, bg?: Cell['bg'], fg?: Cell['fg']): void => {
     surface.set(x, y, {
       char: ' ',
       fg: fg ?? headerBg?.fg,

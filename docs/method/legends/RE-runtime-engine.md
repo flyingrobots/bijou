@@ -67,6 +67,9 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [RE-020 — Typed Color Representation](../retro/RE-020-typed-color-representation.md)
+  - [RE-013 — Memoize Workspace Layout Tree](../retro/RE_013-memoize-workspace-layout-tree.md)
+  - [WritePort byte-level API for zero-alloc ANSI output](../retro/RE_writeport-byte-level-api-for-zero-alloc-ansi-output.md)
   - [RE-012 — Pipeline Observability Hooks](../retro/RE_012-pipeline-observability-hooks.md)
   - [RE-019 — Pre-Parse Theme Token Colors Into Bytes](../retro/RE-019-theme-token-color-cache.md)
   - [RE-023 — Stabilize Render Scheduling in runtime.ts](../retro/RE-023-stabilize-render-scheduling.md)
@@ -74,8 +77,5 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
   - [RE-016 — DAG renderer should handle cycles gracefully](../retro/RE_016-dag-cycle-graceful-handling.md)
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../retro/RE_007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - live backlog:
-  - [RE-013 — Memoize Workspace Layout Tree](../backlog/asap/RE_013-memoize-workspace-layout-tree.md)
-  - [RE-014 — The Buffer Holds Facts](../backlog/cool-ideas/RE_014-buffer-holds-facts-doctrine.md)
-  - [RE-020 — Typed Color Representation](../backlog/up-next/RE-020-typed-color-representation.md)
-  - [WritePort byte-level API for zero-alloc ANSI output](../backlog/up-next/RE_writeport-byte-level-api-for-zero-alloc-ansi-output.md)
+  - [RE-014 — The Buffer Holds Facts](../backlog/v5.0.0/RE_014-buffer-holds-facts-doctrine.md)
   - [RE-021 — Frame Owns the Pump](../backlog/v5.0.0/RE-021-frame-owns-the-pump.md)
