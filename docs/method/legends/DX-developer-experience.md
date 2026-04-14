@@ -49,6 +49,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 ## Current cycle and backlog
 
 - latest completed cycles:
+  - [DX-021 — Error Surface for Crash Post-Mortems](../retro/DX-021-error-surface-post-mortem.md)
   - [DX-007 — Decompose app-frame.ts Mega-Closure](../retro/DX-007-decompose-app-frame-mega-closure.md)
   - [DX-017 — Agent-First Bench Output Format](../retro/DX-017-agent-first-bench-output-format.md)
   - [DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering](../retro/DX-016-scenario-provenance-tags.md)
@@ -66,4 +67,4 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
   - [DX-001 — Type Framed App Messages and Updates End-to-End](../design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
   - [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
 - live backlog:
-  - [DX-021 — Error Surface for Crash Post-Mortems](../backlog/cool-ideas/DX-021-error-surface-post-mortem.md)
+  - none right now

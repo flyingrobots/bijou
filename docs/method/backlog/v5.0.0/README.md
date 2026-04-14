@@ -14,8 +14,6 @@ surface.
   into `bijou-tui`
 - [**CI-003**](./CI-003-surface-shaders.md) — post-process surface shaders
   for CRT, scanline, and other byte-path effects
-- [**DX-021**](./DX-021-error-surface-post-mortem.md) — render a crash
-  surface before alt-screen teardown
 - [**DF docs**](./DF_mcp-interactive-documentation-for-all-bijou-components.md) —
   grow MCP docs breadth into a real field guide for first-party components
 
@@ -30,4 +28,5 @@ Recently completed adjacent work:
 - [RE-012 — Pipeline Observability Hooks](../../retro/RE_012-pipeline-observability-hooks.md)
 - [DL-010 — Strictly Typed App Interface Examples](../../retro/DL-010-strictly-typed-app-examples.md)
 - [DL-009 — Formalize Layout and Viewport Rules](../../retro/DL-009-formalize-layout-and-viewport-rules.md)
+- [DX-021 — Error Surface for Crash Post-Mortems](../../retro/DX-021-error-surface-post-mortem.md)
 - [HT-006 — Allow pages to push notifications in createFramedApp](../../retro/HT-006-page-level-notification-push.md)

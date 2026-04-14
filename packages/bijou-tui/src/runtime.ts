@@ -1,6 +1,7 @@
 import {
   getDefaultContext,
   createSurface,
+  stringToSurface,
   surfaceToString,
   resolveClock,
   installRuntimeViewportOverlay,
@@ -32,6 +33,7 @@ const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
  * 1006 = SGR extended format (supports large coordinates, explicit release).
  */
 const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
 
 /**
  * Run a TEA application.
@@ -84,6 +86,7 @@ export async function run<Model, M>(
   let resolveQuit: (() => void) | null = null;
   let currentDt = 0.016; // Default to 60fps for first frame
   let fatalError: unknown = null;
+  let crashMode = false;
 
   // Double buffering: keep a visible front buffer and a reusable back buffer.
   const initialViewport = runtimeViewport();
@@ -118,6 +121,79 @@ export async function run<Model, M>(
     const routed = app.routeRuntimeIssue?.(issue);
     if (routed !== undefined) {
       bus.emit(routed);
+    }
+  }
+
+  function formatModelSnapshot(snapshot: unknown): string {
+    try {
+      const serialized = JSON.stringify(snapshot, null, 2);
+      return serialized ?? String(snapshot);
+    } catch {
+      return '[unserializable model snapshot]';
+    }
+  }
+
+  function buildCrashSurface(
+    phase: 'update' | 'render' | 'resize',
+    error: unknown,
+    snapshot: Model,
+  ): Surface {
+    const viewport = runtimeViewport();
+    ensureFramebufferSize(viewport.columns, viewport.rows);
+    const detail = error instanceof Error
+      ? error.stack ?? error.message
+      : String(error);
+    const content = [
+      'Bijou runtime crash',
+      '',
+      `Phase: ${phase}`,
+      '',
+      'Error',
+      detail,
+      '',
+      'Model snapshot',
+      formatModelSnapshot(snapshot),
+      '',
+      'Press Enter to exit.',
+    ].join('\n');
+    return stringToSurface(content, viewport.columns, viewport.rows);
+  }
+
+  function enterCrashMode(
+    phase: 'update' | 'render' | 'resize',
+    error: unknown,
+    snapshot: Model,
+  ): void {
+    if (fatalError === null) {
+      fatalError = error;
+    }
+    const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+    writeErrorLine(ctx.io, `[Runtime Error] ${detail}\n`);
+    if (crashMode) return;
+
+    crashMode = true;
+    renderQueued = false;
+    disposeTimerHandle(renderHandle);
+    renderHandle = null;
+    bus.stopPulse();
+
+    try {
+      const crashSurface = buildCrashSurface(phase, error, snapshot);
+      renderSurfaceFrame(
+        ctx.io,
+        currentSurface,
+        crashSurface,
+        ctx.style,
+        outBuf,
+      );
+      currentSurface = crashSurface;
+      nextSurface = createSurface(crashSurface.width, crashSurface.height);
+    } catch (crashRenderError) {
+      writeErrorLine(
+        ctx.io,
+        `[Runtime Error] Failed to render crash surface: ${crashRenderError instanceof Error ? (crashRenderError.stack ?? crashRenderError.message) : String(crashRenderError)}\n`,
+      );
+      shutdown(fatalError);
     }
   }
 
@@ -156,7 +232,13 @@ export async function run<Model, M>(
 
   // 1. Layout Logic Stage
   pipeline.use('Layout', (state, next) => {
-    const viewOutput = app.view(state.model);
+    let viewOutput;
+    try {
+      viewOutput = app.view(state.model);
+    } catch (error) {
+      state.data[FATAL_RENDER_ERROR_KEY] = error;
+      return;
+    }
     const viewport = runtimeViewport();
     (state as any).layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
       width: viewport.columns,
@@ -263,19 +345,12 @@ export async function run<Model, M>(
         };
 
         pipeline.execute(renderState);
+        const fatalRenderError = renderState.data[FATAL_RENDER_ERROR_KEY];
+        if (fatalRenderError !== undefined) {
+          enterCrashMode('render', fatalRenderError, model);
+        }
       } catch (error) {
-        routeRuntimeIssue({
-          level: 'error',
-          source: 'runtime',
-          message: error instanceof Error ? error.message : String(error),
-          atMs: clock.now(),
-          error,
-        });
-        writeErrorLine(
-          ctx.io,
-          `[Runtime Error] ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
-        );
-        shutdown(error);
+        enterCrashMode('render', error, model);
       } finally {
         renderInFlight = false;
         if (renderQueued) {
@@ -315,6 +390,13 @@ export async function run<Model, M>(
   bus.on((msg) => {
     if (!running) return;
 
+    if (crashMode) {
+      if (isKeyMsg(msg) && (msg.key === 'enter' || (msg.key === 'c' && msg.ctrl))) {
+        shutdown(fatalError);
+      }
+      return;
+    }
+
     // Track time delta from pulse
     if (isPulseMsg(msg)) {
       currentDt = msg.dt;
@@ -340,7 +422,14 @@ export async function run<Model, M>(
     }
 
     const previousModel = model;
-    const [newModel, cmds] = app.update(msg, model);
+    let updateResult: [Model, Cmd<M>[]];
+    try {
+      updateResult = app.update(msg, model);
+    } catch (error) {
+      enterCrashMode('update', error, model);
+      return;
+    }
+    const [newModel, cmds] = updateResult;
     model = newModel;
     if (isResizeMsg(msg) || newModel !== previousModel) {
       render();
@@ -356,8 +445,14 @@ export async function run<Model, M>(
     columns: syncedViewport.columns,
     rows: syncedViewport.rows,
   };
-  const [resizedModel, resizeCmds] = app.update(initialResize, model);
-  model = resizedModel;
+  let resizeCmds: Cmd<M>[] = [];
+  try {
+    const [resizedModel, nextResizeCmds] = app.update(initialResize, model);
+    model = resizedModel;
+    resizeCmds = nextResizeCmds;
+  } catch (error) {
+    enterCrashMode('resize', error, model);
+  }
 
   // After a potential resize in update, ensure currentSurface matches size
   // to avoid diffing mismatched grids.
@@ -365,9 +460,11 @@ export async function run<Model, M>(
   resetFramebuffers(postResizeViewport.columns, postResizeViewport.rows);
 
   // Initial render + startup commands
-  render();
-  executeCommands(initCmds);
-  executeCommands(resizeCmds);
+  if (!crashMode) {
+    render();
+    executeCommands(initCmds);
+    executeCommands(resizeCmds);
+  }
 
   // Wait for quit signal
   await new Promise<void>((resolve) => {

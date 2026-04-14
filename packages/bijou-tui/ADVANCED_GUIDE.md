@@ -113,6 +113,21 @@ on the same frame that a different set disappears. Treat that as a strong signal
 that your component identity is unstable and the reconciler is being forced to
 start new animations instead of continuing existing ones.
 
+## Crash Surfaces
+
+Interactive `run(app, { ctx })` now keeps fatal `update()` and `view()` errors
+on-screen inside the alt screen long enough to inspect them.
+
+The runtime crash surface shows:
+
+- the failing phase (`update`, `render`, or startup resize)
+- the error and stack
+- the last stable model snapshot when it can be serialized
+- an explicit `Press Enter to exit.` prompt
+
+This is a developer-facing post-mortem path, not a recovery system. The runtime
+still rethrows the original failure after the user dismisses the surface.
+
 ## Framed Shell Layer Projection
 
 `createFramedApp()` now has a stable seam for page-owned layer metadata and
