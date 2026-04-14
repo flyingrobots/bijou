@@ -34,6 +34,7 @@ const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
  */
 const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
+const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
 /**
  * Run a TEA application.
@@ -484,6 +485,16 @@ export async function run<Model, M>(
     });
   }
 
+  const shutdownDrainResult = await awaitDrainWithinTimeout(
+    bus,
+    clock,
+    SHUTDOWN_DRAIN_TIMEOUT_MS,
+  );
+  if (shutdownDrainResult === 'timed-out') {
+    const message = `Timed out waiting ${SHUTDOWN_DRAIN_TIMEOUT_MS}ms for pending commands to drain during shutdown.`;
+    writeErrorLine(ctx.io, `[Runtime Warning] ${message}\n`);
+  }
+
   // Cleanup — bus disposes all I/O connections
   disposeTimerHandle(renderHandle);
   renderHandle = null;
@@ -503,6 +514,37 @@ export async function run<Model, M>(
 
 function disposeTimerHandle(handle: TimerHandle | null): void {
   handle?.dispose();
+}
+
+async function awaitDrainWithinTimeout(
+  bus: { drain(): Promise<void> },
+  clock: { setTimeout(callback: () => void, ms: number): TimerHandle },
+  timeoutMs: number,
+): Promise<'drained' | 'timed-out'> {
+  let timeoutHandle: TimerHandle | null = null;
+
+  try {
+    return await new Promise<'drained' | 'timed-out'>((resolve) => {
+      let settled = false;
+      const finish = (result: 'drained' | 'timed-out') => {
+        if (settled) return;
+        settled = true;
+        disposeTimerHandle(timeoutHandle);
+        timeoutHandle = null;
+        resolve(result);
+      };
+
+      timeoutHandle = clock.setTimeout(() => {
+        finish('timed-out');
+      }, timeoutMs);
+
+      void bus.drain().then(() => {
+        finish('drained');
+      });
+    });
+  } finally {
+    disposeTimerHandle(timeoutHandle);
+  }
 }
 
 /**

@@ -19,6 +19,7 @@ import {
 } from './screen.js';
 
 const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
+const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
 function counterApp(quitKey = 'q'): App<number, never> {
   return {
@@ -678,6 +679,69 @@ describe('run', () => {
       await promise;
 
       expect(disposeCalls).toBe(1);
+    });
+
+    it('waits for async cleanup-producing commands to settle before shutdown completes', async () => {
+      let disposeCalls = 0;
+      const { clock, ctx } = createInteractiveContext();
+      const app: App<string, never> = {
+        init: () => ['cleanup', [
+          () => new Promise((resolve) => {
+            clock.setTimeout(() => {
+              resolve({
+                dispose() {
+                  disposeCalls += 1;
+                },
+              });
+            }, 25);
+          }),
+          quit(),
+        ]],
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      let settled = false;
+      const promise = run(app, { ctx }).then(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(10);
+      expect(settled).toBe(false);
+
+      await clock.advanceByAsync(20);
+      await promise;
+
+      expect(settled).toBe(true);
+      expect(disposeCalls).toBe(1);
+    });
+
+    it('emits one explicit warning when shutdown drain times out', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const app: App<string, never> = {
+        init: () => ['hang', [
+          () => new Promise(() => {}),
+          quit(),
+        ]],
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      let settled = false;
+      const promise = run(app, { ctx }).then(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(SHUTDOWN_DRAIN_TIMEOUT_MS - 1);
+      expect(settled).toBe(false);
+
+      await clock.advanceByAsync(2);
+      await promise;
+
+      expect(settled).toBe(true);
+      expect(ctx.io.writtenErr.some((chunk) =>
+        chunk.includes('[Runtime Warning] Timed out waiting 1000ms for pending commands to drain during shutdown.'),
+      )).toBe(true);
     });
 
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {

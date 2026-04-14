@@ -1,10 +1,16 @@
 ---
-title: "RE-026 — Drain runtime commands before shutdown"
+title: RE-026 — Drain runtime commands before shutdown
 legend: RE
-lane: asap
+lane: graveyard
 ---
 
 # RE-026 — Drain runtime commands before shutdown
+
+## Disposition
+
+Completed on 2026-04-14 via commit fixing runtime shutdown drain semantics and bounded timeout behavior. Implementation landed in a follow-up commit after the 2026-04-14 audit and passed runtime-focused tests plus full release-readiness validation.
+
+## Original Proposal
 
 The runtime still exits without awaiting `bus.drain()`, which leaves async
 command cleanup timing less deterministic than it should be.

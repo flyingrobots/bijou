@@ -1,10 +1,16 @@
 ---
-title: "DX-028 — Align front-door docs with repo truth"
+title: DX-028 — Align front-door docs with repo truth
 legend: DX
-lane: asap
+lane: graveyard
 ---
 
 # DX-028 — Align front-door docs with repo truth
+
+## Disposition
+
+Completed on 2026-04-14 via README, CONTRIBUTING, and SECURITY updates that align the front door with the shipped package surface, preferred startApp() bootstrap path, npm workspace workflow, and current supported release line. Validation included docs inventory, lint, and full release-readiness.
+
+## Original Proposal
 
 The package-level docs are mostly coherent now, but the front door and operator
 docs still lag the repo's actual runtime and release posture.
