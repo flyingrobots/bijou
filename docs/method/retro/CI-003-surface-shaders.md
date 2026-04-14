@@ -25,3 +25,13 @@ Add a "Post-Process" middleware to `@flyingrobots/bijou-tui`'s render pipeline t
 ## Effort
 
 Medium — requires adding the middleware and a set of byte-manipulation shaders for common effects.
+
+## Completed (2026-04-14)
+
+The post-process path now ships as a reusable `surfaceShaderFilter(...)`
+middleware for the render pipeline's `PostProcess` stage. Bijou TUI now
+exports built-in packed-surface shader passes for `scanlines()`,
+`flicker()`, `noise()`, and `vignette()`, along with regression coverage
+and a package-level `configurePipeline()` example. Apps can now compose
+CRT-style or atmosphere-oriented post-process effects without forking
+the runtime or inventing a second render pipeline.

@@ -180,6 +180,21 @@ export type {
 } from './pipeline/pipeline.js';
 export { createPipeline, getRenderStageTimings, RENDER_STAGE_TIMINGS_KEY } from './pipeline/pipeline.js';
 export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
+export type {
+  SurfaceShader,
+  SurfaceShaderContext,
+  ScanlinesShaderOptions,
+  FlickerShaderOptions,
+  NoiseShaderOptions,
+  VignetteShaderOptions,
+} from './pipeline/middleware/surface-shaders.js';
+export {
+  surfaceShaderFilter,
+  scanlines,
+  flicker,
+  noise,
+  vignette,
+} from './pipeline/middleware/surface-shaders.js';
 
 // Sub-App Composition
 export type { MountOptions, MountedApp, SubAppAdapterCases } from './subapp/mount.js';

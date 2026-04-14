@@ -121,6 +121,25 @@ const tl = timeline()
   .build();
 ```
 
+## Post-Process Shaders
+
+```typescript
+import { run, surfaceShaderFilter, scanlines, vignette } from '@flyingrobots/bijou-tui';
+
+await run(app, {
+  configurePipeline(pipeline) {
+    pipeline.use('PostProcess', surfaceShaderFilter(
+      scanlines({ dimFactor: 0.82 }),
+      vignette({ edgeFactor: 0.78 }),
+    ));
+  },
+});
+```
+
+Use `surfaceShaderFilter(...)` to compose built-in post-process passes like
+`scanlines()`, `flicker()`, `noise()`, and `vignette()` over the packed target
+surface before diff/output.
+
 ## Testing
 
 Use `testRuntime()` when you want an inspectable harness instead of a
