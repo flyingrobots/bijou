@@ -274,6 +274,7 @@ export {
   type FrameAction,
   type FrameNotificationSpec,
   type FramedApp,
+  type FramedAppRunOptions,
   type FramedAppMsg,
   type FramedAppUpdateResult,
   type FrameScopedMsg,
@@ -285,6 +286,7 @@ export {
   emitFrameAction,
   notify,
   projectFrameControls,
+  runFramedApp,
   underlyingFrameLayer,
 } from './app-frame.js';
 

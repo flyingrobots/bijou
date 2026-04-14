@@ -27,6 +27,7 @@ import { createKeyMap, formatKeyCombo, type BindingInfo, type KeyMap } from './k
 import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import { quit } from './commands.js';
+import { runWithLifecycleHooks } from './runtime.js';
 import type { Overlay } from './overlay.js';
 import { compositeSurfaceInto, modal } from './overlay.js';
 import {
@@ -77,6 +78,7 @@ import type {
   FramePageMsg,
   FramePageUpdateResult,
   FramedApp,
+  FramedAppRunOptions,
   FramedAppMsg,
 } from './app-frame-types.js';
 import {
@@ -162,6 +164,7 @@ import {
   openCommandPalette,
   openSearchPalette,
 } from './app-frame-palette.js';
+import type { RenderStageTiming } from './pipeline/pipeline.js';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -461,6 +464,7 @@ export type {
   FramePageMsg,
   FramePageUpdateResult,
   FramedApp,
+  FramedAppRunOptions,
   FramedAppMsg,
   FramedAppUpdateResult,
   FrameScopedMsg,
@@ -508,6 +512,14 @@ interface ResolvedFrameNotificationOptions {
   readonly margin: number;
   readonly gap: number;
   readonly overflow: OverflowBehavior;
+}
+
+interface FrameTimingSnapshot {
+  readonly frameTimeMs: number;
+  readonly viewTimeMs: number;
+  readonly diffTimeMs: number;
+  readonly frameBudgetMs?: number;
+  readonly frameOverBudget: boolean;
 }
 
 function createQuitHelpKeys(i18n?: I18nRuntime): BindingSource {
@@ -634,6 +646,63 @@ function cloneShellThemeContext(
   resolvedTheme: ResolvedTheme,
 ): BijouContext {
   return cloneContextWithResolvedTheme(ctx, resolvedTheme);
+}
+
+function readStageDuration(
+  timings: readonly RenderStageTiming[],
+  stage: RenderStageTiming['stage'],
+): number {
+  return timings.find((timing) => timing.stage === stage)?.durationMs ?? 0;
+}
+
+function summarizeFrameTimings(
+  timings: readonly RenderStageTiming[],
+  frameBudgetMs: number | undefined,
+): FrameTimingSnapshot {
+  const frameTimeMs = timings.reduce((total, timing) => total + timing.durationMs, 0);
+  return {
+    frameTimeMs,
+    viewTimeMs: readStageDuration(timings, 'Layout'),
+    diffTimeMs: readStageDuration(timings, 'Diff'),
+    frameBudgetMs,
+    frameOverBudget: frameBudgetMs != null && frameTimeMs > frameBudgetMs,
+  };
+}
+
+function applyFrameTimingSnapshot<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  snapshot: FrameTimingSnapshot,
+): InternalFrameModel<PageModel, Msg> {
+  if (
+    model.frameTimeMs === snapshot.frameTimeMs
+    && model.viewTimeMs === snapshot.viewTimeMs
+    && model.diffTimeMs === snapshot.diffTimeMs
+    && model.frameBudgetMs === snapshot.frameBudgetMs
+    && model.frameOverBudget === snapshot.frameOverBudget
+  ) {
+    return model;
+  }
+
+  return {
+    ...model,
+    frameTimeMs: snapshot.frameTimeMs,
+    viewTimeMs: snapshot.viewTimeMs,
+    diffTimeMs: snapshot.diffTimeMs,
+    frameBudgetMs: snapshot.frameBudgetMs,
+    frameOverBudget: snapshot.frameOverBudget,
+  };
+}
+
+function resolveFrameBudgetMs<Msg>(
+  runOptions: FramedAppRunOptions<Msg> | undefined,
+  fallbackCtx: BijouContext | undefined,
+): number | undefined {
+  if (runOptions?.frameBudgetMs != null) return runOptions.frameBudgetMs;
+  const refreshRate = runOptions?.ctx?.runtime.refreshRate ?? fallbackCtx?.runtime.refreshRate;
+  if (refreshRate == null || !Number.isFinite(refreshRate) || refreshRate <= 0) {
+    return undefined;
+  }
+  return 1_000 / refreshRate;
 }
 
 // Factory
@@ -2043,6 +2112,11 @@ export function createFramedApp<PageModel, Msg>(
         scrollByPage: {},
         columns: Math.max(1, options.initialColumns ?? 80),
         rows: Math.max(1, options.initialRows ?? 24),
+        frameTimeMs: 0,
+        viewTimeMs: 0,
+        diffTimeMs: 0,
+        frameBudgetMs: undefined,
+        frameOverBudget: false,
         helpOpen: false,
         helpScrollY: 0,
         commandPaletteKind: undefined,
@@ -2414,7 +2488,36 @@ export function createFramedApp<PageModel, Msg>(
     },
   };
 
-  return app;
+  const framedApp = app as unknown as FramedApp<PageModel, Msg>;
+  framedApp.run = async (runOptions?: FramedAppRunOptions<Msg>) => {
+    const frameBudgetMs = resolveFrameBudgetMs(runOptions, resolveFrameCtx());
+    await runWithLifecycleHooks(framedApp, {
+      ...runOptions,
+      mouse: runOptions?.mouse ?? true,
+    }, {
+      afterRender({ model, timings }) {
+        return applyFrameTimingSnapshot(
+          model as InternalFrameModel<PageModel, Msg>,
+          summarizeFrameTimings(timings, frameBudgetMs),
+        );
+      },
+    });
+  };
+
+  return framedApp;
+}
+
+/**
+ * Create and immediately run a batteries-included framed shell.
+ *
+ * This is the one-call hosted path for users who want the frame to own the
+ * runtime pump while `run(app)` remains the low-level TEA contract.
+ */
+export async function runFramedApp<PageModel, Msg>(
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  runOptions?: FramedAppRunOptions<Msg>,
+): Promise<void> {
+  await createFramedApp(options).run(runOptions);
 }
 
 function focusPane<PageModel, Msg>(

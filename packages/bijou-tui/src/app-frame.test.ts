@@ -33,6 +33,7 @@ import {
   describeFrameRuntimeViewStack,
   notify,
   projectFrameControls,
+  runFramedApp,
   type FramePage,
   type FramePageMsg,
   type FramedApp,
@@ -65,6 +66,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_CTRL_P = '\x10';
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
+const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 
 function ctrlKey(key: string) {
   return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
@@ -82,6 +84,29 @@ function textView(text: string) {
   const lines = text.split('\n');
   const width = Math.max(1, ...lines.map((line) => line.length));
   return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
+function createInteractiveContext(options: Parameters<typeof createTestContext>[0] = {}) {
+  const clock = mockClock();
+  const ctx = createTestContext({ ...options, mode: 'interactive', clock });
+  return { clock, ctx };
+}
+
+function scheduleKeys(
+  ctx: ReturnType<typeof createTestContext>,
+  clock: ReturnType<typeof mockClock>,
+  events: Array<{ at: number; key: string }>,
+): void {
+  ctx.io.rawInput = (onKey) => {
+    const handles = events.map(({ at, key }) => clock.setTimeout(() => onKey(key), at));
+    return {
+      dispose() {
+        handles.forEach((handle) => {
+          handle.dispose();
+        });
+      },
+    };
+  };
 }
 
 function createAlternateShellTheme(ctx: BijouContext) {
@@ -309,6 +334,46 @@ describe('createFramedApp', () => {
     expectTypeOf(result).toEqualTypeOf<FramedAppUpdateResult<TypedPageModel, TypedMsg>>();
     expectTypeOf(result[1]).toEqualTypeOf<Cmd<FramedAppMsg<TypedMsg>>[]>();
     expect(result[0].pageModels.typed?.selected).toBe('alpha');
+  });
+
+  it('exposes a self-running hosted runner for framed apps and enables mouse input by default', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 10, key: '\x03' },
+      { at: 20, key: '\x03' },
+    ]);
+
+    const promise = app.run({ ctx });
+    await clock.advanceByAsync(60);
+    await promise;
+
+    expect(ctx.io.written).toContain(ENABLE_MOUSE);
+  });
+
+  it('feeds frame timing and budget telemetry back into shell-owned view state when using runFramedApp()', async () => {
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 10, key: 'x' },
+      { at: 20, key: '\x03' },
+      { at: 30, key: '\x03' },
+    ]);
+
+    const promise = runFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      helpLineSource: ({ model }) => `over:${model.frameOverBudget ? 'yes' : 'no'}`,
+    }, {
+      ctx,
+      frameBudgetMs: 0.0001,
+    });
+
+    await clock.advanceByAsync(80);
+    await promise;
+
+    expect(ctx.io.written.some((chunk) => chunk.includes('over:yes'))).toBe(true);
   });
 
   it('rejects raw string pane renderers with an explicit migration error', () => {

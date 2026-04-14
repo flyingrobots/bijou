@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Frame-owned hosted runner for `createFramedApp()`** —
+  `createFramedApp()` now returns a self-running framed shell with
+  `app.run(...)`, and `runFramedApp(...)` provides a one-call hosted
+  entry point that defaults shell mouse support on. The framed runner
+  composes the shared runtime loop instead of forking it, while folding
+  committed pipeline timings back into `FrameModel.frameTimeMs`,
+  `FrameModel.viewTimeMs`, `FrameModel.diffTimeMs`, and budget telemetry
+  so shell-owned UI can read the frame's own bookkeeping.
+
 ## [4.4.1] - 2026-04-11
 
 ### ✨ Features

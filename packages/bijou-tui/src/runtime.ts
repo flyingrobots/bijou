@@ -13,7 +13,12 @@ import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
-import { createPipeline, type RenderState } from './pipeline/pipeline.js';
+import {
+  createPipeline,
+  getRenderStageTimings,
+  type RenderStageTiming,
+  type RenderState,
+} from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
 import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
@@ -36,6 +41,20 @@ const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
 const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
+export interface RuntimeRenderSummary<Model> {
+  readonly model: Model;
+  readonly dt: number;
+  readonly timings: readonly RenderStageTiming[];
+  readonly viewport: {
+    readonly columns: number;
+    readonly rows: number;
+  };
+}
+
+export interface RuntimeLifecycleHooks<Model> {
+  afterRender?(summary: RuntimeRenderSummary<Model>): Model | void;
+}
+
 /**
  * Run a TEA application.
  *
@@ -55,6 +74,14 @@ const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 export async function run<Model, M>(
   app: App<Model, M>,
   options?: RunOptions<M>,
+): Promise<void> {
+  await runWithLifecycleHooks(app, options);
+}
+
+export async function runWithLifecycleHooks<Model, M>(
+  app: App<Model, M>,
+  options?: RunOptions<M>,
+  hooks?: RuntimeLifecycleHooks<Model>,
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
   const clock = resolveClock(ctx);
@@ -349,6 +376,19 @@ export async function run<Model, M>(
         const fatalRenderError = renderState.data[FATAL_RENDER_ERROR_KEY];
         if (fatalRenderError !== undefined) {
           enterCrashMode('render', fatalRenderError, model);
+          return;
+        }
+
+        if (hooks?.afterRender) {
+          const maybeNextModel = hooks.afterRender({
+            model,
+            dt: currentDt,
+            timings: getRenderStageTimings(renderState),
+            viewport,
+          });
+          if (maybeNextModel !== undefined) {
+            model = maybeNextModel;
+          }
         }
       } catch (error) {
         enterCrashMode('render', error, model);

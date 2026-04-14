@@ -13,6 +13,30 @@ diffing, performance measurement, and frame budget management.
 Raw `App` + `run()` stays as the low-level TEA contract for users who
 want full control. The framed app is the path for everyone else.
 
+## Completed (2026-04-14)
+
+Landed on `release/v5.0.0` as a composition-based runner instead of a
+runtime fork. `createFramedApp()` now returns a self-running framed shell
+with `app.run(...)`, `runFramedApp(...)` provides the one-call hosted
+entry point, and the framed runner delegates to the shared runtime while
+folding committed pipeline timings back into the frame model.
+
+Repo truth after the landing:
+
+- `createFramedApp()` remains App-compatible for tests and wrappers, but
+  now also owns the hosted runner path
+- `runFramedApp(options, runOptions)` is the batteries-included shell
+  entry point
+- framed runners default mouse input on for retained shell hit-testing
+- `FrameModel` now carries `frameTimeMs`, `viewTimeMs`, `diffTimeMs`,
+  `frameBudgetMs`, and `frameOverBudget`
+- the frame budget currently drives shell telemetry and view-state
+  decisions; the shared runtime loop still owns diff/output execution
+  through composition
+
+Validation included targeted runtime/app-frame coverage, `npm run lint`,
+`npm run docs:inventory`, and a full `npm run release:readiness` pass.
+
 ## Current architecture
 
 ```text

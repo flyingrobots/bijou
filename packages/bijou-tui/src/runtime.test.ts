@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createSurface, stringToSurface, type TimerHandle } from '@flyingrobots/bijou';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
-import { run } from './runtime.js';
+import { run, runWithLifecycleHooks } from './runtime.js';
 import { quit } from './commands.js';
 import type { App, KeyMsg, Cmd } from './types.js';
 import { getRenderStageTimings } from './pipeline/pipeline.js';
@@ -467,6 +467,42 @@ describe('run', () => {
 
       expect(completed).toEqual(['Layout', 'Paint', 'PostProcess', 'Diff', 'Output']);
       expect(seenDuringDiff).toEqual([['Layout', 'Paint', 'PostProcess', 'Diff']]);
+    });
+
+    it('lets internal callers fold committed frame timings back into model state', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const seenFrameTimes: number[] = [];
+      const app: App<{ frameTimeMs: number }, never> = {
+        init: () => [{ frameTimeMs: 0 }, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') {
+            seenFrameTimes.push(model.frameTimeMs);
+            return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
+      const promise = runWithLifecycleHooks(app, { ctx }, {
+        afterRender({ model, timings }) {
+          return {
+            ...model,
+            frameTimeMs: timings.reduce((total, timing) => total + timing.durationMs, 0),
+          };
+        },
+      });
+
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(seenFrameTimes).toHaveLength(1);
+      expect(seenFrameTimes[0]).toBeGreaterThan(0);
     });
 
     it('forces a clean redraw when the terminal resizes', async () => {

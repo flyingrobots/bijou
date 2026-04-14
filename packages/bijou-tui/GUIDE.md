@@ -127,6 +127,23 @@ timeline()
 - Built-in help (`?`) and command-palette (`Ctrl+P`).
 - Notification review and shell-owned settings.
 
+For framed shells, prefer the self-running entry point:
+
+```typescript
+import { createFramedApp, runFramedApp } from '@flyingrobots/bijou-tui';
+
+const app = createFramedApp({
+  pages: [page],
+});
+
+await app.run({ ctx });
+// or: await runFramedApp({ pages: [page] }, { ctx });
+```
+
+`app.run()` delegates to the shared runtime, enables mouse input by default for
+the shell, and keeps frame timing/budget telemetry on the frame model. Keep
+raw `run(app, { ctx })` for lower-level TEA ownership or custom host control.
+
 Pages can surface transient shell notifications without owning frame state:
 
 ```typescript

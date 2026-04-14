@@ -7,7 +7,7 @@
 
 import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
 import type { NotificationSpec } from './notification.js';
-import type { App, Cmd, KeyMsg, MouseMsg, PulseMsg } from './types.js';
+import type { App, Cmd, KeyMsg, MouseMsg, PulseMsg, RunOptions } from './types.js';
 import { QUIT, isCmdCleanup } from './types.js';
 import type { BindingInfo } from './keybindings.js';
 import type { PanelVisibilityState } from './panel-state.js';
@@ -53,8 +53,27 @@ export type FramedAppMsg<Msg> = Msg | PageScopedMsg<Msg> | FrameScopedMsg;
 /** Typed update tuple returned by a framed app. */
 export type FramedAppUpdateResult<PageModel, Msg> = [FrameModel<PageModel>, Cmd<FramedAppMsg<Msg>>[]];
 
-/** Fully typed `App` contract returned by `createFramedApp()`. */
-export type FramedApp<PageModel, Msg> = App<FrameModel<PageModel>, FramedAppMsg<Msg>>;
+/** Hosted runtime options accepted by a self-running framed app. */
+export interface FramedAppRunOptions<Msg> extends RunOptions<FramedAppMsg<Msg>> {
+  /**
+   * Optional frame budget in milliseconds used for shell timing telemetry.
+   *
+   * Defaults to the host runtime refresh budget (`1000 / refreshRate`) when
+   * omitted.
+   */
+  readonly frameBudgetMs?: number;
+}
+
+/** Fully typed framed-app contract returned by `createFramedApp()`. */
+export interface FramedApp<PageModel, Msg> extends App<FrameModel<PageModel>, FramedAppMsg<Msg>> {
+  /**
+   * Run the framed app through the hosted runtime.
+   *
+   * Framed apps default `mouse` input to `true` because the shell already
+   * ships retained hit-testing and pane-aware pointer routing.
+   */
+  run(options?: FramedAppRunOptions<Msg>): Promise<void>;
+}
 
 /** Stored pane scroll coordinates. */
 export interface FramePaneScroll {
@@ -82,6 +101,16 @@ export interface FrameModel<PageModel> {
   readonly columns: number;
   /** Current terminal height. */
   readonly rows: number;
+  /** Total wall time of the most recently committed frame. */
+  readonly frameTimeMs: number;
+  /** Layout/view stage duration of the most recently committed frame. */
+  readonly viewTimeMs: number;
+  /** Diff stage duration of the most recently committed frame. */
+  readonly diffTimeMs: number;
+  /** Active frame budget in milliseconds, when the hosted runner owns it. */
+  readonly frameBudgetMs?: number;
+  /** Whether the most recently committed frame exceeded the current budget. */
+  readonly frameOverBudget: boolean;
   /** Help visibility flag. */
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
