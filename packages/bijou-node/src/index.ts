@@ -48,6 +48,14 @@ export {
 /** Options for {@link startApp}. Mirrors {@link RunOptions}. */
 export type StartAppOptions<M = any> = RunOptions<M>;
 
+interface SelfRunningApp<M = unknown> {
+  run(options?: RunOptions<M>): Promise<void>;
+}
+
+function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
+  return typeof (app as unknown as SelfRunningApp<M>).run === 'function';
+}
+
 /** Test-only helper that restores the Node ambient-context initializer after resets. */
 export function _registerDefaultContextInitializerForTesting(): void {
   setDefaultContextInitializer(() => createNodeContext());
@@ -127,7 +135,9 @@ export function initDefaultContext(): BijouContext {
  * This is the first-app convenience path for Node hosts. When no context is
  * provided, it initializes and registers the default Node context so apps that
  * rely on ambient `ctx` resolution still behave correctly. Callers that need
- * explicit ownership can pass `options.ctx` directly.
+ * explicit ownership can pass `options.ctx` directly. Self-running framed apps
+ * are delegated to their hosted runner instead of being forced through raw
+ * `run(app, ...)`.
  *
  * @param app - The TEA application to run.
  * @param options - Runtime options forwarded to {@link run}.
@@ -137,5 +147,9 @@ export async function startApp<Model, M>(
   options?: StartAppOptions<M>,
 ): Promise<void> {
   const ctx = options?.ctx ?? initDefaultContext();
+  if (isSelfRunningApp(app)) {
+    await app.run({ ...options, ctx });
+    return;
+  }
   await run(app, { ...options, ctx });
 }

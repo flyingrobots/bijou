@@ -8,7 +8,7 @@ import {
 } from './index.js';
 import { getDefaultContext, stringToSurface, type Surface } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { run } from '@flyingrobots/bijou-tui';
+import { createFramedApp, run } from '@flyingrobots/bijou-tui';
 
 function textSurface(text: string): Surface {
   const lines = text.split('\n');
@@ -147,5 +147,28 @@ describe('startApp()', () => {
     expect(getDefaultContext()).toBeDefined();
     expect(spy).toHaveBeenCalledWith('hello from ambient run');
     spy.mockRestore();
+  });
+
+  it('delegates to self-running framed apps instead of bypassing their hosted runner', async () => {
+    const ctx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
+    const app = createFramedApp({
+      pages: [{
+        id: 'home',
+        title: 'Home',
+        init: () => [{ count: 0 }, []],
+        update: (_msg, model) => [model, []],
+        layout: () => ({
+          kind: 'pane',
+          paneId: 'main',
+          render: () => textSurface('framed through startApp'),
+        }),
+      }],
+    });
+    const runSpy = vi.spyOn(app, 'run');
+
+    await startApp(app, { ctx });
+
+    expect(runSpy).toHaveBeenCalledWith({ ctx });
+    expect(ctx.io.written.some((chunk) => chunk.includes('framed through startApp'))).toBe(true);
   });
 });

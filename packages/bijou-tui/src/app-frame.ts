@@ -732,27 +732,41 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
-  const defaultFrameCtx = options.ctx ?? resolveSafeCtx();
-  if (options.shellThemes != null && options.shellThemes.length > 0 && defaultFrameCtx == null) {
-    throw new Error('createFramedApp: shellThemes requires options.ctx or a default Bijou context');
-  }
-  const resolvedShellThemes: readonly ResolvedFrameShellTheme[] = options.shellThemes?.map((theme) => ({
-    id: theme.id,
-    label: theme.label,
-    description: theme.description,
-    shellTheme: theme,
-    resolvedTheme: createResolved(
-      theme.theme,
-      defaultFrameCtx!.theme.noColor,
-      defaultFrameCtx!.theme.colorScheme,
-    ),
-  })) ?? [];
-  const enableShellThemeSettings = resolvedShellThemes.length > 1;
-  const initialShellTheme = resolveShellThemeForContext(resolvedShellThemes, defaultFrameCtx)
-    ?? resolvedShellThemes[0];
+  const shellThemeSpecs = options.shellThemes ?? [];
+  let defaultFrameCtx = options.ctx ?? resolveSafeCtx();
+  let resolvedShellThemes: readonly ResolvedFrameShellTheme[] = [];
+  const enableShellThemeSettings = shellThemeSpecs.length > 1;
   const usesAmbientDefaultContext = options.ctx == null && defaultFrameCtx != null;
   let frameCtx = options.ctx;
-  let frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, frameCtx)?.id;
+  let frameCtxShellThemeId: string | undefined;
+  let useRunScopedFrameCtx = false;
+
+  function ensureResolvedShellThemes(explicitCtx?: BijouContext): void {
+    if (shellThemeSpecs.length === 0 || resolvedShellThemes.length > 0) return;
+    const baseCtx = explicitCtx ?? frameCtx ?? options.ctx ?? resolveSafeCtx();
+    if (baseCtx == null) {
+      throw new Error(
+        'createFramedApp: shellThemes requires options.ctx, app.run({ ctx }), or a default Bijou context',
+      );
+    }
+    defaultFrameCtx ??= baseCtx;
+    resolvedShellThemes = shellThemeSpecs.map((theme) => ({
+      id: theme.id,
+      label: theme.label,
+      description: theme.description,
+      shellTheme: theme,
+      resolvedTheme: createResolved(
+        theme.theme,
+        defaultFrameCtx!.theme.noColor,
+        defaultFrameCtx!.theme.colorScheme,
+      ),
+    }));
+  }
+
+  if (frameCtx != null) {
+    ensureResolvedShellThemes(frameCtx);
+    frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, frameCtx)?.id;
+  }
 
   function resolveFrameCtx(): BijouContext | undefined {
     return frameCtx ?? options.ctx ?? resolveSafeCtx();
@@ -760,6 +774,7 @@ export function createFramedApp<PageModel, Msg>(
 
   function resolveFrameThemeCtx(activeShellThemeId: string | undefined): BijouContext | undefined {
     const baseCtx = resolveFrameCtx();
+    ensureResolvedShellThemes(baseCtx);
     if (defaultFrameCtx == null) return baseCtx;
     const activeTheme = resolveCurrentShellTheme(resolvedShellThemes, activeShellThemeId);
     if (activeTheme == null) return baseCtx;
@@ -773,10 +788,11 @@ export function createFramedApp<PageModel, Msg>(
   }
 
   function publishShellThemeContext(nextTheme: ResolvedFrameShellTheme): BijouContext | undefined {
+    ensureResolvedShellThemes(resolveFrameCtx());
     if (defaultFrameCtx == null) return resolveFrameCtx();
     frameCtx = cloneShellThemeContext(defaultFrameCtx, nextTheme.resolvedTheme);
     frameCtxShellThemeId = nextTheme.id;
-    if (usesAmbientDefaultContext) {
+    if (usesAmbientDefaultContext && !useRunScopedFrameCtx) {
       setDefaultContext(frameCtx);
     }
     options.onShellThemeChange?.({
@@ -2136,6 +2152,15 @@ export function createFramedApp<PageModel, Msg>(
         runtimeNotifications: createNotificationState(),
         runtimeNotificationHistoryFilter: 'ALL',
         runtimeNotificationLoopActive: false,
+        activeShellThemeId: undefined,
+      };
+
+      ensureResolvedShellThemes(resolveFrameCtx());
+      const initialShellTheme = resolveShellThemeForContext(resolvedShellThemes, resolveFrameCtx())
+        ?? resolvedShellThemes[0];
+
+      model = {
+        ...model,
         activeShellThemeId: initialShellTheme?.id,
       };
 
@@ -2490,18 +2515,51 @@ export function createFramedApp<PageModel, Msg>(
 
   const framedApp = app as unknown as FramedApp<PageModel, Msg>;
   framedApp.run = async (runOptions?: FramedAppRunOptions<Msg>) => {
+    const previousFrameCtx = frameCtx;
+    const previousFrameCtxShellThemeId = frameCtxShellThemeId;
+    const previousDefaultFrameCtx = defaultFrameCtx;
+    const previousResolvedShellThemes = resolvedShellThemes;
+    const runtimeCtx = runOptions?.ctx;
+
+    if (runtimeCtx != null && options.ctx == null) {
+      useRunScopedFrameCtx = true;
+      frameCtx = runtimeCtx;
+      defaultFrameCtx = runtimeCtx;
+      resolvedShellThemes = [];
+      ensureResolvedShellThemes(runtimeCtx);
+      frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, runtimeCtx)?.id;
+    }
+
     const frameBudgetMs = resolveFrameBudgetMs(runOptions, resolveFrameCtx());
-    await runWithLifecycleHooks(framedApp, {
-      ...runOptions,
-      mouse: runOptions?.mouse ?? true,
-    }, {
-      afterRender({ model, timings }) {
-        return applyFrameTimingSnapshot(
-          model as InternalFrameModel<PageModel, Msg>,
-          summarizeFrameTimings(timings, frameBudgetMs),
-        );
-      },
-    });
+    let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
+    let needsTimingHydrationRender = true;
+
+    try {
+      await runWithLifecycleHooks(framedApp, {
+        ...runOptions,
+        mouse: runOptions?.mouse ?? true,
+      }, {
+        beforeRender(model) {
+          if (pendingTimingSnapshot == null) return model;
+          return applyFrameTimingSnapshot(
+            model as InternalFrameModel<PageModel, Msg>,
+            pendingTimingSnapshot,
+          );
+        },
+        afterRender({ timings }) {
+          pendingTimingSnapshot = summarizeFrameTimings(timings, frameBudgetMs);
+          if (!needsTimingHydrationRender) return;
+          needsTimingHydrationRender = false;
+          return { requestRender: true };
+        },
+      });
+    } finally {
+      useRunScopedFrameCtx = false;
+      frameCtx = previousFrameCtx;
+      frameCtxShellThemeId = previousFrameCtxShellThemeId;
+      defaultFrameCtx = previousDefaultFrameCtx;
+      resolvedShellThemes = previousResolvedShellThemes;
+    }
   };
 
   return framedApp;

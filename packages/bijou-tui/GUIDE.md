@@ -127,7 +127,10 @@ timeline()
 - Built-in help (`?`) and command-palette (`Ctrl+P`).
 - Notification review and shell-owned settings.
 
-For framed shells, prefer the self-running entry point:
+For framed shells, Node hosts can keep using `startApp(app)`: the hosted
+bootstrap now delegates to self-running framed apps automatically. Use the
+explicit framed runner when you want to stay at the `@flyingrobots/bijou-tui`
+layer or when the host owns `ctx` directly:
 
 ```typescript
 import { createFramedApp, runFramedApp } from '@flyingrobots/bijou-tui';
@@ -142,7 +145,8 @@ await app.run({ ctx });
 
 `app.run()` delegates to the shared runtime, enables mouse input by default for
 the shell, and keeps frame timing/budget telemetry on the frame model. Keep
-raw `run(app, { ctx })` for lower-level TEA ownership or custom host control.
+raw `run(app, { ctx })` for lower-level TEA ownership or custom host control,
+and keep `startApp(app)` as the preferred Node-host bootstrap.
 
 Pages can surface transient shell notifications without owning frame state:
 

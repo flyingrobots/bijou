@@ -96,7 +96,10 @@ Select the family based on the interaction semantic.
 - **`grid()`**: Stable regions with simultaneous visibility.
 - **`viewport()`**: The canonical scroll mask for rich composition.
 
-For framed shells, prefer the hosted runner path:
+For framed shells, Node hosts can still prefer `startApp(app)`: the hosted
+Node bootstrap delegates to self-running framed apps automatically. Use the
+explicit runner path when you want to stay inside `@flyingrobots/bijou-tui`
+or when the host owns `ctx` directly:
 
 ```typescript
 import { createFramedApp, runFramedApp } from '@flyingrobots/bijou-tui';
@@ -109,7 +112,8 @@ await app.run({ ctx });
 
 This path keeps the shell batteries included: mouse input defaults to `true`,
 the shared runtime loop still does the heavy lifting, and frame timing/budget
-telemetry stays attached to the frame model for shell-owned UI.
+telemetry stays attached to the frame model for shell-owned UI. For Node-hosted
+apps, `startApp(app)` remains the default bootstrap.
 
 ## Animation
 

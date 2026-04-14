@@ -83,11 +83,11 @@ FramedApp (owns loop, timing, perf stats, frame budget)
 
 ## What changes
 
-- `createFramedApp` returns a self-running object (not `App`)
+- `createFramedApp` returns a self-running object while remaining `App`-compatible
 - New entry point: `await framedApp.run({ ctx })` or `await runFramedApp(options)`
 - The runtime's event loop, surface management, and differ invocation
-  move into the framed app (or a shared internal engine it owns)
-- Frame model gains timing fields: `renderTimeMs`, `viewTimeMs`, `diffTimeMs`
+  stay in the shared runtime, with the framed shell composing that engine
+- Frame model gains timing fields: `frameTimeMs`, `viewTimeMs`, `diffTimeMs`
 - Built-in perf overlay becomes trivial (reads frame's own timing state)
 
 ## Open questions

@@ -51,8 +51,14 @@ export interface RuntimeRenderSummary<Model> {
   };
 }
 
+export interface RuntimePostRenderEffect<Model> {
+  readonly model?: Model;
+  readonly requestRender?: boolean;
+}
+
 export interface RuntimeLifecycleHooks<Model> {
-  afterRender?(summary: RuntimeRenderSummary<Model>): Model | void;
+  beforeRender?(model: Model): Model | void;
+  afterRender?(summary: RuntimeRenderSummary<Model>): RuntimePostRenderEffect<Model> | void;
 }
 
 /**
@@ -354,6 +360,11 @@ export async function runWithLifecycleHooks<Model, M>(
       renderQueued = false;
 
       try {
+        const preRenderModel = hooks?.beforeRender?.(model);
+        if (preRenderModel !== undefined) {
+          model = preRenderModel;
+        }
+
         const viewport = runtimeViewport();
         ensureFramebufferSize(
           viewport.columns,
@@ -380,14 +391,17 @@ export async function runWithLifecycleHooks<Model, M>(
         }
 
         if (hooks?.afterRender) {
-          const maybeNextModel = hooks.afterRender({
+          const postRender = hooks.afterRender({
             model,
             dt: currentDt,
             timings: getRenderStageTimings(renderState),
             viewport,
           });
-          if (maybeNextModel !== undefined) {
-            model = maybeNextModel;
+          if (postRender?.model !== undefined) {
+            model = postRender.model;
+          }
+          if (postRender?.requestRender) {
+            render();
           }
         }
       } catch (error) {
