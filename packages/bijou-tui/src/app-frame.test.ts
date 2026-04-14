@@ -1,6 +1,7 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import {
+  colorHex,
   createSurface,
   getDefaultContext,
   setDefaultContext,
@@ -123,7 +124,7 @@ function createSameNameAlternateShellTheme(ctx: BijouContext) {
 function surfaceHasFg(surface: Surface, fg: string): boolean {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
-      if (surface.get(x, y).fg === fg) return true;
+      if (colorHex(surface.get(x, y).fg) === fg) return true;
     }
   }
   return false;
@@ -132,7 +133,7 @@ function surfaceHasFg(surface: Surface, fg: string): boolean {
 function surfaceHasBg(surface: Surface, bg: string): boolean {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
-      if (surface.get(x, y).bg === bg) return true;
+      if (colorHex(surface.get(x, y).bg) === bg) return true;
     }
   }
   return false;
@@ -1401,13 +1402,13 @@ describe('createFramedApp', () => {
     }).surface;
 
     const hasBg = Array.from({ length: surface.height }, (_, y) =>
-      Array.from({ length: surface.width }, (_, x) => surface.get(x, y).bg).includes('#102938'),
+      Array.from({ length: surface.width }, (_, x) => colorHex(surface.get(x, y).bg)).includes('#102938'),
     ).some(Boolean);
     const hasAccent = Array.from({ length: surface.height }, (_, y) =>
-      Array.from({ length: surface.width }, (_, x) => surface.get(x, y).fg).includes('#ff66cc'),
+      Array.from({ length: surface.width }, (_, x) => colorHex(surface.get(x, y).fg)).includes('#ff66cc'),
     ).some(Boolean);
 
-    expect(surface.get(0, 0).fg).toBe('#335577');
+    expect(colorHex(surface.get(0, 0).fg)).toBe('#335577');
     expect(hasBg).toBe(true);
     expect(hasAccent).toBe(true);
   });

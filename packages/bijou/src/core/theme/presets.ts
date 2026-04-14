@@ -17,19 +17,23 @@ export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
 }
 
 /**
- * Populate fgRGB and bgRGB on an existing TokenValue if not already set.
- * Used by theme resolution to ensure all tokens carry numeric RGB.
+ * Populate fgRGB and bgRGB on an existing TokenValue from its current hex/bg.
+ * Used by theme resolution to ensure cached RGB bytes stay in sync even when
+ * callers clone a theme token and override only the string color fields.
  *
  * **Mutates the token in place.** Callers should not pass frozen/shared tokens.
  */
 export function populateTokenRGB(token: TokenValue): TokenValue {
-  if (!token.fgRGB) {
-    const rgb = tryHexToRgb(token.hex);
-    if (rgb) token.fgRGB = rgb;
-  }
-  if (token.bg && !token.bgRGB) {
-    const rgb = tryHexToRgb(token.bg);
-    if (rgb) token.bgRGB = rgb;
+  const fgRGB = tryHexToRgb(token.hex);
+  if (fgRGB) token.fgRGB = fgRGB;
+  else delete token.fgRGB;
+
+  if (token.bg) {
+    const bgRGB = tryHexToRgb(token.bg);
+    if (bgRGB) token.bgRGB = bgRGB;
+    else delete token.bgRGB;
+  } else {
+    delete token.bgRGB;
   }
   return token;
 }

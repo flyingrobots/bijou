@@ -324,8 +324,11 @@ function resolvePreferenceRowBgRGB(
   ctx: ReturnType<typeof resolveCtx>,
   theme: PreferenceListTheme | undefined,
 ): readonly [number, number, number] | undefined {
-  return theme?.selectedRowBgToken?.bgRGB
-    ?? ctx?.surface('elevated').bgRGB
+  if (theme?.selectedRowBgToken != null) {
+    return theme.selectedRowBgToken.bgRGB
+      ?? colorRgb(theme.selectedRowBgToken.bg ?? theme.selectedRowBgToken.hex);
+  }
+  return ctx?.surface('elevated').bgRGB
     ?? ctx?.surface('secondary').bgRGB
     ?? ctx?.surface('muted').bgRGB;
 }
@@ -338,25 +341,33 @@ function resolvePreferenceValueStyle(
   if (row.kind === 'toggle' && row.checked === true) {
     return {
       fg: theme?.toggleOnToken?.hex ?? ctx?.semantic('accent').hex,
-      fgRGB: theme?.toggleOnToken?.fgRGB ?? ctx?.semantic('accent').fgRGB,
+      fgRGB: theme?.toggleOnToken?.fgRGB
+        ?? colorRgb(theme?.toggleOnToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
     };
   }
   if (row.kind === 'toggle' && row.checked === false) {
     return {
       fg: theme?.toggleOffToken?.hex ?? ctx?.semantic('muted').hex,
-      fgRGB: theme?.toggleOffToken?.fgRGB ?? ctx?.semantic('muted').fgRGB,
+      fgRGB: theme?.toggleOffToken?.fgRGB
+        ?? colorRgb(theme?.toggleOffToken?.hex)
+        ?? ctx?.semantic('muted').fgRGB,
     };
   }
   if (row.kind === 'choice') {
     return {
       fg: theme?.choiceToken?.hex ?? ctx?.semantic('accent').hex,
-      fgRGB: theme?.choiceToken?.fgRGB ?? ctx?.semantic('accent').fgRGB,
+      fgRGB: theme?.choiceToken?.fgRGB
+        ?? colorRgb(theme?.choiceToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
     };
   }
   if (row.kind === 'info' || row.kind === 'action') {
     return {
       fg: theme?.infoToken?.hex ?? ctx?.semantic('primary').hex,
-      fgRGB: theme?.infoToken?.fgRGB ?? ctx?.semantic('primary').fgRGB,
+      fgRGB: theme?.infoToken?.fgRGB
+        ?? colorRgb(theme?.infoToken?.hex)
+        ?? ctx?.semantic('primary').fgRGB,
     };
   }
   if (ctx == null) return {};

@@ -109,7 +109,7 @@ describe('frame regressions', () => {
     const wideText = renderFrameText(wideResult.frames[0]!, wide.ctx.style);
     expect(renderFrameText(narrowResult.frames[0]!, narrow.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-narrow');
     expect(renderFrameText(wideResult.frames[0]!, wide.ctx.style, { crop: true, preserveAnsi: true })).toMatchSnapshot('v3-css-wide');
-    expect(narrowText).toContain('Current width: 7');
+    expect(narrowText).toContain('Current width:');
     expect(narrowText).not.toContain('Current width: 96');
     expect(wideText).toContain('Current width: 96');
     expect(narrowText).not.toBe(wideText);

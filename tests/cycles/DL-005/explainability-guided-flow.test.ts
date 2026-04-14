@@ -50,8 +50,8 @@ describe('DL-005 inspector and guided-flow rhythm cycle', () => {
     expect(whyIndex).toBeGreaterThan(0);
     expect(evidenceIndex).toBeGreaterThan(whyIndex + 1);
     expect(nextIndex).toBeGreaterThan(evidenceIndex + 2);
-    expect(rendered).toContain('- Users cannot tell which pane owns input.');
-    expect(rendered).toContain('- Settings copy competes with primary action labels.');
+    expect(rendered).toContain('1. Users cannot tell which pane owns input.');
+    expect(rendered).toContain('2. Settings copy competes with primary action labels.');
     expect(rendered).toContain('Human review is required before enabling this flow by default.');
   });
 
