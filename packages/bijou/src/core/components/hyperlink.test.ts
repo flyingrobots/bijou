@@ -69,4 +69,10 @@ describe('hyperlink', () => {
     const result = hyperlink('flyingrobots/bijou', 'https://github.com/flyingrobots/bijou', { ctx });
     expect(stripAnsi(result)).toBe('flyingrobots/bijou');
   });
+
+  it('sanitizes control sequences in both the visible text and target url', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = hyperlink('bi\x1b[2Jjou', 'https://example.com\x1b]8;;evil\x07', { ctx });
+    expect(result).toBe('\x1b]8;;https://example.com\x1b\\bijou\x1b]8;;\x1b\\');
+  });
 });

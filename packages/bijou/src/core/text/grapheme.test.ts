@@ -5,6 +5,7 @@ import {
   graphemeClusterWidth,
   graphemeWidth,
   sanitizeTerminalText,
+  sanitizePlainTerminalText,
 } from './grapheme.js';
 
 describe('isWideChar', () => {
@@ -211,5 +212,19 @@ describe('sanitizeTerminalText', () => {
     const linked = '\x1b]8;;https://example.com\x1b\\bijou\x1b]8;;\x1b\\';
     expect(sanitizeTerminalText(linked)).toBe('bijou');
     expect(sanitizeTerminalText(linked, { allowHyperlinks: true })).toBe(linked);
+  });
+});
+
+describe('sanitizePlainTerminalText', () => {
+  it('flattens multiline untrusted text by default', () => {
+    expect(sanitizePlainTerminalText('A\nB\tC')).toBe('A B  C');
+  });
+
+  it('preserves newlines only when explicitly requested', () => {
+    expect(sanitizePlainTerminalText('A\r\nB\tC', { preserveNewlines: true })).toBe('A\nB  C');
+  });
+
+  it('drops mixed DCS and BEL payloads before plain-text cell writes', () => {
+    expect(sanitizePlainTerminalText('A\x1bPshadow\x1b\\B\u0007C')).toBe('ABC');
   });
 });

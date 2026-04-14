@@ -33,4 +33,10 @@ describe('badge', () => {
     const result = surfaceToString(badge('Note', { ctx }), ctx.style);
     expect(result).toBe(' Note ');
   });
+
+  it('sanitizes destructive terminal payloads before writing badge cells', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = surfaceToString(badge('A\x1b[2JB\u0007', { ctx }), ctx.style);
+    expect(result).toBe(' AB ');
+  });
 });

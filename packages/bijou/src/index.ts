@@ -188,6 +188,7 @@ export {
   graphemeClusterWidth,
   graphemeWidth,
   sanitizeTerminalText,
+  sanitizePlainTerminalText,
   prepareWrappedText,
   wrapPreparedTextToWidth,
   clipToWidth,

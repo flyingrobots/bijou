@@ -2,6 +2,7 @@ import { createSurface, isPackedSurface, type Surface, type PackedSurface } from
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { sanitizeNonNegativeInt } from '../numeric.js';
 import { colorRgb } from '../theme/color.js';
+import { sanitizePlainTerminalText } from '../text/index.js';
 import type { SeparatorOptions } from './separator.js';
 import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 import { encodeModifiers } from '../render/packed-cell.js';
@@ -11,7 +12,7 @@ import { encodeModifiers } from '../render/packed-cell.js';
  */
 export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  const label = options.label ?? '';
+  const label = sanitizePlainTerminalText(options.label ?? '');
   const token = options.borderToken ?? ctx?.border('muted');
   const borderStyle = tokenToCellStyle(token);
   const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `, 'separatorSurface label') : [];

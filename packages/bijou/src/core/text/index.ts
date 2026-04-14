@@ -12,6 +12,7 @@ export {
   graphemeClusterWidth,
   graphemeWidth,
   sanitizeTerminalText,
+  sanitizePlainTerminalText,
   ANSI_CONTROL_SEQUENCE_RE,
   ANSI_OSC8_RE,
   ANSI_SGR_RE,

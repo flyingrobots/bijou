@@ -1,7 +1,7 @@
 import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { colorRgb } from '../theme/color.js';
-import { graphemeClusterWidth, segmentGraphemes } from '../text/grapheme.js';
+import { graphemeClusterWidth, sanitizePlainTerminalText, segmentGraphemes } from '../text/grapheme.js';
 import { encodeModifiers } from '../render/packed-cell.js';
 
 export type CellTextStyle = Pick<Cell, 'fg' | 'bg' | 'fgRGB' | 'bgRGB' | 'modifiers'>;
@@ -43,8 +43,8 @@ export interface SurfaceTextSegment {
 // Dingbats (they're Narrow per Unicode East Asian Width).
 const SURFACE_NARROW_OVERRIDES = new Set<string>();
 
-export function segmentSurfaceText(text: string, purpose: string = 'Surface text'): string[] {
-  const graphemes = segmentGraphemes(text ?? '');
+function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
+  const graphemes = segmentGraphemes(text);
   const wide = graphemes.find(
     (grapheme) => graphemeClusterWidth(grapheme) !== 1 && !SURFACE_NARROW_OVERRIDES.has(grapheme),
   );
@@ -52,6 +52,17 @@ export function segmentSurfaceText(text: string, purpose: string = 'Surface text
     throw new Error(`${purpose} does not yet support wide graphemes like "${wide}" in surface rendering.`);
   }
   return graphemes;
+}
+
+/**
+ * Plain surface-text boundary.
+ *
+ * This sanitizes untrusted terminal control sequences before segmenting visible
+ * graphemes for cell writes. Callers that intentionally preserve ANSI styling
+ * should use `parseAnsiToSurface()` instead.
+ */
+export function segmentSurfaceText(text: string, purpose: string = 'Surface text'): string[] {
+  return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text ?? ''), purpose);
 }
 
 export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
@@ -70,9 +81,9 @@ export function tokenToCellStyle(token: TokenValue | undefined): CellTextStyle {
 }
 
 export function createTextSurface(text: string, style: CellTextStyle = {}): Surface {
-  const safeText = text ?? '';
-  const lines = safeText.split(/\r?\n/);
-  const lineGraphemes = lines.map((line) => segmentSurfaceText(line, 'createTextSurface'));
+  const safeText = sanitizePlainTerminalText(text ?? '', { preserveNewlines: true });
+  const lines = safeText.split('\n');
+  const lineGraphemes = lines.map((line) => segmentSanitizedSurfaceText(line, 'createTextSurface'));
   const width = lineGraphemes.reduce((max, graphemes) => Math.max(max, graphemes.length), 0);
   const height = Math.max(1, lines.length);
   const surface = createSurface(width, height);

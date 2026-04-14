@@ -338,15 +338,39 @@ describe('surface-first primitives', () => {
     });
   });
 
+  it('createTextSurface strips destructive terminal escapes before writing cells', () => {
+    const surface = createTextSurface('A\x1b[2JB\u0007');
+
+    expect(surface.width).toBe(2);
+    expect(surface.get(0, 0).char).toBe('A');
+    expect(surface.get(1, 0).char).toBe('B');
+  });
+
   it('separatorSurface rejects wide labels until surface wide-cell support exists', () => {
     const ctx = createTestContext({ mode: 'interactive' });
 
     expect(() => separatorSurface({ label: '漢', width: 8, ctx })).toThrow(/does not yet support wide graphemes/);
   });
 
+  it('separatorSurface sanitizes destructive control sequences in labels', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const rendered = surfaceToString(separatorSurface({ label: 'Te\x1b[2Jst', width: 12, ctx }), ctx.style);
+
+    expect(rendered).not.toContain('\x1b[2J');
+    expect(stripAnsi(rendered)).toContain(' Test ');
+  });
+
   it('boxSurface rejects wide text until surface wide-cell support exists', () => {
     const ctx = createTestContext({ mode: 'interactive' });
 
     expect(() => boxSurface('漢', { ctx })).toThrow(/does not yet support wide graphemes/);
+  });
+
+  it('boxSurface sanitizes destructive control sequences in titles', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const rendered = surfaceToString(boxSurface('Hi', { title: 'Ti\x1b[2Jtle', width: 12, ctx }), ctx.style);
+
+    expect(rendered).not.toContain('\x1b[2J');
+    expect(stripAnsi(rendered)).toContain('Title');
   });
 });

@@ -2,10 +2,11 @@ import { createSurface, isPackedSurface, type Surface, type Cell } from '../../p
 import type { BaseStatusKey } from '../theme/tokens.js';
 import { colorRgb } from '../theme/color.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import { segmentGraphemes } from '../text/grapheme.js';
+import { graphemeWidth, sanitizePlainTerminalText } from '../text/index.js';
 import type { BijouNodeOptions } from './types.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { encodeModifiers } from '../render/packed-cell.js';
+import { segmentSurfaceText } from './surface-text.js';
 
 /** Badge color variant — any status key, plus `'accent'` and `'primary'`. */
 export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
@@ -28,16 +29,17 @@ export interface BadgeOptions extends BijouNodeOptions {
 export function badge(text: string, options: BadgeOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const variant = options.variant ?? 'info';
-  
-  const paddedText = ` ${text} `;
-  const graphemes = segmentGraphemes(paddedText);
+
+  const safeText = sanitizePlainTerminalText(text ?? '');
+  const paddedText = ` ${safeText} `;
+  const graphemes = segmentSurfaceText(paddedText, 'badge');
   const width = graphemes.length;
   const surface = createSurface(width, 1);
 
   if (!ctx || ctx.mode === 'pipe' || ctx.mode === 'accessible') {
     // Basic text output for non-rich modes
-    const char = ctx?.mode === 'pipe' ? `[${text}]` : paddedText;
-    return stringToSurface(char, char.length, 1);
+    const char = ctx?.mode === 'pipe' ? `[${safeText}]` : paddedText;
+    return stringToSurface(char, graphemeWidth(char), 1);
   }
 
   // Resolve global CSS styles
