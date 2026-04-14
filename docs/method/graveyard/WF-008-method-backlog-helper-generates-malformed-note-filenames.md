@@ -1,10 +1,16 @@
 ---
-title: "WF-008 — METHOD backlog helper generates malformed note filenames"
+title: WF-008 — METHOD backlog helper generates malformed note filenames
 legend: WF
-lane: bad-code
+lane: graveyard
 ---
 
 # WF-008 — METHOD backlog helper generates malformed note filenames
+
+## Disposition
+
+Out of scope for Bijou. The malformed filename generation behavior belongs to the METHOD tooling in ~/git/method, not to this repository's product or workflow backlog.
+
+## Original Proposal
 
 The METHOD backlog creation helper currently emits malformed filenames like `DX_dx-022-layout-inspector-overlay.md` and `DF_df-028-story-capture-matrix.md` instead of the repo's canonical `DX-022-...` / `DF-028-...` pattern.
 
