@@ -1,7 +1,7 @@
 ---
 title: DX-028 — Align front-door docs with repo truth
 legend: DX
-lane: graveyard
+lane: retro
 ---
 
 # DX-028 — Align front-door docs with repo truth

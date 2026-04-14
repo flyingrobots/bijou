@@ -1,7 +1,7 @@
 ---
 title: RE-026 — Drain runtime commands before shutdown
 legend: RE
-lane: graveyard
+lane: retro
 ---
 
 # RE-026 — Drain runtime commands before shutdown
