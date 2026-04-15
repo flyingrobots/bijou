@@ -210,4 +210,4 @@ That drift is acceptable for LX-008 because the point of the cycle was to prove 
 
 Spawned:
 
-- [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../BACKLOG/LX-009-localize-shell-help-notification-and-directional-surfaces.md)
+- [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../method/graveyard/legacy-backlog/LX-009-localize-shell-help-notification-and-directional-surfaces.md)

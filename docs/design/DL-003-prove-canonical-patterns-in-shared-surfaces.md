@@ -143,4 +143,4 @@ This cycle intentionally proved the pattern language in two shared collection su
 
 Spawned:
 
-- [DL-004 — Prove Drawer Rhythm and Notice Rows](../BACKLOG/DL-004-prove-drawer-rhythm-and-notice-rows.md)
+- [DL-004 — Prove Drawer Rhythm and Notice Rows](../method/graveyard/legacy-backlog/DL-004-prove-drawer-rhythm-and-notice-rows.md)

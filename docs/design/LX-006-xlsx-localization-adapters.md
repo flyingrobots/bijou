@@ -185,4 +185,4 @@ That work did **not** land here, and that is correct. LX-006 proved the richer s
 
 Spawned:
 
-- [LX-007 — Service-Oriented Localization Adapters](../BACKLOG/LX-007-service-oriented-localization-adapters.md)
+- [LX-007 — Service-Oriented Localization Adapters](../method/graveyard/legacy-backlog/LX-007-service-oriented-localization-adapters.md)

@@ -123,7 +123,7 @@ not hard-code LTR-only assumptions.
 The DOGFOOD docs-site shape must be explicit in repo artifacts:
 
 - this cycle doc
-- release blocker backlog files in `docs/BACKLOG/v4.1.0/`
+- release blocker backlog files in `docs/method/graveyard/legacy-backlog/v4.1.0/`
 - signposts such as `PLAN.md`, `BEARING.md`, and `release.md`
 
 Agents should not have to infer from chat memory that DOGFOOD is
@@ -232,7 +232,7 @@ This cycle should spawn three explicit `4.1.0` blockers:
 Under `tests/cycles/DF-021/`:
 
 - the cycle doc exists and names the missing docs-site sections
-- a `docs/BACKLOG/v4.1.0/` lane exists
+- a `docs/method/graveyard/legacy-backlog/v4.1.0/` lane exists
 - the three blocker items exist in that lane
 - `PLAN.md`, `BEARING.md`, and `release.md` acknowledge reopened
   `4.1.0` blockers around DOGFOOD scope

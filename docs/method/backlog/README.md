@@ -22,9 +22,3 @@ shaped, or still waiting to be pulled into a cycle.
 
 - [`../retro/`](../retro/README.md) — finished ideas and completed lineage
 - [`../graveyard/`](../graveyard/README.md) — superseded or abandoned ideas
-
-## Legacy Archive
-
-The older [`docs/BACKLOG/`](../../BACKLOG/README.md) tree remains only as
-historical and compatibility archive for pre-METHOD backlog notes. Do not
-add new live queue work there.

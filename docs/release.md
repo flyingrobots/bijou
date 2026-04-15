@@ -80,7 +80,7 @@ It closes the downstream background-fill regression, extends that fix to
 the stock shell header/footer chrome, adds opt-in frame-owned shell
 theme cycling for `createFramedApp()`, and makes the stock quit dialog
 accept uppercase `Y` / `N`. The broader engineering focus after that
-release remains DOGFOOD story quality, i18n catalog loader work, MCP
+release remains DOGFOOD story quality, localization ergonomics, MCP
 interactive docs, and layout/viewport formalization.
 
 ### Lock-step Versioned Units

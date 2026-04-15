@@ -18,8 +18,6 @@ Bijou now tracks work through:
   - active and landed cycle docs
 - [`docs/method/backlog/`](./method/backlog/README.md)
   - canonical live backlog lanes and shaped release lanes
-- [`docs/BACKLOG/`](./BACKLOG/README.md)
-  - legacy archive and compatibility surface for pre-METHOD backlog notes
 - [`docs/BEARING.md`](./BEARING.md)
   - current direction and tensions
 - [`docs/VISION.md`](./VISION.md)

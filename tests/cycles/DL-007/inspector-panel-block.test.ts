@@ -80,7 +80,7 @@ describe('DL-007 inspector panel block cycle', () => {
     expect(text).toContain('ops:ops-summary');
   });
 
-  it('spawns the next design-language backlog item', () => {
-    expect(existsRepoPath('docs/BACKLOG/DL-008-promote-guided-flow-block.md')).toBe(true);
+  it('records the next design-language note as landed lineage', () => {
+    expect(existsRepoPath('docs/method/retro/DL_008-promote-guided-flow-block.md')).toBe(true);
   });
 });

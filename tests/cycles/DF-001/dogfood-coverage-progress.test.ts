@@ -126,7 +126,7 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(token.hex).toBe('#000000');
   });
 
-  it('spawns the next DOGFOOD backlog item', () => {
-    expect(existsRepoPath('docs/BACKLOG/DF-002-expand-dogfood-component-family-coverage.md')).toBe(true);
+  it('records the next DOGFOOD item as historical lineage', () => {
+    expect(existsRepoPath('docs/method/retro/DF_002-expand-dogfood-component-family-coverage.md')).toBe(true);
   });
 });

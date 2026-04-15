@@ -34,6 +34,29 @@ const runtime = await createI18nRuntimeAsync({
 });
 ```
 
+The same loader seam also supports file-backed locale bundles through
+`@flyingrobots/bijou-i18n-tools-node`:
+
+```ts
+import { createI18nRuntimeAsync } from '@flyingrobots/bijou-i18n';
+import { createCatalogBundleFileLoader } from '@flyingrobots/bijou-i18n-tools-node';
+
+const runtime = await createI18nRuntimeAsync({
+  locale: 'fr',
+  direction: 'ltr',
+  loader: createCatalogBundleFileLoader({
+    resolvePath: (locale) => `./i18n/${locale}.json`,
+  }),
+});
+```
+
+Once created, the runtime can preload and activate locales explicitly:
+
+```ts
+await runtime.preloadLocale('de');
+await runtime.setLocale('de');
+```
+
 ## Documentation
 
 See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

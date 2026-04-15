@@ -206,4 +206,4 @@ Under `packages/bijou-i18n/src/`:
 
 ### Debt spawned
 
-- [LX-002 — bijou-i18n Tools Package](../BACKLOG/LX-002-bijou-i18n-tools-package.md)
+- [LX-002 — bijou-i18n Tools Package](../method/graveyard/legacy-backlog/LX-002-bijou-i18n-tools-package.md)

@@ -12,7 +12,7 @@ function read(relativePath: string): string {
 describe('WF-001 workflow adoption', () => {
   it('establishes the new planning directories and canonical workflow doc', () => {
     expect(existsSync(resolve(ROOT, 'docs/WORKFLOW.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/BACKLOG/README.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/method/backlog/README.md'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'docs/design/README.md'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'docs/legends/README.md'))).toBe(true);
     expect(existsSync(resolve(ROOT, 'docs/invariants/README.md'))).toBe(true);
@@ -50,7 +50,7 @@ describe('WF-001 workflow adoption', () => {
     expect(cycle).toContain('Retrospective');
 
     expect(existsSync(resolve(ROOT, 'docs/design/LX-001-bijou-i18n-runtime-package.md'))).toBe(true);
-    expect(existsSync(resolve(ROOT, 'docs/BACKLOG/WF-002-migrate-legacy-planning-artifacts.md'))).toBe(true);
+    expect(existsSync(resolve(ROOT, 'docs/method/retro/WF_002-migrate-legacy-planning-artifacts.md'))).toBe(true);
   });
 
   it('freezes new spec-style planning work and removes the fresh i18n spec pair', () => {

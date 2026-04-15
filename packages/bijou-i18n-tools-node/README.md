@@ -30,6 +30,9 @@ const runtime = await createI18nRuntimeAsync({
 });
 ```
 
+That gives Bijou a built-in Node file-loader path without coupling the
+core runtime to filesystem APIs directly.
+
 ## Documentation
 
 See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

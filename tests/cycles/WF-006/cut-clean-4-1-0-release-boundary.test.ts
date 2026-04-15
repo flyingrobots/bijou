@@ -9,9 +9,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
 
   it('keeps WF-006 landed even after the temporary version-target lane is pruned again', () => {
     expect(existsRepoPath('docs/BACKLOG/v4.1.0/README.md')).toBe(false);
-
-    const backlogReadme = readRepoFile('docs/BACKLOG/README.md');
-    // v4.1.0 lane was temporary and pruned.
+    expect(existsRepoPath('docs/BACKLOG')).toBe(false);
     expect(existsRepoPath('docs/BACKLOG/v4.1.0')).toBe(false);
   });
 

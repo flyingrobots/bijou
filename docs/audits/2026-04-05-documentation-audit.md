@@ -56,7 +56,7 @@ The scaffolded path (`npm create bijou-tui-app@latest`) handles
 this automatically, but anyone integrating into an existing project
 hits this wall. The error message doesn't explain how to fix it.
 
-**Backlog:** [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md)
+**Backlog:** [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md)
 
 ---
 
@@ -110,7 +110,7 @@ The perf-gradient demo proved this gap — we could not instrument the
 pipeline from outside because the documentation didn't explain the
 boundaries.
 
-**Backlog:** [DX-008](../BACKLOG/inbox/DX-008-render-pipeline-guide.md)
+**Backlog:** [DX-008](../method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md)
 
 ---
 
@@ -134,9 +134,9 @@ rewrite situation — it's a gap-filling exercise.
 6. Fix the root README interactive example to include context init
 
 **Backlog (future cycles):**
-- [DX-008](../BACKLOG/inbox/DX-008-render-pipeline-guide.md) —
+- [DX-008](../method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md) —
   render pipeline guide
-- [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md) —
+- [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md) —
   context auto-init and error messages
 
 ---

@@ -69,7 +69,7 @@ describe('DL-008 guided-flow block cycle', () => {
     expect(stories).toContain('Prepare the staging rollout');
   });
 
-  it('points to the next design-language backlog item', () => {
-    expect(existsRepoPath('docs/BACKLOG/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md')).toBe(true);
+  it('points to the next design-language closure', () => {
+    expect(existsRepoPath('docs/method/retro/DL-009-formalize-layout-and-viewport-rules.md')).toBe(true);
   });
 });

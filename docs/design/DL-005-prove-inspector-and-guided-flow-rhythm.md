@@ -148,4 +148,4 @@ Trying to prove guided-flow and inspector language in the same cycle would have 
 
 Spawned:
 
-- [DL-006 — Prove Inspector Panel Rhythm](../BACKLOG/DL-006-prove-inspector-panel-rhythm.md)
+- [DL-006 — Prove Inspector Panel Rhythm](../method/graveyard/legacy-backlog/DL-006-prove-inspector-panel-rhythm.md)

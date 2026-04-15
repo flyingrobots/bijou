@@ -54,7 +54,8 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 - latest completed cycle: [LX-008 — Localize Shell Chrome and DOGFOOD](../design/LX-008-localize-shell-chrome-and-dogfood.md)
 - completed follow-on lineage:
+  - [LX-010 — Built-in i18n Catalog Loader](../method/retro/LX-010-built-in-i18n-catalog-loader.md)
   - [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../method/retro/LX_009-localize-shell-help-notification-and-directional-surfaces.md)
   - [LX-007 — Service-Oriented Localization Adapters](../method/retro/LX_007-service-oriented-localization-adapters.md)
 - live backlog:
-  - [LX-010 — Built-in i18n Catalog Loader](../method/backlog/up-next/LX-010-built-in-i18n-catalog-loader.md)
+  - none right now; localization queue work is between cycles

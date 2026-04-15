@@ -50,7 +50,7 @@ relying on branch order inside the shell. Agents benefit even more:
 runtime ownership is increasingly inspectable instead of implicit.
 
 The remaining follow-on is
-[RE-007](../../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md),
+[RE-007](../../method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md),
 which is about moving more of the framed shell onto those explicit
 seams and is intentionally deferred until after `v4.1.0`.
 

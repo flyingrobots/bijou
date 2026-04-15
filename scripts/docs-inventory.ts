@@ -45,7 +45,6 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/ROADMAP.md',
       'docs/COMPLETED.md',
       'docs/GRAVEYARD.md',
-      'docs/BACKLOG/README.md',
       'docs/specs/README.md',
       'docs/archive/README.md',
     ],

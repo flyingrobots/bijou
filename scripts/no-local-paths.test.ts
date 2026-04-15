@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -58,6 +58,9 @@ describe('repo hygiene', () => {
       }
 
       const absolutePath = resolve(ROOT, relativePath);
+      if (!existsSync(absolutePath)) {
+        continue;
+      }
       const buffer = readFileSync(absolutePath);
       if (isBinaryLike(relativePath, buffer)) {
         continue;

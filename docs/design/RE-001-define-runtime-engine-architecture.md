@@ -9,7 +9,7 @@ Legend:
 Depends on:
 
 - [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](./HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
-- [DL-009 — Formalize Layout and Viewport Rules](../BACKLOG/up-next/DL-009-formalize-layout-and-viewport-rules.md)
+- [DL-009 — Formalize Layout and Viewport Rules](../method/graveyard/legacy-backlog/up-next/DL-009-formalize-layout-and-viewport-rules.md)
 
 ## Why this cycle exists
 
@@ -166,4 +166,4 @@ Follow-on:
 - [RE-004 — Route Input Through Layouts and Layer Bubbling](./RE-004-route-input-through-layouts-and-layer-bubbling.md)
 - [RE-005 — Buffer Commands and Effects Separately](./RE-005-buffer-commands-and-effects-separately.md)
 - [RE-006 — Formalize Component Layout and Interaction Contracts](./RE-006-formalize-component-layout-and-interaction-contracts.md)
-- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+- [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)

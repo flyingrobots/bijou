@@ -181,4 +181,4 @@ larger shell workflow subsystem.
 
 Next:
 
-- [DL-009 — Formalize Layout and Viewport Rules](../BACKLOG/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md)
+- [DL-009 — Formalize Layout and Viewport Rules](../method/graveyard/legacy-backlog/v5.0.0/DL-009-formalize-layout-and-viewport-rules.md)

@@ -7,7 +7,7 @@ Legend:
 Depends on:
 
 - [DF-003 — Enforce DOGFOOD Coverage Floor](./DF-003-enforce-dogfood-coverage-floor.md)
-- [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+- [DF-002 — Expand DOGFOOD Component Family Coverage](../method/graveyard/legacy-backlog/DF-002-expand-dogfood-component-family-coverage.md)
 
 ## Why this cycle exists
 

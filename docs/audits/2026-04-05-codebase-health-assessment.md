@@ -31,7 +31,7 @@ The scaffolding path (`npm create bijou-tui-app@latest`) handles this
 implicitly, but anyone integrating bijou into an existing project hits
 this wall.
 
-**Backlog:** [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md)
+**Backlog:** [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md)
 
 ### 1.2. Principle of Least Astonishment — Frame key priority
 
@@ -45,7 +45,7 @@ keys to be primary.
 There is no warning when a page binding collides with a frame binding.
 The key is silently consumed by the frame.
 
-**Backlog:** [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md)
+**Backlog:** [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md)
 
 ### 1.3. Error Usability — Missing context
 
@@ -66,7 +66,7 @@ of your entry file, or pass an explicit ctx to run().
 See: https://github.com/flyingrobots/bijou#quick-start
 ```
 
-**Backlog:** [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md)
+**Backlog:** [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md)
 
 ---
 
@@ -89,7 +89,7 @@ Other documentation is excellent:
 - Multiple entry points (quick start, architecture, design system)
 - `docs/README.md` provides explicit audit rules
 
-**Backlog:** [DX-008](../BACKLOG/inbox/DX-008-render-pipeline-guide.md)
+**Backlog:** [DX-008](../method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md)
 
 ### 2.2. Customization — 8/10
 
@@ -104,7 +104,7 @@ but requires manual message wiring that's easy to get wrong. There is
 no type-level guarantee that all sub-app messages are mapped, and
 forgotten mappings cause silent message drops.
 
-**Backlog:** [DX-010](../BACKLOG/cool-ideas/DX-010-typed-subapp-adapter.md)
+**Backlog:** [DX-010](../method/graveyard/legacy-backlog/cool-ideas/DX-010-typed-subapp-adapter.md)
 
 ---
 
@@ -124,7 +124,7 @@ the same closure. It now has:
 - A circular import with `app-frame-types.ts`
 - No individual function can be unit-tested
 
-**Backlog:** [DX-007](../BACKLOG/bad-code/DX-007-decompose-app-frame-mega-closure.md)
+**Backlog:** [DX-007](../method/graveyard/legacy-backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md)
 
 ### 3.2. Abstraction Violation — Circular import
 
@@ -133,7 +133,7 @@ the same closure. It now has:
 resolves this for type-only imports, but it couples the type layer to
 the implementation file and makes refactoring dangerous.
 
-**Backlog:** [DX-007](../BACKLOG/bad-code/DX-007-decompose-app-frame-mega-closure.md)
+**Backlog:** [DX-007](../method/graveyard/legacy-backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md)
 (addressed as part of the decomposition)
 
 ### 3.3. Testability Barrier — The mega-closure
@@ -151,7 +151,7 @@ This makes tests:
 - **Fragile** — a bug in settings focus logic requires debugging
   through the routing + command buffer + handler table chain
 
-**Backlog:** [DX-007](../BACKLOG/bad-code/DX-007-decompose-app-frame-mega-closure.md)
+**Backlog:** [DX-007](../method/graveyard/legacy-backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md)
 
 ---
 
@@ -178,7 +178,7 @@ The caches are also module-scoped, not instance-scoped. If two
 `createFramedApp` instances existed (unlikely but possible), they
 would share the same mutable cache.
 
-**Backlog:** [RE-010](../BACKLOG/bad-code/RE-010-mutable-surface-caches.md)
+**Backlog:** [RE-010](../method/graveyard/legacy-backlog/bad-code/RE-010-mutable-surface-caches.md)
 
 ### 4.2. Efficiency Sink — renderDiff string concatenation
 
@@ -190,7 +190,7 @@ From the perf-gradient findings: the differ accounts for ~17ms of a
 ~20ms frame at 191×48 with unique-per-cell colors. String
 concatenation in the inner loop contributes to this cost.
 
-**Backlog:** [RE-009](../BACKLOG/bad-code/RE-009-differ-string-concatenation.md)
+**Backlog:** [RE-009](../method/graveyard/legacy-backlog/bad-code/RE-009-differ-string-concatenation.md)
 
 ### 4.3. Dependency Health — Clean
 
@@ -290,31 +290,31 @@ becoming the kind of file that nobody wants to touch.
 
 | ID | Title | Severity |
 |----|-------|----------|
-| [DX-007](../BACKLOG/bad-code/DX-007-decompose-app-frame-mega-closure.md) | Decompose app-frame.ts mega-closure | Critical |
-| [RE-009](../BACKLOG/bad-code/RE-009-differ-string-concatenation.md) | Fix O(n²) string concatenation in renderDiff | Medium |
-| [RE-010](../BACKLOG/bad-code/RE-010-mutable-surface-caches.md) | Scope mutable surface caches | Medium |
+| [DX-007](../method/graveyard/legacy-backlog/bad-code/DX-007-decompose-app-frame-mega-closure.md) | Decompose app-frame.ts mega-closure | Critical |
+| [RE-009](../method/graveyard/legacy-backlog/bad-code/RE-009-differ-string-concatenation.md) | Fix O(n²) string concatenation in renderDiff | Medium |
+| [RE-010](../method/graveyard/legacy-backlog/bad-code/RE-010-mutable-surface-caches.md) | Scope mutable surface caches | Medium |
 
 ### inbox/ (raw ideas to triage)
 
 | ID | Title |
 |----|-------|
-| [DX-008](../BACKLOG/inbox/DX-008-render-pipeline-guide.md) | Render pipeline documentation guide |
-| [DX-009](../BACKLOG/inbox/DX-009-context-auto-init-and-error-messages.md) | Context auto-init and actionable error messages |
-| [RE-011](../BACKLOG/inbox/RE-011-pipeline-per-frame-allocation.md) | Eliminate per-frame allocation in render pipeline |
+| [DX-008](../method/graveyard/legacy-backlog/inbox/DX-008-render-pipeline-guide.md) | Render pipeline documentation guide |
+| [DX-009](../method/graveyard/legacy-backlog/inbox/DX-009-context-auto-init-and-error-messages.md) | Context auto-init and actionable error messages |
+| [RE-011](../method/graveyard/legacy-backlog/inbox/RE-011-pipeline-per-frame-allocation.md) | Eliminate per-frame allocation in render pipeline |
 
 ### cool-ideas/
 
 | ID | Title |
 |----|-------|
-| [DX-010](../BACKLOG/cool-ideas/DX-010-typed-subapp-adapter.md) | Typed sub-app adapter factory |
-| [DX-011](../BACKLOG/cool-ideas/DX-011-key-collision-warnings.md) | Key collision warnings at registration time |
-| [RE-012](../BACKLOG/cool-ideas/RE-012-pipeline-observability-hooks.md) | Pipeline observability hooks (per-stage timing) |
-| [DX-012](../BACKLOG/cool-ideas/DX-012-render-path-naming-convention.md) | Document render-path naming convention (foo vs fooSurface) |
+| [DX-010](../method/graveyard/legacy-backlog/cool-ideas/DX-010-typed-subapp-adapter.md) | Typed sub-app adapter factory |
+| [DX-011](../method/graveyard/legacy-backlog/cool-ideas/DX-011-key-collision-warnings.md) | Key collision warnings at registration time |
+| [RE-012](../method/graveyard/legacy-backlog/cool-ideas/RE-012-pipeline-observability-hooks.md) | Pipeline observability hooks (per-stage timing) |
+| [DX-012](../method/graveyard/legacy-backlog/cool-ideas/DX-012-render-path-naming-convention.md) | Document render-path naming convention (foo vs fooSurface) |
 
 ### asap/ (already filed)
 
 | ID | Title |
 |----|-------|
-| [RE-008](../BACKLOG/asap/RE-008-byte-packed-surface-representation.md) | Byte-packed surface representation |
-| [LX-010](../BACKLOG/asap/LX-010-built-in-i18n-catalog-loader.md) | Built-in i18n catalog loader |
-| [DX-006](../BACKLOG/cool-ideas/DX-006-debug-performance-overlay-component.md) | Debug performance overlay component |
+| [RE-008](../method/graveyard/legacy-backlog/asap/RE-008-byte-packed-surface-representation.md) | Byte-packed surface representation |
+| [LX-010](../method/graveyard/legacy-backlog/asap/LX-010-built-in-i18n-catalog-loader.md) | Built-in i18n catalog loader |
+| [DX-006](../method/graveyard/legacy-backlog/cool-ideas/DX-006-debug-performance-overlay-component.md) | Debug performance overlay component |

@@ -154,4 +154,4 @@ This cycle stayed documentation-first on purpose. It names the canonical pattern
 
 Spawned:
 
-- [DL-003 — Prove Canonical Patterns in Shared Surfaces](../BACKLOG/DL-003-prove-canonical-patterns-in-shared-surfaces.md)
+- [DL-003 — Prove Canonical Patterns in Shared Surfaces](../method/graveyard/legacy-backlog/DL-003-prove-canonical-patterns-in-shared-surfaces.md)

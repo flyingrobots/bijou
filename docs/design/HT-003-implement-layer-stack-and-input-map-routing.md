@@ -134,4 +134,4 @@ What did not land:
 
 Follow-on:
 
-- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../BACKLOG/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)
+- [HT-004 — Promote Explicit Layer Objects and Richer Shell Introspection](../method/graveyard/legacy-backlog/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md)

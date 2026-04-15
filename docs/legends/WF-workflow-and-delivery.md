@@ -43,7 +43,7 @@ An agent can place docs, tests, and follow-on debt in the right location by read
 - current posture:
   - `4.4.1` is the current tagged release line
   - no version-target release lane is active right now
-  - the active engineering focus is docs-system tooling, i18n catalog loader, and post-v5 follow-on hardening
+  - the active engineering focus is docs-system tooling, localization ergonomics, and post-v5 follow-on hardening
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - latest docs-surface closure:
@@ -52,4 +52,3 @@ An agent can place docs, tests, and follow-on debt in the right location by read
   - [WF-002 — Migrate Legacy Planning Artifacts](../method/retro/WF_002-migrate-legacy-planning-artifacts.md)
 - canonical queue reminder:
   - live work belongs in [docs/method/backlog/](../method/backlog/README.md)
-  - `docs/BACKLOG/` remains compatibility/archive only

@@ -181,7 +181,7 @@ The relevant surfaces are the `RE` slices:
 - component layout and interaction contracts
 
 This does **not** mean the migration is complete. The repo still tracks
-[RE-007](../../BACKLOG/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
+[RE-007](../../method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 because some framed-shell behavior still needs to move more fully onto
 those seams.
 

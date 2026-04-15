@@ -1,8 +1,7 @@
 # v5.0.0 — Frame Owns the Pump
 
-Next major version. These items are still live shaping work and now belong
-to the canonical METHOD backlog instead of the legacy `docs/BACKLOG/`
-surface.
+Next major version. These items are still live shaping work in the
+canonical METHOD backlog.
 
 ## Shaped Scope
 

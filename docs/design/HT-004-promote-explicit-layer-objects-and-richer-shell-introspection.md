@@ -130,4 +130,4 @@ What did not land:
 
 Follow-on:
 
-- [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../BACKLOG/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)
+- [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../method/graveyard/legacy-backlog/HT-005-promote-page-provided-layer-registry-and-shell-control-projection.md)

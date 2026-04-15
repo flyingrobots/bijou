@@ -199,4 +199,4 @@ That is correct for this cycle. LX-004 proved the adapter surface with plain tex
 
 Spawned:
 
-- [LX-005 — Rich Spreadsheet and Filesystem Adapters](../BACKLOG/LX-005-rich-spreadsheet-and-filesystem-adapters.md)
+- [LX-005 — Rich Spreadsheet and Filesystem Adapters](../method/graveyard/legacy-backlog/LX-005-rich-spreadsheet-and-filesystem-adapters.md)
