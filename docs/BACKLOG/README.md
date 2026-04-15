@@ -27,6 +27,10 @@ If a legacy note is still active, give it a canonical METHOD copy and
 continue the work there. Keep the legacy file only for historical
 provenance or compatibility.
 
+Every legacy note in this archive now has a corresponding canonical METHOD
+placement under `docs/method/` so current work can be evaluated without
+treating this tree as the live queue.
+
 ## Legacy Lanes
 
 These subdirectories remain as archive views of older planning states:

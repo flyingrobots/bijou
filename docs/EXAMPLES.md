@@ -50,9 +50,10 @@ Keep these because they prove product-level behavior rather than isolated leaf r
 ### Remaining Leaf Examples
 
 Keep leaf examples when they are the clearest isolated explanation of
-a family or API seam not yet covered by DOGFOOD stories. See
-[DF-020](./method/backlog/up-next/DF_020-deepen-dogfood-story-depth-and-variant-quality.md)
-for the full list of examples blocked on DOGFOOD coverage.
+a family or API seam not yet covered by DOGFOOD stories. The remaining
+set in this file is the current reference for example retirements that
+still depend on deeper DOGFOOD teaching. The historical depth follow-on
+is [DF-020](./method/retro/DF-020-deepen-dogfood-story-depth-and-variant-quality.md).
 
 ## Cut Later
 

@@ -48,10 +48,15 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 
 ## Current cycle and backlog
 
-- latest completed cycles:
-  - [DX-001 — Type Framed App Messages and Updates End-to-End](../design/DX-001-type-framed-app-messages-and-updates-end-to-end.md)
-  - [DX-002 — Reconcile Cmd Typing With Cleanup and Effect Patterns](../design/DX-002-reconcile-cmd-typing-with-cleanup-and-effect-patterns.md)
-- live backlog:
-  - [DX-003 — Rationalize Table APIs and Public Table Types](../BACKLOG/DX-003-rationalize-table-apis-and-public-table-types.md)
-  - [DX-004 — Smooth Surface and String Composition Seams](../BACKLOG/DX-004-smooth-surface-and-string-composition-seams.md)
-  - [DX-005 — Polish Small Component and Import Ergonomics](../BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)
+- latest completed closures:
+  - [DX-028 — Align front-door docs with repo truth](../method/retro/DX-028-align-front-door-docs-with-repo-truth.md)
+  - [DX-020 — Layout Localization Pipeline Guide](../method/retro/DX-020-layout-localization-pipeline-guide.md)
+  - [DX-019 — Third-Party Theme Reactivity Hook](../method/retro/DX-019-third-party-theme-reactivity-hook.md)
+- current exploratory backlog:
+  - [DX-027 — Choose-Your-Lane Starter for README and DOGFOOD](../method/backlog/cool-ideas/DX-027-choose-your-lane-starter-for-readme-and-dogfood.md)
+  - [DX-026 — Mode-Lowering Linter](../method/backlog/cool-ideas/DX-026-mode-lowering-linter.md)
+  - [DX-025 — Component Metadata Contract](../method/backlog/cool-ideas/DX-025-component-metadata-contract.md)
+- historical backlog lineage:
+  - [DX-003 — Rationalize Table APIs and Public Table Types](../method/retro/DX_003-rationalize-table-apis-and-public-table-types.md)
+  - [DX-004 — Smooth Surface and String Composition Seams](../method/retro/DX_004-smooth-surface-and-string-composition-seams.md)
+  - [DX-005 — Polish Small Component and Import Ergonomics](../method/retro/DX_005-polish-small-component-and-import-ergonomics.md)

@@ -7,7 +7,7 @@ lane: graveyard
 
 ## Disposition
 
-Retired from `bad-code` on `release/v4.5.0` in commit `69291fa`. This branch fixed the concrete hot-path smell: packed surfaces now preserve `fgRGB` / `bgRGB` through reads and masked writes, first-party surface/TUI components prefer pre-parsed RGB over reparsing strings, and the string path is now much closer to a compatibility boundary than the internal default. The remaining deeper evolution is no longer an immediate defect; track further API-shaping work under `docs/method/backlog/cool-ideas/RE-019-theme-token-color-cache.md` and `docs/BACKLOG/v5.0.0/RE-020-typed-color-representation.md`.
+Retired from `bad-code` on `release/v4.5.0` in commit `69291fa`. This branch fixed the concrete hot-path smell: packed surfaces now preserve `fgRGB` / `bgRGB` through reads and masked writes, first-party surface/TUI components prefer pre-parsed RGB over reparsing strings, and the string path is now much closer to a compatibility boundary than the internal default. The remaining deeper evolution is no longer an immediate defect; track further API-shaping work under `docs/method/backlog/cool-ideas/RE-019-theme-token-color-cache.md` and `docs/method/retro/RE-020-typed-color-representation.md`.
 
 ## Original Proposal
 

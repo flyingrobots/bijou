@@ -35,5 +35,5 @@ Backlog spawned by the retrospective for DF-001.
 This file is kept as historical backlog lineage.
 
 It is not the current DOGFOOD queue. The direct follow-on
-[DF-020](../../BACKLOG/v4.5.0/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+[DF-020](./DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 already shipped in `v4.5.0`.
