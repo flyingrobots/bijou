@@ -1,7 +1,12 @@
 ---
-title: "RE-027 Generalize crash-mode auto-exit beyond TTY detection"
+title: RE-027 Generalize crash-mode auto-exit beyond TTY detection
 legend: RE
 lane: inbox
+priority: medium
+keywords:
+  - runtime
+  - crash-mode
+  - host-capabilities
 ---
 
 # RE-027 Generalize crash-mode auto-exit beyond TTY detection
