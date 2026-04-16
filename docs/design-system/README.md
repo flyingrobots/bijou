@@ -29,11 +29,12 @@ Use these docs when you need to answer:
 
 1. [Foundations](./foundations.md)
 2. [Theme Token Vocabulary](./theme-tokens.md)
-3. [Patterns](./patterns.md)
-4. [Blocks](./blocks.md)
-5. [Pointer and Mouse Policy](./pointer.md)
-6. [Component Families](./component-families.md)
-7. [Data Visualization Policy](./data-visualization.md)
+3. [Theme Authoring Guide](./theme-authoring.md)
+4. [Patterns](./patterns.md)
+5. [Blocks](./blocks.md)
+6. [Pointer and Mouse Policy](./pointer.md)
+7. [Component Families](./component-families.md)
+8. [Data Visualization Policy](./data-visualization.md)
 
 For the raw inventory and taxonomy work behind these docs, see [../archive/component-system-audit.md](../archive/component-system-audit.md).
 

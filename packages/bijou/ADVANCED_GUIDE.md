@@ -80,6 +80,7 @@ Read:
 
 - [GUIDE theme section](./GUIDE.md#themes)
 - [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md)
+- [Theme Authoring Guide](../../docs/design-system/theme-authoring.md)
 - [token graph spec](../../docs/specs/token-graph.spec.json)
 - [theme graph implementation](./src/core/theme/graph.ts)
 - [theme graph types](./src/core/theme/graph-types.ts)

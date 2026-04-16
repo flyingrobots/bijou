@@ -130,5 +130,8 @@ await recordDemoGif({
 | `BIJOU_THEME=./path.json` | Loads a custom DTCG theme file. |
 | `BIJOU_FPS=60` | Overrides the detected terminal refresh rate. |
 
+For the full custom-theme contract, starter JSON, and token-family guidance,
+read [Theme Authoring Guide](../../docs/design-system/theme-authoring.md).
+
 ---
 **The Node package bridges the pure TypeScript foundation to the physical terminal and the host OS.**

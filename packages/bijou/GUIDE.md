@@ -90,6 +90,10 @@ const success = ctx.status('success');
 For the canonical meaning of each token family and the first-party usage rules,
 read [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md).
 
+For a copy-paste starter theme, DTCG JSON shape, and the practical loading
+path for custom themes, read
+[Theme Authoring Guide](../../docs/design-system/theme-authoring.md).
+
 ## Custom Components
 
 Build mode-aware components using the `renderByMode` dispatcher:
