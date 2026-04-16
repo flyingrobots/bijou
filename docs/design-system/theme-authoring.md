@@ -250,6 +250,7 @@ Behavior:
 
 - `themeOverride` wins when it matches one of the provided entries
 - otherwise `BIJOU_THEME` can still select a named entry by id
+- otherwise, if `BIJOU_THEME` is set but does not resolve to a known preset, JSON theme, or named theme entry, the explicit `theme` fallback wins when provided
 - otherwise `themeMode` picks the initial theme
 - otherwise the first entry becomes the fallback
 
