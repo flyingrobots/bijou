@@ -19,6 +19,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `FrameModel.viewTimeMs`, `FrameModel.diffTimeMs`, and budget telemetry
   so shell-owned UI can read the frame's own bookkeeping.
 
+### 🐛 Bug Fixes
+
+- **Crash-mode auto-exit without keyboard TTY** — the interactive runtime
+  now exits fatal crash mode automatically after rendering the crash
+  surface when `stdin` is not a TTY, so scripted hosts and CI-style
+  environments no longer hang waiting for Enter after update/view/render
+  failures.
+- **Scoped Node I/O symlink hardening** — `scopedNodeIO()` now resolves
+  symlinked prefixes before enforcing the root boundary, rejecting
+  escaped file reads and write destinations that tunnel outside the
+  declared root through symlinked files or directories.
+
 ## [4.4.1] - 2026-04-11
 
 ### ✨ Features
