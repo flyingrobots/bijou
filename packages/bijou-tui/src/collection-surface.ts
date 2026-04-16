@@ -7,12 +7,19 @@ import {
   type CellMask,
   type Surface,
 } from '@flyingrobots/bijou';
-import { clipToWidth, sliceAnsi, visibleLength } from './viewport.js';
+import { clipToWidth, tokenizeAnsi, visibleLength } from './viewport.js';
 
 const PRESERVE_BG_MASK: CellMask = {
   ...FULL_MASK,
   bg: false,
 };
+const MARQUEE_CACHE_LIMIT = 128;
+const marqueeLineCache = new Map<string, CachedMarqueeLine>();
+
+interface CachedMarqueeLine {
+  readonly visibleWidth: number;
+  readonly cells: readonly string[];
+}
 
 function rowInsetForWidth(width: number): number {
   return width >= 3 ? 1 : 0;
@@ -100,10 +107,10 @@ function marqueeToWidth(
 ): string {
   if (width <= 0) return '';
 
-  const lineWidth = visibleLength(line);
-  if (lineWidth <= width) return clipToWidth(line, width);
+  const cached = getCachedMarqueeLine(line);
+  if (cached.visibleWidth <= width) return clipToWidth(line, width);
 
-  const overflow = lineWidth - width;
+  const overflow = cached.visibleWidth - width;
   const stepMs = Math.max(1, Math.floor(options.stepMs ?? 220));
   const startPauseSteps = Math.max(1, Math.round(Math.max(0, options.startDelayMs ?? 700) / stepMs));
   const endPauseSteps = Math.max(1, Math.round(Math.max(0, options.endDelayMs ?? 900) / stepMs));
@@ -124,11 +131,36 @@ function marqueeToWidth(
     offset = overflow - 1 - reverseIndex;
   }
 
-  return sliceAnsi(line, offset, offset + width);
+  return cached.cells.slice(offset, offset + width).join('');
 }
 
 function resolveSelectedRowBg(ctx: BijouContext | undefined): string | undefined {
   return ctx?.surface('elevated').bg
     ?? ctx?.surface('secondary').bg
     ?? ctx?.surface('muted').bg;
+}
+
+function getCachedMarqueeLine(line: string): CachedMarqueeLine {
+  const cached = marqueeLineCache.get(line);
+  if (cached != null) {
+    marqueeLineCache.delete(line);
+    marqueeLineCache.set(line, cached);
+    return cached;
+  }
+
+  const visibleWidth = visibleLength(line);
+  const next: CachedMarqueeLine = {
+    visibleWidth,
+    cells: tokenizeAnsi(line, visibleWidth),
+  };
+  marqueeLineCache.set(line, next);
+
+  if (marqueeLineCache.size > MARQUEE_CACHE_LIMIT) {
+    const oldestKey = marqueeLineCache.keys().next().value;
+    if (typeof oldestKey === 'string') {
+      marqueeLineCache.delete(oldestKey);
+    }
+  }
+
+  return next;
 }

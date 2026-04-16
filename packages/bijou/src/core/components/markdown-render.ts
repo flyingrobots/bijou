@@ -178,22 +178,52 @@ function fitMarkdownTableWidths(
     return Math.max(1, max);
   });
 
-  const fitted = [...desired];
+  const contentWidth = desired.reduce((sum, columnWidth) => sum + columnWidth, 0);
+  const targetContentWidth = Math.max(
+    columnCount,
+    width - (measureInteractiveTableWidth(desired) - contentWidth),
+  );
 
-  while (measureInteractiveTableWidth(fitted) > width) {
-    let widestIndex = -1;
-    let widestWidth = -1;
-    for (let index = 0; index < fitted.length; index++) {
-      if (fitted[index]! > 1 && fitted[index]! > widestWidth) {
-        widestIndex = index;
-        widestWidth = fitted[index]!;
-      }
-    }
-    if (widestIndex < 0) break;
-    fitted[widestIndex]!--;
+  if (contentWidth <= targetContentWidth) {
+    return desired;
   }
 
-  return fitted;
+  const shrinkable = desired.map((columnWidth) => columnWidth - 1);
+  const totalShrinkable = shrinkable.reduce((sum, columnWidth) => sum + columnWidth, 0);
+  const targetExtraWidth = targetContentWidth - columnCount;
+
+  if (totalShrinkable <= targetExtraWidth) {
+    return Array.from({ length: columnCount }, () => 1);
+  }
+
+  const scale = targetExtraWidth / totalShrinkable;
+  const fitted = desired.map((_columnWidth, index) => {
+    const exactExtra = shrinkable[index]! * scale;
+    return {
+      width: 1 + Math.floor(exactExtra),
+      remainder: exactExtra - Math.floor(exactExtra),
+    };
+  });
+
+  let usedContentWidth = fitted.reduce((sum, column) => sum + column.width, 0);
+  let remainderBudget = targetContentWidth - usedContentWidth;
+
+  if (remainderBudget > 0) {
+    const byRemainder = fitted
+      .map((column, index) => ({ index, remainder: column.remainder }))
+      .sort((left, right) => {
+        if (right.remainder !== left.remainder) return right.remainder - left.remainder;
+        return desired[right.index]! - desired[left.index]!;
+      });
+
+    for (const column of byRemainder) {
+      if (remainderBudget <= 0) break;
+      fitted[column.index]!.width++;
+      remainderBudget--;
+    }
+  }
+
+  return fitted.map((column) => column.width);
 }
 
 function visibleTextWidth(value: string): number {

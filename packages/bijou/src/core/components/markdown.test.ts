@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { markdown } from './markdown.js';
 import { createTestContext } from '../../adapters/test/index.js';
-import { stripAnsi } from '../text/grapheme.js';
+import { graphemeWidth, stripAnsi } from '../text/grapheme.js';
 
 function ctx(mode: 'interactive' | 'pipe' | 'accessible' = 'interactive', width = 80) {
   return createTestContext({ mode, runtime: { columns: width } });
@@ -158,6 +158,13 @@ describe('markdown()', () => {
       const result = markdown(source, { ctx: ctx('accessible') });
       expect(result).toContain('Row 1: Surface=README.md, Role=Public front door');
       expect(result).toContain('Row 2: Surface=GUIDE.md, Role=Fast path');
+    });
+
+    it('fits interactive markdown tables within the requested width', () => {
+      const result = markdown(source, { ctx: ctx(), width: 20 });
+      for (const line of result.split('\n')) {
+        expect(graphemeWidth(stripAnsi(line))).toBeLessThanOrEqual(20);
+      }
     });
   });
 
