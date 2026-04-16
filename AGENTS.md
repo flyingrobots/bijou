@@ -26,7 +26,7 @@ Do not audit the repository by recursively walking the filesystem. Follow the au
 ### 3. The Direction
 - **`docs/BEARING.md`**: Current execution gravity and active tensions.
 - **`docs/ROADMAP.md`**: Broad strategic horizon and phase targets.
-- **`docs/BACKLOG/`**: The active source of truth for pending work.
+- **`docs/method/backlog/`**: The live METHOD backlog and release lanes.
 - **`docs/design/`**: Active and landed cycle design documents.
 
 ### 4. The Proof
@@ -39,7 +39,7 @@ When starting a new session or recovering from context loss:
 
 1. **Read `docs/BEARING.md`** to find the current execution gravity.
 2. **Read `docs/METHOD.md`** to understand the work doctrine.
-3. **Read the relevant backlog item** in `docs/BACKLOG/asap/`.
+3. **Read the relevant backlog item** in `docs/method/backlog/asap/`.
 4. **Read the latest relevant section** of `docs/CHANGELOG.md`.
 5. **Check `git log -n 5` and `git status`** to verify the current branch state.
 
