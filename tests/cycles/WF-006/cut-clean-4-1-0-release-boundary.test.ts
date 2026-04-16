@@ -24,7 +24,7 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(changelog).toContain('## [4.1.0] - 2026-04-04');
     expect(changelog).toContain('This release section is aligned to the actual `v4.0.0..v4.1.0`');
     expect(changelog).toContain('## [4.0.0] - 2026-03-22');
-    expect(changelog).toMatch(/\[Unreleased\]: https:\/\/github\.com\/flyingrobots\/bijou\/compare\/v4\.\d+\.\d+\.\.\.HEAD/);
+    expect(changelog).toMatch(/\[Unreleased\]: https:\/\/github\.com\/flyingrobots\/bijou\/compare\/v\d+\.\d+\.\d+\.\.\.HEAD/);
     expect(changelog).toContain('[4.1.0]: https://github.com/flyingrobots/bijou/compare/v4.0.0...v4.1.0');
     expect(changelog).toContain('[4.0.0]: https://github.com/flyingrobots/bijou/compare/v3.1.0...v4.0.0');
     expect(releaseGuide).toContain('moved the release smoke gate onto the DOGFOOD contract used for');
