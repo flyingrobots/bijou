@@ -30,6 +30,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   symlinked prefixes before enforcing the root boundary, rejecting
   escaped file reads and write destinations that tunnel outside the
   declared root through symlinked files or directories.
+- **Patched transitive `hono` runtime dependency** — the workspace now
+  pins `hono` to `4.12.14` through root `overrides`, closing the MCP
+  server's transitive exposure to GHSA-458j-xx4x-4375 in server-side
+  JSX rendering.
 - **Deterministic scripted-example smoke harness** — interactive example
   smoke no longer depends on Vitest's default timeout or global
   `console.*` monkeypatching. Scripted examples now accept an explicit
