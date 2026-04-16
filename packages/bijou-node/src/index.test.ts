@@ -200,6 +200,7 @@ describe('createNodeContext()', () => {
     vi.stubEnv('COLORFGBG', '0;15');
     const ctx = createNodeContext({ themes: TEST_THEME_SET, themeMode: 'auto' });
     expect(ctx.theme.theme.name).toBe('light-theme');
+    expect(ctx.theme.colorScheme).toBe('light');
   });
 
   it('supports custom theme ids when a scheme hint is provided', () => {
@@ -211,6 +212,7 @@ describe('createNodeContext()', () => {
     vi.stubEnv('BIJOU_THEME', 'light');
     const ctx = createNodeContext({ themes: TEST_THEME_SET, themeMode: 'dark' });
     expect(ctx.theme.theme.name).toBe('light-theme');
+    expect(ctx.theme.colorScheme).toBe('light');
   });
 
   it('lets an explicit themeOverride beat BIJOU_THEME for theme sets', () => {
@@ -222,6 +224,18 @@ describe('createNodeContext()', () => {
       theme: UNUSED_THEME,
     });
     expect(ctx.theme.theme.name).toBe('light-theme');
+    expect(ctx.theme.colorScheme).toBe('light');
+  });
+
+  it('uses the explicit theme fallback when BIJOU_THEME misses, even with a theme set present', () => {
+    vi.stubEnv('BIJOU_THEME', 'nonexistent');
+    const ctx = createNodeContext({
+      theme: UNUSED_THEME,
+      themes: TEST_THEME_SET,
+      themeMode: 'dark',
+    });
+    expect(ctx.theme.theme.name).toBe('unused-theme');
+    expect(ctx.theme.colorScheme).toBe('dark');
   });
 });
 
@@ -269,6 +283,7 @@ describe('initDefaultContext()', () => {
     vi.stubEnv('COLORFGBG', '0;15');
     const ctx = initDefaultContext({ themes: TEST_THEME_SET, themeMode: 'auto' });
     expect(ctx.theme.theme.name).toBe('light-theme');
+    expect(ctx.theme.colorScheme).toBe('light');
     expect(getDefaultContext()).toBe(ctx);
   });
 });
@@ -384,6 +399,7 @@ describe('startApp()', () => {
     }, { themes: TEST_THEME_SET, themeMode: 'auto' });
 
     expect(getDefaultContext()?.theme.theme.name).toBe('light-theme');
+    expect(getDefaultContext()?.theme.colorScheme).toBe('light');
     expect(spy).toHaveBeenCalledWith('hello from auto themed startApp');
     spy.mockRestore();
   });

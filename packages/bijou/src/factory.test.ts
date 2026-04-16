@@ -104,6 +104,19 @@ describe('createBijou()', () => {
     expect(ctx.mode).toBe('pipe');
   });
 
+  it('detects colorScheme from runtime by default', () => {
+    const ctx = createBijou(basePorts({ COLORFGBG: '0;15' }, true));
+    expect(ctx.theme.colorScheme).toBe('light');
+  });
+
+  it('accepts an explicit colorScheme override', () => {
+    const ctx = createBijou({
+      ...basePorts({}, true),
+      colorScheme: 'light',
+    });
+    expect(ctx.theme.colorScheme).toBe('light');
+  });
+
   it('detects static mode when CI is set with TTY', () => {
     const ctx = createBijou(basePorts({ CI: 'true' }, true));
     expect(ctx.mode).toBe('static');

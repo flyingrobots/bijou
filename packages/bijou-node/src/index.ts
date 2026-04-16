@@ -100,6 +100,13 @@ interface SelfRunningApp<M = unknown> {
   run(options?: RunOptions<M>): Promise<void>;
 }
 
+interface ResolvedNodeThemeSelection {
+  readonly fallbackTheme: Theme | undefined;
+  readonly colorScheme: ColorScheme;
+  readonly envVar: string | undefined;
+  readonly presets: Record<string, Theme> | undefined;
+}
+
 function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
   return typeof (app as unknown as SelfRunningApp<M>).run === 'function';
 }
@@ -121,26 +128,80 @@ function mergeNodeThemePresets(options: NodeThemeOptions): Record<string, Theme>
   return merged;
 }
 
-function resolveExplicitThemeOverride(options: NodeThemeOptions): Theme | undefined {
-  if (options.themeOverride === undefined) return undefined;
-  const match = options.themes?.find((entry) => entry.id === options.themeOverride);
-  return match?.theme;
+function resolveRequestedColorScheme(
+  runtime: ReturnType<typeof nodeRuntime>,
+  options: NodeThemeOptions,
+): ColorScheme {
+  const mode = options.themeMode ?? 'auto';
+  return mode === 'auto' ? detectColorScheme(runtime) : mode;
 }
 
-function resolveAutomaticTheme(runtime: ReturnType<typeof nodeRuntime>, options: NodeThemeOptions): Theme | undefined {
+function resolveAutomaticThemeEntry(
+  options: NodeThemeOptions,
+  targetScheme: ColorScheme,
+): NodeThemeEntry | undefined {
   if (options.themes === undefined || options.themes.length === 0) {
-    return options.theme;
+    return undefined;
   }
-
-  const mode = options.themeMode ?? 'auto';
-  const targetScheme = mode === 'auto' ? detectColorScheme(runtime) : mode;
   const byScheme = options.themes.find((entry) => inferThemeEntryScheme(entry) === targetScheme);
-  if (byScheme !== undefined) return byScheme.theme;
+  if (byScheme !== undefined) return byScheme;
 
   const byId = options.themes.find((entry) => entry.id === targetScheme);
-  if (byId !== undefined) return byId.theme;
+  if (byId !== undefined) return byId;
 
-  return options.themes[0]?.theme ?? options.theme;
+  return options.themes[0];
+}
+
+function resolveNodeThemeSelection(
+  runtime: ReturnType<typeof nodeRuntime>,
+  options: NodeThemeOptions,
+): ResolvedNodeThemeSelection {
+  const colorScheme = resolveRequestedColorScheme(runtime, options);
+  const presets = mergeNodeThemePresets(options);
+  const envVar = options.envVar;
+
+  if (options.themeOverride !== undefined) {
+    const match = options.themes?.find((entry) => entry.id === options.themeOverride);
+    if (match !== undefined) {
+      return {
+        fallbackTheme: match.theme,
+        colorScheme: inferThemeEntryScheme(match) ?? colorScheme,
+        envVar: DISABLED_THEME_ENV_VAR,
+        presets,
+      };
+    }
+  }
+
+  const selectionEnvVar = envVar ?? 'BIJOU_THEME';
+  const envSelection = runtime.env(selectionEnvVar);
+  if (envSelection !== undefined) {
+    const envThemeEntry = options.themes?.find((entry) => entry.id === envSelection);
+    if (envThemeEntry !== undefined) {
+      return {
+        fallbackTheme: envThemeEntry.theme,
+        colorScheme: inferThemeEntryScheme(envThemeEntry) ?? colorScheme,
+        envVar: DISABLED_THEME_ENV_VAR,
+        presets,
+      };
+    }
+
+    return {
+      fallbackTheme: options.theme ?? resolveAutomaticThemeEntry(options, colorScheme)?.theme,
+      colorScheme,
+      envVar,
+      presets,
+    };
+  }
+
+  const automaticThemeEntry = resolveAutomaticThemeEntry(options, colorScheme);
+  return {
+    fallbackTheme: automaticThemeEntry?.theme ?? options.theme,
+    colorScheme: automaticThemeEntry != null
+      ? (inferThemeEntryScheme(automaticThemeEntry) ?? colorScheme)
+      : colorScheme,
+    envVar,
+    presets,
+  };
 }
 
 /** Test-only helper that restores the Node ambient-context initializer after resets. */
@@ -161,19 +222,17 @@ export function _registerDefaultContextInitializerForTesting(): void {
 export function createNodeContext(options: CreateNodeContextOptions = {}): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
-  const explicitOverrideTheme = resolveExplicitThemeOverride(options);
-  const fallbackTheme = explicitOverrideTheme ?? resolveAutomaticTheme(runtime, options);
-  const envVar = explicitOverrideTheme !== undefined ? DISABLED_THEME_ENV_VAR : options.envVar;
-  const presets = mergeNodeThemePresets(options);
+  const selection = resolveNodeThemeSelection(runtime, options);
   // Force level 3 (truecolor) if NO_COLOR is not set, 
   // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
     io: nodeIO(),
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
-    theme: fallbackTheme,
-    presets,
-    envVar,
+    theme: selection.fallbackTheme,
+    presets: selection.presets,
+    envVar: selection.envVar,
+    colorScheme: selection.colorScheme,
   });
 }
 
