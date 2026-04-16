@@ -228,7 +228,9 @@ interface StyledInlineState {
   readonly osc8?: string;
 }
 
-const OSC8_CLOSE = '\x1b]8;;\x1b\\';
+const ESC = String.fromCharCode(27);
+const OSC8_CLOSE = `${ESC}]8;;${ESC}\\`;
+const RESET_SGR_SHORT = `${ESC}[m`;
 const INLINE_CONTROL_RE = new RegExp(`${ANSI_SGR_RE.source}|${ANSI_OSC8_RE.source}`, 'g');
 
 function wrapStyledInlineText(text: string, width: number): string[] {
@@ -356,12 +358,12 @@ function applyStyledInlineControl(
   state: { sgr: string[]; osc8?: string },
   raw: string,
 ): void {
-  if (raw.startsWith('\x1b]8;;')) {
+  if (raw.startsWith(`${ESC}]8;;`)) {
     state.osc8 = raw === OSC8_CLOSE ? undefined : raw;
     return;
   }
 
-  if (raw === RESET_SGR || raw === '\x1b[m') {
+  if (raw === RESET_SGR || raw === RESET_SGR_SHORT) {
     state.sgr = [];
     return;
   }
