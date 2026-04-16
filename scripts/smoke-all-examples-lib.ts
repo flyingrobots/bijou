@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { format } from 'node:util';
 import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';
 import { detectGarbage, stripAnsi } from './smoke-utils.js';
 
@@ -84,6 +83,11 @@ interface SmokeDeps {
     scenario: Scenario,
     deps: SmokeDeps,
   ) => Promise<Result>;
+  readonly loadInteractiveModuleImpl?: (
+    root: string,
+    scenario: Scenario,
+  ) => Promise<InteractiveExampleModule>;
+  readonly interactiveTimeoutMs?: number;
   readonly platform?: NodeJS.Platform;
   readonly execPath?: string;
   readonly env?: NodeJS.ProcessEnv;
@@ -230,7 +234,7 @@ export async function runScenarioWithTimeout(
   deps: SmokeDeps = {},
 ): Promise<Result> {
   if (scenario.mode === 'interactive-scripted') {
-    return runInteractiveScriptedScenario(root, scenario);
+    return runInteractiveScriptedScenario(root, scenario, deps);
   }
 
   const spawnImpl = deps.spawnImpl ?? spawn;
@@ -302,6 +306,7 @@ interface InteractiveExampleModule {
 async function runInteractiveScriptedScenario(
   root: string,
   scenario: Scenario,
+  deps: SmokeDeps = {},
 ): Promise<Result> {
   const spec = INTERACTIVE_FORM_SCRIPTS[scenario.path];
   if (spec === undefined) {
@@ -313,7 +318,8 @@ async function runInteractiveScriptedScenario(
     };
   }
 
-  const module = await import(pathToFileURL(resolve(root, scenario.path)).href) as InteractiveExampleModule;
+  const module = await (deps.loadInteractiveModuleImpl?.(root, scenario)
+    ?? import(pathToFileURL(resolve(root, scenario.path)).href) as Promise<InteractiveExampleModule>);
   if (typeof module.main !== 'function') {
     return {
       path: scenario.path,
@@ -332,42 +338,41 @@ async function runInteractiveScriptedScenario(
   });
 
   const capturedOut: string[] = [];
-  const capturedErr: string[] = [];
-  const originalLog = console.log;
-  const originalError = console.error;
-  const originalWarn = console.warn;
-  console.log = (...args: unknown[]) => {
-    capturedOut.push(`${format(...args)}\n`);
+  const writeLine = (line = '') => {
+    capturedOut.push(`${line}\n`);
   };
-  console.error = (...args: unknown[]) => {
-    capturedErr.push(`${format(...args)}\n`);
-  };
-  console.warn = (...args: unknown[]) => {
-    capturedErr.push(`${format(...args)}\n`);
-  };
+  const interactiveTimeoutMs = deps.interactiveTimeoutMs ?? 5000;
+  let timeoutHandle: NodeJS.Timeout | undefined;
 
   try {
-    if (scenario.path === 'demo.ts') {
-      await module.main(ctx, (_themeName: string, currentCtx: typeof ctx) => currentCtx);
-    } else {
-      await module.main(ctx);
-    }
+    const runMain = scenario.path === 'demo.ts'
+      ? Promise.resolve(module.main(ctx, (_themeName: string, currentCtx: typeof ctx) => currentCtx, writeLine))
+      : Promise.resolve(module.main(ctx, writeLine));
+
+    await Promise.race([
+      runMain,
+      new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+          reject(new Error(`timed out after ${interactiveTimeoutMs}ms`));
+        }, interactiveTimeoutMs);
+      }),
+    ]);
   } catch (error) {
     return finalizeInteractiveResult(
       scenario,
-      ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join('') + capturedErr.join(''),
+      ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join(''),
       'error',
       error instanceof Error ? error.message : String(error),
     );
   } finally {
-    console.log = originalLog;
-    console.error = originalError;
-    console.warn = originalWarn;
+    if (timeoutHandle !== undefined) {
+      clearTimeout(timeoutHandle);
+    }
   }
 
   return finalizeInteractiveResult(
     scenario,
-    ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join('') + capturedErr.join(''),
+    ctx.io.written.join('') + ctx.io.writtenErr.join('') + capturedOut.join(''),
     'ok',
   );
 }

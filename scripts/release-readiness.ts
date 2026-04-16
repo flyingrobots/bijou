@@ -35,6 +35,7 @@ export function buildReleaseReadinessPlan(): readonly ReleaseReadinessStep[] {
     { label: 'workflow:shell:preflight', command: npm, args: ['run', 'workflow:shell:preflight'] },
     { label: 'release:preflight', command: npm, args: ['run', 'release:preflight'] },
     { label: 'test:frames', command: npm, args: ['run', 'test:frames'] },
+    { label: 'verify:interactive-examples', command: npm, args: ['run', 'verify:interactive-examples'] },
     { label: 'smoke:canaries', command: npm, args: ['run', 'smoke:canaries', '--', '--skip-build'] },
     { label: 'smoke:dogfood', command: npm, args: ['run', 'smoke:dogfood', '--', '--skip-build'] },
     { label: 'test', command: npm, args: ['test'] },

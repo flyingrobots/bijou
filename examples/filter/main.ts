@@ -3,7 +3,16 @@ import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { type BijouContext, filter } from '@flyingrobots/bijou';
 
-export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
+type ExampleWriter = (line?: string) => void;
+
+function consoleWriter(line = ''): void {
+  console.log(line);
+}
+
+export async function main(
+  ctx: BijouContext = initDefaultContext(),
+  writeLine: ExampleWriter = consoleWriter,
+): Promise<void> {
   const language = await filter({
     title: 'Choose a programming language:',
     placeholder: 'j/k navigate, type or / to search',
@@ -20,8 +29,8 @@ export async function main(ctx: BijouContext = initDefaultContext()): Promise<vo
     ctx,
   });
 
-  console.log();
-  console.log(`Selected language: ${language.toUpperCase()}`);
+  writeLine();
+  writeLine(`Selected language: ${language.toUpperCase()}`);
 }
 
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

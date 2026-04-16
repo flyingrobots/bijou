@@ -3,7 +3,16 @@ import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { type BijouContext, select } from '@flyingrobots/bijou';
 
-export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
+type ExampleWriter = (line?: string) => void;
+
+function consoleWriter(line = ''): void {
+  console.log(line);
+}
+
+export async function main(
+  ctx: BijouContext = initDefaultContext(),
+  writeLine: ExampleWriter = consoleWriter,
+): Promise<void> {
   const manager = await select({
     title: 'Choose a package manager:',
     options: [
@@ -17,8 +26,8 @@ export async function main(ctx: BijouContext = initDefaultContext()): Promise<vo
     ctx,
   });
 
-  console.log();
-  console.log(`Selected package manager: ${manager.toUpperCase()}`);
+  writeLine();
+  writeLine(`Selected package manager: ${manager.toUpperCase()}`);
 }
 
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

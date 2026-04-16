@@ -37,3 +37,9 @@ npm run typecheck:test
 # ---------------------------------------------------------------------------
 echo "pre-push: running test suite"
 npm test
+
+# ---------------------------------------------------------------------------
+# Interactive example smoke
+# ---------------------------------------------------------------------------
+echo "pre-push: running scripted interactive example smoke"
+npm run verify:interactive-examples

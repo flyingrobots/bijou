@@ -34,6 +34,7 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "verify:interactive-examples": "tsx scripts/smoke-all-examples.ts --skip-build --mode=interactive-scripted",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
     "pr:review-status": "tsx scripts/pr-review-status.ts",
     "pr:merge-readiness": "tsx scripts/pr-review-status.ts --merge-ready",

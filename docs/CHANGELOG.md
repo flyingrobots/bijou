@@ -30,6 +30,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   symlinked prefixes before enforcing the root boundary, rejecting
   escaped file reads and write destinations that tunnel outside the
   declared root through symlinked files or directories.
+- **Deterministic scripted-example smoke harness** — interactive example
+  smoke no longer depends on Vitest's default timeout or global
+  `console.*` monkeypatching. Scripted examples now accept an explicit
+  writer callback for captured output, the harness applies its own
+  timeout budget, and the real interactive example run moved into a
+  dedicated `verify:interactive-examples` integration lane that runs
+  separately from the main unit suite.
 
 ## [4.4.1] - 2026-04-11
 
