@@ -9,9 +9,10 @@
  * @packageDocumentation
  */
 
-import type { BijouContext, Theme } from '@flyingrobots/bijou';
+import type { BijouContext, Theme, ColorScheme } from '@flyingrobots/bijou';
 import {
   createBijou,
+  detectColorScheme,
   resolveSafeCtx,
   setDefaultContext,
   setDefaultContextInitializer,
@@ -45,6 +46,26 @@ export {
   type SurfaceGifOptions,
 } from './recorder.js';
 
+const DISABLED_THEME_ENV_VAR = '__BIJOU_THEME_DISABLED__';
+
+/** Theme-selection options for Node-hosted context creation. */
+export interface NodeThemeEntry {
+  /** Stable selection id for env/config or app-owned override state. */
+  readonly id: string;
+  /** Theme value associated with this entry. */
+  readonly theme: Theme;
+  /**
+   * Optional light/dark hint used by automatic selection.
+   *
+   * When omitted, `id === "light"` and `id === "dark"` are treated as the
+   * corresponding scheme.
+   */
+  readonly scheme?: ColorScheme;
+}
+
+/** Host-level theme mode for automatic selection. */
+export type NodeThemeMode = 'auto' | ColorScheme;
+
 /** Theme-selection options for Node-hosted context creation. */
 export interface NodeThemeOptions {
   /**
@@ -58,6 +79,12 @@ export interface NodeThemeOptions {
   presets?: Record<string, Theme>;
   /** Environment variable name that selects a preset or JSON theme path. */
   envVar?: string;
+  /** Named theme entries available for auto-selection or app-owned overrides. */
+  themes?: readonly NodeThemeEntry[];
+  /** Automatic or forced light/dark selection mode for `themes`. */
+  themeMode?: NodeThemeMode;
+  /** Explicit theme-entry id override that wins over env-driven selection. */
+  themeOverride?: string;
 }
 
 /** Options for {@link createNodeContext}. */
@@ -75,6 +102,45 @@ interface SelfRunningApp<M = unknown> {
 
 function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
   return typeof (app as unknown as SelfRunningApp<M>).run === 'function';
+}
+
+function inferThemeEntryScheme(entry: NodeThemeEntry): ColorScheme | undefined {
+  if (entry.scheme !== undefined) return entry.scheme;
+  if (entry.id === 'light' || entry.id === 'dark') return entry.id;
+  return undefined;
+}
+
+function mergeNodeThemePresets(options: NodeThemeOptions): Record<string, Theme> | undefined {
+  if (options.themes === undefined || options.themes.length === 0) {
+    return options.presets;
+  }
+  const merged: Record<string, Theme> = { ...(options.presets ?? {}) };
+  for (const entry of options.themes) {
+    merged[entry.id] = entry.theme;
+  }
+  return merged;
+}
+
+function resolveExplicitThemeOverride(options: NodeThemeOptions): Theme | undefined {
+  if (options.themeOverride === undefined) return undefined;
+  const match = options.themes?.find((entry) => entry.id === options.themeOverride);
+  return match?.theme;
+}
+
+function resolveAutomaticTheme(runtime: ReturnType<typeof nodeRuntime>, options: NodeThemeOptions): Theme | undefined {
+  if (options.themes === undefined || options.themes.length === 0) {
+    return options.theme;
+  }
+
+  const mode = options.themeMode ?? 'auto';
+  const targetScheme = mode === 'auto' ? detectColorScheme(runtime) : mode;
+  const byScheme = options.themes.find((entry) => inferThemeEntryScheme(entry) === targetScheme);
+  if (byScheme !== undefined) return byScheme.theme;
+
+  const byId = options.themes.find((entry) => entry.id === targetScheme);
+  if (byId !== undefined) return byId.theme;
+
+  return options.themes[0]?.theme ?? options.theme;
 }
 
 /** Test-only helper that restores the Node ambient-context initializer after resets. */
@@ -95,15 +161,19 @@ export function _registerDefaultContextInitializerForTesting(): void {
 export function createNodeContext(options: CreateNodeContextOptions = {}): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
+  const explicitOverrideTheme = resolveExplicitThemeOverride(options);
+  const fallbackTheme = explicitOverrideTheme ?? resolveAutomaticTheme(runtime, options);
+  const envVar = explicitOverrideTheme !== undefined ? DISABLED_THEME_ENV_VAR : options.envVar;
+  const presets = mergeNodeThemePresets(options);
   // Force level 3 (truecolor) if NO_COLOR is not set, 
   // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
     io: nodeIO(),
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
-    theme: options.theme,
-    presets: options.presets,
-    envVar: options.envVar,
+    theme: fallbackTheme,
+    presets,
+    envVar,
   });
 }
 
@@ -140,7 +210,12 @@ export function _resetInitializedForTesting(): void {
  */
 export function initDefaultContext(options: InitDefaultContextOptions = {}): BijouContext {
   const hasExplicitThemeSelection =
-    options.theme !== undefined || options.presets !== undefined || options.envVar !== undefined;
+    options.theme !== undefined
+    || options.presets !== undefined
+    || options.envVar !== undefined
+    || options.themes !== undefined
+    || options.themeMode !== undefined
+    || options.themeOverride !== undefined;
   if (!initialized && !hasExplicitThemeSelection) {
     const existing = resolveSafeCtx();
     if (existing != null) {
@@ -174,11 +249,27 @@ export async function startApp<Model, M>(
   app: App<Model, M>,
   options?: StartAppOptions<M>,
 ): Promise<void> {
-  const { ctx: explicitCtx, theme, presets, envVar, ...runOptions } = options ?? {};
+  const {
+    ctx: explicitCtx,
+    theme,
+    presets,
+    envVar,
+    themes,
+    themeMode,
+    themeOverride,
+    ...runOptions
+  } = options ?? {};
   let ctx = explicitCtx;
   if (!ctx) {
-    if (theme !== undefined || presets !== undefined || envVar !== undefined) {
-      ctx = createNodeContext({ theme, presets, envVar });
+    if (
+      theme !== undefined
+      || presets !== undefined
+      || envVar !== undefined
+      || themes !== undefined
+      || themeMode !== undefined
+      || themeOverride !== undefined
+    ) {
+      ctx = createNodeContext({ theme, presets, envVar, themes, themeMode, themeOverride });
       setDefaultContext(ctx);
       initialized = true;
     } else {

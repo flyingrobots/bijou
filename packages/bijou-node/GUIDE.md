@@ -52,6 +52,31 @@ That creates the hosted Node context with your theme and uses it for the run.
 If the app depends on ambient `ctx` resolution, the same themed host context is
 also registered as the default.
 
+For paired themes with automatic light/dark selection:
+
+```typescript
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+});
+```
+
+If the app owns a persisted user preference, pass it as `themeOverride`:
+
+```typescript
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+  themeOverride: savedThemeId,
+});
+```
+
 ## Custom Context
 
 If you need more control, create the context without setting the global default:
@@ -72,6 +97,10 @@ To own the context explicitly while still selecting a custom theme:
 const ctx = createNodeContext({ theme: MY_THEME });
 await startApp(app, { ctx });
 ```
+
+The same context constructor also accepts `themes`, `themeMode`, and
+`themeOverride` when you want the host to choose from a named theme set before
+the run starts.
 
 ## Individual Adapters
 

@@ -189,6 +189,70 @@ const ctx = createNodeContext({ theme: MY_THEME });
 await startApp(app, { ctx });
 ```
 
+## Automatic light/dark theme sets
+
+If you want more than one theme, `@flyingrobots/bijou-node` now supports a
+named theme set at the host layer:
+
+```typescript
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+});
+```
+
+`themeMode` accepts:
+
+- `auto`
+- `light`
+- `dark`
+
+When `themeMode` is `auto`, the host uses Bijou's terminal color-scheme
+detection to choose the initial entry.
+
+If your ids are not literally `light` and `dark`, add explicit scheme hints:
+
+```typescript
+await startApp(app, {
+  themes: [
+    { id: 'sunrise', scheme: 'light', theme: LIGHT_THEME },
+    { id: 'midnight', scheme: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+});
+```
+
+## User override policy
+
+There are three practical override layers:
+
+- `themeOverride` for an app-owned persisted user choice
+- `BIJOU_THEME` for host/env-driven selection
+- `themeMode: 'auto'` for light/dark automation when nothing more explicit is chosen
+
+Example:
+
+```typescript
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+  themeOverride: savedThemeId,
+});
+```
+
+Behavior:
+
+- `themeOverride` wins when it matches one of the provided entries
+- otherwise `BIJOU_THEME` can still select a named entry by id
+- otherwise `themeMode` picks the initial theme
+- otherwise the first entry becomes the fallback
+
 That same pattern works for any hosted app that goes through
 `@flyingrobots/bijou-node` theme resolution.
 
