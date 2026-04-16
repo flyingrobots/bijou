@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-tui",
-  "version": "4.4.1",
+  "version": "5.0.0",
   "description": "TEA runtime for terminal UIs — model/update/view with keyboard input, alt screen, and layout helpers.",
   "type": "module",
   "sideEffects": false,
@@ -24,10 +24,10 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou-i18n": "4.4.1"
+    "@flyingrobots/bijou-i18n": "5.0.0"
   },
   "peerDependencies": {
-    "@flyingrobots/bijou": "4.4.1"
+    "@flyingrobots/bijou": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

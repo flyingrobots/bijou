@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Notes
+
+- No unreleased entries yet.
+
+## [5.0.0] - 2026-04-16
+
 ### ✨ Features
 
 - **Frame-owned hosted runner for `createFramedApp()`** —

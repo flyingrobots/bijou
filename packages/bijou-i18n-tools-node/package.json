@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-i18n-tools-node",
-  "version": "4.4.1",
+  "version": "5.0.0",
   "description": "Node filesystem helpers for Bijou localization exchange workflows.",
   "type": "module",
   "sideEffects": false,
@@ -24,8 +24,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou-i18n": "4.4.1",
-    "@flyingrobots/bijou-i18n-tools": "4.4.1"
+    "@flyingrobots/bijou-i18n": "5.0.0",
+    "@flyingrobots/bijou-i18n-tools": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

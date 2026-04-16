@@ -58,8 +58,9 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 ### Latest Shipped Release
 
-The latest shipped release is **`4.4.0`**.
+The latest shipped release is **`4.4.1`**.
 
+- `4.4.1` — framed-shell background-fill fixes, stock shell theme cycling, uppercase quit-confirm input
 - `4.4.0` — data-viz toolkit, zero-alloc framed app render, new bench scenarios
 - `4.3.0` — RE-008 byte-packed surface, RE-015 braille fix, `setRGB` API
 - `4.2.0` — RE-007 framed shell, `@flyingrobots/bijou-mcp`, METHOD migration
@@ -73,19 +74,18 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-The next release being prepared is **`4.4.1`**, a focused framed-shell
-polish release after `4.4.0`.
+The next release being prepared is **`5.0.0`**.
 
-It closes the downstream background-fill regression, extends that fix to
-the stock shell header/footer chrome, adds opt-in frame-owned shell
-theme cycling for `createFramedApp()`, and makes the stock quit dialog
-accept uppercase `Y` / `N`. The broader engineering focus after that
-release remains DOGFOOD story quality, localization ergonomics, MCP
-interactive docs, and layout/viewport formalization.
+It promotes the hosted framed-shell runner, simplifies Node-host theme
+selection, hardens the runtime and filesystem surfaces, and makes the
+release-facing proof path more deterministic through the dedicated
+interactive-example verification lane. The broader engineering focus
+after that release remains DOGFOOD docs ingestion, pointer-driven
+selection/copy, and continued shell/presentation polish.
 
 ### Lock-step Versioned Units
 
-These packages move together:
+These workspaces move together:
 
 - `@flyingrobots/bijou`
 - `@flyingrobots/bijou-node`
@@ -97,6 +97,7 @@ These packages move together:
 - `@flyingrobots/bijou-i18n-tools-node`
 - `@flyingrobots/bijou-i18n-tools-xlsx`
 - `@flyingrobots/bijou-mcp`
+- `@flyingrobots/bijou-bench` (private benchmark workspace)
 
 ### Current Automated npm Publish Matrix
 
@@ -202,7 +203,7 @@ When the version is chosen, move that directory to
 docs.
 
 For the release currently being prepared, that work lives under
-`docs/releases/4.4.1/`.
+`docs/releases/5.0.0/`.
 
 ## Phase 3: Local Validation
 

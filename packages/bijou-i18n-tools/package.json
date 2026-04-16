@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-i18n-tools",
-  "version": "4.4.1",
+  "version": "5.0.0",
   "description": "Localization workflow tooling for Bijou — authoring catalogs, stale detection, tabular export/import, and runtime compilation.",
   "type": "module",
   "sideEffects": false,
@@ -24,7 +24,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@flyingrobots/bijou-i18n": "4.4.1"
+    "@flyingrobots/bijou-i18n": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

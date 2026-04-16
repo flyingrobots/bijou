@@ -1,6 +1,6 @@
 {
   "name": "@flyingrobots/bijou-i18n",
-  "version": "4.4.1",
+  "version": "5.0.0",
   "description": "In-memory localization runtime for Bijou — catalogs, locale direction, and runtime-safe lookups.",
   "type": "module",
   "sideEffects": false,

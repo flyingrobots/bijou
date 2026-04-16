@@ -18,9 +18,9 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     const changelog = readRepoFile('docs/CHANGELOG.md');
     const releaseGuide = readRepoFile('docs/release.md');
 
-    // README now reflects the latest release (4.2.0+), not 4.1.0.
+    // README now reflects the latest release line, not 4.1.0.
     // The 4.1.0 release docs remain under docs/releases/4.1.0/.
-    expect(readme).toMatch(/## What's New in v4\.\d+\.\d+/);
+    expect(readme).toMatch(/## What's New in v\d+\.\d+\.\d+/);
     expect(changelog).toContain('## [4.1.0] - 2026-04-04');
     expect(changelog).toContain('This release section is aligned to the actual `v4.0.0..v4.1.0`');
     expect(changelog).toContain('## [4.0.0] - 2026-03-22');

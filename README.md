@@ -9,21 +9,25 @@ Bijou is designed for the mechanic who demands geometric lawfulness and the arch
 
 ![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
 
-## What's New in v4.4.1
+## What's New in v5.0.0
 
-Bijou `v4.4.1` is a framed-shell polish release focused on the `4.4.0`
-regression fallout.
+Bijou `v5.0.0` turns the hosted shell, Node host bootstrapping, and
+release-proof surface into a cleaner first-class product line.
 
-- `createFramedApp()` now preserves shell and pane background fill more
-  honestly, including stock header/footer chrome.
-- framed apps can opt into stock shell theme cycling through
-  `shellThemes`, and DOGFOOD now proves that shared path end to end.
-- the stock quit confirm accepts uppercase `Y` / `N` as well as lowercase
-  input.
+- `createFramedApp()` now owns its hosted runner through `app.run(...)`
+  and `runFramedApp(...)`, and `startApp(app)` delegates to that path
+  automatically.
+- `@flyingrobots/bijou-node` now makes theme selection easy with
+  `startApp(app, { theme })` and automatic light/dark theme sets through
+  `themes`, `themeMode`, and `themeOverride`.
+- the proof surfaces are more honest: `markdown()` renders pipe tables,
+  `npm run perf` exposes the visual performance demo, and the scripted
+  interactive smoke path is deterministic and isolated in
+  `verify:interactive-examples`.
 
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](./docs/releases/4.4.1/whats-new.md), and the
-[migration guide](./docs/releases/4.4.1/migration-guide.md).
+[What's New guide](./docs/releases/5.0.0/whats-new.md), and the
+[migration guide](./docs/releases/5.0.0/migration-guide.md).
 
 ## Why Bijou?
 
