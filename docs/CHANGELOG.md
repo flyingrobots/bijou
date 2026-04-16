@@ -18,6 +18,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   committed pipeline timings back into `FrameModel.frameTimeMs`,
   `FrameModel.viewTimeMs`, `FrameModel.diffTimeMs`, and budget telemetry
   so shell-owned UI can read the frame's own bookkeeping.
+- **Root `npm run perf` entrypoint for the visual gradient demo** —
+  the workspace now exposes the interactive `examples/perf-gradient`
+  workload as `npm run perf`, so operators have a first-class root
+  script for the visual performance demo alongside `bench` and `soak`.
 
 ### 🐛 Bug Fixes
 

@@ -42,6 +42,7 @@ Execute these from the monorepo root.
 - `npm run smoke:canaries`: Execute scaffolding canary tests.
 
 ### Performance & Benchmarks
+- `npm run perf`: Launch the interactive visual performance demo.
 - `npm run bench`: Execute the benchmark suite.
 - `npm run bench:ci:gradient`: Run the fixed gradient stress lane used in CI.
 - `npm run bench:compare`: Compare results against a baseline.
