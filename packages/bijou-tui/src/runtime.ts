@@ -188,7 +188,9 @@ export async function runWithLifecycleHooks<Model, M>(
       'Model snapshot',
       formatModelSnapshot(snapshot),
       '',
-      'Press Enter to exit.',
+      ctx.runtime.stdinIsTTY
+        ? 'Press Enter to exit.'
+        : 'Stdin is not interactive; exiting automatically.',
     ].join('\n');
     return stringToSurface(content, viewport.columns, viewport.rows);
   }
@@ -222,6 +224,9 @@ export async function runWithLifecycleHooks<Model, M>(
       );
       currentSurface = crashSurface;
       nextSurface = createSurface(crashSurface.width, crashSurface.height);
+      if (!ctx.runtime.stdinIsTTY) {
+        shutdown(fatalError);
+      }
     } catch (crashRenderError) {
       writeErrorLine(
         ctx.io,

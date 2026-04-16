@@ -680,6 +680,38 @@ describe('run', () => {
       await expect(promise).rejects.toThrow('render exploded');
     });
 
+    it('auto-exits crash mode when stdin is not a TTY', async () => {
+      const { clock, ctx } = createInteractiveContext({
+        runtime: { stdinIsTTY: false },
+      });
+      let onKey: ((key: string) => void) | null = null;
+      ctx.io.rawInput = (handler) => {
+        onKey = handler;
+        return { dispose() {} };
+      };
+
+      const app: App<number, never> = {
+        init: () => [7, []],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          throw new Error('render exploded');
+        },
+      };
+
+      const promise = run(app, { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+
+      await clock.advanceByAsync(20);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('render exploded');
+      expect(ctx.io.written.join('')).toContain('Bijou runtime crash');
+      expect(ctx.io.written.join('')).toContain('Phase: render');
+      expect(onKey).not.toBeNull();
+    });
+
     it('does not leave runtime timeout handles active after shutdown', async () => {
       const { clock, activeTimeoutCount } = createTrackingClock();
       const ctx = createTestContext({ mode: 'interactive', clock });
