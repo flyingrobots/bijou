@@ -37,6 +37,10 @@ export interface MountedApp<SubMsg> {
   cmds: Cmd<SubMsg>[];
 }
 
+export type SubAppAdapterCases<ParentMsg, SubMsg extends { readonly type: string }> = {
+  readonly [K in SubMsg['type']]: (msg: Extract<SubMsg, { type: K }>) => ParentMsg;
+};
+
 /**
  * Mount a sub-app, returning its rendered surface and any pending commands.
  *
@@ -57,6 +61,22 @@ export function mount<SubModel, SubMsg, ParentMsg>(
   const surfaceOrNode = app.view(model);
 
   return [surfaceOrNode, []];
+}
+
+/**
+ * Build an exhaustive discriminant-based sub-app message mapper.
+ *
+ * The returned function matches the `onMsg` signature expected by
+ * `initSubApp()`, `updateSubApp()`, and `mount()`, while TypeScript enforces
+ * that every `SubMsg['type']` variant is covered up front.
+ */
+export function createSubAppAdapter<ParentMsg, SubMsg extends { readonly type: string }>(
+  cases: SubAppAdapterCases<ParentMsg, SubMsg>,
+): (msg: SubMsg) => ParentMsg {
+  return (msg) => {
+    const handler = cases[msg.type as keyof SubAppAdapterCases<ParentMsg, SubMsg>] as (msg: SubMsg) => ParentMsg;
+    return handler(msg);
+  };
 }
 
 export interface SubAppOptions<SubMsg, ParentMsg> {

@@ -29,16 +29,15 @@ export const COMPACT_VIEWPORT_WIDTH = 52;
 export const COMPACT_VIEWPORT_HEIGHT = 16;
 
 function normalizeNonNegativeInt(value: number | undefined, fallback: number): number {
-  if (value == null || !Number.isFinite(value)) return fallback;
-  return Math.max(0, Math.floor(value));
+  return sanitizeNonNegativeInt(value, fallback);
 }
 
 /**
  * Decide whether a viewport should use compact overlay/layout defaults.
  */
 export function isCompactViewport(width: number, height: number): boolean {
-  return Math.floor(width) < COMPACT_VIEWPORT_WIDTH
-    || Math.floor(height) < COMPACT_VIEWPORT_HEIGHT;
+  return sanitizeNonNegativeInt(width, 0) < COMPACT_VIEWPORT_WIDTH
+    || sanitizeNonNegativeInt(height, 0) < COMPACT_VIEWPORT_HEIGHT;
 }
 
 /**
@@ -87,3 +86,4 @@ export function clampCenteredPosition(
 
   return Math.max(0, Math.min(max, centered));
 }
+import { sanitizeNonNegativeInt } from '@flyingrobots/bijou';

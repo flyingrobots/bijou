@@ -3,13 +3,13 @@
  *
  * Subcommands:
  *   run       — wall-time bench. Spawns N children per scenario,
- *               aggregates stats, optionally writes a report JSON.
- *   compare   — diff two bench.v2 run reports.
+ *               aggregates stats, optionally writes a structured report.
+ *   compare   — diff two bench reports (nested JSON or flat JSONL).
  *   list      — print the scenario registry with IDs and labels.
  *
  * Usage:
  *   node --import tsx bench/src/cli.ts run [--scenario=ID] [--samples=30]
- *                                          [--warmup=N] [--frames=N]
+ *                                          [--warmup=N] [--frames=N] [--format=summary|json|jsonl]
  *                                          [--out=path.json]
  *   node --import tsx bench/src/cli.ts compare <baseline.json> <current.json>
  *   node --import tsx bench/src/cli.ts list
@@ -17,10 +17,19 @@
 
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
-import { SCENARIOS, listScenarioIds } from './scenarios/index.js';
+import {
+  listScenarioIds,
+  parseScenarioTagGroup,
+  selectScenarios,
+  type ScenarioTagGroup,
+} from './scenarios/index.js';
+import { formatReportAsJsonl } from './harnesses/wall-time/format-jsonl.js';
+import { readBenchReport } from './harnesses/wall-time/read-report.js';
 import { runBench, type RunReport } from './harnesses/wall-time/runner.js';
 import { compareReports, formatComparison } from './harnesses/wall-time/compare.js';
 import { formatNs } from './stats.js';
+
+type BenchOutputFormat = 'summary' | 'json' | 'jsonl';
 
 /**
  * Parse `--key=value`, `--key value`, and bare `--flag` forms.
@@ -48,6 +57,57 @@ function parseKv(argv: readonly string[]): Map<string, string> {
   return out;
 }
 
+function flagValues(argv: readonly string[], key: string): string[] {
+  const values: string[] = [];
+  const longFlag = `--${key}`;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (arg === longFlag) {
+      const next = argv[i + 1];
+      if (next != null && !next.startsWith('--')) {
+        values.push(next);
+        i++;
+      }
+      continue;
+    }
+    if (arg.startsWith(`${longFlag}=`)) {
+      values.push(arg.slice(longFlag.length + 1));
+    }
+  }
+
+  return values;
+}
+
+function parseTagGroups(argv: readonly string[]): readonly ScenarioTagGroup[] {
+  return flagValues(argv, 'tag').map(parseScenarioTagGroup);
+}
+
+function formatTagGroups(tagGroups: readonly ScenarioTagGroup[]): string {
+  return tagGroups.map((group) => group.join('+')).join('|');
+}
+
+function parseOutputFormat(value: string | undefined): BenchOutputFormat {
+  if (value == null || value === 'summary') return 'summary';
+  if (value === 'json') return 'json';
+  if (value === 'jsonl' || value === 'flat') return 'jsonl';
+  throw new Error(`invalid --format: ${value} (expected summary, json, or jsonl)`);
+}
+
+function fileFormatForOutput(format: BenchOutputFormat): Exclude<BenchOutputFormat, 'summary'> {
+  return format === 'summary' ? 'json' : format;
+}
+
+function defaultOutExtension(format: Exclude<BenchOutputFormat, 'summary'>): string {
+  return format === 'jsonl' ? 'jsonl' : 'json';
+}
+
+function renderStructuredReport(report: RunReport, format: Exclude<BenchOutputFormat, 'summary'>): string {
+  return format === 'json'
+    ? JSON.stringify(report, null, 2) + '\n'
+    : formatReportAsJsonl(report);
+}
+
 function positional(argv: readonly string[]): string[] {
   // Positionals are non-flag args that are not consumed as values for
   // preceding `--key value` flags. We walk the argv mirroring parseKv's
@@ -70,11 +130,17 @@ function positional(argv: readonly string[]): string[] {
   return result;
 }
 
-function cmdList(): void {
-  process.stdout.write('scenarios:\n');
-  for (const s of SCENARIOS) {
+function cmdList(argv: readonly string[]): void {
+  const tagGroups = parseTagGroups(argv);
+  const scenarios = selectScenarios({ tagGroups });
+
+  process.stdout.write(tagGroups.length > 0
+    ? `scenarios (tags: ${formatTagGroups(tagGroups)}):\n`
+    : 'scenarios:\n');
+  for (const s of scenarios) {
     process.stdout.write(`  ${s.id}\n`);
     process.stdout.write(`    ${s.label}\n`);
+    process.stdout.write(`    tags: ${s.tags.join(', ')}\n`);
     process.stdout.write(`    ${s.columns}×${s.rows}, warmup=${s.defaultWarmupFrames}, measure=${s.defaultMeasureFrames}\n`);
     process.stdout.write(`    ${s.description}\n`);
     process.stdout.write('\n');
@@ -93,19 +159,25 @@ function cmdRun(argv: readonly string[]): void {
   const framesOverride = kv.get('frames');
   const scenarioArg = kv.get('scenario');
   const outArg = kv.get('out');
+  const format = parseOutputFormat(kv.get('format'));
+  const tagGroups = parseTagGroups(argv);
 
-  const scenarioIds =
+  const requestedScenarioIds =
     scenarioArg && scenarioArg !== 'all'
       ? scenarioArg.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
       : undefined;
+  const scenarioIds = selectScenarios({
+    ...(requestedScenarioIds != null ? { ids: requestedScenarioIds } : {}),
+    ...(tagGroups.length > 0 ? { tagGroups } : {}),
+  }).map((scenario) => scenario.id);
 
   process.stderr.write(
-    `bench: scenarios=${scenarioIds?.join(',') ?? 'all'}, samples=${samples}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
+    `bench: scenarios=${scenarioIds.join(',')}, tags=${tagGroups.length > 0 ? formatTagGroups(tagGroups) : 'none'}, samples=${samples}, warmup=${warmupOverride ?? 'default'}, frames=${framesOverride ?? 'default'}\n`,
   );
 
   const report = runBench({
     samples,
-    ...(scenarioIds != null ? { scenarioIds } : {}),
+    scenarioIds,
     ...(warmupOverride != null ? { warmupFramesOverride: Number.parseInt(warmupOverride, 10) } : {}),
     ...(framesOverride != null ? { measureFramesOverride: Number.parseInt(framesOverride, 10) } : {}),
     onProgress: (event) => {
@@ -118,9 +190,14 @@ function cmdRun(argv: readonly string[]): void {
     },
   });
 
-  printSummary(report);
+  if (format === 'summary') {
+    printSummary(report);
+  } else {
+    process.stdout.write(renderStructuredReport(report, format));
+  }
 
   if (outArg != null) {
+    const outFormat = fileFormatForOutput(format);
     let outPath = resolve(process.cwd(), outArg);
     // If the user gave a directory, auto-name the file.
     try {
@@ -128,13 +205,13 @@ function cmdRun(argv: readonly string[]): void {
       if (stat.isDirectory()) {
         const stamp = new Date().toISOString().replace(/[:.]/g, '-');
         const commit = report.commit ?? 'unknown';
-        outPath = join(outPath, `bench-${stamp}-${commit}.json`);
+        outPath = join(outPath, `bench-${stamp}-${commit}.${defaultOutExtension(outFormat)}`);
       }
     } catch {
       // doesn't exist — assume it's a file path
     }
     mkdirSync(dirname(outPath), { recursive: true });
-    writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+    writeFileSync(outPath, renderStructuredReport(report, outFormat), 'utf8');
     process.stderr.write(`\nsaved: ${outPath}\n`);
   }
 }
@@ -161,8 +238,8 @@ function cmdCompare(argv: readonly string[]): void {
   }
   const baselinePath = resolve(process.cwd(), positionals[0]!);
   const currentPath = resolve(process.cwd(), positionals[1]!);
-  const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as RunReport;
-  const current = JSON.parse(readFileSync(currentPath, 'utf8')) as RunReport;
+  const baseline = readBenchReport(baselinePath);
+  const current = readBenchReport(currentPath);
   const comparison = compareReports(baseline, current);
   process.stdout.write(formatComparison(comparison) + '\n');
 }
@@ -177,10 +254,12 @@ function main(): void {
         'bijou-bench — performance harness',
         '',
         'usage:',
-        '  bench run [--scenario=ID|all] [--samples=30] [--warmup=N] [--frames=N] [--out=path]',
+        '  bench run [--scenario=ID|all] [--tag=TAG[,TAG]] [--samples=30] [--warmup=N] [--frames=N] [--format=summary|json|jsonl] [--out=path]',
         '  bench compare <baseline.json> <current.json>',
-        '  bench list',
+        '  bench list [--tag=TAG[,TAG]]',
         '',
+        'Formats: summary=human table (default), json=nested bench.v2, jsonl=flat metric records.',
+        'Tag filters: comma-separated tags are AND within one --tag, repeated --tag flags are OR across groups.',
         `scenarios: ${listScenarioIds().join(', ')}`,
       ].join('\n') + '\n',
     );
@@ -195,7 +274,7 @@ function main(): void {
       cmdCompare(rest);
       break;
     case 'list':
-      cmdList();
+      cmdList(rest);
       break;
     default:
       throw new Error(`unknown subcommand: ${subcommand}`);

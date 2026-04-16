@@ -1,14 +1,23 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import type { BijouContext } from '../../ports/context.js';
+import { createSurface, isPackedSurface, type Cell, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
-import type { TableOptions } from './table.js';
+import { colorRgb, type ColorRef } from '../theme/color.js';
+import type { TableColumn, TableOptions } from './table.js';
 import { createTextSurface, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
+import { encodeModifiers } from '../render/packed-cell.js';
 
 export type TableSurfaceCell = string | Surface;
+export type TableSurfaceRow = readonly TableSurfaceCell[];
 
 export interface TableSurfaceOptions extends Omit<TableOptions, 'rows'> {
-  readonly rows: TableSurfaceCell[][];
+  readonly rows: readonly TableSurfaceRow[];
+}
+
+function isTableSurfaceOptions(
+  value: TableSurfaceOptions | readonly TableColumn[],
+): value is TableSurfaceOptions {
+  return !Array.isArray(value);
 }
 
 function normalizeColumnWidth(width: number | undefined): number | undefined {
@@ -30,7 +39,23 @@ function resolveColumns(
 /**
  * Render a bordered data table as a Surface for V3-native composition.
  */
-export function tableSurface(options: TableSurfaceOptions): Surface {
+export function tableSurface(options: TableSurfaceOptions): Surface;
+export function tableSurface(
+  columns: readonly TableColumn[],
+  rows: readonly TableSurfaceRow[],
+  context?: BijouContext,
+): Surface;
+export function tableSurface(
+  optionsOrColumns: TableSurfaceOptions | readonly TableColumn[],
+  rowData?: readonly TableSurfaceRow[],
+  context?: BijouContext,
+): Surface {
+  let options: TableSurfaceOptions;
+  if (isTableSurfaceOptions(optionsOrColumns)) {
+    options = optionsOrColumns;
+  } else {
+    options = { columns: [...optionsOrColumns], rows: rowData ?? [], ctx: context };
+  }
   const ctx = resolveCtx(options.ctx);
   const overflow = resolveOverflowBehavior(
     options.overflow,
@@ -79,32 +104,34 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
   const totalHeight = 1 + headerHeight + 1 + rowHeights.reduce((sum, height) => sum + height, 0) + 1;
   const surface = createSurface(totalWidth, totalHeight, { char: ' ', empty: false });
 
-  const packed: boolean = 'buffer' in surface;
+  const packedSurface = isPackedSurface(surface) ? surface : undefined;
 
   // Pre-parse border style for setRGB fast path
   let bfR = -1, bfG = 0, bfB = 0, bbR = -1, bbG = 0, bbB = 0, bflags = 0;
-  if (packed && borderStyle.fg) {
-    const rgb = parseHex(borderStyle.fg);
+  if (packedSurface) {
+    const rgb = borderStyle.fgRGB ?? colorRgb(borderStyle.fg);
     if (rgb) { const [r, g, b] = rgb; bfR = r; bfG = g; bfB = b; }
   }
-  if (packed && borderStyle.bg) {
-    const rgb = parseHex(borderStyle.bg);
+  if (packedSurface) {
+    const rgb = borderStyle.bgRGB ?? colorRgb(borderStyle.bg);
     if (rgb) { const [r, g, b] = rgb; bbR = r; bbG = g; bbB = b; }
   }
-  if (packed) bflags = encodeModifiers(borderStyle.modifiers);
+  if (packedSurface) bflags = encodeModifiers(borderStyle.modifiers);
 
-  const setBorder = (x: number, y: number, char: string, bg?: string): void => {
-    if (packed && !bg) {
-      (surface as PackedSurface).setRGB(x, y, char, bfR, bfG, bfB, bbR, bbG, bbB, bflags);
+  const setBorder = (x: number, y: number, char: string, bg?: ColorRef): void => {
+    if (packedSurface && !bg) {
+      packedSurface.setRGB(x, y, char, bfR, bfG, bfB, bbR, bbG, bbB, bflags);
     } else {
       surface.set(x, y, { char, ...borderStyle, bg: bg ?? borderStyle.bg, empty: false });
     }
   };
-  const setSpace = (x: number, y: number, bg?: string, fg?: string): void => {
+  const setSpace = (x: number, y: number, bg?: Cell['bg'], fg?: Cell['fg']): void => {
     surface.set(x, y, {
       char: ' ',
       fg: fg ?? headerBg?.fg,
       bg: bg ?? headerBg?.bg,
+      fgRGB: headerBg?.fgRGB,
+      bgRGB: headerBg?.bgRGB,
       modifiers: headerBg?.modifiers,
       empty: false,
     });
@@ -162,7 +189,7 @@ export function tableSurface(options: TableSurfaceOptions): Surface {
         const cellWidth = colWidths[colIndex]!;
         setBorder(x - 1, y + line, '\u2502');
         for (let fillX = x; fillX < x + cellWidth + 2; fillX++) {
-          if (packed) (surface as PackedSurface).setRGB(fillX, y + line, 0x20, -1, 0, 0, -1, 0, 0);
+          if (packedSurface) packedSurface.setRGB(fillX, y + line, 0x20, -1, 0, 0, -1, 0, 0);
           else surface.set(fillX, y + line, { char: ' ', empty: false });
         }
         x += cellWidth + 3;

@@ -1,24 +1,23 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { sanitizeNonNegativeInt } from '../numeric.js';
+import { colorRgb } from '../theme/color.js';
+import { sanitizePlainTerminalText } from '../text/index.js';
 import type { SeparatorOptions } from './separator.js';
 import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
-import { parseHex, encodeModifiers } from '../render/packed-cell.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
+import { encodeModifiers } from '../render/packed-cell.js';
 
 /**
  * Render a horizontal separator as a Surface for V3-native composition.
  */
 export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  const label = options.label ?? '';
+  const label = sanitizePlainTerminalText(options.label ?? '');
   const token = options.borderToken ?? ctx?.border('muted');
   const borderStyle = tokenToCellStyle(token);
   const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `, 'separatorSurface label') : [];
   const fallbackWidth = labelGraphemes.length > 0 ? labelGraphemes.length : 3;
-  const width = Math.max(0, Math.floor(options.width ?? ctx?.runtime.columns ?? fallbackWidth));
+  const width = sanitizeNonNegativeInt(options.width, ctx?.runtime.columns ?? fallbackWidth);
   const surface = createSurface(width, 1);
 
   if (width === 0) return surface;
@@ -26,12 +25,12 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   // Pre-parse border style for setRGB fast path
   const packed = isPackedSurface(surface);
   let bfgR = -1, bfgG = 0, bfgB = 0, bbgR = -1, bbgG = 0, bbgB = 0, bflags = 0;
-  if (packed && borderStyle.fg) {
-    const rgb = parseHex(borderStyle.fg);
+  if (packed) {
+    const rgb = borderStyle.fgRGB ?? colorRgb(borderStyle.fg);
     if (rgb) { bfgR = rgb[0]; bfgG = rgb[1]; bfgB = rgb[2]; }
   }
-  if (packed && borderStyle.bg) {
-    const rgb = parseHex(borderStyle.bg);
+  if (packed) {
+    const rgb = borderStyle.bgRGB ?? colorRgb(borderStyle.bg);
     if (rgb) { bbgR = rgb[0]; bbgG = rgb[1]; bbgB = rgb[2]; }
   }
   if (packed) bflags = encodeModifiers(borderStyle.modifiers);

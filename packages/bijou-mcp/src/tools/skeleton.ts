@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { skeleton } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -11,7 +12,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const skeletonTool: ToolRegistration = {
+export const skeletonTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_skeleton',
   description: 'Render a placeholder skeleton loader (shimmering block characters). Useful for showing loading state.',
   inputSchema: inputShape,
@@ -21,4 +22,4 @@ export const skeletonTool: ToolRegistration = {
     const result = skeleton({ width: input.width, lines: input.lines, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

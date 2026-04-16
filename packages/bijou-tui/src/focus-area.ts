@@ -24,6 +24,7 @@ import type { BijouContext, Cell, Surface, TokenValue } from '@flyingrobots/bijo
 import { createSurface, parseAnsiToSurface, renderByMode } from '@flyingrobots/bijou';
 import { resolveBCSSTextToken } from './css/text-style.js';
 import {
+  type ScrollbarMode,
   type ScrollState,
   viewport,
   createScrollState,
@@ -57,6 +58,8 @@ export interface FocusAreaState {
   readonly height: number;
   /** Horizontal overflow behavior. */
   readonly overflowX: OverflowX;
+  /** Scrollbar ownership model for the pane edge. */
+  readonly scrollbarMode: ScrollbarMode;
 }
 
 /** Options for creating a new focus area state. */
@@ -69,6 +72,8 @@ export interface FocusAreaOptions {
   readonly height: number;
   /** Horizontal overflow behavior. Default: `'hidden'`. */
   readonly overflowX?: OverflowX;
+  /** Reserve a gutter column or overlay the rightmost content cell. Default: `'gutter'`. */
+  readonly scrollbarMode?: ScrollbarMode;
 }
 
 /** Options for rendering the focus area view. */
@@ -81,6 +86,10 @@ export interface FocusAreaRenderOptions {
   readonly unfocusedGutterToken?: TokenValue;
   /** Show a scrollbar track on the right edge. Default: `true`. */
   readonly showScrollbar?: boolean;
+  /** Token for the scrollbar track. Default: `theme.semantic.muted`. */
+  readonly scrollbarTrackToken?: TokenValue;
+  /** Token for the scrollbar thumb. Default: `theme.semantic.accent`. */
+  readonly scrollbarThumbToken?: TokenValue;
   /** Optional BCSS id for the focus area. */
   readonly id?: string;
   /** Optional BCSS classes for the focus area. */
@@ -99,6 +108,7 @@ const EMPTY_CELL: Cell = { char: ' ', empty: false };
 const SCROLLBAR_TRACK_CELL: Cell = { char: '│', empty: false };
 const SCROLLBAR_THUMB_CELL: Cell = { char: '█', empty: false };
 const gutterCellCache = new Map<string, Cell>();
+const scrollbarCellCache = new Map<string, Cell>();
 
 // ---------------------------------------------------------------------------
 // State creation
@@ -115,7 +125,7 @@ const gutterCellCache = new Map<string, Cell>();
  * @returns Fresh focus area state with scroll at the top-left.
  */
 export function createFocusAreaState(options: FocusAreaOptions): FocusAreaState {
-  const { content, overflowX = 'hidden' } = options;
+  const { content, overflowX = 'hidden', scrollbarMode = 'gutter' } = options;
   // Clamp dimensions to at least 1
   const width = Math.max(1, options.width);
   const height = Math.max(1, options.height);
@@ -124,11 +134,12 @@ export function createFocusAreaState(options: FocusAreaOptions): FocusAreaState 
     scroll: createScrollState(
       content,
       height,
-      resolveFocusAreaViewportWidth(content.split('\n').length, width, height, overflowX),
+      resolveFocusAreaViewportWidth(content.split('\n').length, width, height, overflowX, scrollbarMode),
     ),
     width,
     height,
     overflowX,
+    scrollbarMode,
   };
 }
 
@@ -142,10 +153,10 @@ export function createFocusAreaStateForSurface(
   surface: Surface,
   options: Omit<FocusAreaOptions, 'content'>,
 ): FocusAreaState {
-  const { overflowX = 'hidden' } = options;
+  const { overflowX = 'hidden', scrollbarMode = 'gutter' } = options;
   const width = Math.max(1, options.width);
   const height = Math.max(1, options.height);
-  const viewportWidth = resolveFocusAreaViewportWidth(surface.height, width, height, overflowX);
+  const viewportWidth = resolveFocusAreaViewportWidth(surface.height, width, height, overflowX, scrollbarMode);
   const maxX = viewportWidth === undefined ? 0 : Math.max(0, surface.width - viewportWidth);
   return {
     content: '',
@@ -160,6 +171,7 @@ export function createFocusAreaStateForSurface(
     width,
     height,
     overflowX,
+    scrollbarMode,
   };
 }
 
@@ -264,7 +276,13 @@ export function focusAreaScrollToX(state: FocusAreaState, x: number): FocusAreaS
  */
 export function focusAreaSetContent(state: FocusAreaState, content: string): FocusAreaState {
   const totalLines = content.split('\n').length;
-  const viewportWidth = resolveFocusAreaViewportWidth(totalLines, state.width, state.height, state.overflowX);
+  const viewportWidth = resolveFocusAreaViewportWidth(
+    totalLines,
+    state.width,
+    state.height,
+    state.overflowX,
+    state.scrollbarMode,
+  );
   const newScroll = createScrollState(content, state.height, viewportWidth);
   const clampedY = Math.min(state.scroll.y, newScroll.maxY);
   const clampedX = Math.min(state.scroll.x, newScroll.maxX);
@@ -317,6 +335,7 @@ export function focusArea(state: FocusAreaState, options?: FocusAreaRenderOption
     scrollY: state.scroll.y,
     scrollX,
     showScrollbar,
+    scrollbarMode: state.scrollbarMode,
   });
 
   if (!hasGutter) return body;
@@ -364,7 +383,9 @@ export function focusAreaSurfaceInto(
   const gutterWidth = hasGutter ? 1 : 0;
   const bodyWidth = Math.max(0, state.width - gutterWidth);
   const needsScrollbar = showScrollbar && content.height > state.height && bodyWidth > 0;
-  const contentWidth = needsScrollbar ? Math.max(0, bodyWidth - 1) : bodyWidth;
+  const contentWidth = needsScrollbar && state.scrollbarMode === 'gutter'
+    ? Math.max(0, bodyWidth - 1)
+    : bodyWidth;
   const scrollY = Math.max(0, Math.min(state.scroll.y, Math.max(0, content.height - state.height)));
   const scrollX = state.overflowX === 'scroll'
     ? Math.max(0, Math.min(state.scroll.x, Math.max(0, content.width - contentWidth)))
@@ -375,7 +396,18 @@ export function focusAreaSurfaceInto(
   }
 
   if (needsScrollbar) {
-    paintScrollbarInto(target, offsetX + gutterWidth + contentWidth, offsetY, state.height, content.height, scrollY);
+    const scrollbarX = offsetX + gutterWidth + bodyWidth - 1;
+    const scrollbarCells = resolveScrollbarCells(ctx, options);
+    paintScrollbarInto(
+      target,
+      scrollbarX,
+      offsetY,
+      state.height,
+      content.height,
+      scrollY,
+      scrollbarCells.track,
+      scrollbarCells.thumb,
+    );
   }
 
   if (hasGutter) {
@@ -451,6 +483,51 @@ function resolveGutterCell(
   return parsed;
 }
 
+function resolveScrollbarCells(
+  ctx: BijouContext | undefined,
+  options: FocusAreaRenderOptions | undefined,
+): { track: Cell; thumb: Cell } {
+  return {
+    track: resolveScrollbarCell('track', ctx, options),
+    thumb: resolveScrollbarCell('thumb', ctx, options),
+  };
+}
+
+function resolveScrollbarCell(
+  kind: 'track' | 'thumb',
+  ctx: BijouContext | undefined,
+  options: FocusAreaRenderOptions | undefined,
+): Cell {
+  if (!ctx) {
+    return kind === 'thumb' ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL;
+  }
+
+  const baseToken = kind === 'thumb'
+    ? (options?.scrollbarThumbToken ?? ctx.semantic('accent'))
+    : (options?.scrollbarTrackToken ?? ctx.semantic('muted'));
+  const baseChar = kind === 'thumb' ? SCROLLBAR_THUMB_CELL.char : SCROLLBAR_TRACK_CELL.char;
+  const key = `${kind}:${baseChar}:${JSON.stringify(baseToken)}:${options?.id ?? ''}:${(options?.classes ?? []).join(',')}`;
+  const cached = scrollbarCellCache.get(key);
+  if (cached != null) return cached;
+
+  const token = resolveBCSSTextToken(
+    ctx,
+    {
+      type: kind === 'thumb' ? 'FocusAreaScrollbarThumb' : 'FocusAreaScrollbarTrack',
+      id: options?.id,
+      classes: [...(options?.classes ?? []), 'scrollbar', `scrollbar-${kind}`],
+    },
+    {
+      hex: baseToken.hex,
+      bg: baseToken.bg,
+      modifiers: baseToken.modifiers as string[] | undefined,
+    },
+  );
+  const parsed = parseAnsiToSurface(ctx.style.styled(token as any, baseChar), 1, 1).get(0, 0);
+  scrollbarCellCache.set(key, parsed);
+  return parsed;
+}
+
 function paintScrollbarInto(
   target: Surface,
   column: number,
@@ -458,6 +535,8 @@ function paintScrollbarInto(
   viewportHeight: number,
   totalLines: number,
   scrollY: number,
+  trackCell: Cell,
+  thumbCell: Cell,
 ): void {
   if (totalLines <= viewportHeight) {
     for (let y = 0; y < viewportHeight; y++) {
@@ -477,7 +556,7 @@ function paintScrollbarInto(
       target,
       column,
       row + index,
-      isThumb ? SCROLLBAR_THUMB_CELL : SCROLLBAR_TRACK_CELL,
+      isThumb ? thumbCell : trackCell,
     );
   }
 }
@@ -487,11 +566,14 @@ function resolveFocusAreaViewportWidth(
   width: number,
   height: number,
   overflowX: OverflowX,
+  scrollbarMode: ScrollbarMode,
 ): number | undefined {
   const gutterWidth = width > 1 ? 1 : 0;
   const contentWidth = Math.max(1, width - gutterWidth);
   const hasScrollbar = totalLines > height && contentWidth > 1;
-  const scrollableWidth = hasScrollbar ? Math.max(1, contentWidth - 1) : contentWidth;
+  const scrollableWidth = hasScrollbar && scrollbarMode === 'gutter'
+    ? Math.max(1, contentWidth - 1)
+    : contentWidth;
   return overflowX === 'scroll' ? scrollableWidth : undefined;
 }
 

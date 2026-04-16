@@ -5,8 +5,29 @@
  * with normalized UV mapping and full color/styling support.
  */
 
-import { createSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
+
+function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'rgb' in ref
+    ? (ref as { rgb: readonly [number, number, number] }).rgb
+    : undefined;
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
 
 /**
  * Parameters passed to the shader function.
@@ -84,12 +105,12 @@ export function canvas(
 }
 
 function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
-  if (packed && cell.fg) {
-    const fg = parseHex(cell.fg);
+  if (packed && (cell.fgRGB != null || cell.fg != null)) {
+    const fg = cell.fgRGB ?? resolvedColorRgb(cell.fg) ?? (resolvedColorHex(cell.fg) ? parseHex(resolvedColorHex(cell.fg)!) : undefined);
     if (fg) {
       const [fR, fG, fB] = fg;
       let bR = -1, bG = 0, bB = 0;
-      const bg = cell.bg ? parseHex(cell.bg) : undefined;
+      const bg = cell.bgRGB ?? resolvedColorRgb(cell.bg) ?? (resolvedColorHex(cell.bg) ? parseHex(resolvedColorHex(cell.bg)!) : undefined);
       if (bg) { [bR, bG, bB] = bg; }
       (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;
@@ -100,7 +121,7 @@ function setCellFast(surface: Surface, packed: boolean, x: number, y: number, ce
 
 function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const result = shader({
@@ -117,7 +138,7 @@ function renderCellResolution(surface: Surface, shader: ShaderFn, time: number, 
 
 function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   const subW = width * 2;
   const subH = height * 2;
 
@@ -162,7 +183,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
 
 function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: number, uniforms: Record<string, any>) {
   const { width, height } = surface;
-  const packed: boolean = 'buffer' in surface;
+  const packed = isPackedSurface(surface);
   const subW = width * 2;
   const subH = height * 4;
 

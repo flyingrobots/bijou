@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createPipeline, type RenderState } from './pipeline.js';
+import {
+  createPipeline,
+  getRenderStageTimings,
+  type RenderState,
+} from './pipeline.js';
 import { createSurface } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 
@@ -77,5 +81,93 @@ describe('createPipeline', () => {
 
     expect(log).toEqual(['1', '3']); // Continued after error
     expect(state.ctx.io.writeError).toHaveBeenCalledWith(expect.stringContaining('[Pipeline Error]'));
+  });
+
+  it('reuses the flattened chain until middleware registration changes', () => {
+    const mapSpy = vi.spyOn(Array.prototype, 'map');
+    const pipeline = createPipeline();
+    const log: string[] = [];
+
+    pipeline.use('Layout', (_, next) => { log.push('layout'); next(); });
+    pipeline.use('Paint', (_, next) => { log.push('paint'); next(); });
+
+    pipeline.execute(createMockState());
+    pipeline.execute(createMockState());
+
+    expect(mapSpy).toHaveBeenCalledTimes(1);
+    expect(log).toEqual(['layout', 'paint', 'layout', 'paint']);
+
+    pipeline.use('PostProcess', (_, next) => { log.push('post'); next(); });
+    pipeline.execute(createMockState());
+
+    expect(mapSpy).toHaveBeenCalledTimes(2);
+    expect(log).toEqual([
+      'layout', 'paint',
+      'layout', 'paint',
+      'layout', 'paint', 'post',
+    ]);
+
+    mapSpy.mockRestore();
+  });
+
+  it('records per-stage timings and notifies observers in stage order', () => {
+    let nowMs = 100;
+    const pipeline = createPipeline({ now: () => nowMs });
+    const state = createMockState();
+    const seen: Array<{ stage: string; durationMs: number }> = [];
+
+    pipeline.use('Layout', (_state, next) => {
+      nowMs += 5;
+      next();
+    });
+    pipeline.use('Paint', (_state, next) => {
+      nowMs += 7;
+      next();
+    });
+    pipeline.use('Diff', (_state, next) => {
+      nowMs += 11;
+      next();
+    });
+
+    pipeline.onStageComplete((stage, durationMs) => {
+      seen.push({ stage, durationMs });
+    });
+
+    pipeline.execute(state);
+
+    expect(seen).toEqual([
+      { stage: 'Layout', durationMs: 5 },
+      { stage: 'Paint', durationMs: 7 },
+      { stage: 'PostProcess', durationMs: 0 },
+      { stage: 'Diff', durationMs: 11 },
+      { stage: 'Output', durationMs: 0 },
+    ]);
+    expect(getRenderStageTimings(state)).toEqual(seen);
+  });
+
+  it('records the active stage timing when middleware halts the pipeline', () => {
+    let nowMs = 0;
+    const pipeline = createPipeline({ now: () => nowMs });
+    const state = createMockState();
+
+    pipeline.use('Layout', (_state, next) => {
+      nowMs += 3;
+      next();
+    });
+    pipeline.use('Paint', () => {
+      nowMs += 9;
+      // halt
+    });
+    pipeline.use('PostProcess', (_state, next) => {
+      nowMs += 100;
+      next();
+    });
+
+    pipeline.execute(state);
+
+    expect(getRenderStageTimings(state)).toEqual([
+      { stage: 'Layout', durationMs: 3 },
+      { stage: 'Paint', durationMs: 9 },
+    ]);
   });
 });

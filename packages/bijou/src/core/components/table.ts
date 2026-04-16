@@ -1,6 +1,5 @@
-import { graphemeWidth } from '../text/grapheme.js';
-import { clipToWidth } from '../text/clip.js';
-import { wrapToWidth } from '../text/wrap.js';
+import { RESET_SGR } from '../ansi.js';
+import { ANSI_OSC8_RE, ANSI_SGR_RE, graphemeClusterWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
@@ -17,12 +16,15 @@ export interface TableColumn {
   width?: number;
 }
 
+export type TableTextCell = string;
+export type TableTextRow = readonly TableTextCell[];
+
 /** Configuration for rendering a table. */
 export interface TableOptions extends BijouNodeOptions {
   /** Column definitions (headers and optional widths). */
-  columns: TableColumn[];
+  columns: readonly TableColumn[];
   /** Two-dimensional array of cell strings, one inner array per row. */
-  rows: string[][];
+  rows: readonly TableTextRow[];
   /** Theme token applied to header text. */
   headerToken?: TokenValue;
   /** Theme token applied to border characters. */
@@ -34,13 +36,39 @@ export interface TableOptions extends BijouNodeOptions {
 }
 
 /**
+ * Structural width added by the interactive table frame for a given column count.
+ *
+ * Each column contributes two padding spaces and one vertical divider, with one
+ * extra border character for the outer edge.
+ */
+export function interactiveTableBorderOverhead(columnCount: number): number {
+  return Math.max(0, columnCount) * 3 + 1;
+}
+
+/**
+ * Total rendered width of an interactive table for the supplied column widths.
+ */
+export function measureInteractiveTableWidth(columnWidths: readonly number[]): number {
+  return columnWidths.reduce((total, width) => total + width, 0)
+    + interactiveTableBorderOverhead(columnWidths.length);
+}
+
+function isTableOptions(value: TableOptions | readonly TableColumn[]): value is TableOptions {
+  return !Array.isArray(value);
+}
+
+/**
  * Calculate the visible (non-ANSI) character length of a string.
  *
  * @param str - Input string potentially containing ANSI codes.
  * @returns The number of visible characters.
  */
 function visibleLength(str: string): number {
-  return graphemeWidth(str);
+  let width = 0;
+  for (const grapheme of segmentGraphemes(stripAnsi(str))) {
+    width += tableGraphemeWidth(grapheme);
+  }
+  return width;
 }
 
 /**
@@ -70,9 +98,130 @@ function formatCellLines(
   const safeValue = value ?? '';
   if (!fixedWidth) return safeValue.split('\n');
   if (overflow === 'truncate') {
-    return safeValue.split('\n').map((line) => clipToWidth(line, width));
+    return safeValue.split('\n').map((line) => clipCellToWidth(line, width));
   }
-  return safeValue.split('\n').flatMap((line) => wrapToWidth(line, width));
+  return safeValue.split('\n').flatMap((line) => wrapCellToWidth(line, width));
+}
+
+const TABLE_EMOJI_PRESENTATION_RE = /\p{Emoji_Presentation}/u;
+
+type TableWrapToken =
+  | { readonly kind: 'ansi'; readonly raw: string }
+  | { readonly kind: 'grapheme'; readonly raw: string; readonly width: number };
+
+function tableGraphemeWidth(grapheme: string): number {
+  if (TABLE_EMOJI_PRESENTATION_RE.test(grapheme)) return 2;
+  return graphemeClusterWidth(grapheme);
+}
+
+function isOsc8Escape(raw: string): boolean {
+  return raw.startsWith('\x1b]8;;');
+}
+
+function isResetEscape(raw: string): boolean {
+  return raw === RESET_SGR;
+}
+
+function tokenizeTableText(str: string): TableWrapToken[] {
+  const regex = new RegExp(`${ANSI_SGR_RE.source}|${ANSI_OSC8_RE.source}`, 'g');
+  const tokens: TableWrapToken[] = [];
+  let lastIndex = 0;
+
+  for (const match of str.matchAll(regex)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      const raw = str.slice(lastIndex, index);
+      for (const grapheme of segmentGraphemes(raw)) {
+        tokens.push({
+          kind: 'grapheme',
+          raw: grapheme,
+          width: tableGraphemeWidth(grapheme),
+        });
+      }
+    }
+
+    tokens.push({ kind: 'ansi', raw: match[0] });
+    lastIndex = index + match[0].length;
+  }
+
+  if (lastIndex < str.length) {
+    const raw = str.slice(lastIndex);
+    for (const grapheme of segmentGraphemes(raw)) {
+      tokens.push({
+        kind: 'grapheme',
+        raw: grapheme,
+        width: tableGraphemeWidth(grapheme),
+      });
+    }
+  }
+
+  return tokens;
+}
+
+function clipCellToWidth(str: string, maxWidth: number): string {
+  if (maxWidth <= 0) return '';
+
+  const tokens = tokenizeTableText(str);
+  let visible = 0;
+  let result = '';
+  let hasStyle = false;
+
+  for (const token of tokens) {
+    if (token.kind === 'ansi') {
+      result += token.raw;
+      if (!isOsc8Escape(token.raw)) {
+        hasStyle = true;
+      }
+      continue;
+    }
+
+    if (visible + token.width > maxWidth) {
+      if (hasStyle && !result.endsWith(RESET_SGR)) result += RESET_SGR;
+      break;
+    }
+
+    result += token.raw;
+    visible += token.width;
+  }
+
+  return result;
+}
+
+function wrapCellToWidth(str: string, maxWidth: number): string[] {
+  if (maxWidth <= 0) return [''];
+
+  const tokens = tokenizeTableText(str);
+  if (tokens.length === 0) return [''];
+
+  const lines: string[] = [];
+  let current = '';
+  let currentWidth = 0;
+  let activeStyle = '';
+
+  for (const token of tokens) {
+    if (token.kind === 'ansi') {
+      current += token.raw;
+      if (isOsc8Escape(token.raw)) continue;
+      activeStyle = isResetEscape(token.raw) ? '' : activeStyle + token.raw;
+      continue;
+    }
+
+    if (currentWidth + token.width > maxWidth && currentWidth > 0) {
+      lines.push(activeStyle.length === 0 || current.endsWith(RESET_SGR) ? current : current + RESET_SGR);
+      current = activeStyle + token.raw;
+      currentWidth = token.width;
+      continue;
+    }
+
+    current += token.raw;
+    currentWidth += token.width;
+  }
+
+  if (current.length > 0) {
+    lines.push(activeStyle.length === 0 || current.endsWith(RESET_SGR) ? current : current + RESET_SGR);
+  }
+
+  return lines.length > 0 ? lines : [''];
 }
 
 /**
@@ -86,7 +235,23 @@ function formatCellLines(
  * @param options - Table configuration including columns and row data.
  * @returns The rendered table string.
  */
-export function table(options: TableOptions): string {
+export function table(options: TableOptions): string;
+export function table(
+  columns: readonly TableColumn[],
+  rows: readonly TableTextRow[],
+  context?: BijouContext,
+): string;
+export function table(
+  optionsOrColumns: TableOptions | readonly TableColumn[],
+  rowData?: readonly TableTextRow[],
+  context?: BijouContext,
+): string {
+  let options: TableOptions;
+  if (isTableOptions(optionsOrColumns)) {
+    options = optionsOrColumns;
+  } else {
+    options = { columns: [...optionsOrColumns], rows: rowData ?? [], ctx: context };
+  }
   const ctx = resolveCtx(options.ctx);
   const columns = options.columns ?? [];
   const rows = (options.rows ?? []).map(row => (row ?? []).map(cell => cell ?? ''));

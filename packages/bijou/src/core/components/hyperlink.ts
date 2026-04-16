@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { sanitizePlainTerminalText } from '../text/index.js';
 
 /** Configuration options for the {@link hyperlink} component. */
 export interface HyperlinkOptions {
@@ -26,14 +27,16 @@ export interface HyperlinkOptions {
 export function hyperlink(text: string, url: string, options?: HyperlinkOptions): string {
   const ctx = resolveCtx(options?.ctx);
   const fallback = options?.fallback ?? 'both';
+  const safeText = sanitizePlainTerminalText(text ?? '');
+  const safeUrl = sanitizePlainTerminalText(url ?? '', { newlineReplacement: '' });
 
   // No context → use fallback format
-  if (!ctx) return formatFallback(text, url, fallback);
+  if (!ctx) return formatFallback(safeText, safeUrl, fallback);
 
   return renderByMode(ctx.mode, {
-    interactive: () => `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`,
-    pipe: () => formatFallback(text, url, fallback),
-    accessible: () => `${text} (${url})`,
+    interactive: () => `\x1b]8;;${safeUrl}\x1b\\${safeText}\x1b]8;;\x1b\\`,
+    pipe: () => formatFallback(safeText, safeUrl, fallback),
+    accessible: () => `${safeText} (${safeUrl})`,
   }, options ?? {});
 }
 

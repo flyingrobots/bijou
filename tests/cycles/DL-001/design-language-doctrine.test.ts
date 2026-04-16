@@ -52,12 +52,12 @@ describe('DL-001 design language doctrine cycle', () => {
     expect(content).toContain('agent');
   });
 
-  it('parks notification polish on the Humane Terminal backlog and spawns the next design-language backlog item', () => {
-    const htBacklog = readRepoFile('docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md');
+  it('parks notification polish in Humane Terminal lineage and spawns the next design-language backlog item', () => {
+    const htBacklog = readRepoFile('docs/method/retro/HT_001-notification-center-polish-and-discoverability.md');
     const dlCycle = readRepoFile('docs/design/DL-002-canonicalize-patterns-and-blocks.md');
 
     expect(htBacklog).toContain('Notification Center Polish and Discoverability');
-    expect(htBacklog).toContain('Parked on the backlog');
+    expect(htBacklog).toContain('Repo truth already shipped');
     expect(dlCycle).toContain('Canonicalize Patterns and Blocks');
   });
 });

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { constrain } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -13,7 +14,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const constrainTool: ToolRegistration = {
+export const constrainTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_constrain',
   description: 'Constrain text to a maximum width and/or height, truncating with ellipsis if needed.',
   inputSchema: inputShape,
@@ -25,4 +26,4 @@ export const constrainTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

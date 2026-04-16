@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { progressBar } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -14,7 +15,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const progressBarTool: ToolRegistration = {
+export const progressBarTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_progress_bar',
   description: 'Render a static progress bar showing completion percentage.',
   inputSchema: inputShape,
@@ -27,4 +28,4 @@ export const progressBarTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

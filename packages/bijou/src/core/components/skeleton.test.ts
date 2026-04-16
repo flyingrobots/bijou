@@ -38,4 +38,13 @@ describe('skeleton', () => {
     const result = skeleton({ width: 15, ctx });
     expect(result).toBe('░'.repeat(15));
   });
+
+  it('sanitizes non-finite and fractional dimensions', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    const result = skeleton({ width: Number.NaN, lines: 2.9, ctx });
+    const lines = result.split('\n');
+
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toBe('░'.repeat(20));
+  });
 });

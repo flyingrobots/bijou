@@ -13,9 +13,14 @@ describe('release-readiness', () => {
       'workflow:shell:preflight',
       'release:preflight',
       'test:frames',
+      'verify:interactive-examples',
       'smoke:canaries',
       'smoke:dogfood',
       'test',
+    ]);
+    expect(plan.find((step) => step.label === 'verify:interactive-examples')?.args).toEqual([
+      'run',
+      'verify:interactive-examples',
     ]);
     expect(plan.find((step) => step.label === 'smoke:canaries')?.args).toEqual([
       'run',

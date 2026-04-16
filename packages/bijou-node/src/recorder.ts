@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createRequire } from 'node:module';
-import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { runScript, type App, type ScriptStep } from '@flyingrobots/bijou-tui';
 
 const require = createRequire(import.meta.url);
@@ -16,6 +16,31 @@ const FONT = require('oled-font-5x7') as {
 const GLYPH_MAP = new Map<string, number>(FONT.lookup.map((char, index) => [char, index]));
 const DEFAULT_FOREGROUND = '#f5f7ff';
 const DEFAULT_BACKGROUND = '#0b1020';
+
+function resolvedColorRgb(ref: unknown): Rgb | undefined {
+  if (typeof ref !== 'object' || ref == null) return undefined;
+  if (!('kind' in ref) || (ref as { kind?: unknown }).kind !== 'resolved-color') return undefined;
+  if (!('rgb' in ref)) return undefined;
+  const rgb = (ref as { rgb: readonly [number, number, number] }).rgb;
+  return { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! };
+}
+
+function normalizeRgb(rgb: Rgb | readonly [number, number, number]): Rgb {
+  return Array.isArray(rgb)
+    ? { r: rgb[0]!, g: rgb[1]!, b: rgb[2]! }
+    : (rgb as Rgb);
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
 
 export interface NativeDemoSpec<Model, M = never> {
   name: string;
@@ -80,8 +105,8 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
   }
 
   const rasterOptions: RasterizeOptions = {
-    cellWidth: options.cellWidth ?? 8,
-    cellHeight: options.cellHeight ?? 10,
+    cellWidth: sanitizePositiveInt(options.cellWidth, 8),
+    cellHeight: sanitizePositiveInt(options.cellHeight, 10),
     foreground: options.foreground ?? DEFAULT_FOREGROUND,
     background: options.background ?? DEFAULT_BACKGROUND,
   };
@@ -93,7 +118,7 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
     .map((frame) => rasterizeSurface(frame, rasterOptions));
   const palette = quantize(joinFrames(frames), 256, { format: 'rgb565' });
   const gif = GIFEncoder();
-  const delay = Math.max(2, Math.round((options.frameDelayMs ?? 90) / 10));
+  const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10));
 
   for (const frame of frames) {
     const indexed = applyPalette(frame, palette);
@@ -116,8 +141,8 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
 }
 
 export function rasterizeSurface(surface: Surface, options?: Partial<RasterizeOptions>): Uint8Array {
-  const cellWidth = options?.cellWidth ?? 8;
-  const cellHeight = options?.cellHeight ?? 10;
+  const cellWidth = sanitizePositiveInt(options?.cellWidth, 8);
+  const cellHeight = sanitizePositiveInt(options?.cellHeight, 10);
   const foreground = options?.foreground ?? DEFAULT_FOREGROUND;
   const background = options?.background ?? DEFAULT_BACKGROUND;
   const width = surface.width * cellWidth;
@@ -146,8 +171,10 @@ function drawCell(
   fallbackBackground: string,
 ): void {
   const modifiers = new Set(cell.modifiers ?? []);
-  let fg = parseHex(cell.fg ?? fallbackForeground);
-  let bg = parseHex(cell.bg ?? fallbackBackground);
+  const fgHex = resolvedColorHex(cell.fg);
+  const bgHex = resolvedColorHex(cell.bg);
+  let fg = normalizeRgb(cell.fgRGB ?? resolvedColorRgb(cell.fg) ?? parseHex(fgHex ?? fallbackForeground));
+  let bg = normalizeRgb(cell.bgRGB ?? resolvedColorRgb(cell.bg) ?? parseHex(bgHex ?? fallbackBackground));
 
   if (modifiers.has('inverse')) {
     [fg, bg] = [bg, fg];

@@ -1,4 +1,5 @@
 import type { RuntimePort } from '../../ports/runtime.js';
+import { sanitizePositiveInt } from '../../core/numeric.js';
 
 /**
  * Configuration for {@link mockRuntime}.
@@ -40,8 +41,8 @@ export function mockRuntime(options: MockRuntimeOptions = {}): RuntimePort {
     },
     stdoutIsTTY: options.stdoutIsTTY ?? true,
     stdinIsTTY: options.stdinIsTTY ?? true,
-    columns: options.columns ?? 80,
-    rows: options.rows ?? 24,
-    refreshRate: options.refreshRate ?? 60,
+    columns: sanitizePositiveInt(options.columns, 80),
+    rows: sanitizePositiveInt(options.rows, 24),
+    refreshRate: sanitizePositiveInt(options.refreshRate, 60),
   };
 }

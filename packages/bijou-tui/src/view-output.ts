@@ -58,7 +58,7 @@ export function normalizeViewOutputInto(
 
   if (!isLayoutNodeView(output)) {
     throw new Error(
-      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them explicitly with parseAnsiToSurface(...) or stringToSurface(...).',
+      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them with contentSurface(...), parseAnsiToSurface(...), or stringToSurface(...).',
     );
   }
 
@@ -88,7 +88,7 @@ export function wrapViewOutputAsLayoutRoot(
 
   if (!isLayoutNodeView(output)) {
     throw new Error(
-      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them explicitly with parseAnsiToSurface(...) or stringToSurface(...).',
+      'Bijou runtime views must return a Surface or LayoutNode. Raw strings are no longer supported; convert them with contentSurface(...), parseAnsiToSurface(...), or stringToSurface(...).',
     );
   }
 

@@ -1,34 +1,38 @@
-import { createSurface, type Surface, type Cell, type PackedSurface } from '../../ports/surface.js';
+import { createSurface, isPackedSurface, type Surface, type Cell } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { colorHex, colorRgb, type ColorRef } from '../theme/color.js';
 import { clipToWidth } from '../text/clip.js';
+import { sanitizePlainTerminalText } from '../text/index.js';
 import { wrapToWidth } from '../text/wrap.js';
 import { resolveFillChar, type BoxOptions, type HeaderBoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createSegmentSurface, createTextSurface, segmentSurfaceText, tokenToCellStyle, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { parseHex, encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
+import { encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
-function parseStyleRGB(style: { fg?: string; bg?: string; modifiers?: string[] }): {
+function parseStyleRGB(style: {
+  fg?: ColorRef;
+  bg?: ColorRef;
+  fgRGB?: readonly [number, number, number];
+  bgRGB?: readonly [number, number, number];
+  modifiers?: string[];
+}): {
   fgR: number; fgG: number; fgB: number;
   bgR: number; bgG: number; bgB: number;
   flags: number;
 } | undefined {
   let fgR = -1, fgG = 0, fgB = 0;
   let bgR = -1, bgG = 0, bgB = 0;
-  if (style.fg) {
-    const rgb = parseHex(style.fg);
-    if (!rgb) return undefined;
-    fgR = rgb[0]; fgG = rgb[1]; fgB = rgb[2];
+  const fgRgb = style.fgRGB ?? colorRgb(style.fg);
+  if (style.fg != null && fgRgb == null) return undefined;
+  if (fgRgb) {
+    fgR = fgRgb[0]; fgG = fgRgb[1]; fgB = fgRgb[2];
   }
-  if (style.bg) {
-    const rgb = parseHex(style.bg);
-    if (!rgb) return undefined;
-    bgR = rgb[0]; bgG = rgb[1]; bgB = rgb[2];
+  const bgRgb = style.bgRGB ?? colorRgb(style.bg);
+  if (style.bg != null && bgRgb == null) return undefined;
+  if (bgRgb) {
+    bgR = bgRgb[0]; bgG = bgRgb[1]; bgB = bgRgb[2];
   }
   return { fgR, fgG, fgB, bgR, bgG, bgB, flags: encodeModifiers(style.modifiers) };
 }
@@ -41,13 +45,13 @@ function normalizeFixedWidth(width: number | undefined): number | undefined {
   return Math.max(2, Math.floor(width));
 }
 
-function withInheritedBackground(surface: Surface, background: string | undefined): Surface {
+function withInheritedBackground(surface: Surface, background: ColorRef | undefined): Surface {
   if (background == null) return surface;
 
   const next = surface.clone();
   if (isPackedSurface(next)) {
     // Fast path: write bg bytes directly into the buffer
-    const bgRGB = parseHex(background);
+    const bgRGB = colorRgb(background);
     if (bgRGB) {
       const buf = next.buffer;
       const [bgR, bgG, bgB] = bgRGB;
@@ -69,7 +73,7 @@ function withInheritedBackground(surface: Surface, background: string | undefine
     for (let x = 0; x < next.width; x++) {
       const cell = next.get(x, y);
       if (cell.empty || cell.bg != null) continue;
-      next.set(x, y, { ...cell, bg: background });
+      next.set(x, y, { ...cell, bg: colorHex(background) });
     }
   }
 
@@ -84,6 +88,7 @@ function withInheritedBackground(surface: Surface, background: string | undefine
 export function boxSurface(content: Surface | string, options: BoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
   const { title, width: fixedWidth, padding = {} } = options;
+  const safeTitle = title != null ? sanitizePlainTerminalText(title) : '';
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
   const overflow = resolveOverflowBehavior(options.overflow, bcss);
   const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
@@ -105,8 +110,8 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
       : content;
   }
 
-  const autoTitleWidth = normalizedFixedWidth === undefined && title
-    ? segmentSurfaceText(` ${title} `, 'boxSurface title').length
+  const autoTitleWidth = normalizedFixedWidth === undefined && safeTitle.length > 0
+    ? segmentSurfaceText(` ${safeTitle} `, 'boxSurface title').length
     : 0;
   const innerW = normalizedFixedWidth === undefined
     ? Math.max(contentSurf.width + pl + pr, autoTitleWidth)
@@ -160,9 +165,9 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     surface.setRGB(0, outerH - 1, BORDER.bl, fgR, fgG, fgB, bgR, bgG, bgB, flags);
     surface.setRGB(outerW - 1, outerH - 1, BORDER.br, fgR, fgG, fgB, bgR, bgG, bgB, flags);
 
-    if (title && outerW >= 4) {
+    if (safeTitle.length > 0 && outerW >= 4) {
       const available = Math.max(0, outerW - 4);
-      const titleText = clipToWidth(` ${title} `, available);
+      const titleText = clipToWidth(` ${safeTitle} `, available);
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
       for (let i = 0; i < titleLen; i++) {
@@ -189,9 +194,9 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     surface.set(0, outerH - 1, { ...borderCell, char: BORDER.bl });
     surface.set(outerW - 1, outerH - 1, { ...borderCell, char: BORDER.br });
 
-    if (title && outerW >= 4) {
+    if (safeTitle.length > 0 && outerW >= 4) {
       const available = Math.max(0, outerW - 4);
-      const titleText = clipToWidth(` ${title} `, available);
+      const titleText = clipToWidth(` ${safeTitle} `, available);
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
       for (let i = 0; i < titleLen; i++) {
@@ -221,8 +226,8 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
  */
 export function headerBoxSurface(label: string, options: HeaderBoxOptions = {}): Surface {
   const ctx = resolveCtx(options.ctx);
-  const safeLabel = label ?? '';
-  const detail = options.detail ?? '';
+  const safeLabel = sanitizePlainTerminalText(label ?? '');
+  const detail = sanitizePlainTerminalText(options.detail ?? '');
   const labelToken = options.labelToken ?? ctx?.semantic('primary');
   const mutedToken = ctx?.semantic('muted');
 

@@ -18,6 +18,8 @@
  */
 
 import {
+  sanitizeNonNegativeInt,
+  sanitizePositiveInt,
   table,
   tableSurface,
   type TableColumn,
@@ -54,6 +56,19 @@ export interface NavigableTableOptions {
   readonly height?: number;
 }
 
+export interface NavigableTableInput extends NavigableTableOptions {
+  /** Optional focused row index for snapshot-style rendering. */
+  readonly focusRow?: number;
+  /** Optional scroll offset for snapshot-style rendering. */
+  readonly scrollY?: number;
+}
+
+function isNavigableTableOptions(
+  value: NavigableTableOptions | readonly TableColumn[],
+): value is NavigableTableOptions {
+  return !Array.isArray(value);
+}
+
 /** Options for rendering the navigable table view. */
 export interface NavTableRenderOptions {
   /** Character(s) prepended to the focused row's first cell (default: `"\u25b8"`). */
@@ -77,15 +92,50 @@ export type NavTableSurfaceOptions = NavTableRenderOptions;
  * @param options - Columns, rows, and optional viewport height.
  * @returns Fresh table state with focus on the first row.
  */
-export function createNavigableTableState(options: NavigableTableOptions): NavigableTableState {
-  const height = Math.max(1, options.height ?? 10);
+function resolveNavigableTableOptions(
+  optionsOrColumns: NavigableTableOptions | readonly TableColumn[],
+  rows?: readonly (readonly string[])[],
+  height?: number,
+): NavigableTableOptions {
+  if (isNavigableTableOptions(optionsOrColumns)) {
+    return optionsOrColumns;
+  }
+  return { columns: [...optionsOrColumns], rows: rows ?? [], height };
+}
+
+function resolveNavigableTableState(input: NavigableTableInput): NavigableTableState {
+  const height = sanitizePositiveInt(input.height, 10);
+  const rows = input.rows.map((row) => [...row]);
+  const focusRow = rows.length === 0
+    ? 0
+    : Math.min(sanitizeNonNegativeInt(input.focusRow, 0), rows.length - 1);
+  const scrollY = adjustScroll(
+    focusRow,
+    sanitizeNonNegativeInt(input.scrollY, 0),
+    height,
+    rows.length,
+  );
   return {
-    columns: [...options.columns],
-    rows: options.rows.map((row) => [...row]),
-    focusRow: 0,
-    scrollY: 0,
+    columns: [...input.columns],
+    rows,
+    focusRow,
+    scrollY,
     height,
   };
+}
+
+export function createNavigableTableState(options: NavigableTableOptions): NavigableTableState;
+export function createNavigableTableState(
+  columns: readonly TableColumn[],
+  rows: readonly (readonly string[])[],
+  height?: number,
+): NavigableTableState;
+export function createNavigableTableState(
+  optionsOrColumns: NavigableTableOptions | readonly TableColumn[],
+  rows?: readonly (readonly string[])[],
+  height?: number,
+): NavigableTableState {
+  return resolveNavigableTableState(resolveNavigableTableOptions(optionsOrColumns, rows, height));
 }
 
 // ---------------------------------------------------------------------------
@@ -178,7 +228,8 @@ function adjustScroll(focusRow: number, scrollY: number, height: number, totalRo
  * @param options - Rendering options (focus indicator, context).
  * @returns Rendered table string with focus indicator on the active row.
  */
-export function navigableTable(state: NavigableTableState, options?: NavTableRenderOptions): string {
+export function navigableTable(input: NavigableTableInput, options?: NavTableRenderOptions): string {
+  const state = resolveNavigableTableState(input);
   if (state.rows.length === 0) {
     return table({ columns: state.columns, rows: [], ctx: options?.ctx });
   }
@@ -217,26 +268,27 @@ export function navigableTable(state: NavigableTableState, options?: NavTableRen
  * @returns Rendered table surface with focus indicator on the active row.
  */
 export function navigableTableSurface(
-  state: NavigableTableState,
+  state: NavigableTableInput,
   options?: NavTableSurfaceOptions,
 ): Surface {
-  if (state.rows.length === 0) {
-    return tableSurface({ columns: state.columns, rows: [], ctx: options?.ctx });
+  const resolvedState = resolveNavigableTableState(state);
+  if (resolvedState.rows.length === 0) {
+    return tableSurface({ columns: resolvedState.columns, rows: [], ctx: options?.ctx });
   }
 
   const indicator = options?.focusIndicator ?? '\u25b8';
   const pad = ' '.repeat(indicator.length);
-  const visibleRows = state.rows.slice(state.scrollY, state.scrollY + state.height);
+  const visibleRows = resolvedState.rows.slice(resolvedState.scrollY, resolvedState.scrollY + resolvedState.height);
 
   const decoratedRows = visibleRows.map((row, i) => {
-    const globalIndex = state.scrollY + i;
-    const prefix = globalIndex === state.focusRow ? indicator : pad;
+    const globalIndex = resolvedState.scrollY + i;
+    const prefix = globalIndex === resolvedState.focusRow ? indicator : pad;
     const firstCol = `${prefix} ${row[0] ?? ''}`;
     return [firstCol, ...row.slice(1)];
   });
 
   return tableSurface({
-    columns: state.columns,
+    columns: resolvedState.columns,
     rows: decoratedRows,
     ctx: options?.ctx,
   });

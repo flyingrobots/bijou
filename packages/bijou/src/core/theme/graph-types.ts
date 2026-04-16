@@ -1,4 +1,5 @@
 import type { TokenValue, TextModifier } from './tokens.js';
+import type { RGB } from './tokens.js';
 
 /**
  * Color transformation operations supported by the token graph.
@@ -31,6 +32,10 @@ export interface TokenDefinition {
   bg?: ColorDefinition;
   /** Optional text style modifiers. */
   modifiers?: TextModifier[];
+  /** Optional cached foreground RGB for direct-token imports. */
+  fgRGB?: RGB;
+  /** Optional cached background RGB for direct-token imports. */
+  bgRGB?: RGB;
 }
 
 /**

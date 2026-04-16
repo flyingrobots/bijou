@@ -8,12 +8,13 @@
  * - `tooltip()` — positioned overlay relative to a target element
  */
 
-import type { BijouContext, Surface, PackedSurface, TokenValue, Cell } from '@flyingrobots/bijou';
+import type { BijouContext, Surface, TokenValue, Cell } from '@flyingrobots/bijou';
 import { FLAG_DIM, FLAG_EMPTY } from '@flyingrobots/bijou';
 import { CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_BG_SET, parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 import {
   createSurface,
   graphemeClusterWidth,
+  isPackedSurface,
   parseAnsiToSurface,
   segmentGraphemes,
   shouldApplyBg,
@@ -22,7 +23,29 @@ import {
 } from '@flyingrobots/bijou';
 import { sliceAnsi, visibleLength, clipToWidth } from './viewport.js';
 import type { LayoutRect } from './layout-rect.js';
+
+function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'rgb' in ref
+    ? (ref as { rgb: readonly [number, number, number] }).rgb
+    : undefined;
+}
+
+function resolvedColorHex(ref: unknown): string | undefined {
+  if (typeof ref === 'string') return ref;
+  return typeof ref === 'object'
+    && ref !== null
+    && 'kind' in ref
+    && (ref as { kind?: unknown }).kind === 'resolved-color'
+    && 'hex' in ref
+    ? (ref as { hex: string }).hex
+    : undefined;
+}
 import { clampCenteredPosition, resolveOverlayMargin } from './design-language.js';
+import { forceTextPresentation } from './icon-presentation.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -227,10 +250,10 @@ export function compositeSurfaceInto(
   }
 
   if (options?.dim) {
-    const packed = 'buffer' in target && (target as PackedSurface).buffer instanceof Uint8Array;
+    const packed = isPackedSurface(target);
     if (packed) {
       // Fast path: set the dim flag bit directly in the buffer
-      const buf = (target as PackedSurface).buffer;
+      const buf = target.buffer;
       const size = target.width * target.height;
       for (let i = 0; i < size; i++) {
         const off = i * CELL_STRIDE;
@@ -239,7 +262,7 @@ export function compositeSurfaceInto(
         if (buf[off]! === 0x20 && buf[off + 1]! === 0) continue;
         buf[off + OFF_FLAGS] = buf[off + OFF_FLAGS]! | FLAG_DIM;
       }
-      (target as PackedSurface).markAllDirty();
+      target.markAllDirty();
     } else {
       for (let y = 0; y < target.height; y++) {
         for (let x = 0; x < target.width; x++) {
@@ -320,8 +343,8 @@ function overlayContentFromSurface(surface: Surface, ctx: BijouContext | undefin
 }
 
 function setStyledCell(surface: Surface, x: number, y: number, char: string, style: CellStyle, numStyle?: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number }): void {
-  if (numStyle && 'buffer' in surface) {
-    (surface as PackedSurface).setRGB(x, y, char, numStyle.fR, numStyle.fG, numStyle.fB, numStyle.bR, numStyle.bG, numStyle.bB, numStyle.fl);
+  if (numStyle && isPackedSurface(surface)) {
+    surface.setRGB(x, y, char, numStyle.fR, numStyle.fG, numStyle.fB, numStyle.bR, numStyle.bG, numStyle.bB, numStyle.fl);
   } else {
     surface.set(x, y, { char, ...style, empty: false });
   }
@@ -353,11 +376,13 @@ function lineSurface(text: string, style: CellStyle = {}): Surface {
   const surface = createSurface(width, 1);
   // Pre-parse style for setRGB fast path
   let ns: { fR: number; fG: number; fB: number; bR: number; bG: number; bB: number; fl: number } | undefined;
-  if ('buffer' in surface) {
+  if (isPackedSurface(surface)) {
     let fR = -1, fG = 0, fB = 0, bR = -1, bG = 0, bB = 0;
-    const fgRgb = style.fgRGB ?? (style.fg ? parseHex(style.fg) : undefined);
+    const fgHex = resolvedColorHex(style.fg);
+    const fgRgb = style.fgRGB ?? resolvedColorRgb(style.fg) ?? (fgHex ? parseHex(fgHex) : undefined);
     if (fgRgb) { [fR, fG, fB] = fgRgb; }
-    const bgRgb = style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined);
+    const bgHex = resolvedColorHex(style.bg);
+    const bgRgb = style.bgRGB ?? resolvedColorRgb(style.bg) ?? (bgHex ? parseHex(bgHex) : undefined);
     if (bgRgb) { [bR, bG, bB] = bgRgb; }
     ns = { fR, fG, fB, bR, bG, bB, fl: style.modifiers ? encodeModifiers(style.modifiers) : 0 };
   }
@@ -373,11 +398,14 @@ function lineWithInheritedBackground(line: Surface, style: Pick<CellStyle, 'bg' 
   if ((style.bg == null && style.bgRGB == null) || line.width === 0) return line;
   const result = line.clone();
   // Fast path: packed surface — write bg bytes directly
-  const packed = 'buffer' in result && (result as PackedSurface).buffer instanceof Uint8Array;
-  const rgb = packed ? (style.bgRGB ?? (style.bg ? parseHex(style.bg) : undefined)) : undefined;
-  if (rgb) {
+  const packedSurface = isPackedSurface(result) ? result : undefined;
+  const bgHex = resolvedColorHex(style.bg);
+  const rgb = packedSurface
+    ? (style.bgRGB ?? resolvedColorRgb(style.bg) ?? (bgHex ? parseHex(bgHex) : undefined))
+    : undefined;
+  if (packedSurface && rgb) {
     const [bgR, bgG, bgB] = rgb;
-    const buf = (result as PackedSurface).buffer;
+    const buf = packedSurface.buffer;
     for (let i = 0; i < result.width; i++) {
       const off = i * CELL_STRIDE;
       if (buf[off + OFF_FLAGS]! & FLAG_EMPTY) continue;
@@ -385,7 +413,7 @@ function lineWithInheritedBackground(line: Surface, style: Pick<CellStyle, 'bg' 
       buf[off + 5] = bgR; buf[off + 6] = bgG; buf[off + 7] = bgB;
       buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
     }
-    (result as PackedSurface).markAllDirty();
+    packedSurface.markAllDirty();
     return result;
   }
   for (let x = 0; x < result.width; x++) {
@@ -508,9 +536,9 @@ export function modal(options: ModalOptions): Overlay {
 
 /** Unicode icon characters mapped by toast variant. */
 const TOAST_ICONS: Record<ToastVariant, string> = {
-  success: '\u2714', // ✔
-  error: '\u2718',   // ✘
-  info: '\u2139',    // ℹ
+  success: forceTextPresentation('\u2714'), // ✔
+  error: forceTextPresentation('\u2718'),   // ✘
+  info: forceTextPresentation('\u2139'),    // ℹ
 };
 
 /** Semantic border token keys mapped by toast variant. */

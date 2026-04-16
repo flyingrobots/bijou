@@ -345,6 +345,22 @@ describe('filter()', () => {
       const result = await filter({ title: 'Pick', options: MANY_OPTIONS, maxVisible: 20, ctx });
       expect(result).toBe('v2');
     });
+
+    it('sanitizes non-finite maxVisible values', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['j', 'j', '\r'] },
+      });
+      const result = await filter({
+        title: 'Pick',
+        options: MANY_OPTIONS,
+        maxVisible: Number.NaN,
+        ctx,
+      });
+
+      expect(result).toBe('v3');
+      expect(ctx.io.written.join('')).not.toContain('NaN');
+    });
   });
 
   describe('no-matches status', () => {

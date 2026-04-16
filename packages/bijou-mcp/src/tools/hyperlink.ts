@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { hyperlink } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -13,7 +14,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const hyperlinkTool: ToolRegistration = {
+export const hyperlinkTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_hyperlink',
   description: 'Render a terminal hyperlink (OSC 8). Falls back to text + URL in plain mode.',
   inputSchema: inputShape,
@@ -23,4 +24,4 @@ export const hyperlinkTool: ToolRegistration = {
     const result = hyperlink(input.text, input.url, { fallback: input.fallback, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

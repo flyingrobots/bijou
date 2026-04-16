@@ -15,7 +15,7 @@
  * ```
  */
 
-import { createSurface, parseAnsiToSurface, type Surface } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, sanitizePositiveInt, type Surface } from '@flyingrobots/bijou';
 import type { BindingInfo } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
 import { visibleLength } from './viewport.js';
@@ -40,6 +40,8 @@ export interface HelpOptions {
   separator?: string;
   /** Title shown at the top (default: none). */
   title?: string;
+  /** Label used when a binding does not declare a group (default: `General`). */
+  defaultGroupName?: string;
 }
 
 /** Options for rendering help into a `Surface`. */
@@ -75,6 +77,7 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   const enabledOnly = options?.enabledOnly ?? true;
   const sep = options?.separator ?? '  ';
   const groupFilter = options?.groupFilter;
+  const defaultGroupName = options?.defaultGroupName ?? 'General';
 
   let all = keymap.bindings();
   if (enabledOnly) all = all.filter((b) => b.enabled);
@@ -89,7 +92,7 @@ export function helpView(keymap: BindingSource, options?: HelpOptions): string {
   // Group by group name
   const groups = new Map<string, BindingInfo[]>();
   for (const b of all) {
-    const group = b.group || 'General';
+    const group = b.group || defaultGroupName;
     let list = groups.get(group);
     if (!list) {
       list = [];
@@ -216,12 +219,9 @@ export function helpForSurface(
 
 function renderHelpSurface(text: string, options?: Pick<HelpSurfaceOptions, 'width' | 'height'>): Surface {
   const lines = text.length === 0 ? [''] : text.split('\n');
-  const width = Math.max(
-    1,
-    options?.width ?? 0,
-    ...lines.map((line) => visibleLength(line)),
-  );
-  const height = Math.max(1, options?.height ?? lines.length);
+  const contentWidth = Math.max(1, ...lines.map((line) => visibleLength(line)));
+  const width = Math.max(contentWidth, sanitizePositiveInt(options?.width, 1));
+  const height = sanitizePositiveInt(options?.height, lines.length);
 
   if (text.length === 0) {
     return createSurface(width, height);

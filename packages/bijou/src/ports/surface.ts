@@ -5,16 +5,19 @@
  * of terminal output (character + styling).
  */
 
+import { sanitizeNonNegativeInt } from '../core/numeric.js';
+import { colorHex, colorRgb, isResolvedColor, type ColorRef } from '../core/theme/color.js';
+
 /**
  * A single terminal character cell.
  */
 export interface Cell {
   /** The character to display. Must be a single grapheme. */
   char: string;
-  /** Foreground hex color (e.g. '#ffffff'). Undefined = terminal default. */
-  fg?: string;
-  /** Background hex color (e.g. '#000000'). Undefined = terminal default. */
-  bg?: string;
+  /** Foreground color reference. Undefined = terminal default. */
+  fg?: ColorRef;
+  /** Background color reference. Undefined = terminal default. */
+  bg?: ColorRef;
   /**
    * Pre-parsed foreground RGB channels `[r, g, b]` (0–255 each).
    * When present, the hot path skips hex string parsing of `fg`
@@ -242,6 +245,8 @@ function maskCell(cell: Cell, mask: CellMask): Cell {
     char: mask.char ? cell.char : ' ',
     fg: mask.fg ? cell.fg : undefined,
     bg: mask.bg ? cell.bg : undefined,
+    fgRGB: mask.fg ? cell.fgRGB : undefined,
+    bgRGB: mask.bg ? cell.bgRGB : undefined,
     modifiers: mask.modifiers ? cell.modifiers : undefined,
     empty: mask.alpha ? (cell.empty ?? false) : false,
     opacity: mask.alpha ? (cell.opacity ?? 1) : 1,
@@ -253,6 +258,8 @@ function cloneCell(cell: Cell): Cell {
     char: cell.char,
     fg: cell.fg,
     bg: cell.bg,
+    fgRGB: cell.fgRGB,
+    bgRGB: cell.bgRGB,
     modifiers: cell.modifiers,
     empty: cell.empty,
     opacity: cell.opacity,
@@ -263,12 +270,14 @@ function copyCellInto(target: Cell, source: Cell): void {
   target.char = source.char;
   target.fg = source.fg;
   target.bg = source.bg;
+  target.fgRGB = source.fgRGB;
+  target.bgRGB = source.bgRGB;
   target.modifiers = source.modifiers;
   target.empty = source.empty;
   target.opacity = source.opacity;
 }
 
-function isPackedSurface(s: Surface): s is PackedSurface {
+export function isPackedSurface(s: Surface): s is PackedSurface {
   return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
 }
 
@@ -310,6 +319,28 @@ function inlineHexRGB(hex: string, out: Uint8Array, off: number): boolean {
   return true;
 }
 
+function writeColorRefInto(
+  ref: ColorRef | undefined,
+  rgb: readonly [number, number, number] | undefined,
+  out: Uint8Array,
+  off: number,
+): boolean {
+  if (rgb !== undefined) {
+    out[off] = rgb[0]!;
+    out[off + 1] = rgb[1]!;
+    out[off + 2] = rgb[2]!;
+    return true;
+  }
+  if (ref == null) return false;
+  if (isResolvedColor(ref)) {
+    out[off] = ref.rgb[0]!;
+    out[off + 1] = ref.rgb[1]!;
+    out[off + 2] = ref.rgb[2]!;
+    return true;
+  }
+  return inlineHexRGB(ref, out, off);
+}
+
 /** Encode a Cell into the packed buffer. */
 function encodeCellIntoBuf(
   buf: Uint8Array,
@@ -326,25 +357,13 @@ function encodeCellIntoBuf(
   // Theme tokens populate fgRGB via resolve.ts populateThemeRGB(),
   // so theme-driven paints skip inlineHexRGB entirely.
   let alphaBits = 0;
-  const fgRGB = cell.fgRGB;
-  if (fgRGB !== undefined) {
-    buf[off + OFF_FG_R] = fgRGB[0]!;
-    buf[off + OFF_FG_G] = fgRGB[1]!;
-    buf[off + OFF_FG_B] = fgRGB[2]!;
-    alphaBits |= FLAG_FG_SET;
-  } else if (cell.fg && inlineHexRGB(cell.fg, buf, off + OFF_FG_R)) {
+  if (writeColorRefInto(cell.fg, cell.fgRGB, buf, off + OFF_FG_R)) {
     alphaBits |= FLAG_FG_SET;
   } else {
     buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
   }
 
-  const bgRGB = cell.bgRGB;
-  if (bgRGB !== undefined) {
-    buf[off + OFF_BG_R] = bgRGB[0]!;
-    buf[off + OFF_BG_G] = bgRGB[1]!;
-    buf[off + OFF_BG_B] = bgRGB[2]!;
-    alphaBits |= FLAG_BG_SET;
-  } else if (cell.bg && inlineHexRGB(cell.bg, buf, off + OFF_BG_R)) {
+  if (writeColorRefInto(cell.bg, cell.bgRGB, buf, off + OFF_BG_R)) {
     alphaBits |= FLAG_BG_SET;
   } else {
     buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;
@@ -366,10 +385,14 @@ function decodeCellFromBuf(
   const flags = buf[off + OFF_FLAGS]!;
   const fgSet = (alphaByte & FLAG_FG_SET) !== 0;
   const bgSet = (alphaByte & FLAG_BG_SET) !== 0;
+  const fgRGB = fgSet ? [buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!] as const : undefined;
+  const bgRGB = bgSet ? [buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!] as const : undefined;
   return {
     char: decodeChar(charCode, sideTable),
     fg: fgSet ? toHex(buf[off + OFF_FG_R]!, buf[off + OFF_FG_G]!, buf[off + OFF_FG_B]!) : undefined,
     bg: bgSet ? toHex(buf[off + OFF_BG_R]!, buf[off + OFF_BG_G]!, buf[off + OFF_BG_B]!) : undefined,
+    fgRGB,
+    bgRGB,
     modifiers: decodeModifiers(flags & ~FLAG_EMPTY),
     empty: (flags & FLAG_EMPTY) !== 0,
     opacity: decodeOpacity(alphaByte & OPACITY_MASK),
@@ -386,8 +409,10 @@ function syncCellFromBuf(
 ): void {
   const decoded = decodeCellFromBuf(buf, idx, sideTable);
   cell.char = decoded.char;
-  cell.fg = decoded.fg;
-  cell.bg = decoded.bg;
+  cell.fg = colorHex(decoded.fg);
+  cell.bg = colorHex(decoded.bg);
+  cell.fgRGB = colorRgb(decoded.fg);
+  cell.bgRGB = colorRgb(decoded.bg);
   cell.modifiers = decoded.modifiers;
   cell.empty = decoded.empty;
   // Preserve exact float when available; use quantized only for buffer-decoded reads
@@ -414,7 +439,7 @@ function applyMaskToBuf(
     buf[off + OFF_CHAR + 1] = (charCode >> 8) & 0xFF;
   }
   if (mask.fg) {
-    if (source.fg && inlineHexRGB(source.fg, buf, off + OFF_FG_R)) {
+    if (writeColorRefInto(source.fg, source.fgRGB, buf, off + OFF_FG_R)) {
       buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_FG_SET;
     } else {
       buf[off + OFF_FG_R] = 0; buf[off + OFF_FG_G] = 0; buf[off + OFF_FG_B] = 0;
@@ -422,7 +447,7 @@ function applyMaskToBuf(
     }
   }
   if (mask.bg) {
-    if (source.bg && inlineHexRGB(source.bg, buf, off + OFF_BG_R)) {
+    if (writeColorRefInto(source.bg, source.bgRGB, buf, off + OFF_BG_R)) {
       buf[off + OFF_ALPHA] = buf[off + OFF_ALPHA]! | FLAG_BG_SET;
     } else {
       buf[off + OFF_BG_R] = 0; buf[off + OFF_BG_G] = 0; buf[off + OFF_BG_B] = 0;
@@ -498,8 +523,8 @@ export interface PackedSurface extends Surface {
  * @returns A new Surface instance.
  */
 export function createSurface(width: number, height: number, fill?: Cell): PackedSurface {
-  const w = Math.max(0, Math.floor(width));
-  const h = Math.max(0, Math.floor(height));
+  const w = sanitizeNonNegativeInt(width, 0);
+  const h = sanitizeNonNegativeInt(height, 0);
   const size = w * h;
   const defaultCell: Cell = fill ?? { char: ' ', empty: true };
 

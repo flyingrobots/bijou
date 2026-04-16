@@ -722,6 +722,7 @@ Use when:
 
 - the app has multiple views or work areas
 - shell chrome, palette, overlays, and notifications should be standardized
+- the frame should own the default hosted runtime path via `app.run(...)` or `runFramedApp(...)`
 
 Avoid when:
 
@@ -734,6 +735,7 @@ Content guidance:
 - help text should clarify shell behavior, not restate page content
 - command palette entries should prefer actions and navigation targets, not field-style data entry or explanatory prose
 - use drawers for supplemental workspace context and notifications for event messaging; do not overload the status rail with either
+- prefer the self-running framed-shell path before dropping down to raw `run(app)`
 
 ### `statusBar()` and `statusBarSurface()`
 

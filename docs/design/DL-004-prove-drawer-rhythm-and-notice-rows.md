@@ -150,4 +150,4 @@ This cycle intentionally kept behavior stable and only proved calmer structure a
 
 Spawned:
 
-- [DL-005 — Prove Inspector and Guided Flow Rhythm](../BACKLOG/DL-005-prove-inspector-and-guided-flow-rhythm.md)
+- [DL-005 — Prove Inspector and Guided Flow Rhythm](../method/graveyard/legacy-backlog/DL-005-prove-inspector-and-guided-flow-rhythm.md)

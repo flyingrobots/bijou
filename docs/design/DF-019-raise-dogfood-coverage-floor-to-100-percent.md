@@ -106,4 +106,4 @@ DOGFOOD now covers the whole component-family map. The remaining work is depth, 
 
 Spawned:
 
-- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+- [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../method/graveyard/legacy-backlog/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)

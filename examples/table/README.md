@@ -27,25 +27,25 @@ npx tsx examples/table/main.ts
 import { ctx } from '../_shared/setup.js';
 import { table, separator } from '@flyingrobots/bijou';
 
+const packageColumns = [
+  { header: 'Package', width: 24 },
+  { header: 'Version', width: 10 },
+  { header: 'Size', width: 10 },
+  { header: 'License', width: 10 },
+];
+
+const packageRows = [
+  ['typescript', '5.9.3', '42.1 MB', 'Apache-2.0'],
+  ['vitest', '4.0.18', '12.3 MB', 'MIT'],
+  ['chalk', '5.6.2', '41 KB', 'MIT'],
+  ['@types/node', '22.0.0', '3.8 MB', 'MIT'],
+  ['tsx', '4.19.0', '8.2 MB', 'MIT'],
+];
+
 console.log(separator({ label: 'package dependencies', ctx }));
 console.log();
 
-console.log(table({
-  columns: [
-    { header: 'Package', width: 24 },
-    { header: 'Version', width: 10 },
-    { header: 'Size', width: 10 },
-    { header: 'License', width: 10 },
-  ],
-  rows: [
-    ['typescript', '5.9.3', '42.1 MB', 'Apache-2.0'],
-    ['vitest', '4.0.18', '12.3 MB', 'MIT'],
-    ['chalk', '5.6.2', '41 KB', 'MIT'],
-    ['@types/node', '22.0.0', '3.8 MB', 'MIT'],
-    ['tsx', '4.19.0', '8.2 MB', 'MIT'],
-  ],
-  ctx,
-}));
+console.log(table(packageColumns, packageRows, ctx));
 
 console.log();
 console.log(separator({ label: 'server status', ctx }));

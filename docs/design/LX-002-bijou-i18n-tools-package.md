@@ -209,4 +209,4 @@ That is a feature, not a miss. The cycle stayed focused on the pure tooling core
 
 Spawned:
 
-- [LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows](../BACKLOG/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md)
+- [LX-003 — Spreadsheet Adapters and Catalog Exchange Workflows](../method/graveyard/legacy-backlog/LX-003-spreadsheet-adapters-and-catalog-exchange-workflows.md)

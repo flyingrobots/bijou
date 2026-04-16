@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { markdown } from './markdown.js';
 import { createTestContext } from '../../adapters/test/index.js';
+import { graphemeWidth, stripAnsi } from '../text/grapheme.js';
 
 function ctx(mode: 'interactive' | 'pipe' | 'accessible' = 'interactive', width = 80) {
   return createTestContext({ mode, runtime: { columns: width } });
@@ -130,6 +131,43 @@ describe('markdown()', () => {
     });
   });
 
+  describe('tables', () => {
+    const source = [
+      '| Surface | Role |',
+      '| :--- | :--- |',
+      '| README.md | Public front door |',
+      '| GUIDE.md | Fast path |',
+    ].join('\n');
+
+    it('renders GFM-style tables with boxed output in interactive mode', () => {
+      const result = markdown(source, { ctx: ctx() });
+      expect(result).toContain('README.md');
+      expect(result).toContain('Public front door');
+      expect(result).toContain('\u250c');
+      expect(result).not.toContain('| :--- | :--- |');
+    });
+
+    it('lowers markdown tables to TSV in pipe mode', () => {
+      const result = markdown(source, { ctx: ctx('pipe') });
+      expect(result).toContain('Surface\tRole');
+      expect(result).toContain('README.md\tPublic front door');
+      expect(result).not.toContain('| :--- | :--- |');
+    });
+
+    it('linearizes markdown tables in accessible mode', () => {
+      const result = markdown(source, { ctx: ctx('accessible') });
+      expect(result).toContain('Row 1: Surface=README.md, Role=Public front door');
+      expect(result).toContain('Row 2: Surface=GUIDE.md, Role=Fast path');
+    });
+
+    it('fits interactive markdown tables within the requested width', () => {
+      const result = markdown(source, { ctx: ctx(), width: 20 });
+      for (const line of result.split('\n')) {
+        expect(graphemeWidth(stripAnsi(line))).toBeLessThanOrEqual(20);
+      }
+    });
+  });
+
   describe('code blocks', () => {
     it('renders code block content', () => {
       const source = '```js\nconsole.log("hi");\n```';
@@ -237,6 +275,30 @@ describe('markdown()', () => {
         expect(line.length).toBeLessThanOrEqual(40);
       }
     });
+
+    it('sanitizes non-finite and fractional widths', () => {
+      const result = markdown('word '.repeat(12).trim(), {
+        ctx: ctx('pipe', 18),
+        width: Number.NaN,
+      });
+      const fractional = markdown('word '.repeat(12).trim(), {
+        ctx: ctx('pipe', 40),
+        width: 9.9,
+      });
+
+      for (const line of result.split('\n')) expect(line.length).toBeLessThanOrEqual(18);
+      for (const line of fractional.split('\n')) expect(line.length).toBeLessThanOrEqual(9);
+    });
+
+    it('wraps paragraphs by visible inline width instead of raw markdown markers', () => {
+      const result = stripAnsi(markdown('alpha **beta** gamma', { ctx: ctx(), width: 10 }));
+      expect(result.split('\n')).toEqual(['alpha beta', 'gamma']);
+    });
+
+    it('wraps linked inline text by visible width instead of OSC 8 control bytes', () => {
+      const result = stripAnsi(markdown('alpha [beta](https://example.com) gamma', { ctx: ctx(), width: 10 }));
+      expect(result.split('\n')).toEqual(['alpha beta', 'gamma']);
+    });
   });
 
   describe('width validation', () => {
@@ -286,6 +348,20 @@ describe('markdown()', () => {
       expect(result).toContain('- Item 1');
       expect(result).toContain('---');
       expect(result).toContain('> A quote');
+    });
+
+    it('recognizes a table immediately after a paragraph without a blank line', () => {
+      const source = [
+        'Lead text',
+        '| Name | Role |',
+        '| :--- | :--- |',
+        '| README.md | Front door |',
+      ].join('\n');
+
+      const result = markdown(source, { ctx: ctx('pipe') });
+      expect(result).toContain('Lead text');
+      expect(result).toContain('Name\tRole');
+      expect(result).toContain('README.md\tFront door');
     });
 
     it('handles nested inline formatting', () => {

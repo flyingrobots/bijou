@@ -1,6 +1,8 @@
 export {
+  createI18nRuntimeAsync,
   createI18nRuntime,
   ref,
+  type I18nCatalogLoader,
   type I18nCatalog,
   type I18nCatalogEntry,
   type I18nCatalogKey,

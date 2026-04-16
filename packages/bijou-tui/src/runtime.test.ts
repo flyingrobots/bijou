@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { createSurface, stringToSurface, type TimerHandle } from '@flyingrobots/bijou';
-import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
-import { run } from './runtime.js';
+import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { run, runWithLifecycleHooks } from './runtime.js';
 import { quit } from './commands.js';
 import type { App, KeyMsg, Cmd } from './types.js';
+import { getRenderStageTimings } from './pipeline/pipeline.js';
 import {
   ENTER_ALT_SCREEN,
   HIDE_CURSOR,
@@ -18,6 +19,7 @@ import {
 } from './screen.js';
 
 const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
+const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
 
 function counterApp(quitKey = 'q'): App<number, never> {
   return {
@@ -124,6 +126,17 @@ function scheduleResizes(
 }
 
 describe('run', () => {
+  it('throws an actionable startup error when no ctx or ambient default is available', async () => {
+    _resetDefaultContextForTesting();
+
+    await expect(run(counterApp())).rejects.toThrow(
+      'Import @flyingrobots/bijou-node to register Node auto-init, call startApp(app), or call setDefaultContext() explicitly.',
+    );
+    await expect(run(counterApp())).rejects.toThrow(
+      'https://github.com/flyingrobots/bijou/tree/main/packages/bijou-node/GUIDE.md#basic-setup',
+    );
+  });
+
   describe('non-interactive mode', () => {
     it('renders once in pipe mode and returns', async () => {
       const ctx = createTestContext({ mode: 'pipe' });
@@ -423,6 +436,109 @@ describe('run', () => {
       expect(ctx.io.written.some((chunk) => chunk.includes('X'))).toBe(true);
     });
 
+    it('exposes per-stage pipeline timings through observers and render state data', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const completed: string[] = [];
+      const seenDuringDiff: string[][] = [];
+      const app: App<null, never> = {
+        init: () => [null, [quit()]],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      const promise = run(app, {
+        ctx,
+        configurePipeline(pipeline) {
+          pipeline.onStageComplete((stage, _durationMs, state) => {
+            completed.push(stage);
+            if (stage === 'Diff') {
+              seenDuringDiff.push(getRenderStageTimings(state).map((timing) => timing.stage));
+            }
+          });
+        },
+      });
+
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(completed).toEqual(['Layout', 'Paint', 'PostProcess', 'Diff', 'Output']);
+      expect(seenDuringDiff).toEqual([['Layout', 'Paint', 'PostProcess', 'Diff']]);
+    });
+
+    it('lets internal callers fold committed frame timings back into model state', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const seenFrameTimes: number[] = [];
+      const app: App<{ frameTimeMs: number }, never> = {
+        init: () => [{ frameTimeMs: 0 }, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') {
+            seenFrameTimes.push(model.frameTimeMs);
+            return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: () => {
+          const surface = createSurface(4, 1);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      };
+
+      scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
+      const promise = runWithLifecycleHooks(app, { ctx }, {
+        afterRender({ model, timings }) {
+          return { model: {
+            ...model,
+            frameTimeMs: timings.reduce((total, timing) => total + timing.durationMs, 0),
+          } };
+        },
+      });
+
+      await clock.advanceByAsync(50);
+      await promise;
+
+      expect(seenFrameTimes).toHaveLength(1);
+      expect(seenFrameTimes[0]).toBeGreaterThan(0);
+    });
+
+    it('supports one-shot follow-up renders for lifecycle-driven model hydration', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      let shouldHydrate = false;
+      let hydratedSeenOnQuit = false;
+      const app: App<{ hydrated: boolean }, never> = {
+        init: () => [{ hydrated: false }, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') {
+            hydratedSeenOnQuit = model.hydrated;
+            return [model, [quit()]];
+          }
+          return [model, []];
+        },
+        view: (model) => textView(`hydrated:${model.hydrated ? 'yes' : 'no'}`),
+      };
+
+      scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
+      const promise = runWithLifecycleHooks(app, { ctx }, {
+        beforeRender(model) {
+          return shouldHydrate ? { ...model, hydrated: true } : model;
+        },
+        afterRender() {
+          if (shouldHydrate) return;
+          shouldHydrate = true;
+          return { requestRender: true };
+        },
+      });
+
+      await clock.advanceByAsync(80);
+      await promise;
+
+      expect(hydratedSeenOnQuit).toBe(true);
+    });
+
     it('forces a clean redraw when the terminal resizes', async () => {
       const { clock, ctx } = createInteractiveContext();
       scheduleKeys(ctx, clock, [{ at: 30, key: 'q' }]);
@@ -486,6 +602,116 @@ describe('run', () => {
       );
     });
 
+    it('renders a crash surface and waits for enter when update throws', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      let settled = false;
+      const app: App<{ count: number }, never> = {
+        init: () => [{ count: 3 }, []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'up') {
+            throw new Error('update exploded');
+          }
+          return [model, []];
+        },
+        view: (model) => textView(`count:${model.count}`),
+      };
+
+      scheduleKeys(ctx, clock, [
+        { at: 5, key: '\x1b[A' },
+        { at: 20, key: '\r' },
+      ]);
+
+      const promise = run(app, { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+      rejection.finally(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(10);
+      const written = ctx.io.written.join('');
+      expect(settled).toBe(false);
+      expect(written).toContain('Bijou runtime crash');
+      expect(written).toContain('Phase: update');
+      expect(written).toContain('update exploded');
+      expect(written).toContain('Press Enter to exit.');
+      expect(written).toContain('"count": 3');
+
+      await clock.advanceByAsync(40);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('update exploded');
+    });
+
+    it('renders a crash surface and waits for enter when render fails', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      let settled = false;
+      const app: App<number, never> = {
+        init: () => [7, []],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          throw new Error('render exploded');
+        },
+      };
+
+      scheduleKeys(ctx, clock, [{ at: 50, key: '\r' }]);
+
+      const promise = run(app, { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+      rejection.finally(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(20);
+      const written = ctx.io.written.join('');
+      expect(settled).toBe(false);
+      expect(written).toContain('Bijou runtime crash');
+      expect(written).toContain('Phase: render');
+      expect(written).toContain('render exploded');
+      expect(written).toContain('Press Enter to exit.');
+      expect(written).toContain('7');
+
+      await clock.advanceByAsync(60);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('render exploded');
+    });
+
+    it('auto-exits crash mode when stdin is not a TTY', async () => {
+      const { clock, ctx } = createInteractiveContext({
+        runtime: { stdinIsTTY: false },
+      });
+      let onKey: ((key: string) => void) | null = null;
+      ctx.io.rawInput = (handler) => {
+        onKey = handler;
+        return { dispose() {} };
+      };
+
+      const app: App<number, never> = {
+        init: () => [7, []],
+        update: (_msg, model) => [model, []],
+        view: () => {
+          throw new Error('render exploded');
+        },
+      };
+
+      const promise = run(app, { ctx });
+      const rejection = promise.then(
+        () => null,
+        (error) => error,
+      );
+
+      await clock.advanceByAsync(20);
+      await expect(rejection).resolves.toBeInstanceOf(Error);
+      await expect(promise).rejects.toThrow('render exploded');
+      expect(ctx.io.written.join('')).toContain('Bijou runtime crash');
+      expect(ctx.io.written.join('')).toContain('Phase: render');
+      expect(onKey).not.toBeNull();
+    });
+
     it('does not leave runtime timeout handles active after shutdown', async () => {
       const { clock, activeTimeoutCount } = createTrackingClock();
       const ctx = createTestContext({ mode: 'interactive', clock });
@@ -500,6 +726,42 @@ describe('run', () => {
       await promise;
 
       expect(activeTimeoutCount()).toBe(0);
+    });
+
+    it('coalesces same-timestamp input bursts into one follow-up render', async () => {
+      let viewCalls = 0;
+      const app: App<number, never> = {
+        init: () => [0, []],
+        update(msg, model) {
+          if (msg.type === 'key') {
+            if (msg.key === 'q') return [model, [quit()]];
+            if (msg.key === 'up') return [model + 1, []];
+          }
+          return [model, []];
+        },
+        view(model) {
+          viewCalls += 1;
+          return textView(`count: ${model}`);
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext();
+      scheduleKeys(ctx, clock, [
+        { at: 1, key: '\x1b[A' },
+        { at: 1, key: '\x1b[A' },
+        { at: 1, key: '\x1b[A' },
+        { at: 5, key: 'q' },
+      ]);
+
+      const promise = run(app, { ctx });
+      await clock.advanceByAsync(20);
+      await promise;
+
+      const renderWrites = ctx.io.written.filter((chunk) => chunk.includes('count:') || chunk.endsWith('3'));
+      expect(viewCalls).toBe(2);
+      expect(renderWrites).toContainEqual(expect.stringContaining('count: 0'));
+      expect(renderWrites.some((chunk) => chunk.endsWith('3'))).toBe(true);
+      expect(renderWrites.some((chunk) => chunk.includes('count: 1') || chunk.includes('count: 2'))).toBe(false);
     });
 
     it('disposes cleanup-producing commands during shutdown', async () => {
@@ -519,6 +781,69 @@ describe('run', () => {
       await promise;
 
       expect(disposeCalls).toBe(1);
+    });
+
+    it('waits for async cleanup-producing commands to settle before shutdown completes', async () => {
+      let disposeCalls = 0;
+      const { clock, ctx } = createInteractiveContext();
+      const app: App<string, never> = {
+        init: () => ['cleanup', [
+          () => new Promise((resolve) => {
+            clock.setTimeout(() => {
+              resolve({
+                dispose() {
+                  disposeCalls += 1;
+                },
+              });
+            }, 25);
+          }),
+          quit(),
+        ]],
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      let settled = false;
+      const promise = run(app, { ctx }).then(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(10);
+      expect(settled).toBe(false);
+
+      await clock.advanceByAsync(20);
+      await promise;
+
+      expect(settled).toBe(true);
+      expect(disposeCalls).toBe(1);
+    });
+
+    it('emits one explicit warning when shutdown drain times out', async () => {
+      const { clock, ctx } = createInteractiveContext();
+      const app: App<string, never> = {
+        init: () => ['hang', [
+          () => new Promise(() => {}),
+          quit(),
+        ]],
+        update: (_msg, model) => [model, []],
+        view: (model) => textView(model),
+      };
+
+      let settled = false;
+      const promise = run(app, { ctx }).then(() => {
+        settled = true;
+      });
+
+      await clock.advanceByAsync(SHUTDOWN_DRAIN_TIMEOUT_MS - 1);
+      expect(settled).toBe(false);
+
+      await clock.advanceByAsync(2);
+      await promise;
+
+      expect(settled).toBe(true);
+      expect(ctx.io.writtenErr.some((chunk) =>
+        chunk.includes('[Runtime Warning] Timed out waiting 1000ms for pending commands to drain during shutdown.'),
+      )).toBe(true);
     });
 
     it('does not repeatedly clear the same cell after a surface becomes empty', async () => {

@@ -21,11 +21,9 @@ The runtime calls `init()` once, then loops: render → wait for event → `upda
 ## Minimal Example
 
 ```typescript
-import { run, quit, type App } from '@flyingrobots/bijou-tui';
+import { quit, type App } from '@flyingrobots/bijou-tui';
 import { stringToSurface } from '@flyingrobots/bijou';
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-
-initDefaultContext();
+import { startApp } from '@flyingrobots/bijou-node';
 
 const app: App<{ text: string }, never> = {
   init: () => [{ text: 'Hello!' }, []],
@@ -36,8 +34,11 @@ const app: App<{ text: string }, never> = {
   view: (model) => stringToSurface(model.text, model.text.length, 1),
 };
 
-run(app);
+await startApp(app);
 ```
+
+`startApp()` is the preferred Node-host bootstrap path. Use `run(app, { ctx })`
+when your host owns context creation explicitly.
 
 ### Command Contract
 
@@ -49,20 +50,25 @@ run(app);
 
 ## Fractal TEA (Sub-Apps)
 
-Compose complex UIs by nesting smaller apps using `mount()`, `initSubApp()`, and `updateSubApp()`.
+Compose complex UIs by nesting smaller apps using `createSubAppAdapter()`, `mount()`, `initSubApp()`, and `updateSubApp()`.
 
 ```typescript
-import { mount, initSubApp, updateSubApp, type App } from '@flyingrobots/bijou-tui';
+import { createSubAppAdapter, mount, initSubApp, updateSubApp, type App } from '@flyingrobots/bijou-tui';
+
+const childToParent = createSubAppAdapter<ParentMsg, ChildMsg>({
+  ready: (msg) => ({ type: 'child-ready', value: msg.value }),
+  failed: (msg) => ({ type: 'child-failed', error: msg.error }),
+});
 
 // 1. Parent update
 const [nextChildModel, childCmds] = updateSubApp(childApp, childMsg, model.child, {
-  onMsg: (m) => ({ type: 'childMsg', m }),
+  onMsg: childToParent,
 });
 
 // 2. Parent view
 const [childView, childMountCmds] = mount(childApp, {
   model: model.child,
-  onMsg: (m) => ({ type: 'childMsg', m }),
+  onMsg: childToParent,
 });
 ```
 
@@ -72,7 +78,10 @@ Bijou-TUI uses declarative layout. Components return either a `Surface` (fixed-s
 
 ### Flexbox
 - **`flex()`**: The primary layout engine. Use `basis` for fixed sizes and `flex` for proportional scaling.
-- **`vstackSurface()` / `hstackSurface()`**: Quick vertical/horizontal stacking for surfaces.
+- **`contentSurface()`**: Bridge raw text into surface-land at the composition edge.
+- **`vstackSurface()` / `hstackSurface()`**: Quick vertical/horizontal stacking for surfaces, including mixed `string | Surface` inputs.
+
+Keep `view()` strict: return a `Surface` or `LayoutNode`, not a raw string. If you are mixing string helpers with small surface-returning primitives, bridge first with `contentSurface()` or pass the string directly into `vstackSurface()` / `hstackSurface()`.
 
 ### Viewport & Scrolling
 Use `viewportSurface()` to mask and scroll content:
@@ -84,6 +93,7 @@ viewportSurface({ width: 60, height: 20, content: largeSurface, scrollY: 10 });
 - **`modal()`**: Centered dialog that blocks background interactions.
 - **`toast()`**: Transient notification anchored to a screen edge.
 - **`drawer()`**: Supplemental side-panel (left, right, top, bottom).
+- **`debugOverlay()`**: Corner-anchored perf dashboard for development instrumentation.
 - **`compositeSurface()`**: Painters-algorithm compositor for background and overlays.
 
 ## Animation
@@ -117,11 +127,72 @@ timeline()
 - Built-in help (`?`) and command-palette (`Ctrl+P`).
 - Notification review and shell-owned settings.
 
+For framed shells, Node hosts can keep using `startApp(app)`: the hosted
+bootstrap now delegates to self-running framed apps automatically. Use the
+explicit framed runner when you want to stay at the `@flyingrobots/bijou-tui`
+layer or when the host owns `ctx` directly:
+
+```typescript
+import { createFramedApp, runFramedApp } from '@flyingrobots/bijou-tui';
+
+const app = createFramedApp({
+  pages: [page],
+});
+
+await app.run({ ctx });
+// or: await runFramedApp({ pages: [page] }, { ctx });
+```
+
+`app.run()` delegates to the shared runtime, enables mouse input by default for
+the shell, and keeps frame timing/budget telemetry on the frame model. Keep
+raw `run(app, { ctx })` for lower-level TEA ownership or custom host control,
+and keep `startApp(app)` as the preferred Node-host bootstrap.
+
+Pages can surface transient shell notifications without owning frame state:
+
+```typescript
+import { createFramedApp, notify } from '@flyingrobots/bijou-tui';
+
+update(msg, model) {
+  if (msg.type === 'save-complete') {
+    return [model, [notify({ title: 'Saved', tone: 'SUCCESS' })]];
+  }
+  return [model, []];
+}
+```
+
 ## Interaction
 
 - **`KeyMap`**: Declarative keyboard bindings with group-aware help generation.
 - **`InputStack`**: Layered input routing for modals and overlays.
 - **`MouseMsg`**: Support for SGR mouse reporting (click, drag, scroll).
+
+## Testing with `testRuntime()`
+
+Use `testRuntime()` when you want to assert against the live runtime
+without wiring an `EventBus` by hand.
+
+```typescript
+import { testRuntime } from '@flyingrobots/bijou-tui';
+
+const harness = await testRuntime(app, { ctx });
+
+await harness.press('q');
+expect(harness.snapshot().frame).toBeDefined();
+expect(harness.messages).toHaveLength(1);
+expect(harness.commands.every((record) => record.settled)).toBe(true);
+
+await harness.teardown();
+```
+
+`TestHarness` exposes:
+- `snapshots` for render/model checkpoints
+- `messages` for handled runtime messages
+- `emittedMessages` for messages produced by commands
+- `commands` for final command outcomes and cleanup disposal
+
+Keep `runScript()` for fixture playback, demo capture, and tests where you
+only need final frames plus model state.
 
 ---
 **The runtime view contract requires either a `Surface` or a `LayoutNode`. Raw strings must be converted explicitly.**

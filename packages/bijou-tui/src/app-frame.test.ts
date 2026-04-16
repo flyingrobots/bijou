@@ -1,6 +1,7 @@
 import { describe, it, expect, expectTypeOf, beforeAll, afterAll } from 'vitest';
 import { createTestContext, mockClock, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import {
+  colorHex,
   createSurface,
   getDefaultContext,
   setDefaultContext,
@@ -29,6 +30,9 @@ import {
   createFramedApp,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  notify,
+  projectFrameControls,
+  runFramedApp,
   type FramePage,
   type FramePageMsg,
   type FramedApp,
@@ -61,6 +65,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_CTRL_P = '\x10';
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
+const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 
 function ctrlKey(key: string) {
   return { type: 'key' as const, key, ctrl: true, alt: false, shift: false };
@@ -78,6 +83,29 @@ function textView(text: string) {
   const lines = text.split('\n');
   const width = Math.max(1, ...lines.map((line) => line.length));
   return stringToSurface(text, width, Math.max(1, lines.length));
+}
+
+function createInteractiveContext(options: Parameters<typeof createTestContext>[0] = {}) {
+  const clock = mockClock();
+  const ctx = createTestContext({ ...options, mode: 'interactive', clock });
+  return { clock, ctx };
+}
+
+function scheduleKeys(
+  ctx: ReturnType<typeof createTestContext>,
+  clock: ReturnType<typeof mockClock>,
+  events: Array<{ at: number; key: string }>,
+): void {
+  ctx.io.rawInput = (onKey) => {
+    const handles = events.map(({ at, key }) => clock.setTimeout(() => onKey(key), at));
+    return {
+      dispose() {
+        handles.forEach((handle) => {
+          handle.dispose();
+        });
+      },
+    };
+  };
 }
 
 function createAlternateShellTheme(ctx: BijouContext) {
@@ -120,7 +148,7 @@ function createSameNameAlternateShellTheme(ctx: BijouContext) {
 function surfaceHasFg(surface: Surface, fg: string): boolean {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
-      if (surface.get(x, y).fg === fg) return true;
+      if (colorHex(surface.get(x, y).fg) === fg) return true;
     }
   }
   return false;
@@ -129,7 +157,7 @@ function surfaceHasFg(surface: Surface, fg: string): boolean {
 function surfaceHasBg(surface: Surface, bg: string): boolean {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
-      if (surface.get(x, y).bg === bg) return true;
+      if (colorHex(surface.get(x, y).bg) === bg) return true;
     }
   }
   return false;
@@ -305,6 +333,65 @@ describe('createFramedApp', () => {
     expectTypeOf(result).toEqualTypeOf<FramedAppUpdateResult<TypedPageModel, TypedMsg>>();
     expectTypeOf(result[1]).toEqualTypeOf<Cmd<FramedAppMsg<TypedMsg>>[]>();
     expect(result[0].pageModels.typed?.selected).toBe('alpha');
+  });
+
+  it('exposes a self-running hosted runner for framed apps and enables mouse input by default', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 10, key: '\x03' },
+      { at: 20, key: '\x03' },
+    ]);
+
+    const promise = app.run({ ctx });
+    await clock.advanceByAsync(60);
+    await promise;
+
+    expect(ctx.io.written).toContain(ENABLE_MOUSE);
+  });
+
+  it('rejects concurrent hosted runs on the same framed app instance', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 20, key: '\x03' },
+      { at: 30, key: '\x03' },
+    ]);
+
+    const firstRun = app.run({ ctx });
+    await expect(app.run({ ctx })).rejects.toThrow(
+      'createFramedApp: concurrent app.run() calls on the same framed app are not supported',
+    );
+
+    await clock.advanceByAsync(80);
+    await firstRun;
+  });
+
+  it('feeds frame timing and budget telemetry back into shell-owned view state when using runFramedApp()', async () => {
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 30, key: '\x03' },
+      { at: 40, key: '\x03' },
+    ]);
+
+    const promise = runFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+      helpLineSource: ({ model }) => `over:${model.frameOverBudget ? 'yes' : 'no'}`,
+    }, {
+      ctx,
+      frameBudgetMs: 0.0001,
+    });
+
+    await clock.advanceByAsync(80);
+    await promise;
+
+    expect(ctx.io.written.some((chunk) => chunk.includes('over:yes'))).toBe(true);
   });
 
   it('rejects raw string pane renderers with an explicit migration error', () => {
@@ -622,6 +709,115 @@ describe('createFramedApp', () => {
     const result = await runScript(app, [{ key: 'l' }]);
     expect(result.model.pageModels.home?.count).toBe(1);
     expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
+  });
+
+  it('warns when frame-first key priority shadows page bindings', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('home'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('?', 'Ask page', { type: 'noop' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+    });
+
+    let [model, initCmds] = app.init();
+    expect(initCmds).toHaveLength(0);
+
+    const [nextModel, cmds] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = nextModel;
+    expect(model.helpOpen).toBe(true);
+    expect(cmds).toHaveLength(1);
+
+    const warningMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (warningMsg == null || warningMsg === QUIT || isCmdCleanup(warningMsg)) {
+      throw new Error('expected runtime warning message');
+    }
+
+    const [warnedModel] = app.update(warningMsg, model);
+    expect(warnedModel.runtimeNotifications.items).toHaveLength(1);
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('Page "home" key binding ?');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('?');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('"Ask page"');
+    expect(warnedModel.runtimeNotifications.items[0]?.message).toContain('"Toggle help"');
+  });
+
+  it('warns only once per page for frame-first binding collisions', async () => {
+    const page = (id: string, title: string): FramePage<PageModel, Msg> => ({
+      id,
+      title,
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView(title),
+      }),
+      keyMap: createKeyMap<Msg>().bind('?', `${title} help`, { type: 'noop' }),
+    });
+
+    const app = createFramedApp({
+      pages: [page('home', 'Home'), page('logs', 'Logs')],
+    });
+
+    let [model, initCmds] = app.init();
+    expect(initCmds).toHaveLength(0);
+
+    let update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(update[1]).toHaveLength(1);
+
+    const homeWarning = await update[1][0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (homeWarning == null || homeWarning === QUIT || isCmdCleanup(homeWarning)) {
+      throw new Error('expected home collision warning');
+    }
+    [model] = app.update(homeWarning, model);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+
+    update = app.update({ type: 'key', key: ']', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('logs');
+    expect(update[1]).toHaveLength(0);
+
+    update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(update[1]).toHaveLength(1);
+
+    const logsWarning = await update[1][0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 0,
+    });
+    if (logsWarning == null || logsWarning === QUIT || isCmdCleanup(logsWarning)) {
+      throw new Error('expected logs collision warning');
+    }
+    [model] = app.update(logsWarning, model);
+    expect(model.runtimeNotifications.items).toHaveLength(2);
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+
+    update = app.update({ type: 'key', key: '[', ctrl: false, alt: false, shift: false }, model);
+    model = update[0];
+    expect(model.activePageId).toBe('home');
+    expect(update[1]).toHaveLength(0);
+
+    update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    expect(update[1]).toHaveLength(0);
   });
 
   it('can override the short help strip with page bindings only', async () => {
@@ -1121,6 +1317,142 @@ describe('createFramedApp', () => {
     expect(footer).toContain('Entrée basculer');
   });
 
+  it('localizes shell help groups and notification-center review copy', () => {
+    const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
+    runtime.loadCatalog(FRAME_I18N_CATALOG);
+    runtime.loadCatalog({
+      namespace: 'bijou.shell',
+      entries: [
+        {
+          key: { namespace: 'bijou.shell', id: 'key.group.frame' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Frame', fr: 'Cadre' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'key.toggleHelp' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Toggle help', fr: 'Basculer l’aide' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'help.group.general' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'General', fr: 'Général' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.filter.all' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'All', fr: 'Toutes' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.summary.liveArchived' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: 'Live: {liveCount} • Archived: {archivedCount}',
+            fr: 'Actives : {liveCount} • Archivées : {archivedCount}',
+          },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.summary.filter' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: 'Filter: {filter}',
+            fr: 'Filtre : {filter}',
+          },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.currentStack' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Current stack', fr: 'Pile actuelle' },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.history.title' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: 'History • {filter} • {range}',
+            fr: 'Historique • {filter} • {range}',
+          },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.history.range.window' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: '{start}-{end} of {total}',
+            fr: '{start}-{end} sur {total}',
+          },
+        },
+        {
+          key: { namespace: 'bijou.shell', id: 'notifications.history.action' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            en: 'Action: {label}',
+            fr: 'Action : {label}',
+          },
+        },
+      ],
+    });
+
+    let notifications = seedNotificationHistory<Msg>([
+      {
+        title: 'Deploy failed',
+        message: 'The worker crashed.',
+        variant: 'ACTIONABLE',
+        tone: 'ERROR',
+      },
+    ]);
+    notifications = pushNotification(notifications, {
+      title: 'Live issue',
+      message: 'Needs review.',
+      variant: 'ACTIONABLE',
+      tone: 'WARNING',
+      durationMs: null,
+      action: {
+        label: 'Retry',
+        payload: { type: 'noop' },
+      },
+    }, 999);
+
+    const app = createFramedApp({
+      i18n: runtime,
+      pages: [makePage('home', 'Home', 'main')],
+      notificationCenter: () => ({
+        state: notifications,
+      }),
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    let rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: 90, height: 24 }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Cadre');
+    expect(rendered).toContain('Basculer l’aide');
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    [model] = app.update(shiftKey('n') as unknown as Msg, model);
+    rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: 90, height: 24 }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Actives : 1');
+    expect(rendered).toContain('Archivées');
+    expect(rendered).toContain('Filtre : Toutes');
+    expect(rendered).toContain('Pile actuelle');
+    expect(rendered).toContain('Historique • Toutes • 1-1');
+    expect(rendered).toContain('sur 1');
+    expect(rendered).toContain('Action : Retry');
+  });
+
   it('uses provided settings theme tokens for drawer chrome and selected rows', () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
@@ -1153,13 +1485,13 @@ describe('createFramedApp', () => {
     }).surface;
 
     const hasBg = Array.from({ length: surface.height }, (_, y) =>
-      Array.from({ length: surface.width }, (_, x) => surface.get(x, y).bg).includes('#102938'),
+      Array.from({ length: surface.width }, (_, x) => colorHex(surface.get(x, y).bg)).includes('#102938'),
     ).some(Boolean);
     const hasAccent = Array.from({ length: surface.height }, (_, y) =>
-      Array.from({ length: surface.width }, (_, x) => surface.get(x, y).fg).includes('#ff66cc'),
+      Array.from({ length: surface.width }, (_, x) => colorHex(surface.get(x, y).fg)).includes('#ff66cc'),
     ).some(Boolean);
 
-    expect(surface.get(0, 0).fg).toBe('#335577');
+    expect(colorHex(surface.get(0, 0).fg)).toBe('#335577');
     expect(hasBg).toBe(true);
     expect(hasAccent).toBe(true);
   });
@@ -1444,6 +1776,52 @@ describe('createFramedApp', () => {
     })?.helpSource).toBe(settingsHelp);
   });
 
+  it('projects footer and help controls from the explicit frame layer stack', () => {
+    const workspaceHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('tab', 'Next pane', { type: 'noop' });
+    const settingsHelp = createKeyMap<{ type: 'noop' }>()
+      .bind('enter', 'Apply settings', { type: 'noop' });
+
+    const projection = projectFrameControls({
+      helpOpen: true,
+      commandPalette: undefined,
+      commandPaletteKind: undefined,
+      settingsOpen: true,
+      notificationCenterOpen: false,
+      quitConfirmOpen: false,
+    }, {
+      layers: {
+        workspace: {
+          title: 'Workspace',
+          hintSource: 'Tab next pane',
+          helpSource: workspaceHelp,
+        },
+        settings: {
+          title: 'Workspace settings',
+          hintSource: 'F2/Esc close',
+          helpSource: settingsHelp,
+        },
+        help: {
+          title: 'Keyboard Help',
+          hintSource: 'j/k scroll • Esc close',
+        },
+      },
+    });
+
+    expect(projection.layerStack.map((layer) => layer.kind)).toEqual(['workspace', 'settings', 'help']);
+    expect(projection.activeLayer).toMatchObject({
+      kind: 'help',
+      title: 'Keyboard Help',
+      hintSource: 'j/k scroll • Esc close',
+    });
+    expect(projection.underlyingLayer).toMatchObject({
+      kind: 'settings',
+      title: 'Workspace settings',
+    });
+    expect(projection.footerHintSource).toBe('j/k scroll • Esc close');
+    expect(projection.helpSource).toBe(settingsHelp);
+  });
+
   it('backs frame layer introspection with a runtime view stack', () => {
     const workspaceHelp = createKeyMap<{ type: 'noop' }>()
       .bind('tab', 'Next pane', { type: 'noop' });
@@ -1552,6 +1930,58 @@ describe('createFramedApp', () => {
     expect(rendered).not.toContain('Increment');
   });
 
+  it('uses page-provided layer registry metadata for workspace and page-modal control projection', async () => {
+    const workspaceHelp = createKeyMap<Msg>()
+      .bind('enter', 'Open workspace command', { type: 'noop' });
+    const modalHelp = createKeyMap<Msg>()
+      .bind('enter', 'Apply modal action', { type: 'noop' });
+    const page: FramePage<PageModel, Msg> = {
+      ...makeModalPage('home', 'Home', 'main'),
+      layers(model) {
+        return {
+          workspace: {
+            title: 'Home workspace',
+            hintSource: 'Workspace custom hint',
+            helpSource: workspaceHelp,
+          },
+          'page-modal': model.modalOpen
+            ? {
+                title: 'Inspector',
+                hintSource: 'Modal custom hint',
+                helpSource: modalHelp,
+              }
+            : undefined,
+        };
+      },
+    };
+    const app = createFramedApp({
+      pages: [page],
+    });
+
+    let [model] = app.init();
+    let rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Workspace custom hint');
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Open workspace command');
+    expect(rendered).not.toContain('Apply modal action');
+
+    [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
+    model = (await runScript(app, [{ key: 'm' }])).model;
+    rendered = surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    );
+    expect(rendered).toContain('Modal custom hint');
+  });
+
   it('quits immediately in pipe mode instead of opening quit confirm', async () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     setDefaultContext(pipeCtx);
@@ -1612,6 +2042,56 @@ describe('createFramedApp', () => {
 
     expect(result.model.focusedPaneByPage.home).toBe('right');
     expect(result.model.scrollByPage.home?.right?.y).toBe(1);
+  });
+
+  it('reuses the last rendered workspace layout when routing mouse wheel input', () => {
+    let layoutCalls = 0;
+    const splitPage: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (msg, model) => [model, []],
+      layout: () => {
+        layoutCalls += 1;
+        return {
+          kind: 'split',
+          splitId: 's1',
+          state: createSplitPaneState({ ratio: 0.5 }),
+          paneA: { kind: 'pane', paneId: 'left', render: () => textView(makeLongContent('left')) },
+          paneB: { kind: 'pane', paneId: 'right', render: () => textView(makeLongContent('right')) },
+        };
+      },
+    };
+
+    const app = createFramedApp({
+      initialColumns: 80,
+      initialRows: 20,
+      pages: [splitPage],
+    });
+
+    const [model] = app.init();
+    expect(layoutCalls).toBe(1);
+
+    app.view(model);
+    expect(layoutCalls).toBe(2);
+
+    const [nextModel] = app.update({
+      type: 'mouse',
+      button: 'none',
+      action: 'scroll-down',
+      col: 60,
+      row: 6,
+      shift: false,
+      alt: false,
+      ctrl: false,
+    }, model);
+
+    expect(nextModel.focusedPaneByPage.home).toBe('right');
+    expect(nextModel.scrollByPage.home?.right?.y).toBe(1);
+    expect(layoutCalls).toBe(3);
+
+    app.view(nextModel);
+    expect(layoutCalls).toBe(4);
   });
 
   it('opens command palette and dispatches selected keymap command', async () => {
@@ -1838,6 +2318,77 @@ describe('createFramedApp', () => {
       expect(explicitCtx.theme).toBe(originalTheme);
       expect(explicitCtx.tokenGraph).toBe(originalTokenGraph);
       expect(explicitCtx.theme.theme.name).not.toBe('alternate-shell');
+    } finally {
+      setDefaultContext(testCtx);
+    }
+  });
+
+  it('uses the run-time ctx as the shell rendering context when shellThemes are configured without an ambient default', async () => {
+    const clock = mockClock();
+    const explicitCtx = createTestContext({
+      mode: 'interactive',
+      clock,
+      runtime: { columns: 80, rows: 24 },
+    });
+    const alternateTheme = createAlternateShellTheme(explicitCtx);
+
+    _resetDefaultContextForTesting();
+    try {
+      const app = createFramedApp({
+        pages: [{
+          id: 'home',
+          title: 'Home',
+          init: () => [{ count: 0 }, []],
+          update: (msg, model) => [model, []],
+          layout: () => ({
+            kind: 'pane',
+            paneId: 'main',
+            render: () => {
+              const ctx = explicitCtx;
+              const surface = createSurface(8, 1);
+              surface.fill({
+                char: ' ',
+                bg: ctx.surface('primary').bg,
+                bgRGB: ctx.surface('primary').bgRGB,
+                empty: false,
+              });
+              surface.set(0, 0, {
+                char: 'A',
+                fg: ctx.semantic('muted').hex,
+                fgRGB: ctx.semantic('muted').fgRGB,
+                bg: ctx.surface('primary').bg,
+                bgRGB: ctx.surface('primary').bgRGB,
+                empty: false,
+              });
+              return surface;
+            },
+          }),
+        }],
+        shellThemes: [
+          { id: 'default', label: 'Default', theme: explicitCtx.theme.theme },
+          { id: 'alternate', label: 'Alternate', theme: alternateTheme },
+        ],
+      });
+
+      explicitCtx.io.rawInput = (onKey) => {
+        const handles = [
+          clock.setTimeout(() => onKey('\x03'), 20),
+          clock.setTimeout(() => onKey('\x03'), 30),
+        ];
+        return {
+          dispose() {
+            handles.forEach((handle) => {
+              handle.dispose();
+            });
+          },
+        };
+      };
+
+      const promise = app.run({ ctx: explicitCtx });
+      await clock.advanceByAsync(80);
+      await promise;
+
+      expect(explicitCtx.io.written.some((chunk) => chunk.includes('Home'))).toBe(true);
     } finally {
       setDefaultContext(testCtx);
     }
@@ -2793,6 +3344,86 @@ describe('createFramedApp', () => {
     const rendered = surfaceToString(frame, testCtx.style);
     expect(rendered).toContain('Command rejected: worker crashed during boot');
     expect(cmds).toHaveLength(1);
+  });
+
+  it('lets pages push frame-managed notifications with notify()', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update(msg, model) {
+        if (msg.type === 'inc') {
+          return [{
+            ...model,
+            count: model.count + 1,
+          }, [notify<Msg>({
+            title: 'Saved draft',
+            tone: 'SUCCESS',
+            message: 'Frame-managed notification from the page update',
+          })]];
+        }
+        return [model, []];
+      },
+      layout: () => ({
+        kind: 'pane',
+        paneId: 'main',
+        render: () => textView('home'),
+      }),
+      keyMap: createKeyMap<Msg>().bind('x', 'Increment', { type: 'inc' }),
+    };
+
+    const app = createFramedApp({
+      pages: [page],
+      runtimeNotifications: {
+        placement: 'TOP_CENTER',
+        durationMs: 2_500,
+      },
+    });
+
+    let [model] = app.init();
+    let cmds: Cmd<FramedAppMsg<Msg>>[] = [];
+    [model, cmds] = app.update({ type: 'inc' }, model);
+
+    expect(model.pageModels.home?.count).toBe(1);
+    expect(cmds).toHaveLength(1);
+
+    const returned = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 123,
+    });
+
+    expect(returned).not.toBeUndefined();
+    if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) {
+      throw new Error('expected a frame notification message');
+    }
+
+    [model, cmds] = app.update(returned as Msg, model);
+
+    expect(model.runtimeNotifications.items).toHaveLength(1);
+    expect(model.runtimeNotifications.items[0]).toMatchObject({
+      title: 'Saved draft',
+      tone: 'SUCCESS',
+      message: 'Frame-managed notification from the page update',
+      placement: 'TOP_CENTER',
+      durationMs: 2_500,
+    });
+    expect(cmds).toHaveLength(1);
+
+    const tickMsg = await cmds[0]!(() => undefined, {
+      onPulse: () => ({ dispose() {} }),
+      sleep: async () => undefined,
+      now: () => 200,
+    });
+    expect(tickMsg).not.toBeUndefined();
+    if (tickMsg === undefined || tickMsg === QUIT || isCmdCleanup(tickMsg)) {
+      throw new Error('expected a notification tick message');
+    }
+
+    const [visibleModel] = app.update(tickMsg as Msg, model);
+    const frame = app.view(visibleModel);
+    if (typeof frame === 'string' || !('cells' in frame)) throw new Error('expected a surface from framed app');
+    expect(surfaceToString(frame, testCtx.style)).toContain('notices:1');
   });
 
   it('treats frame-managed runtime notifications as dismiss-only mouse targets', async () => {

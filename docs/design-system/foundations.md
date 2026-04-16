@@ -33,6 +33,9 @@ Bijou should treat tokens as belonging to a small set of roles:
 - **border/separator**
   - grouping and structural division
 
+The exact API-level mapping from these roles to Bijou's shipped token families
+is defined in [Theme Token Vocabulary](./theme-tokens.md).
+
 ### Color rules
 
 - Use status color to explain state, not to decorate.

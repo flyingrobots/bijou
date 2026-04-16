@@ -203,6 +203,17 @@ describe('pager', () => {
     const lines = output.split('\n');
     expect(lines[0]).toContain('line 4');
   });
+
+  it('supports overlay scrollbars without reserving a dead gutter column', () => {
+    const state = createPagerState({
+      content: 'abcde\nfghij\nklmno\npqrst',
+      width: 5,
+      height: 3,
+    });
+    const output = pager(state, { showStatus: false, showScrollbar: true, scrollbarMode: 'overlay' });
+
+    expect(output.split('\n')).toEqual(['abcd█', 'fghi█', 'klmn│']);
+  });
 });
 
 describe('pagerSurface', () => {
@@ -233,6 +244,18 @@ describe('pagerSurface', () => {
 
     expect(lines).toHaveLength(5);
     expect(plainSurface(pagerSurface(content, state, { showStatus: false }))).not.toContain('Line');
+  });
+
+  it('supports overlay scrollbars for surface content', () => {
+    const content = stringToSurface('abcde\nfghij\nklmno\npqrst', 5, 4);
+    const state = createPagerStateForSurface(content, { width: 5, height: 3 });
+    const lines = plainSurface(pagerSurface(content, state, {
+      showStatus: false,
+      showScrollbar: true,
+      scrollbarMode: 'overlay',
+    })).split('\n');
+
+    expect(lines).toEqual(['abcd█', 'fghi█', 'klmn│']);
   });
 });
 

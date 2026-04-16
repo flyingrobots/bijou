@@ -8,6 +8,71 @@
 
 import type { RGB, TokenValue } from './tokens.js';
 
+/** A pre-resolved color value that carries both hex and RGB forms. */
+export interface ResolvedColor {
+  readonly kind: 'resolved-color';
+  readonly hex: string;
+  readonly rgb: RGB;
+}
+
+/** Public color input accepted by hot rendering paths. */
+export type ColorRef = string | ResolvedColor;
+
+/**
+ * Preserve a literal hex string as a lazy color reference.
+ *
+ * User code can keep calling styling APIs with `#rrggbb`; hot paths can
+ * later upgrade that reference via {@link resolveColor}.
+ */
+export function color(hex: string): ColorRef {
+  return hex;
+}
+
+/** Narrow an unknown value to a pre-resolved color reference. */
+export function isResolvedColor(value: unknown): value is ResolvedColor {
+  return typeof value === 'object'
+    && value !== null
+    && 'kind' in value
+    && (value as ResolvedColor).kind === 'resolved-color'
+    && typeof (value as ResolvedColor).hex === 'string'
+    && Array.isArray((value as ResolvedColor).rgb);
+}
+
+/** Resolve a color reference into its eager `{ hex, rgb }` form. */
+export function resolveColor(ref: ColorRef): ResolvedColor {
+  if (isResolvedColor(ref)) return ref;
+  const rgb = hexToRgb(ref);
+  return {
+    kind: 'resolved-color',
+    hex: rgbToHex(rgb),
+    rgb,
+  };
+}
+
+/** Resolve a color reference when valid, otherwise return `undefined`. */
+export function tryResolveColor(ref: ColorRef | undefined): ResolvedColor | undefined {
+  if (ref == null) return undefined;
+  if (isResolvedColor(ref)) return ref;
+  const rgb = tryHexToRgb(ref);
+  if (rgb == null) return undefined;
+  return {
+    kind: 'resolved-color',
+    hex: rgbToHex(rgb),
+    rgb,
+  };
+}
+
+/** Return the canonical hex form for a color reference when available. */
+export function colorHex(ref: ColorRef | undefined): string | undefined {
+  if (ref == null) return undefined;
+  return isResolvedColor(ref) ? ref.hex : ref;
+}
+
+/** Return parsed RGB bytes for a color reference when available. */
+export function colorRgb(ref: ColorRef | undefined): RGB | undefined {
+  return tryResolveColor(ref)?.rgb;
+}
+
 // ── Conversion ─────────────────────────────────────────────────────
 
 /**
@@ -26,6 +91,20 @@ export function hexToRgb(hex: string): RGB {
   }
   const n = parseInt(h, 16);
   return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
+}
+
+/**
+ * Parse a hex color string to an RGB tuple, returning `undefined` for invalid input.
+ *
+ * Use this when theme/runtime code wants to preserve invalid authored input
+ * without throwing, but still cache parsed bytes for valid colors.
+ */
+export function tryHexToRgb(hex: string): RGB | undefined {
+  try {
+    return hexToRgb(hex);
+  } catch {
+    return undefined;
+  }
 }
 
 /**

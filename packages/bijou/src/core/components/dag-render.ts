@@ -12,9 +12,10 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
-import { createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
+import { buildEdgeRoute, createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
+import { sanitizeOptionalPositiveInt, sanitizePositiveInt } from '../numeric.js';
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -208,9 +209,10 @@ export function renderInteractiveLayout(
   for (const layer of layers) {
     if (layer.length > maxNodesPerLayer) maxNodesPerLayer = layer.length;
   }
-  const maxWidth = options.maxWidth ?? ctx.runtime.columns;
+  const maxWidth = sanitizePositiveInt(options.maxWidth, ctx.runtime.columns);
+  const explicitNodeWidth = sanitizeOptionalPositiveInt(options.nodeWidth);
 
-  let nodeWidth = options.nodeWidth ?? nodes.reduce(
+  let nodeWidth = explicitNodeWidth ?? nodes.reduce(
     (max, n) => Math.max(max, visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
     16,
   );
@@ -219,12 +221,12 @@ export function renderInteractiveLayout(
   let colStride = nodeWidth + gap;
   let totalWidth = maxNodesPerLayer * colStride;
 
-  if (totalWidth > maxWidth && !options.nodeWidth) {
+  if (totalWidth > maxWidth && explicitNodeWidth == null) {
     gap = 2;
     colStride = nodeWidth + gap;
     totalWidth = maxNodesPerLayer * colStride;
   }
-  if (totalWidth > maxWidth && !options.nodeWidth) {
+  if (totalWidth > maxWidth && explicitNodeWidth == null) {
     nodeWidth = Math.max(16, Math.floor((maxWidth - gap) / maxNodesPerLayer) - gap);
     colStride = nodeWidth + gap;
     totalWidth = maxNodesPerLayer * colStride;
@@ -246,7 +248,7 @@ export function renderInteractiveLayout(
       const tLayer = layerMap.get(childId);
       const tCol = colIndex.get(childId);
       if (tLayer === undefined || tCol === undefined) continue;
-      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter);
+      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth);
     }
   }
 
@@ -342,28 +344,10 @@ export function renderInteractiveLayout(
       const fCol = colIndex.get(fromId);
       const tCol = colIndex.get(toId);
       if (fLayer === undefined || tLayer === undefined || fCol === undefined || tCol === undefined) continue;
-
-      const srcC = colCenter(fCol);
-      const dstC = colCenter(tCol);
-      const sRow = fLayer * RS + 3;
-      const dRow = tLayer * RS - 1;
-      const midRow = sRow + 1;
-
-      if (srcC === dstC) {
-        for (let r = sRow; r <= dRow && r < gridRows; r++) {
-          if (srcC < gridCols) hlCells.add(encodeArrowPos(r, srcC));
-        }
-      } else {
-        if (sRow < gridRows && srcC < gridCols) hlCells.add(encodeArrowPos(sRow, srcC));
-        const minC = Math.min(srcC, dstC);
-        const maxC2 = Math.max(srcC, dstC);
-        if (midRow < gridRows) {
-          for (let c = minC; c <= maxC2 && c < gridCols; c++) {
-            hlCells.add(encodeArrowPos(midRow, c));
-          }
-        }
-        for (let r = midRow; r <= dRow && r < gridRows; r++) {
-          if (dstC < gridCols) hlCells.add(encodeArrowPos(r, dstC));
+      const route = buildEdgeRoute(fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth, gridCols);
+      for (const point of route.path) {
+        if (point.row >= 0 && point.row < gridRows && point.col >= 0 && point.col < gridCols) {
+          hlCells.add(encodeArrowPos(point.row, point.col));
         }
       }
     }
@@ -403,7 +387,8 @@ export function renderInteractiveLayout(
 
     // 2. Arrowhead
     const encoded = encodeArrowPos(row, col);
-    if (g.arrows.has(encoded)) {
+    const arrowCount = g.arrows.get(encoded) ?? 0;
+    if (arrowCount > 0) {
       const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
       return { ch: '\u25bc', token };
     }
@@ -460,8 +445,9 @@ export function renderInteractiveLayout(
 /**
  * Render the graph as plain text for piped (non-TTY) output.
  *
- * Produces one line per node in the format `Label -> Target1, Target2`
- * with no ANSI styling or box-drawing characters.
+ * Produces one plain-text dependency line per rendered edge so multi-parent
+ * and fan-out relationships remain explicit in linear output. Nodes with no
+ * outgoing edges still render as standalone lines.
  *
  * @param nodes - The graph nodes to render.
  * @returns Plain text representation of the graph.
@@ -474,10 +460,9 @@ export function renderPipe(nodes: DagNode[]): string {
     const edges = n.edges ?? [];
     const badgePart = n.badge ? ` (${n.badge})` : '';
     if (edges.length > 0) {
-      const targets = edges
-        .map(id => labelById.get(id) ?? id)
-        .join(', ');
-      lines.push(`${n.label}${badgePart} -> ${targets}`);
+      for (const id of edges) {
+        lines.push(`${n.label}${badgePart} -> ${labelById.get(id) ?? id}`);
+      }
     } else {
       lines.push(`${n.label}${badgePart}`);
     }

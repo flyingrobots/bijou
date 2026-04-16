@@ -1,5 +1,6 @@
-import { createSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
-import { parseHex, FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
+import { createSurface, isPackedSurface, type Surface, type PackedSurface } from '../../ports/surface.js';
+import { FLAG_BOLD, FLAG_DIM } from '../render/packed-cell.js';
+import { colorRgb } from '../theme/color.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { graphemeWidth } from '../text/grapheme.js';
@@ -70,6 +71,13 @@ export interface PreferenceListSurfaceOptions extends BijouNodeOptions {
   readonly theme?: PreferenceListTheme;
 }
 
+interface PreferenceColorStyle {
+  readonly fg?: string;
+  readonly bg?: string;
+  readonly fgRGB?: readonly [number, number, number];
+  readonly bgRGB?: readonly [number, number, number];
+}
+
 function isPreparedPreferenceRow(row: PreferenceRow | PreparedPreferenceRow): row is PreparedPreferenceRow {
   return 'row' in row && 'baseLeftText' in row;
 }
@@ -109,33 +117,37 @@ export function preferenceRowSurface(
   const layout = resolvePreferenceRowLayout(prepared, width);
   const surface = createSurface(width, layout.height);
   const bg = options.selected ? resolvePreferenceRowBg(ctx, options.theme) : undefined;
+  const bgRGB = options.selected ? resolvePreferenceRowBgRGB(ctx, options.theme) : undefined;
 
-  fillPreferenceRow(surface, bg);
+  fillPreferenceRow(surface, bg, bgRGB);
   writePreferenceLine(surface, 0, buildPreferenceLeftText(prepared.row, options.selected === true), {
     strong: options.selected === true,
     bg,
+    bgRGB,
   });
 
   if (layout.valueLabel.length > 0) {
+    const valueStyle = resolvePreferenceValueStyle(prepared.row, ctx, options.theme);
     if (layout.stackValue) {
       writePreferenceLine(surface, 1, `   ${layout.valueLabel}`, {
         strong: true,
-        fg: resolvePreferenceValueFg(prepared.row, ctx, options.theme),
+        ...valueStyle,
         bg,
+        bgRGB,
       });
     } else {
       const valueChars = Array.from(layout.valueLabel);
       const startX = width >= 3 ? 1 : 0;
       const innerWidth = Math.max(0, width - (startX * 2));
       const valueStart = Math.max(0, innerWidth - valueChars.length);
-      const valFg = resolvePreferenceValueFg(prepared.row, ctx, options.theme);
-      const packed: boolean = 'buffer' in surface;
-      if (packed && valFg) {
-        const fgP = parseHex(valFg);
+      const packed = isPackedSurface(surface);
+      if (packed && (valueStyle.fgRGB != null || valueStyle.fg != null)) {
+        const fgP = valueStyle.fgRGB ?? colorRgb(valueStyle.fg);
         if (fgP) {
           const fR = fgP[0], fG = fgP[1], fB = fgP[2];
           let bR = -1, bG = 0, bB = 0;
-          if (bg) { const bgP = parseHex(bg); if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; } }
+          const bgP = bgRGB ?? colorRgb(bg);
+          if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
           for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
             const char = valueChars[offset]!;
             if (char === ' ') continue;
@@ -145,14 +157,14 @@ export function preferenceRowSurface(
           for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
             const char = valueChars[offset]!;
             if (char === ' ') continue;
-            surface.set(startX + valueStart + offset, 0, { char, fg: valFg, bg, modifiers: ['bold'], empty: false });
+            surface.set(startX + valueStart + offset, 0, { char, ...valueStyle, bg, bgRGB, modifiers: ['bold'], empty: false });
           }
         }
       } else {
         for (let offset = 0; offset < valueChars.length && startX + valueStart + offset < width; offset++) {
           const char = valueChars[offset]!;
           if (char === ' ') continue;
-          surface.set(startX + valueStart + offset, 0, { char, fg: valFg, bg, modifiers: ['bold'], empty: false });
+          surface.set(startX + valueStart + offset, 0, { char, ...valueStyle, bg, bgRGB, modifiers: ['bold'], empty: false });
         }
       }
     }
@@ -166,7 +178,9 @@ export function preferenceRowSurface(
       {
         dim: options.theme?.descriptionToken == null,
         fg: options.theme?.descriptionToken?.hex,
+        fgRGB: options.theme?.descriptionToken?.fgRGB,
         bg,
+        bgRGB,
       },
     );
   }
@@ -216,7 +230,9 @@ export function preferenceListSurface(
     writePreferenceLine(surface, y, section.title, {
       strong: options.theme?.sectionTitleToken == null,
       fg: options.theme?.sectionTitleToken?.hex,
+      fgRGB: options.theme?.sectionTitleToken?.fgRGB,
       bg: options.theme?.sectionTitleToken?.bg,
+      bgRGB: options.theme?.sectionTitleToken?.bgRGB,
     });
     y += 2;
 
@@ -283,9 +299,13 @@ function formatPreferenceValueLabel(row: PreferenceRow): string {
   return row.valueLabel ?? '';
 }
 
-function fillPreferenceRow(surface: Surface, bg: string | undefined): void {
-  if (bg == null) return;
-  surface.fill({ char: ' ', bg, empty: false });
+function fillPreferenceRow(
+  surface: Surface,
+  bg: string | undefined,
+  bgRGB: readonly [number, number, number] | undefined,
+): void {
+  if (bg == null && bgRGB == null) return;
+  surface.fill({ char: ' ', bg, bgRGB, empty: false });
 }
 
 function resolvePreferenceRowBg(
@@ -300,25 +320,61 @@ function resolvePreferenceRowBg(
     ?? ctx?.surface('muted').bg;
 }
 
-function resolvePreferenceValueFg(
+function resolvePreferenceRowBgRGB(
+  ctx: ReturnType<typeof resolveCtx>,
+  theme: PreferenceListTheme | undefined,
+): readonly [number, number, number] | undefined {
+  if (theme?.selectedRowBgToken != null) {
+    return theme.selectedRowBgToken.bgRGB
+      ?? colorRgb(theme.selectedRowBgToken.bg ?? theme.selectedRowBgToken.hex);
+  }
+  return ctx?.surface('elevated').bgRGB
+    ?? ctx?.surface('secondary').bgRGB
+    ?? ctx?.surface('muted').bgRGB;
+}
+
+function resolvePreferenceValueStyle(
   row: PreferenceRow,
   ctx: ReturnType<typeof resolveCtx>,
   theme: PreferenceListTheme | undefined,
-): string | undefined {
+): PreferenceColorStyle {
   if (row.kind === 'toggle' && row.checked === true) {
-    return theme?.toggleOnToken?.hex ?? ctx?.semantic('accent').hex;
+    return {
+      fg: theme?.toggleOnToken?.hex ?? ctx?.semantic('accent').hex,
+      fgRGB: theme?.toggleOnToken?.fgRGB
+        ?? colorRgb(theme?.toggleOnToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
+    };
   }
   if (row.kind === 'toggle' && row.checked === false) {
-    return theme?.toggleOffToken?.hex ?? ctx?.semantic('muted').hex;
+    return {
+      fg: theme?.toggleOffToken?.hex ?? ctx?.semantic('muted').hex,
+      fgRGB: theme?.toggleOffToken?.fgRGB
+        ?? colorRgb(theme?.toggleOffToken?.hex)
+        ?? ctx?.semantic('muted').fgRGB,
+    };
   }
   if (row.kind === 'choice') {
-    return theme?.choiceToken?.hex ?? ctx?.semantic('accent').hex;
+    return {
+      fg: theme?.choiceToken?.hex ?? ctx?.semantic('accent').hex,
+      fgRGB: theme?.choiceToken?.fgRGB
+        ?? colorRgb(theme?.choiceToken?.hex)
+        ?? ctx?.semantic('accent').fgRGB,
+    };
   }
   if (row.kind === 'info' || row.kind === 'action') {
-    return theme?.infoToken?.hex ?? ctx?.semantic('primary').hex;
+    return {
+      fg: theme?.infoToken?.hex ?? ctx?.semantic('primary').hex,
+      fgRGB: theme?.infoToken?.fgRGB
+        ?? colorRgb(theme?.infoToken?.hex)
+        ?? ctx?.semantic('primary').fgRGB,
+    };
   }
-  if (ctx == null) return undefined;
-  return ctx.semantic('primary').hex;
+  if (ctx == null) return {};
+  return {
+    fg: ctx.semantic('primary').hex,
+    fgRGB: ctx.semantic('primary').fgRGB,
+  };
 }
 
 function writePreferenceLine(
@@ -330,16 +386,19 @@ function writePreferenceLine(
     readonly dim?: boolean;
     readonly fg?: string;
     readonly bg?: string;
+    readonly fgRGB?: readonly [number, number, number];
+    readonly bgRGB?: readonly [number, number, number];
   } = {},
 ): void {
   const chars = Array.from(text);
-  const pp: boolean = 'buffer' in surface;
-  if (pp && options.fg) {
-    const fgP = parseHex(options.fg);
+  const pp = isPackedSurface(surface);
+  if (pp && (options.fgRGB != null || options.fg != null)) {
+    const fgP = options.fgRGB ?? colorRgb(options.fg);
     if (fgP) {
       const fR = fgP[0], fG = fgP[1], fB = fgP[2];
       let bR = -1, bG = 0, bB = 0;
-      if (options.bg) { const bgP = parseHex(options.bg); if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; } }
+      const bgP = options.bgRGB ?? colorRgb(options.bg);
+      if (bgP) { bR = bgP[0]; bG = bgP[1]; bB = bgP[2]; }
       const flags = options.strong ? FLAG_BOLD : options.dim ? FLAG_DIM : 0;
       for (let x = 0; x < chars.length && x < surface.width; x++) {
         const char = chars[x]!;
@@ -356,6 +415,8 @@ function writePreferenceLine(
       char,
       fg: options.fg,
       bg: options.bg,
+      fgRGB: options.fgRGB,
+      bgRGB: options.bgRGB,
       modifiers: options.strong ? ['bold'] : options.dim ? ['dim'] : undefined,
       empty: false,
     });

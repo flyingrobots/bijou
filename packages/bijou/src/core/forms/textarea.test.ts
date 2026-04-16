@@ -287,5 +287,22 @@ describe('textarea()', () => {
       const output = ctx.io.written.join('');
       expect(output).toContain('Type here...');
     });
+
+    it('sanitizes non-finite sizing and maxLength inputs', async () => {
+      const ctx = createTestContext({
+        mode: 'interactive',
+        io: { keys: ['a', 'b', 'c', '\x04'] },
+      });
+      const result = await textarea({
+        title: 'Msg',
+        width: Number.NaN,
+        height: Number.POSITIVE_INFINITY,
+        maxLength: Number.NaN,
+        ctx,
+      });
+
+      expect(result).toBe('abc');
+      expect(ctx.io.written.join('')).not.toContain('NaN');
+    });
   });
 });

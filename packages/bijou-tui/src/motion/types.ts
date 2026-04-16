@@ -6,8 +6,10 @@ import type { SpringConfig, SpringPreset } from '../spring.js';
  */
 export interface MotionOptions {
   /** 
-   * A unique key to track this component across frames. 
-   * Essential for stable transitions during list re-ordering.
+   * A unique key to track this component across frames.
+   * This must stay stable across renders. Index-like keys that appear
+   * and disappear together will trigger a runtime warning because they
+   * usually prevent interpolation from ever reusing prior motion state.
    */
   key: string;
   /** 

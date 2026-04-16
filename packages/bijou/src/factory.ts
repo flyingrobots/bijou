@@ -3,15 +3,13 @@ import type { RuntimePort } from './ports/runtime.js';
 import type { IOPort } from './ports/io.js';
 import type { StylePort } from './ports/style.js';
 import type { Theme } from './core/theme/tokens.js';
-import type { OutputMode } from './core/detect/tty.js';
+import type { OutputMode, ColorScheme } from './core/detect/tty.js';
 import { createResolved, type ResolvedTheme } from './core/theme/resolve.js';
 import { createThemeAccessors } from './core/theme/accessors.js';
-import { createTokenGraph } from './core/theme/graph.js';
-import type { TokenDefinitions } from './core/theme/graph-types.js';
 import { CYAN_MAGENTA } from './core/theme/presets.js';
 import { PRESETS } from './core/theme/presets.js';
 import { fromDTCG, type DTCGDocument } from './core/theme/dtcg.js';
-import { detectOutputMode } from './core/detect/tty.js';
+import { detectColorScheme, detectOutputMode } from './core/detect/tty.js';
 import { systemClock } from './core/clock.js';
 import type { ClockPort } from './ports/clock.js';
 
@@ -31,6 +29,8 @@ export interface CreateBijouOptions {
   presets?: Record<string, Theme>;
   /** Environment variable that selects a preset or JSON path. Defaults to `"BIJOU_THEME"`. */
   envVar?: string;
+  /** Explicit light/dark scheme for adaptive token resolution. Defaults to runtime detection. */
+  colorScheme?: ColorScheme;
 }
 
 /**
@@ -52,6 +52,7 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
   const fallback = options.theme ?? CYAN_MAGENTA;
 
   const noColor = runtime.env('NO_COLOR') !== undefined;
+  const colorScheme = options.colorScheme ?? detectColorScheme(runtime);
   const themeValue = runtime.env(envVar);
 
   let themeObj: Theme = fallback;
@@ -70,11 +71,8 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     }
   }
 
-  const theme: ResolvedTheme = createResolved(themeObj, noColor);
+  const theme: ResolvedTheme = createResolved(themeObj, noColor, colorScheme);
   const mode: OutputMode = detectOutputMode(runtime);
-
-  // Initialize Reactive Token Graph
-  const tokenGraph = createTokenGraph(themeObj as unknown as TokenDefinitions);
 
   return {
     theme,
@@ -83,7 +81,7 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     io,
     clock,
     style,
-    tokenGraph,
+    tokenGraph: theme.tokenGraph,
     resolveBCSS: () => ({}),
     ...createThemeAccessors(theme),
   };

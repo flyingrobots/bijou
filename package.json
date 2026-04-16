@@ -15,8 +15,11 @@
     "test:watch": "vitest --config vitest.config.ts",
     "typecheck:test": "tsc --noEmit -p tsconfig.tests.json",
     "bench": "node --import tsx bench/src/cli.ts run",
+    "bench:ci:gradient": "node --import tsx bench/src/cli.ts run --scenario=paint-gradient-rgb,diff-gradient --samples=30",
     "bench:compare": "node --import tsx bench/src/cli.ts compare",
     "bench:baseline": "node --import tsx bench/src/cli.ts run --out bench/baselines",
+    "bench:gc-observer-repro": "node --expose-gc --import tsx bench/src/gc-observer-repro.ts",
+    "perf": "node --import tsx examples/perf-gradient/main.ts",
     "soak": "node --import tsx bench/src/soak-runner.ts",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
@@ -32,6 +35,7 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "verify:interactive-examples": "tsx scripts/smoke-all-examples.ts --skip-build --mode=interactive-scripted",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",
     "pr:review-status": "tsx scripts/pr-review-status.ts",
     "pr:merge-readiness": "tsx scripts/pr-review-status.ts --merge-ready",
@@ -39,6 +43,7 @@
     "version": "bash scripts/version.sh"
   },
   "overrides": {
+    "hono": "4.12.14",
     "picomatch": "^4.0.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },

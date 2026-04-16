@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getDefaultContext, setDefaultContext, _resetDefaultContextForTesting } from './context.js';
+import {
+  getDefaultContext,
+  setDefaultContext,
+  setDefaultContextInitializer,
+  _resetDefaultContextForTesting,
+} from './context.js';
 import { createTestContext } from './adapters/test/index.js';
 import { confirm } from './core/forms/confirm.js';
 
@@ -42,5 +47,13 @@ describe('default context', () => {
     const result = await confirm({ title: 'OK?' });
     expect(result).toBe(true);
     expect(ctx.io.written.length).toBeGreaterThan(0);
+  });
+
+  it('getDefaultContext() lazily initializes the ambient context when an initializer is registered', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    setDefaultContextInitializer(() => ctx);
+
+    expect(getDefaultContext()).toBe(ctx);
+    expect(getDefaultContext()).toBe(ctx);
   });
 });

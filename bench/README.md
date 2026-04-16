@@ -44,6 +44,17 @@ npm run bench
 # Run one scenario
 npm run bench -- run --scenario=paint-gradient-rgb
 
+# Run by tag (comma-separated tags are AND)
+npm run bench -- run --tag=diff
+npm run bench -- run --tag=paint,unique-styles
+
+# Emit structured output instead of the default summary
+npm run bench -- run --format=json
+npm run bench -- run --format=jsonl
+
+# Run the fixed CI gradient lane locally
+npm run -s bench:ci:gradient
+
 # Custom sample count and override frame counts
 npm run bench -- run --samples=50 --warmup=30 --frames=200
 
@@ -58,6 +69,27 @@ npm run bench:compare baseline.json current.json
 
 See `src/scenarios/` for the current registry. Each scenario module
 contains a description explaining what it stresses.
+
+Tag filters are now part of that contract:
+
+- comma-separated tags inside one `--tag=...` are AND
+- repeated `--tag` flags are OR across groups
+
+Examples:
+
+```bash
+npm run bench -- run --tag=diff
+npm run bench -- run --tag=paint,unique-styles
+npm run bench -- list --tag=dogfood
+```
+
+Output formats are also selectable:
+
+- default console output: human summary table
+- `--format=json`: nested `bench.v2` JSON
+- `--format=jsonl` or `--format=flat`: one metric record per line
+
+`bench compare` accepts either nested JSON or flat JSONL reports.
 
 ## Adding a scenario
 
@@ -81,3 +113,37 @@ we rebuilt the bench around the principle that measurements you
 can't trust are worse than no measurement at all.
 
 See `docs/perf/RE-017-byte-pipeline.md` for the full context.
+
+## GC observer repro
+
+If you need to investigate the old `PerformanceObserver('gc')` question in
+isolation, use the dedicated repro instead of rebuilding the measurement logic
+inside a real bench harness:
+
+```bash
+npm run bench:gc-observer-repro
+```
+
+This command intentionally runs outside the main wall-time harness with
+`--expose-gc` so you can compare `heapUsed` deltas against observer-reported GC
+events without polluting production scenarios. It is a diagnostic tool only,
+not a release gate and not part of the trusted wall-time bench story.
+
+## CI gradient lane
+
+The repo now runs a dedicated gradient benchmark lane in CI using the
+wall-time harness, not heap deltas or `PerformanceObserver('gc')`.
+
+It is an informational reporting lane, not a hard regression gate. The harness
+is trusted; the workflow publishes the numbers and JSON artifact so future gate
+work can be built on real CI data instead of guessed thresholds.
+
+- Scenario set: `paint-gradient-rgb`, `diff-gradient`
+- Samples: `30`
+- Output: JSON artifact plus a markdown step summary on the workflow run
+
+Use the same lane locally when you want to reproduce the CI benchmark surface:
+
+```bash
+npm run -s bench:ci:gradient -- --out /tmp/bijou-gradient-ci.json
+```

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { timeline } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -15,7 +16,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const timelineTool: ToolRegistration = {
+export const timelineTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_timeline',
   description: 'Render a vertical timeline with status-colored dots and connector lines. Returns plain-text with Unicode characters.',
   inputSchema: inputShape,
@@ -25,4 +26,4 @@ export const timelineTool: ToolRegistration = {
     const result = timeline(input.events, { ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

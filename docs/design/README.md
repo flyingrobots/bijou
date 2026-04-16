@@ -4,7 +4,7 @@ This directory holds active and landed cycle docs.
 
 ## Lifecycle
 
-- work starts in `docs/BACKLOG/`
+- work starts in `docs/method/backlog/`
 - current queue should be visible in `asap/` and `up-next/`
 - when a cycle begins, move the file here
 - enrich it into a real cycle doc with hills, playbacks, and tests

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { colorHex, type ColorRef } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { parseKey, runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
@@ -34,12 +35,12 @@ function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; shift?: b
   };
 }
 
-function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: string; bg?: string } }) {
+function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: ColorRef; bg?: ColorRef } }) {
   const cells: string[] = [];
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
       const cell = frame.get(x, y);
-      cells.push(`${cell.char ?? ' '}|${cell.fg ?? ''}|${cell.bg ?? ''}`);
+      cells.push(`${cell.char ?? ' '}|${colorHex(cell.fg) ?? ''}|${colorHex(cell.bg) ?? ''}`);
     }
   }
   return cells.join('\n');
@@ -494,6 +495,26 @@ describe('docs preview app', () => {
     expect(text).toContain('Release note');
     expect(text).toContain('This slice');
     expect(text).toContain('Bijou keeps docs');
+  });
+
+  it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = docsPageModel(result.model as any, 'guides');
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedGuideId).toBe('documentation-map');
+    expect(text).toContain('README.md');
+    expect(text).toContain('Public front door');
+    expect(text).not.toContain('| :--- | :--- |');
   });
 
   it('renders the hyperlink story without OSC 8 width corruption', async () => {

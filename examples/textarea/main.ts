@@ -3,7 +3,16 @@ import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { type BijouContext, textarea, headerBox } from '@flyingrobots/bijou';
 
-export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
+type ExampleWriter = (line?: string) => void;
+
+function consoleWriter(line = ''): void {
+  console.log(line);
+}
+
+export async function main(
+  ctx: BijouContext = initDefaultContext(),
+  writeLine: ExampleWriter = consoleWriter,
+): Promise<void> {
   const message = await textarea({
     title: 'Write a commit message:',
     placeholder: 'Describe your changes...',
@@ -13,10 +22,11 @@ export async function main(ctx: BijouContext = initDefaultContext()): Promise<vo
   });
 
   if (message != null) {
-    console.log();
-    console.log(headerBox('Commit Message', { detail: message, ctx }));
+    writeLine();
+    writeLine(headerBox('Commit Message', { detail: message, ctx }));
   } else {
-    console.log('\nCancelled.');
+    writeLine();
+    writeLine('Cancelled.');
   }
 }
 

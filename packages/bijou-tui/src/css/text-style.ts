@@ -1,9 +1,11 @@
-import { createSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, isPackedSurface, segmentGraphemes, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
 
 export interface StyledTextToken {
   hex?: string;
   bg?: string;
+  fgRGB?: readonly [number, number, number];
+  bgRGB?: readonly [number, number, number];
   modifiers?: string[];
 }
 
@@ -62,9 +64,13 @@ export function resolveBCSSTextToken(
   base: StyledTextToken = {},
 ): StyledTextToken {
   const styles = ctx.resolveBCSS(identity);
+  const hex = styles['color'] ?? base.hex;
+  const bg = styles['background'] ?? base.bg;
   return {
-    hex: styles['color'] ?? base.hex,
-    bg: styles['background'] ?? base.bg,
+    hex,
+    bg,
+    fgRGB: styles['color'] != null ? (hex ? parseHex(hex) : undefined) : base.fgRGB,
+    bgRGB: styles['background'] != null ? (bg ? parseHex(bg) : undefined) : base.bgRGB,
     modifiers: mergeBCSSModifiers(base.modifiers, styles),
   };
 }
@@ -77,9 +83,13 @@ export function styleTextWithBCSS(
 ): string {
   if (!ctx) return text;
   const styles = ctx.resolveBCSS(identity);
+  const hex = styles['color'] ?? base.hex;
+  const bg = styles['background'] ?? base.bg;
   const token: StyledTextToken = {
-    hex: styles['color'] ?? base.hex,
-    bg: styles['background'] ?? base.bg,
+    hex,
+    bg,
+    fgRGB: styles['color'] != null ? (hex ? parseHex(hex) : undefined) : base.fgRGB,
+    bgRGB: styles['background'] != null ? (bg ? parseHex(bg) : undefined) : base.bgRGB,
     modifiers: mergeBCSSModifiers(base.modifiers, styles),
   };
 
@@ -120,15 +130,17 @@ function fillStyledText(
     char: ' ',
     fg: token.hex,
     bg: token.bg,
+    fgRGB: token.fgRGB,
+    bgRGB: token.bgRGB,
     modifiers: token.modifiers,
     empty: false,
   });
   const graphemes = segmentGraphemes(text);
-  const packed: boolean = 'buffer' in surface;
-  const fg = packed && token.hex ? parseHex(token.hex) : undefined;
+  const packed = isPackedSurface(surface);
+  const fg = packed ? (token.fgRGB ?? (token.hex ? parseHex(token.hex) : undefined)) : undefined;
   if (fg) {
     const [fR, fG, fB] = fg;
-    const bg = token.bg ? parseHex(token.bg) : undefined;
+    const bg = token.bgRGB ?? (token.bg ? parseHex(token.bg) : undefined);
     let bR = -1, bG = 0, bB = 0;
     if (bg) { bR = bg[0]; bG = bg[1]; bB = bg[2]; }
     const flags = token.modifiers ? encodeModifiers(token.modifiers) : 0;

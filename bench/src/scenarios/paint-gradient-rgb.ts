@@ -28,6 +28,7 @@ const BLOCK = 0x2588; // █
 export const paintGradientRgb: Scenario<State> = {
   id: 'paint-gradient-rgb',
   label: 'Paint: per-cell unique RGB via setRGB (220×58)',
+  tags: ['paint', 'setRGB', 'gradient', 'unique-styles', 'no-hex-parse'],
   description:
     'Fills every cell of a 220×58 surface with a cosine-derived RGB foreground and background via setRGB(). No string hex parsing. Designed to stress the packed-cell paint path and, downstream, the sgrCache worst case in the differ. In real apps the unique-style count saturates at ~30-50; here it is ~12,760 per frame.',
   columns: 220,

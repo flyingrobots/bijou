@@ -9,8 +9,15 @@
  * @packageDocumentation
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
-import { createBijou, setDefaultContext } from '@flyingrobots/bijou';
+import type { BijouContext, Theme, ColorScheme } from '@flyingrobots/bijou';
+import {
+  createBijou,
+  detectColorScheme,
+  resolveSafeCtx,
+  setDefaultContext,
+  setDefaultContextInitializer,
+} from '@flyingrobots/bijou';
+import { run, type App, type RunOptions } from '@flyingrobots/bijou-tui';
 import { nodeRuntime } from './runtime.js';
 import { nodeIO } from './io.js';
 import { chalkStyle } from './style.js';
@@ -18,7 +25,13 @@ import { chalkStyle } from './style.js';
 /** Re-export the Node.js {@link RuntimePort} factory. */
 export { nodeRuntime, detectRefreshRate } from './runtime.js';
 /** Re-export the Node.js {@link IOPort} factory. */
-export { nodeIO } from './io.js';
+export {
+  nodeIO,
+  scopedNodeIO,
+  ScopedNodeIOError,
+  type ScopedNodeIO,
+  type ScopedNodeIOOptions,
+} from './io.js';
 /** Re-export the Chalk-based {@link StylePort} factory and its options type. */
 export { chalkStyle, type ChalkStyleOptions } from './style.js';
 
@@ -33,6 +46,169 @@ export {
   type SurfaceGifOptions,
 } from './recorder.js';
 
+const DISABLED_THEME_ENV_VAR = '__BIJOU_THEME_DISABLED__';
+
+/** Theme-selection options for Node-hosted context creation. */
+export interface NodeThemeEntry {
+  /** Stable selection id for env/config or app-owned override state. */
+  readonly id: string;
+  /** Theme value associated with this entry. */
+  readonly theme: Theme;
+  /**
+   * Optional light/dark hint used by automatic selection.
+   *
+   * When omitted, `id === "light"` and `id === "dark"` are treated as the
+   * corresponding scheme.
+   */
+  readonly scheme?: ColorScheme;
+}
+
+/** Host-level theme mode for automatic selection. */
+export type NodeThemeMode = 'auto' | ColorScheme;
+
+/** Theme-selection options for Node-hosted context creation. */
+export interface NodeThemeOptions {
+  /**
+   * Explicit fallback theme object to use for this host context.
+   *
+   * This wins whenever the selected env var does not point at a known preset or
+   * a valid DTCG JSON file.
+   */
+  theme?: Theme;
+  /** Named preset themes available to env-var selection. */
+  presets?: Record<string, Theme>;
+  /** Environment variable name that selects a preset or JSON theme path. */
+  envVar?: string;
+  /** Named theme entries available for auto-selection or app-owned overrides. */
+  themes?: readonly NodeThemeEntry[];
+  /** Automatic or forced light/dark selection mode for `themes`. */
+  themeMode?: NodeThemeMode;
+  /** Explicit theme-entry id override that wins over env-driven selection. */
+  themeOverride?: string;
+}
+
+/** Options for {@link createNodeContext}. */
+export type CreateNodeContextOptions = NodeThemeOptions;
+
+/** Options for {@link initDefaultContext}. */
+export type InitDefaultContextOptions = NodeThemeOptions;
+
+/** Options for {@link startApp}. */
+export type StartAppOptions<M = any> = RunOptions<M> & NodeThemeOptions;
+
+interface SelfRunningApp<M = unknown> {
+  run(options?: RunOptions<M>): Promise<void>;
+}
+
+interface ResolvedNodeThemeSelection {
+  readonly fallbackTheme: Theme | undefined;
+  readonly colorScheme: ColorScheme;
+  readonly envVar: string | undefined;
+  readonly presets: Record<string, Theme> | undefined;
+}
+
+function isSelfRunningApp<M>(app: App<unknown, M>): app is App<unknown, M> & SelfRunningApp<M> {
+  return typeof (app as unknown as SelfRunningApp<M>).run === 'function';
+}
+
+function inferThemeEntryScheme(entry: NodeThemeEntry): ColorScheme | undefined {
+  if (entry.scheme !== undefined) return entry.scheme;
+  if (entry.id === 'light' || entry.id === 'dark') return entry.id;
+  return undefined;
+}
+
+function mergeNodeThemePresets(options: NodeThemeOptions): Record<string, Theme> | undefined {
+  if (options.themes === undefined || options.themes.length === 0) {
+    return options.presets;
+  }
+  const merged: Record<string, Theme> = { ...(options.presets ?? {}) };
+  for (const entry of options.themes) {
+    merged[entry.id] = entry.theme;
+  }
+  return merged;
+}
+
+function resolveRequestedColorScheme(
+  runtime: ReturnType<typeof nodeRuntime>,
+  options: NodeThemeOptions,
+): ColorScheme {
+  const mode = options.themeMode ?? 'auto';
+  return mode === 'auto' ? detectColorScheme(runtime) : mode;
+}
+
+function resolveAutomaticThemeEntry(
+  options: NodeThemeOptions,
+  targetScheme: ColorScheme,
+): NodeThemeEntry | undefined {
+  if (options.themes === undefined || options.themes.length === 0) {
+    return undefined;
+  }
+  const byScheme = options.themes.find((entry) => inferThemeEntryScheme(entry) === targetScheme);
+  if (byScheme !== undefined) return byScheme;
+
+  const byId = options.themes.find((entry) => entry.id === targetScheme);
+  if (byId !== undefined) return byId;
+
+  return options.themes[0];
+}
+
+function resolveNodeThemeSelection(
+  runtime: ReturnType<typeof nodeRuntime>,
+  options: NodeThemeOptions,
+): ResolvedNodeThemeSelection {
+  const colorScheme = resolveRequestedColorScheme(runtime, options);
+  const presets = mergeNodeThemePresets(options);
+  const envVar = options.envVar;
+
+  if (options.themeOverride !== undefined) {
+    const match = options.themes?.find((entry) => entry.id === options.themeOverride);
+    if (match !== undefined) {
+      return {
+        fallbackTheme: match.theme,
+        colorScheme: inferThemeEntryScheme(match) ?? colorScheme,
+        envVar: DISABLED_THEME_ENV_VAR,
+        presets,
+      };
+    }
+  }
+
+  const selectionEnvVar = envVar ?? 'BIJOU_THEME';
+  const envSelection = runtime.env(selectionEnvVar);
+  if (envSelection !== undefined) {
+    const envThemeEntry = options.themes?.find((entry) => entry.id === envSelection);
+    if (envThemeEntry !== undefined) {
+      return {
+        fallbackTheme: envThemeEntry.theme,
+        colorScheme: inferThemeEntryScheme(envThemeEntry) ?? colorScheme,
+        envVar: DISABLED_THEME_ENV_VAR,
+        presets,
+      };
+    }
+
+    return {
+      fallbackTheme: options.theme ?? resolveAutomaticThemeEntry(options, colorScheme)?.theme,
+      colorScheme,
+      envVar,
+      presets,
+    };
+  }
+
+  const automaticThemeEntry = resolveAutomaticThemeEntry(options, colorScheme);
+  return {
+    fallbackTheme: automaticThemeEntry?.theme ?? options.theme,
+    colorScheme: automaticThemeEntry != null
+      ? (inferThemeEntryScheme(automaticThemeEntry) ?? colorScheme)
+      : colorScheme,
+    envVar,
+    presets,
+  };
+}
+
+/** Test-only helper that restores the Node ambient-context initializer after resets. */
+export function _registerDefaultContextInitializerForTesting(): void {
+  setDefaultContextInitializer(() => createNodeContext());
+}
+
 /**
  * Create a {@link BijouContext} wired to Node.js adapters.
  *
@@ -43,17 +219,24 @@ export {
  *
  * @returns A fresh {@link BijouContext} backed by the current Node.js process.
  */
-export function createNodeContext(): BijouContext {
+export function createNodeContext(options: CreateNodeContextOptions = {}): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
+  const selection = resolveNodeThemeSelection(runtime, options);
   // Force level 3 (truecolor) if NO_COLOR is not set, 
   // as the user is explicitly requesting a rich dashboard experience.
   return createBijou({
     runtime,
     io: nodeIO(),
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
+    theme: selection.fallbackTheme,
+    presets: selection.presets,
+    envVar: selection.envVar,
+    colorScheme: selection.colorScheme,
   });
 }
+
+_registerDefaultContextInitializerForTesting();
 
 /**
  * Guard flag ensuring {@link initDefaultContext} only registers the global
@@ -84,12 +267,77 @@ export function _resetInitializedForTesting(): void {
  * @returns The {@link BijouContext} created during initialization, or a
  *   fresh context on subsequent calls.
  */
-export function initDefaultContext(): BijouContext {
+export function initDefaultContext(options: InitDefaultContextOptions = {}): BijouContext {
+  const hasExplicitThemeSelection =
+    options.theme !== undefined
+    || options.presets !== undefined
+    || options.envVar !== undefined
+    || options.themes !== undefined
+    || options.themeMode !== undefined
+    || options.themeOverride !== undefined;
+  if (!initialized && !hasExplicitThemeSelection) {
+    const existing = resolveSafeCtx();
+    if (existing != null) {
+      initialized = true;
+      return existing;
+    }
+  }
   if (!initialized) {
-    const ctx = createNodeContext();
+    const ctx = createNodeContext(options);
     setDefaultContext(ctx);
     initialized = true;
     return ctx;
   }
-  return createNodeContext();
+  return createNodeContext(options);
+}
+
+/**
+ * Start a Bijou TUI app on the current Node.js host.
+ *
+ * This is the first-app convenience path for Node hosts. When no context is
+ * provided, it initializes and registers the default Node context so apps that
+ * rely on ambient `ctx` resolution still behave correctly. Callers that need
+ * explicit ownership can pass `options.ctx` directly. Self-running framed apps
+ * are delegated to their hosted runner instead of being forced through raw
+ * `run(app, ...)`.
+ *
+ * @param app - The TEA application to run.
+ * @param options - Runtime options forwarded to {@link run}.
+ */
+export async function startApp<Model, M>(
+  app: App<Model, M>,
+  options?: StartAppOptions<M>,
+): Promise<void> {
+  const {
+    ctx: explicitCtx,
+    theme,
+    presets,
+    envVar,
+    themes,
+    themeMode,
+    themeOverride,
+    ...runOptions
+  } = options ?? {};
+  let ctx = explicitCtx;
+  if (!ctx) {
+    if (
+      theme !== undefined
+      || presets !== undefined
+      || envVar !== undefined
+      || themes !== undefined
+      || themeMode !== undefined
+      || themeOverride !== undefined
+    ) {
+      ctx = createNodeContext({ theme, presets, envVar, themes, themeMode, themeOverride });
+      setDefaultContext(ctx);
+      initialized = true;
+    } else {
+      ctx = initDefaultContext();
+    }
+  }
+  if (isSelfRunningApp(app)) {
+    await app.run({ ...runOptions, ctx });
+    return;
+  }
+  await run(app, { ...runOptions, ctx });
 }

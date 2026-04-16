@@ -50,6 +50,7 @@ const PALETTE: readonly [number, number, number][] = [
 export const diffSparse: Scenario<State> = {
   id: 'diff-sparse',
   label: 'Diff: sparse ~10% dirty (220×58)',
+  tags: ['diff', 'sparse-diff', 'partial-update', 'interactive'],
   description:
     'Most realistic representation of a real TUI frame. A full surface is painted in setup. Each frame, ~10% of cells (pseudo-random but deterministic by position + frame index) are re-written with new theme-driven content, and renderDiff runs against the prior current surface. Targets the common case of partial interactive updates.',
   columns: 220,

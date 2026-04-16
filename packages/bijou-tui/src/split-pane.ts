@@ -11,14 +11,18 @@ import {
   createSurface,
   graphemeClusterWidth,
   graphemeWidth,
+  sanitizeNonNegativeInt,
+  solveSplitAxisSizes,
+  solveSplitPaneRects,
   segmentGraphemes,
+  type SplitLayoutDirection,
   type Surface,
   type WritePort,
 } from '@flyingrobots/bijou';
 import { placeSurface } from './surface-layout.js';
 
 /** Split direction. */
-export type SplitPaneDirection = 'row' | 'column';
+export type SplitPaneDirection = SplitLayoutDirection;
 /** Focused pane identifier. */
 export type SplitPaneFocus = 'a' | 'b';
 
@@ -102,17 +106,24 @@ export function splitPaneResizeBy(
   delta: number,
   limits: { total: number; minA?: number; minB?: number; dividerSize?: number },
 ): SplitPaneState {
-  const dividerSize = Math.max(0, limits.dividerSize ?? 1);
-  const available = Math.max(0, limits.total - dividerSize);
+  const safeDelta = Number.isFinite(delta) ? Math.trunc(delta) : 0;
+  const dividerSize = sanitizeNonNegativeInt(limits.dividerSize, 1);
+  const total = sanitizeNonNegativeInt(limits.total, 0);
+  const available = Math.max(0, total - dividerSize);
   if (available <= 0) return { ...state, ratio: 0 };
 
-  const minA = Math.max(0, limits.minA ?? 0);
-  const minB = Math.max(0, limits.minB ?? 0);
-  const [currA] = solveSplit(available, state.ratio, minA, minB);
+  const minA = sanitizeNonNegativeInt(limits.minA, 0);
+  const minB = sanitizeNonNegativeInt(limits.minB, 0);
+  const { paneA: currA } = solveSplitAxisSizes({
+    available,
+    ratio: state.ratio,
+    minA,
+    minB,
+  });
 
   const maxA = Math.max(0, available - Math.min(minB, available));
   const clampedMinA = Math.min(minA, maxA);
-  const nextA = clamp(currA + delta, clampedMinA, maxA);
+  const nextA = clamp(currA + safeDelta, clampedMinA, maxA);
   return { ...state, ratio: nextA / available };
 }
 
@@ -144,29 +155,20 @@ export function splitPaneLayout(
   state: SplitPaneState,
   options: Omit<SplitPaneOptions, 'paneA' | 'paneB'>,
 ): SplitPaneLayout {
-  const direction = options.direction ?? 'row';
-  const width = Math.max(0, options.width);
-  const height = Math.max(0, options.height);
-  const dividerSize = Math.max(0, options.dividerSize ?? 1);
-  const minA = Math.max(0, options.minA ?? 0);
-  const minB = Math.max(0, options.minB ?? 0);
+  const layout = solveSplitPaneRects({
+    direction: options.direction,
+    width: options.width,
+    height: options.height,
+    ratio: state.ratio,
+    minA: options.minA,
+    minB: options.minB,
+    dividerSize: options.dividerSize,
+  });
 
-  if (direction === 'row') {
-    const available = Math.max(0, width - dividerSize);
-    const [a, b] = solveSplit(available, state.ratio, minA, minB);
-    return {
-      paneA: { row: 0, col: 0, width: a, height },
-      divider: { row: 0, col: a, width: dividerSize, height },
-      paneB: { row: 0, col: a + dividerSize, width: b, height },
-    };
-  }
-
-  const available = Math.max(0, height - dividerSize);
-  const [a, b] = solveSplit(available, state.ratio, minA, minB);
   return {
-    paneA: { row: 0, col: 0, width, height: a },
-    divider: { row: a, col: 0, width, height: dividerSize },
-    paneB: { row: a + dividerSize, col: 0, width, height: b },
+    paneA: { row: layout.paneA.y, col: layout.paneA.x, width: layout.paneA.width, height: layout.paneA.height },
+    divider: { row: layout.divider.y, col: layout.divider.x, width: layout.divider.width, height: layout.divider.height },
+    paneB: { row: layout.paneB.y, col: layout.paneB.x, width: layout.paneB.width, height: layout.paneB.height },
   };
 }
 
@@ -202,8 +204,8 @@ export function splitPane(state: SplitPaneState, options: SplitPaneOptions): str
  * Render a split-pane surface.
  */
 export function splitPaneSurface(state: SplitPaneState, options: SplitPaneSurfaceOptions): Surface {
-  const width = Math.max(0, Math.floor(options.width));
-  const height = Math.max(0, Math.floor(options.height));
+  const width = sanitizeNonNegativeInt(options.width, 0);
+  const height = sanitizeNonNegativeInt(options.height, 0);
   if (width === 0 || height === 0) return createSurface(0, 0);
 
   const direction = options.direction ?? 'row';
@@ -230,30 +232,6 @@ export function splitPaneSurface(state: SplitPaneState, options: SplitPaneSurfac
   }
 
   return result;
-}
-
-/** Divide available space between two panes, respecting ratio and minimum constraints. */
-function solveSplit(available: number, ratio: number, minA: number, minB: number): [number, number] {
-  if (available <= 0) return [0, 0];
-
-  // Priority: minB > minA when they conflict (B keeps its minimum first).
-  const maxAFromMinB = Math.max(0, available - Math.min(minB, available));
-  // A's minimum cannot exceed the maximum that still satisfies B's minimum.
-  const clampedMinA = Math.min(minA, maxAFromMinB);
-
-  // Ratio target is clamped to feasible bounds after applying constraints.
-  let desiredA = Math.round(clampRatio(ratio) * available);
-  desiredA = clamp(desiredA, clampedMinA, maxAFromMinB);
-
-  // Guardrail: if rounding drift undercuts B's minimum, pull A back into range.
-  const desiredB = available - desiredA;
-  if (desiredB < Math.min(minB, available)) {
-    desiredA = Math.max(clampedMinA, available - Math.min(minB, available));
-  }
-
-  const a = clamp(desiredA, 0, available);
-  const b = Math.max(0, available - a);
-  return [a, b];
 }
 
 /** Normalize a ratio to the 0–1 range, defaulting non-finite values to 0.5. */

@@ -124,4 +124,4 @@ What did not land:
 
 Follow-on:
 
-- [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](../BACKLOG/DF-004-raise-dogfood-coverage-floor-to-next-target.md)
+- [DF-004 — Raise DOGFOOD Coverage Floor to the Next 5-Point Target](../method/graveyard/legacy-backlog/DF-004-raise-dogfood-coverage-floor-to-next-target.md)

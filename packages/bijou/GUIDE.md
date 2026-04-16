@@ -37,10 +37,18 @@ Bijou provides two primary output formats:
 1. **String-first**: Returns a themed ANSI string. Best for standalone CLIs and scripts.
 2. **Surface-first**: Returns a `Surface` (byte-buffer). Best for high-performance TUIs and complex layouts.
 
+Naming follows the same rule across families: the base export is the public
+family name, and a `*Surface()` companion means “this family on the composable
+surface path.” If there is no `*Surface()` variant, that usually means the
+family is already surface-native, intentionally string-first, or a second name
+would only create fake API duplication.
+
 ### Choosing Feedback Surfaces
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Explanatory, non-urgent supporting text.
 - **`alert()`**: Persistent message that stays in the document flow.
+- **`guidedFlow()`**: Calm multi-step assistance with one obvious next action.
+- **`explainability()`**: AI- or machine-mediated recommendation with explicit provenance and evidence.
 - **`markdown()`**: Renders formatted prose with mode-aware fallbacks.
 
 ### Choosing Prompts
@@ -56,7 +64,7 @@ Bijou provides two primary output formats:
 - **`separator()`**: Section divider with an optional label.
 
 ### Data & Hierarchy
-- **`table()` / `tableSurface()`**: Passive row/column comparison.
+- **`table()` / `tableSurface()`**: Passive row/column comparison. The common case now supports `table(columns, rows, ctx)` and `tableSurface(columns, rows, ctx)` shorthands, while the object form remains available for advanced token/overflow options.
 - **`tree()`**: Parent/child nesting.
 - **`timeline()`**: Chronological sequences.
 - **`dag()` / `dagSlice()`**: Causal or dependency-based graphs.
@@ -72,12 +80,19 @@ Bijou provides two primary output formats:
 `cyan-magenta` (default), `nord`, `catppuccin`.
 
 ### Lookups
-Use semantic helpers on the context to avoid coupling to theme structure:
+Use token helpers on the context to avoid coupling to theme structure:
 ```typescript
 const primary = ctx.semantic('primary');
 const border = ctx.border('muted');
 const success = ctx.status('success');
 ```
+
+For the canonical meaning of each token family and the first-party usage rules,
+read [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md).
+
+For a copy-paste starter theme, DTCG JSON shape, and the practical loading
+path for custom themes, read
+[Theme Authoring Guide](../../docs/design-system/theme-authoring.md).
 
 ## Custom Components
 

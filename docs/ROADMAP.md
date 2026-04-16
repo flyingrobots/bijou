@@ -1,10 +1,19 @@
 # ROADMAP
 
-Bijou's execution is tracked via `docs/BACKLOG/` and `docs/design/`. This document captures the broader strategic horizon.
+This file is a reference-only strategic horizon.
+
+Active execution does not start here. Current work is tracked through:
+
+- `docs/METHOD.md` for workflow doctrine
+- `docs/method/backlog/` for live backlog capture
+- `docs/design/` for cycle-owned design truth
+- `docs/BEARING.md` for current directional tension
+
+Use this page to understand long-range direction, not to infer the current queue.
 
 ```mermaid
 timeline
-    Phase 1 : DOGFOOD Consolidation : Layout/Viewport Formalization : i18n Automation
+    Phase 1 : DOGFOOD Consolidation : Layout/Viewport Formalization : Localization Ergonomics
     Phase 2 : Replay Pipeline : Scenario Test Harness : Low-Allocation Rendering
     Phase 3 : MCP Interactivity : Data Visualization Maturity : Ecosystem Adapters
 ```
@@ -14,7 +23,7 @@ timeline
 ### Phase 1: Foundation Integrity
 - **DOGFOOD Consolidation**: Unify documentation, story protocols, and component explorers.
 - **Layout & Viewport Formalization**: Ensure split panes and scroll regions share a unified interaction model.
-- **i18n Automation**: Implement a built-in catalog loader to simplify the localization pipeline.
+- **Localization Ergonomics**: Keep the shipped runtime loader path discoverable, explicit, and easy to adopt.
 
 ### Phase 2: Deterministic DX
 - **Replay & Scenario Pipeline**: Capture and replay deterministic runtime artifacts.

@@ -140,4 +140,4 @@ That is intentional. The goal here is honesty first, not pretending that a progr
 
 Spawned:
 
-- [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+- [DF-002 — Expand DOGFOOD Component Family Coverage](../method/graveyard/legacy-backlog/DF-002-expand-dogfood-component-family-coverage.md)

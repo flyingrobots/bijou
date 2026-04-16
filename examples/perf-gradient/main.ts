@@ -12,7 +12,8 @@
  * Mouse:
  *   hold   — reverse gradient direction
  *
- * Usage:  npx tsx examples/perf-gradient/main.ts
+ * Usage:  npm run perf
+ *         npx tsx examples/perf-gradient/main.ts
  */
 
 import { initDefaultContext } from '@flyingrobots/bijou-node';

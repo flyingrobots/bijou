@@ -16,12 +16,12 @@ enough to prove the hypothesis empirically:
 ```
 paint-rgb-fixed   145 µs  (11.4 ns/cell) — setRGB, no hex parsing
 paint-ascii       231 µs  (18.1 ns/cell) — set({char}), no colors
-paint-theme-set   624 µs  (48.9 ns/cell) — set({char, fg, bg}) with hex
+paint-set-hex-palette   624 µs  (48.9 ns/cell) — set({char, fg, bg}) with hex
 ```
 
-The delta between paint-theme-set and paint-rgb-fixed is
+The delta between paint-set-hex-palette and paint-rgb-fixed is
 **482 µs per frame of pure hex parsing overhead** — which is
-77% of paint-theme-set's total frame time. That was sufficient
+77% of paint-set-hex-palette's total frame time. That was sufficient
 to confirm the hypothesis (per-cell hex parsing in `inlineHexRGB`)
 and point directly at the fix (pre-parse theme token colors at
 theme load time, see `docs/method/backlog/cool-ideas/RE-019-theme-token-color-cache.md`).

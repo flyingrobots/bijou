@@ -14,9 +14,9 @@ export { progressBar, createProgressBar, createAnimatedProgressBar } from './pro
 export type { ProgressBarOptions, LiveProgressBarOptions, AnimatedProgressBarOptions, ProgressBarController } from './progress.js';
 
 export { table } from './table.js';
-export type { TableColumn, TableOptions } from './table.js';
+export type { TableColumn, TableTextCell, TableTextRow, TableOptions } from './table.js';
 export { tableSurface } from './table-v3.js';
-export type { TableSurfaceCell, TableSurfaceOptions } from './table-v3.js';
+export type { TableSurfaceCell, TableSurfaceRow, TableSurfaceOptions } from './table-v3.js';
 
 export { box, headerBox } from './box.js';
 export type { BoxOptions, HeaderBoxOptions } from './box.js';
@@ -63,6 +63,14 @@ export type { PaginatorOptions } from './paginator.js';
 export { stepper } from './stepper.js';
 export type { StepperStep, StepperOptions } from './stepper.js';
 
+export { guidedFlow } from './guided-flow.js';
+export type {
+  GuidedFlowStepStatus,
+  GuidedFlowStep,
+  GuidedFlowSectionTone,
+  GuidedFlowSection,
+  GuidedFlowOptions,
+} from './guided-flow.js';
 export { explainability } from './explainability.js';
 export type { ExplainabilityEvidenceItem, ExplainabilityOptions } from './explainability.js';
 export { inspector } from './inspector.js';

@@ -1,12 +1,33 @@
 import * as readline from 'readline';
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'fs';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
 import { resolveClock, type ClockPort, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
 
 /** Optional overrides for {@link nodeIO}. */
 export interface NodeIOOptions {
   /** Clock override for deterministic timer scheduling in tests. */
   clock?: ClockPort;
+}
+
+export interface ScopedNodeIOOptions extends NodeIOOptions {
+  /** Root directory that all file access must stay inside. */
+  readonly root: string;
+  /** Optional base adapter for stdout/stdin/timer behavior. Defaults to {@link nodeIO}. */
+  readonly baseIO?: IOPort;
+}
+
+export interface ScopedNodeIO extends IOPort {
+  /** Absolute root directory that constrains filesystem access. */
+  readonly root: string;
+  /** Resolve a relative or absolute path and reject anything outside {@link root}. */
+  resolvePath(path: string): string;
+}
+
+export class ScopedNodeIOError extends Error {
+  constructor(root: string, requestedPath: string) {
+    super(`Scoped node IO path escapes root "${root}": ${requestedPath}`);
+    this.name = 'ScopedNodeIOError';
+  }
 }
 
 /**
@@ -182,6 +203,70 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
      */
     joinPath(...segments: string[]): string {
       return join(...segments);
+    },
+  };
+}
+
+/**
+ * Create a Node.js I/O adapter whose filesystem access is constrained to a root directory.
+ *
+ * This wraps an {@link IOPort} and guards `readFile`, `readDir`, and `joinPath`
+ * so app-level file access cannot escape the declared root. Hosts can also call
+ * {@link ScopedNodeIO.resolvePath} before performing their own writes with Node's
+ * filesystem APIs, preserving the same root boundary for output paths.
+ *
+ * @param options - Root path plus optional adapter overrides.
+ * @returns An {@link ScopedNodeIO} rooted at the provided directory.
+ */
+export function scopedNodeIO(options: ScopedNodeIOOptions): ScopedNodeIO {
+  const baseIO = options.baseIO ?? nodeIO({ clock: options.clock });
+  const root = resolve(options.root);
+  const realRoot = realpathSync.native(root);
+
+  function assertWithinRoot(realCandidate: string, requestedPath: string): void {
+    const rel = relative(realRoot, realCandidate);
+    if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) {
+      return;
+    }
+    throw new ScopedNodeIOError(root, requestedPath);
+  }
+
+  function resolvePathWithinRoot(requestedPath: string): string {
+    const candidate = resolve(root, requestedPath);
+    const suffix: string[] = [];
+    let existingPath = candidate;
+
+    while (!existsSync(existingPath)) {
+      const parent = dirname(existingPath);
+      if (parent === existingPath) {
+        throw new ScopedNodeIOError(root, requestedPath);
+      }
+      suffix.unshift(basename(existingPath));
+      existingPath = parent;
+    }
+
+    const realExistingPath = realpathSync.native(existingPath);
+    const realCandidate = suffix.length === 0
+      ? realExistingPath
+      : resolve(realExistingPath, ...suffix);
+    assertWithinRoot(realCandidate, requestedPath);
+    return realCandidate;
+  }
+
+  return {
+    ...baseIO,
+    root,
+    resolvePath(path: string): string {
+      return resolvePathWithinRoot(path);
+    },
+    readFile(path: string): string {
+      return baseIO.readFile(resolvePathWithinRoot(path));
+    },
+    readDir(path: string): string[] {
+      return baseIO.readDir(resolvePathWithinRoot(path));
+    },
+    joinPath(...segments: string[]): string {
+      return resolvePathWithinRoot(join(...segments));
     },
   };
 }

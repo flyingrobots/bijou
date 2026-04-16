@@ -1,9 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import { renderByMode } from '../mode-render.js';
 import { resolveCtx } from '../resolve-ctx.js';
-import { box } from './box.js';
 import { enumeratedList } from './enumerated-list.js';
+import { guidedFlow, type GuidedFlowSection } from './guided-flow.js';
 import type { BijouNodeOptions } from './types.js';
 
 /** A single evidence item supporting an explainability recommendation. */
@@ -46,13 +45,6 @@ export interface ExplainabilityOptions extends BijouNodeOptions {
   readonly ctx?: BijouContext;
 }
 
-function emphasizeToken(token: TokenValue): TokenValue {
-  return {
-    ...token,
-    modifiers: [...(token.modifiers ?? []), 'bold' as const],
-  };
-}
-
 function formatConfidence(confidence: number | string | undefined): string | undefined {
   if (confidence == null) return undefined;
   if (typeof confidence === 'string') return confidence;
@@ -75,102 +67,36 @@ function buildMetadataLines(options: ExplainabilityOptions): string[] {
   return lines;
 }
 
-function buildPipeSections(options: ExplainabilityOptions): string[] {
-  const lines: string[] = [];
-
-  lines.push(`${options.label ?? '[AI]'} ${options.title}`);
-  lines.push(...buildMetadataLines(options));
+function buildExplainabilitySections(options: ExplainabilityOptions, ctx: BijouContext): GuidedFlowSection[] {
+  const sections: GuidedFlowSection[] = [];
 
   if (options.rationale) {
-    if (lines.length > 0) lines.push('');
-    lines.push('Why:');
-    lines.push(`  ${options.rationale}`);
+    sections.push({ title: 'Why', content: options.rationale });
   }
 
   if (options.evidence && options.evidence.length > 0) {
-    if (lines.length > 0) lines.push('');
-    lines.push('Evidence:');
-    lines.push(...options.evidence.map((item) => `- ${formatEvidenceItem(item)}`));
-  }
-
-  if (options.nextAction) {
-    if (lines.length > 0) lines.push('');
-    lines.push('Next action:');
-    lines.push(`  ${options.nextAction}`);
-  }
-
-  if (options.governance) {
-    if (lines.length > 0) lines.push('');
-    lines.push('Governance:');
-    lines.push(`  ${options.governance}`);
-  }
-
-  return lines;
-}
-
-function buildAccessibleSections(options: ExplainabilityOptions): string[] {
-  const lines: string[] = [`AI explanation: ${options.title}`];
-  lines.push(...buildMetadataLines(options));
-
-  if (options.rationale) {
-    lines.push(`Why: ${options.rationale}`);
-  }
-
-  if (options.evidence && options.evidence.length > 0) {
-    lines.push('Evidence:');
-    lines.push(enumeratedList(
-      options.evidence.map((item) => formatEvidenceItem(item)),
-      { style: 'arabic', indent: 0 },
-    ));
-  }
-
-  if (options.nextAction) {
-    lines.push(`Next action: ${options.nextAction}`);
+    sections.push({
+      title: 'Evidence',
+      content: enumeratedList(
+        options.evidence.map((item) => formatEvidenceItem(item)),
+        {
+          style: ctx.mode === 'interactive' ? 'bullet' : 'arabic',
+          indent: ctx.mode === 'interactive' ? 2 : 0,
+          ctx,
+        },
+      ),
+    });
   }
 
   if (options.governance) {
-    lines.push(`Governance: ${options.governance}`);
+    sections.push({
+      title: 'Governance',
+      content: options.governance,
+      tone: 'muted',
+    });
   }
 
-  return lines;
-}
-
-function buildInteractiveContent(options: ExplainabilityOptions, ctx: BijouContext): string {
-  const primary = ctx.semantic('primary');
-  const strong = emphasizeToken(primary);
-  const muted = ctx.semantic('muted');
-  const info = emphasizeToken(ctx.status('info'));
-  const label = options.label ?? '[AI]';
-
-  const sections: string[] = [
-    `${ctx.style.styled(info, label)} ${ctx.style.styled(strong, options.title)}`,
-  ];
-
-  const metadata = buildMetadataLines(options);
-  if (metadata.length > 0) {
-    sections.push(metadata.map((line) => ctx.style.styled(muted, line)).join('\n'));
-  }
-
-  if (options.rationale) {
-    sections.push(`${ctx.style.styled(strong, 'Why')}\n${options.rationale}`);
-  }
-
-  if (options.evidence && options.evidence.length > 0) {
-    sections.push(`${ctx.style.styled(strong, 'Evidence')}\n${enumeratedList(
-      options.evidence.map((item) => formatEvidenceItem(item)),
-      { style: 'bullet', indent: 2, ctx },
-    )}`);
-  }
-
-  if (options.nextAction) {
-    sections.push(`${ctx.style.styled(strong, 'Next action')}\n${options.nextAction}`);
-  }
-
-  if (options.governance) {
-    sections.push(`${ctx.style.styled(strong, 'Governance')}\n${ctx.style.styled(muted, options.governance)}`);
-  }
-
-  return sections.join('\n\n');
+  return sections;
 }
 
 /**
@@ -183,16 +109,16 @@ function buildInteractiveContent(options: ExplainabilityOptions, ctx: BijouConte
  */
 export function explainability(options: ExplainabilityOptions): string {
   const ctx = resolveCtx(options.ctx);
-
-  return renderByMode(ctx.mode, {
-    pipe: () => buildPipeSections(options).join('\n'),
-    accessible: () => buildAccessibleSections(options).join('\n'),
-    interactive: () => box(buildInteractiveContent(options, ctx), {
-      borderToken: options.borderToken ?? ctx.border('primary'),
-      bgToken: options.bgToken ?? ctx.surface('elevated'),
-      padding: { left: 1, right: 1 },
-      width: options.width,
-      ctx,
-    }),
-  }, options);
+  return guidedFlow({
+    title: options.title,
+    label: options.label ?? '[AI]',
+    accessibleLead: 'AI explanation',
+    metadata: buildMetadataLines(options),
+    sections: buildExplainabilitySections(options, ctx),
+    nextAction: options.nextAction,
+    borderToken: options.borderToken ?? ctx.border('primary'),
+    bgToken: options.bgToken ?? ctx.surface('elevated'),
+    width: options.width,
+    ctx,
+  });
 }

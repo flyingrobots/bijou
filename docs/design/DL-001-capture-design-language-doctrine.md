@@ -155,7 +155,7 @@ Under `tests/cycles/DL-001/`:
   - `docs/strategy/ai-explainability-standard.md`
   - `docs/strategy/content-guide.md`
 - an explicit Humane Terminal backlog item for notification polish:
-  - `docs/BACKLOG/HT-001-notification-center-polish-and-discoverability.md`
+  - `docs/method/retro/HT_001-notification-center-polish-and-discoverability.md`
 
 ### Drift from ideal
 
@@ -167,4 +167,4 @@ This cycle intentionally stayed documentation-only and did not try to fold the d
 
 Spawned:
 
-- [DL-002 — Canonicalize Patterns and Blocks](../BACKLOG/DL-002-canonicalize-patterns-and-blocks.md)
+- [DL-002 — Canonicalize Patterns and Blocks](../method/graveyard/legacy-backlog/DL-002-canonicalize-patterns-and-blocks.md)

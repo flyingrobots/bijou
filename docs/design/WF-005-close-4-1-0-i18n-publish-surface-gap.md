@@ -164,7 +164,7 @@ Bijou should therefore:
 3. Update release docs and signposts so they stop describing the i18n
    publish surface as unresolved.
 4. Promote this backlog item into `docs/design/` and narrow the
-   `docs/BACKLOG/v4.1.0/` lane to the remaining blocker.
+   `docs/method/graveyard/legacy-backlog/v4.1.0/` lane to the remaining blocker.
 5. Add tests that lock the workflow matrices and cycle placement to the
    chosen answer.
 

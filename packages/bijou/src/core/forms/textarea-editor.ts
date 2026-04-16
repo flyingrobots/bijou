@@ -16,6 +16,7 @@ import {
   isPrintableKey,
   subscribeFormKeyInput,
 } from './form-utils.js';
+import { sanitizeOptionalNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
 
 /**
  * Options for the multi-line textarea field.
@@ -48,8 +49,9 @@ export interface TextareaOptions extends FieldOptions<string> {
  */
 export async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
   const styledFn = createStyledFn(ctx);
-  const height = options.height ?? 6;
-  const renderWidth = options.width ?? 80;
+  const height = sanitizePositiveInt(options.height, 6);
+  const renderWidth = sanitizePositiveInt(options.width, 80);
+  const maxLength = sanitizeOptionalNonNegativeInt(options.maxLength);
   const showLineNumbers = options.showLineNumbers ?? false;
   const term = terminalRenderer(ctx);
 
@@ -97,7 +99,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
     // Status line
     const pos = `Ln ${cursorRow + 1}, Col ${cursorCol + 1}`;
-    const lenInfo = options.maxLength != null ? ` | ${totalLength}/${options.maxLength}` : '';
+    const lenInfo = maxLength != null ? ` | ${totalLength}/${maxLength}` : '';
     ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
   }
 
@@ -152,7 +154,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       if (isKey(key, 'enter')) {
         // Enter — newline (counts as 1 character for maxLength)
-        if (options.maxLength != null && totalLength >= options.maxLength) return;
+        if (maxLength != null && totalLength >= maxLength) return;
         const currentLine = lines[cursorRow]!;
         const before = currentLine.slice(0, cursorCol);
         const after = currentLine.slice(cursorCol);
@@ -238,7 +240,7 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
 
       // Printable character
       if (isPrintableKey(key)) {
-        if (options.maxLength != null && totalLength >= options.maxLength) return;
+        if (maxLength != null && totalLength >= maxLength) return;
         const line = lines[cursorRow]!;
         lines[cursorRow] = line.slice(0, cursorCol) + key.text + line.slice(cursorCol);
         cursorCol++;

@@ -44,4 +44,10 @@ describe('paginator', () => {
     const result = paginator({ current: 0, total: 3, style: 'dots', ctx });
     expect(result).toBe('[1/3]');
   });
+
+  it('sanitizes non-finite and out-of-range page counts', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    expect(paginator({ current: Number.NaN, total: Number.NaN, ctx })).toBe('●');
+    expect(paginator({ current: 8.7, total: 3.9, ctx })).toBe('○ ○ ●');
+  });
 });

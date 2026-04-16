@@ -1,7 +1,7 @@
 # RE-008 — Rendering Performance Findings
 
 _Results from the `examples/perf-gradient` stress test, April 2026.
-These findings motivate [RE-008 — Byte-Packed Surface Representation](../BACKLOG/asap/RE-008-byte-packed-surface-representation.md)._
+These findings motivate [RE-008 — Byte-Packed Surface Representation](../method/graveyard/legacy-backlog/asap/RE-008-byte-packed-surface-representation.md)._
 
 ## Test setup
 

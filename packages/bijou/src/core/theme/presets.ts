@@ -1,22 +1,5 @@
-import type { Theme, BaseStatusKey, TokenValue, TextModifier, RGB } from './tokens.js';
-
-/**
- * Parse '#rrggbb' to [r, g, b] via charCode arithmetic.
- *
- * Validates hex digits: `d()` returns -1 for any non-hex character, and
- * because -1 propagates through bitwise OR/shift, the final `< 0` guard
- * catches invalid input even when only one nibble is bad.
- */
-function hexToRGB(hex: string): RGB | undefined {
-  if (hex.length !== 7 || hex.charCodeAt(0) !== 0x23) return undefined;
-  const d = (c: number): number =>
-    c >= 97 ? c - 87 : c >= 65 ? c - 55 : c >= 48 ? c - 48 : -1;
-  const r = (d(hex.charCodeAt(1)) << 4) | d(hex.charCodeAt(2));
-  const g = (d(hex.charCodeAt(3)) << 4) | d(hex.charCodeAt(4));
-  const b = (d(hex.charCodeAt(5)) << 4) | d(hex.charCodeAt(6));
-  if (r < 0 || g < 0 || b < 0) return undefined;
-  return [r, g, b];
-}
+import type { Theme, BaseStatusKey, TokenValue, TextModifier } from './tokens.js';
+import { tryHexToRgb } from './color.js';
 
 /**
  * Shorthand helper to create a TokenValue with less boilerplate.
@@ -26,7 +9,7 @@ function hexToRGB(hex: string): RGB | undefined {
  * @returns TokenValue with the given hex, fgRGB, and optional modifiers.
  */
 export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
-  const fgRGB = hexToRGB(hex);
+  const fgRGB = tryHexToRgb(hex);
   if (modifiers !== undefined) {
     return fgRGB ? { hex, modifiers, fgRGB } : { hex, modifiers };
   }
@@ -34,19 +17,23 @@ export function tv(hex: string, modifiers?: TextModifier[]): TokenValue {
 }
 
 /**
- * Populate fgRGB and bgRGB on an existing TokenValue if not already set.
- * Used by theme resolution to ensure all tokens carry numeric RGB.
+ * Populate fgRGB and bgRGB on an existing TokenValue from its current hex/bg.
+ * Used by theme resolution to ensure cached RGB bytes stay in sync even when
+ * callers clone a theme token and override only the string color fields.
  *
  * **Mutates the token in place.** Callers should not pass frozen/shared tokens.
  */
 export function populateTokenRGB(token: TokenValue): TokenValue {
-  if (!token.fgRGB) {
-    const rgb = hexToRGB(token.hex);
-    if (rgb) token.fgRGB = rgb;
-  }
-  if (token.bg && !token.bgRGB) {
-    const rgb = hexToRGB(token.bg);
-    if (rgb) token.bgRGB = rgb;
+  const fgRGB = tryHexToRgb(token.hex);
+  if (fgRGB) token.fgRGB = fgRGB;
+  else delete token.fgRGB;
+
+  if (token.bg) {
+    const bgRGB = tryHexToRgb(token.bg);
+    if (bgRGB) token.bgRGB = bgRGB;
+    else delete token.bgRGB;
+  } else {
+    delete token.bgRGB;
   }
   return token;
 }

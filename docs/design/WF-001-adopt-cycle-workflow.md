@@ -63,7 +63,7 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 ## Human playback
 
 1. A maintainer has a new idea.
-2. They create one file in `docs/BACKLOG/`.
+2. They create one file in `docs/method/backlog/`.
 3. They decide to start the work.
 4. They move that file into `docs/design/`.
 5. They enrich the cycle doc with hills, playbacks, invariants, and test intent.
@@ -91,7 +91,7 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 
 ## Deliverables
 
-- add `docs/BACKLOG/`
+- add `docs/method/backlog/`
 - add `docs/design/`
 - add `docs/legends/`
 - add `docs/invariants/`
@@ -132,4 +132,4 @@ An agent can enter the repo and, with minimal context, place design, tests, back
 
 ### Debt spawned
 
-- [WF-002 — Migrate Legacy Planning Artifacts](../BACKLOG/WF-002-migrate-legacy-planning-artifacts.md)
+- [WF-002 — Migrate Legacy Planning Artifacts](../method/retro/WF_002-migrate-legacy-planning-artifacts.md)

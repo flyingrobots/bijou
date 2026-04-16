@@ -4,6 +4,7 @@ import type { GradientStop, TokenValue } from '../theme/tokens.js';
 import { lerp3 } from '../theme/gradient.js';
 import { mix } from '../theme/color.js';
 import { resolveClock } from '../clock.js';
+import { sanitizeNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { cursorGuard, type CursorHideHandle } from './cursor-guard.js';
@@ -56,7 +57,7 @@ export function progressBar(percent: number, options: ProgressBarOptions = {}): 
     pipe: () => `Progress: ${Math.round(pct)}%`,
     accessible: () => `${Math.round(pct)} percent complete.`,
     interactive: () => {
-      const width = options.width ?? 20;
+      const width = sanitizeNonNegativeInt(options.width, 20);
       const filledChar = options.filled ?? '\u2588';
       const emptyChar = options.empty ?? '\u2810';
       const showPercent = options.showPercent ?? true;
@@ -199,8 +200,8 @@ export function createAnimatedProgressBar(options: AnimatedProgressBarOptions = 
   const ctx = resolveCtx(options.ctx);
   const clock = resolveClock(ctx);
   const mode = ctx.mode;
-  const fps = options.fps ?? 30;
-  const duration = options.duration ?? 300;
+  const fps = sanitizePositiveInt(options.fps, 30);
+  const duration = sanitizePositiveInt(options.duration, 300);
 
   let currentPct = 0;
   let targetPct = 0;

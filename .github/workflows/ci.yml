@@ -29,6 +29,9 @@ jobs:
         if: matrix.node-version == 22
         run: npm run dogfood:coverage:gate
       - run: npm test
+      - name: Smoke interactive examples
+        if: matrix.node-version == 22
+        run: npm run verify:interactive-examples
       - name: Typecheck tests
         if: matrix.node-version == 22
         run: npm run typecheck:test
@@ -55,3 +58,35 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run ${{ matrix.lane.command }}
+
+  bench_gradient:
+    name: Bench Gradient
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Run trusted gradient benchmark lane
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT_DIR="$RUNNER_TEMP/bijou-bench"
+          mkdir -p "$OUT_DIR"
+          npm run -s bench:ci:gradient -- --out "$OUT_DIR/gradient-ci.json" > "$OUT_DIR/gradient-ci-summary.md"
+          {
+            echo '## Gradient Benchmark'
+            echo
+            echo 'Informational wall-time benchmark lane for the fixed gradient stress scenarios.'
+            echo
+            cat "$OUT_DIR/gradient-ci-summary.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bench-gradient
+          path: |
+            ${{ runner.temp }}/bijou-bench/gradient-ci.json
+            ${{ runner.temp }}/bijou-bench/gradient-ci-summary.md

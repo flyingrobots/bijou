@@ -163,7 +163,7 @@ Bijou should therefore:
 4. Update release docs, backlog/signpost docs, and examples posture docs
    so they stop describing DOGFOOD smoke as future work.
 5. Promote `WF-003` into `docs/design/` and prune the now-empty
-   `docs/BACKLOG/v4.1.0/` lane again.
+   `docs/method/graveyard/legacy-backlog/v4.1.0/` lane again.
 
 ## Tests to write first
 

@@ -39,6 +39,15 @@ const withBadges: DagNode[] = [
   { id: 'c', label: 'Deploy', badge: 'BLOCKED' },
 ];
 
+const cyclic: DagNode[] = [
+  { id: 'a', label: 'A', edges: ['b'] },
+  { id: 'b', label: 'B', edges: ['a'] },
+];
+
+const selfLoop: DagNode[] = [
+  { id: 'a', label: 'A', edges: ['a'] },
+];
+
 const largeGraph: DagNode[] = [
   { id: 'root', label: 'Root', edges: ['a', 'b'] },
   { id: 'a', label: 'A', edges: ['c', 'd'] },
@@ -100,6 +109,17 @@ describe('dag', () => {
       expect(result).toContain('B');
       expect(result).toContain('C');
       expect(result).toContain('D');
+    });
+
+    it('sanitizes non-finite sizing overrides', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag(twoNodes, {
+        nodeWidth: Number.NaN,
+        maxWidth: 30.9,
+        ctx,
+      });
+      expect(result).toContain('Alpha');
+      expect(result).toContain('Beta');
     });
   });
 
@@ -174,13 +194,16 @@ describe('dag', () => {
       expect(result).toBe('Alone');
     });
 
-    it('renders multiple edges', () => {
+    it('renders one pipe line per edge when a node fans out', () => {
       const ctx = createTestContext({ mode: 'pipe' });
       const result = dag(diamond, { ctx });
-      expect(result).toContain('Start -> Left, Right');
-      expect(result).toContain('Left -> End');
-      expect(result).toContain('Right -> End');
-      expect(result).toContain('End');
+      expect(result.split('\n')).toEqual([
+        'Start -> Left',
+        'Start -> Right',
+        'Left -> End',
+        'Right -> End',
+        'End',
+      ]);
     });
 
     it('includes badges in parentheses', () => {
@@ -239,6 +262,24 @@ describe('dag', () => {
       expect(result).toContain('Graph: 2 nodes, 1 edges');
       expect(result).not.toContain('2 edges');
     });
+
+    it('renders cyclic graphs by ignoring cycle-forming edges for layering', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const result = dag(cyclic, { ctx });
+      expect(result).toContain('Graph: 2 nodes, 2 edges');
+      expect(result).toContain('Layer 1:');
+      expect(result).toContain('Layer 2:');
+      expect(result).toContain('A -> B');
+      expect(result).toContain('B -> A');
+    });
+
+    it('renders self-loops without failing the accessibility path', () => {
+      const ctx = createTestContext({ mode: 'accessible' });
+      const result = dag(selfLoop, { ctx });
+      expect(result).toContain('Graph: 1 nodes, 1 edges');
+      expect(result).toContain('Layer 1:');
+      expect(result).toContain('A -> A');
+    });
   });
 
   // ── Layout Tests ────────────────────────────────────────────────
@@ -265,6 +306,21 @@ describe('dag', () => {
       expect(result).toContain('Top');
       expect(result).toContain('Middle');
       expect(result).toContain('Bottom');
+    });
+
+    it('keeps layer-skipping edges visible when another node sits in the same column', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+      const nodes: DagNode[] = [
+        { id: 'a', label: 'A', edges: ['b', 'c'] },
+        { id: 'b', label: 'B', edges: ['c'] },
+        { id: 'c', label: 'C' },
+      ];
+      const result = dag(nodes, { ctx });
+
+      expect(result).toContain('A');
+      expect(result).toContain('B');
+      expect(result).toContain('C');
+      expect(result).toContain('├');
     });
   });
 
@@ -370,21 +426,17 @@ describe('dag', () => {
   // ── Error Cases ─────────────────────────────────────────────────
 
   describe('errors', () => {
-    it('throws on cycle detection', () => {
+    it('renders cyclic graphs without throwing', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-      const cyclic: DagNode[] = [
-        { id: 'a', label: 'A', edges: ['b'] },
-        { id: 'b', label: 'B', edges: ['a'] },
-      ];
-      expect(() => dag(cyclic, { ctx })).toThrow('cycle detected');
+      const result = dag(cyclic, { ctx });
+      expect(result).toContain('A');
+      expect(result).toContain('B');
     });
 
-    it('throws on self-loop', () => {
+    it('renders self-loops without throwing', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
-      const selfLoop: DagNode[] = [
-        { id: 'a', label: 'A', edges: ['a'] },
-      ];
-      expect(() => dag(selfLoop, { ctx })).toThrow('cycle detected');
+      const result = dag(selfLoop, { ctx });
+      expect(result).toContain('A');
     });
 
     it('ignores dangling edge targets without false cycle error', () => {
@@ -584,6 +636,15 @@ describe('dagLayout', () => {
     const layout = dagLayout(diamond, { selectedId: 'a', ctx });
     expect(layout.output).toContain('Start');
     expect(layout.nodes.has('a')).toBe(true);
+  });
+
+  it('returns positions for cyclic graphs instead of throwing', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
+    const layout = dagLayout(cyclic, { ctx });
+    expect(layout.output).toContain('A');
+    expect(layout.output).toContain('B');
+    expect(layout.nodes.has('a')).toBe(true);
+    expect(layout.nodes.has('b')).toBe(true);
   });
 });
 

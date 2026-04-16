@@ -42,9 +42,16 @@ Execute these from the monorepo root.
 - `npm run smoke:canaries`: Execute scaffolding canary tests.
 
 ### Performance & Benchmarks
+- `npm run perf`: Launch the interactive visual performance demo.
 - `npm run bench`: Execute the benchmark suite.
+- `npm run bench:ci:gradient`: Run the fixed gradient stress lane used in CI.
 - `npm run bench:compare`: Compare results against a baseline.
 - `npm run soak`: Run long-duration soak tests.
+
+`npm run bench -- run` now supports:
+- `--tag=...` for scenario provenance filtering
+- `--format=json` for nested `bench.v2` output
+- `--format=jsonl` / `--format=flat` for agent-first flat metric records
 
 ---
 **The release truth is maintained in [`docs/release.md`](./release.md).**

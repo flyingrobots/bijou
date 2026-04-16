@@ -1,4 +1,4 @@
-# `run()`
+# `startApp()`
 
 Minimal counter — hello world of TEA
 
@@ -13,11 +13,10 @@ npx tsx examples/counter/main.ts
 ## Code
 
 ```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { startApp } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
-import { run, quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
-
-initDefaultContext();
+import { quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
+import { ansiSurface } from '../_shared/example-surfaces.ts';
 
 interface Model {
   count: number;
@@ -48,11 +47,15 @@ const app: App<Model, Msg> = {
       `  ${kbd('q')}          quit`,
       '',
     ];
-    return lines.join('\n');
+    return ansiSurface(
+      lines.join('\n'),
+      Math.max(24, ...lines.map((line) => line.length)),
+      Math.max(1, lines.length),
+    );
   },
 };
 
-run(app);
+await startApp(app);
 ```
 
 [← Examples](../README.md)

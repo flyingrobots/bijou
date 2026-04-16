@@ -327,7 +327,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - the next action matters more than conversational prose
 - Avoid when:
   - the content is just a generic status or note with no recommendation/evidence structure
-  - the app needs a full multi-step wizard or inspector panel instead of one explainability surface
+  - the app needs a non-AI guided flow or a full multi-step wizard instead of one explainability surface; prefer `guidedFlow()` for the calmer general case
   - the app is hiding service latency or speculative output behind an authoritative-looking card
 - Content guidance:
   - keep the title as the recommendation or explanation itself, not a vague marketing headline
@@ -341,6 +341,7 @@ If those checks fail, the component work is not doctrinally complete yet.
   - pipe: lower to labeled plain-text sections with one obvious next action
   - accessible: linearize the same fields explicitly with no dependence on borders, color, or layout
 - Related families:
+  - `guidedFlow()`
   - `note()`
   - `alert()`
   - `stepper()`
@@ -387,7 +388,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 - Family: `markdown()`
 - Variants:
-  - headings, emphasis, lists, blockquotes, links, code fences, and other supported markdown structures with mode-aware lowering
+  - headings, emphasis, lists, blockquotes, links, GFM-style pipe tables, code fences, and other supported markdown structures with mode-aware lowering
 - Use when:
   - help, reference, release notes, readme-like content, or bounded prose needs lightweight structure
   - the same content should remain honest across rich, pipe, and accessible output modes

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { tabs } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -14,7 +15,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const tabsTool: ToolRegistration = {
+export const tabsTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_tabs',
   description: 'Render a horizontal tab bar with one active tab highlighted.',
   inputSchema: inputShape,
@@ -24,4 +25,4 @@ export const tabsTool: ToolRegistration = {
     const result = tabs(input.items, { active: input.active, separator: input.separator, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

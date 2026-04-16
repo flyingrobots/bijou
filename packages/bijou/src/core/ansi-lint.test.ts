@@ -30,6 +30,7 @@ const ALLOWED = new Set([
   'core/forms/filter-interactive.ts', // \x1b[K line-clear + key matching
   'core/forms/textarea-editor.ts',  // \x1b[K line-clear + key/arrow matching
   'core/components/hyperlink.ts',   // OSC 8 sequences
+  'core/components/table.ts',       // ANSI-aware table clipping/wrapping with OSC 8 and SGR parsing
   'core/text/clip.ts',              // ANSI-aware text clipping
   'core/text/grapheme.ts',          // ANSI strip for width measurement
   'core/render/differ.ts',          // CUP escape codes for differential rendering

@@ -29,6 +29,7 @@ export {
   type Matrix3x3,
   type TransformOptions,
   createSurface,
+  isPackedSurface,
   FULL_MASK,
   ROTATION_CHAR_MAP,
 } from './ports/surface.js';
@@ -49,10 +50,14 @@ export {
 export {
   getDefaultContext,
   setDefaultContext,
+  setDefaultContextInitializer,
 } from './context.js';
 export {
   cloneContextWithResolvedTheme,
   cloneContextWithTheme,
+  observeTheme,
+  type ThemeChange,
+  type ThemeObservation,
 } from './context-theme.js';
 
 // Context resolution helpers
@@ -66,6 +71,24 @@ export {
   installRuntimeViewportOverlay,
   updateRuntimeViewport,
 } from './core/runtime-viewport.js';
+export {
+  sanitizeNonNegativeInt,
+  sanitizeOptionalNonNegativeInt,
+  sanitizeOptionalPositiveInt,
+  sanitizePositiveInt,
+} from './core/numeric.js';
+export {
+  solveGridRects,
+  solveSplitAxisSizes,
+  solveSplitPaneRects,
+  type GridTrack,
+  type SplitAxisOptions,
+  type SplitAxisSizes,
+  type SplitLayoutDirection,
+  type SplitPaneRectOptions,
+  type SplitPaneRects,
+  type GridRectOptions,
+} from './core/layout/geometry.js';
 
 // Mode rendering strategy
 export {
@@ -130,14 +153,22 @@ export {
   createThemeAccessors,
   type ThemeAccessors,
   // Color manipulation
+  color,
+  colorHex,
+  colorRgb,
   hexToRgb,
+  isResolvedColor,
+  resolveColor,
   rgbToHex,
+  tryResolveColor,
   lighten,
   darken,
   mix,
   complementary,
   saturate,
   desaturate,
+  type ColorRef,
+  type ResolvedColor,
   // Reactive Token Graph
   createTokenGraph,
   type TokenGraph,
@@ -150,14 +181,19 @@ export {
 
 // Text / grapheme utilities
 export {
+  forceTextPresentation,
+  TEXT_PRESENTATION_SELECTOR,
   isWideChar,
   segmentGraphemes,
   graphemeClusterWidth,
   graphemeWidth,
+  sanitizeTerminalText,
+  sanitizePlainTerminalText,
   prepareWrappedText,
   wrapPreparedTextToWidth,
   clipToWidth,
   wrapToWidth,
+  ANSI_CONTROL_SEQUENCE_RE,
   ANSI_SGR_RE,
   stripAnsi,
 } from './core/text/index.js';
@@ -190,9 +226,12 @@ export {
   type ProgressBarController,
   table,
   type TableColumn,
+  type TableTextCell,
+  type TableTextRow,
   type TableOptions,
   tableSurface,
   type TableSurfaceCell,
+  type TableSurfaceRow,
   type TableSurfaceOptions,
   box,
   headerBox,
@@ -239,6 +278,12 @@ export {
   stepper,
   type StepperStep,
   type StepperOptions,
+  guidedFlow,
+  type GuidedFlowStepStatus,
+  type GuidedFlowStep,
+  type GuidedFlowSectionTone,
+  type GuidedFlowSection,
+  type GuidedFlowOptions,
   explainability,
   type ExplainabilityEvidenceItem,
   type ExplainabilityOptions,

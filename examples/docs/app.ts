@@ -2226,31 +2226,19 @@ function renderFamiliesPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
-  const content = createSurface(Math.max(1, paneWidth), Math.max(1, model.familyState.items.length));
-
-  for (let index = 0; index < model.familyState.items.length; index++) {
-    const row = parseRowValue(model.familyState.items[index]!.value);
-    content.blit(
-      renderFamilyRow({
-        row,
-        width: paneWidth,
-        focused: index === model.familyState.focusIndex,
-        selectedStoryId: model.selectedStoryId,
-        expandedFamilies: model.expandedFamilies,
-        ctx,
-        theme,
-      }),
-      0,
-      index,
-    );
-  }
-
-  const body = viewportSurface({
+  const body = browsableListSurface(model.familyState, {
     width: Math.max(1, paneWidth),
-    height: bodyHeight,
-    content,
-    scrollY: model.familyState.scrollY,
     showScrollbar: true,
+    ctx,
+    focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
+    renderItem: ({ item, focused }) => formatFamilyRow({
+      row: parseRowValue(item.value),
+      focused,
+      selectedStoryId: model.selectedStoryId,
+      expandedFamilies: model.expandedFamilies,
+      ctx,
+      theme,
+    }),
   });
 
   return insetPaneSurface(column([
@@ -2494,29 +2482,18 @@ function renderGuideNavPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
-  const content = createSurface(Math.max(1, paneWidth), Math.max(1, model.guideState.items.length));
-
-  for (let index = 0; index < model.guideState.items.length; index++) {
-    content.blit(
-      renderGuideRow({
-        item: model.guideState.items[index]!,
-        width: paneWidth,
-        focused: index === model.guideState.focusIndex,
-        selectedGuideId: model.selectedGuideId,
-        ctx,
-        theme,
-      }),
-      0,
-      index,
-    );
-  }
-
-  const body = viewportSurface({
+  const body = browsableListSurface(model.guideState, {
     width: Math.max(1, paneWidth),
-    height: bodyHeight,
-    content,
-    scrollY: model.guideState.scrollY,
     showScrollbar: true,
+    ctx,
+    focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
+    renderItem: ({ item, focused }) => formatGuideRow({
+      item,
+      focused,
+      selectedGuideId: model.selectedGuideId,
+      ctx,
+      theme,
+    }),
   });
 
   return insetPaneSurface(column([
@@ -2806,13 +2783,13 @@ function createDocsExplorerApp(
             }
             switch (msg.type) {
               case 'family-next':
-                return [{ ...model, familyState: listFocusNext(model.familyState) }, []];
+                return [{ ...model, familyState: listFocusNext(model.familyState), previewTimeMs: 0 }, []];
               case 'family-prev':
-                return [{ ...model, familyState: listFocusPrev(model.familyState) }, []];
+                return [{ ...model, familyState: listFocusPrev(model.familyState), previewTimeMs: 0 }, []];
               case 'family-page-down':
-                return [{ ...model, familyState: listPageDown(model.familyState) }, []];
+                return [{ ...model, familyState: listPageDown(model.familyState), previewTimeMs: 0 }, []];
               case 'family-page-up':
-                return [{ ...model, familyState: listPageUp(model.familyState) }, []];
+                return [{ ...model, familyState: listPageUp(model.familyState), previewTimeMs: 0 }, []];
               case 'activate-row':
                 return [activateFocusedRow(model), []];
               case 'activate-row-index':
@@ -2911,24 +2888,30 @@ function createDocsExplorerApp(
         title: pageTitle(spec.id, i18n),
         init: () => [createInitialExplorerModel(ctx, spec.id), []],
         update(msg: FramePageMsg<DocsMsg>, model) {
-          if (msg.type === 'mouse' || msg.type === 'pulse') {
+          if (msg.type === 'mouse') {
             return [model, []];
+          }
+          if (msg.type === 'pulse') {
+            return [{
+              ...model,
+              previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+            }, []];
           }
           switch (msg.type) {
             case 'guide-next':
-              return [{ ...model, guideState: listFocusNext(model.guideState) }, []];
+              return [{ ...model, guideState: listFocusNext(model.guideState), previewTimeMs: 0 }, []];
             case 'guide-prev':
-              return [{ ...model, guideState: listFocusPrev(model.guideState) }, []];
+              return [{ ...model, guideState: listFocusPrev(model.guideState), previewTimeMs: 0 }, []];
             case 'guide-page-down':
-              return [{ ...model, guideState: listPageDown(model.guideState) }, []];
+              return [{ ...model, guideState: listPageDown(model.guideState), previewTimeMs: 0 }, []];
             case 'guide-page-up':
-              return [{ ...model, guideState: listPageUp(model.guideState) }, []];
+              return [{ ...model, guideState: listPageUp(model.guideState), previewTimeMs: 0 }, []];
             case 'activate-guide':
-              return [activateGuideRow(model, spec.id), []];
+              return [{ ...activateGuideRow(model, spec.id), previewTimeMs: 0 }, []];
             case 'activate-guide-index':
-              return [activateGuideRowIndex(model, spec.id, msg.index), []];
+              return [{ ...activateGuideRowIndex(model, spec.id, msg.index), previewTimeMs: 0 }, []];
             case 'select-guide':
-              return [selectGuide(spec.id, model, msg.guideId), []];
+              return [{ ...selectGuide(spec.id, model, msg.guideId), previewTimeMs: 0 }, []];
             case 'toggle-hints':
               return [{ ...model, showHints: !model.showHints }, []];
             case 'cycle-landing-quality':
@@ -3285,21 +3268,20 @@ function slugify(value: string): string {
     || 'family';
 }
 
-function renderFamilyRow(options: {
+function formatFamilyRow(options: {
   readonly row: RowDescriptor;
-  readonly width: number;
   readonly focused: boolean;
   readonly selectedStoryId?: string;
   readonly expandedFamilies: Readonly<Record<string, boolean>>;
   readonly ctx: BijouContext;
   readonly theme: LandingThemeTokens;
-}): Surface {
-  const { row, width, focused, selectedStoryId, expandedFamilies, ctx, theme } = options;
+}): string {
+  const { row, focused, selectedStoryId, expandedFamilies, ctx, theme } = options;
   const accentToken = docsThemeAccentToken(theme);
   const mutedToken = docsThemeMutedBorderToken(theme);
   if (row.kind === 'family') {
     const family = STORY_FAMILIES.find((candidate) => candidate.id === row.familyId);
-    if (family == null) return line('', width);
+    if (family == null) return '';
     const expanded = expandedFamilies[row.familyId] ?? false;
     const focusPrefix = focused
       ? ctx.style.styled(accentToken as any, '›')
@@ -3308,11 +3290,11 @@ function renderFamilyRow(options: {
     const title = focused
       ? ctx.style.styled(accentToken as any, family.label)
       : family.label;
-    return line(`${focusPrefix} ${arrow} ${title}`, width);
+    return `${focusPrefix} ${arrow} ${title}`;
   }
 
   const story = row.storyId == null ? undefined : findComponentStory(row.storyId);
-  if (story == null) return line('', width);
+  if (story == null) return '';
   const selected = selectedStoryId === story.id;
   const focusPrefix = focused
     ? ctx.style.styled(accentToken as any, '›')
@@ -3323,18 +3305,17 @@ function renderFamilyRow(options: {
   const title = selected
     ? ctx.style.styled(accentToken as any, story.title)
     : story.title;
-  return line(`${focusPrefix}   ${bullet} ${title}`, width);
+  return `${focusPrefix}   ${bullet} ${title}`;
 }
 
-function renderGuideRow(options: {
+function formatGuideRow(options: {
   readonly item: { readonly label: string; readonly value: string; readonly description?: string };
-  readonly width: number;
   readonly focused: boolean;
   readonly selectedGuideId?: string;
   readonly ctx: BijouContext;
   readonly theme: LandingThemeTokens;
-}): Surface {
-  const { item, width, focused, selectedGuideId, ctx, theme } = options;
+}): string {
+  const { item, focused, selectedGuideId, ctx, theme } = options;
   const accentToken = docsThemeAccentToken(theme);
   const mutedToken = docsThemeMutedBorderToken(theme);
   const selected = selectedGuideId === item.value;
@@ -3347,5 +3328,5 @@ function renderGuideRow(options: {
   const title = selected || focused
     ? ctx.style.styled(accentToken as any, item.label)
     : item.label;
-  return line(`${focusPrefix} ${bullet} ${title}`, width);
+  return `${focusPrefix} ${bullet} ${title}`;
 }

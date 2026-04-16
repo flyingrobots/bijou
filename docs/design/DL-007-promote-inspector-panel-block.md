@@ -151,4 +151,4 @@ The right promotion step was one block helper composed from stable patterns and 
 
 Spawned:
 
-- [DL-008 — Promote Guided Flow Block](../BACKLOG/DL-008-promote-guided-flow-block.md)
+- [DL-008 — Promote Guided Flow Block](../method/graveyard/legacy-backlog/DL-008-promote-guided-flow-block.md)

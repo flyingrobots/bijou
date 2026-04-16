@@ -39,6 +39,7 @@ const BLOCK = 0x2588;
 export const diffStatic: Scenario<State> = {
   id: 'diff-static',
   label: 'Diff: identical surfaces, zero changes (220×58)',
+  tags: ['diff', 'static', 'zero-diff', 'floor'],
   description:
     'Paints a full surface in setup() then calls renderDiff against itself every frame. No cells change. Measures the cost of the scan itself. Post-II-1 (render-dirty bitmap) this should drop to near-zero because no cells are dirty-marked. Reference baseline for measuring the II-1 optimization.',
   columns: 220,

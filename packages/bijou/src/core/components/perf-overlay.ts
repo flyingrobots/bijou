@@ -19,6 +19,7 @@
 
 import { createSurface, type Surface } from '../../ports/surface.js';
 import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
+import { sanitizePositiveInt } from '../numeric.js';
 import { brailleChartSurface } from './braille-chart.js';
 import { statsPanelSurface, type StatsPanelEntry } from './stats-panel.js';
 import type { BijouNodeOptions } from './types.js';
@@ -74,10 +75,10 @@ export function perfOverlaySurface(
   options: PerfOverlayOptions = {},
 ): Surface {
   const ctx = resolveCtx(options.ctx);
-  const panelWidth = options.width ?? 32;
+  const panelWidth = sanitizePositiveInt(options.width, 32);
   const title = options.title ?? 'Perf';
   const showChart = options.showChart ?? true;
-  const chartHeight = options.chartHeight ?? 4;
+  const chartHeight = sanitizePositiveInt(options.chartHeight, 4);
 
   const entries: StatsPanelEntry[] = [
     { label: 'FPS', value: String(Math.round(stats.fps)) },

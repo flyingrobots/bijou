@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { badge, surfaceToString } from '@flyingrobots/bijou';
 import { plainStyle } from '@flyingrobots/bijou/adapters/test';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -13,7 +14,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const badgeTool: ToolRegistration = {
+export const badgeTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_badge',
   description: 'Render an inline pill-shaped badge label. Variants: success, error, warning, info, accent, primary.',
   inputSchema: inputShape,
@@ -24,4 +25,4 @@ export const badgeTool: ToolRegistration = {
     const result = surfaceToString(surface, plainStyle());
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

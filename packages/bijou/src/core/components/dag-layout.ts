@@ -11,13 +11,12 @@ import type { DagNode } from './dag.js';
 /**
  * Assign each node to a layer using longest-path layer assignment.
  *
- * Performs Kahn's topological sort to detect cycles, then assigns each
- * node to the layer one past its deepest parent. Root nodes (in-degree 0)
- * are placed on layer 0.
+ * Detects cycle-forming back-edges with a DFS, ignores those edges for the
+ * layering pass, then assigns each node to the layer one past its deepest
+ * remaining parent. Root nodes (in-degree 0) are placed on layer 0.
  *
  * @param nodes - The graph nodes to lay out.
  * @returns Map from node ID to its zero-based layer index.
- * @throws If the graph contains a cycle.
  */
 export function assignLayers(nodes: DagNode[]): Map<string, number> {
   const nodeIds = new Set<string>();
@@ -31,16 +30,44 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
   const children = new Map<string, string[]>();
   const parents = new Map<string, string[]>();
   const inDegree = new Map<string, number>();
+  const ignoredEdges = new Set<string>();
 
   for (const n of nodes) {
     // Filter edges to only include targets that exist in the graph
     children.set(n.id, (n.edges ?? []).filter(e => nodeIds.has(e)));
+  }
+
+  const edgeKey = (fromId: string, toId: string): string => `${fromId}\u0000${toId}`;
+  const visitState = new Map<string, 'visiting' | 'done'>();
+  const visit = (id: string): void => {
+    const state = visitState.get(id);
+    if (state === 'visiting' || state === 'done') return;
+    visitState.set(id, 'visiting');
+    for (const childId of children.get(id) ?? []) {
+      const childState = visitState.get(childId);
+      if (childState === 'visiting') {
+        ignoredEdges.add(edgeKey(id, childId));
+        continue;
+      }
+      if (childState !== 'done') visit(childId);
+    }
+    visitState.set(id, 'done');
+  };
+
+  for (const n of nodes) visit(n.id);
+
+  const layerChildren = new Map<string, string[]>();
+  for (const n of nodes) {
+    const filteredChildren = (children.get(n.id) ?? []).filter(
+      childId => !ignoredEdges.has(edgeKey(n.id, childId)),
+    );
+    layerChildren.set(n.id, filteredChildren);
     inDegree.set(n.id, 0);
     if (!parents.has(n.id)) parents.set(n.id, []);
   }
 
   for (const n of nodes) {
-    for (const childId of children.get(n.id) ?? []) {
+    for (const childId of layerChildren.get(n.id) ?? []) {
       if (!parents.has(childId)) parents.set(childId, []);
       parents.get(childId)!.push(n.id);
       inDegree.set(childId, (inDegree.get(childId) ?? 0) + 1);
@@ -49,6 +76,7 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
 
   // Kahn's topological sort
   const queue: string[] = [];
+  let head = 0;
   for (const [id, deg] of inDegree) {
     if (deg === 0) queue.push(id);
   }
@@ -56,10 +84,10 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
   // Kahn's algorithm: in-degree tracking guarantees each node is queued exactly
   // once (when its in-degree reaches 0), so no visited set is needed.
   const topoOrder: string[] = [];
-  while (queue.length > 0) {
-    const id = queue.shift()!;
+  while (head < queue.length) {
+    const id = queue[head++]!;
     topoOrder.push(id);
-    for (const childId of children.get(id) ?? []) {
+    for (const childId of layerChildren.get(id) ?? []) {
       const newDeg = (inDegree.get(childId) ?? 1) - 1;
       inDegree.set(childId, newDeg);
       if (newDeg === 0) queue.push(childId);
@@ -67,7 +95,13 @@ export function assignLayers(nodes: DagNode[]): Map<string, number> {
   }
 
   if (topoOrder.length !== nodes.length) {
-    throw new Error('[bijou] dag(): cycle detected in graph');
+    // DFS back-edge stripping should leave an acyclic layering graph. If a
+    // residual cycle survives, keep the renderer graceful by appending the
+    // unscheduled nodes in source order instead of failing the whole render.
+    const scheduled = new Set(topoOrder);
+    for (const n of nodes) {
+      if (!scheduled.has(n.id)) topoOrder.push(n.id);
+    }
   }
 
   // Longest-path layer assignment

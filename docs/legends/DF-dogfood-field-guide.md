@@ -79,7 +79,11 @@ before DOGFOOD counts as a real terminal docs product, and can see that
   - [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
-- live follow-on backlog:
-  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+- current exploratory backlog:
+  - [DF-027 — Storybook-Style Tool for Bijou](../method/backlog/cool-ideas/DF-027-storybook-style-tool-for-bijou.md)
+  - [DF-028 — Story Capture Matrix](../method/backlog/cool-ideas/DF-028-story-capture-matrix.md)
+  - [DF-029 — Fixture-to-Docs Promotion Path](../method/backlog/cool-ideas/DF-029-fixture-to-docs-promotion-path.md)
+- completed depth follow-on:
+  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../method/retro/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - historical backlog lineage:
-  - [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+  - [DF-002 — Expand DOGFOOD Component Family Coverage](../method/retro/DF_002-expand-dogfood-component-family-coverage.md)

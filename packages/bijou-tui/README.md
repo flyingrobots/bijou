@@ -7,7 +7,7 @@ The high-fidelity TEA runtime for Bijou.
 ## Role
 
 - **The Elm Architecture (TEA)**: A deterministic state-update-view loop for industrial-strength terminal software.
-- **Fractal TEA**: Compose nested sub-apps with `initSubApp()`, `updateSubApp()`, and `mount()`.
+- **Fractal TEA**: Compose nested sub-apps with `createSubAppAdapter()`, `initSubApp()`, `updateSubApp()`, and `mount()`.
 - **Declarative Motion**: Interpolate layout changes smoothly with physics-based springs and tween animations.
 - **Surface-First Pipeline**: Programmable rendering middleware for fragments, diffing, and shader-based transitions.
 
@@ -20,18 +20,18 @@ npm install @flyingrobots/bijou @flyingrobots/bijou-node @flyingrobots/bijou-tui
 ## Quick Start (Sub-App Composition)
 
 ```typescript
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { run, mount, type App } from '@flyingrobots/bijou-tui';
+import { startApp } from '@flyingrobots/bijou-node';
+import { createSubAppAdapter, mount, type App } from '@flyingrobots/bijou-tui';
 import { createSurface } from '@flyingrobots/bijou';
 
-initDefaultContext();
+type ChildMsg = { type: 'tick' };
+type ParentModel = {
+  left: { count: number };
+  right: { count: number };
+};
+type ParentMsg = { type: 'left'; msg: ChildMsg } | { type: 'right'; msg: ChildMsg };
 
-type ChildModel = { count: number };
-type ChildMsg = { type: 'noop' };
-type Model = { left: ChildModel; right: ChildModel };
-type Msg = { pane: 'left' | 'right'; msg: ChildMsg };
-
-const childApp: App<ChildModel, ChildMsg> = {
+const childApp: App<{ count: number }, ChildMsg> = {
   init: () => [{ count: 0 }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
@@ -41,18 +41,20 @@ const childApp: App<ChildModel, ChildMsg> = {
   }
 };
 
-const app: App<Model, Msg> = {
+const mapLeft = createSubAppAdapter<ParentMsg, ChildMsg>({
+  tick: (msg) => ({ type: 'left', msg }),
+});
+
+const mapRight = createSubAppAdapter<ParentMsg, ChildMsg>({
+  tick: (msg) => ({ type: 'right', msg }),
+});
+
+const app: App<ParentModel, ParentMsg> = {
   init: () => [{ left: { count: 0 }, right: { count: 0 } }, []],
   update: (msg, model) => [model, []],
   view: (model) => {
-    const [left] = mount(childApp, {
-      model: model.left,
-      onMsg: (msg) => ({ pane: 'left', msg }),
-    });
-    const [right] = mount(childApp, {
-      model: model.right,
-      onMsg: (msg) => ({ pane: 'right', msg }),
-    });
+    const [left] = mount(childApp, { model: model.left, onMsg: mapLeft });
+    const [right] = mount(childApp, { model: model.right, onMsg: mapRight });
     
     const screen = createSurface(80, 24);
     screen.blit(left, 0, 0);
@@ -61,8 +63,16 @@ const app: App<Model, Msg> = {
   }
 };
 
-run(app);
+await startApp(app);
 ```
+
+For Node hosts, prefer `startApp()` for the first-app path. Reach for
+`run(app, { ctx })` when the host owns context creation explicitly.
+
+When you need to mix small string fragments with surface-returning primitives,
+keep composition on the surface side: use `contentSurface()` directly or pass
+strings into `vstackSurface()` / `hstackSurface()`. Raw strings are still not a
+valid `view()` return type.
 
 ## Strategy: Choosing Component Families
 
@@ -73,6 +83,7 @@ Select the family based on the interaction semantic.
 - **`modal()`**: Required decision that blocks background activity.
 - **`toast()`**: Transient notification for a single event.
 - **`tooltip()`**: Micro-explanation for a local target.
+- **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
 
 ### Collection Interaction
 - **`navigableTable()`**: Keyboard-driven traversal and cell inspection.
@@ -84,6 +95,25 @@ Select the family based on the interaction semantic.
 - **`splitPane()`**: Dynamic primary/secondary context comparison.
 - **`grid()`**: Stable regions with simultaneous visibility.
 - **`viewport()`**: The canonical scroll mask for rich composition.
+
+For framed shells, Node hosts can still prefer `startApp(app)`: the hosted
+Node bootstrap delegates to self-running framed apps automatically. Use the
+explicit runner path when you want to stay inside `@flyingrobots/bijou-tui`
+or when the host owns `ctx` directly:
+
+```typescript
+import { createFramedApp, runFramedApp } from '@flyingrobots/bijou-tui';
+
+const app = createFramedApp({ pages: [page] });
+
+await app.run({ ctx });
+// or: await runFramedApp({ pages: [page] }, { ctx });
+```
+
+This path keeps the shell batteries included: mouse input defaults to `true`,
+the shared runtime loop still does the heavy lifting, and frame timing/budget
+telemetry stays attached to the frame model for shell-owned UI. For Node-hosted
+apps, `startApp(app)` remains the default bootstrap.
 
 ## Animation
 
@@ -110,10 +140,52 @@ const tl = timeline()
   .build();
 ```
 
+## Post-Process Shaders
+
+```typescript
+import { run, surfaceShaderFilter, scanlines, vignette } from '@flyingrobots/bijou-tui';
+
+await run(app, {
+  configurePipeline(pipeline) {
+    pipeline.use('PostProcess', surfaceShaderFilter(
+      scanlines({ dimFactor: 0.82 }),
+      vignette({ edgeFactor: 0.78 }),
+    ));
+  },
+});
+```
+
+Use `surfaceShaderFilter(...)` to compose built-in post-process passes like
+`scanlines()`, `flicker()`, `noise()`, and `vignette()` over the packed target
+surface before diff/output.
+
+## Testing
+
+Use `testRuntime()` when you want an inspectable harness instead of a
+one-shot script result:
+
+```typescript
+import { testRuntime } from '@flyingrobots/bijou-tui';
+
+const harness = await testRuntime(app, { ctx });
+await harness.press('q');
+
+expect(harness.frame).toBeDefined();
+expect(harness.messages).toHaveLength(1);
+expect(harness.commands.every((record) => record.settled)).toBe(true);
+
+await harness.teardown();
+```
+
+Keep `runScript()` for fixture-style interaction playback and GIF/demo
+capture, and use `testRuntime()` when you need direct assertions on
+snapshots, emitted messages, command outcomes, or cleanup disposal.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path for building apps.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Shell doctrine, shaders, and motion internals.
+- **[Render Pipeline Guide](../../docs/guides/render-pipeline.md)**: Stage order, `RenderState`, and `configurePipeline()` truth.
 - **[Design System](../../docs/design-system/README.md)**: Semantic guidance and patterns.
 
 ---

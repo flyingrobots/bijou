@@ -80,6 +80,8 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
 - live follow-on backlog:
-  - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../BACKLOG/up-next/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
+  - no dedicated DOGFOOD follow-on is active right now
+  - exploratory follow-on:
+    [MCP interactive documentation for all Bijou components](../backlog/cool-ideas/DF_mcp-interactive-documentation-for-all-bijou-components.md)
 - historical backlog lineage:
-  - [DF-002 — Expand DOGFOOD Component Family Coverage](../BACKLOG/DF-002-expand-dogfood-component-family-coverage.md)
+  - [DF-002 — Expand DOGFOOD Component Family Coverage](../retro/DF_002-expand-dogfood-component-family-coverage.md)

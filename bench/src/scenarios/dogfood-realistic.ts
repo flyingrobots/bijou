@@ -8,7 +8,7 @@
  * menus, and body text produce collectively.
  *
  * This is the cross-component regression gate for RE-017's
- * Part II work. Synthetic scenarios (`paint-theme-set`,
+ * Part II work. Synthetic scenarios (`paint-set-hex-palette`,
  * `diff-gradient`, etc.) exercise one code path at a time;
  * `dogfood-realistic` exercises the composition.
  *
@@ -56,6 +56,7 @@ const V_BAR = 0x2502; // │
 export const dogfoodRealistic: Scenario<State> = {
   id: 'dogfood-realistic',
   label: 'Dogfood-realistic: header+sidebar+body+footer (220×58)',
+  tags: ['diff', 'compose', 'dogfood', 'realistic', 're017-gate'],
   description:
     'Multi-region composition simulating a real TUI frame: header bar (2 rows) + left sidebar (20 cols) + main body + footer bar (1 row). Each region painted with different theme bytes via setRGB. Cross-component regression gate. Full repaint per frame — worst-case scroll/resize shape, not steady-state.',
   columns: 220,

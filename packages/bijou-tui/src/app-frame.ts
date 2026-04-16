@@ -11,16 +11,10 @@ import {
   createSurface,
   setDefaultContext,
   type LayoutNode as SurfaceLayoutNode,
-  preparePreferenceSections,
-  preferenceListSurface,
   type PreferenceListTheme,
-  resolvePreferenceRowLayout,
   resolveClock,
   resolveSafeCtx,
   type BijouContext,
-  type PreparedPreferenceSection,
-  type PreferenceRow,
-  type PreferenceSection,
   type OverflowBehavior,
   type ResolvedTheme,
   type Surface,
@@ -28,13 +22,14 @@ import {
   type TokenValue,
 } from '@flyingrobots/bijou';
 import type { I18nRuntime } from '@flyingrobots/bijou-i18n';
-import { helpViewSurface, type BindingSource } from './help.js';
-import { createKeyMap, type KeyMap } from './keybindings.js';
+import type { BindingSource } from './help.js';
+import { createKeyMap, formatKeyCombo, type BindingInfo, type KeyMap } from './keybindings.js';
 import type { App, Cmd, KeyMsg, MouseMsg } from './types.js';
 import { isKeyMsg, isMouseMsg, isResizeMsg } from './types.js';
 import { quit } from './commands.js';
+import { runWithLifecycleHooks } from './runtime.js';
 import type { Overlay } from './overlay.js';
-import { compositeSurfaceInto, drawer, modal } from './overlay.js';
+import { compositeSurfaceInto, modal } from './overlay.js';
 import {
   isShellQuitConfirmAccept,
   isShellQuitConfirmDismiss,
@@ -44,35 +39,25 @@ import {
 } from './shell-quit.js';
 import type { TransitionShaderFn } from './transition-shaders.js';
 import { type BuiltinTransition } from './transition-shaders.js';
-import type { CommandPaletteItem, CommandPaletteState } from './command-palette.js';
+import type { CommandPaletteItem } from './command-palette.js';
 import {
   commandPaletteSurface,
   commandPaletteKeyMap,
 } from './command-palette.js';
-import {
-  createPagerStateForSurface,
-  pagerSurface,
-} from './pager.js';
 import type { GridTrack } from './grid.js';
 import type { SplitPaneDirection, SplitPaneState } from './split-pane.js';
 import type { LayoutRect } from './layout-rect.js';
-import type { PanelVisibilityState } from './panel-state.js';
-import type { PanelMaximizeState } from './panel-state.js';
-import type { PanelDockState } from './panel-dock.js';
 import type { SerializedLayoutState } from './layout-preset.js';
 import { restoreLayoutState } from './layout-preset.js';
 import type { OverflowX } from './focus-area.js';
-import type { Timeline, TimelineState } from './timeline.js';
+import type { Timeline } from './timeline.js';
 import type { ViewOutput } from './view-output.js';
 import {
-  countNotificationHistory,
   createNotificationState,
   dismissNotification,
   hitTestNotificationStack,
   notificationsNeedTick,
   pushNotification,
-  renderNotificationHistorySurface,
-  renderNotificationReviewEntrySurface,
   renderNotificationStack,
   tickNotifications,
   trimNotificationsToViewport,
@@ -81,11 +66,10 @@ import {
   type NotificationState,
   type NotificationTone,
 } from './notification.js';
-import { insetLineSurface } from './collection-surface.js';
-import { vstackSurface } from './surface-layout.js';
 
 // Internal modules
 import type {
+  FrameModel,
   InternalFrameModel,
   FrameAction,
   FrameShellCommand,
@@ -94,6 +78,7 @@ import type {
   FramePageMsg,
   FramePageUpdateResult,
   FramedApp,
+  FramedAppRunOptions,
   FramedAppMsg,
 } from './app-frame-types.js';
 import {
@@ -109,14 +94,41 @@ import {
   frameBodyRect,
   mergeBindingSources,
 } from './app-frame-utils.js';
+import type {
+  ResolvedFrameShellTheme,
+  ResolvedSettingsLayout,
+} from './app-frame-overlays.js';
+import {
+  renderHelpOverlay,
+  isHelpScrollAction,
+  resolveCurrentShellTheme,
+  resolveNextShellTheme,
+  resolveShellThemeForContext,
+  resolveFrameSettings,
+  resolveFrameNotificationCenter,
+  resolveSettingsLayout,
+  resolveNotificationCenterLayout,
+  resolveInputAreas,
+  findInputAreaByPaneId,
+  moveSettingsFocus,
+  scrollSettingsBy,
+  clampSettingsScroll,
+  scrollNotificationCenterBy,
+  cycleNotificationCenterFilter,
+  clampSettingsFocus,
+  renderSettingsDrawer,
+  renderNotificationCenterDrawer,
+  resolveNotificationFooterCue,
+} from './app-frame-overlays.js';
 import {
   activeFrameLayer,
-  describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  projectFrameControls,
   type FrameLayerDescriptor,
   type FrameLayerMetadata,
   type FrameLayerHintSource,
   type FrameLayerKind,
+  type FramePageLayerRegistry,
 } from './app-frame-layers.js';
 import {
   applyRuntimeCommandBuffer,
@@ -128,11 +140,8 @@ import {
   type RuntimeInputRouteResult,
 } from './runtime-engine.js';
 import {
-  frameEndAnchor,
   frameMessage,
-  frameNotificationCue,
   frameNotificationFilterLabel,
-  frameStartAnchor,
 } from './app-frame-i18n.js';
 import {
   resolveHeaderLine,
@@ -155,6 +164,7 @@ import {
   openCommandPalette,
   openSearchPalette,
 } from './app-frame-palette.js';
+import type { RenderStageTiming } from './pipeline/pipeline.js';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -178,6 +188,8 @@ export interface FramePage<PageModel, Msg> {
   inputAreas?: (model: PageModel) => readonly FrameInputArea<PageModel, Msg>[];
   /** Optional modal keymap. When present, it captures all keys until dismissed. */
   modalKeyMap?: (model: PageModel) => KeyMap<Msg> | undefined;
+  /** Optional page-owned layer registry surfaced to the frame for workspace and page-modal control projection. */
+  layers?: (model: PageModel) => FramePageLayerRegistry;
   /** Optional help source override. */
   helpSource?: BindingSource;
   /** Optional page-scoped command items for command palette listing/execution. */
@@ -444,98 +456,34 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   readonly initialLayout?: SerializedLayoutState;
 }
 
-/** Stored pane scroll coordinates. */
-export interface FramePaneScroll {
-  /** Horizontal offset. */
-  readonly x: number;
-  /** Vertical offset. */
-  readonly y: number;
-}
-
-/** Runtime model owned by the frame. */
-export interface FrameModel<PageModel> {
-  /** Current active page id. */
-  readonly activePageId: string;
-  /** Currently selected stock shell theme id (if shell themes are enabled). */
-  readonly activeShellThemeId?: string;
-  /** Stable page order. */
-  readonly pageOrder: readonly string[];
-  /** Current model per page id. */
-  readonly pageModels: Readonly<Record<string, PageModel>>;
-  /** Focused pane id per page (if any). */
-  readonly focusedPaneByPage: Readonly<Record<string, string | undefined>>;
-  /** Per-page/per-pane scroll positions. */
-  readonly scrollByPage: Readonly<Record<string, Readonly<Record<string, FramePaneScroll>>>>;
-  /** Current terminal width. */
-  readonly columns: number;
-  /** Current terminal height. */
-  readonly rows: number;
-  /** Help visibility flag. */
-  readonly helpOpen: boolean;
-  /** Command palette state (undefined when closed). */
-  readonly commandPalette?: CommandPaletteState;
-  /** Kind of active shell palette (`search` vs `command`). */
-  readonly commandPaletteKind?: 'command' | 'search';
-  /** Settings drawer visibility flag. */
-  readonly settingsOpen: boolean;
-  /** Notification center visibility flag. */
-  readonly notificationCenterOpen: boolean;
-  /** Quit-confirm modal visibility flag. */
-  readonly quitConfirmOpen: boolean;
-  /** Active settings row index. */
-  readonly settingsFocusIndex: number;
-  /** Vertical scroll offset for the settings drawer. */
-  readonly settingsScrollY: number;
-  /** Vertical scroll offset for the notification center. */
-  readonly notificationCenterScrollY: number;
-  /** ID of the page we are transitioning away from. */
-  readonly previousPageId?: string;
-  /** Transition progress (0 to 1). */
-  readonly transitionProgress: number;
-  /** Monotonic counter to discard stale transition ticks. */
-  readonly transitionGeneration: number;
-  /** Currently active transition style. */
-  readonly activeTransition?: PageTransition;
-  /** Wall-clock start time of the active transition (ms since epoch). */
-  readonly transitionStartMs?: number;
-  /** Compiled timeline driving the active transition. */
-  readonly transitionTimeline?: Timeline;
-  /** Timeline state for the active transition. */
-  readonly transitionTimelineState?: TimelineState;
-  /** Monotonic frame counter for the active transition (for temporal shader effects). */
-  readonly transitionFrame: number;
-  /** Per-page panel visibility (minimize/fold) state. */
-  readonly minimizedByPage: Readonly<Record<string, PanelVisibilityState>>;
-  /** Per-page maximized pane state. */
-  readonly maximizedPaneByPage: Readonly<Record<string, PanelMaximizeState>>;
-  /** Per-page dock order state. */
-  readonly dockStateByPage: Readonly<Record<string, PanelDockState>>;
-  /** Per-page split ratio overrides (from layout presets/session restore). */
-  readonly splitRatioOverrides: Readonly<Record<string, Readonly<Record<string, number>>>>;
-  /** Frame-managed runtime notifications. */
-  readonly runtimeNotifications: NotificationState<never>;
-  /** Active filter for the shell fallback notification center. */
-  readonly runtimeNotificationHistoryFilter: NotificationHistoryFilter;
-  /** Whether the runtime notification tick loop is active. */
-  readonly runtimeNotificationLoopActive: boolean;
-}
-
 export type {
+  FrameAction,
+  FrameModel,
+  FrameNotificationSpec,
+  FramePaneScroll,
   FramePageMsg,
   FramePageUpdateResult,
   FramedApp,
+  FramedAppRunOptions,
   FramedAppMsg,
   FramedAppUpdateResult,
   FrameScopedMsg,
   PageScopedMsg,
 } from './app-frame-types.js';
+export {
+  emitFrameAction,
+  notify,
+} from './app-frame-types.js';
 
 export type {
+  FrameControlProjection,
   FrameLayerHintSource,
   FrameLayerKind,
   FrameLayerMetadata,
   FrameLayerOwner,
   FrameLayerDescriptor,
+  FramePageLayerKind,
+  FramePageLayerRegistry,
   FrameRuntimeLayer,
   FrameRuntimeViewStack,
   DescribeFrameLayerStackOptions,
@@ -544,6 +492,7 @@ export {
   activeFrameLayer,
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
+  projectFrameControls,
   underlyingFrameLayer,
 } from './app-frame-layers.js';
 
@@ -555,14 +504,6 @@ const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
 const SETTINGS_FEEDBACK_TOAST_WIDTH = 40;
 const EMPTY_RUNTIME_LAYOUTS = createRuntimeRetainedLayouts();
-const DEFAULT_NOTIFICATION_CENTER_FILTERS: readonly NotificationHistoryFilter[] = [
-  'ALL',
-  'ACTIONABLE',
-  'ERROR',
-  'WARNING',
-  'SUCCESS',
-  'INFO',
-];
 
 interface ResolvedFrameNotificationOptions {
   readonly enabled: boolean;
@@ -573,65 +514,91 @@ interface ResolvedFrameNotificationOptions {
   readonly overflow: OverflowBehavior;
 }
 
+interface FrameTimingSnapshot {
+  readonly frameTimeMs: number;
+  readonly viewTimeMs: number;
+  readonly diffTimeMs: number;
+  readonly frameBudgetMs?: number;
+  readonly frameOverBudget: boolean;
+}
 
-const quitHelpKeys = createKeyMap<FrameAction>()
-  .group('Exit', (g) => g
-    .bind('q', 'Quit', { type: 'toggle-help' })
-    .bind('escape', 'Quit', { type: 'toggle-help' })
-    .bind('ctrl+c', 'Quit', { type: 'toggle-help' }));
-const helpLayerHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Help', (g) => g
-    .bind('escape', 'Close help', { type: 'noop' })
-    .bind('?', 'Close help', { type: 'noop' })
-    .bind('up', 'Scroll up', { type: 'noop' })
-    .bind('down', 'Scroll down', { type: 'noop' })
-    .bind('j', 'Scroll down', { type: 'noop' })
-    .bind('k', 'Scroll up', { type: 'noop' })
-    .bind('d', 'Page down', { type: 'noop' })
-    .bind('u', 'Page up', { type: 'noop' })
-    .bind('g', 'Top', { type: 'noop' })
-    .bind('shift+g', 'Bottom', { type: 'noop' }));
-const settingsHelpKeys = createKeyMap<FrameAction>()
-  .group('Settings', (g) => g
-    .bind('escape', 'Close settings', { type: 'toggle-settings' })
-    .bind('f2', 'Close settings', { type: 'toggle-settings' })
-    .bind('up', 'Previous row', { type: 'scroll-up' })
-    .bind('down', 'Next row', { type: 'scroll-down' })
-    .bind('enter', 'Activate setting', { type: 'toggle-settings' })
-    .bind('space', 'Activate setting', { type: 'toggle-settings' })
-    .bind('j', 'Scroll down', { type: 'scroll-down' })
-    .bind('k', 'Scroll up', { type: 'scroll-up' })
-    .bind('d', 'Page down', { type: 'page-down' })
-    .bind('u', 'Page up', { type: 'page-up' })
-    .bind('g', 'Top', { type: 'top' })
-    .bind('shift+g', 'Bottom', { type: 'bottom' })
-    .bind('/', 'Search', { type: 'open-search' })
-    .bind('ctrl+p', 'Open command palette', { type: 'open-palette' })
-    .bind(':', 'Open command palette', { type: 'open-palette' })
-    .bind('?', 'Toggle help', { type: 'toggle-help' }));
-const notificationCenterHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Notifications', (g) => g
-    .bind('shift+n', 'Close notification center', { type: 'noop' })
-    .bind('up', 'Scroll up', { type: 'noop' })
-    .bind('down', 'Scroll down', { type: 'noop' })
-    .bind('j', 'Scroll down', { type: 'noop' })
-    .bind('k', 'Scroll up', { type: 'noop' })
-    .bind('d', 'Page down', { type: 'noop' })
-    .bind('u', 'Page up', { type: 'noop' })
-    .bind('g', 'Top', { type: 'noop' })
-    .bind('shift+g', 'Bottom', { type: 'noop' })
-    .bind('f', 'Cycle filter', { type: 'noop' })
-    .bind('/', 'Search', { type: 'noop' })
-    .bind('ctrl+p', 'Open command palette', { type: 'noop' })
-    .bind(':', 'Open command palette', { type: 'noop' })
-    .bind('?', 'Toggle help', { type: 'noop' }));
-const quitConfirmHelpKeys = createKeyMap<{ type: 'noop' }>()
-  .group('Quit', (g) => g
-    .bind('y', 'Quit', { type: 'noop' })
-    .bind('enter', 'Quit', { type: 'noop' })
-    .bind('n', 'Stay', { type: 'noop' })
-    .bind('escape', 'Stay', { type: 'noop' })
-    .bind('q', 'Stay', { type: 'noop' }));
+function createQuitHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<FrameAction>()
+    .group(t('help.group.quit', 'Quit'), (g) => g
+      .bind('q', t('help.key.quit', 'Quit'), { type: 'toggle-help' })
+      .bind('escape', t('help.key.quit', 'Quit'), { type: 'toggle-help' })
+      .bind('ctrl+c', t('help.key.quit', 'Quit'), { type: 'toggle-help' }));
+}
+
+function createHelpLayerHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.help', 'Help'), (g) => g
+      .bind('escape', t('help.key.closeHelp', 'Close help'), { type: 'noop' })
+      .bind('?', t('help.key.closeHelp', 'Close help'), { type: 'noop' })
+      .bind('up', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('down', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'noop' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'noop' })
+      .bind('g', t('key.top', 'Top'), { type: 'noop' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'noop' }));
+}
+
+function createSettingsHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<FrameAction>()
+    .group(t('help.group.settings', 'Settings'), (g) => g
+      .bind('escape', t('help.key.closeSettings', 'Close settings'), { type: 'toggle-settings' })
+      .bind('f2', t('help.key.closeSettings', 'Close settings'), { type: 'toggle-settings' })
+      .bind('up', t('help.key.previousRow', 'Previous row'), { type: 'scroll-up' })
+      .bind('down', t('help.key.nextRow', 'Next row'), { type: 'scroll-down' })
+      .bind('enter', t('help.key.activateSetting', 'Activate setting'), { type: 'toggle-settings' })
+      .bind('space', t('help.key.activateSetting', 'Activate setting'), { type: 'toggle-settings' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'scroll-down' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'scroll-up' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'page-down' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'page-up' })
+      .bind('g', t('key.top', 'Top'), { type: 'top' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'bottom' })
+      .bind('/', t('key.search', 'Search'), { type: 'open-search' })
+      .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind(':', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' }));
+}
+
+function createNotificationCenterHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.notifications', 'Notifications'), (g) => g
+      .bind('shift+n', t('help.key.closeNotifications', 'Close notification center'), { type: 'noop' })
+      .bind('up', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('down', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('j', t('key.scrollDown', 'Scroll down'), { type: 'noop' })
+      .bind('k', t('key.scrollUp', 'Scroll up'), { type: 'noop' })
+      .bind('d', t('key.pageDown', 'Page down'), { type: 'noop' })
+      .bind('u', t('key.pageUp', 'Page up'), { type: 'noop' })
+      .bind('g', t('key.top', 'Top'), { type: 'noop' })
+      .bind('shift+g', t('key.bottom', 'Bottom'), { type: 'noop' })
+      .bind('f', t('help.key.cycleFilter', 'Cycle filter'), { type: 'noop' })
+      .bind('/', t('key.search', 'Search'), { type: 'noop' })
+      .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'noop' })
+      .bind(':', t('key.openPalette', 'Open command palette'), { type: 'noop' })
+      .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'noop' }));
+}
+
+function createQuitConfirmHelpKeys(i18n?: I18nRuntime): BindingSource {
+  const t = (id: string, fallback: string) => frameMessage(i18n, id, fallback);
+  return createKeyMap<{ type: 'noop' }>()
+    .group(t('help.group.quit', 'Quit'), (g) => g
+      .bind('y', t('help.key.quit', 'Quit'), { type: 'noop' })
+      .bind('enter', t('help.key.quit', 'Quit'), { type: 'noop' })
+      .bind('n', t('help.key.stay', 'Stay'), { type: 'noop' })
+      .bind('escape', t('help.key.stay', 'Stay'), { type: 'noop' })
+      .bind('q', t('help.key.stay', 'Stay'), { type: 'noop' }));
+}
 
 function resolveFrameNotificationOptions<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
@@ -681,109 +648,61 @@ function cloneShellThemeContext(
   return cloneContextWithResolvedTheme(ctx, resolvedTheme);
 }
 
-function resolveShellThemeOptionsText(
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  i18n: I18nRuntime | undefined,
-): string {
-  const labels = shellThemes.map((theme) => theme.label);
-  if (labels.length === 0) return '';
-  if (i18n == null) return labels.join(', ');
-  return i18n.formatList(labels, i18n.locale);
+function readStageDuration(
+  timings: readonly RenderStageTiming[],
+  stage: RenderStageTiming['stage'],
+): number {
+  return timings.find((timing) => timing.stage === stage)?.durationMs ?? 0;
 }
 
-function resolveCurrentShellTheme(
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  activeShellThemeId: string | undefined,
-): ResolvedFrameShellTheme | undefined {
-  return shellThemes.find((theme) => theme.id === activeShellThemeId) ?? shellThemes[0];
-}
-
-function resolveNextShellTheme(
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  activeShellThemeId: string | undefined,
-): ResolvedFrameShellTheme | undefined {
-  if (shellThemes.length === 0) return undefined;
-  const currentIndex = Math.max(0, shellThemes.findIndex((theme) => theme.id === activeShellThemeId));
-  return shellThemes[(currentIndex + 1) % shellThemes.length];
-}
-
-function resolveShellThemeForContext(
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  ctx: BijouContext | undefined,
-): ResolvedFrameShellTheme | undefined {
-  if (ctx == null) return undefined;
-  return shellThemes.find((theme) => theme.resolvedTheme.theme === ctx.theme.theme);
-}
-
-function mergeShellThemeSettings<Msg>(
-  settings: FrameSettings<Msg> | undefined,
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  activeShellThemeId: string | undefined,
-  i18n: I18nRuntime | undefined,
-): FrameSettings<Msg> | undefined {
-  if (shellThemes.length < 2) return settings;
-
-  const currentTheme = resolveCurrentShellTheme(shellThemes, activeShellThemeId);
-  const nextTheme = resolveNextShellTheme(shellThemes, activeShellThemeId);
-  if (currentTheme == null || nextTheme == null) return settings;
-
-  const row: FrameSettingRow<Msg> = {
-    id: FRAME_SHELL_THEME_ROW_ID,
-    label: frameMessage(i18n, 'settings.shellTheme.label', 'Shell theme'),
-    description: currentTheme.description ?? frameMessage(
-      i18n,
-      'settings.shellTheme.description',
-      'Current theme: {theme}. Options: {options}.',
-      {
-        theme: currentTheme.label,
-        options: resolveShellThemeOptionsText(shellThemes, i18n),
-      },
-    ),
-    valueLabel: currentTheme.label,
-    kind: 'choice',
-    feedback: {
-      title: frameMessage(i18n, 'settings.title', 'Settings'),
-      message: frameMessage(
-        i18n,
-        'settings.shellTheme.feedback',
-        'Shell theme set to {theme}.',
-        { theme: nextTheme.label },
-      ),
-    },
+function summarizeFrameTimings(
+  timings: readonly RenderStageTiming[],
+  frameBudgetMs: number | undefined,
+): FrameTimingSnapshot {
+  const frameTimeMs = timings.reduce((total, timing) => total + timing.durationMs, 0);
+  return {
+    frameTimeMs,
+    viewTimeMs: readStageDuration(timings, 'Layout'),
+    diffTimeMs: readStageDuration(timings, 'Diff'),
+    frameBudgetMs,
+    frameOverBudget: frameBudgetMs != null && frameTimeMs > frameBudgetMs,
   };
+}
 
-  const shellSectionTitle = frameMessage(i18n, 'settings.section.shell', 'Shell');
-  if (settings == null) {
-    return {
-      title: frameMessage(i18n, 'settings.title', 'Settings'),
-      sections: [{ id: 'shell', title: shellSectionTitle, rows: [row] }],
-    };
-  }
-
-  const shellSectionIndex = settings.sections.findIndex((section) => section.id === 'shell');
-  if (shellSectionIndex >= 0) {
-    const shellSection = settings.sections[shellSectionIndex]!;
-    const existingRowIndex = shellSection.rows.findIndex((existingRow) => existingRow.id === FRAME_SHELL_THEME_ROW_ID);
-    const nextRows = existingRowIndex >= 0
-      ? shellSection.rows.map((existingRow, index) => (index === existingRowIndex ? row : existingRow))
-      : [...shellSection.rows, row];
-    return {
-      ...settings,
-      sections: settings.sections.map((section, index) => (
-        index === shellSectionIndex
-          ? { ...shellSection, rows: nextRows }
-          : section
-      )),
-    };
+function applyFrameTimingSnapshot<PageModel, Msg>(
+  model: InternalFrameModel<PageModel, Msg>,
+  snapshot: FrameTimingSnapshot,
+): InternalFrameModel<PageModel, Msg> {
+  if (
+    model.frameTimeMs === snapshot.frameTimeMs
+    && model.viewTimeMs === snapshot.viewTimeMs
+    && model.diffTimeMs === snapshot.diffTimeMs
+    && model.frameBudgetMs === snapshot.frameBudgetMs
+    && model.frameOverBudget === snapshot.frameOverBudget
+  ) {
+    return model;
   }
 
   return {
-    ...settings,
-    sections: [
-      { id: 'shell', title: shellSectionTitle, rows: [row] },
-      ...settings.sections,
-    ],
+    ...model,
+    frameTimeMs: snapshot.frameTimeMs,
+    viewTimeMs: snapshot.viewTimeMs,
+    diffTimeMs: snapshot.diffTimeMs,
+    frameBudgetMs: snapshot.frameBudgetMs,
+    frameOverBudget: snapshot.frameOverBudget,
   };
+}
+
+function resolveFrameBudgetMs<Msg>(
+  runOptions: FramedAppRunOptions<Msg> | undefined,
+  fallbackCtx: BijouContext | undefined,
+): number | undefined {
+  if (runOptions?.frameBudgetMs != null) return runOptions.frameBudgetMs;
+  const refreshRate = runOptions?.ctx?.runtime.refreshRate ?? fallbackCtx?.runtime.refreshRate;
+  if (refreshRate == null || !Number.isFinite(refreshRate) || refreshRate <= 0) {
+    return undefined;
+  }
+  return 1_000 / refreshRate;
 }
 
 // Factory
@@ -813,27 +732,41 @@ export function createFramedApp<PageModel, Msg>(
     throw new Error(`createFramedApp: defaultPageId "${defaultPageId}" not found in pages`);
   }
 
-  const defaultFrameCtx = options.ctx ?? resolveSafeCtx();
-  if (options.shellThemes != null && options.shellThemes.length > 0 && defaultFrameCtx == null) {
-    throw new Error('createFramedApp: shellThemes requires options.ctx or a default Bijou context');
-  }
-  const resolvedShellThemes: readonly ResolvedFrameShellTheme[] = options.shellThemes?.map((theme) => ({
-    id: theme.id,
-    label: theme.label,
-    description: theme.description,
-    shellTheme: theme,
-    resolvedTheme: createResolved(
-      theme.theme,
-      defaultFrameCtx!.theme.noColor,
-      defaultFrameCtx!.theme.colorScheme,
-    ),
-  })) ?? [];
-  const enableShellThemeSettings = resolvedShellThemes.length > 1;
-  const initialShellTheme = resolveShellThemeForContext(resolvedShellThemes, defaultFrameCtx)
-    ?? resolvedShellThemes[0];
+  const shellThemeSpecs = options.shellThemes ?? [];
+  let defaultFrameCtx = options.ctx ?? resolveSafeCtx();
+  let resolvedShellThemes: readonly ResolvedFrameShellTheme[] = [];
+  const enableShellThemeSettings = shellThemeSpecs.length > 1;
   const usesAmbientDefaultContext = options.ctx == null && defaultFrameCtx != null;
   let frameCtx = options.ctx;
-  let frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, frameCtx)?.id;
+  let frameCtxShellThemeId: string | undefined;
+  let useRunScopedFrameCtx = false;
+
+  function ensureResolvedShellThemes(explicitCtx?: BijouContext): void {
+    if (shellThemeSpecs.length === 0 || resolvedShellThemes.length > 0) return;
+    const baseCtx = explicitCtx ?? frameCtx ?? options.ctx ?? resolveSafeCtx();
+    if (baseCtx == null) {
+      throw new Error(
+        'createFramedApp: shellThemes requires options.ctx, app.run({ ctx }), or a default Bijou context',
+      );
+    }
+    defaultFrameCtx ??= baseCtx;
+    resolvedShellThemes = shellThemeSpecs.map((theme) => ({
+      id: theme.id,
+      label: theme.label,
+      description: theme.description,
+      shellTheme: theme,
+      resolvedTheme: createResolved(
+        theme.theme,
+        defaultFrameCtx!.theme.noColor,
+        defaultFrameCtx!.theme.colorScheme,
+      ),
+    }));
+  }
+
+  if (frameCtx != null) {
+    ensureResolvedShellThemes(frameCtx);
+    frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, frameCtx)?.id;
+  }
 
   function resolveFrameCtx(): BijouContext | undefined {
     return frameCtx ?? options.ctx ?? resolveSafeCtx();
@@ -841,6 +774,7 @@ export function createFramedApp<PageModel, Msg>(
 
   function resolveFrameThemeCtx(activeShellThemeId: string | undefined): BijouContext | undefined {
     const baseCtx = resolveFrameCtx();
+    ensureResolvedShellThemes(baseCtx);
     if (defaultFrameCtx == null) return baseCtx;
     const activeTheme = resolveCurrentShellTheme(resolvedShellThemes, activeShellThemeId);
     if (activeTheme == null) return baseCtx;
@@ -854,10 +788,11 @@ export function createFramedApp<PageModel, Msg>(
   }
 
   function publishShellThemeContext(nextTheme: ResolvedFrameShellTheme): BijouContext | undefined {
+    ensureResolvedShellThemes(resolveFrameCtx());
     if (defaultFrameCtx == null) return resolveFrameCtx();
     frameCtx = cloneShellThemeContext(defaultFrameCtx, nextTheme.resolvedTheme);
     frameCtxShellThemeId = nextTheme.id;
-    if (usesAmbientDefaultContext) {
+    if (usesAmbientDefaultContext && !useRunScopedFrameCtx) {
       setDefaultContext(frameCtx);
     }
     options.onShellThemeChange?.({
@@ -872,11 +807,30 @@ export function createFramedApp<PageModel, Msg>(
     enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
     i18n: options.i18n,
   });
+  const quitHelpKeys = createQuitHelpKeys(options.i18n);
+  const helpLayerHelpKeys = createHelpLayerHelpKeys(options.i18n);
+  const settingsHelpKeys = createSettingsHelpKeys(options.i18n);
+  const notificationCenterHelpKeys = createNotificationCenterHelpKeys(options.i18n);
+  const quitConfirmHelpKeys = createQuitConfirmHelpKeys(options.i18n);
   const frameNotificationOptions = resolveFrameNotificationOptions(options);
   let composedFrameScratch: Surface | null = null;
   let headerScratch: Surface | undefined;
   let helpLineScratch: Surface | undefined;
   const paneScratchPool = createFramePaneScratchPool();
+  let workspaceLayoutCache:
+    | {
+      readonly activePageId: string;
+      readonly activePageModel: PageModel;
+      readonly columns: number;
+      readonly rows: number;
+      readonly visibilityState: unknown;
+      readonly dockState: unknown;
+      readonly splitRatioOverrides: unknown;
+      readonly maximizedPaneId: string | undefined;
+      readonly paneRects: ReadonlyMap<string, LayoutRect>;
+      readonly tree: SurfaceLayoutNode;
+    }
+    | undefined;
   const paletteKeys = commandPaletteKeyMap<PaletteAction>({
     focusNext: { type: 'cp-next' },
     focusPrev: { type: 'cp-prev' },
@@ -885,6 +839,58 @@ export function createFramedApp<PageModel, Msg>(
     select: { type: 'cp-select' },
     close: { type: 'cp-close' },
   });
+
+  function bindingComboKey(binding: BindingInfo): string {
+    const combo = binding.combo;
+    return `${combo.key}|${combo.ctrl ? 1 : 0}|${combo.alt ? 1 : 0}|${combo.shift ? 1 : 0}`;
+  }
+
+  function findBindingForMessage(
+    bindings: readonly BindingInfo[],
+    msg: KeyMsg,
+  ): BindingInfo | undefined {
+    const comboKey = `${msg.key}|${msg.ctrl ? 1 : 0}|${msg.alt ? 1 : 0}|${msg.shift ? 1 : 0}`;
+    return bindings.find((binding) => binding.enabled && bindingComboKey(binding) === comboKey);
+  }
+
+  function queueFrameKeyCollisionWarning(
+    model: InternalFrameModel<PageModel, Msg>,
+    msg: KeyMsg,
+    teaCmds: Cmd<FramedAppMsg<Msg>>[],
+  ): InternalFrameModel<PageModel, Msg> {
+    if (!frameNotificationOptions.enabled) return model;
+    if ((options.keyPriority ?? 'frame-first') !== 'frame-first') return model;
+    if (model.warnedFrameKeyCollisionPages[model.activePageId]) return model;
+    const activePage = pagesById.get(model.activePageId);
+    if (activePage?.keyMap == null) return model;
+
+    const pageBinding = findBindingForMessage(activePage.keyMap.bindings(), msg);
+    const frameBinding = findBindingForMessage(frameKeys.bindings(), msg);
+    if (pageBinding == null || frameBinding == null) return model;
+
+    const warningCmd: Cmd<FramedAppMsg<Msg>> = async () => wrapFrameMsg({
+      type: 'runtime-issue',
+      issue: {
+        level: 'warning',
+        source: 'runtime',
+        message:
+          `Page "${model.activePageId}" key binding ${formatKeyCombo(pageBinding.combo)} `
+          + `("${pageBinding.description}") is shadowed by the frame binding `
+          + `"${frameBinding.description}" under keyPriority="frame-first". `
+          + `Use keyPriority: 'page-first' or choose a different page binding.`,
+        atMs: resolveClock(resolveFrameCtx()).now(),
+      },
+    });
+    teaCmds.push(warningCmd);
+
+    return {
+      ...model,
+      warnedFrameKeyCollisionPages: {
+        ...model.warnedFrameKeyCollisionPages,
+        [model.activePageId]: true,
+      },
+    };
+  }
 
   function getComposedFrameScratch(width: number, height: number): Surface {
     if (
@@ -1027,20 +1033,19 @@ export function createFramedApp<PageModel, Msg>(
       teaCmds.push(...cmds);
       return nextModel;
     },
+    'warn-frame-key-collision': (model, cmd, teaCmds) => {
+      const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'warn-frame-key-collision' }>;
+      return queueFrameKeyCollisionWarning(model, c.msg, teaCmds);
+    },
 
     // --- help ---
     'help-scroll': (model, cmd) => {
       const c = cmd as Extract<FrameShellCommand<Msg>, { type: 'help-scroll' }>;
-      const activePage = pagesById.get(model.activePageId)!;
-      const overlay = renderHelpOverlay(
-        model,
-        activePage,
-        frameKeys,
-        paletteKeys,
-        options,
-        pagesById,
-        resolvedShellThemes,
-      );
+      const helpSource = resolvePresentedLayerContext(model).controlProjection.helpSource;
+      if (helpSource == null) {
+        return model;
+      }
+      const overlay = renderHelpOverlay(model, helpSource, options.i18n);
       const viewportHeight = Math.max(1, overlay.body.height - 1);
       const delta = c.action === 'down' ? 3
         : c.action === 'up' ? -3
@@ -1400,7 +1405,9 @@ export function createFramedApp<PageModel, Msg>(
 
     // frame-first (default)
     if (frameAction !== undefined) {
-      return resolveFrameActionCommands(msg, frameAction, 'frame');
+      return pageAction !== undefined
+        ? [...resolveFrameActionCommands(msg, frameAction, 'frame'), { type: 'warn-frame-key-collision', msg }]
+        : resolveFrameActionCommands(msg, frameAction, 'frame');
     }
     if (paneAction !== undefined) {
       return [{ type: 'observed-key', msg, route: 'page' }, { type: 'emit-page-msg', pageId: model.activePageId, msg: paneAction }];
@@ -1497,31 +1504,23 @@ export function createFramedApp<PageModel, Msg>(
     };
   }
 
-  function resolveWorkspacePaneRects(
+  function buildWorkspaceLayoutTreeFromPaneRects(
     model: InternalFrameModel<PageModel, Msg>,
-  ): ReadonlyMap<string, LayoutRect> {
-    const bodyRect = resolveBodyRect(model, options);
-    const maxState = model.maximizedPaneByPage[model.activePageId];
-    const maximizedPaneId = maxState?.maximizedPaneId;
-    const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
-    const renderResult = maximizedPaneId
-      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool, themedFrameCtx)
-      : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
-    return renderResult.paneRects;
-  }
-
-  function buildWorkspaceLayoutTree(
-    model: InternalFrameModel<PageModel, Msg>,
+    paneRects: ReadonlyMap<string, LayoutRect>,
+    tabTargets?: readonly {
+      readonly pageId: string;
+      readonly startCol: number;
+      readonly endCol: number;
+    }[],
   ): SurfaceLayoutNode {
-    const header = resolveHeaderLine(
+    const resolvedTabTargets = tabTargets ?? resolveHeaderLine(
       model,
       options,
       pagesById,
       headerScratch,
       resolveFrameThemeCtx(model.activeShellThemeId),
-    );
-    headerScratch = header.surface;
-    const tabChildren: SurfaceLayoutNode[] = header.tabTargets.map((target) =>
+    ).tabTargets;
+    const tabChildren: SurfaceLayoutNode[] = resolvedTabTargets.map((target) =>
       createShellRetainedLayoutNode(`tab:${target.pageId}`, {
         row: 0,
         col: target.startCol,
@@ -1531,7 +1530,6 @@ export function createFramedApp<PageModel, Msg>(
     );
 
     const bodyRect = resolveBodyRect(model, options);
-    const paneRects = resolveWorkspacePaneRects(model);
     const paneChildren: SurfaceLayoutNode[] = [];
     for (const [paneId, rect] of paneRects.entries()) {
       paneChildren.push(createShellRetainedLayoutNode(`pane:${paneId}`, rect));
@@ -1553,6 +1551,97 @@ export function createFramedApp<PageModel, Msg>(
         ),
       ],
     );
+  }
+
+  function rememberWorkspaceLayout(
+    model: InternalFrameModel<PageModel, Msg>,
+    paneRects: ReadonlyMap<string, LayoutRect>,
+    tabTargets?: readonly {
+      readonly pageId: string;
+      readonly startCol: number;
+      readonly endCol: number;
+    }[],
+  ): {
+    readonly activePageId: string;
+    readonly activePageModel: PageModel;
+    readonly columns: number;
+    readonly rows: number;
+    readonly visibilityState: unknown;
+    readonly dockState: unknown;
+    readonly splitRatioOverrides: unknown;
+    readonly maximizedPaneId: string | undefined;
+    readonly paneRects: ReadonlyMap<string, LayoutRect>;
+    readonly tree: SurfaceLayoutNode;
+  } {
+    const activePageId = model.activePageId;
+    const next = {
+      activePageId,
+      activePageModel: model.pageModels[activePageId]!,
+      columns: model.columns,
+      rows: model.rows,
+      visibilityState: model.minimizedByPage[activePageId],
+      dockState: model.dockStateByPage[activePageId],
+      splitRatioOverrides: model.splitRatioOverrides,
+      maximizedPaneId: model.maximizedPaneByPage[activePageId]?.maximizedPaneId,
+      paneRects,
+      tree: buildWorkspaceLayoutTreeFromPaneRects(model, paneRects, tabTargets),
+    } as const;
+    workspaceLayoutCache = next;
+    return next;
+  }
+
+  function matchesWorkspaceLayoutCache(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): boolean {
+    if (workspaceLayoutCache == null) return false;
+    const activePageId = model.activePageId;
+    return workspaceLayoutCache.activePageId === activePageId
+      && workspaceLayoutCache.activePageModel === model.pageModels[activePageId]
+      && workspaceLayoutCache.columns === model.columns
+      && workspaceLayoutCache.rows === model.rows
+      && workspaceLayoutCache.visibilityState === model.minimizedByPage[activePageId]
+      && workspaceLayoutCache.dockState === model.dockStateByPage[activePageId]
+      && workspaceLayoutCache.splitRatioOverrides === model.splitRatioOverrides
+      && workspaceLayoutCache.maximizedPaneId === model.maximizedPaneByPage[activePageId]?.maximizedPaneId;
+  }
+
+  function resolveWorkspaceLayout(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): {
+    readonly activePageId: string;
+    readonly activePageModel: PageModel;
+    readonly columns: number;
+    readonly rows: number;
+    readonly visibilityState: unknown;
+    readonly dockState: unknown;
+    readonly splitRatioOverrides: unknown;
+    readonly maximizedPaneId: string | undefined;
+    readonly paneRects: ReadonlyMap<string, LayoutRect>;
+    readonly tree: SurfaceLayoutNode;
+  } {
+    if (matchesWorkspaceLayoutCache(model)) {
+      return workspaceLayoutCache!;
+    }
+    const bodyRect = resolveBodyRect(model, options);
+    const maxState = model.maximizedPaneByPage[model.activePageId];
+    const maximizedPaneId = maxState?.maximizedPaneId;
+    const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
+    const renderResult = maximizedPaneId
+      ? renderMaximizedPane(model.activePageId, model, bodyRect, pagesById, maximizedPaneId, paneScratchPool, themedFrameCtx)
+      : renderPageContent(model.activePageId, model, bodyRect, pagesById, themedFrameCtx);
+    return rememberWorkspaceLayout(model, renderResult.paneRects);
+  }
+
+  function resolveWorkspacePaneRects(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): ReadonlyMap<string, LayoutRect> {
+    return resolveWorkspaceLayout(model).paneRects;
+  }
+
+  function buildWorkspaceLayoutTree(
+    model: InternalFrameModel<PageModel, Msg>,
+  ): SurfaceLayoutNode {
+    return resolveWorkspaceLayout(model).tree;
   }
 
   function buildSettingsRowChildren(
@@ -1810,6 +1899,7 @@ export function createFramedApp<PageModel, Msg>(
   function resolveLayerMetadata(
     model: InternalFrameModel<PageModel, Msg>,
     activePage: FramePage<PageModel, Msg>,
+    activePageModel: PageModel,
     activeInputArea: FrameInputArea<PageModel, Msg> | undefined,
     modalKeyMap: KeyMap<Msg> | undefined,
   ): Partial<Record<FrameLayerKind, FrameLayerMetadata>> {
@@ -1830,22 +1920,27 @@ export function createFramedApp<PageModel, Msg>(
     const notificationsTitle = notificationCenter == null
       ? frameMessage(options.i18n, 'notifications.title', 'Notifications')
       : `${notificationCenter.title} • ${frameNotificationFilterLabel(options.i18n, notificationCenter.activeFilter)}`;
+    const pageLayers = activePage.layers?.(activePageModel);
+    const workspaceLayer: FrameLayerMetadata = {
+      title: activePage.title,
+      hintSource: workspaceHintSource,
+      helpSource: workspaceHelpSource,
+      ...pageLayers?.workspace,
+    };
+    const pageModalLayer: FrameLayerMetadata = {
+      title: activePage.title,
+      hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
+      helpSource: mergeBindingSources(
+        quitHelpKeys,
+        modalKeyMap,
+        activePage.helpSource ?? activePage.keyMap,
+      ),
+      ...pageLayers?.['page-modal'],
+    };
 
     return {
-      workspace: {
-        title: activePage.title,
-        hintSource: workspaceHintSource,
-        helpSource: workspaceHelpSource,
-      },
-      'page-modal': {
-        title: activePage.title,
-        hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
-        helpSource: mergeBindingSources(
-          quitHelpKeys,
-          modalKeyMap,
-          activePage.helpSource ?? activePage.keyMap,
-        ),
-      },
+      workspace: workspaceLayer,
+      'page-modal': pageModalLayer,
       settings: {
         title: settings?.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
         hintSource: settingsHint,
@@ -1890,17 +1985,17 @@ export function createFramedApp<PageModel, Msg>(
       modalKeyMap,
       pageModalOpen,
     } = resolveLayerContext(model);
-    const layerStack = describeFrameLayerStack(model, {
+    const layerMetadata = resolveLayerMetadata(
+      model,
+      activePage,
+      activePageModel,
+      activeInputArea,
+      modalKeyMap,
+    );
+    const controlProjection = projectFrameControls(model, {
       pageModalOpen,
-      layers: resolveLayerMetadata(
-        model,
-        activePage,
-        activeInputArea,
-        modalKeyMap,
-      ),
+      layers: layerMetadata,
     });
-    const activeLayer = layerStack[layerStack.length - 1]!;
-    const underlyingLayer = layerStack.length > 1 ? layerStack[layerStack.length - 2] : undefined;
     return {
       activePage,
       activePageModel,
@@ -1908,9 +2003,11 @@ export function createFramedApp<PageModel, Msg>(
       activeInputArea,
       modalKeyMap,
       pageModalOpen,
-      layerStack,
-      activeLayer,
-      underlyingLayer,
+      layerMetadata,
+      controlProjection,
+      layerStack: controlProjection.layerStack,
+      activeLayer: controlProjection.activeLayer,
+      underlyingLayer: controlProjection.underlyingLayer,
     };
   }
 
@@ -2026,10 +2123,16 @@ export function createFramedApp<PageModel, Msg>(
         activePageId: defaultPageId,
         pageOrder,
         pageModels,
+        warnedFrameKeyCollisionPages: {},
         focusedPaneByPage: {},
         scrollByPage: {},
         columns: Math.max(1, options.initialColumns ?? 80),
         rows: Math.max(1, options.initialRows ?? 24),
+        frameTimeMs: 0,
+        viewTimeMs: 0,
+        diffTimeMs: 0,
+        frameBudgetMs: undefined,
+        frameOverBudget: false,
         helpOpen: false,
         helpScrollY: 0,
         commandPaletteKind: undefined,
@@ -2049,6 +2152,15 @@ export function createFramedApp<PageModel, Msg>(
         runtimeNotifications: createNotificationState(),
         runtimeNotificationHistoryFilter: 'ALL',
         runtimeNotificationLoopActive: false,
+        activeShellThemeId: undefined,
+      };
+
+      ensureResolvedShellThemes(resolveFrameCtx());
+      const initialShellTheme = resolveShellThemeForContext(resolvedShellThemes, resolveFrameCtx())
+        ?? resolvedShellThemes[0];
+
+      model = {
+        ...model,
         activeShellThemeId: initialShellTheme?.id,
       };
 
@@ -2092,6 +2204,19 @@ export function createFramedApp<PageModel, Msg>(
             overflow: frameNotificationOptions.overflow,
           }, action.issue.atMs);
           return applyFrameNotificationState(model, notifications, action.issue.atMs);
+        }
+        if (action.type === 'push-notification') {
+          if (!frameNotificationOptions.enabled) return [model, []];
+          const nowMs = resolveClock(resolveFrameCtx()).now();
+          const notifications = pushNotification(model.runtimeNotifications, {
+            ...action.notification,
+            placement: action.notification.placement ?? frameNotificationOptions.placement,
+            durationMs: action.notification.durationMs === undefined
+              ? frameNotificationOptions.durationMs
+              : action.notification.durationMs,
+            overflow: action.notification.overflow ?? frameNotificationOptions.overflow,
+          }, nowMs);
+          return applyFrameNotificationState(model, notifications, nowMs);
         }
         if (action.type === 'notification-tick') {
           const notifications = tickNotifications(model.runtimeNotifications, action.atMs);
@@ -2182,7 +2307,7 @@ export function createFramedApp<PageModel, Msg>(
     view(model) {
       const themedFrameCtx = resolveFrameThemeCtx(model.activeShellThemeId);
       const {
-        activePage,
+        controlProjection,
         layerStack,
         activeLayer,
       } = resolvePresentedLayerContext(model);
@@ -2271,6 +2396,7 @@ export function createFramedApp<PageModel, Msg>(
               themedFrameCtx,
             );
       }
+      rememberWorkspaceLayout(model, activeResult.paneRects, headerResult.tabTargets);
 
       const overlays: Overlay[] = [];
       if (options.overlayFactory != null) {
@@ -2323,15 +2449,11 @@ export function createFramedApp<PageModel, Msg>(
       }
 
       if (model.helpOpen) {
-        const helpOverlay = renderHelpOverlay(
-          model,
-          activePage,
-          frameKeys,
-          paletteKeys,
-          options,
-          pagesById,
-          resolvedShellThemes,
-        );
+        const helpSource = controlProjection.helpSource;
+        if (helpSource == null) {
+          throw new Error('createFramedApp: help layer projection is missing a help source');
+        }
+        const helpOverlay = renderHelpOverlay(model, helpSource, options.i18n);
         overlays.push(modal({
           title: activeLayer.kind === 'help'
             ? (activeLayer.title ?? frameMessage(options.i18n, 'help.title', 'Keyboard Help'))
@@ -2391,7 +2513,75 @@ export function createFramedApp<PageModel, Msg>(
     },
   };
 
-  return app;
+  const framedApp = app as unknown as FramedApp<PageModel, Msg>;
+  let hostedRunActive = false;
+  framedApp.run = async (runOptions?: FramedAppRunOptions<Msg>) => {
+    if (hostedRunActive) {
+      throw new Error('createFramedApp: concurrent app.run() calls on the same framed app are not supported');
+    }
+    hostedRunActive = true;
+    const previousFrameCtx = frameCtx;
+    const previousFrameCtxShellThemeId = frameCtxShellThemeId;
+    const previousDefaultFrameCtx = defaultFrameCtx;
+    const previousResolvedShellThemes = resolvedShellThemes;
+    const runtimeCtx = runOptions?.ctx;
+
+    if (runtimeCtx != null && options.ctx == null) {
+      useRunScopedFrameCtx = true;
+      frameCtx = runtimeCtx;
+      defaultFrameCtx = runtimeCtx;
+      resolvedShellThemes = [];
+      ensureResolvedShellThemes(runtimeCtx);
+      frameCtxShellThemeId = resolveShellThemeForContext(resolvedShellThemes, runtimeCtx)?.id;
+    }
+
+    const frameBudgetMs = resolveFrameBudgetMs(runOptions, resolveFrameCtx());
+    let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
+    let needsTimingHydrationRender = true;
+
+    try {
+      await runWithLifecycleHooks(framedApp, {
+        ...runOptions,
+        mouse: runOptions?.mouse ?? true,
+      }, {
+        beforeRender(model) {
+          if (pendingTimingSnapshot == null) return model;
+          return applyFrameTimingSnapshot(
+            model as InternalFrameModel<PageModel, Msg>,
+            pendingTimingSnapshot,
+          );
+        },
+        afterRender({ timings }) {
+          pendingTimingSnapshot = summarizeFrameTimings(timings, frameBudgetMs);
+          if (!needsTimingHydrationRender) return;
+          needsTimingHydrationRender = false;
+          return { requestRender: true };
+        },
+      });
+    } finally {
+      hostedRunActive = false;
+      useRunScopedFrameCtx = false;
+      frameCtx = previousFrameCtx;
+      frameCtxShellThemeId = previousFrameCtxShellThemeId;
+      defaultFrameCtx = previousDefaultFrameCtx;
+      resolvedShellThemes = previousResolvedShellThemes;
+    }
+  };
+
+  return framedApp;
+}
+
+/**
+ * Create and immediately run a batteries-included framed shell.
+ *
+ * This is the one-call hosted path for users who want the frame to own the
+ * runtime pump while `run(app)` remains the low-level TEA contract.
+ */
+export async function runFramedApp<PageModel, Msg>(
+  options: CreateFramedAppOptions<PageModel, Msg>,
+  runOptions?: FramedAppRunOptions<Msg>,
+): Promise<void> {
+  await createFramedApp(options).run(runOptions);
 }
 
 function focusPane<PageModel, Msg>(
@@ -2418,632 +2608,4 @@ function resolveBodyRect<PageModel, Msg>(
     options.bodyTopRows ?? 1,
     options.bodyBottomRows ?? 1,
   );
-}
-
-function renderHelpOverlay<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  activePage: FramePage<PageModel, Msg>,
-  frameKeys: KeyMap<FrameAction>,
-  paletteKeys: KeyMap<PaletteAction>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  shellThemes: readonly ResolvedFrameShellTheme[],
-): { body: Surface; maxScrollY: number; scrollY: number } {
-  const activePageModel = model.pageModels[model.activePageId]!;
-  const activeInputArea = findInputAreaByPaneId(
-    resolveInputAreas(activePage, activePageModel),
-    model.focusedPaneByPage[model.activePageId],
-  );
-  const modalKeyMap = activePage.modalKeyMap?.(activePageModel);
-  const settings = resolveFrameSettings(model, options, pagesById, shellThemes);
-  const notificationCenter = resolveFrameNotificationCenter(model, options, pagesById);
-  const workspaceHintSource = options.helpLineSource?.({
-    model,
-    activePage,
-    frameKeys,
-    globalKeys: options.globalKeys,
-  });
-  const workspaceHelpSource = mergeBindingSources(
-    frameKeys,
-    quitHelpKeys,
-    options.globalKeys,
-    activeInputArea?.helpSource ?? activeInputArea?.keyMap,
-    activePage.helpSource ?? activePage.keyMap,
-  );
-  const layerStack = describeFrameLayerStack(model, {
-    pageModalOpen: modalKeyMap != null,
-    layers: {
-      workspace: {
-        title: activePage.title,
-        hintSource: typeof workspaceHintSource === 'string'
-          ? workspaceHintSource
-          : workspaceHintSource ?? mergeBindingSources(
-            frameKeys,
-            options.globalKeys,
-            activeInputArea?.helpSource ?? activeInputArea?.keyMap,
-            activePage.helpSource ?? activePage.keyMap,
-          ),
-        helpSource: workspaceHelpSource,
-      },
-      'page-modal': {
-        title: activePage.title,
-        hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
-        helpSource: mergeBindingSources(
-          quitHelpKeys,
-          modalKeyMap,
-          activePage.helpSource ?? activePage.keyMap,
-        ),
-      },
-      settings: {
-        title: settings?.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
-        hintSource: frameMessage(options.i18n, 'settings.footer', 'F2/Esc close • ↑/↓ rows • Enter toggle • / search • q quit'),
-        helpSource: mergeBindingSources(settingsHelpKeys, quitHelpKeys),
-      },
-      help: {
-        title: frameMessage(options.i18n, 'help.title', 'Keyboard Help'),
-        hintSource: frameMessage(options.i18n, 'help.hint', 'j/k scroll • d/u page • g/G top/bottom • mouse wheel • ?/Esc close'),
-        helpSource: helpLayerHelpKeys,
-      },
-      'notification-center': {
-        title: notificationCenter == null
-          ? frameMessage(options.i18n, 'notifications.title', 'Notifications')
-          : `${notificationCenter.title} • ${frameNotificationFilterLabel(options.i18n, notificationCenter.activeFilter)}`,
-        hintSource: frameMessage(options.i18n, 'notifications.footer', 'Shift+N close • f filter • j/k scroll • q quit'),
-        helpSource: mergeBindingSources(notificationCenterHelpKeys, quitHelpKeys),
-      },
-      search: {
-        title: model.commandPaletteTitle ?? activePage.searchTitle ?? frameMessage(options.i18n, 'search.title', 'Search'),
-        hintSource: frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close'),
-        helpSource: mergeBindingSources(paletteKeys, quitHelpKeys),
-      },
-      'command-palette': {
-        title: model.commandPaletteTitle ?? frameMessage(options.i18n, 'palette.title', 'Command Palette'),
-        hintSource: frameMessage(options.i18n, 'palette.hint', 'Enter select • Esc close'),
-        helpSource: mergeBindingSources(paletteKeys, quitHelpKeys),
-      },
-      'quit-confirm': {
-        title: frameMessage(options.i18n, 'quit.title', 'Quit?'),
-        hintSource: frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay'),
-        helpSource: quitConfirmHelpKeys,
-      },
-    },
-  });
-  const beneathHelpLayer = layerStack.length > 1 ? layerStack[layerStack.length - 2] : undefined;
-  const source = beneathHelpLayer?.helpSource ?? workspaceHelpSource;
-  const maxDialogWidth = Math.max(28, Math.min(model.columns - 4, 88));
-  const bodyWidth = Math.max(20, maxDialogWidth - 4);
-  const helpSurface = helpViewSurface(source, {
-    title: undefined,
-    width: bodyWidth,
-  });
-  const pagerHeight = Math.max(4, Math.min(helpSurface.height + 1, Math.max(4, model.rows - 8)));
-  const pagerState = createPagerStateForSurface(helpSurface, {
-    width: bodyWidth,
-    height: pagerHeight,
-  });
-  const scrollY = Math.max(0, Math.min(model.helpScrollY, pagerState.scroll.maxY));
-  const scrolledState = {
-    ...pagerState,
-    scroll: {
-      ...pagerState.scroll,
-      y: scrollY,
-    },
-  };
-  return {
-    body: pagerSurface(helpSurface, scrolledState, { showScrollbar: true, showStatus: true }),
-    maxScrollY: pagerState.scroll.maxY,
-    scrollY,
-  };
-}
-
-function isHelpScrollAction(
-  action: FrameAction,
-): action is Extract<FrameAction, { type: 'scroll-up' | 'scroll-down' | 'page-up' | 'page-down' | 'top' | 'bottom' }> {
-  return action.type === 'scroll-up'
-    || action.type === 'scroll-down'
-    || action.type === 'page-up'
-    || action.type === 'page-down'
-    || action.type === 'top'
-    || action.type === 'bottom';
-}
-
-
-
-const FRAME_SHELL_THEME_ROW_ID = '__frame-shell-theme__';
-
-type SettingsRowBehavior = 'cycle-shell-theme';
-
-interface ResolvedFrameShellTheme {
-  readonly id: string;
-  readonly label: string;
-  readonly description?: string;
-  readonly shellTheme: FrameShellTheme;
-  readonly resolvedTheme: ResolvedTheme;
-}
-
-interface FlatSettingsRow<Msg> {
-  readonly index: number;
-  readonly line: number;
-  readonly height: number;
-  readonly row: FrameSettingRow<Msg>;
-  readonly behavior?: SettingsRowBehavior;
-}
-
-interface ResolvedSettingsLayout<Msg> {
-  readonly settings: FrameSettings<Msg>;
-  readonly preferenceSections: readonly PreparedPreferenceSection[];
-  readonly rows: readonly FlatSettingsRow<Msg>[];
-  readonly anchor: 'left' | 'right';
-  readonly startCol: number;
-  readonly drawerWidth: number;
-  readonly contentWidth: number;
-  readonly contentHeight: number;
-  readonly totalLines: number;
-  readonly maxScrollY: number;
-}
-
-interface ResolvedFrameNotificationCenter<Msg> {
-  readonly title: string;
-  readonly state: NotificationState<Msg>;
-  readonly filters: readonly NotificationHistoryFilter[];
-  readonly activeFilter: NotificationHistoryFilter;
-  readonly onFilterChange?: (filter: NotificationHistoryFilter) => Msg | undefined;
-}
-
-interface ResolvedNotificationCenterLayout<Msg> {
-  readonly center: ResolvedFrameNotificationCenter<Msg>;
-  readonly anchor: 'left' | 'right';
-  readonly startCol: number;
-  readonly drawerWidth: number;
-  readonly contentWidth: number;
-  readonly contentHeight: number;
-  readonly content: Surface;
-  readonly maxScrollY: number;
-}
-
-function resolveFrameSettings<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  shellThemes: readonly ResolvedFrameShellTheme[],
-): FrameSettings<Msg> | undefined {
-  const activePage = pagesById.get(model.activePageId)!;
-  const provided = options.settings?.({
-    model,
-    activePage,
-    pageModel: model.pageModels[model.activePageId]!,
-  });
-  return mergeShellThemeSettings(provided, shellThemes, model.activeShellThemeId, options.i18n);
-}
-
-function resolveFrameNotificationCenter<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): ResolvedFrameNotificationCenter<Msg> | undefined {
-  const activePage = pagesById.get(model.activePageId)!;
-  const pageModel = model.pageModels[model.activePageId]!;
-  const provided = options.notificationCenter?.({
-    model,
-    activePage,
-    pageModel,
-    runtimeNotifications: model.runtimeNotifications,
-  });
-
-  if (provided != null) {
-    const filters = provided.filters != null && provided.filters.length > 0
-      ? provided.filters
-      : DEFAULT_NOTIFICATION_CENTER_FILTERS;
-    const activeFilter = filters.includes(provided.activeFilter ?? 'ALL')
-      ? (provided.activeFilter ?? 'ALL')
-      : filters[0]!;
-    return {
-      title: provided.title ?? frameMessage(options.i18n, 'notifications.title', 'Notifications'),
-      state: provided.state,
-      filters,
-      activeFilter,
-      onFilterChange: provided.onFilterChange,
-    };
-  }
-
-  if (options.runtimeNotifications === false) return undefined;
-
-  return {
-    title: frameMessage(options.i18n, 'notifications.title', 'Notifications'),
-    state: model.runtimeNotifications as NotificationState<Msg>,
-    filters: DEFAULT_NOTIFICATION_CENTER_FILTERS,
-    activeFilter: model.runtimeNotificationHistoryFilter,
-  };
-}
-
-function resolveSettingsLayout<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  shellThemes: readonly ResolvedFrameShellTheme[],
-): ResolvedSettingsLayout<Msg> | undefined {
-  const settings = resolveFrameSettings(model, options, pagesById, shellThemes);
-  if (settings == null) return undefined;
-
-  const sections = settings.sections.filter((section) => section.rows.length > 0);
-  if (sections.length === 0) return undefined;
-
-  const drawerWidth = resolveSettingsDrawerWidth(model.columns);
-  const anchor = frameStartAnchor(options.i18n);
-  const startCol = anchor === 'left' ? 0 : Math.max(0, model.columns - drawerWidth);
-  const contentWidth = Math.max(16, drawerWidth - 4);
-  const preferenceSections = preparePreferenceSections(toPreferenceSections(sections));
-  const rows: FlatSettingsRow<Msg>[] = [];
-  let line = 0;
-
-  for (let sectionIndex = 0; sectionIndex < preferenceSections.length; sectionIndex++) {
-    const section = preferenceSections[sectionIndex]!;
-    if (sectionIndex > 0) {
-      line += 1;
-    }
-    line += 1;
-    line += 1;
-    for (let rowIndex = 0; rowIndex < section.rows.length; rowIndex++) {
-      const preparedRow = section.rows[rowIndex]!;
-      const row = sections[sectionIndex]!.rows[rowIndex]!;
-      const rowLayout = resolvePreferenceRowLayout(preparedRow, contentWidth);
-      rows.push({
-        index: rows.length,
-        line,
-        height: rowLayout.height,
-        row,
-        behavior: row.id === FRAME_SHELL_THEME_ROW_ID ? 'cycle-shell-theme' : undefined,
-      });
-      line += rowLayout.height;
-      if (rowIndex < section.rows.length - 1) {
-        line += 1;
-      }
-    }
-  }
-
-  const contentHeight = Math.max(1, model.rows - 2);
-  const totalLines = Math.max(1, line);
-  const maxScrollY = Math.max(0, totalLines - contentHeight);
-
-  return {
-    settings: {
-      ...settings,
-      sections,
-    },
-    preferenceSections,
-    rows,
-    anchor,
-    startCol,
-    drawerWidth,
-    contentWidth,
-    contentHeight,
-    totalLines,
-    maxScrollY,
-  };
-}
-
-function resolveNotificationCenterDrawerWidth(columns: number): number {
-  const boundedColumns = Math.max(28, columns);
-  return Math.min(Math.max(32, Math.floor(boundedColumns * 0.34)), Math.max(32, boundedColumns - 4), 52);
-}
-
-function resolveNotificationCenterLayout<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  ctx?: BijouContext,
-): ResolvedNotificationCenterLayout<Msg> | undefined {
-  const center = resolveFrameNotificationCenter(model, options, pagesById);
-  if (center == null) return undefined;
-
-  const drawerWidth = resolveNotificationCenterDrawerWidth(model.columns);
-  const anchor = frameEndAnchor(options.i18n);
-  const startCol = anchor === 'left' ? 0 : Math.max(0, model.columns - drawerWidth);
-  const contentWidth = Math.max(18, drawerWidth - 4);
-  const content = renderNotificationCenterSurface(center, contentWidth, options.i18n, ctx);
-  const contentHeight = Math.max(1, model.rows - 2);
-  const pagerState = createPagerStateForSurface(content, {
-    width: contentWidth,
-    height: contentHeight,
-  });
-
-  return {
-    center,
-    anchor,
-    startCol,
-    drawerWidth,
-    contentWidth,
-    contentHeight,
-    content,
-    maxScrollY: pagerState.scroll.maxY,
-  };
-}
-
-function resolveSettingsDrawerWidth(columns: number): number {
-  const boundedColumns = Math.max(24, columns);
-  return Math.min(Math.max(28, Math.floor(boundedColumns * 0.3)), Math.max(28, boundedColumns - 4), 42);
-}
-
-function clampSettingsFocus<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedSettingsLayout<Msg>,
-): number {
-  if (layout.rows.length === 0) return 0;
-  return Math.max(0, Math.min(model.settingsFocusIndex, layout.rows.length - 1));
-}
-
-function clampSettingsScroll<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedSettingsLayout<Msg>,
-): number {
-  return Math.max(0, Math.min(model.settingsScrollY, layout.maxScrollY));
-}
-
-function resolveInputAreas<PageModel, Msg>(
-  page: FramePage<PageModel, Msg>,
-  pageModel: PageModel,
-): readonly FrameInputArea<PageModel, Msg>[] {
-  return page.inputAreas?.(pageModel) ?? [];
-}
-
-function findInputAreaByPaneId<PageModel, Msg>(
-  inputAreas: readonly FrameInputArea<PageModel, Msg>[],
-  paneId: string | undefined,
-): FrameInputArea<PageModel, Msg> | undefined {
-  if (paneId == null) return undefined;
-  return inputAreas.find((area) => area.paneId === paneId);
-}
-
-function ensureSettingsRangeVisible(
-  startLine: number,
-  height: number,
-  scrollY: number,
-  visibleLines: number,
-  maxScrollY: number,
-): number {
-  let next = scrollY;
-  const endLine = startLine + Math.max(1, height) - 1;
-  if (startLine < next) {
-    next = startLine;
-  } else if (endLine >= next + visibleLines) {
-    next = endLine - visibleLines + 1;
-  }
-  return Math.max(0, Math.min(next, maxScrollY));
-}
-
-function moveSettingsFocus<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedSettingsLayout<Msg>,
-  delta: number,
-): InternalFrameModel<PageModel, Msg> {
-  if (layout.rows.length === 0) return model;
-  const nextFocus = Math.max(0, Math.min(clampSettingsFocus(model, layout) + delta, layout.rows.length - 1));
-  const focusedRow = layout.rows[nextFocus]!;
-  return {
-    ...model,
-    settingsFocusIndex: nextFocus,
-    settingsScrollY: ensureSettingsRangeVisible(
-      focusedRow.line,
-      focusedRow.height,
-      clampSettingsScroll(model, layout),
-      layout.contentHeight,
-      layout.maxScrollY,
-    ),
-  };
-}
-
-function scrollSettingsBy<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedSettingsLayout<Msg>,
-  delta: number,
-): InternalFrameModel<PageModel, Msg> {
-  return {
-    ...model,
-    settingsScrollY: Math.max(0, Math.min(clampSettingsScroll(model, layout) + delta, layout.maxScrollY)),
-  };
-}
-
-function scrollNotificationCenterBy<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedNotificationCenterLayout<Msg>,
-  delta: number,
-): InternalFrameModel<PageModel, Msg> {
-  return {
-    ...model,
-    notificationCenterScrollY: Math.max(0, Math.min(model.notificationCenterScrollY + delta, layout.maxScrollY)),
-  };
-}
-
-function cycleNotificationCenterFilter<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  layout: ResolvedNotificationCenterLayout<Msg>,
-): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
-  const filters = layout.center.filters;
-  if (filters.length < 2) return [model, []];
-  const currentIndex = Math.max(0, filters.indexOf(layout.center.activeFilter));
-  const nextFilter = filters[(currentIndex + 1) % filters.length]!;
-  if (layout.center.onFilterChange != null) {
-    const action = layout.center.onFilterChange(nextFilter);
-    return [{
-      ...model,
-      notificationCenterScrollY: 0,
-    }, action === undefined ? [] : [emitMsgForPage(model.activePageId, action)]];
-  }
-  return [{
-    ...model,
-    runtimeNotificationHistoryFilter: nextFilter,
-    notificationCenterScrollY: 0,
-  }, []];
-}
-
-function renderSettingsDrawer<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  shellThemes: readonly ResolvedFrameShellTheme[],
-  titleOverride?: string,
-  ctx?: BijouContext,
-): Overlay | undefined {
-  const layout = resolveSettingsLayout(model, options, pagesById, shellThemes);
-  if (layout == null) return undefined;
-
-  const scrollY = clampSettingsScroll(model, layout);
-  const content = renderSettingsSurface(layout, model, ctx);
-  const pagerState = createPagerStateForSurface(content, {
-    width: layout.contentWidth,
-    height: layout.contentHeight,
-  });
-  const scrolledState = {
-    ...pagerState,
-    scroll: {
-      ...pagerState.scroll,
-      y: scrollY,
-    },
-  };
-  const body = pagerSurface(content, scrolledState, {
-    showScrollbar: layout.maxScrollY > 0,
-    showStatus: false,
-  });
-
-  return drawer({
-    anchor: layout.anchor,
-    title: titleOverride ?? layout.settings.title ?? frameMessage(options.i18n, 'settings.title', 'Settings'),
-    content: body,
-    borderToken: layout.settings.borderToken,
-    bgToken: layout.settings.bgToken,
-    ctx,
-    width: layout.drawerWidth,
-    screenWidth: model.columns,
-    screenHeight: model.rows,
-  });
-}
-
-function renderNotificationCenterDrawer<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-  titleOverride?: string,
-  ctx?: BijouContext,
-): Overlay | undefined {
-  const layout = resolveNotificationCenterLayout(model, options, pagesById, ctx);
-  if (layout == null) return undefined;
-
-  const pagerState = createPagerStateForSurface(layout.content, {
-    width: layout.contentWidth,
-    height: layout.contentHeight,
-  });
-  const scrolledState = {
-    ...pagerState,
-    scroll: {
-      ...pagerState.scroll,
-      y: Math.max(0, Math.min(model.notificationCenterScrollY, layout.maxScrollY)),
-    },
-  };
-  const body = pagerSurface(layout.content, scrolledState, {
-    showScrollbar: layout.maxScrollY > 0,
-    showStatus: false,
-  });
-
-  return drawer({
-    anchor: layout.anchor,
-    title: titleOverride ?? `${layout.center.title} • ${frameNotificationFilterLabel(options.i18n, layout.center.activeFilter)}`,
-    content: body,
-    borderToken: ctx?.border('primary'),
-    bgToken: ctx?.surface('elevated'),
-    ctx,
-    width: layout.drawerWidth,
-    screenWidth: model.columns,
-    screenHeight: model.rows,
-  });
-}
-
-function renderSettingsSurface<PageModel, Msg>(
-  layout: ResolvedSettingsLayout<Msg>,
-  model: InternalFrameModel<PageModel, Msg>,
-  ctx?: BijouContext,
-): Surface {
-  const focusedIndex = clampSettingsFocus(model, layout);
-  return preferenceListSurface(layout.preferenceSections, {
-    width: layout.contentWidth,
-    selectedRowId: layout.rows[focusedIndex]?.row.id,
-    ctx,
-    theme: layout.settings.listTheme,
-  });
-}
-
-function toPreferenceSections<Msg>(
-  sections: readonly FrameSettingSection<Msg>[],
-): readonly PreferenceSection[] {
-  return sections.map((section) => ({
-    id: section.id,
-    title: section.title,
-    rows: section.rows.map((row) => toPreferenceRow(row)),
-  }));
-}
-
-function toPreferenceRow<Msg>(row: FrameSettingRow<Msg>): PreferenceRow {
-  return {
-    id: row.id,
-    label: row.label,
-    description: row.description,
-    valueLabel: row.valueLabel,
-    kind: row.kind,
-    checked: row.checked,
-    enabled: row.enabled,
-  };
-}
-
-function resolveNotificationFooterCue<PageModel, Msg>(
-  model: InternalFrameModel<PageModel, Msg>,
-  options: CreateFramedAppOptions<PageModel, Msg>,
-  pagesById: Map<string, FramePage<PageModel, Msg>>,
-): string | undefined {
-  const center = resolveFrameNotificationCenter(model, options, pagesById);
-  if (center == null) return undefined;
-  const liveCount = center.state.items.length;
-  const archivedCount = countNotificationHistory(center.state, center.activeFilter);
-  return frameNotificationCue(options.i18n, liveCount, archivedCount);
-}
-
-function renderNotificationCenterSurface<Msg>(
-  center: ResolvedFrameNotificationCenter<Msg>,
-  width: number,
-  i18n?: I18nRuntime,
-  ctx?: BijouContext,
-): Surface {
-  const rows: Surface[] = [
-    insetLineSurface(`Live: ${center.state.items.length} • Archived: ${center.state.history.length}`, width),
-    insetLineSurface(`Filter: ${frameNotificationFilterLabel(i18n, center.activeFilter)}`, width),
-  ];
-
-  const liveItems = [...center.state.items].sort(
-    (left, right) => right.updatedAtMs - left.updatedAtMs || right.id - left.id,
-  );
-
-  if (liveItems.length > 0) {
-    rows.push(createSurface(width, 1));
-    rows.push(insetLineSurface(
-      ctx == null ? 'Current stack' : ctx.style.bold('Current stack'),
-      width,
-    ));
-    rows.push(createSurface(width, 1));
-    for (let index = 0; index < liveItems.length; index++) {
-      rows.push(renderNotificationReviewEntrySurface(liveItems[index]!, {
-        width,
-        ctx,
-        metaLabel: `${liveItems[index]!.variant} • live`,
-      }));
-      if (index < liveItems.length - 1) rows.push(createSurface(width, 1));
-    }
-  }
-
-  rows.push(createSurface(width, 1));
-  rows.push(renderNotificationHistorySurface(center.state, {
-    width,
-    height: Number.MAX_SAFE_INTEGER,
-    filter: center.activeFilter,
-    ctx,
-  }));
-
-  return vstackSurface(...rows);
 }

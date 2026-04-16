@@ -70,8 +70,14 @@ export type {
 
 // Color manipulation
 export {
+  color,
+  colorHex,
+  colorRgb,
   hexToRgb,
+  isResolvedColor,
+  resolveColor,
   rgbToHex,
+  tryResolveColor,
   lighten,
   darken,
   mix,
@@ -79,3 +85,4 @@ export {
   saturate,
   desaturate,
 } from './color.js';
+export type { ColorRef, ResolvedColor } from './color.js';

@@ -118,6 +118,7 @@ describe('frame shell chrome surfaces', () => {
       splitRatioOverrides: {},
       runtimeNotifications: {} as never,
       runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
     };
     const options = { title: 'Test', pages: [activePage] };
 
@@ -172,6 +173,7 @@ describe('frame shell chrome surfaces', () => {
       splitRatioOverrides: {},
       runtimeNotifications: {} as never,
       runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
     };
     const options = { title: 'Test', pages: [activePage] };
 
@@ -238,6 +240,7 @@ describe('frame shell chrome surfaces', () => {
       splitRatioOverrides: {},
       runtimeNotifications: {} as never,
       runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
     };
 
     const header = resolveHeaderLine(model as any, { title: 'DOGFOOD', pages: [homePage, logsPage] } as any, pagesById as any);
@@ -291,6 +294,7 @@ describe('frame shell chrome surfaces', () => {
       splitRatioOverrides: {},
       runtimeNotifications: {} as never,
       runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
     };
 
     const header = resolveHeaderLine(model as any, {
@@ -349,6 +353,7 @@ describe('frame shell chrome surfaces', () => {
       splitRatioOverrides: {},
       runtimeNotifications: {} as never,
       runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
     };
 
     const header = resolveHeaderLine(model as any, {

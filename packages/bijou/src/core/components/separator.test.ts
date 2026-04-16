@@ -41,4 +41,10 @@ describe('separator', () => {
     const ctx = createTestContext({ mode: 'accessible' });
     expect(separator({ label: 'Section', ctx })).toBe('--- Section ---');
   });
+
+  it('sanitizes non-finite and fractional widths in interactive mode', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    expect(separator({ width: Number.NaN, ctx })).toBe('─'.repeat(80));
+    expect(separator({ width: 5.9, ctx })).toBe('─'.repeat(5));
+  });
 });

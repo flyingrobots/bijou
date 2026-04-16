@@ -149,7 +149,7 @@ must already be aligned to the real `v4.0.0..HEAD` boundary.
 4. Correct the changelog compare links so `[Unreleased]` means
    `v4.0.0...HEAD`.
 5. Promote this cycle into `docs/design/` and prune the now-empty
-   `docs/BACKLOG/v4.1.0/` lane.
+   `docs/method/graveyard/legacy-backlog/v4.1.0/` lane.
 6. Add cycle tests that lock the release boundary and lane-pruning
    behavior.
 

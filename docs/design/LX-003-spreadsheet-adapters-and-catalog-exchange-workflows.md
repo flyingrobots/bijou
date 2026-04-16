@@ -209,4 +209,4 @@ That is correct for this cycle. LX-003 defined the exchange seam those adapters 
 
 Spawned:
 
-- [LX-004 — Provider Adapters for Workbook and Bundle Exchange](../BACKLOG/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md)
+- [LX-004 — Provider Adapters for Workbook and Bundle Exchange](../method/graveyard/legacy-backlog/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md)

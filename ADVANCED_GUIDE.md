@@ -114,6 +114,7 @@ implementation seams together.
 Start here:
 
 - [packages/bijou-tui/ADVANCED_GUIDE.md](./packages/bijou-tui/ADVANCED_GUIDE.md)
+- [Layout Localization Pipeline](./docs/strategy/layout-localization-pipeline.md)
 - [packages/bijou-tui/src/pipeline/pipeline.ts](./packages/bijou-tui/src/pipeline/pipeline.ts)
 - [paint middleware](./packages/bijou-tui/src/pipeline/middleware/paint.ts)
 - [motion middleware](./packages/bijou-tui/src/pipeline/middleware/motion.ts)
@@ -147,6 +148,7 @@ directionality, shell copy, proving surfaces, and exchange workflows.
 Start here:
 
 - [Localization and Bidirectionality](./docs/strategy/localization-and-bidirectionality.md)
+- [Layout Localization Pipeline](./docs/strategy/layout-localization-pipeline.md)
 - [packages/bijou-i18n/README.md](./packages/bijou-i18n/README.md)
 - [packages/bijou-i18n-tools/README.md](./packages/bijou-i18n-tools/README.md)
 - [packages/bijou-i18n-tools-node/README.md](./packages/bijou-i18n-tools-node/README.md)

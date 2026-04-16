@@ -30,6 +30,19 @@ The Bijou work doctrine: A backlog, a loop, and honest bookkeeping.
 | **`bad-code/`** | Technical debt that must be addressed. |
 | **`inbox/`** | Raw ideas. |
 
+The canonical live backlog lives in
+[`docs/method/backlog/`](./method/backlog/README.md). Temporary
+version-target lanes like `docs/method/backlog/vX.Y.Z/` are allowed when
+a shaped release still has grouped blockers that should stay together
+until ship.
+
+## Closure Archives
+
+| Directory | Purpose |
+| :--- | :--- |
+| **`docs/method/retro/`** | Finished ideas with shipped or otherwise completed dispositions. These are historical retros, not live backlog. |
+| **`docs/method/graveyard/`** | Superseded or abandoned ideas that should not be mistaken for current queue work. |
+
 ## The Cycle Loop
 
 ```mermaid
@@ -45,6 +58,7 @@ stateDiagram-v2
 ```
 
 1. **Pull**: Move an item from `asap/` to `docs/design/`.
+   The current canonical lane is `docs/method/backlog/asap/`.
 2. **Branch**: Create `cycle/<cycle_name>`.
 3. **Red**: Write failing tests based on the design's playback questions.
 4. **Green**: Implement the solution until tests pass.

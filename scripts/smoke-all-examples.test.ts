@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildSmokeScenarios,
   createScenarioPlan,
+  type Result,
   listExampleTargets,
   parseSmokeRunOptions,
   resolvePipeConcurrency,
@@ -176,15 +177,41 @@ describe('createScenarioPlan', () => {
 });
 
 describe('runScenarioWithTimeout', () => {
-  it('runs scripted interactive examples in-process', async () => {
+  it('runs scripted interactive examples through an injected fixture module', async () => {
     const result = await runScenarioWithTimeout(ROOT, {
       path: 'examples/select/main.ts',
       mode: 'interactive-scripted',
       script: { keys: ['\r'] },
+    }, {
+      loadInteractiveModuleImpl: async () => ({
+        async main(...args: unknown[]) {
+          const writeLine = args[1] as ((line?: string) => void) | undefined;
+          writeLine?.();
+          writeLine?.('Selected package manager: YARN');
+        },
+      }),
     });
 
     expect(result.status).toBe('ok');
     expect(result.output).toContain('Selected package manager: YARN');
+  });
+
+  it('times out scripted interactive examples inside the harness', async () => {
+    const result = await runScenarioWithTimeout(ROOT, {
+      path: 'examples/select/main.ts',
+      mode: 'interactive-scripted',
+      script: { keys: ['\r'] },
+    }, {
+      interactiveTimeoutMs: 20,
+      loadInteractiveModuleImpl: async () => ({
+        main() {
+          return new Promise<void>(() => {});
+        },
+      }),
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.reason).toBe('timed out after 20ms');
   });
 });
 
@@ -253,5 +280,35 @@ describe('runSmokeAllExamples', () => {
 
     expect(exitCode).toBe(0);
     expect(peak).toBe(2);
+  });
+
+  it('keeps scripted interactive smoke serial and separate from pipe concurrency', async () => {
+    const executed: string[] = [];
+
+    const exitCode = await runSmokeAllExamples({
+      options: {
+        skipBuild: true,
+        pipeConcurrency: 4,
+        modes: ['interactive-scripted'],
+      },
+      scenarios: [
+        { path: 'examples/select/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+        { path: 'examples/filter/main.ts', mode: 'interactive-scripted', script: { keys: ['\r'] } },
+      ],
+      runScenarioImpl: async (_root, scenario) => {
+        executed.push(`${scenario.path}:${scenario.mode}`);
+        return {
+          path: scenario.path,
+          mode: scenario.mode,
+          status: 'ok',
+        } satisfies Result;
+      },
+    });
+
+    expect(exitCode).toBe(0);
+    expect(executed).toEqual([
+      'examples/select/main.ts:interactive-scripted',
+      'examples/filter/main.ts:interactive-scripted',
+    ]);
   });
 });

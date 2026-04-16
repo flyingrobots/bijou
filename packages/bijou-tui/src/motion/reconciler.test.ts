@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { createSurface } from '@flyingrobots/bijou';
+import { describe, expect, it, vi } from 'vitest';
+import { createSurface, type LayoutNode } from '@flyingrobots/bijou';
 import { motion } from './motion.js';
 import { MotionReconciler } from './reconciler.js';
 
@@ -15,6 +15,22 @@ function createMotionNode(
   );
   node.rect = { x, y, width: 4, height: 1 };
   return node;
+}
+
+function createRoot(children: ReturnType<typeof createMotionNode>[]): LayoutNode {
+  return {
+    rect: { x: 0, y: 0, width: 40, height: 10 },
+    children,
+  };
+}
+
+function createStaticNode(id: string, x: number, y: number): LayoutNode {
+  return {
+    id,
+    rect: { x, y, width: 4, height: 1 },
+    children: [],
+    surface: createSurface(4, 1),
+  };
 }
 
 describe('MotionReconciler', () => {
@@ -68,5 +84,38 @@ describe('MotionReconciler', () => {
 
     expect(node.rect.x).toBe(3);
     expect(node.rect.y).toBe(6);
+  });
+
+  it('warns when motion keys appear and disappear on the same frame', () => {
+    const reconciler = new MotionReconciler();
+    const writeError = vi.fn();
+
+    reconciler.reconcile(createRoot([createMotionNode('row-0', 0, 0)]), 0, { writeError });
+    reconciler.reconcile(createRoot([createMotionNode('row-1', 0, 1)]), 1 / 60, { writeError });
+
+    expect(writeError).toHaveBeenCalledTimes(1);
+    expect(writeError).toHaveBeenCalledWith(expect.stringContaining('row-1'));
+    expect(writeError).toHaveBeenCalledWith(expect.stringContaining('row-0'));
+    expect(writeError).toHaveBeenCalledWith(expect.stringContaining('unstable'));
+  });
+
+  it('does not warn when a motion key only appears without a paired disappearance', () => {
+    const reconciler = new MotionReconciler();
+    const writeError = vi.fn();
+
+    reconciler.reconcile(createRoot([]), 0, { writeError });
+    reconciler.reconcile(createRoot([createMotionNode('row-0', 0, 0)]), 1 / 60, { writeError });
+
+    expect(writeError).not.toHaveBeenCalled();
+  });
+
+  it('ignores plain layout node ids that are not tagged with motion()', () => {
+    const reconciler = new MotionReconciler();
+    const writeError = vi.fn();
+
+    reconciler.reconcile(createRoot([createStaticNode('row-0', 0, 0)]), 0, { writeError });
+    reconciler.reconcile(createRoot([createStaticNode('row-1', 0, 1)]), 1 / 60, { writeError });
+
+    expect(writeError).not.toHaveBeenCalled();
   });
 });

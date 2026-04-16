@@ -1,10 +1,6 @@
-import type { Surface, PackedSurface } from '@flyingrobots/bijou';
+import { isPackedSurface, type Surface, type PackedSurface } from '@flyingrobots/bijou';
 import { CELL_STRIDE, OFF_FG_R, OFF_BG_R, OFF_ALPHA, FLAG_FG_SET, FLAG_BG_SET } from '@flyingrobots/bijou/perf';
 import type { RenderMiddleware } from '../pipeline.js';
-
-function isPackedSurface(s: Surface): s is PackedSurface {
-  return 'buffer' in s && (s as any).buffer instanceof Uint8Array;
-}
 /**
  * Creates a post-processing middleware that converts all colors in the
  * target surface to grayscale luminance values.
@@ -77,8 +73,10 @@ function grayscaleCellFallback(surface: Surface): void {
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
-      const newFg = cell.fg ? hexToGrayscale(cell.fg) : undefined;
-      const newBg = cell.bg ? hexToGrayscale(cell.bg) : undefined;
+      const fgHex = typeof cell.fg === 'string' ? cell.fg : cell.fg?.hex;
+      const bgHex = typeof cell.bg === 'string' ? cell.bg : cell.bg?.hex;
+      const newFg = fgHex ? hexToGrayscale(fgHex) : undefined;
+      const newBg = bgHex ? hexToGrayscale(bgHex) : undefined;
       if (newFg !== cell.fg || newBg !== cell.bg) {
         surface.set(x, y, { ...cell, fg: newFg, bg: newBg });
       }

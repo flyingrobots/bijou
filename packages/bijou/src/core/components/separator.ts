@@ -1,6 +1,7 @@
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { sanitizeNonNegativeInt } from '../numeric.js';
 import type { BijouNodeOptions } from './types.js';
 
 /** Configuration for rendering a horizontal separator line. */
@@ -27,7 +28,7 @@ export interface SeparatorOptions extends BijouNodeOptions {
 export function separator(options: SeparatorOptions = {}): string {
   const ctx = resolveCtx(options.ctx);
   const label = options.label;
-  const width = options.width ?? ctx.runtime.columns;
+  const width = sanitizeNonNegativeInt(options.width, ctx.runtime.columns);
 
   return renderByMode(ctx.mode, {
     pipe: () => {
@@ -40,6 +41,7 @@ export function separator(options: SeparatorOptions = {}): string {
     },
     interactive: () => {
       const token = options.borderToken ?? ctx.border('muted');
+      if (width === 0) return '';
 
       if (label) {
         const labelWithSpaces = ` ${label} `;

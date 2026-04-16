@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { sanitizeNonNegativeInt } from '../numeric.js';
 
 /** Configuration for rendering a skeleton placeholder. */
 export interface SkeletonOptions {
@@ -30,8 +31,8 @@ export function skeleton(options: SkeletonOptions = {}): string {
     pipe: () => '',
     accessible: () => 'Loading...',
     interactive: () => {
-      const width = options.width ?? 20;
-      const lines = options.lines ?? 1;
+      const width = sanitizeNonNegativeInt(options.width, 20);
+      const lines = sanitizeNonNegativeInt(options.lines, 1);
       const token = ctx.semantic('muted');
       const line = ctx.style.styled(token, '\u2591'.repeat(width));
 

@@ -149,4 +149,4 @@ The right proof step was one reusable component plus one real product seam, not 
 
 Spawned:
 
-- [DL-007 — Promote Inspector Panel Block](../BACKLOG/DL-007-promote-inspector-panel-block.md)
+- [DL-007 — Promote Inspector Panel Block](../method/graveyard/legacy-backlog/DL-007-promote-inspector-panel-block.md)

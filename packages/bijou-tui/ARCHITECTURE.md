@@ -154,6 +154,25 @@ Scrollable window into content:
 
 Scroll state is a separate immutable record with helpers: `scrollBy`, `scrollTo`, `pageUp`, `pageDown`, `scrollToTop`, `scrollToBottom`.
 
+### Layout localization pipeline
+
+`LayoutNode` trees have an explicit ownership handoff before paint:
+
+1. `app.view(model)` returns a `Surface` or `LayoutNode`
+2. `wrapViewOutputAsLayoutRoot(...)` turns that into a runtime-owned root
+3. `localizeLayoutNode(...)` rebases negative or off-origin trees into a local
+   non-negative coordinate space
+4. the paint middleware blits the localized tree into the target surface
+
+That means paint is not responsible for measuring bounds or discovering root
+offsets. Localization already solved that earlier in the pipeline.
+
+Read [docs/strategy/layout-localization-pipeline.md](../../docs/strategy/layout-localization-pipeline.md)
+for the full recursion, coordinate-space, and retained-layout story.
+Read [docs/strategy/layout-and-viewport-rules.md](../../docs/strategy/layout-and-viewport-rules.md)
+for the user-facing ownership rules that define when regions fill, clip, wrap,
+or become true viewports.
+
 ## EventBus
 
 The bus is a typed publish/subscribe system:
@@ -164,6 +183,10 @@ The bus is a typed publish/subscribe system:
 - **Lifecycle**: `dispose()` disconnects all sources, disposes retained command cleanups, and clears all handlers
 
 The TEA runtime creates an EventBus internally. Apps can also create their own for custom event sources or testing.
+
+Buffered messages, frame actions, and queued events should stay as explicit
+data values. See [The Buffer Holds Facts](../../docs/invariants/buffer-holds-facts.md)
+for the invariant behind that rule.
 
 ## Input System
 

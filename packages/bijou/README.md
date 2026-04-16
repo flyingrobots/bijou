@@ -45,10 +45,18 @@ const panel = boxSurface(
 
 Select the family based on the interaction semantic, not just the visual shape.
 
+Render-path naming follows one house rule: the base family name is the public
+component, and a `*Surface()` companion means “the same family on the composable
+surface path.” If there is no `*Surface()` companion, the family is either
+already surface-native, intentionally string-first, or both paths would be
+fake duplication rather than a real second API.
+
 ### Status and Feedback
 - **`badge()`**: Compact, inline status.
 - **`note()`**: Non-urgent explanation.
 - **`alert()`**: Persistent, in-flow message.
+- **`guidedFlow()`**: Calm multi-step assistance with one explicit next action.
+- **`explainability()`**: AI- or machine-mediated recommendation with visible provenance and evidence.
 - *Use `@flyingrobots/bijou-tui` notifications for stacking, history, or active routing.*
 
 ### Selection and Prompts
@@ -72,7 +80,7 @@ Select the family based on the interaction semantic, not just the visual shape.
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
 - **[ADVANCED_GUIDE.md](./ADVANCED_GUIDE.md)**: Rendering doctrine, themes, and testing.
-- **[Design System](../../docs/design-system/README.md)**: Semantic guidance and component families.
+- **[Design System](../../docs/design-system/README.md)**: Foundations, token vocabulary, and component families.
 
 ---
 Built with 💎 by [FLYING ROBOTS](https://github.com/flyingrobots)

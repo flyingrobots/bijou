@@ -7,7 +7,7 @@ import {
   presetFocused,
   type SerializedLayoutState,
 } from './layout-preset.js';
-import type { FrameModel } from './app-frame.js';
+import type { FrameModel } from './app-frame-types.js';
 import { createNotificationState } from './notification.js';
 
 describe('serializeLayoutState', () => {
@@ -20,6 +20,11 @@ describe('serializeLayoutState', () => {
       scrollByPage: {},
       columns: 80,
       rows: 24,
+      frameTimeMs: 0,
+      viewTimeMs: 0,
+      diffTimeMs: 0,
+      frameBudgetMs: undefined,
+      frameOverBudget: false,
       helpOpen: false,
       settingsOpen: false,
       notificationCenterOpen: false,
@@ -56,6 +61,11 @@ describe('serializeLayoutState', () => {
       scrollByPage: {},
       columns: 80,
       rows: 24,
+      frameTimeMs: 0,
+      viewTimeMs: 0,
+      diffTimeMs: 0,
+      frameBudgetMs: undefined,
+      frameOverBudget: false,
       helpOpen: false,
       settingsOpen: false,
       notificationCenterOpen: false,
@@ -91,6 +101,11 @@ describe('serializeLayoutState', () => {
       scrollByPage: {},
       columns: 80,
       rows: 24,
+      frameTimeMs: 0,
+      viewTimeMs: 0,
+      diffTimeMs: 0,
+      frameBudgetMs: undefined,
+      frameOverBudget: false,
       helpOpen: false,
       settingsOpen: false,
       notificationCenterOpen: false,

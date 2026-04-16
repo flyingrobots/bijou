@@ -1,5 +1,9 @@
 # ComponentStory v0
 
+> Historical note: this is an early DOGFOOD substrate design note. Use
+> [`docs/DOGFOOD.md`](../DOGFOOD.md) for the current docs-surface signpost and
+> METHOD backlog/design docs for active queue work.
+
 _Design note for the first DOGFOOD substrate_
 
 ## Why this exists

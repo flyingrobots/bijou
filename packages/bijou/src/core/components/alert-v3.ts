@@ -4,12 +4,13 @@ import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { type AlertOptions, type AlertVariant } from './alert.js';
 import { boxSurface } from './box-v3.js';
 import { createTextSurface, tokenToCellStyle } from './surface-text.js';
+import { forceTextPresentation } from '../text/icon-presentation.js';
 
 const ICONS: Record<AlertVariant, string> = {
-  success: '\u2713',  // ✓
-  error: '\u2717',    // ✗
-  warning: '\u26A0',  // ⚠
-  info: '\u2139',     // ℹ
+  success: forceTextPresentation('\u2713'), // ✓
+  error: forceTextPresentation('\u2717'),   // ✗
+  warning: forceTextPresentation('\u26A0'), // ⚠
+  info: forceTextPresentation('\u2139'),    // ℹ
 };
 
 const BORDER_TOKENS: Record<AlertVariant, 'success' | 'error' | 'warning' | 'primary'> = {

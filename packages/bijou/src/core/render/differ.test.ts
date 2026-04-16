@@ -152,4 +152,21 @@ describe('surface text bridges', () => {
     expect(surface.get(4, 0).char).toBe('u');
     expect(surface.get(5, 0).char).toBe(' ');
   });
+
+  it('stringToSurface drops destructive terminal escapes before building cells', () => {
+    const surface = stringToSurface('A\x1b[2JB\bC', 3, 1);
+
+    expect(surface.get(0, 0).char).toBe('A');
+    expect(surface.get(1, 0).char).toBe('B');
+    expect(surface.get(2, 0).char).toBe('C');
+  });
+
+  it('parseAnsiToSurface preserves SGR styling while stripping non-SGR terminal escapes', () => {
+    const surface = parseAnsiToSurface('\x1b[38;2;255;0;0mA\x1b[0m\x1b[2JB', 2, 1);
+
+    expect(surface.get(0, 0).char).toBe('A');
+    expect(surface.get(0, 0).fg).toBe('#ff0000');
+    expect(surface.get(1, 0).char).toBe('B');
+    expect(surface.get(1, 0).fg).toBeUndefined();
+  });
 });

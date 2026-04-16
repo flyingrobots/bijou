@@ -42,6 +42,16 @@ describe('createBijou()', () => {
     expect(ctx.theme.theme).toBe(CYAN_MAGENTA);
   });
 
+  it('uses the same token graph for accessors and the public context field', () => {
+    const ctx = createBijou(basePorts());
+
+    expect(ctx.tokenGraph).toBe(ctx.theme.tokenGraph);
+
+    ctx.tokenGraph.set('semantic.accent', '#112233');
+    expect(ctx.semantic('accent').hex).toBe('#112233');
+    expect(ctx.semantic('accent').fgRGB).toEqual([0x11, 0x22, 0x33]);
+  });
+
   it('reads BIJOU_THEME from runtime.env and resolves matching preset', () => {
     const ctx = createBijou(basePorts({ BIJOU_THEME: 'teal-orange-pink' }));
     expect(ctx.theme.theme).toBe(TEAL_ORANGE_PINK);
@@ -92,6 +102,19 @@ describe('createBijou()', () => {
   it('detects pipe mode when stdout is not TTY', () => {
     const ctx = createBijou(basePorts({}, false));
     expect(ctx.mode).toBe('pipe');
+  });
+
+  it('detects colorScheme from runtime by default', () => {
+    const ctx = createBijou(basePorts({ COLORFGBG: '0;15' }, true));
+    expect(ctx.theme.colorScheme).toBe('light');
+  });
+
+  it('accepts an explicit colorScheme override', () => {
+    const ctx = createBijou({
+      ...basePorts({}, true),
+      colorScheme: 'light',
+    });
+    expect(ctx.theme.colorScheme).toBe('light');
   });
 
   it('detects static mode when CI is set with TTY', () => {

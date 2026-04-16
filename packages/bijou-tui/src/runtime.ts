@@ -1,6 +1,7 @@
 import {
   getDefaultContext,
   createSurface,
+  stringToSurface,
   surfaceToString,
   resolveClock,
   installRuntimeViewportOverlay,
@@ -12,7 +13,12 @@ import type { App, Cmd, RunOptions, ResizeMsg } from './types.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import { clearAndHome, enterScreen, exitScreen, renderSurfaceFrame } from './screen.js';
 import { createEventBus } from './eventbus.js';
-import { createPipeline, type RenderState } from './pipeline/pipeline.js';
+import {
+  createPipeline,
+  getRenderStageTimings,
+  type RenderStageTiming,
+  type RenderState,
+} from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
 import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
@@ -32,6 +38,28 @@ const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
  * 1006 = SGR extended format (supports large coordinates, explicit release).
  */
 const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+const FATAL_RENDER_ERROR_KEY = '__fatalRenderError';
+const SHUTDOWN_DRAIN_TIMEOUT_MS = 1000;
+
+export interface RuntimeRenderSummary<Model> {
+  readonly model: Model;
+  readonly dt: number;
+  readonly timings: readonly RenderStageTiming[];
+  readonly viewport: {
+    readonly columns: number;
+    readonly rows: number;
+  };
+}
+
+export interface RuntimePostRenderEffect<Model> {
+  readonly model?: Model;
+  readonly requestRender?: boolean;
+}
+
+export interface RuntimeLifecycleHooks<Model> {
+  beforeRender?(model: Model): Model | void;
+  afterRender?(summary: RuntimeRenderSummary<Model>): RuntimePostRenderEffect<Model> | void;
+}
 
 /**
  * Run a TEA application.
@@ -52,6 +80,14 @@ const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 export async function run<Model, M>(
   app: App<Model, M>,
   options?: RunOptions<M>,
+): Promise<void> {
+  await runWithLifecycleHooks(app, options);
+}
+
+export async function runWithLifecycleHooks<Model, M>(
+  app: App<Model, M>,
+  options?: RunOptions<M>,
+  hooks?: RuntimeLifecycleHooks<Model>,
 ): Promise<void> {
   const ctx = options?.ctx ?? getDefaultContext();
   const clock = resolveClock(ctx);
@@ -84,6 +120,7 @@ export async function run<Model, M>(
   let resolveQuit: (() => void) | null = null;
   let currentDt = 0.016; // Default to 60fps for first frame
   let fatalError: unknown = null;
+  let crashMode = false;
 
   // Double buffering: keep a visible front buffer and a reusable back buffer.
   const initialViewport = runtimeViewport();
@@ -118,6 +155,84 @@ export async function run<Model, M>(
     const routed = app.routeRuntimeIssue?.(issue);
     if (routed !== undefined) {
       bus.emit(routed);
+    }
+  }
+
+  function formatModelSnapshot(snapshot: unknown): string {
+    try {
+      const serialized = JSON.stringify(snapshot, null, 2);
+      return serialized ?? String(snapshot);
+    } catch {
+      return '[unserializable model snapshot]';
+    }
+  }
+
+  function buildCrashSurface(
+    phase: 'update' | 'render' | 'resize',
+    error: unknown,
+    snapshot: Model,
+  ): Surface {
+    const viewport = runtimeViewport();
+    ensureFramebufferSize(viewport.columns, viewport.rows);
+    const detail = error instanceof Error
+      ? error.stack ?? error.message
+      : String(error);
+    const content = [
+      'Bijou runtime crash',
+      '',
+      `Phase: ${phase}`,
+      '',
+      'Error',
+      detail,
+      '',
+      'Model snapshot',
+      formatModelSnapshot(snapshot),
+      '',
+      ctx.runtime.stdinIsTTY
+        ? 'Press Enter to exit.'
+        : 'Stdin is not interactive; exiting automatically.',
+    ].join('\n');
+    return stringToSurface(content, viewport.columns, viewport.rows);
+  }
+
+  function enterCrashMode(
+    phase: 'update' | 'render' | 'resize',
+    error: unknown,
+    snapshot: Model,
+  ): void {
+    if (fatalError === null) {
+      fatalError = error;
+    }
+    const detail = error instanceof Error ? error.stack ?? error.message : String(error);
+    writeErrorLine(ctx.io, `[Runtime Error] ${detail}\n`);
+    if (crashMode) return;
+
+    crashMode = true;
+    renderQueued = false;
+    disposeTimerHandle(renderHandle);
+    renderHandle = null;
+    bus.stopPulse();
+
+    try {
+      const crashSurface = buildCrashSurface(phase, error, snapshot);
+      renderSurfaceFrame(
+        ctx.io,
+        currentSurface,
+        crashSurface,
+        ctx.style,
+        outBuf,
+      );
+      currentSurface = crashSurface;
+      nextSurface = createSurface(crashSurface.width, crashSurface.height);
+      if (!ctx.runtime.stdinIsTTY) {
+        shutdown(fatalError);
+      }
+    } catch (crashRenderError) {
+      writeErrorLine(
+        ctx.io,
+        `[Runtime Error] Failed to render crash surface: ${crashRenderError instanceof Error ? (crashRenderError.stack ?? crashRenderError.message) : String(crashRenderError)}\n`,
+      );
+      shutdown(fatalError);
     }
   }
 
@@ -156,7 +271,13 @@ export async function run<Model, M>(
 
   // 1. Layout Logic Stage
   pipeline.use('Layout', (state, next) => {
-    const viewOutput = app.view(state.model);
+    let viewOutput;
+    try {
+      viewOutput = app.view(state.model);
+    } catch (error) {
+      state.data[FATAL_RENDER_ERROR_KEY] = error;
+      return;
+    }
     const viewport = runtimeViewport();
     (state as any).layoutRoot = wrapViewOutputAsLayoutRoot(viewOutput, {
       width: viewport.columns,
@@ -225,16 +346,30 @@ export async function run<Model, M>(
   }
 
   // Render helper
-  let renderRequested = false;
+  let renderQueued = false;
+  let renderInFlight = false;
   let renderHandle: TimerHandle | null = null;
-  /** Render the current model's view to the terminal. */
-  function render(): void {
-    if (!running || renderRequested) return;
-    renderRequested = true;
+  function scheduleRender(): void {
+    if (renderHandle != null || renderInFlight) return;
 
-    let scheduledHandle: TimerHandle | null = null;
-    scheduledHandle = clock.setTimeout(() => {
+    const scheduledHandle = clock.setTimeout(() => {
+      if (renderHandle === scheduledHandle) {
+        renderHandle = null;
+      }
+      scheduledHandle.dispose();
+      if (!renderQueued) {
+        return;
+      }
+
+      renderInFlight = true;
+      renderQueued = false;
+
       try {
+        const preRenderModel = hooks?.beforeRender?.(model);
+        if (preRenderModel !== undefined) {
+          model = preRenderModel;
+        }
+
         const viewport = runtimeViewport();
         ensureFramebufferSize(
           viewport.columns,
@@ -254,28 +389,44 @@ export async function run<Model, M>(
         };
 
         pipeline.execute(renderState);
+        const fatalRenderError = renderState.data[FATAL_RENDER_ERROR_KEY];
+        if (fatalRenderError !== undefined) {
+          enterCrashMode('render', fatalRenderError, model);
+          return;
+        }
+
+        if (hooks?.afterRender) {
+          const postRender = hooks.afterRender({
+            model,
+            dt: currentDt,
+            timings: getRenderStageTimings(renderState),
+            viewport,
+          });
+          if (postRender?.model !== undefined) {
+            model = postRender.model;
+          }
+          if (postRender?.requestRender) {
+            render();
+          }
+        }
       } catch (error) {
-        routeRuntimeIssue({
-          level: 'error',
-          source: 'runtime',
-          message: error instanceof Error ? error.message : String(error),
-          atMs: clock.now(),
-          error,
-        });
-        writeErrorLine(
-          ctx.io,
-          `[Runtime Error] ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
-        );
-        shutdown(error);
+        enterCrashMode('render', error, model);
       } finally {
-        renderRequested = false;
-        scheduledHandle?.dispose();
-        if (renderHandle === scheduledHandle) {
-          renderHandle = null;
+        renderInFlight = false;
+        if (renderQueued) {
+          scheduleRender();
         }
       }
     }, 0);
+
     renderHandle = scheduledHandle;
+  }
+
+  /** Render the current model's view to the terminal. */
+  function render(): void {
+    if (!running) return;
+    renderQueued = true;
+    scheduleRender();
   }
 
   // Execute commands through the bus
@@ -298,6 +449,13 @@ export async function run<Model, M>(
   // Single subscription drives the entire update cycle
   bus.on((msg) => {
     if (!running) return;
+
+    if (crashMode) {
+      if (isKeyMsg(msg) && (msg.key === 'enter' || (msg.key === 'c' && msg.ctrl))) {
+        shutdown(fatalError);
+      }
+      return;
+    }
 
     // Track time delta from pulse
     if (isPulseMsg(msg)) {
@@ -324,7 +482,14 @@ export async function run<Model, M>(
     }
 
     const previousModel = model;
-    const [newModel, cmds] = app.update(msg, model);
+    let updateResult: [Model, Cmd<M>[]];
+    try {
+      updateResult = app.update(msg, model);
+    } catch (error) {
+      enterCrashMode('update', error, model);
+      return;
+    }
+    const [newModel, cmds] = updateResult;
     model = newModel;
     if (isResizeMsg(msg) || newModel !== previousModel) {
       render();
@@ -340,8 +505,14 @@ export async function run<Model, M>(
     columns: syncedViewport.columns,
     rows: syncedViewport.rows,
   };
-  const [resizedModel, resizeCmds] = app.update(initialResize, model);
-  model = resizedModel;
+  let resizeCmds: Cmd<M>[] = [];
+  try {
+    const [resizedModel, nextResizeCmds] = app.update(initialResize, model);
+    model = resizedModel;
+    resizeCmds = nextResizeCmds;
+  } catch (error) {
+    enterCrashMode('resize', error, model);
+  }
 
   // After a potential resize in update, ensure currentSurface matches size
   // to avoid diffing mismatched grids.
@@ -349,9 +520,11 @@ export async function run<Model, M>(
   resetFramebuffers(postResizeViewport.columns, postResizeViewport.rows);
 
   // Initial render + startup commands
-  render();
-  executeCommands(initCmds);
-  executeCommands(resizeCmds);
+  if (!crashMode) {
+    render();
+    executeCommands(initCmds);
+    executeCommands(resizeCmds);
+  }
 
   // Wait for quit signal
   await new Promise<void>((resolve) => {
@@ -360,7 +533,7 @@ export async function run<Model, M>(
   });
 
   // Ensure any pending render is flushed before exiting
-  if (renderRequested) {
+  if (renderHandle != null || renderInFlight) {
     await new Promise<void>((resolve) => {
       let flushHandle: TimerHandle | null = null;
       flushHandle = clock.setTimeout(() => {
@@ -369,6 +542,16 @@ export async function run<Model, M>(
         resolve();
       }, 0);
     });
+  }
+
+  const shutdownDrainResult = await awaitDrainWithinTimeout(
+    bus,
+    clock,
+    SHUTDOWN_DRAIN_TIMEOUT_MS,
+  );
+  if (shutdownDrainResult === 'timed-out') {
+    const message = `Timed out waiting ${SHUTDOWN_DRAIN_TIMEOUT_MS}ms for pending commands to drain during shutdown.`;
+    writeErrorLine(ctx.io, `[Runtime Warning] ${message}\n`);
   }
 
   // Cleanup — bus disposes all I/O connections
@@ -390,6 +573,37 @@ export async function run<Model, M>(
 
 function disposeTimerHandle(handle: TimerHandle | null): void {
   handle?.dispose();
+}
+
+async function awaitDrainWithinTimeout(
+  bus: { drain(): Promise<void> },
+  clock: { setTimeout(callback: () => void, ms: number): TimerHandle },
+  timeoutMs: number,
+): Promise<'drained' | 'timed-out'> {
+  let timeoutHandle: TimerHandle | null = null;
+
+  try {
+    return await new Promise<'drained' | 'timed-out'>((resolve) => {
+      let settled = false;
+      const finish = (result: 'drained' | 'timed-out') => {
+        if (settled) return;
+        settled = true;
+        disposeTimerHandle(timeoutHandle);
+        timeoutHandle = null;
+        resolve(result);
+      };
+
+      timeoutHandle = clock.setTimeout(() => {
+        finish('timed-out');
+      }, timeoutMs);
+
+      void bus.drain().then(() => {
+        finish('drained');
+      });
+    });
+  } finally {
+    disposeTimerHandle(timeoutHandle);
+  }
 }
 
 /**

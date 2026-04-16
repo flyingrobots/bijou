@@ -1,9 +1,0 @@
----
-title: "MCP interactive documentation for all Bijou components"
-legend: DF
-lane: inbox
----
-
-# MCP interactive documentation for all Bijou components
-
-bijou-mcp should serve as interactive documentation for all of Bijou, not just a rendering service. Add a bijou_docs tool (or MCP resource endpoints) that returns structured, machine-readable documentation for any component: what it does, when to use it, when NOT to use it, interaction profile behavior (interactive/static/pipe/accessible), related components, and example output. Think of it as the design-system field guide but queryable by LLMs — an agent could ask "when should I use a table vs a DAG?" or "what component handles step progress?" and get an authoritative answer with examples. This makes Bijou self-documenting inside any MCP-capable coding tool.

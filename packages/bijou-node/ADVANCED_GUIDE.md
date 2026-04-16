@@ -10,11 +10,13 @@ Node boundary between the pure packages and the real terminal process.
 
 There are two distinct paths:
 
+- `startApp()` when you want the hosted Node fast path
 - `initDefaultContext()` when you want a convenient ambient default
 - `createNodeContext()` when you want explicit ownership and explicit passing
 
 Advanced rule of thumb:
 
+- start with `startApp()` unless you already know you need lower-level runtime ownership
 - use the default only when the app really wants a shared ambient context
 - prefer explicit `ctx` ownership when multiple surfaces, shell theme changes,
   or tests need deliberate context propagation
@@ -34,6 +36,7 @@ one-line bootstrap:
 
 - `nodeRuntime()`
 - `nodeIO()`
+- `scopedNodeIO()`
 - `chalkStyle()`
 
 That is the right lane for:
@@ -47,6 +50,25 @@ Read:
 
 - [GUIDE individual adapters](./GUIDE.md#individual-adapters)
 - [monorepo architecture guide](../../docs/ARCHITECTURE.md)
+
+## Scoped Filesystem Boundary
+
+Use `scopedNodeIO()` when the app should have a rooted asset or workspace view rather
+than raw host filesystem reach.
+
+That is the right lane for:
+
+- file pickers rooted to one project
+- theme or asset loading from an app-owned directory
+- host code that still writes files, but should first validate destinations with
+  `resolvePath()`
+
+Boundary rule:
+
+- `readFile()`, `readDir()`, and `joinPath()` stay inside the declared root
+- `resolvePath()` is for host-owned writes or interop with raw Node APIs
+- if the app truly needs unrestricted filesystem access, keep using raw `nodeIO()`
+  and make that choice explicit
 
 ## Worker Runtime
 

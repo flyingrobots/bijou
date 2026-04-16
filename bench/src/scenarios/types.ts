@@ -29,6 +29,15 @@ export interface Scenario<State = unknown> {
   readonly label: string;
 
   /**
+   * Stable lowercase tags describing what this scenario exercises.
+   *
+   * Tags are for intent and affected code paths, not visual aesthetics:
+   * `diff`, `paint`, `setRGB`, `hex-parse`, `unique-styles`, etc.
+   * Harnesses and CLI tools can use them for focused runs.
+   */
+  readonly tags: readonly string[];
+
+  /**
    * One-paragraph description of what this scenario exercises and
    * what code paths it stresses. Shown in `bench list` and in the
    * RE-017 learnings doc.
@@ -93,3 +102,6 @@ export interface Scenario<State = unknown> {
 
 /** A scenario that erases its generic State parameter, for registries. */
 export type AnyScenario = Scenario<unknown>;
+
+/** One comma-separated AND clause from `--tag=...`. */
+export type ScenarioTagGroup = readonly string[];

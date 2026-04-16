@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { log } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -13,7 +14,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const logTool: ToolRegistration = {
+export const logTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_log',
   description: 'Render a styled log line with level icon and optional timestamp. Levels: debug, info, warn, error.',
   inputSchema: inputShape,
@@ -25,4 +26,4 @@ export const logTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

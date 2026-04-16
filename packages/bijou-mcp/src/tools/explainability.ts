@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { explainability } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -24,7 +25,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const explainabilityTool: ToolRegistration = {
+export const explainabilityTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_explainability',
   description: 'Render an AI explainability card showing a decision with rationale, evidence, confidence, and governance.',
   inputSchema: inputShape,
@@ -40,4 +41,4 @@ export const explainabilityTool: ToolRegistration = {
     });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

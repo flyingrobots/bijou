@@ -3,9 +3,18 @@ import { fileURLToPath } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { type BijouContext, group, input, select, multiselect, confirm, separator, box } from '@flyingrobots/bijou';
 
-export async function main(ctx: BijouContext = initDefaultContext()): Promise<void> {
-  console.log(separator({ label: 'Project Setup', ctx }));
-  console.log();
+type ExampleWriter = (line?: string) => void;
+
+function consoleWriter(line = ''): void {
+  console.log(line);
+}
+
+export async function main(
+  ctx: BijouContext = initDefaultContext(),
+  writeLine: ExampleWriter = consoleWriter,
+): Promise<void> {
+  writeLine(separator({ label: 'Project Setup', ctx }));
+  writeLine();
 
   const result = await group({
     name: () => input({
@@ -40,12 +49,12 @@ export async function main(ctx: BijouContext = initDefaultContext()): Promise<vo
     }),
   });
 
-  console.log();
-  console.log(separator({ label: 'Summary', ctx }));
-  console.log();
+  writeLine();
+  writeLine(separator({ label: 'Summary', ctx }));
+  writeLine();
 
   if (result.cancelled) {
-    console.log('Setup cancelled.');
+    writeLine('Setup cancelled.');
     return;
   }
 
@@ -56,7 +65,7 @@ export async function main(ctx: BijouContext = initDefaultContext()): Promise<vo
     `Deploy:     ${result.values.deploy ? 'yes' : 'no'}`,
   ].join('\n');
 
-  console.log(box(summary, { ctx }));
+  writeLine(box(summary, { ctx }));
 }
 
 if (process.argv[1] != null && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

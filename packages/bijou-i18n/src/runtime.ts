@@ -31,18 +31,25 @@ export interface I18nFormatterPort {
   formatList(values: readonly string[], locale: string): string;
 }
 
+export type I18nCatalogLoader = (locale: string) => Promise<readonly I18nCatalog[]>;
+
 export interface I18nRuntimeOptions {
   readonly locale: string;
   readonly direction: I18nDirection;
   readonly fallbackLocale?: string;
   readonly formatter?: Partial<I18nFormatterPort>;
+  readonly catalogs?: readonly I18nCatalog[];
+  readonly loader?: I18nCatalogLoader;
 }
 
 export interface I18nRuntime extends I18nFormatterPort {
   readonly locale: string;
   readonly direction: I18nDirection;
   loadCatalog(catalog: I18nCatalog): void;
+  loadCatalogs(catalogs: readonly I18nCatalog[]): void;
   unloadCatalog(namespace: string): void;
+  preloadLocale(locale: string): Promise<void>;
+  setLocale(locale: string, direction?: I18nDirection): Promise<void>;
   t(key: I18nCatalogKey, values?: Readonly<Record<string, unknown>>): string;
   resource<T = unknown>(key: I18nCatalogKey): T | undefined;
 }
@@ -88,8 +95,36 @@ export function ref(key: I18nCatalogKey): I18nReference {
 export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
   const entries = new Map<string, I18nCatalogEntry>();
   const namespaces = new Map<string, string[]>();
+  const manualCatalogs = new Map<string, I18nCatalog>();
+  const loaderCatalogs = new Map<string, I18nCatalog>();
+  const loaderCache = new Map<string, readonly I18nCatalog[]>();
   const formatter: I18nFormatterPort = { ...DEFAULT_FORMATTER, ...(options.formatter ?? {}) };
   const fallbackLocale = options.fallbackLocale ?? 'en';
+  let currentLocale = options.locale;
+  let currentDirection = options.direction;
+
+  function rememberCatalog(target: Map<string, I18nCatalog>, catalog: I18nCatalog): void {
+    target.set(catalog.namespace, catalog);
+  }
+
+  function applyCatalogs(source: ReadonlyMap<string, I18nCatalog>): void {
+    for (const catalog of source.values()) {
+      const scoped: string[] = [];
+      for (const entry of catalog.entries) {
+        const key = keyToString(entry.key);
+        entries.set(key, entry);
+        scoped.push(key);
+      }
+      namespaces.set(catalog.namespace, scoped);
+    }
+  }
+
+  function rebuildCatalogState(): void {
+    entries.clear();
+    namespaces.clear();
+    applyCatalogs(manualCatalogs);
+    applyCatalogs(loaderCatalogs);
+  }
 
   function getEntry(key: I18nCatalogKey): I18nCatalogEntry {
     const entry = entries.get(keyToString(key));
@@ -104,7 +139,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     seen: Set<string>,
   ): T | undefined {
     const candidates = [
-      entry.values[options.locale],
+      entry.values[currentLocale],
       entry.values[entry.sourceLocale],
       entry.values[fallbackLocale],
       entry.fallbackValue,
@@ -137,27 +172,61 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     return undefined;
   }
 
+  async function preloadLocale(locale: string): Promise<void> {
+    if (options.loader === undefined || loaderCache.has(locale)) {
+      return;
+    }
+    loaderCache.set(locale, await options.loader(locale));
+  }
+
+  async function activateLoaderLocale(locale: string): Promise<void> {
+    if (options.loader === undefined) {
+      return;
+    }
+    await preloadLocale(locale);
+    loaderCatalogs.clear();
+    for (const catalog of loaderCache.get(locale) ?? []) {
+      rememberCatalog(loaderCatalogs, catalog);
+    }
+    rebuildCatalogState();
+  }
+
+  if (options.catalogs !== undefined) {
+    for (const catalog of options.catalogs) {
+      rememberCatalog(manualCatalogs, catalog);
+    }
+    rebuildCatalogState();
+  }
+
   return {
-    locale: options.locale,
-    direction: options.direction,
+    get locale() {
+      return currentLocale;
+    },
+    get direction() {
+      return currentDirection;
+    },
     loadCatalog(catalog) {
-      const scoped = namespaces.get(catalog.namespace) ?? [];
-      for (const entry of catalog.entries) {
-        const key = keyToString(entry.key);
-        entries.set(key, entry);
-        scoped.push(key);
+      rememberCatalog(manualCatalogs, catalog);
+      rebuildCatalogState();
+    },
+    loadCatalogs(catalogs) {
+      for (const catalog of catalogs) {
+        rememberCatalog(manualCatalogs, catalog);
       }
-      namespaces.set(catalog.namespace, scoped);
+      rebuildCatalogState();
     },
     unloadCatalog(namespace) {
-      const scoped = namespaces.get(namespace);
-      if (scoped === undefined) {
-        return;
+      manualCatalogs.delete(namespace);
+      loaderCatalogs.delete(namespace);
+      rebuildCatalogState();
+    },
+    preloadLocale,
+    async setLocale(locale, direction) {
+      currentLocale = locale;
+      if (direction !== undefined) {
+        currentDirection = direction;
       }
-      for (const key of scoped) {
-        entries.delete(key);
-      }
-      namespaces.delete(namespace);
+      await activateLoaderLocale(locale);
     },
     t(key, values = {}) {
       const entry = getEntry(key);
@@ -190,4 +259,12 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       return formatter.formatList(values, locale);
     },
   };
+}
+
+export async function createI18nRuntimeAsync(options: I18nRuntimeOptions): Promise<I18nRuntime> {
+  const runtime = createI18nRuntime(options);
+  if (options.loader !== undefined) {
+    await runtime.setLocale(options.locale, options.direction);
+  }
+  return runtime;
 }

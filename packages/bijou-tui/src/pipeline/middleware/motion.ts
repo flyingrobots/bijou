@@ -9,7 +9,7 @@ const reconciler = new MotionReconciler();
  */
 export function motionMiddleware(): RenderMiddleware {
   return (state, next) => {
-    const { dt } = state;
+    const { ctx, dt } = state;
     
     // We assume the Layout pass has already populated targetSurface 
     // with a LayoutNode tree if it's not a raw Surface.
@@ -17,7 +17,7 @@ export function motionMiddleware(): RenderMiddleware {
     
     const root = (state as any).layoutRoot as LayoutNode | undefined;
     if (root) {
-      reconciler.reconcile(root, dt);
+      reconciler.reconcile(root, dt, ctx.io);
     }
 
     next();

@@ -20,7 +20,7 @@
  * ```
  */
 
-import { createSurface, parseAnsiToSurface, type IOPort, type Surface } from '@flyingrobots/bijou';
+import { createSurface, parseAnsiToSurface, sanitizePositiveInt, type IOPort, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 import { vstackSurface } from './surface-layout.js';
 import { viewportSurface, visibleLength } from './viewport.js';
@@ -148,7 +148,7 @@ function parseEntries(names: string[], filter?: string): FileEntry[] {
  * @returns Fresh file picker state with focus on the first entry.
  */
 export function createFilePickerState(options: FilePickerOptions): FilePickerState {
-  const height = Math.max(1, options.height ?? 10);
+  const height = sanitizePositiveInt(options.height, 10);
   const entries = safeReadEntries(options.io, options.cwd, options.filter);
 
   return {

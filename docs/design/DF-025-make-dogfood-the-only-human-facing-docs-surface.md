@@ -198,7 +198,7 @@ Under `tests/cycles/DF-025/`:
 
 - the cycle doc exists and contains the DOGFOOD-only decision
 - a repo-owned DOGFOOD entrypoint exists under `docs/`
-- `WF-003` now lives in `docs/BACKLOG/v4.1.0/`
+- `WF-003` now lives in `docs/method/graveyard/legacy-backlog/v4.1.0/`
 - the `v4.1.0` blocker lane lists `DF-023`, `DF-024`, `DF-026`, and
   `WF-003`
 - `README.md`, `docs/README.md`, and `docs/release.md` acknowledge the

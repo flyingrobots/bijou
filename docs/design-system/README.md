@@ -5,6 +5,7 @@ Bijou now has enough surface area that "here are the exports" is no longer a goo
 This section defines the design language behind the library:
 
 - the foundations that shape the UI
+- the token vocabulary that turns color doctrine into API rules
 - the interaction and layout patterns that recur across apps
 - the component families and their intended jobs
 - the policy for visualizing data instead of guessing ad hoc each time
@@ -17,6 +18,7 @@ Use these docs when you need to answer:
 
 - What problem does this component family solve?
 - Which variation should I use?
+- Which token family should this component use?
 - When should I choose one component over another?
 - When should I avoid this component entirely?
 - Does this belong in core `@flyingrobots/bijou` or in `@flyingrobots/bijou-tui`?
@@ -26,11 +28,13 @@ Use these docs when you need to answer:
 ## Read in this order
 
 1. [Foundations](./foundations.md)
-2. [Patterns](./patterns.md)
-3. [Blocks](./blocks.md)
-4. [Pointer and Mouse Policy](./pointer.md)
-5. [Component Families](./component-families.md)
-6. [Data Visualization Policy](./data-visualization.md)
+2. [Theme Token Vocabulary](./theme-tokens.md)
+3. [Theme Authoring Guide](./theme-authoring.md)
+4. [Patterns](./patterns.md)
+5. [Blocks](./blocks.md)
+6. [Pointer and Mouse Policy](./pointer.md)
+7. [Component Families](./component-families.md)
+8. [Data Visualization Policy](./data-visualization.md)
 
 For the raw inventory and taxonomy work behind these docs, see [../archive/component-system-audit.md](../archive/component-system-audit.md).
 
@@ -38,18 +42,22 @@ For the raw inventory and taxonomy work behind these docs, see [../archive/compo
 
 ### Bijou is not just a component library
 
-Bijou is made of four layers:
+Bijou is made of five layers:
 
 1. **Foundations**
-   - color, spacing rhythm, text hierarchy, overflow, motion, focus, interruption
-2. **Patterns**
-   - status, selection, browsing, overlays, forms, shell composition
-3. **Component families**
-   - specific primitives that implement those patterns
-4. **Blocks**
-   - reusable product-level assemblies such as app frames, settings flows, and guided workflows
+  - color, spacing rhythm, text hierarchy, overflow, motion, focus, interruption
+2. **Theme vocabulary**
+  - canonical token families and first-party usage rules
+3. **Patterns**
+  - status, selection, browsing, overlays, forms, shell composition
+4. **Component families**
+  - specific primitives that implement those patterns
+5. **Blocks**
+  - reusable product-level assemblies such as app frames, settings flows, and guided workflows
 
-Components and blocks should be downstream of the first two layers. If the design language is weak, the component catalog and block library both become noisy no matter how many exports exist.
+Components and blocks should be downstream of the first three layers. If the
+design language is weak, the component catalog and block library both become
+noisy no matter how many exports exist.
 
 ### Core versus TUI ownership
 

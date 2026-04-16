@@ -49,6 +49,6 @@ forcing those paths through fake message contracts.
 
 ## Follow-on
 
-- [DX-003 — Rationalize Table APIs and Public Table Types](../BACKLOG/DX-003-rationalize-table-apis-and-public-table-types.md)
-- [DX-004 — Smooth Surface and String Composition Seams](../BACKLOG/DX-004-smooth-surface-and-string-composition-seams.md)
-- [DX-005 — Polish Small Component and Import Ergonomics](../BACKLOG/DX-005-polish-small-component-and-import-ergonomics.md)
+- [DX-003 — Rationalize Table APIs and Public Table Types](../method/graveyard/legacy-backlog/DX-003-rationalize-table-apis-and-public-table-types.md)
+- [DX-004 — Smooth Surface and String Composition Seams](../method/graveyard/legacy-backlog/DX-004-smooth-surface-and-string-composition-seams.md)
+- [DX-005 — Polish Small Component and Import Ergonomics](../method/graveyard/legacy-backlog/DX-005-polish-small-component-and-import-ergonomics.md)

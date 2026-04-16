@@ -104,6 +104,13 @@ describe('helpView', () => {
 
     expect(helpView(km)).toContain('General');
   });
+
+  it('uses a localized fallback group label when provided', () => {
+    const km = createKeyMap<Msg>()
+      .bind('q', 'Quit', { type: 'quit' });
+
+    expect(helpView(km, { defaultGroupName: 'Général' })).toContain('Général');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -199,5 +206,18 @@ describe('help surfaces', () => {
 
     expect(rendered.split('\n').map((line) => line.trimEnd()).join('\n'))
       .toBe(helpFor(sampleKeyMap(), 'Nav'));
+  });
+
+  it('falls back for non-finite width and height', () => {
+    const rendered = surfaceToString(
+      helpViewSurface(sampleKeyMap(), {
+        width: Number.NaN,
+        height: Number.POSITIVE_INFINITY,
+      }),
+      ctx.style,
+    );
+
+    expect(rendered.split('\n').map((line) => line.trimEnd()).join('\n'))
+      .toBe(helpView(sampleKeyMap()));
   });
 });

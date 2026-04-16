@@ -23,6 +23,17 @@ describe('table', () => {
     expect(result).toContain('─'); // table border chars
   });
 
+  it('supports the common shorthand call shape', () => {
+    const ctx = createTestContext({ mode: 'pipe' });
+    const result = table(columns, rows, ctx);
+
+    expect(result).toBe([
+      'Name\tStatus\tScore',
+      'Alice\tactive\t95',
+      'Bob\tpending\t72',
+    ].join('\n'));
+  });
+
   it('wraps fixed-width cell content by default', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     const result = table({
@@ -68,6 +79,28 @@ describe('table', () => {
     const ctx = createTestContext({ mode: 'pipe' });
     const result = table({ columns, rows: [], ctx });
     expect(result).toBe('Name\tStatus\tScore');
+  });
+
+  it('pads emoji-presentation dingbats so later columns stay aligned', () => {
+    const ctx = createTestContext({ mode: 'interactive', noColor: true });
+    const result = table({
+      columns: [
+        { header: 'Name' },
+        { header: 'Status' },
+        { header: 'Count' },
+      ],
+      rows: [
+        ['Alpha', 'ok', '1'],
+        ['Beta', '❌', '2'],
+        ['Gamma', '✅', '3'],
+      ],
+      ctx,
+    });
+
+    const lines = result.split('\n');
+    expect(lines[3]).toBe('│ Alpha │ ok     │ 1     │');
+    expect(lines[4]).toBe('│ Beta  │ ❌     │ 2     │');
+    expect(lines[5]).toBe('│ Gamma │ ✅     │ 3     │');
   });
 
   describe('background fill', () => {

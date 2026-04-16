@@ -95,6 +95,7 @@ Or point directly at a local checkout:
 | `bijou_kbd` | Keyboard key indicator |
 | `bijou_hyperlink` | Terminal hyperlink (OSC 8) |
 | `bijou_skeleton` | Placeholder loading block |
+| `bijou_docs` | Machine-readable docs for the MCP surface plus the full first-party component-family field guide |
 
 ## Example Output
 
@@ -104,9 +105,9 @@ bijou_table
 ┌────────────┬─────────┬─────────┐
 │ Name       │ Status  │ Version │
 ├────────────┼─────────┼─────────┤
-│ bijou      │ healthy │ 4.4.1   │
-│ bijou-node │ healthy │ 4.4.1   │
-│ bijou-mcp  │ new     │ 4.4.1   │
+│ bijou      │ healthy │ 5.0.0   │
+│ bijou-node │ healthy │ 5.0.0   │
+│ bijou-mcp  │ new     │ 5.0.0   │
 └────────────┴─────────┴─────────┘
 
 bijou_tree
@@ -155,6 +156,12 @@ renders correctly in any monospace context.
 
 Each tool accepts structured JSON input, renders via the corresponding
 Bijou component, and returns the result as a plain text string.
+
+All tools also accept an optional `output` field:
+
+- `text` (default): return the rendered plain-text output in `content`
+- `data`: return only MCP `structuredContent` with machine-readable semantic payload
+- `both`: return both the rendered text and the structured payload
 
 ## License
 

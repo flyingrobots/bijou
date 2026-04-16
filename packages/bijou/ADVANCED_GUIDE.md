@@ -29,6 +29,25 @@ For the deeper rendering posture, also read:
 - [Root Advanced Guide](../../ADVANCED_GUIDE.md)
 - [Byte-Pipeline Recovery](../../docs/perf/RE-017-byte-pipeline.md)
 
+## Terminal Text Sanitization Boundary
+
+Raw terminal text should be sanitized when it crosses into the surface model,
+not after it has already become cells.
+
+Rule of thumb:
+
+- use `stringToSurface()` for plain text boundaries
+- use `parseAnsiToSurface()` only when you are intentionally accepting SGR or
+  OSC 8 styling input
+- use `sanitizeTerminalText()` first when untrusted or user-provided terminal
+  text is being inspected outside those helpers
+- do not let arbitrary cursor movement, clear-screen, bell, or other control
+  sequences survive into a `Surface`
+
+This keeps the string boundary explicit and prevents accidental terminal
+injection when a surface later flows back out through `surfaceToString()` or
+the runtime diff writer.
+
 ## Byte-Packed Surface Expectations
 
 `Surface` is a byte-backed render structure, not a themed string blob.
@@ -51,7 +70,8 @@ If you are touching the render bedrock, read:
 
 The beginner guide covers presets and basic extension. The advanced lane is:
 
-- semantic token accessors like `semantic()`, `surface()`, `border()`, `ui()`
+- token accessors like `semantic()`, `surface()`, `border()`, `status()`,
+  `ui()`, and `gradient()`
 - token graph references and transforms
 - DTCG import/export
 - custom theme extension without coupling app code to raw theme object shape
@@ -59,10 +79,46 @@ The beginner guide covers presets and basic extension. The advanced lane is:
 Read:
 
 - [GUIDE theme section](./GUIDE.md#themes)
+- [Theme Token Vocabulary](../../docs/design-system/theme-tokens.md)
+- [Theme Authoring Guide](../../docs/design-system/theme-authoring.md)
 - [token graph spec](../../docs/specs/token-graph.spec.json)
 - [theme graph implementation](./src/core/theme/graph.ts)
 - [theme graph types](./src/core/theme/graph-types.ts)
 - [DTCG tests](./src/core/theme/dtcg.test.ts)
+
+### Observing Theme Changes
+
+Third-party component authors should use `observeTheme(ctx, handler)` as the
+supported reactivity seam.
+
+Use it when a component caches theme-derived work such as:
+
+- prebuilt surfaces
+- measured widths or wrapped text that depend on token modifiers
+- resolved token choices or theme-conditioned component variants
+
+Pattern:
+
+```typescript
+import { observeTheme } from '@flyingrobots/bijou';
+
+const subscription = observeTheme(ctx, () => {
+  cachedSurface = undefined;
+});
+```
+
+Rules:
+
+- invalidate cached theme-derived work in the handler
+- reread tokens through `ctx.semantic()`, `ctx.surface()`, and friends
+- do not subscribe to `ctx.tokenGraph.on()` directly unless you are working on
+  theme-engine internals
+- if the host replaces the entire `ctx` object, dispose the old subscription
+  and resubscribe to the new context
+
+The public context keeps the accessor layer and `tokenGraph` in sync, so
+third-party code can observe theme changes without mutating the context object
+or reaching into private internals.
 
 ## Custom Components And Mode-Aware Authoring
 

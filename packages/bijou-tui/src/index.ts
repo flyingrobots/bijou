@@ -7,6 +7,9 @@
  * @module
  */
 
+// Common core types paired with TUI authoring surfaces
+export type { BijouContext, Cell, Surface } from '@flyingrobots/bijou';
+
 // Types
 export type {
   App,
@@ -165,13 +168,37 @@ export {
 export type { ViewOutput } from './view-output.js';
 
 // Pipeline
-export type { RenderState, RenderMiddleware, RenderStage, RenderPipeline } from './pipeline/pipeline.js';
-export { createPipeline } from './pipeline/pipeline.js';
+export type {
+  RenderState,
+  RenderMiddleware,
+  RenderStage,
+  RenderPipeline,
+  RenderStageTiming,
+  RenderStageCompleteHandler,
+  RenderStageObserver,
+  CreatePipelineOptions,
+} from './pipeline/pipeline.js';
+export { createPipeline, getRenderStageTimings, RENDER_STAGE_TIMINGS_KEY } from './pipeline/pipeline.js';
 export { grayscaleFilter } from './pipeline/middleware/grayscale.js';
+export type {
+  SurfaceShader,
+  SurfaceShaderContext,
+  ScanlinesShaderOptions,
+  FlickerShaderOptions,
+  NoiseShaderOptions,
+  VignetteShaderOptions,
+} from './pipeline/middleware/surface-shaders.js';
+export {
+  surfaceShaderFilter,
+  scanlines,
+  flicker,
+  noise,
+  vignette,
+} from './pipeline/middleware/surface-shaders.js';
 
 // Sub-App Composition
-export type { MountOptions, MountedApp } from './subapp/mount.js';
-export { mount, mapCmds, initSubApp, updateSubApp } from './subapp/mount.js';
+export type { MountOptions, MountedApp, SubAppAdapterCases } from './subapp/mount.js';
+export { mount, mapCmds, initSubApp, updateSubApp, createSubAppAdapter } from './subapp/mount.js';
 
 // Motion API
 export { motion } from './motion/motion.js';
@@ -180,9 +207,12 @@ export type { MotionOptions } from './motion/types.js';
 
 // Layout
 export { vstack, hstack, place } from './layout.js';
-export { vstackSurface, hstackSurface, placeSurface } from './surface-layout.js';
+export { contentSurface, vstackSurface, hstackSurface, placeSurface } from './surface-layout.js';
 export type { HAlign, VAlign, PlaceOptions } from './layout.js';
+export type { SurfaceContent } from './surface-layout.js';
 export type { LayoutRect } from './layout-rect.js';
+export type { DebugOverlayAnchor, DebugOverlayOptions } from './debug-overlay.js';
+export { debugOverlay } from './debug-overlay.js';
 
 // Split pane layout
 export {
@@ -222,6 +252,9 @@ export {
   type FrameLayerMetadata,
   type FrameLayerOwner,
   type FrameLayerDescriptor,
+  type FramePageLayerKind,
+  type FramePageLayerRegistry,
+  type FrameControlProjection,
   type FrameRuntimeLayer,
   type FrameRuntimeViewStack,
   type DescribeFrameLayerStackOptions,
@@ -238,7 +271,10 @@ export {
   type PageTransition,
   type FramePaneScroll,
   type FrameModel,
+  type FrameAction,
+  type FrameNotificationSpec,
   type FramedApp,
+  type FramedAppRunOptions,
   type FramedAppMsg,
   type FramedAppUpdateResult,
   type FrameScopedMsg,
@@ -247,6 +283,10 @@ export {
   describeFrameLayerStack,
   describeFrameRuntimeViewStack,
   createFramedApp,
+  emitFrameAction,
+  notify,
+  projectFrameControls,
+  runFramedApp,
   underlyingFrameLayer,
 } from './app-frame.js';
 
@@ -550,6 +590,7 @@ export {
 // Navigable table
 export {
   type NavigableTableState,
+  type NavigableTableInput,
   type NavigableTableOptions,
   type NavTableRenderOptions,
   type NavTableSurfaceOptions,
@@ -602,7 +643,13 @@ export {
   type ScriptStep,
   type RunScriptOptions,
   type RunScriptResult,
+  type TestRuntimeOptions,
+  type TestRuntimeCommandResolution,
+  type TestRuntimeCommandRecord,
+  type TestRuntimeSnapshot,
+  type TestHarness,
   runScript,
+  testRuntime,
 } from './driver.js';
 
 // Canvas — shader-based character grid

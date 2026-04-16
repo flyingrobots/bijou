@@ -4,6 +4,10 @@
 
 bijou-node is the official Node.js adapter for `@flyingrobots/bijou`. It implements the three port interfaces using Node.js built-ins and chalk.
 
+At the public API layer it also provides `startApp()` as the hosted fast path:
+initialize a Node context when needed, then hand the app off to
+`@flyingrobots/bijou-tui`'s `run()` loop.
+
 ## Port Mapping
 
 ```
@@ -17,6 +21,7 @@ bijou-node is the official Node.js adapter for `@flyingrobots/bijou`. It impleme
 │  @flyingrobots/bijou-node (adapters)         │
 │                                              │
 │  nodeRuntime()   nodeIO()      chalkStyle()  │
+│                   scopedNodeIO()             │
 │  ├─ process.env  ├─ stdout     ├─ chalk.rgb  │
 │  ├─ stdout.isTTY ├─ stdin      ├─ chalk.hex  │
 │  ├─ stdin.isTTY  ├─ readline   └─ chalk.bold │
@@ -54,6 +59,20 @@ Maps `IOPort` to Node.js I/O:
 | `readDir(path)` | `fs.readdirSync(path)` |
 | `joinPath(...segs)` | `path.join(...segs)` |
 
+### scopedNodeIO()
+
+Wraps `nodeIO()` with a rooted filesystem boundary:
+
+| Port method | Behavior |
+|---|---|
+| `readFile(path)` | Resolves inside the declared root, then delegates to `nodeIO().readFile` |
+| `readDir(path)` | Resolves inside the declared root, then delegates to `nodeIO().readDir` |
+| `joinPath(...segs)` | Joins and resolves inside the declared root |
+| `resolvePath(path)` | Returns an absolute in-root path or throws on escape |
+
+This keeps app-level reads and traversal constrained without moving Node filesystem
+policy into the pure packages.
+
 ### chalkStyle()
 
 Maps `StylePort` to chalk:
@@ -77,6 +96,16 @@ Respects `NO_COLOR` — when active, all methods return text unchanged.
 4. Returns a frozen `BijouContext` object
 
 `initDefaultContext()` calls `createNodeContext()` and registers the result as the global default via `setDefaultContext()`.
+
+Module import also registers a lazy Node default-context initializer with the
+core package. That keeps low-level `run(app)` and ambient component calls on the
+common Node path from failing before an explicit `initDefaultContext()` call.
+
+`startApp(app, options)` is the higher-level host helper:
+
+1. Uses `options.ctx` when the host provides one
+2. Otherwise calls `initDefaultContext()` so ambient component calls still work
+3. Delegates runtime ownership to `run(app, { ...options, ctx })`
 
 ## Directory Structure
 

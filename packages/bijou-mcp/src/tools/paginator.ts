@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { paginator } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 const inputShape = {
@@ -12,7 +13,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const paginatorTool: ToolRegistration = {
+export const paginatorTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_paginator',
   description: 'Render a page indicator showing current position. Styles: dots or text.',
   inputSchema: inputShape,
@@ -22,4 +23,4 @@ export const paginatorTool: ToolRegistration = {
     const result = paginator({ current: input.current, total: input.total, style: input.style, ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});

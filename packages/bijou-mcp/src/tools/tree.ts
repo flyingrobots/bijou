@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { tree, type TreeNode } from '@flyingrobots/bijou';
 import { mcpContext } from '../context.js';
+import { withStructuredToolOutput } from '../output.js';
 import type { ToolRegistration } from '../types.js';
 
 interface RawTreeNode {
@@ -20,7 +21,7 @@ const inputShape = {
 
 const inputSchema = z.object(inputShape);
 
-export const treeTool: ToolRegistration = {
+export const treeTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_tree',
   description: 'Render a tree hierarchy with Unicode box-drawing connectors (lines and corner pieces). Returns plain-text.',
   inputSchema: inputShape,
@@ -30,4 +31,4 @@ export const treeTool: ToolRegistration = {
     const result = tree(input.nodes as TreeNode[], { ctx });
     return { content: [{ type: 'text', text: result }] };
   },
-};
+});
