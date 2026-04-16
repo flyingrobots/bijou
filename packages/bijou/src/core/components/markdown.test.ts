@@ -130,6 +130,36 @@ describe('markdown()', () => {
     });
   });
 
+  describe('tables', () => {
+    const source = [
+      '| Surface | Role |',
+      '| :--- | :--- |',
+      '| README.md | Public front door |',
+      '| GUIDE.md | Fast path |',
+    ].join('\n');
+
+    it('renders GFM-style tables with boxed output in interactive mode', () => {
+      const result = markdown(source, { ctx: ctx() });
+      expect(result).toContain('README.md');
+      expect(result).toContain('Public front door');
+      expect(result).toContain('\u250c');
+      expect(result).not.toContain('| :--- | :--- |');
+    });
+
+    it('lowers markdown tables to TSV in pipe mode', () => {
+      const result = markdown(source, { ctx: ctx('pipe') });
+      expect(result).toContain('Surface\tRole');
+      expect(result).toContain('README.md\tPublic front door');
+      expect(result).not.toContain('| :--- | :--- |');
+    });
+
+    it('linearizes markdown tables in accessible mode', () => {
+      const result = markdown(source, { ctx: ctx('accessible') });
+      expect(result).toContain('Row 1: Surface=README.md, Role=Public front door');
+      expect(result).toContain('Row 2: Surface=GUIDE.md, Role=Fast path');
+    });
+  });
+
   describe('code blocks', () => {
     it('renders code block content', () => {
       const source = '```js\nconsole.log("hi");\n```';

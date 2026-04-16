@@ -5,8 +5,8 @@
  * Reuses existing components: `separator()` for HRs, `hyperlink()` for links.
  *
  * Supported syntax: headings (# through ####), bold, italic, code spans,
- * bullet lists, numbered lists, code blocks, horizontal rules, links,
- * blockquotes.
+ * bullet lists, numbered lists, GFM-style pipe tables, code blocks,
+ * horizontal rules, links, and blockquotes.
  */
 
 import type { BijouContext } from '../../ports/context.js';
@@ -31,7 +31,8 @@ export interface MarkdownOptions {
  * Render a markdown string for terminal display.
  *
  * Supports headings, bold, italic, code spans, bullet/numbered lists,
- * code blocks, horizontal rules, links, and blockquotes.
+ * GFM-style pipe tables, code blocks, horizontal rules, links, and
+ * blockquotes.
  *
  * Mode degradation:
  * - `interactive`: full styled output with colors and Unicode

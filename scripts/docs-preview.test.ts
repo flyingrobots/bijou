@@ -497,6 +497,26 @@ describe('docs preview app', () => {
     expect(text).toContain('Bijou keeps docs');
   });
 
+  it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const result = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    const pageModel = docsPageModel(result.model as any, 'guides');
+    const text = frameText(result.frames[result.frames.length - 1]!);
+
+    expect(pageModel.selectedGuideId).toBe('documentation-map');
+    expect(text).toContain('README.md');
+    expect(text).toContain('Public front door');
+    expect(text).not.toContain('| :--- | :--- |');
+  });
+
   it('renders the hyperlink story without OSC 8 width corruption', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);

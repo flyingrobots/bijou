@@ -388,7 +388,7 @@ If those checks fail, the component work is not doctrinally complete yet.
 
 - Family: `markdown()`
 - Variants:
-  - headings, emphasis, lists, blockquotes, links, code fences, and other supported markdown structures with mode-aware lowering
+  - headings, emphasis, lists, blockquotes, links, GFM-style pipe tables, code fences, and other supported markdown structures with mode-aware lowering
 - Use when:
   - help, reference, release notes, readme-like content, or bounded prose needs lightweight structure
   - the same content should remain honest across rich, pipe, and accessible output modes

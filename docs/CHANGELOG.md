@@ -41,6 +41,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   timeout budget, and the real interactive example run moved into a
   dedicated `verify:interactive-examples` integration lane that runs
   separately from the main unit suite.
+- **`markdown()` now renders GFM-style pipe tables** — the core markdown
+  renderer recognizes bounded pipe-table blocks and lowers them through
+  Bijou's `table()` component instead of leaking raw markdown separators
+  into DOGFOOD and other prose surfaces. Interactive/static output now
+  shows boxed tables, pipe mode lowers to TSV, and accessible mode
+  linearizes rows as labeled key-value pairs.
 
 ## [4.4.1] - 2026-04-11
 

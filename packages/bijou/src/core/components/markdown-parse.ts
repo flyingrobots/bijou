@@ -22,6 +22,7 @@ export type BlockType =
   | { type: 'paragraph'; text: string }
   | { type: 'bullet-list'; items: string[] }
   | { type: 'numbered-list'; items: string[] }
+  | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'code-block'; lang: string; lines: string[] }
   | { type: 'blockquote'; lines: string[] }
   | { type: 'hr' }
@@ -117,6 +118,22 @@ export function parseBlocks(source: string): BlockType[] {
       continue;
     }
 
+    // GFM-style pipe table
+    const headerCells = parseTableRow(line);
+    const separatorLine = lines[i + 1];
+    if (headerCells && separatorLine && isTableSeparatorRow(separatorLine, headerCells.length)) {
+      const rows: string[][] = [];
+      i += 2;
+      while (i < lines.length) {
+        const rowCells = parseTableRow(lines[i]!);
+        if (!rowCells || isTableSeparatorRow(lines[i]!, headerCells.length)) break;
+        rows.push(normalizeTableCells(rowCells, headerCells.length));
+        i++;
+      }
+      blocks.push({ type: 'table', headers: headerCells, rows });
+      continue;
+    }
+
     // Paragraph: collect consecutive non-special lines
     let text = line;
     i++;
@@ -146,6 +163,49 @@ function isBlockStart(line: string): boolean {
   if (/^\s*[-*]\s+/.test(line)) return true;
   if (/^\s*\d+\.\s+/.test(line)) return true;
   return false;
+}
+
+function parseTableRow(line: string): string[] | null {
+  const trimmed = line.trim();
+  if (!trimmed.includes('|')) return null;
+
+  const rawCells: string[] = [];
+  let current = '';
+
+  for (let i = 0; i < trimmed.length; i++) {
+    const char = trimmed[i]!;
+    if (char === '\\' && trimmed[i + 1] === '|') {
+      current += '|';
+      i++;
+      continue;
+    }
+    if (char === '|') {
+      rawCells.push(current);
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  rawCells.push(current);
+
+  let cells = rawCells;
+  if (trimmed.startsWith('|')) cells = cells.slice(1);
+  if (trimmed.endsWith('|')) cells = cells.slice(0, -1);
+
+  const normalized = cells.map((cell) => cell.trim());
+  return normalized.length > 0 ? normalized : null;
+}
+
+function isTableSeparatorRow(line: string, expectedColumns: number): boolean {
+  const cells = parseTableRow(line);
+  if (!cells || cells.length !== expectedColumns) return false;
+  return cells.every((cell) => /^:?-{3,}:?$/.test(cell.replace(/\s+/g, '')));
+}
+
+function normalizeTableCells(cells: string[], expectedColumns: number): string[] {
+  if (cells.length === expectedColumns) return cells;
+  if (cells.length > expectedColumns) return cells.slice(0, expectedColumns);
+  return [...cells, ...Array.from({ length: expectedColumns - cells.length }, () => '')];
 }
 
 // ── Inline parser ──────────────────────────────────────────────────

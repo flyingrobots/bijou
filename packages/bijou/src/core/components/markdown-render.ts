@@ -6,9 +6,11 @@
  */
 
 import type { BijouContext } from '../../ports/context.js';
+import { graphemeWidth, stripAnsi } from '../text/grapheme.js';
 import type { BlockType } from './markdown-parse.js';
 import { parseInline, wordWrap } from './markdown-parse.js';
 import { separator } from './separator.js';
+import { table } from './table.js';
 import { renderByMode } from '../mode-render.js';
 
 /**
@@ -99,6 +101,22 @@ export function renderBlocks(
         break;
       }
 
+      case 'table': {
+        const headers = block.headers.map((header) => parseInline(header, ctx));
+        const rows = block.rows.map((row) => row.map((cell) => parseInline(cell, ctx)));
+        const fittedWidths = fitMarkdownTableWidths(headers, rows, width);
+        lines.push(table({
+          columns: headers.map((header, index) => ({
+            header,
+            width: fittedWidths[index],
+          })),
+          rows,
+          ctx,
+        }));
+        lines.push('');
+        break;
+      }
+
       case 'code-block': {
         const cbLines = renderByMode(ctx.mode, {
           pipe: () => ['```' + block.lang, ...block.lines, '```'],
@@ -140,4 +158,44 @@ export function renderBlocks(
   }
 
   return lines.join('\n');
+}
+
+function fitMarkdownTableWidths(
+  headers: readonly string[],
+  rows: readonly (readonly string[])[],
+  width: number,
+): number[] {
+  const columnCount = headers.length;
+  if (columnCount === 0) return [];
+
+  const desired = headers.map((header, index) => {
+    let max = visibleTextWidth(header);
+    for (const row of rows) {
+      max = Math.max(max, visibleTextWidth(row[index] ?? ''));
+    }
+    return Math.max(1, max);
+  });
+
+  const borderOverhead = columnCount * 3 + 1;
+  const availableWidth = Math.max(columnCount, width - borderOverhead);
+  const fitted = [...desired];
+
+  while (fitted.reduce((sum, columnWidth) => sum + columnWidth, 0) > availableWidth) {
+    let widestIndex = -1;
+    let widestWidth = -1;
+    for (let index = 0; index < fitted.length; index++) {
+      if (fitted[index]! > 1 && fitted[index]! > widestWidth) {
+        widestIndex = index;
+        widestWidth = fitted[index]!;
+      }
+    }
+    if (widestIndex < 0) break;
+    fitted[widestIndex]!--;
+  }
+
+  return fitted;
+}
+
+function visibleTextWidth(value: string): number {
+  return graphemeWidth(stripAnsi(value));
 }
