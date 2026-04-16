@@ -6,11 +6,19 @@
  */
 
 import type { BijouContext } from '../../ports/context.js';
-import { graphemeWidth, stripAnsi } from '../text/grapheme.js';
+import { RESET_SGR } from '../ansi.js';
+import {
+  ANSI_OSC8_RE,
+  ANSI_SGR_RE,
+  graphemeClusterWidth,
+  graphemeWidth,
+  segmentGraphemes,
+  stripAnsi,
+} from '../text/grapheme.js';
 import type { BlockType } from './markdown-parse.js';
 import { parseInline, wordWrap } from './markdown-parse.js';
 import { separator } from './separator.js';
-import { table } from './table.js';
+import { measureInteractiveTableWidth, table } from './table.js';
 import { renderByMode } from '../mode-render.js';
 
 /**
@@ -56,14 +64,8 @@ export function renderBlocks(
       }
 
       case 'paragraph': {
-        // Known limitation: wordWrap runs on raw markdown source before
-        // parseInline, so invisible markers like **bold** and [link](url)
-        // consume wrap width. This can cause premature line breaks when
-        // markdown-heavy text is near the wrap boundary. Fixing this
-        // requires strip-for-measurement then wrap-raw then parse-after,
-        // which is complex due to cross-word-boundary formatting spans.
-        const wrapped = wordWrap(block.text, width);
-        lines.push(...wrapped.map(line => parseInline(line, ctx)));
+        const wrapped = wrapInlineMarkdown(block.text, width, ctx);
+        lines.push(...wrapped);
         lines.push('');
         break;
       }
@@ -72,10 +74,10 @@ export function renderBlocks(
         for (const item of block.items) {
           const bullet = mode === 'pipe' ? '- ' : '  \u2022 ';
           const indentWidth = width - bullet.length;
-          const wrapped = wordWrap(item, indentWidth > 0 ? indentWidth : width);
-          lines.push(bullet + parseInline(wrapped[0]!, ctx));
+          const wrapped = wrapInlineMarkdown(item, indentWidth > 0 ? indentWidth : width, ctx);
+          lines.push(bullet + wrapped[0]!);
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(bullet.length) + parseInline(wrapped[i]!, ctx));
+            lines.push(' '.repeat(bullet.length) + wrapped[i]!);
           }
         }
         lines.push('');
@@ -91,10 +93,10 @@ export function renderBlocks(
           const prefix = mode === 'pipe' ? `${n + 1}. ` : `  ${n + 1}. `;
           const paddedPrefix = prefix.padEnd(uniformIndent);
           const indentWidth = width - uniformIndent;
-          const wrapped = wordWrap(block.items[n]!, indentWidth > 0 ? indentWidth : width);
-          lines.push(paddedPrefix + parseInline(wrapped[0]!, ctx));
+          const wrapped = wrapInlineMarkdown(block.items[n]!, indentWidth > 0 ? indentWidth : width, ctx);
+          lines.push(paddedPrefix + wrapped[0]!);
           for (let i = 1; i < wrapped.length; i++) {
-            lines.push(' '.repeat(uniformIndent) + parseInline(wrapped[i]!, ctx));
+            lines.push(' '.repeat(uniformIndent) + wrapped[i]!);
           }
         }
         lines.push('');
@@ -176,11 +178,9 @@ function fitMarkdownTableWidths(
     return Math.max(1, max);
   });
 
-  const borderOverhead = columnCount * 3 + 1;
-  const availableWidth = Math.max(columnCount, width - borderOverhead);
   const fitted = [...desired];
 
-  while (fitted.reduce((sum, columnWidth) => sum + columnWidth, 0) > availableWidth) {
+  while (measureInteractiveTableWidth(fitted) > width) {
     let widestIndex = -1;
     let widestWidth = -1;
     for (let index = 0; index < fitted.length; index++) {
@@ -198,4 +198,184 @@ function fitMarkdownTableWidths(
 
 function visibleTextWidth(value: string): number {
   return graphemeWidth(stripAnsi(value));
+}
+
+function wrapInlineMarkdown(
+  text: string,
+  width: number,
+  ctx: BijouContext,
+): string[] {
+  const rendered = parseInline(text, ctx);
+  if (ctx.mode === 'interactive' || ctx.mode === 'static') {
+    return wrapStyledInlineText(rendered, width);
+  }
+  return wordWrap(rendered, width);
+}
+
+interface VisibleRange {
+  readonly start: number;
+  readonly end: number;
+}
+
+interface StyledInlineToken {
+  readonly kind: 'control' | 'grapheme';
+  readonly raw: string;
+  readonly width?: number;
+}
+
+interface StyledInlineState {
+  readonly sgr: readonly string[];
+  readonly osc8?: string;
+}
+
+const OSC8_CLOSE = '\x1b]8;;\x1b\\';
+const INLINE_CONTROL_RE = new RegExp(`${ANSI_SGR_RE.source}|${ANSI_OSC8_RE.source}`, 'g');
+
+function wrapStyledInlineText(text: string, width: number): string[] {
+  const plain = stripAnsi(text);
+  const ranges = wrapVisibleRanges(plain, width);
+  return ranges.map((range) => sliceStyledVisibleRange(text, range.start, range.end));
+}
+
+function wrapVisibleRanges(text: string, width: number): VisibleRange[] {
+  if (text.length === 0) return [{ start: 0, end: 0 }];
+  if (width <= 0) return [{ start: 0, end: graphemeWidth(text) }];
+
+  const words = text.split(' ');
+  const ranges: VisibleRange[] = [];
+  let cursor = 0;
+  let lineStart = 0;
+  let lineEnd = 0;
+  let lineWidth = 0;
+
+  for (let index = 0; index < words.length; index++) {
+    const word = words[index]!;
+    const wordStart = cursor;
+    const wordWidth = graphemeWidth(word);
+    const wordEnd = wordStart + wordWidth;
+
+    if (lineWidth === 0) {
+      lineStart = wordStart;
+      lineEnd = wordEnd;
+      lineWidth = wordWidth;
+    } else if (lineWidth + 1 + wordWidth <= width) {
+      lineEnd = wordEnd;
+      lineWidth += 1 + wordWidth;
+    } else {
+      ranges.push({ start: lineStart, end: lineEnd });
+      lineStart = wordStart;
+      lineEnd = wordEnd;
+      lineWidth = wordWidth;
+    }
+
+    cursor = wordEnd;
+    if (index < words.length - 1) {
+      cursor += 1;
+    }
+  }
+
+  if (lineWidth > 0) {
+    ranges.push({ start: lineStart, end: lineEnd });
+  }
+
+  return ranges.length > 0 ? ranges : [{ start: 0, end: 0 }];
+}
+
+function tokenizeStyledInlineText(text: string): StyledInlineToken[] {
+  const tokens: StyledInlineToken[] = [];
+  let lastIndex = 0;
+
+  for (const match of text.matchAll(INLINE_CONTROL_RE)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      const raw = text.slice(lastIndex, index);
+      for (const grapheme of segmentGraphemes(raw)) {
+        tokens.push({
+          kind: 'grapheme',
+          raw: grapheme,
+          width: graphemeClusterWidth(grapheme),
+        });
+      }
+    }
+
+    tokens.push({ kind: 'control', raw: match[0] });
+    lastIndex = index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    const raw = text.slice(lastIndex);
+    for (const grapheme of segmentGraphemes(raw)) {
+      tokens.push({
+        kind: 'grapheme',
+        raw: grapheme,
+        width: graphemeClusterWidth(grapheme),
+      });
+    }
+  }
+
+  return tokens;
+}
+
+function sliceStyledVisibleRange(text: string, start: number, end: number): string {
+  if (end <= start) return '';
+
+  const state: { sgr: string[]; osc8?: string } = { sgr: [] };
+  const tokens = tokenizeStyledInlineText(text);
+  let visible = 0;
+  let collecting = false;
+  let result = '';
+
+  for (const token of tokens) {
+    if (token.kind === 'control') {
+      if (collecting) {
+        result += token.raw;
+      }
+      applyStyledInlineControl(state, token.raw);
+      continue;
+    }
+
+    if (visible >= end) break;
+
+    const tokenStart = visible;
+    const tokenEnd = visible + (token.width ?? 0);
+    if (tokenEnd > start && tokenStart < end) {
+      if (!collecting) {
+        collecting = true;
+        result = buildStyledInlinePrefix(state);
+      }
+      result += token.raw;
+    }
+    visible = tokenEnd;
+  }
+
+  if (!collecting) return '';
+  return result + buildStyledInlineSuffix(state);
+}
+
+function applyStyledInlineControl(
+  state: { sgr: string[]; osc8?: string },
+  raw: string,
+): void {
+  if (raw.startsWith('\x1b]8;;')) {
+    state.osc8 = raw === OSC8_CLOSE ? undefined : raw;
+    return;
+  }
+
+  if (raw === RESET_SGR || raw === '\x1b[m') {
+    state.sgr = [];
+    return;
+  }
+
+  state.sgr.push(raw);
+}
+
+function buildStyledInlinePrefix(state: StyledInlineState): string {
+  return `${state.osc8 ?? ''}${state.sgr.join('')}`;
+}
+
+function buildStyledInlineSuffix(state: StyledInlineState): string {
+  let suffix = '';
+  if (state.osc8 != null) suffix += OSC8_CLOSE;
+  if (state.sgr.length > 0) suffix += RESET_SGR;
+  return suffix;
 }

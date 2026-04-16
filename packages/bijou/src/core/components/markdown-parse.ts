@@ -137,7 +137,7 @@ export function parseBlocks(source: string): BlockType[] {
     // Paragraph: collect consecutive non-special lines
     let text = line;
     i++;
-    while (i < lines.length && lines[i]!.trim() !== '' && !isBlockStart(lines[i]!)) {
+    while (i < lines.length && lines[i]!.trim() !== '' && !isBlockStart(lines[i]!, lines[i + 1])) {
       text += ' ' + lines[i]!;
       i++;
     }
@@ -155,14 +155,20 @@ export function parseBlocks(source: string): BlockType[] {
  * @param line - The line to test.
  * @returns `true` if the line starts a code fence, heading, HR, blockquote, or list.
  */
-function isBlockStart(line: string): boolean {
+function isBlockStart(line: string, nextLine?: string): boolean {
   if (line.trimStart().startsWith('```')) return true;
   if (/^(#{1,4})\s+/.test(line)) return true;
   if (/^([-*_]\s*){3,}$/.test(line.trim())) return true;
   if (line.trimStart().startsWith('>')) return true;
   if (/^\s*[-*]\s+/.test(line)) return true;
   if (/^\s*\d+\.\s+/.test(line)) return true;
+  if (isTableStart(line, nextLine)) return true;
   return false;
+}
+
+function isTableStart(line: string, nextLine?: string): boolean {
+  const headerCells = parseTableRow(line);
+  return Boolean(headerCells && nextLine && isTableSeparatorRow(nextLine, headerCells.length));
 }
 
 function parseTableRow(line: string): string[] | null {

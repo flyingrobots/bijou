@@ -107,14 +107,23 @@ function marqueeToWidth(
   const stepMs = Math.max(1, Math.floor(options.stepMs ?? 220));
   const startPauseSteps = Math.max(1, Math.round(Math.max(0, options.startDelayMs ?? 700) / stepMs));
   const endPauseSteps = Math.max(1, Math.round(Math.max(0, options.endDelayMs ?? 900) / stepMs));
-  const positions = [
-    ...Array.from({ length: startPauseSteps }, () => 0),
-    ...Array.from({ length: overflow }, (_value, index) => index + 1),
-    ...Array.from({ length: endPauseSteps }, () => overflow),
-    ...Array.from({ length: Math.max(0, overflow - 1) }, (_value, index) => overflow - 1 - index),
-  ];
-  const stepIndex = Math.floor(Math.max(0, options.elapsedMs) / stepMs) % positions.length;
-  const offset = positions[stepIndex] ?? 0;
+  const forwardSteps = overflow;
+  const reverseSteps = Math.max(0, overflow - 1);
+  const cycleLength = startPauseSteps + forwardSteps + endPauseSteps + reverseSteps;
+  const stepIndex = Math.floor(Math.max(0, options.elapsedMs) / stepMs) % cycleLength;
+
+  let offset = 0;
+  if (stepIndex < startPauseSteps) {
+    offset = 0;
+  } else if (stepIndex < startPauseSteps + forwardSteps) {
+    offset = stepIndex - startPauseSteps + 1;
+  } else if (stepIndex < startPauseSteps + forwardSteps + endPauseSteps) {
+    offset = overflow;
+  } else {
+    const reverseIndex = stepIndex - startPauseSteps - forwardSteps - endPauseSteps;
+    offset = overflow - 1 - reverseIndex;
+  }
+
   return sliceAnsi(line, offset, offset + width);
 }
 

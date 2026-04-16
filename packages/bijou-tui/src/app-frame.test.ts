@@ -354,6 +354,26 @@ describe('createFramedApp', () => {
     expect(ctx.io.written).toContain(ENABLE_MOUSE);
   });
 
+  it('rejects concurrent hosted runs on the same framed app instance', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [
+      { at: 20, key: '\x03' },
+      { at: 30, key: '\x03' },
+    ]);
+
+    const firstRun = app.run({ ctx });
+    await expect(app.run({ ctx })).rejects.toThrow(
+      'createFramedApp: concurrent app.run() calls on the same framed app are not supported',
+    );
+
+    await clock.advanceByAsync(80);
+    await firstRun;
+  });
+
   it('feeds frame timing and budget telemetry back into shell-owned view state when using runFramedApp()', async () => {
     const { clock, ctx } = createInteractiveContext();
     scheduleKeys(ctx, clock, [

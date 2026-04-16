@@ -35,6 +35,24 @@ export interface TableOptions extends BijouNodeOptions {
   ctx?: BijouContext;
 }
 
+/**
+ * Structural width added by the interactive table frame for a given column count.
+ *
+ * Each column contributes two padding spaces and one vertical divider, with one
+ * extra border character for the outer edge.
+ */
+export function interactiveTableBorderOverhead(columnCount: number): number {
+  return Math.max(0, columnCount) * 3 + 1;
+}
+
+/**
+ * Total rendered width of an interactive table for the supplied column widths.
+ */
+export function measureInteractiveTableWidth(columnWidths: readonly number[]): number {
+  return columnWidths.reduce((total, width) => total + width, 0)
+    + interactiveTableBorderOverhead(columnWidths.length);
+}
+
 function isTableOptions(value: TableOptions | readonly TableColumn[]): value is TableOptions {
   return !Array.isArray(value);
 }

@@ -2514,7 +2514,12 @@ export function createFramedApp<PageModel, Msg>(
   };
 
   const framedApp = app as unknown as FramedApp<PageModel, Msg>;
+  let hostedRunActive = false;
   framedApp.run = async (runOptions?: FramedAppRunOptions<Msg>) => {
+    if (hostedRunActive) {
+      throw new Error('createFramedApp: concurrent app.run() calls on the same framed app are not supported');
+    }
+    hostedRunActive = true;
     const previousFrameCtx = frameCtx;
     const previousFrameCtxShellThemeId = frameCtxShellThemeId;
     const previousDefaultFrameCtx = defaultFrameCtx;
@@ -2554,6 +2559,7 @@ export function createFramedApp<PageModel, Msg>(
         },
       });
     } finally {
+      hostedRunActive = false;
       useRunScopedFrameCtx = false;
       frameCtx = previousFrameCtx;
       frameCtxShellThemeId = previousFrameCtxShellThemeId;
