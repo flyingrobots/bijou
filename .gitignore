@@ -12,6 +12,7 @@ Thumbs.db
 .vscode/
 .obsidian/
 .claude/
+.codex/
 *.sublime-workspace
 
 # MCP
