@@ -38,6 +38,20 @@ initializer. That means low-level `run(app)` flows can still resolve ambient
 `ctx` on first use, but `startApp()` remains the preferred first-app entrypoint
 because it makes host ownership explicit in the call site.
 
+## Programmatic Theme Selection
+
+If you already have a `Theme` object in code, the easiest path is:
+
+```typescript
+import { startApp } from '@flyingrobots/bijou-node';
+
+await startApp(app, { theme: MY_THEME });
+```
+
+That creates the hosted Node context with your theme and uses it for the run.
+If the app depends on ambient `ctx` resolution, the same themed host context is
+also registered as the default.
+
 ## Custom Context
 
 If you need more control, create the context without setting the global default:
@@ -50,6 +64,13 @@ const ctx = createNodeContext();
 
 // Pass explicitly to components
 console.log(box('hello', { ctx }));
+```
+
+To own the context explicitly while still selecting a custom theme:
+
+```typescript
+const ctx = createNodeContext({ theme: MY_THEME });
+await startApp(app, { ctx });
 ```
 
 ## Individual Adapters

@@ -6,7 +6,7 @@ import {
   _resetInitializedForTesting,
   _registerDefaultContextInitializerForTesting,
 } from './index.js';
-import { getDefaultContext, stringToSurface, type Surface } from '@flyingrobots/bijou';
+import { getDefaultContext, stringToSurface, type Surface, type Theme } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { createFramedApp, run } from '@flyingrobots/bijou-tui';
 
@@ -14,6 +14,62 @@ function textSurface(text: string): Surface {
   const lines = text.split('\n');
   return stringToSurface(text, Math.max(1, ...lines.map((line) => line.length)), Math.max(1, lines.length));
 }
+
+const TEST_THEME: Theme = {
+  name: 'test-theme',
+  status: {
+    success: { hex: '#22c55e' },
+    error: { hex: '#ef4444' },
+    warning: { hex: '#f59e0b' },
+    info: { hex: '#38bdf8' },
+    pending: { hex: '#64748b', modifiers: ['dim'] },
+    active: { hex: '#38bdf8' },
+    muted: { hex: '#64748b', modifiers: ['dim', 'strikethrough'] },
+  },
+  semantic: {
+    success: { hex: '#22c55e' },
+    error: { hex: '#ef4444' },
+    warning: { hex: '#f59e0b' },
+    info: { hex: '#38bdf8' },
+    accent: { hex: '#c084fc' },
+    muted: { hex: '#94a3b8', modifiers: ['dim'] },
+    primary: { hex: '#f8fafc', modifiers: ['bold'] },
+  },
+  gradient: {
+    brand: [
+      { pos: 0, color: [56, 189, 248] },
+      { pos: 1, color: [192, 132, 252] },
+    ],
+    progress: [
+      { pos: 0, color: [34, 197, 94] },
+      { pos: 1, color: [56, 189, 248] },
+    ],
+  },
+  border: {
+    primary: { hex: '#38bdf8' },
+    secondary: { hex: '#c084fc' },
+    success: { hex: '#22c55e' },
+    warning: { hex: '#f59e0b' },
+    error: { hex: '#ef4444' },
+    muted: { hex: '#64748b' },
+  },
+  ui: {
+    cursor: { hex: '#38bdf8' },
+    scrollThumb: { hex: '#38bdf8' },
+    scrollTrack: { hex: '#334155' },
+    sectionHeader: { hex: '#f8fafc', modifiers: ['bold'] },
+    logo: { hex: '#38bdf8' },
+    tableHeader: { hex: '#f8fafc' },
+    trackEmpty: { hex: '#1e293b' },
+  },
+  surface: {
+    primary: { hex: '#f8fafc', bg: '#0f172a' },
+    secondary: { hex: '#e2e8f0', bg: '#1e293b' },
+    elevated: { hex: '#f8fafc', bg: '#334155' },
+    overlay: { hex: '#f8fafc', bg: '#0f172a' },
+    muted: { hex: '#94a3b8', bg: '#020617' },
+  },
+};
 
 describe('createNodeContext()', () => {
   afterEach(() => {
@@ -51,6 +107,12 @@ describe('createNodeContext()', () => {
     const ctx = createNodeContext();
     expect(ctx.theme.noColor).toBe(true);
   });
+
+  it('uses an explicit theme override when provided', () => {
+    const ctx = createNodeContext({ theme: TEST_THEME });
+    expect(ctx.theme.theme.name).toBe('test-theme');
+    expect(ctx.theme.theme.surface.primary.bg).toBe('#0f172a');
+  });
 });
 
 describe('initDefaultContext()', () => {
@@ -85,6 +147,12 @@ describe('initDefaultContext()', () => {
     const second = initDefaultContext();
     expect(second).not.toBe(first);
     expect(getDefaultContext()).toBe(first);
+  });
+
+  it('registers an explicit theme override as the default on first call', () => {
+    const ctx = initDefaultContext({ theme: TEST_THEME });
+    expect(ctx.theme.theme.name).toBe('test-theme');
+    expect(getDefaultContext()).toBe(ctx);
   });
 });
 
@@ -170,5 +238,35 @@ describe('startApp()', () => {
 
     expect(runSpy).toHaveBeenCalledWith({ ctx });
     expect(ctx.io.written.some((chunk) => chunk.includes('framed through startApp'))).toBe(true);
+  });
+
+  it('creates and registers a themed default context when startApp() receives a theme override', async () => {
+    vi.stubEnv('TERM', 'dumb');
+    const spy = vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+
+    await startApp({
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('hello from themed startApp'),
+    }, { theme: TEST_THEME });
+
+    expect(getDefaultContext()?.theme.theme.name).toBe('test-theme');
+    expect(spy).toHaveBeenCalledWith('hello from themed startApp');
+    spy.mockRestore();
+  });
+
+  it('prefers an explicit ctx over a theme override when both are provided', async () => {
+    vi.stubEnv('TERM', 'dumb');
+    const explicitCtx = createTestContext({ mode: 'pipe', runtime: { columns: 40, rows: 10 } });
+    const writeSpy = vi.spyOn(explicitCtx.io, 'write');
+
+    await startApp({
+      init: () => [0, []],
+      update: (_msg, model) => [model, []],
+      view: () => textSurface('explicit ctx beats theme'),
+    }, { ctx: explicitCtx, theme: TEST_THEME });
+
+    expect(getDefaultContext()).not.toBe(explicitCtx);
+    expect(writeSpy).toHaveBeenCalledWith('explicit ctx beats theme');
   });
 });

@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext, Theme } from '@flyingrobots/bijou';
 import {
   createBijou,
   resolveSafeCtx,
@@ -45,8 +45,29 @@ export {
   type SurfaceGifOptions,
 } from './recorder.js';
 
-/** Options for {@link startApp}. Mirrors {@link RunOptions}. */
-export type StartAppOptions<M = any> = RunOptions<M>;
+/** Theme-selection options for Node-hosted context creation. */
+export interface NodeThemeOptions {
+  /**
+   * Explicit fallback theme object to use for this host context.
+   *
+   * This wins whenever the selected env var does not point at a known preset or
+   * a valid DTCG JSON file.
+   */
+  theme?: Theme;
+  /** Named preset themes available to env-var selection. */
+  presets?: Record<string, Theme>;
+  /** Environment variable name that selects a preset or JSON theme path. */
+  envVar?: string;
+}
+
+/** Options for {@link createNodeContext}. */
+export type CreateNodeContextOptions = NodeThemeOptions;
+
+/** Options for {@link initDefaultContext}. */
+export type InitDefaultContextOptions = NodeThemeOptions;
+
+/** Options for {@link startApp}. */
+export type StartAppOptions<M = any> = RunOptions<M> & NodeThemeOptions;
 
 interface SelfRunningApp<M = unknown> {
   run(options?: RunOptions<M>): Promise<void>;
@@ -71,7 +92,7 @@ export function _registerDefaultContextInitializerForTesting(): void {
  *
  * @returns A fresh {@link BijouContext} backed by the current Node.js process.
  */
-export function createNodeContext(): BijouContext {
+export function createNodeContext(options: CreateNodeContextOptions = {}): BijouContext {
   const runtime = nodeRuntime();
   const noColor = runtime.env('NO_COLOR') !== undefined;
   // Force level 3 (truecolor) if NO_COLOR is not set, 
@@ -80,6 +101,9 @@ export function createNodeContext(): BijouContext {
     runtime,
     io: nodeIO(),
     style: chalkStyle({ noColor, level: noColor ? 0 : 3 }),
+    theme: options.theme,
+    presets: options.presets,
+    envVar: options.envVar,
   });
 }
 
@@ -114,19 +138,23 @@ export function _resetInitializedForTesting(): void {
  * @returns The {@link BijouContext} created during initialization, or a
  *   fresh context on subsequent calls.
  */
-export function initDefaultContext(): BijouContext {
-  const existing = resolveSafeCtx();
-  if (!initialized && existing != null) {
-    initialized = true;
-    return existing;
+export function initDefaultContext(options: InitDefaultContextOptions = {}): BijouContext {
+  const hasExplicitThemeSelection =
+    options.theme !== undefined || options.presets !== undefined || options.envVar !== undefined;
+  if (!initialized && !hasExplicitThemeSelection) {
+    const existing = resolveSafeCtx();
+    if (existing != null) {
+      initialized = true;
+      return existing;
+    }
   }
   if (!initialized) {
-    const ctx = createNodeContext();
+    const ctx = createNodeContext(options);
     setDefaultContext(ctx);
     initialized = true;
     return ctx;
   }
-  return createNodeContext();
+  return createNodeContext(options);
 }
 
 /**
@@ -146,10 +174,20 @@ export async function startApp<Model, M>(
   app: App<Model, M>,
   options?: StartAppOptions<M>,
 ): Promise<void> {
-  const ctx = options?.ctx ?? initDefaultContext();
+  const { ctx: explicitCtx, theme, presets, envVar, ...runOptions } = options ?? {};
+  let ctx = explicitCtx;
+  if (!ctx) {
+    if (theme !== undefined || presets !== undefined || envVar !== undefined) {
+      ctx = createNodeContext({ theme, presets, envVar });
+      setDefaultContext(ctx);
+      initialized = true;
+    } else {
+      ctx = initDefaultContext();
+    }
+  }
   if (isSelfRunningApp(app)) {
-    await app.run({ ...options, ctx });
+    await app.run({ ...runOptions, ctx });
     return;
   }
-  await run(app, { ...options, ctx });
+  await run(app, { ...runOptions, ctx });
 }

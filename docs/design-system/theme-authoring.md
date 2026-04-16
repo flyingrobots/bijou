@@ -166,6 +166,29 @@ For Node-hosted apps, the fastest path is `BIJOU_THEME`:
 BIJOU_THEME=./themes/my-theme.json npm run dogfood
 ```
 
+## Applying a theme programmatically
+
+If you already have a `Theme` object in code, the easiest hosted path is:
+
+```typescript
+import { startApp } from '@flyingrobots/bijou-node';
+
+await startApp(app, { theme: MY_THEME });
+```
+
+That one call creates the Node host context with your theme and uses it for the
+run. If the app relies on ambient `ctx` resolution, that same themed context is
+also registered as the default for the hosted run.
+
+If you want explicit ownership of the context object first, use:
+
+```typescript
+import { createNodeContext } from '@flyingrobots/bijou-node';
+
+const ctx = createNodeContext({ theme: MY_THEME });
+await startApp(app, { ctx });
+```
+
 That same pattern works for any hosted app that goes through
 `@flyingrobots/bijou-node` theme resolution.
 

@@ -18,6 +18,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   committed pipeline timings back into `FrameModel.frameTimeMs`,
   `FrameModel.viewTimeMs`, `FrameModel.diffTimeMs`, and budget telemetry
   so shell-owned UI can read the frame's own bookkeeping.
+- **One-line programmatic custom-theme selection for Node hosts** —
+  `@flyingrobots/bijou-node` now accepts theme-selection options at the
+  host bootstrap layer. `createNodeContext({ theme })`,
+  `initDefaultContext({ theme })`, and `startApp(app, { theme })` now
+  let apps opt into a custom theme without dropping down to raw
+  `createBijou(...)` assembly.
 - **Root `npm run perf` entrypoint for the visual gradient demo** —
   the workspace now exposes the interactive `examples/perf-gradient`
   workload as `npm run perf`, so operators have a first-class root
