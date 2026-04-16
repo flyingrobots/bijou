@@ -1,22 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import chalk from 'chalk';
 import { chalkStyle } from './style.js';
 
-// Chalk may suppress color in non-TTY test environments.
-// We test behavior, not ANSI codes: colored mode should use chalk (may or may not emit ANSI),
-// noColor mode must return plain text.
-const chalkEmitsColor = chalk.hex('#ff0000')('x') !== 'x';
-
 describe('chalkStyle()', () => {
-  describe('with color', () => {
+  describe('ambient color mode', () => {
     const style = chalkStyle(false);
 
     it('styled() returns string containing the text', () => {
       expect(style.styled({ hex: '#ff0000' }, 'red')).toContain('red');
-    });
-
-    it.runIf(chalkEmitsColor)('styled() applies hex color when chalk supports it', () => {
-      expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(new RegExp('\\x1b\\['));
     });
 
     it('styled() applies bold modifier', () => {
@@ -40,45 +30,9 @@ describe('chalkStyle()', () => {
       expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toContain('uline');
     });
 
-    it.runIf(chalkEmitsColor)('styled() emits ANSI for underline modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toMatch(new RegExp('\\x1b\\['));
-    });
-
     it('styled() applies curly-underline via raw SGR 4:3', () => {
       const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'curly');
       expect(result).toContain('curly');
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits SGR 4:3 for curly-underline', () => {
-      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'curly');
-      expect(result).toContain('\x1b[4:3m');
-      expect(result).toContain('\x1b[24m');
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits SGR 4:4 for dotted-underline', () => {
-      const result = style.styled({ hex: '#ffffff', modifiers: ['dotted-underline'] }, 'dotted');
-      expect(result).toContain('\x1b[4:4m');
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits SGR 4:5 for dashed-underline', () => {
-      const result = style.styled({ hex: '#ffffff', modifiers: ['dashed-underline'] }, 'dashed');
-      expect(result).toContain('\x1b[4:5m');
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits ANSI for bold modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toMatch(new RegExp('\\x1b\\['));
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits ANSI for dim modifier', () => {
-      expect(style.styled({ hex: '#808080', modifiers: ['dim'] }, 'muted')).toMatch(new RegExp('\\x1b\\['));
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits ANSI for strikethrough modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['strikethrough'] }, 'gone')).toMatch(new RegExp('\\x1b\\['));
-    });
-
-    it.runIf(chalkEmitsColor)('styled() emits ANSI for inverse modifier', () => {
-      expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toMatch(new RegExp('\\x1b\\['));
     });
 
     it('rgb() returns string containing the text', () => {
@@ -97,21 +51,65 @@ describe('chalkStyle()', () => {
       expect(style.bgRgb(0, 0, 255, 'blue')).toContain('blue');
     });
 
-    it.runIf(chalkEmitsColor)('bgRgb() emits ANSI for background color', () => {
-      expect(style.bgRgb(0, 0, 255, 'blue')).toMatch(new RegExp('\\x1b\\['));
-    });
-
     it('bgHex() returns string containing the text', () => {
       expect(style.bgHex('#0000ff', 'blue')).toContain('blue');
     });
+  });
 
-    it.runIf(chalkEmitsColor)('bgHex() emits ANSI for background color', () => {
-      expect(style.bgHex('#0000ff', 'blue')).toMatch(new RegExp('\\x1b\\['));
+  describe('explicit level: 3 mode', () => {
+    const style = chalkStyle({ level: 3 });
+
+    it('styled() emits ANSI for hex color deterministically', () => {
+      expect(style.styled({ hex: '#ff0000' }, 'red')).toMatch(/\x1b\[/);
     });
 
-    it.runIf(chalkEmitsColor)('styled() applies bg field from token', () => {
+    it('styled() emits ANSI for underline modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['underline'] }, 'uline')).toMatch(/\x1b\[/);
+    });
+
+    it('styled() emits SGR 4:3 for curly-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['curly-underline'] }, 'curly');
+      expect(result).toContain('\x1b[4:3m');
+      expect(result).toContain('\x1b[24m');
+    });
+
+    it('styled() emits SGR 4:4 for dotted-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['dotted-underline'] }, 'dotted');
+      expect(result).toContain('\x1b[4:4m');
+    });
+
+    it('styled() emits SGR 4:5 for dashed-underline', () => {
+      const result = style.styled({ hex: '#ffffff', modifiers: ['dashed-underline'] }, 'dashed');
+      expect(result).toContain('\x1b[4:5m');
+    });
+
+    it('styled() emits ANSI for bold modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['bold'] }, 'text')).toMatch(/\x1b\[/);
+    });
+
+    it('styled() emits ANSI for dim modifier', () => {
+      expect(style.styled({ hex: '#808080', modifiers: ['dim'] }, 'muted')).toMatch(/\x1b\[/);
+    });
+
+    it('styled() emits ANSI for strikethrough modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['strikethrough'] }, 'gone')).toMatch(/\x1b\[/);
+    });
+
+    it('styled() emits ANSI for inverse modifier', () => {
+      expect(style.styled({ hex: '#ffffff', modifiers: ['inverse'] }, 'inv')).toMatch(/\x1b\[/);
+    });
+
+    it('bgRgb() emits ANSI for background color', () => {
+      expect(style.bgRgb(0, 0, 255, 'blue')).toMatch(/\x1b\[/);
+    });
+
+    it('bgHex() emits ANSI for background color', () => {
+      expect(style.bgHex('#0000ff', 'blue')).toMatch(/\x1b\[/);
+    });
+
+    it('styled() applies bg field from token', () => {
       const result = style.styled({ hex: '#ffffff', bg: '#0000ff' }, 'bg-test');
-      expect(result).toMatch(new RegExp('\\x1b\\['));
+      expect(result).toMatch(/\x1b\[/);
       expect(result).toContain('bg-test');
     });
   });
