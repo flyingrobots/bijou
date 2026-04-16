@@ -1,6 +1,6 @@
 import * as readline from 'readline';
-import { readFileSync, readdirSync } from 'fs';
-import { isAbsolute, join, relative, resolve } from 'path';
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'fs';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'path';
 import { resolveClock, type ClockPort, type IOPort, type RawInputHandle, type TimerHandle } from '@flyingrobots/bijou';
 
 /** Optional overrides for {@link nodeIO}. */
@@ -221,14 +221,36 @@ export function nodeIO(options: NodeIOOptions = {}): IOPort {
 export function scopedNodeIO(options: ScopedNodeIOOptions): ScopedNodeIO {
   const baseIO = options.baseIO ?? nodeIO({ clock: options.clock });
   const root = resolve(options.root);
+  const realRoot = realpathSync.native(root);
+
+  function assertWithinRoot(realCandidate: string, requestedPath: string): void {
+    const rel = relative(realRoot, realCandidate);
+    if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) {
+      return;
+    }
+    throw new ScopedNodeIOError(root, requestedPath);
+  }
 
   function resolvePathWithinRoot(requestedPath: string): string {
     const candidate = resolve(root, requestedPath);
-    const rel = relative(root, candidate);
-    if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) {
-      return candidate;
+    const suffix: string[] = [];
+    let existingPath = candidate;
+
+    while (!existsSync(existingPath)) {
+      const parent = dirname(existingPath);
+      if (parent === existingPath) {
+        throw new ScopedNodeIOError(root, requestedPath);
+      }
+      suffix.unshift(basename(existingPath));
+      existingPath = parent;
     }
-    throw new ScopedNodeIOError(root, requestedPath);
+
+    const realExistingPath = realpathSync.native(existingPath);
+    const realCandidate = suffix.length === 0
+      ? realExistingPath
+      : resolve(realExistingPath, ...suffix);
+    assertWithinRoot(realCandidate, requestedPath);
+    return realCandidate;
   }
 
   return {

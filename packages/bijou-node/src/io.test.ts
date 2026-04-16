@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { mockClock } from '@flyingrobots/bijou/adapters/test';
 import { nodeIO, scopedNodeIO, ScopedNodeIOError } from './io.js';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, symlinkSync, realpathSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -102,11 +102,16 @@ describe('nodeIO()', () => {
 
 describe('scopedNodeIO()', () => {
   let tempDir: string | undefined;
+  let tempOutsideDir: string | undefined;
 
   afterEach(() => {
     if (tempDir) {
       rmSync(tempDir, { recursive: true, force: true });
       tempDir = undefined;
+    }
+    if (tempOutsideDir) {
+      rmSync(tempOutsideDir, { recursive: true, force: true });
+      tempOutsideDir = undefined;
     }
   });
 
@@ -134,13 +139,17 @@ describe('scopedNodeIO()', () => {
   it('returns rooted paths from joinPath()', () => {
     tempDir = mkdtempSync(join(tmpdir(), 'bijou-scoped-'));
     const io = scopedNodeIO({ root: tempDir });
-    expect(io.joinPath('docs', 'readme.txt')).toBe(join(tempDir, 'docs', 'readme.txt'));
+    expect(io.joinPath('docs', 'readme.txt')).toBe(
+      join(realpathSync.native(tempDir), 'docs', 'readme.txt'),
+    );
   });
 
   it('resolves write destinations inside the root', () => {
     tempDir = mkdtempSync(join(tmpdir(), 'bijou-scoped-'));
     const io = scopedNodeIO({ root: tempDir });
-    expect(io.resolvePath('captures/frame.gif')).toBe(join(tempDir, 'captures', 'frame.gif'));
+    expect(io.resolvePath('captures/frame.gif')).toBe(
+      join(realpathSync.native(tempDir), 'captures', 'frame.gif'),
+    );
   });
 
   it('rejects relative traversal outside the root', () => {
@@ -159,6 +168,26 @@ describe('scopedNodeIO()', () => {
     const io = scopedNodeIO({ root: tempDir });
     expect(() => io.readFile(outside)).toThrow(ScopedNodeIOError);
     expect(() => io.readDir(tmpdir())).toThrow(ScopedNodeIOError);
+  });
+
+  it('rejects symlinked files that resolve outside the root', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-scoped-'));
+    tempOutsideDir = mkdtempSync(join(tmpdir(), 'bijou-outside-'));
+    writeFileSync(join(tempOutsideDir, 'secret.txt'), 'outside root');
+    symlinkSync(join(tempOutsideDir, 'secret.txt'), join(tempDir, 'secret-link.txt'));
+
+    const io = scopedNodeIO({ root: tempDir });
+    expect(() => io.readFile('secret-link.txt')).toThrow(ScopedNodeIOError);
+  });
+
+  it('rejects write destinations that traverse symlinked directories outside the root', () => {
+    tempDir = mkdtempSync(join(tmpdir(), 'bijou-scoped-'));
+    tempOutsideDir = mkdtempSync(join(tmpdir(), 'bijou-outside-'));
+    symlinkSync(tempOutsideDir, join(tempDir, 'escape-dir'));
+
+    const io = scopedNodeIO({ root: tempDir });
+    expect(() => io.resolvePath('escape-dir/capture.txt')).toThrow(ScopedNodeIOError);
+    expect(() => io.joinPath('escape-dir', 'capture.txt')).toThrow(ScopedNodeIOError);
   });
 
   it('passes through terminal writes from the base adapter', () => {
