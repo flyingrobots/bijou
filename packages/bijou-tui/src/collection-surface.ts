@@ -7,7 +7,7 @@ import {
   type CellMask,
   type Surface,
 } from '@flyingrobots/bijou';
-import { clipToWidth } from './viewport.js';
+import { clipToWidth, sliceAnsi, visibleLength } from './viewport.js';
 
 const PRESERVE_BG_MASK: CellMask = {
   ...FULL_MASK,
@@ -33,6 +33,7 @@ export function collectionRowsSurface(
   options: {
     readonly width: number;
     readonly selectedRowIndex?: number;
+    readonly selectedRowOverflow?: SelectedRowOverflow;
     readonly ctx?: BijouContext;
   },
 ): Surface {
@@ -44,12 +45,14 @@ export function collectionRowsSurface(
   const surface = createSurface(safeWidth, height, { char: ' ', empty: false });
 
   for (let row = 0; row < lines.length; row++) {
-    const selected = row === options.selectedRowIndex && selectedBg != null;
-    if (selected) {
+    const selected = row === options.selectedRowIndex;
+    const paintSelectedBg = selected && selectedBg != null;
+    if (paintSelectedBg) {
       surface.fill({ char: ' ', bg: selectedBg, empty: false }, 0, row, safeWidth, 1);
     }
 
-    const lineSurface = parseAnsiToSurface(clipToWidth(lines[row]!, innerWidth), innerWidth, 1);
+    const lineText = resolveRowText(lines[row]!, innerWidth, selected, options.selectedRowOverflow);
+    const lineSurface = parseAnsiToSurface(lineText, innerWidth, 1);
     surface.blit(
       lineSurface,
       startCol,
@@ -58,11 +61,61 @@ export function collectionRowsSurface(
       0,
       innerWidth,
       1,
-      selected ? PRESERVE_BG_MASK : FULL_MASK,
+      paintSelectedBg ? PRESERVE_BG_MASK : FULL_MASK,
     );
   }
 
   return surface;
+}
+
+export type SelectedRowOverflow =
+  | 'clip'
+  | {
+    readonly mode: 'marquee';
+    readonly elapsedMs: number;
+    readonly stepMs?: number;
+    readonly startDelayMs?: number;
+    readonly endDelayMs?: number;
+  };
+
+function resolveRowText(
+  line: string,
+  innerWidth: number,
+  selected: boolean,
+  overflow: SelectedRowOverflow | undefined,
+): string {
+  if (!selected || overflow == null || overflow === 'clip') {
+    return clipToWidth(line, innerWidth);
+  }
+  if (overflow.mode !== 'marquee') {
+    return clipToWidth(line, innerWidth);
+  }
+  return marqueeToWidth(line, innerWidth, overflow);
+}
+
+function marqueeToWidth(
+  line: string,
+  width: number,
+  options: Exclude<SelectedRowOverflow, 'clip'>,
+): string {
+  if (width <= 0) return '';
+
+  const lineWidth = visibleLength(line);
+  if (lineWidth <= width) return clipToWidth(line, width);
+
+  const overflow = lineWidth - width;
+  const stepMs = Math.max(1, Math.floor(options.stepMs ?? 220));
+  const startPauseSteps = Math.max(1, Math.round(Math.max(0, options.startDelayMs ?? 700) / stepMs));
+  const endPauseSteps = Math.max(1, Math.round(Math.max(0, options.endDelayMs ?? 900) / stepMs));
+  const positions = [
+    ...Array.from({ length: startPauseSteps }, () => 0),
+    ...Array.from({ length: overflow }, (_value, index) => index + 1),
+    ...Array.from({ length: endPauseSteps }, () => overflow),
+    ...Array.from({ length: Math.max(0, overflow - 1) }, (_value, index) => overflow - 1 - index),
+  ];
+  const stepIndex = Math.floor(Math.max(0, options.elapsedMs) / stepMs) % positions.length;
+  const offset = positions[stepIndex] ?? 0;
+  return sliceAnsi(line, offset, offset + width);
 }
 
 function resolveSelectedRowBg(ctx: BijouContext | undefined): string | undefined {

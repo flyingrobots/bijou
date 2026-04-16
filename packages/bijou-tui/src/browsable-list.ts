@@ -24,7 +24,7 @@
 import { createSurface, sanitizePositiveInt, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { createKeyMap, type KeyMap } from './keybindings.js';
 import { viewportSurface, visibleLength } from './viewport.js';
-import { collectionRowsSurface } from './collection-surface.js';
+import { collectionRowsSurface, type SelectedRowOverflow } from './collection-surface.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -78,6 +78,8 @@ export interface BrowsableListRenderOptions {
   readonly focusIndicator?: string;
   /** Bijou context for theming and styling. */
   readonly ctx?: BijouContext;
+  /** Optional row formatter for custom list chrome. */
+  readonly renderItem?: BrowsableListItemRenderer<any>;
 }
 
 /** Options for rendering the browsable list into a `Surface`. */
@@ -86,7 +88,18 @@ export interface BrowsableListSurfaceOptions extends BrowsableListRenderOptions 
   readonly width?: number;
   /** Show a scrollbar track on the right edge. Default: false. */
   readonly showScrollbar?: boolean;
+  /** Overflow behavior for the focused row. Defaults to `clip`. */
+  readonly focusedRowOverflow?: SelectedRowOverflow;
 }
+
+export interface BrowsableListRenderItemState<T> {
+  readonly item: BrowsableListItem<T>;
+  readonly index: number;
+  readonly focused: boolean;
+  readonly ctx?: BijouContext;
+}
+
+export type BrowsableListItemRenderer<T> = (state: BrowsableListRenderItemState<T>) => string;
 
 // ---------------------------------------------------------------------------
 // State creation
@@ -195,9 +208,18 @@ function renderBrowsableListLines<T>(
   state: BrowsableListState<T>,
   indicator: string,
   ctx?: BijouContext,
+  renderItem?: BrowsableListItemRenderer<T>,
 ): string[] {
   const pad = ' '.repeat(indicator.length);
   return state.items.map((item, index) => {
+    if (renderItem) {
+      return renderItem({
+        item,
+        index,
+        focused: index === state.focusIndex,
+        ctx,
+      });
+    }
     const prefix = index === state.focusIndex ? indicator : pad;
     const desc = item.description == null
       ? ''
@@ -230,7 +252,7 @@ export function browsableList<T>(
   if (state.items.length === 0) return '';
 
   const indicator = options?.focusIndicator ?? '\u25b8';
-  return renderBrowsableListLines(state, indicator, options?.ctx)
+  return renderBrowsableListLines(state, indicator, options?.ctx, options?.renderItem)
     .slice(state.scrollY, state.scrollY + state.height)
     .join('\n');
 }
@@ -251,12 +273,15 @@ export function browsableListSurface<T>(
   options?: BrowsableListSurfaceOptions,
 ): Surface {
   const indicator = options?.focusIndicator ?? '\u25b8';
-  const lines = renderBrowsableListLines(state, indicator, options?.ctx);
-  const width = Math.max(
-    1,
-    options?.width ?? 0,
-    ...lines.map((line) => visibleLength(line)),
+  const lines = renderBrowsableListLines(
+    state,
+    indicator,
+    options?.ctx,
+    options?.renderItem as BrowsableListItemRenderer<T> | undefined,
   );
+  const width = options?.width != null
+    ? Math.max(1, sanitizePositiveInt(options.width, 1))
+    : Math.max(1, ...lines.map((line) => visibleLength(line)));
 
   if (lines.length === 0) {
     return createSurface(width, Math.max(1, state.height));
@@ -265,6 +290,7 @@ export function browsableListSurface<T>(
   const content = collectionRowsSurface(lines, {
     width,
     selectedRowIndex: state.focusIndex,
+    selectedRowOverflow: options?.focusedRowOverflow,
     ctx: options?.ctx,
   });
 

@@ -47,6 +47,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   into DOGFOOD and other prose surfaces. Interactive/static output now
   shows boxed tables, pipe mode lowers to TSV, and accessible mode
   linearizes rows as labeled key-value pairs.
+- **Focused browsable rows can marquee overflowing labels** — the shared
+  browsable-list surface now supports a deterministic marquee mode for
+  the highlighted row, and DOGFOOD uses it in the left navigation lanes
+  so long focused guide and family labels can be read without losing the
+  fixed pane width or scrollbar chrome.
 
 ## [4.4.1] - 2026-04-11
 

@@ -196,6 +196,47 @@ describe('browsableList', () => {
       expect(rendered).toContain('Banana');
       expect(rendered).toContain('Cherry');
     });
+
+    it('supports custom item rendering in the surface path', () => {
+      const state = createBrowsableListState({ items: [{ label: 'ignored', value: 'x' }], height: 1 });
+      const rendered = surfaceToString(
+        browsableListSurface(state, {
+          width: 20,
+          renderItem: ({ item, focused }) => focused ? `> ${item.value}` : String(item.value),
+        }),
+        ctx.style,
+      );
+
+      expect(rendered).toContain('> x');
+      expect(rendered).not.toContain('ignored');
+    });
+
+    it('marquees the focused row when it overflows the available width', () => {
+      const state = createBrowsableListState({
+        items: [{ label: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', value: 'alpha' }],
+        height: 1,
+      });
+      const initial = surfaceToString(
+        browsableListSurface(state, {
+          width: 12,
+          renderItem: ({ item }) => item.label,
+          focusedRowOverflow: { mode: 'marquee', elapsedMs: 0, stepMs: 200, startDelayMs: 0, endDelayMs: 0 },
+        }),
+        ctx.style,
+      );
+      const shifted = surfaceToString(
+        browsableListSurface(state, {
+          width: 12,
+          renderItem: ({ item }) => item.label,
+          focusedRowOverflow: { mode: 'marquee', elapsedMs: 1200, stepMs: 200, startDelayMs: 0, endDelayMs: 0 },
+        }),
+        ctx.style,
+      );
+
+      expect(initial).toContain('ABCDEFGHIJ');
+      expect(shifted).toContain('GHIJKLMNOP');
+      expect(shifted).not.toBe(initial);
+    });
   });
 
   describe('keymap', () => {
