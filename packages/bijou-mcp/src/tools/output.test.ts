@@ -94,6 +94,24 @@ describe('MCP structured output modes', () => {
     expect(result.structuredContent).not.toHaveProperty('rendered');
   });
 
+  it('bijou_dag accepts compact node and edge style options', async () => {
+    const result = await dagTool.handler({
+      nodes: [
+        { id: 'a', label: 'A', edges: ['b', 'c'] },
+        { id: 'b', label: 'B', compactShape: 'round' },
+        { id: 'c', label: 'C', compactShape: 'angle' },
+      ],
+      nodeStyle: 'compact',
+      nodeWidth: 3,
+      edgeStyle: 'double',
+    });
+
+    expect(result.content[0]?.text).toContain('[A]');
+    expect(result.content[0]?.text).toContain('(B)');
+    expect(result.content[0]?.text).toContain('<C>');
+    expect(result.content[0]?.text).toContain('╩');
+  });
+
   it('bijou_docs supports both text and structured payloads', async () => {
     const docsTool = createDocsTool(ALL_TOOLS);
     const result = await docsTool.handler({ query: 'dag', output: 'both' });

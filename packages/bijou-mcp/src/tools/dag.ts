@@ -10,7 +10,14 @@ const inputShape = {
     label: z.string().describe('Display text for the node.'),
     edges: z.array(z.string()).optional().describe('IDs of child nodes this node connects to.'),
     badge: z.string().optional().describe('Short annotation (e.g. status or count).'),
+    compactShape: z.enum(['square', 'round', 'angle', 'brace', 'plain']).optional()
+      .describe('Compact wrapper used when nodeStyle="compact".'),
   })).describe('Array of DAG nodes with edges.'),
+  nodeWidth: z.number().optional().describe('Fixed node width override for the rendered graph.'),
+  nodeStyle: z.enum(['box', 'compact']).optional()
+    .describe('Node renderer family. Use "compact" for one-line nodes in narrow layouts.'),
+  edgeStyle: z.enum(['single', 'heavy', 'double', 'dashed']).optional()
+    .describe('Edge glyph family used for routed connectors.'),
   maxWidth: z.number().optional().describe('Maximum render width (default 80).'),
   terminalWidth: z.number().optional().describe('Terminal width override (default 80).'),
 };
@@ -25,7 +32,13 @@ export const dagTool: ToolRegistration = withStructuredToolOutput({
     const input = inputSchema.parse(args);
     const tw = input.terminalWidth ?? input.maxWidth ?? 80;
     const ctx = mcpContext(tw);
-    const result = dag(input.nodes, { maxWidth: input.maxWidth, ctx });
+    const result = dag(input.nodes, {
+      nodeWidth: input.nodeWidth,
+      nodeStyle: input.nodeStyle,
+      edgeStyle: input.edgeStyle,
+      maxWidth: input.maxWidth,
+      ctx,
+    });
     return { content: [{ type: 'text', text: result }] };
   },
 });

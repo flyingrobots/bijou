@@ -72,3 +72,9 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
   - [RE-006 — Formalize Component Layout and Interaction Contracts](../design/RE-006-formalize-component-layout-and-interaction-contracts.md)
 - cool ideas:
   - [RE-021 — Frame Owns the Pump](../method/backlog/cool-ideas/RE-021-frame-owns-the-pump.md)
+  - [RE-024 — Surface Budget Warnings](../method/backlog/cool-ideas/RE-024-surface-budget-warnings.md)
+  - [RE-025 — DAG Path Emphasis](../method/backlog/cool-ideas/RE-025-dag-path-emphasis.md)
+  - [RE-026 — DAG Edge Labels](../method/backlog/cool-ideas/RE-026-dag-edge-labels.md)
+  - [RE-027 — DAG Compact Legend Mode](../method/backlog/cool-ideas/RE-027-dag-compact-legend-mode.md)
+  - [RE-028 — DAG Edge Semantics and Metadata](../method/backlog/cool-ideas/RE-028-dag-edge-semantics-and-metadata.md)
+  - [RE-029 — DAG Adaptive Density and Lowering](../method/backlog/cool-ideas/RE-029-dag-adaptive-density-and-lowering.md)

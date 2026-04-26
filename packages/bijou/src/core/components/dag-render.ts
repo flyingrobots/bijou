@@ -10,9 +10,9 @@
 
 import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
-import type { DagNode, DagOptions, DagNodePosition } from './dag.js';
+import type { DagCompactShape, DagEdgeStyle, DagNode, DagNodePosition, DagNodeStyle, DagOptions } from './dag.js';
 import { assignLayers, buildLayerArrays, orderColumns } from './dag-layout.js';
-import { buildEdgeRoute, createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
+import { arrowChar, buildEdgeRoute, createGrid, markEdge, junctionChar, encodeArrowPos } from './dag-edges.js';
 import type { GridState } from './dag-edges.js';
 import { graphemeWidth, segmentGraphemes, stripAnsi } from '../text/grapheme.js';
 import { sanitizeOptionalPositiveInt, sanitizePositiveInt } from '../numeric.js';
@@ -56,6 +56,134 @@ function truncateLabel(text: string, maxLen: number): string {
   return result + '\u2026';
 }
 
+/**
+ * Choose the horizontal gap between DAG columns for a given node width.
+ *
+ * Narrow node boxes benefit from tighter sibling spacing; wide boxes need
+ * more separation so routed edges remain readable.
+ */
+function preferredColumnGap(nodeWidth: number): number {
+  if (nodeWidth <= 5) return 1;
+  if (nodeWidth <= 9) return 2;
+  if (nodeWidth <= 13) return 3;
+  return 4;
+}
+
+function nodeHeightForStyle(nodeStyle: DagNodeStyle): number {
+  return nodeStyle === 'compact' ? 1 : 3;
+}
+
+function rowStrideForStyle(nodeStyle: DagNodeStyle): number {
+  return nodeStyle === 'compact' ? 4 : 6;
+}
+
+function minimumRenderableNodeWidth(nodeStyle: DagNodeStyle): number {
+  return nodeStyle === 'compact' ? 3 : 5;
+}
+
+function autoWidthFloor(nodeStyle: DagNodeStyle): number {
+  return nodeStyle === 'compact' ? 3 : 16;
+}
+
+function minimumCanvasWidthForDetours(
+  nodes: readonly DagNode[],
+  layerMap: ReadonlyMap<string, number>,
+  colIndex: ReadonlyMap<string, number>,
+  layerWidths: readonly number[],
+  nodeWidth: number,
+): number {
+  const detourOffset = Math.floor(nodeWidth / 2) + 1;
+  let requiredWidth = 0;
+
+  for (const node of nodes) {
+    const fromLayer = layerMap.get(node.id);
+    const fromCol = colIndex.get(node.id);
+    if (fromLayer === undefined || fromCol === undefined) continue;
+    for (const childId of node.edges ?? []) {
+      const toLayer = layerMap.get(childId);
+      const toCol = colIndex.get(childId);
+      if (toLayer === undefined || toCol === undefined) continue;
+      if (fromCol !== toCol || toLayer - fromLayer <= 1) continue;
+      requiredWidth = Math.max(
+        requiredWidth,
+        (layerWidths[fromLayer] ?? 0) + detourOffset * 2,
+        (layerWidths[toLayer] ?? 0) + detourOffset * 2,
+      );
+    }
+  }
+
+  return requiredWidth;
+}
+
+function compactDelimiters(shape: DagCompactShape): { open: string; close: string } {
+  switch (shape) {
+    case 'round': return { open: '(', close: ')' };
+    case 'angle': return { open: '<', close: '>' };
+    case 'brace': return { open: '{', close: '}' };
+    case 'plain': return { open: '', close: '' };
+    case 'square':
+    default:
+      return { open: '[', close: ']' };
+  }
+}
+
+function combinedLabel(label: string, badgeText?: string): string {
+  return badgeText ? `${label} ${badgeText}` : label;
+}
+
+function withBackground(token: TokenValue, bgToken?: TokenValue): TokenValue {
+  if (!bgToken?.bg) return token;
+  return {
+    ...token,
+    bg: bgToken.bg,
+    bgRGB: bgToken.bgRGB ?? token.bgRGB,
+  };
+}
+
+function buildCenteredRun(
+  label: string,
+  width: number,
+  labelType: CharType,
+): { content: string; types: CharType[] } {
+  const text = truncateLabel(label, width);
+  const remaining = Math.max(0, width - visibleLength(text));
+  const left = Math.floor(remaining / 2);
+  const right = remaining - left;
+  const content = ' '.repeat(left) + text + ' '.repeat(right);
+  const types: CharType[] = [];
+  for (let i = 0; i < left; i++) types.push('pad');
+  for (let i = 0; i < segmentGraphemes(text).length; i++) types.push(labelType);
+  for (let i = 0; i < right; i++) types.push('pad');
+  return { content, types };
+}
+
+function buildCenteredLabelAndBadge(
+  label: string,
+  badgeText: string | undefined,
+  width: number,
+): { content: string; types: CharType[] } {
+  if (!badgeText) return buildCenteredRun(label, width, 'label');
+
+  const maxLabelWidth = Math.max(1, width - visibleLength(badgeText) - 1);
+  const truncatedLabel = truncateLabel(label, maxLabelWidth);
+  const combined = `${truncatedLabel} ${badgeText}`;
+  const remaining = Math.max(0, width - visibleLength(combined));
+  const left = Math.floor(remaining / 2);
+  const right = remaining - left;
+
+  const types: CharType[] = [];
+  for (let i = 0; i < left; i++) types.push('pad');
+  for (let i = 0; i < segmentGraphemes(truncatedLabel).length; i++) types.push('label');
+  types.push('pad');
+  for (let i = 0; i < segmentGraphemes(badgeText).length; i++) types.push('badge');
+  for (let i = 0; i < right; i++) types.push('pad');
+
+  return {
+    content: ' '.repeat(left) + combined + ' '.repeat(right),
+    types,
+  };
+}
+
 // ── Node Box Rendering ─────────────────────────────────────────────
 
 /** Classification of a character within a rendered node box, used for per-character styling. */
@@ -68,10 +196,14 @@ type CharType = 'border' | 'label' | 'badge' | 'pad';
  * type classifications for applying differential style tokens.
  */
 interface NodeBoxResult {
-  /** The three rendered lines: top border, content, bottom border. */
+  /** The rendered lines for this node. */
   lines: string[];
   /** Per-character type classification for each line, aligned with `lines`. */
   charTypes: CharType[][];
+  /** Rendered node height in rows. */
+  height: number;
+  /** Rendered node width in columns. */
+  width: number;
 }
 
 /**
@@ -98,37 +230,12 @@ function renderNodeBox(
   const innerW = width - 2;
   const contentW = innerW - 2;
 
-  let content: string;
-  let midTypes: CharType[];
-  if (badgeText) {
-    const maxLabelW = contentW - visibleLength(badgeText) - 1;
-    const tLabel = truncateLabel(label, maxLabelW);
-    const gap = Math.max(1, contentW - visibleLength(tLabel) - visibleLength(badgeText));
-    content = tLabel + ' '.repeat(gap) + badgeText;
-
-    // Build char-type map for mid line: border + pad + label + gap + badge + pad + border
-    // Use segmentGraphemes for correct grapheme cluster counting.
-    midTypes = ['border']; // v
-    midTypes.push('pad');  // space
-    for (let i = 0; i < segmentGraphemes(tLabel).length; i++) midTypes.push('label');
-    for (let i = 0; i < gap; i++) midTypes.push('pad');
-    for (let i = 0; i < segmentGraphemes(badgeText).length; i++) midTypes.push('badge');
-  } else {
-    content = truncateLabel(label, contentW);
-
-    // Build char-type map for mid line: border + pad + label + pad + border
-    midTypes = ['border']; // v
-    midTypes.push('pad');  // space
-    for (let i = 0; i < segmentGraphemes(content).length; i++) midTypes.push('label');
-  }
-
-  const padRight = Math.max(0, contentW - visibleLength(content));
-  for (let i = 0; i < padRight; i++) midTypes.push('pad');
-  midTypes.push('pad');    // trailing space
-  midTypes.push('border'); // v
+  const centered = buildCenteredLabelAndBadge(label, badgeText, contentW);
+  const content = centered.content;
+  const midTypes: CharType[] = ['border', 'pad', ...centered.types, 'pad', 'border'];
 
   const top = '\u256d' + h.repeat(innerW) + '\u256e';
-  const mid = v + ' ' + content + ' '.repeat(padRight) + ' ' + v;
+  const mid = v + ' ' + content + ' ' + v;
   const bot = '\u2570' + h.repeat(innerW) + '\u256f';
 
   const borderLine: CharType[] = Array.from({ length: width }, () => 'border');
@@ -136,6 +243,30 @@ function renderNodeBox(
   return {
     lines: [top, mid, bot],
     charTypes: [borderLine, midTypes, borderLine],
+    height: 3,
+    width,
+  };
+}
+
+function renderCompactNode(
+  label: string,
+  badgeText: string | undefined,
+  width: number,
+  shape: DagCompactShape,
+): NodeBoxResult {
+  const { open, close } = compactDelimiters(shape);
+  const contentWidth = Math.max(1, width - visibleLength(open) - visibleLength(close));
+  const centered = buildCenteredLabelAndBadge(label, badgeText, contentWidth);
+  const line = open + centered.content + close;
+  const charTypes: CharType[] = [];
+  for (let i = 0; i < segmentGraphemes(open).length; i++) charTypes.push('border');
+  charTypes.push(...centered.types);
+  for (let i = 0; i < segmentGraphemes(close).length; i++) charTypes.push('border');
+  return {
+    lines: [line],
+    charTypes: [charTypes],
+    height: 1,
+    width,
   };
 }
 
@@ -191,9 +322,6 @@ export function renderInteractiveLayout(
 ): { output: string; nodes: Map<string, DagNodePosition>; width: number; height: number } {
   if (nodes.length === 0) return { output: '', nodes: new Map(), width: 0, height: 0 };
 
-  const nodeMap = new Map<string, DagNode>();
-  for (const n of nodes) nodeMap.set(n.id, n);
-
   const layerMap = assignLayers(nodes);
   const layers = buildLayerArrays(nodes, layerMap);
   orderColumns(layers, nodes);
@@ -205,37 +333,66 @@ export function renderInteractiveLayout(
     }
   }
 
+  const nodeStyle: DagNodeStyle = options.nodeStyle ?? 'box';
+  const edgeStyle: DagEdgeStyle = options.edgeStyle ?? 'single';
+  const nodeHeight = nodeHeightForStyle(nodeStyle);
+  const rowStride = rowStrideForStyle(nodeStyle);
+  const renderableMinWidth = minimumRenderableNodeWidth(nodeStyle);
+
   let maxNodesPerLayer = 1;
   for (const layer of layers) {
     if (layer.length > maxNodesPerLayer) maxNodesPerLayer = layer.length;
   }
   const maxWidth = sanitizePositiveInt(options.maxWidth, ctx.runtime.columns);
   const explicitNodeWidth = sanitizeOptionalPositiveInt(options.nodeWidth);
+  const maxCompactChrome = nodes.reduce((max, n) => {
+    const shape = n.compactShape ?? 'square';
+    const { open, close } = compactDelimiters(shape);
+    return Math.max(max, visibleLength(open) + visibleLength(close));
+  }, 2);
 
-  let nodeWidth = explicitNodeWidth ?? nodes.reduce(
-    (max, n) => Math.max(max, visibleLength(n.label) + (n.badge ? visibleLength(n.badge) + 2 : 0) + 4),
-    16,
+  let nodeWidth = Math.max(
+    explicitNodeWidth ?? nodes.reduce(
+      (max, n) => Math.max(
+        max,
+        visibleLength(combinedLabel(n.label, nodeStyle === 'compact' ? n.badge : undefined))
+          + (nodeStyle === 'compact' ? maxCompactChrome : (n.badge ? visibleLength(n.badge) + 4 : 4)),
+      ),
+      autoWidthFloor(nodeStyle),
+    ),
+    renderableMinWidth,
   );
 
-  let gap = 4;
+  let gap = preferredColumnGap(nodeWidth);
   let colStride = nodeWidth + gap;
-  let totalWidth = maxNodesPerLayer * colStride;
+  let totalWidth = maxNodesPerLayer * nodeWidth + Math.max(0, maxNodesPerLayer - 1) * gap;
 
   if (totalWidth > maxWidth && explicitNodeWidth == null) {
-    gap = 2;
+    gap = Math.min(gap, 2);
     colStride = nodeWidth + gap;
-    totalWidth = maxNodesPerLayer * colStride;
+    totalWidth = maxNodesPerLayer * nodeWidth + Math.max(0, maxNodesPerLayer - 1) * gap;
   }
   if (totalWidth > maxWidth && explicitNodeWidth == null) {
-    nodeWidth = Math.max(16, Math.floor((maxWidth - gap) / maxNodesPerLayer) - gap);
+    nodeWidth = Math.max(
+      autoWidthFloor(nodeStyle),
+      Math.floor((maxWidth - Math.max(0, maxNodesPerLayer - 1) * gap) / maxNodesPerLayer),
+    );
     colStride = nodeWidth + gap;
-    totalWidth = maxNodesPerLayer * colStride;
+    totalWidth = maxNodesPerLayer * nodeWidth + Math.max(0, maxNodesPerLayer - 1) * gap;
   }
 
-  const RS = 6;
-  const gridRows = layers.length * RS;
+  const layerWidths = layers.map((layer) => layer.length === 0
+    ? 0
+    : layer.length * nodeWidth + Math.max(0, layer.length - 1) * gap);
+  totalWidth = Math.max(
+    layerWidths.reduce((max, width) => Math.max(max, width), 0),
+    minimumCanvasWidthForDetours(nodes, layerMap, colIndex, layerWidths, nodeWidth),
+  );
+  const layerOffsets = layerWidths.map((width) => Math.max(0, Math.floor((totalWidth - width) / 2)));
+
+  const gridRows = layers.length * rowStride;
   const gridCols = totalWidth;
-  const colCenter = (c: number): number => c * colStride + Math.floor(nodeWidth / 2);
+  const colCenter = (layer: number, col: number): number => layerOffsets[layer]! + col * colStride + Math.floor(nodeWidth / 2);
 
   const g: GridState = createGrid(gridRows, gridCols);
 
@@ -248,7 +405,7 @@ export function renderInteractiveLayout(
       const tLayer = layerMap.get(childId);
       const tCol = colIndex.get(childId);
       if (tLayer === undefined || tCol === undefined) continue;
-      markEdge(g, fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth);
+      markEdge(g, fCol, fLayer, tCol, tLayer, rowStride, colCenter, nodeWidth, nodeHeight);
     }
   }
 
@@ -269,7 +426,13 @@ export function renderInteractiveLayout(
     /** Column-expanded type classifications per line. */
     charTypes: CharType[][];
     /** The resolved style token for this node. */
-    token: TokenValue;
+    borderToken: TokenValue;
+    /** Optional background token applied behind the node. */
+    padToken: TokenValue;
+    /** The resolved style token for the node label. */
+    labelToken: TokenValue;
+    /** The resolved style token for the node badge. */
+    badgeToken: TokenValue;
     /** Reference to the original DagNode. */
     node: DagNode;
   }
@@ -285,23 +448,34 @@ export function renderInteractiveLayout(
     const layer = layerMap.get(n.id);
     const col = colIndex.get(n.id);
     if (layer === undefined || col === undefined) continue;
-    const startCol = col * colStride;
-    const startRow = layer * RS;
+    const box = nodeStyle === 'compact'
+      ? renderCompactNode(
+        n.label,
+        n.badge,
+        nodeWidth,
+        n.compactShape ?? 'square',
+      )
+      : renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
+    const startCol = layerOffsets[layer]! + col * colStride;
+    const startRow = layer * rowStride;
 
-    positions.set(n.id, { row: startRow, col: startCol, width: nodeWidth, height: 3 });
+    positions.set(n.id, { row: startRow, col: startCol, width: box.width, height: box.height });
 
-    const box = renderNodeBox(n.label, n.badge, nodeWidth, n._ghost === true);
-
-    let nToken: TokenValue;
+    let baseBorderToken: TokenValue;
     if (options.selectedId === n.id) {
-      nToken = options.selectedToken ?? ctx.ui('cursor');
+      baseBorderToken = options.selectedToken ?? ctx.ui('cursor');
     } else if (highlightSet.has(n.id) && hlToken) {
-      nToken = hlToken;
+      baseBorderToken = hlToken;
     } else if (n.token) {
-      nToken = n.token;
+      baseBorderToken = n.token;
     } else {
-      nToken = options.nodeToken ?? ctx.border('primary');
+      baseBorderToken = options.nodeToken ?? ctx.border('primary');
     }
+    const bgToken = n.bgToken ?? options.nodeBgToken;
+    const borderToken = withBackground(baseBorderToken, bgToken);
+    const labelToken = withBackground(n.labelToken ?? baseBorderToken, bgToken);
+    const badgeToken = withBackground(n.badgeToken ?? (n.labelToken ?? baseBorderToken), bgToken);
+    const padToken = bgToken ?? borderToken;
 
     // Expand grapheme arrays to column-aligned arrays so cellAt can
     // index by column offset directly (handles CJK/wide characters).
@@ -316,13 +490,17 @@ export function renderInteractiveLayout(
     }
 
     const placed: PlacedNode = {
-      startRow, startCol, width: nodeWidth, box,
+      startRow, startCol, width: box.width, box,
       chars: expandedChars,
       charTypes: expandedTypes,
-      token: nToken, node: n,
+      borderToken,
+      padToken,
+      labelToken,
+      badgeToken,
+      node: n,
     };
 
-    for (let lineIdx = 0; lineIdx < 3; lineIdx++) {
+    for (let lineIdx = 0; lineIdx < box.height; lineIdx++) {
       const row = startRow + lineIdx;
       if (row >= gridRows) continue;
       let list = nodesByRow.get(row);
@@ -344,7 +522,7 @@ export function renderInteractiveLayout(
       const fCol = colIndex.get(fromId);
       const tCol = colIndex.get(toId);
       if (fLayer === undefined || tLayer === undefined || fCol === undefined || tCol === undefined) continue;
-      const route = buildEdgeRoute(fCol, fLayer, tCol, tLayer, RS, colCenter, nodeWidth, gridCols);
+      const route = buildEdgeRoute(fCol, fLayer, tCol, tLayer, rowStride, colCenter, nodeWidth, nodeHeight, gridCols);
       for (const point of route.path) {
         if (point.row >= 0 && point.row < gridRows && point.col >= 0 && point.col < gridCols) {
           hlCells.add(encodeArrowPos(point.row, point.col));
@@ -372,14 +550,13 @@ export function renderInteractiveLayout(
           const ci = col - p.startCol;
           const ch = p.chars[lineIdx]![ci] ?? ' ';
           const charType = p.charTypes[lineIdx]![ci];
-          let token: TokenValue;
-          if (charType === 'label' && p.node.labelToken) {
-            token = p.node.labelToken;
-          } else if (charType === 'badge' && p.node.badgeToken) {
-            token = p.node.badgeToken;
-          } else {
-            token = p.token;
-          }
+          const token = charType === 'label'
+            ? p.labelToken
+            : charType === 'badge'
+              ? p.badgeToken
+              : charType === 'border'
+                ? p.borderToken
+                : p.padToken;
           return { ch, token };
         }
       }
@@ -390,14 +567,14 @@ export function renderInteractiveLayout(
     const arrowCount = g.arrows.get(encoded) ?? 0;
     if (arrowCount > 0) {
       const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
-      return { ch: '\u25bc', token };
+      return { ch: arrowChar(edgeStyle), token };
     }
 
     // 3. Edge
     const dirs = g.dirs[row]?.[col];
     if (dirs && dirs.size > 0) {
       const token = hlCells.has(encoded) ? (hlToken ?? edgeToken) : edgeToken;
-      return { ch: junctionChar(dirs), token };
+      return { ch: junctionChar(dirs, edgeStyle), token };
     }
 
     // 4. Empty

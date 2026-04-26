@@ -9,6 +9,12 @@ import { renderByMode } from '../mode-render.js';
 
 // ── Types ──────────────────────────────────────────────────────────
 
+export type DagEdgeStyle = 'single' | 'heavy' | 'double' | 'dashed';
+
+export type DagNodeStyle = 'box' | 'compact';
+
+export type DagCompactShape = 'square' | 'round' | 'angle' | 'brace' | 'plain';
+
 /**
  * A single node in a directed graph rendered through the DAG component.
  *
@@ -25,8 +31,12 @@ export interface DagNode {
   edges?: readonly string[];
   /** Short annotation text displayed alongside the label (e.g., a status or count). */
   badge?: string;
+  /** Compact node wrapper used when `nodeStyle: 'compact'` is active. */
+  compactShape?: DagCompactShape;
   /** Color/style token applied to the node box border. */
   token?: TokenValue;
+  /** Background token applied behind the node border and content. */
+  bgToken?: TokenValue;
   /** Color/style token applied to the label text only. */
   labelToken?: TokenValue;
   /** Color/style token applied to the badge text only. */
@@ -46,8 +56,12 @@ export interface DagNode {
 export interface DagOptions {
   /** Default color/style token for all node box borders. */
   nodeToken?: TokenValue;
+  /** Default background token applied behind node borders and labels. */
+  nodeBgToken?: TokenValue;
   /** Color/style token for edge lines and arrowheads. */
   edgeToken?: TokenValue;
+  /** Glyph family used for edge lines and junctions. */
+  edgeStyle?: DagEdgeStyle;
   /** Ordered list of node IDs forming a path to highlight. */
   highlightPath?: string[];
   /** Color/style token applied to highlighted path edges and nodes. */
@@ -58,6 +72,8 @@ export interface DagOptions {
   selectedToken?: TokenValue;
   /** Fixed character width for every node box. Auto-calculated when omitted. */
   nodeWidth?: number;
+  /** Node renderer family. `'box'` is the default rich mode, `'compact'` is a one-line fallback. */
+  nodeStyle?: DagNodeStyle;
   /** Maximum total character width for the rendered graph. Defaults to terminal columns. */
   maxWidth?: number;
   /** Layout direction. Currently only `'down'` is implemented. */
