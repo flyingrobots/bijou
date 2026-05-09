@@ -68,6 +68,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `componentMetadataReportText()` so docs, DOGFOOD, MCP payloads, and agent
   workflows can share one validated component description with modes, args,
   variants, invariants, examples, source paths, and semantic facts.
+- **Story capture matrix for `bijou`** — `@flyingrobots/bijou` now exports
+  `captureStoryMatrix()` and `storyCaptureMatrixText()` so docs, tests,
+  DOGFOOD, and MCP tooling can render every profile/variant pair from one
+  story renderer, track missing required output modes, attach component
+  metadata, and print deterministic multi-mode captures.
 
 ### 🐛 Bug Fixes
 

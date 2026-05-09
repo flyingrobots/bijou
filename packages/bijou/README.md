@@ -92,6 +92,10 @@ fake duplication rather than a real second API.
   arg, variant, invariant, example, and source facts for tooling.
 - **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
   payloads, and agent-facing reports.
+- **`captureStoryMatrix()`**: Capture every profile/variant pair from a story
+  renderer.
+- **`storyCaptureMatrixText()`**: Render a deterministic multi-mode story
+  matrix for docs and tests.
 
 ## Documentation
 

@@ -253,6 +253,41 @@ drifts, and `componentMetadataReportText()` renders those issues for review.
 This is intentionally not a complete story schema; it is the shared contract
 that story surfaces can build on.
 
+### Story Capture Matrix
+
+Use `captureStoryMatrix()` when one story renderer needs to prove multiple
+profiles and variants together. The helper records string outputs for every
+profile/variant pair and can report required output modes that are missing from
+the profile set.
+
+```typescript
+import {
+  captureStoryMatrix,
+  storyCaptureMatrixText,
+} from '@flyingrobots/bijou';
+
+const matrix = captureStoryMatrix({
+  storyId: 'alert',
+  profiles: [
+    { id: 'rich', label: 'Rich', mode: 'interactive', width: 80 },
+    { id: 'pipe', label: 'Pipe', mode: 'pipe', width: 80 },
+  ],
+  variants: [
+    { id: 'warning', label: 'Warning' },
+  ],
+  requiredModes: ['interactive', 'static', 'pipe', 'accessible'],
+  render({ profile, variant }) {
+    return `${variant.label} rendered for ${profile.mode}`;
+  },
+});
+
+console.log(storyCaptureMatrixText(matrix));
+```
+
+This slice keeps rendering caller-owned. Surface-specific capture, test-context
+construction, and baseline file writing can wrap the matrix without changing
+the shared report format.
+
 ## Component Families Beyond The Fast Path
 
 The quick guide covers the most common choices. The families below are still

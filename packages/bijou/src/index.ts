@@ -113,6 +113,16 @@ export {
   type ComponentMetadataVariant,
 } from './core/component-metadata.js';
 export {
+  captureStoryMatrix,
+  storyCaptureMatrixText,
+  type StoryCapture,
+  type StoryCaptureMatrix,
+  type StoryCaptureMatrixOptions,
+  type StoryCaptureProfile,
+  type StoryCaptureRenderInput,
+  type StoryCaptureVariant,
+} from './core/story-capture.js';
+export {
   lintModeLowering,
   modeLoweringReportText,
   type ModeLoweringAssertionResult,
