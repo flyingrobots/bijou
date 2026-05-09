@@ -96,6 +96,10 @@ fake duplication rather than a real second API.
   renderer.
 - **`storyCaptureMatrixText()`**: Render a deterministic multi-mode story
   matrix for docs and tests.
+- **`createFixturePromotionRecord()`**: Preserve provenance when a fixture,
+  docs page, story, example, or MCP payload is promoted into another surface.
+- **`fixturePromotionText()`**: Render that promotion record for review and
+  agent output.
 
 ## Documentation
 

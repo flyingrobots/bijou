@@ -123,6 +123,16 @@ export {
   type StoryCaptureVariant,
 } from './core/story-capture.js';
 export {
+  createFixturePromotionRecord,
+  fixturePromotionText,
+  reverseFixturePromotionRecord,
+  type FixturePromotionArtifact,
+  type FixturePromotionArtifactKind,
+  type FixturePromotionRecord,
+  type FixturePromotionRecordOptions,
+  type ReverseFixturePromotionOptions,
+} from './core/fixture-promotion.js';
+export {
   lintModeLowering,
   modeLoweringReportText,
   type ModeLoweringAssertionResult,

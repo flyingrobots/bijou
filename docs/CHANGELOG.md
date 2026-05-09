@@ -73,6 +73,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   DOGFOOD, and MCP tooling can render every profile/variant pair from one
   story renderer, track missing required output modes, attach component
   metadata, and print deterministic multi-mode captures.
+- **Fixture-to-docs promotion records for `bijou`** — `@flyingrobots/bijou`
+  now exports `createFixturePromotionRecord()`,
+  `reverseFixturePromotionRecord()`, and `fixturePromotionText()` so fixtures,
+  docs, stories, examples, and MCP payloads can share deterministic provenance
+  with component metadata, story matrices, tags, and notes.
 
 ### 🐛 Bug Fixes
 

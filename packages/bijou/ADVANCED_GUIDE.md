@@ -288,6 +288,32 @@ This slice keeps rendering caller-owned. Surface-specific capture, test-context
 construction, and baseline file writing can wrap the matrix without changing
 the shared report format.
 
+### Fixture-To-Docs Promotion
+
+Use `createFixturePromotionRecord()` when an executable fixture, docs section,
+story, example, or MCP payload should point back to the surface it came from.
+The record is pure provenance; a later CLI can decide how to write files.
+
+```typescript
+import {
+  createFixturePromotionRecord,
+  fixturePromotionText,
+} from '@flyingrobots/bijou';
+
+const promotion = createFixturePromotionRecord({
+  id: 'alert-basic-docs',
+  from: { kind: 'fixture', path: 'packages/bijou/src/core/components/alert.test.ts' },
+  to: { kind: 'docs', path: 'packages/bijou/README.md#status-and-feedback' },
+  tags: ['docs', 'regression'],
+});
+
+console.log(fixturePromotionText(promotion));
+```
+
+`reverseFixturePromotionRecord()` swaps source and target while keeping metadata,
+story matrix, tags, and notes intact, which covers the docs-to-fixture direction
+without a second record type.
+
 ## Component Families Beyond The Fast Path
 
 The quick guide covers the most common choices. The families below are still
