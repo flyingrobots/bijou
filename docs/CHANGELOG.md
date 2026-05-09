@@ -6,6 +6,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### ✨ Features
+
+- **Raytrace shader kernel for `bijou-tui`** — `@flyingrobots/bijou-tui`
+  now exports small pure helpers for shader-authored ray scenes: look-at and
+  orbit camera rays, vector math, sphere and plane intersections, nearest-hit
+  selection, and reflection. Apps keep their own material, lighting, and
+  palette policy while sharing the geometry math used by canvas title screens
+  and procedural previews.
+
 ### 🐛 Bug Fixes
 
 - **High-resolution canvas color averaging** — `canvas()` in `quad` and

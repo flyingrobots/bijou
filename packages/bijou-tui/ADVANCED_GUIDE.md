@@ -103,6 +103,26 @@ values are averaged across the sampled subpixels. That lets shader code return
 the real material or image color per sample instead of fixing collapsed cells
 with post-render color passes.
 
+For tiny raytraced title screens or previews, use the raytrace shader kernel
+for geometry and keep lighting local to the app:
+```typescript
+import { canvas, raytraceLookAtRay, raytraceNearestHit, type RaytraceShape } from '@flyingrobots/bijou-tui';
+
+const shapes: readonly RaytraceShape[] = [
+  { kind: 'sphere', center: [0, 0, 0], radius: 1 },
+];
+
+const preview = canvas(32, 12, ({ u, v }) => {
+  const ray = raytraceLookAtRay({
+    origin: [0, 0, 4],
+    target: [0, 0, 0],
+    screen: [(u * 2) - 1, (v * -2) + 1],
+  });
+  const hit = raytraceNearestHit(ray, shapes);
+  return hit ? { char: '*', fg: '#ffffff' } : ' ';
+});
+```
+
 ## Advanced Logic
 
 - **Event Bus Middleware**: Intercept or transform every message in the system.

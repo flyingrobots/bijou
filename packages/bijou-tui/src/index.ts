@@ -214,6 +214,34 @@ export type { LayoutRect } from './layout-rect.js';
 export type { DebugOverlayAnchor, DebugOverlayOptions } from './debug-overlay.js';
 export { debugOverlay } from './debug-overlay.js';
 
+// Shader raytrace helpers
+export type {
+  RaytraceVector3,
+  RaytraceScreenPoint,
+  RaytraceRay,
+  RaytraceSphere,
+  RaytracePlane,
+  RaytraceShape,
+  RaytraceHit,
+  RaytraceLookAtRayOptions,
+  RaytraceOrbitCameraRayOptions,
+} from './raytrace.js';
+export {
+  raytraceLookAtRay,
+  raytraceOrbitCameraRay,
+  raytraceNearestHit,
+  raytraceSphereHit,
+  raytracePlaneHit,
+  raytraceReflect,
+  raytraceNormalize,
+  raytraceLength,
+  raytraceDot,
+  raytraceCross,
+  raytraceAdd,
+  raytraceSub,
+  raytraceScale,
+} from './raytrace.js';
+
 // Split pane layout
 export {
   type SplitPaneDirection,
