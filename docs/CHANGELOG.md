@@ -42,6 +42,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   for opt-in, non-fatal runtime warnings. Budgets can cover width, height,
   surface area, styled cells, total frame duration, and per-stage duration, with
   runtime violations routed through the existing `routeRuntimeIssue` hook.
+- **Theme contrast doctor for `bijou`** — `@flyingrobots/bijou` now exports
+  `doctorTheme()` and `themeContrastRatio()` so theme authors can detect invalid
+  token colors, weak foreground/background contrast, and suspicious color reuse
+  through structured reports instead of manual visual inspection.
 
 ### 🐛 Bug Fixes
 

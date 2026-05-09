@@ -28,6 +28,17 @@ export { styled, styledStatus } from './styled.js';
 // Theme extension
 export { extendTheme } from './extend.js';
 
+// Theme doctor
+export { doctorTheme, themeContrastRatio } from './doctor.js';
+export type {
+  ThemeContrastPair,
+  ThemeDoctorIssue,
+  ThemeDoctorIssueKind,
+  ThemeDoctorOptions,
+  ThemeDoctorReport,
+  ThemeDoctorSeverity,
+} from './doctor.js';
+
 // Gradient
 export { lerp3, gradientText } from './gradient.js';
 

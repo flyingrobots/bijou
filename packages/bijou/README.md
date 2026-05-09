@@ -76,6 +76,13 @@ fake duplication rather than a real second API.
 - **`breadcrumb()`**: Path context.
 - **`stepper()`**: Ordered stages in a linear process.
 
+### Theme Authoring
+- **`extendTheme()`**: Build a custom theme from a known-good preset.
+- **`doctorTheme()`**: Structured checks for invalid colors, weak contrast,
+  and suspicious token reuse.
+- **`themeContrastRatio()`**: Deterministic foreground/background contrast
+  calculation for token-pair tests.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.

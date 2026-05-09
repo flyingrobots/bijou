@@ -86,6 +86,39 @@ Read:
 - [theme graph types](./src/core/theme/graph-types.ts)
 - [DTCG tests](./src/core/theme/dtcg.test.ts)
 
+### Theme Doctor
+
+Use `doctorTheme()` when a theme change needs structured feedback before visual
+review. The doctor is pure: it returns invalid-color errors, low-contrast
+warnings, and optional color-reuse warnings without mutating the theme or
+opening a terminal UI.
+
+```typescript
+import { doctorTheme } from '@flyingrobots/bijou';
+
+const report = doctorTheme(theme, {
+  contrastPairs: [
+    {
+      foreground: 'semantic.primary',
+      background: 'surface.primary',
+      minRatio: 4.5,
+    },
+  ],
+  maxColorReuse: 8,
+});
+
+if (!report.passed) {
+  for (const issue of report.issues) {
+    console.error(issue.message);
+  }
+}
+```
+
+Use explicit `contrastPairs` for house-rule checks. Use `maxColorReuse` when a
+theme should avoid too many semantic tokens collapsing to the same color. Use
+`themeContrastRatio()` directly in tests that only need a numeric contrast
+assertion.
+
 ### Observing Theme Changes
 
 Third-party component authors should use `observeTheme(ctx, handler)` as the

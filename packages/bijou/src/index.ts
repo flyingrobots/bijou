@@ -125,6 +125,15 @@ export {
   styledStatus,
   // Theme extension
   extendTheme,
+  // Theme doctor
+  doctorTheme,
+  themeContrastRatio,
+  type ThemeContrastPair,
+  type ThemeDoctorIssue,
+  type ThemeDoctorIssueKind,
+  type ThemeDoctorOptions,
+  type ThemeDoctorReport,
+  type ThemeDoctorSeverity,
   // Gradient
   lerp3,
   gradientText,
