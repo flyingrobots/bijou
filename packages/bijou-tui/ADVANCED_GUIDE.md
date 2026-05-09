@@ -220,6 +220,40 @@ handled/stopped owners, hit targets, command/effect labels or counts, swallowed
 input, and no-op handlers. Use it alongside `layoutInspectorOverlay()` when a
 bug could be either geometry ownership or input priority.
 
+## Focus Map Surface
+
+`inspectFocusMap()` keeps focus diagnostics separate from the focus system
+itself. Apps provide current node facts, and the helper reports deterministic
+tab order, focused node ids, and basic focus-health issues.
+
+```typescript
+import {
+  focusMapSurface,
+  focusMapText,
+  inspectFocusMap,
+} from '@flyingrobots/bijou-tui';
+
+const nodes = [
+  {
+    id: 'editor',
+    owner: 'workspace',
+    role: 'textbox',
+    rect: { x: 2, y: 1, width: 60, height: 20 },
+    tabIndex: 1,
+    focusable: true,
+    focused: true,
+  },
+];
+
+const report = inspectFocusMap(nodes);
+const text = focusMapText(nodes);
+const surface = focusMapSurface(nodes, { width: 80, height: 8 });
+```
+
+Issue detection covers missing focus, multiple focused nodes,
+focused-disabled nodes, and duplicate tab indexes. Use the text form in tests
+and logs; use the surface form inside debug panes or docs previews.
+
 ## Surface Budget Warnings
 
 `evaluateSurfaceBudget()` checks a rendered `Surface` and optional pipeline

@@ -236,6 +236,20 @@ export {
   inputRoutingInspectorText,
 } from './input-routing-inspector.js';
 export type {
+  FocusMapIssue,
+  FocusMapIssueKind,
+  FocusMapNode,
+  FocusMapRect,
+  FocusMapReport,
+  FocusMapSurfaceOptions,
+  FocusMapTextOptions,
+} from './focus-map.js';
+export {
+  focusMapSurface,
+  focusMapText,
+  inspectFocusMap,
+} from './focus-map.js';
+export type {
   SurfaceDiff,
   SurfaceDiffBounds,
   SurfaceDiffCell,

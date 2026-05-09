@@ -88,6 +88,7 @@ Select the family based on the interaction semantic.
   bounds, focus, and layers.
 - **`inputRoutingInspectorText()`**: Development-only route trace for recent
   key and pointer events.
+- **`focusMapText()`**: Development-only focus ownership and tab-order report.
 - **`evaluateSurfaceBudget()`**: Deterministic warnings for surface and timing
   thresholds.
 - **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
@@ -271,6 +272,27 @@ const history = appendInputRoutingRecord({ records: [] }, {
 });
 
 console.log(inputRoutingInspectorText(history));
+```
+
+Use `focusMapText()` or `focusMapSurface()` when focus ownership and tab order
+need the same deterministic treatment:
+
+```typescript
+import { focusMapText } from '@flyingrobots/bijou-tui';
+
+const report = focusMapText([
+  {
+    id: 'editor',
+    owner: 'workspace',
+    role: 'textbox',
+    rect: { x: 2, y: 1, width: 60, height: 20 },
+    tabIndex: 1,
+    focusable: true,
+    focused: true,
+  },
+]);
+
+expect(report).toContain('[1] *editor');
 ```
 
 ## Documentation

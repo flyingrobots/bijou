@@ -51,6 +51,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `inputRoutingInspectorSurface()` so apps and tests can inspect recent
   `RuntimeInputRouteResult` facts, including visited views, handlers, hit
   targets, commands, effects, swallowed input, and no-op handlers.
+- **Focus map surface for `bijou-tui`** — `@flyingrobots/bijou-tui` now exports
+  `inspectFocusMap()`, `focusMapText()`, and `focusMapSurface()` so apps and
+  tests can inspect focus ownership, tab order, focused-disabled nodes, missing
+  focus, multiple focused nodes, and duplicate tab indexes as deterministic
+  text or bounded surfaces.
 
 ### 🐛 Bug Fixes
 
