@@ -213,6 +213,19 @@ export type { SurfaceContent } from './surface-layout.js';
 export type { LayoutRect } from './layout-rect.js';
 export type { DebugOverlayAnchor, DebugOverlayOptions } from './debug-overlay.js';
 export { debugOverlay } from './debug-overlay.js';
+export type {
+  SurfaceDiff,
+  SurfaceDiffBounds,
+  SurfaceDiffCell,
+  SurfaceDiffCellKind,
+  SurfaceDiffRenderMode,
+  SurfaceDiffRenderOptions,
+} from './surface-diff.js';
+export {
+  diffSurfaces,
+  surfaceDiffSurface,
+  surfaceDiffText,
+} from './surface-diff.js';
 
 // Shader raytrace helpers
 export type {

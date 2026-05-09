@@ -155,6 +155,25 @@ on the same frame that a different set disappears. Treat that as a strong signal
 that your component identity is unstable and the reconciler is being forced to
 start new animations instead of continuing existing ones.
 
+## Surface Diff Viewer
+
+`diffSurfaces()` compares two `Surface` objects cell by cell and keeps character
+changes separate from style-only changes. That matters for terminal regressions
+where text snapshots look correct but color, modifiers, or opacity changed.
+
+```typescript
+import { diffSurfaces, surfaceDiffSurface, surfaceDiffText } from '@flyingrobots/bijou-tui';
+
+const diff = diffSurfaces(before, after);
+const report = surfaceDiffText(before, after);
+const overlay = surfaceDiffSurface(before, after, { mode: 'overlay' });
+```
+
+Use `surfaceDiffText()` in failing tests and logs. Use
+`surfaceDiffSurface(..., { mode: 'side-by-side' })` when you want a compact
+viewer surface, or `mode: 'overlay'` when you want changed cells marked on the
+after frame.
+
 ## Crash Surfaces
 
 Interactive `run(app, { ctx })` now keeps fatal `update()` and `view()` errors

@@ -27,6 +27,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   proves the motion/shader family with quad shader waves, Braille fields,
   glyph-fit raytraced geometry, and a deterministic spring/timeline preview
   across rich, static, pipe, and accessible profiles.
+- **Surface diff viewer for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `diffSurfaces()`, `surfaceDiffSurface()`, and `surfaceDiffText()` so
+  tests and debug surfaces can inspect changed cells, char deltas, style-only
+  deltas, changed bounds, side-by-side views, and overlay views without ad hoc
+  surface dumps.
 
 ### 🐛 Bug Fixes
 

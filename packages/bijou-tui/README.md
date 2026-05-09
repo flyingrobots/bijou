@@ -84,6 +84,7 @@ Select the family based on the interaction semantic.
 - **`toast()`**: Transient notification for a single event.
 - **`tooltip()`**: Micro-explanation for a local target.
 - **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
+- **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
 
 ### Collection Interaction
 - **`navigableTable()`**: Keyboard-driven traversal and cell inspection.
@@ -198,6 +199,15 @@ await harness.teardown();
 Keep `runScript()` for fixture-style interaction playback and GIF/demo
 capture, and use `testRuntime()` when you need direct assertions on
 snapshots, emitted messages, command outcomes, or cleanup disposal.
+
+Use `surfaceDiffText()` or `surfaceDiffSurface()` when a frame assertion fails
+and you need cell-level truth instead of a raw string dump:
+
+```typescript
+import { surfaceDiffText } from '@flyingrobots/bijou-tui';
+
+expect(surfaceDiffText(before, after)).toContain('surface diff: 2 changed');
+```
 
 ## Documentation
 
