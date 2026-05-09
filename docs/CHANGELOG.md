@@ -23,9 +23,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   Braille while collapsing coverage through `fitCellGlyph()`. Shader authors can
   render geometry-aware Unicode glyphs or ASCII density output and keep the
   existing high-resolution color averaging path.
+- **Motion and shader DOGFOOD audit** — the DOGFOOD component explorer now
+  proves the motion/shader family with quad shader waves, Braille fields,
+  glyph-fit raytraced geometry, and a deterministic spring/timeline preview
+  across rich, static, pipe, and accessible profiles.
 
 ### 🐛 Bug Fixes
 
+- **Spring example API drift** — `examples/spring` no longer passes the removed
+  `fps` option to `animate()`, keeping the interactive spring comparison aligned
+  with the current pulse-driven animation command API.
 - **Stable spring animation under slow pulses** — `animate()` spring commands
   now integrate with bounded fixed timesteps instead of applying large runtime
   pulse deltas directly to spring physics. Slow terminal frames may delay spring

@@ -29,11 +29,10 @@ focus it and use the wheel to scroll long docs or help content.
 - a framed shell can present both top-level docs sections and a rich component browser without pretending those are the same thing
 - DOGFOOD can now publish repo orientation, package docs, and release docs inside the same shell
 
-## Included stories
+## Included story families
 
-- `alert()` for in-flow status and straightforward graceful lowering
-- `modal()` for structured overlay doctrine and TUI interruption
-- `viewportSurface()` for width-sensitive masking and overflow behavior
+- feedback, overlays, viewport masking, forms, navigation, data visualization, shell composition, and motion/shader effects
+- `motion-and-shader-effects` now covers quad shader waves, Braille fields, glyph-fit raytracing, and spring/timeline orchestration across rich, static, pipe, and accessible profiles
 
 ## Keys
 

@@ -2,7 +2,7 @@ import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { kbd, type Surface } from '@flyingrobots/bijou';
 import {
   run, quit, isKeyMsg, type App,
-  animate, SPRING_PRESETS,
+  animate,
 } from '@flyingrobots/bijou-tui';
 import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
 
@@ -28,7 +28,6 @@ function launchAll(from: number, to: number): ReturnType<typeof animate>[] {
       from,
       to,
       spring: preset,
-      fps: 60,
       onFrame: (value: number) => ({ type: 'frame' as const, preset, value }),
       onComplete: () => ({ type: 'done' as const }),
     })
