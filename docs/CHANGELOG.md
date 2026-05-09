@@ -21,6 +21,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Stable spring animation under slow pulses** — `animate()` spring commands
+  now integrate with bounded fixed timesteps instead of applying large runtime
+  pulse deltas directly to spring physics. Slow terminal frames may delay spring
+  progress, but they no longer turn one delayed pulse into a large position or
+  velocity spike.
 - **High-resolution canvas color averaging** — `canvas()` in `quad` and
   `braille` resolution now averages available foreground and background RGB
   values across sampled subpixels instead of borrowing the first lit

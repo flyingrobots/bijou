@@ -99,6 +99,45 @@ describe('animate', () => {
       await promise;
       expect(frames.length).toBeGreaterThan(1);
     });
+
+    it('keeps critically damped springs bounded under slow pulse frames', async () => {
+      const frames: number[] = [];
+      const target = 100;
+      const cmd = animate({
+        from: 0,
+        to: target,
+        spring: {
+          mass: 1,
+          stiffness: 144,
+          damping: 24,
+          precision: 0.01,
+        },
+        onFrame: (v) => {
+          frames.push(v);
+          return v;
+        },
+      });
+
+      const caps = createMockCaps();
+      let settled = false;
+      const promise = Promise.resolve(cmd(() => {}, caps)).then(() => {
+        settled = true;
+      });
+
+      for (let i = 0; i < 240 && !settled; i++) {
+        caps.pulse(1);
+        await new Promise<void>((resolve) => queueMicrotask(resolve));
+      }
+
+      expect(settled).toBe(true);
+      await promise;
+      expect(frames.length).toBeGreaterThan(1);
+      expect(frames[0]!).toBeGreaterThan(0);
+      expect(frames[0]!).toBeLessThan(target);
+      expect(frames.every((value) => Number.isFinite(value))).toBe(true);
+      expect(frames.every((value) => value >= 0 && value <= target)).toBe(true);
+      expect(frames.at(-1)).toBe(target);
+    });
   });
 
   describe('tween mode', () => {

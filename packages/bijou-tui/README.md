@@ -129,6 +129,11 @@ const cmd = animate({
 });
 ```
 
+Spring commands integrate physics with bounded fixed timesteps by default, so a
+slow terminal frame cannot feed a large raw pulse delta into the spring. Tune
+`fixedStepSeconds` and `maxPulseSeconds` only when an app needs a custom
+simulation cadence.
+
 ### Timeline Orchestration
 ```typescript
 import { timeline } from '@flyingrobots/bijou-tui';

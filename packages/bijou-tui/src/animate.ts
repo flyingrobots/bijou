@@ -29,6 +29,9 @@ import {
   EASINGS,
 } from './spring.js';
 
+const DEFAULT_SPRING_FIXED_STEP_SECONDS = 1 / 120;
+const DEFAULT_SPRING_MAX_PULSE_SECONDS = 1 / 20;
+
 // ---------------------------------------------------------------------------
 // Animate options
 // ---------------------------------------------------------------------------
@@ -61,6 +64,10 @@ export interface SpringAnimateOptions<M> extends AnimateBase<M> {
   readonly type?: 'spring';
   /** Spring config — preset name or custom values. */
   readonly spring?: Partial<SpringConfig> | SpringPreset;
+  /** Integration step in seconds. Defaults to 1/120 for stable spring physics. */
+  readonly fixedStepSeconds?: number;
+  /** Maximum pulse time accepted in one runtime pulse. Defaults to 1/20. */
+  readonly maxPulseSeconds?: number;
 }
 
 /**
@@ -116,12 +123,27 @@ export function animate<M>(options: AnimateOptions<M>): Cmd<M> {
   }
 
   const config = resolveSpringConfig(options.spring);
-  return createSpringCmd(from, to, config, onFrame, onComplete);
+  return createSpringCmd(
+    from,
+    to,
+    config,
+    {
+      fixedStepSeconds: resolvePositiveSeconds(options.fixedStepSeconds, DEFAULT_SPRING_FIXED_STEP_SECONDS),
+      maxPulseSeconds: resolveMaxPulseSeconds(options.maxPulseSeconds, options.fixedStepSeconds),
+    },
+    onFrame,
+    onComplete,
+  );
 }
 
 // ---------------------------------------------------------------------------
 // Internal: spring command
 // ---------------------------------------------------------------------------
+
+interface SpringIntegrationOptions {
+  readonly fixedStepSeconds: number;
+  readonly maxPulseSeconds: number;
+}
 
 /**
  * Build a TEA command that runs a spring animation via `setInterval`.
@@ -139,15 +161,31 @@ function createSpringCmd<M>(
   from: number,
   to: number,
   config: SpringConfig,
+  integration: SpringIntegrationOptions,
   onFrame: (value: number) => M,
   onComplete?: () => M,
 ): Cmd<M> {
   return (emit, caps) =>
     new Promise<void>((resolve) => {
       let state = createSpringState(from);
+      let accumulatedSeconds = 0;
 
       const handle = caps.onPulse((dt) => {
-        state = springStep(state, to, config, dt);
+        accumulatedSeconds = Math.min(
+          integration.maxPulseSeconds,
+          accumulatedSeconds + acceptedPulseSeconds(dt, integration.maxPulseSeconds),
+        );
+        let stepped = false;
+        while (accumulatedSeconds >= integration.fixedStepSeconds && !state.done) {
+          state = springStep(state, to, config, integration.fixedStepSeconds);
+          accumulatedSeconds -= integration.fixedStepSeconds;
+          stepped = true;
+        }
+
+        if (!stepped) {
+          return;
+        }
+
         emit(onFrame(state.value));
 
         if (state.done) {
@@ -157,6 +195,24 @@ function createSpringCmd<M>(
         }
       });
     });
+}
+
+function resolveMaxPulseSeconds(maxPulseSeconds: number | undefined, fixedStepSeconds: number | undefined): number {
+  return Math.max(
+    resolvePositiveSeconds(maxPulseSeconds, DEFAULT_SPRING_MAX_PULSE_SECONDS),
+    resolvePositiveSeconds(fixedStepSeconds, DEFAULT_SPRING_FIXED_STEP_SECONDS),
+  );
+}
+
+function resolvePositiveSeconds(value: number | undefined, fallback: number): number {
+  return value != null && Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function acceptedPulseSeconds(dt: number, maxPulseSeconds: number): number {
+  if (!Number.isFinite(dt) || dt <= 0) {
+    return 0;
+  }
+  return Math.min(dt, maxPulseSeconds);
 }
 
 // ---------------------------------------------------------------------------

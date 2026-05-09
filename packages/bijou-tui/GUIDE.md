@@ -104,6 +104,10 @@ Natural, responsive motion without fixed durations.
 animate({ from: 0, to: 100, spring: 'wobbly', onFrame: (v) => ({ type: 'move', x: v }) });
 ```
 
+Spring animation uses bounded fixed-step integration internally. Slow frames
+can make motion progress conservatively, but they do not hand a one-second
+runtime pulse directly to spring physics.
+
 ### Tween
 Predictable, duration-based transitions.
 ```typescript
