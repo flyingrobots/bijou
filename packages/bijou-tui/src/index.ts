@@ -242,6 +242,18 @@ export {
   raytraceScale,
 } from './raytrace.js';
 
+// Cell glyph fitting helpers
+export type {
+  CellGlyphFitMode,
+  CellGlyphCandidate,
+  CellGlyphFitOptions,
+} from './cell-glyph-fit.js';
+export {
+  CELL_GLYPH_ASCII_DENSITY_RAMP,
+  CELL_GLYPH_UNICODE_CANDIDATES,
+  fitCellGlyph,
+} from './cell-glyph-fit.js';
+
 // Split pane layout
 export {
   type SplitPaneDirection,

@@ -123,6 +123,15 @@ const preview = canvas(32, 12, ({ u, v }) => {
 });
 ```
 
+When Braille is too textured for a logo or icon, fit sampled 2x4 coverage to a
+regular glyph:
+```typescript
+import { fitCellGlyph } from '@flyingrobots/bijou-tui';
+
+const glyph = fitCellGlyph([1, 1, 1, 1, 0, 0, 0, 0]); // "▀"
+const asciiGlyph = fitCellGlyph([1, 1, 1, 1, 0, 0, 0, 0], { mode: 'ascii' });
+```
+
 ## Advanced Logic
 
 - **Event Bus Middleware**: Intercept or transform every message in the system.

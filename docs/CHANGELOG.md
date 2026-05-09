@@ -14,6 +14,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selection, and reflection. Apps keep their own material, lighting, and
   palette policy while sharing the geometry math used by canvas title screens
   and procedural previews.
+- **Cell glyph fitting for shader experiments** — `@flyingrobots/bijou-tui`
+  now exports `fitCellGlyph()` with Unicode geometry candidates and an ASCII
+  density ramp. Apps can collapse 2x4 coverage samples into block, half-block,
+  line, diagonal, or plain ASCII glyphs without committing to Braille.
 
 ### 🐛 Bug Fixes
 

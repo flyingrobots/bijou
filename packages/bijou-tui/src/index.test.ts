@@ -6,6 +6,7 @@ import type {
 } from '@flyingrobots/bijou';
 import {
   canvas,
+  fitCellGlyph,
   projectFrameControls,
   raytraceLookAtRay,
   type BijouContext,
@@ -38,5 +39,9 @@ describe('package root export ergonomics', () => {
     });
 
     expect(ray.direction).toEqual([0, 0, -1]);
+  });
+
+  it('re-exports cell glyph fitting helpers from the package root', () => {
+    expect(fitCellGlyph([1, 1, 1, 1, 1, 1, 1, 1])).toBe('█');
   });
 });
