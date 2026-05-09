@@ -46,6 +46,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `doctorTheme()` and `themeContrastRatio()` so theme authors can detect invalid
   token colors, weak foreground/background contrast, and suspicious color reuse
   through structured reports instead of manual visual inspection.
+- **Input routing inspector for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `appendInputRoutingRecord()`, `inputRoutingInspectorText()`, and
+  `inputRoutingInspectorSurface()` so apps and tests can inspect recent
+  `RuntimeInputRouteResult` facts, including visited views, handlers, hit
+  targets, commands, effects, swallowed input, and no-op handlers.
 
 ### 🐛 Bug Fixes
 

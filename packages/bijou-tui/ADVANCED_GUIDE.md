@@ -189,6 +189,37 @@ Use the overlay when pane bounds, clipping, focus ownership, or z-layering need
 visual inspection. Use the text report in tests and logs where screenshot
 inspection would hide the actual geometry facts.
 
+## Input Routing Inspector
+
+`appendInputRoutingRecord()` keeps a bounded history of existing
+`RuntimeInputEvent` and `RuntimeInputRouteResult` facts. It does not route input
+itself; it makes router output readable.
+
+```typescript
+import {
+  appendInputRoutingRecord,
+  inputRoutingInspectorSurface,
+  inputRoutingInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+let history = { records: [] };
+
+history = appendInputRoutingRecord(history, {
+  rawInput: '\\x1b[A',
+  event,
+  result,
+  commandLabels: ['select-previous'],
+}, { maxEvents: 20 });
+
+const report = inputRoutingInspectorText(history);
+const surface = inputRoutingInspectorSurface(history, { width: 80 });
+```
+
+The report includes event kind, raw input when supplied, visited views,
+handled/stopped owners, hit targets, command/effect labels or counts, swallowed
+input, and no-op handlers. Use it alongside `layoutInspectorOverlay()` when a
+bug could be either geometry ownership or input priority.
+
 ## Surface Budget Warnings
 
 `evaluateSurfaceBudget()` checks a rendered `Surface` and optional pipeline

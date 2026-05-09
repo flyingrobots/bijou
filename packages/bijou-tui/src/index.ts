@@ -225,6 +225,17 @@ export {
   layoutInspectorText,
 } from './layout-inspector.js';
 export type {
+  InputRoutingInspectorHistory,
+  InputRoutingInspectorHistoryOptions,
+  InputRoutingInspectorRecord,
+  InputRoutingInspectorSurfaceOptions,
+} from './input-routing-inspector.js';
+export {
+  appendInputRoutingRecord,
+  inputRoutingInspectorSurface,
+  inputRoutingInspectorText,
+} from './input-routing-inspector.js';
+export type {
   SurfaceDiff,
   SurfaceDiffBounds,
   SurfaceDiffCell,

@@ -86,6 +86,8 @@ Select the family based on the interaction semantic.
 - **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
 - **`layoutInspectorOverlay()`**: Development-only geometry HUD for region
   bounds, focus, and layers.
+- **`inputRoutingInspectorText()`**: Development-only route trace for recent
+  key and pointer events.
 - **`evaluateSurfaceBudget()`**: Deterministic warnings for surface and timing
   thresholds.
 - **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
@@ -251,6 +253,24 @@ await run(app, {
   ctx,
   surfaceBudget: { maxArea: 4000, maxStageDurationMs: { Paint: 8 } },
 });
+```
+
+Use `appendInputRoutingRecord()` and `inputRoutingInspectorText()` when a shell
+or app wants to keep the last few routing decisions visible:
+
+```typescript
+import {
+  appendInputRoutingRecord,
+  inputRoutingInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const history = appendInputRoutingRecord({ records: [] }, {
+  event,
+  result,
+  commandLabels: ['save-file'],
+});
+
+console.log(inputRoutingInspectorText(history));
 ```
 
 ## Documentation
