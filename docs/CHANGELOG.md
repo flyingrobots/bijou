@@ -6,9 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Notes
+### 🐛 Bug Fixes
 
-- No unreleased entries yet.
+- **High-resolution canvas color averaging** — `canvas()` in `quad` and
+  `braille` resolution now averages available foreground and background RGB
+  values across sampled subpixels instead of borrowing the first lit
+  subpixel's style. Empty Braille cells can now retain averaged background
+  color, so shader-authored procedural images no longer need app-local
+  post-render color correction loops.
 
 ## [5.0.0] - 2026-04-16
 

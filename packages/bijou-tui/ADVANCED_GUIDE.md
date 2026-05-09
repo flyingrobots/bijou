@@ -96,6 +96,13 @@ function renderWave(_ctx: BijouContext): Surface {
 }
 ```
 
+When `canvas()` runs in `quad` or `braille` resolution, each terminal cell
+samples multiple shader results for coverage. Non-space samples still choose
+the quadrant or Braille dots, while available foreground and background RGB
+values are averaged across the sampled subpixels. That lets shader code return
+the real material or image color per sample instead of fixing collapsed cells
+with post-render color passes.
+
 ## Advanced Logic
 
 - **Event Bus Middleware**: Intercept or transform every message in the system.
