@@ -147,6 +147,19 @@ const tl = timeline()
 
 ## Post-Process Shaders
 
+`canvas()` can render procedural surfaces at cell, Quad, Braille, or glyph-fit
+resolution. Use `resolution: 'glyph'` when a shader should sample a 2x4 grid but
+collapse into geometry-aware Unicode or ASCII characters instead of Braille.
+
+```typescript
+import { canvas } from '@flyingrobots/bijou-tui';
+
+const logo = canvas(24, 6, ({ u, v }) => {
+  const lit = Math.abs(u - v) < 0.08;
+  return lit ? { char: 'X', fg: '#ffffff' } : ' ';
+}, { resolution: 'glyph' });
+```
+
 ```typescript
 import { run, surfaceShaderFilter, scanlines, vignette } from '@flyingrobots/bijou-tui';
 

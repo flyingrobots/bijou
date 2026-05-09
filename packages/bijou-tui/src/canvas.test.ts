@@ -129,6 +129,45 @@ describe('canvas()', () => {
     expect(cell.fgRGB).toEqual([15, 30, 45]);
   });
 
+  it('fits glyph resolution from 2x4 diagonal coverage', () => {
+    const coverage = [0, 1, 0, 1, 1, 0, 1, 0];
+    let index = 0;
+    const shader: ShaderFn = () => coverage[index++] === 1 ? 'X' : ' ';
+
+    const surface = canvas(1, 1, shader, { resolution: 'glyph' });
+
+    expect(index).toBe(8);
+    expect(surface.get(0, 0).char).toBe('╱');
+  });
+
+  it('fits glyph resolution with the ASCII density ramp', () => {
+    const surface = canvas(1, 1, () => 'X', {
+      resolution: 'glyph',
+      glyphFit: { mode: 'ascii' },
+    });
+
+    expect(surface.get(0, 0).char).toBe('@');
+  });
+
+  it('averages glyph-fit sub-pixel colors', () => {
+    const samples = [
+      { char: 'X', fgRGB: [0, 0, 0] },
+      { char: ' ', fgRGB: [8, 16, 24] },
+      { char: 'X', fgRGB: [16, 32, 48] },
+      { char: ' ', fgRGB: [24, 48, 72] },
+      { char: 'X', fgRGB: [32, 64, 96] },
+      { char: ' ', fgRGB: [40, 80, 120] },
+      { char: 'X', fgRGB: [48, 96, 144] },
+      { char: ' ', fgRGB: [56, 112, 168] },
+    ] as const;
+    let index = 0;
+    const shader: ShaderFn = () => samples[index++]!;
+
+    const surface = canvas(1, 1, shader, { resolution: 'glyph' });
+
+    expect(surface.get(0, 0).fgRGB).toEqual([28, 56, 84]);
+  });
+
   it('handles uniforms', () => {
     const shader: ShaderFn = ({ uniforms }) => uniforms.value;
     const surface = canvas(1, 1, shader, { uniforms: { value: 'Z' } });

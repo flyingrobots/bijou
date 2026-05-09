@@ -18,6 +18,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   now exports `fitCellGlyph()` with Unicode geometry candidates and an ASCII
   density ramp. Apps can collapse 2x4 coverage samples into block, half-block,
   line, diagonal, or plain ASCII glyphs without committing to Braille.
+- **Glyph-fit canvas resolution** — `canvas()` now accepts
+  `resolution: 'glyph'` plus `glyphFit` options, sampling the same 2x4 grid as
+  Braille while collapsing coverage through `fitCellGlyph()`. Shader authors can
+  render geometry-aware Unicode glyphs or ASCII density output and keep the
+  existing high-resolution color averaging path.
 
 ### 🐛 Bug Fixes
 

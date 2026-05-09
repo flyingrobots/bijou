@@ -96,12 +96,12 @@ function renderWave(_ctx: BijouContext): Surface {
 }
 ```
 
-When `canvas()` runs in `quad` or `braille` resolution, each terminal cell
-samples multiple shader results for coverage. Non-space samples still choose
-the quadrant or Braille dots, while available foreground and background RGB
-values are averaged across the sampled subpixels. That lets shader code return
-the real material or image color per sample instead of fixing collapsed cells
-with post-render color passes.
+When `canvas()` runs in `quad`, `braille`, or `glyph` resolution, each terminal
+cell samples multiple shader results for coverage. Non-space samples choose the
+quadrant, Braille dots, or fitted cell glyph, while available foreground and
+background RGB values are averaged across the sampled subpixels. That lets
+shader code return the real material or image color per sample instead of
+fixing collapsed cells with post-render color passes.
 
 For tiny raytraced title screens or previews, use the raytrace shader kernel
 for geometry and keep lighting local to the app:
@@ -124,7 +124,13 @@ const preview = canvas(32, 12, ({ u, v }) => {
 ```
 
 When Braille is too textured for a logo or icon, fit sampled 2x4 coverage to a
-regular glyph:
+regular glyph directly from `canvas()`:
+```typescript
+const logo = canvas(24, 6, shader, { resolution: 'glyph' });
+const asciiLogo = canvas(24, 6, shader, { resolution: 'glyph', glyphFit: { mode: 'ascii' } });
+```
+
+The standalone helper remains available for custom reducers:
 ```typescript
 import { fitCellGlyph } from '@flyingrobots/bijou-tui';
 
