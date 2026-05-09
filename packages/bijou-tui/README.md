@@ -86,6 +86,8 @@ Select the family based on the interaction semantic.
 - **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
 - **`layoutInspectorOverlay()`**: Development-only geometry HUD for region
   bounds, focus, and layers.
+- **`evaluateSurfaceBudget()`**: Deterministic warnings for surface and timing
+  thresholds.
 - **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
 
 ### Collection Interaction
@@ -232,6 +234,23 @@ expect(layoutInspectorText([
   { id: 'editor', rect: { x: 2, y: 1, width: 40, height: 12 } },
 ]))
   .toContain('focused=false');
+```
+
+Use `evaluateSurfaceBudget()` directly in tests or pass `surfaceBudget` to
+`run()` when an interactive app should route non-fatal runtime warnings:
+
+```typescript
+import { evaluateSurfaceBudget, run } from '@flyingrobots/bijou-tui';
+
+expect(evaluateSurfaceBudget({
+  surface: frame,
+  thresholds: { maxArea: 4000 },
+})).toEqual([]);
+
+await run(app, {
+  ctx,
+  surfaceBudget: { maxArea: 4000, maxStageDurationMs: { Paint: 8 } },
+});
 ```
 
 ## Documentation

@@ -37,6 +37,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   development-only geometry debugging. Apps can draw clipped region bounds and
   labels over an existing surface, mark focused regions, and log a deterministic
   report of ids, roles, rects, clip rects, scroll offsets, focus, and layers.
+- **Surface budget warnings for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `evaluateSurfaceBudget()` and accepts `run(..., { surfaceBudget })`
+  for opt-in, non-fatal runtime warnings. Budgets can cover width, height,
+  surface area, styled cells, total frame duration, and per-stage duration, with
+  runtime violations routed through the existing `routeRuntimeIssue` hook.
 
 ### 🐛 Bug Fixes
 

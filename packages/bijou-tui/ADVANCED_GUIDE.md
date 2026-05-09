@@ -189,6 +189,41 @@ Use the overlay when pane bounds, clipping, focus ownership, or z-layering need
 visual inspection. Use the text report in tests and logs where screenshot
 inspection would hide the actual geometry facts.
 
+## Surface Budget Warnings
+
+`evaluateSurfaceBudget()` checks a rendered `Surface` and optional pipeline
+timings against explicit thresholds. It is pure and returns stable warning
+objects, so tests can assert budget behavior without starting the runtime.
+
+```typescript
+import { evaluateSurfaceBudget, run } from '@flyingrobots/bijou-tui';
+
+const warnings = evaluateSurfaceBudget({
+  label: 'preview',
+  surface,
+  timings,
+  thresholds: {
+    maxArea: 4000,
+    maxStyledCells: 1200,
+    maxFrameDurationMs: 16,
+    maxStageDurationMs: { Paint: 8, Diff: 4 },
+  },
+});
+```
+
+Interactive apps can also opt into runtime warnings:
+
+```typescript
+await run(app, {
+  ctx,
+  surfaceBudget: { maxArea: 4000, maxFrameDurationMs: 16 },
+});
+```
+
+Runtime warnings are non-fatal and deduplicated by message. Apps that implement
+`routeRuntimeIssue()` receive budget violations as `level: 'warning'` and
+`source: 'runtime'`; apps that do not opt in stay silent.
+
 ## Surface Diff Viewer
 
 `diffSurfaces()` compares two `Surface` objects cell by cell and keeps character

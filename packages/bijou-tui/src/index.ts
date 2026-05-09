@@ -237,6 +237,13 @@ export {
   surfaceDiffSurface,
   surfaceDiffText,
 } from './surface-diff.js';
+export type {
+  EvaluateSurfaceBudgetOptions,
+  SurfaceBudgetMetric,
+  SurfaceBudgetThresholds,
+  SurfaceBudgetWarning,
+} from './surface-budget.js';
+export { evaluateSurfaceBudget } from './surface-budget.js';
 
 // Shader raytrace helpers
 export type {

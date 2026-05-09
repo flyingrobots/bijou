@@ -10,6 +10,7 @@
 import type { BijouContext } from '@flyingrobots/bijou';
 import type { Middleware } from './eventbus.js';
 import type { RenderPipeline } from './pipeline/pipeline.js';
+import type { SurfaceBudgetThresholds } from './surface-budget.js';
 import type { ViewOutput } from './view-output.js';
 
 // --- Messages ---
@@ -265,6 +266,8 @@ export interface RunOptions<M = any> {
   middlewares?: Middleware<M>[];
   /** Optional hook to extend the render pipeline with custom middleware. */
   configurePipeline?: (pipeline: RenderPipeline) => void;
+  /** Optional non-fatal render budget warnings routed as runtime issues. */
+  surfaceBudget?: SurfaceBudgetThresholds;
   /** Optional BCSS stylesheet string. */
   css?: string;
 }

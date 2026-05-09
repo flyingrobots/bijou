@@ -24,6 +24,7 @@ import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
 import { installBCSSResolver } from './css/install.js';
 import { normalizeViewOutput, wrapViewOutputAsLayoutRoot } from './view-output.js';
+import { evaluateSurfaceBudget, type SurfaceBudgetWarning } from './surface-budget.js';
 import type { RuntimeIssue } from './types.js';
 
 /**
@@ -95,6 +96,8 @@ export async function runWithLifecycleHooks<Model, M>(
   const useAltScreen = options?.altScreen ?? true;
   const useHideCursor = options?.hideCursor ?? true;
   const useMouse = options?.mouse ?? false;
+  const surfaceBudget = options?.surfaceBudget;
+  const routedSurfaceBudgetWarnings = new Set<string>();
   installBCSSResolver(ctx, options?.css);
   const runtimeViewport = () => readRuntimeViewport(ctx.runtime);
 
@@ -156,6 +159,20 @@ export async function runWithLifecycleHooks<Model, M>(
     if (routed !== undefined) {
       bus.emit(routed);
     }
+  }
+
+  function routeSurfaceBudgetWarning(warning: SurfaceBudgetWarning): void {
+    if (routedSurfaceBudgetWarnings.has(warning.message)) {
+      return;
+    }
+
+    routedSurfaceBudgetWarnings.add(warning.message);
+    routeRuntimeIssue({
+      level: 'warning',
+      source: 'runtime',
+      message: warning.message,
+      atMs: clock.now(),
+    });
   }
 
   function formatModelSnapshot(snapshot: unknown): string {
@@ -395,11 +412,22 @@ export async function runWithLifecycleHooks<Model, M>(
           return;
         }
 
+        const timings = getRenderStageTimings(renderState);
+        if (surfaceBudget !== undefined) {
+          for (const warning of evaluateSurfaceBudget({
+            surface: renderState.targetSurface,
+            timings,
+            thresholds: surfaceBudget,
+          })) {
+            routeSurfaceBudgetWarning(warning);
+          }
+        }
+
         if (hooks?.afterRender) {
           const postRender = hooks.afterRender({
             model,
             dt: currentDt,
-            timings: getRenderStageTimings(renderState),
+            timings,
             viewport,
           });
           if (postRender?.model !== undefined) {
