@@ -97,6 +97,22 @@ export {
   type ModeMap,
 } from './core/mode-render.js';
 export {
+  componentMetadataReportText,
+  componentMetadataSummary,
+  defineComponentMetadata,
+  validateComponentMetadata,
+  type ComponentMetadata,
+  type ComponentMetadataArg,
+  type ComponentMetadataDocs,
+  type ComponentMetadataExample,
+  type ComponentMetadataInvariant,
+  type ComponentMetadataIssue,
+  type ComponentMetadataIssueKind,
+  type ComponentMetadataReport,
+  type ComponentMetadataSeverity,
+  type ComponentMetadataVariant,
+} from './core/component-metadata.js';
+export {
   lintModeLowering,
   modeLoweringReportText,
   type ModeLoweringAssertionResult,

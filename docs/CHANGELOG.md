@@ -62,6 +62,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `accessible` output without pixel-matching rendered text. Reports include
   missing required facts, changed fact values, duplicate facts, and custom
   assertion failures.
+- **Component metadata contract for `bijou`** — `@flyingrobots/bijou` now
+  exports `ComponentMetadata`, `defineComponentMetadata()`,
+  `validateComponentMetadata()`, `componentMetadataSummary()`, and
+  `componentMetadataReportText()` so docs, DOGFOOD, MCP payloads, and agent
+  workflows can share one validated component description with modes, args,
+  variants, invariants, examples, source paths, and semantic facts.
 
 ### 🐛 Bug Fixes
 

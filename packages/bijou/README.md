@@ -88,6 +88,10 @@ fake duplication rather than a real second API.
 - **`lintModeLowering()`**: Compare explicit semantic facts across output modes.
 - **`modeLoweringReportText()`**: Render a compact lowering report for tests,
   docs, and review comments.
+- **`defineComponentMetadata()`**: Declare validated package, family, mode,
+  arg, variant, invariant, example, and source facts for tooling.
+- **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
+  payloads, and agent-facing reports.
 
 ## Documentation
 

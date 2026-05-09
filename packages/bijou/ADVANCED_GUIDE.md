@@ -216,6 +216,43 @@ Do not use it for pixel or snapshot equivalence. It is a semantic contract:
 entities, labels, states, counts, edges, and component-specific facts should
 survive lowering even when the visible rendering changes completely.
 
+### Component Metadata
+
+Use `defineComponentMetadata()` when a component's package, family, modes,
+arguments, variants, invariants, examples, docs, and source path need to be
+shared by docs, DOGFOOD, MCP payloads, or agents.
+
+```typescript
+import {
+  componentMetadataSummary,
+  defineComponentMetadata,
+} from '@flyingrobots/bijou';
+
+const metadata = defineComponentMetadata({
+  packageName: '@flyingrobots/bijou',
+  componentName: 'alert',
+  family: 'status-feedback',
+  modes: ['interactive', 'static', 'pipe', 'accessible'],
+  docs: {
+    summary: 'Persistent in-flow message with severity.',
+  },
+  variants: [
+    {
+      id: 'warning',
+      label: 'Warning',
+      facts: [{ kind: 'state', key: 'severity', value: 'warning' }],
+    },
+  ],
+});
+
+console.log(componentMetadataSummary(metadata));
+```
+
+`validateComponentMetadata()` returns deterministic issue paths when metadata
+drifts, and `componentMetadataReportText()` renders those issues for review.
+This is intentionally not a complete story schema; it is the shared contract
+that story surfaces can build on.
+
 ## Component Families Beyond The Fast Path
 
 The quick guide covers the most common choices. The families below are still
