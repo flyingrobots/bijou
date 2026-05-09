@@ -177,6 +177,45 @@ Good companion docs:
 - [Content Guide](../../docs/strategy/content-guide.md)
 - [Accessibility and Assistive Modes](../../docs/strategy/accessibility-and-assistive-modes.md)
 
+### Mode-Lowering Linter
+
+Use `lintModeLowering()` when a component needs proof that lower modes preserve
+meaning rather than visual shape. The helper compares explicit semantic facts
+from each mode and reports missing facts, changed values, duplicates, and custom
+assertion failures.
+
+```typescript
+import {
+  lintModeLowering,
+  modeLoweringReportText,
+} from '@flyingrobots/bijou';
+
+const report = lintModeLowering({
+  modes: [
+    {
+      mode: 'interactive',
+      facts: [
+        { kind: 'entity', key: 'save-button' },
+        { kind: 'count', key: 'rows', value: 3 },
+      ],
+    },
+    {
+      mode: 'accessible',
+      facts: [
+        { kind: 'entity', key: 'save-button' },
+        { kind: 'count', key: 'rows', value: 3 },
+      ],
+    },
+  ],
+});
+
+console.log(modeLoweringReportText(report));
+```
+
+Do not use it for pixel or snapshot equivalence. It is a semantic contract:
+entities, labels, states, counts, edges, and component-specific facts should
+survive lowering even when the visible rendering changes completely.
+
 ## Component Families Beyond The Fast Path
 
 The quick guide covers the most common choices. The families below are still

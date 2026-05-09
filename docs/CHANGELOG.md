@@ -56,6 +56,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   tests can inspect focus ownership, tab order, focused-disabled nodes, missing
   focus, multiple focused nodes, and duplicate tab indexes as deterministic
   text or bounded surfaces.
+- **Mode-lowering linter for `bijou`** — `@flyingrobots/bijou` now exports
+  `lintModeLowering()` and `modeLoweringReportText()` so component authors can
+  compare semantic facts across `interactive`, `static`, `pipe`, and
+  `accessible` output without pixel-matching rendered text. Reports include
+  missing required facts, changed fact values, duplicate facts, and custom
+  assertion failures.
 
 ### 🐛 Bug Fixes
 

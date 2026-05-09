@@ -96,6 +96,20 @@ export {
   type ModeHandler,
   type ModeMap,
 } from './core/mode-render.js';
+export {
+  lintModeLowering,
+  modeLoweringReportText,
+  type ModeLoweringAssertionResult,
+  type ModeLoweringFact,
+  type ModeLoweringFactKind,
+  type ModeLoweringFactValue,
+  type ModeLoweringIssue,
+  type ModeLoweringIssueKind,
+  type ModeLoweringModeFacts,
+  type ModeLoweringOptions,
+  type ModeLoweringReport,
+  type ModeLoweringSeverity,
+} from './core/mode-lowering.js';
 
 // Background fill utilities
 export { shouldApplyBg, makeBgFill } from './core/bg-fill.js';

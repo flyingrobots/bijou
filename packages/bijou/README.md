@@ -83,6 +83,12 @@ fake duplication rather than a real second API.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast
   calculation for token-pair tests.
 
+### Mode-Aware Authoring
+- **`renderByMode()`**: Dispatch a component to the current output contract.
+- **`lintModeLowering()`**: Compare explicit semantic facts across output modes.
+- **`modeLoweringReportText()`**: Render a compact lowering report for tests,
+  docs, and review comments.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
