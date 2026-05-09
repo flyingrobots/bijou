@@ -155,6 +155,40 @@ on the same frame that a different set disappears. Treat that as a strong signal
 that your component identity is unstable and the reconciler is being forced to
 start new animations instead of continuing existing ones.
 
+## Layout Inspector Overlay
+
+`layoutInspectorOverlay()` composites development-only geometry over an existing
+surface. It accepts either Bijou's native `{ row, col, width, height }` rects or
+debug-friendly `{ x, y, width, height }` rects, clips borders to the target
+surface, and prefixes focused region labels with `*`.
+
+```typescript
+import {
+  layoutInspectorOverlay,
+  layoutInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const overlay = layoutInspectorOverlay(frame, [
+  {
+    id: 'editor',
+    role: 'pane',
+    rect: { row: 1, col: 2, width: 40, height: 12 },
+    clip: { row: 2, col: 2, width: 40, height: 10 },
+    scroll: { x: 0, y: 12 },
+    focused: true,
+    layer: 3,
+  },
+]);
+
+const report = layoutInspectorText([
+  { id: 'editor', rect: { x: 2, y: 1, width: 40, height: 12 }, focused: true },
+]);
+```
+
+Use the overlay when pane bounds, clipping, focus ownership, or z-layering need
+visual inspection. Use the text report in tests and logs where screenshot
+inspection would hide the actual geometry facts.
+
 ## Surface Diff Viewer
 
 `diffSurfaces()` compares two `Surface` objects cell by cell and keeps character

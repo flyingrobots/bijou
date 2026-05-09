@@ -84,6 +84,8 @@ Select the family based on the interaction semantic.
 - **`toast()`**: Transient notification for a single event.
 - **`tooltip()`**: Micro-explanation for a local target.
 - **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
+- **`layoutInspectorOverlay()`**: Development-only geometry HUD for region
+  bounds, focus, and layers.
 - **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
 
 ### Collection Interaction
@@ -207,6 +209,29 @@ and you need cell-level truth instead of a raw string dump:
 import { surfaceDiffText } from '@flyingrobots/bijou-tui';
 
 expect(surfaceDiffText(before, after)).toContain('surface diff: 2 changed');
+```
+
+Use `layoutInspectorOverlay()` when a layout assertion needs visual geometry
+truth on top of the rendered frame:
+
+```typescript
+import {
+  layoutInspectorOverlay,
+  layoutInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const inspected = layoutInspectorOverlay(frame, [
+  {
+    id: 'editor',
+    rect: { col: 2, row: 1, width: 40, height: 12 },
+    focused: true,
+  },
+]);
+
+expect(layoutInspectorText([
+  { id: 'editor', rect: { x: 2, y: 1, width: 40, height: 12 } },
+]))
+  .toContain('focused=false');
 ```
 
 ## Documentation

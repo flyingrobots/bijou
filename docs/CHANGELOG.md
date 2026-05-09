@@ -32,6 +32,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   tests and debug surfaces can inspect changed cells, char deltas, style-only
   deltas, changed bounds, side-by-side views, and overlay views without ad hoc
   surface dumps.
+- **Layout inspector overlay for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `layoutInspectorOverlay()` and `layoutInspectorText()` for
+  development-only geometry debugging. Apps can draw clipped region bounds and
+  labels over an existing surface, mark focused regions, and log a deterministic
+  report of ids, roles, rects, clip rects, scroll offsets, focus, and layers.
 
 ### 🐛 Bug Fixes
 

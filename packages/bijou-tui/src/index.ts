@@ -214,6 +214,17 @@ export type { LayoutRect } from './layout-rect.js';
 export type { DebugOverlayAnchor, DebugOverlayOptions } from './debug-overlay.js';
 export { debugOverlay } from './debug-overlay.js';
 export type {
+  LayoutInspectorOptions,
+  LayoutInspectorRect,
+  LayoutInspectorRegion,
+  LayoutInspectorScroll,
+  LayoutInspectorXYRect,
+} from './layout-inspector.js';
+export {
+  layoutInspectorOverlay,
+  layoutInspectorText,
+} from './layout-inspector.js';
+export type {
   SurfaceDiff,
   SurfaceDiffBounds,
   SurfaceDiffCell,
