@@ -63,7 +63,7 @@ The boundary remains:
   audit notification system
 - [**DF-036**](../../../design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md) -
   audit loading placeholders
-- [**DF-041**](./DF-041-audit-inspector-panels-family-across-real-surfaces.md) -
+- [**DF-041**](../../../design/DF-041-audit-inspector-panels-family-across-real-surfaces.md) -
   audit inspector panels
 - [**DF-049**](./DF-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.md) -
   audit multi-field and staged forms
