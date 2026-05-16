@@ -51,7 +51,7 @@ The boundary remains:
 
 ## First Blocks And Shell Proof
 
-- [**DF-063**](./DF-063-audit-app-shell-family-across-real-surfaces.md) -
+- [**DF-063**](../../../design/DF-063-audit-app-shell-family-across-real-surfaces.md) -
   audit app shell family across real surfaces
 - [**DX-032**](../../../design/DX-032-create-tui-app-skeleton-renders-consumer-pages.md) -
   make `createTuiAppSkeleton` render consumer pages
