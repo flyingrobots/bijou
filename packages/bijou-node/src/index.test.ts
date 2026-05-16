@@ -1,14 +1,16 @@
-import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
+import { describe, it, expect, expectTypeOf, afterEach, beforeEach, vi } from 'vitest';
 import {
   createNodeContext,
   initDefaultContext,
   startApp,
+  type NodeThemeOptions,
+  type StartAppOptions,
   _resetInitializedForTesting,
   _registerDefaultContextInitializerForTesting,
 } from './index.js';
 import { getDefaultContext, stringToSurface, type Surface, type Theme } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { createFramedApp, run } from '@flyingrobots/bijou-tui';
+import { createFramedApp, run, type RunOptions } from '@flyingrobots/bijou-tui';
 
 function textSurface(text: string): Surface {
   const lines = text.split('\n');
@@ -419,5 +421,9 @@ describe('startApp()', () => {
 
     expect(getDefaultContext()).not.toBe(explicitCtx);
     expect(writeSpy).toHaveBeenCalledWith('explicit ctx beats theme');
+  });
+
+  it('defaults StartAppOptions message payloads to unknown instead of any', () => {
+    expectTypeOf<StartAppOptions>().toEqualTypeOf<RunOptions<unknown> & NodeThemeOptions>();
   });
 });

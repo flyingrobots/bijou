@@ -94,7 +94,7 @@ export type CreateNodeContextOptions = NodeThemeOptions;
 export type InitDefaultContextOptions = NodeThemeOptions;
 
 /** Options for {@link startApp}. */
-export type StartAppOptions<M = any> = RunOptions<M> & NodeThemeOptions;
+export type StartAppOptions<M = unknown> = RunOptions<M> & NodeThemeOptions;
 
 interface SelfRunningApp<M = unknown> {
   run(options?: RunOptions<M>): Promise<void>;

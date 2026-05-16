@@ -74,7 +74,7 @@ The boundary remains:
 
 - [**DF-027**](../../../design/DF-027-storybook-style-tool-for-bijou.md) -
   seed a Storybook-style tool for Bijou blocks and component stories
-- [**DX-033**](./DX-033-remove-showcase-layout-sludge.md) -
+- [**DX-033**](../../../design/DX-033-remove-showcase-layout-sludge.md) -
   remove showcase layout sludge and manual scrolling/string assembly
 - [**WF-009**](../../../design/WF-009-keep-release-prs-under-automated-review-file-limits.md) -
   keep release PRs under automated review file limits

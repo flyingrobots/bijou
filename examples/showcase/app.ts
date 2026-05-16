@@ -1,7 +1,8 @@
-import type { BijouContext } from '@flyingrobots/bijou';
+import type { BijouContext, Surface } from '@flyingrobots/bijou';
 import { box, kbd, markdown } from '@flyingrobots/bijou';
 import {
   animate,
+  browsableListSurface,
   createBrowsableListState,
   createFramedApp,
   createKeyMap,
@@ -68,7 +69,7 @@ function renderDetail(
 }
 
 function renderWelcomeContent(width: number, _height: number, ctx: BijouContext): string {
-  const w = Math.max(20, Math.min(52, width - 4));
+  const w = Math.max(20, Math.min(52, width));
   return [
     '',
     '',
@@ -97,41 +98,26 @@ function renderWelcomeContent(width: number, _height: number, ctx: BijouContext)
 function renderSidebar(
   model: ShowcasePageModel,
   width: number,
-  _height: number,
+  height: number,
   category: Category,
   ctx: BijouContext,
-): string {
-  const items = model.listState.items;
-  const focus = model.listState.focusIndex;
-  const scrollY = model.listState.scrollY;
-  const visibleCount = model.listState.height;
-  const visible = items.slice(scrollY, scrollY + visibleCount);
+): Surface {
+  const viewportHeight = Math.max(1, height);
+  const state = model.listState.height === viewportHeight
+    ? model.listState
+    : { ...model.listState, height: viewportHeight };
 
-  const lines: string[] = [];
-  for (let i = 0; i < visible.length; i++) {
-    const item = visible[i]!;
-    const globalIdx = scrollY + i;
-    const isFocused = globalIdx === focus;
-    const entry = findEntry(item.value);
-    const tier = entry?.tier ?? 1;
-    const tierMark = tier === 3 ? ' *' : '';
-
-    if (isFocused) {
-      const label = ctx.style.styled(ctx.semantic('primary'), `> ${item.label}${tierMark}`);
-      lines.push(label);
-    } else {
-      lines.push(`  ${item.label}${tierMark}`);
-    }
-  }
-
-  // Scroll indicator
-  if (items.length > visibleCount) {
-    const pct = Math.round(((focus + 1) / items.length) * 100);
-    lines.push('');
-    lines.push(` ${focus + 1}/${items.length} (${pct}%)`);
-  }
-
-  return lines.join('\n');
+  return browsableListSurface(state, {
+    width: Math.max(1, width),
+    showScrollbar: state.items.length > state.height,
+    ctx,
+    renderItem: ({ item, focused }) => {
+      const entry = findEntry(item.value);
+      const tierMark = (entry?.tier ?? 1) === 3 ? ' *' : '';
+      const label = `${focused ? '>' : ' '} ${item.label}${tierMark}`;
+      return focused ? ctx.style.styled(ctx.semantic('primary'), label) : label;
+    },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +249,7 @@ function createCategoryPage(
         paneA: {
           kind: 'pane',
           paneId: `${category.id}-sidebar`,
-          render: (w, h) => contentSurface(renderSidebar(model, w, h, category, ctx)),
+          render: (w, h) => renderSidebar(model, w, h, category, ctx),
         },
         paneB: {
           kind: 'pane',
@@ -336,7 +322,7 @@ export function createShowcaseApp(
           title: 'Quit Showcase?',
           body: 'Exit the component showcase?\n\nEnter = Yes\nEsc = No',
           hint: 'q request  |  enter confirm  |  esc cancel',
-          width: Math.min(48, Math.max(34, frame.screenRect.width - 4)),
+          width: resolveQuitModalWidth(frame.screenRect.width),
           screenWidth: frame.screenRect.width,
           screenHeight: frame.screenRect.height,
           borderToken: ctx.border('primary'),
@@ -384,4 +370,8 @@ function clamp01(value: number): number {
   if (value < 0) return 0;
   if (value > 1) return 1;
   return value;
+}
+
+function resolveQuitModalWidth(screenWidth: number): number {
+  return Math.max(1, Math.min(48, screenWidth));
 }
