@@ -76,6 +76,7 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 - latest DOGFOOD docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest supporting closure:
+  - [DF-064 — Audit Keybinding Help And Shell Hints Family Across Real Surfaces](../design/DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md)
   - [DF-066 — Audit Data Visualization Family Across Real Surfaces](../design/DF-066-audit-data-visualization-family-across-real-surfaces.md)
   - [DF-049 — Audit Multi-Field And Staged Forms Family Across Real Surfaces](../design/DF-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.md)
   - [DF-041 — Audit Inspector Panels Family Across Real Surfaces](../design/DF-041-audit-inspector-panels-family-across-real-surfaces.md)
