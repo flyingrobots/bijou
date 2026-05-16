@@ -67,7 +67,7 @@ The boundary remains:
   audit inspector panels
 - [**DF-049**](../../../design/DF-049-audit-multi-field-and-staged-forms-family-across-real-surfaces.md) -
   audit multi-field and staged forms
-- [**DF-066**](./DF-066-audit-data-visualization-family-across-real-surfaces.md) -
+- [**DF-066**](../../../design/DF-066-audit-data-visualization-family-across-real-surfaces.md) -
   audit data visualization
 
 ## Tooling And Release Hygiene
