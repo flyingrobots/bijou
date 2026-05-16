@@ -40,7 +40,7 @@ The boundary remains:
 
 ## Core Runtime Scope
 
-- [**DF-065**](./DF-065-audit-workspace-layout-family-across-real-surfaces.md) -
+- [**DF-065**](../../../design/DF-065-audit-workspace-layout-family-across-real-surfaces.md) -
   audit workspace layout family across real surfaces
 - [**DF-060**](./DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md) -
   audit viewport masking and scrollable inspection panes
