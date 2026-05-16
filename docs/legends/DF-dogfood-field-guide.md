@@ -76,6 +76,7 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 - latest DOGFOOD docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest supporting closure:
+  - [DF-036 — Audit Loading Placeholders Family Across Real Surfaces](../design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md)
   - [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
