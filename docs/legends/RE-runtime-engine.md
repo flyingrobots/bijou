@@ -66,6 +66,8 @@ An agent can inspect runtime objects and predict routing, layout ownership, comm
 
 ## Current cycle and backlog
 
+- active design draft:
+  - [RE-035 — Mandatory Layout Envelope And Constraint Negotiation](../design/RE-035-mandatory-layout-envelope-and-constraint-negotiation.md)
 - latest completed cycle:
   - [RE-007 — Migrate Framed Shell Onto Runtime Engine Seams](../design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
 - previous completed cycle:
