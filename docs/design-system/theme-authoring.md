@@ -28,7 +28,7 @@ The built-in required keys inside those groups are:
 - `status`: `success`, `error`, `warning`, `info`, `pending`, `active`, `muted`
 - `semantic`: `success`, `error`, `warning`, `info`, `accent`, `muted`, `primary`
 - `border`: `primary`, `secondary`, `success`, `warning`, `error`, `muted`
-- `ui`: `cursor`, `scrollThumb`, `scrollTrack`, `sectionHeader`, `logo`, `tableHeader`, `trackEmpty`
+- `ui`: `cursor`, `focusGutter`, `scrollThumb`, `scrollTrack`, `sectionHeader`, `logo`, `tableHeader`, `trackEmpty`
 - `surface`: `primary`, `secondary`, `elevated`, `overlay`, `muted`
 - `gradient`: `brand`, `progress`
 
@@ -123,6 +123,7 @@ shape to copy and edit.
   },
   "ui": {
     "cursor": { "$type": "color", "$value": "#38bdf8" },
+    "focusGutter": { "$type": "color", "$value": "#c084fc" },
     "scrollThumb": { "$type": "color", "$value": "#38bdf8" },
     "scrollTrack": { "$type": "color", "$value": "#334155" },
     "sectionHeader": { "$type": "color", "$value": { "hex": "#f8fafc", "modifiers": ["bold"] } },
@@ -306,6 +307,7 @@ export const MY_THEME: Theme = {
   },
   ui: {
     cursor: { hex: '#38bdf8' },
+    focusGutter: { hex: '#c084fc' },
     scrollThumb: { hex: '#38bdf8' },
     scrollTrack: { hex: '#334155' },
     sectionHeader: { hex: '#f8fafc', modifiers: ['bold'] },

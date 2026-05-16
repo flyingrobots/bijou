@@ -294,6 +294,19 @@ describe('focusArea', () => {
     });
   });
 
+  it('defaults the focused gutter to the shell focus UI token', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    ctx.tokenGraph.set('ui.focusGutter', '#123456');
+    ctx.tokenGraph.set('semantic.accent', '#abcdef');
+
+    const state = createFocusAreaState({ content: SHORT_CONTENT, width: 40, height: 5 });
+    focusArea(state, { focused: true, ctx });
+
+    const styledGutter = style.calls.find((call) => call.method === 'styled' && call.text === '▎');
+    expect(styledGutter?.token).toMatchObject({ hex: '#123456' });
+  });
+
   it('defaults to focused=true', () => {
     const state = createFocusAreaState({ content: SHORT_CONTENT, width: 40, height: 5 });
     const output = focusArea(state);
@@ -444,6 +457,30 @@ describe('focusAreaSurface', () => {
     const trackCall = style.calls.find((call) => call.method === 'styled' && call.text === '│');
     expect(thumbCall?.token).toMatchObject({ hex: '#ff00ff', bg: '#101010' });
     expect(trackCall?.token).toMatchObject({ hex: '#00ffff' });
+  });
+
+  it('defaults scrollbar cells to scrollbar UI tokens', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ style });
+    ctx.tokenGraph.set('ui.scrollThumb', '#123456');
+    ctx.tokenGraph.set('ui.scrollTrack', '#654321');
+    ctx.tokenGraph.set('semantic.accent', '#abcdef');
+    ctx.tokenGraph.set('semantic.muted', '#fedcba');
+
+    const content = stringToSurface('abcde\nfghij\nklmno\npqrst', 5, 4);
+    const state = createFocusAreaStateForSurface(content, {
+      width: 6,
+      height: 2,
+      overflowX: 'hidden',
+      scrollbarMode: 'overlay',
+    });
+
+    focusAreaSurface(content, state, { ctx, id: 'main' });
+
+    const thumbCall = style.calls.find((call) => call.method === 'styled' && call.text === '█');
+    const trackCall = style.calls.find((call) => call.method === 'styled' && call.text === '│');
+    expect(thumbCall?.token).toMatchObject({ hex: '#123456' });
+    expect(trackCall?.token).toMatchObject({ hex: '#654321' });
   });
 });
 

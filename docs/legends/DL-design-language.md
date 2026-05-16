@@ -55,6 +55,7 @@ An agent can evaluate proposed Bijou UX changes against explicit doctrine, playb
 ## Current cycle and backlog
 
 - latest completed lineage:
+  - [DL-012 — Separate focus gutter chrome from scrollbar UI tokens](../design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md)
   - [DL-010 — Strictly Typed App Interface Examples](../method/retro/DL-010-strictly-typed-app-examples.md)
   - [DL-009 — Formalize Layout and Viewport Rules](../method/retro/DL-009-formalize-layout-and-viewport-rules.md)
 - current exploratory backlog:

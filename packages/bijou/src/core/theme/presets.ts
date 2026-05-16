@@ -91,6 +91,7 @@ export const CYAN_MAGENTA: Theme<BaseStatusKey> = {
 
   ui: {
     cursor:        tv('#00ffff'),
+    focusGutter:   tv('#ff00ff'),
     scrollThumb:   tv('#00ffff'),
     scrollTrack:   tv('#808080'),
     sectionHeader: tv('#0000ff', ['bold']),
@@ -161,6 +162,7 @@ export const TEAL_ORANGE_PINK: Theme<BaseStatusKey> = {
 
   ui: {
     cursor:        tv('#3bcfd4'),
+    focusGutter:   tv('#f20094'),
     scrollThumb:   tv('#3bcfd4'),
     scrollTrack:   tv('#6b7280'),
     sectionHeader: tv('#fc9305', ['bold']),
@@ -222,6 +224,7 @@ export const PRESETS: Record<string, Theme> = {
     },
     ui: {
       cursor:        tv('#88C0D0'),
+      focusGutter:   tv('#B48EAD'),
       scrollThumb:   tv('#81A1C1'),
       scrollTrack:   tv('#3B4252'),
       sectionHeader: tv('#88C0D0', ['bold']),
@@ -278,6 +281,7 @@ export const PRESETS: Record<string, Theme> = {
     },
     ui: {
       cursor:        tv('#f5e0dc'),
+      focusGutter:   tv('#cba6f7'),
       scrollThumb:   tv('#89b4fa'),
       scrollTrack:   tv('#313244'),
       sectionHeader: tv('#fab387', ['bold']),

@@ -188,7 +188,16 @@ const SEMANTIC_KEYS = ['success', 'error', 'warning', 'info', 'accent', 'muted',
 /** All built-in border keys used when extracting from a DTCG document. */
 const BORDER_KEYS = ['primary', 'secondary', 'success', 'warning', 'error', 'muted'] as const;
 /** All built-in UI element keys used when extracting from a DTCG document. */
-const UI_KEYS: readonly BaseUiKey[] = ['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty'];
+const UI_KEYS: readonly BaseUiKey[] = [
+  'cursor',
+  'focusGutter',
+  'scrollThumb',
+  'scrollTrack',
+  'sectionHeader',
+  'logo',
+  'tableHeader',
+  'trackEmpty',
+];
 /** All built-in surface keys used when extracting from a DTCG document. */
 const SURFACE_KEYS = ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const;
 /** All built-in gradient keys used when extracting from a DTCG document. */

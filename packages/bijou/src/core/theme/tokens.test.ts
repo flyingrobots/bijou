@@ -78,6 +78,7 @@ describe('theme/tokens types', () => {
       },
       ui: {
         cursor: { hex: '#00ffff' },
+        focusGutter: { hex: '#ff00ff' },
         scrollThumb: { hex: '#00ffff' },
         scrollTrack: { hex: '#808080' },
         sectionHeader: { hex: '#0000ff' },

@@ -58,7 +58,8 @@ House rules:
 
 - prefer `semantic.primary` for deliberate foreground emphasis
 - prefer `semantic.muted` for metadata, hints, and supporting text
-- prefer `semantic.accent` for local active/focused affordances
+- prefer `semantic.accent` for local active/focused affordances inside a
+  component
 - do not use `semantic.*` as a generic background-fill family
 
 ### `surface`
@@ -124,6 +125,7 @@ to domain data.
 This is the default family for:
 
 - cursor or selection chrome owned by the shell/runtime
+- focused pane gutters owned by reusable shell frames
 - scrollbars and tracks
 - section headers
 - logos or branded shell marks
@@ -133,6 +135,7 @@ This is the default family for:
 Built-in keys:
 
 - `cursor`
+- `focusGutter`
 - `scrollThumb`
 - `scrollTrack`
 - `sectionHeader`
@@ -144,6 +147,8 @@ House rules:
 
 - reserve `ui.*` for framework/runtime chrome, not business-domain statuses
 - prefer a dedicated `ui` token when the same affordance recurs across shells
+- use `ui.focusGutter` for focused shell pane gutters; use
+  `semantic.accent` for local active emphasis inside a component
 - do not use `ui.*` as a back door for arbitrary one-off component colors
 
 ### `status`
@@ -199,13 +204,15 @@ domain-specific semantics, prefer these defaults:
 
 - default supporting text: `semantic.muted`
 - explicit primary emphasis: `semantic.primary`
-- local active or focused affordance: `semantic.accent`
+- local active or focused affordance inside a component: `semantic.accent`
 - default structural border: `border.muted`
 - default contained-region fill: `surface.elevated`
 - default secondary-pane fill: `surface.secondary`
 - default overlay fill: `surface.overlay`
 - default disabled or inset fill: `surface.muted`
 - reusable shell cursor or selected-shell chrome: `ui.cursor`
+- reusable focused shell gutter chrome: `ui.focusGutter`
+- reusable scrollbar chrome: `ui.scrollThumb` and `ui.scrollTrack`
 - table header chrome: `ui.tableHeader`
 - progress empty track: `ui.trackEmpty`
 
@@ -291,7 +298,7 @@ Examples of the intended split:
 - `badge()` should use `status.*` when it is carrying a real status
 - `kbd()` should use muted structure tokens, not a status token
 - `tableSurface()` should use `ui.tableHeader` for reusable header chrome
-- shell cursor, scrollbars, and track fills should use `ui.*`, not business
-  statuses
+- shell cursor, focused gutters, scrollbars, and track fills should use
+  `ui.*`, not business statuses
 - overlays and drawers should communicate interruption primarily through
   `surface.overlay`, not by tinting everything as a warning
