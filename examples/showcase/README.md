@@ -2,6 +2,10 @@
 
 Interactive component explorer with live previews across rich, pipe, and accessible modes.
 
+The showcase is now a secondary example surface. Use `npm run dogfood` for the
+canonical human-facing docs app and `npm run dogfood:storybook` for the
+text-first story index and capture matrix over the canonical DOGFOOD stories.
+
 ## Run
 
 ```sh
@@ -27,5 +31,6 @@ Use a `Surface` preview when the component being demonstrated is already surface
 
 - The badge preview now uses structured surface composition instead of lowering each badge individually.
 - The showcase still presents all three modes side by side so degradation behavior stays visible.
+- Sidebar scrolling is delegated to `browsableListSurface()` so the example does not own its own row slicing.
 
 [← Examples](../README.md)
