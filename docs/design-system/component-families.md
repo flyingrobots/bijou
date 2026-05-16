@@ -1062,6 +1062,8 @@ If those checks fail, the component work is not doctrinally complete yet.
   - `TOAST`
   - info, success, warning, error tone variants
   - per-notification placement and duration
+  - history/archive view
+  - frame-routed runtime notifications
 - Use when:
   - the app owns transient messaging as a system instead of rendering one ad hoc overlay at a time
   - stacking, placement, routing, or history matter
