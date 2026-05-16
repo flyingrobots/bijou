@@ -59,7 +59,7 @@ The boundary remains:
   audit keybinding help and shell hints
 - [**DF-061**](../../../design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md) -
   audit overlay primitives
-- [**DF-062**](./DF-062-audit-notification-system-family-across-real-surfaces.md) -
+- [**DF-062**](../../../design/DF-062-audit-notification-system-family-across-real-surfaces.md) -
   audit notification system
 - [**DF-036**](../../../design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md) -
   audit loading placeholders
