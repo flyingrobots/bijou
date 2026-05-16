@@ -72,7 +72,7 @@ The boundary remains:
 
 ## Tooling And Release Hygiene
 
-- [**DF-027**](./DF-027-storybook-style-tool-for-bijou.md) -
+- [**DF-027**](../../../design/DF-027-storybook-style-tool-for-bijou.md) -
   seed a Storybook-style tool for Bijou blocks and component stories
 - [**DX-033**](./DX-033-remove-showcase-layout-sludge.md) -
   remove showcase layout sludge and manual scrolling/string assembly

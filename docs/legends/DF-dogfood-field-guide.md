@@ -76,6 +76,7 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 - latest DOGFOOD docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest supporting closure:
+  - [DF-027 — Storybook-Style Tool for Bijou](../design/DF-027-storybook-style-tool-for-bijou.md)
   - [DF-062 — Audit Notification System Family Across Real Surfaces](../design/DF-062-audit-notification-system-family-across-real-surfaces.md)
   - [DF-061 — Audit Overlay Primitives Family Across Real Surfaces](../design/DF-061-audit-overlay-primitives-family-across-real-surfaces.md)
   - [DF-060 — Audit Viewport Masking And Scrollable Inspection Panes Family Across Real Surfaces](../design/DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md)
@@ -89,10 +90,10 @@ before DOGFOOD counts as a real terminal docs product, and can see that
   - [DF-026 — Demote Examples To Secondary Reference Status](../design/DF-026-demote-examples-to-secondary-reference-status.md)
 - latest workflow closure:
   - [WF-003 — Replace `smoke:examples:*` With `smoke:dogfood`](../design/WF-003-replace-smoke-examples-with-smoke-dogfood.md)
-- current exploratory backlog:
-  - [DF-027 — Storybook-Style Tool for Bijou](../method/backlog/cool-ideas/DF-027-storybook-style-tool-for-bijou.md)
-  - [DF-028 — Story Capture Matrix](../method/backlog/cool-ideas/DF-028-story-capture-matrix.md)
-  - [DF-029 — Fixture-to-Docs Promotion Path](../method/backlog/cool-ideas/DF-029-fixture-to-docs-promotion-path.md)
+- current story-tooling lineage:
+  - [DF-027 — Storybook-Style Tool for Bijou](../design/DF-027-storybook-style-tool-for-bijou.md)
+  - [DF-028 — Story Capture Matrix](../design/DF-028-story-capture-matrix.md)
+  - [DF-029 — Fixture-to-Docs Promotion Path](../design/DF-029-fixture-to-docs-promotion-path.md)
 - completed depth follow-on:
   - [DF-020 — Deepen DOGFOOD Story Depth and Variant Quality](../method/retro/DF-020-deepen-dogfood-story-depth-and-variant-quality.md)
 - historical backlog lineage:
