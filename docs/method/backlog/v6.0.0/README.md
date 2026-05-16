@@ -76,7 +76,7 @@ The boundary remains:
   seed a Storybook-style tool for Bijou blocks and component stories
 - [**DX-033**](./DX-033-remove-showcase-layout-sludge.md) -
   remove showcase layout sludge and manual scrolling/string assembly
-- [**WF-009**](./WF-009-keep-release-prs-under-automated-review-file-limits.md) -
+- [**WF-009**](../../../design/WF-009-keep-release-prs-under-automated-review-file-limits.md) -
   keep release PRs under automated review file limits
 
 ## Execution Order
@@ -89,4 +89,3 @@ The boundary remains:
 
 Stop before tagging `v6.0.0`. The tag is a separate release operation after
 the lane is complete and release readiness is green.
-

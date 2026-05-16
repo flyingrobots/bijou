@@ -29,7 +29,8 @@ Bijou now tracks work through:
 
 ## Working Loop
 
-1. Pull from `docs/method/backlog/asap/` or `docs/method/backlog/up-next/`.
+1. Pull from `docs/method/backlog/asap/`, `docs/method/backlog/up-next/`,
+   or the active shaped release lane.
 2. Create a branch named `cycle/<cycle_name>` for that cycle.
 3. Move the file into `docs/design/` and enrich it into a real cycle doc.
 4. Write failing tests. Playback questions become the executable spec.
@@ -39,6 +40,37 @@ Bijou now tracks work through:
 8. Push the cycle branch and open a pull request to `main`.
 9. After merge, sync `BEARING.md`, `CHANGELOG.md`, and any other
    signposts that changed.
+
+## PR Size Discipline
+
+Release-boundary work must still move through reviewable PRs.
+
+Use precursor PRs before the final release sync when a branch is likely to
+cross automated review limits.
+
+Hard stop before opening a PR:
+
+- more than 140 changed files
+
+Caution threshold before opening a PR:
+
+- more than 10 commits
+- unrelated legends or cycle families on one branch
+- generated snapshots or docs mixed with unrelated runtime changes
+- more than one release-lane blocker implemented at once
+
+When a threshold is hit, split the work by cycle or product surface:
+
+- runtime engine
+- TUI shell and interaction
+- core components
+- DOGFOOD and docs proof
+- backlog or release-lane bookkeeping
+- version, changelog, and final release docs
+
+The final release PR should be boring: version bump, changelog, long-form
+release docs, release-readiness proof, and final metadata only. Feature work
+should land through precursor PRs before that point.
 
 ## Repo Rules
 

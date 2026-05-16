@@ -58,8 +58,11 @@ That is why `release:readiness` is the validation gauntlet, not the
 
 ### Latest Shipped Release
 
-The latest shipped release is **`4.4.1`**.
+The latest shipped release is **`5.0.0`**.
 
+- `5.0.0` - frame-owned hosted runner, Node-host theme selection,
+  crash-mode auto-exit, scoped Node I/O symlink hardening, deterministic
+  scripted-example smoke, markdown pipe tables, and browsable-list marquee
 - `4.4.1` — framed-shell background-fill fixes, stock shell theme cycling, uppercase quit-confirm input
 - `4.4.0` — data-viz toolkit, zero-alloc framed app render, new bench scenarios
 - `4.3.0` — RE-008 byte-packed surface, RE-015 braille fix, `setRGB` API
@@ -74,14 +77,12 @@ Long-form release docs live under `docs/releases/<version>/`.
 
 ### Next Release Posture
 
-The next release being prepared is **`5.0.0`**.
+The next release being prepared is **`6.0.0`**.
 
-It promotes the hosted framed-shell runner, simplifies Node-host theme
-selection, hardens the runtime and filesystem surfaces, and makes the
-release-facing proof path more deterministic through the dedicated
-interactive-example verification lane. The broader engineering focus
-after that release remains DOGFOOD docs ingestion, pointer-driven
-selection/copy, and continued shell/presentation polish.
+It is shaped around layout truth and standard blocks: mandatory layout
+envelopes, viewport and chrome formalization, first-party block composition,
+and tooling that can inspect variants and mode lowerings. The active shaping
+lane is [`docs/method/backlog/v6.0.0/`](./method/backlog/v6.0.0/README.md).
 
 ### Lock-step Versioned Units
 
@@ -157,6 +158,26 @@ first-release policy.
 Bijou does **not** currently auto-compute the semver bump from commit
 history. The maintainer chooses the target version deliberately.
 
+### 0. Slice release-boundary work before the final PR
+
+Before bumping versions, make sure feature and documentation work has already
+landed through reviewable precursor PRs.
+
+Hard stop before opening a release-boundary PR:
+
+- more than 140 changed files
+
+Caution threshold:
+
+- more than 10 commits
+- unrelated legends or cycle families on one branch
+- generated snapshots or docs mixed with unrelated runtime changes
+- more than one release-lane blocker implemented at once
+
+When a threshold is hit, split the branch by cycle or product surface. The
+final release PR should primarily contain the version bump, changelog, long-form
+release docs, release-readiness proof, and final metadata updates.
+
 ### 1. Pick the target version
 
 Allowed tag formats are:
@@ -202,8 +223,8 @@ When the version is chosen, move that directory to
 `docs/releases/X.Y.Z/` and update any version placeholders inside the
 docs.
 
-For the release currently being prepared, that work lives under
-`docs/releases/5.0.0/`.
+For `v6.0.0`, release shaping currently lives under
+`docs/method/backlog/v6.0.0/` until long-form release docs are drafted.
 
 ## Phase 3: Local Validation
 
