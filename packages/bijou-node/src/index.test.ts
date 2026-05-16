@@ -56,6 +56,7 @@ function makeTheme(name: string, primaryHex: string, primaryBg: string, accentHe
     },
     ui: {
       cursor: { hex: '#38bdf8' },
+      focusGutter: { hex: accentHex },
       scrollThumb: { hex: '#38bdf8' },
       scrollTrack: { hex: '#334155' },
       sectionHeader: { hex: primaryHex, modifiers: ['bold'] },
@@ -132,6 +133,7 @@ const LEGACY_TEST_THEME: Theme = {
   },
   ui: {
     cursor: { hex: '#38bdf8' },
+    focusGutter: { hex: '#c084fc' },
     scrollThumb: { hex: '#38bdf8' },
     scrollTrack: { hex: '#334155' },
     sectionHeader: { hex: '#f8fafc', modifiers: ['bold'] },

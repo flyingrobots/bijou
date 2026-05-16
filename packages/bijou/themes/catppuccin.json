@@ -115,6 +115,10 @@
       "$type": "color",
       "$value": "#f5e0dc"
     },
+    "focusGutter": {
+      "$type": "color",
+      "$value": "#cba6f7"
+    },
     "scrollThumb": {
       "$type": "color",
       "$value": "#89b4fa"

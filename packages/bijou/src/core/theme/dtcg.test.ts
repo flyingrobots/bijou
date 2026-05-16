@@ -85,6 +85,7 @@ describe('DTCG interop', () => {
         },
         ui: {
           cursor: { $type: 'color', $value: '#00ffff' },
+          focusGutter: { $type: 'color', $value: '#ff00ff' },
           scrollThumb: { $type: 'color', $value: '#00ffff' },
           scrollTrack: { $type: 'color', $value: '#808080' },
           sectionHeader: { $type: 'color', $value: '#0000ff' },
@@ -149,6 +150,7 @@ describe('DTCG interop', () => {
         },
         ui: {
           cursor: { $type: 'color', $value: '#00ffff' },
+          focusGutter: { $type: 'color', $value: '#ff00ff' },
           scrollThumb: { $type: 'color', $value: '#00ffff' },
           scrollTrack: { $type: 'color', $value: '#808080' },
           sectionHeader: { $type: 'color', $value: '#0000ff' },
@@ -222,7 +224,7 @@ describe('DTCG interop', () => {
         semantic: filler(['success', 'error', 'warning', 'info', 'accent', 'muted', 'primary']),
         gradient: { brand: { $type: 'gradient', $value: [] }, progress: { $type: 'gradient', $value: [] } },
         border: filler(['primary', 'secondary', 'success', 'warning', 'error', 'muted']),
-        ui: filler(['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty']),
+        ui: filler(['cursor', 'focusGutter', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty']),
         surface: filler(['primary', 'secondary', 'elevated', 'overlay', 'muted']),
         ...overrides,
       };
@@ -410,6 +412,7 @@ describe('DTCG interop', () => {
         },
         ui: {
           cursor: { hex: '#ff00ff' },
+          focusGutter: { hex: '#ff66cc' },
           scrollThumb: { hex: '#cccccc' },
           scrollTrack: { hex: '#222222' },
           sectionHeader: { hex: '#0000ff', modifiers: ['bold'] },
@@ -492,6 +495,7 @@ describe('DTCG interop', () => {
         },
         ui: {
           cursor: { hex: '#00ffff' },
+          focusGutter: { hex: '#ff00ff' },
           scrollThumb: { hex: '#00ffff' },
           scrollTrack: { hex: '#808080' },
           sectionHeader: { hex: '#0000ff' },

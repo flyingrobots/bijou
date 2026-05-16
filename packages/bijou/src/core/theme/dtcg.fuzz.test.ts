@@ -5,7 +5,16 @@ import type { Theme, TextModifier, GradientStop, TokenValue, BaseStatusKey, Base
 
 const ALL_MODIFIERS: TextModifier[] = ['bold', 'dim', 'strikethrough', 'inverse', 'underline', 'curly-underline', 'dotted-underline', 'dashed-underline'];
 const STATUS_KEYS: BaseStatusKey[] = ['success', 'error', 'warning', 'info', 'pending', 'active', 'muted'];
-const UI_KEYS: BaseUiKey[] = ['cursor', 'scrollThumb', 'scrollTrack', 'sectionHeader', 'logo', 'tableHeader', 'trackEmpty'];
+const UI_KEYS: BaseUiKey[] = [
+  'cursor',
+  'focusGutter',
+  'scrollThumb',
+  'scrollTrack',
+  'sectionHeader',
+  'logo',
+  'tableHeader',
+  'trackEmpty',
+];
 const SEMANTIC_KEYS = ['success', 'error', 'warning', 'info', 'accent', 'muted', 'primary'] as const;
 const BORDER_KEYS = ['primary', 'secondary', 'success', 'warning', 'error', 'muted'] as const;
 const SURFACE_KEYS = ['primary', 'secondary', 'elevated', 'overlay', 'muted'] as const;

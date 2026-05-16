@@ -63,8 +63,8 @@ export type InkColor = string | undefined;
 export type BaseStatusKey = 'success' | 'error' | 'warning' | 'info' | 'pending' | 'active' | 'muted';
 
 /** Built-in UI element keys. */
-export type BaseUiKey = 'cursor' | 'scrollThumb' | 'scrollTrack' | 'sectionHeader'
-  | 'logo' | 'tableHeader' | 'trackEmpty';
+export type BaseUiKey = 'cursor' | 'focusGutter' | 'scrollThumb' | 'scrollTrack'
+  | 'sectionHeader' | 'logo' | 'tableHeader' | 'trackEmpty';
 
 /** Built-in gradient keys. */
 export type BaseGradientKey = 'brand' | 'progress';

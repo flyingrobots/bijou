@@ -641,6 +641,7 @@ const VERDANT_PLUM_THEME: Theme = {
   ui: {
     ...CYAN_MAGENTA.ui,
     cursor: tv(VERDANT_PLUM_COLORS[4]),
+    focusGutter: { hex: VERDANT_PLUM_COLORS[3], bg: VERDANT_PLUM_COLORS[0], modifiers: ['bold'] },
     scrollThumb: tv(VERDANT_PLUM_COLORS[4]),
     scrollTrack: tv(VERDANT_PLUM_COLORS[1]),
     sectionHeader: tv(VERDANT_PLUM_COLORS[2], ['bold']),
@@ -2144,6 +2145,7 @@ function landingTokensToShellTheme(theme: LandingThemeTokens): Theme {
     ui: {
       ...CYAN_MAGENTA.ui,
       cursor: tv(sampleColorRamp(theme.logoRamp, 0.88)),
+      focusGutter: docsThemeFocusedGutterToken(theme),
       scrollThumb: tv(sampleColorRamp(theme.logoRamp, 0.88)),
       scrollTrack: tv(sampleColorRamp(theme.waveRamp, 0.18)),
       sectionHeader: tv(sampleColorRamp(theme.waveRamp, 0.8), ['bold']),
@@ -2859,21 +2861,18 @@ function createDocsExplorerApp(
                 family: {
                   kind: 'pane',
                   paneId: 'family-nav',
-                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                   render: (width, height) => renderFamiliesPane(model, width, height, getCtx(), theme),
                 },
                 main: {
                   kind: 'pane',
                   paneId: 'story-content',
-                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                   render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
                 },
                 variants: {
                   kind: 'pane',
                   paneId: 'story-variants',
-                  focusedGutterToken: docsThemeFocusedGutterToken(theme),
                   unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                   render: (width, height) => renderVariantsPane(model, width, height, getCtx(), theme),
                 },
@@ -2955,21 +2954,18 @@ function createDocsExplorerApp(
               nav: {
                 kind: 'pane',
                 paneId: 'guide-nav',
-                focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                 render: (width, height) => renderGuideNavPane(spec.id, model, width, height, getCtx(), theme, i18n),
               },
               main: {
                 kind: 'pane',
                 paneId: 'guide-content',
-                focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                 render: (width) => renderGuideReaderPane(spec.id, model, width, getCtx(), theme),
               },
               meta: {
                 kind: 'pane',
                 paneId: 'guide-meta',
-                focusedGutterToken: docsThemeFocusedGutterToken(theme),
                 unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
                 render: (width) => renderGuideInfoPane(spec.id, model, width, getCtx(), theme, i18n),
               },

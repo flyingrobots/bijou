@@ -46,6 +46,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `doctorTheme()` and `themeContrastRatio()` so theme authors can detect invalid
   token colors, weak foreground/background contrast, and suspicious color reuse
   through structured reports instead of manual visual inspection.
+- **Focused gutter UI token** — `@flyingrobots/bijou` now includes
+  `ui.focusGutter` as a built-in theme token, and `@flyingrobots/bijou-tui`
+  focus-area defaults use shell UI tokens for focused gutters and scrollbars
+  instead of borrowing generic semantic accent/muted colors.
 - **Input routing inspector for `bijou-tui`** — `@flyingrobots/bijou-tui` now
   exports `appendInputRoutingRecord()`, `inputRoutingInspectorText()`, and
   `inputRoutingInspectorSurface()` so apps and tests can inspect recent

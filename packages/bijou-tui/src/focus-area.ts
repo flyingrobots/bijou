@@ -2,7 +2,8 @@
  * Focus area building block — a scrollable pane with a colored left gutter.
  *
  * Wraps `viewport()` and prepends a styled gutter character (`▎`) to each
- * line indicating focus state: bright accent when focused, muted when unfocused.
+ * line indicating focus state: shell focus chrome when focused, muted when
+ * unfocused.
  *
  * Follows the building block pattern: immutable state + pure transformers +
  * pure render + convenience keymap factory.
@@ -80,15 +81,15 @@ export interface FocusAreaOptions {
 export interface FocusAreaRenderOptions {
   /** Whether the pane is currently focused. Default: `true`. */
   readonly focused?: boolean;
-  /** Token for the focused gutter. Default: `theme.semantic.accent`. */
+  /** Token for the focused gutter. Default: `theme.ui.focusGutter`. */
   readonly focusedGutterToken?: TokenValue;
   /** Token for the unfocused gutter. Default: `theme.semantic.muted`. */
   readonly unfocusedGutterToken?: TokenValue;
   /** Show a scrollbar track on the right edge. Default: `true`. */
   readonly showScrollbar?: boolean;
-  /** Token for the scrollbar track. Default: `theme.semantic.muted`. */
+  /** Token for the scrollbar track. Default: `theme.ui.scrollTrack`. */
   readonly scrollbarTrackToken?: TokenValue;
-  /** Token for the scrollbar thumb. Default: `theme.semantic.accent`. */
+  /** Token for the scrollbar thumb. Default: `theme.ui.scrollThumb`. */
   readonly scrollbarThumbToken?: TokenValue;
   /** Optional BCSS id for the focus area. */
   readonly id?: string;
@@ -301,7 +302,7 @@ export function focusAreaSetContent(state: FocusAreaState, content: string): Foc
  * Render the focus area — viewport content with a colored left gutter.
  *
  * The gutter character (`▎`) is styled based on focus state:
- * - Focused: `focusedGutterToken` (default: `theme.semantic.accent`)
+ * - Focused: `focusedGutterToken` (default: `theme.ui.focusGutter`)
  * - Unfocused: `unfocusedGutterToken` (default: `theme.semantic.muted`)
  * - Static mode: unstyled gutter
  * - Pipe / accessible mode: no gutter (full width to content)
@@ -449,7 +450,7 @@ function resolveGutter(
     static: () => GUTTER_CHAR,
     interactive: () => {
       const baseToken = focused
-        ? (options?.focusedGutterToken ?? ctx.semantic('accent'))
+        ? (options?.focusedGutterToken ?? ctx.ui('focusGutter'))
         : (options?.unfocusedGutterToken ?? ctx.semantic('muted'));
       const token = resolveBCSSTextToken(
         ctx,
@@ -503,8 +504,8 @@ function resolveScrollbarCell(
   }
 
   const baseToken = kind === 'thumb'
-    ? (options?.scrollbarThumbToken ?? ctx.semantic('accent'))
-    : (options?.scrollbarTrackToken ?? ctx.semantic('muted'));
+    ? (options?.scrollbarThumbToken ?? ctx.ui('scrollThumb'))
+    : (options?.scrollbarTrackToken ?? ctx.ui('scrollTrack'));
   const baseChar = kind === 'thumb' ? SCROLLBAR_THUMB_CELL.char : SCROLLBAR_TRACK_CELL.char;
   const key = `${kind}:${baseChar}:${JSON.stringify(baseToken)}:${options?.id ?? ''}:${(options?.classes ?? []).join(',')}`;
   const cached = scrollbarCellCache.get(key);
