@@ -51,6 +51,7 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 - active design draft:
   - [DX-031 — Standard Bijou Blocks](../design/DX-031-standard-bijou-blocks.md)
 - latest completed closures:
+  - [DX-030 — Add Boundary-Aware Pointer Selection And Copy](../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md)
   - [DX-028 — Align front-door docs with repo truth](../method/retro/DX-028-align-front-door-docs-with-repo-truth.md)
   - [DX-020 — Layout Localization Pipeline Guide](../method/retro/DX-020-layout-localization-pipeline-guide.md)
   - [DX-019 — Third-Party Theme Reactivity Hook](../method/retro/DX-019-third-party-theme-reactivity-hook.md)
