@@ -21,8 +21,29 @@ import {
   type KeyMap,
   type KeyMsg,
   type Overlay,
+  type ViewOutput,
 } from '@flyingrobots/bijou-tui';
 import { renderSplitPaneLabelSurface } from './split-pane-surface.js';
+
+/** Context passed to consumer-provided skeleton page renderers. */
+export interface SkeletonRenderContext {
+  /** Bijou context used by the skeleton shell. */
+  readonly ctx: BijouContext;
+  /** Tab being rendered. */
+  readonly tab: SkeletonTab;
+  /** Current skeleton-owned page model. */
+  readonly model: SkeletonPageModel;
+}
+
+/** Context passed to consumer-provided skeleton layout factories. */
+export interface SkeletonLayoutContext {
+  /** Bijou context used by the skeleton shell. */
+  readonly ctx: BijouContext;
+  /** Tab being rendered. */
+  readonly tab: SkeletonTab;
+  /** Current skeleton-owned page model. */
+  readonly model: SkeletonPageModel;
+}
 
 /** Single top-level tab in the app skeleton. */
 export interface SkeletonTab {
@@ -30,6 +51,24 @@ export interface SkeletonTab {
   readonly id: string;
   /** Visible tab label. */
   readonly title: string;
+  /**
+   * Optional pane renderer for this tab.
+   *
+   * Use this when the page body is a single pane. Return a `Surface` or
+   * `LayoutNode`; strings are intentionally not accepted by the framed app
+   * render seam.
+   */
+  readonly render?: (
+    width: number,
+    height: number,
+    context: SkeletonRenderContext,
+  ) => ViewOutput;
+  /**
+   * Optional full frame layout factory for this tab.
+   *
+   * Use this when the page owns splits, grids, or custom pane topology.
+   */
+  readonly layout?: (context: SkeletonLayoutContext) => FrameLayoutNode;
 }
 
 /** Resolved active-tab metadata for dynamic status rendering. */
@@ -103,8 +142,8 @@ export interface CreateTuiAppSkeletonOptions {
   readonly globalKeys?: KeyMap<SkeletonMsg>;
 }
 
-/** Internal page model used for defaults. */
-interface SkeletonPageModel {
+/** Page model owned by the stock skeleton shell. */
+export interface SkeletonPageModel {
   readonly ready: true;
   readonly drawerOpen: boolean;
   readonly drawerProgress: number;
@@ -120,7 +159,7 @@ interface SkeletonPageConfig {
 /** Describes a page's tab and layout kind before rendering. */
 interface SkeletonPageSpec {
   readonly tab: SkeletonTab;
-  readonly kind: 'drawer' | 'split' | 'empty';
+  readonly kind: 'drawer' | 'split' | 'empty' | 'custom';
 }
 
 /** Messages used by the skeleton app shell. */
@@ -168,6 +207,9 @@ export function createTuiAppSkeleton(
     if (seenTabIds.has(tab.id)) {
       throw new Error(`createTuiAppSkeleton: duplicate tab id "${tab.id}"`);
     }
+    if (tab.render != null && tab.layout != null) {
+      throw new Error(`createTuiAppSkeleton: tab "${tab.id}" cannot define both render and layout`);
+    }
     seenTabIds.add(tab.id);
   }
 
@@ -184,7 +226,7 @@ export function createTuiAppSkeleton(
       update(msg: FramePageMsg<SkeletonMsg>, model: SkeletonPageModel) {
         return updateSkeletonPage(msg, model, config);
       },
-      layout: () => layoutFor(spec, options.ctx),
+      layout: (model: SkeletonPageModel) => layoutFor(spec, options.ctx, model),
       keyMap: config.hasDrawer
         ? createKeyMap<SkeletonMsg>().group('Page', (group) => group
           .bind('o', 'Toggle drawer', { type: 'toggle-drawer' }),
@@ -461,7 +503,9 @@ function renderDrawerContent(model: SkeletonPageModel): string {
 function buildPageSpecs(tabs: readonly SkeletonTab[]): readonly SkeletonPageSpec[] {
   return tabs.map((tab, index) => ({
     tab,
-    kind: index === 0 ? 'drawer' : (index === 1 ? 'split' : 'empty'),
+    kind: tab.render != null || tab.layout != null
+      ? 'custom'
+      : (index === 0 ? 'drawer' : (index === 1 ? 'split' : 'empty')),
   }));
 }
 
@@ -528,7 +572,23 @@ function updateSkeletonPage(
 }
 
 /** Build the layout tree for a skeleton page (single pane, split, or empty). */
-function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
+function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext, model: SkeletonPageModel): FrameLayoutNode {
+  if (spec.tab.layout != null) {
+    return spec.tab.layout({ ctx, tab: spec.tab, model });
+  }
+
+  if (spec.tab.render != null) {
+    return {
+      kind: 'pane',
+      paneId: `${spec.tab.id}-main`,
+      render: (width: number, height: number) => spec.tab.render!(width, height, {
+        ctx,
+        tab: spec.tab,
+        model,
+      }),
+    };
+  }
+
   switch (spec.kind) {
     case 'drawer':
       return {
@@ -556,6 +616,7 @@ function layoutFor(spec: SkeletonPageSpec, ctx: BijouContext): FrameLayoutNode {
       };
 
     case 'empty':
+    case 'custom':
       return {
         kind: 'pane',
         paneId: `${spec.tab.id}-main`,
