@@ -1,4 +1,16 @@
-# BUG: `createTuiAppSkeleton` acts as a hardcoded test harness rather than a generic app starter
+---
+title: DX-032 Create TUI app skeleton renders consumer pages
+legend: DX
+lane: v6.0.0
+priority: high
+keywords:
+  - skeleton
+  - starter
+  - blocks
+  - app-shell
+---
+
+# DX-032 Create TUI app skeleton renders consumer pages
 
 ## Date
 2026-04-26

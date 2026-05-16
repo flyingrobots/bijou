@@ -1,7 +1,7 @@
 ---
 title: WF-009 Keep release PRs under automated review file limits
 legend: WF
-lane: up-next
+lane: v6.0.0
 priority: high
 keywords:
   - reviewability

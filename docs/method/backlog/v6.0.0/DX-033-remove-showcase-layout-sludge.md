@@ -1,6 +1,19 @@
-# Bad Code Backlog
+---
+title: DX-033 Remove showcase layout sludge
+legend: DX
+lane: v6.0.0
+priority: medium
+keywords:
+  - examples
+  - layout
+  - scrolling
+  - strings
+  - debt
+---
 
-Entries logged by EXPERT Bijou BigBro.
+# DX-033 Remove showcase layout sludge
+
+Debt pulled from the bad-code lane for the v6 layout-and-blocks release.
 
 ## 2026-04-26
 

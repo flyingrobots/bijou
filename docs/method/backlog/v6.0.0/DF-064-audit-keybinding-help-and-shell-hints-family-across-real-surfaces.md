@@ -1,21 +1,27 @@
 ---
-title: DF-041 Audit inspector panels family across real surfaces
+title: DF-064 Audit keybinding help and shell hints family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - inspector
+  - help
 ---
 
-# DF-041 Audit inspector panels family across real surfaces
+# DF-064 Audit keybinding help and shell hints family across real surfaces
 
-Audit the inspector panels family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the keybinding help and shell hints family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `inspector()`
+- `createKeyMap()`
+- `helpView()`
+- `helpViewSurface()`
+- `helpShort()`
+- `helpShortSurface()`
+- `helpFor()`
+- `helpForSurface()`
 
 Audit bar:
 - run the family in a real interactive TUI

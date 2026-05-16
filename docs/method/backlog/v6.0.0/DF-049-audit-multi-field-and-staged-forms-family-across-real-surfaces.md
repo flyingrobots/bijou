@@ -1,28 +1,22 @@
 ---
-title: DF-065 Audit workspace layout family across real surfaces
+title: DF-049 Audit multi-field and staged forms family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - layout
+  - forms
 ---
 
-# DF-065 Audit workspace layout family across real surfaces
+# DF-049 Audit multi-field and staged forms family across real surfaces
 
-Audit the workspace layout family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the multi-field and staged forms family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `splitPane()`
-- `splitPaneSurface()`
-- `grid()`
-- `gridSurface()`
-- `flex()`
-- `vstack()`
-- `hstack()`
-- `place()`
+- `group()`
+- `wizard()`
 
 Audit bar:
 - run the family in a real interactive TUI

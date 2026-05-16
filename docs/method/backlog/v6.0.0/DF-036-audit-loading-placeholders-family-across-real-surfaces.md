@@ -1,27 +1,21 @@
 ---
-title: DF-064 Audit keybinding help and shell hints family across real surfaces
+title: DF-036 Audit loading placeholders family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - help
+  - skeleton
 ---
 
-# DF-064 Audit keybinding help and shell hints family across real surfaces
+# DF-036 Audit loading placeholders family across real surfaces
 
-Audit the keybinding help and shell hints family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the loading placeholders family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `createKeyMap()`
-- `helpView()`
-- `helpViewSurface()`
-- `helpShort()`
-- `helpShortSurface()`
-- `helpFor()`
-- `helpForSurface()`
+- `skeleton()`
 
 Audit bar:
 - run the family in a real interactive TUI

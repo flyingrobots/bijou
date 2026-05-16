@@ -1,25 +1,24 @@
 ---
-title: DF-063 Audit app shell family across real surfaces
+title: DF-061 Audit overlay primitives family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - shell
+  - overlays
 ---
 
-# DF-063 Audit app shell family across real surfaces
+# DF-061 Audit overlay primitives family across real surfaces
 
-Audit the app shell family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the overlay primitives family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `createFramedApp()`
-- `statusBar()`
-- `statusBarSurface()`
-- `commandPalette()`
-- `commandPaletteSurface()`
+- `tooltip()`
+- `drawer()`
+- `modal()`
+- `toast()`
 
 Audit bar:
 - run the family in a real interactive TUI

@@ -1,26 +1,21 @@
 ---
-title: DF-062 Audit notification system family across real surfaces
+title: DF-041 Audit inspector panels family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - notifications
+  - inspector
 ---
 
-# DF-062 Audit notification system family across real surfaces
+# DF-041 Audit inspector panels family across real surfaces
 
-Audit the notification system family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the inspector panels family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `renderNotificationStack()`
-- `renderNotificationHistory()`
-- `pushNotification()`
-- `dismissNotification()`
-- `tickNotifications()`
-- framed runtime notification routing
+- `inspector()`
 
 Audit bar:
 - run the family in a real interactive TUI

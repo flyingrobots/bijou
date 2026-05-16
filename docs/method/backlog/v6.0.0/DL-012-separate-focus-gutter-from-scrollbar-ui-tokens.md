@@ -1,7 +1,7 @@
 ---
 title: DL-012 Separate focus gutter chrome from scrollbar UI tokens
 legend: DL
-lane: up-next
+lane: v6.0.0
 priority: high
 keywords:
   - theme

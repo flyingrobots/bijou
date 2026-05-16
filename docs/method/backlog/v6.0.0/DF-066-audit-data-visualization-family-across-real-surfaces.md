@@ -1,24 +1,24 @@
 ---
-title: DF-061 Audit overlay primitives family across real surfaces
+title: DF-066 Audit data visualization family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - overlays
+  - visualization
 ---
 
-# DF-061 Audit overlay primitives family across real surfaces
+# DF-066 Audit data visualization family across real surfaces
 
-Audit the overlay primitives family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the data visualization family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `tooltip()`
-- `drawer()`
-- `modal()`
-- `toast()`
+- `sparkline()`
+- `brailleChartSurface()`
+- `statsPanelSurface()`
+- `perfOverlaySurface()`
 
 Audit bar:
 - run the family in a real interactive TUI

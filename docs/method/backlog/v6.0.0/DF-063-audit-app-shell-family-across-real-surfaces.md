@@ -1,22 +1,25 @@
 ---
-title: DF-049 Audit multi-field and staged forms family across real surfaces
+title: DF-063 Audit app shell family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - forms
+  - shell
 ---
 
-# DF-049 Audit multi-field and staged forms family across real surfaces
+# DF-063 Audit app shell family across real surfaces
 
-Audit the multi-field and staged forms family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the app shell family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `group()`
-- `wizard()`
+- `createFramedApp()`
+- `statusBar()`
+- `statusBarSurface()`
+- `commandPalette()`
+- `commandPaletteSurface()`
 
 Audit bar:
 - run the family in a real interactive TUI

@@ -1,24 +1,26 @@
 ---
-title: DF-066 Audit data visualization family across real surfaces
+title: DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - visualization
+  - viewport
 ---
 
-# DF-066 Audit data visualization family across real surfaces
+# DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces
 
-Audit the data visualization family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the viewport masking and scrollable inspection panes family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `sparkline()`
-- `brailleChartSurface()`
-- `statsPanelSurface()`
-- `perfOverlaySurface()`
+- `viewport()`
+- `viewportSurface()`
+- `pager()`
+- `pagerSurface()`
+- `focusArea()`
+- `focusAreaSurface()`
 
 Audit bar:
 - run the family in a real interactive TUI

@@ -1,7 +1,7 @@
 ---
 title: "DF-027 — Storybook-Style Tool for Bijou"
 legend: DF
-lane: cool-ideas
+lane: v6.0.0
 ---
 
 # DF-027 — Storybook-Style Tool for Bijou

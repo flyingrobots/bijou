@@ -1,7 +1,7 @@
 ---
 title: DX-030 Add boundary-aware pointer selection and copy
 legend: DX
-lane: up-next
+lane: v6.0.0
 priority: high
 keywords:
   - dogfood

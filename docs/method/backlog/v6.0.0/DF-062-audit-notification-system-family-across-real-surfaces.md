@@ -1,26 +1,26 @@
 ---
-title: DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces
+title: DF-062 Audit notification system family across real surfaces
 legend: DF
-lane: up-next
+lane: v6.0.0
 priority: medium
 keywords:
   - component-audit
   - dogfood
   - lowerings
-  - viewport
+  - notifications
 ---
 
-# DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces
+# DF-062 Audit notification system family across real surfaces
 
-Audit the viewport masking and scrollable inspection panes family against real runtime behavior instead of trusting fixtures or docs alone.
+Audit the notification system family against real runtime behavior instead of trusting fixtures or docs alone.
 
 Scope:
-- `viewport()`
-- `viewportSurface()`
-- `pager()`
-- `pagerSurface()`
-- `focusArea()`
-- `focusAreaSurface()`
+- `renderNotificationStack()`
+- `renderNotificationHistory()`
+- `pushNotification()`
+- `dismissNotification()`
+- `tickNotifications()`
+- framed runtime notification routing
 
 Audit bar:
 - run the family in a real interactive TUI
