@@ -55,7 +55,7 @@ The boundary remains:
   audit app shell family across real surfaces
 - [**DX-032**](../../../design/DX-032-create-tui-app-skeleton-renders-consumer-pages.md) -
   make `createTuiAppSkeleton` render consumer pages
-- [**DF-064**](./DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md) -
+- [**DF-064**](../../../design/DF-064-audit-keybinding-help-and-shell-hints-family-across-real-surfaces.md) -
   audit keybinding help and shell hints
 - [**DF-061**](./DF-061-audit-overlay-primitives-family-across-real-surfaces.md) -
   audit overlay primitives
