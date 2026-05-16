@@ -42,7 +42,7 @@ The boundary remains:
 
 - [**DF-065**](../../../design/DF-065-audit-workspace-layout-family-across-real-surfaces.md) -
   audit workspace layout family across real surfaces
-- [**DF-060**](./DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md) -
+- [**DF-060**](../../../design/DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md) -
   audit viewport masking and scrollable inspection panes
 - [**DL-012**](../../../design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md) -
   separate focus gutter chrome from scrollbar UI tokens

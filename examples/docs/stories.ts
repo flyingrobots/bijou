@@ -41,15 +41,18 @@ import {
   compositeSurface,
   browsableListSurface,
   cpFilter,
+  createFocusAreaStateForSurface,
   createKeyMap,
   createAccordionState,
   createBrowsableListState,
   createCommandPaletteState,
   createNavigableTableState,
   createNotificationState,
+  createPagerStateForSurface,
   createSplitPaneState,
   dismissNotification,
   filePickerSurface,
+  focusAreaSurface,
   gridSurface,
   helpShort,
   helpShortSurface,
@@ -58,6 +61,7 @@ import {
   interactiveAccordion,
   modal,
   navigableTableSurface,
+  pagerSurface,
   pushNotification,
   renderNotificationHistory,
   renderNotificationHistorySurface,
@@ -136,8 +140,18 @@ function viewportPreviewSurface(
   content: string | Surface,
   scrollY: number,
   ctx: BijouContext,
-): Surface {
+  summaryLines: readonly string[],
+): string | Surface {
   const viewportWidth = Math.max(24, width);
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      'viewport mask',
+      `scrollY=${scrollY}`,
+      `width=${viewportWidth}`,
+      ...summaryLines,
+    ].join('\n');
+  }
+
   const header = separatorSurface({ label: 'viewport mask', width: viewportWidth, ctx });
   const body = viewportSurface({
     width: viewportWidth,
@@ -151,6 +165,112 @@ function viewportPreviewSurface(
     body,
     line(`  scrollY=${scrollY}  width=${viewportWidth}`, viewportWidth),
   ]);
+}
+
+function pagerPreviewSurface(width: number, ctx: BijouContext): string | Surface {
+  const paneWidth = Math.max(30, Math.min(width, 54));
+  const content = boxSurface(column([
+    line('Build plan'),
+    spacer(),
+    line('1. Resolve dependencies'),
+    line('2. Run migrations'),
+    line('3. Bake artifacts'),
+    line('4. Roll canaries'),
+    line('5. Promote release'),
+    spacer(),
+    line('Each stage emits its own frame and can be replayed later.'),
+    spacer(),
+    line('Pager status keeps long linear text anchored.'),
+  ]), {
+    title: 'release reader',
+    width: paneWidth,
+    ctx,
+  });
+  const state = createPagerStateForSurface(content, {
+    width: paneWidth,
+    height: 10,
+  });
+  const scrollY = Math.min(3, state.scroll.maxY);
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      'pager surface',
+      `Line ${scrollY + 1}/${content.height}`,
+      'release reader',
+      'Run migrations',
+      'Promote release',
+    ].join('\n');
+  }
+
+  return boxSurface(
+    pagerSurface(content, {
+      ...state,
+      scroll: { ...state.scroll, y: scrollY },
+    }, {
+      showScrollbar: true,
+      showStatus: true,
+    }),
+    {
+      title: 'pager surface',
+      width: paneWidth + 2,
+      ctx,
+    },
+  );
+}
+
+function focusedPanePreviewSurface(width: number, ctx: BijouContext): string | Surface {
+  const paneWidth = Math.max(30, Math.min(width, 54));
+  const content = column([
+    boxSurface('Signals\n\n- db healthy\n- cache warm\n- queue low', {
+      title: 'Inspector notes',
+      width: paneWidth - 2,
+      ctx,
+    }),
+    spacer(),
+    boxSurface('Warnings\n\n- migration is slow\n- stale preview', {
+      title: 'Review',
+      width: paneWidth - 2,
+      ctx,
+    }),
+    spacer(),
+    boxSurface('Actions\n\n- confirm deploy\n- watch rollout', {
+      title: 'Next',
+      width: paneWidth - 2,
+      ctx,
+    }),
+  ]);
+  const state = createFocusAreaStateForSurface(content, {
+    width: paneWidth,
+    height: 9,
+  });
+  const scrollY = Math.min(2, state.scroll.maxY);
+
+  if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+    return [
+      'focused pane',
+      'focused=true',
+      `scrollY=${scrollY}`,
+      'Inspector notes',
+      'Warnings',
+      'Actions',
+    ].join('\n');
+  }
+
+  return boxSurface(
+    focusAreaSurface(content, {
+      ...state,
+      scroll: { ...state.scroll, y: scrollY },
+    }, {
+      focused: true,
+      ctx,
+      id: 'docs-inspector',
+    }),
+    {
+      title: 'focused pane',
+      width: paneWidth + 2,
+      ctx,
+    },
+  );
 }
 
 const LONG_DOCUMENT = [
@@ -3333,12 +3453,14 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
     id: 'viewport-surface',
     coverageFamilyIds: ['viewport-masking-and-scrollable-inspection-panes'],
     family: 'Masking and overflow',
-    title: 'viewportSurface()',
+    title: 'viewportSurface() / pagerSurface() / focusAreaSurface()',
     package: 'bijou-tui',
     docs: {
-      summary: 'Masking wrapper for overflow content that clips a larger surface into a scrollable window without flattening the child first.',
+      summary: 'Masking and scrollable-pane family for bounded overflow content, long linear readers, and focused inspection panes without flattening structured surfaces first.',
       useWhen: [
         'A pane needs overflow scrolling while preserving structured surface composition.',
+        'A long linear document needs a visible current-line position.',
+        'A workspace pane needs focus ownership and gutter chrome.',
         'The child content may be wider or taller than the visible region and should be clipped predictably.',
         'Higher-level widgets like lists, file pickers, and tables need a shared masking primitive.',
       ],
@@ -3351,8 +3473,8 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       gracefulLowering: {
         interactive: 'Rich viewport mask with proportional scrollbar over structured child content.',
         static: 'Single deterministic frame of the same masked region for screenshots and CI.',
-        pipe: 'Explicit text lowering at the boundary, usually by rendering one clipped frame.',
-        accessible: 'Linear text output with explicit scroll status language when appropriate.',
+        pipe: 'Sequential text with explicit viewport, pager, or focus context instead of hidden interactive regions.',
+        accessible: 'Linear pane output with explicit scroll position or focus context when appropriate.',
       },
     },
     profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
@@ -3370,6 +3492,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           }),
           4,
           ctx,
+          ['release-notes.md', 'Build plan', 'Run migrations', 'Promote release'],
         ),
       },
       {
@@ -3399,7 +3522,20 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           ]),
           3,
           ctx,
+          ['structured stack', 'Signals', 'Review', 'Actions'],
         ),
+      },
+      {
+        id: 'pager-window',
+        label: 'Pager window',
+        description: 'A long linear document keeps current-line status attached to the visible window.',
+        render: ({ width, ctx }) => pagerPreviewSurface(width, ctx),
+      },
+      {
+        id: 'focused-pane',
+        label: 'Focused pane',
+        description: 'A scrollable inspection pane owns focus chrome without turning the gutter into content.',
+        render: ({ width, ctx }) => focusedPanePreviewSurface(width, ctx),
       },
     ],
     tags: ['layout', 'masking', 'scroll'],
