@@ -51,6 +51,7 @@ import {
   createPagerStateForSurface,
   createSplitPaneState,
   dismissNotification,
+  drawer,
   filePickerSurface,
   focusAreaSurface,
   gridSurface,
@@ -70,6 +71,7 @@ import {
   statusBarSurface,
   tickNotifications,
   toast,
+  tooltip,
   viewportSurface,
   commandPaletteSurface,
   createSpringState,
@@ -2138,6 +2140,15 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         label: 'Confirm deploy',
         description: 'Short blocking decision with explicit yes/no guidance.',
         render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'modal: Confirm deploy',
+              'Deploy release-control to production?',
+              'This will roll all workers and re-open the queue.',
+              'Actions: y yes, n no, esc cancel',
+            ].join('\n');
+          }
+
           const screenWidth = Math.max(32, width);
           const screenHeight = 14;
           const background = modalBackdrop(screenWidth, ctx);
@@ -2163,6 +2174,16 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         label: 'Shortcut help',
         description: 'Small focused explanation for the current surface, not a full settings page.',
         render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'modal: Keyboard help',
+              'j/k: Move between stories',
+              '1-4: Switch profile',
+              ',/.: Cycle variants',
+              'esc: return to the page',
+            ].join('\n');
+          }
+
           const screenWidth = Math.max(32, width);
           const screenHeight = 14;
           const background = modalBackdrop(screenWidth, ctx);
@@ -2185,6 +2206,216 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       },
     ],
     tags: ['overlay', 'interruption', 'surface'],
+  },
+  {
+    kind: 'component',
+    id: 'drawer',
+    coverageFamilyIds: ['overlay-primitives'],
+    family: 'Overlays and interruption',
+    title: 'drawer()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Anchored supplemental panel for sidecar context that should remain related to the current surface without blocking the whole task.',
+      useWhen: [
+        'The user needs supplemental context while keeping the main task visible.',
+        'The panel belongs to a workspace edge or scoped region.',
+        'The content is more durable than a tooltip but less interrupting than a modal.',
+      ],
+      avoidWhen: [
+        'The user must make a blocking decision before continuing; prefer `modal()`.',
+        'The content is a one-line explanation; prefer `tooltip()`.',
+        'The event is transient and should disappear; prefer `toast()` or the notification system.',
+      ],
+      relatedFamilies: ['modal()', 'tooltip()', 'createFramedApp()'],
+      gracefulLowering: {
+        interactive: 'Anchored side panel over the current surface with visible ownership chrome.',
+        static: 'Single deterministic drawer snapshot with the supplemented context visible.',
+        pipe: 'Plain supplemental section placed after the current context.',
+        accessible: 'Linear side-panel content with relationship to the active task made explicit.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'supplemental-right',
+        label: 'Supplemental right drawer',
+        description: 'Side context stays visible without turning into a blocking dialog.',
+        render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'drawer: Release context',
+              'Supplemental context for release dashboard',
+              'Canaries stable in eu-west',
+              'Queue depth low',
+              'Action: watch rollout',
+            ].join('\n');
+          }
+
+          const screenWidth = Math.max(40, width);
+          const screenHeight = 12;
+          const overlay = drawer({
+            title: 'Release context',
+            content: column([
+              line('Canaries stable'),
+              spacer(),
+              line('Queue depth low'),
+              line('Rollout window open'),
+              spacer(),
+              line('Action: watch rollout'),
+            ]),
+            anchor: 'right',
+            width: Math.min(28, Math.max(16, screenWidth - 10)),
+            screenWidth,
+            screenHeight,
+            borderToken: ctx.border('primary'),
+            bgToken: ctx.surface('elevated'),
+            ctx,
+          });
+          return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
+        },
+      },
+      {
+        id: 'bottom-review',
+        label: 'Bottom review drawer',
+        description: 'A bottom drawer can hold short review context without covering the whole workspace.',
+        render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'drawer: Review queue',
+              'Supplemental review panel',
+              '2 migrations waiting',
+              '1 config diff ready',
+            ].join('\n');
+          }
+
+          const screenWidth = Math.max(40, width);
+          const screenHeight = 12;
+          const overlay = drawer({
+            title: 'Review queue',
+            content: column([
+              line('2 migrations waiting'),
+              line('1 config diff ready'),
+              line('Press Enter to inspect'),
+            ]),
+            anchor: 'bottom',
+            height: 5,
+            screenWidth,
+            screenHeight,
+            borderToken: ctx.border('primary'),
+            bgToken: ctx.surface('elevated'),
+            ctx,
+          });
+          return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
+        },
+      },
+    ],
+    tags: ['overlay', 'drawer', 'supplemental'],
+  },
+  {
+    kind: 'component',
+    id: 'tooltip',
+    coverageFamilyIds: ['overlay-primitives'],
+    family: 'Overlays and interruption',
+    title: 'tooltip()',
+    package: 'bijou-tui',
+    docs: {
+      summary: 'Short local explanation positioned near the thing it describes, for cases where the meaning is helpful but not part of the document flow.',
+      useWhen: [
+        'A nearby label or control needs a terse explanation.',
+        'The explanation is local, non-blocking, and short-lived.',
+        'Position relative to the target helps more than adding permanent copy.',
+      ],
+      avoidWhen: [
+        'The content is actionable or scrollable; prefer `drawer()` or in-flow help.',
+        'The user must acknowledge it; prefer `modal()`.',
+        'The message is an event or status; prefer `toast()` or notification system.',
+      ],
+      relatedFamilies: ['drawer()', 'modal()', 'kbd()'],
+      gracefulLowering: {
+        interactive: 'Positioned explanatory overlay clamped to the screen bounds.',
+        static: 'Visible explanation snapshot near the target.',
+        pipe: 'Plain parenthetical explanation next to the related label.',
+        accessible: 'Inline explanatory text associated with the target label.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'local-explanation',
+        label: 'Local explanation',
+        description: 'Tooltip content explains one nearby action without becoming a command surface.',
+        render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'tooltip: Command palette',
+              'Explains: Search actions and docs without leaving the current page.',
+            ].join('\n');
+          }
+
+          const screenWidth = Math.max(36, width);
+          const screenHeight = 10;
+          const background = screenSurface(screenWidth, screenHeight, boxSurface(column([
+            line('Docs toolbar'),
+            spacer(),
+            line(`${kbd('cmd+k', { ctx })} Command palette`),
+          ]), {
+            title: 'toolbar',
+            width: Math.max(28, screenWidth - 6),
+            ctx,
+          }), 2, 2);
+          const overlay = tooltip({
+            content: 'Search actions and docs',
+            row: 5,
+            col: Math.min(screenWidth - 6, 18),
+            direction: 'bottom',
+            screenWidth,
+            screenHeight,
+            borderToken: ctx.border('primary'),
+            bgToken: ctx.surface('elevated'),
+            ctx,
+          });
+          return compositeSurface(background, [overlay]);
+        },
+      },
+      {
+        id: 'clamped-edge',
+        label: 'Clamped edge',
+        description: 'Tooltip placement clamps to the viewport instead of overflowing the screen.',
+        render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'tooltip: Edge action',
+              'Explains: Runs verification for the selected release.',
+            ].join('\n');
+          }
+
+          const screenWidth = Math.max(36, width);
+          const screenHeight = 10;
+          const background = screenSurface(screenWidth, screenHeight, boxSurface(column([
+            line('Release actions'),
+            spacer(),
+            line('Verify release'),
+          ]), {
+            title: 'actions',
+            width: Math.max(28, screenWidth - 6),
+            ctx,
+          }), 2, 2);
+          const overlay = tooltip({
+            content: 'Runs verification for the selected release',
+            row: 1,
+            col: screenWidth - 2,
+            direction: 'right',
+            screenWidth,
+            screenHeight,
+            borderToken: ctx.border('primary'),
+            bgToken: ctx.surface('elevated'),
+            ctx,
+          });
+          return compositeSurface(background, [overlay]);
+        },
+      },
+    ],
+    tags: ['overlay', 'tooltip', 'explanation'],
   },
   {
     kind: 'component',
@@ -2331,7 +2562,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
   {
     kind: 'component',
     id: 'toast',
-    coverageFamilyIds: ['low-level-transient-overlay'],
+    coverageFamilyIds: ['low-level-transient-overlay', 'overlay-primitives'],
     family: 'Feedback overlays and history',
     title: 'toast()',
     package: 'bijou-tui',
@@ -2362,6 +2593,13 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         label: 'Saved notification',
         description: 'A directly composed success toast anchored to the current working surface.',
         render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'toast: success',
+              'Operation saved.',
+            ].join('\n');
+          }
+
           const screenWidth = Math.max(36, width);
           const screenHeight = 12;
           const overlay = toast({
@@ -2372,10 +2610,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
             screenHeight,
             ctx,
           });
-          if (ctx.mode === 'interactive' || ctx.mode === 'static') {
-            return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
-          }
-          return overlay.content;
+          return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
         },
       },
       {
@@ -2383,6 +2618,13 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         label: 'Anchored error',
         description: 'Low-level toast placement remains explicit when one local failure needs brief attention.',
         render: ({ width, ctx }) => {
+          if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {
+            return [
+              'toast: error',
+              'Rollback required before promote.',
+            ].join('\n');
+          }
+
           const screenWidth = Math.max(36, width);
           const screenHeight = 12;
           const overlay = toast({
@@ -2393,10 +2635,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
             screenHeight,
             ctx,
           });
-          if (ctx.mode === 'interactive' || ctx.mode === 'static') {
-            return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
-          }
-          return overlay.content;
+          return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);
         },
       },
     ],
