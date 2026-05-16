@@ -96,6 +96,48 @@ function renderWave(_ctx: BijouContext): Surface {
 }
 ```
 
+When `canvas()` runs in `quad`, `braille`, or `glyph` resolution, each terminal
+cell samples multiple shader results for coverage. Non-space samples choose the
+quadrant, Braille dots, or fitted cell glyph, while available foreground and
+background RGB values are averaged across the sampled subpixels. That lets
+shader code return the real material or image color per sample instead of
+fixing collapsed cells with post-render color passes.
+
+For tiny raytraced title screens or previews, use the raytrace shader kernel
+for geometry and keep lighting local to the app:
+```typescript
+import { canvas, raytraceLookAtRay, raytraceNearestHit, type RaytraceShape } from '@flyingrobots/bijou-tui';
+
+const shapes: readonly RaytraceShape[] = [
+  { kind: 'sphere', center: [0, 0, 0], radius: 1 },
+];
+
+const preview = canvas(32, 12, ({ u, v }) => {
+  const ray = raytraceLookAtRay({
+    origin: [0, 0, 4],
+    target: [0, 0, 0],
+    screen: [(u * 2) - 1, (v * -2) + 1],
+  });
+  const hit = raytraceNearestHit(ray, shapes);
+  return hit ? { char: '*', fg: '#ffffff' } : ' ';
+});
+```
+
+When Braille is too textured for a logo or icon, fit sampled 2x4 coverage to a
+regular glyph directly from `canvas()`:
+```typescript
+const logo = canvas(24, 6, shader, { resolution: 'glyph' });
+const asciiLogo = canvas(24, 6, shader, { resolution: 'glyph', glyphFit: { mode: 'ascii' } });
+```
+
+The standalone helper remains available for custom reducers:
+```typescript
+import { fitCellGlyph } from '@flyingrobots/bijou-tui';
+
+const glyph = fitCellGlyph([1, 1, 1, 1, 0, 0, 0, 0]); // "▀"
+const asciiGlyph = fitCellGlyph([1, 1, 1, 1, 0, 0, 0, 0], { mode: 'ascii' });
+```
+
 ## Advanced Logic
 
 - **Event Bus Middleware**: Intercept or transform every message in the system.
@@ -112,6 +154,159 @@ The runtime now emits a development warning when one set of motion keys appears
 on the same frame that a different set disappears. Treat that as a strong signal
 that your component identity is unstable and the reconciler is being forced to
 start new animations instead of continuing existing ones.
+
+## Layout Inspector Overlay
+
+`layoutInspectorOverlay()` composites development-only geometry over an existing
+surface. It accepts either Bijou's native `{ row, col, width, height }` rects or
+debug-friendly `{ x, y, width, height }` rects, clips borders to the target
+surface, and prefixes focused region labels with `*`.
+
+```typescript
+import {
+  layoutInspectorOverlay,
+  layoutInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const overlay = layoutInspectorOverlay(frame, [
+  {
+    id: 'editor',
+    role: 'pane',
+    rect: { row: 1, col: 2, width: 40, height: 12 },
+    clip: { row: 2, col: 2, width: 40, height: 10 },
+    scroll: { x: 0, y: 12 },
+    focused: true,
+    layer: 3,
+  },
+]);
+
+const report = layoutInspectorText([
+  { id: 'editor', rect: { x: 2, y: 1, width: 40, height: 12 }, focused: true },
+]);
+```
+
+Use the overlay when pane bounds, clipping, focus ownership, or z-layering need
+visual inspection. Use the text report in tests and logs where screenshot
+inspection would hide the actual geometry facts.
+
+## Input Routing Inspector
+
+`appendInputRoutingRecord()` keeps a bounded history of existing
+`RuntimeInputEvent` and `RuntimeInputRouteResult` facts. It does not route input
+itself; it makes router output readable.
+
+```typescript
+import {
+  appendInputRoutingRecord,
+  inputRoutingInspectorSurface,
+  inputRoutingInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+let history = { records: [] };
+
+history = appendInputRoutingRecord(history, {
+  rawInput: '\\x1b[A',
+  event,
+  result,
+  commandLabels: ['select-previous'],
+}, { maxEvents: 20 });
+
+const report = inputRoutingInspectorText(history);
+const surface = inputRoutingInspectorSurface(history, { width: 80 });
+```
+
+The report includes event kind, raw input when supplied, visited views,
+handled/stopped owners, hit targets, command/effect labels or counts, swallowed
+input, and no-op handlers. Use it alongside `layoutInspectorOverlay()` when a
+bug could be either geometry ownership or input priority.
+
+## Focus Map Surface
+
+`inspectFocusMap()` keeps focus diagnostics separate from the focus system
+itself. Apps provide current node facts, and the helper reports deterministic
+tab order, focused node ids, and basic focus-health issues.
+
+```typescript
+import {
+  focusMapSurface,
+  focusMapText,
+  inspectFocusMap,
+} from '@flyingrobots/bijou-tui';
+
+const nodes = [
+  {
+    id: 'editor',
+    owner: 'workspace',
+    role: 'textbox',
+    rect: { x: 2, y: 1, width: 60, height: 20 },
+    tabIndex: 1,
+    focusable: true,
+    focused: true,
+  },
+];
+
+const report = inspectFocusMap(nodes);
+const text = focusMapText(nodes);
+const surface = focusMapSurface(nodes, { width: 80, height: 8 });
+```
+
+Issue detection covers missing focus, multiple focused nodes,
+focused-disabled nodes, and duplicate tab indexes. Use the text form in tests
+and logs; use the surface form inside debug panes or docs previews.
+
+## Surface Budget Warnings
+
+`evaluateSurfaceBudget()` checks a rendered `Surface` and optional pipeline
+timings against explicit thresholds. It is pure and returns stable warning
+objects, so tests can assert budget behavior without starting the runtime.
+
+```typescript
+import { evaluateSurfaceBudget, run } from '@flyingrobots/bijou-tui';
+
+const warnings = evaluateSurfaceBudget({
+  label: 'preview',
+  surface,
+  timings,
+  thresholds: {
+    maxArea: 4000,
+    maxStyledCells: 1200,
+    maxFrameDurationMs: 16,
+    maxStageDurationMs: { Paint: 8, Diff: 4 },
+  },
+});
+```
+
+Interactive apps can also opt into runtime warnings:
+
+```typescript
+await run(app, {
+  ctx,
+  surfaceBudget: { maxArea: 4000, maxFrameDurationMs: 16 },
+});
+```
+
+Runtime warnings are non-fatal and deduplicated by message. Apps that implement
+`routeRuntimeIssue()` receive budget violations as `level: 'warning'` and
+`source: 'runtime'`; apps that do not opt in stay silent.
+
+## Surface Diff Viewer
+
+`diffSurfaces()` compares two `Surface` objects cell by cell and keeps character
+changes separate from style-only changes. That matters for terminal regressions
+where text snapshots look correct but color, modifiers, or opacity changed.
+
+```typescript
+import { diffSurfaces, surfaceDiffSurface, surfaceDiffText } from '@flyingrobots/bijou-tui';
+
+const diff = diffSurfaces(before, after);
+const report = surfaceDiffText(before, after);
+const overlay = surfaceDiffSurface(before, after, { mode: 'overlay' });
+```
+
+Use `surfaceDiffText()` in failing tests and logs. Use
+`surfaceDiffSurface(..., { mode: 'side-by-side' })` when you want a compact
+viewer surface, or `mode: 'overlay'` when you want changed cells marked on the
+after frame.
 
 ## Crash Surfaces
 

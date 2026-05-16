@@ -16,7 +16,9 @@ shaped, or still waiting to be pulled into a cycle.
 
 ## Release Lanes
 
-- [`v5.0.0/`](./v5.0.0/README.md) — current major-version shaping lane
+- [`v6.0.0/`](./v6.0.0/README.md) - current major-version shaping lane
+- [`v5.0.0/`](./v5.0.0/README.md) - closed major-version shaping lane retained
+  for release lineage
 
 ## Closure Surfaces
 

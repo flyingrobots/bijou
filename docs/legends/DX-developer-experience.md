@@ -48,6 +48,8 @@ An agent can inspect the public API surface and produce type-safe Bijou code wit
 
 ## Current cycle and backlog
 
+- active design draft:
+  - [DX-031 — Standard Bijou Blocks](../design/DX-031-standard-bijou-blocks.md)
 - latest completed closures:
   - [DX-028 — Align front-door docs with repo truth](../method/retro/DX-028-align-front-door-docs-with-repo-truth.md)
   - [DX-020 — Layout Localization Pipeline Guide](../method/retro/DX-020-layout-localization-pipeline-guide.md)

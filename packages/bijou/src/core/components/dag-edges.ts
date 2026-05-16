@@ -11,6 +11,9 @@
 /** Cardinal direction for edge routing through grid cells. */
 export type Dir = 'U' | 'D' | 'L' | 'R';
 
+/** Glyph family used when converting routed edges into Unicode characters. */
+export type EdgeGlyphStyle = 'single' | 'heavy' | 'double' | 'dashed';
+
 /**
  * Mutable grid state used during edge routing.
  *
@@ -69,12 +72,41 @@ export function decodeArrowPos(encoded: number): { row: number; col: number } {
  * Lookup table mapping sorted direction-set keys to Unicode box-drawing characters.
  * For example, `'DR'` maps to `\u250c` (top-left corner).
  */
-const JUNCTION: Record<string, string> = {
+const SINGLE_JUNCTION: Record<string, string> = {
   'D': '\u2502', 'U': '\u2502', 'DU': '\u2502',
   'L': '\u2500', 'R': '\u2500', 'LR': '\u2500',
   'DR': '\u250c', 'DL': '\u2510', 'RU': '\u2514', 'LU': '\u2518',
   'DRU': '\u251c', 'DLU': '\u2524', 'DLR': '\u252c', 'LRU': '\u2534',
   'DLRU': '\u253c',
+};
+
+const HEAVY_JUNCTION: Record<string, string> = {
+  'D': '\u2503', 'U': '\u2503', 'DU': '\u2503',
+  'L': '\u2501', 'R': '\u2501', 'LR': '\u2501',
+  'DR': '\u250f', 'DL': '\u2513', 'RU': '\u2517', 'LU': '\u251b',
+  'DRU': '\u2523', 'DLU': '\u252b', 'DLR': '\u2533', 'LRU': '\u253b',
+  'DLRU': '\u254b',
+};
+
+const DOUBLE_JUNCTION: Record<string, string> = {
+  'D': '\u2551', 'U': '\u2551', 'DU': '\u2551',
+  'L': '\u2550', 'R': '\u2550', 'LR': '\u2550',
+  'DR': '\u2554', 'DL': '\u2557', 'RU': '\u255a', 'LU': '\u255d',
+  'DRU': '\u2560', 'DLU': '\u2563', 'DLR': '\u2566', 'LRU': '\u2569',
+  'DLRU': '\u256c',
+};
+
+const DASHED_JUNCTION: Record<string, string> = {
+  ...SINGLE_JUNCTION,
+  'D': '\u254e', 'U': '\u254e', 'DU': '\u254e',
+  'L': '\u254c', 'R': '\u254c', 'LR': '\u254c',
+};
+
+const JUNCTIONS: Record<EdgeGlyphStyle, Record<string, string>> = {
+  single: SINGLE_JUNCTION,
+  heavy: HEAVY_JUNCTION,
+  double: DOUBLE_JUNCTION,
+  dashed: DASHED_JUNCTION,
 };
 
 // ── Functions ──────────────────────────────────────────────────────
@@ -86,11 +118,18 @@ const JUNCTION: Record<string, string> = {
  * @returns The appropriate box-drawing character, or `' '` (space) for an empty
  *   direction set (no edge traffic through this cell).
  */
-export function junctionChar(dirs: Set<Dir>): string {
+export function junctionChar(dirs: Set<Dir>, style: EdgeGlyphStyle = 'single'): string {
   if (dirs.size === 0) return ' ';
   // Alphabetical sort of D,L,R,U matches JUNCTION table keys
   const key = [...dirs].sort().join('');
-  return JUNCTION[key] ?? '\u253c';
+  return JUNCTIONS[style][key] ?? JUNCTIONS[style]['DLRU'] ?? '\u253c';
+}
+
+/**
+ * Select the arrowhead character for an edge style.
+ */
+export function arrowChar(style: EdgeGlyphStyle = 'single'): string {
+  return style === 'dashed' ? '\u25be' : '\u25bc';
 }
 
 /**
@@ -148,18 +187,20 @@ export function markEdge(
   fromLayer: number,
   toCol: number,
   toLayer: number,
-  RS: number,
-  colCenter: (c: number) => number,
+  rowStride: number,
+  colCenter: (layer: number, col: number) => number,
   nodeWidth: number,
+  nodeHeight: number,
 ): void {
   const route = buildEdgeRoute(
     fromCol,
     fromLayer,
     toCol,
     toLayer,
-    RS,
+    rowStride,
     colCenter,
     nodeWidth,
+    nodeHeight,
     g.cols,
   );
 
@@ -224,15 +265,16 @@ export function buildEdgeRoute(
   fromLayer: number,
   toCol: number,
   toLayer: number,
-  RS: number,
-  colCenter: (c: number) => number,
+  rowStride: number,
+  colCenter: (layer: number, col: number) => number,
   nodeWidth: number,
+  nodeHeight: number,
   gridCols: number,
 ): EdgeRoute {
-  const srcC = colCenter(fromCol);
-  const dstC = colCenter(toCol);
-  const sRow = fromLayer * RS + 3;
-  const dRow = toLayer * RS - 1;
+  const srcC = colCenter(fromLayer, fromCol);
+  const dstC = colCenter(toLayer, toCol);
+  const sRow = fromLayer * rowStride + nodeHeight;
+  const dRow = toLayer * rowStride - 1;
   const mid = sRow + 1;
   const path: GridPoint[] = [];
 

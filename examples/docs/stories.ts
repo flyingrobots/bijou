@@ -32,7 +32,7 @@ import {
   stepper,
   table,
   tabs,
-  timeline,
+  timeline as processTimeline,
   tree,
   type Surface,
 } from '@flyingrobots/bijou';
@@ -68,7 +68,17 @@ import {
   toast,
   viewportSurface,
   commandPaletteSurface,
-} from '@flyingrobots/bijou-tui';
+  createSpringState,
+  raytraceDot,
+  raytraceNearestHit,
+  raytraceNormalize,
+  raytraceOrbitCameraRay,
+  raytraceReflect,
+  resolveSpringConfig,
+  springStep,
+  timeline as motionTimeline,
+  type RaytraceShape,
+} from '../../packages/bijou-tui/src/index.js';
 import {
   badgeSurface,
   column,
@@ -1509,7 +1519,7 @@ function temporalPreview(input: {
   } = input;
 
   const preview = mode === 'timeline'
-    ? timeline([
+    ? processTimeline([
         { label: 'Build created', description: 'Artifacts stamped for review', status: 'success' },
         { label: 'Canary promoted', description: '10% traffic live in eu-west', status: 'info' },
         { label: 'Latency drift detected', description: 'Retry backlog climbed above baseline', status: 'warning' },
@@ -1536,7 +1546,7 @@ function motionPreview(input: {
   readonly width: number;
   readonly ctx: BijouContext;
   readonly title: string;
-  readonly mode: 'wave' | 'braille';
+  readonly mode: 'wave' | 'braille' | 'glyph-raytrace' | 'spring-timeline';
   readonly timeMs: number;
 }): string | Surface {
   const {
@@ -1551,13 +1561,33 @@ function motionPreview(input: {
     return [
       title,
       '',
-      mode === 'wave'
-        ? 'Animated shader field lowers to a truthful final-state snapshot.'
-        : 'High-resolution motion lowers to explicit static state text when motion is unavailable.',
+      motionConstrainedSummary(mode),
     ].join('\n');
   }
 
   const panelWidth = Math.max(42, Math.min(width, 60));
+  if (mode === 'glyph-raytrace') {
+    const art = renderGlyphRaytracePreview(panelWidth - 2, 9, timeMs);
+    return boxSurface(column([
+      art,
+      spacer(),
+      line(mutedText(ctx, 'Glyph-fit raytracing proves the shader path with geometry, light, and no post-process hacks.'), panelWidth - 2),
+    ]), {
+      title,
+      width: panelWidth,
+      ctx,
+    });
+  }
+
+  if (mode === 'spring-timeline') {
+    return renderSpringTimelinePreview({
+      width: panelWidth,
+      ctx,
+      title,
+      timeMs,
+    });
+  }
+
   const art = canvas(panelWidth - 2, 8, ({ u, v, time }) => {
     const dx = u - 0.5;
     const dy = (v - 0.5) * 1.8;
@@ -1578,6 +1608,120 @@ function motionPreview(input: {
   ]), {
     title,
     width: panelWidth,
+    ctx,
+  });
+}
+
+const MOTION_RAYTRACE_SHAPES: readonly RaytraceShape[] = [
+  { kind: 'sphere', center: [-0.42, -0.1, 0], radius: 0.42 },
+  { kind: 'sphere', center: [0.34, 0.02, 0.18], radius: 0.3 },
+  { kind: 'plane', point: [0, -0.58, 0], normal: [0, 1, 0] },
+];
+
+function motionConstrainedSummary(mode: 'wave' | 'braille' | 'glyph-raytrace' | 'spring-timeline'): string {
+  if (mode === 'wave') {
+    return 'Shader motion field lowers to a truthful final-state snapshot when animation is unavailable.';
+  }
+  if (mode === 'braille') {
+    return 'High-resolution shader motion lowers to explicit static state text instead of decorative glyph output.';
+  }
+  if (mode === 'glyph-raytrace') {
+    return 'Raytrace shader preview lowers to scene state: two lit surfaces, one floor, and a deterministic camera.';
+  }
+  return 'Spring timeline preview lowers to the orchestrated motion state: camera settle, glow fade, and transition timing.';
+}
+
+function renderGlyphRaytracePreview(width: number, height: number, timeMs: number): Surface {
+  const light = raytraceNormalize([-0.45, 0.9, -0.35]);
+  const view = raytraceNormalize([0, 0.15, -1]);
+  return canvas(width, height, ({ u, v, time }) => {
+    const ray = raytraceOrbitCameraRay({
+      angleRadians: 0.52 + (time * 0.16),
+      radius: 2.35,
+      height: 0.82,
+      target: [0, -0.08, 0],
+      screen: [(u - 0.5) * 1.65, (0.5 - v) * 1.15],
+      focalLength: 1.35,
+    });
+    const hit = raytraceNearestHit(ray, MOTION_RAYTRACE_SHAPES);
+    if (hit === undefined) {
+      return { char: ' ', coverage: 0, bgRGB: [8, 11, 15] };
+    }
+
+    const diffuse = Math.max(0, raytraceDot(hit.normal, light));
+    const reflected = raytraceReflect(ray.direction, hit.normal);
+    const rim = Math.pow(Math.max(0, raytraceDot(reflected, view)), 4);
+    const planePulse = hit.shape.kind === 'plane'
+      ? ((Math.floor(hit.point[0] * 5) + Math.floor(hit.point[2] * 5)) % 2 === 0 ? 0.24 : 0.08)
+      : 0;
+    const coverage = Math.min(1, 0.18 + (diffuse * 0.62) + (rim * 0.34) + planePulse);
+    const warm = hit.shape.kind === 'sphere' ? 70 : 28;
+
+    return {
+      char: '█',
+      coverage,
+      fgRGB: [
+        Math.round(52 + (diffuse * 118) + warm),
+        Math.round(88 + (diffuse * 104)),
+        Math.round(120 + (rim * 96)),
+      ],
+      bgRGB: [8, 11, 15],
+    };
+  }, {
+    time: timeMs / 1000,
+    resolution: 'glyph',
+    glyphFit: { mode: 'unicode' },
+  });
+}
+
+function renderSpringTimelinePreview(input: {
+  readonly width: number;
+  readonly ctx: BijouContext;
+  readonly title: string;
+  readonly timeMs: number;
+}): Surface {
+  const {
+    width,
+    ctx,
+    title,
+    timeMs,
+  } = input;
+  const timeline = motionTimeline()
+    .add('camera', { from: 0, to: 1, spring: 'stiff' })
+    .add('glow', { type: 'tween', from: 0, to: 1, duration: 520 }, '<')
+    .label('settle')
+    .add('caption', { type: 'tween', from: 0, to: 1, duration: 260 }, 'settle+=120')
+    .build();
+
+  let state = timeline.init();
+  const frames = Math.max(1, Math.min(90, Math.floor((timeMs / 1000) * 60)));
+  for (let frame = 0; frame < frames; frame++) {
+    state = timeline.step(state, 1 / 60);
+  }
+
+  const values = timeline.values(state);
+  const springConfig = resolveSpringConfig('stiff');
+  let springState = createSpringState(0);
+  for (let frame = 0; frame < frames; frame++) {
+    springState = springStep(springState, 1, springConfig, 1 / 120);
+  }
+
+  const barWidth = Math.max(10, width - 18);
+  const filled = Math.max(0, Math.min(barWidth, Math.round((values.camera ?? 0) * barWidth)));
+  const empty = Math.max(0, barWidth - filled);
+  const process = processTimeline([
+    { label: 'camera spring', description: `settled ${Math.round(springState.value * 100)}%`, status: 'info' },
+    { label: 'shader glow', description: `opacity ${Math.round((values.glow ?? 0) * 100)}%`, status: 'success' },
+    { label: 'caption reveal', description: `timeline ${Math.round((values.caption ?? 0) * 100)}%`, status: 'warning' },
+  ], { ctx });
+
+  return boxSurface(column([
+    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${Math.round((values.camera ?? 0) * 100)}%`, width - 2),
+    spacer(),
+    contentSurface(process),
+  ]), {
+    title,
+    width,
     ctx,
   });
 }
@@ -3809,7 +3953,7 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
         'Readability or scanning would be harmed by the animation.',
         'A stable status cue would communicate the meaning more directly.',
       ],
-      relatedFamilies: ['gradientText()', 'createFramedApp()', 'notification system'],
+      relatedFamilies: ['animate()', 'timeline()', 'transition shaders', 'raytrace helpers'],
       gracefulLowering: {
         interactive: 'Shader-driven or animated surfaces reinforce state change or atmosphere deliberately.',
         static: 'The final visual state remains truthful without pretending motion still exists.',
@@ -3843,7 +3987,35 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
           timeMs,
         }),
       },
+      {
+        id: 'glyph-raytrace',
+        label: 'Glyph raytrace',
+        description: 'Glyph-fit resolution can carry app-authored raytraced geometry without forcing Braille.',
+        render: ({ width, ctx, timeMs }) => motionPreview({
+          width,
+          ctx,
+          title: 'glyph raytrace',
+          mode: 'glyph-raytrace',
+          timeMs,
+        }),
+      },
+      {
+        id: 'spring-timeline',
+        label: 'Spring timeline',
+        description: 'Spring motion and timeline orchestration should be inspectable as one deterministic frame.',
+        render: ({ width, ctx, timeMs }) => motionPreview({
+          width,
+          ctx,
+          title: 'spring timeline',
+          mode: 'spring-timeline',
+          timeMs,
+        }),
+      },
     ],
+    source: {
+      examplePath: 'examples/transitions/main.ts',
+      snippetLabel: 'Transition shader playground',
+    },
     tags: ['motion', 'shader', 'canvas'],
   },
   {

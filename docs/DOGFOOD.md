@@ -23,6 +23,7 @@ operators need when learning or validating Bijou.
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
 - **Component Explorer**: A live, interactive field guide to every component family.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
+- **Motion and Shader Surfaces**: Exercising canvas, glyph-fit raytracing, transitions, springs, and timelines from the docs app itself.
 - **Design Language**: Defining and enforcing the project's visual and interactive standards.
 
 ### Relationship to Examples

@@ -6,9 +6,95 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
-### Notes
+### ✨ Features
 
-- No unreleased entries yet.
+- **Raytrace shader kernel for `bijou-tui`** — `@flyingrobots/bijou-tui`
+  now exports small pure helpers for shader-authored ray scenes: look-at and
+  orbit camera rays, vector math, sphere and plane intersections, nearest-hit
+  selection, and reflection. Apps keep their own material, lighting, and
+  palette policy while sharing the geometry math used by canvas title screens
+  and procedural previews.
+- **Cell glyph fitting for shader experiments** — `@flyingrobots/bijou-tui`
+  now exports `fitCellGlyph()` with Unicode geometry candidates and an ASCII
+  density ramp. Apps can collapse 2x4 coverage samples into block, half-block,
+  line, diagonal, or plain ASCII glyphs without committing to Braille.
+- **Glyph-fit canvas resolution** — `canvas()` now accepts
+  `resolution: 'glyph'` plus `glyphFit` options, sampling the same 2x4 grid as
+  Braille while collapsing coverage through `fitCellGlyph()`. Shader authors can
+  render geometry-aware Unicode glyphs or ASCII density output and keep the
+  existing high-resolution color averaging path.
+- **Motion and shader DOGFOOD audit** — the DOGFOOD component explorer now
+  proves the motion/shader family with quad shader waves, Braille fields,
+  glyph-fit raytraced geometry, and a deterministic spring/timeline preview
+  across rich, static, pipe, and accessible profiles.
+- **Surface diff viewer for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `diffSurfaces()`, `surfaceDiffSurface()`, and `surfaceDiffText()` so
+  tests and debug surfaces can inspect changed cells, char deltas, style-only
+  deltas, changed bounds, side-by-side views, and overlay views without ad hoc
+  surface dumps.
+- **Layout inspector overlay for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `layoutInspectorOverlay()` and `layoutInspectorText()` for
+  development-only geometry debugging. Apps can draw clipped region bounds and
+  labels over an existing surface, mark focused regions, and log a deterministic
+  report of ids, roles, rects, clip rects, scroll offsets, focus, and layers.
+- **Surface budget warnings for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `evaluateSurfaceBudget()` and accepts `run(..., { surfaceBudget })`
+  for opt-in, non-fatal runtime warnings. Budgets can cover width, height,
+  surface area, styled cells, total frame duration, and per-stage duration, with
+  runtime violations routed through the existing `routeRuntimeIssue` hook.
+- **Theme contrast doctor for `bijou`** — `@flyingrobots/bijou` now exports
+  `doctorTheme()` and `themeContrastRatio()` so theme authors can detect invalid
+  token colors, weak foreground/background contrast, and suspicious color reuse
+  through structured reports instead of manual visual inspection.
+- **Input routing inspector for `bijou-tui`** — `@flyingrobots/bijou-tui` now
+  exports `appendInputRoutingRecord()`, `inputRoutingInspectorText()`, and
+  `inputRoutingInspectorSurface()` so apps and tests can inspect recent
+  `RuntimeInputRouteResult` facts, including visited views, handlers, hit
+  targets, commands, effects, swallowed input, and no-op handlers.
+- **Focus map surface for `bijou-tui`** — `@flyingrobots/bijou-tui` now exports
+  `inspectFocusMap()`, `focusMapText()`, and `focusMapSurface()` so apps and
+  tests can inspect focus ownership, tab order, focused-disabled nodes, missing
+  focus, multiple focused nodes, and duplicate tab indexes as deterministic
+  text or bounded surfaces.
+- **Mode-lowering linter for `bijou`** — `@flyingrobots/bijou` now exports
+  `lintModeLowering()` and `modeLoweringReportText()` so component authors can
+  compare semantic facts across `interactive`, `static`, `pipe`, and
+  `accessible` output without pixel-matching rendered text. Reports include
+  missing required facts, changed fact values, duplicate facts, and custom
+  assertion failures.
+- **Component metadata contract for `bijou`** — `@flyingrobots/bijou` now
+  exports `ComponentMetadata`, `defineComponentMetadata()`,
+  `validateComponentMetadata()`, `componentMetadataSummary()`, and
+  `componentMetadataReportText()` so docs, DOGFOOD, MCP payloads, and agent
+  workflows can share one validated component description with modes, args,
+  variants, invariants, examples, source paths, and semantic facts.
+- **Story capture matrix for `bijou`** — `@flyingrobots/bijou` now exports
+  `captureStoryMatrix()` and `storyCaptureMatrixText()` so docs, tests,
+  DOGFOOD, and MCP tooling can render every profile/variant pair from one
+  story renderer, track missing required output modes, attach component
+  metadata, and print deterministic multi-mode captures.
+- **Fixture-to-docs promotion records for `bijou`** — `@flyingrobots/bijou`
+  now exports `createFixturePromotionRecord()`,
+  `reverseFixturePromotionRecord()`, and `fixturePromotionText()` so fixtures,
+  docs, stories, examples, and MCP payloads can share deterministic provenance
+  with component metadata, story matrices, tags, and notes.
+
+### 🐛 Bug Fixes
+
+- **Spring example API drift** — `examples/spring` no longer passes the removed
+  `fps` option to `animate()`, keeping the interactive spring comparison aligned
+  with the current pulse-driven animation command API.
+- **Stable spring animation under slow pulses** — `animate()` spring commands
+  now integrate with bounded fixed timesteps instead of applying large runtime
+  pulse deltas directly to spring physics. Slow terminal frames may delay spring
+  progress, but they no longer turn one delayed pulse into a large position or
+  velocity spike.
+- **High-resolution canvas color averaging** — `canvas()` in `quad` and
+  `braille` resolution now averages available foreground and background RGB
+  values across sampled subpixels instead of borrowing the first lit
+  subpixel's style. Empty Braille cells can now retain averaged background
+  color, so shader-authored procedural images no longer need app-local
+  post-render color correction loops.
 
 ## [5.0.0] - 2026-04-16
 

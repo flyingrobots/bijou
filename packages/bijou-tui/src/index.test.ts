@@ -6,9 +6,12 @@ import type {
 } from '@flyingrobots/bijou';
 import {
   canvas,
+  fitCellGlyph,
   projectFrameControls,
+  raytraceLookAtRay,
   type BijouContext,
   type Cell,
+  type RaytraceRay,
   type ShaderFn,
   type Surface,
 } from './index.js';
@@ -26,5 +29,19 @@ describe('package root export ergonomics', () => {
 
   it('re-exports framed shell control projection helpers from the package root', () => {
     expect(typeof projectFrameControls).toBe('function');
+  });
+
+  it('re-exports raytrace shader helpers from the package root', () => {
+    const ray: RaytraceRay = raytraceLookAtRay({
+      origin: [0, 0, 1],
+      target: [0, 0, 0],
+      screen: [0, 0],
+    });
+
+    expect(ray.direction).toEqual([0, 0, -1]);
+  });
+
+  it('re-exports cell glyph fitting helpers from the package root', () => {
+    expect(fitCellGlyph([1, 1, 1, 1, 1, 1, 1, 1])).toBe('█');
   });
 });

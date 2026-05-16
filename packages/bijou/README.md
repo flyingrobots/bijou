@@ -76,6 +76,31 @@ fake duplication rather than a real second API.
 - **`breadcrumb()`**: Path context.
 - **`stepper()`**: Ordered stages in a linear process.
 
+### Theme Authoring
+- **`extendTheme()`**: Build a custom theme from a known-good preset.
+- **`doctorTheme()`**: Structured checks for invalid colors, weak contrast,
+  and suspicious token reuse.
+- **`themeContrastRatio()`**: Deterministic foreground/background contrast
+  calculation for token-pair tests.
+
+### Mode-Aware Authoring
+- **`renderByMode()`**: Dispatch a component to the current output contract.
+- **`lintModeLowering()`**: Compare explicit semantic facts across output modes.
+- **`modeLoweringReportText()`**: Render a compact lowering report for tests,
+  docs, and review comments.
+- **`defineComponentMetadata()`**: Declare validated package, family, mode,
+  arg, variant, invariant, example, and source facts for tooling.
+- **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
+  payloads, and agent-facing reports.
+- **`captureStoryMatrix()`**: Capture every profile/variant pair from a story
+  renderer.
+- **`storyCaptureMatrixText()`**: Render a deterministic multi-mode story
+  matrix for docs and tests.
+- **`createFixturePromotionRecord()`**: Preserve provenance when a fixture,
+  docs page, story, example, or MCP payload is promoted into another surface.
+- **`fixturePromotionText()`**: Render that promotion record for review and
+  agent output.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.

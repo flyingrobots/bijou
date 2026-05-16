@@ -7,6 +7,21 @@
 
 import { createSurface, isPackedSurface, type Surface, type PackedSurface, type Cell } from '@flyingrobots/bijou';
 import { parseHex, encodeModifiers } from '@flyingrobots/bijou/perf';
+import { fitCellGlyph, type CellGlyphFitOptions } from './cell-glyph-fit.js';
+
+type RGB = readonly [number, number, number];
+
+interface ColorAccumulator {
+  r: number;
+  g: number;
+  b: number;
+  count: number;
+}
+
+interface StyleAccumulator {
+  fg: ColorAccumulator;
+  bg: ColorAccumulator;
+}
 
 function resolvedColorRgb(ref: unknown): readonly [number, number, number] | undefined {
   return typeof ref === 'object'
@@ -29,6 +44,62 @@ function resolvedColorHex(ref: unknown): string | undefined {
     : undefined;
 }
 
+function resolveCellColor(rgb: RGB | undefined, ref: Cell['fg'] | Cell['bg']): RGB | undefined {
+  if (rgb !== undefined) return rgb;
+
+  const resolvedRgb = resolvedColorRgb(ref);
+  if (resolvedRgb !== undefined) return resolvedRgb;
+
+  const hex = resolvedColorHex(ref);
+  return hex === undefined ? undefined : parseHex(hex);
+}
+
+function createColorAccumulator(): ColorAccumulator {
+  return { r: 0, g: 0, b: 0, count: 0 };
+}
+
+function createStyleAccumulator(): StyleAccumulator {
+  return {
+    fg: createColorAccumulator(),
+    bg: createColorAccumulator()
+  };
+}
+
+function accumulateColor(accumulator: ColorAccumulator, rgb: RGB): void {
+  accumulator.r += rgb[0]!;
+  accumulator.g += rgb[1]!;
+  accumulator.b += rgb[2]!;
+  accumulator.count++;
+}
+
+function accumulateResolvedColor(accumulator: ColorAccumulator, rgb: RGB | undefined, ref: Cell['fg'] | Cell['bg']): void {
+  const resolved = resolveCellColor(rgb, ref);
+  if (resolved !== undefined) accumulateColor(accumulator, resolved);
+}
+
+function accumulateCellStyle(accumulator: StyleAccumulator, cell: Cell): void {
+  accumulateResolvedColor(accumulator.fg, cell.fgRGB, cell.fg);
+  accumulateResolvedColor(accumulator.bg, cell.bgRGB, cell.bg);
+}
+
+function averagedColor(accumulator: ColorAccumulator): RGB | undefined {
+  if (accumulator.count === 0) return undefined;
+  return [
+    Math.round(accumulator.r / accumulator.count),
+    Math.round(accumulator.g / accumulator.count),
+    Math.round(accumulator.b / accumulator.count)
+  ];
+}
+
+function averagedCellStyle(accumulator: StyleAccumulator): Pick<Cell, 'fgRGB' | 'bgRGB'> {
+  const style: Pick<Cell, 'fgRGB' | 'bgRGB'> = {};
+  const fgRGB = averagedColor(accumulator.fg);
+  const bgRGB = averagedColor(accumulator.bg);
+  if (fgRGB !== undefined) style.fgRGB = fgRGB;
+  if (bgRGB !== undefined) style.bgRGB = bgRGB;
+  return style;
+}
+
 /**
  * Parameters passed to the shader function.
  */
@@ -43,19 +114,25 @@ export interface ShaderParams {
   uniforms: Record<string, any>;
 }
 
+export interface ShaderCell extends Cell {
+  /** Optional normalized coverage used by glyph-fit resolution. */
+  readonly coverage?: number;
+}
+
 /**
  * Shader function called per "pixel" (cell or sub-pixel).
  * 
  * Returns a Cell defining the character and style. 
  * In high-res modes (Braille/Quad), the character is treated as a boolean 
- * (non-space = on) and styling is taken from the first non-space sub-pixel.
+ * (non-space = on) and available foreground/background colors are averaged
+ * across sampled sub-pixels.
  */
-export type ShaderFn = (params: ShaderParams) => Cell | string;
+export type ShaderFn = (params: ShaderParams) => ShaderCell | string;
 
 /**
  * Resolution modes for the canvas.
  */
-export type CanvasResolution = 'cell' | 'quad' | 'braille';
+export type CanvasResolution = 'cell' | 'quad' | 'braille' | 'glyph';
 
 /**
  * Options for the {@link canvas} renderer.
@@ -67,6 +144,8 @@ export interface CanvasOptions {
   resolution?: CanvasResolution;
   /** Custom data passed to the shader. */
   uniforms?: Record<string, any>;
+  /** Glyph fitting options used when resolution is 'glyph'. */
+  glyphFit?: CellGlyphFitOptions;
 }
 
 /**
@@ -84,7 +163,7 @@ export function canvas(
   shader: ShaderFn,
   options: CanvasOptions = {}
 ): Surface {
-  const { resolution = 'cell', time = 0, uniforms = {} } = options;
+  const { resolution = 'cell', time = 0, uniforms = {}, glyphFit } = options;
   const surface = createSurface(cols, rows);
 
   if (cols <= 0 || rows <= 0) return surface;
@@ -99,19 +178,25 @@ export function canvas(
     case 'braille':
       renderBrailleResolution(surface, shader, time, uniforms);
       break;
+    case 'glyph':
+      renderGlyphResolution(surface, shader, time, uniforms, glyphFit);
+      break;
   }
 
   return surface;
 }
 
 function setCellFast(surface: Surface, packed: boolean, x: number, y: number, cell: Cell): void {
-  if (packed && (cell.fgRGB != null || cell.fg != null)) {
-    const fg = cell.fgRGB ?? resolvedColorRgb(cell.fg) ?? (resolvedColorHex(cell.fg) ? parseHex(resolvedColorHex(cell.fg)!) : undefined);
-    if (fg) {
-      const [fR, fG, fB] = fg;
-      let bR = -1, bG = 0, bB = 0;
-      const bg = cell.bgRGB ?? resolvedColorRgb(cell.bg) ?? (resolvedColorHex(cell.bg) ? parseHex(resolvedColorHex(cell.bg)!) : undefined);
-      if (bg) { [bR, bG, bB] = bg; }
+  if (packed && (cell.fgRGB != null || cell.fg != null || cell.bgRGB != null || cell.bg != null)) {
+    let fR = -1, fG = 0, fB = 0;
+    const fg = resolveCellColor(cell.fgRGB, cell.fg);
+    if (fg) { [fR, fG, fB] = fg; }
+
+    let bR = -1, bG = 0, bB = 0;
+    const bg = resolveCellColor(cell.bgRGB, cell.bg);
+    if (bg) { [bR, bG, bB] = bg; }
+
+    if (fg || bg) {
       (surface as PackedSurface).setRGB(x, y, cell.char, fR, fG, fB, bR, bG, bB, encodeModifiers(cell.modifiers));
       return;
     }
@@ -153,6 +238,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
     for (let x = 0; x < width; x++) {
       let mask = 0;
       let firstStyledCell: Cell | null = null;
+      const styleAccumulator = createStyleAccumulator();
 
       for (let sy = 0; sy < 2; sy++) {
         for (let sx = 0; sx < 2; sx++) {
@@ -165,6 +251,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
             uniforms
           });
           const cell = typeof result === 'string' ? { char: result } : result;
+          accumulateCellStyle(styleAccumulator, cell);
           
           if (cell.char !== ' ') {
             mask |= (1 << (sy * 2 + sx));
@@ -175,6 +262,7 @@ function renderQuadResolution(surface: Surface, shader: ShaderFn, time: number, 
 
       setCellFast(surface, packed, x, y, {
         ...(firstStyledCell || { char: ' ' }),
+        ...averagedCellStyle(styleAccumulator),
         char: QUAD_CHARS[mask] || ' '
       });
     }
@@ -198,6 +286,7 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
     for (let x = 0; x < width; x++) {
       let code = 0;
       let firstStyledCell: Cell | null = null;
+      const styleAccumulator = createStyleAccumulator();
 
       for (let sy = 0; sy < 4; sy++) {
         for (let sx = 0; sx < 2; sx++) {
@@ -210,6 +299,7 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
             uniforms
           });
           const cell = typeof result === 'string' ? { char: result } : result;
+          accumulateCellStyle(styleAccumulator, cell);
           
           if (cell.char !== ' ') {
             code |= DOT_MAP[sy]![sx]!;
@@ -220,8 +310,67 @@ function renderBrailleResolution(surface: Surface, shader: ShaderFn, time: numbe
 
       setCellFast(surface, packed, x, y, {
         ...(firstStyledCell || { char: ' ' }),
+        ...averagedCellStyle(styleAccumulator),
         char: String.fromCharCode(0x2800 + code)
       });
     }
   }
+}
+
+function renderGlyphResolution(
+  surface: Surface,
+  shader: ShaderFn,
+  time: number,
+  uniforms: Record<string, any>,
+  glyphFit: CellGlyphFitOptions | undefined,
+) {
+  const { width, height } = surface;
+  const packed = isPackedSurface(surface);
+  const subW = width * 2;
+  const subH = height * 4;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let firstStyledCell: ShaderCell | null = null;
+      const coverage: number[] = [];
+      const styleAccumulator = createStyleAccumulator();
+
+      for (let sy = 0; sy < 4; sy++) {
+        for (let sx = 0; sx < 2; sx++) {
+          const px = x * 2 + sx;
+          const py = y * 4 + sy;
+          const result = shader({
+            u: px / (subW - 1 || 1),
+            v: py / (subH - 1 || 1),
+            time,
+            uniforms
+          });
+          const cell = typeof result === 'string' ? { char: result } : result;
+          coverage.push(cellCoverage(cell));
+          accumulateCellStyle(styleAccumulator, cell);
+
+          if (cell.char !== ' ' && !firstStyledCell) {
+            firstStyledCell = cell;
+          }
+        }
+      }
+
+      setCellFast(surface, packed, x, y, {
+        ...(firstStyledCell || { char: ' ' }),
+        ...averagedCellStyle(styleAccumulator),
+        char: fitCellGlyph(coverage, glyphFit)
+      });
+    }
+  }
+}
+
+function cellCoverage(cell: ShaderCell): number {
+  if (cell.coverage !== undefined) return clampCoverage(cell.coverage);
+  return cell.char === ' ' ? 0 : 1;
+}
+
+function clampCoverage(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  if (value >= 1) return 1;
+  return value;
 }

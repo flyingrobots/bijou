@@ -1,19 +1,19 @@
 # v5.0.0 — Frame Owns the Pump
 
-Next major version. These items are still live shaping work in the
-canonical METHOD backlog.
+Closed major-version shaping lane retained for release lineage. `v5.0.0`
+is already tagged and published.
 
 ## Shaped Scope
 
-- [**RE-021**](./RE-021-frame-owns-the-pump.md) — frame owns the pump:
+- [**RE-021**](../../retro/RE-021-frame-owns-the-pump.md) — frame owns the pump:
   `createFramedApp` owns the render loop, timing, frame budget, and perf
   bookkeeping
-- [**HT-upstream**](./HT_upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.md) —
+- [**HT-upstream**](../../retro/HT_upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.md) —
   upstream edge-overlay scrollbars and BCSS overflow handling from XYPH
   into `bijou-tui`
-- [**CI-003**](./CI-003-surface-shaders.md) — post-process surface shaders
+- [**CI-003**](../../retro/CI-003-surface-shaders.md) — post-process surface shaders
   for CRT, scanline, and other byte-path effects
-- [**DF docs**](./DF_mcp-interactive-documentation-for-all-bijou-components.md) —
+- [**DF docs**](../../retro/DF_mcp-interactive-documentation-for-all-bijou-components.md) —
   grow MCP docs breadth into a real field guide for first-party components
 
 ## Adjacent Work

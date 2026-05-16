@@ -86,6 +86,39 @@ Read:
 - [theme graph types](./src/core/theme/graph-types.ts)
 - [DTCG tests](./src/core/theme/dtcg.test.ts)
 
+### Theme Doctor
+
+Use `doctorTheme()` when a theme change needs structured feedback before visual
+review. The doctor is pure: it returns invalid-color errors, low-contrast
+warnings, and optional color-reuse warnings without mutating the theme or
+opening a terminal UI.
+
+```typescript
+import { doctorTheme } from '@flyingrobots/bijou';
+
+const report = doctorTheme(theme, {
+  contrastPairs: [
+    {
+      foreground: 'semantic.primary',
+      background: 'surface.primary',
+      minRatio: 4.5,
+    },
+  ],
+  maxColorReuse: 8,
+});
+
+if (!report.passed) {
+  for (const issue of report.issues) {
+    console.error(issue.message);
+  }
+}
+```
+
+Use explicit `contrastPairs` for house-rule checks. Use `maxColorReuse` when a
+theme should avoid too many semantic tokens collapsing to the same color. Use
+`themeContrastRatio()` directly in tests that only need a numeric contrast
+assertion.
+
 ### Observing Theme Changes
 
 Third-party component authors should use `observeTheme(ctx, handler)` as the
@@ -143,6 +176,143 @@ Good companion docs:
 - [Design System Overview](../../docs/design-system/README.md)
 - [Content Guide](../../docs/strategy/content-guide.md)
 - [Accessibility and Assistive Modes](../../docs/strategy/accessibility-and-assistive-modes.md)
+
+### Mode-Lowering Linter
+
+Use `lintModeLowering()` when a component needs proof that lower modes preserve
+meaning rather than visual shape. The helper compares explicit semantic facts
+from each mode and reports missing facts, changed values, duplicates, and custom
+assertion failures.
+
+```typescript
+import {
+  lintModeLowering,
+  modeLoweringReportText,
+} from '@flyingrobots/bijou';
+
+const report = lintModeLowering({
+  modes: [
+    {
+      mode: 'interactive',
+      facts: [
+        { kind: 'entity', key: 'save-button' },
+        { kind: 'count', key: 'rows', value: 3 },
+      ],
+    },
+    {
+      mode: 'accessible',
+      facts: [
+        { kind: 'entity', key: 'save-button' },
+        { kind: 'count', key: 'rows', value: 3 },
+      ],
+    },
+  ],
+});
+
+console.log(modeLoweringReportText(report));
+```
+
+Do not use it for pixel or snapshot equivalence. It is a semantic contract:
+entities, labels, states, counts, edges, and component-specific facts should
+survive lowering even when the visible rendering changes completely.
+
+### Component Metadata
+
+Use `defineComponentMetadata()` when a component's package, family, modes,
+arguments, variants, invariants, examples, docs, and source path need to be
+shared by docs, DOGFOOD, MCP payloads, or agents.
+
+```typescript
+import {
+  componentMetadataSummary,
+  defineComponentMetadata,
+} from '@flyingrobots/bijou';
+
+const metadata = defineComponentMetadata({
+  packageName: '@flyingrobots/bijou',
+  componentName: 'alert',
+  family: 'status-feedback',
+  modes: ['interactive', 'static', 'pipe', 'accessible'],
+  docs: {
+    summary: 'Persistent in-flow message with severity.',
+  },
+  variants: [
+    {
+      id: 'warning',
+      label: 'Warning',
+      facts: [{ kind: 'state', key: 'severity', value: 'warning' }],
+    },
+  ],
+});
+
+console.log(componentMetadataSummary(metadata));
+```
+
+`validateComponentMetadata()` returns deterministic issue paths when metadata
+drifts, and `componentMetadataReportText()` renders those issues for review.
+This is intentionally not a complete story schema; it is the shared contract
+that story surfaces can build on.
+
+### Story Capture Matrix
+
+Use `captureStoryMatrix()` when one story renderer needs to prove multiple
+profiles and variants together. The helper records string outputs for every
+profile/variant pair and can report required output modes that are missing from
+the profile set.
+
+```typescript
+import {
+  captureStoryMatrix,
+  storyCaptureMatrixText,
+} from '@flyingrobots/bijou';
+
+const matrix = captureStoryMatrix({
+  storyId: 'alert',
+  profiles: [
+    { id: 'rich', label: 'Rich', mode: 'interactive', width: 80 },
+    { id: 'pipe', label: 'Pipe', mode: 'pipe', width: 80 },
+  ],
+  variants: [
+    { id: 'warning', label: 'Warning' },
+  ],
+  requiredModes: ['interactive', 'static', 'pipe', 'accessible'],
+  render({ profile, variant }) {
+    return `${variant.label} rendered for ${profile.mode}`;
+  },
+});
+
+console.log(storyCaptureMatrixText(matrix));
+```
+
+This slice keeps rendering caller-owned. Surface-specific capture, test-context
+construction, and baseline file writing can wrap the matrix without changing
+the shared report format.
+
+### Fixture-To-Docs Promotion
+
+Use `createFixturePromotionRecord()` when an executable fixture, docs section,
+story, example, or MCP payload should point back to the surface it came from.
+The record is pure provenance; a later CLI can decide how to write files.
+
+```typescript
+import {
+  createFixturePromotionRecord,
+  fixturePromotionText,
+} from '@flyingrobots/bijou';
+
+const promotion = createFixturePromotionRecord({
+  id: 'alert-basic-docs',
+  from: { kind: 'fixture', path: 'packages/bijou/src/core/components/alert.test.ts' },
+  to: { kind: 'docs', path: 'packages/bijou/README.md#status-and-feedback' },
+  tags: ['docs', 'regression'],
+});
+
+console.log(fixturePromotionText(promotion));
+```
+
+`reverseFixturePromotionRecord()` swaps source and target while keeping metadata,
+story matrix, tags, and notes intact, which covers the docs-to-fixture direction
+without a second record type.
 
 ## Component Families Beyond The Fast Path
 

@@ -35,11 +35,17 @@ export interface DagSource {
   /** Optional per-node color/style token. */
   token?(id: string): TokenValue | undefined;
 
+  /** Optional per-node background token. */
+  bgToken?(id: string): TokenValue | undefined;
+
   /** Optional per-node label text color. */
   labelToken?(id: string): TokenValue | undefined;
 
   /** Optional per-node badge text color. */
   badgeToken?(id: string): TokenValue | undefined;
+
+  /** Optional compact node wrapper used by the compact renderer. */
+  compactShape?(id: string): DagNode['compactShape'];
 }
 
 /**
@@ -140,8 +146,10 @@ export function arraySource(nodes: DagNode[]): SlicedDagSource {
     parents: (id) => [...(parentMap.get(id) ?? [])],
     badge: (id) => map.get(id)?.badge,
     token: (id) => map.get(id)?.token,
+    bgToken: (id) => map.get(id)?.bgToken,
     labelToken: (id) => map.get(id)?.labelToken,
     badgeToken: (id) => map.get(id)?.badgeToken,
+    compactShape: (id) => map.get(id)?.compactShape,
     ghost: (id) => map.get(id)?._ghost ?? false,
     ghostLabel: (id) => map.get(id)?._ghostLabel,
   };
@@ -172,10 +180,14 @@ export function materialize(source: SlicedDagSource): DagNode[] {
     if (badge !== undefined) node.badge = badge;
     const token = source.token?.(id);
     if (token !== undefined) node.token = token;
+    const bgToken = source.bgToken?.(id);
+    if (bgToken !== undefined) node.bgToken = bgToken;
     const labelToken = source.labelToken?.(id);
     if (labelToken !== undefined) node.labelToken = labelToken;
     const badgeToken = source.badgeToken?.(id);
     if (badgeToken !== undefined) node.badgeToken = badgeToken;
+    const compactShape = source.compactShape?.(id);
+    if (compactShape !== undefined) node.compactShape = compactShape;
     if (source.ghost(id)) {
       node._ghost = true;
       node._ghostLabel = source.ghostLabel(id);
@@ -361,9 +373,13 @@ export function sliceSource(
 
     token: (id) => ghostNodes.has(id) ? undefined : source.token?.(id),
 
+    bgToken: (id) => ghostNodes.has(id) ? undefined : source.bgToken?.(id),
+
     labelToken: (id) => ghostNodes.has(id) ? undefined : source.labelToken?.(id),
 
     badgeToken: (id) => ghostNodes.has(id) ? undefined : source.badgeToken?.(id),
+
+    compactShape: (id) => ghostNodes.has(id) ? undefined : source.compactShape?.(id),
 
     ghost: (id) => ghostNodes.has(id) || (inheritGhost !== null && inheritGhost.ghost(id)),
 

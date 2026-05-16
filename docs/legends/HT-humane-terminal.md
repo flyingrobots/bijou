@@ -56,4 +56,5 @@ A framed Bijou app exposes focus, control ownership, and shell affordances clear
   - [HT-005 — Promote Page-Provided Layer Registry and Shell Control Projection](../method/retro/HT_005-promote-page-provided-layer-registry-and-shell-control-projection.md)
   - [HT-001 — Notification Center Polish and Discoverability](../method/retro/HT_001-notification-center-polish-and-discoverability.md)
 - current exploratory backlog:
+  - [HT-009 — File Explorer Surface](../method/backlog/cool-ideas/HT-009-file-explorer-surface.md)
   - [HT-007 — Focus Map Surface](../method/backlog/cool-ideas/HT-007-focus-map-surface.md)

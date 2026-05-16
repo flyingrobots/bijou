@@ -3,7 +3,7 @@ import { dag, dagSlice, dagLayout } from './dag.js';
 import type { DagNode } from './dag.js';
 import { arraySource, isDagSource, isSlicedDagSource, sliceSource } from './dag-source.js';
 import type { DagSource, SlicedDagSource } from './dag-source.js';
-import { createTestContext } from '../../adapters/test/index.js';
+import { auditStyle, createTestContext } from '../../adapters/test/index.js';
 
 // ── Test Data ──────────────────────────────────────────────────────
 
@@ -17,6 +17,13 @@ const diamond: DagNode[] = [
   { id: 'b', label: 'Left', edges: ['d'] },
   { id: 'c', label: 'Right', edges: ['d'] },
   { id: 'd', label: 'End' },
+];
+
+const compactDiamond: DagNode[] = [
+  { id: 'a', label: 'A', edges: ['b', 'c'] },
+  { id: 'b', label: 'B', edges: ['d'] },
+  { id: 'c', label: 'C', edges: ['d'] },
+  { id: 'd', label: 'D' },
 ];
 
 const linear: DagNode[] = [
@@ -320,7 +327,7 @@ describe('dag', () => {
       expect(result).toContain('A');
       expect(result).toContain('B');
       expect(result).toContain('C');
-      expect(result).toContain('├');
+      expect(result).toMatch(/[─┌┐┬┴┼├┤]/);
     });
   });
 
@@ -371,6 +378,13 @@ describe('dag', () => {
       expect(boxMatch![0].length).toBe(30);
     });
 
+    it('tightens sibling spacing for compact nodeWidth overrides', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag(compactDiamond, { nodeWidth: 5, ctx });
+      expect(result).toContain('╭───╮ ╭───╮');
+      expect(result).not.toContain('╭───╮    ╭───╮');
+    });
+
     it('renders with highlightPath without error', () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
       const result = dag(diamond, {
@@ -381,6 +395,51 @@ describe('dag', () => {
       expect(result).toContain('Start');
       expect(result).toContain('Left');
       expect(result).toContain('End');
+    });
+
+    it('supports heavy, double, and dashed edge styles', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80 } });
+      const heavy = dag(compactDiamond, { nodeWidth: 5, edgeStyle: 'heavy', ctx });
+      const double = dag(compactDiamond, { nodeWidth: 5, edgeStyle: 'double', ctx });
+      const dashed = dag(compactDiamond, { nodeWidth: 5, edgeStyle: 'dashed', ctx });
+
+      expect(heavy).toContain('┃');
+      expect(heavy).toContain('━');
+      expect(double).toContain('║');
+      expect(double).toContain('═');
+      expect(dashed).toContain('╌');
+      expect(dashed).toContain('▾');
+    });
+
+    it('supports compact node style', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag(compactDiamond, { nodeStyle: 'compact', nodeWidth: 3, ctx });
+      expect(result).toContain('[A]');
+      expect(result).toContain('[B]');
+      expect(result).toContain('[C]');
+      expect(result).toContain('[D]');
+    });
+
+    it('supports compact per-node shapes', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag([
+        { id: 'a', label: 'A', edges: ['b', 'c', 'd', 'e'], compactShape: 'square' },
+        { id: 'b', label: 'B', compactShape: 'round' },
+        { id: 'c', label: 'C', compactShape: 'angle' },
+        { id: 'd', label: 'D', compactShape: 'brace' },
+        { id: 'e', label: 'E', compactShape: 'plain' },
+      ], { nodeStyle: 'compact', nodeWidth: 3, ctx });
+      expect(result).toContain('[A]');
+      expect(result).toContain('(B)');
+      expect(result).toContain('<C>');
+      expect(result).toContain('{D}');
+      expect(result).toMatch(/\sE(?:\n|$)/);
+    });
+
+    it('centers labels inside boxed nodes', () => {
+      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 40 } });
+      const result = dag([{ id: 'a', label: 'Parse' }], { nodeWidth: 14, ctx });
+      expect(result).toContain('│   Parse    │');
     });
   });
 
@@ -1246,24 +1305,39 @@ describe('DagNode labelToken / badgeToken', () => {
   it('works through arraySource', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
-      { id: 'a', label: 'A', edges: ['b'], labelToken: { hex: '#00ff00' } },
+      {
+        id: 'a',
+        label: 'A',
+        edges: ['b'],
+        labelToken: { hex: '#00ff00' },
+        bgToken: { hex: '#111111', bg: '#222222' },
+        compactShape: 'round',
+      },
       { id: 'b', label: 'B', badgeToken: { hex: '#ff0000' }, badge: 'X' },
     ];
     const src = arraySource(nodes);
+    expect(src.bgToken!('a')).toEqual({ hex: '#111111', bg: '#222222' });
+    expect(src.compactShape!('a')).toBe('round');
     expect(src.labelToken!('a')).toEqual({ hex: '#00ff00' });
     expect(src.badgeToken!('b')).toEqual({ hex: '#ff0000' });
     expect(src.labelToken!('b')).toBeUndefined();
     expect(src.badgeToken!('a')).toBeUndefined();
-    // Should render without error
-    const result = dag(src, { ctx });
-    expect(result).toContain('A');
+    const result = dag(src, { nodeStyle: 'compact', nodeWidth: 3, ctx });
+    expect(result).toContain('(A)');
     expect(result).toContain('B');
   });
 
   it('works through dagSlice', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120 } });
     const nodes: DagNode[] = [
-      { id: 'a', label: 'A', edges: ['b'], labelToken: { hex: '#00ff00' } },
+      {
+        id: 'a',
+        label: 'A',
+        edges: ['b'],
+        labelToken: { hex: '#00ff00' },
+        bgToken: { hex: '#111111', bg: '#222222' },
+        compactShape: 'round',
+      },
       { id: 'b', label: 'B', edges: ['c'], badgeToken: { hex: '#ff0000' }, badge: 'X' },
       { id: 'c', label: 'C' },
     ];
@@ -1271,12 +1345,72 @@ describe('DagNode labelToken / badgeToken', () => {
     const sliced = dagSlice(src, 'b', { direction: 'both', depth: 1 });
     // labelToken should be preserved for 'a'
     expect(sliced.labelToken!('a')).toEqual({ hex: '#00ff00' });
+    expect(sliced.bgToken!('a')).toEqual({ hex: '#111111', bg: '#222222' });
+    expect(sliced.compactShape!('a')).toBe('round');
     // badgeToken should be preserved for 'b'
     expect(sliced.badgeToken!('b')).toEqual({ hex: '#ff0000' });
-    // Should render without error
-    const result = dag(sliced, { ctx });
-    expect(result).toContain('A');
+    const result = dag(sliced, { nodeStyle: 'compact', nodeWidth: 3, ctx });
+    expect(result).toContain('(A)');
     expect(result).toContain('B');
+  });
+
+  it('styles node border, background, label, badge, and edges independently in interactive mode', () => {
+    const style = auditStyle();
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 80 }, style });
+    const borderToken = { hex: '#111111' };
+    const bgToken = { hex: '#222222', bg: '#101010' };
+    const labelToken = { hex: '#33cc33' };
+    const badgeToken = { hex: '#ff5555' };
+    const edgeToken = { hex: '#4488ff' };
+
+    const result = dag([
+      {
+        id: 'a',
+        label: 'Build',
+        badge: 'HOT',
+        edges: ['b'],
+        labelToken,
+        badgeToken,
+      },
+      { id: 'b', label: 'Ship' },
+    ], {
+      nodeToken: borderToken,
+      nodeBgToken: bgToken,
+      edgeToken,
+      ctx,
+    });
+
+    expect(result).toContain('Build');
+    expect(result).toContain('HOT');
+    expect(style.calls.some(
+      (call) => call.method === 'styled'
+        && call.token?.hex === borderToken.hex
+        && call.token?.bg === bgToken.bg
+        && call.text.includes('╭'),
+    )).toBe(true);
+    expect(style.calls.some(
+      (call) => call.method === 'styled'
+        && call.token?.hex === labelToken.hex
+        && call.token?.bg === bgToken.bg
+        && call.text.includes('Build'),
+    )).toBe(true);
+    expect(style.calls.some(
+      (call) => call.method === 'styled'
+        && call.token?.hex === badgeToken.hex
+        && call.token?.bg === bgToken.bg
+        && call.text.includes('HOT'),
+    )).toBe(true);
+    expect(style.calls.some(
+      (call) => call.method === 'styled'
+        && call.token?.hex === bgToken.hex
+        && call.token?.bg === bgToken.bg
+        && call.text.includes(' '),
+    )).toBe(true);
+    expect(style.calls.some(
+      (call) => call.method === 'styled'
+        && call.token?.hex === edgeToken.hex
+        && /[│▼]/.test(call.text),
+    )).toBe(true);
   });
 
   it('pipe mode ignores tokens (no ANSI output)', () => {

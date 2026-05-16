@@ -96,7 +96,15 @@ export type {
 } from './preference-list.js';
 
 export { dag, dagSlice, dagLayout } from './dag.js';
-export type { DagNode, DagOptions, DagNodePosition, DagLayout } from './dag.js';
+export type {
+  DagCompactShape,
+  DagEdgeStyle,
+  DagNode,
+  DagNodePosition,
+  DagNodeStyle,
+  DagOptions,
+  DagLayout,
+} from './dag.js';
 
 export { arraySource, isDagSource, isSlicedDagSource } from './dag-source.js';
 export type { DagSource, SlicedDagSource, DagSliceOptions } from './dag-source.js';

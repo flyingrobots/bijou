@@ -368,6 +368,45 @@ describe('run', () => {
       expect(seenIssues).toContain('command:Error: boom');
     });
 
+    it('routes opt-in surface budget warnings through the app runtime issue hook', async () => {
+      type Msg = { type: 'issue'; text: string };
+      const seenIssues: string[] = [];
+
+      const budgetedApp: App<string, Msg> = {
+        init: () => ['idle', []],
+        update(msg, model) {
+          if (msg.type === 'key' && msg.key === 'q') {
+            return [model, [quit<Msg>()]];
+          }
+          if (msg.type === 'issue') {
+            seenIssues.push(msg.text);
+            return [`issue:${msg.text}`, []];
+          }
+          return [model, []];
+        },
+        view() {
+          return createSurface(4, 4, { char: '.', empty: false });
+        },
+        routeRuntimeIssue(issue) {
+          return {
+            type: 'issue',
+            text: `${issue.level}:${issue.source}:${issue.message}`,
+          };
+        },
+      };
+
+      const { clock, ctx } = createInteractiveContext({ runtime: { columns: 4, rows: 4 } });
+      scheduleKeys(ctx, clock, [{ at: 20, key: 'q' }]);
+      const promise = run(budgetedApp, {
+        ctx,
+        surfaceBudget: { maxArea: 1 },
+      });
+      await clock.advanceByAsync(100);
+      await promise;
+
+      expect(seenIssues).toContain('warning:runtime:surface surface-area 16 > 1');
+    });
+
     it('runs init commands before startup resize commands', async () => {
       type Msg = { type: 'init-cmd' } | { type: 'resize-cmd' };
       const order: string[] = [];

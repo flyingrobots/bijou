@@ -84,6 +84,14 @@ Select the family based on the interaction semantic.
 - **`toast()`**: Transient notification for a single event.
 - **`tooltip()`**: Micro-explanation for a local target.
 - **`debugOverlay()`**: Development-only perf HUD composited onto any app surface.
+- **`layoutInspectorOverlay()`**: Development-only geometry HUD for region
+  bounds, focus, and layers.
+- **`inputRoutingInspectorText()`**: Development-only route trace for recent
+  key and pointer events.
+- **`focusMapText()`**: Development-only focus ownership and tab-order report.
+- **`evaluateSurfaceBudget()`**: Deterministic warnings for surface and timing
+  thresholds.
+- **`surfaceDiffSurface()`**: Side-by-side or overlay inspection for two rendered surfaces.
 
 ### Collection Interaction
 - **`navigableTable()`**: Keyboard-driven traversal and cell inspection.
@@ -129,6 +137,11 @@ const cmd = animate({
 });
 ```
 
+Spring commands integrate physics with bounded fixed timesteps by default, so a
+slow terminal frame cannot feed a large raw pulse delta into the spring. Tune
+`fixedStepSeconds` and `maxPulseSeconds` only when an app needs a custom
+simulation cadence.
+
 ### Timeline Orchestration
 ```typescript
 import { timeline } from '@flyingrobots/bijou-tui';
@@ -141,6 +154,19 @@ const tl = timeline()
 ```
 
 ## Post-Process Shaders
+
+`canvas()` can render procedural surfaces at cell, Quad, Braille, or glyph-fit
+resolution. Use `resolution: 'glyph'` when a shader should sample a 2x4 grid but
+collapse into geometry-aware Unicode or ASCII characters instead of Braille.
+
+```typescript
+import { canvas } from '@flyingrobots/bijou-tui';
+
+const logo = canvas(24, 6, ({ u, v }) => {
+  const lit = Math.abs(u - v) < 0.08;
+  return lit ? { char: 'X', fg: '#ffffff' } : ' ';
+}, { resolution: 'glyph' });
+```
 
 ```typescript
 import { run, surfaceShaderFilter, scanlines, vignette } from '@flyingrobots/bijou-tui';
@@ -180,6 +206,94 @@ await harness.teardown();
 Keep `runScript()` for fixture-style interaction playback and GIF/demo
 capture, and use `testRuntime()` when you need direct assertions on
 snapshots, emitted messages, command outcomes, or cleanup disposal.
+
+Use `surfaceDiffText()` or `surfaceDiffSurface()` when a frame assertion fails
+and you need cell-level truth instead of a raw string dump:
+
+```typescript
+import { surfaceDiffText } from '@flyingrobots/bijou-tui';
+
+expect(surfaceDiffText(before, after)).toContain('surface diff: 2 changed');
+```
+
+Use `layoutInspectorOverlay()` when a layout assertion needs visual geometry
+truth on top of the rendered frame:
+
+```typescript
+import {
+  layoutInspectorOverlay,
+  layoutInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const inspected = layoutInspectorOverlay(frame, [
+  {
+    id: 'editor',
+    rect: { col: 2, row: 1, width: 40, height: 12 },
+    focused: true,
+  },
+]);
+
+expect(layoutInspectorText([
+  { id: 'editor', rect: { x: 2, y: 1, width: 40, height: 12 } },
+]))
+  .toContain('focused=false');
+```
+
+Use `evaluateSurfaceBudget()` directly in tests or pass `surfaceBudget` to
+`run()` when an interactive app should route non-fatal runtime warnings:
+
+```typescript
+import { evaluateSurfaceBudget, run } from '@flyingrobots/bijou-tui';
+
+expect(evaluateSurfaceBudget({
+  surface: frame,
+  thresholds: { maxArea: 4000 },
+})).toEqual([]);
+
+await run(app, {
+  ctx,
+  surfaceBudget: { maxArea: 4000, maxStageDurationMs: { Paint: 8 } },
+});
+```
+
+Use `appendInputRoutingRecord()` and `inputRoutingInspectorText()` when a shell
+or app wants to keep the last few routing decisions visible:
+
+```typescript
+import {
+  appendInputRoutingRecord,
+  inputRoutingInspectorText,
+} from '@flyingrobots/bijou-tui';
+
+const history = appendInputRoutingRecord({ records: [] }, {
+  event,
+  result,
+  commandLabels: ['save-file'],
+});
+
+console.log(inputRoutingInspectorText(history));
+```
+
+Use `focusMapText()` or `focusMapSurface()` when focus ownership and tab order
+need the same deterministic treatment:
+
+```typescript
+import { focusMapText } from '@flyingrobots/bijou-tui';
+
+const report = focusMapText([
+  {
+    id: 'editor',
+    owner: 'workspace',
+    role: 'textbox',
+    rect: { x: 2, y: 1, width: 60, height: 20 },
+    tabIndex: 1,
+    focusable: true,
+    focused: true,
+  },
+]);
+
+expect(report).toContain('[1] *editor');
+```
 
 ## Documentation
 
