@@ -46,7 +46,7 @@ The boundary remains:
   audit viewport masking and scrollable inspection panes
 - [**DL-012**](../../../design/DL-012-separate-focus-gutter-from-scrollbar-ui-tokens.md) -
   separate focus gutter chrome from scrollbar UI tokens
-- [**DX-030**](./DX-030-add-boundary-aware-pointer-selection-and-copy.md) -
+- [**DX-030**](../../../design/DX-030-add-boundary-aware-pointer-selection-and-copy.md) -
   add boundary-aware pointer selection and copy
 
 ## First Blocks And Shell Proof
