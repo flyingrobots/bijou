@@ -61,7 +61,7 @@ The boundary remains:
   audit overlay primitives
 - [**DF-062**](./DF-062-audit-notification-system-family-across-real-surfaces.md) -
   audit notification system
-- [**DF-036**](./DF-036-audit-loading-placeholders-family-across-real-surfaces.md) -
+- [**DF-036**](../../../design/DF-036-audit-loading-placeholders-family-across-real-surfaces.md) -
   audit loading placeholders
 - [**DF-041**](./DF-041-audit-inspector-panels-family-across-real-surfaces.md) -
   audit inspector panels
