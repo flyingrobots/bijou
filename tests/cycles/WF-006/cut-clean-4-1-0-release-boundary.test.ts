@@ -41,8 +41,9 @@ describe('WF-006 cut clean 4.1.0 release boundary', () => {
     expect(bearing).toContain('4.1.0');
     expect(bearing).toContain('RE-007');
 
-    // Release guide evolves; check that it references the latest shipped release
-    expect(releaseGuide).toMatch(/The latest shipped release is \*\*`4\.\d+\.\d+`\*\*\./);
+    // Release guide evolves; check that it references a concrete shipped release
+    // instead of freezing this historical 4.1.0 cycle to the 4.x line forever.
+    expect(releaseGuide).toMatch(/The latest shipped release is \*\*`\d+\.\d+\.\d+`\*\*\./);
     expect(releaseGuide).not.toContain('The currently shaped next release target is **`4.1.0`**.');
 
     expect(workflowLegend).toContain('no version-target release lane is active right now');
