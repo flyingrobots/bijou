@@ -72,9 +72,10 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     expect(text).toContain('Footer cue: notices:2');
   });
 
-  it('registers the text-first workstation command', () => {
+  it('registers the text-first workstation commands', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
 
+    expect(packageJson.scripts.storybook).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['dogfood:storybook']).toBe('tsx examples/docs/storybook-workstation.ts');
   });
 });

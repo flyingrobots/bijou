@@ -12,7 +12,7 @@ npm run dogfood
 
 For a text-first Storybook-style story index and capture workstation:
 ```bash
-npm run dogfood:storybook
+npm run storybook
 ```
 
 ## Purpose

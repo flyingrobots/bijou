@@ -35,6 +35,7 @@
     "smoke:dogfood": "tsx scripts/smoke-dogfood.ts",
     "smoke:dogfood:landing": "tsx scripts/smoke-dogfood.ts --scenario=landing --skip-build",
     "smoke:dogfood:docs": "tsx scripts/smoke-dogfood.ts --scenario=docs --skip-build",
+    "storybook": "tsx examples/docs/storybook-workstation.ts",
     "dogfood:storybook": "tsx examples/docs/storybook-workstation.ts",
     "verify:interactive-examples": "tsx scripts/smoke-all-examples.ts --skip-build --mode=interactive-scripted",
     "smoke:canaries": "tsx scripts/smoke-canaries.ts",

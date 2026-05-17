@@ -69,7 +69,8 @@ that instead of inventing another story registry.
 - The selected-story matrix captures every profile/variant combination and has
   no missing canonical modes for canonical DOGFOOD stories.
 - The matrix output contains real rendered story content.
-- `package.json` exposes `npm run dogfood:storybook`.
+- `package.json` exposes `npm run storybook`, with `npm run dogfood:storybook`
+  kept as a DOGFOOD-scoped compatibility alias.
 
 ## Implementation Outline
 
@@ -100,7 +101,8 @@ and CI, but still powered by the same story records humans browse in DOGFOOD.
   stories, variants, packages, and source paths.
 - `captureDogfoodStorybookMatrix()` renders a selected story through every
   profile/variant pair and returns a `StoryCaptureMatrix`.
-- `npm run dogfood:storybook` provides the text-first command path.
+- `npm run storybook` provides the text-first command path, while
+  `npm run dogfood:storybook` remains available for existing docs and users.
 
 ## Retrospective
 
