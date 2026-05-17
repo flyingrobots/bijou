@@ -45,6 +45,7 @@ import {
   type Cmd,
   type FramePageMsg,
   type FrameModel,
+  type FrameLayoutNode,
   type FramedApp,
   type FramedAppMsg,
   type FrameShellTheme,
@@ -133,6 +134,8 @@ const PACKAGES_PAGE_ID = 'packages';
 const PHILOSOPHY_PAGE_ID = 'philosophy';
 const RELEASE_PAGE_ID = 'release';
 const DOCS_SIDEBAR_WIDTH = 32;
+const DOCS_STANDARD_NAV_WIDTH = 28;
+const DOCS_NARROW_NAV_WIDTH = 26;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
 const DOGFOOD_I18N_NAMESPACE = 'bijou.dogfood';
@@ -141,6 +144,17 @@ const DOCS_LAYOUT_VERTICAL_MARGIN_ROWS = 2;
 const DOCS_FAMILY_SEPARATOR_ROWS = 1;
 
 export { FRAME_I18N_CATALOG };
+
+export type DocsLayoutVariant = 'wide' | 'standard' | 'narrow' | 'tiny';
+
+export function resolveDocsLayoutVariant(columns: number, rows: number): DocsLayoutVariant {
+  const width = Math.max(0, Math.floor(columns));
+  const height = Math.max(0, Math.floor(rows));
+  if (width >= 120 && height >= 24) return 'wide';
+  if (width >= 88 && height >= 20) return 'standard';
+  if (width >= 64 && height >= 16) return 'narrow';
+  return 'tiny';
+}
 
 export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
   namespace: DOGFOOD_I18N_NAMESPACE,
@@ -247,6 +261,7 @@ interface RowDescriptor {
 }
 
 interface DocsExplorerModel {
+  readonly layoutVariant: DocsLayoutVariant;
   readonly familyState: ReturnType<typeof createBrowsableListState<string>>;
   readonly expandedFamilies: Readonly<Record<string, boolean>>;
   readonly selectedStoryId?: string;
@@ -826,6 +841,7 @@ function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): Docs
   const expandedFamilies = Object.fromEntries(STORY_FAMILIES.map((family) => [family.id, false]));
   const guideItems = guideItemsForPage(pageId);
   return {
+    layoutVariant: resolveDocsLayoutVariant(ctx.runtime.columns, ctx.runtime.rows),
     familyState: createBrowsableListState({
       items: buildFamilyItems(expandedFamilies),
       height: 14,
@@ -2206,6 +2222,43 @@ function resolveFamilyPaneBodyHeight(frameRows: number): number {
   );
 }
 
+function docsNavWidthForVariant(variant: DocsLayoutVariant): number {
+  switch (variant) {
+    case 'wide':
+      return DOCS_SIDEBAR_WIDTH;
+    case 'standard':
+      return DOCS_STANDARD_NAV_WIDTH;
+    case 'narrow':
+      return DOCS_NARROW_NAV_WIDTH;
+    case 'tiny':
+      return 0;
+  }
+}
+
+function visiblePaneIdsForLayout(pageId: DocsPageId, variant: DocsLayoutVariant): readonly string[] {
+  if (pageId === COMPONENTS_PAGE_ID) {
+    switch (variant) {
+      case 'wide':
+        return ['family-nav', 'story-content', 'story-variants'];
+      case 'standard':
+      case 'narrow':
+        return ['family-nav', 'story-content'];
+      case 'tiny':
+        return ['story-content'];
+    }
+  }
+
+  switch (variant) {
+    case 'wide':
+      return ['guide-nav', 'guide-content', 'guide-meta'];
+    case 'standard':
+    case 'narrow':
+      return ['guide-nav', 'guide-content'];
+    case 'tiny':
+      return ['guide-content'];
+  }
+}
+
 function insetPaneSurface(content: Surface, width: number): Surface {
   const safeWidth = Math.max(1, width);
   const inset = resolvePaneInset(safeWidth);
@@ -2749,6 +2802,161 @@ function resolveGuidePaneMouse(
   return index == null ? undefined : { type: 'activate-guide-index', index };
 }
 
+function createComponentsPageLayout(
+  model: DocsExplorerModel,
+  theme: LandingThemeTokens,
+  getCtx: () => BijouContext,
+  i18n: I18nRuntime,
+): FrameLayoutNode {
+  const family: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'family-nav',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width, height) => renderFamiliesPane(model, width, height, getCtx(), theme),
+  };
+  const main: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'story-content',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
+  };
+  const variants: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'story-variants',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width, height) => renderVariantsPane(model, width, height, getCtx(), theme),
+  };
+
+  switch (model.layoutVariant) {
+    case 'tiny':
+      return main;
+    case 'narrow': {
+      const navWidth = docsNavWidthForVariant(model.layoutVariant);
+      return {
+        kind: 'grid',
+        gridId: 'docs-shell',
+        columns: [1, navWidth, 1, '1fr'],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . .',
+          '. family . main',
+          '. . . .',
+        ],
+        gap: 0,
+        cells: { family, main },
+      };
+    }
+    case 'standard': {
+      const navWidth = docsNavWidthForVariant(model.layoutVariant);
+      return {
+        kind: 'grid',
+        gridId: 'docs-shell',
+        columns: [1, navWidth, 1, '1fr', 1],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . . .',
+          '. family . main .',
+          '. . . . .',
+        ],
+        gap: 0,
+        cells: { family, main },
+      };
+    }
+    case 'wide':
+      return {
+        kind: 'grid',
+        gridId: 'docs-shell',
+        columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . . . . .',
+          '. family . main . variants .',
+          '. . . . . . .',
+        ],
+        gap: 0,
+        cells: { family, main, variants },
+      };
+  }
+}
+
+function createGuidePageLayout(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  theme: LandingThemeTokens,
+  getCtx: () => BijouContext,
+  i18n: I18nRuntime,
+): FrameLayoutNode {
+  const nav: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'guide-nav',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width, height) => renderGuideNavPane(pageId, model, width, height, getCtx(), theme, i18n),
+  };
+  const main: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'guide-content',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width) => renderGuideReaderPane(pageId, model, width, getCtx(), theme),
+  };
+  const meta: FrameLayoutNode = {
+    kind: 'pane',
+    paneId: 'guide-meta',
+    unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
+    render: (width) => renderGuideInfoPane(pageId, model, width, getCtx(), theme, i18n),
+  };
+
+  switch (model.layoutVariant) {
+    case 'tiny':
+      return main;
+    case 'narrow': {
+      const navWidth = docsNavWidthForVariant(model.layoutVariant);
+      return {
+        kind: 'grid',
+        gridId: `docs-${pageId}`,
+        columns: [1, navWidth, 1, '1fr'],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . .',
+          '. nav . main',
+          '. . . .',
+        ],
+        gap: 0,
+        cells: { nav, main },
+      };
+    }
+    case 'standard': {
+      const navWidth = docsNavWidthForVariant(model.layoutVariant);
+      return {
+        kind: 'grid',
+        gridId: `docs-${pageId}`,
+        columns: [1, navWidth, 1, '1fr', 1],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . . .',
+          '. nav . main .',
+          '. . . . .',
+        ],
+        gap: 0,
+        cells: { nav, main },
+      };
+    }
+    case 'wide':
+      return {
+        kind: 'grid',
+        gridId: `docs-${pageId}`,
+        columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
+        rows: [1, '1fr', 1],
+        areas: [
+          '. . . . . . .',
+          '. nav . main . meta .',
+          '. . . . . . .',
+        ],
+        gap: 0,
+        cells: { nav, main, meta },
+      };
+  }
+}
+
 function createDocsExplorerApp(
   getCtx: () => BijouContext,
   onShellThemeChange: (ctx: BijouContext) => void,
@@ -2846,38 +3054,7 @@ function createDocsExplorerApp(
           },
           layout(model) {
             const theme = resolveLandingTheme(model.landingThemeIndex);
-            return {
-              kind: 'grid',
-              gridId: 'docs-shell',
-              columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
-              rows: [1, '1fr', 1],
-              areas: [
-                '. . . . . . .',
-                '. family . main . variants .',
-                '. . . . . . .',
-              ],
-              gap: 0,
-              cells: {
-                family: {
-                  kind: 'pane',
-                  paneId: 'family-nav',
-                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderFamiliesPane(model, width, height, getCtx(), theme),
-                },
-                main: {
-                  kind: 'pane',
-                  paneId: 'story-content',
-                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
-                },
-                variants: {
-                  kind: 'pane',
-                  paneId: 'story-variants',
-                  unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                  render: (width, height) => renderVariantsPane(model, width, height, getCtx(), theme),
-                },
-              },
-            };
+            return createComponentsPageLayout(model, theme, getCtx, i18n);
           },
         };
       }
@@ -2939,38 +3116,7 @@ function createDocsExplorerApp(
         },
         layout(model) {
           const theme = resolveLandingTheme(model.landingThemeIndex);
-          return {
-            kind: 'grid',
-            gridId: `docs-${spec.id}`,
-            columns: [1, DOCS_SIDEBAR_WIDTH, 1, '1fr', 1, DOCS_SIDEBAR_WIDTH, 1],
-            rows: [1, '1fr', 1],
-            areas: [
-              '. . . . . . .',
-              '. nav . main . meta .',
-              '. . . . . . .',
-            ],
-            gap: 0,
-            cells: {
-              nav: {
-                kind: 'pane',
-                paneId: 'guide-nav',
-                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width, height) => renderGuideNavPane(spec.id, model, width, height, getCtx(), theme, i18n),
-              },
-              main: {
-                kind: 'pane',
-                paneId: 'guide-content',
-                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideReaderPane(spec.id, model, width, getCtx(), theme),
-              },
-              meta: {
-                kind: 'pane',
-                paneId: 'guide-meta',
-                unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-                render: (width) => renderGuideInfoPane(spec.id, model, width, getCtx(), theme, i18n),
-              },
-            },
-          };
+          return createGuidePageLayout(spec.id, model, theme, getCtx, i18n);
         },
       };
     }),
@@ -3039,11 +3185,17 @@ function syncDocsExplorerViewportLayout(
   docsModel: FrameModel<DocsExplorerModel>,
 ): FrameModel<DocsExplorerModel> {
   const nextHeight = resolveFamilyPaneBodyHeight(docsModel.rows);
+  const nextLayoutVariant = resolveDocsLayoutVariant(docsModel.columns, docsModel.rows);
   let changed = false;
   const nextPageModels: Record<string, DocsExplorerModel> = {};
+  const nextFocusedPaneByPage: Record<string, string | undefined> = {};
+  const nextScrollByPage: Record<string, Readonly<Record<string, { readonly x: number; readonly y: number }>>> = {};
 
   for (const [pageId, pageModel] of Object.entries(docsModel.pageModels)) {
-    let nextPageModel = pageModel;
+    const docsPageId = pageId as DocsPageId;
+    let nextPageModel: DocsExplorerModel = pageModel.layoutVariant === nextLayoutVariant
+      ? pageModel
+      : { ...pageModel, layoutVariant: nextLayoutVariant };
     if (pageId === COMPONENTS_PAGE_ID) {
       if (pageModel.familyState.height !== nextHeight) {
         nextPageModel = {
@@ -3076,8 +3228,24 @@ function syncDocsExplorerViewportLayout(
       };
     }
 
+    const visiblePaneIds = visiblePaneIdsForLayout(docsPageId, nextLayoutVariant);
+    const previousFocusedPane = docsModel.focusedPaneByPage[pageId];
+    const nextFocusedPane = previousFocusedPane != null && visiblePaneIds.includes(previousFocusedPane)
+      ? previousFocusedPane
+      : visiblePaneIds[0];
+    const previousScroll = docsModel.scrollByPage[pageId] ?? {};
+    const nextScroll = Object.fromEntries(visiblePaneIds.map((paneId) => [
+      paneId,
+      previousScroll[paneId] ?? { x: 0, y: 0 },
+    ]));
+
     nextPageModels[pageId] = nextPageModel;
+    nextFocusedPaneByPage[pageId] = nextFocusedPane;
+    nextScrollByPage[pageId] = nextScroll;
     if (nextPageModel !== pageModel) {
+      changed = true;
+    }
+    if (nextFocusedPane !== previousFocusedPane) {
       changed = true;
     }
   }
@@ -3086,6 +3254,14 @@ function syncDocsExplorerViewportLayout(
     ? {
         ...docsModel,
         pageModels: nextPageModels,
+        focusedPaneByPage: {
+          ...docsModel.focusedPaneByPage,
+          ...nextFocusedPaneByPage,
+        },
+        scrollByPage: {
+          ...docsModel.scrollByPage,
+          ...nextScrollByPage,
+        },
       }
     : docsModel;
 }
