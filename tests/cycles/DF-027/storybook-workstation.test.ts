@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { storyCaptureMatrixText } from '@flyingrobots/bijou';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   captureDogfoodStorybookMatrix,
   createDogfoodStorybookWorkbenchModel,
@@ -75,7 +77,27 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
   it('registers the text-first workstation commands', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
 
-    expect(packageJson.scripts.storybook).toBe('tsx examples/docs/storybook-workstation.ts');
+    expect(packageJson.scripts['storybook:index']).toBe('tsx examples/docs/storybook-workstation.ts');
     expect(packageJson.scripts['dogfood:storybook']).toBe('tsx examples/docs/storybook-workstation.ts');
+  });
+
+  it('registers the interactive story browser command', () => {
+    const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
+
+    expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
+  });
+
+  it('can start DOGFOOD directly on the interactive component browser', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'components',
+      initialSelectedStoryId: 'notification-system',
+    });
+    const [model] = app.init();
+
+    expect(model.route).toBe('docs');
+    expect(model.docsModel.activePageId).toBe('components');
+    expect(model.docsModel.pageModels.components!.selectedStoryId).toBe('notification-system');
   });
 });

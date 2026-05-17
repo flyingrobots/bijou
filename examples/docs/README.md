@@ -12,10 +12,16 @@ First DOGFOOD slice: a story-driven docs surface built with Bijou itself.
 npm run dogfood
 ```
 
-For a text-first Storybook-style index over the same DOGFOOD story catalog, run:
+For the interactive Storybook-style component browser, run:
 
 ```sh
 npm run storybook
+```
+
+For a text-first Storybook-style index over the same DOGFOOD story catalog, run:
+
+```sh
+npm run storybook:index
 ```
 
 You now land on a dedicated full-screen title screen first: an animated shader composition built from [assets/bijou.txt](../../assets/bijou.txt), [assets/background.txt](../../assets/background.txt), and the FlyingRobots wordmark assets in [assets/flyingrobots-wide-large.txt](../../assets/flyingrobots-wide-large.txt) and [assets/flyingrobots-wide-small.txt](../../assets/flyingrobots-wide-small.txt). The landing screen keeps the treatment sparse: the animated BIJOU mark, a centered `Press [Enter]` cue, the FlyingRobots wordmark, and a reserved last-line footer for quit/continue guidance plus the Bijou version.
@@ -71,7 +77,8 @@ focus it and use the wheel to scroll long docs or help content.
 - The title screen is deliberately sparse rather than fully blank. It keeps only the entry prompt and brand marks on top of the shader treatment.
 - The `Guides`, `Packages`, `Philosophy`, and `Release` sections are no longer just shell shape. They now publish real corpus pages inside the app, and the release-facing smoke contract now runs through DOGFOOD instead of the broad examples tree.
 - The docs shell already exposes shell-level search through the standard frame command palette, so users can jump straight to the current section's content instead of walking every list manually first.
-- `npm run storybook` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling. `npm run dogfood:storybook` remains as the compatibility alias.
+- `npm run storybook` opens the interactive component browser directly in the DOGFOOD shell.
+- `npm run storybook:index` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling. `npm run dogfood:storybook` remains as the compatibility alias.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.
 - The docs shell uses explicit responsive layout variants: wide keeps navigation, content, and metadata/variant context visible; standard and narrow fold secondary panes; tiny renders one useful content pane instead of a crushed multi-column surface.

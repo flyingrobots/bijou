@@ -10,9 +10,14 @@ Bijou engine.
 npm run dogfood
 ```
 
-For a text-first Storybook-style story index and capture workstation:
+For the interactive Storybook-style component browser:
 ```bash
 npm run storybook
+```
+
+For the deterministic text-first story index and capture workstation:
+```bash
+npm run storybook:index
 ```
 
 ## Purpose

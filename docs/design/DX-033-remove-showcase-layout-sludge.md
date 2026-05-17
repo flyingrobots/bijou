@@ -91,7 +91,7 @@ entries intentionally demonstrate string-returning core components.
 
 The key fix is ownership: scroll clipping moves back to the shared list/viewport
 primitive, and the primary story/doc tooling now lives in DOGFOOD and
-`npm run storybook`.
+`npm run storybook` / `npm run storybook:index`.
 
 ## Playback
 

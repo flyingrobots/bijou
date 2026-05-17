@@ -735,6 +735,8 @@ interface DocsAppOptions {
   readonly direction?: I18nDirection;
   readonly extraI18nCatalogs?: readonly I18nCatalog[];
   readonly initialRoute?: RootModel['route'];
+  readonly initialPageId?: DocsPageId;
+  readonly initialSelectedStoryId?: string;
 }
 
 function dogfoodText(
@@ -860,6 +862,14 @@ function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): Docs
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
   };
+}
+
+function createInitialComponentsExplorerModel(
+  ctx: BijouContext,
+  initialSelectedStoryId?: string,
+): DocsExplorerModel {
+  const model = createInitialExplorerModel(ctx, COMPONENTS_PAGE_ID);
+  return initialSelectedStoryId == null ? model : selectStory(model, initialSelectedStoryId);
 }
 
 function buildFamilyItems(
@@ -2961,12 +2971,14 @@ function createDocsExplorerApp(
   getCtx: () => BijouContext,
   onShellThemeChange: (ctx: BijouContext) => void,
   i18n: I18nRuntime,
+  options: Pick<DocsAppOptions, 'initialPageId' | 'initialSelectedStoryId'> = {},
 ): FramedApp<DocsExplorerModel, DocsMsg> {
   const ctx = getCtx();
   return createFramedApp<DocsExplorerModel, DocsMsg>({
     ctx,
     i18n,
     title: 'Bijou Docs',
+    defaultPageId: options.initialPageId ?? GUIDES_PAGE_ID,
     headerStyle: ({ pageModel }) => ({
       activeTabToken: resolveDocsThemeActiveHeaderTabToken(resolveLandingTheme(pageModel.landingThemeIndex)),
     }),
@@ -2980,7 +2992,7 @@ function createDocsExplorerApp(
           id: spec.id,
           title: pageTitle(spec.id, i18n),
           keyMap: componentsPageKeys,
-          init: () => [createInitialExplorerModel(ctx, spec.id), []],
+          init: () => [createInitialComponentsExplorerModel(ctx, options.initialSelectedStoryId), []],
           update(msg: FramePageMsg<DocsMsg>, model) {
             if (msg.type === 'mouse') {
               return [model, []];
@@ -3288,7 +3300,7 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const i18n = createDocsI18nRuntime(options);
   const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
     currentCtx = nextCtx;
-  }, i18n);
+  }, i18n, options);
   const renderLanding = createLandingRenderer(() => currentCtx, i18n);
   const initialRoute = options.initialRoute ?? 'landing';
 
