@@ -29,6 +29,7 @@ operators need when learning or validating Bijou.
 - **Component Explorer**: A live, interactive field guide to every component family.
 - **Storybook Workstation**: A deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
+- **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.
 - **Motion and Shader Surfaces**: Exercising canvas, glyph-fit raytracing, transitions, springs, and timelines from the docs app itself.
 - **Design Language**: Defining and enforcing the project's visual and interactive standards.
 

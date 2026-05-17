@@ -34,6 +34,7 @@ focus it and use the wheel to scroll long docs or help content.
 - the docs pane and preview pane both derive from the same story record once you enter the `Components` section
 - profile switching is part of the experience, not an afterthought
 - a framed shell can present both top-level docs sections and a rich component browser without pretending those are the same thing
+- the docs shell now chooses explicit `wide`, `standard`, `narrow`, and `tiny` layout variants so terminal resize remains a product decision instead of only geometry recomputation
 - DOGFOOD can now publish repo orientation, package docs, and release docs inside the same shell
 
 ## Included story families
@@ -73,6 +74,7 @@ focus it and use the wheel to scroll long docs or help content.
 - `npm run dogfood:storybook` exposes the story catalog as a deterministic text-first workstation for agents, CI, and future MCP or block tooling.
 - DOGFOOD now also uses the standard shell-owned settings drawer, so `F2`, the command palette, or shell-level frame bindings can toggle visible preferences like footer control hints and landing quality without the docs app shipping its own overlay plumbing.
 - Landing quality is adjustable directly from the landing screen too, so users can see the effect before they ever leave the title treatment.
+- The docs shell uses explicit responsive layout variants: wide keeps navigation, content, and metadata/variant context visible; standard and narrow fold secondary panes; tiny renders one useful content pane instead of a crushed multi-column surface.
 - Settings rows now carry real secondary descriptions, toggles render with checkbox-style `☐` / `☑` affordances, and choice rows use a distinct cycling marker so the drawer reads like a product settings surface instead of a plain text list.
 - Focus now owns input in the explorer: the family lane handles browse/expand keys only while it is active, the variants lane can own arrow-key variant changes, and pane clicks or `Tab` move that ownership through the standard frame shell instead of letting inactive lanes keep responding.
 - The footer is now the truthful control surface for the explorer: shell cues stay visible, active-pane hints only appear when they can actually do something, and stale in-pane legends no longer linger under shell overlays or focus changes.
