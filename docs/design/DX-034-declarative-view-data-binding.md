@@ -257,15 +257,22 @@ interface BindingSnapshot<Data> {
   readonly requirementId: string;
   readonly version: number;
   readonly status: 'ready' | 'loading' | 'empty' | 'stale' | 'error';
-  readonly data?: Data;
-  readonly issues?: readonly BindingIssue[];
-  readonly facts?: readonly BindingFact[];
+  readonly data?: DeepReadonly<Data>;
+  readonly issues: readonly BindingIssue[];
+  readonly facts: readonly BindingFact[];
 }
 ```
 
 Provider updates do not mutate mounted views. They produce a new snapshot
 version and trigger a runtime binding invalidation. The next render receives a
 new immutable binding frame.
+
+DX-034A snapshots accept inert plain snapshot data: null, strings, numbers,
+booleans, arrays, and enumerable string-keyed plain objects. They reject mutable
+built-ins and executable values such as `Map`, `Set`, `Date`, typed arrays,
+functions, accessors, symbol-keyed properties, symbols, and bigint. Snapshot
+construction copies accepted data before freezing it, so provider-owned or
+business-owned source objects are not frozen in place.
 
 ### 4. Binding Frames Are Immutable
 
@@ -277,13 +284,61 @@ The frame should support explicit reads:
 data.require('article');
 data.get('outline');
 data.status('comments');
-data.issueList('reviews');
+data.issues('reviews');
 ```
 
 The frame should not support writes.
 
 Any attempt to mutate data from inside a view should be structurally impossible
 in the public API and rejected at runtime where objects cross a boundary.
+
+### DX-034A Binding Snapshot And Frame Primitives
+
+DX-034A lands the first runtime-truth slice in `@flyingrobots/bijou`.
+
+The public core now includes:
+
+- `DataRequirement`
+- `ProviderId`
+- `RequirementId`
+- `BindingStatus`
+- `BindingSnapshot`
+- `BindingFrame`
+- `BindingIssue`
+- `BindingFact`
+- `CommandIntent`
+- `defineDataRequirement()`
+- `bindingSnapshot()`
+- `bindingFrame()`
+- `commandIntent()`
+
+This slice proves the objects, not the full runtime lifecycle:
+
+```ts
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
+
+const snapshot = bindingSnapshot({
+  providerId: 'docs.articleProvider',
+  requirementId: article.id,
+  version: 1,
+  status: 'ready',
+  data: { title: 'DX-034' },
+});
+
+const frame = bindingFrame([snapshot]);
+
+frame.require('article');
+frame.get('article');
+frame.status('article');
+frame.issues('article');
+```
+
+The current `BindingFrame` deliberately does not include provider scopes,
+subscriptions, active hierarchy traversal, schema adapters, command dispatch, or
+AppShell rendering. Those remain follow-on runtime layers.
 
 ### 5. User Input Emits Commands
 
@@ -476,34 +531,33 @@ flow.
 
 ## Implementation Outline
 
-1. Define the public architecture vocabulary:
+1. Done: define the public architecture vocabulary:
    - `DataRequirement`
-   - `Provider`
-   - `ProviderScope`
    - `BindingSnapshot`
    - `BindingFrame`
    - `CommandIntent`
-2. Add cycle tests proving the design remains unidirectional, declarative, and
-   immutable.
-3. Add pure runtime prototypes for immutable binding snapshots and binding
-   frames.
-4. Add provider-scope resolution without global registration.
-5. Add active-view binding collection over the existing view-stack model.
-6. Add invalidation flow from provider snapshot updates to view re-render.
-7. Add Command intent declaration and dispatch proof.
-8. Integrate the contract with DX-031 block definitions.
-9. Prove AppShell with nested provider-bound navigation, content, inspector,
+2. Done: add behavioral tests proving the design remains unidirectional,
+   declarative, and immutable at the primitive layer.
+3. Done: add pure runtime primitives for immutable binding snapshots and
+   binding frames.
+4. Next: define provider and provider-scope contracts without global
+   registration.
+5. Next: add provider-scope resolution.
+6. Next: add active-view binding collection over the existing view-stack model.
+7. Next: add invalidation flow from provider snapshot updates to view re-render.
+8. Next: add Command intent dispatch proof.
+9. Next: integrate the contract with DX-031 block definitions.
+10. Next: prove AppShell with nested provider-bound navigation, content, inspector,
    and status blocks.
-10. Add DOGFOOD stories and captures for ready, loading, stale, empty, and
+11. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First
 
-- Cycle tests proving the design doc names unidirectional, declarative, and
-  immutable as hard requirements.
-- Public contract tests proving views declare data requirements without
-  receiving mutable provider handles.
-- Runtime tests proving binding snapshots are immutable and versioned.
+- Behavioral tests proving public binding frames expose immutable data without
+  provider handles.
+- Behavioral tests proving binding snapshots are immutable and versioned.
+- Behavioral tests proving command intents are metadata, not callbacks.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -552,4 +606,7 @@ flow.
 
 ## Retrospective
 
-Not started.
+DX-034A landed the primitive contract layer first. The important restraint is
+that `BindingFrame` is not a provider scope, subscription manager, active-view
+resolver, schema adapter, or AppShell slot model. It is only the immutable data
+frame views can read during render.
