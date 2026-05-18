@@ -10,12 +10,12 @@ Bijou engine.
 npm run dogfood
 ```
 
-For the interactive Storybook-style component browser:
+For the standalone Storybook-style development and testing workbench:
 ```bash
 npm run storybook
 ```
 
-For the deterministic text-first story index and capture workstation:
+For the deterministic text-first story index and capture matrix:
 ```bash
 npm run storybook:index
 ```
@@ -32,7 +32,7 @@ operators need when learning or validating Bijou.
 ### Today's Proof Points
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
 - **Component Explorer**: A live, interactive field guide to every component family.
-- **Storybook Workstation**: A deterministic story index and matrix capture path over the same DOGFOOD story catalog.
+- **Storybook Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
 - **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.
 - **Motion and Shader Surfaces**: Exercising canvas, glyph-fit raytracing, transitions, springs, and timelines from the docs app itself.

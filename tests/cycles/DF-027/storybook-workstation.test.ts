@@ -1,15 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { storyCaptureMatrixText } from '@flyingrobots/bijou';
+import { storyCaptureMatrixText, stripAnsi, surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { createDocsApp } from '../../../examples/docs/app.js';
+import {
+  createStorybookApp,
+  selectedStorybookStory,
+} from '../../../examples/docs/storybook-app.js';
 import {
   captureDogfoodStorybookMatrix,
   createDogfoodStorybookWorkbenchModel,
   renderDogfoodStorybookIndex,
 } from '../../../examples/docs/storybook-workstation.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
+import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { readRepoFile } from '../repo.js';
 
 describe('DF-027 Storybook-style DOGFOOD workstation', () => {
@@ -83,21 +87,27 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
 
   it('registers the interactive story browser command', () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '..', '..', '..', 'package.json'), 'utf8'));
+    const entrypoint = readRepoFile('examples/docs/storybook.ts');
 
     expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
+    expect(entrypoint).toContain('createStorybookApp');
+    expect(entrypoint).not.toContain('createDocsApp');
   });
 
-  it('can start DOGFOOD directly on the interactive component browser', () => {
+  it('can start a standalone interactive Storybook workbench', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx, {
-      initialRoute: 'docs',
-      initialPageId: 'components',
-      initialSelectedStoryId: 'notification-system',
-    });
+    const app = createStorybookApp(ctx, { initialStoryId: 'notification-system' });
     const [model] = app.init();
+    const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
+    const text = stripAnsi(surfaceToString(surface, ctx.style));
 
-    expect(model.route).toBe('docs');
-    expect(model.docsModel.activePageId).toBe('components');
-    expect(model.docsModel.pageModels.components!.selectedStoryId).toBe('notification-system');
+    expect(selectedStorybookStory(model).id).toBe('notification-system');
+    expect((model as any).route).toBeUndefined();
+    expect((model as any).docsModel).toBeUndefined();
+    expect(text).toContain('Bijou Storybook');
+    expect(text).toContain('notification-system');
+    expect(text).toContain('test matrix');
+    expect(text).toContain('all required modes');
+    expect(text).not.toContain('Press [Enter]');
   });
 });

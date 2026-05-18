@@ -11,14 +11,13 @@ lane: design
 Bijou already has the pieces of a Storybook-style workflow: structured
 `ComponentStory` records, DOGFOOD's component explorer, story capture matrices,
 fixture-promotion records, and MCP-facing docs payloads. The missing piece is a
-stable workstation model that tooling can consume without scraping the full
-docs app.
+standalone workstation that developers can use without entering the full docs
+app, backed by a stable model that tooling can consume without scraping DOGFOOD.
 
-This cycle adds the first dedicated DOGFOOD storybook workstation slice. It is
-deliberately text-first and deterministic: a model/index over every DOGFOOD
-story plus a matrix capture path for any selected story. Future rich TUI,
-screenshots, MCP exports, block tooling, and schema-bound controls can build on
-that instead of inventing another story registry.
+This cycle adds the first dedicated Storybook workstation slice. It includes an
+interactive TUI for local component browsing and development, plus the
+deterministic model/index and matrix capture path for agents, CI, MCP exports,
+block tooling, screenshots, and schema-bound controls.
 
 ## Sponsored Users
 
@@ -30,8 +29,9 @@ that instead of inventing another story registry.
 
 ## Hills
 
-1. A builder can run one Storybook-style command and see the DOGFOOD story
-   catalog grouped by family, with variants, modes, packages, and sources.
+1. A builder can run `npm run storybook` and enter a standalone Storybook-style
+   workbench over the story catalog, with variants, profiles, package/source
+   facts, and a preview surface.
 2. A maintainer can capture a selected story across every variant/profile pair
    using the same `StoryCaptureMatrix` substrate as existing docs tooling.
 3. A future UI or MCP tool can consume a stable workstation model instead of
@@ -51,13 +51,13 @@ that instead of inventing another story registry.
 
 ## Requirements
 
-- Add a DOGFOOD storybook workstation module.
+- Add a standalone interactive Storybook workstation app.
+- Add a DOGFOOD storybook workstation module for deterministic tooling.
 - Add a text index renderer for the story catalog.
 - Add a selected-story matrix capture helper.
 - Reuse `ComponentStory` and `StoryCaptureMatrix` contracts.
-- Add a root script for the text-first workstation.
-- Keep this first slice deterministic and non-interactive; richer controls can
-  build on the model later.
+- Add root scripts for the interactive workbench and text-first workstation.
+- Keep both paths on the same story catalog instead of duplicating story truth.
 
 ## Acceptance Criteria
 
@@ -69,25 +69,28 @@ that instead of inventing another story registry.
 - The selected-story matrix captures every profile/variant combination and has
   no missing canonical modes for canonical DOGFOOD stories.
 - The matrix output contains real rendered story content.
+- `npm run storybook` launches a standalone interactive Storybook workbench
+  instead of deep-linking into `createDocsApp()`.
 - `package.json` exposes `npm run storybook:index` for the deterministic
   text-first workstation, with `npm run dogfood:storybook` kept as a
   DOGFOOD-scoped compatibility alias.
 
 ## Implementation Outline
 
-1. Add `examples/docs/storybook-workstation.ts`.
-2. Export pure model/index/matrix helpers from that module.
-3. Add a small CLI path that prints either the index or a selected story matrix.
-4. Add a DF-027 cycle test around the model, text output, matrix capture, and
+1. Add `examples/docs/storybook-app.ts`.
+2. Add `examples/docs/storybook-workstation.ts`.
+3. Export pure model/index/matrix helpers from that module.
+4. Add a small CLI path that prints either the index or a selected story matrix.
+5. Add a DF-027 cycle test around the model, text output, matrix capture, and
    script registration.
-5. Move the backlog note into `docs/design/` and update the v6 lane pointer.
+6. Move the backlog note into `docs/design/` and update the v6 lane pointer.
 
 ## Drift Check
 
 The current DOGFOOD app remains the canonical human-facing docs surface. This
-slice does not fork story data, add a browser dependency, or build a second TUI
-shell. The workstation reads the existing `COMPONENT_STORIES` catalog and uses
-the existing story protocol plus `captureStoryMatrix()`.
+slice does not fork story data or add a browser dependency. The standalone
+workbench and text-first workstation both read the existing `COMPONENT_STORIES`
+catalog and use the existing story protocol plus `captureStoryMatrix()`.
 
 The result is a narrow, reusable tooling seam: deterministic enough for agents
 and CI, but still powered by the same story records humans browse in DOGFOOD.
@@ -102,11 +105,17 @@ and CI, but still powered by the same story records humans browse in DOGFOOD.
   stories, variants, packages, and source paths.
 - `captureDogfoodStorybookMatrix()` renders a selected story through every
   profile/variant pair and returns a `StoryCaptureMatrix`.
+- `createStorybookApp()` launches a standalone interactive TUI over the same
+  story catalog, with catalog navigation, profile/variant switching, preview,
+  and test-matrix panes.
+- `npm run storybook` now targets the standalone interactive workbench instead
+  of opening DOGFOOD on the components page.
 - `npm run storybook:index` provides the text-first command path, while
   `npm run dogfood:storybook` remains available for existing docs and users.
 
 ## Retrospective
 
-The right first Storybook-style tool is not another interactive shell. It is a
-stable model and capture path that makes the existing DOGFOOD stories reusable
-by humans, CI, MCP, release audits, and future block tooling.
+The right Storybook-style tool has two layers: a standalone interactive
+workbench for humans and a stable model/capture path for CI, MCP, release
+audits, agents, and future block tooling. Both layers stay useful because they
+share the same story records instead of minting a second registry.
