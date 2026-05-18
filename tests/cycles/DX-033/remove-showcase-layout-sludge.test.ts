@@ -44,7 +44,8 @@ describe('DX-033 remove showcase layout sludge', () => {
 
     expect(readme).toContain('secondary example surface');
     expect(readme).toContain('npm run dogfood');
-    expect(readme).toContain('npm run dogfood:storybook');
+    expect(readme).toContain('npm run storybook');
+    expect(readme).toContain('npm run storybook:index');
     expect(readme).toContain('browsableListSurface()');
     expect(lane).toContain('../../../design/DX-033-remove-showcase-layout-sludge.md');
     expect(legend).toContain('DX-033 — Remove showcase layout sludge');

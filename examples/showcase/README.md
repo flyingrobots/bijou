@@ -3,8 +3,9 @@
 Interactive component explorer with live previews across rich, pipe, and accessible modes.
 
 The showcase is now a secondary example surface. Use `npm run dogfood` for the
-canonical human-facing docs app and `npm run dogfood:storybook` for the
-text-first story index and capture matrix over the canonical DOGFOOD stories.
+canonical human-facing docs app, `npm run storybook` for the interactive story
+browser, and `npm run storybook:index` for the text-first story index and capture
+matrix over the canonical DOGFOOD stories.
 
 ## Run
 

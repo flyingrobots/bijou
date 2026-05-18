@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Standalone Storybook workbench** — `npm run storybook` now launches a
+  dedicated interactive Storybook-style development and testing TUI over the
+  DOGFOOD story catalog instead of deep-linking into the DOGFOOD docs shell.
+  The workbench has its own catalog navigation, live preview, profile/variant
+  switching, and test-matrix pane, while `npm run storybook:index` remains the
+  deterministic text-first index and capture path.
 - **Raytrace shader kernel for `bijou-tui`** — `@flyingrobots/bijou-tui`
   now exports small pure helpers for shader-authored ray scenes: look-at and
   orbit camera rays, vector math, sphere and plane intersections, nearest-hit
