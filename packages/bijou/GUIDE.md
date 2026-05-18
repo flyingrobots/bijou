@@ -160,16 +160,26 @@ import {
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
+  defineDataProvider,
+  provide,
+  providerScope,
 } from '@flyingrobots/bijou';
 
 const article = defineDataRequirement({
   id: 'article',
   resource: 'docs.article',
 });
+const articleProvider = defineDataProvider({
+  id: 'docs.articleProvider',
+  resource: article.resource,
+});
+const providers = providerScope([provide(articleProvider)], {
+  id: 'docs.appShell',
+});
 
 const frame = bindingFrame([
   bindingSnapshot({
-    providerId: 'docs.articleProvider',
+    providerId: articleProvider.id,
     requirementId: article.id,
     version: 1,
     status: 'ready',
@@ -181,12 +191,15 @@ const openArticle = commandIntent<{ articleId: string }>('docs.openArticle');
 
 frame.require<{ title: string }>('article');
 frame.status('article');
+providers.has(article.resource);
 openArticle.id;
 ```
 
-`BindingFrame` is only the immutable render-time data frame. Provider scopes,
-subscriptions, active-view lifecycle, schema adapters, and command dispatch
-remain runtime follow-on layers.
+`ProviderScope` is an explicit local registry of provider metadata. It does not
+subscribe, refresh, resolve active views, dispatch commands, or register globals.
+`BindingFrame` is only the immutable render-time data frame. Provider
+resolution, subscriptions, active-view lifecycle, schema adapters, and command
+dispatch remain runtime follow-on layers.
 
 Snapshot data is copied before it is frozen. Use inert plain snapshot data:
 null, strings, numbers, booleans, arrays, and enumerable string-keyed plain

@@ -166,6 +166,11 @@ Scopes let an app provide one navigation source at the shell level, override a
 selection source inside a modal, or bind a test provider for a story without
 touching global state.
 
+DX-034B makes scopes explicit local values in the public contract. A
+`ProviderScope` declares which `DataProvider` metadata is available for which
+resource, but it does not subscribe, refresh, resolve nested scopes, or dispatch
+Commands.
+
 ### Binding Snapshot
 
 An immutable runtime value created by a provider for one requirement.
@@ -336,9 +341,53 @@ frame.status('article');
 frame.issues('article');
 ```
 
-The current `BindingFrame` deliberately does not include provider scopes,
-subscriptions, active hierarchy traversal, schema adapters, command dispatch, or
-AppShell rendering. Those remain follow-on runtime layers.
+The `BindingFrame` deliberately does not include provider scopes, subscriptions,
+active hierarchy traversal, schema adapters, command dispatch, or AppShell
+rendering. Those remain separate runtime layers.
+
+### DX-034B Provider Scope Contracts
+
+DX-034B lands the explicit provider/scope contract layer in
+`@flyingrobots/bijou`.
+
+The public core now includes:
+
+- `DataProvider`
+- `DataProviderInput`
+- `ProviderScope`
+- `ProviderScopeEntry`
+- `ProviderScopeOptions`
+- `defineDataProvider()`
+- `provide()`
+- `providerScope()`
+- `isDataProvider()`
+
+This slice proves local provider availability, not provider resolution or
+subscription lifecycle:
+
+```ts
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
+
+const articleProvider = defineDataProvider({
+  id: 'docs.articleProvider',
+  resource: article.resource,
+});
+
+const providers = providerScope([provide(articleProvider)], {
+  id: 'docs.appShell',
+});
+
+providers.has(article.resource);
+providers.get(article.resource);
+providers.resources();
+```
+
+`ProviderScope` rejects duplicate resources and duplicate provider ids inside a
+single scope. It also rejects loose provider-shaped objects, so importing a
+module cannot silently register a provider or bypass the constructor contract.
 
 ### 5. User Input Emits Commands
 
@@ -380,9 +429,9 @@ stories:
 ```ts
 const app = appShell({
   providers: providerScope([
-    provide(articleResource, articleProvider),
-    provide(selectionResource, selectionProvider),
-    provide(commandLogResource, commandLogProvider),
+    provide(articleProvider),
+    provide(selectionProvider),
+    provide(commandLogProvider),
   ]),
   slots: {
     navigation: navigationBlock(),
@@ -540,7 +589,7 @@ flow.
    declarative, and immutable at the primitive layer.
 3. Done: add pure runtime primitives for immutable binding snapshots and
    binding frames.
-4. Next: define provider and provider-scope contracts without global
+4. Done: define provider and provider-scope contracts without global
    registration.
 5. Next: add provider-scope resolution.
 6. Next: add active-view binding collection over the existing view-stack model.
@@ -558,6 +607,8 @@ flow.
   provider handles.
 - Behavioral tests proving binding snapshots are immutable and versioned.
 - Behavioral tests proving command intents are metadata, not callbacks.
+- Behavioral tests proving provider scopes are explicit local registries without
+  hidden globals.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -610,3 +661,8 @@ DX-034A landed the primitive contract layer first. The important restraint is
 that `BindingFrame` is not a provider scope, subscription manager, active-view
 resolver, schema adapter, or AppShell slot model. It is only the immutable data
 frame views can read during render.
+
+DX-034B then landed explicit provider/scope metadata. The restraint remains the
+same: `ProviderScope` says which providers are locally available, but it still
+does not perform nearest-scope resolution, subscribe to backing sources,
+invalidate views, or dispatch Commands.

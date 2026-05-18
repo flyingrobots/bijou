@@ -10,15 +10,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Binding frame primitives for `bijou`** — `@flyingrobots/bijou` now exports
   `DataRequirement`, `BindingSnapshot`, `BindingFrame`, `BindingStatus`,
-  `BindingIssue`, `BindingFact`, `CommandIntent`, and helper constructors for
-  the first DX-034 runtime-truth slice. Snapshots normalize provider and
-  requirement ids, copy and freeze inert plain snapshot data without freezing
-  caller objects, reject mutable built-ins, executable values, and hidden
-  property channels, carry versioned ready/loading/empty/stale/error status, and
-  bind into immutable frames with `require()`, `get()`, `status()`, `issues()`,
-  and `facts()` accessors. Command intents are inspectable metadata only;
-  provider scopes, subscriptions, active hierarchy traversal, schema adapters,
-  and AppShell rendering remain follow-on work.
+  `BindingIssue`, `BindingFact`, `DataProvider`, `ProviderScope`,
+  `ProviderScopeEntry`, `CommandIntent`, and helper constructors for the first
+  DX-034 runtime-truth slices. Snapshots normalize provider and requirement ids,
+  copy and freeze inert plain snapshot data without freezing caller objects,
+  reject mutable built-ins, executable values, and hidden property channels,
+  carry versioned ready/loading/empty/stale/error status, and bind into
+  immutable frames with `require()`, `get()`, `status()`, `issues()`, and
+  `facts()` accessors. Provider scopes are explicit local registries built with
+  `defineDataProvider()`, `provide()`, and `providerScope()`; they reject
+  duplicate resources and provider ids without registering globals. Command
+  intents are inspectable metadata only; subscriptions, active hierarchy
+  traversal, provider resolution, schema adapters, and AppShell rendering remain
+  follow-on work.
 - **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so

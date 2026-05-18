@@ -5,7 +5,10 @@ import {
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
+  defineDataProvider,
   isBindingSnapshot,
+  provide,
+  providerScope,
   type BindingIssue,
   type BindingStatus,
 } from './binding.js';
@@ -349,5 +352,86 @@ describe('binding primitives', () => {
     expect('execute' in intent).toBe(false);
     expect('handler' in intent).toBe(false);
     expect('dispatch' in intent).toBe(false);
+  });
+
+  it('defines inspectable providers and explicit provider scopes without runtime handles', () => {
+    const articleProvider = defineDataProvider({
+      id: ' docs.articleProvider ',
+      resource: ' docs.article ',
+      label: 'Articles',
+      facts: [{ kind: 'entity', key: 'provider', value: 'docs.articleProvider' }],
+    });
+    const scope = providerScope([provide(articleProvider)], {
+      id: ' appShell.providers ',
+      label: 'App shell providers',
+      facts: [{ kind: 'entity', key: 'scope', value: 'appShell.providers' }],
+    });
+
+    expect(articleProvider.id).toBe('docs.articleProvider');
+    expect(articleProvider.resource).toBe('docs.article');
+    expect(Object.isFrozen(articleProvider)).toBe(true);
+    expect(Object.isFrozen(articleProvider.facts)).toBe(true);
+    expect(scope.id).toBe('appShell.providers');
+    expect(scope.label).toBe('App shell providers');
+    expect(scope.resources()).toEqual(['docs.article']);
+    expect(scope.providerIds()).toEqual(['docs.articleProvider']);
+    expect(scope.providers()).toEqual([articleProvider]);
+    expect(scope.facts).toEqual([
+      { kind: 'entity', key: 'scope', value: 'appShell.providers' },
+    ]);
+    expect(scope.has(' docs.article ')).toBe(true);
+    expect(scope.get('docs.article')).toBe(articleProvider);
+    expect(Object.isFrozen(scope)).toBe(true);
+    expect(Object.isFrozen(scope.resources())).toBe(true);
+    expect(Object.isFrozen(scope.providers())).toBe(true);
+    expect(Object.isFrozen(scope.providerIds())).toBe(true);
+    expect(Object.isFrozen(scope.facts)).toBe(true);
+    expect('refresh' in articleProvider).toBe(false);
+    expect('subscribe' in articleProvider).toBe(false);
+    expect('snapshot' in articleProvider).toBe(false);
+    expect('dispatch' in scope).toBe(false);
+  });
+
+  it('keeps provider scopes local and rejects ambiguous or loose provider entries', () => {
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article',
+    });
+    const replacementArticleProvider = defineDataProvider({
+      id: 'docs.replacementArticleProvider',
+      resource: 'docs.article',
+    });
+    const duplicateIdProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article.v2',
+    });
+    const selectionProvider = defineDataProvider({
+      id: 'docs.selectionProvider',
+      resource: 'docs.selection',
+    });
+    const articleScope = providerScope([provide(articleProvider)]);
+    const selectionScope = providerScope([provide(selectionProvider)]);
+
+    expect(articleScope.has('docs.article')).toBe(true);
+    expect(articleScope.has('docs.selection')).toBe(false);
+    expect(selectionScope.has('docs.selection')).toBe(true);
+    expect(selectionScope.has('docs.article')).toBe(false);
+    expect(() => providerScope([
+      provide(articleProvider),
+      provide(replacementArticleProvider),
+    ])).toThrow('provider scope: duplicate resource docs.article');
+    expect(() => providerScope([
+      provide(articleProvider),
+      provide(duplicateIdProvider),
+    ])).toThrow('provider scope: duplicate provider id docs.articleProvider');
+    expect(() => provide({
+      id: 'docs.looseProvider',
+      resource: 'docs.article',
+      facts: [],
+    } as never)).toThrow('provider scope: provider was not created by defineDataProvider()');
+    expect(() => providerScope([{
+      resource: articleProvider.resource,
+      provider: articleProvider,
+    } as never])).toThrow('provider scope: entry at index 0 was not created by provide()');
   });
 });

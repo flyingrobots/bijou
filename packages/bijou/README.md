@@ -98,9 +98,11 @@ fake duplication rather than a real second API.
   Bijou peer compatibility for ordinary NPM block packages.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
   payloads, and agent-facing reports.
-- **`defineDataRequirement()` / `bindingSnapshot()` / `bindingFrame()`**:
-  Model provider-delivered plain data as copied, versioned immutable snapshots
-  and read-only render frames.
+- **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
+  Declare data requirements and explicit local provider availability without
+  hidden global registration.
+- **`bindingSnapshot()` / `bindingFrame()`**: Model provider-delivered plain
+  data as copied, versioned immutable snapshots and read-only render frames.
 - **`commandIntent()`**: Declare user intent outputs as inspectable metadata,
   without business-logic callbacks or provider mutation handles.
 - **`captureStoryMatrix()`**: Capture every profile/variant pair from a story

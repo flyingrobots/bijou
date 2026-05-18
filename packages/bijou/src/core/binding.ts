@@ -1,7 +1,9 @@
 import type { ModeLoweringFact } from './mode-lowering.js';
 
 const DATA_REQUIREMENT_BRAND: unique symbol = Symbol('DataRequirement');
+const DATA_PROVIDER_BRAND: unique symbol = Symbol('DataProvider');
 const BINDING_SNAPSHOT_BRAND: unique symbol = Symbol('BindingSnapshot');
+const PROVIDER_SCOPE_ENTRY_BRAND: unique symbol = Symbol('ProviderScopeEntry');
 const COMMAND_INTENT_BRAND: unique symbol = Symbol('CommandIntent');
 const COMMAND_INTENT_PAYLOAD: unique symbol = Symbol('CommandIntentPayload');
 
@@ -45,6 +47,36 @@ export interface DataRequirement {
   readonly description?: string;
   readonly optional?: boolean;
   readonly facts: readonly BindingFact[];
+}
+
+export interface DataProviderInput {
+  readonly id: string;
+  readonly resource: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly facts?: readonly BindingFact[];
+}
+
+export interface DataProvider {
+  readonly [DATA_PROVIDER_BRAND]: true;
+  readonly id: ProviderId;
+  readonly resource: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly facts: readonly BindingFact[];
+}
+
+export interface ProviderScopeEntry {
+  readonly [PROVIDER_SCOPE_ENTRY_BRAND]: true;
+  readonly resource: string;
+  readonly provider: DataProvider;
+}
+
+export interface ProviderScopeOptions {
+  readonly id?: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly facts?: readonly BindingFact[];
 }
 
 export interface BindingSnapshotInput<Data = unknown> {
@@ -97,6 +129,72 @@ const BINDING_ISSUE_SEVERITIES: readonly BindingIssueSeverity[] = [
 ];
 const EMPTY_BINDING_ISSUES = Object.freeze([]) as readonly BindingIssue[];
 const EMPTY_BINDING_FACTS = Object.freeze([]) as readonly BindingFact[];
+
+export class ProviderScope {
+  readonly #providersByResource: ReadonlyMap<string, DataProvider>;
+  readonly #providersById: ReadonlyMap<ProviderId, DataProvider>;
+  readonly id?: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly facts: readonly BindingFact[];
+
+  constructor(entries: readonly ProviderScopeEntry[], options: ProviderScopeOptions = {}) {
+    const providersByResource = new Map<string, DataProvider>();
+    const providersById = new Map<ProviderId, DataProvider>();
+
+    entries.forEach((entry, index) => {
+      if (!isProviderScopeEntry(entry)) {
+        throw new Error(
+          `provider scope: entry at index ${index} was not created by provide()`,
+        );
+      }
+
+      if (providersByResource.has(entry.resource)) {
+        throw new Error(`provider scope: duplicate resource ${entry.resource}`);
+      }
+      if (providersById.has(entry.provider.id)) {
+        throw new Error(`provider scope: duplicate provider id ${entry.provider.id}`);
+      }
+
+      providersByResource.set(entry.resource, entry.provider);
+      providersById.set(entry.provider.id, entry.provider);
+    });
+
+    this.#providersByResource = providersByResource;
+    this.#providersById = providersById;
+    this.id = optionalTrimmedText(options.id);
+    this.label = optionalTrimmedText(options.label);
+    this.description = optionalTrimmedText(options.description);
+    this.facts = freezeFacts(options.facts);
+    Object.freeze(this);
+  }
+
+  resources(): readonly string[] {
+    return Object.freeze([...this.#providersByResource.keys()]);
+  }
+
+  providers(): readonly DataProvider[] {
+    return Object.freeze([...this.#providersByResource.values()]);
+  }
+
+  providerIds(): readonly ProviderId[] {
+    return Object.freeze([...this.#providersById.keys()]);
+  }
+
+  has(resource: string): boolean {
+    return this.get(resource) !== undefined;
+  }
+
+  get(resource: string): DataProvider | undefined {
+    const normalizedResource = normalizeRequiredText({
+      scope: 'provider scope',
+      field: 'resource',
+      value: resource,
+    });
+
+    return this.#providersByResource.get(normalizedResource);
+  }
+}
 
 export class BindingFrame {
   readonly #snapshotsByRequirementId: ReadonlyMap<RequirementId, BindingSnapshot>;
@@ -194,6 +292,48 @@ export function defineDataRequirement(input: DataRequirementInput): DataRequirem
   return Object.freeze(requirement);
 }
 
+export function defineDataProvider(input: DataProviderInput): DataProvider {
+  const provider = {
+    id: normalizeRequiredText({
+      scope: 'data provider',
+      field: 'id',
+      value: input.id,
+    }),
+    resource: normalizeRequiredText({
+      scope: 'data provider',
+      field: 'resource',
+      value: input.resource,
+    }),
+    label: optionalTrimmedText(input.label),
+    description: optionalTrimmedText(input.description),
+    facts: freezeFacts(input.facts),
+  } as DataProvider;
+
+  Object.defineProperty(provider, DATA_PROVIDER_BRAND, { value: true });
+  return Object.freeze(provider);
+}
+
+export function provide(provider: DataProvider): ProviderScopeEntry {
+  if (!isDataProvider(provider)) {
+    throw new Error('provider scope: provider was not created by defineDataProvider()');
+  }
+
+  const entry = {
+    resource: provider.resource,
+    provider,
+  } as ProviderScopeEntry;
+
+  Object.defineProperty(entry, PROVIDER_SCOPE_ENTRY_BRAND, { value: true });
+  return Object.freeze(entry);
+}
+
+export function providerScope(
+  entries: readonly ProviderScopeEntry[],
+  options: ProviderScopeOptions = {},
+): ProviderScope {
+  return new ProviderScope(entries, options);
+}
+
 export function bindingSnapshot<Data = unknown>(
   input: BindingSnapshotInput<Data>,
 ): BindingSnapshot<Data> {
@@ -259,8 +399,32 @@ export function isBindingSnapshot(value: unknown): value is BindingSnapshot {
   );
 }
 
+export function isDataProvider(value: unknown): value is DataProvider {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as DataProviderBrandCarrier)[DATA_PROVIDER_BRAND] === true,
+  );
+}
+
+function isProviderScopeEntry(value: unknown): value is ProviderScopeEntry {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as ProviderScopeEntryBrandCarrier)[PROVIDER_SCOPE_ENTRY_BRAND] === true,
+  );
+}
+
 interface BindingSnapshotBrandCarrier {
   readonly [BINDING_SNAPSHOT_BRAND]?: true;
+}
+
+interface DataProviderBrandCarrier {
+  readonly [DATA_PROVIDER_BRAND]?: true;
+}
+
+interface ProviderScopeEntryBrandCarrier {
+  readonly [PROVIDER_SCOPE_ENTRY_BRAND]?: true;
 }
 
 interface RequiredTextOptions {
