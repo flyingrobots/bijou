@@ -188,6 +188,12 @@ openArticle.id;
 subscriptions, active-view lifecycle, schema adapters, and command dispatch
 remain runtime follow-on layers.
 
+Snapshot data is copied before it is frozen. Use inert plain snapshot data:
+null, strings, numbers, booleans, arrays, and enumerable string-keyed plain
+objects. Mutable built-ins and executable values such as `Map`, `Set`, `Date`,
+typed arrays, functions, accessors, symbol-keyed properties, symbols, and bigint
+are rejected at the binding boundary.
+
 ## Testing
 
 Use `createTestContext` to verify behavior across all modes without mocking:

@@ -99,8 +99,8 @@ fake duplication rather than a real second API.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
   payloads, and agent-facing reports.
 - **`defineDataRequirement()` / `bindingSnapshot()` / `bindingFrame()`**:
-  Model provider-delivered data as versioned immutable snapshots and read-only
-  render frames.
+  Model provider-delivered plain data as copied, versioned immutable snapshots
+  and read-only render frames.
 - **`commandIntent()`**: Declare user intent outputs as inspectable metadata,
   without business-logic callbacks or provider mutation handles.
 - **`captureStoryMatrix()`**: Capture every profile/variant pair from a story

@@ -219,7 +219,7 @@ export function bindingSnapshot<Data = unknown>(
     requirementId,
     version: input.version,
     status: input.status,
-    ...(input.data === undefined ? {} : { data: deepFreeze(input.data) }),
+    ...(input.data === undefined ? {} : { data: freezeSnapshotData(input.data) }),
     issues: freezeIssues(input.issues),
     facts: freezeFacts(input.facts),
   } as BindingSnapshot<Data>;
@@ -330,6 +330,88 @@ function freezeFacts(facts: readonly BindingFact[] | undefined): readonly Bindin
   }
 
   return deepFreeze([...facts]);
+}
+
+function freezeSnapshotData<T>(value: T): DeepReadonly<T> {
+  return deepFreeze(cloneSnapshotData(value, 'data'));
+}
+
+function cloneSnapshotData<T>(value: T, path: string, seen: WeakSet<object> = new WeakSet<object>()): T {
+  if (
+    value === null
+    || typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'boolean'
+  ) {
+    return value;
+  }
+
+  if (typeof value === 'bigint' || typeof value === 'symbol' || typeof value === 'function') {
+    throw new Error(`binding data: unsupported ${typeof value} at ${path}`);
+  }
+
+  if (value === undefined) {
+    throw new Error(`binding data: unsupported undefined at ${path}`);
+  }
+
+  if (typeof value !== 'object') {
+    throw new Error(`binding data: unsupported ${typeof value} at ${path}`);
+  }
+
+  const objectValue = value as object;
+  if (seen.has(objectValue)) {
+    throw new Error(`binding data: circular reference at ${path}`);
+  }
+  seen.add(objectValue);
+
+  try {
+    if (Array.isArray(value)) {
+      return value.map((item, index) => cloneSnapshotData(item, `${path}[${index}]`, seen)) as T;
+    }
+
+    if (!isPlainObject(value)) {
+      throw new Error(`binding data: unsupported ${objectKind(value)} at ${path}`);
+    }
+
+    const clone = Object.create(Object.getPrototypeOf(value)) as SnapshotDataObject;
+    const descriptors = Object.getOwnPropertyDescriptors(value);
+    for (const key of Reflect.ownKeys(descriptors)) {
+      if (typeof key === 'symbol') {
+        throw new Error(`binding data: unsupported symbol property at ${path}`);
+      }
+
+      const propertyPath = `${path}.${key}`;
+      const descriptor = descriptors[key];
+      if (descriptor === undefined) {
+        continue;
+      }
+      if (!descriptor.enumerable) {
+        throw new Error(`binding data: unsupported non-enumerable property at ${propertyPath}`);
+      }
+      if ('get' in descriptor || 'set' in descriptor) {
+        throw new Error(`binding data: unsupported accessor at ${propertyPath}`);
+      }
+
+      clone[key] = cloneSnapshotData(descriptor.value, propertyPath, seen);
+    }
+
+    return clone as T;
+  } finally {
+    seen.delete(objectValue);
+  }
+}
+
+interface SnapshotDataObject {
+  [key: string]: unknown;
+}
+
+function isPlainObject(value: object): boolean {
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function objectKind(value: object): string {
+  return Object.prototype.toString.call(value).slice(8, -1);
 }
 
 function deepFreeze<T>(value: T, seen: WeakSet<object> = new WeakSet<object>()): DeepReadonly<T> {

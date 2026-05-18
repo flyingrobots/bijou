@@ -257,15 +257,22 @@ interface BindingSnapshot<Data> {
   readonly requirementId: string;
   readonly version: number;
   readonly status: 'ready' | 'loading' | 'empty' | 'stale' | 'error';
-  readonly data?: Data;
-  readonly issues?: readonly BindingIssue[];
-  readonly facts?: readonly BindingFact[];
+  readonly data?: DeepReadonly<Data>;
+  readonly issues: readonly BindingIssue[];
+  readonly facts: readonly BindingFact[];
 }
 ```
 
 Provider updates do not mutate mounted views. They produce a new snapshot
 version and trigger a runtime binding invalidation. The next render receives a
 new immutable binding frame.
+
+DX-034A snapshots accept inert plain snapshot data: null, strings, numbers,
+booleans, arrays, and enumerable string-keyed plain objects. They reject mutable
+built-ins and executable values such as `Map`, `Set`, `Date`, typed arrays,
+functions, accessors, symbol-keyed properties, symbols, and bigint. Snapshot
+construction copies accepted data before freezing it, so provider-owned or
+business-owned source objects are not frozen in place.
 
 ### 4. Binding Frames Are Immutable
 
