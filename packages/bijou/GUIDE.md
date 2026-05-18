@@ -149,6 +149,45 @@ Blocks are explicit imports, not runtime plugins. `BlockMetadata` and
 `BlockPackageManifest` are intended for docs, DOGFOOD, MCP payloads, and package
 compatibility checks; schema-bound blocks are still a follow-on layer.
 
+## Binding Frames
+
+Use binding primitives when a view should render provider-delivered data without
+receiving a provider handle:
+
+```typescript
+import {
+  bindingFrame,
+  bindingSnapshot,
+  commandIntent,
+  defineDataRequirement,
+} from '@flyingrobots/bijou';
+
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
+
+const frame = bindingFrame([
+  bindingSnapshot({
+    providerId: 'docs.articleProvider',
+    requirementId: article.id,
+    version: 1,
+    status: 'ready',
+    data: { title: 'DX-034' },
+  }),
+]);
+
+const openArticle = commandIntent<{ articleId: string }>('docs.openArticle');
+
+frame.require<{ title: string }>('article');
+frame.status('article');
+openArticle.id;
+```
+
+`BindingFrame` is only the immutable render-time data frame. Provider scopes,
+subscriptions, active-view lifecycle, schema adapters, and command dispatch
+remain runtime follow-on layers.
+
 ## Testing
 
 Use `createTestContext` to verify behavior across all modes without mocking:

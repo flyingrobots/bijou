@@ -97,6 +97,28 @@ export {
   type ModeMap,
 } from './core/mode-render.js';
 export {
+  BindingFrame,
+  bindingFrame,
+  bindingSnapshot,
+  commandIntent,
+  defineDataRequirement,
+  isBindingSnapshot,
+  type BindingFact,
+  type BindingIssue,
+  type BindingIssueSeverity,
+  type BindingSnapshot,
+  type BindingSnapshotInput,
+  type BindingStatus,
+  type CommandIntent,
+  type CommandIntentId,
+  type CommandIntentOptions,
+  type DataRequirement,
+  type DataRequirementInput,
+  type DeepReadonly,
+  type ProviderId,
+  type RequirementId,
+} from './core/binding.js';
+export {
   blockMetadataReportText,
   blockMetadataSummary,
   blockPackageManifestReportText,

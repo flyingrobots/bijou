@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Binding frame primitives for `bijou`** — `@flyingrobots/bijou` now exports
+  `DataRequirement`, `BindingSnapshot`, `BindingFrame`, `BindingStatus`,
+  `BindingIssue`, `BindingFact`, `CommandIntent`, and helper constructors for
+  the first DX-034 runtime-truth slice. Snapshots normalize provider and
+  requirement ids, freeze data/issues/facts, carry versioned ready/loading/
+  empty/stale/error status, and bind into immutable frames with `require()`,
+  `get()`, `status()`, `issues()`, and `facts()` accessors. Command intents are
+  inspectable metadata only; provider scopes, subscriptions, active hierarchy
+  traversal, schema adapters, and AppShell rendering remain follow-on work.
 - **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so
