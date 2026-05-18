@@ -510,6 +510,32 @@ Runtime-engine posture:
 That keeps third-party blocks powerful without making them runtime plugins with
 unbounded authority.
 
+## Relationship To DX-034
+
+[DX-034 - Declarative View Data Binding](./DX-034-declarative-view-data-binding.md)
+is the design gate between metadata-only blocks and provider-bound AppShell
+composition.
+
+DX-031 answers:
+
+- what is a block?
+- what slots, variants, modes, facts, stories, and package metadata does it
+  declare?
+- how can tooling discover block contracts before rendering?
+
+DX-034 answers:
+
+- how does an active block or view declare the data it needs?
+- which provider scope satisfies those requirements?
+- what immutable snapshot is currently rendered?
+- how do user interactions leave the view tree as Commands instead of direct
+  data mutation?
+
+Rendered AppShell work should build on both cycles. AppShell needs named block
+slots, but it also needs a unidirectional data-binding loop so nested navigation,
+content, inspector, status, and overlay blocks can render provider-backed
+snapshots without owning business state.
+
 ## Schema-Bound Blocks
 
 The happy path for app builders should be extremely direct:
@@ -3075,16 +3101,18 @@ blocks.
    `BlockPackageManifest` shape in `@flyingrobots/bijou`.
 3. Done: add `defineBlock()` and `defineBlockPackage()` authoring helpers,
    validation/report helpers, and compact summaries.
-4. Next: add `defineSchemaBlock()` and a Zod schema adapter.
-5. Next: add block stories for `AppShell`, `ReaderSurface`, and
+4. Next: formalize provider-bound view data requirements in DX-034 before
+   hardening rendered AppShell APIs.
+5. Next: add `defineSchemaBlock()` and a Zod schema adapter.
+6. Next: add block stories for `AppShell`, `ReaderSurface`, and
    `InspectorPanel`.
-6. Next: capture interactive, static, pipe, and accessible outputs for the
+7. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-7. Next: prove the first three blocks in DOGFOOD before broadening the
+8. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-8. Next: add catalog-only variant/config metadata for later blocks without
+9. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-9. Continue to defer modal stacks, notifications, auth forms, animated
+10. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 

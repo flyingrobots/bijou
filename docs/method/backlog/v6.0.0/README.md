@@ -37,6 +37,8 @@ The boundary remains:
   mandatory layout envelope and constraint negotiation
 - [**DX-031**](../../../design/DX-031-standard-bijou-blocks.md) -
   standard Bijou blocks
+- [**DX-034**](../../../design/DX-034-declarative-view-data-binding.md) -
+  declarative view data binding
 
 ## Core Runtime Scope
 
