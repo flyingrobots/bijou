@@ -47,6 +47,29 @@ Blocks should not hide:
 - accessibility semantics
 - localization or directional assumptions
 
+## Current public contract
+
+Bijou now exposes a metadata-first block authoring contract from
+`@flyingrobots/bijou`:
+
+- `BlockMetadata` declares a block's package, name, family, scale, modes, slots,
+  variants, config options, composed components, semantic facts, story ids, and
+  docs.
+- `BlockDefinition` pairs that metadata with an explicit render function.
+- `BlockPackageManifest` declares the exported blocks, package version, Bijou
+  peer range, docs, and tags for ordinary NPM distribution.
+- `defineBlock()` and `defineBlockPackage()` validate definitions before
+  authors publish or index them.
+- `validateBlockMetadata()`, `blockMetadataSummary()`, and report helpers give
+  tests, docs, DOGFOOD, MCP payloads, and agents a deterministic way to inspect
+  block facts without rendering a terminal surface.
+
+This is the first DX-031 slice: blocks are described before they render, package
+authors avoid hidden global registration, and tooling can discover slots and
+mode support directly. Schema-bound blocks remain a follow-on; the current
+contract deliberately does not make Zod, GraphQL, or database schemas part of
+the core block dependency surface.
+
 ## First credible block candidates
 
 ### App frame

@@ -110,6 +110,45 @@ export function myComponent(text: string, options: { ctx?: BijouContext } = {}) 
 }
 ```
 
+## Block Authoring
+
+Use `defineBlock()` when a reusable app-level composition needs stable metadata
+that tools can inspect before rendering:
+
+```typescript
+import { defineBlock, defineBlockPackage } from '@flyingrobots/bijou';
+
+export const readerSurfaceBlock = defineBlock({
+  metadata: {
+    packageName: '@example/bijou-blocks-docs',
+    blockName: 'ReaderSurface',
+    family: 'content-reading',
+    scale: 'section',
+    modes: ['interactive', 'static', 'pipe', 'accessible'],
+    docs: { summary: 'Readable content with optional navigation and outline slots.' },
+    slots: [
+      { id: 'content', required: true },
+      { id: 'navigation', required: false },
+      { id: 'outline', required: false },
+    ],
+    composedComponents: ['markdown', 'viewportSurface'],
+    storyIds: ['reader-surface/docs-reader'],
+  },
+  render: ({ slots }) => ({ output: slots?.content ?? '' }),
+});
+
+export const docsBlocks = defineBlockPackage({
+  packageName: '@example/bijou-blocks-docs',
+  version: '1.0.0',
+  bijouPeerRange: '^5.0.0',
+  blocks: [readerSurfaceBlock.metadata.blockName],
+});
+```
+
+Blocks are explicit imports, not runtime plugins. `BlockMetadata` and
+`BlockPackageManifest` are intended for docs, DOGFOOD, MCP payloads, and package
+compatibility checks; schema-bound blocks are still a follow-on layer.
+
 ## Testing
 
 Use `createTestContext` to verify behavior across all modes without mocking:
