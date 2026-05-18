@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
+  `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
+  `defineBlockPackage()`, validation/report helpers, and compact summaries so
+  reusable block packages can declare slots, variants, config, mode support,
+  composed components, semantic facts, stories, docs, tags, and Bijou peer
+  compatibility without hidden global registration. This lands the first
+  metadata-only DX-031 slice; schema-bound blocks and the rendered standard
+  block catalog remain follow-on work.
 - **Standalone Storybook workbench** — `npm run storybook` now launches a
   dedicated interactive Storybook-style development and testing TUI over the
   DOGFOOD story catalog instead of deep-linking into the DOGFOOD docs shell.

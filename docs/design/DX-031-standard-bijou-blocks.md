@@ -300,35 +300,70 @@ instead of being inferred from rendered output.
 Metadata sketch:
 
 ```ts
-interface BlockMetadata {
+type BlockScale =
+  | 'app'
+  | 'section'
+  | 'panel'
+  | 'control'
+  | 'item'
+  | 'data'
+  | 'diagnostic';
+
+interface BlockMetadataDocs {
+  readonly summary: string;
+  readonly useWhen?: readonly string[];
+  readonly avoidWhen?: readonly string[];
+  readonly relatedDocs?: readonly string[];
+}
+
+interface BlockSlot {
   readonly id: string;
-  readonly name: string;
-  readonly purpose: string;
-  readonly requiredSlots: readonly string[];
-  readonly optionalSlots: readonly string[];
-  readonly variants: readonly BlockVariantMetadata[];
-  readonly configOptions: readonly BlockConfigOption[];
-  readonly composedComponents: readonly string[];
+  readonly label?: string;
+  readonly required?: boolean;
+  readonly description?: string;
+}
+
+interface BlockMetadata {
+  readonly packageName: string;
+  readonly blockName: string;
+  readonly family: string;
+  readonly scale: BlockScale;
   readonly modes: readonly ('interactive' | 'static' | 'pipe' | 'accessible')[];
-  readonly responsiveVariants: readonly string[];
-  readonly semanticFacts: readonly string[];
-  readonly storyIds: readonly string[];
+  readonly docs: BlockMetadataDocs;
+  readonly sourcePath?: string;
+  readonly slots: readonly BlockSlot[];
+  readonly variants?: readonly BlockVariantMetadata[];
+  readonly configOptions?: readonly BlockConfigOption[];
+  readonly composedComponents?: readonly string[];
+  readonly semanticFacts?: readonly ModeLoweringFact[];
+  readonly storyIds?: readonly string[];
+  readonly examples?: readonly BlockExample[];
+  readonly tags?: readonly string[];
 }
 
 interface BlockVariantMetadata {
   readonly id: string;
-  readonly name: string;
-  readonly purpose: string;
-  readonly requiredSlots: readonly string[];
-  readonly optionalSlots: readonly string[];
-  readonly semanticFacts: readonly string[];
+  readonly label: string;
+  readonly description?: string;
+  readonly requiredSlots?: readonly string[];
+  readonly optionalSlots?: readonly string[];
+  readonly facts?: readonly ModeLoweringFact[];
 }
 
 interface BlockConfigOption {
   readonly id: string;
+  readonly label?: string;
   readonly kind: 'boolean' | 'enum' | 'number' | 'string' | 'adapter';
-  readonly required: boolean;
-  readonly description: string;
+  readonly required?: boolean;
+  readonly description?: string;
+  readonly values?: readonly string[];
+}
+
+interface BlockExample {
+  readonly id: string;
+  readonly label: string;
+  readonly path?: string;
+  readonly command?: string;
 }
 
 type BlockSchemaResult<Data> =
@@ -376,6 +411,12 @@ declare function defineBlock<Config>(
   definition: BlockDefinition<Config>,
 ): BlockDefinition<Config>;
 
+declare function validateBlockMetadata(
+  metadata: BlockMetadata,
+): BlockMetadataReport;
+
+declare function blockMetadataSummary(metadata: BlockMetadata): string;
+
 declare function defineSchemaBlock<Data, Config>(
   definition: SchemaBoundBlockDefinition<Data, Config>,
 ): SchemaBoundBlockDefinition<Data, Config>;
@@ -390,9 +431,10 @@ declare function defineBlockPackage(
 ): BlockPackageManifest;
 ```
 
-The exact type name can change. The important boundary is that a block is
-described before it renders, and its slots and semantic facts are visible to
-tests, docs, DOGFOOD, and agents.
+DX-031A lands this as a public metadata-first API in `@flyingrobots/bijou`.
+The schema-bound functions remain follow-on API work. The important boundary is
+that a block is described before it renders, and its slots and semantic facts
+are visible to tests, docs, DOGFOOD, and agents.
 
 ## Public Block API And Distribution
 
@@ -467,6 +509,32 @@ Runtime-engine posture:
 
 That keeps third-party blocks powerful without making them runtime plugins with
 unbounded authority.
+
+## Relationship To DX-034
+
+[DX-034 - Declarative View Data Binding](./DX-034-declarative-view-data-binding.md)
+is the design gate between metadata-only blocks and provider-bound AppShell
+composition.
+
+DX-031 answers:
+
+- what is a block?
+- what slots, variants, modes, facts, stories, and package metadata does it
+  declare?
+- how can tooling discover block contracts before rendering?
+
+DX-034 answers:
+
+- how does an active block or view declare the data it needs?
+- which provider scope satisfies those requirements?
+- what immutable snapshot is currently rendered?
+- how do user interactions leave the view tree as Commands instead of direct
+  data mutation?
+
+Rendered AppShell work should build on both cycles. AppShell needs named block
+slots, but it also needs a unidirectional data-binding loop so nested navigation,
+content, inspector, status, and overlay blocks can render provider-backed
+snapshots without owning business state.
 
 ## Schema-Bound Blocks
 
@@ -3027,21 +3095,26 @@ blocks.
 
 ## Implementation Outline
 
-1. Add the human-readable block catalog and keep it independent from low-level
-   layout implementation.
-2. Define a minimal public `BlockMetadata`, `BlockDefinition`, and
-   `BlockPackageManifest` shape or reuse existing metadata contracts if they
-   prove sufficient.
-3. Add `defineBlock()` and `defineBlockPackage()` authoring helpers.
-4. Add `defineSchemaBlock()` and a Zod schema adapter.
-5. Add block stories for `AppShell`, `ReaderSurface`, and `InspectorPanel`.
-6. Capture interactive, static, pipe, and accessible outputs for the first
-   implementation set.
-7. Prove the first three blocks in DOGFOOD before broadening the catalog.
-8. Add catalog-only variant/config metadata for later blocks without
+1. Done: add the human-readable block catalog and keep it independent from
+   low-level layout implementation.
+2. Done: define a minimal public `BlockMetadata`, `BlockDefinition`, and
+   `BlockPackageManifest` shape in `@flyingrobots/bijou`.
+3. Done: add `defineBlock()` and `defineBlockPackage()` authoring helpers,
+   validation/report helpers, and compact summaries.
+4. Next: formalize provider-bound view data requirements in DX-034 before
+   hardening rendered AppShell APIs.
+5. Next: add `defineSchemaBlock()` and a Zod schema adapter.
+6. Next: add block stories for `AppShell`, `ReaderSurface`, and
+   `InspectorPanel`.
+7. Next: capture interactive, static, pipe, and accessible outputs for the
+   first implementation set.
+8. Next: prove the first three blocks in DOGFOOD before broadening the
+   catalog.
+9. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-9. Defer modal stacks, notifications, auth forms, animated carousels, complex
-   controls, and workspace-like behavior until the block contract is proven.
+10. Continue to defer modal stacks, notifications, auth forms, animated
+   carousels, complex controls, and workspace-like behavior until the first
+   rendered block set is proven.
 
 ## Tests To Write First
 
@@ -3152,6 +3225,38 @@ blocks.
 - Modal and notification stacks depend on retained layout hit-testing work.
 - Workspace-style docking should remain outside this cycle.
 
+## Playback
+
+DX-031A Block Contract lands the public, metadata-first slice of this cycle.
+
+What is now true:
+
+- `@flyingrobots/bijou` exports `BlockMetadata`, `BlockDefinition`,
+  `BlockPackageManifest`, `defineBlock()`, `defineBlockPackage()`,
+  `validateBlockMetadata()`, validation/report helpers, and compact summary
+  helpers.
+- Block metadata declares package identity, block name, family, scale, modes,
+  docs, slots, variants, config options, composed components, semantic facts,
+  stories, examples, and tags.
+- Block package manifests declare version, Bijou peer compatibility, exported
+  blocks, docs, and tags without hidden global registration.
+- Public API tests prove authors can define blocks and package manifests without
+  importing DOGFOOD internals.
+- The design-system blocks entrypoint now points to the current public
+  contract instead of only naming future candidates.
+
+Still out of scope for this slice:
+
+- `defineSchemaBlock()`, Zod adapters, and schema-to-block compilers.
+- Rendered first-party `AppShell`, `ReaderSurface`, and `InspectorPanel`
+  blocks.
+- DOGFOOD block galleries and multi-mode story captures for rendered blocks.
+- Modal stacks, notifications, auth blocks, workspace docking, and complex
+  domain-specific block packages.
+
 ## Retrospective
 
-Not started.
+DX-031 is now partially landed rather than not started. The first slice gives
+the ecosystem a stable block contract to index, review, and publish against,
+but "full block availability" still requires schema binding, a rendered
+first-party block set, DOGFOOD proof, story captures, and catalog expansion.

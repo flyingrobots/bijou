@@ -92,6 +92,12 @@ fake duplication rather than a real second API.
   arg, variant, invariant, example, and source facts for tooling.
 - **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
   payloads, and agent-facing reports.
+- **`defineBlock()`**: Declare a validated reusable block with package, family,
+  scale, mode, slot, variant, config, component, story, and semantic facts.
+- **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
+  Bijou peer compatibility for ordinary NPM block packages.
+- **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
+  payloads, and agent-facing reports.
 - **`captureStoryMatrix()`**: Capture every profile/variant pair from a story
   renderer.
 - **`storyCaptureMatrixText()`**: Render a deterministic multi-mode story
