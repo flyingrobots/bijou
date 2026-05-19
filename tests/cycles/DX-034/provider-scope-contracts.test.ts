@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bindingFrameFromSnapshots,
+  bindingSnapshot,
   defineDataProvider,
   defineDataRequirement,
   provide,
@@ -47,5 +49,37 @@ describe('DX-034B provider scope contracts', () => {
       'docs.articleProvider',
     );
     expect(resolveProviderRequirement(article, emptyScope).status).toBe('missing-required');
+  });
+
+  it('assembles render frames from resolved provider snapshots without provider handles', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: article.resource,
+    });
+    const scope = providerScope([provide(articleProvider)], { id: 'populated' });
+    const resolution = resolveProviderRequirement(article, scope);
+    const assembled = bindingFrameFromSnapshots({
+      resolutions: [resolution],
+      snapshots: [
+        bindingSnapshot({
+          providerId: 'docs.articleProvider',
+          requirementId: 'article',
+          version: 1,
+          status: 'ready',
+          data: { title: 'DX-034' },
+        }),
+      ],
+    });
+
+    expect(assembled.frame.require<{ title: string }>('article')).toEqual({
+      title: 'DX-034',
+    });
+    expect(assembled.issues).toEqual([]);
+    expect('provider' in assembled.frame).toBe(false);
+    expect('refresh' in assembled).toBe(false);
   });
 });

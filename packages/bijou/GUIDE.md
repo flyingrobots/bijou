@@ -157,6 +157,7 @@ receiving a provider handle:
 ```typescript
 import {
   bindingFrame,
+  bindingFrameFromSnapshots,
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
@@ -190,11 +191,24 @@ const frame = bindingFrame([
 
 const openArticle = commandIntent<{ articleId: string }>('docs.openArticle');
 const resolution = resolveProviderRequirement(article, providers);
+const assembled = bindingFrameFromSnapshots({
+  resolutions: [resolution],
+  snapshots: [
+    bindingSnapshot({
+      providerId: articleProvider.id,
+      requirementId: article.id,
+      version: 1,
+      status: 'ready',
+      data: { title: 'DX-034' },
+    }),
+  ],
+});
 
 frame.require<{ title: string }>('article');
 frame.status('article');
 providers.has(article.resource);
 resolution.status;
+assembled.frame.status('article');
 openArticle.id;
 ```
 
@@ -203,6 +217,9 @@ subscribe, refresh, resolve active views, dispatch commands, or register globals
 `resolveProviderRequirement()` resolves against exactly the scope it receives and
 returns frozen metadata for tooling and runtime handoff; it still does not fetch,
 subscribe, or walk a view hierarchy.
+`bindingFrameFromSnapshots()` assembles a render frame from resolved provider
+metadata and already-created snapshots; provider reads remain outside this
+contract.
 `BindingFrame` is only the immutable render-time data frame. Provider
 resolution hierarchy, subscriptions, active-view lifecycle, schema adapters, and
 command dispatch remain runtime follow-on layers.

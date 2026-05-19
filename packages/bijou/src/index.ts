@@ -99,6 +99,7 @@ export {
 export {
   BindingFrame,
   bindingFrame,
+  bindingFrameFromSnapshots,
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
@@ -115,6 +116,8 @@ export {
   type BindingFact,
   type BindingIssue,
   type BindingIssueSeverity,
+  type BindingFrameAssembly,
+  type BindingFrameFromSnapshotsInput,
   type BindingSnapshot,
   type BindingSnapshotInput,
   type BindingStatus,

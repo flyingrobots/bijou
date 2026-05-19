@@ -365,6 +365,8 @@ The public core now includes:
 - `ProviderResolutionStatus`
 - `resolveProviderRequirement()`
 - `resolveProviderRequirements()`
+- `BindingFrameAssembly`
+- `bindingFrameFromSnapshots()`
 
 This slice proves local provider availability and one-scope resolution, not
 hierarchical provider resolution or subscription lifecycle:
@@ -390,6 +392,20 @@ providers.resources();
 
 const resolution = resolveProviderRequirement(article, providers);
 resolution.status;
+
+const assembled = bindingFrameFromSnapshots({
+  resolutions: [resolution],
+  snapshots: [
+    bindingSnapshot({
+      providerId: 'docs.articleProvider',
+      requirementId: 'article',
+      version: 1,
+      status: 'ready',
+      data: { title: 'DX-034' },
+    }),
+  ],
+});
+assembled.frame.require('article');
 ```
 
 `ProviderScope` rejects duplicate resources and duplicate provider ids inside a
@@ -397,6 +413,8 @@ single scope. It also rejects loose provider-shaped objects, so importing a
 module cannot silently register a provider or bypass the constructor contract.
 Resolution results are frozen metadata. Missing required providers become
 deterministic issues; missing optional providers are inspectable but not errors.
+Frame assembly reports missing or provider-mismatched snapshots as deterministic
+issues while keeping provider reads outside the render frame.
 
 ### 5. User Input Emits Commands
 
@@ -601,13 +619,14 @@ flow.
 4. Done: define provider and provider-scope contracts without global
    registration.
 5. Done: add one-scope provider resolution.
-6. Next: add active-view binding collection over the existing view-stack model.
-7. Next: add invalidation flow from provider snapshot updates to view re-render.
-8. Next: add Command intent dispatch proof.
-9. Next: integrate the contract with DX-031 block definitions.
-10. Next: prove AppShell with nested provider-bound navigation, content, inspector,
+6. Done: assemble immutable binding frames from resolved snapshots.
+7. Next: add active-view binding collection over the existing view-stack model.
+8. Next: add invalidation flow from provider snapshot updates to view re-render.
+9. Next: add Command intent dispatch proof.
+10. Next: integrate the contract with DX-031 block definitions.
+11. Next: prove AppShell with nested provider-bound navigation, content, inspector,
    and status blocks.
-11. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+12. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First

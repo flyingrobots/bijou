@@ -103,6 +103,8 @@ fake duplication rather than a real second API.
   hidden global registration.
 - **`resolveProviderRequirement()`**: Resolve a requirement against an explicit
   local provider scope as frozen metadata, without subscribing or fetching.
+- **`bindingFrameFromSnapshots()`**: Assemble read-only render frames from
+  resolved provider metadata and already-created immutable snapshots.
 - **`bindingSnapshot()` / `bindingFrame()`**: Model provider-delivered plain
   data as copied, versioned immutable snapshots and read-only render frames.
 - **`commandIntent()`**: Declare user intent outputs as inspectable metadata,

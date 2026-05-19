@@ -115,6 +115,17 @@ export interface BindingSnapshot<Data = unknown> {
   readonly facts: readonly BindingFact[];
 }
 
+export interface BindingFrameFromSnapshotsInput {
+  readonly resolutions: readonly ProviderResolution[];
+  readonly snapshots: readonly BindingSnapshot[];
+}
+
+export interface BindingFrameAssembly {
+  readonly frame: BindingFrame;
+  readonly issues: readonly BindingIssue[];
+  readonly facts: readonly BindingFact[];
+}
+
 export interface CommandIntentOptions {
   readonly label?: string;
   readonly description?: string;
@@ -451,6 +462,83 @@ export function bindingSnapshot<Data = unknown>(
 
 export function bindingFrame(snapshots: readonly BindingSnapshot[]): BindingFrame {
   return new BindingFrame(snapshots);
+}
+
+export function bindingFrameFromSnapshots(input: BindingFrameFromSnapshotsInput): BindingFrameAssembly {
+  const resolutionsByRequirementId = new Map<RequirementId, ProviderResolution>();
+  const snapshotsByRequirementId = new Map<RequirementId, BindingSnapshot>();
+
+  input.resolutions.forEach((resolution, index) => {
+    if (!isProviderResolution(resolution)) {
+      throw new Error(
+        `binding frame assembly: resolution at index ${index} was not created by resolveProviderRequirement()`,
+      );
+    }
+    if (resolutionsByRequirementId.has(resolution.requirementId)) {
+      throw new Error(`binding frame assembly: duplicate resolution ${resolution.requirementId}`);
+    }
+
+    resolutionsByRequirementId.set(resolution.requirementId, resolution);
+  });
+
+  input.snapshots.forEach((snapshot, index) => {
+    if (!isBindingSnapshot(snapshot)) {
+      throw new Error(
+        `binding frame assembly: snapshot at index ${index} was not created by bindingSnapshot()`,
+      );
+    }
+    if (!resolutionsByRequirementId.has(snapshot.requirementId)) {
+      throw new Error(`binding frame assembly: snapshot requirement ${snapshot.requirementId} was not resolved`);
+    }
+    if (snapshotsByRequirementId.has(snapshot.requirementId)) {
+      throw new Error(`binding frame assembly: duplicate snapshot ${snapshot.requirementId}`);
+    }
+
+    snapshotsByRequirementId.set(snapshot.requirementId, snapshot);
+  });
+
+  const frameSnapshots: BindingSnapshot[] = [];
+  const issues: BindingIssue[] = [];
+  const facts: BindingFact[] = [];
+
+  for (const resolution of resolutionsByRequirementId.values()) {
+    facts.push(...resolution.facts);
+
+    if (resolution.status !== 'resolved') {
+      issues.push(...resolution.issues);
+      continue;
+    }
+
+    const snapshot = snapshotsByRequirementId.get(resolution.requirementId);
+    if (snapshot === undefined) {
+      issues.push({
+        severity: 'error',
+        code: 'snapshot.missing',
+        message: `No snapshot supplied for resolved requirement ${resolution.requirementId}`,
+        path: resolution.requirementId,
+      });
+      continue;
+    }
+
+    if (snapshot.providerId !== resolution.providerId) {
+      issues.push({
+        severity: 'error',
+        code: 'snapshot.provider-mismatch',
+        message: `Snapshot for requirement ${resolution.requirementId} came from provider ${snapshot.providerId}; expected ${resolution.providerId}`,
+        path: resolution.requirementId,
+      });
+      continue;
+    }
+
+    frameSnapshots.push(snapshot);
+    facts.push(...snapshot.facts);
+  }
+
+  return Object.freeze({
+    frame: bindingFrame(frameSnapshots),
+    issues: freezeIssues(issues),
+    facts: freezeFacts(facts),
+  });
 }
 
 export function commandIntent<Payload = unknown>(
