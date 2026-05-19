@@ -93,14 +93,26 @@ fake duplication rather than a real second API.
 - **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
   payloads, and agent-facing reports.
 - **`defineBlock()`**: Declare a validated reusable block with package, family,
-  scale, mode, slot, variant, config, component, story, and semantic facts.
+  scale, mode, slot, variant, config, component, story, semantic facts, optional
+  view data contracts, and command intents.
 - **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
   Bijou peer compatibility for ordinary NPM block packages.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
   payloads, and agent-facing reports.
-- **`defineDataRequirement()` / `bindingSnapshot()` / `bindingFrame()`**:
-  Model provider-delivered plain data as copied, versioned immutable snapshots
-  and read-only render frames.
+- **`defineAppShellComposition()`**: Compose runtime-backed blocks into logical
+  AppShell slots with an explicit provider scope, without rendering or
+  subscribing.
+- **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
+  Declare data requirements and explicit local provider availability without
+  hidden global registration.
+- **`defineViewData()`**: Group named data requirements for a view or block
+  without binding them to providers.
+- **`resolveProviderRequirement()`**: Resolve a requirement against an explicit
+  local provider scope as frozen metadata, without subscribing or fetching.
+- **`bindingFrameFromSnapshots()`**: Assemble read-only render frames from
+  resolved provider metadata and already-created immutable snapshots.
+- **`bindingSnapshot()` / `bindingFrame()`**: Model provider-delivered plain
+  data as copied, versioned immutable snapshots and read-only render frames.
 - **`commandIntent()`**: Declare user intent outputs as inspectable metadata,
   without business-logic callbacks or provider mutation handles.
 - **`captureStoryMatrix()`**: Capture every profile/variant pair from a story

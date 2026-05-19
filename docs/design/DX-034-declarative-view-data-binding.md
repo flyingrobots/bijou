@@ -166,6 +166,11 @@ Scopes let an app provide one navigation source at the shell level, override a
 selection source inside a modal, or bind a test provider for a story without
 touching global state.
 
+DX-034B makes scopes explicit local values in the public contract. A
+`ProviderScope` declares which `DataProvider` metadata is available for which
+resource, but it does not subscribe, refresh, resolve nested scopes, or dispatch
+Commands.
+
 ### Binding Snapshot
 
 An immutable runtime value created by a provider for one requirement.
@@ -336,9 +341,135 @@ frame.status('article');
 frame.issues('article');
 ```
 
-The current `BindingFrame` deliberately does not include provider scopes,
-subscriptions, active hierarchy traversal, schema adapters, command dispatch, or
-AppShell rendering. Those remain follow-on runtime layers.
+The `BindingFrame` deliberately does not include provider scopes, subscriptions,
+active hierarchy traversal, schema adapters, command dispatch, or AppShell
+rendering. Those remain separate runtime layers.
+
+### DX-034B Provider Scope Contracts
+
+DX-034B lands the explicit provider/scope contract layer in
+`@flyingrobots/bijou`.
+
+The public core now includes:
+
+- `DataProvider`
+- `DataProviderInput`
+- `ProviderScope`
+- `ProviderScopeEntry`
+- `ProviderScopeOptions`
+- `defineDataProvider()`
+- `provide()`
+- `providerScope()`
+- `isDataProvider()`
+- `ProviderResolution`
+- `ProviderResolutionStatus`
+- `resolveProviderRequirement()`
+- `resolveProviderRequirements()`
+- `BindingFrameAssembly`
+- `bindingFrameFromSnapshots()`
+- `ViewDataContract`
+- `ViewDataRequirementEntry`
+- `defineViewData()`
+
+This slice proves local provider availability and one-scope resolution, not
+hierarchical provider resolution or subscription lifecycle:
+
+```ts
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
+
+const readerData = defineViewData({
+  id: 'reader.data',
+  requirements: [{ name: 'article', requirement: article }],
+});
+
+const articleProvider = defineDataProvider({
+  id: 'docs.articleProvider',
+  resource: article.resource,
+});
+
+const providers = providerScope([provide(articleProvider)], {
+  id: 'docs.appShell',
+});
+
+providers.has(article.resource);
+providers.get(article.resource);
+providers.resources();
+
+const resolution = resolveProviderRequirement(article, providers);
+resolution.status;
+
+const assembled = bindingFrameFromSnapshots({
+  resolutions: [resolution],
+  snapshots: [
+    bindingSnapshot({
+      providerId: 'docs.articleProvider',
+      requirementId: 'article',
+      version: 1,
+      status: 'ready',
+      data: { title: 'DX-034' },
+    }),
+  ],
+});
+assembled.frame.require('article');
+```
+
+`ProviderScope` rejects duplicate resources and duplicate provider ids inside a
+single scope. It also rejects loose provider-shaped objects, so importing a
+module cannot silently register a provider or bypass the constructor contract.
+`ViewDataContract` names the data a view needs before any provider binding
+occurs.
+Resolution results are frozen metadata. Missing required providers become
+deterministic issues; missing optional providers are inspectable but not errors.
+Frame assembly reports missing or provider-mismatched snapshots as deterministic
+issues while keeping provider reads outside the render frame.
+
+### DX-034C AppShell Composition Contract
+
+DX-034C lands the first structural AppShell composition contract in
+`@flyingrobots/bijou`.
+
+The public core now includes:
+
+- `AppShellComposition`
+- `AppShellCompositionInput`
+- `AppShellSlot`
+- `AppShellSlotContent`
+- `AppShellSlotId`
+- `AppShellSlots`
+- `defineAppShellComposition()`
+- `isAppShellComposition()`
+
+This slice proves semantic shell slots and inspectability. It still does not
+render AppShell, resolve hierarchical provider scopes, subscribe, refresh, walk
+the active hierarchy, or dispatch commands:
+
+```ts
+const docsShell = defineAppShellComposition({
+  id: 'docs.shell',
+  providers,
+  slots: {
+    navigation: navigationBlock,
+    content: readerSurfaceBlock,
+    inspector: inspectorPanelBlock,
+  },
+});
+
+docsShell.slotIds();
+docsShell.slot('content');
+docsShell.dataContracts();
+docsShell.commandIntents();
+docsShell.providerScope();
+```
+
+Slots are logical regions: `navigation`, `content`, `inspector`, `status`, and
+`overlays`. Physical slots such as `leftNav` are rejected at construction time.
+Slot content must be a block returned by `defineBlock()` or nested arrays of
+such blocks. The composition exposes the nested blocks' declared view data
+contracts and command intents for tooling without adding provider handles or
+render-time mutation paths.
 
 ### 5. User Input Emits Commands
 
@@ -380,9 +511,9 @@ stories:
 ```ts
 const app = appShell({
   providers: providerScope([
-    provide(articleResource, articleProvider),
-    provide(selectionResource, selectionProvider),
-    provide(commandLogResource, commandLogProvider),
+    provide(articleProvider),
+    provide(selectionProvider),
+    provide(commandLogProvider),
   ]),
   slots: {
     navigation: navigationBlock(),
@@ -540,16 +671,20 @@ flow.
    declarative, and immutable at the primitive layer.
 3. Done: add pure runtime primitives for immutable binding snapshots and
    binding frames.
-4. Next: define provider and provider-scope contracts without global
+4. Done: define provider and provider-scope contracts without global
    registration.
-5. Next: add provider-scope resolution.
-6. Next: add active-view binding collection over the existing view-stack model.
-7. Next: add invalidation flow from provider snapshot updates to view re-render.
-8. Next: add Command intent dispatch proof.
-9. Next: integrate the contract with DX-031 block definitions.
-10. Next: prove AppShell with nested provider-bound navigation, content, inspector,
+5. Done: add one-scope provider resolution.
+6. Done: assemble immutable binding frames from resolved snapshots.
+7. Done: declare view data contracts.
+8. Done: integrate view data and command contracts with DX-031 block definitions.
+9. Done: add a structural AppShell composition contract for semantic slots,
+   explicit provider scopes, and nested block data/command introspection.
+10. Next: add active-view binding collection over the existing view-stack model.
+11. Next: add invalidation flow from provider snapshot updates to view re-render.
+12. Next: add Command intent dispatch proof.
+13. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
-11. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+14. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First
@@ -558,6 +693,8 @@ flow.
   provider handles.
 - Behavioral tests proving binding snapshots are immutable and versioned.
 - Behavioral tests proving command intents are metadata, not callbacks.
+- Behavioral tests proving provider scopes are explicit local registries without
+  hidden globals.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -610,3 +747,8 @@ DX-034A landed the primitive contract layer first. The important restraint is
 that `BindingFrame` is not a provider scope, subscription manager, active-view
 resolver, schema adapter, or AppShell slot model. It is only the immutable data
 frame views can read during render.
+
+DX-034B then landed explicit provider/scope metadata. The restraint remains the
+same: `ProviderScope` says which providers are locally available, but it still
+does not perform nearest-scope resolution, subscribe to backing sources,
+invalidate views, or dispatch Commands.

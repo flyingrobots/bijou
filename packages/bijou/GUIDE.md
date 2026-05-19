@@ -116,7 +116,18 @@ Use `defineBlock()` when a reusable app-level composition needs stable metadata
 that tools can inspect before rendering:
 
 ```typescript
-import { defineBlock, defineBlockPackage } from '@flyingrobots/bijou';
+import {
+  commandIntent,
+  defineBlock,
+  defineBlockPackage,
+  defineDataRequirement,
+  defineViewData,
+} from '@flyingrobots/bijou';
+
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
 
 export const readerSurfaceBlock = defineBlock({
   metadata: {
@@ -134,6 +145,11 @@ export const readerSurfaceBlock = defineBlock({
     composedComponents: ['markdown', 'viewportSurface'],
     storyIds: ['reader-surface/docs-reader'],
   },
+  data: defineViewData({
+    id: 'reader.data',
+    requirements: [{ name: 'article', requirement: article }],
+  }),
+  commands: [commandIntent<{ articleId: string }>('reader.openArticle')],
   render: ({ slots }) => ({ output: slots?.content ?? '' }),
 });
 
@@ -147,7 +163,48 @@ export const docsBlocks = defineBlockPackage({
 
 Blocks are explicit imports, not runtime plugins. `BlockMetadata` and
 `BlockPackageManifest` are intended for docs, DOGFOOD, MCP payloads, and package
-compatibility checks; schema-bound blocks are still a follow-on layer.
+compatibility checks. `data` and `commands` are inspectable contracts, not
+runtime provider handles or command callbacks. Schema-bound blocks are still a
+follow-on layer.
+
+## AppShell Composition
+
+Use `defineAppShellComposition()` to describe logical shell slots before
+AppShell rendering, provider resolution, or subscription lifecycle is
+introduced:
+
+```typescript
+import {
+  defineAppShellComposition,
+  defineDataProvider,
+  provide,
+  providerScope,
+} from '@flyingrobots/bijou';
+
+const providers = providerScope([
+  provide(defineDataProvider({
+    id: 'docs.articleProvider',
+    resource: article.resource,
+  })),
+], { id: 'docs.shell.providers' });
+
+export const docsShell = defineAppShellComposition({
+  id: 'docs.shell',
+  providers,
+  slots: {
+    content: readerSurfaceBlock,
+  },
+});
+
+docsShell.slot('content');
+docsShell.dataContracts();
+docsShell.commandIntents();
+```
+
+AppShell composition slots are structural. They group runtime-backed block
+definitions by semantic region, expose nested data and command contracts for
+tooling, and keep provider scopes explicit. They do not render, refresh,
+subscribe, dispatch commands, or walk the active view hierarchy.
 
 ## Binding Frames
 
@@ -157,19 +214,36 @@ receiving a provider handle:
 ```typescript
 import {
   bindingFrame,
+  bindingFrameFromSnapshots,
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
+  defineDataProvider,
+  defineViewData,
+  provide,
+  providerScope,
+  resolveProviderRequirement,
 } from '@flyingrobots/bijou';
 
 const article = defineDataRequirement({
   id: 'article',
   resource: 'docs.article',
 });
+const articleProvider = defineDataProvider({
+  id: 'docs.articleProvider',
+  resource: article.resource,
+});
+const providers = providerScope([provide(articleProvider)], {
+  id: 'docs.appShell',
+});
+const readerData = defineViewData({
+  id: 'reader.data',
+  requirements: [{ name: 'article', requirement: article }],
+});
 
 const frame = bindingFrame([
   bindingSnapshot({
-    providerId: 'docs.articleProvider',
+    providerId: articleProvider.id,
     requirementId: article.id,
     version: 1,
     status: 'ready',
@@ -178,15 +252,41 @@ const frame = bindingFrame([
 ]);
 
 const openArticle = commandIntent<{ articleId: string }>('docs.openArticle');
+const resolution = resolveProviderRequirement(article, providers);
+const assembled = bindingFrameFromSnapshots({
+  resolutions: [resolution],
+  snapshots: [
+    bindingSnapshot({
+      providerId: articleProvider.id,
+      requirementId: article.id,
+      version: 1,
+      status: 'ready',
+      data: { title: 'DX-034' },
+    }),
+  ],
+});
 
 frame.require<{ title: string }>('article');
 frame.status('article');
+providers.has(article.resource);
+readerData.requirement('article');
+resolution.status;
+assembled.frame.status('article');
 openArticle.id;
 ```
 
-`BindingFrame` is only the immutable render-time data frame. Provider scopes,
-subscriptions, active-view lifecycle, schema adapters, and command dispatch
-remain runtime follow-on layers.
+`ProviderScope` is an explicit local registry of provider metadata. It does not
+subscribe, refresh, resolve active views, dispatch commands, or register globals.
+`ViewDataContract` groups named requirements before any provider binding occurs.
+`resolveProviderRequirement()` resolves against exactly the scope it receives and
+returns frozen metadata for tooling and runtime handoff; it still does not fetch,
+subscribe, or walk a view hierarchy.
+`bindingFrameFromSnapshots()` assembles a render frame from resolved provider
+metadata and already-created snapshots; provider reads remain outside this
+contract.
+`BindingFrame` is only the immutable render-time data frame. Provider
+resolution hierarchy, subscriptions, active-view lifecycle, schema adapters, and
+command dispatch remain runtime follow-on layers.
 
 Snapshot data is copied before it is frozen. Use inert plain snapshot data:
 null, strings, numbers, booleans, arrays, and enumerable string-keyed plain

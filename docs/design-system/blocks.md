@@ -60,6 +60,10 @@ Bijou now exposes a metadata-first block authoring contract from
   peer range, docs, and tags for ordinary NPM distribution.
 - `defineBlock()` and `defineBlockPackage()` validate definitions before
   authors publish or index them.
+- `defineBlock()` can attach DX-034 view data contracts and command intents for
+  discovery without provider handles or command callbacks.
+- `defineAppShellComposition()` groups runtime-backed blocks into logical
+  navigation, content, inspector, status, and overlay slots without rendering.
 - `validateBlockMetadata()`, `blockMetadataSummary()`, and report helpers give
   tests, docs, DOGFOOD, MCP payloads, and agents a deterministic way to inspect
   block facts without rendering a terminal surface.

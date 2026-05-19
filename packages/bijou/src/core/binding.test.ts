@@ -2,10 +2,17 @@ import { describe, expect, it } from 'vitest';
 import {
   BindingFrame,
   bindingFrame,
+  bindingFrameFromSnapshots,
   bindingSnapshot,
   commandIntent,
   defineDataRequirement,
+  defineDataProvider,
+  defineViewData,
   isBindingSnapshot,
+  provide,
+  providerScope,
+  resolveProviderRequirement,
+  resolveProviderRequirements,
   type BindingIssue,
   type BindingStatus,
 } from './binding.js';
@@ -349,5 +356,351 @@ describe('binding primitives', () => {
     expect('execute' in intent).toBe(false);
     expect('handler' in intent).toBe(false);
     expect('dispatch' in intent).toBe(false);
+  });
+
+  it('defines inspectable providers and explicit provider scopes without runtime handles', () => {
+    const articleProvider = defineDataProvider({
+      id: ' docs.articleProvider ',
+      resource: ' docs.article ',
+      label: 'Articles',
+      facts: [{ kind: 'entity', key: 'provider', value: 'docs.articleProvider' }],
+    });
+    const scope = providerScope([provide(articleProvider)], {
+      id: ' appShell.providers ',
+      label: 'App shell providers',
+      facts: [{ kind: 'entity', key: 'scope', value: 'appShell.providers' }],
+    });
+
+    expect(articleProvider.id).toBe('docs.articleProvider');
+    expect(articleProvider.resource).toBe('docs.article');
+    expect(Object.isFrozen(articleProvider)).toBe(true);
+    expect(Object.isFrozen(articleProvider.facts)).toBe(true);
+    expect(scope.id).toBe('appShell.providers');
+    expect(scope.label).toBe('App shell providers');
+    expect(scope.resources()).toEqual(['docs.article']);
+    expect(scope.providerIds()).toEqual(['docs.articleProvider']);
+    expect(scope.providers()).toEqual([articleProvider]);
+    expect(scope.facts).toEqual([
+      { kind: 'entity', key: 'scope', value: 'appShell.providers' },
+    ]);
+    expect(scope.has(' docs.article ')).toBe(true);
+    expect(scope.get('docs.article')).toBe(articleProvider);
+    expect(Object.isFrozen(scope)).toBe(true);
+    expect(Object.isFrozen(scope.resources())).toBe(true);
+    expect(Object.isFrozen(scope.providers())).toBe(true);
+    expect(Object.isFrozen(scope.providerIds())).toBe(true);
+    expect(Object.isFrozen(scope.facts)).toBe(true);
+    expect('refresh' in articleProvider).toBe(false);
+    expect('subscribe' in articleProvider).toBe(false);
+    expect('snapshot' in articleProvider).toBe(false);
+    expect('dispatch' in scope).toBe(false);
+  });
+
+  it('keeps provider scopes local and rejects ambiguous or loose provider entries', () => {
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article',
+    });
+    const replacementArticleProvider = defineDataProvider({
+      id: 'docs.replacementArticleProvider',
+      resource: 'docs.article',
+    });
+    const duplicateIdProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article.v2',
+    });
+    const selectionProvider = defineDataProvider({
+      id: 'docs.selectionProvider',
+      resource: 'docs.selection',
+    });
+    const articleScope = providerScope([provide(articleProvider)]);
+    const selectionScope = providerScope([provide(selectionProvider)]);
+
+    expect(articleScope.has('docs.article')).toBe(true);
+    expect(articleScope.has('docs.selection')).toBe(false);
+    expect(selectionScope.has('docs.selection')).toBe(true);
+    expect(selectionScope.has('docs.article')).toBe(false);
+    expect(() => providerScope([
+      provide(articleProvider),
+      provide(replacementArticleProvider),
+    ])).toThrow('provider scope: duplicate resource docs.article');
+    expect(() => providerScope([
+      provide(articleProvider),
+      provide(duplicateIdProvider),
+    ])).toThrow('provider scope: duplicate provider id docs.articleProvider');
+    expect(() => provide({
+      id: 'docs.looseProvider',
+      resource: 'docs.article',
+      facts: [],
+    } as never)).toThrow('provider scope: provider was not created by defineDataProvider()');
+    expect(() => providerScope([{
+      resource: articleProvider.resource,
+      provider: articleProvider,
+    } as never])).toThrow('provider scope: entry at index 0 was not created by provide()');
+  });
+
+  it('resolves data requirements against an explicit provider scope', () => {
+    const article = defineDataRequirement({
+      id: ' article ',
+      resource: ' docs.article ',
+    });
+    const comments = defineDataRequirement({
+      id: 'comments',
+      resource: 'docs.comments',
+      optional: true,
+    });
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article',
+    });
+    const scope = providerScope([provide(articleProvider)], { id: 'docs.appShell' });
+    const resolved = resolveProviderRequirement(article, scope);
+    const optionalMissing = resolveProviderRequirement(comments, scope);
+    const all = resolveProviderRequirements([article, comments], scope);
+
+    expect(resolved.status).toBe('resolved');
+    expect(resolved.requirementId).toBe('article');
+    expect(resolved.resource).toBe('docs.article');
+    expect(resolved.providerId).toBe('docs.articleProvider');
+    expect(resolved.scopeId).toBe('docs.appShell');
+    expect(resolved.issues).toEqual([]);
+    expect(Object.isFrozen(resolved)).toBe(true);
+    expect(Object.isFrozen(resolved.issues)).toBe(true);
+    expect(optionalMissing.status).toBe('missing-optional');
+    expect(optionalMissing.providerId).toBeUndefined();
+    expect(optionalMissing.issues).toEqual([]);
+    expect(all.map((resolution) => resolution.status)).toEqual(['resolved', 'missing-optional']);
+    expect(Object.isFrozen(all)).toBe(true);
+    expect('refresh' in resolved).toBe(false);
+    expect('subscribe' in resolved).toBe(false);
+    expect('snapshot' in resolved).toBe(false);
+  });
+
+  it('reports required provider misses as immutable resolution issues', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const scope = providerScope([], { id: 'empty' });
+    const missing = resolveProviderRequirement(article, scope);
+
+    expect(missing.status).toBe('missing-required');
+    expect(missing.providerId).toBeUndefined();
+    expect(missing.issues).toEqual([
+      {
+        severity: 'error',
+        code: 'provider.missing',
+        message: 'No provider in scope empty satisfies resource docs.article',
+        path: 'article',
+      },
+    ]);
+    expect(Object.isFrozen(missing.issues)).toBe(true);
+    expect(() => {
+      (missing.issues as BindingIssue[]).push({
+        severity: 'error',
+        code: 'mutated',
+        message: 'mutated',
+      });
+    }).toThrow(TypeError);
+    expect(() => resolveProviderRequirement({
+      id: 'article',
+      resource: 'docs.article',
+      facts: [],
+    } as never, scope)).toThrow(
+      'provider resolution: requirement was not created by defineDataRequirement()',
+    );
+  });
+
+  it('assembles binding frames from resolved provider snapshots', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const comments = defineDataRequirement({
+      id: 'comments',
+      resource: 'docs.comments',
+    });
+    const outline = defineDataRequirement({
+      id: 'outline',
+      resource: 'docs.outline',
+      optional: true,
+    });
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article',
+    });
+    const commentsProvider = defineDataProvider({
+      id: 'docs.commentsProvider',
+      resource: 'docs.comments',
+    });
+    const scope = providerScope([
+      provide(articleProvider),
+      provide(commentsProvider),
+    ]);
+    const resolutions = resolveProviderRequirements([article, comments, outline], scope);
+    const assembled = bindingFrameFromSnapshots({
+      resolutions,
+      snapshots: [
+        bindingSnapshot({
+          providerId: 'docs.articleProvider',
+          requirementId: 'article',
+          version: 1,
+          status: 'ready',
+          data: { title: 'DX-034' },
+        }),
+      ],
+    });
+
+    expect(assembled.frame.require<{ title: string }>('article')).toEqual({ title: 'DX-034' });
+    expect(assembled.issues).toEqual([
+      {
+        severity: 'error',
+        code: 'snapshot.missing',
+        message: 'No snapshot supplied for resolved requirement comments',
+        path: 'comments',
+      },
+    ]);
+    expect(assembled.facts).toEqual([]);
+    expect(Object.isFrozen(assembled)).toBe(true);
+    expect(Object.isFrozen(assembled.issues)).toBe(true);
+    expect('provider' in assembled).toBe(false);
+    expect('refresh' in assembled).toBe(false);
+    expect('subscribe' in assembled).toBe(false);
+  });
+
+  it('rejects snapshots that do not match resolved provider metadata', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: 'docs.article',
+    });
+    const scope = providerScope([provide(articleProvider)]);
+    const resolutions = resolveProviderRequirements([article], scope);
+    const wrongProvider = bindingFrameFromSnapshots({
+      resolutions,
+      snapshots: [
+        bindingSnapshot({
+          providerId: 'docs.otherProvider',
+          requirementId: 'article',
+          version: 1,
+          status: 'ready',
+          data: { title: 'Wrong provider' },
+        }),
+      ],
+    });
+
+    expect(wrongProvider.frame.get('article')).toBeUndefined();
+    expect(wrongProvider.issues).toEqual([
+      {
+        severity: 'error',
+        code: 'snapshot.provider-mismatch',
+        message: 'Snapshot for requirement article came from provider docs.otherProvider; expected docs.articleProvider',
+        path: 'article',
+      },
+    ]);
+    expect(() => bindingFrameFromSnapshots({
+      resolutions,
+      snapshots: [
+        bindingSnapshot({
+          providerId: 'docs.articleProvider',
+          requirementId: 'unknown',
+          version: 1,
+          status: 'ready',
+          data: { title: 'Unknown' },
+        }),
+      ],
+    })).toThrow('binding frame assembly: snapshot requirement unknown was not resolved');
+    expect(() => bindingFrameFromSnapshots({
+      resolutions: [{
+        requirementId: 'article',
+        resource: 'docs.article',
+        optional: false,
+        status: 'resolved',
+        providerId: 'docs.articleProvider',
+        issues: [],
+        facts: [],
+      } as never],
+      snapshots: [],
+    })).toThrow('binding frame assembly: resolution at index 0 was not created by resolveProviderRequirement()');
+  });
+
+  it('defines immutable named view data contracts without provider handles', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const outline = defineDataRequirement({
+      id: 'outline',
+      resource: 'docs.outline',
+      optional: true,
+    });
+    const data = defineViewData({
+      id: ' reader.data ',
+      requirements: [
+        { name: ' article ', requirement: article },
+        { name: 'outline', requirement: outline },
+      ],
+      facts: [{ kind: 'entity', key: 'viewData', value: 'reader.data' }],
+    });
+
+    expect(data.id).toBe('reader.data');
+    expect(data.names()).toEqual(['article', 'outline']);
+    expect(data.requirementIds()).toEqual(['article', 'outline']);
+    expect(data.requirement(' article ')).toBe(article);
+    expect(data.requirement('outline')).toBe(outline);
+    expect(data.entry('article')).toEqual({
+      name: 'article',
+      requirement: article,
+    });
+    expect(Object.isFrozen(data)).toBe(true);
+    expect(Object.isFrozen(data.names())).toBe(true);
+    expect(Object.isFrozen(data.requirements())).toBe(true);
+    expect(Object.isFrozen(data.facts)).toBe(true);
+    expect('provider' in data).toBe(false);
+    expect('refresh' in data).toBe(false);
+    expect('subscribe' in data).toBe(false);
+  });
+
+  it('rejects ambiguous or loose view data requirements', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const articleAgain = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article.v2',
+    });
+    const comments = defineDataRequirement({
+      id: 'comments',
+      resource: 'docs.comments',
+    });
+
+    expect(() => defineViewData({
+      requirements: [
+        { name: 'content', requirement: article },
+        { name: 'content', requirement: comments },
+      ],
+    })).toThrow('view data: duplicate requirement name content');
+    expect(() => defineViewData({
+      requirements: [
+        { name: 'article', requirement: article },
+        { name: 'articleAgain', requirement: articleAgain },
+      ],
+    })).toThrow('view data: duplicate requirement id article');
+    expect(() => defineViewData({
+      requirements: [
+        {
+          name: 'article',
+          requirement: {
+            id: 'article',
+            resource: 'docs.article',
+            facts: [],
+          } as never,
+        },
+      ],
+    })).toThrow('view data: requirement article was not created by defineDataRequirement()');
   });
 });

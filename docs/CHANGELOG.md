@@ -10,21 +10,38 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Binding frame primitives for `bijou`** — `@flyingrobots/bijou` now exports
   `DataRequirement`, `BindingSnapshot`, `BindingFrame`, `BindingStatus`,
-  `BindingIssue`, `BindingFact`, `CommandIntent`, and helper constructors for
-  the first DX-034 runtime-truth slice. Snapshots normalize provider and
-  requirement ids, copy and freeze inert plain snapshot data without freezing
-  caller objects, reject mutable built-ins, executable values, and hidden
-  property channels, carry versioned ready/loading/empty/stale/error status, and
-  bind into immutable frames with `require()`, `get()`, `status()`, `issues()`,
-  and `facts()` accessors. Command intents are inspectable metadata only;
-  provider scopes, subscriptions, active hierarchy traversal, schema adapters,
-  and AppShell rendering remain follow-on work.
+  `BindingIssue`, `BindingFact`, `DataProvider`, `ProviderScope`,
+  `ProviderScopeEntry`, `CommandIntent`, and helper constructors for the first
+  DX-034 runtime-truth slices. Snapshots normalize provider and requirement ids,
+  copy and freeze inert plain snapshot data without freezing caller objects,
+  reject mutable built-ins, executable values, and hidden property channels,
+  carry versioned ready/loading/empty/stale/error status, and bind into
+  immutable frames with `require()`, `get()`, `status()`, `issues()`, and
+  `facts()` accessors. Provider scopes are explicit local registries built with
+  `defineDataProvider()`, `provide()`, and `providerScope()`; they reject
+  duplicate resources and provider ids without registering globals.
+  `resolveProviderRequirement()` and `resolveProviderRequirements()` turn a
+  requirement plus an explicit scope into frozen resolution metadata, including
+  deterministic required-provider-missing issues. `bindingFrameFromSnapshots()`
+  assembles immutable render frames from resolved provider metadata and supplied
+  snapshots, reporting missing or provider-mismatched snapshots as deterministic
+  issues without exposing provider handles. `defineViewData()` declares frozen
+  named view data contracts so blocks/views can expose required resources before
+  binding to providers. Command intents are inspectable metadata only.
+  `defineAppShellComposition()` adds the first structural AppShell composition
+  contract: semantic navigation/content/inspector/status/overlays slots can hold
+  runtime-backed block definitions, attach an explicit provider scope, and expose
+  nested view data contracts and command intents without rendering, subscribing,
+  refreshing, or walking the active hierarchy. Subscriptions, active hierarchy
+  traversal, hierarchical provider resolution, schema adapters, and AppShell
+  rendering remain follow-on work.
 - **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so
   reusable block packages can declare slots, variants, config, mode support,
-  composed components, semantic facts, stories, docs, tags, and Bijou peer
-  compatibility without hidden global registration. This lands the first
+  composed components, semantic facts, stories, docs, tags, DX-034 view data
+  contracts, command intents, and Bijou peer compatibility without hidden global
+  registration. This lands the first
   metadata-only DX-031 slice; schema-bound blocks and the rendered standard
   block catalog remain follow-on work.
 - **Standalone Storybook workbench** — `npm run storybook` now launches a

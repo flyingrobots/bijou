@@ -1,5 +1,13 @@
 import type { OutputMode } from './detect/tty.js';
 import type { ModeLoweringFact } from './mode-lowering.js';
+import {
+  isCommandIntent,
+  isViewDataContract,
+  type CommandIntent,
+  type ViewDataContract,
+} from './binding.js';
+
+const BLOCK_DEFINITION_BRAND: unique symbol = Symbol('BlockDefinition');
 
 export type BlockScale =
   | 'app'
@@ -85,9 +93,16 @@ export interface BlockRenderResult<Output = unknown> {
   readonly facts?: readonly ModeLoweringFact[];
 }
 
-export interface BlockDefinition<Config = unknown, Output = unknown> {
+export interface BlockDefinitionInput<Config = unknown, Output = unknown> {
   readonly metadata: BlockMetadata;
+  readonly data?: ViewDataContract;
+  readonly commands?: readonly CommandIntent[];
   readonly render: (input: BlockRenderInput<Config>) => BlockRenderResult<Output>;
+}
+
+export interface BlockDefinition<Config = unknown, Output = unknown>
+  extends BlockDefinitionInput<Config, Output> {
+  readonly [BLOCK_DEFINITION_BRAND]: true;
 }
 
 export interface BlockPackageManifest {
@@ -154,7 +169,7 @@ const LIST_SEPARATOR = ',';
 const EMPTY_LABEL = '-';
 
 export function defineBlock<Config = unknown, Output = unknown>(
-  definition: BlockDefinition<Config, Output>,
+  definition: BlockDefinitionInput<Config, Output>,
 ): BlockDefinition<Config, Output> {
   const report = validateBlockMetadata(definition.metadata);
   const hasError = report.issues.some((issue) => issue.severity === 'error');
@@ -162,7 +177,32 @@ export function defineBlock<Config = unknown, Output = unknown>(
     throw new Error(blockMetadataReportText(report));
   }
 
-  return definition;
+  if (definition.data !== undefined && !isViewDataContract(definition.data)) {
+    throw new Error('block definition: data must be created by defineViewData()');
+  }
+
+  const commands = definition.commands ?? [];
+  commands.forEach((command, index) => {
+    if (!isCommandIntent(command)) {
+      throw new Error(`block definition: command at index ${index} must be created by commandIntent()`);
+    }
+  });
+
+  const block = {
+    ...definition,
+    ...(definition.commands === undefined ? {} : { commands: Object.freeze([...commands]) }),
+  } as BlockDefinition<Config, Output>;
+
+  Object.defineProperty(block, BLOCK_DEFINITION_BRAND, { value: true });
+  return Object.freeze(block);
+}
+
+export function isBlockDefinition(value: unknown): value is BlockDefinition {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as BlockDefinitionBrandCarrier)[BLOCK_DEFINITION_BRAND] === true,
+  );
 }
 
 export function defineBlockPackage(manifest: BlockPackageManifest): BlockPackageManifest {
@@ -173,6 +213,10 @@ export function defineBlockPackage(manifest: BlockPackageManifest): BlockPackage
   }
 
   return manifest;
+}
+
+interface BlockDefinitionBrandCarrier {
+  readonly [BLOCK_DEFINITION_BRAND]?: true;
 }
 
 export function validateBlockMetadata(metadata: BlockMetadata): BlockMetadataReport {
