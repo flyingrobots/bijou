@@ -144,6 +144,27 @@ export {
   type ViewDataRequirementEntry,
 } from './core/binding.js';
 export {
+  activateBinding,
+  bindingLifecycleRecord,
+  defineBindingLifecycleOwner,
+  disposeBinding,
+  invalidateBinding,
+  isBindingLifecycleOwner,
+  isBindingLifecycleRecord,
+  suspendBinding,
+  type BindingInvalidation,
+  type BindingInvalidationInput,
+  type BindingInvalidationReason,
+  type BindingLifecycleOwner,
+  type BindingLifecycleOwnerInput,
+  type BindingLifecycleOwnerKind,
+  type BindingLifecycleRecord,
+  type BindingLifecycleRecordInput,
+  type BindingLifecycleState,
+  type BindingLifecycleTransition,
+  type BindingLifecycleTransitionReason,
+} from './core/binding-lifecycle.js';
+export {
   AppShellComposition,
   defineAppShellComposition,
   isAppShellComposition,
