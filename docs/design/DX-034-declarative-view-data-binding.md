@@ -426,6 +426,51 @@ deterministic issues; missing optional providers are inspectable but not errors.
 Frame assembly reports missing or provider-mismatched snapshots as deterministic
 issues while keeping provider reads outside the render frame.
 
+### DX-034C AppShell Composition Contract
+
+DX-034C lands the first structural AppShell composition contract in
+`@flyingrobots/bijou`.
+
+The public core now includes:
+
+- `AppShellComposition`
+- `AppShellCompositionInput`
+- `AppShellSlot`
+- `AppShellSlotContent`
+- `AppShellSlotId`
+- `AppShellSlots`
+- `defineAppShellComposition()`
+- `isAppShellComposition()`
+
+This slice proves semantic shell slots and inspectability. It still does not
+render AppShell, resolve hierarchical provider scopes, subscribe, refresh, walk
+the active hierarchy, or dispatch commands:
+
+```ts
+const docsShell = defineAppShellComposition({
+  id: 'docs.shell',
+  providers,
+  slots: {
+    navigation: navigationBlock,
+    content: readerSurfaceBlock,
+    inspector: inspectorPanelBlock,
+  },
+});
+
+docsShell.slotIds();
+docsShell.slot('content');
+docsShell.dataContracts();
+docsShell.commandIntents();
+docsShell.providerScope();
+```
+
+Slots are logical regions: `navigation`, `content`, `inspector`, `status`, and
+`overlays`. Physical slots such as `leftNav` are rejected at construction time.
+Slot content must be a block returned by `defineBlock()` or nested arrays of
+such blocks. The composition exposes the nested blocks' declared view data
+contracts and command intents for tooling without adding provider handles or
+render-time mutation paths.
+
 ### 5. User Input Emits Commands
 
 Views communicate user intent through Commands:
@@ -632,12 +677,14 @@ flow.
 6. Done: assemble immutable binding frames from resolved snapshots.
 7. Done: declare view data contracts.
 8. Done: integrate view data and command contracts with DX-031 block definitions.
-9. Next: add active-view binding collection over the existing view-stack model.
-10. Next: add invalidation flow from provider snapshot updates to view re-render.
-11. Next: add Command intent dispatch proof.
-12. Next: prove AppShell with nested provider-bound navigation, content, inspector,
+9. Done: add a structural AppShell composition contract for semantic slots,
+   explicit provider scopes, and nested block data/command introspection.
+10. Next: add active-view binding collection over the existing view-stack model.
+11. Next: add invalidation flow from provider snapshot updates to view re-render.
+12. Next: add Command intent dispatch proof.
+13. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
-13. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+14. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First

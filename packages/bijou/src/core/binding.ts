@@ -5,6 +5,7 @@ const DATA_PROVIDER_BRAND: unique symbol = Symbol('DataProvider');
 const VIEW_DATA_CONTRACT_BRAND: unique symbol = Symbol('ViewDataContract');
 const BINDING_SNAPSHOT_BRAND: unique symbol = Symbol('BindingSnapshot');
 const PROVIDER_SCOPE_ENTRY_BRAND: unique symbol = Symbol('ProviderScopeEntry');
+const PROVIDER_SCOPE_BRAND: unique symbol = Symbol('ProviderScope');
 const PROVIDER_RESOLUTION_BRAND: unique symbol = Symbol('ProviderResolution');
 const COMMAND_INTENT_BRAND: unique symbol = Symbol('CommandIntent');
 const COMMAND_INTENT_PAYLOAD: unique symbol = Symbol('CommandIntentPayload');
@@ -248,6 +249,7 @@ export class ViewDataContract {
 }
 
 export class ProviderScope {
+  readonly [PROVIDER_SCOPE_BRAND] = true;
   readonly #providersByResource: ReadonlyMap<string, DataProvider>;
   readonly #providersById: ReadonlyMap<ProviderId, DataProvider>;
   readonly id?: string;
@@ -679,6 +681,14 @@ export function isDataProvider(value: unknown): value is DataProvider {
   );
 }
 
+export function isProviderScope(value: unknown): value is ProviderScope {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as ProviderScopeBrandCarrier)[PROVIDER_SCOPE_BRAND] === true,
+  );
+}
+
 export function isCommandIntent(value: unknown): value is CommandIntent {
   return Boolean(
     value
@@ -721,6 +731,10 @@ interface DataProviderBrandCarrier {
 
 interface ProviderScopeEntryBrandCarrier {
   readonly [PROVIDER_SCOPE_ENTRY_BRAND]?: true;
+}
+
+interface ProviderScopeBrandCarrier {
+  readonly [PROVIDER_SCOPE_BRAND]?: true;
 }
 
 interface ProviderResolutionBrandCarrier {

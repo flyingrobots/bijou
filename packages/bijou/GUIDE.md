@@ -167,6 +167,45 @@ compatibility checks. `data` and `commands` are inspectable contracts, not
 runtime provider handles or command callbacks. Schema-bound blocks are still a
 follow-on layer.
 
+## AppShell Composition
+
+Use `defineAppShellComposition()` to describe logical shell slots before
+AppShell rendering, provider resolution, or subscription lifecycle is
+introduced:
+
+```typescript
+import {
+  defineAppShellComposition,
+  defineDataProvider,
+  provide,
+  providerScope,
+} from '@flyingrobots/bijou';
+
+const providers = providerScope([
+  provide(defineDataProvider({
+    id: 'docs.articleProvider',
+    resource: article.resource,
+  })),
+], { id: 'docs.shell.providers' });
+
+export const docsShell = defineAppShellComposition({
+  id: 'docs.shell',
+  providers,
+  slots: {
+    content: readerSurfaceBlock,
+  },
+});
+
+docsShell.slot('content');
+docsShell.dataContracts();
+docsShell.commandIntents();
+```
+
+AppShell composition slots are structural. They group runtime-backed block
+definitions by semantic region, expose nested data and command contracts for
+tooling, and keep provider scopes explicit. They do not render, refresh,
+subscribe, dispatch commands, or walk the active view hierarchy.
+
 ## Binding Frames
 
 Use binding primitives when a view should render provider-delivered data without

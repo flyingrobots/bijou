@@ -99,6 +99,9 @@ fake duplication rather than a real second API.
   Bijou peer compatibility for ordinary NPM block packages.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
   payloads, and agent-facing reports.
+- **`defineAppShellComposition()`**: Compose runtime-backed blocks into logical
+  AppShell slots with an explicit provider scope, without rendering or
+  subscribing.
 - **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
   Declare data requirements and explicit local provider availability without
   hidden global registration.

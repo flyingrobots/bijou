@@ -3107,16 +3107,18 @@ blocks.
    hardening rendered AppShell APIs.
 5. Done: attach DX-034 view data contracts and command intents to block
    definitions for discovery.
-6. Next: add `defineSchemaBlock()` and a Zod schema adapter.
-7. Next: add block stories for `AppShell`, `ReaderSurface`, and
+6. Done: add a structural AppShell composition contract for logical block slots
+   and nested data/command introspection without rendering.
+7. Next: add `defineSchemaBlock()` and a Zod schema adapter.
+8. Next: add block stories for `AppShell`, `ReaderSurface`, and
    `InspectorPanel`.
-8. Next: capture interactive, static, pipe, and accessible outputs for the
+9. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-9. Next: prove the first three blocks in DOGFOOD before broadening the
+10. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-10. Next: add catalog-only variant/config metadata for later blocks without
+11. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-11. Continue to defer modal stacks, notifications, auth forms, animated
+12. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 
