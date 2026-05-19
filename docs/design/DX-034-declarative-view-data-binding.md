@@ -471,6 +471,112 @@ such blocks. The composition exposes the nested blocks' declared view data
 contracts and command intents for tooling without adding provider handles or
 render-time mutation paths.
 
+### DX-034D Active Binding Lifecycle
+
+DX-034D formalizes the active binding lifecycle before rendered AppShell or
+runtime provider subscriptions begin.
+
+Core invariant:
+
+```text
+Active hierarchy owns which bindings are active.
+Providers publish snapshots.
+Runtime assembles new frames.
+Views render frames.
+Commands leave views as intent.
+Business logic owns change.
+```
+
+This slice is design-only. It defines lifecycle ownership and vocabulary; it
+does not implement provider subscriptions, active hierarchy traversal, command
+dispatch, rendered AppShell, schema binding, cache retention, or DOGFOOD
+integration.
+
+#### Lifecycle Ownership
+
+The active view hierarchy owns binding lifetime.
+
+A data requirement becomes active when all of these are true:
+
+1. a block or view declares the requirement through an inspectable data contract
+2. that block or view is present in the active hierarchy
+3. the runtime resolves the requirement against an explicit provider scope
+4. the runtime creates binding ownership for that active view node
+
+Views never choose their own binding state. Views do not subscribe, refresh,
+dispose, retain cache, or mutate provider state. The runtime owns lifecycle
+transitions and provider subscription policy.
+
+#### Lifecycle Vocabulary
+
+Use the smallest useful lifecycle vocabulary first:
+
+- `active`: the requirement is owned by the active hierarchy; the runtime may
+  hold a provider subscription; provider snapshots can invalidate the current
+  frame.
+- `suspended`: the requirement is not currently rendering, but runtime/provider
+  policy may retain resumable state or cache. Views do not decide what is
+  retained.
+- `disposed`: the requirement ownership is released. The runtime no longer
+  expects provider updates for that view binding.
+
+Provider cache retention is provider/runtime policy, not view policy. DX-034D
+names lifecycle states but does not implement cache retention.
+
+#### Provider Subscription Ownership
+
+Provider subscriptions are runtime lifecycle. Binding frames are immutable
+render inputs.
+
+Providers may subscribe to channels, messages, queries, files, databases, MCP,
+or in-memory business state internally, but render receives only immutable
+snapshots assembled into a `BindingFrame`. A view never receives provider
+handles, subscription handles, refresh methods, mutable stores, or dispatcher
+callbacks.
+
+#### Provider Update Flow
+
+Provider updates do not mutate rendered views or existing frames.
+
+The lifecycle flow is:
+
+```text
+provider publishes snapshot
+  -> runtime records binding invalidation
+  -> runtime assembles next BindingFrame
+  -> active view renders the next frame
+```
+
+Invalidation belongs to runtime binding ownership, not to rendered cells. Static,
+pipe, and accessible modes must be able to observe lifecycle facts such as
+active, suspended, disposed, loading, stale, empty, error, and invalidated
+without parsing terminal output.
+
+#### Command Flow
+
+Commands leave views as intent records.
+
+Views may emit declared command intents, but they do not dispatch business
+logic, call provider methods, or mutate provider inputs. Runtime command
+integration receives command intent records and hands them to business logic.
+Business logic handles Commands, updates state or provider inputs, and providers
+eventually publish new snapshots.
+
+#### Active Lifecycle Questions
+
+DX-034D answers:
+
+- When does a requirement become active?
+- Who owns the binding while a view is active?
+- What happens when a view leaves the active hierarchy?
+- What is suspended versus disposed?
+- Who owns provider subscriptions?
+- How does a provider update become a new `BindingFrame`?
+- How do Commands leave views?
+- Who dispatches Commands to business logic?
+- What lifecycle facts are inspectable?
+- What lower-mode facts survive static, pipe, and accessible output?
+
 ### 5. User Input Emits Commands
 
 Views communicate user intent through Commands:
@@ -679,12 +785,14 @@ flow.
 8. Done: integrate view data and command contracts with DX-031 block definitions.
 9. Done: add a structural AppShell composition contract for semantic slots,
    explicit provider scopes, and nested block data/command introspection.
-10. Next: add active-view binding collection over the existing view-stack model.
-11. Next: add invalidation flow from provider snapshot updates to view re-render.
-12. Next: add Command intent dispatch proof.
-13. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
+10. Done: formalize the active binding lifecycle before runtime subscriptions
+   or rendered AppShell begin.
+11. Next: add active-view binding collection over the existing view-stack model.
+12. Next: add invalidation flow from provider snapshot updates to view re-render.
+13. Next: add Command intent dispatch proof.
+14. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
-14. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+15. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First
@@ -695,6 +803,9 @@ flow.
 - Behavioral tests proving command intents are metadata, not callbacks.
 - Behavioral tests proving provider scopes are explicit local registries without
   hidden globals.
+- Cycle tests proving the active hierarchy owns active binding lifetime,
+  provider subscriptions belong to runtime lifecycle, and binding frames remain
+  immutable render inputs.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -752,3 +863,12 @@ DX-034B then landed explicit provider/scope metadata. The restraint remains the
 same: `ProviderScope` says which providers are locally available, but it still
 does not perform nearest-scope resolution, subscribe to backing sources,
 invalidate views, or dispatch Commands.
+
+DX-034C landed structural AppShell composition. It proves semantic slots and
+nested block introspection, but still does not render AppShell or invent binding
+lifecycle policy.
+
+DX-034D formalized active binding lifecycle ownership before runtime code. The
+important restraint is that active hierarchy, provider subscriptions,
+invalidation, and command dispatch are runtime responsibilities; views still
+receive immutable frames and emit intent only.
