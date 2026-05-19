@@ -12,11 +12,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   exports lifecycle owners, immutable lifecycle records, deterministic
   `active`/`suspended`/`disposed` transitions, invalidation records, and
   lifecycle facts for the DX-034E transition-algebra slice. These are pure
-  contract/value-object primitives: runtime brand checks require own constructor
-  markers, rehydrated transition histories must remain contiguous, and provider
-  subscriptions, active hierarchy traversal, command dispatch, rendered
-  AppShell, schema binding, cache retention, and DOGFOOD integration remain
-  follow-on work.
+  contract/value-object primitives: provider subscriptions, active hierarchy
+  traversal, command dispatch, rendered AppShell, schema binding, cache
+  retention, and DOGFOOD integration remain follow-on work. Runtime brand checks
+  require own constructor markers, and rehydrated transition histories must
+  remain contiguous.
 - **Binding frame primitives for `bijou`** — `@flyingrobots/bijou` now exports
   `DataRequirement`, `BindingSnapshot`, `BindingFrame`, `BindingStatus`,
   `BindingIssue`, `BindingFact`, `DataProvider`, `ProviderScope`,
