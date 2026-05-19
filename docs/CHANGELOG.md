@@ -25,10 +25,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   deterministic required-provider-missing issues. `bindingFrameFromSnapshots()`
   assembles immutable render frames from resolved provider metadata and supplied
   snapshots, reporting missing or provider-mismatched snapshots as deterministic
-  issues without exposing provider handles. Command intents are inspectable
-  metadata only; subscriptions, active hierarchy traversal, hierarchical
-  provider resolution, schema adapters, and AppShell rendering remain follow-on
-  work.
+  issues without exposing provider handles. `defineViewData()` declares frozen
+  named view data contracts so blocks/views can expose required resources before
+  binding to providers. Command intents are inspectable metadata only;
+  subscriptions, active hierarchy traversal, hierarchical provider resolution,
+  schema adapters, and AppShell rendering remain follow-on work.
 - **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so

@@ -4,6 +4,7 @@ import {
   bindingSnapshot,
   defineDataProvider,
   defineDataRequirement,
+  defineViewData,
   provide,
   providerScope,
   resolveProviderRequirement,
@@ -81,5 +82,21 @@ describe('DX-034B provider scope contracts', () => {
     expect(assembled.issues).toEqual([]);
     expect('provider' in assembled.frame).toBe(false);
     expect('refresh' in assembled).toBe(false);
+  });
+
+  it('declares named view data requirements before provider binding', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const viewData = defineViewData({
+      id: 'reader.data',
+      requirements: [{ name: 'article', requirement: article }],
+    });
+
+    expect(viewData.names()).toEqual(['article']);
+    expect(viewData.requirement('article')).toBe(article);
+    expect('provider' in viewData).toBe(false);
+    expect('subscribe' in viewData).toBe(false);
   });
 });

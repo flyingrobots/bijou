@@ -162,6 +162,7 @@ import {
   commandIntent,
   defineDataRequirement,
   defineDataProvider,
+  defineViewData,
   provide,
   providerScope,
   resolveProviderRequirement,
@@ -177,6 +178,10 @@ const articleProvider = defineDataProvider({
 });
 const providers = providerScope([provide(articleProvider)], {
   id: 'docs.appShell',
+});
+const readerData = defineViewData({
+  id: 'reader.data',
+  requirements: [{ name: 'article', requirement: article }],
 });
 
 const frame = bindingFrame([
@@ -207,6 +212,7 @@ const assembled = bindingFrameFromSnapshots({
 frame.require<{ title: string }>('article');
 frame.status('article');
 providers.has(article.resource);
+readerData.requirement('article');
 resolution.status;
 assembled.frame.status('article');
 openArticle.id;
@@ -214,6 +220,7 @@ openArticle.id;
 
 `ProviderScope` is an explicit local registry of provider metadata. It does not
 subscribe, refresh, resolve active views, dispatch commands, or register globals.
+`ViewDataContract` groups named requirements before any provider binding occurs.
 `resolveProviderRequirement()` resolves against exactly the scope it receives and
 returns frozen metadata for tooling and runtime handoff; it still does not fetch,
 subscribe, or walk a view hierarchy.

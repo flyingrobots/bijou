@@ -101,6 +101,8 @@ fake duplication rather than a real second API.
 - **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
   Declare data requirements and explicit local provider availability without
   hidden global registration.
+- **`defineViewData()`**: Group named data requirements for a view or block
+  without binding them to providers.
 - **`resolveProviderRequirement()`**: Resolve a requirement against an explicit
   local provider scope as frozen metadata, without subscribing or fetching.
 - **`bindingFrameFromSnapshots()`**: Assemble read-only render frames from

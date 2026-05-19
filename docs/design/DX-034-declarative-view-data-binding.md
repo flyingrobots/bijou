@@ -367,6 +367,9 @@ The public core now includes:
 - `resolveProviderRequirements()`
 - `BindingFrameAssembly`
 - `bindingFrameFromSnapshots()`
+- `ViewDataContract`
+- `ViewDataRequirementEntry`
+- `defineViewData()`
 
 This slice proves local provider availability and one-scope resolution, not
 hierarchical provider resolution or subscription lifecycle:
@@ -375,6 +378,11 @@ hierarchical provider resolution or subscription lifecycle:
 const article = defineDataRequirement({
   id: 'article',
   resource: 'docs.article',
+});
+
+const readerData = defineViewData({
+  id: 'reader.data',
+  requirements: [{ name: 'article', requirement: article }],
 });
 
 const articleProvider = defineDataProvider({
@@ -411,6 +419,8 @@ assembled.frame.require('article');
 `ProviderScope` rejects duplicate resources and duplicate provider ids inside a
 single scope. It also rejects loose provider-shaped objects, so importing a
 module cannot silently register a provider or bypass the constructor contract.
+`ViewDataContract` names the data a view needs before any provider binding
+occurs.
 Resolution results are frozen metadata. Missing required providers become
 deterministic issues; missing optional providers are inspectable but not errors.
 Frame assembly reports missing or provider-mismatched snapshots as deterministic
@@ -620,13 +630,14 @@ flow.
    registration.
 5. Done: add one-scope provider resolution.
 6. Done: assemble immutable binding frames from resolved snapshots.
-7. Next: add active-view binding collection over the existing view-stack model.
-8. Next: add invalidation flow from provider snapshot updates to view re-render.
-9. Next: add Command intent dispatch proof.
-10. Next: integrate the contract with DX-031 block definitions.
-11. Next: prove AppShell with nested provider-bound navigation, content, inspector,
+7. Done: declare view data contracts.
+8. Next: add active-view binding collection over the existing view-stack model.
+9. Next: add invalidation flow from provider snapshot updates to view re-render.
+10. Next: add Command intent dispatch proof.
+11. Next: integrate the contract with DX-031 block definitions.
+12. Next: prove AppShell with nested provider-bound navigation, content, inspector,
    and status blocks.
-12. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+13. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First

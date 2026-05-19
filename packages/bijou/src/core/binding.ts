@@ -2,6 +2,7 @@ import type { ModeLoweringFact } from './mode-lowering.js';
 
 const DATA_REQUIREMENT_BRAND: unique symbol = Symbol('DataRequirement');
 const DATA_PROVIDER_BRAND: unique symbol = Symbol('DataProvider');
+const VIEW_DATA_CONTRACT_BRAND: unique symbol = Symbol('ViewDataContract');
 const BINDING_SNAPSHOT_BRAND: unique symbol = Symbol('BindingSnapshot');
 const PROVIDER_SCOPE_ENTRY_BRAND: unique symbol = Symbol('ProviderScopeEntry');
 const PROVIDER_RESOLUTION_BRAND: unique symbol = Symbol('ProviderResolution');
@@ -67,6 +68,19 @@ export interface DataProvider {
   readonly label?: string;
   readonly description?: string;
   readonly facts: readonly BindingFact[];
+}
+
+export interface ViewDataRequirementEntry {
+  readonly name: string;
+  readonly requirement: DataRequirement;
+}
+
+export interface ViewDataInput {
+  readonly id?: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly requirements: readonly ViewDataRequirementEntry[];
+  readonly facts?: readonly BindingFact[];
 }
 
 export interface ProviderScopeEntry {
@@ -155,6 +169,83 @@ const BINDING_ISSUE_SEVERITIES: readonly BindingIssueSeverity[] = [
 ];
 const EMPTY_BINDING_ISSUES = Object.freeze([]) as readonly BindingIssue[];
 const EMPTY_BINDING_FACTS = Object.freeze([]) as readonly BindingFact[];
+
+export class ViewDataContract {
+  readonly [VIEW_DATA_CONTRACT_BRAND] = true;
+  readonly #entriesByName: ReadonlyMap<string, ViewDataRequirementEntry>;
+  readonly #entriesByRequirementId: ReadonlyMap<RequirementId, ViewDataRequirementEntry>;
+  readonly id?: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly facts: readonly BindingFact[];
+
+  constructor(input: ViewDataInput) {
+    const entriesByName = new Map<string, ViewDataRequirementEntry>();
+    const entriesByRequirementId = new Map<RequirementId, ViewDataRequirementEntry>();
+
+    input.requirements.forEach((entry) => {
+      const name = normalizeRequiredText({
+        scope: 'view data',
+        field: 'requirement name',
+        value: entry.name,
+      });
+      if (!isDataRequirement(entry.requirement)) {
+        throw new Error(`view data: requirement ${name} was not created by defineDataRequirement()`);
+      }
+      if (entriesByName.has(name)) {
+        throw new Error(`view data: duplicate requirement name ${name}`);
+      }
+      if (entriesByRequirementId.has(entry.requirement.id)) {
+        throw new Error(`view data: duplicate requirement id ${entry.requirement.id}`);
+      }
+
+      const normalizedEntry = Object.freeze({
+        name,
+        requirement: entry.requirement,
+      });
+      entriesByName.set(name, normalizedEntry);
+      entriesByRequirementId.set(entry.requirement.id, normalizedEntry);
+    });
+
+    this.#entriesByName = entriesByName;
+    this.#entriesByRequirementId = entriesByRequirementId;
+    this.id = optionalTrimmedText(input.id);
+    this.label = optionalTrimmedText(input.label);
+    this.description = optionalTrimmedText(input.description);
+    this.facts = freezeFacts(input.facts);
+    Object.freeze(this);
+  }
+
+  names(): readonly string[] {
+    return Object.freeze([...this.#entriesByName.keys()]);
+  }
+
+  requirementIds(): readonly RequirementId[] {
+    return Object.freeze([...this.#entriesByRequirementId.keys()]);
+  }
+
+  entries(): readonly ViewDataRequirementEntry[] {
+    return Object.freeze([...this.#entriesByName.values()]);
+  }
+
+  requirements(): readonly DataRequirement[] {
+    return Object.freeze(this.entries().map((entry) => entry.requirement));
+  }
+
+  entry(name: string): ViewDataRequirementEntry | undefined {
+    const normalizedName = normalizeRequiredText({
+      scope: 'view data',
+      field: 'requirement name',
+      value: name,
+    });
+
+    return this.#entriesByName.get(normalizedName);
+  }
+
+  requirement(name: string): DataRequirement | undefined {
+    return this.entry(name)?.requirement;
+  }
+}
 
 export class ProviderScope {
   readonly #providersByResource: ReadonlyMap<string, DataProvider>;
@@ -323,6 +414,18 @@ export function isDataRequirement(value: unknown): value is DataRequirement {
     value
       && typeof value === 'object'
       && (value as DataRequirementBrandCarrier)[DATA_REQUIREMENT_BRAND] === true,
+  );
+}
+
+export function defineViewData(input: ViewDataInput): ViewDataContract {
+  return new ViewDataContract(input);
+}
+
+export function isViewDataContract(value: unknown): value is ViewDataContract {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as ViewDataContractBrandCarrier)[VIEW_DATA_CONTRACT_BRAND] === true,
   );
 }
 
@@ -598,6 +701,10 @@ interface BindingSnapshotBrandCarrier {
 
 interface DataRequirementBrandCarrier {
   readonly [DATA_REQUIREMENT_BRAND]?: true;
+}
+
+interface ViewDataContractBrandCarrier {
+  readonly [VIEW_DATA_CONTRACT_BRAND]?: true;
 }
 
 interface DataProviderBrandCarrier {
