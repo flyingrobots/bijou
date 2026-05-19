@@ -135,6 +135,7 @@ describe('binding lifecycle primitives', () => {
 
   it('rejects empty ids, invalid states, and loose lifecycle-shaped objects', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+    const inheritedOwner = Object.create(owner);
 
     expect(() => defineBindingLifecycleOwner({ id: '', kind: 'view' })).toThrow(
       'binding lifecycle owner: id is required',
@@ -145,6 +146,13 @@ describe('binding lifecycle primitives', () => {
     })).toThrow('binding lifecycle owner: unsupported kind page');
     expect(() => bindingLifecycleRecord({
       owner: { id: 'reader.view', kind: 'view' } as never,
+      requirementId: 'article',
+    })).toThrow(
+      'binding lifecycle: owner was not created by defineBindingLifecycleOwner()',
+    );
+    expect(isBindingLifecycleOwner(inheritedOwner)).toBe(false);
+    expect(() => bindingLifecycleRecord({
+      owner: inheritedOwner,
       requirementId: 'article',
     })).toThrow(
       'binding lifecycle: owner was not created by defineBindingLifecycleOwner()',
@@ -191,6 +199,13 @@ describe('binding lifecycle primitives', () => {
       state: 'active',
       transitions: [{ from: 'disposed', to: 'active', reason: 'activate' }],
     })).toThrow('binding transition: disposed bindings cannot transition to active');
+
+    const record = activeRecord();
+    const inheritedRecord = Object.create(record);
+    expect(isBindingLifecycleRecord(inheritedRecord)).toBe(false);
+    expect(() => suspendBinding(inheritedRecord)).toThrow(
+      'binding lifecycle: record was not created by bindingLifecycleRecord()',
+    );
   });
 
   it('exposes no provider handles, subscription handles, refresh methods, or dispatch callbacks', () => {

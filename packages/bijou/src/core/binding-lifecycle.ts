@@ -137,6 +137,7 @@ export function isBindingLifecycleOwner(value: unknown): value is BindingLifecyc
   return Boolean(
     value
       && typeof value === 'object'
+      && Object.prototype.hasOwnProperty.call(value, BINDING_LIFECYCLE_OWNER_BRAND)
       && (value as BindingLifecycleOwnerBrandCarrier)[BINDING_LIFECYCLE_OWNER_BRAND] === true,
   );
 }
@@ -192,6 +193,7 @@ export function isBindingLifecycleRecord(value: unknown): value is BindingLifecy
   return Boolean(
     value
       && typeof value === 'object'
+      && Object.prototype.hasOwnProperty.call(value, BINDING_LIFECYCLE_RECORD_BRAND)
       && (value as BindingLifecycleRecordBrandCarrier)[BINDING_LIFECYCLE_RECORD_BRAND] === true,
   );
 }
