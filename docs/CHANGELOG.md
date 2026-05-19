@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Binding lifecycle primitives for `bijou`** — `@flyingrobots/bijou` now
+  exports lifecycle owners, immutable lifecycle records, deterministic
+  `active`/`suspended`/`disposed` transitions, invalidation records, and
+  lifecycle facts for the DX-034E transition-algebra slice. These are pure
+  contract/value-object primitives: provider subscriptions, active hierarchy
+  traversal, command dispatch, rendered AppShell, schema binding, cache
+  retention, and DOGFOOD integration remain follow-on work.
 - **Binding frame primitives for `bijou`** — `@flyingrobots/bijou` now exports
   `DataRequirement`, `BindingSnapshot`, `BindingFrame`, `BindingStatus`,
   `BindingIssue`, `BindingFact`, `DataProvider`, `ProviderScope`,

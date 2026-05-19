@@ -577,6 +577,58 @@ DX-034D answers:
 - What lifecycle facts are inspectable?
 - What lower-mode facts survive static, pipe, and accessible output?
 
+### DX-034E Binding Lifecycle Primitives
+
+DX-034E implements lifecycle as transition algebra, not as a runtime manager.
+
+The primitives answer what state a binding is in, who owns it, what transition
+produced the next record, what invalidation happened, and what lifecycle facts
+tooling can inspect.
+
+They do not subscribe, refresh, dispatch, traverse the active view tree, render
+AppShell, retain caches, or bind schemas.
+
+The public vocabulary stays deliberately small:
+
+- `BindingLifecycleOwner`: the active-view, block, AppShell, or runtime owner
+  responsible for one binding lifetime.
+- `BindingLifecycleRecord`: an immutable record for one owner and one
+  requirement.
+- `BindingLifecycleState`: `active`, `suspended`, and `disposed`.
+- `BindingLifecycleTransition`: the immutable record of an activation,
+  suspension, disposal, or invalidation transition.
+- `BindingInvalidation`: an immutable fact that a provider update, scope
+  change, manual runtime action, owner suspension, or owner disposal means a
+  later runtime layer should assemble a new frame.
+
+Allowed transitions are:
+
+```text
+active -> suspended
+active -> disposed
+suspended -> active
+suspended -> disposed
+active -> active by invalidation only
+suspended -> suspended by invalidation only
+```
+
+Disposed bindings cannot be activated, suspended, or invalidated. A disposed
+binding means ownership was released; later activation requires a new lifecycle
+record and a new ownership event.
+
+Provider updates create invalidation records. They do not mutate existing
+frames, fetch data, call providers, or dispatch Commands:
+
+```text
+provider publishes snapshot
+  -> runtime creates BindingInvalidation
+  -> runtime later assembles next BindingFrame
+```
+
+Lifecycle records are immutable facts, not managers. They expose no provider
+handles, subscription handles, refresh methods, command dispatch callbacks,
+mutable stores, or render hooks.
+
 ### 5. User Input Emits Commands
 
 Views communicate user intent through Commands:
@@ -787,12 +839,14 @@ flow.
    explicit provider scopes, and nested block data/command introspection.
 10. Done: formalize the active binding lifecycle before runtime subscriptions
    or rendered AppShell begin.
-11. Next: add active-view binding collection over the existing view-stack model.
-12. Next: add invalidation flow from provider snapshot updates to view re-render.
-13. Next: add Command intent dispatch proof.
-14. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
+11. Done: add binding lifecycle primitives as immutable transition-algebra
+   value objects.
+12. Next: add active-view binding collection over the existing view-stack model.
+13. Next: add invalidation flow from provider snapshot updates to view re-render.
+14. Next: add Command intent dispatch proof.
+15. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
-15. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+16. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First
@@ -806,6 +860,8 @@ flow.
 - Cycle tests proving the active hierarchy owns active binding lifetime,
   provider subscriptions belong to runtime lifecycle, and binding frames remain
   immutable render inputs.
+- Behavioral tests proving lifecycle records are immutable transition-algebra
+  facts with active, suspended, disposed, and invalidated states.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -872,3 +928,8 @@ DX-034D formalized active binding lifecycle ownership before runtime code. The
 important restraint is that active hierarchy, provider subscriptions,
 invalidation, and command dispatch are runtime responsibilities; views still
 receive immutable frames and emit intent only.
+
+DX-034E landed binding lifecycle primitives as transition algebra. The restraint
+is that lifecycle records are immutable facts, not managers: they do not
+subscribe, refresh, dispatch, traverse the active hierarchy, render AppShell,
+retain caches, or bind schemas.
