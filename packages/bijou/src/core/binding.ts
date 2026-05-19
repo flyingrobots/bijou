@@ -679,6 +679,14 @@ export function isDataProvider(value: unknown): value is DataProvider {
   );
 }
 
+export function isCommandIntent(value: unknown): value is CommandIntent {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as CommandIntentBrandCarrier)[COMMAND_INTENT_BRAND] === true,
+  );
+}
+
 export function isProviderResolution(value: unknown): value is ProviderResolution {
   return Boolean(
     value
@@ -717,6 +725,10 @@ interface ProviderScopeEntryBrandCarrier {
 
 interface ProviderResolutionBrandCarrier {
   readonly [PROVIDER_RESOLUTION_BRAND]?: true;
+}
+
+interface CommandIntentBrandCarrier {
+  readonly [COMMAND_INTENT_BRAND]?: true;
 }
 
 interface RequiredTextOptions {

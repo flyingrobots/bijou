@@ -116,7 +116,18 @@ Use `defineBlock()` when a reusable app-level composition needs stable metadata
 that tools can inspect before rendering:
 
 ```typescript
-import { defineBlock, defineBlockPackage } from '@flyingrobots/bijou';
+import {
+  commandIntent,
+  defineBlock,
+  defineBlockPackage,
+  defineDataRequirement,
+  defineViewData,
+} from '@flyingrobots/bijou';
+
+const article = defineDataRequirement({
+  id: 'article',
+  resource: 'docs.article',
+});
 
 export const readerSurfaceBlock = defineBlock({
   metadata: {
@@ -134,6 +145,11 @@ export const readerSurfaceBlock = defineBlock({
     composedComponents: ['markdown', 'viewportSurface'],
     storyIds: ['reader-surface/docs-reader'],
   },
+  data: defineViewData({
+    id: 'reader.data',
+    requirements: [{ name: 'article', requirement: article }],
+  }),
+  commands: [commandIntent<{ articleId: string }>('reader.openArticle')],
   render: ({ slots }) => ({ output: slots?.content ?? '' }),
 });
 
@@ -147,7 +163,9 @@ export const docsBlocks = defineBlockPackage({
 
 Blocks are explicit imports, not runtime plugins. `BlockMetadata` and
 `BlockPackageManifest` are intended for docs, DOGFOOD, MCP payloads, and package
-compatibility checks; schema-bound blocks are still a follow-on layer.
+compatibility checks. `data` and `commands` are inspectable contracts, not
+runtime provider handles or command callbacks. Schema-bound blocks are still a
+follow-on layer.
 
 ## Binding Frames
 

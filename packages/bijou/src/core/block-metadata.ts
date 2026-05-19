@@ -1,5 +1,11 @@
 import type { OutputMode } from './detect/tty.js';
 import type { ModeLoweringFact } from './mode-lowering.js';
+import {
+  isCommandIntent,
+  isViewDataContract,
+  type CommandIntent,
+  type ViewDataContract,
+} from './binding.js';
 
 export type BlockScale =
   | 'app'
@@ -87,6 +93,8 @@ export interface BlockRenderResult<Output = unknown> {
 
 export interface BlockDefinition<Config = unknown, Output = unknown> {
   readonly metadata: BlockMetadata;
+  readonly data?: ViewDataContract;
+  readonly commands?: readonly CommandIntent[];
   readonly render: (input: BlockRenderInput<Config>) => BlockRenderResult<Output>;
 }
 
@@ -162,7 +170,21 @@ export function defineBlock<Config = unknown, Output = unknown>(
     throw new Error(blockMetadataReportText(report));
   }
 
-  return definition;
+  if (definition.data !== undefined && !isViewDataContract(definition.data)) {
+    throw new Error('block definition: data must be created by defineViewData()');
+  }
+
+  const commands = definition.commands ?? [];
+  commands.forEach((command, index) => {
+    if (!isCommandIntent(command)) {
+      throw new Error(`block definition: command at index ${index} must be created by commandIntent()`);
+    }
+  });
+
+  return Object.freeze({
+    ...definition,
+    ...(definition.commands === undefined ? {} : { commands: Object.freeze([...commands]) }),
+  });
 }
 
 export function defineBlockPackage(manifest: BlockPackageManifest): BlockPackageManifest {

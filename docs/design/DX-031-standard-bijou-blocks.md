@@ -383,6 +383,8 @@ interface BlockSchemaFacts {
 
 interface BlockDefinition<Config = unknown> {
   readonly metadata: BlockMetadata;
+  readonly data?: ViewDataContract;
+  readonly commands?: readonly CommandIntent[];
   readonly render: (input: BlockRenderInput<Config>) => BlockRenderResult;
 }
 
@@ -3101,18 +3103,20 @@ blocks.
    `BlockPackageManifest` shape in `@flyingrobots/bijou`.
 3. Done: add `defineBlock()` and `defineBlockPackage()` authoring helpers,
    validation/report helpers, and compact summaries.
-4. Next: formalize provider-bound view data requirements in DX-034 before
+4. Done: formalize provider-bound view data requirements in DX-034 before
    hardening rendered AppShell APIs.
-5. Next: add `defineSchemaBlock()` and a Zod schema adapter.
-6. Next: add block stories for `AppShell`, `ReaderSurface`, and
+5. Done: attach DX-034 view data contracts and command intents to block
+   definitions for discovery.
+6. Next: add `defineSchemaBlock()` and a Zod schema adapter.
+7. Next: add block stories for `AppShell`, `ReaderSurface`, and
    `InspectorPanel`.
-7. Next: capture interactive, static, pipe, and accessible outputs for the
+8. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-8. Next: prove the first three blocks in DOGFOOD before broadening the
+9. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-9. Next: add catalog-only variant/config metadata for later blocks without
+10. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-10. Continue to defer modal stacks, notifications, auth forms, animated
+11. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 

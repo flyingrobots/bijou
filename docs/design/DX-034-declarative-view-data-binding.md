@@ -631,10 +631,10 @@ flow.
 5. Done: add one-scope provider resolution.
 6. Done: assemble immutable binding frames from resolved snapshots.
 7. Done: declare view data contracts.
-8. Next: add active-view binding collection over the existing view-stack model.
-9. Next: add invalidation flow from provider snapshot updates to view re-render.
-10. Next: add Command intent dispatch proof.
-11. Next: integrate the contract with DX-031 block definitions.
+8. Done: integrate view data and command contracts with DX-031 block definitions.
+9. Next: add active-view binding collection over the existing view-stack model.
+10. Next: add invalidation flow from provider snapshot updates to view re-render.
+11. Next: add Command intent dispatch proof.
 12. Next: prove AppShell with nested provider-bound navigation, content, inspector,
    and status blocks.
 13. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and

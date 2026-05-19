@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   blockMetadataSummary,
+  commandIntent,
   defineBlock,
   defineBlockPackage,
+  defineDataRequirement,
+  defineViewData,
   validateBlockMetadata,
   type BlockMetadata,
 } from '../../../packages/bijou/src/index.js';
@@ -80,11 +83,24 @@ describe('DX-031 block contract cycle', () => {
     expect(rootBarrel).toContain('defineBlockPackage');
     expect(rootBarrel).toContain('validateBlockMetadata');
     expect(rootBarrel).toContain('blockMetadataSummary');
+    expect(rootBarrel).toContain('ViewDataContract');
+    expect(rootBarrel).toContain('CommandIntent');
   });
 
   it('lets authors define a block and package manifest without global registration', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const data = defineViewData({
+      id: 'reader.data',
+      requirements: [{ name: 'article', requirement: article }],
+    });
+    const openArticle = commandIntent<{ articleId: string }>('reader.openArticle');
     const block = defineBlock({
       metadata: readerSurfaceMetadata,
+      data,
+      commands: [openArticle],
       render: ({ slots }) => ({
         output: slots?.content ?? '',
         facts: [{ kind: 'entity', key: 'block', value: 'ReaderSurface' }],
@@ -102,6 +118,8 @@ describe('DX-031 block contract cycle', () => {
     expect(validateBlockMetadata(block.metadata).passed).toBe(true);
     expect(blockMetadataSummary(block.metadata)).toContain('requiredSlots=content');
     expect(block.render({ slots: { content: 'hello' } }).output).toBe('hello');
+    expect(block.data?.requirement('article')).toBe(article);
+    expect(block.commands?.[0]).toBe(openArticle);
     expect(manifest.blocks).toEqual(['ReaderSurface']);
   });
 });

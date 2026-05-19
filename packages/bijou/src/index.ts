@@ -106,6 +106,7 @@ export {
   defineDataProvider,
   defineViewData,
   isBindingSnapshot,
+  isCommandIntent,
   isDataProvider,
   isDataRequirement,
   isProviderResolution,

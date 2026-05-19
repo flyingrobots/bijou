@@ -93,7 +93,8 @@ fake duplication rather than a real second API.
 - **`componentMetadataSummary()`**: Render compact metadata for docs, MCP
   payloads, and agent-facing reports.
 - **`defineBlock()`**: Declare a validated reusable block with package, family,
-  scale, mode, slot, variant, config, component, story, and semantic facts.
+  scale, mode, slot, variant, config, component, story, semantic facts, optional
+  view data contracts, and command intents.
 - **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
   Bijou peer compatibility for ordinary NPM block packages.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP

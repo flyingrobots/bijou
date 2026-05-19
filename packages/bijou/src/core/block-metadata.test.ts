@@ -10,6 +10,11 @@ import {
   validateBlockPackageManifest,
   type BlockMetadata,
 } from './block-metadata.js';
+import {
+  commandIntent,
+  defineDataRequirement,
+  defineViewData,
+} from './binding.js';
 
 const appShellMetadata: BlockMetadata = {
   packageName: '@flyingrobots/bijou',
@@ -84,6 +89,52 @@ describe('block metadata contract', () => {
       'stories=app-shell/docs-shell',
       'source=packages/bijou/src/core/block-metadata.ts',
     ].join('\n'));
+  });
+
+  it('attaches inspectable data and command contracts to block definitions', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const data = defineViewData({
+      id: 'reader.data',
+      requirements: [{ name: 'article', requirement: article }],
+    });
+    const selectHeading = commandIntent<{ headingId: string }>('reader.selectHeading');
+    const block = defineBlock({
+      metadata: appShellMetadata,
+      data,
+      commands: [selectHeading],
+      render: () => ({ output: 'reader' }),
+    });
+
+    expect(block.data).toBe(data);
+    expect(block.commands).toEqual([selectHeading]);
+    expect(Object.isFrozen(block)).toBe(true);
+    expect(Object.isFrozen(block.commands)).toBe(true);
+    expect(block.data?.requirement('article')).toBe(article);
+    expect(block.commands?.[0]?.id).toBe('reader.selectHeading');
+    expect('provider' in block).toBe(false);
+    expect('subscribe' in block).toBe(false);
+  });
+
+  it('rejects loose block data and command contracts', () => {
+    expect(() => defineBlock({
+      metadata: appShellMetadata,
+      data: {
+        id: 'reader.data',
+        requirements: [],
+      } as never,
+      render: () => ({ output: 'reader' }),
+    })).toThrow('block definition: data must be created by defineViewData()');
+    expect(() => defineBlock({
+      metadata: appShellMetadata,
+      commands: [{
+        id: 'reader.selectHeading',
+        facts: [],
+      } as never],
+      render: () => ({ output: 'reader' }),
+    })).toThrow('block definition: command at index 0 must be created by commandIntent()');
   });
 
   it('reports missing fields, empty lists, duplicate ids, and unknown slot references deterministically', () => {

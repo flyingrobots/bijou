@@ -34,8 +34,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so
   reusable block packages can declare slots, variants, config, mode support,
-  composed components, semantic facts, stories, docs, tags, and Bijou peer
-  compatibility without hidden global registration. This lands the first
+  composed components, semantic facts, stories, docs, tags, DX-034 view data
+  contracts, command intents, and Bijou peer compatibility without hidden global
+  registration. This lands the first
   metadata-only DX-031 slice; schema-bound blocks and the rendered standard
   block catalog remain follow-on work.
 - **Standalone Storybook workbench** — `npm run storybook` now launches a
