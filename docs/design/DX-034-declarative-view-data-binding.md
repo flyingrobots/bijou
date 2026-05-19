@@ -629,6 +629,65 @@ Lifecycle records are immutable facts, not managers. They expose no provider
 handles, subscription handles, refresh methods, command dispatch callbacks,
 mutable stores, or render hooks.
 
+### DX-034F Active Binding Collection
+
+DX-034F collects declared active bindings before provider runtime integration.
+
+The collection answers:
+
+```text
+given declared data requirements and explicit lifecycle owners,
+which owner/requirement pairs are active?
+```
+
+It uses `BindingLifecycleOwner` from DX-034E. It does not introduce another
+ownership vocabulary. An active binding entry binds:
+
+- one explicit `BindingLifecycleOwner`
+- one declared `DataRequirement`
+- optional provider id metadata
+
+Collections can produce active `BindingLifecycleRecord` values from those
+entries so the later runtime layer has stable ownership facts to consume:
+
+```ts
+const collection = activeBindingCollection([
+  activeBindingEntry({
+    owner: defineBindingLifecycleOwner({
+      id: 'docs.shell',
+      kind: 'app-shell',
+    }),
+    requirement: articleRequirement,
+    providerId: 'docs.articleProvider',
+  }),
+]);
+
+collection.entries();
+collection.requirements();
+collection.owners();
+collection.lifecycleRecords();
+```
+
+DX-034F also allows declared `ViewDataContract` values to be collected without
+rendering blocks or views:
+
+```ts
+const collection = collectActiveBindings({
+  contracts: [{
+    owner,
+    contract: readerSurfaceBlock.data,
+    providerIds: [
+      { requirementId: 'article', providerId: 'docs.articleProvider' },
+    ],
+  }],
+});
+```
+
+Collection inspects declarations, not rendered output. It does not subscribe,
+refresh, dispatch, render, cache, resolve provider scopes, traverse the real TUI
+runtime tree, bind schemas, or integrate DOGFOOD. Provider ids are metadata
+only; provider handles are not exposed.
+
 ### 5. User Input Emits Commands
 
 Views communicate user intent through Commands:
@@ -841,12 +900,14 @@ flow.
    or rendered AppShell begin.
 11. Done: add binding lifecycle primitives as immutable transition-algebra
    value objects.
-12. Next: add active-view binding collection over the existing view-stack model.
-13. Next: add invalidation flow from provider snapshot updates to view re-render.
-14. Next: add Command intent dispatch proof.
-15. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
+12. Done: add active binding collection primitives for declared owner and
+   requirement pairs.
+13. Next: add active-view binding collection over the existing view-stack model.
+14. Next: add invalidation flow from provider snapshot updates to view re-render.
+15. Next: add Command intent dispatch proof.
+16. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
-16. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
+17. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
     error binding states.
 
 ## Tests To Write First
@@ -862,6 +923,9 @@ flow.
   immutable render inputs.
 - Behavioral tests proving lifecycle records are immutable transition-algebra
   facts with active, suspended, disposed, and invalidated states.
+- Behavioral tests proving active binding collections bind declared
+  requirements to explicit lifecycle owners without rendering, subscribing, or
+  dispatching.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -885,6 +949,8 @@ flow.
 - Views communicate user intent only through Commands.
 - Providers are explicit, scoped, and free of import-time global registration.
 - Active view hierarchy controls which data bindings are active.
+- Active binding collections expose active owner/requirement pairs and lifecycle
+  ownership records before runtime provider integration.
 - Provider updates produce new immutable binding frames.
 - Binding status is visible to tooling and lower modes.
 - Schema-bound blocks compose with provider-bound views but do not replace the
@@ -933,3 +999,8 @@ DX-034E landed binding lifecycle primitives as transition algebra. The restraint
 is that lifecycle records are immutable facts, not managers: they do not
 subscribe, refresh, dispatch, traverse the active hierarchy, render AppShell,
 retain caches, or bind schemas.
+
+DX-034F landed active binding collection primitives. The restraint is that
+collections inspect declarations and produce active lifecycle ownership records;
+they do not subscribe, refresh, dispatch, render, cache, resolve provider
+scopes, traverse the real TUI runtime tree, bind schemas, or integrate DOGFOOD.
