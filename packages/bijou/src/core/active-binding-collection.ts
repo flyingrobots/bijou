@@ -58,6 +58,7 @@ export class ActiveBindingCollection {
     Object.defineProperty(this, ACTIVE_BINDING_COLLECTION_BRAND, { value: true });
 
     const entriesByKey = new Map<string, ActiveBindingEntry>();
+    const entryIndexesByKey = new Map<string, number>();
     const normalizedEntries: ActiveBindingEntry[] = [];
 
     entries.forEach((entry, index) => {
@@ -68,14 +69,24 @@ export class ActiveBindingCollection {
       }
 
       const key = activeBindingKey(entry.owner.id, entry.requirement.id);
-      if (entriesByKey.has(key)) {
-        throw new Error(
-          `active binding collection: duplicate owner ${entry.owner.id} `
-          + `requirement ${entry.requirement.id}`,
-        );
+      const existingEntry = entriesByKey.get(key);
+      if (existingEntry !== undefined) {
+        const mergedEntry = mergeDuplicateEntry(existingEntry, entry);
+        const existingIndex = entryIndexesByKey.get(key);
+        if (existingIndex === undefined) {
+          throw new Error(
+            `active binding collection: missing index for owner ${entry.owner.id} `
+            + `requirement ${entry.requirement.id}`,
+          );
+        }
+
+        entriesByKey.set(key, mergedEntry);
+        normalizedEntries[existingIndex] = mergedEntry;
+        return;
       }
 
       entriesByKey.set(key, entry);
+      entryIndexesByKey.set(key, normalizedEntries.length);
       normalizedEntries.push(entry);
     });
 
@@ -301,6 +312,33 @@ function providerAssignmentsByRequirementId(
 
 function activeBindingKey(ownerId: string, requirementId: string): string {
   return `${ownerId}\u0000${requirementId}`;
+}
+
+function mergeDuplicateEntry(
+  existingEntry: ActiveBindingEntry,
+  incomingEntry: ActiveBindingEntry,
+): ActiveBindingEntry {
+  if (
+    existingEntry.providerId !== undefined
+    && incomingEntry.providerId !== undefined
+    && existingEntry.providerId !== incomingEntry.providerId
+  ) {
+    throw new Error(
+      `active binding collection: conflicting providers for owner ${incomingEntry.owner.id} `
+      + `requirement ${incomingEntry.requirement.id}`,
+    );
+  }
+
+  const providerId = existingEntry.providerId ?? incomingEntry.providerId;
+  if (providerId === existingEntry.providerId) {
+    return existingEntry;
+  }
+
+  return activeBindingEntry({
+    owner: existingEntry.owner,
+    requirement: existingEntry.requirement,
+    providerId,
+  });
 }
 
 interface ActiveBindingEntryBrandCarrier {
