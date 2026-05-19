@@ -199,6 +199,15 @@ describe('binding lifecycle primitives', () => {
       state: 'active',
       transitions: [{ from: 'disposed', to: 'active', reason: 'activate' }],
     })).toThrow('binding transition: disposed bindings cannot transition to active');
+    expect(() => bindingLifecycleRecord({
+      owner,
+      requirementId: 'article',
+      state: 'disposed',
+      transitions: [
+        { from: 'active', to: 'suspended', reason: 'suspend' },
+        { from: 'active', to: 'disposed', reason: 'dispose' },
+      ],
+    })).toThrow('binding lifecycle: transition chain is discontinuous at index 1');
 
     const record = activeRecord();
     const inheritedRecord = Object.create(record);

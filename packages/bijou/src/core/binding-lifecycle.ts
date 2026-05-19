@@ -375,6 +375,19 @@ function freezeTransitions(
   }
 
   const frozenTransitions = transitions.map(freezeTransition);
+  for (let index = 1; index < frozenTransitions.length; index += 1) {
+    const previous = frozenTransitions[index - 1];
+    const current = frozenTransitions[index];
+    if (previous === undefined || current === undefined) {
+      throw new Error(`binding lifecycle: missing transition at index ${index}`);
+    }
+    if (previous.to !== current.from) {
+      throw new Error(
+        `binding lifecycle: transition chain is discontinuous at index ${index}`,
+      );
+    }
+  }
+
   const finalTransition = frozenTransitions.at(-1);
   if (finalTransition !== undefined && finalTransition.to !== expectedState) {
     throw new Error(
