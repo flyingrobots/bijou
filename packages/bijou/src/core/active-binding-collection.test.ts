@@ -194,6 +194,68 @@ describe('active binding collection primitives', () => {
     );
   });
 
+  it('rejects malformed contract inputs and provider assignments with domain errors', () => {
+    const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+    const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+    const data = defineViewData({
+      requirements: [{ name: 'article', requirement: article }],
+    });
+    const malformedContract = Object.create(data, {
+      requirementIds: { value: () => ['article'] },
+      requirements: { value: () => [null] },
+    });
+
+    expect(() => collectActiveBindings({
+      entries: {} as never,
+    })).toThrow('active binding collection: entries must be an array');
+    expect(() => collectActiveBindings({
+      contracts: {} as never,
+    })).toThrow('active binding collection: contracts must be an array');
+    expect(() => collectActiveBindings({
+      contracts: [null as never],
+    })).toThrow('active binding collection: contract 0 must be an object');
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: data,
+        providerIds: {} as never,
+      }],
+    })).toThrow('active binding collection: providerIds must be an array');
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: data,
+        providerIds: [null as never],
+      }],
+    })).toThrow('active binding collection: provider assignment 0 must be an object');
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: data,
+        providerIds: [{ requirementId: 42, providerId: 'docs.articleProvider' } as never],
+      }],
+    })).toThrow(
+      'active binding collection: provider assignment 0 requirementId must be a string',
+    );
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: data,
+        providerIds: [{ requirementId: 'article', providerId: 42 } as never],
+      }],
+    })).toThrow(
+      'active binding collection: provider assignment 0 providerId must be a string',
+    );
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: malformedContract,
+      }],
+    })).toThrow(
+      'active binding collection: contract 0 requirement 0 was not created by defineDataRequirement()',
+    );
+  });
+
   it('does not mutate previous collections when with() creates a new collection', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });

@@ -15,10 +15,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   for the DX-034F collection slice. Collections bind declared data requirements
   to explicit lifecycle owners, preserve optional provider id metadata, collapse
   repeated owner/requirement declarations into one logical binding unless
-  provider ids conflict, and can produce active lifecycle records without
-  rendering, subscribing, dispatching, caching, resolving provider handles,
-  traversing the active TUI runtime tree, binding schemas, or integrating
-  DOGFOOD.
+  provider ids conflict, report malformed contract/provider assignment inputs
+  with deterministic domain errors, and can produce active lifecycle records
+  without rendering, subscribing, dispatching, caching, resolving provider
+  handles, traversing the active TUI runtime tree, binding schemas, or
+  integrating DOGFOOD.
 - **Binding lifecycle primitives for `bijou`** — `@flyingrobots/bijou` now
   exports lifecycle owners, immutable lifecycle records, deterministic
   `active`/`suspended`/`disposed` transitions, invalidation records, and
