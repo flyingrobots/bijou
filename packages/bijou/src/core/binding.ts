@@ -4,6 +4,7 @@ const DATA_REQUIREMENT_BRAND: unique symbol = Symbol('DataRequirement');
 const DATA_PROVIDER_BRAND: unique symbol = Symbol('DataProvider');
 const BINDING_SNAPSHOT_BRAND: unique symbol = Symbol('BindingSnapshot');
 const PROVIDER_SCOPE_ENTRY_BRAND: unique symbol = Symbol('ProviderScopeEntry');
+const PROVIDER_RESOLUTION_BRAND: unique symbol = Symbol('ProviderResolution');
 const COMMAND_INTENT_BRAND: unique symbol = Symbol('CommandIntent');
 const COMMAND_INTENT_PAYLOAD: unique symbol = Symbol('CommandIntentPayload');
 
@@ -14,6 +15,8 @@ export type CommandIntentId = string;
 export type BindingStatus = 'ready' | 'loading' | 'empty' | 'stale' | 'error';
 
 export type BindingIssueSeverity = 'info' | 'warning' | 'error';
+
+export type ProviderResolutionStatus = 'resolved' | 'missing-optional' | 'missing-required';
 
 export type BindingFact = ModeLoweringFact;
 
@@ -77,6 +80,18 @@ export interface ProviderScopeOptions {
   readonly label?: string;
   readonly description?: string;
   readonly facts?: readonly BindingFact[];
+}
+
+export interface ProviderResolution {
+  readonly [PROVIDER_RESOLUTION_BRAND]: true;
+  readonly requirementId: RequirementId;
+  readonly resource: string;
+  readonly optional: boolean;
+  readonly status: ProviderResolutionStatus;
+  readonly scopeId?: string;
+  readonly providerId?: ProviderId;
+  readonly issues: readonly BindingIssue[];
+  readonly facts: readonly BindingFact[];
 }
 
 export interface BindingSnapshotInput<Data = unknown> {
@@ -292,6 +307,14 @@ export function defineDataRequirement(input: DataRequirementInput): DataRequirem
   return Object.freeze(requirement);
 }
 
+export function isDataRequirement(value: unknown): value is DataRequirement {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as DataRequirementBrandCarrier)[DATA_REQUIREMENT_BRAND] === true,
+  );
+}
+
 export function defineDataProvider(input: DataProviderInput): DataProvider {
   const provider = {
     id: normalizeRequiredText({
@@ -332,6 +355,64 @@ export function providerScope(
   options: ProviderScopeOptions = {},
 ): ProviderScope {
   return new ProviderScope(entries, options);
+}
+
+export function resolveProviderRequirement(
+  requirement: DataRequirement,
+  scope: ProviderScope,
+): ProviderResolution {
+  if (!isDataRequirement(requirement)) {
+    throw new Error('provider resolution: requirement was not created by defineDataRequirement()');
+  }
+
+  const provider = scope.get(requirement.resource);
+  const base = {
+    requirementId: requirement.id,
+    resource: requirement.resource,
+    optional: requirement.optional === true,
+    scopeId: scope.id,
+    facts: freezeFacts([
+      ...requirement.facts,
+      ...(provider?.facts ?? []),
+    ]),
+  };
+
+  if (provider !== undefined) {
+    return providerResolution({
+      ...base,
+      status: 'resolved',
+      providerId: provider.id,
+      issues: EMPTY_BINDING_ISSUES,
+    });
+  }
+
+  if (requirement.optional === true) {
+    return providerResolution({
+      ...base,
+      status: 'missing-optional',
+      issues: EMPTY_BINDING_ISSUES,
+    });
+  }
+
+  return providerResolution({
+    ...base,
+    status: 'missing-required',
+    issues: freezeIssues([{
+      severity: 'error',
+      code: 'provider.missing',
+      message: `No provider in scope ${scope.id ?? '<anonymous>'} satisfies resource ${requirement.resource}`,
+      path: requirement.id,
+    }]),
+  });
+}
+
+export function resolveProviderRequirements(
+  requirements: readonly DataRequirement[],
+  scope: ProviderScope,
+): readonly ProviderResolution[] {
+  return Object.freeze(
+    requirements.map((requirement) => resolveProviderRequirement(requirement, scope)),
+  );
 }
 
 export function bindingSnapshot<Data = unknown>(
@@ -407,6 +488,14 @@ export function isDataProvider(value: unknown): value is DataProvider {
   );
 }
 
+export function isProviderResolution(value: unknown): value is ProviderResolution {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && (value as ProviderResolutionBrandCarrier)[PROVIDER_RESOLUTION_BRAND] === true,
+  );
+}
+
 function isProviderScopeEntry(value: unknown): value is ProviderScopeEntry {
   return Boolean(
     value
@@ -419,12 +508,20 @@ interface BindingSnapshotBrandCarrier {
   readonly [BINDING_SNAPSHOT_BRAND]?: true;
 }
 
+interface DataRequirementBrandCarrier {
+  readonly [DATA_REQUIREMENT_BRAND]?: true;
+}
+
 interface DataProviderBrandCarrier {
   readonly [DATA_PROVIDER_BRAND]?: true;
 }
 
 interface ProviderScopeEntryBrandCarrier {
   readonly [PROVIDER_SCOPE_ENTRY_BRAND]?: true;
+}
+
+interface ProviderResolutionBrandCarrier {
+  readonly [PROVIDER_RESOLUTION_BRAND]?: true;
 }
 
 interface RequiredTextOptions {
@@ -486,6 +583,22 @@ function normalizeIssue(issue: BindingIssue, index: number): BindingIssue {
     }),
     path: optionalTrimmedText(issue.path),
   };
+}
+
+function providerResolution(input: Omit<ProviderResolution, typeof PROVIDER_RESOLUTION_BRAND>): ProviderResolution {
+  const resolution = {
+    requirementId: input.requirementId,
+    resource: input.resource,
+    optional: input.optional,
+    status: input.status,
+    scopeId: input.scopeId,
+    providerId: input.providerId,
+    issues: input.issues,
+    facts: input.facts,
+  } as ProviderResolution;
+
+  Object.defineProperty(resolution, PROVIDER_RESOLUTION_BRAND, { value: true });
+  return Object.freeze(resolution);
 }
 
 function freezeFacts(facts: readonly BindingFact[] | undefined): readonly BindingFact[] {

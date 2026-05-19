@@ -101,6 +101,8 @@ fake duplication rather than a real second API.
 - **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
   Declare data requirements and explicit local provider availability without
   hidden global registration.
+- **`resolveProviderRequirement()`**: Resolve a requirement against an explicit
+  local provider scope as frozen metadata, without subscribing or fetching.
 - **`bindingSnapshot()` / `bindingFrame()`**: Model provider-delivered plain
   data as copied, versioned immutable snapshots and read-only render frames.
 - **`commandIntent()`**: Declare user intent outputs as inspectable metadata,

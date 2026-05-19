@@ -361,9 +361,13 @@ The public core now includes:
 - `provide()`
 - `providerScope()`
 - `isDataProvider()`
+- `ProviderResolution`
+- `ProviderResolutionStatus`
+- `resolveProviderRequirement()`
+- `resolveProviderRequirements()`
 
-This slice proves local provider availability, not provider resolution or
-subscription lifecycle:
+This slice proves local provider availability and one-scope resolution, not
+hierarchical provider resolution or subscription lifecycle:
 
 ```ts
 const article = defineDataRequirement({
@@ -383,11 +387,16 @@ const providers = providerScope([provide(articleProvider)], {
 providers.has(article.resource);
 providers.get(article.resource);
 providers.resources();
+
+const resolution = resolveProviderRequirement(article, providers);
+resolution.status;
 ```
 
 `ProviderScope` rejects duplicate resources and duplicate provider ids inside a
 single scope. It also rejects loose provider-shaped objects, so importing a
 module cannot silently register a provider or bypass the constructor contract.
+Resolution results are frozen metadata. Missing required providers become
+deterministic issues; missing optional providers are inspectable but not errors.
 
 ### 5. User Input Emits Commands
 
@@ -591,7 +600,7 @@ flow.
    binding frames.
 4. Done: define provider and provider-scope contracts without global
    registration.
-5. Next: add provider-scope resolution.
+5. Done: add one-scope provider resolution.
 6. Next: add active-view binding collection over the existing view-stack model.
 7. Next: add invalidation flow from provider snapshot updates to view re-render.
 8. Next: add Command intent dispatch proof.

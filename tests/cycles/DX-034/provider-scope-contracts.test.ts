@@ -4,6 +4,7 @@ import {
   defineDataRequirement,
   provide,
   providerScope,
+  resolveProviderRequirement,
 } from '../../../packages/bijou/src/index.js';
 
 describe('DX-034B provider scope contracts', () => {
@@ -27,5 +28,24 @@ describe('DX-034B provider scope contracts', () => {
     expect('refresh' in articleProvider).toBe(false);
     expect('subscribe' in articleProvider).toBe(false);
     expect('provider' in emptyScope).toBe(false);
+  });
+
+  it('resolves requirements without consulting global provider state', () => {
+    const article = defineDataRequirement({
+      id: 'article',
+      resource: 'docs.article',
+    });
+    const articleProvider = defineDataProvider({
+      id: 'docs.articleProvider',
+      resource: article.resource,
+    });
+    const populatedScope = providerScope([provide(articleProvider)], { id: 'populated' });
+    const emptyScope = providerScope([], { id: 'empty' });
+
+    expect(resolveProviderRequirement(article, populatedScope).status).toBe('resolved');
+    expect(resolveProviderRequirement(article, populatedScope).providerId).toBe(
+      'docs.articleProvider',
+    );
+    expect(resolveProviderRequirement(article, emptyScope).status).toBe('missing-required');
   });
 });

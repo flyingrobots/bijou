@@ -163,6 +163,7 @@ import {
   defineDataProvider,
   provide,
   providerScope,
+  resolveProviderRequirement,
 } from '@flyingrobots/bijou';
 
 const article = defineDataRequirement({
@@ -188,18 +189,23 @@ const frame = bindingFrame([
 ]);
 
 const openArticle = commandIntent<{ articleId: string }>('docs.openArticle');
+const resolution = resolveProviderRequirement(article, providers);
 
 frame.require<{ title: string }>('article');
 frame.status('article');
 providers.has(article.resource);
+resolution.status;
 openArticle.id;
 ```
 
 `ProviderScope` is an explicit local registry of provider metadata. It does not
 subscribe, refresh, resolve active views, dispatch commands, or register globals.
+`resolveProviderRequirement()` resolves against exactly the scope it receives and
+returns frozen metadata for tooling and runtime handoff; it still does not fetch,
+subscribe, or walk a view hierarchy.
 `BindingFrame` is only the immutable render-time data frame. Provider
-resolution, subscriptions, active-view lifecycle, schema adapters, and command
-dispatch remain runtime follow-on layers.
+resolution hierarchy, subscriptions, active-view lifecycle, schema adapters, and
+command dispatch remain runtime follow-on layers.
 
 Snapshot data is copied before it is frozen. Use inert plain snapshot data:
 null, strings, numbers, booleans, arrays, and enumerable string-keyed plain

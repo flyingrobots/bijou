@@ -19,10 +19,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   immutable frames with `require()`, `get()`, `status()`, `issues()`, and
   `facts()` accessors. Provider scopes are explicit local registries built with
   `defineDataProvider()`, `provide()`, and `providerScope()`; they reject
-  duplicate resources and provider ids without registering globals. Command
-  intents are inspectable metadata only; subscriptions, active hierarchy
-  traversal, provider resolution, schema adapters, and AppShell rendering remain
-  follow-on work.
+  duplicate resources and provider ids without registering globals.
+  `resolveProviderRequirement()` and `resolveProviderRequirements()` turn a
+  requirement plus an explicit scope into frozen resolution metadata, including
+  deterministic required-provider-missing issues. Command intents are
+  inspectable metadata only; subscriptions, active hierarchy traversal,
+  hierarchical provider resolution, schema adapters, and AppShell rendering
+  remain follow-on work.
 - **Block metadata contract for `bijou`** — `@flyingrobots/bijou` now exports
   `BlockMetadata`, `BlockDefinition`, `BlockPackageManifest`, `defineBlock()`,
   `defineBlockPackage()`, validation/report helpers, and compact summaries so
