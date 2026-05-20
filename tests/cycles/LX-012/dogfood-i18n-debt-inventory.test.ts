@@ -12,7 +12,9 @@ describe('LX-012 DOGFOOD i18n debt inventory', () => {
     expect(inventory.total).toBeGreaterThan(0);
     expect(inventory.bySurface.length).toBeGreaterThan(1);
     expect(inventory.bySurface.every((surface) => surface.count > 0)).toBe(true);
-    expect(inventory.entries.every((entry) => entry.path.startsWith('examples/docs/'))).toBe(true);
+    expect(
+      inventory.entries.every((entry) => entry.path.replaceAll('\\', '/').startsWith('examples/docs/')),
+    ).toBe(true);
     expect(inventory.entries.every((entry) => entry.line > 0 && entry.column > 0)).toBe(true);
   });
 

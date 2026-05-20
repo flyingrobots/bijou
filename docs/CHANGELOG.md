@@ -10,7 +10,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
   DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
-  count by source surface, and ratchets the current baseline at `1740` strings
+  count by source surface, and ratchets the current baseline at `2220` strings
   across `docs-app`, `dogfood-locale`, `component-stories`, and Storybook-style
   DOGFOOD entrypoints. The scanner filters ids, file paths, import paths, and
   catalog-backed fallback calls so review sees the remaining localization debt

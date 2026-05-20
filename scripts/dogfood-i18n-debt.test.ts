@@ -15,6 +15,9 @@ describe('DOGFOOD i18n debt inventory', () => {
           "import value from './local-module.js';",
           "const cataloged = dogfoodMessage('settings.title', 'Settings');",
           "const fallback = dogfoodText(i18n, 'docs.page.guides', 'Guides');",
+          "const token = 'docs.page.guides';",
+          "const loadingLabel = 'loading';",
+          "const continueLabel = 'continue';",
           "const page = { id: 'docs.page.guides', title: 'Raw English Title' };",
           "const markdown = readMarkdownDoc('./content/guide.md');",
           "const summary = `Visible template text ${cataloged}`;",
@@ -23,10 +26,28 @@ describe('DOGFOOD i18n debt inventory', () => {
     });
 
     expect(inventory.entries.map((entry) => entry.value)).toEqual([
+      'loading',
+      'continue',
       'Raw English Title',
       'Visible template text',
     ]);
-    expect(inventory.bySurface).toEqual([{ surface: 'fixture', count: 2 }]);
+    expect(inventory.bySurface).toEqual([{ surface: 'fixture', count: 4 }]);
+  });
+
+  it('freezes nested inventory entries and surface counts', () => {
+    const inventory = collectDogfoodI18nDebt({
+      sources: [{
+        surface: 'fixture',
+        path: 'examples/docs/fixture.ts',
+        text: "const title = 'Raw English Title';",
+      }],
+    });
+
+    expect(Object.isFrozen(inventory)).toBe(true);
+    expect(Object.isFrozen(inventory.entries)).toBe(true);
+    expect(Object.isFrozen(inventory.entries[0])).toBe(true);
+    expect(Object.isFrozen(inventory.bySurface)).toBe(true);
+    expect(Object.isFrozen(inventory.bySurface[0])).toBe(true);
   });
 
   it('groups the current DOGFOOD debt by source surface and stays within the explicit baseline', () => {

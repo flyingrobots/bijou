@@ -48,13 +48,13 @@ export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = Objec
 ]);
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 1740,
+  total: 2220,
   bySurface: Object.freeze({
-    'component-stories': 1466,
-    'docs-app': 242,
-    'dogfood-locale': 8,
-    'storybook-app': 14,
-    'storybook-workstation': 10,
+    'component-stories': 1753,
+    'docs-app': 405,
+    'dogfood-locale': 12,
+    'storybook-app': 38,
+    'storybook-workstation': 12,
   }),
 });
 
@@ -199,7 +199,7 @@ function normalizeLocalizableText(rawValue: string): string | undefined {
   if (value.startsWith('.') || value.startsWith('/')) return undefined;
   if (value.startsWith('@')) return undefined;
   if (/\.(gif|js|json|md|tape|ts|txt)$/i.test(value)) return undefined;
-  if (/^[a-z][a-z0-9._:/-]*$/.test(value)) return undefined;
+  if (/^[a-z0-9._:/-]+$/i.test(value) && /[._:/-]/.test(value)) return undefined;
   return value;
 }
 
@@ -284,8 +284,8 @@ function readRepoFile(path: string): string {
 
 function freezeInventory(inventory: DogfoodI18nDebtInventory): DogfoodI18nDebtInventory {
   return Object.freeze({
-    entries: Object.freeze([...inventory.entries]),
-    bySurface: Object.freeze([...inventory.bySurface]),
+    entries: Object.freeze(inventory.entries.map((entry) => Object.freeze({ ...entry }))),
+    bySurface: Object.freeze(inventory.bySurface.map((entry) => Object.freeze({ ...entry }))),
     total: inventory.total,
   });
 }
