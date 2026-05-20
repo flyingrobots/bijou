@@ -225,6 +225,13 @@ describe('active binding collection primitives', () => {
       contracts: [{
         owner,
         contract: data,
+        providerIds: { length: 0 } as never,
+      }],
+    })).toThrow('active binding collection: providerIds must be an array');
+    expect(() => collectActiveBindings({
+      contracts: [{
+        owner,
+        contract: data,
         providerIds: [null as never],
       }],
     })).toThrow('active binding collection: provider assignment 0 must be an object');

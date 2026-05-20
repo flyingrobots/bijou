@@ -302,11 +302,14 @@ function activeBindingEntriesFromContract(
 function providerAssignmentsByRequirementId(
   assignments: readonly ActiveBindingProviderAssignment[] | undefined,
 ): ReadonlyMap<RequirementId, ProviderId> {
-  if (assignments === undefined || assignments.length === 0) {
+  if (assignments === undefined) {
     return new Map();
   }
   if (!Array.isArray(assignments)) {
     throw new Error('active binding collection: providerIds must be an array');
+  }
+  if (assignments.length === 0) {
+    return new Map();
   }
 
   const providerIds = new Map<RequirementId, ProviderId>();
