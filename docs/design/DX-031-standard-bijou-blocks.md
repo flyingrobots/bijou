@@ -279,7 +279,7 @@ classDiagram
 
   BlockPackageManifest "1" *-- "1..*" BlockDefinition : exports
   BlockDefinition "1" *-- "1" BlockMetadata : describes
-  SchemaBoundBlock "1" --|> BlockDefinition : specializes
+  SchemaBoundBlock "1" *-- "1" BlockDefinition : wraps
   SchemaBoundBlock "1" *-- "1" BlockSchemaAdapter : validates
   BlockMetadata "1" *-- "1..*" BlockSlot : required slots
   BlockMetadata "1" o-- "0..*" BlockSlot : optional slots

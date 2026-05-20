@@ -15,7 +15,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   unknown boundary data into immutable typed data or deterministic issues before
   producing immutable block render input and binding facts. This does not add a
   hard Zod dependency, provider subscriptions, command dispatch, rendered
-  AppShell, DOGFOOD integration, or a broad block catalog.
+  AppShell, DOGFOOD integration, or a broad block catalog. Schema-bound bind
+  outputs now reject unsupported render-input/backchannel keys and malformed
+  untyped scalar/list inputs with deterministic domain errors.
 - **Runtime binding loop proofs for DX-034** —
   `@flyingrobots/bijou-tui` now exports runtime binding-source collection over
   the existing `RuntimeViewStack`, using `blocksBelow` to decide which declared

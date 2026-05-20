@@ -195,6 +195,44 @@ describe('schema-bound block contract', () => {
     }
   });
 
+  it('rejects unsupported bind output keys instead of dropping them silently', () => {
+    const block = defineBlock({
+      metadata: readerSurfaceMetadata,
+      render: () => ({ output: 'reader' }),
+    });
+    const topLevelTypo = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => ({ slotz: { content: 'typo' } }) as never,
+    });
+    const wrappedTypo = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => ({ input: { slotz: { content: 'typo' } } }) as never,
+    });
+    const backchannel = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => ({
+        input: { slots: { content: 'safe' } },
+        dispatch: () => undefined,
+      }) as never,
+    });
+
+    expect(() => bindSchemaBlockInput(topLevelTypo, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: unsupported bind output key slotz');
+    expect(() => bindSchemaBlockInput(wrappedTypo, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: unsupported input key slotz');
+    expect(() => bindSchemaBlockInput(backchannel, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: unsupported bind output key dispatch');
+  });
+
   it('preserves data and command contracts without taking ownership of provider lifecycle', () => {
     const article = defineDataRequirement({
       id: 'article',
@@ -263,5 +301,53 @@ describe('schema-bound block contract', () => {
       id: 'docs.invalid',
       parse: () => ({ ok: false, issues: [] }),
     }), {})).toThrow(Error);
+  });
+
+  it('reports deterministic errors for malformed untyped schema inputs', () => {
+    expect(() => defineBlockSchemaAdapter({
+      id: 42,
+      parse: () => ({ ok: true, data: {} }),
+    } as never)).toThrow('block schema adapter: id must be a string');
+
+    expect(() => parseBlockSchema(defineBlockSchemaAdapter({
+      id: 'docs.invalid',
+      parse: () => ({ ok: false, issues: { code: 'bad' } }) as never,
+    }), {})).toThrow('block schema result: issues must be an array');
+
+    const badDescription = defineBlockSchemaAdapter({
+      id: 'docs.description',
+      parse: () => ({ ok: true, data: {} }),
+      describe: () => ({ requiredFields: 'id' }) as never,
+    });
+    expect(() => badDescription.describe?.()).toThrow(
+      'block schema description: requiredFields must be an array',
+    );
+
+    const badSchemaFacts = defineBlockSchemaAdapter({
+      id: 'docs.facts',
+      parse: () => ({ ok: true, data: {} }),
+      describe: () => ({ facts: 'entity:article' }) as never,
+    });
+    expect(() => badSchemaFacts.describe?.()).toThrow(
+      'block schema description: facts must be an array',
+    );
+
+    const block = defineBlock({
+      metadata: readerSurfaceMetadata,
+      render: () => ({ output: 'reader' }),
+    });
+    const badBindFacts = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => ({
+        input: { slots: { content: 'DX-031' } },
+        facts: 'entity:article',
+      }) as never,
+    });
+
+    expect(() => bindSchemaBlockInput(badBindFacts, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: facts must be an array');
   });
 });

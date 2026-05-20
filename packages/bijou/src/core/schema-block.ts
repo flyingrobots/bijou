@@ -224,7 +224,12 @@ interface SchemaBoundBlockBrandCarrier {
 interface RequiredTextOptions {
   readonly scope: string;
   readonly field: string;
-  readonly value: string;
+  readonly value: unknown;
+}
+
+interface TextFieldOptions {
+  readonly scope: string;
+  readonly field: string;
 }
 
 interface NormalizedBindOutput<Config> {
@@ -269,7 +274,7 @@ function normalizeSchemaDescription(
     requiredFields: freezeStringList(description.requiredFields, 'requiredFields'),
     optionalFields: freezeStringList(description.optionalFields, 'optionalFields'),
     redactedFields: freezeStringList(description.redactedFields, 'redactedFields'),
-    facts: freezeFacts(description.facts),
+    facts: freezeFacts(description.facts, 'block schema description'),
   });
 }
 
@@ -281,6 +286,10 @@ function normalizeBindOutput<Config>(
   }
 
   if (Object.prototype.hasOwnProperty.call(output, 'input')) {
+    assertOnlyKeys(output, ['input', 'facts'], {
+      scope: 'schema block bind',
+      label: 'bind output',
+    });
     const wrappedOutput = output as {
       readonly input?: BlockRenderInput<Config>;
       readonly facts?: readonly BindingFact[];
@@ -288,13 +297,21 @@ function normalizeBindOutput<Config>(
     if (!isObjectLike(wrappedOutput.input)) {
       throw new Error('schema block bind: input must be an object');
     }
+    assertOnlyKeys(wrappedOutput.input, ['config', 'slots', 'mode'], {
+      scope: 'schema block bind',
+      label: 'input',
+    });
 
     return {
       input: freezeRenderInput(wrappedOutput.input),
-      facts: freezeFacts(wrappedOutput.facts),
+      facts: freezeFacts(wrappedOutput.facts, 'schema block bind'),
     };
   }
 
+  assertOnlyKeys(output, ['config', 'slots', 'mode'], {
+    scope: 'schema block bind',
+    label: 'bind output',
+  });
   return {
     input: freezeRenderInput(output as BlockRenderInput<Config>),
     facts: EMPTY_BINDING_FACTS,
@@ -321,7 +338,13 @@ function freezeRenderInput<Config>(
 function freezeSchemaIssues(
   issues: readonly BlockSchemaIssue[] | undefined,
 ): readonly BlockSchemaIssue[] {
-  if (issues === undefined || issues.length === 0) {
+  if (issues === undefined) {
+    throw new Error('block schema result: failed result requires at least one issue');
+  }
+  if (!Array.isArray(issues)) {
+    throw new Error('block schema result: issues must be an array');
+  }
+  if (issues.length === 0) {
     throw new Error('block schema result: failed result requires at least one issue');
   }
 
@@ -348,12 +371,24 @@ function normalizeIssue(issue: BlockSchemaIssue, index: number): BlockSchemaIssu
       field: `issues[${index}].message`,
       value: issue.message,
     }),
-    path: optionalTrimmedText(issue.path),
+    path: optionalTrimmedText(issue.path, {
+      scope: 'block schema issue',
+      field: `issues[${index}].path`,
+    }),
   };
 }
 
-function freezeFacts(facts: readonly BindingFact[] | undefined): readonly BindingFact[] {
-  if (facts === undefined || facts.length === 0) {
+function freezeFacts(
+  facts: readonly BindingFact[] | undefined,
+  scope = 'block schema facts',
+): readonly BindingFact[] {
+  if (facts === undefined) {
+    return EMPTY_BINDING_FACTS;
+  }
+  if (!Array.isArray(facts)) {
+    throw new Error(`${scope}: facts must be an array`);
+  }
+  if (facts.length === 0) {
     return EMPTY_BINDING_FACTS;
   }
 
@@ -366,6 +401,9 @@ function freezeStringList(
 ): readonly string[] | undefined {
   if (values === undefined) {
     return undefined;
+  }
+  if (!Array.isArray(values)) {
+    throw new Error(`block schema description: ${field} must be an array`);
   }
 
   return Object.freeze(values.map((value, index) => normalizeRequiredText({
@@ -393,6 +431,10 @@ function normalizeOutputMode(value: OutputMode | undefined): OutputMode | undefi
 }
 
 function normalizeRequiredText(options: RequiredTextOptions): string {
+  if (typeof options.value !== 'string') {
+    throw new Error(`${options.scope}: ${options.field} must be a string`);
+  }
+
   const normalized = options.value.trim();
   if (normalized === '') {
     throw new Error(`${options.scope}: ${options.field} is required`);
@@ -401,9 +443,15 @@ function normalizeRequiredText(options: RequiredTextOptions): string {
   return normalized;
 }
 
-function optionalTrimmedText(value: string | undefined): string | undefined {
+function optionalTrimmedText(
+  value: unknown,
+  options: TextFieldOptions,
+): string | undefined {
   if (value === undefined) {
     return undefined;
+  }
+  if (typeof value !== 'string') {
+    throw new Error(`${options.scope}: ${options.field} must be a string`);
   }
 
   const normalized = value.trim();
@@ -412,6 +460,27 @@ function optionalTrimmedText(value: string | undefined): string | undefined {
 
 function isObjectLike(value: unknown): value is object {
   return value !== null && typeof value === 'object';
+}
+
+interface AllowedKeyOptions {
+  readonly scope: string;
+  readonly label: string;
+}
+
+function assertOnlyKeys(
+  value: object,
+  allowedKeys: readonly string[],
+  options: AllowedKeyOptions,
+): void {
+  for (const key of Reflect.ownKeys(value)) {
+    if (typeof key !== 'string' || !allowedKeys.includes(key)) {
+      throw new Error(`${options.scope}: unsupported ${options.label} key ${keyText(key)}`);
+    }
+  }
+}
+
+function keyText(key: string | symbol): string {
+  return typeof key === 'string' ? key : key.toString();
 }
 
 function freezeInertData<T>(

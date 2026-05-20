@@ -89,6 +89,8 @@ describe('DX-031B schema-bound block contract', () => {
 
     expect(dx031).toContain('DX-031B Schema-Bound Blocks');
     expect(dx031).toContain('Schema-bound blocks validate boundary data');
+    expect(dx031).toContain('SchemaBoundBlock "1" *-- "1" BlockDefinition : wraps');
+    expect(dx031).not.toContain('SchemaBoundBlock "1" --|> BlockDefinition : specializes');
     expect(dx031).toContain('They do not fetch,');
     expect(dx031).toContain('subscribe, dispatch, compose runtime views, or render AppShell');
     expect(blocks).toContain('Schema-bound blocks validate unknown boundary data');
