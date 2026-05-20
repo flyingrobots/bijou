@@ -222,6 +222,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Counter block DOGFOOD intent emissions** — The non-shipping counter block
+  fixture now creates its command-intent metadata from the same public package
+  graph validated by the TUI runtime, so pressing `+`, `=`, or `-` in the
+  DOGFOOD Blocks preview no longer trips duplicate source/package intent
+  branding during `node --import tsx` execution.
 - **Spring example API drift** — `examples/spring` no longer passes the removed
   `fps` option to `animate()`, keeping the interactive spring comparison aligned
   with the current pulse-driven animation command API.

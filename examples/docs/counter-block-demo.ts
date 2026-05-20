@@ -12,7 +12,7 @@ import {
   type BlockRenderResult,
   type OutputMode,
   type Surface,
-} from '../../packages/bijou/src/index.js';
+} from '@flyingrobots/bijou';
 import {
   isRuntimeCommandIntentEmission,
   runtimeCommandIntentEmission,

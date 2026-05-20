@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
@@ -66,6 +67,33 @@ describe('DX-031F counter block fixture', () => {
     expect(equals?.intent.id).toBe('fixture.counter.increment');
     expect(minus?.intent.id).toBe('fixture.counter.decrement');
     expect(counterDemoIntentForKey('x')).toBeUndefined();
+  });
+
+  it('emits increment intents through the same node/tsx module graph used by DOGFOOD', () => {
+    const moduleUrl = new URL('../../../examples/docs/counter-block-demo.ts', import.meta.url);
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--import',
+        'tsx',
+        '--input-type=module',
+        '--eval',
+        [
+          `import { applyCounterDemoIntent, counterDemoIntentForAction, createCounterDemoModel } from ${JSON.stringify(moduleUrl.href)};`,
+          'const next = applyCounterDemoIntent(createCounterDemoModel(5), counterDemoIntentForAction("increment"));',
+          'process.stdout.write(JSON.stringify({ counter: next.counter, lastIntentId: next.lastIntentId }));',
+        ].join('\n'),
+      ],
+      {
+        cwd: new URL('../../../', import.meta.url),
+        encoding: 'utf8',
+      },
+    );
+
+    expect(JSON.parse(output)).toEqual({
+      counter: 6,
+      lastIntentId: 'fixture.counter.increment',
+    });
   });
 
   it('renders a deterministic animated progress surface from the previous value to the target value', () => {
