@@ -102,6 +102,18 @@ describe('DOGFOOD i18n export workflow', () => {
       .toBe('Bevorzugte Sprache');
   });
 
+  it('prints help as a successful usage path', async () => {
+    const result = await runDogfoodI18nExport({
+      args: ['--help'],
+      stdout: (text) => text,
+      stderr: () => undefined,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Usage: npm run dogfood:i18n:export');
+    expect(result.stderr).toBe('');
+  });
+
   it('can write CSV workbooks and JSON bundles to explicit filesystem targets', async () => {
     const dir = await makeTempDir();
     const result = await runDogfoodI18nExport({

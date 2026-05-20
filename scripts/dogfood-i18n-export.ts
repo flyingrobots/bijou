@@ -31,6 +31,7 @@ interface ParsedArgs {
   readonly out?: string;
   readonly bundle?: string;
   readonly coverage: boolean;
+  readonly help: boolean;
 }
 
 function usage(): string {
@@ -47,6 +48,7 @@ function parseArgs(args: readonly string[]): ParsedArgs {
   let out: string | undefined;
   let bundle: string | undefined;
   let coverage = false;
+  let help = false;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -79,7 +81,8 @@ function parseArgs(args: readonly string[]): ParsedArgs {
       continue;
     }
     if (arg === '--help' || arg === '-h') {
-      throw new Error(usage());
+      help = true;
+      continue;
     }
     throw new Error(`Unknown Dogfood i18n export argument: ${arg}`);
   }
@@ -90,6 +93,7 @@ function parseArgs(args: readonly string[]): ParsedArgs {
     out,
     bundle,
     coverage,
+    help,
   };
 }
 
@@ -118,6 +122,10 @@ export async function runDogfoodI18nExport(
 
   try {
     const parsed = parseArgs(args);
+    if (parsed.help) {
+      writeStdout(`${usage()}\n`);
+      return { exitCode: 0, stdout, stderr };
+    }
     if (parsed.coverage) {
       writeStdout(`${dogfoodI18nCoverage()
         .map((entry) => `${entry.locale}: ${entry.translated}/${entry.total} translated (${entry.missing} missing)`)
