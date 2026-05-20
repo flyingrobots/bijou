@@ -706,6 +706,10 @@ Layers expose branded `RuntimeViewBindingSource` values, and
 `collectRuntimeViewBindings()` converts active sources into an
 `ActiveBindingCollection`.
 
+Runtime binding sources normalize, copy, and freeze provider assignment metadata
+at construction so later caller mutation cannot change active binding
+collection results.
+
 DX-034G does not subscribe, refresh, dispatch, render, cache, resolve provider
 handles, bind schemas, or integrate DOGFOOD. It only proves that the active
 view hierarchy can identify active owner/requirement pairs.
@@ -725,6 +729,10 @@ provider manager.
 It resolves the collection's requirements against the scope, assembles the next
 immutable `BindingFrame`, and records provider updates as lifecycle
 invalidations. It never mutates the previous frame or lifecycle records.
+Explicit provider assignments carried by active binding entries are
+authoritative: a scope-resolved provider that conflicts with an explicit
+assignment becomes a deterministic `provider.assignment-mismatch` issue rather
+than data in the frame.
 
 ```text
 provider publishes snapshot
@@ -746,6 +754,8 @@ Views emit branded `RuntimeCommandIntentEmission` values from declared
 `RuntimeCommandIntentRoute` values into the existing `RuntimeCommandBuffer`.
 Business logic still handles the resulting command later through the normal
 command-buffer path.
+Emissions copy and deeply freeze inert payload data before routing so caller
+mutation cannot change the command that eventually reaches business logic.
 
 ```text
 view emits command intent

@@ -121,4 +121,61 @@ describe('binding frame updates from provider snapshots', () => {
     expect('subscribe' in update).toBe(false);
     expect('dispatch' in update).toBe(false);
   });
+
+  it('treats explicit active binding provider assignments as authoritative', () => {
+    const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+    const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+    const collection = activeBindingCollection([
+      activeBindingEntry({
+        owner,
+        requirement: article,
+        providerId: 'docs.expectedProvider',
+      }),
+    ]);
+    const scope = providerScope([
+      provide(defineDataProvider({
+        id: 'docs.actualProvider',
+        resource: 'docs.article',
+      })),
+    ]);
+    const update = bindingFrameUpdateFromSnapshots({
+      collection,
+      scope,
+      snapshots: [
+        bindingSnapshot({
+          providerId: 'docs.actualProvider',
+          requirementId: 'article',
+          version: 1,
+          status: 'ready',
+          data: { title: 'Wrong provider' },
+        }),
+      ],
+    });
+
+    expect(update.frame.get('article')).toBeUndefined();
+    expect(update.records).toEqual([
+      {
+        owner,
+        requirementId: 'article',
+        providerId: 'docs.expectedProvider',
+        state: 'active',
+        version: 1,
+        invalidations: [],
+        transitions: [],
+        facts: [],
+      },
+    ]);
+    expect(update.issues.map((issue) => issue.code)).toEqual([
+      'provider.assignment-mismatch',
+    ]);
+  });
+
+  it('throws deterministic errors for non-object frame update inputs', () => {
+    expect(() => bindingFrameUpdateFromSnapshots(null as never)).toThrow(
+      'binding frame update: input must be an object',
+    );
+    expect(() => bindingFrameUpdateFromSnapshots([] as never)).toThrow(
+      'binding frame update: input must be an object',
+    );
+  });
 });

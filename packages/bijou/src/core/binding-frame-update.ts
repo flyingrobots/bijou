@@ -40,6 +40,9 @@ export interface BindingFrameUpdate {
 export function bindingFrameUpdateFromSnapshots(
   input: BindingFrameUpdateFromSnapshotsInput,
 ): BindingFrameUpdate {
+  if (!isObjectRecord(input)) {
+    throw new Error('binding frame update: input must be an object');
+  }
   if (!isActiveBindingCollection(input.collection)) {
     throw new Error(
       'binding frame update: collection was not created by activeBindingCollection()',
@@ -61,21 +64,37 @@ export function bindingFrameUpdateFromSnapshots(
   });
 
   const resolutions = resolveProviderRequirements(input.collection.requirements(), input.scope);
-  const assembly = bindingFrameFromSnapshots({
+  const providerAssignmentMismatches = providerAssignmentMismatchIssues(
+    input.collection,
     resolutions,
-    snapshots: input.snapshots,
+  );
+  const mismatchedRequirementIds = new Set(
+    providerAssignmentMismatches.map((issue) => issue.path),
+  );
+  const effectiveResolutions = resolutions.filter(
+    (resolution) => !mismatchedRequirementIds.has(resolution.requirementId),
+  );
+  const effectiveSnapshots = input.snapshots.filter(
+    (snapshot) => !mismatchedRequirementIds.has(snapshot.requirementId),
+  );
+  const assembly = bindingFrameFromSnapshots({
+    resolutions: effectiveResolutions,
+    snapshots: effectiveSnapshots,
   });
   const records = invalidateUpdatedRecords({
     records: input.records ?? lifecycleRecordsForResolvedCollection(input.collection, resolutions),
-    resolutions,
-    snapshots: input.snapshots,
+    resolutions: effectiveResolutions,
+    snapshots: effectiveSnapshots,
   });
 
   return Object.freeze({
     frame: assembly.frame,
     records,
     resolutions,
-    issues: assembly.issues,
+    issues: freezeIssues([
+      ...providerAssignmentMismatches,
+      ...assembly.issues,
+    ]),
     facts: assembly.facts,
   });
 }
@@ -147,4 +166,48 @@ function invalidateUpdatedRecords(options: {
       });
     }),
   );
+}
+
+function providerAssignmentMismatchIssues(
+  collection: ActiveBindingCollection,
+  resolutions: readonly ProviderResolution[],
+): readonly BindingIssue[] {
+  const providerIdsByRequirementId = new Map<RequirementId, string>();
+  collection.entries().forEach((entry) => {
+    if (entry.providerId !== undefined) {
+      providerIdsByRequirementId.set(entry.requirement.id, entry.providerId);
+    }
+  });
+
+  return freezeIssues(resolutions.flatMap((resolution) => {
+    const expectedProviderId = providerIdsByRequirementId.get(resolution.requirementId);
+    if (
+      expectedProviderId === undefined
+      || resolution.providerId === undefined
+      || resolution.providerId === expectedProviderId
+    ) {
+      return [];
+    }
+
+    return [{
+      severity: 'error',
+      code: 'provider.assignment-mismatch',
+      message:
+        `Resolved provider ${resolution.providerId} for requirement `
+        + `${resolution.requirementId}; expected ${expectedProviderId}`,
+      path: resolution.requirementId,
+    } satisfies BindingIssue];
+  }));
+}
+
+function freezeIssues(issues: readonly BindingIssue[]): readonly BindingIssue[] {
+  if (issues.length === 0) {
+    return Object.freeze([]);
+  }
+
+  return Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }

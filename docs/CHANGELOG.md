@@ -21,6 +21,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   buffer while business logic applies commands later. Provider subscriptions,
   active hierarchy lifecycle management, rendered AppShell, schema binding,
   cache retention, and DOGFOOD integration remain follow-on work.
+- **Runtime binding loop hardening for DX-034** — Runtime binding sources now
+  normalize, copy, and freeze provider assignment objects instead of retaining
+  caller-owned references. Command intent emissions now copy and deeply freeze
+  inert payload data before routing, rejecting hidden mutation channels before a
+  command reaches the runtime buffer. `bindingFrameUpdateFromSnapshots()` now
+  treats explicit active binding provider assignments as authoritative and
+  reports deterministic `provider.assignment-mismatch` issues instead of
+  accepting snapshots from a different provider resolved by resource alone. The
+  new public binding-loop helpers also reject non-object inputs with
+  deterministic domain errors instead of raw `TypeError`s.
 - **Active binding collection primitives for `bijou`** —
   `@flyingrobots/bijou` now exports `ActiveBindingEntry`,
   `ActiveBindingCollection`, `activeBindingEntry()`,

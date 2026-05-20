@@ -119,6 +119,46 @@ describe('runtime active binding collection', () => {
       'runtime binding collection: source at layer docs-shell index 0 was not created by runtimeViewBindingSource()',
     );
   });
+
+  it('copies provider assignments before freezing a runtime binding source', () => {
+    const owner = defineBindingLifecycleOwner({ id: 'docs.shell', kind: 'app-shell' });
+    const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+    const data = defineViewData({
+      requirements: [{ name: 'article', requirement: article }],
+    });
+    const assignment = {
+      requirementId: 'article',
+      providerId: 'docs.articleProvider',
+    };
+    const source = runtimeViewBindingSource({
+      owner,
+      contract: data,
+      providerIds: [assignment],
+    });
+    assignment.providerId = 'docs.mutatedProvider';
+    const stack = createRuntimeViewStack({
+      id: 'docs-shell',
+      kind: 'app-shell',
+      dismissible: false,
+      blocksBelow: false,
+      model: { bindingSources: [source] },
+    });
+
+    expect(Object.isFrozen(source.providerIds)).toBe(true);
+    expect(Object.isFrozen(source.providerIds?.[0])).toBe(true);
+    expect(collectRuntimeViewBindings(stack).get('docs.shell', 'article')?.providerId).toBe(
+      'docs.articleProvider',
+    );
+  });
+
+  it('throws deterministic errors for non-object runtime binding source inputs', () => {
+    expect(() => runtimeViewBindingSource(null as never)).toThrow(
+      'runtime binding source: input must be an object',
+    );
+    expect(() => runtimeViewBindingSource([] as never)).toThrow(
+      'runtime binding source: input must be an object',
+    );
+  });
 });
 
 describe('runtime command intent dispatch proof', () => {
@@ -180,6 +220,48 @@ describe('runtime command intent dispatch proof', () => {
       buffer: createRuntimeCommandBuffer(),
     })).toThrow(
       'runtime command intent dispatch: no route for intent reader.refreshRequested',
+    );
+  });
+
+  it('copies and freezes command intent payloads before routing', () => {
+    type Payload = { readonly heading: { readonly id: string } };
+    type Command = { readonly type: 'reader.selectHeading'; readonly headingId: string };
+    const selectHeading = commandIntent<Payload>('reader.selectHeading');
+    const payload = { heading: { id: 'intro' } };
+    const emission = runtimeCommandIntentEmission(selectHeading, payload);
+    const route = runtimeCommandIntentRoute<Payload, Command>({
+      intent: selectHeading,
+      toCommand: (intentEmission) => ({
+        type: 'reader.selectHeading',
+        headingId: intentEmission.payload.heading.id,
+      }),
+    });
+    payload.heading.id = 'mutated';
+
+    const dispatched = dispatchRuntimeCommandIntent({
+      emission,
+      routes: [route],
+      buffer: createRuntimeCommandBuffer<Command>(),
+    });
+
+    expect(Object.isFrozen(emission.payload)).toBe(true);
+    expect(Object.isFrozen(emission.payload.heading)).toBe(true);
+    expect(dispatched.command.headingId).toBe('intro');
+  });
+
+  it('throws deterministic errors for non-object command routing inputs', () => {
+    const intent = commandIntent('reader.refreshRequested');
+
+    expect(() => runtimeCommandIntentEmission(
+      intent,
+      undefined,
+      null as never,
+    )).toThrow('runtime command intent emission: options must be an object');
+    expect(() => runtimeCommandIntentRoute(null as never)).toThrow(
+      'runtime command intent route: input must be an object',
+    );
+    expect(() => dispatchRuntimeCommandIntent(null as never)).toThrow(
+      'runtime command intent dispatch: input must be an object',
     );
   });
 });

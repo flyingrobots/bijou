@@ -7,6 +7,7 @@ import {
   type ActiveBindingProviderAssignment,
   type BindingLifecycleOwner,
   type CommandIntent,
+  type DeepReadonly,
   type ViewDataContract,
 } from '@flyingrobots/bijou';
 import {
@@ -46,7 +47,7 @@ export interface RuntimeCommandIntentEmissionOptions {
 export interface RuntimeCommandIntentEmission<Payload = undefined> {
   readonly [RUNTIME_COMMAND_INTENT_EMISSION_BRAND]: true;
   readonly intent: CommandIntent<Payload>;
-  readonly payload: Payload;
+  readonly payload: DeepReadonly<Payload>;
   readonly owner?: BindingLifecycleOwner;
 }
 
@@ -75,6 +76,8 @@ export interface DispatchRuntimeCommandIntentResult<Command> {
 export function runtimeViewBindingSource(
   input: RuntimeViewBindingSourceInput,
 ): RuntimeViewBindingSource {
+  assertObjectRecord(input, 'runtime binding source');
+
   if (!isBindingLifecycleOwner(input.owner)) {
     throw new Error(
       'runtime binding source: owner was not created by defineBindingLifecycleOwner()',
@@ -85,16 +88,11 @@ export function runtimeViewBindingSource(
       'runtime binding source: contract was not created by defineViewData()',
     );
   }
-  if (input.providerIds !== undefined && !Array.isArray(input.providerIds)) {
-    throw new Error('runtime binding source: providerIds must be an array');
-  }
 
   const source = {
     owner: input.owner,
     contract: input.contract,
-    providerIds: input.providerIds === undefined
-      ? undefined
-      : Object.freeze([...input.providerIds]),
+    providerIds: freezeProviderAssignments(input.providerIds),
   } as RuntimeViewBindingSource;
 
   Object.defineProperty(source, RUNTIME_VIEW_BINDING_SOURCE_BRAND, { value: true });
@@ -114,6 +112,8 @@ export function runtimeCommandIntentEmission<Payload>(
   payload?: Payload,
   options: RuntimeCommandIntentEmissionOptions = {},
 ): RuntimeCommandIntentEmission<Payload | undefined> {
+  assertObjectRecord(options, 'runtime command intent emission', 'options');
+
   if (!isCommandIntent(intent)) {
     throw new Error('runtime command intent emission: intent was not created by commandIntent()');
   }
@@ -125,7 +125,7 @@ export function runtimeCommandIntentEmission<Payload>(
 
   const emission = {
     intent,
-    payload,
+    payload: freezeRuntimePayload(payload),
     owner: options.owner,
   } as RuntimeCommandIntentEmission<Payload | undefined>;
 
@@ -147,6 +147,8 @@ export function isRuntimeCommandIntentEmission(
 export function runtimeCommandIntentRoute<Payload, Command>(
   input: RuntimeCommandIntentRouteInput<Payload, Command>,
 ): RuntimeCommandIntentRoute<Payload, Command> {
+  assertObjectRecord(input, 'runtime command intent route');
+
   if (!isCommandIntent(input.intent)) {
     throw new Error('runtime command intent route: intent was not created by commandIntent()');
   }
@@ -175,6 +177,8 @@ export function isRuntimeCommandIntentRoute(value: unknown): value is RuntimeCom
 export function dispatchRuntimeCommandIntent<Payload, Command>(
   input: DispatchRuntimeCommandIntentInput<Payload, Command>,
 ): DispatchRuntimeCommandIntentResult<Command> {
+  assertObjectRecord(input, 'runtime command intent dispatch');
+
   if (!isRuntimeCommandIntentEmission(input.emission)) {
     throw new Error(
       'runtime command intent dispatch: emission was not created by runtimeCommandIntentEmission()',
@@ -299,4 +303,190 @@ function isRuntimeCommandBuffer(value: unknown): value is RuntimeCommandBuffer {
       && typeof value === 'object'
       && Array.isArray((value as RuntimeCommandBuffer).items),
   );
+}
+
+function freezeProviderAssignments(
+  assignments: readonly ActiveBindingProviderAssignment[] | undefined,
+): readonly ActiveBindingProviderAssignment[] | undefined {
+  if (assignments === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(assignments)) {
+    throw new Error('runtime binding source: providerIds must be an array');
+  }
+
+  const seenRequirementIds = new Set<string>();
+  return Object.freeze(assignments.map((assignment, index) => {
+    assertObjectRecord(
+      assignment,
+      'runtime binding source',
+      `provider assignment ${index}`,
+    );
+    const requirementId = normalizeRequiredText({
+      scope: 'runtime binding source',
+      field: `provider assignment ${index} requirementId`,
+      value: assignment['requirementId'],
+    });
+    if (seenRequirementIds.has(requirementId)) {
+      throw new Error(
+        `runtime binding source: duplicate provider assignment ${requirementId}`,
+      );
+    }
+
+    seenRequirementIds.add(requirementId);
+    return Object.freeze({
+      requirementId,
+      providerId: normalizeRequiredText({
+        scope: 'runtime binding source',
+        field: `provider assignment ${index} providerId`,
+        value: assignment['providerId'],
+      }),
+    });
+  }));
+}
+
+function freezeRuntimePayload<Payload>(
+  payload: Payload | undefined,
+): DeepReadonly<Payload | undefined> {
+  if (payload === undefined) {
+    return undefined as DeepReadonly<Payload | undefined>;
+  }
+
+  return deepFreeze(cloneRuntimePayload(payload, 'payload'));
+}
+
+function cloneRuntimePayload<Payload>(
+  value: Payload,
+  path: string,
+  seen: WeakSet<object> = new WeakSet<object>(),
+): Payload {
+  if (
+    value === null
+    || typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'boolean'
+  ) {
+    return value;
+  }
+
+  if (typeof value === 'bigint' || typeof value === 'symbol' || typeof value === 'function') {
+    throw new Error(`runtime command intent payload: unsupported ${typeof value} at ${path}`);
+  }
+  if (value === undefined) {
+    throw new Error(`runtime command intent payload: unsupported undefined at ${path}`);
+  }
+  if (typeof value !== 'object') {
+    throw new Error(`runtime command intent payload: unsupported ${typeof value} at ${path}`);
+  }
+
+  const objectValue = value as object;
+  if (seen.has(objectValue)) {
+    throw new Error(`runtime command intent payload: circular reference at ${path}`);
+  }
+  seen.add(objectValue);
+
+  try {
+    if (Array.isArray(value)) {
+      return value.map((item, index) => cloneRuntimePayload(
+        item,
+        `${path}[${index}]`,
+        seen,
+      )) as Payload;
+    }
+    if (!isPlainObject(value)) {
+      throw new Error(
+        `runtime command intent payload: unsupported ${objectKind(value)} at ${path}`,
+      );
+    }
+
+    const clone = Object.create(Object.getPrototypeOf(value)) as Record<string, unknown>;
+    const descriptors = Object.getOwnPropertyDescriptors(value);
+    for (const key of Reflect.ownKeys(descriptors)) {
+      if (typeof key === 'symbol') {
+        throw new Error(`runtime command intent payload: unsupported symbol property at ${path}`);
+      }
+
+      const descriptor = descriptors[key];
+      const propertyPath = `${path}.${key}`;
+      if (descriptor === undefined) {
+        continue;
+      }
+      if (!descriptor.enumerable) {
+        throw new Error(
+          `runtime command intent payload: unsupported non-enumerable property at ${propertyPath}`,
+        );
+      }
+      if ('get' in descriptor || 'set' in descriptor) {
+        throw new Error(
+          `runtime command intent payload: unsupported accessor at ${propertyPath}`,
+        );
+      }
+
+      clone[key] = cloneRuntimePayload(descriptor.value, propertyPath, seen);
+    }
+
+    return clone as Payload;
+  } finally {
+    seen.delete(objectValue);
+  }
+}
+
+function deepFreeze<Payload>(
+  value: Payload,
+  seen: WeakSet<object> = new WeakSet<object>(),
+): DeepReadonly<Payload> {
+  if (value === null || typeof value !== 'object') {
+    return value as DeepReadonly<Payload>;
+  }
+
+  const objectValue = value as object;
+  if (seen.has(objectValue)) {
+    return value as DeepReadonly<Payload>;
+  }
+
+  seen.add(objectValue);
+  for (const key of Reflect.ownKeys(objectValue)) {
+    const descriptor = Object.getOwnPropertyDescriptor(objectValue, key);
+    if (descriptor !== undefined && 'value' in descriptor) {
+      deepFreeze(descriptor.value, seen);
+    }
+  }
+
+  return Object.freeze(value) as DeepReadonly<Payload>;
+}
+
+function assertObjectRecord(
+  value: unknown,
+  scope: string,
+  label = 'input',
+): asserts value {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${scope}: ${label} must be an object`);
+  }
+}
+
+function normalizeRequiredText(options: {
+  readonly scope: string;
+  readonly field: string;
+  readonly value: unknown;
+}): string {
+  if (typeof options.value !== 'string') {
+    throw new Error(`${options.scope}: ${options.field} must be a string`);
+  }
+
+  const normalized = options.value.trim();
+  if (normalized === '') {
+    throw new Error(`${options.scope}: ${options.field} is required`);
+  }
+
+  return normalized;
+}
+
+function isPlainObject(value: object): boolean {
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function objectKind(value: object): string {
+  return Object.prototype.toString.call(value).slice(8, -1);
 }
