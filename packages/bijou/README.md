@@ -99,7 +99,8 @@ fake duplication rather than a real second API.
   `inspectorPanelBlock`**: Import the first-party standard block
   definitions for AppShell, ReaderSurface, and InspectorPanel. These expose
   contracts, stories, data requirements, command intents, and schema-bound
-  posture without providing rendered AppShell product yet.
+  posture, with deterministic first-proof render output across all output
+  modes. Production AppShell behavior remains a later runtime slice.
 - **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
   Bijou peer compatibility for ordinary NPM block packages.
 - **`defineBlockSchemaAdapter()` / `defineSchemaBlock()`**: Validate unknown

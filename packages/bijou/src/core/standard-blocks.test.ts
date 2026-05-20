@@ -12,6 +12,7 @@ import {
   bindSchemaBlockInput,
   isSchemaBoundBlockDefinition,
 } from './schema-block.js';
+import { lintModeLowering } from './mode-lowering.js';
 import {
   appShellBlock,
   inspectorPanelBlock,
@@ -255,6 +256,101 @@ describe('first-party standard block definitions', () => {
     expect(composition.commandIntents().map((intent) => intent.id)).toContain('reader.selectHeading');
     expect(composition.commandIntents().map((intent) => intent.id)).toContain('inspector.revealSelection');
     expect(renderCalls).toBe(0);
+  });
+
+  it('renders AppShell semantic regions without placeholder output', () => {
+    const rendered = appShellBlock.render({
+      mode: 'pipe',
+      slots: {
+        navigation: 'Docs nav',
+        content: 'Blocks guide',
+        inspector: 'Current block: ReaderSurface',
+        status: 'Ready',
+        overlays: ['Command palette', 'Help drawer'],
+      },
+    });
+
+    expect(rendered.output).toContain('AppShell');
+    expect(rendered.output).toContain('navigation: Docs nav');
+    expect(rendered.output).toContain('content: Blocks guide');
+    expect(rendered.output).toContain('inspector: Current block: ReaderSurface');
+    expect(rendered.output).toContain('status: Ready');
+    expect(rendered.output).toContain('overlays: Command palette; Help drawer');
+    expect(rendered.output).not.toContain('definition placeholder');
+    expect(rendered.facts).toEqual(expect.arrayContaining([
+      { kind: 'entity', key: 'block', value: 'AppShell' },
+      { kind: 'state', key: 'block.rendered', value: true },
+      { kind: 'entity', key: 'region.content', value: 'present' },
+    ]));
+  });
+
+  it('renders ReaderSurface content, navigation, and outline deterministically', () => {
+    const outline = Object.freeze(['Why Blocks', 'Lowering']);
+    const rendered = readerSurfaceBlock.render({
+      mode: 'accessible',
+      slots: {
+        content: '# Blocks\nBlocks are reusable Bijou view contracts.',
+        navigation: 'Components > Blocks',
+        outline,
+      },
+    });
+
+    expect(rendered.output).toContain('ReaderSurface');
+    expect(rendered.output).toContain('Navigation: Components > Blocks');
+    expect(rendered.output).toContain('Content:');
+    expect(rendered.output).toContain('# Blocks');
+    expect(rendered.output).toContain('Outline: Why Blocks; Lowering');
+    expect(rendered.output).not.toContain('definition placeholder');
+    expect(outline).toEqual(['Why Blocks', 'Lowering']);
+    expect(rendered.facts).toEqual(expect.arrayContaining([
+      { kind: 'entity', key: 'block', value: 'ReaderSurface' },
+      { kind: 'state', key: 'block.rendered', value: true },
+      { kind: 'entity', key: 'slot.content', value: 'present' },
+      { kind: 'entity', key: 'slot.outline', value: 'present' },
+    ]));
+  });
+
+  it('renders InspectorPanel selection and details deterministically', () => {
+    const details = Object.freeze(['type: block', 'state: ready']);
+    const rendered = inspectorPanelBlock.render({
+      mode: 'pipe',
+      slots: {
+        selection: 'ReaderSurface',
+        details,
+        actions: ['reveal source', 'focus docs'],
+      },
+    });
+
+    expect(rendered.output).toContain('InspectorPanel');
+    expect(rendered.output).toContain('selection: ReaderSurface');
+    expect(rendered.output).toContain('details: type: block; state: ready');
+    expect(rendered.output).toContain('actions: reveal source; focus docs');
+    expect(rendered.output).not.toContain('definition placeholder');
+    expect(details).toEqual(['type: block', 'state: ready']);
+    expect(rendered.facts).toEqual(expect.arrayContaining([
+      { kind: 'entity', key: 'block', value: 'InspectorPanel' },
+      { kind: 'state', key: 'block.rendered', value: true },
+      { kind: 'entity', key: 'slot.selection', value: 'present' },
+      { kind: 'entity', key: 'slot.details', value: 'present' },
+    ]));
+  });
+
+  it('preserves rendered block facts across output modes', () => {
+    const modes = ['interactive', 'static', 'pipe', 'accessible'] as const;
+    const report = lintModeLowering({
+      modes: modes.map((mode) => ({
+        mode,
+        facts: readerSurfaceBlock.render({
+          mode,
+          slots: {
+            content: 'Rendered body',
+            outline: ['Intro'],
+          },
+        }).facts ?? [],
+      })),
+    });
+
+    expect(report).toMatchObject({ passed: true });
   });
 });
 

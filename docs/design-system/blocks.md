@@ -65,8 +65,10 @@ Bijou now exposes a metadata-first block authoring contract from
 - `appShellBlock`, `readerSurfaceBlock`, `inspectorPanelBlock`,
   `standardBlocks`, `standardBlockStories`, and
   `standardBlockPackageManifest` expose the first-party block definitions:
-  AppShell, ReaderSurface, and InspectorPanel. They are definition and contract
-  artifacts, not rendered block products.
+  AppShell, ReaderSurface, and InspectorPanel. Their render functions now
+  produce deterministic first-proof output across interactive, static, pipe,
+  and accessible modes while keeping provider lifecycle and production AppShell
+  behavior out of the block definition layer.
 - `defineAppShellComposition()` groups runtime-backed blocks into logical
   navigation, content, inspector, status, and overlay slots without rendering.
 - `defineBlockSchemaAdapter()`, `defineSchemaBlock()`, and
@@ -81,7 +83,7 @@ registration, and tooling can discover slots and mode support directly.
 Schema-bound blocks validate unknown boundary data without making Zod, GraphQL,
 or database schemas part of the core block dependency surface. Provider
 subscriptions, active hierarchy traversal, rendered AppShell, and DOGFOOD block
-proof remain follow-on work.
+multi-mode captures remain follow-on work.
 
 ## First credible block candidates
 
