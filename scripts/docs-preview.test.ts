@@ -114,7 +114,7 @@ describe('docs preview app', () => {
   it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
     execFileSync(
       process.execPath,
-      ['--import', 'tsx', '-e', "await import('./examples/docs/app.ts')"],
+      ['--import', 'tsx', '--input-type=module', '-e', "await import('./examples/docs/app.ts')"],
       {
         cwd: resolve(import.meta.dirname, '..'),
         stdio: 'pipe',
