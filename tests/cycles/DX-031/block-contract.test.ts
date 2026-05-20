@@ -70,7 +70,8 @@ describe('DX-031 block contract cycle', () => {
     expect(blocks).toContain('BlockMetadata');
     expect(blocks).toContain('BlockPackageManifest');
     expect(blocks).toContain('defineBlock()');
-    expect(blocks).toContain('Schema-bound blocks remain a follow-on');
+    expect(blocks).toContain('defineSchemaBlock()');
+    expect(blocks).toContain('Schema-bound blocks validate unknown boundary data');
   });
 
   it('exports public block helpers from the bijou root barrel', () => {
@@ -85,6 +86,9 @@ describe('DX-031 block contract cycle', () => {
     expect(rootBarrel).toContain('blockMetadataSummary');
     expect(rootBarrel).toContain('ViewDataContract');
     expect(rootBarrel).toContain('CommandIntent');
+    expect(rootBarrel).toContain('defineBlockSchemaAdapter');
+    expect(rootBarrel).toContain('defineSchemaBlock');
+    expect(rootBarrel).toContain('bindSchemaBlockInput');
   });
 
   it('lets authors define a block and package manifest without global registration', () => {

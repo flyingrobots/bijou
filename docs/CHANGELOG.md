@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Schema-bound block contract for `bijou`** — `@flyingrobots/bijou` now
+  exports adapter-first schema-bound block primitives:
+  `BlockSchemaAdapter`, `defineBlockSchemaAdapter()`, `defineSchemaBlock()`,
+  `parseBlockSchema()`, and `bindSchemaBlockInput()`. Blocks can validate
+  unknown boundary data into immutable typed data or deterministic issues before
+  producing immutable block render input and binding facts. This does not add a
+  hard Zod dependency, provider subscriptions, command dispatch, rendered
+  AppShell, DOGFOOD integration, or a broad block catalog.
 - **Runtime binding loop proofs for DX-034** —
   `@flyingrobots/bijou-tui` now exports runtime binding-source collection over
   the existing `RuntimeViewStack`, using `blocksBelow` to decide which declared

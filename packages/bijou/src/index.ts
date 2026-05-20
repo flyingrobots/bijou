@@ -222,6 +222,23 @@ export {
   type BlockVariantMetadata,
 } from './core/block-metadata.js';
 export {
+  bindSchemaBlockInput,
+  defineBlockSchemaAdapter,
+  defineSchemaBlock,
+  isBlockSchemaAdapter,
+  isSchemaBoundBlockDefinition,
+  parseBlockSchema,
+  type BlockSchemaAdapter,
+  type BlockSchemaAdapterInput,
+  type BlockSchemaDescription,
+  type BlockSchemaIssue,
+  type BlockSchemaResult,
+  type SchemaBlockBindOutput,
+  type SchemaBlockBindResult,
+  type SchemaBoundBlockDefinition,
+  type SchemaBoundBlockDefinitionInput,
+} from './core/schema-block.js';
+export {
   componentMetadataReportText,
   componentMetadataSummary,
   defineComponentMetadata,

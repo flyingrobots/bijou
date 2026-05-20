@@ -118,9 +118,12 @@ that tools can inspect before rendering:
 ```typescript
 import {
   commandIntent,
+  bindSchemaBlockInput,
   defineBlock,
   defineBlockPackage,
+  defineBlockSchemaAdapter,
   defineDataRequirement,
+  defineSchemaBlock,
   defineViewData,
 } from '@flyingrobots/bijou';
 
@@ -164,8 +167,59 @@ export const docsBlocks = defineBlockPackage({
 Blocks are explicit imports, not runtime plugins. `BlockMetadata` and
 `BlockPackageManifest` are intended for docs, DOGFOOD, MCP payloads, and package
 compatibility checks. `data` and `commands` are inspectable contracts, not
-runtime provider handles or command callbacks. Schema-bound blocks are still a
-follow-on layer.
+runtime provider handles or command callbacks.
+
+Use schema-bound blocks when unknown boundary data needs validation before it
+becomes render input:
+
+```typescript
+const articleSchema = defineBlockSchemaAdapter<{ id: string; title: string }>({
+  id: 'docs.article',
+  parse(input) {
+    if (
+      input === null
+      || typeof input !== 'object'
+      || typeof (input as { id?: unknown }).id !== 'string'
+      || typeof (input as { title?: unknown }).title !== 'string'
+    ) {
+      return {
+        ok: false,
+        issues: [{
+          severity: 'error',
+          code: 'article.invalid',
+          message: 'Article data is required.',
+        }],
+      };
+    }
+
+    return {
+      ok: true,
+      data: {
+        id: (input as { id: string }).id,
+        title: (input as { title: string }).title,
+      },
+    };
+  },
+});
+
+const articleReaderBlock = defineSchemaBlock({
+  block: readerSurfaceBlock,
+  schema: articleSchema,
+  bind: article => ({
+    input: { slots: { content: article.title } },
+    facts: [{ kind: 'entity', key: 'article', value: article.id }],
+  }),
+});
+
+const bound = bindSchemaBlockInput(articleReaderBlock, {
+  id: 'intro',
+  title: 'Introduction',
+});
+```
+
+Schema-bound blocks validate shape at the block boundary. They do not fetch,
+subscribe, dispatch commands, resolve providers, render AppShell, or register
+global runtime behavior.
 
 ## AppShell Composition
 
