@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Counter block DOGFOOD fixture and frame perf HUD** — DOGFOOD now includes a
+  non-shipping `CounterDemoBlock` fixture in the Blocks preview and Storybook
+  catalog. The fixture proves bounded `0..10` counter state, animated
+  interactive progress, `-`/`+` command-intent emissions, static output without
+  controls, plain pipe/screenreader lowering, and a JSON snapshot shape without
+  becoming part of the shipping standard block catalog. `createFramedApp()` also
+  owns a global backtick shortcut for a shell performance HUD built from
+  `perfOverlaySurface()`, parallel to the shell-owned quit/help/settings
+  handlers.
 - **Rendered standard block proof for `bijou`** —
   `AppShell`, `ReaderSurface`, and `InspectorPanel` now render deterministic
   first-party block output across interactive, static, pipe, and accessible

@@ -129,6 +129,7 @@ timeline()
 - Tab and page switching.
 - Pane focus and scroll isolation.
 - Built-in help (`?`) and command-palette (`Ctrl+P`).
+- Shell performance HUD (`` ` ``) backed by `perfOverlaySurface()`.
 - Notification review and shell-owned settings.
 
 For framed shells, Node hosts can keep using `startApp(app)`: the hosted

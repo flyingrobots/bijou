@@ -111,6 +111,10 @@ export interface FrameModel<PageModel> {
   readonly frameBudgetMs?: number;
   /** Whether the most recently committed frame exceeded the current budget. */
   readonly frameOverBudget: boolean;
+  /** Whether the shell-owned performance HUD is visible. */
+  readonly perfHudOpen: boolean;
+  /** Recent frame timings retained for the shell-owned performance HUD. */
+  readonly frameTimeHistory: readonly number[];
   /** Help visibility flag. */
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
@@ -226,6 +230,7 @@ export type FrameAction =
   | { type: 'scroll-right' }
   | { type: 'open-search' }
   | { type: 'open-palette' }
+  | { type: 'toggle-perf-hud' }
   | { type: 'toggle-minimize' }
   | { type: 'toggle-maximize' }
   | { type: 'dock-up' }

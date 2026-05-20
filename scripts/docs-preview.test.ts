@@ -1036,4 +1036,28 @@ describe('docs preview app', () => {
     ], { ctx });
     expect((dismissed.model as any).docsModel.quitConfirmOpen).toBe(false);
   });
+
+  it('opens the global frame performance HUD from DOGFOOD with backtick', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const opened = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '`' },
+    ], { ctx });
+    const openedText = frameText(opened.frames.at(-1)!);
+
+    expect((opened.model as any).docsModel.perfHudOpen).toBe(true);
+    expect(openedText).toContain('Perf HUD');
+    expect(openedText).toContain('frame');
+
+    const closed = await runScript(app, [
+      { key: KEY_ENTER },
+      { key: '`' },
+      { key: '`' },
+    ], { ctx });
+
+    expect((closed.model as any).docsModel.perfHudOpen).toBe(false);
+    expect(frameText(closed.frames.at(-1)!)).not.toContain('Perf HUD');
+  });
 });

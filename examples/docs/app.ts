@@ -52,6 +52,7 @@ import {
   type App,
   type Cmd,
   type FramePageMsg,
+  type FrameInputArea,
   type FrameModel,
   type FrameLayoutNode,
   type FramedApp,
@@ -85,6 +86,15 @@ import {
   type StoryMode,
 } from '../_stories/protocol.js';
 import { resolveDogfoodDocsCoverage, type DogfoodDocsCoverage } from './coverage.js';
+import {
+  applyCounterDemoIntent,
+  counterDemoIntentForAction,
+  counterDemoLivePreviewText,
+  createCounterDemoModel,
+  tickCounterDemoModel,
+  type CounterDemoIntentAction,
+  type CounterDemoModel,
+} from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -289,6 +299,7 @@ interface DocsExplorerModel {
   readonly showHints: boolean;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
+  readonly counterBlockDemo: CounterDemoModel;
 }
 
 type ExplorerMsg =
@@ -313,7 +324,8 @@ type ExplorerMsg =
   | { type: 'activate-guide-index'; index: number }
   | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
-  | { type: 'cycle-landing-quality' };
+  | { type: 'cycle-landing-quality' }
+  | { type: 'counter-block-intent'; action: CounterDemoIntentAction };
 
 interface RootModel {
   readonly route: 'landing' | 'docs';
@@ -782,6 +794,13 @@ const componentsPageKeys = createKeyMap<ExplorerMsg>()
     .bind(',', 'Previous variant', { type: 'variant-prev' }),
   );
 
+const blocksPreviewPaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Counter fixture', (group) => group
+    .bind('-', 'Decrease counter', { type: 'counter-block-intent', action: 'decrement' })
+    .bind('+', 'Increase counter', { type: 'counter-block-intent', action: 'increment' })
+    .bind('=', 'Increase counter', { type: 'counter-block-intent', action: 'increment' }),
+  );
+
 interface DocsAppOptions {
   readonly locale?: string;
   readonly direction?: I18nDirection;
@@ -966,17 +985,25 @@ function formatDocsList(values: readonly string[]): string {
 }
 
 function renderBlocksPreviewPane(
+  model: DocsExplorerModel,
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(28, paneWidth - 6);
-  const sections = standardBlocks.map((block) => ({
-    title: `Page: ${block.metadata.blockName}`,
-    expanded: true,
-    content: standardBlockLivePreviewText(block, bodyWidth, ctx),
-  }));
+  const sections = [
+    {
+      title: 'Fixture: CounterDemoBlock',
+      expanded: true,
+      content: counterDemoLivePreviewText(model.counterBlockDemo, bodyWidth, ctx),
+    },
+    ...standardBlocks.map((block) => ({
+      title: `Page: ${block.metadata.blockName}`,
+      expanded: true,
+      content: standardBlockLivePreviewText(block, bodyWidth, ctx),
+    })),
+  ];
   const body = accordion(sections, {
     indicatorToken: docsThemeBorderToken(theme),
     titleToken: docsThemeAccentToken(theme),
@@ -1258,6 +1285,7 @@ function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): Docs
     showHints: true,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
+    counterBlockDemo: createCounterDemoModel(5),
   };
 }
 
@@ -2990,7 +3018,7 @@ function renderGuideReaderPane(
   }
 
   if (pageId === BLOCKS_PAGE_ID && doc.id === 'blocks-preview') {
-    return renderBlocksPreviewPane(width, ctx, theme);
+    return renderBlocksPreviewPane(model, width, ctx, theme);
   }
 
   return insetPaneSurface(column([
@@ -3078,6 +3106,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRun
             { paneSwitch },
           );
         case 'guide-content':
+          if (pageId === BLOCKS_PAGE_ID && pageModel.selectedGuideId === 'blocks-preview') {
+            return dogfoodText(
+              i18n,
+              'docs.footer.blocksPreview',
+              '{paneSwitch} • -/+ counter fixture • j/k scroll • d/u page • g/G top/bottom',
+              { paneSwitch },
+            );
+          }
           return dogfoodText(
             i18n,
             'docs.footer.guide',
@@ -3483,9 +3519,11 @@ function createDocsExplorerApp(
             return [model, []];
           }
           if (msg.type === 'pulse') {
+            const deltaMs = Math.round(Math.max(0, msg.dt) * 1000);
             return [{
               ...model,
-              previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+              previewTimeMs: model.previewTimeMs + deltaMs,
+              counterBlockDemo: tickCounterDemoModel(model.counterBlockDemo, deltaMs),
             }, []];
           }
           switch (msg.type) {
@@ -3507,17 +3545,37 @@ function createDocsExplorerApp(
               return [{ ...model, showHints: !model.showHints }, []];
             case 'cycle-landing-quality':
               return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+            case 'counter-block-intent':
+              return [{
+                ...model,
+                counterBlockDemo: applyCounterDemoIntent(
+                  model.counterBlockDemo,
+                  counterDemoIntentForAction(msg.action),
+                ),
+                previewTimeMs: 0,
+              }, []];
             default:
               return [model, []];
           }
         },
         inputAreas(model) {
-          return [{
+          const inputAreas: FrameInputArea<DocsExplorerModel, DocsMsg>[] = [{
             paneId: 'guide-nav',
             keyMap: guidePaneKeys,
             helpSource: guidePaneKeys,
             mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
           }];
+          if (spec.id === BLOCKS_PAGE_ID && model.selectedGuideId === 'blocks-preview') {
+            return [
+              ...inputAreas,
+              {
+                paneId: 'guide-content',
+                keyMap: blocksPreviewPaneKeys,
+                helpSource: blocksPreviewPaneKeys,
+              },
+            ];
+          }
+          return inputAreas;
         },
         searchTitle: `Search ${pageTitle(spec.id, i18n).toLowerCase()}`,
         searchItems() {

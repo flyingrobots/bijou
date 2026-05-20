@@ -30,6 +30,12 @@ describe('parseKeyCombo', () => {
     });
   });
 
+  it('parses literal plus as a plain key instead of a modifier separator', () => {
+    expect(parseKeyCombo('+')).toEqual({
+      key: '+', ctrl: false, alt: false, shift: false,
+    });
+  });
+
   it('parses ctrl modifier', () => {
     expect(parseKeyCombo('ctrl+c')).toEqual({
       key: 'c', ctrl: true, alt: false, shift: false,

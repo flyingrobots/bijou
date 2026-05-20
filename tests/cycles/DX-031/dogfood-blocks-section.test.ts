@@ -78,6 +78,49 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     }
   });
 
+  it('executes the counter fixture block from the DOGFOOD Blocks preview', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 80 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+
+    const incremented = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: 'blocks-preview' },
+        },
+      },
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'counter-block-intent', action: 'increment' },
+        },
+      },
+    ], { ctx });
+    const incrementedText = frameText(incremented.frames.at(-1)!);
+
+    expect(docsPageModel(incremented.model as any, 'blocks').counterBlockDemo.counter).toBe(6);
+    expect(incrementedText).toContain('Fixture: CounterDemoBlock');
+    expect(incrementedText).toContain('Counter: 6');
+    expect(incrementedText).toContain('fixture.counter.increment');
+
+    const decremented = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: 'blocks-preview' },
+        },
+      },
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'counter-block-intent', action: 'decrement' },
+        },
+      },
+    ], { ctx });
+
+    expect(docsPageModel(decremented.model as any, 'blocks').counterBlockDemo.counter).toBe(4);
+  });
+
   it('renders block lowering posture from the standard block mode declarations', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 54 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });

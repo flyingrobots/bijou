@@ -119,9 +119,10 @@ await app.run({ ctx });
 ```
 
 This path keeps the shell batteries included: mouse input defaults to `true`,
-the shared runtime loop still does the heavy lifting, and frame timing/budget
-telemetry stays attached to the frame model for shell-owned UI. For Node-hosted
-apps, `startApp(app)` remains the default bootstrap.
+the shared runtime loop still does the heavy lifting, frame timing/budget
+telemetry stays attached to the frame model for shell-owned UI, and `` ` ``
+toggles the built-in performance HUD. For Node-hosted apps, `startApp(app)`
+remains the default bootstrap.
 
 ## Animation
 

@@ -99,6 +99,13 @@ import {
   CANONICAL_STORY_PROFILE_PRESETS,
   type ComponentStory,
 } from '../_stories/protocol.js';
+import {
+  counterDemoBlock,
+  counterDemoBlockSurface,
+  createCounterDemoModel,
+  renderCounterDemoJson,
+  tickCounterDemoModel,
+} from './counter-block-demo.js';
 
 export interface DogfoodComponentStory<State = void> extends ComponentStory<State> {
   readonly coverageFamilyIds: readonly string[];
@@ -2564,6 +2571,79 @@ export const COMPONENT_STORIES: readonly DogfoodComponentStory[] = [
       },
     ],
     tags: ['progress', 'loading', 'animation'],
+  },
+  {
+    kind: 'component',
+    id: 'fixture-counter-block',
+    coverageFamilyIds: ['progress-indicators'],
+    family: 'Blocks',
+    title: 'CounterDemoBlock fixture',
+    package: 'bijou',
+    docs: {
+      summary: 'Non-shipping fixture block proving bounded counter intents, animated visual progress, static lowering, plain text, screenreader text, and JSON snapshots.',
+      useWhen: [
+        'You need a canonical block-shaped demo for DOGFOOD or Storybook.',
+        'You want to inspect command intents without provider subscriptions or runtime dispatch.',
+        'You need a small example of one block lowering across rich and plain profiles.',
+      ],
+      avoidWhen: [
+        'A production UI needs a reusable counter widget; this block is intentionally a fixture.',
+        'You need provider lifecycle or active hierarchy traversal; this demo stops at command intent emission.',
+      ],
+      relatedFamilies: ['progressBar()', 'commandIntent()', 'AppShell block previews'],
+      gracefulLowering: {
+        interactive: 'Animated bounded progress bar, label, and visible -/+ intent affordances.',
+        static: 'Static bounded progress bar and label with no buttons.',
+        pipe: 'Plain `Counter: X` text.',
+        accessible: 'Plain `Counter: X` screenreader text.',
+      },
+    },
+    profilePresets: CANONICAL_STORY_PROFILE_PRESETS,
+    variants: [
+      {
+        id: 'interactive',
+        label: 'Interactive',
+        description: 'Animated progress target with visible command-intent affordances.',
+        render: ({ width, ctx, timeMs }) => {
+          const model = tickCounterDemoModel({
+            ...createCounterDemoModel(7),
+            previousCounter: 2,
+            animationTimeMs: 0,
+          }, timeMs);
+          return counterDemoBlockSurface({
+            counter: model.counter,
+            previousCounter: model.previousCounter,
+            animationTimeMs: model.animationTimeMs,
+            width,
+            ctx,
+          });
+        },
+      },
+      {
+        id: 'static',
+        label: 'Static',
+        description: 'Single-frame progress and label without the -/+ controls.',
+        render: ({ width, ctx }) => boxSurface(contentSurface(counterDemoBlock.render({
+          config: { counter: 7, width, ctx },
+          mode: 'static',
+        }).output), {
+          title: 'CounterDemoBlock static',
+          width: Math.max(32, Math.min(72, width)),
+          ctx,
+        }),
+      },
+      {
+        id: 'json',
+        label: 'JSON',
+        description: 'Automation snapshot for the same bounded counter state.',
+        render: ({ width, ctx }) => boxSurface(contentSurface(JSON.stringify(renderCounterDemoJson(7))), {
+          title: 'CounterDemoBlock JSON',
+          width: Math.max(32, Math.min(72, width)),
+          ctx,
+        }),
+      },
+    ],
+    tags: ['blocks', 'fixture', 'counter', 'intent', 'lowering'],
   },
   {
     kind: 'component',

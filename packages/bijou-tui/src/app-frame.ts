@@ -9,6 +9,7 @@ import {
   cloneContextWithResolvedTheme,
   createResolved,
   createSurface,
+  perfOverlaySurface,
   setDefaultContext,
   type LayoutNode as SurfaceLayoutNode,
   type PreferenceListTheme,
@@ -504,6 +505,7 @@ const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
 const SETTINGS_FEEDBACK_TOAST_WIDTH = 40;
 const EMPTY_RUNTIME_LAYOUTS = createRuntimeRetainedLayouts();
+const FRAME_TIMING_HISTORY_LIMIT = 60;
 
 interface ResolvedFrameNotificationOptions {
   readonly enabled: boolean;
@@ -673,12 +675,17 @@ function applyFrameTimingSnapshot<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   snapshot: FrameTimingSnapshot,
 ): InternalFrameModel<PageModel, Msg> {
+  const nextHistory = snapshot.frameTimeMs > 0
+    ? Object.freeze([...model.frameTimeHistory, snapshot.frameTimeMs].slice(-FRAME_TIMING_HISTORY_LIMIT))
+    : model.frameTimeHistory;
+
   if (
     model.frameTimeMs === snapshot.frameTimeMs
     && model.viewTimeMs === snapshot.viewTimeMs
     && model.diffTimeMs === snapshot.diffTimeMs
     && model.frameBudgetMs === snapshot.frameBudgetMs
     && model.frameOverBudget === snapshot.frameOverBudget
+    && nextHistory === model.frameTimeHistory
   ) {
     return model;
   }
@@ -690,6 +697,7 @@ function applyFrameTimingSnapshot<PageModel, Msg>(
     diffTimeMs: snapshot.diffTimeMs,
     frameBudgetMs: snapshot.frameBudgetMs,
     frameOverBudget: snapshot.frameOverBudget,
+    frameTimeHistory: nextHistory,
   };
 }
 
@@ -1180,6 +1188,20 @@ export function createFramedApp<PageModel, Msg>(
     return [{ type: 'observed-key', msg, route }, { type: 'open-quit-confirm' }];
   }
 
+  function isShellPerfHudRequest(msg: KeyMsg): boolean {
+    return !msg.ctrl && !msg.alt && !msg.shift && msg.key === '`';
+  }
+
+  function perfHudCommands(
+    msg: KeyMsg,
+    route: ObservedKeyRoute,
+  ): FrameShellCommand<Msg>[] {
+    return [
+      { type: 'observed-key', msg, route },
+      { type: 'apply-frame-action', action: { type: 'toggle-perf-hud' } },
+    ];
+  }
+
   function resolveFrameActionCommands(
     msg: KeyMsg,
     action: FrameAction,
@@ -1201,6 +1223,9 @@ export function createFramedApp<PageModel, Msg>(
     const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'palette' };
     if (msg.ctrl && !msg.alt && msg.key === 'c') {
       return quitRequestCommands(msg, 'palette');
+    }
+    if (isShellPerfHudRequest(msg)) {
+      return perfHudCommands(msg, 'palette');
     }
     if (!msg.ctrl && !msg.alt && !msg.shift && msg.key === 'escape') {
       return [obs, { type: 'close-palette' }];
@@ -1231,6 +1256,9 @@ export function createFramedApp<PageModel, Msg>(
     }
     if (isShellQuitRequest(msg)) {
       return quitRequestCommands(msg, 'help');
+    }
+    if (isShellPerfHudRequest(msg)) {
+      return perfHudCommands(msg, 'help');
     }
     const helpAction = frameKeys.handle(msg);
     if (helpAction && isHelpScrollAction(helpAction)) {
@@ -1263,6 +1291,9 @@ export function createFramedApp<PageModel, Msg>(
     }
     if (isShellQuitRequest(msg)) {
       return quitRequestCommands(msg, 'frame');
+    }
+    if (isShellPerfHudRequest(msg)) {
+      return perfHudCommands(msg, 'frame');
     }
     if (options.enableCommandPalette && !msg.ctrl && !msg.alt && msg.key === '/') {
       return [obs, { type: 'open-search-palette' }];
@@ -1332,6 +1363,9 @@ export function createFramedApp<PageModel, Msg>(
     if (isShellQuitRequest(msg)) {
       return quitRequestCommands(msg, 'frame');
     }
+    if (isShellPerfHudRequest(msg)) {
+      return perfHudCommands(msg, 'frame');
+    }
     const centerFrameAction = frameKeys.handle(msg);
     if (centerFrameAction?.type === 'toggle-notifications') {
       return [obs, { type: 'apply-frame-action', action: centerFrameAction }];
@@ -1378,6 +1412,9 @@ export function createFramedApp<PageModel, Msg>(
   ): FrameShellCommand<Msg>[] {
     if (isShellQuitRequest(msg)) {
       return quitRequestCommands(msg, 'frame');
+    }
+    if (isShellPerfHudRequest(msg)) {
+      return perfHudCommands(msg, 'frame');
     }
     const context = resolveLayerContext(model);
     const { activePage, activeInputArea } = context;
@@ -1460,6 +1497,9 @@ export function createFramedApp<PageModel, Msg>(
 
         if (frameLayer.kind === 'quit-confirm') {
           const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'frame' };
+          if (isShellPerfHudRequest(msg)) {
+            return { handled: true, commands: perfHudCommands(msg, 'frame') };
+          }
           if (isShellQuitConfirmAccept(msg)) {
             return { handled: true, commands: [obs, { type: 'close-quit-confirm' }, { type: 'quit' }] };
           }
@@ -1472,6 +1512,9 @@ export function createFramedApp<PageModel, Msg>(
         if (frameLayer.kind === 'page-modal') {
           const { modalKeyMap } = context;
           const obs: FrameShellCommand<Msg> = { type: 'observed-key', msg, route: 'page' };
+          if (isShellPerfHudRequest(msg)) {
+            return { handled: true, commands: perfHudCommands(msg, 'frame') };
+          }
           if (modalKeyMap != null) {
             const modalAction = modalKeyMap.handle(msg);
             if (modalAction !== undefined) {
@@ -2108,6 +2151,51 @@ export function createFramedApp<PageModel, Msg>(
     return [nextModel, notificationCmds];
   }
 
+  function renderPerfHudOverlay(
+    model: InternalFrameModel<PageModel, Msg>,
+    ctx: BijouContext | undefined,
+  ): Overlay {
+    const frameTimeMs = Math.max(0, model.frameTimeMs);
+    const history = model.frameTimeHistory.length > 0
+      ? model.frameTimeHistory
+      : frameTimeMs > 0
+        ? [frameTimeMs]
+        : undefined;
+    const fps = frameTimeMs > 0 ? 1_000 / frameTimeMs : (ctx?.runtime.refreshRate ?? 0);
+    const surface = perfOverlaySurface({
+      fps,
+      frameTimeMs,
+      frameTimeHistory: history,
+      width: model.columns,
+      height: model.rows,
+      extras: [
+        { label: 'view', value: `${model.viewTimeMs.toFixed(2)} ms` },
+        { label: 'diff', value: `${model.diffTimeMs.toFixed(2)} ms` },
+        ...(model.frameBudgetMs == null
+          ? []
+          : [{
+            label: 'budget',
+            value: `${model.frameBudgetMs.toFixed(2)} ms${model.frameOverBudget ? ' over' : ''}`,
+          }]),
+      ],
+    }, {
+      title: 'Perf HUD',
+      width: Math.max(28, Math.min(42, model.columns - 2)),
+      chartHeight: 3,
+      showChart: (history?.length ?? 0) >= 2,
+      borderToken: ctx?.border('primary'),
+      bgToken: ctx?.surface('elevated'),
+      ctx,
+    });
+
+    return {
+      content: '',
+      surface,
+      row: Math.max(0, Math.min(1, model.rows - surface.height)),
+      col: Math.max(0, model.columns - surface.width - 1),
+    };
+  }
+
   const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
     init() {
       const pageModels: Record<string, PageModel> = {};
@@ -2133,6 +2221,8 @@ export function createFramedApp<PageModel, Msg>(
         diffTimeMs: 0,
         frameBudgetMs: undefined,
         frameOverBudget: false,
+        perfHudOpen: false,
+        frameTimeHistory: Object.freeze([]),
         helpOpen: false,
         helpScrollY: 0,
         commandPaletteKind: undefined,
@@ -2494,6 +2584,10 @@ export function createFramedApp<PageModel, Msg>(
           screenWidth: model.columns,
           screenHeight: model.rows,
         }));
+      }
+
+      if (model.perfHudOpen) {
+        overlays.push(renderPerfHudOverlay(model, themedFrameCtx));
       }
 
       if (model.quitConfirmOpen) {

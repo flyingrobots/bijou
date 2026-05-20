@@ -141,6 +141,8 @@ export function applyFrameAction<PageModel, Msg>(
       // covers the recursive case (e.g., a palette frame-action entry that
       // would re-trigger palette opening while the palette is already open).
       return [model, []];
+    case 'toggle-perf-hud':
+      return [{ ...model, perfHudOpen: !model.perfHudOpen }, []];
     case 'toggle-minimize':
       return [applyToggleMinimize(model, pagesById), []];
     case 'toggle-maximize':

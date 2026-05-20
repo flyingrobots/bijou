@@ -143,6 +143,7 @@ export function createFrameKeyMap(
       .bind('/', t('key.search', 'Search'), { type: 'open-search' })
       .bind('ctrl+p', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
       .bind(':', t('key.openPalette', 'Open command palette'), { type: 'open-palette' })
+      .bind('`', t('key.perfHud', 'Toggle performance HUD'), { type: 'toggle-perf-hud' })
       .bind('ctrl+m', t('key.toggleMinimize', 'Fold/unfold pane'), { type: 'toggle-minimize' })
       .bind('ctrl+f', t('key.toggleMaximize', 'Full-screen pane'), { type: 'toggle-maximize' }),
     )

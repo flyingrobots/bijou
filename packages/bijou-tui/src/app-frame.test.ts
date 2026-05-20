@@ -1057,6 +1057,21 @@ describe('createFramedApp', () => {
     expect(result.model.helpOpen).toBe(true);
   });
 
+  it('toggles the frame performance HUD with backtick from the global shell layer', async () => {
+    const app = createFramedApp({
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const opened = await runScript(app, [{ key: '`' }]);
+    expect(opened.model.perfHudOpen).toBe(true);
+    expect(surfaceToString(opened.frames.at(-1)!, testCtx.style)).toContain('Perf HUD');
+    expect(surfaceToString(opened.frames.at(-1)!, testCtx.style)).toContain('frame');
+
+    const closed = await runScript(app, [{ key: '`' }, { key: '`' }]);
+    expect(closed.model.perfHudOpen).toBe(false);
+    expect(surfaceToString(closed.frames.at(-1)!, testCtx.style)).not.toContain('Perf HUD');
+  });
+
   it('closes help with ? when help is open', async () => {
     const app = createFramedApp({
       pages: [makePage('home', 'Home', 'main')],
