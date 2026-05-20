@@ -87,6 +87,49 @@ describe('binding frame updates from provider snapshots', () => {
     expect(Object.isFrozen(update.frame)).toBe(true);
   });
 
+  it('does not re-invalidate lifecycle records for already-applied snapshot versions', () => {
+    const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
+    const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });
+    const collection = activeBindingCollection([
+      activeBindingEntry({ owner, requirement: article }),
+    ]);
+    const scope = providerScope([
+      provide(defineDataProvider({
+        id: 'docs.articleProvider',
+        resource: 'docs.article',
+      })),
+    ]);
+    const snapshot = bindingSnapshot({
+      providerId: 'docs.articleProvider',
+      requirementId: 'article',
+      version: 2,
+      status: 'ready',
+      data: { title: 'After' },
+    });
+    const firstUpdate = bindingFrameUpdateFromSnapshots({
+      collection,
+      scope,
+      snapshots: [snapshot],
+    });
+
+    const secondUpdate = bindingFrameUpdateFromSnapshots({
+      collection,
+      scope,
+      snapshots: [snapshot],
+      records: firstUpdate.records,
+    });
+
+    expect(firstUpdate.records[0]?.invalidations).toEqual([{
+      requirementId: 'article',
+      providerId: 'docs.articleProvider',
+      reason: 'provider-update',
+      snapshotVersion: 2,
+    }]);
+    expect(secondUpdate.records[0]).toBe(firstUpdate.records[0]);
+    expect(secondUpdate.records[0]?.invalidations).toHaveLength(1);
+    expect(secondUpdate.records[0]?.version).toBe(firstUpdate.records[0]?.version);
+  });
+
   it('reports missing or provider-mismatched snapshots without exposing provider handles', () => {
     const owner = defineBindingLifecycleOwner({ id: 'reader.view', kind: 'view' });
     const article = defineDataRequirement({ id: 'article', resource: 'docs.article' });

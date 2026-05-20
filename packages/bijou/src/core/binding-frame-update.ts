@@ -158,6 +158,9 @@ function invalidateUpdatedRecords(options: {
       ) {
         return record;
       }
+      if (hasProviderUpdateInvalidation(record, snapshot)) {
+        return record;
+      }
 
       return invalidateBinding(record, {
         reason: 'provider-update',
@@ -166,6 +169,17 @@ function invalidateUpdatedRecords(options: {
       });
     }),
   );
+}
+
+function hasProviderUpdateInvalidation(
+  record: BindingLifecycleRecord,
+  snapshot: BindingSnapshot,
+): boolean {
+  return record.invalidations.some((invalidation) => (
+    invalidation.reason === 'provider-update'
+    && invalidation.providerId === snapshot.providerId
+    && invalidation.snapshotVersion === snapshot.version
+  ));
 }
 
 function providerAssignmentMismatchIssues(
