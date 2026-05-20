@@ -30,7 +30,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   reports deterministic `provider.assignment-mismatch` issues instead of
   accepting snapshots from a different provider resolved by resource alone. The
   new public binding-loop helpers also reject non-object inputs with
-  deterministic domain errors instead of raw `TypeError`s.
+  deterministic domain errors instead of raw `TypeError`s. Runtime binding layer
+  collection now preserves the existing `blocksBelow` semantics used by input
+  routing, and repeated frame updates with the same provider snapshot version do
+  not duplicate lifecycle invalidations.
 - **Active binding collection primitives for `bijou`** —
   `@flyingrobots/bijou` now exports `ActiveBindingEntry`,
   `ActiveBindingCollection`, `activeBindingEntry()`,

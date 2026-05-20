@@ -697,8 +697,8 @@ The runtime view stack determines which layers contribute active bindings:
 
 - the top layer is active
 - layers below remain active only while each layer above them has
-  `blocksBelow: true`
-- a layer with `blocksBelow: false` blocks lower layers from active binding
+  `blocksBelow: false`
+- a layer with `blocksBelow: true` blocks lower layers from active binding
   ownership
 
 Runtime binding collection still inspects declarations, not rendered output.
@@ -729,6 +729,9 @@ provider manager.
 It resolves the collection's requirements against the scope, assembles the next
 immutable `BindingFrame`, and records provider updates as lifecycle
 invalidations. It never mutates the previous frame or lifecycle records.
+Snapshots whose provider id and version already appear in a lifecycle record's
+provider-update invalidations do not create duplicate invalidations or lifecycle
+churn.
 Explicit provider assignments carried by active binding entries are
 authoritative: a scope-resolved provider that conflicts with an explicit
 assignment becomes a deterministic `provider.assignment-mismatch` issue rather

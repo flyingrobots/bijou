@@ -63,14 +63,14 @@ describe('runtime active binding collection', () => {
       id: 'help',
       kind: 'overlay',
       dismissible: true,
-      blocksBelow: true,
+      blocksBelow: false,
       model: { bindingSources: [helpSource] },
     });
     const modalStack = pushRuntimeView(passThroughStack, {
       id: 'modal',
       kind: 'modal',
       dismissible: true,
-      blocksBelow: false,
+      blocksBelow: true,
       model: { bindingSources: [modalSource] },
     });
 

@@ -239,7 +239,7 @@ export function runtimeActiveBindingLayers<Model extends RuntimeBindingLayerMode
     }
 
     activeLayers.unshift(layer);
-    if (!layer.blocksBelow) {
+    if (layer.blocksBelow) {
       break;
     }
   }

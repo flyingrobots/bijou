@@ -67,14 +67,14 @@ describe('DX-034G/H/I active binding runtime loop', () => {
       id: 'help-overlay',
       kind: 'overlay',
       dismissible: true,
-      blocksBelow: true,
+      blocksBelow: false,
       model: { bindingSources: [overlaySource] },
     });
     const modalStack = pushRuntimeView(overlayStack, {
       id: 'choice-modal',
       kind: 'modal',
       dismissible: true,
-      blocksBelow: false,
+      blocksBelow: true,
       model: { bindingSources: [modalSource] },
     });
 
@@ -194,6 +194,9 @@ describe('DX-034G/H/I active binding runtime loop', () => {
     expect(cycle).toContain('### DX-034G Active View Binding Collection');
     expect(cycle).toContain('### DX-034H Provider Update Invalidation Flow');
     expect(cycle).toContain('### DX-034I Command Intent Dispatch Proof');
+    expect(cycle).toContain('`blocksBelow: false`');
+    expect(cycle).toContain('`blocksBelow: true` blocks lower layers');
+    expect(cycle).toContain('do not create duplicate invalidations');
     expect(cycle).toContain('DX-034G does not subscribe, refresh, dispatch, render, cache');
     expect(cycle).toContain('DX-034H does not fetch data, subscribe, refresh providers');
     expect(cycle).toContain('Command intents and emissions expose no provider handles');
