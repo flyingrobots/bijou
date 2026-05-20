@@ -1,0 +1,104 @@
+import { describe, expect, it } from 'vitest';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { runScript } from '@flyingrobots/bijou-tui';
+import { createDocsApp, DOGFOOD_I18N_CATALOG } from '../../../examples/docs/app.js';
+import {
+  DOGFOOD_LOCALE_OPTIONS,
+  resolveDogfoodInitialLocale,
+} from '../../../examples/docs/locale.js';
+import { createNodeDogfoodLocalePort } from '../../../examples/docs/node-locale.js';
+
+const KEY_DOWN = '\x1b[B';
+const KEY_ENTER = '\r';
+const KEY_F2 = '\x1bOQ';
+
+function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+  let text = '';
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      text += frame.get(x, y).char || ' ';
+    }
+    text += '\n';
+  }
+  return text;
+}
+
+function pageLocales(model: unknown): readonly string[] {
+  const pageModels = (model as {
+    readonly docsModel: {
+      readonly pageModels: Readonly<Record<string, { readonly locale: string }>>;
+    };
+  }).docsModel.pageModels;
+  return Object.values(pageModels).map((pageModel) => pageModel.locale);
+}
+
+describe('LX-011 DOGFOOD locale ratchet', () => {
+  it('resolves the initial DOGFOOD locale through an injected port before falling back to English', () => {
+    expect(resolveDogfoodInitialLocale({
+      localePort: { preferredLocale: () => 'fr_FR.UTF-8' },
+    }).id).toBe('fr');
+    expect(resolveDogfoodInitialLocale({
+      locale: 'de-DE',
+      localePort: { preferredLocale: () => 'fr_FR.UTF-8' },
+    }).id).toBe('de');
+    expect(resolveDogfoodInitialLocale({
+      localePort: { preferredLocale: () => 'zz-ZZ' },
+    }).id).toBe('en');
+  });
+
+  it('keeps Node locale discovery behind the DOGFOOD locale port', () => {
+    expect(createNodeDogfoodLocalePort({
+      LC_ALL: 'es_MX.UTF-8',
+      LC_MESSAGES: 'de_DE.UTF-8',
+      LANG: 'fr_FR.UTF-8',
+    }).preferredLocale()).toBe('es_MX.UTF-8');
+    expect(createNodeDogfoodLocalePort({
+      LANGUAGE: 'fr:de',
+      LANG: 'en_US.UTF-8',
+    }).preferredLocale()).toBe('fr');
+  });
+
+  it('ratchets the settings language catalog for every supported DOGFOOD locale', () => {
+    const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
+    for (const locale of DOGFOOD_LOCALE_OPTIONS) {
+      const entry = entries.get(`settings.language.${locale.id}`);
+      expect(entry?.values.en).toEqual(expect.any(String));
+      for (const supported of DOGFOOD_LOCALE_OPTIONS) {
+        expect(entry?.values[supported.id]).toEqual(expect.any(String));
+      }
+    }
+    expect(entries.get('settings.section.localization')?.values.fr).toBe('Localisation');
+    expect(entries.get('settings.language.label')?.values.fr).toBe('Langue préférée');
+  });
+
+  it('initializes DOGFOOD pages from the injected locale preference', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      localePort: { preferredLocale: () => 'fr_FR.UTF-8' },
+    });
+
+    const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+  });
+
+  it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+  });
+});

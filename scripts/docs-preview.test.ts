@@ -108,7 +108,9 @@ describe('docs preview app', () => {
 
     expect(source).toContain("../../packages/bijou-node/src/index.js");
     expect(source).toContain("../../packages/bijou-tui/src/index.js");
-    expect(source).toMatch(/await run\(createDocsApp\(ctx\), \{ ctx, mouse: true \}\);/);
+    expect(source).toContain("import { createNodeDogfoodLocalePort } from './node-locale.js';");
+    expect(source).toContain('localePort: createNodeDogfoodLocalePort()');
+    expect(source).toMatch(/await run\(createDocsApp\(ctx, \{\s+localePort: createNodeDogfoodLocalePort\(\),\s+\}\), \{ ctx, mouse: true \}\);/);
   });
 
   it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
@@ -777,6 +779,9 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('↻ Shell theme');
     expect(frameText(settingsFrame)).toContain('Storybook Workstation');
     expect(frameText(settingsFrame)).not.toContain('Landing theme');
+    expect(frameText(settingsFrame)).toContain('Localization');
+    expect(frameText(settingsFrame)).toContain('Preferred language');
+    expect(frameText(settingsFrame)).toContain('Current language: English');
     expect(frameText(settingsFrame)).toContain('Landing');
     expect(frameText(settingsFrame)).toContain('Adapts render cost to');
     expect(frameText(settingsFrame)).toContain('Options:');
@@ -799,6 +804,8 @@ describe('docs preview app', () => {
     }).surface;
     expect(model.docsModel.runtimeNotifications.items[0]?.message).toBe('Show hints turned off.');
     expect(frameText(frame)).toContain('notices:1');
+    updateResult = app.update(keyMsg('down') as any, model);
+    model = updateResult[0] as any;
     updateResult = app.update(keyMsg('down') as any, model);
     model = updateResult[0] as any;
     updateResult = app.update(keyMsg('down') as any, model);

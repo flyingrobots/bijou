@@ -85,6 +85,14 @@ import {
   type StoryMode,
 } from '../_stories/protocol.js';
 import { resolveDogfoodDocsCoverage, type DogfoodDocsCoverage } from './coverage.js';
+import {
+  dogfoodLocaleLabel,
+  dogfoodLocaleOptionsText,
+  nextDogfoodLocale,
+  resolveDogfoodInitialLocale,
+  resolveDogfoodLocale,
+  type DogfoodLocalePort,
+} from './locale.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -215,6 +223,11 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('docs.separator.welcome', 'welcome to bijou'),
     dogfoodMessage('settings.section.shell', 'Shell'),
     dogfoodMessage('settings.section.appearance', 'Appearance'),
+    dogfoodMessage('settings.section.localization', 'Localization', {
+      fr: 'Localisation',
+      es: 'Localización',
+      de: 'Lokalisierung',
+    }),
     dogfoodMessage('settings.section.landing', 'Landing'),
     dogfoodMessage('settings.showHints.label', 'Show hints'),
     dogfoodMessage('settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
@@ -222,6 +235,41 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('settings.showHints.off', 'Off'),
     dogfoodMessage('settings.showHints.feedback.on', 'Show hints turned on.'),
     dogfoodMessage('settings.showHints.feedback.off', 'Show hints turned off.'),
+    dogfoodMessage('settings.language.label', 'Preferred language', {
+      fr: 'Langue préférée',
+      es: 'Idioma preferido',
+      de: 'Bevorzugte Sprache',
+    }),
+    dogfoodMessage('settings.language.description', 'Current language: {language}. Options: {options}.', {
+      fr: 'Langue actuelle : {language}. Options : {options}.',
+      es: 'Idioma actual: {language}. Opciones: {options}.',
+      de: 'Aktuelle Sprache: {language}. Optionen: {options}.',
+    }),
+    dogfoodMessage('settings.language.feedback', 'Language set to {language}.', {
+      fr: 'Langue définie sur {language}.',
+      es: 'Idioma establecido en {language}.',
+      de: 'Sprache auf {language} gesetzt.',
+    }),
+    dogfoodMessage('settings.language.en', 'English', {
+      fr: 'anglais',
+      es: 'inglés',
+      de: 'Englisch',
+    }),
+    dogfoodMessage('settings.language.fr', 'French', {
+      fr: 'français',
+      es: 'francés',
+      de: 'Französisch',
+    }),
+    dogfoodMessage('settings.language.es', 'Spanish', {
+      fr: 'espagnol',
+      es: 'español',
+      de: 'Spanisch',
+    }),
+    dogfoodMessage('settings.language.de', 'German', {
+      fr: 'allemand',
+      es: 'alemán',
+      de: 'Deutsch',
+    }),
     dogfoodMessage('settings.landingQuality.label', 'Landing quality'),
     dogfoodMessage('settings.landingQuality.description.auto', 'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.'),
     dogfoodMessage('settings.landingQuality.description.quality', 'Prioritizes the richest title treatment even on larger terminals. Options: {options}.'),
@@ -231,12 +279,16 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
   ],
 };
 
-function dogfoodMessage(id: string, value: string) {
+function dogfoodMessage(
+  id: string,
+  value: string,
+  translations: Readonly<Record<string, string>> = {},
+) {
   return {
     key: { namespace: DOGFOOD_I18N_NAMESPACE, id },
     kind: 'message' as const,
     sourceLocale: 'en',
-    values: { en: value },
+    values: { en: value, ...translations },
   };
 }
 
@@ -287,6 +339,7 @@ interface DocsExplorerModel {
   readonly guideState: ReturnType<typeof createBrowsableListState<string>>;
   readonly selectedGuideId?: string;
   readonly showHints: boolean;
+  readonly locale: string;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
 }
@@ -313,6 +366,7 @@ type ExplorerMsg =
   | { type: 'activate-guide-index'; index: number }
   | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
+  | { type: 'cycle-locale' }
   | { type: 'cycle-landing-quality' };
 
 interface RootModel {
@@ -784,6 +838,7 @@ const componentsPageKeys = createKeyMap<ExplorerMsg>()
 
 interface DocsAppOptions {
   readonly locale?: string;
+  readonly localePort?: DogfoodLocalePort;
   readonly direction?: I18nDirection;
   readonly extraI18nCatalogs?: readonly I18nCatalog[];
   readonly initialRoute?: RootModel['route'];
@@ -822,6 +877,27 @@ function shellText(
 function formatI18nList(i18n: I18nRuntime | undefined, values: readonly string[]): string {
   if (i18n == null) return values.join(', ');
   return i18n.formatList(values, i18n.locale);
+}
+
+function applyDogfoodLocale(
+  i18n: I18nRuntime,
+  options: Pick<DocsAppOptions, 'direction'>,
+  locale: string,
+): void {
+  const option = resolveDogfoodLocale(locale);
+  void i18n.setLocale(option.id, options.direction ?? option.direction);
+}
+
+function dogfoodLocaleSettingDescription(currentLocale: string, i18n?: I18nRuntime): string {
+  return dogfoodText(
+    i18n,
+    'settings.language.description',
+    'Current language: {language}. Options: {options}.',
+    {
+      language: dogfoodLocaleLabel(currentLocale, i18n),
+      options: dogfoodLocaleOptionsText(i18n),
+    },
+  );
 }
 
 function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
@@ -1236,7 +1312,11 @@ function buildStoryFamilies(stories: readonly ComponentStory[]): readonly StoryF
   }));
 }
 
-function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): DocsExplorerModel {
+function createInitialExplorerModel(
+  ctx: BijouContext,
+  pageId: DocsPageId,
+  locale: string,
+): DocsExplorerModel {
   const expandedFamilies = Object.fromEntries(STORY_FAMILIES.map((family) => [family.id, false]));
   const guideItems = guideItemsForPage(pageId);
   return {
@@ -1256,6 +1336,7 @@ function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): Docs
     }),
     selectedGuideId: guideItems[0]?.value,
     showHints: true,
+    locale,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
   };
@@ -1263,9 +1344,10 @@ function createInitialExplorerModel(ctx: BijouContext, pageId: DocsPageId): Docs
 
 function createInitialComponentsExplorerModel(
   ctx: BijouContext,
+  locale: string,
   initialSelectedStoryId?: string,
 ): DocsExplorerModel {
-  const model = createInitialExplorerModel(ctx, COMPONENTS_PAGE_ID);
+  const model = createInitialExplorerModel(ctx, COMPONENTS_PAGE_ID, locale);
   return initialSelectedStoryId == null ? model : selectStory(model, initialSelectedStoryId);
 }
 
@@ -2182,6 +2264,7 @@ function syncDocsSharedSettings(
   return mapDocsPageModels(docsModel, (pageModel) => {
     if (
       pageModel.showHints === activePageModel.showHints
+      && pageModel.locale === activePageModel.locale
       && pageModel.landingThemeIndex === landingThemeIndex
       && pageModel.landingQualityMode === activePageModel.landingQualityMode
     ) {
@@ -2190,6 +2273,7 @@ function syncDocsSharedSettings(
     return {
       ...pageModel,
       showHints: activePageModel.showHints,
+      locale: activePageModel.locale,
       landingThemeIndex,
       landingQualityMode: activePageModel.landingQualityMode,
     };
@@ -3374,7 +3458,8 @@ function createDocsExplorerApp(
   getCtx: () => BijouContext,
   onShellThemeChange: (ctx: BijouContext) => void,
   i18n: I18nRuntime,
-  options: Pick<DocsAppOptions, 'initialPageId' | 'initialSelectedStoryId'> = {},
+  options: Pick<DocsAppOptions, 'direction' | 'initialPageId' | 'initialSelectedStoryId'> = {},
+  initialLocale = 'en',
 ): FramedApp<DocsExplorerModel, DocsMsg> {
   const ctx = getCtx();
   return createFramedApp<DocsExplorerModel, DocsMsg>({
@@ -3395,7 +3480,7 @@ function createDocsExplorerApp(
           id: spec.id,
           title: pageTitle(spec.id, i18n),
           keyMap: componentsPageKeys,
-          init: () => [createInitialComponentsExplorerModel(ctx, options.initialSelectedStoryId), []],
+          init: () => [createInitialComponentsExplorerModel(ctx, initialLocale, options.initialSelectedStoryId), []],
           update(msg: FramePageMsg<DocsMsg>, model) {
             if (msg.type === 'mouse') {
               return [model, []];
@@ -3435,6 +3520,11 @@ function createDocsExplorerApp(
                 return [{ ...model, profileMode: msg.mode }, []];
               case 'toggle-hints':
                 return [{ ...model, showHints: !model.showHints }, []];
+              case 'cycle-locale': {
+                const nextLocale = nextDogfoodLocale(model.locale);
+                applyDogfoodLocale(i18n, options, nextLocale.id);
+                return [{ ...model, locale: nextLocale.id }, []];
+              }
               case 'cycle-landing-quality':
                 return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
               default:
@@ -3477,7 +3567,7 @@ function createDocsExplorerApp(
       return {
         id: spec.id,
         title: pageTitle(spec.id, i18n),
-        init: () => [createInitialExplorerModel(ctx, spec.id), []],
+        init: () => [createInitialExplorerModel(ctx, spec.id, initialLocale), []],
         update(msg: FramePageMsg<DocsMsg>, model) {
           if (msg.type === 'mouse') {
             return [model, []];
@@ -3505,6 +3595,11 @@ function createDocsExplorerApp(
               return [{ ...selectGuide(spec.id, model, msg.guideId), previewTimeMs: 0 }, []];
             case 'toggle-hints':
               return [{ ...model, showHints: !model.showHints }, []];
+            case 'cycle-locale': {
+              const nextLocale = nextDogfoodLocale(model.locale);
+              applyDogfoodLocale(i18n, options, nextLocale.id);
+              return [{ ...model, locale: nextLocale.id }, []];
+            }
             case 'cycle-landing-quality':
               return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
             default:
@@ -3541,6 +3636,7 @@ function createDocsExplorerApp(
     },
     settings: ({ model, pageModel }) => {
       const theme = resolveLandingTheme(pageModel.landingThemeIndex);
+      const nextLocale = nextDogfoodLocale(pageModel.locale);
       return {
         borderToken: docsThemeBorderToken(theme),
         bgToken: docsThemeSurfaceToken(theme),
@@ -3564,6 +3660,27 @@ function createDocsExplorerApp(
               message: pageModel.showHints
                 ? dogfoodText(i18n, 'settings.showHints.feedback.off', 'Show hints turned off.')
                 : dogfoodText(i18n, 'settings.showHints.feedback.on', 'Show hints turned on.'),
+            },
+          }],
+        },
+        {
+          id: 'localization',
+          title: dogfoodText(i18n, 'settings.section.localization', 'Localization'),
+          rows: [{
+            id: 'preferred-language',
+            label: dogfoodText(i18n, 'settings.language.label', 'Preferred language'),
+            description: dogfoodLocaleSettingDescription(pageModel.locale, i18n),
+            valueLabel: dogfoodLocaleLabel(pageModel.locale, i18n),
+            kind: 'choice',
+            action: { type: 'cycle-locale' },
+            feedback: {
+              title: shellText(i18n, 'settings.title', 'Settings'),
+              message: dogfoodText(
+                i18n,
+                'settings.language.feedback',
+                'Language set to {language}.',
+                { language: dogfoodLocaleLabel(nextLocale.id, i18n) },
+              ),
             },
           }],
         },
@@ -3682,9 +3799,10 @@ function syncDocsExplorerViewportLayout(
 }
 
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
+  const initialLocale = resolveDogfoodInitialLocale(options);
   const runtime = createI18nRuntime({
-    locale: options.locale ?? 'en',
-    direction: options.direction ?? 'ltr',
+    locale: options.locale ?? initialLocale.id,
+    direction: options.direction ?? initialLocale.direction,
     fallbackLocale: 'en',
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
@@ -3700,10 +3818,11 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   const syncShellThemeContext = (themeId: string | undefined) => {
     currentCtx = applyDocsShellThemeToContext(ctx, themeId);
   };
+  const initialLocale = resolveDogfoodInitialLocale(options);
   const i18n = createDocsI18nRuntime(options);
   const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
     currentCtx = nextCtx;
-  }, i18n, options);
+  }, i18n, options, initialLocale.id);
   const renderLanding = createLandingRenderer(() => currentCtx, i18n);
   const initialRoute = options.initialRoute ?? 'landing';
 

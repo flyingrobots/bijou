@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD locale preference and i18n ratchet** — DOGFOOD now resolves its
+  initial language through an explicit locale port with a Node adapter that
+  reads operating-system locale signals, exposes a Settings drawer language
+  preference, and syncs the chosen locale across docs pages. The first LX-011
+  ratchet covers the language settings surface and supported language catalog
+  entries so new DOGFOOD localization work stays behind the i18n runtime instead
+  of adding another hard-coded English settings seam.
 - **Rendered standard block proof for `bijou`** —
   `AppShell`, `ReaderSurface`, and `InspectorPanel` now render deterministic
   first-party block output across interactive, static, pipe, and accessible
