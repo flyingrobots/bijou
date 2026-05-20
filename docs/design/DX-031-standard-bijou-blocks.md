@@ -279,7 +279,7 @@ classDiagram
 
   BlockPackageManifest "1" *-- "1..*" BlockDefinition : exports
   BlockDefinition "1" *-- "1" BlockMetadata : describes
-  SchemaBoundBlock "1" --|> BlockDefinition : specializes
+  SchemaBoundBlock "1" *-- "1" BlockDefinition : wraps
   SchemaBoundBlock "1" *-- "1" BlockSchemaAdapter : validates
   BlockMetadata "1" *-- "1..*" BlockSlot : required slots
   BlockMetadata "1" o-- "0..*" BlockSlot : optional slots
@@ -366,19 +366,28 @@ interface BlockExample {
   readonly command?: string;
 }
 
+type DeepReadonly<T> = T extends readonly (infer Item)[]
+  ? readonly DeepReadonly<Item>[]
+  : T extends object
+    ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+    : T;
+
 type BlockSchemaResult<Data> =
-  | { readonly ok: true; readonly data: Data }
+  | { readonly ok: true; readonly data: DeepReadonly<Data> }
   | { readonly ok: false; readonly issues: readonly BlockSchemaIssue[] };
 
 interface BlockSchemaIssue {
-  readonly path: readonly string[];
+  readonly severity: 'info' | 'warning' | 'error';
+  readonly code: string;
   readonly message: string;
+  readonly path?: string;
 }
 
-interface BlockSchemaFacts {
-  readonly requiredFields: readonly string[];
-  readonly optionalFields: readonly string[];
+interface BlockSchemaDescription {
+  readonly requiredFields?: readonly string[];
+  readonly optionalFields?: readonly string[];
   readonly redactedFields?: readonly string[];
+  readonly facts?: readonly ModeLoweringFact[];
 }
 
 interface BlockDefinition<Config = unknown> {
@@ -391,13 +400,18 @@ interface BlockDefinition<Config = unknown> {
 interface BlockSchemaAdapter<Data> {
   readonly id: string;
   readonly parse: (input: unknown) => BlockSchemaResult<Data>;
-  readonly describe?: () => BlockSchemaFacts;
+  readonly describe?: () => BlockSchemaDescription;
 }
 
-interface SchemaBoundBlockDefinition<Data, Config = unknown>
-  extends BlockDefinition<Config> {
+interface SchemaBoundBlockDefinition<Data, Config = unknown> {
+  readonly block: BlockDefinition<Config>;
   readonly schema: BlockSchemaAdapter<Data>;
-  readonly bind: (data: Data) => BlockRenderInput<Config>;
+  readonly bind: (
+    data: DeepReadonly<Data>,
+  ) => BlockRenderInput<Config> | {
+    readonly input: BlockRenderInput<Config>;
+    readonly facts?: readonly ModeLoweringFact[];
+  };
 }
 
 interface BlockPackageManifest {
@@ -423,10 +437,18 @@ declare function defineSchemaBlock<Data, Config>(
   definition: SchemaBoundBlockDefinition<Data, Config>,
 ): SchemaBoundBlockDefinition<Data, Config>;
 
-declare function renderSchemaBlock<Data, Config>(
+declare function bindSchemaBlockInput<Data, Config>(
   block: SchemaBoundBlockDefinition<Data, Config>,
   input: unknown,
-): BlockRenderResult;
+): {
+  readonly ok: true;
+  readonly input: BlockRenderInput<Config>;
+  readonly facts: readonly ModeLoweringFact[];
+} | {
+  readonly ok: false;
+  readonly issues: readonly BlockSchemaIssue[];
+  readonly facts: readonly ModeLoweringFact[];
+};
 
 declare function defineBlockPackage(
   manifest: BlockPackageManifest,
@@ -434,9 +456,14 @@ declare function defineBlockPackage(
 ```
 
 DX-031A lands this as a public metadata-first API in `@flyingrobots/bijou`.
-The schema-bound functions remain follow-on API work. The important boundary is
-that a block is described before it renders, and its slots and semantic facts
-are visible to tests, docs, DOGFOOD, and agents.
+
+DX-031B Schema-Bound Blocks lands the schema adapter layer as a public boundary
+contract in `@flyingrobots/bijou`. Schema-bound blocks validate boundary data
+before producing block render input or binding facts. They do not fetch,
+subscribe, dispatch, compose runtime views, or render AppShell. The important
+boundary is that a block and its schema are described before rendering, and their
+slots, semantic facts, and validation facts are visible to tests, docs, DOGFOOD,
+and agents.
 
 ## Public Block API And Distribution
 
@@ -540,35 +567,43 @@ snapshots without owning business state.
 
 ## Schema-Bound Blocks
 
-The happy path for app builders should be extremely direct:
+The schema-bound boundary for app builders should be direct:
 
 1. define or import a schema
 2. bind that schema to a block
 3. pass a schema-compliant object
-4. get a working UI with validation, defaults, slots, and semantic facts
+4. receive immutable block render input and validation facts
 
 In app code, the target ergonomics should feel like:
 
 ```ts
-const productDetailsBlock = defineSchemaBlock({
+const productDetailsBaseBlock = defineBlock({
   metadata: productDetailsMetadata,
-  schema: zodBlockSchema(productDetailsSchema),
-  bind: product => ({
-    slots: {
-      title: product.name,
-      summary: product.summary,
-      specs: product.specs,
-      reviews: product.reviews,
-      primaryAction: { id: 'add-to-cart', label: 'Add to cart' },
-    },
-    config: {
-      variant: 'purchase-detail',
-    },
-  }),
   render: productDetails,
 });
 
-renderSchemaBlock(productDetailsBlock, {
+const productDetailsBlock = defineSchemaBlock({
+  block: productDetailsBaseBlock,
+  schema: zodBlockSchema(productDetailsSchema),
+  bind: product => ({
+    input: {
+      slots: {
+        title: product.name,
+        summary: product.summary,
+        specs: product.specs,
+        reviews: product.reviews,
+        primaryAction: { id: 'add-to-cart', label: 'Add to cart' },
+      },
+      config: {
+        variant: 'purchase-detail',
+      },
+    },
+    facts: [{ kind: 'entity', key: 'product', value: product.id }],
+  }),
+});
+
+bindSchemaBlockInput(productDetailsBlock, {
+  id: 'bijou-pro',
   name: 'Bijou Pro',
   summary: 'Runtime truth for terminal apps.',
   specs: [{ label: 'Mode', value: 'interactive' }],
@@ -576,14 +611,15 @@ renderSchemaBlock(productDetailsBlock, {
 });
 ```
 
-That is the real DX target: give the block a valid object and it should render
-the expected surface without the app author manually wiring every row, action,
-validation message, and lower-mode fact.
+That is the real DX target for this layer: give the schema-bound block an
+unknown object and it should validate the boundary before producing immutable
+render input, validation issues, and lower-mode facts. Rendering remains the
+ordinary block renderer's job.
 
-Zod should be the first-class authoring adapter because it is familiar in the
-TypeScript ecosystem and Bijou already uses it in MCP tooling. The core block
-contract should still be schema-adapter shaped so the runtime does not require
-Zod as a hard dependency forever.
+Zod can become the first optional authoring adapter because it is familiar in
+the TypeScript ecosystem and Bijou already uses it in MCP tooling. The core
+block contract is schema-adapter shaped so the runtime does not require Zod as a
+hard dependency.
 
 Recommended split:
 
@@ -622,6 +658,8 @@ Rules:
 
 - schema validation happens before rendering
 - invalid data produces explicit validation facts, not partial mystery UI
+- schema-bound blocks validate boundary data and do not fetch, subscribe,
+  dispatch, compose runtime views, or render AppShell
 - schema-bound blocks still render through ordinary Bijou layout envelopes
 - schemas may describe data shape, but blocks still own presentation choices
 - secret fields must be redacted before metadata, diagnostics, or captures
@@ -3112,16 +3150,19 @@ blocks.
 7. Done: prove active runtime binding collection, provider snapshot
    invalidation into new immutable frames, and command intent routing before
    rendered AppShell work begins.
-8. Next: add `defineSchemaBlock()` and a Zod schema adapter.
-9. Next: add block stories for `AppShell`, `ReaderSurface`, and
+8. Done: add adapter-first `defineSchemaBlock()` support without making Zod,
+   provider lifecycle, AppShell rendering, or DOGFOOD proof part of the core
+   schema-bound block contract.
+9. Next: add an optional Zod schema adapter package or helper.
+10. Next: add block stories for `AppShell`, `ReaderSurface`, and
    `InspectorPanel`.
-10. Next: capture interactive, static, pipe, and accessible outputs for the
+11. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-11. Next: prove the first three blocks in DOGFOOD before broadening the
+12. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-12. Next: add catalog-only variant/config metadata for later blocks without
+13. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-13. Continue to defer modal stacks, notifications, auth forms, animated
+14. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 
@@ -3134,9 +3175,10 @@ blocks.
   compatibility.
 - Public API tests proving importing a block package does not mutate global
   runtime state.
-- Public API tests proving a schema-bound block validates data before render.
-- Public API tests proving a Zod-backed adapter can bind valid data into block
-  slots, config, and semantic facts.
+- Public API tests proving a schema-bound block validates data before bind or
+  render output is consumed.
+- Public API tests proving an adapter can bind valid data into block slots,
+  config, and semantic facts without a hard Zod dependency.
 - Public API tests proving invalid schema data becomes validation facts instead
   of partial rendered UI.
 - Tooling tests proving block metadata can be indexed without rendering a
@@ -3177,8 +3219,8 @@ blocks.
 - Importing a block package does not register runtime behavior globally.
 - Blocks can bind schema-compliant data objects to slots, config, validation,
   semantic facts, and render input.
-- Zod is supported as a first-class schema authoring adapter without making
-  every block depend on Zod directly.
+- The core schema-bound block API is adapter-first and does not require Zod as a
+  hard dependency.
 - GraphQL, database, or local-storage schema compilers can generate draft block
   metadata, schema adapters, stories, and semantic facts.
 - Tooling can discover block slots, variants, modes, semantic facts, and story
@@ -3254,9 +3296,28 @@ What is now true:
 - The design-system blocks entrypoint now points to the current public
   contract instead of only naming future candidates.
 
-Still out of scope for this slice:
+DX-031B Schema-Bound Blocks adds the boundary validation slice.
 
-- `defineSchemaBlock()`, Zod adapters, and schema-to-block compilers.
+What is now true:
+
+- `@flyingrobots/bijou` exports `BlockSchemaAdapter`,
+  `defineBlockSchemaAdapter()`, `defineSchemaBlock()`,
+  `parseBlockSchema()`, and `bindSchemaBlockInput()`.
+- Schema-bound blocks wrap an existing `BlockDefinition`, preserving block
+  metadata, data contracts, command intents, and ordinary render ownership.
+- Schema adapters validate unknown input into immutable typed data or immutable
+  deterministic issues.
+- Schema adapters snapshot their parse/describe callbacks at definition time.
+- Binding schema data produces immutable block render input and optional
+  semantic facts without rendering, subscribing, dispatching, resolving
+  providers, or owning AppShell behavior.
+- Bind outputs must be plain objects with supported render-input keys, so
+  class instances, built-ins, and backchannel handles cannot silently normalize
+  into empty input.
+
+Still out of scope after this slice:
+
+- Zod adapters and schema-to-block compilers.
 - Rendered first-party `AppShell`, `ReaderSurface`, and `InspectorPanel`
   blocks.
 - DOGFOOD block galleries and multi-mode story captures for rendered blocks.

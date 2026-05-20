@@ -64,15 +64,19 @@ Bijou now exposes a metadata-first block authoring contract from
   discovery without provider handles or command callbacks.
 - `defineAppShellComposition()` groups runtime-backed blocks into logical
   navigation, content, inspector, status, and overlay slots without rendering.
+- `defineBlockSchemaAdapter()`, `defineSchemaBlock()`, and
+  `bindSchemaBlockInput()` validate unknown boundary data before producing block
+  render input and binding facts.
 - `validateBlockMetadata()`, `blockMetadataSummary()`, and report helpers give
   tests, docs, DOGFOOD, MCP payloads, and agents a deterministic way to inspect
   block facts without rendering a terminal surface.
 
-This is the first DX-031 slice: blocks are described before they render, package
-authors avoid hidden global registration, and tooling can discover slots and
-mode support directly. Schema-bound blocks remain a follow-on; the current
-contract deliberately does not make Zod, GraphQL, or database schemas part of
-the core block dependency surface.
+Blocks are described before they render, package authors avoid hidden global
+registration, and tooling can discover slots and mode support directly.
+Schema-bound blocks validate unknown boundary data without making Zod, GraphQL,
+or database schemas part of the core block dependency surface. Provider
+subscriptions, active hierarchy traversal, rendered AppShell, and DOGFOOD block
+proof remain follow-on work.
 
 ## First credible block candidates
 

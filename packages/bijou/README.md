@@ -97,6 +97,9 @@ fake duplication rather than a real second API.
   view data contracts, and command intents.
 - **`defineBlockPackage()`**: Declare exported blocks, docs, tags, version, and
   Bijou peer compatibility for ordinary NPM block packages.
+- **`defineBlockSchemaAdapter()` / `defineSchemaBlock()`**: Validate unknown
+  boundary data before producing immutable block render input and binding facts,
+  without fetching, subscribing, dispatching, or rendering AppShell.
 - **`blockMetadataSummary()`**: Render compact block metadata for docs, MCP
   payloads, and agent-facing reports.
 - **`defineAppShellComposition()`**: Compose runtime-backed blocks into logical
