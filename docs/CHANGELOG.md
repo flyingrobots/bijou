@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD i18n workbook export** — DOGFOOD's own runtime catalog now lives in
+  `examples/docs/i18n/dogfood-catalog.ts` instead of the main docs app module,
+  and `npm run dogfood:i18n:export` can export translation workbooks as CSV/TSV
+  or a JSON catalog bundle through the existing `@flyingrobots/bijou-i18n-tools`
+  adapters. `npm run dogfood:i18n:coverage` reports current per-locale catalog
+  coverage. These are localization workflow artifacts; DOGFOOD still consumes
+  runtime catalogs rather than parsing spreadsheet files from the render path.
 - **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
   DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
   count by source surface, and ratchets the current baseline at `2220` strings
