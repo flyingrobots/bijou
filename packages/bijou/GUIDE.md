@@ -245,13 +245,13 @@ inspectorPanelBlock.data?.names();
 appShellBlock.metadata.slots.map(slot => slot.id);
 ```
 
-These definitions are contract artifacts. They declare metadata, semantic
-slots, data requirements, command intents, story ids, and package visibility for
-`AppShell`, `ReaderSurface`, and `InspectorPanel`.
+These definitions declare metadata, semantic slots, data requirements, command
+intents, story ids, package visibility, and deterministic first-proof render
+output for `AppShell`, `ReaderSurface`, and `InspectorPanel`.
 
-They do not implement rendered AppShell, provider subscriptions, active runtime
-traversal, command dispatch, DOGFOOD captures, or the full standard block
-catalog.
+They do not implement provider subscriptions, active runtime traversal, command
+dispatch, production AppShell behavior, DOGFOOD multi-mode captures, or the
+full standard block catalog.
 
 ## AppShell Composition
 

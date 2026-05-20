@@ -3156,14 +3156,17 @@ blocks.
 9. Done: add first-party block definitions and story declarations for
    `AppShell`, `ReaderSurface`, and `InspectorPanel` without making them
    rendered block products.
-10. Next: add an optional Zod schema adapter package or helper.
-11. Next: capture interactive, static, pipe, and accessible outputs for the
+10. Done: replace the first-party definition placeholders with deterministic
+   rendered proof output and stable lowering facts for `AppShell`,
+   `ReaderSurface`, and `InspectorPanel`.
+11. Next: add an optional Zod schema adapter package or helper.
+12. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-12. Next: prove the first three blocks in DOGFOOD before broadening the
+13. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-13. Next: add catalog-only variant/config metadata for later blocks without
+14. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-14. Continue to defer modal stacks, notifications, auth forms, animated
+15. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 
@@ -3338,14 +3341,38 @@ What is now true:
 Still out of scope after this slice:
 
 - Zod adapters and schema-to-block compilers.
-- Rendered first-party `AppShell`, `ReaderSurface`, and `InspectorPanel` blocks.
 - DOGFOOD block galleries and multi-mode story captures for rendered blocks.
 - Modal stacks, notifications, auth blocks, workspace docking, and complex
   domain-specific block packages.
+
+DX-031E Rendered Standard Block Proof replaces the first-party placeholders
+with deterministic render output.
+
+What is now true:
+
+- `AppShell`, `ReaderSurface`, and `InspectorPanel` render concrete string
+  output for interactive, static, pipe, and accessible modes.
+- `AppShell` renders semantic region output for `navigation`, `content`,
+  `inspector`, `status`, and `overlays`.
+- `ReaderSurface` renders content, navigation, and outline output.
+- `InspectorPanel` renders selection, details, and actions output.
+- Render facts stay stable across modes so lowering checks do not need to parse
+  rendered text.
+- Render results do not expose provider handles, subscription handles, refresh
+  methods, active-tree traversal, or command dispatch callbacks.
+
+Still out of scope after this slice:
+
+- Provider subscriptions and cache policy.
+- Active runtime traversal.
+- Command dispatch integration.
+- Production AppShell behavior.
+- DOGFOOD multi-mode captures for rendered blocks.
+- Catalog expansion beyond `AppShell`, `ReaderSurface`, and `InspectorPanel`.
 
 ## Retrospective
 
 DX-031 is now partially landed rather than not started. The first slice gives
 the ecosystem a stable block contract to index, review, and publish against,
-but "full block availability" still requires schema binding, a rendered
-first-party block set, DOGFOOD proof, story captures, and catalog expansion.
+but "full block availability" still requires DOGFOOD multi-mode proof, story
+captures, and catalog expansion.

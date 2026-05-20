@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Rendered standard block proof for `bijou`** —
+  `AppShell`, `ReaderSurface`, and `InspectorPanel` now render deterministic
+  first-party block output across interactive, static, pipe, and accessible
+  modes with stable lowering facts. This replaces definition placeholders with
+  live semantic region/content/selection output while still avoiding provider
+  subscriptions, active runtime traversal, command dispatch, cache policy,
+  rendered production AppShell behavior, or catalog expansion.
 - **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
   beside Components, with pages for what blocks are, how to author them,
   pre-made first-party blocks, a live accordion preview of standard block pages,

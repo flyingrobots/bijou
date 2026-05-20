@@ -7,10 +7,14 @@ import {
 import {
   defineBlock,
   defineBlockPackage,
+  isBlockDefinition,
   type BlockDefinition,
   type BlockMetadata,
   type BlockPackageManifest,
+  type BlockRenderInput,
+  type BlockRenderResult,
 } from './block-metadata.js';
+import type { OutputMode } from './detect/tty.js';
 import {
   defineBlockSchemaAdapter,
   defineSchemaBlock,
@@ -156,10 +160,7 @@ export const appShellBlock: BlockDefinition = defineBlock({
     shellToggleInspector,
     shellOpenOverlay,
   ],
-  render: () => ({
-    output: 'AppShell definition placeholder',
-    facts: [{ kind: 'entity', key: 'block', value: 'AppShell' }],
-  }),
+  render: renderAppShellBlock,
 });
 
 export const readerSurfaceBlock: BlockDefinition = defineBlock({
@@ -169,10 +170,7 @@ export const readerSurfaceBlock: BlockDefinition = defineBlock({
     readerSelectHeading,
     readerOpenReference,
   ],
-  render: ({ slots }) => ({
-    output: slots?.['content'] ?? 'ReaderSurface definition placeholder',
-    facts: [{ kind: 'entity', key: 'block', value: 'ReaderSurface' }],
-  }),
+  render: renderReaderSurfaceBlock,
 });
 
 export const inspectorPanelBlock: BlockDefinition = defineBlock({
@@ -182,10 +180,7 @@ export const inspectorPanelBlock: BlockDefinition = defineBlock({
     inspectorRevealSelection,
     inspectorFocusSource,
   ],
-  render: ({ slots }) => ({
-    output: slots?.['selection'] ?? 'InspectorPanel definition placeholder',
-    facts: [{ kind: 'entity', key: 'block', value: 'InspectorPanel' }],
-  }),
+  render: renderInspectorPanelBlock,
 });
 
 export const readerSurfaceSchemaAdapter: BlockSchemaAdapter<ReaderSurfaceSchemaData> =
@@ -464,6 +459,217 @@ function standardBlockStory(
     state,
     facts,
   });
+}
+
+function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string> {
+  const mode = normalizeOutputMode(input.mode);
+  const sections: readonly RenderSection[] = [
+    renderSection('navigation', 'Navigation', ownSlotValue(input.slots, 'navigation'), false),
+    renderSection('content', 'Content', ownSlotValue(input.slots, 'content'), true),
+    renderSection('inspector', 'Inspector', ownSlotValue(input.slots, 'inspector'), false),
+    renderSection('status', 'Status', ownSlotValue(input.slots, 'status'), false),
+    renderSection('overlays', 'Overlays', ownSlotValue(input.slots, 'overlays'), false),
+  ].filter((section) => section.required || section.present);
+
+  return renderedBlockResult({
+    output: mode === 'accessible'
+      ? renderAccessibleSections('AppShell', sections)
+      : mode === 'pipe'
+        ? renderPipeSections('AppShell', sections)
+        : renderVisualSections('AppShell', sections),
+    facts: renderFacts('AppShell', sections, 'region'),
+  });
+}
+
+function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<string> {
+  const mode = normalizeOutputMode(input.mode);
+  const sections: readonly RenderSection[] = [
+    renderSection('navigation', 'Navigation', ownSlotValue(input.slots, 'navigation'), false),
+    renderSection('content', 'Content', ownSlotValue(input.slots, 'content'), true),
+    renderSection('outline', 'Outline', ownSlotValue(input.slots, 'outline'), false),
+  ].filter((section) => section.required || section.present);
+
+  return renderedBlockResult({
+    output: mode === 'accessible'
+      ? renderAccessibleSections('ReaderSurface', sections)
+      : mode === 'pipe'
+        ? renderPipeSections('ReaderSurface', sections)
+        : renderVisualSections('ReaderSurface', sections),
+    facts: renderFacts('ReaderSurface', sections, 'slot'),
+  });
+}
+
+function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<string> {
+  const mode = normalizeOutputMode(input.mode);
+  const sections: readonly RenderSection[] = [
+    renderSection('selection', 'Selection', ownSlotValue(input.slots, 'selection'), true),
+    renderSection('details', 'Details', ownSlotValue(input.slots, 'details'), false),
+    renderSection('actions', 'Actions', ownSlotValue(input.slots, 'actions'), false),
+  ].filter((section) => section.required || section.present);
+
+  return renderedBlockResult({
+    output: mode === 'accessible'
+      ? renderAccessibleSections('InspectorPanel', sections)
+      : mode === 'pipe'
+        ? renderPipeSections('InspectorPanel', sections)
+        : renderVisualSections('InspectorPanel', sections),
+    facts: renderFacts('InspectorPanel', sections, 'slot'),
+  });
+}
+
+interface RenderSection {
+  readonly id: string;
+  readonly label: string;
+  readonly content: string;
+  readonly required: boolean;
+  readonly present: boolean;
+}
+
+interface RenderedBlockOptions {
+  readonly output: string;
+  readonly facts: readonly BindingFact[];
+}
+
+function renderedBlockResult(options: RenderedBlockOptions): BlockRenderResult<string> {
+  const facts = Object.freeze(options.facts.map((fact) => Object.freeze({ ...fact })));
+  return Object.freeze({
+    output: options.output,
+    facts,
+  });
+}
+
+function renderSection(
+  id: string,
+  label: string,
+  value: unknown,
+  required: boolean,
+): RenderSection {
+  const content = slotValueText(value);
+  const present = content !== undefined;
+  return Object.freeze({
+    id,
+    label,
+    content: content ?? (required ? `(missing required ${id})` : ''),
+    required,
+    present,
+  });
+}
+
+function renderPipeSections(blockName: StandardBlockName, sections: readonly RenderSection[]): string {
+  return [
+    blockName,
+    ...sections.map((section) => formatSectionLine(section.id, section.content)),
+  ].join('\n');
+}
+
+function renderAccessibleSections(blockName: StandardBlockName, sections: readonly RenderSection[]): string {
+  return [
+    blockName,
+    ...sections.map((section) => formatSectionLine(section.label, section.content)),
+  ].join('\n');
+}
+
+function renderVisualSections(blockName: StandardBlockName, sections: readonly RenderSection[]): string {
+  return [
+    blockName,
+    ...sections.flatMap((section) => [
+      `--- ${section.label} ---`,
+      indentBlock(section.content),
+    ]),
+  ].join('\n');
+}
+
+function formatSectionLine(label: string, content: string): string {
+  if (content.includes('\n')) {
+    return `${label}:\n${indentBlock(content)}`;
+  }
+
+  return `${label}: ${content}`;
+}
+
+function indentBlock(content: string): string {
+  return content
+    .split('\n')
+    .map((line) => `  ${line}`)
+    .join('\n');
+}
+
+function renderFacts(
+  blockName: StandardBlockName,
+  sections: readonly RenderSection[],
+  sectionFactPrefix: 'region' | 'slot',
+): readonly BindingFact[] {
+  const facts: BindingFact[] = [
+    { kind: 'entity', key: 'block', value: blockName },
+    { kind: 'state', key: 'block.rendered', value: true },
+  ];
+
+  for (const section of sections) {
+    if (section.present) {
+      facts.push({ kind: 'entity', key: `${sectionFactPrefix}.${section.id}`, value: 'present' });
+    }
+  }
+
+  return facts;
+}
+
+function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
+  return ALL_OUTPUT_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
+}
+
+function ownSlotValue(slots: Readonly<Record<string, unknown>> | undefined, key: string): unknown {
+  if (!isPlainRecord(slots)) {
+    return undefined;
+  }
+
+  const descriptor = Object.getOwnPropertyDescriptor(slots, key);
+  return descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
+}
+
+function slotValueText(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (Array.isArray(value)) {
+    const parts = value
+      .map((item) => slotValueText(item))
+      .filter((item): item is string => item !== undefined && item.trim() !== '');
+    return parts.length === 0 ? undefined : parts.join('; ');
+  }
+
+  if (isBlockDefinition(value)) {
+    return value.metadata.blockName;
+  }
+
+  switch (typeof value) {
+    case 'string':
+      return value;
+    case 'number':
+    case 'boolean':
+      return String(value);
+    case 'object':
+      return recordSlotText(value);
+    default:
+      return undefined;
+  }
+}
+
+function recordSlotText(value: object): string | undefined {
+  if (!isPlainRecord(value)) {
+    return undefined;
+  }
+
+  const entries = Object.entries(Object.getOwnPropertyDescriptors(value))
+    .flatMap(([key, descriptor]) => {
+      if (!('value' in descriptor)) {
+        return [];
+      }
+
+      const text = slotValueText(descriptor.value);
+      return text === undefined ? [] : [`${key}: ${text}`];
+    });
+  return entries.length === 0 ? undefined : entries.join('; ');
 }
 
 function schemaError<Data = never>(code: string, message: string): BlockSchemaResult<Data> {
