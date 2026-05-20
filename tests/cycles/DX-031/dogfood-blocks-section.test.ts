@@ -49,8 +49,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
   });
 
-  it('renders a code-backed preview of standard blocks and their story variants', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 54 } });
+  it('renders an accordion-backed live preview for standard blocks and their story variants', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 160 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
 
     const result = await runScript(app, [{
@@ -62,12 +62,19 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const text = frameText(result.frames.at(-1)!);
 
     expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-preview');
+    expect(text).toContain('blocks • live preview');
+    expect(text).toContain('Live example');
+    expect(text).toContain('Live lowering preview');
+    expect(text).toContain('Live documentation');
+    expect(text).toContain('AppShell live example');
+    expect(text).toContain('ReaderSurface live example');
+    expect(text).toContain('InspectorPanel live example');
     for (const block of standardBlocks) {
+      expect(text).toContain(`Page: ${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);
     }
-    for (const story of standardBlockStories.slice(0, 8)) {
+    for (const story of standardBlockStories) {
       expect(text).toContain(story.id);
-      expect(text).toContain(story.label);
     }
   });
 

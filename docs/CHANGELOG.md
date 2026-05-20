@@ -10,9 +10,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
   beside Components, with pages for what blocks are, how to author them,
-  pre-made first-party blocks, a declaration-backed preview of standard block
-  variants/stories, and how block declarations lower across modes. The preview
-  and lowering pages are generated from the public `standardBlocks`,
+  pre-made first-party blocks, a live accordion preview of standard block pages,
+  and how block declarations lower across modes. The preview renders one inline
+  page per standard block with a live example surface, live lowering preview,
+  and live documentation generated from the public `standardBlocks`,
   `standardBlockStories`, and package-manifest exports rather than copied
   tables.
 - **First-party standard block definitions for `bijou`** —

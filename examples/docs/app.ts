@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import {
+  accordion,
   boxSurface,
   blockMetadataSummary,
   blockPackageManifestSummary,
@@ -17,6 +18,7 @@ import {
   tv,
   wrapToWidth,
   type BijouContext,
+  type BlockDefinition,
   type PreferenceListTheme,
   type Surface,
   type StandardBlockStory,
@@ -961,6 +963,231 @@ function standardBlockLoweringMarkdown(): string {
 
 function formatDocsList(values: readonly string[]): string {
   return values.length === 0 ? '-' : values.join(', ');
+}
+
+function renderBlocksPreviewPane(
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyWidth = Math.max(28, paneWidth - 6);
+  const sections = standardBlocks.map((block) => ({
+    title: `Page: ${block.metadata.blockName}`,
+    expanded: true,
+    content: standardBlockLivePreviewText(block, bodyWidth, ctx),
+  }));
+  const body = accordion(sections, {
+    indicatorToken: docsThemeBorderToken(theme),
+    titleToken: docsThemeAccentToken(theme),
+    ctx,
+  });
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface('blocks • live preview', paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(body),
+  ]), width);
+}
+
+function standardBlockLivePreviewText(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+): string {
+  return [
+    'Live example',
+    indentBlock(surfacePlainText(standardBlockExampleSurface(block, width, ctx))),
+    '',
+    'Live lowering preview',
+    indentBlock(standardBlockLoweringPreviewText(block)),
+    '',
+    'Live documentation',
+    indentBlock(standardBlockDocumentationText(block)),
+  ].join('\n');
+}
+
+function standardBlockExampleSurface(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+): Surface {
+  const cardWidth = Math.max(30, Math.min(78, width));
+
+  switch (block.metadata.blockName) {
+    case 'AppShell':
+      return boxSurface(column([
+        line('navigation  Guides / Components / Blocks'),
+        line('content     ReaderSurface: DOGFOOD Blocks'),
+        line('inspector   InspectorPanel: selected block facts'),
+        line('status      provider snapshots idle; commands ready'),
+        line('overlays    none'),
+      ]), {
+        title: 'AppShell live example',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    case 'ReaderSurface':
+      return boxSurface(contentSurface(markdown([
+        '# DOGFOOD Blocks',
+        '',
+        'ReaderSurface presents validated content with optional navigation and outline context.',
+        '',
+        '- metadata declares slots and variants',
+        '- data contracts describe boundary needs',
+        '- commands express user intent',
+      ].join('\n'), {
+        width: Math.max(24, cardWidth - 6),
+        ctx,
+      })), {
+        title: 'ReaderSurface live example',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    case 'InspectorPanel':
+      return boxSurface(contentSurface(inspector({
+        title: 'InspectorPanel live example',
+        currentValue: 'ReaderSurface',
+        sections: [
+          {
+            title: 'Selection',
+            content: 'standard block definition',
+          },
+          {
+            title: 'Facts',
+            content: 'data: reader.article; command: reader.selectHeading',
+            tone: 'muted',
+          },
+        ],
+        width: Math.max(24, cardWidth - 4),
+        borderToken: ctx.border('muted'),
+        ctx,
+      })), {
+        title: 'InspectorPanel shell',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    default:
+      return boxSurface(paragraphSurface(block.metadata.docs.summary, Math.max(24, cardWidth - 6)), {
+        title: `${block.metadata.blockName} live example`,
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+  }
+}
+
+function standardBlockLoweringPreviewText(block: BlockDefinition): string {
+  const slots = standardBlockExampleSlots(block.metadata.blockName);
+  return block.metadata.modes
+    .map((mode) => {
+      const result = block.render({ mode, slots });
+      const output = blockRenderOutputText(result.output);
+      const facts = formatDocsList((result.facts ?? []).map((fact) => `${fact.kind}:${fact.key}=${fact.value}`));
+      return `${mode}: ${output} | facts: ${facts}`;
+    })
+    .join('\n');
+}
+
+function standardBlockExampleSlots(blockName: string): Readonly<Record<string, unknown>> {
+  switch (blockName) {
+    case 'AppShell':
+      return {
+        navigation: 'Guides / Components / Blocks',
+        content: 'ReaderSurface block page',
+        inspector: 'selected block facts',
+        status: 'ready',
+        overlays: [],
+      };
+    case 'ReaderSurface':
+      return {
+        content: 'ReaderSurface live content from DOGFOOD Blocks.',
+        navigation: 'Blocks navigation',
+        outline: ['What are Blocks', 'How Blocks Lower'],
+      };
+    case 'InspectorPanel':
+      return {
+        selection: 'ReaderSurface',
+        details: ['schema-bound', 'provider-ready', 'command-aware'],
+        actions: ['Reveal selection', 'Focus source'],
+      };
+    default:
+      return {};
+  }
+}
+
+function standardBlockDocumentationText(block: BlockDefinition): string {
+  const metadata = block.metadata;
+  const stories = standardBlockStories.filter((story) => story.blockName === metadata.blockName);
+  const slots = metadata.slots.map((slot) => `${slot.id}${slot.required === true ? ' required' : ' optional'}`);
+  const variants = (metadata.variants ?? []).map((variant) => `${variant.id} (${variant.label})`);
+  const dataNames = block.data?.names() ?? [];
+  const commands = block.commands?.map((command) => command.id) ?? [];
+
+  return [
+    metadata.docs.summary,
+    `Contract: ${blockMetadataSummary(metadata)}`,
+    `Slots: ${formatDocsList(slots)}`,
+    `Variants: ${formatDocsList(variants)}`,
+    `Data requirements: ${formatDocsList(dataNames)}`,
+    `Command intents: ${formatDocsList(commands)}`,
+    `Stories: ${formatDocsList(stories.map((story) => `${story.id} (${story.state})`))}`,
+    `Source: ${metadata.sourcePath ?? '-'}`,
+  ].join('\n');
+}
+
+function blockRenderOutputText(output: unknown): string {
+  if (typeof output === 'string') {
+    return compactInlineText(output);
+  }
+  if (isSurfaceLike(output)) {
+    return compactInlineText(surfacePlainText(output));
+  }
+  try {
+    return compactInlineText(JSON.stringify(output));
+  } catch {
+    return String(output);
+  }
+}
+
+function isSurfaceLike(value: unknown): value is Surface {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && typeof (value as Surface).width === 'number'
+      && typeof (value as Surface).height === 'number'
+      && typeof (value as Surface).get === 'function',
+  );
+}
+
+function surfacePlainText(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let text = '';
+    for (let x = 0; x < surface.width; x++) {
+      text += surface.get(x, y).char || ' ';
+    }
+    lines.push(text.trimEnd());
+  }
+  return lines.join('\n').trimEnd();
+}
+
+function compactInlineText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim() || '-';
+}
+
+function indentBlock(value: string): string {
+  return value
+    .split('\n')
+    .map((lineText) => `  ${lineText}`)
+    .join('\n');
 }
 
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
@@ -2760,6 +2987,10 @@ function renderGuideReaderPane(
         ctx,
       }),
     ]), width);
+  }
+
+  if (pageId === BLOCKS_PAGE_ID && doc.id === 'blocks-preview') {
+    return renderBlocksPreviewPane(width, ctx, theme);
   }
 
   return insetPaneSurface(column([
