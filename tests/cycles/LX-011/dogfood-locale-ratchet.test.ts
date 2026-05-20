@@ -84,6 +84,42 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
   });
 
+  it('normalizes supported explicit locale aliases before rendering localized settings', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'fr-FR',
+    });
+
+    const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(text).toContain('Langue préférée');
+    expect(text).not.toContain('Preferred language');
+  });
+
+  it('keeps the language setting renderable when an extra DOGFOOD catalog is partial', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'fr',
+      extraI18nCatalogs: [{
+        namespace: 'bijou.dogfood',
+        entries: [{
+          key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Preferred language', fr: 'Langue préférée' },
+        }],
+      }],
+    });
+
+    const result = await runScript(app, [{ key: KEY_F2 }], { ctx });
+
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+  });
+
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, {

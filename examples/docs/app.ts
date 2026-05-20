@@ -91,6 +91,7 @@ import {
   nextDogfoodLocale,
   resolveDogfoodInitialLocale,
   resolveDogfoodLocale,
+  resolveDogfoodRuntimeLocale,
   type DogfoodLocalePort,
 } from './locale.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
@@ -3801,7 +3802,7 @@ function syncDocsExplorerViewportLayout(
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
   const initialLocale = resolveDogfoodInitialLocale(options);
   const runtime = createI18nRuntime({
-    locale: options.locale ?? initialLocale.id,
+    locale: resolveDogfoodRuntimeLocale(options),
     direction: options.direction ?? initialLocale.direction,
     fallbackLocale: 'en',
   });

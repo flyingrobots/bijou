@@ -55,16 +55,20 @@ export function normalizeDogfoodLocaleTag(locale: string | undefined): string | 
     .toLowerCase();
 }
 
-export function resolveDogfoodLocale(locale: string | undefined): DogfoodLocaleOption {
+function findDogfoodLocale(locale: string | undefined): DogfoodLocaleOption | undefined {
   const normalized = normalizeDogfoodLocaleTag(locale);
-  if (normalized == null) return DEFAULT_LOCALE;
+  if (normalized == null) return undefined;
   const primary = normalized.split('-')[0]!;
   return DOGFOOD_LOCALE_OPTIONS.find((option) => (
     option.id === normalized
     || option.aliases.includes(normalized)
     || option.id === primary
     || option.aliases.includes(primary)
-  )) ?? DEFAULT_LOCALE;
+  ));
+}
+
+export function resolveDogfoodLocale(locale: string | undefined): DogfoodLocaleOption {
+  return findDogfoodLocale(locale) ?? DEFAULT_LOCALE;
 }
 
 export function resolveDogfoodInitialLocale(
@@ -76,6 +80,18 @@ export function resolveDogfoodInitialLocale(
   return resolveDogfoodLocale(options.locale ?? options.localePort?.preferredLocale());
 }
 
+export function resolveDogfoodRuntimeLocale(
+  options: {
+    readonly locale?: string;
+    readonly localePort?: DogfoodLocalePort;
+  },
+): string {
+  if (options.locale !== undefined) {
+    return findDogfoodLocale(options.locale)?.id ?? options.locale;
+  }
+  return resolveDogfoodInitialLocale(options).id;
+}
+
 export function nextDogfoodLocale(currentLocale: string): DogfoodLocaleOption {
   const current = resolveDogfoodLocale(currentLocale);
   const currentIndex = DOGFOOD_LOCALE_OPTIONS.findIndex((option) => option.id === current.id);
@@ -84,7 +100,12 @@ export function nextDogfoodLocale(currentLocale: string): DogfoodLocaleOption {
 
 export function dogfoodLocaleLabel(locale: string, i18n?: I18nRuntime): string {
   const option = resolveDogfoodLocale(locale);
-  const localizedName = i18n?.t({ namespace: 'bijou.dogfood', id: `settings.language.${option.id}` }) ?? option.label;
+  let localizedName = option.label;
+  try {
+    localizedName = i18n?.t({ namespace: 'bijou.dogfood', id: `settings.language.${option.id}` }) ?? option.label;
+  } catch {
+    localizedName = option.label;
+  }
   return localizedName === option.nativeLabel ? localizedName : `${localizedName} / ${option.nativeLabel}`;
 }
 

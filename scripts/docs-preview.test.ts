@@ -7,6 +7,7 @@ import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots
 import { parseKey, runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG } from '../examples/docs/app.js';
 import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
+import { createNodeDocsApp } from '../examples/docs/node-app.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
@@ -108,9 +109,17 @@ describe('docs preview app', () => {
 
     expect(source).toContain("../../packages/bijou-node/src/index.js");
     expect(source).toContain("../../packages/bijou-tui/src/index.js");
-    expect(source).toContain("import { createNodeDogfoodLocalePort } from './node-locale.js';");
-    expect(source).toContain('localePort: createNodeDogfoodLocalePort()');
-    expect(source).toMatch(/await run\(createDocsApp\(ctx, \{\s+localePort: createNodeDogfoodLocalePort\(\),\s+\}\), \{ ctx, mouse: true \}\);/);
+    expect(source).toContain("import { createNodeDocsApp } from './node-app.js';");
+    expect(source).toContain('createNodeDocsApp(ctx)');
+  });
+
+  it('builds the Node DOGFOOD app through the locale adapter instead of process reads in view code', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createNodeDocsApp(ctx, { LC_ALL: 'fr_FR.UTF-8' });
+
+    const result = await runScript(app, [{ key: KEY_ENTER }, { key: KEY_F2 }], { ctx });
+
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
   });
 
   it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
