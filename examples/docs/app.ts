@@ -782,6 +782,21 @@ const guidePaneKeys = createKeyMap<ExplorerMsg>()
     .bind('space', 'Open guide', { type: 'activate-guide' }),
   );
 
+const blocksPreviewGuidePaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Guides', (group) => group
+    .bind('down', 'Next guide', { type: 'guide-next' })
+    .bind('up', 'Previous guide', { type: 'guide-prev' })
+    .bind('pagedown', 'Page down', { type: 'guide-page-down' })
+    .bind('pageup', 'Page up', { type: 'guide-page-up' })
+    .bind('enter', 'Open guide', { type: 'activate-guide' })
+    .bind('space', 'Open guide', { type: 'activate-guide' }),
+  )
+  .group('Counter fixture', (group) => group
+    .bind('-', 'Decrease counter', { type: 'counter-block-intent', action: 'decrement' })
+    .bind('+', 'Increase counter', { type: 'counter-block-intent', action: 'increment' })
+    .bind('=', 'Increase counter', { type: 'counter-block-intent', action: 'increment' }),
+  );
+
 const componentsPageKeys = createKeyMap<ExplorerMsg>()
   .group('Profiles', (group) => group
     .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
@@ -3099,6 +3114,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRun
     if (pageId !== COMPONENTS_PAGE_ID) {
       switch (focusedPane) {
         case 'guide-nav':
+          if (pageId === BLOCKS_PAGE_ID && pageModel.selectedGuideId === 'blocks-preview') {
+            return dogfoodText(
+              i18n,
+              'docs.footer.blocksPreviewNav',
+              '{paneSwitch} • ↑/↓ browse • Enter open • -/+ counter fixture',
+              { paneSwitch },
+            );
+          }
           return dogfoodText(
             i18n,
             'docs.footer.guideNav',
@@ -3567,7 +3590,11 @@ function createDocsExplorerApp(
           }];
           if (spec.id === BLOCKS_PAGE_ID && model.selectedGuideId === 'blocks-preview') {
             return [
-              ...inputAreas,
+              {
+                ...inputAreas[0]!,
+                keyMap: blocksPreviewGuidePaneKeys,
+                helpSource: blocksPreviewGuidePaneKeys,
+              },
               {
                 paneId: 'guide-content',
                 keyMap: blocksPreviewPaneKeys,

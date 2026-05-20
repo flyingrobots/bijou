@@ -226,7 +226,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   fixture now creates its command-intent metadata from the same public package
   graph validated by the TUI runtime, so pressing `+`, `=`, or `-` in the
   DOGFOOD Blocks preview no longer trips duplicate source/package intent
-  branding during `node --import tsx` execution.
+  branding during `node --import tsx` execution. Blocks preview counter
+  shortcuts are also active from the default guide-navigation focus, so the
+  visible fixture controls update the rendered counter without requiring a pane
+  focus hop.
 - **Spring example API drift** — `examples/spring` no longer passes the removed
   `fps` option to `animate()`, keeping the interactive spring comparison aligned
   with the current pulse-driven animation command API.
