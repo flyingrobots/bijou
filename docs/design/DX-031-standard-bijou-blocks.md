@@ -3153,9 +3153,10 @@ blocks.
 8. Done: add adapter-first `defineSchemaBlock()` support without making Zod,
    provider lifecycle, AppShell rendering, or DOGFOOD proof part of the core
    schema-bound block contract.
-9. Next: add an optional Zod schema adapter package or helper.
-10. Next: add block stories for `AppShell`, `ReaderSurface`, and
-   `InspectorPanel`.
+9. Done: add first-party block definitions and story declarations for
+   `AppShell`, `ReaderSurface`, and `InspectorPanel` without making them
+   rendered block product.
+10. Next: add an optional Zod schema adapter package or helper.
 11. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
 12. Next: prove the first three blocks in DOGFOOD before broadening the
@@ -3315,11 +3316,29 @@ What is now true:
   class instances, built-ins, and backchannel handles cannot silently normalize
   into empty input.
 
+DX-031C First-Party Block Definitions adds the first first-party standard block
+definition slice.
+
+What is now true:
+
+- `@flyingrobots/bijou` exports `appShellBlock`, `readerSurfaceBlock`,
+  `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`, and
+  `standardBlockPackageManifest`.
+- The first-party `AppShell`, `ReaderSurface`, and `InspectorPanel` blocks are
+  real `defineBlock()` outputs with valid metadata.
+- `ReaderSurface` and `InspectorPanel` declare DX-034 data contracts and command
+  intents.
+- Reader and Inspector schema-bound wrappers validate boundary data before
+  producing render input.
+- AppShell uses semantic slots: `navigation`, `content`, `inspector`, `status`,
+  and `overlays`.
+- Definition and composition introspection do not render blocks, subscribe,
+  dispatch, resolve providers, or walk the active runtime tree.
+
 Still out of scope after this slice:
 
 - Zod adapters and schema-to-block compilers.
-- Rendered first-party `AppShell`, `ReaderSurface`, and `InspectorPanel`
-  blocks.
+- Rendered first-party `AppShell`, `ReaderSurface`, and `InspectorPanel` blocks.
 - DOGFOOD block galleries and multi-mode story captures for rendered blocks.
 - Modal stacks, notifications, auth blocks, workspace docking, and complex
   domain-specific block packages.

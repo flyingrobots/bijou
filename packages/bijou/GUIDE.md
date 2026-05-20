@@ -221,6 +221,38 @@ Schema-bound blocks validate shape at the block boundary. They do not fetch,
 subscribe, dispatch commands, resolve providers, render AppShell, or register
 global runtime behavior.
 
+## First-Party Standard Blocks
+
+Bijou exports the first first-party standard block definitions:
+
+```typescript
+import {
+  appShellBlock,
+  inspectorPanelBlock,
+  readerSurfaceBlock,
+  standardBlockPackageManifest,
+  standardBlockStories,
+  standardBlocks,
+} from '@flyingrobots/bijou';
+
+standardBlocks.map(block => block.metadata.blockName);
+standardBlockStories.map(story => story.id);
+standardBlockPackageManifest.blocks;
+
+readerSurfaceBlock.data?.names();
+readerSurfaceBlock.commands?.map(command => command.id);
+inspectorPanelBlock.data?.names();
+appShellBlock.metadata.slots.map(slot => slot.id);
+```
+
+These definitions are contract artifacts. They declare metadata, semantic
+slots, data requirements, command intents, story ids, and package visibility for
+`AppShell`, `ReaderSurface`, and `InspectorPanel`.
+
+They do not implement rendered AppShell, provider subscriptions, active runtime
+traversal, command dispatch, DOGFOOD captures, or the full standard block
+catalog.
+
 ## AppShell Composition
 
 Use `defineAppShellComposition()` to describe logical shell slots before
