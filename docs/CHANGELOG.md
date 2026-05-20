@@ -18,6 +18,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selected locale's generated JSON catalog at runtime. `npm run
   dogfood:i18n:build`, `npm run dogfood:i18n:check`, `npm run
   dogfood:i18n:export`, and `npm run dogfood:i18n:coverage` cover the workflow.
+  DOGFOOD also publishes an in-app i18n workflow guide covering the package
+  split, source table, generated runtime catalogs, selected-locale loading, and
+  language-addition checklist.
 - **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
   DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
   count by source surface, and ratchets the current baseline at `2220` strings

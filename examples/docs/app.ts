@@ -124,6 +124,7 @@ const BIJOU_PACKAGE_JSON = JSON.parse(
 const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
+const GUIDES_I18N_WORKFLOW_TEXT = readMarkdownDoc('./content/guides-i18n-workflow.md');
 const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
 const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md');
 const BLOCKS_WHAT_ARE_BLOCKS_TEXT = readMarkdownDoc('../../docs/design-system/blocks.md');
@@ -338,6 +339,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Navigate DOGFOOD',
     summary: 'How to move between sections, panes, search, settings, and component stories.',
     body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
+  },
+  {
+    id: 'guides-i18n-workflow',
+    pageId: GUIDES_PAGE_ID,
+    title: '@flyingrobots/bijou-i18n workflow',
+    summary: '@flyingrobots/bijou-i18n-tools + @flyingrobots/bijou-i18n-tools-node',
+    body: GUIDES_I18N_WORKFLOW_TEXT,
   },
   {
     id: 'documentation-map',
