@@ -16,6 +16,15 @@ app consumes this through a locale port rather than reading process state from
 view code, so localization remains behind the same hexagonal boundary as the
 rest of the host integration.
 
+To inspect and enforce the current source-level localization debt:
+```bash
+npm run dogfood:i18n:debt
+```
+
+That report counts remaining localizable DOGFOOD UI strings by source surface.
+It is a source inventory, not a rendered-output scraper, so ids, paths, and
+catalog-backed fallback calls stay separate from visible raw copy.
+
 For the standalone Storybook-style development and testing workbench:
 ```bash
 npm run storybook
@@ -42,6 +51,9 @@ operators need when learning or validating Bijou.
   authoring, first-party blocks, live accordion previews, and lowering posture.
 - **Locale Preference**: The Settings drawer can switch DOGFOOD's preferred
   language after startup, while startup itself uses the host locale adapter.
+- **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining
+  localizable source strings by DOGFOOD surface and fails when the baseline
+  increases.
 - **Storybook Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
 - **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.

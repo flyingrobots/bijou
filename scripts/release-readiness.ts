@@ -32,6 +32,7 @@ export function buildReleaseReadinessPlan(): readonly ReleaseReadinessStep[] {
     { label: 'typecheck:test', command: npm, args: ['run', 'typecheck:test'] },
     { label: 'docs:design-system:preflight', command: npm, args: ['run', 'docs:design-system:preflight'] },
     { label: 'dogfood:coverage:gate', command: npm, args: ['run', 'dogfood:coverage:gate'] },
+    { label: 'dogfood:i18n:debt', command: npm, args: ['run', 'dogfood:i18n:debt'] },
     { label: 'workflow:shell:preflight', command: npm, args: ['run', 'workflow:shell:preflight'] },
     { label: 'release:preflight', command: npm, args: ['run', 'release:preflight'] },
     { label: 'test:frames', command: npm, args: ['run', 'test:frames'] },

@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
+  DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
+  count by source surface, and ratchets the current baseline at `1740` strings
+  across `docs-app`, `dogfood-locale`, `component-stories`, and Storybook-style
+  DOGFOOD entrypoints. The scanner filters ids, file paths, import paths, and
+  catalog-backed fallback calls so review sees the remaining localization debt
+  without scraping terminal render output. `release:readiness` now runs the
+  i18n debt ratchet alongside the existing DOGFOOD coverage gate.
 - **DOGFOOD locale preference and i18n ratchet** — DOGFOOD now resolves its
   initial language through an explicit locale port with a Node adapter that
   reads operating-system locale signals, exposes a Settings drawer language
