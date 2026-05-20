@@ -96,7 +96,7 @@ fake duplication rather than a real second API.
   scale, mode, slot, variant, config, component, story, semantic facts, optional
   view data contracts, and command intents.
 - **`standardBlocks` / `appShellBlock` / `readerSurfaceBlock` /
-  `inspectorPanelBlock`**: Import the first first-party standard block
+  `inspectorPanelBlock`**: Import the first-party standard block
   definitions for AppShell, ReaderSurface, and InspectorPanel. These expose
   contracts, stories, data requirements, command intents, and schema-bound
   posture without providing rendered AppShell product yet.
