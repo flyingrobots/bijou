@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   appShellBlock,
+  defineBlock,
   defineAppShellComposition,
   inspectorPanelBlock,
   readerSurfaceBlock,
@@ -45,26 +46,55 @@ describe('DX-031C first-party block definitions', () => {
   });
 
   it('composes declared blocks without rendering them', () => {
+    const renderCalls: string[] = [];
+    const spyReaderSurfaceBlock = defineBlock({
+      metadata: readerSurfaceBlock.metadata,
+      data: readerSurfaceBlock.data,
+      commands: readerSurfaceBlock.commands,
+      render: (input) => {
+        renderCalls.push('ReaderSurface');
+        return readerSurfaceBlock.render(input);
+      },
+    });
+    const spyInspectorPanelBlock = defineBlock({
+      metadata: inspectorPanelBlock.metadata,
+      data: inspectorPanelBlock.data,
+      commands: inspectorPanelBlock.commands,
+      render: (input) => {
+        renderCalls.push('InspectorPanel');
+        return inspectorPanelBlock.render(input);
+      },
+    });
+    const spyAppShellBlock = defineBlock({
+      metadata: appShellBlock.metadata,
+      data: appShellBlock.data,
+      commands: appShellBlock.commands,
+      render: (input) => {
+        renderCalls.push('AppShell');
+        return appShellBlock.render(input);
+      },
+    });
     const composition = defineAppShellComposition({
       slots: {
-        content: readerSurfaceBlock,
-        inspector: inspectorPanelBlock,
-        status: appShellBlock,
+        content: spyReaderSurfaceBlock,
+        inspector: spyInspectorPanelBlock,
+        status: spyAppShellBlock,
       },
     });
 
     expect(composition.blocks()).toEqual([
-      readerSurfaceBlock,
-      inspectorPanelBlock,
-      appShellBlock,
+      spyReaderSurfaceBlock,
+      spyInspectorPanelBlock,
+      spyAppShellBlock,
     ]);
     expect(composition.dataContracts()).toEqual([
-      readerSurfaceBlock.data,
-      inspectorPanelBlock.data,
+      spyReaderSurfaceBlock.data,
+      spyInspectorPanelBlock.data,
     ]);
     expect(composition.commandIntents().map((intent) => intent.id)).toContain('shell.focusRegion');
     expect(composition.commandIntents().map((intent) => intent.id)).toContain('reader.selectHeading');
     expect(composition.commandIntents().map((intent) => intent.id)).toContain('inspector.revealSelection');
+    expect(renderCalls).toEqual([]);
   });
 
   it('declares deterministic first-party story coverage in code', () => {
