@@ -104,6 +104,32 @@ describe('schema-bound block contract', () => {
     expect(schemaBlock.schema).toBe(articleSchema);
   });
 
+  it('snapshots adapter callbacks when the schema adapter is defined', () => {
+    const schemaInput = {
+      id: 'docs.article',
+      parse: (): { readonly ok: true; readonly data: Article } => ({
+        ok: true,
+        data: { id: 'original', title: 'Original' },
+      }),
+      describe: () => ({ requiredFields: ['id'] }),
+    };
+    const articleSchema = defineBlockSchemaAdapter<Article>(schemaInput);
+
+    schemaInput.parse = () => ({
+      ok: true,
+      data: { id: 'mutated', title: 'Mutated' },
+    });
+    schemaInput.describe = () => ({ requiredFields: ['mutated'] });
+
+    expect(parseBlockSchema(articleSchema, {})).toEqual({
+      ok: true,
+      data: { id: 'original', title: 'Original' },
+    });
+    expect(articleSchema.describe?.()).toMatchObject({
+      requiredFields: ['id'],
+    });
+  });
+
   it('validates unknown boundary data into immutable typed data or immutable issues', () => {
     const articleSchema = defineArticleSchema();
     const valid = parseBlockSchema(articleSchema, {
@@ -231,6 +257,41 @@ describe('schema-bound block contract', () => {
       id: 'dx-031',
       title: 'DX-031',
     })).toThrow('schema block bind: unsupported bind output key dispatch');
+  });
+
+  it('rejects non-plain bind outputs instead of normalizing them to empty input', () => {
+    const block = defineBlock({
+      metadata: readerSurfaceMetadata,
+      render: () => ({ output: 'reader' }),
+    });
+    const dateOutput = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => new Date(0) as never,
+    });
+    const wrappedDateInput = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => ({ input: new Date(0) }) as never,
+    });
+    const arrayOutput = defineSchemaBlock({
+      block,
+      schema: defineArticleSchema(),
+      bind: () => [] as never,
+    });
+
+    expect(() => bindSchemaBlockInput(dateOutput, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: bind output must be a plain object');
+    expect(() => bindSchemaBlockInput(wrappedDateInput, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: input must be a plain object');
+    expect(() => bindSchemaBlockInput(arrayOutput, {
+      id: 'dx-031',
+      title: 'DX-031',
+    })).toThrow('schema block bind: bind output must be a plain object');
   });
 
   it('preserves data and command contracts without taking ownership of provider lifecycle', () => {

@@ -109,13 +109,15 @@ export function defineBlockSchemaAdapter<Data>(
   if (typeof input.parse !== 'function') {
     throw new Error('block schema adapter: parse must be a function');
   }
+  const parse = input.parse;
+  const describe = input.describe;
 
   const adapter = {
     id,
-    parse: (value: unknown) => normalizeSchemaResult(input.parse(value)),
-    ...(input.describe === undefined
+    parse: (value: unknown) => normalizeSchemaResult(parse(value)),
+    ...(describe === undefined
       ? {}
-      : { describe: () => normalizeSchemaDescription(input.describe?.() ?? {}) }),
+      : { describe: () => normalizeSchemaDescription(describe() ?? {}) }),
   } as BlockSchemaAdapter<Data>;
 
   Object.defineProperty(adapter, BLOCK_SCHEMA_ADAPTER_BRAND, { value: true });
@@ -284,6 +286,9 @@ function normalizeBindOutput<Config>(
   if (!isObjectLike(output)) {
     throw new Error('schema block bind: bind output must be an object');
   }
+  if (!isPlainObject(output)) {
+    throw new Error('schema block bind: bind output must be a plain object');
+  }
 
   if (Object.prototype.hasOwnProperty.call(output, 'input')) {
     assertOnlyKeys(output, ['input', 'facts'], {
@@ -296,6 +301,9 @@ function normalizeBindOutput<Config>(
     };
     if (!isObjectLike(wrappedOutput.input)) {
       throw new Error('schema block bind: input must be an object');
+    }
+    if (!isPlainObject(wrappedOutput.input)) {
+      throw new Error('schema block bind: input must be a plain object');
     }
     assertOnlyKeys(wrappedOutput.input, ['config', 'slots', 'mode'], {
       scope: 'schema block bind',

@@ -3307,9 +3307,13 @@ What is now true:
   metadata, data contracts, command intents, and ordinary render ownership.
 - Schema adapters validate unknown input into immutable typed data or immutable
   deterministic issues.
+- Schema adapters snapshot their parse/describe callbacks at definition time.
 - Binding schema data produces immutable block render input and optional
   semantic facts without rendering, subscribing, dispatching, resolving
   providers, or owning AppShell behavior.
+- Bind outputs must be plain objects with supported render-input keys, so
+  class instances, built-ins, and backchannel handles cannot silently normalize
+  into empty input.
 
 Still out of scope after this slice:
 
