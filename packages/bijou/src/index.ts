@@ -239,6 +239,24 @@ export {
   type SchemaBoundBlockDefinitionInput,
 } from './core/schema-block.js';
 export {
+  appShellBlock,
+  inspectorPanelBlock,
+  inspectorPanelSchemaAdapter,
+  inspectorPanelSchemaBlock,
+  readerSurfaceBlock,
+  readerSurfaceSchemaAdapter,
+  readerSurfaceSchemaBlock,
+  standardBlockPackageManifest,
+  standardBlocks,
+  standardBlockStories,
+  type InspectorPanelSchemaData,
+  type ReaderSurfaceOutlineItem,
+  type ReaderSurfaceSchemaData,
+  type StandardBlockName,
+  type StandardBlockStory,
+  type StandardBlockStoryState,
+} from './core/standard-blocks.js';
+export {
   componentMetadataReportText,
   componentMetadataSummary,
   defineComponentMetadata,

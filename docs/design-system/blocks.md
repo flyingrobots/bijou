@@ -62,6 +62,11 @@ Bijou now exposes a metadata-first block authoring contract from
   authors publish or index them.
 - `defineBlock()` can attach DX-034 view data contracts and command intents for
   discovery without provider handles or command callbacks.
+- `appShellBlock`, `readerSurfaceBlock`, `inspectorPanelBlock`,
+  `standardBlocks`, `standardBlockStories`, and
+  `standardBlockPackageManifest` expose the first-party block definitions:
+  AppShell, ReaderSurface, and InspectorPanel. They are definition and contract
+  artifacts, not rendered block products.
 - `defineAppShellComposition()` groups runtime-backed blocks into logical
   navigation, content, inspector, status, and overlay slots without rendering.
 - `defineBlockSchemaAdapter()`, `defineSchemaBlock()`, and
