@@ -8,6 +8,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Runtime binding loop proofs for DX-034** —
+  `@flyingrobots/bijou-tui` now exports runtime binding-source collection over
+  the existing `RuntimeViewStack`, using `blocksBelow` to decide which declared
+  view data contracts are active without rendering, subscribing, refreshing,
+  dispatching, or resolving provider handles. `@flyingrobots/bijou` now exports
+  `bindingFrameUpdateFromSnapshots()` to turn explicit provider snapshots into a
+  new immutable `BindingFrame` plus lifecycle invalidation facts without
+  mutating prior frames or records. `@flyingrobots/bijou-tui` also exports
+  command intent emissions, explicit intent routes, and dispatch helpers that
+  map declared `CommandIntent` metadata into the existing runtime command
+  buffer while business logic applies commands later. Provider subscriptions,
+  active hierarchy lifecycle management, rendered AppShell, schema binding,
+  cache retention, and DOGFOOD integration remain follow-on work.
 - **Active binding collection primitives for `bijou`** —
   `@flyingrobots/bijou` now exports `ActiveBindingEntry`,
   `ActiveBindingCollection`, `activeBindingEntry()`,

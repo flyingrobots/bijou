@@ -144,6 +144,11 @@ export {
   type ViewDataRequirementEntry,
 } from './core/binding.js';
 export {
+  bindingFrameUpdateFromSnapshots,
+  type BindingFrameUpdate,
+  type BindingFrameUpdateFromSnapshotsInput,
+} from './core/binding-frame-update.js';
+export {
   ActiveBindingCollection,
   activeBindingCollection,
   activeBindingEntry,

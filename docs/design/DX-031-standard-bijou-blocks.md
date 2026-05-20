@@ -3109,16 +3109,19 @@ blocks.
    definitions for discovery.
 6. Done: add a structural AppShell composition contract for logical block slots
    and nested data/command introspection without rendering.
-7. Next: add `defineSchemaBlock()` and a Zod schema adapter.
-8. Next: add block stories for `AppShell`, `ReaderSurface`, and
+7. Done: prove active runtime binding collection, provider snapshot
+   invalidation into new immutable frames, and command intent routing before
+   rendered AppShell work begins.
+8. Next: add `defineSchemaBlock()` and a Zod schema adapter.
+9. Next: add block stories for `AppShell`, `ReaderSurface`, and
    `InspectorPanel`.
-9. Next: capture interactive, static, pipe, and accessible outputs for the
+10. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-10. Next: prove the first three blocks in DOGFOOD before broadening the
+11. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-11. Next: add catalog-only variant/config metadata for later blocks without
+12. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-12. Continue to defer modal stacks, notifications, auth forms, animated
+13. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 
