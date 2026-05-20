@@ -223,7 +223,7 @@ global runtime behavior.
 
 ## First-Party Standard Blocks
 
-Bijou exports the first first-party standard block definitions:
+Bijou exports the first-party standard block definitions:
 
 ```typescript
 import {
