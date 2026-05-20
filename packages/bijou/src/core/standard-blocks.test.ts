@@ -172,6 +172,57 @@ describe('first-party standard block definitions', () => {
     expect('dispatch' in inspectorPanelSchemaBlock).toBe(false);
   });
 
+  it('rejects schema boundary accessors without invoking them', () => {
+    let getterCalls = 0;
+    const accessorArticle = Object.defineProperties({}, {
+      id: {
+        enumerable: true,
+        get() {
+          getterCalls += 1;
+          return 'dx-031';
+        },
+      },
+      title: {
+        enumerable: true,
+        get() {
+          getterCalls += 1;
+          return 'DX-031';
+        },
+      },
+      body: {
+        enumerable: true,
+        get() {
+          getterCalls += 1;
+          return 'Hidden accessor body';
+        },
+      },
+    });
+    const accessorSelection = Object.defineProperties({}, {
+      selectionId: {
+        enumerable: true,
+        get() {
+          getterCalls += 1;
+          return 'heading:intro';
+        },
+      },
+      label: {
+        enumerable: true,
+        get() {
+          getterCalls += 1;
+          return 'Intro';
+        },
+      },
+    });
+
+    expect(bindSchemaBlockInput(readerSurfaceSchemaBlock, accessorArticle)).toMatchObject({
+      ok: false,
+    });
+    expect(bindSchemaBlockInput(inspectorPanelSchemaBlock, accessorSelection)).toMatchObject({
+      ok: false,
+    });
+    expect(getterCalls).toBe(0);
+  });
+
   it('lets AppShell composition inspect declarations without executing render', () => {
     let renderCalls = 0;
     const spyBlock = defineBlock({

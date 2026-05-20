@@ -16,7 +16,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   metadata, data contracts, command intents, story declarations, schema-bound
   wrappers, and package visibility. This does not implement rendered AppShell,
   provider subscriptions, active runtime traversal, command dispatch, DOGFOOD
-  captures, or the full standard block catalog.
+  captures, or the full standard block catalog. First-party block schema
+  adapters reject accessor-backed and non-plain boundary inputs without invoking
+  getters, so schema validation stays a data-shape boundary check.
 - **Schema-bound block contract for `bijou`** — `@flyingrobots/bijou` now
   exports adapter-first schema-bound block primitives:
   `BlockSchemaAdapter`, `defineBlockSchemaAdapter()`, `defineSchemaBlock()`,

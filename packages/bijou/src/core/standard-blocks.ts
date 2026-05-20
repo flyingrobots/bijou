@@ -478,43 +478,56 @@ function schemaError<Data = never>(code: string, message: string): BlockSchemaRe
 }
 
 function isReaderSurfaceSchemaData(input: unknown): input is ReaderSurfaceSchemaData {
-  if (!isRecord(input)) {
+  if (!isPlainRecord(input)) {
     return false;
   }
 
   if (
-    typeof input['id'] !== 'string'
-    || typeof input['title'] !== 'string'
-    || typeof input['body'] !== 'string'
+    typeof ownDataProperty(input, 'id') !== 'string'
+    || typeof ownDataProperty(input, 'title') !== 'string'
+    || typeof ownDataProperty(input, 'body') !== 'string'
   ) {
     return false;
   }
 
-  const outline = input['outline'];
+  const outline = ownDataProperty(input, 'outline');
   return outline === undefined
     || (Array.isArray(outline) && outline.every(isReaderSurfaceOutlineItem));
 }
 
 function isReaderSurfaceOutlineItem(input: unknown): input is ReaderSurfaceOutlineItem {
-  return isRecord(input)
-    && typeof input['id'] === 'string'
-    && typeof input['label'] === 'string';
+  return isPlainRecord(input)
+    && typeof ownDataProperty(input, 'id') === 'string'
+    && typeof ownDataProperty(input, 'label') === 'string';
 }
 
 function isInspectorPanelSchemaData(input: unknown): input is InspectorPanelSchemaData {
-  if (!isRecord(input)) {
+  if (!isPlainRecord(input)) {
     return false;
   }
 
-  if (typeof input['selectionId'] !== 'string' || typeof input['label'] !== 'string') {
+  if (
+    typeof ownDataProperty(input, 'selectionId') !== 'string'
+    || typeof ownDataProperty(input, 'label') !== 'string'
+  ) {
     return false;
   }
 
-  const details = input['details'];
+  const details = ownDataProperty(input, 'details');
   return details === undefined
     || (Array.isArray(details) && details.every((detail) => typeof detail === 'string'));
 }
 
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return input !== null && typeof input === 'object' && !Array.isArray(input);
+function isPlainRecord(input: unknown): input is Record<string, unknown> {
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    return false;
+  }
+
+  const prototype = Object.getPrototypeOf(input);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function ownDataProperty(input: Record<string, unknown>, key: string): unknown {
+  const descriptor = Object.getOwnPropertyDescriptor(input, key);
+  return descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
 }
