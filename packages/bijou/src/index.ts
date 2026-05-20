@@ -144,6 +144,19 @@ export {
   type ViewDataRequirementEntry,
 } from './core/binding.js';
 export {
+  ActiveBindingCollection,
+  activeBindingCollection,
+  activeBindingEntry,
+  collectActiveBindings,
+  isActiveBindingCollection,
+  isActiveBindingEntry,
+  type ActiveBindingContractInput,
+  type ActiveBindingEntry,
+  type ActiveBindingEntryInput,
+  type ActiveBindingProviderAssignment,
+  type CollectActiveBindingsInput,
+} from './core/active-binding-collection.js';
+export {
   activateBinding,
   bindingLifecycleRecord,
   defineBindingLifecycleOwner,
