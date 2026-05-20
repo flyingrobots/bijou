@@ -109,6 +109,28 @@ export {
   runtimeComponentAcceptsInput,
   transitionRuntimeState,
 } from './runtime-engine.js';
+export type {
+  DispatchRuntimeCommandIntentInput,
+  DispatchRuntimeCommandIntentResult,
+  RuntimeBindingLayerModel,
+  RuntimeCommandIntentEmission,
+  RuntimeCommandIntentEmissionOptions,
+  RuntimeCommandIntentRoute,
+  RuntimeCommandIntentRouteInput,
+  RuntimeViewBindingSource,
+  RuntimeViewBindingSourceInput,
+} from './runtime-binding.js';
+export {
+  collectRuntimeViewBindings,
+  dispatchRuntimeCommandIntent,
+  isRuntimeCommandIntentEmission,
+  isRuntimeCommandIntentRoute,
+  isRuntimeViewBindingSource,
+  runtimeActiveBindingLayers,
+  runtimeCommandIntentEmission,
+  runtimeCommandIntentRoute,
+  runtimeViewBindingSource,
+} from './runtime-binding.js';
 
 // Key parsing
 export { parseKey, parseMouse } from './keys.js';

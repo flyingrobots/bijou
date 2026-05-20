@@ -688,6 +688,88 @@ refresh, dispatch, render, cache, resolve provider scopes, traverse the real TUI
 runtime tree, bind schemas, or integrate DOGFOOD. Provider ids are metadata
 only; provider handles are not exposed.
 
+### DX-034G Active View Binding Collection
+
+DX-034G connects the pure active-binding collection contract to the existing
+runtime view-stack model in `@flyingrobots/bijou-tui`.
+
+The runtime view stack determines which layers contribute active bindings:
+
+- the top layer is active
+- layers below remain active only while each layer above them has
+  `blocksBelow: false`
+- a layer with `blocksBelow: true` blocks lower layers from active binding
+  ownership
+
+Runtime binding collection still inspects declarations, not rendered output.
+Layers expose branded `RuntimeViewBindingSource` values, and
+`collectRuntimeViewBindings()` converts active sources into an
+`ActiveBindingCollection`.
+
+Runtime binding sources normalize, copy, and freeze provider assignment metadata
+at construction so later caller mutation cannot change active binding
+collection results.
+
+DX-034G does not subscribe, refresh, dispatch, render, cache, resolve provider
+handles, bind schemas, or integrate DOGFOOD. It only proves that the active
+view hierarchy can identify active owner/requirement pairs.
+
+### DX-034H Provider Update Invalidation Flow
+
+DX-034H proves the provider-update half of the loop without implementing a
+provider manager.
+
+`bindingFrameUpdateFromSnapshots()` takes:
+
+- an `ActiveBindingCollection`
+- an explicit `ProviderScope`
+- immutable `BindingSnapshot` values
+- optional current lifecycle records
+
+It resolves the collection's requirements against the scope, assembles the next
+immutable `BindingFrame`, and records provider updates as lifecycle
+invalidations. It never mutates the previous frame or lifecycle records.
+Snapshots whose provider id and version already appear in a lifecycle record's
+provider-update invalidations do not create duplicate invalidations or lifecycle
+churn.
+Explicit provider assignments carried by active binding entries are
+authoritative: a scope-resolved provider that conflicts with an explicit
+assignment becomes a deterministic `provider.assignment-mismatch` issue rather
+than data in the frame.
+
+```text
+provider publishes snapshot
+  -> binding lifecycle records receive invalidation facts
+  -> runtime assembles next immutable BindingFrame
+  -> views later render the new frame
+```
+
+DX-034H does not fetch data, subscribe, refresh providers, retain caches, walk
+the active hierarchy, render AppShell, or dispatch Commands.
+
+### DX-034I Command Intent Dispatch Proof
+
+DX-034I proves the command half of the loop without putting business logic in
+views.
+
+Views emit branded `RuntimeCommandIntentEmission` values from declared
+`CommandIntent` metadata. Runtime code maps those emissions through explicit
+`RuntimeCommandIntentRoute` values into the existing `RuntimeCommandBuffer`.
+Business logic still handles the resulting command later through the normal
+command-buffer path.
+Emissions copy and deeply freeze inert payload data before routing so caller
+mutation cannot change the command that eventually reaches business logic.
+
+```text
+view emits command intent
+  -> runtime maps intent to a command
+  -> command buffer records the command
+  -> business logic applies the command later
+```
+
+Command intents and emissions expose no provider handles, subscription handles,
+refresh methods, dispatch callbacks, mutable stores, or render hooks.
+
 ### 5. User Input Emits Commands
 
 Views communicate user intent through Commands:
@@ -902,9 +984,10 @@ flow.
    value objects.
 12. Done: add active binding collection primitives for declared owner and
    requirement pairs.
-13. Next: add active-view binding collection over the existing view-stack model.
-14. Next: add invalidation flow from provider snapshot updates to view re-render.
-15. Next: add Command intent dispatch proof.
+13. Done: add active-view binding collection over the existing view-stack model.
+14. Done: add invalidation flow from provider snapshot updates to new immutable
+   binding frames.
+15. Done: add Command intent dispatch proof through the runtime command buffer.
 16. Next: prove rendered AppShell with provider-bound navigation, content, inspector,
    and status blocks.
 17. Next: add DOGFOOD stories and captures for ready, loading, stale, empty, and
@@ -926,6 +1009,8 @@ flow.
 - Behavioral tests proving active binding collections bind declared
   requirements to explicit lifecycle owners without rendering, subscribing, or
   dispatching.
+- Runtime tests proving active view-stack layers determine active bindings
+  without rendering, subscribing, or dispatching.
 - Runtime tests proving provider scopes resolve nearest-provider wins without
   hidden globals.
 - Runtime tests proving active views create bindings and inactive views dispose
@@ -952,6 +1037,8 @@ flow.
 - Active binding collections expose active owner/requirement pairs and lifecycle
   ownership records before runtime provider integration.
 - Provider updates produce new immutable binding frames.
+- Command intent emissions enter the runtime command buffer without embedding
+  business logic callbacks in views.
 - Binding status is visible to tooling and lower modes.
 - Schema-bound blocks compose with provider-bound views but do not replace the
   provider lifecycle.
@@ -1004,3 +1091,17 @@ DX-034F landed active binding collection primitives. The restraint is that
 collections inspect declarations and produce active lifecycle ownership records;
 they do not subscribe, refresh, dispatch, render, cache, resolve provider
 scopes, traverse the real TUI runtime tree, bind schemas, or integrate DOGFOOD.
+
+DX-034G landed active view-stack binding collection in `@flyingrobots/bijou-tui`.
+The restraint is that the runtime stack only decides which declared binding
+sources are active; it still does not render, subscribe, refresh, dispatch,
+resolve provider handles, or retain caches.
+
+DX-034H landed provider-update invalidation and frame assembly as a pure
+contract helper. The restraint is that snapshot updates create new immutable
+frames and lifecycle invalidation facts; no provider manager or subscription
+loop exists yet.
+
+DX-034I landed command intent emission and runtime command-buffer routing. The
+restraint is that command routes map intent records to command values; business
+logic still applies commands later through the existing runtime command buffer.

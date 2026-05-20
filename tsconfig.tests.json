@@ -7,7 +7,13 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@flyingrobots/bijou": ["./packages/bijou/src/index.ts"],
+      "@flyingrobots/bijou/adapters/test": ["./packages/bijou/src/adapters/test/index.ts"],
+      "@flyingrobots/bijou/perf": ["./packages/bijou/src/core/render/packed-cell.ts"]
+    }
   },
   "include": ["packages/*/src/**/*.test.ts", "packages/*/src/**/*.d.ts", "scripts/**/*.test.ts", "scripts/**/*.d.ts", "tests/**/*.test.ts", "tests/**/*.d.ts"]
 }

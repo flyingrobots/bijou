@@ -8,6 +8,32 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Runtime binding loop proofs for DX-034** —
+  `@flyingrobots/bijou-tui` now exports runtime binding-source collection over
+  the existing `RuntimeViewStack`, using `blocksBelow` to decide which declared
+  view data contracts are active without rendering, subscribing, refreshing,
+  dispatching, or resolving provider handles. `@flyingrobots/bijou` now exports
+  `bindingFrameUpdateFromSnapshots()` to turn explicit provider snapshots into a
+  new immutable `BindingFrame` plus lifecycle invalidation facts without
+  mutating prior frames or records. `@flyingrobots/bijou-tui` also exports
+  command intent emissions, explicit intent routes, and dispatch helpers that
+  map declared `CommandIntent` metadata into the existing runtime command
+  buffer while business logic applies commands later. Provider subscriptions,
+  active hierarchy lifecycle management, rendered AppShell, schema binding,
+  cache retention, and DOGFOOD integration remain follow-on work.
+- **Runtime binding loop hardening for DX-034** — Runtime binding sources now
+  normalize, copy, and freeze provider assignment objects instead of retaining
+  caller-owned references. Command intent emissions now copy and deeply freeze
+  inert payload data before routing, rejecting hidden mutation channels before a
+  command reaches the runtime buffer. `bindingFrameUpdateFromSnapshots()` now
+  treats explicit active binding provider assignments as authoritative and
+  reports deterministic `provider.assignment-mismatch` issues instead of
+  accepting snapshots from a different provider resolved by resource alone. The
+  new public binding-loop helpers also reject non-object inputs with
+  deterministic domain errors instead of raw `TypeError`s. Runtime binding layer
+  collection now preserves the existing `blocksBelow` semantics used by input
+  routing, and repeated frame updates with the same provider snapshot version do
+  not duplicate lifecycle invalidations.
 - **Active binding collection primitives for `bijou`** —
   `@flyingrobots/bijou` now exports `ActiveBindingEntry`,
   `ActiveBindingCollection`, `activeBindingEntry()`,
