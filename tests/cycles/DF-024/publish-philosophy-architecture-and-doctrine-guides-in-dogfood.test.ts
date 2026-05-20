@@ -31,8 +31,8 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
 
   it('publishes doctrine and architecture pages in the Philosophy section', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs' });
-    const opened = await runScript(app, [{ key: ']' }, { key: ']' }, { key: ']' }], { ctx });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'philosophy' });
+    const opened = await runScript(app, [], { ctx });
     const overviewText = frameText(opened.frames.at(-1)!);
 
     expect(opened.model.docsModel.activePageId).toBe('philosophy');
@@ -43,9 +43,6 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
     expect(overviewText).toContain('Design System Overview');
 
     const systemStyle = await runScript(app, [
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'philosophy-system-style-javascript' } } },
     ], { ctx });
     const systemStyleText = frameText(systemStyle.frames.at(-1)!);
@@ -53,9 +50,6 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
     expect(systemStyleText).toContain('TypeScript is a useful dialect');
 
     const architecture = await runScript(app, [
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'philosophy-architecture' } } },
     ], { ctx });
     const architectureText = frameText(architecture.frames.at(-1)!);

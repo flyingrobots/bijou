@@ -32,6 +32,8 @@ operators need when learning or validating Bijou.
 ### Today's Proof Points
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
 - **Component Explorer**: A live, interactive field guide to every component family.
+- **Blocks Section**: A first-class Blocks lane covering block purpose,
+  authoring, first-party blocks, live accordion previews, and lowering posture.
 - **Storybook Workstation**: A standalone interactive story browser plus deterministic story index and matrix capture path over the same DOGFOOD story catalog.
 - **Graceful Lowering**: Verifying that documentation renders correctly across `rich`, `static`, `pipe`, and `accessible` modes.
 - **Responsive Product Layout**: Proving that resize is not enough by selecting `wide`, `standard`, `narrow`, and `tiny` docs layouts that keep constrained terminals useful.

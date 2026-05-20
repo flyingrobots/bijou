@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import {
+  accordion,
   boxSurface,
+  blockMetadataSummary,
+  blockPackageManifestSummary,
   cloneContextWithTheme,
   createSurface,
   CYAN_MAGENTA,
@@ -8,15 +11,20 @@ import {
   lerp3,
   markdown,
   progressBar,
-  type PreferenceListTheme,
   separatorSurface,
+  standardBlockPackageManifest,
+  standardBlocks,
+  standardBlockStories,
   tv,
   wrapToWidth,
   type BijouContext,
+  type BlockDefinition,
+  type PreferenceListTheme,
   type Surface,
+  type StandardBlockStory,
   type Theme,
   type TokenValue,
-} from '@flyingrobots/bijou';
+} from '../../packages/bijou/src/index.js';
 import {
   FRAME_I18N_CATALOG,
   browsableListSurface,
@@ -104,6 +112,11 @@ const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md')
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
 const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
 const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md');
+const BLOCKS_WHAT_ARE_BLOCKS_TEXT = readMarkdownDoc('../../docs/design-system/blocks.md');
+const BLOCKS_MAKE_YOUR_OWN_TEXT = readMarkdownDoc('./content/blocks-make-your-own.md');
+const BLOCKS_PRE_MADE_TEXT = standardBlockInventoryMarkdown();
+const BLOCKS_PREVIEW_TEXT = standardBlockPreviewMarkdown();
+const BLOCKS_LOWERING_TEXT = standardBlockLoweringMarkdown();
 const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
 const PACKAGE_BIJOU_TEXT = readMarkdownDocExcerpt('../../packages/bijou/README.md', ['## Install']);
 const PACKAGE_BIJOU_NODE_TEXT = readMarkdownDocExcerpt('../../packages/bijou-node/README.md', ['## Install']);
@@ -130,6 +143,7 @@ const LANDING_CONTROLS_TEXT = 'Esc/q quit • ↑/↓ quality • ←/→ theme 
 const VERSION_TEXT = `v${BIJOU_VERSION}`;
 const GUIDES_PAGE_ID = 'guides';
 const COMPONENTS_PAGE_ID = 'components';
+const BLOCKS_PAGE_ID = 'blocks';
 const PACKAGES_PAGE_ID = 'packages';
 const PHILOSOPHY_PAGE_ID = 'philosophy';
 const RELEASE_PAGE_ID = 'release';
@@ -181,6 +195,7 @@ export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
     dogfoodMessage('docs.footer.guideMeta', '{paneSwitch} • section overview'),
     dogfoodMessage('docs.page.guides', 'Guides'),
     dogfoodMessage('docs.page.components', 'Components'),
+    dogfoodMessage('docs.page.blocks', 'Blocks'),
     dogfoodMessage('docs.page.packages', 'Packages'),
     dogfoodMessage('docs.page.philosophy', 'Philosophy'),
     dogfoodMessage('docs.page.release', 'Release'),
@@ -234,6 +249,7 @@ interface StoryFamily {
 type DocsPageId =
   | typeof GUIDES_PAGE_ID
   | typeof COMPONENTS_PAGE_ID
+  | typeof BLOCKS_PAGE_ID
   | typeof PACKAGES_PAGE_ID
   | typeof PHILOSOPHY_PAGE_ID
   | typeof RELEASE_PAGE_ID;
@@ -358,6 +374,7 @@ const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
   { id: GUIDES_PAGE_ID, title: 'Guides' },
   { id: COMPONENTS_PAGE_ID, title: 'Components' },
+  { id: BLOCKS_PAGE_ID, title: 'Blocks' },
   { id: PACKAGES_PAGE_ID, title: 'Packages' },
   { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
   { id: RELEASE_PAGE_ID, title: 'Release' },
@@ -390,6 +407,41 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Secondary Example Map',
     summary: 'Why examples are now secondary/internal and what reference value they still keep.',
     body: GUIDES_SECONDARY_EXAMPLES_TEXT,
+  },
+  {
+    id: 'blocks-what-are-blocks',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'What are Blocks',
+    summary: 'The design-system posture for larger, opinionated Bijou assemblies.',
+    body: BLOCKS_WHAT_ARE_BLOCKS_TEXT,
+  },
+  {
+    id: 'blocks-make-your-own',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'How to Make Your Own Blocks',
+    summary: 'The block authoring contract: metadata first, schema adapters at boundaries, and commands as intent.',
+    body: BLOCKS_MAKE_YOUR_OWN_TEXT,
+  },
+  {
+    id: 'blocks-pre-made',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'Pre-made Blocks',
+    summary: 'The first-party standard blocks exported by @flyingrobots/bijou.',
+    body: BLOCKS_PRE_MADE_TEXT,
+  },
+  {
+    id: 'blocks-preview',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'Block Preview',
+    summary: 'A code-backed preview index for standard blocks, variants, and declared stories.',
+    body: BLOCKS_PREVIEW_TEXT,
+  },
+  {
+    id: 'blocks-lowering',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'How Blocks Lower',
+    summary: 'How standard block declarations carry mode and semantic facts before rendered block output lands.',
+    body: BLOCKS_LOWERING_TEXT,
   },
   {
     id: 'packages-overview',
@@ -795,6 +847,349 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
 }
 
+function standardBlockInventoryMarkdown(): string {
+  const blockSections = standardBlocks
+    .map((block) => {
+      const metadata = block.metadata;
+      const requiredSlots = metadata.slots
+        .filter((slot) => slot.required === true)
+        .map((slot) => slot.id);
+      const optionalSlots = metadata.slots
+        .filter((slot) => slot.required !== true)
+        .map((slot) => slot.id);
+      const dataNames = block.data?.names() ?? [];
+      const commandIds = block.commands?.map((command) => command.id) ?? [];
+
+      return [
+        `## ${metadata.blockName}`,
+        '',
+        metadata.docs.summary,
+        '',
+        `- Contract: ${blockMetadataSummary(metadata)}`,
+        `- Family: ${metadata.family}`,
+        `- Scale: ${metadata.scale}`,
+        `- Modes: ${metadata.modes.join(', ')}`,
+        `- Required slots: ${formatDocsList(requiredSlots)}`,
+        `- Optional slots: ${formatDocsList(optionalSlots)}`,
+        `- Data requirements: ${formatDocsList(dataNames)}`,
+        `- Command intents: ${formatDocsList(commandIds)}`,
+        `- Source: ${metadata.sourcePath ?? 'not published'}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    '# Pre-made Blocks',
+    '',
+    `Package: ${blockPackageManifestSummary(standardBlockPackageManifest)}`,
+    '',
+    blockSections,
+  ].join('\n');
+}
+
+function standardBlockPreviewMarkdown(): string {
+  const storiesByBlock = new Map<string, StandardBlockStory[]>();
+  for (const story of standardBlockStories) {
+    const existing = storiesByBlock.get(story.blockName) ?? [];
+    storiesByBlock.set(story.blockName, [...existing, story]);
+  }
+
+  const storyMatrix = standardBlockStories
+    .map((story) => `- ${story.id} - ${story.label} - ${story.blockName} - ${story.state}`)
+    .join('\n');
+  const blockSections = standardBlocks
+    .map((block) => {
+      const metadata = block.metadata;
+      const variants = metadata.variants ?? [];
+      const stories = storiesByBlock.get(metadata.blockName) ?? [];
+
+      return [
+        `## ${metadata.blockName}`,
+        '',
+        `Variants: ${formatDocsList(variants.map((variant) => `${variant.id} (${variant.label})`))}`,
+        '',
+        'Stories:',
+        stories.map((story) => `- ${story.id} - ${story.label} - ${story.state}`).join('\n'),
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    '# Block Preview',
+    '',
+    'The current standard block preview is declaration-backed. It indexes metadata, variants, and stories without rendering AppShell or resolving provider lifecycles.',
+    '',
+    '## Story Matrix',
+    '',
+    storyMatrix,
+    '',
+    blockSections,
+  ].join('\n');
+}
+
+function standardBlockLoweringMarkdown(): string {
+  const declaredModes = Array.from(
+    new Set(standardBlocks.flatMap((block) => block.metadata.modes)),
+  ).sort();
+  const blockRows = standardBlocks
+    .map((block) => {
+      const metadata = block.metadata;
+      const semanticFacts = (metadata.semanticFacts ?? [])
+        .map((fact) => `${fact.kind}:${fact.key}=${fact.value}`);
+      const variantFacts = (metadata.variants ?? [])
+        .flatMap((variant) => variant.facts ?? [])
+        .map((fact) => `${fact.kind}:${fact.key}=${fact.value}`);
+
+      return [
+        `## ${metadata.blockName}`,
+        '',
+        `- Modes: ${metadata.modes.join(', ')}`,
+        `- Semantic facts: ${formatDocsList(semanticFacts)}`,
+        `- Variant facts: ${formatDocsList(variantFacts)}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    '# How Blocks Lower',
+    '',
+    'Blocks lower by preserving declared modes, semantic facts, story states, data requirements, and command intents as inspectable contract data before rendered output exists.',
+    '',
+    `Declared modes: ${declaredModes.join(', ')}`,
+    '',
+    blockRows,
+  ].join('\n');
+}
+
+function formatDocsList(values: readonly string[]): string {
+  return values.length === 0 ? '-' : values.join(', ');
+}
+
+function renderBlocksPreviewPane(
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyWidth = Math.max(28, paneWidth - 6);
+  const sections = standardBlocks.map((block) => ({
+    title: `Page: ${block.metadata.blockName}`,
+    expanded: true,
+    content: standardBlockLivePreviewText(block, bodyWidth, ctx),
+  }));
+  const body = accordion(sections, {
+    indicatorToken: docsThemeBorderToken(theme),
+    titleToken: docsThemeAccentToken(theme),
+    ctx,
+  });
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface('blocks • live preview', paneWidth, ctx, theme),
+    spacer(1, 1),
+    contentSurface(body),
+  ]), width);
+}
+
+function standardBlockLivePreviewText(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+): string {
+  return [
+    'Live example',
+    indentBlock(surfacePlainText(standardBlockExampleSurface(block, width, ctx))),
+    '',
+    'Live lowering preview',
+    indentBlock(standardBlockLoweringPreviewText(block)),
+    '',
+    'Live documentation',
+    indentBlock(standardBlockDocumentationText(block)),
+  ].join('\n');
+}
+
+function standardBlockExampleSurface(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+): Surface {
+  const cardWidth = Math.max(30, Math.min(78, width));
+
+  switch (block.metadata.blockName) {
+    case 'AppShell':
+      return boxSurface(column([
+        line('navigation  Guides / Components / Blocks'),
+        line('content     ReaderSurface: DOGFOOD Blocks'),
+        line('inspector   InspectorPanel: selected block facts'),
+        line('status      provider snapshots idle; commands ready'),
+        line('overlays    none'),
+      ]), {
+        title: 'AppShell live example',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    case 'ReaderSurface':
+      return boxSurface(contentSurface(markdown([
+        '# DOGFOOD Blocks',
+        '',
+        'ReaderSurface presents validated content with optional navigation and outline context.',
+        '',
+        '- metadata declares slots and variants',
+        '- data contracts describe boundary needs',
+        '- commands express user intent',
+      ].join('\n'), {
+        width: Math.max(24, cardWidth - 6),
+        ctx,
+      })), {
+        title: 'ReaderSurface live example',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    case 'InspectorPanel':
+      return boxSurface(contentSurface(inspector({
+        title: 'InspectorPanel live example',
+        currentValue: 'ReaderSurface',
+        sections: [
+          {
+            title: 'Selection',
+            content: 'standard block definition',
+          },
+          {
+            title: 'Facts',
+            content: 'data: reader.article; command: reader.selectHeading',
+            tone: 'muted',
+          },
+        ],
+        width: Math.max(24, cardWidth - 4),
+        borderToken: ctx.border('muted'),
+        ctx,
+      })), {
+        title: 'InspectorPanel shell',
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+    default:
+      return boxSurface(paragraphSurface(block.metadata.docs.summary, Math.max(24, cardWidth - 6)), {
+        title: `${block.metadata.blockName} live example`,
+        width: cardWidth,
+        borderToken: ctx.border('primary'),
+        padding: { left: 1, right: 1 },
+        ctx,
+      });
+  }
+}
+
+function standardBlockLoweringPreviewText(block: BlockDefinition): string {
+  const slots = standardBlockExampleSlots(block.metadata.blockName);
+  return block.metadata.modes
+    .map((mode) => {
+      const result = block.render({ mode, slots });
+      const output = blockRenderOutputText(result.output);
+      const facts = formatDocsList((result.facts ?? []).map((fact) => `${fact.kind}:${fact.key}=${fact.value}`));
+      return `${mode}: ${output} | facts: ${facts}`;
+    })
+    .join('\n');
+}
+
+function standardBlockExampleSlots(blockName: string): Readonly<Record<string, unknown>> {
+  switch (blockName) {
+    case 'AppShell':
+      return {
+        navigation: 'Guides / Components / Blocks',
+        content: 'ReaderSurface block page',
+        inspector: 'selected block facts',
+        status: 'ready',
+        overlays: [],
+      };
+    case 'ReaderSurface':
+      return {
+        content: 'ReaderSurface live content from DOGFOOD Blocks.',
+        navigation: 'Blocks navigation',
+        outline: ['What are Blocks', 'How Blocks Lower'],
+      };
+    case 'InspectorPanel':
+      return {
+        selection: 'ReaderSurface',
+        details: ['schema-bound', 'provider-ready', 'command-aware'],
+        actions: ['Reveal selection', 'Focus source'],
+      };
+    default:
+      return {};
+  }
+}
+
+function standardBlockDocumentationText(block: BlockDefinition): string {
+  const metadata = block.metadata;
+  const stories = standardBlockStories.filter((story) => story.blockName === metadata.blockName);
+  const slots = metadata.slots.map((slot) => `${slot.id}${slot.required === true ? ' required' : ' optional'}`);
+  const variants = (metadata.variants ?? []).map((variant) => `${variant.id} (${variant.label})`);
+  const dataNames = block.data?.names() ?? [];
+  const commands = block.commands?.map((command) => command.id) ?? [];
+
+  return [
+    metadata.docs.summary,
+    `Contract: ${blockMetadataSummary(metadata)}`,
+    `Slots: ${formatDocsList(slots)}`,
+    `Variants: ${formatDocsList(variants)}`,
+    `Data requirements: ${formatDocsList(dataNames)}`,
+    `Command intents: ${formatDocsList(commands)}`,
+    `Stories: ${formatDocsList(stories.map((story) => `${story.id} (${story.state})`))}`,
+    `Source: ${metadata.sourcePath ?? '-'}`,
+  ].join('\n');
+}
+
+function blockRenderOutputText(output: unknown): string {
+  if (typeof output === 'string') {
+    return compactInlineText(output);
+  }
+  if (isSurfaceLike(output)) {
+    return compactInlineText(surfacePlainText(output));
+  }
+  try {
+    return compactInlineText(JSON.stringify(output));
+  } catch {
+    return String(output);
+  }
+}
+
+function isSurfaceLike(value: unknown): value is Surface {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && typeof (value as Surface).width === 'number'
+      && typeof (value as Surface).height === 'number'
+      && typeof (value as Surface).get === 'function',
+  );
+}
+
+function surfacePlainText(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let text = '';
+    for (let x = 0; x < surface.width; x++) {
+      text += surface.get(x, y).char || ' ';
+    }
+    lines.push(text.trimEnd());
+  }
+  return lines.join('\n').trimEnd();
+}
+
+function compactInlineText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim() || '-';
+}
+
+function indentBlock(value: string): string {
+  return value
+    .split('\n')
+    .map((lineText) => `  ${lineText}`)
+    .join('\n');
+}
+
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
   return GUIDE_DOCS.filter((doc) => doc.pageId === pageId);
 }
@@ -813,6 +1208,8 @@ function pageTitle(pageId: DocsPageId, i18n?: I18nRuntime): string {
       return dogfoodText(i18n, 'docs.page.guides', 'Guides');
     case COMPONENTS_PAGE_ID:
       return dogfoodText(i18n, 'docs.page.components', 'Components');
+    case BLOCKS_PAGE_ID:
+      return dogfoodText(i18n, 'docs.page.blocks', 'Blocks');
     case PACKAGES_PAGE_ID:
       return dogfoodText(i18n, 'docs.page.packages', 'Packages');
     case PHILOSOPHY_PAGE_ID:
@@ -2592,6 +2989,10 @@ function renderGuideReaderPane(
     ]), width);
   }
 
+  if (pageId === BLOCKS_PAGE_ID && doc.id === 'blocks-preview') {
+    return renderBlocksPreviewPane(width, ctx, theme);
+  }
+
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
     spacer(1, 1),
@@ -2617,6 +3018,8 @@ function renderGuideInfoPane(
     switch (pageId) {
       case GUIDES_PAGE_ID:
         return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
+      case BLOCKS_PAGE_ID:
+        return 'This section publishes the block authoring, inventory, preview, and lowering path directly inside DOGFOOD.';
       case PACKAGES_PAGE_ID:
         return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
       case PHILOSOPHY_PAGE_ID:
