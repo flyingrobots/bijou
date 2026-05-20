@@ -54,4 +54,10 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 
 - latest completed cycle: [LX-009 — Localize Shell Help, Notification, and Directional Surfaces](../retro/LX_009-localize-shell-help-notification-and-directional-surfaces.md)
 - live backlog:
-  - no dedicated localization cycle is live right now
+  - [LX-012 — DOGFOOD i18n Debt Inventory](../backlog/asap/LX-012-dogfood-i18n-debt-inventory.md)
+  - [LX-013 — DOGFOOD Locale Preference Persistence](../backlog/asap/LX-013-dogfood-locale-preference-persistence.md)
+  - [LX-014 — Expand DOGFOOD Catalog Coverage](../backlog/asap/LX-014-expand-dogfood-catalog-coverage.md)
+- cool ideas:
+  - [LX-015 — DOGFOOD Localization Burndown Dashboard](../backlog/cool-ideas/LX-015-dogfood-localization-burndown-dashboard.md)
+  - [LX-016 — Portable Locale Preferences Across Hosts](../backlog/cool-ideas/LX-016-portable-locale-preferences-across-hosts.md)
+  - [LX-017 — Multilingual DOGFOOD Translation Workbench](../backlog/cool-ideas/LX-017-multilingual-dogfood-translation-workbench.md)
