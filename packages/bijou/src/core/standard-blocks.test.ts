@@ -284,6 +284,45 @@ describe('first-party standard block definitions', () => {
     ]));
   });
 
+  it('omits absent optional sections while preserving required section fallback output', () => {
+    const shell = appShellBlock.render({
+      mode: 'pipe',
+      slots: { content: 'Blocks guide' },
+    });
+    expect(shell.output).toContain('content: Blocks guide');
+    expect(shell.output).not.toContain('navigation:');
+    expect(shell.output).not.toContain('inspector:');
+    expect(shell.output).not.toContain('status:');
+    expect(shell.output).not.toContain('overlays:');
+    expect(shell.facts).toContainEqual({ kind: 'entity', key: 'region.content', value: 'present' });
+    expect(shell.facts).not.toContainEqual({ kind: 'entity', key: 'region.navigation', value: 'present' });
+
+    const reader = readerSurfaceBlock.render({
+      mode: 'pipe',
+      slots: { content: 'Only the article body' },
+    });
+    expect(reader.output).toContain('content: Only the article body');
+    expect(reader.output).not.toContain('navigation:');
+    expect(reader.output).not.toContain('outline:');
+    expect(reader.facts).toContainEqual({ kind: 'entity', key: 'slot.content', value: 'present' });
+    expect(reader.facts).not.toContainEqual({ kind: 'entity', key: 'slot.outline', value: 'present' });
+
+    const inspector = inspectorPanelBlock.render({
+      mode: 'pipe',
+      slots: { selection: 'ReaderSurface' },
+    });
+    expect(inspector.output).toContain('selection: ReaderSurface');
+    expect(inspector.output).not.toContain('details:');
+    expect(inspector.output).not.toContain('actions:');
+    expect(inspector.facts).toContainEqual({ kind: 'entity', key: 'slot.selection', value: 'present' });
+    expect(inspector.facts).not.toContainEqual({ kind: 'entity', key: 'slot.details', value: 'present' });
+
+    const missingRequired = readerSurfaceBlock.render({ mode: 'pipe', slots: {} });
+    expect(missingRequired.output).toContain('content: (missing required content)');
+    expect(missingRequired.output).not.toContain('navigation:');
+    expect(missingRequired.output).not.toContain('outline:');
+  });
+
   it('renders ReaderSurface content, navigation, and outline deterministically', () => {
     const outline = Object.freeze(['Why Blocks', 'Lowering']);
     const rendered = readerSurfaceBlock.render({

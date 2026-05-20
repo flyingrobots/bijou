@@ -469,7 +469,7 @@ function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string>
     renderSection('inspector', 'Inspector', ownSlotValue(input.slots, 'inspector'), false),
     renderSection('status', 'Status', ownSlotValue(input.slots, 'status'), false),
     renderSection('overlays', 'Overlays', ownSlotValue(input.slots, 'overlays'), false),
-  ].filter((section) => section.required || section.content !== undefined);
+  ].filter((section) => section.required || section.present);
 
   return renderedBlockResult({
     output: mode === 'accessible'
@@ -487,7 +487,7 @@ function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<st
     renderSection('navigation', 'Navigation', ownSlotValue(input.slots, 'navigation'), false),
     renderSection('content', 'Content', ownSlotValue(input.slots, 'content'), true),
     renderSection('outline', 'Outline', ownSlotValue(input.slots, 'outline'), false),
-  ].filter((section) => section.required || section.content !== undefined);
+  ].filter((section) => section.required || section.present);
 
   return renderedBlockResult({
     output: mode === 'accessible'
@@ -505,7 +505,7 @@ function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<s
     renderSection('selection', 'Selection', ownSlotValue(input.slots, 'selection'), true),
     renderSection('details', 'Details', ownSlotValue(input.slots, 'details'), false),
     renderSection('actions', 'Actions', ownSlotValue(input.slots, 'actions'), false),
-  ].filter((section) => section.required || section.content !== undefined);
+  ].filter((section) => section.required || section.present);
 
   return renderedBlockResult({
     output: mode === 'accessible'
@@ -549,7 +549,7 @@ function renderSection(
   return Object.freeze({
     id,
     label,
-    content: content ?? `(missing required ${id})`,
+    content: content ?? (required ? `(missing required ${id})` : ''),
     required,
     present,
   });
