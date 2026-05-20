@@ -22,7 +22,7 @@ import {
   type StandardBlockStory,
   type Theme,
   type TokenValue,
-} from '@flyingrobots/bijou';
+} from '../../packages/bijou/src/index.js';
 import {
   FRAME_I18N_CATALOG,
   browsableListSurface,

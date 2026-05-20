@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -108,6 +109,17 @@ describe('docs preview app', () => {
     expect(source).toContain("../../packages/bijou-node/src/index.js");
     expect(source).toContain("../../packages/bijou-tui/src/index.js");
     expect(source).toMatch(/await run\(createDocsApp\(ctx\), \{ ctx, mouse: true \}\);/);
+  });
+
+  it('imports the DOGFOOD app through the same tsx path used by npm run dogfood', () => {
+    execFileSync(
+      process.execPath,
+      ['--import', 'tsx', '-e', "await import('./examples/docs/app.ts')"],
+      {
+        cwd: resolve(import.meta.dirname, '..'),
+        stdio: 'pipe',
+      },
+    );
   });
 
   it('builds the framed explorer shell from the provided ctx without relying on a default singleton', async () => {
