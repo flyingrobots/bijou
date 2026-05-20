@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp, DOGFOOD_I18N_CATALOG } from '../../../examples/docs/app.js';
+import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
 import {
   DOGFOOD_LOCALE_OPTIONS,
   resolveDogfoodInitialLocale,
@@ -61,14 +62,17 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
   it('ratchets the settings language catalog for every supported DOGFOOD locale', () => {
     const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
     for (const locale of DOGFOOD_LOCALE_OPTIONS) {
-      const entry = entries.get(`settings.language.${locale.id}`);
+      const localeEntries = new Map(
+        dogfoodI18nCatalogsForLocale(locale.id)[0]?.entries.map((entry) => [entry.key.id, entry]),
+      );
+      const entry = localeEntries.get(`settings.language.${locale.id}`);
       expect(entry?.values.en).toEqual(expect.any(String));
-      for (const supported of DOGFOOD_LOCALE_OPTIONS) {
-        expect(entry?.values[supported.id]).toEqual(expect.any(String));
-      }
+      expect(entry?.values[locale.id]).toEqual(expect.any(String));
     }
-    expect(entries.get('settings.section.localization')?.values.fr).toBe('Localisation');
-    expect(entries.get('settings.language.label')?.values.fr).toBe('Langue préférée');
+    expect(entries.get('settings.section.localization')?.values.en).toBe('Localization');
+    expect(dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(
+      (entry) => entry.key.id === 'settings.language.label',
+    )?.values.fr).toBe('Langue préférée');
   });
 
   it('initializes DOGFOOD pages from the injected locale preference', async () => {

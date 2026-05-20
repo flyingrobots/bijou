@@ -1,8 +1,7 @@
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { rm } from 'node:fs/promises';
 import { createI18nRuntime } from '../packages/bijou-i18n/src/index.js';
 import {
   compileCatalogs,
@@ -10,12 +9,17 @@ import {
   importTranslationWorkbook,
   parseExchangeSheet,
 } from '../packages/bijou-i18n-tools/src/index.js';
-import { DOGFOOD_I18N_CATALOG } from '../examples/docs/i18n/dogfood-catalog.js';
+import {
+  DOGFOOD_I18N_CATALOG,
+  dogfoodI18nCatalogsForLocale,
+} from '../examples/docs/i18n/dogfood-catalog.js';
 import {
   createDogfoodCatalogBundle,
   createDogfoodTranslationWorkbook,
   dogfoodAuthoringCatalogs,
+  dogfoodStringTable,
 } from '../examples/docs/i18n/dogfood-authoring.js';
+import { runDogfoodI18nBuild } from './dogfood-i18n-build.js';
 import { runDogfoodI18nExport } from './dogfood-i18n-export.js';
 
 const tempDirs: string[] = [];
@@ -33,17 +37,26 @@ afterEach(async () => {
 });
 
 describe('DOGFOOD i18n export workflow', () => {
-  it('keeps Dogfood runtime strings in a dedicated catalog module', () => {
+  it('keeps Dogfood runtime strings in generated selected-locale catalog files', () => {
     const languageEntry = DOGFOOD_I18N_CATALOG.entries.find(
+      (entry) => entry.key.id === 'settings.language.label',
+    );
+    const frLanguageEntry = dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(
       (entry) => entry.key.id === 'settings.language.label',
     );
 
     expect(DOGFOOD_I18N_CATALOG.namespace).toBe('bijou.dogfood');
     expect(languageEntry?.values.en).toBe('Preferred language');
-    expect(languageEntry?.values.fr).toBe('Langue préférée');
+    expect(languageEntry?.values.fr).toBeUndefined();
+    expect(frLanguageEntry?.values).toEqual({
+      en: 'Preferred language',
+      fr: 'Langue préférée',
+    });
+    expect(frLanguageEntry?.values.es).toBeUndefined();
   });
 
-  it('converts the Dogfood runtime catalog into authoring catalogs that compile back into runtime catalogs', () => {
+  it('uses the committed Dogfood CSV string table as the authoring source', () => {
+    const table = dogfoodStringTable();
     const authoring = dogfoodAuthoringCatalogs();
     const compiled = compileCatalogs(authoring);
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
@@ -52,6 +65,7 @@ describe('DOGFOOD i18n export workflow', () => {
       runtime.loadCatalog(catalog);
     }
 
+    expect(table.rows.length).toBeGreaterThan(DOGFOOD_I18N_CATALOG.entries.length);
     expect(authoring[0]?.entries.length).toBe(DOGFOOD_I18N_CATALOG.entries.length);
     expect(runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' }))
       .toBe('Langue préférée');
@@ -102,5 +116,35 @@ describe('DOGFOOD i18n export workflow', () => {
     expect(result.exitCode).toBe(0);
     expect(manifest).toContain('"format": "csv"');
     expect(bundle).toContain('"namespace": "bijou.dogfood"');
+  });
+
+  it('builds per-locale runtime catalog JSON files from the committed CSV source', async () => {
+    const dir = await makeTempDir();
+    const result = runDogfoodI18nBuild({
+      outDir: join(dir, 'catalogs'),
+      stdout: () => undefined,
+      stderr: () => undefined,
+    });
+    const frCatalog = await readFile(join(dir, 'catalogs', 'fr', 'bijou.dogfood.json'), 'utf8');
+
+    expect(result.exitCode).toBe(0);
+    expect(result.files).toEqual([
+      join(dir, 'catalogs', 'de', 'bijou.dogfood.json'),
+      join(dir, 'catalogs', 'en', 'bijou.dogfood.json'),
+      join(dir, 'catalogs', 'es', 'bijou.dogfood.json'),
+      join(dir, 'catalogs', 'fr', 'bijou.dogfood.json'),
+    ]);
+    expect(JSON.parse(frCatalog).entries.find(
+      (entry: { key: { id: string } }) => entry.key.id === 'settings.language.label',
+    ).values).toEqual({
+      en: 'Preferred language',
+      fr: 'Langue préférée',
+    });
+    expect(runDogfoodI18nBuild({
+      outDir: join(dir, 'catalogs'),
+      check: true,
+      stdout: () => undefined,
+      stderr: () => undefined,
+    }).exitCode).toBe(0);
   });
 });

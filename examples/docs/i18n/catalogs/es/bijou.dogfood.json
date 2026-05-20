@@ -1,0 +1,706 @@
+{
+  "namespace": "bijou.dogfood",
+  "entries": [
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.coverage.body"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.coverage.status"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{documented}/{total} families • {percent}%"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.coverage.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Documentation coverage"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.step1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "1. Browse component families in the left lane."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.step2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "2. Press Enter to expand a family or open a component."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.step3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "3. Use Tab to move focus between families, docs, and variants."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.step4"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "4. Press / to search by component name at any time."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.step5"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "5. Press F2 for settings, ? for help, and q or Esc to quit."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.guide.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "How to use these docs"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.intro.body"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.intro.body2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.empty.intro.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "What is Bijou?"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.family"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.guide"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • j/k scroll • d/u page • g/G top/bottom"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.guideMeta"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • section overview"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.guideNav"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • ↑/↓ browse • Enter open"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.paneSwitch"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Tab next pane"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.shell"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "? Help • / Search • F2 Settings • q Quit"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.story"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • j/k scroll • d/u page • g/G top/bottom"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.variants"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.blocks"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Blocks"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.components"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Components"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.guides"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Guides"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.packages"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Packages"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.philosophy"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Philosophy"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.page.release"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Release"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.search.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Search components"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.separator.welcome"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "welcome to bijou"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.dogfood.expansion"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Documentation Of Good Foundational Onboarding and Discovery"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.dogfood.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.footer.controls"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.prompt.enter"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Press [Enter]"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.auto"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Auto"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.balanced"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Balanced"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.performance"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Performance"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.profile.balanced"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "balanced"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.profile.full"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "full"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.profile.performance"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "performance"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.quality.quality"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Quality"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "landing.toast.quality"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Landing quality: {quality}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.description.auto"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.description.balanced"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.description.performance"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Minimizes title-screen work for giant terminals and slower emulators. Options: {options}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.description.quality"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Prioritizes the richest title treatment even on larger terminals. Options: {options}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.feedback"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Landing quality set to {quality}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.landingQuality.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Landing quality"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.de"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "German",
+        "es": "alemán"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Current language: {language}. Options: {options}.",
+        "es": "Idioma actual: {language}. Opciones: {options}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.en"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "English",
+        "es": "inglés"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.es"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Spanish",
+        "es": "español"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.feedback"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Language set to {language}.",
+        "es": "Idioma establecido en {language}."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.fr"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "French",
+        "es": "francés"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.language.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Preferred language",
+        "es": "Idioma preferido"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.section.appearance"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Appearance"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.section.landing"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Landing"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.section.localization"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Localization",
+        "es": "Localización"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.section.shell"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Shell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.feedback.off"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Show hints turned off."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.feedback.on"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Show hints turned on."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Show hints"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.off"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Off"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "settings.showHints.on"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "On"
+      }
+    }
+  ]
+}

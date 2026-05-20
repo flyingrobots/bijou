@@ -19,7 +19,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@flyingrobots/bijou-i18n-tools": ["../bijou-i18n-tools/src/index.ts"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts"],

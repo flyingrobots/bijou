@@ -25,8 +25,30 @@ That report counts remaining localizable DOGFOOD UI strings by source surface.
 It is a source inventory, not a rendered-output scraper, so ids, paths, and
 catalog-backed fallback calls stay separate from visible raw copy.
 
-DOGFOOD also exposes its catalog through the i18n workbook adapters instead of
-requiring translators to edit the docs app source directly:
+DOGFOOD's catalog source is a committed CSV string table:
+
+```text
+examples/docs/i18n/source/dogfood-strings.csv
+```
+
+Build the selected-locale runtime JSON catalog files from that table with:
+```bash
+npm run dogfood:i18n:build
+npm run dogfood:i18n:check
+```
+
+The generated runtime files live under:
+
+```text
+examples/docs/i18n/catalogs/<locale>/<namespace>.json
+```
+
+DOGFOOD loads only the selected locale directory at runtime. The generated
+catalog for `fr`, for example, carries English source values plus French
+translations, not every translation language.
+
+The same source table can also be exported through the i18n workbook adapters
+instead of requiring translators to edit the docs app source directly:
 ```bash
 npm run dogfood:i18n:export -- --locale fr --format csv
 npm run dogfood:i18n:export -- --locale fr --format tsv --out /tmp/dogfood-fr
@@ -34,9 +56,9 @@ npm run dogfood:i18n:export -- --format json --bundle /tmp/dogfood-catalog.json
 npm run dogfood:i18n:coverage
 ```
 
-The CSV/TSV and JSON outputs are workflow artifacts produced by
-`@flyingrobots/bijou-i18n-tools`; DOGFOOD still loads compiled runtime catalogs
-rather than parsing spreadsheet files during rendering.
+The CSV/TSV and JSON conversions are produced by `@flyingrobots/bijou-i18n-tools`;
+DOGFOOD still loads generated runtime catalog JSON rather than parsing
+spreadsheet files during rendering.
 
 For the standalone Storybook-style development and testing workbench:
 ```bash

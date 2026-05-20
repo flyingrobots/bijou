@@ -1,15 +1,14 @@
-import type { I18nCatalog, I18nCatalogEntry } from '../../../packages/bijou-i18n/src/index.js';
+import { readFileSync } from 'node:fs';
 import {
+  authoringCatalogsFromStringTable,
   exportCatalogBundle,
   exportTranslationWorkbook,
-  hashSourceValue,
+  parseStringTable,
   type AuthoringCatalog,
-  type AuthoringCatalogEntry,
-  type AuthoringTranslation,
   type CatalogBundle,
   type ExchangeWorkbook,
+  type StringTable,
 } from '../../../packages/bijou-i18n-tools/src/index.js';
-import { DOGFOOD_I18N_CATALOG } from './dogfood-catalog.js';
 import { DOGFOOD_LOCALE_OPTIONS } from '../locale.js';
 
 export interface DogfoodI18nLocaleCoverage {
@@ -19,13 +18,16 @@ export interface DogfoodI18nLocaleCoverage {
   readonly missing: number;
 }
 
+const DOGFOOD_STRING_TABLE_URL = new URL('./source/dogfood-strings.csv', import.meta.url);
+
+export function dogfoodStringTable(): StringTable {
+  return parseStringTable(readFileSync(DOGFOOD_STRING_TABLE_URL, 'utf8'), 'csv');
+}
+
 export function dogfoodAuthoringCatalogs(
-  catalogs: readonly I18nCatalog[] = [DOGFOOD_I18N_CATALOG],
+  table: StringTable = dogfoodStringTable(),
 ): readonly AuthoringCatalog[] {
-  return catalogs.map((catalog) => ({
-    namespace: catalog.namespace,
-    entries: catalog.entries.map((entry) => runtimeEntryToAuthoringEntry(entry)),
-  }));
+  return authoringCatalogsFromStringTable(table);
 }
 
 export function createDogfoodTranslationWorkbook(locale: string): ExchangeWorkbook {
@@ -53,32 +55,4 @@ export function dogfoodI18nCoverage(
       missing: entries.length - translated,
     };
   });
-}
-
-function runtimeEntryToAuthoringEntry(entry: I18nCatalogEntry): AuthoringCatalogEntry {
-  const sourceValue = entry.values[entry.sourceLocale] ?? entry.fallbackValue;
-  if (sourceValue === undefined) {
-    throw new Error(`Dogfood i18n catalog entry ${entry.key.id} is missing source locale ${entry.sourceLocale}`);
-  }
-
-  const sourceHash = hashSourceValue(sourceValue);
-  const translations: Record<string, AuthoringTranslation> = {};
-  for (const [locale, value] of Object.entries(entry.values)) {
-    if (locale === entry.sourceLocale) {
-      continue;
-    }
-    translations[locale] = {
-      value,
-      sourceHash,
-      status: 'current',
-    };
-  }
-
-  return {
-    key: entry.key,
-    kind: entry.kind,
-    sourceLocale: entry.sourceLocale,
-    sourceValue,
-    translations,
-  };
 }

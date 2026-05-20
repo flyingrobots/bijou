@@ -1,12 +1,10 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   serializeCatalogBundleJson,
   serializeExchangeSheet,
 } from '../packages/bijou-i18n-tools/src/index.js';
-import {
-  writeCatalogBundleFile,
-  writeExchangeWorkbookDirectory,
-} from '../packages/bijou-i18n-tools-node/src/index.js';
 import {
   createDogfoodCatalogBundle,
   createDogfoodTranslationWorkbook,
@@ -131,7 +129,7 @@ export async function runDogfoodI18nExport(
     if (parsed.format === 'json') {
       const content = `${serializeCatalogBundleJson(bundle)}\n`;
       if (parsed.bundle != null) {
-        await writeCatalogBundleFile(parsed.bundle, bundle);
+        await writeTextFile(parsed.bundle, content);
       } else {
         writeStdout(content);
       }
@@ -144,7 +142,7 @@ export async function runDogfoodI18nExport(
 
     const workbook = createDogfoodTranslationWorkbook(parsed.locale);
     if (parsed.out != null) {
-      await writeExchangeWorkbookDirectory(parsed.out, workbook, parsed.format);
+      await writeWorkbookDirectory(parsed.out, workbook, parsed.format);
     } else {
       const sheet = workbook.sheets[0];
       if (sheet == null) {
@@ -153,7 +151,7 @@ export async function runDogfoodI18nExport(
       writeStdout(`${serializeExchangeSheet(sheet, parsed.format)}\n`);
     }
     if (parsed.bundle != null) {
-      await writeCatalogBundleFile(parsed.bundle, bundle);
+      await writeTextFile(parsed.bundle, `${serializeCatalogBundleJson(bundle)}\n`);
     }
     return { exitCode: 0, stdout, stderr };
   } catch (error) {
@@ -164,6 +162,40 @@ export async function runDogfoodI18nExport(
     }
     return { exitCode: 1, stdout, stderr };
   }
+}
+
+async function writeTextFile(path: string, content: string): Promise<void> {
+  await mkdir(dirnameSafe(path), { recursive: true });
+  await writeFile(path, content, 'utf8');
+}
+
+async function writeWorkbookDirectory(
+  dir: string,
+  workbook: ReturnType<typeof createDogfoodTranslationWorkbook>,
+  format: 'csv' | 'tsv',
+): Promise<void> {
+  await mkdir(dir, { recursive: true });
+  const manifest = {
+    version: 1,
+    format,
+    sheets: workbook.sheets.map((sheet) => ({
+      name: sheet.name,
+      fileName: `${sheet.name}.${format}`,
+    })),
+  };
+  for (const sheet of workbook.sheets) {
+    await writeFile(
+      join(dir, `${sheet.name}.${format}`),
+      serializeExchangeSheet(sheet, format),
+      'utf8',
+    );
+  }
+  await writeFile(join(dir, 'workbook.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+}
+
+function dirnameSafe(path: string): string {
+  const slash = path.lastIndexOf('/');
+  return slash <= 0 ? '.' : path.slice(0, slash);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

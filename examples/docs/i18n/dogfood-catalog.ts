@@ -1,117 +1,30 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import type { I18nCatalog } from '../../../packages/bijou-i18n/src/index.js';
 
 export const DOGFOOD_I18N_NAMESPACE = 'bijou.dogfood';
 
-export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
-  namespace: DOGFOOD_I18N_NAMESPACE,
-  entries: [
-    dogfoodMessage('landing.prompt.enter', 'Press [Enter]'),
-    dogfoodMessage('landing.footer.controls', 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue'),
-    dogfoodMessage('landing.dogfood.title', 'DOGFOOD'),
-    dogfoodMessage('landing.dogfood.expansion', 'Documentation Of Good Foundational Onboarding and Discovery'),
-    dogfoodMessage('landing.quality.auto', 'Auto'),
-    dogfoodMessage('landing.quality.quality', 'Quality'),
-    dogfoodMessage('landing.quality.balanced', 'Balanced'),
-    dogfoodMessage('landing.quality.performance', 'Performance'),
-    dogfoodMessage('landing.quality.profile.full', 'full'),
-    dogfoodMessage('landing.quality.profile.balanced', 'balanced'),
-    dogfoodMessage('landing.quality.profile.performance', 'performance'),
-    dogfoodMessage('landing.toast.quality', 'Landing quality: {quality}'),
-    dogfoodMessage('docs.footer.shell', '? Help • / Search • F2 Settings • q Quit'),
-    dogfoodMessage('docs.footer.paneSwitch', 'Tab next pane'),
-    dogfoodMessage('docs.footer.family', '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand'),
-    dogfoodMessage('docs.footer.story', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
-    dogfoodMessage('docs.footer.variants', '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles'),
-    dogfoodMessage('docs.footer.guideNav', '{paneSwitch} • ↑/↓ browse • Enter open'),
-    dogfoodMessage('docs.footer.guide', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
-    dogfoodMessage('docs.footer.guideMeta', '{paneSwitch} • section overview'),
-    dogfoodMessage('docs.page.guides', 'Guides'),
-    dogfoodMessage('docs.page.components', 'Components'),
-    dogfoodMessage('docs.page.blocks', 'Blocks'),
-    dogfoodMessage('docs.page.packages', 'Packages'),
-    dogfoodMessage('docs.page.philosophy', 'Philosophy'),
-    dogfoodMessage('docs.page.release', 'Release'),
-    dogfoodMessage('docs.search.title', 'Search components'),
-    dogfoodMessage('docs.empty.intro.title', 'What is Bijou?'),
-    dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
-    dogfoodMessage('docs.empty.intro.body2', 'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.'),
-    dogfoodMessage('docs.empty.guide.title', 'How to use these docs'),
-    dogfoodMessage('docs.empty.coverage.title', 'Documentation coverage'),
-    dogfoodMessage('docs.empty.coverage.body', 'DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time.'),
-    dogfoodMessage('docs.empty.coverage.status', '{documented}/{total} families • {percent}%'),
-    dogfoodMessage('docs.empty.guide.step1', '1. Browse component families in the left lane.'),
-    dogfoodMessage('docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.'),
-    dogfoodMessage('docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.'),
-    dogfoodMessage('docs.empty.guide.step4', '4. Press / to search by component name at any time.'),
-    dogfoodMessage('docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.'),
-    dogfoodMessage('docs.separator.welcome', 'welcome to bijou'),
-    dogfoodMessage('settings.section.shell', 'Shell'),
-    dogfoodMessage('settings.section.appearance', 'Appearance'),
-    dogfoodMessage('settings.section.localization', 'Localization', {
-      fr: 'Localisation',
-      es: 'Localización',
-      de: 'Lokalisierung',
-    }),
-    dogfoodMessage('settings.section.landing', 'Landing'),
-    dogfoodMessage('settings.showHints.label', 'Show hints'),
-    dogfoodMessage('settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
-    dogfoodMessage('settings.showHints.on', 'On'),
-    dogfoodMessage('settings.showHints.off', 'Off'),
-    dogfoodMessage('settings.showHints.feedback.on', 'Show hints turned on.'),
-    dogfoodMessage('settings.showHints.feedback.off', 'Show hints turned off.'),
-    dogfoodMessage('settings.language.label', 'Preferred language', {
-      fr: 'Langue préférée',
-      es: 'Idioma preferido',
-      de: 'Bevorzugte Sprache',
-    }),
-    dogfoodMessage('settings.language.description', 'Current language: {language}. Options: {options}.', {
-      fr: 'Langue actuelle : {language}. Options : {options}.',
-      es: 'Idioma actual: {language}. Opciones: {options}.',
-      de: 'Aktuelle Sprache: {language}. Optionen: {options}.',
-    }),
-    dogfoodMessage('settings.language.feedback', 'Language set to {language}.', {
-      fr: 'Langue définie sur {language}.',
-      es: 'Idioma establecido en {language}.',
-      de: 'Sprache auf {language} gesetzt.',
-    }),
-    dogfoodMessage('settings.language.en', 'English', {
-      fr: 'anglais',
-      es: 'inglés',
-      de: 'Englisch',
-    }),
-    dogfoodMessage('settings.language.fr', 'French', {
-      fr: 'français',
-      es: 'francés',
-      de: 'Französisch',
-    }),
-    dogfoodMessage('settings.language.es', 'Spanish', {
-      fr: 'espagnol',
-      es: 'español',
-      de: 'Spanisch',
-    }),
-    dogfoodMessage('settings.language.de', 'German', {
-      fr: 'allemand',
-      es: 'alemán',
-      de: 'Deutsch',
-    }),
-    dogfoodMessage('settings.landingQuality.label', 'Landing quality'),
-    dogfoodMessage('settings.landingQuality.description.auto', 'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.quality', 'Prioritizes the richest title treatment even on larger terminals. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.balanced', 'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.performance', 'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.feedback', 'Landing quality set to {quality}.'),
-  ],
-};
+const DOGFOOD_CATALOG_ROOT = new URL('./catalogs/', import.meta.url);
 
-function dogfoodMessage(
-  id: string,
-  value: string,
-  translations: Readonly<Record<string, string>> = {},
-) {
-  return {
-    key: { namespace: DOGFOOD_I18N_NAMESPACE, id },
-    kind: 'message' as const,
-    sourceLocale: 'en',
-    values: { en: value, ...translations },
-  };
+export function dogfoodI18nCatalogsForLocale(locale: string): readonly I18nCatalog[] {
+  const localeRoot = new URL(`${encodeURIComponent(locale)}/`, DOGFOOD_CATALOG_ROOT);
+  const catalogs = readdirSync(localeRoot)
+    .filter((fileName) => fileName.endsWith('.json'))
+    .sort((left, right) => left.localeCompare(right))
+    .map((fileName) => readRuntimeCatalog(new URL(fileName, localeRoot)));
+  return Object.freeze(catalogs);
+}
+
+export const DOGFOOD_I18N_CATALOG: I18nCatalog = dogfoodI18nCatalogsForLocale('en')[0]!;
+
+function readRuntimeCatalog(url: URL): I18nCatalog {
+  const parsed = JSON.parse(readFileSync(url, 'utf8')) as unknown;
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`Invalid DOGFOOD i18n catalog: expected object at ${url.pathname}`);
+  }
+  const namespace = (parsed as { namespace?: unknown }).namespace;
+  const entries = (parsed as { entries?: unknown }).entries;
+  if (typeof namespace !== 'string' || !Array.isArray(entries)) {
+    throw new Error(`Invalid DOGFOOD i18n catalog: missing namespace or entries at ${url.pathname}`);
+  }
+  return Object.freeze(parsed as I18nCatalog);
 }

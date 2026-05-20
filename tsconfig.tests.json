@@ -11,6 +11,9 @@
     "baseUrl": ".",
     "paths": {
       "@flyingrobots/bijou": ["./packages/bijou/src/index.ts"],
+      "@flyingrobots/bijou-i18n": ["./packages/bijou-i18n/src/index.ts"],
+      "@flyingrobots/bijou-i18n-tools": ["./packages/bijou-i18n-tools/src/index.ts"],
+      "@flyingrobots/bijou-i18n-tools-node": ["./packages/bijou-i18n-tools-node/src/index.ts"],
       "@flyingrobots/bijou/adapters/test": ["./packages/bijou/src/adapters/test/index.ts"],
       "@flyingrobots/bijou/perf": ["./packages/bijou/src/core/render/packed-cell.ts"]
     }

@@ -97,6 +97,7 @@ import {
 import {
   DOGFOOD_I18N_CATALOG,
   DOGFOOD_I18N_NAMESPACE,
+  dogfoodI18nCatalogsForLocale,
 } from './i18n/dogfood-catalog.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
@@ -775,7 +776,15 @@ function applyDogfoodLocale(
   locale: string,
 ): void {
   const option = resolveDogfoodLocale(locale);
+  loadDogfoodRuntimeCatalogs(i18n, option.id);
   void i18n.setLocale(option.id, options.direction ?? option.direction);
+}
+
+function loadDogfoodRuntimeCatalogs(i18n: I18nRuntime, locale: string): void {
+  i18n.unloadCatalog(DOGFOOD_I18N_NAMESPACE);
+  for (const catalog of dogfoodI18nCatalogsForLocale(locale)) {
+    i18n.loadCatalog(catalog);
+  }
 }
 
 function dogfoodLocaleSettingDescription(currentLocale: string, i18n?: I18nRuntime): string {
@@ -3696,7 +3705,7 @@ function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
     fallbackLocale: 'en',
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
-  runtime.loadCatalog(DOGFOOD_I18N_CATALOG);
+  loadDogfoodRuntimeCatalogs(runtime, initialLocale.id);
   for (const catalog of options.extraI18nCatalogs ?? []) {
     runtime.loadCatalog(catalog);
   }

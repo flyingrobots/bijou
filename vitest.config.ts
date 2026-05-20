@@ -13,6 +13,15 @@ export default defineConfig({
       '@flyingrobots/bijou': fileURLToPath(
         new URL('./packages/bijou/src/index.ts', import.meta.url),
       ),
+      '@flyingrobots/bijou-i18n': fileURLToPath(
+        new URL('./packages/bijou-i18n/src/index.ts', import.meta.url),
+      ),
+      '@flyingrobots/bijou-i18n-tools': fileURLToPath(
+        new URL('./packages/bijou-i18n-tools/src/index.ts', import.meta.url),
+      ),
+      '@flyingrobots/bijou-i18n-tools-node': fileURLToPath(
+        new URL('./packages/bijou-i18n-tools-node/src/index.ts', import.meta.url),
+      ),
     },
   },
   test: {
