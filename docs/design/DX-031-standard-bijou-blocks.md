@@ -3155,7 +3155,7 @@ blocks.
    schema-bound block contract.
 9. Done: add first-party block definitions and story declarations for
    `AppShell`, `ReaderSurface`, and `InspectorPanel` without making them
-   rendered block product.
+   rendered block products.
 10. Next: add an optional Zod schema adapter package or helper.
 11. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
@@ -3316,7 +3316,7 @@ What is now true:
   class instances, built-ins, and backchannel handles cannot silently normalize
   into empty input.
 
-DX-031C First-Party Block Definitions adds the first first-party standard block
+DX-031C First-Party Block Definitions adds the first-party standard block
 definition slice.
 
 What is now true:
