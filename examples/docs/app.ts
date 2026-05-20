@@ -341,18 +341,18 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: GUIDES_NAVIGATE_DOGFOOD_TEXT,
   },
   {
-    id: 'guides-i18n-workflow',
-    pageId: GUIDES_PAGE_ID,
-    title: '@flyingrobots/bijou-i18n workflow',
-    summary: '@flyingrobots/bijou-i18n-tools + @flyingrobots/bijou-i18n-tools-node',
-    body: GUIDES_I18N_WORKFLOW_TEXT,
-  },
-  {
     id: 'documentation-map',
     pageId: GUIDES_PAGE_ID,
     title: 'Documentation Map',
     summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
     body: GUIDES_DOCUMENTATION_MAP_TEXT,
+  },
+  {
+    id: 'guides-i18n-workflow',
+    pageId: GUIDES_PAGE_ID,
+    title: '@flyingrobots/bijou-i18n workflow',
+    summary: '@flyingrobots/bijou-i18n-tools + @flyingrobots/bijou-i18n-tools-node',
+    body: GUIDES_I18N_WORKFLOW_TEXT,
   },
   {
     id: 'secondary-example-map',
