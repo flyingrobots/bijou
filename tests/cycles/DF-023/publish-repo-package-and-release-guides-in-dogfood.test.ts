@@ -51,8 +51,8 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
 
   it('publishes package explainer pages in the Packages section', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs' });
-    const opened = await runScript(app, [{ key: ']' }, { key: ']' }], { ctx });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'packages' });
+    const opened = await runScript(app, [], { ctx });
     const packagesText = frameText(opened.frames.at(-1)!);
 
     expect(opened.model.docsModel.activePageId).toBe('packages');
@@ -64,8 +64,6 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(packagesText).not.toContain('left lane');
 
     const packageDoc = await runScript(app, [
-      { key: ']' },
-      { key: ']' },
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'package-bijou' } } },
     ], { ctx });
     const packageText = frameText(packageDoc.frames.at(-1)!);
@@ -77,8 +75,8 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
   it('publishes the current release story and migration guide in Release', async () => {
     const versionSlug = BIJOU_VERSION.replaceAll('.', '-');
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
-    const app = createDocsApp(ctx, { initialRoute: 'docs' });
-    const opened = await runScript(app, [{ key: ']' }, { key: ']' }, { key: ']' }, { key: ']' }], { ctx });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
+    const opened = await runScript(app, [], { ctx });
     const releaseText = frameText(opened.frames.at(-1)!);
 
     expect(opened.model.docsModel.activePageId).toBe('release');
@@ -86,19 +84,11 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(releaseText).toContain(`Migration Guide v${BIJOU_VERSION}`);
 
     const whatsNew = await runScript(app, [
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-whats-new-${versionSlug}` } } },
     ], { ctx });
     expect(frameText(whatsNew.frames.at(-1)!)).toContain(`New in Bijou ${BIJOU_VERSION}`);
 
     const migration = await runScript(app, [
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
-      { key: ']' },
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: `release-migration-${versionSlug}` } } },
     ], { ctx });
     expect(frameText(migration.frames.at(-1)!)).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);

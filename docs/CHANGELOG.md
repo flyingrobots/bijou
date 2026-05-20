@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
+  beside Components, with pages for what blocks are, how to author them,
+  pre-made first-party blocks, a declaration-backed preview of standard block
+  variants/stories, and how block declarations lower across modes. The preview
+  and lowering pages are generated from the public `standardBlocks`,
+  `standardBlockStories`, and package-manifest exports rather than copied
+  tables.
 - **First-party standard block definitions for `bijou`** —
   `@flyingrobots/bijou` now exports `appShellBlock`, `readerSurfaceBlock`,
   `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`,
