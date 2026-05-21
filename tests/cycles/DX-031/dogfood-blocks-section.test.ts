@@ -87,7 +87,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
   });
 
   it('renders a surface-backed live preview for standard blocks and their story variants', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 160 } });
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
 
     const result = await runScript(app, [{
@@ -103,6 +103,16 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).toContain('Live example');
     expect(text).toContain('Live lowering preview');
     expect(text).toContain('Live documentation');
+    expect(text).toContain('interactive mode');
+    expect(text).toContain('static mode');
+    expect(text).toContain('pipe mode');
+    expect(text).toContain('accessible mode');
+    expect(text).toContain('surface output:');
+    expect(text).toContain('documentation');
+    expect(text).not.toContain('interactive:');
+    expect(text).not.toContain('static:');
+    expect(text).not.toContain('pipe:');
+    expect(text).not.toContain('accessible:');
     expect(text).not.toContain('provider snapshots idle; commands ready');
     expect(foregroundStyledTextCellExists(result.frames.at(-1)!, 'AppShell')).toBe(true);
     for (const block of standardBlocks) {

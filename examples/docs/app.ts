@@ -18,6 +18,7 @@ import {
   wrapToWidth,
   type BijouContext,
   type BlockDefinition,
+  type OutputMode,
   type PreferenceListTheme,
   type Surface,
   type StandardBlockStory,
@@ -991,10 +992,10 @@ function standardBlockLivePreviewSurface(
     standardBlockExampleSurface(block, contentWidth, ctx),
     spacer(1, 1),
     line(dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview')),
-    contentSurface(standardBlockLoweringPreviewText(block)),
+    standardBlockLoweringPreviewSurface(block, contentWidth, ctx, theme, localization),
     spacer(1, 1),
     line(dogfoodText(localization, 'blocks.preview.liveDocumentation', 'Live documentation')),
-    contentSurface(standardBlockDocumentationText(block)),
+    standardBlockDocumentationSurface(block, contentWidth, ctx, theme, localization),
   ]), {
     title: dogfoodText(
       localization,
@@ -1034,16 +1035,77 @@ function standardBlockExampleSurface(
   });
 }
 
-function standardBlockLoweringPreviewText(block: BlockDefinition): string {
+function standardBlockLoweringPreviewSurface(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  localization: LocalizationPort,
+): Surface {
+  const safeWidth = Math.max(30, Math.min(78, width));
+  const modeCards = block.metadata.modes.flatMap((mode, index) => {
+    const modeCard = standardBlockModePreviewSurface(
+      block,
+      mode as OutputMode,
+      safeWidth,
+      ctx,
+      theme,
+      localization,
+    );
+    return index === 0 ? [modeCard] : [spacer(1, 1), modeCard];
+  });
+
+  return column(modeCards);
+}
+
+function standardBlockModePreviewSurface(
+  block: BlockDefinition,
+  mode: OutputMode,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  localization: LocalizationPort,
+): Surface {
+  const cardWidth = Math.max(30, Math.min(78, width));
+  const innerWidth = Math.max(24, cardWidth - 4);
   const slots = standardBlockExampleSlots(block.metadata.blockName);
-  return block.metadata.modes
-    .map((mode) => {
-      const result = block.render({ mode, slots });
-      const output = blockRenderOutputText(result.output);
-      const facts = formatDocsList((result.facts ?? []).map((fact) => `${fact.kind}:${fact.key}=${fact.value}`));
-      return `${mode}: ${output} | facts: ${facts}`;
-    })
-    .join('\n');
+  const result = block.render({
+    mode,
+    slots,
+    config: { width: innerWidth },
+  });
+  const output = isSurfaceLike(result.output)
+    ? paragraphSurface(dogfoodText(
+      localization,
+      'blocks.preview.surfaceOutput',
+      'surface output: {width}x{height}',
+      { width: result.output.width, height: result.output.height },
+    ), innerWidth)
+    : paragraphSurface(blockRenderOutputText(result.output, 320), innerWidth);
+  const facts = formatDocsList((result.facts ?? []).map((fact) => `${fact.kind}:${fact.key}=${fact.value}`));
+  const factsLine = dogfoodText(
+    localization,
+    'blocks.preview.loweringFacts',
+    'facts: {facts}',
+    { facts: compactPreviewText(facts, 240) },
+  );
+
+  return boxSurface(column([
+    output,
+    spacer(1, 1),
+    paragraphSurface(factsLine, innerWidth),
+  ]), {
+    title: dogfoodText(
+      localization,
+      'blocks.preview.modeTitle',
+      '{mode} mode',
+      { mode },
+    ),
+    width: cardWidth,
+    borderToken: docsThemeBorderToken(theme),
+    padding: { left: 1, right: 1 },
+    ctx,
+  });
 }
 
 function standardBlockExampleSlots(blockName: string): Readonly<Record<string, unknown>> {
@@ -1093,15 +1155,34 @@ function standardBlockDocumentationText(block: BlockDefinition): string {
   ].join('\n');
 }
 
-function blockRenderOutputText(output: unknown): string {
+function standardBlockDocumentationSurface(
+  block: BlockDefinition,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  localization: LocalizationPort,
+): Surface {
+  const cardWidth = Math.max(30, Math.min(78, width));
+  const innerWidth = Math.max(24, cardWidth - 4);
+
+  return boxSurface(paragraphSurface(standardBlockDocumentationText(block), innerWidth), {
+    title: dogfoodText(localization, 'blocks.preview.documentationTitle', 'documentation'),
+    width: cardWidth,
+    borderToken: docsThemeBorderToken(theme),
+    padding: { left: 1, right: 1 },
+    ctx,
+  });
+}
+
+function blockRenderOutputText(output: unknown, maxLength = 120): string {
   if (typeof output === 'string') {
-    return compactPreviewText(output);
+    return compactPreviewText(output, maxLength);
   }
   if (isSurfaceLike(output)) {
     return `${output.width}x${output.height}`;
   }
   try {
-    return compactPreviewText(JSON.stringify(output));
+    return compactPreviewText(JSON.stringify(output), maxLength);
   } catch {
     return String(output);
   }
