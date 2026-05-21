@@ -36,9 +36,10 @@ const table = parseStringTable(csv, 'csv');
 const catalogs = runtimeCatalogsForLocaleFromStringTable(table, 'fr');
 ```
 
-The generated runtime catalogs include the source locale plus the selected
-locale only. Other locale translations stay in the source table and do not ride
-along in the runtime payload.
+The generated runtime catalogs include only the selected locale's values. Source
+strings remain in the string table and the generated source-locale catalog.
+Other locale translations stay in the source table and do not ride along in the
+runtime payload.
 
 Service-backed workflows can use the built-in async adapter ports without
 pulling remote service details into the tooling core:

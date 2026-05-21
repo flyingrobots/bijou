@@ -34,6 +34,21 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(inventory.bySurface).toEqual([{ surface: 'fixture', count: 4 }]);
   });
 
+  it('ignores machine environment mode literals without dropping visible copy', () => {
+    const inventory = collectDogfoodI18nDebt({
+      sources: [{
+        surface: 'fixture',
+        path: 'examples/docs/fixture.ts',
+        text: [
+          "const isProduction = process.env.NODE_ENV === 'production';",
+          "const visible = 'production';",
+        ].join('\n'),
+      }],
+    });
+
+    expect(inventory.entries.map((entry) => entry.value)).toEqual(['production']);
+  });
+
   it('freezes nested inventory entries and surface counts', () => {
     const inventory = collectDogfoodI18nDebt({
       sources: [{

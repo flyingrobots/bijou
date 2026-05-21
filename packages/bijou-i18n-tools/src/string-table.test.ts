@@ -42,7 +42,7 @@ describe('i18n string table workflow', () => {
     expect(catalogs[0]?.entries[0]?.translations.es).toBeUndefined();
   });
 
-  it('builds selected-locale runtime catalogs without carrying unrelated translations', () => {
+  it('builds selected-locale runtime catalogs without carrying source or unrelated translations', () => {
     const table = parseStringTable([
       'namespace,id,kind,sourceLocale,sourceValueKind,sourceValue,locale,valueKind,value,status,description',
       'bijou.docs,settings.language,message,en,string,Preferred language,en,string,Preferred language,current,',
@@ -58,7 +58,6 @@ describe('i18n string table workflow', () => {
     expect(runtime.t({ namespace: 'bijou.docs', id: 'settings.language' }))
       .toBe('Langue préférée');
     expect(entry?.values).toEqual({
-      en: 'Preferred language',
       fr: 'Langue préférée',
     });
   });

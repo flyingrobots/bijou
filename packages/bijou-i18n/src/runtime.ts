@@ -33,13 +33,27 @@ export interface I18nFormatterPort {
 
 export type I18nCatalogLoader = (locale: string) => Promise<readonly I18nCatalog[]>;
 
+export type I18nMissingReason = 'missing-key' | 'missing-locale';
+
+export interface I18nMissingMessageContext {
+  readonly key: I18nCatalogKey;
+  readonly locale: string;
+  readonly fallbackLocale: string;
+  readonly sourceLocale?: string;
+  readonly reason: I18nMissingReason;
+}
+
+export type I18nMissingMessageFormatter = (context: I18nMissingMessageContext) => string;
+
 export interface I18nRuntimeOptions {
   readonly locale: string;
   readonly direction: I18nDirection;
   readonly fallbackLocale?: string;
   readonly formatter?: Partial<I18nFormatterPort>;
+  readonly fallbackCatalogs?: readonly I18nCatalog[];
   readonly catalogs?: readonly I18nCatalog[];
   readonly loader?: I18nCatalogLoader;
+  readonly missingMessage?: I18nMissingMessageFormatter;
 }
 
 export interface I18nRuntime extends I18nFormatterPort {
@@ -94,7 +108,7 @@ export function ref(key: I18nCatalogKey): I18nReference {
 
 export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
   const entries = new Map<string, I18nCatalogEntry>();
-  const namespaces = new Map<string, string[]>();
+  const fallbackCatalogs = new Map<string, I18nCatalog>();
   const manualCatalogs = new Map<string, I18nCatalog>();
   const loaderCatalogs = new Map<string, I18nCatalog>();
   const loaderCache = new Map<string, readonly I18nCatalog[]>();
@@ -109,37 +123,46 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
 
   function applyCatalogs(source: ReadonlyMap<string, I18nCatalog>): void {
     for (const catalog of source.values()) {
-      const scoped: string[] = [];
       for (const entry of catalog.entries) {
         const key = keyToString(entry.key);
-        entries.set(key, entry);
-        scoped.push(key);
+        const existing = entries.get(key);
+        entries.set(key, existing === undefined ? entry : mergeCatalogEntry(existing, entry));
       }
-      namespaces.set(catalog.namespace, scoped);
     }
   }
 
   function rebuildCatalogState(): void {
     entries.clear();
-    namespaces.clear();
+    applyCatalogs(fallbackCatalogs);
     applyCatalogs(manualCatalogs);
     applyCatalogs(loaderCatalogs);
-  }
-
-  function getEntry(key: I18nCatalogKey): I18nCatalogEntry {
-    const entry = entries.get(keyToString(key));
-    if (entry === undefined) {
-      throw new Error(`Missing i18n key: ${keyToString(key)}`);
-    }
-    return entry;
   }
 
   function resolveLocalizedValue<T>(
     entry: I18nCatalogEntry<T>,
     seen: Set<string>,
+    options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
   ): T | undefined {
+    const localized = entry.values[currentLocale];
+    if (localized !== undefined) {
+      return resolveCandidate(localized, seen, options) as T;
+    }
+
+    if (
+      options.missingMessage !== undefined
+      && currentLocale !== entry.sourceLocale
+      && currentLocale !== fallbackLocale
+    ) {
+      return options.missingMessage({
+        key: entry.key,
+        locale: currentLocale,
+        fallbackLocale,
+        sourceLocale: entry.sourceLocale,
+        reason: 'missing-locale',
+      }) as T;
+    }
+
     const candidates = [
-      entry.values[currentLocale],
       entry.values[entry.sourceLocale],
       entry.values[fallbackLocale],
       entry.fallbackValue,
@@ -149,27 +172,35 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (candidate === undefined) {
         continue;
       }
-      if (isReference(candidate)) {
-        const refKey = keyToString(candidate.$ref);
-        if (seen.has(refKey)) {
-          throw new Error(`Cyclic i18n reference: ${refKey}`);
-        }
-        seen.add(refKey);
-        const referencedEntry = entries.get(refKey);
-        if (referencedEntry === undefined) {
-          throw new Error(`Missing i18n reference: ${refKey}`);
-        }
-        const resolved = resolveLocalizedValue(referencedEntry, seen);
-        seen.delete(refKey);
-        if (resolved !== undefined) {
-          return resolved as T;
-        }
-        throw new Error(`Missing i18n reference: ${refKey}`);
-      }
-      return candidate as T;
+      return resolveCandidate(candidate, seen, options) as T;
     }
 
     return undefined;
+  }
+
+  function resolveCandidate<T>(
+    candidate: T | I18nReference,
+    seen: Set<string>,
+    options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
+  ): T | undefined {
+    if (isReference(candidate)) {
+      const refKey = keyToString(candidate.$ref);
+      if (seen.has(refKey)) {
+        throw new Error(`Cyclic i18n reference: ${refKey}`);
+      }
+      seen.add(refKey);
+      const referencedEntry = entries.get(refKey);
+      if (referencedEntry === undefined) {
+        throw new Error(`Missing i18n reference: ${refKey}`);
+      }
+      const resolved = resolveLocalizedValue(referencedEntry, seen, options);
+      seen.delete(refKey);
+      if (resolved !== undefined) {
+        return resolved as T;
+      }
+      throw new Error(`Missing i18n reference: ${refKey}`);
+    }
+    return candidate as T;
   }
 
   async function preloadLocale(locale: string): Promise<void> {
@@ -194,6 +225,12 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
   if (options.catalogs !== undefined) {
     for (const catalog of options.catalogs) {
       rememberCatalog(manualCatalogs, catalog);
+    }
+    rebuildCatalogState();
+  }
+  if (options.fallbackCatalogs !== undefined) {
+    for (const catalog of options.fallbackCatalogs) {
+      rememberCatalog(fallbackCatalogs, catalog);
     }
     rebuildCatalogState();
   }
@@ -229,11 +266,24 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       await activateLoaderLocale(locale);
     },
     t(key, values = {}) {
-      const entry = getEntry(key);
+      const entry = entries.get(keyToString(key));
+      if (entry === undefined) {
+        if (options.missingMessage !== undefined) {
+          return interpolate(options.missingMessage({
+            key,
+            locale: currentLocale,
+            fallbackLocale,
+            reason: 'missing-key',
+          }), values);
+        }
+        throw new Error(`Missing i18n key: ${keyToString(key)}`);
+      }
       if (entry.kind !== 'message') {
         throw new Error(`Expected message entry for ${keyToString(key)} but found ${entry.kind}`);
       }
-      const resolved = resolveLocalizedValue(entry, new Set<string>());
+      const resolved = resolveLocalizedValue(entry, new Set<string>(), {
+        missingMessage: options.missingMessage,
+      });
       if (typeof resolved !== 'string') {
         throw new Error(`Resolved message for ${keyToString(key)} was not a string`);
       }
@@ -258,6 +308,22 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     formatList(values, locale) {
       return formatter.formatList(values, locale);
     },
+  };
+}
+
+function mergeCatalogEntry(left: I18nCatalogEntry, right: I18nCatalogEntry): I18nCatalogEntry {
+  if (left.kind !== right.kind || left.sourceLocale !== right.sourceLocale) {
+    throw new Error(`Conflicting i18n catalog entry metadata for ${keyToString(left.key)}`);
+  }
+  return {
+    key: left.key,
+    kind: left.kind,
+    sourceLocale: left.sourceLocale,
+    values: {
+      ...left.values,
+      ...right.values,
+    },
+    fallbackValue: right.fallbackValue ?? left.fallbackValue,
   };
 }
 

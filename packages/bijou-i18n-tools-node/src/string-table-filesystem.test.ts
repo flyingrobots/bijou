@@ -48,7 +48,6 @@ describe('i18n string table filesystem workflow', () => {
     expect(frCatalogs).toHaveLength(1);
     expect(frCatalogs[0]?.namespace).toBe('bijou.docs');
     expect(frCatalogs[0]?.entries[0]?.values).toEqual({
-      en: 'Preferred language',
       fr: 'Langue préférée',
     });
     expect(runtime.t({ namespace: 'bijou.docs', id: 'settings.language' }))
@@ -71,7 +70,6 @@ describe('i18n string table filesystem workflow', () => {
 
     expect(runtime.t({ namespace: 'bijou.docs', id: 'title' })).toBe('Dokumentation');
     expect((await loader('de'))[0]?.entries[0]?.values).toEqual({
-      en: 'Docs',
       de: 'Dokumentation',
     });
   });

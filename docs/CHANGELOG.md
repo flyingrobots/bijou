@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Runtime localization fallback posture** — Generated string-table runtime
+  catalogs now keep non-source locale files language-specific instead of
+  embedding English source strings in every selected-locale payload. The i18n
+  runtime accepts explicit fallback catalogs for production fallback behavior
+  and an injectable missing-localization formatter for development builds.
+  DOGFOOD now loads English as a separate fallback catalog, loads the selected
+  locale catalog independently, and renders bright missing-localization markers
+  for untranslated selected-locale strings outside production.
 - **String-table i18n workflow** — `@flyingrobots/bijou-i18n-tools` now
   supports a standard source string-table workflow that converts CSV/TSV rows
   into authoring catalogs and selected-locale runtime catalogs, while
@@ -23,7 +31,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   language-addition checklist.
 - **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
   DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
-  count by source surface, and ratchets the current baseline at `2220` strings
+  count by source surface, and ratchets the current baseline at `2219` strings
   across `docs-app`, `dogfood-locale`, `component-stories`, and Storybook-style
   DOGFOOD entrypoints. The scanner filters ids, file paths, import paths, and
   catalog-backed fallback calls so review sees the remaining localization debt

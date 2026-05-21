@@ -37,7 +37,7 @@ afterEach(async () => {
 });
 
 describe('DOGFOOD i18n export workflow', () => {
-  it('keeps Dogfood runtime strings in generated selected-locale catalog files', () => {
+  it('keeps generated selected-locale catalog files language-specific', () => {
     const languageEntry = DOGFOOD_I18N_CATALOG.entries.find(
       (entry) => entry.key.id === 'settings.language.label',
     );
@@ -49,9 +49,9 @@ describe('DOGFOOD i18n export workflow', () => {
     expect(languageEntry?.values.en).toBe('Preferred language');
     expect(languageEntry?.values.fr).toBeUndefined();
     expect(frLanguageEntry?.values).toEqual({
-      en: 'Preferred language',
       fr: 'Langue préférée',
     });
+    expect(frLanguageEntry?.values.en).toBeUndefined();
     expect(frLanguageEntry?.values.es).toBeUndefined();
   });
 
@@ -149,7 +149,6 @@ describe('DOGFOOD i18n export workflow', () => {
     expect(JSON.parse(frCatalog).entries.find(
       (entry: { key: { id: string } }) => entry.key.id === 'settings.language.label',
     ).values).toEqual({
-      en: 'Preferred language',
       fr: 'Langue préférée',
     });
     expect(runDogfoodI18nBuild({

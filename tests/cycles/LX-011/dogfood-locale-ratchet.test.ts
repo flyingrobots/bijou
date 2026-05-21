@@ -66,8 +66,10 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
         dogfoodI18nCatalogsForLocale(locale.id)[0]?.entries.map((entry) => [entry.key.id, entry]),
       );
       const entry = localeEntries.get(`settings.language.${locale.id}`);
-      expect(entry?.values.en).toEqual(expect.any(String));
       expect(entry?.values[locale.id]).toEqual(expect.any(String));
+      if (locale.id !== 'en') {
+        expect(entry?.values.en).toBeUndefined();
+      }
     }
     expect(entries.get('settings.section.localization')?.values.en).toBe('Localization');
     expect(dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(

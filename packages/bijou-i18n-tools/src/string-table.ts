@@ -263,11 +263,11 @@ export function runtimeCatalogsByLocaleFromStringTable(
 }
 
 function runtimeEntryForLocale(entry: AuthoringCatalogEntry, locale: string): I18nCatalogEntry {
-  const values: Record<string, unknown> = {
-    [entry.sourceLocale]: entry.sourceValue,
-  };
+  const values: Record<string, unknown> = {};
   const translation = entry.translations[locale];
-  if (locale !== entry.sourceLocale && translation?.status === 'current') {
+  if (locale === entry.sourceLocale) {
+    values[entry.sourceLocale] = entry.sourceValue;
+  } else if (translation?.status === 'current') {
     values[locale] = translation.value;
   }
   return Object.freeze({
