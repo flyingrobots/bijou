@@ -8,9 +8,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -19,9 +17,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{documented}/{total} families • {percent}%"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -30,9 +26,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Documentation coverage"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -41,9 +35,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "1. Browse component families in the left lane."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -52,9 +44,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "2. Press Enter to expand a family or open a component."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -63,9 +53,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "3. Use Tab to move focus between families, docs, and variants."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -74,9 +62,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "4. Press / to search by component name at any time."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -85,9 +71,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "5. Press F2 for settings, ? for help, and q or Esc to quit."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -96,9 +80,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "How to use these docs"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -107,9 +89,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -118,9 +98,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -129,9 +107,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "What is Bijou?"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -140,9 +116,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -151,9 +125,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • j/k scroll • d/u page • g/G top/bottom"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -162,9 +134,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • section overview"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -173,9 +143,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • ↑/↓ browse • Enter open"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -184,9 +152,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Tab next pane"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -195,9 +161,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "? Help • / Search • F2 Settings • q Quit"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -206,9 +170,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • j/k scroll • d/u page • g/G top/bottom"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -217,9 +179,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -228,9 +188,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Blocks"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -239,9 +197,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Components"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -250,9 +206,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Guides"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -261,9 +215,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Packages"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -272,9 +224,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Philosophy"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -283,9 +233,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Release"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -294,9 +242,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Search components"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -305,9 +251,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "welcome to bijou"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -316,9 +260,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Documentation Of Good Foundational Onboarding and Discovery"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -327,9 +269,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "DOGFOOD"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -338,9 +278,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -349,9 +287,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Press [Enter]"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -360,9 +296,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Auto"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -371,9 +305,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Balanced"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -382,9 +314,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Performance"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -393,9 +323,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "balanced"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -404,9 +332,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "full"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -415,9 +341,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "performance"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -426,9 +350,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Quality"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -437,9 +359,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Landing quality: {quality}"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -448,9 +368,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -459,9 +377,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -470,9 +386,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Minimizes title-screen work for giant terminals and slower emulators. Options: {options}."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -481,9 +395,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Prioritizes the richest title treatment even on larger terminals. Options: {options}."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -492,9 +404,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Landing quality set to {quality}."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -503,9 +413,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Landing quality"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -515,7 +423,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "German",
         "es": "alemán"
       }
     },
@@ -527,7 +434,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Current language: {language}. Options: {options}.",
         "es": "Idioma actual: {language}. Opciones: {options}."
       }
     },
@@ -539,7 +445,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "English",
         "es": "inglés"
       }
     },
@@ -551,7 +456,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Spanish",
         "es": "español"
       }
     },
@@ -563,7 +467,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Language set to {language}.",
         "es": "Idioma establecido en {language}."
       }
     },
@@ -575,7 +478,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "French",
         "es": "francés"
       }
     },
@@ -587,7 +489,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Preferred language",
         "es": "Idioma preferido"
       }
     },
@@ -598,9 +499,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Appearance"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -609,9 +508,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Landing"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -621,7 +518,6 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Localization",
         "es": "Localización"
       }
     },
@@ -632,9 +528,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Shell"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -643,9 +537,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -654,9 +546,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Show hints turned off."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -665,9 +555,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Show hints turned on."
-      }
+      "values": {}
     },
     {
       "key": {
@@ -676,9 +564,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Show hints"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -687,9 +573,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "Off"
-      }
+      "values": {}
     },
     {
       "key": {
@@ -698,9 +582,7 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {
-        "en": "On"
-      }
+      "values": {}
     }
   ]
 }

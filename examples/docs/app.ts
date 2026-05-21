@@ -86,6 +86,7 @@ import {
 } from '../_stories/protocol.js';
 import { resolveDogfoodDocsCoverage, type DogfoodDocsCoverage } from './coverage.js';
 import {
+  DEFAULT_LOCALE,
   dogfoodLocaleLabel,
   dogfoodLocaleOptionsText,
   nextDogfoodLocale,
@@ -99,6 +100,7 @@ import {
   DOGFOOD_I18N_NAMESPACE,
   dogfoodI18nCatalogsForLocale,
 } from './i18n/dogfood-catalog.js';
+import { dogfoodMissingLocalizationMessage } from './i18n/missing-localization.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -739,6 +741,7 @@ interface DocsAppOptions {
   readonly locale?: string;
   readonly localePort?: DogfoodLocalePort;
   readonly direction?: I18nDirection;
+  readonly showMissingLocalizationMarkers?: boolean;
   readonly extraI18nCatalogs?: readonly I18nCatalog[];
   readonly initialRoute?: RootModel['route'];
   readonly initialPageId?: DocsPageId;
@@ -790,9 +793,18 @@ function applyDogfoodLocale(
 
 function loadDogfoodRuntimeCatalogs(i18n: I18nRuntime, locale: string): void {
   i18n.unloadCatalog(DOGFOOD_I18N_NAMESPACE);
+  if (locale === DEFAULT_LOCALE.id) {
+    return;
+  }
   for (const catalog of dogfoodI18nCatalogsForLocale(locale)) {
     i18n.loadCatalog(catalog);
   }
+}
+
+function shouldShowMissingLocalizationMarkers(
+  options: Pick<DocsAppOptions, 'showMissingLocalizationMarkers'>,
+): boolean {
+  return options.showMissingLocalizationMarkers ?? process.env.NODE_ENV !== 'production';
 }
 
 function dogfoodLocaleSettingDescription(currentLocale: string, i18n?: I18nRuntime): string {
@@ -3707,10 +3719,13 @@ function syncDocsExplorerViewportLayout(
 
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
   const initialLocale = resolveDogfoodInitialLocale(options);
+  const showMissingLocalizationMarkers = shouldShowMissingLocalizationMarkers(options);
   const runtime = createI18nRuntime({
     locale: resolveDogfoodRuntimeLocale(options),
     direction: options.direction ?? initialLocale.direction,
-    fallbackLocale: 'en',
+    fallbackLocale: DEFAULT_LOCALE.id,
+    fallbackCatalogs: dogfoodI18nCatalogsForLocale(DEFAULT_LOCALE.id),
+    missingMessage: showMissingLocalizationMarkers ? dogfoodMissingLocalizationMessage : undefined,
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
   loadDogfoodRuntimeCatalogs(runtime, initialLocale.id);

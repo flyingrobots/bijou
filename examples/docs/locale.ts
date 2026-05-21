@@ -43,7 +43,7 @@ export const DOGFOOD_LOCALE_OPTIONS: readonly DogfoodLocaleOption[] = Object.fre
   },
 ] satisfies readonly DogfoodLocaleOption[]);
 
-const DEFAULT_LOCALE = DOGFOOD_LOCALE_OPTIONS[0]!;
+export const DEFAULT_LOCALE = DOGFOOD_LOCALE_OPTIONS[0]!;
 
 export function normalizeDogfoodLocaleTag(locale: string | undefined): string | undefined {
   const trimmed = locale?.trim();

@@ -43,9 +43,15 @@ The generated runtime files live under:
 examples/docs/i18n/catalogs/<locale>/<namespace>.json
 ```
 
-DOGFOOD loads only the selected locale directory at runtime. The generated
-catalog for `fr`, for example, carries English source values plus French
-translations, not every translation language.
+DOGFOOD loads the generated English catalog as an explicit production fallback,
+then loads only the selected locale directory at runtime. The generated catalog
+for `fr`, for example, carries French values only. English source values remain
+in the source table and the generated English catalog, not every translated
+payload.
+
+In non-production builds, missing selected-locale strings render as a bright
+missing-localization marker instead of quietly falling back to English. That
+keeps untranslated UI visible while development is running.
 
 The same source table can also be exported through the i18n workbook adapters
 instead of requiring translators to edit the docs app source directly:

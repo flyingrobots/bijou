@@ -48,10 +48,10 @@ export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = Objec
 ]);
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2220,
+  total: 2219,
   bySurface: Object.freeze({
     'component-stories': 1753,
-    'docs-app': 405,
+    'docs-app': 404,
     'dogfood-locale': 12,
     'storybook-app': 38,
     'storybook-workstation': 12,
@@ -209,6 +209,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
   if (hasAncestor(node, (ancestor) => ts.isNoSubstitutionTemplateLiteral(ancestor) && ts.isLiteralTypeNode(ancestor.parent))) {
     return true;
   }
+  if (hasAncestor(node, (ancestor) => isNodeEnvComparison(ancestor, sourceFile))) return true;
 
   const propertyName = nearestPropertyName(node);
   if (propertyName != null && NONLOCALIZABLE_PROPERTY_NAMES.has(propertyName)) return true;
@@ -252,6 +253,18 @@ function callExpressionName(call: ts.CallExpression, sourceFile: ts.SourceFile):
   if (ts.isIdentifier(call.expression)) return call.expression.text;
   if (ts.isPropertyAccessExpression(call.expression)) return call.expression.name.text;
   return call.expression.getText(sourceFile);
+}
+
+function isNodeEnvComparison(node: ts.Node, sourceFile: ts.SourceFile): boolean {
+  if (!ts.isBinaryExpression(node)) return false;
+  if (
+    node.operatorToken.kind !== ts.SyntaxKind.EqualsEqualsEqualsToken
+    && node.operatorToken.kind !== ts.SyntaxKind.ExclamationEqualsEqualsToken
+  ) {
+    return false;
+  }
+  return node.left.getText(sourceFile) === 'process.env.NODE_ENV'
+    || node.right.getText(sourceFile) === 'process.env.NODE_ENV';
 }
 
 function containsNode(parent: ts.Node, target: ts.Node): boolean {

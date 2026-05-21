@@ -10,6 +10,8 @@ The in-memory localization runtime for Bijou.
 - generic resource lookup
 - runtime-safe references
 - locale-aware formatting seams
+- explicit fallback catalogs
+- injectable missing-localization message formatting
 - async locale loader support for runtime-integrated catalog activation
 
 This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in `@flyingrobots/bijou-i18n-tools`.
@@ -31,6 +33,35 @@ const runtime = await createI18nRuntimeAsync({
   locale: 'fr',
   direction: 'ltr',
   loader,
+});
+```
+
+When runtime payloads are generated as pure per-locale catalogs, load the source
+or fallback catalog separately:
+
+```ts
+import { createI18nRuntime } from '@flyingrobots/bijou-i18n';
+
+const runtime = createI18nRuntime({
+  locale: 'fr',
+  direction: 'ltr',
+  fallbackLocale: 'en',
+  fallbackCatalogs: [englishCatalog],
+  catalogs: [frenchCatalog],
+});
+```
+
+Production apps can use fallback catalogs for readable missing translations.
+Development apps can inject `missingMessage` to render a loud marker instead of
+quietly falling back when the selected locale is missing a string:
+
+```ts
+const runtime = createI18nRuntime({
+  locale: 'fr',
+  direction: 'ltr',
+  fallbackLocale: 'en',
+  fallbackCatalogs: [englishCatalog],
+  missingMessage: ({ key }) => `<MISSING LOC STRING KEY=${key.namespace}:${key.id}>`,
 });
 ```
 

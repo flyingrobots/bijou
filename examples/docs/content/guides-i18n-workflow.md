@@ -6,13 +6,14 @@ filesystem adapters. The rule is simple:
 ```text
 source string table
   -> generated per-locale runtime catalogs
-  -> selected locale loaded by the runtime
+  -> English fallback catalog plus selected locale loaded by the runtime
 ```
 
 Runtime code should not parse spreadsheets, CSV files, or all languages at
-once. It should load the generated JSON catalogs for the selected language.
-In Node, `createRuntimeCatalogDirectoryLoader()` reads that selected-locale
-catalog directory for the i18n runtime.
+once. Production should load the generated English catalog as the fallback and
+then load the generated JSON catalogs for the selected language. In Node,
+`createRuntimeCatalogDirectoryLoader()` reads that selected-locale catalog
+directory for the i18n runtime.
 
 ## Package Roles
 
@@ -60,8 +61,9 @@ For example, French DOGFOOD strings are generated at:
 examples/docs/i18n/catalogs/fr/bijou.dogfood.json
 ```
 
-That file contains English source values plus French translations only. It does
-not carry Spanish, German, or every other language.
+That file contains French values only. English source values stay in the source
+table and in the generated English runtime catalog. It does not carry Spanish,
+German, or every other language.
 
 ## Load One Locale
 
@@ -71,13 +73,17 @@ At runtime, load the selected locale directory:
 import { createI18nRuntimeAsync } from '@flyingrobots/bijou-i18n';
 import { createRuntimeCatalogDirectoryLoader } from '@flyingrobots/bijou-i18n-tools-node';
 
+const loader = createRuntimeCatalogDirectoryLoader({
+  rootDir: './i18n/catalogs',
+});
+const englishCatalogs = await loader('en');
+
 const runtime = await createI18nRuntimeAsync({
   locale: 'fr',
   direction: 'ltr',
   fallbackLocale: 'en',
-  loader: createRuntimeCatalogDirectoryLoader({
-    rootDir: './i18n/catalogs',
-  }),
+  fallbackCatalogs: englishCatalogs,
+  loader,
 });
 ```
 
@@ -85,6 +91,17 @@ Switching language should load the new locale's generated JSON catalogs and
 replace the old selected-locale catalog payload. Views should ask the runtime
 for localized strings; they should not read CSV, JSON files, process locale
 state, or translation provider handles directly.
+
+In non-production builds, missing selected-locale strings should be loud instead
+of silently readable. DOGFOOD uses a bright missing-localization marker for that
+path:
+
+```text
+<MISSING LOC STRING KEY=bijou.dogfood:docs.page.guides>
+```
+
+Production builds keep English fallback catalogs loaded so incomplete
+translations still render readable UI.
 
 ## Add A Language
 
@@ -109,4 +126,6 @@ npm run dogfood:i18n:export -- --format json --bundle /tmp/dogfood-catalog.json
 - Keep string-table conversion in `@flyingrobots/bijou-i18n-tools`.
 - Keep filesystem reads and writes in `@flyingrobots/bijou-i18n-tools-node`.
 - Keep runtime payloads selected-locale only.
+- Keep English fallback loaded separately in production.
+- Keep missing selected-locale strings visually loud in development.
 - Keep views free of provider handles, filesystem reads, and CSV parsing.

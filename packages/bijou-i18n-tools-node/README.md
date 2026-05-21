@@ -52,6 +52,9 @@ const runtime = await createI18nRuntimeAsync({
 ```
 
 The loader reads only `./i18n/catalogs/fr/*.json` for the selected locale.
+For production fallback behavior, load `./i18n/catalogs/en/*.json` as explicit
+fallback catalogs through `createI18nRuntime({ fallbackCatalogs })` and keep the
+directory loader responsible only for the active selected locale.
 
 ## Documentation
 
