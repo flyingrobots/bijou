@@ -10,6 +10,10 @@ import {
   type BlockMetadata,
 } from './block-metadata.js';
 import {
+  blockRenderNode,
+  renderBlockTree,
+} from './block-tree-render.js';
+import {
   bindSchemaBlockInput,
   isSchemaBoundBlockDefinition,
 } from './schema-block.js';
@@ -307,6 +311,45 @@ describe('first-party standard block definitions', () => {
     expect(surfaceText(interactive.output)).toContain('Docs nav');
     expect(pipe.output).toContain('navigation: Docs nav');
     expect(accessible.output).toContain('Navigation: Docs nav');
+  });
+
+  it('renders nested standard blocks through the explicit block tree renderer', () => {
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 72 },
+      slots: {
+        navigation: 'Blocks nav',
+        content: blockRenderNode(readerSurfaceBlock, {
+          slots: {
+            content: 'Nested reader content from a child block.',
+            outline: ['Overview', 'Lowering'],
+          },
+        }),
+        inspector: blockRenderNode(inspectorPanelBlock, {
+          slots: {
+            selection: 'ReaderSurface',
+            details: ['schema-bound', 'provider-ready'],
+          },
+        }),
+        status: 'ready',
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive block tree output should be a surface');
+    }
+
+    const text = surfaceText(rendered.output);
+    expect(text).toContain('AppShell');
+    expect(text).toContain('ReaderSurface');
+    expect(text).toContain('Nested reader content from a child block.');
+    expect(text).toContain('InspectorPanel');
+    expect(text).toContain('schema-bound; provider-ready');
+    expect(rendered.facts).toEqual(expect.arrayContaining([
+      { kind: 'entity', key: 'block', value: 'AppShell' },
+      { kind: 'entity', key: 'block', value: 'ReaderSurface' },
+      { kind: 'entity', key: 'block', value: 'InspectorPanel' },
+    ]));
   });
 
   it('omits absent optional sections while preserving required section fallback output', () => {

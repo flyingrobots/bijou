@@ -679,6 +679,10 @@ function slotValueText(value: unknown): string | undefined {
     return undefined;
   }
 
+  if (isSurfaceSlotValue(value)) {
+    return surfaceSlotText(value);
+  }
+
   if (Array.isArray(value)) {
     const parts = value
       .map((item) => slotValueText(item))
@@ -701,6 +705,30 @@ function slotValueText(value: unknown): string | undefined {
     default:
       return undefined;
   }
+}
+
+function isSurfaceSlotValue(value: unknown): value is Surface {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && typeof (value as Surface).width === 'number'
+      && typeof (value as Surface).height === 'number'
+      && typeof (value as Surface).get === 'function',
+  );
+}
+
+function surfaceSlotText(surface: Surface): string | undefined {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char || ' ';
+    }
+    lines.push(line.trimEnd());
+  }
+
+  const text = lines.join('\n').trim();
+  return text === '' ? undefined : text;
 }
 
 function recordSlotText(value: object): string | undefined {

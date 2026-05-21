@@ -63,6 +63,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   live semantic region/content/selection output while still avoiding provider
   subscriptions, active runtime traversal, command dispatch, cache policy,
   rendered production AppShell behavior, or catalog expansion.
+- **Explicit block-tree rendering for nested blocks** —
+  `@flyingrobots/bijou` now exports `blockRenderNode()`,
+  `isBlockRenderNode()`, and `renderBlockTree()` so callers can explicitly
+  render nested block declarations into parent slots. Ordinary `block.render()`
+  remains a local single-block render contract, while the tree renderer
+  resolves branded child render nodes, inherits output mode, aggregates lowering
+  facts, bounds recursive depth, and avoids provider subscriptions, refresh,
+  command dispatch, active hierarchy traversal, and DOGFOOD-specific branches.
 - **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
   beside Components, with pages for what blocks are, how to author them,
   pre-made first-party blocks, a live surface-backed preview of standard block

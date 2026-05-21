@@ -3,17 +3,21 @@ import {
   boxSurface,
   blockMetadataSummary,
   blockPackageManifestSummary,
+  blockRenderNode,
   cloneContextWithTheme,
   createSurface,
   CYAN_MAGENTA,
   inspector,
+  inspectorPanelBlock,
   lerp3,
   markdown,
   progressBar,
+  readerSurfaceBlock,
   separatorSurface,
   standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
+  renderBlockTree,
   tv,
   wrapToWidth,
   type BijouContext,
@@ -1035,11 +1039,11 @@ function standardBlockExampleSurface(
   ctx: BijouContext,
 ): Surface {
   const cardWidth = Math.max(30, Math.min(78, width));
-  const rendered = block.render({
+  const rendered = renderBlockTree(blockRenderNode(block, {
     mode: 'interactive',
     slots: standardBlockExampleSlots(block.metadata.blockName),
     config: { width: cardWidth },
-  });
+  }));
 
   if (isSurfaceLike(rendered.output)) {
     return rendered.output;
@@ -1100,11 +1104,11 @@ function standardBlockModePreviewSurface(
   const cardWidth = Math.max(30, Math.min(78, width));
   const innerWidth = Math.max(24, cardWidth - 4);
   const slots = standardBlockExampleSlots(block.metadata.blockName);
-  const result = block.render({
+  const result = renderBlockTree(blockRenderNode(block, {
     mode,
     slots,
     config: { width: innerWidth },
-  });
+  }));
   const output = isSurfaceLike(result.output)
     ? modeSurfacePreview(result.output, innerWidth)
     : modeTextPreview(blockRenderOutputText(result.output, 220), innerWidth);
@@ -1160,8 +1164,20 @@ function standardBlockExampleSlots(blockName: string): Readonly<Record<string, u
     case 'AppShell':
       return {
         navigation: 'Guides / Components / Blocks',
-        content: 'ReaderSurface block page',
-        inspector: 'selected block facts',
+        content: blockRenderNode(readerSurfaceBlock, {
+          slots: {
+            content: 'ReaderSurface live content from DOGFOOD Blocks.',
+            navigation: 'Blocks navigation',
+            outline: ['What are Blocks', 'How Blocks Lower'],
+          },
+        }),
+        inspector: blockRenderNode(inspectorPanelBlock, {
+          slots: {
+            selection: 'ReaderSurface',
+            details: ['schema-bound', 'provider-ready', 'command-aware'],
+            actions: ['Reveal selection', 'Focus source'],
+          },
+        }),
         status: 'ready',
         overlays: [],
       };

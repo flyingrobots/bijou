@@ -111,6 +111,10 @@ fake duplication rather than a real second API.
 - **`defineAppShellComposition()`**: Compose runtime-backed blocks into logical
   AppShell slots with an explicit provider scope, without rendering or
   subscribing.
+- **`blockRenderNode()` / `renderBlockTree()`**: Explicitly render nested block
+  declarations into parent slots when a preview or host intentionally wants a
+  block tree, while ordinary `block.render()` remains a local single-block
+  render contract.
 - **`defineDataRequirement()` / `defineDataProvider()` / `providerScope()`**:
   Declare data requirements and explicit local provider availability without
   hidden global registration.

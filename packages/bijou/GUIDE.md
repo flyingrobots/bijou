@@ -228,8 +228,10 @@ Bijou exports the first-party standard block definitions:
 ```typescript
 import {
   appShellBlock,
+  blockRenderNode,
   inspectorPanelBlock,
   readerSurfaceBlock,
+  renderBlockTree,
   standardBlockPackageManifest,
   standardBlockStories,
   standardBlocks,
@@ -243,11 +245,25 @@ readerSurfaceBlock.data?.names();
 readerSurfaceBlock.commands?.map(command => command.id);
 inspectorPanelBlock.data?.names();
 appShellBlock.metadata.slots.map(slot => slot.id);
+
+const renderedShell = renderBlockTree(blockRenderNode(appShellBlock, {
+  mode: 'pipe',
+  slots: {
+    content: blockRenderNode(readerSurfaceBlock, {
+      slots: { content: 'Nested reader content.' },
+    }),
+  },
+}));
 ```
 
 These definitions declare metadata, semantic slots, data requirements, command
 intents, story ids, package visibility, and deterministic first-proof render
 output for `AppShell`, `ReaderSurface`, and `InspectorPanel`.
+
+Use `renderBlockTree()` when nested block declarations should become rendered
+child output inside a parent slot. Ordinary `block.render()` remains a local
+single-block render contract, and `defineAppShellComposition()` remains
+declaration introspection rather than rendering.
 
 They do not implement provider subscriptions, active runtime traversal, command
 dispatch, production AppShell behavior, DOGFOOD multi-mode captures, or the

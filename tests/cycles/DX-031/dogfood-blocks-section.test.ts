@@ -155,6 +155,12 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       expect(text).not.toContain('provider snapshots idle; commands ready');
       expect(text).toContain(`Page: ${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);
+      if (block.metadata.blockName === 'AppShell') {
+        expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
+        expect(text).toContain('InspectorPanel');
+        expect(text).toContain('schema-bound; provider-ready; command-aware');
+        expect(text).not.toContain('ReaderSurface block page');
+      }
       expect(foregroundStyledTextCellExists(result.frames.at(-1)!, block.metadata.blockName)).toBe(true);
       for (const story of standardBlockStories.filter((candidate) => candidate.blockName === block.metadata.blockName)) {
         expect(text).toContain(story.id);
