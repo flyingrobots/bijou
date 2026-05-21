@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD block mode proof** — DOGFOOD now has a cycle proof that the Blocks
+  preview exposes live multi-mode lowering for every first-party standard block,
+  while the standard block render paths continue to emit stable rendered-block
+  facts across interactive, static, pipe, and accessible modes.
 - **Provider-bound AppShell proof** — The DX-034 proof suite now assembles
   active ReaderSurface bindings from declared data contracts, resolves them
   through an explicit provider scope, creates immutable BindingFrame updates
