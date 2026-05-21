@@ -4,6 +4,138 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.commandIntents"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Befehlsabsichten"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.contract"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Vertrag"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.dataRequirements"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Datenanforderungen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.slots"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Slots"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.source"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Quelle"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.stories"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Stories"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.doc.variants"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Varianten"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveDocumentation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Live-Dokumentation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveExample"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Live-Beispiel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveLowering"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Live-Absenkungsvorschau"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.pageTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Seite: {blockName}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Blöcke • Live-Vorschau"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",
@@ -180,6 +312,116 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-lowering.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Wie Standardblock-Deklarationen Modus- und Semantikfakten tragen, bevor gerenderte Blockausgabe landet."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-lowering.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Wie Blöcke abgesenkt werden"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-make-your-own.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Der Block-Autorenvertrag: zuerst Metadaten, Schemaadapter an Grenzen und Befehle als Absicht."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-make-your-own.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Eigene Blöcke erstellen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-pre-made.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Die Standardblöcke aus erster Hand, die @flyingrobots/bijou exportiert."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-pre-made.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Vorgefertigte Blöcke"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ein codegestützter Vorschauindex für Standardblöcke, Varianten und deklarierte Stories."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Block-Vorschau"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-what-are-blocks.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Die Designsystem-Haltung für größere, meinungsstarke Bijou-Zusammenstellungen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guide.blocks-what-are-blocks.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Was sind Blöcke"
+      }
     },
     {
       "key": {
