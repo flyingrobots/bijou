@@ -65,10 +65,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   rendered production AppShell behavior, or catalog expansion.
 - **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
   beside Components, with pages for what blocks are, how to author them,
-  pre-made first-party blocks, a live accordion preview of standard block pages,
-  and how block declarations lower across modes. The preview renders one inline
-  page per standard block with a live example surface, live lowering preview,
-  and live documentation generated from the public `standardBlocks`,
+  pre-made first-party blocks, a live surface-backed preview of standard block
+  pages, and how block declarations lower across modes. The preview renders one
+  inline page per standard block with a live example surface, live lowering
+  preview, and live documentation generated from the public `standardBlocks`,
   `standardBlockStories`, and package-manifest exports rather than copied
   tables.
 - **First-party standard block definitions for `bijou`** —
@@ -261,6 +261,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **DOGFOOD Blocks preview rendering** — The Blocks preview now composes live
+  block example `Surface`s directly instead of flattening them into accordion
+  text before render, preserving TUI styling and bordered example surfaces.
 - **Spring example API drift** — `examples/spring` no longer passes the removed
   `fps` option to `animate()`, keeping the interactive spring comparison aligned
   with the current pulse-driven animation command API.

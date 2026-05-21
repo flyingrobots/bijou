@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import {
-  accordion,
   boxSurface,
   blockMetadataSummary,
   blockPackageManifestSummary,
@@ -956,42 +955,58 @@ function renderBlocksPreviewPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
+  localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(28, paneWidth - 6);
-  const sections = standardBlocks.map((block) => ({
-    title: `Page: ${block.metadata.blockName}`,
-    expanded: true,
-    content: standardBlockLivePreviewText(block, bodyWidth, ctx),
-  }));
-  const body = accordion(sections, {
-    indicatorToken: docsThemeBorderToken(theme),
-    titleToken: docsThemeAccentToken(theme),
-    ctx,
+  const sections = standardBlocks.flatMap((block, index) => {
+    const section = standardBlockLivePreviewSurface(block, bodyWidth, ctx, theme, localization);
+    return index === 0 ? [section] : [spacer(1, 1), section];
   });
 
   return insetPaneSurface(column([
-    themedSeparatorSurface('blocks • live preview', paneWidth, ctx, theme),
+    themedSeparatorSurface(
+      dogfoodText(localization, 'blocks.preview.separator', 'blocks • live preview'),
+      paneWidth,
+      ctx,
+      theme,
+    ),
     spacer(1, 1),
-    contentSurface(body),
+    ...sections,
   ]), width);
 }
 
-function standardBlockLivePreviewText(
+function standardBlockLivePreviewSurface(
   block: BlockDefinition,
   width: number,
   ctx: BijouContext,
-): string {
-  return [
-    'Live example',
-    indentBlock(surfacePlainText(standardBlockExampleSurface(block, width, ctx))),
-    '',
-    'Live lowering preview',
-    indentBlock(standardBlockLoweringPreviewText(block)),
-    '',
-    'Live documentation',
-    indentBlock(standardBlockDocumentationText(block)),
-  ].join('\n');
+  theme: LandingThemeTokens,
+  localization: LocalizationPort,
+): Surface {
+  const safeWidth = Math.max(30, width);
+  const contentWidth = Math.max(24, safeWidth - 4);
+
+  return boxSurface(column([
+    line(dogfoodText(localization, 'blocks.preview.liveExample', 'Live example')),
+    standardBlockExampleSurface(block, contentWidth, ctx),
+    spacer(1, 1),
+    line(dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview')),
+    contentSurface(standardBlockLoweringPreviewText(block)),
+    spacer(1, 1),
+    line(dogfoodText(localization, 'blocks.preview.liveDocumentation', 'Live documentation')),
+    contentSurface(standardBlockDocumentationText(block)),
+  ]), {
+    title: dogfoodText(
+      localization,
+      'blocks.preview.pageTitle',
+      '▼ Page: {blockName}',
+      { blockName: block.metadata.blockName },
+    ),
+    width: safeWidth,
+    borderToken: docsThemeBorderToken(theme),
+    padding: { left: 1, right: 1 },
+    ctx,
+  });
 }
 
 function standardBlockExampleSurface(
@@ -1168,13 +1183,6 @@ function surfacePlainText(surface: Surface): string {
 
 function compactInlineText(value: string): string {
   return value.replace(/\s+/g, ' ').trim() || '-';
-}
-
-function indentBlock(value: string): string {
-  return value
-    .split('\n')
-    .map((lineText) => `  ${lineText}`)
-    .join('\n');
 }
 
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
@@ -2965,6 +2973,7 @@ function renderGuideReaderPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
+  localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
@@ -2985,7 +2994,7 @@ function renderGuideReaderPane(
   }
 
   if (pageId === BLOCKS_PAGE_ID && doc.id === 'blocks-preview') {
-    return renderBlocksPreviewPane(width, ctx, theme);
+    return renderBlocksPreviewPane(width, ctx, theme, localization);
   }
 
   return insetPaneSurface(column([
@@ -3304,7 +3313,7 @@ function createGuidePageLayout(
     kind: 'pane',
     paneId: 'guide-content',
     unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-    render: (width) => renderGuideReaderPane(pageId, model, width, getCtx(), theme),
+    render: (width) => renderGuideReaderPane(pageId, model, width, getCtx(), theme, localization),
   };
   const meta: FrameLayoutNode = {
     kind: 'pane',

@@ -4,6 +4,51 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveDocumentation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveExample"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.liveLoweringPreview"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.pageTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",

@@ -22,6 +22,43 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   return text;
 }
 
+function foregroundStyledTextCellExists(
+  frame: {
+    width: number;
+    height: number;
+    get(x: number, y: number): {
+      char?: string;
+      fg?: unknown;
+      fgRGB?: unknown;
+      modifiers?: readonly string[];
+    };
+  },
+  needle: string,
+) {
+  for (let y = 0; y < frame.height; y++) {
+    let row = '';
+    for (let x = 0; x < frame.width; x++) {
+      row += frame.get(x, y).char || ' ';
+    }
+
+    const start = row.indexOf(needle);
+    if (start === -1) continue;
+
+    for (let x = start; x < Math.min(frame.width, start + needle.length); x++) {
+      const cell = frame.get(x, y);
+      if (
+        cell.fg != null
+        || cell.fgRGB != null
+        || (cell.modifiers?.length ?? 0) > 0
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 describe('DX-031D DOGFOOD Blocks section', () => {
   afterEach(() => _resetDefaultContextForTesting());
 
@@ -49,7 +86,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
   });
 
-  it('renders an accordion-backed live preview for standard blocks and their story variants', async () => {
+  it('renders a surface-backed live preview for standard blocks and their story variants', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 160 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
 
@@ -69,6 +106,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).toContain('AppShell live example');
     expect(text).toContain('ReaderSurface live example');
     expect(text).toContain('InspectorPanel live example');
+    expect(foregroundStyledTextCellExists(result.frames.at(-1)!, 'AppShell live example')).toBe(true);
     for (const block of standardBlocks) {
       expect(text).toContain(`Page: ${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);
