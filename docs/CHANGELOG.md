@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD chrome localization coverage** — DOGFOOD now moves top-level docs
+  navigation and first settings chrome labels through the source string table
+  and generated locale catalogs. Spanish, French, and German catalogs now cover
+  page tabs, search title, shell/settings section labels, hint toggles, and
+  landing-quality labels without copying English fallback data into
+  non-English payloads. The DOGFOOD i18n debt ratchet drops to `2213` raw
+  strings.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n

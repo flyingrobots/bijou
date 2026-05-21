@@ -188,7 +188,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Blöcke"
+      }
     },
     {
       "key": {
@@ -197,7 +199,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Komponenten"
+      }
     },
     {
       "key": {
@@ -206,7 +210,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Leitfäden"
+      }
     },
     {
       "key": {
@@ -215,7 +221,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Pakete"
+      }
     },
     {
       "key": {
@@ -224,7 +232,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Philosophie"
+      }
     },
     {
       "key": {
@@ -233,7 +243,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Version"
+      }
     },
     {
       "key": {
@@ -242,7 +254,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Komponenten suchen"
+      }
     },
     {
       "key": {
@@ -404,7 +418,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Startqualität auf {quality} gesetzt."
+      }
     },
     {
       "key": {
@@ -413,7 +429,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Startqualität"
+      }
     },
     {
       "key": {
@@ -499,7 +517,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Darstellung"
+      }
     },
     {
       "key": {
@@ -508,7 +528,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Startseite"
+      }
     },
     {
       "key": {
@@ -528,7 +550,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Oberfläche"
+      }
     },
     {
       "key": {
@@ -537,7 +561,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Zeigt Steuerhinweise für den aktiven Bereich in der Fußzeile. Für eine ruhigere Oberfläche ausschalten und ? für die vollständige Tastaturübersicht verwenden."
+      }
     },
     {
       "key": {
@@ -546,7 +572,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Hinweise ausgeschaltet."
+      }
     },
     {
       "key": {
@@ -555,7 +583,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Hinweise eingeschaltet."
+      }
     },
     {
       "key": {
@@ -564,7 +594,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Hinweise anzeigen"
+      }
     },
     {
       "key": {
@@ -573,7 +605,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Aus"
+      }
     },
     {
       "key": {
@@ -582,7 +616,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "de": "Ein"
+      }
     }
   ]
 }

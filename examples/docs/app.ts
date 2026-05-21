@@ -212,7 +212,6 @@ interface GuideDoc {
 
 interface DocsPageSpec {
   readonly id: DocsPageId;
-  readonly title: string;
 }
 
 interface RowDescriptor {
@@ -320,12 +319,12 @@ type LandingQualityMode = 'auto' | 'quality' | 'balanced' | 'performance';
 const STORY_FAMILIES = buildStoryFamilies(COMPONENT_STORIES);
 const DOGFOOD_DOCS_COVERAGE = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 const DOCS_SITE_PAGES: readonly DocsPageSpec[] = Object.freeze([
-  { id: GUIDES_PAGE_ID, title: 'Guides' },
-  { id: COMPONENTS_PAGE_ID, title: 'Components' },
-  { id: BLOCKS_PAGE_ID, title: 'Blocks' },
-  { id: PACKAGES_PAGE_ID, title: 'Packages' },
-  { id: PHILOSOPHY_PAGE_ID, title: 'Philosophy' },
-  { id: RELEASE_PAGE_ID, title: 'Release' },
+  { id: GUIDES_PAGE_ID },
+  { id: COMPONENTS_PAGE_ID },
+  { id: BLOCKS_PAGE_ID },
+  { id: PACKAGES_PAGE_ID },
+  { id: PHILOSOPHY_PAGE_ID },
+  { id: RELEASE_PAGE_ID },
 ]);
 const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {

@@ -188,7 +188,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Blocs"
+      }
     },
     {
       "key": {
@@ -197,7 +199,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Composants"
+      }
     },
     {
       "key": {
@@ -206,7 +210,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Guides"
+      }
     },
     {
       "key": {
@@ -215,7 +221,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Paquets"
+      }
     },
     {
       "key": {
@@ -224,7 +232,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Philosophie"
+      }
     },
     {
       "key": {
@@ -233,7 +243,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Version"
+      }
     },
     {
       "key": {
@@ -242,7 +254,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Rechercher des composants"
+      }
     },
     {
       "key": {
@@ -404,7 +418,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Qualité de lancement définie sur {quality}."
+      }
     },
     {
       "key": {
@@ -413,7 +429,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Qualité de lancement"
+      }
     },
     {
       "key": {
@@ -499,7 +517,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Apparence"
+      }
     },
     {
       "key": {
@@ -508,7 +528,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Accueil"
+      }
     },
     {
       "key": {
@@ -528,7 +550,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Interface"
+      }
     },
     {
       "key": {
@@ -537,7 +561,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Affiche les indices de contrôle du volet actif dans le pied de page. Désactivez-les pour une interface plus calme et utilisez ? pour la carte complète des touches."
+      }
     },
     {
       "key": {
@@ -546,7 +572,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Indices désactivés."
+      }
     },
     {
       "key": {
@@ -555,7 +583,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Indices activés."
+      }
     },
     {
       "key": {
@@ -564,7 +594,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Afficher les indices"
+      }
     },
     {
       "key": {
@@ -573,7 +605,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Désactivé"
+      }
     },
     {
       "key": {
@@ -582,7 +616,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "fr": "Activé"
+      }
     }
   ]
 }
