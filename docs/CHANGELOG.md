@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Provider-bound AppShell proof** — The DX-034 proof suite now assembles
+  active ReaderSurface bindings from declared data contracts, resolves them
+  through an explicit provider scope, creates immutable BindingFrame updates
+  from provider snapshots, and renders `AppShell` from frame data without
+  provider handles, subscriptions, refresh callbacks, command dispatch, or
+  mutation.
 - **DOGFOOD locale preference persistence** — DOGFOOD now separates locale
   discovery from preference persistence. Startup resolves an explicit locale
   override first, then a persisted locale preference, then the host locale port,
