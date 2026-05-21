@@ -105,13 +105,38 @@ describe('block tree rendering', () => {
     expect(rendered.output).not.toContain('unsafe accessor content');
   });
 
-  it('fails deterministically when nested rendering exceeds the maximum depth', () => {
-    const slots: Record<string, unknown> = {};
-    const node = blockRenderNode(appShellBlock, {
+  it('snapshots slot records when creating render nodes', () => {
+    const slots: Record<string, unknown> = { content: 'initial content' };
+    const node = blockRenderNode(readerSurfaceBlock, {
       mode: 'pipe',
       slots,
     });
-    slots.content = node;
+
+    slots.content = 'mutated content';
+
+    const rendered = renderBlockTree(node);
+
+    expect(rendered.output).toContain('content: initial content');
+    expect(rendered.output).not.toContain('mutated content');
+  });
+
+  it('fails deterministically when nested rendering exceeds the maximum depth', () => {
+    const node = blockRenderNode(appShellBlock, {
+      mode: 'pipe',
+      slots: {
+        content: blockRenderNode(appShellBlock, {
+          slots: {
+            content: blockRenderNode(appShellBlock, {
+              slots: {
+                content: blockRenderNode(appShellBlock, {
+                  slots: { content: 'leaf' },
+                }),
+              },
+            }),
+          },
+        }),
+      },
+    });
 
     expect(() => renderBlockTree(node, { maxDepth: 2 })).toThrow(
       'block tree render: maximum depth 2 exceeded at AppShell',

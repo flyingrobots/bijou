@@ -272,6 +272,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localization runtime method binding** — `I18nRuntime.t()` now resolves
+  messages through closure-owned runtime state so callers can destructure or
+  pass the helper as a function without losing access to localization state.
+- **Nested block visual composition** — Standard block visual rendering now
+  preserves child `Surface` output as surface-native content instead of
+  flattening nested block output to plain text and recreating cells without
+  styling.
+- **Block render node snapshots** — `blockRenderNode()` now snapshots plain
+  slot/config records at construction time, so mutating caller-owned input
+  objects after node creation no longer changes later render output.
 - **Standard block TUI rendering** — First-party standard blocks now return
   surface-backed output in interactive and static modes while preserving text
   output for pipe and accessible modes, so DOGFOOD can display the actual block

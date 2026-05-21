@@ -72,6 +72,12 @@ that block participates in an explicit render tree.
 It is not a provider handle, subscription, cache entry, command dispatcher, or
 view lifecycle owner.
 
+The node snapshots caller-provided plain data at construction time. Mutating the
+original slot/config objects after `blockRenderNode()` returns must not alter
+later render output. Renderable runtime values such as nested block nodes,
+block definitions, and surfaces remain identity values; the renderer must not
+strip their brands or cell data while normalizing inert records.
+
 ### Block Tree Renderer
 
 A pure renderer that starts from a `BlockRenderNode` or `BlockDefinition`,
@@ -99,6 +105,12 @@ When `renderBlockTree()` receives a node:
 The parent block still owns how it displays a slot. The tree renderer only makes
 sure the slot value is rendered child output rather than an unrendered
 declaration.
+
+For visual modes, rendered child `Surface` values stay surfaces. Parent blocks
+may frame, clip, stack, or blit them, but they must not convert them to text and
+then recreate new surfaces because that loses cell-level styling and makes
+nested blocks look like printed lowering output. Text extraction remains
+appropriate for pipe and accessible lowering.
 
 ## Non-Goals
 
@@ -135,9 +147,12 @@ preview output.
   render.
 - Render tree inputs are runtime-branded rather than loose `{ block, input }`
   shapes.
+- Render tree nodes snapshot plain slot/config records at construction time.
 - Accessor properties in slot records are not invoked during slot resolution.
 - Child mode inherits from the parent unless a child explicitly sets its own
   mode.
+- Nested visual child surfaces preserve cell styling when rendered through
+  parent block surfaces.
 - Recursive render depth is bounded and fails deterministically.
 - Lowering facts from nested blocks remain inspectable.
 

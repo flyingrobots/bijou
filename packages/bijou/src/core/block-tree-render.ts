@@ -45,7 +45,7 @@ export function blockRenderNode<Config = unknown>(
 
   const node = {
     block,
-    input: Object.freeze({ ...input }),
+    input: snapshotInput(input),
   } as BlockRenderNode<Config>;
 
   Object.defineProperty(node, BLOCK_RENDER_NODE_BRAND, { value: true });
@@ -69,6 +69,41 @@ export function renderBlockTree<Config = unknown>(
     maxDepth,
     ...(options.mode === undefined ? {} : { optionMode: options.mode }),
   }, undefined, 0);
+}
+
+function snapshotInput<Config>(input: BlockRenderInput<Config>): BlockRenderInput<Config> {
+  return snapshotPlainRecord(input) as BlockRenderInput<Config>;
+}
+
+function snapshotValue(value: unknown): unknown {
+  if (isBlockRenderNode(value) || isBlockDefinition(value)) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return Object.freeze(value.map((item) => snapshotValue(item)));
+  }
+
+  if (isPlainRecord(value)) {
+    return snapshotPlainRecord(value);
+  }
+
+  return value;
+}
+
+function snapshotPlainRecord(input: object): Readonly<Record<string, unknown>> {
+  const record: Record<string, unknown> = {};
+  const descriptors = Object.getOwnPropertyDescriptors(input);
+
+  for (const [key, descriptor] of Object.entries(descriptors)) {
+    if (!('value' in descriptor)) {
+      continue;
+    }
+
+    record[key] = snapshotValue(descriptor.value);
+  }
+
+  return Object.freeze(record);
 }
 
 function renderTarget<Config = unknown>(

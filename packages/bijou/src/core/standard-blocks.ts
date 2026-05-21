@@ -524,6 +524,7 @@ interface RenderSection {
   readonly id: string;
   readonly label: string;
   readonly content: string;
+  readonly visualContent: string | Surface;
   readonly required: boolean;
   readonly present: boolean;
 }
@@ -548,11 +549,14 @@ function renderSection(
   required: boolean,
 ): RenderSection {
   const content = slotValueText(value);
-  const present = content !== undefined;
+  const visualContent = slotValueVisualContent(value, content);
+  const present = content !== undefined || visualContent !== undefined;
+  const fallbackContent = required ? `(missing required ${id})` : '';
   return Object.freeze({
     id,
     label,
-    content: content ?? (required ? `(missing required ${id})` : ''),
+    content: content ?? fallbackContent,
+    visualContent: visualContent ?? fallbackContent,
     required,
     present,
   });
@@ -579,7 +583,7 @@ function renderVisualSectionsSurface(
 ): Surface {
   const safeWidth = Math.max(30, Math.floor(width));
   const sectionWidth = Math.max(24, safeWidth - 4);
-  const sectionSurfaces = sections.map((section) => boxSurface(createTextSurface(section.content), {
+  const sectionSurfaces = sections.map((section) => boxSurface(section.visualContent, {
     title: section.label,
     width: sectionWidth,
     padding: { left: 1, right: 1 },
@@ -705,6 +709,14 @@ function slotValueText(value: unknown): string | undefined {
     default:
       return undefined;
   }
+}
+
+function slotValueVisualContent(value: unknown, textContent: string | undefined): string | Surface | undefined {
+  if (isSurfaceSlotValue(value)) {
+    return value;
+  }
+
+  return textContent;
 }
 
 function isSurfaceSlotValue(value: unknown): value is Surface {

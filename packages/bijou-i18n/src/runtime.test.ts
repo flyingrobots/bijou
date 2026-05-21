@@ -96,6 +96,32 @@ describe('bijou-i18n runtime', () => {
     expect(runtime.t({ namespace: 'shell', id: 'ready' })).toBe('Ready');
   });
 
+  it('keeps message lookup independent from method receiver binding', () => {
+    const runtime = createI18nRuntime({
+      locale: 'en',
+      direction: 'ltr',
+      catalogs: [
+        {
+          namespace: 'shell',
+          entries: [
+            {
+              key: { namespace: 'shell', id: 'ready' },
+              kind: 'message',
+              sourceLocale: 'en',
+              values: {
+                en: 'Ready',
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    const { t } = runtime;
+
+    expect(t({ namespace: 'shell', id: 'ready' })).toBe('Ready');
+  });
+
   it('creates an async runtime that preloads the initial locale through the loader', async () => {
     const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
       namespace: 'shell',

@@ -110,6 +110,11 @@ The runtime continues to own catalog state, fallback behavior, locale switching,
 references, and formatting. The port makes that behavior consumable by
 application code without leaking the runtime surface everywhere.
 
+Runtime convenience methods that remain public, such as `t()`, should behave
+like stable API functions instead of receiver-sensitive object methods. Callers
+may pass or destructure these helpers without preserving a JavaScript `this`
+binding; the runtime state remains closure-owned at the adapter boundary.
+
 ### Node / Filesystem Adapters
 
 Adapters that read selected-locale generated JSON catalogs from disk belong in
@@ -212,6 +217,8 @@ runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' });
 ## Acceptance Criteria
 
 - `@flyingrobots/bijou-i18n` exports a first-class localization port contract.
+- Runtime lookup helpers stay receiver-independent so app code can pass them
+  around without binding `this`.
 - The runtime adapter returns immutable localized objects.
 - Localized objects preserve key, locale, direction, kind, status, value,
   issues, and facts.

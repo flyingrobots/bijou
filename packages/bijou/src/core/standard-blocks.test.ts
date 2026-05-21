@@ -13,6 +13,7 @@ import {
   blockRenderNode,
   renderBlockTree,
 } from './block-tree-render.js';
+import { createSurface } from '../ports/surface.js';
 import {
   bindSchemaBlockInput,
   isSchemaBoundBlockDefinition,
@@ -352,6 +353,52 @@ describe('first-party standard block definitions', () => {
     ]));
   });
 
+  it('preserves child surface cells when visual blocks render nested block output', () => {
+    const childSurface = createSurface(1, 1);
+    childSurface.set(0, 0, {
+      char: 'X',
+      fg: '#00ff00',
+      bg: '#ff00ff',
+      modifiers: ['bold'],
+    });
+    const childBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'StyledChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Styled child test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? childSurface
+          : 'X',
+      }),
+    });
+
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 48 },
+      slots: {
+        content: blockRenderNode(childBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    const cell = findCell(rendered.output, 'X');
+
+    expect(cell).toMatchObject({
+      fg: '#00ff00',
+      bg: '#ff00ff',
+      modifiers: ['bold'],
+    });
+  });
+
   it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',
@@ -483,6 +530,22 @@ function surfaceText(surface: { width: number; height: number; get(x: number, y:
     text += '\n';
   }
   return text;
+}
+
+function findCell(
+  surface: { width: number; height: number; get(x: number, y: number): { char?: string } },
+  char: string,
+): { char?: string; fg?: string; bg?: string; modifiers?: readonly string[] } | undefined {
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      const cell = surface.get(x, y);
+      if (cell.char === char) {
+        return cell;
+      }
+    }
+  }
+
+  return undefined;
 }
 
 const spyMetadata: BlockMetadata = {
