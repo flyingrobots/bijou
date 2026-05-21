@@ -94,6 +94,11 @@ import {
   resolveDogfoodRuntimeLocale,
   type DogfoodLocalePort,
 } from './locale.js';
+import {
+  DOGFOOD_I18N_CATALOG,
+  DOGFOOD_I18N_NAMESPACE,
+  dogfoodI18nCatalogsForLocale,
+} from './i18n/dogfood-catalog.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -119,6 +124,7 @@ const BIJOU_PACKAGE_JSON = JSON.parse(
 const BIJOU_VERSION = BIJOU_PACKAGE_JSON.version;
 const GUIDES_START_HERE_TEXT = readMarkdownDoc('./content/guides-start-here.md');
 const GUIDES_NAVIGATE_DOGFOOD_TEXT = readMarkdownDoc('./content/guides-navigate-dogfood.md');
+const GUIDES_I18N_WORKFLOW_TEXT = readMarkdownDoc('./content/guides-i18n-workflow.md');
 const GUIDES_DOCUMENTATION_MAP_TEXT = readMarkdownDoc('../../docs/README.md');
 const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md');
 const BLOCKS_WHAT_ARE_BLOCKS_TEXT = readMarkdownDoc('../../docs/design-system/blocks.md');
@@ -161,12 +167,11 @@ const DOCS_STANDARD_NAV_WIDTH = 28;
 const DOCS_NARROW_NAV_WIDTH = 26;
 const DOCS_SHELL_HINT = '? Help • / Search • F2 Settings • q Quit';
 const DOCS_PANE_SWITCH_HINT = 'Tab next pane';
-const DOGFOOD_I18N_NAMESPACE = 'bijou.dogfood';
 const DOCS_FRAME_CHROME_ROWS = 2;
 const DOCS_LAYOUT_VERTICAL_MARGIN_ROWS = 2;
 const DOCS_FAMILY_SEPARATOR_ROWS = 1;
 
-export { FRAME_I18N_CATALOG };
+export { DOGFOOD_I18N_CATALOG, FRAME_I18N_CATALOG };
 
 export type DocsLayoutVariant = 'wide' | 'standard' | 'narrow' | 'tiny';
 
@@ -177,120 +182,6 @@ export function resolveDocsLayoutVariant(columns: number, rows: number): DocsLay
   if (width >= 88 && height >= 20) return 'standard';
   if (width >= 64 && height >= 16) return 'narrow';
   return 'tiny';
-}
-
-export const DOGFOOD_I18N_CATALOG: I18nCatalog = {
-  namespace: DOGFOOD_I18N_NAMESPACE,
-  entries: [
-    dogfoodMessage('landing.prompt.enter', 'Press [Enter]'),
-    dogfoodMessage('landing.footer.controls', 'Esc/q quit • ↑/↓ quality • ←/→ theme • Enter continue'),
-    dogfoodMessage('landing.dogfood.title', 'DOGFOOD'),
-    dogfoodMessage('landing.dogfood.expansion', 'Documentation Of Good Foundational Onboarding and Discovery'),
-    dogfoodMessage('landing.quality.auto', 'Auto'),
-    dogfoodMessage('landing.quality.quality', 'Quality'),
-    dogfoodMessage('landing.quality.balanced', 'Balanced'),
-    dogfoodMessage('landing.quality.performance', 'Performance'),
-    dogfoodMessage('landing.quality.profile.full', 'full'),
-    dogfoodMessage('landing.quality.profile.balanced', 'balanced'),
-    dogfoodMessage('landing.quality.profile.performance', 'performance'),
-    dogfoodMessage('landing.toast.quality', 'Landing quality: {quality}'),
-    dogfoodMessage('docs.footer.shell', '? Help • / Search • F2 Settings • q Quit'),
-    dogfoodMessage('docs.footer.paneSwitch', 'Tab next pane'),
-    dogfoodMessage('docs.footer.family', '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand'),
-    dogfoodMessage('docs.footer.story', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
-    dogfoodMessage('docs.footer.variants', '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles'),
-    dogfoodMessage('docs.footer.guideNav', '{paneSwitch} • ↑/↓ browse • Enter open'),
-    dogfoodMessage('docs.footer.guide', '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom'),
-    dogfoodMessage('docs.footer.guideMeta', '{paneSwitch} • section overview'),
-    dogfoodMessage('docs.page.guides', 'Guides'),
-    dogfoodMessage('docs.page.components', 'Components'),
-    dogfoodMessage('docs.page.blocks', 'Blocks'),
-    dogfoodMessage('docs.page.packages', 'Packages'),
-    dogfoodMessage('docs.page.philosophy', 'Philosophy'),
-    dogfoodMessage('docs.page.release', 'Release'),
-    dogfoodMessage('docs.search.title', 'Search components'),
-    dogfoodMessage('docs.empty.intro.title', 'What is Bijou?'),
-    dogfoodMessage('docs.empty.intro.body', 'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.'),
-    dogfoodMessage('docs.empty.intro.body2', 'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.'),
-    dogfoodMessage('docs.empty.guide.title', 'How to use these docs'),
-    dogfoodMessage('docs.empty.coverage.title', 'Documentation coverage'),
-    dogfoodMessage('docs.empty.coverage.body', 'DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time.'),
-    dogfoodMessage('docs.empty.coverage.status', '{documented}/{total} families • {percent}%'),
-    dogfoodMessage('docs.empty.guide.step1', '1. Browse component families in the left lane.'),
-    dogfoodMessage('docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.'),
-    dogfoodMessage('docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.'),
-    dogfoodMessage('docs.empty.guide.step4', '4. Press / to search by component name at any time.'),
-    dogfoodMessage('docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.'),
-    dogfoodMessage('docs.separator.welcome', 'welcome to bijou'),
-    dogfoodMessage('settings.section.shell', 'Shell'),
-    dogfoodMessage('settings.section.appearance', 'Appearance'),
-    dogfoodMessage('settings.section.localization', 'Localization', {
-      fr: 'Localisation',
-      es: 'Localización',
-      de: 'Lokalisierung',
-    }),
-    dogfoodMessage('settings.section.landing', 'Landing'),
-    dogfoodMessage('settings.showHints.label', 'Show hints'),
-    dogfoodMessage('settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
-    dogfoodMessage('settings.showHints.on', 'On'),
-    dogfoodMessage('settings.showHints.off', 'Off'),
-    dogfoodMessage('settings.showHints.feedback.on', 'Show hints turned on.'),
-    dogfoodMessage('settings.showHints.feedback.off', 'Show hints turned off.'),
-    dogfoodMessage('settings.language.label', 'Preferred language', {
-      fr: 'Langue préférée',
-      es: 'Idioma preferido',
-      de: 'Bevorzugte Sprache',
-    }),
-    dogfoodMessage('settings.language.description', 'Current language: {language}. Options: {options}.', {
-      fr: 'Langue actuelle : {language}. Options : {options}.',
-      es: 'Idioma actual: {language}. Opciones: {options}.',
-      de: 'Aktuelle Sprache: {language}. Optionen: {options}.',
-    }),
-    dogfoodMessage('settings.language.feedback', 'Language set to {language}.', {
-      fr: 'Langue définie sur {language}.',
-      es: 'Idioma establecido en {language}.',
-      de: 'Sprache auf {language} gesetzt.',
-    }),
-    dogfoodMessage('settings.language.en', 'English', {
-      fr: 'anglais',
-      es: 'inglés',
-      de: 'Englisch',
-    }),
-    dogfoodMessage('settings.language.fr', 'French', {
-      fr: 'français',
-      es: 'francés',
-      de: 'Französisch',
-    }),
-    dogfoodMessage('settings.language.es', 'Spanish', {
-      fr: 'espagnol',
-      es: 'español',
-      de: 'Spanisch',
-    }),
-    dogfoodMessage('settings.language.de', 'German', {
-      fr: 'allemand',
-      es: 'alemán',
-      de: 'Deutsch',
-    }),
-    dogfoodMessage('settings.landingQuality.label', 'Landing quality'),
-    dogfoodMessage('settings.landingQuality.description.auto', 'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.quality', 'Prioritizes the richest title treatment even on larger terminals. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.balanced', 'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.description.performance', 'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.'),
-    dogfoodMessage('settings.landingQuality.feedback', 'Landing quality set to {quality}.'),
-  ],
-};
-
-function dogfoodMessage(
-  id: string,
-  value: string,
-  translations: Readonly<Record<string, string>> = {},
-) {
-  return {
-    key: { namespace: DOGFOOD_I18N_NAMESPACE, id },
-    kind: 'message' as const,
-    sourceLocale: 'en',
-    values: { en: value, ...translations },
-  };
 }
 
 interface StoryFamily {
@@ -455,6 +346,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Documentation Map',
     summary: 'Repo orientation and the current-truth documentation lanes inside Bijou.',
     body: GUIDES_DOCUMENTATION_MAP_TEXT,
+  },
+  {
+    id: 'guides-i18n-workflow',
+    pageId: GUIDES_PAGE_ID,
+    title: '@flyingrobots/bijou-i18n workflow',
+    summary: '@flyingrobots/bijou-i18n-tools + @flyingrobots/bijou-i18n-tools-node',
+    body: GUIDES_I18N_WORKFLOW_TEXT,
   },
   {
     id: 'secondary-example-map',
@@ -886,7 +784,15 @@ function applyDogfoodLocale(
   locale: string,
 ): void {
   const option = resolveDogfoodLocale(locale);
+  loadDogfoodRuntimeCatalogs(i18n, option.id);
   void i18n.setLocale(option.id, options.direction ?? option.direction);
+}
+
+function loadDogfoodRuntimeCatalogs(i18n: I18nRuntime, locale: string): void {
+  i18n.unloadCatalog(DOGFOOD_I18N_NAMESPACE);
+  for (const catalog of dogfoodI18nCatalogsForLocale(locale)) {
+    i18n.loadCatalog(catalog);
+  }
 }
 
 function dogfoodLocaleSettingDescription(currentLocale: string, i18n?: I18nRuntime): string {
@@ -3807,7 +3713,7 @@ function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
     fallbackLocale: 'en',
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
-  runtime.loadCatalog(DOGFOOD_I18N_CATALOG);
+  loadDogfoodRuntimeCatalogs(runtime, initialLocale.id);
   for (const catalog of options.extraI18nCatalogs ?? []) {
     runtime.loadCatalog(catalog);
   }

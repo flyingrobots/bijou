@@ -8,6 +8,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **String-table i18n workflow** — `@flyingrobots/bijou-i18n-tools` now
+  supports a standard source string-table workflow that converts CSV/TSV rows
+  into authoring catalogs and selected-locale runtime catalogs, while
+  `@flyingrobots/bijou-i18n-tools-node` can read/write string tables and
+  generated per-locale catalog JSON files. DOGFOOD now keeps its string source
+  in `examples/docs/i18n/source/dogfood-strings.csv`, builds
+  `examples/docs/i18n/catalogs/<locale>/bijou.dogfood.json`, and loads only the
+  selected locale's generated JSON catalog at runtime. `npm run
+  dogfood:i18n:build`, `npm run dogfood:i18n:check`, `npm run
+  dogfood:i18n:export`, and `npm run dogfood:i18n:coverage` cover the workflow.
+  DOGFOOD also publishes an in-app i18n workflow guide covering the package
+  split, source table, generated runtime catalogs, selected-locale loading, and
+  language-addition checklist.
+- **DOGFOOD i18n debt inventory** — `npm run dogfood:i18n:debt` now scans
+  DOGFOOD source surfaces for remaining localizable raw UI strings, groups the
+  count by source surface, and ratchets the current baseline at `2220` strings
+  across `docs-app`, `dogfood-locale`, `component-stories`, and Storybook-style
+  DOGFOOD entrypoints. The scanner filters ids, file paths, import paths, and
+  catalog-backed fallback calls so review sees the remaining localization debt
+  without scraping terminal render output. `release:readiness` now runs the
+  i18n debt ratchet alongside the existing DOGFOOD coverage gate.
 - **DOGFOOD locale preference and i18n ratchet** — DOGFOOD now resolves its
   initial language through an explicit locale port with a Node adapter that
   reads operating-system locale signals, exposes a Settings drawer language

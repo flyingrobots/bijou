@@ -1,14 +1,20 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, extname, join } from 'node:path';
+import type { I18nCatalog } from '@flyingrobots/bijou-i18n';
 import {
+  parseStringTable,
   parseCatalogBundleJson,
   parseExchangeSheet,
+  runtimeCatalogsByLocaleFromStringTable,
   serializeCatalogBundleJson,
   serializeExchangeSheet,
+  serializeStringTable,
   type CatalogBundle,
   type DelimitedFormat,
   type ExchangeSheet,
   type ExchangeWorkbook,
+  type StringTable,
 } from '@flyingrobots/bijou-i18n-tools';
 
 export interface WorkbookDirectorySheet {
@@ -70,6 +76,34 @@ export async function writeExchangeSheetFile(
   await writeFile(path, content, 'utf8');
 }
 
+export async function writeStringTableFile(
+  path: string,
+  table: StringTable,
+  format?: DelimitedFormat,
+): Promise<void> {
+  const resolvedFormat = format ?? inferDelimitedFormat(path);
+  await mkdir(dirnameSafe(path), { recursive: true });
+  await writeFile(path, serializeStringTable(table, resolvedFormat), 'utf8');
+}
+
+export async function readStringTableFile(
+  path: string,
+  format?: DelimitedFormat,
+): Promise<StringTable> {
+  const resolvedFormat = format ?? inferDelimitedFormat(path);
+  const content = await readFile(path, 'utf8');
+  return parseStringTable(content, resolvedFormat);
+}
+
+export function readStringTableFileSync(
+  path: string,
+  format?: DelimitedFormat,
+): StringTable {
+  const resolvedFormat = format ?? inferDelimitedFormat(path);
+  const content = readFileSync(path, 'utf8');
+  return parseStringTable(content, resolvedFormat);
+}
+
 export async function readExchangeSheetFile(
   path: string,
   format?: DelimitedFormat,
@@ -89,6 +123,73 @@ export async function readCatalogBundleFile(path: string): Promise<CatalogBundle
   inferBundleExtension(path);
   const content = await readFile(path, 'utf8');
   return parseCatalogBundleJson(content);
+}
+
+export async function writeRuntimeCatalogFiles(
+  dir: string,
+  table: StringTable,
+): Promise<void> {
+  const byLocale = runtimeCatalogsByLocaleFromStringTable(table);
+  await mkdir(dir, { recursive: true });
+  for (const [locale, catalogs] of Object.entries(byLocale)) {
+    const localeDir = join(dir, locale);
+    await mkdir(localeDir, { recursive: true });
+    for (const catalog of catalogs) {
+      await writeFile(
+        join(localeDir, runtimeCatalogFileName(catalog.namespace)),
+        `${JSON.stringify(catalog, null, 2)}\n`,
+        'utf8',
+      );
+    }
+  }
+}
+
+export function writeRuntimeCatalogFilesSync(
+  dir: string,
+  table: StringTable,
+): void {
+  const byLocale = runtimeCatalogsByLocaleFromStringTable(table);
+  mkdirSync(dir, { recursive: true });
+  for (const [locale, catalogs] of Object.entries(byLocale)) {
+    const localeDir = join(dir, locale);
+    mkdirSync(localeDir, { recursive: true });
+    for (const catalog of catalogs) {
+      writeFileSync(
+        join(localeDir, runtimeCatalogFileName(catalog.namespace)),
+        `${JSON.stringify(catalog, null, 2)}\n`,
+        'utf8',
+      );
+    }
+  }
+}
+
+export async function readRuntimeCatalogFilesForLocale(
+  dir: string,
+  locale: string,
+): Promise<readonly I18nCatalog[]> {
+  const localeDir = join(dir, locale);
+  const files = (await readdir(localeDir))
+    .filter((file) => file.endsWith('.json'))
+    .sort((left, right) => left.localeCompare(right));
+  const catalogs = await Promise.all(files.map(async (file) => parseRuntimeCatalog(
+    await readFile(join(localeDir, file), 'utf8'),
+    `${localeDir}/${file}`,
+  )));
+  return Object.freeze(catalogs);
+}
+
+export function readRuntimeCatalogFilesForLocaleSync(
+  dir: string,
+  locale: string,
+): readonly I18nCatalog[] {
+  const localeDir = join(dir, locale);
+  const files = readdirSync(localeDir)
+    .filter((file) => file.endsWith('.json'))
+    .sort((left, right) => left.localeCompare(right));
+  return Object.freeze(files.map((file) => parseRuntimeCatalog(
+    readFileSync(join(localeDir, file), 'utf8'),
+    `${localeDir}/${file}`,
+  )));
 }
 
 export async function writeExchangeWorkbookDirectory(
@@ -191,4 +292,26 @@ function parseWorkbookManifest(input: string): WorkbookDirectoryManifest {
 function dirnameSafe(path: string): string {
   const slash = path.lastIndexOf('/');
   return slash <= 0 ? '.' : path.slice(0, slash);
+}
+
+function runtimeCatalogFileName(namespace: string): string {
+  return `${encodeURIComponent(namespace)}.json`;
+}
+
+function parseRuntimeCatalog(input: string, context: string): I18nCatalog {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(input);
+  } catch {
+    throw new Error(`Invalid runtime catalog json: malformed json in ${context}`);
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error(`Invalid runtime catalog json: expected object in ${context}`);
+  }
+  const namespace = (parsed as { namespace?: unknown }).namespace;
+  const entries = (parsed as { entries?: unknown }).entries;
+  if (typeof namespace !== 'string' || !Array.isArray(entries)) {
+    throw new Error(`Invalid runtime catalog json: missing namespace or entries in ${context}`);
+  }
+  return parsed as I18nCatalog;
 }

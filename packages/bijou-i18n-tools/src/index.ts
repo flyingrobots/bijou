@@ -1,9 +1,13 @@
 export {
+  parseDelimitedSheet,
   parseCatalogBundleJson,
   parseExchangeSheet,
   serializeCatalogBundleJson,
+  serializeDelimitedSheet,
   serializeExchangeSheet,
   type DelimitedFormat,
+  type DelimitedSheet,
+  type DelimitedSheetInput,
 } from './adapters.js';
 
 export {
@@ -51,3 +55,15 @@ export {
   type ServiceExchangeSnapshot,
   type TranslationWorkbookServicePullResult,
 } from './service.js';
+
+export {
+  authoringCatalogsFromStringTable,
+  exportStringTable,
+  parseStringTable,
+  runtimeCatalogsByLocaleFromStringTable,
+  runtimeCatalogsForLocaleFromStringTable,
+  serializeStringTable,
+  stringTableFromDelimitedSheet,
+  type StringTable,
+  type StringTableRow,
+} from './string-table.js';

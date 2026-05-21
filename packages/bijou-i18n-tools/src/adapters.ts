@@ -3,6 +3,16 @@ import { exportCatalogBundle, importCatalogBundle } from './exchange.js';
 
 export type DelimitedFormat = 'csv' | 'tsv';
 
+export interface DelimitedSheet {
+  readonly columns: readonly string[];
+  readonly rows: readonly Readonly<Record<string, string>>[];
+}
+
+export interface DelimitedSheetInput {
+  readonly columns: readonly string[];
+  readonly rows: readonly object[];
+}
+
 function delimiterFor(format: DelimitedFormat): string {
   return format === 'csv' ? ',' : '\t';
 }
@@ -109,19 +119,53 @@ function assertWorkbookRow(row: Record<string, string>, context: string): Transl
   return row as unknown as TranslationWorkbookRow;
 }
 
-export function serializeExchangeSheet(sheet: ExchangeSheet, format: DelimitedFormat): string {
+function serializedCell(row: object, column: string): string {
+  const value = (row as Readonly<Record<string, unknown>>)[column];
+  return typeof value === 'string' ? value : '';
+}
+
+export function serializeDelimitedSheet(sheet: DelimitedSheetInput, format: DelimitedFormat): string {
   const delimiter = delimiterFor(format);
   const lines = [
     serializeDelimitedRow(sheet.columns, delimiter),
     ...sheet.rows.map((row) => serializeDelimitedRow(
-      sheet.columns.map((column) => {
-        const value = row[column as keyof TranslationWorkbookRow];
-        return typeof value === 'string' ? value : '';
-      }),
+      sheet.columns.map((column) => serializedCell(row, column)),
       delimiter,
     )),
   ];
   return lines.join('\n');
+}
+
+export function parseDelimitedSheet(input: string, format: DelimitedFormat): DelimitedSheet {
+  const delimiter = delimiterFor(format);
+  const rows = parseDelimited(input, delimiter);
+  if (rows.length === 0) {
+    throw new Error('Invalid delimited sheet: empty input');
+  }
+
+  const [header, ...body] = rows;
+  if (header === undefined) {
+    throw new Error('Invalid delimited sheet: missing header');
+  }
+
+  const columns = [...header];
+  const parsedRows = body.map((cells, rowIndex) => {
+    if (cells.length !== columns.length) {
+      throw new Error(`Invalid delimited sheet: ragged row ${rowIndex + 2}`);
+    }
+    return Object.freeze(Object.fromEntries(
+      columns.map((column, index) => [column, cells[index] ?? '']),
+    ) as Record<string, string>);
+  });
+
+  return Object.freeze({
+    columns: Object.freeze(columns),
+    rows: Object.freeze(parsedRows),
+  });
+}
+
+export function serializeExchangeSheet(sheet: ExchangeSheet, format: DelimitedFormat): string {
+  return serializeDelimitedSheet(sheet, format);
 }
 
 export function parseExchangeSheet(
@@ -129,29 +173,15 @@ export function parseExchangeSheet(
   input: string,
   format: DelimitedFormat,
 ): ExchangeSheet {
-  const delimiter = delimiterFor(format);
-  const rows = parseDelimited(input, delimiter);
-  if (rows.length === 0) {
-    throw new Error(`Invalid delimited sheet: empty ${name}`);
-  }
-
-  const [header, ...body] = rows;
-  if (header === undefined) {
-    throw new Error(`Invalid delimited sheet: missing header in ${name}`);
-  }
-
-  const columns = [...header];
-  const parsedRows = body.map((cells, rowIndex) => {
-    if (cells.length !== columns.length) {
-      throw new Error(`Invalid delimited sheet: ragged row ${rowIndex + 2} in ${name}`);
-    }
-    const record = Object.fromEntries(columns.map((column, index) => [column, cells[index] ?? ''])) as Record<string, string>;
+  const sheet = parseDelimitedSheet(input, format);
+  const parsedRows = sheet.rows.map((row, rowIndex) => {
+    const record = { ...row };
     return assertWorkbookRow(record, `${name}:${rowIndex + 2}`);
   });
 
   return {
     name,
-    columns,
+    columns: sheet.columns,
     rows: parsedRows,
   };
 }

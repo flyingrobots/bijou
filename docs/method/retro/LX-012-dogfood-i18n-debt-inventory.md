@@ -1,10 +1,21 @@
 ---
 title: "LX-012 — DOGFOOD i18n Debt Inventory"
 legend: LX
-lane: asap
+lane: retro
 ---
 
 # LX-012 — DOGFOOD i18n Debt Inventory
+
+Completed on `cycle/lx-012-dogfood-i18n-debt-inventory`.
+
+DOGFOOD now has a deterministic source inventory for remaining localizable UI
+strings. The inventory groups raw localizable strings by source surface, filters
+out nonlocalizable ids, file paths, import paths, and cataloged fallback calls,
+and enforces the current count through `npm run dogfood:i18n:debt`. The release
+readiness plan includes the new ratchet so future DOGFOOD work cannot silently
+increase the counted localization debt.
+
+## Original Proposal
 
 LX-011 added the first DOGFOOD locale preference ratchet, but most visible
 DOGFOOD copy can still enter the app as raw English strings in pages, previews,

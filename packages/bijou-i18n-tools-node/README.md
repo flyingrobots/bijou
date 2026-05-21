@@ -5,6 +5,9 @@ Node filesystem helpers for Bijou localization exchange workflows.
 `@flyingrobots/bijou-i18n-tools-node` builds on `@flyingrobots/bijou-i18n-tools` and provides:
 
 - reading and writing CSV/TSV exchange sheet files
+- reading and writing source string-table CSV/TSV files
+- generating per-locale runtime catalog JSON files
+- loading one selected locale directory of runtime catalog JSON files
 - reading and writing JSON catalog bundle files
 - reading and writing workbook directories with a versioned manifest
 - extension-based format inference for `.csv`, `.tsv`, and `.json`
@@ -32,6 +35,23 @@ const runtime = await createI18nRuntimeAsync({
 
 That gives Bijou a built-in Node file-loader path without coupling the
 core runtime to filesystem APIs directly.
+
+For generated per-locale runtime catalogs, use the directory loader:
+
+```ts
+import { createI18nRuntimeAsync } from '@flyingrobots/bijou-i18n';
+import { createRuntimeCatalogDirectoryLoader } from '@flyingrobots/bijou-i18n-tools-node';
+
+const runtime = await createI18nRuntimeAsync({
+  locale: 'fr',
+  direction: 'ltr',
+  loader: createRuntimeCatalogDirectoryLoader({
+    rootDir: './i18n/catalogs',
+  }),
+});
+```
+
+The loader reads only `./i18n/catalogs/fr/*.json` for the selected locale.
 
 ## Documentation
 
