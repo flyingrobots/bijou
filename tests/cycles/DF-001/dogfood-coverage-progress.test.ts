@@ -97,6 +97,22 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
   });
 
+  it('routes the perf HUD toggle through the shell from the landing screen', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx);
+
+    const toggled = await runScript(app, [{ key: '`' }], { ctx });
+    const model = toggled.model as {
+      route: string;
+      docsModel: { perfHudOpen: boolean };
+    };
+    const text = frameText(toggled.frames.at(-1)!);
+
+    expect(model.route).toBe('docs');
+    expect(model.docsModel.perfHudOpen).toBe(true);
+    expect(text).toContain('Perf HUD');
+  });
+
   it('scores the active docs tab color against the real tab background', () => {
     const waveRamp = Array.from({ length: 100 }, () => '#666666');
     waveRamp[6] = '#111111';

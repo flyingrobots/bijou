@@ -111,6 +111,8 @@ export interface FrameModel<PageModel> {
   readonly frameBudgetMs?: number;
   /** Whether the most recently committed frame exceeded the current budget. */
   readonly frameOverBudget: boolean;
+  /** Shell-owned performance HUD visibility flag. */
+  readonly perfHudOpen: boolean;
   /** Help visibility flag. */
   readonly helpOpen: boolean;
   /** Command palette state (undefined when closed). */
@@ -209,6 +211,7 @@ export interface RenderResult {
 /** Discriminated union of all frame-level actions (tabs, panes, scroll, palette, help, transitions). */
 export type FrameAction =
   | { type: 'toggle-help' }
+  | { type: 'toggle-perf-hud' }
   | { type: 'toggle-settings' }
   | { type: 'toggle-notifications' }
   | { type: 'push-notification'; notification: FrameNotificationSpec }

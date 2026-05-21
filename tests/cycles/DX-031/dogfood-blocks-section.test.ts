@@ -111,7 +111,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
     expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-preview');
     expect(text).toContain('Block Preview');
-    expect(text).toContain('Story Matrix');
+    expect(text).toContain('Available Blocks');
     expect(text).not.toContain('Live example');
     expect(text).not.toContain('Live lowering preview');
     expect(text).not.toContain('Live documentation');
@@ -146,6 +146,9 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       expect(text).toContain('facts:');
       expect(text).toContain('documentation');
       expect(text).not.toContain('surface output:');
+      expect(text).not.toContain('Contract: block metadata:');
+      expect(text).not.toContain('components=AppShellComposition');
+      expect(text).not.toContain('Source: packages/bijou/src/core/standard-blocks.ts');
       expect(text).not.toContain('entity:region.navigation=present');
       expect(text).not.toContain('entity:slot.navigation=present');
       expect(text).not.toContain('interactive:');

@@ -82,6 +82,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   giant reader document. Guide content scroll now resets when a selected guide
   page changes, so block previews open at their live example instead of
   inheriting a stale scroll offset from the previous page.
+- **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
+  built-in perf HUD surface toggled by the backtick key. The HUD reads the
+  frame model's timing telemetry, works from workspace and active shell layers
+  such as help, and DOGFOOD routes the same shell toggle from its landing screen
+  instead of shipping a separate overlay path.
 - **First-party standard block definitions for `bijou`** —
   `@flyingrobots/bijou` now exports `appShellBlock`, `readerSurfaceBlock`,
   `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`,
@@ -282,6 +287,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - **Block render node snapshots** — `blockRenderNode()` now snapshots plain
   slot/config records at construction time, so mutating caller-owned input
   objects after node creation no longer changes later render output.
+- **DOGFOOD block preview readability** — Selected block preview pages now keep
+  raw compact metadata summaries, source paths, and embedded preview scrollbars
+  out of the live TUI documentation surface. The overview stays an index of
+  available blocks and stories, while selected block pages show a live example,
+  clipped lowering preview, and concise human-readable block documentation.
 - **Standard block TUI rendering** — First-party standard blocks now return
   surface-backed output in interactive and static modes while preserving text
   output for pipe and accessible modes, so DOGFOOD can display the actual block

@@ -825,6 +825,7 @@ function shouldRouteLandingKeyIntoShell(msg: KeyMsg): boolean {
   }
   return msg.key === 'f2'
     || msg.key === '?'
+    || msg.key === '`'
     || msg.key === '/'
     || msg.key === ':'
     || (msg.key === 'n' && msg.shift);
@@ -888,9 +889,6 @@ function standardBlockPreviewMarkdown(): string {
     storiesByBlock.set(story.blockName, [...existing, story]);
   }
 
-  const storyMatrix = standardBlockStories
-    .map((story) => `- ${story.id} - ${story.label} - ${story.blockName} - ${story.state}`)
-    .join('\n');
   const blockSections = standardBlocks
     .map((block) => {
       const metadata = block.metadata;
@@ -899,6 +897,8 @@ function standardBlockPreviewMarkdown(): string {
 
       return [
         `## ${metadata.blockName}`,
+        '',
+        metadata.docs.summary,
         '',
         `Variants: ${formatDocsList(variants.map((variant) => `${variant.id} (${variant.label})`))}`,
         '',
@@ -911,11 +911,9 @@ function standardBlockPreviewMarkdown(): string {
   return [
     '# Block Preview',
     '',
-    'The current standard block preview is declaration-backed. It indexes metadata, variants, and stories without rendering AppShell or resolving provider lifecycles.',
+    'Select a block in the side navigation to see its live TUI example, lowering preview, and documentation. The overview keeps the package inventory readable without rendering every block at once.',
     '',
-    '## Story Matrix',
-    '',
-    storyMatrix,
+    '## Available Blocks',
     '',
     blockSections,
   ].join('\n');
@@ -1143,8 +1141,7 @@ function modeSurfacePreview(surface: Surface, width: number): Surface {
     content: surface,
     width,
     height: Math.min(6, surface.height),
-    showScrollbar: surface.height > 6,
-    scrollbarMode: 'overlay',
+    showScrollbar: false,
   });
 }
 
@@ -1154,8 +1151,7 @@ function modeTextPreview(text: string, width: number): Surface {
     content: wrapped,
     width,
     height: Math.min(5, wrapped.height),
-    showScrollbar: wrapped.height > 5,
-    scrollbarMode: 'overlay',
+    showScrollbar: false,
   });
 }
 
@@ -1208,13 +1204,14 @@ function standardBlockDocumentationText(block: BlockDefinition): string {
 
   return [
     metadata.docs.summary,
-    `Contract: ${blockMetadataSummary(metadata)}`,
+    `Family: ${metadata.family}`,
+    `Scale: ${metadata.scale}`,
+    `Modes: ${formatDocsList(metadata.modes)}`,
     `Slots: ${formatDocsList(slots)}`,
     `Variants: ${formatDocsList(variants)}`,
     `Data requirements: ${formatDocsList(dataNames)}`,
     `Command intents: ${formatDocsList(commands)}`,
     `Stories: ${formatDocsList(stories.map((story) => `${story.id} (${story.state})`))}`,
-    `Source: ${metadata.sourcePath ?? '-'}`,
   ].join('\n');
 }
 

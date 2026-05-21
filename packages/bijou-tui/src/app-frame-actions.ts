@@ -77,6 +77,8 @@ export function applyFrameAction<PageModel, Msg>(
   switch (action.type) {
     case 'toggle-help':
       return [{ ...model, helpOpen: !model.helpOpen }, []];
+    case 'toggle-perf-hud':
+      return [{ ...model, perfHudOpen: !model.perfHudOpen }, []];
     case 'toggle-settings': {
       const activePage = pagesById.get(model.activePageId)!;
       const settings = options.settings?.({

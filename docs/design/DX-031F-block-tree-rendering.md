@@ -139,6 +139,12 @@ DOGFOOD should not call composition introspection to render visuals. It should
 use composition for declaration inspection and block-tree rendering for rendered
 preview output.
 
+The preview surface is still product UI, not a debug dump. The overview page may
+index available blocks and stories, but selected block pages should keep the
+live example first, show clipped lowering previews without embedded scrollbars,
+and present concise human documentation instead of raw compact metadata strings,
+source-path dumps, or full lowering fact payloads.
+
 ## Acceptance Criteria
 
 - Nested block previews render child output, not only child block names.
@@ -153,6 +159,8 @@ preview output.
   mode.
 - Nested visual child surfaces preserve cell styling when rendered through
   parent block surfaces.
+- DOGFOOD selected block pages do not expose raw contract-summary or source-path
+  debug text as the live documentation surface.
 - Recursive render depth is bounded and fails deterministically.
 - Lowering facts from nested blocks remain inspectable.
 

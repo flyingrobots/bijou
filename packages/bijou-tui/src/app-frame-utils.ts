@@ -136,6 +136,7 @@ export function createFrameKeyMap(
   const keyMap = createKeyMap<FrameAction>()
     .group(group('key.group.frame', 'Frame'), (g) => g
       .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' })
+      .bind('`', t('key.togglePerfHud', 'Toggle perf HUD'), { type: 'toggle-perf-hud' })
       .bind('[', t('key.prevTab', 'Previous tab'), { type: 'prev-tab' })
       .bind(']', t('key.nextTab', 'Next tab'), { type: 'next-tab' })
       .bind('tab', t('key.nextPane', 'Next pane'), { type: 'next-pane' })
