@@ -103,10 +103,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).toContain('Live example');
     expect(text).toContain('Live lowering preview');
     expect(text).toContain('Live documentation');
-    expect(text).toContain('AppShell live example');
-    expect(text).toContain('ReaderSurface live example');
-    expect(text).toContain('InspectorPanel live example');
-    expect(foregroundStyledTextCellExists(result.frames.at(-1)!, 'AppShell live example')).toBe(true);
+    expect(text).not.toContain('provider snapshots idle; commands ready');
+    expect(foregroundStyledTextCellExists(result.frames.at(-1)!, 'AppShell')).toBe(true);
     for (const block of standardBlocks) {
       expect(text).toContain(`Page: ${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);

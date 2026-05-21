@@ -6,6 +6,7 @@ import {
   defineBlock,
   validateBlockMetadata,
   validateBlockPackageManifest,
+  type BlockRenderResult,
   type BlockMetadata,
 } from './block-metadata.js';
 import {
@@ -284,6 +285,30 @@ describe('first-party standard block definitions', () => {
     ]));
   });
 
+  it('renders interactive and static standard blocks as surfaces while preserving text lowering modes', () => {
+    const slots = {
+      navigation: 'Docs nav',
+      content: 'Blocks guide',
+      inspector: 'Current block: ReaderSurface',
+      status: 'Ready',
+    };
+    const interactive = appShellBlock.render({ mode: 'interactive', slots, config: { width: 64 } });
+    const staticOutput = appShellBlock.render({ mode: 'static', slots, config: { width: 64 } });
+    const pipe = appShellBlock.render({ mode: 'pipe', slots });
+    const accessible = appShellBlock.render({ mode: 'accessible', slots });
+
+    if (!isSurfaceOutput(interactive) || !isSurfaceOutput(staticOutput)) {
+      throw new Error('interactive and static AppShell output should be surfaces');
+    }
+    expect(typeof pipe.output).toBe('string');
+    expect(typeof accessible.output).toBe('string');
+    expect(surfaceText(interactive.output)).toContain('AppShell');
+    expect(surfaceText(interactive.output)).toContain('Navigation');
+    expect(surfaceText(interactive.output)).toContain('Docs nav');
+    expect(pipe.output).toContain('navigation: Docs nav');
+    expect(accessible.output).toContain('Navigation: Docs nav');
+  });
+
   it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',
@@ -392,6 +417,30 @@ describe('first-party standard block definitions', () => {
     expect(report).toMatchObject({ passed: true });
   });
 });
+
+function isSurfaceOutput(
+  result: BlockRenderResult<unknown>,
+): result is BlockRenderResult<{ width: number; height: number; get(x: number, y: number): { char?: string } }> {
+  const output = result.output;
+  return Boolean(
+    output
+      && typeof output === 'object'
+      && typeof (output as { width?: unknown }).width === 'number'
+      && typeof (output as { height?: unknown }).height === 'number'
+      && typeof (output as { get?: unknown }).get === 'function',
+  );
+}
+
+function surfaceText(surface: { width: number; height: number; get(x: number, y: number): { char?: string } }): string {
+  let text = '';
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      text += surface.get(x, y).char || ' ';
+    }
+    text += '\n';
+  }
+  return text;
+}
 
 const spyMetadata: BlockMetadata = {
   packageName: '@flyingrobots/bijou',

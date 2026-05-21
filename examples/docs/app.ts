@@ -1015,75 +1015,23 @@ function standardBlockExampleSurface(
   ctx: BijouContext,
 ): Surface {
   const cardWidth = Math.max(30, Math.min(78, width));
+  const rendered = block.render({
+    mode: 'interactive',
+    slots: standardBlockExampleSlots(block.metadata.blockName),
+    config: { width: cardWidth },
+  });
 
-  switch (block.metadata.blockName) {
-    case 'AppShell':
-      return boxSurface(column([
-        line('navigation  Guides / Components / Blocks'),
-        line('content     ReaderSurface: DOGFOOD Blocks'),
-        line('inspector   InspectorPanel: selected block facts'),
-        line('status      provider snapshots idle; commands ready'),
-        line('overlays    none'),
-      ]), {
-        title: 'AppShell live example',
-        width: cardWidth,
-        borderToken: ctx.border('primary'),
-        padding: { left: 1, right: 1 },
-        ctx,
-      });
-    case 'ReaderSurface':
-      return boxSurface(contentSurface(markdown([
-        '# DOGFOOD Blocks',
-        '',
-        'ReaderSurface presents validated content with optional navigation and outline context.',
-        '',
-        '- metadata declares slots and variants',
-        '- data contracts describe boundary needs',
-        '- commands express user intent',
-      ].join('\n'), {
-        width: Math.max(24, cardWidth - 6),
-        ctx,
-      })), {
-        title: 'ReaderSurface live example',
-        width: cardWidth,
-        borderToken: ctx.border('primary'),
-        padding: { left: 1, right: 1 },
-        ctx,
-      });
-    case 'InspectorPanel':
-      return boxSurface(contentSurface(inspector({
-        title: 'InspectorPanel live example',
-        currentValue: 'ReaderSurface',
-        sections: [
-          {
-            title: 'Selection',
-            content: 'standard block definition',
-          },
-          {
-            title: 'Facts',
-            content: 'data: reader.article; command: reader.selectHeading',
-            tone: 'muted',
-          },
-        ],
-        width: Math.max(24, cardWidth - 4),
-        borderToken: ctx.border('muted'),
-        ctx,
-      })), {
-        title: 'InspectorPanel shell',
-        width: cardWidth,
-        borderToken: ctx.border('primary'),
-        padding: { left: 1, right: 1 },
-        ctx,
-      });
-    default:
-      return boxSurface(paragraphSurface(block.metadata.docs.summary, Math.max(24, cardWidth - 6)), {
-        title: `${block.metadata.blockName} live example`,
-        width: cardWidth,
-        borderToken: ctx.border('primary'),
-        padding: { left: 1, right: 1 },
-        ctx,
-      });
+  if (isSurfaceLike(rendered.output)) {
+    return rendered.output;
   }
+
+  return boxSurface(contentSurface(blockRenderOutputText(rendered.output)), {
+    title: `${block.metadata.blockName} live example`,
+    width: cardWidth,
+    borderToken: ctx.border('primary'),
+    padding: { left: 1, right: 1 },
+    ctx,
+  });
 }
 
 function standardBlockLoweringPreviewText(block: BlockDefinition): string {
@@ -1147,13 +1095,13 @@ function standardBlockDocumentationText(block: BlockDefinition): string {
 
 function blockRenderOutputText(output: unknown): string {
   if (typeof output === 'string') {
-    return compactInlineText(output);
+    return compactPreviewText(output);
   }
   if (isSurfaceLike(output)) {
-    return compactInlineText(surfacePlainText(output));
+    return `${output.width}x${output.height}`;
   }
   try {
-    return compactInlineText(JSON.stringify(output));
+    return compactPreviewText(JSON.stringify(output));
   } catch {
     return String(output);
   }
@@ -1183,6 +1131,13 @@ function surfacePlainText(surface: Surface): string {
 
 function compactInlineText(value: string): string {
   return value.replace(/\s+/g, ' ').trim() || '-';
+}
+
+function compactPreviewText(value: string, maxLength = 120): string {
+  const compacted = compactInlineText(value);
+  return compacted.length <= maxLength
+    ? compacted
+    : `${compacted.slice(0, Math.max(0, maxLength - 1))}…`;
 }
 
 function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {

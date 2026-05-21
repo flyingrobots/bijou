@@ -261,6 +261,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Standard block TUI rendering** — First-party standard blocks now return
+  surface-backed output in interactive and static modes while preserving text
+  output for pipe and accessible modes, so DOGFOOD can display the actual block
+  render result instead of a hand-written preview mock.
 - **DOGFOOD Blocks preview rendering** — The Blocks preview now composes live
   block example `Surface`s directly instead of flattening them into accordion
   text before render, preserving TUI styling and bordered example surfaces.
