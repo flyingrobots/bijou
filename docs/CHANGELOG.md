@@ -67,10 +67,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   beside Components, with pages for what blocks are, how to author them,
   pre-made first-party blocks, a live surface-backed preview of standard block
   pages, and how block declarations lower across modes. The preview renders one
-  inline page per standard block with a live example surface, live lowering
-  preview, and live documentation generated from the public `standardBlocks`,
-  `standardBlockStories`, and package-manifest exports rather than copied
-  tables.
+  selectable side-nav page per standard block with a live example surface, live
+  lowering preview, and live documentation generated from the public
+  `standardBlocks`, `standardBlockStories`, and package-manifest exports rather
+  than copied tables, so DOGFOOD no longer stacks every block preview into one
+  giant reader document.
 - **First-party standard block definitions for `bijou`** —
   `@flyingrobots/bijou` now exports `appShellBlock`, `readerSurfaceBlock`,
   `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`,

@@ -172,6 +172,7 @@ const BLOCKS_PAGE_ID = 'blocks';
 const PACKAGES_PAGE_ID = 'packages';
 const PHILOSOPHY_PAGE_ID = 'philosophy';
 const RELEASE_PAGE_ID = 'release';
+const BLOCK_PREVIEW_GUIDE_ID = 'blocks-preview';
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_STANDARD_NAV_WIDTH = 28;
 const DOCS_NARROW_NAV_WIDTH = 26;
@@ -393,12 +394,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: BLOCKS_PRE_MADE_TEXT,
   },
   {
-    id: 'blocks-preview',
+    id: BLOCK_PREVIEW_GUIDE_ID,
     pageId: BLOCKS_PAGE_ID,
     title: 'Block Preview',
     summary: 'A code-backed preview index for standard blocks, variants, and declared stories.',
     body: BLOCKS_PREVIEW_TEXT,
   },
+  ...standardBlocks.map(blockPreviewGuideDoc),
   {
     id: 'blocks-lowering',
     pageId: BLOCKS_PAGE_ID,
@@ -953,7 +955,27 @@ function formatDocsList(values: readonly string[]): string {
   return values.length === 0 ? '-' : values.join(', ');
 }
 
+function blockPreviewGuideId(block: BlockDefinition): string {
+  return `${BLOCK_PREVIEW_GUIDE_ID}-${slugify(block.metadata.blockName)}`;
+}
+
+function blockPreviewGuideDoc(block: BlockDefinition): GuideDoc {
+  return {
+    id: blockPreviewGuideId(block),
+    pageId: BLOCKS_PAGE_ID,
+    title: `  ${block.metadata.blockName}`,
+    summary: block.metadata.docs.summary,
+    body: standardBlockDocumentationText(block),
+  };
+}
+
+function standardBlockForPreviewGuide(doc: GuideDoc): BlockDefinition | undefined {
+  if (doc.pageId !== BLOCKS_PAGE_ID) return undefined;
+  return standardBlocks.find((block) => blockPreviewGuideId(block) === doc.id);
+}
+
 function renderBlocksPreviewPane(
+  block: BlockDefinition,
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
@@ -961,10 +983,6 @@ function renderBlocksPreviewPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(28, paneWidth - 6);
-  const sections = standardBlocks.flatMap((block, index) => {
-    const section = standardBlockLivePreviewSurface(block, bodyWidth, ctx, theme, localization);
-    return index === 0 ? [section] : [spacer(1, 1), section];
-  });
 
   return insetPaneSurface(column([
     themedSeparatorSurface(
@@ -974,7 +992,7 @@ function renderBlocksPreviewPane(
       theme,
     ),
     spacer(1, 1),
-    ...sections,
+    standardBlockLivePreviewSurface(block, bodyWidth, ctx, theme, localization),
   ]), width);
 }
 
@@ -3058,8 +3076,9 @@ function renderGuideReaderPane(
     ]), width);
   }
 
-  if (pageId === BLOCKS_PAGE_ID && doc.id === 'blocks-preview') {
-    return renderBlocksPreviewPane(width, ctx, theme, localization);
+  const standardBlock = standardBlockForPreviewGuide(doc);
+  if (standardBlock !== undefined) {
+    return renderBlocksPreviewPane(standardBlock, width, ctx, theme, localization);
   }
 
   return insetPaneSurface(column([
