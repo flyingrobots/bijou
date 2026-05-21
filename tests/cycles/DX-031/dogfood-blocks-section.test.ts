@@ -107,8 +107,11 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).toContain('static mode');
     expect(text).toContain('pipe mode');
     expect(text).toContain('accessible mode');
-    expect(text).toContain('surface output:');
+    expect(text).toContain('facts: 6');
     expect(text).toContain('documentation');
+    expect(text).not.toContain('surface output:');
+    expect(text).not.toContain('entity:region.navigation=present');
+    expect(text).not.toContain('entity:slot.navigation=present');
     expect(text).not.toContain('interactive:');
     expect(text).not.toContain('static:');
     expect(text).not.toContain('pipe:');

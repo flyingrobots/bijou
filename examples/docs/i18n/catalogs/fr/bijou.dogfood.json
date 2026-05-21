@@ -76,15 +76,6 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
-        "id": "blocks.preview.surfaceOutput"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {}
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",

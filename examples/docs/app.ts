@@ -73,6 +73,7 @@ import {
   column,
   contentSurface,
   line,
+  row,
   spacer,
   textSurface,
 } from '../_shared/example-surfaces.js';
@@ -1043,19 +1044,31 @@ function standardBlockLoweringPreviewSurface(
   localization: LocalizationPort,
 ): Surface {
   const safeWidth = Math.max(30, Math.min(78, width));
-  const modeCards = block.metadata.modes.flatMap((mode, index) => {
-    const modeCard = standardBlockModePreviewSurface(
-      block,
-      mode as OutputMode,
-      safeWidth,
-      ctx,
-      theme,
-      localization,
-    );
-    return index === 0 ? [modeCard] : [spacer(1, 1), modeCard];
-  });
+  const useColumns = safeWidth >= 68;
+  const gap = useColumns ? 2 : 0;
+  const cardWidth = useColumns
+    ? Math.max(30, Math.floor((safeWidth - gap) / 2))
+    : safeWidth;
+  const cards = block.metadata.modes.map((mode) => standardBlockModePreviewSurface(
+    block,
+    mode as OutputMode,
+    cardWidth,
+    ctx,
+    theme,
+    localization,
+  ));
+  const modeRows: Surface[] = [];
 
-  return column(modeCards);
+  for (let index = 0; index < cards.length; index += useColumns ? 2 : 1) {
+    const left = cards[index]!;
+    const right = useColumns ? cards[index + 1] : undefined;
+    const modeRow = right === undefined
+      ? left
+      : row([left, spacer(gap, 1), right]);
+    modeRows.push(...(modeRows.length === 0 ? [modeRow] : [spacer(1, 1), modeRow]));
+  }
+
+  return column(modeRows);
 }
 
 function standardBlockModePreviewSurface(
@@ -1075,19 +1088,14 @@ function standardBlockModePreviewSurface(
     config: { width: innerWidth },
   });
   const output = isSurfaceLike(result.output)
-    ? paragraphSurface(dogfoodText(
-      localization,
-      'blocks.preview.surfaceOutput',
-      'surface output: {width}x{height}',
-      { width: result.output.width, height: result.output.height },
-    ), innerWidth)
-    : paragraphSurface(blockRenderOutputText(result.output, 320), innerWidth);
-  const facts = formatDocsList((result.facts ?? []).map((fact) => `${fact.kind}:${fact.key}=${fact.value}`));
+    ? modeSurfacePreview(result.output, innerWidth)
+    : modeTextPreview(blockRenderOutputText(result.output, 220), innerWidth);
+  const facts = result.facts ?? [];
   const factsLine = dogfoodText(
     localization,
     'blocks.preview.loweringFacts',
-    'facts: {facts}',
-    { facts: compactPreviewText(facts, 240) },
+    'facts: {count}',
+    { count: facts.length },
   );
 
   return boxSurface(column([
@@ -1105,6 +1113,27 @@ function standardBlockModePreviewSurface(
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },
     ctx,
+  });
+}
+
+function modeSurfacePreview(surface: Surface, width: number): Surface {
+  return viewportSurface({
+    content: surface,
+    width,
+    height: Math.min(6, surface.height),
+    showScrollbar: surface.height > 6,
+    scrollbarMode: 'overlay',
+  });
+}
+
+function modeTextPreview(text: string, width: number): Surface {
+  const wrapped = paragraphSurface(text, width);
+  return viewportSurface({
+    content: wrapped,
+    width,
+    height: Math.min(5, wrapped.height),
+    showScrollbar: wrapped.height > 5,
+    scrollbarMode: 'overlay',
   });
 }
 

@@ -53,7 +53,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "facts: {facts}"
+        "en": "facts: {count}"
       }
     },
     {
@@ -87,17 +87,6 @@
       "sourceLocale": "en",
       "values": {
         "en": "blocks • live preview"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "blocks.preview.surfaceOutput"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "surface output: {width}x{height}"
       }
     },
     {
