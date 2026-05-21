@@ -6,6 +6,8 @@ import { createDocsApp } from '../../../examples/docs/app.js';
 
 const KEY_ENTER = '\r';
 const KEY_NEXT_TAB = ']';
+const KEY_TAB = '\t';
+const KEY_BOTTOM = 'G';
 
 function blockPreviewGuideId(blockName: string): string {
   const slug = blockName
@@ -161,6 +163,37 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         expect(text).not.toContain(`Page: ${otherBlock.metadata.blockName}`);
       }
     }
+  });
+
+  it('resets the guide content scroll when selecting another block preview', async () => {
+    const [firstBlock, secondBlock] = standardBlocks;
+    expect(firstBlock).toBeDefined();
+    expect(secondBlock).toBeDefined();
+
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 60 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const result = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock!.metadata.blockName) },
+        },
+      },
+      { key: KEY_TAB },
+      { key: KEY_BOTTOM },
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(secondBlock!.metadata.blockName) },
+        },
+      },
+    ], { ctx });
+    const model = result.model as any;
+    const text = frameText(result.frames.at(-1)!);
+
+    expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
+    expect(text).toContain(`Page: ${secondBlock!.metadata.blockName}`);
+    expect(text).toContain('Live example');
   });
 
   it('renders block lowering posture from the standard block mode declarations', async () => {

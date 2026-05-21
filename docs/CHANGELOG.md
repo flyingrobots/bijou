@@ -71,7 +71,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   lowering preview, and live documentation generated from the public
   `standardBlocks`, `standardBlockStories`, and package-manifest exports rather
   than copied tables, so DOGFOOD no longer stacks every block preview into one
-  giant reader document.
+  giant reader document. Guide content scroll now resets when a selected guide
+  page changes, so block previews open at their live example instead of
+  inheriting a stale scroll offset from the previous page.
 - **First-party standard block definitions for `bijou`** —
   `@flyingrobots/bijou` now exports `appShellBlock`, `readerSurfaceBlock`,
   `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`,

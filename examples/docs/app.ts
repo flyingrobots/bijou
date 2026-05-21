@@ -3803,6 +3803,37 @@ function syncDocsExplorerViewportLayout(
     : docsModel;
 }
 
+function resetGuideContentScrollOnGuideSelection(
+  previousDocsModel: FrameModel<DocsExplorerModel>,
+  nextDocsModel: FrameModel<DocsExplorerModel>,
+): FrameModel<DocsExplorerModel> {
+  let nextScrollByPage = nextDocsModel.scrollByPage;
+  let changed = false;
+
+  for (const [pageId, nextPageModel] of Object.entries(nextDocsModel.pageModels)) {
+    if (pageId === COMPONENTS_PAGE_ID) continue;
+    const previousSelectedGuideId = previousDocsModel.pageModels[pageId]?.selectedGuideId;
+    if (previousSelectedGuideId === nextPageModel.selectedGuideId) continue;
+
+    const pageScroll = nextScrollByPage[pageId] ?? {};
+    const guideContentScroll = pageScroll['guide-content'];
+    if ((guideContentScroll?.x ?? 0) === 0 && (guideContentScroll?.y ?? 0) === 0) continue;
+
+    nextScrollByPage = {
+      ...nextScrollByPage,
+      [pageId]: {
+        ...pageScroll,
+        'guide-content': { x: 0, y: 0 },
+      },
+    };
+    changed = true;
+  }
+
+  return changed
+    ? { ...nextDocsModel, scrollByPage: nextScrollByPage }
+    : nextDocsModel;
+}
+
 function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
   const initialLocale = resolveDogfoodInitialLocale(options);
   const showMissingLocalizationMarkers = shouldShowMissingLocalizationMarkers(options);
@@ -3844,7 +3875,8 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
     model: RootModel,
   ): [RootModel, Cmd<RootMsg>[]] {
     const [docsModel, cmds] = explorer.update(message, model.docsModel);
-    const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(docsModel));
+    const resetDocsModel = resetGuideContentScrollOnGuideSelection(model.docsModel, docsModel);
+    const syncedDocsModel = syncDocsSharedSettings(syncDocsExplorerViewportLayout(resetDocsModel));
     return [{
       ...model,
       docsModel: syncedDocsModel,
