@@ -51,7 +51,7 @@
     "version": "bash scripts/version.sh"
   },
   "overrides": {
-    "hono": "4.12.14",
+    "hono": "4.12.21",
     "picomatch": "^4.0.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
