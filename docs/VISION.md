@@ -17,6 +17,10 @@ mindmap
             Accessible
             Localizable
             Resilient Viewports
+        Product Surfaces
+            Blocks
+            Localization
+            DOGFOOD Proof
         Empirical Documentation
             DOGFOOD
             Living Field Guide
@@ -38,10 +42,20 @@ A rendering foundation built on typed arrays and zero-allocation hot paths. The 
 ### 3. Humane Interaction
 A shell model that remains truthful under the pressures of keyboard, mouse, compact viewports, and localization. Accessibility and internationalization are substrate properties, not afterthoughts.
 
-### 4. Empirical Documentation
-DOGFOOD is the canonical proving ground. Every component and pattern is verified in a living product surface within the repository.
+### 4. Product Surfaces
+Bijou's architecture becomes credible only when it survives visible product
+surfaces. Blocks and localization are the current pressure points: Blocks must
+move from contracts into real reusable product assemblies, and localization must
+make DOGFOOD visibly usable without hiding missing translations behind copied
+English fallback data.
 
-### 5. Agent-First Legibility
+### 5. Empirical Documentation
+DOGFOOD is the canonical proving ground. Every component, Block, localization
+flow, and pattern is verified in a living product surface within the repository.
+Documentation should not merely describe the system; it should expose the system
+working under real product pressure.
+
+### 6. Agent-First Legibility
 The system is designed to be codable and inspectable by both humans and AI. MCP rendering services and interactive documentation provide a machine-readable interface to the toolkit.
 
 ---
