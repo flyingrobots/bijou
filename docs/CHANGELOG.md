@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD locale preference persistence** — DOGFOOD now separates locale
+  discovery from preference persistence. Startup resolves an explicit locale
+  override first, then a persisted locale preference, then the host locale port,
+  and finally the default locale. The Node DOGFOOD entrypoint supplies a
+  file-backed preference adapter, while the docs app sees only the
+  `DogfoodLocalePreferencePort` and writes normalized locale ids when the
+  Settings language action changes the selected locale.
 - **DOGFOOD chrome localization coverage** — DOGFOOD now moves top-level docs
   navigation and first settings chrome labels through the source string table
   and generated locale catalogs. Spanish, French, and German catalogs now cover

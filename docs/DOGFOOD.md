@@ -10,11 +10,13 @@ Bijou engine.
 npm run dogfood
 ```
 
-DOGFOOD initializes its language through the host locale adapter and then lets
-users change the preferred language from the Settings drawer (`F2`). The docs
-app consumes this through a locale port rather than reading process state from
-view code, so localization remains behind the same hexagonal boundary as the
-rest of the host integration.
+DOGFOOD initializes its language through an explicit preference port first, then
+falls back to the host locale adapter and finally the project default. Users can
+change the preferred language from the Settings drawer (`F2`), and the Node
+entrypoint persists that locale id through a small file-backed adapter. The docs
+app consumes preference and locale ports rather than reading process or
+filesystem state from view code, so localization remains behind the same
+hexagonal boundary as the rest of the host integration.
 
 To inspect and enforce the current source-level localization debt:
 ```bash
@@ -91,7 +93,8 @@ operators need when learning or validating Bijou.
 - **Blocks Section**: A first-class Blocks lane covering block purpose,
   authoring, first-party blocks, live accordion previews, and lowering posture.
 - **Locale Preference**: The Settings drawer can switch DOGFOOD's preferred
-  language after startup, while startup itself uses the host locale adapter.
+  language after startup, and the Node entrypoint persists that choice through a
+  port/adapter before falling back to the host locale adapter.
 - **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining
   localizable source strings by DOGFOOD surface and fails when the baseline
   increases.

@@ -4,6 +4,11 @@ export interface DogfoodLocalePort {
   preferredLocale(): string | undefined;
 }
 
+export interface DogfoodLocalePreferencePort {
+  readPreferredLocale(): string | undefined;
+  writePreferredLocale(locale: string): void;
+}
+
 export interface DogfoodLocaleOption {
   readonly id: string;
   readonly label: string;
@@ -75,15 +80,21 @@ export function resolveDogfoodInitialLocale(
   options: {
     readonly locale?: string;
     readonly localePort?: DogfoodLocalePort;
+    readonly localePreferencePort?: DogfoodLocalePreferencePort;
   },
 ): DogfoodLocaleOption {
-  return resolveDogfoodLocale(options.locale ?? options.localePort?.preferredLocale());
+  return resolveDogfoodLocale(
+    options.locale
+      ?? options.localePreferencePort?.readPreferredLocale()
+      ?? options.localePort?.preferredLocale(),
+  );
 }
 
 export function resolveDogfoodRuntimeLocale(
   options: {
     readonly locale?: string;
     readonly localePort?: DogfoodLocalePort;
+    readonly localePreferencePort?: DogfoodLocalePreferencePort;
   },
 ): string {
   if (options.locale !== undefined) {

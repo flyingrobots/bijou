@@ -93,6 +93,7 @@ import {
   resolveDogfoodInitialLocale,
   resolveDogfoodLocale,
   resolveDogfoodRuntimeLocale,
+  type DogfoodLocalePreferencePort,
   type DogfoodLocalePort,
 } from './locale.js';
 import {
@@ -741,6 +742,7 @@ const componentsPageKeys = createKeyMap<ExplorerMsg>()
 interface DocsAppOptions {
   readonly locale?: string;
   readonly localePort?: DogfoodLocalePort;
+  readonly localePreferencePort?: DogfoodLocalePreferencePort;
   readonly direction?: I18nDirection;
   readonly showMissingLocalizationMarkers?: boolean;
   readonly extraI18nCatalogs?: readonly I18nCatalog[];
@@ -784,12 +786,13 @@ function formatI18nList(i18n: I18nRuntime | undefined, values: readonly string[]
 
 function applyDogfoodLocale(
   i18n: I18nRuntime,
-  options: Pick<DocsAppOptions, 'direction'>,
+  options: Pick<DocsAppOptions, 'direction' | 'localePreferencePort'>,
   locale: string,
 ): void {
   const option = resolveDogfoodLocale(locale);
   loadDogfoodRuntimeCatalogs(i18n, option.id);
   void i18n.setLocale(option.id, options.direction ?? option.direction);
+  options.localePreferencePort?.writePreferredLocale(option.id);
 }
 
 function loadDogfoodRuntimeCatalogs(i18n: I18nRuntime, locale: string): void {

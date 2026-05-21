@@ -92,6 +92,28 @@ replace the old selected-locale catalog payload. Views should ask the runtime
 for localized strings; they should not read CSV, JSON files, process locale
 state, or translation provider handles directly.
 
+## Persist Locale Preference
+
+DOGFOOD keeps the selected language behind a preference port:
+
+```ts
+interface DogfoodLocalePreferencePort {
+  readPreferredLocale(): string | undefined;
+  writePreferredLocale(locale: string): void;
+}
+```
+
+Startup resolves locale in this order:
+
+1. explicit app option for tests or host override
+2. persisted preference from the preference port
+3. operating-system locale from the host locale port
+4. project default locale
+
+The Node entrypoint supplies a file-backed adapter. Core DOGFOOD app code only
+receives the port, so views do not read home directories, environment variables,
+or filesystem paths.
+
 In non-production builds, missing selected-locale strings should be loud instead
 of silently readable. DOGFOOD uses a bright missing-localization marker for that
 path:
@@ -123,6 +145,7 @@ npm run dogfood:i18n:export -- --format json --bundle /tmp/dogfood-catalog.json
 ## Architecture Rules
 
 - Keep localization behind runtime ports and adapters.
+- Keep locale preference persistence behind an explicit preference port.
 - Keep string-table conversion in `@flyingrobots/bijou-i18n-tools`.
 - Keep filesystem reads and writes in `@flyingrobots/bijou-i18n-tools-node`.
 - Keep runtime payloads selected-locale only.
