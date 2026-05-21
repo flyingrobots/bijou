@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Localization port contract for `bijou-i18n`** —
+  `@flyingrobots/bijou-i18n` now exports `LocalizationPort`,
+  `LocalizationRequest`, `LocalizedObject`, localization status/issue/fact
+  types, and `createRuntimeLocalizationPort()`. Runtime-backed localization
+  resolution returns immutable structured objects that preserve key, locale,
+  direction, entry kind, translated/fallback/missing status, value, issues, and
+  facts instead of exposing only naked strings. DOGFOOD now routes ordinary
+  docs text lookup through the localization port while keeping catalog loading
+  and locale activation at the app composition boundary.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n

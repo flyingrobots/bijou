@@ -7,6 +7,8 @@ filesystem adapters. The rule is simple:
 source string table
   -> generated per-locale runtime catalogs
   -> English fallback catalog plus selected locale loaded by the runtime
+  -> runtime-backed LocalizationPort
+  -> localized objects consumed by views
 ```
 
 Runtime code should not parse spreadsheets, CSV files, or all languages at
@@ -18,7 +20,8 @@ directory for the i18n runtime.
 ## Package Roles
 
 - `@flyingrobots/bijou-i18n`: runtime catalogs, locale switching, fallback
-  lookup, direction, and formatting ports.
+  lookup, direction, formatting ports, and the app-facing `LocalizationPort`
+  contract.
 - `@flyingrobots/bijou-i18n-tools`: provider-neutral authoring tools for string
   tables, workbook exchange, stale detection, and runtime catalog generation.
 - `@flyingrobots/bijou-i18n-tools-node`: Node filesystem helpers for reading
@@ -88,9 +91,22 @@ const runtime = await createI18nRuntimeAsync({
 ```
 
 Switching language should load the new locale's generated JSON catalogs and
-replace the old selected-locale catalog payload. Views should ask the runtime
-for localized strings; they should not read CSV, JSON files, process locale
-state, or translation provider handles directly.
+replace the old selected-locale catalog payload. App composition can keep the
+runtime so it can activate catalogs, but views should use a `LocalizationPort`
+and receive localized objects. They should not read CSV, JSON files, process
+locale state, or translation provider handles directly.
+
+```ts
+import {
+  createRuntimeLocalizationPort,
+  type LocalizationPort,
+} from '@flyingrobots/bijou-i18n';
+
+const localization: LocalizationPort = createRuntimeLocalizationPort(runtime);
+const label = localization.resolve<string>({
+  key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
+});
+```
 
 In non-production builds, missing selected-locale strings should be loud instead
 of silently readable. DOGFOOD uses a bright missing-localization marker for that
@@ -123,6 +139,8 @@ npm run dogfood:i18n:export -- --format json --bundle /tmp/dogfood-catalog.json
 ## Architecture Rules
 
 - Keep localization behind runtime ports and adapters.
+- Resolve app/view copy through `LocalizationPort`, not direct runtime string
+  lookups.
 - Keep string-table conversion in `@flyingrobots/bijou-i18n-tools`.
 - Keep filesystem reads and writes in `@flyingrobots/bijou-i18n-tools-node`.
 - Keep runtime payloads selected-locale only.

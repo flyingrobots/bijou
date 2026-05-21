@@ -16,3 +16,18 @@ export {
   type I18nRuntime,
   type I18nRuntimeOptions,
 } from './runtime.js';
+
+export {
+  createRuntimeLocalizationPort,
+  freezeLocalizedObject,
+  freezeLocalizedValue,
+  type LocalizedObject,
+  type LocalizationFact,
+  type LocalizationFactKind,
+  type LocalizationIssue,
+  type LocalizationIssueCode,
+  type LocalizationPort,
+  type LocalizationRequest,
+  type LocalizationStatus,
+  type RuntimeLocalizationPortSource,
+} from './localization.js';

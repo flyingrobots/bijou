@@ -13,6 +13,8 @@ The in-memory localization runtime for Bijou.
 - explicit fallback catalogs
 - injectable missing-localization message formatting
 - async locale loader support for runtime-integrated catalog activation
+- an application-facing `LocalizationPort` that resolves structured localized
+  objects
 
 This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in `@flyingrobots/bijou-i18n-tools`.
 
@@ -87,6 +89,37 @@ Once created, the runtime can preload and activate locales explicitly:
 await runtime.preloadLocale('de');
 await runtime.setLocale('de');
 ```
+
+## Localization Port
+
+Use `LocalizationPort` at application and view boundaries when callers need a
+localized object instead of a concrete runtime:
+
+```ts
+import {
+  createI18nRuntime,
+  createRuntimeLocalizationPort,
+} from '@flyingrobots/bijou-i18n';
+
+const runtime = createI18nRuntime({
+  locale: 'fr',
+  direction: 'ltr',
+  fallbackLocale: 'en',
+  fallbackCatalogs: [englishCatalog],
+  catalogs: [frenchCatalog],
+});
+const localization = createRuntimeLocalizationPort(runtime);
+
+const title = localization.resolve<string>({
+  key: { namespace: 'app', id: 'title' },
+});
+```
+
+`resolve()` returns a frozen localized object with the key, locale, direction,
+entry kind, translated/fallback/missing status, value, issues, and facts. That
+keeps rendering code away from catalog loading, filesystem paths, CSV data, and
+runtime mutation details while preserving enough state for tooling and lower
+modes.
 
 ## Documentation
 

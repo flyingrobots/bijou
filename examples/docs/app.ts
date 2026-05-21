@@ -63,9 +63,11 @@ import {
 } from '../../packages/bijou-tui/src/index.js';
 import {
   createI18nRuntime,
+  createRuntimeLocalizationPort,
   type I18nCatalog,
   type I18nDirection,
   type I18nRuntime,
+  type LocalizationPort,
 } from '../../packages/bijou-i18n/src/index.js';
 import {
   column,
@@ -101,6 +103,11 @@ import {
   dogfoodI18nCatalogsForLocale,
 } from './i18n/dogfood-catalog.js';
 import { dogfoodMissingLocalizationMessage } from './i18n/missing-localization.js';
+import {
+  dogfoodLocalizedText,
+  formatLocalizedList,
+  localizedText,
+} from './localization.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -748,37 +755,22 @@ interface DocsAppOptions {
   readonly initialSelectedStoryId?: string;
 }
 
-function dogfoodText(
-  i18n: I18nRuntime | undefined,
-  id: string,
-  fallback: string,
-  values: Readonly<Record<string, unknown>> = {},
-): string {
-  if (i18n == null) return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
-  try {
-    return i18n.t({ namespace: DOGFOOD_I18N_NAMESPACE, id }, values);
-  } catch {
-    return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
-  }
-}
-
 function shellText(
-  i18n: I18nRuntime | undefined,
+  localization: LocalizationPort | undefined,
   id: string,
   fallback: string,
   values: Readonly<Record<string, unknown>> = {},
 ): string {
-  if (i18n == null) return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
-  try {
-    return i18n.t({ namespace: FRAME_I18N_CATALOG.namespace, id }, values);
-  } catch {
-    return fallback.replace(/\{([^}]+)\}/g, (_match, rawKey: string) => String(values[rawKey] ?? `{${rawKey}}`));
-  }
+  return localizedText(localization, FRAME_I18N_CATALOG.namespace, id, fallback, values);
 }
 
-function formatI18nList(i18n: I18nRuntime | undefined, values: readonly string[]): string {
-  if (i18n == null) return values.join(', ');
-  return i18n.formatList(values, i18n.locale);
+function dogfoodText(
+  localization: LocalizationPort | undefined,
+  id: string,
+  fallback: string,
+  values: Readonly<Record<string, unknown>> = {},
+): string {
+  return dogfoodLocalizedText(localization, id, fallback, values);
 }
 
 function applyDogfoodLocale(
@@ -807,14 +799,14 @@ function shouldShowMissingLocalizationMarkers(
   return options.showMissingLocalizationMarkers ?? process.env.NODE_ENV !== 'production';
 }
 
-function dogfoodLocaleSettingDescription(currentLocale: string, i18n?: I18nRuntime): string {
+function dogfoodLocaleSettingDescription(currentLocale: string, localization?: LocalizationPort): string {
   return dogfoodText(
-    i18n,
+    localization,
     'settings.language.description',
     'Current language: {language}. Options: {options}.',
     {
-      language: dogfoodLocaleLabel(currentLocale, i18n),
-      options: dogfoodLocaleOptionsText(i18n),
+      language: dogfoodLocaleLabel(currentLocale, localization),
+      options: dogfoodLocaleOptionsText(localization),
     },
   );
 }
@@ -1197,20 +1189,20 @@ function guideItemsForPage(pageId: DocsPageId): readonly { label: string; value:
   }));
 }
 
-function pageTitle(pageId: DocsPageId, i18n?: I18nRuntime): string {
+function pageTitle(pageId: DocsPageId, localization?: LocalizationPort): string {
   switch (pageId) {
     case GUIDES_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.guides', 'Guides');
+      return dogfoodText(localization, 'docs.page.guides', 'Guides');
     case COMPONENTS_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.components', 'Components');
+      return dogfoodText(localization, 'docs.page.components', 'Components');
     case BLOCKS_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.blocks', 'Blocks');
+      return dogfoodText(localization, 'docs.page.blocks', 'Blocks');
     case PACKAGES_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.packages', 'Packages');
+      return dogfoodText(localization, 'docs.page.packages', 'Packages');
     case PHILOSOPHY_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.philosophy', 'Philosophy');
+      return dogfoodText(localization, 'docs.page.philosophy', 'Philosophy');
     case RELEASE_PAGE_ID:
-      return dogfoodText(i18n, 'docs.page.release', 'Release');
+      return dogfoodText(localization, 'docs.page.release', 'Release');
   }
 }
 
@@ -1539,7 +1531,7 @@ function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, ind
   return activateGuideRow(focusGuideRow(model, index), pageId);
 }
 
-function createLandingRenderer(getCtx: () => BijouContext, i18n: I18nRuntime): (model: RootModel) => Surface {
+function createLandingRenderer(getCtx: () => BijouContext, localization: LocalizationPort): (model: RootModel) => Surface {
   const cache: LandingFrameCache = {};
 
   return (model: RootModel): Surface => {
@@ -1580,14 +1572,14 @@ function createLandingRenderer(getCtx: () => BijouContext, i18n: I18nRuntime): (
       ? FLYING_ROBOTS_LARGE_LINES
       : FLYING_ROBOTS_SMALL_LINES;
     const wordmark = createWordmarkSurface(wordmarkGlyphs, quantizedTimeMs, tokens);
-    const staticSurfaces = getLandingStaticSurfaces(tokens, i18n);
-    const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, i18n);
-    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, i18n);
+    const staticSurfaces = getLandingStaticSurfaces(tokens, localization);
+    const promptLine = createLandingPromptSurface(tokens, quantizedTimeMs, localization);
+    const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, localization);
     const dogfoodPanel = getLandingDogfoodPanel(
       Math.max(28, Math.min(width - 6, 88)),
       ctx,
       tokens,
-      i18n,
+      localization,
     );
     const panelPromptGap = 1;
     const promptWordmarkGap = 1;
@@ -1878,41 +1870,41 @@ function quantizeLandingFps(quality: LandingQualityProfile, fps: number): number
   return Math.max(1, Math.round(fps / quality.fpsStep) * quality.fpsStep);
 }
 
-function landingQualityProfileLabel(quality: LandingQualityProfile, i18n?: I18nRuntime): string {
+function landingQualityProfileLabel(quality: LandingQualityProfile, localization?: LocalizationPort): string {
   switch (quality.id) {
     case 'full':
-      return dogfoodText(i18n, 'landing.quality.profile.full', 'full');
+      return dogfoodText(localization, 'landing.quality.profile.full', 'full');
     case 'balanced':
-      return dogfoodText(i18n, 'landing.quality.profile.balanced', 'balanced');
+      return dogfoodText(localization, 'landing.quality.profile.balanced', 'balanced');
     case 'ultra':
-      return dogfoodText(i18n, 'landing.quality.profile.performance', 'performance');
+      return dogfoodText(localization, 'landing.quality.profile.performance', 'performance');
     default:
       return quality.id;
   }
 }
 
-function landingQualityModeLabel(mode: LandingQualityMode, i18n?: I18nRuntime): string {
+function landingQualityModeLabel(mode: LandingQualityMode, localization?: LocalizationPort): string {
   switch (mode) {
     case 'auto':
-      return dogfoodText(i18n, 'landing.quality.auto', 'Auto');
+      return dogfoodText(localization, 'landing.quality.auto', 'Auto');
     case 'quality':
-      return dogfoodText(i18n, 'landing.quality.quality', 'Quality');
+      return dogfoodText(localization, 'landing.quality.quality', 'Quality');
     case 'balanced':
-      return dogfoodText(i18n, 'landing.quality.balanced', 'Balanced');
+      return dogfoodText(localization, 'landing.quality.balanced', 'Balanced');
     case 'performance':
-      return dogfoodText(i18n, 'landing.quality.performance', 'Performance');
+      return dogfoodText(localization, 'landing.quality.performance', 'Performance');
   }
 }
 
 function landingQualityBadgeLabel(
   quality: LandingQualityProfile,
   mode: LandingQualityMode,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): string {
   if (mode === 'auto') {
-    return `auto/${landingQualityProfileLabel(quality, i18n)}`;
+    return `auto/${landingQualityProfileLabel(quality, localization)}`;
   }
-  return landingQualityModeLabel(mode, i18n).toLowerCase();
+  return landingQualityModeLabel(mode, localization).toLowerCase();
 }
 
 function nextLandingQualityMode(mode: LandingQualityMode): LandingQualityMode {
@@ -1945,50 +1937,50 @@ function landingQualitySettingValue(
   width: number,
   height: number,
   mode: LandingQualityMode,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): string {
-  if (mode !== 'auto') return landingQualityModeLabel(mode, i18n);
-  return `${landingQualityModeLabel(mode, i18n)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode), i18n)})`;
+  if (mode !== 'auto') return landingQualityModeLabel(mode, localization);
+  return `${landingQualityModeLabel(mode, localization)} (${landingQualityProfileLabel(resolveLandingQuality(width, height, mode), localization)})`;
 }
 
 function landingQualitySettingDescription(
   width: number,
   height: number,
   mode: LandingQualityMode,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): string {
-  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode), i18n);
-  const options = formatI18nList(i18n, [
-    landingQualityModeLabel('auto', i18n),
-    landingQualityModeLabel('quality', i18n),
-    landingQualityModeLabel('balanced', i18n),
-    landingQualityModeLabel('performance', i18n),
+  const currentProfile = landingQualityProfileLabel(resolveLandingQuality(width, height, mode), localization);
+  const options = formatLocalizedList(localization, [
+    landingQualityModeLabel('auto', localization),
+    landingQualityModeLabel('quality', localization),
+    landingQualityModeLabel('balanced', localization),
+    landingQualityModeLabel('performance', localization),
   ]);
   switch (mode) {
     case 'auto':
       return dogfoodText(
-        i18n,
+        localization,
         'settings.landingQuality.description.auto',
         'Adapts render cost to terminal size. Current auto profile: {profile}. Options: {options}.',
         { profile: currentProfile, options },
       );
     case 'quality':
       return dogfoodText(
-        i18n,
+        localization,
         'settings.landingQuality.description.quality',
         'Prioritizes the richest title treatment even on larger terminals. Options: {options}.',
         { options },
       );
     case 'balanced':
       return dogfoodText(
-        i18n,
+        localization,
         'settings.landingQuality.description.balanced',
         'Keeps the title screen expressive while reducing render work on larger terminals. Options: {options}.',
         { options },
       );
     case 'performance':
       return dogfoodText(
-        i18n,
+        localization,
         'settings.landingQuality.description.performance',
         'Minimizes title-screen work for giant terminals and slower emulators. Options: {options}.',
         { options },
@@ -2028,11 +2020,11 @@ function updateLandingFps(current: number, dtSeconds: number): number {
   return Math.max(1, Math.round((current * (1 - LANDING_FPS_ALPHA)) + (instantFps * LANDING_FPS_ALPHA)));
 }
 
-function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime): {
+function getLandingStaticSurfaces(tokens: LandingThemeTokens, localization: LocalizationPort): {
   readonly footerControls: Surface;
   readonly footerVersion: Surface;
 } {
-  const controlsText = dogfoodText(i18n, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
+  const controlsText = dogfoodText(localization, 'landing.footer.controls', LANDING_CONTROLS_TEXT);
   const cacheKey = `${tokens.id}:${controlsText}`;
   const cached = LANDING_STATIC_SURFACE_CACHE.get(cacheKey);
   if (cached) return cached;
@@ -2058,9 +2050,9 @@ function getLandingStaticSurfaces(tokens: LandingThemeTokens, i18n: I18nRuntime)
 function createLandingPromptSurface(
   tokens: LandingThemeTokens,
   timeMs: number,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): Surface {
-  const promptText = dogfoodText(i18n, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
+  const promptText = dogfoodText(localization, 'landing.prompt.enter', ENTER_PROMPT_TEXT);
   const highlightStart = promptText.indexOf('[');
   const highlightEnd = promptText.indexOf(']');
   const time = timeMs / 1000;
@@ -2097,9 +2089,9 @@ function getLandingFpsBadge(
   fps: number,
   quality: LandingQualityProfile,
   mode: LandingQualityMode,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): Surface {
-  const qualityLabel = landingQualityBadgeLabel(quality, mode, i18n);
+  const qualityLabel = landingQualityBadgeLabel(quality, mode, localization);
   const key = `${tokens.id}:${fps}:${quality.id}:${mode}:${qualityLabel}`;
   const cached = LANDING_FPS_BADGE_CACHE.get(key);
   if (cached) return cached;
@@ -2118,11 +2110,11 @@ function getLandingDogfoodPanel(
   width: number,
   ctx: BijouContext,
   tokens: LandingThemeTokens,
-  i18n?: I18nRuntime,
+  localization?: LocalizationPort,
 ): Surface {
-  const title = dogfoodText(i18n, 'landing.dogfood.title', 'DOGFOOD');
+  const title = dogfoodText(localization, 'landing.dogfood.title', 'DOGFOOD');
   const expansion = dogfoodText(
-    i18n,
+    localization,
     'landing.dogfood.expansion',
     'Documentation Of Good Foundational Onboarding and Discovery',
   );
@@ -2222,7 +2214,7 @@ function applyLandingThemeSelection(
   };
 }
 
-function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode, i18n?: I18nRuntime): RootModel {
+function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode, localization?: LocalizationPort): RootModel {
   const activePageModel = model.docsModel.pageModels[model.docsModel.activePageId];
   if (activePageModel == null || activePageModel.landingQualityMode === mode) return model;
 
@@ -2235,10 +2227,10 @@ function applyLandingQualitySelection(model: RootModel, mode: LandingQualityMode
     )),
     landingToast: {
       message: dogfoodText(
-        i18n,
+        localization,
         'landing.toast.quality',
         'Landing quality: {quality}',
-        { quality: landingQualityModeLabel(mode, i18n) },
+        { quality: landingQualityModeLabel(mode, localization) },
       ),
       expiresAtMs: model.landingTimeMs + 1600,
     },
@@ -2716,7 +2708,7 @@ function renderEmptyStoryPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(28, paneWidth - 6);
@@ -2724,7 +2716,7 @@ function renderEmptyStoryPane(
   const intro = boxSurface(column([
     paragraphSurface(
       dogfoodText(
-        i18n,
+        localization,
         'docs.empty.intro.body',
         'Bijou is a surface-native terminal UI framework for building styled, stateful, testable TUIs without dropping back into stringly view code.',
       ),
@@ -2733,14 +2725,14 @@ function renderEmptyStoryPane(
     spacer(),
     paragraphSurface(
       dogfoodText(
-        i18n,
+        localization,
         'docs.empty.intro.body2',
         'DOGFOOD is the living field guide for the framework. The docs, previews, shell, and teaching surfaces are built in Bijou itself so the documentation exercises the same runtime and design system it describes.',
       ),
       Math.max(24, bodyWidth - 2),
     ),
   ]), {
-    title: dogfoodText(i18n, 'docs.empty.intro.title', 'What is Bijou?'),
+    title: dogfoodText(localization, 'docs.empty.intro.title', 'What is Bijou?'),
     width: Math.max(24, paneWidth),
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },
@@ -2750,7 +2742,7 @@ function renderEmptyStoryPane(
   const coverage = boxSurface(column([
     paragraphSurface(
       dogfoodText(
-        i18n,
+        localization,
         'docs.empty.coverage.body',
         'DOGFOOD currently documents {documented} of {total} canonical component families. This field guide is honest about current coverage and will keep expanding over time.',
         {
@@ -2769,7 +2761,7 @@ function renderEmptyStoryPane(
     })),
     spacer(),
     line(dogfoodText(
-      i18n,
+      localization,
       'docs.empty.coverage.status',
       '{documented}/{total} families • {percent}%',
       {
@@ -2779,7 +2771,7 @@ function renderEmptyStoryPane(
       },
     )),
   ]), {
-    title: dogfoodText(i18n, 'docs.empty.coverage.title', 'Documentation coverage'),
+    title: dogfoodText(localization, 'docs.empty.coverage.title', 'Documentation coverage'),
     width: Math.max(24, paneWidth),
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },
@@ -2787,13 +2779,13 @@ function renderEmptyStoryPane(
   });
 
   const guide = boxSurface(column([
-    line(dogfoodText(i18n, 'docs.empty.guide.step1', '1. Browse component families in the left lane.')),
-    line(dogfoodText(i18n, 'docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.')),
-    line(dogfoodText(i18n, 'docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.')),
-    line(dogfoodText(i18n, 'docs.empty.guide.step4', '4. Press / to search by component name at any time.')),
-    line(dogfoodText(i18n, 'docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step1', '1. Browse component families in the left lane.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step2', '2. Press Enter to expand a family or open a component.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step3', '3. Use Tab to move focus between families, docs, and variants.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step4', '4. Press / to search by component name at any time.')),
+    line(dogfoodText(localization, 'docs.empty.guide.step5', '5. Press F2 for settings, ? for help, and q or Esc to quit.')),
   ]), {
-    title: dogfoodText(i18n, 'docs.empty.guide.title', 'How to use these docs'),
+    title: dogfoodText(localization, 'docs.empty.guide.title', 'How to use these docs'),
     width: Math.max(24, paneWidth),
     borderToken: docsThemeMutedBorderToken(theme),
     padding: { left: 1, right: 1 },
@@ -2801,7 +2793,7 @@ function renderEmptyStoryPane(
   });
 
   return insetPaneSurface(column([
-    themedSeparatorSurface(dogfoodText(i18n, 'docs.separator.welcome', 'welcome to bijou'), paneWidth, ctx, theme),
+    themedSeparatorSurface(dogfoodText(localization, 'docs.separator.welcome', 'welcome to bijou'), paneWidth, ctx, theme),
     spacer(1, 1),
     intro,
     spacer(1, 1),
@@ -2816,11 +2808,11 @@ function renderStoryPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): Surface {
   const story = selectedStory(model);
   if (story == null) {
-    return renderEmptyStoryPane(width, ctx, theme, i18n);
+    return renderEmptyStoryPane(width, ctx, theme, localization);
   }
 
   const paneWidth = resolvePaneInnerWidth(width);
@@ -2943,7 +2935,7 @@ function renderGuideNavPane(
   height: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
@@ -2962,7 +2954,7 @@ function renderGuideNavPane(
   });
 
   return insetPaneSurface(column([
-    themedSeparatorSurface(pageTitle(pageId, i18n).toLowerCase(), paneWidth, ctx, theme),
+    themedSeparatorSurface(pageTitle(pageId, localization).toLowerCase(), paneWidth, ctx, theme),
     body,
   ]), width);
 }
@@ -3012,7 +3004,7 @@ function renderGuideInfoPane(
   width: number,
   ctx: BijouContext,
   theme: LandingThemeTokens,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
@@ -3035,11 +3027,11 @@ function renderGuideInfoPane(
   })();
 
   return insetPaneSurface(column([
-    themedSeparatorSurface(`section • ${pageTitle(pageId, i18n).toLowerCase()}`, paneWidth, ctx, theme),
+    themedSeparatorSurface(`section • ${pageTitle(pageId, localization).toLowerCase()}`, paneWidth, ctx, theme),
     spacer(1, 1),
     contentSurface(inspector({
       title: 'guide info',
-      currentValue: doc?.title ?? pageTitle(pageId, i18n),
+      currentValue: doc?.title ?? pageTitle(pageId, localization),
       sections: [
         {
           title: 'Summary',
@@ -3060,36 +3052,36 @@ function renderGuideInfoPane(
   ]), width);
 }
 
-function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRuntime): string {
+function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization: LocalizationPort): string {
   const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
   const pageModel = model.pageModels[pageId];
   if (pageModel == null || !pageModel.showHints) {
-    return dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
+    return dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
   }
 
   const focusedPane = model.focusedPaneByPage[pageId];
   const story = pageModel.selectedStoryId == null ? undefined : findComponentStory(pageModel.selectedStoryId);
-  const paneSwitch = dogfoodText(i18n, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
+  const paneSwitch = dogfoodText(localization, 'docs.footer.paneSwitch', DOCS_PANE_SWITCH_HINT);
   const activeHint = (() => {
     if (pageId !== COMPONENTS_PAGE_ID) {
       switch (focusedPane) {
         case 'guide-nav':
           return dogfoodText(
-            i18n,
+            localization,
             'docs.footer.guideNav',
             '{paneSwitch} • ↑/↓ browse • Enter open',
             { paneSwitch },
           );
         case 'guide-content':
           return dogfoodText(
-            i18n,
+            localization,
             'docs.footer.guide',
             '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom',
             { paneSwitch },
           );
         case 'guide-meta':
           return dogfoodText(
-            i18n,
+            localization,
             'docs.footer.guideMeta',
             '{paneSwitch} • section overview',
             { paneSwitch },
@@ -3102,14 +3094,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRun
     switch (focusedPane) {
       case 'family-nav':
         return dogfoodText(
-          i18n,
+          localization,
           'docs.footer.family',
           '{paneSwitch} • ↑/↓ browse • Enter open • ←/→ collapse/expand',
           { paneSwitch },
         );
       case 'story-content':
         return dogfoodText(
-          i18n,
+          localization,
           'docs.footer.story',
           '{paneSwitch} • j/k scroll • d/u page • g/G top/bottom',
           { paneSwitch },
@@ -3118,7 +3110,7 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRun
         return story == null
           ? paneSwitch
           : dogfoodText(
-            i18n,
+            localization,
             'docs.footer.variants',
             '{paneSwitch} • ↑/↓ variant • ,/. cycle • 1-4 profiles',
             { paneSwitch },
@@ -3128,7 +3120,7 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, i18n: I18nRun
     }
   })();
 
-  const shellHint = dogfoodText(i18n, 'docs.footer.shell', DOCS_SHELL_HINT);
+  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
   return activeHint == null ? shellHint : `${shellHint} • ${activeHint}`;
 }
 
@@ -3222,7 +3214,7 @@ function createComponentsPageLayout(
   model: DocsExplorerModel,
   theme: LandingThemeTokens,
   getCtx: () => BijouContext,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): FrameLayoutNode {
   const family: FrameLayoutNode = {
     kind: 'pane',
@@ -3234,7 +3226,7 @@ function createComponentsPageLayout(
     kind: 'pane',
     paneId: 'story-content',
     unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-    render: (width) => renderStoryPane(model, width, getCtx(), theme, i18n),
+    render: (width) => renderStoryPane(model, width, getCtx(), theme, localization),
   };
   const variants: FrameLayoutNode = {
     kind: 'pane',
@@ -3300,13 +3292,13 @@ function createGuidePageLayout(
   model: DocsExplorerModel,
   theme: LandingThemeTokens,
   getCtx: () => BijouContext,
-  i18n: I18nRuntime,
+  localization: LocalizationPort,
 ): FrameLayoutNode {
   const nav: FrameLayoutNode = {
     kind: 'pane',
     paneId: 'guide-nav',
     unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-    render: (width, height) => renderGuideNavPane(pageId, model, width, height, getCtx(), theme, i18n),
+    render: (width, height) => renderGuideNavPane(pageId, model, width, height, getCtx(), theme, localization),
   };
   const main: FrameLayoutNode = {
     kind: 'pane',
@@ -3318,7 +3310,7 @@ function createGuidePageLayout(
     kind: 'pane',
     paneId: 'guide-meta',
     unfocusedGutterToken: docsThemeUnfocusedGutterToken(theme),
-    render: (width) => renderGuideInfoPane(pageId, model, width, getCtx(), theme, i18n),
+    render: (width) => renderGuideInfoPane(pageId, model, width, getCtx(), theme, localization),
   };
 
   switch (model.layoutVariant) {
@@ -3377,6 +3369,7 @@ function createDocsExplorerApp(
   getCtx: () => BijouContext,
   onShellThemeChange: (ctx: BijouContext) => void,
   i18n: I18nRuntime,
+  localization: LocalizationPort,
   options: Pick<DocsAppOptions, 'direction' | 'initialPageId' | 'initialSelectedStoryId'> = {},
   initialLocale = 'en',
 ): FramedApp<DocsExplorerModel, DocsMsg> {
@@ -3391,13 +3384,13 @@ function createDocsExplorerApp(
     }),
     initialColumns: ctx.runtime.columns,
     initialRows: ctx.runtime.rows,
-    helpLineSource: ({ model }) => buildDocsFooterHint(model, i18n),
+    helpLineSource: ({ model }) => buildDocsFooterHint(model, localization),
     shellThemes: DOCS_SHELL_THEMES,
     pages: DOCS_SITE_PAGES.map((spec) => {
       if (spec.id === COMPONENTS_PAGE_ID) {
         return {
           id: spec.id,
-          title: pageTitle(spec.id, i18n),
+          title: pageTitle(spec.id, localization),
           keyMap: componentsPageKeys,
           init: () => [createInitialComponentsExplorerModel(ctx, initialLocale, options.initialSelectedStoryId), []],
           update(msg: FramePageMsg<DocsMsg>, model) {
@@ -3466,7 +3459,7 @@ function createDocsExplorerApp(
               },
             ];
           },
-          searchTitle: dogfoodText(i18n, 'docs.search.title', 'Search components'),
+          searchTitle: dogfoodText(localization, 'docs.search.title', 'Search components'),
           searchItems(model) {
             return COMPONENT_STORIES.map((story) => ({
               id: story.id,
@@ -3478,14 +3471,14 @@ function createDocsExplorerApp(
           },
           layout(model) {
             const theme = resolveLandingTheme(model.landingThemeIndex);
-            return createComponentsPageLayout(model, theme, getCtx, i18n);
+            return createComponentsPageLayout(model, theme, getCtx, localization);
           },
         };
       }
 
       return {
         id: spec.id,
-        title: pageTitle(spec.id, i18n),
+        title: pageTitle(spec.id, localization),
         init: () => [createInitialExplorerModel(ctx, spec.id, initialLocale), []],
         update(msg: FramePageMsg<DocsMsg>, model) {
           if (msg.type === 'mouse') {
@@ -3533,19 +3526,19 @@ function createDocsExplorerApp(
             mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
           }];
         },
-        searchTitle: `Search ${pageTitle(spec.id, i18n).toLowerCase()}`,
+        searchTitle: `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
         searchItems() {
           return guideDocsForPage(spec.id).map((doc) => ({
             id: doc.id,
             label: doc.title,
             description: doc.summary,
-            category: pageTitle(spec.id, i18n),
+            category: pageTitle(spec.id, localization),
             action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
           }));
         },
         layout(model) {
           const theme = resolveLandingTheme(model.landingThemeIndex);
-          return createGuidePageLayout(spec.id, model, theme, getCtx, i18n);
+          return createGuidePageLayout(spec.id, model, theme, getCtx, localization);
         },
       };
     }),
@@ -3563,64 +3556,64 @@ function createDocsExplorerApp(
         sections: [
         {
           id: 'shell',
-          title: dogfoodText(i18n, 'settings.section.shell', 'Shell'),
+          title: dogfoodText(localization, 'settings.section.shell', 'Shell'),
           rows: [{
             id: 'show-hints',
-            label: dogfoodText(i18n, 'settings.showHints.label', 'Show hints'),
-            description: dogfoodText(i18n, 'settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
+            label: dogfoodText(localization, 'settings.showHints.label', 'Show hints'),
+            description: dogfoodText(localization, 'settings.showHints.description', 'Show active-pane control cues in the footer. Turn this off for a quieter shell and use ? for the full key map.'),
             valueLabel: pageModel.showHints
-              ? dogfoodText(i18n, 'settings.showHints.on', 'On')
-              : dogfoodText(i18n, 'settings.showHints.off', 'Off'),
+              ? dogfoodText(localization, 'settings.showHints.on', 'On')
+              : dogfoodText(localization, 'settings.showHints.off', 'Off'),
             checked: pageModel.showHints,
             kind: 'toggle',
             action: { type: 'toggle-hints' },
             feedback: {
-              title: shellText(i18n, 'settings.title', 'Settings'),
+              title: shellText(localization, 'settings.title', 'Settings'),
               message: pageModel.showHints
-                ? dogfoodText(i18n, 'settings.showHints.feedback.off', 'Show hints turned off.')
-                : dogfoodText(i18n, 'settings.showHints.feedback.on', 'Show hints turned on.'),
+                ? dogfoodText(localization, 'settings.showHints.feedback.off', 'Show hints turned off.')
+                : dogfoodText(localization, 'settings.showHints.feedback.on', 'Show hints turned on.'),
             },
           }],
         },
         {
           id: 'localization',
-          title: dogfoodText(i18n, 'settings.section.localization', 'Localization'),
+          title: dogfoodText(localization, 'settings.section.localization', 'Localization'),
           rows: [{
             id: 'preferred-language',
-            label: dogfoodText(i18n, 'settings.language.label', 'Preferred language'),
-            description: dogfoodLocaleSettingDescription(pageModel.locale, i18n),
-            valueLabel: dogfoodLocaleLabel(pageModel.locale, i18n),
+            label: dogfoodText(localization, 'settings.language.label', 'Preferred language'),
+            description: dogfoodLocaleSettingDescription(pageModel.locale, localization),
+            valueLabel: dogfoodLocaleLabel(pageModel.locale, localization),
             kind: 'choice',
             action: { type: 'cycle-locale' },
             feedback: {
-              title: shellText(i18n, 'settings.title', 'Settings'),
+              title: shellText(localization, 'settings.title', 'Settings'),
               message: dogfoodText(
-                i18n,
+                localization,
                 'settings.language.feedback',
                 'Language set to {language}.',
-                { language: dogfoodLocaleLabel(nextLocale.id, i18n) },
+                { language: dogfoodLocaleLabel(nextLocale.id, localization) },
               ),
             },
           }],
         },
         {
           id: 'landing',
-          title: dogfoodText(i18n, 'settings.section.landing', 'Landing'),
+          title: dogfoodText(localization, 'settings.section.landing', 'Landing'),
           rows: [
             {
               id: 'landing-quality',
-              label: dogfoodText(i18n, 'settings.landingQuality.label', 'Landing quality'),
-              description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode, i18n),
-              valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode, i18n),
+              label: dogfoodText(localization, 'settings.landingQuality.label', 'Landing quality'),
+              description: landingQualitySettingDescription(model.columns, model.rows, pageModel.landingQualityMode, localization),
+              valueLabel: landingQualitySettingValue(model.columns, model.rows, pageModel.landingQualityMode, localization),
               kind: 'choice',
               action: { type: 'cycle-landing-quality' },
               feedback: {
-                title: shellText(i18n, 'settings.title', 'Settings'),
+                title: shellText(localization, 'settings.title', 'Settings'),
                 message: dogfoodText(
-                  i18n,
+                  localization,
                   'settings.landingQuality.feedback',
                   'Landing quality set to {quality}.',
-                  { quality: landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode), i18n) },
+                  { quality: landingQualityModeLabel(nextLandingQualityMode(pageModel.landingQualityMode), localization) },
                 ),
               },
             },
@@ -3742,10 +3735,11 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
   };
   const initialLocale = resolveDogfoodInitialLocale(options);
   const i18n = createDocsI18nRuntime(options);
+  const localization = createRuntimeLocalizationPort(i18n);
   const explorer = createDocsExplorerApp(() => currentCtx, (nextCtx) => {
     currentCtx = nextCtx;
-  }, i18n, options, initialLocale.id);
-  const renderLanding = createLandingRenderer(() => currentCtx, i18n);
+  }, i18n, localization, options, initialLocale.id);
+  const renderLanding = createLandingRenderer(() => currentCtx, localization);
   const initialRoute = options.initialRoute ?? 'landing';
 
   function mapExplorer(cmds: Cmd<FramedAppMsg<DocsMsg>>[]): Cmd<RootMsg>[] {
@@ -3846,10 +3840,10 @@ export function createDocsApp(ctx: BijouContext, options: DocsAppOptions = {}): 
             return [applyLandingThemeSelection(syncShellThemeContext, model, nextLandingThemeIndex(model.landingThemeIndex, 1)), []];
           }
           if (msg.key === 'up') {
-            return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
+            return [applyLandingQualitySelection(model, previousLandingQualityMode(resolveLandingQualityMode(model)), localization), []];
           }
           if (msg.key === 'down') {
-            return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model)), i18n), []];
+            return [applyLandingQualitySelection(model, nextLandingQualityMode(resolveLandingQualityMode(model)), localization), []];
           }
           if (!msg.ctrl && !msg.alt && /^[1-9]$/.test(msg.key)) {
             const themeIndex = Number(msg.key) - 1;

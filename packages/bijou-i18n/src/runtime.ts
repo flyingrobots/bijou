@@ -1,3 +1,11 @@
+import {
+  freezeLocalizedObject,
+  type LocalizedObject,
+  type LocalizationIssue,
+  type LocalizationRequest,
+  type LocalizationStatus,
+} from './localization.js';
+
 export type I18nDirection = 'ltr' | 'rtl' | 'auto';
 
 export interface I18nCatalogKey {
@@ -64,6 +72,7 @@ export interface I18nRuntime extends I18nFormatterPort {
   unloadCatalog(namespace: string): void;
   preloadLocale(locale: string): Promise<void>;
   setLocale(locale: string, direction?: I18nDirection): Promise<void>;
+  localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value>;
   t(key: I18nCatalogKey, values?: Readonly<Record<string, unknown>>): string;
   resource<T = unknown>(key: I18nCatalogKey): T | undefined;
 }
@@ -102,6 +111,12 @@ function interpolate(template: string, values: Readonly<Record<string, unknown>>
   });
 }
 
+interface LocalizedResolution<T> {
+  readonly status: LocalizationStatus;
+  readonly value?: T;
+  readonly issues: readonly LocalizationIssue[];
+}
+
 export function ref(key: I18nCatalogKey): I18nReference {
   return { $ref: key };
 }
@@ -138,14 +153,32 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     applyCatalogs(loaderCatalogs);
   }
 
-  function resolveLocalizedValue<T>(
+  function localizationIssue(
+    code: LocalizationIssue['code'],
+    key: I18nCatalogKey,
+    message: string,
+  ): LocalizationIssue {
+    return {
+      code,
+      key,
+      locale: currentLocale,
+      fallbackLocale,
+      message,
+    };
+  }
+
+  function resolveLocalizedValueResult<T>(
     entry: I18nCatalogEntry<T>,
     seen: Set<string>,
     options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
-  ): T | undefined {
+  ): LocalizedResolution<T> {
     const localized = entry.values[currentLocale];
     if (localized !== undefined) {
-      return resolveCandidate(localized, seen, options) as T;
+      return {
+        status: 'translated',
+        value: resolveCandidate(localized, seen, options) as T,
+        issues: [],
+      };
     }
 
     if (
@@ -153,13 +186,23 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       && currentLocale !== entry.sourceLocale
       && currentLocale !== fallbackLocale
     ) {
-      return options.missingMessage({
-        key: entry.key,
-        locale: currentLocale,
-        fallbackLocale,
-        sourceLocale: entry.sourceLocale,
-        reason: 'missing-locale',
-      }) as T;
+      return {
+        status: 'missing',
+        value: options.missingMessage({
+          key: entry.key,
+          locale: currentLocale,
+          fallbackLocale,
+          sourceLocale: entry.sourceLocale,
+          reason: 'missing-locale',
+        }) as T,
+        issues: [
+          localizationIssue(
+            'missing-locale',
+            entry.key,
+            `Missing selected-locale value for ${keyToString(entry.key)}`,
+          ),
+        ],
+      };
     }
 
     const candidates = [
@@ -172,10 +215,31 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (candidate === undefined) {
         continue;
       }
-      return resolveCandidate(candidate, seen, options) as T;
+      return {
+        status: 'fallback',
+        value: resolveCandidate(candidate, seen, options) as T,
+        issues: [],
+      };
     }
 
-    return undefined;
+    return {
+      status: 'missing',
+      issues: [
+        localizationIssue(
+          'missing-locale',
+          entry.key,
+          `Missing localized value for ${keyToString(entry.key)}`,
+        ),
+      ],
+    };
+  }
+
+  function resolveLocalizedValue<T>(
+    entry: I18nCatalogEntry<T>,
+    seen: Set<string>,
+    options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
+  ): T | undefined {
+    return resolveLocalizedValueResult(entry, seen, options).value;
   }
 
   function resolveCandidate<T>(
@@ -265,29 +329,122 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       }
       await activateLoaderLocale(locale);
     },
-    t(key, values = {}) {
-      const entry = entries.get(keyToString(key));
+    localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
+      const entry = entries.get(keyToString(request.key));
+      const kind = request.kind ?? entry?.kind ?? 'message';
+      const facts = [
+        { kind: 'locale' as const, key: 'locale', value: currentLocale },
+        { kind: 'direction' as const, key: 'direction', value: currentDirection },
+      ];
+
       if (entry === undefined) {
-        if (options.missingMessage !== undefined) {
-          return interpolate(options.missingMessage({
-            key,
+        const issue = localizationIssue(
+          'missing-key',
+          request.key,
+          `Missing i18n key: ${keyToString(request.key)}`,
+        );
+        const value = kind === 'message' && options.missingMessage !== undefined
+          ? interpolate(options.missingMessage({
+            key: request.key,
             locale: currentLocale,
             fallbackLocale,
             reason: 'missing-key',
-          }), values);
-        }
-        throw new Error(`Missing i18n key: ${keyToString(key)}`);
+          }), request.values ?? {}) as Value
+          : undefined;
+
+        return freezeLocalizedObject({
+          key: request.key,
+          locale: currentLocale,
+          fallbackLocale,
+          direction: currentDirection,
+          kind,
+          status: 'missing',
+          value,
+          issues: [issue],
+          facts: [
+            ...facts,
+            { kind: 'localization-status', key: 'status', value: 'missing' },
+            { kind: 'entry-kind', key: 'kind', value: kind },
+          ],
+        });
       }
-      if (entry.kind !== 'message') {
-        throw new Error(`Expected message entry for ${keyToString(key)} but found ${entry.kind}`);
+
+      if (request.kind !== undefined && entry.kind !== request.kind) {
+        const issue = localizationIssue(
+          'kind-mismatch',
+          request.key,
+          `Expected ${request.kind} entry for ${keyToString(request.key)} but found ${entry.kind}`,
+        );
+        return freezeLocalizedObject({
+          key: request.key,
+          locale: currentLocale,
+          fallbackLocale,
+          sourceLocale: entry.sourceLocale,
+          direction: currentDirection,
+          kind: entry.kind,
+          status: 'missing',
+          issues: [issue],
+          facts: [
+            ...facts,
+            { kind: 'localization-status', key: 'status', value: 'missing' },
+            { kind: 'entry-kind', key: 'kind', value: entry.kind },
+          ],
+        });
       }
-      const resolved = resolveLocalizedValue(entry, new Set<string>(), {
+
+      const resolved = resolveLocalizedValueResult<Value>(entry as I18nCatalogEntry<Value>, new Set<string>(), {
         missingMessage: options.missingMessage,
       });
-      if (typeof resolved !== 'string') {
+      let value = resolved.value;
+      const issues = [...resolved.issues];
+
+      if (entry.kind === 'message' && value !== undefined) {
+        if (typeof value !== 'string') {
+          issues.push(localizationIssue(
+            'invalid-message-value',
+            request.key,
+            `Resolved message for ${keyToString(request.key)} was not a string`,
+          ));
+          value = undefined;
+        } else {
+          value = interpolate(value, request.values ?? {}) as Value;
+        }
+      }
+
+      const status = issues.some((issue) => issue.code === 'invalid-message-value')
+        ? 'missing'
+        : resolved.status;
+
+      return freezeLocalizedObject({
+        key: request.key,
+        locale: currentLocale,
+        fallbackLocale,
+        sourceLocale: entry.sourceLocale,
+        direction: currentDirection,
+        kind: entry.kind,
+        status,
+        value,
+        issues,
+        facts: [
+          ...facts,
+          { kind: 'localization-status', key: 'status', value: status },
+          { kind: 'entry-kind', key: 'kind', value: entry.kind },
+        ],
+      });
+    },
+    t(key, values = {}) {
+      const entry = entries.get(keyToString(key));
+      if (entry !== undefined && entry.kind !== 'message') {
+        throw new Error(`Expected message entry for ${keyToString(key)} but found ${entry.kind}`);
+      }
+      const resolved = this.localize<string>({ key, kind: 'message', values });
+      if (resolved.value === undefined) {
+        throw new Error(`Missing i18n key: ${keyToString(key)}`);
+      }
+      if (typeof resolved.value !== 'string') {
         throw new Error(`Resolved message for ${keyToString(key)} was not a string`);
       }
-      return interpolate(resolved, values);
+      return resolved.value;
     },
     resource<T = unknown>(key: I18nCatalogKey): T | undefined {
       const entry = entries.get(keyToString(key));
