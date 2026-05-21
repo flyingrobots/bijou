@@ -30,27 +30,29 @@ describe('LX-018 runtime localization fallback behavior', () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 40 } });
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
+      initialPageId: 'components',
       locale: 'fr',
       showMissingLocalizationMarkers: true,
     });
     const result = await runScript(app, [], { ctx });
     const text = frameText(result.frames.at(-1)!);
 
-    expect(text).toContain('<MISSING LOC STRING KEY=bijou.dogfood:docs.page.guides>');
-    expect(text).not.toContain('[Guides]');
+    expect(text).toContain('<MISSING LOC STRING KEY=bijou.dogfood:docs.empty.coverage.title>');
+    expect(text).not.toContain('Documentation coverage');
   });
 
   it('uses English fallback strings in production mode when the selected locale is incomplete', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 40 } });
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
+      initialPageId: 'components',
       locale: 'fr',
       showMissingLocalizationMarkers: false,
     });
     const result = await runScript(app, [], { ctx });
     const text = frameText(result.frames.at(-1)!);
 
-    expect(text).toContain('[Guides]');
+    expect(text).toContain('Documentation coverage');
     expect(text).not.toContain('<MISSING LOC STRING KEY=');
   });
 
