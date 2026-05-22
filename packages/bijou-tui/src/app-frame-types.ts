@@ -34,6 +34,9 @@ export type FramePageMsg<Msg> = Msg | MouseMsg | PulseMsg;
 /** Typed tuple returned by framed pages from `init()` and `update()`. */
 export type FramePageUpdateResult<PageModel, Msg> = [PageModel, Cmd<Msg>[]];
 
+/** Static or model-resolved page text used for tab and search labels. */
+export type FramePageText<PageModel> = string | ((model: PageModel) => string);
+
 /** Wrapper that tags a user message with its originating page ID. */
 export interface PageScopedMsg<Msg> {
   readonly [PAGE_MSG_TOKEN]: true;

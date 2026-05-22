@@ -297,6 +297,19 @@ describe('bijou-i18n runtime', () => {
     expect(loader).toHaveBeenCalledTimes(1);
   });
 
+  it('commits no-loader locale switches synchronously for frame update loops', async () => {
+    const runtime = createI18nRuntime({
+      locale: 'en',
+      direction: 'ltr',
+    });
+
+    const localeSwitch = runtime.setLocale('fr', 'rtl');
+
+    expect(runtime.locale).toBe('fr');
+    expect(runtime.direction).toBe('rtl');
+    await expect(localeSwitch).resolves.toBeUndefined();
+  });
+
   it('uses explicit fallback catalogs when selected-locale catalogs omit source strings', () => {
     const runtime = createI18nRuntime({
       locale: 'fr',

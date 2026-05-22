@@ -300,6 +300,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **DOGFOOD locale page labels** — Framed page tab, layer, palette, and search
+  labels can now resolve from the active page model instead of being snapped at
+  app construction, and no-loader locale switches commit synchronously so
+  DOGFOOD language cycling refreshes visible shell labels in the next frame
+  without ignored asynchronous locale work.
 - **DOGFOOD locale catalog overrides** — Language cycling now reloads
   caller-provided extra i18n catalogs after generated DOGFOOD catalogs, so
   host and test catalog overrides survive selected-locale changes.

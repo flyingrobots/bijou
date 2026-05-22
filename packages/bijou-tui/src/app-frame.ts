@@ -77,6 +77,7 @@ import type {
   ObservedKeyRoute,
   PaletteAction,
   FramePageMsg,
+  FramePageText,
   FramePageUpdateResult,
   FramedApp,
   FramedAppRunOptions,
@@ -94,6 +95,7 @@ import {
   createFrameKeyMap,
   frameBodyRect,
   mergeBindingSources,
+  resolveFramePageText,
 } from './app-frame-utils.js';
 import type {
   ResolvedFrameShellTheme,
@@ -176,7 +178,7 @@ export interface FramePage<PageModel, Msg> {
   /** Stable page id. */
   readonly id: string;
   /** Tab title. */
-  readonly title: string;
+  readonly title: FramePageText<PageModel>;
   /** Page-level initializer. */
   init(): FramePageUpdateResult<PageModel, Msg>;
   /** Page-level updater (custom messages plus raw mouse forwarding). */
@@ -198,7 +200,7 @@ export interface FramePage<PageModel, Msg> {
   /** Optional page-scoped search items opened by the shell search action. */
   searchItems?: (model: PageModel) => readonly FrameCommandItem<Msg>[];
   /** Optional title used by the shell search surface. */
-  readonly searchTitle?: string;
+  readonly searchTitle?: FramePageText<PageModel>;
 }
 
 /** Custom command-palette item with optional message dispatch action. */
@@ -1970,21 +1972,22 @@ export function createFramedApp<PageModel, Msg>(
     const quitHint = frameMessage(options.i18n, 'quit.footer', 'Y quit • N stay');
     const paletteTitle = model.commandPaletteTitle
       ?? frameMessage(options.i18n, 'palette.title', 'Command Palette');
+    const activePageTitle = resolveFramePageText(activePage.title, activePageModel) ?? '';
     const searchTitle = model.commandPaletteTitle
-      ?? activePage.searchTitle
+      ?? resolveFramePageText(activePage.searchTitle, activePageModel)
       ?? frameMessage(options.i18n, 'search.title', 'Search');
     const notificationsTitle = notificationCenter == null
       ? frameMessage(options.i18n, 'notifications.title', 'Notifications')
       : `${notificationCenter.title} • ${frameNotificationFilterLabel(options.i18n, notificationCenter.activeFilter)}`;
     const pageLayers = activePage.layers?.(activePageModel);
     const workspaceLayer: FrameLayerMetadata = {
-      title: activePage.title,
+      title: activePageTitle,
       hintSource: workspaceHintSource,
       helpSource: workspaceHelpSource,
       ...pageLayers?.workspace,
     };
     const pageModalLayer: FrameLayerMetadata = {
-      title: activePage.title,
+      title: activePageTitle,
       hintSource: modalKeyMap ?? activePage.helpSource ?? activePage.keyMap,
       helpSource: mergeBindingSources(
         quitHelpKeys,

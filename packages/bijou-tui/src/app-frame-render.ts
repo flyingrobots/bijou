@@ -43,6 +43,7 @@ import {
   mergeMaps,
   offsetRect,
   fitLine,
+  resolveFramePageText,
 } from './app-frame-utils.js';
 import { normalizeViewOutput, normalizeViewOutputInto, type ViewOutput } from './view-output.js';
 import { paintStyledTextSurfaceWithBCSS } from './css/text-style.js';
@@ -522,7 +523,9 @@ export function resolveHeaderLine<PageModel, Msg>(
   const tabTargets: FrameHeaderTabTarget[] = [];
   const tabs = model.pageOrder.map((id, index) => {
     const page = pagesById.get(id)!;
-    const label = id === model.activePageId ? `[${page.title}]` : ` ${page.title} `;
+    const pageModel = model.pageModels[id]!;
+    const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
+    const label = id === model.activePageId ? `[${pageTitle}]` : ` ${pageTitle} `;
     const width = visibleLength(label);
     const startCol = cursor;
     const endCol = cursor + width - 1;

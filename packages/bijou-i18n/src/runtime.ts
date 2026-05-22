@@ -447,6 +447,14 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     },
     preloadLocale,
     async setLocale(locale, direction) {
+      if (options.loader === undefined) {
+        currentLocale = locale;
+        if (direction !== undefined) {
+          currentDirection = direction;
+        }
+        return;
+      }
+
       const catalogs = await loadLocaleCatalogs(locale);
       currentLocale = locale;
       if (direction !== undefined) {

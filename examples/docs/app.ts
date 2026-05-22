@@ -287,6 +287,7 @@ type ExplorerMsg =
   | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
   | { type: 'cycle-locale' }
+  | { type: 'locale-activated'; locale: string }
   | { type: 'cycle-landing-quality' }
   | { type: 'counter-block-intent'; action: CounterDemoIntentAction };
 
@@ -817,10 +818,23 @@ function applyDogfoodLocale(
   i18n: I18nRuntime,
   options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs'>,
   locale: string,
-): void {
+): Promise<string> {
   const option = resolveDogfoodLocale(locale);
   loadDogfoodRuntimeCatalogs(i18n, option.id, options.extraI18nCatalogs ?? []);
-  void i18n.setLocale(option.id, options.direction ?? option.direction);
+  return i18n
+    .setLocale(option.id, options.direction ?? option.direction)
+    .then(() => option.id);
+}
+
+function activateDogfoodLocale(
+  i18n: I18nRuntime,
+  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs'>,
+  locale: string,
+): Cmd<ExplorerMsg> {
+  return async () => ({
+    type: 'locale-activated',
+    locale: await applyDogfoodLocale(i18n, options, locale),
+  });
 }
 
 function loadDogfoodRuntimeCatalogs(
@@ -3584,7 +3598,7 @@ function createDocsExplorerApp(
       if (spec.id === COMPONENTS_PAGE_ID) {
         return {
           id: spec.id,
-          title: pageTitle(spec.id, localization),
+          title: () => pageTitle(spec.id, localization),
           keyMap: componentsPageKeys,
           init: () => [createInitialComponentsExplorerModel(ctx, initialLocale, options.initialSelectedStoryId), []],
           update(msg: FramePageMsg<DocsMsg>, model) {
@@ -3628,9 +3642,10 @@ function createDocsExplorerApp(
                 return [{ ...model, showHints: !model.showHints }, []];
               case 'cycle-locale': {
                 const nextLocale = nextDogfoodLocale(model.locale);
-                applyDogfoodLocale(i18n, options, nextLocale.id);
-                return [{ ...model, locale: nextLocale.id }, []];
+                return [model, [activateDogfoodLocale(i18n, options, nextLocale.id)]];
               }
+              case 'locale-activated':
+                return [{ ...model, locale: msg.locale }, []];
               case 'cycle-landing-quality':
                 return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
               default:
@@ -3653,7 +3668,7 @@ function createDocsExplorerApp(
               },
             ];
           },
-          searchTitle: dogfoodText(localization, 'docs.search.title', 'Search components'),
+          searchTitle: () => dogfoodText(localization, 'docs.search.title', 'Search components'),
           searchItems(model) {
             return COMPONENT_STORIES.map((story) => ({
               id: story.id,
@@ -3672,7 +3687,7 @@ function createDocsExplorerApp(
 
       return {
         id: spec.id,
-        title: pageTitle(spec.id, localization),
+        title: () => pageTitle(spec.id, localization),
         init: () => [createInitialExplorerModel(ctx, spec.id, initialLocale), []],
         update(msg: FramePageMsg<DocsMsg>, model) {
           if (msg.type === 'mouse') {
@@ -3717,9 +3732,10 @@ function createDocsExplorerApp(
               return [{ ...model, showHints: !model.showHints }, []];
             case 'cycle-locale': {
               const nextLocale = nextDogfoodLocale(model.locale);
-              applyDogfoodLocale(i18n, options, nextLocale.id);
-              return [{ ...model, locale: nextLocale.id }, []];
+              return [model, [activateDogfoodLocale(i18n, options, nextLocale.id)]];
             }
+            case 'locale-activated':
+              return [{ ...model, locale: msg.locale }, []];
             case 'cycle-landing-quality':
               return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
             case 'counter-block-intent':
@@ -3761,7 +3777,7 @@ function createDocsExplorerApp(
           }
           return inputAreas;
         },
-        searchTitle: `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
+        searchTitle: () => `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
         searchItems() {
           return guideDocsForPage(spec.id).map((doc) => ({
             id: doc.id,
