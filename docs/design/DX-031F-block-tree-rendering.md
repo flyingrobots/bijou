@@ -150,6 +150,8 @@ When focus moves onto a standard block row, the selected preview should move to
 that block so the side navigation, guide info pane, and live preview always
 describe the same block. This keeps the DOGFOOD Blocks page aligned with the
 Components gallery posture: browse a named item, see that item.
+The `Block Preview` parent row is a preview-group entry; opening it should land
+on the first concrete block preview rather than a prose inventory page.
 
 ## Acceptance Criteria
 
@@ -171,6 +173,8 @@ Components gallery posture: browse a named item, see that item.
   debug text as the live documentation surface.
 - DOGFOOD block rows in the side navigation select their corresponding preview
   when focused.
+- DOGFOOD's `Block Preview` group entry opens the first concrete standard block
+  preview instead of a prose overview.
 - DOGFOOD lower-mode previews summarize output and facts without rendering
   clipped nested mini-surfaces in the main preview page.
 - Recursive render depth is bounded and fails deterministically.

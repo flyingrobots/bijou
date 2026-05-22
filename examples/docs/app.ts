@@ -1549,14 +1549,24 @@ function selectedGuide(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc |
   return selected ?? docs[0];
 }
 
+function resolveSelectableGuideId(pageId: DocsPageId, guideId: string): string {
+  if (pageId === BLOCKS_PAGE_ID && guideId === BLOCK_PREVIEW_GUIDE_ID) {
+    const firstBlock = standardBlocks[0];
+    return firstBlock == null ? guideId : blockPreviewGuideId(firstBlock);
+  }
+
+  return guideId;
+}
+
 function selectGuide(pageId: DocsPageId, model: DocsExplorerModel, guideId?: string): DocsExplorerModel {
   if (guideId == null) return model;
+  const selectableGuideId = resolveSelectableGuideId(pageId, guideId);
   const docs = guideDocsForPage(pageId);
-  const index = docs.findIndex((doc) => doc.id === guideId);
+  const index = docs.findIndex((doc) => doc.id === selectableGuideId);
   if (index < 0) return model;
   return {
     ...model,
-    selectedGuideId: guideId,
+    selectedGuideId: selectableGuideId,
     guideState: {
       ...model.guideState,
       focusIndex: index,
@@ -1577,7 +1587,8 @@ function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, ind
 function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerModel): DocsExplorerModel {
   if (pageId !== BLOCKS_PAGE_ID) return model;
   const doc = focusedGuideDoc(pageId, model);
-  if (doc == null || standardBlockForPreviewGuide(doc) === undefined) return model;
+  if (doc == null) return model;
+  if (doc.id !== BLOCK_PREVIEW_GUIDE_ID && standardBlockForPreviewGuide(doc) === undefined) return model;
   return selectGuide(pageId, model, doc.id);
 }
 

@@ -83,10 +83,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   page changes, so block previews open at their live example instead of
   inheriting a stale scroll offset from the previous page. Standard block rows
   in the Blocks side navigation now select their preview when focused, and
-  lower-mode preview output is summarized as mode/fact data instead of rendering
-  clipped nested mini-surfaces inside the main preview. Standard block visual
-  sections also fit oversized nested child surfaces to the parent section so
-  rendered child blocks do not overrun AppShell preview regions.
+  opening the `Block Preview` group lands on the first concrete block preview
+  instead of a prose inventory page. Lower-mode preview output is summarized as
+  mode/fact data instead of rendering clipped nested mini-surfaces inside the
+  main preview. Standard block visual sections also fit oversized nested child
+  surfaces to the parent section so rendered child blocks do not overrun
+  AppShell preview regions.
 - **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
   built-in perf HUD surface toggled by the backtick key. The HUD reads the
   frame model's timing telemetry, works from workspace and active shell layers

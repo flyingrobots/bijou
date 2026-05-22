@@ -97,7 +97,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
   });
 
-  it('keeps the block preview overview as an index instead of one giant live preview stack', async () => {
+  it('opens the Block Preview group on the first standard block preview', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
 
@@ -108,13 +108,14 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       },
     }], { ctx });
     const text = frameText(result.frames.at(-1)!);
+    const firstBlockName = standardBlocks[0]!.metadata.blockName;
 
-    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe('blocks-preview');
-    expect(text).toContain('Block Preview');
-    expect(text).toContain('Available Blocks');
-    expect(text).not.toContain('Live example');
-    expect(text).not.toContain('Live lowering preview');
-    expect(text).not.toContain('Live documentation');
+    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(firstBlockName));
+    expect(text).toContain(`Page: ${firstBlockName}`);
+    expect(text).toContain('Live example');
+    expect(text).toContain('Live lowering preview');
+    expect(text).toContain('Live documentation');
+    expect(text).not.toContain('Available Blocks');
   });
 
   it('selects focused standard block rows from the Blocks side navigation', async () => {
@@ -127,7 +128,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: 'blocks-preview' },
+          msg: { type: 'select-guide', guideId: 'blocks-pre-made' },
         },
       },
       {
