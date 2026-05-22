@@ -77,7 +77,6 @@ import {
   column,
   contentSurface,
   line,
-  row,
   spacer,
   textSurface,
 } from '../_shared/example-surfaces.js';
@@ -1064,94 +1063,37 @@ function standardBlockLoweringPreviewSurface(
   localization: LocalizationPort,
 ): Surface {
   const safeWidth = Math.max(30, Math.min(78, width));
-  const useColumns = safeWidth >= 68;
-  const gap = useColumns ? 2 : 0;
-  const cardWidth = useColumns
-    ? Math.max(30, Math.floor((safeWidth - gap) / 2))
-    : safeWidth;
-  const cards = block.metadata.modes.map((mode) => standardBlockModePreviewSurface(
-    block,
-    mode as OutputMode,
-    cardWidth,
-    ctx,
-    theme,
-    localization,
-  ));
-  const modeRows: Surface[] = [];
-
-  for (let index = 0; index < cards.length; index += useColumns ? 2 : 1) {
-    const left = cards[index]!;
-    const right = useColumns ? cards[index + 1] : undefined;
-    const modeRow = right === undefined
-      ? left
-      : row([left, spacer(gap, 1), right]);
-    modeRows.push(...(modeRows.length === 0 ? [modeRow] : [spacer(1, 1), modeRow]));
-  }
-
-  return column(modeRows);
-}
-
-function standardBlockModePreviewSurface(
-  block: BlockDefinition,
-  mode: OutputMode,
-  width: number,
-  ctx: BijouContext,
-  theme: LandingThemeTokens,
-  localization: LocalizationPort,
-): Surface {
-  const cardWidth = Math.max(30, Math.min(78, width));
-  const innerWidth = Math.max(24, cardWidth - 4);
+  const innerWidth = Math.max(24, safeWidth - 4);
   const slots = standardBlockExampleSlots(block.metadata.blockName);
-  const result = renderBlockTree(blockRenderNode(block, {
-    mode,
-    slots,
-    config: { width: innerWidth },
-  }));
-  const output = isSurfaceLike(result.output)
-    ? modeSurfacePreview(result.output, innerWidth)
-    : modeTextPreview(blockRenderOutputText(result.output, 220), innerWidth);
-  const facts = result.facts ?? [];
-  const factsLine = dogfoodText(
-    localization,
-    'blocks.preview.loweringFacts',
-    'facts: {count}',
-    { count: facts.length },
-  );
-
-  return boxSurface(column([
-    output,
-    spacer(1, 1),
-    paragraphSurface(factsLine, innerWidth),
-  ]), {
-    title: dogfoodText(
+  const modeLines = block.metadata.modes.map((mode) => {
+    const result = renderBlockTree(blockRenderNode(block, {
+      mode: mode as OutputMode,
+      slots,
+      config: { width: innerWidth },
+    }));
+    const outputSummary = blockRenderOutputText(result.output, Math.max(36, innerWidth - 22));
+    const factsLine = dogfoodText(
+      localization,
+      'blocks.preview.loweringFacts',
+      'facts: {count}',
+      { count: result.facts?.length ?? 0 },
+    );
+    const modeLabel = dogfoodText(
       localization,
       'blocks.preview.modeTitle',
       '{mode} mode',
       { mode },
-    ),
-    width: cardWidth,
+    );
+
+    return `${modeLabel}: ${outputSummary}; ${factsLine}`;
+  });
+
+  return boxSurface(paragraphSurface(modeLines.join('\n'), innerWidth), {
+    title: dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview'),
+    width: safeWidth,
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },
     ctx,
-  });
-}
-
-function modeSurfacePreview(surface: Surface, width: number): Surface {
-  return viewportSurface({
-    content: surface,
-    width,
-    height: Math.min(6, surface.height),
-    showScrollbar: false,
-  });
-}
-
-function modeTextPreview(text: string, width: number): Surface {
-  const wrapped = paragraphSurface(text, width);
-  return viewportSurface({
-    content: wrapped,
-    width,
-    height: Math.min(5, wrapped.height),
-    showScrollbar: false,
   });
 }
 
@@ -1161,6 +1103,7 @@ function standardBlockExampleSlots(blockName: string): Readonly<Record<string, u
       return {
         navigation: 'Guides / Components / Blocks',
         content: blockRenderNode(readerSurfaceBlock, {
+          config: { width: 58 },
           slots: {
             content: 'ReaderSurface live content from DOGFOOD Blocks.',
             navigation: 'Blocks navigation',
@@ -1168,6 +1111,7 @@ function standardBlockExampleSlots(blockName: string): Readonly<Record<string, u
           },
         }),
         inspector: blockRenderNode(inspectorPanelBlock, {
+          config: { width: 58 },
           slots: {
             selection: 'ReaderSurface',
             details: ['schema-bound', 'provider-ready', 'command-aware'],
@@ -1256,18 +1200,6 @@ function isSurfaceLike(value: unknown): value is Surface {
       && typeof (value as Surface).height === 'number'
       && typeof (value as Surface).get === 'function',
   );
-}
-
-function surfacePlainText(surface: Surface): string {
-  const lines: string[] = [];
-  for (let y = 0; y < surface.height; y++) {
-    let text = '';
-    for (let x = 0; x < surface.width; x++) {
-      text += surface.get(x, y).char || ' ';
-    }
-    lines.push(text.trimEnd());
-  }
-  return lines.join('\n').trimEnd();
 }
 
 function compactInlineText(value: string): string {
@@ -1604,6 +1536,13 @@ function focusGuideRow(model: DocsExplorerModel, index: number): DocsExplorerMod
   };
 }
 
+function focusedGuideDoc(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc | undefined {
+  const guideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  return guideId == null
+    ? undefined
+    : guideDocsForPage(pageId).find((doc) => doc.id === guideId);
+}
+
 function selectedGuide(pageId: DocsPageId, model: DocsExplorerModel): GuideDoc | undefined {
   const docs = guideDocsForPage(pageId);
   const selected = docs.find((doc) => doc.id === model.selectedGuideId);
@@ -1633,6 +1572,13 @@ function activateGuideRow(model: DocsExplorerModel, pageId: DocsPageId): DocsExp
 
 function activateGuideRowIndex(model: DocsExplorerModel, pageId: DocsPageId, index: number): DocsExplorerModel {
   return activateGuideRow(focusGuideRow(model, index), pageId);
+}
+
+function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerModel): DocsExplorerModel {
+  if (pageId !== BLOCKS_PAGE_ID) return model;
+  const doc = focusedGuideDoc(pageId, model);
+  if (doc == null || standardBlockForPreviewGuide(doc) === undefined) return model;
+  return selectGuide(pageId, model, doc.id);
 }
 
 function createLandingRenderer(getCtx: () => BijouContext, localization: LocalizationPort): (model: RootModel) => Surface {
@@ -3597,14 +3543,22 @@ function createDocsExplorerApp(
             }, []];
           }
           switch (msg.type) {
-            case 'guide-next':
-              return [{ ...model, guideState: listFocusNext(model.guideState), previewTimeMs: 0 }, []];
-            case 'guide-prev':
-              return [{ ...model, guideState: listFocusPrev(model.guideState), previewTimeMs: 0 }, []];
-            case 'guide-page-down':
-              return [{ ...model, guideState: listPageDown(model.guideState), previewTimeMs: 0 }, []];
-            case 'guide-page-up':
-              return [{ ...model, guideState: listPageUp(model.guideState), previewTimeMs: 0 }, []];
+            case 'guide-next': {
+              const focusedModel = { ...model, guideState: listFocusNext(model.guideState), previewTimeMs: 0 };
+              return [selectFocusedBlockPreviewGuide(spec.id, focusedModel), []];
+            }
+            case 'guide-prev': {
+              const focusedModel = { ...model, guideState: listFocusPrev(model.guideState), previewTimeMs: 0 };
+              return [selectFocusedBlockPreviewGuide(spec.id, focusedModel), []];
+            }
+            case 'guide-page-down': {
+              const focusedModel = { ...model, guideState: listPageDown(model.guideState), previewTimeMs: 0 };
+              return [selectFocusedBlockPreviewGuide(spec.id, focusedModel), []];
+            }
+            case 'guide-page-up': {
+              const focusedModel = { ...model, guideState: listPageUp(model.guideState), previewTimeMs: 0 };
+              return [selectFocusedBlockPreviewGuide(spec.id, focusedModel), []];
+            }
             case 'activate-guide':
               return [{ ...activateGuideRow(model, spec.id), previewTimeMs: 0 }, []];
             case 'activate-guide-index':

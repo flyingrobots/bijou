@@ -117,6 +117,59 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).not.toContain('Live documentation');
   });
 
+  it('selects focused standard block rows from the Blocks side navigation', async () => {
+    const firstBlock = standardBlocks[0];
+    expect(firstBlock).toBeDefined();
+
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const result = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: 'blocks-preview' },
+        },
+      },
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'guide-next' },
+        },
+      },
+    ], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+    const blockName = firstBlock!.metadata.blockName;
+
+    expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
+    expect(text).toContain(`Page: ${blockName}`);
+    expect(text).toContain('Live example');
+    expect(text).not.toContain('Available Blocks');
+  });
+
+  it('keeps selected block pages preview-first at a normal DOGFOOD viewport', async () => {
+    const readerBlock = standardBlocks.find((block) => block.metadata.blockName === 'ReaderSurface');
+    expect(readerBlock).toBeDefined();
+
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+    const result = await runScript(app, [{
+      msg: {
+        type: 'docs',
+        msg: { type: 'select-guide', guideId: blockPreviewGuideId(readerBlock!.metadata.blockName) },
+      },
+    }], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+
+    expect(text).toContain('Live example');
+    expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
+    expect(text).toContain('Live lowering preview');
+    expect(text).toContain('interactive mode');
+    expect(text).toContain('static mode');
+    expect(text).not.toContain('Available Blocks');
+    expect(text).not.toContain('Contract: block metadata:');
+    expect(text).not.toContain('Source: packages/bijou/src/core/standard-blocks.ts');
+  });
+
   it('renders the selected standard block preview without stacking every block page', async () => {
     for (const block of standardBlocks) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });

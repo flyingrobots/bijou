@@ -141,9 +141,15 @@ preview output.
 
 The preview surface is still product UI, not a debug dump. The overview page may
 index available blocks and stories, but selected block pages should keep the
-live example first, show clipped lowering previews without embedded scrollbars,
-and present concise human documentation instead of raw compact metadata strings,
-source-path dumps, or full lowering fact payloads.
+live example first, summarize lower-mode output without clipped nested
+mini-surfaces, and present concise human documentation instead of raw compact
+metadata strings, source-path dumps, or full lowering fact payloads.
+
+The Blocks navigation is also a preview picker, not only a document outline.
+When focus moves onto a standard block row, the selected preview should move to
+that block so the side navigation, guide info pane, and live preview always
+describe the same block. This keeps the DOGFOOD Blocks page aligned with the
+Components gallery posture: browse a named item, see that item.
 
 ## Acceptance Criteria
 
@@ -159,8 +165,14 @@ source-path dumps, or full lowering fact payloads.
   mode.
 - Nested visual child surfaces preserve cell styling when rendered through
   parent block surfaces.
+- Oversized nested visual child surfaces are fitted to their parent section
+  instead of overrunning the parent block layout.
 - DOGFOOD selected block pages do not expose raw contract-summary or source-path
   debug text as the live documentation surface.
+- DOGFOOD block rows in the side navigation select their corresponding preview
+  when focused.
+- DOGFOOD lower-mode previews summarize output and facts without rendering
+  clipped nested mini-surfaces in the main preview page.
 - Recursive render depth is bounded and fails deterministically.
 - Lowering facts from nested blocks remain inspectable.
 

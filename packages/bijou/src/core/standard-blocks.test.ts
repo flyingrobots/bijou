@@ -399,6 +399,43 @@ describe('first-party standard block definitions', () => {
     });
   });
 
+  it('fits oversized child surfaces within parent visual sections', () => {
+    const wideChild = createSurface(96, 1);
+    wideChild.set(0, 0, { char: 'A' });
+    wideChild.set(95, 0, { char: 'Z' });
+    const wideBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'WideChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Oversized child surface test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? wideChild
+          : 'A',
+      }),
+    });
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 40 },
+      slots: {
+        content: blockRenderNode(wideBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    expect(rendered.output.width).toBe(40);
+    expect(findCell(rendered.output, 'A')).toBeDefined();
+    expect(findCell(rendered.output, 'Z')).toBeUndefined();
+  });
+
   it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',

@@ -583,11 +583,15 @@ function renderVisualSectionsSurface(
 ): Surface {
   const safeWidth = Math.max(30, Math.floor(width));
   const sectionWidth = Math.max(24, safeWidth - 4);
-  const sectionSurfaces = sections.map((section) => boxSurface(section.visualContent, {
-    title: section.label,
-    width: sectionWidth,
-    padding: { left: 1, right: 1 },
-  }));
+  const sectionContentWidth = Math.max(1, sectionWidth - 4);
+  const sectionSurfaces = sections.map((section) => {
+    const content = fitVisualContent(section.visualContent, sectionContentWidth);
+    return boxSurface(content, {
+      title: section.label,
+      width: sectionWidth,
+      padding: { left: 1, right: 1 },
+    });
+  });
 
   return boxSurface(stackSurfaces(sectionSurfaces, 1), {
     title: blockName,
@@ -758,6 +762,16 @@ function recordSlotText(value: object): string | undefined {
       return text === undefined ? [] : [`${key}: ${text}`];
     });
   return entries.length === 0 ? undefined : entries.join('; ');
+}
+
+function fitVisualContent(content: string | Surface, width: number): string | Surface {
+  if (!isSurfaceSlotValue(content) || content.width <= width) {
+    return content;
+  }
+
+  const clipped = createSurface(width, content.height);
+  clipped.blit(content, 0, 0);
+  return clipped;
 }
 
 function schemaError<Data = never>(code: string, message: string): BlockSchemaResult<Data> {
