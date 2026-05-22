@@ -286,16 +286,21 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     if (options.loader === undefined || loaderCache.has(locale)) {
       return;
     }
-    loaderCache.set(locale, await options.loader(locale));
+    const catalogs = await options.loader(locale);
+    loaderCache.set(locale, catalogs);
   }
 
-  async function activateLoaderLocale(locale: string): Promise<void> {
+  async function loadLocaleCatalogs(locale: string): Promise<readonly I18nCatalog[] | undefined> {
     if (options.loader === undefined) {
-      return;
+      return undefined;
     }
     await preloadLocale(locale);
+    return loaderCache.get(locale) ?? [];
+  }
+
+  function activateLoaderCatalogs(catalogs: readonly I18nCatalog[]): void {
     loaderCatalogs.clear();
-    for (const catalog of loaderCache.get(locale) ?? []) {
+    for (const catalog of catalogs) {
       rememberCatalog(loaderCatalogs, catalog);
     }
     rebuildCatalogState();
@@ -442,11 +447,14 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     },
     preloadLocale,
     async setLocale(locale, direction) {
+      const catalogs = await loadLocaleCatalogs(locale);
       currentLocale = locale;
       if (direction !== undefined) {
         currentDirection = direction;
       }
-      await activateLoaderLocale(locale);
+      if (catalogs !== undefined) {
+        activateLoaderCatalogs(catalogs);
+      }
     },
     localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
       return localizeRequest<Value>(request);

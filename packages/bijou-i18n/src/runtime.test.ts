@@ -219,6 +219,40 @@ describe('bijou-i18n runtime', () => {
     expect(loader).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps the active locale stable when loader-backed locale switching fails', async () => {
+    const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => {
+      if (locale === 'fr') {
+        throw new Error('catalog loader unavailable');
+      }
+
+      return [{
+        namespace: 'shell',
+        entries: [
+          {
+            key: { namespace: 'shell', id: 'greeting' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: {
+              [locale]: `Hello from ${locale}`,
+            },
+          },
+        ],
+      }];
+    });
+
+    const runtime = await createI18nRuntimeAsync({
+      locale: 'en',
+      direction: 'ltr',
+      loader,
+    });
+
+    await expect(runtime.setLocale('fr', 'rtl')).rejects.toThrow('catalog loader unavailable');
+
+    expect(runtime.locale).toBe('en');
+    expect(runtime.direction).toBe('ltr');
+    expect(runtime.t({ namespace: 'shell', id: 'greeting' })).toBe('Hello from en');
+  });
+
   it('preloads a locale without switching until setLocale is called', async () => {
     const loader = vi.fn<I18nCatalogLoader>(async (locale: string) => [{
       namespace: 'shell',

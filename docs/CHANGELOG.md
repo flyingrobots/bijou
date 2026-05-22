@@ -300,6 +300,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Atomic locale switching** — Loader-backed `setLocale()` now commits locale,
+  direction, and loader-managed catalogs only after the selected locale catalogs
+  load successfully, so failed locale switches leave the runtime on its previous
+  locale state.
 - **Localization resource immutability** — `I18nRuntime.resource()` now returns
   cloned, deeply frozen resource values through the same portable localized
   value boundary used by `localize()`, so callers cannot mutate catalog-backed
