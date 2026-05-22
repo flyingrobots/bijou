@@ -51,6 +51,48 @@ describe('bijou-i18n runtime', () => {
     expect(runtime.resource<string[]>({ namespace: 'assets', id: 'logo' })).toEqual(['BIJOU']);
   });
 
+  it('returns frozen resource values without leaking catalog state', () => {
+    const runtime = createI18nRuntime({ locale: 'en', direction: 'ltr' });
+
+    runtime.loadCatalog({
+      namespace: 'assets',
+      entries: [
+        {
+          key: { namespace: 'assets', id: 'logo' },
+          kind: 'resource',
+          sourceLocale: 'en',
+          values: {
+            en: {
+              label: 'Logo',
+              lines: ['BIJOU'],
+            },
+          },
+        },
+      ],
+    });
+
+    const resolved = runtime.resource<{ readonly label: string; readonly lines: readonly string[] }>({
+      namespace: 'assets',
+      id: 'logo',
+    });
+
+    expect(resolved).toEqual({ label: 'Logo', lines: ['BIJOU'] });
+    expect(Object.isFrozen(resolved)).toBe(true);
+    expect(Object.isFrozen(resolved?.lines)).toBe(true);
+
+    try {
+      (resolved?.lines as string[] | undefined)?.push('MUTATED');
+    } catch {
+      // Frozen values should reject mutation; old mutable values should still
+      // fail the final catalog-state assertion below.
+    }
+
+    expect(runtime.resource({ namespace: 'assets', id: 'logo' })).toEqual({
+      label: 'Logo',
+      lines: ['BIJOU'],
+    });
+  });
+
   it('fails clearly on missing references and missing message keys', () => {
     const runtime = createI18nRuntime({ locale: 'en', direction: 'ltr' });
 

@@ -300,6 +300,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localization resource immutability** — `I18nRuntime.resource()` now returns
+  cloned, deeply frozen resource values through the same portable localized
+  value boundary used by `localize()`, so callers cannot mutate catalog-backed
+  runtime state by retaining resource objects or arrays.
 - **Localization value boundary validation** — `freezeLocalizedValue()` now
   enforces the documented portable catalog boundary with deterministic errors
   for cyclic graphs, symbol-keyed properties, non-enumerable properties,

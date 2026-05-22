@@ -1,5 +1,6 @@
 import {
   freezeLocalizedObject,
+  freezeLocalizedValue,
   type LocalizedObject,
   type LocalizationIssue,
   type LocalizationRequest,
@@ -469,7 +470,8 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (entry === undefined) {
         return undefined;
       }
-      return resolveLocalizedValue(entry as I18nCatalogEntry<T>, new Set<string>());
+      const resolved = resolveLocalizedValue(entry as I18nCatalogEntry<T>, new Set<string>());
+      return resolved === undefined ? undefined : freezeLocalizedValue(resolved);
     },
     formatNumber(value, locale) {
       return formatter.formatNumber(value, locale);
