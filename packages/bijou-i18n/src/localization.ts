@@ -38,6 +38,15 @@ export interface LocalizationFact {
   readonly value: string;
 }
 
+/**
+ * Structured localization result returned by a {@link LocalizationPort}.
+ *
+ * Values are expected to be JSON-shaped boundary payloads: plain objects,
+ * arrays, scalars, or nullish values. Symbol-keyed properties, non-enumerable
+ * properties, cyclic graphs, class instances, and accessors are outside the
+ * portable catalog contract; accessors are rejected when plain objects cross
+ * the freeze boundary.
+ */
 export interface LocalizedObject<Value = unknown> {
   readonly key: I18nCatalogKey;
   readonly locale: string;
@@ -114,6 +123,13 @@ export function freezeLocalizedObject<Value>(
   });
 }
 
+/**
+ * Deep-freeze a JSON-shaped localized value.
+ *
+ * This helper intentionally preserves the portable catalog contract rather
+ * than arbitrary JavaScript object identity. Plain objects must expose data
+ * properties only; accessor-backed plain objects are rejected.
+ */
 export function freezeLocalizedValue<Value>(value: Value): Value {
   if (value == null || typeof value !== 'object') {
     return value;

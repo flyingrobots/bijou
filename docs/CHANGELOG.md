@@ -95,7 +95,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `CounterDemoBlock` fixture preview that proves bounded counter state,
   animated interactive progress, `-`/`+` Command intent emissions, static
   lowering without controls, pipe/screenreader text, and a JSON snapshot
-  without provider subscriptions or runtime command dispatch.
+  without provider subscriptions or runtime command dispatch. The counter
+  fixture animation tick is scoped to the active counter preview so inactive
+  DOGFOOD guide pages do not continue advancing fixture state.
 - **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
   built-in perf HUD surface toggled by the backtick key. The HUD reads the
   frame model's timing telemetry, works from workspace and active shell layers

@@ -206,6 +206,33 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(frameText(decremented.frames.at(-1)!)).toContain('Counter: 5');
   });
 
+  it('does not tick the CounterDemoBlock fixture when another Blocks guide is selected', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any });
+
+    const result = await runScript(app, [
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: 'blocks-preview-counterdemoblock' },
+        },
+      },
+      { key: '+' },
+      {
+        msg: {
+          type: 'docs',
+          msg: { type: 'select-guide', guideId: 'blocks-what-are-blocks' },
+        },
+      },
+      { pulse: { dt: 0.6 } },
+    ], { ctx });
+    const blocksModel = docsPageModel(result.model as any, 'blocks');
+
+    expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
+    expect(blocksModel.counterBlockDemo.counter).toBe(6);
+    expect(blocksModel.counterBlockDemo.animationTimeMs).toBe(0);
+  });
+
   it('renders the selected standard block preview without stacking every block page', async () => {
     for (const block of standardBlocks) {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 220, rows: 260 } });

@@ -62,6 +62,7 @@ import {
   type FramedApp,
   type FramedAppMsg,
   type FrameShellTheme,
+  type KeyMapGroup,
   type KeyMsg,
   type MouseMsg,
   type ResizeMsg,
@@ -746,25 +747,21 @@ const variantPaneKeys = createKeyMap<ExplorerMsg>()
     .bind('pageup', 'Previous variant', { type: 'variant-prev' }),
   );
 
-const guidePaneKeys = createKeyMap<ExplorerMsg>()
-  .group('Guides', (group) => group
+function addGuidePaneBindings(group: KeyMapGroup<ExplorerMsg>): KeyMapGroup<ExplorerMsg> {
+  return group
     .bind('down', 'Next guide', { type: 'guide-next' })
     .bind('up', 'Previous guide', { type: 'guide-prev' })
     .bind('pagedown', 'Page down', { type: 'guide-page-down' })
     .bind('pageup', 'Page up', { type: 'guide-page-up' })
     .bind('enter', 'Open guide', { type: 'activate-guide' })
-    .bind('space', 'Open guide', { type: 'activate-guide' }),
-  );
+    .bind('space', 'Open guide', { type: 'activate-guide' });
+}
+
+const guidePaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Guides', addGuidePaneBindings);
 
 const counterBlockGuidePaneKeys = createKeyMap<ExplorerMsg>()
-  .group('Guides', (group) => group
-    .bind('down', 'Next guide', { type: 'guide-next' })
-    .bind('up', 'Previous guide', { type: 'guide-prev' })
-    .bind('pagedown', 'Page down', { type: 'guide-page-down' })
-    .bind('pageup', 'Page up', { type: 'guide-page-up' })
-    .bind('enter', 'Open guide', { type: 'activate-guide' })
-    .bind('space', 'Open guide', { type: 'activate-guide' }),
-  )
+  .group('Guides', addGuidePaneBindings)
   .group('Counter fixture', (group) => group
     .bind('-', 'Decrease counter', { type: 'counter-block-intent', action: 'decrement' })
     .bind('+', 'Increase counter', { type: 'counter-block-intent', action: 'increment' })
@@ -3684,10 +3681,14 @@ function createDocsExplorerApp(
           }
           if (msg.type === 'pulse') {
             const deltaMs = Math.round(Math.max(0, msg.dt) * 1000);
+            const shouldTickCounterDemo = spec.id === BLOCKS_PAGE_ID
+              && model.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID;
             return [{
               ...model,
               previewTimeMs: model.previewTimeMs + deltaMs,
-              counterBlockDemo: tickCounterDemoModel(model.counterBlockDemo, deltaMs),
+              counterBlockDemo: shouldTickCounterDemo
+                ? tickCounterDemoModel(model.counterBlockDemo, deltaMs)
+                : model.counterBlockDemo,
             }, []];
           }
           switch (msg.type) {
