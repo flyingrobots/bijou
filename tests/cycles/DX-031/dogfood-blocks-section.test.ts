@@ -92,6 +92,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       'Pre-made Blocks',
       'Block Preview',
       ...standardBlocks.map((block) => `  ${block.metadata.blockName}`),
+      '  CounterDemoBlock',
       'How Blocks Lower',
     ]);
     expect(blocksModel.selectedGuideId).toBe('blocks-what-are-blocks');
@@ -169,6 +170,37 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(text).not.toContain('Available Blocks');
     expect(text).not.toContain('Contract: block metadata:');
     expect(text).not.toContain('Source: packages/bijou/src/core/standard-blocks.ts');
+  });
+
+  it('renders the CounterDemoBlock fixture and applies command-intent keys', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
+    const runCounterSteps = async (keys: readonly string[]) => runScript(
+      createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any }),
+      [
+        {
+          msg: {
+            type: 'docs',
+            msg: { type: 'select-guide', guideId: 'blocks-preview-counterdemoblock' },
+          },
+        },
+        ...keys.map((key) => ({ key })),
+      ],
+      { ctx },
+    );
+    const selected = await runCounterSteps([]);
+    const incremented = await runCounterSteps(['+']);
+    const decremented = await runCounterSteps(['+', '-']);
+
+    expect(docsPageModel(selected.model as any, 'blocks').selectedGuideId).toBe('blocks-preview-counterdemoblock');
+    expect(docsPageModel(incremented.model as any, 'blocks').counterBlockDemo.counter).toBe(6);
+    expect(docsPageModel(decremented.model as any, 'blocks').counterBlockDemo.counter).toBe(5);
+    expect(frameText(selected.frames.at(-1)!)).toContain('Counter: 5');
+    expect(frameText(selected.frames.at(-1)!)).toContain('[-] decrease');
+    expect(frameText(selected.frames.at(-1)!)).toContain('[+] increase');
+    expect(frameText(selected.frames.at(-1)!)).toContain('json: {"counter":5}');
+    expect(frameText(incremented.frames.at(-1)!)).toContain('Counter: 6');
+    expect(frameText(incremented.frames.at(-1)!)).toContain('json: {"counter":6}');
+    expect(frameText(decremented.frames.at(-1)!)).toContain('Counter: 5');
   });
 
   it('renders the selected standard block preview without stacking every block page', async () => {

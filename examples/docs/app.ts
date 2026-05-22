@@ -56,6 +56,7 @@ import {
   type App,
   type Cmd,
   type FramePageMsg,
+  type FrameInputArea,
   type FrameModel,
   type FrameLayoutNode,
   type FramedApp,
@@ -112,6 +113,19 @@ import {
   formatLocalizedList,
   localizedText,
 } from './localization.js';
+import {
+  applyCounterDemoIntent,
+  counterDemoBlock,
+  counterDemoBlockConfig,
+  counterDemoBlockSurface,
+  counterDemoDocumentationText,
+  counterDemoIntentForAction,
+  counterDemoLoweringPreviewText,
+  createCounterDemoModel,
+  tickCounterDemoModel,
+  type CounterDemoIntentAction,
+  type CounterDemoModel,
+} from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -176,6 +190,7 @@ const PACKAGES_PAGE_ID = 'packages';
 const PHILOSOPHY_PAGE_ID = 'philosophy';
 const RELEASE_PAGE_ID = 'release';
 const BLOCK_PREVIEW_GUIDE_ID = 'blocks-preview';
+const COUNTER_DEMO_BLOCK_GUIDE_ID = `${BLOCK_PREVIEW_GUIDE_ID}-counterdemoblock`;
 const DOCS_SIDEBAR_WIDTH = 32;
 const DOCS_STANDARD_NAV_WIDTH = 28;
 const DOCS_NARROW_NAV_WIDTH = 26;
@@ -248,6 +263,7 @@ interface DocsExplorerModel {
   readonly locale: string;
   readonly landingThemeIndex: number;
   readonly landingQualityMode: LandingQualityMode;
+  readonly counterBlockDemo: CounterDemoModel;
 }
 
 type ExplorerMsg =
@@ -273,7 +289,8 @@ type ExplorerMsg =
   | { type: 'select-guide'; guideId: string }
   | { type: 'toggle-hints' }
   | { type: 'cycle-locale' }
-  | { type: 'cycle-landing-quality' };
+  | { type: 'cycle-landing-quality' }
+  | { type: 'counter-block-intent'; action: CounterDemoIntentAction };
 
 interface RootModel {
   readonly route: 'landing' | 'docs';
@@ -404,6 +421,7 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     body: BLOCKS_PREVIEW_TEXT,
   },
   ...standardBlocks.map(blockPreviewGuideDoc),
+  counterDemoBlockPreviewGuideDoc(),
   {
     id: 'blocks-lowering',
     pageId: BLOCKS_PAGE_ID,
@@ -738,6 +756,21 @@ const guidePaneKeys = createKeyMap<ExplorerMsg>()
     .bind('space', 'Open guide', { type: 'activate-guide' }),
   );
 
+const counterBlockGuidePaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Guides', (group) => group
+    .bind('down', 'Next guide', { type: 'guide-next' })
+    .bind('up', 'Previous guide', { type: 'guide-prev' })
+    .bind('pagedown', 'Page down', { type: 'guide-page-down' })
+    .bind('pageup', 'Page up', { type: 'guide-page-up' })
+    .bind('enter', 'Open guide', { type: 'activate-guide' })
+    .bind('space', 'Open guide', { type: 'activate-guide' }),
+  )
+  .group('Counter fixture', (group) => group
+    .bind('-', 'Decrease counter', { type: 'counter-block-intent', action: 'decrement' })
+    .bind('+', 'Increase counter', { type: 'counter-block-intent', action: 'increment' })
+    .bind('=', 'Increase counter', { type: 'counter-block-intent', action: 'increment' }),
+  );
+
 const componentsPageKeys = createKeyMap<ExplorerMsg>()
   .group('Profiles', (group) => group
     .bind('1', 'Rich profile', { type: 'set-profile', mode: 'interactive' })
@@ -748,6 +781,13 @@ const componentsPageKeys = createKeyMap<ExplorerMsg>()
   .group('Variants', (group) => group
     .bind('.', 'Next variant', { type: 'variant-next' })
     .bind(',', 'Previous variant', { type: 'variant-prev' }),
+  );
+
+const counterBlockPreviewPaneKeys = createKeyMap<ExplorerMsg>()
+  .group('Counter fixture', (group) => group
+    .bind('-', 'Decrease counter', { type: 'counter-block-intent', action: 'decrement' })
+    .bind('+', 'Increase counter', { type: 'counter-block-intent', action: 'increment' })
+    .bind('=', 'Increase counter', { type: 'counter-block-intent', action: 'increment' }),
   );
 
 interface DocsAppOptions {
@@ -970,6 +1010,16 @@ function blockPreviewGuideDoc(block: BlockDefinition): GuideDoc {
   };
 }
 
+function counterDemoBlockPreviewGuideDoc(): GuideDoc {
+  return {
+    id: COUNTER_DEMO_BLOCK_GUIDE_ID,
+    pageId: BLOCKS_PAGE_ID,
+    title: `  ${counterDemoBlock.metadata.blockName}`,
+    summary: counterDemoBlock.metadata.docs.summary,
+    body: counterDemoDocumentationText(),
+  };
+}
+
 function standardBlockForPreviewGuide(doc: GuideDoc): BlockDefinition | undefined {
   if (doc.pageId !== BLOCKS_PAGE_ID) return undefined;
   return standardBlocks.find((block) => blockPreviewGuideId(block) === doc.id);
@@ -994,6 +1044,61 @@ function renderBlocksPreviewPane(
     ),
     spacer(1, 1),
     standardBlockLivePreviewSurface(block, bodyWidth, ctx, theme, localization),
+  ]), width);
+}
+
+function renderCounterDemoPreviewPane(
+  model: DocsExplorerModel,
+  width: number,
+  ctx: BijouContext,
+  theme: LandingThemeTokens,
+  localization: LocalizationPort,
+): Surface {
+  const paneWidth = resolvePaneInnerWidth(width);
+  const bodyWidth = Math.max(28, paneWidth - 6);
+  const cardWidth = Math.max(30, Math.min(78, bodyWidth));
+
+  return insetPaneSurface(column([
+    themedSeparatorSurface(
+      dogfoodText(localization, 'blocks.preview.separator', 'blocks • live preview'),
+      paneWidth,
+      ctx,
+      theme,
+    ),
+    spacer(1, 1),
+    boxSurface(column([
+      line(dogfoodText(localization, 'blocks.preview.liveExample', 'Live example')),
+      counterDemoBlockSurface(counterDemoBlockConfig(model.counterBlockDemo, ctx, cardWidth)),
+      spacer(1, 1),
+      line(dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview')),
+      boxSurface(paragraphSurface(counterDemoLoweringPreviewText(model.counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
+        title: dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview'),
+        width: cardWidth,
+        borderToken: docsThemeBorderToken(theme),
+        padding: { left: 1, right: 1 },
+        ctx,
+      }),
+      spacer(1, 1),
+      line(dogfoodText(localization, 'blocks.preview.liveDocumentation', 'Live documentation')),
+      boxSurface(paragraphSurface(counterDemoDocumentationText(), cardWidth - 4), {
+        title: dogfoodText(localization, 'blocks.preview.documentationTitle', 'documentation'),
+        width: cardWidth,
+        borderToken: docsThemeBorderToken(theme),
+        padding: { left: 1, right: 1 },
+        ctx,
+      }),
+    ]), {
+      title: dogfoodText(
+        localization,
+        'blocks.preview.pageTitle',
+        '▼ Page: {blockName}',
+        { blockName: counterDemoBlock.metadata.blockName },
+      ),
+      width: Math.max(30, bodyWidth),
+      borderToken: docsThemeBorderToken(theme),
+      padding: { left: 1, right: 1 },
+      ctx,
+    }),
   ]), width);
 }
 
@@ -1039,7 +1144,7 @@ function standardBlockExampleSurface(
   const rendered = renderBlockTree(blockRenderNode(block, {
     mode: 'interactive',
     slots: standardBlockExampleSlots(block.metadata.blockName),
-    config: { width: cardWidth },
+    config: standardBlockExampleConfig(cardWidth, block.metadata.blockName),
   }));
 
   if (isSurfaceLike(rendered.output)) {
@@ -1069,7 +1174,7 @@ function standardBlockLoweringPreviewSurface(
     const result = renderBlockTree(blockRenderNode(block, {
       mode: mode as OutputMode,
       slots,
-      config: { width: innerWidth },
+      config: standardBlockExampleConfig(innerWidth, block.metadata.blockName),
     }));
     const outputSummary = blockRenderOutputText(result.output, Math.max(36, innerWidth - 22));
     const factsLine = dogfoodText(
@@ -1097,25 +1202,29 @@ function standardBlockLoweringPreviewSurface(
   });
 }
 
+function standardBlockExampleConfig(width: number, blockName?: string): Readonly<Record<string, number>> {
+  return {
+    width,
+    sectionHeight: blockName === 'AppShell' ? 8 : 5,
+  };
+}
+
 function standardBlockExampleSlots(blockName: string): Readonly<Record<string, unknown>> {
   switch (blockName) {
     case 'AppShell':
       return {
         navigation: 'Guides / Components / Blocks',
         content: blockRenderNode(readerSurfaceBlock, {
-          config: { width: 58 },
+          config: { width: 58, sectionHeight: 4 },
           slots: {
             content: 'ReaderSurface live content from DOGFOOD Blocks.',
-            navigation: 'Blocks navigation',
-            outline: ['What are Blocks', 'How Blocks Lower'],
           },
         }),
         inspector: blockRenderNode(inspectorPanelBlock, {
-          config: { width: 58 },
+          config: { width: 58, sectionHeight: 4 },
           slots: {
             selection: 'ReaderSurface',
             details: ['schema-bound', 'provider-ready', 'command-aware'],
-            actions: ['Reveal selection', 'Focus source'],
           },
         }),
         status: 'ready',
@@ -1286,6 +1395,7 @@ function createInitialExplorerModel(
     locale,
     landingThemeIndex: 0,
     landingQualityMode: 'auto',
+    counterBlockDemo: createCounterDemoModel(5),
   };
 }
 
@@ -1588,7 +1698,13 @@ function selectFocusedBlockPreviewGuide(pageId: DocsPageId, model: DocsExplorerM
   if (pageId !== BLOCKS_PAGE_ID) return model;
   const doc = focusedGuideDoc(pageId, model);
   if (doc == null) return model;
-  if (doc.id !== BLOCK_PREVIEW_GUIDE_ID && standardBlockForPreviewGuide(doc) === undefined) return model;
+  if (
+    doc.id !== BLOCK_PREVIEW_GUIDE_ID
+    && doc.id !== COUNTER_DEMO_BLOCK_GUIDE_ID
+    && standardBlockForPreviewGuide(doc) === undefined
+  ) {
+    return model;
+  }
   return selectGuide(pageId, model, doc.id);
 }
 
@@ -3050,6 +3166,9 @@ function renderGuideReaderPane(
   if (standardBlock !== undefined) {
     return renderBlocksPreviewPane(standardBlock, width, ctx, theme, localization);
   }
+  if (doc.id === COUNTER_DEMO_BLOCK_GUIDE_ID) {
+    return renderCounterDemoPreviewPane(model, width, ctx, theme, localization);
+  }
 
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
@@ -3129,6 +3248,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
     if (pageId !== COMPONENTS_PAGE_ID) {
       switch (focusedPane) {
         case 'guide-nav':
+          if (pageId === BLOCKS_PAGE_ID && pageModel.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID) {
+            return dogfoodText(
+              localization,
+              'docs.footer.counterBlockNav',
+              '{paneSwitch} • ↑/↓ browse • Enter open • -/+ counter fixture',
+              { paneSwitch },
+            );
+          }
           return dogfoodText(
             localization,
             'docs.footer.guideNav',
@@ -3136,6 +3263,14 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
             { paneSwitch },
           );
         case 'guide-content':
+          if (pageId === BLOCKS_PAGE_ID && pageModel.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID) {
+            return dogfoodText(
+              localization,
+              'docs.footer.counterBlock',
+              '{paneSwitch} • -/+ counter fixture • j/k scroll • d/u page • g/G top/bottom',
+              { paneSwitch },
+            );
+          }
           return dogfoodText(
             localization,
             'docs.footer.guide',
@@ -3548,9 +3683,11 @@ function createDocsExplorerApp(
             return [model, []];
           }
           if (msg.type === 'pulse') {
+            const deltaMs = Math.round(Math.max(0, msg.dt) * 1000);
             return [{
               ...model,
-              previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+              previewTimeMs: model.previewTimeMs + deltaMs,
+              counterBlockDemo: tickCounterDemoModel(model.counterBlockDemo, deltaMs),
             }, []];
           }
           switch (msg.type) {
@@ -3585,17 +3722,44 @@ function createDocsExplorerApp(
             }
             case 'cycle-landing-quality':
               return [{ ...model, landingQualityMode: nextLandingQualityMode(model.landingQualityMode) }, []];
+            case 'counter-block-intent':
+              if (spec.id !== BLOCKS_PAGE_ID || model.selectedGuideId !== COUNTER_DEMO_BLOCK_GUIDE_ID) {
+                return [model, []];
+              }
+              return [{
+                ...model,
+                counterBlockDemo: applyCounterDemoIntent(
+                  model.counterBlockDemo,
+                  counterDemoIntentForAction(msg.action),
+                ),
+                previewTimeMs: 0,
+              }, []];
             default:
               return [model, []];
           }
         },
         inputAreas(model) {
-          return [{
+          const inputAreas: FrameInputArea<DocsExplorerModel, DocsMsg>[] = [{
             paneId: 'guide-nav',
             keyMap: guidePaneKeys,
             helpSource: guidePaneKeys,
             mouse: ({ msg, rect }) => resolveGuidePaneMouse(msg, model, rect),
           }];
+          if (spec.id === BLOCKS_PAGE_ID && model.selectedGuideId === COUNTER_DEMO_BLOCK_GUIDE_ID) {
+            return [
+              {
+                ...inputAreas[0]!,
+                keyMap: counterBlockGuidePaneKeys,
+                helpSource: counterBlockGuidePaneKeys,
+              },
+              {
+                paneId: 'guide-content',
+                keyMap: counterBlockPreviewPaneKeys,
+                helpSource: counterBlockPreviewPaneKeys,
+              },
+            ];
+          }
+          return inputAreas;
         },
         searchTitle: `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
         searchItems() {

@@ -436,6 +436,43 @@ describe('first-party standard block definitions', () => {
     expect(findCell(rendered.output, 'Z')).toBeUndefined();
   });
 
+  it('fits tall child surfaces within bounded parent visual sections', () => {
+    const tallChild = createSurface(8, 12);
+    tallChild.set(0, 0, { char: 'T' });
+    tallChild.set(0, 11, { char: 'B' });
+    const tallBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'TallChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Tall child surface test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? tallChild
+          : 'T',
+      }),
+    });
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 40, sectionHeight: 4 },
+      slots: {
+        content: blockRenderNode(tallBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    expect(findCell(rendered.output, 'T')).toBeDefined();
+    expect(findCell(rendered.output, 'B')).toBeUndefined();
+    expect(rendered.output.height).toBeLessThan(14);
+  });
+
   it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',

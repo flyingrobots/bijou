@@ -173,6 +173,10 @@ export interface KeyMapGroup<A> {
  * @throws {Error} If a modifier is duplicated, unknown, or the key part is empty.
  */
 export function parseKeyCombo(descriptor: string): KeyCombo {
+  if (descriptor === '+') {
+    return { key: '+', ctrl: false, alt: false, shift: false };
+  }
+
   // Lowercase the entire descriptor for consistency with parseKey(), which always
   // returns lowercase key names (e.g., 'escape', 'enter', 'c' for Ctrl+C).
   // Uppercase letter bindings should use 'shift+a' not 'A'.

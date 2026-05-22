@@ -139,6 +139,14 @@ DOGFOOD should not call composition introspection to render visuals. It should
 use composition for declaration inspection and block-tree rendering for rendered
 preview output.
 
+The Blocks preview may also host non-shipping fixture blocks. Fixture blocks
+must be clearly labeled as DOGFOOD examples and may prove interaction and
+lowering behavior that is not part of the first-party shipping block catalog.
+They still need to follow the same rendering boundary: visible controls emit
+inspectable Command intent records, state changes happen in the DOGFOOD model,
+and lower modes expose deterministic text or JSON summaries without provider
+handles, subscriptions, or runtime dispatch hidden in the block.
+
 The preview surface is still product UI, not a debug dump. The overview page may
 index available blocks and stories, but selected block pages should keep the
 live example first, summarize lower-mode output without clipped nested
@@ -177,6 +185,9 @@ on the first concrete block preview rather than a prose inventory page.
   preview instead of a prose overview.
 - DOGFOOD lower-mode previews summarize output and facts without rendering
   clipped nested mini-surfaces in the main preview page.
+- DOGFOOD fixture block previews render as selected block pages with live
+  controls, command-intent state transitions, and deterministic static, pipe,
+  accessible, and JSON lowering summaries.
 - Recursive render depth is bounded and fails deterministically.
 - Lowering facts from nested blocks remain inspectable.
 

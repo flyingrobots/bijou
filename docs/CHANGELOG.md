@@ -88,7 +88,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   mode/fact data instead of rendering clipped nested mini-surfaces inside the
   main preview. Standard block visual sections also fit oversized nested child
   surfaces to the parent section so rendered child blocks do not overrun
-  AppShell preview regions.
+  AppShell preview regions. DOGFOOD also publishes a non-shipping
+  `CounterDemoBlock` fixture preview that proves bounded counter state,
+  animated interactive progress, `-`/`+` Command intent emissions, static
+  lowering without controls, pipe/screenreader text, and a JSON snapshot
+  without provider subscriptions or runtime command dispatch.
 - **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
   built-in perf HUD surface toggled by the backtick key. The HUD reads the
   frame model's timing telemetry, works from workspace and active shell layers

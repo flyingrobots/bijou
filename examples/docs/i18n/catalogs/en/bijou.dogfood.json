@@ -224,6 +224,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.footer.counterBlock"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • -/+ counter fixture • j/k scroll • d/u page • g/G top/bottom"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.counterBlockNav"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • ↑/↓ browse • Enter open • -/+ counter fixture"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.footer.family"
       },
       "kind": "message",

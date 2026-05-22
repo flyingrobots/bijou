@@ -79,6 +79,12 @@ describe('parseKeyCombo', () => {
       key: 'escape', ctrl: false, alt: false, shift: false,
     });
   });
+
+  it('parses plus as a plain key instead of a modifier separator', () => {
+    expect(parseKeyCombo('+')).toEqual({
+      key: '+', ctrl: false, alt: false, shift: false,
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

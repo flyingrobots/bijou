@@ -479,7 +479,7 @@ function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string 
       ? renderAccessibleSections('AppShell', sections)
       : mode === 'pipe'
         ? renderPipeSections('AppShell', sections)
-        : renderVisualSectionsSurface('AppShell', sections, renderSurfaceWidth(input)),
+        : renderVisualSectionsSurface('AppShell', sections, renderSurfaceBounds(input)),
     facts: renderFacts('AppShell', sections, 'region'),
   });
 }
@@ -497,7 +497,7 @@ function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<st
       ? renderAccessibleSections('ReaderSurface', sections)
       : mode === 'pipe'
         ? renderPipeSections('ReaderSurface', sections)
-        : renderVisualSectionsSurface('ReaderSurface', sections, renderSurfaceWidth(input)),
+        : renderVisualSectionsSurface('ReaderSurface', sections, renderSurfaceBounds(input)),
     facts: renderFacts('ReaderSurface', sections, 'slot'),
   });
 }
@@ -515,7 +515,7 @@ function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<s
       ? renderAccessibleSections('InspectorPanel', sections)
       : mode === 'pipe'
         ? renderPipeSections('InspectorPanel', sections)
-        : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceWidth(input)),
+        : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceBounds(input)),
     facts: renderFacts('InspectorPanel', sections, 'slot'),
   });
 }
@@ -532,6 +532,11 @@ interface RenderSection {
 interface RenderedBlockOptions {
   readonly output: string | Surface;
   readonly facts: readonly BindingFact[];
+}
+
+interface RenderSurfaceBounds {
+  readonly width: number;
+  readonly sectionHeight?: number;
 }
 
 function renderedBlockResult(options: RenderedBlockOptions): BlockRenderResult<string | Surface> {
@@ -579,13 +584,13 @@ function renderAccessibleSections(blockName: StandardBlockName, sections: readon
 function renderVisualSectionsSurface(
   blockName: StandardBlockName,
   sections: readonly RenderSection[],
-  width: number,
+  bounds: RenderSurfaceBounds,
 ): Surface {
-  const safeWidth = Math.max(30, Math.floor(width));
+  const safeWidth = Math.max(30, Math.floor(bounds.width));
   const sectionWidth = Math.max(24, safeWidth - 4);
   const sectionContentWidth = Math.max(1, sectionWidth - 4);
   const sectionSurfaces = sections.map((section) => {
-    const content = fitVisualContent(section.visualContent, sectionContentWidth);
+    const content = fitVisualContent(section.visualContent, sectionContentWidth, bounds.sectionHeight);
     return boxSurface(content, {
       title: section.label,
       width: sectionWidth,
@@ -638,16 +643,23 @@ function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
   return ALL_OUTPUT_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
 }
 
-function renderSurfaceWidth(input: BlockRenderInput): number {
+function renderSurfaceBounds(input: BlockRenderInput): RenderSurfaceBounds {
   const config = input.config;
+  let width = 78;
+  let sectionHeight: number | undefined;
   if (isPlainRecord(config)) {
-    const width = ownDataProperty(config, 'width');
-    if (typeof width === 'number' && Number.isFinite(width)) {
-      return Math.max(30, Math.min(120, Math.floor(width)));
+    const widthValue = ownDataProperty(config, 'width');
+    if (typeof widthValue === 'number' && Number.isFinite(widthValue)) {
+      width = Math.max(30, Math.min(120, Math.floor(widthValue)));
+    }
+
+    const sectionHeightValue = ownDataProperty(config, 'sectionHeight');
+    if (typeof sectionHeightValue === 'number' && Number.isFinite(sectionHeightValue)) {
+      sectionHeight = Math.max(1, Math.min(40, Math.floor(sectionHeightValue)));
     }
   }
 
-  return 78;
+  return sectionHeight === undefined ? { width } : { width, sectionHeight };
 }
 
 function stackSurfaces(surfaces: readonly Surface[], gap = 0): Surface {
@@ -764,12 +776,17 @@ function recordSlotText(value: object): string | undefined {
   return entries.length === 0 ? undefined : entries.join('; ');
 }
 
-function fitVisualContent(content: string | Surface, width: number): string | Surface {
-  if (!isSurfaceSlotValue(content) || content.width <= width) {
+function fitVisualContent(content: string | Surface, width: number, height?: number): string | Surface {
+  if (typeof content === 'string') {
+    return height === undefined ? content : content.split('\n').slice(0, height).join('\n');
+  }
+
+  const safeHeight = height === undefined ? content.height : Math.min(content.height, height);
+  if (content.width <= width && content.height <= safeHeight) {
     return content;
   }
 
-  const clipped = createSurface(width, content.height);
+  const clipped = createSurface(width, safeHeight);
   clipped.blit(content, 0, 0);
   return clipped;
 }
