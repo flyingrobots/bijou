@@ -300,6 +300,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localized array payload validation** — `freezeLocalizedValue()` now applies
+  the same portable boundary checks to array-owned properties as plain objects,
+  rejecting symbol, non-enumerable, accessor, named, and self-referential
+  non-index properties instead of silently dropping them while cloning indexed
+  array items.
 - **DOGFOOD locale page labels** — Framed page tab, layer, palette, and search
   labels can now resolve from the active page model instead of being snapped at
   app construction, and no-loader locale switches commit synchronously so

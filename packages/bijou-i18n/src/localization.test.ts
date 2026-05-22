@@ -201,6 +201,38 @@ describe('LocalizationPort runtime adapter', () => {
     );
   });
 
+  it('rejects non-portable localized array own properties deterministically', () => {
+    const symbolKey = Symbol('array-secret');
+    const symbolArray = ['visible'] as unknown[] & Record<symbol, unknown>;
+    symbolArray[symbolKey] = 'hidden';
+
+    const nonEnumerableArray = ['visible'];
+    Object.defineProperty(nonEnumerableArray, 'hidden', {
+      enumerable: false,
+      value: 'secret',
+    });
+
+    const accessorArray = ['visible'];
+    Object.defineProperty(accessorArray, 'hidden', {
+      enumerable: true,
+      get() {
+        return 'secret';
+      },
+    });
+
+    const namedPropertyArray = ['visible'] as unknown[] & { hidden?: string };
+    namedPropertyArray.hidden = 'secret';
+
+    const selfReferentialArray = ['visible'] as unknown[] & { self?: unknown };
+    selfReferentialArray.self = selfReferentialArray;
+
+    expect(() => freezeLocalizedValue(symbolArray)).toThrow(Error);
+    expect(() => freezeLocalizedValue(nonEnumerableArray)).toThrow(Error);
+    expect(() => freezeLocalizedValue(accessorArray)).toThrow(Error);
+    expect(() => freezeLocalizedValue(namedPropertyArray)).toThrow(Error);
+    expect(() => freezeLocalizedValue(selfReferentialArray)).toThrow(Error);
+  });
+
   it('delegates selected-locale list formatting through the port', () => {
     const runtime = createI18nRuntime({ locale: 'en', direction: 'ltr' });
     const localization = createRuntimeLocalizationPort(runtime);

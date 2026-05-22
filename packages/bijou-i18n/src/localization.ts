@@ -165,6 +165,7 @@ function cloneLocalizedObjectValue(
   seen: WeakSet<object>,
 ): unknown {
   if (Array.isArray(value)) {
+    validateLocalizedArray(value, path);
     return Object.freeze(value.map((item, index) => cloneLocalizedValue(item, `${path}[${index}]`, seen)));
   }
 
@@ -195,6 +196,50 @@ function cloneLocalizedObjectValue(
   }
 
   return Object.freeze(output);
+}
+
+function validateLocalizedArray(value: readonly unknown[], path: string): void {
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  for (const key of Reflect.ownKeys(descriptors)) {
+    if (typeof key === 'symbol') {
+      throw new Error(`Localized value contains unsupported symbol property at ${path}`);
+    }
+
+    if (key === 'length') {
+      continue;
+    }
+
+    const descriptor = descriptors[key];
+    if (descriptor === undefined) {
+      continue;
+    }
+
+    const propertyPath = arrayPropertyPath(path, key);
+    if (!descriptor.enumerable) {
+      throw new Error(`Localized value contains unsupported non-enumerable property: ${propertyPath}`);
+    }
+    if (!('value' in descriptor)) {
+      throw new Error(`Localized value contains unsupported accessor property: ${propertyPath}`);
+    }
+    if (!isArrayIndexKey(key)) {
+      throw new Error(`Localized value contains unsupported array property: ${propertyPath}`);
+    }
+  }
+}
+
+function arrayPropertyPath(path: string, key: string): string {
+  return isArrayIndexKey(key) ? `${path}[${key}]` : `${path}.${key}`;
+}
+
+function isArrayIndexKey(key: string): boolean {
+  if (key === '') {
+    return false;
+  }
+  const index = Number(key);
+  return Number.isInteger(index)
+    && index >= 0
+    && index < 2 ** 32 - 1
+    && String(index) === key;
 }
 
 function objectKind(value: object): string {
