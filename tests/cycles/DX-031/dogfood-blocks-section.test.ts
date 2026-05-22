@@ -32,6 +32,10 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
   return text;
 }
 
+function frameRows(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+  return frameText(frame).split('\n');
+}
+
 function foregroundStyledTextCellExists(
   frame: {
     width: number;
@@ -201,6 +205,9 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(frameText(selected.frames.at(-1)!)).toContain('[-] decrease');
     expect(frameText(selected.frames.at(-1)!)).toContain('[+] increase');
     expect(frameText(selected.frames.at(-1)!)).toContain('json: {"counter":5}');
+    const selectedRows = frameRows(selected.frames.at(-1)!);
+    expect(selectedRows.find((row) => row.includes('CounterDemoBlock fixture'))).toContain('┐');
+    expect(selectedRows.find((row) => row.includes('┌─ Live lowering preview'))).toContain('┐');
     expect(frameText(incremented.frames.at(-1)!)).toContain('Counter: 6');
     expect(frameText(incremented.frames.at(-1)!)).toContain('json: {"counter":6}');
     expect(frameText(decremented.frames.at(-1)!)).toContain('Counter: 5');

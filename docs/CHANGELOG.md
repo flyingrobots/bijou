@@ -97,7 +97,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   lowering without controls, pipe/screenreader text, and a JSON snapshot
   without provider subscriptions or runtime command dispatch. The counter
   fixture animation tick is scoped to the active counter preview so inactive
-  DOGFOOD guide pages do not continue advancing fixture state.
+  DOGFOOD guide pages do not continue advancing fixture state. The counter
+  fixture preview now sizes nested live/example/documentation cards to the
+  outer page content width, preventing boxed surfaces from wrapping their
+  borders across rows at normal DOGFOOD viewport sizes.
 - **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
   built-in perf HUD surface toggled by the backtick key. The HUD reads the
   frame model's timing telemetry, works from workspace and active shell layers

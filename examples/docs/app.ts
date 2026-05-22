@@ -1053,7 +1053,9 @@ function renderCounterDemoPreviewPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyWidth = Math.max(28, paneWidth - 6);
-  const cardWidth = Math.max(30, Math.min(78, bodyWidth));
+  const pageWidth = Math.max(30, bodyWidth);
+  const pageContentWidth = Math.max(24, pageWidth - 4);
+  const cardWidth = Math.max(30, Math.min(78, pageContentWidth));
 
   return insetPaneSurface(column([
     themedSeparatorSurface(
@@ -1091,7 +1093,7 @@ function renderCounterDemoPreviewPane(
         '▼ Page: {blockName}',
         { blockName: counterDemoBlock.metadata.blockName },
       ),
-      width: Math.max(30, bodyWidth),
+      width: pageWidth,
       borderToken: docsThemeBorderToken(theme),
       padding: { left: 1, right: 1 },
       ctx,
