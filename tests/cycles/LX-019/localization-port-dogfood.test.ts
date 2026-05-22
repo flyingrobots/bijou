@@ -59,4 +59,28 @@ describe('LX-019 DOGFOOD localization port usage', () => {
     }]);
     expect(formatLocalizedList(localization, ['un', 'deux'])).toBe('un / deux');
   });
+
+  it('falls back when localized list formatting fails', () => {
+    const localization: LocalizationPort = {
+      locale: 'fr',
+      direction: 'ltr',
+      resolve<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {
+        return localizedObject(request.key, undefined) as LocalizedObject<Value>;
+      },
+      formatNumber(value) {
+        return String(value);
+      },
+      formatDate(value) {
+        return value.toISOString();
+      },
+      formatTime(value) {
+        return value.toISOString();
+      },
+      formatList() {
+        throw new Error('formatter unavailable');
+      },
+    };
+
+    expect(formatLocalizedList(localization, ['un', 'deux'])).toBe('un, deux');
+  });
 });

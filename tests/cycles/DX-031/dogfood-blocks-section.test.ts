@@ -51,17 +51,20 @@ function foregroundStyledTextCellExists(
       row += frame.get(x, y).char || ' ';
     }
 
-    const start = row.indexOf(needle);
-    if (start === -1) continue;
-
-    for (let x = start; x < Math.min(frame.width, start + needle.length); x++) {
-      const cell = frame.get(x, y);
-      if (
-        cell.fg != null
-        || cell.fgRGB != null
-        || (cell.modifiers?.length ?? 0) > 0
-      ) {
-        return true;
+    for (
+      let start = row.indexOf(needle);
+      start !== -1;
+      start = row.indexOf(needle, start + 1)
+    ) {
+      for (let x = start; x < Math.min(frame.width, start + needle.length); x++) {
+        const cell = frame.get(x, y);
+        if (
+          cell.fg != null
+          || cell.fgRGB != null
+          || (cell.modifiers?.length ?? 0) > 0
+        ) {
+          return true;
+        }
       }
     }
   }

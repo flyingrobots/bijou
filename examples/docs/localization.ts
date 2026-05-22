@@ -45,5 +45,13 @@ export function formatLocalizedList(
   localization: LocalizationPort | undefined,
   values: readonly string[],
 ): string {
-  return localization?.formatList(values) ?? values.join(', ');
+  if (localization == null) {
+    return values.join(', ');
+  }
+
+  try {
+    return localization.formatList(values);
+  } catch {
+    return values.join(', ');
+  }
 }

@@ -330,4 +330,85 @@ describe('bijou-i18n runtime', () => {
     expect(runtime.t({ namespace: 'shell', id: 'label' }))
       .toBe('<MISSING LOC STRING KEY=shell:greeting>');
   });
+
+  it('does not use missing-message markers as resource values', () => {
+    const runtime = createI18nRuntime({
+      locale: 'fr',
+      direction: 'ltr',
+      fallbackLocale: 'en',
+      missingMessage: ({ key }) => `<MISSING LOC STRING KEY=${key.namespace}:${key.id}>`,
+      fallbackCatalogs: [{
+        namespace: 'assets',
+        entries: [{
+          key: { namespace: 'assets', id: 'logo' },
+          kind: 'resource',
+          sourceLocale: 'en',
+          values: {
+            en: ['BIJOU'],
+          },
+        }],
+      }],
+    });
+
+    const resolved = runtime.localize<readonly string[]>({
+      key: { namespace: 'assets', id: 'logo' },
+      kind: 'resource',
+    });
+
+    expect(resolved.status).toBe('fallback');
+    expect(resolved.value).toEqual(['BIJOU']);
+    expect(resolved.value).not.toBe('<MISSING LOC STRING KEY=assets:logo>');
+  });
+
+  it('propagates referenced message status and issues through localize', () => {
+    const runtime = createI18nRuntime({
+      locale: 'fr',
+      direction: 'ltr',
+      fallbackLocale: 'en',
+      missingMessage: ({ key }) => `<MISSING LOC STRING KEY=${key.namespace}:${key.id}>`,
+      fallbackCatalogs: [{
+        namespace: 'shell',
+        entries: [
+          {
+            key: { namespace: 'shell', id: 'label' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: {
+              en: ref({ namespace: 'shell', id: 'greeting' }),
+            },
+          },
+          {
+            key: { namespace: 'shell', id: 'greeting' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: {
+              en: 'Hello',
+            },
+          },
+        ],
+      }],
+      catalogs: [{
+        namespace: 'shell',
+        entries: [{
+          key: { namespace: 'shell', id: 'label' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: {
+            fr: ref({ namespace: 'shell', id: 'greeting' }),
+          },
+        }],
+      }],
+    });
+
+    const resolved = runtime.localize<string>({
+      key: { namespace: 'shell', id: 'label' },
+      kind: 'message',
+    });
+
+    expect(resolved.status).toBe('missing');
+    expect(resolved.value).toBe('<MISSING LOC STRING KEY=shell:greeting>');
+    expect(resolved.issues.map((issue) => issue.key)).toEqual([
+      { namespace: 'shell', id: 'greeting' },
+    ]);
+  });
 });

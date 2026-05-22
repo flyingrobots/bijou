@@ -103,9 +103,10 @@ import {
 } from '@flyingrobots/bijou-i18n';
 
 const localization: LocalizationPort = createRuntimeLocalizationPort(runtime);
-const label = localization.resolve<string>({
+const labelResult = localization.resolve<string>({
   key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
 });
+const label = labelResult.value ?? 'Language';
 ```
 
 In non-production builds, missing selected-locale strings should be loud instead

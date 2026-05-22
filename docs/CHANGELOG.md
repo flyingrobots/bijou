@@ -16,7 +16,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   direction, entry kind, translated/fallback/missing status, value, issues, and
   facts instead of exposing only naked strings. DOGFOOD now routes ordinary
   docs text lookup through the localization port while keeping catalog loading
-  and locale activation at the app composition boundary.
+  and locale activation at the app composition boundary. Missing-localization
+  marker strings are limited to message entries so resource/data payloads keep
+  their structured value contracts, and `$ref` resolution propagates referenced
+  fallback/missing status metadata through the returned localized object.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n

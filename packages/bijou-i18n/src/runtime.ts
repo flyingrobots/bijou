@@ -174,11 +174,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
   ): LocalizedResolution<T> {
     const localized = entry.values[currentLocale];
     if (localized !== undefined) {
-      return {
-        status: 'translated',
-        value: resolveCandidate(localized, seen, options) as T,
-        issues: [],
-      };
+      return resolveCandidateResult(localized, seen, options, 'translated');
     }
 
     if (
@@ -215,11 +211,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (candidate === undefined) {
         continue;
       }
-      return {
-        status: 'fallback',
-        value: resolveCandidate(candidate, seen, options) as T,
-        issues: [],
-      };
+      return resolveCandidateResult(candidate, seen, options, 'fallback');
     }
 
     return {
@@ -242,11 +234,25 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     return resolveLocalizedValueResult(entry, seen, options).value;
   }
 
-  function resolveCandidate<T>(
+  function mergeResolutionStatus(
+    candidateStatus: LocalizationStatus,
+    referencedStatus: LocalizationStatus,
+  ): LocalizationStatus {
+    if (candidateStatus === 'missing' || referencedStatus === 'missing') {
+      return 'missing';
+    }
+    if (candidateStatus === 'fallback' || referencedStatus === 'fallback') {
+      return 'fallback';
+    }
+    return 'translated';
+  }
+
+  function resolveCandidateResult<T>(
     candidate: T | I18nReference,
     seen: Set<string>,
     options: { readonly missingMessage?: I18nMissingMessageFormatter } = {},
-  ): T | undefined {
+    candidateStatus: LocalizationStatus,
+  ): LocalizedResolution<T> {
     if (isReference(candidate)) {
       const refKey = keyToString(candidate.$ref);
       if (seen.has(refKey)) {
@@ -257,14 +263,22 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       if (referencedEntry === undefined) {
         throw new Error(`Missing i18n reference: ${refKey}`);
       }
-      const resolved = resolveLocalizedValue(referencedEntry, seen, options);
+      const resolved = resolveLocalizedValueResult<T>(referencedEntry as I18nCatalogEntry<T>, seen, options);
       seen.delete(refKey);
-      if (resolved !== undefined) {
-        return resolved as T;
+      if (resolved.value !== undefined) {
+        return {
+          status: mergeResolutionStatus(candidateStatus, resolved.status),
+          value: resolved.value,
+          issues: resolved.issues,
+        };
       }
       throw new Error(`Missing i18n reference: ${refKey}`);
     }
-    return candidate as T;
+    return {
+      status: candidateStatus,
+      value: candidate as T,
+      issues: [],
+    };
   }
 
   async function preloadLocale(locale: string): Promise<void> {
@@ -363,7 +377,7 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     }
 
     const resolved = resolveLocalizedValueResult<Value>(entry as I18nCatalogEntry<Value>, new Set<string>(), {
-      missingMessage: options.missingMessage,
+      missingMessage: entry.kind === 'message' ? options.missingMessage : undefined,
     });
     let value = resolved.value;
     const issues = [...resolved.issues];
