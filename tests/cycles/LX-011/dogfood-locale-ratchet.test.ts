@@ -126,6 +126,33 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
   });
 
+  it('preserves extra DOGFOOD catalog overrides after language cycling', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+      extraI18nCatalogs: [{
+        namespace: 'bijou.dogfood',
+        entries: [{
+          key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Preferred language override', fr: 'Langue sentinelle' },
+        }],
+      }],
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue sentinelle');
+  });
+
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, {

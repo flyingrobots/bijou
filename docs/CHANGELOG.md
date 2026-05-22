@@ -300,6 +300,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **DOGFOOD locale catalog overrides** — Language cycling now reloads
+  caller-provided extra i18n catalogs after generated DOGFOOD catalogs, so
+  host and test catalog overrides survive selected-locale changes.
 - **Atomic locale switching** — Loader-backed `setLocale()` now commits locale,
   direction, and loader-managed catalogs only after the selected locale catalogs
   load successfully, so failed locale switches leave the runtime on its previous

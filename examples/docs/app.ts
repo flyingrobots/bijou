@@ -815,20 +815,26 @@ function dogfoodText(
 
 function applyDogfoodLocale(
   i18n: I18nRuntime,
-  options: Pick<DocsAppOptions, 'direction'>,
+  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs'>,
   locale: string,
 ): void {
   const option = resolveDogfoodLocale(locale);
-  loadDogfoodRuntimeCatalogs(i18n, option.id);
+  loadDogfoodRuntimeCatalogs(i18n, option.id, options.extraI18nCatalogs ?? []);
   void i18n.setLocale(option.id, options.direction ?? option.direction);
 }
 
-function loadDogfoodRuntimeCatalogs(i18n: I18nRuntime, locale: string): void {
+function loadDogfoodRuntimeCatalogs(
+  i18n: I18nRuntime,
+  locale: string,
+  extraCatalogs: readonly I18nCatalog[] = [],
+): void {
   i18n.unloadCatalog(DOGFOOD_I18N_NAMESPACE);
-  if (locale === DEFAULT_LOCALE.id) {
-    return;
+  if (locale !== DEFAULT_LOCALE.id) {
+    for (const catalog of dogfoodI18nCatalogsForLocale(locale)) {
+      i18n.loadCatalog(catalog);
+    }
   }
-  for (const catalog of dogfoodI18nCatalogsForLocale(locale)) {
+  for (const catalog of extraCatalogs) {
     i18n.loadCatalog(catalog);
   }
 }
@@ -3981,10 +3987,7 @@ function createDocsI18nRuntime(options: DocsAppOptions = {}): I18nRuntime {
     missingMessage: showMissingLocalizationMarkers ? dogfoodMissingLocalizationMessage : undefined,
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
-  loadDogfoodRuntimeCatalogs(runtime, initialLocale.id);
-  for (const catalog of options.extraI18nCatalogs ?? []) {
-    runtime.loadCatalog(catalog);
-  }
+  loadDogfoodRuntimeCatalogs(runtime, initialLocale.id, options.extraI18nCatalogs ?? []);
   return runtime;
 }
 
