@@ -1,8 +1,6 @@
 import { readFileSync } from 'node:fs';
 import {
   boxSurface,
-  blockMetadataSummary,
-  blockPackageManifestSummary,
   blockRenderNode,
   cloneContextWithTheme,
   createSurface,
@@ -14,7 +12,6 @@ import {
   progressBar,
   readerSurfaceBlock,
   separatorSurface,
-  standardBlockPackageManifest,
   standardBlocks,
   standardBlockStories,
   renderBlockTree,
@@ -896,7 +893,6 @@ function standardBlockInventoryMarkdown(): string {
         '',
         metadata.docs.summary,
         '',
-        `- Contract: ${blockMetadataSummary(metadata)}`,
         `- Family: ${metadata.family}`,
         `- Scale: ${metadata.scale}`,
         `- Modes: ${metadata.modes.join(', ')}`,
@@ -904,7 +900,6 @@ function standardBlockInventoryMarkdown(): string {
         `- Optional slots: ${formatDocsList(optionalSlots)}`,
         `- Data requirements: ${formatDocsList(dataNames)}`,
         `- Command intents: ${formatDocsList(commandIds)}`,
-        `- Source: ${metadata.sourcePath ?? 'not published'}`,
       ].join('\n');
     })
     .join('\n\n');
@@ -912,7 +907,9 @@ function standardBlockInventoryMarkdown(): string {
   return [
     '# Pre-made Blocks',
     '',
-    `Package: ${blockPackageManifestSummary(standardBlockPackageManifest)}`,
+    `First-party standard blocks shipped by @flyingrobots/bijou: ${standardBlocks.length}.`,
+    '',
+    'These are public block authoring contracts with semantic slots, declared modes, data requirements, command intents, variants, and stories. Select a block under Block Preview for the live rendered example.',
     '',
     blockSections,
   ].join('\n');
@@ -1066,19 +1063,16 @@ function renderCounterDemoPreviewPane(
     ),
     spacer(1, 1),
     boxSurface(column([
-      line(dogfoodText(localization, 'blocks.preview.liveExample', 'Live example')),
       counterDemoBlockSurface(counterDemoBlockConfig(model.counterBlockDemo, ctx, cardWidth)),
       spacer(1, 1),
-      line(dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview')),
       boxSurface(paragraphSurface(counterDemoLoweringPreviewText(model.counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
-        title: dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview'),
+        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
         width: cardWidth,
         borderToken: docsThemeBorderToken(theme),
         padding: { left: 1, right: 1 },
         ctx,
       }),
       spacer(1, 1),
-      line(dogfoodText(localization, 'blocks.preview.liveDocumentation', 'Live documentation')),
       boxSurface(paragraphSurface(counterDemoDocumentationText(), cardWidth - 4), {
         title: dogfoodText(localization, 'blocks.preview.documentationTitle', 'documentation'),
         width: cardWidth,
@@ -1112,13 +1106,10 @@ function standardBlockLivePreviewSurface(
   const contentWidth = Math.max(24, safeWidth - 4);
 
   return boxSurface(column([
-    line(dogfoodText(localization, 'blocks.preview.liveExample', 'Live example')),
     standardBlockExampleSurface(block, contentWidth, ctx),
     spacer(1, 1),
-    line(dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview')),
     standardBlockLoweringPreviewSurface(block, contentWidth, ctx, theme, localization),
     spacer(1, 1),
-    line(dogfoodText(localization, 'blocks.preview.liveDocumentation', 'Live documentation')),
     standardBlockDocumentationSurface(block, contentWidth, ctx, theme, localization),
   ]), {
     title: dogfoodText(
@@ -1151,7 +1142,7 @@ function standardBlockExampleSurface(
   }
 
   return boxSurface(contentSurface(blockRenderOutputText(rendered.output)), {
-    title: `${block.metadata.blockName} live example`,
+    title: block.metadata.blockName,
     width: cardWidth,
     borderToken: ctx.border('primary'),
     padding: { left: 1, right: 1 },
@@ -1193,7 +1184,7 @@ function standardBlockLoweringPreviewSurface(
   });
 
   return boxSurface(paragraphSurface(modeLines.join('\n'), innerWidth), {
-    title: dogfoodText(localization, 'blocks.preview.liveLoweringPreview', 'Live lowering preview'),
+    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
     width: safeWidth,
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },

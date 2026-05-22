@@ -100,7 +100,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   DOGFOOD guide pages do not continue advancing fixture state. The counter
   fixture preview now sizes nested live/example/documentation cards to the
   outer page content width, preventing boxed surfaces from wrapping their
-  borders across rows at normal DOGFOOD viewport sizes.
+  borders across rows at normal DOGFOOD viewport sizes. Blocks preview pages
+  now remove redundant `Live ...` wrapper labels so the rendered block,
+  mode-lowering, and documentation cards carry the section titles directly,
+  while the Pre-made Blocks page presents a curated first-party catalog instead
+  of raw package/metadata summary strings.
 - **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
   built-in perf HUD surface toggled by the backtick key. The HUD reads the
   frame model's timing telemetry, works from workspace and active shell layers

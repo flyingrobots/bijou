@@ -13,34 +13,16 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveDocumentation"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {}
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveExample"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {}
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveLoweringPreview"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {}
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
         "id": "blocks.preview.loweringFacts"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.modeLoweringTitle"
       },
       "kind": "message",
       "sourceLocale": "en",

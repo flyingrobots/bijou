@@ -15,45 +15,23 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveDocumentation"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "Live documentation"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveExample"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "Live example"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "blocks.preview.liveLoweringPreview"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "Live lowering preview"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
         "id": "blocks.preview.loweringFacts"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {
         "en": "facts: {count}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.modeLoweringTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "mode lowering"
       }
     },
     {
