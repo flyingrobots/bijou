@@ -72,38 +72,59 @@ export function renderBlockTree<Config = unknown>(
 }
 
 function snapshotInput<Config>(input: BlockRenderInput<Config>): BlockRenderInput<Config> {
-  return snapshotPlainRecord(input) as BlockRenderInput<Config>;
+  return snapshotPlainRecord(input, 'input', new WeakSet<object>()) as BlockRenderInput<Config>;
 }
 
-function snapshotValue(value: unknown): unknown {
+function snapshotValue(value: unknown, path: string, seen: WeakSet<object>): unknown {
   if (isBlockRenderNode(value) || isBlockDefinition(value)) {
     return value;
   }
 
   if (Array.isArray(value)) {
-    return Object.freeze(value.map((item) => snapshotValue(item)));
+    if (seen.has(value)) {
+      throw new Error(`block render node: circular reference at ${path}`);
+    }
+    seen.add(value);
+    try {
+      return Object.freeze(value.map((item, index) => snapshotValue(item, `${path}[${index}]`, seen)));
+    } finally {
+      seen.delete(value);
+    }
   }
 
   if (isPlainRecord(value)) {
-    return snapshotPlainRecord(value);
+    return snapshotPlainRecord(value, path, seen);
   }
 
   return value;
 }
 
-function snapshotPlainRecord(input: object): Readonly<Record<string, unknown>> {
-  const record: Record<string, unknown> = {};
-  const descriptors = Object.getOwnPropertyDescriptors(input);
+function snapshotPlainRecord(
+  input: object,
+  path: string,
+  seen: WeakSet<object>,
+): Readonly<Record<string, unknown>> {
+  if (seen.has(input)) {
+    throw new Error(`block render node: circular reference at ${path}`);
+  }
+  seen.add(input);
 
-  for (const [key, descriptor] of Object.entries(descriptors)) {
-    if (!('value' in descriptor)) {
-      continue;
+  const record: Record<string, unknown> = {};
+  try {
+    const descriptors = Object.getOwnPropertyDescriptors(input);
+
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+      if (!('value' in descriptor)) {
+        continue;
+      }
+
+      record[key] = snapshotValue(descriptor.value, `${path}.${key}`, seen);
     }
 
-    record[key] = snapshotValue(descriptor.value);
+    return Object.freeze(record);
+  } finally {
+    seen.delete(input);
   }
-
-  return Object.freeze(record);
 }
 
 function renderTarget<Config = unknown>(

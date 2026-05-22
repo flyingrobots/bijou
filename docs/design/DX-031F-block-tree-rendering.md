@@ -170,6 +170,8 @@ on the first concrete block preview rather than a prose inventory page.
 - Render tree inputs are runtime-branded rather than loose `{ block, input }`
   shapes.
 - Render tree nodes snapshot plain slot/config records at construction time.
+- Render tree node construction rejects cyclic plain slot/config records with
+  deterministic contract errors instead of recursing until stack overflow.
 - Accessor properties in slot records are not invoked during slot resolution.
 - Child mode inherits from the parent unless a child explicitly sets its own
   mode.

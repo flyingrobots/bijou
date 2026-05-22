@@ -4,6 +4,7 @@ import {
   defineBlock,
   defineDataRequirement,
   defineViewData,
+  graphemeWidth,
   progressBar,
   type BijouContext,
   type BlockDefinition,
@@ -329,7 +330,7 @@ function normalizeCounterMode(mode: OutputMode | undefined): OutputMode {
 }
 
 function widestLine(lines: readonly string[]): number {
-  return lines.reduce((width, value) => Math.max(width, value.length), 1);
+  return lines.reduce((width, value) => Math.max(width, graphemeWidth(value)), 1);
 }
 
 function summarizeCounterOutput(value: string): string {

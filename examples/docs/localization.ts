@@ -19,17 +19,13 @@ export function localizedText(
     return interpolateFallbackText(fallback, values);
   }
 
-  try {
-    const resolved = localization.resolve<string>({
-      key: { namespace, id },
-      values,
-    });
-    return typeof resolved.value === 'string'
-      ? resolved.value
-      : interpolateFallbackText(fallback, values);
-  } catch {
-    return interpolateFallbackText(fallback, values);
-  }
+  const resolved = localization.resolve<string>({
+    key: { namespace, id },
+    values,
+  });
+  return typeof resolved.value === 'string'
+    ? resolved.value
+    : interpolateFallbackText(fallback, values);
 }
 
 export function dogfoodLocalizedText(

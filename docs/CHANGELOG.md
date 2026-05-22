@@ -300,6 +300,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localization value boundary validation** — `freezeLocalizedValue()` now
+  enforces the documented portable catalog boundary with deterministic errors
+  for cyclic graphs, symbol-keyed properties, non-enumerable properties,
+  accessors, class instances, functions, symbols, and bigint values instead of
+  silently dropping metadata, shallow-freezing mutable objects, or overflowing
+  the stack.
+- **Block render node cycle rejection** — `blockRenderNode()` now rejects cyclic
+  plain slot/config records with deterministic contract errors while preserving
+  existing snapshot behavior for inert plain data.
+- **DOGFOOD localization failure visibility** — DOGFOOD text lookup no longer
+  catches every localization-port failure and falls back to English copy, so
+  unexpected adapter/catalog failures remain observable instead of being hidden
+  behind fallback text.
+- **Counter fixture terminal width** — The DOGFOOD `CounterDemoBlock` fixture
+  now sizes its preview card with ANSI-aware grapheme width so styled progress
+  bar output does not inflate the card width.
 - **Localization runtime method binding** — `I18nRuntime.t()` now resolves
   messages through closure-owned runtime state so callers can destructure or
   pass the helper as a function without losing access to localization state.

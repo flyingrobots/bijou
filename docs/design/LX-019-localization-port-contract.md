@@ -1,6 +1,6 @@
 # LX-019 — Localization Port Contract
 
-Legend: [LX — Localization and Bidirectionality](../method/legends/LX-localization-and-bidirectionality.md)
+Legend: [LX — Localization and Bidirectionality](../legends/LX-localization-and-bidirectionality.md)
 
 ## Why This Cycle Exists
 
@@ -220,6 +220,10 @@ runtime.t({ namespace: 'bijou.dogfood', id: 'settings.language.label' });
 - Runtime lookup helpers stay receiver-independent so app code can pass them
   around without binding `this`.
 - The runtime adapter returns immutable localized objects.
+- Localized values enforce the portable JSON-shaped catalog boundary with
+  deterministic errors for cyclic graphs, symbol-keyed properties,
+  non-enumerable properties, accessors, class instances, functions, symbols, and
+  bigint values.
 - Localized objects preserve key, locale, direction, kind, status, value,
   issues, and facts.
 - Missing selected-locale translations remain inspectable as missing

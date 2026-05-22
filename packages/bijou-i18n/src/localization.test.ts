@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
+  freezeLocalizedValue,
 } from './index.js';
 
 describe('LocalizationPort runtime adapter', () => {
@@ -155,6 +156,49 @@ describe('LocalizationPort runtime adapter', () => {
     expect(resolved.value).toEqual({ label: 'Logo', lines: ['BIJOU'] });
     expect(Object.isFrozen(resolved.value)).toBe(true);
     expect(Object.isFrozen(resolved.value?.lines)).toBe(true);
+  });
+
+  it('rejects non-portable localized value shapes deterministically', () => {
+    const cyclicValue: Record<string, unknown> = { label: 'Cycle' };
+    cyclicValue.self = cyclicValue;
+    const secretKey = Symbol('secret');
+    const symbolValue = { label: 'Symbol', [secretKey]: 'hidden' };
+    const nonEnumerableValue: Record<string, unknown> = { label: 'Hidden' };
+    Object.defineProperty(nonEnumerableValue, 'hidden', {
+      enumerable: false,
+      value: 'secret',
+    });
+    const accessorValue = Object.defineProperty({}, 'label', {
+      enumerable: true,
+      get() {
+        return 'unsafe';
+      },
+    });
+
+    expect(() => freezeLocalizedValue(cyclicValue)).toThrow(
+      'Localized value contains circular reference at value.self',
+    );
+    expect(() => freezeLocalizedValue(symbolValue)).toThrow(
+      'Localized value contains unsupported symbol property at value',
+    );
+    expect(() => freezeLocalizedValue(nonEnumerableValue)).toThrow(
+      'Localized value contains unsupported non-enumerable property: value.hidden',
+    );
+    expect(() => freezeLocalizedValue(accessorValue)).toThrow(
+      'Localized value contains unsupported accessor property: value.label',
+    );
+    expect(() => freezeLocalizedValue(new Date(0))).toThrow(
+      'Localized value contains unsupported Date at value',
+    );
+    expect(() => freezeLocalizedValue(() => 'unsafe')).toThrow(
+      'Localized value contains unsupported function at value',
+    );
+    expect(() => freezeLocalizedValue(Symbol('unsafe'))).toThrow(
+      'Localized value contains unsupported symbol at value',
+    );
+    expect(() => freezeLocalizedValue(1n)).toThrow(
+      'Localized value contains unsupported bigint at value',
+    );
   });
 
   it('delegates selected-locale list formatting through the port', () => {

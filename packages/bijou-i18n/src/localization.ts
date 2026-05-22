@@ -131,26 +131,72 @@ export function freezeLocalizedObject<Value>(
  * properties only; accessor-backed plain objects are rejected.
  */
 export function freezeLocalizedValue<Value>(value: Value): Value {
+  return cloneLocalizedValue(value, 'value', new WeakSet<object>()) as Value;
+}
+
+function cloneLocalizedValue(
+  value: unknown,
+  path: string,
+  seen: WeakSet<object>,
+): unknown {
   if (value == null || typeof value !== 'object') {
+    if (typeof value === 'bigint' || typeof value === 'symbol' || typeof value === 'function') {
+      throw new Error(`Localized value contains unsupported ${typeof value} at ${path}`);
+    }
     return value;
   }
 
+  const objectValue = value as object;
+  if (seen.has(objectValue)) {
+    throw new Error(`Localized value contains circular reference at ${path}`);
+  }
+  seen.add(objectValue);
+
+  try {
+    return cloneLocalizedObjectValue(value, path, seen);
+  } finally {
+    seen.delete(objectValue);
+  }
+}
+
+function cloneLocalizedObjectValue(
+  value: object,
+  path: string,
+  seen: WeakSet<object>,
+): unknown {
   if (Array.isArray(value)) {
-    return Object.freeze(value.map((item) => freezeLocalizedValue(item))) as Value;
+    return Object.freeze(value.map((item, index) => cloneLocalizedValue(item, `${path}[${index}]`, seen)));
   }
 
   const prototype = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null) {
-    return Object.freeze(value);
+    throw new Error(`Localized value contains unsupported ${objectKind(value)} at ${path}`);
   }
 
   const output: Record<string, unknown> = {};
-  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-    if (!('value' in descriptor)) {
-      throw new Error(`Localized value contains unsupported accessor property: ${key}`);
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  for (const key of Reflect.ownKeys(descriptors)) {
+    if (typeof key === 'symbol') {
+      throw new Error(`Localized value contains unsupported symbol property at ${path}`);
     }
-    output[key] = freezeLocalizedValue(descriptor.value);
+
+    const descriptor = descriptors[key];
+    if (descriptor === undefined) {
+      continue;
+    }
+    const propertyPath = `${path}.${key}`;
+    if (!descriptor.enumerable) {
+      throw new Error(`Localized value contains unsupported non-enumerable property: ${propertyPath}`);
+    }
+    if (!('value' in descriptor)) {
+      throw new Error(`Localized value contains unsupported accessor property: ${propertyPath}`);
+    }
+    output[key] = cloneLocalizedValue(descriptor.value, propertyPath, seen);
   }
 
-  return Object.freeze(output) as Value;
+  return Object.freeze(output);
+}
+
+function objectKind(value: object): string {
+  return Object.prototype.toString.call(value).slice(8, -1);
 }

@@ -3,6 +3,7 @@ import { standardBlocks, standardBlockStories } from '@flyingrobots/bijou';
 import { _resetDefaultContextForTesting, createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
+import { counterDemoBlockSurface } from '../../../examples/docs/counter-block-demo.js';
 
 const KEY_ENTER = '\r';
 const KEY_NEXT_TAB = ']';
@@ -233,6 +234,21 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(frameText(incremented.frames.at(-1)!)).toContain('Counter: 6');
     expect(frameText(incremented.frames.at(-1)!)).toContain('json: {"counter":6}');
     expect(frameText(decremented.frames.at(-1)!)).toContain('Counter: 5');
+  });
+
+  it('sizes the CounterDemoBlock fixture by visible terminal width', () => {
+    const baseCtx = createTestContext({ mode: 'interactive', runtime: { columns: 100, rows: 40 } });
+    const styledCtx = {
+      ...baseCtx,
+      style: {
+        ...baseCtx.style,
+        styled: (_token: unknown, text: string) => `\x1b[31m${text}\x1b[0m`,
+      },
+    };
+
+    const surface = counterDemoBlockSurface({ counter: 5, ctx: styledCtx });
+
+    expect(surface.width).toBe(70);
   });
 
   it('does not tick the CounterDemoBlock fixture when another Blocks guide is selected', async () => {

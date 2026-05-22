@@ -120,6 +120,20 @@ describe('block tree rendering', () => {
     expect(rendered.output).not.toContain('mutated content');
   });
 
+  it('rejects cyclic render-node input records deterministically', () => {
+    const cyclicSlots: Record<string, unknown> = { content: 'cyclic content' };
+    cyclicSlots.self = cyclicSlots;
+    const cyclicConfig: Record<string, unknown> = { width: 40 };
+    cyclicConfig.self = cyclicConfig;
+
+    expect(() => blockRenderNode(readerSurfaceBlock, { slots: cyclicSlots })).toThrow(
+      'block render node: circular reference at input.slots.self',
+    );
+    expect(() => blockRenderNode(readerSurfaceBlock, { config: cyclicConfig })).toThrow(
+      'block render node: circular reference at input.config.self',
+    );
+  });
+
   it('fails deterministically when nested rendering exceeds the maximum depth', () => {
     const node = blockRenderNode(appShellBlock, {
       mode: 'pipe',

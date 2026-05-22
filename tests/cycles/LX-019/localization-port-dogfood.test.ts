@@ -83,4 +83,30 @@ describe('LX-019 DOGFOOD localization port usage', () => {
 
     expect(formatLocalizedList(localization, ['un', 'deux'])).toBe('un, deux');
   });
+
+  it('does not hide localization port failures behind fallback copy', () => {
+    const localization: LocalizationPort = {
+      locale: 'fr',
+      direction: 'ltr',
+      resolve<Value = unknown>(): LocalizedObject<Value> {
+        throw new Error('localization adapter unavailable');
+      },
+      formatNumber(value) {
+        return String(value);
+      },
+      formatDate(value) {
+        return value.toISOString();
+      },
+      formatTime(value) {
+        return value.toISOString();
+      },
+      formatList(values) {
+        return values.join(' / ');
+      },
+    };
+
+    expect(() => dogfoodLocalizedText(localization, 'example.title', 'Example')).toThrow(
+      'localization adapter unavailable',
+    );
+  });
 });
