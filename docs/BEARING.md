@@ -15,6 +15,8 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
   command-intent, lifecycle, active-binding, first-party definition, DOGFOOD
   documentation, and fixture-demo proof. The visible product layer is still
   emerging; the architecture is ahead of the rendered catalog.
+- `LX-019` — DOGFOOD text lookup now goes through an application-facing
+  localization port instead of view code reaching for the concrete runtime.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -43,18 +45,19 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 - New Block work should consume the existing contracts, not invent provider,
   lifecycle, callback, or localization policy while rendering.
 
-### 3. Localization Port Before More View-Level Lookup
+### 3. DOGFOOD Becomes Block-Authored
 
-- English fallback is separate from selected-locale catalogs.
-- Missing selected-locale strings are now real missing data, not disguised
-  English.
-- DOGFOOD now needs an app-facing localization port so views ask for localized
-  objects instead of depending directly on the concrete i18n runtime.
+- DOGFOOD should prove Bijou's Block system by using Blocks for semantic app
+  surfaces, not merely previewing Blocks in one section.
+- Components remain the leaf rendering vocabulary inside Blocks.
+- Storybook should move onto the shared framed shell path and expose a
+  `StorybookWorkbenchBlock` contract instead of staying a parallel bespoke TUI.
 
 ## Tensions
 
-- **View-Level Runtime Leakage**: DOGFOOD still passes the concrete i18n
-  runtime through rendering helpers for ordinary text lookup.
+- **Block Boundary Drift**: It is tempting to wrap every component in a Block.
+  That would blur the useful boundary; Blocks should own product semantics,
+  while components own leaf rendering.
 - **Product Proof Lag**: Blocks have better contracts than visible rendered
   proof. AppShell rendering must consume existing data-flow contracts instead of
   creating a parallel prop/callback path.
@@ -67,26 +70,27 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 ## Next Target
 
 The immediate focus is
-[LX-019 — Localization Port Contract](./design/LX-019-localization-port-contract.md).
+[DF-069 — Block-Authored DOGFOOD](./design/DF-069-block-authored-dogfood.md).
 
-LX-019 should stay boundary-focused:
+DF-069 should stay product-composition focused:
 
-- define the application-facing `LocalizationPort` in `@flyingrobots/bijou-i18n`
-- return structured localized objects instead of naked strings
-- keep catalog/file loading in adapters
-- keep DOGFOOD runtime composition at the app boundary
-- migrate DOGFOOD text helpers to the port
+- move Storybook toward the framed shell path
+- introduce DOGFOOD Blocks for semantic app/page surfaces
+- keep low-level components as rendering primitives inside Blocks
+- preserve unidirectional data-binding and localization-port boundaries
 
 Non-goals for the next cycle:
 
-- no localization dashboard
-- no translation workbench
-- no portable preference system
-- no broad catalog expansion
-- no remote localization service
+- no full visual redesign of DOGFOOD
+- no conversion of every leaf component into a Block
+- no hidden global block registry
+- no new provider lifecycle system
+- no localization runtime rewrite
 
 Expected sequence:
 
-1. `LX-019` puts application-facing localization lookup behind a port.
-2. Remaining DOGFOOD text surfaces continue moving into catalogs.
-3. Blocks product proof resumes with less view-level localization leakage.
+1. `DF-069` makes the next DOGFOOD proof block-authored at semantic boundaries.
+2. Storybook moves onto the same framed-shell model.
+3. DOGFOOD pages migrate to Blocks incrementally, starting with title,
+   navigation, documentation article, settings, block preview, and inspector
+   surfaces.
