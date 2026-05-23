@@ -168,6 +168,106 @@ export interface TitleScreenBlockConfig {
   readonly subtitle?: string;
 }
 
+export interface NavigationListBlockConfig {
+  readonly itemCount?: number;
+  readonly activeLabel?: string;
+}
+
+export const navigationItemsRequirement = defineDataRequirement({
+  id: 'navigation.items',
+  resource: 'dogfood.navigation.items',
+  label: 'Navigation items',
+  description: 'Visible DOGFOOD navigation groups and rows.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+});
+
+export const navigationSelectionRequirement = defineDataRequirement({
+  id: 'navigation.selection',
+  resource: 'dogfood.navigation.selection',
+  label: 'Navigation selection',
+  description: 'Focused or active DOGFOOD navigation row.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+});
+
+export const navigationListData = defineViewData({
+  id: 'navigation-list.data',
+  label: 'NavigationListBlock data',
+  description: 'DOGFOOD navigation rows and selected item.',
+  requirements: [
+    { name: 'items', requirement: navigationItemsRequirement },
+    { name: 'selection', requirement: navigationSelectionRequirement },
+  ],
+});
+
+export const navigationSelectItemIntent = commandIntent<{ readonly itemId: string }>(
+  'navigation.selectItem',
+  {
+    label: 'Select item',
+    description: 'Request activation of a DOGFOOD navigation row.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NavigationListBlock' }],
+  },
+);
+
+export const navigationExpandGroupIntent = commandIntent<{ readonly groupId: string }>(
+  'navigation.expandGroup',
+  {
+    label: 'Expand group',
+    description: 'Request expansion of a DOGFOOD navigation group.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NavigationListBlock' }],
+  },
+);
+
+export const navigationCollapseGroupIntent = commandIntent<{ readonly groupId: string }>(
+  'navigation.collapseGroup',
+  {
+    label: 'Collapse group',
+    description: 'Request collapse of a DOGFOOD navigation group.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NavigationListBlock' }],
+  },
+);
+
+export const navigationListBlock: BlockDefinition<NavigationListBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'NavigationListBlock',
+    family: 'dogfood-navigation',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns DOGFOOD section and guide navigation as selectable semantic rows.',
+      useWhen: ['DOGFOOD needs selectable navigation with explicit command intents.'],
+      avoidWhen: ['A component only needs a local menu without app navigation semantics.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'items', required: true, description: 'Navigation rows and groups.' },
+      { id: 'selection', required: false, description: 'Current focused or active row.' },
+    ],
+    variants: [
+      {
+        id: 'docs-sidebar',
+        label: 'Docs sidebar',
+        requiredSlots: ['items'],
+        optionalSlots: ['selection'],
+        facts: [{ kind: 'state', key: 'dogfood.navigation.scope', value: 'docs-sidebar' }],
+      },
+    ],
+    composedComponents: ['browsableListSurface()', 'viewportSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+    storyIds: ['navigation-list.docs-sidebar'],
+    examples: [{ id: 'dogfood.navigation', label: 'DOGFOOD docs navigation' }],
+    tags: ['dogfood', 'navigation', 'selection'],
+  },
+  data: navigationListData,
+  commands: [
+    navigationSelectItemIntent,
+    navigationExpandGroupIntent,
+    navigationCollapseGroupIntent,
+  ],
+  render: renderNavigationListBlock,
+});
+
 export const titleRouteRequirement = defineDataRequirement({
   id: 'title.route',
   resource: 'dogfood.route',
@@ -369,8 +469,17 @@ export const titleScreenBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['title', 'entry'],
 });
 
+export const navigationListBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: navigationListBlock,
+  role: 'navigation',
+  surfaceId: 'docs.navigation',
+  description: 'DOGFOOD docs and guide navigation surface.',
+  tags: ['navigation', 'docs'],
+});
+
 export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   titleScreenBlockRegistryEntry,
+  navigationListBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
 
@@ -480,6 +589,30 @@ function renderTitleScreenBlock(
       'Actions: open docs; open Storybook; open settings',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'TitleScreenBlock' }],
+  };
+}
+
+function renderNavigationListBlock(
+  input: BlockRenderInput<NavigationListBlockConfig>,
+): BlockRenderResult<string> {
+  const itemCount = input.config?.itemCount ?? 0;
+  const activeLabel = input.config?.activeLabel ?? 'none';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Navigation items: ${itemCount}; active: ${activeLabel}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+    };
+  }
+
+  return {
+    output: [
+      'NavigationListBlock',
+      `items: ${itemCount}`,
+      `active: ${activeLabel}`,
+      'Intents: select item; expand group; collapse group',
+    ].join('\n'),
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
   };
 }
 

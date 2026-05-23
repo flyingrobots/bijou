@@ -10,6 +10,8 @@ import {
   dogfoodBlockRegistryEntry,
   isDogfoodBlockRegistry,
   isDogfoodBlockRegistryEntry,
+  navigationListBlock,
+  navigationListBlockRegistryEntry,
   storybookWorkbenchBlock,
   storybookWorkbenchBlockRegistryEntry,
   titleScreenBlock,
@@ -167,6 +169,28 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       },
       mode: 'accessible',
     }).output).toBe('Bijou: Terminal UI proof');
+  });
+
+  it('publishes DOGFOOD navigation as a selectable block surface', () => {
+    expect(navigationListBlockRegistryEntry.block).toBe(navigationListBlock);
+    expect(navigationListBlockRegistryEntry.role).toBe('navigation');
+    expect(defaultDogfoodBlockRegistry.forSurface('docs.navigation')).toBe(
+      navigationListBlockRegistryEntry,
+    );
+    expect(navigationListBlock.data?.names()).toEqual(['items', 'selection']);
+    expect(navigationListBlock.commands?.map((intent) => intent.id)).toEqual([
+      'navigation.selectItem',
+      'navigation.expandGroup',
+      'navigation.collapseGroup',
+    ]);
+
+    expect(navigationListBlock.render({
+      config: {
+        itemCount: 7,
+        activeLabel: 'Blocks',
+      },
+      mode: 'pipe',
+    }).output).toBe('Navigation items: 7; active: Blocks');
   });
 });
 
