@@ -19,6 +19,7 @@ import type { Cmd, KeyMsg } from './types.js';
 import type { KeyMap } from './keybindings.js';
 import { formatKeyCombo } from './keybindings.js';
 import { frameMessage } from './app-frame-i18n.js';
+import { resolveFramePageText } from './app-frame-utils.js';
 import {
   createCommandPaletteState,
   cpFilter,
@@ -122,8 +123,10 @@ export function openSearchPalette<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): InternalFrameModel<PageModel, Msg> {
   const page = pagesById.get(model.activePageId)!;
+  const pageModel = model.pageModels[model.activePageId]!;
   const entries = buildSearchEntries(model, frameKeys, options, pagesById);
-  const title = page.searchTitle ?? frameMessage(options.i18n, 'search.title', 'Search');
+  const title = resolveFramePageText(page.searchTitle, pageModel)
+    ?? frameMessage(options.i18n, 'search.title', 'Search');
   return openPaletteModel(model, entries, title, 'search');
 }
 
@@ -191,6 +194,8 @@ export function buildPaletteEntries<PageModel, Msg>(
   }
 
   const page = pagesById.get(model.activePageId)!;
+  const pageModel = model.pageModels[model.activePageId]!;
+  const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
   if (page.keyMap != null) {
     for (const b of page.keyMap.bindings()) {
       if (!b.enabled) continue;
@@ -202,7 +207,7 @@ export function buildPaletteEntries<PageModel, Msg>(
         item: {
           id,
           label: b.description,
-          category: page.title,
+          category: pageTitle,
           shortcut: formatKeyCombo(b.combo),
         },
         msgAction: action,
@@ -219,7 +224,7 @@ export function buildPaletteEntries<PageModel, Msg>(
         item: {
           ...item,
           id,
-          category: item.category ?? page.title,
+          category: item.category ?? pageTitle,
         },
         msgAction: item.action,
         targetPageId: model.activePageId,
@@ -238,8 +243,10 @@ export function buildSearchEntries<PageModel, Msg>(
   pagesById: Map<string, FramePage<PageModel, Msg>>,
 ): readonly PaletteEntry<Msg>[] {
   const page = pagesById.get(model.activePageId)!;
-  const items = page.searchItems?.(model.pageModels[model.activePageId]!)
-    ?? page.commandItems?.(model.pageModels[model.activePageId]!)
+  const pageModel = model.pageModels[model.activePageId]!;
+  const pageTitle = resolveFramePageText(page.title, pageModel) ?? '';
+  const items = page.searchItems?.(pageModel)
+    ?? page.commandItems?.(pageModel)
     ?? [];
 
   return items.map((item, index) => ({
@@ -247,7 +254,7 @@ export function buildSearchEntries<PageModel, Msg>(
     item: {
       ...item,
       id: `search:${index}`,
-      category: item.category ?? page.title,
+      category: item.category ?? pageTitle,
     },
     msgAction: item.action,
     targetPageId: model.activePageId,

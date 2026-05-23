@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { createSurface, parseAnsiToSurface, setDefaultContext, type LayoutNode } from '@flyingrobots/bijou';
+import {
+  createSurface,
+  parseAnsiToSurface,
+  setDefaultContext,
+  type LayoutNode,
+  type Surface,
+} from '@flyingrobots/bijou';
 import { createTestContext, _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
 import { createFrameKeyMap } from './app-frame-utils.js';
 import {
@@ -15,6 +21,18 @@ import { createPanelVisibilityState } from './panel-state.js';
 import { createPanelDockState } from './panel-dock.js';
 
 afterEach(() => _resetDefaultContextForTesting());
+
+function surfacePlainText(surface: Surface): string {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char;
+    }
+    lines.push(line);
+  }
+  return lines.join('\n');
+}
 
 describe('renderTransition', () => {
   const ctx = createTestContext({ mode: 'interactive' });
@@ -256,6 +274,48 @@ describe('frame shell chrome surfaces', () => {
     expect(activeCell.fg).not.toBe('#d8dee9');
     expect(activeCell.fg).not.toBe(inactiveCell.fg);
     expect(activeCell.modifiers).toContain('bold');
+  });
+
+  it('resolves page tab text from the current page model at render time', () => {
+    const activePage = {
+      id: 'home',
+      title: (model: { readonly count: number }) => `Home ${model.count}`,
+      init: () => [{ count: 0 }, []] as const,
+      update: (_msg: never, model: { readonly count: number }) => [model, []] as const,
+      layout: () => ({ kind: 'pane' as const, paneId: 'main', render: () => createSurface(1, 1) }),
+    };
+    const pagesById = new Map([['home', activePage]]);
+    const model = {
+      activePageId: 'home',
+      pageOrder: ['home'],
+      pageModels: { home: { count: 2 } },
+      focusedPaneByPage: { home: 'main' },
+      scrollByPage: {},
+      columns: 24,
+      rows: 5,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
+      runtimeNotifications: {} as never,
+      runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
+    };
+    const options = { title: 'DOGFOOD', pages: [activePage] };
+
+    const firstHeader = resolveHeaderLine(model as any, options as any, pagesById as any);
+    const nextHeader = resolveHeaderLine({
+      ...model,
+      pageModels: { home: { count: 7 } },
+    } as any, options as any, pagesById as any);
+
+    expect(surfacePlainText(firstHeader.surface)).toContain('Home 2');
+    expect(surfacePlainText(nextHeader.surface)).toContain('Home 7');
+    expect(surfacePlainText(nextHeader.surface)).not.toContain('Home 2');
   });
 
   it('honors an explicit active-tab token override from frame options', () => {

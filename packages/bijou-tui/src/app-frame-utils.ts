@@ -6,7 +6,7 @@
  */
 
 import type { FrameLayoutNode } from './app-frame.js';
-import type { FrameAction } from './app-frame-types.js';
+import type { FrameAction, FramePageText } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import { isMinimized } from './panel-state.js';
@@ -51,6 +51,14 @@ export function assertUniquePaneIds(paneIds: readonly string[], scope: string): 
     }
     seen.add(paneId);
   }
+}
+
+/** Resolve static or model-derived framed page text. */
+export function resolveFramePageText<PageModel>(
+  source: FramePageText<PageModel> | undefined,
+  model: PageModel,
+): string | undefined {
+  return typeof source === 'function' ? source(model) : source;
 }
 
 /** Walk the layout tree to find the pane node with the given ID. */
@@ -136,6 +144,7 @@ export function createFrameKeyMap(
   const keyMap = createKeyMap<FrameAction>()
     .group(group('key.group.frame', 'Frame'), (g) => g
       .bind('?', t('key.toggleHelp', 'Toggle help'), { type: 'toggle-help' })
+      .bind('`', t('key.togglePerfHud', 'Toggle perf HUD'), { type: 'toggle-perf-hud' })
       .bind('[', t('key.prevTab', 'Previous tab'), { type: 'prev-tab' })
       .bind(']', t('key.nextTab', 'Next tab'), { type: 'next-tab' })
       .bind('tab', t('key.nextPane', 'Next pane'), { type: 'next-pane' })

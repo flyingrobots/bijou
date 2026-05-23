@@ -71,6 +71,9 @@ Bijou now exposes a metadata-first block authoring contract from
   behavior out of the block definition layer.
 - `defineAppShellComposition()` groups runtime-backed blocks into logical
   navigation, content, inspector, status, and overlay slots without rendering.
+- `blockRenderNode()` and `renderBlockTree()` explicitly render nested block
+  declarations when a host or preview wants child block output inside parent
+  slots. Ordinary `block.render()` remains a local single-block render contract.
 - `defineBlockSchemaAdapter()`, `defineSchemaBlock()`, and
   `bindSchemaBlockInput()` validate unknown boundary data before producing block
   render input and binding facts.

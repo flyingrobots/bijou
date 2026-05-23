@@ -99,7 +99,8 @@ Select the family based on the interaction semantic.
 - **`commandPalette()`**: Action discovery and navigation.
 
 ### Shell and Workspace Layout
-- **`createFramedApp()`**: Batteries-included workspace with tabs, panes, and help.
+- **`createFramedApp()`**: Batteries-included workspace with tabs, panes,
+  help, and a shell-owned perf HUD toggled with the backtick key.
 - **`splitPane()`**: Dynamic primary/secondary context comparison.
 - **`grid()`**: Stable regions with simultaneous visibility.
 - **`viewport()`**: The canonical scroll mask for rich composition.

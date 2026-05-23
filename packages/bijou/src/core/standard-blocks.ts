@@ -22,6 +22,9 @@ import {
   type BlockSchemaResult,
   type SchemaBoundBlockDefinition,
 } from './schema-block.js';
+import { boxSurface } from './components/box-v3.js';
+import { createTextSurface } from './components/surface-text.js';
+import { createSurface, type Surface } from '../ports/surface.js';
 
 const BIJOU_PACKAGE = '@flyingrobots/bijou';
 const ALL_OUTPUT_MODES = Object.freeze([
@@ -461,7 +464,7 @@ function standardBlockStory(
   });
 }
 
-function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string> {
+function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
   const sections: readonly RenderSection[] = [
     renderSection('navigation', 'Navigation', ownSlotValue(input.slots, 'navigation'), false),
@@ -476,12 +479,12 @@ function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<string>
       ? renderAccessibleSections('AppShell', sections)
       : mode === 'pipe'
         ? renderPipeSections('AppShell', sections)
-        : renderVisualSections('AppShell', sections),
+        : renderVisualSectionsSurface('AppShell', sections, renderSurfaceBounds(input)),
     facts: renderFacts('AppShell', sections, 'region'),
   });
 }
 
-function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<string> {
+function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
   const sections: readonly RenderSection[] = [
     renderSection('navigation', 'Navigation', ownSlotValue(input.slots, 'navigation'), false),
@@ -494,12 +497,12 @@ function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<st
       ? renderAccessibleSections('ReaderSurface', sections)
       : mode === 'pipe'
         ? renderPipeSections('ReaderSurface', sections)
-        : renderVisualSections('ReaderSurface', sections),
+        : renderVisualSectionsSurface('ReaderSurface', sections, renderSurfaceBounds(input)),
     facts: renderFacts('ReaderSurface', sections, 'slot'),
   });
 }
 
-function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<string> {
+function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
   const sections: readonly RenderSection[] = [
     renderSection('selection', 'Selection', ownSlotValue(input.slots, 'selection'), true),
@@ -512,7 +515,7 @@ function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderResult<s
       ? renderAccessibleSections('InspectorPanel', sections)
       : mode === 'pipe'
         ? renderPipeSections('InspectorPanel', sections)
-        : renderVisualSections('InspectorPanel', sections),
+        : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceBounds(input)),
     facts: renderFacts('InspectorPanel', sections, 'slot'),
   });
 }
@@ -521,16 +524,22 @@ interface RenderSection {
   readonly id: string;
   readonly label: string;
   readonly content: string;
+  readonly visualContent: string | Surface;
   readonly required: boolean;
   readonly present: boolean;
 }
 
 interface RenderedBlockOptions {
-  readonly output: string;
+  readonly output: string | Surface;
   readonly facts: readonly BindingFact[];
 }
 
-function renderedBlockResult(options: RenderedBlockOptions): BlockRenderResult<string> {
+interface RenderSurfaceBounds {
+  readonly width: number;
+  readonly sectionHeight?: number;
+}
+
+function renderedBlockResult(options: RenderedBlockOptions): BlockRenderResult<string | Surface> {
   const facts = Object.freeze(options.facts.map((fact) => Object.freeze({ ...fact })));
   return Object.freeze({
     output: options.output,
@@ -545,11 +554,14 @@ function renderSection(
   required: boolean,
 ): RenderSection {
   const content = slotValueText(value);
-  const present = content !== undefined;
+  const visualContent = slotValueVisualContent(value, content);
+  const present = content !== undefined || visualContent !== undefined;
+  const fallbackContent = required ? `(missing required ${id})` : '';
   return Object.freeze({
     id,
     label,
-    content: content ?? (required ? `(missing required ${id})` : ''),
+    content: content ?? fallbackContent,
+    visualContent: visualContent ?? fallbackContent,
     required,
     present,
   });
@@ -569,14 +581,28 @@ function renderAccessibleSections(blockName: StandardBlockName, sections: readon
   ].join('\n');
 }
 
-function renderVisualSections(blockName: StandardBlockName, sections: readonly RenderSection[]): string {
-  return [
-    blockName,
-    ...sections.flatMap((section) => [
-      `--- ${section.label} ---`,
-      indentBlock(section.content),
-    ]),
-  ].join('\n');
+function renderVisualSectionsSurface(
+  blockName: StandardBlockName,
+  sections: readonly RenderSection[],
+  bounds: RenderSurfaceBounds,
+): Surface {
+  const safeWidth = Math.max(30, Math.floor(bounds.width));
+  const sectionWidth = Math.max(24, safeWidth - 4);
+  const sectionContentWidth = Math.max(1, sectionWidth - 4);
+  const sectionSurfaces = sections.map((section) => {
+    const content = fitVisualContent(section.visualContent, sectionContentWidth, bounds.sectionHeight);
+    return boxSurface(content, {
+      title: section.label,
+      width: sectionWidth,
+      padding: { left: 1, right: 1 },
+    });
+  });
+
+  return boxSurface(stackSurfaces(sectionSurfaces, 1), {
+    title: blockName,
+    width: safeWidth,
+    padding: { left: 1, right: 1 },
+  });
 }
 
 function formatSectionLine(label: string, content: string): string {
@@ -617,6 +643,48 @@ function normalizeOutputMode(mode: OutputMode | undefined): OutputMode {
   return ALL_OUTPUT_MODES.includes(mode as OutputMode) ? mode as OutputMode : 'interactive';
 }
 
+function renderSurfaceBounds(input: BlockRenderInput): RenderSurfaceBounds {
+  const config = input.config;
+  let width = 78;
+  let sectionHeight: number | undefined;
+  if (isPlainRecord(config)) {
+    const widthValue = ownDataProperty(config, 'width');
+    if (typeof widthValue === 'number' && Number.isFinite(widthValue)) {
+      width = Math.max(30, Math.min(120, Math.floor(widthValue)));
+    }
+
+    const sectionHeightValue = ownDataProperty(config, 'sectionHeight');
+    if (typeof sectionHeightValue === 'number' && Number.isFinite(sectionHeightValue)) {
+      sectionHeight = Math.max(1, Math.min(40, Math.floor(sectionHeightValue)));
+    }
+  }
+
+  return sectionHeight === undefined ? { width } : { width, sectionHeight };
+}
+
+function stackSurfaces(surfaces: readonly Surface[], gap = 0): Surface {
+  if (surfaces.length === 0) {
+    return createTextSurface('');
+  }
+
+  const safeGap = Math.max(0, Math.floor(gap));
+  const width = Math.max(1, ...surfaces.map((surface) => surface.width));
+  const height = surfaces.reduce((sum, surface) => sum + surface.height, 0)
+    + (safeGap * Math.max(0, surfaces.length - 1));
+  const result = createSurface(width, height);
+  let y = 0;
+
+  surfaces.forEach((surface, index) => {
+    if (index > 0) {
+      y += safeGap;
+    }
+    result.blit(surface, 0, y);
+    y += surface.height;
+  });
+
+  return result;
+}
+
 function ownSlotValue(slots: Readonly<Record<string, unknown>> | undefined, key: string): unknown {
   if (!isPlainRecord(slots)) {
     return undefined;
@@ -629,6 +697,10 @@ function ownSlotValue(slots: Readonly<Record<string, unknown>> | undefined, key:
 function slotValueText(value: unknown): string | undefined {
   if (value === undefined || value === null) {
     return undefined;
+  }
+
+  if (isSurfaceSlotValue(value)) {
+    return surfaceSlotText(value);
   }
 
   if (Array.isArray(value)) {
@@ -655,6 +727,38 @@ function slotValueText(value: unknown): string | undefined {
   }
 }
 
+function slotValueVisualContent(value: unknown, textContent: string | undefined): string | Surface | undefined {
+  if (isSurfaceSlotValue(value)) {
+    return value;
+  }
+
+  return textContent;
+}
+
+function isSurfaceSlotValue(value: unknown): value is Surface {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && typeof (value as Surface).width === 'number'
+      && typeof (value as Surface).height === 'number'
+      && typeof (value as Surface).get === 'function',
+  );
+}
+
+function surfaceSlotText(surface: Surface): string | undefined {
+  const lines: string[] = [];
+  for (let y = 0; y < surface.height; y++) {
+    let line = '';
+    for (let x = 0; x < surface.width; x++) {
+      line += surface.get(x, y).char || ' ';
+    }
+    lines.push(line.trimEnd());
+  }
+
+  const text = lines.join('\n').trim();
+  return text === '' ? undefined : text;
+}
+
 function recordSlotText(value: object): string | undefined {
   if (!isPlainRecord(value)) {
     return undefined;
@@ -670,6 +774,21 @@ function recordSlotText(value: object): string | undefined {
       return text === undefined ? [] : [`${key}: ${text}`];
     });
   return entries.length === 0 ? undefined : entries.join('; ');
+}
+
+function fitVisualContent(content: string | Surface, width: number, height?: number): string | Surface {
+  if (typeof content === 'string') {
+    return height === undefined ? content : content.split('\n').slice(0, height).join('\n');
+  }
+
+  const safeHeight = height === undefined ? content.height : Math.min(content.height, height);
+  if (content.width <= width && content.height <= safeHeight) {
+    return content;
+  }
+
+  const clipped = createSurface(width, safeHeight);
+  clipped.blit(content, 0, 0);
+  return clipped;
 }
 
 function schemaError<Data = never>(code: string, message: string): BlockSchemaResult<Data> {

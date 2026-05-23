@@ -6,8 +6,14 @@ import {
   defineBlock,
   validateBlockMetadata,
   validateBlockPackageManifest,
+  type BlockRenderResult,
   type BlockMetadata,
 } from './block-metadata.js';
+import {
+  blockRenderNode,
+  renderBlockTree,
+} from './block-tree-render.js';
+import { createSurface } from '../ports/surface.js';
 import {
   bindSchemaBlockInput,
   isSchemaBoundBlockDefinition,
@@ -284,6 +290,189 @@ describe('first-party standard block definitions', () => {
     ]));
   });
 
+  it('renders interactive and static standard blocks as surfaces while preserving text lowering modes', () => {
+    const slots = {
+      navigation: 'Docs nav',
+      content: 'Blocks guide',
+      inspector: 'Current block: ReaderSurface',
+      status: 'Ready',
+    };
+    const interactive = appShellBlock.render({ mode: 'interactive', slots, config: { width: 64 } });
+    const staticOutput = appShellBlock.render({ mode: 'static', slots, config: { width: 64 } });
+    const pipe = appShellBlock.render({ mode: 'pipe', slots });
+    const accessible = appShellBlock.render({ mode: 'accessible', slots });
+
+    if (!isSurfaceOutput(interactive) || !isSurfaceOutput(staticOutput)) {
+      throw new Error('interactive and static AppShell output should be surfaces');
+    }
+    expect(typeof pipe.output).toBe('string');
+    expect(typeof accessible.output).toBe('string');
+    expect(surfaceText(interactive.output)).toContain('AppShell');
+    expect(surfaceText(interactive.output)).toContain('Navigation');
+    expect(surfaceText(interactive.output)).toContain('Docs nav');
+    expect(pipe.output).toContain('navigation: Docs nav');
+    expect(accessible.output).toContain('Navigation: Docs nav');
+  });
+
+  it('renders nested standard blocks through the explicit block tree renderer', () => {
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 72 },
+      slots: {
+        navigation: 'Blocks nav',
+        content: blockRenderNode(readerSurfaceBlock, {
+          slots: {
+            content: 'Nested reader content from a child block.',
+            outline: ['Overview', 'Lowering'],
+          },
+        }),
+        inspector: blockRenderNode(inspectorPanelBlock, {
+          slots: {
+            selection: 'ReaderSurface',
+            details: ['schema-bound', 'provider-ready'],
+          },
+        }),
+        status: 'ready',
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive block tree output should be a surface');
+    }
+
+    const text = surfaceText(rendered.output);
+    expect(text).toContain('AppShell');
+    expect(text).toContain('ReaderSurface');
+    expect(text).toContain('Nested reader content from a child block.');
+    expect(text).toContain('InspectorPanel');
+    expect(text).toContain('schema-bound; provider-ready');
+    expect(rendered.facts).toEqual(expect.arrayContaining([
+      { kind: 'entity', key: 'block', value: 'AppShell' },
+      { kind: 'entity', key: 'block', value: 'ReaderSurface' },
+      { kind: 'entity', key: 'block', value: 'InspectorPanel' },
+    ]));
+  });
+
+  it('preserves child surface cells when visual blocks render nested block output', () => {
+    const childSurface = createSurface(1, 1);
+    childSurface.set(0, 0, {
+      char: 'X',
+      fg: '#00ff00',
+      bg: '#ff00ff',
+      modifiers: ['bold'],
+    });
+    const childBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'StyledChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Styled child test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? childSurface
+          : 'X',
+      }),
+    });
+
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 48 },
+      slots: {
+        content: blockRenderNode(childBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    const cell = findCell(rendered.output, 'X');
+
+    expect(cell).toMatchObject({
+      fg: '#00ff00',
+      bg: '#ff00ff',
+      modifiers: ['bold'],
+    });
+  });
+
+  it('fits oversized child surfaces within parent visual sections', () => {
+    const wideChild = createSurface(96, 1);
+    wideChild.set(0, 0, { char: 'A' });
+    wideChild.set(95, 0, { char: 'Z' });
+    const wideBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'WideChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Oversized child surface test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? wideChild
+          : 'A',
+      }),
+    });
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 40 },
+      slots: {
+        content: blockRenderNode(wideBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    expect(rendered.output.width).toBe(40);
+    expect(findCell(rendered.output, 'A')).toBeDefined();
+    expect(findCell(rendered.output, 'Z')).toBeUndefined();
+  });
+
+  it('fits tall child surfaces within bounded parent visual sections', () => {
+    const tallChild = createSurface(8, 12);
+    tallChild.set(0, 0, { char: 'T' });
+    tallChild.set(0, 11, { char: 'B' });
+    const tallBlock = defineBlock({
+      metadata: {
+        packageName: '@flyingrobots/bijou-test',
+        blockName: 'TallChild',
+        family: 'test',
+        scale: 'control',
+        modes: ['interactive', 'static', 'pipe', 'accessible'],
+        docs: { summary: 'Tall child surface test block.' },
+        slots: [{ id: 'content', required: false }],
+      },
+      render: ({ mode }) => ({
+        output: mode === 'interactive' || mode === 'static'
+          ? tallChild
+          : 'T',
+      }),
+    });
+    const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
+      mode: 'interactive',
+      config: { width: 40, sectionHeight: 4 },
+      slots: {
+        content: blockRenderNode(tallBlock),
+      },
+    }));
+
+    if (!isSurfaceOutput(rendered)) {
+      throw new Error('interactive nested block output should be a surface');
+    }
+
+    expect(findCell(rendered.output, 'T')).toBeDefined();
+    expect(findCell(rendered.output, 'B')).toBeUndefined();
+    expect(rendered.output.height).toBeLessThan(14);
+  });
+
   it('omits absent optional sections while preserving required section fallback output', () => {
     const shell = appShellBlock.render({
       mode: 'pipe',
@@ -392,6 +581,46 @@ describe('first-party standard block definitions', () => {
     expect(report).toMatchObject({ passed: true });
   });
 });
+
+function isSurfaceOutput(
+  result: BlockRenderResult<unknown>,
+): result is BlockRenderResult<{ width: number; height: number; get(x: number, y: number): { char?: string } }> {
+  const output = result.output;
+  return Boolean(
+    output
+      && typeof output === 'object'
+      && typeof (output as { width?: unknown }).width === 'number'
+      && typeof (output as { height?: unknown }).height === 'number'
+      && typeof (output as { get?: unknown }).get === 'function',
+  );
+}
+
+function surfaceText(surface: { width: number; height: number; get(x: number, y: number): { char?: string } }): string {
+  let text = '';
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      text += surface.get(x, y).char || ' ';
+    }
+    text += '\n';
+  }
+  return text;
+}
+
+function findCell(
+  surface: { width: number; height: number; get(x: number, y: number): { char?: string } },
+  char: string,
+): { char?: string; fg?: string; bg?: string; modifiers?: readonly string[] } | undefined {
+  for (let y = 0; y < surface.height; y++) {
+    for (let x = 0; x < surface.width; x++) {
+      const cell = surface.get(x, y);
+      if (cell.char === char) {
+        return cell;
+      }
+    }
+  }
+
+  return undefined;
+}
 
 const spyMetadata: BlockMetadata = {
   packageName: '@flyingrobots/bijou',

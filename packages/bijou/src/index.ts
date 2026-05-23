@@ -222,6 +222,13 @@ export {
   type BlockVariantMetadata,
 } from './core/block-metadata.js';
 export {
+  blockRenderNode,
+  isBlockRenderNode,
+  renderBlockTree,
+  type BlockRenderNode,
+  type BlockTreeRenderOptions,
+} from './core/block-tree-render.js';
+export {
   bindSchemaBlockInput,
   defineBlockSchemaAdapter,
   defineSchemaBlock,

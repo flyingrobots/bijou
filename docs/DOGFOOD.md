@@ -89,7 +89,8 @@ operators need when learning or validating Bijou.
 - **Shell Integrity**: Testing the framed shell, tabs, and pane focus in a production-grade surface.
 - **Component Explorer**: A live, interactive field guide to every component family.
 - **Blocks Section**: A first-class Blocks lane covering block purpose,
-  authoring, first-party blocks, live accordion previews, and lowering posture.
+  authoring, first-party blocks, live surface-backed previews, and lowering
+  posture.
 - **Locale Preference**: The Settings drawer can switch DOGFOOD's preferred
   language after startup, while startup itself uses the host locale adapter.
 - **Localization Debt Ratchet**: `npm run dogfood:i18n:debt` counts remaining

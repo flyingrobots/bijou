@@ -126,6 +126,94 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
   });
 
+  it('preserves extra DOGFOOD catalog overrides after language cycling', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+      extraI18nCatalogs: [{
+        namespace: 'bijou.dogfood',
+        entries: [{
+          key: { namespace: 'bijou.dogfood', id: 'settings.language.label' },
+          kind: 'message',
+          sourceLocale: 'en',
+          values: { en: 'Preferred language override', fr: 'Langue sentinelle' },
+        }],
+      }],
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue sentinelle');
+  });
+
+  it('refreshes frame page labels from the selected locale after language cycling', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+      extraI18nCatalogs: [{
+        namespace: 'bijou.dogfood',
+        entries: [
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.guides' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Guides', fr: 'Guides sentinelle' },
+          },
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.blocks' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Blocks', fr: 'Blocs sentinelle' },
+          },
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.components' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Components', fr: 'Composants sentinelle' },
+          },
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.packages' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Packages', fr: 'Paquets sentinelle' },
+          },
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.philosophy' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Philosophy', fr: 'Philosophie sentinelle' },
+          },
+          {
+            key: { namespace: 'bijou.dogfood', id: 'docs.page.release' },
+            kind: 'message',
+            sourceLocale: 'en',
+            values: { en: 'Release', fr: 'Publication sentinelle' },
+          },
+        ],
+      }],
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+
+    expect(text).toContain('Blocs sentinelle');
+    expect(text).toContain('Paquets sentinelle');
+    expect(text).not.toContain('[Guides]  Components  Blocks');
+  });
+
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, {

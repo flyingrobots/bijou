@@ -1,4 +1,5 @@
-import type { I18nDirection, I18nRuntime } from '../../packages/bijou-i18n/src/index.js';
+import type { I18nDirection, LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
+import { dogfoodLocalizedText, formatLocalizedList } from './localization.js';
 
 export interface DogfoodLocalePort {
   preferredLocale(): string | undefined;
@@ -98,18 +99,17 @@ export function nextDogfoodLocale(currentLocale: string): DogfoodLocaleOption {
   return DOGFOOD_LOCALE_OPTIONS[(currentIndex + 1) % DOGFOOD_LOCALE_OPTIONS.length] ?? DEFAULT_LOCALE;
 }
 
-export function dogfoodLocaleLabel(locale: string, i18n?: I18nRuntime): string {
+export function dogfoodLocaleLabel(locale: string, localization?: LocalizationPort): string {
   const option = resolveDogfoodLocale(locale);
-  let localizedName = option.label;
-  try {
-    localizedName = i18n?.t({ namespace: 'bijou.dogfood', id: `settings.language.${option.id}` }) ?? option.label;
-  } catch {
-    localizedName = option.label;
-  }
+  const localizedName = dogfoodLocalizedText(
+    localization,
+    `settings.language.${option.id}`,
+    option.label,
+  );
   return localizedName === option.nativeLabel ? localizedName : `${localizedName} / ${option.nativeLabel}`;
 }
 
-export function dogfoodLocaleOptionsText(i18n?: I18nRuntime): string {
-  const labels = DOGFOOD_LOCALE_OPTIONS.map((option) => dogfoodLocaleLabel(option.id, i18n));
-  return i18n?.formatList(labels, i18n.locale) ?? labels.join(', ');
+export function dogfoodLocaleOptionsText(localization?: LocalizationPort): string {
+  const labels = DOGFOOD_LOCALE_OPTIONS.map((option) => dogfoodLocaleLabel(option.id, localization));
+  return formatLocalizedList(localization, labels);
 }

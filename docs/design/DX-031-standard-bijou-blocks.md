@@ -16,6 +16,7 @@ Legend:
 Depends on:
 
 - [DX-025 - Component Metadata Contract](./DX-025-component-metadata-contract.md)
+- [DX-031F - Block Tree Rendering](./DX-031F-block-tree-rendering.md)
 - [DF-028 - Story Capture Matrix](./DF-028-story-capture-matrix.md)
 - [DF-029 - Fixture-to-Docs Promotion Path](./DF-029-fixture-to-docs-promotion-path.md)
 - [RE-035](./RE-035-mandatory-layout-envelope-and-constraint-negotiation.md)
@@ -3159,14 +3160,16 @@ blocks.
 10. Done: replace the first-party definition placeholders with deterministic
    rendered proof output and stable lowering facts for `AppShell`,
    `ReaderSurface`, and `InspectorPanel`.
-11. Next: add an optional Zod schema adapter package or helper.
-12. Next: capture interactive, static, pipe, and accessible outputs for the
+11. Done: add explicit block-tree rendering so nested block declarations render
+   child output without making ordinary `block.render()` recursive.
+12. Next: add an optional Zod schema adapter package or helper.
+13. Next: capture interactive, static, pipe, and accessible outputs for the
    first implementation set.
-13. Next: prove the first three blocks in DOGFOOD before broadening the
+14. Next: prove the first three blocks in DOGFOOD before broadening the
    catalog.
-14. Next: add catalog-only variant/config metadata for later blocks without
+15. Next: add catalog-only variant/config metadata for later blocks without
    implementing those blocks yet.
-15. Continue to defer modal stacks, notifications, auth forms, animated
+16. Continue to defer modal stacks, notifications, auth forms, animated
    carousels, complex controls, and workspace-like behavior until the first
    rendered block set is proven.
 

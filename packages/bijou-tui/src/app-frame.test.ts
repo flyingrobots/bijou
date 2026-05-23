@@ -65,6 +65,7 @@ const KEY_ESCAPE = '\x1b';
 const KEY_CTRL_P = '\x10';
 const KEY_ENTER = '\r';
 const KEY_DOWN = '\x1b[B';
+const KEY_BACKTICK = '`';
 const ENABLE_MOUSE = '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
 
 function ctrlKey(key: string) {
@@ -1076,6 +1077,23 @@ describe('createFramedApp', () => {
     expect((result.model as any).quitConfirmOpen).toBe(false);
   });
 
+  it('toggles the perf HUD from the workspace and active help layer', async () => {
+    const app = createFramedApp({
+      initialColumns: 96,
+      initialRows: 30,
+      pages: [makePage('home', 'Home', 'main')],
+    });
+
+    const workspaceResult = await runScript(app, [{ key: KEY_BACKTICK }]);
+    expect(workspaceResult.model.perfHudOpen).toBe(true);
+    expect(surfaceToString(workspaceResult.frames.at(-1)!, testCtx.style)).toContain('Perf HUD');
+
+    const helpResult = await runScript(app, [{ key: '?' }, { key: KEY_BACKTICK }]);
+    expect(helpResult.model.helpOpen).toBe(true);
+    expect(helpResult.model.perfHudOpen).toBe(true);
+    expect(surfaceToString(helpResult.frames.at(-1)!, testCtx.style)).toContain('Perf HUD');
+  });
+
   it('lets help scroll with frame scroll keys when the overlay is taller than the viewport', () => {
     const tallHelpPage: FramePage<PageModel, Msg> = {
       id: 'home',
@@ -1246,6 +1264,34 @@ describe('createFramedApp', () => {
 
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
     expect((model as any).commandPalette).toBeUndefined();
+  });
+
+  it('opens page search with search metadata derived from the active page model', () => {
+    const page: FramePage<PageModel, Msg> = {
+      ...makePage('home', 'Home', 'main'),
+      searchTitle: (model) => `Search count ${model.count}`,
+      searchItems: (model) => [{
+        id: 'count-result',
+        label: `Count ${model.count}`,
+      }],
+    };
+    const app = createFramedApp({
+      pages: [page],
+      enableCommandPalette: true,
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'inc' }, model);
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+
+    expect(model.pageModels.home?.count).toBe(1);
+    expect((model as any).commandPaletteKind).toBe('search');
+    expect((model as any).commandPaletteTitle).toBe('Search count 1');
+    expect((model as any).commandPalette?.items).toEqual([{
+      id: 'search:0',
+      label: 'Count 1',
+      category: 'Home',
+    }]);
   });
 
   it('uses localized shell defaults for command palette and settings footer copy', () => {

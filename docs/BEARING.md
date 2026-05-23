@@ -4,6 +4,9 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 
 ## Recent Ships
 
+- `LX-014` — DOGFOOD catalog coverage expanded across visible product
+  surfaces, making locale switching more useful while preserving honest
+  selected-locale catalog data.
 - `LX-018` — localization catalog data is now honest: generated non-English
   DOGFOOD catalogs do not embed copied English fallback strings, English
   fallback catalogs load separately at runtime, and non-production builds can
@@ -40,55 +43,50 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 - New Block work should consume the existing contracts, not invent provider,
   lifecycle, callback, or localization policy while rendering.
 
-### 3. Localization Coverage Before Preference Polish
+### 3. Localization Port Before More View-Level Lookup
+
 - English fallback is separate from selected-locale catalogs.
 - Missing selected-locale strings are now real missing data, not disguised
   English.
-- The next value comes from moving visible DOGFOOD strings into the source
-  string table and regenerating honest locale catalogs.
+- DOGFOOD now needs an app-facing localization port so views ask for localized
+  objects instead of depending directly on the concrete i18n runtime.
 
 ## Tensions
 
-- **Visible English Debt**: DOGFOOD still has too many hard-coded English strings
-  in navigation, settings, Blocks docs, preview chrome, common actions, and
-  status labels.
+- **View-Level Runtime Leakage**: DOGFOOD still passes the concrete i18n
+  runtime through rendering helpers for ordinary text lookup.
 - **Product Proof Lag**: Blocks have better contracts than visible rendered
   proof. AppShell rendering must consume existing data-flow contracts instead of
   creating a parallel prop/callback path.
-- **Persistence Timing**: Locale preference persistence matters, but it is less
-  valuable until enough of DOGFOOD visibly responds to locale changes.
+- **Coverage Still Matters**: Catalog coverage has improved, but future visible
+  product work should keep moving text into the source table instead of adding
+  new hard-coded strings.
 - **Measurement Temptation**: A localization dashboard would be useful, but
   coverage must improve before a dashboard becomes the next highest-value move.
 
 ## Next Target
 
 The immediate focus is
-[LX-014 — Expand DOGFOOD Catalog Coverage](./method/backlog/asap/LX-014-expand-dogfood-catalog-coverage.md).
+[LX-019 — Localization Port Contract](./design/LX-019-localization-port-contract.md).
 
-LX-014 should stay product-facing and narrow:
+LX-019 should stay boundary-focused:
 
-- move visible DOGFOOD strings into the source string table
-- cover top navigation, settings/menu labels, Blocks docs, Blocks preview
-  chrome, Counter demo labels, i18n docs, common actions, and common
-  loading/empty/error/status labels
-- regenerate locale catalogs without copying English fallback data into
-  non-English payloads
-- ratchet hard-coded localization debt down
-- preserve the existing runtime fallback policy
+- define the application-facing `LocalizationPort` in `@flyingrobots/bijou-i18n`
+- return structured localized objects instead of naked strings
+- keep catalog/file loading in adapters
+- keep DOGFOOD runtime composition at the app boundary
+- migrate DOGFOOD text helpers to the port
 
 Non-goals for the next cycle:
 
-- no locale preference persistence
 - no localization dashboard
 - no translation workbench
 - no portable preference system
-- no new Blocks architecture
-- no rendered AppShell work
-- no broad standard Block catalog expansion
+- no broad catalog expansion
+- no remote localization service
 
 Expected sequence:
 
-1. `LX-014` expands visible DOGFOOD catalog coverage.
-2. `LX-013` persists selected locale through a port/adapter.
-3. Blocks product proof resumes with less visible localization debt underneath
-   the showcase.
+1. `LX-019` puts application-facing localization lookup behind a port.
+2. Remaining DOGFOOD text surfaces continue moving into catalogs.
+3. Blocks product proof resumes with less view-level localization leakage.

@@ -4,6 +4,72 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.preview.documentationTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "documentation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.loweringFacts"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "facts: {count}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.modeLoweringTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "mode lowering"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.modeTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{mode} mode"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.pageTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "▼ Page: {blockName}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.preview.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "blocks • live preview"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",
@@ -131,6 +197,28 @@
       "sourceLocale": "en",
       "values": {
         "en": "What is Bijou?"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.counterBlock"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • -/+ counter fixture • j/k scroll • d/u page • g/G top/bottom"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.footer.counterBlockNav"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{paneSwitch} • ↑/↓ browse • Enter open • -/+ counter fixture"
       }
     },
     {

@@ -8,6 +8,23 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Localization port contract for `bijou-i18n`** —
+  `@flyingrobots/bijou-i18n` now exports `LocalizationPort`,
+  `LocalizationRequest`, `LocalizedObject`, localization status/issue/fact
+  types, and `createRuntimeLocalizationPort()`. Runtime-backed localization
+  resolution returns immutable structured objects that preserve key, locale,
+  direction, entry kind, translated/fallback/missing status, value, issues, and
+  facts instead of exposing only naked strings. DOGFOOD now routes ordinary
+  docs text lookup through the localization port while keeping catalog loading
+  and locale activation at the app composition boundary. Missing-localization
+  marker strings are limited to message entries so resource/data payloads keep
+  their structured value contracts, and `$ref` resolution propagates referenced
+  fallback/missing status metadata through the returned localized object. The
+  localized resource/data freeze boundary now rejects sparse arrays so portable
+  structured payloads cannot carry array holes across adapter boundaries.
+  Adapter authors can call `isJsonShapedLocalizedValue()` before constructing
+  catalogs to verify that resource/data payloads satisfy the same portability
+  rules the runtime enforces.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n
@@ -54,14 +71,50 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   live semantic region/content/selection output while still avoiding provider
   subscriptions, active runtime traversal, command dispatch, cache policy,
   rendered production AppShell behavior, or catalog expansion.
+- **Explicit block-tree rendering for nested blocks** —
+  `@flyingrobots/bijou` now exports `blockRenderNode()`,
+  `isBlockRenderNode()`, and `renderBlockTree()` so callers can explicitly
+  render nested block declarations into parent slots. Ordinary `block.render()`
+  remains a local single-block render contract, while the tree renderer
+  resolves branded child render nodes, inherits output mode, aggregates lowering
+  facts, bounds recursive depth, and avoids provider subscriptions, refresh,
+  command dispatch, active hierarchy traversal, and DOGFOOD-specific branches.
 - **Blocks section in DOGFOOD** — DOGFOOD now has a first-class Blocks section
   beside Components, with pages for what blocks are, how to author them,
-  pre-made first-party blocks, a live accordion preview of standard block pages,
-  and how block declarations lower across modes. The preview renders one inline
-  page per standard block with a live example surface, live lowering preview,
-  and live documentation generated from the public `standardBlocks`,
-  `standardBlockStories`, and package-manifest exports rather than copied
-  tables.
+  pre-made first-party blocks, a live surface-backed preview of standard block
+  pages, and how block declarations lower across modes. The preview renders one
+  selectable side-nav page per standard block with a live example surface, live
+  lowering preview, and live documentation generated from the public
+  `standardBlocks`, `standardBlockStories`, and package-manifest exports rather
+  than copied tables, so DOGFOOD no longer stacks every block preview into one
+  giant reader document. Guide content scroll now resets when a selected guide
+  page changes, so block previews open at their live example instead of
+  inheriting a stale scroll offset from the previous page. Standard block rows
+  in the Blocks side navigation now select their preview when focused, and
+  opening the `Block Preview` group lands on the first concrete block preview
+  instead of a prose inventory page. Lower-mode preview output is summarized as
+  mode/fact data instead of rendering clipped nested mini-surfaces inside the
+  main preview. Standard block visual sections also fit oversized nested child
+  surfaces to the parent section so rendered child blocks do not overrun
+  AppShell preview regions. DOGFOOD also publishes a non-shipping
+  `CounterDemoBlock` fixture preview that proves bounded counter state,
+  animated interactive progress, `-`/`+` Command intent emissions, static
+  lowering without controls, pipe/screenreader text, and a JSON snapshot
+  without provider subscriptions or runtime command dispatch. The counter
+  fixture animation tick is scoped to the active counter preview so inactive
+  DOGFOOD guide pages do not continue advancing fixture state. The counter
+  fixture preview now sizes nested live/example/documentation cards to the
+  outer page content width, preventing boxed surfaces from wrapping their
+  borders across rows at normal DOGFOOD viewport sizes. Blocks preview pages
+  now remove redundant `Live ...` wrapper labels so the rendered block,
+  mode-lowering, and documentation cards carry the section titles directly,
+  while the Pre-made Blocks page presents a curated first-party catalog instead
+  of raw package/metadata summary strings.
+- **Shell-owned performance HUD toggle** — `createFramedApp()` now owns a
+  built-in perf HUD surface toggled by the backtick key. The HUD reads the
+  frame model's timing telemetry, works from workspace and active shell layers
+  such as help, and DOGFOOD routes the same shell toggle from its landing screen
+  instead of shipping a separate overlay path.
 - **First-party standard block definitions for `bijou`** —
   `@flyingrobots/bijou` now exports `appShellBlock`, `readerSurfaceBlock`,
   `inspectorPanelBlock`, `standardBlocks`, `standardBlockStories`,
@@ -252,6 +305,69 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localization loader activation staging** — Loader-backed locale activation
+  now stages third-party catalog bundles and rebuilds the candidate entry table
+  before swapping loader catalogs or committing locale/direction changes, so a
+  conflicting catalog bundle cannot leave the runtime half-switched.
+- **Localized array payload validation** — `freezeLocalizedValue()` now applies
+  the same portable boundary checks to array-owned properties as plain objects,
+  rejecting symbol, non-enumerable, accessor, named, and self-referential
+  non-index properties instead of silently dropping them while cloning indexed
+  array items.
+- **DOGFOOD locale page labels** — Framed page tab, layer, palette, and search
+  labels can now resolve from the active page model instead of being snapped at
+  app construction, and no-loader locale switches commit synchronously so
+  DOGFOOD language cycling refreshes visible shell labels in the next frame
+  without ignored asynchronous locale work.
+- **DOGFOOD locale catalog overrides** — Language cycling now reloads
+  caller-provided extra i18n catalogs after generated DOGFOOD catalogs, so
+  host and test catalog overrides survive selected-locale changes.
+- **Atomic locale switching** — Loader-backed `setLocale()` now commits locale,
+  direction, and loader-managed catalogs only after the selected locale catalogs
+  load successfully, so failed locale switches leave the runtime on its previous
+  locale state.
+- **Localization resource immutability** — `I18nRuntime.resource()` now returns
+  cloned, deeply frozen resource values through the same portable localized
+  value boundary used by `localize()`, so callers cannot mutate catalog-backed
+  runtime state by retaining resource objects or arrays.
+- **Localization value boundary validation** — `freezeLocalizedValue()` now
+  enforces the documented portable catalog boundary with deterministic errors
+  for cyclic graphs, symbol-keyed properties, non-enumerable properties,
+  accessors, class instances, functions, symbols, and bigint values instead of
+  silently dropping metadata, shallow-freezing mutable objects, or overflowing
+  the stack.
+- **Block render node cycle rejection** — `blockRenderNode()` now rejects cyclic
+  plain slot/config records with deterministic contract errors while preserving
+  existing snapshot behavior for inert plain data.
+- **DOGFOOD localization failure visibility** — DOGFOOD text lookup no longer
+  catches every localization-port failure and falls back to English copy, so
+  unexpected adapter/catalog failures remain observable instead of being hidden
+  behind fallback text.
+- **Counter fixture terminal width** — The DOGFOOD `CounterDemoBlock` fixture
+  now sizes its preview card with ANSI-aware grapheme width so styled progress
+  bar output does not inflate the card width.
+- **Localization runtime method binding** — `I18nRuntime.t()` now resolves
+  messages through closure-owned runtime state so callers can destructure or
+  pass the helper as a function without losing access to localization state.
+- **Nested block visual composition** — Standard block visual rendering now
+  preserves child `Surface` output as surface-native content instead of
+  flattening nested block output to plain text and recreating cells without
+  styling.
+- **Block render node snapshots** — `blockRenderNode()` now snapshots plain
+  slot/config records at construction time, so mutating caller-owned input
+  objects after node creation no longer changes later render output.
+- **DOGFOOD block preview readability** — Selected block preview pages now keep
+  raw compact metadata summaries, source paths, and embedded preview scrollbars
+  out of the live TUI documentation surface. The overview stays an index of
+  available blocks and stories, while selected block pages show a live example,
+  clipped lowering preview, and concise human-readable block documentation.
+- **Standard block TUI rendering** — First-party standard blocks now return
+  surface-backed output in interactive and static modes while preserving text
+  output for pipe and accessible modes, so DOGFOOD can display the actual block
+  render result instead of a hand-written preview mock.
+- **DOGFOOD Blocks preview rendering** — The Blocks preview now composes live
+  block example `Surface`s directly instead of flattening them into accordion
+  text before render, preserving TUI styling and bordered example surfaces.
 - **Spring example API drift** — `examples/spring` no longer passes the removed
   `fps` option to `animate()`, keeping the interactive spring comparison aligned
   with the current pulse-driven animation command API.

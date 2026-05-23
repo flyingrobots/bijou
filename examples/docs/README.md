@@ -59,6 +59,7 @@ focus it and use the wheel to scroll long docs or help content.
 - `?`: open keyboard help
 - `/`: search the current docs section in the standard shell search surface
 - `F2`: open the standard shell settings drawer
+- Backtick: toggle the standard shell performance HUD
 - `↑` / `↓`: move through the focused pane's rows
 - `Enter` / `Space`: open the focused guide, expand a family, select a component, or activate the focused row
 - `←` / `→`: collapse or expand the focused family on the left lane inside `Components`

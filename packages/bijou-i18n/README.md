@@ -13,6 +13,10 @@ The in-memory localization runtime for Bijou.
 - explicit fallback catalogs
 - injectable missing-localization message formatting
 - async locale loader support for runtime-integrated catalog activation
+- an application-facing `LocalizationPort` that resolves structured localized
+  objects
+- `isJsonShapedLocalizedValue()` for adapter-side resource/data payload
+  conformance checks
 
 This package is intentionally runtime-only. Spreadsheet workflows, stale detection, pseudo-localization, and catalog compilation belong in `@flyingrobots/bijou-i18n-tools`.
 
@@ -86,6 +90,106 @@ Once created, the runtime can preload and activate locales explicitly:
 ```ts
 await runtime.preloadLocale('de');
 await runtime.setLocale('de');
+```
+
+## Localization Port
+
+Use `LocalizationPort` at application and view boundaries when callers need a
+localized object instead of a concrete runtime:
+
+```ts
+import {
+  createI18nRuntime,
+  createRuntimeLocalizationPort,
+} from '@flyingrobots/bijou-i18n';
+
+const runtime = createI18nRuntime({
+  locale: 'fr',
+  direction: 'ltr',
+  fallbackLocale: 'en',
+  fallbackCatalogs: [englishCatalog],
+  catalogs: [frenchCatalog],
+});
+const localization = createRuntimeLocalizationPort(runtime);
+
+const title = localization.resolve<string>({
+  key: { namespace: 'app', id: 'title' },
+});
+```
+
+`resolve()` returns a frozen localized object with the key, locale, direction,
+entry kind, translated/fallback/missing status, value, issues, and facts. That
+keeps rendering code away from catalog loading, filesystem paths, CSV data, and
+runtime mutation details while preserving enough state for tooling and lower
+modes.
+
+## Resource And Data Payloads
+
+Message entries resolve to strings. `resource` and `data` entries resolve to
+portable structured values, and the runtime freezes those values before handing
+them to callers.
+
+Keep resource/data payloads JSON-shaped:
+
+- strings, numbers, booleans, null, and undefined
+- arrays with indexed entries only
+- plain objects with enumerable data properties only
+
+Do not use:
+
+- class instances or built-ins such as `Date`
+- symbol-keyed properties
+- non-enumerable properties
+- accessor properties
+- cyclic object graphs
+- functions, symbols, or bigint values
+
+Unsupported shapes are rejected at the localization boundary rather than being
+silently normalized. This keeps generated catalogs, runtime loader adapters, and
+view code honest: adapters must produce portable data, and consumers can trust
+that localized resource/data values are immutable snapshots rather than mutable
+runtime handles.
+
+Adapters can check payloads before building catalogs:
+
+```ts
+import { isJsonShapedLocalizedValue } from '@flyingrobots/bijou-i18n';
+
+if (!isJsonShapedLocalizedValue(payload)) {
+  throw new Error('i18n resource/data payload must be JSON-shaped');
+}
+```
+
+Valid resource/data payloads are dense, plain data:
+
+```ts
+const validResource = {
+  label: 'Counter',
+  range: { min: 0, max: 10 },
+  marks: ['empty', 'half', 'full'],
+};
+```
+
+Invalid payloads are rejected instead of being silently normalized:
+
+```ts
+class CounterResource {
+  readonly label = 'Counter';
+}
+
+const sparse = new Array<string>(2);
+sparse[1] = 'full';
+
+const accessor = Object.defineProperty({}, 'label', {
+  enumerable: true,
+  get() {
+    return 'Counter';
+  },
+});
+
+isJsonShapedLocalizedValue(new CounterResource()); // false
+isJsonShapedLocalizedValue(sparse); // false
+isJsonShapedLocalizedValue(accessor); // false
 ```
 
 ## Documentation

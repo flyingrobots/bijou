@@ -56,6 +56,8 @@ An agent can reason about locale, direction, catalogs, and translation workflow 
 - live backlog:
   - [LX-013 — DOGFOOD Locale Preference Persistence](../backlog/asap/LX-013-dogfood-locale-preference-persistence.md)
   - [LX-014 — Expand DOGFOOD Catalog Coverage](../backlog/asap/LX-014-expand-dogfood-catalog-coverage.md)
+- active design draft:
+  - [LX-019 — Localization Port Contract](../../design/LX-019-localization-port-contract.md)
 - cool ideas:
   - [LX-015 — DOGFOOD Localization Burndown Dashboard](../backlog/cool-ideas/LX-015-dogfood-localization-burndown-dashboard.md)
   - [LX-016 — Portable Locale Preferences Across Hosts](../backlog/cool-ideas/LX-016-portable-locale-preferences-across-hosts.md)
