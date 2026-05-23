@@ -10,7 +10,9 @@ import {
 } from '@flyingrobots/bijou';
 import {
   browsableListSurface,
+  createFramedApp,
   createBrowsableListState,
+  createKeyMap,
   isKeyMsg,
   isMouseMsg,
   isResizeMsg,
@@ -24,6 +26,12 @@ import {
   type BrowsableListItem,
   type BrowsableListState,
   type Cmd,
+  type FrameLayoutNode,
+  type FramePage,
+  type FramePageMsg,
+  type FramedApp,
+  type KeyMsg,
+  type ResizeMsg,
 } from '../../packages/bijou-tui/src/index.js';
 import {
   createStoryProfileContext,
@@ -61,10 +69,17 @@ export interface StorybookModel {
   readonly previewTimeMs: number;
 }
 
+export interface StorybookPageMsg {
+  readonly type: 'storybook-key';
+  readonly key: string;
+}
+
+type StorybookRuntimeMsg = FramePageMsg<StorybookPageMsg> | KeyMsg | ResizeMsg;
+
 export function createStorybookApp(
   ctx: BijouContext,
   options: StorybookAppOptions = {},
-): App<StorybookModel> {
+): App<StorybookModel, StorybookPageMsg> {
   const stories = options.stories ?? COMPONENT_STORIES;
   const title = options.title ?? DEFAULT_TITLE;
 
@@ -74,38 +89,56 @@ export function createStorybookApp(
     },
 
     update(msg, model) {
-      if (isResizeMsg(msg)) {
-        return [{
-          ...model,
-          columns: Math.max(1, msg.columns),
-          rows: Math.max(1, msg.rows),
-          storyState: syncStoryListHeight(model.storyState, storyListHeight(msg.rows)),
-        }, []];
-      }
-
-      if (msg.type === 'pulse') {
-        return [{
-          ...model,
-          previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
-        }, []];
-      }
-
-      if (isMouseMsg(msg)) {
-        if (msg.action === 'scroll-down') return [focusStory(model, 1), []];
-        if (msg.action === 'scroll-up') return [focusStory(model, -1), []];
-        return [model, []];
-      }
-
-      if (!isKeyMsg(msg)) {
-        return [model, []];
-      }
-
-      return updateKey(msg.key, model, stories);
+      return updateStorybookMessage(msg, model, stories);
     },
 
     view(model) {
       return renderStorybook(model, ctx, stories);
     },
+  };
+}
+
+export function createStorybookFrameApp(
+  ctx: BijouContext,
+  options: StorybookAppOptions = {},
+): FramedApp<StorybookModel, StorybookPageMsg> {
+  const stories = options.stories ?? COMPONENT_STORIES;
+  const title = options.title ?? DEFAULT_TITLE;
+
+  return createFramedApp<StorybookModel, StorybookPageMsg>({
+    ctx,
+    title,
+    initialColumns: ctx.runtime.columns,
+    initialRows: ctx.runtime.rows,
+    helpLineSource: () => FOOTER_HINT,
+    pages: [createStorybookPage(ctx, stories, title, options.initialStoryId)],
+  });
+}
+
+export function createStorybookPage(
+  ctx: BijouContext,
+  stories: readonly ComponentStory[] = COMPONENT_STORIES,
+  title = DEFAULT_TITLE,
+  initialStoryId?: string,
+): FramePage<StorybookModel, StorybookPageMsg> {
+  return {
+    id: 'storybook',
+    title: 'Storybook',
+    init: () => [createInitialStorybookModel(ctx, stories, title, initialStoryId), []],
+    update(msg: FramePageMsg<StorybookPageMsg>, model) {
+      return updateStorybookMessage(msg, model, stories);
+    },
+    keyMap: storybookPageKeys,
+    layout: (model) => ({
+      kind: 'pane',
+      paneId: 'storybook-workbench',
+      overflowX: 'scroll',
+      render: (width, height) => renderStorybookBody({
+        ...model,
+        columns: width,
+        rows: height,
+      }, ctx, stories),
+    }) satisfies FrameLayoutNode,
   };
 }
 
@@ -145,11 +178,49 @@ export function selectedStorybookStory(
   return stories.find((story) => story.id === storyId) ?? stories[0]!;
 }
 
+function updateStorybookMessage(
+  msg: StorybookRuntimeMsg,
+  model: StorybookModel,
+  stories: readonly ComponentStory[],
+): [StorybookModel, Cmd<StorybookPageMsg>[]] {
+  if (isResizeMsg(msg)) {
+    return [{
+      ...model,
+      columns: Math.max(1, msg.columns),
+      rows: Math.max(1, msg.rows),
+      storyState: syncStoryListHeight(model.storyState, storyListHeight(msg.rows)),
+    }, []];
+  }
+
+  if (msg.type === 'pulse') {
+    return [{
+      ...model,
+      previewTimeMs: model.previewTimeMs + Math.round(Math.max(0, msg.dt) * 1000),
+    }, []];
+  }
+
+  if (isMouseMsg(msg)) {
+    if (msg.action === 'scroll-down') return [focusStory(model, 1), []];
+    if (msg.action === 'scroll-up') return [focusStory(model, -1), []];
+    return [model, []];
+  }
+
+  if (msg.type === 'storybook-key') {
+    return updateKey(msg.key, model, stories);
+  }
+
+  if (!isKeyMsg(msg)) {
+    return [model, []];
+  }
+
+  return updateKey(msg.key, model, stories);
+}
+
 function updateKey(
   key: string,
   model: StorybookModel,
   stories: readonly ComponentStory[],
-): [StorybookModel, Cmd<never>[]] {
+): [StorybookModel, Cmd<StorybookPageMsg>[]] {
   switch (key) {
     case 'q':
     case 'escape':
@@ -182,6 +253,25 @@ function updateKey(
   }
 }
 
+const storybookPageKeys = createKeyMap<StorybookPageMsg>()
+  .group('Storybook', (group) => group
+    .bind('down', 'Next story', { type: 'storybook-key', key: 'down' })
+    .bind('j', 'Next story', { type: 'storybook-key', key: 'j' })
+    .bind(']', 'Next story', { type: 'storybook-key', key: ']' })
+    .bind('up', 'Previous story', { type: 'storybook-key', key: 'up' })
+    .bind('k', 'Previous story', { type: 'storybook-key', key: 'k' })
+    .bind('[', 'Previous story', { type: 'storybook-key', key: '[' })
+    .bind('pagedown', 'Page down', { type: 'storybook-key', key: 'pagedown' })
+    .bind('d', 'Page down', { type: 'storybook-key', key: 'd' })
+    .bind('pageup', 'Page up', { type: 'storybook-key', key: 'pageup' })
+    .bind('u', 'Page up', { type: 'storybook-key', key: 'u' })
+    .bind('.', 'Next variant', { type: 'storybook-key', key: '.' })
+    .bind(',', 'Previous variant', { type: 'storybook-key', key: ',' })
+    .bind('1', 'Profile 1', { type: 'storybook-key', key: '1' })
+    .bind('2', 'Profile 2', { type: 'storybook-key', key: '2' })
+    .bind('3', 'Profile 3', { type: 'storybook-key', key: '3' })
+    .bind('4', 'Profile 4', { type: 'storybook-key', key: '4' }));
+
 function renderStorybook(
   model: StorybookModel,
   ctx: BijouContext,
@@ -196,23 +286,36 @@ function renderStorybook(
 
   const bodyTop = 1;
   const bodyHeight = Math.max(1, model.rows - 2);
-  if (model.columns >= 116 && bodyHeight >= 12) {
+  screen.blit(renderStorybookBody({ ...model, rows: bodyHeight }, ctx, stories), 0, bodyTop);
+
+  screen.blit(line(fit(FOOTER_HINT, model.columns), model.columns), 0, model.rows - 1);
+  return screen;
+}
+
+function renderStorybookBody(
+  model: StorybookModel,
+  ctx: BijouContext,
+  stories: readonly ComponentStory[],
+): Surface {
+  const screen = createSurface(model.columns, model.rows);
+  const story = selectedStorybookStory(model, stories);
+
+  if (model.columns >= 116 && model.rows >= 12) {
     const catalogWidth = 34;
     const testingWidth = 36;
     const previewWidth = Math.max(20, model.columns - catalogWidth - testingWidth);
-    screen.blit(renderCatalogPane(model, catalogWidth, bodyHeight, ctx), 0, bodyTop);
-    screen.blit(renderPreviewPane(model, story, previewWidth, bodyHeight, ctx), catalogWidth, bodyTop);
-    screen.blit(renderTestingPane(model, story, testingWidth, bodyHeight, ctx), catalogWidth + previewWidth, bodyTop);
-  } else if (model.columns >= 76 && bodyHeight >= 10) {
+    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx), 0, 0);
+    screen.blit(renderPreviewPane(model, story, previewWidth, model.rows, ctx), catalogWidth, 0);
+    screen.blit(renderTestingPane(model, story, testingWidth, model.rows, ctx), catalogWidth + previewWidth, 0);
+  } else if (model.columns >= 76 && model.rows >= 10) {
     const catalogWidth = 30;
     const previewWidth = Math.max(20, model.columns - catalogWidth);
-    screen.blit(renderCatalogPane(model, catalogWidth, bodyHeight, ctx), 0, bodyTop);
-    screen.blit(renderPreviewPane(model, story, previewWidth, bodyHeight, ctx), catalogWidth, bodyTop);
+    screen.blit(renderCatalogPane(model, catalogWidth, model.rows, ctx), 0, 0);
+    screen.blit(renderPreviewPane(model, story, previewWidth, model.rows, ctx), catalogWidth, 0);
   } else {
-    screen.blit(renderPreviewPane(model, story, model.columns, bodyHeight, ctx), 0, bodyTop);
+    screen.blit(renderPreviewPane(model, story, model.columns, model.rows, ctx), 0, 0);
   }
 
-  screen.blit(line(fit(FOOTER_HINT, model.columns), model.columns), 0, model.rows - 1);
   return screen;
 }
 

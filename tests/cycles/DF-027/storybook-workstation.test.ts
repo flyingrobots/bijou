@@ -5,6 +5,7 @@ import { storyCaptureMatrixText, stripAnsi, surfaceToString } from '@flyingrobot
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import {
   createStorybookApp,
+  createStorybookFrameApp,
   selectedStorybookStory,
 } from '../../../examples/docs/storybook-app.js';
 import {
@@ -90,7 +91,7 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     const entrypoint = readRepoFile('examples/docs/storybook.ts');
 
     expect(packageJson.scripts.storybook).toBe('node --import tsx examples/docs/storybook.ts');
-    expect(entrypoint).toContain('createStorybookApp');
+    expect(entrypoint).toContain('createStorybookFrameApp');
     expect(entrypoint).not.toContain('createDocsApp');
   });
 
@@ -109,5 +110,20 @@ describe('DF-027 Storybook-style DOGFOOD workstation', () => {
     expect(text).toContain('test matrix');
     expect(text).toContain('all required modes');
     expect(text).not.toContain('Press [Enter]');
+  });
+
+  it('runs the interactive Storybook entrypoint through the AppFrame shell', () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const app = createStorybookFrameApp(ctx, { initialStoryId: 'notification-system' });
+    const [model] = app.init();
+    const pageModel = (model as any).pageModels.storybook;
+    const surface = normalizeViewOutput(app.view(model), { width: 120, height: 40 }).surface;
+    const text = stripAnsi(surfaceToString(surface, ctx.style));
+
+    expect((model as any).activePageId).toBe('storybook');
+    expect(selectedStorybookStory(pageModel).id).toBe('notification-system');
+    expect(text).toContain('Bijou Storybook');
+    expect(text).toContain('Storybook');
+    expect(text).toContain('notification-system');
   });
 });
