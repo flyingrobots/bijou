@@ -202,6 +202,9 @@ describe('LocalizationPort runtime adapter', () => {
   });
 
   it('rejects non-portable localized array own properties deterministically', () => {
+    const sparseArray = new Array<string>(2);
+    sparseArray[1] = 'visible';
+
     const symbolKey = Symbol('array-secret');
     const symbolArray = ['visible'] as unknown[] & Record<symbol, unknown>;
     symbolArray[symbolKey] = 'hidden';
@@ -226,6 +229,7 @@ describe('LocalizationPort runtime adapter', () => {
     const selfReferentialArray = ['visible'] as unknown[] & { self?: unknown };
     selfReferentialArray.self = selfReferentialArray;
 
+    expect(() => freezeLocalizedValue(sparseArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(symbolArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(nonEnumerableArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(accessorArray)).toThrow(Error);

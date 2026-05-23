@@ -19,7 +19,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   and locale activation at the app composition boundary. Missing-localization
   marker strings are limited to message entries so resource/data payloads keep
   their structured value contracts, and `$ref` resolution propagates referenced
-  fallback/missing status metadata through the returned localized object.
+  fallback/missing status metadata through the returned localized object. The
+  localized resource/data freeze boundary now rejects sparse arrays so portable
+  structured payloads cannot carry array holes across adapter boundaries.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n

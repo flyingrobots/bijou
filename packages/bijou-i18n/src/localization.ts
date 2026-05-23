@@ -200,6 +200,7 @@ function cloneLocalizedObjectValue(
 
 function validateLocalizedArray(value: readonly unknown[], path: string): void {
   const descriptors = Object.getOwnPropertyDescriptors(value);
+  let indexedPropertyCount = 0;
   for (const key of Reflect.ownKeys(descriptors)) {
     if (typeof key === 'symbol') {
       throw new Error(`Localized value contains unsupported symbol property at ${path}`);
@@ -224,6 +225,11 @@ function validateLocalizedArray(value: readonly unknown[], path: string): void {
     if (!isArrayIndexKey(key)) {
       throw new Error(`Localized value contains unsupported array property: ${propertyPath}`);
     }
+    indexedPropertyCount += 1;
+  }
+
+  if (indexedPropertyCount !== value.length) {
+    throw new Error(`Localized value contains unsupported sparse array at ${path}`);
   }
 }
 
