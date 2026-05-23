@@ -21,7 +21,7 @@ function blockPreviewGuideId(blockName: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  return `blocks-preview-${slug || 'block'}`;
+  return `blocks-preview-${slug || 'family'}`;
 }
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
@@ -48,6 +48,7 @@ async function renderBlocksGuide(guideId: string, columns = 150, rows = 43) {
       msg: { type: 'select-guide', guideId },
     },
   }], { ctx });
+  expect(result.frames.length).toBeGreaterThan(0);
 
   return {
     ctx,
@@ -163,14 +164,15 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
   });
 
   it('renders the CounterDemoBlock preview page without wrapped border rows and keeps intent keys live', async () => {
-    const selected = await renderBlocksGuide('blocks-preview-counterdemoblock', 150, 43);
+    const guideId = blockPreviewGuideId('CounterDemoBlock');
+    const selected = await renderBlocksGuide(guideId, 150, 43);
     const incremented = await runScript(
       createDocsApp(selected.ctx, { initialRoute: 'docs', initialPageId: 'blocks' as any }),
       [
         {
           msg: {
             type: 'docs',
-            msg: { type: 'select-guide', guideId: 'blocks-preview-counterdemoblock' },
+            msg: { type: 'select-guide', guideId },
           },
         },
         { key: '+' },
