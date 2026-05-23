@@ -134,6 +134,22 @@ export function freezeLocalizedValue<Value>(value: Value): Value {
   return cloneLocalizedValue(value, 'value', new WeakSet<object>()) as Value;
 }
 
+/**
+ * Check whether a value can cross the localization resource/data boundary.
+ *
+ * This performs the same validation as {@link freezeLocalizedValue} without
+ * exposing the frozen clone. Adapter code can use it to reject non-portable
+ * payloads before constructing catalogs.
+ */
+export function isJsonShapedLocalizedValue(value: unknown): boolean {
+  try {
+    freezeLocalizedValue(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function cloneLocalizedValue(
   value: unknown,
   path: string,

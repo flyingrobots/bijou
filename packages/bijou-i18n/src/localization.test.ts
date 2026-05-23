@@ -3,7 +3,86 @@ import {
   createI18nRuntime,
   createRuntimeLocalizationPort,
   freezeLocalizedValue,
+  isJsonShapedLocalizedValue,
 } from './index.js';
+
+class UnsupportedPayloadClass {
+  readonly label = 'class instance';
+}
+
+function sparseArrayPayload(): readonly string[] {
+  const value = new Array<string>(2);
+  value[1] = 'visible';
+  return value;
+}
+
+function symbolObjectPayload(): object {
+  const secretKey = Symbol('secret');
+  return { label: 'Symbol', [secretKey]: 'hidden' };
+}
+
+function nonEnumerableObjectPayload(): object {
+  const value: Record<string, unknown> = { label: 'Hidden' };
+  Object.defineProperty(value, 'hidden', {
+    enumerable: false,
+    value: 'secret',
+  });
+  return value;
+}
+
+function accessorObjectPayload(): object {
+  return Object.defineProperty({}, 'label', {
+    enumerable: true,
+    get() {
+      return 'unsafe';
+    },
+  });
+}
+
+function circularObjectPayload(): object {
+  const value: Record<string, unknown> = { label: 'Cycle' };
+  value.self = value;
+  return value;
+}
+
+function symbolArrayPayload(): readonly unknown[] {
+  const symbolKey = Symbol('array-secret');
+  const value = ['visible'] as unknown[] & Record<symbol, unknown>;
+  value[symbolKey] = 'hidden';
+  return value;
+}
+
+function nonEnumerableArrayPayload(): readonly unknown[] {
+  const value = ['visible'];
+  Object.defineProperty(value, 'hidden', {
+    enumerable: false,
+    value: 'secret',
+  });
+  return value;
+}
+
+function accessorArrayPayload(): readonly unknown[] {
+  const value = ['visible'];
+  Object.defineProperty(value, 'hidden', {
+    enumerable: true,
+    get() {
+      return 'secret';
+    },
+  });
+  return value;
+}
+
+function namedPropertyArrayPayload(): readonly unknown[] {
+  const value = ['visible'] as unknown[] & { hidden?: string };
+  value.hidden = 'secret';
+  return value;
+}
+
+function selfReferentialArrayPayload(): readonly unknown[] {
+  const value = ['visible'] as unknown[] & { self?: unknown };
+  value.self = value;
+  return value;
+}
 
 describe('LocalizationPort runtime adapter', () => {
   it('returns a structured localized object for translated messages', () => {
@@ -202,32 +281,12 @@ describe('LocalizationPort runtime adapter', () => {
   });
 
   it('rejects non-portable localized array own properties deterministically', () => {
-    const sparseArray = new Array<string>(2);
-    sparseArray[1] = 'visible';
-
-    const symbolKey = Symbol('array-secret');
-    const symbolArray = ['visible'] as unknown[] & Record<symbol, unknown>;
-    symbolArray[symbolKey] = 'hidden';
-
-    const nonEnumerableArray = ['visible'];
-    Object.defineProperty(nonEnumerableArray, 'hidden', {
-      enumerable: false,
-      value: 'secret',
-    });
-
-    const accessorArray = ['visible'];
-    Object.defineProperty(accessorArray, 'hidden', {
-      enumerable: true,
-      get() {
-        return 'secret';
-      },
-    });
-
-    const namedPropertyArray = ['visible'] as unknown[] & { hidden?: string };
-    namedPropertyArray.hidden = 'secret';
-
-    const selfReferentialArray = ['visible'] as unknown[] & { self?: unknown };
-    selfReferentialArray.self = selfReferentialArray;
+    const sparseArray = sparseArrayPayload();
+    const symbolArray = symbolArrayPayload();
+    const nonEnumerableArray = nonEnumerableArrayPayload();
+    const accessorArray = accessorArrayPayload();
+    const namedPropertyArray = namedPropertyArrayPayload();
+    const selfReferentialArray = selfReferentialArrayPayload();
 
     expect(() => freezeLocalizedValue(sparseArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(symbolArray)).toThrow(Error);
@@ -235,6 +294,45 @@ describe('LocalizationPort runtime adapter', () => {
     expect(() => freezeLocalizedValue(accessorArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(namedPropertyArray)).toThrow(Error);
     expect(() => freezeLocalizedValue(selfReferentialArray)).toThrow(Error);
+  });
+
+  it('reports JSON-shaped payload conformance with a focused matrix', () => {
+    const mutablePayload = { label: 'Ready', nested: { values: [1, 2, 3] } };
+    const validPayloads = [
+      { name: 'undefined', payload: undefined },
+      { name: 'null', payload: null },
+      { name: 'boolean', payload: true },
+      { name: 'number', payload: 3 },
+      { name: 'string', payload: 'ready' },
+      { name: 'dense array', payload: ['ready', { count: 2 }] },
+      { name: 'plain object', payload: mutablePayload },
+    ];
+    const invalidPayloads = [
+      { name: 'function primitive', payload: () => 'unsafe' },
+      { name: 'symbol primitive', payload: Symbol('unsafe') },
+      { name: 'bigint primitive', payload: 1n },
+      { name: 'built-in object', payload: new Date(0) },
+      { name: 'class instance', payload: new UnsupportedPayloadClass() },
+      { name: 'symbol-keyed object', payload: symbolObjectPayload() },
+      { name: 'non-enumerable object', payload: nonEnumerableObjectPayload() },
+      { name: 'accessor object', payload: accessorObjectPayload() },
+      { name: 'circular object', payload: circularObjectPayload() },
+      { name: 'sparse array', payload: sparseArrayPayload() },
+      { name: 'symbol-keyed array', payload: symbolArrayPayload() },
+      { name: 'non-enumerable array', payload: nonEnumerableArrayPayload() },
+      { name: 'accessor array', payload: accessorArrayPayload() },
+      { name: 'named-property array', payload: namedPropertyArrayPayload() },
+      { name: 'self-referential array', payload: selfReferentialArrayPayload() },
+    ];
+
+    for (const { name, payload } of validPayloads) {
+      expect(isJsonShapedLocalizedValue(payload), name).toBe(true);
+    }
+    for (const { name, payload } of invalidPayloads) {
+      expect(isJsonShapedLocalizedValue(payload), name).toBe(false);
+    }
+    expect(Object.isFrozen(mutablePayload)).toBe(false);
+    expect(Object.isFrozen(mutablePayload.nested)).toBe(false);
   });
 
   it('delegates selected-locale list formatting through the port', () => {

@@ -22,6 +22,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   fallback/missing status metadata through the returned localized object. The
   localized resource/data freeze boundary now rejects sparse arrays so portable
   structured payloads cannot carry array holes across adapter boundaries.
+  Adapter authors can call `isJsonShapedLocalizedValue()` before constructing
+  catalogs to verify that resource/data payloads satisfy the same portability
+  rules the runtime enforces.
 - **Runtime localization fallback posture** — Generated string-table runtime
   catalogs now keep non-source locale files language-specific instead of
   embedding English source strings in every selected-locale payload. The i18n

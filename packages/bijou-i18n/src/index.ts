@@ -21,6 +21,7 @@ export {
   createRuntimeLocalizationPort,
   freezeLocalizedObject,
   freezeLocalizedValue,
+  isJsonShapedLocalizedValue,
   type LocalizedObject,
   type LocalizationFact,
   type LocalizationFactKind,
