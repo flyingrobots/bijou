@@ -6,6 +6,8 @@ import {
 import {
   DOGFOOD_BLOCK_PACKAGE,
   defaultDogfoodBlockRegistry,
+  documentationArticleBlock,
+  documentationArticleBlockRegistryEntry,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
   isDogfoodBlockRegistry,
@@ -191,6 +193,27 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       },
       mode: 'pipe',
     }).output).toBe('Navigation items: 7; active: Blocks');
+  });
+
+  it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
+    expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
+    expect(documentationArticleBlockRegistryEntry.role).toBe('article');
+    expect(defaultDogfoodBlockRegistry.forSurface('docs.article')).toBe(
+      documentationArticleBlockRegistryEntry,
+    );
+    expect(documentationArticleBlock.data?.names()).toEqual(['article', 'headings']);
+    expect(documentationArticleBlock.commands?.map((intent) => intent.id)).toEqual([
+      'documentation.selectHeading',
+      'documentation.openReference',
+    ]);
+
+    expect(documentationArticleBlock.render({
+      config: {
+        title: 'Blocks',
+        headingCount: 5,
+      },
+      mode: 'accessible',
+    }).output).toBe('Article: Blocks; headings: 5');
   });
 });
 
