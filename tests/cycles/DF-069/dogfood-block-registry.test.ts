@@ -4,12 +4,17 @@ import {
   type BlockDefinition,
 } from '@flyingrobots/bijou';
 import {
+  blockPreviewBlock,
+  blockPreviewBlockRegistryEntry,
   DOGFOOD_BLOCK_PACKAGE,
   defaultDogfoodBlockRegistry,
   documentationArticleBlock,
   documentationArticleBlockRegistryEntry,
+  dogfoodBlockCoverageReport,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
+  guideInspectorBlock,
+  guideInspectorBlockRegistryEntry,
   isDogfoodBlockRegistry,
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
@@ -236,6 +241,70 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       },
       mode: 'pipe',
     }).output).toBe('Settings sections: 3; active: Locale');
+  });
+
+  it('publishes the DOGFOOD Blocks preview as a block-authored surface', () => {
+    expect(blockPreviewBlockRegistryEntry.block).toBe(blockPreviewBlock);
+    expect(blockPreviewBlockRegistryEntry.role).toBe('preview');
+    expect(defaultDogfoodBlockRegistry.forSurface('blocks.preview')).toBe(blockPreviewBlockRegistryEntry);
+    expect(blockPreviewBlock.data?.names()).toEqual(['definition', 'modes']);
+    expect(blockPreviewBlock.commands?.map((intent) => intent.id)).toEqual([
+      'blockPreview.selectBlock',
+      'blockPreview.cycleMode',
+    ]);
+
+    expect(blockPreviewBlock.render({
+      config: {
+        blockName: 'ReaderSurface',
+        modeCount: 4,
+      },
+      mode: 'pipe',
+    }).output).toBe('Block preview: ReaderSurface; modes: 4');
+  });
+
+  it('publishes the DOGFOOD guide inspector as a block-authored surface', () => {
+    expect(guideInspectorBlockRegistryEntry.block).toBe(guideInspectorBlock);
+    expect(guideInspectorBlockRegistryEntry.role).toBe('inspector');
+    expect(defaultDogfoodBlockRegistry.forSurface('guide.inspector')).toBe(
+      guideInspectorBlockRegistryEntry,
+    );
+    expect(guideInspectorBlock.data?.names()).toEqual(['selection', 'facts']);
+    expect(guideInspectorBlock.commands?.map((intent) => intent.id)).toEqual([
+      'guideInspector.openSource',
+      'guideInspector.focusSection',
+    ]);
+
+    expect(guideInspectorBlock.render({
+      config: {
+        selectionLabel: 'Block Preview',
+        factCount: 6,
+      },
+      mode: 'accessible',
+    }).output).toBe('Guide inspector: Block Preview; facts: 6');
+  });
+
+  it('covers the intended semantic DOGFOOD surfaces without discovery-time rendering', () => {
+    const report = dogfoodBlockCoverageReport();
+
+    expect(report.missingSurfaceIds).toEqual([]);
+    expect(report.registeredSurfaceIds).toEqual([
+      'landing.title',
+      'docs.navigation',
+      'docs.article',
+      'blocks.preview',
+      'guide.inspector',
+      'frame.settings',
+      'storybook.workbench',
+    ]);
+    expect(defaultDogfoodBlockRegistry.blockNames()).toEqual([
+      'TitleScreenBlock',
+      'NavigationListBlock',
+      'DocumentationArticleBlock',
+      'BlockPreviewBlock',
+      'GuideInspectorBlock',
+      'SettingsMenuBlock',
+      'StorybookWorkbenchBlock',
+    ]);
   });
 });
 

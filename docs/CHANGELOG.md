@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
+  branded block registry for semantic product surfaces and publishes block
+  contracts for the title screen, navigation list, documentation article, block
+  preview, guide inspector, settings menu, and Storybook workbench. The
+  interactive Storybook entrypoint now runs through the AppFrame shell instead
+  of a parallel bespoke TUI, while registry discovery remains render-free and
+  does not introduce provider handles, subscriptions, command dispatch, or a
+  hidden global block registry.
 - **Localization port contract for `bijou-i18n`** —
   `@flyingrobots/bijou-i18n` now exports `LocalizationPort`,
   `LocalizationRequest`, `LocalizedObject`, localization status/issue/fact

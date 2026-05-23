@@ -124,6 +124,20 @@ they render into.
 - behavior tests proving localization and command intent boundaries stay
   declarative
 
+## Playback
+
+DF-069A lands the block-authored DOGFOOD contract layer:
+
+- DOGFOOD has a local, branded `DogfoodBlockRegistry`.
+- Registry discovery rejects loose block-shaped objects.
+- Registry discovery records surface ownership without calling `render()`.
+- Storybook now has a `StorybookWorkbenchBlock` contract and the interactive
+  Storybook entrypoint uses the AppFrame shell.
+- DOGFOOD surface blocks now cover title, navigation, documentation article,
+  block preview, guide inspector, settings, and Storybook workbench surfaces.
+
 ## Retrospective
 
-Started in the block-authored DOGFOOD stack.
+This slice deliberately stops at semantic surface contracts and the Storybook
+frame migration. It does not rewrite every DOGFOOD renderer yet, does not move
+provider lifecycle policy, and does not convert leaf components into Blocks.

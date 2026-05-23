@@ -183,6 +183,187 @@ export interface SettingsMenuBlockConfig {
   readonly activeSettingLabel?: string;
 }
 
+export interface BlockPreviewBlockConfig {
+  readonly blockName?: string;
+  readonly modeCount?: number;
+}
+
+export interface GuideInspectorBlockConfig {
+  readonly selectionLabel?: string;
+  readonly factCount?: number;
+}
+
+export const blockPreviewDefinitionRequirement = defineDataRequirement({
+  id: 'block-preview.definition',
+  resource: 'dogfood.blocks.preview.definition',
+  label: 'Preview block definition',
+  description: 'Block definition selected for the DOGFOOD Blocks preview.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
+});
+
+export const blockPreviewModesRequirement = defineDataRequirement({
+  id: 'block-preview.modes',
+  resource: 'dogfood.blocks.preview.modes',
+  label: 'Preview modes',
+  description: 'Lowering modes rendered for the selected block preview.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
+});
+
+export const blockPreviewData = defineViewData({
+  id: 'block-preview.data',
+  label: 'BlockPreviewBlock data',
+  description: 'Selected block definition plus lowering modes.',
+  requirements: [
+    { name: 'definition', requirement: blockPreviewDefinitionRequirement },
+    { name: 'modes', requirement: blockPreviewModesRequirement },
+  ],
+});
+
+export const blockPreviewSelectBlockIntent = commandIntent<{ readonly blockName: string }>(
+  'blockPreview.selectBlock',
+  {
+    label: 'Select block',
+    description: 'Request preview focus for a DOGFOOD or standard block.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'BlockPreviewBlock' }],
+  },
+);
+
+export const blockPreviewCycleModeIntent = commandIntent<{ readonly direction: -1 | 1 }>(
+  'blockPreview.cycleMode',
+  {
+    label: 'Cycle mode',
+    description: 'Request the next or previous lowering mode preview.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'BlockPreviewBlock' }],
+  },
+);
+
+export const blockPreviewBlock: BlockDefinition<BlockPreviewBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'BlockPreviewBlock',
+    family: 'dogfood-blocks',
+    scale: 'section',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD live block preview and lowering summary surface.',
+      useWhen: ['DOGFOOD needs to show a selected Block across supported output modes.'],
+      avoidWhen: ['A page only needs static catalog metadata without live preview output.'],
+      relatedDocs: ['docs/design-system/blocks.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'definition', required: true, description: 'Selected block definition and stories.' },
+      { id: 'lowering', required: false, description: 'Mode-lowering preview output.' },
+    ],
+    variants: [
+      {
+        id: 'live',
+        label: 'Live',
+        requiredSlots: ['definition'],
+        optionalSlots: ['lowering'],
+        facts: [{ kind: 'state', key: 'dogfood.blockPreview.mode', value: 'live' }],
+      },
+    ],
+    composedComponents: ['renderBlockTree()', 'boxSurface()', 'viewportSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
+    storyIds: ['block-preview.live'],
+    examples: [{ id: 'dogfood.blocks.preview', label: 'DOGFOOD block preview' }],
+    tags: ['dogfood', 'blocks', 'preview'],
+  },
+  data: blockPreviewData,
+  commands: [
+    blockPreviewSelectBlockIntent,
+    blockPreviewCycleModeIntent,
+  ],
+  render: renderBlockPreviewBlock,
+});
+
+export const guideInspectorSelectionRequirement = defineDataRequirement({
+  id: 'guide-inspector.selection',
+  resource: 'dogfood.guide.inspector.selection',
+  label: 'Guide selection',
+  description: 'Current section or block selection shown in the DOGFOOD guide inspector.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+});
+
+export const guideInspectorFactsRequirement = defineDataRequirement({
+  id: 'guide-inspector.facts',
+  resource: 'dogfood.guide.inspector.facts',
+  label: 'Guide facts',
+  description: 'Facts, posture, and source links for the selected DOGFOOD guide row.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+});
+
+export const guideInspectorData = defineViewData({
+  id: 'guide-inspector.data',
+  label: 'GuideInspectorBlock data',
+  description: 'DOGFOOD guide selection details and facts.',
+  requirements: [
+    { name: 'selection', requirement: guideInspectorSelectionRequirement },
+    { name: 'facts', requirement: guideInspectorFactsRequirement },
+  ],
+});
+
+export const guideInspectorOpenSourceIntent = commandIntent<{ readonly sourcePath: string }>(
+  'guideInspector.openSource',
+  {
+    label: 'Open source',
+    description: 'Request opening the source path for the selected guide row.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'GuideInspectorBlock' }],
+  },
+);
+
+export const guideInspectorFocusSectionIntent = commandIntent<{ readonly sectionId: string }>(
+  'guideInspector.focusSection',
+  {
+    label: 'Focus section',
+    description: 'Request focus for another section related to the current inspector row.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'GuideInspectorBlock' }],
+  },
+);
+
+export const guideInspectorBlock: BlockDefinition<GuideInspectorBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'GuideInspectorBlock',
+    family: 'dogfood-inspector',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD side inspector for selected guide rows and block facts.',
+      useWhen: ['DOGFOOD needs a semantic side panel explaining the current docs selection.'],
+      avoidWhen: ['A surface needs to render primary documentation content.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'selection', required: true, description: 'Current selected guide row.' },
+      { id: 'facts', required: false, description: 'Selection facts, posture, and source hints.' },
+    ],
+    variants: [
+      {
+        id: 'guide-info',
+        label: 'Guide info',
+        requiredSlots: ['selection'],
+        optionalSlots: ['facts'],
+        facts: [{ kind: 'state', key: 'dogfood.inspector.surface', value: 'guide-info' }],
+      },
+    ],
+    composedComponents: ['inspector()', 'boxSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+    storyIds: ['guide-inspector.guide-info'],
+    examples: [{ id: 'dogfood.guide.inspector', label: 'DOGFOOD guide inspector' }],
+    tags: ['dogfood', 'inspector', 'facts'],
+  },
+  data: guideInspectorData,
+  commands: [
+    guideInspectorOpenSourceIntent,
+    guideInspectorFocusSectionIntent,
+  ],
+  render: renderGuideInspectorBlock,
+});
+
 export const settingsSectionsRequirement = defineDataRequirement({
   id: 'settings.sections',
   resource: 'dogfood.settings.sections',
@@ -678,6 +859,22 @@ export const documentationArticleBlockRegistryEntry = dogfoodBlockRegistryEntry(
   tags: ['docs', 'article'],
 });
 
+export const blockPreviewBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: blockPreviewBlock,
+  role: 'preview',
+  surfaceId: 'blocks.preview',
+  description: 'DOGFOOD Blocks live preview and lowering surface.',
+  tags: ['blocks', 'preview'],
+});
+
+export const guideInspectorBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: guideInspectorBlock,
+  role: 'inspector',
+  surfaceId: 'guide.inspector',
+  description: 'DOGFOOD side inspector surface.',
+  tags: ['inspector', 'guide'],
+});
+
 export const settingsMenuBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: settingsMenuBlock,
   role: 'settings',
@@ -686,13 +883,46 @@ export const settingsMenuBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['settings', 'frame'],
 });
 
+export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
+  'landing.title',
+  'docs.navigation',
+  'docs.article',
+  'blocks.preview',
+  'guide.inspector',
+  'frame.settings',
+  'storybook.workbench',
+]);
+
 export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   titleScreenBlockRegistryEntry,
   navigationListBlockRegistryEntry,
   documentationArticleBlockRegistryEntry,
+  blockPreviewBlockRegistryEntry,
+  guideInspectorBlockRegistryEntry,
   settingsMenuBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
+
+export interface DogfoodBlockCoverageReport {
+  readonly requiredSurfaceIds: readonly string[];
+  readonly registeredSurfaceIds: readonly string[];
+  readonly missingSurfaceIds: readonly string[];
+}
+
+export function dogfoodBlockCoverageReport(
+  registry: DogfoodBlockRegistry = defaultDogfoodBlockRegistry,
+): DogfoodBlockCoverageReport {
+  const registeredSurfaceIds = registry.surfaceIds();
+  const registered = new Set(registeredSurfaceIds);
+
+  return Object.freeze({
+    requiredSurfaceIds: requiredDogfoodBlockSurfaceIds,
+    registeredSurfaceIds,
+    missingSurfaceIds: Object.freeze(
+      requiredDogfoodBlockSurfaceIds.filter((surfaceId) => !registered.has(surfaceId)),
+    ),
+  });
+}
 
 export function dogfoodBlockRegistryEntry(
   input: DogfoodBlockRegistryEntryInput,
@@ -872,6 +1102,54 @@ function renderSettingsMenuBlock(
       'Intents: activate row; set locale; set shell theme',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+  };
+}
+
+function renderBlockPreviewBlock(
+  input: BlockRenderInput<BlockPreviewBlockConfig>,
+): BlockRenderResult<string> {
+  const blockName = input.config?.blockName ?? 'none';
+  const modeCount = input.config?.modeCount ?? 0;
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Block preview: ${blockName}; modes: ${modeCount}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
+    };
+  }
+
+  return {
+    output: [
+      'BlockPreviewBlock',
+      `block: ${blockName}`,
+      `modes: ${modeCount}`,
+      'Intents: select block; cycle mode',
+    ].join('\n'),
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'BlockPreviewBlock' }],
+  };
+}
+
+function renderGuideInspectorBlock(
+  input: BlockRenderInput<GuideInspectorBlockConfig>,
+): BlockRenderResult<string> {
+  const selectionLabel = input.config?.selectionLabel ?? 'none';
+  const factCount = input.config?.factCount ?? 0;
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Guide inspector: ${selectionLabel}; facts: ${factCount}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+    };
+  }
+
+  return {
+    output: [
+      'GuideInspectorBlock',
+      `selection: ${selectionLabel}`,
+      `facts: ${factCount}`,
+      'Intents: open source; focus section',
+    ].join('\n'),
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
   };
 }
 
