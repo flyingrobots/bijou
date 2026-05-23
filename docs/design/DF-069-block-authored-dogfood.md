@@ -141,3 +141,9 @@ DF-069A lands the block-authored DOGFOOD contract layer:
 This slice deliberately stops at semantic surface contracts and the Storybook
 frame migration. It does not rewrite every DOGFOOD renderer yet, does not move
 provider lifecycle policy, and does not convert leaf components into Blocks.
+
+The final review gate also tightened the DOGFOOD i18n debt scanner so framed
+Storybook machine tokens such as key names, event discriminants, mode literals,
+pane overflow policy, tones, and internal thrown errors do not count as visible
+English copy. Storybook labels and rendered text still count as localization
+debt until they move behind a localization port.

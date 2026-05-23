@@ -18,6 +18,13 @@ describe('DOGFOOD i18n debt inventory', () => {
           "const token = 'docs.page.guides';",
           "const loadingLabel = 'loading';",
           "const continueLabel = 'continue';",
+          "const requiredModes: readonly OutputMode[] = ['interactive', 'static'];",
+          "const msg = { type: 'fixture-event', key: 'j' };",
+          "const pane = { overflowX: 'scroll', tone: 'muted' };",
+          "if (msg.type === 'pulse') return msg;",
+          "switch (msg.key) { case 'j': return msg; }",
+          "throw new Error('Internal fixture failure');",
+          "createKeyMap().group('Visible key group', (group) => group.bind('j', 'Visible key label', msg));",
           "const page = { id: 'docs.page.guides', title: 'Raw English Title' };",
           "const markdown = readMarkdownDoc('./content/guide.md');",
           "const summary = `Visible template text ${cataloged}`;",
@@ -28,10 +35,12 @@ describe('DOGFOOD i18n debt inventory', () => {
     expect(inventory.entries.map((entry) => entry.value)).toEqual([
       'loading',
       'continue',
+      'Visible key group',
+      'Visible key label',
       'Raw English Title',
       'Visible template text',
     ]);
-    expect(inventory.bySurface).toEqual([{ surface: 'fixture', count: 4 }]);
+    expect(inventory.bySurface).toEqual([{ surface: 'fixture', count: 6 }]);
   });
 
   it('ignores machine environment mode literals without dropping visible copy', () => {
