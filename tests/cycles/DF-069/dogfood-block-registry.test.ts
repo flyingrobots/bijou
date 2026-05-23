@@ -12,6 +12,8 @@ import {
   isDogfoodBlockRegistryEntry,
   storybookWorkbenchBlock,
   storybookWorkbenchBlockRegistryEntry,
+  titleScreenBlock,
+  titleScreenBlockRegistryEntry,
   type DogfoodBlockRegistryEntry,
 } from '../../../examples/docs/dogfood-blocks.js';
 
@@ -125,7 +127,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     expect(defaultDogfoodBlockRegistry.forSurface('storybook.workbench')).toBe(
       storybookWorkbenchBlockRegistryEntry,
     );
-    expect(defaultDogfoodBlockRegistry.blockNames()).toEqual(['StorybookWorkbenchBlock']);
+    expect(defaultDogfoodBlockRegistry.blockNames()).toContain('StorybookWorkbenchBlock');
     expect(storybookWorkbenchBlock.data?.names()).toEqual(['stories', 'selection']);
     expect(storybookWorkbenchBlock.commands?.map((intent) => intent.id)).toEqual([
       'storybook.selectStory',
@@ -145,6 +147,26 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     expect(output).toBe(
       'StorybookWorkbench stories: 12; selected: Button / Primary; profile: desktop',
     );
+  });
+
+  it('publishes the DOGFOOD title screen as an app-level block', () => {
+    expect(titleScreenBlockRegistryEntry.block).toBe(titleScreenBlock);
+    expect(titleScreenBlockRegistryEntry.role).toBe('title');
+    expect(defaultDogfoodBlockRegistry.forSurface('landing.title')).toBe(titleScreenBlockRegistryEntry);
+    expect(titleScreenBlock.data?.names()).toEqual(['route']);
+    expect(titleScreenBlock.commands?.map((intent) => intent.id)).toEqual([
+      'title.openDocs',
+      'title.openStorybook',
+      'title.openSettings',
+    ]);
+
+    expect(titleScreenBlock.render({
+      config: {
+        title: 'Bijou',
+        subtitle: 'Terminal UI proof',
+      },
+      mode: 'accessible',
+    }).output).toBe('Bijou: Terminal UI proof');
   });
 });
 
