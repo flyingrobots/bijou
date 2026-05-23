@@ -14,6 +14,8 @@ import {
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
   navigationListBlockRegistryEntry,
+  settingsMenuBlock,
+  settingsMenuBlockRegistryEntry,
   storybookWorkbenchBlock,
   storybookWorkbenchBlockRegistryEntry,
   titleScreenBlock,
@@ -214,6 +216,26 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       },
       mode: 'accessible',
     }).output).toBe('Article: Blocks; headings: 5');
+  });
+
+  it('publishes DOGFOOD settings as a frame-owned block surface', () => {
+    expect(settingsMenuBlockRegistryEntry.block).toBe(settingsMenuBlock);
+    expect(settingsMenuBlockRegistryEntry.role).toBe('settings');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.settings')).toBe(settingsMenuBlockRegistryEntry);
+    expect(settingsMenuBlock.data?.names()).toEqual(['sections', 'selection']);
+    expect(settingsMenuBlock.commands?.map((intent) => intent.id)).toEqual([
+      'settings.activateRow',
+      'settings.setLocale',
+      'settings.setShellTheme',
+    ]);
+
+    expect(settingsMenuBlock.render({
+      config: {
+        sectionCount: 3,
+        activeSettingLabel: 'Locale',
+      },
+      mode: 'pipe',
+    }).output).toBe('Settings sections: 3; active: Locale');
   });
 });
 
