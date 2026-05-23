@@ -5,10 +5,13 @@ import {
 } from '@flyingrobots/bijou';
 import {
   DOGFOOD_BLOCK_PACKAGE,
+  defaultDogfoodBlockRegistry,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
   isDogfoodBlockRegistry,
   isDogfoodBlockRegistryEntry,
+  storybookWorkbenchBlock,
+  storybookWorkbenchBlockRegistryEntry,
   type DogfoodBlockRegistryEntry,
 } from '../../../examples/docs/dogfood-blocks.js';
 
@@ -114,6 +117,34 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     expect(registry.blockNames()).toEqual(['TitleScreenBlock']);
     expect(next.blockNames()).toEqual(['TitleScreenBlock', 'SettingsMenuBlock']);
     expect(next.forSurface('docs.settings')).toBe(settings);
+  });
+
+  it('publishes Storybook as an inspectable DOGFOOD workbench block', () => {
+    expect(storybookWorkbenchBlockRegistryEntry.block).toBe(storybookWorkbenchBlock);
+    expect(storybookWorkbenchBlockRegistryEntry.role).toBe('workbench');
+    expect(defaultDogfoodBlockRegistry.forSurface('storybook.workbench')).toBe(
+      storybookWorkbenchBlockRegistryEntry,
+    );
+    expect(defaultDogfoodBlockRegistry.blockNames()).toEqual(['StorybookWorkbenchBlock']);
+    expect(storybookWorkbenchBlock.data?.names()).toEqual(['stories', 'selection']);
+    expect(storybookWorkbenchBlock.commands?.map((intent) => intent.id)).toEqual([
+      'storybook.selectStory',
+      'storybook.cycleVariant',
+      'storybook.setProfile',
+    ]);
+
+    const output = storybookWorkbenchBlock.render({
+      config: {
+        storyCount: 12,
+        selectedStoryLabel: 'Button / Primary',
+        profileLabel: 'desktop',
+      },
+      mode: 'pipe',
+    }).output;
+
+    expect(output).toBe(
+      'StorybookWorkbench stories: 12; selected: Button / Primary; profile: desktop',
+    );
   });
 });
 

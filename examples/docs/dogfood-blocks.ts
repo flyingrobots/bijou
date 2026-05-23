@@ -1,12 +1,38 @@
 import {
+  commandIntent,
+  defineBlock,
+  defineDataRequirement,
+  defineViewData,
   isBlockDefinition,
   type BlockDefinition,
+  type BlockRenderInput,
+  type BlockRenderResult,
+  type OutputMode,
 } from '@flyingrobots/bijou';
 
 const DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND: unique symbol = Symbol('DogfoodBlockRegistryEntry');
 const DOGFOOD_BLOCK_REGISTRY_BRAND: unique symbol = Symbol('DogfoodBlockRegistry');
 
 export const DOGFOOD_BLOCK_PACKAGE = '@flyingrobots/bijou-dogfood';
+const DOGFOOD_BLOCK_MODES: readonly OutputMode[] = Object.freeze([
+  'interactive',
+  'static',
+  'pipe',
+  'accessible',
+]);
+const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
+  'app-shell',
+  'title',
+  'navigation',
+  'article',
+  'settings',
+  'inspector',
+  'preview',
+  'workbench',
+  'fixture',
+]);
+
+export type DogfoodBlockDefinition = BlockDefinition<never, unknown>;
 
 export type DogfoodBlockRole =
   | 'app-shell'
@@ -20,7 +46,7 @@ export type DogfoodBlockRole =
   | 'fixture';
 
 export interface DogfoodBlockRegistryEntryInput {
-  readonly block: BlockDefinition;
+  readonly block: DogfoodBlockDefinition;
   readonly role: DogfoodBlockRole;
   readonly surfaceId: string;
   readonly description?: string;
@@ -29,7 +55,7 @@ export interface DogfoodBlockRegistryEntryInput {
 
 export interface DogfoodBlockRegistryEntry {
   readonly [DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND]: true;
-  readonly block: BlockDefinition;
+  readonly block: DogfoodBlockDefinition;
   readonly blockName: string;
   readonly packageName: string;
   readonly role: DogfoodBlockRole;
@@ -85,7 +111,7 @@ export class DogfoodBlockRegistry {
     return Object.freeze([...this.#entries]);
   }
 
-  blocks(): readonly BlockDefinition[] {
+  blocks(): readonly DogfoodBlockDefinition[] {
     return Object.freeze(this.#entries.map((entry) => entry.block));
   }
 
@@ -131,10 +157,137 @@ export class DogfoodBlockRegistry {
   }
 }
 
+export interface StorybookWorkbenchBlockConfig {
+  readonly storyCount?: number;
+  readonly selectedStoryLabel?: string;
+  readonly profileLabel?: string;
+}
+
+export const storybookStoriesRequirement = defineDataRequirement({
+  id: 'storybook.stories',
+  resource: 'dogfood.storybook.stories',
+  label: 'Story catalog',
+  description: 'Available component stories for the DOGFOOD Storybook workbench.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+});
+
+export const storybookSelectionRequirement = defineDataRequirement({
+  id: 'storybook.selection',
+  resource: 'dogfood.storybook.selection',
+  label: 'Selected story',
+  description: 'The active story, variant, and profile in the Storybook workbench.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+});
+
+export const storybookWorkbenchData = defineViewData({
+  id: 'storybook-workbench.data',
+  label: 'StorybookWorkbenchBlock data',
+  description: 'DOGFOOD Storybook catalog and selection data.',
+  requirements: [
+    { name: 'stories', requirement: storybookStoriesRequirement },
+    { name: 'selection', requirement: storybookSelectionRequirement },
+  ],
+});
+
+export const storybookSelectStoryIntent = commandIntent<{ readonly storyId: string }>(
+  'storybook.selectStory',
+  {
+    label: 'Select story',
+    description: 'Request focus for a component story.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+  },
+);
+
+export const storybookCycleVariantIntent = commandIntent<{ readonly direction: -1 | 1 }>(
+  'storybook.cycleVariant',
+  {
+    label: 'Cycle variant',
+    description: 'Request the next or previous variant for the selected story.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+  },
+);
+
+export const storybookSetProfileIntent = commandIntent<{ readonly profileIndex: number }>(
+  'storybook.setProfile',
+  {
+    label: 'Set profile',
+    description: 'Request a viewport/profile preset for the selected story.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'StorybookWorkbenchBlock' }],
+  },
+);
+
+export const storybookWorkbenchBlock: BlockDefinition<StorybookWorkbenchBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'StorybookWorkbenchBlock',
+    family: 'dogfood-workbench',
+    scale: 'app',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Frames the component story catalog, live preview, testing notes, and footer controls.',
+      useWhen: [
+        'DOGFOOD needs to present component stories inside the same app frame posture as docs.',
+      ],
+      avoidWhen: [
+        'A production app needs to embed a single component preview without the DOGFOOD story catalog.',
+      ],
+      relatedDocs: ['docs/design/DF-069-block-authored-dogfood.md'],
+    },
+    sourcePath: 'examples/docs/storybook-app.ts',
+    slots: [
+      { id: 'catalog', required: true, description: 'Story catalog navigation.' },
+      { id: 'preview', required: true, description: 'Live component story preview.' },
+      { id: 'testing', required: false, description: 'Mode-lowering and interaction notes.' },
+      { id: 'footer', required: false, description: 'Workbench key hints and status text.' },
+    ],
+    variants: [
+      {
+        id: 'wide',
+        label: 'Wide',
+        requiredSlots: ['catalog', 'preview'],
+        optionalSlots: ['testing', 'footer'],
+        facts: [{ kind: 'state', key: 'dogfood.storybook.layout', value: 'wide' }],
+      },
+      {
+        id: 'narrow',
+        label: 'Narrow',
+        requiredSlots: ['preview'],
+        optionalSlots: ['catalog', 'testing', 'footer'],
+        facts: [{ kind: 'state', key: 'dogfood.storybook.layout', value: 'narrow' }],
+      },
+    ],
+    composedComponents: ['createFramedApp()', 'viewportSurface()', 'browsableListSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+    storyIds: ['storybook.workbench.wide', 'storybook.workbench.narrow'],
+    examples: [{ id: 'storybook.dogfood', label: 'DOGFOOD Storybook workbench' }],
+    tags: ['dogfood', 'storybook', 'workbench', 'app-frame'],
+  },
+  data: storybookWorkbenchData,
+  commands: [
+    storybookSelectStoryIntent,
+    storybookCycleVariantIntent,
+    storybookSetProfileIntent,
+  ],
+  render: renderStorybookWorkbenchBlock,
+});
+
+export const storybookWorkbenchBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: storybookWorkbenchBlock,
+  role: 'workbench',
+  surfaceId: 'storybook.workbench',
+  description: 'Storybook component workstation entrypoint.',
+  tags: ['storybook', 'workbench'],
+});
+
+export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
+  storybookWorkbenchBlockRegistryEntry,
+]);
+
 export function dogfoodBlockRegistryEntry(
   input: DogfoodBlockRegistryEntryInput,
 ): DogfoodBlockRegistryEntry {
-  if (!isBlockDefinition(input.block)) {
+  const candidateBlock: unknown = input.block;
+  if (!isBlockDefinition(candidateBlock)) {
     throw new Error('dogfood block registry entry: block was not created by defineBlock()');
   }
 
@@ -159,7 +312,7 @@ export function dogfoodBlockRegistryEntry(
     surfaceId,
     ...(description === undefined ? {} : { description }),
     tags,
-  } as DogfoodBlockRegistryEntry;
+  } as unknown as DogfoodBlockRegistryEntry;
 
   Object.defineProperty(entry, DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND, { value: true });
   return Object.freeze(entry);
@@ -189,6 +342,31 @@ export function isDogfoodBlockRegistry(value: unknown): value is DogfoodBlockReg
       && Object.prototype.hasOwnProperty.call(value, DOGFOOD_BLOCK_REGISTRY_BRAND)
       && (value as DogfoodBlockRegistryBrandCarrier)[DOGFOOD_BLOCK_REGISTRY_BRAND] === true,
   );
+}
+
+function renderStorybookWorkbenchBlock(
+  input: BlockRenderInput<StorybookWorkbenchBlockConfig>,
+): BlockRenderResult<string> {
+  const storyCount = input.config?.storyCount ?? 0;
+  const selectedStoryLabel = input.config?.selectedStoryLabel ?? 'none';
+  const profileLabel = input.config?.profileLabel ?? 'default';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `StorybookWorkbench stories: ${storyCount}; selected: ${selectedStoryLabel}; profile: ${profileLabel}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+    };
+  }
+
+  return {
+    output: [
+      'StorybookWorkbench',
+      `stories: ${storyCount}`,
+      `selected: ${selectedStoryLabel}`,
+      `profile: ${profileLabel}`,
+    ].join('\n'),
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'StorybookWorkbenchBlock' }],
+  };
 }
 
 function dogfoodBlockKey(packageName: string, blockName: string): string {
@@ -234,18 +412,6 @@ function optionalTrimmedText(value: unknown): string | undefined {
     value,
   });
 }
-
-const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
-  'app-shell',
-  'title',
-  'navigation',
-  'article',
-  'settings',
-  'inspector',
-  'preview',
-  'workbench',
-  'fixture',
-]);
 
 interface DogfoodBlockRegistryEntryBrandCarrier {
   readonly [DOGFOOD_BLOCK_REGISTRY_ENTRY_BRAND]?: true;
