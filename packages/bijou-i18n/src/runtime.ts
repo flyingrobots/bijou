@@ -137,21 +137,38 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
     target.set(catalog.namespace, catalog);
   }
 
-  function applyCatalogs(source: ReadonlyMap<string, I18nCatalog>): void {
+  function applyCatalogsTo(
+    targetEntries: Map<string, I18nCatalogEntry>,
+    source: ReadonlyMap<string, I18nCatalog>,
+  ): void {
     for (const catalog of source.values()) {
       for (const entry of catalog.entries) {
         const key = keyToString(entry.key);
-        const existing = entries.get(key);
-        entries.set(key, existing === undefined ? entry : mergeCatalogEntry(existing, entry));
+        const existing = targetEntries.get(key);
+        targetEntries.set(key, existing === undefined ? entry : mergeCatalogEntry(existing, entry));
       }
     }
   }
 
-  function rebuildCatalogState(): void {
+  function buildCatalogState(
+    stagedLoaderCatalogs: ReadonlyMap<string, I18nCatalog> = loaderCatalogs,
+  ): Map<string, I18nCatalogEntry> {
+    const nextEntries = new Map<string, I18nCatalogEntry>();
+    applyCatalogsTo(nextEntries, fallbackCatalogs);
+    applyCatalogsTo(nextEntries, manualCatalogs);
+    applyCatalogsTo(nextEntries, stagedLoaderCatalogs);
+    return nextEntries;
+  }
+
+  function commitCatalogState(nextEntries: ReadonlyMap<string, I18nCatalogEntry>): void {
     entries.clear();
-    applyCatalogs(fallbackCatalogs);
-    applyCatalogs(manualCatalogs);
-    applyCatalogs(loaderCatalogs);
+    for (const [key, entry] of nextEntries) {
+      entries.set(key, entry);
+    }
+  }
+
+  function rebuildCatalogState(): void {
+    commitCatalogState(buildCatalogState());
   }
 
   function localizationIssue(
@@ -299,11 +316,17 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
   }
 
   function activateLoaderCatalogs(catalogs: readonly I18nCatalog[]): void {
-    loaderCatalogs.clear();
+    const stagedLoaderCatalogs = new Map<string, I18nCatalog>();
     for (const catalog of catalogs) {
-      rememberCatalog(loaderCatalogs, catalog);
+      rememberCatalog(stagedLoaderCatalogs, catalog);
     }
-    rebuildCatalogState();
+    const nextEntries = buildCatalogState(stagedLoaderCatalogs);
+
+    loaderCatalogs.clear();
+    for (const [namespace, catalog] of stagedLoaderCatalogs) {
+      loaderCatalogs.set(namespace, catalog);
+    }
+    commitCatalogState(nextEntries);
   }
 
   if (options.catalogs !== undefined) {
@@ -456,12 +479,12 @@ export function createI18nRuntime(options: I18nRuntimeOptions): I18nRuntime {
       }
 
       const catalogs = await loadLocaleCatalogs(locale);
+      if (catalogs !== undefined) {
+        activateLoaderCatalogs(catalogs);
+      }
       currentLocale = locale;
       if (direction !== undefined) {
         currentDirection = direction;
-      }
-      if (catalogs !== undefined) {
-        activateLoaderCatalogs(catalogs);
       }
     },
     localize<Value = unknown>(request: LocalizationRequest): LocalizedObject<Value> {

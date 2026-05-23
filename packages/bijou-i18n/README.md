@@ -121,6 +121,33 @@ keeps rendering code away from catalog loading, filesystem paths, CSV data, and
 runtime mutation details while preserving enough state for tooling and lower
 modes.
 
+## Resource And Data Payloads
+
+Message entries resolve to strings. `resource` and `data` entries resolve to
+portable structured values, and the runtime freezes those values before handing
+them to callers.
+
+Keep resource/data payloads JSON-shaped:
+
+- strings, numbers, booleans, null, and undefined
+- arrays with indexed entries only
+- plain objects with enumerable data properties only
+
+Do not use:
+
+- class instances or built-ins such as `Date`
+- symbol-keyed properties
+- non-enumerable properties
+- accessor properties
+- cyclic object graphs
+- functions, symbols, or bigint values
+
+Unsupported shapes are rejected at the localization boundary rather than being
+silently normalized. This keeps generated catalogs, runtime loader adapters, and
+view code honest: adapters must produce portable data, and consumers can trust
+that localized resource/data values are immutable snapshots rather than mutable
+runtime handles.
+
 ## Documentation
 
 See the [Bijou repo](https://github.com/flyingrobots/bijou) for the full documentation map, architecture guide, and design system.

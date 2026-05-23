@@ -1266,6 +1266,34 @@ describe('createFramedApp', () => {
     expect((model as any).commandPalette).toBeUndefined();
   });
 
+  it('opens page search with search metadata derived from the active page model', () => {
+    const page: FramePage<PageModel, Msg> = {
+      ...makePage('home', 'Home', 'main'),
+      searchTitle: (model) => `Search count ${model.count}`,
+      searchItems: (model) => [{
+        id: 'count-result',
+        label: `Count ${model.count}`,
+      }],
+    };
+    const app = createFramedApp({
+      pages: [page],
+      enableCommandPalette: true,
+    });
+
+    let [model] = app.init();
+    [model] = app.update({ type: 'inc' }, model);
+    [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
+
+    expect(model.pageModels.home?.count).toBe(1);
+    expect((model as any).commandPaletteKind).toBe('search');
+    expect((model as any).commandPaletteTitle).toBe('Search count 1');
+    expect((model as any).commandPalette?.items).toEqual([{
+      id: 'search:0',
+      label: 'Count 1',
+      category: 'Home',
+    }]);
+  });
+
   it('uses localized shell defaults for command palette and settings footer copy', () => {
     const runtime = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
     runtime.loadCatalog(FRAME_I18N_CATALOG);

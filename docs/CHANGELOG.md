@@ -300,6 +300,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **Localization loader activation staging** — Loader-backed locale activation
+  now stages third-party catalog bundles and rebuilds the candidate entry table
+  before swapping loader catalogs or committing locale/direction changes, so a
+  conflicting catalog bundle cannot leave the runtime half-switched.
 - **Localized array payload validation** — `freezeLocalizedValue()` now applies
   the same portable boundary checks to array-owned properties as plain objects,
   rejecting symbol, non-enumerable, accessor, named, and self-referential
