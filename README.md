@@ -242,6 +242,32 @@ Blocks are Bijou's higher-level authoring contract for reusable, inspectable UI
 surfaces. A block can declare metadata, slots, variants, data requirements,
 command intents, stories, schema posture, and mode-lowering behavior.
 
+### Unidirectional Binding
+
+Blocks participate in Bijou's declarative binding system. The loop is
+intentionally one-way:
+
+```text
+business logic / providers
+  -> immutable BindingSnapshots
+  -> BindingFrame render input
+  -> blocks and views render
+  -> CommandIntent records leave as user intent
+  -> business logic decides the next state
+```
+
+That separation keeps Blocks from becoming prop-and-callback containers. Blocks
+declare what data they need; providers publish immutable snapshots; frames
+deliver read-only render input; views emit command intents; business logic owns
+change. There is no hidden provider registry, render-time refresh hook, mutable
+view store, or two-way binding path in the block contract.
+
+The public contracts live in [`@flyingrobots/bijou`](./packages/bijou/) so
+tooling, DOGFOOD, MCP payloads, and future block packages can inspect them
+without running the TUI runtime. Runtime lifecycle and host integration belong
+in the TUI layer. The architecture is described in
+[`DX-034 - Declarative View Data Binding`](./docs/design/DX-034-declarative-view-data-binding.md).
+
 Current DOGFOOD pages include:
 
 - What are Blocks
