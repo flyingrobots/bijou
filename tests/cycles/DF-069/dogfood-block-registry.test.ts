@@ -225,6 +225,11 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       },
       mode: 'pipe',
     }).output).toBe('Search query: block; results: 3; active: Block Preview');
+
+    expect(searchPanelBlock.render({
+      config: { title: 'Search blocks' },
+      mode: 'accessible',
+    }).output).toBe('Search blocks');
   });
 
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {

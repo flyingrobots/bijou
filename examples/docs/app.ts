@@ -132,6 +132,7 @@ import {
   footerHintBlock,
   guideInspectorBlock,
   navigationListBlock,
+  searchPanelBlock,
   titleScreenBlock,
 } from './dogfood-blocks.js';
 
@@ -3500,6 +3501,13 @@ function renderDocsFooterHint(config: {
   }).output);
 }
 
+function renderDocsSearchTitle(title: string): string {
+  return String(searchPanelBlock.render({
+    config: { title },
+    mode: 'accessible',
+  }).output);
+}
+
 function familyRowIndexAtPosition(
   model: DocsExplorerModel,
   row: number,
@@ -3836,7 +3844,9 @@ function createDocsExplorerApp(
               },
             ];
           },
-          searchTitle: () => dogfoodText(localization, 'docs.search.title', 'Search components'),
+          searchTitle: () => renderDocsSearchTitle(
+            dogfoodText(localization, 'docs.search.title', 'Search components'),
+          ),
           searchItems(model) {
             return COMPONENT_STORIES.map((story) => ({
               id: story.id,
@@ -3945,7 +3955,7 @@ function createDocsExplorerApp(
           }
           return inputAreas;
         },
-        searchTitle: () => `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
+        searchTitle: () => renderDocsSearchTitle(`Search ${pageTitle(spec.id, localization).toLowerCase()}`),
         searchItems() {
           return guideDocsForPage(spec.id).map((doc) => ({
             id: doc.id,

@@ -211,6 +211,7 @@ export interface SettingsMenuBlockConfig {
 }
 
 export interface SearchPanelBlockConfig {
+  readonly title?: string;
   readonly query?: string;
   readonly resultCount?: number;
   readonly activeResultLabel?: string;
@@ -1412,14 +1413,21 @@ function renderSettingsMenuBlock(
 function renderSearchPanelBlock(
   input: BlockRenderInput<SearchPanelBlockConfig>,
 ): BlockRenderResult<string> {
+  const title = input.config?.title;
   const query = input.config?.query ?? '';
   const resultCount = input.config?.resultCount ?? 0;
   const activeResultLabel = input.config?.activeResultLabel ?? 'none';
   const queryLabel = query.trim() === '' ? 'empty' : query;
+  const titleOnly = title != null
+    && query.trim() === ''
+    && resultCount === 0
+    && activeResultLabel === 'none';
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
+      output: titleOnly
+        ? title
+        : `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
         { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
