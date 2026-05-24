@@ -21,6 +21,8 @@ import {
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
   navigationListBlockRegistryEntry,
+  searchPanelBlock,
+  searchPanelBlockRegistryEntry,
   settingsMenuBlock,
   settingsMenuBlockRegistryEntry,
   storybookWorkbenchBlock,
@@ -204,6 +206,27 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Navigation items: 7; active: Blocks');
   });
 
+  it('publishes DOGFOOD search as an inspectable command surface', () => {
+    expect(searchPanelBlockRegistryEntry.block).toBe(searchPanelBlock);
+    expect(searchPanelBlockRegistryEntry.role).toBe('search');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.search')).toBe(searchPanelBlockRegistryEntry);
+    expect(searchPanelBlock.data?.names()).toEqual(['query', 'items', 'selection']);
+    expect(searchPanelBlock.commands?.map((intent) => intent.id)).toEqual([
+      'search.submitQuery',
+      'search.selectResult',
+      'search.dismiss',
+    ]);
+
+    expect(searchPanelBlock.render({
+      config: {
+        query: 'block',
+        resultCount: 3,
+        activeResultLabel: 'Block Preview',
+      },
+      mode: 'pipe',
+    }).output).toBe('Search query: block; results: 3; active: Block Preview');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -312,6 +335,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'blocks.preview',
       'guide.inspector',
       'frame.settings',
+      'frame.search',
       'frame.footer',
       'storybook.workbench',
     ]);
@@ -322,6 +346,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'BlockPreviewBlock',
       'GuideInspectorBlock',
       'SettingsMenuBlock',
+      'SearchPanelBlock',
       'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);

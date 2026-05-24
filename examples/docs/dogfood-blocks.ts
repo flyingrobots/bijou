@@ -25,6 +25,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'title',
   'navigation',
   'article',
+  'search',
   'settings',
   'inspector',
   'preview',
@@ -40,6 +41,7 @@ export type DogfoodBlockRole =
   | 'title'
   | 'navigation'
   | 'article'
+  | 'search'
   | 'settings'
   | 'inspector'
   | 'preview'
@@ -206,6 +208,12 @@ export interface SettingsMenuBlockConfig {
   readonly sectionCount?: number;
   readonly activeSettingLabel?: string;
   readonly sections?: readonly SettingsMenuBlockSection[];
+}
+
+export interface SearchPanelBlockConfig {
+  readonly query?: string;
+  readonly resultCount?: number;
+  readonly activeResultLabel?: string;
 }
 
 export interface GuideInspectorBlockSection {
@@ -496,6 +504,109 @@ export const settingsMenuBlock: BlockDefinition<SettingsMenuBlockConfig, string>
     settingsSetShellThemeIntent,
   ],
   render: renderSettingsMenuBlock,
+});
+
+export const searchQueryRequirement = defineDataRequirement({
+  id: 'search.query',
+  resource: 'dogfood.search.query',
+  label: 'Search query',
+  description: 'Current DOGFOOD search query.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchItemsRequirement = defineDataRequirement({
+  id: 'search.items',
+  resource: 'dogfood.search.items',
+  label: 'Search results',
+  description: 'Visible DOGFOOD search result rows.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchSelectionRequirement = defineDataRequirement({
+  id: 'search.selection',
+  resource: 'dogfood.search.selection',
+  label: 'Search selection',
+  description: 'Focused DOGFOOD search result.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchPanelData = defineViewData({
+  id: 'search-panel.data',
+  label: 'SearchPanelBlock data',
+  description: 'DOGFOOD search query, results, and focused row.',
+  requirements: [
+    { name: 'query', requirement: searchQueryRequirement },
+    { name: 'items', requirement: searchItemsRequirement },
+    { name: 'selection', requirement: searchSelectionRequirement },
+  ],
+});
+
+export const searchSubmitQueryIntent = commandIntent<{ readonly query: string }>(
+  'search.submitQuery',
+  {
+    label: 'Submit query',
+    description: 'Request DOGFOOD search results for the active query.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+  },
+);
+
+export const searchSelectResultIntent = commandIntent<{ readonly resultId: string }>(
+  'search.selectResult',
+  {
+    label: 'Select result',
+    description: 'Request activation of a DOGFOOD search result.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+  },
+);
+
+export const searchDismissIntent = commandIntent('search.dismiss', {
+  label: 'Dismiss search',
+  description: 'Request closing the DOGFOOD search surface.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+});
+
+export const searchPanelBlock: BlockDefinition<SearchPanelBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'SearchPanelBlock',
+    family: 'dogfood-search',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD search query and result-selection command contract.',
+      useWhen: ['DOGFOOD needs a searchable command or page picker surface.'],
+      avoidWhen: ['A surface only needs local filtering without global search semantics.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'query', required: true, description: 'Current search query.' },
+      { id: 'items', required: true, description: 'Visible search results.' },
+      { id: 'selection', required: false, description: 'Focused search result.' },
+    ],
+    variants: [
+      {
+        id: 'overlay',
+        label: 'Overlay',
+        requiredSlots: ['query', 'items'],
+        optionalSlots: ['selection'],
+        facts: [{ kind: 'state', key: 'dogfood.search.surface', value: 'overlay' }],
+      },
+    ],
+    composedComponents: ['createFramedApp() search', 'browsableListSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+    storyIds: ['search-panel.overlay'],
+    examples: [{ id: 'dogfood.search', label: 'DOGFOOD search panel' }],
+    tags: ['dogfood', 'search', 'frame'],
+  },
+  data: searchPanelData,
+  commands: [
+    searchSubmitQueryIntent,
+    searchSelectResultIntent,
+    searchDismissIntent,
+  ],
+  render: renderSearchPanelBlock,
 });
 
 export const footerControlsRequirement = defineDataRequirement({
@@ -985,6 +1096,14 @@ export const settingsMenuBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['settings', 'frame'],
 });
 
+export const searchPanelBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: searchPanelBlock,
+  role: 'search',
+  surfaceId: 'frame.search',
+  description: 'DOGFOOD frame search query and result surface.',
+  tags: ['search', 'frame'],
+});
+
 export const footerHintBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: footerHintBlock,
   role: 'footer',
@@ -1000,6 +1119,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'blocks.preview',
   'guide.inspector',
   'frame.settings',
+  'frame.search',
   'frame.footer',
   'storybook.workbench',
 ]);
@@ -1011,6 +1131,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   blockPreviewBlockRegistryEntry,
   guideInspectorBlockRegistryEntry,
   settingsMenuBlockRegistryEntry,
+  searchPanelBlockRegistryEntry,
   footerHintBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
@@ -1285,6 +1406,39 @@ function renderSettingsMenuBlock(
       'Intents: activate row; set locale; set shell theme',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+  };
+}
+
+function renderSearchPanelBlock(
+  input: BlockRenderInput<SearchPanelBlockConfig>,
+): BlockRenderResult<string> {
+  const query = input.config?.query ?? '';
+  const resultCount = input.config?.resultCount ?? 0;
+  const activeResultLabel = input.config?.activeResultLabel ?? 'none';
+  const queryLabel = query.trim() === '' ? 'empty' : query;
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
+        { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'SearchPanelBlock',
+      `query: ${queryLabel}`,
+      `results: ${resultCount}`,
+      `active: ${activeResultLabel}`,
+      'Intents: submit query; select result; dismiss',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
+      { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
+    ],
   };
 }
 
