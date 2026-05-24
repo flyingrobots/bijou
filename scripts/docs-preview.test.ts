@@ -535,8 +535,12 @@ describe('docs preview app', () => {
     const text = frameText(result.frames[result.frames.length - 1]!);
 
     expect(pageModel.selectedGuideId).toBe('documentation-map');
-    expect(text).toContain('README.md');
+    expect(text).toContain('┌');
+    expect(text).toContain('┬');
+    expect(text).toContain('Surface');
+    expect(text).toContain('Role');
     expect(text).toContain('Public front door');
+    expect(text).not.toContain('| Surface | Role |');
     expect(text).not.toContain('| :--- | :--- |');
   });
 
