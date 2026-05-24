@@ -78,7 +78,7 @@ describe('DF-070 DOGFOOD block product polish', () => {
       },
     }], { ctx });
     const text = frameText(result.frames.at(-1)!);
-    const guideModel = (result.model as {
+    const guideModel = (result.model as unknown as {
       readonly docsModel: {
         readonly pageModels: {
           readonly guides: {
