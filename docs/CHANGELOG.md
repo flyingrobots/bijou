@@ -314,6 +314,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   docs, stories, examples, and MCP payloads can share deterministic provenance
   with component metadata, story matrices, tags, and notes.
 
+### 📝 Documentation
+
+- **End-to-end terminal scenarios guide** — Added
+  `docs/guides/terminal-scenarios.md` with Mermaid-backed walkthroughs for
+  colored CLI output, interactive form flows, basic retained TUI apps, and
+  Braille-resolution shader renderers.
+
 ### 🐛 Bug Fixes
 
 - **Localization loader activation staging** — Loader-backed locale activation
