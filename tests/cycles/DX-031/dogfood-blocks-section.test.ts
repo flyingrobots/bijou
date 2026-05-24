@@ -317,7 +317,6 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       expect(text).not.toContain('pipe:');
       expect(text).not.toContain('accessible:');
       expect(text).not.toContain('provider snapshots idle; commands ready');
-      expect(text).toContain(`${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);
       if (block.metadata.blockName === 'AppShell') {
         expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
