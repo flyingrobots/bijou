@@ -126,7 +126,12 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
-import { documentationArticleBlock, guideInspectorBlock, navigationListBlock } from './dogfood-blocks.js';
+import {
+  documentationArticleBlock,
+  footerHintBlock,
+  guideInspectorBlock,
+  navigationListBlock,
+} from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -3332,8 +3337,11 @@ function renderGuideInfoPane(
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization: LocalizationPort): string {
   const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
   const pageModel = model.pageModels[pageId];
+  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
   if (pageModel == null || !pageModel.showHints) {
-    return dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
+    return renderDocsFooterHint({
+      controls: shellHint,
+    });
   }
 
   const focusedPane = model.focusedPaneByPage[pageId];
@@ -3412,9 +3420,21 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
         return undefined;
     }
   })();
+  return renderDocsFooterHint({
+    controls: shellHint,
+    activeHint,
+  });
+}
 
-  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
-  return activeHint == null ? shellHint : `${shellHint} • ${activeHint}`;
+function renderDocsFooterHint(config: {
+  readonly controls: string;
+  readonly activeHint?: string;
+  readonly status?: string;
+}): string {
+  return String(footerHintBlock.render({
+    config,
+    mode: 'pipe',
+  }).output);
 }
 
 function familyRowIndexAtPosition(
