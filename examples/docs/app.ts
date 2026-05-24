@@ -76,6 +76,7 @@ import {
   column,
   contentSurface,
   line,
+  proseSurface,
   spacer,
   textSurface,
 } from '../_shared/example-surfaces.js';
@@ -3025,8 +3026,9 @@ function renderStoryPane(
     padding: { left: 1, right: 1 },
     ctx,
   });
+  const docsWidth = Math.max(24, paneWidth - 2);
   const docs = markdown(storyDocsMarkdown(story, variant, preset), {
-    width: Math.max(24, paneWidth - 2),
+    width: docsWidth,
     ctx,
   });
 
@@ -3040,7 +3042,7 @@ function renderStoryPane(
       vAlign: 'top',
     }),
     spacer(1, 1),
-    contentSurface(docs),
+    proseSurface(docs, docsWidth),
   ]), width);
 }
 
@@ -3183,10 +3185,10 @@ function renderGuideReaderPane(
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
     spacer(1, 1),
-    contentSurface(markdown(doc.body, {
+    proseSurface(markdown(doc.body, {
       width: Math.max(24, paneWidth - 2),
       ctx,
-    })),
+    }), Math.max(24, paneWidth - 2)),
   ]), width);
 }
 

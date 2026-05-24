@@ -13,8 +13,9 @@ import {
 import {
   contentSurface as composeContentSurface,
   hstackSurface,
+  proseSurface as composeProseSurface,
   vstackSurface,
-} from '@flyingrobots/bijou-tui';
+} from '../../packages/bijou-tui/src/index.js';
 
 export function line(text: string, width = visibleWidth(text)): Surface {
   return parseAnsiToSurface(text, Math.max(1, width), 1);
@@ -50,6 +51,10 @@ export function ansiSurface(text: string, width: number, height: number): Surfac
 
 export function contentSurface(text: string): Surface {
   return composeContentSurface(text);
+}
+
+export function proseSurface(text: string, width: number): Surface {
+  return composeProseSurface(text, { width });
 }
 
 export function badgeSurface(label: string, variant: BadgeVariant, ctx: BijouContext): Surface {
