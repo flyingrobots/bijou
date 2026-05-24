@@ -175,6 +175,7 @@ export interface NavigationListBlockConfig {
 
 export interface DocumentationArticleBlockConfig {
   readonly title?: string;
+  readonly body?: string;
   readonly headingCount?: number;
 }
 
@@ -1061,12 +1062,28 @@ function renderDocumentationArticleBlock(
   input: BlockRenderInput<DocumentationArticleBlockConfig>,
 ): BlockRenderResult<string> {
   const title = input.config?.title ?? 'Untitled article';
+  const body = input.config?.body;
   const headingCount = input.config?.headingCount ?? 0;
+
+  if (body !== undefined && (input.mode === 'interactive' || input.mode === 'static')) {
+    return {
+      output: body,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' },
+        { kind: 'state', key: 'dogfood.documentation.headingCount', value: String(headingCount) },
+      ],
+    };
+  }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Article: ${title}; headings: ${headingCount}`,
-      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' }],
+      output: body === undefined
+        ? `Article: ${title}; headings: ${headingCount}`
+        : `${title}: ${body.replace(/\s+/g, ' ').trim()}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' },
+        { kind: 'state', key: 'dogfood.documentation.headingCount', value: String(headingCount) },
+      ],
     };
   }
 

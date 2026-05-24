@@ -126,6 +126,7 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
+import { documentationArticleBlock } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -894,6 +895,13 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
   const lines = content.split('\n');
   const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
+}
+
+function countMarkdownHeadings(markdownText: string): number {
+  return markdownText
+    .split('\n')
+    .filter((lineText) => /^#{1,6}\s+\S/.test(lineText.trim()))
+    .length;
 }
 
 function standardBlockInventoryMarkdown(): string {
@@ -3182,13 +3190,24 @@ function renderGuideReaderPane(
     return renderCounterDemoPreviewPane(model, width, ctx, theme, localization);
   }
 
+  const docsWidth = Math.max(24, paneWidth - 2);
+  const renderedArticle = documentationArticleBlock.render({
+    config: {
+      title: doc.title,
+      body: doc.body,
+      headingCount: countMarkdownHeadings(doc.body),
+    },
+    mode: ctx.mode,
+  });
+  const articleBody = String(renderedArticle.output);
+
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
     spacer(1, 1),
-    proseSurface(markdown(doc.body, {
-      width: Math.max(24, paneWidth - 2),
+    proseSurface(markdown(articleBody, {
+      width: docsWidth,
       ctx,
-    }), Math.max(24, paneWidth - 2)),
+    }), docsWidth),
   ]), width);
 }
 

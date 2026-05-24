@@ -13,6 +13,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   word boundaries before entering surface-land. Existing `contentSurface()`
   remains the raw/preformatted bridge for tables, boxes, and caller-managed
   line breaks.
+- **DOGFOOD documentation article block rendering** — DOGFOOD article panes now
+  route documentation bodies through `DocumentationArticleBlock` before
+  rendering markdown into the reader surface, so the semantic article Block owns
+  the product content path instead of remaining only a registry contract.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block
