@@ -26,6 +26,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'navigation',
   'article',
   'search',
+  'notifications',
   'settings',
   'inspector',
   'preview',
@@ -42,6 +43,7 @@ export type DogfoodBlockRole =
   | 'navigation'
   | 'article'
   | 'search'
+  | 'notifications'
   | 'settings'
   | 'inspector'
   | 'preview'
@@ -215,6 +217,11 @@ export interface SearchPanelBlockConfig {
   readonly query?: string;
   readonly resultCount?: number;
   readonly activeResultLabel?: string;
+}
+
+export interface NotificationCenterBlockConfig {
+  readonly notificationCount?: number;
+  readonly activeFilterLabel?: string;
 }
 
 export interface GuideInspectorBlockSection {
@@ -609,6 +616,93 @@ export const searchPanelBlock: BlockDefinition<SearchPanelBlockConfig, string> =
   ],
   render: renderSearchPanelBlock,
 });
+
+export const notificationItemsRequirement = defineDataRequirement({
+  id: 'notifications.items',
+  resource: 'dogfood.notifications.items',
+  label: 'Notification items',
+  description: 'Frame-owned DOGFOOD notification rows.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+});
+
+export const notificationFilterRequirement = defineDataRequirement({
+  id: 'notifications.filter',
+  resource: 'dogfood.notifications.filter',
+  label: 'Notification filter',
+  description: 'Current notification center filter state.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+});
+
+export const notificationCenterData = defineViewData({
+  id: 'notification-center.data',
+  label: 'NotificationCenterBlock data',
+  description: 'DOGFOOD notification items and filter posture.',
+  requirements: [
+    { name: 'items', requirement: notificationItemsRequirement },
+    { name: 'filter', requirement: notificationFilterRequirement },
+  ],
+});
+
+export const notificationDismissIntent = commandIntent<{ readonly notificationId: string }>(
+  'notifications.dismiss',
+  {
+    label: 'Dismiss notification',
+    description: 'Request dismissal of a DOGFOOD notification row.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NotificationCenterBlock' }],
+  },
+);
+
+export const notificationSetFilterIntent = commandIntent<{ readonly filterId: string }>(
+  'notifications.setFilter',
+  {
+    label: 'Set notification filter',
+    description: 'Request a notification center filter change.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NotificationCenterBlock' }],
+  },
+);
+
+export const notificationCenterBlock: BlockDefinition<NotificationCenterBlockConfig, string> =
+  defineBlock({
+    metadata: {
+      packageName: DOGFOOD_BLOCK_PACKAGE,
+      blockName: 'NotificationCenterBlock',
+      family: 'dogfood-notifications',
+      scale: 'panel',
+      modes: DOGFOOD_BLOCK_MODES,
+      docs: {
+        summary: 'Owns the frame notification center contract for inspectable DOGFOOD notices.',
+        useWhen: ['DOGFOOD needs to expose notification center state and intents.'],
+        avoidWhen: ['A page only emits a transient local message without frame ownership.'],
+        relatedDocs: ['docs/DOGFOOD.md'],
+      },
+      sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+      slots: [
+        { id: 'items', required: true, description: 'Notification rows.' },
+        { id: 'filter', required: false, description: 'Current notification filter.' },
+      ],
+      variants: [
+        {
+          id: 'center',
+          label: 'Center',
+          requiredSlots: ['items'],
+          optionalSlots: ['filter'],
+          facts: [{ kind: 'state', key: 'dogfood.notifications.surface', value: 'center' }],
+        },
+      ],
+      composedComponents: ['notificationCenterSurface()', 'toast()'],
+      semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+      storyIds: ['notification-center.center'],
+      examples: [{ id: 'dogfood.notifications', label: 'DOGFOOD notification center' }],
+      tags: ['dogfood', 'notifications', 'frame'],
+    },
+    data: notificationCenterData,
+    commands: [
+      notificationDismissIntent,
+      notificationSetFilterIntent,
+    ],
+    render: renderNotificationCenterBlock,
+  });
 
 export const footerControlsRequirement = defineDataRequirement({
   id: 'footer.controls',
@@ -1105,6 +1199,14 @@ export const searchPanelBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['search', 'frame'],
 });
 
+export const notificationCenterBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: notificationCenterBlock,
+  role: 'notifications',
+  surfaceId: 'frame.notifications',
+  description: 'DOGFOOD frame notification center surface.',
+  tags: ['notifications', 'frame'],
+});
+
 export const footerHintBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: footerHintBlock,
   role: 'footer',
@@ -1121,6 +1223,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'guide.inspector',
   'frame.settings',
   'frame.search',
+  'frame.notifications',
   'frame.footer',
   'storybook.workbench',
 ]);
@@ -1133,6 +1236,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   guideInspectorBlockRegistryEntry,
   settingsMenuBlockRegistryEntry,
   searchPanelBlockRegistryEntry,
+  notificationCenterBlockRegistryEntry,
   footerHintBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
@@ -1446,6 +1550,36 @@ function renderSearchPanelBlock(
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
       { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
+    ],
+  };
+}
+
+function renderNotificationCenterBlock(
+  input: BlockRenderInput<NotificationCenterBlockConfig>,
+): BlockRenderResult<string> {
+  const notificationCount = input.config?.notificationCount ?? 0;
+  const activeFilterLabel = input.config?.activeFilterLabel ?? 'All';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Notifications items: ${notificationCount}; filter: ${activeFilterLabel}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
+        { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'NotificationCenterBlock',
+      `items: ${notificationCount}`,
+      `filter: ${activeFilterLabel}`,
+      'Intents: dismiss notification; set filter',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
+      { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
     ],
   };
 }

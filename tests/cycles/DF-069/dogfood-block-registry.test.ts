@@ -21,6 +21,8 @@ import {
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
   navigationListBlockRegistryEntry,
+  notificationCenterBlock,
+  notificationCenterBlockRegistryEntry,
   searchPanelBlock,
   searchPanelBlockRegistryEntry,
   settingsMenuBlock,
@@ -232,6 +234,27 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Search blocks');
   });
 
+  it('publishes DOGFOOD notifications as an inspectable frame surface', () => {
+    expect(notificationCenterBlockRegistryEntry.block).toBe(notificationCenterBlock);
+    expect(notificationCenterBlockRegistryEntry.role).toBe('notifications');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.notifications')).toBe(
+      notificationCenterBlockRegistryEntry,
+    );
+    expect(notificationCenterBlock.data?.names()).toEqual(['items', 'filter']);
+    expect(notificationCenterBlock.commands?.map((intent) => intent.id)).toEqual([
+      'notifications.dismiss',
+      'notifications.setFilter',
+    ]);
+
+    expect(notificationCenterBlock.render({
+      config: {
+        notificationCount: 4,
+        activeFilterLabel: 'Unread',
+      },
+      mode: 'pipe',
+    }).output).toBe('Notifications items: 4; filter: Unread');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -341,6 +364,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'guide.inspector',
       'frame.settings',
       'frame.search',
+      'frame.notifications',
       'frame.footer',
       'storybook.workbench',
     ]);
@@ -352,6 +376,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'GuideInspectorBlock',
       'SettingsMenuBlock',
       'SearchPanelBlock',
+      'NotificationCenterBlock',
       'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
