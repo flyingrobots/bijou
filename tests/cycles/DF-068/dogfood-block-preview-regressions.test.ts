@@ -107,9 +107,9 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
       const { text } = await renderBlocksGuide(blockPreviewGuideId(block.metadata.blockName), 150, 43);
       const previewRegion = textBefore(text, 'documentation');
 
-      expect(text).toContain(`Page: ${block.metadata.blockName}`);
+      expect(text).toContain(`${block.metadata.blockName}`);
       expect(previewRegion).toContain(block.metadata.blockName);
-      expect(previewRegion).toContain('mode lowering');
+      expect(previewRegion).toContain('lowering summary');
       expect(previewRegion).toContain('interactive mode');
       expect(previewRegion).toContain('static mode');
 
@@ -125,17 +125,17 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
     }
   });
 
-  it('keeps mode lowering compact instead of rendering nested mini-surfaces inside the summary', async () => {
+  it('keeps lowering summary compact instead of rendering nested mini-surfaces inside the summary', async () => {
     const { text } = await renderBlocksGuide(blockPreviewGuideId('ReaderSurface'), 150, 43);
     const loweringRegion = text
-      .slice(text.indexOf('mode lowering'))
+      .slice(text.indexOf('lowering summary'))
       .split('documentation')[0] ?? '';
 
     expect(loweringRegion).toContain('interactive mode:');
     expect(loweringRegion).toContain('static mode:');
     expect(loweringRegion).toContain('pipe mode:');
     expect(loweringRegion).toContain('accessible mode:');
-    expect(loweringRegion).toContain('facts:');
+    expect(loweringRegion).toContain('facts');
     expect(loweringRegion).not.toContain('surface output:');
     expect(loweringRegion).not.toContain('┌─ ReaderSurface');
     expect(loweringRegion).not.toContain('┌─ Navigation');
@@ -182,7 +182,7 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
     const selectedRows = rowsFor(selected.text);
 
     expectBoxTitleRowCloses(rowContaining(selectedRows, 'CounterDemoBlock fixture'));
-    expectBoxTitleRowCloses(rowContaining(selectedRows, 'mode lowering'));
+    expectBoxTitleRowCloses(rowContaining(selectedRows, 'lowering summary'));
     expectBoxTitleRowCloses(rowContaining(selectedRows, 'documentation'));
     expect(selected.text).toContain('Counter: 5');
     expect(selected.text).toContain('json: {"counter":5}');

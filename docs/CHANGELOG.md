@@ -30,6 +30,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   section headings, fallback summary, and posture copy now come from the
   DOGFOOD string table and generated runtime catalogs, reducing raw visible
   English debt in the Blocks/docs side panel.
+- **DOGFOOD Blocks preview posture** — Standard block preview cards now use the
+  block name as the primary title and present lower-mode output as a compact
+  lowering summary, reducing debug-flavored page framing while preserving the
+  same rendered examples, facts, and documentation sections.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block

@@ -1099,7 +1099,7 @@ function renderCounterDemoPreviewPane(
       counterDemoBlockSurface(counterDemoBlockConfig(model.counterBlockDemo, ctx, cardWidth)),
       spacer(1, 1),
       boxSurface(paragraphSurface(counterDemoLoweringPreviewText(model.counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
-        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
+        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
         width: cardWidth,
         borderToken: docsThemeBorderToken(theme),
         padding: { left: 1, right: 1 },
@@ -1117,7 +1117,7 @@ function renderCounterDemoPreviewPane(
       title: dogfoodText(
         localization,
         'blocks.preview.pageTitle',
-        '▼ Page: {blockName}',
+        '{blockName}',
         { blockName: counterDemoBlock.metadata.blockName },
       ),
       width: pageWidth,
@@ -1148,7 +1148,7 @@ function standardBlockLivePreviewSurface(
     title: dogfoodText(
       localization,
       'blocks.preview.pageTitle',
-      '▼ Page: {blockName}',
+      '{blockName}',
       { blockName: block.metadata.blockName },
     ),
     width: safeWidth,
@@ -1203,7 +1203,7 @@ function standardBlockLoweringPreviewSurface(
     const factsLine = dogfoodText(
       localization,
       'blocks.preview.loweringFacts',
-      'facts: {count}',
+      '{count} facts',
       { count: result.facts?.length ?? 0 },
     );
     const modeLabel = dogfoodText(
@@ -1213,11 +1213,11 @@ function standardBlockLoweringPreviewSurface(
       { mode },
     );
 
-    return `${modeLabel}: ${outputSummary}; ${factsLine}`;
+    return `${modeLabel}: ${outputSummary} (${factsLine})`;
   });
 
   return boxSurface(paragraphSurface(modeLines.join('\n'), innerWidth), {
-    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
+    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
     width: safeWidth,
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },

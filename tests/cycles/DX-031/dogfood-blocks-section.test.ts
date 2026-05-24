@@ -120,8 +120,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const firstBlockName = standardBlocks[0]!.metadata.blockName;
 
     expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(firstBlockName));
-    expect(text).toContain(`Page: ${firstBlockName}`);
-    expect(text).toContain('mode lowering');
+    expect(text).toContain(`${firstBlockName}`);
+    expect(text).toContain('lowering summary');
     expect(text).toContain('documentation');
     expect(text).not.toContain('Live example');
     expect(text).not.toContain('Available Blocks');
@@ -151,8 +151,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const blockName = firstBlock!.metadata.blockName;
 
     expect(docsPageModel(result.model as any, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
-    expect(text).toContain(`Page: ${blockName}`);
-    expect(text).toContain('mode lowering');
+    expect(text).toContain(`${blockName}`);
+    expect(text).toContain('lowering summary');
     expect(text).not.toContain('Available Blocks');
   });
 
@@ -194,7 +194,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
 
     expect(text).toContain('ReaderSurface');
     expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
-    expect(text).toContain('mode lowering');
+    expect(text).toContain('lowering summary');
     expect(text).toContain('interactive mode');
     expect(text).toContain('static mode');
     expect(text).not.toContain('Available Blocks');
@@ -230,7 +230,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     expect(frameText(selected.frames.at(-1)!)).toContain('json: {"counter":5}');
     const selectedRows = frameRows(selected.frames.at(-1)!);
     expect(selectedRows.find((row) => row.includes('CounterDemoBlock fixture'))).toContain('┐');
-    expect(selectedRows.find((row) => row.includes('┌─ mode lowering'))).toContain('┐');
+    expect(selectedRows.find((row) => row.includes('┌─ lowering summary'))).toContain('┐');
     expect(frameText(incremented.frames.at(-1)!)).toContain('Counter: 6');
     expect(frameText(incremented.frames.at(-1)!)).toContain('json: {"counter":6}');
     expect(frameText(decremented.frames.at(-1)!)).toContain('Counter: 5');
@@ -297,14 +297,14 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         blockPreviewGuideId(block.metadata.blockName),
       );
       expect(text).toContain('blocks • live preview');
-      expect(text).toContain('mode lowering');
+      expect(text).toContain('lowering summary');
       expect(text).toContain('documentation');
       expect(text).not.toContain('Live example');
       expect(text).toContain('interactive mode');
       expect(text).toContain('static mode');
       expect(text).toContain('pipe mode');
       expect(text).toContain('accessible mode');
-      expect(text).toContain('facts:');
+      expect(text).toContain('facts');
       expect(text).toContain('documentation');
       expect(text).not.toContain('surface output:');
       expect(text).not.toContain('Contract: block metadata:');
@@ -317,7 +317,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       expect(text).not.toContain('pipe:');
       expect(text).not.toContain('accessible:');
       expect(text).not.toContain('provider snapshots idle; commands ready');
-      expect(text).toContain(`Page: ${block.metadata.blockName}`);
+      expect(text).toContain(`${block.metadata.blockName}`);
       expect(text).toContain(block.metadata.blockName);
       if (block.metadata.blockName === 'AppShell') {
         expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
@@ -330,7 +330,9 @@ describe('DX-031D DOGFOOD Blocks section', () => {
         expect(text).toContain(story.id);
       }
       for (const otherBlock of otherBlocks) {
-        expect(text).not.toContain(`Page: ${otherBlock.metadata.blockName}`);
+        for (const story of standardBlockStories.filter((candidate) => candidate.blockName === otherBlock.metadata.blockName)) {
+          expect(text).not.toContain(story.id);
+        }
       }
     }
   });
@@ -362,8 +364,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     const text = frameText(result.frames.at(-1)!);
 
     expect(model.docsModel.scrollByPage.blocks?.['guide-content']?.y ?? 0).toBe(0);
-    expect(text).toContain(`Page: ${secondBlock!.metadata.blockName}`);
-    expect(text).toContain('mode lowering');
+    expect(text).toContain(`${secondBlock!.metadata.blockName}`);
+    expect(text).toContain('lowering summary');
   });
 
   it('renders block lowering posture from the standard block mode declarations', async () => {
