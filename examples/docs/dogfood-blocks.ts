@@ -27,6 +27,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'article',
   'search',
   'notifications',
+  'diagnostics',
   'settings',
   'inspector',
   'preview',
@@ -44,6 +45,7 @@ export type DogfoodBlockRole =
   | 'article'
   | 'search'
   | 'notifications'
+  | 'diagnostics'
   | 'settings'
   | 'inspector'
   | 'preview'
@@ -222,6 +224,13 @@ export interface SearchPanelBlockConfig {
 export interface NotificationCenterBlockConfig {
   readonly notificationCount?: number;
   readonly activeFilterLabel?: string;
+}
+
+export interface PerfHudBlockConfig {
+  readonly fps?: number;
+  readonly frameMs?: number;
+  readonly columns?: number;
+  readonly rows?: number;
 }
 
 export interface GuideInspectorBlockSection {
@@ -703,6 +712,75 @@ export const notificationCenterBlock: BlockDefinition<NotificationCenterBlockCon
     ],
     render: renderNotificationCenterBlock,
   });
+
+export const perfHudMetricsRequirement = defineDataRequirement({
+  id: 'perf-hud.metrics',
+  resource: 'dogfood.perfHud.metrics',
+  label: 'Performance metrics',
+  description: 'Frame timing metrics visible in the DOGFOOD perf HUD.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+});
+
+export const perfHudViewportRequirement = defineDataRequirement({
+  id: 'perf-hud.viewport',
+  resource: 'dogfood.perfHud.viewport',
+  label: 'Viewport size',
+  description: 'Current DOGFOOD terminal viewport size shown in diagnostics.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+});
+
+export const perfHudData = defineViewData({
+  id: 'perf-hud.data',
+  label: 'PerfHudBlock data',
+  description: 'DOGFOOD frame timing and viewport diagnostics.',
+  requirements: [
+    { name: 'metrics', requirement: perfHudMetricsRequirement },
+    { name: 'viewport', requirement: perfHudViewportRequirement },
+  ],
+});
+
+export const perfHudToggleIntent = commandIntent('perfHud.toggle', {
+  label: 'Toggle perf HUD',
+  description: 'Request the DOGFOOD perf HUD to open or close.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'PerfHudBlock' }],
+});
+
+export const perfHudBlock: BlockDefinition<PerfHudBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'PerfHudBlock',
+    family: 'dogfood-diagnostics',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD performance HUD diagnostics contract.',
+      useWhen: ['DOGFOOD needs inspectable timing and viewport diagnostics.'],
+      avoidWhen: ['A page needs product content rather than frame diagnostics.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+    slots: [
+      { id: 'metrics', required: true, description: 'Timing metrics.' },
+      { id: 'viewport', required: true, description: 'Viewport dimensions.' },
+    ],
+    variants: [
+      {
+        id: 'hud',
+        label: 'HUD',
+        requiredSlots: ['metrics', 'viewport'],
+        facts: [{ kind: 'state', key: 'dogfood.perfHud.surface', value: 'hud' }],
+      },
+    ],
+    composedComponents: ['renderFramePerfHudOverlay()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+    storyIds: ['perf-hud.hud'],
+    examples: [{ id: 'dogfood.perfHud', label: 'DOGFOOD perf HUD' }],
+    tags: ['dogfood', 'diagnostics', 'frame'],
+  },
+  data: perfHudData,
+  commands: [perfHudToggleIntent],
+  render: renderPerfHudBlock,
+});
 
 export const footerControlsRequirement = defineDataRequirement({
   id: 'footer.controls',
@@ -1207,6 +1285,14 @@ export const notificationCenterBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['notifications', 'frame'],
 });
 
+export const perfHudBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: perfHudBlock,
+  role: 'diagnostics',
+  surfaceId: 'frame.perfHud',
+  description: 'DOGFOOD frame performance HUD surface.',
+  tags: ['diagnostics', 'frame'],
+});
+
 export const footerHintBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: footerHintBlock,
   role: 'footer',
@@ -1224,6 +1310,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'frame.settings',
   'frame.search',
   'frame.notifications',
+  'frame.perfHud',
   'frame.footer',
   'storybook.workbench',
 ]);
@@ -1237,6 +1324,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   settingsMenuBlockRegistryEntry,
   searchPanelBlockRegistryEntry,
   notificationCenterBlockRegistryEntry,
+  perfHudBlockRegistryEntry,
   footerHintBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
@@ -1580,6 +1668,40 @@ function renderNotificationCenterBlock(
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
       { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+    ],
+  };
+}
+
+function renderPerfHudBlock(
+  input: BlockRenderInput<PerfHudBlockConfig>,
+): BlockRenderResult<string> {
+  const fps = input.config?.fps ?? 0;
+  const frameMs = input.config?.frameMs ?? 0;
+  const columns = input.config?.columns ?? 0;
+  const rows = input.config?.rows ?? 0;
+  const frameLabel = frameMs.toFixed(2).replace(/\.?0+$/, '');
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Perf HUD fps: ${fps}; frame: ${frameLabel} ms; size: ${columns}x${rows}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
+        { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'PerfHudBlock',
+      `fps: ${fps}`,
+      `frame: ${frameLabel} ms`,
+      `size: ${columns}x${rows}`,
+      'Intents: toggle perf HUD',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
+      { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
     ],
   };
 }

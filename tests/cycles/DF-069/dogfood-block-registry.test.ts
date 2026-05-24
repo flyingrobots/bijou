@@ -23,6 +23,8 @@ import {
   navigationListBlockRegistryEntry,
   notificationCenterBlock,
   notificationCenterBlockRegistryEntry,
+  perfHudBlock,
+  perfHudBlockRegistryEntry,
   searchPanelBlock,
   searchPanelBlockRegistryEntry,
   settingsMenuBlock,
@@ -255,6 +257,24 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Notifications items: 4; filter: Unread');
   });
 
+  it('publishes DOGFOOD performance HUD as an inspectable diagnostics surface', () => {
+    expect(perfHudBlockRegistryEntry.block).toBe(perfHudBlock);
+    expect(perfHudBlockRegistryEntry.role).toBe('diagnostics');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.perfHud')).toBe(perfHudBlockRegistryEntry);
+    expect(perfHudBlock.data?.names()).toEqual(['metrics', 'viewport']);
+    expect(perfHudBlock.commands?.map((intent) => intent.id)).toEqual(['perfHud.toggle']);
+
+    expect(perfHudBlock.render({
+      config: {
+        fps: 60,
+        frameMs: 1.25,
+        columns: 150,
+        rows: 43,
+      },
+      mode: 'pipe',
+    }).output).toBe('Perf HUD fps: 60; frame: 1.25 ms; size: 150x43');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -365,6 +385,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'frame.settings',
       'frame.search',
       'frame.notifications',
+      'frame.perfHud',
       'frame.footer',
       'storybook.workbench',
     ]);
@@ -377,6 +398,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'SettingsMenuBlock',
       'SearchPanelBlock',
       'NotificationCenterBlock',
+      'PerfHudBlock',
       'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
