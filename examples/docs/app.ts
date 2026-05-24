@@ -131,6 +131,7 @@ import {
   footerHintBlock,
   guideInspectorBlock,
   navigationListBlock,
+  titleScreenBlock,
 } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -2327,13 +2328,21 @@ function getLandingDogfoodPanel(
     'landing.dogfood.expansion',
     'Documentation Of Good Foundational Onboarding and Discovery',
   );
-  const key = `${tokens.id}:${width}:${title}:${expansion}`;
+  const renderedTitle = titleScreenBlock.render({
+    config: {
+      title,
+      subtitle: expansion,
+    },
+    mode: 'interactive',
+  });
+  const [panelTitle = title, panelBody = expansion] = String(renderedTitle.output).split('\n');
+  const key = `${tokens.id}:${width}:${panelTitle}:${panelBody}`;
   const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
   const bodyWidth = Math.max(18, width - 4);
   const body = centerSurfaceHorizontally(createTransparentTextSurface(
-    wrapToWidth(expansion, bodyWidth).join('\n'),
+    wrapToWidth(panelBody, bodyWidth).join('\n'),
     {
       bg: tokens.background,
       transparentSpaces: false,
@@ -2342,7 +2351,7 @@ function getLandingDogfoodPanel(
     },
   ), bodyWidth);
   const surface = boxSurface(body, {
-    title,
+    title: panelTitle,
     width,
     borderToken: landingDogfoodPanelBorderToken(tokens),
     padding: { left: 1, right: 1 },
