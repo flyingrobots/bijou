@@ -34,6 +34,20 @@ describe('DF-070 DOGFOOD block product polish', () => {
     expect(rendered.output).toContain('# Readable article');
     expect(rendered.output).toContain('This article body is the product content.');
     expect(rendered.output).not.toContain('DocumentationArticleBlock');
+
+    const fallback = documentationArticleBlock.render({
+      config: {
+        title: 'Readable article',
+        headingCount: 2,
+      },
+      mode: 'interactive',
+    });
+
+    expect(fallback.facts).toContainEqual({
+      kind: 'state',
+      key: 'dogfood.documentation.headingCount',
+      value: '2',
+    });
   });
 
   it('renders concrete navigation rows through NavigationListBlock', () => {
@@ -118,6 +132,7 @@ describe('DF-070 DOGFOOD block product polish', () => {
               id: 'show-hints',
               label: 'Show hints',
               valueLabel: 'On',
+              description: 'Display shell-owned help text.',
             }],
           },
           {
@@ -127,17 +142,38 @@ describe('DF-070 DOGFOOD block product polish', () => {
               id: 'preferred-language',
               label: 'Preferred language',
               valueLabel: 'English',
+              description: 'Language used for DOGFOOD chrome.',
             }],
           },
         ],
       },
       mode: 'pipe',
     });
+    const interactive = settingsMenuBlock.render({
+      config: {
+        sections: [
+          {
+            id: 'localization',
+            title: 'Localization',
+            rows: [{
+              id: 'preferred-language',
+              label: 'Preferred language',
+              valueLabel: 'English',
+              description: 'Language used for DOGFOOD chrome.',
+            }],
+          },
+        ],
+      },
+      mode: 'interactive',
+    });
 
     expect(rendered.output).toContain('Shell');
     expect(rendered.output).toContain('- Show hints: On');
+    expect(rendered.output).toContain('Display shell-owned help text.');
     expect(rendered.output).toContain('Localization');
     expect(rendered.output).toContain('- Preferred language: English');
+    expect(rendered.output).toContain('Language used for DOGFOOD chrome.');
+    expect(interactive.output).toContain('Language used for DOGFOOD chrome.');
     expect(rendered.output).not.toContain('sections: 2');
   });
 });

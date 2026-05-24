@@ -1118,14 +1118,15 @@ function renderDocumentationArticleBlock(
   const title = input.config?.title ?? 'Untitled article';
   const body = input.config?.body;
   const headingCount = input.config?.headingCount ?? 0;
+  const facts = [
+    { kind: 'entity' as const, key: 'dogfood.block', value: 'DocumentationArticleBlock' },
+    { kind: 'state' as const, key: 'dogfood.documentation.headingCount', value: String(headingCount) },
+  ];
 
   if (body !== undefined && (input.mode === 'interactive' || input.mode === 'static')) {
     return {
       output: body,
-      facts: [
-        { kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' },
-        { kind: 'state', key: 'dogfood.documentation.headingCount', value: String(headingCount) },
-      ],
+      facts,
     };
   }
 
@@ -1134,10 +1135,7 @@ function renderDocumentationArticleBlock(
       output: body === undefined
         ? `Article: ${title}; headings: ${headingCount}`
         : `${title}: ${body.replace(/\s+/g, ' ').trim()}`,
-      facts: [
-        { kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' },
-        { kind: 'state', key: 'dogfood.documentation.headingCount', value: String(headingCount) },
-      ],
+      facts,
     };
   }
 
@@ -1148,8 +1146,14 @@ function renderDocumentationArticleBlock(
       `headings: ${headingCount}`,
       'Intents: select heading; open reference',
     ].join('\n'),
-    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' }],
+    facts,
   };
+}
+
+function renderSettingsMenuRow(row: SettingsMenuBlockRow): readonly string[] {
+  const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
+  const summary = `- ${row.label}${value}`;
+  return row.description == null ? [summary] : [summary, `  ${row.description}`];
 }
 
 function renderSettingsMenuBlock(
@@ -1166,10 +1170,7 @@ function renderSettingsMenuBlock(
       return {
         output: sections.flatMap((section) => [
           section.title,
-          ...section.rows.map((row) => {
-            const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
-            return `- ${row.label}${value}`;
-          }),
+          ...section.rows.flatMap(renderSettingsMenuRow),
         ]).join('\n'),
         facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
       };
@@ -1187,10 +1188,7 @@ function renderSettingsMenuBlock(
         'SettingsMenuBlock',
         ...sections.flatMap((section) => [
           section.title,
-          ...section.rows.map((row) => {
-            const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
-            return `- ${row.label}${value}`;
-          }),
+          ...section.rows.flatMap(renderSettingsMenuRow),
         ]),
       ].join('\n'),
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
