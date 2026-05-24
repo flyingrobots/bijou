@@ -17,6 +17,10 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
   emerging; the architecture is ahead of the rendered catalog.
 - `LX-019` — DOGFOOD text lookup now goes through an application-facing
   localization port instead of view code reaching for the concrete runtime.
+- `DF-070` — DOGFOOD docs, Blocks preview, settings, and guide surfaces now
+  route more visible text through semantic Blocks; prose wrapping is
+  word-aware; the CounterDemoBlock fixture proves interactive intent and
+  lowering behavior inside DOGFOOD.
 - `4.4.1` — framed-shell polish and background-fill recovery after `4.4.0`.
 - `4.2.0` — [RE-007](./design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md)
   lands the framed shell on the runtime-engine seams and ships
@@ -70,18 +74,18 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 
 ## Next Target
 
-The immediate focus is
-[DF-070 — DOGFOOD Block Product Polish](./design/DF-070-dogfood-block-product-polish.md).
+The immediate focus is `DF-071` — DOGFOOD block-authored surfaces.
 
-DF-070 should stay visible-product focused:
+DF-071 should keep pushing visible DOGFOOD product surfaces through semantic
+Blocks:
 
-- fix prose wrapping so text breaks on word boundaries where possible
-- make DOGFOOD article, navigation, inspector, and settings surfaces render
-  through their semantic Blocks
-- keep components as leaf rendering primitives inside those Blocks
-- preserve unidirectional data-binding and localization-port boundaries
-- improve visible localization coverage only where this cycle touches product
-  surfaces
+- make title, footer, navigation, article, inspector, settings, preview, and
+  workbench surfaces explain their block ownership through runtime contracts
+- keep Components as the leaf rendering vocabulary inside those Blocks
+- preserve unidirectional data-binding, command-intent, and localization-port
+  boundaries
+- keep the Blocks section useful as a product preview, not a raw metadata dump
+- improve localization coverage only where touched visible surfaces need it
 
 Non-goals for the next cycle:
 
@@ -90,11 +94,14 @@ Non-goals for the next cycle:
 - no hidden global block registry
 - no new provider lifecycle system
 - no localization runtime rewrite
+- no shipping standard block catalog expansion beyond clearly useful
+  DOGFOOD-proven surfaces
 
 Expected sequence:
 
-1. `DF-070` tightens the visible DOGFOOD product surface around Blocks.
-2. Locale persistence and touched block-surface catalog coverage land behind the
-   existing localization boundary.
-3. New Blocks become easier to add because the existing DOGFOOD shell proves the
-   path through product rendering, not only through contract previews.
+1. `DF-071` makes more DOGFOOD shell and docs surfaces block-authored without
+   changing the low-level component boundary.
+2. The next Blocks catalog slice can promote proven DOGFOOD surfaces into
+   first-party candidates where the semantics are stable.
+3. Product verification should prove visible block rendering and lowering
+   behavior directly instead of relying on metadata-only checks.
