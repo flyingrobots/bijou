@@ -127,6 +127,7 @@ import {
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import {
+  defaultDogfoodBlockRegistry,
   documentationArticleBlock,
   footerHintBlock,
   guideInspectorBlock,
@@ -163,6 +164,7 @@ const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md')
 const BLOCKS_WHAT_ARE_BLOCKS_TEXT = readMarkdownDoc('../../docs/design-system/blocks.md');
 const BLOCKS_MAKE_YOUR_OWN_TEXT = readMarkdownDoc('./content/blocks-make-your-own.md');
 const BLOCKS_PRE_MADE_TEXT = standardBlockInventoryMarkdown();
+const BLOCKS_DOGFOOD_SURFACES_TEXT = dogfoodSurfaceBlockInventoryMarkdown();
 const BLOCKS_PREVIEW_TEXT = standardBlockPreviewMarkdown();
 const BLOCKS_LOWERING_TEXT = standardBlockLoweringMarkdown();
 const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
@@ -419,6 +421,13 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Pre-made Blocks',
     summary: 'The first-party standard blocks exported by @flyingrobots/bijou.',
     body: BLOCKS_PRE_MADE_TEXT,
+  },
+  {
+    id: 'blocks-dogfood-surfaces',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'DOGFOOD Surface Blocks',
+    summary: 'The semantic Blocks DOGFOOD uses for its own visible product surfaces.',
+    body: BLOCKS_DOGFOOD_SURFACES_TEXT,
   },
   {
     id: BLOCK_PREVIEW_GUIDE_ID,
@@ -953,6 +962,51 @@ function standardBlockInventoryMarkdown(): string {
     `First-party standard blocks shipped by @flyingrobots/bijou: ${standardBlocks.length}.`,
     '',
     'These are public block authoring contracts with semantic slots, declared modes, data requirements, command intents, variants, and stories. Select a block under Block Preview for the live rendered example.',
+    '',
+    blockSections,
+  ].join('\n');
+}
+
+function dogfoodSurfaceBlockInventoryMarkdown(): string {
+  const entries = defaultDogfoodBlockRegistry.entries();
+  const surfaceIndex = entries
+    .map((entry) => `- ${entry.blockName} -> ${entry.surfaceId} (${entry.role})`)
+    .join('\n');
+  const blockSections = entries
+    .map((entry) => {
+      const metadata = entry.block.metadata;
+      const dataNames = entry.block.data?.names() ?? [];
+      const commandIds = entry.block.commands?.map((command) => command.id) ?? [];
+
+      return [
+        `## ${metadata.blockName}`,
+        '',
+        entry.description ?? metadata.docs.summary,
+        '',
+        `- Surface: ${entry.surfaceId}`,
+        `- Role: ${entry.role}`,
+        `- Family: ${metadata.family}`,
+        `- Scale: ${metadata.scale}`,
+        `- Modes: ${metadata.modes.join(', ')}`,
+        `- Data requirements: ${formatDocsList(dataNames)}`,
+        `- Command intents: ${formatDocsList(commandIds)}`,
+        `- Tags: ${formatDocsList(entry.tags)}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    '# DOGFOOD Surface Blocks',
+    '',
+    `DOGFOOD currently registers ${entries.length} semantic product surface Blocks.`,
+    '',
+    'These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks.',
+    '',
+    '## Surface index',
+    '',
+    surfaceIndex,
+    '',
+    '## Surface details',
     '',
     blockSections,
   ].join('\n');
