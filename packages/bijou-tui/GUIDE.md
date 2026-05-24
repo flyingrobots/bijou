@@ -79,9 +79,10 @@ Bijou-TUI uses declarative layout. Components return either a `Surface` (fixed-s
 ### Flexbox
 - **`flex()`**: The primary layout engine. Use `basis` for fixed sizes and `flex` for proportional scaling.
 - **`contentSurface()`**: Bridge raw text into surface-land at the composition edge.
+- **`proseSurface()`**: Bridge paragraph-like text into surface-land after wrapping it at word boundaries for a known width.
 - **`vstackSurface()` / `hstackSurface()`**: Quick vertical/horizontal stacking for surfaces, including mixed `string | Surface` inputs.
 
-Keep `view()` strict: return a `Surface` or `LayoutNode`, not a raw string. If you are mixing string helpers with small surface-returning primitives, bridge first with `contentSurface()` or pass the string directly into `vstackSurface()` / `hstackSurface()`.
+Keep `view()` strict: return a `Surface` or `LayoutNode`, not a raw string. If you are mixing string helpers with small surface-returning primitives, bridge first with `contentSurface()` or pass the string directly into `vstackSurface()` / `hstackSurface()`. Use `proseSurface()` for readable paragraphs; do not use it for preformatted terminal art.
 
 ### Viewport & Scrolling
 Use `viewportSurface()` to mask and scroll content:

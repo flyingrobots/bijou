@@ -74,6 +74,10 @@ keep composition on the surface side: use `contentSurface()` directly or pass
 strings into `vstackSurface()` / `hstackSurface()`. Raw strings are still not a
 valid `view()` return type.
 
+Use `proseSurface(text, { width })` when paragraph-like text should wrap at
+word boundaries before becoming a surface. Keep `contentSurface()` for
+preformatted output, tables, boxes, and caller-managed line breaks.
+
 ## Strategy: Choosing Component Families
 
 Select the family based on the interaction semantic.

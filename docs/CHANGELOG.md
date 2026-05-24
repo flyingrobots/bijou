@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Word-aware prose surfaces for `bijou-tui`** — `@flyingrobots/bijou-tui`
+  now exports `proseSurface()` for paragraph-like text that should wrap at
+  word boundaries before entering surface-land. Existing `contentSurface()`
+  remains the raw/preformatted bridge for tables, boxes, and caller-managed
+  line breaks.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block
