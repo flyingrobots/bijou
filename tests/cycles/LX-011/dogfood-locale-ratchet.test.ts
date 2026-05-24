@@ -82,6 +82,38 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(writes.get('/tmp/bijou-test-locale')).toBe('fr\n');
   });
 
+  it('keeps Node locale discovery best-effort when preference reads fail', () => {
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'de_DE.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText() {
+          throw Object.assign(new Error('permission denied'), { code: 'EACCES' });
+        },
+        writeText() {},
+      },
+    });
+
+    expect(port.preferredLocale()).toBe('de_DE.UTF-8');
+  });
+
+  it('keeps Node locale preference writes best-effort', () => {
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'en_US.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText() {
+          return undefined;
+        },
+        writeText() {
+          throw Object.assign(new Error('read only'), { code: 'EROFS' });
+        },
+      },
+    });
+
+    expect(() => port.savePreferredLocale?.('fr')).not.toThrow();
+  });
+
   it('ratchets the settings language catalog for every supported DOGFOOD locale', () => {
     const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
     for (const locale of DOGFOOD_LOCALE_OPTIONS) {

@@ -27,7 +27,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   resolved, keeping persistence behind the host adapter instead of the app
   reading process globals directly. Preference writes are best-effort, so a
   host storage failure cannot block the already-activated runtime locale from
-  updating the DOGFOOD model.
+  updating the DOGFOOD model, and unreadable preference files fall back to the
+  environment-derived locale.
 - **DOGFOOD guide-info localization coverage** — The guide inspector title,
   section headings, fallback summary, and posture copy now come from the
   DOGFOOD string table and generated runtime catalogs, reducing raw visible

@@ -37,10 +37,8 @@ const nodeDogfoodLocaleStorage: NodeDogfoodLocaleStorage = {
   readText(path) {
     try {
       return readFileSync(path, 'utf8');
-    } catch (error) {
-      const code = (error as { readonly code?: string }).code;
-      if (code === 'ENOENT') return undefined;
-      throw error;
+    } catch {
+      return undefined;
     }
   },
   writeText(path, text) {
@@ -65,7 +63,11 @@ function readSavedLocale(
   preferencePath: string | undefined,
 ): string | undefined {
   if (preferencePath == null) return undefined;
-  return firstLocaleCandidate(storage.readText(preferencePath));
+  try {
+    return firstLocaleCandidate(storage.readText(preferencePath));
+  } catch {
+    return undefined;
+  }
 }
 
 export function createNodeDogfoodLocalePort(
@@ -87,7 +89,11 @@ export function createNodeDogfoodLocalePort(
     },
     savePreferredLocale(locale) {
       if (preferencePath == null) return;
-      storage.writeText(preferencePath, `${locale}\n`);
+      try {
+        storage.writeText(preferencePath, `${locale}\n`);
+      } catch {
+        // Preference persistence is best-effort; runtime locale activation wins.
+      }
     },
   };
 }
