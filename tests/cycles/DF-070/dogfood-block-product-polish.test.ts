@@ -3,6 +3,7 @@ import {
   documentationArticleBlock,
   guideInspectorBlock,
   navigationListBlock,
+  settingsMenuBlock,
 } from '../../../examples/docs/dogfood-blocks.js';
 
 describe('DF-070 DOGFOOD block product polish', () => {
@@ -62,5 +63,39 @@ describe('DF-070 DOGFOOD block product polish', () => {
     expect(rendered.output).toContain('Summary: Block authoring and preview guidance.');
     expect(rendered.output).toContain('Current posture: DOGFOOD publishes block docs from real contracts.');
     expect(rendered.output).not.toContain('facts: 2');
+  });
+
+  it('renders concrete settings rows through SettingsMenuBlock', () => {
+    const rendered = settingsMenuBlock.render({
+      config: {
+        sections: [
+          {
+            id: 'shell',
+            title: 'Shell',
+            rows: [{
+              id: 'show-hints',
+              label: 'Show hints',
+              valueLabel: 'On',
+            }],
+          },
+          {
+            id: 'localization',
+            title: 'Localization',
+            rows: [{
+              id: 'preferred-language',
+              label: 'Preferred language',
+              valueLabel: 'English',
+            }],
+          },
+        ],
+      },
+      mode: 'pipe',
+    });
+
+    expect(rendered.output).toContain('Shell');
+    expect(rendered.output).toContain('- Show hints: On');
+    expect(rendered.output).toContain('Localization');
+    expect(rendered.output).toContain('- Preferred language: English');
+    expect(rendered.output).not.toContain('sections: 2');
   });
 });

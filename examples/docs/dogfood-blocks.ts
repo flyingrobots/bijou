@@ -187,9 +187,23 @@ export interface DocumentationArticleBlockConfig {
   readonly headingCount?: number;
 }
 
+export interface SettingsMenuBlockRow {
+  readonly id: string;
+  readonly label: string;
+  readonly valueLabel?: string;
+  readonly description?: string;
+}
+
+export interface SettingsMenuBlockSection {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly SettingsMenuBlockRow[];
+}
+
 export interface SettingsMenuBlockConfig {
   readonly sectionCount?: number;
   readonly activeSettingLabel?: string;
+  readonly sections?: readonly SettingsMenuBlockSection[];
 }
 
 export interface GuideInspectorBlockSection {
@@ -1141,12 +1155,44 @@ function renderDocumentationArticleBlock(
 function renderSettingsMenuBlock(
   input: BlockRenderInput<SettingsMenuBlockConfig>,
 ): BlockRenderResult<string> {
-  const sectionCount = input.config?.sectionCount ?? 0;
-  const activeSettingLabel = input.config?.activeSettingLabel ?? 'none';
+  const sections = input.config?.sections ?? [];
+  const sectionCount = input.config?.sectionCount ?? sections.length;
+  const activeSettingLabel = input.config?.activeSettingLabel
+    ?? sections.find((section) => section.rows.length > 0)?.rows[0]?.label
+    ?? 'none';
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
+    if (sections.length > 0) {
+      return {
+        output: sections.flatMap((section) => [
+          section.title,
+          ...section.rows.map((row) => {
+            const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
+            return `- ${row.label}${value}`;
+          }),
+        ]).join('\n'),
+        facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+      };
+    }
+
     return {
       output: `Settings sections: ${sectionCount}; active: ${activeSettingLabel}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+    };
+  }
+
+  if (sections.length > 0) {
+    return {
+      output: [
+        'SettingsMenuBlock',
+        ...sections.flatMap((section) => [
+          section.title,
+          ...section.rows.map((row) => {
+            const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
+            return `- ${row.label}${value}`;
+          }),
+        ]),
+      ].join('\n'),
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
     };
   }
