@@ -126,7 +126,7 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
-import { documentationArticleBlock, navigationListBlock } from './dogfood-blocks.js';
+import { documentationArticleBlock, guideInspectorBlock, navigationListBlock } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -3250,6 +3250,25 @@ function renderGuideInfoPane(
         return 'This section now has a visible home in DOGFOOD.';
     }
   })();
+  const guideInspectorSections = [
+    {
+      title: 'Summary',
+      content: description,
+      tone: 'muted' as const,
+    },
+    {
+      title: 'Current posture',
+      content: currentPosture,
+      tone: 'muted' as const,
+    },
+  ];
+  const renderedInspector = guideInspectorBlock.render({
+    config: {
+      selectionLabel: doc?.title ?? pageTitle(pageId, localization),
+      sections: guideInspectorSections,
+    },
+    mode: ctx.mode,
+  });
 
   return insetPaneSurface(column([
     themedSeparatorSurface(`section • ${pageTitle(pageId, localization).toLowerCase()}`, paneWidth, ctx, theme),
@@ -3257,18 +3276,13 @@ function renderGuideInfoPane(
     contentSurface(inspector({
       title: 'guide info',
       currentValue: doc?.title ?? pageTitle(pageId, localization),
-      sections: [
-        {
-          title: 'Summary',
-          content: description,
+      sections: ctx.mode === 'interactive' || ctx.mode === 'static'
+        ? guideInspectorSections
+        : [{
+          title: 'GuideInspectorBlock',
+          content: String(renderedInspector.output),
           tone: 'muted',
-        },
-        {
-          title: 'Current posture',
-          content: currentPosture,
-          tone: 'muted',
-        },
-      ],
+        }],
       width: Math.max(22, paneWidth),
       borderToken: docsThemeMutedBorderToken(theme),
       bgToken: docsThemeSurfaceToken(theme),

@@ -192,6 +192,12 @@ export interface SettingsMenuBlockConfig {
   readonly activeSettingLabel?: string;
 }
 
+export interface GuideInspectorBlockSection {
+  readonly title: string;
+  readonly content: string;
+  readonly tone?: 'default' | 'muted';
+}
+
 export interface BlockPreviewBlockConfig {
   readonly blockName?: string;
   readonly modeCount?: number;
@@ -200,6 +206,7 @@ export interface BlockPreviewBlockConfig {
 export interface GuideInspectorBlockConfig {
   readonly selectionLabel?: string;
   readonly factCount?: number;
+  readonly sections?: readonly GuideInspectorBlockSection[];
 }
 
 export const blockPreviewDefinitionRequirement = defineDataRequirement({
@@ -1183,11 +1190,36 @@ function renderGuideInspectorBlock(
   input: BlockRenderInput<GuideInspectorBlockConfig>,
 ): BlockRenderResult<string> {
   const selectionLabel = input.config?.selectionLabel ?? 'none';
-  const factCount = input.config?.factCount ?? 0;
+  const sections = input.config?.sections ?? [];
+  const factCount = input.config?.factCount ?? sections.length;
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
+    if (sections.length > 0) {
+      return {
+        output: [
+          `Guide inspector: ${selectionLabel}`,
+          ...sections.map((section) => `${section.title}: ${section.content}`),
+        ].join('\n'),
+        facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+      };
+    }
+
     return {
       output: `Guide inspector: ${selectionLabel}; facts: ${factCount}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+    };
+  }
+
+  if (sections.length > 0) {
+    return {
+      output: [
+        'GuideInspectorBlock',
+        `selection: ${selectionLabel}`,
+        ...sections.flatMap((section) => [
+          `${section.title}:`,
+          section.content,
+        ]),
+      ].join('\n'),
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
     };
   }

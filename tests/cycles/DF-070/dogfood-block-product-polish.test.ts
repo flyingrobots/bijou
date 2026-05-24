@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   documentationArticleBlock,
+  guideInspectorBlock,
   navigationListBlock,
 } from '../../../examples/docs/dogfood-blocks.js';
 
@@ -35,5 +36,31 @@ describe('DF-070 DOGFOOD block product polish', () => {
     expect(rendered.output).toContain('Guides');
     expect(rendered.output).toContain('> Blocks');
     expect(rendered.output).not.toContain('items: 2');
+  });
+
+  it('renders guide inspector sections through GuideInspectorBlock', () => {
+    const rendered = guideInspectorBlock.render({
+      config: {
+        selectionLabel: 'Blocks',
+        sections: [
+          {
+            title: 'Summary',
+            content: 'Block authoring and preview guidance.',
+            tone: 'muted',
+          },
+          {
+            title: 'Current posture',
+            content: 'DOGFOOD publishes block docs from real contracts.',
+            tone: 'muted',
+          },
+        ],
+      },
+      mode: 'accessible',
+    });
+
+    expect(rendered.output).toContain('Guide inspector: Blocks');
+    expect(rendered.output).toContain('Summary: Block authoring and preview guidance.');
+    expect(rendered.output).toContain('Current posture: DOGFOOD publishes block docs from real contracts.');
+    expect(rendered.output).not.toContain('facts: 2');
   });
 });
