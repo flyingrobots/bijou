@@ -13,6 +13,8 @@ import {
   dogfoodBlockCoverageReport,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
+  footerHintBlock,
+  footerHintBlockRegistryEntry,
   guideInspectorBlock,
   guideInspectorBlockRegistryEntry,
   isDogfoodBlockRegistry,
@@ -283,6 +285,22 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Guide inspector: Block Preview; facts: 6');
   });
 
+  it('publishes DOGFOOD footer hints as shell chrome owned by a block', () => {
+    expect(footerHintBlockRegistryEntry.block).toBe(footerHintBlock);
+    expect(footerHintBlockRegistryEntry.role).toBe('footer');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.footer')).toBe(footerHintBlockRegistryEntry);
+    expect(footerHintBlock.data?.names()).toEqual(['controls', 'status']);
+
+    expect(footerHintBlock.render({
+      config: {
+        controls: '? Help • q Quit',
+        activeHint: 'Tab next pane',
+        status: 'page:blocks',
+      },
+      mode: 'pipe',
+    }).output).toBe('? Help • q Quit • Tab next pane • page:blocks');
+  });
+
   it('covers the intended semantic DOGFOOD surfaces without discovery-time rendering', () => {
     const report = dogfoodBlockCoverageReport();
 
@@ -294,6 +312,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'blocks.preview',
       'guide.inspector',
       'frame.settings',
+      'frame.footer',
       'storybook.workbench',
     ]);
     expect(defaultDogfoodBlockRegistry.blockNames()).toEqual([
@@ -303,6 +322,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'BlockPreviewBlock',
       'GuideInspectorBlock',
       'SettingsMenuBlock',
+      'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
   });
