@@ -74,14 +74,18 @@ const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
   'id',
   'ids',
   'importPath',
+  'key',
   'kind',
   'mode',
   'namespace',
+  'overflowX',
   'packageName',
   'path',
   'sourceLocale',
   'supportsModes',
   'tags',
+  'tone',
+  'type',
   'version',
 ]);
 
@@ -210,6 +214,10 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
     return true;
   }
   if (hasAncestor(node, (ancestor) => isNodeEnvComparison(ancestor, sourceFile))) return true;
+  if (isCaseClauseExpression(node)) return true;
+  if (isDiscriminantComparison(node)) return true;
+  if (isErrorConstructorArgument(node)) return true;
+  if (hasAncestor(node, (ancestor) => isOutputModeDeclaration(ancestor, sourceFile))) return true;
 
   const propertyName = nearestPropertyName(node);
   if (propertyName != null && NONLOCALIZABLE_PROPERTY_NAMES.has(propertyName)) return true;
@@ -223,6 +231,7 @@ function isNonlocalizableContext(node: ts.Node, sourceFile: ts.SourceFile): bool
     if (callName != null && LOCALIZED_FALLBACK_FUNCTIONS.has(callName) && (argumentIndex === 1 || argumentIndex === 2)) {
       return true;
     }
+    if (callName === 'bind' && argumentIndex === 0) return true;
     if (callName != null && PATH_FUNCTIONS.has(callName)) return true;
     if (call.expression.kind === ts.SyntaxKind.ImportKeyword) return true;
   }
@@ -265,6 +274,46 @@ function isNodeEnvComparison(node: ts.Node, sourceFile: ts.SourceFile): boolean 
   }
   return node.left.getText(sourceFile) === 'process.env.NODE_ENV'
     || node.right.getText(sourceFile) === 'process.env.NODE_ENV';
+}
+
+function isCaseClauseExpression(node: ts.Node): boolean {
+  return ts.isCaseClause(node.parent) && node.parent.expression === node;
+}
+
+function isDiscriminantComparison(node: ts.Node): boolean {
+  if (!ts.isBinaryExpression(node.parent)) return false;
+  const binary = node.parent;
+  if (
+    binary.operatorToken.kind !== ts.SyntaxKind.EqualsEqualsEqualsToken
+    && binary.operatorToken.kind !== ts.SyntaxKind.ExclamationEqualsEqualsToken
+  ) {
+    return false;
+  }
+
+  const otherSide = binary.left === node ? binary.right : binary.right === node ? binary.left : undefined;
+  return otherSide != null && ts.isPropertyAccessExpression(otherSide) && isDiscriminantProperty(otherSide.name.text);
+}
+
+function isDiscriminantProperty(name: string): boolean {
+  return name === 'action'
+    || name === 'kind'
+    || name === 'mode'
+    || name === 'status'
+    || name === 'type';
+}
+
+function isErrorConstructorArgument(node: ts.Node): boolean {
+  for (let current: ts.Node | undefined = node.parent; current != null; current = current.parent) {
+    if (!ts.isNewExpression(current)) continue;
+    if (current.expression.getText() !== 'Error') continue;
+    return current.arguments?.some((argument) => argument === node || containsNode(argument, node)) ?? false;
+  }
+  return false;
+}
+
+function isOutputModeDeclaration(node: ts.Node, sourceFile: ts.SourceFile): boolean {
+  if (!ts.isVariableDeclaration(node) || node.type == null) return false;
+  return node.type.getText(sourceFile).includes('OutputMode');
 }
 
 function containsNode(parent: ts.Node, target: ts.Node): boolean {

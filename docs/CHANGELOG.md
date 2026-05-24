@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
+  branded block registry for semantic product surfaces and publishes block
+  contracts for the title screen, navigation list, documentation article, block
+  preview, guide inspector, settings menu, and Storybook workbench. The
+  interactive Storybook entrypoint now runs through the AppFrame shell instead
+  of a parallel bespoke TUI, while registry discovery remains render-free and
+  does not introduce provider handles, subscriptions, command dispatch, or a
+  hidden global block registry.
 - **Localization port contract for `bijou-i18n`** —
   `@flyingrobots/bijou-i18n` now exports `LocalizationPort`,
   `LocalizationRequest`, `LocalizedObject`, localization status/issue/fact
@@ -52,8 +60,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   across `docs-app`, `dogfood-locale`, `component-stories`, and Storybook-style
   DOGFOOD entrypoints. The scanner filters ids, file paths, import paths, and
   catalog-backed fallback calls so review sees the remaining localization debt
-  without scraping terminal render output. `release:readiness` now runs the
-  i18n debt ratchet alongside the existing DOGFOOD coverage gate.
+  without scraping terminal render output. It also filters machine-only key
+  names, event discriminants, mode literals, pane policy tokens, tone tokens,
+  and internal thrown-error strings so framed Storybook protocol data does not
+  inflate visible-copy debt. `release:readiness` now runs the i18n debt ratchet
+  alongside the existing DOGFOOD coverage gate.
 - **DOGFOOD locale preference and i18n ratchet** — DOGFOOD now resolves its
   initial language through an explicit locale port with a Node adapter that
   reads operating-system locale signals, exposes a Settings drawer language
