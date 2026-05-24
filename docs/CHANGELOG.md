@@ -25,7 +25,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   the selected language through the injected locale port. The Node adapter
   persists that preference in a small state file when a preference path can be
   resolved, keeping persistence behind the host adapter instead of the app
-  reading process globals directly.
+  reading process globals directly. Preference writes are best-effort, so a
+  host storage failure cannot block the already-activated runtime locale from
+  updating the DOGFOOD model.
 - **DOGFOOD guide-info localization coverage** — The guide inspector title,
   section headings, fallback summary, and posture copy now come from the
   DOGFOOD string table and generated runtime catalogs, reducing raw visible

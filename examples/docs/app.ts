@@ -835,7 +835,11 @@ function activateDogfoodLocale(
 ): Cmd<ExplorerMsg> {
   return async () => {
     const activatedLocale = await applyDogfoodLocale(i18n, options, locale);
-    await options.localePort?.savePreferredLocale?.(activatedLocale);
+    try {
+      await options.localePort?.savePreferredLocale?.(activatedLocale);
+    } catch {
+      // Preference persistence is best-effort; the activated runtime locale wins.
+    }
     return {
       type: 'locale-activated',
       locale: activatedLocale,

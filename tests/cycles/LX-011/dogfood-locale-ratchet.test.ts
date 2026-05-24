@@ -277,4 +277,31 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
     expect(savedLocales).toEqual(['fr']);
   });
+
+  it('keeps locale activation when preference persistence fails', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const attemptedSaves: string[] = [];
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+      localePort: {
+        preferredLocale: () => 'en',
+        savePreferredLocale(locale) {
+          attemptedSaves.push(locale);
+          throw new Error('preference store unavailable');
+        },
+      },
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(attemptedSaves).toEqual(['fr']);
+  });
 });
