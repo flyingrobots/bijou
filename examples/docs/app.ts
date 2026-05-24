@@ -830,13 +830,17 @@ function applyDogfoodLocale(
 
 function activateDogfoodLocale(
   i18n: I18nRuntime,
-  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs'>,
+  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs' | 'localePort'>,
   locale: string,
 ): Cmd<ExplorerMsg> {
-  return async () => ({
-    type: 'locale-activated',
-    locale: await applyDogfoodLocale(i18n, options, locale),
-  });
+  return async () => {
+    const activatedLocale = await applyDogfoodLocale(i18n, options, locale);
+    await options.localePort?.savePreferredLocale?.(activatedLocale);
+    return {
+      type: 'locale-activated',
+      locale: activatedLocale,
+    };
+  };
 }
 
 function loadDogfoodRuntimeCatalogs(

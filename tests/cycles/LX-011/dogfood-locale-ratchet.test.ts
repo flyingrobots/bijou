@@ -59,6 +59,29 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     }).preferredLocale()).toBe('fr');
   });
 
+  it('persists DOGFOOD locale preferences through the Node locale port', () => {
+    const writes = new Map<string, string>();
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'es_MX.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText(path) {
+          return writes.get(path);
+        },
+        writeText(path, text) {
+          writes.set(path, text);
+        },
+      },
+    });
+
+    expect(port.preferredLocale()).toBe('es_MX.UTF-8');
+
+    port.savePreferredLocale?.('fr');
+
+    expect(port.preferredLocale()).toBe('fr');
+    expect(writes.get('/tmp/bijou-test-locale')).toBe('fr\n');
+  });
+
   it('ratchets the settings language catalog for every supported DOGFOOD locale', () => {
     const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
     for (const locale of DOGFOOD_LOCALE_OPTIONS) {
@@ -216,9 +239,16 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
 
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const savedLocales: string[] = [];
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
       locale: 'en',
+      localePort: {
+        preferredLocale: () => 'en',
+        savePreferredLocale(locale) {
+          savedLocales.push(locale);
+        },
+      },
     });
 
     const result = await runScript(app, [
@@ -230,5 +260,6 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
 
     expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(savedLocales).toEqual(['fr']);
   });
 });

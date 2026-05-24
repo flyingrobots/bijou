@@ -21,6 +21,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   concrete navigation rows and selected item ids, and DOGFOOD routes guide
   navigation through that block-owned row shape before rendering the interactive
   list surface.
+- **DOGFOOD locale preference persistence** — DOGFOOD locale changes now save
+  the selected language through the injected locale port. The Node adapter
+  persists that preference in a small state file when a preference path can be
+  resolved, keeping persistence behind the host adapter instead of the app
+  reading process globals directly.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block
