@@ -155,6 +155,11 @@ secondary/internal reference material, not the main public docs path.
 
 Read more in [`docs/DOGFOOD.md`](./docs/DOGFOOD.md).
 
+For code-first walkthroughs of common terminal scenarios, read
+[`docs/guides/terminal-scenarios.md`](./docs/guides/terminal-scenarios.md).
+It covers colored CLI output, interactive forms, retained TUI apps, and
+Braille-resolution shader rendering with end-to-end diagrams.
+
 ## Storybook And Preview Workflows
 
 Bijou has a Storybook-style workstation for exercising components and docs
@@ -335,6 +340,7 @@ rendering and diff scenarios.
 | :--- | :--- |
 | [`GUIDE.md`](./GUIDE.md) | Orientation, fast paths, and monorepo workflow. |
 | [`ADVANCED_GUIDE.md`](./ADVANCED_GUIDE.md) | Deeper runtime, rendering, shader, and motion topics. |
+| [`docs/guides/terminal-scenarios.md`](./docs/guides/terminal-scenarios.md) | End-to-end terminal scenarios with Mermaid diagrams and code. |
 | [`docs/DOGFOOD.md`](./docs/DOGFOOD.md) | The docs app, DOGFOOD proof points, i18n workflow, and Storybook commands. |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Ports, adapters, package stack, and structural rules. |
 | [`docs/VISION.md`](./docs/VISION.md) | Project identity and long-term product intent. |
