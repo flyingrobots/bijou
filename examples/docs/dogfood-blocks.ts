@@ -171,6 +171,14 @@ export interface TitleScreenBlockConfig {
 export interface NavigationListBlockConfig {
   readonly itemCount?: number;
   readonly activeLabel?: string;
+  readonly activeItemId?: string;
+  readonly items?: readonly NavigationListBlockItem[];
+}
+
+export interface NavigationListBlockItem {
+  readonly id: string;
+  readonly label: string;
+  readonly depth?: number;
 }
 
 export interface DocumentationArticleBlockConfig {
@@ -1037,13 +1045,35 @@ function renderTitleScreenBlock(
 function renderNavigationListBlock(
   input: BlockRenderInput<NavigationListBlockConfig>,
 ): BlockRenderResult<string> {
-  const itemCount = input.config?.itemCount ?? 0;
-  const activeLabel = input.config?.activeLabel ?? 'none';
+  const items = input.config?.items ?? [];
+  const activeItemId = input.config?.activeItemId;
+  const activeItem = items.find((item) => item.id === activeItemId);
+  const itemCount = input.config?.itemCount ?? items.length;
+  const activeLabel = input.config?.activeLabel ?? activeItem?.label ?? 'none';
+
+  if (items.length > 0) {
+    return {
+      output: items
+        .map((item) => {
+          const marker = item.id === activeItemId ? '>' : '-';
+          const indent = '  '.repeat(Math.max(0, Math.floor(item.depth ?? 0)));
+          return `${indent}${marker} ${item.label}`;
+        })
+        .join('\n'),
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+      ],
+    };
+  }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
       output: `Navigation items: ${itemCount}; active: ${activeLabel}`,
-      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+      ],
     };
   }
 
@@ -1054,7 +1084,10 @@ function renderNavigationListBlock(
       `active: ${activeLabel}`,
       'Intents: select item; expand group; collapse group',
     ].join('\n'),
-    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+      { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+    ],
   };
 }
 

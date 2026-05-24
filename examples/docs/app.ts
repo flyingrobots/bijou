@@ -126,7 +126,7 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
-import { documentationArticleBlock } from './dogfood-blocks.js';
+import { documentationArticleBlock, navigationListBlock } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -3136,19 +3136,31 @@ function renderGuideNavPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
-  const body = browsableListSurface(model.guideState, {
-    width: Math.max(1, paneWidth),
-    showScrollbar: true,
-    ctx,
-    focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
-    renderItem: ({ item, focused }) => formatGuideRow({
-      item,
-      focused,
-      selectedGuideId: model.selectedGuideId,
-      ctx,
-      theme,
-    }),
+  const navigationBlockResult = navigationListBlock.render({
+    config: {
+      activeItemId: model.selectedGuideId,
+      items: model.guideState.items.map((item) => ({
+        id: item.value,
+        label: item.label,
+      })),
+    },
+    mode: ctx.mode,
   });
+  const body = ctx.mode === 'pipe' || ctx.mode === 'accessible'
+    ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
+    : browsableListSurface(model.guideState, {
+        width: Math.max(1, paneWidth),
+        showScrollbar: true,
+        ctx,
+        focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
+        renderItem: ({ item, focused }) => formatGuideRow({
+          item,
+          focused,
+          selectedGuideId: model.selectedGuideId,
+          ctx,
+          theme,
+        }),
+      });
 
   return insetPaneSurface(column([
     themedSeparatorSurface(pageTitle(pageId, localization).toLowerCase(), paneWidth, ctx, theme),

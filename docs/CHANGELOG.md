@@ -17,6 +17,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   route documentation bodies through `DocumentationArticleBlock` before
   rendering markdown into the reader surface, so the semantic article Block owns
   the product content path instead of remaining only a registry contract.
+- **DOGFOOD navigation block rendering** — `NavigationListBlock` now accepts
+  concrete navigation rows and selected item ids, and DOGFOOD routes guide
+  navigation through that block-owned row shape before rendering the interactive
+  list surface.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block
