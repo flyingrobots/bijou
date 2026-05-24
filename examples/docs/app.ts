@@ -3237,31 +3237,57 @@ function renderGuideInfoPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
-  const description = doc?.summary ?? 'This section is still being expanded.';
+  const description = doc?.summary
+    ?? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.');
   const currentPosture = (() => {
     switch (pageId) {
       case GUIDES_PAGE_ID:
-        return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.guides',
+          'Reader-first orientation path for DOGFOOD with the repo documentation map.',
+        );
       case BLOCKS_PAGE_ID:
-        return 'This section publishes the block authoring, inventory, preview, and lowering path directly inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.blocks',
+          'Block authoring inventory preview and lowering path published directly inside DOGFOOD.',
+        );
       case PACKAGES_PAGE_ID:
-        return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.packages',
+          'Explainer pages for shipped workspace packages published inside DOGFOOD.',
+        );
       case PHILOSOPHY_PAGE_ID:
-        return 'This section now publishes the key doctrine, architecture, invariants, and design-system guidance inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.philosophy',
+          'Key doctrine architecture invariants and design-system guidance published inside DOGFOOD.',
+        );
       case RELEASE_PAGE_ID:
-        return `This section now publishes the ${BIJOU_VERSION} release story and migration guidance inside DOGFOOD.`;
+        return dogfoodText(
+          localization,
+          'guide.info.posture.release',
+          '{version} release story and migration guidance published inside DOGFOOD.',
+          { version: BIJOU_VERSION },
+        );
       default:
-        return 'This section now has a visible home in DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.defaultPosture',
+          'This section now has a visible home in DOGFOOD.',
+        );
     }
   })();
   const guideInspectorSections = [
     {
-      title: 'Summary',
+      title: dogfoodText(localization, 'guide.info.summaryTitle', 'Summary'),
       content: description,
       tone: 'muted' as const,
     },
     {
-      title: 'Current posture',
+      title: dogfoodText(localization, 'guide.info.currentPostureTitle', 'Current posture'),
       content: currentPosture,
       tone: 'muted' as const,
     },
@@ -3278,7 +3304,7 @@ function renderGuideInfoPane(
     themedSeparatorSurface(`section • ${pageTitle(pageId, localization).toLowerCase()}`, paneWidth, ctx, theme),
     spacer(1, 1),
     contentSurface(inspector({
-      title: 'guide info',
+      title: dogfoodText(localization, 'guide.info.title', 'guide info'),
       currentValue: doc?.title ?? pageTitle(pageId, localization),
       sections: ctx.mode === 'interactive' || ctx.mode === 'static'
         ? guideInspectorSections

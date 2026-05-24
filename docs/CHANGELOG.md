@@ -26,6 +26,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   persists that preference in a small state file when a preference path can be
   resolved, keeping persistence behind the host adapter instead of the app
   reading process globals directly.
+- **DOGFOOD guide-info localization coverage** — The guide inspector title,
+  section headings, fallback summary, and posture copy now come from the
+  DOGFOOD string table and generated runtime catalogs, reducing raw visible
+  English debt in the Blocks/docs side panel.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block

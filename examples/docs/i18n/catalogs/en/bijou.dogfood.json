@@ -400,6 +400,116 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "guide.info.currentPostureTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Current posture"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.defaultPosture"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "This section now has a visible home in DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.defaultSummary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "This section is still being expanded."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.blocks"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Block authoring inventory preview and lowering path published directly inside DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.guides"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Reader-first orientation path for DOGFOOD with the repo documentation map."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.packages"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Explainer pages for shipped workspace packages published inside DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.philosophy"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Key doctrine architecture invariants and design-system guidance published inside DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.posture.release"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{version} release story and migration guidance published inside DOGFOOD."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.summaryTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Summary"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "guide.info.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "guide info"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "landing.dogfood.expansion"
       },
       "kind": "message",

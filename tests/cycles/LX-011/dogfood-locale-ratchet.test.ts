@@ -100,6 +100,21 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     )?.values.fr).toBe('Langue préférée');
   });
 
+  it('ratchets guide inspector chrome into the DOGFOOD string table', () => {
+    const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
+    const frEntries = new Map(
+      dogfoodI18nCatalogsForLocale('fr')[0]?.entries.map((entry) => [entry.key.id, entry]),
+    );
+    const esEntries = new Map(
+      dogfoodI18nCatalogsForLocale('es')[0]?.entries.map((entry) => [entry.key.id, entry]),
+    );
+
+    expect(entries.get('guide.info.title')?.values.en).toBe('guide info');
+    expect(frEntries.get('guide.info.summaryTitle')?.values.fr).toBe('Résumé');
+    expect(esEntries.get('guide.info.currentPostureTitle')?.values.es).toBe('Postura actual');
+    expect(entries.get('guide.info.posture.blocks')?.values.en).toContain('Block authoring');
+  });
+
   it('initializes DOGFOOD pages from the injected locale preference', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx, {
