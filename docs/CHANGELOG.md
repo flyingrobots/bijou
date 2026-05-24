@@ -8,6 +8,35 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **Word-aware prose surfaces for `bijou-tui`** — `@flyingrobots/bijou-tui`
+  now exports `proseSurface()` for paragraph-like text that should wrap at
+  word boundaries before entering surface-land. Existing `contentSurface()`
+  remains the raw/preformatted bridge for tables, boxes, and caller-managed
+  line breaks.
+- **DOGFOOD documentation article block rendering** — DOGFOOD article panes now
+  route documentation bodies through `DocumentationArticleBlock` before
+  rendering markdown into the reader surface, so the semantic article Block owns
+  the product content path instead of remaining only a registry contract.
+- **DOGFOOD navigation block rendering** — `NavigationListBlock` now accepts
+  concrete navigation rows and selected item ids, and DOGFOOD routes guide
+  navigation through that block-owned row shape before rendering the interactive
+  list surface.
+- **DOGFOOD locale preference persistence** — DOGFOOD locale changes now save
+  the selected language through the injected locale port. The Node adapter
+  persists that preference in a small state file when a preference path can be
+  resolved, keeping persistence behind the host adapter instead of the app
+  reading process globals directly. Preference writes are best-effort, so a
+  host storage failure cannot block the already-activated runtime locale from
+  updating the DOGFOOD model, and unreadable preference files fall back to the
+  environment-derived locale.
+- **DOGFOOD guide-info localization coverage** — The guide inspector title,
+  section headings, fallback summary, and posture copy now come from the
+  DOGFOOD string table and generated runtime catalogs, reducing raw visible
+  English debt in the Blocks/docs side panel.
+- **DOGFOOD Blocks preview posture** — Standard block preview cards now use the
+  block name as the primary title and present lower-mode output as a compact
+  lowering summary, reducing debug-flavored page framing while preserving the
+  same rendered examples, facts, and documentation sections.
 - **Block-authored DOGFOOD surface contracts** — DOGFOOD now has a local,
   branded block registry for semantic product surfaces and publishes block
   contracts for the title screen, navigation list, documentation article, block

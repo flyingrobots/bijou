@@ -3,11 +3,16 @@ import {
   graphemeWidth,
   parseAnsiToSurface,
   stripAnsi,
+  wrapToWidth,
   type Surface,
 } from '@flyingrobots/bijou';
 import type { PlaceOptions } from './layout.js';
 
 export type SurfaceContent = string | Surface;
+
+export interface ProseSurfaceOptions {
+  readonly width: number;
+}
 
 /**
  * Bridge raw text into surface-land at the composition edge.
@@ -17,6 +22,22 @@ export function contentSurface(content: string): Surface {
   const width = Math.max(1, ...lines.map((line) => graphemeWidth(stripAnsi(line))));
   const height = Math.max(1, lines.length);
   return parseAnsiToSurface(content, width, height);
+}
+
+/**
+ * Bridge prose text into surface-land after wrapping at word boundaries.
+ *
+ * Use this for paragraph-like text that should reflow inside a known column
+ * width. Keep `contentSurface()` for preformatted output, tables, boxes, and
+ * other surfaces where callers already control line breaks.
+ */
+export function proseSurface(content: string, options: ProseSurfaceOptions): Surface {
+  const finiteWidth = Number.isFinite(options.width) ? options.width : 1;
+  const width = Math.max(1, Math.floor(finiteWidth));
+  const wrapped = wrapToWidth(content, width);
+  const text = wrapped.join('\n');
+  const height = Math.max(1, wrapped.length);
+  return parseAnsiToSurface(text, width, height);
 }
 
 /**

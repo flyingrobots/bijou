@@ -76,6 +76,7 @@ before DOGFOOD counts as a real terminal docs product, and can see that
 - latest DOGFOOD docs-surface closure:
   - [DF-025 — Make DOGFOOD The Only Human-Facing Docs Surface](../design/DF-025-make-dogfood-the-only-human-facing-docs-surface.md)
 - latest supporting closure:
+  - [DF-070 — DOGFOOD Block Product Polish](../design/DF-070-dogfood-block-product-polish.md)
   - [DF-069 — Block-Authored DOGFOOD](../design/DF-069-block-authored-dogfood.md)
   - [DF-067 — Prove Responsive DOGFOOD Layout Variants](../design/DF-067-prove-responsive-dogfood-layout-variants.md)
   - [DF-027 — Storybook-Style Tool for Bijou](../design/DF-027-storybook-style-tool-for-bijou.md)

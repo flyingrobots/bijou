@@ -45,6 +45,7 @@ import {
   column,
   contentSurface,
   line,
+  proseSurface,
   spacer,
 } from '../_shared/example-surfaces.js';
 import { COMPONENT_STORIES } from './stories.js';
@@ -384,10 +385,11 @@ function renderPreviewPane(
     padding: { left: 1, right: 1 },
     ctx,
   });
-  const docs = contentSurface(markdown(storyDocsMarkdown(story, variant, profile), {
-    width: Math.max(20, bodyWidth - 2),
+  const docsWidth = Math.max(20, bodyWidth - 2);
+  const docs = proseSurface(markdown(storyDocsMarkdown(story, variant, profile), {
+    width: docsWidth,
     ctx,
-  }));
+  }), docsWidth);
 
   return paneSurface('preview', column([
     line(fit(story.title, bodyWidth), bodyWidth),

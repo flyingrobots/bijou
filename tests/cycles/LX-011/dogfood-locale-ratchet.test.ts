@@ -59,6 +59,61 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     }).preferredLocale()).toBe('fr');
   });
 
+  it('persists DOGFOOD locale preferences through the Node locale port', () => {
+    const writes = new Map<string, string>();
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'es_MX.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText(path) {
+          return writes.get(path);
+        },
+        writeText(path, text) {
+          writes.set(path, text);
+        },
+      },
+    });
+
+    expect(port.preferredLocale()).toBe('es_MX.UTF-8');
+
+    port.savePreferredLocale?.('fr');
+
+    expect(port.preferredLocale()).toBe('fr');
+    expect(writes.get('/tmp/bijou-test-locale')).toBe('fr\n');
+  });
+
+  it('keeps Node locale discovery best-effort when preference reads fail', () => {
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'de_DE.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText() {
+          throw Object.assign(new Error('permission denied'), { code: 'EACCES' });
+        },
+        writeText() {},
+      },
+    });
+
+    expect(port.preferredLocale()).toBe('de_DE.UTF-8');
+  });
+
+  it('keeps Node locale preference writes best-effort', () => {
+    const port = createNodeDogfoodLocalePort({
+      env: { LANG: 'en_US.UTF-8' },
+      preferencePath: '/tmp/bijou-test-locale',
+      storage: {
+        readText() {
+          return undefined;
+        },
+        writeText() {
+          throw Object.assign(new Error('read only'), { code: 'EROFS' });
+        },
+      },
+    });
+
+    expect(() => port.savePreferredLocale?.('fr')).not.toThrow();
+  });
+
   it('ratchets the settings language catalog for every supported DOGFOOD locale', () => {
     const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
     for (const locale of DOGFOOD_LOCALE_OPTIONS) {
@@ -75,6 +130,21 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     expect(dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(
       (entry) => entry.key.id === 'settings.language.label',
     )?.values.fr).toBe('Langue préférée');
+  });
+
+  it('ratchets guide inspector chrome into the DOGFOOD string table', () => {
+    const entries = new Map(DOGFOOD_I18N_CATALOG.entries.map((entry) => [entry.key.id, entry]));
+    const frEntries = new Map(
+      dogfoodI18nCatalogsForLocale('fr')[0]?.entries.map((entry) => [entry.key.id, entry]),
+    );
+    const esEntries = new Map(
+      dogfoodI18nCatalogsForLocale('es')[0]?.entries.map((entry) => [entry.key.id, entry]),
+    );
+
+    expect(entries.get('guide.info.title')?.values.en).toBe('guide info');
+    expect(frEntries.get('guide.info.summaryTitle')?.values.fr).toBe('Résumé');
+    expect(esEntries.get('guide.info.currentPostureTitle')?.values.es).toBe('Postura actual');
+    expect(entries.get('guide.info.posture.blocks')?.values.en).toContain('Block authoring');
   });
 
   it('initializes DOGFOOD pages from the injected locale preference', async () => {
@@ -216,9 +286,16 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
 
   it('cycles the preferred language through settings and syncs every DOGFOOD page model', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const savedLocales: string[] = [];
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
       locale: 'en',
+      localePort: {
+        preferredLocale: () => 'en',
+        savePreferredLocale(locale) {
+          savedLocales.push(locale);
+        },
+      },
     });
 
     const result = await runScript(app, [
@@ -230,5 +307,33 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
 
     expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
     expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(savedLocales).toEqual(['fr']);
+  });
+
+  it('keeps locale activation when preference persistence fails', async () => {
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    const attemptedSaves: string[] = [];
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      locale: 'en',
+      localePort: {
+        preferredLocale: () => 'en',
+        savePreferredLocale(locale) {
+          attemptedSaves.push(locale);
+          throw new Error('preference store unavailable');
+        },
+      },
+    });
+
+    const result = await runScript(app, [
+      { key: KEY_F2 },
+      { key: KEY_DOWN },
+      { key: KEY_DOWN },
+      { key: KEY_ENTER },
+    ], { ctx });
+
+    expect(pageLocales(result.model)).toEqual(['fr', 'fr', 'fr', 'fr', 'fr', 'fr']);
+    expect(frameText(result.frames.at(-1)!)).toContain('Langue préférée');
+    expect(attemptedSaves).toEqual(['fr']);
   });
 });

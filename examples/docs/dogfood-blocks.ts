@@ -171,16 +171,45 @@ export interface TitleScreenBlockConfig {
 export interface NavigationListBlockConfig {
   readonly itemCount?: number;
   readonly activeLabel?: string;
+  readonly activeItemId?: string;
+  readonly items?: readonly NavigationListBlockItem[];
+}
+
+export interface NavigationListBlockItem {
+  readonly id: string;
+  readonly label: string;
+  readonly depth?: number;
 }
 
 export interface DocumentationArticleBlockConfig {
   readonly title?: string;
+  readonly body?: string;
   readonly headingCount?: number;
+}
+
+export interface SettingsMenuBlockRow {
+  readonly id: string;
+  readonly label: string;
+  readonly valueLabel?: string;
+  readonly description?: string;
+}
+
+export interface SettingsMenuBlockSection {
+  readonly id: string;
+  readonly title: string;
+  readonly rows: readonly SettingsMenuBlockRow[];
 }
 
 export interface SettingsMenuBlockConfig {
   readonly sectionCount?: number;
   readonly activeSettingLabel?: string;
+  readonly sections?: readonly SettingsMenuBlockSection[];
+}
+
+export interface GuideInspectorBlockSection {
+  readonly title: string;
+  readonly content: string;
+  readonly tone?: 'default' | 'muted';
 }
 
 export interface BlockPreviewBlockConfig {
@@ -191,6 +220,7 @@ export interface BlockPreviewBlockConfig {
 export interface GuideInspectorBlockConfig {
   readonly selectionLabel?: string;
   readonly factCount?: number;
+  readonly sections?: readonly GuideInspectorBlockSection[];
 }
 
 export const blockPreviewDefinitionRequirement = defineDataRequirement({
@@ -1036,13 +1066,35 @@ function renderTitleScreenBlock(
 function renderNavigationListBlock(
   input: BlockRenderInput<NavigationListBlockConfig>,
 ): BlockRenderResult<string> {
-  const itemCount = input.config?.itemCount ?? 0;
-  const activeLabel = input.config?.activeLabel ?? 'none';
+  const items = input.config?.items ?? [];
+  const activeItemId = input.config?.activeItemId;
+  const activeItem = items.find((item) => item.id === activeItemId);
+  const itemCount = input.config?.itemCount ?? items.length;
+  const activeLabel = input.config?.activeLabel ?? activeItem?.label ?? 'none';
+
+  if (items.length > 0) {
+    return {
+      output: items
+        .map((item) => {
+          const marker = item.id === activeItemId ? '>' : '-';
+          const indent = '  '.repeat(Math.max(0, Math.floor(item.depth ?? 0)));
+          return `${indent}${marker} ${item.label}`;
+        })
+        .join('\n'),
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+      ],
+    };
+  }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
       output: `Navigation items: ${itemCount}; active: ${activeLabel}`,
-      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+        { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+      ],
     };
   }
 
@@ -1053,7 +1105,10 @@ function renderNavigationListBlock(
       `active: ${activeLabel}`,
       'Intents: select item; expand group; collapse group',
     ].join('\n'),
-    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' }],
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'NavigationListBlock' },
+      { kind: 'state', key: 'dogfood.navigation.itemCount', value: String(itemCount) },
+    ],
   };
 }
 
@@ -1061,12 +1116,26 @@ function renderDocumentationArticleBlock(
   input: BlockRenderInput<DocumentationArticleBlockConfig>,
 ): BlockRenderResult<string> {
   const title = input.config?.title ?? 'Untitled article';
+  const body = input.config?.body;
   const headingCount = input.config?.headingCount ?? 0;
+  const facts = [
+    { kind: 'entity' as const, key: 'dogfood.block', value: 'DocumentationArticleBlock' },
+    { kind: 'state' as const, key: 'dogfood.documentation.headingCount', value: String(headingCount) },
+  ];
+
+  if (body !== undefined && (input.mode === 'interactive' || input.mode === 'static')) {
+    return {
+      output: body,
+      facts,
+    };
+  }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Article: ${title}; headings: ${headingCount}`,
-      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' }],
+      output: body === undefined
+        ? `Article: ${title}; headings: ${headingCount}`
+        : `${title}: ${body.replace(/\s+/g, ' ').trim()}`,
+      facts,
     };
   }
 
@@ -1077,19 +1146,51 @@ function renderDocumentationArticleBlock(
       `headings: ${headingCount}`,
       'Intents: select heading; open reference',
     ].join('\n'),
-    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'DocumentationArticleBlock' }],
+    facts,
   };
+}
+
+function renderSettingsMenuRow(row: SettingsMenuBlockRow): readonly string[] {
+  const value = row.valueLabel == null ? '' : `: ${row.valueLabel}`;
+  const summary = `- ${row.label}${value}`;
+  return row.description == null ? [summary] : [summary, `  ${row.description}`];
 }
 
 function renderSettingsMenuBlock(
   input: BlockRenderInput<SettingsMenuBlockConfig>,
 ): BlockRenderResult<string> {
-  const sectionCount = input.config?.sectionCount ?? 0;
-  const activeSettingLabel = input.config?.activeSettingLabel ?? 'none';
+  const sections = input.config?.sections ?? [];
+  const sectionCount = input.config?.sectionCount ?? sections.length;
+  const activeSettingLabel = input.config?.activeSettingLabel
+    ?? sections.find((section) => section.rows.length > 0)?.rows[0]?.label
+    ?? 'none';
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
+    if (sections.length > 0) {
+      return {
+        output: sections.flatMap((section) => [
+          section.title,
+          ...section.rows.flatMap(renderSettingsMenuRow),
+        ]).join('\n'),
+        facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+      };
+    }
+
     return {
       output: `Settings sections: ${sectionCount}; active: ${activeSettingLabel}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+    };
+  }
+
+  if (sections.length > 0) {
+    return {
+      output: [
+        'SettingsMenuBlock',
+        ...sections.flatMap((section) => [
+          section.title,
+          ...section.rows.flatMap(renderSettingsMenuRow),
+        ]),
+      ].join('\n'),
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
     };
   }
@@ -1133,11 +1234,36 @@ function renderGuideInspectorBlock(
   input: BlockRenderInput<GuideInspectorBlockConfig>,
 ): BlockRenderResult<string> {
   const selectionLabel = input.config?.selectionLabel ?? 'none';
-  const factCount = input.config?.factCount ?? 0;
+  const sections = input.config?.sections ?? [];
+  const factCount = input.config?.factCount ?? sections.length;
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
+    if (sections.length > 0) {
+      return {
+        output: [
+          `Guide inspector: ${selectionLabel}`,
+          ...sections.map((section) => `${section.title}: ${section.content}`),
+        ].join('\n'),
+        facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+      };
+    }
+
     return {
       output: `Guide inspector: ${selectionLabel}; facts: ${factCount}`,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
+    };
+  }
+
+  if (sections.length > 0) {
+    return {
+      output: [
+        'GuideInspectorBlock',
+        `selection: ${selectionLabel}`,
+        ...sections.flatMap((section) => [
+          `${section.title}:`,
+          section.content,
+        ]),
+      ].join('\n'),
       facts: [{ kind: 'entity', key: 'dogfood.block', value: 'GuideInspectorBlock' }],
     };
   }

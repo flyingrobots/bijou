@@ -3,6 +3,7 @@ import { dogfoodLocalizedText, formatLocalizedList } from './localization.js';
 
 export interface DogfoodLocalePort {
   preferredLocale(): string | undefined;
+  savePreferredLocale?(locale: string): void | Promise<void>;
 }
 
 export interface DogfoodLocaleOption {

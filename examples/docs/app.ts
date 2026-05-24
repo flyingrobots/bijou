@@ -76,6 +76,7 @@ import {
   column,
   contentSurface,
   line,
+  proseSurface,
   spacer,
   textSurface,
 } from '../_shared/example-surfaces.js';
@@ -125,6 +126,7 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
+import { documentationArticleBlock, guideInspectorBlock, navigationListBlock } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -828,13 +830,21 @@ function applyDogfoodLocale(
 
 function activateDogfoodLocale(
   i18n: I18nRuntime,
-  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs'>,
+  options: Pick<DocsAppOptions, 'direction' | 'extraI18nCatalogs' | 'localePort'>,
   locale: string,
 ): Cmd<ExplorerMsg> {
-  return async () => ({
-    type: 'locale-activated',
-    locale: await applyDogfoodLocale(i18n, options, locale),
-  });
+  return async () => {
+    const activatedLocale = await applyDogfoodLocale(i18n, options, locale);
+    try {
+      await options.localePort?.savePreferredLocale?.(activatedLocale);
+    } catch {
+      // Preference persistence is best-effort; the activated runtime locale wins.
+    }
+    return {
+      type: 'locale-activated',
+      locale: activatedLocale,
+    };
+  };
 }
 
 function loadDogfoodRuntimeCatalogs(
@@ -893,6 +903,13 @@ function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[])
   const lines = content.split('\n');
   const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
+}
+
+function countMarkdownHeadings(markdownText: string): number {
+  return markdownText
+    .split('\n')
+    .filter((lineText) => /^#{1,6}\s+\S/.test(lineText.trim()))
+    .length;
 }
 
 function standardBlockInventoryMarkdown(): string {
@@ -1086,7 +1103,7 @@ function renderCounterDemoPreviewPane(
       counterDemoBlockSurface(counterDemoBlockConfig(model.counterBlockDemo, ctx, cardWidth)),
       spacer(1, 1),
       boxSurface(paragraphSurface(counterDemoLoweringPreviewText(model.counterBlockDemo, cardWidth, ctx), cardWidth - 4), {
-        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
+        title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
         width: cardWidth,
         borderToken: docsThemeBorderToken(theme),
         padding: { left: 1, right: 1 },
@@ -1104,7 +1121,7 @@ function renderCounterDemoPreviewPane(
       title: dogfoodText(
         localization,
         'blocks.preview.pageTitle',
-        '▼ Page: {blockName}',
+        '{blockName}',
         { blockName: counterDemoBlock.metadata.blockName },
       ),
       width: pageWidth,
@@ -1135,7 +1152,7 @@ function standardBlockLivePreviewSurface(
     title: dogfoodText(
       localization,
       'blocks.preview.pageTitle',
-      '▼ Page: {blockName}',
+      '{blockName}',
       { blockName: block.metadata.blockName },
     ),
     width: safeWidth,
@@ -1190,7 +1207,7 @@ function standardBlockLoweringPreviewSurface(
     const factsLine = dogfoodText(
       localization,
       'blocks.preview.loweringFacts',
-      'facts: {count}',
+      '{count} facts',
       { count: result.facts?.length ?? 0 },
     );
     const modeLabel = dogfoodText(
@@ -1200,11 +1217,11 @@ function standardBlockLoweringPreviewSurface(
       { mode },
     );
 
-    return `${modeLabel}: ${outputSummary}; ${factsLine}`;
+    return `${modeLabel}: ${outputSummary} (${factsLine})`;
   });
 
   return boxSurface(paragraphSurface(modeLines.join('\n'), innerWidth), {
-    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'mode lowering'),
+    title: dogfoodText(localization, 'blocks.preview.modeLoweringTitle', 'lowering summary'),
     width: safeWidth,
     borderToken: docsThemeBorderToken(theme),
     padding: { left: 1, right: 1 },
@@ -3025,8 +3042,9 @@ function renderStoryPane(
     padding: { left: 1, right: 1 },
     ctx,
   });
+  const docsWidth = Math.max(24, paneWidth - 2);
   const docs = markdown(storyDocsMarkdown(story, variant, preset), {
-    width: Math.max(24, paneWidth - 2),
+    width: docsWidth,
     ctx,
   });
 
@@ -3040,7 +3058,7 @@ function renderStoryPane(
       vAlign: 'top',
     }),
     spacer(1, 1),
-    contentSurface(docs),
+    proseSurface(docs, docsWidth),
   ]), width);
 }
 
@@ -3126,19 +3144,35 @@ function renderGuideNavPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
-  const body = browsableListSurface(model.guideState, {
-    width: Math.max(1, paneWidth),
-    showScrollbar: true,
-    ctx,
-    focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
-    renderItem: ({ item, focused }) => formatGuideRow({
-      item,
-      focused,
-      selectedGuideId: model.selectedGuideId,
-      ctx,
-      theme,
-    }),
+  const loweredMode = ctx.mode === 'pipe' || ctx.mode === 'accessible';
+  const focusedGuideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  const navigationBlockResult = navigationListBlock.render({
+    config: {
+      activeItemId: loweredMode
+        ? focusedGuideId ?? model.selectedGuideId
+        : model.selectedGuideId,
+      items: model.guideState.items.map((item) => ({
+        id: item.value,
+        label: item.label,
+      })),
+    },
+    mode: ctx.mode,
   });
+  const body = loweredMode
+    ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
+    : browsableListSurface(model.guideState, {
+        width: Math.max(1, paneWidth),
+        showScrollbar: true,
+        ctx,
+        focusedRowOverflow: { mode: 'marquee', elapsedMs: model.previewTimeMs },
+        renderItem: ({ item, focused }) => formatGuideRow({
+          item,
+          focused,
+          selectedGuideId: model.selectedGuideId,
+          ctx,
+          theme,
+        }),
+      });
 
   return insetPaneSurface(column([
     themedSeparatorSurface(pageTitle(pageId, localization).toLowerCase(), paneWidth, ctx, theme),
@@ -3180,13 +3214,24 @@ function renderGuideReaderPane(
     return renderCounterDemoPreviewPane(model, width, ctx, theme, localization);
   }
 
+  const docsWidth = Math.max(24, paneWidth - 2);
+  const renderedArticle = documentationArticleBlock.render({
+    config: {
+      title: doc.title,
+      body: doc.body,
+      headingCount: countMarkdownHeadings(doc.body),
+    },
+    mode: ctx.mode,
+  });
+  const articleBody = String(renderedArticle.output);
+
   return insetPaneSurface(column([
     themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
     spacer(1, 1),
-    contentSurface(markdown(doc.body, {
-      width: Math.max(24, paneWidth - 2),
+    proseSurface(markdown(articleBody, {
+      width: docsWidth,
       ctx,
-    })),
+    }), docsWidth),
   ]), width);
 }
 
@@ -3200,42 +3245,82 @@ function renderGuideInfoPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
-  const description = doc?.summary ?? 'This section is still being expanded.';
+  const description = doc?.summary
+    ?? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.');
   const currentPosture = (() => {
     switch (pageId) {
       case GUIDES_PAGE_ID:
-        return 'This is the reader-first orientation path for DOGFOOD, including the repo documentation map.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.guides',
+          'Reader-first orientation path for DOGFOOD with the repo documentation map.',
+        );
       case BLOCKS_PAGE_ID:
-        return 'This section publishes the block authoring, inventory, preview, and lowering path directly inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.blocks',
+          'Block authoring inventory preview and lowering path published directly inside DOGFOOD.',
+        );
       case PACKAGES_PAGE_ID:
-        return 'This section now publishes explainer pages for the shipped workspace packages inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.packages',
+          'Explainer pages for shipped workspace packages published inside DOGFOOD.',
+        );
       case PHILOSOPHY_PAGE_ID:
-        return 'This section now publishes the key doctrine, architecture, invariants, and design-system guidance inside DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.posture.philosophy',
+          'Key doctrine architecture invariants and design-system guidance published inside DOGFOOD.',
+        );
       case RELEASE_PAGE_ID:
-        return `This section now publishes the ${BIJOU_VERSION} release story and migration guidance inside DOGFOOD.`;
+        return dogfoodText(
+          localization,
+          'guide.info.posture.release',
+          '{version} release story and migration guidance published inside DOGFOOD.',
+          { version: BIJOU_VERSION },
+        );
       default:
-        return 'This section now has a visible home in DOGFOOD.';
+        return dogfoodText(
+          localization,
+          'guide.info.defaultPosture',
+          'This section now has a visible home in DOGFOOD.',
+        );
     }
   })();
+  const guideInspectorSections = [
+    {
+      title: dogfoodText(localization, 'guide.info.summaryTitle', 'Summary'),
+      content: description,
+      tone: 'muted' as const,
+    },
+    {
+      title: dogfoodText(localization, 'guide.info.currentPostureTitle', 'Current posture'),
+      content: currentPosture,
+      tone: 'muted' as const,
+    },
+  ];
+  const renderedInspector = guideInspectorBlock.render({
+    config: {
+      selectionLabel: doc?.title ?? pageTitle(pageId, localization),
+      sections: guideInspectorSections,
+    },
+    mode: ctx.mode,
+  });
 
   return insetPaneSurface(column([
     themedSeparatorSurface(`section • ${pageTitle(pageId, localization).toLowerCase()}`, paneWidth, ctx, theme),
     spacer(1, 1),
     contentSurface(inspector({
-      title: 'guide info',
+      title: dogfoodText(localization, 'guide.info.title', 'guide info'),
       currentValue: doc?.title ?? pageTitle(pageId, localization),
-      sections: [
-        {
-          title: 'Summary',
-          content: description,
+      sections: ctx.mode === 'interactive' || ctx.mode === 'static'
+        ? guideInspectorSections
+        : [{
+          title: 'GuideInspectorBlock',
+          content: String(renderedInspector.output),
           tone: 'muted',
-        },
-        {
-          title: 'Current posture',
-          content: currentPosture,
-          tone: 'muted',
-        },
-      ],
+        }],
       width: Math.max(22, paneWidth),
       borderToken: docsThemeMutedBorderToken(theme),
       bgToken: docsThemeSurfaceToken(theme),

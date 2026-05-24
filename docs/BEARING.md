@@ -34,8 +34,8 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
   localization.
 - The next work should improve what users can see in DOGFOOD before adding
   another abstract layer.
-- The localization pipeline is honest; the bottleneck is visible catalog
-  coverage.
+- The localization pipeline is honest; the bottleneck is visible product
+  coverage and block-authored surface polish.
 
 ### 2. Blocks Crossing From Contracts To Product
 - Blocks have a strong data-flow and composition spine.
@@ -50,8 +50,9 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 - DOGFOOD should prove Bijou's Block system by using Blocks for semantic app
   surfaces, not merely previewing Blocks in one section.
 - Components remain the leaf rendering vocabulary inside Blocks.
-- Storybook should move onto the shared framed shell path and expose a
-  `StorybookWorkbenchBlock` contract instead of staying a parallel bespoke TUI.
+- Storybook now runs through the shared framed shell path and exposes a
+  `StorybookWorkbenchBlock` contract; the remaining work is making more
+  DOGFOOD product surfaces render through their Blocks instead of beside them.
 
 ## Tensions
 
@@ -70,14 +71,17 @@ Current direction and active tensions. Historical ship data is in `CHANGELOG.md`
 ## Next Target
 
 The immediate focus is
-[DF-069 — Block-Authored DOGFOOD](./design/DF-069-block-authored-dogfood.md).
+[DF-070 — DOGFOOD Block Product Polish](./design/DF-070-dogfood-block-product-polish.md).
 
-DF-069 should stay product-composition focused:
+DF-070 should stay visible-product focused:
 
-- move Storybook toward the framed shell path
-- introduce DOGFOOD Blocks for semantic app/page surfaces
-- keep low-level components as rendering primitives inside Blocks
+- fix prose wrapping so text breaks on word boundaries where possible
+- make DOGFOOD article, navigation, inspector, and settings surfaces render
+  through their semantic Blocks
+- keep components as leaf rendering primitives inside those Blocks
 - preserve unidirectional data-binding and localization-port boundaries
+- improve visible localization coverage only where this cycle touches product
+  surfaces
 
 Non-goals for the next cycle:
 
@@ -89,8 +93,8 @@ Non-goals for the next cycle:
 
 Expected sequence:
 
-1. `DF-069` makes the next DOGFOOD proof block-authored at semantic boundaries.
-2. Storybook moves onto the same framed-shell model.
-3. DOGFOOD pages migrate to Blocks incrementally, starting with title,
-   navigation, documentation article, settings, block preview, and inspector
-   surfaces.
+1. `DF-070` tightens the visible DOGFOOD product surface around Blocks.
+2. Locale persistence and touched block-surface catalog coverage land behind the
+   existing localization boundary.
+3. New Blocks become easier to add because the existing DOGFOOD shell proves the
+   path through product rendering, not only through contract previews.
