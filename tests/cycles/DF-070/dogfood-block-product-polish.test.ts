@@ -1,10 +1,24 @@
 import { describe, expect, it } from 'vitest';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { runScript } from '@flyingrobots/bijou-tui';
+import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   documentationArticleBlock,
   guideInspectorBlock,
   navigationListBlock,
   settingsMenuBlock,
 } from '../../../examples/docs/dogfood-blocks.js';
+
+function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+  let text = '';
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width; x++) {
+      text += frame.get(x, y).char || ' ';
+    }
+    text += '\n';
+  }
+  return text;
+}
 
 describe('DF-070 DOGFOOD block product polish', () => {
   it('renders documentation article body data through DocumentationArticleBlock', () => {
@@ -37,6 +51,34 @@ describe('DF-070 DOGFOOD block product polish', () => {
     expect(rendered.output).toContain('Guides');
     expect(rendered.output).toContain('> Blocks');
     expect(rendered.output).not.toContain('items: 2');
+  });
+
+  it('marks the focused navigation row in lowered DOGFOOD nav output before selection', async () => {
+    const ctx = createTestContext({ mode: 'accessible', runtime: { columns: 100, rows: 40 } });
+    const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'guides' });
+
+    const result = await runScript(app, [{
+      msg: {
+        type: 'docs',
+        msg: { type: 'guide-next' },
+      },
+    }], { ctx });
+    const text = frameText(result.frames.at(-1)!);
+    const guideModel = (result.model as {
+      readonly docsModel: {
+        readonly pageModels: {
+          readonly guides: {
+            readonly selectedGuideId: string;
+            readonly guideState: { readonly focusIndex: number };
+          };
+        };
+      };
+    }).docsModel.pageModels.guides;
+
+    expect(guideModel.selectedGuideId).toBe('start-here');
+    expect(guideModel.guideState.focusIndex).toBe(1);
+    expect(text).toContain('- Start Here');
+    expect(text).toContain('> Navigate DOGFOOD');
   });
 
   it('renders guide inspector sections through GuideInspectorBlock', () => {

@@ -3144,9 +3144,13 @@ function renderGuideNavPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
+  const loweredMode = ctx.mode === 'pipe' || ctx.mode === 'accessible';
+  const focusedGuideId = model.guideState.items[model.guideState.focusIndex]?.value;
   const navigationBlockResult = navigationListBlock.render({
     config: {
-      activeItemId: model.selectedGuideId,
+      activeItemId: loweredMode
+        ? focusedGuideId ?? model.selectedGuideId
+        : model.selectedGuideId,
       items: model.guideState.items.map((item) => ({
         id: item.value,
         label: item.label,
@@ -3154,7 +3158,7 @@ function renderGuideNavPane(
     },
     mode: ctx.mode,
   });
-  const body = ctx.mode === 'pipe' || ctx.mode === 'accessible'
+  const body = loweredMode
     ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
     : browsableListSurface(model.guideState, {
         width: Math.max(1, paneWidth),
