@@ -45,6 +45,15 @@ describe('proseSurface', () => {
     expect(result.width).toBe(5);
     expect(plainSurface(result)).toBe('super\ncalif\nragil\nistic');
   });
+
+  it('falls back to a finite width before wrapping prose', () => {
+    for (const width of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const result = proseSurface('abc', { width });
+
+      expect(result.width).toBe(1);
+      expect(plainSurface(result)).toBe('a\nb\nc');
+    }
+  });
 });
 
 describe('vstackSurface', () => {

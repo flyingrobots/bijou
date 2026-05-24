@@ -32,7 +32,8 @@ export function contentSurface(content: string): Surface {
  * other surfaces where callers already control line breaks.
  */
 export function proseSurface(content: string, options: ProseSurfaceOptions): Surface {
-  const width = Math.max(1, Math.floor(options.width));
+  const finiteWidth = Number.isFinite(options.width) ? options.width : 1;
+  const width = Math.max(1, Math.floor(finiteWidth));
   const wrapped = wrapToWidth(content, width);
   const text = wrapped.join('\n');
   const height = Math.max(1, wrapped.length);
