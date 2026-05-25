@@ -17,6 +17,8 @@ import {
   footerHintBlockRegistryEntry,
   guideInspectorBlock,
   guideInspectorBlockRegistryEntry,
+  helpOverlayBlock,
+  helpOverlayBlockRegistryEntry,
   isDogfoodBlockRegistry,
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
@@ -275,6 +277,22 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Perf HUD fps: 60; frame: 1.25 ms; size: 150x43');
   });
 
+  it('publishes DOGFOOD help overlay as an inspectable keyboard guidance surface', () => {
+    expect(helpOverlayBlockRegistryEntry.block).toBe(helpOverlayBlock);
+    expect(helpOverlayBlockRegistryEntry.role).toBe('help');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.help')).toBe(helpOverlayBlockRegistryEntry);
+    expect(helpOverlayBlock.data?.names()).toEqual(['bindings', 'scope']);
+    expect(helpOverlayBlock.commands?.map((intent) => intent.id)).toEqual(['help.dismiss']);
+
+    expect(helpOverlayBlock.render({
+      config: {
+        bindingCount: 12,
+        scopeLabel: 'Blocks page',
+      },
+      mode: 'pipe',
+    }).output).toBe('Help scope: Blocks page; bindings: 12');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -386,6 +404,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'frame.search',
       'frame.notifications',
       'frame.perfHud',
+      'frame.help',
       'frame.footer',
       'storybook.workbench',
     ]);
@@ -399,6 +418,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'SearchPanelBlock',
       'NotificationCenterBlock',
       'PerfHudBlock',
+      'HelpOverlayBlock',
       'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
