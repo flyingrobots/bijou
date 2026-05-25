@@ -43,19 +43,36 @@ DF-071 may connect these layers, but it must not collapse them.
 4. Route docs footer hint text through the footer/status Block.
 5. Add block-authored landing/title behavior proof.
 6. Route the landing DOGFOOD panel through `TitleScreenBlock` data.
-7. Add block-authored page chrome coverage for top navigation.
-8. Route top-level docs page labels through a semantic nav Block seam.
-9. Add block-authored search surface coverage.
-10. Route search chrome text through the search Block seam without changing
-    search mechanics.
-11. Add block-authored article fallback coverage for missing docs.
-12. Route missing-doc fallback through `DocumentationArticleBlock`.
-13. Add block registry/product coverage for the new semantic surfaces.
+7. Add a registry-backed DOGFOOD surface Block inventory page.
+8. Add block-authored search surface coverage.
+9. Route search chrome title text through the search Block seam without
+   changing search mechanics.
+10. Add block-authored notification center coverage.
+11. Add block-authored performance HUD coverage.
+12. Add block-authored keyboard help coverage.
+13. Add block-authored command palette coverage.
 14. Update docs and changelog with the shipped public DOGFOOD surface posture.
 15. Run full validation, push, and open a PR.
 
 The plan can adapt if the code reveals a cleaner seam, but each slice must keep
 the same separation of concerns.
+
+## Adaptation Note
+
+The top navigation seam is owned by the generic `AppFrame` tab renderer. DF-071
+therefore did not fork tab rendering inside DOGFOOD. Instead, it covered the
+frame-owned surfaces that already have stable semantic boundaries:
+
+- footer hints
+- search title
+- notifications
+- performance HUD
+- keyboard help
+- command palette
+
+The actual overlay renderers remain in `@flyingrobots/bijou-tui`. DOGFOOD now
+publishes local block contracts for those surfaces so the app can be inspected
+as a block-authored product without duplicating frame runtime behavior.
 
 ## Non-Goals
 
@@ -78,4 +95,18 @@ the same separation of concerns.
 
 ## Retrospective
 
-Not started.
+DF-071 landed the first broad pass over DOGFOOD block-authored product
+surfaces. It added or routed:
+
+- `FooterHintBlock`
+- `SearchPanelBlock`
+- `NotificationCenterBlock`
+- `PerfHudBlock`
+- `HelpOverlayBlock`
+- `CommandPaletteBlock`
+- `TitleScreenBlock` landing title data
+- a registry-backed DOGFOOD surface inventory page
+
+The key restraint held: frame runtime surfaces remain rendered by
+`@flyingrobots/bijou-tui`, while DOGFOOD owns the semantic block contracts,
+data requirements, command intents, and visible documentation inventory.
