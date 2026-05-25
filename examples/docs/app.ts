@@ -134,6 +134,7 @@ import {
   navigationListBlock,
   searchPanelBlock,
   titleScreenBlock,
+  type DogfoodBlockRegistryEntry,
 } from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
@@ -1000,7 +1001,7 @@ function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): 
       return [
         `## ${metadata.blockName}`,
         '',
-        entry.description ?? metadata.docs.summary,
+        dogfoodSurfaceBlockDescription(entry, localization),
         '',
         `- ${label('surface', 'Surface')}: ${entry.surfaceId}`,
         `- ${label('role', 'Role')}: ${entry.role}`,
@@ -1038,6 +1039,18 @@ function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): 
     '',
     blockSections,
   ].join('\n');
+}
+
+function dogfoodSurfaceBlockDescription(
+  entry: DogfoodBlockRegistryEntry,
+  localization?: LocalizationPort,
+): string {
+  const fallback = entry.description ?? entry.block.metadata.docs.summary;
+  return dogfoodText(
+    localization,
+    `blocks.surfaceInventory.entry.${entry.surfaceId}.description`,
+    fallback,
+  );
 }
 
 function standardBlockPreviewMarkdown(): string {

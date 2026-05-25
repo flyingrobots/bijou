@@ -361,8 +361,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - **DOGFOOD block surface inventory localization** — The DOGFOOD surface block
   inventory page now resolves its title, summary, body copy, headings, and
-  detail labels through the DOGFOOD string table and generated runtime catalogs
-  instead of accepting new raw visible English into the i18n debt baseline.
+  detail labels/descriptions through the DOGFOOD string table and generated
+  runtime catalogs instead of accepting new raw visible English into the i18n
+  debt baseline.
 - **DOGFOOD landing theme ownership** — The animated DOGFOOD title screen now
   paints landing background, logo, wordmark, and panel cells with explicit
   Bijou-owned backgrounds, so custom terminal-profile background colors do not

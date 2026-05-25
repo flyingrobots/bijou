@@ -262,7 +262,9 @@ describe('docs preview app', () => {
 
     expect(text).toContain(pseudoLocalize('DOGFOOD Surface Blocks'));
     expect(text).toContain(pseudoLocalize('Surface index'));
+    expect(text).toContain(pseudoLocalize('DOGFOOD title and entry action surface.'));
     expect(text).not.toContain('DOGFOOD currently registers');
+    expect(text).not.toContain('DOGFOOD title and entry action surface.');
   });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {
