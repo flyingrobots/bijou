@@ -70,6 +70,303 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.count"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD currently registers {count} semantic product surface Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.blocks.preview.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD Blocks live preview and lowering surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.docs.article.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD documentation article content surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.docs.navigation.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD docs and guide navigation surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.commandPalette.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame command palette surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.footer.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame footer hint surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.help.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame keyboard help overlay surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.notifications.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame notification center surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.perfHud.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame performance HUD surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.search.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame search query and result surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.frame.settings.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD frame settings menu surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.guide.inspector.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD side inspector surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.landing.title.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD title and entry action surface."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.entry.storybook.workbench.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Storybook component workstation entrypoint."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.commandIntents"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Command intents"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.dataRequirements"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Data requirements"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.family"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Family"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.modes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Modes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.role"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Role"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.scale"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Scale"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.surface"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Surface"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.label.tags"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Tags"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The semantic Blocks DOGFOOD uses for its own visible product surfaces."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.surfaceDetailsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Surface details"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.surfaceIndexTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Surface index"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "blocks.surfaceInventory.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "DOGFOOD Surface Blocks"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.empty.coverage.body"
       },
       "kind": "message",

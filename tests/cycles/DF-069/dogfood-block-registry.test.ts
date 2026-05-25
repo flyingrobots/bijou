@@ -6,6 +6,8 @@ import {
 import {
   blockPreviewBlock,
   blockPreviewBlockRegistryEntry,
+  commandPaletteBlock,
+  commandPaletteBlockRegistryEntry,
   DOGFOOD_BLOCK_PACKAGE,
   defaultDogfoodBlockRegistry,
   documentationArticleBlock,
@@ -13,12 +15,22 @@ import {
   dogfoodBlockCoverageReport,
   dogfoodBlockRegistry,
   dogfoodBlockRegistryEntry,
+  footerHintBlock,
+  footerHintBlockRegistryEntry,
   guideInspectorBlock,
   guideInspectorBlockRegistryEntry,
+  helpOverlayBlock,
+  helpOverlayBlockRegistryEntry,
   isDogfoodBlockRegistry,
   isDogfoodBlockRegistryEntry,
   navigationListBlock,
   navigationListBlockRegistryEntry,
+  notificationCenterBlock,
+  notificationCenterBlockRegistryEntry,
+  perfHudBlock,
+  perfHudBlockRegistryEntry,
+  searchPanelBlock,
+  searchPanelBlockRegistryEntry,
   settingsMenuBlock,
   settingsMenuBlockRegistryEntry,
   storybookWorkbenchBlock,
@@ -202,6 +214,108 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Navigation items: 7; active: Blocks');
   });
 
+  it('publishes DOGFOOD search as an inspectable command surface', () => {
+    expect(searchPanelBlockRegistryEntry.block).toBe(searchPanelBlock);
+    expect(searchPanelBlockRegistryEntry.role).toBe('search');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.search')).toBe(searchPanelBlockRegistryEntry);
+    expect(searchPanelBlock.data?.names()).toEqual(['query', 'items', 'selection']);
+    expect(searchPanelBlock.commands?.map((intent) => intent.id)).toEqual([
+      'search.submitQuery',
+      'search.selectResult',
+      'search.dismiss',
+    ]);
+
+    expect(searchPanelBlock.render({
+      config: {
+        query: 'block',
+        resultCount: 3,
+        activeResultLabel: 'Block Preview',
+      },
+      mode: 'pipe',
+    }).output).toBe('Search query: block; results: 3; active: Block Preview');
+
+    expect(searchPanelBlock.render({
+      config: { title: 'Search blocks' },
+      mode: 'accessible',
+    }).output).toBe('Search blocks');
+  });
+
+  it('publishes DOGFOOD notifications as an inspectable frame surface', () => {
+    expect(notificationCenterBlockRegistryEntry.block).toBe(notificationCenterBlock);
+    expect(notificationCenterBlockRegistryEntry.role).toBe('notifications');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.notifications')).toBe(
+      notificationCenterBlockRegistryEntry,
+    );
+    expect(notificationCenterBlock.data?.names()).toEqual(['items', 'filter']);
+    expect(notificationCenterBlock.commands?.map((intent) => intent.id)).toEqual([
+      'notifications.dismiss',
+      'notifications.setFilter',
+    ]);
+
+    expect(notificationCenterBlock.render({
+      config: {
+        notificationCount: 4,
+        activeFilterLabel: 'Unread',
+      },
+      mode: 'pipe',
+    }).output).toBe('Notification items: 4; filter: Unread');
+  });
+
+  it('publishes DOGFOOD performance HUD as an inspectable diagnostics surface', () => {
+    expect(perfHudBlockRegistryEntry.block).toBe(perfHudBlock);
+    expect(perfHudBlockRegistryEntry.role).toBe('diagnostics');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.perfHud')).toBe(perfHudBlockRegistryEntry);
+    expect(perfHudBlock.data?.names()).toEqual(['metrics', 'viewport']);
+    expect(perfHudBlock.commands?.map((intent) => intent.id)).toEqual(['perfHud.toggle']);
+
+    expect(perfHudBlock.render({
+      config: {
+        fps: 60,
+        frameMs: 1.25,
+        columns: 150,
+        rows: 43,
+      },
+      mode: 'pipe',
+    }).output).toBe('Perf HUD fps: 60; frame: 1.25 ms; size: 150x43');
+  });
+
+  it('publishes DOGFOOD help overlay as an inspectable keyboard guidance surface', () => {
+    expect(helpOverlayBlockRegistryEntry.block).toBe(helpOverlayBlock);
+    expect(helpOverlayBlockRegistryEntry.role).toBe('help');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.help')).toBe(helpOverlayBlockRegistryEntry);
+    expect(helpOverlayBlock.data?.names()).toEqual(['bindings', 'scope']);
+    expect(helpOverlayBlock.commands?.map((intent) => intent.id)).toEqual(['help.dismiss']);
+
+    expect(helpOverlayBlock.render({
+      config: {
+        bindingCount: 12,
+        scopeLabel: 'Blocks page',
+      },
+      mode: 'pipe',
+    }).output).toBe('Help scope: Blocks page; bindings: 12');
+  });
+
+  it('publishes DOGFOOD command palette as an inspectable command surface', () => {
+    expect(commandPaletteBlockRegistryEntry.block).toBe(commandPaletteBlock);
+    expect(commandPaletteBlockRegistryEntry.role).toBe('commands');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.commandPalette')).toBe(
+      commandPaletteBlockRegistryEntry,
+    );
+    expect(commandPaletteBlock.data?.names()).toEqual(['commands', 'selection']);
+    expect(commandPaletteBlock.commands?.map((intent) => intent.id)).toEqual([
+      'commandPalette.execute',
+      'commandPalette.dismiss',
+    ]);
+
+    expect(commandPaletteBlock.render({
+      config: {
+        commandCount: 8,
+        activeCommandLabel: 'Open settings',
+      },
+      mode: 'pipe',
+    }).output).toBe('Command palette commands: 8; active: Open settings');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -283,6 +397,22 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Guide inspector: Block Preview; facts: 6');
   });
 
+  it('publishes DOGFOOD footer hints as shell chrome owned by a block', () => {
+    expect(footerHintBlockRegistryEntry.block).toBe(footerHintBlock);
+    expect(footerHintBlockRegistryEntry.role).toBe('footer');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.footer')).toBe(footerHintBlockRegistryEntry);
+    expect(footerHintBlock.data?.names()).toEqual(['controls', 'status']);
+
+    expect(footerHintBlock.render({
+      config: {
+        controls: '? Help • q Quit',
+        activeHint: 'Tab next pane',
+        status: 'page:blocks',
+      },
+      mode: 'pipe',
+    }).output).toBe('? Help • q Quit • Tab next pane • page:blocks');
+  });
+
   it('covers the intended semantic DOGFOOD surfaces without discovery-time rendering', () => {
     const report = dogfoodBlockCoverageReport();
 
@@ -294,6 +424,12 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'blocks.preview',
       'guide.inspector',
       'frame.settings',
+      'frame.search',
+      'frame.notifications',
+      'frame.perfHud',
+      'frame.help',
+      'frame.commandPalette',
+      'frame.footer',
       'storybook.workbench',
     ]);
     expect(defaultDogfoodBlockRegistry.blockNames()).toEqual([
@@ -303,6 +439,12 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'BlockPreviewBlock',
       'GuideInspectorBlock',
       'SettingsMenuBlock',
+      'SearchPanelBlock',
+      'NotificationCenterBlock',
+      'PerfHudBlock',
+      'HelpOverlayBlock',
+      'CommandPaletteBlock',
+      'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
   });

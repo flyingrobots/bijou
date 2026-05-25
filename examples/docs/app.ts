@@ -126,7 +126,16 @@ import {
   type CounterDemoModel,
 } from './counter-block-demo.js';
 import { COMPONENT_STORIES, findComponentStory } from './stories.js';
-import { documentationArticleBlock, guideInspectorBlock, navigationListBlock } from './dogfood-blocks.js';
+import {
+  defaultDogfoodBlockRegistry,
+  documentationArticleBlock,
+  footerHintBlock,
+  guideInspectorBlock,
+  navigationListBlock,
+  searchPanelBlock,
+  titleScreenBlock,
+  type DogfoodBlockRegistryEntry,
+} from './dogfood-blocks.js';
 
 const LOGO_TEXT = readFileSync(new URL('../../assets/bijou.txt', import.meta.url), 'utf8').trimEnd();
 const LOGO_LINES = LOGO_TEXT.split(/\r?\n/);
@@ -235,6 +244,9 @@ interface GuideDoc {
   readonly title: string;
   readonly summary: string;
   readonly body: string;
+  readonly localizedTitle?: (localization: LocalizationPort | undefined) => string;
+  readonly localizedSummary?: (localization: LocalizationPort | undefined) => string;
+  readonly localizedBody?: (localization: LocalizationPort | undefined) => string;
 }
 
 interface DocsPageSpec {
@@ -413,6 +425,24 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
     title: 'Pre-made Blocks',
     summary: 'The first-party standard blocks exported by @flyingrobots/bijou.',
     body: BLOCKS_PRE_MADE_TEXT,
+  },
+  {
+    id: 'blocks-dogfood-surfaces',
+    pageId: BLOCKS_PAGE_ID,
+    title: 'blocks-dogfood-surfaces',
+    summary: '',
+    body: '',
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      'blocks.surfaceInventory.title',
+      'DOGFOOD Surface Blocks',
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'blocks.surfaceInventory.summary',
+      'The semantic Blocks DOGFOOD uses for its own visible product surfaces.',
+    ),
+    localizedBody: (localization) => dogfoodSurfaceBlockInventoryMarkdown(localization),
   },
   {
     id: BLOCK_PREVIEW_GUIDE_ID,
@@ -952,6 +982,77 @@ function standardBlockInventoryMarkdown(): string {
   ].join('\n');
 }
 
+function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): string {
+  const entries = defaultDogfoodBlockRegistry.entries();
+  const surfaceIndex = entries
+    .map((entry) => `- ${entry.blockName} -> ${entry.surfaceId} (${entry.role})`)
+    .join('\n');
+  const label = (id: string, fallback: string) => dogfoodText(
+    localization,
+    `blocks.surfaceInventory.label.${id}`,
+    fallback,
+  );
+  const blockSections = entries
+    .map((entry) => {
+      const metadata = entry.block.metadata;
+      const dataNames = entry.block.data?.names() ?? [];
+      const commandIds = entry.block.commands?.map((command) => command.id) ?? [];
+
+      return [
+        `## ${metadata.blockName}`,
+        '',
+        dogfoodSurfaceBlockDescription(entry, localization),
+        '',
+        `- ${label('surface', 'Surface')}: ${entry.surfaceId}`,
+        `- ${label('role', 'Role')}: ${entry.role}`,
+        `- ${label('family', 'Family')}: ${metadata.family}`,
+        `- ${label('scale', 'Scale')}: ${metadata.scale}`,
+        `- ${label('modes', 'Modes')}: ${metadata.modes.join(', ')}`,
+        `- ${label('dataRequirements', 'Data requirements')}: ${formatDocsList(dataNames)}`,
+        `- ${label('commandIntents', 'Command intents')}: ${formatDocsList(commandIds)}`,
+        `- ${label('tags', 'Tags')}: ${formatDocsList(entry.tags)}`,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    `# ${dogfoodText(localization, 'blocks.surfaceInventory.title', 'DOGFOOD Surface Blocks')}`,
+    '',
+    dogfoodText(
+      localization,
+      'blocks.surfaceInventory.count',
+      'DOGFOOD currently registers {count} semantic product surface Blocks.',
+      { count: entries.length },
+    ),
+    '',
+    dogfoodText(
+      localization,
+      'blocks.surfaceInventory.description',
+      'These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks.',
+    ),
+    '',
+    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceIndexTitle', 'Surface index')}`,
+    '',
+    surfaceIndex,
+    '',
+    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceDetailsTitle', 'Surface details')}`,
+    '',
+    blockSections,
+  ].join('\n');
+}
+
+function dogfoodSurfaceBlockDescription(
+  entry: DogfoodBlockRegistryEntry,
+  localization?: LocalizationPort,
+): string {
+  const fallback = entry.description ?? entry.block.metadata.docs.summary;
+  return dogfoodText(
+    localization,
+    `blocks.surfaceInventory.entry.${entry.surfaceId}.description`,
+    fallback,
+  );
+}
+
 function standardBlockPreviewMarkdown(): string {
   const storiesByBlock = new Map<string, StandardBlockStory[]>();
   for (const story of standardBlockStories) {
@@ -1353,12 +1454,38 @@ function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
   return GUIDE_DOCS.filter((doc) => doc.pageId === pageId);
 }
 
-function guideItemsForPage(pageId: DocsPageId): readonly { label: string; value: string; description?: string }[] {
+function guideDocTitle(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedTitle?.(localization) ?? doc.title;
+}
+
+function guideDocSummary(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedSummary?.(localization) ?? doc.summary;
+}
+
+function guideDocBody(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedBody?.(localization) ?? doc.body;
+}
+
+function guideItemsForPage(
+  pageId: DocsPageId,
+  localization?: LocalizationPort,
+): readonly { label: string; value: string; description?: string }[] {
   return guideDocsForPage(pageId).map((doc) => ({
-    label: doc.title,
+    label: guideDocTitle(doc, localization),
     value: doc.id,
-    description: doc.summary,
+    description: guideDocSummary(doc, localization),
   }));
+}
+
+function localizedGuideStateForPage(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  localization: LocalizationPort,
+): DocsExplorerModel['guideState'] {
+  return {
+    ...model.guideState,
+    items: guideItemsForPage(pageId, localization),
+  };
 }
 
 function pageTitle(pageId: DocsPageId, localization?: LocalizationPort): string {
@@ -1918,7 +2045,14 @@ function paintLandingBackground(
 
       for (let y = tileY; y < maxY; y++) {
         for (let x = tileX; x < maxX; x++) {
-          surface.set(x, y, { char, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
+          surface.set(x, y, {
+            char,
+            bg: tokens.background,
+            fg,
+            modifiers: modifiers as string[] | undefined,
+            empty: false,
+            opacity: 1,
+          });
         }
       }
     }
@@ -1985,7 +2119,14 @@ function paintLogoInto(
         for (let x = tileX; x < maxX; x++) {
           const targetX = destX + x;
           if (targetX < 0 || targetX >= target.width) continue;
-          target.set(targetX, targetY, { char: glyph, fg, modifiers: modifiers as string[] | undefined, empty: false, opacity: 1 });
+          target.set(targetX, targetY, {
+            char: glyph,
+            bg: tokens.background,
+            fg,
+            modifiers: modifiers as string[] | undefined,
+            empty: false,
+            opacity: 1,
+          });
         }
       }
     }
@@ -1998,6 +2139,7 @@ function createWordmarkSurface(
   tokens: LandingThemeTokens,
 ): Surface {
   return createTransparentTextSurface(lines, {
+    bg: tokens.background,
     fg: (x, y, char, totalWidth) => {
       if (char === ' ') return undefined;
       const xRatio = totalWidth <= 1 ? 0 : x / (totalWidth - 1);
@@ -2322,13 +2464,21 @@ function getLandingDogfoodPanel(
     'landing.dogfood.expansion',
     'Documentation Of Good Foundational Onboarding and Discovery',
   );
-  const key = `${tokens.id}:${width}:${title}:${expansion}`;
+  const renderedTitle = titleScreenBlock.render({
+    config: {
+      title,
+      subtitle: expansion,
+    },
+    mode: 'interactive',
+  });
+  const [panelTitle = title, panelBody = expansion] = String(renderedTitle.output).split('\n');
+  const key = `${tokens.id}:${width}:${panelTitle}:${panelBody}`;
   const cached = LANDING_DOGFOOD_PANEL_CACHE.get(key);
   if (cached) return cached;
 
   const bodyWidth = Math.max(18, width - 4);
   const body = centerSurfaceHorizontally(createTransparentTextSurface(
-    wrapToWidth(expansion, bodyWidth).join('\n'),
+    wrapToWidth(panelBody, bodyWidth).join('\n'),
     {
       bg: tokens.background,
       transparentSpaces: false,
@@ -2337,9 +2487,10 @@ function getLandingDogfoodPanel(
     },
   ), bodyWidth);
   const surface = boxSurface(body, {
-    title,
+    title: panelTitle,
     width,
     borderToken: landingDogfoodPanelBorderToken(tokens),
+    bgToken: { hex: tokens.footerStrongColor, bg: tokens.background },
     padding: { left: 1, right: 1 },
     ctx,
   });
@@ -2695,6 +2846,7 @@ function landingDogfoodPanelBorderToken(theme: LandingThemeTokens): TokenValue {
       sampleColorRamp(theme.logoRamp, 0.84),
       sampleColorRamp(theme.waveRamp, 0.78),
     ]),
+    bg: theme.background,
   };
 }
 
@@ -3145,13 +3297,14 @@ function renderGuideNavPane(
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
   const loweredMode = ctx.mode === 'pipe' || ctx.mode === 'accessible';
-  const focusedGuideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  const guideState = localizedGuideStateForPage(pageId, model, localization);
+  const focusedGuideId = guideState.items[guideState.focusIndex]?.value;
   const navigationBlockResult = navigationListBlock.render({
     config: {
       activeItemId: loweredMode
         ? focusedGuideId ?? model.selectedGuideId
         : model.selectedGuideId,
-      items: model.guideState.items.map((item) => ({
+      items: guideState.items.map((item) => ({
         id: item.value,
         label: item.label,
       })),
@@ -3160,7 +3313,7 @@ function renderGuideNavPane(
   });
   const body = loweredMode
     ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
-    : browsableListSurface(model.guideState, {
+    : browsableListSurface(guideState, {
         width: Math.max(1, paneWidth),
         showScrollbar: true,
         ctx,
@@ -3215,18 +3368,20 @@ function renderGuideReaderPane(
   }
 
   const docsWidth = Math.max(24, paneWidth - 2);
+  const docTitle = guideDocTitle(doc, localization);
+  const docBody = guideDocBody(doc, localization);
   const renderedArticle = documentationArticleBlock.render({
     config: {
-      title: doc.title,
-      body: doc.body,
-      headingCount: countMarkdownHeadings(doc.body),
+      title: docTitle,
+      body: docBody,
+      headingCount: countMarkdownHeadings(docBody),
     },
     mode: ctx.mode,
   });
   const articleBody = String(renderedArticle.output);
 
   return insetPaneSurface(column([
-    themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
+    themedSeparatorSurface(`docs • ${docTitle}`, paneWidth, ctx, theme),
     spacer(1, 1),
     proseSurface(markdown(articleBody, {
       width: docsWidth,
@@ -3245,7 +3400,10 @@ function renderGuideInfoPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
-  const description = doc?.summary
+  const selectedTitle = doc == null ? pageTitle(pageId, localization) : guideDocTitle(doc, localization);
+  const description = doc == null
+    ? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.')
+    : guideDocSummary(doc, localization)
     ?? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.');
   const currentPosture = (() => {
     switch (pageId) {
@@ -3302,7 +3460,7 @@ function renderGuideInfoPane(
   ];
   const renderedInspector = guideInspectorBlock.render({
     config: {
-      selectionLabel: doc?.title ?? pageTitle(pageId, localization),
+      selectionLabel: selectedTitle,
       sections: guideInspectorSections,
     },
     mode: ctx.mode,
@@ -3313,7 +3471,7 @@ function renderGuideInfoPane(
     spacer(1, 1),
     contentSurface(inspector({
       title: dogfoodText(localization, 'guide.info.title', 'guide info'),
-      currentValue: doc?.title ?? pageTitle(pageId, localization),
+      currentValue: selectedTitle,
       sections: ctx.mode === 'interactive' || ctx.mode === 'static'
         ? guideInspectorSections
         : [{
@@ -3332,8 +3490,11 @@ function renderGuideInfoPane(
 function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization: LocalizationPort): string {
   const pageId = (model.activePageId as DocsPageId | undefined) ?? GUIDES_PAGE_ID;
   const pageModel = model.pageModels[pageId];
+  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
   if (pageModel == null || !pageModel.showHints) {
-    return dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
+    return renderDocsFooterHint({
+      controls: shellHint,
+    });
   }
 
   const focusedPane = model.focusedPaneByPage[pageId];
@@ -3412,9 +3573,28 @@ function buildDocsFooterHint(model: FrameModel<DocsExplorerModel>, localization:
         return undefined;
     }
   })();
+  return renderDocsFooterHint({
+    controls: shellHint,
+    activeHint,
+  });
+}
 
-  const shellHint = dogfoodText(localization, 'docs.footer.shell', DOCS_SHELL_HINT);
-  return activeHint == null ? shellHint : `${shellHint} • ${activeHint}`;
+function renderDocsFooterHint(config: {
+  readonly controls: string;
+  readonly activeHint?: string;
+  readonly status?: string;
+}): string {
+  return String(footerHintBlock.render({
+    config,
+    mode: 'pipe',
+  }).output);
+}
+
+function renderDocsSearchTitle(title: string): string {
+  return String(searchPanelBlock.render({
+    config: { title },
+    mode: 'accessible',
+  }).output);
 }
 
 function familyRowIndexAtPosition(
@@ -3753,7 +3933,9 @@ function createDocsExplorerApp(
               },
             ];
           },
-          searchTitle: () => dogfoodText(localization, 'docs.search.title', 'Search components'),
+          searchTitle: () => renderDocsSearchTitle(
+            dogfoodText(localization, 'docs.search.title', 'Search components'),
+          ),
           searchItems(model) {
             return COMPONENT_STORIES.map((story) => ({
               id: story.id,
@@ -3862,12 +4044,12 @@ function createDocsExplorerApp(
           }
           return inputAreas;
         },
-        searchTitle: () => `Search ${pageTitle(spec.id, localization).toLowerCase()}`,
+        searchTitle: () => renderDocsSearchTitle(`Search ${pageTitle(spec.id, localization).toLowerCase()}`),
         searchItems() {
           return guideDocsForPage(spec.id).map((doc) => ({
             id: doc.id,
-            label: doc.title,
-            description: doc.summary,
+            label: guideDocTitle(doc, localization),
+            description: guideDocSummary(doc, localization),
             category: pageTitle(spec.id, localization),
             action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
           }));

@@ -25,9 +25,15 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'title',
   'navigation',
   'article',
+  'search',
+  'notifications',
+  'diagnostics',
+  'help',
+  'commands',
   'settings',
   'inspector',
   'preview',
+  'footer',
   'workbench',
   'fixture',
 ]);
@@ -39,9 +45,15 @@ export type DogfoodBlockRole =
   | 'title'
   | 'navigation'
   | 'article'
+  | 'search'
+  | 'notifications'
+  | 'diagnostics'
+  | 'help'
+  | 'commands'
   | 'settings'
   | 'inspector'
   | 'preview'
+  | 'footer'
   | 'workbench'
   | 'fixture';
 
@@ -206,6 +218,35 @@ export interface SettingsMenuBlockConfig {
   readonly sections?: readonly SettingsMenuBlockSection[];
 }
 
+export interface SearchPanelBlockConfig {
+  readonly title?: string;
+  readonly query?: string;
+  readonly resultCount?: number;
+  readonly activeResultLabel?: string;
+}
+
+export interface NotificationCenterBlockConfig {
+  readonly notificationCount?: number;
+  readonly activeFilterLabel?: string;
+}
+
+export interface PerfHudBlockConfig {
+  readonly fps?: number;
+  readonly frameMs?: number;
+  readonly columns?: number;
+  readonly rows?: number;
+}
+
+export interface HelpOverlayBlockConfig {
+  readonly bindingCount?: number;
+  readonly scopeLabel?: string;
+}
+
+export interface CommandPaletteBlockConfig {
+  readonly commandCount?: number;
+  readonly activeCommandLabel?: string;
+}
+
 export interface GuideInspectorBlockSection {
   readonly title: string;
   readonly content: string;
@@ -221,6 +262,12 @@ export interface GuideInspectorBlockConfig {
   readonly selectionLabel?: string;
   readonly factCount?: number;
   readonly sections?: readonly GuideInspectorBlockSection[];
+}
+
+export interface FooterHintBlockConfig {
+  readonly controls?: string;
+  readonly activeHint?: string;
+  readonly status?: string;
 }
 
 export const blockPreviewDefinitionRequirement = defineDataRequirement({
@@ -488,6 +535,481 @@ export const settingsMenuBlock: BlockDefinition<SettingsMenuBlockConfig, string>
     settingsSetShellThemeIntent,
   ],
   render: renderSettingsMenuBlock,
+});
+
+export const searchQueryRequirement = defineDataRequirement({
+  id: 'search.query',
+  resource: 'dogfood.search.query',
+  label: 'Search query',
+  description: 'Current DOGFOOD search query.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchItemsRequirement = defineDataRequirement({
+  id: 'search.items',
+  resource: 'dogfood.search.items',
+  label: 'Search results',
+  description: 'Visible DOGFOOD search result rows.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchSelectionRequirement = defineDataRequirement({
+  id: 'search.selection',
+  resource: 'dogfood.search.selection',
+  label: 'Search selection',
+  description: 'Focused DOGFOOD search result.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+});
+
+export const searchPanelData = defineViewData({
+  id: 'search-panel.data',
+  label: 'SearchPanelBlock data',
+  description: 'DOGFOOD search query, results, and focused row.',
+  requirements: [
+    { name: 'query', requirement: searchQueryRequirement },
+    { name: 'items', requirement: searchItemsRequirement },
+    { name: 'selection', requirement: searchSelectionRequirement },
+  ],
+});
+
+export const searchSubmitQueryIntent = commandIntent<{ readonly query: string }>(
+  'search.submitQuery',
+  {
+    label: 'Submit query',
+    description: 'Request DOGFOOD search results for the active query.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+  },
+);
+
+export const searchSelectResultIntent = commandIntent<{ readonly resultId: string }>(
+  'search.selectResult',
+  {
+    label: 'Select result',
+    description: 'Request activation of a DOGFOOD search result.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+  },
+);
+
+export const searchDismissIntent = commandIntent('search.dismiss', {
+  label: 'Dismiss search',
+  description: 'Request closing the DOGFOOD search surface.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'SearchPanelBlock' }],
+});
+
+export const searchPanelBlock: BlockDefinition<SearchPanelBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'SearchPanelBlock',
+    family: 'dogfood-search',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD search query and result-selection command contract.',
+      useWhen: ['DOGFOOD needs a searchable command or page picker surface.'],
+      avoidWhen: ['A surface only needs local filtering without global search semantics.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'query', required: true, description: 'Current search query.' },
+      { id: 'items', required: true, description: 'Visible search results.' },
+      { id: 'selection', required: false, description: 'Focused search result.' },
+    ],
+    variants: [
+      {
+        id: 'overlay',
+        label: 'Overlay',
+        requiredSlots: ['query', 'items'],
+        optionalSlots: ['selection'],
+        facts: [{ kind: 'state', key: 'dogfood.search.surface', value: 'overlay' }],
+      },
+    ],
+    composedComponents: ['createFramedApp() search', 'browsableListSurface()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' }],
+    storyIds: ['search-panel.overlay'],
+    examples: [{ id: 'dogfood.search', label: 'DOGFOOD search panel' }],
+    tags: ['dogfood', 'search', 'frame'],
+  },
+  data: searchPanelData,
+  commands: [
+    searchSubmitQueryIntent,
+    searchSelectResultIntent,
+    searchDismissIntent,
+  ],
+  render: renderSearchPanelBlock,
+});
+
+export const notificationItemsRequirement = defineDataRequirement({
+  id: 'notifications.items',
+  resource: 'dogfood.notifications.items',
+  label: 'Notification items',
+  description: 'Frame-owned DOGFOOD notification rows.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+});
+
+export const notificationFilterRequirement = defineDataRequirement({
+  id: 'notifications.filter',
+  resource: 'dogfood.notifications.filter',
+  label: 'Notification filter',
+  description: 'Current notification center filter state.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+});
+
+export const notificationCenterData = defineViewData({
+  id: 'notification-center.data',
+  label: 'NotificationCenterBlock data',
+  description: 'DOGFOOD notification items and filter posture.',
+  requirements: [
+    { name: 'items', requirement: notificationItemsRequirement },
+    { name: 'filter', requirement: notificationFilterRequirement },
+  ],
+});
+
+export const notificationDismissIntent = commandIntent<{ readonly notificationId: string }>(
+  'notifications.dismiss',
+  {
+    label: 'Dismiss notification',
+    description: 'Request dismissal of a DOGFOOD notification row.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NotificationCenterBlock' }],
+  },
+);
+
+export const notificationSetFilterIntent = commandIntent<{ readonly filterId: string }>(
+  'notifications.setFilter',
+  {
+    label: 'Set notification filter',
+    description: 'Request a notification center filter change.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'NotificationCenterBlock' }],
+  },
+);
+
+export const notificationCenterBlock: BlockDefinition<NotificationCenterBlockConfig, string> =
+  defineBlock({
+    metadata: {
+      packageName: DOGFOOD_BLOCK_PACKAGE,
+      blockName: 'NotificationCenterBlock',
+      family: 'dogfood-notifications',
+      scale: 'panel',
+      modes: DOGFOOD_BLOCK_MODES,
+      docs: {
+        summary: 'Owns the frame notification center contract for inspectable DOGFOOD notices.',
+        useWhen: ['DOGFOOD needs to expose notification center state and intents.'],
+        avoidWhen: ['A page only emits a transient local message without frame ownership.'],
+        relatedDocs: ['docs/DOGFOOD.md'],
+      },
+      sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+      slots: [
+        { id: 'items', required: true, description: 'Notification rows.' },
+        { id: 'filter', required: false, description: 'Current notification filter.' },
+      ],
+      variants: [
+        {
+          id: 'center',
+          label: 'Center',
+          requiredSlots: ['items'],
+          optionalSlots: ['filter'],
+          facts: [{ kind: 'state', key: 'dogfood.notifications.surface', value: 'center' }],
+        },
+      ],
+      composedComponents: ['notificationCenterSurface()', 'toast()'],
+      semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' }],
+      storyIds: ['notification-center.center'],
+      examples: [{ id: 'dogfood.notifications', label: 'DOGFOOD notification center' }],
+      tags: ['dogfood', 'notifications', 'frame'],
+    },
+    data: notificationCenterData,
+    commands: [
+      notificationDismissIntent,
+      notificationSetFilterIntent,
+    ],
+    render: renderNotificationCenterBlock,
+  });
+
+export const perfHudMetricsRequirement = defineDataRequirement({
+  id: 'perf-hud.metrics',
+  resource: 'dogfood.perfHud.metrics',
+  label: 'Performance metrics',
+  description: 'Frame timing metrics visible in the DOGFOOD perf HUD.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+});
+
+export const perfHudViewportRequirement = defineDataRequirement({
+  id: 'perf-hud.viewport',
+  resource: 'dogfood.perfHud.viewport',
+  label: 'Viewport size',
+  description: 'Current DOGFOOD terminal viewport size shown in diagnostics.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+});
+
+export const perfHudData = defineViewData({
+  id: 'perf-hud.data',
+  label: 'PerfHudBlock data',
+  description: 'DOGFOOD frame timing and viewport diagnostics.',
+  requirements: [
+    { name: 'metrics', requirement: perfHudMetricsRequirement },
+    { name: 'viewport', requirement: perfHudViewportRequirement },
+  ],
+});
+
+export const perfHudToggleIntent = commandIntent('perfHud.toggle', {
+  label: 'Toggle perf HUD',
+  description: 'Request the DOGFOOD perf HUD to open or close.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'PerfHudBlock' }],
+});
+
+export const perfHudBlock: BlockDefinition<PerfHudBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'PerfHudBlock',
+    family: 'dogfood-diagnostics',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD performance HUD diagnostics contract.',
+      useWhen: ['DOGFOOD needs inspectable timing and viewport diagnostics.'],
+      avoidWhen: ['A page needs product content rather than frame diagnostics.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+    slots: [
+      { id: 'metrics', required: true, description: 'Timing metrics.' },
+      { id: 'viewport', required: true, description: 'Viewport dimensions.' },
+    ],
+    variants: [
+      {
+        id: 'hud',
+        label: 'HUD',
+        requiredSlots: ['metrics', 'viewport'],
+        facts: [{ kind: 'state', key: 'dogfood.perfHud.surface', value: 'hud' }],
+      },
+    ],
+    composedComponents: ['renderFramePerfHudOverlay()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' }],
+    storyIds: ['perf-hud.hud'],
+    examples: [{ id: 'dogfood.perfHud', label: 'DOGFOOD perf HUD' }],
+    tags: ['dogfood', 'diagnostics', 'frame'],
+  },
+  data: perfHudData,
+  commands: [perfHudToggleIntent],
+  render: renderPerfHudBlock,
+});
+
+export const helpBindingsRequirement = defineDataRequirement({
+  id: 'help.bindings',
+  resource: 'dogfood.help.bindings',
+  label: 'Help bindings',
+  description: 'Keyboard bindings visible in the DOGFOOD help overlay.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' }],
+});
+
+export const helpScopeRequirement = defineDataRequirement({
+  id: 'help.scope',
+  resource: 'dogfood.help.scope',
+  label: 'Help scope',
+  description: 'Active page or layer scope for DOGFOOD keyboard guidance.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' }],
+});
+
+export const helpOverlayData = defineViewData({
+  id: 'help-overlay.data',
+  label: 'HelpOverlayBlock data',
+  description: 'DOGFOOD keyboard help bindings and active scope.',
+  requirements: [
+    { name: 'bindings', requirement: helpBindingsRequirement },
+    { name: 'scope', requirement: helpScopeRequirement },
+  ],
+});
+
+export const helpDismissIntent = commandIntent('help.dismiss', {
+  label: 'Dismiss help',
+  description: 'Request closing the DOGFOOD keyboard help overlay.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'HelpOverlayBlock' }],
+});
+
+export const helpOverlayBlock: BlockDefinition<HelpOverlayBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'HelpOverlayBlock',
+    family: 'dogfood-help',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD keyboard help overlay contract.',
+      useWhen: ['DOGFOOD needs page- or layer-scoped keyboard guidance.'],
+      avoidWhen: ['A surface only needs a single footer hint line.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+    slots: [
+      { id: 'bindings', required: true, description: 'Visible keyboard bindings.' },
+      { id: 'scope', required: true, description: 'Active help scope.' },
+    ],
+    variants: [
+      {
+        id: 'overlay',
+        label: 'Overlay',
+        requiredSlots: ['bindings', 'scope'],
+        facts: [{ kind: 'state', key: 'dogfood.help.surface', value: 'overlay' }],
+      },
+    ],
+    composedComponents: ['renderHelpOverlay()', 'modal()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' }],
+    storyIds: ['help-overlay.overlay'],
+    examples: [{ id: 'dogfood.help', label: 'DOGFOOD keyboard help' }],
+    tags: ['dogfood', 'help', 'frame'],
+  },
+  data: helpOverlayData,
+  commands: [helpDismissIntent],
+  render: renderHelpOverlayBlock,
+});
+
+export const commandPaletteCommandsRequirement = defineDataRequirement({
+  id: 'command-palette.commands',
+  resource: 'dogfood.commandPalette.commands',
+  label: 'Command palette commands',
+  description: 'Frame-owned DOGFOOD command palette items.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteSelectionRequirement = defineDataRequirement({
+  id: 'command-palette.selection',
+  resource: 'dogfood.commandPalette.selection',
+  label: 'Command palette selection',
+  description: 'Focused DOGFOOD command palette item.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteData = defineViewData({
+  id: 'command-palette.data',
+  label: 'CommandPaletteBlock data',
+  description: 'DOGFOOD command palette items and active command selection.',
+  requirements: [
+    { name: 'commands', requirement: commandPaletteCommandsRequirement },
+    { name: 'selection', requirement: commandPaletteSelectionRequirement },
+  ],
+});
+
+export const commandPaletteExecuteIntent = commandIntent<{ readonly commandId: string }>(
+  'commandPalette.execute',
+  {
+    label: 'Execute command',
+    description: 'Request execution of the selected DOGFOOD command palette item.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'CommandPaletteBlock' }],
+  },
+);
+
+export const commandPaletteDismissIntent = commandIntent('commandPalette.dismiss', {
+  label: 'Dismiss command palette',
+  description: 'Request closing the DOGFOOD command palette.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteBlock: BlockDefinition<CommandPaletteBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'CommandPaletteBlock',
+    family: 'dogfood-commands',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD command palette contract for global command discovery.',
+      useWhen: ['DOGFOOD needs inspectable global commands and command execution intents.'],
+      avoidWhen: ['A page only needs a local inline action row.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+    slots: [
+      { id: 'commands', required: true, description: 'Available command rows.' },
+      { id: 'selection', required: false, description: 'Focused command row.' },
+    ],
+    variants: [
+      {
+        id: 'palette',
+        label: 'Palette',
+        requiredSlots: ['commands'],
+        optionalSlots: ['selection'],
+        facts: [{ kind: 'state', key: 'dogfood.commandPalette.surface', value: 'palette' }],
+      },
+    ],
+    composedComponents: ['commandPaletteSurface()', 'modal()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+    storyIds: ['command-palette.palette'],
+    examples: [{ id: 'dogfood.commandPalette', label: 'DOGFOOD command palette' }],
+    tags: ['dogfood', 'commands', 'frame'],
+  },
+  data: commandPaletteData,
+  commands: [
+    commandPaletteExecuteIntent,
+    commandPaletteDismissIntent,
+  ],
+  render: renderCommandPaletteBlock,
+});
+
+export const footerControlsRequirement = defineDataRequirement({
+  id: 'footer.controls',
+  resource: 'dogfood.frame.footer.controls',
+  label: 'Footer controls',
+  description: 'Shell-owned controls visible in the DOGFOOD footer hint line.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'FooterHintBlock' }],
+});
+
+export const footerStatusRequirement = defineDataRequirement({
+  id: 'footer.status',
+  resource: 'dogfood.frame.footer.status',
+  label: 'Footer status',
+  description: 'Optional active pane or page status appended to the footer.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'FooterHintBlock' }],
+});
+
+export const footerHintData = defineViewData({
+  id: 'footer-hint.data',
+  label: 'FooterHintBlock data',
+  description: 'DOGFOOD frame footer controls and active status hints.',
+  requirements: [
+    { name: 'controls', requirement: footerControlsRequirement },
+    { name: 'status', requirement: footerStatusRequirement },
+  ],
+});
+
+export const footerHintBlock: BlockDefinition<FooterHintBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'FooterHintBlock',
+    family: 'dogfood-shell',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the shell footer hint contract for visible DOGFOOD controls and active status.',
+      useWhen: ['DOGFOOD needs to show shell-level key hints or active-pane controls.'],
+      avoidWhen: ['A surface needs a full help overlay or command palette.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'examples/docs/app.ts',
+    slots: [
+      { id: 'controls', required: true, description: 'Always-visible shell controls.' },
+      { id: 'status', required: false, description: 'Active-pane or page status text.' },
+    ],
+    variants: [
+      {
+        id: 'line',
+        label: 'Line',
+        requiredSlots: ['controls'],
+        optionalSlots: ['status'],
+        facts: [{ kind: 'state', key: 'dogfood.footer.surface', value: 'line' }],
+      },
+    ],
+    composedComponents: ['createFramedApp() footer', 'localized footer hints'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'FooterHintBlock' }],
+    storyIds: ['footer-hint.line'],
+    examples: [{ id: 'dogfood.footer', label: 'DOGFOOD footer hints' }],
+    tags: ['dogfood', 'footer', 'shell'],
+  },
+  data: footerHintData,
+  render: renderFooterHintBlock,
 });
 
 export const documentationArticleRequirement = defineDataRequirement({
@@ -913,6 +1435,54 @@ export const settingsMenuBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['settings', 'frame'],
 });
 
+export const searchPanelBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: searchPanelBlock,
+  role: 'search',
+  surfaceId: 'frame.search',
+  description: 'DOGFOOD frame search query and result surface.',
+  tags: ['search', 'frame'],
+});
+
+export const notificationCenterBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: notificationCenterBlock,
+  role: 'notifications',
+  surfaceId: 'frame.notifications',
+  description: 'DOGFOOD frame notification center surface.',
+  tags: ['notifications', 'frame'],
+});
+
+export const perfHudBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: perfHudBlock,
+  role: 'diagnostics',
+  surfaceId: 'frame.perfHud',
+  description: 'DOGFOOD frame performance HUD surface.',
+  tags: ['diagnostics', 'frame'],
+});
+
+export const helpOverlayBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: helpOverlayBlock,
+  role: 'help',
+  surfaceId: 'frame.help',
+  description: 'DOGFOOD frame keyboard help overlay surface.',
+  tags: ['help', 'frame'],
+});
+
+export const commandPaletteBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: commandPaletteBlock,
+  role: 'commands',
+  surfaceId: 'frame.commandPalette',
+  description: 'DOGFOOD frame command palette surface.',
+  tags: ['commands', 'frame'],
+});
+
+export const footerHintBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: footerHintBlock,
+  role: 'footer',
+  surfaceId: 'frame.footer',
+  description: 'DOGFOOD frame footer hint surface.',
+  tags: ['footer', 'frame'],
+});
+
 export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'landing.title',
   'docs.navigation',
@@ -920,6 +1490,12 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'blocks.preview',
   'guide.inspector',
   'frame.settings',
+  'frame.search',
+  'frame.notifications',
+  'frame.perfHud',
+  'frame.help',
+  'frame.commandPalette',
+  'frame.footer',
   'storybook.workbench',
 ]);
 
@@ -930,6 +1506,12 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   blockPreviewBlockRegistryEntry,
   guideInspectorBlockRegistryEntry,
   settingsMenuBlockRegistryEntry,
+  searchPanelBlockRegistryEntry,
+  notificationCenterBlockRegistryEntry,
+  perfHudBlockRegistryEntry,
+  helpOverlayBlockRegistryEntry,
+  commandPaletteBlockRegistryEntry,
+  footerHintBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
 
@@ -1203,6 +1785,201 @@ function renderSettingsMenuBlock(
       'Intents: activate row; set locale; set shell theme',
     ].join('\n'),
     facts: [{ kind: 'entity', key: 'dogfood.block', value: 'SettingsMenuBlock' }],
+  };
+}
+
+function renderSearchPanelBlock(
+  input: BlockRenderInput<SearchPanelBlockConfig>,
+): BlockRenderResult<string> {
+  const title = input.config?.title;
+  const query = input.config?.query ?? '';
+  const resultCount = input.config?.resultCount ?? 0;
+  const activeResultLabel = input.config?.activeResultLabel ?? 'none';
+  const queryLabel = query.trim() === '' ? 'empty' : query;
+  const titleOnly = title != null
+    && query.trim() === ''
+    && resultCount === 0
+    && activeResultLabel === 'none';
+  const facts = [
+    { kind: 'entity' as const, key: 'dogfood.block', value: 'SearchPanelBlock' },
+    { kind: 'state' as const, key: 'dogfood.search.resultCount', value: String(resultCount) },
+  ];
+
+  if (titleOnly) {
+    return {
+      output: title,
+      facts,
+    };
+  }
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
+      facts,
+    };
+  }
+
+  return {
+    output: [
+      'SearchPanelBlock',
+      `query: ${queryLabel}`,
+      `results: ${resultCount}`,
+      `active: ${activeResultLabel}`,
+      'Intents: submit query; select result; dismiss',
+    ].join('\n'),
+    facts,
+  };
+}
+
+function renderNotificationCenterBlock(
+  input: BlockRenderInput<NotificationCenterBlockConfig>,
+): BlockRenderResult<string> {
+  const notificationCount = input.config?.notificationCount ?? 0;
+  const activeFilterLabel = input.config?.activeFilterLabel ?? 'All';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Notification items: ${notificationCount}; filter: ${activeFilterLabel}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
+        { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'NotificationCenterBlock',
+      `items: ${notificationCount}`,
+      `filter: ${activeFilterLabel}`,
+      'Intents: dismiss notification; set filter',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
+      { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },
+    ],
+  };
+}
+
+function renderPerfHudBlock(
+  input: BlockRenderInput<PerfHudBlockConfig>,
+): BlockRenderResult<string> {
+  const fps = input.config?.fps ?? 0;
+  const frameMs = input.config?.frameMs ?? 0;
+  const columns = input.config?.columns ?? 0;
+  const rows = input.config?.rows ?? 0;
+  const frameLabel = frameMs.toFixed(2).replace(/\.?0+$/, '');
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Perf HUD fps: ${fps}; frame: ${frameLabel} ms; size: ${columns}x${rows}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
+        { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'PerfHudBlock',
+      `fps: ${fps}`,
+      `frame: ${frameLabel} ms`,
+      `size: ${columns}x${rows}`,
+      'Intents: toggle perf HUD',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'PerfHudBlock' },
+      { kind: 'state', key: 'dogfood.perfHud.fps', value: String(fps) },
+    ],
+  };
+}
+
+function renderHelpOverlayBlock(
+  input: BlockRenderInput<HelpOverlayBlockConfig>,
+): BlockRenderResult<string> {
+  const bindingCount = input.config?.bindingCount ?? 0;
+  const scopeLabel = input.config?.scopeLabel ?? 'workspace';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Help scope: ${scopeLabel}; bindings: ${bindingCount}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' },
+        { kind: 'state', key: 'dogfood.help.bindingCount', value: String(bindingCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'HelpOverlayBlock',
+      `scope: ${scopeLabel}`,
+      `bindings: ${bindingCount}`,
+      'Intents: dismiss help',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' },
+      { kind: 'state', key: 'dogfood.help.bindingCount', value: String(bindingCount) },
+    ],
+  };
+}
+
+function renderCommandPaletteBlock(
+  input: BlockRenderInput<CommandPaletteBlockConfig>,
+): BlockRenderResult<string> {
+  const commandCount = input.config?.commandCount ?? 0;
+  const activeCommandLabel = input.config?.activeCommandLabel ?? 'none';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Command palette commands: ${commandCount}; active: ${activeCommandLabel}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
+        { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'CommandPaletteBlock',
+      `commands: ${commandCount}`,
+      `active: ${activeCommandLabel}`,
+      'Intents: execute command; dismiss command palette',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
+      { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
+    ],
+  };
+}
+
+function renderFooterHintBlock(
+  input: BlockRenderInput<FooterHintBlockConfig>,
+): BlockRenderResult<string> {
+  const parts = [
+    input.config?.controls,
+    input.config?.activeHint,
+    input.config?.status,
+  ]
+    .map((part) => part?.trim())
+    .filter((part): part is string => part != null && part !== '');
+  const output = parts.length > 0 ? parts.join(' • ') : 'No footer hints';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output,
+      facts: [{ kind: 'entity', key: 'dogfood.block', value: 'FooterHintBlock' }],
+    };
+  }
+
+  return {
+    output: [
+      'FooterHintBlock',
+      output,
+    ].join('\n'),
+    facts: [{ kind: 'entity', key: 'dogfood.block', value: 'FooterHintBlock' }],
   };
 }
 

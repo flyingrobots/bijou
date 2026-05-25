@@ -680,7 +680,9 @@ function fillSurfaceBackground(
   if (backgroundToken.bg == null && backgroundToken.bgRGB == null) return;
   target.fill({
     char: ' ',
+    fg: backgroundToken.hex,
     bg: backgroundToken.bg,
+    fgRGB: backgroundToken.fgRGB,
     bgRGB: backgroundToken.bgRGB,
     empty: false,
   }, offsetCol, offsetRow, width, height);
@@ -689,15 +691,20 @@ function fillSurfaceBackground(
 function applySurfaceBackground(surface: Surface, backgroundToken: TokenValue | undefined): Surface {
   if (backgroundToken == null) return surface;
   if (backgroundToken.bg == null && backgroundToken.bgRGB == null) return surface;
+  const hasFallbackForeground = backgroundToken.hex != null || backgroundToken.fgRGB != null;
   for (let y = 0; y < surface.height; y++) {
     for (let x = 0; x < surface.width; x++) {
       const cell = surface.get(x, y);
-      if (cell.bg != null || cell.bgRGB != null) continue;
+      const needsBackground = cell.bg == null && cell.bgRGB == null;
+      const needsForeground = hasFallbackForeground && cell.fg == null && cell.fgRGB == null;
+      if (!needsBackground && !needsForeground) continue;
       surface.set(x, y, {
         ...cell,
         char: cell.char.length > 0 ? cell.char : ' ',
-        bg: backgroundToken.bg,
-        bgRGB: backgroundToken.bgRGB,
+        fg: needsForeground ? backgroundToken.hex : cell.fg,
+        bg: needsBackground ? backgroundToken.bg : cell.bg,
+        fgRGB: needsForeground ? backgroundToken.fgRGB : cell.fgRGB,
+        bgRGB: needsBackground ? backgroundToken.bgRGB : cell.bgRGB,
         empty: false,
       });
     }
