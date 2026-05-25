@@ -159,6 +159,70 @@ describe('frame shell chrome surfaces', () => {
     }
   });
 
+  it('paints unstyled pane text with the frame surface foreground', () => {
+    const ctx = createTestContext({ mode: 'interactive' });
+    setDefaultContext(ctx);
+    const expectedSurface = ctx.surface('primary');
+    const expectedFg = expectedSurface.hex;
+    const expectedBg = expectedSurface.bg;
+    expect(expectedBg).toBeDefined();
+
+    const page = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{}, []] as const,
+      update: (_msg: never, model: {}) => [model, []] as const,
+      layout: () => ({
+        kind: 'pane' as const,
+        paneId: 'main',
+        render: (width: number, height: number) => {
+          const surface = createSurface(width, height);
+          surface.set(0, 0, { char: 'A', empty: false });
+          return surface;
+        },
+      }),
+    };
+    const pagesById = new Map([['home', page]]);
+    const model = {
+      activePageId: 'home',
+      pageOrder: ['home'],
+      pageModels: { home: {} },
+      focusedPaneByPage: { home: 'main' },
+      scrollByPage: {},
+      columns: 8,
+      rows: 4,
+      helpOpen: false,
+      transitionProgress: 1,
+      transitionGeneration: 0,
+      transitionFrame: 0,
+      minimizedByPage: {},
+      maximizedPaneByPage: {},
+      dockStateByPage: {},
+      splitRatioOverrides: {},
+      runtimeNotifications: {} as never,
+      runtimeNotificationLoopActive: false,
+      warnedFrameKeyCollisionPages: {},
+    };
+    const target = createSurface(8, 4);
+
+    renderPageContentInto(
+      'home',
+      model as any,
+      { row: 0, col: 0, width: 8, height: 4 },
+      pagesById as any,
+      target,
+      0,
+      0,
+      undefined,
+      ctx,
+    );
+
+    const textCell = target.get(1, 0);
+    expect(textCell.char).toBe('A');
+    expect(textCell.fg).toBe(expectedFg);
+    expect(textCell.bg).toBe(expectedBg);
+  });
+
   it('falls back to the frame background when chrome rows have no explicit BCSS background', () => {
     const ctx = createTestContext({ mode: 'interactive' });
     setDefaultContext(ctx);

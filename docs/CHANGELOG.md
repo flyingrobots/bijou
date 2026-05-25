@@ -359,6 +359,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### 🐛 Bug Fixes
 
+- **AppFrame foreground ownership** — Frame-rendered panes now apply the
+  paired surface foreground when they paint a Bijou-owned background behind
+  unstyled cells, so DOGFOOD and other framed apps do not inherit unreadable
+  terminal-profile foreground colors after users customize their terminal
+  theme.
 - **Localization loader activation staging** — Loader-backed locale activation
   now stages third-party catalog bundles and rebuilds the candidate entry table
   before swapping loader catalogs or committing locale/direction changes, so a
