@@ -10,6 +10,7 @@ import { resolveDogfoodDocsCoverage } from '../examples/docs/coverage.js';
 import { createNodeDocsApp } from '../examples/docs/node-app.js';
 import { COMPONENT_STORIES } from '../examples/docs/stories.js';
 import { pseudoLocalize } from '../packages/bijou-i18n-tools/src/index.js';
+import { wrapPageMsg } from '../packages/bijou-tui/src/app-frame-types.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
 
@@ -236,6 +237,32 @@ describe('docs preview app', () => {
     const text = frameText(entered.frames.at(-1)!);
     expect(text).toContain(pseudoLocalize('Guides'));
     expect(text).toMatch(/Šëàřçħ/);
+  });
+
+  it('localizes the DOGFOOD surface block inventory page from the catalog', async () => {
+    const locale = 'qps-ploc';
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 48, refreshRate: 60 } });
+    const app = createDocsApp(ctx, {
+      initialRoute: 'docs',
+      initialPageId: 'blocks',
+      locale,
+      direction: 'ltr',
+      extraI18nCatalogs: [
+        withLocaleValues(DOGFOOD_I18N_CATALOG, locale, (value) => pseudoLocalize(value)),
+      ],
+    });
+
+    const selected = await runScript(app, [{
+      msg: {
+        type: 'docs',
+        msg: wrapPageMsg('blocks', { type: 'select-guide', guideId: 'blocks-dogfood-surfaces' }),
+      },
+    }], { ctx });
+    const text = frameText(selected.frames.at(-1)!);
+
+    expect(text).toContain(pseudoLocalize('DOGFOOD Surface Blocks'));
+    expect(text).toContain(pseudoLocalize('Surface index'));
+    expect(text).not.toContain('DOGFOOD currently registers');
   });
 
   it('opens landing quit confirm with escape and quits on confirmation', async () => {

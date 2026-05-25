@@ -165,7 +165,6 @@ const GUIDES_SECONDARY_EXAMPLES_TEXT = readMarkdownDoc('../../docs/EXAMPLES.md')
 const BLOCKS_WHAT_ARE_BLOCKS_TEXT = readMarkdownDoc('../../docs/design-system/blocks.md');
 const BLOCKS_MAKE_YOUR_OWN_TEXT = readMarkdownDoc('./content/blocks-make-your-own.md');
 const BLOCKS_PRE_MADE_TEXT = standardBlockInventoryMarkdown();
-const BLOCKS_DOGFOOD_SURFACES_TEXT = dogfoodSurfaceBlockInventoryMarkdown();
 const BLOCKS_PREVIEW_TEXT = standardBlockPreviewMarkdown();
 const BLOCKS_LOWERING_TEXT = standardBlockLoweringMarkdown();
 const PACKAGES_OVERVIEW_TEXT = readMarkdownDoc('./content/packages-overview.md');
@@ -244,6 +243,9 @@ interface GuideDoc {
   readonly title: string;
   readonly summary: string;
   readonly body: string;
+  readonly localizedTitle?: (localization: LocalizationPort | undefined) => string;
+  readonly localizedSummary?: (localization: LocalizationPort | undefined) => string;
+  readonly localizedBody?: (localization: LocalizationPort | undefined) => string;
 }
 
 interface DocsPageSpec {
@@ -426,9 +428,20 @@ const GUIDE_DOCS: readonly GuideDoc[] = Object.freeze([
   {
     id: 'blocks-dogfood-surfaces',
     pageId: BLOCKS_PAGE_ID,
-    title: 'DOGFOOD Surface Blocks',
-    summary: 'The semantic Blocks DOGFOOD uses for its own visible product surfaces.',
-    body: BLOCKS_DOGFOOD_SURFACES_TEXT,
+    title: 'blocks-dogfood-surfaces',
+    summary: '',
+    body: '',
+    localizedTitle: (localization) => dogfoodText(
+      localization,
+      'blocks.surfaceInventory.title',
+      'DOGFOOD Surface Blocks',
+    ),
+    localizedSummary: (localization) => dogfoodText(
+      localization,
+      'blocks.surfaceInventory.summary',
+      'The semantic Blocks DOGFOOD uses for its own visible product surfaces.',
+    ),
+    localizedBody: (localization) => dogfoodSurfaceBlockInventoryMarkdown(localization),
   },
   {
     id: BLOCK_PREVIEW_GUIDE_ID,
@@ -968,11 +981,16 @@ function standardBlockInventoryMarkdown(): string {
   ].join('\n');
 }
 
-function dogfoodSurfaceBlockInventoryMarkdown(): string {
+function dogfoodSurfaceBlockInventoryMarkdown(localization?: LocalizationPort): string {
   const entries = defaultDogfoodBlockRegistry.entries();
   const surfaceIndex = entries
     .map((entry) => `- ${entry.blockName} -> ${entry.surfaceId} (${entry.role})`)
     .join('\n');
+  const label = (id: string, fallback: string) => dogfoodText(
+    localization,
+    `blocks.surfaceInventory.label.${id}`,
+    fallback,
+  );
   const blockSections = entries
     .map((entry) => {
       const metadata = entry.block.metadata;
@@ -984,30 +1002,39 @@ function dogfoodSurfaceBlockInventoryMarkdown(): string {
         '',
         entry.description ?? metadata.docs.summary,
         '',
-        `- Surface: ${entry.surfaceId}`,
-        `- Role: ${entry.role}`,
-        `- Family: ${metadata.family}`,
-        `- Scale: ${metadata.scale}`,
-        `- Modes: ${metadata.modes.join(', ')}`,
-        `- Data requirements: ${formatDocsList(dataNames)}`,
-        `- Command intents: ${formatDocsList(commandIds)}`,
-        `- Tags: ${formatDocsList(entry.tags)}`,
+        `- ${label('surface', 'Surface')}: ${entry.surfaceId}`,
+        `- ${label('role', 'Role')}: ${entry.role}`,
+        `- ${label('family', 'Family')}: ${metadata.family}`,
+        `- ${label('scale', 'Scale')}: ${metadata.scale}`,
+        `- ${label('modes', 'Modes')}: ${metadata.modes.join(', ')}`,
+        `- ${label('dataRequirements', 'Data requirements')}: ${formatDocsList(dataNames)}`,
+        `- ${label('commandIntents', 'Command intents')}: ${formatDocsList(commandIds)}`,
+        `- ${label('tags', 'Tags')}: ${formatDocsList(entry.tags)}`,
       ].join('\n');
     })
     .join('\n\n');
 
   return [
-    '# DOGFOOD Surface Blocks',
+    `# ${dogfoodText(localization, 'blocks.surfaceInventory.title', 'DOGFOOD Surface Blocks')}`,
     '',
-    `DOGFOOD currently registers ${entries.length} semantic product surface Blocks.`,
+    dogfoodText(
+      localization,
+      'blocks.surfaceInventory.count',
+      'DOGFOOD currently registers {count} semantic product surface Blocks.',
+      { count: entries.length },
+    ),
     '',
-    'These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks.',
+    dogfoodText(
+      localization,
+      'blocks.surfaceInventory.description',
+      'These Blocks describe visible DOGFOOD app surfaces. They are local DOGFOOD contracts, not automatically promoted first-party standard Blocks.',
+    ),
     '',
-    '## Surface index',
+    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceIndexTitle', 'Surface index')}`,
     '',
     surfaceIndex,
     '',
-    '## Surface details',
+    `## ${dogfoodText(localization, 'blocks.surfaceInventory.surfaceDetailsTitle', 'Surface details')}`,
     '',
     blockSections,
   ].join('\n');
@@ -1414,12 +1441,38 @@ function guideDocsForPage(pageId: DocsPageId): readonly GuideDoc[] {
   return GUIDE_DOCS.filter((doc) => doc.pageId === pageId);
 }
 
-function guideItemsForPage(pageId: DocsPageId): readonly { label: string; value: string; description?: string }[] {
+function guideDocTitle(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedTitle?.(localization) ?? doc.title;
+}
+
+function guideDocSummary(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedSummary?.(localization) ?? doc.summary;
+}
+
+function guideDocBody(doc: GuideDoc, localization?: LocalizationPort): string {
+  return doc.localizedBody?.(localization) ?? doc.body;
+}
+
+function guideItemsForPage(
+  pageId: DocsPageId,
+  localization?: LocalizationPort,
+): readonly { label: string; value: string; description?: string }[] {
   return guideDocsForPage(pageId).map((doc) => ({
-    label: doc.title,
+    label: guideDocTitle(doc, localization),
     value: doc.id,
-    description: doc.summary,
+    description: guideDocSummary(doc, localization),
   }));
+}
+
+function localizedGuideStateForPage(
+  pageId: DocsPageId,
+  model: DocsExplorerModel,
+  localization: LocalizationPort,
+): DocsExplorerModel['guideState'] {
+  return {
+    ...model.guideState,
+    items: guideItemsForPage(pageId, localization),
+  };
 }
 
 function pageTitle(pageId: DocsPageId, localization?: LocalizationPort): string {
@@ -3231,13 +3284,14 @@ function renderGuideNavPane(
   const paneWidth = resolvePaneInnerWidth(width);
   const bodyHeight = Math.max(1, height - DOCS_FAMILY_SEPARATOR_ROWS);
   const loweredMode = ctx.mode === 'pipe' || ctx.mode === 'accessible';
-  const focusedGuideId = model.guideState.items[model.guideState.focusIndex]?.value;
+  const guideState = localizedGuideStateForPage(pageId, model, localization);
+  const focusedGuideId = guideState.items[guideState.focusIndex]?.value;
   const navigationBlockResult = navigationListBlock.render({
     config: {
       activeItemId: loweredMode
         ? focusedGuideId ?? model.selectedGuideId
         : model.selectedGuideId,
-      items: model.guideState.items.map((item) => ({
+      items: guideState.items.map((item) => ({
         id: item.value,
         label: item.label,
       })),
@@ -3246,7 +3300,7 @@ function renderGuideNavPane(
   });
   const body = loweredMode
     ? proseSurface(String(navigationBlockResult.output), Math.max(1, paneWidth))
-    : browsableListSurface(model.guideState, {
+    : browsableListSurface(guideState, {
         width: Math.max(1, paneWidth),
         showScrollbar: true,
         ctx,
@@ -3301,18 +3355,20 @@ function renderGuideReaderPane(
   }
 
   const docsWidth = Math.max(24, paneWidth - 2);
+  const docTitle = guideDocTitle(doc, localization);
+  const docBody = guideDocBody(doc, localization);
   const renderedArticle = documentationArticleBlock.render({
     config: {
-      title: doc.title,
-      body: doc.body,
-      headingCount: countMarkdownHeadings(doc.body),
+      title: docTitle,
+      body: docBody,
+      headingCount: countMarkdownHeadings(docBody),
     },
     mode: ctx.mode,
   });
   const articleBody = String(renderedArticle.output);
 
   return insetPaneSurface(column([
-    themedSeparatorSurface(`docs • ${doc.title}`, paneWidth, ctx, theme),
+    themedSeparatorSurface(`docs • ${docTitle}`, paneWidth, ctx, theme),
     spacer(1, 1),
     proseSurface(markdown(articleBody, {
       width: docsWidth,
@@ -3331,7 +3387,10 @@ function renderGuideInfoPane(
 ): Surface {
   const paneWidth = resolvePaneInnerWidth(width);
   const doc = selectedGuide(pageId, model);
-  const description = doc?.summary
+  const selectedTitle = doc == null ? pageTitle(pageId, localization) : guideDocTitle(doc, localization);
+  const description = doc == null
+    ? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.')
+    : guideDocSummary(doc, localization)
     ?? dogfoodText(localization, 'guide.info.defaultSummary', 'This section is still being expanded.');
   const currentPosture = (() => {
     switch (pageId) {
@@ -3388,7 +3447,7 @@ function renderGuideInfoPane(
   ];
   const renderedInspector = guideInspectorBlock.render({
     config: {
-      selectionLabel: doc?.title ?? pageTitle(pageId, localization),
+      selectionLabel: selectedTitle,
       sections: guideInspectorSections,
     },
     mode: ctx.mode,
@@ -3399,7 +3458,7 @@ function renderGuideInfoPane(
     spacer(1, 1),
     contentSurface(inspector({
       title: dogfoodText(localization, 'guide.info.title', 'guide info'),
-      currentValue: doc?.title ?? pageTitle(pageId, localization),
+      currentValue: selectedTitle,
       sections: ctx.mode === 'interactive' || ctx.mode === 'static'
         ? guideInspectorSections
         : [{
@@ -3976,8 +4035,8 @@ function createDocsExplorerApp(
         searchItems() {
           return guideDocsForPage(spec.id).map((doc) => ({
             id: doc.id,
-            label: doc.title,
-            description: doc.summary,
+            label: guideDocTitle(doc, localization),
+            description: guideDocSummary(doc, localization),
             category: pageTitle(spec.id, localization),
             action: { type: 'select-guide', guideId: doc.id } satisfies ExplorerMsg,
           }));

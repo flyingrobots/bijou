@@ -48,10 +48,10 @@ export const DOGFOOD_I18N_DEBT_SOURCES: readonly DogfoodI18nDebtSource[] = Objec
 ]);
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2009,
+  total: 1993,
   bySurface: Object.freeze({
     'component-stories': 1638,
-    'docs-app': 315,
+    'docs-app': 299,
     'dogfood-locale': 12,
     'storybook-app': 37,
     'storybook-workstation': 7,
