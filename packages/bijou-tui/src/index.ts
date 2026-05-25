@@ -585,6 +585,31 @@ export {
   formatKeyCombo,
 } from './keybindings.js';
 
+// Input feature events and semantic action maps
+export {
+  type InputActionBinding,
+  type InputActionMap,
+  type InputDevice,
+  type InputEvent,
+  type InputFeature,
+  type InputFeatureEvent,
+  type InputFeatureEventPattern,
+  type InputFeatureEventType,
+  type InputGestureRecognizer,
+  type InputGestureRecognizerOptions,
+  type StandardInputFeatureEventType,
+  DEFAULT_DOUBLE_TAP_MS,
+  KEYBOARD_INPUT_DEVICE_ID,
+  createInputActionMap,
+  createInputGestureRecognizer,
+  defineInputDevice,
+  defineInputFeature,
+  inputEventMatches,
+  inputFeatureEvent,
+  keyboardFeature,
+  keyboardModifierFeature,
+} from './input-map.js';
+
 // Help generation
 export {
   type BindingSource,

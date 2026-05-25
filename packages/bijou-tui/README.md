@@ -279,6 +279,26 @@ const history = appendInputRoutingRecord({ records: [] }, {
 console.log(inputRoutingInspectorText(history));
 ```
 
+Use `createInputGestureRecognizer()` and `createInputActionMap()` when raw input
+needs to become semantic gestures before routing. Bijou ships standard feature
+event names such as `press`, `held`, `release`, `tap`, `double-tap`,
+`long-press`, and lets apps provide their own event type strings.
+
+```typescript
+import {
+  createInputActionMap,
+  createInputGestureRecognizer,
+} from '@flyingrobots/bijou-tui';
+
+const recognizer = createInputGestureRecognizer({ doubleTapMs: 300 });
+const actions = createInputActionMap<{ type: 'toggle-footer' }>()
+  .bind('footer.doubleTab', 'Toggle footer', [
+    { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
+  ], { type: 'toggle-footer' });
+
+const action = actions.handle(recognizer.observeKey(keyMsg, ctx.runtime.clock.now()));
+```
+
 Use `focusMapText()` or `focusMapSurface()` when focus ownership and tab order
 need the same deterministic treatment:
 

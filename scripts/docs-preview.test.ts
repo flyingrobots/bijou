@@ -1079,7 +1079,7 @@ describe('docs preview app', () => {
       { key: KEY_DOWN },
       { key: KEY_ENTER },
       { key: KEY_TAB },
-      { key: KEY_TAB },
+      { key: KEY_TAB, delay: 350 },
     ], { ctx });
 
     const frame = result.frames[result.frames.length - 1]!;

@@ -220,6 +220,41 @@ handled/stopped owners, hit targets, command/effect labels or counts, swallowed
 input, and no-op handlers. Use it alongside `layoutInspectorOverlay()` when a
 bug could be either geometry ownership or input priority.
 
+## Input Feature Action Maps
+
+`createInputGestureRecognizer()` turns raw key messages into inspectable input
+feature events. `createInputActionMap()` then maps one or more feature events to
+an app or shell action.
+
+```typescript
+import {
+  createInputActionMap,
+  createInputGestureRecognizer,
+} from '@flyingrobots/bijou-tui';
+
+const recognizer = createInputGestureRecognizer({ doubleTapMs: 300 });
+const actions = createInputActionMap<{ type: 'toggle-footer' }>()
+  .bind('footer.doubleTab', 'Toggle footer', [
+    { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
+  ], { type: 'toggle-footer' });
+
+const inputEvent = recognizer.observeKey(keyMsg, ctx.runtime.clock.now());
+const action = actions.handle(inputEvent);
+```
+
+Feature-event patterns are arrays so compound inputs can stay declarative:
+
+```typescript
+actions.bind('ctrlDoubleTab', 'Ctrl double-tap Tab', [
+  { deviceId: 'keyboard', featureId: 'modifier.ctrl', type: 'held' },
+  { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
+], { type: 'toggle-footer' });
+```
+
+The recognizer uses caller-provided timestamps instead of owning a timer. That
+keeps gesture recognition deterministic in tests and lets hosts decide which
+clock is authoritative.
+
 ## Focus Map Surface
 
 `inspectFocusMap()` keeps focus diagnostics separate from the focus system

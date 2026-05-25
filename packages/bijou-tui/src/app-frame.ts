@@ -167,6 +167,10 @@ import {
   openCommandPalette,
   openSearchPalette,
 } from './app-frame-palette.js';
+import {
+  createInputActionMap,
+  createInputGestureRecognizer,
+} from './input-map.js';
 import type { RenderStageTiming } from './pipeline/pipeline.js';
 
 // ---------------------------------------------------------------------------
@@ -506,6 +510,7 @@ export {
 const FRAME_NOTIFICATION_TICK_MS = 40;
 const DEFAULT_FRAME_NOTIFICATION_DURATION_MS = 6_000;
 const SETTINGS_FEEDBACK_TOAST_WIDTH = 40;
+const FRAME_FOOTER_DOUBLE_TAB_MS = 300;
 const EMPTY_RUNTIME_LAYOUTS = createRuntimeRetainedLayouts();
 
 interface ResolvedFrameNotificationOptions {
@@ -810,6 +815,13 @@ export function createFramedApp<PageModel, Msg>(
     enableNotifications: options.notificationCenter != null || options.runtimeNotifications !== false,
     i18n: options.i18n,
   });
+  const frameInputRecognizer = createInputGestureRecognizer({
+    doubleTapMs: FRAME_FOOTER_DOUBLE_TAB_MS,
+  });
+  const frameInputActions = createInputActionMap<FrameAction>()
+    .bind('frame.footer.doubleTab', 'Toggle footer', [
+      { deviceId: 'keyboard', featureId: 'key.tab', type: 'double-tap' },
+    ], { type: 'toggle-footer' });
   const quitHelpKeys = createQuitHelpKeys(options.i18n);
   const helpLayerHelpKeys = createHelpLayerHelpKeys(options.i18n);
   const settingsHelpKeys = createSettingsHelpKeys(options.i18n);
@@ -1218,6 +1230,25 @@ export function createFramedApp<PageModel, Msg>(
     return [{ type: 'observed-key', msg, route }, { type: 'open-quit-confirm' }];
   }
 
+  function resolveFrameInputActionCommands(
+    msg: KeyMsg,
+    route: ObservedKeyRoute,
+  ): FrameShellCommand<Msg>[] | undefined {
+    const inputEvent = frameInputRecognizer.observeKey(msg, resolveClock(resolveFrameCtx()).now());
+    const inputAction = frameInputActions.handle(inputEvent);
+    if (inputAction == null || msg.ctrl || msg.alt || msg.shift) {
+      return undefined;
+    }
+    return [{ type: 'observed-key', msg, route }, { type: 'apply-frame-action', action: inputAction }];
+  }
+
+  function routeForFrameInputAction(layerKind: FrameLayerKind): ObservedKeyRoute {
+    if (layerKind === 'search' || layerKind === 'command-palette') return 'palette';
+    if (layerKind === 'help') return 'help';
+    if (layerKind === 'page-modal') return 'page';
+    return 'frame';
+  }
+
   function resolveFrameActionCommands(
     msg: KeyMsg,
     action: FrameAction,
@@ -1489,6 +1520,13 @@ export function createFramedApp<PageModel, Msg>(
       ({ layer }) => {
         const frameLayer = layer.model;
         if (frameLayer == null) return undefined;
+        const inputActionCommands = resolveFrameInputActionCommands(
+          msg,
+          routeForFrameInputAction(frameLayer.kind),
+        );
+        if (inputActionCommands != null) {
+          return { handled: true, commands: inputActionCommands };
+        }
 
         if (frameLayer.kind === 'search' || frameLayer.kind === 'command-palette') {
           return { handled: true, commands: handlePaletteLayerKeyCommands(msg, frameLayer.kind) };
@@ -2194,6 +2232,9 @@ export function createFramedApp<PageModel, Msg>(
         frameOverBudget: false,
         perfHudOpen: false,
         helpOpen: false,
+        footerVisible: true,
+        footerTranslateY: 0,
+        footerAnimationGeneration: 0,
         helpScrollY: 0,
         commandPaletteKind: undefined,
         settingsOpen: false,
@@ -2395,7 +2436,12 @@ export function createFramedApp<PageModel, Msg>(
       frameSurface.clear();
       frameSurface.blit(header, 0, 0);
       if (model.rows > 1) {
-        frameSurface.blit(helpLine, 0, model.rows - 1);
+        const footerVisible = model.footerVisible ?? true;
+        const footerTranslateY = Math.max(0, Math.min(1, model.footerTranslateY ?? (footerVisible ? 0 : 1)));
+        const footerRow = model.rows - helpLine.height + Math.floor(footerTranslateY * helpLine.height);
+        if (footerRow < model.rows) {
+          frameSurface.blit(helpLine, 0, footerRow);
+        }
       }
 
       let activeResult: { paneRects: ReadonlyMap<string, LayoutRect>; paneOrder: readonly string[] };

@@ -92,6 +92,38 @@ function createInteractiveContext(options: Parameters<typeof createTestContext>[
   return { clock, ctx };
 }
 
+async function collectCommandMessages<M>(
+  cmd: Cmd<M>,
+  pulses: readonly number[],
+): Promise<M[]> {
+  const messages: M[] = [];
+  const pulseHandlers = new Set<(dt: number) => void>();
+  let settled = false;
+  const promise = Promise.resolve(cmd((message) => messages.push(message), {
+    onPulse(handler) {
+      pulseHandlers.add(handler);
+      return {
+        dispose() {
+          pulseHandlers.delete(handler);
+        },
+      };
+    },
+  })).then(() => {
+    settled = true;
+  });
+
+  for (const dt of pulses) {
+    if (settled) break;
+    for (const handler of [...pulseHandlers]) {
+      handler(dt);
+    }
+    await Promise.resolve();
+  }
+
+  await promise;
+  return messages;
+}
+
 function scheduleKeys(
   ctx: ReturnType<typeof createTestContext>,
   clock: ReturnType<typeof mockClock>,
@@ -499,6 +531,70 @@ describe('createFramedApp', () => {
     expect(result.model.pageModels.home?.leftHits).toBe(1);
     expect(result.model.pageModels.home?.rightHits).toBe(1);
     expect(result.model.focusedPaneByPage.home).toBe('right');
+  });
+
+  it('toggles the footer with a double Tab gesture while preserving single Tab pane focus', async () => {
+    const page: FramePage<PageModel, Msg> = {
+      id: 'home',
+      title: 'Home',
+      init: () => [{ count: 0 }, []],
+      update: (_msg, model) => [model, []],
+      layout: () => ({
+        kind: 'split',
+        splitId: 's1',
+        state: createSplitPaneState({ ratio: 0.5 }),
+        paneA: { kind: 'pane', paneId: 'left', render: () => textView('left') },
+        paneB: { kind: 'pane', paneId: 'right', render: () => textView('right') },
+      }),
+    };
+    const app = createFramedApp({
+      title: 'Test',
+      pages: [page],
+    });
+    const tab = { type: 'key' as const, key: 'tab', ctrl: false, alt: false, shift: false };
+
+    let [model] = app.init();
+    const [afterSingleTab, singleTabCmds] = app.update(tab, model);
+
+    expect(afterSingleTab.focusedPaneByPage.home).toBe('right');
+    expect(afterSingleTab.footerVisible).toBe(true);
+    expect(afterSingleTab.footerTranslateY).toBe(0);
+    expect(singleTabCmds).toHaveLength(0);
+
+    let footerCmds: Cmd<FramedAppMsg<Msg>>[];
+    [model, footerCmds] = app.update(tab, afterSingleTab);
+
+    expect(model.focusedPaneByPage.home).toBe('right');
+    expect(model.footerVisible).toBe(false);
+    expect(footerCmds).toHaveLength(1);
+
+    const hideMessages = await collectCommandMessages(footerCmds[0]!, [0.1, 0.1]);
+    for (const message of hideMessages) {
+      [model] = app.update(message, model);
+    }
+
+    expect(model.footerVisible).toBe(false);
+    expect(model.footerTranslateY).toBe(1);
+    expect(surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    )).not.toContain('[NORMAL]');
+
+    [model] = app.update(tab, model);
+    [model, footerCmds] = app.update(tab, model);
+    expect(model.footerVisible).toBe(true);
+
+    const showMessages = await collectCommandMessages(footerCmds[0]!, [0.1, 0.1]);
+    for (const message of showMessages) {
+      [model] = app.update(message, model);
+    }
+
+    expect(model.footerVisible).toBe(true);
+    expect(model.footerTranslateY).toBe(0);
+    expect(surfaceToString(
+      normalizeViewOutput(app.view(model), { width: model.columns, height: model.rows }).surface,
+      testCtx.style,
+    )).toContain('[NORMAL]');
   });
 
   it('triggers transition animation when switching tabs', async () => {
