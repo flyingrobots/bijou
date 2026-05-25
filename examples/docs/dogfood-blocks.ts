@@ -1800,16 +1800,22 @@ function renderSearchPanelBlock(
     && query.trim() === ''
     && resultCount === 0
     && activeResultLabel === 'none';
+  const facts = [
+    { kind: 'entity' as const, key: 'dogfood.block', value: 'SearchPanelBlock' },
+    { kind: 'state' as const, key: 'dogfood.search.resultCount', value: String(resultCount) },
+  ];
+
+  if (titleOnly) {
+    return {
+      output: title,
+      facts,
+    };
+  }
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: titleOnly
-        ? title
-        : `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
-      facts: [
-        { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
-        { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
-      ],
+      output: `Search query: ${queryLabel}; results: ${resultCount}; active: ${activeResultLabel}`,
+      facts,
     };
   }
 
@@ -1821,10 +1827,7 @@ function renderSearchPanelBlock(
       `active: ${activeResultLabel}`,
       'Intents: submit query; select result; dismiss',
     ].join('\n'),
-    facts: [
-      { kind: 'entity', key: 'dogfood.block', value: 'SearchPanelBlock' },
-      { kind: 'state', key: 'dogfood.search.resultCount', value: String(resultCount) },
-    ],
+    facts,
   };
 }
 
@@ -1836,7 +1839,7 @@ function renderNotificationCenterBlock(
 
   if (input.mode === 'pipe' || input.mode === 'accessible') {
     return {
-      output: `Notifications items: ${notificationCount}; filter: ${activeFilterLabel}`,
+      output: `Notification items: ${notificationCount}; filter: ${activeFilterLabel}`,
       facts: [
         { kind: 'entity', key: 'dogfood.block', value: 'NotificationCenterBlock' },
         { kind: 'state', key: 'dogfood.notifications.count', value: String(notificationCount) },

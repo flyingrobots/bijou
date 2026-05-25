@@ -4,6 +4,7 @@ import { runScript } from '@flyingrobots/bijou-tui';
 import { createDocsApp } from '../../../examples/docs/app.js';
 import {
   defaultDogfoodBlockRegistry,
+  notificationCenterBlock,
   searchPanelBlock,
 } from '../../../examples/docs/dogfood-blocks.js';
 
@@ -57,5 +58,30 @@ describe('DF-071 DOGFOOD block-authored surfaces', () => {
     expect(text).toContain(expectedTitle);
     expect(text).toContain('What are Blocks');
     expect(text).toContain('Pre-made Blocks');
+  });
+
+  it('keeps title-only search output identical across modes', () => {
+    for (const mode of ['interactive', 'static', 'pipe', 'accessible'] as const) {
+      const result = searchPanelBlock.render({
+        config: { title: 'Search blocks' },
+        mode,
+      });
+
+      expect(result.output).toBe('Search blocks');
+      expect(result.facts).toContainEqual({
+        kind: 'state',
+        key: 'dogfood.search.resultCount',
+        value: '0',
+      });
+    }
+  });
+
+  it('lowers notification center item counts with singular modifier copy', () => {
+    for (const mode of ['pipe', 'accessible'] as const) {
+      expect(notificationCenterBlock.render({
+        config: { notificationCount: 2, activeFilterLabel: 'Actionable' },
+        mode,
+      }).output).toBe('Notification items: 2; filter: Actionable');
+    }
   });
 });
