@@ -258,7 +258,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
         activeFilterLabel: 'Unread',
       },
       mode: 'pipe',
-    }).output).toBe('Notifications items: 4; filter: Unread');
+    }).output).toBe('Notification items: 4; filter: Unread');
   });
 
   it('publishes DOGFOOD performance HUD as an inspectable diagnostics surface', () => {
