@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### ✨ Features
 
+- **DOGFOOD block-authored shell surfaces** — DOGFOOD now routes footer hint
+  text through `FooterHintBlock`, routes frame search title text through
+  `SearchPanelBlock`, and publishes registry-backed block contracts for
+  notifications, the performance HUD, keyboard help, the command palette, and a
+  generated DOGFOOD surface inventory page. Generic `AppFrame` renderers still
+  own the frame overlays; DOGFOOD owns the semantic surface contracts, data
+  requirements, command intents, and inspection inventory.
 - **Word-aware prose surfaces for `bijou-tui`** — `@flyingrobots/bijou-tui`
   now exports `proseSurface()` for paragraph-like text that should wrap at
   word boundaries before entering surface-land. Existing `contentSurface()`
