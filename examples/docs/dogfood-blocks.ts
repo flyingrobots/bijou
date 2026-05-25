@@ -29,6 +29,7 @@ const DOGFOOD_BLOCK_ROLES: readonly DogfoodBlockRole[] = Object.freeze([
   'notifications',
   'diagnostics',
   'help',
+  'commands',
   'settings',
   'inspector',
   'preview',
@@ -48,6 +49,7 @@ export type DogfoodBlockRole =
   | 'notifications'
   | 'diagnostics'
   | 'help'
+  | 'commands'
   | 'settings'
   | 'inspector'
   | 'preview'
@@ -238,6 +240,11 @@ export interface PerfHudBlockConfig {
 export interface HelpOverlayBlockConfig {
   readonly bindingCount?: number;
   readonly scopeLabel?: string;
+}
+
+export interface CommandPaletteBlockConfig {
+  readonly commandCount?: number;
+  readonly activeCommandLabel?: string;
 }
 
 export interface GuideInspectorBlockSection {
@@ -858,6 +865,89 @@ export const helpOverlayBlock: BlockDefinition<HelpOverlayBlockConfig, string> =
   render: renderHelpOverlayBlock,
 });
 
+export const commandPaletteCommandsRequirement = defineDataRequirement({
+  id: 'command-palette.commands',
+  resource: 'dogfood.commandPalette.commands',
+  label: 'Command palette commands',
+  description: 'Frame-owned DOGFOOD command palette items.',
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteSelectionRequirement = defineDataRequirement({
+  id: 'command-palette.selection',
+  resource: 'dogfood.commandPalette.selection',
+  label: 'Command palette selection',
+  description: 'Focused DOGFOOD command palette item.',
+  optional: true,
+  facts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteData = defineViewData({
+  id: 'command-palette.data',
+  label: 'CommandPaletteBlock data',
+  description: 'DOGFOOD command palette items and active command selection.',
+  requirements: [
+    { name: 'commands', requirement: commandPaletteCommandsRequirement },
+    { name: 'selection', requirement: commandPaletteSelectionRequirement },
+  ],
+});
+
+export const commandPaletteExecuteIntent = commandIntent<{ readonly commandId: string }>(
+  'commandPalette.execute',
+  {
+    label: 'Execute command',
+    description: 'Request execution of the selected DOGFOOD command palette item.',
+    facts: [{ kind: 'entity', key: 'dogfood.command', value: 'CommandPaletteBlock' }],
+  },
+);
+
+export const commandPaletteDismissIntent = commandIntent('commandPalette.dismiss', {
+  label: 'Dismiss command palette',
+  description: 'Request closing the DOGFOOD command palette.',
+  facts: [{ kind: 'entity', key: 'dogfood.command', value: 'CommandPaletteBlock' }],
+});
+
+export const commandPaletteBlock: BlockDefinition<CommandPaletteBlockConfig, string> = defineBlock({
+  metadata: {
+    packageName: DOGFOOD_BLOCK_PACKAGE,
+    blockName: 'CommandPaletteBlock',
+    family: 'dogfood-commands',
+    scale: 'panel',
+    modes: DOGFOOD_BLOCK_MODES,
+    docs: {
+      summary: 'Owns the DOGFOOD command palette contract for global command discovery.',
+      useWhen: ['DOGFOOD needs inspectable global commands and command execution intents.'],
+      avoidWhen: ['A page only needs a local inline action row.'],
+      relatedDocs: ['docs/DOGFOOD.md'],
+    },
+    sourcePath: 'packages/bijou-tui/src/app-frame.ts',
+    slots: [
+      { id: 'commands', required: true, description: 'Available command rows.' },
+      { id: 'selection', required: false, description: 'Focused command row.' },
+    ],
+    variants: [
+      {
+        id: 'palette',
+        label: 'Palette',
+        requiredSlots: ['commands'],
+        optionalSlots: ['selection'],
+        facts: [{ kind: 'state', key: 'dogfood.commandPalette.surface', value: 'palette' }],
+      },
+    ],
+    composedComponents: ['commandPaletteSurface()', 'modal()'],
+    semanticFacts: [{ kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' }],
+    storyIds: ['command-palette.palette'],
+    examples: [{ id: 'dogfood.commandPalette', label: 'DOGFOOD command palette' }],
+    tags: ['dogfood', 'commands', 'frame'],
+  },
+  data: commandPaletteData,
+  commands: [
+    commandPaletteExecuteIntent,
+    commandPaletteDismissIntent,
+  ],
+  render: renderCommandPaletteBlock,
+});
+
 export const footerControlsRequirement = defineDataRequirement({
   id: 'footer.controls',
   resource: 'dogfood.frame.footer.controls',
@@ -1377,6 +1467,14 @@ export const helpOverlayBlockRegistryEntry = dogfoodBlockRegistryEntry({
   tags: ['help', 'frame'],
 });
 
+export const commandPaletteBlockRegistryEntry = dogfoodBlockRegistryEntry({
+  block: commandPaletteBlock,
+  role: 'commands',
+  surfaceId: 'frame.commandPalette',
+  description: 'DOGFOOD frame command palette surface.',
+  tags: ['commands', 'frame'],
+});
+
 export const footerHintBlockRegistryEntry = dogfoodBlockRegistryEntry({
   block: footerHintBlock,
   role: 'footer',
@@ -1396,6 +1494,7 @@ export const requiredDogfoodBlockSurfaceIds: readonly string[] = Object.freeze([
   'frame.notifications',
   'frame.perfHud',
   'frame.help',
+  'frame.commandPalette',
   'frame.footer',
   'storybook.workbench',
 ]);
@@ -1411,6 +1510,7 @@ export const defaultDogfoodBlockRegistry = dogfoodBlockRegistry([
   notificationCenterBlockRegistryEntry,
   perfHudBlockRegistryEntry,
   helpOverlayBlockRegistryEntry,
+  commandPaletteBlockRegistryEntry,
   footerHintBlockRegistryEntry,
   storybookWorkbenchBlockRegistryEntry,
 ]);
@@ -1818,6 +1918,36 @@ function renderHelpOverlayBlock(
     facts: [
       { kind: 'entity', key: 'dogfood.block', value: 'HelpOverlayBlock' },
       { kind: 'state', key: 'dogfood.help.bindingCount', value: String(bindingCount) },
+    ],
+  };
+}
+
+function renderCommandPaletteBlock(
+  input: BlockRenderInput<CommandPaletteBlockConfig>,
+): BlockRenderResult<string> {
+  const commandCount = input.config?.commandCount ?? 0;
+  const activeCommandLabel = input.config?.activeCommandLabel ?? 'none';
+
+  if (input.mode === 'pipe' || input.mode === 'accessible') {
+    return {
+      output: `Command palette commands: ${commandCount}; active: ${activeCommandLabel}`,
+      facts: [
+        { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
+        { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
+      ],
+    };
+  }
+
+  return {
+    output: [
+      'CommandPaletteBlock',
+      `commands: ${commandCount}`,
+      `active: ${activeCommandLabel}`,
+      'Intents: execute command; dismiss command palette',
+    ].join('\n'),
+    facts: [
+      { kind: 'entity', key: 'dogfood.block', value: 'CommandPaletteBlock' },
+      { kind: 'state', key: 'dogfood.commandPalette.commandCount', value: String(commandCount) },
     ],
   };
 }

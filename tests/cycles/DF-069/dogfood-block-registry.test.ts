@@ -6,6 +6,8 @@ import {
 import {
   blockPreviewBlock,
   blockPreviewBlockRegistryEntry,
+  commandPaletteBlock,
+  commandPaletteBlockRegistryEntry,
   DOGFOOD_BLOCK_PACKAGE,
   defaultDogfoodBlockRegistry,
   documentationArticleBlock,
@@ -293,6 +295,27 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
     }).output).toBe('Help scope: Blocks page; bindings: 12');
   });
 
+  it('publishes DOGFOOD command palette as an inspectable command surface', () => {
+    expect(commandPaletteBlockRegistryEntry.block).toBe(commandPaletteBlock);
+    expect(commandPaletteBlockRegistryEntry.role).toBe('commands');
+    expect(defaultDogfoodBlockRegistry.forSurface('frame.commandPalette')).toBe(
+      commandPaletteBlockRegistryEntry,
+    );
+    expect(commandPaletteBlock.data?.names()).toEqual(['commands', 'selection']);
+    expect(commandPaletteBlock.commands?.map((intent) => intent.id)).toEqual([
+      'commandPalette.execute',
+      'commandPalette.dismiss',
+    ]);
+
+    expect(commandPaletteBlock.render({
+      config: {
+        commandCount: 8,
+        activeCommandLabel: 'Open settings',
+      },
+      mode: 'pipe',
+    }).output).toBe('Command palette commands: 8; active: Open settings');
+  });
+
   it('publishes DOGFOOD documentation articles as semantic content blocks', () => {
     expect(documentationArticleBlockRegistryEntry.block).toBe(documentationArticleBlock);
     expect(documentationArticleBlockRegistryEntry.role).toBe('article');
@@ -405,6 +428,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'frame.notifications',
       'frame.perfHud',
       'frame.help',
+      'frame.commandPalette',
       'frame.footer',
       'storybook.workbench',
     ]);
@@ -419,6 +443,7 @@ describe('DF-069 DOGFOOD block registry primitives', () => {
       'NotificationCenterBlock',
       'PerfHudBlock',
       'HelpOverlayBlock',
+      'CommandPaletteBlock',
       'FooterHintBlock',
       'StorybookWorkbenchBlock',
     ]);
